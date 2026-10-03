@@ -1,0 +1,124 @@
+[gd_scene load_steps=51 format=3]
+
+[ext_resource type="Script" path="res://zombie_test.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0001.png" id="idle_0001"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0002.png" id="idle_0002"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0003.png" id="idle_0003"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0004.png" id="idle_0004"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0005.png" id="idle_0005"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0006.png" id="idle_0006"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0007.png" id="idle_0007"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0008.png" id="idle_0008"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0009.png" id="idle_0009"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0010.png" id="idle_0010"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0011.png" id="idle_0011"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0012.png" id="idle_0012"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0013.png" id="idle_0013"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0014.png" id="idle_0014"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0015.png" id="idle_0015"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0016.png" id="idle_0016"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0017.png" id="idle_0017"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0018.png" id="idle_0018"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0019.png" id="idle_0019"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0020.png" id="idle_0020"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0021.png" id="idle_0021"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0022.png" id="idle_0022"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0023.png" id="idle_0023"]
+[ext_resource type="Texture2D" path="res://assets/zombie/idle/zombie_idle_0024.png" id="idle_0024"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0001.png" id="walk_0001"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0002.png" id="walk_0002"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0003.png" id="walk_0003"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0004.png" id="walk_0004"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0005.png" id="walk_0005"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0006.png" id="walk_0006"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0007.png" id="walk_0007"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0008.png" id="walk_0008"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0009.png" id="walk_0009"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0010.png" id="walk_0010"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0011.png" id="walk_0011"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0012.png" id="walk_0012"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0013.png" id="walk_0013"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0014.png" id="walk_0014"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0015.png" id="walk_0015"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0016.png" id="walk_0016"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0017.png" id="walk_0017"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0018.png" id="walk_0018"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0019.png" id="walk_0019"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0020.png" id="walk_0020"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0021.png" id="walk_0021"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0022.png" id="walk_0022"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0023.png" id="walk_0023"]
+[ext_resource type="Texture2D" path="res://assets/zombie/walk/zombie_walk_0024.png" id="walk_0024"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_zombie"]
+animations = [{
+"frames": [
+{"duration": 1.0, "texture": ExtResource("idle_0001")},
+{"duration": 1.0, "texture": ExtResource("idle_0002")},
+{"duration": 1.0, "texture": ExtResource("idle_0003")},
+{"duration": 1.0, "texture": ExtResource("idle_0004")},
+{"duration": 1.0, "texture": ExtResource("idle_0005")},
+{"duration": 1.0, "texture": ExtResource("idle_0006")},
+{"duration": 1.0, "texture": ExtResource("idle_0007")},
+{"duration": 1.0, "texture": ExtResource("idle_0008")},
+{"duration": 1.0, "texture": ExtResource("idle_0009")},
+{"duration": 1.0, "texture": ExtResource("idle_0010")},
+{"duration": 1.0, "texture": ExtResource("idle_0011")},
+{"duration": 1.0, "texture": ExtResource("idle_0012")},
+{"duration": 1.0, "texture": ExtResource("idle_0013")},
+{"duration": 1.0, "texture": ExtResource("idle_0014")},
+{"duration": 1.0, "texture": ExtResource("idle_0015")},
+{"duration": 1.0, "texture": ExtResource("idle_0016")},
+{"duration": 1.0, "texture": ExtResource("idle_0017")},
+{"duration": 1.0, "texture": ExtResource("idle_0018")},
+{"duration": 1.0, "texture": ExtResource("idle_0019")},
+{"duration": 1.0, "texture": ExtResource("idle_0020")},
+{"duration": 1.0, "texture": ExtResource("idle_0021")},
+{"duration": 1.0, "texture": ExtResource("idle_0022")},
+{"duration": 1.0, "texture": ExtResource("idle_0023")},
+{"duration": 1.0, "texture": ExtResource("idle_0024")}
+],
+"loop": true,
+"name": &"idle",
+"speed": 24.0
+}, {
+"frames": [
+{"duration": 1.0, "texture": ExtResource("walk_0001")},
+{"duration": 1.0, "texture": ExtResource("walk_0002")},
+{"duration": 1.0, "texture": ExtResource("walk_0003")},
+{"duration": 1.0, "texture": ExtResource("walk_0004")},
+{"duration": 1.0, "texture": ExtResource("walk_0005")},
+{"duration": 1.0, "texture": ExtResource("walk_0006")},
+{"duration": 1.0, "texture": ExtResource("walk_0007")},
+{"duration": 1.0, "texture": ExtResource("walk_0008")},
+{"duration": 1.0, "texture": ExtResource("walk_0009")},
+{"duration": 1.0, "texture": ExtResource("walk_0010")},
+{"duration": 1.0, "texture": ExtResource("walk_0011")},
+{"duration": 1.0, "texture": ExtResource("walk_0012")},
+{"duration": 1.0, "texture": ExtResource("walk_0013")},
+{"duration": 1.0, "texture": ExtResource("walk_0014")},
+{"duration": 1.0, "texture": ExtResource("walk_0015")},
+{"duration": 1.0, "texture": ExtResource("walk_0016")},
+{"duration": 1.0, "texture": ExtResource("walk_0017")},
+{"duration": 1.0, "texture": ExtResource("walk_0018")},
+{"duration": 1.0, "texture": ExtResource("walk_0019")},
+{"duration": 1.0, "texture": ExtResource("walk_0020")},
+{"duration": 1.0, "texture": ExtResource("walk_0021")},
+{"duration": 1.0, "texture": ExtResource("walk_0022")},
+{"duration": 1.0, "texture": ExtResource("walk_0023")},
+{"duration": 1.0, "texture": ExtResource("walk_0024")}
+],
+"loop": true,
+"name": &"walk",
+"speed": 24.0
+}]
+
+[node name="ZombieTest" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Zombie" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(480, 270)
+sprite_frames = SubResource("SpriteFrames_zombie")
+animation = &"idle"
+autoplay = "idle"
