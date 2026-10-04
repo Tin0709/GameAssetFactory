@@ -1,0 +1,33 @@
+{
+  "triangles": 2828,
+  "vertices": 1496,
+  "materials": 6,
+  "bones": 20,
+  "height": 1.8727,
+  "bounds_z": [
+    0.0,
+    1.87275
+  ],
+  "hierarchy": {
+    "Root": null,
+    "Hips": "Root",
+    "Spine": "Hips",
+    "Chest": "Spine",
+    "Neck": "Chest",
+    "Head": "Neck",
+    "Clavicle.R": "Chest",
+    "UpperArm.R": "Clavicle.R",
+    "Forearm.R": "UpperArm.R",
+    "Hand.R": "Forearm.R",
+    "Clavicle.L": "Chest",
+    "UpperArm.L": "Clavicle.L",
+    "Forearm.L": "UpperArm.L",
+    "Hand.L": "Forearm.L",
+    "Thigh.R": "Hips",
+    "Shin.R": "Thigh.R",
+    "Foot.R": "Shin.R",
+    "Thigh.L": "Hips",
+    "Shin.L": "Thigh.L",
+    "Foot.L": "Shin.L"
+  }
+}
