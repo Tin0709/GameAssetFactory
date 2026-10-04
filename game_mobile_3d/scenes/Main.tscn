@@ -1,0 +1,402 @@
+[gd_scene load_steps=14 format=3]
+[ext_resource type="Environment" path="res://environment/Courtyard.tres" id="1_env"]
+[ext_resource type="Script" path="res://scripts/debug_overlay.gd" id="2_debug"]
+[ext_resource type="Material" path="res://materials/Cyan.tres" id="mat_Cyan"]
+[ext_resource type="Material" path="res://materials/DarkStone.tres" id="mat_DarkStone"]
+[ext_resource type="Material" path="res://materials/Edge.tres" id="mat_Edge"]
+[ext_resource type="Material" path="res://materials/Ground.tres" id="mat_Ground"]
+[ext_resource type="Material" path="res://materials/LightStone.tres" id="mat_LightStone"]
+[ext_resource type="Material" path="res://materials/Moss.tres" id="mat_Moss"]
+[ext_resource type="Material" path="res://materials/Path.tres" id="mat_Path"]
+[ext_resource type="Material" path="res://materials/Stone.tres" id="mat_Stone"]
+[sub_resource type="BoxMesh" id="Box"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="CylinderMesh" id="Crystal"]
+top_radius = 0.0
+bottom_radius = 0.65
+height = 1.8
+radial_segments = 4
+rings = 1
+
+[sub_resource type="StyleBoxFlat" id="Panel"]
+bg_color = Color(0.035, 0.075, 0.095, 1)
+border_width_left = 3
+border_color = Color(0.1, 0.85, 0.91, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("1_env")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(17, 20, 23)
+rotation_degrees = Vector3(-35, 36.5, 0)
+projection = 1
+size = 25.0
+near = 0.1
+far = 65.0
+current = true
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, -28, 0)
+light_color = Color(1, 0.85, 0.66, 1)
+light_energy = 1.25
+shadow_enabled = true
+shadow_bias = 0.08
+directional_shadow_mode = 0
+directional_shadow_max_distance = 48.0
+
+[node name="Courtyard" type="Node3D" parent="."]
+
+[node name="Foundation" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, -0.65, 0)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(17, 1.2, 14)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Edge")
+cast_shadow = 0
+
+[node name="GrassPlatform" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0, 0)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(16.6, 0.22, 13.6)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Ground")
+cast_shadow = 0
+
+[node name="SanctumFloor" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.18, -0.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(7.6, 0.18, 6.8)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_DarkStone")
+cast_shadow = 0
+
+[node name="InnerFloor" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.29, -0.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(6.8, 0.08, 6.0)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Path")
+cast_shadow = 0
+
+[node name="AltarBase" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.48, -0.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(2.6, 0.36, 2.6)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 1
+
+[node name="AltarCap" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.73, -0.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(2.1, 0.16, 2.1)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_LightStone")
+cast_shadow = 0
+
+[node name="AltarDarkInset" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.84, -0.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.6, 0.06, 1.6)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_DarkStone")
+cast_shadow = 0
+
+[node name="RuneSide-1" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-1, 0.825, -0.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(0.07, 0.02, 1.6)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Cyan")
+cast_shadow = 0
+
+[node name="RuneSide1" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(1, 0.825, -0.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(0.07, 0.02, 1.6)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Cyan")
+cast_shadow = 0
+
+[node name="RuneEnd-1.8" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.825, -1.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.8, 0.02, 0.07)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Cyan")
+cast_shadow = 0
+
+[node name="RuneEnd0.2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.825, 0.2)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.8, 0.02, 0.07)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Cyan")
+cast_shadow = 0
+
+[node name="WestWall" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-5.5, 1.0, -2.9)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.0, 1.8, 5.0)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 1
+
+[node name="WestWallCap" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-5.5, 1.97, -3.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.2, 0.18, 3.2)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_LightStone")
+cast_shadow = 0
+
+[node name="NorthWall" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-2.3, 0.9, -5.3)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(5.5, 1.6, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 1
+
+[node name="NorthBrokenWall" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(4.3, 0.6, -5.3)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(3.0, 1.0, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 1
+
+[node name="PillarFoot-3.2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-3.2, 0.45, -3.4)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.35, 0.35, 1.35)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_DarkStone")
+cast_shadow = 0
+
+[node name="Pillar-3.2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-3.2, 1.95, -3.4)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(0.85, 2.65, 0.85)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 1
+
+[node name="PillarCrown-3.2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-3.2, 3.36, -3.4)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.22, 0.25, 1.22)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_LightStone")
+cast_shadow = 1
+
+[node name="PillarRune-3.2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-3.2, 2.3, -2.965)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(0.12, 0.65, 0.025)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Cyan")
+cast_shadow = 0
+
+[node name="PillarFoot3.2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(3.2, 0.45, -3.4)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.35, 0.35, 1.35)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_DarkStone")
+cast_shadow = 0
+
+[node name="Pillar3.2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(3.2, 1.95, -3.4)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(0.85, 2.65, 0.85)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 1
+
+[node name="PillarCrown3.2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(3.2, 3.36, -3.4)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.22, 0.25, 1.22)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_LightStone")
+cast_shadow = 1
+
+[node name="PillarRune3.2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(3.2, 2.3, -2.965)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(0.12, 0.65, 0.025)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Cyan")
+cast_shadow = 0
+
+[node name="BrokenLintel" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-2.1, 3.60, -3.4)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(3.1, 0.28, 1.0)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 1
+
+[node name="EastBrokenPillar" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(5.0, 0.8, 1.4)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.0, 1.4, 1.0)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 1
+
+[node name="EastPillarCap" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(5.0, 1.58, 1.4)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.2, 0.16, 1.2)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_LightStone")
+cast_shadow = 0
+
+[node name="Approach0" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.17, 1.7)
+rotation_degrees = Vector3(0, -4, 0)
+scale = Vector3(1.8, 0.13, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Path")
+cast_shadow = 0
+
+[node name="Approach1" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.17, 2.8)
+rotation_degrees = Vector3(0, -1, 0)
+scale = Vector3(1.8, 0.13, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Path")
+cast_shadow = 0
+
+[node name="Approach2" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.17, 3.9)
+rotation_degrees = Vector3(0, 2, 0)
+scale = Vector3(1.8, 0.13, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Path")
+cast_shadow = 0
+
+[node name="Approach3" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 0.17, 5)
+rotation_degrees = Vector3(0, 5, 0)
+scale = Vector3(1.8, 0.13, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Path")
+cast_shadow = 0
+
+[node name="RubbleA" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-4.2, 0.34, 1.8)
+rotation_degrees = Vector3(0, 23, 0)
+scale = Vector3(1.4, 0.45, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 0
+
+[node name="RubbleB" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-5.7, 0.31, 2.7)
+rotation_degrees = Vector3(0, -16, 0)
+scale = Vector3(0.65, 0.4, 0.9)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_LightStone")
+cast_shadow = 0
+
+[node name="RubbleC" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(4.0, 0.35, 3.6)
+rotation_degrees = Vector3(0, 35, 0)
+scale = Vector3(1.1, 0.5, 0.7)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Stone")
+cast_shadow = 0
+
+[node name="RubbleD" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(5.8, 0.28, -2.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(0.8, 0.32, 1.2)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_DarkStone")
+cast_shadow = 0
+
+[node name="MossWest" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(-6.2, 0.16, -1.6)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(0.9, 0.09, 2.4)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Moss")
+cast_shadow = 0
+
+[node name="MossNorth" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(2.4, 0.16, -5.8)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(2.4, 0.09, 0.6)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Moss")
+cast_shadow = 0
+
+[node name="MossEast" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(5.5, 0.16, 2.9)
+rotation_degrees = Vector3(0, 0, 0)
+scale = Vector3(1.0, 0.09, 1.5)
+mesh = SubResource("Box")
+material_override = ExtResource("mat_Moss")
+cast_shadow = 0
+
+[node name="CrystalTip" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0, 2.3, -0.8)
+rotation_degrees = Vector3(0, 45, -8)
+mesh = SubResource("Crystal")
+material_override = ExtResource("mat_Cyan")
+cast_shadow = 0
+
+[node name="CrystalBase" type="MeshInstance3D" parent="Courtyard"]
+position = Vector3(0.09, 1.1, -0.8)
+rotation_degrees = Vector3(0, 45, 172)
+scale = Vector3(1, 0.34, 1)
+mesh = SubResource("Crystal")
+material_override = ExtResource("mat_Cyan")
+cast_shadow = 0
+
+[node name="DebugOverlay" type="CanvasLayer" parent="."]
+script = ExtResource("2_debug")
+
+[node name="Margin" type="MarginContainer" parent="DebugOverlay"]
+offset_left = 28.0
+offset_top = 24.0
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="DebugOverlay/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Padding" type="MarginContainer" parent="DebugOverlay/Margin/Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 10
+
+[node name="Rows" type="VBoxContainer" parent="DebugOverlay/Margin/Panel/Padding"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="DebugOverlay/Margin/Panel/Padding/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.94, 0.95, 1)
+theme_override_font_sizes/font_size = 16
+text = "CYAN SANCTUM / VISUAL LAB"
+
+[node name="Metrics" type="Label" parent="DebugOverlay/Margin/Panel/Padding/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Measuring frame time..."
+

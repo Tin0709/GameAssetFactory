@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "Ground"
+albedo_color = Color(0.25, 0.37, 0.30, 1)
+roughness = 1.0
+specular_mode = 2
+
+

@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "LightStone"
+albedo_color = Color(0.76, 0.69, 0.50, 1)
+roughness = 1.0
+specular_mode = 2
+
+

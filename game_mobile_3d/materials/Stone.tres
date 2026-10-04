@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "Stone"
+albedo_color = Color(0.60, 0.55, 0.41, 1)
+roughness = 1.0
+specular_mode = 2
+
+
