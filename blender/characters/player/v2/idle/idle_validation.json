@@ -1,0 +1,223 @@
+{
+  "action": "Player_Idle",
+  "fps": 24,
+  "playback_frames": [
+    1,
+    48
+  ],
+  "closure_frame": 49,
+  "duration_seconds": 2,
+  "sample_count": 193,
+  "max_sole_drift_mm": 0.0008810921915265965,
+  "root_matrix_error": 0,
+  "object_translation_m": 0,
+  "closure_vertex_difference_m": 0.0,
+  "curve_closure_error": 0.0,
+  "seam_tangent_error": 1.056497112017496e-10,
+  "min_edge_length_ratio": 0.8137711953901925,
+  "max_edge_length_ratio": 1.187765818217379,
+  "weight_changes": false,
+  "rest_structure_changes": false,
+  "frames": [
+    {
+      "frame": 1,
+      "max_sole_drift_mm": 0.0
+    },
+    {
+      "frame": 2,
+      "max_sole_drift_mm": 0.00029730057273400987
+    },
+    {
+      "frame": 3,
+      "max_sole_drift_mm": 0.0006988327118936495
+    },
+    {
+      "frame": 4,
+      "max_sole_drift_mm": 0.0007512636738247908
+    },
+    {
+      "frame": 5,
+      "max_sole_drift_mm": 0.0006557070240677838
+    },
+    {
+      "frame": 6,
+      "max_sole_drift_mm": 0.00029704053179369723
+    },
+    {
+      "frame": 7,
+      "max_sole_drift_mm": 5.9720946631883826e-05
+    },
+    {
+      "frame": 8,
+      "max_sole_drift_mm": 0.0001456946938422611
+    },
+    {
+      "frame": 9,
+      "max_sole_drift_mm": 0.0002738180430958992
+    },
+    {
+      "frame": 10,
+      "max_sole_drift_mm": 0.0003222217967869311
+    },
+    {
+      "frame": 11,
+      "max_sole_drift_mm": 0.00036483276588996353
+    },
+    {
+      "frame": 12,
+      "max_sole_drift_mm": 0.00028770114908611847
+    },
+    {
+      "frame": 13,
+      "max_sole_drift_mm": 0.0001212868883531602
+    },
+    {
+      "frame": 14,
+      "max_sole_drift_mm": 0.00031385985297074703
+    },
+    {
+      "frame": 15,
+      "max_sole_drift_mm": 0.000541462617137257
+    },
+    {
+      "frame": 16,
+      "max_sole_drift_mm": 0.0006423243839402848
+    },
+    {
+      "frame": 17,
+      "max_sole_drift_mm": 0.0006546331565252931
+    },
+    {
+      "frame": 18,
+      "max_sole_drift_mm": 0.0004568350384598228
+    },
+    {
+      "frame": 19,
+      "max_sole_drift_mm": 3.332000937312528e-05
+    },
+    {
+      "frame": 20,
+      "max_sole_drift_mm": 0.0005971629890654647
+    },
+    {
+      "frame": 21,
+      "max_sole_drift_mm": 0.0008207930107330851
+    },
+    {
+      "frame": 22,
+      "max_sole_drift_mm": 0.0007144506845968878
+    },
+    {
+      "frame": 23,
+      "max_sole_drift_mm": 0.00047047745431771037
+    },
+    {
+      "frame": 24,
+      "max_sole_drift_mm": 0.0002372753317373917
+    },
+    {
+      "frame": 25,
+      "max_sole_drift_mm": 6.705522537231445e-05
+    },
+    {
+      "frame": 26,
+      "max_sole_drift_mm": 0.00027509992354562876
+    },
+    {
+      "frame": 27,
+      "max_sole_drift_mm": 0.0003775533933494761
+    },
+    {
+      "frame": 28,
+      "max_sole_drift_mm": 0.0004420555735672104
+    },
+    {
+      "frame": 29,
+      "max_sole_drift_mm": 0.0004194220288109055
+    },
+    {
+      "frame": 30,
+      "max_sole_drift_mm": 0.0002738088369369507
+    },
+    {
+      "frame": 31,
+      "max_sole_drift_mm": 7.580416554631528e-05
+    },
+    {
+      "frame": 32,
+      "max_sole_drift_mm": 0.0004004643753283229
+    },
+    {
+      "frame": 33,
+      "max_sole_drift_mm": 0.0006475150386282085
+    },
+    {
+      "frame": 34,
+      "max_sole_drift_mm": 0.0006952488712479104
+    },
+    {
+      "frame": 35,
+      "max_sole_drift_mm": 0.0005837691554507173
+    },
+    {
+      "frame": 36,
+      "max_sole_drift_mm": 0.0003908917949099823
+    },
+    {
+      "frame": 37,
+      "max_sole_drift_mm": 6.188917057900187e-05
+    },
+    {
+      "frame": 38,
+      "max_sole_drift_mm": 0.0003031111616199478
+    },
+    {
+      "frame": 39,
+      "max_sole_drift_mm": 0.0005836816726701256
+    },
+    {
+      "frame": 40,
+      "max_sole_drift_mm": 0.0006707281471400475
+    },
+    {
+      "frame": 41,
+      "max_sole_drift_mm": 0.0006890478042058826
+    },
+    {
+      "frame": 42,
+      "max_sole_drift_mm": 0.00037358922894429117
+    },
+    {
+      "frame": 43,
+      "max_sole_drift_mm": 6.143906154658885e-05
+    },
+    {
+      "frame": 44,
+      "max_sole_drift_mm": 0.0002529085289313447
+    },
+    {
+      "frame": 45,
+      "max_sole_drift_mm": 0.00038807441720680645
+    },
+    {
+      "frame": 46,
+      "max_sole_drift_mm": 0.0006317553078620614
+    },
+    {
+      "frame": 47,
+      "max_sole_drift_mm": 0.0005533052099300254
+    },
+    {
+      "frame": 48,
+      "max_sole_drift_mm": 0.0002792571361176756
+    },
+    {
+      "frame": 49,
+      "max_sole_drift_mm": 0.0
+    }
+  ],
+  "max_motion_per_frame_mm": 2.7296275637090583,
+  "seam_motion_mm": 1.598893515105651,
+  "max_second_difference_mm": 0.36580749139668745,
+  "asset_signature_unchanged": true
+}
