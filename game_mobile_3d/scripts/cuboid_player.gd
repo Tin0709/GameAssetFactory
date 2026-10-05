@@ -28,6 +28,17 @@ var current_speed: float = 0.0
 func _ready() -> void:
 	current_hp = max_hp
 
+func equip_test_weapon(index: int) -> void:
+	# Shared test/debug entry point into the existing animation/socket runtime.
+	if is_dead or index < 0 or index > 2: return
+	visual.equip_weapon(index)
+	visual.recoil_time = 100.0
+	visual.recoil_gain = 1.0
+	visual.queued_recoil = false
+	visual.recoil_amount = 0.0
+	visual.is_firing = false
+	$Pistol.cooldown = 0.15
+
 func take_damage(amount: int) -> bool:
 	if is_dead or amount <= 0 or hurt_remaining > 0.0:
 		return false

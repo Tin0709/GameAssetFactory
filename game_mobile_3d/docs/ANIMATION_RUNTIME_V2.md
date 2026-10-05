@@ -73,8 +73,15 @@ Real horizontal velocity after `move_and_slide()` drives the controller. Idle
 blends toward motion over the first 0.5 m/s. Walk-to-run weight uses smoothstep
 between 4.25 and 6.25 m/s. Weights reach their targets over 0.13 seconds.
 There is one persistent normalized gait phase, independent of stance and recoil.
-Cycle rate is speed divided by blended authored stride distance: **0.94 m walk**
-and **1.6 m run**. Both clips sample this same phase at their own durations.
+Cycle rate uses calibrated visual stride distances: **2.5 m walk** and
+**2.7174 m run**, blended with the pose weight. At unchanged gameplay speeds
+this gives **1.7 full cycles/s at 4.25 m/s** and **2.3 full cycles/s at 6.25 m/s**
+(3.4 / 4.6 footfalls/s). Equivalent clip playback multipliers are 2.04x Walk
+and 1.84x Run. Lower speeds proportionally slow the cycle; unusually high
+speeds are capped at 2.3 cycles/s. A bounded rate ramp settles any rate change
+within 0.13 seconds, without resetting phase. Both clips sample the same phase
+at their own durations. `walk_cadence`, `run_cadence` and `cadence_transition`
+are exposed tuning properties; `cycles_per_second` reports the actual clock.
 Idle breathing retains its own clock. Stopping does not reset gait phase.
 
 Without a target the visual follows movement; with a target it turns toward
@@ -151,7 +158,12 @@ updated for the non-deforming socket and isolated character mesh, and polish
 assertions now inspect V2 cadence and upper-body recoil rather than obsolete
 whole-model recoil. Gameplay combat and progression behavior remain covered.
 
-The V2 matrix has **1,442 passing checks**. Sampled hand-contact error across
+The V2 matrix has **1,455 passing checks**, including measured phase travel at 30 and 120 FPS, slow/normal/fast
+speed response, a cadence cap, and stopping within 0.16 seconds in addition
+to the original 1,442 checks. The cadence follow-up re-ran this suite headless
+and rendered, plus rendered polish, gameplay and progression. Combat/spawn
+results above are the existing integration results; those unaffected systems
+were not redundantly rerun. Sampled hand-contact error across
 ready/aim, motion and recoil is below **12 mm** (15 mm test limit). This is not
 a guarantee of exact contact during rapid weapon crossfades. Both three-quarter
 and side pose galleries were rendered and inspected; the gameplay debug HUD
@@ -166,10 +178,13 @@ this is desktop evidence, **not a phone budget measurement**.
 
 ### Visual limits
 
-- The unchanged 4.25/6.25 m/s gameplay speeds exceed the authored nominal speeds.
-  Distance-correct cadence is consequently brisk: about 4.52 walk cycles/s and
-  3.91 run cycles/s. Slower cadence would increase sliding without longer clips
-  or different gameplay speeds. Neither source clips nor gameplay speeds changed.
+- The previous distance-locked clock produced 4.52 walk / 3.91 run cycles/s,
+  making the body dip and cycle too rapidly. The final 1.7 / 2.3 calibration
+  prioritizes readable rhythm. It cannot maintain planted feet at 4.25/6.25 m/s
+  with the existing short strides: steady-travel foot sliding remains and can
+  be more visible than with the previous fast clock. This is an explicit tradeoff,
+  not a claim that reducing playback speed also fixes contact travel. Neither
+  source clips nor gameplay speeds changed; no leg stretching was introduced.
 - Rigid feet roll between corners; turning, gait blends and uneven terrain can
   still slide. No foot planting/IK is claimed.
 - Fixed cuboid hands obscure some receiver detail. Long-gun stock/body proximity
@@ -200,6 +215,14 @@ run sequentially. In the restricted workspace, APPDATA was redirected to
 but assets imported and runtime tests completed without script errors.
 
 ## Files changed
+
+The cadence follow-up started from a clean working tree containing the completed
+integration above. It changes only `scripts/player_animation_v2.gd`,
+`tests/validate_animation_v2.gd`, `tests/validate_polish.gd`, this document, and
+their validation reports/rendered captures. It does not re-export correct GLBs,
+modify Blender sources or gameplay speeds, commit, or push.
+
+Full integration inventory (already present before that follow-up):
 
 - Added `scripts/player_animation_v2.gd`, `animation_pose_sampler.gd`,
   `player_weapon_socket.gd`, `animation_weapon_debug.gd` and generated UIDs.

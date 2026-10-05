@@ -20,14 +20,14 @@ func step(count: int) -> void:
 
 func contacts() -> float:
 	var error := 0.0
-	var weapon: Node3D = v.socket.instances[v.weapon_type]
 	for pair in [["Arm.R", "Grip_Point"], ["Arm.L", "Support_Hand_Point"]]:
 		var bone: int = v.skeleton.find_bone(pair[0])
-		var hand: Vector3 = v.skeleton.global_transform * v.skeleton.get_bone_global_pose(bone) * Vector3(0, 0.605, 0)
-		var marker: Node3D = weapon.find_child(pair[1], true, false)
+		var palm: Vector3 = v.Socket.MAIN_HAND_CONTACTS[v.weapon_type] if pair[0] == "Arm.R" else v.Socket.SUPPORT_HAND_CONTACTS[v.weapon_type]
+		var hand: Vector3 = v.skeleton.global_transform * v.skeleton.get_bone_global_pose(bone) * palm
 		# Update attachment explicitly for deterministic manual evaluation.
 		var socket_bone: int = v.skeleton.find_bone("WeaponSocket")
-		var point: Vector3 = v.skeleton.global_transform * v.skeleton.get_bone_global_pose(socket_bone) * weapon.transform * marker.transform.origin
+		var contact: Vector3 = v.socket.grips[v.weapon_type] if pair[0] == "Arm.R" else v.socket.supports[v.weapon_type]
+		var point: Vector3 = v.skeleton.global_transform * v.skeleton.get_bone_global_pose(socket_bone) * contact
 		error = maxf(error, hand.distance_to(point))
 	return error
 
@@ -52,6 +52,9 @@ func run() -> void:
 		for item in v.socket.instances:
 			if item.visible: visible_count += 1
 		check(visible_count == 1, "Exactly one equipped weapon")
+		check(v.socket.instances[weapon].scale.is_equal_approx(Vector3.ONE * v.Socket.HOLD_SCALES[weapon]), "Per-weapon scale applied once")
+		for arm in [v.main_arm, v.support_arm]:
+			check(v.skeleton.get_bone_pose_position(arm).is_equal_approx(v.raise_pose.position(arm, v.aim_weight * v.raise_pose.clip.length)), "Hold correction preserves authored shoulder position")
 		for aiming in [false, true]:
 			for speed in [0.0, 4.25, 6.25]:
 				for direction in [Vector3.BACK, Vector3.FORWARD, Vector3.LEFT, Vector3.RIGHT, Vector3(1,0,1).normalized(), Vector3(-1,0,-1).normalized()]:
@@ -86,6 +89,21 @@ func run() -> void:
 	check(max_contact < 0.015, "Hand contacts within 15mm: " + str(max_contact))
 	# No other pose writer and no phase resets while stance/weapon changes.
 	check(not v.animation_player.is_playing(), "Animation library has no competing playback")
+	# Measure phase travel, not just the configured rate. Settled clocks must
+	# produce the same cadence at different display frame rates.
+	v.stride_sign = 1.0
+	for speed_and_rate in [[2.125, 0.85], [4.25, 1.7], [6.25, 2.3], [12.5, 2.3]]:
+		v.movement_speed = speed_and_rate[0]
+		step(30)
+		check(absf(v.cycles_per_second - speed_and_rate[1]) < 0.001, "Speed-responsive bounded cadence")
+		for fps in [30, 120]:
+			var phase_start: float = v.locomotion_phase
+			for frame in fps: v._process(1.0 / fps)
+			var expected_phase := fposmod(phase_start + speed_and_rate[1], 1.0)
+			check(absf(wrapf(v.locomotion_phase - expected_phase, -0.5, 0.5)) < 0.001, "Frame-rate independent phase integration")
+	v.movement_speed = 0.0
+	step(10)
+	check(v.cycles_per_second == 0.0, "Cadence settles to zero within 0.16s")
 	v.movement_speed = 4.25
 	step(40)
 	var changes: int = v.state_changes

@@ -89,7 +89,7 @@ func reset_run() -> void:
 	selection_open = false
 	selection_locked = true
 	get_tree().paused = false
-	get_tree().reload_current_scene()
+	get_parent().reset_run()
 
 func _exit_tree() -> void:
 	if selection_open: get_tree().paused = false

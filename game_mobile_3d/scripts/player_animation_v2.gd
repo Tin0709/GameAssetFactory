@@ -6,6 +6,13 @@ const Socket = preload("res://scripts/player_weapon_socket.gd")
 const PREFIXES = ["Pistol", "LongGun", "Shotgun"]
 const WEAPON_NAMES = ["Pistol", "M4A1", "Shotgun"]
 const RECOILS = ["Pistol_Recoil", "Rifle_Recoil", "Shotgun_Recoil"]
+## Visual full-stride cycles/second at the unchanged gameplay speed anchors.
+## Short authored strides cannot simultaneously give natural cadence and plant
+## feet at 4.25/6.25 m/s. Prefer readable rhythm over distance-locked fast bobbing.
+@export_range(0.5, 3.0) var walk_cadence: float = 1.7
+@export_range(0.5, 3.5) var run_cadence: float = 2.3
+@export_range(0.1, 0.16) var cadence_transition: float = 0.13
+var cycles_per_second: float = 0.0
 var skeleton: Skeleton3D
 var socket: BoneAttachment3D
 var samples := {}
@@ -19,6 +26,9 @@ var recoil_mask := PackedInt32Array()
 var hips: int
 var chest: int
 var head: int
+var main_arm: int
+var support_arm: int
+var socket_bone: int
 var has_target := false
 var is_firing := false
 var weapon_type := 0
@@ -60,6 +70,9 @@ func _ready() -> void:
 	hips = skeleton.find_bone("Hips")
 	chest = skeleton.find_bone("Chest")
 	head = skeleton.find_bone("Head")
+	main_arm = skeleton.find_bone("Arm.R")
+	support_arm = skeleton.find_bone("Arm.L")
+	socket_bone = skeleton.find_bone("WeaponSocket")
 	for i in skeleton.get_bone_count():
 		switch_positions.append(skeleton.get_bone_pose_position(i))
 		switch_rotations.append(skeleton.get_bone_pose_rotation(i))
@@ -113,9 +126,12 @@ func _process(delta: float) -> void:
 	move_weight = move_toward(move_weight, clampf(movement_speed / 0.5, 0.0, 1.0), delta / 0.13)
 	run_weight = move_toward(run_weight, smoothstep(4.25, 6.25, movement_speed), delta / 0.13)
 	switch_weight = minf(1.0, switch_weight + delta / 0.13)
-	# Authored distance per cycle: .78333*1.2=.94m walk, 2*.8=1.6m run.
-	var cycles := movement_speed / lerpf(0.94, 1.6, run_weight)
-	locomotion_phase = fposmod(locomotion_phase + delta * cycles * stride_sign, 1.0)
+	# Blend calibrated visual stride lengths with the same weight as the poses.
+	# Cadence remains speed-responsive below the anchors and bounded above them.
+	var visual_stride := lerpf(4.25 / walk_cadence, 6.25 / run_cadence, run_weight)
+	var desired_cycles := clampf(movement_speed / visual_stride, 0.0, run_cadence)
+	cycles_per_second = move_toward(cycles_per_second, desired_cycles, delta * run_cadence / cadence_transition)
+	locomotion_phase = fposmod(locomotion_phase + delta * cycles_per_second * stride_sign, 1.0)
 	weapon_lag = lerpf(weapon_lag, clampf(acceleration.z * 0.0004, -0.012, 0.012), 1.0 - exp(-8.0 * delta))
 	idle_time = fposmod(idle_time + delta, idle.clip.length)
 	recoil_time += delta
@@ -140,8 +156,6 @@ func _evaluate(_delta: float) -> void:
 		if i in upper:
 			p = raise_pose.position(i, aim_weight * raise_pose.clip.length)
 			q = raise_pose.rotation(i, aim_weight * raise_pose.clip.length)
-			p = switch_positions[i].lerp(p, switch_weight)
-			q = switch_rotations[i].slerp(q, switch_weight)
 		skeleton.set_bone_pose_position(i, p)
 		skeleton.set_bone_pose_rotation(i, q.normalized())
 	# Rotate hips in skeleton space, then cancel that rotation at chest: arms,
@@ -159,6 +173,22 @@ func _evaluate(_delta: float) -> void:
 			var difference: Quaternion = recoil_pose.rotation(i, 0.0).inverse() * recoil_pose.rotation(i, recoil_time)
 			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i) + offset)
 			skeleton.set_bone_pose_rotation(i, (skeleton.get_bone_pose_rotation(i) * Quaternion.IDENTITY.slerp(difference, recoil_gain)).normalized())
+	# Follow the final layered socket, including recoil, with each arm's outer
+	# palm edge. Shoulders, arm lengths, twist and socket recoil stay authored.
+	var socket_pose := skeleton.get_bone_global_pose(socket_bone)
+	_hold_arm(main_arm, socket_pose * socket.grips[weapon_type], Socket.MAIN_HAND_CONTACTS[weapon_type])
+	_hold_arm(support_arm, socket_pose * socket.supports[weapon_type], Socket.SUPPORT_HAND_CONTACTS[weapon_type])
+	# Blend final corrected destinations once; switching never reapplies offsets
+	# to an already-corrected captured pose.
+	for i in upper:
+		skeleton.set_bone_pose_position(i, switch_positions[i].lerp(skeleton.get_bone_pose_position(i), switch_weight))
+		skeleton.set_bone_pose_rotation(i, switch_rotations[i].slerp(skeleton.get_bone_pose_rotation(i), switch_weight).normalized())
+
+func _hold_arm(bone: int, contact: Vector3, palm: Vector3) -> void:
+	var pose := skeleton.get_bone_global_pose(bone)
+	var from := (pose.basis * palm).normalized()
+	var toward := (contact - pose.origin).normalized()
+	_rotate_global(bone, Quaternion(from, toward))
 
 func _rotate_global(bone: int, offset: Quaternion) -> void:
 	if bone < 0: return

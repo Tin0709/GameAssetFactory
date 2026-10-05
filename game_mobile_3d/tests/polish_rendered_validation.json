@@ -3,8 +3,8 @@
 	"draw_calls": 44.0,
 	"passed": true,
 	"phone_tested": false,
-	"rendered_fps": 121.0,
-	"run_cycles_per_second": 3.90624791383743,
+	"rendered_fps": 120.0,
+	"run_cycles_per_second": 2.29999877166902,
 	"stopping_distance": 0.275000095367432,
-	"walk_cycles_per_second": 4.52127608847111
+	"walk_cycles_per_second": 1.69999980926514
 }

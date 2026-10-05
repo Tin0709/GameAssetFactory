@@ -2,6 +2,9 @@ extends RefCounted
 ## Isolated three-actor fixture for earlier suites, never used by runtime scenes.
 const ZOMBIE = preload("res://scenes/characters/CuboidZombie.tscn")
 static func prepare(level: Node) -> void:
+	# Earlier suites exercise gameplay, bypass the new startup UI deliberately.
+	if not level.is_inside_tree():
+		level.ready.connect(level.select_test_weapon.bind(0), CONNECT_ONE_SHOT)
 	level.get_node("SpawnDirector").enabled = false
 	for point in [Vector3(4, 0.02, -3), Vector3(-4, 0.02, -1), Vector3(-6.5, 0.02, 4.5)]:
 		var enemy := ZOMBIE.instantiate()

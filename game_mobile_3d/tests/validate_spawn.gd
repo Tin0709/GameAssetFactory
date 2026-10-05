@@ -26,6 +26,7 @@ func fresh() -> void:
 	level = LEVEL.instantiate()
 	level.get_node("Actors/Player/Pistol").enabled = false
 	root.add_child(level)
+	level.select_test_weapon(0)
 	current_scene = level
 	player = level.get_node("Actors/Player")
 	combat = level.get_node("Combat")

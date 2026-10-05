@@ -1,0 +1,15 @@
+{
+	"checks": 1455,
+	"failures": [],
+	"matrix_cpu_usec": 207354,
+	"max_contact_m": 0.0117537938058376,
+	"phone_tested": false,
+	"player_update_average_usec": 23.48,
+	"zombie_phases": [
+		0.0,
+		0.48469997882843,
+		0.96939995765686,
+		0.454100024700165,
+		0.938799915313721
+	]
+}

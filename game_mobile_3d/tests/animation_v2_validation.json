@@ -1,10 +1,10 @@
 {
-	"checks": 1442,
+	"checks": 1455,
 	"failures": [],
-	"matrix_cpu_usec": 218638,
+	"matrix_cpu_usec": 208108,
 	"max_contact_m": 0.0117537938058376,
 	"phone_tested": false,
-	"player_update_average_usec": 24.098,
+	"player_update_average_usec": 23.631,
 	"zombie_phases": [
 		0.0,
 		0.48469997882843,

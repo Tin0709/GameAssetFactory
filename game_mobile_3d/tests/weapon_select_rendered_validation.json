@@ -1,0 +1,7 @@
+{
+	"capture": true,
+	"checks": 130,
+	"failures": [],
+	"phone_tested": false,
+	"touch_events_tested": true
+}
