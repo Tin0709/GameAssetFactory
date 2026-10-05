@@ -1,4 +1,5 @@
 extends SceneTree
+const FIXTURE = preload("res://tests/legacy_fixture.gd")
 ## Focused controller/feedback regression using actual physics frames.
 const LEVEL = preload("res://scenes/CuboidGameplayTest.tscn")
 var checks := 0
@@ -18,6 +19,7 @@ func tick(count: int) -> void:
 	for i in range(count): await physics_frame
 func run() -> void:
 	level = LEVEL.instantiate()
+	FIXTURE.prepare(level)
 	level.get_node("Actors/Player/Pistol").enabled = false
 	root.add_child(level)
 	current_scene = level
@@ -107,6 +109,7 @@ func run() -> void:
 		level.queue_free()
 		await process_frame
 		level = LEVEL.instantiate()
+		FIXTURE.prepare(level)
 		root.add_child(level)
 		current_scene = level
 		await create_timer(1.8).timeout

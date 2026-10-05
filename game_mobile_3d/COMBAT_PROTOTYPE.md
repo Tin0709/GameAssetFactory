@@ -2,7 +2,7 @@
 
 Open `project.godot` in Godot 4.7.2 and press **F5**, or run `scenes/CuboidGameplayTest.tscn` with **F6**. **WASD** moves, **Shift** runs, **R** resets. The pistol fires automatically at the nearest living zombie. Move toward cyan drops to collect EXP. The existing arena, camera, Mobile renderer, imported character models and locomotion clips remain in use.
 
-This arena starts with exactly three zombies. After clearing it, collect the drops and press R for another pass; the three drops now earn one level-up selection. Waves are not implemented; debug builds support L for further upgrade tests. See [LEVEL_UP_SYSTEM.md](LEVEL_UP_SYSTEM.md). To inspect melee/defeat without the pistol killing everything first, turn off `enabled` on `Actors/Player/Pistol` in the inspector. Toggle `Combat.combat_enabled` off to inspect movement without damage.
+[SpawnDirector](SPAWN_DIRECTOR.md) starts the arena with five perimeter zombies and continuously adds pressure up to a 40-active-enemy cap. Difficulty increases with active survival time. EXP now feeds upgrade selection naturally. To inspect melee/defeat without the pistol killing everything first, turn off `enabled` on `Actors/Player/Pistol` in the inspector. Toggle `Combat.combat_enabled` off to inspect movement without damage/spawning.
 
 See [GAME_FEEL_POLISH.md](GAME_FEEL_POLISH.md) for the focused movement/feedback revision and measured validation.
 
@@ -23,7 +23,7 @@ All values are exported inspector properties on their corresponding scripts.
 
 ## Health and combat flow
 
-Player HP clamps to zero. Invalid damage, damage during the short grace period, and damage after defeat are ignored. Health/EXP signals update the HUD immediately; living count and FPS refresh four times per second. Defeat freezes movement and zombie simulation, disables the gun, removes active projectiles and blocks EXP collection. The UI continues to process R. Reset reloads the scene, restoring HP 100, EXP 0, three living zombies and fresh cooldowns.
+Player HP clamps to zero. Invalid damage, damage during the short grace period, and damage after defeat are ignored. Health/EXP signals update the HUD immediately; living count and FPS refresh four times per second. Defeat freezes movement and zombie simulation, disables the gun, removes active projectiles and blocks EXP collection. The UI continues to process R. Reset reloads the scene, restoring HP 100, EXP 0, five starting zombies and fresh cooldowns.
 
 The gun checks a scene-local cached living-enemy registry rather than searching the scene tree every frame. It selects by squared horizontal distance and fires a straight, non-homing projectile toward the target's torso position at shot time. Existing movement/facing stays independent from automatic targeting; there is no held-weapon model or Blender asset change.
 
@@ -66,6 +66,6 @@ The Windows driver override is the Mobile-rendered path tested here; omit it on 
 
 Checks cover nearest/dead/out-of-range targeting, fast swept hits, miss expiry/wall cleanup, auto-fire cadence, three-hit deaths, repeat-damage rejection, flash isolation/cleanup, one-drop accounting, melee cooldown and escaping windup, player HP/grace/defeat, disabled movement, reset, audio resources, and 15 repeated kills/collections. The movement/import suite separately verifies all five locomotion clips, rigid bone scales, loop closure, collisions and controls. Both headless and rendered Mobile runs passed on Godot 4.7.2.
 
-Base arena remains 564 triangles, 27 mesh instances and eight shadow casters. Each active bullet, drop or burst adds one 12-triangle box and no shadows. At the default two shots/s and 0.9 s lifetime, normally at most two bullets are alive; only three enemies/drops exist in the normal test. Flash adds a short extra draw pass on the struck actor. No ragdolls, particle systems, dynamic projectile/EXP lights, or recurring scene-tree scans are used.
+Base arena remains 564 triangles, 27 mesh instances and eight shadow casters. Each active bullet, drop or burst adds one 12-triangle box and no shadows. At the default two shots/s and 0.9 s lifetime, normally at most two bullets are alive; the director caps living enemies at 40; temporary corpses and accumulated drops may add mesh instances beyond that. Flash adds a short extra draw pass on the struck actor. No ragdolls, particle systems, dynamic projectile/EXP lights, or recurring scene-tree scans are used.
 
 Current concerns: desktop validation does not prove phone frame time, battery/thermals or audio cost. The inherited sun/shadows remain the main GPU budget item; MP3 decoding and transient allocations should be profiled before increasing enemy/shot counts. Pooling is unnecessary at this test scale but can be introduced when measured traffic warrants it. Chase is direct, and shots aim at current target position, so obstacles or faster enemies would need navigation/aiming iteration. Touch input and phone exports remain future work.

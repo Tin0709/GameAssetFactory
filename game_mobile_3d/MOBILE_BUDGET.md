@@ -1,5 +1,7 @@
 # Mobile visual budget
 
+Continuous perimeter enemies and the active cap are documented in [SPAWN_DIRECTOR.md](SPAWN_DIRECTOR.md).
+
 The original visual foundation remains `scenes/Main.tscn`. The default scene is now the first cuboid gameplay test, with keyboard movement, three chasing zombies and lightweight imported characters. See [GAMEPLAY_TEST.md](GAMEPLAY_TEST.md) for controls and implementation.
 
 Auto-fire combat and [a lightweight level-up overlay](LEVEL_UP_SYSTEM.md) are included. [COMBAT_PROTOTYPE.md](COMBAT_PROTOTYPE.md) records tuning, HP/EXP, simple effects/audio and validation. Base geometry is unchanged; bullets, drops and bursts add small unshadowed boxes, with a brief additional draw pass for hit flash.

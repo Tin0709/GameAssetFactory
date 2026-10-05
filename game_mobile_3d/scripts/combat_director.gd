@@ -5,6 +5,7 @@ extends Node
 var active: bool = true
 var player: CharacterBody3D
 var living_zombies: Array[Node3D] = []
+var kill_count: int = 0
 @onready var projectiles: Node3D = $Projectiles
 @onready var pickups: Node3D = $Pickups
 @onready var effects: Node3D = $Effects
@@ -26,8 +27,12 @@ func _ready() -> void:
 func register_zombie(zombie: Node3D) -> void:
 	if not living_zombies.has(zombie) and not zombie.is_dead:
 		living_zombies.append(zombie)
+		zombie.tree_exiting.connect(_unregister_zombie.bind(zombie), CONNECT_ONE_SHOT)
 	zombie.combat = self
 	zombie.target = player
+
+func _unregister_zombie(zombie: Node3D) -> void:
+	living_zombies.erase(zombie)
 
 func can_fight() -> bool:
 	return active and combat_enabled and not get_tree().paused
@@ -59,7 +64,9 @@ func spawn_impact(position: Vector3) -> void:
 	effect.global_position = position
 
 func enemy_death_started(zombie: Node3D) -> void:
+	if not living_zombies.has(zombie): return
 	living_zombies.erase(zombie)
+	kill_count += 1
 	play_sound(&"zombie_death")
 
 func spawn_exp(position: Vector3) -> void:

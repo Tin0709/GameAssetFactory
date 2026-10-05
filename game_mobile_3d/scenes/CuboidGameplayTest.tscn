@@ -1,5 +1,6 @@
 [gd_scene load_steps=22 format=3]
 
+[ext_resource type="Script" path="res://scripts/spawn_director.gd" id="spawner"]
 [ext_resource type="Script" path="res://scripts/level_progression.gd" id="progression"]
 [ext_resource type="PackedScene" path="res://scenes/ui/UpgradeSelection.tscn" id="upgrade_ui"]
 
@@ -10,8 +11,6 @@
 [ext_resource type="Script" path="res://scripts/combat_audio.gd" id="audio"]
 
 [ext_resource type="PackedScene" path="res://scenes/characters/CuboidPlayer.tscn" id="player"]
-
-[ext_resource type="PackedScene" path="res://scenes/characters/CuboidZombie.tscn" id="zombie"]
 
 [ext_resource type="Material" path="res://materials/Ground.tres" id="Ground"]
 
@@ -288,15 +287,6 @@ cast_shadow = 0
 [node name="Player" parent="Actors" instance=ExtResource("player")]
 position = Vector3(0, 0.02, 1.8)
 
-[node name="ZombieNear" parent="Actors" instance=ExtResource("zombie")]
-position = Vector3(4, 0.02, -3)
-
-[node name="ZombieLeft" parent="Actors" instance=ExtResource("zombie")]
-position = Vector3(-4, 0.02, -1)
-
-[node name="ZombieFar" parent="Actors" instance=ExtResource("zombie")]
-position = Vector3(-6.5, 0.02, 4.5)
-
 [node name="Combat" type="Node" parent="."]
 script = ExtResource("combat")
 
@@ -313,6 +303,9 @@ script = ExtResource("audio")
 process_mode = 3
 script = ExtResource("progression")
 
+[node name="SpawnDirector" type="Node" parent="."]
+script = ExtResource("spawner")
+
 [node name="HUD" type="CanvasLayer" parent="."]
 
 [node name="Help" type="PanelContainer" parent="HUD"]
@@ -326,13 +319,13 @@ theme_override_styles/panel = SubResource("Panel")
 [node name="Text" type="Label" parent="HUD/Help"]
 theme_override_colors/font_color = Color(0.84, 0.91, 0.91, 1)
 theme_override_font_sizes/font_size = 18
-text = "CUBOID SURVIVAL / COMBAT TEST\nWASD move  |  Shift run  |  R reset\nAuto-fire nearby zombies. Collect cyan EXP.\nDebug build: L grants a level-up."
+text = "CUBOID SURVIVAL / COMBAT TEST\nWASD move  |  Shift run  |  R reset\nAuto-fire nearby zombies. Collect cyan EXP.\nDebug: L level-up  |  K spawn 1  |  J spawn 10"
 
 [node name="Status" type="Label" parent="HUD"]
 offset_left = 24.0
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -110.0
+offset_top = -142.0
 offset_right = 800.0
 offset_bottom = -64.0
 theme_override_colors/font_color = Color(0.84, 0.91, 0.91, 1)

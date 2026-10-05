@@ -1,4 +1,5 @@
 extends SceneTree
+const FIXTURE = preload("res://tests/legacy_fixture.gd")
 ## Exercise actual physics/input/animations. Run headless, or add -- --capture.
 
 var checks: int = 0
@@ -23,6 +24,7 @@ func _run() -> void:
 	check(packed != null, "Test level loads")
 	if failed: return
 	var level := packed.instantiate()
+	FIXTURE.prepare(level)
 	# Keep this movement/import regression suite independent of the combat suite.
 	level.get_node("Combat").combat_enabled = false
 	root.add_child(level)
@@ -143,6 +145,7 @@ func _run() -> void:
 	await process_frame
 	await tick(5)
 	check(current_scene != level, "R resets the test scene")
+	FIXTURE.after_reset(current_scene)
 	current_scene.get_node("Combat").combat_enabled = false
 	if failed: return
 	if "--capture" in OS.get_cmdline_user_args():

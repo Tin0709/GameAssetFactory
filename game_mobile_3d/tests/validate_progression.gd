@@ -1,4 +1,5 @@
 extends SceneTree
+const FIXTURE = preload("res://tests/legacy_fixture.gd")
 ## Real pickup, paused gameplay, input routing, stacked stats and reset integration.
 const LEVEL = preload("res://scenes/CuboidGameplayTest.tscn")
 const CATALOG = preload("res://scripts/upgrade_catalog.gd")
@@ -25,6 +26,7 @@ func fresh() -> void:
 		level.queue_free()
 		await process_frame
 	level = LEVEL.instantiate()
+	FIXTURE.prepare(level)
 	level.get_node("Actors/Player/Pistol").enabled = false
 	root.add_child(level)
 	current_scene = level
@@ -161,6 +163,7 @@ func run() -> void:
 	check(reset_player.walk_speed == 4.25 and reset_player.run_speed == 6.25 and reset_player.max_hp == 100 and reset_player.current_hp == 100 and reset_player.level == 1, "R clears stacked player upgrades")
 	check(reset_pistol.damage == 20 and reset_pistol.fire_interval == 0.5 and reset_pistol.projectile_speed == 14 and reset_pistol.projectile_range == 12.6 and reset_pistol.attack_range == 8, "R clears all stacked weapon upgrades")
 	level = current_scene
+	FIXTURE.after_reset(level)
 	# All gameplay presentation and physics stop, including in-flight effects/tweens.
 	await fresh()
 	var enemy: CharacterBody3D = combat.living_zombies[0]
@@ -226,6 +229,7 @@ func run() -> void:
 	await key(KEY_R)
 	await tick(4)
 	level = current_scene
+	FIXTURE.after_reset(level)
 	player = level.get_node("Actors/Player")
 	progression = level.get_node("Progression")
 	combat = level.get_node("Combat")

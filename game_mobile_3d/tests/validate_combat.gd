@@ -1,4 +1,5 @@
 extends SceneTree
+const FIXTURE = preload("res://tests/legacy_fixture.gd")
 ## Real physics/collision/timing tests, plus optional Mobile-rendered capture.
 
 const LEVEL = preload("res://scenes/CuboidGameplayTest.tscn")
@@ -28,6 +29,7 @@ func fresh(auto_fire: bool = false) -> void:
 		level.queue_free()
 		await process_frame
 	level = LEVEL.instantiate()
+	FIXTURE.prepare(level)
 	# Isolate combat accounting; progression has its own integration suite.
 	level.get_node("Progression").enabled = false
 	level.get_node("Actors/Player/Pistol").enabled = auto_fire
@@ -173,6 +175,7 @@ func _run() -> void:
 	await process_frame
 	await tick(2)
 	level = current_scene
+	FIXTURE.after_reset(level)
 	player = level.get_node("Actors/Player")
 	combat = level.get_node("Combat")
 	pistol = player.get_node("Pistol")

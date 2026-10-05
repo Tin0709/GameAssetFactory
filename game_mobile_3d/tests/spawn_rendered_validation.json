@@ -1,0 +1,36 @@
+{
+	"baseline_draw_calls": 43.0,
+	"baseline_fps": 120.0,
+	"checks": 69,
+	"engine": "4.7.2-stable (official)",
+	"passed": true,
+	"phone_tested": false,
+	"renderer": "mobile",
+	"repeated_kills": 36,
+	"stress_alive": 40,
+	"stress_draw_calls": 113.0,
+	"stress_fps_samples": [
+		120.0,
+		120.0,
+		120.0,
+		118.0,
+		120.0,
+		120.0
+	],
+	"stress_physics_ms": [
+		1.574,
+		1.816,
+		1.772,
+		1.998,
+		1.926,
+		1.868
+	],
+	"stress_process_ms": [
+		10.246,
+		10.652,
+		10.394,
+		23.495,
+		9.864,
+		10.946
+	]
+}

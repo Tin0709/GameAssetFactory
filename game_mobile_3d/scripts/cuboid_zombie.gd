@@ -15,6 +15,8 @@ extends CharacterBody3D
 @export var knockback_speed: float = 2.4
 @export var knockback_decay: float = 16.0
 @export var speed_variation: float = 0.08
+@export var speed_limit: float = 2.75
+@export var persistent_chase: bool = false
 @export var walk_cycle_speed: float = 1.0
 @export var attack_anticipation: float = 0.10
 @export var attack_recovery: float = 0.18
@@ -40,7 +42,7 @@ func _ready() -> void:
 	speed_multiplier = lerpf(1.0 - speed_variation, 1.0 + speed_variation, phase)
 	fall_sign = -1.0 if phase < 0.5 else 1.0
 	visual.animation_player.seek(phase * visual.animation_player.current_animation_length, true)
-	target = get_tree().get_first_node_in_group("player") as Node3D
+	if not is_instance_valid(target): target = get_tree().get_first_node_in_group("player") as Node3D
 
 func take_damage(amount: int, direction: Vector3 = Vector3.ZERO) -> bool:
 	if is_dead or amount <= 0: return false
@@ -89,7 +91,7 @@ func _physics_process(delta: float) -> void:
 		var offset := target.global_position - global_position
 		offset.y = 0.0
 		var distance := offset.length()
-		if chasing and distance > lose_target_range:
+		if chasing and not persistent_chase and distance > lose_target_range:
 			chasing = false
 		elif not chasing and distance <= detection_range:
 			chasing = true
@@ -116,8 +118,9 @@ func _physics_process(delta: float) -> void:
 	else:
 		chasing = false
 		pending_attack = -1.0
-	velocity.x = direction.x * move_speed * speed_multiplier + knockback.x
-	velocity.z = direction.z * move_speed * speed_multiplier + knockback.z
+	var effective_speed := minf(speed_limit, move_speed * speed_multiplier)
+	velocity.x = direction.x * effective_speed + knockback.x
+	velocity.z = direction.z * effective_speed + knockback.z
 	knockback *= exp(-knockback_decay * delta)
 	if is_on_floor(): velocity.y = 0.0
 	else: velocity.y -= gravity * delta

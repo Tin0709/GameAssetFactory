@@ -1,6 +1,6 @@
 # Level-up and upgrade selection prototype
 
-Open `project.godot` and press F5. Kill the three zombies and collect their cyan drops to earn the first selection. Click/tap a card, or press 1/2/3, to choose. R resets from gameplay or while selecting. Debug builds only: L grants exactly the EXP remaining to the next threshold; `Progression.debug_exp_shortcut` disables this test shortcut. No waves or extra enemies were added, so subsequent levels in the current arena use L or test grants.
+Open `project.godot` and press F5. Kill zombies and collect three cyan drops to earn the first selection. Click/tap a card, or press 1/2/3, to choose. R resets from gameplay or while selecting. Debug builds only: L grants exactly the EXP remaining to the next threshold; `Progression.debug_exp_shortcut` disables this test shortcut. The [SpawnDirector](SPAWN_DIRECTOR.md) now provides continuous enemies and natural EXP for subsequent levels; L remains optional for isolated testing.
 
 ## EXP and state flow
 
@@ -77,6 +77,6 @@ The combat regression disables progression to separately verify 15-drop/15-EXP a
 
 ## Limits and mobile budget
 
-This is a scene-local, transient prototype: upgrades reset with R and there is no save/meta progression. Only three zombies exist, so the natural current round earns one selection. No waves, inventory or new weapon systems. More EXP/pending levels are covered by debug grants and tests.
+This is a scene-local, transient prototype: upgrades reset with R and there is no save/meta progression. The SpawnDirector adds continuous perimeter enemies up to 40 active. No discrete waves, inventory or new weapon systems. Overflow and multiple pending levels are also covered by debug grants and tests.
 
 Three reusable buttons and a dim screen quad add a small UI cost; no gameplay per-frame progression scan. Randomization and value formatting happen only when opening a selection. UI feedback uses one short tween. Physical phone/touch-device testing, notch-safe margins and exported mobile builds remain untested; desktop captures verify logical layouts and Mobile rendering, not phone GPU/audio performance. The inherited shadows, audio decoding and frequent effects at very low fire intervals should be profiled on target devices before scaling enemy counts.

@@ -1,5 +1,7 @@
 # Cuboid gameplay test
 
+Continuous perimeter enemies and the active cap are documented in [SPAWN_DIRECTOR.md](SPAWN_DIRECTOR.md).
+
 The scene includes auto-fire combat and [level-up upgrade selection](LEVEL_UP_SYSTEM.md). See [COMBAT_PROTOTYPE.md](COMBAT_PROTOTYPE.md) for health, attacks, death/EXP/audio, tuning and combat validation. The movement/import details below still apply.
 
 Open `project.godot` in Godot 4.7.2 and press **F5**. The project now starts `scenes/CuboidGameplayTest.tscn`. Open that scene and press **F6** to run it directly. The previous visual foundation remains available as `scenes/Main.tscn`.
@@ -12,7 +14,7 @@ Open `project.godot` in Godot 4.7.2 and press **F5**. The project now starts `sc
 | --- | --- |
 | `scenes/characters/CuboidPlayer.tscn` | CharacterBody3D, capsule collision, visual wrapper and imported V6 model |
 | `scenes/characters/CuboidZombie.tscn` | CharacterBody3D, capsule collision, visual wrapper and imported V2 model |
-| `scenes/CuboidGameplayTest.tscn` | Floor, physical boundaries, one player, three zombies, camera, one sun and HUD |
+| `scenes/CuboidGameplayTest.tscn` | Floor, physical boundaries, one player, continuous SpawnDirector enemies, camera, one sun and HUD |
 | `scripts/cuboid_player.gd` | Responsive WASD/Shift movement, normalized diagonals, gravity, facing and animation selection |
 | `scripts/cuboid_zombie.gd` | Cached player target, range checks, direct pursuit, stop distance and animation selection |
 | `scripts/cuboid_animation.gd` | Shared named-loop playback, 0.10-second transitions, nearest sampling and visual turning |
