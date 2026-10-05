@@ -34,9 +34,14 @@ var attack_visual_remaining: float = 0.0
 var knockback: Vector3 = Vector3.ZERO
 var speed_multiplier: float = 1.0
 var fall_sign: float = 1.0
+const FEEDBACK = preload("res://scripts/character_damage_feedback.gd")
+var damage_feedback: Node3D
 
 func _ready() -> void:
 	current_hp = max_hp
+	damage_feedback = FEEDBACK.new()
+	damage_feedback.name = "DamageFeedback"
+	add_child(damage_feedback)
 	# Stable spawn-position variation: no random work each frame.
 	var phase := fposmod(position.x * 0.37 + position.z * 0.61, 1.0)
 	speed_multiplier = lerpf(1.0 - speed_variation, 1.0 + speed_variation, phase)
@@ -50,6 +55,7 @@ func take_damage(amount: int, direction: Vector3 = Vector3.ZERO) -> bool:
 	if is_dead or amount <= 0: return false
 	current_hp = maxi(0, current_hp - amount)
 	visual.flash_hit()
+	damage_feedback.show_hit(amount, current_hp, max_hp, combat.effects if is_instance_valid(combat) else null)
 	if is_instance_valid(combat): combat.play_sound(&"zombie_hit")
 	if current_hp == 0:
 		_begin_death(direction)
@@ -81,7 +87,9 @@ func _begin_death(direction: Vector3) -> void:
 	tween.tween_callback(_finish_death)
 
 func _finish_death() -> void:
-	if is_instance_valid(combat): combat.spawn_exp(global_position)
+	if is_instance_valid(combat):
+		combat.spawn_death_smoke(visual.to_global(Vector3(0, 0.90, 0)))
+		combat.spawn_exp(global_position)
 	queue_free()
 
 func _physics_process(delta: float) -> void:

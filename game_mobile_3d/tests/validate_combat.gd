@@ -81,7 +81,7 @@ func _run() -> void:
 	check(hit_mesh.material_overlay != null, "Brief hit flash active")
 	check(combat.living_zombies[1].visual.meshes[0].material_overlay == null, "Shared atlas does not flash other zombies")
 	await tick(14)
-	check(hit_mesh.material_overlay == null and combat.effects.get_child_count() == 0, "Flash/burst clean up")
+	check(hit_mesh.material_overlay == null and combat.effects.get_children().all(func(effect): return effect.get_script() == preload("res://scripts/damage_number.gd")), "Flash/burst clean up; longer damage numbers may remain")
 	# Empty-air lifetime and world-wall collision cleanup are separate paths.
 	combat.fire(Vector3(0, 3, 0), Vector3.RIGHT, 20, 1, 0.05)
 	await tick(8)

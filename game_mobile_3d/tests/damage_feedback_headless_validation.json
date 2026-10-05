@@ -1,0 +1,14 @@
+{
+	"baseline_60_physics_frames_usec": 10927,
+	"checks": 46,
+	"desktop_benchmark": {},
+	"failures": [],
+	"passed": true,
+	"peak_draw_calls": 0,
+	"phone_tested": false,
+	"rendered": false,
+	"renderer": "mobile",
+	"stress_deaths": 24,
+	"stress_smoke_pieces": 192,
+	"weapon_note": "All models retain existing shared automatic firing cadence/stats; no new rifle rate or shotgun pellet mechanics."
+}

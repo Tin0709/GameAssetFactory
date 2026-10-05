@@ -1,6 +1,7 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/damage_flash.gdshader" id="1"]
 
 [resource]
 resource_name = "BriefHitFlash"
-shading_mode = 0
-albedo_color = Color(1, 0.88, 0.58, 1)
+shader = ExtResource("1")

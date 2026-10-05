@@ -7,6 +7,7 @@ var current_state: StringName = &""
 const HIT_MATERIAL = preload("res://materials/HitFlash.tres")
 var meshes: Array[MeshInstance3D] = []
 var flash_remaining: float = 0.0
+var flash_duration: float = 0.10
 @export var transition_time: float = 0.12
 @export var rate_response: float = 18.0
 var desired_rate: float = 1.0
@@ -37,13 +38,18 @@ func _process(delta: float) -> void:
 	animation_player.speed_scale = lerpf(animation_player.speed_scale, desired_rate, 1.0 - exp(-rate_response * delta))
 	if flash_remaining > 0.0:
 		flash_remaining = maxf(0.0, flash_remaining - delta)
+		var strength := minf(1.0, flash_remaining / (flash_duration * 0.65))
+		for instance in meshes: instance.set_instance_shader_parameter("hit_strength", strength)
 		if flash_remaining == 0.0:
 			for instance in meshes: instance.material_overlay = null
 
-func flash_hit(duration: float = 0.09) -> void:
-	flash_remaining = duration
+func flash_hit(duration: float = 0.10) -> void:
+	flash_duration = maxf(0.001, duration)
+	flash_remaining = flash_duration
 	# Instance overlays avoid flashing other actors that share the atlas material.
-	for instance in meshes: instance.material_overlay = HIT_MATERIAL
+	for instance in meshes:
+		instance.set_instance_shader_parameter("hit_strength", 1.0)
+		instance.material_overlay = HIT_MATERIAL
 
 func has_state(state: StringName) -> bool:
 	return animation_player.has_animation(animation_prefix + "_" + String(state))

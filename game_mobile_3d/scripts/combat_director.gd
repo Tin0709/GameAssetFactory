@@ -14,6 +14,13 @@ const PROJECTILE = preload("res://scenes/combat/PistolProjectile.tscn")
 const PICKUP = preload("res://scenes/combat/ExpPickup.tscn")
 const MUZZLE = preload("res://scenes/combat/MuzzleFlash.tscn")
 const IMPACT = preload("res://scenes/combat/ImpactBurst.tscn")
+const DEATH_SMOKE = preload("res://scripts/zombie_death_smoke.gd")
+
+func spawn_death_smoke(position: Vector3) -> void:
+	var smoke := DEATH_SMOKE.new()
+	smoke.name = "DeathSmoke"
+	effects.add_child(smoke)
+	smoke.global_position = position
 
 func _ready() -> void:
 	player = get_tree().get_first_node_in_group("player") as CharacterBody3D

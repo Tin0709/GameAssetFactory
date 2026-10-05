@@ -24,9 +24,15 @@ var is_dead: bool = false
 var hurt_remaining: float = 0.0
 var combat: Node
 var current_speed: float = 0.0
+const FEEDBACK = preload("res://scripts/character_damage_feedback.gd")
+var damage_feedback: Node3D
 
 func _ready() -> void:
 	current_hp = max_hp
+	damage_feedback = FEEDBACK.new()
+	damage_feedback.name = "DamageFeedback"
+	damage_feedback.player_hit = true
+	add_child(damage_feedback)
 
 func equip_test_weapon(index: int) -> void:
 	# Shared test/debug entry point into the existing animation/socket runtime.
@@ -45,6 +51,7 @@ func take_damage(amount: int) -> bool:
 	current_hp = maxi(0, current_hp - amount)
 	hurt_remaining = hurt_grace_period
 	visual.flash_hit()
+	damage_feedback.show_hit(amount, current_hp, max_hp, combat.effects if is_instance_valid(combat) else null)
 	if is_instance_valid(combat): combat.play_sound(&"player_hurt")
 	health_changed.emit(current_hp, max_hp)
 	if current_hp == 0:

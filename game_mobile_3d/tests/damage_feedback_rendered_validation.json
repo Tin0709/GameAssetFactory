@@ -1,0 +1,36 @@
+{
+	"baseline_60_physics_frames_usec": 500236,
+	"checks": 53,
+	"desktop_benchmark": {
+		"actors": 40,
+		"baseline": {
+			"draw_calls": 116.0,
+			"physics_ms": 2.02493333333333,
+			"process_ms": 17.6284666666666,
+			"wall_fps": 120.033929590764
+		},
+		"frames_per_sample": 90,
+		"gpu": "NVIDIA GeForce RTX 4070 Ti SUPER",
+		"rapid_hits": {
+			"draw_calls": 243.555555555556,
+			"physics_ms": 1.6616,
+			"process_ms": 10.821,
+			"wall_fps": 119.910626612964
+		},
+		"recovered": {
+			"draw_calls": 116.0,
+			"physics_ms": 1.67483333333333,
+			"process_ms": 9.6796111111111,
+			"wall_fps": 119.964650416344
+		}
+	},
+	"failures": [],
+	"passed": true,
+	"peak_draw_calls": 87,
+	"phone_tested": false,
+	"rendered": true,
+	"renderer": "mobile",
+	"stress_deaths": 24,
+	"stress_smoke_pieces": 192,
+	"weapon_note": "All models retain existing shared automatic firing cadence/stats; no new rifle rate or shotgun pellet mechanics."
+}
