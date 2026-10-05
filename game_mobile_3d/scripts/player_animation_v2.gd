@@ -5,6 +5,10 @@ const Sampler = preload("res://scripts/animation_pose_sampler.gd")
 const Socket = preload("res://scripts/player_weapon_socket.gd")
 const Spring = preload("res://scripts/secondary_spring.gd")
 @export var bounce_tuning: Resource = preload("res://materials/BounceTuning.tres")
+## Opt-in integration mode: unchanged authored Idle/Run timing; legacy Walk and
+## combat/socket composition stay available. Disabled for every existing scene.
+@export var authored_locomotion: bool = false
+var authored_run_time: float = 0.0
 var bounce_enabled := true
 var bounce_override := 1.0
 var body_spring := Spring.new()
@@ -79,6 +83,11 @@ func _ready() -> void:
 	idle = samples["Player_Idle"]
 	walk = samples["Player_Walk"]
 	run = samples["Player_Run"]
+	if authored_locomotion:
+		idle = samples["Idle"]
+		run = samples["Run"]
+		idle.clip.loop_mode = Animation.LOOP_LINEAR
+		run.clip.loop_mode = Animation.LOOP_LINEAR
 	for name in ["Arm.L", "Arm.R", "WeaponSocket"]: upper.append(skeleton.find_bone(name))
 	for name in ["Chest", "Neck", "Head", "Arm.L", "Arm.R", "WeaponSocket"]: recoil_mask.append(skeleton.find_bone(name))
 	hips = skeleton.find_bone("Hips")
@@ -163,6 +172,10 @@ func _process(delta: float) -> void:
 	_advance_springs(delta)
 	weapon_lag = lerpf(weapon_lag, clampf(acceleration.z * 0.0004, -0.012, 0.012), 1.0 - exp(-8.0 * delta))
 	idle_time = fposmod(idle_time + delta, idle.clip.length)
+	if authored_locomotion:
+		# Seconds, independent of legacy cadence and direction. Never restart on
+		# speed changes or a turn; authored Run always advances at 1x.
+		authored_run_time = fposmod(authored_run_time + delta, run.clip.length)
 	recoil_time += delta
 	if recoil_time >= recoil_pose.clip.length and queued_recoil:
 		recoil_time = fposmod(recoil_time, recoil_pose.clip.length)
@@ -178,7 +191,7 @@ func _process(delta: float) -> void:
 
 func _evaluate(_delta: float) -> void:
 	var wt: float = locomotion_phase * walk.clip.length
-	var rt: float = locomotion_phase * run.clip.length
+	var rt: float = authored_run_time if authored_locomotion else locomotion_phase * run.clip.length
 	for i in skeleton.get_bone_count():
 		var p: Vector3 = idle.position(i, idle_time).lerp(walk.position(i, wt).lerp(run.position(i, rt), run_weight), move_weight)
 		var q: Quaternion = idle.rotation(i, idle_time).slerp(walk.rotation(i, wt).slerp(run.rotation(i, rt), run_weight), move_weight)
@@ -222,6 +235,18 @@ func _evaluate(_delta: float) -> void:
 	for i in upper:
 		skeleton.set_bone_pose_position(i, switch_positions[i].lerp(skeleton.get_bone_pose_position(i), switch_weight))
 		skeleton.set_bone_pose_rotation(i, switch_rotations[i].slerp(skeleton.get_bone_pose_rotation(i), switch_weight).normalized())
+	if authored_locomotion:
+		# Keep existing Walk/aim/recoil behavior. For unarmed locomotion review,
+		# restore the authored body instead of layering extra lean, springs or
+		# arm gripping onto V7. Socket/weapon attachment remains fully functional.
+		var authored_weight := maxf(1.0 - move_weight, run_weight) * (1.0 - aim_weight)
+		if is_firing: authored_weight = 0.0
+		for i in skeleton.get_bone_count():
+			if i == socket_bone: continue
+			var authored_p: Vector3 = idle.position(i, idle_time).lerp(run.position(i, rt), move_weight)
+			var authored_q: Quaternion = idle.rotation(i, idle_time).slerp(run.rotation(i, rt), move_weight)
+			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i).lerp(authored_p, authored_weight))
+			skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(authored_q, authored_weight).normalized())
 
 func _hold_arm(bone: int, contact: Vector3, palm: Vector3) -> void:
 	var pose := skeleton.get_bone_global_pose(bone)

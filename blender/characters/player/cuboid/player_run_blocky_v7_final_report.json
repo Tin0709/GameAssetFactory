@@ -1,0 +1,490 @@
+{
+  "action": "Player_Run_Blocky_V7_Final",
+  "source_action": "Player_Run_Blocky_V6",
+  "exact_differences": "Copied V6; removed only 2 constant-zero Leg yaw curves (4 keys); added explicit 24-FPS/16-frame cycle metadata. No pose, timing, handle, or clipping corrections.",
+  "removed_redundant_channels": [
+    {
+      "path": "pose.bones[\"Leg.L\"].rotation_euler",
+      "index": 1,
+      "key_count": 2
+    },
+    {
+      "path": "pose.bones[\"Leg.R\"].rotation_euler",
+      "index": 1,
+      "key_count": 2
+    }
+  ],
+  "redundant_keys_removed": 4,
+  "accidental_channels_removed": 0,
+  "curves_before": 37,
+  "curves_after": 35,
+  "keys_before": 450,
+  "keys_after": 446,
+  "animated_bones": [
+    "Hips",
+    "Leg.L",
+    "Leg.R",
+    "Spine",
+    "Chest",
+    "Arm.L",
+    "Arm.R",
+    "Neck",
+    "Head"
+  ],
+  "frame_range": [
+    1,
+    17
+  ],
+  "unique_playback_frames": [
+    1,
+    16
+  ],
+  "fps": 24,
+  "duration_seconds": 0.6666666666666666,
+  "qa_sample_count": 1025,
+  "qa_frame_step": 0.015625,
+  "v6_pose_max_matrix_difference": 0,
+  "v6_mesh_max_position_difference_m": 0,
+  "root_travel_m": 0,
+  "hips_accumulated_world_travel_m": 0.0,
+  "loop_pose_max_matrix_mismatch": 0.0,
+  "loop_channel_velocity_max_mismatch": 3.3377355219965654e-08,
+  "loop_world_matrix_velocity_max_mismatch_per_frame": 0.0,
+  "cyclic_evaluation_max_matrix_mismatch": 0,
+  "endpoint_velocity_details": [
+    {
+      "path": "pose.bones[\"Hips\"].rotation_euler",
+      "index": 0,
+      "first_velocity": 0.0012466628847517302,
+      "last_velocity": 0.0012466639993562692,
+      "mismatch": 1.1146045390906384e-09
+    },
+    {
+      "path": "pose.bones[\"Hips\"].rotation_euler",
+      "index": 1,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Hips\"].rotation_euler",
+      "index": 2,
+      "first_velocity": 0.0036651913398618305,
+      "last_velocity": 0.0036651960137865673,
+      "mismatch": 4.6739247368254855e-09
+    },
+    {
+      "path": "pose.bones[\"Hips\"].location",
+      "index": 0,
+      "first_velocity": -0.003779999671429376,
+      "last_velocity": -0.003780003051015664,
+      "mismatch": 3.379586287904912e-09
+    },
+    {
+      "path": "pose.bones[\"Hips\"].location",
+      "index": 1,
+      "first_velocity": -0.03800000350305391,
+      "last_velocity": -0.03800003688040913,
+      "mismatch": 3.3377355219965654e-08
+    },
+    {
+      "path": "pose.bones[\"Hips\"].location",
+      "index": 2,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Leg.L\"].rotation_euler",
+      "index": 0,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Leg.L\"].rotation_euler",
+      "index": 2,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Leg.L\"].location",
+      "index": 0,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Leg.L\"].location",
+      "index": 1,
+      "first_velocity": -0.004232469201087952,
+      "last_velocity": -0.004232469946146011,
+      "mismatch": 7.450580595189105e-10
+    },
+    {
+      "path": "pose.bones[\"Leg.L\"].location",
+      "index": 2,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Leg.R\"].rotation_euler",
+      "index": 0,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Leg.R\"].rotation_euler",
+      "index": 2,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Leg.R\"].location",
+      "index": 0,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Leg.R\"].location",
+      "index": 1,
+      "first_velocity": -0.007753312700628852,
+      "last_velocity": -0.007753344935247068,
+      "mismatch": 3.223461821598439e-08
+    },
+    {
+      "path": "pose.bones[\"Leg.R\"].location",
+      "index": 2,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Spine\"].rotation_euler",
+      "index": 0,
+      "first_velocity": 0.006829451613339045,
+      "last_velocity": 0.006829455491690109,
+      "mismatch": 3.878351063912877e-09
+    },
+    {
+      "path": "pose.bones[\"Spine\"].rotation_euler",
+      "index": 1,
+      "first_velocity": 0.0009598584508670887,
+      "last_velocity": 0.0009598707878338169,
+      "mismatch": 1.233696672814713e-08
+    },
+    {
+      "path": "pose.bones[\"Spine\"].rotation_euler",
+      "index": 2,
+      "first_velocity": -0.002897913097010151,
+      "last_velocity": -0.002897914663661207,
+      "mismatch": 1.5666510558461078e-09
+    },
+    {
+      "path": "pose.bones[\"Chest\"].rotation_euler",
+      "index": 0,
+      "first_velocity": 0.007749316878101896,
+      "last_velocity": 0.007749317435888186,
+      "mismatch": 5.577862902464426e-10
+    },
+    {
+      "path": "pose.bones[\"Chest\"].rotation_euler",
+      "index": 1,
+      "first_velocity": 0.0,
+      "last_velocity": 0.0,
+      "mismatch": 0.0
+    },
+    {
+      "path": "pose.bones[\"Chest\"].rotation_euler",
+      "index": 2,
+      "first_velocity": -0.010788082533789526,
+      "last_velocity": -0.01078808633108515,
+      "mismatch": 3.7972956237752875e-09
+    },
+    {
+      "path": "pose.bones[\"Arm.L\"].rotation_euler",
+      "index": 0,
+      "first_velocity": 0.025683046918096954,
+      "last_velocity": 0.02568306988055218,
+      "mismatch": 2.2962455225455924e-08
+    },
+    {
+      "path": "pose.bones[\"Arm.L\"].rotation_euler",
+      "index": 1,
+      "first_velocity": 0.0006498722746892139,
+      "last_velocity": 0.0006498775123381733,
+      "mismatch": 5.237648959400924e-09
+    },
+    {
+      "path": "pose.bones[\"Arm.L\"].rotation_euler",
+      "index": 2,
+      "first_velocity": 0.003465991673826675,
+      "last_velocity": 0.003466004085902296,
+      "mismatch": 1.2412075621210522e-08
+    },
+    {
+      "path": "pose.bones[\"Arm.R\"].rotation_euler",
+      "index": 0,
+      "first_velocity": -0.025178021643175164,
+      "last_velocity": -0.025178043240959187,
+      "mismatch": 2.1597784023025257e-08
+    },
+    {
+      "path": "pose.bones[\"Arm.R\"].rotation_euler",
+      "index": 1,
+      "first_velocity": 0.0005804334344493179,
+      "last_velocity": 0.000580430387623684,
+      "mismatch": 3.0468256339124047e-09
+    },
+    {
+      "path": "pose.bones[\"Arm.R\"].rotation_euler",
+      "index": 2,
+      "first_velocity": -0.0038695672675610544,
+      "last_velocity": -0.003869558842300785,
+      "mismatch": 8.425260269399187e-09
+    },
+    {
+      "path": "pose.bones[\"Neck\"].rotation_euler",
+      "index": 0,
+      "first_velocity": -0.003182198105361606,
+      "last_velocity": -0.003182189662011028,
+      "mismatch": 8.44335057816406e-09
+    },
+    {
+      "path": "pose.bones[\"Neck\"].rotation_euler",
+      "index": 1,
+      "first_velocity": -0.00010793964055687344,
+      "last_velocity": -0.00010793799417394923,
+      "mismatch": 1.646382924211224e-09
+    },
+    {
+      "path": "pose.bones[\"Neck\"].rotation_euler",
+      "index": 2,
+      "first_velocity": 0.0029581536947027175,
+      "last_velocity": 0.002958143903372737,
+      "mismatch": 9.791329980309016e-09
+    },
+    {
+      "path": "pose.bones[\"Head\"].rotation_euler",
+      "index": 0,
+      "first_velocity": -0.002169166144700313,
+      "last_velocity": -0.002169152936245451,
+      "mismatch": 1.3208454861975139e-08
+    },
+    {
+      "path": "pose.bones[\"Head\"].rotation_euler",
+      "index": 1,
+      "first_velocity": -0.00023270077482626952,
+      "last_velocity": -0.0002327022084067657,
+      "mismatch": 1.4335804961749035e-09
+    },
+    {
+      "path": "pose.bones[\"Head\"].rotation_euler",
+      "index": 2,
+      "first_velocity": 0.0020141412595499407,
+      "last_velocity": 0.0020141252319199033,
+      "mismatch": 1.6027630037399043e-08
+    },
+    {
+      "path": "pose.bones[\"Head\"].location",
+      "index": 1,
+      "first_velocity": 0.0017323396984277658,
+      "last_velocity": 0.0017323250032901512,
+      "mismatch": 1.4695137614574583e-08
+    }
+  ],
+  "minimum_leg_bottom_z_m": 0.0025382116436958313,
+  "maximum_ground_penetration_m": 0,
+  "support_clearance_range_m": [
+    0.0025382116436958313,
+    0.006431296467781067
+  ],
+  "maximum_recovery_clearance_m": 0.09528136998414993,
+  "max_rigid_length_error_m": 2.394183881704315e-07,
+  "max_world_rotation_step_per_64th_frame_degrees": 0.2880353205192259,
+  "clipping_max_overlap_m": {
+    "Head / Chest": 0.008796267269644886,
+    "Head / Arm.L": 0.01258462987607345,
+    "Head / Arm.R": 0.009499705280177295,
+    "Arm.L / Chest": 0.0035921884700655937,
+    "Arm.R / Chest": 0.0009903430473059416,
+    "Chest / Leg.L": 0.09027340868487954,
+    "Chest / Leg.R": 0.09057321993168443
+  },
+  "clipping_corrected": false,
+  "world_rotation_ranges_degrees": {
+    "Chest": [
+      [
+        5.326499972345995,
+        8.635053851583926
+      ],
+      [
+        -3.711409535542685,
+        4.155040994305591
+      ],
+      [
+        -1.9388439647828533,
+        1.7642965595524733
+      ]
+    ],
+    "Head": [
+      [
+        2.7519015727315317,
+        5.2220638186155615
+      ],
+      [
+        -1.4675482121689856,
+        1.839246786635962
+      ],
+      [
+        -0.5818530898619552,
+        0.5274316366591746
+      ]
+    ]
+  },
+  "gaze_max_deviation_degrees": 5.234389512791542,
+  "key_poses": [
+    {
+      "frame": 1.0,
+      "leg_bottom_z_m": {
+        "Leg.L": 0.05969963222742081,
+        "Leg.R": 0.0030000321567058563
+      },
+      "forward_components": {
+        "Leg.L": -0.6428518295288086,
+        "Leg.R": 0.4697172939777374,
+        "Arm.L": 0.3220501244068146,
+        "Arm.R": -0.5986549854278564
+      }
+    },
+    {
+      "frame": 3.0,
+      "leg_bottom_z_m": {
+        "Leg.L": 0.017400024458765984,
+        "Leg.R": 0.003000013530254364
+      },
+      "forward_components": {
+        "Leg.L": -0.2328086793422699,
+        "Leg.R": 0.18331779539585114,
+        "Arm.L": 0.2702612280845642,
+        "Arm.R": -0.6229233145713806
+      }
+    },
+    {
+      "frame": 5.0,
+      "leg_bottom_z_m": {
+        "Leg.L": 0.027000021189451218,
+        "Leg.R": 0.0030000321567058563
+      },
+      "forward_components": {
+        "Leg.L": 0.03206900507211685,
+        "Leg.R": -0.34449243545532227,
+        "Arm.L": -0.0007874071598052979,
+        "Arm.R": -0.31921711564064026
+      }
+    },
+    {
+      "frame": 7.0,
+      "leg_bottom_z_m": {
+        "Leg.L": 0.04086758568882942,
+        "Leg.R": 0.08364806324243546
+      },
+      "forward_components": {
+        "Leg.L": 0.35710540413856506,
+        "Leg.R": -0.5462402701377869,
+        "Arm.L": -0.3811280429363251,
+        "Arm.R": 0.10161828249692917
+      }
+    },
+    {
+      "frame": 9.0,
+      "leg_bottom_z_m": {
+        "Leg.L": 0.0029999911785125732,
+        "Leg.R": 0.041434094309806824
+      },
+      "forward_components": {
+        "Leg.L": 0.5017070174217224,
+        "Leg.R": -0.6143474578857422,
+        "Arm.L": -0.6323394179344177,
+        "Arm.R": 0.35173213481903076
+      }
+    },
+    {
+      "frame": 11.0,
+      "leg_bottom_z_m": {
+        "Leg.L": 0.003000006079673767,
+        "Leg.R": 0.017399964854121208
+      },
+      "forward_components": {
+        "Leg.L": 0.16610893607139587,
+        "Leg.R": -0.26658061146736145,
+        "Arm.L": -0.6227794289588928,
+        "Arm.R": 0.3217407464981079
+      }
+    },
+    {
+      "frame": 13.0,
+      "leg_bottom_z_m": {
+        "Leg.L": 0.004009108990430832,
+        "Leg.R": 0.025080028921365738
+      },
+      "forward_components": {
+        "Leg.L": -0.36158138513565063,
+        "Leg.R": 0.049497514963150024,
+        "Arm.L": -0.3008466958999634,
+        "Arm.R": 0.05597792565822601
+      }
+    },
+    {
+      "frame": 15.0,
+      "leg_bottom_z_m": {
+        "Leg.L": 0.09132447093725204,
+        "Leg.R": 0.04384753108024597
+      },
+      "forward_components": {
+        "Leg.L": -0.5751468539237976,
+        "Leg.R": 0.3894495368003845,
+        "Arm.L": 0.13482917845249176,
+        "Arm.R": -0.32692283391952515
+      }
+    },
+    {
+      "frame": 17.0,
+      "leg_bottom_z_m": {
+        "Leg.L": 0.05969963222742081,
+        "Leg.R": 0.0030000321567058563
+      },
+      "forward_components": {
+        "Leg.L": -0.6428518295288086,
+        "Leg.R": 0.4697172939777374,
+        "Arm.L": 0.3220501244068146,
+        "Arm.R": -0.5986549854278564
+      }
+    }
+  ],
+  "all_prior_actions_unchanged": true,
+  "production_unchanged": true,
+  "mesh_skinning_rest_hierarchy_lengths_unchanged": true,
+  "scale_or_object_or_root_or_unused_bone_animation_present": false,
+  "ready_for_godot_testing_after_visual_approval": true,
+  "exported": false,
+  "playback_qa": {
+    "normal_fps": 24,
+    "half_speed_fps": 12,
+    "normal_seconds": 15,
+    "normal_cycles_at_least": 10,
+    "unique_frames": [
+      1,
+      16
+    ],
+    "final_authoring_preview": [
+      1,
+      17
+    ]
+  }
+}

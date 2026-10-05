@@ -1,0 +1,281 @@
+{
+  "export_blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_game_export_v1.blend",
+  "glb": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\export\\player_cuboid_animated_v1.glb",
+  "mesh": "Player_Cuboid_Base",
+  "armature": "Player_Cuboid_Rig",
+  "clips": {
+    "Idle": {
+      "range": [
+        1.0,
+        49.0
+      ],
+      "duration": 2.0
+    },
+    "Run": {
+      "range": [
+        1.0,
+        17.0
+      ],
+      "duration": 0.6666666666666666
+    }
+  },
+  "authoring_fps": 24,
+  "export_sampling_hz": 96,
+  "blender_forward": "-Y",
+  "gltf_forward": "+Z",
+  "gltf_up": "+Y",
+  "transforms_changed": false,
+  "mesh_transform": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "armature_transform": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "protected_hashes": {
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\blocky_character_mixamo_test.blend": "e6feff38a10e6a8d4b0332e609a455fc77a73c89ba0b6ccf53981d2f9589e40b",
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_v6.blend": "cc2344b6c5fe00ec6a0f50f18997977206644c0d6037ed0dd0f0a9e338342cdd"
+  },
+  "technical_export_fix_constant_neutral_channels": {
+    "Idle": [
+      [
+        "pose.bones[\"Hips\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Spine\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Spine\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Chest\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Chest\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Chest\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Neck\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Neck\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Neck\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Neck\"].rotation_euler",
+        0
+      ],
+      [
+        "pose.bones[\"Neck\"].rotation_euler",
+        1
+      ],
+      [
+        "pose.bones[\"Neck\"].rotation_euler",
+        2
+      ],
+      [
+        "pose.bones[\"Head\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Head\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Head\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Arm.L\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Arm.L\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Arm.L\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Arm.R\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Arm.R\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Arm.R\"].location",
+        2
+      ]
+    ],
+    "Run": [
+      [
+        "pose.bones[\"Spine\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Spine\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Spine\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Chest\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Chest\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Chest\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Neck\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Neck\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Neck\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Head\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Head\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Arm.L\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Arm.L\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Arm.L\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Arm.R\"].location",
+        0
+      ],
+      [
+        "pose.bones[\"Arm.R\"].location",
+        1
+      ],
+      [
+        "pose.bones[\"Arm.R\"].location",
+        2
+      ],
+      [
+        "pose.bones[\"Leg.L\"].rotation_euler",
+        1
+      ],
+      [
+        "pose.bones[\"Leg.R\"].rotation_euler",
+        1
+      ]
+    ]
+  },
+  "validation": "PASS",
+  "glb_bytes": 65756,
+  "animations": {
+    "Idle": {
+      "duration_seconds": 2.0,
+      "sample_count": 193,
+      "max_mesh_difference_from_approved_blender_m": 4.3392836387637365e-07,
+      "root_travel_m": 0,
+      "hips_accumulated_world_travel_m": 0.0,
+      "loop_vertex_mismatch_m": 0.0,
+      "rigid_joint_scale_error": 3.400459140934231e-07,
+      "channel_count": 18
+    },
+    "Run": {
+      "duration_seconds": 0.6666666865348816,
+      "sample_count": 65,
+      "max_mesh_difference_from_approved_blender_m": 4.786961795153919e-07,
+      "root_travel_m": 0,
+      "hips_accumulated_world_travel_m": 0.0,
+      "loop_vertex_mismatch_m": 0.0,
+      "rigid_joint_scale_error": 6.111220451909816e-07,
+      "channel_count": 18
+    }
+  },
+  "node_names": [
+    "Leg.L",
+    "Leg.R",
+    "Arm.L",
+    "Arm.R",
+    "Head",
+    "Neck",
+    "Chest",
+    "Spine",
+    "Hips",
+    "Root",
+    "Player_Cuboid_Base",
+    "Player_Cuboid_Rig"
+  ],
+  "mesh_count": 1,
+  "skin_count": 1,
+  "joint_count": 10,
+  "embedded_images": 1,
+  "mixamo_absent": true,
+  "source_test_production_hashes_unchanged": true,
+  "no_scale_or_root_or_object_animation": true,
+  "original_authored_curves_exactly_preserved_in_export_actions": true,
+  "export_mesh_weights_uvs_rest_bones_unchanged": true,
+  "roundtrip_method": "Independent glTF TRS evaluation + inverse-bind CPU skinning, bidirectional vertex-set distance at every quarter authoring-frame against original Blender evaluated mesh",
+  "loop_note": "glTF does not encode a playback loop flag; enable looping for Idle/Run on Godot import. End key at 0.6666667s closes the Run interval, without adding an extra 1/24s hold."
+}
