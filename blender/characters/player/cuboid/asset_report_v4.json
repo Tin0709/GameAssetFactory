@@ -1,0 +1,29 @@
+{
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_v4.blend",
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "material_count": 1,
+  "triangles": 120,
+  "bone_count": 18,
+  "dimensions_m": [
+    0.9,
+    0.45,
+    1.8
+  ],
+  "roughness": 0.54,
+  "specular_ior_level": 0.22,
+  "metallic": 0,
+  "nearest_sampling": true,
+  "packed_atlas": true,
+  "geometry_rig_uv_weights_unchanged": true,
+  "geometry_rig_signature": "71417cd53ce6febe9f3171063b38e20d619ab1a9b5c3a80df7766b928b1a6521",
+  "v3_sha256": "a9b8313b81863b6086e3a2299c5c5e24ad720b7e076c5f1b043b943427663a7c",
+  "v3_unchanged": true,
+  "original_pixel_art": true,
+  "reference_pixels_sampled": false,
+  "final_saved_revision_verified": true,
+  "front_side_back_visually_checked": true,
+  "strap_continuity_checked": true
+}
