@@ -1,0 +1,79 @@
+{
+  "glb_triangles": 552,
+  "glb_materials": 1,
+  "glb_draw_surfaces": 1,
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9984,
+      "wrapS": 33071,
+      "wrapT": 33071
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Grip_Point",
+      "translation": null
+    },
+    {
+      "name": "M4A1_Blocky_Base",
+      "translation": null
+    },
+    {
+      "name": "Muzzle_Point",
+      "translation": [
+        0,
+        0.18000000715255737,
+        -0.6859999895095825
+      ]
+    },
+    {
+      "name": "Support_Hand_Point",
+      "translation": [
+        0,
+        0.125,
+        -0.375
+      ]
+    },
+    {
+      "name": "M4A1_Blocky_Root",
+      "translation": null
+    }
+  ],
+  "previews": {
+    "front": {
+      "size": [
+        1280,
+        960
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    "side": {
+      "size": [
+        1280,
+        960
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    "isometric": {
+      "size": [
+        1280,
+        960
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    }
+  },
+  "character_files_sha256": {
+    "player": "cc2344b6c5fe00ec6a0f50f18997977206644c0d6037ed0dd0f0a9e338342cdd",
+    "zombie": "22e2abb4670206aaa1e96711340f958e113921b5499f19414deea65cde460a8c"
+  }
+}

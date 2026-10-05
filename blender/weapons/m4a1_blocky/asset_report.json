@@ -1,0 +1,164 @@
+{
+  "triangles": 552,
+  "vertices": 324,
+  "polygons": 295,
+  "material_count": 1,
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "texture_packed": true,
+  "forward_blender": "+Y",
+  "forward_godot": "-Z",
+  "origin": "primary grip center",
+  "bounds_m": {
+    "X": [
+      -0.057999998331069946,
+      0.057999998331069946
+    ],
+    "Y": [
+      -0.31199997663497925,
+      0.6850000023841858
+    ],
+    "Z": [
+      -0.13699999451637268,
+      0.3135000169277191
+    ]
+  },
+  "dimensions_m": [
+    0.11599999666213989,
+    0.996999979019165,
+    0.4505000114440918
+  ],
+  "markers": {
+    "Grip_Point": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Muzzle_Point": [
+      0.0,
+      0.6859999895095825,
+      0.18000000715255737
+    ],
+    "Support_Hand_Point": [
+      0.0,
+      0.375,
+      0.125
+    ]
+  },
+  "parts": [
+    {
+      "name": "Stock",
+      "triangles": 80,
+      "bevel_m": 0.0025
+    },
+    {
+      "name": "Stock_Heel",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Stock_Link",
+      "triangles": 8,
+      "bevel_m": 0
+    },
+    {
+      "name": "Receiver",
+      "triangles": 80,
+      "bevel_m": 0.002
+    },
+    {
+      "name": "Top_Rail",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Rear_Sight_Base",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Rear_Sight_Left",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Rear_Sight_Right",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Handguard",
+      "triangles": 44,
+      "bevel_m": 0.002
+    },
+    {
+      "name": "Front_Collar",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Barrel",
+      "triangles": 44,
+      "bevel_m": 0.001
+    },
+    {
+      "name": "Muzzle_Shroud",
+      "triangles": 24,
+      "bevel_m": 0
+    },
+    {
+      "name": "Front_Sight_Base",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Front_Sight_Left",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Front_Sight_Right",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Front_Sight_Bridge",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Magazine",
+      "triangles": 60,
+      "bevel_m": 0.0015
+    },
+    {
+      "name": "Magazine_Floorplate",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Pistol_Grip",
+      "triangles": 44,
+      "bevel_m": 0.0015
+    },
+    {
+      "name": "Trigger_Guard_Bottom",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Trigger_Guard_Front",
+      "triangles": 12,
+      "bevel_m": 0
+    },
+    {
+      "name": "Trigger",
+      "triangles": 12,
+      "bevel_m": 0
+    }
+  ],
+  "original": true,
+  "character_sources_unchanged": true
+}
