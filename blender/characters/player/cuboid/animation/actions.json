@@ -1,0 +1,95 @@
+[
+  {
+    "name": "Player_Idle",
+    "playback": [
+      1,
+      48
+    ],
+    "keys_and_export": [
+      1,
+      49
+    ],
+    "fps": 24,
+    "duration_s": 2.0,
+    "curves": 43,
+    "keys": 324,
+    "animated_bones": [
+      "Chest",
+      "Forearm.L",
+      "Forearm.R",
+      "Hand.L",
+      "Hand.R",
+      "Head",
+      "Hips",
+      "Shin.L",
+      "Shin.R",
+      "Spine",
+      "Thigh.L",
+      "Thigh.R",
+      "UpperArm.L",
+      "UpperArm.R"
+    ]
+  },
+  {
+    "name": "Player_Walk",
+    "playback": [
+      1,
+      32
+    ],
+    "keys_and_export": [
+      1,
+      33
+    ],
+    "fps": 24,
+    "duration_s": 1.3333333333333333,
+    "curves": 43,
+    "keys": 626,
+    "animated_bones": [
+      "Chest",
+      "Forearm.L",
+      "Forearm.R",
+      "Hand.L",
+      "Hand.R",
+      "Head",
+      "Hips",
+      "Shin.L",
+      "Shin.R",
+      "Spine",
+      "Thigh.L",
+      "Thigh.R",
+      "UpperArm.L",
+      "UpperArm.R"
+    ]
+  },
+  {
+    "name": "Player_Run",
+    "playback": [
+      1,
+      24
+    ],
+    "keys_and_export": [
+      1,
+      25
+    ],
+    "fps": 24,
+    "duration_s": 1.0,
+    "curves": 43,
+    "keys": 698,
+    "animated_bones": [
+      "Chest",
+      "Forearm.L",
+      "Forearm.R",
+      "Hand.L",
+      "Hand.R",
+      "Head",
+      "Hips",
+      "Shin.L",
+      "Shin.R",
+      "Spine",
+      "Thigh.L",
+      "Thigh.R",
+      "UpperArm.L",
+      "UpperArm.R"
+    ]
+  }
+]

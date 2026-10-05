@@ -1,0 +1,113 @@
+{
+  "Player_Idle": {
+    "playback": [
+      1,
+      48
+    ],
+    "closing_key": 49,
+    "fps": 24,
+    "loop_vertex_error_m": 0.0,
+    "loop_velocity_error_m_per_frame": 3.68935418222545e-05,
+    "rigid_edge_error_m": 2.037551839473295e-07,
+    "root_matrix_error": 0,
+    "minimum_floor_z_m": -9.219629646395333e-07,
+    "scale_range": [
+      1,
+      1
+    ],
+    "max_quarter_frame_vertex_travel_m": 0.0005585955777763806,
+    "head_max_world_rotation_deg": 0.6243209116044202,
+    "foot_contact": {
+      "L": {
+        "lateral_span_m": 1.1920928955078125e-07,
+        "treadmill_corrected_foreaft_span_m": 2.091220721922582e-06,
+        "stance_min_z_m": -9.219135677085433e-07,
+        "stance_max_z_m": 9.240530971510452e-07
+      },
+      "R": {
+        "lateral_span_m": 1.2665987014770508e-07,
+        "treadmill_corrected_foreaft_span_m": 2.0914377500957926e-06,
+        "stance_min_z_m": -9.219629646395333e-07,
+        "stance_max_z_m": 9.239951737072261e-07
+      }
+    },
+    "switching_actions_resets_unused_channels": true,
+    "full_isometric_frames_rendered": 48,
+    "chronological_frame_review_complete": true,
+    "normal_speed_preview_duration_verified": true
+  },
+  "Player_Walk": {
+    "playback": [
+      1,
+      32
+    ],
+    "closing_key": 33,
+    "fps": 24,
+    "loop_vertex_error_m": 0.0,
+    "loop_velocity_error_m_per_frame": 0.00035319959771120193,
+    "rigid_edge_error_m": 2.1838660591022574e-07,
+    "root_matrix_error": 0,
+    "minimum_floor_z_m": -0.0013436414301395416,
+    "scale_range": [
+      1,
+      1
+    ],
+    "max_quarter_frame_vertex_travel_m": 0.020299687502260733,
+    "head_max_world_rotation_deg": 0.7773241392844346,
+    "foot_contact": {
+      "L": {
+        "lateral_span_m": 0.00021610409021377563,
+        "treadmill_corrected_foreaft_span_m": 0.007235541939735413,
+        "stance_min_z_m": -0.0013436414301395416,
+        "stance_max_z_m": 0.00021752715110778809
+      },
+      "R": {
+        "lateral_span_m": 0.00021652132272720337,
+        "treadmill_corrected_foreaft_span_m": 0.007038891315460205,
+        "stance_min_z_m": -0.0012968666851520538,
+        "stance_max_z_m": 4.727393388748169e-05
+      }
+    },
+    "switching_actions_resets_unused_channels": true,
+    "full_isometric_frames_rendered": 32,
+    "chronological_frame_review_complete": true,
+    "normal_speed_preview_duration_verified": true
+  },
+  "Player_Run": {
+    "playback": [
+      1,
+      24
+    ],
+    "closing_key": 25,
+    "fps": 24,
+    "loop_vertex_error_m": 0.0,
+    "loop_velocity_error_m_per_frame": 0.0006734269827523129,
+    "rigid_edge_error_m": 1.6781058370662905e-07,
+    "root_matrix_error": 0,
+    "minimum_floor_z_m": -0.0028786808252334595,
+    "scale_range": [
+      1,
+      1
+    ],
+    "max_quarter_frame_vertex_travel_m": 0.039991737428470855,
+    "head_max_world_rotation_deg": 0.7922836943097905,
+    "foot_contact": {
+      "L": {
+        "lateral_span_m": 0.0002689287066459656,
+        "treadmill_corrected_foreaft_span_m": 0.02524682879447937,
+        "stance_min_z_m": -0.0027906708419322968,
+        "stance_max_z_m": 0.009740346111357212
+      },
+      "R": {
+        "lateral_span_m": 0.0002669095993041992,
+        "treadmill_corrected_foreaft_span_m": 0.025154829025268555,
+        "stance_min_z_m": -0.0028786808252334595,
+        "stance_max_z_m": 0.010415233671665192
+      }
+    },
+    "switching_actions_resets_unused_channels": true,
+    "full_isometric_frames_rendered": 24,
+    "chronological_frame_review_complete": true,
+    "normal_speed_preview_duration_verified": true
+  }
+}
