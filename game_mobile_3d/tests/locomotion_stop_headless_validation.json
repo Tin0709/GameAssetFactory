@@ -1,0 +1,11 @@
+{
+	"actual_gameplay_stops": 96,
+	"checks": 74510,
+	"dead_zone_mps": 0.12,
+	"failures": [],
+	"peak_pattern_frame_degrees_60fps": 25.1430311179152,
+	"peak_stop_frame_degrees_60fps": 25.6984706389571,
+	"peak_stop_sweep_degrees": 185.963757361996,
+	"rendered": false,
+	"transition_seconds": 0.13
+}

@@ -18,6 +18,7 @@ var leg_right: int
 const PREFIXES = ["Pistol", "LongGun", "Shotgun"]
 const WEAPON_NAMES = ["Pistol", "M4A1", "Shotgun"]
 const RECOILS = ["Pistol_Recoil", "Rifle_Recoil", "Shotgun_Recoil"]
+const LOCOMOTION_DEAD_ZONE := 0.12
 ## Visual full-stride cycles/second at the unchanged gameplay speed anchors.
 ## Short authored strides cannot simultaneously give natural cadence and plant
 ## feet at 4.25/6.25 m/s. Prefer readable rhythm over distance-locked fast bobbing.
@@ -56,6 +57,7 @@ var run_weight := 0.0
 var move_weight := 0.0
 var idle_time := 0.0
 var lower_yaw := 0.0
+var lower_rotation := Quaternion.IDENTITY
 var stride_sign := 1.0
 var weapon_lag := 0.0
 var previous_velocity := Vector3.ZERO
@@ -118,7 +120,7 @@ func update_motion(velocity_world: Vector3, target: Node3D, delta: float) -> voi
 	velocity_world.y = 0.0
 	movement_speed = velocity_world.length()
 	has_target = is_instance_valid(target)
-	var direction := target.global_position - global_position if has_target else velocity_world
+	var direction := target.global_position - global_position if has_target else (velocity_world if movement_speed >= LOCOMOTION_DEAD_ZONE else Vector3.ZERO)
 	var old_yaw := rotation.y
 	face_direction(direction, delta, 16.0)
 	turn_rate = lerpf(turn_rate, wrapf(rotation.y - old_yaw, -PI, PI) / maxf(delta, 0.001), 1.0 - exp(-12.0 * delta))
@@ -128,22 +130,27 @@ func update_motion(velocity_world: Vector3, target: Node3D, delta: float) -> voi
 	acceleration = acceleration.lerp(global_basis.inverse() * (velocity_world - previous_velocity) / maxf(delta, 0.001), 1.0 - exp(-10.0 * delta))
 	previous_velocity = velocity_world
 	# Fold the stride plane into +/-90 degrees and reverse phase for backpedal.
-	var yaw := atan2(local.x, local.z) if movement_speed > 0.1 else lower_yaw
-	yaw = lower_yaw + wrapf(yaw - lower_yaw, -PI / 2.0, PI / 2.0)
-	lower_yaw = lerp_angle(lower_yaw, yaw, 1.0 - exp(-delta / 0.13))
-	stride_sign = -1.0 if local.dot(Vector3(sin(lower_yaw), 0, cos(lower_yaw))) < -0.05 else 1.0
+	if movement_speed >= LOCOMOTION_DEAD_ZONE:
+		var yaw := lower_yaw + wrapf(atan2(local.x, local.z) - lower_yaw, -PI / 2.0, PI / 2.0)
+		lower_yaw = wrapf(lerp_angle(lower_yaw, yaw, 1.0 - exp(-delta / 0.13)), -PI, PI)
+		stride_sign = -1.0 if local.dot(Vector3(sin(lower_yaw), 0, cos(lower_yaw))) < -0.05 else 1.0
 
 func _process(delta: float) -> void:
 	super._process(delta)
 	if frozen or skeleton == null: return
 	aim_weight = move_toward(aim_weight, 1.0 if has_target else 0.0, delta / 0.13)
-	move_weight = move_toward(move_weight, clampf(movement_speed / 0.5, 0.0, 1.0), delta / 0.13)
+	move_weight = move_toward(move_weight, clampf(movement_speed / 0.5, 0.0, 1.0) if movement_speed >= LOCOMOTION_DEAD_ZONE else 0.0, delta / 0.13)
+	var desired_lower := Quaternion.IDENTITY.slerp(Quaternion(Vector3.UP, lower_yaw), move_weight).normalized()
+	var lower_angle := lower_rotation.angle_to(desired_lower)
+	# At +/-PI, a partially weighted direction can change its shortest branch.
+	# Limit that seam to the same 0.13s turn-back rate instead of a one-frame flip.
+	lower_rotation = lower_rotation.slerp(desired_lower, minf(1.0, delta * PI / 0.13 / maxf(lower_angle, 0.00001))).normalized()
 	run_weight = move_toward(run_weight, smoothstep(4.25, 6.25, movement_speed), delta / 0.13)
 	switch_weight = minf(1.0, switch_weight + delta / 0.13)
 	# Blend calibrated visual stride lengths with the same weight as the poses.
 	# Cadence remains speed-responsive below the anchors and bounded above them.
 	var visual_stride := lerpf(4.25 / walk_cadence, 6.25 / run_cadence, run_weight)
-	var desired_cycles := clampf(movement_speed / visual_stride, 0.0, run_cadence)
+	var desired_cycles := clampf(movement_speed / visual_stride, 0.0, run_cadence) if movement_speed >= LOCOMOTION_DEAD_ZONE else 0.0
 	cycles_per_second = move_toward(cycles_per_second, desired_cycles, delta * run_cadence / cadence_transition)
 	var phase_travel := delta * cycles_per_second * stride_sign
 	var contacts := Spring.contacts_crossed(locomotion_phase, phase_travel, bounce_tuning.contact_phase)
@@ -163,7 +170,7 @@ func _process(delta: float) -> void:
 		queued_recoil = false
 	is_firing = recoil_time < recoil_pose.clip.length
 	recoil_amount = (1.0 - recoil_time / recoil_pose.clip.length) * recoil_gain if is_firing else 0.0
-	var state: StringName = &"Idle" if movement_speed < 0.12 else (&"Run" if run_weight > 0.5 else &"Walk")
+	var state: StringName = &"Idle" if movement_speed < LOCOMOTION_DEAD_ZONE else (&"Run" if run_weight > 0.5 else &"Walk")
 	if state != current_state:
 		current_state = state
 		state_changes += 1
@@ -188,8 +195,10 @@ func _evaluate(_delta: float) -> void:
 		skeleton.set_bone_pose_rotation(i, q.normalized())
 	# Rotate hips in skeleton space, then cancel that rotation at chest: arms,
 	# socket and head follow target while the leg stride follows local movement.
-	_rotate_global(hips, Quaternion(Vector3.UP, lower_yaw * move_weight))
-	_rotate_global(chest, Quaternion(Vector3.UP, -lower_yaw * move_weight))
+	# Never fade an unwrapped Euler angle: multiple turns would unwind on stop.
+	# The normalized direction quaternion returns to Idle by its shortest path.
+	_rotate_global(hips, lower_rotation)
+	_rotate_global(chest, lower_rotation.inverse())
 	# Carry the whole chest/arms/socket together to retain both fixed contacts.
 	var lean := clampf(acceleration.z * 0.0012, -0.035, 0.035) + weapon_lag + run_weight * (1.0 - aim_weight) * 0.025
 	var lag := clampf(turn_rate * -0.008, -0.025, 0.025)
