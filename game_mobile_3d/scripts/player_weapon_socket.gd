@@ -3,12 +3,17 @@ extends BoneAttachment3D
 const WEAPONS = [preload("res://assets/weapons/pistol_v4.glb"), preload("res://assets/weapons/m4a1_v4.glb"), preload("res://assets/weapons/shotgun_v4.glb")]
 const HOLD_SCALES = [1.20, 1.12, 1.14]
 ## Socket space: +Y is barrel-forward, +Z is weapon-up (before Y-up undo).
-const HOLD_OFFSETS = [Vector3(0, 0.035, 0.065), Vector3(0, 0.015, 0.075), Vector3(0, 0.020, 0.070)]
-## A small rear/underside contact on the existing forward support region.
-const SUPPORT_OFFSETS = [Vector3.ZERO, Vector3(0, -0.018, 0.025), Vector3(0, -0.015, 0.020)]
-## Arm-local contact near the distal/top edge, rather than its volume center.
-const MAIN_HAND_CONTACTS = [Vector3(0, 0.610, 0.090), Vector3(0, 0.587, 0.090), Vector3(0, 0.590, 0.090)]
-const SUPPORT_HAND_CONTACTS = [Vector3(0, 0.616, 0.100), Vector3(0, 0.617, 0.100), Vector3(0, 0.623, 0.100)]
+const HOLD_OFFSETS = [Vector3(0.015, 0.025, 0.035), Vector3(0.210, 0.270, -0.120), Vector3(0.210, 0.340, 0.035)]
+## Bring the rigid arm roots onto the front shoulder, without changing length.
+const SHOULDER_OFFSETS = [Vector3.ZERO, Vector3(0, -0.020, 0.100), Vector3(0, 0, 0.120)]
+const LOW_READY_FORWARD = [0.0, 0.030, 0.070]
+const LOW_READY_SHOULDER_FORWARD = [0.0, 0.055, 0.070]
+## Bring support toward the grip/receiver underside for a compact closed hold.
+const SUPPORT_OFFSETS = [Vector3(0, -0.005, 0.010), Vector3(0, -0.018, 0.265), Vector3(0, -0.015, 0.250)]
+## Opposite inner palm edges close around the gun, rather than stacking it on
+## the arm centers. Preserve a small upper-edge inset for intentional overlap.
+const MAIN_HAND_CONTACTS = [Vector3(-0.100, 0.594, 0.055), Vector3(-0.100, 0.656, 0.055), Vector3(-0.100, 0.670, 0.055)]
+const SUPPORT_HAND_CONTACTS = [Vector3(0.100, 0.609, 0.055), Vector3(0.100, 0.635, 0.065), Vector3(0.100, 0.668, 0.065)]
 var instances: Array[Node3D] = []
 var muzzles: Array[Node3D] = []
 var grips: Array[Vector3] = []

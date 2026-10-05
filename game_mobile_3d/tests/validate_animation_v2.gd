@@ -54,7 +54,8 @@ func run() -> void:
 		check(visible_count == 1, "Exactly one equipped weapon")
 		check(v.socket.instances[weapon].scale.is_equal_approx(Vector3.ONE * v.Socket.HOLD_SCALES[weapon]), "Per-weapon scale applied once")
 		for arm in [v.main_arm, v.support_arm]:
-			check(v.skeleton.get_bone_pose_position(arm).is_equal_approx(v.raise_pose.position(arm, v.aim_weight * v.raise_pose.clip.length)), "Hold correction preserves authored shoulder position")
+			var adjustment: Vector3 = v.skeleton.get_bone_pose_position(arm) - v.raise_pose.position(arm, v.aim_weight * v.raise_pose.clip.length)
+			check(adjustment.length() <= 0.191 and (weapon != 0 or adjustment.is_zero_approx()), "Shoulder hold adjustment bounded; pistol retains authored shoulders")
 		for aiming in [false, true]:
 			for speed in [0.0, 4.25, 6.25]:
 				for direction in [Vector3.BACK, Vector3.FORWARD, Vector3.LEFT, Vector3.RIGHT, Vector3(1,0,1).normalized(), Vector3(-1,0,-1).normalized()]:

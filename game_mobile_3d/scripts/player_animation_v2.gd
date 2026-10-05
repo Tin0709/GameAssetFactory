@@ -156,6 +156,12 @@ func _evaluate(_delta: float) -> void:
 		if i in upper:
 			p = raise_pose.position(i, aim_weight * raise_pose.clip.length)
 			q = raise_pose.rotation(i, aim_weight * raise_pose.clip.length)
+			if i == main_arm or i == support_arm:
+				var parent_rest := skeleton.get_bone_global_rest(skeleton.get_bone_parent(i))
+				var shoulder_offset: Vector3 = Socket.SHOULDER_OFFSETS[weapon_type] + Vector3(0, 0, Socket.LOW_READY_SHOULDER_FORWARD[weapon_type] * (1.0 - aim_weight))
+				p += parent_rest.basis.inverse() * shoulder_offset
+			elif i == socket_bone:
+				p += Basis(q) * Vector3(0, Socket.LOW_READY_FORWARD[weapon_type] * (1.0 - aim_weight), 0)
 		skeleton.set_bone_pose_position(i, p)
 		skeleton.set_bone_pose_rotation(i, q.normalized())
 	# Rotate hips in skeleton space, then cancel that rotation at chest: arms,
@@ -174,7 +180,8 @@ func _evaluate(_delta: float) -> void:
 			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i) + offset)
 			skeleton.set_bone_pose_rotation(i, (skeleton.get_bone_pose_rotation(i) * Quaternion.IDENTITY.slerp(difference, recoil_gain)).normalized())
 	# Follow the final layered socket, including recoil, with each arm's outer
-	# palm edge. Shoulders, arm lengths, twist and socket recoil stay authored.
+	# palm edge. Arm lengths, twist and socket recoil stay authored; long-gun
+	# shoulders use the small front-shoulder stance offset above.
 	var socket_pose := skeleton.get_bone_global_pose(socket_bone)
 	_hold_arm(main_arm, socket_pose * socket.grips[weapon_type], Socket.MAIN_HAND_CONTACTS[weapon_type])
 	_hold_arm(support_arm, socket_pose * socket.supports[weapon_type], Socket.SUPPORT_HAND_CONTACTS[weapon_type])

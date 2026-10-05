@@ -1,0 +1,79 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/player_pose_lab.gd" id="lab"]
+[ext_resource type="Script" path="res://scripts/player_animation_v2.gd" id="animation"]
+[ext_resource type="PackedScene" path="res://assets/characters/player_animation_v2.glb" id="model"]
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.14, 0.19, 0.23, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.8
+
+[sub_resource type="StandardMaterial3D" id="FloorMaterial"]
+albedo_color = Color(0.24, 0.29, 0.32, 1)
+roughness = 1.0
+
+[sub_resource type="PlaneMesh" id="Floor"]
+material = SubResource("FloorMaterial")
+size = Vector2(12, 12)
+
+[sub_resource type="StyleBoxFlat" id="Panel"]
+bg_color = Color(0.035, 0.055, 0.07, 0.95)
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+
+[node name="PlayerPoseLab" type="Node3D"]
+script = ExtResource("lab")
+
+[node name="Player" type="Node3D" parent="."]
+
+[node name="Visual" type="Node3D" parent="Player"]
+script = ExtResource("animation")
+
+[node name="Model" parent="Player/Visual" instance=ExtResource("model")]
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+mesh = SubResource("Floor")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")
+
+[node name="KeyLight" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-45, -30, 0)
+light_energy = 1.1
+
+[node name="Camera" type="Camera3D" parent="."]
+current = true
+near = 0.05
+far = 40.0
+fov = 42.0
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="PanelContainer" parent="HUD"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 336.0
+offset_bottom = 560.0
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Stack" type="VBoxContainer" parent="HUD/Panel"]
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="HUD/Panel/Stack"]
+theme_override_font_sizes/font_size = 22
+text = "PLAYER POSE LAB"
+
+[node name="Status" type="Label" parent="HUD/Panel/Stack"]
+theme_override_font_sizes/font_size = 16
+
+[node name="Controls" type="VBoxContainer" parent="HUD/Panel/Stack"]
+theme_override_constants/separation = 6
+
+[node name="Help" type="Label" parent="HUD/Panel/Stack"]
+theme_override_font_sizes/font_size = 14
+text = "RMB drag: orbit  |  Wheel: zoom\nSpace: freeze / resume  |  .: step\nN / H / Q: 1x / 0.5x / 0.25x\nC: reset camera  |  V: next view\nI / W / R: Idle / Walk / Run\nL / A: LowReady / Aim  |  F: recoil\n1 / 2 / 3: Pistol / M4A1 / Shotgun"
