@@ -42,6 +42,8 @@ func run() -> void:
 	level.select_test_weapon(0)
 	player = level.player
 	visual = player.visual
+	# Baseline authored locomotion is measured without the opt-in carry overlay.
+	visual.set_weapon_equipped(false)
 	player.get_node("Pistol").enabled = false
 	level.combat.audio.minimum_event_interval = 1000000.0
 	await tick(20)

@@ -1,0 +1,47 @@
+[gd_resource type="Animation" format=3]
+
+[resource]
+resource_name = "WeaponHold"
+loop_mode = 1
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Player_Cuboid_Rig/Skeleton3D:Arm.L")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0.33749998, 0.28124988, 0.1, 1, 1, 0.33749998, 0.28124988, 0.1)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Player_Cuboid_Rig/Skeleton3D:Arm.L")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, -3.4886742e-08, 0.6623804, 0.747477, 0.050303843, 1, 1, -3.4886742e-08, 0.6623804, 0.747477, 0.050303843)
+tracks/2/type = "position_3d"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Player_Cuboid_Rig/Skeleton3D:Arm.R")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, -0.33749998, 0.28124988, 0.1, 1, 1, -0.33749998, 0.28124988, 0.1)
+tracks/3/type = "rotation_3d"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Player_Cuboid_Rig/Skeleton3D:Arm.R")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = PackedFloat32Array(0, 1, 4.6375455e-08, -0.23757353, -0.80328923, 0.546155, 1, 1, 4.6375455e-08, -0.23757353, -0.80328923, 0.546155)
+tracks/4/type = "position_3d"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Player_Cuboid_Rig/Skeleton3D:WeaponSocket")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = PackedFloat32Array(0, 1, 0.19335166, 0.10546875, 0.23091672, 1, 1, 0.19335166, 0.10546875, 0.23091672)
+tracks/5/type = "rotation_3d"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Player_Cuboid_Rig/Skeleton3D:WeaponSocket")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = PackedFloat32Array(0, 1, -0.094736286, -0.6820172, -0.71959394, 0.08978922, 1, 1, -0.094736286, -0.6820172, -0.71959394, 0.08978922)

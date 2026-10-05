@@ -3,7 +3,7 @@
 	"failures": [],
 	"metrics": {
 		"authored_body_position_error_m": 0.00000000372529029846191,
-		"authored_rotation_quaternion_dot_error": 0.0,
+		"authored_rotation_quaternion_dot_error": 0.0000000596046447753906,
 		"blend_seconds": 0.13,
 		"bone_scale_error": 0.0,
 		"camera_current": true,
@@ -48,5 +48,5 @@
 		"turn_state_changes_from_real_speed": 2,
 		"walk_speed_mps": 4.25
 	},
-	"rendered": true
+	"rendered": false
 }

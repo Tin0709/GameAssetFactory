@@ -12,6 +12,12 @@ var authored_run_time: float = 0.0
 ## Authored Run clock only. 1.60 balances measured support slip and readability;
 ## original clip duration, Walk cadence and gameplay speed remain untouched.
 @export_range(0.5, 3.0, 0.01) var run_animation_speed_scale: float = 1.60
+@export var generic_weapon_carry: bool = false
+@export_range(0.10, 0.18, 0.01) var weapon_hold_blend_duration: float = 0.13
+var weapon_equipped: bool = true
+var weapon_hold_weight: float = 0.0
+var weapon_hold_pose: RefCounted
+var fire_enabled_before_unequip: bool = true
 var bounce_enabled := true
 var bounce_override := 1.0
 var body_spring := Spring.new()
@@ -104,6 +110,10 @@ func _ready() -> void:
 	for i in skeleton.get_bone_count():
 		switch_positions.append(skeleton.get_bone_pose_position(i))
 		switch_rotations.append(skeleton.get_bone_pose_rotation(i))
+	if generic_weapon_carry:
+		var hold: Animation = load("res://assets/characters/WeaponHold.tres")
+		animation_player.get_animation_library("").add_animation("WeaponHold", hold)
+		weapon_hold_pose = Sampler.new(hold, skeleton)
 	socket = Socket.new()
 	socket.name = "WeaponAttachment"
 	skeleton.add_child(socket)
@@ -115,7 +125,9 @@ func _select_clips() -> void:
 	recoil_pose = samples[RECOILS[weapon_type]]
 
 func equip_weapon(index: int) -> void:
-	if index == weapon_type or frozen: return
+	if frozen: return
+	if generic_weapon_carry: set_weapon_equipped(true)
+	if index == weapon_type: return
 	for i in upper:
 		switch_positions[i] = skeleton.get_bone_pose_position(i)
 		switch_rotations[i] = skeleton.get_bone_pose_rotation(i)
@@ -126,6 +138,18 @@ func equip_weapon(index: int) -> void:
 	recoil_amount = 0.0
 	socket.equip(weapon_type)
 	_select_clips()
+
+func set_weapon_equipped(equipped: bool) -> void:
+	if weapon_equipped == equipped: return
+	weapon_equipped = equipped
+	if is_instance_valid(socket): socket.visible = equipped
+	# Use the existing enabled gate; firing/profile/projectile mechanics are unchanged.
+	var gun := get_parent().get_node_or_null("Pistol")
+	if gun != null:
+		if not equipped:
+			fire_enabled_before_unequip = gun.enabled
+			gun.enabled = false
+		else: gun.enabled = fire_enabled_before_unequip
 
 func update_motion(velocity_world: Vector3, target: Node3D, delta: float) -> void:
 	if frozen: return
@@ -150,6 +174,8 @@ func update_motion(velocity_world: Vector3, target: Node3D, delta: float) -> voi
 func _process(delta: float) -> void:
 	super._process(delta)
 	if frozen or skeleton == null: return
+	if generic_weapon_carry:
+		weapon_hold_weight = move_toward(weapon_hold_weight, 1.0 if weapon_equipped else 0.0, delta / weapon_hold_blend_duration)
 	aim_weight = move_toward(aim_weight, 1.0 if has_target else 0.0, delta / 0.13)
 	move_weight = move_toward(move_weight, clampf(movement_speed / 0.5, 0.0, 1.0) if movement_speed >= LOCOMOTION_DEAD_ZONE else 0.0, delta / 0.13)
 	var desired_lower := Quaternion.IDENTITY.slerp(Quaternion(Vector3.UP, lower_yaw), move_weight).normalized()
@@ -230,8 +256,9 @@ func _evaluate(_delta: float) -> void:
 	# palm edge. Arm lengths, twist and socket recoil stay authored; long-gun
 	# shoulders use the small front-shoulder stance offset above.
 	var socket_pose := skeleton.get_bone_global_pose(socket_bone)
-	_hold_arm(main_arm, socket_pose * socket.grips[weapon_type], Socket.MAIN_HAND_CONTACTS[weapon_type])
-	_hold_arm(support_arm, socket_pose * socket.supports[weapon_type], Socket.SUPPORT_HAND_CONTACTS[weapon_type])
+	if not generic_weapon_carry:
+		_hold_arm(main_arm, socket_pose * socket.grips[weapon_type], Socket.MAIN_HAND_CONTACTS[weapon_type])
+		_hold_arm(support_arm, socket_pose * socket.supports[weapon_type], Socket.SUPPORT_HAND_CONTACTS[weapon_type])
 	# Blend final corrected destinations once; switching never reapplies offsets
 	# to an already-corrected captured pose.
 	for i in upper:
@@ -249,6 +276,12 @@ func _evaluate(_delta: float) -> void:
 			var authored_q: Quaternion = idle.rotation(i, idle_time).slerp(run.rotation(i, rt), move_weight)
 			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i).lerp(authored_p, authored_weight))
 			skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(authored_q, authored_weight).normalized())
+	if generic_weapon_carry:
+		# A filtered Animation pose layer in the existing sole writer. No IK or
+		# grip correction: arms/socket inherit Chest's authored locomotion rhythm.
+		for i in upper:
+			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i).lerp(weapon_hold_pose.position(i, 0.0), weapon_hold_weight))
+			skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(weapon_hold_pose.rotation(i, 0.0), weapon_hold_weight).normalized())
 
 func _hold_arm(bone: int, contact: Vector3, palm: Vector3) -> void:
 	var pose := skeleton.get_bone_global_pose(bone)

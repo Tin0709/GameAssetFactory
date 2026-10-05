@@ -1,0 +1,24 @@
+{
+	"checks": 84,
+	"failures": [],
+	"metrics": {
+		"blend_seconds": 0.13,
+		"filtered_bones": [
+			"Arm.L",
+			"Arm.R",
+			"WeaponSocket"
+		],
+		"inherited_arm_motion_degrees": 4.76452310649475,
+		"root_translation_max_m": 0.0,
+		"run_scale": 1.6,
+		"run_speed": 6.25,
+		"runtime_skeletons": 1,
+		"socket_path": "/root/CuboidGameplayTest/Actors/Player/Visual/Model/Player_Cuboid_Rig/Skeleton3D/WeaponAttachment",
+		"weapon_local_transforms": [
+			"[X: (1.2, 0.0, 0.0), Y: (0.0, -0.0, 1.2), Z: (0.0, -1.2, -0.0), O: (0.015, 0.025, 0.035)]",
+			"[X: (1.12, 0.0, 0.0), Y: (0.0, -0.0, 1.12), Z: (0.0, -1.12, -0.0), O: (0.21, 0.27, -0.12)]",
+			"[X: (1.14, 0.0, 0.0), Y: (0.0, -0.0, 1.14), Z: (0.0, -1.14, -0.0), O: (0.21, 0.34, 0.035)]"
+		]
+	},
+	"rendered": true
+}
