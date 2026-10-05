@@ -1,0 +1,18 @@
+{
+  "Zombie_Idle": {
+    "frames": 48,
+    "fps": 24,
+    "duration_ms": 2000,
+    "gif_frame_count_verified": true,
+    "apng_transparent": true,
+    "normal_speed_preview": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\enemies\\zombie\\Zombie_Idle.gif"
+  },
+  "Zombie_Walk": {
+    "frames": 32,
+    "fps": 24,
+    "duration_ms": 1330,
+    "gif_frame_count_verified": true,
+    "apng_transparent": true,
+    "normal_speed_preview": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\enemies\\zombie\\Zombie_Walk.gif"
+  }
+}

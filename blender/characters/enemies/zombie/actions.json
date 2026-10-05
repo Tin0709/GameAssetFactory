@@ -1,0 +1,64 @@
+[
+  {
+    "name": "Zombie_Idle",
+    "playback": [
+      1,
+      48
+    ],
+    "keys_and_export": [
+      1,
+      49
+    ],
+    "fps": 24,
+    "duration_s": 2.0,
+    "curves": 45,
+    "keys": 342,
+    "animated_bones": [
+      "Chest",
+      "Forearm.L",
+      "Forearm.R",
+      "Hand.L",
+      "Hand.R",
+      "Head",
+      "Hips",
+      "Shin.L",
+      "Shin.R",
+      "Spine",
+      "Thigh.L",
+      "Thigh.R",
+      "UpperArm.L",
+      "UpperArm.R"
+    ]
+  },
+  {
+    "name": "Zombie_Walk",
+    "playback": [
+      1,
+      32
+    ],
+    "keys_and_export": [
+      1,
+      33
+    ],
+    "fps": 24,
+    "duration_s": 1.3333333333333333,
+    "curves": 45,
+    "keys": 675,
+    "animated_bones": [
+      "Chest",
+      "Forearm.L",
+      "Forearm.R",
+      "Hand.L",
+      "Hand.R",
+      "Head",
+      "Hips",
+      "Shin.L",
+      "Shin.R",
+      "Spine",
+      "Thigh.L",
+      "Thigh.R",
+      "UpperArm.L",
+      "UpperArm.R"
+    ]
+  }
+]

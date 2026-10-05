@@ -1,0 +1,70 @@
+{
+  "Zombie_Idle": {
+    "playback": [
+      1,
+      48
+    ],
+    "closing_key": 49,
+    "fps": 24,
+    "loop_vertex_error_m": 0.0,
+    "loop_velocity_error_m_per_frame": 3.769728732309794e-05,
+    "rigid_edge_error_m": 2.2468146687604218e-07,
+    "root_matrix_error": 0,
+    "minimum_floor_z_m": -6.391294846253004e-06,
+    "scale_range": [
+      1,
+      1
+    ],
+    "max_quarter_frame_vertex_travel_m": 0.0008619968664452149,
+    "head_max_world_rotation_deg": 8.301066992680411,
+    "foot_contact": {
+      "L": {
+        "lateral_span_m": 3.121793270111084e-05,
+        "treadmill_corrected_foreaft_span_m": 8.738855285628233e-06,
+        "stance_min_z_m": -6.391294846253004e-06,
+        "stance_max_z_m": 3.487787125777686e-08
+      },
+      "R": {
+        "lateral_span_m": 3.121793270111084e-05,
+        "treadmill_corrected_foreaft_span_m": 8.738564247323666e-06,
+        "stance_min_z_m": -6.391281203832477e-06,
+        "stance_max_z_m": 3.4878183896580595e-08
+      }
+    },
+    "switching_actions_resets_unused_channels": true
+  },
+  "Zombie_Walk": {
+    "playback": [
+      1,
+      32
+    ],
+    "closing_key": 33,
+    "fps": 24,
+    "loop_vertex_error_m": 0.0,
+    "loop_velocity_error_m_per_frame": 0.00018927898540868995,
+    "rigid_edge_error_m": 1.9544831231232962e-07,
+    "root_matrix_error": 0,
+    "minimum_floor_z_m": -0.0018689874559640884,
+    "scale_range": [
+      1,
+      1
+    ],
+    "max_quarter_frame_vertex_travel_m": 0.014786373490443015,
+    "head_max_world_rotation_deg": 8.309084780992361,
+    "foot_contact": {
+      "L": {
+        "lateral_span_m": 0.0002834424376487732,
+        "treadmill_corrected_foreaft_span_m": 0.008062675595283508,
+        "stance_min_z_m": -0.0010230913758277893,
+        "stance_max_z_m": 0.0005477368831634521
+      },
+      "R": {
+        "lateral_span_m": 0.0003012344241142273,
+        "treadmill_corrected_foreaft_span_m": 0.006710171699523926,
+        "stance_min_z_m": -0.0010072514414787292,
+        "stance_max_z_m": 0.0005026459693908691
+      }
+    },
+    "switching_actions_resets_unused_channels": true
+  }
+}
