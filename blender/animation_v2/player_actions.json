@@ -1,0 +1,219 @@
+[
+  {
+    "name": "Player_Idle",
+    "layer": "base",
+    "frames": 90,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "Player_Walk",
+    "layer": "base",
+    "frames": 36,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "Player_Run",
+    "layer": "base",
+    "frames": 24,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "Pistol_LowReady",
+    "layer": "weapon override",
+    "frames": 1,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "Pistol_Aim",
+    "layer": "weapon override",
+    "frames": 1,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "Pistol_Raise",
+    "layer": "weapon transition",
+    "frames": 4,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "LongGun_LowReady",
+    "layer": "weapon override",
+    "frames": 1,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "LongGun_Aim",
+    "layer": "weapon override",
+    "frames": 1,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "LongGun_Raise",
+    "layer": "weapon transition",
+    "frames": 4,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "Shotgun_LowReady",
+    "layer": "weapon override",
+    "frames": 1,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "Shotgun_Aim",
+    "layer": "weapon override",
+    "frames": 1,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "Shotgun_Raise",
+    "layer": "weapon transition",
+    "frames": 4,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "Pistol_Recoil",
+    "layer": "additive local delta",
+    "frames": 7,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "Rifle_Recoil",
+    "layer": "additive local delta",
+    "frames": 5,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "Shotgun_Recoil",
+    "layer": "additive local delta",
+    "frames": 13,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "REVIEW_Pistol_WalkLowReady",
+    "layer": "review composite only",
+    "frames": 36,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "REVIEW_Pistol_RunLowReady",
+    "layer": "review composite only",
+    "frames": 24,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "REVIEW_Pistol_Aim",
+    "layer": "review composite only",
+    "frames": 60,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "REVIEW_M4A1_WalkLowReady",
+    "layer": "review composite only",
+    "frames": 36,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "REVIEW_M4A1_RunLowReady",
+    "layer": "review composite only",
+    "frames": 24,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "REVIEW_M4A1_Aim",
+    "layer": "review composite only",
+    "frames": 60,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "REVIEW_Shotgun_WalkLowReady",
+    "layer": "review composite only",
+    "frames": 36,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "REVIEW_Shotgun_RunLowReady",
+    "layer": "review composite only",
+    "frames": 24,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "REVIEW_Shotgun_Aim",
+    "layer": "review composite only",
+    "frames": 60,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "REVIEW_Pistol_Raise",
+    "layer": "review composite only",
+    "frames": 18,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "REVIEW_Pistol_Fire",
+    "layer": "review composite only",
+    "frames": 30,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "REVIEW_M4A1_Raise",
+    "layer": "review composite only",
+    "frames": 18,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "REVIEW_M4A1_Fire",
+    "layer": "review composite only",
+    "frames": 30,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "REVIEW_Shotgun_Raise",
+    "layer": "review composite only",
+    "frames": 18,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "REVIEW_Shotgun_Fire",
+    "layer": "review composite only",
+    "frames": 30,
+    "fps": 30,
+    "loop": false
+  },
+  {
+    "name": "REVIEW_Locomotion_Transitions",
+    "layer": "review composite only",
+    "frames": 90,
+    "fps": 30,
+    "loop": false
+  }
+]

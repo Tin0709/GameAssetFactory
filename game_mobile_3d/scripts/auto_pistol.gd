@@ -11,7 +11,7 @@ var combat: Node
 var cooldown: float = 0.15
 
 func nearest_target() -> Node3D:
-	if not is_instance_valid(combat): return null
+	if not is_instance_valid(combat) or not combat.can_fight(): return null
 	var nearest: Node3D
 	var best_distance := attack_range * attack_range
 	for zombie in combat.living_zombies:
@@ -30,7 +30,7 @@ func _physics_process(delta: float) -> void:
 	if cooldown > 0.0: return
 	var target := nearest_target()
 	if target == null: return
-	var origin: Vector3 = combat.player.global_position + Vector3(0, 1.02, 0)
+	var origin: Vector3 = combat.player.visual.socket.muzzle_position()
 	var aim: Vector3 = target.global_position + Vector3(0, 1.02, 0)
 	combat.fire(origin, (aim - origin).normalized(), damage, projectile_speed, projectile_lifetime, projectile_range)
 	cooldown = fire_interval

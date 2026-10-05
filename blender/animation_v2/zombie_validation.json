@@ -1,0 +1,22 @@
+{
+  "Zombie_Idle": {
+    "duration_s": 3.0,
+    "layer": "base",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 2.0371072018132708e-07,
+    "minimum_z_m": -2.944673838101153e-07,
+    "channels": 54,
+    "half_frame_samples": 181
+  },
+  "Zombie_Walk": {
+    "duration_s": 1.6,
+    "layer": "base",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.9716220311938315e-07,
+    "minimum_z_m": 0.003959033638238907,
+    "channels": 54,
+    "half_frame_samples": 97
+  }
+}

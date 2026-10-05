@@ -1,0 +1,10 @@
+{
+  "unchanged": true,
+  "sha256": {
+    "blender\\characters\\player\\cuboid\\player_cuboid_v6.blend": "cc2344b6c5fe00ec6a0f50f18997977206644c0d6037ed0dd0f0a9e338342cdd",
+    "blender\\characters\\enemies\\zombie\\zombie_cuboid_v2.blend": "22e2abb4670206aaa1e96711340f958e113921b5499f19414deea65cde460a8c",
+    "blender\\weapons\\pistol\\blocky_pistol_v4.blend": "ab170310dcb3c8a93ba8cfc729d77077e22f9e384fa9323613b6bb691419237b",
+    "blender\\weapons\\m4a1_blocky\\m4a1_blocky_v4.blend": "1e20da10e5049119951c44201ef31dec413244e9081f10f167e554cefab42fb4",
+    "blender\\weapons\\shotgun\\blocky_shotgun_v4.blend": "22a80a14f3a1e5234aea27b46824cfe21e2655d06f38af22e5edaadd27e62816"
+  }
+}

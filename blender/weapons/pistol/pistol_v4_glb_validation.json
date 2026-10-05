@@ -1,0 +1,15 @@
+{
+  "Pistol": {
+    "triangles": 296,
+    "surfaces": 1,
+    "material_count": 1,
+    "nearest_sampler": true,
+    "markers_verified": true,
+    "dimensions_verified": true,
+    "previews": {
+      "side": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v4_side.png",
+      "isometric": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v4_isometric.png",
+      "trigger_closeup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v4_trigger_closeup.png"
+    }
+  }
+}

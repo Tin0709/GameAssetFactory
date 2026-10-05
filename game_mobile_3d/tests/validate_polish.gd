@@ -40,8 +40,8 @@ func run() -> void:
 	var changes: int = visual.state_changes
 	await tick(12)
 	check(visual.state_changes == changes, "Sustained walk does not restart")
-	check(visual.animation_player.speed_scale > 2.5 and visual.animation_player.speed_scale < 2.8, "Walk cadence tracks actual speed")
-	metrics.walk_rate = visual.animation_player.speed_scale
+	check(absf(visual.movement_speed / 0.94 - 4.25 / 0.94) < 0.1, "V2 walk phase follows authored stride distance")
+	metrics.walk_cycles_per_second = visual.movement_speed / 0.94
 	if "--capture" in OS.get_cmdline_user_args():
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("res://tests/polish_walk.png")
@@ -52,8 +52,8 @@ func run() -> void:
 	await tick(22)
 	check(absf(Vector2(player.velocity.x, player.velocity.z).length() - player.run_speed) < 0.1, "Normalized diagonal sprint")
 	check(visual.current_state == &"Run", "Sprint transitions to Run")
-	check(visual.animation_player.speed_scale > 1.8 and visual.animation_player.speed_scale < 2.5, "Run cadence synced")
-	metrics.run_rate = visual.animation_player.speed_scale
+	check(visual.run_weight > 0.99 and absf(visual.movement_speed / 1.6 - 6.25 / 1.6) < 0.1, "V2 run phase follows authored stride distance")
+	metrics.run_cycles_per_second = visual.movement_speed / 1.6
 	var facing := Vector3.BACK.rotated(Vector3.UP, visual.rotation.y)
 	check(facing.dot(Vector3(1, 0, -1).normalized()) > 0.98, "Smooth rotation converges quickly")
 	Input.action_release("move_right")
@@ -72,7 +72,7 @@ func run() -> void:
 		combat.fire(Vector3(0, 3, 0), Vector3.RIGHT, 20, 1, 0.10)
 		check(combat.effects.get_child_count() >= 1, "Muzzle flash spawned")
 		await tick(2)
-		check(visual.model.position.length() > 0.001, "Tiny rigid recoil visible")
+		check(visual.is_firing and visual.recoil_amount > 0.0, "Upper-body recoil active")
 		await tick(12)
 	check(combat.projectiles.get_child_count() == 0 and combat.effects.get_child_count() == 0, "Repeated shots clean up")
 	check(visual.model.position.length() < 0.001 and visual.model.scale == Vector3.ONE, "Recoil restores rigid model")

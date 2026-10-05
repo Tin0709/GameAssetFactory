@@ -1,0 +1,41 @@
+{
+  "Pistol": {
+    "triangles": 340,
+    "surfaces": 1,
+    "material_count": 1,
+    "nearest_sampler": true,
+    "markers_verified": true,
+    "dimensions_verified": true,
+    "previews": {
+      "isometric": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v3_isometric.png",
+      "trigger_closeup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v3_trigger_closeup.png",
+      "side": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v3_side.png"
+    }
+  },
+  "M4A1": {
+    "triangles": 760,
+    "surfaces": 1,
+    "material_count": 1,
+    "nearest_sampler": true,
+    "markers_verified": true,
+    "dimensions_verified": true,
+    "previews": {
+      "isometric": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v4_isometric.png",
+      "trigger_closeup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v4_trigger_closeup.png",
+      "side": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v4_side.png"
+    }
+  },
+  "Shotgun": {
+    "triangles": 670,
+    "surfaces": 2,
+    "material_count": 1,
+    "nearest_sampler": true,
+    "markers_verified": true,
+    "dimensions_verified": true,
+    "previews": {
+      "isometric": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v3_isometric.png",
+      "trigger_closeup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v3_trigger_closeup.png",
+      "side": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v3_side.png"
+    }
+  }
+}

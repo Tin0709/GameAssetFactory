@@ -1,5 +1,7 @@
 # Blocky weapon family
 
+Latest readable set: [Pistol V3, M4A1 V4 and Shotgun V3](WEAPON_REFINEMENT.md), with validated GLBs and side/isometric previews.
+
 Latest geometry-clean revisions: [Pistol V2, M4A1 V3 and Shotgun V2](GEOMETRY_CLEANUP.md). That report links the current GLBs, trigger close-ups and isometric previews. The original family versions below remain preserved.
 
 Created and validated with Blender MCP. M4A1 V2 is the style anchor; V1 remains intact. The pistol and pump-action shotgun are original designs with no commercial logos or copied markings.

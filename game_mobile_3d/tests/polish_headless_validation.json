@@ -2,7 +2,7 @@
 	"checks": 42,
 	"passed": true,
 	"phone_tested": false,
-	"run_rate": 2.187495470047,
+	"run_cycles_per_second": 3.90624791383743,
 	"stopping_distance": 0.275000065565109,
-	"walk_rate": 2.74065351486206
+	"walk_cycles_per_second": 4.52127608847111
 }

@@ -1,0 +1,27 @@
+[
+  {
+    "entity": 0,
+    "phase": 0.0,
+    "rate": 0.97
+  },
+  {
+    "entity": 1,
+    "phase": 0.19,
+    "rate": 1.03
+  },
+  {
+    "entity": 2,
+    "phase": 0.43,
+    "rate": 1.0
+  },
+  {
+    "entity": 3,
+    "phase": 0.67,
+    "rate": 0.95
+  },
+  {
+    "entity": 4,
+    "phase": 0.84,
+    "rate": 1.05
+  }
+]

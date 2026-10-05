@@ -1,0 +1,283 @@
+{
+  "Player_Idle": {
+    "duration_s": 3.0,
+    "layer": "base",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.8590877026714026e-07,
+    "minimum_z_m": -1.264403124423552e-07,
+    "channels": 54,
+    "half_frame_samples": 181
+  },
+  "Player_Walk": {
+    "duration_s": 1.2,
+    "layer": "base",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.698801525007454e-07,
+    "minimum_z_m": 0.0038582757115364075,
+    "channels": 54,
+    "half_frame_samples": 73
+  },
+  "Player_Run": {
+    "duration_s": 0.8,
+    "layer": "base",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.5073629566764168e-07,
+    "minimum_z_m": 0.003356877714395523,
+    "channels": 54,
+    "half_frame_samples": 49
+  },
+  "weapon_contact_max_errors_m": {
+    "REVIEW_Pistol_WalkLowReady": 1.891112349405446e-07,
+    "REVIEW_Pistol_RunLowReady": 1.84354827279726e-07,
+    "REVIEW_Pistol_Aim": 2.4028122425079346e-07,
+    "REVIEW_M4A1_WalkLowReady": 1.4600096599955427e-07,
+    "REVIEW_M4A1_RunLowReady": 8.429369702178807e-08,
+    "REVIEW_M4A1_Aim": 1.5910086411284374e-07,
+    "REVIEW_Shotgun_WalkLowReady": 1.3657139822709083e-07,
+    "REVIEW_Shotgun_RunLowReady": 1.2013700229374393e-07,
+    "REVIEW_Shotgun_Aim": 2.4755668231600746e-07
+  },
+  "Pistol_LowReady": {
+    "duration_s": 0.03333333333333333,
+    "layer": "weapon override",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 8.071461149450343e-08,
+    "minimum_z_m": 0.0,
+    "channels": 18,
+    "half_frame_samples": 3
+  },
+  "Pistol_Aim": {
+    "duration_s": 0.03333333333333333,
+    "layer": "weapon override",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 7.519567646330216e-08,
+    "minimum_z_m": 0.0,
+    "channels": 18,
+    "half_frame_samples": 3
+  },
+  "Pistol_Raise": {
+    "duration_s": 0.13333333333333333,
+    "layer": "weapon transition",
+    "loop": false,
+    "loop_vertex_error_m": 0,
+    "rigid_edge_error_m": 1.2521118541997112e-07,
+    "minimum_z_m": 0.0,
+    "channels": 18,
+    "half_frame_samples": 9
+  },
+  "LongGun_LowReady": {
+    "duration_s": 0.03333333333333333,
+    "layer": "weapon override",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 7.93348789995818e-08,
+    "minimum_z_m": 0.0,
+    "channels": 18,
+    "half_frame_samples": 3
+  },
+  "LongGun_Aim": {
+    "duration_s": 0.03333333333333333,
+    "layer": "weapon override",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.0486002821608054e-07,
+    "minimum_z_m": 0.0,
+    "channels": 18,
+    "half_frame_samples": 3
+  },
+  "LongGun_Raise": {
+    "duration_s": 0.13333333333333333,
+    "layer": "weapon transition",
+    "loop": false,
+    "loop_vertex_error_m": 0,
+    "rigid_edge_error_m": 1.0486002821608054e-07,
+    "minimum_z_m": 0.0,
+    "channels": 18,
+    "half_frame_samples": 9
+  },
+  "Shotgun_LowReady": {
+    "duration_s": 0.03333333333333333,
+    "layer": "weapon override",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.0348029089168875e-07,
+    "minimum_z_m": 0.0,
+    "channels": 18,
+    "half_frame_samples": 3
+  },
+  "Shotgun_Aim": {
+    "duration_s": 0.03333333333333333,
+    "layer": "weapon override",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 9.727145131033232e-08,
+    "minimum_z_m": 0.0,
+    "channels": 18,
+    "half_frame_samples": 3
+  },
+  "Shotgun_Raise": {
+    "duration_s": 0.13333333333333333,
+    "layer": "weapon transition",
+    "loop": false,
+    "loop_vertex_error_m": 0,
+    "rigid_edge_error_m": 1.4901162392888523e-07,
+    "minimum_z_m": 0.0,
+    "channels": 18,
+    "half_frame_samples": 9
+  },
+  "REVIEW_Pistol_WalkLowReady": {
+    "duration_s": 1.2,
+    "layer": "review composite only",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.7660637263716694e-07,
+    "minimum_z_m": 0.0038582757115364075,
+    "channels": 60,
+    "half_frame_samples": 73
+  },
+  "REVIEW_Pistol_RunLowReady": {
+    "duration_s": 0.8,
+    "layer": "review composite only",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.4609177689806074e-07,
+    "minimum_z_m": 0.003356877714395523,
+    "channels": 60,
+    "half_frame_samples": 49
+  },
+  "REVIEW_Pistol_Aim": {
+    "duration_s": 2.0,
+    "layer": "review composite only",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.6009710335218585e-07,
+    "minimum_z_m": -1.37058819404956e-07,
+    "channels": 60,
+    "half_frame_samples": 121
+  },
+  "REVIEW_M4A1_WalkLowReady": {
+    "duration_s": 1.2,
+    "layer": "review composite only",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 2.0834033520600315e-07,
+    "minimum_z_m": 0.0038582757115364075,
+    "channels": 60,
+    "half_frame_samples": 73
+  },
+  "REVIEW_M4A1_RunLowReady": {
+    "duration_s": 0.8,
+    "layer": "review composite only",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.9596575739910804e-07,
+    "minimum_z_m": 0.003356877714395523,
+    "channels": 60,
+    "half_frame_samples": 49
+  },
+  "REVIEW_M4A1_Aim": {
+    "duration_s": 2.0,
+    "layer": "review composite only",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.851866151536541e-07,
+    "minimum_z_m": -1.37058819404956e-07,
+    "channels": 60,
+    "half_frame_samples": 121
+  },
+  "REVIEW_Shotgun_WalkLowReady": {
+    "duration_s": 1.2,
+    "layer": "review composite only",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.7384689776633877e-07,
+    "minimum_z_m": 0.0038582757115364075,
+    "channels": 60,
+    "half_frame_samples": 73
+  },
+  "REVIEW_Shotgun_RunLowReady": {
+    "duration_s": 0.8,
+    "layer": "review composite only",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.5876225112343434e-07,
+    "minimum_z_m": 0.003356877714395523,
+    "channels": 60,
+    "half_frame_samples": 49
+  },
+  "REVIEW_Shotgun_Aim": {
+    "duration_s": 2.0,
+    "layer": "review composite only",
+    "loop": true,
+    "loop_vertex_error_m": 0.0,
+    "rigid_edge_error_m": 1.7798611018360333e-07,
+    "minimum_z_m": -1.37058819404956e-07,
+    "channels": 60,
+    "half_frame_samples": 121
+  },
+  "REVIEW_Pistol_Raise": {
+    "duration_s": 0.6,
+    "layer": "review composite only",
+    "loop": false,
+    "loop_vertex_error_m": 0,
+    "rigid_edge_error_m": 1.8368843540672586e-07,
+    "minimum_z_m": 0.003438446670770645,
+    "channels": 60,
+    "half_frame_samples": 37
+  },
+  "REVIEW_Pistol_Fire": {
+    "duration_s": 1.0,
+    "layer": "review composite only",
+    "loop": false,
+    "loop_vertex_error_m": 0,
+    "rigid_edge_error_m": 1.6838815986019995e-07,
+    "minimum_z_m": 0.0037962645292282104,
+    "channels": 60,
+    "half_frame_samples": 61
+  },
+  "REVIEW_M4A1_Raise": {
+    "duration_s": 0.6,
+    "layer": "review composite only",
+    "loop": false,
+    "loop_vertex_error_m": 0,
+    "rigid_edge_error_m": 1.8368843540672586e-07,
+    "minimum_z_m": 0.003438446670770645,
+    "channels": 60,
+    "half_frame_samples": 37
+  },
+  "REVIEW_M4A1_Fire": {
+    "duration_s": 1.0,
+    "layer": "review composite only",
+    "loop": false,
+    "loop_vertex_error_m": 0,
+    "rigid_edge_error_m": 1.710874227844883e-07,
+    "minimum_z_m": 0.0037962645292282104,
+    "channels": 60,
+    "half_frame_samples": 61
+  },
+  "REVIEW_Shotgun_Raise": {
+    "duration_s": 0.6,
+    "layer": "review composite only",
+    "loop": false,
+    "loop_vertex_error_m": 0,
+    "rigid_edge_error_m": 1.8368843540672586e-07,
+    "minimum_z_m": 0.003438446670770645,
+    "channels": 60,
+    "half_frame_samples": 37
+  },
+  "REVIEW_Shotgun_Fire": {
+    "duration_s": 1.0,
+    "layer": "review composite only",
+    "loop": false,
+    "loop_vertex_error_m": 0,
+    "rigid_edge_error_m": 1.8609206786646126e-07,
+    "minimum_z_m": 0.0037962645292282104,
+    "channels": 60,
+    "half_frame_samples": 61
+  }
+}

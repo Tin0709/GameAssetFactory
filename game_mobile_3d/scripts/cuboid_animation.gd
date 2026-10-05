@@ -13,6 +13,8 @@ var desired_rate: float = 1.0
 var state_changes: int = 0
 var lunge_tween: Tween
 var recoil_tween: Tween
+var phase_offset: float = 0.0
+var rate_variation: float = 1.0
 @onready var model: Node3D = $Model
 
 func _ready() -> void:
@@ -75,9 +77,13 @@ func freeze_animation() -> void:
 func play_state(state: StringName, playback_rate: float = 1.0) -> void:
 	var clip := StringName(animation_prefix + "_" + String(state))
 	assert(animation_player.has_animation(clip), "Missing animation: " + String(clip))
-	desired_rate = playback_rate
+	desired_rate = playback_rate * rate_variation
 	if current_state != state:
+		var phase := phase_offset
+		if animation_player.is_playing() and animation_player.current_animation_length > 0.0:
+			phase = fposmod(animation_player.current_animation_position / animation_player.current_animation_length, 1.0)
 		animation_player.play(clip, transition_time)
+		animation_player.seek(phase * animation_player.get_animation(clip).length, true)
 		state_changes += 1
 		current_state = state
 

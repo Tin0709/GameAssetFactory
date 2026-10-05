@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Zombie_Idle",
+    "layer": "base",
+    "frames": 90,
+    "fps": 30,
+    "loop": true
+  },
+  {
+    "name": "Zombie_Walk",
+    "layer": "base",
+    "frames": 48,
+    "fps": 30,
+    "loop": true
+  }
+]

@@ -1,0 +1,70 @@
+{
+  "before_triangles": 670,
+  "after_triangles": 670,
+  "topology": {
+    "Blocky_Shotgun_Base": {
+      "islands": 1,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "duplicate_faces": 0,
+      "inconsistent_normal_edges": 0,
+      "signed_volume": 0.010266834731704751,
+      "triangles": 542
+    },
+    "Shotgun_Pump": {
+      "islands": 1,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "duplicate_faces": 0,
+      "inconsistent_normal_edges": 0,
+      "signed_volume": 0.0021587263445721028,
+      "triangles": 128
+    }
+  },
+  "bounds_m": [
+    [
+      -0.06449999660253525,
+      0.06449999660253525
+    ],
+    [
+      -0.32600000500679016,
+      0.6490000486373901
+    ],
+    [
+      -0.03589452803134918,
+      0.2615000009536743
+    ]
+  ],
+  "dimensions_m": {
+    "width": 0.1289999932050705,
+    "length": 0.9750000536441803,
+    "height": 0.2973945289850235
+  },
+  "markers_blender_m": {
+    "Grip_Point": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Muzzle_Point": [
+      0.0,
+      0.6499999761581421,
+      0.20200000703334808
+    ],
+    "Support_Hand_Point": [
+      0.0,
+      0.35600000619888306,
+      0.13099999725818634
+    ]
+  },
+  "pump_separate": true,
+  "materials": 1,
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v3.blend",
+  "glb": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v3.glb"
+}

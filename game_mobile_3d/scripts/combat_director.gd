@@ -51,7 +51,7 @@ func fire(origin: Vector3, direction: Vector3, damage: int, speed: float, lifeti
 	bullet.look_at(origin + direction, Vector3.FORWARD if absf(direction.dot(Vector3.UP)) > 0.98 else Vector3.UP)
 	var muzzle := MUZZLE.instantiate()
 	effects.add_child(muzzle)
-	muzzle.global_position = origin + direction * 0.42
+	muzzle.global_position = origin
 	player.visual.shot_recoil(direction)
 	play_sound(&"pistol_shot")
 

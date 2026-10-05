@@ -1,0 +1,60 @@
+{
+  "before_triangles": 670,
+  "after_triangles": 508,
+  "topology": {
+    "Blocky_Shotgun_Base": {
+      "islands": 1,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "duplicate_faces": 0,
+      "inconsistent_normal_edges": 0,
+      "signed_volume": 0.007446820449598521,
+      "triangles": 428
+    },
+    "Shotgun_Pump": {
+      "islands": 1,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "duplicate_faces": 0,
+      "inconsistent_normal_edges": 0,
+      "signed_volume": 0.0009748582842510997,
+      "triangles": 80
+    }
+  },
+  "dimensions_m": {
+    "width": 0.0949999988079071,
+    "length": 1.1200000047683716,
+    "height": 0.24000000953674316
+  },
+  "materials": 1,
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "packed_atlas_sha256": "e0d9638e3cf1e7353ebd40ccaa32d429beae3d7fab0e0a497d3546b76fa544c8",
+  "markers_blender_m": {
+    "Grip_Point": [
+      0,
+      0,
+      0
+    ],
+    "Support_Hand_Point": [
+      0.0,
+      0.35600000619888306,
+      0.07000000029802322
+    ],
+    "Muzzle_Point": [
+      0,
+      0.69,
+      0.122
+    ]
+  },
+  "origin": "unchanged grip root at (0,0,0)",
+  "forward": "Blender +Y / Godot -Z",
+  "separate_pump": true,
+  "blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v4.blend",
+  "glb": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v4.glb",
+  "design": "Original tapered traditional stock, slim receiver, long faceted barrel and guide tube, slate fore-end; same family atlas."
+}

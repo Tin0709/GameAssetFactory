@@ -1,0 +1,14 @@
+{
+  "triangles": 508,
+  "draw_surfaces": 2,
+  "material_count": 1,
+  "embedded_atlas": true,
+  "nearest_sampler": true,
+  "runtime_names_and_axes_verified": true,
+  "dimensions_verified": {
+    "width": 0.0949999988079071,
+    "height": 0.24000000208616257,
+    "length": 1.1200000047683716
+  },
+  "transparent_previews_verified": true
+}

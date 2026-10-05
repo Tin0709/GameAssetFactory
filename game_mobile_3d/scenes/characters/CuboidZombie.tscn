@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/cuboid_zombie.gd" id="1_zombie"]
 [ext_resource type="Script" path="res://scripts/cuboid_animation.gd" id="2_animation"]
-[ext_resource type="PackedScene" path="res://assets/characters/zombie_cuboid_v2.glb" id="3_model"]
+[ext_resource type="PackedScene" path="res://assets/characters/zombie_animation_v2.glb" id="3_model"]
 
 [sub_resource type="CapsuleShape3D" id="BodyShape"]
 radius = 0.30
@@ -22,3 +22,4 @@ script = ExtResource("2_animation")
 animation_prefix = "Zombie"
 
 [node name="Model" parent="Visual" instance=ExtResource("3_model")]
+

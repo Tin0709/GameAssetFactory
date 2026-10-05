@@ -1,0 +1,74 @@
+{
+  "composites": {
+    "REVIEW_M4A1_Aim": 5.990192664337689e-07,
+    "REVIEW_M4A1_Fire": 0.00011950570745174756,
+    "REVIEW_M4A1_Raise": 0.0020524928345349207,
+    "REVIEW_M4A1_RunLowReady": 3.193997077123841e-06,
+    "REVIEW_M4A1_WalkLowReady": 6.343065695104826e-07,
+    "REVIEW_Pistol_Aim": 4.870345148530201e-07,
+    "REVIEW_Pistol_Fire": 4.583817776627992e-05,
+    "REVIEW_Pistol_Raise": 0.002229197210107996,
+    "REVIEW_Pistol_RunLowReady": 1.4086573357990048e-06,
+    "REVIEW_Pistol_WalkLowReady": 3.8310766614027146e-07,
+    "REVIEW_Shotgun_Aim": 4.77999893794818e-07,
+    "REVIEW_Shotgun_Fire": 8.253502855957197e-05,
+    "REVIEW_Shotgun_Raise": 0.0020954937169579994,
+    "REVIEW_Shotgun_RunLowReady": 3.6188966333791948e-06,
+    "REVIEW_Shotgun_WalkLowReady": 5.306152646173494e-07
+  },
+  "layers": {
+    "Pistol_LowReady_Idle": 3.6486931693465826e-07,
+    "Pistol_LowReady_Walk": 2.997933009430971e-07,
+    "Pistol_LowReady_Run": 3.21175336499372e-07,
+    "Pistol_Aim_Idle": 3.1390406636810967e-07,
+    "Pistol_Aim_Walk": 3.629924568128549e-07,
+    "Pistol_Aim_Run": 2.7126278846163953e-07,
+    "Pistol_Recoil_on_Aim": 4.5263807688843e-05,
+    "Pistol_Recoil_on_Walk_Aim": 4.410179597875258e-05,
+    "Pistol_Recoil_on_Run_Aim": 4.402119037054729e-05,
+    "M4A1_LowReady_Idle": 2.4027400458748785e-07,
+    "M4A1_LowReady_Walk": 2.827296549232345e-07,
+    "M4A1_LowReady_Run": 2.0485709734063626e-07,
+    "M4A1_Aim_Idle": 2.497889789080651e-07,
+    "M4A1_Aim_Walk": 3.665201031043781e-07,
+    "M4A1_Aim_Run": 2.4027400458748785e-07,
+    "Rifle_Recoil_on_Aim": 0.00011609543935784888,
+    "Rifle_Recoil_on_Walk_Aim": 0.00011291966238662319,
+    "Rifle_Recoil_on_Run_Aim": 0.00011290094075884041,
+    "Shotgun_LowReady_Idle": 2.5636927089222153e-07,
+    "Shotgun_LowReady_Walk": 3.6286698764222625e-07,
+    "Shotgun_LowReady_Run": 3.6983709472390583e-07,
+    "Shotgun_Aim_Idle": 3.7608830523860343e-07,
+    "Shotgun_Aim_Walk": 3.9000071073479654e-07,
+    "Shotgun_Aim_Run": 3.6983709472390583e-07,
+    "Shotgun_Recoil_on_Aim": 7.931538031847254e-05,
+    "Shotgun_Recoil_on_Walk_Aim": 7.421601682580556e-05,
+    "Shotgun_Recoil_on_Run_Aim": 7.435712283908554e-05
+  },
+  "recoil_endpoint_errors": {
+    "Pistol_Recoil": 0.0,
+    "Rifle_Recoil": 0.0,
+    "Shotgun_Recoil": 0.0
+  },
+  "stance_contact_slip_m_s": {
+    "Walk": 0.00016313943241759037,
+    "Run": 0.003463425419547179
+  },
+  "notes": [
+    "Contact points sit within unchanged cuboid hand volume, 70 mm from its end.",
+    "Subframe interpolation contact tolerance is 6 mm; authored frame contacts are near floating-point precision.",
+    "Godot quaternion additive import/runtime has not been tested."
+  ],
+  "locomotion_transition": {
+    "REVIEW_Locomotion_Transitions": {
+      "duration_s": 3.0,
+      "layer": "review composite only",
+      "loop": false,
+      "loop_vertex_error_m": 0,
+      "rigid_edge_error_m": 2.496462288004153e-07,
+      "minimum_z_m": 0.003011595457792282,
+      "channels": 60,
+      "half_frame_samples": 181
+    }
+  }
+}

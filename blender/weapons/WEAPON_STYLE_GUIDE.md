@@ -1,6 +1,6 @@
 # Weapon style guide
 
-The blocky M4A1 V2 (geometry-clean successor: V3) is the style anchor for this game's weapon family. Preserve its chunky cuboid forms, charcoal/cool-gray palette, crisp pixel accents, and restrained light edges. Future weapons should read as distinct silhouettes while belonging to the same visual world.
+The blocky M4A1 V2 (geometry-clean successor: V3; current readability revision: V4) is the style anchor for this game's weapon family. Preserve its chunky cuboid forms, charcoal/cool-gray palette, crisp pixel accents, and restrained light edges. Future weapons should read as distinct silhouettes while belonging to the same visual world.
 
 ## Shape and readability
 

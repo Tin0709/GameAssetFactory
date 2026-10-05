@@ -1,0 +1,58 @@
+{
+  "characters": [
+    {
+      "source": "blender\\animation_v2\\player_animation_v2.blend",
+      "sha256": "672e25233635f63944d7da23e85399523704289e2aff269471c982a1332700e0",
+      "actions": [
+        "LongGun_Aim",
+        "LongGun_LowReady",
+        "LongGun_Raise",
+        "Pistol_Aim",
+        "Pistol_LowReady",
+        "Pistol_Raise",
+        "Pistol_Recoil",
+        "Player_Idle",
+        "Player_Run",
+        "Player_Walk",
+        "Rifle_Recoil",
+        "Shotgun_Aim",
+        "Shotgun_LowReady",
+        "Shotgun_Raise",
+        "Shotgun_Recoil"
+      ],
+      "joints": 11,
+      "rigid_single_bone_vertices": 144,
+      "bytes": 113712,
+      "recoil": "absolute reference poses; runtime quaternion difference"
+    },
+    {
+      "source": "blender\\animation_v2\\zombie_animation_v2.blend",
+      "sha256": "f19ce66335b0cf92af7988268096aa1f691ab2db5c491abaf8a48f7fcc89aea3",
+      "actions": [
+        "Zombie_Idle",
+        "Zombie_Walk"
+      ],
+      "joints": 10,
+      "rigid_single_bone_vertices": 144,
+      "bytes": 48316,
+      "recoil": "absolute reference poses; runtime quaternion difference"
+    }
+  ],
+  "weapons": [
+    {
+      "source": "blender\\weapons\\pistol\\blocky_pistol_v4.glb",
+      "runtime": "pistol_v4.glb",
+      "sha256": "9bc92ec865a1195ca1f9c1303183fcacb095f509c453cc2548d11b1ebb02c045"
+    },
+    {
+      "source": "blender\\weapons\\m4a1_blocky\\m4a1_blocky_v4.glb",
+      "runtime": "m4a1_v4.glb",
+      "sha256": "332253db1b5103e1166d65e9b0595a8078cbd90b89bafbf5bbf2d79f803b200f"
+    },
+    {
+      "source": "blender\\weapons\\shotgun\\blocky_shotgun_v4.glb",
+      "runtime": "shotgun_v4.glb",
+      "sha256": "b9fa77310c53ed493e1448d68d4a22273b6e9bba78a0d47e13815ea19d94cd06"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "before_triangles": 760,
+  "after_triangles": 760,
+  "topology": {
+    "M4A1_Blocky_Base": {
+      "islands": 1,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "duplicate_faces": 0,
+      "inconsistent_normal_edges": 0,
+      "signed_volume": 0.013198884114372972,
+      "triangles": 760
+    }
+  },
+  "bounds_m": [
+    [
+      -0.051500000059604645,
+      0.051500000059604645
+    ],
+    [
+      -0.31199997663497925,
+      0.6850000023841858
+    ],
+    [
+      -0.13699999451637268,
+      0.3135000169277191
+    ]
+  ],
+  "dimensions_m": {
+    "width": 0.10300000011920929,
+    "length": 0.996999979019165,
+    "height": 0.4505000114440918
+  },
+  "markers_blender_m": {
+    "Grip_Point": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Muzzle_Point": [
+      0.0,
+      0.6859999895095825,
+      0.18000000715255737
+    ],
+    "Support_Hand_Point": [
+      0.0,
+      0.375,
+      0.125
+    ]
+  },
+  "pump_separate": false,
+  "materials": 1,
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v4.blend",
+  "glb": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v4.glb"
+}

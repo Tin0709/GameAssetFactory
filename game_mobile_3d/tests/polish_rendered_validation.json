@@ -1,10 +1,10 @@
 {
 	"checks": 43,
-	"draw_calls": 38.0,
+	"draw_calls": 44.0,
 	"passed": true,
 	"phone_tested": false,
-	"rendered_fps": 120.0,
-	"run_rate": 2.16927123069763,
+	"rendered_fps": 121.0,
+	"run_cycles_per_second": 3.90624791383743,
 	"stopping_distance": 0.275000095367432,
-	"walk_rate": 2.74021220207214
+	"walk_cycles_per_second": 4.52127608847111
 }

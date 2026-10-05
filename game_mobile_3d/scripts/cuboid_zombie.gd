@@ -41,6 +41,8 @@ func _ready() -> void:
 	var phase := fposmod(position.x * 0.37 + position.z * 0.61, 1.0)
 	speed_multiplier = lerpf(1.0 - speed_variation, 1.0 + speed_variation, phase)
 	fall_sign = -1.0 if phase < 0.5 else 1.0
+	visual.phase_offset = phase
+	visual.rate_variation = lerpf(0.95, 1.05, fposmod(phase * 7.31, 1.0))
 	visual.animation_player.seek(phase * visual.animation_player.current_animation_length, true)
 	if not is_instance_valid(target): target = get_tree().get_first_node_in_group("player") as Node3D
 

@@ -332,6 +332,15 @@ theme_override_colors/font_color = Color(0.84, 0.91, 0.91, 1)
 theme_override_font_sizes/font_size = 18
 text = "HP 100/100  |  EXP 0  |  Living zombies 3  |  FPS"
 
+[node name="AnimationDebug" type="Label" parent="HUD"]
+offset_left = 24.0
+offset_top = 166.0
+offset_right = 700.0
+offset_bottom = 210.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.84, 0.91, 0.91, 1)
+theme_override_font_sizes/font_size = 14
+
 [node name="Defeated" type="PanelContainer" parent="HUD"]
 visible = false
 anchors_preset = 8

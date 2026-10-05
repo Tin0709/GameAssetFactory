@@ -1,0 +1,11 @@
+{
+  "Pistol": {
+    "atlas_material_roots_and_markers_preserved": true
+  },
+  "M4A1": {
+    "atlas_material_roots_and_markers_preserved": true
+  },
+  "Shotgun": {
+    "atlas_material_roots_and_markers_preserved": true
+  }
+}

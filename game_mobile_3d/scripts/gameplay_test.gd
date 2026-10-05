@@ -7,6 +7,7 @@ var status_elapsed: float = 0.0
 @onready var spawner: Node = $SpawnDirector
 
 func _ready() -> void:
+	$HUD/AnimationDebug.visible = OS.is_debug_build()
 	if not OS.is_debug_build() or not progression.debug_exp_shortcut:
 		$HUD/Help/Text.text = $HUD/Help/Text.text.replace("\nDebug: L level-up  |  K spawn 1  |  J spawn 10", "")
 	player.health_changed.connect(_health_updated)
@@ -30,6 +31,8 @@ func update_status() -> void:
 	$HUD/ExpBar.max_value = progression.required_exp()
 	$HUD/ExpBar.value = player.experience
 	$HUD/ExpText.text = "EXP %d / %d" % [player.experience, progression.required_exp()]
+	if OS.is_debug_build():
+		$HUD/AnimationDebug.text = player.visual.debug_text() + "\n1 Pistol  |  2 M4A1  |  3 Shotgun"
 
 func _process(delta: float) -> void:
 	status_elapsed += delta

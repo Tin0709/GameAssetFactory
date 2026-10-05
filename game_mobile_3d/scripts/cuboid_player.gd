@@ -69,12 +69,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.y -= gravity * delta
 	move_and_slide()
-	visual.face_direction(direction, delta, turn_speed)
 	var actual_speed := Vector2(get_real_velocity().x, get_real_velocity().z).length()
 	current_speed = actual_speed
-	if actual_speed < 0.12:
-		visual.play_state(&"Idle")
-	elif running:
-		visual.play_state(&"Run", clampf(actual_speed / run_cycle_speed, 0.5, 2.5))
-	else:
-		visual.play_state(&"Walk", clampf(actual_speed / walk_cycle_speed, 0.5, 2.8))
+	var target: Node3D = $Pistol.nearest_target() if $Pistol.enabled else null
+	visual.update_motion(get_real_velocity(), target, delta)

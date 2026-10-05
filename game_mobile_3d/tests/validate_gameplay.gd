@@ -43,9 +43,9 @@ func _run() -> void:
 	for actor in [player] + zombies:
 		var visual: Node3D = actor.get_node("Visual")
 		var skeleton := visual.find_child("Skeleton3D", true, false) as Skeleton3D
-		check(skeleton != null and skeleton.get_bone_count() == 10, "Ten imported bones")
-		check(visual.find_children("*", "MeshInstance3D", true, false).size() == 1, "Single mesh per actor")
-		for mesh: MeshInstance3D in visual.find_children("*", "MeshInstance3D", true, false):
+		check(skeleton != null and skeleton.get_bone_count() == (11 if actor == player else 10), "Original bones plus player weapon socket")
+		check(visual.meshes.size() == 1, "Single character mesh per actor, excluding attachments")
+		for mesh: MeshInstance3D in visual.meshes:
 			check(mesh.mesh.get_faces().size() / 3 == 72, "72 triangles per imported actor")
 			var material := mesh.mesh.surface_get_material(0) as BaseMaterial3D
 			check(material.texture_filter == BaseMaterial3D.TEXTURE_FILTER_NEAREST, "Nearest pixel sampling")
@@ -124,7 +124,7 @@ func _run() -> void:
 		var visual: Node3D = actor.get_node("Visual")
 		var skeleton := visual.find_child("Skeleton3D", true, false) as Skeleton3D
 		for clip in visual.animation_player.get_animation_list():
-			if clip == &"RESET": continue
+			if not String(clip).begins_with(visual.animation_prefix + "_"): continue
 			var animation: Animation = visual.animation_player.get_animation(clip)
 			visual.animation_player.play(clip, 0)
 			visual.animation_player.seek(0, true)
