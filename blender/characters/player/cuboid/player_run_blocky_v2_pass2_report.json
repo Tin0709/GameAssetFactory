@@ -1,0 +1,385 @@
+{
+  "action": "Player_Run_Blocky_V2",
+  "source_action": "Player_Run_Blocky_V1",
+  "pass_name": "Pass 2 torso/body mechanics only",
+  "bones_added": [
+    "Spine",
+    "Chest"
+  ],
+  "local_axes": {
+    "Hips": {
+      "local_x_world": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "local_y_world": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "local_z_world": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    "Spine": {
+      "local_x_world": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "local_y_world": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "local_z_world": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    "Chest": {
+      "local_x_world": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "local_y_world": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "local_z_world": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    }
+  },
+  "local_rotation_ranges_degrees": {
+    "Spine": [
+      [
+        2.900304507922984,
+        4.348765649734663
+      ],
+      [
+        -2.4149239447451976,
+        2.759987876378592
+      ],
+      [
+        -0.5849112537019755,
+        0.5399736248834633
+      ]
+    ],
+    "Chest": [
+      [
+        1.3500692786098836,
+        2.698773159715999
+      ],
+      [
+        -3.359935684816645,
+        3.8399946768573447
+      ],
+      [
+        -2.274223541946816,
+        2.0997653560624694
+      ]
+    ]
+  },
+  "forward_lean_range_degrees": [
+    5.496348920215453,
+    8.247870989423024
+  ],
+  "side_lean_range_degrees": [
+    -1.642101375528143,
+    1.7807934401312957
+  ],
+  "timing_offsets_frames": {
+    "Spine": 0.55,
+    "Chest": 0.95
+  },
+  "additional_chest_delay_frames": 0.3999999999999999,
+  "rotation_keyframes_per_added_bone": 10,
+  "interpolation": "BEZIER AUTO_CLAMPED; CYCLES REPEAT",
+  "root_travel_m": 0,
+  "hips_horizontal_accumulated_travel_m": 0.0,
+  "lower_body_max_matrix_difference": 0,
+  "loop_max_matrix_mismatch": 0.0,
+  "minimum_leg_bottom_z_m": 0.0008383356034755707,
+  "ground_penetration_m": 0,
+  "max_rigid_length_error_m": 2.060551024807289e-07,
+  "scale_animation_present": false,
+  "max_rotation_change_per_eighth_frame_degrees": 0.3310219965147739,
+  "torso_leg_intersections": {
+    "Chest / Leg.L": {
+      "sample_count": 129,
+      "max_overlap_m": 0.09287816524738446,
+      "baseline_max_overlap_m": 0.09445038490230218,
+      "max_increase_from_v1_m": 0.01997413986828178
+    },
+    "Chest / Leg.R": {
+      "sample_count": 129,
+      "max_overlap_m": 0.09208202711306512,
+      "baseline_max_overlap_m": 0.09396966430358589,
+      "max_increase_from_v1_m": 0.018620481321704574
+    }
+  },
+  "key_pose_validation": [
+    {
+      "frame": 1.0,
+      "forward_lean_degrees": 6.354562727406641,
+      "side_lean_degrees": 0.46896695690836454,
+      "spine_rotation_degrees": [
+        3.388831226987207,
+        -2.3711759427810315,
+        -0.3700438810992616
+      ],
+      "chest_rotation_degrees": [
+        1.7762281529805453,
+        -3.3368475109878863,
+        -1.187314515146648
+      ],
+      "intersections": [
+        {
+          "pair": "Chest / Leg.L",
+          "overlap_m": 0.06837517127860337,
+          "baseline_overlap_m": 0.07080266869161278
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "overlap_m": 0.05059332441305742,
+          "baseline_overlap_m": 0.05454293079674244
+        }
+      ]
+    },
+    {
+      "frame": 3.0,
+      "forward_lean_degrees": 7.938054310879359,
+      "side_lean_degrees": 1.273972586756456,
+      "spine_rotation_degrees": [
+        4.222494235001345,
+        -1.479453125170612,
+        -0.5743940964014782
+      ],
+      "chest_rotation_degrees": [
+        2.5041311245040303,
+        -2.4982917396504924,
+        -2.153215641742639
+      ],
+      "intersections": [
+        {
+          "pair": "Chest / Leg.L",
+          "overlap_m": 0.09132780926302075,
+          "baseline_overlap_m": 0.09318382432684302
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "overlap_m": 0.08429783768951893,
+          "baseline_overlap_m": 0.08200316177681088
+        }
+      ]
+    },
+    {
+      "frame": 5.0,
+      "forward_lean_degrees": 7.279038785731654,
+      "side_lean_degrees": 1.546737155740796,
+      "spine_rotation_degrees": [
+        3.7631072373705114,
+        0.9489675935396483,
+        -0.3222920275797191
+      ],
+      "chest_rotation_degrees": [
+        2.2950895564177936,
+        0.5845624871674817,
+        -1.665373328977592
+      ],
+      "intersections": [
+        {
+          "pair": "Chest / Leg.L",
+          "overlap_m": 0.05243960126244929,
+          "baseline_overlap_m": 0.036485061384155415
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "overlap_m": 0.022496364210383035,
+          "baseline_overlap_m": 0.03669485170394182
+        }
+      ]
+    },
+    {
+      "frame": 7.0,
+      "forward_lean_degrees": 5.613472547066881,
+      "side_lean_degrees": 0.27520152076714327,
+      "spine_rotation_degrees": [
+        3.027863199871438,
+        2.6671086161672317,
+        0.058936941955886335
+      ],
+      "chest_rotation_degrees": [
+        1.3919522120438133,
+        3.461688001090087,
+        0.02052877388070801
+      ],
+      "intersections": [
+        {
+          "pair": "Chest / Leg.L",
+          "overlap_m": 0.041936496912967414,
+          "baseline_overlap_m": 0.04395823087543249
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "overlap_m": 0.05364797811489552,
+          "baseline_overlap_m": 0.061274584382772446
+        }
+      ]
+    },
+    {
+      "frame": 9.0,
+      "forward_lean_degrees": 6.199749811030941,
+      "side_lean_degrees": -0.48082033024855925,
+      "spine_rotation_degrees": [
+        3.3533185121713722,
+        2.672352067015686,
+        0.3749222636726639
+      ],
+      "chest_rotation_degrees": [
+        1.6572357989117565,
+        3.793694958907944,
+        1.204498737489871
+      ],
+      "intersections": [
+        {
+          "pair": "Chest / Leg.L",
+          "overlap_m": 0.053708501829532906,
+          "baseline_overlap_m": 0.05794386472553015
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "overlap_m": 0.06452114111743867,
+          "baseline_overlap_m": 0.06770764174871147
+        }
+      ]
+    },
+    {
+      "frame": 11.0,
+      "forward_lean_degrees": 7.897364744128756,
+      "side_lean_degrees": -1.2144723672230204,
+      "spine_rotation_degrees": [
+        4.180968819281783,
+        1.432534848214502,
+        0.5358813277144208
+      ],
+      "chest_rotation_degrees": [
+        2.502910868520125,
+        2.5520679534201185,
+        2.0436111692446213
+      ],
+      "intersections": [
+        {
+          "pair": "Chest / Leg.L",
+          "overlap_m": 0.08175090921577066,
+          "baseline_overlap_m": 0.07907884242013097
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "overlap_m": 0.09164062421768904,
+          "baseline_overlap_m": 0.09358466137200594
+        }
+      ]
+    },
+    {
+      "frame": 13.0,
+      "forward_lean_degrees": 7.108178839258742,
+      "side_lean_degrees": -1.4486700534344918,
+      "spine_rotation_degrees": [
+        3.7038429666027803,
+        -0.9373601139320348,
+        0.309075824979156
+      ],
+      "chest_rotation_degrees": [
+        2.187595825816721,
+        -0.6631419459386273,
+        1.567246882658075
+      ],
+      "intersections": [
+        {
+          "pair": "Chest / Leg.L",
+          "overlap_m": 0.02458167880831752,
+          "baseline_overlap_m": 0.0384779809974134
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "overlap_m": 0.053737147609354,
+          "baseline_overlap_m": 0.038913914366276
+        }
+      ]
+    },
+    {
+      "frame": 15.0,
+      "forward_lean_degrees": 5.558700800828825,
+      "side_lean_degrees": -0.28918891576956934,
+      "spine_rotation_degrees": [
+        2.9371271249555804,
+        -2.344164038717512,
+        -0.05708649429934179
+      ],
+      "chest_rotation_degrees": [
+        1.4267929002783426,
+        -3.067409568278989,
+        -0.004982049370355727
+      ],
+      "intersections": [
+        {
+          "pair": "Chest / Leg.L",
+          "overlap_m": 0.05725262814667076,
+          "baseline_overlap_m": 0.06453040614724159
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "overlap_m": 0.04480473526928108,
+          "baseline_overlap_m": 0.04754582094028592
+        }
+      ]
+    },
+    {
+      "frame": 17.0,
+      "forward_lean_degrees": 6.354562727406641,
+      "side_lean_degrees": 0.46896695690836454,
+      "spine_rotation_degrees": [
+        3.388831226987207,
+        -2.3711759427810315,
+        -0.3700438810992616
+      ],
+      "chest_rotation_degrees": [
+        1.7762281529805453,
+        -3.3368475109878863,
+        -1.187314515146648
+      ],
+      "intersections": [
+        {
+          "pair": "Chest / Leg.L",
+          "overlap_m": 0.06837517127860337,
+          "baseline_overlap_m": 0.07080266869161278
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "overlap_m": 0.05059332441305742,
+          "baseline_overlap_m": 0.05454293079674244
+        }
+      ]
+    }
+  ],
+  "v1_unchanged": true,
+  "all_existing_actions_unchanged": true,
+  "mesh_weights_rest_hierarchy_unchanged": true,
+  "arms_neck_head_local_neutral": true,
+  "production_unchanged": true,
+  "preview_range": [
+    1,
+    17
+  ],
+  "fps": 24
+}
