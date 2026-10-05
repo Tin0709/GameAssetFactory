@@ -1,0 +1,132 @@
+{
+  "model_unit_m": 0.05625,
+  "height_m": 1.8,
+  "width_front_m": 0.9,
+  "overall_depth_m": 0.45,
+  "triangles": 120,
+  "vertices": 80,
+  "materials": 1,
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "bones": 18,
+  "rigid_geometry_sections": 10,
+  "animations": 0,
+  "outer_layers": false,
+  "dimensions_m": {
+    "head": [
+      0.45,
+      0.45,
+      0.45
+    ],
+    "torso": [
+      0.45,
+      0.225,
+      0.675
+    ],
+    "each_arm": [
+      0.225,
+      0.225,
+      0.675
+    ],
+    "each_leg": [
+      0.225,
+      0.225,
+      0.675
+    ]
+  },
+  "z_ranges_m": {
+    "legs": [
+      0,
+      0.675
+    ],
+    "torso_and_arms": [
+      0.675,
+      1.35
+    ],
+    "head": [
+      1.35,
+      1.8
+    ]
+  },
+  "earlier_version_sha256": {
+    "player_cuboid_v1.blend": "ddb16d6ae0279084d824052cca90b556e9ff358b6dade543f5fbe7667c59ae7f",
+    "player_cuboid_v2.blend": "8140398f9d6003e37e7c36ae1e5d30ed6f091029f18641e79132e3ac36ebb302"
+  },
+  "measured_dimensions_m": {
+    "Head": [
+      0.45,
+      0.45,
+      0.45
+    ],
+    "Torso": [
+      0.45,
+      0.225,
+      0.675
+    ],
+    "Arm.L": [
+      0.225,
+      0.225,
+      0.675
+    ],
+    "Arm.R": [
+      0.225,
+      0.225,
+      0.675
+    ],
+    "Leg.L": [
+      0.225,
+      0.225,
+      0.675
+    ],
+    "Leg.R": [
+      0.225,
+      0.225,
+      0.675
+    ]
+  },
+  "measured_z_ranges_m": {
+    "Head": [
+      1.35,
+      1.8
+    ],
+    "Torso": [
+      0.675,
+      1.35
+    ],
+    "Arm.L": [
+      0.675,
+      1.35
+    ],
+    "Arm.R": [
+      0.675,
+      1.35
+    ],
+    "Leg.L": [
+      0.0,
+      0.675
+    ],
+    "Leg.R": [
+      0.0,
+      0.675
+    ]
+  },
+  "measured_total_dimensions_m": [
+    0.9,
+    0.45,
+    1.8
+  ],
+  "validation": {
+    "saved_file_reopened": true,
+    "dimension_tolerance_m": 1e-06,
+    "model_pixel_grid_verified": true,
+    "rigid_pose_checks": 2,
+    "maximum_edge_length_change_m": 1.0089325985784825e-07,
+    "pose_reset": true,
+    "previous_versions_unchanged": true,
+    "atlas_packed": true,
+    "nearest_sampling": true,
+    "no_actions": true
+  }
+}
