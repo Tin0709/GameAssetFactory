@@ -7,7 +7,12 @@ var current_state: StringName = &""
 const HIT_MATERIAL = preload("res://materials/HitFlash.tres")
 var meshes: Array[MeshInstance3D] = []
 var flash_remaining: float = 0.0
+@export var transition_time: float = 0.12
+@export var rate_response: float = 18.0
+var desired_rate: float = 1.0
+var state_changes: int = 0
 var lunge_tween: Tween
+var recoil_tween: Tween
 @onready var model: Node3D = $Model
 
 func _ready() -> void:
@@ -27,6 +32,7 @@ func _ready() -> void:
 	play_state(&"Idle")
 
 func _process(delta: float) -> void:
+	animation_player.speed_scale = lerpf(animation_player.speed_scale, desired_rate, 1.0 - exp(-rate_response * delta))
 	if flash_remaining > 0.0:
 		flash_remaining = maxf(0.0, flash_remaining - delta)
 		if flash_remaining == 0.0:
@@ -40,7 +46,7 @@ func flash_hit(duration: float = 0.09) -> void:
 func has_state(state: StringName) -> bool:
 	return animation_player.has_animation(animation_prefix + "_" + String(state))
 
-func attack_lunge() -> void:
+func attack_lunge(anticipation: float = 0.10, strike: float = 0.08, recovery: float = 0.18) -> void:
 	if has_state(&"Attack"):
 		play_state(&"Attack")
 		return
@@ -48,20 +54,31 @@ func attack_lunge() -> void:
 	if lunge_tween and lunge_tween.is_valid(): lunge_tween.kill()
 	model.position = Vector3.ZERO
 	lunge_tween = create_tween()
-	lunge_tween.tween_property(model, "position:z", 0.13, 0.10).set_trans(Tween.TRANS_SINE)
-	lunge_tween.tween_property(model, "position:z", 0.0, 0.18).set_trans(Tween.TRANS_SINE)
+	lunge_tween.tween_property(model, "position:z", -0.045, anticipation).set_trans(Tween.TRANS_SINE)
+	lunge_tween.tween_property(model, "position:z", 0.19, strike).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	lunge_tween.tween_property(model, "position:z", 0.0, recovery).set_trans(Tween.TRANS_SINE)
+
+func shot_recoil(world_direction: Vector3) -> void:
+	if recoil_tween and recoil_tween.is_valid(): recoil_tween.kill()
+	var local_direction := global_basis.inverse() * world_direction
+	model.position = Vector3.ZERO
+	recoil_tween = create_tween()
+	recoil_tween.tween_property(model, "position", -local_direction * 0.022, 0.035)
+	recoil_tween.tween_property(model, "position", Vector3.ZERO, 0.09).set_trans(Tween.TRANS_SINE)
 
 func freeze_animation() -> void:
 	animation_player.pause()
+	if recoil_tween and recoil_tween.is_valid(): recoil_tween.kill()
 	if lunge_tween and lunge_tween.is_valid(): lunge_tween.kill()
 	model.position = Vector3.ZERO
 
 func play_state(state: StringName, playback_rate: float = 1.0) -> void:
 	var clip := StringName(animation_prefix + "_" + String(state))
 	assert(animation_player.has_animation(clip), "Missing animation: " + String(clip))
-	animation_player.speed_scale = playback_rate
+	desired_rate = playback_rate
 	if current_state != state:
-		animation_player.play(clip, 0.10)
+		animation_player.play(clip, transition_time)
+		state_changes += 1
 		current_state = state
 
 func face_direction(direction: Vector3, delta: float, turn_speed: float) -> void:

@@ -1,9 +1,8 @@
 {
 	"capture": false,
-	"checks": 77,
+	"checks": 85,
 	"engine": "4.7.2-stable (official)",
 	"passed": true,
 	"phone_tested": false,
-	"renderer": "mobile",
-	"repeated_kills": 15
+	"renderer": "mobile"
 }

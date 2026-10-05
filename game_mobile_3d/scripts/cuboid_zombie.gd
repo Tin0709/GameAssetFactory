@@ -1,20 +1,24 @@
 extends CharacterBody3D
 ## Rigid whole-limb shamble, timed melee windup, and a tweened whole-body death.
 
-@export var move_speed: float = 0.6
+@export var move_speed: float = 2.05
 @export var detection_range: float = 6.5
 @export var lose_target_range: float = 8.0
 @export var stop_distance: float = 1.05
-@export var turn_speed: float = 5.0
+@export var turn_speed: float = 10.0
 @export var gravity: float = 18.0
 @export var max_hp: int = 60
 @export var attack_damage: int = 10
 @export var attack_range: float = 1.15
 @export var attack_interval: float = 1.10
-@export var attack_windup: float = 0.12
-@export var knockback_speed: float = 1.1
-@export var knockback_decay: float = 13.0
-@export var death_duration: float = 0.55
+@export var attack_windup: float = 0.18
+@export var knockback_speed: float = 2.4
+@export var knockback_decay: float = 16.0
+@export var speed_variation: float = 0.08
+@export var walk_cycle_speed: float = 1.0
+@export var attack_anticipation: float = 0.10
+@export var attack_recovery: float = 0.18
+@export var death_duration: float = 0.62
 @onready var visual: Node3D = $Visual
 var target: Node3D
 var combat: Node
@@ -26,9 +30,16 @@ var attack_cooldown: float = 0.0
 var pending_attack: float = -1.0
 var attack_visual_remaining: float = 0.0
 var knockback: Vector3 = Vector3.ZERO
+var speed_multiplier: float = 1.0
+var fall_sign: float = 1.0
 
 func _ready() -> void:
 	current_hp = max_hp
+	# Stable spawn-position variation: no random work each frame.
+	var phase := fposmod(position.x * 0.37 + position.z * 0.61, 1.0)
+	speed_multiplier = lerpf(1.0 - speed_variation, 1.0 + speed_variation, phase)
+	fall_sign = -1.0 if phase < 0.5 else 1.0
+	visual.animation_player.seek(phase * visual.animation_player.current_animation_length, true)
 	target = get_tree().get_first_node_in_group("player") as Node3D
 
 func take_damage(amount: int, direction: Vector3 = Vector3.ZERO) -> bool:
@@ -54,13 +65,16 @@ func _begin_death(direction: Vector3) -> void:
 	visual.freeze_animation()
 	if is_instance_valid(combat): combat.enemy_death_started(self)
 	# Rotate the entire visual; individual cuboids never bend, squash or scale.
-	var fall_side := -1.0 if direction.x < 0.0 else 1.0
-	var fallen := Vector3(-0.22, visual.rotation.y, fall_side * 1.48)
-	var tween := create_tween().set_parallel(true)
-	tween.tween_property(visual, "rotation", fallen, death_duration * 0.75).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(visual, "position:y", 0.12, death_duration * 0.75)
-	tween.chain().tween_interval(death_duration * 0.25)
-	tween.chain().tween_callback(_finish_death)
+	var fall_side := fall_sign if absf(direction.x) < 0.05 else signf(direction.x)
+	var base_rotation := visual.rotation
+	var tween := create_tween()
+	# Brief recoil, then lose balance, fall, and hold before cleanup.
+	tween.tween_property(visual, "rotation", base_rotation + Vector3(-0.06, 0, fall_side * 0.10), 0.055)
+	tween.tween_property(visual, "rotation", base_rotation + Vector3(-0.30, 0, fall_side * 0.38), 0.10)
+	tween.tween_property(visual, "rotation", base_rotation + Vector3(-0.35, 0, fall_side * 1.48), death_duration - 0.285).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(visual, "position:y", 0.12, death_duration - 0.285)
+	tween.tween_interval(0.13)
+	tween.tween_callback(_finish_death)
 
 func _finish_death() -> void:
 	if is_instance_valid(combat): combat.spawn_exp(global_position)
@@ -93,17 +107,17 @@ func _physics_process(delta: float) -> void:
 		if fighting and distance <= attack_range and attack_cooldown == 0.0:
 			attack_cooldown = attack_interval
 			pending_attack = attack_windup
-			attack_visual_remaining = 0.28
+			attack_visual_remaining = attack_windup + attack_recovery
 			holding_distance = true
-			visual.attack_lunge()
+			visual.attack_lunge(attack_anticipation, maxf(0.01, attack_windup - attack_anticipation), attack_recovery)
 			combat.play_sound(&"zombie_attack")
-		if chasing and not holding_distance: direction = offset.normalized()
+		if chasing and not holding_distance and attack_visual_remaining == 0.0: direction = offset.normalized()
 		visual.face_direction(offset, delta, turn_speed)
 	else:
 		chasing = false
 		pending_attack = -1.0
-	velocity.x = direction.x * move_speed + knockback.x
-	velocity.z = direction.z * move_speed + knockback.z
+	velocity.x = direction.x * move_speed * speed_multiplier + knockback.x
+	velocity.z = direction.z * move_speed * speed_multiplier + knockback.z
 	knockback *= exp(-knockback_decay * delta)
 	if is_on_floor(): velocity.y = 0.0
 	else: velocity.y -= gravity * delta
@@ -115,4 +129,4 @@ func _physics_process(delta: float) -> void:
 	if direction.is_zero_approx() or actual_speed < 0.025:
 		visual.play_state(&"Idle")
 	else:
-		visual.play_state(&"Walk", clampf(actual_speed / 0.60, 0.65, 1.4))
+		visual.play_state(&"Walk", clampf(actual_speed / walk_cycle_speed, 0.5, 2.2))

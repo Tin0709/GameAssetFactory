@@ -2,7 +2,9 @@
 
 Open `project.godot` in Godot 4.7.2 and press **F5**, or run `scenes/CuboidGameplayTest.tscn` with **F6**. **WASD** moves, **Shift** runs, **R** resets. The pistol fires automatically at the nearest living zombie. Move toward cyan drops to collect EXP. The existing arena, camera, Mobile renderer, imported character models and locomotion clips remain in use.
 
-This arena starts with exactly three zombies. After clearing it, collect the drops and press R for another pass; waves and level-ups are not implemented. To inspect melee/defeat without the pistol killing everything first, turn off `enabled` on `Actors/Player/Pistol` in the inspector. Toggle `Combat.combat_enabled` off to inspect movement without damage.
+This arena starts with exactly three zombies. After clearing it, collect the drops and press R for another pass; the three drops now earn one level-up selection. Waves are not implemented; debug builds support L for further upgrade tests. See [LEVEL_UP_SYSTEM.md](LEVEL_UP_SYSTEM.md). To inspect melee/defeat without the pistol killing everything first, turn off `enabled` on `Actors/Player/Pistol` in the inspector. Toggle `Combat.combat_enabled` off to inspect movement without damage.
+
+See [GAME_FEEL_POLISH.md](GAME_FEEL_POLISH.md) for the focused movement/feedback revision and measured validation.
 
 ## Tuning
 
@@ -10,13 +12,13 @@ All values are exported inspector properties on their corresponding scripts.
 
 | System | Initial values |
 | --- | --- |
-| Player (`cuboid_player.gd`) | 100 max/start HP; 0.35 s hurt grace; existing walk/run speeds 1.3/2.8 m/s |
+| Player (`cuboid_player.gd`) | 100 max/start HP; 0.35 s hurt grace; walk/run 4.25/6.25 m/s; acceleration/braking 42/60 m/s² |
 | Pistol (`auto_pistol.gd`) | 20 damage; 8 m target range; 0.5 s interval (about 2 shots/s); 0.15 s initial delay |
 | Projectile (`pistol_projectile.gd`) | 14 m/s speed; 0.9 s lifetime; inherited shot damage |
-| Zombie (`cuboid_zombie.gd`) | 60 HP; 0.6 m/s chase; existing 6.5 m detection/8 m loss range |
-| Zombie attack | 10 damage; 1.15 m reach; 1.10 s interval; 0.12 s windup; 0.28 s visual lunge |
-| Hit reaction | 0.09 s instance flash; 1.1 m/s initial knockback, exponential decay at 13/s; 0.14 s single-box impact |
-| Zombie death | 0.55 s rigid whole-body collapse, then one drop and removal |
+| Zombie (`cuboid_zombie.gd`) | 60 HP; 2.05 m/s chase ±8%; existing 6.5 m detection/8 m loss range |
+| Zombie attack | 10 damage; 1.15 m reach; 1.10 s interval; 0.18 s windup; 0.36 s anticipation/strike/recovery |
+| Hit reaction | 0.09 s instance flash; 2.4 m/s initial knockback, exponential decay at 16/s; 0.14 s single-box impact |
+| Zombie death | 0.62 s rigid whole-body collapse, then one drop and removal |
 | EXP (`exp_pickup.gd`) | One EXP per drop; 0.70 m horizontal collection radius |
 
 ## Health and combat flow
@@ -27,11 +29,11 @@ The gun checks a scene-local cached living-enemy registry rather than searching 
 
 Projectiles are small unlit box meshes with one swept physics ray each tick. The ray checks world layer 1 and zombie layer 4, excludes the player, and sweeps the complete traveled segment to avoid tunneling. A hit applies damage once, plays the short impact sound, spawns a tiny burst and frees the bullet. A miss expires after 0.9 seconds, and world collisions also remove it. No projectile RigidBody3D or extra dynamic light is used.
 
-Zombies stop near the player, begin a windup and apply melee damage only if the player is still alive and in range at the strike time. The cooldown prevents per-frame contact damage; moving away resumes chase. Without a `Zombie_Attack` clip, the existing idle pose and a 0.13 m whole-model lunge supply feedback. `cuboid_animation.gd` will prefer an imported attack clip with that name if one is added later; adjust the exported windup to match its strike timing.
+Zombies stop near the player, begin a windup and apply melee damage only if the player is still alive and in range at the strike time. The cooldown prevents per-frame contact damage; moving away resumes chase. Without a `Zombie_Attack` clip, the existing idle pose and a -0.045 m anticipation and 0.19 m whole-model lunge supply feedback. `cuboid_animation.gd` will prefer an imported attack clip with that name if one is added later; adjust the exported windup to match its strike timing.
 
 Damage uses a per-instance temporary material overlay, so shared atlas resources do not flash other actors. Knockback translates the CharacterBody3D, and death rotates/translates the entire visual while freezing skeletal playback. Character scale remains one: the cuboid parts never bend or squash. At death start, the enemy immediately leaves targeting and living-count registration and its collision is disabled. Further damage is ignored. The corpse drops exactly one EXP object and frees itself after the collapse. `_begin_death`/`_finish_death` are the isolated replacement points for a future authored death animation.
 
-EXP is one shared cyan emissive box mesh with gentle rotation/bob. It has no dynamic light or physics body: collection uses a cached player reference and squared-distance check. A collected flag prevents duplicate awards before deferred removal. There is no level-up system.
+EXP is one shared cyan emissive box mesh with gentle rotation/bob. It has no dynamic light or physics body: collection uses a cached player reference and squared-distance check. A collected flag prevents duplicate awards during a 0.12 s travel/pop toward the player before removal. Awards feed the centralized level/upgrade coordinator; reaching a threshold pauses gameplay for a choice.
 
 ## Files created/changed
 
@@ -47,7 +49,7 @@ Changed: `cuboid_player.gd` (health/EXP), `cuboid_zombie.gd` (health/attacks/dea
 
 The originals under `audio/game/` are preserved. Copied and integrated: pistol shot, zombie hit/death/attack, player hurt/death, and EXP pickup MP3s. The 14-second bullet-impact recording was decoded with Godot, reduced to a single 0.26-second transient and given 12 ms edge fades; only that short WAV plays per impact. Its extraction position and processing are in `audio_manifest.json`.
 
-Eight scene-owned AudioStreamPlayers each have a three-voice polyphony cap and conservative event volumes. Enemy death tails can finish after the enemy node disappears. Reset stops/reclaims all voices. Sound playback is skipped under the headless dummy driver, while automated checks still verify the streams and short impact duration. Rendered validation exercises the actual audio playback path.
+Ten scene-owned AudioStreamPlayers have three-voice combat caps and single-voice level-up/selection caps and conservative event volumes. Enemy death tails can finish after the enemy node disappears. Reset stops/reclaims all voices. Sound playback is skipped under the headless dummy driver, while automated checks still verify the streams and short impact duration. Rendered validation exercises the actual audio playback path.
 
 ## Validation and performance
 

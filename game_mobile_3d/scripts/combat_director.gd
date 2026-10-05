@@ -11,6 +11,7 @@ var living_zombies: Array[Node3D] = []
 @onready var audio: Node = $Audio
 const PROJECTILE = preload("res://scenes/combat/PistolProjectile.tscn")
 const PICKUP = preload("res://scenes/combat/ExpPickup.tscn")
+const MUZZLE = preload("res://scenes/combat/MuzzleFlash.tscn")
 const IMPACT = preload("res://scenes/combat/ImpactBurst.tscn")
 
 func _ready() -> void:
@@ -29,9 +30,9 @@ func register_zombie(zombie: Node3D) -> void:
 	zombie.target = player
 
 func can_fight() -> bool:
-	return active and combat_enabled
+	return active and combat_enabled and not get_tree().paused
 
-func fire(origin: Vector3, direction: Vector3, damage: int, speed: float, lifetime: float) -> void:
+func fire(origin: Vector3, direction: Vector3, damage: int, speed: float, lifetime: float, travel_range: float = -1.0) -> void:
 	if not can_fight() or direction.length_squared() < 0.0001: return
 	var bullet := PROJECTILE.instantiate()
 	bullet.combat = self
@@ -39,9 +40,14 @@ func fire(origin: Vector3, direction: Vector3, damage: int, speed: float, lifeti
 	bullet.damage = damage
 	bullet.speed = speed
 	bullet.lifetime = lifetime
+	bullet.travel_range = travel_range if travel_range > 0 else speed * lifetime
 	projectiles.add_child(bullet)
 	bullet.global_position = origin
 	bullet.look_at(origin + direction, Vector3.FORWARD if absf(direction.dot(Vector3.UP)) > 0.98 else Vector3.UP)
+	var muzzle := MUZZLE.instantiate()
+	effects.add_child(muzzle)
+	muzzle.global_position = origin + direction * 0.42
+	player.visual.shot_recoil(direction)
 	play_sound(&"pistol_shot")
 
 func play_sound(event: StringName) -> void:

@@ -6,6 +6,8 @@ extends Node3D
 @export var damage: int = 20
 var direction: Vector3 = Vector3.FORWARD
 var combat: Node
+var travel_range: float = 12.6
+var distance_traveled: float = 0.0
 var age: float = 0.0
 var spent: bool = false
 
@@ -19,7 +21,9 @@ func _physics_process(delta: float) -> void:
 		spent = true
 		queue_free()
 		return
-	var destination := global_position + direction * speed * delta
+	var travel := minf(speed * delta, maxf(0.0, travel_range - distance_traveled))
+	var destination := global_position + direction * travel
+	distance_traveled += travel
 	var query := PhysicsRayQueryParameters3D.create(global_position, destination, 5)
 	query.exclude = [combat.player.get_rid()]
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
@@ -33,3 +37,6 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 	else:
 		global_position = destination
+		if distance_traveled >= travel_range:
+			spent = true
+			queue_free()

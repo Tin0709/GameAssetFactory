@@ -13,6 +13,12 @@
     "player_hurt",
     "exp_pickup",
     "zombie_attack",
-    "player_death"
-  ]
+    "player_death",
+    "level_up",
+    "upgrade_selected"
+  ],
+  "progression_sources": {
+    "level_up": "audio/game/Level up.mp3",
+    "upgrade_selected": "audio/game/Upgrade selected.mp3"
+  }
 }

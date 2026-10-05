@@ -1,4 +1,7 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://scripts/level_progression.gd" id="progression"]
+[ext_resource type="PackedScene" path="res://scenes/ui/UpgradeSelection.tscn" id="upgrade_ui"]
 
 [ext_resource type="Environment" path="res://environment/Gameplay.tres" id="env"]
 
@@ -33,6 +36,12 @@ size = Vector3(16.8, 1.8, 0.4)
 
 [sub_resource type="BoxShape3D" id="VerticalWall"]
 size = Vector3(0.4, 1.8, 12.8)
+
+[sub_resource type="StyleBoxFlat" id="ExpBackground"]
+bg_color = Color(0.02, 0.07, 0.09, 1)
+
+[sub_resource type="StyleBoxFlat" id="ExpFill"]
+bg_color = Color(0.1, 0.85, 0.91, 1)
 
 [sub_resource type="StyleBoxFlat" id="Panel"]
 bg_color = Color(0.035, 0.075, 0.095, 1)
@@ -300,6 +309,10 @@ script = ExtResource("combat")
 [node name="Audio" type="Node" parent="Combat"]
 script = ExtResource("audio")
 
+[node name="Progression" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("progression")
+
 [node name="HUD" type="CanvasLayer" parent="."]
 
 [node name="Help" type="PanelContainer" parent="HUD"]
@@ -313,15 +326,15 @@ theme_override_styles/panel = SubResource("Panel")
 [node name="Text" type="Label" parent="HUD/Help"]
 theme_override_colors/font_color = Color(0.84, 0.91, 0.91, 1)
 theme_override_font_sizes/font_size = 18
-text = "CUBOID SURVIVAL / COMBAT TEST
-WASD move  |  Shift run  |  R reset
-Auto-fire nearby zombies. Collect cyan EXP."
+text = "CUBOID SURVIVAL / COMBAT TEST\nWASD move  |  Shift run  |  R reset\nAuto-fire nearby zombies. Collect cyan EXP.\nDebug build: L grants a level-up."
 
 [node name="Status" type="Label" parent="HUD"]
 offset_left = 24.0
-offset_top = 646.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -110.0
 offset_right = 800.0
-offset_bottom = 694.0
+offset_bottom = -64.0
 theme_override_colors/font_color = Color(0.84, 0.91, 0.91, 1)
 theme_override_font_sizes/font_size = 18
 text = "HP 100/100  |  EXP 0  |  Living zombies 3  |  FPS"
@@ -343,7 +356,29 @@ theme_override_styles/panel = SubResource("Panel")
 
 [node name="Text" type="Label" parent="HUD/Defeated"]
 theme_override_font_sizes/font_size = 28
-text = "DEFEATED
-Press R to try again"
+text = "DEFEATED\nPress R to try again"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ExpBar" type="ProgressBar" parent="HUD"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_right = 384.0
+offset_top = -52.0
+offset_bottom = -32.0
+mouse_filter = 2
+max_value = 3.0
+show_percentage = false
+theme_override_styles/background = SubResource("ExpBackground")
+theme_override_styles/fill = SubResource("ExpFill")
+[node name="ExpText" type="Label" parent="HUD"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 400.0
+offset_top = -56.0
+offset_right = 580.0
+offset_bottom = -28.0
+theme_override_font_sizes/font_size = 18
+text = "EXP 0 / 3"
+[node name="UpgradeSelection" parent="HUD" instance=ExtResource("upgrade_ui")]

@@ -1,6 +1,6 @@
 # Cuboid gameplay test
 
-The scene now includes the first auto-fire combat loop. See [COMBAT_PROTOTYPE.md](COMBAT_PROTOTYPE.md) for health, attacks, death/EXP/audio, tuning and combat validation. The movement/import details below still apply.
+The scene includes auto-fire combat and [level-up upgrade selection](LEVEL_UP_SYSTEM.md). See [COMBAT_PROTOTYPE.md](COMBAT_PROTOTYPE.md) for health, attacks, death/EXP/audio, tuning and combat validation. The movement/import details below still apply.
 
 Open `project.godot` in Godot 4.7.2 and press **F5**. The project now starts `scenes/CuboidGameplayTest.tscn`. Open that scene and press **F6** to run it directly. The previous visual foundation remains available as `scenes/Main.tscn`.
 

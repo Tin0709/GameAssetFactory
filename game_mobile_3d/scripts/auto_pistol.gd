@@ -4,6 +4,7 @@ extends Node3D
 @export var attack_range: float = 8.0
 @export var fire_interval: float = 0.5
 @export var projectile_speed: float = 14.0
+@export var projectile_range: float = 12.6
 @export var projectile_lifetime: float = 0.9
 @export var enabled: bool = true
 var combat: Node
@@ -31,5 +32,5 @@ func _physics_process(delta: float) -> void:
 	if target == null: return
 	var origin: Vector3 = combat.player.global_position + Vector3(0, 1.02, 0)
 	var aim: Vector3 = target.global_position + Vector3(0, 1.02, 0)
-	combat.fire(origin, (aim - origin).normalized(), damage, projectile_speed, projectile_lifetime)
+	combat.fire(origin, (aim - origin).normalized(), damage, projectile_speed, projectile_lifetime, projectile_range)
 	cooldown = fire_interval

@@ -7,7 +7,7 @@ shading_mode = 0
 albedo_color = Color(1, 0.80, 0.34, 1)
 
 [sub_resource type="BoxMesh" id="BulletMesh"]
-size = Vector3(0.055, 0.055, 0.22)
+size = Vector3(0.065, 0.065, 0.38)
 material = SubResource("BulletMaterial")
 
 [node name="PistolProjectile" type="Node3D"]

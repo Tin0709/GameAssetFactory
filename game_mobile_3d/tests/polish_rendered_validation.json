@@ -1,0 +1,10 @@
+{
+	"checks": 43,
+	"draw_calls": 38.0,
+	"passed": true,
+	"phone_tested": false,
+	"rendered_fps": 120.0,
+	"run_rate": 2.16927123069763,
+	"stopping_distance": 0.275000095367432,
+	"walk_rate": 2.74021220207214
+}

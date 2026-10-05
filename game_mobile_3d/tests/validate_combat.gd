@@ -28,6 +28,8 @@ func fresh(auto_fire: bool = false) -> void:
 		level.queue_free()
 		await process_frame
 	level = LEVEL.instantiate()
+	# Isolate combat accounting; progression has its own integration suite.
+	level.get_node("Progression").enabled = false
 	level.get_node("Actors/Player/Pistol").enabled = auto_fire
 	root.add_child(level)
 	current_scene = level
@@ -44,7 +46,7 @@ func _run() -> void:
 	check(combat.living_zombies.size() == 3, "Three living zombies registered")
 	check(level.get_node("HUD/Status").text.contains("HP 100/100"), "HUD displays initial HP")
 	check(pistol.damage == 20 and pistol.fire_interval == 0.5 and pistol.projectile_speed == 14, "Tuning accessible")
-	check(combat.audio.players.size() == 8, "Eight audio hooks loaded")
+	check(combat.audio.players.size() == 10, "Ten audio hooks loaded")
 	for voice in combat.audio.players.values():
 		check(voice.stream != null and voice.stream.get_length() > 0, "Audio resource usable")
 	check(combat.audio.players[&"bullet_impact"].stream.get_length() < 0.30, "Multi-impact recording reduced to a short clip")
@@ -107,9 +109,9 @@ func _run() -> void:
 	check(combat.pickups.get_child_count() == 1, "Exactly one EXP drop per zombie")
 	check(combat.projectiles.get_child_count() == 0, "No bullets accumulate after target dies")
 	player.position = Vector3(4, 0.01, 0)
-	await tick(4)
+	await tick(14)
 	check(player.experience == 1 and combat.pickups.get_child_count() == 0, "Move close collects one EXP")
-	await tick(4)
+	await tick(14)
 	check(player.experience == 1, "Pickup cannot award twice")
 	if failed: return
 
@@ -118,7 +120,7 @@ func _run() -> void:
 	first = combat.living_zombies[0]
 	first.position = Vector3(0.85, 0.01, 0)
 	first.set_physics_process(true)
-	await tick(10)
+	await tick(14)
 	check(player.current_hp == 90, "First melee attack deals 10 after windup")
 	check(first.holding_distance and first.visual.current_state == &"Idle", "Attack holds chase and uses idle/lunge fallback")
 	await tick(45)
@@ -198,7 +200,7 @@ func _run() -> void:
 	check(combat.living_zombies.is_empty() and get_nodes_in_group("zombies").is_empty(), "Twelve repeated deaths leave no enemies")
 	check(combat.pickups.get_child_count() == 15, "Fifteen kills produce fifteen drops")
 	for pickup in combat.pickups.get_children(): pickup.global_position = Vector3(0, 0.24, 0)
-	await tick(4)
+	await tick(14)
 	check(player.experience == 15 and combat.pickups.get_child_count() == 0, "Repeated EXP collection has exact accounting")
 	if failed: return
 
