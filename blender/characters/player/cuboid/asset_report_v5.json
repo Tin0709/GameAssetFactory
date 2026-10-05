@@ -1,0 +1,75 @@
+{
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_v5.blend",
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "material_count": 1,
+  "changed_texels": 8,
+  "changed_texel_coordinates_top_left_origin": [
+    [
+      11,
+      14
+    ],
+    [
+      12,
+      14
+    ],
+    [
+      9,
+      13
+    ],
+    [
+      11,
+      13
+    ],
+    [
+      12,
+      13
+    ],
+    [
+      9,
+      12
+    ],
+    [
+      10,
+      12
+    ],
+    [
+      11,
+      12
+    ]
+  ],
+  "face_layout_zero_based": {
+    "centerline_x": 3.5,
+    "eye_row_y": 4,
+    "pupil_columns_x": [
+      2,
+      5
+    ],
+    "white_columns_x": [
+      1,
+      6
+    ],
+    "nose_columns_x": [
+      3,
+      4
+    ],
+    "nose_row_y": 5,
+    "mouth_columns_x": [
+      3,
+      4
+    ],
+    "mouth_row_y": 6
+  },
+  "hair_unchanged": true,
+  "all_non_face_texels_unchanged": true,
+  "geometry_rig_uv_weights_unchanged": true,
+  "material_shader_unchanged": true,
+  "structure_signature": "71417cd53ce6febe9f3171063b38e20d619ab1a9b5c3a80df7766b928b1a6521",
+  "v4_sha256": "52a86d1f0d4e4a8b9b9f24c613c129637d44947f30b5a8088a4b5d61c4f37dff",
+  "v4_unchanged": true,
+  "atlas_packed": true,
+  "nearest_sampling": true,
+  "saved_file_reopened_and_verified": true
+}
