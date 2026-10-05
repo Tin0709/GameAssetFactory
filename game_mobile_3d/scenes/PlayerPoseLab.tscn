@@ -76,4 +76,4 @@ theme_override_constants/separation = 4
 
 [node name="Help" type="Label" parent="HUD/Panel/Stack"]
 theme_override_font_sizes/font_size = 14
-text = "RMB orbit  |  Wheel zoom\nSpace freeze  |  . step  |  N/H/Q speed\nB bounce  |  T hit  |  C reset  |  V view\nI/W/R states  |  L/A stance  |  F recoil"
+text = "RMB orbit  |  Wheel zoom\nSpace freeze  |  . step  |  N/H/Q speed\nB bounce  |  T hit  |  G auto fire\nI/W/R states  |  L/A stance  |  F shot"

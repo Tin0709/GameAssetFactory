@@ -151,7 +151,8 @@ func _process(delta: float) -> void:
 	if bounce_enabled and move_weight > 0.1 and contacts > 0:
 		contact_count += contacts
 		var impulse: float = lerpf(bounce_tuning.walk_contact_impulse, bounce_tuning.run_contact_impulse, run_weight) * move_weight
-		body_spring.kick(Vector3(-impulse * contacts, 0, 0), bounce_tuning.max_velocity)
+		var pitch: float = lerpf(bounce_tuning.walk_pitch_impulse, bounce_tuning.run_pitch_impulse, run_weight) * move_weight
+		body_spring.kick(Vector3(-impulse * contacts, pitch * contacts, 0), bounce_tuning.player_max_velocity)
 	_advance_springs(delta)
 	weapon_lag = lerpf(weapon_lag, clampf(acceleration.z * 0.0004, -0.012, 0.012), 1.0 - exp(-8.0 * delta))
 	idle_time = fposmod(idle_time + delta, idle.clip.length)
@@ -246,7 +247,7 @@ func freeze_animation() -> void:
 
 func set_bounce(enabled: bool, strength: float = 1.0) -> void:
 	bounce_enabled = enabled
-	bounce_override = clampf(strength, 0.0, 1.5)
+	bounce_override = clampf(strength, 0.0, 2.0)
 	for spring in [body_spring, chest_spring, head_spring, arm_spring, weapon_spring]: spring.reset()
 
 func hit_impulse(world_direction: Vector3 = Vector3.ZERO) -> void:
@@ -260,21 +261,21 @@ func landing_response() -> void:
 
 func _advance_springs(delta: float) -> void:
 	if not bounce_enabled: return
-	var limits := Vector3(bounce_tuning.max_body_drop, bounce_tuning.max_body_angle, bounce_tuning.max_body_angle)
+	var limits := Vector3(bounce_tuning.player_max_drop, bounce_tuning.player_max_angle, bounce_tuning.player_max_angle)
 	var target := Vector3(0, clampf(-acceleration.z * bounce_tuning.acceleration_strength, -limits.y, limits.y), clampf(-turn_rate * bounce_tuning.turn_spring_strength, -limits.z, limits.z))
 	target.x = (idle.position(hips, idle_time).y - idle.position(hips, 0).y) * bounce_tuning.idle_follow_strength * (1.0 - move_weight)
 	var substeps := clampi(ceili(delta * bounce_tuning.integration_hz), 1, bounce_tuning.max_substeps)
 	for substep in substeps:
 		var dt := delta / substeps
-		body_spring.advance(dt, target, bounce_tuning.bounce_frequency, bounce_tuning.bounce_damping, limits)
-		chest_spring.advance(dt, body_spring.value, bounce_tuning.chest_frequency, bounce_tuning.bounce_damping + 0.10, limits)
-		head_spring.advance(dt, chest_spring.value * bounce_tuning.head_follow_strength, bounce_tuning.head_frequency, bounce_tuning.bounce_damping + 0.18, limits)
-		arm_spring.advance(dt, chest_spring.value, bounce_tuning.arm_frequency, bounce_tuning.bounce_damping + 0.12, limits)
-		weapon_spring.advance(dt, arm_spring.value, bounce_tuning.weapon_frequencies[weapon_type], bounce_tuning.bounce_damping + 0.10, limits)
+		body_spring.advance(dt, target, bounce_tuning.player_frequency, bounce_tuning.player_damping, limits)
+		chest_spring.advance(dt, body_spring.value, bounce_tuning.chest_frequency, bounce_tuning.player_damping + 0.10, limits)
+		head_spring.advance(dt, chest_spring.value * bounce_tuning.head_follow_strength, bounce_tuning.head_frequency, bounce_tuning.player_damping + 0.18, limits)
+		arm_spring.advance(dt, chest_spring.value, bounce_tuning.arm_frequency, bounce_tuning.player_damping + 0.12, limits)
+		weapon_spring.advance(dt, arm_spring.value, bounce_tuning.weapon_frequencies[weapon_type], bounce_tuning.player_damping + 0.10, limits)
 
 func _apply_springs() -> void:
 	if not bounce_enabled: return
-	var gain: float = bounce_tuning.bounce_strength * bounce_override
+	var gain: float = bounce_tuning.bounce_strength * bounce_override * lerpf(1.0, bounce_tuning.combat_body_response, aim_weight)
 	var drop: float = body_spring.value.x * gain
 	skeleton.set_bone_pose_position(hips, skeleton.get_bone_pose_position(hips) + Vector3.UP * drop)
 	# Counter-translate rigid leg anchors: the secondary layer does not move soles.
@@ -287,7 +288,7 @@ func _apply_springs() -> void:
 	var head_offset := (head_spring.value - chest_spring.value) * gain
 	skeleton.set_bone_pose_position(head, skeleton.get_bone_pose_position(head) + Vector3.UP * head_offset.x * bounce_tuning.head_vertical_follow)
 	_rotate_global(head, Quaternion.from_euler(Vector3(head_offset.y, head_offset.z, 0)))
-	var follow: float = gain * bounce_tuning.weapon_follow_strength * lerpf(1.0, bounce_tuning.aim_stabilization, aim_weight) * bounce_tuning.weapon_mass[weapon_type]
+	var follow: float = bounce_tuning.bounce_strength * bounce_override * bounce_tuning.weapon_follow_strength * lerpf(1.0, bounce_tuning.aim_stabilization, aim_weight) * bounce_tuning.weapon_mass[weapon_type]
 	var relative := (weapon_spring.value - chest_spring.value) * follow
 	relative.x = clampf(relative.x, -bounce_tuning.max_weapon_shift, bounce_tuning.max_weapon_shift)
 	relative.y = clampf(relative.y, -bounce_tuning.max_weapon_angle, bounce_tuning.max_weapon_angle)

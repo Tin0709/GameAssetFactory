@@ -16,6 +16,12 @@ var distance := 3.8
 var orbiting := false
 var bounce_enabled := true
 var bounce_strength := 1.0
+const Profiles = preload("res://scripts/weapon_fire_profiles.gd")
+const Flash = preload("res://scenes/combat/MuzzleFlash.tscn")
+const Tracer = preload("res://scenes/combat/PistolProjectile.tscn")
+var sustained_fire := false
+var fire_clock := 0.0
+var shot_count := 0
 @onready var visual: Node3D = $Player/Visual
 @onready var camera: Camera3D = $Camera
 @onready var status: Label = $HUD/Panel/Stack/Status
@@ -29,8 +35,8 @@ func _ready() -> void:
 	_add_row(["L LowReady", "A Aim", "F Recoil"], [set_aim.bind(false), set_aim.bind(true), fire_recoil])
 	_add_row(["Freeze / Play", "Step frame"], [toggle_pause, step_frame])
 	_add_row(["N 1x", "H 0.5x", "Q 0.25x"], [set_speed.bind(1.0), set_speed.bind(0.5), set_speed.bind(0.25)])
-	_add_row(["B Bounce ON/OFF", "T Hit"], [toggle_bounce, hit_preview])
-	_add_row(["0%", "50%", "100%", "150%"], [set_bounce_strength.bind(0.0), set_bounce_strength.bind(0.5), set_bounce_strength.bind(1.0), set_bounce_strength.bind(1.5)])
+	_add_row(["B Bounce", "T Hit", "G Auto fire"], [toggle_bounce, hit_preview, toggle_sustained_fire])
+	_add_row(["0%", "50%", "100%", "150%", "200%"], [set_bounce_strength.bind(0.0), set_bounce_strength.bind(0.5), set_bounce_strength.bind(1.0), set_bounce_strength.bind(1.5), set_bounce_strength.bind(2.0)])
 	_add_row(["Front", "Side", "Rear"], [set_view.bind(0), set_view.bind(1), set_view.bind(2)])
 	_add_row(["3/4", "Isometric", "C Reset"], [set_view.bind(3), set_view.bind(4), reset_camera])
 	_add_row(["Orbit left", "Orbit right", "Zoom +", "Zoom -"], [rotate_camera.bind(-0.25), rotate_camera.bind(0.25), zoom.bind(0.85), zoom.bind(1.15)])
@@ -51,6 +57,7 @@ func _add_row(labels: Array, actions: Array) -> void:
 
 func equip(index: int) -> void:
 	visual.equip_weapon(index)
+	fire_clock = 0.0
 	_update_status()
 
 func set_locomotion(index: int) -> void:
@@ -62,9 +69,31 @@ func set_aim(value: bool) -> void:
 	_update_status()
 
 func fire_recoil() -> void:
-	# Production recoil, with no firing/projectile/damage service.
+	# Same shot presentation; lab tracers never raycast or damage anything.
 	visual.shot_recoil(Vector3.BACK)
+	var origin: Vector3 = visual.socket.muzzle_position()
+	var forward := Vector3.BACK.rotated(Vector3.UP, visual.rotation.y)
+	var flash := Flash.instantiate()
+	flash.configure(visual.weapon_type, shot_count)
+	add_child(flash)
+	flash.global_position = origin
+	flash.look_at(origin + forward)
+	flash.set_process(false)
+	for direction in Profiles.directions(forward, visual.weapon_type, shot_count):
+		var tracer := Tracer.instantiate()
+		tracer.set_physics_process(false)
+		tracer.direction = direction
+		tracer.set_meta("lab_tracer", true)
+		add_child(tracer)
+		tracer.global_position = origin
+		tracer.look_at(origin + direction)
+		if visual.weapon_type == 2: tracer.get_node("Visual").scale = Vector3(0.5, 0.5, 0.65)
+	shot_count += 1
 	_update_status()
+
+func toggle_sustained_fire() -> void:
+	sustained_fire = not sustained_fire
+	fire_clock = 0.0
 
 func toggle_pause() -> void:
 	animation_paused = not animation_paused
@@ -80,7 +109,7 @@ func toggle_bounce() -> void:
 	_update_status()
 
 func set_bounce_strength(value: float) -> void:
-	bounce_strength = clampf(value, 0.0, 1.5)
+	bounce_strength = clampf(value, 0.0, 2.0)
 	visual.set_bounce(bounce_enabled, bounce_strength)
 	_update_status()
 
@@ -98,6 +127,21 @@ func _advance(delta: float) -> void:
 	# Override target presence after motion input: no target/enemy is instantiated.
 	visual.has_target = aiming
 	visual._process(animation_delta)
+	if sustained_fire:
+		fire_clock -= animation_delta
+		if fire_clock <= 0.0:
+			fire_recoil()
+			fire_clock = maxf(0.0, fire_clock + Profiles.PROFILES[visual.weapon_type].interval)
+	for child in get_children():
+		if child.has_meta("lab_tracer"):
+			child.age += animation_delta
+			child.position += child.direction * 18.0 * animation_delta
+			if child.age >= 0.22:
+				remove_child(child)
+				child.queue_free()
+		elif child.get_script() == preload("res://scripts/muzzle_flash.gd"):
+			child._process(animation_delta)
+			if child.is_queued_for_deletion(): remove_child(child)
 
 func _process(delta: float) -> void:
 	if not animation_paused: _advance(delta)
@@ -110,7 +154,7 @@ func _update_status() -> void:
 		"active" if visual.is_firing else ("queued" if visual.recoil_time == 0.0 else "settled"),
 		visual.recoil_time if visual.recoil_time < 1.0 else 0.0,
 		"ON" if bounce_enabled else "OFF", int(bounce_strength * 100),
-		playback_speed, "FROZEN" if animation_paused else "playing", camera_mode, distance]
+		playback_speed, "FROZEN" if animation_paused else ("auto fire" if sustained_fire else "playing"), camera_mode, distance]
 
 func set_view(index: int) -> void:
 	view_index = index % VIEWS.size()
@@ -164,6 +208,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_L: set_aim(false)
 			KEY_A: set_aim(true)
 			KEY_F: fire_recoil()
+			KEY_G: toggle_sustained_fire()
 			KEY_B: toggle_bounce()
 			KEY_T: hit_preview()
 			KEY_SPACE: toggle_pause()

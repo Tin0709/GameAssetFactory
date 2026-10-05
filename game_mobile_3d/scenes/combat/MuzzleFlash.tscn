@@ -1,19 +1,32 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://scripts/impact_burst.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/muzzle_flash.gd" id="1_script"]
 
 [sub_resource type="StandardMaterial3D" id="ImpactMaterial"]
 shading_mode = 0
 albedo_color = Color(1, 0.85, 0.48, 1)
+emission_enabled = true
+emission = Color(1, 0.62, 0.16, 1)
+emission_energy_multiplier = 2.0
 
 [sub_resource type="BoxMesh" id="ImpactMesh"]
-size = Vector3(0.16, 0.16, 0.16)
+size = Vector3(0.24, 0.06, 0.09)
+material = SubResource("ImpactMaterial")
+
+[sub_resource type="BoxMesh" id="Vertical"]
+size = Vector3(0.06, 0.24, 0.09)
 material = SubResource("ImpactMaterial")
 
 [node name="MuzzleFlash" type="Node3D"]
 script = ExtResource("1_script")
-duration = 0.045
 
-[node name="Visual" type="MeshInstance3D" parent="."]
+[node name="Visual" type="Node3D" parent="."]
+position = Vector3(0, 0, -0.04)
+
+[node name="Horizontal" type="MeshInstance3D" parent="Visual"]
 mesh = SubResource("ImpactMesh")
+cast_shadow = 0
+
+[node name="Vertical" type="MeshInstance3D" parent="Visual"]
+mesh = SubResource("Vertical")
 cast_shadow = 0

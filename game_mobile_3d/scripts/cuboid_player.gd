@@ -3,6 +3,8 @@ extends CharacterBody3D
 
 @export var walk_speed: float = 4.25
 @export var run_speed: float = 6.25
+@export var combat_move_speed: float = 2.6
+@export var firing_speed_threshold: float = 3.0
 @export var acceleration: float = 42.0
 @export var deceleration: float = 60.0
 @export var walk_cycle_speed: float = 1.55
@@ -44,6 +46,10 @@ func equip_test_weapon(index: int) -> void:
 	visual.recoil_amount = 0.0
 	visual.is_firing = false
 	$Pistol.cooldown = 0.15
+	$Pistol.select_weapon(index)
+
+func can_fire_moving() -> bool:
+	return not is_dead and current_speed <= firing_speed_threshold
 
 func take_damage(amount: int, direction: Vector3 = Vector3.ZERO) -> bool:
 	if is_dead or amount <= 0 or hurt_remaining > 0.0:
@@ -77,7 +83,9 @@ func _physics_process(delta: float) -> void:
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction := Vector3(input.x, 0.0, input.y)
 	var running := Input.is_action_pressed("sprint") and not input.is_zero_approx()
+	var target: Node3D = $Pistol.nearest_target() if $Pistol.enabled else null
 	var speed := run_speed if running else walk_speed
+	if target != null and not running: speed = minf(speed, combat_move_speed)
 	var horizontal := Vector2(velocity.x, velocity.z)
 	var desired := Vector2(direction.x, direction.z) * speed
 	horizontal = horizontal.move_toward(desired, (deceleration if direction.is_zero_approx() else acceleration) * delta)
@@ -92,5 +100,4 @@ func _physics_process(delta: float) -> void:
 	if not was_grounded and is_on_floor(): visual.landing_response()
 	var actual_speed := Vector2(get_real_velocity().x, get_real_velocity().z).length()
 	current_speed = actual_speed
-	var target: Node3D = $Pistol.nearest_target() if $Pistol.enabled else null
-	visual.update_motion(get_real_velocity(), target, delta)
+	visual.update_motion(get_real_velocity(), target if can_fire_moving() else null, delta)

@@ -1,0 +1,25 @@
+{
+	"checks": 1213,
+	"corpse_hold_seconds": 0.45,
+	"death_variants": [
+		0,
+		1,
+		2,
+		3,
+		4,
+		5
+	],
+	"failures": [],
+	"forty_death_pose_usec": 294.111111111111,
+	"forty_zombies_added_usec": 176.083333333333,
+	"forty_zombies_off_usec": 199.558333333333,
+	"forty_zombies_on_usec": 375.641666666667,
+	"max_body_drop_m": 0.133595019578934,
+	"max_death_ground_penetration_m": 0.0,
+	"max_hand_contact_m": 0.0119293406605721,
+	"phone_tested": false,
+	"player_update_usec": 52.765,
+	"render_sample": {},
+	"rendered": false,
+	"smoke_start_seconds": 1.07
+}

@@ -69,7 +69,7 @@ func update_status() -> void:
 	$HUD/ExpBar.value = player.experience
 	$HUD/ExpText.text = "EXP %d / %d" % [player.experience, progression.required_exp()]
 	if OS.is_debug_build():
-		$HUD/AnimationDebug.text = "Weapon: " + player.visual.WEAPON_NAMES[player.visual.weapon_type] + "\n" + player.visual.debug_text() + "\n1 Pistol  |  2 M4A1  |  3 Shotgun  |  F2 Weapon Test Select"
+		$HUD/AnimationDebug.text = "Weapon: " + player.visual.debug_text() + "\n" + player.get_node("Pistol").debug_text() + "\n1 Pistol  |  2 M4A1  |  3 Shotgun  |  F2 Weapon Test Select"
 
 func _process(delta: float) -> void:
 	status_elapsed += delta

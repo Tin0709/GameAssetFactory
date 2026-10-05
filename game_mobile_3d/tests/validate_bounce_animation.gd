@@ -64,7 +64,7 @@ func run() -> void:
 	var v: Node3D = lab.visual
 	for weapon in 3:
 		lab.equip(weapon)
-		for strength in [0.0, 0.5, 1.0, 1.5]:
+		for strength in [0.0, 0.5, 1.0, 1.5, 2.0]:
 			lab.set_bounce_strength(strength)
 			for aiming in [false, true]:
 				lab.set_aim(aiming)
@@ -76,7 +76,7 @@ func run() -> void:
 						if frame > 15:
 							maximum_contact = maxf(maximum_contact, contact_error(v))
 						maximum_drop = maxf(maximum_drop, absf(v.body_spring.value.x * strength))
-					check(v.body_spring.value.is_finite() and absf(v.body_spring.value.x) <= 0.0241, "Bounded player spring across weapon/state/strength")
+					check(v.body_spring.value.is_finite() and absf(v.body_spring.value.x) <= v.bounce_tuning.player_max_drop + 0.0001, "Bounded player spring across weapon/state/strength")
 					for bone in v.skeleton.get_bone_count(): check(v.skeleton.get_bone_pose_scale(bone) == Vector3.ONE, "Rigid bone scale")
 	check(maximum_contact < 0.015, "Held hand contacts remain within 15mm")
 	lab.set_bounce_strength(1.0)

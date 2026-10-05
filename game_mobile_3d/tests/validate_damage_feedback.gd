@@ -129,9 +129,9 @@ func _run() -> void:
 		first.position = Vector3(1.0, 0.01, 0)
 		for other in combat.living_zombies.slice(1): other.position = Vector3(-6, 0.01, -4)
 		await tick(2)
-		combat.fire(Vector3(0, 1.02, 0), Vector3.RIGHT, player.get_node("Pistol").damage, 120, 0.9)
+		combat.fire(Vector3(0, 1.02, 0), Vector3.RIGHT, player.get_node("Pistol").damage_per_shot, 120, 0.9)
 		await tick(2)
-		check(first.current_hp == 40 and effects(NUMBER).size() == 1, "Weapon %d projectile produces one feedback event" % weapon)
+		check(first.current_hp == 60 - player.get_node("Pistol").damage_per_shot and effects(NUMBER).size() == 1, "Weapon %d single projectile produces one feedback event at its profile damage" % weapon)
 		check(player.visual.recoil_time < 0.2, "Weapon %d recoil retained" % weapon)
 
 	await fresh()
@@ -142,7 +142,7 @@ func _run() -> void:
 	var pistol: Node = player.get_node("Pistol")
 	pistol.enabled = true
 	await tick(92)
-	check(first.is_dead and combat.kill_count == 1, "M4A1 automatic shared cadence kills once")
+	check(first.is_dead and combat.kill_count == 1, "M4A1 automatic profile kills once")
 	pistol.enabled = false
 	await tick(70)
 	check(not is_instance_valid(first) and combat.pickups.get_child_count() == 1, "Automatic death/drop retained")
@@ -249,7 +249,7 @@ func _run() -> void:
 		"stress_deaths": 24, "stress_smoke_pieces": 192, "peak_draw_calls": peak_draws,
 		"baseline_60_physics_frames_usec": baseline_usec, "phone_tested": false,
 		"desktop_benchmark": benchmark,
-		"weapon_note": "All models retain existing shared automatic firing cadence/stats; no new rifle rate or shotgun pellet mechanics."}
+		"weapon_note": "Per-weapon damage and rapid M4 cadence use the existing swept projectile feedback path; shotgun spread is covered by validate_movement_weapons.gd."}
 	var output := FileAccess.open("res://tests/damage_feedback_%s_validation.json" % ("rendered" if rendered else "headless"), FileAccess.WRITE)
 	output.store_string(JSON.stringify(report, "\t"))
 	print("DAMAGE FEEDBACK: %d checks, %d failures" % [checks, failures.size()])

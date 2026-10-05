@@ -15,6 +15,7 @@ const PICKUP = preload("res://scenes/combat/ExpPickup.tscn")
 const MUZZLE = preload("res://scenes/combat/MuzzleFlash.tscn")
 const IMPACT = preload("res://scenes/combat/ImpactBurst.tscn")
 const DEATH_SMOKE = preload("res://scripts/zombie_death_smoke.gd")
+const Profiles = preload("res://scripts/weapon_fire_profiles.gd")
 
 func spawn_death_smoke(position: Vector3) -> void:
 	var smoke := DEATH_SMOKE.new()
@@ -44,8 +45,22 @@ func _unregister_zombie(zombie: Node3D) -> void:
 func can_fight() -> bool:
 	return active and combat_enabled and not get_tree().paused
 
-func fire(origin: Vector3, direction: Vector3, damage: int, speed: float, lifetime: float, travel_range: float = -1.0) -> void:
-	if not can_fight() or direction.length_squared() < 0.0001: return
+func fire(origin: Vector3, direction: Vector3, damage: int, speed: float, lifetime: float, travel_range: float = -1.0, weapon: int = 0, shot: int = 0) -> void:
+	if not can_fight() or not player.can_fire_moving() or direction.length_squared() < 0.0001: return
+	if weapon == 2:
+		for pellet_direction in Profiles.directions(direction, weapon, shot):
+			_spawn_projectile(origin, pellet_direction, damage, speed, lifetime, travel_range, true)
+	else:
+		_spawn_projectile(origin, direction, damage, speed, lifetime, travel_range, false)
+	var muzzle := MUZZLE.instantiate()
+	muzzle.configure(weapon, shot)
+	effects.add_child(muzzle)
+	muzzle.global_position = origin
+	muzzle.look_at(origin + direction, Vector3.FORWARD if absf(direction.dot(Vector3.UP)) > 0.98 else Vector3.UP)
+	player.visual.shot_recoil(direction)
+	play_sound(&"pistol_shot")
+
+func _spawn_projectile(origin: Vector3, direction: Vector3, damage: int, speed: float, lifetime: float, travel_range: float, pellet: bool) -> void:
 	var bullet := PROJECTILE.instantiate()
 	bullet.combat = self
 	bullet.direction = direction
@@ -56,11 +71,7 @@ func fire(origin: Vector3, direction: Vector3, damage: int, speed: float, lifeti
 	projectiles.add_child(bullet)
 	bullet.global_position = origin
 	bullet.look_at(origin + direction, Vector3.FORWARD if absf(direction.dot(Vector3.UP)) > 0.98 else Vector3.UP)
-	var muzzle := MUZZLE.instantiate()
-	effects.add_child(muzzle)
-	muzzle.global_position = origin
-	player.visual.shot_recoil(direction)
-	play_sound(&"pistol_shot")
+	if pellet: bullet.get_node("Visual").scale = Vector3(0.5, 0.5, 0.65)
 
 func play_sound(event: StringName) -> void:
 	audio.play_event(event)
