@@ -1,0 +1,211 @@
+{
+  "action": "Player_Run_Blocky_V1",
+  "pass_name": "Pass 1 lower-body blocking only",
+  "fps": 24,
+  "frame_range": [
+    1,
+    17
+  ],
+  "duration_seconds": 0.6666666666666666,
+  "animated_bones": [
+    "Hips",
+    "Leg.L",
+    "Leg.R"
+  ],
+  "key_poses": [
+    {
+      "frame": 1.0,
+      "label": "Right-foot Contact",
+      "hips_world": [
+        -0.010999999940395355,
+        -0.004000000189989805,
+        0.6580570936203003
+      ],
+      "leg_bottoms_world_z_m": {
+        "Leg.L": 0.062062136828899384,
+        "Leg.R": 0.0030000098049640656
+      },
+      "leg_swing_degrees": {
+        "Leg.L": -37.999999919081475,
+        "Leg.R": 28.000000209988553
+      }
+    },
+    {
+      "frame": 3.0,
+      "label": "Down",
+      "hips_world": [
+        -0.017999999225139618,
+        0.0020000000949949026,
+        0.6325145363807678
+      ],
+      "leg_bottoms_world_z_m": {
+        "Leg.L": 0.01800002157688141,
+        "Leg.R": 0.002999965101480484
+      },
+      "leg_swing_degrees": {
+        "Leg.L": -12.000000333930423,
+        "Leg.R": 12.000000333930423
+      }
+    },
+    {
+      "frame": 5.0,
+      "label": "Passing",
+      "hips_world": [
+        -0.007000000216066837,
+        0.007000000216066837,
+        0.6792858242988586
+      ],
+      "leg_bottoms_world_z_m": {
+        "Leg.L": 0.02800002507865429,
+        "Leg.R": 0.0030000098049640656
+      },
+      "leg_swing_degrees": {
+        "Leg.L": 3.0000000834826057,
+        "Leg.R": -18.000000500895634
+      }
+    },
+    {
+      "frame": 7.0,
+      "label": "Up",
+      "hips_world": [
+        0.003000000026077032,
+        0.0020000000949949026,
+        0.7152858376502991
+      ],
+      "leg_bottoms_world_z_m": {
+        "Leg.L": 0.04244539141654968,
+        "Leg.R": 0.08700842410326004
+      },
+      "leg_swing_degrees": {
+        "Leg.L": 22.000000043023345,
+        "Leg.R": -31.999999752116263
+      }
+    },
+    {
+      "frame": 9.0,
+      "label": "Left-foot Contact",
+      "hips_world": [
+        0.012000000104308128,
+        -0.003000000026077032,
+        0.650514543056488
+      ],
+      "leg_bottoms_world_z_m": {
+        "Leg.L": 0.0029999762773513794,
+        "Leg.R": 0.04303550720214844
+      },
+      "leg_swing_degrees": {
+        "Leg.L": 30.000000834826057,
+        "Leg.R": -36.00000100179127
+      }
+    },
+    {
+      "frame": 11.0,
+      "label": "Down",
+      "hips_world": [
+        0.01600000075995922,
+        0.0020000000949949026,
+        0.6335145235061646
+      ],
+      "leg_bottoms_world_z_m": {
+        "Leg.L": 0.002999965101480484,
+        "Leg.R": 0.01799997128546238
+      },
+      "leg_swing_degrees": {
+        "Leg.L": 11.000000021511672,
+        "Leg.R": -14.000000104994276
+      }
+    },
+    {
+      "frame": 13.0,
+      "label": "Passing",
+      "hips_world": [
+        0.006000000052154064,
+        0.006000000052154064,
+        0.6782858371734619
+      ],
+      "leg_bottoms_world_z_m": {
+        "Leg.L": 0.004051178693771362,
+        "Leg.R": 0.026000026613473892
+      },
+      "leg_swing_degrees": {
+        "Leg.L": -18.999999959540737,
+        "Leg.R": 3.999999969014533
+      }
+    },
+    {
+      "frame": 15.0,
+      "label": "Up",
+      "hips_world": [
+        -0.0020000000949949026,
+        0.0010000000474974513,
+        0.7132858037948608
+      ],
+      "leg_bottoms_world_z_m": {
+        "Leg.L": 0.09500464051961899,
+        "Leg.R": 0.04554950073361397
+      },
+      "leg_swing_degrees": {
+        "Leg.L": -33.99999866940647,
+        "Leg.R": 24.000000667860846
+      }
+    },
+    {
+      "frame": 17.0,
+      "label": "Right-foot Contact / loop",
+      "hips_world": [
+        -0.010999999940395355,
+        -0.004000000189989805,
+        0.6580570936203003
+      ],
+      "leg_bottoms_world_z_m": {
+        "Leg.L": 0.062062136828899384,
+        "Leg.R": 0.0030000098049640656
+      },
+      "leg_swing_degrees": {
+        "Leg.L": -37.999999919081475,
+        "Leg.R": 28.000000209988553
+      }
+    }
+  ],
+  "hips_vertical_world_range_m": [
+    0.6325145363807678,
+    0.7152858376502991
+  ],
+  "hips_vertical_excursion_m": 0.08277130126953125,
+  "hips_lateral_world_range_m": [
+    -0.017999999225139618,
+    0.01600000075995922
+  ],
+  "hips_lateral_excursion_m": 0.03399999998509884,
+  "max_leg_swing_degrees": {
+    "Leg.L": 37.999999919081475,
+    "Leg.R": 36.00000100179127
+  },
+  "root_travel_m": 0,
+  "hips_accumulated_horizontal_travel_m": 0.0,
+  "loop_max_matrix_mismatch": 0.0,
+  "minimum_leg_bottom_z_m": 0.0008383356034755707,
+  "max_ground_penetration_m": 0,
+  "max_vertical_leg_root_tuck_m": 0.07043839830160141,
+  "ground_contact_method": "Small vertical translation of rigid leg roots into pelvis; no scale, shortening, bone-length change or knee simulation",
+  "max_rigid_length_error_m": 1.5294558575185135e-07,
+  "scale_animation_present": false,
+  "upper_body_independent_animation": false,
+  "protected_actions_unchanged": true,
+  "mesh_skinning_rest_hierarchy_unchanged": true,
+  "production_unchanged": true,
+  "interpolation": "BEZIER AUTO_CLAMPED; CYCLES REPEAT",
+  "pose_rotation_key_frames": [
+    1,
+    3,
+    5,
+    7,
+    9,
+    11,
+    13,
+    15,
+    17
+  ],
+  "ground_compensation_location_step_frames": 0.25,
+  "ready_for_visual_review": true
+}

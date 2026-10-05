@@ -1,0 +1,495 @@
+{
+  "action": "Player_Run_Mixamo_RAW",
+  "target": "Player_Cuboid_Rig",
+  "source": "Mixamo_Working",
+  "source_action": "Running_Mixamo_InPlace",
+  "frame_range": [
+    1.0,
+    16.200000000000003
+  ],
+  "duration_seconds": 0.6333333333333334,
+  "fps": 24,
+  "animated_bones": [
+    "Hips",
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "Arm.L",
+    "Arm.R",
+    "Leg.L",
+    "Leg.R"
+  ],
+  "animated_bone_count": 9,
+  "curve_count": 54,
+  "bake_sample_count": 153,
+  "sample_step_frames": 0.1,
+  "rotation_representation": "XYZ Euler, continuity unwrapped; original bone rotation modes preserved",
+  "location_channels": "Hips motion plus constant zero location for other mapped bones, preventing residual Idle translations",
+  "interpolation": "LINEAR",
+  "cyclic": true,
+  "loop_rotation_mismatch_degrees": {
+    "Hips": 0.0,
+    "Spine": 0.0,
+    "Chest": 0.0,
+    "Neck": 0.0,
+    "Head": 0.0,
+    "Arm.L": 0.0,
+    "Arm.R": 0.0,
+    "Leg.L": 0.0,
+    "Leg.R": 0.0
+  },
+  "loop_hips_displacement_m": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "hips_accumulated_horizontal_travel_m": 0.0,
+  "root_travel_m": 0,
+  "hips_axis_ranges_m": [
+    0.017919467762112617,
+    0.07263934426009655,
+    0.06931072473526001
+  ],
+  "max_rotation_error_degrees": 0,
+  "min_bone_direction_alignment": 0.9999998309940565,
+  "max_rigid_length_error_m": 2.2574880109704765e-07,
+  "max_scale_error": 0,
+  "scale_animation_present": false,
+  "representative_validation": [
+    {
+      "frame": 1.0,
+      "time_seconds": 0.0,
+      "bone_direction_alignment": {
+        "Hips": 0.9999999906867743,
+        "Spine": 0.9999999839346856,
+        "Chest": 1.0000000153668225,
+        "Neck": 0.9999999743125958,
+        "Head": 0.9999999979045242,
+        "Arm.L": 1.0000000707805157,
+        "Arm.R": 0.9999999348074198,
+        "Leg.L": 1.0000001096632332,
+        "Leg.R": 1.000000017695129
+      },
+      "bone_rotation_error_degrees": {
+        "Hips": 0.0,
+        "Spine": 0.0,
+        "Chest": 0.0,
+        "Neck": 0.0,
+        "Head": 0.0,
+        "Arm.L": 0.0,
+        "Arm.R": 0.0,
+        "Leg.L": 0.0,
+        "Leg.R": 0.0
+      },
+      "hips_world": [
+        0.0,
+        0.0,
+        0.6749999523162842
+      ],
+      "root_travel_m": 0.0,
+      "min_mesh_z_m": -0.0017078425735235214,
+      "intersections": [
+        {
+          "pair": "Head / Chest",
+          "minimum_sat_overlap_m": 0.04878535075113177
+        },
+        {
+          "pair": "Chest / Arm.R",
+          "minimum_sat_overlap_m": 0.00457798782736063
+        },
+        {
+          "pair": "Chest / Leg.L",
+          "minimum_sat_overlap_m": 0.07149397869943641
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "minimum_sat_overlap_m": 0.02452545694541186
+        },
+        {
+          "pair": "Leg.L / Leg.R",
+          "minimum_sat_overlap_m": 0.016175780852790922
+        }
+      ]
+    },
+    {
+      "frame": 4.8,
+      "time_seconds": 0.15833333333333333,
+      "bone_direction_alignment": {
+        "Hips": 0.9999999065300926,
+        "Spine": 1.0000000282307155,
+        "Chest": 1.0000000742438715,
+        "Neck": 1.0000000903382897,
+        "Head": 0.9999999998835847,
+        "Arm.L": 1.0000001639127731,
+        "Arm.R": 1.000000037252903,
+        "Leg.L": 1.0000000324798748,
+        "Leg.R": 1.0000000190921128
+      },
+      "bone_rotation_error_degrees": {
+        "Hips": 0.0,
+        "Spine": 0.0,
+        "Chest": 0.0,
+        "Neck": 0.0,
+        "Head": 0.0,
+        "Arm.L": 0.0,
+        "Arm.R": 0.0,
+        "Leg.L": 0.0,
+        "Leg.R": 0.0
+      },
+      "hips_world": [
+        -0.00795693788677454,
+        -0.0005135524552315474,
+        0.7059102654457092
+      ],
+      "root_travel_m": 0.0,
+      "min_mesh_z_m": 0.019435543566942215,
+      "intersections": [
+        {
+          "pair": "Head / Chest",
+          "minimum_sat_overlap_m": 0.05611160909757018
+        },
+        {
+          "pair": "Head / Arm.L",
+          "minimum_sat_overlap_m": 0.01767597661819309
+        },
+        {
+          "pair": "Chest / Arm.R",
+          "minimum_sat_overlap_m": 0.01599107589572668
+        },
+        {
+          "pair": "Chest / Leg.L",
+          "minimum_sat_overlap_m": 0.07552600728377001
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "minimum_sat_overlap_m": 0.021788029836898204
+        },
+        {
+          "pair": "Leg.L / Leg.R",
+          "minimum_sat_overlap_m": 0.01291994284838438
+        }
+      ]
+    },
+    {
+      "frame": 8.6,
+      "time_seconds": 0.31666666666666665,
+      "bone_direction_alignment": {
+        "Hips": 0.9999999538995326,
+        "Spine": 0.9999999688006938,
+        "Chest": 1.0000000286381692,
+        "Neck": 1.0000000426662154,
+        "Head": 0.9999999670835678,
+        "Arm.L": 0.9999999701976776,
+        "Arm.R": 0.9999999962747097,
+        "Leg.L": 1.0000000558793545,
+        "Leg.R": 0.9999998898711056
+      },
+      "bone_rotation_error_degrees": {
+        "Hips": 0.0,
+        "Spine": 0.0,
+        "Chest": 0.0,
+        "Neck": 0.0,
+        "Head": 0.0,
+        "Arm.L": 0.0,
+        "Arm.R": 0.0,
+        "Leg.L": 0.0,
+        "Leg.R": 0.0
+      },
+      "hips_world": [
+        0.0019340852741152048,
+        0.0063668955117464066,
+        0.6651663184165955
+      ],
+      "root_travel_m": 0.0,
+      "min_mesh_z_m": -0.01648189127445221,
+      "intersections": [
+        {
+          "pair": "Head / Chest",
+          "minimum_sat_overlap_m": 0.03672216134145856
+        },
+        {
+          "pair": "Head / Arm.R",
+          "minimum_sat_overlap_m": 0.010837534227903234
+        },
+        {
+          "pair": "Chest / Arm.L",
+          "minimum_sat_overlap_m": 0.00829502401757054
+        },
+        {
+          "pair": "Chest / Leg.L",
+          "minimum_sat_overlap_m": 0.013022657949477434
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "minimum_sat_overlap_m": 0.06417654803954065
+        },
+        {
+          "pair": "Leg.L / Leg.R",
+          "minimum_sat_overlap_m": 0.0007682163268327713
+        }
+      ]
+    },
+    {
+      "frame": 12.4,
+      "time_seconds": 0.47500000000000003,
+      "bone_direction_alignment": {
+        "Hips": 0.9999999384162948,
+        "Spine": 1.0000001726439223,
+        "Chest": 1.0000000288709998,
+        "Neck": 1.0000000796280801,
+        "Head": 1.0000001224689186,
+        "Arm.L": 0.9999999981373549,
+        "Arm.R": 1.0000000949949026,
+        "Leg.L": 1.0000000226245902,
+        "Leg.R": 1.0000000204890966
+      },
+      "bone_rotation_error_degrees": {
+        "Hips": 0.0,
+        "Spine": 0.0,
+        "Chest": 0.0,
+        "Neck": 0.0,
+        "Head": 0.0,
+        "Arm.L": 0.0,
+        "Arm.R": 0.0,
+        "Leg.L": 0.0,
+        "Leg.R": 0.0
+      },
+      "hips_world": [
+        0.00859341025352478,
+        -0.011634993366897106,
+        0.7190004587173462
+      ],
+      "root_travel_m": 0.0,
+      "min_mesh_z_m": 0.050528980791568756,
+      "intersections": [
+        {
+          "pair": "Head / Chest",
+          "minimum_sat_overlap_m": 0.04905042890459299
+        },
+        {
+          "pair": "Head / Arm.R",
+          "minimum_sat_overlap_m": 0.025629841123191
+        },
+        {
+          "pair": "Chest / Arm.L",
+          "minimum_sat_overlap_m": 0.021756665781140327
+        },
+        {
+          "pair": "Chest / Arm.R",
+          "minimum_sat_overlap_m": 0.0038866233080625534
+        },
+        {
+          "pair": "Chest / Leg.L",
+          "minimum_sat_overlap_m": 0.027802915079519153
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "minimum_sat_overlap_m": 0.05936336447484791
+        },
+        {
+          "pair": "Leg.L / Leg.R",
+          "minimum_sat_overlap_m": 0.004965774714946747
+        }
+      ]
+    },
+    {
+      "frame": 16.2,
+      "time_seconds": 0.6333333333333333,
+      "bone_direction_alignment": {
+        "Hips": 1.0000000121071935,
+        "Spine": 0.999999987303454,
+        "Chest": 1.0000000218860805,
+        "Neck": 0.9999999855022512,
+        "Head": 0.9999999915016815,
+        "Arm.L": 1.0000001676380634,
+        "Arm.R": 0.9999999813735485,
+        "Leg.L": 1.0000001022126526,
+        "Leg.R": 1.0000000586733222
+      },
+      "bone_rotation_error_degrees": {
+        "Hips": 0.0,
+        "Spine": 0.0,
+        "Chest": 0.0,
+        "Neck": 0.0,
+        "Head": 0.0,
+        "Arm.L": 0.0,
+        "Arm.R": 0.0,
+        "Leg.L": 0.0,
+        "Leg.R": 0.0
+      },
+      "hips_world": [
+        0.0,
+        0.0,
+        0.6749999523162842
+      ],
+      "root_travel_m": 0.0,
+      "min_mesh_z_m": -0.0017078425735235214,
+      "intersections": [
+        {
+          "pair": "Head / Chest",
+          "minimum_sat_overlap_m": 0.04878535075113177
+        },
+        {
+          "pair": "Chest / Arm.R",
+          "minimum_sat_overlap_m": 0.00457798782736063
+        },
+        {
+          "pair": "Chest / Leg.L",
+          "minimum_sat_overlap_m": 0.07149397869943641
+        },
+        {
+          "pair": "Chest / Leg.R",
+          "minimum_sat_overlap_m": 0.02452545694541186
+        },
+        {
+          "pair": "Leg.L / Leg.R",
+          "minimum_sat_overlap_m": 0.016175780852790922
+        }
+      ]
+    }
+  ],
+  "cycle_checks": [
+    {
+      "phase": 0.25,
+      "max_matrix_error": 0.0
+    },
+    {
+      "phase": 0.5,
+      "max_matrix_error": 0.0
+    },
+    {
+      "phase": 0.75,
+      "max_matrix_error": 0.0
+    }
+  ],
+  "intersection_summary": {
+    "Head / Chest": {
+      "sample_count": 305,
+      "first_frame": 1.0,
+      "last_frame": 16.2,
+      "max_minimum_sat_overlap_m": 0.058108927216380835
+    },
+    "Chest / Arm.R": {
+      "sample_count": 191,
+      "first_frame": 1.0,
+      "last_frame": 16.2,
+      "max_minimum_sat_overlap_m": 0.016344774514436722
+    },
+    "Chest / Leg.L": {
+      "sample_count": 299,
+      "first_frame": 1.0,
+      "last_frame": 16.2,
+      "max_minimum_sat_overlap_m": 0.09101873030886054
+    },
+    "Chest / Leg.R": {
+      "sample_count": 305,
+      "first_frame": 1.0,
+      "last_frame": 16.2,
+      "max_minimum_sat_overlap_m": 0.08724450308363885
+    },
+    "Leg.L / Leg.R": {
+      "sample_count": 304,
+      "first_frame": 1.0,
+      "last_frame": 16.2,
+      "max_minimum_sat_overlap_m": 0.02512168465182185
+    },
+    "Head / Arm.L": {
+      "sample_count": 89,
+      "first_frame": 1.15,
+      "last_frame": 5.55,
+      "max_minimum_sat_overlap_m": 0.03079625207465142
+    },
+    "Chest / Arm.L": {
+      "sample_count": 216,
+      "first_frame": 4.95,
+      "last_frame": 15.7,
+      "max_minimum_sat_overlap_m": 0.021949894726276398
+    },
+    "Head / Arm.R": {
+      "sample_count": 121,
+      "first_frame": 7.8,
+      "last_frame": 13.8,
+      "max_minimum_sat_overlap_m": 0.03403421785333194
+    }
+  },
+  "lowest_mesh_z_m": -0.0260322205722332,
+  "endpoint_numerical_residue_removed": {
+    "Hips": {
+      "location_m": 4.1781268272516433e-07,
+      "rotation_degrees": 0.0
+    },
+    "Spine": {
+      "location_m": 0.0,
+      "rotation_degrees": 0.0
+    },
+    "Chest": {
+      "location_m": 0.0,
+      "rotation_degrees": 0.0
+    },
+    "Neck": {
+      "location_m": 0.0,
+      "rotation_degrees": 0.0
+    },
+    "Head": {
+      "location_m": 0.0,
+      "rotation_degrees": 0.0
+    },
+    "Arm.L": {
+      "location_m": 0.0,
+      "rotation_degrees": 0.0
+    },
+    "Arm.R": {
+      "location_m": 0.0,
+      "rotation_degrees": 0.0
+    },
+    "Leg.L": {
+      "location_m": 0.0,
+      "rotation_degrees": 0.0
+    },
+    "Leg.R": {
+      "location_m": 0.0,
+      "rotation_degrees": 0.0
+    }
+  },
+  "original_objects_unchanged": {
+    "Player_Cuboid_Rig": true,
+    "Player_Cuboid_Base": true,
+    "Mixamo_Working": true,
+    "Armature": true
+  },
+  "original_actions_unchanged": {
+    "Armature|mixamo.com|Layer0": true,
+    "Player_Idle": true,
+    "Player_Run": true,
+    "Player_Walk": true,
+    "Running_Mixamo_InPlace": true,
+    "Running_Mixamo_RAW": true
+  },
+  "production_file_unchanged": true,
+  "scene_timing_unchanged": true,
+  "target_idle_restored": true,
+  "stylized": false,
+  "exported": false,
+  "visual_review": {
+    "views": [
+      "isometric",
+      "side"
+    ],
+    "frames": [
+      1,
+      4.8,
+      8.6,
+      12.4,
+      16.2
+    ],
+    "contact_sheet": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\mixamo_raw_review\\Player_Run_Mixamo_RAW_review.png",
+    "notes": [
+      "First and endpoint poses visually match.",
+      "Whole rigid arms can reach near head height, following source upper-arm motion without elbow articulation.",
+      "Clipping occurs around neck/chest, shoulders and pelvis; legs overlap near the crotch.",
+      "No corrective stylization or geometry edits performed."
+    ],
+    "ready_for_raw_visual_review": true
+  }
+}

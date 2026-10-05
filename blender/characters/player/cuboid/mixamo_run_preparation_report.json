@@ -1,0 +1,682 @@
+{
+  "raw_original_action": "Armature|mixamo.com|Layer0",
+  "preserved_raw_action": "Running_Mixamo_RAW",
+  "working_action": "Running_Mixamo_InPlace",
+  "raw_armature": "Armature",
+  "working_armature": "Mixamo_Working",
+  "source_fps": 30.0,
+  "scene_fps": 24,
+  "source_frame_range": [
+    1.0,
+    20.0
+  ],
+  "prepared_frame_range": [
+    1.0,
+    16.200000000000003
+  ],
+  "source_duration_seconds": 0.6333333333333333,
+  "prepared_duration_seconds": 0.6333333333333334,
+  "forward_axis_world": [
+    0.0,
+    -1.0,
+    0.0
+  ],
+  "removed_forward_travel_m": 3.74849796295166,
+  "removed_hips_channel_drift": [
+    0.0,
+    4.841838836669922,
+    374.81854248046875
+  ],
+  "method": "Linear forward drift subtraction; exact affine key/handle retiming; no integer-frame rounding",
+  "in_place_validation": {
+    "endpoint_hips_displacement_m": [
+      -6.51925802230835e-09,
+      2.421438694000244e-08,
+      4.76837158203125e-07
+    ],
+    "forward_position_range_m": 0.08275775238871574,
+    "lateral_range_m": 0.020415587350726128,
+    "vertical_range_m": 0.07896542549133301,
+    "max_expected_location_error_m": 4.4330954551696777e-07,
+    "max_rotation_matrix_error": 6.51925802230835e-09
+  },
+  "loop": {
+    "max_endpoint_rotation_difference_degrees": 0.0,
+    "hips_endpoint_distance_m": 4.7749608658425e-07,
+    "clean_pose_loop": true,
+    "subframe_endpoint": 16.200000000000003
+  },
+  "mapping": {
+    "Hips": "Hips",
+    "Spine": "Spine",
+    "Spine2": "Chest",
+    "Neck": "Neck",
+    "Head": "Head",
+    "LeftArm": "Arm.L",
+    "RightArm": "Arm.R",
+    "LeftUpLeg": "Leg.L",
+    "RightUpLeg": "Leg.R",
+    "Chest_note": "Spine1 and Spine2 are collapsed into Chest via source Spine2 cumulative pose delta relative to mapped Spine."
+  },
+  "rest_corrections": {
+    "Hips": {
+      "source": "mixamorig:Hips",
+      "target": "Hips",
+      "source_rest_world_quaternion": [
+        0.7025251388549805,
+        0.7116588950157166,
+        0.0,
+        0.0
+      ],
+      "target_actual_rest_world_quaternion": [
+        0.7071068286895752,
+        0.7071068286895752,
+        0.0,
+        0.0
+      ],
+      "virtual_target_reference_world_quaternion": [
+        0.7025251984596252,
+        0.7116588950157166,
+        0.0,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_quaternion": [
+        0.9999791383743286,
+        0.006458507385104895,
+        0.0,
+        -0.0
+      ],
+      "target_virtual_reference_from_actual_rest_degrees": 0.7401887209321926,
+      "source_rest_to_virtual_target_basis_quaternion": [
+        1.0,
+        -2.9802322387695312e-08,
+        0.0,
+        0.0
+      ],
+      "source_rest_to_actual_target_basis_quaternion": [
+        0.9999791979789734,
+        -0.006458580493927002,
+        0.0,
+        0.0
+      ]
+    },
+    "Spine": {
+      "source": "mixamorig:Spine",
+      "target": "Spine",
+      "source_rest_world_quaternion": [
+        0.7573080658912659,
+        0.653057873249054,
+        0.0,
+        0.0
+      ],
+      "target_actual_rest_world_quaternion": [
+        0.7071068286895752,
+        0.7071068286895752,
+        0.0,
+        0.0
+      ],
+      "virtual_target_reference_world_quaternion": [
+        0.7573080658912659,
+        0.653057873249054,
+        0.0,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_quaternion": [
+        0.9972792863845825,
+        -0.07371605187654495,
+        0.0,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_degrees": 8.454881999015452,
+      "source_rest_to_virtual_target_basis_quaternion": [
+        1.0,
+        -5.960464477539063e-08,
+        0.0,
+        0.0
+      ],
+      "source_rest_to_actual_target_basis_quaternion": [
+        0.9972792863845825,
+        0.07371595501899719,
+        0.0,
+        0.0
+      ]
+    },
+    "Chest": {
+      "source": "mixamorig:Spine2",
+      "target": "Chest",
+      "source_rest_world_quaternion": [
+        0.7488301992416382,
+        0.6627618670463562,
+        0.0,
+        0.0
+      ],
+      "target_actual_rest_world_quaternion": [
+        0.7071068286895752,
+        0.7071068286895752,
+        0.0,
+        0.0
+      ],
+      "virtual_target_reference_world_quaternion": [
+        0.7488301992416382,
+        0.662761926651001,
+        0.0,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_quaternion": [
+        0.9981463551521301,
+        -0.060859475284814835,
+        0.0,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_degrees": 6.978273647634151,
+      "source_rest_to_virtual_target_basis_quaternion": [
+        1.0,
+        2.9802322387695312e-08,
+        0.0,
+        0.0
+      ],
+      "source_rest_to_actual_target_basis_quaternion": [
+        0.9981464147567749,
+        0.060859471559524536,
+        0.0,
+        0.0
+      ]
+    },
+    "Neck": {
+      "source": "mixamorig:Neck",
+      "target": "Neck",
+      "source_rest_world_quaternion": [
+        0.7488301992416382,
+        0.6627618670463562,
+        0.0,
+        0.0
+      ],
+      "target_actual_rest_world_quaternion": [
+        0.7071068286895752,
+        0.7071068286895752,
+        0.0,
+        0.0
+      ],
+      "virtual_target_reference_world_quaternion": [
+        0.748830258846283,
+        0.6627618670463562,
+        0.0,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_quaternion": [
+        0.9981463551521301,
+        -0.06085953488945961,
+        0.0,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_degrees": 6.978273647634151,
+      "source_rest_to_virtual_target_basis_quaternion": [
+        1.0,
+        -2.9802322387695312e-08,
+        0.0,
+        0.0
+      ],
+      "source_rest_to_actual_target_basis_quaternion": [
+        0.9981464147567749,
+        0.060859471559524536,
+        0.0,
+        0.0
+      ]
+    },
+    "Head": {
+      "source": "mixamorig:Head",
+      "target": "Head",
+      "source_rest_world_quaternion": [
+        0.7488303184509277,
+        0.6627618670463562,
+        0.0,
+        0.0
+      ],
+      "target_actual_rest_world_quaternion": [
+        0.7071068286895752,
+        0.7071068286895752,
+        0.0,
+        0.0
+      ],
+      "virtual_target_reference_world_quaternion": [
+        0.748830258846283,
+        0.6627618670463562,
+        0.0,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_quaternion": [
+        0.9981463551521301,
+        -0.060859546065330505,
+        0.0,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_degrees": 6.978273647634151,
+      "source_rest_to_virtual_target_basis_quaternion": [
+        1.0,
+        2.9802322387695312e-08,
+        0.0,
+        0.0
+      ],
+      "source_rest_to_actual_target_basis_quaternion": [
+        0.9981464147567749,
+        0.06085959076881409,
+        0.0,
+        0.0
+      ]
+    },
+    "Arm.L": {
+      "source": "mixamorig:LeftArm",
+      "target": "Arm.L",
+      "source_rest_world_quaternion": [
+        1.8058112782881608e-09,
+        -0.7071068286895752,
+        -0.7071068286895752,
+        3.364572176423053e-09
+      ],
+      "target_actual_rest_world_quaternion": [
+        3.0908616110991716e-08,
+        -3.0908616110991716e-08,
+        -0.7071068286895752,
+        0.7071068286895752
+      ],
+      "virtual_target_reference_world_quaternion": [
+        -0.5000000596046448,
+        -0.5000000596046448,
+        -0.4999999701976776,
+        0.4999999701976776
+      ],
+      "target_virtual_reference_from_actual_rest_quaternion": [
+        0.7071067094802856,
+        -2.4221034067295477e-08,
+        -0.7071068286895752,
+        -0.0
+      ],
+      "target_virtual_reference_from_actual_rest_degrees": 90.00000933466734,
+      "source_rest_to_virtual_target_basis_quaternion": [
+        0.7071067690849304,
+        -6.12869328620036e-08,
+        -0.7071067690849304,
+        5.960464477539063e-08
+      ],
+      "source_rest_to_actual_target_basis_quaternion": [
+        0.5,
+        0.5,
+        -0.4999999701976776,
+        -0.4999999701976776
+      ]
+    },
+    "Arm.R": {
+      "source": "mixamorig:RightArm",
+      "target": "Arm.R",
+      "source_rest_world_quaternion": [
+        2.765990529951523e-07,
+        -0.7071067094802856,
+        0.7071068286895752,
+        2.9984238381075556e-07
+      ],
+      "target_actual_rest_world_quaternion": [
+        3.0908616110991716e-08,
+        -3.0908616110991716e-08,
+        -0.7071068286895752,
+        0.7071068286895752
+      ],
+      "virtual_target_reference_world_quaternion": [
+        0.5,
+        0.4999999701976776,
+        -0.5000001192092896,
+        0.5
+      ],
+      "target_virtual_reference_from_actual_rest_quaternion": [
+        0.7071068286895752,
+        4.84420432655952e-08,
+        0.7071067690849304,
+        0.0
+      ],
+      "target_virtual_reference_from_actual_rest_degrees": 89.99998884409983,
+      "source_rest_to_virtual_target_basis_quaternion": [
+        -0.7071065306663513,
+        -6.051426737485599e-08,
+        -0.7071070671081543,
+        -5.960464477539063e-08
+      ],
+      "source_rest_to_actual_target_basis_quaternion": [
+        -0.49999985098838806,
+        -0.5000002980232239,
+        -0.5000001788139343,
+        -0.4999997913837433
+      ]
+    },
+    "Leg.L": {
+      "source": "mixamorig:LeftUpLeg",
+      "target": "Leg.L",
+      "source_rest_world_quaternion": [
+        1.252893895298257e-07,
+        -1.8730378315012786e-07,
+        -0.7043368816375732,
+        0.7098658680915833
+      ],
+      "target_actual_rest_world_quaternion": [
+        3.090862321641907e-08,
+        -3.090862321641907e-08,
+        -0.7071068286895752,
+        0.7071068286895752
+      ],
+      "virtual_target_reference_world_quaternion": [
+        3.916227342415368e-10,
+        -6.142515474039101e-08,
+        -0.704336941242218,
+        0.7098658680915833
+      ],
+      "target_virtual_reference_from_actual_rest_quaternion": [
+        0.9999923706054688,
+        -0.003909565042704344,
+        -4.298632916288625e-08,
+        -0.0
+      ],
+      "target_virtual_reference_from_actual_rest_degrees": 0.4476235442502201,
+      "source_rest_to_virtual_target_basis_quaternion": [
+        1.0,
+        -2.9802322387695312e-08,
+        -1.773270525973203e-07,
+        -3.126388037344441e-13
+      ],
+      "source_rest_to_actual_target_basis_quaternion": [
+        0.9999923706054688,
+        -0.003909558057785034,
+        -1.7732571677697706e-07,
+        -4.402169651029908e-08
+      ]
+    },
+    "Leg.R": {
+      "source": "mixamorig:RightUpLeg",
+      "target": "Leg.R",
+      "source_rest_world_quaternion": [
+        3.813511995076624e-08,
+        -9.946327139687128e-08,
+        -0.7043449878692627,
+        0.7098578214645386
+      ],
+      "target_actual_rest_world_quaternion": [
+        3.090862321641907e-08,
+        -3.090862321641907e-08,
+        -0.7071068286895752,
+        0.7071068286895752
+      ],
+      "virtual_target_reference_world_quaternion": [
+        3.9204545165816285e-10,
+        -6.14247213093222e-08,
+        -0.7043449282646179,
+        0.7098578810691833
+      ],
+      "target_virtual_reference_from_actual_rest_quaternion": [
+        0.9999924302101135,
+        -0.003898220369592309,
+        -4.2986222581475886e-08,
+        -0.0
+      ],
+      "target_virtual_reference_from_actual_rest_degrees": 0.4458716007281118,
+      "source_rest_to_virtual_target_basis_quaternion": [
+        1.0,
+        5.960464477539063e-08,
+        -5.35861097716861e-08,
+        -3.907985046680551e-14
+      ],
+      "source_rest_to_actual_target_basis_quaternion": [
+        0.9999924898147583,
+        -0.0038981735706329346,
+        -5.3585701209613035e-08,
+        -4.353595528527876e-08
+      ]
+    }
+  },
+  "rotation_formula": "Qdesired_world = (Qsource_pose_world @ inverse(Qsource_rest_world)) @ Qtarget_virtual_reference_world. Convert desired rotation through actual target rest and evaluated parent matrices into target matrix_basis. Virtual arm reference is a pose-space calibration, never a rest-pose edit.",
+  "single_frame_validation": {
+    "source_frame": 6.0,
+    "prepared_frame": 5.0,
+    "bones": {
+      "Hips": {
+        "basis_rotation_quaternion": [
+          0.9975243806838989,
+          0.06460016220808029,
+          0.027501629665493965,
+          0.0039549642242491245
+        ],
+        "basis_location": [
+          -0.007568757981061935,
+          0.026428401470184326,
+          -0.001696228631772101
+        ],
+        "bone_direction_world": [
+          -0.004337122663855553,
+          -0.12909798324108124,
+          0.9916223287582397
+        ],
+        "source_direction_world": [
+          -0.004337127320468426,
+          -0.12909801304340363,
+          0.9916223287582397
+        ],
+        "direction_alignment_dot": 0.9999999755855242
+      },
+      "Spine": {
+        "basis_rotation_quaternion": [
+          0.9969482421875,
+          0.010624091140925884,
+          0.07453066855669022,
+          -0.02065112069249153
+        ],
+        "basis_location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "bone_direction_world": [
+          0.03936400264501572,
+          -0.1445610523223877,
+          0.9887126088142395
+        ],
+        "source_direction_world": [
+          0.039363984018564224,
+          -0.14456087350845337,
+          0.9887126088142395
+        ],
+        "direction_alignment_dot": 1.0000000491272658
+      },
+      "Chest": {
+        "basis_rotation_quaternion": [
+          0.9995056986808777,
+          -0.008675085380673409,
+          0.01455460861325264,
+          0.026481376960873604
+        ],
+        "basis_location": [
+          -5.587935447692871e-09,
+          1.1920928955078125e-07,
+          1.4901161193847656e-08
+        ],
+        "bone_direction_world": [
+          -0.01609937660396099,
+          -0.1392783671617508,
+          0.990122377872467
+        ],
+        "source_direction_world": [
+          -0.0160994715988636,
+          -0.1392780840396881,
+          0.990122377872467
+        ],
+        "direction_alignment_dot": 0.9999999447900336
+      },
+      "Neck": {
+        "basis_rotation_quaternion": [
+          0.9983962178230286,
+          0.02287309616804123,
+          -0.01903439126908779,
+          -0.048161786049604416
+        ],
+        "basis_location": [
+          -3.725290298461914e-09,
+          0.0,
+          -1.4901161193847656e-08
+        ],
+        "bone_direction_world": [
+          0.08768445998430252,
+          -0.16264425218105316,
+          0.982780933380127
+        ],
+        "source_direction_world": [
+          0.08768444508314133,
+          -0.16264431178569794,
+          0.982780933380127
+        ],
+        "direction_alignment_dot": 1.0000000651925802
+      },
+      "Head": {
+        "basis_rotation_quaternion": [
+          0.9820563197135925,
+          -0.1653420478105545,
+          -0.09021462500095367,
+          0.009418651461601257
+        ],
+        "basis_location": [
+          -1.4901161193847656e-08,
+          -1.1920928955078125e-07,
+          1.4901161193847656e-08
+        ],
+        "bone_direction_world": [
+          0.031080098822712898,
+          0.16368725895881653,
+          0.9860226511955261
+        ],
+        "source_direction_world": [
+          0.03108012117445469,
+          0.1636875569820404,
+          0.9860225319862366
+        ],
+        "direction_alignment_dot": 1.0000001079170033
+      },
+      "Arm.L": {
+        "basis_rotation_quaternion": [
+          0.8930909037590027,
+          -0.4048222005367279,
+          0.11817346513271332,
+          0.15666095912456512
+        ],
+        "basis_location": [
+          2.9802322387695312e-08,
+          -1.1920928955078125e-07,
+          -7.450580596923828e-09
+        ],
+        "bone_direction_world": [
+          0.21653319895267487,
+          0.8333132266998291,
+          -0.5086279511451721
+        ],
+        "source_direction_world": [
+          0.21653321385383606,
+          0.8333130478858948,
+          -0.508628249168396
+        ],
+        "direction_alignment_dot": 0.9999999776482582
+      },
+      "Arm.R": {
+        "basis_rotation_quaternion": [
+          0.949479877948761,
+          -0.19192251563072205,
+          -0.17670319974422455,
+          -0.1744411736726761
+        ],
+        "basis_location": [
+          -2.9802322387695312e-08,
+          0.0,
+          -7.450580596923828e-09
+        ],
+        "bone_direction_world": [
+          -0.4443356990814209,
+          0.3218177556991577,
+          -0.8360616564750671
+        ],
+        "source_direction_world": [
+          -0.4443358778953552,
+          0.3218178451061249,
+          -0.8360615372657776
+        ],
+        "direction_alignment_dot": 0.9999999776482582
+      },
+      "Leg.L": {
+        "basis_rotation_quaternion": [
+          0.9376753568649292,
+          0.34714576601982117,
+          -0.0075582703575491905,
+          -0.014059385284781456
+        ],
+        "basis_location": [
+          -7.450580596923828e-09,
+          5.960464477539063e-08,
+          0.0
+        ],
+        "bone_direction_world": [
+          0.01826799288392067,
+          -0.548028290271759,
+          -0.8362603187561035
+        ],
+        "source_direction_world": [
+          0.018268002197146416,
+          -0.5480284094810486,
+          -0.8362602591514587
+        ],
+        "direction_alignment_dot": 1.00000008274219
+      },
+      "Leg.R": {
+        "basis_rotation_quaternion": [
+          0.9974360466003418,
+          -0.048425767570734024,
+          0.0422152541577816,
+          0.031530898064374924
+        ],
+        "basis_location": [
+          7.450580596923828e-09,
+          5.960464477539063e-08,
+          0.0
+        ],
+        "bone_direction_world": [
+          0.06599119305610657,
+          0.22489196062088013,
+          -0.9721464514732361
+        ],
+        "source_direction_world": [
+          0.06599120050668716,
+          0.2248920202255249,
+          -0.9721464514732361
+        ],
+        "direction_alignment_dot": 0.999999962747097
+      }
+    },
+    "root_world_translation_m": 0.0,
+    "root_world_rotation_degrees": 0.0,
+    "hips_world_delta_m": [
+      -0.007568757981061935,
+      0.001696228631772101,
+      0.026428380981087685
+    ],
+    "translation_amplitude_scale": 0.8777345985454759,
+    "max_rigid_pairwise_distance_error_m": 1.6723455209533e-07,
+    "arm_axes_correct": true,
+    "all_mapped_axes_correct": true,
+    "passed": true
+  },
+  "original_objects_unchanged": {
+    "Armature": true,
+    "Player_Cuboid_Rig": true,
+    "Player_Cuboid_Base": true
+  },
+  "original_actions_unchanged": {
+    "Armature|mixamo.com|Layer0": true,
+    "Player_Idle": true,
+    "Player_Run": true,
+    "Player_Walk": true
+  },
+  "scene_timing_unchanged": true,
+  "production_hash_unchanged": true,
+  "target_idle_restored": true,
+  "full_retarget_baked": false
+}

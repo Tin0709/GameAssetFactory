@@ -1,0 +1,14 @@
+{
+  "frames": [
+    1.0,
+    4.8,
+    8.6,
+    12.4,
+    16.2
+  ],
+  "views": [
+    "iso",
+    "side"
+  ],
+  "action": "Player_Run_Mixamo_RAW"
+}
