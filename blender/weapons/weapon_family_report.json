@@ -1,0 +1,143 @@
+{
+  "M4A1": {
+    "dimensions_m": {
+      "width": 0.10300000011920929,
+      "length": 0.996999979019165,
+      "height": 0.4505000114440918
+    },
+    "triangles": 552,
+    "mesh_count": 1,
+    "material_count": 1,
+    "texture_resolution": [
+      64,
+      64
+    ],
+    "texture_packed": true,
+    "forward_blender": "+Y",
+    "forward_godot": "-Z",
+    "origin": "primary hand grip center",
+    "markers_blender_m": {
+      "Grip_Point": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Muzzle_Point": [
+        0.0,
+        0.6859999895095825,
+        0.18000000715255737
+      ],
+      "Support_Hand_Point": [
+        0.0,
+        0.375,
+        0.125
+      ]
+    },
+    "identity_transforms": true,
+    "original_design": true,
+    "material": {
+      "roughness": 0.48,
+      "metallic": 0,
+      "specular_ior_level": 0.25,
+      "filter": "Closest"
+    },
+    "blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v2.blend",
+    "glb": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v2.glb",
+    "width_reduction_percent": 11.206896551724144
+  },
+  "Pistol": {
+    "dimensions_m": {
+      "width": 0.052000001072883606,
+      "length": 0.27300000935792923,
+      "height": 0.22699999809265137
+    },
+    "triangles": 264,
+    "mesh_count": 1,
+    "material_count": 1,
+    "texture_resolution": [
+      64,
+      64
+    ],
+    "texture_packed": true,
+    "forward_blender": "+Y",
+    "forward_godot": "-Z",
+    "origin": "primary hand grip center",
+    "markers_blender_m": {
+      "Grip_Point": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Muzzle_Point": [
+        0.0,
+        0.23600000143051147,
+        0.11699999868869781
+      ],
+      "Support_Hand_Point": [
+        0.0,
+        0.03400000184774399,
+        0.0
+      ]
+    },
+    "identity_transforms": true,
+    "original_design": true,
+    "material": {
+      "roughness": 0.48,
+      "metallic": 0,
+      "specular_ior_level": 0.25,
+      "filter": "Closest"
+    },
+    "blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v1.blend",
+    "glb": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v1.glb"
+  },
+  "Shotgun": {
+    "dimensions_m": {
+      "width": 0.1289999932050705,
+      "length": 0.9750000536441803,
+      "height": 0.2973945289850235
+    },
+    "triangles": 424,
+    "mesh_count": 2,
+    "material_count": 1,
+    "texture_resolution": [
+      64,
+      64
+    ],
+    "texture_packed": true,
+    "forward_blender": "+Y",
+    "forward_godot": "-Z",
+    "origin": "primary hand grip center",
+    "markers_blender_m": {
+      "Grip_Point": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Muzzle_Point": [
+        0.0,
+        0.6499999761581421,
+        0.20200000703334808
+      ],
+      "Support_Hand_Point": [
+        0.0,
+        0.35600000619888306,
+        0.13099999725818634
+      ]
+    },
+    "identity_transforms": "Root and main mesh identity; pump has intentional support-center local translation, unit scale and zero rotation.",
+    "original_design": true,
+    "material": {
+      "roughness": 0.48,
+      "metallic": 0,
+      "specular_ior_level": 0.25,
+      "filter": "Closest"
+    },
+    "blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v1.blend",
+    "glb": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v1.glb",
+    "pump_translation_blender_m": [
+      0.0,
+      0.35600000619888306,
+      0.13099999725818634
+    ]
+  }
+}

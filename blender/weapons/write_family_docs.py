@@ -1,0 +1,25 @@
+import json
+from pathlib import Path
+base=Path('C:/Users/ADMIN/Desktop/GameAssetFactory/blender/weapons')
+r=json.loads((base/'weapon_family_report.json').read_text())
+lines=['# Blocky weapon family','', 'Created and validated with Blender MCP. M4A1 V2 is the style anchor; V1 remains intact. The pistol and pump-action shotgun are original designs with no commercial logos or copied markings.','', '[Shared weapon style guide](WEAPON_STYLE_GUIDE.md)','', '## Assets','', '| Weapon | Length x width x height (m) | Tris | Meshes | Blender | Godot GLB |','|---|---|---:|---:|---|---|']
+for key,item in r.items():
+ d=item['dimensions_m'];blend=Path(item['blend']).relative_to(base).as_posix();glb=Path(item['glb']).relative_to(base).as_posix()
+ lines.append(f"| {key} | {d['length']:.4f} x {d['width']:.4f} x {d['height']:.4f} | {item['triangles']} | {item['mesh_count']} | [Blend]({blend}) | [GLB]({glb}) |")
+lines+=['','M4A1 width reduction: 11.2069%; only vertex X coordinates changed. Length, height, UVs, materials and attachment points are unchanged.','', '## Presentation','', '[True-scale comparison](weapon_family_comparison.png) / [Comparison Blender scene](weapon_family_comparison.blend). The orthographic comparison uses meter-scale geometry without individual weapon scaling.','', '| Weapon | Side | Front three-quarter | Isometric |','|---|---|---|---|']
+for key,item in r.items():
+ b=Path(item['blend']).relative_to(base);stem=b.stem
+ paths=[(b.parent/(stem+'_'+s+'.png')).as_posix() for s in ['side','threequarter','isometric']]
+ lines.append(f'| {key} | [Side]({paths[0]}) | [Three-quarter]({paths[1]}) | [Isometric]({paths[2]}) |')
+lines+=['','## Materials and geometry','', 'Each asset has one opaque material and a packed 64x64 atlas. The new weapons reuse the original M4A1 atlas palette and motifs to maintain family consistency. GLBs embed the image and export nearest-neighbor/nearest-mipmap filtering. Metallic 0, roughness 0.48, mild Blender specular 0.25. Subtle painted edges plus small single-segment structural chamfers provide highlights; no outline shader is required. GLTF core specular response can differ slightly from Blender.','', 'M4A1 and pistol: one mesh and one draw surface each. Shotgun: main mesh plus Shotgun_Pump, two surfaces using the same material. The pump pivot is at the support-hand position, with unit scale and zero rotation. Move it approximately 0.045 m rearward along Blender local Y (Godot local +Z) for later pump animation. No reload or pump animations were created.','', '## Godot attachment convention','', 'Root and main mesh origins sit at the primary hand grip. Blender +Y forward / +Z up maps to Godot -Z forward / +Y up. All roots and main meshes have identity transforms. The pump has an intentional local translation at its working center. Grip_Point is (0,0,0) on every asset. Keep all marker nodes when importing. Instance under a hand BoneAttachment3D or weapon socket; align socket rotation to the hand bone. This delivery does not modify the Godot gameplay project.','', '| Weapon | Godot Muzzle_Point (x,y,z) m | Godot Support_Hand_Point (x,y,z) m |','|---|---|---|']
+for key,item in r.items():
+ vals=[]
+ for marker in ['Muzzle_Point','Support_Hand_Point']:
+  x,y,z=item['markers_blender_m'][marker];vals.append(f'({x:.3f}, {z:.3f}, {-y:.3f})')
+ lines.append(f'| {key} | {vals[0]} | {vals[1]} |')
+lines+=['','Use Muzzle_Point.global_position for projectile/VFX placement and -Muzzle_Point.global_basis.z.normalized() for forward direction.','', '## Validation and source','', 'Blender validation confirms dimensions, triangle counts, unit scale, zero rotation, UV bounds, nondegenerate triangles, packed atlas, nearest filtering, and centered grips. GLB validation confirms matching bounds/counts, one material each, exported marker positions/axes, embedded image, nearest sampler and no animations. Preview PNGs are 1280x960 RGBA; comparison is 2048x768 RGBA. All contain transparent pixels.','', 'Source: build_weapon_family_v1.py and build_weapon_comparison.py. Checks: validate_weapon_family_blender.py / validate_weapon_family_glb.py; machine-readable results in weapon_family_report.json, blender_validation.json and glb_validation.json. The builder guards against overwriting existing family outputs and opens the original M4A1 read-only. Run it via Blender MCP in an isolated Blender process.']
+(base/'README.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
+for key,folder in [('Pistol','pistol'),('Shotgun','shotgun')]:
+ item=r[key];d=item['dimensions_m']
+ txt=f"# {key} V1\n\nOriginal blocky game weapon, matching the M4A1 style anchor.\n\nDimensions: {d['length']:.4f} m long, {d['width']:.4f} m wide, {d['height']:.4f} m high. {item['triangles']} triangles; {item['mesh_count']} mesh(es); one packed 64x64 atlas and one material.\n\nSee [family README](../README.md) for GLB export, preview links, marker positions, runtime conventions and validation, and [style guide](../WEAPON_STYLE_GUIDE.md) for future weapons.\n"
+ (base/folder/'README.md').write_text(txt)

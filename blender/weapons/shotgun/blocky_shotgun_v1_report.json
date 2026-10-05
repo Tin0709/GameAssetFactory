@@ -1,0 +1,50 @@
+{
+  "dimensions_m": {
+    "width": 0.1289999932050705,
+    "length": 0.9750000536441803,
+    "height": 0.2973945289850235
+  },
+  "triangles": 424,
+  "mesh_count": 2,
+  "material_count": 1,
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "texture_packed": true,
+  "forward_blender": "+Y",
+  "forward_godot": "-Z",
+  "origin": "primary hand grip center",
+  "markers_blender_m": {
+    "Grip_Point": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Muzzle_Point": [
+      0.0,
+      0.6499999761581421,
+      0.20200000703334808
+    ],
+    "Support_Hand_Point": [
+      0.0,
+      0.35600000619888306,
+      0.13099999725818634
+    ]
+  },
+  "identity_transforms": "Root and main mesh identity; pump has intentional support-center local translation, unit scale and zero rotation.",
+  "original_design": true,
+  "material": {
+    "roughness": 0.48,
+    "metallic": 0,
+    "specular_ior_level": 0.25,
+    "filter": "Closest"
+  },
+  "blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v1.blend",
+  "glb": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v1.glb",
+  "pump_translation_blender_m": [
+    0.0,
+    0.35600000619888306,
+    0.13099999725818634
+  ]
+}

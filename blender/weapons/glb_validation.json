@@ -1,0 +1,59 @@
+{
+  "M4A1": {
+    "triangles": 552,
+    "surfaces": 1,
+    "materials": 1,
+    "dimensions_m": {
+      "width": 0.10300000011920929,
+      "length": 0.996999979019165,
+      "height": 0.4505000114440918
+    },
+    "embedded_64_atlas": true,
+    "nearest_sampler": true,
+    "attachment_axes_verified": true,
+    "no_animation": true,
+    "previews": {
+      "side": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v2_side.png",
+      "threequarter": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v2_threequarter.png",
+      "isometric": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\m4a1_blocky\\m4a1_blocky_v2_isometric.png"
+    }
+  },
+  "Pistol": {
+    "triangles": 264,
+    "surfaces": 1,
+    "materials": 1,
+    "dimensions_m": {
+      "width": 0.052000001072883606,
+      "length": 0.27300000935792923,
+      "height": 0.22699999809265137
+    },
+    "embedded_64_atlas": true,
+    "nearest_sampler": true,
+    "attachment_axes_verified": true,
+    "no_animation": true,
+    "previews": {
+      "side": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v1_side.png",
+      "threequarter": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v1_threequarter.png",
+      "isometric": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v1_isometric.png"
+    }
+  },
+  "Shotgun": {
+    "triangles": 424,
+    "surfaces": 2,
+    "materials": 1,
+    "dimensions_m": {
+      "width": 0.1289999932050705,
+      "length": 0.9750000536441803,
+      "height": 0.2973945289850235
+    },
+    "embedded_64_atlas": true,
+    "nearest_sampler": true,
+    "attachment_axes_verified": true,
+    "no_animation": true,
+    "previews": {
+      "side": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v1_side.png",
+      "threequarter": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v1_threequarter.png",
+      "isometric": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\shotgun\\blocky_shotgun_v1_isometric.png"
+    }
+  }
+}

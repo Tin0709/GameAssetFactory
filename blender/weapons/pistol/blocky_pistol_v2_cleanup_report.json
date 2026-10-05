@@ -1,0 +1,60 @@
+{
+  "before_triangles": 264,
+  "after_triangles": 352,
+  "topology": {
+    "Blocky_Pistol_Base": {
+      "islands": 1,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "duplicate_faces": 0,
+      "inconsistent_normal_edges": 0,
+      "signed_volume": 0.0012733267182821989,
+      "triangles": 352
+    }
+  },
+  "bounds_m": [
+    [
+      -0.026000000536441803,
+      0.026000000536441803
+    ],
+    [
+      -0.03799999877810478,
+      0.23500001430511475
+    ],
+    [
+      -0.07199999690055847,
+      0.1550000011920929
+    ]
+  ],
+  "dimensions_m": {
+    "width": 0.052000001072883606,
+    "length": 0.27300001308321953,
+    "height": 0.22699999809265137
+  },
+  "markers_blender_m": {
+    "Grip_Point": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Muzzle_Point": [
+      0.0,
+      0.23600000143051147,
+      0.11699999868869781
+    ],
+    "Support_Hand_Point": [
+      0.0,
+      0.03400000184774399,
+      0.0
+    ]
+  },
+  "pump_separate": false,
+  "materials": 1,
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v2.blend",
+  "glb": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\weapons\\pistol\\blocky_pistol_v2.glb"
+}
