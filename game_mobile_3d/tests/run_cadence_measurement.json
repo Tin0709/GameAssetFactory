@@ -1,0 +1,198 @@
+{
+  "method": "641 samples, bottom-center of each rigid 0.675m leg; +Z forward. Support when the lowest sole corner is <=12mm above root-level floor. Smooth center trajectory avoids discontinuous heel/toe corner switching. Intervals are circular across the loop.",
+  "support_threshold_m": 0.012,
+  "contact_intervals": [
+    {
+      "bone": "Leg.R",
+      "phase_start": 0.9828125,
+      "phase_end": 1.2609375,
+      "frame_start": 16.72500046864153,
+      "frame_end": 21.175000601261868,
+      "duration_seconds": 0.18541667219251412,
+      "backward_displacement_m": 0.5831186473369601,
+      "mean_local_forward_velocity_mps": -3.144909464945637
+    },
+    {
+      "bone": "Leg.L",
+      "phase_start": 0.48125,
+      "phase_end": 0.759375,
+      "frame_start": 8.700000229477888,
+      "frame_end": 13.150000362098226,
+      "duration_seconds": 0.18541667219251406,
+      "backward_displacement_m": 0.610594004392624,
+      "mean_local_forward_velocity_mps": -3.293091161503846
+    }
+  ],
+  "authored_cycle_seconds": 0.666666686534882,
+  "implied_speed_at_1x_mps": 3.2190003132247416,
+  "effective_cycle_travel_m": 2.146000272772286,
+  "effective_step_length_m": 1.073000136386143,
+  "mean_zero_slip_scale": 1.9415965802559532,
+  "least_squares_slip_scale": 1.5796481370119497,
+  "local_support_velocity_range_mps": [
+    -5.323564251555081,
+    0.6457042501648403
+  ],
+  "matched_candidates": [
+    {
+      "scale": 1.6503570932175602,
+      "cycle_seconds": 0.403952992521842,
+      "cycles_per_second": 2.4755355660496297,
+      "steps_per_second": 4.951071132099259,
+      "mean_world_support_velocity_mps": 0.9374999999999999,
+      "rms_world_support_velocity_mps": 2.7102820827169554,
+      "mean_abs_world_support_velocity_mps": 2.02605591591506,
+      "slip_direction": "forward",
+      "signed_slip_distance_per_support_m": 0.10532758691731625,
+      "absolute_slip_distance_per_support_m": 0.22762621928841204
+    },
+    {
+      "scale": 1.7959768367367568,
+      "cycle_seconds": 0.3712000471822332,
+      "cycles_per_second": 2.6939651748187146,
+      "steps_per_second": 5.387930349637429,
+      "mean_world_support_velocity_mps": 0.46874999999999956,
+      "rms_world_support_velocity_mps": 2.8067743228703934,
+      "mean_abs_world_support_velocity_mps": 2.1662511509510587,
+      "slip_direction": "forward",
+      "signed_slip_distance_per_support_m": 0.04839375615119931,
+      "absolute_slip_distance_per_support_m": 0.22364379725094502
+    },
+    {
+      "scale": 1.9415965802559532,
+      "cycle_seconds": 0.3433600436435657,
+      "cycles_per_second": 2.9123947835877995,
+      "steps_per_second": 5.824789567175599,
+      "mean_world_support_velocity_mps": -7.110417124003812e-17,
+      "rms_world_support_velocity_mps": 2.9917354947329584,
+      "mean_abs_world_support_velocity_mps": 2.3811169975183764,
+      "slip_direction": "mean matched",
+      "signed_slip_distance_per_support_m": 4.423544863740858e-17,
+      "absolute_slip_distance_per_support_m": 0.22738955881488374
+    },
+    {
+      "scale": 2.0872163237751495,
+      "cycle_seconds": 0.3194046917614565,
+      "cycles_per_second": 3.1308243923568844,
+      "steps_per_second": 6.261648784713769,
+      "mean_world_support_velocity_mps": -0.4687499999999997,
+      "rms_world_support_velocity_mps": 3.250096380210604,
+      "mean_abs_world_support_velocity_mps": 2.65111283997397,
+      "slip_direction": "backward",
+      "signed_slip_distance_per_support_m": -0.041641139013822666,
+      "absolute_slip_distance_per_support_m": 0.23551009772946427
+    },
+    {
+      "scale": 2.232836067294346,
+      "cycle_seconds": 0.298573950994405,
+      "cycles_per_second": 3.3492540011259693,
+      "steps_per_second": 6.6985080022519385,
+      "mean_world_support_velocity_mps": -0.9374999999999993,
+      "rms_world_support_velocity_mps": 3.565938548287616,
+      "mean_abs_world_support_velocity_mps": 2.9665910477670563,
+      "slip_direction": "backward",
+      "signed_slip_distance_per_support_m": -0.0778508251127989,
+      "absolute_slip_distance_per_support_m": 0.24634833156363536
+    }
+  ],
+  "visual_candidates": [
+    {
+      "scale": 1,
+      "cycle_seconds": 0.666666686534882,
+      "cycles_per_second": 1.4999999552965169,
+      "steps_per_second": 2.9999999105930337,
+      "mean_world_support_velocity_mps": 3.0309996867752584,
+      "rms_world_support_velocity_mps": 3.4001793676789074,
+      "mean_abs_world_support_velocity_mps": 3.0309996867752584,
+      "slip_direction": "forward",
+      "signed_slip_distance_per_support_m": 0.5619978753384209,
+      "absolute_slip_distance_per_support_m": 0.5619978753384209
+    },
+    {
+      "scale": 1.35,
+      "cycle_seconds": 0.4938271752110237,
+      "cycles_per_second": 2.024999939650298,
+      "steps_per_second": 4.049999879300596,
+      "mean_world_support_velocity_mps": 1.9043495771465988,
+      "rms_world_support_velocity_mps": 2.8202193730742278,
+      "mean_abs_world_support_velocity_mps": 2.143255004136185,
+      "slip_direction": "forward",
+      "signed_slip_distance_per_support_m": 0.2615541935449953,
+      "absolute_slip_distance_per_support_m": 0.294366822612507
+    },
+    {
+      "scale": 1.5,
+      "cycle_seconds": 0.44444445768992136,
+      "cycles_per_second": 2.249999932944775,
+      "steps_per_second": 4.49999986588955,
+      "mean_world_support_velocity_mps": 1.4214995301628877,
+      "rms_world_support_velocity_mps": 2.71343828644728,
+      "mean_abs_world_support_velocity_mps": 2.0631627487762976,
+      "slip_direction": "forward",
+      "signed_slip_distance_per_support_m": 0.1757131416040167,
+      "absolute_slip_distance_per_support_m": 0.255029847379774
+    },
+    {
+      "scale": 1.6,
+      "cycle_seconds": 0.4166666790843013,
+      "cycles_per_second": 2.399999928474427,
+      "steps_per_second": 4.799999856948854,
+      "mean_world_support_velocity_mps": 1.0995994988404134,
+      "rms_world_support_velocity_mps": 2.6994862980970273,
+      "mean_abs_world_support_velocity_mps": 2.025338065840193,
+      "slip_direction": "forward",
+      "signed_slip_distance_per_support_m": 0.12742754988721605,
+      "absolute_slip_distance_per_support_m": 0.2347071526455697
+    },
+    {
+      "scale": 1.65,
+      "cycle_seconds": 0.40404041608174673,
+      "cycles_per_second": 2.4749999262392524,
+      "steps_per_second": 4.949999852478505,
+      "mean_world_support_velocity_mps": 0.9386494831791768,
+      "rms_world_support_velocity_mps": 2.7101637257920697,
+      "mean_abs_world_support_velocity_mps": 2.025959413478428,
+      "slip_direction": "forward",
+      "signed_slip_distance_per_support_m": 0.10547955365230681,
+      "absolute_slip_distance_per_support_m": 0.2276646378450108
+    },
+    {
+      "scale": 1.8,
+      "cycle_seconds": 0.3703703814082678,
+      "cycles_per_second": 2.69999991953373,
+      "steps_per_second": 5.39999983906746,
+      "mean_world_support_velocity_mps": 0.45579943619546526,
+      "rms_world_support_velocity_mps": 2.8107574728152533,
+      "mean_abs_world_support_velocity_mps": 2.1712610750076924,
+      "slip_direction": "forward",
+      "signed_slip_distance_per_support_m": 0.046951563692548576,
+      "absolute_slip_distance_per_support_m": 0.2236600016605928
+    },
+    {
+      "scale": 2,
+      "cycle_seconds": 0.333333343267441,
+      "cycles_per_second": 2.9999999105930337,
+      "steps_per_second": 5.9999998211860675,
+      "mean_world_support_velocity_mps": -0.18800062644948287,
+      "rms_world_support_velocity_mps": 3.0874563576147716,
+      "mean_abs_world_support_velocity_mps": 2.4865391008967714,
+      "slip_direction": "backward",
+      "signed_slip_distance_per_support_m": -0.01742922526318551,
+      "absolute_slip_distance_per_support_m": 0.2305229026824227
+    }
+  ],
+  "chosen_visual_scale": 1.6,
+  "chosen_metrics": {
+    "scale": 1.6,
+    "cycle_seconds": 0.4166666790843013,
+    "cycles_per_second": 2.399999928474427,
+    "steps_per_second": 4.799999856948854,
+    "mean_world_support_velocity_mps": 1.0995994988404134,
+    "rms_world_support_velocity_mps": 2.6994862980970273,
+    "mean_abs_world_support_velocity_mps": 2.025338065840193,
+    "slip_direction": "forward",
+    "signed_slip_distance_per_support_m": 0.12742754988721605,
+    "absolute_slip_distance_per_support_m": 0.2347071526455697
+  },
+  "reason": "1.60 is close to the 1.580 RMS optimum and keeps 4.8 steps/s. Mean matching at 1.942 has 5.825 steps/s and more backward/forward oscillatory slip; no scalar multiplier can plant every sample."
+}

@@ -9,6 +9,9 @@ const Spring = preload("res://scripts/secondary_spring.gd")
 ## combat/socket composition stay available. Disabled for every existing scene.
 @export var authored_locomotion: bool = false
 var authored_run_time: float = 0.0
+## Authored Run clock only. 1.60 balances measured support slip and readability;
+## original clip duration, Walk cadence and gameplay speed remain untouched.
+@export_range(0.5, 3.0, 0.01) var run_animation_speed_scale: float = 1.60
 var bounce_enabled := true
 var bounce_override := 1.0
 var body_spring := Spring.new()
@@ -173,9 +176,8 @@ func _process(delta: float) -> void:
 	weapon_lag = lerpf(weapon_lag, clampf(acceleration.z * 0.0004, -0.012, 0.012), 1.0 - exp(-8.0 * delta))
 	idle_time = fposmod(idle_time + delta, idle.clip.length)
 	if authored_locomotion:
-		# Seconds, independent of legacy cadence and direction. Never restart on
-		# speed changes or a turn; authored Run always advances at 1x.
-		authored_run_time = fposmod(authored_run_time + delta, run.clip.length)
+		# Continuous authored seconds; changing direction never resets phase.
+		authored_run_time = fposmod(authored_run_time + delta * run_animation_speed_scale, run.clip.length)
 	recoil_time += delta
 	if recoil_time >= recoil_pose.clip.length and queued_recoil:
 		recoil_time = fposmod(recoil_time, recoil_pose.clip.length)
