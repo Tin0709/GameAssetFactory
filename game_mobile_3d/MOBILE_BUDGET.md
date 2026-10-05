@@ -1,6 +1,8 @@
 # Mobile visual budget
 
-This is a visual foundation only. No gameplay, enemies, combat, progression, menus, physics, or imported assets are included.
+The original visual foundation remains `scenes/Main.tscn`. The default scene is now the first cuboid gameplay test, with keyboard movement, three chasing zombies and lightweight imported characters. See [GAMEPLAY_TEST.md](GAMEPLAY_TEST.md) for controls and implementation.
+
+Auto-fire combat is now included. [COMBAT_PROTOTYPE.md](COMBAT_PROTOTYPE.md) records tuning, HP/EXP, simple effects/audio and validation. Base geometry is unchanged; bullets, drops and bursts add small unshadowed boxes, with a brief additional draw pass for hit flash.
 
 ## Baseline
 
@@ -26,7 +28,7 @@ This is a visual foundation only. No gameplay, enemies, combat, progression, men
 
 ## Validation and running
 
-Import `project.godot` in Godot 4.x and press F6 for the open Main scene or F5 for the project. The main scene is `scenes/Main.tscn`. No plugins or Blender setup are required.
+Import `project.godot` in Godot 4.x and press F5 for the gameplay test, `scenes/CuboidGameplayTest.tscn`. Open `scenes/Main.tscn` and press F6 to inspect the original visual foundation. No plugins or Blender setup are required.
 
 Commands from this project directory (replace `godot` with your executable):
 

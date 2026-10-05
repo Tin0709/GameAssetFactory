@@ -1,0 +1,11 @@
+Player Cuboid V6
+
+Geometry: six closed cuboids (head, torso, two arms, two legs). Each limb is one full-height block with eight vertices and six quads. Removed upper/lower splits, internal end caps and all elbow/knee articulation. 48 vertices, 36 quads, 72 triangles (previously 120).
+
+Rig: 10 bones: Root, Hips, Spine, Chest, Neck, Head, Arm.L/R and Leg.L/R. Arm pivots at shoulders; leg pivots at hips. No forearm/shin/hand/foot chains. One rigid weight per vertex; no scaling, constraints or simulation.
+
+Rest proportions unchanged: total height 1.80 m, head 0.45 x 0.45 x 0.45 m, torso 0.45 x 0.225 x 0.675 m, each limb 0.225 x 0.225 x 0.675 m. Original V5 64x64 packed texture and material retained exactly. Full-length UV rectangles replace split limb rectangles, preserving face/outfit pixel placement.
+
+Player_Idle, Player_Walk and Player_Run rebuilt for whole-arm/whole-leg swing, torso counter-rotation and head stabilization (24 FPS; 48/32/24 playback frames; duplicate closing keys 49/33/25). Earlier movement file and V5 source preserved and hash-checked. All actions evaluated at quarter-frame intervals: cuboid edge lengths preserved within 0.000001 m, closing poses identical, Root stationary. Walk floor interpolation reaches -1.72 mm; these adapted clips have not been tested in Godot.
+
+Transparent previews: player_cuboid_v6_front.png, player_cuboid_v6_isometric.png, player_cuboid_v6_side.png. Additional run-pose preview demonstrates seamless limbs while rotated.

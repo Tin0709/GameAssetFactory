@@ -1,0 +1,77 @@
+[
+  {
+    "name": "Player_Idle",
+    "playback": [
+      1,
+      48
+    ],
+    "keys_and_export": [
+      1,
+      49
+    ],
+    "fps": 24,
+    "duration_s": 2.0,
+    "curves": 33,
+    "keys": 276,
+    "animated_bones": [
+      "Arm.L",
+      "Arm.R",
+      "Chest",
+      "Head",
+      "Hips",
+      "Leg.L",
+      "Leg.R",
+      "Spine"
+    ]
+  },
+  {
+    "name": "Player_Walk",
+    "playback": [
+      1,
+      32
+    ],
+    "keys_and_export": [
+      1,
+      33
+    ],
+    "fps": 24,
+    "duration_s": 1.3333333333333333,
+    "curves": 33,
+    "keys": 456,
+    "animated_bones": [
+      "Arm.L",
+      "Arm.R",
+      "Chest",
+      "Head",
+      "Hips",
+      "Leg.L",
+      "Leg.R",
+      "Spine"
+    ]
+  },
+  {
+    "name": "Player_Run",
+    "playback": [
+      1,
+      24
+    ],
+    "keys_and_export": [
+      1,
+      25
+    ],
+    "fps": 24,
+    "duration_s": 1.0,
+    "curves": 33,
+    "keys": 508,
+    "animated_bones": [
+      "Arm.L",
+      "Arm.R",
+      "Chest",
+      "Head",
+      "Hips",
+      "Leg.L",
+      "Leg.R",
+      "Spine"
+    ]
+  }
+]

@@ -1,0 +1,91 @@
+{
+  "saved": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_v6.blend",
+  "triangles": 72,
+  "vertices": 48,
+  "bones": 10,
+  "rigid_parts": 6,
+  "material_count": 1,
+  "texture_unchanged": true,
+  "earlier_files_unchanged": true,
+  "source_hashes": {
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\animation\\player_cuboid_v5_movement.blend": "bf3eedc7c6746f6351c27d4bba55f362db663755502b304b6afdfc7153a53c51",
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_v5.blend": "15be56e9e60d719cdcb60d459926a03b10e479231b9dbb0926f118e82f960203"
+  },
+  "actions": [
+    {
+      "name": "Player_Idle",
+      "playback": [
+        1,
+        48
+      ],
+      "keys_and_export": [
+        1,
+        49
+      ],
+      "fps": 24,
+      "duration_s": 2.0,
+      "curves": 33,
+      "keys": 276,
+      "animated_bones": [
+        "Arm.L",
+        "Arm.R",
+        "Chest",
+        "Head",
+        "Hips",
+        "Leg.L",
+        "Leg.R",
+        "Spine"
+      ]
+    },
+    {
+      "name": "Player_Walk",
+      "playback": [
+        1,
+        32
+      ],
+      "keys_and_export": [
+        1,
+        33
+      ],
+      "fps": 24,
+      "duration_s": 1.3333333333333333,
+      "curves": 33,
+      "keys": 456,
+      "animated_bones": [
+        "Arm.L",
+        "Arm.R",
+        "Chest",
+        "Head",
+        "Hips",
+        "Leg.L",
+        "Leg.R",
+        "Spine"
+      ]
+    },
+    {
+      "name": "Player_Run",
+      "playback": [
+        1,
+        24
+      ],
+      "keys_and_export": [
+        1,
+        25
+      ],
+      "fps": 24,
+      "duration_s": 1.0,
+      "curves": 33,
+      "keys": 508,
+      "animated_bones": [
+        "Arm.L",
+        "Arm.R",
+        "Chest",
+        "Head",
+        "Hips",
+        "Leg.L",
+        "Leg.R",
+        "Spine"
+      ]
+    }
+  ]
+}

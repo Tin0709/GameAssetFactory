@@ -1,0 +1,13 @@
+Zombie Cuboid V2
+
+Six closed cuboids: cube head, box torso, one unsplit cuboid per arm and leg. Each limb has eight vertices, six quads, and no intermediate loops, caps or elbow/knee joints. 48 vertices, 72 triangles (V1: 120), 10 bones (V1: 18).
+
+Rest mesh, UVs, bone hierarchy and rest matrices match player V6 exactly. Height 1.80 m; head 0.45 x 0.45 x 0.45 m; torso 0.45 x 0.225 x 0.675 m; each limb 0.225 x 0.225 x 0.675 m. Root/Hips/Spine/Chest/Neck/Head, Arm.L/R, Leg.L/R. Single full-weight bone binding per cuboid; all scales remain one.
+
+Original zombie V1 packed 64x64 atlas and material retained, including green skin, sunken eyes, slate worn jacket, faded undershirt, distressed cuffs, dark trousers and brown shoes. One material, nearest sampling, nonmetallic. Limb UVs cover full original 12-pixel rectangles.
+
+Zombie_Idle (48 frames plus closing key 49) and Zombie_Walk (32 frames plus closing key 33), 24 FPS, adapted to whole-limb movement. Arms stay raised with asymmetric droop; hips/chest/head retain delayed sway and hunch. Walk uses modest uneven hip swings with full-block floor correction baked into ordinary transforms. Root stationary, no constraints/simulation, no elbow/knee bending. Runtime Godot playback has not been tested.
+
+Quarter-frame checks: rigid edges maintained below 0.000001 m error; loop closing vertices exactly match; idle feet planted with negligible numeric drift; walk minimum clearance approximately 1.4 mm. Static transparent front/isometric/side previews and eight walk key-pose previews visually reviewed. Detailed validation: zombie_v2_validation.json.
+
+Zombie V1 and player V6 files unchanged (hash-checked).

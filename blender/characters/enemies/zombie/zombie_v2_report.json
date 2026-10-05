@@ -1,0 +1,66 @@
+{
+  "saved": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\enemies\\zombie\\zombie_cuboid_v2.blend",
+  "triangles": 72,
+  "vertices": 48,
+  "bones": 10,
+  "rigid_parts": 6,
+  "material_count": 1,
+  "texture_unchanged": true,
+  "earlier_files_unchanged": true,
+  "source_hashes": {
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\enemies\\zombie\\zombie_cuboid_v1.blend": "969f5efaf1485e86206d360736296ea1cb90761ad496394dc3851dfcfb9b1e23",
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_v6.blend": "cc2344b6c5fe00ec6a0f50f18997977206644c0d6037ed0dd0f0a9e338342cdd"
+  },
+  "actions": [
+    {
+      "name": "Zombie_Idle",
+      "playback": [
+        1,
+        48
+      ],
+      "keys_and_export": [
+        1,
+        49
+      ],
+      "fps": 24,
+      "duration_s": 2.0,
+      "curves": 35,
+      "keys": 294,
+      "animated_bones": [
+        "Arm.L",
+        "Arm.R",
+        "Chest",
+        "Head",
+        "Hips",
+        "Leg.L",
+        "Leg.R",
+        "Spine"
+      ]
+    },
+    {
+      "name": "Zombie_Walk",
+      "playback": [
+        1,
+        32
+      ],
+      "keys_and_export": [
+        1,
+        33
+      ],
+      "fps": 24,
+      "duration_s": 1.3333333333333333,
+      "curves": 35,
+      "keys": 505,
+      "animated_bones": [
+        "Arm.L",
+        "Arm.R",
+        "Chest",
+        "Head",
+        "Hips",
+        "Leg.L",
+        "Leg.R",
+        "Spine"
+      ]
+    }
+  ]
+}

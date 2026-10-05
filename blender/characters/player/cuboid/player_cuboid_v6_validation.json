@@ -1,0 +1,53 @@
+{
+  "Player_Idle": {
+    "edge_length_error_m": 1.823246885690466e-07,
+    "loop_vertex_error_m": 0.0,
+    "minimum_floor_z_m": -9.219632488566276e-07,
+    "root_stationary": true
+  },
+  "Player_Walk": {
+    "edge_length_error_m": 1.833325928846108e-07,
+    "loop_vertex_error_m": 0.0,
+    "minimum_floor_z_m": -0.0017153644002974033,
+    "root_stationary": true
+  },
+  "Player_Run": {
+    "edge_length_error_m": 1.8367747722791705e-07,
+    "loop_vertex_error_m": 0.0,
+    "minimum_floor_z_m": 0.0008962228894233704,
+    "root_stationary": true
+  },
+  "rest_dimensions_m": {
+    "Head": [
+      0.45,
+      0.45,
+      0.45
+    ],
+    "Torso": [
+      0.45,
+      0.225,
+      0.675
+    ],
+    "Arm.L": [
+      0.225,
+      0.225,
+      0.675
+    ],
+    "Arm.R": [
+      0.225,
+      0.225,
+      0.675
+    ],
+    "Leg.L": [
+      0.225,
+      0.225,
+      0.675
+    ],
+    "Leg.R": [
+      0.225,
+      0.225,
+      0.675
+    ]
+  },
+  "texture_matches_v5_exactly": true
+}

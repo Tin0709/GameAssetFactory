@@ -1,0 +1,52 @@
+[
+  {
+    "source": "blender/characters/player/cuboid/player_cuboid_v6.blend",
+    "source_sha256": "cc2344b6c5fe00ec6a0f50f18997977206644c0d6037ed0dd0f0a9e338342cdd",
+    "runtime_file": "player_cuboid_v6.glb",
+    "bytes": 47676,
+    "actions": [
+      "Player_Idle",
+      "Player_Walk",
+      "Player_Run"
+    ],
+    "joints": 10,
+    "materials": 1,
+    "samplers": [
+      {
+        "magFilter": 9728,
+        "minFilter": 9984,
+        "wrapS": 33071,
+        "wrapT": 33071
+      }
+    ],
+    "animations_seconds": {
+      "Player_Idle": 2,
+      "Player_Run": 1,
+      "Player_Walk": 1.3333333333333333
+    }
+  },
+  {
+    "source": "blender/characters/enemies/zombie/zombie_cuboid_v2.blend",
+    "source_sha256": "22e2abb4670206aaa1e96711340f958e113921b5499f19414deea65cde460a8c",
+    "runtime_file": "zombie_cuboid_v2.glb",
+    "bytes": 38520,
+    "actions": [
+      "Zombie_Idle",
+      "Zombie_Walk"
+    ],
+    "joints": 10,
+    "materials": 1,
+    "samplers": [
+      {
+        "magFilter": 9728,
+        "minFilter": 9984,
+        "wrapS": 33071,
+        "wrapT": 33071
+      }
+    ],
+    "animations_seconds": {
+      "Zombie_Idle": 2,
+      "Zombie_Walk": 1.3333333333333333
+    }
+  }
+]

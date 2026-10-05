@@ -1,0 +1,11 @@
+{
+	"capture": false,
+	"checks": 354,
+	"engine": "4.7.2-stable (official)",
+	"mesh_instances": 27,
+	"passed": true,
+	"phone_tested": false,
+	"renderer": "mobile",
+	"shadow_casters": 8,
+	"triangles": 564
+}

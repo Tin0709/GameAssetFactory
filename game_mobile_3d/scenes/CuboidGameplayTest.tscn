@@ -1,0 +1,349 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Environment" path="res://environment/Gameplay.tres" id="env"]
+
+[ext_resource type="Script" path="res://scripts/gameplay_test.gd" id="script"]
+[ext_resource type="Script" path="res://scripts/combat_director.gd" id="combat"]
+[ext_resource type="Script" path="res://scripts/combat_audio.gd" id="audio"]
+
+[ext_resource type="PackedScene" path="res://scenes/characters/CuboidPlayer.tscn" id="player"]
+
+[ext_resource type="PackedScene" path="res://scenes/characters/CuboidZombie.tscn" id="zombie"]
+
+[ext_resource type="Material" path="res://materials/Ground.tres" id="Ground"]
+
+[ext_resource type="Material" path="res://materials/Path.tres" id="Path"]
+
+[ext_resource type="Material" path="res://materials/Stone.tres" id="Stone"]
+
+[ext_resource type="Material" path="res://materials/DarkStone.tres" id="DarkStone"]
+
+[ext_resource type="Material" path="res://materials/Cyan.tres" id="Cyan"]
+
+[ext_resource type="Material" path="res://materials/Edge.tres" id="Edge"]
+
+[sub_resource type="BoxMesh" id="Box"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="BoxShape3D" id="FloorShape"]
+size = Vector3(18, 0.4, 14)
+
+[sub_resource type="BoxShape3D" id="HorizontalWall"]
+size = Vector3(16.8, 1.8, 0.4)
+
+[sub_resource type="BoxShape3D" id="VerticalWall"]
+size = Vector3(0.4, 1.8, 12.8)
+
+[sub_resource type="StyleBoxFlat" id="Panel"]
+bg_color = Color(0.035, 0.075, 0.095, 1)
+border_width_left = 3
+border_color = Color(0.1, 0.85, 0.91, 1)
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+
+[node name="CuboidGameplayTest" type="Node3D"]
+script = ExtResource("script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("env")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(12, 15, 16)
+rotation_degrees = Vector3(-36.31588642394517, 36.86989764584402, 0)
+projection = 1
+size = 14.5
+near = 0.1
+far = 60.0
+current = true
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, -28, 0)
+light_color = Color(1, 0.85, 0.66, 1)
+light_energy = 1.25
+shadow_enabled = true
+shadow_bias = 0.04
+directional_shadow_mode = 0
+directional_shadow_max_distance = 36.0
+
+[node name="Arena" type="Node3D" parent="."]
+
+[node name="Foundation" type="MeshInstance3D" parent="Arena"]
+position = Vector3(0, -0.55, 0)
+scale = Vector3(18.4, 0.4, 14.4)
+mesh = SubResource("Box")
+material_override = ExtResource("Edge")
+cast_shadow = 0
+
+[node name="Floor" type="StaticBody3D" parent="Arena"]
+collision_layer = 1
+collision_mask = 6
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/Floor"]
+position = Vector3(0, -0.2, 0)
+shape = SubResource("FloorShape")
+
+[node name="Ground" type="MeshInstance3D" parent="Arena/Floor"]
+position = Vector3(0, -0.2, 0)
+scale = Vector3(18, 0.4, 14)
+mesh = SubResource("Box")
+material_override = ExtResource("Ground")
+cast_shadow = 0
+
+[node name="Tile_-2_-2" type="MeshInstance3D" parent="Arena"]
+position = Vector3(-2, 0.004, -2)
+scale = Vector3(1.9, 0.008, 1.9)
+mesh = SubResource("Box")
+material_override = ExtResource("Path")
+cast_shadow = 0
+
+[node name="Tile_-2_0" type="MeshInstance3D" parent="Arena"]
+position = Vector3(-2, 0.004, 0)
+scale = Vector3(1.9, 0.008, 1.9)
+mesh = SubResource("Box")
+material_override = ExtResource("Path")
+cast_shadow = 0
+
+[node name="Tile_-2_2" type="MeshInstance3D" parent="Arena"]
+position = Vector3(-2, 0.004, 2)
+scale = Vector3(1.9, 0.008, 1.9)
+mesh = SubResource("Box")
+material_override = ExtResource("Path")
+cast_shadow = 0
+
+[node name="Tile_0_-2" type="MeshInstance3D" parent="Arena"]
+position = Vector3(0, 0.004, -2)
+scale = Vector3(1.9, 0.008, 1.9)
+mesh = SubResource("Box")
+material_override = ExtResource("Path")
+cast_shadow = 0
+
+[node name="Tile_0_0" type="MeshInstance3D" parent="Arena"]
+position = Vector3(0, 0.004, 0)
+scale = Vector3(1.9, 0.008, 1.9)
+mesh = SubResource("Box")
+material_override = ExtResource("Path")
+cast_shadow = 0
+
+[node name="Tile_0_2" type="MeshInstance3D" parent="Arena"]
+position = Vector3(0, 0.004, 2)
+scale = Vector3(1.9, 0.008, 1.9)
+mesh = SubResource("Box")
+material_override = ExtResource("Path")
+cast_shadow = 0
+
+[node name="Tile_2_-2" type="MeshInstance3D" parent="Arena"]
+position = Vector3(2, 0.004, -2)
+scale = Vector3(1.9, 0.008, 1.9)
+mesh = SubResource("Box")
+material_override = ExtResource("Path")
+cast_shadow = 0
+
+[node name="Tile_2_0" type="MeshInstance3D" parent="Arena"]
+position = Vector3(2, 0.004, 0)
+scale = Vector3(1.9, 0.008, 1.9)
+mesh = SubResource("Box")
+material_override = ExtResource("Path")
+cast_shadow = 0
+
+[node name="Tile_2_2" type="MeshInstance3D" parent="Arena"]
+position = Vector3(2, 0.004, 2)
+scale = Vector3(1.9, 0.008, 1.9)
+mesh = SubResource("Box")
+material_override = ExtResource("Path")
+cast_shadow = 0
+
+[node name="North" type="StaticBody3D" parent="Arena"]
+position = Vector3(0, 0.35, -6.4)
+collision_layer = 1
+collision_mask = 6
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/North"]
+position = Vector3(0, 0.55, 0)
+shape = SubResource("HorizontalWall")
+
+[node name="Curb" type="MeshInstance3D" parent="Arena/North"]
+position = Vector3(0, 0, 0)
+scale = Vector3(16.8, 0.7, 0.4)
+mesh = SubResource("Box")
+material_override = ExtResource("Stone")
+cast_shadow = 0
+
+[node name="South" type="StaticBody3D" parent="Arena"]
+position = Vector3(0, 0.35, 6.4)
+collision_layer = 1
+collision_mask = 6
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/South"]
+position = Vector3(0, 0.55, 0)
+shape = SubResource("HorizontalWall")
+
+[node name="Curb" type="MeshInstance3D" parent="Arena/South"]
+position = Vector3(0, 0, 0)
+scale = Vector3(16.8, 0.7, 0.4)
+mesh = SubResource("Box")
+material_override = ExtResource("Stone")
+cast_shadow = 0
+
+[node name="West" type="StaticBody3D" parent="Arena"]
+position = Vector3(-8.2, 0.35, 0)
+collision_layer = 1
+collision_mask = 6
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/West"]
+position = Vector3(0, 0.55, 0)
+shape = SubResource("VerticalWall")
+
+[node name="Curb" type="MeshInstance3D" parent="Arena/West"]
+position = Vector3(0, 0, 0)
+scale = Vector3(0.4, 0.7, 12.8)
+mesh = SubResource("Box")
+material_override = ExtResource("Stone")
+cast_shadow = 0
+
+[node name="East" type="StaticBody3D" parent="Arena"]
+position = Vector3(8.2, 0.35, 0)
+collision_layer = 1
+collision_mask = 6
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/East"]
+position = Vector3(0, 0.55, 0)
+shape = SubResource("VerticalWall")
+
+[node name="Curb" type="MeshInstance3D" parent="Arena/East"]
+position = Vector3(0, 0, 0)
+scale = Vector3(0.4, 0.7, 12.8)
+mesh = SubResource("Box")
+material_override = ExtResource("Stone")
+cast_shadow = 0
+
+[node name="Pillar_-8.2_-6.4" type="MeshInstance3D" parent="Arena"]
+position = Vector3(-8.2, 0.75, -6.4)
+scale = Vector3(0.8, 1.5, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("DarkStone")
+cast_shadow = 1
+
+[node name="Rune_-8.2_-6.4" type="MeshInstance3D" parent="Arena"]
+position = Vector3(-8.2, 1.52, -6.4)
+scale = Vector3(0.62, 0.05, 0.62)
+mesh = SubResource("Box")
+material_override = ExtResource("Cyan")
+cast_shadow = 0
+
+[node name="Pillar_-8.2_6.4" type="MeshInstance3D" parent="Arena"]
+position = Vector3(-8.2, 0.75, 6.4)
+scale = Vector3(0.8, 1.5, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("DarkStone")
+cast_shadow = 1
+
+[node name="Rune_-8.2_6.4" type="MeshInstance3D" parent="Arena"]
+position = Vector3(-8.2, 1.52, 6.4)
+scale = Vector3(0.62, 0.05, 0.62)
+mesh = SubResource("Box")
+material_override = ExtResource("Cyan")
+cast_shadow = 0
+
+[node name="Pillar_8.2_-6.4" type="MeshInstance3D" parent="Arena"]
+position = Vector3(8.2, 0.75, -6.4)
+scale = Vector3(0.8, 1.5, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("DarkStone")
+cast_shadow = 1
+
+[node name="Rune_8.2_-6.4" type="MeshInstance3D" parent="Arena"]
+position = Vector3(8.2, 1.52, -6.4)
+scale = Vector3(0.62, 0.05, 0.62)
+mesh = SubResource("Box")
+material_override = ExtResource("Cyan")
+cast_shadow = 0
+
+[node name="Pillar_8.2_6.4" type="MeshInstance3D" parent="Arena"]
+position = Vector3(8.2, 0.75, 6.4)
+scale = Vector3(0.8, 1.5, 0.8)
+mesh = SubResource("Box")
+material_override = ExtResource("DarkStone")
+cast_shadow = 1
+
+[node name="Rune_8.2_6.4" type="MeshInstance3D" parent="Arena"]
+position = Vector3(8.2, 1.52, 6.4)
+scale = Vector3(0.62, 0.05, 0.62)
+mesh = SubResource("Box")
+material_override = ExtResource("Cyan")
+cast_shadow = 0
+
+[node name="Actors" type="Node3D" parent="."]
+
+[node name="Player" parent="Actors" instance=ExtResource("player")]
+position = Vector3(0, 0.02, 1.8)
+
+[node name="ZombieNear" parent="Actors" instance=ExtResource("zombie")]
+position = Vector3(4, 0.02, -3)
+
+[node name="ZombieLeft" parent="Actors" instance=ExtResource("zombie")]
+position = Vector3(-4, 0.02, -1)
+
+[node name="ZombieFar" parent="Actors" instance=ExtResource("zombie")]
+position = Vector3(-6.5, 0.02, 4.5)
+
+[node name="Combat" type="Node" parent="."]
+script = ExtResource("combat")
+
+[node name="Projectiles" type="Node3D" parent="Combat"]
+
+[node name="Pickups" type="Node3D" parent="Combat"]
+
+[node name="Effects" type="Node3D" parent="Combat"]
+
+[node name="Audio" type="Node" parent="Combat"]
+script = ExtResource("audio")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Help" type="PanelContainer" parent="HUD"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 390.0
+offset_bottom = 110.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Text" type="Label" parent="HUD/Help"]
+theme_override_colors/font_color = Color(0.84, 0.91, 0.91, 1)
+theme_override_font_sizes/font_size = 18
+text = "CUBOID SURVIVAL / COMBAT TEST
+WASD move  |  Shift run  |  R reset
+Auto-fire nearby zombies. Collect cyan EXP."
+
+[node name="Status" type="Label" parent="HUD"]
+offset_left = 24.0
+offset_top = 646.0
+offset_right = 800.0
+offset_bottom = 694.0
+theme_override_colors/font_color = Color(0.84, 0.91, 0.91, 1)
+theme_override_font_sizes/font_size = 18
+text = "HP 100/100  |  EXP 0  |  Living zombies 3  |  FPS"
+
+[node name="Defeated" type="PanelContainer" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -70.0
+offset_right = 200.0
+offset_bottom = 70.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Text" type="Label" parent="HUD/Defeated"]
+theme_override_font_sizes/font_size = 28
+text = "DEFEATED
+Press R to try again"
+horizontal_alignment = 1
+vertical_alignment = 1

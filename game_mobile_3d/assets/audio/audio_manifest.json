@@ -1,0 +1,18 @@
+{
+  "bullet_impact": {
+    "source": "audio/game/Bullet impact.mp3",
+    "recorded_start_s": 0.14501133786848072,
+    "length_s": 0.26,
+    "fade_ms": 12,
+    "method": "Godot MP3 decoder + first transient selection, PCM crop; no long multi-impact playback"
+  },
+  "copied_mp3": [
+    "pistol_shot",
+    "zombie_hit",
+    "zombie_death",
+    "player_hurt",
+    "exp_pickup",
+    "zombie_attack",
+    "player_death"
+  ]
+}

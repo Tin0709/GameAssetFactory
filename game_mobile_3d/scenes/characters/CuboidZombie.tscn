@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/cuboid_zombie.gd" id="1_zombie"]
+[ext_resource type="Script" path="res://scripts/cuboid_animation.gd" id="2_animation"]
+[ext_resource type="PackedScene" path="res://assets/characters/zombie_cuboid_v2.glb" id="3_model"]
+
+[sub_resource type="CapsuleShape3D" id="BodyShape"]
+radius = 0.30
+height = 1.80
+
+[node name="CuboidZombie" type="CharacterBody3D" groups=["zombies"]]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_zombie")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("BodyShape")
+
+[node name="Visual" type="Node3D" parent="."]
+script = ExtResource("2_animation")
+animation_prefix = "Zombie"
+
+[node name="Model" parent="Visual" instance=ExtResource("3_model")]

@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/pistol_projectile.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="BulletMaterial"]
+shading_mode = 0
+albedo_color = Color(1, 0.80, 0.34, 1)
+
+[sub_resource type="BoxMesh" id="BulletMesh"]
+size = Vector3(0.055, 0.055, 0.22)
+material = SubResource("BulletMaterial")
+
+[node name="PistolProjectile" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Visual" type="MeshInstance3D" parent="."]
+mesh = SubResource("BulletMesh")
+cast_shadow = 0

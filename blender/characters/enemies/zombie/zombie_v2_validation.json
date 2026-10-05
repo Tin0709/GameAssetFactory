@@ -1,0 +1,22 @@
+{
+  "Zombie_Idle": {
+    "rigid_edge_error_m": 1.9022904668153373e-07,
+    "loop_vertex_error_m": 0.0,
+    "minimum_floor_z_m": -6.361492523865309e-06,
+    "root_stationary": true,
+    "unit_scales": true
+  },
+  "Zombie_Walk": {
+    "rigid_edge_error_m": 1.9498490710923022e-07,
+    "loop_vertex_error_m": 0.0,
+    "minimum_floor_z_m": 0.0014180936850607395,
+    "root_stationary": true,
+    "unit_scales": true
+  },
+  "matches_player_v6_mesh_uv_and_rig_exactly": true,
+  "texture_matches_zombie_v1_exactly": true,
+  "no_intermediate_limb_vertices": true,
+  "height_m": 1.8,
+  "triangles": 72,
+  "bones": 10
+}
