@@ -154,7 +154,7 @@ func run() -> void:
 	for enemy in victims:
 		enemy.position = Vector3(2, 0.02, 0)
 		enemy.take_damage(60)
-	await tick(42)
+	await tick(70)
 	player.position = Vector3(2, 0.01, 0)
 	await tick(16)
 	check(paused and progression.selection_open and player.level == 2 and combat.kill_count == 3, "EXP/level-up integrates with continuous director")
@@ -205,7 +205,7 @@ func run() -> void:
 		for enemy in combat.living_zombies.duplicate():
 			enemy.take_damage(enemy.current_hp)
 			total_killed += 1
-		await tick(42)
+		await tick(70)
 		check(combat.living_zombies.is_empty() and get_nodes_in_group("zombies").is_empty(), "Repeated deaths leave no stale registry/actor references")
 		if round_index < 2:
 			spawner.debug_spawn(10)

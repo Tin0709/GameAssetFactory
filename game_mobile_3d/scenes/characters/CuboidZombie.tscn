@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/cuboid_zombie.gd" id="1_zombie"]
-[ext_resource type="Script" path="res://scripts/cuboid_animation.gd" id="2_animation"]
+[ext_resource type="Script" path="res://scripts/zombie_animation_secondary.gd" id="2_animation"]
 [ext_resource type="PackedScene" path="res://assets/characters/zombie_animation_v2.glb" id="3_model"]
 
 [sub_resource type="CapsuleShape3D" id="BodyShape"]

@@ -1,5 +1,5 @@
 extends CharacterBody3D
-## Rigid whole-limb shamble, timed melee windup, and a tweened whole-body death.
+## Rigid shamble, existing melee timing, and procedural toy-body death feedback.
 
 @export var move_speed: float = 2.05
 @export var detection_range: float = 6.5
@@ -55,6 +55,7 @@ func take_damage(amount: int, direction: Vector3 = Vector3.ZERO) -> bool:
 	if is_dead or amount <= 0: return false
 	current_hp = maxi(0, current_hp - amount)
 	visual.flash_hit()
+	visual.hit_impulse(direction)
 	damage_feedback.show_hit(amount, current_hp, max_hp, combat.effects if is_instance_valid(combat) else null)
 	if is_instance_valid(combat): combat.play_sound(&"zombie_hit")
 	if current_hp == 0:
@@ -74,21 +75,12 @@ func _begin_death(direction: Vector3) -> void:
 	set_deferred("collision_mask", 0)
 	visual.freeze_animation()
 	if is_instance_valid(combat): combat.enemy_death_started(self)
-	# Rotate the entire visual; individual cuboids never bend, squash or scale.
-	var fall_side := fall_sign if absf(direction.x) < 0.05 else signf(direction.x)
-	var base_rotation := visual.rotation
-	var tween := create_tween()
-	# Brief recoil, then lose balance, fall, and hold before cleanup.
-	tween.tween_property(visual, "rotation", base_rotation + Vector3(-0.06, 0, fall_side * 0.10), 0.055)
-	tween.tween_property(visual, "rotation", base_rotation + Vector3(-0.30, 0, fall_side * 0.38), 0.10)
-	tween.tween_property(visual, "rotation", base_rotation + Vector3(-0.35, 0, fall_side * 1.48), death_duration - 0.285).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(visual, "position:y", 0.12, death_duration - 0.285)
-	tween.tween_interval(0.13)
-	tween.tween_callback(_finish_death)
+	visual.death_finished.connect(_finish_death, CONNECT_ONE_SHOT)
+	visual.start_death(direction, death_duration)
 
 func _finish_death() -> void:
 	if is_instance_valid(combat):
-		combat.spawn_death_smoke(visual.to_global(Vector3(0, 0.90, 0)))
+		combat.spawn_death_smoke(visual.death_smoke_position())
 		combat.spawn_exp(global_position)
 	queue_free()
 
@@ -115,7 +107,7 @@ func _physics_process(delta: float) -> void:
 			pending_attack -= delta
 			if pending_attack <= 0.0:
 				pending_attack = -1.0
-				if fighting and distance <= attack_range: target.take_damage(attack_damage)
+				if fighting and distance <= attack_range: target.take_damage(attack_damage, offset.normalized())
 		if fighting and distance <= attack_range and attack_cooldown == 0.0:
 			attack_cooldown = attack_interval
 			pending_attack = attack_windup

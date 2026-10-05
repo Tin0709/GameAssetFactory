@@ -106,7 +106,7 @@ func _run() -> void:
 	check(not first.take_damage(20), "Dead enemy rejects further damage")
 	check(combat.living_zombies.size() == 2, "Living count updates at death start")
 	check(first.visual.scale.is_equal_approx(Vector3.ONE), "Death keeps whole-body scale unchanged")
-	await tick(40)
+	await tick(70)
 	check(not is_instance_valid(first), "Corpse removed after collapse")
 	check(combat.pickups.get_child_count() == 1, "Exactly one EXP drop per zombie")
 	check(combat.projectiles.get_child_count() == 0, "No bullets accumulate after target dies")
@@ -187,7 +187,7 @@ func _run() -> void:
 	# Repeated kills exercise cleanup, registry updates and one-drop accounting.
 	await fresh()
 	for enemy in combat.living_zombies.duplicate(): enemy.take_damage(60)
-	await tick(42)
+	await tick(70)
 	check(combat.living_zombies.is_empty() and get_nodes_in_group("zombies").is_empty(), "Initial three deaths clean up")
 	for i in range(12):
 		var enemy := ZOMBIE.instantiate()
@@ -199,7 +199,7 @@ func _run() -> void:
 		enemy.take_damage(20)
 		enemy.take_damage(20)
 		check(enemy.is_dead and not enemy.take_damage(20), "Repeated lethal damage stays single-use")
-	await tick(42)
+	await tick(70)
 	check(combat.living_zombies.is_empty() and get_nodes_in_group("zombies").is_empty(), "Twelve repeated deaths leave no enemies")
 	check(combat.pickups.get_child_count() == 15, "Fifteen kills produce fifteen drops")
 	for pickup in combat.pickups.get_children(): pickup.global_position = Vector3(0, 0.24, 0)

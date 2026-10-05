@@ -1,0 +1,74 @@
+[
+	{
+		"aim": false,
+		"baseline": {
+			"Chest": 0.0,
+			"Head": 0.0
+		},
+		"bounce": {
+			"Chest": 0.0,
+			"Head": 0.0
+		},
+		"weapon": 0
+	},
+	{
+		"aim": true,
+		"baseline": {
+			"Chest": 0.0,
+			"Head": 0.0
+		},
+		"bounce": {
+			"Chest": 0.0,
+			"Head": 0.0
+		},
+		"weapon": 0
+	},
+	{
+		"aim": false,
+		"baseline": {
+			"Chest": 0.0116139948368073,
+			"Head": 0.0
+		},
+		"bounce": {
+			"Chest": 0.0137197598814964,
+			"Head": 0.0
+		},
+		"weapon": 1
+	},
+	{
+		"aim": true,
+		"baseline": {
+			"Chest": 0.0,
+			"Head": 0.0
+		},
+		"bounce": {
+			"Chest": 0.0,
+			"Head": 0.0
+		},
+		"weapon": 1
+	},
+	{
+		"aim": false,
+		"baseline": {
+			"Chest": 0.0351344496011734,
+			"Head": 0.0
+		},
+		"bounce": {
+			"Chest": 0.0355838686227798,
+			"Head": 0.0
+		},
+		"weapon": 2
+	},
+	{
+		"aim": true,
+		"baseline": {
+			"Chest": 0.0,
+			"Head": 0.0
+		},
+		"bounce": {
+			"Chest": 0.0,
+			"Head": 0.0
+		},
+		"weapon": 2
+	}
+]

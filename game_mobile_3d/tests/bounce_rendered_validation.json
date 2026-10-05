@@ -1,0 +1,30 @@
+{
+	"checks": 1031,
+	"corpse_hold_seconds": 0.45,
+	"death_variants": [
+		0,
+		1,
+		2,
+		3,
+		4,
+		5
+	],
+	"failures": [],
+	"forty_death_pose_usec": 249.8,
+	"forty_zombies_added_usec": 147.625,
+	"forty_zombies_off_usec": 167.216666666667,
+	"forty_zombies_on_usec": 314.841666666667,
+	"max_body_drop_m": 0.022525938693434,
+	"max_death_ground_penetration_m": 0.0,
+	"max_hand_contact_m": 0.0119293322786689,
+	"phone_tested": false,
+	"player_update_usec": 46.169,
+	"render_sample": {
+		"forty_deaths_fps": 119.982242628091,
+		"gpu": "NVIDIA GeForce RTX 4070 Ti SUPER",
+		"off_fps": 118.629747331819,
+		"on_fps": 119.576062997984
+	},
+	"rendered": true,
+	"smoke_start_seconds": 1.07
+}

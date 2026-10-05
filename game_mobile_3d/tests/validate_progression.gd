@@ -89,7 +89,7 @@ func run() -> void:
 	for enemy in combat.living_zombies.duplicate():
 		enemy.position = Vector3(2, 0.01, 0)
 		enemy.take_damage(60)
-	await tick(42)
+	await tick(70)
 	check(combat.living_zombies.is_empty() and combat.pickups.get_child_count() == 3, "Actual three zombie kills produce three drops")
 	player.position = Vector3(2, 0.01, 0)
 	await tick(16)

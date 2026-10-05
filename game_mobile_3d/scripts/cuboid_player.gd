@@ -45,12 +45,13 @@ func equip_test_weapon(index: int) -> void:
 	visual.is_firing = false
 	$Pistol.cooldown = 0.15
 
-func take_damage(amount: int) -> bool:
+func take_damage(amount: int, direction: Vector3 = Vector3.ZERO) -> bool:
 	if is_dead or amount <= 0 or hurt_remaining > 0.0:
 		return false
 	current_hp = maxi(0, current_hp - amount)
 	hurt_remaining = hurt_grace_period
 	visual.flash_hit()
+	visual.hit_impulse(direction)
 	damage_feedback.show_hit(amount, current_hp, max_hp, combat.effects if is_instance_valid(combat) else null)
 	if is_instance_valid(combat): combat.play_sound(&"player_hurt")
 	health_changed.emit(current_hp, max_hp)
@@ -86,7 +87,9 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0.0
 	else:
 		velocity.y -= gravity * delta
+	var was_grounded := is_on_floor()
 	move_and_slide()
+	if not was_grounded and is_on_floor(): visual.landing_response()
 	var actual_speed := Vector2(get_real_velocity().x, get_real_velocity().z).length()
 	current_speed = actual_speed
 	var target: Node3D = $Pistol.nearest_target() if $Pistol.enabled else null

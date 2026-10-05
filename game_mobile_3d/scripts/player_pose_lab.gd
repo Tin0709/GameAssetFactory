@@ -14,6 +14,8 @@ var yaw := deg_to_rad(35.0)
 var pitch := deg_to_rad(16.0)
 var distance := 3.8
 var orbiting := false
+var bounce_enabled := true
+var bounce_strength := 1.0
 @onready var visual: Node3D = $Player/Visual
 @onready var camera: Camera3D = $Camera
 @onready var status: Label = $HUD/Panel/Stack/Status
@@ -27,6 +29,8 @@ func _ready() -> void:
 	_add_row(["L LowReady", "A Aim", "F Recoil"], [set_aim.bind(false), set_aim.bind(true), fire_recoil])
 	_add_row(["Freeze / Play", "Step frame"], [toggle_pause, step_frame])
 	_add_row(["N 1x", "H 0.5x", "Q 0.25x"], [set_speed.bind(1.0), set_speed.bind(0.5), set_speed.bind(0.25)])
+	_add_row(["B Bounce ON/OFF", "T Hit"], [toggle_bounce, hit_preview])
+	_add_row(["0%", "50%", "100%", "150%"], [set_bounce_strength.bind(0.0), set_bounce_strength.bind(0.5), set_bounce_strength.bind(1.0), set_bounce_strength.bind(1.5)])
 	_add_row(["Front", "Side", "Rear"], [set_view.bind(0), set_view.bind(1), set_view.bind(2)])
 	_add_row(["3/4", "Isometric", "C Reset"], [set_view.bind(3), set_view.bind(4), reset_camera])
 	_add_row(["Orbit left", "Orbit right", "Zoom +", "Zoom -"], [rotate_camera.bind(-0.25), rotate_camera.bind(0.25), zoom.bind(0.85), zoom.bind(1.15)])
@@ -39,7 +43,7 @@ func _add_row(labels: Array, actions: Array) -> void:
 	for i in labels.size():
 		var button := Button.new()
 		button.text = labels[i]
-		button.custom_minimum_size.y = 34
+		button.custom_minimum_size.y = 28
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.focus_mode = Control.FOCUS_NONE
 		button.pressed.connect(actions[i])
@@ -70,6 +74,19 @@ func set_speed(value: float) -> void:
 	playback_speed = clampf(value, 0.25, 1.0)
 	_update_status()
 
+func toggle_bounce() -> void:
+	bounce_enabled = not bounce_enabled
+	visual.set_bounce(bounce_enabled, bounce_strength)
+	_update_status()
+
+func set_bounce_strength(value: float) -> void:
+	bounce_strength = clampf(value, 0.0, 1.5)
+	visual.set_bounce(bounce_enabled, bounce_strength)
+	_update_status()
+
+func hit_preview() -> void:
+	visual.hit_impulse(Vector3.BACK)
+
 func step_frame() -> void:
 	if animation_paused:
 		_advance(1.0 / 60.0)
@@ -87,11 +104,12 @@ func _process(delta: float) -> void:
 	_update_status()
 
 func _update_status() -> void:
-	status.text = "Weapon: %s\nPreview: %s | %s\nPose: %s | %s\nRecoil: %s (%.3fs)\nPlayback: %.2fx | %s\nCamera: %s | %.2fm" % [
+	status.text = "Weapon: %s\nPreview: %s | %s\nPose: %s | %s\nRecoil: %s (%.3fs)\nBounce: %s | %d%%\nPlayback: %.2fx | %s\nCamera: %s | %.2fm" % [
 		visual.WEAPON_NAMES[visual.weapon_type], STATES[locomotion], "Aim" if aiming else "LowReady",
 		visual.current_state, "Aim" if visual.aim_weight > 0.5 else "LowReady",
 		"active" if visual.is_firing else ("queued" if visual.recoil_time == 0.0 else "settled"),
 		visual.recoil_time if visual.recoil_time < 1.0 else 0.0,
+		"ON" if bounce_enabled else "OFF", int(bounce_strength * 100),
 		playback_speed, "FROZEN" if animation_paused else "playing", camera_mode, distance]
 
 func set_view(index: int) -> void:
@@ -146,6 +164,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_L: set_aim(false)
 			KEY_A: set_aim(true)
 			KEY_F: fire_recoil()
+			KEY_B: toggle_bounce()
+			KEY_T: hit_preview()
 			KEY_SPACE: toggle_pause()
 			KEY_PERIOD: step_frame()
 			KEY_N: set_speed(1.0)

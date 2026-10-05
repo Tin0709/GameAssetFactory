@@ -3,6 +3,18 @@ extends "res://scripts/cuboid_animation.gd"
 ## native Animation tracks, avoiding competing AnimationTree/modifier writers.
 const Sampler = preload("res://scripts/animation_pose_sampler.gd")
 const Socket = preload("res://scripts/player_weapon_socket.gd")
+const Spring = preload("res://scripts/secondary_spring.gd")
+@export var bounce_tuning: Resource = preload("res://materials/BounceTuning.tres")
+var bounce_enabled := true
+var bounce_override := 1.0
+var body_spring := Spring.new()
+var chest_spring := Spring.new()
+var head_spring := Spring.new()
+var arm_spring := Spring.new()
+var weapon_spring := Spring.new()
+var contact_count := 0
+var leg_left: int
+var leg_right: int
 const PREFIXES = ["Pistol", "LongGun", "Shotgun"]
 const WEAPON_NAMES = ["Pistol", "M4A1", "Shotgun"]
 const RECOILS = ["Pistol_Recoil", "Rifle_Recoil", "Shotgun_Recoil"]
@@ -73,6 +85,8 @@ func _ready() -> void:
 	main_arm = skeleton.find_bone("Arm.R")
 	support_arm = skeleton.find_bone("Arm.L")
 	socket_bone = skeleton.find_bone("WeaponSocket")
+	leg_left = skeleton.find_bone("Leg.L")
+	leg_right = skeleton.find_bone("Leg.R")
 	for i in skeleton.get_bone_count():
 		switch_positions.append(skeleton.get_bone_pose_position(i))
 		switch_rotations.append(skeleton.get_bone_pose_rotation(i))
@@ -131,7 +145,14 @@ func _process(delta: float) -> void:
 	var visual_stride := lerpf(4.25 / walk_cadence, 6.25 / run_cadence, run_weight)
 	var desired_cycles := clampf(movement_speed / visual_stride, 0.0, run_cadence)
 	cycles_per_second = move_toward(cycles_per_second, desired_cycles, delta * run_cadence / cadence_transition)
-	locomotion_phase = fposmod(locomotion_phase + delta * cycles_per_second * stride_sign, 1.0)
+	var phase_travel := delta * cycles_per_second * stride_sign
+	var contacts := Spring.contacts_crossed(locomotion_phase, phase_travel, bounce_tuning.contact_phase)
+	locomotion_phase = fposmod(locomotion_phase + phase_travel, 1.0)
+	if bounce_enabled and move_weight > 0.1 and contacts > 0:
+		contact_count += contacts
+		var impulse: float = lerpf(bounce_tuning.walk_contact_impulse, bounce_tuning.run_contact_impulse, run_weight) * move_weight
+		body_spring.kick(Vector3(-impulse * contacts, 0, 0), bounce_tuning.max_velocity)
+	_advance_springs(delta)
 	weapon_lag = lerpf(weapon_lag, clampf(acceleration.z * 0.0004, -0.012, 0.012), 1.0 - exp(-8.0 * delta))
 	idle_time = fposmod(idle_time + delta, idle.clip.length)
 	recoil_time += delta
@@ -179,6 +200,7 @@ func _evaluate(_delta: float) -> void:
 			var difference: Quaternion = recoil_pose.rotation(i, 0.0).inverse() * recoil_pose.rotation(i, recoil_time)
 			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i) + offset)
 			skeleton.set_bone_pose_rotation(i, (skeleton.get_bone_pose_rotation(i) * Quaternion.IDENTITY.slerp(difference, recoil_gain)).normalized())
+	_apply_springs()
 	# Follow the final layered socket, including recoil, with each arm's outer
 	# palm edge. Arm lengths, twist and socket recoil stay authored; long-gun
 	# shoulders use the small front-shoulder stance offset above.
@@ -205,6 +227,10 @@ func _rotate_global(bone: int, offset: Quaternion) -> void:
 
 func shot_recoil(_world_direction: Vector3) -> void:
 	if frozen: return
+	if bounce_enabled:
+		var impulse: float = bounce_tuning.recoil_follow_impulses[weapon_type]
+		body_spring.kick(Vector3(0, -impulse * 0.6, 0), bounce_tuning.max_velocity)
+		weapon_spring.kick(Vector3(0, -impulse, 0), bounce_tuning.max_velocity)
 	# Preserve an active impulse's time: repeated rifle shots cannot hard-reset it.
 	if recoil_time < recoil_pose.clip.length:
 		recoil_gain = minf(1.45, recoil_gain + 0.3)
@@ -217,6 +243,65 @@ func freeze_animation() -> void:
 	frozen = true
 	is_firing = false
 	super.freeze_animation()
+
+func set_bounce(enabled: bool, strength: float = 1.0) -> void:
+	bounce_enabled = enabled
+	bounce_override = clampf(strength, 0.0, 1.5)
+	for spring in [body_spring, chest_spring, head_spring, arm_spring, weapon_spring]: spring.reset()
+
+func hit_impulse(world_direction: Vector3 = Vector3.ZERO) -> void:
+	if frozen or not bounce_enabled: return
+	var local := global_basis.inverse() * world_direction.normalized()
+	if local.is_zero_approx(): local = Vector3.BACK
+	body_spring.kick(Vector3(-bounce_tuning.hit_impulse * 0.15, local.z * bounce_tuning.hit_impulse, -local.x * bounce_tuning.hit_impulse), bounce_tuning.max_velocity)
+
+func landing_response() -> void:
+	if bounce_enabled: body_spring.kick(Vector3(-bounce_tuning.landing_impulse, 0, 0), bounce_tuning.max_velocity)
+
+func _advance_springs(delta: float) -> void:
+	if not bounce_enabled: return
+	var limits := Vector3(bounce_tuning.max_body_drop, bounce_tuning.max_body_angle, bounce_tuning.max_body_angle)
+	var target := Vector3(0, clampf(-acceleration.z * bounce_tuning.acceleration_strength, -limits.y, limits.y), clampf(-turn_rate * bounce_tuning.turn_spring_strength, -limits.z, limits.z))
+	target.x = (idle.position(hips, idle_time).y - idle.position(hips, 0).y) * bounce_tuning.idle_follow_strength * (1.0 - move_weight)
+	var substeps := clampi(ceili(delta * bounce_tuning.integration_hz), 1, bounce_tuning.max_substeps)
+	for substep in substeps:
+		var dt := delta / substeps
+		body_spring.advance(dt, target, bounce_tuning.bounce_frequency, bounce_tuning.bounce_damping, limits)
+		chest_spring.advance(dt, body_spring.value, bounce_tuning.chest_frequency, bounce_tuning.bounce_damping + 0.10, limits)
+		head_spring.advance(dt, chest_spring.value * bounce_tuning.head_follow_strength, bounce_tuning.head_frequency, bounce_tuning.bounce_damping + 0.18, limits)
+		arm_spring.advance(dt, chest_spring.value, bounce_tuning.arm_frequency, bounce_tuning.bounce_damping + 0.12, limits)
+		weapon_spring.advance(dt, arm_spring.value, bounce_tuning.weapon_frequencies[weapon_type], bounce_tuning.bounce_damping + 0.10, limits)
+
+func _apply_springs() -> void:
+	if not bounce_enabled: return
+	var gain: float = bounce_tuning.bounce_strength * bounce_override
+	var drop: float = body_spring.value.x * gain
+	skeleton.set_bone_pose_position(hips, skeleton.get_bone_pose_position(hips) + Vector3.UP * drop)
+	# Counter-translate rigid leg anchors: the secondary layer does not move soles.
+	for leg in [leg_left, leg_right]:
+		var parent_basis := skeleton.get_bone_global_pose(skeleton.get_bone_parent(leg)).basis
+		skeleton.set_bone_pose_position(leg, skeleton.get_bone_pose_position(leg) + parent_basis.inverse() * Vector3.DOWN * drop)
+	var chest_offset := chest_spring.value * gain
+	skeleton.set_bone_pose_position(chest, skeleton.get_bone_pose_position(chest) + Vector3.UP * (chest_spring.value.x - body_spring.value.x) * gain * bounce_tuning.chest_vertical_follow)
+	_rotate_global(chest, Quaternion.from_euler(Vector3(chest_offset.y, chest_offset.z, 0)))
+	var head_offset := (head_spring.value - chest_spring.value) * gain
+	skeleton.set_bone_pose_position(head, skeleton.get_bone_pose_position(head) + Vector3.UP * head_offset.x * bounce_tuning.head_vertical_follow)
+	_rotate_global(head, Quaternion.from_euler(Vector3(head_offset.y, head_offset.z, 0)))
+	var follow: float = gain * bounce_tuning.weapon_follow_strength * lerpf(1.0, bounce_tuning.aim_stabilization, aim_weight) * bounce_tuning.weapon_mass[weapon_type]
+	var relative := (weapon_spring.value - chest_spring.value) * follow
+	relative.x = clampf(relative.x, -bounce_tuning.max_weapon_shift, bounce_tuning.max_weapon_shift)
+	relative.y = clampf(relative.y, -bounce_tuning.max_weapon_angle, bounce_tuning.max_weapon_angle)
+	relative.z = clampf(relative.z, -bounce_tuning.max_weapon_angle, bounce_tuning.max_weapon_angle)
+	var pivot := skeleton.get_bone_global_pose(chest).origin
+	var rotation := Basis(Quaternion.from_euler(Vector3(relative.y, relative.z, 0)))
+	# One rigid transform for the two hands and socket; final contact solver remains.
+	for bone in upper:
+		var pose := skeleton.get_bone_global_pose(bone)
+		pose.origin = pivot + rotation * (pose.origin - pivot) + Vector3.UP * relative.x
+		pose.basis = rotation * pose.basis
+		var local := skeleton.get_bone_global_pose(skeleton.get_bone_parent(bone)).affine_inverse() * pose
+		skeleton.set_bone_pose_position(bone, local.origin)
+		skeleton.set_bone_pose_rotation(bone, local.basis.get_rotation_quaternion().normalized())
 
 func debug_text() -> String:
 	return "%s | %s | %s | target %s | firing %s | %.2f m/s" % [WEAPON_NAMES[weapon_type], current_state, "Aim" if aim_weight > 0.5 else "LowReady", has_target, is_firing, movement_speed]

@@ -144,7 +144,7 @@ func _run() -> void:
 	await tick(92)
 	check(first.is_dead and combat.kill_count == 1, "M4A1 automatic shared cadence kills once")
 	pistol.enabled = false
-	await tick(40)
+	await tick(70)
 	check(not is_instance_valid(first) and combat.pickups.get_child_count() == 1, "Automatic death/drop retained")
 	await tick(45)
 	check(effects(SMOKE).is_empty() and effects(NUMBER).is_empty(), "Automatic-fire transient cleanup")
@@ -196,7 +196,7 @@ func _run() -> void:
 	first.take_damage(40)
 	check(first.is_dead and first.visual.flash_remaining > 0, "Final hit flash precedes collapse")
 	check(not first.take_damage(10), "Dead actor rejects duplicate feedback")
-	await tick(39)
+	await tick(67)
 	check(not is_instance_valid(first) and effects(SMOKE).size() == 1, "Smoke begins when existing death completes")
 	if not effects(SMOKE).is_empty():
 		var smoke = effects(SMOKE)[0]
@@ -210,7 +210,7 @@ func _run() -> void:
 	# Many actors share geometry/materials, but retain independent state.
 	await fresh()
 	for enemy in combat.living_zombies.duplicate(): enemy.take_damage(60)
-	await tick(90)
+	await tick(120)
 	var pickup_count: int = combat.pickups.get_child_count()
 	var baseline_start := Time.get_ticks_usec()
 	await tick(60)
@@ -224,7 +224,7 @@ func _run() -> void:
 		enemy.take_damage(20)
 		enemy.take_damage(40)
 	check(effects(NUMBER).size() == 48 and combat.living_zombies.is_empty(), "24 simultaneous deaths emit exactly 48 accepted-hit numbers")
-	await tick(40)
+	await tick(70)
 	check(effects(SMOKE).size() == 24, "One smoke burst per death")
 	await capture("many_deaths")
 	var peak_draws := int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))

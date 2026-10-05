@@ -62,7 +62,7 @@ offset_bottom = 560.0
 theme_override_styles/panel = SubResource("Panel")
 
 [node name="Stack" type="VBoxContainer" parent="HUD/Panel"]
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="Title" type="Label" parent="HUD/Panel/Stack"]
 theme_override_font_sizes/font_size = 22
@@ -72,8 +72,8 @@ text = "PLAYER POSE LAB"
 theme_override_font_sizes/font_size = 16
 
 [node name="Controls" type="VBoxContainer" parent="HUD/Panel/Stack"]
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
 [node name="Help" type="Label" parent="HUD/Panel/Stack"]
 theme_override_font_sizes/font_size = 14
-text = "RMB drag: orbit  |  Wheel: zoom\nSpace: freeze / resume  |  .: step\nN / H / Q: 1x / 0.5x / 0.25x\nC: reset camera  |  V: next view\nI / W / R: Idle / Walk / Run\nL / A: LowReady / Aim  |  F: recoil\n1 / 2 / 3: Pistol / M4A1 / Shotgun"
+text = "RMB orbit  |  Wheel zoom\nSpace freeze  |  . step  |  N/H/Q speed\nB bounce  |  T hit  |  C reset  |  V view\nI/W/R states  |  L/A stance  |  F recoil"
