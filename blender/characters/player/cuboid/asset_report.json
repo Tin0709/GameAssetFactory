@@ -1,0 +1,48 @@
+{
+  "mesh": "Player_Cuboid_Base",
+  "rig": "Player_Cuboid_Rig",
+  "triangles": 276,
+  "vertices": 184,
+  "cuboids": 23,
+  "texture_resolution": [
+    64,
+    64
+  ],
+  "materials": 1,
+  "bones": 18,
+  "height_m": 1.82,
+  "animations": 0,
+  "rigid_weighting": true,
+  "hierarchy": {
+    "Root": null,
+    "Hips": "Root",
+    "Spine": "Hips",
+    "Chest": "Spine",
+    "Neck": "Chest",
+    "Head": "Neck",
+    "UpperArm.L": "Chest",
+    "Forearm.L": "UpperArm.L",
+    "Hand.L": "Forearm.L",
+    "UpperArm.R": "Chest",
+    "Forearm.R": "UpperArm.R",
+    "Hand.R": "Forearm.R",
+    "Thigh.L": "Hips",
+    "Shin.L": "Thigh.L",
+    "Foot.L": "Shin.L",
+    "Thigh.R": "Hips",
+    "Shin.R": "Thigh.R",
+    "Foot.R": "Shin.R"
+  },
+  "validation": {
+    "saved_file_reopened": true,
+    "one_mesh_one_material": true,
+    "atlas_packed": true,
+    "uvs_in_bounds": true,
+    "single_rigid_weight_per_vertex": true,
+    "flat_faces": true,
+    "temporary_pose_checks": 2,
+    "maximum_edge_length_change_m": 1.5407326528493748e-07,
+    "all_poses_reset": true,
+    "no_animation_data": true
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "triangles": 276,
+  "vertices": 184,
+  "materials": 1,
+  "bones": 18,
+  "texture": [
+    64,
+    64
+  ],
+  "height_m": 2.05,
+  "max_rigid_pose_edge_error_m": 2.693273777887306e-07,
+  "animations": 0,
+  "proportions": {
+    "head_size": [
+      0.44,
+      0.42
+    ],
+    "head_height_fraction": [
+      0.24175824175824176,
+      0.20487804878048782
+    ],
+    "torso_width": [
+      0.47,
+      0.37
+    ],
+    "torso_depth": [
+      0.29,
+      0.205
+    ],
+    "torso_height": [
+      0.48,
+      0.598
+    ],
+    "shoulder_outer_width": [
+      0.92,
+      0.718
+    ],
+    "arm_width": [
+      0.212,
+      0.166
+    ],
+    "arm_length": [
+      0.709,
+      0.791
+    ],
+    "leg_width": [
+      0.209,
+      0.176
+    ],
+    "leg_top_height": [
+      0.746,
+      0.918
+    ],
+    "boot_width": [
+      0.233,
+      0.176
+    ],
+    "boot_depth": [
+      0.378,
+      0.25
+    ]
+  },
+  "leg_profile": "constant 0.176m width; 0.205m depth from thigh through boot shaft, no knee or calf bulge",
+  "flat_torso": "upper and lower front faces share Y=-0.1025m; no projecting pockets or belly",
+  "validation": {
+    "final_revision_pose_checks": 2,
+    "saved_file_reopened": true,
+    "pose_reset": true,
+    "atlas_packed": true,
+    "preview_comparison_same_scale": true
+  }
+}
