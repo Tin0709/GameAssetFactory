@@ -1,0 +1,14 @@
+{
+  "mesh_attributes_identical": {
+    "POSITION": true,
+    "NORMAL": true,
+    "TEXCOORD_0": true,
+    "JOINTS_0": true,
+    "WEIGHTS_0": true
+  },
+  "clips": {
+    "Idle": "identical channels, times, interpolation and values",
+    "Run": "identical channels, times, interpolation and values"
+  },
+  "source_glb_unchanged_sha256": "60784ef8d3452a35a62995f46e66dad73bd9647dc241efb4f3d4b48f0abd9a61"
+}

@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "clips": [
+    "HolsterLongGun",
+    "Idle",
+    "Run"
+  ],
+  "duration": 0.7083333134651184,
+  "bones": [
+    "Root",
+    "Hips",
+    "Leg.L",
+    "Leg.R",
+    "Spine",
+    "Chest",
+    "Arm.L",
+    "Arm.R",
+    "Neck",
+    "Head",
+    "WeaponCarrier"
+  ],
+  "holster_bones": [
+    "Arm.L",
+    "Arm.R",
+    "Chest",
+    "Head",
+    "Neck",
+    "Spine",
+    "WeaponCarrier"
+  ],
+  "holster_lower_tracks": 0,
+  "holster_scale_tracks": 0,
+  "source_max_position_error_m": 3.2394514580480936e-07,
+  "source_max_rotation_error_deg": 0.04752037410691561,
+  "comparison_samples": 69,
+  "idle_run_preserved_from_v1": true,
+  "mesh_nodes": [
+    "Player_Cuboid_Base"
+  ],
+  "node_names": [
+    "Leg.L",
+    "Leg.R",
+    "Arm.L",
+    "Arm.R",
+    "Head",
+    "Neck",
+    "WeaponCarrier",
+    "Chest",
+    "Spine",
+    "Hips",
+    "Root",
+    "Player_Cuboid_Base",
+    "Player_Cuboid_Rig"
+  ]
+}

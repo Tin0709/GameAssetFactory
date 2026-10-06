@@ -1,0 +1,17 @@
+{
+	"checks": 58,
+	"clock_error_seconds": 0.0000000000000000520417042793042,
+	"failures": [],
+	"phases": [
+		0,
+		25,
+		50,
+		75
+	],
+	"run_speed": 6.25,
+	"runtime_scale": 1.6,
+	"weapons": [
+		"M4A1",
+		"Shotgun"
+	]
+}

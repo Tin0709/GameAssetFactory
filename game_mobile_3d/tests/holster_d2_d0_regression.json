@@ -1,0 +1,23 @@
+{
+	"categories": [
+		"PISTOL",
+		"LONG_GUN",
+		"LONG_GUN"
+	],
+	"checks": 112,
+	"clock_error_seconds": 0.0000000000000000520417042793042,
+	"draw_radii_m": [
+		8,
+		10,
+		6
+	],
+	"failures": [],
+	"grace_seconds": 1.5,
+	"placeholder": true,
+	"rendered": false,
+	"retain_radii_m": [
+		9.6,
+		12,
+		7.2
+	]
+}

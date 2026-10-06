@@ -44,6 +44,7 @@ func run() -> void:
 	level.get_node("SpawnDirector").enabled=false;level.get_node("Progression").enabled=false
 	root.add_child(level);current_scene=level;level.select_test_weapon(1)
 	player=level.player;v=player.visual;b=player.get_node("WeaponBehavior");gun=player.get_node("Pistol")
+	v.authored_long_gun_holster=false # Explicit D0 foundation regression fixture.
 	gun.cooldown=1000.0;level.combat.audio.minimum_event_interval=1000000.0
 	enemy=preload("res://scenes/characters/CuboidZombie.tscn").instantiate()
 	enemy.max_hp=100000;level.get_node("Actors").add_child(enemy)
@@ -165,7 +166,7 @@ func run() -> void:
 	var scans: int=gun.target_scan_count
 	for i in 10:gun.nearest_target();gun.awareness_target(true)
 	check(gun.target_scan_count-scans<=1,"Awareness/movement/fire share cached registry query")
-	check(v.skeleton.get_bone_count()==11 and v.find_children("*","Skeleton3D",true,false).size()==1,"No bones or skeletons duplicated")
+	check(v.skeleton.get_bone_count()==12 and v.find_children("*","Skeleton3D",true,false).size()==1,"Required Carrier plus legacy socket; no skeletons duplicated")
 	check(v.run_animation_speed_scale==1.6 and player.run_speed==6.25 and player.walk_speed==4.25,"Approved cadence/speeds preserved")
 	var report={"checks":checks,"failures":failures,"clock_error_seconds":clock_error,"rendered":rendered,"placeholder":true,"categories":["PISTOL","LONG_GUN","LONG_GUN"],"draw_radii_m":[8,10,6],"retain_radii_m":[9.6,12,7.2],"grace_seconds":b.holster_grace_seconds}
 	var file:=FileAccess.open("res://tests/weapon_behavior_d0_validation.json",FileAccess.WRITE)

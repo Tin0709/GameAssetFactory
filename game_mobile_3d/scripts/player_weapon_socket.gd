@@ -24,6 +24,57 @@ var hand_transforms: Array[Transform3D] = []
 var back_socket: BoneAttachment3D
 var hip_socket: BoneAttachment3D
 var current_attachment: StringName = &"hand"
+var carrier_socket: BoneAttachment3D
+var back_mount: Node3D
+var transport_entry := Transform3D.IDENTITY
+var transport_release := Transform3D.IDENTITY
+var transport_jumps: Array[Dictionary] = []
+## Broader Shotgun receiver/stock needs additional clearance along transport
+## +Y (barrel-forward) and +Z (weapon-up). M4 mount and shared motion unchanged.
+const SHOTGUN_TRANSPORT_OFFSET = Vector3(0, 0.125, 0.025)
+
+func prepare_transport_socket(endpoint: Transform3D) -> void:
+	prepare_stow_sockets()
+	carrier_socket = BoneAttachment3D.new(); carrier_socket.name = "WeaponCarrierSocket"
+	carrier_socket.bone_name = "WeaponCarrier"; get_parent().add_child(carrier_socket)
+	back_mount = Node3D.new(); back_mount.name = "BackWeaponMount"
+	back_socket.add_child(back_mount); back_mount.transform = endpoint
+
+func sync_transport_sockets() -> void:
+	# Native attachment refresh, only while the authored transition is active.
+	carrier_socket.on_skeleton_update()
+	back_socket.on_skeleton_update()
+
+func transport_canonical() -> Transform3D:
+	var basis := Basis(Vector3.RIGHT, PI / 2.0).scaled(Vector3.ONE * HOLD_SCALES[equipped])
+	# Grip_Point may be offset in the original standalone asset.
+	var grip_local := hand_transforms[equipped].affine_inverse() * grips[equipped]
+	var clearance := SHOTGUN_TRANSPORT_OFFSET if equipped == 2 else Vector3.ZERO
+	return Transform3D(basis, clearance - basis * grip_local)
+
+func _transport_reparent(destination: Node3D, label: String) -> void:
+	var instance := instances[equipped]; var before := instance.global_transform
+	instance.reparent(destination, true)
+	transport_jumps.append({"handoff": label, "position_m": before.origin.distance_to(instance.global_position), "rotation_rad": before.basis.get_rotation_quaternion().angle_to(instance.global_basis.get_rotation_quaternion()), "instance": instance.get_instance_id()})
+
+func begin_transport() -> void:
+	_transport_reparent(carrier_socket, "hand_to_carrier")
+	transport_entry = instances[equipped].transform
+	current_attachment = &"carrier"
+
+func end_transport(keep_global: bool) -> void:
+	if back_mount == null: return
+	if keep_global: _transport_reparent(back_mount, "carrier_to_back")
+	else: instances[equipped].reparent(back_mount, false)
+	transport_release = instances[equipped].transform
+	current_attachment = &"back"
+
+func update_transport(time: float, release_time: float, duration: float, blend_in: float) -> void:
+	var canonical := transport_canonical()
+	if current_attachment == &"carrier":
+		instances[equipped].transform = transport_entry.interpolate_with(canonical, smoothstep(0.0, blend_in, time))
+	elif current_attachment == &"back":
+		instances[equipped].transform = transport_release.interpolate_with(canonical, smoothstep(release_time, duration, time))
 
 func _ready() -> void:
 	bone_name = "WeaponSocket"
@@ -72,6 +123,11 @@ func prepare_stow_sockets() -> void:
 
 func attach_equipped(attachment: StringName) -> void:
 	prepare_stow_sockets()
+	if attachment == &"back" and back_mount != null:
+		instances[equipped].reparent(back_mount, false)
+		instances[equipped].transform = transport_canonical()
+		current_attachment = attachment
+		return
 	var destination: Node3D = self if attachment == &"hand" else (back_socket if attachment == &"back" else hip_socket)
 	var instance := instances[equipped]
 	if instance.get_parent() != destination: instance.reparent(destination, false)
