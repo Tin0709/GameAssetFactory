@@ -33,23 +33,23 @@ func run() -> void:
 	for weapon in [1,2]:
 		player.equip_test_weapon(weapon);gun.cooldown=1000
 		for phase in [0.0,0.25,0.5,0.75]:
-			near=false;Input.action_press("move_right");Input.action_press("sprint")
+			# D3: READY is prepared before sprint; sprint itself now requests the
+			# same D2 authored transport instead of a manual mid-sprint restart.
+			near=true
 			b.weapon_attach_to_hand();b._set_state(b.State.READY);b.grace_elapsed=0
-			await ticks(30)
-			check(player.current_speed>6.0,"Real controller runs at unchanged 6.25m/s")
+			await ticks(10)
 			v.authored_run_time=phase*v.run.clip.length
-			var start: float=v.authored_run_time
-			b._begin(b.State.HOLSTERING)
-			check(v.authored_run_time==start,"Reactive start never resets Run phase")
+			Input.action_press("move_right");Input.action_press("sprint")
 			monitoring=true
 			await ticks(15)
+			check(player.current_speed>6.0,"Real controller runs at unchanged 6.25m/s")
 			check(b.state==b.State.HOLSTERING and v.socket.current_attachment==&"carrier","Real-process trajectory active")
 			Input.action_release("move_right");Input.action_press("move_forward")
 			await ticks(35)
 			check(b.state==b.State.STOWED and v.socket.current_attachment==&"back","Real-process completion releases carrier")
 			check(player.current_speed>6.0 and not gun.can_fire(),"Direction change continues running during transition")
 			check(v.skeleton.get_bone_global_pose(v.skeleton.find_bone("Root")).origin.length()<0.000001,"No visual root motion")
-			monitoring=false;Input.action_release("move_forward");Input.action_release("sprint")
+			monitoring=false;near=false;Input.action_release("move_forward");Input.action_release("sprint")
 			await ticks(25)
 	# Natural Idle grace timer, not forced start.
 	player.equip_test_weapon(1);gun.cooldown=1000;near=true

@@ -26,6 +26,9 @@ var is_dead: bool = false
 var hurt_remaining: float = 0.0
 var combat: Node
 var current_speed: float = 0.0
+## Published from the same input decision that chooses run_speed, not from
+## velocity thresholds. Weapon behavior consumes this after controller physics.
+var fast_sprinting: bool = false
 const FEEDBACK = preload("res://scripts/character_damage_feedback.gd")
 var damage_feedback: Node3D
 
@@ -79,13 +82,15 @@ func collect_exp(value: int) -> void:
 
 func _physics_process(delta: float) -> void:
 	hurt_remaining = maxf(0.0, hurt_remaining - delta)
-	if is_dead: return
+	if is_dead:
+		fast_sprinting = false
+		return
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction := Vector3(input.x, 0.0, input.y)
-	var running := Input.is_action_pressed("sprint") and not input.is_zero_approx()
+	fast_sprinting = Input.is_action_pressed("sprint") and not input.is_zero_approx()
 	var target: Node3D = $Pistol.nearest_target() if $Pistol.enabled else null
-	var speed := run_speed if running else walk_speed
-	if target != null and not running: speed = minf(speed, combat_move_speed)
+	var speed := run_speed if fast_sprinting else walk_speed
+	if target != null and not fast_sprinting: speed = minf(speed, combat_move_speed)
 	var horizontal := Vector2(velocity.x, velocity.z)
 	var desired := Vector2(direction.x, direction.z) * speed
 	horizontal = horizontal.move_toward(desired, (deceleration if direction.is_zero_approx() else acceleration) * delta)

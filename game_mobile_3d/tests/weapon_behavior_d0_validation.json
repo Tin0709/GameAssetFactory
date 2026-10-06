@@ -14,7 +14,7 @@
 	"failures": [],
 	"grace_seconds": 1.5,
 	"placeholder": true,
-	"rendered": true,
+	"rendered": false,
 	"retain_radii_m": [
 		9.6,
 		12,

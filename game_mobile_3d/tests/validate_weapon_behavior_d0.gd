@@ -97,7 +97,7 @@ func run() -> void:
 	player.equip_test_weapon(1)
 	Input.action_press("move_backward");Input.action_press("sprint");await tick(25)
 	nearby=true;distance=3.0;await tick(40)
-	check(v.current_state==&"Run" and player.current_speed>6.2,"Run continues through Draw")
+	check(v.current_state==&"Run" and player.current_speed>6.2 and b.state==b.State.STOWED,"D3: Run continues while sprint suppresses Draw")
 	for name in ["Root","Hips","Leg.L","Leg.R"]:
 		var bone: int=v.skeleton.find_bone(name)
 		check(v.skeleton.get_bone_pose_position(bone).distance_to(v.run.position(bone,v.authored_run_time))<0.00001 and absf(v.skeleton.get_bone_pose_rotation(bone).dot(v.run.rotation(bone,v.authored_run_time)))>0.999999,"Run lower body unchanged %s"%name)
@@ -106,7 +106,7 @@ func run() -> void:
 		player.equip_test_weapon(weapon)
 		check(phase==v.authored_run_time,"Switch never resets locomotion")
 		Input.action_release("move_backward");Input.action_press("move_right");await tick(20)
-		check(v.current_state==&"Run" and b.state==b.State.READY,"Moving switch/turn stays READY")
+		check(v.current_state==&"Run" and b.state==b.State.STOWED,"D3: moving switch/turn stays stowed during Sprint")
 		for i in 3:
 			check(v.socket.instances[i].get_instance_id()==ids[i],"Same weapon instance retained")
 			if i!=weapon:check(v.socket.instances[i].get_parent()==v.socket and not v.socket.instances[i].visible,"Inactive weapon safely returned/hidden")

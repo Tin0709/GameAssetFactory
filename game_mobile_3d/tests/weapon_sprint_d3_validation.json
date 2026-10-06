@@ -1,0 +1,15 @@
+{
+	"cases": {
+		"0": "A through I, K/L/M passed",
+		"1": "A through I, K/L/M passed",
+		"2": "A through I, K/L/M passed",
+		"J": "switching during/stowed sprint passed"
+	},
+	"checks": 1127,
+	"clock_error_seconds": 0.0000000000000000520417042793042,
+	"failures": [],
+	"rendered": false,
+	"root_travel": 0.0,
+	"shots_during_sprint": 0,
+	"sprint_source": "controller sprint input AND nonzero movement vector"
+}
