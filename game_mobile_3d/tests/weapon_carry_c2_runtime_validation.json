@@ -10,7 +10,7 @@
 			"WeaponSocket",
 			"Chest"
 		],
-		"inherited_arm_motion_degrees": 7.12133324046054,
+		"inherited_arm_motion_degrees": 8.02673415221414,
 		"root_translation_max_m": 0.0,
 		"run_scale": 1.6,
 		"run_speed": 6.25,
@@ -22,5 +22,5 @@
 			"[X: (1.14, 0.0, 0.0), Y: (0.0, -0.0, 1.14), Z: (0.0, -1.14, -0.0), O: (0.21, 0.34, 0.035)]"
 		]
 	},
-	"rendered": true
+	"rendered": false
 }

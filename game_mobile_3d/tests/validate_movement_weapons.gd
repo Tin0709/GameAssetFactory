@@ -49,6 +49,7 @@ func run() -> void:
 	level.get_node("SpawnDirector").enabled = false
 	level.get_node("Progression").enabled = false
 	root.add_child(level)
+	level.player.get_node("WeaponBehavior").enabled=false # Historical pose/gameplay baseline, without D0 behavior.
 	current_scene = level
 	check(paused and level.weapon_selector.visible, "Startup selection pauses gameplay")
 	level.select_test_weapon(0)
@@ -298,3 +299,4 @@ func stress() -> void:
 	gun.enabled = false
 	clear_enemies()
 	await tick(90)
+

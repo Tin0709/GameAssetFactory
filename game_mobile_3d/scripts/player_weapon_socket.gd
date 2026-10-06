@@ -1,4 +1,5 @@
 extends BoneAttachment3D
+const Profiles = preload("res://scripts/weapon_fire_profiles.gd")
 ## Runtime hold tuning only; authored meshes and marker locations stay intact.
 const WEAPONS = [preload("res://assets/weapons/pistol_v4.glb"), preload("res://assets/weapons/m4a1_v4.glb"), preload("res://assets/weapons/shotgun_v4.glb")]
 const HOLD_SCALES = [1.20, 1.12, 1.14]
@@ -19,6 +20,10 @@ var muzzles: Array[Node3D] = []
 var grips: Array[Vector3] = []
 var supports: Array[Vector3] = []
 var equipped: int = 0
+var hand_transforms: Array[Transform3D] = []
+var back_socket: BoneAttachment3D
+var hip_socket: BoneAttachment3D
+var current_attachment: StringName = &"hand"
 
 func _ready() -> void:
 	bone_name = "WeaponSocket"
@@ -43,12 +48,43 @@ func _ready() -> void:
 				var material := mesh.mesh.surface_get_material(surface) as BaseMaterial3D
 				if material: material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 		instances.append(instance)
+		hand_transforms.append(instance.transform)
 		muzzles.append(instance.find_child("Muzzle_Point", true, false) as Node3D)
 	equip(0)
 
 func equip(index: int) -> void:
+	# Return inactive instances to the original parent. Never duplicate weapons.
+	for i in instances.size():
+		if instances[i].get_parent() != self: instances[i].reparent(self, false)
+		instances[i].transform = hand_transforms[i]
+	current_attachment = &"hand"
 	equipped = clampi(index, 0, 2)
 	for i in instances.size(): instances[i].visible = i == equipped
+
+func prepare_stow_sockets() -> void:
+	if back_socket != null: return
+	back_socket = BoneAttachment3D.new(); back_socket.name = "BackWeaponSocket"
+	back_socket.bone_name = "Chest"; get_parent().add_child(back_socket)
+	back_socket.position = Vector3(0, 0.10, -0.30)
+	hip_socket = BoneAttachment3D.new(); hip_socket.name = "HipWeaponSocket_R"
+	hip_socket.bone_name = "Hips"; get_parent().add_child(hip_socket)
+	hip_socket.position = Vector3(-0.40, 0.18, -0.02)
+
+func attach_equipped(attachment: StringName) -> void:
+	prepare_stow_sockets()
+	var destination: Node3D = self if attachment == &"hand" else (back_socket if attachment == &"back" else hip_socket)
+	var instance := instances[equipped]
+	if instance.get_parent() != destination: instance.reparent(destination, false)
+	if attachment == &"hand": instance.transform = hand_transforms[equipped]
+	else:
+		# TEMPORARY preview placement; no procedural Draw/Holster trajectory.
+		instance.position = Vector3.ZERO
+		instance.rotation = Vector3(-PI/2, 0, deg_to_rad(-18.0) if attachment == &"back" else 0.0)
+		instance.scale = Vector3.ONE * HOLD_SCALES[equipped]
+	current_attachment = attachment
+
+func set_equipped_visible(shown: bool) -> void:
+	for i in instances.size(): instances[i].visible = shown and i == equipped
 
 func muzzle_position() -> Vector3:
 	return muzzles[equipped].global_position if muzzles[equipped] else global_position

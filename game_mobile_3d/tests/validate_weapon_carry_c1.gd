@@ -41,7 +41,9 @@ func unchanged_lower() -> void:
 func run() -> void:
 	rendered="--capture" in OS.get_cmdline_user_args()
 	level=LEVEL.instantiate();level.get_node("SpawnDirector").enabled=false;level.get_node("Progression").enabled=false
-	root.add_child(level);current_scene=level;level.select_test_weapon(0)
+	root.add_child(level)
+	level.player.get_node("WeaponBehavior").enabled=false # Historical pose/gameplay baseline, without D0 behavior.
+	current_scene=level;level.select_test_weapon(0)
 	player=level.player;v=player.visual;player.get_node("Pistol").enabled=false
 	v.long_gun_carry_v2=false # Preserve C1's generic-pose regression baseline.
 	level.combat.audio.minimum_event_interval=1000000.0
@@ -115,4 +117,6 @@ func run() -> void:
 	file.store_string(JSON.stringify({"checks":checks,"failures":failures,"metrics":metrics,"rendered":rendered},"\t"));file.close()
 	print("WEAPON_CARRY_C1="+JSON.stringify({"checks":checks,"failures":failures,"metrics":metrics,"rendered":rendered}))
 	quit(0 if failures.is_empty() else 1)
+
+
 

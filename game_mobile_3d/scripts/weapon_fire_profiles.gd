@@ -1,4 +1,9 @@
 extends RefCounted
+enum Category { PISTOL, LONG_GUN }
+const CATEGORIES = [Category.PISTOL, Category.LONG_GUN, Category.LONG_GUN]
+
+static func category(weapon: int) -> int:
+	return CATEGORIES[clampi(weapon, 0, CATEGORIES.size()-1)]
 ## Prototype shot data shared by gameplay and the isolated Pose Lab.
 const PROFILES = [
 	{"damage": 20, "interval": 0.50, "target_range": 8.0, "speed": 14.0, "range": 12.6, "pellets": 1, "spread": 0.0, "flash_scale": 0.75, "flash_duration": 0.04},

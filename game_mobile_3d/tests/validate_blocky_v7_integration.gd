@@ -38,6 +38,7 @@ func run() -> void:
 	level.get_node("SpawnDirector").enabled = false
 	level.get_node("Progression").enabled = false
 	root.add_child(level)
+	level.player.get_node("WeaponBehavior").enabled=false # Historical pose/gameplay baseline, without D0 behavior.
 	current_scene = level
 	level.select_test_weapon(0)
 	player = level.player
@@ -176,3 +177,4 @@ func run() -> void:
 	file.store_string(JSON.stringify(report, "\t"));file.close()
 	print("BLOCKY_V7_VALIDATION=" + JSON.stringify(report))
 	quit(0 if failures.is_empty() else 1)
+

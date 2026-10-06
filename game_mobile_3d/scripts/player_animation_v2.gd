@@ -20,6 +20,7 @@ var weapon_hold_weight: float = 0.0
 var weapon_hold_pose: RefCounted
 var long_gun_hold_pose: RefCounted
 var long_gun_weight: float = 0.0
+var weapon_behavior: Node
 var fire_enabled_before_unequip: bool = true
 var bounce_enabled := true
 var bounce_override := 1.0
@@ -144,6 +145,7 @@ func equip_weapon(index: int) -> void:
 	recoil_amount = 0.0
 	socket.equip(weapon_type)
 	_select_clips()
+	if weapon_behavior != null: weapon_behavior.on_weapon_switched()
 
 func set_weapon_equipped(equipped: bool) -> void:
 	if weapon_equipped == equipped: return
@@ -156,6 +158,7 @@ func set_weapon_equipped(equipped: bool) -> void:
 			fire_enabled_before_unequip = gun.enabled
 			gun.enabled = false
 		else: gun.enabled = fire_enabled_before_unequip
+	if is_instance_valid(socket): socket.set_equipped_visible(equipped)
 
 func update_motion(velocity_world: Vector3, target: Node3D, delta: float) -> void:
 	if frozen: return
@@ -181,9 +184,11 @@ func _process(delta: float) -> void:
 	super._process(delta)
 	if frozen or skeleton == null: return
 	if generic_weapon_carry:
-		weapon_hold_weight = move_toward(weapon_hold_weight, 1.0 if weapon_equipped else 0.0, delta / weapon_hold_blend_duration)
-		long_gun_weight = move_toward(long_gun_weight, 1.0 if long_gun_carry_v2 and weapon_equipped and weapon_type > 0 else 0.0, delta / weapon_hold_blend_duration)
-	aim_weight = move_toward(aim_weight, 1.0 if has_target else 0.0, delta / 0.13)
+		var carry: bool = weapon_equipped if weapon_behavior == null else weapon_behavior.carry_requested()
+		weapon_hold_weight = move_toward(weapon_hold_weight, 1.0 if carry else 0.0, delta / weapon_hold_blend_duration)
+		long_gun_weight = move_toward(long_gun_weight, 1.0 if long_gun_carry_v2 and carry and Socket.Profiles.category(weapon_type) == Socket.Profiles.Category.LONG_GUN else 0.0, delta / weapon_hold_blend_duration)
+	var ready: bool = weapon_behavior == null or weapon_behavior.is_ready()
+	aim_weight = move_toward(aim_weight, 1.0 if has_target and ready else 0.0, delta / 0.13)
 	move_weight = move_toward(move_weight, clampf(movement_speed / 0.5, 0.0, 1.0) if movement_speed >= LOCOMOTION_DEAD_ZONE else 0.0, delta / 0.13)
 	var desired_lower := Quaternion.IDENTITY.slerp(Quaternion(Vector3.UP, lower_yaw), move_weight).normalized()
 	var lower_angle := lower_rotation.angle_to(desired_lower)
@@ -386,4 +391,6 @@ func _apply_springs() -> void:
 		skeleton.set_bone_pose_rotation(bone, local.basis.get_rotation_quaternion().normalized())
 
 func debug_text() -> String:
-	return "%s | %s | %s | target %s | firing %s | %.2f m/s" % [WEAPON_NAMES[weapon_type], current_state, "Aim" if aim_weight > 0.5 else "LowReady", has_target, is_firing, movement_speed]
+	var text := "%s | %s | %s | target %s | firing %s | %.2f m/s" % [WEAPON_NAMES[weapon_type], current_state, "Aim" if aim_weight > 0.5 else "LowReady", has_target, is_firing, movement_speed]
+	if weapon_behavior != null and weapon_behavior.debug_visible: text += "\n" + weapon_behavior.debug_text()
+	return text

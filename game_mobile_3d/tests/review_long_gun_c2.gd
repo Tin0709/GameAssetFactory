@@ -10,7 +10,9 @@ func image_capture(label: String) -> void:
 func run() -> void:
 	level=preload("res://scenes/CuboidGameplayTest.tscn").instantiate()
 	level.get_node("SpawnDirector").enabled=false;level.get_node("Progression").enabled=false
-	root.add_child(level);current_scene=level;level.select_test_weapon(1)
+	root.add_child(level)
+	level.player.get_node("WeaponBehavior").enabled=false # Historical pose/gameplay baseline, without D0 behavior.
+	current_scene=level;level.select_test_weapon(1)
 	var player=level.player
 	v=player.visual;player.get_node("Pistol").enabled=false
 	await tick(20)
@@ -39,3 +41,5 @@ func run() -> void:
 					camera.size=3.4;await image_capture("%d_%s_gameplay_close"%[weapon,state])
 			v.set_process(true)
 	quit()
+
+

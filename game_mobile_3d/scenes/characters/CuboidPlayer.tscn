@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/cuboid_player.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/player_blocky_v7_integration.gd" id="2_animation"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/auto_pistol.gd" id="4_pistol"]
 
 [ext_resource type="Script" path="res://scripts/animation_weapon_debug.gd" id="5_debug"]
+[ext_resource type="Script" path="res://scripts/weapon_behavior.gd" id="6_behavior"]
 
 [sub_resource type="CapsuleShape3D" id="BodyShape"]
 radius = 0.30
@@ -34,4 +35,7 @@ script = ExtResource("4_pistol")
 
 [node name="WeaponDebug" type="Node" parent="."]
 script = ExtResource("5_debug")
+
+[node name="WeaponBehavior" type="Node" parent="."]
+script = ExtResource("6_behavior")
 
