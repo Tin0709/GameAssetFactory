@@ -1919,5 +1919,47 @@
       ]
     ],
     "saved_nla_tracks_added": 0
+  },
+  "V1_sha256": "240acd44c051a87fc00254930acf1c22f0f36af755714721d001ed0f389a5149",
+  "lower_body_key_counts": {
+    "Root": 0,
+    "Hips": 0,
+    "Leg.L": 0,
+    "Leg.R": 0
+  },
+  "scale_key_count": 0,
+  "curve_count": 31,
+  "keyframe_count": 300,
+  "settle_overshoot_position_m": 0.014422102102862001,
+  "settle_overshoot_rotation_deg": 0.998570583572966,
+  "stowed_endpoint_matrix_max_error": 1.7881393432617188e-07,
+  "markers": [
+    [
+      "HOLSTER_BEGIN",
+      1
+    ],
+    [
+      "SUPPORT_HAND_RELEASE",
+      5
+    ],
+    [
+      "WEAPON_BACK_CONTACT",
+      15
+    ],
+    [
+      "HOLSTER_RELEASE",
+      16
+    ],
+    [
+      "HOLSTER_DONE",
+      18
+    ]
+  ],
+  "subframe_events": {
+    "HOLSTER_BEGIN": 1,
+    "SUPPORT_HAND_RELEASE": 5.3,
+    "WEAPON_BACK_CONTACT": 14.8,
+    "HOLSTER_RELEASE": 15.5,
+    "HOLSTER_DONE": 18
   }
 }
