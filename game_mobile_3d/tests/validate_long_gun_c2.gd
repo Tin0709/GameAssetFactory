@@ -17,39 +17,43 @@ func tick(n: int) -> void:
 func capture(label: String) -> void:
 	if not rendered:return
 	await process_frame;await RenderingServer.frame_post_draw
-	root.get_texture().get_image().save_png("res://tests/carry_c1_%s.png"%label)
+	root.get_texture().get_image().save_png("res://tests/carry_c2_runtime_%s.png"%label)
 	if label.ends_with("idle") or label.ends_with("run"):
 		var camera: Camera3D=level.get_node("Camera3D")
 		var old_size:=camera.size;camera.size=4.5
 		await process_frame;await RenderingServer.frame_post_draw
-		root.get_texture().get_image().save_png("res://tests/carry_c1_%s_close.png"%label)
+		root.get_texture().get_image().save_png("res://tests/carry_c2_runtime_%s_close.png"%label)
 		camera.size=old_size
 func release() -> void:
 	for a in ["move_left","move_right","move_forward","move_backward","sprint"]:Input.action_release(a)
 func unchanged_lower() -> void:
 	v.set_process(false)
 	var original: float=v.weapon_hold_weight
+	var original_category: float=v.long_gun_weight
+	v.long_gun_weight=0.0
 	v.weapon_hold_weight=0.0;v._evaluate(0.0)
 	var poses: Dictionary={}
-	for name in ["Root","Hips","Leg.L","Leg.R","Spine","Chest","Neck","Head"]:
+	for name in ["Root","Hips","Leg.L","Leg.R","Spine","Neck","Head"]:
 		var bone: int=v.skeleton.find_bone(name)
 		poses[bone]=[v.skeleton.get_bone_pose_position(bone),v.skeleton.get_bone_pose_rotation(bone)]
-	v.weapon_hold_weight=1.0;v._evaluate(0.0)
+	v.weapon_hold_weight=1.0;v.long_gun_weight=original_category;v._evaluate(0.0)
 	for bone in poses:
 		check(v.skeleton.get_bone_pose_position(bone).is_equal_approx(poses[bone][0]) and absf(v.skeleton.get_bone_pose_rotation(bone).dot(poses[bone][1]))>0.999999,"Hold filter preserves %s"%v.skeleton.get_bone_name(bone))
-	v.weapon_hold_weight=original;v._evaluate(0.0);v.set_process(true)
+	v.weapon_hold_weight=original;v.long_gun_weight=original_category;v._evaluate(0.0);v.set_process(true)
 func run() -> void:
 	rendered="--capture" in OS.get_cmdline_user_args()
 	level=LEVEL.instantiate();level.get_node("SpawnDirector").enabled=false;level.get_node("Progression").enabled=false
 	root.add_child(level);current_scene=level;level.select_test_weapon(0)
 	player=level.player;v=player.visual;player.get_node("Pistol").enabled=false
-	v.long_gun_carry_v2=false # Preserve C1's generic-pose regression baseline.
 	level.combat.audio.minimum_event_interval=1000000.0
 	await tick(20)
 	check(v.run_animation_speed_scale==1.6 and player.run_speed==6.25 and player.walk_speed==4.25,"Approved cadence and speeds unchanged")
 	check(v.animation_player.has_animation("WeaponHold") and v.skeleton.get_bone_count()==11,"One pose resource and one skeleton/socket")
 	var pose: Animation=v.animation_player.get_animation("WeaponHold")
 	for track in pose.get_track_count():check(String(pose.track_get_path(track).get_subname(0)) in ["Arm.L","Arm.R","WeaponSocket"],"Strict upper filter")
+	var long_pose: Animation=v.animation_player.get_animation("LongGunHold_V2")
+	for track in long_pose.get_track_count():
+		check(String(long_pose.track_get_path(track).get_subname(0)) in ["Arm.L","Arm.R","WeaponSocket","Chest"] and long_pose.track_get_type(track)!=Animation.TYPE_SCALE_3D,"Long-gun upper filter/no scale")
 	v.set_weapon_equipped(false);await tick(15)
 	check(v.weapon_hold_weight==0.0 and not v.socket.visible,"Unarmed Idle state")
 	await capture("unarmed_idle")
@@ -62,6 +66,9 @@ func run() -> void:
 		player.position=Vector3(0,0.02,0);player.equip_test_weapon(weapon)
 		await tick(20)
 		check(v.weapon_hold_weight==1.0 and v.socket.visible and v.socket.equipped==weapon,"Armed Idle %d"%weapon)
+		check(v.long_gun_weight==(0.0 if weapon==0 else 1.0),"Pistol excluded/long-gun selected %d"%weapon)
+		if weapon==0:
+			for bone in v.upper:check(absf(v.skeleton.get_bone_pose_rotation(bone).dot(v.weapon_hold_pose.rotation(bone,0.0)))>0.999999,"Pistol retains original generic pose")
 		unchanged_lower();await capture("weapon_%d_idle"%weapon)
 		player.position=Vector3(0,0.02,-3)
 		Input.action_press("move_backward");Input.action_press("sprint");await tick(25)
@@ -76,6 +83,26 @@ func run() -> void:
 		check(v.socket.muzzle_position().is_finite(),"Socket muzzle valid %d"%weapon)
 		release();await tick(25)
 		check(v.current_state==&"Idle", "Armed stop %d"%weapon)
+	player.equip_test_weapon(1);await tick(15)
+	player.position=Vector3(0,0.02,-3)
+	Input.action_press("move_backward");Input.action_press("move_right");Input.action_press("sprint");await tick(25)
+	check(v.current_state==&"Run" and absf(player.current_speed-6.25)<0.01,"M4A1 diagonal Run")
+	release();await tick(25)
+	# Compare the Chest delta to baseline at several phases: constant bias must
+	# preserve, rather than replace, its changing locomotion rotation.
+	v.set_process(false)
+	var saved_clock: float=v.authored_run_time
+	v.move_weight=1.0;v.run_weight=1.0
+	var max_bias_error:=0.0
+	for phase in [0.0,0.083333,0.166667,0.333333,0.5]:
+		v.authored_run_time=phase;v.long_gun_weight=0.0;v._evaluate(0.0)
+		var base: Quaternion=v.skeleton.get_bone_global_pose(v.chest).basis.get_rotation_quaternion()
+		v.long_gun_weight=1.0;v._evaluate(0.0)
+		var applied: Quaternion=v.skeleton.get_bone_global_pose(v.chest).basis.get_rotation_quaternion()
+		var expected: Quaternion=v.long_gun_hold_pose.rotation(v.chest,0.0)*base
+		max_bias_error=maxf(max_bias_error,1.0-absf(applied.dot(expected)))
+	check(max_bias_error<0.000001,"Chest bias retains source rhythm across Run poses")
+	v.authored_run_time=saved_clock;v.set_process(true);await tick(25)
 	for repeat in 3:
 		player.position=Vector3(0,0.02,-3)
 		Input.action_press("move_backward");Input.action_press("sprint");await tick(25)
@@ -108,11 +135,12 @@ func run() -> void:
 		check(player.current_speed>0.1 and player.current_speed<=3.0 and player.get_node("Pistol").shot_count>shots,"Unchanged moving fire gate/profile %d"%weapon)
 		await capture("weapon_%d_moving_fire"%weapon)
 		release();await tick(20)
-	metrics={"filtered_bones":["Arm.L","Arm.R","WeaponSocket"],"blend_seconds":v.weapon_hold_blend_duration,"run_scale":v.run_animation_speed_scale,"run_speed":player.run_speed,"runtime_skeletons":v.find_children("*","Skeleton3D",true,false).size(),"socket_path":str(v.socket.get_path()),"weapon_local_transforms":[]}
+	metrics={"filtered_bones":["Arm.L","Arm.R","WeaponSocket","Chest"],"blend_seconds":v.weapon_hold_blend_duration,"run_scale":v.run_animation_speed_scale,"run_speed":player.run_speed,"runtime_skeletons":v.find_children("*","Skeleton3D",true,false).size(),"socket_path":str(v.socket.get_path()),"weapon_local_transforms":[],"chest_bias_dot_error":max_bias_error}
 	metrics.merge({"inherited_arm_motion_degrees":rad_to_deg(inherited_arm_motion),"root_translation_max_m":stationary_root_error})
 	for instance in v.socket.instances:metrics.weapon_local_transforms.append(str(instance.transform))
-	var file:=FileAccess.open("res://tests/weapon_carry_c1_validation.json",FileAccess.WRITE)
+	var file:=FileAccess.open("res://tests/weapon_carry_c2_runtime_validation.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify({"checks":checks,"failures":failures,"metrics":metrics,"rendered":rendered},"\t"));file.close()
-	print("WEAPON_CARRY_C1="+JSON.stringify({"checks":checks,"failures":failures,"metrics":metrics,"rendered":rendered}))
+	print("LONG_GUN_C2="+JSON.stringify({"checks":checks,"failures":failures,"metrics":metrics,"rendered":rendered}))
 	quit(0 if failures.is_empty() else 1)
+
 

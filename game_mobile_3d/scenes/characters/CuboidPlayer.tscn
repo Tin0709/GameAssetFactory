@@ -25,6 +25,7 @@ script = ExtResource("2_animation")
 animation_prefix = "Player"
 authored_locomotion = true
 generic_weapon_carry = true
+long_gun_carry_v2 = true
 
 [node name="Model" parent="Visual" instance=ExtResource("3_model")]
 

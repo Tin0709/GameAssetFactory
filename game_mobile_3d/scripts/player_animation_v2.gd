@@ -13,10 +13,13 @@ var authored_run_time: float = 0.0
 ## original clip duration, Walk cadence and gameplay speed remain untouched.
 @export_range(0.5, 3.0, 0.01) var run_animation_speed_scale: float = 1.60
 @export var generic_weapon_carry: bool = false
+@export var long_gun_carry_v2: bool = false
 @export_range(0.10, 0.18, 0.01) var weapon_hold_blend_duration: float = 0.13
 var weapon_equipped: bool = true
 var weapon_hold_weight: float = 0.0
 var weapon_hold_pose: RefCounted
+var long_gun_hold_pose: RefCounted
+var long_gun_weight: float = 0.0
 var fire_enabled_before_unequip: bool = true
 var bounce_enabled := true
 var bounce_override := 1.0
@@ -114,6 +117,9 @@ func _ready() -> void:
 		var hold: Animation = load("res://assets/characters/WeaponHold.tres")
 		animation_player.get_animation_library("").add_animation("WeaponHold", hold)
 		weapon_hold_pose = Sampler.new(hold, skeleton)
+		var long_hold: Animation = load("res://assets/characters/LongGunHold_V2.tres")
+		animation_player.get_animation_library("").add_animation("LongGunHold_V2", long_hold)
+		long_gun_hold_pose = Sampler.new(long_hold, skeleton)
 	socket = Socket.new()
 	socket.name = "WeaponAttachment"
 	skeleton.add_child(socket)
@@ -176,6 +182,7 @@ func _process(delta: float) -> void:
 	if frozen or skeleton == null: return
 	if generic_weapon_carry:
 		weapon_hold_weight = move_toward(weapon_hold_weight, 1.0 if weapon_equipped else 0.0, delta / weapon_hold_blend_duration)
+		long_gun_weight = move_toward(long_gun_weight, 1.0 if long_gun_carry_v2 and weapon_equipped and weapon_type > 0 else 0.0, delta / weapon_hold_blend_duration)
 	aim_weight = move_toward(aim_weight, 1.0 if has_target else 0.0, delta / 0.13)
 	move_weight = move_toward(move_weight, clampf(movement_speed / 0.5, 0.0, 1.0) if movement_speed >= LOCOMOTION_DEAD_ZONE else 0.0, delta / 0.13)
 	var desired_lower := Quaternion.IDENTITY.slerp(Quaternion(Vector3.UP, lower_yaw), move_weight).normalized()
@@ -277,11 +284,16 @@ func _evaluate(_delta: float) -> void:
 			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i).lerp(authored_p, authored_weight))
 			skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(authored_q, authored_weight).normalized())
 	if generic_weapon_carry:
+		# Add a restrained model-space Chest bias, retaining all locomotion delta.
+		var chest_bias: Quaternion = Quaternion.IDENTITY.slerp(long_gun_hold_pose.rotation(chest, 0.0), long_gun_weight)
+		_rotate_global(chest, chest_bias)
 		# A filtered Animation pose layer in the existing sole writer. No IK or
 		# grip correction: arms/socket inherit Chest's authored locomotion rhythm.
 		for i in upper:
-			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i).lerp(weapon_hold_pose.position(i, 0.0), weapon_hold_weight))
-			skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(weapon_hold_pose.rotation(i, 0.0), weapon_hold_weight).normalized())
+			var p: Vector3 = weapon_hold_pose.position(i, 0.0).lerp(long_gun_hold_pose.position(i, 0.0), long_gun_weight)
+			var q: Quaternion = weapon_hold_pose.rotation(i, 0.0).slerp(long_gun_hold_pose.rotation(i, 0.0), long_gun_weight)
+			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i).lerp(p, weapon_hold_weight))
+			skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(q, weapon_hold_weight).normalized())
 
 func _hold_arm(bone: int, contact: Vector3, palm: Vector3) -> void:
 	var pose := skeleton.get_bone_global_pose(bone)
