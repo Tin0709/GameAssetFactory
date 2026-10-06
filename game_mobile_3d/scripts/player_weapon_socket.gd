@@ -56,6 +56,7 @@ func _transport_reparent(destination: Node3D, label: String) -> void:
 	var instance := instances[equipped]; var before := instance.global_transform
 	instance.reparent(destination, true)
 	transport_jumps.append({"handoff": label, "position_m": before.origin.distance_to(instance.global_position), "rotation_rad": before.basis.get_rotation_quaternion().angle_to(instance.global_basis.get_rotation_quaternion()), "instance": instance.get_instance_id()})
+	if transport_jumps.size()>32: transport_jumps.pop_front()
 
 func begin_transport() -> void:
 	_transport_reparent(carrier_socket, "hand_to_carrier")

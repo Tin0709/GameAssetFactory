@@ -78,6 +78,7 @@ func _evaluate(delta: float) -> void:
 		if holster_fired.has(event_name) or time + 0.000001 < holster_event_time(event_name): continue
 		holster_fired[event_name] = true
 		holster_event_log.append({"event": event_name, "time": time, "token": holster_token, "weapon": holster_weapon})
+		if holster_event_log.size()>64: holster_event_log.pop_front()
 		holster_event.emit(event_name, holster_token)
 		if event_name == &"HOLSTER_RELEASE":
 			weapon_behavior.weapon_release_carrier_to_back(holster_token)
