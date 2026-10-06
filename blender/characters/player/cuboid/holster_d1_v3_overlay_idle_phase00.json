@@ -1,0 +1,319 @@
+{
+  "source": "Player_Idle",
+  "speed_scale": 1.0,
+  "phase": 0,
+  "frames": 22,
+  "exit_blend_frames": 4,
+  "head_or_deep_chest_hits": [],
+  "samples": [
+    {
+      "holster_frame": 1,
+      "source_frame": 1.0,
+      "hips_location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 2,
+      "source_frame": 2.0,
+      "hips_location": [
+        0.00037389318458735943,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 3,
+      "source_frame": 3.0,
+      "hips_location": [
+        0.0007721941801719368,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 4,
+      "source_frame": 4.0,
+      "hips_location": [
+        0.0011704950593411922,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 5,
+      "source_frame": 5.0,
+      "hips_location": [
+        0.0015443882439285517,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 6,
+      "source_frame": 6.0,
+      "hips_location": [
+        0.0018694656901061535,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 7,
+      "source_frame": 7.0,
+      "hips_location": [
+        0.00212132022716105,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 8,
+      "source_frame": 8.0,
+      "hips_location": [
+        0.00233023171313107,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 9,
+      "source_frame": 9.0,
+      "hips_location": [
+        0.0025332209188491106,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 10,
+      "source_frame": 10.0,
+      "hips_location": [
+        0.002715990412980318,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 11,
+      "source_frame": 11.0,
+      "hips_location": [
+        0.002864241600036621,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 12,
+      "source_frame": 12.0,
+      "hips_location": [
+        0.002963677514344454,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 13,
+      "source_frame": 13.0,
+      "hips_location": [
+        0.003000000026077032,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 14,
+      "source_frame": 14.0,
+      "hips_location": [
+        0.002963677514344454,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 15,
+      "source_frame": 15.0,
+      "hips_location": [
+        0.002864241600036621,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 16,
+      "source_frame": 16.0,
+      "hips_location": [
+        0.002715990412980318,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 17,
+      "source_frame": 17.0,
+      "hips_location": [
+        0.0025332209188491106,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 18,
+      "source_frame": 18.0,
+      "hips_location": [
+        0.00233023171313107,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 19,
+      "source_frame": 19.0,
+      "hips_location": [
+        0.00212132022716105,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 20,
+      "source_frame": 20.0,
+      "hips_location": [
+        0.0018694659229367971,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 21,
+      "source_frame": 21.0,
+      "hips_location": [
+        0.0015443881275132298,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "holster_frame": 22,
+      "source_frame": 22.0,
+      "hips_location": [
+        0.0011704950593411922,
+        0.0,
+        0.0
+      ],
+      "root": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "no_NLA_added": true
+}
