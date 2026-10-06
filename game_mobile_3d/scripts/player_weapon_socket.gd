@@ -32,6 +32,18 @@ var transport_jumps: Array[Dictionary] = []
 ## Broader Shotgun receiver/stock needs additional clearance along transport
 ## +Y (barrel-forward) and +Z (weapon-up). M4 mount and shared motion unchanged.
 const SHOTGUN_TRANSPORT_OFFSET = Vector3(0, 0.125, 0.025)
+## Chest space: stock toward upper-right, barrel toward lower-left. Asset -Z
+## is barrel-forward; its broad face stays parallel to the back. Same socket
+## and authored transport, with only a category-specific final visual mount.
+const BACK_CARRY_ANGLE = 20.0
+const BACK_CARRY_ORIGINS = [Vector3.ZERO, Vector3(0.025, 0.110, -0.180), Vector3(0.005, 0.095, -0.177)]
+
+func back_canonical() -> Transform3D:
+	var angle := deg_to_rad(BACK_CARRY_ANGLE)
+	var stock_axis := Vector3(cos(angle), sin(angle), 0)
+	var weapon_up := Vector3(sin(angle), -cos(angle), 0)
+	var basis := Basis(weapon_up.cross(stock_axis), weapon_up, stock_axis).scaled(Vector3.ONE * HOLD_SCALES[equipped])
+	return back_mount.transform.affine_inverse() * Transform3D(basis, BACK_CARRY_ORIGINS[equipped])
 
 func prepare_transport_socket(endpoint: Transform3D) -> void:
 	prepare_stow_sockets()
@@ -73,9 +85,21 @@ func end_transport(keep_global: bool) -> void:
 func update_transport(time: float, release_time: float, duration: float, blend_in: float) -> void:
 	var canonical := transport_canonical()
 	if current_attachment == &"carrier":
-		instances[equipped].transform = transport_entry.interpolate_with(canonical, smoothstep(0.0, blend_in, time))
+		var authored := transport_entry.interpolate_with(canonical, smoothstep(0.0, blend_in, time))
+		# Settle the visual only after the early shoulder transport. The target
+		# follows Chest; interpolation runs through release, keeping the approved
+		# event time and global-preserving reparent. No authored bone is changed.
+		var target := carrier_socket.global_transform.affine_inverse() * back_mount.global_transform * back_canonical()
+		var settling := smoothstep(release_time - 0.30, duration, time)
+		var pose := authored.interpolate_with(target, settling)
+		# Stock sweeps beside the head while rotating. Temporary back clearance
+		# vanishes at both ends; the bulkier Shotgun uses the larger allowance.
+		var clearance := 0.085 if equipped == 2 else 0.060
+		var sweep_clearance := Vector3(-0.035 if equipped == 1 else 0.0, 0, -clearance) * sin(PI * settling)
+		pose.origin += carrier_socket.global_basis.inverse() * back_socket.global_basis * sweep_clearance
+		instances[equipped].transform = pose
 	elif current_attachment == &"back":
-		instances[equipped].transform = transport_release.interpolate_with(canonical, smoothstep(release_time, duration, time))
+		instances[equipped].transform = transport_release.interpolate_with(back_canonical(), smoothstep(release_time, duration, time))
 
 func _ready() -> void:
 	bone_name = "WeaponSocket"
@@ -126,7 +150,7 @@ func attach_equipped(attachment: StringName) -> void:
 	prepare_stow_sockets()
 	if attachment == &"back" and back_mount != null:
 		instances[equipped].reparent(back_mount, false)
-		instances[equipped].transform = transport_canonical()
+		instances[equipped].transform = back_canonical()
 		current_attachment = attachment
 		return
 	var destination: Node3D = self if attachment == &"hand" else (back_socket if attachment == &"back" else hip_socket)

@@ -27,24 +27,7 @@
     },
     "2_0_0": {
       "samples": 43,
-      "head_hits": [
-        {
-          "time": 0.65,
-          "triangles": 4
-        },
-        {
-          "time": 0.666666666666667,
-          "triangles": 9
-        },
-        {
-          "time": 0.683333333333334,
-          "triangles": 9
-        },
-        {
-          "time": 0.700000000000001,
-          "triangles": 24
-        }
-      ],
+      "head_hits": [],
       "deep_chest_hits": [
         {
           "time": 0.0,
@@ -62,24 +45,7 @@
     },
     "2_0_25": {
       "samples": 43,
-      "head_hits": [
-        {
-          "time": 0.65,
-          "triangles": 9
-        },
-        {
-          "time": 0.666666666666667,
-          "triangles": 9
-        },
-        {
-          "time": 0.683333333333334,
-          "triangles": 9
-        },
-        {
-          "time": 0.700000000000001,
-          "triangles": 9
-        }
-      ],
+      "head_hits": [],
       "deep_chest_hits": [
         {
           "time": 0.0,
@@ -97,24 +63,7 @@
     },
     "2_0_5": {
       "samples": 43,
-      "head_hits": [
-        {
-          "time": 0.65,
-          "triangles": 9
-        },
-        {
-          "time": 0.666666666666667,
-          "triangles": 9
-        },
-        {
-          "time": 0.683333333333334,
-          "triangles": 18
-        },
-        {
-          "time": 0.700000000000001,
-          "triangles": 24
-        }
-      ],
+      "head_hits": [],
       "deep_chest_hits": [
         {
           "time": 0.0,
@@ -132,24 +81,7 @@
     },
     "2_0_75": {
       "samples": 43,
-      "head_hits": [
-        {
-          "time": 0.65,
-          "triangles": 9
-        },
-        {
-          "time": 0.666666666666667,
-          "triangles": 9
-        },
-        {
-          "time": 0.683333333333334,
-          "triangles": 9
-        },
-        {
-          "time": 0.700000000000001,
-          "triangles": 9
-        }
-      ],
+      "head_hits": [],
       "deep_chest_hits": [
         {
           "time": 0.0,

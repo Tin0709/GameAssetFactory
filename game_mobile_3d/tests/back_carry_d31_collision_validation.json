@@ -1,0 +1,55 @@
+{
+  "cases": {
+    "1_idle": {
+      "samples": 32,
+      "head_hits": 0,
+      "deep_chest_hits": 0,
+      "arm_hits": 0
+    },
+    "1_run": {
+      "samples": 32,
+      "head_hits": 0,
+      "deep_chest_hits": 0,
+      "arm_hits": 0
+    },
+    "1_sprint": {
+      "samples": 32,
+      "head_hits": 0,
+      "deep_chest_hits": 0,
+      "arm_hits": 2100
+    },
+    "1_holster": {
+      "samples": 42,
+      "head_hits": 0,
+      "deep_chest_hits": 0,
+      "arm_hits": 2644
+    },
+    "2_idle": {
+      "samples": 32,
+      "head_hits": 0,
+      "deep_chest_hits": 0,
+      "arm_hits": 0
+    },
+    "2_run": {
+      "samples": 32,
+      "head_hits": 0,
+      "deep_chest_hits": 0,
+      "arm_hits": 0
+    },
+    "2_sprint": {
+      "samples": 32,
+      "head_hits": 0,
+      "deep_chest_hits": 0,
+      "arm_hits": 1323
+    },
+    "2_holster": {
+      "samples": 42,
+      "head_hits": 0,
+      "deep_chest_hits": 46,
+      "arm_hits": 1845
+    }
+  },
+  "stowed_pass": true,
+  "transition_head_pass": true,
+  "known_entry_chest_overlap": "Shotgun initial 0-0.0333 seconds unchanged D2 limitation"
+}

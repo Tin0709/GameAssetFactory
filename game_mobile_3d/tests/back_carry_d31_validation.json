@@ -1,0 +1,33 @@
+{
+	"checks": 1808,
+	"diagonal_degrees": 20,
+	"failures": [],
+	"handoffs": [
+		{
+			"handoff": "hand_to_carrier",
+			"instance": 56153343744,
+			"position_m": 0.0000000149011611938477,
+			"rotation_rad": 0.0
+		},
+		{
+			"handoff": "carrier_to_back",
+			"instance": 56153343744,
+			"position_m": 0.000000256303280821157,
+			"rotation_rad": 0.0
+		},
+		{
+			"handoff": "hand_to_carrier",
+			"instance": 56254007046,
+			"position_m": 0.000000271614283064991,
+			"rotation_rad": 0.0
+		},
+		{
+			"handoff": "carrier_to_back",
+			"instance": 56254007046,
+			"position_m": 0.000000300517172036052,
+			"rotation_rad": 0.000690533954184502
+		}
+	],
+	"rendered": true,
+	"root_travel": 0.0
+}

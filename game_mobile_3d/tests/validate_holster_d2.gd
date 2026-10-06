@@ -129,7 +129,7 @@ func run() -> void:
 				if steps in [8,20,35,38]: await capture(label+"_step%d"%steps,steps>=35)
 			check(b.state==b.State.STOWED and v.socket.current_attachment==&"back", "DONE stows on stable back socket")
 			check(v.socket.instances[weapon].get_parent()==v.socket.back_mount, "Carrier released at back")
-			check(v.socket.instances[weapon].transform.is_equal_approx(v.socket.transport_canonical()), "Approved back endpoint reached")
+			check(v.socket.instances[weapon].transform.is_equal_approx(v.socket.back_canonical()), "D3.1 refined back visual endpoint reached")
 			check(v.holster_fired.size()==5, "All five centralized events once")
 			for name in ["Arm.L","Arm.R"]:
 				var bone: int = v.skeleton.find_bone(name)
