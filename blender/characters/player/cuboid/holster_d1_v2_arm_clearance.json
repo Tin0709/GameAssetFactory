@@ -1,0 +1,602 @@
+{
+  "samples": 137,
+  "proximal_arm_interior_hits": [
+    {
+      "frame": 1.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 32
+      }
+    },
+    {
+      "frame": 1.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 32
+      }
+    },
+    {
+      "frame": 1.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 32
+      }
+    },
+    {
+      "frame": 1.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 32
+      }
+    },
+    {
+      "frame": 1.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 32
+      }
+    },
+    {
+      "frame": 1.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 32
+      }
+    },
+    {
+      "frame": 1.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 32
+      }
+    },
+    {
+      "frame": 1.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 32
+      }
+    },
+    {
+      "frame": 2.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 30
+      }
+    },
+    {
+      "frame": 2.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 30
+      }
+    },
+    {
+      "frame": 2.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 27
+      }
+    },
+    {
+      "frame": 2.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 27
+      }
+    },
+    {
+      "frame": 2.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 29
+      }
+    },
+    {
+      "frame": 2.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 30
+      }
+    },
+    {
+      "frame": 2.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 28
+      }
+    },
+    {
+      "frame": 2.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 26
+      }
+    },
+    {
+      "frame": 3.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 24
+      }
+    },
+    {
+      "frame": 3.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 23
+      }
+    },
+    {
+      "frame": 3.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 23
+      }
+    },
+    {
+      "frame": 3.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 23
+      }
+    },
+    {
+      "frame": 3.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 26
+      }
+    },
+    {
+      "frame": 3.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 31
+      }
+    },
+    {
+      "frame": 3.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 28
+      }
+    },
+    {
+      "frame": 3.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 28
+      }
+    },
+    {
+      "frame": 4.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 32
+      }
+    },
+    {
+      "frame": 4.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 50
+      }
+    },
+    {
+      "frame": 4.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 47
+      }
+    },
+    {
+      "frame": 4.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 61
+      }
+    },
+    {
+      "frame": 4.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 64
+      }
+    },
+    {
+      "frame": 4.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 67
+      }
+    },
+    {
+      "frame": 4.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 66
+      }
+    },
+    {
+      "frame": 4.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 65
+      }
+    },
+    {
+      "frame": 5.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 62
+      }
+    },
+    {
+      "frame": 5.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 62
+      }
+    },
+    {
+      "frame": 5.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 62
+      }
+    },
+    {
+      "frame": 5.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 66
+      }
+    },
+    {
+      "frame": 5.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 58
+      }
+    },
+    {
+      "frame": 5.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 56
+      }
+    },
+    {
+      "frame": 5.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 56
+      }
+    },
+    {
+      "frame": 5.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 56
+      }
+    },
+    {
+      "frame": 6.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 56
+      }
+    },
+    {
+      "frame": 6.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 62
+      }
+    },
+    {
+      "frame": 6.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 59
+      }
+    },
+    {
+      "frame": 6.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 51
+      }
+    },
+    {
+      "frame": 6.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 54
+      }
+    },
+    {
+      "frame": 6.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 53
+      }
+    },
+    {
+      "frame": 6.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 49
+      }
+    },
+    {
+      "frame": 6.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 44
+      }
+    },
+    {
+      "frame": 7.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 47
+      }
+    },
+    {
+      "frame": 7.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 47
+      }
+    },
+    {
+      "frame": 7.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 47
+      }
+    },
+    {
+      "frame": 7.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 47
+      }
+    },
+    {
+      "frame": 7.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 47
+      }
+    },
+    {
+      "frame": 7.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 47
+      }
+    },
+    {
+      "frame": 7.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 42
+      }
+    },
+    {
+      "frame": 7.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 38
+      }
+    },
+    {
+      "frame": 8.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 30
+      }
+    },
+    {
+      "frame": 8.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 30
+      }
+    },
+    {
+      "frame": 8.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 8
+      }
+    },
+    {
+      "frame": 10.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 18
+      }
+    },
+    {
+      "frame": 10.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 88
+      }
+    },
+    {
+      "frame": 10.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 95
+      }
+    },
+    {
+      "frame": 11.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 111
+      }
+    },
+    {
+      "frame": 11.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 115
+      }
+    },
+    {
+      "frame": 11.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 110
+      }
+    },
+    {
+      "frame": 11.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 109
+      }
+    },
+    {
+      "frame": 11.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 94
+      }
+    },
+    {
+      "frame": 11.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 81
+      }
+    },
+    {
+      "frame": 11.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 77
+      }
+    },
+    {
+      "frame": 11.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 67
+      }
+    },
+    {
+      "frame": 12.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 57
+      }
+    },
+    {
+      "frame": 12.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 49
+      }
+    },
+    {
+      "frame": 12.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 65
+      }
+    },
+    {
+      "frame": 12.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 106
+      }
+    },
+    {
+      "frame": 12.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 105
+      }
+    },
+    {
+      "frame": 12.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 91
+      }
+    },
+    {
+      "frame": 12.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 110
+      }
+    },
+    {
+      "frame": 12.875,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 104
+      }
+    },
+    {
+      "frame": 13.0,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 91
+      }
+    },
+    {
+      "frame": 13.125,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 74
+      }
+    },
+    {
+      "frame": 13.25,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 35
+      }
+    },
+    {
+      "frame": 13.375,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 35
+      }
+    },
+    {
+      "frame": 13.5,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 35
+      }
+    },
+    {
+      "frame": 13.625,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 20
+      }
+    },
+    {
+      "frame": 13.75,
+      "triangles": {
+        "Arm.L": 0,
+        "Arm.R": 12
+      }
+    }
+  ],
+  "distal_contact_exclusion_m": 0.2,
+  "surface_margin_m": 0.025
+}

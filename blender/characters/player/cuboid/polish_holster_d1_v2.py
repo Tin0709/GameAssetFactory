@@ -71,6 +71,12 @@ for f,(point,pitch,roll) in weapon_keys.items():
  if f!=1 and q.dot(previous_q)<0:q.negate();p.rotation_quaternion=q
  previous_q=q.copy()
  p.keyframe_insert('location',frame=f,group='WeaponCarrier');p.keyframe_insert('rotation_quaternion',frame=f,group='WeaponCarrier')
+# Small shoulder-driven corrections to keep the guiding arm outside the rifle.
+for f,delta in [(10.6,(0,10,0)),(12.9,(20,10,20)),(14.3,(8,5,8))]:
+ scene.frame_set(int(f),subframe=f-int(f))
+ p=rig.pose.bones['Arm.R']
+ p.rotation_euler=[p.rotation_euler[i]+math.radians(delta[i]) for i in range(3)]
+ p.keyframe_insert('rotation_euler',frame=f,group='Arm.R')
 for c in curves(action):
  for k in c.keyframe_points:k.interpolation='BEZIER';k.handle_left_type='AUTO_CLAMPED';k.handle_right_type='AUTO_CLAMPED'
  c.update()
@@ -137,4 +143,3 @@ action['event_subframes_json']=json.dumps({'HOLSTER_BEGIN':1,'SUPPORT_HAND_RELEA
 # Save after visual review, not during construction.
 result={k:v for k,v in report.items() if k not in ['samples','ready_blender_matrix','stowed_blender_matrix']}
 print('D1_BLOCKING='+json.dumps({k:v for k,v in report.items() if k not in ['samples','ready_blender_matrix','stowed_blender_matrix']}))
-
