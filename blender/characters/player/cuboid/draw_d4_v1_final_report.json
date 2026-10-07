@@ -1,0 +1,99 @@
+{
+  "action": "Draw_LongGun_V1",
+  "frames": [
+    1,
+    14
+  ],
+  "fps": 24,
+  "duration_seconds": 0.5416666666666666,
+  "markers": {
+    "DRAW_BEGIN": 1,
+    "WEAPON_GRAB": 5,
+    "WEAPON_BACK_RELEASE": 5,
+    "SUPPORT_HAND_CATCH": 11,
+    "DRAW_READY": 14
+  },
+  "key_beats": [
+    1,
+    2,
+    4,
+    5,
+    7,
+    9,
+    11,
+    13,
+    14
+  ],
+  "right_arm_timing": {
+    "prepare": 2.4,
+    "reach": 4,
+    "grab": 5,
+    "pull": 7,
+    "sweep": 9,
+    "control": 11,
+    "settle": 13,
+    "ready": 14
+  },
+  "left_arm_timing": {
+    "neutral_until": 7.6,
+    "receive_begins": 9.3,
+    "catch": 11,
+    "ready": 14
+  },
+  "chest_degrees": {
+    "pitch": [
+      0,
+      3
+    ],
+    "yaw": [
+      -8,
+      2
+    ],
+    "roll": [
+      -0.3,
+      0.5
+    ]
+  },
+  "spine_degrees": {
+    "pitch": [
+      0,
+      0.4
+    ],
+    "yaw": [
+      -1,
+      0
+    ]
+  },
+  "neck_max_degrees": 2,
+  "head_max_degrees": 1,
+  "lower_keys": {
+    "Root": 0,
+    "Hips": 0,
+    "Leg.L": 0,
+    "Leg.R": 0
+  },
+  "scale_keys": 0,
+  "endpoint_matrix_max_errors": {
+    "Chest": 2.3283064365386963e-10,
+    "WeaponCarrier": 1.1920928955078125e-07,
+    "Arm.R": 1.1920928955078125e-07,
+    "Arm.L": 1.1920928955078125e-07
+  },
+  "previous_actions_unchanged": 14,
+  "geometry_weights_rest_hierarchy_unchanged": true,
+  "weapon_carrier_non_deforming": true,
+  "overlays": {
+    "Idle": "passed",
+    "Run_phases_percent": [
+      0,
+      25,
+      50,
+      75
+    ],
+    "Run_speed_scale": 1.6,
+    "lower_pose_max_error": 1.1920928955078125e-07
+  },
+  "clipping": "No head/deep chest weapon penetration in 630 sampled poses. Visible rigid-arm/gun overlap remains, especially acquisition and catch; grip fit is blocking, not final polish.",
+  "Godot_modified": false,
+  "preview_ready": true
+}
