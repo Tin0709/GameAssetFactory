@@ -7,6 +7,7 @@ META=json.loads((BASE/'turning_study_r3_review/preview_metadata.json').read_text
 GAITS={'Walk':{'period':16,'twist':3.0,'roll':1.8,'lateral':.006,'bank':4.0,'pitch_rock':1.0,'foreaft':.005},
        'Sprint':{'period':13,'twist':4.0,'roll':2.4,'lateral':.008,'bank':6.0,'pitch_rock':1.4,'foreaft':.008}}
 ARM_INSET=.032 # close the 28 mm shoulder gap introduced by the slim mesh
+LONG_GUN_CENTER_EXTRA=.015 # horizontal only; no change to height or face distance
 
 def source_curves(gait):
     action=bpy.data.actions[CURRENT['locomotion']['imported_actions'][gait+'_ReferenceStudy_V2']]
@@ -105,7 +106,8 @@ def author_upper(scene,rig,gait,kind,turning,base,target=None):
             p.location+=rest.to_3x3().inverted()@Vector((ARM_INSET if side=='R' else -ARM_INSET,0,0))
         if kind!='Unarmed':
             p=rig.pose.bones['WeaponCarrier'];rest=p.parent.bone.matrix_local.inverted()@p.bone.matrix_local
-            p.location+=rest.to_3x3().inverted()@Vector((ARM_INSET,0,0))
+            inward=ARM_INSET+(LONG_GUN_CENTER_EXTRA if kind in ['Rifle','Shotgun'] else 0)
+            p.location+=rest.to_3x3().inverted()@Vector((inward,0,0))
         p=rig.pose.bones['Spine']
         pitch=0 if base is not None else native_pose(table,'Spine',source_frame)[1].x
         rock=2*drive*drive-1 # two gentle fore/aft rocks per full left/right stride

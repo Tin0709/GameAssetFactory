@@ -337,5 +337,14 @@
     "each_arm_inward_m": 0.032,
     "gun_follows_right_hand": true,
     "mesh_width_unchanged": true
+  },
+  "long_gun_horizontal_only": {
+    "inward_m": 0.015,
+    "forward_change_m": 0,
+    "height_change_m": 0,
+    "weapons": [
+      "Rifle",
+      "Shotgun"
+    ]
   }
 }
