@@ -1,0 +1,20 @@
+{
+  "fps": 24.0,
+  "frames": 48,
+  "duration_s": 2.0,
+  "decoded_review_frames": [
+    1,
+    15,
+    20,
+    31,
+    43
+  ],
+  "views": [
+    "Front",
+    "Side",
+    "Gameplay",
+    "Rear",
+    "GameplayDistance",
+    "CloseGun"
+  ]
+}
