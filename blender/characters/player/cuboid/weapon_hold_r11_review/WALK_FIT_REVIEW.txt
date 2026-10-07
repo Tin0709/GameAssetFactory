@@ -1,0 +1,8 @@
+R11 WALK SWAY + LONG-GUN FIT — STUDY / HUMAN REVIEW PENDING
+Original Walk, no running. Torso +/-1.8 degrees and +/-6 mm lateral; arms and weapon inherit torso motion.
+Rifle and shotgun moved inward 1.5 cm. Shotgun enlarged 30% relative to previous approved size.
+Shotgun moved forward 11.5 cm to preserve face clearance after enlargement; sampled minimum clearance 3.95 cm.
+Straight slim arms and simple separated support remain unchanged.
+Pistol and rifle size unchanged. Original Actions and previous .blend review files preserved.
+Default scene: R11_SHOWCASE_MOVE; individual R11_WALK_PISTOL / RIFLE / SHOTGUN.
+Space starts/stops preview. No production migration.

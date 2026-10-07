@@ -1,13 +1,6 @@
 {
-  "passed": false,
-  "failures": [
-    "LongGunHold_SimpleR11 pose/clearance failed",
-    "LongGunMove_SimpleR11 pose/clearance failed",
-    "LongGunAimAround_SimpleR11 pose/clearance failed",
-    "ShotgunHold_SimpleR11 pose/clearance failed",
-    "ShotgunMove_SimpleR11 pose/clearance failed",
-    "ShotgunAimAround_SimpleR11 pose/clearance failed"
-  ],
+  "passed": true,
+  "failures": [],
   "actions": {
     "PistolHold_SimpleR11": {
       "straight_angle_max_deg": 0,
@@ -30,19 +23,19 @@
       ],
       "pistol_slide_above_hand_margin_m": 0.13089847564697266
     },
-    "PistolMove_SimpleR11": {
+    "PistolMove_WalkSwayR11": {
       "straight_angle_max_deg": 0,
       "elbow_gap_max_m": 0,
       "forward_error_max_deg": 0,
       "head_intersections": 0,
       "head_gap_lower_min_m": 0.38509693083471486,
       "head_gap_upper_min_m": 0.38509693083471486,
-      "left_cross_min_m": 0.20276376605033875,
+      "left_cross_min_m": 0.20276373624801636,
       "arm_separation_lower_min_m": 0.11178037624416681,
       "left_weapon_gap_lower_min_m": 0.11614192567041874,
-      "loop_error": 4.898587368981641e-19,
+      "loop_error": 5.878304429187663e-18,
       "samples": 129,
-      "attachment_alignment_max_m": 2.4027400458748785e-07,
+      "attachment_alignment_max_m": 4.777675730550706e-07,
       "anchor_role": "primary grip placement reference after requested resizing",
       "weapon_scale_xyz": [
         1.0625,
@@ -72,7 +65,7 @@
       ],
       "pistol_slide_above_hand_margin_m": 0.1308983564376831
     },
-    "LongGunHold_SimpleR11": {
+    "LongGunHold_SimpleR11_CenterFitR11": {
       "straight_angle_max_deg": 0,
       "elbow_gap_max_m": 0,
       "forward_error_max_deg": 0,
@@ -81,10 +74,10 @@
       "head_gap_upper_min_m": 0.054626909258353284,
       "left_cross_min_m": 0.20276376605033875,
       "arm_separation_lower_min_m": 0.11178037624416681,
-      "left_weapon_gap_lower_min_m": 0.11261123839791891,
+      "left_weapon_gap_lower_min_m": 0.1269184989112246,
       "loop_error": 4.898587368981641e-19,
       "samples": 193,
-      "attachment_alignment_max_m": 0.0299999696691195,
+      "attachment_alignment_max_m": 2.1820989283336673e-07,
       "anchor_role": "primary grip placement reference after requested resizing",
       "weapon_scale_xyz": [
         0.8925,
@@ -92,19 +85,19 @@
         1.05
       ]
     },
-    "LongGunMove_SimpleR11": {
+    "LongGunMove_WalkSwayR11_CenterFitR11": {
       "straight_angle_max_deg": 0,
       "elbow_gap_max_m": 0,
       "forward_error_max_deg": 0,
       "head_intersections": 0,
       "head_gap_lower_min_m": 0.054626909258353284,
       "head_gap_upper_min_m": 0.054626909258353284,
-      "left_cross_min_m": 0.20276376605033875,
+      "left_cross_min_m": 0.20276373624801636,
       "arm_separation_lower_min_m": 0.11178037624416681,
-      "left_weapon_gap_lower_min_m": 0.11261123839791891,
-      "loop_error": 4.898587368981641e-19,
+      "left_weapon_gap_lower_min_m": 0.1269184989112246,
+      "loop_error": 5.878304429187663e-18,
       "samples": 129,
-      "attachment_alignment_max_m": 0.0299999696691195,
+      "attachment_alignment_max_m": 5.066018154101549e-07,
       "anchor_role": "primary grip placement reference after requested resizing",
       "weapon_scale_xyz": [
         0.8925,
@@ -112,7 +105,7 @@
         1.05
       ]
     },
-    "LongGunAimAround_SimpleR11": {
+    "LongGunAimAround_SimpleR11_CenterFitR11": {
       "straight_angle_max_deg": 0,
       "elbow_gap_max_m": 0,
       "forward_error_max_deg": 0,
@@ -121,10 +114,10 @@
       "head_gap_upper_min_m": 0.054626759214703724,
       "left_cross_min_m": 0.20276367664337158,
       "arm_separation_lower_min_m": 0.1117803009802063,
-      "left_weapon_gap_lower_min_m": 0.11261108000223592,
+      "left_weapon_gap_lower_min_m": 0.1269183262415789,
       "loop_error": 4.898587368981641e-19,
       "samples": 577,
-      "attachment_alignment_max_m": 0.030000076215705804,
+      "attachment_alignment_max_m": 3.2979340881344774e-07,
       "anchor_role": "primary grip placement reference after requested resizing",
       "weapon_scale_xyz": [
         0.8925,
@@ -132,68 +125,68 @@
         1.05
       ]
     },
-    "ShotgunHold_SimpleR11": {
+    "ShotgunHold_SimpleR11_CenterFitR11": {
       "straight_angle_max_deg": 0,
       "elbow_gap_max_m": 0,
       "forward_error_max_deg": 0,
       "head_intersections": 0,
-      "head_gap_lower_min_m": 0.03762192228451278,
-      "head_gap_upper_min_m": 0.03762192228451278,
+      "head_gap_lower_min_m": 0.0394844123872059,
+      "head_gap_upper_min_m": 0.0394844123872059,
       "left_cross_min_m": 0.20276376605033875,
       "arm_separation_lower_min_m": 0.11178037624416681,
-      "left_weapon_gap_lower_min_m": 0.10963387759116165,
+      "left_weapon_gap_lower_min_m": 0.11799354007886423,
       "loop_error": 4.898587368981641e-19,
       "samples": 193,
-      "attachment_alignment_max_m": 0.029999969669445167,
+      "attachment_alignment_max_m": 2.6462838970898366e-07,
       "anchor_role": "primary grip placement reference after requested resizing",
       "weapon_scale_xyz": [
-        0.74375,
-        0.875,
-        0.875
+        0.966875,
+        1.1375,
+        1.1375
       ],
-      "shotgun_receiver_lower_edge_above_hand_m": 0.021898508071899414
+      "shotgun_receiver_lower_edge_above_hand_m": 0.03607344627380371
     },
-    "ShotgunMove_SimpleR11": {
+    "ShotgunMove_WalkSwayR11_CenterFitR11": {
       "straight_angle_max_deg": 0,
       "elbow_gap_max_m": 0,
       "forward_error_max_deg": 0,
       "head_intersections": 0,
-      "head_gap_lower_min_m": 0.03762192228451278,
-      "head_gap_upper_min_m": 0.03762192228451278,
-      "left_cross_min_m": 0.20276376605033875,
+      "head_gap_lower_min_m": 0.0394844123872059,
+      "head_gap_upper_min_m": 0.0394844123872059,
+      "left_cross_min_m": 0.20276373624801636,
       "arm_separation_lower_min_m": 0.11178037624416681,
-      "left_weapon_gap_lower_min_m": 0.10963384778883926,
-      "loop_error": 4.898587368981641e-19,
+      "left_weapon_gap_lower_min_m": 0.11799354007886423,
+      "loop_error": 5.878304429187663e-18,
       "samples": 129,
-      "attachment_alignment_max_m": 0.029999969669445167,
+      "attachment_alignment_max_m": 4.981348366162263e-07,
       "anchor_role": "primary grip placement reference after requested resizing",
       "weapon_scale_xyz": [
-        0.74375,
-        0.875,
-        0.875
+        0.966875,
+        1.1375,
+        1.1375
       ],
-      "shotgun_receiver_lower_edge_above_hand_m": 0.021898508071899414
+      "shotgun_receiver_lower_edge_above_hand_m": 0.03607344627380371
     },
-    "ShotgunAimAround_SimpleR11": {
+    "ShotgunAimAround_SimpleR11_CenterFitR11": {
       "straight_angle_max_deg": 0,
       "elbow_gap_max_m": 0,
       "forward_error_max_deg": 0,
       "head_intersections": 0,
-      "head_gap_lower_min_m": 0.03762176899884856,
-      "head_gap_upper_min_m": 0.03762176899884856,
+      "head_gap_lower_min_m": 0.03948424236500303,
+      "head_gap_upper_min_m": 0.03948424236500303,
       "left_cross_min_m": 0.20276367664337158,
       "arm_separation_lower_min_m": 0.1117803009802063,
-      "left_weapon_gap_lower_min_m": 0.1096337544698454,
+      "left_weapon_gap_lower_min_m": 0.1179933780082425,
       "loop_error": 4.898587368981641e-19,
       "samples": 577,
-      "attachment_alignment_max_m": 0.030000098574762397,
+      "attachment_alignment_max_m": 3.3783269073827965e-07,
       "anchor_role": "primary grip placement reference after requested resizing",
       "weapon_scale_xyz": [
-        0.74375,
-        0.875,
-        0.875
+        0.966875,
+        1.1375,
+        1.1375
       ],
-      "shotgun_receiver_lower_edge_above_hand_m": 0.021898388862609863
+      "shotgun_receiver_lower_edge_above_hand_m": 0.03607332706451416
     }
   },
   "walking_preview_gait": "original Walk only, 16-frame gait repeated 4 times",
@@ -204,14 +197,14 @@
   ],
   "action_digests": {
     "PistolHold_SimpleR11": "6e5493bb25e7bf1128f08beb7d2282be7773783f4a04401986baf016fc704918",
-    "PistolMove_SimpleR11": "bf902bae4731db4da5ed5deb370833ef1b549e5a9f23f44b1c7bab82d6183697",
+    "PistolMove_WalkSwayR11": "6e4acf8fe2bd03c978343d747ad49df9c0f3b79886f1170a91010a28aed30392",
     "PistolAimAround_SimpleR11": "b13994f3bb49b6c893356cfc6070e3152dddf0e522ac2ebf78da9a931e1915e4",
-    "LongGunHold_SimpleR11": "e02439a2db7beeb00be5fc4b0f6386f3248b6af91e4946159faef917190f1098",
-    "LongGunMove_SimpleR11": "274f88dd5e288ce305e48364ff585fc06053f258b4c4c20dcae67f2ccaec2e37",
-    "LongGunAimAround_SimpleR11": "2a822933d7b4afb74089aefbc2ed4d91b17e58d0d5e7650358d63c281da83616",
-    "ShotgunHold_SimpleR11": "3690f37e105e6a1e53975dc97f2833d432243583c1d2deb10d6ca2fd9f79b8cd",
-    "ShotgunMove_SimpleR11": "653fbfae8d296757a054f3fdcffe09892fbdb46ccad99b84de8500182cdeed4d",
-    "ShotgunAimAround_SimpleR11": "df56801655d38ac8ff7e565c236663bb435c6b754e86f7497ce87d6352a97b01"
+    "LongGunHold_SimpleR11_CenterFitR11": "254cf9928c4b22516dcee4a9784afd3c7c0404680ddf44c49e6697424c325691",
+    "LongGunMove_WalkSwayR11_CenterFitR11": "7350b272b1357dcb3fa1d536408c33e6c23a0501cb67c7d0483c59d383a9502c",
+    "LongGunAimAround_SimpleR11_CenterFitR11": "9de1250285fa4eed4ded18f08f69593659b75bbae66ba5b5ea0ba50a95ba0913",
+    "ShotgunHold_SimpleR11_CenterFitR11": "014bc5c3f359463eac0c0ff82bf5a6bd2deb9c112ef2058782037990ed62ccb8",
+    "ShotgunMove_WalkSwayR11_CenterFitR11": "3423ffb1075a7af42daed077e1018649386c9dc41abc05610fc365e6fb68ef42",
+    "ShotgunAimAround_SimpleR11_CenterFitR11": "f01e237ca5c362bb70b252527cd53df8665ce8bb5afb2cd3e0fd0b090336ea81"
   },
   "source_actions_preserved": 104,
   "source_meshes_preserved": 344,

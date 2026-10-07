@@ -79,22 +79,22 @@
       ],
       "socket": [
         [
-          0.8924999833106995,
-          0.0,
-          0.0,
-          1.6820350667856587e-09
+          0.8924999237060547,
+          -7.3707759895569325e-09,
+          9.393517075295676e-10,
+          -4.2618069073796505e-09
         ],
         [
-          9.908738986002085e-17,
+          -2.7050148787566286e-09,
           1.0499999523162842,
-          0.0,
-          -2.324489045690825e-08
+          5.6461431086063385e-09,
+          -1.862645149230957e-09
         ],
         [
-          4.1359030627651384e-25,
-          0.0,
+          -5.793339141746401e-10,
+          2.019805833697319e-08,
           1.0499999523162842,
-          -5.704658967431442e-10
+          -7.427297532558441e-08
         ],
         [
           0.0,
@@ -109,9 +109,9 @@
         0.07999999821186066
       ],
       "actions": {
-        "Hold": "LongGunHold_SimpleR11_CenterFitR11",
-        "Move": "LongGunMove_WalkSwayR11_CenterFitR11",
-        "AimAround": "LongGunAimAround_SimpleR11_CenterFitR11"
+        "Hold": "LongGunHold_SimpleR11",
+        "Move": "LongGunMove_WalkSwayR11",
+        "AimAround": "LongGunAimAround_SimpleR11"
       },
       "baseline_actions": {
         "Hold": "LongGunHold_ElbowStudy_V2",
@@ -139,7 +139,7 @@
         0.065,
         0.035
       ],
-      "gun_offset_character_right_m": 0.015
+      "gun_offset_character_right_m": 0.03
     },
     "Shotgun": {
       "scene": "R11_AUTHOR_SHOTGUN",
@@ -151,22 +151,22 @@
       ],
       "socket": [
         [
-          0.9668750166893005,
-          4.7357956188122754e-17,
-          1.8691634865738256e-17,
-          2.994315906335032e-10
+          0.7437499761581421,
+          2.5500312972326356e-09,
+          6.707523425575346e-12,
+          -4.2618069073796505e-09
         ],
         [
-          1.341808466392995e-17,
-          1.1375000476837158,
-          -4.2548155697755564e-17,
-          1.865553578284107e-08
+          2.7128734814141353e-09,
+          0.8749999403953552,
+          -1.5133991837501526e-08,
+          -1.862645149230957e-09
         ],
         [
-          -2.9159638604821323e-17,
-          -1.5046018295645548e-17,
-          1.1375000476837158,
-          1.1103987951344152e-08
+          6.037623734300723e-10,
+          1.4435499906539917e-08,
+          0.875,
+          -7.427297532558441e-08
         ],
         [
           0.0,
@@ -181,9 +181,9 @@
         0.05000000074505806
       ],
       "actions": {
-        "Hold": "ShotgunHold_SimpleR11_CenterFitR11",
-        "Move": "ShotgunMove_WalkSwayR11_CenterFitR11",
-        "AimAround": "ShotgunAimAround_SimpleR11_CenterFitR11"
+        "Hold": "ShotgunHold_SimpleR11",
+        "Move": "ShotgunMove_WalkSwayR11",
+        "AimAround": "ShotgunAimAround_SimpleR11"
       },
       "baseline_actions": {
         "Hold": "ShotgunHold_ElbowStudy_V2",
@@ -203,15 +203,15 @@
       "anchor_role": "trigger centre",
       "baseline_scale": 1.0,
       "study_weapon_scale": [
-        0.966875,
-        1.1375,
-        1.1375
+        0.74375,
+        0.875,
+        0.875
       ],
       "gun_offset_forward_up_m": [
-        0.175,
+        0.06,
         0.14
       ],
-      "gun_offset_character_right_m": 0.015
+      "gun_offset_character_right_m": 0.03
     }
   },
   "locomotion": {
@@ -269,7 +269,7 @@
           "weapons": [
             "R11_Showcase_Hold_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
           ],
-          "upper": "LongGunHold_SimpleR11_CenterFitR11"
+          "upper": "LongGunHold_SimpleR11"
         },
         "Shotgun": {
           "rig": "R11_Showcase_Hold_Shotgun_Rig",
@@ -278,7 +278,7 @@
             "R11_Showcase_Hold_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
             "R11_Showcase_Hold_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
           ],
-          "upper": "ShotgunHold_SimpleR11_CenterFitR11"
+          "upper": "ShotgunHold_SimpleR11"
         }
       },
       "frames": 96,
@@ -302,7 +302,7 @@
           "weapons": [
             "R11_Showcase_Move_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
           ],
-          "upper": "LongGunMove_WalkSwayR11_CenterFitR11"
+          "upper": "LongGunMove_WalkSwayR11"
         },
         "Shotgun": {
           "rig": "R11_Showcase_Move_Shotgun_Rig",
@@ -311,7 +311,7 @@
             "R11_Showcase_Move_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
             "R11_Showcase_Move_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
           ],
-          "upper": "ShotgunMove_WalkSwayR11_CenterFitR11"
+          "upper": "ShotgunMove_WalkSwayR11"
         }
       },
       "frames": 64,
@@ -335,7 +335,7 @@
           "weapons": [
             "R11_Showcase_AimAround_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
           ],
-          "upper": "LongGunAimAround_SimpleR11_CenterFitR11"
+          "upper": "LongGunAimAround_SimpleR11"
         },
         "Shotgun": {
           "rig": "R11_Showcase_AimAround_Shotgun_Rig",
@@ -344,7 +344,7 @@
             "R11_Showcase_AimAround_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
             "R11_Showcase_AimAround_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
           ],
-          "upper": "ShotgunAimAround_SimpleR11_CenterFitR11"
+          "upper": "ShotgunAimAround_SimpleR11"
         }
       },
       "frames": 288,
@@ -368,7 +368,7 @@
           "weapons": [
             "R11_Showcase_Turn_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
           ],
-          "upper": "LongGunMove_WalkSwayR11_CenterFitR11"
+          "upper": "LongGunMove_WalkSwayR11"
         },
         "Shotgun": {
           "rig": "R11_Showcase_Turn_Shotgun_Rig",
@@ -377,7 +377,7 @@
             "R11_Showcase_Turn_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
             "R11_Showcase_Turn_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
           ],
-          "upper": "ShotgunMove_WalkSwayR11_CenterFitR11"
+          "upper": "ShotgunMove_WalkSwayR11"
         }
       },
       "frames": 456,
@@ -412,7 +412,7 @@
           "weapons": [
             "R11_Walk_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
           ],
-          "upper": "LongGunMove_WalkSwayR11_CenterFitR11"
+          "upper": "LongGunMove_WalkSwayR11"
         }
       },
       "frames": 64,
@@ -430,7 +430,7 @@
             "R11_Walk_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
             "R11_Walk_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
           ],
-          "upper": "ShotgunMove_WalkSwayR11_CenterFitR11"
+          "upper": "ShotgunMove_WalkSwayR11"
         }
       },
       "frames": 64,
@@ -486,14 +486,8 @@
     },
     "actions": {
       "Pistol": "PistolMove_WalkSwayR11",
-      "Rifle": "LongGunMove_WalkSwayR11_CenterFitR11",
-      "Shotgun": "ShotgunMove_WalkSwayR11_CenterFitR11"
+      "Rifle": "LongGunMove_WalkSwayR11",
+      "Shotgun": "ShotgunMove_WalkSwayR11"
     }
-  },
-  "center_shotgun_fit": {
-    "inward_change_m": 0.015,
-    "shotgun_size_multiplier": 1.3,
-    "shotgun_forward_clearance_adjustment_m": 0.115,
-    "production_migration": false
   }
 }

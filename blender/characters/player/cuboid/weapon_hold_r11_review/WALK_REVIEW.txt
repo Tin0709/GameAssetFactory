@@ -1,0 +1,12 @@
+R11 WALK REVIEW — HUMAN ART REVIEW PENDING
+
+Default scene: R11_SHOWCASE_MOVE — Pistol, Rifle, Shotgun side by side.
+Individual scenes: R11_WALK_PISTOL / R11_WALK_RIFLE / R11_WALK_SHOTGUN.
+Space starts/stops walking playback. Frames 1–64, 24 fps.
+Original 16-frame Walk gait, repeated four times, unchanged playback speed. No running in these walking scenes.
+Current slim arms preserved. Right arm straight, left arm straight crossing with separation.
+Requested enlarged/narrower guns and raised/forward long-gun placement preserved.
+Rifle and shotgun retain the latest 3 cm character-right adjustment.
+104 original Actions, 344 meshes and 154 rest rigs passed preservation checks.
+Slim-arm source file remains unchanged on disk; this is a separate review copy.
+No production migration.

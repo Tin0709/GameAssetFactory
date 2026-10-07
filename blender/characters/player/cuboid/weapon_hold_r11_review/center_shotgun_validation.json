@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "failures": [],
+  "walking": {
+    "Pistol": {
+      "scale_xyz": [
+        1.0625,
+        1.25,
+        1.25
+      ],
+      "gun_hand_relative_matrix_error": 3.5762786865234375e-07,
+      "torso_roll_min_max_deg": [
+        -1.8000011599953034,
+        1.8000011599953034
+      ]
+    },
+    "Rifle": {
+      "scale_xyz": [
+        0.8924999833106995,
+        1.0499999523162842,
+        1.0499999523162842
+      ],
+      "gun_hand_relative_matrix_error": 4.0605664253234863e-07,
+      "torso_roll_min_max_deg": [
+        -1.8000011599953034,
+        1.8000011599953034
+      ]
+    },
+    "Shotgun": {
+      "scale_xyz": [
+        0.9668750166893005,
+        1.1375000476837158,
+        1.1375000476837158
+      ],
+      "gun_hand_relative_matrix_error": 3.5762786865234375e-07,
+      "torso_roll_min_max_deg": [
+        -1.8000011599953034,
+        1.8000011599953034
+      ]
+    }
+  },
+  "head_gap_min_m": {
+    "Pistol": 0.38509675451915026,
+    "Rifle": 0.054626759214703724,
+    "Shotgun": 0.03948424236500303
+  },
+  "previous_actions_preserved": 116
+}

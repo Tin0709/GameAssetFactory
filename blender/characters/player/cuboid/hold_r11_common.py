@@ -8,8 +8,9 @@ TRIGGER={'Rifle':Vector((0,.118,.080)),'Shotgun':Vector((0,.088,.050)),'Pistol':
 ATTACHMENT_SCALE={'Rifle':.84,'Shotgun':.70,'Pistol':1.0}
 # User: enlarge 25%, THEN narrow local X by 15%; Y/Z remain 125%.
 STUDY_GUN_SCALE={cat:(base*1.25*.85,base*1.25,base*1.25) for cat,base in ATTACHMENT_SCALE.items()}
-GUN_OFFSET={'Rifle':(.065,.035),'Shotgun':(.060,.140),'Pistol':(0,0)} # forward, up; metres
-GUN_RIGHT={'Rifle':.030,'Shotgun':.030,'Pistol':0} # character's right, not viewer's
+STUDY_GUN_SCALE['Shotgun']=tuple(v*1.30 for v in STUDY_GUN_SCALE['Shotgun'])
+GUN_OFFSET={'Rifle':(.065,.035),'Shotgun':(.175,.140),'Pistol':(0,0)} # enlarged shotgun stock stays clear of face
+GUN_RIGHT={'Rifle':.015,'Shotgun':.015,'Pistol':0} # moved inward 1.5 cm from the previous character-right offset
 
 def clone_r11(label,s,cat):
     r,m,ws=clone_r10('R11_'+label,s,cat)

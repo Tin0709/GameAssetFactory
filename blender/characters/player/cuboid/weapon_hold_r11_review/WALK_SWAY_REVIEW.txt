@@ -1,0 +1,8 @@
+R11 WALK SWAY — STUDY ONLY / HUMAN REVIEW PENDING
+Torso roll +/-1.8 degrees and lateral sway +/-6 mm, following original Walk 16-frame gait.
+Straight arms and gun inherit torso motion together. No independent elbow or support-hand mechanics.
+Pistol / rifle / shotgun share the same sway. Walk only, no running.
+Original 9 R11 hold Actions remain preserved; new Move_WalkSwayR11 Actions are separate copies.
+Default: R11_SHOWCASE_MOVE. Individual: R11_WALK_PISTOL / R11_WALK_RIFLE / R11_WALK_SHOTGUN.
+Original lower gait and source assets unchanged. No production migration.
+Space toggles playback.

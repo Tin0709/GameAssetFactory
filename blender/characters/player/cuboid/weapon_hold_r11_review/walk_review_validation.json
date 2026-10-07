@@ -1,0 +1,21 @@
+{
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_weapon_hold_r11_walk_review.blend",
+  "default_scene": "R11_SHOWCASE_MOVE",
+  "mesh_checks": {
+    "Pistol": {
+      "walk_matches_current_slim_mesh": true,
+      "triple_matches_current_slim_mesh": true
+    },
+    "Rifle": {
+      "walk_matches_current_slim_mesh": true,
+      "triple_matches_current_slim_mesh": true
+    },
+    "Shotgun": {
+      "walk_matches_current_slim_mesh": true,
+      "triple_matches_current_slim_mesh": true
+    }
+  },
+  "source_slim_file_preserved": true,
+  "walking_only": true,
+  "production_migration": false
+}
