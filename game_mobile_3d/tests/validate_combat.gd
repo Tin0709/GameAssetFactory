@@ -62,6 +62,7 @@ func _run() -> void:
 	second.take_damage(60, Vector3.RIGHT)
 	check(second.is_dead and pistol.nearest_target() == first, "Dying enemy immediately excluded")
 	first.position.x = 9
+	await tick(1) # Target registry is shared/cached for one real physics tick.
 	check(pistol.nearest_target() == null, "Out-of-range targets ignored")
 	if failed: return
 
@@ -97,6 +98,15 @@ func _run() -> void:
 	first.position = Vector3(4, 0.01, 0)
 	combat.living_zombies[1].position = Vector3(9, 0.01, -4)
 	combat.living_zombies[2].position = Vector3(-9, 0.01, -4)
+	# Measure firing cadence after the real authored Draw has reached READY.
+	# Hold cooldown during Draw so the first observation starts before shot one.
+	pistol.cooldown = 1000.0
+	var behavior := player.get_node("WeaponBehavior")
+	for frame in range(90):
+		if behavior.is_ready(): break
+		await tick(1)
+	check(behavior.is_ready(), "Authored Draw reaches READY before cadence measurement")
+	pistol.cooldown = 0.0
 	await tick(30)
 	check(first.current_hp == 40, "First auto-shot deals 20")
 	await tick(30)

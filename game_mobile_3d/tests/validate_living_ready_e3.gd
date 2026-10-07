@@ -57,6 +57,7 @@ func run() -> void:
 	level.get_node("SpawnDirector").enabled = false; level.get_node("Progression").enabled = false
 	root.add_child(level); current_scene = level; level.select_test_weapon(1)
 	p = level.player; v = p.visual; b = p.get_node("WeaponBehavior"); gun = p.get_node("Pistol")
+	v.set_locomotion_mode(0) # Forced READY+Run stabilization belongs only to Run V7.
 	check(v.animation_player.has_animation("LongGunReadyIdle"), "Imported Living Ready Idle exists")
 	check(v.animation_player.has_animation("LongGunReadyRun"), "Imported Living Ready Run exists")
 	if not failures.is_empty(): finish(); return

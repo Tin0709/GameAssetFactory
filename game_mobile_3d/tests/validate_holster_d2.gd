@@ -81,6 +81,7 @@ func run() -> void:
 		DirAccess.make_dir_recursive_absolute("res://.validation/holster_d2")
 		level.get_node("HUD").visible=false
 	player = level.player; v = player.visual; b = player.get_node("WeaponBehavior"); gun = player.get_node("Pistol")
+	v.set_locomotion_mode(0) # D2's authored Run-phase fixture; live suite exercises Reference.
 	player.set_physics_process(false); b.set_physics_process(false); gun.set_physics_process(false); v.set_process(false)
 	# Behavior's suspension gate expects the real controller to be active. Keep
 	# it active but disable its inherited processing while manually stepping it.

@@ -230,6 +230,7 @@ func _process(delta: float) -> void:
 	_evaluate(delta)
 
 func _evaluate(_delta: float) -> void:
+	if _evaluate_locomotion_pose(_delta): return
 	var wt: float = locomotion_phase * walk.clip.length
 	var rt: float = authored_run_time if authored_locomotion else locomotion_phase * run.clip.length
 	for i in skeleton.get_bone_count():
@@ -257,12 +258,7 @@ func _evaluate(_delta: float) -> void:
 	var lag := clampf(turn_rate * -0.008, -0.025, 0.025)
 	_rotate_global(chest, Quaternion.from_euler(Vector3(lean, lag, clampf(-acceleration.x * 0.0006, -0.02, 0.02))))
 	_rotate_global(head, Quaternion.from_euler(Vector3(-lean * 0.65, -lag * 0.6, 0)))
-	if is_firing:
-		for i in recoil_mask:
-			var offset: Vector3 = (recoil_pose.position(i, recoil_time) - recoil_pose.position(i, 0.0)) * recoil_gain
-			var difference: Quaternion = recoil_pose.rotation(i, 0.0).inverse() * recoil_pose.rotation(i, recoil_time)
-			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i) + offset)
-			skeleton.set_bone_pose_rotation(i, (skeleton.get_bone_pose_rotation(i) * Quaternion.IDENTITY.slerp(difference, recoil_gain)).normalized())
+	_apply_firing_recoil()
 	_apply_springs()
 	# Follow the final layered socket, including recoil, with each arm's outer
 	# palm edge. Arm lengths, twist and socket recoil stay authored; long-gun
@@ -290,6 +286,17 @@ func _evaluate(_delta: float) -> void:
 			skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(authored_q, authored_weight).normalized())
 	if generic_weapon_carry:
 		_apply_weapon_carry()
+
+func _evaluate_locomotion_pose(_delta: float) -> bool:
+	return false # Extension hook; the complete Legacy branch above remains available.
+
+func _apply_firing_recoil() -> void:
+	if not is_firing: return
+	for i in recoil_mask:
+		var offset: Vector3 = (recoil_pose.position(i, recoil_time) - recoil_pose.position(i, 0.0)) * recoil_gain
+		var difference: Quaternion = recoil_pose.rotation(i, 0.0).inverse() * recoil_pose.rotation(i, recoil_time)
+		skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i) + offset)
+		skeleton.set_bone_pose_rotation(i, (skeleton.get_bone_pose_rotation(i) * Quaternion.IDENTITY.slerp(difference, recoil_gain)).normalized())
 
 func _apply_weapon_carry() -> void:
 	# Add a restrained model-space Chest bias, retaining all locomotion delta.

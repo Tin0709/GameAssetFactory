@@ -1,0 +1,856 @@
+{
+  "focused_red_log": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nERROR: Production reference locomotion mode is available\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/validate_locomotion_r6p.gd:14)\n       [1] run (res://tests/validate_locomotion_r6p.gd:22)\nERROR: Production exposes six samples of one shared phase\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/validate_locomotion_r6p.gd:14)\n       [1] run (res://tests/validate_locomotion_r6p.gd:23)\nERROR: New clips coexist with required production clips\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/validate_locomotion_r6p.gd:14)\n       [1] run (res://tests/validate_locomotion_r6p.gd:24)\n{\"checks\":3,\"failures\":[\"Production reference locomotion mode is available\",\"Production exposes six samples of one shared phase\",\"New clips coexist with required production clips\"],\"legacy_pose_error\":0.0,\"passed\":false,\"phase_error\":0.0,\"reference_lab_pose_error\":0.0}\n",
+  "live_red_log": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nERROR: Real gameplay uses reference integration\n   at: push_error (core/variant/variant_utility.cpp:1023)\n   GDScript backtrace (most recent call first):\n       [0] check (res://tests/validate_locomotion_r6p_live.gd:18)\n       [1] run (res://tests/validate_locomotion_r6p_live.gd:41)\n{\"cases\":[],\"checks\":1,\"failures\":[\"Real gameplay uses reference integration\"],\"passed\":false,\"peak_armed_pose_local_error\":0.0}\n",
+  "focused_green": {
+    "checks": 7245,
+    "failures": [],
+    "legacy_pose_error": 0.0,
+    "passed": true,
+    "phase_error": 5.64304381001079e-10,
+    "reference_lab_pose_error": 2.38564041410427e-07
+  },
+  "live_green": {
+    "cases": [
+      {
+        "attachment": "back",
+        "case": "Walk -> Draw",
+        "phase": 0.649999980628491,
+        "sprint_blend": 0.0,
+        "state": "DRAWING",
+        "turn": 0.00782320786625521,
+        "weapon": 1
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.599999922513965,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": -0.00597776587731084,
+        "weapon": 1
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.0499999091029214,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": -0.0035282840803081,
+        "weapon": 1
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.499999895691877,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": -0.00120930034571687,
+        "weapon": 1
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.949999882280833,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": 0.000864727105099245,
+        "weapon": 1
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.399999868869788,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": 0.00329300617143286,
+        "weapon": 1
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.849999855458744,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": 0.00343761414776678,
+        "weapon": 1
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.299999842047699,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": 0.00113870532036078,
+        "weapon": 1
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.749999828636655,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": -0.000931907729365441,
+        "weapon": 1
+      },
+      {
+        "attachment": "carrier",
+        "case": "READY turn -> Sprint Holster",
+        "phase": 0.802060266569996,
+        "sprint_blend": 0.238095238095238,
+        "state": "HOLSTERING",
+        "turn": -0.284136430492867,
+        "weapon": 1
+      },
+      {
+        "attachment": "back",
+        "case": "Sprint release -> Draw while turning",
+        "phase": 0.557279872786919,
+        "sprint_blend": 0.761904761904762,
+        "state": "DRAWING",
+        "turn": -0.63413303317574,
+        "weapon": 1
+      },
+      {
+        "attachment": "back",
+        "case": "Walk -> Draw",
+        "phase": 0.694230238903756,
+        "sprint_blend": 0.0,
+        "state": "DRAWING",
+        "turn": 0.153518275109386,
+        "weapon": 2
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.64423018078923,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": -0.00597732091276978,
+        "weapon": 2
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.0942301673781862,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": -0.00352809935755884,
+        "weapon": 2
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.544230153967141,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": -0.00120929713982928,
+        "weapon": 2
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.994230140556098,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": 0.000864716354672963,
+        "weapon": 2
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.444230127145053,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": 0.00329315606331642,
+        "weapon": 2
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.894230113734009,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": 0.0034374449939561,
+        "weapon": 2
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.344230100322964,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": 0.00113872067949147,
+        "weapon": 2
+      },
+      {
+        "attachment": "hand",
+        "case": "READY bend/circle",
+        "phase": 0.79423008691192,
+        "sprint_blend": 0.0,
+        "state": "READY",
+        "turn": -0.000932013805295828,
+        "weapon": 2
+      },
+      {
+        "attachment": "carrier",
+        "case": "READY turn -> Sprint Holster",
+        "phase": 0.846290524845261,
+        "sprint_blend": 0.238095238095238,
+        "state": "HOLSTERING",
+        "turn": -0.284136506499592,
+        "weapon": 2
+      },
+      {
+        "attachment": "back",
+        "case": "Sprint release -> Draw while turning",
+        "phase": 0.601510131062184,
+        "sprint_blend": 0.761904761904762,
+        "state": "DRAWING",
+        "turn": -0.634136292172878,
+        "weapon": 2
+      }
+    ],
+    "checks": 1761,
+    "failures": [],
+    "passed": true,
+    "peak_armed_pose_local_error": 2.54740143645904e-07,
+    "peak_world_grip_rotation_error_degrees": 0.0
+  },
+  "regressions": {
+    "animation_v2": {
+      "exit": 0,
+      "errors": [],
+      "report": {
+        "checks": 1572,
+        "failures": [],
+        "matrix_cpu_usec": 406161,
+        "max_contact_m": 0.0120559157803655,
+        "phone_tested": false,
+        "player_update_average_usec": 50.357,
+        "zombie_phases": [
+          0.0,
+          0.48469997882843,
+          0.96939995765686,
+          0.454100024700165,
+          0.938799915313721
+        ]
+      }
+    },
+    "blocky_v7_integration": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "locomotion_stop": {
+      "exit": 0,
+      "errors": [],
+      "report": {
+        "actual_gameplay_stops": 96,
+        "checks": 74510,
+        "dead_zone_mps": 0.12,
+        "failures": [],
+        "peak_pattern_frame_degrees_60fps": 25.1430311179152,
+        "peak_stop_frame_degrees_60fps": 25.6984706389571,
+        "peak_stop_sweep_degrees": 185.963757361996,
+        "rendered": false,
+        "transition_seconds": 0.13
+      }
+    },
+    "movement_weapons": {
+      "exit": 0,
+      "errors": [],
+      "report": {
+        "bounce_4.25_hip_range_m": [
+          -0.0340242311358452,
+          0.0102091655135155
+        ],
+        "bounce_6.25_hip_range_m": [
+          -0.0675891116261482,
+          0.02029899507761
+        ],
+        "checks": 798,
+        "failures": [],
+        "forty_zombies_wall_usec_per_frame": 2204.68888888889,
+        "phone_tested": false,
+        "rendered": false,
+        "shotgun_target_damage": [
+          10,
+          10,
+          10
+        ],
+        "weapon_0_shots_in_2s": 4,
+        "weapon_1_10s": {
+          "peak_projectiles": 1,
+          "shots": 83,
+          "wall_usec_per_frame": 345.565
+        },
+        "weapon_1_live_projectile_tick_usec": 1.67,
+        "weapon_1_shot_construct_and_free_usec": 21.41,
+        "weapon_1_shots_in_2s": 16,
+        "weapon_2_10s": {
+          "peak_projectiles": 7,
+          "shots": 10,
+          "wall_usec_per_frame": 369.666666666667
+        },
+        "weapon_2_live_projectile_tick_usec": 11.778,
+        "weapon_2_shot_construct_and_free_usec": 64.31,
+        "weapon_2_shots_in_2s": 2
+      }
+    },
+    "weapon_carry_c1": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "weapon_behavior_d0": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "holster_d2": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "holster_d2_live": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "draw_d5": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "draw_d5_live": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "weapon_sprint_d3": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "back_carry_d31": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "back_carry_d31_live": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "living_ready_e3": {
+      "exit": 0,
+      "errors": [],
+      "report": {
+        "cases": [
+          {
+            "attachment": "hand",
+            "case": "A/I standing draw -> idle",
+            "move_weight": 0.0,
+            "ready_run_time": 0.266666626930235,
+            "ready_weight": 1.0,
+            "run_time": 0.266666626930235,
+            "state": "READY",
+            "weapon": 1
+          },
+          {
+            "attachment": "hand",
+            "case": "B/C/D/E/F running and direction changes 2.60",
+            "move_weight": 1.0,
+            "ready_run_time": 0.559998807907073,
+            "ready_weight": 1.0,
+            "run_time": 0.559998807907073,
+            "state": "READY",
+            "weapon": 1
+          },
+          {
+            "attachment": "hand",
+            "case": "B/C/D/E/F running and direction changes 4.25",
+            "move_weight": 1.0,
+            "ready_run_time": 0.506664302349029,
+            "ready_weight": 1.0,
+            "run_time": 0.506664302349029,
+            "state": "READY",
+            "weapon": 1
+          },
+          {
+            "attachment": "hand",
+            "case": "B/C/D/E/F running and direction changes 6.25",
+            "move_weight": 1.0,
+            "ready_run_time": 0.453329796790985,
+            "ready_weight": 1.0,
+            "run_time": 0.453329796790985,
+            "state": "READY",
+            "weapon": 1
+          },
+          {
+            "attachment": "back",
+            "case": "K sprint -> holster -> stowed",
+            "move_weight": 1.0,
+            "ready_run_time": 0.359996383984789,
+            "ready_weight": 0.0,
+            "run_time": 0.359996383984789,
+            "state": "STOWED",
+            "weapon": 1
+          },
+          {
+            "attachment": "hand",
+            "case": "J/L moving draw -> ReadyRun",
+            "move_weight": 1.0,
+            "ready_run_time": 0.479996344248358,
+            "ready_weight": 1.0,
+            "run_time": 0.479996344248358,
+            "state": "READY",
+            "weapon": 1
+          },
+          {
+            "attachment": "hand",
+            "case": "A/I standing draw -> idle",
+            "move_weight": 0.0,
+            "ready_run_time": 0.0799961654344177,
+            "ready_weight": 1.0,
+            "run_time": 0.0799961654344177,
+            "state": "READY",
+            "weapon": 2
+          },
+          {
+            "attachment": "hand",
+            "case": "B/C/D/E/F running and direction changes 2.60",
+            "move_weight": 1.0,
+            "ready_run_time": 0.373328346411256,
+            "ready_weight": 1.0,
+            "run_time": 0.373328346411256,
+            "state": "READY",
+            "weapon": 2
+          },
+          {
+            "attachment": "hand",
+            "case": "B/C/D/E/F running and direction changes 4.25",
+            "move_weight": 1.0,
+            "ready_run_time": 0.319993840853212,
+            "ready_weight": 1.0,
+            "run_time": 0.319993840853212,
+            "state": "READY",
+            "weapon": 2
+          },
+          {
+            "attachment": "hand",
+            "case": "B/C/D/E/F running and direction changes 6.25",
+            "move_weight": 1.0,
+            "ready_run_time": 0.266659335295168,
+            "ready_weight": 1.0,
+            "run_time": 0.266659335295168,
+            "state": "READY",
+            "weapon": 2
+          },
+          {
+            "attachment": "back",
+            "case": "K sprint -> holster -> stowed",
+            "move_weight": 1.0,
+            "ready_run_time": 0.173325922488972,
+            "ready_weight": 0.0,
+            "run_time": 0.173325922488972,
+            "state": "STOWED",
+            "weapon": 2
+          },
+          {
+            "attachment": "hand",
+            "case": "J/L moving draw -> ReadyRun",
+            "move_weight": 1.0,
+            "ready_run_time": 0.293325882752541,
+            "ready_weight": 1.0,
+            "run_time": 0.293325882752541,
+            "state": "READY",
+            "weapon": 2
+          }
+        ],
+        "checks": 1962,
+        "clock_error_seconds": 3.46944695195361e-17,
+        "composition_position_error_m": 2.45756240246919e-07,
+        "composition_rotation_error_rad": 0.0009765625,
+        "failures": [],
+        "lower_position_error_m": 0.0,
+        "passed": true,
+        "phase_error_seconds": 0.0
+      }
+    },
+    "ready_e3_live": {
+      "exit": 0,
+      "errors": [],
+      "report": {
+        "cases": [
+          {
+            "natural_idle_ready": true,
+            "natural_moving_draw": "Walk fallback",
+            "natural_walk_fallback": true,
+            "ready_run": "separate composition diagnostic only",
+            "sprint_stow": true,
+            "weapon": 1
+          },
+          {
+            "natural_idle_ready": true,
+            "natural_moving_draw": "Walk fallback",
+            "natural_walk_fallback": true,
+            "ready_run": "separate composition diagnostic only",
+            "sprint_stow": true,
+            "weapon": 2
+          }
+        ],
+        "checks": 41,
+        "clock_error_seconds": 5.20417042793042e-17,
+        "failures": [],
+        "passed": true
+      }
+    },
+    "weapon_select": {
+      "exit": 0,
+      "errors": [],
+      "report": {
+        "capture": false,
+        "checks": 127,
+        "failures": [],
+        "phone_tested": false,
+        "touch_events_tested": true
+      }
+    },
+    "combat": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "gameplay": {
+      "exit": 0,
+      "errors": [],
+      "report": null
+    },
+    "bounce_animation": {
+      "exit": 0,
+      "errors": [],
+      "report": {
+        "checks": 1213,
+        "corpse_hold_seconds": 0.45,
+        "death_variants": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "failures": [],
+        "forty_death_pose_usec": 253.444444444444,
+        "forty_zombies_added_usec": 159.291666666667,
+        "forty_zombies_off_usec": 163.858333333333,
+        "forty_zombies_on_usec": 323.15,
+        "max_body_drop_m": 0.133595019578934,
+        "max_death_ground_penetration_m": 0.0,
+        "max_hand_contact_m": 0.0119293406605721,
+        "phone_tested": false,
+        "player_update_usec": 47.018,
+        "render_sample": {},
+        "rendered": false,
+        "smoke_start_seconds": 1.07
+      }
+    },
+    "player_pose_lab": {
+      "exit": 0,
+      "errors": [],
+      "report": {
+        "capture": false,
+        "checks": 143,
+        "failures": [],
+        "phone_tested": false
+      }
+    }
+  },
+  "performance": {
+    "cases": {
+      "Armed_Sprint_Legacy": {
+        "mean_usec": 85.161,
+        "median_usec": 79,
+        "p95_usec": 119
+      },
+      "Armed_Sprint_Reference": {
+        "mean_usec": 55.569,
+        "median_usec": 52,
+        "p95_usec": 76
+      },
+      "Armed_Walk_Legacy": {
+        "mean_usec": 66.0535,
+        "median_usec": 62,
+        "p95_usec": 86
+      },
+      "Armed_Walk_Reference": {
+        "mean_usec": 56.0905,
+        "median_usec": 53,
+        "p95_usec": 73
+      },
+      "Free_Sprint_Legacy": {
+        "mean_usec": 65.6205,
+        "median_usec": 61,
+        "p95_usec": 89
+      },
+      "Free_Sprint_Reference": {
+        "mean_usec": 56.0975,
+        "median_usec": 51,
+        "p95_usec": 77
+      },
+      "Free_Walk_Legacy": {
+        "mean_usec": 73.482,
+        "median_usec": 61,
+        "p95_usec": 126
+      },
+      "Free_Walk_Reference": {
+        "mean_usec": 54.2825,
+        "median_usec": 51,
+        "p95_usec": 72
+      }
+    },
+    "samples_per_case": 4000,
+    "scope": "desktop headless existing visual _process only; not a phone or GPU benchmark"
+  },
+  "captures": {
+    "Draw_Holster_Sprint": {
+      "frames": 192,
+      "duration_seconds": 8.0,
+      "speed_min": 0.0,
+      "speed_max": 6.25000476837158,
+      "turn_min": -0.824650132186599,
+      "turn_max": 0.99650368418289,
+      "weapon_states": [
+        "STOWED",
+        "DRAWING",
+        "READY",
+        "HOLSTERING"
+      ],
+      "last_phase": 0.0663458459101312,
+      "final_turn": 0.272337454566033
+    },
+    "Idle": {
+      "frames": 48,
+      "duration_seconds": 2.0,
+      "speed_min": 0.0,
+      "speed_max": 0.0,
+      "turn_min": 0.0,
+      "turn_max": 0.0,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.0,
+      "final_turn": 0.0
+    },
+    "READY_CCW": {
+      "frames": 192,
+      "duration_seconds": 8.0,
+      "speed_min": 2.59998917579651,
+      "speed_max": 2.60001134872437,
+      "turn_min": -0.821442093738031,
+      "turn_max": -0.809480567652228,
+      "weapon_states": [
+        "READY"
+      ],
+      "last_phase": 0.0124996419996022,
+      "final_turn": -0.82097358686996
+    },
+    "READY_Circle": {
+      "frames": 192,
+      "duration_seconds": 8.0,
+      "speed_min": 2.59998917579651,
+      "speed_max": 2.60001134872437,
+      "turn_min": 0.809480522643504,
+      "turn_max": 0.82144286190838,
+      "weapon_states": [
+        "READY"
+      ],
+      "last_phase": 0.0124996419996022,
+      "final_turn": 0.820973655645464
+    },
+    "READY_S": {
+      "frames": 192,
+      "duration_seconds": 8.0,
+      "speed_min": 0.0,
+      "speed_max": 2.60137867927551,
+      "turn_min": -0.485431229066607,
+      "turn_max": 0.999292595415227,
+      "weapon_states": [
+        "READY"
+      ],
+      "last_phase": 0.999999731779098,
+      "final_turn": -2.32309722381093e-05
+    },
+    "Sprint_CCW": {
+      "frames": 96,
+      "duration_seconds": 4.0,
+      "speed_min": 6.24999094009399,
+      "speed_max": 6.25000905990601,
+      "turn_min": -0.999999999999999,
+      "turn_max": -0.944255044676209,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.377197532283363,
+      "final_turn": -0.999999999999999
+    },
+    "Sprint_CW": {
+      "frames": 96,
+      "duration_seconds": 4.0,
+      "speed_min": 6.24999094009399,
+      "speed_max": 6.25000905990601,
+      "turn_min": 0.987913772661511,
+      "turn_max": 0.999999999999999,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.377197532283363,
+      "final_turn": 0.999999999999999
+    },
+    "Sprint_Recovery": {
+      "frames": 42,
+      "duration_seconds": 1.75,
+      "speed_min": 6.24999332427979,
+      "speed_max": 6.25000715255737,
+      "turn_min": 0.000141724656334283,
+      "turn_max": 0.999007902045552,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.223351530799375,
+      "final_turn": 0.000141724656334283
+    },
+    "Sprint_Reversal": {
+      "frames": 96,
+      "duration_seconds": 4.0,
+      "speed_min": 0.835709452629089,
+      "speed_max": 6.25000905990601,
+      "turn_min": -0.999999990997486,
+      "turn_max": 0.999999994391722,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.377197532283363,
+      "final_turn": -0.999999990997486
+    },
+    "Sprint_S": {
+      "frames": 96,
+      "duration_seconds": 4.0,
+      "speed_min": 1.93159103393555,
+      "speed_max": 5.48323631286621,
+      "turn_min": -0.904587352198716,
+      "turn_max": 0.995111533060726,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.377197532283363,
+      "final_turn": -0.288008719501865
+    },
+    "Sprint_Straight": {
+      "frames": 48,
+      "duration_seconds": 2.0,
+      "speed_min": 6.24998998641968,
+      "speed_max": 6.25001859664917,
+      "turn_min": -0.0465157547525074,
+      "turn_max": -2.17511318937221e-08,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.684889975408707,
+      "final_turn": -2.17511318937221e-08
+    },
+    "Walk_CCW": {
+      "frames": 96,
+      "duration_seconds": 4.0,
+      "speed_min": 4.24998569488525,
+      "speed_max": 4.25001096725464,
+      "turn_min": -0.999999999999999,
+      "turn_max": -0.923432055574032,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.0124998208135365,
+      "final_turn": -0.999999999999999
+    },
+    "Walk_CW": {
+      "frames": 96,
+      "duration_seconds": 4.0,
+      "speed_min": 4.24998569488525,
+      "speed_max": 4.25001096725464,
+      "turn_min": 0.989756396839933,
+      "turn_max": 0.999999999999999,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.0124998208135365,
+      "final_turn": 0.999999999999999
+    },
+    "Walk_Recovery": {
+      "frames": 42,
+      "duration_seconds": 1.75,
+      "speed_min": 4.24999380111694,
+      "speed_max": 4.25000953674316,
+      "turn_min": 0.000111651081958872,
+      "turn_max": 0.998724523166841,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.637499921396375,
+      "final_turn": 0.000111651081958872
+    },
+    "Walk_Reversal": {
+      "frames": 96,
+      "duration_seconds": 4.0,
+      "speed_min": 0.757086515426636,
+      "speed_max": 4.25001096725464,
+      "turn_min": -0.999999992771207,
+      "turn_max": 0.99999999524674,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.0124998208135365,
+      "final_turn": -0.999999992771207
+    },
+    "Walk_S": {
+      "frames": 96,
+      "duration_seconds": 4.0,
+      "speed_min": 0.548202395439148,
+      "speed_max": 4.25000190734863,
+      "turn_min": -0.669874092266426,
+      "turn_max": 0.998698469203697,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.0124998208135365,
+      "final_turn": -0.627841391237645
+    },
+    "Walk_Sprint": {
+      "frames": 96,
+      "duration_seconds": 4.0,
+      "speed_min": 4.2499885559082,
+      "speed_max": 6.25000810623169,
+      "turn_min": 0.989756396839933,
+      "turn_max": 0.999999999999999,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.70480746709516,
+      "final_turn": 0.999999999999999
+    },
+    "Walk_Straight": {
+      "frames": 48,
+      "duration_seconds": 2.0,
+      "speed_min": 4.24999237060547,
+      "speed_max": 4.25000667572021,
+      "turn_min": -0.0465157547525074,
+      "turn_max": -2.17511318937221e-08,
+      "weapon_states": [
+        "STOWED"
+      ],
+      "last_phase": 0.0124999102205037,
+      "final_turn": -2.17511318937221e-08
+    }
+  },
+  "original_v4_sha256": "b4c9a9b2d7b16106012be1ff23df5169eb617fadcae2fe02a211070367ef3d13"
+}

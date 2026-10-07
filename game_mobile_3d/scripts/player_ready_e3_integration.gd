@@ -47,8 +47,12 @@ func ready_run_sample_time() -> float:
 	# never receives it, and there is no independently advancing ReadyRun clock.
 	return authored_run_time / run.clip.length * ready_run_pose.clip.length
 
+func ready_run_blend_weight() -> float:
+	return run_weight # Reference gait extension excludes the Run V7 correction.
+
 func _apply_weapon_carry() -> void:
-	if ready_idle_pose == null or living_ready_weight <= 0.0 or Socket.Profiles.category(weapon_type) != Socket.Profiles.Category.LONG_GUN or (ready_move_weight == 1.0 and run_weight == 0.0):
+	var ready_run_weight := ready_run_blend_weight()
+	if ready_idle_pose == null or living_ready_weight <= 0.0 or Socket.Profiles.category(weapon_type) != Socket.Profiles.Category.LONG_GUN or (ready_move_weight == 1.0 and ready_run_weight == 0.0):
 		super._apply_weapon_carry(); return
 	for i in ready_mask.size():
 		ready_base_positions[i] = skeleton.get_bone_pose_position(ready_mask[i])
@@ -79,8 +83,8 @@ func _apply_weapon_carry() -> void:
 		run_p = base_p.lerp(run_p, carry_weight); run_q = base_q.slerp(run_q, carry_weight)
 		# Normal Walk uses the original final Hold pose; its stride clock and
 		# compensation are untouched. A dedicated ReadyWalk needs later authoring.
-		var moving_p := legacy_p.lerp(run_p, run_weight)
-		var moving_q := legacy_q.slerp(run_q, run_weight)
+		var moving_p := legacy_p.lerp(run_p, ready_run_weight)
+		var moving_q := legacy_q.slerp(run_q, ready_run_weight)
 		var living_p := idle_p.lerp(moving_p, ready_move_weight)
 		var living_q := idle_q.slerp(moving_q, ready_move_weight)
 		skeleton.set_bone_pose_position(bone, legacy_p.lerp(living_p, living_ready_weight))

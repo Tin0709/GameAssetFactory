@@ -39,7 +39,12 @@ func run() -> void:
 	player.set_physics_process(false)
 	v = player.visual
 	v.set_process(false)
-	check(v.skeleton.get_bone_count() == 11, "Player retains ten bones plus non-deforming socket")
+	# This historical suite measures the original V2 raise/grip/cadence contract.
+	v.set_locomotion_mode(0)
+	v.authored_locomotion=false;v.generic_weapon_carry=false;v.long_gun_carry_v2=false
+	v.idle=v.samples["Player_Idle"];v.walk=v.samples["Player_Walk"];v.run=v.samples["Player_Run"]
+	v.weapon_behavior.enabled=false
+	check(v.skeleton.get_bone_count() == 12, "Original bones plus Carrier and non-deforming socket")
 	check(v.animation_player.get_animation_list().size() >= 15, "All player actions imported")
 	var target := Node3D.new()
 	world.add_child(target)

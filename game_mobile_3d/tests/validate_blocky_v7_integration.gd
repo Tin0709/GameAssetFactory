@@ -43,6 +43,7 @@ func run() -> void:
 	level.select_test_weapon(0)
 	player = level.player
 	visual = player.visual
+	visual.set_locomotion_mode(0) # Explicit retained Run V7 rollback contract.
 	# Baseline authored locomotion is measured without the opt-in carry overlay.
 	visual.set_weapon_equipped(false)
 	player.get_node("Pistol").enabled = false
@@ -55,7 +56,7 @@ func run() -> void:
 	check(absf(visual.run.clip.length - 16.0 / 24.0) < 0.000001, "Run has exact authored duration")
 	check(visual.current_state == &"Idle" and player.is_on_floor(), "Idle and collision floor work")
 	check(visual.find_children("*", "Skeleton3D", true, false).size() == 1, "One live skeleton")
-	check(visual.skeleton.get_bone_count() == 11 and visual.socket_bone >= 0, "Existing non-deforming weapon socket retained")
+	check(visual.skeleton.get_bone_count() == 12 and visual.socket_bone >= 0, "Carrier and existing non-deforming weapon socket retained")
 	check(player.walk_speed == 4.25 and player.run_speed == 6.25, "Gameplay speeds unchanged")
 	var material := visual.meshes[0].mesh.surface_get_material(0) as BaseMaterial3D
 	check(material != null and material.albedo_texture != null and material.texture_filter == BaseMaterial3D.TEXTURE_FILTER_NEAREST, "Imported textured mesh uses nearest filtering")

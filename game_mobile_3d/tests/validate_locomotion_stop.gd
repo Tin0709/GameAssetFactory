@@ -192,7 +192,7 @@ func gameplay(directions: Array) -> void:
 					for frame in 24:
 						await physics_frame
 						var current: Quaternion = visual.skeleton.get_bone_global_pose(visual.leg_left).basis.get_rotation_quaternion()
-						check(previous.angle_to(current) < deg_to_rad(35), "Actual gameplay input release has no leg flip")
+						check(previous.angle_to(current) < deg_to_rad(35), "Actual gameplay input release has no leg flip: %.2f deg, weapon %d sprint %s frame %d"%[rad_to_deg(previous.angle_to(current)),weapon,sprinting,frame])
 						previous = current
 					check(player.current_speed < 0.001 and visual.move_weight == 0.0 and visual.lower_rotation.angle_to(Quaternion.IDENTITY) < 0.001, "Actual gameplay stop reaches neutral Idle")
 					gameplay_stops += 1

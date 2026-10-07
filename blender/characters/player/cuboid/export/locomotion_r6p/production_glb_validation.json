@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "clips": {
+    "Walk": {
+      "duration": 0.6666666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "WalkTurnLeft": {
+      "duration": 0.6666666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "WalkTurnRight": {
+      "duration": 0.6666666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "Sprint": {
+      "duration": 0.5416666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "SprintTurnLeft": {
+      "duration": 0.5416666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "SprintTurnRight": {
+      "duration": 0.5416666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    }
+  },
+  "source_max_position_error_m": 6.537568011599405e-07,
+  "source_max_rotation_error_deg": 0.03386189770042439,
+  "nodes": [
+    "Leg.L",
+    "Leg.R",
+    "Arm.L",
+    "Arm.R",
+    "Head",
+    "Neck",
+    "WeaponCarrier",
+    "Chest",
+    "Spine",
+    "Hips",
+    "Root",
+    "Player_Cuboid_Base",
+    "Player_Cuboid_Rig"
+  ],
+  "production_source": "player_cuboid_animated_v4.glb",
+  "production_output": "player_cuboid_animated_v5.glb",
+  "previous_clips": [
+    "HolsterLongGun",
+    "Idle",
+    "Run",
+    "DrawLongGun",
+    "LongGunReadyIdle",
+    "LongGunReadyRun"
+  ],
+  "all_prior_animation_accessors_binary_preserved": true,
+  "mesh_rig_skin_materials_images_unchanged": true,
+  "production_source_sha256": "b4c9a9b2d7b16106012be1ff23df5169eb617fadcae2fe02a211070367ef3d13"
+}

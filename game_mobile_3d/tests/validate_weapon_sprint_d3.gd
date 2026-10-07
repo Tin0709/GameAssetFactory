@@ -102,7 +102,12 @@ func run() -> void:
 		check(absf(player.current_speed-6.25)<.01 and v.current_state==&"Run","Run stays at unchanged speed %d"%weapon)
 		for name in ["Arm.L","Arm.R"]:
 			var bone: int=v.skeleton.find_bone(name)
-			check(absf(v.skeleton.get_bone_pose_rotation(bone).dot(v.run.rotation(bone,v.authored_run_time)))>.999999,"Stowed sprint restores free Run arm %s"%name)
+			var expected:Quaternion=v.run.rotation(bone,v.authored_run_time)
+			if v.locomotion_mode==1:
+				var turn_clip=v.samples["SprintTurnLeft" if v.reference_turn_amount<0 else "SprintTurnRight"]
+				var time:float=v.reference_sample_time("Sprint")
+				expected=v.samples.Sprint.rotation(bone,time).slerp(turn_clip.rotation(bone,time),absf(v.reference_turn_amount))
+			check(absf(v.skeleton.get_bone_pose_rotation(bone).dot(expected))>.999999,"Stowed sprint restores active gait's free arm %s"%name)
 		await ticks(35);check(b.request_id==token,"No enemy/sprint transition flicker %d"%weapon)
 		move_sprint(false);await ticks(2)
 		check(b.state==b.State.DRAWING and b.request_id==token+1,"D: threat draws immediately on sprint exit %d"%weapon)

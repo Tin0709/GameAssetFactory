@@ -44,6 +44,7 @@ func run() -> void:
 	level.get_node("SpawnDirector").enabled=false;level.get_node("Progression").enabled=false
 	root.add_child(level);current_scene=level;level.select_test_weapon(1)
 	player=level.player;v=player.visual;b=player.get_node("WeaponBehavior");gun=player.get_node("Pistol")
+	v.set_locomotion_mode(0) # Original D0 placeholder + Run V7 diagnostic contract.
 	v.authored_long_gun_holster=false # Explicit D0 foundation regression fixture.
 	v.authored_long_gun_draw=false # Retain the D0 placeholder contract in this fixture.
 	gun.cooldown=1000.0;level.combat.audio.minimum_event_interval=1000000.0

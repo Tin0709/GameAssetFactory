@@ -80,6 +80,9 @@ func run() -> void:
 		check(visible_count == 1, "Exactly one weapon visible")
 		check(visual.recoil_pose.clip == visual.samples[visual.RECOILS[weapon]].clip, "Weapon-specific recoil clip")
 		check(pistol.nearest_target() != null, "Target acquired")
+		pistol.cooldown=1000.0
+		await tick(60) # Selection does not bypass the real Draw/READY firing gate.
+		check(player.get_node("WeaponBehavior").is_ready(),"Selected weapon naturally reaches READY")
 		pistol.cooldown = 0.0
 		pistol._physics_process(0.01)
 		check(combat.projectiles.get_child_count() > 0 and visual.recoil_time < 1.0, "Selected weapon fires and starts recoil")

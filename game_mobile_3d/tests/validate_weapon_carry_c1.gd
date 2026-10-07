@@ -45,11 +45,12 @@ func run() -> void:
 	level.player.get_node("WeaponBehavior").enabled=false # Historical pose/gameplay baseline, without D0 behavior.
 	current_scene=level;level.select_test_weapon(0)
 	player=level.player;v=player.visual;player.get_node("Pistol").enabled=false
+	v.set_locomotion_mode(0) # C1's historical V7/generic-carry baseline.
 	v.long_gun_carry_v2=false # Preserve C1's generic-pose regression baseline.
 	level.combat.audio.minimum_event_interval=1000000.0
 	await tick(20)
 	check(v.run_animation_speed_scale==1.6 and player.run_speed==6.25 and player.walk_speed==4.25,"Approved cadence and speeds unchanged")
-	check(v.animation_player.has_animation("WeaponHold") and v.skeleton.get_bone_count()==11,"One pose resource and one skeleton/socket")
+	check(v.animation_player.has_animation("WeaponHold") and v.skeleton.get_bone_count()==12,"One pose resource and one skeleton with Carrier/socket")
 	var pose: Animation=v.animation_player.get_animation("WeaponHold")
 	for track in pose.get_track_count():check(String(pose.track_get_path(track).get_subname(0)) in ["Arm.L","Arm.R","WeaponSocket"],"Strict upper filter")
 	v.set_weapon_equipped(false);await tick(15)
