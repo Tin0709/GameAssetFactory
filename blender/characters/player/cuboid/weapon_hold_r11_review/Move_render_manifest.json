@@ -6,14 +6,14 @@
     },
     "Rifle": {
       "name": "LongGunMove_SimpleR11",
-      "digest": "274f88dd5e288ce305e48364ff585fc06053f258b4c4c20dcae67f2ccaec2e37"
+      "digest": "ea2aa8ce9a0c716ba587c6d16c1964f907baed7d6feed49fdef61ffeaacaf654"
     },
     "Shotgun": {
       "name": "ShotgunMove_SimpleR11",
-      "digest": "653fbfae8d296757a054f3fdcffe09892fbdb46ccad99b84de8500182cdeed4d"
+      "digest": "5427521afec64e932bf76599fefe7e6403073a611d641c3a58f4890afe4cc312"
     }
   },
-  "sha256": "4b877ada378b1bc18bb3dc51dc01b255b8b9af5833ad5f4e6ac126393036b0ec",
+  "sha256": "c3a6f8d9189194470d771239266f9a1c8b095492db6b03ceaed35c9cb4af7021",
   "frames": 64,
   "offsets": {
     "Rifle": [
@@ -28,6 +28,11 @@
       0,
       0
     ]
+  },
+  "character_right_offsets": {
+    "Rifle": 0.03,
+    "Shotgun": 0.03,
+    "Pistol": 0
   },
   "weapon_scales": {
     "Rifle": [

@@ -1,0 +1,62 @@
+{
+  "Hold": {
+    "decoded_frames": 96,
+    "fps": 24.0,
+    "seconds": 4.0,
+    "previews": [
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Hold_frame1.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Hold_frame25.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Hold_frame49.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Hold_frame73.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Hold_frame96.jpg"
+    ]
+  },
+  "Move": {
+    "decoded_frames": 64,
+    "fps": 24.0,
+    "seconds": 2.6666666666666665,
+    "previews": [
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Move_frame1.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Move_frame17.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Move_frame33.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Move_frame49.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Move_frame64.jpg"
+    ]
+  },
+  "AimAround": {
+    "decoded_frames": 288,
+    "fps": 24.0,
+    "seconds": 12.0,
+    "previews": [
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\AimAround_frame1.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\AimAround_frame73.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\AimAround_frame145.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\AimAround_frame217.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\AimAround_frame288.jpg"
+    ]
+  },
+  "Sprint": {
+    "decoded_frames": 208,
+    "fps": 24.0,
+    "seconds": 8.666666666666666,
+    "previews": [
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Sprint_frame1.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Sprint_frame53.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Sprint_frame105.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Sprint_frame157.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Sprint_frame208.jpg"
+    ]
+  },
+  "Turn": {
+    "decoded_frames": 456,
+    "fps": 24.0,
+    "seconds": 19.0,
+    "previews": [
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Turn_frame1.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Turn_frame115.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Turn_frame229.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Turn_frame343.jpg",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\weapon_hold_r11_review\\Turn_frame456.jpg"
+    ]
+  }
+}

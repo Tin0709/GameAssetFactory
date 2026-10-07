@@ -8,3 +8,6 @@ Goal: Follow the supplied overhead layout and firearm images with straight arms,
 4. Render native previews and a local review page. Verify straightness, joined elbows, forward axis, face clearance, unchanged source data and locomotion. Stop for human review; no production migration.
 
 Review focus: character handedness, gun-to-face space, support arm simplicity, scan continuity, preserved gait phase.
+
+
+Final steering: raised near-horizontal straight arms from the additional front/top/underside references; visible non-contact gaps between arms and between left hand/weapon. Rifle lifted and advanced; shotgun entire receiver above hand. All guns then enlarged 25%, with width narrowed 15% of that enlarged width. New dev root transforms only; no production migration.

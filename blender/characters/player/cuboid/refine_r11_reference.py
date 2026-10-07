@@ -25,5 +25,6 @@ for cat,d in design['categories'].items():
         cam=camera(s,'R11_'+cat+'_ReferenceAngle',(3,-5,25),(0,-.35,1.2),1.95);d['cameras']['ReferenceAngle']=cam.name
     d['trigger']=list(TRIGGER[cat]);d['anchor_role']='trigger centre' if cat!='Pistol' else 'grip offset within block hand'
     d['gun_offset_forward_up_m']=list(GUN_OFFSET[cat])
+    d['gun_offset_character_right_m']=GUN_RIGHT[cat]
     assign(r,bpy.data.actions[d['actions']['Hold']]);s.frame_set(25)
 (OUT/'design.json').write_text(json.dumps(design,indent=2));result={'reference':'inward straight-arm convergence, lower hand height; no elbow changes'}

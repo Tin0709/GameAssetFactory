@@ -24,7 +24,7 @@ for cat,d in design['categories'].items():
             f=1+i/2;sample(r,s,a,f);dg=bpy.context.evaluated_depsgraph_get();gm=r.matrix_world.inverted()@main.evaluated_get(dg).matrix_world
             for side in ['R','L']:
                 u=r.pose.bones['UpperArm.'+side];fo=r.pose.bones['ForeArm.'+side];row['straight_angle_max_deg']=max(row['straight_angle_max_deg'],math.degrees((u.tail-u.head).angle(fo.tail-fo.head)));row['elbow_gap_max_m']=max(row['elbow_gap_max_m'],(u.tail-fo.head).length)
-            ch=r.pose.bones['Chest'].matrix.to_3x3();offset=ch@Vector((0,GUN_OFFSET[cat][1],GUN_OFFSET[cat][0]))
+            ch=r.pose.bones['Chest'].matrix.to_3x3();offset=ch@Vector((-GUN_RIGHT[cat],GUN_OFFSET[cat][1],GUN_OFFSET[cat][0]))
             anchor=Vector(tuple(TRIGGER[cat][j]*ATTACHMENT_SCALE[cat]/STUDY_GUN_SCALE[cat][j] for j in range(3)))
             row['trigger_to_hand_end_max_m']=max(row['trigger_to_hand_end_max_m'],(gm@anchor-r.pose.bones['ForeArm.R'].tail-offset).length)
             forward=r.pose.bones['Chest'].matrix.to_3x3()@Vector((0,0,1));row['forward_error_max_deg']=max(row['forward_error_max_deg'],math.degrees(forward.angle(gm.to_3x3()@Vector((0,1,0)))))
@@ -58,5 +58,8 @@ for mode,d in design['showcases'].items():
         if d['lower'] and (len(strips)!=1 or strips[0].action.name!=d['lower']):fail.append(mode+cat+' gait composition changed')
         if not d['lower'] and strips:fail.append(mode+cat+' unexpected lower track')
         if mode=='Turn' and r.parent.animation_data.action.name!=design['locomotion']['imported_actions']['PREVIEW_ONLY_R3_Walk_Path']:fail.append(cat+' turn path changed')
-report={'passed':not fail,'failures':fail,'actions':stats,'action_digests':{name:digest(bpy.data.actions[name]) for d in design['categories'].values() for name in d['actions'].values()},'source_actions_preserved':len(baseline['actions']),'source_meshes_preserved':len(baseline['geometry']),'source_rigs_preserved':len(baseline['rigs']),'note':'Straightness and attachment alignment sampled every half-frame. Head/arm separation sampled every 8 frames. Visual similarity requires human review; no claim of pixel identity across different character/weapon assets.'}
+for cat,d in design.get('walking',{}).items():
+    r=bpy.data.objects[d['actors'][cat]['rig']];strips=[st for tr in r.animation_data.nla_tracks for st in tr.strips]
+    if len(strips)!=1 or strips[0].action.name!=design['locomotion']['lower_copies']['Walk'] or strips[0].repeat!=4 or strips[0].scale!=1:fail.append(cat+' individual preview is not original Walk phase')
+report={'passed':not fail,'failures':fail,'actions':stats,'walking_preview_gait':'original Walk only, 16-frame gait repeated 4 times','walking_previews':list(design.get('walking',{})),'action_digests':{name:digest(bpy.data.actions[name]) for d in design['categories'].values() for name in d['actions'].values()},'source_actions_preserved':len(baseline['actions']),'source_meshes_preserved':len(baseline['geometry']),'source_rigs_preserved':len(baseline['rigs']),'note':'Straightness and attachment alignment sampled every half-frame. Head/arm separation sampled every 8 frames. Visual similarity requires human review; no claim of pixel identity across different character/weapon assets.'}
 (OUT/'validation.json').write_text(json.dumps(report,indent=2));result=report

@@ -15,8 +15,8 @@ assert all((OUT/p).is_file() for p in a.paths)
 for c in ['Pistol','Rifle','Shotgun']:
     for t in ['A','B']:
         for v in ['FrontReference','ReferenceAngle','ReverseTop','UnderReference','FrontThreeQuarter','Front','Side','Overhead']:assert (OUT/f'{c}_{t}_{v}.png').is_file()
-for m in ['Hold','Move','AimAround','Sprint','Turn']:assert (OUT/f'{m}_24fps.mp4').is_file()
+for m in ['Hold','Move','AimAround','Turn','Pistol_Walk','Rifle_Walk','Shotgun_Walk']:assert (OUT/f'{m}_24fps.mp4').is_file()
 scripts=re.findall(r'<script>(.*?)</script>',h,re.S);p=OUT/'page_script_check.js';p.write_text('\n'.join(scripts),encoding='utf-8')
 r=subprocess.run(['C:/Program Files/nodejs/node.exe','--check',str(p)],capture_output=True,text=True);assert r.returncode==0,r.stderr
-report={'passed':True,'static_links':len(a.paths),'AB_routes':48,'motion_routes':5,'javascript_syntax':'passed','browser_interaction':'not run; local file browser access unavailable'}
+report={'passed':True,'static_links':len(a.paths),'AB_routes':48,'motion_routes':7,'javascript_syntax':'passed','browser_interaction':'not run; local file browser access unavailable'}
 (OUT/'page_validation.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
