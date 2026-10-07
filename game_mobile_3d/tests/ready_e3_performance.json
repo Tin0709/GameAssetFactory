@@ -1,0 +1,13 @@
+{
+	"cpu_pose_usec": {
+		"Idle_legacy": 64.563,
+		"Idle_living": 82.5566666666667,
+		"Run_legacy": 65.891,
+		"Run_living": 83.7006666666667,
+		"Walk_legacy": 65.3513333333333,
+		"Walk_living": 64.9213333333333
+	},
+	"measured_iterations": 3000,
+	"phone_tested": false,
+	"warm_iterations": 200
+}

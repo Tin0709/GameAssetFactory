@@ -1,0 +1,29 @@
+{
+  "source_file_sha256": "2c45904613af8f836581184170a38b3539062e6f41287c2e49880e4b554d1e04",
+  "source_unchanged": true,
+  "protected_actions": {
+    "Draw_LongGun_V1": "59f282e14f9a7c69b63a1cba898faa7d6a7e276c17c4f0b2e54c74a19fb6484f",
+    "Draw_LongGun_V2": "d6f4522102849b4490e08ccc42437714132c6b7366629ac0cb52d38f3e0127e1",
+    "Draw_LongGun_V3_Final": "40e6963bdf34c3a14085f19bdd8538d2bd10ac5714d8f4f6b09319b4ca748fa3",
+    "Holster_LongGun_V1": "c3a5af2bc6a647dbe03ea5acea067005c6c00304683850eefd3068679ec34aea",
+    "Holster_LongGun_V2": "8aef42cf82c609debc7efd431cf1d6fde3200e66a6564dd7582a031daa160e89",
+    "Holster_LongGun_V3_Final": "17776e2daf4e43c2f35310c2077481cd81e00d0224cfc016721071b81d3c017e",
+    "HolsterLongGun": "17776e2daf4e43c2f35310c2077481cd81e00d0224cfc016721071b81d3c017e",
+    "Idle": "301dbee21e68b85fee0ab1d5cdf5f5771b144da19831579759bb56184ab42b8d",
+    "LongGunHold_V2": "e61a0d3d7dfb6bdb3888666d5e27d080da6c37a7d42eba60caf48a7c25066c35",
+    "LongGunReady_Loop_V1": "d7ae9e104cf65bc2c684f35cbd87a7872d3d80a67182e0cffd01039b76e3fdda",
+    "LongGunReady_Run_V1": "f6ffd9693a969d9a81b8c2f63efdb6d33f1f3825c964a57dc9efa645f8c863ec",
+    "Player_Idle": "16acf0d3f28f6b4aad8b9427135c388e0211eef29f72c0772d89193352474b6f",
+    "Player_Run_Blocky_V1": "50d17c38d1b7c19908420ea70d1e452ffbbd83ed7f1a0b7440a396c03ba0a401",
+    "Player_Run_Blocky_V2": "a6e9ad98175d3f52e56ab3d26d467accedc3961d31812f9111013c3fc27aff60",
+    "Player_Run_Blocky_V3": "38cf238e2029055b517cba9531b010e29dcc6bafa0b98858429e8969d9c256dc",
+    "Player_Run_Blocky_V4": "0c04d87f853a14eb50d19ea2f374b17e74286b6a9654f7adc5bb0f467f22172c",
+    "Player_Run_Blocky_V5": "ac66ed0bae9bee2489cb766355846017bebb41fe89623faae68cb25d45f7552c",
+    "Player_Run_Blocky_V6": "c0bdae1b87a1b0b60aa6d0fc635ae56be5589412264f1886adab1008c9311c63",
+    "Player_Run_Blocky_V7_Final": "cfffe904241cb8bc0f0cef4311b857d6672af22b09944c2aebceb568629e7306",
+    "PREVIEW_ONLY_E2_Run_Phase0_A": "da7f6e6f4f595cc4568cf7fc62e83bf7cad5ce951c0cd88b74a5a13ee41bae3a",
+    "PREVIEW_ONLY_E2_Run_Phase0_B": "d9c7ea3500eeeeb9b39ea6c89e2b2a213a8d5be7e94ab38383e250fca03c3da5",
+    "PREVIEW_ONLY_E2_Run_Phase0_C": "ece7960c7314355cf6b5b4e0ec661ace697475d5badc5baf1fe38d20c2c6274d",
+    "Run": "ffe9322e2486aff7cfce4a89a54aa5f8ac05a0b0b731173df6cdc6c4938294c6"
+  }
+}

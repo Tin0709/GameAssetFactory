@@ -1,0 +1,24 @@
+{
+	"cases": [
+		{
+			"natural_idle_ready": true,
+			"natural_moving_draw": "Walk fallback",
+			"natural_walk_fallback": true,
+			"ready_run": "separate composition diagnostic only",
+			"sprint_stow": true,
+			"weapon": 1
+		},
+		{
+			"natural_idle_ready": true,
+			"natural_moving_draw": "Walk fallback",
+			"natural_walk_fallback": true,
+			"ready_run": "separate composition diagnostic only",
+			"sprint_stow": true,
+			"weapon": 2
+		}
+	],
+	"checks": 41,
+	"clock_error_seconds": 0.0000000000000000520417042793042,
+	"failures": [],
+	"passed": true
+}

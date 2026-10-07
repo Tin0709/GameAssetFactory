@@ -1,0 +1,102 @@
+{
+  "passed": true,
+  "export": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\characters\\player_cuboid_animated_v4.glb",
+  "clips": [
+    "HolsterLongGun",
+    "Idle",
+    "Run",
+    "DrawLongGun",
+    "LongGunReadyIdle",
+    "LongGunReadyRun"
+  ],
+  "ready": {
+    "LongGunReadyIdle": {
+      "duration_seconds": 1.3333333730697632,
+      "source_frames": [
+        1.0,
+        33.0
+      ],
+      "channels": {
+        "Spine": [
+          "rotation"
+        ],
+        "Chest": [
+          "rotation"
+        ],
+        "Neck": [
+          "rotation"
+        ],
+        "Head": [
+          "rotation"
+        ],
+        "Arm.R": [
+          "rotation",
+          "translation"
+        ],
+        "Arm.L": [
+          "rotation",
+          "translation"
+        ],
+        "WeaponCarrier": [
+          "rotation",
+          "translation"
+        ]
+      },
+      "source_samples": 129,
+      "max_source_position_error_m": 2.40238809469227e-07,
+      "max_source_rotation_error_deg": 0.03166446655643522,
+      "seam_matrix_error": 0.0,
+      "lower_tracks": 0,
+      "scale_tracks": 0
+    },
+    "LongGunReadyRun": {
+      "duration_seconds": 0.6666666865348816,
+      "source_frames": [
+        1.0,
+        17.0
+      ],
+      "channels": {
+        "Spine": [
+          "rotation",
+          "translation"
+        ],
+        "Chest": [
+          "rotation",
+          "translation"
+        ],
+        "Neck": [
+          "rotation",
+          "translation"
+        ],
+        "Head": [
+          "rotation",
+          "translation"
+        ],
+        "Arm.R": [
+          "rotation",
+          "translation"
+        ],
+        "Arm.L": [
+          "rotation",
+          "translation"
+        ],
+        "WeaponCarrier": [
+          "rotation",
+          "translation"
+        ]
+      },
+      "source_samples": 65,
+      "max_source_position_error_m": 4.473271078706184e-07,
+      "max_source_rotation_error_deg": 0.029568904180950303,
+      "seam_matrix_error": 0.0,
+      "lower_tracks": 0,
+      "scale_tracks": 0
+    }
+  },
+  "v3_mesh_rig_idle_run_draw_holster_byte_preserved": true,
+  "retained_base_glb_vs_blender_composition_difference": {
+    "position_m": 3.9728266359920677e-07,
+    "rotation_deg": 0.04432135897749102
+  },
+  "legacy_hold_sha256": "e6447448618f4448f7e0183ccfd775ac68f482feb4e8b3d98fb3a031f7b1b9ca"
+}

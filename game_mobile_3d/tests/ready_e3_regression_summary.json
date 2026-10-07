@@ -1,0 +1,164 @@
+{
+  "validate_draw_d5": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_holster_d2": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_weapon_sprint_d3": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_weapon_behavior_d0": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_animation_v2": {
+    "passed": false,
+    "errors": [
+      "ERROR: Player retains ten bones plus non-deforming socket",
+      "ERROR: Target loss blends",
+      "ERROR: Target loss blends",
+      "ERROR: Target loss blends",
+      "ERROR: Hand contacts within 15mm: 1.06805813312531"
+    ],
+    "baseline_same_errors": true
+  },
+  "validate_blocky_v7_integration": {
+    "passed": false,
+    "errors": [
+      "ERROR: Existing non-deforming weapon socket retained"
+    ],
+    "baseline_same_errors": true
+  },
+  "validate_back_carry_d31": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_movement_weapons": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_locomotion_stop": {
+    "passed": false,
+    "errors": [
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip",
+      "ERROR: Actual gameplay input release has no leg flip"
+    ],
+    "baseline_same_errors": true
+  },
+  "validate_gameplay": {
+    "passed": false,
+    "errors": [
+      "ERROR: GAMEPLAY TEST FAILED: Original bones plus player weapon socket"
+    ],
+    "baseline_same_errors": true
+  },
+  "validate_combat": {
+    "passed": false,
+    "errors": [
+      "ERROR: COMBAT TEST FAILED: Out-of-range targets ignored"
+    ],
+    "baseline_same_errors": true
+  },
+  "validate_progression": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_spawn": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_weapon_select": {
+    "passed": false,
+    "errors": [
+      "ERROR: Selected weapon fires and starts recoil",
+      "ERROR: Index p_index = -1 is out of bounds ((int)data.children_cache.size() - data.internal_children_front_count_cache - data.internal_children_back_count_cache = 0).",
+      "SCRIPT ERROR: Invalid access to property or key 'global_position' on a base object of type 'null instance'."
+    ],
+    "baseline_same_errors": true
+  },
+  "validate_player_pose_lab": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_polish": {
+    "passed": false,
+    "errors": [
+      "ERROR: POLISH TEST FAILED: Death starts with loss of balance",
+      "ERROR: POLISH TEST FAILED: Death cleanup and drop",
+      "ERROR: Index p_index = 0 is out of bounds ((int)data.children_cache.size() - data.internal_children_front_count_cache - data.internal_children_back_count_cache = 0).",
+      "SCRIPT ERROR: Invalid access to property or key 'collected' on a base object of type 'null instance'."
+    ],
+    "baseline_same_errors": true
+  },
+  "validate_bounce_animation": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_damage_feedback": {
+    "passed": true,
+    "errors": [],
+    "baseline_same_errors": null
+  },
+  "validate_living_ready_e3": {
+    "passed": true,
+    "errors": []
+  },
+  "validate_ready_e3_live": {
+    "passed": true,
+    "errors": []
+  },
+  "source_blend_unchanged": true,
+  "rendered_sprint": {
+    "passed": true,
+    "checks": 1229,
+    "baseline_passed": true,
+    "first_run_cleanup_warning": true,
+    "verbose_rerun_cleanup_warning": false,
+    "game_review_runtime_errors": 0
+  }
+}

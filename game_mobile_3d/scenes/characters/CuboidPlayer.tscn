@@ -1,8 +1,8 @@
 [gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/cuboid_player.gd" id="1_player"]
-[ext_resource type="Script" path="res://scripts/player_draw_d5_integration.gd" id="2_animation"]
-[ext_resource type="PackedScene" path="res://assets/characters/player_cuboid_animated_v3.glb" id="3_model"]
+[ext_resource type="Script" path="res://scripts/player_ready_e3_integration.gd" id="2_animation"]
+[ext_resource type="PackedScene" path="res://assets/characters/player_cuboid_animated_v4.glb" id="3_model"]
 [ext_resource type="Script" path="res://scripts/auto_pistol.gd" id="4_pistol"]
 
 [ext_resource type="Script" path="res://scripts/animation_weapon_debug.gd" id="5_debug"]

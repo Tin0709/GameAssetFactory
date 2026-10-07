@@ -289,16 +289,19 @@ func _evaluate(_delta: float) -> void:
 			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i).lerp(authored_p, authored_weight))
 			skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(authored_q, authored_weight).normalized())
 	if generic_weapon_carry:
-		# Add a restrained model-space Chest bias, retaining all locomotion delta.
-		var chest_bias: Quaternion = Quaternion.IDENTITY.slerp(long_gun_hold_pose.rotation(chest, 0.0), long_gun_weight)
-		_rotate_global(chest, chest_bias)
-		# A filtered Animation pose layer in the existing sole writer. No IK or
-		# grip correction: arms/socket inherit Chest's authored locomotion rhythm.
-		for i in upper:
-			var p: Vector3 = weapon_hold_pose.position(i, 0.0).lerp(long_gun_hold_pose.position(i, 0.0), long_gun_weight)
-			var q: Quaternion = weapon_hold_pose.rotation(i, 0.0).slerp(long_gun_hold_pose.rotation(i, 0.0), long_gun_weight)
-			skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i).lerp(p, weapon_hold_weight))
-			skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(q, weapon_hold_weight).normalized())
+		_apply_weapon_carry()
+
+func _apply_weapon_carry() -> void:
+	# Add a restrained model-space Chest bias, retaining all locomotion delta.
+	var chest_bias: Quaternion = Quaternion.IDENTITY.slerp(long_gun_hold_pose.rotation(chest, 0.0), long_gun_weight)
+	_rotate_global(chest, chest_bias)
+	# A filtered Animation pose layer in the existing sole writer. No IK or
+	# grip correction: arms/socket inherit Chest's authored locomotion rhythm.
+	for i in upper:
+		var p: Vector3 = weapon_hold_pose.position(i, 0.0).lerp(long_gun_hold_pose.position(i, 0.0), long_gun_weight)
+		var q: Quaternion = weapon_hold_pose.rotation(i, 0.0).slerp(long_gun_hold_pose.rotation(i, 0.0), long_gun_weight)
+		skeleton.set_bone_pose_position(i, skeleton.get_bone_pose_position(i).lerp(p, weapon_hold_weight))
+		skeleton.set_bone_pose_rotation(i, skeleton.get_bone_pose_rotation(i).slerp(q, weapon_hold_weight).normalized())
 
 func _hold_arm(bone: int, contact: Vector3, palm: Vector3) -> void:
 	var pose := skeleton.get_bone_global_pose(bone)

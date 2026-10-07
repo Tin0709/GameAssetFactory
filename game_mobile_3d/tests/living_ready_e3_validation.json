@@ -1,0 +1,132 @@
+{
+	"cases": [
+		{
+			"attachment": "hand",
+			"case": "A/I standing draw -> idle",
+			"move_weight": 0.0,
+			"ready_run_time": 0.266666626930235,
+			"ready_weight": 1.0,
+			"run_time": 0.266666626930235,
+			"state": "READY",
+			"weapon": 1
+		},
+		{
+			"attachment": "hand",
+			"case": "B/C/D/E/F running and direction changes 2.60",
+			"move_weight": 1.0,
+			"ready_run_time": 0.559998807907073,
+			"ready_weight": 1.0,
+			"run_time": 0.559998807907073,
+			"state": "READY",
+			"weapon": 1
+		},
+		{
+			"attachment": "hand",
+			"case": "B/C/D/E/F running and direction changes 4.25",
+			"move_weight": 1.0,
+			"ready_run_time": 0.506664302349029,
+			"ready_weight": 1.0,
+			"run_time": 0.506664302349029,
+			"state": "READY",
+			"weapon": 1
+		},
+		{
+			"attachment": "hand",
+			"case": "B/C/D/E/F running and direction changes 6.25",
+			"move_weight": 1.0,
+			"ready_run_time": 0.453329796790985,
+			"ready_weight": 1.0,
+			"run_time": 0.453329796790985,
+			"state": "READY",
+			"weapon": 1
+		},
+		{
+			"attachment": "back",
+			"case": "K sprint -> holster -> stowed",
+			"move_weight": 1.0,
+			"ready_run_time": 0.359996383984789,
+			"ready_weight": 0.0,
+			"run_time": 0.359996383984789,
+			"state": "STOWED",
+			"weapon": 1
+		},
+		{
+			"attachment": "hand",
+			"case": "J/L moving draw -> ReadyRun",
+			"move_weight": 1.0,
+			"ready_run_time": 0.479996344248358,
+			"ready_weight": 1.0,
+			"run_time": 0.479996344248358,
+			"state": "READY",
+			"weapon": 1
+		},
+		{
+			"attachment": "hand",
+			"case": "A/I standing draw -> idle",
+			"move_weight": 0.0,
+			"ready_run_time": 0.0799961654344177,
+			"ready_weight": 1.0,
+			"run_time": 0.0799961654344177,
+			"state": "READY",
+			"weapon": 2
+		},
+		{
+			"attachment": "hand",
+			"case": "B/C/D/E/F running and direction changes 2.60",
+			"move_weight": 1.0,
+			"ready_run_time": 0.373328346411256,
+			"ready_weight": 1.0,
+			"run_time": 0.373328346411256,
+			"state": "READY",
+			"weapon": 2
+		},
+		{
+			"attachment": "hand",
+			"case": "B/C/D/E/F running and direction changes 4.25",
+			"move_weight": 1.0,
+			"ready_run_time": 0.319993840853212,
+			"ready_weight": 1.0,
+			"run_time": 0.319993840853212,
+			"state": "READY",
+			"weapon": 2
+		},
+		{
+			"attachment": "hand",
+			"case": "B/C/D/E/F running and direction changes 6.25",
+			"move_weight": 1.0,
+			"ready_run_time": 0.266659335295168,
+			"ready_weight": 1.0,
+			"run_time": 0.266659335295168,
+			"state": "READY",
+			"weapon": 2
+		},
+		{
+			"attachment": "back",
+			"case": "K sprint -> holster -> stowed",
+			"move_weight": 1.0,
+			"ready_run_time": 0.173325922488972,
+			"ready_weight": 0.0,
+			"run_time": 0.173325922488972,
+			"state": "STOWED",
+			"weapon": 2
+		},
+		{
+			"attachment": "hand",
+			"case": "J/L moving draw -> ReadyRun",
+			"move_weight": 1.0,
+			"ready_run_time": 0.293325882752541,
+			"ready_weight": 1.0,
+			"run_time": 0.293325882752541,
+			"state": "READY",
+			"weapon": 2
+		}
+	],
+	"checks": 1962,
+	"clock_error_seconds": 0.0000000000000000346944695195361,
+	"composition_position_error_m": 0.000000245756240246919,
+	"composition_rotation_error_rad": 0.0009765625,
+	"failures": [],
+	"lower_position_error_m": 0.0,
+	"passed": true,
+	"phase_error_seconds": 0.0
+}
