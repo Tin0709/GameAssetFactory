@@ -1,0 +1,86 @@
+R10-WH2 — ELBOW FOLD + THREE-WEAPON SHOWCASE
+2026-10-08 | STUDY ONLY | Awaiting human visual review
+
+BASE AND SCOPE
+The approved R10-WH1 hold is A. B changes only UpperArm.R, ForeArm.R,
+UpperArm.L and ForeArm.L rotation curves. The weapon placement, sight/eye
+relationship, subtle head lean, torso breathing and scan curves are copied
+unchanged. All original Actions, geometry, weights and bone rest data remain
+preserved. No production or Godot migration is included.
+
+ELBOW SHAPING
+The elbow plane is lowered and drawn toward the body, so the upper segment
+descends and the forearm rises toward its contact. This exposes an intentional
+fold instead of letting the two cuboids read as one extended tube.
+
+Rifle and shotgun contacts slide modestly back along the existing gun surface.
+The rifle uses 6.5 cm rearward primary and 8 cm rearward support controls; the
+shotgun uses 6 cm and 8 cm. These are internal hand-centre controls, not a gun
+translation. A shallow lateral surface fit maintains the actual contact.
+
+The pistol keeps its longitudinal contact positions. Its support forearm rolls
+30 degrees around the gun direction to expose a corner touch and a stronger
+upward fold. The already bent trigger arm retains a more open fold; forcing
+both hands closer together would undo WH1's separated hand roles.
+
+Representative ready frame 25, bend between upper-arm and forearm directions:
+                         RIGHT primary        LEFT light support
+Rifle / M4:              56.8 -> 69.5 deg      36.6 -> 70.1 deg
+Shotgun:                 58.9 -> 79.7 deg      38.4 -> 54.2 deg
+Pistol:                  77.6 -> 72.6 deg      39.2 -> 54.2 deg
+Angle alone is not an aesthetic score. The pistol improvement comes chiefly
+from the support fold and elbow plane, rather than increasing every angle.
+
+CONSISTENT HOLD LANGUAGE
+The CHARACTER'S RIGHT arm remains the primary control, with the gun on the
+right-eye side (screen-left in a neutral front view). The LEFT arm crosses the
+body and only lightly supports. Nominal signed vertex depth remains about
+3 mm for the right contact and 0.6 mm for the left. The single WeaponCarrier
+authority is retained; the left hand does not control a competing gun transform.
+
+The original eye-face proxy and head lean are unchanged. Contact depth and eye
+alignment are measurement proxies, not a finger grip or calibrated ADS camera.
+Rigid cuboids still meet at their joints; this is a pose refinement, with no
+rounding, bevel, rig stretching or anatomical mesh replacement.
+
+LIVING BEHAVIOR
+Ready breathing, moving hold, continuous look-around and turning retain the
+approved timing. The left support gesture still follows the scan three frames
+later (125 ms at 24 fps). The new elbow shape is baked throughout each clip,
+with quaternion continuity and looping handles. There is no reset to a neutral
+arm pose during the scan.
+
+Native Walk remains 16 frames and Sprint 13 frames, at 24 fps. Both A and B use
+the same original lower-body Actions, NLA timing and path/facing curves. Turning
+keeps the original path-test case cuts; it is labelled as a reel, not a loop.
+Sprint's 208-frame movie is an excerpt; its full combined loop is 832 frames.
+
+SHOWCASE AND A/B REVIEW
+index.html presents pistol, rifle/M4 and shotgun together, in that order.
+The top showcase offers a stable representative hold and 24-fps living ready /
+aim-around clips. Angle controls expose front, trigger-side 3/4, support-side
+3/4, side and rear views. A/B controls compare the actual approved WH1 pose to
+the refined pose. Separate A/B videos cover Ready, Look-around, Walk, Turning
+and Sprint for every weapon. Full renders open from each character card.
+
+Blender contains R10WH2_SHOWCASE_HOLD and R10WH2_SHOWCASE_AIMAROUND, each with
+all three weapons. Fifteen R10WH2_AB_<CLASS>_<MODE> scenes provide paired review.
+Nine public <LongGun/Shotgun/Pistol><Hold/Move/AimAround>_ElbowStudy_V2 Actions
+and three PREVIEW_ONLY_R10WH2_<CLASS>_TURN Actions are new study data only.
+
+VERIFICATION
+validation.json checks all twelve upper clips at half-frame intervals, including
+exact preservation of every non-arm curve, original Actions, geometry/weights,
+rest rig, eye alignment, shallow contacts, head/chest clearance, connected
+elbows, unit scale, upward forearm fold, motion steps and loop seams.
+review_validation.json checks identical composed body/gait poses and original
+path bindings; every integer turning/showcase frame fits the review camera.
+media_validation.json records full decode, frame count, fps and hashes for all
+17 clips. file_preservation.json checks all 10,319 protected source files.
+final_save.json and delivery_validation.json verify the delivered checkpoint
+and reopened study. The read-only review is recorded in audit_notes.txt.
+
+Human review should judge the elbow hooks from both 3/4 views and the side view,
+the primary/support distinction, and the breathing/scan continuity in motion.
+Mechanical checks do not establish artistic approval. Broad production
+migration remains stopped pending review.

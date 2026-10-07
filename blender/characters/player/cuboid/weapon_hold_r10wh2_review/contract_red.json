@@ -1,0 +1,15 @@
+{
+  "passed": false,
+  "missing": [
+    "LongGunHold_ElbowStudy_V2",
+    "LongGunMove_ElbowStudy_V2",
+    "LongGunAimAround_ElbowStudy_V2",
+    "ShotgunHold_ElbowStudy_V2",
+    "ShotgunMove_ElbowStudy_V2",
+    "ShotgunAimAround_ElbowStudy_V2",
+    "PistolHold_ElbowStudy_V2",
+    "PistolMove_ElbowStudy_V2",
+    "PistolAimAround_ElbowStudy_V2"
+  ],
+  "reason": "New elbow studies not authored"
+}

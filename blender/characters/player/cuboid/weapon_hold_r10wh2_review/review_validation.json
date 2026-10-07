@@ -1,0 +1,324 @@
+{
+  "passed": true,
+  "failures": [],
+  "reviews": {
+    "Pistol_Hold": {
+      "sample_frames": [
+        1,
+        25,
+        49,
+        73,
+        96
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": []
+    },
+    "Pistol_Move": {
+      "sample_frames": [
+        1,
+        17,
+        33,
+        49,
+        64
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": [
+        [
+          "PREVIEW_ONLY_R9W4_Walk_LOWER",
+          4.0,
+          1.0
+        ]
+      ]
+    },
+    "Pistol_AimAround": {
+      "sample_frames": [
+        1,
+        49,
+        73,
+        145,
+        217,
+        289
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": []
+    },
+    "Pistol_Turn": {
+      "sample_frames": [
+        1,
+        25,
+        49,
+        72,
+        73,
+        109,
+        144,
+        145,
+        193,
+        240,
+        241,
+        301,
+        348,
+        349,
+        409,
+        456
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": [
+        [
+          "PREVIEW_ONLY_R9W4_Walk_V3_TURN_LOWER",
+          1.0,
+          1.0
+        ]
+      ]
+    },
+    "Pistol_Sprint": {
+      "sample_frames": [
+        1,
+        14,
+        52,
+        104,
+        156,
+        208,
+        833
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": [
+        [
+          "PREVIEW_ONLY_R9W4_Sprint_LOWER",
+          64.0,
+          1.0
+        ]
+      ]
+    },
+    "Rifle_Hold": {
+      "sample_frames": [
+        1,
+        25,
+        49,
+        73,
+        96
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": []
+    },
+    "Rifle_Move": {
+      "sample_frames": [
+        1,
+        17,
+        33,
+        49,
+        64
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": [
+        [
+          "PREVIEW_ONLY_R9W4_Walk_LOWER",
+          4.0,
+          1.0
+        ]
+      ]
+    },
+    "Rifle_AimAround": {
+      "sample_frames": [
+        1,
+        49,
+        73,
+        145,
+        217,
+        289
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": []
+    },
+    "Rifle_Turn": {
+      "sample_frames": [
+        1,
+        25,
+        49,
+        72,
+        73,
+        109,
+        144,
+        145,
+        193,
+        240,
+        241,
+        301,
+        348,
+        349,
+        409,
+        456
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": [
+        [
+          "PREVIEW_ONLY_R9W4_Walk_V3_TURN_LOWER",
+          1.0,
+          1.0
+        ]
+      ]
+    },
+    "Rifle_Sprint": {
+      "sample_frames": [
+        1,
+        14,
+        52,
+        104,
+        156,
+        208,
+        833
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": [
+        [
+          "PREVIEW_ONLY_R9W4_Sprint_LOWER",
+          64.0,
+          1.0
+        ]
+      ]
+    },
+    "Shotgun_Hold": {
+      "sample_frames": [
+        1,
+        25,
+        49,
+        73,
+        96
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": []
+    },
+    "Shotgun_Move": {
+      "sample_frames": [
+        1,
+        17,
+        33,
+        49,
+        64
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": [
+        [
+          "PREVIEW_ONLY_R9W4_Walk_LOWER",
+          4.0,
+          1.0
+        ]
+      ]
+    },
+    "Shotgun_AimAround": {
+      "sample_frames": [
+        1,
+        49,
+        73,
+        145,
+        217,
+        289
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": []
+    },
+    "Shotgun_Turn": {
+      "sample_frames": [
+        1,
+        25,
+        49,
+        72,
+        73,
+        109,
+        144,
+        145,
+        193,
+        240,
+        241,
+        301,
+        348,
+        349,
+        409,
+        456
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": [
+        [
+          "PREVIEW_ONLY_R9W4_Walk_V3_TURN_LOWER",
+          1.0,
+          1.0
+        ]
+      ]
+    },
+    "Shotgun_Sprint": {
+      "sample_frames": [
+        1,
+        14,
+        52,
+        104,
+        156,
+        208,
+        833
+      ],
+      "matched_body_and_gait_max_difference": 0,
+      "gait_strips": [
+        [
+          "PREVIEW_ONLY_R9W4_Sprint_LOWER",
+          64.0,
+          1.0
+        ]
+      ]
+    }
+  },
+  "camera_bounds": {
+    "Pistol_Turn": {
+      "min": [
+        0.10341377556324005,
+        0.2848812937736511
+      ],
+      "max": [
+        0.8964071869850159,
+        0.7333858013153076
+      ],
+      "frames": 456
+    },
+    "Rifle_Turn": {
+      "min": [
+        0.03758725896477699,
+        0.2848812937736511
+      ],
+      "max": [
+        0.962361216545105,
+        0.7751901149749756
+      ],
+      "frames": 456
+    },
+    "Shotgun_Turn": {
+      "min": [
+        0.03931102529168129,
+        0.2848812937736511
+      ],
+      "max": [
+        0.9605283141136169,
+        0.774788498878479
+      ],
+      "frames": 456
+    },
+    "Showcase_Hold": {
+      "min": [
+        0.10949749499559402,
+        0.14614351093769073
+      ],
+      "max": [
+        0.8986176252365112,
+        0.7683298587799072
+      ],
+      "frames": 96
+    },
+    "Showcase_AimAround": {
+      "min": [
+        0.10585752129554749,
+        0.14614351093769073
+      ],
+      "max": [
+        0.9380429983139038,
+        0.7687279582023621
+      ],
+      "frames": 288
+    }
+  }
+}
