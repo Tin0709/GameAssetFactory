@@ -1,0 +1,746 @@
+[
+  {
+    "offset": [
+      0,
+      0,
+      0
+    ],
+    "pole_back": 0.2,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 13,
+        "depth_m": 0.030054447874237833
+      }
+    },
+    "cost": 0.0
+  },
+  {
+    "offset": [
+      0,
+      -0.025,
+      0
+    ],
+    "pole_back": 0.2,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "ForeArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 32,
+        "depth_m": 0.029826474046491358
+      }
+    },
+    "cost": 0.0015
+  },
+  {
+    "offset": [
+      0,
+      -0.05,
+      0
+    ],
+    "pole_back": 0.1,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "ForeArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 32,
+        "depth_m": 0.030906386453117884
+      }
+    },
+    "cost": 0.003
+  },
+  {
+    "offset": [
+      0,
+      -0.05,
+      0
+    ],
+    "pole_back": 0.2,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "ForeArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 32,
+        "depth_m": 0.030906386453117884
+      }
+    },
+    "cost": 0.003
+  },
+  {
+    "offset": [
+      0.025,
+      0,
+      0
+    ],
+    "pole_back": 0.2,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 25,
+        "depth_m": 0.0030472465097780566
+      },
+      "ForeArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 13,
+        "depth_m": 0.03195964044658606
+      }
+    },
+    "cost": 0.004547246509778056
+  },
+  {
+    "offset": [
+      0,
+      -0.025,
+      0
+    ],
+    "pole_back": 0.1,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 29,
+        "depth_m": 0.007609672239465293
+      },
+      "ForeArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 32,
+        "depth_m": 0.029826474046491358
+      }
+    },
+    "cost": 0.009109672239465292
+  },
+  {
+    "offset": [
+      0.05,
+      -0.025,
+      0
+    ],
+    "pole_back": 0.2,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 21,
+        "depth_m": 0.009175262050330146
+      },
+      "ForeArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 37,
+        "depth_m": 0.03401557882099854
+      }
+    },
+    "cost": 0.01252936401657983
+  },
+  {
+    "offset": [
+      0,
+      0,
+      0
+    ],
+    "pole_back": 0.1,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 34,
+        "depth_m": 0.023805658138445707
+      },
+      "ForeArm.R": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 13,
+        "depth_m": 0.030054447874237833
+      }
+    },
+    "cost": 0.023805658138445707
+  },
+  {
+    "offset": [
+      0.05,
+      -0.025,
+      0
+    ],
+    "pole_back": 0.1,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 43,
+        "depth_m": 0.033417217079543815
+      },
+      "ForeArm.R": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 37,
+        "depth_m": 0.03401557882099854
+      }
+    },
+    "cost": 0.0367713190457935
+  },
+  {
+    "offset": [
+      0.025,
+      0,
+      0
+    ],
+    "pole_back": 0.1,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 43,
+        "depth_m": 0.03690027439252541
+      },
+      "ForeArm.R": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 13,
+        "depth_m": 0.03195964044658606
+      }
+    },
+    "cost": 0.03840027439252541
+  },
+  {
+    "offset": [
+      0.05,
+      0,
+      0
+    ],
+    "pole_back": 0.2,
+    "contacts": {
+      "Head": {
+        "triangles": 22,
+        "depth_m": 0.002062537551966892
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 42,
+        "depth_m": 0.01567035237499692
+      },
+      "ForeArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 21,
+        "depth_m": 0.035075193827597384
+      }
+    },
+    "cost": 0.039295727894665844
+  },
+  {
+    "offset": [
+      0,
+      -0.05,
+      0
+    ],
+    "pole_back": 0,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 30,
+        "depth_m": 0.038200157526215306
+      },
+      "ForeArm.R": {
+        "triangles": 11,
+        "depth_m": 0.0017823315374566606
+      },
+      "ForeArm.L": {
+        "triangles": 32,
+        "depth_m": 0.030906386453117884
+      }
+    },
+    "cost": 0.04120015752621531
+  },
+  {
+    "offset": [
+      0,
+      -0.025,
+      0
+    ],
+    "pole_back": 0,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 30,
+        "depth_m": 0.053758813122282034
+      },
+      "ForeArm.R": {
+        "triangles": 11,
+        "depth_m": 0.00917356391517965
+      },
+      "ForeArm.L": {
+        "triangles": 32,
+        "depth_m": 0.029826474046491358
+      }
+    },
+    "cost": 0.055258813122282036
+  },
+  {
+    "offset": [
+      0,
+      0,
+      0
+    ],
+    "pole_back": 0,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 44,
+        "depth_m": 0.06798515468621197
+      },
+      "ForeArm.R": {
+        "triangles": 11,
+        "depth_m": 0.01882711614868582
+      },
+      "ForeArm.L": {
+        "triangles": 13,
+        "depth_m": 0.030054447874237833
+      }
+    },
+    "cost": 0.06798515468621197
+  },
+  {
+    "offset": [
+      0.05,
+      0,
+      0
+    ],
+    "pole_back": 0.1,
+    "contacts": {
+      "Head": {
+        "triangles": 22,
+        "depth_m": 0.002062537551966892
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 43,
+        "depth_m": 0.049035794133098665
+      },
+      "ForeArm.R": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 21,
+        "depth_m": 0.035075193827597384
+      }
+    },
+    "cost": 0.07266116965276759
+  },
+  {
+    "offset": [
+      0.05,
+      -0.025,
+      0
+    ],
+    "pole_back": 0,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 44,
+        "depth_m": 0.07080873491447182
+      },
+      "ForeArm.R": {
+        "triangles": 22,
+        "depth_m": 0.01169270126466515
+      },
+      "ForeArm.L": {
+        "triangles": 37,
+        "depth_m": 0.03401557882099854
+      }
+    },
+    "cost": 0.0741628368807215
+  },
+  {
+    "offset": [
+      0.025,
+      0,
+      0
+    ],
+    "pole_back": 0,
+    "contacts": {
+      "Head": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 44,
+        "depth_m": 0.07621811724667704
+      },
+      "ForeArm.R": {
+        "triangles": 11,
+        "depth_m": 0.020444140555541
+      },
+      "ForeArm.L": {
+        "triangles": 13,
+        "depth_m": 0.03195964044658606
+      }
+    },
+    "cost": 0.07771811724667704
+  },
+  {
+    "offset": [
+      0.05,
+      0,
+      0
+    ],
+    "pole_back": 0,
+    "contacts": {
+      "Head": {
+        "triangles": 22,
+        "depth_m": 0.002062537551966892
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 44,
+        "depth_m": 0.08323185639903141
+      },
+      "ForeArm.R": {
+        "triangles": 11,
+        "depth_m": 0.02112472864509851
+      },
+      "ForeArm.L": {
+        "triangles": 21,
+        "depth_m": 0.035075193827597384
+      }
+    },
+    "cost": 0.10685723191870033
+  },
+  {
+    "offset": [
+      0.075,
+      0,
+      0
+    ],
+    "pole_back": 0.2,
+    "contacts": {
+      "Head": {
+        "triangles": 53,
+        "depth_m": 0.015504338248926636
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 43,
+        "depth_m": 0.02687339617579443
+      },
+      "ForeArm.R": {
+        "triangles": 5,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 37,
+        "depth_m": 0.03911206878912543
+      }
+    },
+    "cost": 0.1864167786650608
+  },
+  {
+    "offset": [
+      0.05,
+      0.025,
+      0
+    ],
+    "pole_back": 0.2,
+    "contacts": {
+      "Head": {
+        "triangles": 60,
+        "depth_m": 0.016008550118227494
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 41,
+        "depth_m": 0.030335338728267325
+      },
+      "ForeArm.R": {
+        "triangles": 4,
+        "depth_m": 0.0
+      },
+      "ForeArm.L": {
+        "triangles": 13,
+        "depth_m": 0.0366601622987901
+      }
+    },
+    "cost": 0.19377494187679195
+  },
+  {
+    "offset": [
+      0.075,
+      0,
+      0
+    ],
+    "pole_back": 0.1,
+    "contacts": {
+      "Head": {
+        "triangles": 53,
+        "depth_m": 0.015504338248926636
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 43,
+        "depth_m": 0.06016658496165006
+      },
+      "ForeArm.R": {
+        "triangles": 5,
+        "depth_m": 0.0007188501931133517
+      },
+      "ForeArm.L": {
+        "triangles": 37,
+        "depth_m": 0.03911206878912543
+      }
+    },
+    "cost": 0.21970996745091642
+  },
+  {
+    "offset": [
+      0.05,
+      0.025,
+      0
+    ],
+    "pole_back": 0.1,
+    "contacts": {
+      "Head": {
+        "triangles": 60,
+        "depth_m": 0.016008550118227494
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 43,
+        "depth_m": 0.06530108044943594
+      },
+      "ForeArm.R": {
+        "triangles": 11,
+        "depth_m": 0.004439637695539789
+      },
+      "ForeArm.L": {
+        "triangles": 13,
+        "depth_m": 0.0366601622987901
+      }
+    },
+    "cost": 0.22874068359796057
+  },
+  {
+    "offset": [
+      0.05,
+      0.025,
+      0
+    ],
+    "pole_back": 0,
+    "contacts": {
+      "Head": {
+        "triangles": 60,
+        "depth_m": 0.016008550118227494
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 51,
+        "depth_m": 0.08077701733566683
+      },
+      "ForeArm.R": {
+        "triangles": 11,
+        "depth_m": 0.03204520619102247
+      },
+      "ForeArm.L": {
+        "triangles": 13,
+        "depth_m": 0.0366601622987901
+      }
+    },
+    "cost": 0.24421662048419146
+  },
+  {
+    "offset": [
+      0.075,
+      0,
+      0
+    ],
+    "pole_back": 0,
+    "contacts": {
+      "Head": {
+        "triangles": 53,
+        "depth_m": 0.015504338248926636
+      },
+      "Chest": {
+        "triangles": 0,
+        "depth_m": 0.0
+      },
+      "UpperArm.R": {
+        "triangles": 44,
+        "depth_m": 0.08907962936904423
+      },
+      "ForeArm.R": {
+        "triangles": 22,
+        "depth_m": 0.02085819284299284
+      },
+      "ForeArm.L": {
+        "triangles": 37,
+        "depth_m": 0.03911206878912543
+      }
+    },
+    "cost": 0.2486230118583106
+  }
+]

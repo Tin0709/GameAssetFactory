@@ -1,0 +1,47 @@
+{
+  "ready": {
+    "frames": 96,
+    "fps": 24.0,
+    "duration_s": 4.0,
+    "size": [
+      1440,
+      640
+    ]
+  },
+  "move": {
+    "frames": 64,
+    "fps": 24.0,
+    "duration_s": 2.6666666666666665,
+    "size": [
+      1440,
+      640
+    ]
+  },
+  "sweep": {
+    "frames": 288,
+    "fps": 24.0,
+    "duration_s": 12.0,
+    "size": [
+      1440,
+      640
+    ]
+  },
+  "walk_local": {
+    "frames": 288,
+    "fps": 24.0,
+    "duration_s": 12.0,
+    "size": [
+      1440,
+      640
+    ]
+  },
+  "figure8": {
+    "frames": 288,
+    "fps": 24.0,
+    "duration_s": 12.0,
+    "size": [
+      1440,
+      640
+    ]
+  }
+}

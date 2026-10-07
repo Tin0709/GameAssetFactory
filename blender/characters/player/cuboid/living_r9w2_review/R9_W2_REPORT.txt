@@ -1,0 +1,141 @@
+R9-W2 — SUPPORT-ARM READABILITY + WEAPON CONTACT POLISH
+2026-10-07 | BLENDER-ONLY RIGV2 STUDY | ARTISTIC STATUS: AWAITING HUMAN REVIEW
+
+1. ACTUAL CAUSES
+Inspected W1 centered Ready, left/right steering, reversal, and the same
+moments over the existing Walk, using fixed inspection cameras. Before
+frames are retained. Reference interpretation is reused from W1; no exact
+reference angles or timing have been inferred from its moving camera.
+
+A: W1's elbow-pole variation was small. B: from the gameplay camera the
+far-side left elbow was largely superimposed on the rifle/torso. C: the
+previous left internal hand-center target (weapon local y about 0.25m,
+z about 0.02m) was near the magazine, not a defined handguard surface.
+The primary grip also ran through the solid right terminal block. The stock
+crossed the right upper-arm volume. This explains why tiny center-target
+drift in W1 did not establish good contact. These findings correct the
+overbroad 'fore-end contact' wording in the W1 report.
+
+2. CONTACT CORRECTIONS AND REMAINING INTERSECTIONS
+The rifle sweep, placement, scale and orientation are unchanged. The right
+elbow configuration moves rearward to clear the stock while a side surface
+of the terminal block meets the grip. The left block approaches the rear
+handguard underside instead of enclosing the magazine. Both corrections
+are shared by B and C. No mesh, hand size, segment length or weapon scaling.
+
+Targets stored in design.json are INTERNAL block control points, not contact
+markers. The surface diagnostics use terminal rigid-block bounds and patches
+on the actual grip side (x=-0.033) and handguard underside (z=0.122), plus
+weapon-triangle/rigid-box intersection checks. A probe caught a 7mm floating
+support before final surface fitting; the rejected pose is not the V2.
+
+Final C surface-patch gaps across half-frames: right <=
+1.071mm; left <= 1.425mm.
+The terminal hand boxes do not intersect in the sampled steering sweep.
+Stock butt-pad samples retain body contact, but contact can include embedding.
+
+Remaining visible stock/upper-arm penetration: Steering frame 191.5,
+t=7.9375s, Side and Close views (StockWorst_C_Side.png / Close.png).
+Maximum weapon-vertex depth against a 5mm inset upper-arm box is
+9.85mm, versus W1's roughly 64mm
+for that region. This is a lower-bound proxy, not exact penetration volume.
+Right forearm retains 4 intersecting triangles in the inset-box test;
+left forearm reaches 4 during steering. Their sampled vertex-depth proxy is
+zero, which DOES NOT establish zero intersection. Small corner/edge overlaps
+remain around the grip/stock, visible in the same close side diagnosis.
+The support's worst sampled surface gap is frame 256.5 / 10.6458s; inspect
+SupportGapWorst_C_Close.png and Opposite.png. No conspicuous detachment is
+visible there, but the broad block still makes an edge contact, not a
+fingered wrap. This is contact polish, not fully clean weapon-body geometry.
+
+3. LEFT SHOULDER / ELBOW / FOREARM
+The shoulder joint stays fixed. Upper-arm and forearm rotations coordinate
+around the unchanged two-link chain; the elbow remains connected. C rotates
+the elbow-plane configuration through an authored 30-degree bias plus a
+30-degree response to W1's existing support-drive sample. That sample already
+contains the chosen 125ms history. No extra whole-hand lag was added.
+This configuration was chosen from actual geometry, not a universal rule
+mapping left aim to elbow opening. A negative-direction probe hid the elbow
+more; a moderate positive orbit gave the clearer silhouette without a
+horizontal 'airplane' arm. Support x/y stay fixed in weapon space while its
+internal center height adjusts to keep a terminal surface at the handguard.
+Most motion comes from the elbow/upper arm, not sliding the contact away.
+
+At the fixed 960x640 Gameplay inspection camera, horizontal elbow travel is
+30.3px for A,
+22.2px for B and
+55.3px for C.
+These are projected joint ranges, not visibility percentages or artistic
+scores. Occlusion remains at several headings and at native distance.
+
+4. RIGHT-GRIP / WEAPON RELATIONSHIP
+Weapon authority is unchanged: WeaponCarrier bone -> COPY_TRANSFORMS on
+M4A1_Reference_CarrierMount -> M4A1_Blocky_Root -> M4A1_Blocky_Base.
+Actual bones are UpperArm.L/R and ForeArm.L/R; no hand bones exist.
+Right contact is identical between B and C. It no longer pins the center
+inside the grip; it fits a block side surface beside the grip. Across the
+steering half-frame samples, authored right internal-target fit error is
+0.032mm; left is
+0.500mm. These are bake/interpolation
+errors around the per-frame intended target, not claims of identical rigid
+hand-to-gun transforms. The arm pivots as the pose changes.
+
+5. CHEST / HEAD
+No Chest, Spine, Neck, Head or WeaponCarrier curve changes versus V1.
+No increased head tilt and no new weapon path or competing driver.
+
+6. CREATED FILE / ACTIONS
+../player_longgun_living_r9w2_study.blend
+LongGunAimAround_LeftRight_V2: 288-frame cycle / 12 seconds.
+LongGunReady_LivingRef_V2: 96-frame cycle / 4 seconds.
+LongGunReady_Move_V2: 64-frame cycle / 2.667 seconds.
+All are upper-body/helper only, 39 curves, no Root/Hips/leg tracks.
+Ready and Move V2 are needed because they share the corrected contact.
+Six PREVIEW_ONLY_R9W2_A/B Actions hold upper-only W1/reference comparisons.
+Existing V1 lower-body/path Actions are used directly in NLA, with no new
+lower-body animation tracks, clock remap, 1.60x multiplier or Run V7 clock.
+
+7. MATCHED A/B/C REVIEW
+A original W1; B corrected contact with W1 gesture; C same corrected contact
+plus the clearer support response. Matched camera, orthographic size, input,
+timing and locomotion phase in each triptych. Uniform directional lighting
+removes the positional lighting differences of W1's shared-scene previews.
+All comparison clips are 24fps at 1x default. Five complete videos: stationary
+sweep/reversal, same sweep over Walk with root removed, actual figure-eight,
+Ready and Move. The figure-eight remains an authored diagnostic scenario.
+Gameplay framing comes first, then native-distance and close/side diagnosis.
+Blender opens on R9W2_REVIEW_SWEEP, frame 49, with C selected and the original
+crossbow frame board beside the viewport. Scene selector exposes other cases.
+
+8. PRESERVATION / VALIDATION
+9725 protected files unchanged; 36 pre-existing Actions
+unchanged, including every V1 and the Walk source. Geometry/weights, rest
+matrices, hierarchy, bone lengths and 13-bone RigV2 remain unchanged.
+No new persistent IK, no bone constraints, no added bones, scale or stretching.
+Shoulder shifts are below 0.001mm and connected elbow gap is zero in samples.
+No head/chest weapon triangles intersect the 5mm inset boxes at half-frames.
+Sampled A/B/C lower-body matrices match the original NLA source exactly;
+Chest/head/weapon matrices agree exactly between variants. NLA uses the
+original frame range with scale/repeat 1, so no gait clock restart is inserted.
+Loop endpoint matrices agree below 0.000001. Finite-difference upper-body
+rotation-velocity mismatch at the seam is <=
+0.001486rad/s;
+new arm quaternion curves use periodic endpoint tangents. This is sampled
+numerical continuity, not proof of artistic smoothness or all-time collision
+freedom. Full video streams were decoded, and ordered rendered frames were
+inspected. I do NOT claim a continuous perceptual playback review.
+
+9. ARTISTIC LIMITATIONS / STOP
+C has a clearer elbow configuration and more visible open/settle motion;
+the major contact improvement is already apparent in B. The rifle still
+occludes the far elbow at some headings. At native-distance framing the
+difference is smaller than close inspection suggests. The diagonal rifle
+still foreshortens in the opposite view. The fingerless blocks give edge
+support rather than a convincing wrapped grip, and residual stock/corner
+penetration above remains. Review the arm sweep in real-time playback before
+accepting it artistically. Planted turning weight and foot sliding remain
+separate unresolved W1 issues; they were not redesigned here.
+No Godot, production migration, gameplay, recoil/reload or Draw/Holster edits.
+No further pass is started automatically.
+
+ARTISTIC STATUS: AWAITING HUMAN REVIEW.
