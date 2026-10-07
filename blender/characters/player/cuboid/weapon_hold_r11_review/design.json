@@ -351,39 +351,6 @@
       "lower": null,
       "loop": true
     },
-    "Sprint": {
-      "scene": "R11_SHOWCASE_SPRINT",
-      "actors": {
-        "Pistol": {
-          "rig": "R11_Showcase_Sprint_Pistol_Rig",
-          "mesh": "R11_Showcase_Sprint_Pistol_R9W1_Author_Mesh",
-          "weapons": [
-            "R11_Showcase_Sprint_Pistol_R9W4_Asset_Pistol_Blocky_Pistol_Base"
-          ],
-          "upper": "PistolMove_SimpleR11"
-        },
-        "Rifle": {
-          "rig": "R11_Showcase_Sprint_Rifle_Rig",
-          "mesh": "R11_Showcase_Sprint_Rifle_R9W1_Author_Mesh",
-          "weapons": [
-            "R11_Showcase_Sprint_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
-          ],
-          "upper": "LongGunMove_SimpleR11"
-        },
-        "Shotgun": {
-          "rig": "R11_Showcase_Sprint_Shotgun_Rig",
-          "mesh": "R11_Showcase_Sprint_Shotgun_R9W1_Author_Mesh",
-          "weapons": [
-            "R11_Showcase_Sprint_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
-            "R11_Showcase_Sprint_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
-          ],
-          "upper": "ShotgunMove_SimpleR11"
-        }
-      },
-      "frames": 208,
-      "lower": "PREVIEW_ONLY_R9W4_Sprint_LOWER",
-      "loop": false
-    },
     "Turn": {
       "scene": "R11_SHOWCASE_TURN",
       "actors": {
@@ -415,6 +382,95 @@
       },
       "frames": 456,
       "lower": "PREVIEW_ONLY_R9W4_Walk_V3_TURN_LOWER",
+      "loop": false
+    }
+  },
+  "walking": {
+    "Pistol": {
+      "scene": "R11_WALK_PISTOL",
+      "actors": {
+        "Pistol": {
+          "rig": "R11_Walk_Pistol_Rig",
+          "mesh": "R11_Walk_Pistol_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_Walk_Pistol_R9W4_Asset_Pistol_Blocky_Pistol_Base"
+          ],
+          "upper": "PistolMove_SimpleR11"
+        }
+      },
+      "frames": 64,
+      "lower": "PREVIEW_ONLY_R9W4_Walk_LOWER",
+      "loop": true,
+      "gait": "Walk"
+    },
+    "Rifle": {
+      "scene": "R11_WALK_RIFLE",
+      "actors": {
+        "Rifle": {
+          "rig": "R11_Walk_Rifle_Rig",
+          "mesh": "R11_Walk_Rifle_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_Walk_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
+          ],
+          "upper": "LongGunMove_SimpleR11"
+        }
+      },
+      "frames": 64,
+      "lower": "PREVIEW_ONLY_R9W4_Walk_LOWER",
+      "loop": true,
+      "gait": "Walk"
+    },
+    "Shotgun": {
+      "scene": "R11_WALK_SHOTGUN",
+      "actors": {
+        "Shotgun": {
+          "rig": "R11_Walk_Shotgun_Rig",
+          "mesh": "R11_Walk_Shotgun_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_Walk_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
+            "R11_Walk_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
+          ],
+          "upper": "ShotgunMove_SimpleR11"
+        }
+      },
+      "frames": 64,
+      "lower": "PREVIEW_ONLY_R9W4_Walk_LOWER",
+      "loop": true,
+      "gait": "Walk"
+    }
+  },
+  "archived_previews": {
+    "Sprint": {
+      "scene": "R11_ARCHIVE_PRE_WALK_ONLY_SPRINT",
+      "actors": {
+        "Pistol": {
+          "rig": "R11_Showcase_Sprint_Pistol_Rig",
+          "mesh": "R11_Showcase_Sprint_Pistol_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_Showcase_Sprint_Pistol_R9W4_Asset_Pistol_Blocky_Pistol_Base"
+          ],
+          "upper": "PistolMove_SimpleR11"
+        },
+        "Rifle": {
+          "rig": "R11_Showcase_Sprint_Rifle_Rig",
+          "mesh": "R11_Showcase_Sprint_Rifle_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_Showcase_Sprint_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
+          ],
+          "upper": "LongGunMove_SimpleR11"
+        },
+        "Shotgun": {
+          "rig": "R11_Showcase_Sprint_Shotgun_Rig",
+          "mesh": "R11_Showcase_Sprint_Shotgun_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_Showcase_Sprint_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
+            "R11_Showcase_Sprint_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
+          ],
+          "upper": "ShotgunMove_SimpleR11"
+        }
+      },
+      "frames": 208,
+      "lower": "PREVIEW_ONLY_R9W4_Sprint_LOWER",
       "loop": false
     }
   }

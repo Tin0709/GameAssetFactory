@@ -3506,5 +3506,13 @@
       }
     }
   },
-  "contact_diagnostic_note": "Exact triangle-versus-terminal-box intersections; conservative surface distance bounds. Before bounds reconstructed at original width using unchanged pose and weapon transforms. Zero intersections do not imply a pose regression; left-hand separation already exists in the source study."
+  "contact_diagnostic_note": "Exact triangle-versus-terminal-box intersections; conservative surface distance bounds. Before bounds reconstructed at original width using unchanged pose and weapon transforms. Zero intersections do not imply a pose regression; left-hand separation already exists in the source study.",
+  "final_fresh_checks": {
+    "original_file_sha256": true,
+    "actions": true,
+    "rigs_rest_bones": true,
+    "other_meshes": true,
+    "weights_topology_uv_materials": true,
+    "width_length_depth": true
+  }
 }
