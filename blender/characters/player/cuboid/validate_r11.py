@@ -49,7 +49,8 @@ for cat,d in design['categories'].items():
             sample(r,s,a,25);gm=main.evaluated_get(bpy.context.evaluated_depsgraph_get()).matrix_world;p=r.matrix_world@r.pose.bones['ForeArm.R'].matrix
             handtop=max((p@Vector((x,y,z))).z for x in [-.1125,.1125] for y in [.1875,.3375] for z in [-.1125,.1125]);bottom=min((gm@Vector((x,y,.054))).z for x in [-.0375,.0375] for y in [-.034,.237]);row['shotgun_receiver_lower_edge_above_hand_m']=bottom-handtop
             if row['shotgun_receiver_lower_edge_above_hand_m']<.005:fail.append(name+' shotgun receiver buried in hand')
-        if row['straight_angle_max_deg']>.08 or row['elbow_gap_max_m']>1e-5 or row['attachment_alignment_max_m']>1e-5 or row['forward_error_max_deg']>.08 or row['head_intersections'] or row['head_gap_lower_min_m']<.025 or row['loop_error']>1e-5 or row['left_cross_min_m']<.15 or row['arm_separation_lower_min_m']<.015 or row['left_weapon_gap_lower_min_m']<.02:fail.append(name+' pose/clearance failed')
+        cross_required=not (cat=='Pistol' and design.get('pistol_one_hand'))
+        if row['straight_angle_max_deg']>.08 or row['elbow_gap_max_m']>1e-5 or row['attachment_alignment_max_m']>1e-5 or row['forward_error_max_deg']>.08 or row['head_intersections'] or row['head_gap_lower_min_m']<.025 or row['loop_error']>1e-5 or (cross_required and row['left_cross_min_m']<.15) or row['arm_separation_lower_min_m']<.015 or row['left_weapon_gap_lower_min_m']<.02:fail.append(name+' pose/clearance failed')
         stats[name]=row
 # The preview NLA retains the original lower clip and unchanged path Action.
 for mode,d in design['showcases'].items():

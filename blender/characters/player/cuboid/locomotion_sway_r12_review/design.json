@@ -1,0 +1,318 @@
+{
+  "scope": "Isolated universal torso-sway study; human review before production migration",
+  "gaits": {
+    "Walk": {
+      "period": 16,
+      "twist": 3.0,
+      "roll": 1.8,
+      "lateral": 0.006,
+      "bank": 4.0
+    },
+    "Sprint": {
+      "period": 13,
+      "twist": 4.0,
+      "roll": 2.4,
+      "lateral": 0.008,
+      "bank": 6.0
+    }
+  },
+  "source_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_weapon_hold_r11_walk_sway_fit_study.blend",
+  "scenes": {
+    "Walk": {
+      "scene": "R12_WALK_ALL",
+      "actors": {
+        "Unarmed": {
+          "rig": "R12_Walk_Unarmed_Rig",
+          "mesh": "R11_R12_Walk_Unarmed_R9W1_Author_Mesh",
+          "weapons": [],
+          "upper": "R12_Walk_Unarmed_Upper",
+          "motion": {
+            "harmonic_cos": -0.9999655841119016,
+            "harmonic_sin": 0.008296420417478845,
+            "end_frame": 17,
+            "bank_max_deg": 0
+          }
+        },
+        "Pistol": {
+          "rig": "R12_Walk_Pistol_Rig",
+          "mesh": "R11_R12_Walk_Pistol_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Walk_Pistol_R9W4_Asset_Pistol_Blocky_Pistol_Base"
+          ],
+          "upper": "R12_Walk_Pistol_Upper",
+          "motion": {
+            "harmonic_cos": -0.9999655841119016,
+            "harmonic_sin": 0.008296420417478845,
+            "end_frame": 17,
+            "bank_max_deg": 0
+          }
+        },
+        "Rifle": {
+          "rig": "R12_Walk_Rifle_Rig",
+          "mesh": "R11_R12_Walk_Rifle_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Walk_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
+          ],
+          "upper": "R12_Walk_Rifle_Upper",
+          "motion": {
+            "harmonic_cos": -0.9999655841119016,
+            "harmonic_sin": 0.008296420417478845,
+            "end_frame": 17,
+            "bank_max_deg": 0
+          }
+        },
+        "Shotgun": {
+          "rig": "R12_Walk_Shotgun_Rig",
+          "mesh": "R11_R12_Walk_Shotgun_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Walk_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
+            "R11_R12_Walk_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
+          ],
+          "upper": "R12_Walk_Shotgun_Upper",
+          "motion": {
+            "harmonic_cos": -0.9999655841119016,
+            "harmonic_sin": 0.008296420417478845,
+            "end_frame": 17,
+            "bank_max_deg": 0
+          }
+        }
+      },
+      "lower": "PREVIEW_ONLY_R9W4_Walk_LOWER",
+      "frame_start": 1,
+      "frame_end": 64,
+      "path_yaw": null,
+      "loop": true
+    },
+    "Walk_Turn": {
+      "scene": "R12_WALK_TURN_ALL",
+      "actors": {
+        "Unarmed": {
+          "rig": "R12_Walk_Unarmed_Turn_Rig",
+          "mesh": "R11_R12_Walk_Unarmed_Turn_R9W1_Author_Mesh",
+          "weapons": [],
+          "upper": "R12_Walk_Unarmed_Turn_Upper",
+          "motion": {
+            "harmonic_cos": -0.9999655841119016,
+            "harmonic_sin": 0.008296420417478845,
+            "end_frame": 456,
+            "bank_max_deg": 3.6176886705721802
+          }
+        },
+        "Pistol": {
+          "rig": "R12_Walk_Pistol_Turn_Rig",
+          "mesh": "R11_R12_Walk_Pistol_Turn_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Walk_Pistol_Turn_R9W4_Asset_Pistol_Blocky_Pistol_Base"
+          ],
+          "upper": "R12_Walk_Pistol_Turn_Upper",
+          "motion": {
+            "harmonic_cos": -0.9999655841119016,
+            "harmonic_sin": 0.008296420417478845,
+            "end_frame": 456,
+            "bank_max_deg": 3.6176886705721802
+          }
+        },
+        "Rifle": {
+          "rig": "R12_Walk_Rifle_Turn_Rig",
+          "mesh": "R11_R12_Walk_Rifle_Turn_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Walk_Rifle_Turn_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
+          ],
+          "upper": "R12_Walk_Rifle_Turn_Upper",
+          "motion": {
+            "harmonic_cos": -0.9999655841119016,
+            "harmonic_sin": 0.008296420417478845,
+            "end_frame": 456,
+            "bank_max_deg": 3.6176886705721802
+          }
+        },
+        "Shotgun": {
+          "rig": "R12_Walk_Shotgun_Turn_Rig",
+          "mesh": "R11_R12_Walk_Shotgun_Turn_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Walk_Shotgun_Turn_R9W4_Asset_Shotgun_Shotgun_Pump",
+            "R11_R12_Walk_Shotgun_Turn_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
+          ],
+          "upper": "R12_Walk_Shotgun_Turn_Upper",
+          "motion": {
+            "harmonic_cos": -0.9999655841119016,
+            "harmonic_sin": 0.008296420417478845,
+            "end_frame": 456,
+            "bank_max_deg": 3.6176886705721802
+          }
+        }
+      },
+      "lower": "PREVIEW_ONLY_R9W4_Walk_V3_TURN_LOWER",
+      "frame_start": 145,
+      "frame_end": 240,
+      "path_yaw": "R12_Walk_NativeYaw_InPlace",
+      "loop": false
+    },
+    "Sprint": {
+      "scene": "R12_SPRINT_ALL",
+      "actors": {
+        "Unarmed": {
+          "rig": "R12_Sprint_Unarmed_Rig",
+          "mesh": "R11_R12_Sprint_Unarmed_R9W1_Author_Mesh",
+          "weapons": [],
+          "upper": "R12_Sprint_Unarmed_Upper",
+          "motion": {
+            "harmonic_cos": -0.9964246114806034,
+            "harmonic_sin": 0.08448664767718425,
+            "end_frame": 14,
+            "bank_max_deg": 0
+          }
+        },
+        "Pistol": {
+          "rig": "R12_Sprint_Pistol_Rig",
+          "mesh": "R11_R12_Sprint_Pistol_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Sprint_Pistol_R9W4_Asset_Pistol_Blocky_Pistol_Base"
+          ],
+          "upper": "R12_Sprint_Pistol_Upper",
+          "motion": {
+            "harmonic_cos": -0.9964246114806034,
+            "harmonic_sin": 0.08448664767718425,
+            "end_frame": 14,
+            "bank_max_deg": 0
+          }
+        },
+        "Rifle": {
+          "rig": "R12_Sprint_Rifle_Rig",
+          "mesh": "R11_R12_Sprint_Rifle_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Sprint_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
+          ],
+          "upper": "R12_Sprint_Rifle_Upper",
+          "motion": {
+            "harmonic_cos": -0.9964246114806034,
+            "harmonic_sin": 0.08448664767718425,
+            "end_frame": 14,
+            "bank_max_deg": 0
+          }
+        },
+        "Shotgun": {
+          "rig": "R12_Sprint_Shotgun_Rig",
+          "mesh": "R11_R12_Sprint_Shotgun_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Sprint_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
+            "R11_R12_Sprint_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
+          ],
+          "upper": "R12_Sprint_Shotgun_Upper",
+          "motion": {
+            "harmonic_cos": -0.9964246114806034,
+            "harmonic_sin": 0.08448664767718425,
+            "end_frame": 14,
+            "bank_max_deg": 0
+          }
+        }
+      },
+      "lower": "PREVIEW_ONLY_R9W4_Sprint_LOWER",
+      "frame_start": 1,
+      "frame_end": 52,
+      "path_yaw": null,
+      "loop": true
+    },
+    "Sprint_Turn": {
+      "scene": "R12_SPRINT_TURN_ALL",
+      "actors": {
+        "Unarmed": {
+          "rig": "R12_Sprint_Unarmed_Turn_Rig",
+          "mesh": "R11_R12_Sprint_Unarmed_Turn_R9W1_Author_Mesh",
+          "weapons": [],
+          "upper": "R12_Sprint_Unarmed_Turn_Upper",
+          "motion": {
+            "harmonic_cos": -0.9964246114806034,
+            "harmonic_sin": 0.08448664767718425,
+            "end_frame": 456,
+            "bank_max_deg": 5.4265330058582695
+          }
+        },
+        "Pistol": {
+          "rig": "R12_Sprint_Pistol_Turn_Rig",
+          "mesh": "R11_R12_Sprint_Pistol_Turn_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Sprint_Pistol_Turn_R9W4_Asset_Pistol_Blocky_Pistol_Base"
+          ],
+          "upper": "R12_Sprint_Pistol_Turn_Upper",
+          "motion": {
+            "harmonic_cos": -0.9964246114806034,
+            "harmonic_sin": 0.08448664767718425,
+            "end_frame": 456,
+            "bank_max_deg": 5.4265330058582695
+          }
+        },
+        "Rifle": {
+          "rig": "R12_Sprint_Rifle_Turn_Rig",
+          "mesh": "R11_R12_Sprint_Rifle_Turn_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Sprint_Rifle_Turn_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
+          ],
+          "upper": "R12_Sprint_Rifle_Turn_Upper",
+          "motion": {
+            "harmonic_cos": -0.9964246114806034,
+            "harmonic_sin": 0.08448664767718425,
+            "end_frame": 456,
+            "bank_max_deg": 5.4265330058582695
+          }
+        },
+        "Shotgun": {
+          "rig": "R12_Sprint_Shotgun_Turn_Rig",
+          "mesh": "R11_R12_Sprint_Shotgun_Turn_R9W1_Author_Mesh",
+          "weapons": [
+            "R11_R12_Sprint_Shotgun_Turn_R9W4_Asset_Shotgun_Shotgun_Pump",
+            "R11_R12_Sprint_Shotgun_Turn_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
+          ],
+          "upper": "R12_Sprint_Shotgun_Turn_Upper",
+          "motion": {
+            "harmonic_cos": -0.9964246114806034,
+            "harmonic_sin": 0.08448664767718425,
+            "end_frame": 456,
+            "bank_max_deg": 5.4265330058582695
+          }
+        }
+      },
+      "lower": "PREVIEW_ONLY_R9W4_Sprint_V3_TURN_LOWER",
+      "frame_start": 145,
+      "frame_end": 240,
+      "path_yaw": "R12_Sprint_NativeYaw_InPlace",
+      "loop": false
+    }
+  },
+  "source_locomotion": {
+    "source_file": "player_locomotion_turning_v3_study.blend",
+    "source_action_digests": {
+      "Walk_ReferenceStudy_V2": "a8097861aeeb804aa3a2de96b72c3983d7f609684216cdce8d27b7fe50e8b626",
+      "Sprint_ReferenceStudy_V2": "83faf7231c2abf7a0aad9b918d3d8d53a31bbb22026834967145bf4b426a600d",
+      "Walk_TurnLeft_Reference_V3": "1591898ad84ed6b846e836aedc0e657abf07ffd9a1678152a6ad396e2df65b71",
+      "Walk_TurnRight_Reference_V3": "43ea9b1ff467c22502b441f5fb7c64563f257febde4af110ef9708967806d435",
+      "Sprint_TurnLeft_Reference_V3": "f9ff910cfd72967b63c3a9e302e9c57e1daa9ff4ac3ca8e49bb7633d027b0a99",
+      "Sprint_TurnRight_Reference_V3": "d0a2a6917516eb2152bfb53cd9dc806b29ce2b65e814bd189a205af687344913",
+      "PREVIEW_ONLY_R3_Walk_Path": "3ef163352b322bd7d830c10822460ffa09e5259808af97821553da6ac9acc729",
+      "PREVIEW_ONLY_R3_Sprint_Path": "b77c6067e2f93dbfa8a59b41abd29c10dbdec725bb89945fa029f6657f980b79"
+    },
+    "imported_actions": {
+      "Walk_ReferenceStudy_V2": "R9W4_SOURCE_Walk_ReferenceStudy_V2",
+      "Sprint_ReferenceStudy_V2": "R9W4_SOURCE_Sprint_ReferenceStudy_V2",
+      "Walk_TurnLeft_Reference_V3": "R9W4_SOURCE_Walk_TurnLeft_Reference_V3",
+      "Walk_TurnRight_Reference_V3": "R9W4_SOURCE_Walk_TurnRight_Reference_V3",
+      "Sprint_TurnLeft_Reference_V3": "R9W4_SOURCE_Sprint_TurnLeft_Reference_V3",
+      "Sprint_TurnRight_Reference_V3": "R9W4_SOURCE_Sprint_TurnRight_Reference_V3",
+      "PREVIEW_ONLY_R3_Walk_Path": "R9W4_SOURCE_PREVIEW_ONLY_R3_Walk_Path",
+      "PREVIEW_ONLY_R3_Sprint_Path": "R9W4_SOURCE_PREVIEW_ONLY_R3_Sprint_Path"
+    },
+    "lower_rest_matrix_error": 0.0,
+    "walk_period": 16,
+    "sprint_period": 13,
+    "turn_weights_and_paths": "Original R3 review metadata / path Actions; V3 turn poses at same continuing phase; no foot edits",
+    "lower_copies": {
+      "Walk": "PREVIEW_ONLY_R9W4_Walk_LOWER",
+      "Sprint": "PREVIEW_ONLY_R9W4_Sprint_LOWER"
+    },
+    "turn_lower": {
+      "Walk": "PREVIEW_ONLY_R9W4_Walk_V3_TURN_LOWER",
+      "Sprint": "PREVIEW_ONLY_R9W4_Sprint_V3_TURN_LOWER"
+    }
+  },
+  "turn_preview": "Native S-curve case only, original phase and yaw; in-place direction review"
+}

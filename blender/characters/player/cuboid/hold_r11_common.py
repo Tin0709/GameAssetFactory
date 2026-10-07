@@ -10,7 +10,7 @@ ATTACHMENT_SCALE={'Rifle':.84,'Shotgun':.70,'Pistol':1.0}
 STUDY_GUN_SCALE={cat:(base*1.25*.85,base*1.25,base*1.25) for cat,base in ATTACHMENT_SCALE.items()}
 STUDY_GUN_SCALE['Shotgun']=tuple(v*1.30 for v in STUDY_GUN_SCALE['Shotgun'])
 GUN_OFFSET={'Rifle':(.065,.035),'Shotgun':(.175,.140),'Pistol':(0,0)} # enlarged shotgun stock stays clear of face
-GUN_RIGHT={'Rifle':.015,'Shotgun':.015,'Pistol':0} # moved inward 1.5 cm from the previous character-right offset
+GUN_RIGHT={'Rifle':.005,'Shotgun':.005,'Pistol':0} # latest art review: another 1 cm inward, keeping right-arm ownership
 
 def clone_r11(label,s,cat):
     r,m,ws=clone_r10('R11_'+label,s,cat)
