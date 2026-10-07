@@ -1,0 +1,4710 @@
+[
+  {
+    "path": "pose.bones[\"Chest\"].rotation_euler",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.7333333492279053,
+          0.0
+        ],
+        "right": [
+          1.2666666507720947,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          1.7999999523162842,
+          0.016580628231167793
+        ],
+        "left": [
+          1.5333333015441895,
+          0.009916644543409348
+        ],
+        "right": [
+          2.5333333015441895,
+          0.03490658476948738
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          4.0,
+          0.03490658476948738
+        ],
+        "left": [
+          3.2666666507720947,
+          0.030506901443004608
+        ],
+        "right": [
+          4.333333492279053,
+          0.03690643981099129
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          0.04363323003053665
+        ],
+        "left": [
+          4.666666507720947,
+          0.04072434827685356
+        ],
+        "right": [
+          5.800000190734863,
+          0.05061454698443413
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.400000095367432,
+          0.05235987901687622
+        ],
+        "left": [
+          6.599999904632568,
+          0.05235987901687622
+        ],
+        "right": [
+          8.0,
+          0.05235987901687622
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.199999809265137,
+          0.05235987901687622
+        ],
+        "left": [
+          8.600000381469727,
+          0.05235987901687622
+        ],
+        "right": [
+          9.866666793823242,
+          0.05235987901687622
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.199999809265137,
+          0.045378562062978745
+        ],
+        "left": [
+          10.533332824707031,
+          0.0471106581389904
+        ],
+        "right": [
+          11.383333206176758,
+          0.04490223526954651
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.75,
+          0.04415683075785637
+        ],
+        "left": [
+          11.566666603088379,
+          0.044691890478134155
+        ],
+        "right": [
+          12.25,
+          0.04269757494330406
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.25,
+          0.036651913076639175
+        ],
+        "left": [
+          12.75,
+          0.03882307559251785
+        ],
+        "right": [
+          13.5,
+          0.03556632995605469
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.03490658476948738
+        ],
+        "left": [
+          13.75,
+          0.03490658476948738
+        ],
+        "right": [
+          14.25,
+          0.03490658476948738
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Chest\"].rotation_euler",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.7333333492279053,
+          0.0
+        ],
+        "right": [
+          1.2666666507720947,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          1.7999999523162842,
+          -0.01745329238474369
+        ],
+        "left": [
+          1.5333333015441895,
+          -0.008578781969845295
+        ],
+        "right": [
+          2.5333333015441895,
+          -0.04185819625854492
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          4.0,
+          -0.10471975803375244
+        ],
+        "left": [
+          3.2666666507720947,
+          -0.06849953532218933
+        ],
+        "right": [
+          4.333333492279053,
+          -0.12118349969387054
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          -0.13962633907794952
+        ],
+        "left": [
+          4.666666507720947,
+          -0.13962633907794952
+        ],
+        "right": [
+          5.800000190734863,
+          -0.13962633907794952
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.400000095367432,
+          -0.0872664600610733
+        ],
+        "left": [
+          6.599999904632568,
+          -0.13962633907794952
+        ],
+        "right": [
+          8.0,
+          -0.047996558248996735
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.199999809265137,
+          0.03490658476948738
+        ],
+        "left": [
+          8.600000381469727,
+          0.03490658476948738
+        ],
+        "right": [
+          9.866666793823242,
+          0.03490658476948738
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.199999809265137,
+          0.0
+        ],
+        "left": [
+          10.533332824707031,
+          0.020141437649726868
+        ],
+        "right": [
+          11.383333206176758,
+          -0.00553889712318778
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.75,
+          -0.017492802813649178
+        ],
+        "left": [
+          11.566666603088379,
+          -0.011484375223517418
+        ],
+        "right": [
+          12.25,
+          -0.033879414200782776
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.25,
+          -0.06108652427792549
+        ],
+        "left": [
+          12.75,
+          -0.05073424428701401
+        ],
+        "right": [
+          13.5,
+          -0.06626266241073608
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          -0.06981316953897476
+        ],
+        "left": [
+          13.75,
+          -0.06981316953897476
+        ],
+        "right": [
+          14.25,
+          -0.06981316953897476
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Chest\"].rotation_euler",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.7333333492279053,
+          0.0
+        ],
+        "right": [
+          1.2666666507720947,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          1.7999999523162842,
+          0.0
+        ],
+        "left": [
+          1.5333333015441895,
+          0.0
+        ],
+        "right": [
+          2.5333333015441895,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          4.0,
+          0.0
+        ],
+        "left": [
+          3.2666666507720947,
+          0.0
+        ],
+        "right": [
+          4.333333492279053,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          0.008726646192371845
+        ],
+        "left": [
+          4.666666507720947,
+          0.008726646192371845
+        ],
+        "right": [
+          5.800000190734863,
+          0.008726646192371845
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.400000095367432,
+          -0.005235987715423107
+        ],
+        "left": [
+          6.599999904632568,
+          -0.005235987715423107
+        ],
+        "right": [
+          8.0,
+          -0.005235987715423107
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.199999809265137,
+          -0.005235987715423107
+        ],
+        "left": [
+          8.600000381469727,
+          -0.005235987715423107
+        ],
+        "right": [
+          9.866666793823242,
+          -0.005235987715423107
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.199999809265137,
+          0.0
+        ],
+        "left": [
+          10.533332824707031,
+          0.0
+        ],
+        "right": [
+          11.383333206176758,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.75,
+          0.0
+        ],
+        "left": [
+          11.566666603088379,
+          0.0
+        ],
+        "right": [
+          12.25,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.25,
+          0.0
+        ],
+        "left": [
+          12.75,
+          0.0
+        ],
+        "right": [
+          13.5,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          13.75,
+          0.0
+        ],
+        "right": [
+          14.25,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Spine\"].rotation_euler",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.3333333134651184,
+          0.0
+        ],
+        "right": [
+          1.6666667461395264,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          3.0,
+          0.0026179938577115536
+        ],
+        "left": [
+          2.3333332538604736,
+          0.0012051084777340293
+        ],
+        "right": [
+          3.933333396911621,
+          0.004596033599227667
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.800000190734863,
+          0.006981316953897476
+        ],
+        "left": [
+          4.866666793823242,
+          0.006981316953897476
+        ],
+        "right": [
+          6.433333396911621,
+          0.006981316953897476
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.700000286102295,
+          0.006108652334660292
+        ],
+        "left": [
+          7.066667079925537,
+          0.006612857338041067
+        ],
+        "right": [
+          9.050000190734863,
+          0.0050339000299572945
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.75,
+          0.001745329238474369
+        ],
+        "left": [
+          10.399999618530273,
+          0.003342371666803956
+        ],
+        "right": [
+          12.5,
+          0.0008580834255553782
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          13.25,
+          0.0
+        ],
+        "right": [
+          14.75,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Spine\"].rotation_euler",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.3333333134651184,
+          0.0
+        ],
+        "right": [
+          1.6666667461395264,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          3.0,
+          0.0
+        ],
+        "left": [
+          2.3333332538604736,
+          0.0
+        ],
+        "right": [
+          3.933333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.800000190734863,
+          -0.01745329238474369
+        ],
+        "left": [
+          4.866666793823242,
+          -0.01745329238474369
+        ],
+        "right": [
+          6.433333396911621,
+          -0.01745329238474369
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.700000286102295,
+          -0.006981316953897476
+        ],
+        "left": [
+          7.066667079925537,
+          -0.010256502777338028
+        ],
+        "right": [
+          9.050000190734863,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.75,
+          0.0
+        ],
+        "left": [
+          10.399999618530273,
+          0.0
+        ],
+        "right": [
+          12.5,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          13.25,
+          0.0
+        ],
+        "right": [
+          14.75,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Spine\"].rotation_euler",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.3333333134651184,
+          0.0
+        ],
+        "right": [
+          1.6666667461395264,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          3.0,
+          0.0
+        ],
+        "left": [
+          2.3333332538604736,
+          0.0
+        ],
+        "right": [
+          3.933333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.800000190734863,
+          0.0
+        ],
+        "left": [
+          4.866666793823242,
+          0.0
+        ],
+        "right": [
+          6.433333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.700000286102295,
+          0.0
+        ],
+        "left": [
+          7.066667079925537,
+          0.0
+        ],
+        "right": [
+          9.050000190734863,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.75,
+          0.0
+        ],
+        "left": [
+          10.399999618530273,
+          0.0
+        ],
+        "right": [
+          12.5,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          13.25,
+          0.0
+        ],
+        "right": [
+          14.75,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Neck\"].rotation_euler",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.11666667461395264,
+          0.0
+        ],
+        "right": [
+          2.116666793823242,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          4.349999904632568,
+          0.0
+        ],
+        "left": [
+          3.233333110809326,
+          0.0
+        ],
+        "right": [
+          5.799999713897705,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.699999809265137,
+          0.0
+        ],
+        "left": [
+          7.25,
+          0.0
+        ],
+        "right": [
+          9.800000190734863,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.0,
+          0.0
+        ],
+        "left": [
+          10.899999618530273,
+          0.0
+        ],
+        "right": [
+          12.666666984558105,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          13.333333015441895,
+          0.0
+        ],
+        "right": [
+          14.666666984558105,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Neck\"].rotation_euler",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.11666667461395264,
+          0.0
+        ],
+        "right": [
+          2.116666793823242,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          4.349999904632568,
+          0.03490658476948738
+        ],
+        "left": [
+          3.233333110809326,
+          0.03490658476948738
+        ],
+        "right": [
+          5.799999713897705,
+          0.03490658476948738
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.699999809265137,
+          -0.010471975430846214
+        ],
+        "left": [
+          7.25,
+          -0.010471975430846214
+        ],
+        "right": [
+          9.800000190734863,
+          -0.010471975430846214
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.0,
+          0.003490658476948738
+        ],
+        "left": [
+          10.899999618530273,
+          0.003490658476948738
+        ],
+        "right": [
+          12.666666984558105,
+          0.003490658476948738
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          13.333333015441895,
+          0.0
+        ],
+        "right": [
+          14.666666984558105,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Neck\"].rotation_euler",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.11666667461395264,
+          0.0
+        ],
+        "right": [
+          2.116666793823242,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          4.349999904632568,
+          0.0
+        ],
+        "left": [
+          3.233333110809326,
+          0.0
+        ],
+        "right": [
+          5.799999713897705,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.699999809265137,
+          0.0
+        ],
+        "left": [
+          7.25,
+          0.0
+        ],
+        "right": [
+          9.800000190734863,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.0,
+          0.0
+        ],
+        "left": [
+          10.899999618530273,
+          0.0
+        ],
+        "right": [
+          12.666666984558105,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          13.333333015441895,
+          0.0
+        ],
+        "right": [
+          14.666666984558105,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Head\"].rotation_euler",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.2666667699813843,
+          0.0
+        ],
+        "right": [
+          2.266666889190674,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          4.800000190734863,
+          0.0
+        ],
+        "left": [
+          3.5333333015441895,
+          0.0
+        ],
+        "right": [
+          6.333333492279053,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.399999618530273,
+          0.0
+        ],
+        "left": [
+          7.866666316986084,
+          0.0
+        ],
+        "right": [
+          10.933333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          12.466666221618652,
+          0.0
+        ],
+        "right": [
+          15.533333778381348,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Head\"].rotation_euler",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.2666667699813843,
+          0.0
+        ],
+        "right": [
+          2.266666889190674,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          4.800000190734863,
+          0.01745329238474369
+        ],
+        "left": [
+          3.5333333015441895,
+          0.01745329238474369
+        ],
+        "right": [
+          6.333333492279053,
+          0.01745329238474369
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.399999618530273,
+          -0.006981316953897476
+        ],
+        "left": [
+          7.866666316986084,
+          -0.006981316953897476
+        ],
+        "right": [
+          10.933333396911621,
+          -0.006981316953897476
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          12.466666221618652,
+          0.0
+        ],
+        "right": [
+          15.533333778381348,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Head\"].rotation_euler",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.2666667699813843,
+          0.0
+        ],
+        "right": [
+          2.266666889190674,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          4.800000190734863,
+          0.0
+        ],
+        "left": [
+          3.5333333015441895,
+          0.0
+        ],
+        "right": [
+          6.333333492279053,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.399999618530273,
+          0.0
+        ],
+        "left": [
+          7.866666316986084,
+          0.0
+        ],
+        "right": [
+          10.933333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          12.466666221618652,
+          0.0
+        ],
+        "right": [
+          15.533333778381348,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"WeaponCarrier\"].location",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          -0.07238292694091797
+        ],
+        "left": [
+          -0.4166666269302368,
+          -0.07238292694091797
+        ],
+        "right": [
+          2.4166665077209473,
+          -0.07238292694091797
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          -0.07238292694091797
+        ],
+        "left": [
+          5.150000095367432,
+          -0.07238292694091797
+        ],
+        "right": [
+          5.349999904632568,
+          -0.07238292694091797
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      },
+      {
+        "co": [
+          5.550000190734863,
+          -0.05658239126205444
+        ],
+        "left": [
+          5.450000286102295,
+          -0.07238292694091797
+        ],
+        "right": [
+          5.849999904632568,
+          -0.009180832654237747
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.449999809265137,
+          0.33050042390823364
+        ],
+        "left": [
+          6.150000095367432,
+          0.20203112065792084
+        ],
+        "right": [
+          6.683333396911621,
+          0.4304210841655731
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.150000095367432,
+          0.516089916229248
+        ],
+        "left": [
+          6.916666507720947,
+          0.48028743267059326
+        ],
+        "right": [
+          7.5,
+          0.5697935819625854
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.199999809265137,
+          0.6034736037254333
+        ],
+        "left": [
+          7.849999904632568,
+          0.591853678226471
+        ],
+        "right": [
+          8.516666412353516,
+          0.6139868497848511
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.149999618530273,
+          0.6159539222717285
+        ],
+        "left": [
+          8.833333015441895,
+          0.6159539222717285
+        ],
+        "right": [
+          9.733332633972168,
+          0.6159539222717285
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          0.15457580983638763
+        ],
+        "left": [
+          10.316666603088379,
+          0.3246925473213196
+        ],
+        "right": [
+          11.316666603088379,
+          0.03306383639574051
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.149999618530273,
+          -0.027638046070933342
+        ],
+        "left": [
+          11.733332633972168,
+          -0.026639742776751518
+        ],
+        "right": [
+          12.483332633972168,
+          -0.0284366887062788
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.149999618530273,
+          -0.0284366887062788
+        ],
+        "left": [
+          12.816666603088379,
+          -0.027638046070933342
+        ],
+        "right": [
+          13.433333396911621,
+          -0.02911553531885147
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          -0.03258292376995087
+        ],
+        "left": [
+          13.899999618530273,
+          -0.03258292376995087
+        ],
+        "right": [
+          14.100000381469727,
+          -0.03258292376995087
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"WeaponCarrier\"].location",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          -0.668021559715271
+        ],
+        "left": [
+          -0.4166666269302368,
+          -0.668021559715271
+        ],
+        "right": [
+          2.4166665077209473,
+          -0.668021559715271
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          -0.668021559715271
+        ],
+        "left": [
+          5.150000095367432,
+          -0.668021559715271
+        ],
+        "right": [
+          5.349999904632568,
+          -0.668021559715271
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      },
+      {
+        "co": [
+          5.550000190734863,
+          -0.678185760974884
+        ],
+        "left": [
+          5.450000286102295,
+          -0.671718955039978
+        ],
+        "right": [
+          5.849999904632568,
+          -0.6975861191749573
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.449999809265137,
+          -0.8135311007499695
+        ],
+        "left": [
+          6.150000095367432,
+          -0.7419111132621765
+        ],
+        "right": [
+          6.683333396911621,
+          -0.8692355751991272
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.150000095367432,
+          -0.941451907157898
+        ],
+        "left": [
+          6.916666507720947,
+          -0.941451907157898
+        ],
+        "right": [
+          7.5,
+          -0.941451907157898
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.199999809265137,
+          -0.49479806423187256
+        ],
+        "left": [
+          7.849999904632568,
+          -0.692982017993927
+        ],
+        "right": [
+          8.516666412353516,
+          -0.3154887557029724
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.149999618530273,
+          -0.10428322851657867
+        ],
+        "left": [
+          8.833333015441895,
+          -0.17734315991401672
+        ],
+        "right": [
+          9.733332633972168,
+          0.030300885438919067
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          0.030300885438919067
+        ],
+        "left": [
+          10.316666603088379,
+          0.030300885438919067
+        ],
+        "right": [
+          11.316666603088379,
+          0.030300885438919067
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.149999618530273,
+          0.00830494798719883
+        ],
+        "left": [
+          11.733332633972168,
+          0.013639794662594795
+        ],
+        "right": [
+          12.483332633972168,
+          0.004037070088088512
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.149999618530273,
+          0.004037070088088512
+        ],
+        "left": [
+          12.816666603088379,
+          0.004141532350331545
+        ],
+        "right": [
+          13.433333396911621,
+          0.003948277328163385
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0036510825157165527
+        ],
+        "left": [
+          13.899999618530273,
+          0.0036510825157165527
+        ],
+        "right": [
+          14.100000381469727,
+          0.0036510825157165527
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"WeaponCarrier\"].location",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.10673964023590088
+        ],
+        "left": [
+          -0.4166666269302368,
+          0.10673964023590088
+        ],
+        "right": [
+          2.4166665077209473,
+          0.10673964023590088
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          0.10673964023590088
+        ],
+        "left": [
+          5.150000095367432,
+          0.10673964023590088
+        ],
+        "right": [
+          5.349999904632568,
+          0.10673964023590088
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      },
+      {
+        "co": [
+          5.550000190734863,
+          0.10107994079589844
+        ],
+        "left": [
+          5.450000286102295,
+          0.10527031123638153
+        ],
+        "right": [
+          5.849999904632568,
+          0.08850885182619095
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.449999809265137,
+          0.012368917465209961
+        ],
+        "left": [
+          6.150000095367432,
+          0.05144844204187393
+        ],
+        "right": [
+          6.683333396911621,
+          -0.01802629418671131
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.150000095367432,
+          -0.04964292049407959
+        ],
+        "left": [
+          6.916666507720947,
+          -0.04964292049407959
+        ],
+        "right": [
+          7.5,
+          -0.04964292049407959
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.199999809265137,
+          0.0009192228317260742
+        ],
+        "left": [
+          7.849999904632568,
+          -0.02596341073513031
+        ],
+        "right": [
+          8.516666412353516,
+          0.025241607800126076
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.149999618530273,
+          0.05512845516204834
+        ],
+        "left": [
+          8.833333015441895,
+          0.05218605697154999
+        ],
+        "right": [
+          9.733332633972168,
+          0.06054866313934326
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          0.06054866313934326
+        ],
+        "left": [
+          10.316666603088379,
+          0.06054866313934326
+        ],
+        "right": [
+          11.316666603088379,
+          0.06054866313934326
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.149999618530273,
+          0.018132472410798073
+        ],
+        "left": [
+          11.733332633972168,
+          0.018132472410798073
+        ],
+        "right": [
+          12.483332633972168,
+          0.018132472410798073
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.149999618530273,
+          0.018323231488466263
+        ],
+        "left": [
+          12.816666603088379,
+          0.018323231488466263
+        ],
+        "right": [
+          13.433333396911621,
+          0.018323231488466263
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.01695716381072998
+        ],
+        "left": [
+          13.899999618530273,
+          0.01695716381072998
+        ],
+        "right": [
+          14.100000381469727,
+          0.01695716381072998
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"WeaponCarrier\"].rotation_quaternion",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.1707589477300644
+        ],
+        "left": [
+          -0.4166666269302368,
+          0.1707589477300644
+        ],
+        "right": [
+          2.4166665077209473,
+          0.1707589477300644
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          0.1707589477300644
+        ],
+        "left": [
+          5.150000095367432,
+          0.1707589477300644
+        ],
+        "right": [
+          5.349999904632568,
+          0.1707589477300644
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      },
+      {
+        "co": [
+          5.550000190734863,
+          0.1707589328289032
+        ],
+        "left": [
+          5.450000286102295,
+          0.1707589328289032
+        ],
+        "right": [
+          5.849999904632568,
+          0.1707589328289032
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.449999809265137,
+          0.36433854699134827
+        ],
+        "left": [
+          6.150000095367432,
+          0.26492565870285034
+        ],
+        "right": [
+          6.683333396911621,
+          0.44165974855422974
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.150000095367432,
+          0.5884767174720764
+        ],
+        "left": [
+          6.916666507720947,
+          0.5221546292304993
+        ],
+        "right": [
+          7.5,
+          0.6879597902297974
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.199999809265137,
+          0.8196009397506714
+        ],
+        "left": [
+          7.849999904632568,
+          0.7555542588233948
+        ],
+        "right": [
+          8.516666412353516,
+          0.8775479197502136
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.149999618530273,
+          0.9561646580696106
+        ],
+        "left": [
+          8.833333015441895,
+          0.932590663433075
+        ],
+        "right": [
+          9.733332633972168,
+          0.9995903968811035
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          0.9995903968811035
+        ],
+        "left": [
+          10.316666603088379,
+          0.9995903968811035
+        ],
+        "right": [
+          11.316666603088379,
+          0.9995903968811035
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.149999618530273,
+          0.9993577599525452
+        ],
+        "left": [
+          11.733332633972168,
+          0.9994174242019653
+        ],
+        "right": [
+          12.483332633972168,
+          0.9993100166320801
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.149999618530273,
+          0.9993100166320801
+        ],
+        "left": [
+          12.816666603088379,
+          0.9993293285369873
+        ],
+        "right": [
+          13.433333396911621,
+          0.9992935657501221
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.9992386102676392
+        ],
+        "left": [
+          13.899999618530273,
+          0.9992386102676392
+        ],
+        "right": [
+          14.100000381469727,
+          0.9992386102676392
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"WeaponCarrier\"].rotation_quaternion",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          -0.6602751612663269
+        ],
+        "left": [
+          -0.4166666269302368,
+          -0.6602751612663269
+        ],
+        "right": [
+          2.4166665077209473,
+          -0.6602751612663269
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          -0.6602751612663269
+        ],
+        "left": [
+          5.150000095367432,
+          -0.6602751612663269
+        ],
+        "right": [
+          5.349999904632568,
+          -0.6602751612663269
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      },
+      {
+        "co": [
+          5.550000190734863,
+          -0.6602751016616821
+        ],
+        "left": [
+          5.450000286102295,
+          -0.6602751612663269
+        ],
+        "right": [
+          5.849999904632568,
+          -0.6602749228477478
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.449999809265137,
+          -0.5648373961448669
+        ],
+        "left": [
+          6.150000095367432,
+          -0.6034682393074036
+        ],
+        "right": [
+          6.683333396911621,
+          -0.5347911715507507
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.150000095367432,
+          -0.4941707253456116
+        ],
+        "left": [
+          6.916666507720947,
+          -0.5157402157783508
+        ],
+        "right": [
+          7.5,
+          -0.4618165194988251
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.199999809265137,
+          -0.36554238200187683
+        ],
+        "left": [
+          7.849999904632568,
+          -0.4237956404685974
+        ],
+        "right": [
+          8.516666412353516,
+          -0.31283703446388245
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.149999618530273,
+          -0.18833646178245544
+        ],
+        "left": [
+          8.833333015441895,
+          -0.24356956779956818
+        ],
+        "right": [
+          9.733332633972168,
+          -0.08659124374389648
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          -0.003558659227564931
+        ],
+        "left": [
+          10.316666603088379,
+          -0.03246953710913658
+        ],
+        "right": [
+          11.316666603088379,
+          0.017091969028115273
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.149999618530273,
+          0.02487991563975811
+        ],
+        "left": [
+          11.733332633972168,
+          0.02487991563975811
+        ],
+        "right": [
+          12.483332633972168,
+          0.02487991563975811
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.149999618530273,
+          0.019218940287828445
+        ],
+        "left": [
+          12.816666603088379,
+          0.020806798711419106
+        ],
+        "right": [
+          13.433333396911621,
+          0.017869260162115097
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.01744186133146286
+        ],
+        "left": [
+          13.899999618530273,
+          0.01744186133146286
+        ],
+        "right": [
+          14.100000381469727,
+          0.01744186133146286
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"WeaponCarrier\"].rotation_quaternion",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          -0.7279866337776184
+        ],
+        "left": [
+          -0.4166666269302368,
+          -0.7279866337776184
+        ],
+        "right": [
+          2.4166665077209473,
+          -0.7279866337776184
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          -0.7279866337776184
+        ],
+        "left": [
+          5.150000095367432,
+          -0.7279866337776184
+        ],
+        "right": [
+          5.349999904632568,
+          -0.7279866337776184
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      },
+      {
+        "co": [
+          5.550000190734863,
+          -0.7279866933822632
+        ],
+        "left": [
+          5.450000286102295,
+          -0.7279866337776184
+        ],
+        "right": [
+          5.849999904632568,
+          -0.7279868721961975
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.449999809265137,
+          -0.737545907497406
+        ],
+        "left": [
+          6.150000095367432,
+          -0.737545907497406
+        ],
+        "right": [
+          6.683333396911621,
+          -0.737545907497406
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.150000095367432,
+          -0.6360859870910645
+        ],
+        "left": [
+          6.916666507720947,
+          -0.6829205751419067
+        ],
+        "right": [
+          7.5,
+          -0.5658341646194458
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.199999809265137,
+          -0.43928262591362
+        ],
+        "left": [
+          7.849999904632568,
+          -0.5131117105484009
+        ],
+        "right": [
+          8.516666412353516,
+          -0.37248486280441284
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.149999618530273,
+          -0.22419753670692444
+        ],
+        "left": [
+          8.833333015441895,
+          -0.28840941190719604
+        ],
+        "right": [
+          9.733332633972168,
+          -0.10591249167919159
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          -0.028357604518532753
+        ],
+        "left": [
+          10.316666603088379,
+          -0.055031657218933105
+        ],
+        "right": [
+          11.316666603088379,
+          -0.009304709732532501
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.149999618530273,
+          -0.002602220978587866
+        ],
+        "left": [
+          11.733332633972168,
+          -0.002602220978587866
+        ],
+        "right": [
+          12.483332633972168,
+          -0.002602220978587866
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.149999618530273,
+          -0.004224653355777264
+        ],
+        "left": [
+          12.816666603088379,
+          -0.0037362866569310427
+        ],
+        "right": [
+          13.433333396911621,
+          -0.004639765247702599
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          -0.0048569608479738235
+        ],
+        "left": [
+          13.899999618530273,
+          -0.0048569608479738235
+        ],
+        "right": [
+          14.100000381469727,
+          -0.0048569608479738235
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"WeaponCarrier\"].rotation_quaternion",
+    "index": 3,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.07009714841842651
+        ],
+        "left": [
+          -0.4166666269302368,
+          0.07009714841842651
+        ],
+        "right": [
+          2.4166665077209473,
+          0.07009714841842651
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          0.07009714841842651
+        ],
+        "left": [
+          5.150000095367432,
+          0.07009714841842651
+        ],
+        "right": [
+          5.349999904632568,
+          0.07009714841842651
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      },
+      {
+        "co": [
+          5.550000190734863,
+          0.07009714096784592
+        ],
+        "left": [
+          5.450000286102295,
+          0.07009714841842651
+        ],
+        "right": [
+          5.849999904632568,
+          0.07009711861610413
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.449999809265137,
+          0.06513221561908722
+        ],
+        "left": [
+          6.150000095367432,
+          0.06513221561908722
+        ],
+        "right": [
+          6.683333396911621,
+          0.06513221561908722
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          7.150000095367432,
+          0.06989290565252304
+        ],
+        "left": [
+          6.916666507720947,
+          0.06989290565252304
+        ],
+        "right": [
+          7.5,
+          0.06989290565252304
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.199999809265137,
+          0.040790848433971405
+        ],
+        "left": [
+          7.849999904632568,
+          0.05762624740600586
+        ],
+        "right": [
+          8.516666412353516,
+          0.025558821856975555
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.149999618530273,
+          0.00373661145567894
+        ],
+        "left": [
+          8.833333015441895,
+          0.006586849689483643
+        ],
+        "right": [
+          9.733332633972168,
+          -0.0015138289891183376
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          -0.0015138289891183376
+        ],
+        "left": [
+          10.316666603088379,
+          -0.0015138289891183376
+        ],
+        "right": [
+          11.316666603088379,
+          -0.0015138289891183376
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.149999618530273,
+          0.022995982319116592
+        ],
+        "left": [
+          11.733332633972168,
+          0.015085626393556595
+        ],
+        "right": [
+          12.483332633972168,
+          0.02932426705956459
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.149999618530273,
+          0.03135588765144348
+        ],
+        "left": [
+          12.816666603088379,
+          0.030091525986790657
+        ],
+        "right": [
+          13.433333396911621,
+          0.03243059664964676
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.034559860825538635
+        ],
+        "left": [
+          13.899999618530273,
+          0.034559860825538635
+        ],
+        "right": [
+          14.100000381469727,
+          0.034559860825538635
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "FREE",
+        "right_type": "FREE"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.R\"].location",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.6166666746139526,
+          0.0
+        ],
+        "right": [
+          1.3833333253860474,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          2.1500000953674316,
+          0.0
+        ],
+        "left": [
+          1.7666667699813843,
+          0.0
+        ],
+        "right": [
+          2.683333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          3.75,
+          0.0
+        ],
+        "left": [
+          3.2166666984558105,
+          0.0
+        ],
+        "right": [
+          4.166666507720947,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          0.0
+        ],
+        "left": [
+          4.583333492279053,
+          0.0
+        ],
+        "right": [
+          5.083333492279053,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          0.0
+        ],
+        "left": [
+          5.166666507720947,
+          0.0
+        ],
+        "right": [
+          5.800000190734863,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.900000095367432,
+          0.0
+        ],
+        "left": [
+          6.349999904632568,
+          0.0
+        ],
+        "right": [
+          7.616666793823242,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.050000190734863,
+          0.0
+        ],
+        "left": [
+          8.333333969116211,
+          0.0
+        ],
+        "right": [
+          9.683333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.949999809265137,
+          0.0
+        ],
+        "left": [
+          10.316666603088379,
+          0.0
+        ],
+        "right": [
+          11.366666793823242,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.199999809265137,
+          0.0
+        ],
+        "left": [
+          11.783332824707031,
+          0.0
+        ],
+        "right": [
+          12.433333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.899999618530273,
+          0.0
+        ],
+        "left": [
+          12.666666030883789,
+          0.0
+        ],
+        "right": [
+          13.266666412353516,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          13.633333206176758,
+          0.0
+        ],
+        "right": [
+          14.366666793823242,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.R\"].location",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.6166666746139526,
+          0.0
+        ],
+        "right": [
+          1.3833333253860474,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          2.1500000953674316,
+          0.02500009536743164
+        ],
+        "left": [
+          1.7666667699813843,
+          0.02500009536743164
+        ],
+        "right": [
+          2.683333396911621,
+          0.02500009536743164
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          3.75,
+          0.02499997615814209
+        ],
+        "left": [
+          3.2166666984558105,
+          0.02499997615814209
+        ],
+        "right": [
+          4.166666507720947,
+          0.02499997615814209
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          0.02500009536743164
+        ],
+        "left": [
+          4.583333492279053,
+          0.02500009536743164
+        ],
+        "right": [
+          5.083333492279053,
+          0.02500009536743164
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          0.02500009536743164
+        ],
+        "left": [
+          5.166666507720947,
+          0.02500009536743164
+        ],
+        "right": [
+          5.800000190734863,
+          0.02500009536743164
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.900000095367432,
+          0.0
+        ],
+        "left": [
+          6.349999904632568,
+          0.0
+        ],
+        "right": [
+          7.616666793823242,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.050000190734863,
+          0.0
+        ],
+        "left": [
+          8.333333969116211,
+          0.0
+        ],
+        "right": [
+          9.683333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.949999809265137,
+          0.004500269889831543
+        ],
+        "left": [
+          10.316666603088379,
+          0.0015083409380167723
+        ],
+        "right": [
+          11.366666793823242,
+          0.006468644365668297
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.199999809265137,
+          0.011159539222717285
+        ],
+        "left": [
+          11.783332824707031,
+          0.009079154580831528
+        ],
+        "right": [
+          12.433333396911621,
+          0.012324554845690727
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.899999618530273,
+          0.013949871063232422
+        ],
+        "left": [
+          12.666666030883789,
+          0.013323322869837284
+        ],
+        "right": [
+          13.266666412353516,
+          0.014934447593986988
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.014999866485595703
+        ],
+        "left": [
+          13.633333206176758,
+          0.014999866485595703
+        ],
+        "right": [
+          14.366666793823242,
+          0.014999866485595703
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.R\"].location",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.6166666746139526,
+          0.0
+        ],
+        "right": [
+          1.3833333253860474,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          2.1500000953674316,
+          -0.025000005960464478
+        ],
+        "left": [
+          1.7666667699813843,
+          -0.006455967202782631
+        ],
+        "right": [
+          2.683333396911621,
+          -0.05080040544271469
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          3.75,
+          -0.10000000149011612
+        ],
+        "left": [
+          3.2166666984558105,
+          -0.10000000149011612
+        ],
+        "right": [
+          4.166666507720947,
+          -0.10000000149011612
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          -0.09999998658895493
+        ],
+        "left": [
+          4.583333492279053,
+          -0.09999998658895493
+        ],
+        "right": [
+          5.083333492279053,
+          -0.09999998658895493
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          -0.09999998658895493
+        ],
+        "left": [
+          5.166666507720947,
+          -0.09999998658895493
+        ],
+        "right": [
+          5.800000190734863,
+          -0.09999998658895493
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.900000095367432,
+          0.0
+        ],
+        "left": [
+          6.349999904632568,
+          0.0
+        ],
+        "right": [
+          7.616666793823242,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.050000190734863,
+          0.0
+        ],
+        "left": [
+          8.333333969116211,
+          0.0
+        ],
+        "right": [
+          9.683333396911621,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.949999809265137,
+          0.010499998927116394
+        ],
+        "left": [
+          10.316666603088379,
+          0.0035186586901545525
+        ],
+        "right": [
+          11.366666793823242,
+          0.015092986635863781
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.199999809265137,
+          0.026039130985736847
+        ],
+        "left": [
+          11.783332824707031,
+          0.021184712648391724
+        ],
+        "right": [
+          12.433333396911621,
+          0.028757603839039803
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.899999618530273,
+          0.03255000337958336
+        ],
+        "left": [
+          12.666666030883789,
+          0.031088057905435562
+        ],
+        "right": [
+          13.266666412353516,
+          0.03484734520316124
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.03500000014901161
+        ],
+        "left": [
+          13.633333206176758,
+          0.03500000014901161
+        ],
+        "right": [
+          14.366666793823242,
+          0.03500000014901161
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.R\"].rotation_euler",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.6166666746139526,
+          0.0
+        ],
+        "right": [
+          1.3833333253860474,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          2.1500000953674316,
+          -0.42066866159439087
+        ],
+        "left": [
+          1.7666667699813843,
+          -0.42066866159439087
+        ],
+        "right": [
+          2.683333396911621,
+          -0.42066866159439087
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          3.75,
+          -0.18273352086544037
+        ],
+        "left": [
+          3.2166666984558105,
+          -0.18273352086544037
+        ],
+        "right": [
+          4.166666507720947,
+          -0.18273352086544037
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          -0.3397159278392792
+        ],
+        "left": [
+          4.583333492279053,
+          -0.3397159278392792
+        ],
+        "right": [
+          5.083333492279053,
+          -0.3397159278392792
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          -0.3397159278392792
+        ],
+        "left": [
+          5.166666507720947,
+          -0.3397159278392792
+        ],
+        "right": [
+          5.800000190734863,
+          -0.3397159278392792
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.900000095367432,
+          -1.3031246662139893
+        ],
+        "left": [
+          6.349999904632568,
+          -1.3031246662139893
+        ],
+        "right": [
+          7.616666793823242,
+          -1.3031246662139893
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.050000190734863,
+          0.4530887007713318
+        ],
+        "left": [
+          8.333333969116211,
+          -0.036322176456451416
+        ],
+        "right": [
+          9.683333396911621,
+          0.8855912089347839
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.949999809265137,
+          0.8855912089347839
+        ],
+        "left": [
+          10.316666603088379,
+          0.8855912089347839
+        ],
+        "right": [
+          11.366666793823242,
+          0.8855912089347839
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.199999809265137,
+          0.8760420680046082
+        ],
+        "left": [
+          11.783332824707031,
+          0.8760420680046082
+        ],
+        "right": [
+          12.433333396911621,
+          0.8760420680046082
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.899999618530273,
+          0.8986489176750183
+        ],
+        "left": [
+          12.666666030883789,
+          0.8966870307922363
+        ],
+        "right": [
+          13.266666412353516,
+          0.9017319083213806
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.9017319083213806
+        ],
+        "left": [
+          13.633333206176758,
+          0.9017319083213806
+        ],
+        "right": [
+          14.366666793823242,
+          0.9017319083213806
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.R\"].rotation_euler",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          -0.0
+        ],
+        "left": [
+          0.6166666746139526,
+          -0.0
+        ],
+        "right": [
+          1.3833333253860474,
+          -0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          2.1500000953674316,
+          -0.1062161922454834
+        ],
+        "left": [
+          1.7666667699813843,
+          -0.08610644191503525
+        ],
+        "right": [
+          2.683333396911621,
+          -0.1341949701309204
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          3.75,
+          -0.1341949701309204
+        ],
+        "left": [
+          3.2166666984558105,
+          -0.1341949701309204
+        ],
+        "right": [
+          4.166666507720947,
+          -0.1341949701309204
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          -0.09352713823318481
+        ],
+        "left": [
+          4.583333492279053,
+          -0.09352713823318481
+        ],
+        "right": [
+          5.083333492279053,
+          -0.09352713823318481
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          -0.09352713823318481
+        ],
+        "left": [
+          5.166666507720947,
+          -0.09352713823318481
+        ],
+        "right": [
+          5.800000190734863,
+          -0.09352713823318481
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.900000095367432,
+          -0.32765600085258484
+        ],
+        "left": [
+          6.349999904632568,
+          -0.32765600085258484
+        ],
+        "right": [
+          7.616666793823242,
+          -0.32765600085258484
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.050000190734863,
+          0.429354727268219
+        ],
+        "left": [
+          8.333333969116211,
+          0.429354727268219
+        ],
+        "right": [
+          9.683333396911621,
+          0.429354727268219
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.949999809265137,
+          0.027032479643821716
+        ],
+        "left": [
+          10.316666603088379,
+          0.17813317477703094
+        ],
+        "right": [
+          11.366666793823242,
+          -0.07237588614225388
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.199999809265137,
+          -0.16872715950012207
+        ],
+        "left": [
+          11.783332824707031,
+          -0.12844938039779663
+        ],
+        "right": [
+          12.433333396911621,
+          -0.1912827044725418
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.899999618530273,
+          -0.21477660536766052
+        ],
+        "left": [
+          12.666666030883789,
+          -0.20888471603393555
+        ],
+        "right": [
+          13.266666412353516,
+          -0.22403529286384583
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          -0.22403529286384583
+        ],
+        "left": [
+          13.633333206176758,
+          -0.22403529286384583
+        ],
+        "right": [
+          14.366666793823242,
+          -0.22403529286384583
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.R\"].rotation_euler",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          0.6166666746139526,
+          0.0
+        ],
+        "right": [
+          1.3833333253860474,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          2.1500000953674316,
+          -0.06463469564914703
+        ],
+        "left": [
+          1.7666667699813843,
+          -0.06463469564914703
+        ],
+        "right": [
+          2.683333396911621,
+          -0.06463469564914703
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          3.75,
+          1.387518286705017
+        ],
+        "left": [
+          3.2166666984558105,
+          1.387518286705017
+        ],
+        "right": [
+          4.166666507720947,
+          1.387518286705017
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          1.3405234813690186
+        ],
+        "left": [
+          4.583333492279053,
+          1.3405234813690186
+        ],
+        "right": [
+          5.083333492279053,
+          1.3405234813690186
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.25,
+          1.3405234813690186
+        ],
+        "left": [
+          5.166666507720947,
+          1.3405234813690186
+        ],
+        "right": [
+          5.800000190734863,
+          1.3405234813690186
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          6.900000095367432,
+          -0.009854194708168507
+        ],
+        "left": [
+          6.349999904632568,
+          0.4992890954017639
+        ],
+        "right": [
+          7.616666793823242,
+          -0.6732832789421082
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.050000190734863,
+          -0.7728586792945862
+        ],
+        "left": [
+          8.333333969116211,
+          -0.7728586792945862
+        ],
+        "right": [
+          9.683333396911621,
+          -0.7728586792945862
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.949999809265137,
+          0.1750127375125885
+        ],
+        "left": [
+          10.316666603088379,
+          -0.11847084760665894
+        ],
+        "right": [
+          11.366666793823242,
+          0.3680940866470337
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.199999809265137,
+          0.4251435697078705
+        ],
+        "left": [
+          11.783332824707031,
+          0.404966801404953
+        ],
+        "right": [
+          12.433333396911621,
+          0.4364425539970398
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          12.899999618530273,
+          0.4469027519226074
+        ],
+        "left": [
+          12.666666030883789,
+          0.44250571727752686
+        ],
+        "right": [
+          13.266666412353516,
+          0.4538123905658722
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.4566078186035156
+        ],
+        "left": [
+          13.633333206176758,
+          0.4566078186035156
+        ],
+        "right": [
+          14.366666793823242,
+          0.4566078186035156
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.L\"].location",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.3333333730697632,
+          0.0
+        ],
+        "right": [
+          2.3333334922790527,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          0.0
+        ],
+        "left": [
+          3.6666665077209473,
+          0.0
+        ],
+        "right": [
+          6.016666889190674,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.050000190734863,
+          0.0
+        ],
+        "left": [
+          7.0333333015441895,
+          0.0
+        ],
+        "right": [
+          8.5,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.40000057220459,
+          0.0
+        ],
+        "left": [
+          8.950000762939453,
+          0.0
+        ],
+        "right": [
+          9.90000057220459,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          0.0
+        ],
+        "left": [
+          10.399999618530273,
+          0.0
+        ],
+        "right": [
+          11.199999809265137,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.800000190734863,
+          0.0
+        ],
+        "left": [
+          11.5,
+          0.0
+        ],
+        "right": [
+          12.233333587646484,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.100000381469727,
+          0.0
+        ],
+        "left": [
+          12.666666984558105,
+          0.0
+        ],
+        "right": [
+          13.40000057220459,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.0
+        ],
+        "left": [
+          13.699999809265137,
+          0.0
+        ],
+        "right": [
+          14.300000190734863,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.L\"].location",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.3333333730697632,
+          0.0
+        ],
+        "right": [
+          2.3333334922790527,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          0.0
+        ],
+        "left": [
+          3.6666665077209473,
+          0.0
+        ],
+        "right": [
+          6.016666889190674,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.050000190734863,
+          0.0
+        ],
+        "left": [
+          7.0333333015441895,
+          0.0
+        ],
+        "right": [
+          8.5,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.40000057220459,
+          0.0
+        ],
+        "left": [
+          8.950000762939453,
+          0.0
+        ],
+        "right": [
+          9.90000057220459,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          0.010499954223632812
+        ],
+        "left": [
+          10.399999618530273,
+          0.00490223616361618
+        ],
+        "right": [
+          11.199999809265137,
+          0.013858589343726635
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.800000190734863,
+          0.020843029022216797
+        ],
+        "left": [
+          11.5,
+          0.017467597499489784
+        ],
+        "right": [
+          12.233333587646484,
+          0.025718651711940765
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.100000381469727,
+          0.03254985809326172
+        ],
+        "left": [
+          12.666666984558105,
+          0.030106937512755394
+        ],
+        "right": [
+          13.40000057220459,
+          0.03424111008644104
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.034999966621398926
+        ],
+        "left": [
+          13.699999809265137,
+          0.034999966621398926
+        ],
+        "right": [
+          14.300000190734863,
+          0.034999966621398926
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.L\"].location",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.3333333730697632,
+          0.0
+        ],
+        "right": [
+          2.3333334922790527,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          0.0
+        ],
+        "left": [
+          3.6666665077209473,
+          0.0
+        ],
+        "right": [
+          6.016666889190674,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.050000190734863,
+          0.0
+        ],
+        "left": [
+          7.0333333015441895,
+          0.0
+        ],
+        "right": [
+          8.5,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.40000057220459,
+          0.0
+        ],
+        "left": [
+          8.950000762939453,
+          0.0
+        ],
+        "right": [
+          9.90000057220459,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          0.04349999129772186
+        ],
+        "left": [
+          10.399999618530273,
+          0.020309487357735634
+        ],
+        "right": [
+          11.199999809265137,
+          0.05741431191563606
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.800000190734863,
+          0.08634980022907257
+        ],
+        "left": [
+          11.5,
+          0.07236579805612564
+        ],
+        "right": [
+          12.233333587646484,
+          0.10654890537261963
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.100000381469727,
+          0.13485001027584076
+        ],
+        "left": [
+          12.666666984558105,
+          0.1247294545173645
+        ],
+        "right": [
+          13.40000057220459,
+          0.14185655117034912
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.14500001072883606
+        ],
+        "left": [
+          13.699999809265137,
+          0.14500001072883606
+        ],
+        "right": [
+          14.300000190734863,
+          0.14500001072883606
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.L\"].rotation_euler",
+    "index": 0,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.3333333730697632,
+          0.0
+        ],
+        "right": [
+          2.3333334922790527,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          -3.725290742551124e-09
+        ],
+        "left": [
+          3.6666665077209473,
+          -3.725290742551124e-09
+        ],
+        "right": [
+          6.016666889190674,
+          -3.725290742551124e-09
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.050000190734863,
+          3.7252898543727042e-09
+        ],
+        "left": [
+          7.0333333015441895,
+          -3.725290742551124e-09
+        ],
+        "right": [
+          8.5,
+          7.023088777202702e-09
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.40000057220459,
+          0.6335279941558838
+        ],
+        "left": [
+          8.950000762939453,
+          0.4079137444496155
+        ],
+        "right": [
+          9.90000057220459,
+          0.8842102885246277
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          0.9320856928825378
+        ],
+        "left": [
+          10.399999618530273,
+          0.9098319411277771
+        ],
+        "right": [
+          11.199999809265137,
+          0.9454379677772522
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.800000190734863,
+          0.9669830799102783
+        ],
+        "left": [
+          11.5,
+          0.9575777649879456
+        ],
+        "right": [
+          12.233333587646484,
+          0.980568528175354
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.100000381469727,
+          0.9884486794471741
+        ],
+        "left": [
+          12.666666984558105,
+          0.9884486794471741
+        ],
+        "right": [
+          13.40000057220459,
+          0.9884486794471741
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.9828530550003052
+        ],
+        "left": [
+          13.699999809265137,
+          0.9828530550003052
+        ],
+        "right": [
+          14.300000190734863,
+          0.9828530550003052
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.L\"].rotation_euler",
+    "index": 1,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          -0.0
+        ],
+        "left": [
+          -0.3333333730697632,
+          -0.0
+        ],
+        "right": [
+          2.3333334922790527,
+          -0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          -1.1117664122650694e-08
+        ],
+        "left": [
+          3.6666665077209473,
+          -1.1117664122650694e-08
+        ],
+        "right": [
+          6.016666889190674,
+          -1.1117664122650694e-08
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.050000190734863,
+          5.238688927100554e-10
+        ],
+        "left": [
+          7.0333333015441895,
+          -1.1117665010829114e-08
+        ],
+        "right": [
+          8.5,
+          5.676680014943258e-09
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.40000057220459,
+          0.32347041368484497
+        ],
+        "left": [
+          8.950000762939453,
+          0.32347041368484497
+        ],
+        "right": [
+          9.90000057220459,
+          0.32347041368484497
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          0.22744405269622803
+        ],
+        "left": [
+          10.399999618530273,
+          0.26765361428260803
+        ],
+        "right": [
+          11.199999809265137,
+          0.2033182978630066
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.800000190734863,
+          0.17172378301620483
+        ],
+        "left": [
+          11.5,
+          0.18481117486953735
+        ],
+        "right": [
+          12.233333587646484,
+          0.15281979739665985
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.100000381469727,
+          0.14522363245487213
+        ],
+        "left": [
+          12.666666984558105,
+          0.14522363245487213
+        ],
+        "right": [
+          13.40000057220459,
+          0.14522363245487213
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          0.1486586332321167
+        ],
+        "left": [
+          13.699999809265137,
+          0.1486586332321167
+        ],
+        "right": [
+          14.300000190734863,
+          0.1486586332321167
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  },
+  {
+    "path": "pose.bones[\"Arm.L\"].rotation_euler",
+    "index": 2,
+    "keys": [
+      {
+        "co": [
+          1.0,
+          0.0
+        ],
+        "left": [
+          -0.3333333730697632,
+          0.0
+        ],
+        "right": [
+          2.3333334922790527,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          5.0,
+          0.0
+        ],
+        "left": [
+          3.6666665077209473,
+          0.0
+        ],
+        "right": [
+          6.016666889190674,
+          0.0
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          8.050000190734863,
+          -4.6566123179658803e-10
+        ],
+        "left": [
+          7.0333333015441895,
+          0.0
+        ],
+        "right": [
+          8.5,
+          -6.717736367178873e-10
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          9.40000057220459,
+          -0.821492075920105
+        ],
+        "left": [
+          8.950000762939453,
+          -0.821492075920105
+        ],
+        "right": [
+          9.90000057220459,
+          -0.821492075920105
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          10.899999618530273,
+          -0.5498865246772766
+        ],
+        "left": [
+          10.399999618530273,
+          -0.64852374792099
+        ],
+        "right": [
+          11.199999809265137,
+          -0.49070411920547485
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          11.800000190734863,
+          -0.4221033453941345
+        ],
+        "left": [
+          11.5,
+          -0.4582809805870056
+        ],
+        "right": [
+          12.233333587646484,
+          -0.36984682083129883
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          13.100000381469727,
+          -0.2900986671447754
+        ],
+        "left": [
+          12.666666984558105,
+          -0.3097568452358246
+        ],
+        "right": [
+          13.40000057220459,
+          -0.27648916840553284
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      },
+      {
+        "co": [
+          14.0,
+          -0.27648916840553284
+        ],
+        "left": [
+          13.699999809265137,
+          -0.27648916840553284
+        ],
+        "right": [
+          14.300000190734863,
+          -0.27648916840553284
+        ],
+        "interpolation": "BEZIER",
+        "left_type": "AUTO_CLAMPED",
+        "right_type": "AUTO_CLAMPED"
+      }
+    ]
+  }
+]

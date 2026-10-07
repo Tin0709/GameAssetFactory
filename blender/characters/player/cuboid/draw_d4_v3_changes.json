@@ -1,0 +1,326 @@
+{
+  "changes": [
+    {
+      "bone": "Arm.R",
+      "retime": [
+        3.85,
+        3.75
+      ]
+    },
+    {
+      "bone": "Chest",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 1.8,
+      "before": 0.013962633907794952,
+      "after": 0.01658062789394613
+    },
+    {
+      "bone": "Chest",
+      "retime": [
+        7.35,
+        7.4
+      ]
+    },
+    {
+      "bone": "Spine",
+      "retime": [
+        8.35,
+        7.7
+      ]
+    },
+    {
+      "bone": "Spine",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 7.7,
+      "before": 0.005235987715423107,
+      "after": 0.006108652381980153
+    },
+    {
+      "bone": "Arm.R",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 12.9,
+      "before": 0.9038848876953125,
+      "after": 0.8986488999393295
+    },
+    {
+      "bone": "Arm.L",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 13.1,
+      "before": 0.9928119778633118,
+      "after": 0.988448654733326
+    },
+    {
+      "bone": "Chest",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 11.75,
+      "before": 0.045915693044662476,
+      "after": 0.04415683007545653
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 0,
+      "frame": 12.15,
+      "before": -0.024341460317373276,
+      "after": -0.027638045698404314
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 0,
+      "frame": 13.15,
+      "before": -0.025672532618045807,
+      "after": -0.02843668907880783
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 1,
+      "frame": 12.15,
+      "before": 0.011407524347305298,
+      "after": 0.0083049476146698
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 1,
+      "frame": 13.15,
+      "before": 0.004294395446777344,
+      "after": 0.0040370702743530275
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 2,
+      "frame": 12.15,
+      "before": 0.018916010856628418,
+      "after": 0.018132472038269044
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 2,
+      "frame": 13.15,
+      "before": 0.01923394203186035,
+      "after": 0.018323230743408202
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 0,
+      "frame": 12.15,
+      "before": 0.9994372129440308,
+      "after": 0.9993577718734741
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 0,
+      "frame": 13.15,
+      "before": 0.9993575811386108,
+      "after": 0.9993099927902221
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 1,
+      "frame": 12.15,
+      "before": 0.029838617891073227,
+      "after": 0.02487991526722908
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 1,
+      "frame": 13.15,
+      "before": 0.020403658971190453,
+      "after": 0.019218939915299417
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 2,
+      "frame": 12.15,
+      "before": -0.0010990611044690013,
+      "after": -0.00260222100187093
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 2,
+      "frame": 13.15,
+      "before": -0.0038031151052564383,
+      "after": -0.004224653402343392
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 3,
+      "frame": 12.15,
+      "before": 0.015286730602383614,
+      "after": 0.02299598269164562
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 3,
+      "frame": 13.15,
+      "before": 0.029219908639788628,
+      "after": 0.03135588951408863
+    },
+    {
+      "bone": "Arm.R",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 5,
+      "before": -0.330989271402359,
+      "after": -0.3397159278392792
+    },
+    {
+      "bone": "Arm.R",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 5.25,
+      "before": -0.330989271402359,
+      "after": -0.3397159278392792
+    },
+    {
+      "bone": "Arm.R",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 9.05,
+      "before": 0.48799529671669006,
+      "after": 0.4530887007713318
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 0,
+      "frame": 8.2,
+      "before": 0.6154736280441284,
+      "after": 0.6034736280441284
+    }
+  ],
+  "grip_cleanup": [
+    {
+      "bone": "Arm.R",
+      "frame": 3.75,
+      "triangles_before": 56,
+      "triangles_after": 56,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.R",
+      "frame": 5,
+      "triangles_before": 66,
+      "triangles_after": 64,
+      "delta_degrees": [
+        -0.5,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.R",
+      "frame": 6.9,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.R",
+      "frame": 9.05,
+      "triangles_before": 52,
+      "triangles_after": 45,
+      "delta_degrees": [
+        -2,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 9.4,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 10.9,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 11.8,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "catch_cleanup": [
+    {
+      "bone": "Arm.L",
+      "frame": 10.9,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ],
+      "terminal_exclusion_m": 0.04
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 11.8,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ],
+      "terminal_exclusion_m": 0.04
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 13.1,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ],
+      "terminal_exclusion_m": 0.04
+    }
+  ]
+}

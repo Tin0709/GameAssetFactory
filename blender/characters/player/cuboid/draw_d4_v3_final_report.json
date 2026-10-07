@@ -1,0 +1,584 @@
+{
+  "action": "Draw_LongGun_V3_Final",
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_weapon_animation_dev.blend",
+  "backup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_weapon_animation_dev_before_draw_v3_20261007_073438.blend",
+  "frames": [
+    1,
+    14
+  ],
+  "fps": 24,
+  "duration_seconds": 0.5416666666666666,
+  "notice_frame": 1.8,
+  "reach_frames": [
+    2.15,
+    3.75,
+    5.0
+  ],
+  "grab_frame": 5.0,
+  "release_frame": 5.25,
+  "pull_frames": [
+    6.45,
+    7.15
+  ],
+  "chest_reaction_frame": 7.4,
+  "spine_response_frame": 7.7,
+  "sweep_frames": [
+    8.2,
+    9.15
+  ],
+  "left_intercept_frame": 9.4,
+  "catch_frame": 10.9,
+  "ready_frame": 14,
+  "changes": [
+    {
+      "bone": "Arm.R",
+      "retime": [
+        3.85,
+        3.75
+      ]
+    },
+    {
+      "bone": "Chest",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 1.8,
+      "before": 0.013962633907794952,
+      "after": 0.01658062789394613
+    },
+    {
+      "bone": "Chest",
+      "retime": [
+        7.35,
+        7.4
+      ]
+    },
+    {
+      "bone": "Spine",
+      "retime": [
+        8.35,
+        7.7
+      ]
+    },
+    {
+      "bone": "Spine",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 7.7,
+      "before": 0.005235987715423107,
+      "after": 0.006108652381980153
+    },
+    {
+      "bone": "Arm.R",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 12.9,
+      "before": 0.9038848876953125,
+      "after": 0.8986488999393295
+    },
+    {
+      "bone": "Arm.L",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 13.1,
+      "before": 0.9928119778633118,
+      "after": 0.988448654733326
+    },
+    {
+      "bone": "Chest",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 11.75,
+      "before": 0.045915693044662476,
+      "after": 0.04415683007545653
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 0,
+      "frame": 12.15,
+      "before": -0.024341460317373276,
+      "after": -0.027638045698404314
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 0,
+      "frame": 13.15,
+      "before": -0.025672532618045807,
+      "after": -0.02843668907880783
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 1,
+      "frame": 12.15,
+      "before": 0.011407524347305298,
+      "after": 0.0083049476146698
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 1,
+      "frame": 13.15,
+      "before": 0.004294395446777344,
+      "after": 0.0040370702743530275
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 2,
+      "frame": 12.15,
+      "before": 0.018916010856628418,
+      "after": 0.018132472038269044
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 2,
+      "frame": 13.15,
+      "before": 0.01923394203186035,
+      "after": 0.018323230743408202
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 0,
+      "frame": 12.15,
+      "before": 0.9994372129440308,
+      "after": 0.9993577718734741
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 0,
+      "frame": 13.15,
+      "before": 0.9993575811386108,
+      "after": 0.9993099927902221
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 1,
+      "frame": 12.15,
+      "before": 0.029838617891073227,
+      "after": 0.02487991526722908
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 1,
+      "frame": 13.15,
+      "before": 0.020403658971190453,
+      "after": 0.019218939915299417
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 2,
+      "frame": 12.15,
+      "before": -0.0010990611044690013,
+      "after": -0.00260222100187093
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 2,
+      "frame": 13.15,
+      "before": -0.0038031151052564383,
+      "after": -0.004224653402343392
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 3,
+      "frame": 12.15,
+      "before": 0.015286730602383614,
+      "after": 0.02299598269164562
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "rotation_quaternion",
+      "axis": 3,
+      "frame": 13.15,
+      "before": 0.029219908639788628,
+      "after": 0.03135588951408863
+    },
+    {
+      "bone": "Arm.R",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 5,
+      "before": -0.330989271402359,
+      "after": -0.3397159278392792
+    },
+    {
+      "bone": "Arm.R",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 5.25,
+      "before": -0.330989271402359,
+      "after": -0.3397159278392792
+    },
+    {
+      "bone": "Arm.R",
+      "property": "rotation_euler",
+      "axis": 0,
+      "frame": 9.05,
+      "before": 0.48799529671669006,
+      "after": 0.4530887007713318
+    },
+    {
+      "bone": "WeaponCarrier",
+      "property": "location",
+      "axis": 0,
+      "frame": 8.2,
+      "before": 0.6154736280441284,
+      "after": 0.6034736280441284
+    }
+  ],
+  "grip_cleanup": [
+    {
+      "bone": "Arm.R",
+      "frame": 3.75,
+      "triangles_before": 56,
+      "triangles_after": 56,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.R",
+      "frame": 5,
+      "triangles_before": 66,
+      "triangles_after": 64,
+      "delta_degrees": [
+        -0.5,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.R",
+      "frame": 6.9,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.R",
+      "frame": 9.05,
+      "triangles_before": 52,
+      "triangles_after": 45,
+      "delta_degrees": [
+        -2,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 9.4,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 10.9,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 11.8,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "catch_cleanup": [
+    {
+      "bone": "Arm.L",
+      "frame": 10.9,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ],
+      "terminal_exclusion_m": 0.04
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 11.8,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ],
+      "terminal_exclusion_m": 0.04
+    },
+    {
+      "bone": "Arm.L",
+      "frame": 13.1,
+      "triangles_before": 0,
+      "triangles_after": 0,
+      "delta_degrees": [
+        0,
+        0,
+        0
+      ],
+      "terminal_exclusion_m": 0.04
+    }
+  ],
+  "overlap_note": "Grip diagnostic improved locally (64 vs 66 triangles at grab, 45 vs 52 at sweep). Triangle counts are mesh-dependent, not penetration depth. Left-arm catch interior remains clear outside final 0.04m terminal contact zone. Remaining rigid-arm/gun contact and fixed Ready grip retained for hold compatibility; not collision-free.",
+  "settle_authored_degrees": {
+    "WeaponCarrier": 0.6,
+    "Arm.R": 0.35,
+    "Arm.L": 0.25,
+    "Chest": 0.07922457512265124
+  },
+  "ranges_degrees_xyz": {
+    "Chest": {
+      "0": [
+        0.0,
+        3.0000000834826057
+      ],
+      "1": [
+        -7.999999938029066,
+        1.9997773630290063
+      ],
+      "2": [
+        -0.29999999767609,
+        0.4999999961268166
+      ]
+    },
+    "Spine": {
+      "0": [
+        0.0,
+        0.3999972488175294
+      ],
+      "1": [
+        -0.9999466314007426,
+        0.0
+      ],
+      "2": [
+        0.0,
+        0.0
+      ]
+    },
+    "Neck": {
+      "0": [
+        0.0,
+        0.0
+      ],
+      "1": [
+        -0.5999360690504169,
+        1.9999788536095218
+      ],
+      "2": [
+        0.0,
+        0.0
+      ]
+    },
+    "Head": {
+      "0": [
+        0.0,
+        0.0
+      ],
+      "1": [
+        -0.3999977824260583,
+        0.9999690429589566
+      ],
+      "2": [
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "event_subframes": {
+    "DRAW_BEGIN": 1.0,
+    "WEAPON_GRAB": 5.0,
+    "WEAPON_BACK_RELEASE": 5.25,
+    "SUPPORT_HAND_CATCH": 10.9,
+    "DRAW_READY": 14.0
+  },
+  "marker_frames": {
+    "DRAW_BEGIN": 1,
+    "WEAPON_GRAB": 5,
+    "WEAPON_BACK_RELEASE": 5,
+    "SUPPORT_HAND_CATCH": 11,
+    "DRAW_READY": 14
+  },
+  "event_source": "Action event_subframes_json; markers are integer display references.",
+  "curve_cleanup": "Preserved all meaningful keys and Bezier interpolation; AUTO_CLAMPED retained; existing secured/Ready carrier FREE horizontal tangents retained; sub-1e-6 arm translation noise set to zero. No aggressive simplification.",
+  "curve_count": 31,
+  "key_count": 266,
+  "trajectory": "Continuous outward clear, forward sweep, catch and Ready. Reviewed 417 carrier samples and four camera views; no head/deep chest penetration in 630 standalone/overlay poses at 0.125f increments.",
+  "velocity_comparison": {
+    "V2": {
+      "velocity_bins": {
+        "secured": {
+          "mean_m_s": 0.18452146284631885,
+          "peak_m_s": 0.2564565655579021,
+          "mean_deg_s": 55.95945072079093,
+          "peak_deg_s": 82.15576754026367
+        },
+        "contact_release": {
+          "mean_m_s": 0.6045880224017559,
+          "peak_m_s": 1.8911330739708698,
+          "mean_deg_s": 10.376285042878193,
+          "peak_deg_s": 13.470898333779738
+        },
+        "pull": {
+          "mean_m_s": 9.452297891086937,
+          "peak_m_s": 13.559511368259042,
+          "mean_deg_s": 788.7939621805793,
+          "peak_deg_s": 1020.0663771356617
+        },
+        "sweep": {
+          "mean_m_s": 9.786787158755127,
+          "peak_m_s": 15.74144601750365,
+          "mean_deg_s": 711.3796944957651,
+          "peak_deg_s": 936.1969954967506
+        },
+        "catch": {
+          "mean_m_s": 5.989979421938356,
+          "peak_m_s": 7.998221416383629,
+          "mean_deg_s": 190.2493793889847,
+          "peak_deg_s": 274.9169315401059
+        },
+        "settle": {
+          "mean_m_s": 0.644115365421136,
+          "peak_m_s": 3.108009037196039,
+          "mean_deg_s": 22.013201205188214,
+          "peak_deg_s": 92.3578335815082
+        }
+      },
+      "secured_chest_relative_matrix_error": 1.766110826473266e-07
+    },
+    "V3": {
+      "velocity_bins": {
+        "secured": {
+          "mean_m_s": 0.18627549208604696,
+          "peak_m_s": 0.25507641285033344,
+          "mean_deg_s": 56.46033102356399,
+          "peak_deg_s": 82.05677075978765
+        },
+        "contact_release": {
+          "mean_m_s": 0.6049261889699911,
+          "peak_m_s": 1.8906754870541134,
+          "mean_deg_s": 9.770907992774056,
+          "peak_deg_s": 13.314355781018675
+        },
+        "pull": {
+          "mean_m_s": 9.42484586044364,
+          "peak_m_s": 13.571292184592874,
+          "mean_deg_s": 788.8511546919699,
+          "peak_deg_s": 1019.767593254683
+        },
+        "sweep": {
+          "mean_m_s": 9.74402043106419,
+          "peak_m_s": 15.760995705783586,
+          "mean_deg_s": 711.7975475875725,
+          "peak_deg_s": 934.8894640518574
+        },
+        "catch": {
+          "mean_m_s": 6.055639331206139,
+          "peak_m_s": 8.012012676144156,
+          "mean_deg_s": 182.52930481414904,
+          "peak_deg_s": 271.80698475886743
+        },
+        "settle": {
+          "mean_m_s": 0.6330792095332594,
+          "peak_m_s": 3.196377811395264,
+          "mean_deg_s": 23.835452444023176,
+          "peak_deg_s": 87.15029357794079
+        }
+      },
+      "secured_chest_relative_matrix_error": 1.5827692245728997e-07
+    }
+  },
+  "endpoint_vs_v2_max_errors": {
+    "Arm.R": 0.0,
+    "Arm.L": 0.0,
+    "Chest": 0.0,
+    "Spine": 0.0,
+    "Neck": 0.0,
+    "Head": 0.0,
+    "WeaponCarrier": 0.0
+  },
+  "endpoint_vs_hold_max_errors": {
+    "Chest": 2.3283064365386963e-10,
+    "WeaponCarrier": 1.1920928955078125e-07,
+    "Arm.R": 1.1920928955078125e-07,
+    "Arm.L": 1.1920928955078125e-07
+  },
+  "idle_overlay": "Numerically sampled and gameplay-size render sequence reviewed. Notice/reach/catch/Ready retained.",
+  "run_overlay": {
+    "phases_percent": [
+      0,
+      25,
+      50,
+      75
+    ],
+    "cadence": 1.6,
+    "lower_pose_max_error": 1.1920928955078125e-07,
+    "result": "Source lower-body clock progresses independently; source arm acquisition uses 3-frame smooth blend; no large visible acquisition snap in rendered preview sequences. Catch and Ready remain readable.",
+    "scope": "Blender preview harness only; runtime layer blending is not implemented or tested in Godot."
+  },
+  "lower_key_counts": {
+    "Root": 0,
+    "Hips": 0,
+    "Leg.L": 0,
+    "Leg.R": 0
+  },
+  "scale_keys": 0,
+  "protected_actions_unchanged": [
+    "Draw_LongGun_V1",
+    "Draw_LongGun_V2",
+    "Holster_LongGun_V1",
+    "Holster_LongGun_V2",
+    "Holster_LongGun_V3_Final",
+    "HolsterLongGun",
+    "Idle",
+    "Player_Idle",
+    "Player_Run_Blocky_V1",
+    "Player_Run_Blocky_V2",
+    "Player_Run_Blocky_V3",
+    "Player_Run_Blocky_V4",
+    "Player_Run_Blocky_V5",
+    "Player_Run_Blocky_V6",
+    "Player_Run_Blocky_V7_Final",
+    "Run"
+  ],
+  "geometry_weights_rest_lengths_hierarchy_unchanged": true,
+  "weapon_carrier_non_deforming": true,
+  "ready_for_godot_integration": true,
+  "Godot_modified": false,
+  "preview_ready": true,
+  "preview_comparison": "draw_d4_v3_review/V2_vs_V3.gif; V2 and V3_Final in Action selector.",
+  "settle_note": "Carrier overshoot/settle keys move 60% of their original local-space deviation from Ready; approximately 0.6 degree authored weapon settle. Chest residual after subtracting the prior added 0.18 degree is 0.07922457512265124."
+}
