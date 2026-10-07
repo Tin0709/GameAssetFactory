@@ -1,0 +1,79 @@
+{
+  "bones": [
+    "Root",
+    "Hips",
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "UpperArm.L",
+    "ForeArm.L",
+    "UpperArm.R",
+    "ForeArm.R",
+    "WeaponCarrier",
+    "Leg.L",
+    "Leg.R"
+  ],
+  "arm_lengths": {
+    "UpperArm.L": 0.3374999761581421,
+    "ForeArm.L": 0.3374999165534973,
+    "UpperArm.R": 0.3374999761581421,
+    "ForeArm.R": 0.3374999165534973
+  },
+  "pose": {
+    "R": {
+      "shoulder": [
+        -0.3336988687515259,
+        0.045969750732183456,
+        1.3501965999603271
+      ],
+      "elbow": [
+        -0.3213634192943573,
+        -0.13883072137832642,
+        1.0680568218231201
+      ],
+      "hand_center": [
+        -0.18000000715255737,
+        -0.3400000035762787,
+        1.159999966621399
+      ],
+      "reach": 0.4569143895782946,
+      "bend_deg": 81.57574462606566
+    },
+    "L": {
+      "shoulder": [
+        0.32655155658721924,
+        -0.09435459226369858,
+        1.3483537435531616
+      ],
+      "elbow": [
+        0.17611488699913025,
+        -0.33075040578842163,
+        1.160225749015808
+      ],
+      "hand_center": [
+        0.01731649972498417,
+        -0.5373165607452393,
+        1.1921582221984863
+      ],
+      "reach": 0.5623510183292315,
+      "bend_deg": 41.14711726832982
+    }
+  },
+  "grip": [
+    -0.18000000715255737,
+    -0.3400000035762787,
+    1.159999966621399
+  ],
+  "support_contact_weapon_local": [
+    0,
+    0.25,
+    0.02
+  ],
+  "support": [
+    0.01731649972498417,
+    -0.5373165607452393,
+    1.1921582221984863
+  ],
+  "notes": "Two-link math baked to FK rotations only. No runtime helpers, hand bones, constraints, stretching or arm translation. Support target is a selected fore-end contact, not old far support helper."
+}

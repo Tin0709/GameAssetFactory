@@ -1,0 +1,13 @@
+{
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_longgun_living_r9w1_study.blend",
+  "scene": "R9W1_REVIEW_LOCAL",
+  "frame": 49,
+  "active_rig": "R9W1_Local_Living_Rig",
+  "action": "PREVIEW_ONLY_R9W1_Steering_Local",
+  "references_packed": true,
+  "other_scenes": [
+    "R9W1_REVIEW_READY",
+    "R9W1_REVIEW_MOVE",
+    "R9W1_REVIEW_STEERING"
+  ]
+}

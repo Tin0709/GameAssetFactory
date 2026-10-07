@@ -1,0 +1,26 @@
+{
+  "ABCD_aim_24fps.mp4": {
+    "fps": 24.0,
+    "frames": 48,
+    "duration_s": 2.0,
+    "sampled_frames": [
+      1,
+      15,
+      20,
+      31,
+      43
+    ]
+  },
+  "aim_close_24fps.mp4": {
+    "fps": 24.0,
+    "frames": 48,
+    "duration_s": 2.0,
+    "sampled_frames": [
+      1,
+      15,
+      20,
+      31,
+      43
+    ]
+  }
+}

@@ -1,0 +1,364 @@
+{
+  "preservation_passed": true,
+  "protected_files": 9599,
+  "protected_actions": 25,
+  "new_actions": [
+    "LongGunAimBias_RigV2_Study_V1",
+    "LongGunHold_RigV2_Study_V1"
+  ],
+  "bone_count": 13,
+  "rigid_weighting_passed": true,
+  "non_arm_geometry_uvs_preserved": true,
+  "poses": {
+    "LongGunAimBias_RigV2_Study_V1_1": {
+      "hand_center_target_errors_m": {
+        "R": 1.2013700229374393e-07,
+        "L": 1.336050319703616e-07
+      },
+      "contact": {
+        "Head": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "Chest": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "UpperArm.L": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "ForeArm.L": {
+          "weapon_triangle_hits_inset_5mm": 107,
+          "max_vertex_penetration_m": 0.06311986516914023
+        },
+        "UpperArm.R": {
+          "weapon_triangle_hits_inset_5mm": 35,
+          "max_vertex_penetration_m": 0.06119376620510808
+        },
+        "ForeArm.R": {
+          "weapon_triangle_hits_inset_5mm": 66,
+          "max_vertex_penetration_m": 0.06833477238325902
+        }
+      },
+      "stock_butt_center": [
+        -0.43094855546951294,
+        -0.08905141800642014,
+        1.3101059198379517
+      ]
+    },
+    "LongGunAimBias_RigV2_Study_V1_7": {
+      "hand_center_target_errors_m": {
+        "R": 1.2013700229374393e-07,
+        "L": 1.336050319703616e-07
+      },
+      "contact": {
+        "Head": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "Chest": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "UpperArm.L": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "ForeArm.L": {
+          "weapon_triangle_hits_inset_5mm": 107,
+          "max_vertex_penetration_m": 0.06311986516914023
+        },
+        "UpperArm.R": {
+          "weapon_triangle_hits_inset_5mm": 35,
+          "max_vertex_penetration_m": 0.06119376620510808
+        },
+        "ForeArm.R": {
+          "weapon_triangle_hits_inset_5mm": 66,
+          "max_vertex_penetration_m": 0.06833477238325902
+        }
+      },
+      "stock_butt_center": [
+        -0.43094855546951294,
+        -0.08905141800642014,
+        1.3101059198379517
+      ]
+    },
+    "LongGunAimBias_RigV2_Study_V1_15": {
+      "hand_center_target_errors_m": {
+        "R": 1.0745380149674383e-07,
+        "L": 1.2013700229374393e-07
+      },
+      "contact": {
+        "Head": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "Chest": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "UpperArm.L": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "ForeArm.L": {
+          "weapon_triangle_hits_inset_5mm": 107,
+          "max_vertex_penetration_m": 0.06311962613559885
+        },
+        "UpperArm.R": {
+          "weapon_triangle_hits_inset_5mm": 35,
+          "max_vertex_penetration_m": 0.06119378432794512
+        },
+        "ForeArm.R": {
+          "weapon_triangle_hits_inset_5mm": 66,
+          "max_vertex_penetration_m": 0.06833464942273715
+        }
+      },
+      "stock_butt_center": [
+        -0.4311198890209198,
+        -0.08985006809234619,
+        1.309519648551941
+      ]
+    },
+    "LongGunAimBias_RigV2_Study_V1_20": {
+      "hand_center_target_errors_m": {
+        "R": 1.0745380149674383e-07,
+        "L": 1.8070538097075974e-07
+      },
+      "contact": {
+        "Head": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "Chest": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "UpperArm.L": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "ForeArm.L": {
+          "weapon_triangle_hits_inset_5mm": 107,
+          "max_vertex_penetration_m": 0.0631197792666432
+        },
+        "UpperArm.R": {
+          "weapon_triangle_hits_inset_5mm": 35,
+          "max_vertex_penetration_m": 0.06119375772797364
+        },
+        "ForeArm.R": {
+          "weapon_triangle_hits_inset_5mm": 66,
+          "max_vertex_penetration_m": 0.06833468426294531
+        }
+      },
+      "stock_butt_center": [
+        -0.4311681389808655,
+        -0.09007503092288971,
+        1.3093538284301758
+      ]
+    },
+    "LongGunAimBias_RigV2_Study_V1_23": {
+      "hand_center_target_errors_m": {
+        "R": 1.1920928955078125e-07,
+        "L": 1.3457530638715954e-07
+      },
+      "contact": {
+        "Head": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "Chest": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "UpperArm.L": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "ForeArm.L": {
+          "weapon_triangle_hits_inset_5mm": 107,
+          "max_vertex_penetration_m": 0.0631196503434985
+        },
+        "UpperArm.R": {
+          "weapon_triangle_hits_inset_5mm": 35,
+          "max_vertex_penetration_m": 0.06119375213491948
+        },
+        "ForeArm.R": {
+          "weapon_triangle_hits_inset_5mm": 66,
+          "max_vertex_penetration_m": 0.06833464454112559
+        }
+      },
+      "stock_butt_center": [
+        -0.43114182353019714,
+        -0.08995231986045837,
+        1.3094441890716553
+      ]
+    },
+    "LongGunAimBias_RigV2_Study_V1_31": {
+      "hand_center_target_errors_m": {
+        "R": 8.940696716308594e-08,
+        "L": 1.3329305248569582e-07
+      },
+      "contact": {
+        "Head": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "Chest": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "UpperArm.L": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "ForeArm.L": {
+          "weapon_triangle_hits_inset_5mm": 107,
+          "max_vertex_penetration_m": 0.06311958746991128
+        },
+        "UpperArm.R": {
+          "weapon_triangle_hits_inset_5mm": 35,
+          "max_vertex_penetration_m": 0.061193769001635145
+        },
+        "ForeArm.R": {
+          "weapon_triangle_hits_inset_5mm": 66,
+          "max_vertex_penetration_m": 0.06833480992283392
+        }
+      },
+      "stock_butt_center": [
+        -0.4310145080089569,
+        -0.089358851313591,
+        1.3098807334899902
+      ]
+    },
+    "LongGunAimBias_RigV2_Study_V1_43": {
+      "hand_center_target_errors_m": {
+        "R": 1.2013700229374393e-07,
+        "L": 1.336050319703616e-07
+      },
+      "contact": {
+        "Head": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "Chest": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "UpperArm.L": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "ForeArm.L": {
+          "weapon_triangle_hits_inset_5mm": 107,
+          "max_vertex_penetration_m": 0.06311986516914023
+        },
+        "UpperArm.R": {
+          "weapon_triangle_hits_inset_5mm": 35,
+          "max_vertex_penetration_m": 0.06119376620510808
+        },
+        "ForeArm.R": {
+          "weapon_triangle_hits_inset_5mm": 66,
+          "max_vertex_penetration_m": 0.06833477238325902
+        }
+      },
+      "stock_butt_center": [
+        -0.43094855546951294,
+        -0.08905141800642014,
+        1.3101059198379517
+      ]
+    },
+    "LongGunAimBias_RigV2_Study_V1_49": {
+      "hand_center_target_errors_m": {
+        "R": 1.2013700229374393e-07,
+        "L": 1.336050319703616e-07
+      },
+      "contact": {
+        "Head": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "Chest": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "UpperArm.L": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "ForeArm.L": {
+          "weapon_triangle_hits_inset_5mm": 107,
+          "max_vertex_penetration_m": 0.06311986516914023
+        },
+        "UpperArm.R": {
+          "weapon_triangle_hits_inset_5mm": 35,
+          "max_vertex_penetration_m": 0.06119376620510808
+        },
+        "ForeArm.R": {
+          "weapon_triangle_hits_inset_5mm": 66,
+          "max_vertex_penetration_m": 0.06833477238325902
+        }
+      },
+      "stock_butt_center": [
+        -0.43094855546951294,
+        -0.08905141800642014,
+        1.3101059198379517
+      ]
+    },
+    "LongGunHold_RigV2_Study_V1_1": {
+      "hand_center_target_errors_m": {
+        "R": 1.3328003749250113e-07,
+        "L": 1.7031748578840685e-07
+      },
+      "contact": {
+        "Head": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "Chest": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "UpperArm.L": {
+          "weapon_triangle_hits_inset_5mm": 0,
+          "max_vertex_penetration_m": 0.0
+        },
+        "ForeArm.L": {
+          "weapon_triangle_hits_inset_5mm": 107,
+          "max_vertex_penetration_m": 0.06311974891792363
+        },
+        "UpperArm.R": {
+          "weapon_triangle_hits_inset_5mm": 35,
+          "max_vertex_penetration_m": 0.061193762809507724
+        },
+        "ForeArm.R": {
+          "weapon_triangle_hits_inset_5mm": 66,
+          "max_vertex_penetration_m": 0.06833470850025303
+        }
+      },
+      "stock_butt_center": [
+        -0.43094849586486816,
+        -0.08905141800642014,
+        1.3101059198379517
+      ]
+    }
+  },
+  "actions": {
+    "LongGunAimBias_RigV2_Study_V1": {
+      "lower_body_error": 0,
+      "scale_error": 0,
+      "arm_translation_error": 0,
+      "loop_seam_error": 0.0,
+      "peak_world_head_delta_deg": 2.672361245082383
+    },
+    "LongGunHold_RigV2_Study_V1": {
+      "lower_body_error": 0,
+      "scale_error": 0,
+      "arm_translation_error": 0,
+      "loop_seam_error": 0.0,
+      "peak_world_head_delta_deg": 0
+    }
+  },
+  "contact_note": "Weapon triangles vs 5mm inset rigid boxes; vertex depth is a lower bound, not exact volumetric penetration. Fingerless hand contact is intentional. Does not test every possible body pair."
+}

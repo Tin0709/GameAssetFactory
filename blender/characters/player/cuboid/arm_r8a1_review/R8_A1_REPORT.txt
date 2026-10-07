@@ -1,0 +1,178 @@
+R8-A1 — ARM RIG UPGRADE / LONG-GUN HOLD
+2026-10-07 | Blender-only study
+
+1. RIG CHANGES
+
+File: ../player_longgun_arm_rig_v2_study.blend
+Author rig: R8A1_RigV2_Author / R8A1_RigV2_Skeleton.
+The copied Arm.L/R bones became UpperArm.L/R, each 337.5 mm long.
+Connected ForeArm.L/R bones add another 337.5 mm per side. Total bone count
+is 13, up from 11; total arm length remains 675 mm per side. All other bone
+rest transforms, hierarchy and lengths are unchanged.
+
+Each original arm cuboid is now two independently rigid cuboids of the same
+225 mm width/depth. All vertices have exactly one bone weight of 1.0.
+Faces remain flat; no smoothing, rounding, organic elbow deformation, fingers,
+face rig, hand bones, stretch, or arm translations were introduced.
+The hand is the terminal part of each forearm, as requested for minimalism.
+Arm-side UVs follow the existing atlas with interpolation at the elbow cut;
+the new elbow caps use existing end-face UVs. Non-arm geometry and UVs match
+the source exactly. Legs and locomotion were not changed.
+
+There are no new bone constraints or persistent helper controls. Two-link
+geometry was used offline to choose the shoulder/elbow/hand pose, then baked
+as ordinary FK quaternion rotations. This is not a runtime IK rig. The
+existing WeaponCarrier mount relationship is retained in the study copies.
+
+New Actions:
+- LongGunHold_RigV2_Study_V1
+- LongGunAimBias_RigV2_Study_V1
+
+Validation preserves 9,599 existing tracked files, all 25 source Actions,
+all source mesh geometry and rig signatures. No production or Godot edits.
+Original and R7-W1 assets remain intact. See preservation.json and validation.json.
+
+2. HOLD STUDY RESULT
+
+Stock-to-shoulder: the buttstock now overlaps the right shoulder/upper-arm
+pocket and reads as received by the body. Its center is approximately
+(-0.431, -0.089, 1.310) m. This is a stylized seated contact, with measurable
+interpenetration noted below; it is not claimed to be a perfect surface fit.
+
+Trigger arm: the elbow sits lower and behind the grip, while the forearm
+returns upward to the receiver. The elbow bends approximately 81.6 degrees
+from straight. This compact return was impossible with the previous rigid
+beam. The grip no longer requires the R7-W1 shoulder translation.
+
+Support arm: the elbow has a different, more forward shape and bends about
+41.1 degrees. The hand supports the fore-end roughly 280 mm forward along
+the gun's axis from the grip (weapon scale is the unchanged 1.12). Its center
+is lower than the fore-end body, avoiding the first candidate's deeper
+through-gun placement. Both hand centers meet their selected geometric
+targets to floating-point precision. These are authored contact targets,
+not evidence of anatomically realistic fingers or palms.
+
+Rifle/body relationship: grip position is (-0.180,-0.340,1.160) m: about
+116 mm closer along forward depth and 191 mm higher than original A. The
+rifle points diagonally across the upper body. Changing its direction as
+well as adding elbows is what allows distinct fore-end support without
+longer arms. Relative to previous B, the grip is 100 mm closer along depth
+and 20 mm higher. These values are coordinate comparisons, not clearance.
+
+Torso/shoulders: restrained spine/chest yaw and forward participation help
+receive the stock; shoulders keep their normal joint positions. The upper
+arms can descend independently of the upward-pointing forearms, producing
+the compact structure missing in B.
+
+Head/gaze: the base head turns toward the diagonal gun line and inclines
+slightly. The eyes remain visible in the principal front/gameplay views.
+The result suggests weapon focus; exact eye-through-aperture alignment is
+not established by this study or by the supplied perspective stills.
+
+3. AIM-BIAS RESULT
+
+The new aim Action starts from the RigV2 hold, focuses, adds a small emphasis,
+and settles. Frames 1–48 play at 24 fps; frame 49 matches the first pose.
+Markers: HOLD 1, FOCUS 15, EMPHASIS 20, SETTLED 43.
+Peak local head offset is 1.2/1.0/-1.1 degrees, with small neck participation
+and 0.25 degrees of chest participation. Combined world head change peaks
+at 2.67 degrees. No full recoil, muzzle effect, or firing system was created.
+
+The ordered close-view frames show a small focus gesture rather than a broad
+tilt. At gameplay distance it is barely distinguishable from C. This is
+secondary life, not a strong gameplay signal. Two decoded 48-frame videos
+provide shared-scene and close-up playback; final timing/artistic judgement
+is left to the human reviewer.
+
+4. COMPARISON
+
+A: LongGunHold_V2 on the original rig.
+B: LongGunHold_ReferenceStudy_V1 on the original rigid-arm rig.
+C: LongGunHold_RigV2_Study_V1 on the articulated study rig.
+D: LongGunAimBias_RigV2_Study_V1 at focus peak / in playback.
+E: the three reference images supplied for R7-W1, retained unchanged.
+Reference 1 is the principal compact-rifle target. No additional separate
+compact-reference file was present in this request, so the existing three
+are used. Exact reference rigs or joint angles are not inferred from images.
+
+A reads lower and carried forward. B improves rifle height but leaves rigid
+arms and crowded hand roles. C/D create a lower trigger elbow, returning
+forearm, and separate forward support, much closer to the compact reference
+structure. The head and stock now participate in the same upper-body shape.
+It remains our character's proportions, materials and fingerless block style.
+
+Seven matched views are provided for every A/B/C/D pose: front three-quarter,
+side, rear three-quarter, elevated gameplay three-quarter, opposite elevated
+three-quarter, native gameplay distance, and close inspection. All subjects
+within each sheet share the same camera, scale, lighting and framing.
+
+The main front/gameplay camera is on the opposite side from the R7-W1 main
+camera, which shows the new arm structure more clearly. GameplayOpposite
+explicitly retains the previous R7-W1 elevated angle. The new diagonal rifle
+is strongly foreshortened from that angle; this limitation is included for
+review rather than excluded. The shared-scene A/B/C/D video has spatial
+lighting differences; use the matched individual renders for pose comparison.
+
+Gameplay-distance verdict: C/D read as a more compact shouldered rifle pose,
+especially through the stock/upper-arm connection and low trigger elbow.
+Fine elbow boundaries and D's tiny head gesture largely disappear at this
+size. The opposite view compresses the hands and barrel, so angle-dependent
+readability still deserves attention during eventual production polishing.
+
+5. LIMITATIONS
+
+The minimal articulation meaningfully resolves the main rigid-arm blocker.
+No further skeletal complexity is demonstrated as necessary for this hold.
+This does not certify this rig for every future reload, holster, or extreme
+arm pose, and existing one-piece-arm Actions cannot simply be applied to the
+renamed/split arm bones without an explicit future migration/retarget pass.
+
+There are visible hard elbow seams and intersecting cuboid corners. These
+are the rigid-segment construction, not soft skin deformation. The forearms
+and hands remain chunky; wrist orientation cannot be controlled separately.
+Hand bones were not needed to demonstrate this hold, but that choice may
+be reconsidered only if a later approved pose requires independent wrists.
+
+Contact checks use weapon triangles against boxes inset 5 mm from the body
+surfaces. C and sampled D frames 1,7,15,20,23,31,43,49 have zero weapon/head,
+weapon/chest, or weapon/left-upper-arm intersections. This is a bounded
+sampled test, not exhaustive all-pairs collision validation.
+
+The stock intersects the right upper-arm/shoulder box (35 weapon triangles;
+maximum sampled weapon-vertex depth about 61 mm). The trigger forearm/hand
+has 66 intersecting triangles, about 68 mm maximum vertex depth. The support
+forearm/hand has 107, about 63 mm. These topology-dependent counts/depths
+are proxies and do not mean that every visible contact has that penetration.
+They do mean contact polish is still needed: do not describe these as all
+minor or fully clean. Some insertion into fingerless block hands and a seated
+stock is visually useful, but excess receiver/wrist or stock/sleeve burial
+should be reduced during hold polish before any production replacement.
+
+Quarter-frame sampling verifies unchanged root/hips/legs, no arm translation,
+no scale animation, and exact loop endpoint agreement. All mesh weights are
+rigid and the non-arm surface/UV data is preserved. These checks protect the
+asset; they do not replace human visual approval.
+
+6. RECOMMENDATION
+
+RIGV2 IS GOOD ENOUGH; NEXT STEP SHOULD BE PRODUCTION HOLD/HOLSTER UPGRADE.
+
+This recommendation concerns the minimal arm structure: the two-segment FK
+arms solve the compact elbow/forearm problem without more bones or controls.
+After human review, the next separate task should polish the contacts and
+author/migrate hold and holster for the chosen rig, with compatibility checks.
+The current study pose is not a drop-in production-approved animation.
+No production replacement, holster rewrite, gameplay integration, reload,
+or recoil system is included in this pass.
+
+7. ARTISTIC STATUS
+
+AWAITING HUMAN REVIEW
+
+Blender review scene: R8A1_COMPARISON. A/B/C/D are editable characters;
+D is selected at frame 20 and the supplied reference board is shown beside
+the viewport. Play frames 1–48 or inspect 1,15,20,43.
+R8A1_AUTHORING contains the isolated RigV2 authoring character; R8A1_LEGACY
+contains the original rig for matched A/B renders.
+Review package: index.html, comparison_*.jpg/png, ABCD_aim_24fps.mp4,
+aim_close_24fps.mp4, focus_sequence.jpg, and the full-resolution A/B/C/D PNGs.
