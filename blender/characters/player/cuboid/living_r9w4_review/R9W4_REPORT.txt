@@ -1,0 +1,23 @@
+R9-W4 — GLOBAL ONE-ARM WEAPON-HOLD STUDY
+ARTISTIC STATUS: AWAITING HUMAN REVIEW
+Blender study only • 7 October 2026
+
+The left arm carries the weapon. Both arms extend forward with near-straight elbows; shoulder-to-terminal-block centre reach is approximately 0.587 m. The right block hand hovers beside the receiver instead of gripping it. Rifle and shotgun support use the fore-end; pistol support uses the grip underside. Native weapon geometry and existing scales are preserved.
+
+Hold, moving hold and aim sweeps share this language across M4A1, pistol and shotgun. Spine, Chest, Neck and Head participate in breathing and facing. The supporting arm/carrier lead; the off-arm gesture follows by 125 ms. Private turn previews respond at 65% amplitude to the original facing-rate sequence to avoid rapid wrist roll. Actual world facing stays unchanged.
+
+Sampled off-hand clearance to the whole gun:
+  M4A1/rifle: lower bound >= 29.72 mm; upper bound <= 31.92 mm.
+  Pistol:     lower bound >= 28.79 mm; upper bound <= 41.47 mm.
+  Shotgun:    lower bound >= 28.25 mm; upper bound <= 57.92 mm.
+These are conservative SAT/vertex distance bounds, not exact minimum distances. Whole right upper-arm/forearm intersection counts are zero. The carrying block remains within 1.74 mm of its support surface. Elbows remain connected; no deep Head/Chest intersections were found in the sampled 5 mm inset tests.
+
+The extended, separated hold remains mechanically consistent during Walk, Sprint, aim sweeps and turning. Native Walk16/Sprint13 clocks continue at 24 fps; original path speeds remain 1.4/2.1 m/s, with current V3 turn poses at the same gait phase. A and B share their lower poses and paths. No foot, speed, cadence, Godot, runtime, gameplay or Draw/Holster changes were made. All prior studies and all 9,991 protected files remain unchanged.
+
+A/B: rifle A uses the exact W3 actions. Pistol/shotgun A are explicitly labeled compact-hold adapters because no earlier living RigV2 category actions existed. B uses nine new upper-only OneArmStudy_V1 actions. Front 3/4, side and rear 3/4 boards use identical individual cameras for A/B. Turn previews use fitted rear oblique views with matching-height staging and unchanged path transforms.
+
+Limitations: the carry is high; large off-hand blocks can overlap the face or receiver in projection, hiding a physical gap. The pistol is small relative to the fists; the shotgun stock projects behind the supporting side. Fingerless rigid blocks limit gesture detail. Future production Draw/Holster compatibility is unverified. Mechanical checks do not establish artistic naturalness.
+
+Review index.html, the 13 fully decoded 24 fps movies and chronological contact sheets in this folder. Turning reels keep the original path-case cuts and are not loops. Sprint movie is a 208-frame excerpt; Blender contains its full 832-frame joint loop. Blender opens on R9W4_REVIEW_RIFLE_AIMAROUND, frame 73, A left/B right. Use Space to play and the scene selector for other categories.
+
+R9W4_TECHNICAL_NOTES.txt contains action names, evidence files and detailed limitations. Validation, composition, motion, camera, media and preservation checks pass; final_save.json verifies the delivered live-saved Blender binary.

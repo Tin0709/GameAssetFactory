@@ -1,0 +1,482 @@
+[
+  {
+    "category": "Rifle",
+    "drive": -1,
+    "fit_config": {
+      "support_y": 0.34,
+      "support_z": 0.028625758556003255,
+      "hover_x": 0.14052642258401285,
+      "hover_y": -0.015,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 20,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0010256281455314903,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0010256281455314903
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.030002714100641967,
+      "gap_upper_m": 0.030844801384864673,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.025642710937361743
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.08213027139273443,
+      "gap_upper_m": 0.08586065968174356,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.07002210903364925
+    }
+  },
+  {
+    "category": "Rifle",
+    "drive": -0.5,
+    "fit_config": {
+      "support_y": 0.34,
+      "support_z": 0.02861315441390903,
+      "hover_x": 0.13458493624886766,
+      "hover_y": -0.015,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 20,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0009632086904223236,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0009632086904223236
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.02999907691025544,
+      "gap_upper_m": 0.02999907691025544,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.02999907691025544
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.07048077828853855,
+      "gap_upper_m": 0.0746431967754199,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.06870371417881416
+    }
+  },
+  {
+    "category": "Rifle",
+    "drive": 0,
+    "fit_config": {
+      "support_y": 0.34,
+      "support_z": 0.028219837812435984,
+      "hover_x": 0.14205139362087368,
+      "hover_y": -0.015,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 20,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.001247430977255909,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.001247430977255909
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.029995564721182866,
+      "gap_upper_m": 0.029995564721182866,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.029995564721182866
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.06610025100654837,
+      "gap_upper_m": 0.07077040503949822,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.06401863545375702
+    }
+  },
+  {
+    "category": "Rifle",
+    "drive": 0.5,
+    "fit_config": {
+      "support_y": 0.34,
+      "support_z": 0.02810179461321738,
+      "hover_x": 0.15296399512129497,
+      "hover_y": -0.015,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 20,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0011884614139414523,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0011884614139414523
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.029990778456451817,
+      "gap_upper_m": 0.029990778456451817,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.029990778456451817
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.06089201951281087,
+      "gap_upper_m": 0.0609685214004497,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.06095664988495242
+    }
+  },
+  {
+    "category": "Rifle",
+    "drive": 1,
+    "fit_config": {
+      "support_y": 0.34,
+      "support_z": 0.027900055460600277,
+      "hover_x": 0.167135674563617,
+      "hover_y": -0.015,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 20,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0011708258291806967,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0011708258291806967
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.02998398184253312,
+      "gap_upper_m": 0.03019188403368212,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.027888264343850167
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.046405689469093125,
+      "gap_upper_m": 0.046405689469093125,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.046405689469093125
+    }
+  },
+  {
+    "category": "Pistol",
+    "drive": -1,
+    "fit_config": {
+      "support_y": 0.035,
+      "support_z": -0.1899711866975435,
+      "hover_x": 0.1773595674552744,
+      "hover_y": 0.035,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 9,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0011892831903933532,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0011892831903933532
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.029972708776443147,
+      "gap_upper_m": 0.03075976979911297,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.030729539906721004
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.23534803215233052,
+      "gap_upper_m": 0.23534803215233052,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.23534803215233052
+    }
+  },
+  {
+    "category": "Pistol",
+    "drive": -0.5,
+    "fit_config": {
+      "support_y": 0.035,
+      "support_z": -0.20036669983501595,
+      "hover_x": 0.19052499030780118,
+      "hover_y": 0.035,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.001107260919415709,
+      "gap_upper_m": 0.0014919685065675854,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.001107260919415709
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.030440142523122257,
+      "gap_upper_m": 0.0340126578355789,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.029662179353733095
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.23772625225009475,
+      "gap_upper_m": 0.23772625225009475,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.23772625225009475
+    }
+  },
+  {
+    "category": "Pistol",
+    "drive": 0,
+    "fit_config": {
+      "support_y": 0.035,
+      "support_z": -0.20202926761204107,
+      "hover_x": 0.19171307497768797,
+      "hover_y": 0.035,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.0006901201550824215,
+      "gap_upper_m": 0.0006901201550824215,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0006901201550824215
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.03059357975268162,
+      "gap_upper_m": 0.03812851882476472,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.03347988192303579
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.23388055360709004,
+      "gap_upper_m": 0.23388055360709004,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.23388055360709004
+    }
+  },
+  {
+    "category": "Pistol",
+    "drive": 0.5,
+    "fit_config": {
+      "support_y": 0.035,
+      "support_z": -0.2057126163829884,
+      "hover_x": 0.19271987338251323,
+      "hover_y": 0.035,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.000538141060626704,
+      "gap_upper_m": 0.000538141060626704,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.000538141060626704
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.029935639236883513,
+      "gap_upper_m": 0.03723425005474326,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.029301621727525526
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.22392065691341478,
+      "gap_upper_m": 0.22392065691341478,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.22392065691341478
+    }
+  },
+  {
+    "category": "Pistol",
+    "drive": 1,
+    "fit_config": {
+      "support_y": 0.035,
+      "support_z": -0.2139489422824093,
+      "hover_x": 0.1853362076359511,
+      "hover_y": 0.035,
+      "hover_z": 0
+    },
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.0005308374332785443,
+      "gap_upper_m": 0.0005308374332785443,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0005308374332785443
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.029976449411280498,
+      "gap_upper_m": 0.0356942932212511,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.03345805582803674
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.20645469410198414,
+      "gap_upper_m": 0.20645469410198414,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.20645469410198414
+    }
+  },
+  {
+    "category": "Shotgun",
+    "drive": -1,
+    "fit_config": {
+      "support_y": 0.356,
+      "support_z": -0.08101860343207994,
+      "hover_x": 0.16518599809972595,
+      "hover_y": 0.0,
+      "hover_z": 0.02
+    },
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.0007793999251453632,
+      "gap_upper_m": 0.0007793999251453632,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0007793999251453632
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.030234016214058412,
+      "gap_upper_m": 0.030324961286278186,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.030222072451670967
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.10751867970635076,
+      "gap_upper_m": 0.13814480441528512,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.11283426380106132
+    }
+  },
+  {
+    "category": "Shotgun",
+    "drive": -0.5,
+    "fit_config": {
+      "support_y": 0.356,
+      "support_z": -0.08105687297429684,
+      "hover_x": 0.16437180390183712,
+      "hover_y": 0.0,
+      "hover_z": 0.02
+    },
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.0007838450113162726,
+      "gap_upper_m": 0.0007838450113162726,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0007838450113162726
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.03051145463671351,
+      "gap_upper_m": 0.03051145463671351,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.03051145463671351
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.09719773479137883,
+      "gap_upper_m": 0.11722802687671556,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.11690616111108504
+    }
+  },
+  {
+    "category": "Shotgun",
+    "drive": 0,
+    "fit_config": {
+      "support_y": 0.356,
+      "support_z": -0.08107427424857268,
+      "hover_x": 0.1753562086053489,
+      "hover_y": 0.0,
+      "hover_z": 0.02
+    },
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.000721676949541783,
+      "gap_upper_m": 0.000721676949541783,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.000721676949541783
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.03042956301563296,
+      "gap_upper_m": 0.030544155839638668,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.030054770727321878
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.0918381152499946,
+      "gap_upper_m": 0.10241297327787159,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.10203191172938092
+    }
+  },
+  {
+    "category": "Shotgun",
+    "drive": 0.5,
+    "fit_config": {
+      "support_y": 0.356,
+      "support_z": -0.08091258906448529,
+      "hover_x": 0.18687739548138843,
+      "hover_y": 0.0,
+      "hover_z": 0.02
+    },
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.0004597979095433552,
+      "gap_upper_m": 0.0004597979095433552,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0004597979095433552
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.029963664406802162,
+      "gap_upper_m": 0.03910258371066214,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.035053203528013374
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.0783342288241683,
+      "gap_upper_m": 0.08239720472296774,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.08190513751218204
+    }
+  },
+  {
+    "category": "Shotgun",
+    "drive": 1,
+    "fit_config": {
+      "support_y": 0.356,
+      "support_z": -0.08126016415100962,
+      "hover_x": 0.19729547963554905,
+      "hover_y": 0.0,
+      "hover_z": 0.02
+    },
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.0006890495721180723,
+      "gap_upper_m": 0.0006890495721180723,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.0006890495721180723
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.029775401462764944,
+      "gap_upper_m": 0.05765289558799251,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.05765289558799251
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.050798077338558345,
+      "gap_upper_m": 0.05294717240021454,
+      "vertex_depth_m": 0.0,
+      "signed_vertex_m": 0.050798077338558345
+    }
+  }
+]

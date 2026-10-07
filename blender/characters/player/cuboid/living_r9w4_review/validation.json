@@ -1,0 +1,115 @@
+{
+  "passed": true,
+  "failures": [],
+  "actions": {
+    "LongGunHold_OneArmStudy_V1": {
+      "off_terminal_gap_lower_min_m": 0.02999496835383203,
+      "off_terminal_gap_upper_max_m": 0.029999746868347943,
+      "off_arm_intersections_max": 0,
+      "support_terminal_gap_upper_max_m": 0.0013074991614094866,
+      "arm_reach_min_m": 0.5869995791167288,
+      "elbow_gap_max_m": 0,
+      "head_chest_inset_intersections_max": 0,
+      "scale_error_max": 0,
+      "loop_error": 2.086162567138672e-07,
+      "samples": 193
+    },
+    "LongGunMove_OneArmStudy_V1": {
+      "off_terminal_gap_lower_min_m": 0.029995090593041895,
+      "off_terminal_gap_upper_max_m": 0.029999489020223147,
+      "off_arm_intersections_max": 0,
+      "support_terminal_gap_upper_max_m": 0.001307678809185281,
+      "arm_reach_min_m": 0.5869997238922576,
+      "elbow_gap_max_m": 0,
+      "head_chest_inset_intersections_max": 0,
+      "scale_error_max": 0,
+      "loop_error": 2.086162567138672e-07,
+      "samples": 129
+    },
+    "LongGunAimAround_OneArmStudy_V1": {
+      "off_terminal_gap_lower_min_m": 0.029721773282327085,
+      "off_terminal_gap_upper_max_m": 0.03191470618115999,
+      "off_arm_intersections_max": 0,
+      "support_terminal_gap_upper_max_m": 0.0013187647975421296,
+      "arm_reach_min_m": 0.5869995725720809,
+      "elbow_gap_max_m": 0,
+      "head_chest_inset_intersections_max": 0,
+      "scale_error_max": 0,
+      "loop_error": 5.960464477539063e-08,
+      "samples": 577
+    },
+    "PistolHold_OneArmStudy_V1": {
+      "off_terminal_gap_lower_min_m": 0.030037078276087453,
+      "off_terminal_gap_upper_max_m": 0.038278538114382046,
+      "off_arm_intersections_max": 0,
+      "support_terminal_gap_upper_max_m": 0.0009440295960055772,
+      "arm_reach_min_m": 0.5869998456623323,
+      "elbow_gap_max_m": 0,
+      "head_chest_inset_intersections_max": 0,
+      "scale_error_max": 0,
+      "loop_error": 1.7881393432617188e-07,
+      "samples": 193
+    },
+    "PistolMove_OneArmStudy_V1": {
+      "off_terminal_gap_lower_min_m": 0.029927512926188116,
+      "off_terminal_gap_upper_max_m": 0.03927818967208576,
+      "off_arm_intersections_max": 0,
+      "support_terminal_gap_upper_max_m": 0.001077161986248007,
+      "arm_reach_min_m": 0.5869997631601347,
+      "elbow_gap_max_m": 0,
+      "head_chest_inset_intersections_max": 0,
+      "scale_error_max": 0,
+      "loop_error": 5.960464477539063e-08,
+      "samples": 129
+    },
+    "PistolAimAround_OneArmStudy_V1": {
+      "off_terminal_gap_lower_min_m": 0.02879559900040274,
+      "off_terminal_gap_upper_max_m": 0.04146371062874716,
+      "off_arm_intersections_max": 0,
+      "support_terminal_gap_upper_max_m": 0.0013767825600951714,
+      "arm_reach_min_m": 0.58699940776592,
+      "elbow_gap_max_m": 0,
+      "head_chest_inset_intersections_max": 0,
+      "scale_error_max": 0,
+      "loop_error": 2.980232238769531e-07,
+      "samples": 577
+    },
+    "ShotgunHold_OneArmStudy_V1": {
+      "off_terminal_gap_lower_min_m": 0.03011953904942563,
+      "off_terminal_gap_upper_max_m": 0.031233172534621663,
+      "off_arm_intersections_max": 0,
+      "support_terminal_gap_upper_max_m": 0.0007828222622781877,
+      "arm_reach_min_m": 0.5869997903303308,
+      "elbow_gap_max_m": 0,
+      "head_chest_inset_intersections_max": 0,
+      "scale_error_max": 0,
+      "loop_error": 1.6391277313232422e-07,
+      "samples": 193
+    },
+    "ShotgunMove_OneArmStudy_V1": {
+      "off_terminal_gap_lower_min_m": 0.030138268480262576,
+      "off_terminal_gap_upper_max_m": 0.03299279488811012,
+      "off_arm_intersections_max": 0,
+      "support_terminal_gap_upper_max_m": 0.0007978671686753036,
+      "arm_reach_min_m": 0.5869998155172998,
+      "elbow_gap_max_m": 0,
+      "head_chest_inset_intersections_max": 0,
+      "scale_error_max": 0,
+      "loop_error": 2.9802322387695312e-08,
+      "samples": 129
+    },
+    "ShotgunAimAround_OneArmStudy_V1": {
+      "off_terminal_gap_lower_min_m": 0.02897648113513429,
+      "off_terminal_gap_upper_max_m": 0.05791529873432126,
+      "off_arm_intersections_max": 0,
+      "support_terminal_gap_upper_max_m": 0.0008049738579854887,
+      "arm_reach_min_m": 0.5869997631601347,
+      "elbow_gap_max_m": 0,
+      "head_chest_inset_intersections_max": 0,
+      "scale_error_max": 0,
+      "loop_error": 1.7881393432617188e-07,
+      "samples": 577
+    }
+  },
+  "note": "SAT intersection tests and conservative surface-distance bounds; ordered frames and human playback determine artistic readability."
+}

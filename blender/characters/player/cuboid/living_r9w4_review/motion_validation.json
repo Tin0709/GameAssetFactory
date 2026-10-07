@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "failures": [],
+  "actions": {
+    "LongGunHold_OneArmStudy_V1": {
+      "half_frame_rotation_max_deg": 0.1312212074681015,
+      "loop_position_derivative_error_m_per_half_frame": 1.2990531157078367e-07,
+      "samples": 195
+    },
+    "LongGunMove_OneArmStudy_V1": {
+      "half_frame_rotation_max_deg": 0.3189807732144381,
+      "loop_position_derivative_error_m_per_half_frame": 2.6151431761360534e-07,
+      "samples": 131
+    },
+    "LongGunAimAround_OneArmStudy_V1": {
+      "half_frame_rotation_max_deg": 1.8302868591053747,
+      "loop_position_derivative_error_m_per_half_frame": 2.4755668231600746e-07,
+      "samples": 579
+    },
+    "PREVIEW_ONLY_R9W4_Rifle_ONEARM_TURN_RESPONSE": {
+      "half_frame_rotation_max_deg": 7.781363875149665,
+      "samples": 911,
+      "loop": false
+    },
+    "PistolHold_OneArmStudy_V1": {
+      "half_frame_rotation_max_deg": 0.03956468118525214,
+      "loop_position_derivative_error_m_per_half_frame": 3.6538242802736845e-07,
+      "samples": 195
+    },
+    "PistolMove_OneArmStudy_V1": {
+      "half_frame_rotation_max_deg": 0.08846931922527276,
+      "loop_position_derivative_error_m_per_half_frame": 1.4835497975480021e-06,
+      "samples": 131
+    },
+    "PistolAimAround_OneArmStudy_V1": {
+      "half_frame_rotation_max_deg": 0.15323335969831878,
+      "loop_position_derivative_error_m_per_half_frame": 2.8799361325843138e-06,
+      "samples": 579
+    },
+    "PREVIEW_ONLY_R9W4_Pistol_ONEARM_TURN_RESPONSE": {
+      "half_frame_rotation_max_deg": 0.7077556743800928,
+      "samples": 911,
+      "loop": false
+    },
+    "ShotgunHold_OneArmStudy_V1": {
+      "half_frame_rotation_max_deg": 0.11869405356091633,
+      "loop_position_derivative_error_m_per_half_frame": 5.291486056019277e-07,
+      "samples": 195
+    },
+    "ShotgunMove_OneArmStudy_V1": {
+      "half_frame_rotation_max_deg": 0.2797646284450016,
+      "loop_position_derivative_error_m_per_half_frame": 2.017599617107867e-05,
+      "samples": 131
+    },
+    "ShotgunAimAround_OneArmStudy_V1": {
+      "half_frame_rotation_max_deg": 1.179669825918111,
+      "loop_position_derivative_error_m_per_half_frame": 0.0001328751516589347,
+      "samples": 579
+    },
+    "PREVIEW_ONLY_R9W4_Shotgun_ONEARM_TURN_RESPONSE": {
+      "half_frame_rotation_max_deg": 4.910701961337714,
+      "samples": 911,
+      "loop": false
+    }
+  },
+  "note": "Pose continuity diagnostics bound discontinuities; naturalness and gesture timing still require human playback."
+}

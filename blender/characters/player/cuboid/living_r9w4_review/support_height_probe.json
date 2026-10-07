@@ -1,0 +1,326 @@
+[
+  {
+    "category": "Rifle",
+    "support_z": 0.01,
+    "left": {
+      "triangles": 98,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.06672683565380155
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.05294664817035899,
+      "gap_upper_m": 0.06348233174284784,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 25,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.029166192451342665
+    },
+    "root_chest": [
+      0.3375180959701538,
+      0.239999920129776,
+      0.390230268239975
+    ]
+  },
+  {
+    "category": "Rifle",
+    "support_z": -0.03,
+    "left": {
+      "triangles": 64,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.07365914874707266
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.05425487764091874,
+      "gap_upper_m": 0.06395895636858014,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 25,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.029874591476412804
+    },
+    "root_chest": [
+      0.3408258557319641,
+      0.2399999350309372,
+      0.38619881868362427
+    ]
+  },
+  {
+    "category": "Rifle",
+    "support_z": -0.07,
+    "left": {
+      "triangles": 47,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.07318843637590816
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.05666471496183456,
+      "gap_upper_m": 0.0649209652991059,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 28,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.020374561048241646
+    },
+    "root_chest": [
+      0.34690043330192566,
+      0.24000000953674316,
+      0.37859952449798584
+    ]
+  },
+  {
+    "category": "Rifle",
+    "support_z": -0.09,
+    "left": {
+      "triangles": 44,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.056515005069973034
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.05827412984646407,
+      "gap_upper_m": 0.06562311840566956,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 30,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.018182509621077925
+    },
+    "root_chest": [
+      0.3509434163570404,
+      0.23999986052513123,
+      0.3733944594860077
+    ]
+  },
+  {
+    "category": "Rifle",
+    "support_z": -0.11,
+    "left": {
+      "triangles": 44,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.056431479556753206
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.06014641305238999,
+      "gap_upper_m": 0.06649903637366009,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 33,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.019112888907868553
+    },
+    "root_chest": [
+      0.35563308000564575,
+      0.24000006914138794,
+      0.3672018051147461
+    ]
+  },
+  {
+    "category": "Pistol",
+    "support_z": -0.18,
+    "left": {
+      "triangles": 35,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.014727420636120314
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.018826758444594666,
+      "gap_upper_m": 0.02731216737431831,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.1882718696475476,
+      "gap_upper_m": 0.1882718696475476,
+      "vertex_depth_m": 0.0
+    },
+    "root_chest": [
+      0.13772724568843842,
+      0.239999920129776,
+      0.4706761837005615
+    ]
+  },
+  {
+    "category": "Pistol",
+    "support_z": -0.2,
+    "left": {
+      "triangles": 15,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.0012619952825070058
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.018923731483539152,
+      "gap_upper_m": 0.027476601444052517,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.1897982551932782,
+      "gap_upper_m": 0.1897982551932782,
+      "vertex_depth_m": 0.0
+    },
+    "root_chest": [
+      0.1470707207918167,
+      0.23999986052513123,
+      0.4651040732860565
+    ]
+  },
+  {
+    "category": "Pistol",
+    "support_z": -0.22,
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.014392000803496549,
+      "gap_upper_m": 0.014707684440775363,
+      "vertex_depth_m": 0.0
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.019101245768297914,
+      "gap_upper_m": 0.026022223193787903,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.19124602221255005,
+      "gap_upper_m": 0.19124602221255005,
+      "vertex_depth_m": 0.0
+    },
+    "root_chest": [
+      0.157222181558609,
+      0.2399998903274536,
+      0.45877861976623535
+    ]
+  },
+  {
+    "category": "Shotgun",
+    "support_z": -0.04,
+    "left": {
+      "triangles": 93,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.03900156775917568
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.0450435685185846,
+      "gap_upper_m": 0.05434225103929189,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.05556658207920784,
+      "gap_upper_m": 0.07419361028548559,
+      "vertex_depth_m": 0.0
+    },
+    "root_chest": [
+      0.4057597815990448,
+      0.24000005424022675,
+      0.22132840752601624
+    ]
+  },
+  {
+    "category": "Shotgun",
+    "support_z": -0.07,
+    "left": {
+      "triangles": 22,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.0,
+      "vertex_depth_m": 0.010001550091614561
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.046501497045479956,
+      "gap_upper_m": 0.055177624774936616,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.05768211671082418,
+      "gap_upper_m": 0.07255758669888959,
+      "vertex_depth_m": 0.0
+    },
+    "root_chest": [
+      0.4078812301158905,
+      0.24000006914138794,
+      0.21604812145233154
+    ]
+  },
+  {
+    "category": "Shotgun",
+    "support_z": -0.09,
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.009240263785969385,
+      "gap_upper_m": 0.009240263785969385,
+      "vertex_depth_m": 0.0
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.047721344588850634,
+      "gap_upper_m": 0.05594941618737976,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.059428652160122,
+      "gap_upper_m": 0.07138003326699457,
+      "vertex_depth_m": 0.0
+    },
+    "root_chest": [
+      0.4096325933933258,
+      0.23999997973442078,
+      0.21157321333885193
+    ]
+  },
+  {
+    "category": "Shotgun",
+    "support_z": -0.11,
+    "left": {
+      "triangles": 0,
+      "gap_lower_m": 0.027591373384640974,
+      "gap_upper_m": 0.027591373384640974,
+      "vertex_depth_m": 0.0
+    },
+    "right": {
+      "triangles": 0,
+      "gap_lower_m": 0.0491360045901561,
+      "gap_upper_m": 0.05693645201632263,
+      "vertex_depth_m": 0.0
+    },
+    "head": {
+      "triangles": 0,
+      "gap_lower_m": 0.06142814633809984,
+      "gap_upper_m": 0.07034452494749466,
+      "vertex_depth_m": 0.0
+    },
+    "root_chest": [
+      0.41163766384124756,
+      0.24000002443790436,
+      0.20631304383277893
+    ]
+  }
+]

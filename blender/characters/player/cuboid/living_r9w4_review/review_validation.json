@@ -1,0 +1,152 @@
+{
+  "passed": true,
+  "failures": [],
+  "reviews": {
+    "Rifle_Hold": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.029995400343109824,
+      "off_terminal_gap_upper_max_m": 0.029999062425275225,
+      "support_terminal_gap_upper_max_m": 0.0012532835796131153,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 10,
+      "loop_error": null
+    },
+    "Rifle_Move": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.02999516401684038,
+      "off_terminal_gap_upper_max_m": 0.02999887303568116,
+      "support_terminal_gap_upper_max_m": 0.001263370528844135,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 10,
+      "loop_error": null
+    },
+    "Rifle_AimAround": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.02996187901774816,
+      "off_terminal_gap_upper_max_m": 0.030546071139319328,
+      "support_terminal_gap_upper_max_m": 0.00126621981327657,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 10,
+      "loop_error": null
+    },
+    "Rifle_Turn": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 1.1920928955078125e-07,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.02986205113155098,
+      "off_terminal_gap_upper_max_m": 0.030274875055206325,
+      "support_terminal_gap_upper_max_m": 0.0013113232201001773,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 911,
+      "loop_error": null
+    },
+    "Pistol_Hold": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.030234568466395106,
+      "off_terminal_gap_upper_max_m": 0.038191245144222355,
+      "support_terminal_gap_upper_max_m": 0.0008941389028963714,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 10,
+      "loop_error": null
+    },
+    "Pistol_Move": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.02996355314312016,
+      "off_terminal_gap_upper_max_m": 0.039235362001094565,
+      "support_terminal_gap_upper_max_m": 0.0010746565496902588,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 10,
+      "loop_error": null
+    },
+    "Pistol_AimAround": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.02964027680050206,
+      "off_terminal_gap_upper_max_m": 0.040314950796044316,
+      "support_terminal_gap_upper_max_m": 0.0007568620399434206,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 10,
+      "loop_error": null
+    },
+    "Pistol_Turn": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 1.1920928955078125e-07,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.028793362000050338,
+      "off_terminal_gap_upper_max_m": 0.04142362217264473,
+      "support_terminal_gap_upper_max_m": 0.001735737874210692,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 911,
+      "loop_error": null
+    },
+    "Shotgun_Hold": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.030211783387549818,
+      "off_terminal_gap_upper_max_m": 0.031139218515683628,
+      "support_terminal_gap_upper_max_m": 0.0007774342631758357,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 10,
+      "loop_error": null
+    },
+    "Shotgun_Move": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.03020788249015971,
+      "off_terminal_gap_upper_max_m": 0.03296896222335017,
+      "support_terminal_gap_upper_max_m": 0.0007967775596537524,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 10,
+      "loop_error": null
+    },
+    "Shotgun_AimAround": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.029543133051784354,
+      "off_terminal_gap_upper_max_m": 0.05701751944913229,
+      "support_terminal_gap_upper_max_m": 0.0007792461460228162,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 10,
+      "loop_error": null
+    },
+    "Shotgun_Turn": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 1.1920928955078125e-07,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.02825737727860078,
+      "off_terminal_gap_upper_max_m": 0.04421950254314517,
+      "support_terminal_gap_upper_max_m": 0.0008018851309168767,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 911,
+      "loop_error": null
+    },
+    "Sprint_All": {
+      "lower_pose_error_max": 0,
+      "path_world_yaw_error_max": 0,
+      "off_arm_intersections_max": 0,
+      "off_terminal_gap_lower_min_m": 0.029963438924411556,
+      "off_terminal_gap_upper_max_m": 0.0392352384272683,
+      "support_terminal_gap_upper_max_m": 0.001248407674132368,
+      "head_chest_inset_intersections_max": 0,
+      "samples": 12,
+      "loop_error": 2.086162567138672e-07
+    }
+  },
+  "approved_locomotion_source_digests_match": true,
+  "native_lower_curves_unchanged": true,
+  "note": "Quarter-frame V3 lower reel bake, dense half-frame turn composition; distance bounds remain sampled evidence. Native 16/13-frame clocks continue through original path cuts."
+}

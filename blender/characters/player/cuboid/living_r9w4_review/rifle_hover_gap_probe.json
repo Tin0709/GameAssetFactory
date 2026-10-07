@@ -1,0 +1,62 @@
+[
+  {
+    "hover_x": 0.12,
+    "off": {
+      "triangles": 0,
+      "gap_lower_m": 0.005827826833835537,
+      "gap_upper_m": 0.005827826833835537,
+      "vertex_depth_m": 0.0
+    },
+    "support": {
+      "triangles": 0,
+      "gap_lower_m": 0.0050919754101944464,
+      "gap_upper_m": 0.005645262306777074,
+      "vertex_depth_m": 0.0
+    }
+  },
+  {
+    "hover_x": 0.14,
+    "off": {
+      "triangles": 0,
+      "gap_lower_m": 0.027894509820175273,
+      "gap_upper_m": 0.027894509820175273,
+      "vertex_depth_m": 0.0
+    },
+    "support": {
+      "triangles": 0,
+      "gap_lower_m": 0.0037253115894712863,
+      "gap_upper_m": 0.005494476049472731,
+      "vertex_depth_m": 0.0
+    }
+  },
+  {
+    "hover_x": 0.16,
+    "off": {
+      "triangles": 0,
+      "gap_lower_m": 0.050090279691146544,
+      "gap_upper_m": 0.050090279691146544,
+      "vertex_depth_m": 0.0
+    },
+    "support": {
+      "triangles": 0,
+      "gap_lower_m": 0.001338027439157341,
+      "gap_upper_m": 0.0045197571456402665,
+      "vertex_depth_m": 0.0
+    }
+  },
+  {
+    "hover_x": 0.18,
+    "off": {
+      "triangles": 0,
+      "gap_lower_m": 0.07243624198128229,
+      "gap_upper_m": 0.07243624198128229,
+      "vertex_depth_m": 0.0
+    },
+    "support": {
+      "triangles": 3,
+      "gap_lower_m": 0.0,
+      "gap_upper_m": 0.004191756111416242,
+      "vertex_depth_m": 0.0
+    }
+  }
+]

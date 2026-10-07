@@ -1,0 +1,97 @@
+R9-W4 — GLOBAL ONE-ARM WEAPON-HOLD STUDY
+ARTISTIC STATUS: AWAITING HUMAN REVIEW
+Blender study only • 7 October 2026
+
+Study: player_weapon_onearm_r9w4_study.blend
+Review: index.html in this folder, 13 native 24 fps A/B movies, nine matched
+front 3/4 / side / rear 3/4 boards, and chronological motion contact sheets.
+The supplied crossbow reference is preserved as provided_crossbow_reference.png.
+
+The left arm now carries the weapon. Both arms extend forward with near-straight
+elbows; shoulder-to-terminal-block centre reach is approximately 0.587 m from
+the existing 0.600 m maximum. The right block hand hovers beside the receiver
+instead of clamping it. Rifle support moved to the fore-end; pistol support
+uses its grip underside; shotgun support uses its fore-end. Native weapon
+geometry and existing scales are preserved. The existing WeaponCarrier remains
+the sole weapon transform authority; the arms are coordinated baked FK.
+
+Hold, moving hold and aim sweep share that design. Spine, Chest, Neck and Head
+participate in breathing and facing response. The carrier and supporting arm
+lead; the hovering-arm gesture follows by 125 ms. Turning previews drive the
+response from the original signed facing-rate sequence, at 65% upper-gesture
+amplitude to avoid rapid hovering-wrist roll on the fastest turn-rate ramps.
+Actual world facing and all original locomotion remain unchanged.
+
+Measured off-hand clearance (all public action and composed preview samples):
+  M4A1/rifle: conservative lower bound >= 29.72 mm; upper bound <= 31.92 mm.
+  Pistol:     conservative lower bound >= 28.79 mm; upper bound <= 41.47 mm.
+  Shotgun:    conservative lower bound >= 28.25 mm; upper bound <= 57.92 mm.
+These are triangle/box SAT separation lower bounds and nearest-vertex distance
+upper bounds to the full gun, not exact minimum-distance measurements. Each
+sample's true surface distance lies between its bounds. The upper bound can
+be loose on broad flat faces. Whole right upper-arm and forearm/gun intersection
+counts are zero. The carrying block remains within 1.74 mm of its support
+surface. Contact at the primary arm is intentional. Deep Head/Chest intersection
+tests use a 5 mm inset and found none; they are not a claim of perfect silhouette.
+
+The mechanical language remains extended and separated during Walk, Sprint,
+aim sweeps and turning. The rendered sequence keeps the same gait and path
+phase in A and B. Native Walk is 16 frames, Sprint is 13 frames, both at 24 fps;
+original path speeds remain 1.4 m/s and 2.1 m/s. Canonical V3 left/right turn
+poses are mixed at the continuous native gait phase in private preview layers.
+No new foot motion, speed, cadence or locomotion controller was authored.
+
+A/B interpretation:
+  Rifle A: exact W3 LivingRef V2 / Move V2 / AimAround V3 actions.
+  Pistol and shotgun A: explicitly named PREVIEW_ONLY compact-hold adapters.
+  No earlier living RigV2 pistol/shotgun category actions existed; these A poses
+  demonstrate the previous compact philosophy rather than a saved historical
+  category result. B uses the nine new public upper-only study actions.
+  Turning reels retain the original path-case cuts and do not form loops.
+  Sprint movie is a 208-frame excerpt; the Blender Sprint_All scene holds the
+  complete 832-frame joint upper/lower loop.
+
+Public actions (no Root, Hips, leg or scale tracks):
+  LongGunHold_OneArmStudy_V1 / LongGunMove_OneArmStudy_V1 /
+    LongGunAimAround_OneArmStudy_V1
+  PistolHold_OneArmStudy_V1 / PistolMove_OneArmStudy_V1 /
+    PistolAimAround_OneArmStudy_V1
+  ShotgunHold_OneArmStudy_V1 / ShotgunMove_OneArmStudy_V1 /
+    ShotgunAimAround_OneArmStudy_V1
+Hold: 96 unique frames; Move: 64; AimAround: 288. Each has a duplicate closing
+pose outside its displayed unique-frame range. Private PREVIEW_ONLY actions
+contain category baseline adapters, source lower layers and turn responses.
+
+Evidence:
+  validation.json: nine public actions, 2,697 half-frame pose samples; connected
+  elbows, unchanged scales, closed loops and all original action/rig/mesh hashes.
+  review_validation.json: 13 composed scenes; 2,733 dense turning samples plus
+  representative Hold/Move/Aim/Sprint samples, equal A/B lower-body matrices,
+  approved source action hashes and exact native lower curve keys/handles.
+  motion_validation.json: evaluated upper-pose continuity diagnostics.
+  camera_validation.json: full A/B turn trajectories enclosed with a margin.
+  media_validation.json: all 13 expected movies decoded fully, 24 fps.
+  file_preservation.json: all 9,991 preexisting tracked files compared by SHA256.
+  final_save.json: live Blender checkpoint and delivered study binary hash.
+
+Remaining limitations and review points:
+  The carry is high; the large off-hand block can overlap the face/receiver in
+  some projections. Physical separation does not guarantee a clearly visible
+  gap from every camera. The pistol is small relative to the existing fists.
+  The shotgun stock projects behind the supporting side. These points should
+  be judged in the side/rear boards and the moving comparisons.
+  Fingerless rigid blocks limit support/trigger gesture detail. The new Ready
+  endpoint intentionally changes the earlier hold direction; future production
+  Draw/Holster transition compatibility has not been established.
+  Sampled geometry and continuity checks establish mechanical integrity;
+  'more alive and natural' remains an artistic judgment for human playback.
+
+All prior studies, source weapon files and production files remain preserved.
+No Godot/runtime/gameplay/Draw/Holster changes, new hands, mesh/weight/rest-pose
+edits, persistent IK or base hierarchy modifications were made.
+
+Blender review entry: R9W4_REVIEW_RIFLE_AIMAROUND, A left / B right.
+Use Space to play; choose PISTOL/SHOTGUN and HOLD/MOVE/TURN comparison scenes
+from the scene selector. Front/side/rear matched boards use the same individual
+diagnostic camera for both A and B. Paired moving movies use the front 3/4 camera;
+turning movies use the matched rear oblique camera.
