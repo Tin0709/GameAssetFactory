@@ -7,7 +7,7 @@ META=json.loads((BASE/'turning_study_r3_review/preview_metadata.json').read_text
 GAITS={'Walk':{'period':16,'twist':3.0,'roll':1.8,'lateral':.006,'bank':4.0,'pitch_rock':1.30,'foreaft':.00650},
        'Sprint':{'period':13,'twist':4.0,'roll':2.4,'lateral':.008,'bank':6.0,'pitch_rock':1.82,'foreaft':.01040}}
 ARM_INSET=.032 # close the 28 mm shoulder gap introduced by the slim mesh
-LONG_GUN_CENTER_EXTRA=.015 # horizontal only; no change to height or face distance
+LONG_GUN_CENTER_EXTRA=.0165 # +10% horizontal only; no change to height or face distance
 SHOTGUN_EXTRA_SCALE=1.15
 SHOTGUN_FIXED_BACK_ADVANCE=.07354375 # native rear stock -0.431 * current Y scale 1.1375 * 15%
 PISTOL_EXTRA_SCALE=1.30

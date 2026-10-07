@@ -57,7 +57,7 @@
           "weapons": [
             "R11_R12_Walk_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
           ],
-          "upper": "R12_Walk_Rifle_Upper_Foreaft30",
+          "upper": "R12_Walk_Rifle_Upper_Foreaft30_Center10",
           "motion": {
             "harmonic_cos": 0.9999655841119016,
             "harmonic_sin": -0.008296420417478845,
@@ -72,7 +72,7 @@
             "R11_R12_Walk_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
             "R11_R12_Walk_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
           ],
-          "upper": "R12_Walk_Shotgun_Upper_Size15_Foreaft30",
+          "upper": "R12_Walk_Shotgun_Upper_Size15_Foreaft30_Center10",
           "motion": {
             "harmonic_cos": 0.9999655841119016,
             "harmonic_sin": -0.008296420417478845,
@@ -122,7 +122,7 @@
           "weapons": [
             "R11_R12_Walk_Rifle_Turn_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
           ],
-          "upper": "R12_Walk_Rifle_Turn_Upper_Foreaft30",
+          "upper": "R12_Walk_Rifle_Turn_Upper_Foreaft30_Center10",
           "motion": {
             "harmonic_cos": 0.9999655841119016,
             "harmonic_sin": -0.008296420417478845,
@@ -137,7 +137,7 @@
             "R11_R12_Walk_Shotgun_Turn_R9W4_Asset_Shotgun_Shotgun_Pump",
             "R11_R12_Walk_Shotgun_Turn_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
           ],
-          "upper": "R12_Walk_Shotgun_Turn_Upper_Size15_Foreaft30",
+          "upper": "R12_Walk_Shotgun_Turn_Upper_Size15_Foreaft30_Center10",
           "motion": {
             "harmonic_cos": 0.9999655841119016,
             "harmonic_sin": -0.008296420417478845,
@@ -187,7 +187,7 @@
           "weapons": [
             "R11_R12_Sprint_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
           ],
-          "upper": "R12_Sprint_Rifle_Upper_Foreaft30",
+          "upper": "R12_Sprint_Rifle_Upper_Foreaft30_Center10",
           "motion": {
             "harmonic_cos": 0.9964246114806034,
             "harmonic_sin": -0.08448664767718425,
@@ -202,7 +202,7 @@
             "R11_R12_Sprint_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
             "R11_R12_Sprint_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
           ],
-          "upper": "R12_Sprint_Shotgun_Upper_Size15_Foreaft30",
+          "upper": "R12_Sprint_Shotgun_Upper_Size15_Foreaft30_Center10",
           "motion": {
             "harmonic_cos": 0.9964246114806034,
             "harmonic_sin": -0.08448664767718425,
@@ -252,7 +252,7 @@
           "weapons": [
             "R11_R12_Sprint_Rifle_Turn_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
           ],
-          "upper": "R12_Sprint_Rifle_Turn_Upper_Foreaft30",
+          "upper": "R12_Sprint_Rifle_Turn_Upper_Foreaft30_Center10",
           "motion": {
             "harmonic_cos": 0.9964246114806034,
             "harmonic_sin": -0.08448664767718425,
@@ -267,7 +267,7 @@
             "R11_R12_Sprint_Shotgun_Turn_R9W4_Asset_Shotgun_Shotgun_Pump",
             "R11_R12_Sprint_Shotgun_Turn_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
           ],
-          "upper": "R12_Sprint_Shotgun_Turn_Upper_Size15_Foreaft30",
+          "upper": "R12_Sprint_Shotgun_Turn_Upper_Size15_Foreaft30_Center10",
           "motion": {
             "harmonic_cos": 0.9964246114806034,
             "harmonic_sin": -0.08448664767718425,
@@ -341,13 +341,9 @@
     "status": "wrapped up; unchanged during shotgun resize"
   },
   "long_gun_horizontal_only": {
-    "inward_m": 0.015,
-    "forward_change_m": 0,
-    "height_change_m": 0,
-    "weapons": [
-      "Rifle",
-      "Shotgun"
-    ]
+    "inward_m": 0.0165,
+    "forward_m": 0,
+    "up_m": 0
   },
   "idle": {
     "scene": "R12_HOLD_ALL",
@@ -372,7 +368,7 @@
         "weapons": [
           "R11_R12_Hold_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
         ],
-        "upper": "R12_Hold_Rifle_Upper"
+        "upper": "R12_Hold_Rifle_Upper_Center10"
       },
       "Shotgun": {
         "rig": "R12_Hold_Shotgun_Rig",
@@ -381,7 +377,7 @@
           "R11_R12_Hold_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
           "R11_R12_Hold_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
         ],
-        "upper": "R12_Hold_Shotgun_Upper_Size15"
+        "upper": "R12_Hold_Shotgun_Upper_Size15_Center10"
       }
     },
     "frame_start": 1,
@@ -389,7 +385,7 @@
     "loop": true,
     "scope": "Same close shoulders, single-hand pistol and lateral long-gun placement at rest"
   },
-  "delivery_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_locomotion_sway_r12_shotgun15_study.blend",
+  "delivery_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_locomotion_sway_r12_final_review.blend",
   "shotgun_extra_size15": {
     "multiplier": 1.15,
     "pivot": "rear stock face held in place; enlargement extends forward",
@@ -510,5 +506,94 @@
       }
     },
     "primary_hand": "RIGHT only"
+  },
+  "longgun_center_extra10": {
+    "previous_inward_m": 0.015,
+    "new_inward_m": 0.0165,
+    "additional_inward_m": 0.0015,
+    "forward_change_m": 0,
+    "height_change_m": 0,
+    "checks": {
+      "Walk_Rifle": {
+        "chest_space_shift_m": [
+          0.0015001073479652405,
+          4.470348358154297e-08,
+          0.0
+        ],
+        "arm_body_curves_unchanged": true
+      },
+      "Walk_Shotgun": {
+        "chest_space_shift_m": [
+          0.0014999955892562866,
+          5.960464477539063e-08,
+          5.960464477539063e-08
+        ],
+        "arm_body_curves_unchanged": true
+      },
+      "Walk_Turn_Rifle": {
+        "chest_space_shift_m": [
+          0.0015001073479652405,
+          4.470348358154297e-08,
+          0.0
+        ],
+        "arm_body_curves_unchanged": true
+      },
+      "Walk_Turn_Shotgun": {
+        "chest_space_shift_m": [
+          0.0014999955892562866,
+          5.960464477539063e-08,
+          5.960464477539063e-08
+        ],
+        "arm_body_curves_unchanged": true
+      },
+      "Sprint_Rifle": {
+        "chest_space_shift_m": [
+          0.0014999806880950928,
+          -1.043081283569336e-07,
+          0.0
+        ],
+        "arm_body_curves_unchanged": true
+      },
+      "Sprint_Shotgun": {
+        "chest_space_shift_m": [
+          0.0014996379613876343,
+          -8.940696716308594e-08,
+          -5.960464477539063e-08
+        ],
+        "arm_body_curves_unchanged": true
+      },
+      "Sprint_Turn_Rifle": {
+        "chest_space_shift_m": [
+          0.0014999434351921082,
+          5.960464477539063e-08,
+          0.0
+        ],
+        "arm_body_curves_unchanged": true
+      },
+      "Sprint_Turn_Shotgun": {
+        "chest_space_shift_m": [
+          0.0014998242259025574,
+          5.960464477539063e-08,
+          5.960464477539063e-08
+        ],
+        "arm_body_curves_unchanged": true
+      },
+      "Hold_Rifle": {
+        "chest_space_shift_m": [
+          0.0015000104904174805,
+          0.0,
+          5.960464477539063e-08
+        ],
+        "arm_body_curves_unchanged": true
+      },
+      "Hold_Shotgun": {
+        "chest_space_shift_m": [
+          0.0014998912811279297,
+          0.0,
+          0.0
+        ],
+        "arm_body_curves_unchanged": true
+      }
+    }
   }
 }

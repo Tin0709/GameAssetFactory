@@ -1,18 +1,19 @@
-R12 — UNIVERSAL LOCOMOTION SWAY / STUDY ONLY
+R12 — LOCOMOTION / WEAPON STUDY — HUMAN REVIEW
 
-Review scenes:
-R12_WALK_ALL — original 16-frame Walk
-R12_SPRINT_ALL — original 13-frame Sprint
-R12_WALK_TURN_ALL / R12_SPRINT_TURN_ALL — native S-curve case, original gait phase and heading, in-place review (frames 145–240)
-R12_HOLD_ALL — living idle pose
+R12_WALK_ALL: original 16-frame Walk; default live review.
+R12_SPRINT_ALL: original 13-frame Sprint.
+R12_WALK_TURN_ALL / R12_SPRINT_TURN_ALL: original S-curve heading and gait phase, in-place review frames 145–240.
+R12_HOLD_ALL: living idle.
+Each scene shows Unarmed / Pistol / Rifle / Shotgun.
 
-Every scene includes Unarmed, Pistol, Rifle and Shotgun.
-Torso retains original vertical bob; adds gentle fore/aft rock and same-side shoulder lead from actual gait phase. Torso leans smoothly into turns.
-Right arm owns all guns. Pistol uses one hand; left arm swings freely. Rifle/shotgun left arms swing independently, lightly delayed, without touching the weapon.
-Slim shoulders moved inward 32 mm to close the previous mesh gap; arm widths unchanged.
-Rifle/shotgun shifted a further 15 mm HORIZONTALLY toward the body centre. No forward/up change in this adjustment.
-Face clearance retained: rifle 54.63 mm, shotgun 39.48 mm. Shotgun retains its requested additional 30% size.
+LATEST REVIEW CHANGES
+Torso fore/aft translation and pitch increased 30% for Walk/Sprint, armed or unarmed. Arms and guns inherit the new torso rhythm. Original vertical bob and lower gait untouched.
+Pistol enlarged an additional 30%; slide lowered 20 mm. Right-hand ownership; free left arm retains native gait swing.
+Rifle/shotgun extra inward shift increased 10%: 15 mm -> 16.5 mm. Horizontal only; no change to height or forward distance. Face clearance remains rifle 54.6 mm / shotgun 39.5 mm.
+Shotgun additional 15% enlargement; rear stock remains at previous forward distance.
+Approved shoulder fit (32 mm inward each side) wrapped up and unchanged; slim arm widths retained.
+Rifle/shotgun left arm moves independently with soft gait delay, stays straight and does not touch the gun.
 
-Validated all 16 moving variants; original lower gait channels match exactly. 131 original Actions, 393 mesh objects and 175 rest rigs preserved.
-Space toggles playback. Scene menu switches review modes.
-Human visual review pending; no production migration or Godot changes. Previous .blend files preserved.
+16 moving variants passed final native validation. Source Actions / meshes / rest rigs preserved.
+Space toggles playback; Scene selector changes view. Previous .blend versions retained for A/B.
+Study only; human visual review pending. No production/Godot migration.
