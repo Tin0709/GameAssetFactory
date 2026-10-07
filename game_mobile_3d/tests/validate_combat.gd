@@ -102,7 +102,7 @@ func _run() -> void:
 	# Hold cooldown during Draw so the first observation starts before shot one.
 	pistol.cooldown = 1000.0
 	var behavior := player.get_node("WeaponBehavior")
-	for frame in range(90):
+	for frame in range(ceili(player.visual.draw_duration()*60)+12):
 		if behavior.is_ready(): break
 		await tick(1)
 	check(behavior.is_ready(), "Authored Draw reaches READY before cadence measurement")

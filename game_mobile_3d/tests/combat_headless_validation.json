@@ -1,6 +1,6 @@
 {
 	"capture": false,
-	"checks": 77,
+	"checks": 78,
 	"engine": "4.7.2-stable (official)",
 	"passed": true,
 	"phone_tested": false,

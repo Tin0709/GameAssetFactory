@@ -298,6 +298,7 @@ script = ExtResource("combat")
 
 [node name="Audio" type="Node" parent="Combat"]
 script = ExtResource("audio")
+silent_test = true
 
 [node name="Progression" type="Node" parent="."]
 process_mode = 3
@@ -331,6 +332,30 @@ offset_bottom = -64.0
 theme_override_colors/font_color = Color(0.84, 0.91, 0.91, 1)
 theme_override_font_sizes/font_size = 18
 text = "HP 100/100  |  EXP 0  |  Living zombies 3  |  FPS"
+
+[node name="AnimationTestEnemyButton" type="Button" parent="HUD"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 70.0
+theme_override_font_sizes/font_size = 18
+text = "Enemy test ở giữa map"
+focus_mode = 0
+
+[node name="AnimationTestEnemyStatus" type="Label" parent="HUD"]
+visible = false
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -340.0
+offset_top = 78.0
+offset_right = -24.0
+offset_bottom = 120.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+text = "Đứng yên · không tấn công · bất tử\nXóa enemy để thử cất súng khi hết mục tiêu"
+horizontal_alignment = 2
 
 [node name="AnimationDebug" type="Label" parent="HUD"]
 offset_left = 24.0

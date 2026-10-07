@@ -133,7 +133,7 @@ func _decide_weapon_intention(delta: float) -> void:
 
 func _interrupt_draw_for_sprint() -> void:
 	if authored_draw:
-		if socket.current_attachment == &"back":
+		if socket.current_attachment in [&"back", &"hip"]:
 			visual.cancel_authored_draw(true); authored_draw = false
 			request_id += 1; transition_elapsed = 0.0; handoff_done = false
 			_set_state(State.STOWED)
@@ -183,7 +183,7 @@ func weapon_attach_to_carrier(token: int) -> void:
 	socket.begin_transport(); attachment_changed.emit(&"WeaponCarrierSocket")
 
 func weapon_draw_to_carrier(token: int, time: float) -> void:
-	if not _valid_event(token) or not authored_draw or state != State.DRAWING or socket.current_attachment != &"back": return
+	if not _valid_event(token) or not authored_draw or state != State.DRAWING or socket.current_attachment not in [&"back", &"hip"]: return
 	socket.begin_draw_transport(time); attachment_changed.emit(&"WeaponCarrierSocket")
 
 func weapon_draw_to_hand(token: int) -> void:
@@ -192,7 +192,8 @@ func weapon_draw_to_hand(token: int) -> void:
 
 func weapon_release_carrier_to_back(token: int) -> void:
 	if not _valid_event(token) or not authored_holster or socket.current_attachment != &"carrier": return
-	socket.end_transport(true); attachment_changed.emit(&"BackWeaponSocket")
+	socket.end_transport(true)
+	attachment_changed.emit(&"HipWeaponSocket_R" if socket.current_attachment == &"hip" else &"BackWeaponSocket")
 
 func weapon_attach_to_back(token: int = -1) -> void:
 	if not _valid_event(token) or Profiles.category(socket.equipped) != Profiles.Category.LONG_GUN: return

@@ -121,11 +121,14 @@ func _ready() -> void:
 		var long_hold: Animation = load("res://assets/characters/LongGunHold_V2.tres")
 		animation_player.get_animation_library("").add_animation("LongGunHold_V2", long_hold)
 		long_gun_hold_pose = Sampler.new(long_hold, skeleton)
-	socket = Socket.new()
+	socket = _new_weapon_socket()
 	socket.name = "WeaponAttachment"
 	skeleton.add_child(socket)
 	_select_clips()
 	_evaluate(0.0)
+
+func _new_weapon_socket() -> BoneAttachment3D:
+	return Socket.new()
 
 func _select_clips() -> void:
 	raise_pose = samples[PREFIXES[weapon_type] + "_Raise"]

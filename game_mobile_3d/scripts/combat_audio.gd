@@ -14,10 +14,17 @@ const STREAMS = {
 	&"upgrade_selected": preload("res://assets/audio/upgrade_selected.mp3")
 }
 @export var minimum_event_interval: float = 0.045
+@export var silent_test: bool = false
 var players: Dictionary = {}
 var last_played: Dictionary = {}
+var silent_review: bool = false
 
 func _ready() -> void:
+	silent_review = silent_test or "--silent-review" in OS.get_cmdline_user_args()
+	if silent_review:
+		AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), true)
+		DisplayServer.window_set_title("Cyan Sanctum | SILENT TEST")
+		print("SILENT TEST: Master muted=", AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")))
 	for event in STREAMS:
 		var voice := AudioStreamPlayer.new()
 		voice.stream = STREAMS[event]
@@ -32,7 +39,7 @@ func _ready() -> void:
 
 func play_event(event: StringName) -> void:
 	# Dummy audio cannot reliably drain compressed sounds during headless shutdown.
-	if DisplayServer.get_name() == "headless": return
+	if silent_review or DisplayServer.get_name() == "headless": return
 	var voice: AudioStreamPlayer = players.get(event)
 	if voice == null: return
 	var now := Time.get_ticks_msec()

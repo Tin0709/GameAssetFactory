@@ -1,6 +1,6 @@
 {
 	"capture": false,
-	"checks": 121,
+	"checks": 127,
 	"failures": [],
 	"phone_tested": false,
 	"touch_events_tested": true
