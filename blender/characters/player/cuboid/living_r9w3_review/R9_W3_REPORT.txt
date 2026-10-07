@@ -1,0 +1,106 @@
+R9-W3 — TARGETED STOCK / RIGHT UPPER-ARM CONTACT STUDY
+ARTISTIC STATUS: AWAITING HUMAN REVIEW
+
+1. Reproduction
+Continued from player_longgun_living_r9w2_study.blend in connected live Blender.
+Frame 191.5 is the source LongGunAimAround_LeftRight_V2 Action frame:
+(191.5 - 1) / 24 = 7.9375 seconds. The 288-frame cycle is 12 seconds; the
+existing stationary, Walk and figure-eight previews use unretimed 1:1 phase.
+The actual joined M4A1_Blocky_Base stock enters UpperArm.R, not UpperArm.L.
+Rear stock vertex (-0.0515, -0.294, 0.0415) in weapon space lies approximately
+14.85 mm inside the rigid upper-arm box in the sampled vertex-depth proxy.
+Reproduced the source pose and consecutive frame window 187–196 before editing.
+The overlap is clearest from the close side. At gameplay framing, the contact
+is subtle and partly occluded. It exists in source poses, not only composition.
+Actual RigV2 bones: Root, Hips, Spine, Chest, Neck, Head, UpperArm.L, ForeArm.L,
+UpperArm.R, ForeArm.R, WeaponCarrier, Leg.L, Leg.R. There are no hand bones.
+
+2. Cause supported by inspection
+W2's right upper-arm/elbow plane brings the stock's lower rear corner into the
+arm even though its terminal block has a small grip-side surface gap. A good
+internal target fit alone does not prevent stock/arm surface overlap.
+The single authority remains WeaponCarrier -> constrained reference carrier
+mount -> M4A1 root/mesh. Interpolation and gait composition are not the cause.
+Two affected negative-drive lobes were checked separately (peaks near 191.5
+and 244.5). The earlier opposite sweep had no inset stock contact and receives
+no mirrored correction.
+
+3. Smallest correction tested and retained
+Created LongGunAimAround_LeftRight_V3 by copying V2. Tested right elbow-plane
+orbits on the duplicate, first with a fixed terminal center, then with grip-side
+surface refitting. Negative orbit worsened contact. Retained a maximum positive
+6-degree orbit, weighted by a quintic ramp of the existing negative aim drive.
+Smaller orbits left more of the reported overlap; larger orbits were unnecessary
+for this limited improvement. The surface refit avoids embedding the grip block
+while allowing up to 4.39 mm internal center shift. No weapon experiment needed.
+Only eight quaternion component curves on UpperArm.R and ForeArm.R change.
+Affected keys are localized to two lobes within frames 176–258, with smooth
+Bezier entry/exit. Shoulder positions, limb lengths and elbow connectivity stay
+fixed. Rifle, support-arm, Chest and head curves remain exact V2 copies.
+
+4. Before/after result and remaining limitations
+At 191.5 the sampled stock vertex-depth proxy falls from 14.85 to 2.88 mm;
+at 244.5 the candidate is approximately 2.88 mm. Whole-sweep maximum falls
+from 14.85 to 6.49 mm, with residual contact near frame 256.5. This is a reduced-
+contact candidate, not a collision-free result. Triangle intersections remain,
+including five against the 5 mm inset arm box at 191.5; the vertex proxy is not
+an exact penetration volume or maximum penetration depth.
+Matched side stills show a small right-arm change and unchanged rifle/support
+motion. Ordered full-sweep, Walk, reversal and figure-eight frames show no
+obvious new grip float or detached joints. Continuous perceptual playback was
+not inspected; normal-speed moving previews remain available for human judgment.
+Fingerless contact, some elbow occlusion, foot sliding and planted-turning weight
+remain. No additional polish, pivots or lower-body correction was attempted.
+
+5. Grip, endpoint and loop tradeoffs
+Right grip-side surface gap is approximately 0.81 mm at 191.5, and at most
+1.08 mm across the sampled sweep. Support pose/contact is unchanged. Existing
+right forearm edge intersections remain; no new head/deep-Chest intersections
+were found by the sampled inset-box test. Elbows remain connected; shoulder
+shift is within floating-point tolerance. No scaling or persistent IK.
+Quarter-frame samples show a localized elbow speed increase (0.060 to 0.127 m/s
+peak) and acceleration increase (1.072 to 1.383 m/s² peak), without a quaternion
+sign jump. These are descriptive measurements, not artistic acceptance.
+Ready endpoints and loop tangents are unchanged. Both A/B Walk and figure-eight
+use identical original NLA Actions, scale=1, repeat=1 and frame ranges. No
+Draw/Holster migration is required. No Ready/Move V3 copies were created.
+
+6. Changed files/Actions and preservation checks
+All paths below are under:
+C:/Users/ADMIN/Desktop/GameAssetFactory/blender/characters/player/cuboid/
+
+New study: player_longgun_living_r9w3_study.blend
+New Action: LongGunAimAround_LeftRight_V3
+New study helpers:
+  contact_probe_r9w3.py
+  create_living_r9w3.py
+  validate_living_r9w3.py
+  review_living_r9w3.py
+  validate_review_living_r9w3.py
+  render_living_r9w3.py
+  package_living_r9w3.py
+New evidence/report folder: living_r9w3_review/ (exact paths in changed_files.json).
+No existing tracked file changes: SHA256 checked all 9,915 baseline tracked files,
+including original W1/W2 studies and production files. All pre-existing Action
+digests, geometry/weight hashes, rest poses and hierarchies match the baseline.
+V3 has the same channel set and duration as V2: no new Root/Hips/leg/scale tracks.
+No Godot, production, locomotion, firing or transition changes.
+
+Source/contact contract: 577 half-frame samples, GREEN.
+Temporal/composed checks: 1,153 quarter-frame samples per variant plus matching
+stationary/Walk/figure-eight/contact composition samples, GREEN.
+All four required MP4s decoded at 24 fps: complete sweep/Walk/figure-eight =
+288 frames each; close interval = 36 frames (176–211). Cameras and lighting are
+matched within each A/B comparison. Close view is an explicit inspection zoom.
+
+Live in-place saving hit a pathname lock; reused W2's unique live checkpoint-copy
+method and copied that live-saved binary to the checked, owned W3 filename.
+No separate background Blender editing was used.
+
+Review: living_r9w3_review/index.html (open locally in a browser), or the MP4s.
+The optional localhost browser preview could not connect in this environment;
+the saved videos and Blender A/B review remain available.
+Blender: R9W3_REVIEW_CONTACT, paused at frame 191.5, A on left / B on right.
+Space plays the contact interval. Scene selector also contains R9W3_REVIEW_SWEEP,
+R9W3_REVIEW_WALK_LOCAL and R9W3_REVIEW_FIGURE8 for full cycles.
+STOP: candidate remains AWAITING HUMAN REVIEW. No automatic further polish.

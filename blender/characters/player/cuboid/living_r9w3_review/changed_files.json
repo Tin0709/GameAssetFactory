@@ -1,0 +1,381 @@
+{
+  "all_new": true,
+  "files": [
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\contact_probe_r9w3.py",
+      "bytes": 2049,
+      "sha256": "5489d89ed0df17c257e46b3b1c7e4c46477161994c79ad912fbaf1492d309494"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\create_living_r9w3.py",
+      "bytes": 3544,
+      "sha256": "3f90d3527c33f714a13e1f5cc7f765710005fa977a21b84e778ddb37c7023c1c"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\validate_living_r9w3.py",
+      "bytes": 6118,
+      "sha256": "9bf0ea0353bd5dcea99169ace0baf681f0f56dab445b1d2b21bf18beceae6a4d"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\review_living_r9w3.py",
+      "bytes": 3451,
+      "sha256": "de7c2781c344a8a81b3b39f9c6755d96ba8d1962e9346849bdfdf954b01ae460"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\validate_review_living_r9w3.py",
+      "bytes": 4068,
+      "sha256": "bedda3898e99a9a47e394b7380ab373ba2a8193271826bd094742341e2241746"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\render_living_r9w3.py",
+      "bytes": 1029,
+      "sha256": "c82a50473f1e5fe7b8baf1bec67f9d99c95b501eea5c6edd5b684317aca22c69"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\package_living_r9w3.py",
+      "bytes": 6227,
+      "sha256": "2dcddb7b26e2118357fe4cb6634948e13a6d7cb3b52b13fb46d836cb99d0ed41"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_longgun_living_r9w3_study.blend",
+      "bytes": 23620127,
+      "sha256": "6171b9a06a1a656667bf399edc2172da5abc51b369cdea8758ee0841a97ee7ec"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline.json",
+      "bytes": 472381,
+      "sha256": "e67ca133cffdfa3978ffd90f5536221b700291a9a1a754cb11587fde749e7f79"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_f189_Close.png",
+      "bytes": 606012,
+      "sha256": "0963d3b6b1d2db50b593e45add4470658304ec3b125bf9319add8e60fc6811ad"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_f189_Gameplay.png",
+      "bytes": 580081,
+      "sha256": "a604abcf5f6c030fd78147bd0118009fd2941cbb736a673b1ddb421dee9cf845"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_f189_Side.png",
+      "bytes": 581850,
+      "sha256": "573b291f9f717c5c64d13bdaf691641b96e18f5d7ebe744e05b50002d26db6a9"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_f191_5_Close.png",
+      "bytes": 605624,
+      "sha256": "94542a31184cc6440f7cb53fd0c2aa6e31524bef21fa5bd51f81aaa4d7159693"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_f191_5_Gameplay.png",
+      "bytes": 580297,
+      "sha256": "6fff91db32b460848ba5f189e9a5939ba83d7c01d025c8e208297f561ed7b3b6"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_f191_5_Side.png",
+      "bytes": 581873,
+      "sha256": "65d1fe227819e398d37cdaada9fc6b3f64421089096d3b95b90c089ecc4eddb6"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_f194_Close.png",
+      "bytes": 605081,
+      "sha256": "d7c8981763499650e12fcda03b2b7f81fc226703755f3c8ff7ab6fb58221a259"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_f194_Gameplay.png",
+      "bytes": 579955,
+      "sha256": "fd4feaaa4b4284753335bcb124eb78c9e98cabed892162536d3f8381683df89d"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_f194_Side.png",
+      "bytes": 581232,
+      "sha256": "817d568e5b0e7fb70cda76a29e20da6bc03a6c5a693a5681d82cb1be34a773ed"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\baseline_sweep.json",
+      "bytes": 44318,
+      "sha256": "482b304d64fa7fff0e2263e49eab04e5728ec460d41d41cee4bd4db16077d42d"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\checkpoint.json",
+      "bytes": 290,
+      "sha256": "715e6d034fe7a793ef22408dbf7ea410fa93abcb16978dfc3ac351d6f844a5e2"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\checkpoint_1791367391647893800.blend",
+      "bytes": 23620127,
+      "sha256": "6171b9a06a1a656667bf399edc2172da5abc51b369cdea8758ee0841a97ee7ec"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\comparison_samples.json",
+      "bytes": 854863,
+      "sha256": "8899a4c189a975e1e0b7b415187f4b3e79e740c313cb3725bd95669392df1868"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_AB_24fps.mp4",
+      "bytes": 178661,
+      "sha256": "a3c10d8507dfe8b9d9684338c98fa24e4c4c9bb5bcf7855836c694b01196931a"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_AB_24fps_ordered.png",
+      "bytes": 447493,
+      "sha256": "1211f9e9a739f013fd89c46e3346a4a7d1a4978def0387b72d8f8a142b4682c7"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_AB_f189.png",
+      "bytes": 1067264,
+      "sha256": "c840241db5038eec9becf91507e7511dd2f61f9c6a3b46635ceaf799b89d2833"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_AB_f191_5.png",
+      "bytes": 1248751,
+      "sha256": "519e456ea464c175502baa94c17dac103897d66cc18cf42398f2fc186faac875"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_AB_f194.png",
+      "bytes": 1066487,
+      "sha256": "93a31d3d7b39128c6f0d3dc41ee9f58ba5525f30bfdbe9c1fad88f233819f321"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_AB_f244_5.png",
+      "bytes": 1065147,
+      "sha256": "4c3e84fc89487d638e199c2d4fc27ab51b1b2684b64d919693d925f71a43aa83"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_AB_f256_5.png",
+      "bytes": 1060843,
+      "sha256": "cd7cc272511d796c5268ba1400b51b70f39cf68575d369c27533ad97769b6874"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_timestamp_f189_AB.png",
+      "bytes": 869904,
+      "sha256": "14405201b0e9e28206c1b7c1747ae4b32618ba226a74cbb9e90f1f717ce278bf"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_timestamp_f191_5_AB.png",
+      "bytes": 868918,
+      "sha256": "58feb938e6a94b8699640a0d55b5d433ef8bd198bf7673cb76b36ca173a37db2"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_timestamp_f194_AB.png",
+      "bytes": 869075,
+      "sha256": "d876ee7d6f1466cb5a163c848aab13f0c891f74b9819c1745cbfd68897dfdd14"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_timestamp_f244_5_AB.png",
+      "bytes": 870181,
+      "sha256": "ba4f2c7fde95f13cb2da5e8c3c3fdbf443c6e83f04590ea3917303836d761dd9"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contact_timestamp_f256_5_AB.png",
+      "bytes": 858004,
+      "sha256": "0eac73c5812ba6e1b0633270926fb8f3933e68d36c3a72f5e507def327b056bc"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\contract_red.json",
+      "bytes": 149,
+      "sha256": "80800d0e42e963afe963a916bbed8b4de861dc864070d57e76f9a08f672e089d"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\design.json",
+      "bytes": 21127,
+      "sha256": "8622494d826ca384dd36331d382e04436b963705e8f471b6514f9646cf75f65e"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\figure8_AB_24fps.mp4",
+      "bytes": 564191,
+      "sha256": "d594d0baf23b3acac803c86d1a9d7bec2f485f625e81c8a17f6f3f0d5d3c81f0"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\figure8_AB_24fps_ordered.png",
+      "bytes": 411507,
+      "sha256": "240258c82b11e23ca2abbb1e36a76b9851eb2c873c99b8691d1fd39bab5ff602"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\file_preservation.json",
+      "bytes": 84,
+      "sha256": "0156871ebb019202a824eafd88caa843c82130a56eebd5186d06e01306031b05"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\final_save.json",
+      "bytes": 259,
+      "sha256": "af7793a006729814c9a90a5cab498b6dca2ae2ecee14356ff414a6c4343687a5"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\fit_probe.json",
+      "bytes": 4001,
+      "sha256": "680eefc12a695f999b92a1c3a7392fd9a786f99b5337afbc3a13e19dd12d50a3"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\index.html",
+      "bytes": 3585,
+      "sha256": "f84d0ce36d4a9bad1812af2be76c981b31643e44d1e2ebec5bd049bd2c276935"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\interval_probe.json",
+      "bytes": 3239,
+      "sha256": "41ce0ce7dd5fa34e0c35109a1e0a95558d10f5db7d1efa6061d7ea8b2cb9cf57"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_A_f145_Side.png",
+      "bytes": 588721,
+      "sha256": "266a40c1e79db9b4b28e4c5c5e5c45f7e36feaeb6cfda4c888a6430c8f9e43ac"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_A_f189_Side.png",
+      "bytes": 590377,
+      "sha256": "69378cf3170474a07ca58c7a740b4bbfe55e4614b6bf14564ed0d05ebcb69c11"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_A_f191_5_Gameplay.png",
+      "bytes": 590765,
+      "sha256": "d41b0d184e33aa3dbe2fdb4630276eb52f63c2e1de7345f8bdffcd0a9eb17ffa"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_A_f191_5_Side.png",
+      "bytes": 590505,
+      "sha256": "3534888c943f5e94b348c49b9318c5500c6571c2c6e31d8cdcd33d542a49996c"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_A_f194_Side.png",
+      "bytes": 590435,
+      "sha256": "c9e607cfc82f54613011c7ce2db6f5dcc821f790c75b17827f825cb62b620c25"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_A_f244_5_Side.png",
+      "bytes": 590512,
+      "sha256": "9cd92a996c455cd3ba466c39355a1c9902f5ff34b03a255164a8742a7e37e3f3"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_A_f256_5_Side.png",
+      "bytes": 588226,
+      "sha256": "9cce14c5337209044902bd2a87ee56b205c89da77bba33f6e845466ee48dc9aa"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_B_f145_Side.png",
+      "bytes": 588721,
+      "sha256": "1499428baa04ac706709a500008fc2ebe6d206dbb48641c9410048bd71100691"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_B_f189_Side.png",
+      "bytes": 590574,
+      "sha256": "418f7a8185fd440cbed1e179d5306798ac7e208c0cfb421bf90e1dc09ec0f22b"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_B_f191_5_Gameplay.png",
+      "bytes": 591072,
+      "sha256": "c97ff28e937c96973d41aa682e4fb3e30c203eaf971e659fa102634c3980d8a2"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_B_f191_5_Side.png",
+      "bytes": 590286,
+      "sha256": "dd52ddf65776118e30597d6d5970d116a03919b0a4b645290b4a1642411aac55"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_B_f194_Side.png",
+      "bytes": 590245,
+      "sha256": "d56e137a697c4f410d104caa7f0e532643c08ef719c5f31dc8aef432c9b0b6d3"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_B_f244_5_Side.png",
+      "bytes": 590169,
+      "sha256": "1d0430258e9c1964cfcae3d8563d1d577bbfc91748e0f803315a4d705ab377c8"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\matched_B_f256_5_Side.png",
+      "bytes": 588036,
+      "sha256": "1a3b1016ec3dfcd78abb95d7362ab03f028aadc7b1f9905cd2039d8663191261"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\media_validation.json",
+      "bytes": 568,
+      "sha256": "e6ea931cffd337ca7a02185ceb785e0596e2c6cf8f944a7db27e2f067ae71e16"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\orbit_probe.json",
+      "bytes": 38988,
+      "sha256": "a46a7ce79536a8d13f2868e6ea52e8657c41595a8d89c7172c6fcebd8e7fa5ea"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\probe_fit_12_Close.png",
+      "bytes": 627669,
+      "sha256": "232a99eea64b96c10064f9536cb2975a618ef672217c992758c81b42f3deff66"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\probe_fit_12_Side.png",
+      "bytes": 590521,
+      "sha256": "516d4b10d2c7a8f0ba21f4ab0cc5e633411ccfc47bfb915ccdea1ab943b21e05"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\probe_fit_6_Close.png",
+      "bytes": 627997,
+      "sha256": "08e6f7bfebb53f59366d11d35afa14feec27e4c7e1f2201169d96f3d48625da7"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\probe_fit_6_Side.png",
+      "bytes": 590230,
+      "sha256": "76e8b4b9f58addc01af91b42eea7774df7274fbdaeaa924a20bef56fb0827495"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\probe_fit_8_Close.png",
+      "bytes": 627428,
+      "sha256": "bd5f4e7cbc09a54f3c73a351fecb71aa26a7e92d586deb33ca056f09c3a4e004"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\probe_fit_8_Side.png",
+      "bytes": 590413,
+      "sha256": "c879a20042087162391b07e6d60249d20008fe5bb031a411bc1ba465e1a2c245"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\protected_files.json",
+      "bytes": 1433451,
+      "sha256": "99616ea24245c3be3ae6f469af98dfae41b5f9b28b2d37b6388e1ad8ce49b20c"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\R9_W3_REPORT.txt",
+      "bytes": 6477,
+      "sha256": "dd5a3f84ac48c37358e15c5e54b236202006cd6e4f03262856d634a5b96f28a3"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\review.json",
+      "bytes": 2694,
+      "sha256": "ed30042f2eca9df281cdb767eecdb0cdc3969d068e78cbb6f2b3343b5cfde3c3"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\review_validation.json",
+      "bytes": 2918,
+      "sha256": "9e8ba6f9ffebdf9fa9e7f7dc3a8e16644209018d6980455acc1e98d4150bf9b1"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\stock_region.json",
+      "bytes": 2836,
+      "sha256": "c5aeb78e62863425dbf47385478fa7b0823d45bf74604d1687920a0b8b03e666"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\sweep_AB_24fps.mp4",
+      "bytes": 757271,
+      "sha256": "ad22594ea198aeb0cc6ce435d15791e42b314deaec9ce1224de8bb0720106e4c"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\sweep_AB_24fps_ordered.png",
+      "bytes": 708978,
+      "sha256": "73e112954b49f9e2abb7af61e0da50f44d56bfa6a33be0d2e98fd32b18277638"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\validation.json",
+      "bytes": 2185,
+      "sha256": "378883d96cfff1c0dc434a80b8be51a4454d64956a65f0d60a4757a1ea4ae79c"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\walk_local_AB_24fps.mp4",
+      "bytes": 940667,
+      "sha256": "b6b54f24f122bb79794193bce0a5e0080fac1c72c930d2ebb9b5a5fab1458775"
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\walk_local_AB_24fps_ordered.png",
+      "bytes": 740544,
+      "sha256": "8b47a4ca2e0b93489b1d1b3b4a9fae5305c318cc77b437563cbfd08cebd3b270"
+    }
+  ],
+  "self_manifest": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\living_r9w3_review\\changed_files.json"
+}

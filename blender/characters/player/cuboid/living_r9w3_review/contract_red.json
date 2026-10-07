@@ -1,0 +1,7 @@
+{
+  "passed": false,
+  "failures": [
+    "Missing justified V3 contact candidate"
+  ],
+  "baseline_event_inset_depth_m": 0.009851940412124893
+}

@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "failures": [],
+  "composition": {
+    "SWEEP": {
+      "maximum": {
+        "protected_pose_error": 0,
+        "weapon_carrier_world_error": 1.1920928955078125e-07,
+        "elbow_gap_m": 0
+      },
+      "lower_strips": {
+        "A": [],
+        "B": []
+      }
+    },
+    "WALK_LOCAL": {
+      "maximum": {
+        "protected_pose_error": 0,
+        "weapon_carrier_world_error": 1.1920928955078125e-07,
+        "elbow_gap_m": 0
+      },
+      "lower_strips": {
+        "A": [
+          {
+            "action": "PREVIEW_ONLY_R9W1_Steering_Local",
+            "action_frame_start": 1.0,
+            "action_frame_end": 289.0,
+            "frame_start": 1.0,
+            "frame_end": 289.0,
+            "scale": 1.0,
+            "repeat": 1.0
+          }
+        ],
+        "B": [
+          {
+            "action": "PREVIEW_ONLY_R9W1_Steering_Local",
+            "action_frame_start": 1.0,
+            "action_frame_end": 289.0,
+            "frame_start": 1.0,
+            "frame_end": 289.0,
+            "scale": 1.0,
+            "repeat": 1.0
+          }
+        ]
+      }
+    },
+    "FIGURE8": {
+      "maximum": {
+        "protected_pose_error": 0,
+        "weapon_carrier_world_error": 4.76837158203125e-07,
+        "elbow_gap_m": 0
+      },
+      "lower_strips": {
+        "A": [
+          {
+            "action": "LongGunAimAround_LeftRight_V1",
+            "action_frame_start": 1.0,
+            "action_frame_end": 289.0,
+            "frame_start": 1.0,
+            "frame_end": 289.0,
+            "scale": 1.0,
+            "repeat": 1.0
+          }
+        ],
+        "B": [
+          {
+            "action": "LongGunAimAround_LeftRight_V1",
+            "action_frame_start": 1.0,
+            "action_frame_end": 289.0,
+            "frame_start": 1.0,
+            "frame_end": 289.0,
+            "scale": 1.0,
+            "repeat": 1.0
+          }
+        ]
+      }
+    },
+    "CONTACT": {
+      "maximum": {
+        "protected_pose_error": 0,
+        "weapon_carrier_world_error": 5.960464477539063e-08,
+        "elbow_gap_m": 0
+      },
+      "lower_strips": {
+        "A": [],
+        "B": []
+      }
+    }
+  },
+  "temporal": {
+    "A": {
+      "quarter_frame_samples": 1153,
+      "max_elbow_speed_m_s": 0.06046126017325426,
+      "max_elbow_acceleration_m_s2": 1.0724585469027699,
+      "min_adjacent_quaternion_abs_dot": 0.9999994039535522
+    },
+    "B": {
+      "quarter_frame_samples": 1153,
+      "max_elbow_speed_m_s": 0.12696253668303925,
+      "max_elbow_acceleration_m_s2": 1.383448034461382,
+      "min_adjacent_quaternion_abs_dot": 0.9999987483024597
+    }
+  },
+  "opposite_sweep_max_elbow_difference_m": 0.0,
+  "loop_tangent_change": 0.0,
+  "inspection": "Dense pose sampling and ordered rendered frames; continuous perceptual playback requires human review."
+}

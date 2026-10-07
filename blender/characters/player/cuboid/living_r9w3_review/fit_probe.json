@@ -1,0 +1,202 @@
+[
+  {
+    "angle": 3,
+    "center_shift_mm": 1.1955052656248606,
+    "stock": {
+      "triangles": 36,
+      "depth_m": 0.00874655484064732
+    },
+    "stock_inset": {
+      "triangles": 11,
+      "depth_m": 0.003746554840647315
+    },
+    "grip_surface": {
+      "signed_m": 0.0008136322721838951,
+      "gap_m": 0.0008136322721838951,
+      "surface_point": [
+        -0.033,
+        0.01,
+        0.085
+      ]
+    },
+    "forearm": {
+      "triangles": 4,
+      "depth_m": 0.0
+    }
+  },
+  {
+    "angle": 4,
+    "center_shift_mm": 1.8197745327129657,
+    "stock": {
+      "triangles": 36,
+      "depth_m": 0.006736688576358396
+    },
+    "stock_inset": {
+      "triangles": 11,
+      "depth_m": 0.0017366885763583917
+    },
+    "grip_surface": {
+      "signed_m": 0.0007911268565803792,
+      "gap_m": 0.0007911268565803792,
+      "surface_point": [
+        -0.033,
+        0.01,
+        0.085
+      ]
+    },
+    "forearm": {
+      "triangles": 4,
+      "depth_m": 0.0
+    }
+  },
+  {
+    "angle": 5,
+    "center_shift_mm": 2.490311903937632,
+    "stock": {
+      "triangles": 29,
+      "depth_m": 0.004789775928079179
+    },
+    "stock_inset": {
+      "triangles": 5,
+      "depth_m": 0.0
+    },
+    "grip_surface": {
+      "signed_m": 0.0008175006844103189,
+      "gap_m": 0.0008175006844103189,
+      "surface_point": [
+        -0.033,
+        0.01,
+        0.085
+      ]
+    },
+    "forearm": {
+      "triangles": 4,
+      "depth_m": 0.0
+    }
+  },
+  {
+    "angle": 6,
+    "center_shift_mm": 3.1491667457152204,
+    "stock": {
+      "triangles": 19,
+      "depth_m": 0.0028843963917487003
+    },
+    "stock_inset": {
+      "triangles": 5,
+      "depth_m": 0.0
+    },
+    "grip_surface": {
+      "signed_m": 0.0008124338984489415,
+      "gap_m": 0.0008124338984489415,
+      "surface_point": [
+        -0.033,
+        0.01,
+        0.085
+      ]
+    },
+    "forearm": {
+      "triangles": 4,
+      "depth_m": 0.0
+    }
+  },
+  {
+    "angle": 7,
+    "center_shift_mm": 3.8221478422211397,
+    "stock": {
+      "triangles": 19,
+      "depth_m": 0.0018604737839272856
+    },
+    "stock_inset": {
+      "triangles": 5,
+      "depth_m": 0.0
+    },
+    "grip_surface": {
+      "signed_m": 0.0008121864870190565,
+      "gap_m": 0.0008121864870190565,
+      "surface_point": [
+        -0.033,
+        0.01,
+        0.085
+      ]
+    },
+    "forearm": {
+      "triangles": 4,
+      "depth_m": 0.0
+    }
+  },
+  {
+    "angle": 8,
+    "center_shift_mm": 4.490226419418559,
+    "stock": {
+      "triangles": 13,
+      "depth_m": 0.0018169418514246694
+    },
+    "stock_inset": {
+      "triangles": 5,
+      "depth_m": 0.0
+    },
+    "grip_surface": {
+      "signed_m": 0.0007903067916631562,
+      "gap_m": 0.0007903067916631562,
+      "surface_point": [
+        -0.033,
+        0.01,
+        0.085
+      ]
+    },
+    "forearm": {
+      "triangles": 4,
+      "depth_m": 0.0
+    }
+  },
+  {
+    "angle": 9,
+    "center_shift_mm": 5.18141691487303,
+    "stock": {
+      "triangles": 12,
+      "depth_m": 0.0017858176171619
+    },
+    "stock_inset": {
+      "triangles": 5,
+      "depth_m": 0.0
+    },
+    "grip_surface": {
+      "signed_m": 0.0007863746583461756,
+      "gap_m": 0.0007863746583461756,
+      "surface_point": [
+        -0.033,
+        0.01,
+        0.085
+      ]
+    },
+    "forearm": {
+      "triangles": 4,
+      "depth_m": 0.0
+    }
+  },
+  {
+    "angle": 12,
+    "center_shift_mm": 7.34210017062478,
+    "stock": {
+      "triangles": 9,
+      "depth_m": 0.0
+    },
+    "stock_inset": {
+      "triangles": 4,
+      "depth_m": 0.0
+    },
+    "grip_surface": {
+      "signed_m": 0.0008141826465725838,
+      "gap_m": 0.0008141826465725838,
+      "surface_point": [
+        -0.033,
+        0.01,
+        0.085
+      ]
+    },
+    "forearm": {
+      "triangles": 4,
+      "depth_m": 0.0
+    }
+  }
+]
