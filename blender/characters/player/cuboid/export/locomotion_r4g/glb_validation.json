@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "clips": {
+    "Walk": {
+      "duration": 0.6666666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "WalkTurnLeft": {
+      "duration": 0.6666666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "WalkTurnRight": {
+      "duration": 0.6666666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "Sprint": {
+      "duration": 0.5416666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "SprintTurnLeft": {
+      "duration": 0.5416666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    },
+    "SprintTurnRight": {
+      "duration": 0.5416666865348816,
+      "seam_error": 0.0,
+      "scale_tracks": 0,
+      "root_motion": false
+    }
+  },
+  "source_max_position_error_m": 6.934087877821618e-07,
+  "source_max_rotation_error_deg": 0.03544399221432943,
+  "nodes": [
+    "Leg.L",
+    "Leg.R",
+    "Arm.L",
+    "Arm.R",
+    "Head",
+    "Neck",
+    "WeaponCarrier",
+    "Chest",
+    "Spine",
+    "Hips",
+    "Root",
+    "Player_Cuboid_Base",
+    "Player_Cuboid_Rig"
+  ]
+}
