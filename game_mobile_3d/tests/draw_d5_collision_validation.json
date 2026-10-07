@@ -1,0 +1,222 @@
+{
+  "cases": {
+    "1_-1_0": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": []
+    },
+    "1_0_0": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": []
+    },
+    "1_0_25": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": []
+    },
+    "1_0_5": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": []
+    },
+    "1_0_75": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": []
+    },
+    "2_-1_0": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": [
+        {
+          "time": 0.475000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.483333333333334,
+          "triangles": 7
+        },
+        {
+          "time": 0.491666666666667,
+          "triangles": 7
+        },
+        {
+          "time": 0.500000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.508333333333334,
+          "triangles": 33
+        },
+        {
+          "time": 0.516666666666667,
+          "triangles": 39
+        },
+        {
+          "time": 0.525000000000001,
+          "triangles": 41
+        },
+        {
+          "time": 0.533333333333334,
+          "triangles": 41
+        }
+      ]
+    },
+    "2_0_0": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": [
+        {
+          "time": 0.475000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.483333333333334,
+          "triangles": 7
+        },
+        {
+          "time": 0.491666666666667,
+          "triangles": 7
+        },
+        {
+          "time": 0.500000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.508333333333334,
+          "triangles": 33
+        },
+        {
+          "time": 0.516666666666667,
+          "triangles": 39
+        },
+        {
+          "time": 0.525000000000001,
+          "triangles": 41
+        },
+        {
+          "time": 0.533333333333334,
+          "triangles": 41
+        }
+      ]
+    },
+    "2_0_25": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": [
+        {
+          "time": 0.475000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.483333333333334,
+          "triangles": 7
+        },
+        {
+          "time": 0.491666666666667,
+          "triangles": 7
+        },
+        {
+          "time": 0.500000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.508333333333334,
+          "triangles": 33
+        },
+        {
+          "time": 0.516666666666667,
+          "triangles": 39
+        },
+        {
+          "time": 0.525000000000001,
+          "triangles": 41
+        },
+        {
+          "time": 0.533333333333334,
+          "triangles": 41
+        }
+      ]
+    },
+    "2_0_5": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": [
+        {
+          "time": 0.475000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.483333333333334,
+          "triangles": 7
+        },
+        {
+          "time": 0.491666666666667,
+          "triangles": 7
+        },
+        {
+          "time": 0.500000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.508333333333334,
+          "triangles": 33
+        },
+        {
+          "time": 0.516666666666667,
+          "triangles": 39
+        },
+        {
+          "time": 0.525000000000001,
+          "triangles": 41
+        },
+        {
+          "time": 0.533333333333334,
+          "triangles": 41
+        }
+      ]
+    },
+    "2_0_75": {
+      "samples": 64,
+      "head_hits": [],
+      "deep_chest_hits": [
+        {
+          "time": 0.475000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.483333333333334,
+          "triangles": 7
+        },
+        {
+          "time": 0.491666666666667,
+          "triangles": 7
+        },
+        {
+          "time": 0.500000000000001,
+          "triangles": 7
+        },
+        {
+          "time": 0.508333333333334,
+          "triangles": 33
+        },
+        {
+          "time": 0.516666666666667,
+          "triangles": 39
+        },
+        {
+          "time": 0.525000000000001,
+          "triangles": 41
+        },
+        {
+          "time": 0.533333333333334,
+          "triangles": 41
+        }
+      ]
+    }
+  },
+  "samples": 640,
+  "passed": false,
+  "method": "Actual weapon triangles vs rigid head/chest boxes, SAT; head inset 1cm, chest inset 3.5cm"
+}

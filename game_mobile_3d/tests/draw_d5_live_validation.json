@@ -1,0 +1,338 @@
+{
+	"cases": [
+		{
+			"events": [
+				{
+					"authored_time": 0.0,
+					"event": "DRAW_BEGIN",
+					"time": 0.0,
+					"token": 2,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.166666666666667,
+					"event": "WEAPON_GRAB",
+					"time": 0.166666666666667,
+					"token": 2,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.177083333333333,
+					"event": "WEAPON_BACK_RELEASE",
+					"time": 0.183333333333333,
+					"token": 2,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.4125,
+					"event": "SUPPORT_HAND_CATCH",
+					"time": 0.416666666666667,
+					"token": 2,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.541666666666667,
+					"event": "DRAW_READY",
+					"time": 0.541666666666667,
+					"token": 2,
+					"weapon": 1
+				}
+			],
+			"phase": 0.0,
+			"weapon": 1
+		},
+		{
+			"events": [
+				{
+					"authored_time": 0.0,
+					"event": "DRAW_BEGIN",
+					"time": 0.0,
+					"token": 6,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.166666666666667,
+					"event": "WEAPON_GRAB",
+					"time": 0.166666666666667,
+					"token": 6,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.177083333333333,
+					"event": "WEAPON_BACK_RELEASE",
+					"time": 0.183333333333333,
+					"token": 6,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.4125,
+					"event": "SUPPORT_HAND_CATCH",
+					"time": 0.416666666666667,
+					"token": 6,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.541666666666667,
+					"event": "DRAW_READY",
+					"time": 0.541666666666667,
+					"token": 6,
+					"weapon": 1
+				}
+			],
+			"phase": 0.25,
+			"weapon": 1
+		},
+		{
+			"events": [
+				{
+					"authored_time": 0.0,
+					"event": "DRAW_BEGIN",
+					"time": 0.0,
+					"token": 10,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.166666666666667,
+					"event": "WEAPON_GRAB",
+					"time": 0.166666666666667,
+					"token": 10,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.177083333333333,
+					"event": "WEAPON_BACK_RELEASE",
+					"time": 0.183333333333333,
+					"token": 10,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.4125,
+					"event": "SUPPORT_HAND_CATCH",
+					"time": 0.416666666666667,
+					"token": 10,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.541666666666667,
+					"event": "DRAW_READY",
+					"time": 0.541666666666667,
+					"token": 10,
+					"weapon": 1
+				}
+			],
+			"phase": 0.5,
+			"weapon": 1
+		},
+		{
+			"events": [
+				{
+					"authored_time": 0.0,
+					"event": "DRAW_BEGIN",
+					"time": 0.0,
+					"token": 14,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.166666666666667,
+					"event": "WEAPON_GRAB",
+					"time": 0.166666666666667,
+					"token": 14,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.177083333333333,
+					"event": "WEAPON_BACK_RELEASE",
+					"time": 0.183333333333333,
+					"token": 14,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.4125,
+					"event": "SUPPORT_HAND_CATCH",
+					"time": 0.416666666666667,
+					"token": 14,
+					"weapon": 1
+				},
+				{
+					"authored_time": 0.541666666666667,
+					"event": "DRAW_READY",
+					"time": 0.541666666666667,
+					"token": 14,
+					"weapon": 1
+				}
+			],
+			"phase": 0.75,
+			"weapon": 1
+		},
+		{
+			"events": [
+				{
+					"authored_time": 0.0,
+					"event": "DRAW_BEGIN",
+					"time": 0.0,
+					"token": 19,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.166666666666667,
+					"event": "WEAPON_GRAB",
+					"time": 0.166666666666667,
+					"token": 19,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.177083333333333,
+					"event": "WEAPON_BACK_RELEASE",
+					"time": 0.183333333333333,
+					"token": 19,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.4125,
+					"event": "SUPPORT_HAND_CATCH",
+					"time": 0.416666666666667,
+					"token": 19,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.541666666666667,
+					"event": "DRAW_READY",
+					"time": 0.541666666666667,
+					"token": 19,
+					"weapon": 2
+				}
+			],
+			"phase": 0.0,
+			"weapon": 2
+		},
+		{
+			"events": [
+				{
+					"authored_time": 0.0,
+					"event": "DRAW_BEGIN",
+					"time": 0.0,
+					"token": 23,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.166666666666667,
+					"event": "WEAPON_GRAB",
+					"time": 0.166666666666667,
+					"token": 23,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.177083333333333,
+					"event": "WEAPON_BACK_RELEASE",
+					"time": 0.183333333333333,
+					"token": 23,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.4125,
+					"event": "SUPPORT_HAND_CATCH",
+					"time": 0.416666666666667,
+					"token": 23,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.541666666666667,
+					"event": "DRAW_READY",
+					"time": 0.541666666666667,
+					"token": 23,
+					"weapon": 2
+				}
+			],
+			"phase": 0.25,
+			"weapon": 2
+		},
+		{
+			"events": [
+				{
+					"authored_time": 0.0,
+					"event": "DRAW_BEGIN",
+					"time": 0.0,
+					"token": 27,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.166666666666667,
+					"event": "WEAPON_GRAB",
+					"time": 0.166666666666667,
+					"token": 27,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.177083333333333,
+					"event": "WEAPON_BACK_RELEASE",
+					"time": 0.183333333333333,
+					"token": 27,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.4125,
+					"event": "SUPPORT_HAND_CATCH",
+					"time": 0.416666666666667,
+					"token": 27,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.541666666666667,
+					"event": "DRAW_READY",
+					"time": 0.541666666666667,
+					"token": 27,
+					"weapon": 2
+				}
+			],
+			"phase": 0.5,
+			"weapon": 2
+		},
+		{
+			"events": [
+				{
+					"authored_time": 0.0,
+					"event": "DRAW_BEGIN",
+					"time": 0.0,
+					"token": 31,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.166666666666667,
+					"event": "WEAPON_GRAB",
+					"time": 0.166666666666667,
+					"token": 31,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.177083333333333,
+					"event": "WEAPON_BACK_RELEASE",
+					"time": 0.183333333333333,
+					"token": 31,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.4125,
+					"event": "SUPPORT_HAND_CATCH",
+					"time": 0.416666666666667,
+					"token": 31,
+					"weapon": 2
+				},
+				{
+					"authored_time": 0.541666666666667,
+					"event": "DRAW_READY",
+					"time": 0.541666666666667,
+					"token": 31,
+					"weapon": 2
+				}
+			],
+			"phase": 0.75,
+			"weapon": 2
+		}
+	],
+	"checks": 585,
+	"clock_error": 0.0000000000000000520417042793042,
+	"failures": [],
+	"minimum_draw_speed": 1.85698866844177,
+	"rendered": false,
+	"shots_drawing": 0
+}

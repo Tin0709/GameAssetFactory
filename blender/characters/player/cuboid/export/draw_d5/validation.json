@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "clips": [
+    "HolsterLongGun",
+    "Idle",
+    "Run",
+    "DrawLongGun"
+  ],
+  "duration": 0.5416666865348816,
+  "authored_channels": {
+    "Spine": [
+      "rotation"
+    ],
+    "Chest": [
+      "rotation"
+    ],
+    "Neck": [
+      "rotation"
+    ],
+    "Head": [
+      "rotation"
+    ],
+    "Arm.R": [
+      "rotation",
+      "translation"
+    ],
+    "Arm.L": [
+      "rotation",
+      "translation"
+    ],
+    "WeaponCarrier": [
+      "rotation",
+      "translation"
+    ]
+  },
+  "lower_tracks": 0,
+  "scale_tracks": 0,
+  "root_motion": 0,
+  "samples": 53,
+  "source_max_position_error_m": 2.5753508550673934e-07,
+  "source_max_rotation_error_deg": 0.03281201715436123,
+  "mesh_rig_idle_run_holster_byte_preserved": true,
+  "events": {
+    "DRAW_BEGIN": 0.0,
+    "WEAPON_GRAB": 0.16666666666666666,
+    "WEAPON_BACK_RELEASE": 0.17708333333333334,
+    "SUPPORT_HAND_CATCH": 0.41250000000000003,
+    "DRAW_READY": 0.5416666666666666
+  },
+  "export": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\characters\\player_cuboid_animated_v3.glb"
+}

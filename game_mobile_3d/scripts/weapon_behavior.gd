@@ -26,14 +26,17 @@ var visual: Node3D
 var gun: Node3D
 var socket: BoneAttachment3D
 var authored_holster := false
+var authored_draw := false
 var desired_weapon_state: StringName = &"STOWED"
 
 func sprint_active() -> bool:
 	return get_parent().fast_sprinting
 
 func _cancel_authored() -> void:
+	if visual.has_method("cancel_authored_draw"): visual.cancel_authored_draw()
 	if visual.has_method("cancel_authored_holster"): visual.cancel_authored_holster()
 	authored_holster = false
+	authored_draw = false
 
 func _ready() -> void:
 	# Controller (parent, priority 0) publishes sprint before this child; gun
@@ -63,8 +66,12 @@ func _physics_process(delta: float) -> void:
 	suspended = false
 	if not enabled:
 		desired_weapon_state = &"BEHAVIOR_DISABLED"
-		_cancel_authored()
-		if state != State.READY:
+		if authored_draw:
+			visual.finish_disabled_draw(); authored_draw = false
+			attachment_changed.emit(&"WeaponAttachment")
+			request_id += 1; _set_state(State.READY)
+		elif state != State.READY:
+			_cancel_authored()
 			request_id += 1
 			weapon_attach_to_hand(); _set_state(State.READY)
 		return
@@ -83,6 +90,9 @@ func _physics_process(delta: float) -> void:
 	# require its normal acquire range.
 	threat_present = is_instance_valid(gun.awareness_target(state != State.STOWED or threat_present))
 	_decide_weapon_intention(delta)
+	if authored_draw and state == State.DRAWING:
+		transition_elapsed = minf(transition_elapsed + delta, visual.draw_duration())
+		return
 	if authored_holster and state == State.HOLSTERING:
 		transition_elapsed = minf(transition_elapsed + delta, visual.holster_duration())
 		return # Visual sole pose writer emits centralized clip events after posing.
@@ -122,6 +132,14 @@ func _decide_weapon_intention(delta: float) -> void:
 			if grace_elapsed >= holster_grace_seconds: _begin(State.HOLSTERING)
 
 func _interrupt_draw_for_sprint() -> void:
+	if authored_draw:
+		if socket.current_attachment == &"back":
+			visual.cancel_authored_draw(true); authored_draw = false
+			request_id += 1; transition_elapsed = 0.0; handoff_done = false
+			_set_state(State.STOWED)
+		# After release finish the short forward transport, then ordinary Holster.
+		# This retains Carrier ownership and never reverses or teleports it.
+		return
 	if socket.current_attachment == &"hand":
 		# Placeholder already handed off: capture its current upper pose and use
 		# ordinary Holster. Its new token invalidates pending Draw completion.
@@ -133,6 +151,7 @@ func _interrupt_draw_for_sprint() -> void:
 		_set_state(State.STOWED)
 
 func transition_duration() -> float:
+	if authored_draw and state == State.DRAWING: return visual.draw_duration()
 	if authored_holster and state == State.HOLSTERING: return visual.holster_duration()
 	var long_gun := Profiles.category(socket.equipped) == Profiles.Category.LONG_GUN
 	if state == State.DRAWING: return maxf(0.001, long_gun_draw_seconds if long_gun else pistol_draw_seconds)
@@ -141,7 +160,9 @@ func transition_duration() -> float:
 func _begin(next: State) -> void:
 	request_id += 1; transition_elapsed = 0.0; handoff_done = false
 	_set_state(next)
+	authored_draw = next == State.DRAWING and visual.has_method("has_authored_draw") and visual.has_authored_draw()
 	authored_holster = next == State.HOLSTERING and visual.has_method("has_authored_holster") and visual.has_authored_holster()
+	if authored_draw: visual.start_authored_draw(request_id)
 	if authored_holster: visual.start_authored_holster(request_id)
 	transition_requested.emit(&"Draw" if next == State.DRAWING else &"Holster", request_id, socket.equipped)
 
@@ -161,6 +182,14 @@ func weapon_attach_to_carrier(token: int) -> void:
 	if not _valid_event(token) or not authored_holster or state != State.HOLSTERING: return
 	socket.begin_transport(); attachment_changed.emit(&"WeaponCarrierSocket")
 
+func weapon_draw_to_carrier(token: int, time: float) -> void:
+	if not _valid_event(token) or not authored_draw or state != State.DRAWING or socket.current_attachment != &"back": return
+	socket.begin_draw_transport(time); attachment_changed.emit(&"WeaponCarrierSocket")
+
+func weapon_draw_to_hand(token: int) -> void:
+	if not _valid_event(token) or not authored_draw or state != State.DRAWING or socket.current_attachment != &"carrier": return
+	socket.end_draw_transport(); attachment_changed.emit(&"WeaponAttachment")
+
 func weapon_release_carrier_to_back(token: int) -> void:
 	if not _valid_event(token) or not authored_holster or socket.current_attachment != &"carrier": return
 	socket.end_transport(true); attachment_changed.emit(&"BackWeaponSocket")
@@ -179,6 +208,11 @@ func _attach_stowed(token: int = -1) -> void:
 
 func draw_finished(token: int = -1) -> void:
 	if not _valid_event(token) or state != State.DRAWING or socket.current_attachment != &"hand": return
+	if authored_draw:
+		authored_draw = false
+		if sprint_active():
+			_begin(State.HOLSTERING)
+			return
 	if sprint_active():
 		_interrupt_draw_for_sprint()
 		return
@@ -205,4 +239,4 @@ func on_weapon_switched() -> void:
 
 func debug_text() -> String:
 	var attachment: String = {&"hand":"WeaponAttachment", &"carrier":"WeaponCarrierSocket", &"back":"BackWeaponSocket", &"hip":"HipWeaponSocket_R"}.get(socket.current_attachment, str(socket.current_attachment))
-	return "Sprint %s | Desired %s | Weapon %s | threat %s | %s%s" % [sprint_active(), desired_weapon_state, State.keys()[state], threat_present, attachment, " | AUTHORED HOLSTER" if authored_holster else (" | PLACEHOLDER" if placeholder_transitions else "")]
+	return "Sprint %s | Desired %s | Weapon %s | threat %s | %s%s" % [sprint_active(), desired_weapon_state, State.keys()[state], threat_present, attachment, " | AUTHORED DRAW" if authored_draw else (" | AUTHORED HOLSTER" if authored_holster else (" | PLACEHOLDER" if placeholder_transitions else ""))]

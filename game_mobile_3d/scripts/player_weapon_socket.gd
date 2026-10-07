@@ -29,6 +29,10 @@ var back_mount: Node3D
 var transport_entry := Transform3D.IDENTITY
 var transport_release := Transform3D.IDENTITY
 var transport_jumps: Array[Dictionary] = []
+var draw_mount_entry := Transform3D.IDENTITY
+var draw_mount_started := 0.0
+var draw_hand_entry := Transform3D.IDENTITY
+var draw_ready_mounts: Array[Transform3D] = []
 ## Broader Shotgun receiver/stock needs additional clearance along transport
 ## +Y (barrel-forward) and +Z (weapon-up). M4 mount and shared motion unchanged.
 const SHOTGUN_TRANSPORT_OFFSET = Vector3(0, 0.125, 0.025)
@@ -74,6 +78,37 @@ func begin_transport() -> void:
 	_transport_reparent(carrier_socket, "hand_to_carrier")
 	transport_entry = instances[equipped].transform
 	current_attachment = &"carrier"
+
+func begin_draw_transport(time: float) -> void:
+	_transport_reparent(carrier_socket, "back_to_carrier")
+	draw_mount_entry = instances[equipped].transform
+	draw_mount_started = time
+	current_attachment = &"carrier"
+
+func prepare_draw_mounts(carrier_endpoint: Transform3D, hand_endpoint: Transform3D) -> void:
+	for hand_transform in hand_transforms:
+		draw_ready_mounts.append(carrier_endpoint.affine_inverse() * hand_endpoint * hand_transform)
+
+func update_draw_transport(time: float, catch_time: float, ready_time: float) -> void:
+	if current_attachment != &"carrier": return
+	# Preserve the release frame, then reconcile category-specific back/grip
+	# mounting over 80 ms. The authored Carrier supplies the entire trajectory.
+	var canonical := transport_canonical()
+	if equipped == 2: canonical.origin.x -= 0.01 # Draw-only stock/head clearance.
+	var pose := draw_mount_entry.interpolate_with(canonical, smoothstep(draw_mount_started, draw_mount_started + 0.08, time))
+	# Shotgun's existing transport clearance differs from its READY visual mount.
+	# Reconcile only that weapon offset during the authored catch-to-ready settle.
+	if equipped == 2:
+		pose = pose.interpolate_with(draw_ready_mounts[equipped], smoothstep(catch_time, ready_time, time))
+	instances[equipped].transform = pose
+
+func end_draw_transport() -> void:
+	_transport_reparent(self, "carrier_to_hand" if current_attachment == &"carrier" else "draw_cancel_back_to_hand")
+	draw_hand_entry = instances[equipped].transform
+	current_attachment = &"hand"
+
+func finish_draw_mount(weight: float) -> void:
+	instances[equipped].transform = draw_hand_entry.interpolate_with(hand_transforms[equipped], weight)
 
 func end_transport(keep_global: bool) -> void:
 	if back_mount == null: return

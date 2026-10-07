@@ -135,10 +135,13 @@ func run() -> void:
 		# I after Draw handoff: regular captured-pose Holster; no reverse.
 		await reset(weapon);near=true
 		await ticks(18 if weapon!=0 else 12)
-		check(b.state==b.State.DRAWING and v.socket.current_attachment==&"hand","I fixture post-handoff Draw %d"%weapon)
+		check(b.state==b.State.DRAWING and v.socket.current_attachment==(&"carrier" if weapon!=0 else &"hand"),"I fixture post-release Draw %d"%weapon)
 		old=b.request_id;move_sprint(true);await ticks(2)
-		check(b.state==b.State.HOLSTERING and b.authored_holster==(weapon!=0),"I: post-handoff redirects to ordinary Holster %d"%weapon)
-		b.draw_finished(old);await ticks(50)
+		if weapon!=0:
+			check(b.state==b.State.DRAWING and b.authored_draw,"I: released authored Draw finishes forward before Holster %d"%weapon)
+		else:
+			check(b.state==b.State.HOLSTERING and not b.authored_holster,"I: Pistol retains immediate placeholder Holster")
+		b.draw_finished(old);await ticks(65)
 		check(b.state==b.State.STOWED and v.socket.current_attachment==stow,"I: post-handoff safely ends stowed %d"%weapon)
 		cases[str(weapon)]="A through I, K/L/M passed"
 	# J: switch during actual transport and while stowed sprint; no stale mounts.

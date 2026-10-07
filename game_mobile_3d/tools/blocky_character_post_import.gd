@@ -9,8 +9,9 @@ func _post_import(scene: Node) -> Object:
 		player.get_animation(name).loop_mode = Animation.LOOP_LINEAR
 	# Godot can synthesize rest tracks for animated descendants. Preserve this
 	# authored clip's strict upper-body mask after import as well as in the GLB.
-	if player.has_animation("HolsterLongGun"):
-		var holster := player.get_animation("HolsterLongGun")
+	for clip_name in ["HolsterLongGun", "DrawLongGun"]:
+		if not player.has_animation(clip_name): continue
+		var holster := player.get_animation(clip_name)
 		var mask := ["Spine", "Chest", "Arm.L", "Arm.R", "Neck", "Head", "WeaponCarrier"]
 		for track in range(holster.get_track_count()-1, -1, -1):
 			var path := holster.track_get_path(track)

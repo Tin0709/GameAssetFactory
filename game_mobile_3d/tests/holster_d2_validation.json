@@ -371,194 +371,200 @@
 			"weapon": 2
 		}
 	],
-	"checks": 9088,
+	"checks": 9089,
 	"clock_error": 0.0000000000000000520417042793042,
 	"duration": 0.708333313465118,
 	"failures": [],
 	"handoffs": [
 		{
-			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
-			"position_m": 0.0000000149011611938477,
-			"rotation_rad": 0.000690533954184502
-		},
-		{
 			"handoff": "carrier_to_back",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000149011611938477,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000149011611938477,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.000000256303280821157,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000596046447753906,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000912696123123169,
 			"rotation_rad": 0.000690533954184502
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.00000000745058059692383,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.000000127591192722321,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000149011611938477,
 			"rotation_rad": 0.0009765625
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000344589352607727,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.0000000149011611938477,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.0000000707805156707764,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.000000271614283064991,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.000000300517172036052,
 			"rotation_rad": 0.000690533954184502
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.00000026658611318453,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.000000267495551042884,
 			"rotation_rad": 0.0009765625
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.000000238883785641519,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.000000177355218511366,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.000000269150604026436,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.000000271262791784466,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000149011611938477,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.000000256303280821157,
 			"rotation_rad": 0.0
 		},
 		{
+			"handoff": "back_to_carrier",
+			"instance": 50549753603,
+			"position_m": 0.000000244056280962468,
+			"rotation_rad": 0.0
+		},
+		{
+			"handoff": "carrier_to_hand",
+			"instance": 50549753603,
+			"position_m": 0.00000023853496600168,
+			"rotation_rad": 0.0009765625
+		},
+		{
 			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000596046447753906,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000372529029846191,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.000000309086857441798,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.000000120137002568299,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 50046437125,
+			"instance": 50650416905,
 			"position_m": 0.000000120137002568299,
 			"rotation_rad": 0.000690533954184502
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.00000000745058059692383,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000897168703772877,
 			"rotation_rad": 0.000690533954184502
 		},
 		{
 			"handoff": "hand_to_carrier",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000600685012841495,
 			"rotation_rad": 0.0
 		},
 		{
 			"handoff": "carrier_to_back",
-			"instance": 49945773823,
+			"instance": 50549753603,
 			"position_m": 0.0000000897168703772877,
 			"rotation_rad": 0.0
 		}

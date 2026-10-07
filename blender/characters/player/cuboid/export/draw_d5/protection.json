@@ -1,0 +1,23 @@
+{
+  "source_file_sha256": "9e678b81b8ce40aa716bcc335908da819c444a9c8ff51e81d6748dbfbd28d60c",
+  "protected_actions": {
+    "Draw_LongGun_V1": "207457a022d0178b760b3b9171b4bf2e6db6c4258332d7c2b7d3c8cfd09662ca",
+    "Draw_LongGun_V2": "296b6798e9026df085d359e1f2d33f62dfa74b9a7298a2331ec80bf8c13fcbaa",
+    "Draw_LongGun_V3_Final": "4a5a98d55c8145ddcff3d5e4bf4cf3e2449abeda11e175fd6c15933e605bc74e",
+    "Holster_LongGun_V1": "2efe88625791bb7fed6c4d3113810be23890a261808f677887e0533f6306520d",
+    "Holster_LongGun_V2": "deb4f1a3973fd0f7bf41bf8a45705a10ed8d1fb9ccf5ab7d0c1ca6d5e9f3eb7f",
+    "Holster_LongGun_V3_Final": "0a29f91b058a329d267f48c19562e36ceea25faeebfe7a69c688f71be8a1840b",
+    "HolsterLongGun": "0a29f91b058a329d267f48c19562e36ceea25faeebfe7a69c688f71be8a1840b",
+    "Idle": "cc323fd232f8dd5565189accf1e6296f56cbc1a2c89222443c13f1f9491d7e9f",
+    "Player_Idle": "5a69a3fa4d650747c9e062e6af3fee7f3e95cec80cce6bb976654af0cc8e2ecc",
+    "Player_Run_Blocky_V1": "7ce3b3dd09a8e9f76c1554f2d297228c4d4168b9de8b5323e5dd39ffb9fc24b5",
+    "Player_Run_Blocky_V2": "19c72ed1c72bb83701a7b323826e71e853fbdf0dadf8196bf39824a865ccf7f4",
+    "Player_Run_Blocky_V3": "179853da35fededf80167bfaa1addaee6fb91f566567de7fb5784f27351dac06",
+    "Player_Run_Blocky_V4": "f7a6f084ca3cb72d5f466df05ff03146af8ac7cf2f6c5a112cf9606a64631429",
+    "Player_Run_Blocky_V5": "681812eab83de72ea4e764f956d460451fd59be3b935addd512dfa67c349716d",
+    "Player_Run_Blocky_V6": "682334258496a1a93946b905d55792dc9a0ad711dd9ca3774d3c1515803a561c",
+    "Player_Run_Blocky_V7_Final": "d722889225b2fda52cf74c6eddf65c2d642f4ff91d6408c37eb990be41da6040",
+    "Run": "f994f842a505ddd8a2d1251cdb5963a32f58e0fafb7a3ef637ca71877e69236a"
+  },
+  "source_unchanged": true
+}
