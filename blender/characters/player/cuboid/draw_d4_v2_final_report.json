@@ -1,0 +1,121 @@
+{
+  "action": "Draw_LongGun_V2",
+  "source_preserved": "Draw_LongGun_V1",
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_weapon_animation_dev.blend",
+  "backup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_cuboid_weapon_animation_dev_before_draw_v2_20261007_071426.blend",
+  "frames": [
+    1,
+    14
+  ],
+  "fps": 24,
+  "duration_seconds": 0.5416666666666666,
+  "markers_subframes": {
+    "DRAW_BEGIN": 1.0,
+    "WEAPON_GRAB": 5.0,
+    "WEAPON_BACK_RELEASE": 5.25,
+    "SUPPORT_HAND_CATCH": 10.9,
+    "DRAW_READY": 14.0
+  },
+  "marker_note": "event_subframes_json is authoritative; Blender pose markers display nearest integer frame.",
+  "notice_frame": 1.8,
+  "right_arm_timing": {
+    "prepare": 2.15,
+    "reach": 3.85,
+    "grab": 5,
+    "contact_hold_end": 5.25,
+    "pull": 6.9,
+    "sweep": 9.05,
+    "control": 10.95,
+    "settle": 12.9,
+    "ready": 14
+  },
+  "weapon_timing": {
+    "secured_through": 5.25,
+    "resistance": 5.55,
+    "pull_acceleration": 6.45,
+    "clear_body": 7.15,
+    "sweep": [
+      8.2,
+      9.15
+    ],
+    "catch": 10.9,
+    "overshoot": 12.15,
+    "settle": 13.15,
+    "ready": 14
+  },
+  "chest_reaction_frame": 7.35,
+  "left_arm_timing": {
+    "neutral_until": 8.05,
+    "interception_begins": 9.4,
+    "catch": 10.9,
+    "follow_through": 11.8,
+    "settle": 13.1,
+    "ready": 14
+  },
+  "velocity_changes": "Chest-relative weapon remains secured through 5.25. Pull accelerates after delayed release. Peak Sweep angular speed 1472.6 -> 936.2 deg/s; translational peak 15.47 -> 15.74 m/s. Catch reduces angular speed to peak 274.9 deg/s; settle is brief.",
+  "trajectory_changes": "Outward pull before forward sweep; rotation distributed across Pull/Sweep; delayed left-arm interception follows posed weapon, then both arms stabilize.",
+  "weapon_settle_degrees": 1.0,
+  "arm_settle_degrees": {
+    "Arm.R": 0.65,
+    "Arm.L": 0.5
+  },
+  "chest_settle_degrees": 0.18,
+  "chest_foundation_degrees": {
+    "pitch": [
+      0,
+      3
+    ],
+    "yaw": [
+      -8,
+      2
+    ]
+  },
+  "spine_degrees": {
+    "pitch": [
+      0,
+      0.4
+    ],
+    "yaw": [
+      -1,
+      0
+    ]
+  },
+  "spine_lag_frames": [
+    5.8,
+    8.35,
+    11.75
+  ],
+  "neck_max_degrees": 2,
+  "head_max_degrees": 1,
+  "lower_keys": {
+    "Root": 0,
+    "Hips": 0,
+    "Leg.L": 0,
+    "Leg.R": 0
+  },
+  "scale_keys": 0,
+  "endpoint_matrix_max_errors": {
+    "Chest": 2.3283064365386963e-10,
+    "WeaponCarrier": 1.1920928955078125e-07,
+    "Arm.R": 1.1920928955078125e-07,
+    "Arm.L": 1.1920928955078125e-07
+  },
+  "previous_actions_unchanged": 15,
+  "geometry_weights_rest_hierarchy_unchanged": true,
+  "weapon_carrier_non_deforming": true,
+  "overlays": {
+    "Idle": "sampled and visually reviewed",
+    "Run_phases_percent": [
+      0,
+      25,
+      50,
+      75
+    ],
+    "Run_speed_scale": 1.6,
+    "lower_pose_max_error": 1.1920928955078125e-07
+  },
+  "clipping": "No head/deep chest weapon penetration in 630 sampled poses, sampled every 0.125 frame. Rigid-arm/gun intersections persist through acquisition/catch and approved Ready grip; not a fully collision-free clip.",
+  "Godot_modified": false,
+  "preview_ready": true,
+  "comparison": "Both V1/V2 retained in Action selector; review renders include V1 comparison frames 5, 11, 14."
+}
