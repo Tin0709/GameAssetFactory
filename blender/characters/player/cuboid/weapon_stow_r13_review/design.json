@@ -1,0 +1,410 @@
+{
+  "scope": "Study/dev only; no production migration",
+  "source": "Holster_LongGun_V3_Final",
+  "source_hold_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_locomotion_sway_r12_final_review.blend",
+  "scene": "R13_STOW_REVIEW",
+  "front_scene": "R13_STOW_FRONT_REVIEW",
+  "actors": {
+    "Pistol": {
+      "rig": "R13_Pistol_Rig",
+      "mesh": "R11_R12_Stow_Pistol_R9W1_Author_Mesh",
+      "weapons": [
+        "R11_R12_Stow_Pistol_R9W4_Asset_Pistol_Blocky_Pistol_Base"
+      ],
+      "action": "R13_Pistol_Holster_ClearArc",
+      "start": {
+        "Spine": {
+          "location": [
+            0.0,
+            0.0020000000949949026,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Chest": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Neck": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Head": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            0.9998477101325989,
+            0.0,
+            0.0,
+            0.017452426254749298
+          ]
+        },
+        "UpperArm.L": {
+          "location": [
+            0.03200000151991844,
+            0.0,
+            2.797528875220223e-09
+          ],
+          "rotation_quaternion": [
+            0.9996573328971863,
+            0.0,
+            0.0,
+            0.026176920160651207
+          ]
+        },
+        "ForeArm.L": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "UpperArm.R": {
+          "location": [
+            -0.03200000151991844,
+            0.0,
+            -2.797528875220223e-09
+          ],
+          "rotation_quaternion": [
+            0.09993245452642441,
+            -0.11099646240472794,
+            0.7348397970199585,
+            0.6615918874740601
+          ]
+        },
+        "ForeArm.R": {
+          "location": [
+            0.0,
+            2.9802322387695312e-08,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            1.3038519597330378e-08,
+            -2.0023435354232788e-08,
+            -6.635674232313704e-09
+          ]
+        },
+        "WeaponCarrier": {
+          "location": [
+            0.0011367169208824635,
+            0.1260388344526291,
+            0.38934510946273804
+          ],
+          "rotation_quaternion": [
+            0.9963100552558899,
+            0.07841143012046814,
+            -0.002738072071224451,
+            0.03479190915822983
+          ]
+        }
+      }
+    },
+    "Rifle": {
+      "rig": "R13_Rifle_Rig",
+      "mesh": "R11_R12_Stow_Rifle_R9W1_Author_Mesh",
+      "weapons": [
+        "R11_R12_Stow_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
+      ],
+      "action": "R13_Rifle_Holster_ClearArc",
+      "start": {
+        "Spine": {
+          "location": [
+            0.0,
+            0.0020000000949949026,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Chest": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Neck": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Head": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            0.9998477101325989,
+            0.0,
+            0.0,
+            0.017452426254749298
+          ]
+        },
+        "UpperArm.L": {
+          "location": [
+            0.03200000151991844,
+            0.0,
+            2.797528875220223e-09
+          ],
+          "rotation_quaternion": [
+            0.10146994143724442,
+            -0.1131182387471199,
+            -0.7357492446899414,
+            -0.6599857807159424
+          ]
+        },
+        "ForeArm.L": {
+          "location": [
+            -2.9802322387695312e-08,
+            -2.9802322387695312e-08,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            4.6566128730773926e-08,
+            -1.3504179108281278e-08,
+            -7.392372491921151e-09
+          ]
+        },
+        "UpperArm.R": {
+          "location": [
+            -0.03200000151991844,
+            0.0,
+            -2.797528875220223e-09
+          ],
+          "rotation_quaternion": [
+            0.09993245452642441,
+            -0.11099646240472794,
+            0.7348397970199585,
+            0.6615918874740601
+          ]
+        },
+        "ForeArm.R": {
+          "location": [
+            0.0,
+            2.9802322387695312e-08,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            1.3038519597330378e-08,
+            -2.0023435354232788e-08,
+            -6.635674232313704e-09
+          ]
+        },
+        "WeaponCarrier": {
+          "location": [
+            -0.007955183275043964,
+            0.10466361045837402,
+            0.3015959560871124
+          ],
+          "rotation_quaternion": [
+            0.9963100552558899,
+            0.07841143012046814,
+            -0.0027380723040550947,
+            0.03479190915822983
+          ]
+        }
+      }
+    },
+    "Shotgun": {
+      "rig": "R13_Shotgun_Rig",
+      "mesh": "R11_R12_Stow_Shotgun_R9W1_Author_Mesh",
+      "weapons": [
+        "R11_R12_Stow_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
+        "R11_R12_Stow_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
+      ],
+      "action": "R13_Shotgun_Holster_ClearArc",
+      "start": {
+        "Spine": {
+          "location": [
+            0.0,
+            0.0020000000949949026,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Chest": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Neck": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "Head": {
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_quaternion": [
+            0.9998477101325989,
+            0.0,
+            0.0,
+            0.017452426254749298
+          ]
+        },
+        "UpperArm.L": {
+          "location": [
+            0.03200000151991844,
+            0.0,
+            2.797528875220223e-09
+          ],
+          "rotation_quaternion": [
+            0.10146994143724442,
+            -0.1131182387471199,
+            -0.7357492446899414,
+            -0.6599857807159424
+          ]
+        },
+        "ForeArm.L": {
+          "location": [
+            -2.9802322387695312e-08,
+            -2.9802322387695312e-08,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            4.6566128730773926e-08,
+            -1.3504179108281278e-08,
+            -7.392372491921151e-09
+          ]
+        },
+        "UpperArm.R": {
+          "location": [
+            -0.03200000151991844,
+            0.0,
+            -2.797528875220223e-09
+          ],
+          "rotation_quaternion": [
+            0.09993245452642441,
+            -0.11099646240472794,
+            0.7348397970199585,
+            0.6615918874740601
+          ]
+        },
+        "ForeArm.R": {
+          "location": [
+            0.0,
+            2.9802322387695312e-08,
+            0.0
+          ],
+          "rotation_quaternion": [
+            1.0,
+            1.3038519597330378e-08,
+            -2.0023435354232788e-08,
+            -6.635674232313704e-09
+          ]
+        },
+        "WeaponCarrier": {
+          "location": [
+            -0.02337578870356083,
+            0.30101099610328674,
+            0.47160467505455017
+          ],
+          "rotation_quaternion": [
+            0.9963100552558899,
+            0.07841142266988754,
+            -0.00273807137273252,
+            0.034791912883520126
+          ]
+        }
+      }
+    }
+  },
+  "frames": {
+    "ready": [
+      1,
+      12
+    ],
+    "holster": [
+      12,
+      38
+    ],
+    "stowed": [
+      38,
+      70
+    ],
+    "review_return": [
+      70,
+      96
+    ]
+  },
+  "fps": 24
+}

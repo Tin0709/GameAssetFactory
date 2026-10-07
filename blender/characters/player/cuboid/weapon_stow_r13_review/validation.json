@@ -1,0 +1,64 @@
+{
+  "passed": false,
+  "failures": [
+    "Pistol pose continuity/rig invariant",
+    "Pistol abrupt motion",
+    "Rifle pose continuity/rig invariant",
+    "Rifle abrupt motion",
+    "Shotgun pose continuity/rig invariant",
+    "Shotgun abrupt motion"
+  ],
+  "actors": {
+    "Pistol": {
+      "head_hits": [],
+      "chest_hits": [],
+      "gap_min": 0.05544599047717247,
+      "bend_max_deg": 0,
+      "half_frame_step_deg": 19.14637603609599,
+      "max_step_bone_frame": [
+        "UpperArm.R",
+        36.5
+      ],
+      "start_error": 2.0,
+      "loop_error": 0.0,
+      "lower_error": 0,
+      "grip_error_before_handoff": 6.124462067518573e-07,
+      "stowed_matrix_drift": 0
+    },
+    "Rifle": {
+      "head_hits": [],
+      "chest_hits": [],
+      "gap_min": 0.05962710295054985,
+      "bend_max_deg": 0,
+      "half_frame_step_deg": 19.14637603609599,
+      "max_step_bone_frame": [
+        "UpperArm.R",
+        36.5
+      ],
+      "start_error": 2.0,
+      "loop_error": 0.0,
+      "lower_error": 0,
+      "grip_error_before_handoff": 5.198423707715686e-07,
+      "stowed_matrix_drift": 0
+    },
+    "Shotgun": {
+      "head_hits": [],
+      "chest_hits": [],
+      "gap_min": 0.044488760687350526,
+      "bend_max_deg": 0,
+      "half_frame_step_deg": 19.14637603609599,
+      "max_step_bone_frame": [
+        "UpperArm.R",
+        36.5
+      ],
+      "start_error": 2.0,
+      "loop_error": 0.0,
+      "lower_error": 0,
+      "grip_error_before_handoff": 4.3349639526253914e-07,
+      "stowed_matrix_drift": 0
+    }
+  },
+  "original_actions_preserved": 189,
+  "original_meshes_preserved": 438,
+  "scope": "Study only; visual approval pending"
+}
