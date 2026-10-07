@@ -5,7 +5,7 @@ design=json.loads((OUT/'design.json').read_text())
 for cat,d in design['categories'].items():
     d.setdefault('baseline_scale',1.12 if cat=='Rifle' else 1.0)
     for data in [d]+[s['actors'][cat] for s in design['showcases'].values()]:
-        w=next(bpy.data.objects[n] for n in data['weapons'] if '_Base' in n);w.parent.scale=(STUDY_GUN_SCALE[cat],)*3
+        w=next(bpy.data.objects[n] for n in data['weapons'] if '_Base' in n);w.parent.scale=STUDY_GUN_SCALE[cat]
     s=bpy.data.scenes[d['scene']];bpy.context.window.scene=s;r=bpy.data.objects[d['rig']];assign(r,None)
     for p in r.pose.bones:p.matrix_basis=Matrix.Identity(4)
     bpy.context.view_layer.update();w=next(bpy.data.objects[n] for n in d['weapons'] if '_Base' in n);gm=r.matrix_world.inverted()@w.evaluated_get(bpy.context.evaluated_depsgraph_get()).matrix_world

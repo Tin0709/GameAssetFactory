@@ -1,0 +1,49 @@
+{
+  "actions": {
+    "Pistol": {
+      "name": "PistolHold_SimpleR11",
+      "digest": "6e5493bb25e7bf1128f08beb7d2282be7773783f4a04401986baf016fc704918"
+    },
+    "Rifle": {
+      "name": "LongGunHold_SimpleR11",
+      "digest": "e02439a2db7beeb00be5fc4b0f6386f3248b6af91e4946159faef917190f1098"
+    },
+    "Shotgun": {
+      "name": "ShotgunHold_SimpleR11",
+      "digest": "3690f37e105e6a1e53975dc97f2833d432243583c1d2deb10d6ca2fd9f79b8cd"
+    }
+  },
+  "sha256": "605ca2a4448bd01390476e292cc985960e22dbe7c7fc8a9fc552047948189f62",
+  "frames": 96,
+  "offsets": {
+    "Rifle": [
+      0.065,
+      0.035
+    ],
+    "Shotgun": [
+      0.06,
+      0.14
+    ],
+    "Pistol": [
+      0,
+      0
+    ]
+  },
+  "weapon_scales": {
+    "Rifle": [
+      0.8925,
+      1.05,
+      1.05
+    ],
+    "Shotgun": [
+      0.74375,
+      0.875,
+      0.875
+    ],
+    "Pistol": [
+      1.0625,
+      1.25,
+      1.25
+    ]
+  }
+}

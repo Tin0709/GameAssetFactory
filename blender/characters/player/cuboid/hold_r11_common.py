@@ -5,14 +5,16 @@ OUT=BASE/'weapon_hold_r11_review'
 # Long guns pin their actual trigger centre to the right hand end.
 # Pistol's grip sits in the upper part of the block hand, leaving its slide visible.
 TRIGGER={'Rifle':Vector((0,.118,.080)),'Shotgun':Vector((0,.088,.050)),'Pistol':Vector((0,0,-.115))}
-STUDY_GUN_SCALE={'Rifle':.84,'Shotgun':.70,'Pistol':1.0}
-GUN_OFFSET={'Rifle':(.035,.035),'Shotgun':(.060,.100),'Pistol':(0,0)} # forward, up; metres
+ATTACHMENT_SCALE={'Rifle':.84,'Shotgun':.70,'Pistol':1.0}
+# User: enlarge 25%, THEN narrow local X by 15%; Y/Z remain 125%.
+STUDY_GUN_SCALE={cat:(base*1.25*.85,base*1.25,base*1.25) for cat,base in ATTACHMENT_SCALE.items()}
+GUN_OFFSET={'Rifle':(.065,.035),'Shotgun':(.060,.140),'Pistol':(0,0)} # forward, up; metres
 
 def clone_r11(label,s,cat):
     r,m,ws=clone_r10('R11_'+label,s,cat)
     for o in list(s.objects):
         if o.name.startswith('R10WH1_R11_'):o.name=o.name.replace('R10WH1_R11_','R11_',1)
-    next(w for w in ws if '_Base' in w.name).parent.scale=(STUDY_GUN_SCALE[cat],)*3
+    next(w for w in ws if '_Base' in w.name).parent.scale=STUDY_GUN_SCALE[cat]
     return r,m,ws
 
 def simple_pose(r,socket,cat,yaw=0,breath=0):
@@ -36,10 +38,11 @@ def simple_pose(r,socket,cat,yaw=0,breath=0):
     forward=(ch.to_3x3()@Vector((0,0,1))).normalized();up=(ch.to_3x3()@Vector((0,1,0))).normalized();x=forward.cross(up).normalized()
     # Crossbow references have no rear firearm stock. Fit the dev long guns
     # to the same straight-arm reach rather than lowering/bending that pose.
-    scale=STUDY_GUN_SCALE[cat]
-    gm=(Matrix((x,forward,up)).transposed()@Matrix.Diagonal(Vector((scale,scale,scale)))).to_4x4()
+    orient=Matrix((x,forward,up)).transposed()
+    gm=(orient@Matrix.Diagonal(Vector(STUDY_GUN_SCALE[cat]))).to_4x4()
     offset=GUN_OFFSET[cat]
-    gm.translation=tip-gm.to_3x3()@TRIGGER[cat]+forward*offset[0]+up*offset[1]
+    # Keep the approved grip placement while enlarging the weapon around it.
+    gm.translation=tip-(orient@TRIGGER[cat])*ATTACHMENT_SCALE[cat]+forward*offset[0]+up*offset[1]
     r.pose.bones['WeaponCarrier'].matrix=gm@socket.inverted();bpy.context.view_layer.update()
 
 tree=ast.parse((BASE/'review_onearm_r9w4.py').read_text())

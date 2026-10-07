@@ -13,8 +13,12 @@ for view in VIEWS:
             im=Image.open(OUT/f'{cat}_{tag}_{view}.png').convert('RGB');im.thumbnail((490,460));board.paste(im,(i*500+5,j*512+45));draw.text((i*500+15,j*512+45),cat,font=font,fill='white')
     board.save(OUT/f'AB_{view}.jpg',quality=94)
 movies={}
+validation=json.loads((OUT/'validation.json').read_text());design=json.loads((OUT/'design.json').read_text())
 for mode,N in MODES.items():
-    p=OUT/f'{mode}_24fps.mp4';cap=cv2.VideoCapture(str(p));count=0;previews=[]
+    p=OUT/f'{mode}_24fps.mp4';manifest=json.loads((OUT/f'{mode}_render_manifest.json').read_text());assert hashlib.sha256(p.read_bytes()).hexdigest()==manifest['sha256']
+    for data in manifest['actions'].values():assert data['digest']==validation['action_digests'][data['name']],(mode,'stale pose render')
+    for cat,scale in manifest['weapon_scales'].items():assert max(abs(a-b) for a,b in zip(scale,design['categories'][cat]['study_weapon_scale']))<1e-6,(mode,'stale gun size')
+    cap=cv2.VideoCapture(str(p));count=0;previews=[]
     while True:
         ok,frame=cap.read()
         if not ok:break
@@ -33,7 +37,7 @@ html='''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewpor
 <nav><button id="new" class="active" onclick="version('B')">B · R11</button><button id="old" onclick="version('A')">A · previous WH2</button><label>View <select id="angle" onchange="update()"><option value="FrontReference">New front reference</option><option value="ReferenceAngle">Reference overhead</option><option value="ReverseTop">Reverse overhead reference</option><option value="UnderReference">Underside reference</option><option value="FrontThreeQuarter">Front three-quarter</option><option value="Front">Front</option><option value="Side">Side</option><option value="Overhead">Direct overhead</option></select></label></nav>
 <div class="cards">'''
 for cat in CATS:html+=f'<article class="card"><h2>{cat}</h2><img id="{cat}" src="{cat}_B_FrontReference.png" alt="{cat} R11 hold"></article>'
-html+='''</div><p class="muted">A/B views use the same character, weapon geometry, camera and lighting. R11 dev long guns are sized to keep stocks clear at the raised reference height. A is the stopped WH2 development pose.</p><img id="ab" class="wide" src="AB_FrontReference.jpg" alt="Three-weapon matched A/B comparison">
+html+='''</div><p class="muted">A/B views use the same character, weapon geometry, camera and lighting. Latest R11 guns are 25% larger, then 15% narrower in width. Their grips and stocks retain clearance at the raised reference height. A is the stopped WH2 development pose.</p><img id="ab" class="wide" src="AB_FrontReference.jpg" alt="Three-weapon matched A/B comparison">
 <h2>Living showcase</h2><nav id="motion">'''
 for mode,label in [('Hold','Ready / breathe'),('Move','Walk'),('AimAround','Look around'),('Sprint','Sprint'),('Turn','Turn / change direction')]:html+=f'<button onclick="motion(\'{mode}\')">{label}</button>'
 html+='''</nav><video id="movie" src="Hold_24fps.mp4" controls loop playsinline preload="metadata"></video><p id="note" class="muted">Ready breathing · 4 seconds · loop.</p>
