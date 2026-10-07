@@ -1,0 +1,171 @@
+{
+  "action": "LongGunReady_Run_V1",
+  "authoring_fps": 24,
+  "keys": [
+    1,
+    17
+  ],
+  "unique_frames": [
+    1,
+    16
+  ],
+  "authoring_seconds": 0.6666666666666666,
+  "runtime_cadence": 1.6,
+  "runtime_cycle_seconds": 0.41666666666666663,
+  "animated_bones": [
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "Arm.R",
+    "Arm.L",
+    "WeaponCarrier"
+  ],
+  "lower_keys": {
+    "Root": 0,
+    "Hips": 0,
+    "Leg.L": 0,
+    "Leg.R": 0
+  },
+  "scale_tracks": 0,
+  "protected_actions_unchanged": [
+    "Draw_LongGun_V1",
+    "Draw_LongGun_V2",
+    "Draw_LongGun_V3_Final",
+    "Holster_LongGun_V1",
+    "Holster_LongGun_V2",
+    "Holster_LongGun_V3_Final",
+    "HolsterLongGun",
+    "Idle",
+    "LongGunHold_V2",
+    "LongGunReady_Loop_V1",
+    "Player_Idle",
+    "Player_Run_Blocky_V1",
+    "Player_Run_Blocky_V2",
+    "Player_Run_Blocky_V3",
+    "Player_Run_Blocky_V4",
+    "Player_Run_Blocky_V5",
+    "Player_Run_Blocky_V6",
+    "Player_Run_Blocky_V7_Final",
+    "Run"
+  ],
+  "geometry_weights_rest_lengths_hierarchy_unchanged": true,
+  "seam_matrix_error": 0.0,
+  "seam_curve_slope_error": 5.0224788057662284e-08,
+  "lower_overlay_error": 1.1920928955078125e-07,
+  "arm_weapon_relative_matrix_error": 4.5806169509887695e-05,
+  "measurements": {
+    "A": {
+      "vertical_excursion_m": {
+        "Hips": 0.08127129077911377,
+        "Spine": 0.08131355047225952,
+        "Chest": 0.0820542573928833,
+        "WeaponCarrier": 0.1047409176826477,
+        "Head": 0.07873916625976562
+      },
+      "rotation_diameter_degrees": {
+        "Chest": 8.200903976049467,
+        "WeaponCarrier": 8.20099811852164,
+        "Head": 3.5523809604368086
+      }
+    },
+    "B": {
+      "vertical_excursion_m": {
+        "Hips": 0.08127129077911377,
+        "Spine": 0.08131355047225952,
+        "Chest": 0.08217501640319824,
+        "WeaponCarrier": 0.108634352684021,
+        "Head": 0.07998251914978027
+      },
+      "rotation_diameter_degrees": {
+        "Chest": 8.341734792772314,
+        "WeaponCarrier": 8.219029817930474,
+        "Head": 3.542008891295321
+      }
+    },
+    "C": {
+      "vertical_excursion_m": {
+        "Hips": 0.08127129077911377,
+        "Spine": 0.055293262004852295,
+        "Chest": 0.055727362632751465,
+        "WeaponCarrier": 0.0292741060256958,
+        "Head": 0.017315983772277832
+      },
+      "rotation_diameter_degrees": {
+        "Chest": 4.7609453680301295,
+        "WeaponCarrier": 2.8796128767192535,
+        "Head": 1.0726373465294263
+      }
+    }
+  },
+  "head_deep_chest_hits": [],
+  "phase_compatibility": [
+    {
+      "phase": 0,
+      "shared_phase_error": 0.0
+    },
+    {
+      "phase": 4,
+      "shared_phase_error": 0.0
+    },
+    {
+      "phase": 8,
+      "shared_phase_error": 0.0
+    },
+    {
+      "phase": 12,
+      "shared_phase_error": 0.0
+    }
+  ],
+  "max_composed_difference_from_current_hold": {
+    "Spine": {
+      "position_m": 0.013392417492703985,
+      "angle_deg": 0.5352215741292798
+    },
+    "Chest": {
+      "position_m": 0.013588540778723771,
+      "angle_deg": 1.800537543288561
+    },
+    "Neck": {
+      "position_m": 0.031359570594962125,
+      "angle_deg": 1.371139878590844
+    },
+    "Head": {
+      "position_m": 0.03136007501790074,
+      "angle_deg": 1.4071995421488088
+    },
+    "Arm.R": {
+      "position_m": 0.04026475166805291,
+      "angle_deg": 2.7971554179642744
+    },
+    "Arm.L": {
+      "position_m": 0.04438823217510917,
+      "angle_deg": 2.7971554179642744
+    },
+    "WeaponCarrier": {
+      "position_m": 0.041119761769246886,
+      "angle_deg": 2.7971436925043127
+    }
+  },
+  "transition_scope": "Compared to composed Run + approved Hold endpoints over all Run phases. Requires blending; does not claim zero mismatch or runtime approval.",
+  "preview_scope": "Blender authoring composition, no production Godot modifications. A=Hold V2; B=independent Ready Loop V1; C=phase-locked Ready Run V1.",
+  "saved_file_verified": true,
+  "preview_pose_max_matrix_error": 1.1920928955078125e-07,
+  "rifle_marker_vertical_excursion_m": {
+    "A": {
+      "Muzzle_Point": 0.14449429512023926,
+      "Grip_Point": 0.1047409176826477,
+      "Support_Hand_Point": 0.12688523530960083
+    },
+    "B": {
+      "Muzzle_Point": 0.15539216995239258,
+      "Grip_Point": 0.108634352684021,
+      "Support_Hand_Point": 0.1346815824508667
+    },
+    "C": {
+      "Muzzle_Point": 0.04397052526473999,
+      "Grip_Point": 0.0292741060256958,
+      "Support_Hand_Point": 0.03737688064575195
+    }
+  }
+}
