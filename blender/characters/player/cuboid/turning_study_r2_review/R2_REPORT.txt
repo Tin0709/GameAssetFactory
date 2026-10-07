@@ -1,0 +1,151 @@
+PHASE R2-T — FIRST TURNING STUDY
+
+Delivered development file:
+C:\Users\ADMIN\Desktop\GameAssetFactory\blender\characters\player\cuboid\player_locomotion_turning_study.blend
+
+New full-body Actions:
+Walk_TurnLeft_Reference_V1
+Walk_TurnRight_Reference_V1
+Sprint_TurnLeft_Reference_V1
+Sprint_TurnRight_Reference_V1
+
+Open index.html in this folder for the normal-speed H.264 A/B reel, timestamped
+pose sheets, source evidence and gameplay-camera views. Blender is left in
+R2_Review_AB: Walk upper row, Sprint lower row, A left and B right. Press Space.
+R2_Review_Gameplay provides the elevated project camera. Individual R2_Walk_A/B
+and R2_Sprint_A/B scenes provide larger fixed-camera views. Timeline markers name
+the five path tests. PREVIEW_ONLY Actions and path parents are review scaffolding.
+
+OBSERVATIONS VERSUS DESIGN
+The original 102829 recording was located, SHA256 checked, and all 589 frames
+decoded at 30 FPS. Both full-frame overview sheets, all three consecutive-frame
+entry/return sheets, repeated-heading/circle sheets and additional original
+full-frame samples were inspected. The useful entry/curve/recovery windows in
+the supplied brief were covered. Inspection used extracted images, NOT observed
+continuous playback. Technical checks do not constitute artistic approval.
+
+Visible evidence: intermediate body orientations, continuing opposite arm/leg
+progression, oblique waist/shoulder presentation, small relative head/torso
+differences and return toward upright movement. Faster curves look more assertive.
+The source does not establish its algorithm, exact banking angle, rig topology,
+foot contacts, head-lead delay, input or camera trajectory. Some projected lean
+comes from forward gait lean seen at changing headings. The exit also includes
+deceleration, so it cannot identify a turn-only damping constant. No FOV or size
+changes were reproduced as body scaling.
+
+The implementation is an original approximation using the existing R1 gaits.
+It is not presented as a verified Minecraft implementation.
+
+TIMING AND COMPOSITION
+Walk: preserved 16 intervals at 24 FPS = 0.666667 s, keys 1..17, unique loop 1..16.
+Sprint: preserved 13 intervals at 24 FPS = 0.541667 s, keys 1..14, unique loop 1..13.
+No 1.60 multiplier. Terminal endpoints remain in the Actions.
+
+Common normalized phase: phi = ((frame - 1) / period) mod 1. Phase 0 is the R1
+right-leg reach / left-arm-forward pose; phase 0.5 is the opposite progression.
+These are pose anchors, not verified planted-contact events. Both turn variants
+sample the corresponding R1 phase without retiming or restarting the stride.
+
+Runtime-style contract for this study: interpolate absolute full poses between
+straight and the selected turn variant at the same normalized phase. Locations
+use linear interpolation and rotations use quaternion slerp. Complete poses are
+never added together. A sign change passes through the base gait in the S test.
+World translation and yaw belong solely to a separate PREVIEW path parent.
+Root has zero motion; bounded local torso yaw does not repeat full path heading.
+
+Left/right are anatomical/travel-relative: model forward is -Y, left is +X.
+Positive yaw about world +Z turns left (CCW from above). Screen direction is not
+used to choose the turn variant.
+
+CHOSEN POSE VALUES — NOT SOURCE MEASUREMENTS
+At full turn weight, nominal additional bank is 5.3 degrees Walk / 9.5 Sprint.
+Hips supplies 4.8 / 9 degrees, with 0.3 at Spine and 0.2 at Chest. A small lateral
+Hips offset is 8 / 12 mm. Hips height is adjusted to retain base leg-bottom
+clearance, with a 1.5 mm margin. Local leg progression remains the R1 cycle.
+
+Yaw toward the turn: Hips 0.5 / 1 degree; Spine+Chest 1.25 / 1.75 degrees; relative
+Neck+Head allowance 2 / 3 degrees. Neck+Head counter only one degree of the bank,
+so the head follows the body while staying modestly differentiated. Full-weight
+head vertical excursion is about 5.70 cm Walk / 13.10 cm Sprint on either side.
+There is no head translation cancellation, world locking or invented lag chain.
+
+Arms retain their gait and original R1 shoulder translations; the small balance
+rotation is 0.5 / 0.8 degrees. No additional shoulder translation was introduced.
+No knees, elbows, limb scaling, deformation, rest or hierarchy changes were made.
+
+During validation, distributing too much independent waist twist and leg
+counter-lean caused overlap near the rigid hip seam. The delivered V1s place most
+bank in Hips and keep relative waist/head changes smaller. No extra versions,
+torso separation or rig upgrade were used to compensate.
+
+A/B PATH REVIEW
+A: original straight R1 pose with preview path and heading.
+B: same path, camera, speed and phase, with the turning-pose blend.
+Fixed rear-oblique world cameras remain stationary throughout each panel/reel.
+The elevated gameplay camera also has fixed orientation; no camera orbit stands
+in for actor turning. A/B share the same path Action for each gait.
+
+The 19-second reel runs both gaits together at normal speed:
+0..3 s: straight -> left bend -> straight.
+3..6 s: straight -> right bend -> straight.
+6..10 s: S curve, with smooth sign change through straight.
+10..14.5 s: CCW circle across multiple strides, then straight recovery.
+14.5..19 s: CW circle across multiple strides, then straight recovery.
+Hard cuts reposition the actor between distinct test paths; they are labeled
+test changes, not claimed seamless locomotion transitions. Global gait time
+continues. Turn entry and exit within every path do not restart it.
+
+Chosen preview speed is 1.4 m/s Walk and 2.1 m/s Sprint, not measured source speed.
+Blend weight follows signed yaw rate, with quintic entry/exit easing and a
+120-degree/s full-weight reference. The bends peak at half weight; circles at
+full weight. High straight-line speed alone yields zero turn weight. Both
+circles accumulate exactly +/-360 degrees while keeping the same local sign,
+including rear/front-facing quadrants.
+
+Sampled A/B images show a restrained Walk response and a more readable Sprint
+bank, ongoing arm swings, and return to the base posture. Both sides were checked
+independently. At gameplay scale the main Sprint silhouette change survives;
+small head and waist differences are subtler. Pose sheets use one shared A/B
+crop per timestamp for detail; use the uncropped movie for actual world travel.
+
+VALIDATION AND LIMITATIONS
+All four loops have zero endpoint curve-value error and seam-slope error below
+4.5e-7. No scale or WeaponCarrier tracks, and no accumulated Root transform.
+Pure left/right and 25%, 50%, 75% blends were checked every 1/8 frame, plus direct
+left/right midpoint stress checks. Eighteen pose/blend cases passed. The moving
+reel was checked every half frame (911 samples per A/B/gait, excluding path-cut
+interpolation). Minimum moving-preview leg bottom is about 4.35 mm above ground.
+Evaluated A/B poses match their expected shared-phase poses with zero recorded
+error. Sixteen left/right/Walk/Sprint entry tests cover 0%, 25%, 50%, 75% phase;
+phase error stays below 1e-10 and recovery returns to the corresponding base pose.
+
+No hits remained in the conservative inset body-box checks: arms/chest/head,
+head/chest, leg/leg and legs/chest. The boxes inset surfaces by 15 mm and exclude
+the top 70 mm of the intentional rigid hip seam. This detects major penetration;
+it is not proof that all adjoining surfaces have zero overlap. Sampled images
+show no new gross shoulder/neck separation or excessive head twist.
+
+Foot sliding remains visible against the grid, especially on tight curves. The
+rigid R1 cycles were not authored with world-space planted feet. The near-ground
+lower-face-center proxy has median horizontal speeds about 1.07/1.23 m/s for
+Walk A/B and 1.67/1.89 m/s for Sprint A/B. This includes foot roll/recovery near
+the ground and is not a precise contact solver or source-foot measurement. No
+perfect planting claim is made. A production contact pass would be separate work.
+
+Remaining reference mismatch: more regular waist response, straighter rigid limb
+recovery, reduced arm wrap, and a deliberately restrained turn lean. Preview path
+radii, speeds, smoothing and angles are chosen test values. Continuous motion
+feel still requires the user's playback review. No limitation presently requires
+approval for a rig change; the existing rig supports this bounded first study.
+
+PRESERVATION / SCOPE
+All 25 pre-existing Actions, including both R1 gaits and approved weapon Actions,
+match captured key/handle/modifier/marker/property fingerprints. Existing mesh
+vertices, weights and polygons and all existing rigs' rest matrices, lengths,
+hierarchies and deform flags match. Original R1 and weapon-development .blend
+SHA256 values are unchanged. Godot has no changed tracked files. No production
+locomotion, controller, movement speed, weapon layers or sockets were modified.
+
+Evidence: preservation_before.json, source_verification.json, design_values.json,
+validation.json, phase_entry_tests.json, preview_metadata.json and
+preview_validation.json. Work stops at these four V1 variants and the review reel.

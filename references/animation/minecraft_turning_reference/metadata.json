@@ -1,0 +1,10 @@
+{
+  "file": "Screen Recording 2026-10-07 102829.mp4",
+  "fps": 30.0,
+  "video_frames": 589,
+  "width": 550,
+  "height": 640,
+  "duration_video_seconds": 19.633333333333333,
+  "original_sha256": "107e549eefb89b4142e4870250b559a806cd9439b3c7a13d9f2fad96dd6974f7",
+  "frame_indexing": "zero-based; timestamp_seconds = frame_index / fps"
+}

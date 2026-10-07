@@ -1,0 +1,132 @@
+PHASE R2-T — REFERENCE-DRIVEN WALK / SPRINT TURNING STUDY
+
+The user supplied an additional locomotion reference:
+Screen Recording 2026-10-07 102829.mp4
+
+Locate the supplied minecraft_turning_reference folder, read
+ANALYSIS_FOR_CODEX.md and metadata.json, and inspect both full-frame
+and dense cropped sheets. Inspect additional original video frames if needed.
+This extends the existing R1 reference study; it does not replace production
+locomotion or the weapon-animation work.
+
+GOAL
+Recreate the visible feeling of continuing to walk/run while changing
+heading: ongoing steps, responsive torso/shoulders, controlled lean,
+relative head orientation and a smooth return to straight travel.
+Do not present a guessed source algorithm as a verified Minecraft technique.
+
+SAFETY / PREFLIGHT
+- Confirm live Blender connection and active file before editing.
+- Locate player_locomotion_reference_study.blend and actual R1 Actions:
+  Walk_ReferenceStudy_V1 and Sprint_ReferenceStudy_V1.
+- Preserve them and all production/weapon assets. Work in a new copy, e.g.
+  player_locomotion_turning_study.blend. Never overwrite an existing copy.
+- No simultaneous writer to this Blender session. If MCP fails, report it;
+  do not silently edit a separate stale/background scene.
+- Inspect only relevant rig/reference/preview files. Reuse working helpers.
+- No Godot changes, new skills/plugins, mesh/weight/rest-pose/hierarchy edits.
+
+OBSERVE FIRST
+Useful windows:
+1.267–1.733 s: slower turn entry.
+1.3–5.8 s: slower curved movement / recurring headings.
+8.333–8.833 s: faster turn entry.
+12.0–15.9 s: repeated faster curves.
+17.6–18.233 s: return toward straight/upright and deceleration.
+
+The footage shows intermediate orientations and ongoing limb cycles.
+Projected lean combines gait, forward lean, view projection and turning.
+Do not claim exact angles, contact timing, source rig topology or a fixed
+head-lead delay from it. Do not reproduce camera/FOV changes as body scaling.
+
+FIRST-PASS ASSETS
+Create four NEW full-pose locomotion variants:
+Walk_TurnLeft_Reference_V1
+Walk_TurnRight_Reference_V1
+Sprint_TurnLeft_Reference_V1
+Sprint_TurnRight_Reference_V1
+
+Use each corresponding R1 gait as its base. Document the common contact/phase
+convention. Left/right variants retain that gait's duration and cyclic phase.
+These are sustained turning gaits, NOT one-shot 90-degree turns.
+Do not create CircleWalk/CircleSprint clips or an exhaustive angle library.
+
+COMPOSITION CONTRACT
+For this study, use absolute full-pose variants crossfaded with the matching
+straight gait at a shared normalized phase. Do not add complete poses together.
+Keep net world translation/yaw out of the character Root animation.
+Use a separate PREVIEW path parent to supply travel and facing changes.
+Residual local Hips/torso turn pose must not apply the full heading twice.
+
+Unlike weapon overlays, these are full-body locomotion variants:
+Hips and leg channels MAY be changed within the new Actions when needed
+for balance/contact. Their original Actions and rig remain untouched.
+Keep rigid cuboid geometry; no new knees/elbows or bone scaling.
+
+MOTION DESIGN
+- Keep recognizable R1 Walk/Sprint rhythm and opposite arm/leg progression.
+- Ease into a restrained turn-dependent lean and torso/shoulder bias.
+- Fast turning can be more assertive than slow turning, but do not bank
+  heavily merely because speed is high on a straight path.
+- Maintain small head/torso orientation differences where visually useful;
+  no exaggerated anticipation delay, backward head lock, or bob elimination.
+- Let arms continue the gait with modest turn balance. Do not freeze them
+  or use independent random lag to manufacture complexity.
+- A sustained curve should maintain coherent turn intent while stride
+  motion continues. No return-to-neutral every footstep/quadrant.
+- Return toward the base gait smoothly as curvature decreases.
+- Treat left/right relative to actual character/travel orientation, not the
+  screen. Mirror as a starting point only; verify both signs and contacts.
+- Use small leg/hip corrections only if needed; do not compensate by
+  excessive shoulder translations, torso gaps, or foot penetration.
+
+TIMING
+Verify R1 intervals. Expected bases at 24 FPS:
+Walk: 16 frame intervals (~0.667 s).
+Sprint: 13 frame intervals (~0.542 s).
+Preserve each duration for now. Do not apply the old 1.60 game multiplier.
+Retain terminal loop keys/continuity; exclude duplicate terminal display
+samples only when setting cyclic preview, not by shortening Action duration.
+
+PREVIEW TESTS
+Make a reusable, non-production Blender comparison:
+A = corresponding base gait + heading/path change only.
+B = same gait/cadence/path/camera + turning variant blend.
+
+For Walk and Sprint show:
+straight -> moving left bend -> straight;
+straight -> moving right bend -> straight;
+S-curve;
+clockwise and counterclockwise circles for multiple strides;
+curve -> straight recovery.
+
+Use smooth preview trajectories; constant-speed circles should maintain
+a constant local turn sign, not reset at camera-facing quadrants.
+Entry/exit and left-right changes must be independent of the gait clock.
+Test turn entry at 0%, 25%, 50%, 75% cycle phase.
+A sharp reversal may be a stress test, not a reference-matched pivot.
+
+Use a fixed world camera first, then an elevated gameplay-style camera.
+Do not substitute a rotating camera around an otherwise unchanged character.
+Keep changes to gameplay movement/controller out of this task.
+
+VALIDATION / EVIDENCE
+Verify source asset preservation, loop poses/velocities, no scale keys or
+accumulated Root motion, and body/ground intersections between authored keys.
+Check blend midpoints as well as pure left/right poses.
+Report visible foot sliding, overbanking, head/torso twist, shoulder gaps,
+and any remaining mismatch honestly; do not claim perfect foot planting.
+Provide one concise normal-speed A/B preview and useful timestamped sheets.
+State whether you actually inspected continuous motion or only sampled images.
+Technical pass counts are not artistic approval.
+
+STOP after this first turning study. Do not auto-polish versions, upgrade the
+rig, integrate Godot, change weapon layers or rewrite R1 straight gaits.
+
+FINAL REPORT
+- Verified reference observations vs design choices/uncertainties.
+- Development file, new Actions, gait phases/durations and pose ranges.
+- How lean/torso/arms/head contribute; what still differs from reference.
+- A/B path tests, left/right sign and phase continuity, clipping/sliding.
+- Any limitation requiring user approval; source preservation.
+- Leave Blender ready for human visual review.

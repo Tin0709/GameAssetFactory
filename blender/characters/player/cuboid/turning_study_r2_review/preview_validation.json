@@ -1,0 +1,87 @@
+{
+  "preview_checks": {
+    "Walk_A": {
+      "samples": 911,
+      "min_leg_bottom_m": 0.005999974386497797,
+      "inset_body_hits": [],
+      "root_error": 0.0,
+      "shared_phase_pose_error": 0.0,
+      "near_ground_lower_face_center_horizontal_speed_m_s": {
+        "count": 562,
+        "median": 1.065288962703561,
+        "p95": 4.091063779416611,
+        "max": 4.409990854622138
+      },
+      "foot_metric_note": "Lower face-center proxy at bottom height <3 cm; not a recovered source contact or proof of foot planting."
+    },
+    "Walk_B": {
+      "samples": 911,
+      "min_leg_bottom_m": 0.005770992230295757,
+      "inset_body_hits": [],
+      "root_error": 0.0,
+      "shared_phase_pose_error": 0.0,
+      "near_ground_lower_face_center_horizontal_speed_m_s": {
+        "count": 562,
+        "median": 1.2280105402186852,
+        "p95": 4.388823174307598,
+        "max": 4.806736328467628
+      },
+      "foot_metric_note": "Lower face-center proxy at bottom height <3 cm; not a recovered source contact or proof of foot planting."
+    },
+    "Sprint_A": {
+      "samples": 911,
+      "min_leg_bottom_m": 0.005999997912117472,
+      "inset_body_hits": [],
+      "root_error": 0.0,
+      "shared_phase_pose_error": 0.0,
+      "near_ground_lower_face_center_horizontal_speed_m_s": {
+        "count": 414,
+        "median": 1.672478761047436,
+        "p95": 5.015238856009495,
+        "max": 5.241274888569731
+      },
+      "foot_metric_note": "Lower face-center proxy at bottom height <3 cm; not a recovered source contact or proof of foot planting."
+    },
+    "Sprint_B": {
+      "samples": 911,
+      "min_leg_bottom_m": 0.004350502623442942,
+      "inset_body_hits": [],
+      "root_error": 0.0,
+      "shared_phase_pose_error": 0.0,
+      "near_ground_lower_face_center_horizontal_speed_m_s": {
+        "count": 449,
+        "median": 1.8921949882049491,
+        "p95": 7.289235043896249,
+        "max": 7.8625162348049535
+      },
+      "foot_metric_note": "Lower face-center proxy at bottom height <3 cm; not a recovered source contact or proof of foot planting."
+    }
+  },
+  "circle_sign_checks": [
+    {
+      "gait": "Walk",
+      "case": "CCW circle",
+      "yaw_degrees": 360.0000000000024,
+      "same_local_sign_across_all_headings": true
+    },
+    {
+      "gait": "Walk",
+      "case": "CW circle",
+      "yaw_degrees": -360.0000000000024,
+      "same_local_sign_across_all_headings": true
+    },
+    {
+      "gait": "Sprint",
+      "case": "CCW circle",
+      "yaw_degrees": 360.0000000000024,
+      "same_local_sign_across_all_headings": true
+    },
+    {
+      "gait": "Sprint",
+      "case": "CW circle",
+      "yaw_degrees": -360.0000000000024,
+      "same_local_sign_across_all_headings": true
+    }
+  ],
+  "phase_entry_cases": 16
+}

@@ -1,0 +1,187 @@
+{
+  "preserved_actions": 25,
+  "preserved_geometry_weights_all_existing_rigs": true,
+  "original_blend_hashes_unchanged": true,
+  "pose_checks": {
+    "Walk_Left_w0.25": {
+      "samples": 129,
+      "min_leg_bottom_m": 0.005936768857190522,
+      "head_bob_m": 0.04767775535583496,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.2907399153479923,
+      "inset_body_hits": []
+    },
+    "Walk_Left_w0.5": {
+      "samples": 129,
+      "min_leg_bottom_m": 0.006166122311488387,
+      "head_bob_m": 0.05078887939453125,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.5828247909930954,
+      "inset_body_hits": []
+    },
+    "Walk_Left_w0.75": {
+      "samples": 129,
+      "min_leg_bottom_m": 0.006687091117276278,
+      "head_bob_m": 0.0539013147354126,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.8749095599164926,
+      "inset_body_hits": []
+    },
+    "Walk_Left_w1.0": {
+      "samples": 129,
+      "min_leg_bottom_m": 0.007499231219952218,
+      "head_bob_m": 0.05701494216918945,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 1.1663245967752582,
+      "inset_body_hits": []
+    },
+    "Walk_Right_w0.25": {
+      "samples": 129,
+      "min_leg_bottom_m": 0.005936776307771119,
+      "head_bob_m": 0.04767775535583496,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.2907399153479923,
+      "inset_body_hits": []
+    },
+    "Walk_Right_w0.5": {
+      "samples": 129,
+      "min_leg_bottom_m": 0.0061661331148301635,
+      "head_bob_m": 0.05078887939453125,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.5828247909930954,
+      "inset_body_hits": []
+    },
+    "Walk_Right_w0.75": {
+      "samples": 129,
+      "min_leg_bottom_m": 0.006687098567856875,
+      "head_bob_m": 0.0539013147354126,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.8749095599164926,
+      "inset_body_hits": []
+    },
+    "Walk_Right_w1.0": {
+      "samples": 129,
+      "min_leg_bottom_m": 0.007499234945242517,
+      "head_bob_m": 0.05701494216918945,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 1.1663245967752582,
+      "inset_body_hits": []
+    },
+    "Walk_LeftRightMidpoint": {
+      "min_leg_bottom_m": 0.012236866223883869
+    },
+    "Sprint_Left_w0.25": {
+      "samples": 105,
+      "min_leg_bottom_m": 0.004922000150406447,
+      "head_bob_m": 0.10792601108551025,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.40348237952195487,
+      "inset_body_hits": []
+    },
+    "Sprint_Left_w0.5": {
+      "samples": 105,
+      "min_leg_bottom_m": 0.0048115054219493025,
+      "head_bob_m": 0.11555278301239014,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.8079353395971391,
+      "inset_body_hits": []
+    },
+    "Sprint_Left_w0.75": {
+      "samples": 105,
+      "min_leg_bottom_m": 0.005675138341276309,
+      "head_bob_m": 0.12327349185943604,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 1.2117447144256084,
+      "inset_body_hits": []
+    },
+    "Sprint_Left_w1.0": {
+      "samples": 105,
+      "min_leg_bottom_m": 0.007497705912051789,
+      "head_bob_m": 0.1310206651687622,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 1.6153963012120798,
+      "inset_body_hits": []
+    },
+    "Sprint_Right_w0.25": {
+      "samples": 105,
+      "min_leg_bottom_m": 0.0049219479963422685,
+      "head_bob_m": 0.10792601108551025,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.40348237952195487,
+      "inset_body_hits": []
+    },
+    "Sprint_Right_w0.5": {
+      "samples": 105,
+      "min_leg_bottom_m": 0.004811572477174675,
+      "head_bob_m": 0.11555278301239014,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 0.8079353395971391,
+      "inset_body_hits": []
+    },
+    "Sprint_Right_w0.75": {
+      "samples": 105,
+      "min_leg_bottom_m": 0.005675149517147204,
+      "head_bob_m": 0.12327349185943604,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 1.2117447144256084,
+      "inset_body_hits": []
+    },
+    "Sprint_Right_w1.0": {
+      "samples": 105,
+      "min_leg_bottom_m": 0.00749772863632181,
+      "head_bob_m": 0.1310206651687622,
+      "root_basis_error": 0.0,
+      "additional_shoulder_translation_m": 0.0,
+      "head_local_delta_max_deg": 1.6153963012120798,
+      "inset_body_hits": []
+    },
+    "Sprint_LeftRightMidpoint": {
+      "min_leg_bottom_m": 0.014789354007265665
+    }
+  },
+  "loop_checks": {
+    "Walk_TurnLeft_Reference_V1": {
+      "endpoint_error": 0.0,
+      "seam_slope_error": 2.9224897409030337e-07,
+      "duration": 0.6666666666666666,
+      "scale_tracks": 0,
+      "weapon_tracks": 0
+    },
+    "Walk_TurnRight_Reference_V1": {
+      "endpoint_error": 0.0,
+      "seam_slope_error": 2.9224897409030337e-07,
+      "duration": 0.6666666666666666,
+      "scale_tracks": 0,
+      "weapon_tracks": 0
+    },
+    "Sprint_TurnLeft_Reference_V1": {
+      "endpoint_error": 0.0,
+      "seam_slope_error": 4.4270207807950435e-07,
+      "duration": 0.5416666666666666,
+      "scale_tracks": 0,
+      "weapon_tracks": 0
+    },
+    "Sprint_TurnRight_Reference_V1": {
+      "endpoint_error": 0.0,
+      "seam_slope_error": 4.4270207807950435e-07,
+      "duration": 0.5416666666666666,
+      "scale_tracks": 0,
+      "weapon_tracks": 0
+    }
+  }
+}
