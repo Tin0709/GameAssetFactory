@@ -4,8 +4,9 @@ R12OUT=BASE/'locomotion_sway_r12_review'
 R12OUT.mkdir(exist_ok=True)
 CURRENT=json.loads((OUT/'design.json').read_text())
 META=json.loads((BASE/'turning_study_r3_review/preview_metadata.json').read_text())
-GAITS={'Walk':{'period':16,'twist':3.0,'roll':1.8,'lateral':.006,'bank':4.0},
-       'Sprint':{'period':13,'twist':4.0,'roll':2.4,'lateral':.008,'bank':6.0}}
+GAITS={'Walk':{'period':16,'twist':3.0,'roll':1.8,'lateral':.006,'bank':4.0,'pitch_rock':1.0,'foreaft':.005},
+       'Sprint':{'period':13,'twist':4.0,'roll':2.4,'lateral':.008,'bank':6.0,'pitch_rock':1.4,'foreaft':.008}}
+ARM_INSET=.032 # close the 28 mm shoulder gap introduced by the slim mesh
 
 def source_curves(gait):
     action=bpy.data.actions[CURRENT['locomotion']['imported_actions'][gait+'_ReferenceStudy_V2']]
@@ -19,7 +20,8 @@ def native_pose(table,bone,frame):
     return loc,rot
 
 def gait_harmonic(gait,table):
-    period=GAITS[gait]['period'];samples=np.array([native_pose(table,'Leg.L',1+i)[1].x-native_pose(table,'Leg.R',1+i)[1].x for i in range(period)])
+    # On this rig positive leg-X points the foot forward (native bone-Y points down).
+    period=GAITS[gait]['period'];samples=np.array([native_pose(table,'Leg.R',1+i)[1].x-native_pose(table,'Leg.L',1+i)[1].x for i in range(period)])
     phase=2*np.pi*np.arange(period)/period
     c=float(np.dot(samples,np.cos(phase))*2/period);s=float(np.dot(samples,np.sin(phase))*2/period)
     amplitude=math.hypot(c,s)
@@ -87,14 +89,34 @@ def author_upper(scene,rig,gait,kind,turning,base,target=None):
             loc,rot=native_pose(table,'Arm.L',source_frame)
             p=rig.pose.bones['UpperArm.L'];p.location=loc;p.rotation_quaternion=rot.to_quaternion()@Quaternion((0,0,1),math.radians(3))
             p=rig.pose.bones['ForeArm.L'];p.location=(0,0,0);p.rotation_quaternion=(1,0,0,0)
+        elif kind in ['Rifle','Shotgun']:
+            # Free support shape: one straight cuboid arm, softly swinging below
+            # its old support position. The gun remains owned by the right side.
+            lag=1.5 if gait=='Walk' else 1.0
+            support_phase=phase-2*math.pi*lag/cfg['period']
+            drop=math.radians(2+2*math.sin(support_phase))
+            drift=math.radians(.75)*math.cos(support_phase)
+            p=rig.pose.bones['UpperArm.L'];rest=p.parent.bone.matrix_local.inverted()@p.bone.matrix_local
+            down_axis=rest.to_3x3().inverted()@Vector((1,0,0));yaw_axis=rest.to_3x3().inverted()@Vector((0,1,0))
+            p.rotation_quaternion=Quaternion(yaw_axis,drift)@Quaternion(down_axis,drop)@base['UpperArm.L'][1]
+        for side in ['R','L']:
+            p=rig.pose.bones['UpperArm.'+side]
+            rest=p.parent.bone.matrix_local.inverted()@p.bone.matrix_local
+            p.location+=rest.to_3x3().inverted()@Vector((ARM_INSET if side=='R' else -ARM_INSET,0,0))
+        if kind!='Unarmed':
+            p=rig.pose.bones['WeaponCarrier'];rest=p.parent.bone.matrix_local.inverted()@p.bone.matrix_local
+            p.location+=rest.to_3x3().inverted()@Vector((ARM_INSET,0,0))
         p=rig.pose.bones['Spine']
         pitch=0 if base is not None else native_pose(table,'Spine',source_frame)[1].x
+        rock=2*drive*drive-1 # two gentle fore/aft rocks per full left/right stride
+        pitch+=math.radians(cfg['pitch_rock'])*rock
         lean=float(np.interp(frame-1,np.arange(len(bank)),bank)) if turning else 0
         # The native hips counter-yaw. Keep those source leg/hip keys untouched,
         # while letting the upper torso visibly follow the same-side leading leg.
         native_hip_yaw=hip_yaw.evaluate(frame if turning else source_frame)
         p.rotation_quaternion=Euler((pitch,math.radians(cfg['twist'])*drive-native_hip_yaw,math.radians(cfg['roll'])*drive+lean),'XYZ').to_quaternion()
         p.location.x-=cfg['lateral']*drive
+        p.location.z+=cfg['foreaft']*rock
         if base is not None:p.location.y=base['Spine'][0].y+.0015*math.cos(2*phase)
         else:
             # Replace the old torso yaw/roll, retaining native forward pitch.

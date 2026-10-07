@@ -6,14 +6,18 @@
       "twist": 3.0,
       "roll": 1.8,
       "lateral": 0.006,
-      "bank": 4.0
+      "bank": 4.0,
+      "pitch_rock": 1.0,
+      "foreaft": 0.005
     },
     "Sprint": {
       "period": 13,
       "twist": 4.0,
       "roll": 2.4,
       "lateral": 0.008,
-      "bank": 6.0
+      "bank": 6.0,
+      "pitch_rock": 1.4,
+      "foreaft": 0.008
     }
   },
   "source_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_weapon_hold_r11_walk_sway_fit_study.blend",
@@ -27,8 +31,8 @@
           "weapons": [],
           "upper": "R12_Walk_Unarmed_Upper",
           "motion": {
-            "harmonic_cos": -0.9999655841119016,
-            "harmonic_sin": 0.008296420417478845,
+            "harmonic_cos": 0.9999655841119016,
+            "harmonic_sin": -0.008296420417478845,
             "end_frame": 17,
             "bank_max_deg": 0
           }
@@ -41,8 +45,8 @@
           ],
           "upper": "R12_Walk_Pistol_Upper",
           "motion": {
-            "harmonic_cos": -0.9999655841119016,
-            "harmonic_sin": 0.008296420417478845,
+            "harmonic_cos": 0.9999655841119016,
+            "harmonic_sin": -0.008296420417478845,
             "end_frame": 17,
             "bank_max_deg": 0
           }
@@ -55,8 +59,8 @@
           ],
           "upper": "R12_Walk_Rifle_Upper",
           "motion": {
-            "harmonic_cos": -0.9999655841119016,
-            "harmonic_sin": 0.008296420417478845,
+            "harmonic_cos": 0.9999655841119016,
+            "harmonic_sin": -0.008296420417478845,
             "end_frame": 17,
             "bank_max_deg": 0
           }
@@ -70,8 +74,8 @@
           ],
           "upper": "R12_Walk_Shotgun_Upper",
           "motion": {
-            "harmonic_cos": -0.9999655841119016,
-            "harmonic_sin": 0.008296420417478845,
+            "harmonic_cos": 0.9999655841119016,
+            "harmonic_sin": -0.008296420417478845,
             "end_frame": 17,
             "bank_max_deg": 0
           }
@@ -92,8 +96,8 @@
           "weapons": [],
           "upper": "R12_Walk_Unarmed_Turn_Upper",
           "motion": {
-            "harmonic_cos": -0.9999655841119016,
-            "harmonic_sin": 0.008296420417478845,
+            "harmonic_cos": 0.9999655841119016,
+            "harmonic_sin": -0.008296420417478845,
             "end_frame": 456,
             "bank_max_deg": 3.6176886705721802
           }
@@ -106,8 +110,8 @@
           ],
           "upper": "R12_Walk_Pistol_Turn_Upper",
           "motion": {
-            "harmonic_cos": -0.9999655841119016,
-            "harmonic_sin": 0.008296420417478845,
+            "harmonic_cos": 0.9999655841119016,
+            "harmonic_sin": -0.008296420417478845,
             "end_frame": 456,
             "bank_max_deg": 3.6176886705721802
           }
@@ -120,8 +124,8 @@
           ],
           "upper": "R12_Walk_Rifle_Turn_Upper",
           "motion": {
-            "harmonic_cos": -0.9999655841119016,
-            "harmonic_sin": 0.008296420417478845,
+            "harmonic_cos": 0.9999655841119016,
+            "harmonic_sin": -0.008296420417478845,
             "end_frame": 456,
             "bank_max_deg": 3.6176886705721802
           }
@@ -135,8 +139,8 @@
           ],
           "upper": "R12_Walk_Shotgun_Turn_Upper",
           "motion": {
-            "harmonic_cos": -0.9999655841119016,
-            "harmonic_sin": 0.008296420417478845,
+            "harmonic_cos": 0.9999655841119016,
+            "harmonic_sin": -0.008296420417478845,
             "end_frame": 456,
             "bank_max_deg": 3.6176886705721802
           }
@@ -157,8 +161,8 @@
           "weapons": [],
           "upper": "R12_Sprint_Unarmed_Upper",
           "motion": {
-            "harmonic_cos": -0.9964246114806034,
-            "harmonic_sin": 0.08448664767718425,
+            "harmonic_cos": 0.9964246114806034,
+            "harmonic_sin": -0.08448664767718425,
             "end_frame": 14,
             "bank_max_deg": 0
           }
@@ -171,8 +175,8 @@
           ],
           "upper": "R12_Sprint_Pistol_Upper",
           "motion": {
-            "harmonic_cos": -0.9964246114806034,
-            "harmonic_sin": 0.08448664767718425,
+            "harmonic_cos": 0.9964246114806034,
+            "harmonic_sin": -0.08448664767718425,
             "end_frame": 14,
             "bank_max_deg": 0
           }
@@ -185,8 +189,8 @@
           ],
           "upper": "R12_Sprint_Rifle_Upper",
           "motion": {
-            "harmonic_cos": -0.9964246114806034,
-            "harmonic_sin": 0.08448664767718425,
+            "harmonic_cos": 0.9964246114806034,
+            "harmonic_sin": -0.08448664767718425,
             "end_frame": 14,
             "bank_max_deg": 0
           }
@@ -200,8 +204,8 @@
           ],
           "upper": "R12_Sprint_Shotgun_Upper",
           "motion": {
-            "harmonic_cos": -0.9964246114806034,
-            "harmonic_sin": 0.08448664767718425,
+            "harmonic_cos": 0.9964246114806034,
+            "harmonic_sin": -0.08448664767718425,
             "end_frame": 14,
             "bank_max_deg": 0
           }
@@ -222,8 +226,8 @@
           "weapons": [],
           "upper": "R12_Sprint_Unarmed_Turn_Upper",
           "motion": {
-            "harmonic_cos": -0.9964246114806034,
-            "harmonic_sin": 0.08448664767718425,
+            "harmonic_cos": 0.9964246114806034,
+            "harmonic_sin": -0.08448664767718425,
             "end_frame": 456,
             "bank_max_deg": 5.4265330058582695
           }
@@ -236,8 +240,8 @@
           ],
           "upper": "R12_Sprint_Pistol_Turn_Upper",
           "motion": {
-            "harmonic_cos": -0.9964246114806034,
-            "harmonic_sin": 0.08448664767718425,
+            "harmonic_cos": 0.9964246114806034,
+            "harmonic_sin": -0.08448664767718425,
             "end_frame": 456,
             "bank_max_deg": 5.4265330058582695
           }
@@ -250,8 +254,8 @@
           ],
           "upper": "R12_Sprint_Rifle_Turn_Upper",
           "motion": {
-            "harmonic_cos": -0.9964246114806034,
-            "harmonic_sin": 0.08448664767718425,
+            "harmonic_cos": 0.9964246114806034,
+            "harmonic_sin": -0.08448664767718425,
             "end_frame": 456,
             "bank_max_deg": 5.4265330058582695
           }
@@ -265,8 +269,8 @@
           ],
           "upper": "R12_Sprint_Shotgun_Turn_Upper",
           "motion": {
-            "harmonic_cos": -0.9964246114806034,
-            "harmonic_sin": 0.08448664767718425,
+            "harmonic_cos": 0.9964246114806034,
+            "harmonic_sin": -0.08448664767718425,
             "end_frame": 456,
             "bank_max_deg": 5.4265330058582695
           }
@@ -314,5 +318,24 @@
       "Sprint": "PREVIEW_ONLY_R9W4_Sprint_V3_TURN_LOWER"
     }
   },
-  "turn_preview": "Native S-curve case only, original phase and yaw; in-place direction review"
+  "turn_preview": "Native S-curve case only, original phase and yaw; in-place direction review",
+  "pistol": "Right hand only; free left arm uses the active gait swing",
+  "support_arm": {
+    "role": "independent light support, no weapon contact",
+    "drop_degrees": [
+      0,
+      4
+    ],
+    "lateral_yaw_degrees": 0.75,
+    "lag_frames": {
+      "Walk": 1.5,
+      "Sprint": 1.0
+    },
+    "straight_arm": true
+  },
+  "shoulder_fit": {
+    "each_arm_inward_m": 0.032,
+    "gun_follows_right_hand": true,
+    "mesh_width_unchanged": true
+  }
 }
