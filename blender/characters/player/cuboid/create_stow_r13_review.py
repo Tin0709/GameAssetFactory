@@ -105,4 +105,7 @@ assert all(digest(bpy.data.actions[n])==h for n,h in baseline['actions'].items()
 d={'scope':'Study/dev only; no production migration','source':'Holster_LongGun_V3_Final','source_hold_file':approved['delivery_file'],'scene':sc.name,'front_scene':front_sc.name,'actors':actors,'frames':{'ready':[1,12],'holster':[12,38],'stowed':[38,70],'review_return':[70,96]},'fps':24}
 (R13OUT/'design.json').write_text(json.dumps(d,indent=2))
 bpy.context.window.scene=sc;sc.frame_set(38)
-result={'scenes':[sc.name,front_sc.name],'actors':list(actors),'frames':d['frames'],'source_preserved':True}
+# The final clearance adaptation follows creation; keep the initial pass for comparison.
+p=BASE/'refine_stow_r13_review.py';ns={'__file__':str(p)}
+exec(compile(p.read_text(encoding='utf-8'),str(p),'exec'),ns)
+result={'scenes':[sc.name,front_sc.name],'actors':list(actors),'frames':d['frames'],'source_preserved':True,'clearance_refinement':True}

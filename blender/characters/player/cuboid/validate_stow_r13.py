@@ -37,7 +37,7 @@ for kind,a in d['actors'].items():
             if stowed is None:stowed=local
             row['stowed_matrix_drift']=max(row['stowed_matrix_drift'],max(abs(local[x][y]-stowed[x][y]) for x in range(4) for y in range(4)))
         if f==1:
-            first=pose;row['start_error']=max(max((r.pose.bones[n].location-Vector(p['location'])).length,(r.pose.bones[n].rotation_quaternion-Quaternion(p['rotation_quaternion'])).magnitude) for n,p in a['start'].items())
+            first=pose;row['start_error']=max(max((r.pose.bones[n].location-Vector(p['location'])).length,min((r.pose.bones[n].rotation_quaternion-Quaternion(p['rotation_quaternion'])).magnitude,(r.pose.bones[n].rotation_quaternion+Quaternion(p['rotation_quaternion'])).magnitude)) for n,p in a['start'].items())
         if f==109:row['loop_error']=max(abs(first[n][x][y]-pose[n][x][y]) for n in UPPER for x in range(4) for y in range(4))
     if row['head_hits'] or row['chest_hits']:fail.append(kind+' intersects head/chest')
     if row['start_error']>1e-5 or row['loop_error']>1e-5 or row['lower_error']>1e-5 or row['bend_max_deg']>.08:fail.append(kind+' pose continuity/rig invariant')

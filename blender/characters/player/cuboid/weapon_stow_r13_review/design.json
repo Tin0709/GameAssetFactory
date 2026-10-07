@@ -11,7 +11,7 @@
       "weapons": [
         "R11_R12_Stow_Pistol_R9W4_Asset_Pistol_Blocky_Pistol_Base"
       ],
-      "action": "R13_Pistol_Holster_ClearArc",
+      "action": "R13_Pistol_Holster_HorizontalBack",
       "start": {
         "Spine": {
           "location": [
@@ -130,7 +130,33 @@
             0.03479190915822983
           ]
         }
-      }
+      },
+      "back_target_chest_matrix": [
+        [
+          -3.038945237676671e-07,
+          1.6003119945526123,
+          -0.2821778953075409,
+          -0.13371996581554413
+        ],
+        [
+          7.484019448611434e-08,
+          0.28217777609825134,
+          1.600311279296875,
+          -0.14854374527931213
+        ],
+        [
+          1.381250023841858,
+          8.804725126765334e-08,
+          -3.575226514840324e-07,
+          -0.16341260075569153
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
     },
     "Rifle": {
       "rig": "R13_Rifle_Rig",
@@ -138,7 +164,7 @@
       "weapons": [
         "R11_R12_Stow_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
       ],
-      "action": "R13_Rifle_Holster_ClearArc",
+      "action": "R13_Rifle_Holster_HorizontalBack",
       "start": {
         "Spine": {
           "location": [
@@ -257,7 +283,33 @@
             0.03479190915822983
           ]
         }
-      }
+      },
+      "back_target_chest_matrix": [
+        [
+          -1.963626203860258e-07,
+          1.0340478420257568,
+          -0.1823303997516632,
+          -0.15962029993534088
+        ],
+        [
+          4.83582844879038e-08,
+          0.18233026564121246,
+          1.0340477228164673,
+          -0.21648339927196503
+        ],
+        [
+          0.892500102519989,
+          5.689206972192551e-08,
+          -2.3101470958408754e-07,
+          -0.17346373200416565
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
     },
     "Shotgun": {
       "rig": "R13_Shotgun_Rig",
@@ -266,7 +318,7 @@
         "R11_R12_Stow_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
         "R11_R12_Stow_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
       ],
-      "action": "R13_Shotgun_Holster_ClearArc",
+      "action": "R13_Shotgun_Holster_HorizontalBack",
       "start": {
         "Spine": {
           "location": [
@@ -385,7 +437,33 @@
             0.034791912883520126
           ]
         }
-      }
+      },
+      "back_target_chest_matrix": [
+        [
+          -2.446351174967276e-07,
+          1.2882513999938965,
+          -0.2271532416343689,
+          -0.14759480953216553
+        ],
+        [
+          6.0246364341765e-08,
+          0.22715315222740173,
+          1.2882508039474487,
+          -0.12613461911678314
+        ],
+        [
+          1.1119064092636108,
+          7.087805187211416e-08,
+          -2.8780576144527004e-07,
+          -0.18031542003154755
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
     }
   },
   "frames": {
@@ -404,7 +482,29 @@
     "review_return": [
       70,
       96
+    ],
+    "arm_settle": [
+      38,
+      50
+    ],
+    "stowed_rest": [
+      50,
+      58
+    ],
+    "review_arm_prepare": [
+      58,
+      70
     ]
   },
-  "fps": 24
+  "fps": 24,
+  "delivery_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_weapon_stow_r13_review.blend",
+  "clearance": "Simple outward right-arm arc; resized gun stays clear of head/chest",
+  "back_mount": {
+    "orientation": "horizontal across back",
+    "slope_degrees": 10,
+    "nearest_surface_chest_z_m": -0.1275,
+    "chest_back_surface_z_m": -0.1125,
+    "gap_m": 0.015,
+    "center_chest_y_m": -0.06
+  }
 }

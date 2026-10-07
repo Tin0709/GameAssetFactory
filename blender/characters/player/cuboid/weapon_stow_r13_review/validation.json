@@ -1,60 +1,61 @@
 {
   "passed": false,
   "failures": [
-    "Pistol pose continuity/rig invariant",
     "Pistol abrupt motion",
-    "Rifle pose continuity/rig invariant",
     "Rifle abrupt motion",
-    "Shotgun pose continuity/rig invariant",
+    "Shotgun intersects head/chest",
     "Shotgun abrupt motion"
   ],
   "actors": {
     "Pistol": {
       "head_hits": [],
       "chest_hits": [],
-      "gap_min": 0.05544599047717247,
+      "gap_min": 0.019999898921325254,
       "bend_max_deg": 0,
-      "half_frame_step_deg": 19.14637603609599,
+      "half_frame_step_deg": 13.044309791042338,
       "max_step_bone_frame": [
-        "UpperArm.R",
-        36.5
+        "WeaponCarrier",
+        32.0
       ],
-      "start_error": 2.0,
+      "start_error": 9.664351005159956e-08,
       "loop_error": 0.0,
       "lower_error": 0,
-      "grip_error_before_handoff": 6.124462067518573e-07,
+      "grip_error_before_handoff": 5.573463708001441e-07,
       "stowed_matrix_drift": 0
     },
     "Rifle": {
       "head_hits": [],
       "chest_hits": [],
-      "gap_min": 0.05962710295054985,
+      "gap_min": 0.020396089335159948,
       "bend_max_deg": 0,
-      "half_frame_step_deg": 19.14637603609599,
+      "half_frame_step_deg": 13.044309791042338,
       "max_step_bone_frame": [
-        "UpperArm.R",
-        36.5
+        "WeaponCarrier",
+        32.0
       ],
-      "start_error": 2.0,
+      "start_error": 2.4031912392474686e-07,
       "loop_error": 0.0,
       "lower_error": 0,
-      "grip_error_before_handoff": 5.198423707715686e-07,
+      "grip_error_before_handoff": 4.765032567416411e-07,
       "stowed_matrix_drift": 0
     },
     "Shotgun": {
       "head_hits": [],
-      "chest_hits": [],
-      "gap_min": 0.044488760687350526,
-      "bend_max_deg": 0,
-      "half_frame_step_deg": 19.14637603609599,
-      "max_step_bone_frame": [
-        "UpperArm.R",
-        36.5
+      "chest_hits": [
+        28.5,
+        79.5
       ],
-      "start_error": 2.0,
+      "gap_min": 0.0,
+      "bend_max_deg": 0,
+      "half_frame_step_deg": 13.044309791042338,
+      "max_step_bone_frame": [
+        "WeaponCarrier",
+        32.0
+      ],
+      "start_error": 9.730426882661117e-08,
       "loop_error": 0.0,
       "lower_error": 0,
-      "grip_error_before_handoff": 4.3349639526253914e-07,
+      "grip_error_before_handoff": 5.654378347470051e-07,
       "stowed_matrix_drift": 0
     }
   },

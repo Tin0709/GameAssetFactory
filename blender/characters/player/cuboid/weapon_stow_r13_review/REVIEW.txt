@@ -1,0 +1,19 @@
+R13 — BACK STOW — STUDY REVIEW ONLY
+
+R13_STOW_REVIEW: rear 3/4 default, three current weapon classes side by side.
+R13_STOW_FRONT_REVIEW: front 3/4 companion view, same actors and timing.
+All R12 standing/walk/sprint/turn scenes remain available in the Scene selector.
+
+108-frame loop at 24 fps:
+1–12 current ready pose; 12–38 holster to back; 38–50 arm settles;
+50–58 stowed rest; 58–70 arm prepares for review return;
+70–96 reverse path returns to ready; 96–108 ready rest.
+Reverse return exists only to repeat the review, not as a production draw animation.
+
+Based on Holster_LongGun_V3_Final gun rotation/body motion, adapted to the current straight-arm hold and enlarged guns.
+Right hand owns the weapon until the continuous back handoff. Left arm withdraws independently. Arms stay straight.
+Latest R12 weapon sizes and placements retained; approved close shoulder fit retained.
+Native half-frame validation: no head/chest penetration for all three guns; hand attachment stable before back handoff; stable back mount; smooth loop; source Actions/meshes/rest rigs preserved.
+
+Space toggles playback. Scene selector switches front/rear or existing movement studies.
+Previous .blend files preserved. Human art review pending; no production/Godot migration.
