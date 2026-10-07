@@ -1,0 +1,52 @@
+{
+  "preserved_existing_actions": 23,
+  "original_geometry_weights_bones_unchanged": true,
+  "weapon_development_file_unchanged": true,
+  "gaits": {
+    "Walk": {
+      "period_frames": 16,
+      "seconds": 0.6666666666666666,
+      "samples": 257,
+      "min_leg_bottom_m": 0.005998030149906963,
+      "minimum_of_both_feet_range_m": [
+        0.005998030149906963,
+        0.0400000052619629
+      ],
+      "head_vertical_excursion_m": 0.04467320442199707,
+      "hips_vertical_excursion_m": 0.04390144348144531,
+      "head_orientation_from_rest_deg_range": [
+        0.659675998460816,
+        1.0210481806763796
+      ],
+      "root_basis_error": 0,
+      "endpoint_curve_error": 0.0,
+      "seam_slope_error": 2.9224897409030337e-07,
+      "inset_body_box_overlaps": [],
+      "scale_tracks": 0,
+      "weapon_tracks": 0
+    },
+    "Sprint": {
+      "period_frames": 13,
+      "seconds": 0.5416666666666666,
+      "samples": 209,
+      "min_leg_bottom_m": 0.00599595185977142,
+      "minimum_of_both_feet_range_m": [
+        0.00599595185977142,
+        0.06599998034572518
+      ],
+      "head_vertical_excursion_m": 0.1005932092666626,
+      "hips_vertical_excursion_m": 0.09701669216156006,
+      "head_orientation_from_rest_deg_range": [
+        1.5875378805783018,
+        2.257651582029661
+      ],
+      "root_basis_error": 0,
+      "endpoint_curve_error": 0.0,
+      "seam_slope_error": 4.4270207807950435e-07,
+      "inset_body_box_overlaps": [],
+      "scale_tracks": 0,
+      "weapon_tracks": 0
+    }
+  },
+  "comparison_rig_curve_evaluation_error": 0.0
+}

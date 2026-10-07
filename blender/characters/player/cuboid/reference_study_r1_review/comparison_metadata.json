@@ -1,0 +1,42 @@
+[
+  {
+    "gait": "walk",
+    "view": "front",
+    "source_take": "093249",
+    "start_source_frame": 25,
+    "preview_seconds": 1.3333333333333333,
+    "candidate_period_frames": 16,
+    "candidate_start_frame": 9,
+    "source_sampling": "nearest 30 FPS frame at 24 FPS output, no intentional speed change"
+  },
+  {
+    "gait": "walk",
+    "view": "rear",
+    "source_take": "093200",
+    "start_source_frame": 65,
+    "preview_seconds": 2.0,
+    "candidate_period_frames": 16,
+    "candidate_start_frame": 9,
+    "source_sampling": "nearest 30 FPS frame at 24 FPS output, no intentional speed change"
+  },
+  {
+    "gait": "sprint",
+    "view": "front",
+    "source_take": "093249",
+    "start_source_frame": 90,
+    "preview_seconds": 2.0,
+    "candidate_period_frames": 13,
+    "candidate_start_frame": 1,
+    "source_sampling": "nearest 30 FPS frame at 24 FPS output, no intentional speed change"
+  },
+  {
+    "gait": "sprint",
+    "view": "rear",
+    "source_take": "093200",
+    "start_source_frame": 205,
+    "preview_seconds": 2.0,
+    "candidate_period_frames": 13,
+    "candidate_start_frame": 1,
+    "source_sampling": "nearest 30 FPS frame at 24 FPS output, no intentional speed change"
+  }
+]

@@ -1,0 +1,53 @@
+{
+  "093200": {
+    "file": "Screen Recording 2026-10-07 093200.mp4",
+    "fps": 30.0,
+    "nframes": 421,
+    "w": 288,
+    "h": 400
+  },
+  "093249": {
+    "file": "Screen Recording 2026-10-07 093249.mp4",
+    "fps": 30.0,
+    "nframes": 271,
+    "w": 322,
+    "h": 538
+  },
+  "analysis": {
+    "time_convention": "source video frame numbers zero-based; seconds = frame/30",
+    "separate_takes": true,
+    "cadence_estimates": {
+      "slower_cycle_seconds": [
+        0.6333333333333333,
+        0.6666666666666666
+      ],
+      "faster_cycle_seconds": [
+        0.5333333333333333,
+        0.5666666666666667
+      ]
+    },
+    "cadence_method": "ordered-frame comparison plus lagged character-pixel differences; approximate periodicity, not contact detection",
+    "windows_seconds": {
+      "rear_slower": [
+        1.9,
+        5.8
+      ],
+      "rear_faster": [
+        6.5,
+        11.2
+      ],
+      "front_slower": [
+        0.2,
+        2.4
+      ],
+      "front_faster": [
+        3.0,
+        7.5
+      ]
+    },
+    "source_sha256": {
+      "Screen Recording 2026-10-07 093249.mp4": "e8c2956dbac9b3fd4d365b94db68513991ef615fb065dc9ed1cfdd032713eb68",
+      "Screen Recording 2026-10-07 093200.mp4": "a97527ff90b7d0984bf81ebe8d0c779c4ae796aafdd81735adf45118869208e9"
+    }
+  }
+}
