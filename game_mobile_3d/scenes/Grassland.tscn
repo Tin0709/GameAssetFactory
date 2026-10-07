@@ -1,0 +1,77 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/grassland.gd" id="map"]
+[ext_resource type="PackedScene" path="res://scenes/characters/CuboidPlayer.tscn" id="player"]
+[ext_resource type="Environment" path="res://environment/Gameplay.tres" id="environment"]
+
+[sub_resource type="BoxShape3D" id="ground"]
+size = Vector3(40, 1, 40)
+
+[node name="Grassland" type="Node3D"]
+script = ExtResource("map")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("environment")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(12, 16, 16)
+rotation_degrees = Vector3(-36.31588642394517, 36.86989764584402, 0)
+projection = 1
+size = 14.5
+near = 0.1
+far = 60.0
+current = true
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, -28, 0)
+light_color = Color(1, 0.85, 0.66, 1)
+light_energy = 1.25
+shadow_enabled = true
+shadow_bias = 0.04
+directional_shadow_mode = 0
+directional_shadow_max_distance = 36.0
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Ground" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+position = Vector3(0, 0.5, 0)
+shape = SubResource("ground")
+
+[node name="Grass" type="Node3D" parent="."]
+
+[node name="Actors" type="Node3D" parent="."]
+
+[node name="Player" parent="Actors" instance=ExtResource("player")]
+position = Vector3(0, 1.02, 0)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Help" type="Label" parent="HUD"]
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 680.0
+offset_bottom = 120.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 0.92, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.13, 0.06, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="Status" type="Label" parent="HUD"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -42.0
+offset_right = 900.0
+offset_bottom = -14.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 0.92, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.13, 0.06, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18

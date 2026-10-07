@@ -1,0 +1,55 @@
+{
+  "source": "blender\\environment\\studies\\grass_block_wind_v3\\grass_block_wind_v3.blend",
+  "source_sha256": "f1243780e7197d6b3495a43e9e19a145f5e4693bec08c8c502611ba1a2cc20be",
+  "objects": [
+    "ENV_GrassDirt_Block_1m",
+    "ENV_Grass_Full_Surface_2D",
+    "ENV_Wind_Global"
+  ],
+  "material": "ENV_Pixel_Atlas_Opaque",
+  "texture": "ENV_Atlas_64_Nearest",
+  "adjustments": [
+    "Export copy only: simplify collinear top/bottom n-gon boundary points. Same planar surface, corners, UVs and stepped side geometry."
+  ],
+  "grass_vertices": 392,
+  "grass_triangles": 294,
+  "height_rings": [
+    0,
+    0.22,
+    0.65,
+    1
+  ],
+  "wind_seconds": 4,
+  "wind_tip_x_m": 0.018,
+  "wind_tip_y_m": 0.007,
+  "grass_dirt_block_v3.glb": {
+    "triangles": 288,
+    "vertices": 174,
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "uv_layers": [
+      "UV_Atlas"
+    ],
+    "color_attributes": []
+  },
+  "grass_patch_v3.glb": {
+    "triangles": 294,
+    "vertices": 392,
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "uv_layers": [
+      "UV_Atlas",
+      "UV_Blade_Root"
+    ],
+    "color_attributes": [
+      "GRASS_BEND_DATA"
+    ]
+  },
+  "source_unchanged": true
+}

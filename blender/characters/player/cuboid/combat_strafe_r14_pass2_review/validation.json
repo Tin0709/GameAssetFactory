@@ -1,0 +1,580 @@
+{
+  "preservation": {
+    "actions": true,
+    "mesh_and_weights": true,
+    "rigs": true,
+    "V1_file": true
+  },
+  "sampling": "1/8 of a 48 FPS frame = 384 Hz; evaluated bones and original sole corners",
+  "cases": {
+    "Right": {
+      "action": "Combat_StrafeRight_V2",
+      "duration_seconds": 0.3333333333333333,
+      "leading_leg": "Leg.R",
+      "trailing_delay_seconds": 0.16666666666666666,
+      "support_segments": [
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 10.5,
+          "plant_end_frame": 16.875,
+          "centroid_xy_drift_m": 1.0192405149247667e-05,
+          "x_drift_m": 1.0192394256591797e-05,
+          "y_drift_m": 3.5390257835388184e-08,
+          "sole_corner_xy_drift_m": 0.022898361903518922,
+          "implied_stride_velocity_mps": 2.6000765259451475
+        },
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 26.5,
+          "plant_end_frame": 32.875,
+          "centroid_xy_drift_m": 1.0371218895769623e-05,
+          "x_drift_m": 1.0371208190917969e-05,
+          "y_drift_m": 3.5390257835388184e-08,
+          "sole_corner_xy_drift_m": 0.022898321231465367,
+          "implied_stride_velocity_mps": 2.600077906790027
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 2.5,
+          "plant_end_frame": 8.875,
+          "centroid_xy_drift_m": 1.0132814264442804e-05,
+          "x_drift_m": 1.0132789611816406e-05,
+          "y_drift_m": 3.725290298461914e-08,
+          "sole_corner_xy_drift_m": 0.023210287344974004,
+          "implied_stride_velocity_mps": 2.6000763634927644
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 18.5,
+          "plant_end_frame": 24.875,
+          "centroid_xy_drift_m": 1.0043407516738758e-05,
+          "x_drift_m": 1.004338264465332e-05,
+          "y_drift_m": 3.725290298461914e-08,
+          "sole_corner_xy_drift_m": 0.02321019455475013,
+          "implied_stride_velocity_mps": 2.6000758761355427
+        }
+      ],
+      "centroid_xy_slip_mm": 0.010371218895769623,
+      "sole_corner_xy_slip_mm": 23.210287344974002,
+      "x_slip_mm": 0.010371208190917969,
+      "y_slip_mm": 3.725290298461914e-05,
+      "implied_stride_velocity_mps": [
+        2.6000758761355427,
+        2.600077906790027
+      ],
+      "max_twist_deg": 1.5000052932367631,
+      "max_chest_heading_deg": 5.336085607127948e-07,
+      "floor_min_m": 0.00197040056809783,
+      "max_flight_clearance_m": 0.05499706417322159,
+      "max_FK_offset_m": 0.07898480428433756,
+      "max_leg_angle_deg": 40.00740959162115,
+      "hips_bounce_mm": 13.984441757202148,
+      "loop_value_max_error": 0.0,
+      "loop_derivative_max_error": 5.9604644775390625e-05,
+      "forbidden_tracks": []
+    },
+    "Left": {
+      "action": "Combat_StrafeLeft_V2",
+      "duration_seconds": 0.3333333333333333,
+      "leading_leg": "Leg.L",
+      "trailing_delay_seconds": 0.16666666666666666,
+      "support_segments": [
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 2.5,
+          "plant_end_frame": 8.875,
+          "centroid_xy_drift_m": 1.0132814264442804e-05,
+          "x_drift_m": 1.0132789611816406e-05,
+          "y_drift_m": 3.5390257835388184e-08,
+          "sole_corner_xy_drift_m": 0.023210287344974004,
+          "implied_stride_velocity_mps": 2.6000763634927644
+        },
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 18.5,
+          "plant_end_frame": 24.875,
+          "centroid_xy_drift_m": 1.0050858078898304e-05,
+          "x_drift_m": 1.0050833225250244e-05,
+          "y_drift_m": 3.5390257835388184e-08,
+          "sole_corner_xy_drift_m": 0.02321019455475013,
+          "implied_stride_velocity_mps": 2.6000758761355427
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 10.5,
+          "plant_end_frame": 16.875,
+          "centroid_xy_drift_m": 1.0147701713651342e-05,
+          "x_drift_m": 1.0147690773010254e-05,
+          "y_drift_m": 3.5390257835388184e-08,
+          "sole_corner_xy_drift_m": 0.02289830216641539,
+          "implied_stride_velocity_mps": 2.6000761198141613
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 26.5,
+          "plant_end_frame": 32.875,
+          "centroid_xy_drift_m": 1.0132800568546655e-05,
+          "x_drift_m": 1.0132789611816406e-05,
+          "y_drift_m": 3.5390257835388184e-08,
+          "sole_corner_xy_drift_m": 0.02289826149425573,
+          "implied_stride_velocity_mps": 2.6000761198141618
+        }
+      ],
+      "centroid_xy_slip_mm": 0.010147701713651341,
+      "sole_corner_xy_slip_mm": 23.210287344974002,
+      "x_slip_mm": 0.010147690773010254,
+      "y_slip_mm": 3.5390257835388184e-05,
+      "implied_stride_velocity_mps": [
+        2.6000758761355427,
+        2.6000763634927644
+      ],
+      "max_twist_deg": 1.5000052038031022,
+      "max_chest_heading_deg": 4.2688682312579694e-07,
+      "floor_min_m": 0.0019703260622918606,
+      "max_flight_clearance_m": 0.05499699339270592,
+      "max_FK_offset_m": 0.07898482786665681,
+      "max_leg_angle_deg": 40.00741323408682,
+      "hips_bounce_mm": 13.984441757202148,
+      "loop_value_max_error": 0.0,
+      "loop_derivative_max_error": 5.9604644775390625e-05,
+      "forbidden_tracks": []
+    },
+    "ForwardRight": {
+      "action": "Combat_StrafeForwardRight_V1",
+      "duration_seconds": 0.3333333333333333,
+      "leading_leg": "Leg.R",
+      "trailing_delay_seconds": 0.16666666666666666,
+      "support_segments": [
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 10.5,
+          "plant_end_frame": 16.875,
+          "centroid_xy_drift_m": 1.0164038146582004e-05,
+          "x_drift_m": 7.212162017822266e-06,
+          "y_drift_m": 7.16187059879303e-06,
+          "sole_corner_xy_drift_m": 0.03204346974690503,
+          "implied_stride_velocity_mps": 2.60007656655824
+        },
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 26.5,
+          "plant_end_frame": 32.875,
+          "centroid_xy_drift_m": 1.0157477932343508e-05,
+          "x_drift_m": 7.212162017822266e-06,
+          "y_drift_m": 7.152557373046875e-06,
+          "sole_corner_xy_drift_m": 0.03204345339820478,
+          "implied_stride_velocity_mps": 2.6000764853320497
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 2.5,
+          "plant_end_frame": 8.875,
+          "centroid_xy_drift_m": 1.0073184967041016e-05,
+          "x_drift_m": 7.152557373046875e-06,
+          "y_drift_m": 7.092952728271484e-06,
+          "sole_corner_xy_drift_m": 0.03282383920806945,
+          "implied_stride_velocity_mps": 2.6000755512306717
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 18.5,
+          "plant_end_frame": 24.875,
+          "centroid_xy_drift_m": 1.009028161642747e-05,
+          "x_drift_m": 7.160007953643799e-06,
+          "y_drift_m": 7.109716534614563e-06,
+          "sole_corner_xy_drift_m": 0.03282376561458697,
+          "implied_stride_velocity_mps": 2.600075957361747
+        }
+      ],
+      "centroid_xy_slip_mm": 0.010164038146582004,
+      "sole_corner_xy_slip_mm": 32.82383920806945,
+      "x_slip_mm": 0.007212162017822266,
+      "y_slip_mm": 0.00716187059879303,
+      "implied_stride_velocity_mps": [
+        2.6000755512306717,
+        2.60007656655824
+      ],
+      "max_twist_deg": 1.5000052038031022,
+      "max_chest_heading_deg": 4.2688682312579694e-07,
+      "floor_min_m": 0.0019733309745788574,
+      "max_flight_clearance_m": 0.054996974766254425,
+      "max_FK_offset_m": 0.08964330143230191,
+      "max_leg_angle_deg": 39.984781174900895,
+      "hips_bounce_mm": 13.984441757202148,
+      "loop_value_max_error": 0.0,
+      "loop_derivative_max_error": 5.9604644775390625e-05,
+      "forbidden_tracks": []
+    },
+    "ForwardLeft": {
+      "action": "Combat_StrafeForwardLeft_V1",
+      "duration_seconds": 0.3333333333333333,
+      "leading_leg": "Leg.L",
+      "trailing_delay_seconds": 0.16666666666666666,
+      "support_segments": [
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 2.5,
+          "plant_end_frame": 8.875,
+          "centroid_xy_drift_m": 1.0073184967041016e-05,
+          "x_drift_m": 7.152557373046875e-06,
+          "y_drift_m": 7.092952728271484e-06,
+          "sole_corner_xy_drift_m": 0.03282383920806945,
+          "implied_stride_velocity_mps": 2.6000755512306717
+        },
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 18.5,
+          "plant_end_frame": 24.875,
+          "centroid_xy_drift_m": 1.0103396795204002e-05,
+          "x_drift_m": 7.152557373046875e-06,
+          "y_drift_m": 7.135793566703796e-06,
+          "sole_corner_xy_drift_m": 0.032823790441322394,
+          "implied_stride_velocity_mps": 2.600076119814159
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 10.5,
+          "plant_end_frame": 16.875,
+          "centroid_xy_drift_m": 1.0132366570249824e-05,
+          "x_drift_m": 7.167458534240723e-06,
+          "y_drift_m": 7.16187059879303e-06,
+          "sole_corner_xy_drift_m": 0.03204344885689767,
+          "implied_stride_velocity_mps": 2.600076363492758
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 26.5,
+          "plant_end_frame": 32.875,
+          "centroid_xy_drift_m": 1.0199537339636355e-05,
+          "x_drift_m": 7.212162017822266e-06,
+          "y_drift_m": 7.212162017822266e-06,
+          "sole_corner_xy_drift_m": 0.03204345339820478,
+          "implied_stride_velocity_mps": 2.600076769623707
+        }
+      ],
+      "centroid_xy_slip_mm": 0.010199537339636355,
+      "sole_corner_xy_slip_mm": 32.82383920806945,
+      "x_slip_mm": 0.007212162017822266,
+      "y_slip_mm": 0.007212162017822266,
+      "implied_stride_velocity_mps": [
+        2.6000755512306717,
+        2.600076769623707
+      ],
+      "max_twist_deg": 1.5000052038031022,
+      "max_chest_heading_deg": 4.2688682312579694e-07,
+      "floor_min_m": 0.001973334699869156,
+      "max_flight_clearance_m": 0.054996978491544724,
+      "max_FK_offset_m": 0.08964330143230191,
+      "max_leg_angle_deg": 39.98479164755574,
+      "hips_bounce_mm": 13.984441757202148,
+      "loop_value_max_error": 0.0,
+      "loop_derivative_max_error": 5.9604644775390625e-05,
+      "forbidden_tracks": []
+    },
+    "BackwardRight": {
+      "action": "Combat_StrafeBackwardRight_V1",
+      "duration_seconds": 0.3333333333333333,
+      "leading_leg": "Leg.R",
+      "trailing_delay_seconds": 0.16666666666666666,
+      "support_segments": [
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 10.5,
+          "plant_end_frame": 16.875,
+          "centroid_xy_drift_m": 1.0225945618824227e-05,
+          "x_drift_m": 7.256865501403809e-06,
+          "y_drift_m": 7.204711437225342e-06,
+          "sole_corner_xy_drift_m": 0.03245552145478449,
+          "implied_stride_velocity_mps": 2.600077013302245
+        },
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 26.5,
+          "plant_end_frame": 32.875,
+          "centroid_xy_drift_m": 1.0157477932343508e-05,
+          "x_drift_m": 7.212162017822266e-06,
+          "y_drift_m": 7.152557373046875e-06,
+          "sole_corner_xy_drift_m": 0.03245551966132501,
+          "implied_stride_velocity_mps": 2.6000764853320497
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 2.5,
+          "plant_end_frame": 8.875,
+          "centroid_xy_drift_m": 1.0115243642614568e-05,
+          "x_drift_m": 7.152557373046875e-06,
+          "y_drift_m": 7.152557373046875e-06,
+          "sole_corner_xy_drift_m": 0.03280738030666218,
+          "implied_stride_velocity_mps": 2.6000758761355374
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 18.5,
+          "plant_end_frame": 24.875,
+          "centroid_xy_drift_m": 1.008377113214863e-05,
+          "x_drift_m": 7.092952728271484e-06,
+          "y_drift_m": 7.167458534240723e-06,
+          "sole_corner_xy_drift_m": 0.03280739272623197,
+          "implied_stride_velocity_mps": 2.600075957361747
+        }
+      ],
+      "centroid_xy_slip_mm": 0.010225945618824228,
+      "sole_corner_xy_slip_mm": 32.80739272623197,
+      "x_slip_mm": 0.007256865501403809,
+      "y_slip_mm": 0.007204711437225342,
+      "implied_stride_velocity_mps": [
+        2.6000758761355374,
+        2.600077013302245
+      ],
+      "max_twist_deg": 1.5000052038031022,
+      "max_chest_heading_deg": 4.2688682312579694e-07,
+      "floor_min_m": 0.001978269312530756,
+      "max_flight_clearance_m": 0.048328422009944916,
+      "max_FK_offset_m": 0.08431750586002348,
+      "max_leg_angle_deg": 40.100850221932596,
+      "hips_bounce_mm": 13.984441757202148,
+      "loop_value_max_error": 0.0,
+      "loop_derivative_max_error": 5.9604644775390625e-05,
+      "forbidden_tracks": []
+    },
+    "BackwardLeft": {
+      "action": "Combat_StrafeBackwardLeft_V1",
+      "duration_seconds": 0.3333333333333333,
+      "leading_leg": "Leg.L",
+      "trailing_delay_seconds": 0.16666666666666666,
+      "support_segments": [
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 2.5,
+          "plant_end_frame": 8.875,
+          "centroid_xy_drift_m": 1.0157477932343508e-05,
+          "x_drift_m": 7.152557373046875e-06,
+          "y_drift_m": 7.212162017822266e-06,
+          "sole_corner_xy_drift_m": 0.032807465469332026,
+          "implied_stride_velocity_mps": 2.6000762010403617
+        },
+        {
+          "foot": "Leg.R",
+          "plant_start_frame": 18.5,
+          "plant_end_frame": 24.875,
+          "centroid_xy_drift_m": 1.0175952819476664e-05,
+          "x_drift_m": 7.160007953643799e-06,
+          "y_drift_m": 7.230788469314575e-06,
+          "sole_corner_xy_drift_m": 0.032807492082621015,
+          "implied_stride_velocity_mps": 2.6000765665582404
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 10.5,
+          "plant_end_frame": 16.875,
+          "centroid_xy_drift_m": 1.0269404629562442e-05,
+          "x_drift_m": 7.286667823791504e-06,
+          "y_drift_m": 7.236376404762268e-06,
+          "sole_corner_xy_drift_m": 0.032455568084696094,
+          "implied_stride_velocity_mps": 2.600077338206927
+        },
+        {
+          "foot": "Leg.L",
+          "plant_start_frame": 26.5,
+          "plant_end_frame": 32.875,
+          "centroid_xy_drift_m": 1.0326063898787351e-05,
+          "x_drift_m": 7.331371307373047e-06,
+          "y_drift_m": 7.271766662597656e-06,
+          "sole_corner_xy_drift_m": 0.03245560395381328,
+          "implied_stride_velocity_mps": 2.6000777443377237
+        }
+      ],
+      "centroid_xy_slip_mm": 0.010326063898787352,
+      "sole_corner_xy_slip_mm": 32.80749208262102,
+      "x_slip_mm": 0.007331371307373047,
+      "y_slip_mm": 0.007271766662597656,
+      "implied_stride_velocity_mps": [
+        2.6000762010403617,
+        2.6000777443377237
+      ],
+      "max_twist_deg": 1.5000052038031022,
+      "max_chest_heading_deg": 4.2688682312579694e-07,
+      "floor_min_m": 0.001978255808353424,
+      "max_flight_clearance_m": 0.048328422009944916,
+      "max_FK_offset_m": 0.0843175058600234,
+      "max_leg_angle_deg": 40.10084999456151,
+      "hips_bounce_mm": 13.984441757202148,
+      "loop_value_max_error": 0.0,
+      "loop_derivative_max_error": 5.9604644775390625e-05,
+      "forbidden_tracks": []
+    }
+  },
+  "transitions": [
+    {
+      "scene": "R14P2_T1_Right_ForwardRight_Forward",
+      "sequence": [
+        "Right",
+        "ForwardRight",
+        "Forward"
+      ],
+      "max_twist_deg": 1.5000053999218799,
+      "floor_min_m": 0.0019703335128724575,
+      "max_world_foot_delta_per_384hz_sample_m": 0.022098326114039876,
+      "max_near_ground_foot_speed_mps": 2.0563079369276003,
+      "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
+      "max_near_ground_centroid_excursion_m": 0.13989218284058438,
+      "handoff_phases": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "scene": "R14P2_T2_Left_ForwardLeft_Forward",
+      "sequence": [
+        "Left",
+        "ForwardLeft",
+        "Forward"
+      ],
+      "max_twist_deg": 1.5000052037665386,
+      "floor_min_m": 0.0019703335128724575,
+      "max_world_foot_delta_per_384hz_sample_m": 0.023340929359294514,
+      "max_near_ground_foot_speed_mps": 1.2540712593367056,
+      "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
+      "max_near_ground_centroid_excursion_m": 0.04073020296385305,
+      "handoff_phases": [
+        0.25,
+        0.5
+      ]
+    },
+    {
+      "scene": "R14P2_T3_Right_BackwardRight_Backward",
+      "sequence": [
+        "Right",
+        "BackwardRight",
+        "Backward"
+      ],
+      "max_twist_deg": 1.5000053104882443,
+      "floor_min_m": 0.0019326681504026055,
+      "max_world_foot_delta_per_384hz_sample_m": 0.024497997060958517,
+      "max_near_ground_foot_speed_mps": 2.4149526383160627,
+      "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
+      "max_near_ground_centroid_excursion_m": 0.18995331577336316,
+      "handoff_phases": [
+        0.5,
+        0.0
+      ]
+    },
+    {
+      "scene": "R14P2_T4_Left_BackwardLeft_Backward",
+      "sequence": [
+        "Left",
+        "BackwardLeft",
+        "Backward"
+      ],
+      "max_twist_deg": 1.5000052037665386,
+      "floor_min_m": 0.0016181208193302155,
+      "max_world_foot_delta_per_384hz_sample_m": 0.022187733106553174,
+      "max_near_ground_foot_speed_mps": 4.848888754068028,
+      "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
+      "max_near_ground_centroid_excursion_m": 0.22930376758971224,
+      "handoff_phases": [
+        0.75,
+        0.5
+      ]
+    },
+    {
+      "scene": "R14P2_T5_ForwardRight_BackwardRight",
+      "sequence": [
+        "ForwardRight",
+        "BackwardRight"
+      ],
+      "max_twist_deg": 1.5000053999218799,
+      "floor_min_m": 0.001963658258318901,
+      "max_world_foot_delta_per_384hz_sample_m": 0.024077420849069907,
+      "max_near_ground_foot_speed_mps": 3.5977304727434127,
+      "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
+      "max_near_ground_centroid_excursion_m": 0.13600502662716266,
+      "handoff_phases": [
+        0.0
+      ]
+    },
+    {
+      "scene": "R14P2_T6_ForwardLeft_BackwardLeft",
+      "sequence": [
+        "ForwardLeft",
+        "BackwardLeft"
+      ],
+      "max_twist_deg": 1.5000053999218799,
+      "floor_min_m": 0.001973401755094528,
+      "max_world_foot_delta_per_384hz_sample_m": 0.02262145755060228,
+      "max_near_ground_foot_speed_mps": 1.5440286002233372,
+      "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
+      "max_near_ground_centroid_excursion_m": 0.034763871744510615,
+      "handoff_phases": [
+        0.25
+      ]
+    },
+    {
+      "scene": "R14P2_T7_ForwardRight_BackwardRight_BackwardLeft_ForwardLeft_ForwardRight",
+      "sequence": [
+        "ForwardRight",
+        "BackwardRight",
+        "BackwardLeft",
+        "ForwardLeft",
+        "ForwardRight"
+      ],
+      "max_twist_deg": 1.5000053999218799,
+      "floor_min_m": 0.001711714081466198,
+      "max_world_foot_delta_per_384hz_sample_m": 0.025060972965599563,
+      "max_near_ground_foot_speed_mps": 4.66887080844338,
+      "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
+      "max_near_ground_centroid_excursion_m": 0.3113167003524086,
+      "handoff_phases": [
+        0.5,
+        0.0,
+        0.5,
+        0.0
+      ]
+    },
+    {
+      "scene": "R14P2_T8_Forward_ForwardRight_Right",
+      "sequence": [
+        "Forward",
+        "ForwardRight",
+        "Right"
+      ],
+      "max_twist_deg": 1.5000053999218799,
+      "floor_min_m": 0.001774083822965622,
+      "max_world_foot_delta_per_384hz_sample_m": 0.024078245171710082,
+      "max_near_ground_foot_speed_mps": 5.389137762613681,
+      "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
+      "max_near_ground_centroid_excursion_m": 0.19722349477086984,
+      "handoff_phases": [
+        0.375,
+        0.0
+      ]
+    },
+    {
+      "scene": "R14P2_T9_Backward_BackwardLeft_Left",
+      "sequence": [
+        "Backward",
+        "BackwardLeft",
+        "Left"
+      ],
+      "max_twist_deg": 1.5000053826338349,
+      "floor_min_m": 0.0007009021937847137,
+      "max_world_foot_delta_per_384hz_sample_m": 0.030701876492958087,
+      "max_near_ground_foot_speed_mps": 11.789520573295906,
+      "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
+      "max_near_ground_centroid_excursion_m": 0.6846425131300261,
+      "handoff_phases": [
+        0.0,
+        0.875
+      ]
+    }
+  ],
+  "new_Combat_Strafe_Actions": [
+    "Combat_StrafeBackwardLeft_V1",
+    "Combat_StrafeBackwardRight_V1",
+    "Combat_StrafeForwardLeft_V1",
+    "Combat_StrafeForwardRight_V1",
+    "Combat_StrafeLeft_V2",
+    "Combat_StrafeRight_V2"
+  ],
+  "pass": true
+}
