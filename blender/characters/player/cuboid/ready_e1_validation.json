@@ -1,0 +1,314 @@
+{
+  "action": "LongGunReady_Loop_V1",
+  "fps": 24,
+  "cycle_frames": 32,
+  "seconds": 1.3333333333333333,
+  "key_range": [
+    1,
+    33
+  ],
+  "playback_range": [
+    1,
+    32
+  ],
+  "animated_bones": [
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "Arm.R",
+    "Arm.L",
+    "WeaponCarrier"
+  ],
+  "lower_keys": {
+    "Root": 0,
+    "Hips": 0,
+    "Leg.L": 0,
+    "Leg.R": 0
+  },
+  "scale_keys": 0,
+  "protected_actions_unchanged": [
+    "Draw_LongGun_V1",
+    "Draw_LongGun_V2",
+    "Draw_LongGun_V3_Final",
+    "Holster_LongGun_V1",
+    "Holster_LongGun_V2",
+    "Holster_LongGun_V3_Final",
+    "HolsterLongGun",
+    "Idle",
+    "Player_Idle",
+    "Player_Run_Blocky_V1",
+    "Player_Run_Blocky_V2",
+    "Player_Run_Blocky_V3",
+    "Player_Run_Blocky_V4",
+    "Player_Run_Blocky_V5",
+    "Player_Run_Blocky_V6",
+    "Player_Run_Blocky_V7_Final",
+    "Run"
+  ],
+  "geometry_weights_rest_lengths_hierarchy_unchanged": true,
+  "runtime_hold_resource_unchanged": true,
+  "seam_matrix_error": 0.0,
+  "seam_velocity": "Matched zero end/start Bezier tangents",
+  "draw_endpoint_error": 1.1920928955078125e-07,
+  "holster_start_error_at_ready_neutral": 1.1920928955078125e-07,
+  "holster_note": "Neutral is exact. Other Ready phases are bounded offsets, so arbitrary-phase exit still requires the existing transition blend; this pass does not modify it.",
+  "grip_relative_transform_max_error": 0.00013384222984313965,
+  "ranges_degrees_local_xyz": {
+    "Chest": {
+      "0": [
+        1.61340583467755,
+        2.7092079812204863
+      ],
+      "1": [
+        -4.1633866316977,
+        -3.7552495316172347
+      ],
+      "2": [
+        -0.13182063660904947,
+        0.09460442325542431
+      ]
+    },
+    "Spine": {
+      "0": [
+        -0.09000001531108286,
+        0.1800000039417393
+      ],
+      "1": [
+        -0.029999998433587676,
+        0.04500000098543482
+      ],
+      "2": [
+        -0.02800000031671026,
+        0.017999999727163266
+      ]
+    },
+    "Neck": {
+      "0": [
+        -0.6147864477707584,
+        0.3277605811860928
+      ],
+      "1": [
+        -0.1971404970660185,
+        0.13289090857569197
+      ],
+      "2": [
+        -0.08693787608752218,
+        0.12948392484032498
+      ]
+    },
+    "Head": {
+      "0": [
+        -0.1756036833133518,
+        0.09366543232710624
+      ],
+      "1": [
+        -0.0564668747456813,
+        0.03791862227054559
+      ],
+      "2": [
+        -0.0249167568758313,
+        0.03677844425156295
+      ]
+    },
+    "Arm.R": {
+      "0": [
+        51.34500110437081,
+        52.24586890494964
+      ],
+      "1": [
+        -12.920133536836921,
+        -12.813705529189782
+      ],
+      "2": [
+        26.102795639707036,
+        26.17108557857612
+      ]
+    },
+    "Arm.L": {
+      "0": [
+        56.06353825473115,
+        56.795181288433746
+      ],
+      "1": [
+        8.324976069870042,
+        8.833897733795922
+      ],
+      "2": [
+        -15.955586570980124,
+        -15.655229002228813
+      ]
+    }
+  },
+  "standalone_peak_rotation_degrees": {
+    "Spine": 0.18557482568664485,
+    "Chest": 0.9404443712291186,
+    "Neck": 0.2825484107794578,
+    "Head": 0.08846931922527276,
+    "Arm.R": 0.356082280744668,
+    "Arm.L": 0.35827357084905204,
+    "WeaponCarrier": 0.356082280744668
+  },
+  "standalone_position_peak_to_peak_m": {
+    "Spine": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Chest": [
+      0.00022626412101089954,
+      0.0013253578508738428,
+      1.430511474609375e-06
+    ],
+    "Neck": [
+      0.0012869216734543443,
+      0.008017666637897491,
+      0.0002560615539550781
+    ],
+    "Head": [
+      0.0012869216734543443,
+      0.008017666637897491,
+      0.0002560615539550781
+    ],
+    "Arm.R": [
+      0.0005489587783813477,
+      0.004277639091014862,
+      0.0003504753112792969
+    ],
+    "Arm.L": [
+      0.0010163486003875732,
+      0.001928582787513733,
+      0.0020138025283813477
+    ],
+    "WeaponCarrier": [
+      0.0014653876423835754,
+      0.00029543042182922363,
+      0.003995537757873535
+    ]
+  },
+  "lower_overlay_error": 1.1920928955078125e-07,
+  "overlays": [
+    {
+      "layer": "Idle",
+      "phase_frames": 0,
+      "variant": "Hold",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.0038410425186157227,
+        "Head": 0.003725886344909668,
+        "WeaponCarrier": 0.0015725493431091309
+      }
+    },
+    {
+      "layer": "Idle",
+      "phase_frames": 0,
+      "variant": "Ready",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.0038423538208007812,
+        "Head": 0.0038646459579467773,
+        "WeaponCarrier": 0.005498945713043213
+      }
+    },
+    {
+      "layer": "Run",
+      "phase_frames": 0,
+      "variant": "Hold",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.07791030406951904,
+        "Head": 0.07494819164276123,
+        "WeaponCarrier": 0.09907960891723633
+      }
+    },
+    {
+      "layer": "Run",
+      "phase_frames": 0,
+      "variant": "Ready",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.07802796363830566,
+        "Head": 0.07615327835083008,
+        "WeaponCarrier": 0.10296136140823364
+      }
+    },
+    {
+      "layer": "Run",
+      "phase_frames": 4,
+      "variant": "Hold",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.07536959648132324,
+        "Head": 0.07238352298736572,
+        "WeaponCarrier": 0.09840351343154907
+      }
+    },
+    {
+      "layer": "Run",
+      "phase_frames": 4,
+      "variant": "Ready",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.07549214363098145,
+        "Head": 0.07365953922271729,
+        "WeaponCarrier": 0.10229998826980591
+      }
+    },
+    {
+      "layer": "Run",
+      "phase_frames": 8,
+      "variant": "Hold",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.07791030406951904,
+        "Head": 0.07494819164276123,
+        "WeaponCarrier": 0.09907960891723633
+      }
+    },
+    {
+      "layer": "Run",
+      "phase_frames": 8,
+      "variant": "Ready",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.07802796363830566,
+        "Head": 0.07614624500274658,
+        "WeaponCarrier": 0.10295557975769043
+      }
+    },
+    {
+      "layer": "Run",
+      "phase_frames": 12,
+      "variant": "Hold",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.07536959648132324,
+        "Head": 0.07238352298736572,
+        "WeaponCarrier": 0.09840351343154907
+      }
+    },
+    {
+      "layer": "Run",
+      "phase_frames": 12,
+      "variant": "Ready",
+      "sampled_seconds": 20,
+      "inset_head_chest_hits": [],
+      "vertical_peak_to_peak_m": {
+        "Chest": 0.07549118995666504,
+        "Head": 0.07362556457519531,
+        "WeaponCarrier": 0.10229271650314331
+      }
+    }
+  ],
+  "composition_scope": "Blender preview: full locomotion body delta + Ready body delta; arms/carrier replaced. No runtime integration and no added phase damping.",
+  "runtime_files_modified": false
+}
