@@ -1,6 +1,9 @@
 extends "res://scripts/player_reference_locomotion_r6p.gd"
 ## Native saved R12/R13 Actions in the existing sole writer; lower gait untouched.
 const R13Socket=preload("res://scripts/player_weapon_socket_r13.gd")
+const R13_TRANSITION_SPEED: float=R13Socket.TRANSITION_SPEED
+const R13_ENTRY_BLEND: float=0.10/R13_TRANSITION_SPEED
+const R13_EXIT_BLEND: float=0.12/R13_TRANSITION_SPEED
 const R13_KINDS=["Pistol","Rifle","Shotgun"]
 const R13_BODY=["Spine","Chest","Neck","Head"]
 var r13_samples: Dictionary={}
@@ -29,27 +32,29 @@ func _ready() -> void:
 	var skeleton_path:=String(animation_root.get_path_to(skeleton))
 	for name: String in data.clips:
 		var source: Dictionary=data.clips[name]
-		var clip:=Animation.new();clip.resource_name=name;clip.length=source.length
+		# Retime only stow/draw, preserving native poses and all locomotion clocks.
+		var playback_speed: float=R13_TRANSITION_SPEED if name.begins_with("R13_") else 1.0
+		var clip:=Animation.new();clip.resource_name=name;clip.length=source.length/playback_speed
 		clip.loop_mode=Animation.LOOP_LINEAR if source.loop else Animation.LOOP_NONE
 		for bone_name: String in source.samples[0]:
 			var pt:=clip.add_track(Animation.TYPE_POSITION_3D);var qt:=clip.add_track(Animation.TYPE_ROTATION_3D)
 			clip.track_set_path(pt,NodePath(skeleton_path+":"+bone_name));clip.track_set_path(qt,NodePath(skeleton_path+":"+bone_name))
 			for index in source.samples.size():
 				var p: Dictionary=source.samples[index][bone_name]
-				clip.position_track_insert_key(pt,index/48.0,Vector3(p.p[0],p.p[1],p.p[2]))
-				clip.rotation_track_insert_key(qt,index/48.0,Quaternion(p.q[0],p.q[1],p.q[2],p.q[3]))
+				clip.position_track_insert_key(pt,index/48.0/playback_speed,Vector3(p.p[0],p.p[1],p.p[2]))
+				clip.rotation_track_insert_key(qt,index/48.0/playback_speed,Quaternion(p.q[0],p.q[1],p.q[2],p.q[3]))
 		library.add_animation(name,clip);r13_samples[name]=Sampler.new(clip,skeleton)
 	for name in HOLSTER_BONES:r13_mask.append(skeleton.find_bone(name))
 	_evaluate(0)
 func r13_clip_name(kind: String) -> String: return "R13_"+R13_KINDS[socket.equipped]+"_"+kind
 func has_authored_holster() -> bool: return not r13_samples.is_empty()
 func has_authored_draw() -> bool: return not r13_samples.is_empty()
-func holster_duration() -> float: return 46.0/24.0
-func draw_duration() -> float: return 46.0/24.0
+func holster_duration() -> float: return 46.0/24.0/R13_TRANSITION_SPEED
+func draw_duration() -> float: return 46.0/24.0/R13_TRANSITION_SPEED
 func holster_event_time(event: StringName) -> float:
-	return {&"HOLSTER_BEGIN":0.0,&"SUPPORT_HAND_RELEASE":10.0/24.0,&"WEAPON_BACK_CONTACT":29.4/24.0,&"HOLSTER_RELEASE":29.4/24.0,&"HOLSTER_DONE":46.0/24.0}.get(event,0.0)
+	return float({&"HOLSTER_BEGIN":0.0,&"SUPPORT_HAND_RELEASE":10.0/24.0,&"WEAPON_BACK_CONTACT":29.4/24.0,&"HOLSTER_RELEASE":29.4/24.0,&"HOLSTER_DONE":46.0/24.0}.get(event,0.0))/R13_TRANSITION_SPEED
 func draw_event_time(event: StringName) -> float:
-	return {&"DRAW_BEGIN":0.0,&"WEAPON_BACK_RELEASE":16.6/24.0,&"SUPPORT_HAND_CATCH":46.0/24.0,&"DRAW_READY":46.0/24.0}.get(event,0.0)
+	return float({&"DRAW_BEGIN":0.0,&"WEAPON_BACK_RELEASE":16.6/24.0,&"SUPPORT_HAND_CATCH":46.0/24.0,&"DRAW_READY":46.0/24.0}.get(event,0.0))/R13_TRANSITION_SPEED
 func _process(delta: float) -> void:
 	if not frozen:r13_idle_time=fposmod(r13_idle_time+delta,4.0)
 	super._process(delta)
@@ -121,20 +126,20 @@ func _evaluate(delta: float) -> void:
 	if r13_samples.is_empty():return
 	if r13_mode==&"":
 		if r13_exit_time>=0:
-			r13_exit_time=minf(r13_exit_time+delta,0.12);var blend:=smoothstep(0,0.12,r13_exit_time)
+			r13_exit_time=minf(r13_exit_time+delta,R13_EXIT_BLEND);var blend:=smoothstep(0,R13_EXIT_BLEND,r13_exit_time)
 			for index in r13_mask.size():
 				var bone:=r13_mask[index]
 				if skeleton.get_bone_name(bone)=="WeaponCarrier":continue
 				skeleton.set_bone_pose_position(bone,r13_exit_positions[index].lerp(skeleton.get_bone_pose_position(bone),blend))
 				skeleton.set_bone_pose_rotation(bone,r13_exit_rotations[index].slerp(skeleton.get_bone_pose_rotation(bone),blend).normalized())
 			if socket.current_attachment==&"hand":socket.finish_draw_mount(blend)
-			if r13_exit_time>=0.12:r13_exit_time=-1
+			if r13_exit_time>=R13_EXIT_BLEND:r13_exit_time=-1
 		return
 	if weapon_behavior==null or r13_token!=weapon_behavior.request_id or r13_weapon!=socket.equipped:r13_mode=&"";return
 	var is_draw:=r13_mode==&"Draw"
 	var time: float=minf(weapon_behavior.transition_elapsed,draw_duration())
 	var pose: RefCounted=r13_samples[r13_clip_name(String(r13_mode))]
-	var entering:=smoothstep(0,0.10,time);var exiting:=smoothstep(draw_duration()-0.12,draw_duration(),time)
+	var entering:=smoothstep(0,R13_ENTRY_BLEND,time);var exiting:=smoothstep(draw_duration()-R13_EXIT_BLEND,draw_duration(),time)
 	for index in r13_mask.size():
 		var bone:=r13_mask[index];var name:=skeleton.get_bone_name(bone)
 		var p: Vector3=pose.position(bone,time);var q: Quaternion=pose.rotation(bone,time)
@@ -162,6 +167,6 @@ func _evaluate(delta: float) -> void:
 			weapon_behavior.weapon_release_carrier_to_back(r13_token);r13_released=true
 			holster_event_log.append({"event":"HOLSTER_RELEASE","time":time,"weapon":r13_weapon,"token":r13_token})
 			holster_event.emit(&"HOLSTER_RELEASE",r13_token)
-		socket.update_transport(time,holster_event_time(&"HOLSTER_RELEASE"),holster_duration(),0.10)
+		socket.update_transport(time,holster_event_time(&"HOLSTER_RELEASE"),holster_duration(),R13_ENTRY_BLEND)
 		if time+0.000001>=holster_duration():r13_mode=&"";weapon_behavior.holster_finished(r13_token)
 func ready_context_text() -> String: return "R13 | latest native "+R13_KINDS[weapon_type]+" | active gait phase %.3f"%reference_phase

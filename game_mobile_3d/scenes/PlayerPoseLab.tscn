@@ -1,8 +1,15 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://dwhbvg4dhn8of"]
 
-[ext_resource type="Script" path="res://scripts/player_pose_lab.gd" id="lab"]
-[ext_resource type="Script" path="res://scripts/player_animation_v2.gd" id="animation"]
-[ext_resource type="PackedScene" path="res://assets/characters/player_animation_v2.glb" id="model"]
+[ext_resource type="Script" uid="uid://d4kmhh7mpmq8a" path="res://scripts/player_animation_v2.gd" id="animation"]
+[ext_resource type="Script" uid="uid://dbjbjhkkog1iq" path="res://scripts/player_pose_lab.gd" id="lab"]
+[ext_resource type="PackedScene" uid="uid://chxfkfo0oueoe" path="res://assets/characters/player_animation_v2.glb" id="model"]
+
+[sub_resource type="StandardMaterial3D" id="FloorMaterial"]
+albedo_color = Color(0.24, 0.29, 0.32, 1)
+
+[sub_resource type="PlaneMesh" id="Floor"]
+material = SubResource("FloorMaterial")
+size = Vector2(12, 12)
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1
@@ -11,69 +18,69 @@ ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_energy = 0.8
 
-[sub_resource type="StandardMaterial3D" id="FloorMaterial"]
-albedo_color = Color(0.24, 0.29, 0.32, 1)
-roughness = 1.0
-
-[sub_resource type="PlaneMesh" id="Floor"]
-material = SubResource("FloorMaterial")
-size = Vector2(12, 12)
-
 [sub_resource type="StyleBoxFlat" id="Panel"]
-bg_color = Color(0.035, 0.055, 0.07, 0.95)
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
 content_margin_bottom = 12.0
+bg_color = Color(0.035, 0.055, 0.07, 0.95)
 
-[node name="PlayerPoseLab" type="Node3D"]
+[node name="PlayerPoseLab" type="Node3D" unique_id=2053590248]
 script = ExtResource("lab")
 
-[node name="Player" type="Node3D" parent="."]
+[node name="Player" type="Node3D" parent="." unique_id=689513508]
 
-[node name="Visual" type="Node3D" parent="Player"]
+[node name="Visual" type="Node3D" parent="Player" unique_id=411624470]
 script = ExtResource("animation")
 
-[node name="Model" parent="Player/Visual" instance=ExtResource("model")]
+[node name="Model" parent="Player/Visual" unique_id=768990729 instance=ExtResource("model")]
 
-[node name="Floor" type="MeshInstance3D" parent="."]
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=1941120067]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.14013052, 0.052642822, 0.043783665)
 mesh = SubResource("Floor")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1070919513]
 environment = SubResource("Environment")
 
-[node name="KeyLight" type="DirectionalLight3D" parent="."]
-rotation_degrees = Vector3(-45, -30, 0)
+[node name="KeyLight" type="DirectionalLight3D" parent="." unique_id=874108443]
+transform = Transform3D(0.8660254, 0.35355338, -0.35355338, 0, 0.70710677, 0.70710677, 0.5, -0.6123724, 0.6123724, 0, 0, 0)
 light_energy = 1.1
 
-[node name="Camera" type="Camera3D" parent="."]
+[node name="Camera" type="Camera3D" parent="." unique_id=674828360]
 current = true
-near = 0.05
-far = 40.0
 fov = 42.0
+far = 40.0
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=83117585]
 
-[node name="Panel" type="PanelContainer" parent="HUD"]
+[node name="Panel" type="PanelContainer" parent="HUD" unique_id=658243386]
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 336.0
 offset_bottom = 560.0
 theme_override_styles/panel = SubResource("Panel")
 
-[node name="Stack" type="VBoxContainer" parent="HUD/Panel"]
+[node name="Stack" type="VBoxContainer" parent="HUD/Panel" unique_id=1754776017]
+layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Title" type="Label" parent="HUD/Panel/Stack"]
+[node name="Title" type="Label" parent="HUD/Panel/Stack" unique_id=503716303]
+layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "PLAYER POSE LAB"
 
-[node name="Status" type="Label" parent="HUD/Panel/Stack"]
+[node name="Status" type="Label" parent="HUD/Panel/Stack" unique_id=168490125]
+layout_mode = 2
 theme_override_font_sizes/font_size = 16
 
-[node name="Controls" type="VBoxContainer" parent="HUD/Panel/Stack"]
+[node name="Controls" type="VBoxContainer" parent="HUD/Panel/Stack" unique_id=670004583]
+layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="Help" type="Label" parent="HUD/Panel/Stack"]
+[node name="Help" type="Label" parent="HUD/Panel/Stack" unique_id=242457001]
+layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "RMB orbit  |  Wheel zoom\nSpace freeze  |  . step  |  N/H/Q speed\nB bounce  |  T hit  |  G auto fire\nI/W/R states  |  L/A stance  |  F shot"
+text = "RMB orbit  |  Wheel zoom
+Space freeze  |  . step  |  N/H/Q speed
+B bounce  |  T hit  |  G auto fire
+I/W/R states  |  L/A stance  |  F shot"

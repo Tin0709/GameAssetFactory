@@ -2,6 +2,7 @@ extends "res://scripts/player_weapon_socket.gd"
 ## Exact approved geometry/mounts. No legacy percentages or contact adjustments.
 const ASSETS_R13 = [preload("res://assets/characters/r13/pistol.glb"), preload("res://assets/characters/r13/rifle.glb"), preload("res://assets/characters/r13/shotgun.glb")]
 const KINDS_R13 = ["Pistol","Rifle","Shotgun"]
+const TRANSITION_SPEED: float = 5.25
 var r13_data: Dictionary
 var r13_stow_mounts: Array[Transform3D] = []
 
@@ -62,7 +63,7 @@ func update_transport(time: float, release_time: float, duration: float, blend_i
 
 func update_draw_transport(time: float, _catch: float, _ready: float) -> void:
 	if current_attachment==&"carrier":
-		instances[equipped].transform=draw_mount_entry.interpolate_with(hand_transforms[equipped],smoothstep(draw_mount_started,draw_mount_started+0.08,time))
+		instances[equipped].transform=draw_mount_entry.interpolate_with(hand_transforms[equipped],smoothstep(draw_mount_started,draw_mount_started+0.08/TRANSITION_SPEED,time))
 
 func attach_equipped(attachment: StringName) -> void:
 	prepare_stow_sockets()
