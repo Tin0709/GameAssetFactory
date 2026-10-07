@@ -1,19 +1,14 @@
-R13 — BACK STOW — STUDY REVIEW ONLY
+R13 — UPPER-BACK LONG-GUN / RIGHT-HIP PISTOL REVIEW
 
-R13_STOW_REVIEW: rear 3/4 default, three current weapon classes side by side.
-R13_STOW_FRONT_REVIEW: front 3/4 companion view, same actors and timing.
-All R12 standing/walk/sprint/turn scenes remain available in the Scene selector.
+R13_STOW_REVIEW: rear 3/4 default, all three weapons.
+R13_STOW_FRONT_REVIEW: front 3/4. R12 movement scenes retained.
 
-108-frame loop at 24 fps:
-1–12 current ready pose; 12–38 holster to back; 38–50 arm settles;
-50–58 stowed rest; 58–70 arm prepares for review return;
-70–96 reverse path returns to ready; 96–108 ready rest.
-Reverse return exists only to repeat the review, not as a production draw animation.
+Latest adjustment: rifle/shotgun visual bounding-box centre at Chest-local Y +0.05 m; torso centre is -0.05625 m. Gun centres sit 106.25 mm above torso centre. Previous stock-height cap removed.
+Rear silhouette keeps its 55-degree muzzle-down slope. The stock leans backward 12 degrees for head clearance. Nearest gun surface remains 15 mm outside the back. No weapon resizing.
+Pistol unchanged: character RIGHT hip, barrel down, exactly half its width inset into the hip as requested.
 
-Based on Holster_LongGun_V3_Final gun rotation/body motion, adapted to the current straight-arm hold and enlarged guns.
-Right hand owns the weapon until the continuous back handoff. Left arm withdraws independently. Arms stay straight.
-Latest R12 weapon sizes and placements retained; approved close shoulder fit retained.
-Native half-frame validation: no head/chest penetration for all three guns; hand attachment stable before back handoff; stable back mount; smooth loop; source Actions/meshes/rest rigs preserved.
+124-frame review loop at 24 fps: ready 1–12; stow 12–46; arm settles 46–58; stowed rest 58–66; prepare reverse 66–78; review return 78–112; ready rest 112–124. Reverse is review reset only.
+Native half-frame validation passed: full long-gun path has no head/chest penetration; pistol requested lower-hip overlap retained; stable hand attachment before handoff; stable stow; smooth loop; original Actions/meshes/rest rigs preserved.
 
-Space toggles playback. Scene selector switches front/rear or existing movement studies.
-Previous .blend files preserved. Human art review pending; no production/Godot migration.
+Space toggles playback. Scene selector changes view. Previous study files preserved.
+Study only; human visual approval pending. No production/Godot migration.
