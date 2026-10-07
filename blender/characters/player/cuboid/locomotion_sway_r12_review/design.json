@@ -346,5 +346,46 @@
       "Rifle",
       "Shotgun"
     ]
-  }
+  },
+  "idle": {
+    "scene": "R12_HOLD_ALL",
+    "actors": {
+      "Unarmed": {
+        "rig": "R12_Hold_Unarmed_Rig",
+        "mesh": "R11_R12_Hold_Unarmed_R9W1_Author_Mesh",
+        "weapons": [],
+        "upper": "R12_Hold_Unarmed_Upper"
+      },
+      "Pistol": {
+        "rig": "R12_Hold_Pistol_Rig",
+        "mesh": "R11_R12_Hold_Pistol_R9W1_Author_Mesh",
+        "weapons": [
+          "R11_R12_Hold_Pistol_R9W4_Asset_Pistol_Blocky_Pistol_Base"
+        ],
+        "upper": "R12_Hold_Pistol_Upper"
+      },
+      "Rifle": {
+        "rig": "R12_Hold_Rifle_Rig",
+        "mesh": "R11_R12_Hold_Rifle_R9W1_Author_Mesh",
+        "weapons": [
+          "R11_R12_Hold_Rifle_R9W1_Author_R8A1_Author_M4A1_Blocky_Base"
+        ],
+        "upper": "R12_Hold_Rifle_Upper"
+      },
+      "Shotgun": {
+        "rig": "R12_Hold_Shotgun_Rig",
+        "mesh": "R11_R12_Hold_Shotgun_R9W1_Author_Mesh",
+        "weapons": [
+          "R11_R12_Hold_Shotgun_R9W4_Asset_Shotgun_Shotgun_Pump",
+          "R11_R12_Hold_Shotgun_R9W4_Asset_Shotgun_Blocky_Shotgun_Base"
+        ],
+        "upper": "R12_Hold_Shotgun_Upper"
+      }
+    },
+    "frame_start": 1,
+    "frame_end": 96,
+    "loop": true,
+    "scope": "Same close shoulders, single-hand pistol and lateral long-gun placement at rest"
+  },
+  "delivery_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_locomotion_sway_r12_study.blend"
 }

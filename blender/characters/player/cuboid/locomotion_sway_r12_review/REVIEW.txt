@@ -1,0 +1,18 @@
+R12 — UNIVERSAL LOCOMOTION SWAY / STUDY ONLY
+
+Review scenes:
+R12_WALK_ALL — original 16-frame Walk
+R12_SPRINT_ALL — original 13-frame Sprint
+R12_WALK_TURN_ALL / R12_SPRINT_TURN_ALL — native S-curve case, original gait phase and heading, in-place review (frames 145–240)
+R12_HOLD_ALL — living idle pose
+
+Every scene includes Unarmed, Pistol, Rifle and Shotgun.
+Torso retains original vertical bob; adds gentle fore/aft rock and same-side shoulder lead from actual gait phase. Torso leans smoothly into turns.
+Right arm owns all guns. Pistol uses one hand; left arm swings freely. Rifle/shotgun left arms swing independently, lightly delayed, without touching the weapon.
+Slim shoulders moved inward 32 mm to close the previous mesh gap; arm widths unchanged.
+Rifle/shotgun shifted a further 15 mm HORIZONTALLY toward the body centre. No forward/up change in this adjustment.
+Face clearance retained: rifle 54.63 mm, shotgun 39.48 mm. Shotgun retains its requested additional 30% size.
+
+Validated all 16 moving variants; original lower gait channels match exactly. 131 original Actions, 393 mesh objects and 175 rest rigs preserved.
+Space toggles playback. Scene menu switches review modes.
+Human visual review pending; no production migration or Godot changes. Previous .blend files preserved.

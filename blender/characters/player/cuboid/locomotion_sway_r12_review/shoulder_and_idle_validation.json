@@ -1,0 +1,97 @@
+{
+  "passed": true,
+  "failures": [],
+  "contact": {
+    "Walk": {
+      "Unarmed": {
+        "shoulder_body_gap_max_m": -0.003910411409297931,
+        "head_gap_min_m": 99
+      },
+      "Pistol": {
+        "shoulder_body_gap_max_m": -0.0037947550464895174,
+        "head_gap_min_m": 0.38509680271724256
+      },
+      "Rifle": {
+        "shoulder_body_gap_max_m": -0.04309406708160113,
+        "head_gap_min_m": 0.054626808438605456
+      },
+      "Shotgun": {
+        "shoulder_body_gap_max_m": -0.04309406708160113,
+        "head_gap_min_m": 0.03948418141527965
+      }
+    },
+    "Walk_Turn": {
+      "Unarmed": {
+        "shoulder_body_gap_max_m": -0.003910397037760804,
+        "head_gap_min_m": 99
+      },
+      "Pistol": {
+        "shoulder_body_gap_max_m": -0.0037947866123581586,
+        "head_gap_min_m": 0.3850968032236127
+      },
+      "Rifle": {
+        "shoulder_body_gap_max_m": -0.043094046982177725,
+        "head_gap_min_m": 0.054626668174077464
+      },
+      "Shotgun": {
+        "shoulder_body_gap_max_m": -0.043094046982177725,
+        "head_gap_min_m": 0.0394838230173673
+      }
+    },
+    "Sprint": {
+      "Unarmed": {
+        "shoulder_body_gap_max_m": -0.003908964591240793,
+        "head_gap_min_m": 99
+      },
+      "Pistol": {
+        "shoulder_body_gap_max_m": 0.0012990138487886105,
+        "head_gap_min_m": 0.3850966914793009
+      },
+      "Rifle": {
+        "shoulder_body_gap_max_m": -0.0431180815213969,
+        "head_gap_min_m": 0.054626772763121556
+      },
+      "Shotgun": {
+        "shoulder_body_gap_max_m": -0.0431180815213969,
+        "head_gap_min_m": 0.03948417491377432
+      }
+    },
+    "Sprint_Turn": {
+      "Unarmed": {
+        "shoulder_body_gap_max_m": -0.0039089861463106335,
+        "head_gap_min_m": 99
+      },
+      "Pistol": {
+        "shoulder_body_gap_max_m": 0.0012990245218901242,
+        "head_gap_min_m": 0.38509674552548634
+      },
+      "Rifle": {
+        "shoulder_body_gap_max_m": -0.04311803370175693,
+        "head_gap_min_m": 0.05462678343234734
+      },
+      "Shotgun": {
+        "shoulder_body_gap_max_m": -0.04311803370175693,
+        "head_gap_min_m": 0.03948418022068384
+      }
+    },
+    "Hold": {
+      "Unarmed": {
+        "shoulder_body_gap_max_m": -0.0038750344517810564,
+        "head_gap_min_m": 99
+      },
+      "Pistol": {
+        "shoulder_body_gap_max_m": -0.0037594019558522263,
+        "head_gap_min_m": 0.3850968712300701
+      },
+      "Rifle": {
+        "shoulder_body_gap_max_m": -0.044351629148313754,
+        "head_gap_min_m": 0.054626909258353284
+      },
+      "Shotgun": {
+        "shoulder_body_gap_max_m": -0.044351629148313754,
+        "head_gap_min_m": 0.03948471041042978
+      }
+    }
+  },
+  "note": "Arm/chest OBB separation; negative values indicate intended shoulder overlap, positive values are a conservative separation bound."
+}
