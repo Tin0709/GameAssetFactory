@@ -1,0 +1,146 @@
+{
+  "passed": true,
+  "required_movies": 15,
+  "movies": {
+    "Rifle_Hold": {
+      "file": "Rifle_Hold_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 96,
+      "metadata_frames": 96,
+      "sha256": "be40c7801907a28e767a3572451c67bef5b95cb191c8c45e68c4a6cc1bbcf7da",
+      "loop": true
+    },
+    "Rifle_Move": {
+      "file": "Rifle_Move_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 64,
+      "metadata_frames": 64,
+      "sha256": "72048a07f18bae9beb6b55c0e2d9c440956917fea48f308ea72ebdd973542bfd",
+      "loop": true
+    },
+    "Rifle_AimAround": {
+      "file": "Rifle_AimAround_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 288,
+      "metadata_frames": 288,
+      "sha256": "e622c392f7786e9c2de76a7fa0849e48ba8e2015933f99ff96f031f1de37b088",
+      "loop": true
+    },
+    "Rifle_Turn": {
+      "file": "Rifle_Turn_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 456,
+      "metadata_frames": 456,
+      "sha256": "f30bce3eab2b811a29a756558e7554beb63abdf40c188d184694cb17c2667c3a",
+      "loop": false
+    },
+    "Rifle_Sprint": {
+      "file": "Rifle_Sprint_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 208,
+      "metadata_frames": 208,
+      "sha256": "6a18f030af53a87937bbb0831e8b71571e61537ff5e7e840a31a80535a8cc73d",
+      "loop": false
+    },
+    "Shotgun_Hold": {
+      "file": "Shotgun_Hold_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 96,
+      "metadata_frames": 96,
+      "sha256": "ae425440a99f30ab42774aa173e93be7f18c20f7136435386ced20c68a0c667e",
+      "loop": true
+    },
+    "Shotgun_Move": {
+      "file": "Shotgun_Move_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 64,
+      "metadata_frames": 64,
+      "sha256": "eff1a944383c917aa73352c5b1d6e1e3a5da29eaf2a724abdfc8b6d9389d305c",
+      "loop": true
+    },
+    "Shotgun_AimAround": {
+      "file": "Shotgun_AimAround_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 288,
+      "metadata_frames": 288,
+      "sha256": "e28195876d2ce928bac48f0eaed8f65f06d0c61b1586c93a304fc92980d5ebf3",
+      "loop": true
+    },
+    "Shotgun_Turn": {
+      "file": "Shotgun_Turn_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 456,
+      "metadata_frames": 456,
+      "sha256": "09386a2d08cb27d81e2d944c588cb6a50f4fbe05f0d576374ec4d1d292743701",
+      "loop": false
+    },
+    "Shotgun_Sprint": {
+      "file": "Shotgun_Sprint_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 208,
+      "metadata_frames": 208,
+      "sha256": "4ade6d2447088b10229d3d3c512b352eb3291795cb0cbd6d695d50038decd2a1",
+      "loop": false
+    },
+    "Pistol_Hold": {
+      "file": "Pistol_Hold_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 96,
+      "metadata_frames": 96,
+      "sha256": "74050289181344bb817f5b07ef224aeb4411a5016ffe53c99aff48cbb55971cf",
+      "loop": true
+    },
+    "Pistol_Move": {
+      "file": "Pistol_Move_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 64,
+      "metadata_frames": 64,
+      "sha256": "37f155498ccd4727d4546c7a4b4417adf7a1c0cff003bf9db9fb1f8a66577c80",
+      "loop": true
+    },
+    "Pistol_AimAround": {
+      "file": "Pistol_AimAround_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 288,
+      "metadata_frames": 288,
+      "sha256": "522fb19d8d5758ec179f9765609a8bb0dcc6a17749c18be06452e2a6533e60c2",
+      "loop": true
+    },
+    "Pistol_Turn": {
+      "file": "Pistol_Turn_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 456,
+      "metadata_frames": 456,
+      "sha256": "df7b865db9abda02213998c1f969fe80ba0ccd885494a29c67b470417fdbebcb",
+      "loop": false
+    },
+    "Pistol_Sprint": {
+      "file": "Pistol_Sprint_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 208,
+      "metadata_frames": 208,
+      "sha256": "3c785f806fe1f27259b03dc0264316e8bcd325aac947a5dfe2a0b217b4ed3df4",
+      "loop": false
+    }
+  },
+  "context_movies": {
+    "Rifle": {
+      "file": "Rifle_Turn_context_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 456,
+      "sha256": "b79caf2cd94f2c0ff9fd047d3de2fb18c1105a6b1e1ffc829f0a3d3dc21eded0"
+    },
+    "Shotgun": {
+      "file": "Shotgun_Turn_context_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 456,
+      "sha256": "5e0ea4dcc2d7490d3cbb06b6977068e80f2b790db2da2a9551219ad2768f3628"
+    },
+    "Pistol": {
+      "file": "Pistol_Turn_context_AB_24fps.mp4",
+      "fps": 24.0,
+      "decoded_frames": 456,
+      "sha256": "18a756f83b7270b77c7318f8eed2adf71a7be1eeebec90d8dd71cb626bab1d41"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "passed": false,
+  "failures": [
+    "Missing right-hand/right-eye study actions"
+  ],
+  "missing": [
+    "LongGunHold_RightEyeStudy_V1",
+    "LongGunMove_RightEyeStudy_V1",
+    "LongGunAimAround_RightEyeStudy_V1",
+    "ShotgunHold_RightEyeStudy_V1",
+    "ShotgunMove_RightEyeStudy_V1",
+    "ShotgunAimAround_RightEyeStudy_V1",
+    "PistolHold_RightEyeStudy_V1",
+    "PistolMove_RightEyeStudy_V1",
+    "PistolAimAround_RightEyeStudy_V1"
+  ]
+}

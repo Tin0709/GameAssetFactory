@@ -1,0 +1,23 @@
+{
+  "Rifle": {
+    "head_triangles_max": 0,
+    "left_depth_max_m": 0.0006076075420700794,
+    "right_gap_upper_max_m": 0.0,
+    "left_gap_upper_max_m": 0.0,
+    "root_chest_x_max": -0.06588338315486908
+  },
+  "Shotgun": {
+    "head_triangles_max": 0,
+    "left_depth_max_m": 0.0006077397256659123,
+    "right_gap_upper_max_m": 0.0,
+    "left_gap_upper_max_m": 0.0,
+    "root_chest_x_max": -0.059331558644771576
+  },
+  "Pistol": {
+    "head_triangles_max": 0,
+    "left_depth_max_m": 0.0006039058690592292,
+    "right_gap_upper_max_m": 0.0,
+    "left_gap_upper_max_m": 0.0,
+    "root_chest_x_max": -0.08312095701694489
+  }
+}

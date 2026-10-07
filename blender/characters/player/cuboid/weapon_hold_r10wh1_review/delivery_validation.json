@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "failures": [],
+  "missing": [],
+  "new_public_actions": 9,
+  "original_actions": 77,
+  "review_scenes": 15,
+  "scene": "R10WH1_REVIEW_RIFLE_AIMAROUND",
+  "frame": 73,
+  "filepath": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_weapon_hold_r10wh1_study.blend",
+  "report_embedded": true,
+  "file_images_packed": true
+}
