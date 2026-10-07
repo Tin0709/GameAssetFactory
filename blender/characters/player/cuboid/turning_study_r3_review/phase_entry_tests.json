@@ -1,0 +1,130 @@
+[
+  {
+    "gait": "Walk",
+    "direction": "Left",
+    "entry_phase": 0,
+    "phase_error": 0.0,
+    "floor_min_m": 0.0039271527421576025,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Walk",
+    "direction": "Left",
+    "entry_phase": 0.25,
+    "phase_error": 0.0,
+    "floor_min_m": 0.004681069862721099,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Walk",
+    "direction": "Left",
+    "entry_phase": 0.5,
+    "phase_error": 0.0,
+    "floor_min_m": 0.004016185089182223,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Walk",
+    "direction": "Left",
+    "entry_phase": 0.75,
+    "phase_error": 0.0,
+    "floor_min_m": 0.0040975446766857715,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Walk",
+    "direction": "Right",
+    "entry_phase": 0,
+    "phase_error": 0.0,
+    "floor_min_m": 0.004016177638601626,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Walk",
+    "direction": "Right",
+    "entry_phase": 0.25,
+    "phase_error": 0.0,
+    "floor_min_m": 0.004097552127266368,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Walk",
+    "direction": "Right",
+    "entry_phase": 0.5,
+    "phase_error": 0.0,
+    "floor_min_m": 0.00392715683997702,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Walk",
+    "direction": "Right",
+    "entry_phase": 0.75,
+    "phase_error": 0.0,
+    "floor_min_m": 0.004681076940772577,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Sprint",
+    "direction": "Left",
+    "entry_phase": 0,
+    "phase_error": 1.1102230246251565e-16,
+    "floor_min_m": 0.003230046106653006,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Sprint",
+    "direction": "Left",
+    "entry_phase": 0.25,
+    "phase_error": 2.220446049250313e-16,
+    "floor_min_m": 0.005423456442315899,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Sprint",
+    "direction": "Left",
+    "entry_phase": 0.5,
+    "phase_error": 2.220446049250313e-16,
+    "floor_min_m": 0.004006091497048558,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Sprint",
+    "direction": "Left",
+    "entry_phase": 0.75,
+    "phase_error": 2.7755575615628914e-16,
+    "floor_min_m": 0.0029081028468125325,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Sprint",
+    "direction": "Right",
+    "entry_phase": 0,
+    "phase_error": 1.1102230246251565e-16,
+    "floor_min_m": 0.004006007305488168,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Sprint",
+    "direction": "Right",
+    "entry_phase": 0.25,
+    "phase_error": 2.220446049250313e-16,
+    "floor_min_m": 0.0029080510652774727,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Sprint",
+    "direction": "Right",
+    "entry_phase": 0.5,
+    "phase_error": 2.220446049250313e-16,
+    "floor_min_m": 0.0032301265729230977,
+    "return_pose_location_error": 0.0
+  },
+  {
+    "gait": "Sprint",
+    "direction": "Right",
+    "entry_phase": 0.75,
+    "phase_error": 2.7755575615628914e-16,
+    "floor_min_m": 0.005423460912664435,
+    "return_pose_location_error": 0.0
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "action": "Walk_TurnLeft_Reference_V2",
+    "seconds": 0.6666666666666666,
+    "signed_direction": 1,
+    "added_axial_bank_deg_range": [
+      4.19298886675,
+      5.5240659477500005
+    ],
+    "hips_floor_correction_m_range": [
+      -0.005053726987328868,
+      0.016395919460916356
+    ],
+    "head_turn_bank_retained_fraction": 0.8
+  },
+  {
+    "action": "Walk_TurnRight_Reference_V2",
+    "seconds": 0.6666666666666666,
+    "signed_direction": -1,
+    "added_axial_bank_deg_range": [
+      4.19298886675,
+      5.5240659477500005
+    ],
+    "hips_floor_correction_m_range": [
+      -0.005053721119996803,
+      0.016395916055768275
+    ],
+    "head_turn_bank_retained_fraction": 0.8
+  },
+  {
+    "action": "Sprint_TurnLeft_Reference_V2",
+    "seconds": 0.5416666666666666,
+    "signed_direction": 1,
+    "added_axial_bank_deg_range": [
+      6.7907053425312505,
+      9.12992532275
+    ],
+    "hips_floor_correction_m_range": [
+      -0.010894337325222882,
+      0.023822801828682072
+    ],
+    "head_turn_bank_retained_fraction": 0.8
+  },
+  {
+    "action": "Sprint_TurnRight_Reference_V2",
+    "seconds": 0.5416666666666666,
+    "signed_direction": -1,
+    "added_axial_bank_deg_range": [
+      6.7907053425312505,
+      9.12992532275
+    ],
+    "hips_floor_correction_m_range": [
+      -0.010894334624387438,
+      0.02382284131675977
+    ],
+    "head_turn_bank_retained_fraction": 0.8
+  }
+]
