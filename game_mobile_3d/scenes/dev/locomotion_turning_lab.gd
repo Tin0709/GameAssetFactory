@@ -10,13 +10,16 @@ var path_index := 0
 var circle_radius := 6.0
 var camera_offset := Vector3(0,13,10)
 var path_label := "Manual"
-var paths := ["Sequence","CW circle","CCW circle"]
+var paths := ["Sequence","CW circle","CCW circle","Left/right reversal"]
 
 func _ready() -> void:
-	DisplayServer.window_set_title("R4-G — Locomotion Turning Lab")
+	DisplayServer.window_set_title("R5 — Locomotion Turning Lab — A/B/C review")
+	debug.label_settings=debug.label_settings.duplicate()
+	debug.label_settings.font_size=14
 	make_grid()
 	camera.position=actor.position+camera_offset;camera.look_at(actor.position+Vector3(0,0.9,0))
-	print("R4G_LAB_READY — WASD move, Shift sprint, Tab A/B, F1 HUD, Space demo, F2 path, F3 auto gait, [ ] radius, R reset")
+	actor.set_review_mode(2)
+	print("R5_LAB_READY — WASD move, Shift sprint, Tab A/B/C, F1 HUD, Space demo, F2 path, F3 auto gait, [ ] radius, R reset")
 	if "--smoke" in OS.get_cmdline_user_args(): get_tree().call_deferred("quit")
 
 func _physics_process(dt: float) -> void:
@@ -33,7 +36,10 @@ func _physics_process(dt: float) -> void:
 func auto_direction(dt: float) -> Vector3:
 	var speed: float = actor.sprint_speed if auto_sprint else actor.walk_speed
 	var rate := 0.0
-	if path_index>0:
+	if path_index==3:
+		rate=(1.0 if fmod(auto_time,6.0)<3 else -1.0)*speed/circle_radius
+		path_label="Left/right reversal r=%.1fm"%circle_radius
+	elif path_index>0:
 		rate=(-1.0 if path_index==1 else 1.0)*speed/circle_radius
 		path_label=paths[path_index]+" r=%.1fm"%circle_radius
 	else:
@@ -52,7 +58,7 @@ func auto_direction(dt: float) -> Vector3:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo: return
 	match event.physical_keycode:
-		KEY_TAB: actor.turning_enabled=not actor.turning_enabled
+		KEY_TAB: actor.set_review_mode((actor.review_mode+1)%3)
 		KEY_F1: debug.visible=not debug.visible
 		KEY_SPACE: automated=not automated;auto_heading=actor.visual.rotation.y;auto_time=0
 		KEY_F2: path_index=(path_index+1)%paths.size();auto_heading=actor.visual.rotation.y;auto_time=0
@@ -66,7 +72,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	update_debug()
 
 func update_debug() -> void:
-	debug.text="R4-G · LOCOMOTION TURNING LAB · AWAITING HUMAN REVIEW\nWASD move · Shift sprint · Tab A/B · F1 hide HUD · C close view · R reset\nSpace auto/manual · F2 sequence/CW/CCW · F3 auto Walk/Sprint · [ ] radius\n\n%s | %s | %s\nPhase %.3f · turn %+.3f (- left / + right) · yaw %+.1f°/s\nSpeed %.2f m/s · Sprint blend %.2f · cadence 1.0\n%s\n%s"%["B — TURNING BLEND" if actor.turning_enabled else "A — PATH/FACING ONLY","Sprint" if actor.sprint_weight>0.5 else "Walk",path_label if automated else "Manual",actor.phase,actor.turn_amount,rad_to_deg(actor.angular_velocity),actor.current_speed,actor.sprint_weight,actor.active_names(),"Auto radius %.1f m"%circle_radius if automated else "Release input: freeze gait pose; no idle/start/stop clip"]
+	var modes := ["A — STRAIGHT / PATH ONLY","B — V2 / ORIGINAL MAPPING","C — %s / CALIBRATED MAPPING"%("V3" if actor.candidate_use_v3 else "V2")]
+	debug.text="R5 · LOCOMOTION TURNING LAB · AWAITING HUMAN REVIEW\nWASD move · Shift sprint · Tab A/B/C · F1 hide HUD · C close view · R reset\nSpace auto/manual · F2 sequence/CW/CCW/reversal · F3 Walk/Sprint · [ ] radius\n\n%s | %s | %s\nSpeed %.2f m/s · phase %.3f · Sprint blend %.2f · cadence 1.0\nRaw yaw %+.3f rad/s (%+.1f°/s)\nB normalized %+.3f → smoothed %+.3f\nC normalized %+.3f → shaped %+.3f → smoothed %+.3f\nAPPLIED turn %+.3f (- left / + right)\nC reference %.2f rad/s · exponent %.2f · filter %.2fs\n%s\n%s"%[modes[actor.review_mode],"Sprint" if actor.sprint_weight>0.5 else "Walk",path_label if automated else "Manual",actor.current_speed,actor.phase,actor.sprint_weight,actor.angular_velocity,rad_to_deg(actor.angular_velocity),actor.raw_normalized_turn,actor.turn_amount,actor.candidate_normalized_turn,actor.candidate_shaped_turn,actor.candidate_turn_amount,actor.final_turn_value,actor.candidate_full_turn_rate,actor.candidate_response_exponent,actor.candidate_filter_seconds,actor.active_names(),"Auto radius %.1f m"%circle_radius if automated else "Release input: freeze gait pose; no idle/start/stop clip"]
 
 func make_grid() -> void:
 	var mesh := ImmediateMesh.new()

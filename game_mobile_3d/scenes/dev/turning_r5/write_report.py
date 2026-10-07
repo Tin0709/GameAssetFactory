@@ -1,0 +1,61 @@
+import json
+from pathlib import Path
+OUT=Path(__file__).resolve().parents[3]/'.validation/locomotion_r5'
+ROOT=OUT.parents[2]
+data=json.loads((OUT/'comparison_summary.json').read_text())
+lines=['PHASE R5 — DYNAMIC TURNING V3','ARTISTIC STATUS: AWAITING HUMAN REVIEW.','','1. ROOT-CAUSE MEASUREMENTS',
+'Measured first, before changing mapping or animation: 12 actual CharacterBody3D movement cases, 480 physics samples each, 60 Hz. Each case runs 1s straight, 5s curved, 2s straight recovery. Original samples are preserved in baseline_samples.json. The lab has a custom same-phase absolute-pose sampler, not an AnimationTree; final_blend is the actual value used by that sampler.',
+'Speeds remain Walk 4.25 m/s, Sprint 6.25 m/s. Mild bends are +/-0.55 rad/s; default circle radius 6m; tight circle 2.5m; S-curve commanded peak 0.8 rad/s. Reversal switches left to right at t=3.5s. Positive world-Y yaw is local left; negative animation weight selects TurnLeft. Camera does not determine sign.',
+'Absolute values below. Sustained mean is mean |blend| over t=2..6s (includes both sides of S/reversal). Times are measured from curve onset; -- means threshold not reached.',
+'Case                         raw yaw   original norm/peak/mean    remap norm/peak/mean      time >=.8 B/C   >=.9 B/C   recovery <.05 B/C']
+def time(v):return '--' if v is None else f'{v:.3f}'
+for gait in ['Walk','Sprint']:
+ for case in ['MildLeft','MildRight','DefaultCircle','TightCircle','S-curve','Reversal']:
+  n=gait+'_'+case;b=data['cases'][n]['B'];c=data['cases'][n]['C_mapping']
+  lines.append(f"{n:28} {b['raw_yaw_peak_rad_s']:.3f}    {b['normalized_peak']:.3f}/{b['final_peak']:.3f}/{b['sustained_abs_mean']:.3f}             {c['normalized_peak']:.3f}/{c['final_peak']:.3f}/{c['sustained_abs_mean']:.3f}         {time(b['seconds_to_0_8'])}/{time(c['seconds_to_0_8'])}       {time(b['seconds_to_0_9'])}/{time(c['seconds_to_0_9'])}      {b['recovery_to_0_05_s']:.3f}/{c['recovery_to_0_05_s']:.3f}")
+lines += ['', 'Diagnosis: BOTH, with runtime under-drive demonstrated first. No baseline case reached 0.9. Default Sprint only reached 0.347, so most authored body response was hidden. After the remap-only experiment, tight turns reached 1.0 but the V2 torso still moved largely as a Hips-led bank. V2 Spine + Chest added about 0.45 degrees combined; the saved same-pose renders and supplied reference showed a remaining shoulder/torso expression gap. That narrower remaining gap justified V3. This artistic judgment is provisional; it is not a claim of human approval.',
+'Original B was rerun after implementation: every recorded baseline field matched exactly across all 5,760 samples. Movement, heading, phase, speed and both mapping streams also match exactly between the remap-only and final V3 render stages.',
+'', '2. RUNTIME MAPPING CHANGE',
+'Original B: n = clamp(-actual_yaw_rate / 3.0, -1, 1); exponential smoothing tau=0.10s.',
+'Candidate C: n = clamp(-actual_yaw_rate / 1.20, -1, 1); target = sign(n)*abs(n)^1.35; identical exponential smoothing tau=0.10s. No dead zone. Values are exported on the LAB actor: candidate_full_turn_rate, candidate_response_exponent, candidate_filter_seconds. candidate_use_v3=false restores the remap-only V2 experiment.',
+'Calibration anchors came from measured paths: tiny 0.10 rad/s -> 0.035; mild 0.55 -> 0.349; medium 0.80 -> 0.578 before smoothing; default Sprint 1.042 -> 0.826; tight Walk/Sprint 1.70/2.50 -> 1.0. The exponent preserves fine response near zero while the lower reference exposes full poses on tight curves. Facing_response=12, max_yaw_rate=6, gait blend=.14s and movement speeds are untouched.',
+'Both original and candidate filters keep running during A/B/C switching. Mode changes only select the pose stream; no path, phase, facing or speed reset.',
+'', '3. TURNING V3',
+'Created only after the measured remap-only V2 review. New file: blender/characters/player/cuboid/player_locomotion_turning_v3_study.blend. All 51 existing Actions preserved inside the new study; the original V2 study file remains byte-identical.',
+'Actions: Walk_TurnLeft_Reference_V3; Walk_TurnRight_Reference_V3; Sprint_TurnLeft_Reference_V3; Sprint_TurnRight_Reference_V3.',
+'Straight bases: Walk_ReferenceStudy_V2 and Sprint_ReferenceStudy_V2. Authored periods remain 16/24s and 13/24s. Each is a sustained full-pose variant sampled on the same normalized gait clock.',
+'Walk added bank: Hips 4.14–5.26 degrees, Spine 0.75–1.05, Chest 1.14–1.66; combined 6.30–7.74. Hips support bias ~9mm with phase variation. Neck/Head together counter 0.88–1.08 degrees.',
+'Sprint added bank: Hips 6.99–9.02 degrees, Spine 1.26–1.74, Chest 2.15–3.06; combined 10.87–13.40. Hips support bias ~16mm with phase variation. Neck/Head counter 1.52–1.65 degrees; leveling is capped to respect the rigid seam.',
+'Hips retains V2 contact/down/passing/up rhythm. Spine bank lags the step wave by .08 and Chest by .18; Chest yaw also varies with the stride. Sprint has more support bias, shoulder yaw, and delayed torso response. These are authoring choices, not measurements of reference angles.',
+'Leg local channels and arm pitch/twist retain straight V2. Arms keep their cross-body rhythm, with a small phase-dependent balance roll and up to 8mm inside-arm clearance in Sprint. Hips vertical correction preserves baseline floor clearance without IK or rig edits. Root is fixed; no scale channels.',
+'Added Euler bank sums are not exact perceived world tilt. In the rendered full-turn test, signed Chest-up projection spans roughly 5.54–8.59 degrees Walk and 10.04–15.12 Sprint because the existing gait also contributes; Head projection is lower. No exact source angle match is claimed.',
+'', '4. A/B/C ARTISTIC COMPARISON',
+'A: straight V2 + existing movement/facing. B: turning V2 + original mapping. C: V3 + calibrated mapping. The local review player has a second experiment selector where C is calibrated V2, preserving the pre-V3 decision evidence.',
+'Provisional visual assessment from ordered captured frames and measured motion timing, prepared for 24 FPS / 1.0x review. Continuous human playback perception was not directly observed by the assistant.',
+'1) C is less stiff than B in the inspected circle and S-curve sequences: inward silhouette and shoulder relationship change more clearly. A remains predominantly gait plus facing rotation.',
+'2) Medium/strong turning is more readable, especially from rear/front three-quarter headings. Tiny turns intentionally remain subtle. The high lab camera foreshortens lateral bank in some headings.',
+'3) Sprint is more committed than Walk through sustained curves. It still is not physically grounded at tiny radii; that limitation is visible and should not be hidden with more bank.',
+'4) Mild Walk stays moderate: mapping settles at .349, producing only a fraction of the full 6–8 degree turn design. Default 6m Walk is .491.',
+'5) Torso life improves through delayed Spine/Chest bank and yaw. The character remains blocky; a flexible spine was not introduced.',
+'6) Shoulders support the direction and arms keep swinging, including forward presentation. No new frozen or airplane-arm pose was observed in the inspected phases.',
+'7) Head retains bob and a small counterbalance. It still inherits substantial bank because aggressive independent leveling would conflict with the cuboid seam.',
+'8) Straight recovery is gradual rather than an immediate upright switch. Mild cases fall below .05 in .267s; tight cases in .400s Walk / .433s Sprint. All bones share a smooth blend envelope with their authored relative response; this is not a new per-bone recovery solver.',
+'9) Strong reversal crosses neutral after .133s Walk / .117s Sprint and reaches opposite .8 at .283s. No forced neutral hold or gait reset. The sharp test is visibly brisk and should receive human timing review.',
+'10) No obviously excessive Walk pose in the inspected mild cases. Strong Sprint is intentionally more assertive. At 1.5m the path itself reads too tight for this rigid gait; no extra animation was added to make that stress case look natural.',
+'Minimum reasonable radius, provisional visual recommendation: about 2.5m Walk and 4m Sprint at these fixed speeds; prefer 6m Sprint for normal review. The 2.5m Sprint case remains a stress test; 1.5m exposes skating and rapid heading changes. These are judgments from the tested 1.5/2.5/4/6m samples, not validated gameplay limits.',
+'', '5. LIMITATIONS',
+'Foot sliding remains visible. Stronger bank makes the upper body intention clearer but does not reduce physical sliding; in the tightest Sprint cases the contrast with unplanted feet can make skating more noticeable. No IK, root motion, stride warping, speed or cadence changes were made.',
+'Rigid legs cannot reproduce a bent recovery shape or adapt inside/outside footholds. The fixed high camera, rigid neck seam and simple support model still differ from the supplied reference. Reference speed/radius/3D angles are not calibrated. No knees, elbows, pivots, strafing, start/stop Actions or production integration.',
+'The saved HTML review is a local file. The browser automation tool refused local-file navigation, so automated browser UI validation was not completed. Captured frames were inspected directly, file completeness checked, and the Godot lab is the primary interactive review surface.',
+'An initial sandboxed renderer/import run could not write normal Godot cache/editor directories. A permitted rerun resolved this environment issue; final import, capture and runtime validation logs contain no runtime errors. Blender reported inability to write an optional thumbnail outside the workspace; the new .blend save succeeded and was reopened for validation/export.',
+'', '6. PRESERVATION AND VALIDATION',
+'SHA-256 check: 9,470 tracked files outside the two authorized lab scripts remain byte-identical. This includes production player/controller, weapons, Draw/Holster/Ready, Run V7, original straight/turning study files and the existing V2 GLB. No project main-scene change.',
+'Blender validation: all 51 existing Action digests, geometry/weights, rest matrices, hierarchy and bone lengths preserved. Four new Actions pass endpoint and tangent seam checks; dense straight/left/right blend samples show no inset body intersections or floor penetration. Leg local channels and arm pitch/twist remain within the established V2 tolerance.',
+'Export validation: new V3 GLB matches sampled Blender matrices to <0.0001m and <0.12 degrees; no scale tracks or accumulated Root. The original live mesh/rig remains in the lab; only four V3 animation resources are read from the new test GLB.',
+'Godot runtime: 47,428 checks passed. Co-located A/B/C actors have exactly identical paths and yaw; normalized phase error ~1.13e-9. Native V2 and V3 pose checks each compare 7,020 bone samples, max position error 0.000000716m and rotation error 0.0009766rad. Tiny 0.1rad/s steering final weight .034923. Correct sign through multiple full circles. Mode switches preserve phase/path/facing.',
+'Review captures: 12 paths per experiment, 24 FPS, actual movement simulated at 120Hz with five physics steps per displayed frame. Each A/B/C triplet is captured from one shared movement snapshot. Both remap-only and final V3 stages are retained.',
+'Rollback: copy rollback/locomotion_lab_actor.gd.txt to game_mobile_3d/scenes/dev/locomotion_lab_actor.gd and rollback/locomotion_turning_lab.gd.txt to game_mobile_3d/scenes/dev/locomotion_turning_lab.gd. New study/export files may remain unused; originals need no restoration. To compare mapping alone without rollback, set candidate_use_v3=false on the isolated lab actor.',
+'Live lab launch: Godot --path game_mobile_3d --script res://scenes/dev/turning_r5/open_review.gd . Opens mode C, automated Sprint, 6m clockwise circle. Tab cycles A/B/C; F1 hides/shows data; Space auto/manual; F2 sequence/CW/CCW/reversal; F3 Walk/Sprint; [ ] radius; C closer camera; R position reset; WASD/Shift manual movement.',
+'', 'STOP: R5 study and isolated lab comparison only.', 'ARTISTIC STATUS: AWAITING HUMAN REVIEW.']
+(OUT/'R5_REPORT.txt').write_text('\n\n'.join(lines),encoding='utf-8')
+print('R5_REPORT_WRITTEN',OUT/'R5_REPORT.txt')
