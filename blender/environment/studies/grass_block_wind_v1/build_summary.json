@@ -1,0 +1,19 @@
+{
+  "blend": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\environment\\studies\\grass_block_wind_v1\\grass_block_wind_v1.blend",
+  "block_dimensions": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "grass_rest_dimensions": [
+    0.47770631313323975,
+    0.36307424306869507,
+    0.4399999976158142
+  ],
+  "asset_objects": [
+    "ENV_GrassDirt_Block_1m",
+    "ENV_Grass_Tuft_Hero",
+    "ENV_Wind_Global"
+  ],
+  "version": "5.2.2 LTS"
+}

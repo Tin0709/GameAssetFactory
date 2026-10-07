@@ -1,0 +1,107 @@
+{
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\environment\\studies\\grass_block_wind_v1\\grass_block_wind_v1.blend",
+  "blender_version": "5.2.2 LTS",
+  "objects": {
+    "ENV_GrassDirt_Block_1m": {
+      "vertices": 174,
+      "polygons": 121,
+      "triangles": 344,
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "connected_components": 1,
+      "nonmanifold_edges": 0,
+      "loose_edges": 0,
+      "zero_area_faces": 0,
+      "signed_volume_m3": 0.9799180533054959,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material_count": 1,
+      "modifier_count": 0
+    },
+    "ENV_Grass_Tuft_Hero": {
+      "vertices": 224,
+      "polygons": 196,
+      "triangles": 392,
+      "dimensions": [
+        0.47770631313323975,
+        0.36307424306869507,
+        0.4399999976158142
+      ],
+      "connected_components": 14,
+      "nonmanifold_edges": 0,
+      "loose_edges": 0,
+      "zero_area_faces": 0,
+      "signed_volume_m3": 0.0049911359576029785,
+      "location": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material_count": 1,
+      "modifier_count": 0
+    }
+  },
+  "checks": {
+    "geometry_and_exact_block_dimensions": true,
+    "clean_applied_rotation_scale": true,
+    "roots_planted_all_97_samples": true,
+    "seam_position_and_velocity_match": true,
+    "drivers_valid_and_motion_subtle": true,
+    "packed_atlas_palette_survives_reload": true,
+    "one_shared_opaque_material_packed_nearest_64_atlas": true,
+    "no_missing_image_dependencies": true
+  },
+  "wind": {
+    "duration_seconds": 4,
+    "fps": 24,
+    "playback_frames": [
+      1,
+      96
+    ],
+    "duplicate_seam_frame": 97,
+    "root_vertex_count": 56,
+    "maximum_root_displacement_m": 0,
+    "maximum_vertex_displacement_m": 0.018315115001192605,
+    "seam_position_error_m": 0.0,
+    "seam_velocity_error_m_per_frame": 8.33000234328132e-07,
+    "valid_shape_key_drivers": 4,
+    "shared_phase_expression": "2*pi*(frame-1)/96"
+  },
+  "grass_basis_dimensions_m": [
+    0.4790828078985214,
+    0.36178918182849884,
+    0.4399999976158142
+  ],
+  "packed_atlas_base_top_srgb": [
+    0.5686274766921997,
+    0.7450980544090271,
+    0.3607843220233917
+  ],
+  "all_checks_passed": true
+}

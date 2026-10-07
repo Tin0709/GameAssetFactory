@@ -1,0 +1,129 @@
+{
+  "preservation": {
+    "actions": true,
+    "meshes_weights": true,
+    "rigs": true
+  },
+  "sampling": "1/8 frame at 24 FPS, evaluated bone matrices and original rigid-weighted sole vertices",
+  "cases": {
+    "B": {
+      "max_twist_deg": 1.2996470547370909,
+      "hips_yaw_range_deg": [
+        -2.000002372166866,
+        2.000002158853469
+      ],
+      "chest_yaw_range_deg": [
+        -0.9580644637262622,
+        0.9578628374860945
+      ],
+      "floor_min_m": 0.00286733522079885,
+      "max_foot_clearance_m": 0.041000187397003174,
+      "max_support_speed_mps": 0.10587139821333483,
+      "max_support_segment_drift_m": 0.01661992633262028,
+      "max_leg_hip_offset_m": 0.03666759890570939,
+      "hips_height_range_m": [
+        0.6780009865760803,
+        0.6919988989830017
+      ],
+      "hips_lateral_range_m": [
+        -0.009999863803386688,
+        0.009999863803386688
+      ],
+      "sole_lateral_gap_min_m": 0.059043169021606445,
+      "flight_windows": {
+        "Leg.L": [
+          11.75,
+          17.25
+        ],
+        "Leg.R": [
+          1.75,
+          7.25
+        ]
+      },
+      "forbidden_tracks": [],
+      "loop_value_max_error": 0.0,
+      "loop_derivative_max_error": 7.450580596923828e-06,
+      "simultaneous_flight_samples": 0,
+      "support_horizontal_drift_m": 0.013590963557537293,
+      "support_travel_axis_range_m": 7.330067455768585e-05
+    },
+    "C": {
+      "max_twist_deg": 1.2996469771894426,
+      "hips_yaw_range_deg": [
+        -2.0000022529816444,
+        2.000002466295028
+      ],
+      "chest_yaw_range_deg": [
+        -0.9578629938092698,
+        0.958064513330619
+      ],
+      "floor_min_m": 0.0028672756161540747,
+      "max_foot_clearance_m": 0.041000012308359146,
+      "max_support_speed_mps": 0.10587057928917105,
+      "max_support_segment_drift_m": 0.016619980683159324,
+      "max_leg_hip_offset_m": 0.036667595750979734,
+      "hips_height_range_m": [
+        0.6780009865760803,
+        0.6919988989830017
+      ],
+      "hips_lateral_range_m": [
+        -0.009999863803386688,
+        0.009999863803386688
+      ],
+      "sole_lateral_gap_min_m": 0.05904315412044525,
+      "flight_windows": {
+        "Leg.L": [
+          1.75,
+          7.25
+        ],
+        "Leg.R": [
+          11.75,
+          17.25
+        ]
+      },
+      "forbidden_tracks": [],
+      "loop_value_max_error": 0.0,
+      "loop_derivative_max_error": 7.450580596923828e-06,
+      "simultaneous_flight_samples": 0,
+      "support_horizontal_drift_m": 0.013590971007999442,
+      "support_travel_axis_range_m": 7.330067455768585e-05
+    },
+    "D": {
+      "max_twist_deg": 1.2997462151625738,
+      "hips_yaw_range_deg": [
+        -2.000002372166866,
+        2.000002372166866
+      ],
+      "chest_yaw_range_deg": [
+        -0.9582125727528853,
+        0.9580644637262622
+      ],
+      "floor_min_m": 0.0027358285151422024,
+      "max_foot_clearance_m": 0.041000187397003174,
+      "max_support_speed_mps": 0.13550418802791514,
+      "max_support_segment_drift_m": 0,
+      "max_leg_hip_offset_m": 0.03668177482685553,
+      "hips_height_range_m": [
+        0.6780008673667908,
+        0.6919988989830017
+      ],
+      "hips_lateral_range_m": [
+        -0.009999863803386688,
+        0.009999863803386688
+      ],
+      "sole_lateral_gap_min_m": 0.05904316529631615,
+      "flight_windows": {
+        "Leg.L": [
+          11.75,
+          265.25
+        ],
+        "Leg.R": [
+          1.75,
+          255.25
+        ]
+      },
+      "forbidden_tracks": []
+    }
+  },
+  "pass": true
+}

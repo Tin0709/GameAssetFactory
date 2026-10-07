@@ -1,0 +1,31 @@
+GRASS BLOCK + WIND | BLENDER REVIEW v1
+
+Scope: separate study. No production assets overwritten; no Godot files touched.
+Block: ENV_GrassDirt_Block_1m, exact 1 x 1 x 1 m, bottom origin, identity transforms.
+The rim overhang is 6 mm per edge WITHIN the block bounds. Stepped grass edge reaches
+0.75-0.875 m. Geometry stays sharp, with no bevels, subdivision, or alpha surfaces.
+Grass: ENV_Grass_Tuft_Hero, 14 broad opaque rectangular blades, height 0.44 m.
+Its local root plane is Z=0; review placement is Z=1 on the block.
+One shared opaque material and packed 64 x 64 nearest-sampled atlas for both assets.
+
+PLAYBACK: frames 1-96, 24 fps, 4 seconds. Frame 97 is the mathematical duplicate
+of frame 1 and is deliberately excluded from playback. Space starts/stops playback.
+Global controller: ENV_Wind_Global["phase"] = 2*pi*(frame-1)/96.
+Four signed shape keys decompose sine/cosine motion in X and Y. Every blade root is
+unchanged. Weight is normalized blade height squared. Tip amplitude is 0.018 m in X,
+0.007 m in Y, with a slight height-dependent delay. No random time offsets or jitter.
+The WIND_HEIGHT_SQUARED vertex group documents the equivalent deformation mask.
+
+LATER GAME SYNC RECOMMENDATION (DOCUMENTATION ONLY):
+Use ONE global time/phase uniform, phase = 2*pi*global_time/4, for all grass instances.
+Apply wind in a shared world direction, anchored at local root Z=0. Use local blade
+height weight squared and a small height delay, preserving the same global phase.
+Uniform-height tuft meshes may use normalized local Y after coordinate conversion;
+for these varied-height blades preserve the per-vertex WIND_HEIGHT_SQUARED mask.
+Optional seeded amplitude variation can be +/-10%; keep phase identical by default.
+Small seeded phase offsets can be added later only if desired, never independent clocks.
+This Blender shape-key loop is a preview recipe; no runtime rig/shader is installed.
+
+REVIEW: choose camera Hero for proportions, Grass_Detail for silhouette/sway, or
+Block_Back for opposite sides. Studio collection can be hidden while inspecting.
+Human review still needed: palette, stepped rim, tuft density/scale, and sway strength.
