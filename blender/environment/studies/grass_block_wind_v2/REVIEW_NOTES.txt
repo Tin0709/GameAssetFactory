@@ -1,0 +1,50 @@
+PLAYER-REACTIVE GRASS PREPARATION | BLENDER REVIEW v2
+
+Original exact 1m block and 14-blade tuft preserved. Four height rings per blade
+(0, 0.22, 0.65, 1), 392 grass triangles, no subdivisions, no physics.
+Root vertices stay fixed. Upper vertices bend more strongly with height squared.
+One GPU-readable POINT/FLOAT_COLOR attribute: GRASS_BEND_DATA.
+R = t squared (bend mask), G = t (per-blade normalized height),
+B = blade height / 0.44m, A = 1. This mask is deformation data, not surface color.
+The current pixel material ignores it; a future custom GPU shader can read it.
+Do not multiply the atlas by this vertex color in the future grass shader.
+
+WIND REVIEW: ENV_Grass_Block_Wind_Review, 1-96 at 24fps, 4 seconds.
+One global phase, fixed roots, 1.8cm X / 0.7cm Y tip amplitude, slight height delay.
+Two prepared Player_Bend_X/Y shape keys stay zero in this hero scene.
+
+PLAYER DEMO: scene menu -> ENV_Player_Reaction_Demo, 1-192 at 24fps.
+Space plays. The blue cuboid is only a Player movement proxy.
+It walks right at 0.552m/s, then runs left at 1.38m/s.
+Walking bends tips about 5cm; running bends about 9.6cm and responds sooner.
+Both recover softly with a small authored rebound. Wind continues underneath.
+The demonstration copy uses the same topology and masks as the hero.
+This is an authored illustration of a local pass and recovery, not a simulation
+or a distance-query runtime. No enemies affect the grass. The original v1 is safe.
+
+FUTURE GODOT RECOMMENDATION ONLY:
+Final vertex displacement = shared global wind + local Player disturbance.
+Only one Player-side provider publishes world position, velocity/direction/speed,
+and a short fixed-size history of recent movement segments with timestamps.
+Use global shader uniforms and one shared grass shader; do not create per-patch
+scripts, physics bodies, or AnimationPlayers for thousands of patches.
+Evaluate squared distance from each grass root to the current or recent Player
+movement segments. Smoothstep falloff goes to zero outside a small radius.
+Combine radial push-away direction with a smaller motion-direction component.
+Walking uses a smaller amplitude and slower response; running a larger, quicker one.
+For follow-through and recovery in a stateless vertex shader, evaluate a smooth
+time envelope or damped response from the recent timestamped segments. Current
+position alone cannot describe which patches were recently disturbed after departure.
+Keep a short fixed trail (e.g. 4 recent segments), prune expired samples in the single
+Player provider, and cap total offset. Mask both wind and disturbance by R=t^2,
+with root mask exactly zero. G supports a small height-dependent response delay.
+Use continuous envelopes with zero influence at radius/age boundaries to avoid snapping.
+Use the same global wind phase across every instance. Optional seeded amplitude
+variation is okay; use no independent clocks. Convert wind/displacement between
+world and local coordinates so rotated instances keep one coherent world direction.
+Godot's up axis requires coordinate conversion from Blender Z; mask is axis-independent.
+No Godot files, shaders, export assets or runtime systems were created in this task.
+
+REVIEW: art palette, tuft scale/density, wind subtlety, and walk/run bend and rebound.
+The prepared four-ring silhouette is intentionally stylized; assess it at gameplay
+distance. A denser mesh or per-grass physics is not needed for this small bend.

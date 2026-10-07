@@ -1,0 +1,45 @@
+FULL-SURFACE 2D GRASS | BLENDER REVIEW v3
+
+Latest direction: flat leaves evenly spread across the whole block surface, moderately
+interwoven. 49 leaves on a jittered 7x7 root grid, varied angles/heights, no thickness.
+Leaf heights vary from about 0.48 to 0.70m, averaging near 0.60 of a full block.
+Four height rings per leaf (0, 0.22, 0.65, 1); only 294 triangles for the complete patch.
+Two-sided opaque material: no alpha overdraw, bevels, physics or subdivision.
+The exact 1 x 1 x 1 block is unchanged. Grass roots are local Z=0, placed at world Z=1.
+
+GPU PREPARATION:
+GRASS_BEND_DATA (POINT/FLOAT_COLOR): R=t^2, G=t, B=blade height/0.70m, A=1.
+UV_Blade_Root (second UV map / UV2): each blade's root XY encoded as (x+0.5,y+0.5).
+Decode root XY by subtracting 0.5 and transform the root to world space for proximity.
+This lets a full patch respond per blade, including leaving distant blades unaffected.
+The mask is deformation data, not albedo: the pixel material ignores vertex colors.
+Roots have R=G=0 exactly. Upper rings bend more. Both wind and disturbance use this mask.
+
+MAIN SCENE: ENV_Grass_Block_Wind_Review, wind only, 1-96 at 24fps, 4 seconds.
+Global phase = 2*pi*(frame-1)/96. Tip amplitude 1.8cm X, 0.7cm Y with small height delay.
+Player_Bend_X/Y are prepared and zero. Frame 97 is the duplicate seam, excluded.
+
+DEMO SCENE: ENV_Player_Reaction_Demo, 1-192 at 24fps, 8 seconds.
+The blue marker walks right at 0.552m/s, then runs left at 1.38m/s.
+Seven authored response columns demonstrate localized bending near the path.
+Blades beyond 0.30m sideways from the Player path receive no Player displacement.
+Walking is gentle, running is stronger/faster; both follow through and rebound softly.
+Global wind continues throughout. Bases stay fixed. This is a short authored visual
+demonstration, not a proximity-query implementation or a physics simulation.
+
+FUTURE GODOT SUPPORT (DOCUMENTATION ONLY):
+Final displacement = shared global wind + local Player disturbance, multiplied by
+the per-vertex bend mask. Only the Player supplies global position, movement/speed,
+and a short fixed history of movement segments with timestamps (e.g. 4 segments).
+A shared GPU vertex shader uses per-blade world root distance to those segments,
+smoothstep radius falloff, outward direction plus a small movement-direction push,
+speed-dependent strength/response, and a smooth time envelope for follow-through
+and recovery. Current position alone is insufficient for recovery after departure.
+Use continuous envelopes at influence/age boundaries and clamp the total bend.
+All instances use one global wind phase/direction; optional seeded amplitude variation
+can be small. No independent clocks, per-grass physics, scripts or AnimationPlayers.
+Ignore enemies. Convert Blender Z to the future engine's up axis. The mask is
+axis-independent; convert world wind vectors to each instance's local coordinates.
+
+REVIEW: density, coverage, flat-leaf silhouette, scale, colors, wind strength,
+and walk/run bend/recovery. No Godot files or runtime systems were created.

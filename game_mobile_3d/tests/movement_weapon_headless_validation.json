@@ -9,7 +9,7 @@
 	],
 	"checks": 798,
 	"failures": [],
-	"forty_zombies_wall_usec_per_frame": 2170.57777777778,
+	"forty_zombies_wall_usec_per_frame": 3247.25555555556,
 	"phone_tested": false,
 	"rendered": false,
 	"shotgun_target_damage": [
@@ -21,17 +21,17 @@
 	"weapon_1_10s": {
 		"peak_projectiles": 2,
 		"shots": 83,
-		"wall_usec_per_frame": 339.923333333333
+		"wall_usec_per_frame": 451.383333333333
 	},
-	"weapon_1_live_projectile_tick_usec": 1.672,
-	"weapon_1_shot_construct_and_free_usec": 20.43,
+	"weapon_1_live_projectile_tick_usec": 2.29,
+	"weapon_1_shot_construct_and_free_usec": 40.08,
 	"weapon_1_shots_in_2s": 16,
 	"weapon_2_10s": {
 		"peak_projectiles": 7,
 		"shots": 10,
-		"wall_usec_per_frame": 374.203333333333
+		"wall_usec_per_frame": 425.926666666667
 	},
-	"weapon_2_live_projectile_tick_usec": 11.608,
-	"weapon_2_shot_construct_and_free_usec": 63.32,
+	"weapon_2_live_projectile_tick_usec": 20.628,
+	"weapon_2_shot_construct_and_free_usec": 140.94,
 	"weapon_2_shots_in_2s": 2
 }

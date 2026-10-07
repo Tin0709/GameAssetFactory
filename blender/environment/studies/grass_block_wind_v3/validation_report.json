@@ -1,0 +1,101 @@
+{
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\environment\\studies\\grass_block_wind_v3\\grass_block_wind_v3.blend",
+  "checks": {
+    "exact_block_unchanged_and_clean_transforms": true,
+    "49_zero_thickness_segmented_two_sided_leaves": true,
+    "unequal_blade_heights_around_60_percent_block": true,
+    "full_surface_even_grid_and_gpu_masks_root_uv_valid": true,
+    "wind_seam_and_roots_verified_after_reload": true,
+    "wind_plus_player_additive_roots_fixed_far_leaves_unaffected": true,
+    "run_stronger_than_walk_and_demo_grass_returns": true,
+    "packed_atlas_palette_correct_after_reload": true
+  },
+  "geometry": {
+    "ENV_GrassDirt_Block_1m": {
+      "vertices": 174,
+      "polygons": 121,
+      "triangles": 344,
+      "components": 1,
+      "zero_area_triangles": 0,
+      "loose_edges": 0,
+      "boundary_edges": 0,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "ENV_Grass_Full_Surface_2D": {
+      "vertices": 392,
+      "polygons": 147,
+      "triangles": 294,
+      "components": 49,
+      "zero_area_triangles": 0,
+      "loose_edges": 0,
+      "boundary_edges": 392,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        0.9447963237762451,
+        0.9471172094345093,
+        0.6984238624572754
+      ]
+    }
+  },
+  "grass_basis_dimensions_m": [
+    0.9443607330322266,
+    0.9492148756980896,
+    0.6984238624572754
+  ],
+  "blade_heights_m": {
+    "minimum": 0.4807101786136627,
+    "maximum": 0.6984238624572754,
+    "mean": 0.5704109303805293
+  },
+  "wind": {
+    "duration_seconds": 4,
+    "frames": [
+      1,
+      96
+    ],
+    "fps": 24,
+    "seam_position_error_m": 0.0,
+    "seam_velocity_error_m_per_frame": 1.501712528671799e-06,
+    "maximum_root_displacement_m": 0,
+    "maximum_vertex_displacement_m": 0.018315102189385795
+  },
+  "player_demo": {
+    "duration_seconds": 8,
+    "frames": [
+      1,
+      192
+    ],
+    "walk_peak_displacement_m": 0.04954129244943981,
+    "run_peak_displacement_m": 0.08955541714287467,
+    "root_displacement_m": 0,
+    "far_blade_player_displacement_m": 0,
+    "far_blade_count": 21,
+    "wind_plus_player_additive_error_m": 0,
+    "grass_loop_seam_error_m": 0.0,
+    "method": "Authored, localized column responses; no runtime proximity simulation or Godot code."
+  },
+  "all_checks_passed": true
+}

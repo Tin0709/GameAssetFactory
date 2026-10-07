@@ -43,6 +43,9 @@ func _ready() -> void:
 				var p: Dictionary=source.samples[index][bone_name]
 				clip.position_track_insert_key(pt,index/48.0/playback_speed,Vector3(p.p[0],p.p[1],p.p[2]))
 				clip.rotation_track_insert_key(qt,index/48.0/playback_speed,Quaternion(p.q[0],p.q[1],p.q[2],p.q[3]))
+		# Versioned R15 GLB also contains the native upper clips. Keep this runtime
+		# timing layer instance-local, including the approved 5.25x stow/draw rate.
+		if library.has_animation(name):library.remove_animation(name)
 		library.add_animation(name,clip);r13_samples[name]=Sampler.new(clip,skeleton)
 	for name in HOLSTER_BONES:r13_mask.append(skeleton.find_bone(name))
 	_evaluate(0)
