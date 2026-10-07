@@ -20,7 +20,7 @@ for i,kind in enumerate(['Unarmed','Pistol','Rifle','Shotgun']):
             p.location+=rest.to_3x3().inverted()@Vector((ARM_INSET if side=='R' else -ARM_INSET,0,0))
         if kind!='Unarmed':
             p=rig.pose.bones['WeaponCarrier'];rest=p.parent.bone.matrix_local.inverted()@p.bone.matrix_local
-            p.location+=rest.to_3x3().inverted()@Vector((ARM_INSET+(LONG_GUN_CENTER_EXTRA if kind in ['Rifle','Shotgun'] else 0),0,0))
+            p.location+=rest.to_3x3().inverted()@Vector((ARM_INSET+(LONG_GUN_CENTER_EXTRA if kind in ['Rifle','Shotgun'] else 0),-PISTOL_CARRIER_DROP if kind=='Pistol' else 0,SHOTGUN_FIXED_BACK_ADVANCE if kind=='Shotgun' else 0))
         rig.pose.bones['Spine'].location.y+=.0015*math.sin(phase)
         for n in UPPER:
             p=rig.pose.bones[n];p.keyframe_insert('rotation_quaternion',frame=frame,group=n);p.keyframe_insert('location',frame=frame,group=n)
