@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/litematic_m2_map.gd" id="map"]
 [ext_resource type="PackedScene" path="res://scenes/characters/CuboidPlayer.tscn" id="player"]
-[ext_resource type="Environment" path="res://assets/environment/litematic_m2_v2/m2_dungeons_daylight_v3.tres" id="environment"]
+[ext_resource type="Environment" path="res://assets/environment/litematic_m2_v2/m2_studio_daylight_v4.tres" id="environment"]
 
 [ext_resource type="Script" path="res://scripts/litematic_m2_combat.gd" id="combat"]
 [ext_resource type="Script" path="res://scripts/litematic_m2_spawn.gd" id="spawn"]
@@ -23,24 +23,32 @@ near = 0.1
 far = 60.0
 current = true
 
+[node name="ActorFill" type="DirectionalLight3D" parent="Camera3D"]
+rotation_degrees = Vector3(15, 0, 0)
+light_color = Color(0.96, 0.97, 1, 1)
+light_energy = 0.25
+light_specular = 0.0
+light_cull_mask = 2
+shadow_enabled = false
+
 [node name="Sun" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-42, -45, 0)
-light_color = Color(1, 0.98, 0.90, 1)
-light_energy = 1.5
+light_color = Color(1, 0.96, 0.87, 1)
+light_energy = 1.25
 light_specular = 0.25
 light_angular_distance = 0.0
 shadow_enabled = true
 shadow_bias = 0.1
 shadow_normal_bias = 0.45
-shadow_opacity = 0.93
-shadow_blur = 1.2
+shadow_opacity = 0.88
+shadow_blur = 2.0
 directional_shadow_mode = 0
 directional_shadow_max_distance = 32.0
 
 [node name="StudioFill" type="DirectionalLight3D" parent="."]
-rotation_degrees = Vector3(-50.20593, 120.96375, 0)
-light_color = Color(0.68, 0.82, 1, 1)
-light_energy = 0.16
+rotation_degrees = Vector3(-35, 115, 0)
+light_color = Color(0.90, 0.94, 1, 1)
+light_energy = 0.22
 light_specular = 0.0
 shadow_enabled = false
 

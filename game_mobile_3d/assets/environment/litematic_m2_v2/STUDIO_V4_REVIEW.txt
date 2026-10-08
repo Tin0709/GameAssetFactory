@@ -1,0 +1,58 @@
+M2 STUDIO LOOK V4 — 2026-10-08
+ARTISTIC STATUS: AWAITING HUMAN REVIEW
+
+Active review scene:
+res://scenes/maps/m2_v1/LitematicMapPreview.tscn
+Open this scene in Godot and press F6. Restart an already-running scene
+to load the new lighting. The project's F5 main scene is unchanged.
+
+This pass responds to the approved Blender V3 preview and the supplied
+Dungeons screenshots. It improves the current exact map's presentation;
+it does not claim identical lighting or scenery to either reference.
+
+Rendering changes:
+- Retain the original approved V3 pixel shapes and native meshes.
+- Build a runtime copy of the atlas, reducing only grass-top contrast to
+  approximately 72% while preserving each tile's mean color and alpha.
+  Include existing padding to preserve tiling. Source PNG files stay intact.
+- Remove the previous extra green tint on vegetation and terrain.
+- Warm key: rotation (-42,-45,0), energy 1.25, color (1,.96,.87).
+- Cool fill: rotation (-35,115,0), energy .22, color (.90,.94,1).
+- Ambient energy .12; AgX contrast 1.30; saturation .94.
+- A faint camera-relative light affects actor render layer 2 only.
+  Actors retain layer 1. Collision masks and gameplay logic are unchanged.
+- Add lightweight voxel-neighbor corner occlusion to terrain vertex colors,
+  with up to 24% darkening. Geometry and UVs are unchanged.
+- Mobile renderer retained. MSAA 2x, 2048 directional shadow atlas,
+  medium PCF filtering, blur 2, opacity .88, depth/normal bias .1/.45.
+- Existing double-sided grass shadows and wind deformation are preserved.
+
+Preservation and verification:
+- 15000 logical source cells, 5448 exposed faces, 10896 terrain triangles.
+- 2500 column collision rays and 4 outside-map checks: no mismatches.
+- 512 short grass, 50 tall grass; native plant transforms/bend attributes match.
+- Walk 4.25 m/s, sprint 6.25 m/s, stone collision, manual enemy spawning,
+  all three weapon selections and wind interaction/recovery checked.
+- Original atlas regions/native export hashes, source map, main scene,
+  production player and R15 combat animation code preserved.
+- Real GPU screenshots and shadow checks use the Mobile renderer on an
+  RTX 4070 Ti SUPER in a hidden offscreen SubViewport. No desktop input.
+- Flat-ground shadow test covers gameplay, overhead and isometric views.
+- Phone performance has not been measured; shadow quality needs later
+  device testing before selecting a final mobile quality preset.
+
+Evidence, relative to repository root:
+.validation/m2_studio_v4/01_current.png                 prior version
+.validation/m2_studio_v4/07_final_same_camera.png       final same-camera render
+.validation/m2_studio_v4/rendered_review/              gameplay/movement views
+.validation/m2_studio_v4/godot_validation.json
+.validation/m2_studio_v4/look_validation.json
+.validation/m2_studio_v4/shadow_surface_validation.json
+.validation/m2_studio_v4/grass_shadow_validation.json
+.validation/m2_studio_v4/rendered_review/review_report.json
+
+Remaining artistic difference:
+The source map is a mostly flat grass field. The supplied Dungeons scene
+also uses paths, flowers, bushes, water and terrain levels to establish
+color grouping and depth. This lighting pass preserves the approved exact
+map and does not add that composition. No wider scene migration performed.

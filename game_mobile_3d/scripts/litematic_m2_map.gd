@@ -32,9 +32,13 @@ var spawn_five_button: Button
 
 func _ready() -> void:
 	process_physics_priority = 2
+	get_viewport().msaa_3d = Viewport.MSAA_2X
 	# Match the approved studio feel on Mobile using filtered shadow maps.
 	# The key's depth bias prevents flat terrain from shadowing itself.
 	RenderingServer.directional_soft_shadow_filter_set_quality(RenderingServer.SHADOW_QUALITY_SOFT_MEDIUM)
+	RenderingServer.directional_shadow_atlas_set_size(2048,true)
+	$Actors.child_entered_tree.connect(func(actor): configure_actor_lighting.call_deferred(actor))
+	for actor in $Actors.get_children(): configure_actor_lighting(actor)
 	var start := Time.get_ticks_msec()
 	runtime = JSON.parse_string(FileAccess.get_file_as_string(DATA))
 	if not validate_runtime():
@@ -60,7 +64,7 @@ func _ready() -> void:
 	reset_player()
 	setup_panel()
 	set_enemies_enabled(false)
-	$HUD/Help.text = "M2 — V3 BLOCKS / STUDIO LIGHT\nWASD move · Shift sprint · R center · V review camera\n1/2/3 weapons · 0 unequip · T spawn 1 · K spawn 5\nLIGHTING REVIEW · approved V3 texture style"
+	$HUD/Help.text = "M2 — STUDIO LOOK V4\nWASD move · Shift sprint · R center · V review camera\n1/2/3 weapons · 0 unequip · T spawn 1 · K spawn 5\nCOLOR / LIGHTING REVIEW"
 	$WorldEnvironment.environment = $WorldEnvironment.environment.duplicate()
 	$WorldEnvironment.environment.fog_enabled = false
 	build_msec = Time.get_ticks_msec()-start
@@ -106,7 +110,7 @@ func mesh_from_scene(scene: PackedScene) -> Mesh:
 func setup_materials() -> void:
 	var atlas = load(BASE+"meadow_m2_atlas.png")
 	terrain_material = StandardMaterial3D.new()
-	terrain_material.albedo_texture = atlas
+	terrain_material.albedo_texture = studio_atlas(atlas)
 	terrain_material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	terrain_material.roughness = 1.0
 	terrain_material.metallic_specular = 0.08
@@ -115,11 +119,34 @@ func setup_materials() -> void:
 	grass_material.shader = load(BASE+"m2_grass.gdshader")
 	grass_material.set_shader_parameter("atlas",atlas)
 	grass_material.set_shader_parameter("wind_direction",Vector2(1,0))
-	grass_material.set_shader_parameter("meadow_color_tint",Vector3(0.78,1.0,0.87))
+	grass_material.set_shader_parameter("meadow_color_tint",Vector3.ONE)
 	tall_grass_material = grass_material.duplicate()
 	tall_grass_material.set_shader_parameter("review_wind_gain",4.0)
 	tall_grass_material.set_shader_parameter("review_interaction_gain",3.0)
 	tall_grass_material.set_shader_parameter("review_max_bend",0.6)
+
+func configure_actor_lighting(actor: Node) -> void:
+	if not is_instance_valid(actor): return
+	# A faint camera fill affects characters only, keeping terrain contrast.
+	for mesh in actor.find_children("*","GeometryInstance3D",true,false): mesh.layers |= 2
+
+func studio_atlas(source: Texture2D) -> Texture2D:
+	# Preserve the approved pixel shapes/mean colors, but reduce the grass-top
+	# contrast at gameplay scale. Original on-disk textures remain intact.
+	var image: Image = source.get_image().duplicate()
+	for region in range(4):
+		var x0 := 2+36*region
+		var mean := Color(0,0,0,0)
+		for y in range(94,126):
+			for x in range(x0,x0+32): mean += image.get_pixel(x,y)
+		mean /= 1024.0
+		for y in range(92,128):
+			for x in range(x0-2,x0+34):
+				var original := image.get_pixel(x,y)
+				var softened := mean.lerp(original,0.72)
+				softened.a = original.a
+				image.set_pixel(x,y,softened)
+	return ImageTexture.create_from_image(image)
 
 func prepare_short_mesh(source: Mesh) -> ArrayMesh:
 	var result := ArrayMesh.new()
@@ -171,7 +198,7 @@ func build_terrain(source_cells: Dictionary, parent: Node3D) -> void:
 							tool.set_normal(normals[index])
 							tool.set_uv(terrain_uv(uv[index],p,state,direction))
 							var world_vertex := vertices[index]+Vector3(p)+Vector3(0.5,0,0.5)
-							tool.set_color(terrain_color(world_vertex,state,direction))
+							tool.set_color(terrain_contact_color(world_vertex,p,direction,source_cells))
 							tool.add_vertex(world_vertex)
 						emitted += 1
 			if emitted > 0:
@@ -194,13 +221,19 @@ func build_terrain(source_cells: Dictionary, parent: Node3D) -> void:
 		node.add_child(body)
 		if parent == $Terrain: terrain_triangles += faces.size()/3
 
-func terrain_color(vertex: Vector3, state: String, direction: Vector3i) -> Color:
-	if state != "minecraft:grass_block[snowy=false]" or direction != Vector3i.UP:
-		return Color.WHITE
-	# Broad, continuous warm/cool variation; never alter dirt or stone colors.
-	# Shared world coordinates keep the tint continuous at block boundaries.
-	var field := sin(vertex.x*0.12+sin(vertex.z*0.19))*cos(vertex.z*0.14)
-	return Color(0.70,0.95,0.93).lerp(Color(0.86,1.04,0.80),field*0.5+0.5)
+func terrain_contact_color(vertex: Vector3, owner: Vector3i, direction: Vector3i, source_cells: Dictionary) -> Color:
+	# Static voxel corner occlusion; source geometry/collision stay intact.
+	var axes := [0,2] if direction.y != 0 else ([1,2] if direction.x != 0 else [0,1])
+	var a := Vector3i.ZERO
+	var b := Vector3i.ZERO
+	a[axes[0]] = 1 if vertex[axes[0]] > owner[axes[0]]+0.5 else -1
+	b[axes[1]] = 1 if vertex[axes[1]] > owner[axes[1]]+0.5 else -1
+	var side_a: bool = source_cells.get(owner+direction+a,"") in SOLIDS
+	var side_b: bool = source_cells.get(owner+direction+b,"") in SOLIDS
+	var diagonal: bool = source_cells.get(owner+direction+a+b,"") in SOLIDS
+	var occlusion := 3 if side_a and side_b else int(side_a)+int(side_b)+int(diagonal)
+	var shade := 1.0-0.24*occlusion/3.0
+	return Color(shade,shade,shade,1.0)
 
 func terrain_uv(uv: Vector2, cell: Vector3i, state: String, direction: Vector3i) -> Vector2:
 	# The approved V3 atlas has four grass tops. Change only surface UVs;
