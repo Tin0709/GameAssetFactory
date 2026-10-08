@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-09",
+  "study": "ForestQualitySlice",
+  "art_approved": false,
+  "phone_verified": false,
+  "headless_validation": "PASS",
+  "mobile_d3d12_validation": "PASS",
+  "covered": [
+    "native GLB vertex color",
+    "A/B restoration",
+    "no grass shadow/fog",
+    "floor movement",
+    "production gun damage",
+    "wall foundations",
+    "closed exterior terrace"
+  ],
+  "profiles": "separate serial processes; user Godot editor remained open; no concurrent study render",
+  "source_checks": "blender/environment/studies/forest_canopy_v2/validation_source.json"
+}

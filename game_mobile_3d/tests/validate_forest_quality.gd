@@ -12,6 +12,16 @@ func run() -> void:
 		print("FOREST_QUALITY missing study scene")
 		quit(1)
 		return
+	for asset in ["tree_oak_a","tree_oak_b","shrub_fern","shrub_leaf"]:
+		if not ResourceLoader.exists("res://assets/environment/forest_canopy_v2/%s.glb" % asset):
+			print("FOREST_QUALITY asset not imported: " + asset)
+			quit(1)
+			return
+		var asset_root = load("res://assets/environment/forest_canopy_v2/%s.glb" % asset).instantiate()
+		for node in asset_root.find_children("*","MeshInstance3D",true,false):
+			var mat = node.mesh.surface_get_material(0)
+			check(mat.vertex_color_use_as_albedo and not mat.vertex_color_is_srgb,"Reusable asset retains linear vertex color: " + asset)
+		asset_root.free()
 	var shared_env = load("res://environment/Gameplay.tres")
 	var original_ambient: float = shared_env.ambient_light_energy
 	var level = load("res://scenes/ForestQualitySlice.tscn").instantiate()
@@ -30,6 +40,13 @@ func run() -> void:
 		for grass in level.forest_grass:
 			check(grass.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,"Grass never casts shadows")
 	check(shared_env.ambient_light_energy == original_ambient,"Shared Environment remains untouched")
+	var boundary_ray := PhysicsRayQueryParameters3D.create(Vector3(-26,1.5,-24.5),Vector3(-24,1.5,-24.5),1)
+	check(not level.get_world_3d().direct_space_state.intersect_ray(boundary_ray).is_empty(),"Exterior terrace has a closed side and collision")
+	# Probe at ankle height: the first pillar and end wall must reach their local floor.
+	for probe in [Vector3(3.7,1.15,-6.3),Vector3(6.8,1.2,-3.25)]:
+		var axis := Vector3.FORWARD if probe.x < 4.0 else Vector3.RIGHT
+		var ray := PhysicsRayQueryParameters3D.create(probe-axis*0.7,probe+axis*0.7,1)
+		check(not level.get_world_3d().direct_space_state.intersect_ray(ray).is_empty(),"Courtyard foundations touch the lower terrace: " + str(probe))
 	level.reset_player()
 	var start: Vector3 = level.player.global_position
 	Input.action_press("move_forward")

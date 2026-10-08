@@ -3,6 +3,7 @@ extends SceneTree
 var level: Node3D
 var out := "res://.validation/quality_slice"
 var stats := {}
+var default_profile_stage := 3
 func _initialize() -> void:
 	AudioServer.set_bus_mute(0,true)
 	call_deferred("run")
@@ -128,7 +129,7 @@ func sample_window(seconds: float) -> Dictionary:
 	return summary
 
 func profile() -> void:
-	var stage := 3
+	var stage := default_profile_stage
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--stage="): stage = int(arg.trim_prefix("--stage="))
 	level.set_review_stage(stage)

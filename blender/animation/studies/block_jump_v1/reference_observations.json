@@ -1,0 +1,106 @@
+{
+  "source": "C:/Users/ADMIN/Videos/Screen Recordings/Screen Recording 2026-10-09 042310.mp4",
+  "metadata": {
+    "fps": 30,
+    "frames": 491,
+    "duration_seconds": 16.366667,
+    "width": 510,
+    "height": 646
+  },
+  "observed": {
+    "type": "Rear third-person running traversal over ascending block steps and a drop onto flat ground; Minecraft UI visible, no confirmed mod identity",
+    "visual_language": [
+      "Continuous asymmetric running legs in flight",
+      "Compact arm counterbalance rather than large simultaneous arm raise",
+      "Small torso/head response",
+      "Very little visible anticipation; motion flows directly from locomotion"
+    ],
+    "first_clear_ascent_window": {
+      "frame_bounds": [
+        44,
+        62
+      ],
+      "seconds": [
+        1.466667,
+        2.066667
+      ]
+    },
+    "first_clear_drop_window": {
+      "frame_bounds": [
+        110,
+        128
+      ],
+      "seconds": [
+        3.666667,
+        4.266667
+      ]
+    },
+    "second_drop_window": {
+      "frame_bounds": [
+        406,
+        422
+      ],
+      "seconds": [
+        13.533333,
+        14.066667
+      ]
+    },
+    "uncertainty": "These are event inspection windows, not exact takeoff/contact labels. Follow-camera vertical lag, rear view, and occluded soles limit physical height/contact measurements. No 3D trajectory or precise joint angles are inferred."
+  },
+  "authoring_proposal_not_source_measurement": {
+    "source_blend": "blender/characters/player/cuboid/player_combat_strafe_r14_pass2_study.blend",
+    "clone_rig": "R12_Hold_Unarmed_Rig",
+    "clone_mesh": "R11_R12_Hold_Unarmed_R9W1_Author_Mesh",
+    "bone_names_from_saved_preservation": [
+      "Root",
+      "Hips",
+      "Spine",
+      "Chest",
+      "Neck",
+      "Head",
+      "UpperArm.L",
+      "ForeArm.L",
+      "UpperArm.R",
+      "ForeArm.R",
+      "WeaponCarrier",
+      "Leg.L",
+      "Leg.R"
+    ],
+    "actions": [
+      "BlockJump_Up_V1",
+      "BlockHop_Down_V1"
+    ],
+    "preview_fps": 24,
+    "block_height_m": 1.0,
+    "travel_policy": "Animate preview parent for world displacement; keep Root unkeyed. Body Actions supply rigid pose only.",
+    "arm_policy": "Keep original complete geometry and selected width. Maintain collinear source UpperArm/ForeArm sections, with forearm local identity rotation, for compatibility with existing whole-arm export collapse.",
+    "review_policy": "Blender study only. Native side and three-quarter views plus continuous walk-up-drop-walk preview. No GLB export or Godot integration before human artistic review.",
+    "authored_study_timing_global_frames_24fps": {
+      "up_prep": [
+        17,
+        18
+      ],
+      "up_flight": [
+        19,
+        33
+      ],
+      "up_recovery": [
+        33,
+        38
+      ],
+      "down_edge_unload": [
+        67,
+        73
+      ],
+      "down_fall": [
+        74,
+        85
+      ],
+      "down_recovery": [
+        85,
+        91
+      ]
+    },
+    "approval_status": "PENDING USER REVIEW; timing is authored proposal, not source measurement"
+  }
+}

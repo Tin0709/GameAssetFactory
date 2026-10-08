@@ -1,6 +1,6 @@
 # Hướng mỹ thuật — zombie sinh tồn khối hộp
 
-Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; bằng chứng, nguồn và cách tái hiện ở [RESEARCH.md](RESEARCH.md). **Thử nghiệm QualitySlice chưa được người dùng duyệt mỹ thuật.**
+Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; bằng chứng, nguồn và cách tái hiện ở [RESEARCH.md](RESEARCH.md). Người dùng đánh giá QualitySlice đầu chưa đạt kỳ vọng; **ForestQualitySlice mới vẫn chờ review**, không là phong cách đã duyệt.
 
 ## Điều đã được người dùng chấp nhận hoặc yêu cầu
 
@@ -12,6 +12,8 @@ Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; b�
 | Texture có cụm pixel chữ nhật bất quy tắc, bảng màu gọn; cỏ xanh, đất nâu vàng, đá xanh xám | [STYLE_APPROVED_V3.txt](../../blender/environment/studies/dungeons_ground_style_v2/STYLE_APPROVED_V3.txt) ghi xác nhận 2026-10-08. |
 | Cỏ v4 bản rộng; không bóng cỏ; sương hoãn | [GRASSLAND_V4.md](../GRASSLAND_V4.md). Đây là ràng buộc đã ghi từ lượt trước, không phải phê duyệt mọi bố cục v4/50×50. |
 | Mục tiêu 30 FPS, test tự động không tiếng, trả lại tiếng khi người dùng test | Xác nhận trực tiếp trong chat 2026-10-09. Chưa chọn điện thoại tối thiểu. |
+| Lưu cây/bụi cây để reuse; nhảy lên/xuống block phải làm và review trong Blender trước | Yêu cầu trực tiếp 2026-10-09. Chưa phê duyệt bộ cây mới hoặc motion nhảy. |
+| ForestQualitySlice là scene chính để mở project và bấm F5 review | Yêu cầu trực tiếp tiếp theo ngày 2026-10-09; cho phép đổi `run/main_scene`, không đồng nghĩa đã duyệt mọi chi tiết mỹ thuật. |
 
 Việc tích hợp R13/R15 được cho phép không đồng nghĩa mọi chuyển động đã được duyệt là tự nhiên. Những dòng “AWAITING HUMAN REVIEW” ở các báo cáo cũ vẫn cần được tôn trọng. Không gán phần trăm giống game tham chiếu.
 
@@ -35,7 +37,8 @@ Tham chiếu chính U1: tán cây tối làm khung, cỏ thấp dày xen cụm l
 ## Lựa chọn thực hiện và đường lui
 
 - **Lượt đầu đã thử:** scene riêng kế thừa 50×50; actor/đất/cỏ/đá hiện có, bốn cây proxy opaque; ít hoa hơn, ambient giảm, sun ấm, MSAA 2×. Giữ bản gốc bằng F1 và từng bước bằng F2/F4/F5. Kết quả chỉ chứng minh được các thay đổi cụ thể trong ảnh, chưa đạt chất lượng mục tiêu cuối.
-- **Lượt kế tiếp nên ưu tiên:** một chuyển tiếp locomotion/strafe có đo tiếp xúc chân, đồng thời hoàn thiện một cây thật với texture cùng ngôn ngữ V3. Làm riêng từng lượt để biết nguyên nhân cải thiện. Chưa sửa animation hoặc tái xuất nhân vật trong nghiên cứu này.
+- **Lượt hai đã thử:** ForestQualitySlice dùng cây tác giả, địa hình bậc, tường đá đổ, cỏ theo cụm; so hình học dưới đèn cũ rồi đèn mới với PCF/Filmic. F1 bản QualitySlice trước, F2 hình học mới/đèn cũ, F4 bản mới, Tab A/B. Camera/tỷ lệ actor giữ nguyên. Bộ cây có màu vertex, chưa phải texture atlas chuẩn cuối; xem [nguồn Blender, GLB và cách reuse](../../blender/environment/studies/forest_canopy_v2/README.md).
+- **Ưu tiên mới do người dùng yêu cầu:** nghiên cứu clip nhảy lên/xuống block và dựng animation Blender để review trước. Chưa thay controller, gait hoặc export nhân vật production. Walk↔strafe/foot contact vẫn là vấn đề riêng còn mở.
 - **Ánh sáng bake:** chỉ thử ở một khu terrain/prop cố định đã chuẩn bị UV2. Actor dùng probe và bóng trực tiếp. Không unwrap đè UV2 của cỏ vì UV2 đang chứa gốc uốn. Chưa bake trong lượt này.
 - **Nếu vượt 33.3 ms trên điện thoại:** đo pass gây tốn, thử tắt MSAA hoặc giảm 3D render scale, giảm mật độ vật trang trí và số caster. Giữ silhouette nhân vật và nhịp combat trước. Đây là thứ tự thử, chưa phải cấu hình tối thiểu đã chứng minh.
 - **Chưa có lý do đổi engine:** Mobile hỗ trợ các công cụ cơ bản cần cho hướng này. Nâng engine, đổi renderer/engine hoặc thay cấu trúc map là đề xuất riêng cần bài toán, chi phí, lợi ích và bằng chứng thiết bị.

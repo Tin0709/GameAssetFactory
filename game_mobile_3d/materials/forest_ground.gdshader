@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode diffuse_burley, specular_disabled;
-uniform vec4 meadow_a : source_color = vec4(0.32,0.45,0.16,1.0);
-uniform vec4 meadow_b : source_color = vec4(0.43,0.55,0.22,1.0);
+uniform vec4 meadow_a : source_color = vec4(0.24,0.37,0.15,1.0);
+uniform vec4 meadow_b : source_color = vec4(0.36,0.48,0.21,1.0);
 uniform vec4 soil_a : source_color = vec4(0.52,0.40,0.24,1.0);
 uniform vec4 soil_b : source_color = vec4(0.66,0.53,0.33,1.0);
 uniform vec3 player_position;

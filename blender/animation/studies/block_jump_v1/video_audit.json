@@ -1,0 +1,32 @@
+[
+  {
+    "file": "block_jump_gameplay.mp4",
+    "sha256": "9c8048fd3fee2eda499cadda8127a436f9eb16b7dc88867f3f34adbbb35deb58",
+    "fps": 24.0,
+    "frames": 208,
+    "decoded_all_frames": 208,
+    "size": [
+      960,
+      540
+    ],
+    "duration_s": 8.666666666666666,
+    "same_clock_replay": true,
+    "max_replay_pixel_mean_error_compression": 0.5680459104938271,
+    "encoded_pixel_sheet": ".validation\\block_jump_gameplay_encoded_sheet.jpg"
+  },
+  {
+    "file": "block_jump_side.mp4",
+    "sha256": "1b4e4e6caa6729be2fd26b7d4de85a01d075bee76c1718715359b165a0f57c32",
+    "fps": 24.0,
+    "frames": 208,
+    "decoded_all_frames": 208,
+    "size": [
+      960,
+      540
+    ],
+    "duration_s": 8.666666666666666,
+    "same_clock_replay": true,
+    "max_replay_pixel_mean_error_compression": 0.3906275720164609,
+    "encoded_pixel_sheet": ".validation\\block_jump_side_encoded_sheet.jpg"
+  }
+]

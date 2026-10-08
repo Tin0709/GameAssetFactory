@@ -1,0 +1,19 @@
+{
+	"art_approved": false,
+	"camera": {
+		"position": "(12.0, 16.00014, 16.0)",
+		"projection": "orthographic",
+		"rotation": "(-36.31588, 36.8699, 0.0)",
+		"size": 14.5
+	},
+	"device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+	"engine": "4.7.2-stable (official)",
+	"note": "Matched frozen camera/actor/wind for stage0(previous QualitySlice), stage1(new assets/terrain, previous light), stage2(new light). Other views diagnostic only.",
+	"phone_verified": false,
+	"renderer": "mobile",
+	"resolution": [
+		1280,
+		720
+	],
+	"target_fps": 30
+}

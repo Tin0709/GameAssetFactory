@@ -1,0 +1,149 @@
+{
+  "source_fresh_open": "PASS",
+  "assets": {
+    "tree_oak_a": {
+      "source_meshes": [
+        "tree_oak_a__Bark",
+        "tree_oak_a__Leaves"
+      ],
+      "triangles": 2772,
+      "leaf_min_height_m": 2.1600000858306885,
+      "sha256_glb": "f2fd3f5f4438f170ba58b6bf3255a555213f5e9b5859ebddb91e678b8b7457f8",
+      "validation": "PASS"
+    },
+    "tree_oak_b": {
+      "source_meshes": [
+        "tree_oak_b__Bark",
+        "tree_oak_b__Leaves"
+      ],
+      "triangles": 2262,
+      "leaf_min_height_m": 2.1600000858306885,
+      "sha256_glb": "4ce71d0ed347bf2684e21c47080de1a6b0db385c4dbcef442c17fe69bebef666",
+      "validation": "PASS"
+    },
+    "shrub_fern": {
+      "source_meshes": [
+        "shrub_fern__Leaves"
+      ],
+      "triangles": 636,
+      "leaf_min_height_m": 0.0,
+      "sha256_glb": "4a0b8dc3e510f705ff2bc4de5b930ae5d52572db8361bcd66964b77e41c0f012",
+      "validation": "PASS"
+    },
+    "shrub_leaf": {
+      "source_meshes": [
+        "shrub_leaf__Leaves"
+      ],
+      "triangles": 310,
+      "leaf_min_height_m": 0.0,
+      "sha256_glb": "13ee0395a68bbf3b3ab96aac82df8c2ef36cecdd276fd539198b5b639c975df8",
+      "validation": "PASS"
+    }
+  },
+  "glb_binary_audits": [
+    {
+      "file": "tree_oak_a.glb",
+      "bytes": 213628,
+      "triangles": 2772,
+      "mesh_names": [
+        "Bark",
+        "Leaves"
+      ],
+      "primitive_count": 2,
+      "material_count": 2,
+      "bounds_gltf_min": [
+        -1.9800000190734863,
+        0,
+        -1.7999999523162842
+      ],
+      "bounds_gltf_max": [
+        1.9800000190734863,
+        4.860000133514404,
+        1.6200000047683716
+      ],
+      "COLOR_0": true,
+      "all_opaque_single_sided": true,
+      "textures": 0,
+      "max_linear_COLOR_0_palette_error": 1.1974800562253307e-07,
+      "validation": "PASS"
+    },
+    {
+      "file": "tree_oak_b.glb",
+      "bytes": 173848,
+      "triangles": 2262,
+      "mesh_names": [
+        "Bark",
+        "Leaves"
+      ],
+      "primitive_count": 2,
+      "material_count": 2,
+      "bounds_gltf_min": [
+        -1.7999999523162842,
+        0,
+        -1.7999999523162842
+      ],
+      "bounds_gltf_max": [
+        1.9800000190734863,
+        4.320000171661377,
+        1.440000057220459
+      ],
+      "COLOR_0": true,
+      "all_opaque_single_sided": true,
+      "textures": 0,
+      "max_linear_COLOR_0_palette_error": 1.1974800562253307e-07,
+      "validation": "PASS"
+    },
+    {
+      "file": "shrub_fern.glb",
+      "bytes": 52068,
+      "triangles": 636,
+      "mesh_names": [
+        "Leaves"
+      ],
+      "primitive_count": 1,
+      "material_count": 1,
+      "bounds_gltf_min": [
+        -0.6144976019859314,
+        0,
+        -0.6473018527030945
+      ],
+      "bounds_gltf_max": [
+        0.5946663022041321,
+        0.7985000014305115,
+        0.6657724976539612
+      ],
+      "COLOR_0": true,
+      "all_opaque_single_sided": true,
+      "textures": 0,
+      "max_linear_COLOR_0_palette_error": 7.539689983460107e-08,
+      "validation": "PASS"
+    },
+    {
+      "file": "shrub_leaf.glb",
+      "bytes": 25480,
+      "triangles": 310,
+      "mesh_names": [
+        "Leaves"
+      ],
+      "primitive_count": 1,
+      "material_count": 1,
+      "bounds_gltf_min": [
+        -0.5600000023841858,
+        0,
+        -0.5600000023841858
+      ],
+      "bounds_gltf_max": [
+        0.699999988079071,
+        0.8399999737739563,
+        0.5600000023841858
+      ],
+      "COLOR_0": true,
+      "all_opaque_single_sided": true,
+      "textures": 0,
+      "max_linear_COLOR_0_palette_error": 1.1974800562253307e-07,
+      "validation": "PASS"
+    }
+  ],
+  "art_status": "Original study; awaiting human review; Godot review handled by parent task.",
+  "sha256_source": "c696e8ad77e7d727c5b0a64546654013263612b2fa14e678f208f5564ff2add4"
+}

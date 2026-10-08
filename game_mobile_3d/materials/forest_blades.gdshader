@@ -79,7 +79,7 @@ void fragment() {
     float field = sin(root_position.x * 0.24 + sin(root_position.z * 0.21)) * sin(root_position.z * 0.17 - 0.7);
     vec3 palette = mix(vec3(0.70,0.88,0.88), vec3(1.07,1.07,0.75), field*0.5+0.5);
     float root_to_tip = mix(0.68,1.10,smoothstep(0.0,1.0,blade_height));
-    ALBEDO = source*palette*root_to_tip*mix(0.9,1.10,patch_variation);
+    ALBEDO = source*palette*root_to_tip*mix(0.9,1.10,patch_variation)*0.85;
     vec3 face_normal = FRONT_FACING ? NORMAL : -NORMAL;
     vec3 up_view = (VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz;
     NORMAL = normalize(mix(face_normal,up_view,0.65));

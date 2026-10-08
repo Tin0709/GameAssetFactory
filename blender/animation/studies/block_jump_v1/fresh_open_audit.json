@@ -1,0 +1,27 @@
+{
+  "fresh_open_pass": true,
+  "source_disk_sha256_matches": true,
+  "freshly_appended_source_mesh_weights_uv_match_study": true,
+  "freshly_appended_rest_rig_matches_study": true,
+  "bone_count": 13,
+  "source_actions_unmodified_on_disk": true,
+  "no_runtime_integration": true,
+  "body_action_has_root_or_scale_tracks": false,
+  "missing_external_files": [],
+  "images": [
+    {
+      "name": "Player_Cuboid_V5_Face_Atlas_64",
+      "size": [
+        64,
+        64
+      ],
+      "packed": true,
+      "source": "FILE",
+      "path": "//..\\..\\..\\characters\\player\\cuboid\\player_cuboid_v5_atlas_64.png"
+    }
+  ],
+  "active_scene": "BLOCK_JUMP_V1_REVIEW",
+  "frame_on_open": 27,
+  "camera": "Gameplay_Oblique_FIXED",
+  "approved_32mm_inward_shoulder_pose_in_all_study_actions": true
+}

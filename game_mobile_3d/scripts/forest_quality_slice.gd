@@ -15,10 +15,12 @@ var contact_points: Array[Vector3] = []
 var saved_shadow_size: int
 var saved_shadow_quality: int
 var saved_shadow_16bit: bool
+var previous_shadow_blur: float
 var forest_mesh_triangles := 0
 
 func _ready() -> void:
 	super._ready()
+	previous_shadow_blur = $Sun.shadow_blur
 	saved_shadow_size = int(ProjectSettings.get_setting("rendering/lights_and_shadows/directional_shadow/size",1024))
 	saved_shadow_quality = int(ProjectSettings.get_setting("rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality",1))
 	saved_shadow_16bit = bool(ProjectSettings.get_setting("rendering/lights_and_shadows/directional_shadow/16_bits",true))
@@ -34,9 +36,9 @@ func _ready() -> void:
 	forest_blade_material = grass_material.duplicate()
 	forest_blade_material.shader = load("res://materials/forest_blades.gdshader")
 	build_grove_assets()
+	build_ruins()
 	build_terraced_ground()
 	build_forest_grass()
-	build_ruins()
 	build_flower_accents()
 	forest_ready = true
 	set_forest_stage(2)
@@ -64,7 +66,8 @@ func contact_shade(p: Vector3) -> float:
 	return 1.0-occlusion
 
 func add_quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, normal: Vector3, color: Color) -> void:
-	for vertex in [a,b,c,a,c,d]:
+	# Godot front faces use clockwise winding; normals stay explicit for lighting.
+	for vertex in [a,c,b,a,d,c]:
 		st.set_normal(normal)
 		st.set_color(color*Color(contact_shade(vertex),contact_shade(vertex),contact_shade(vertex),1.0))
 		st.add_vertex(vertex)
@@ -82,10 +85,10 @@ func build_terraced_ground() -> void:
 					var z: float = cz*10+iz-25
 					var h := ground_height(x,z)
 					add_quad(st,Vector3(x,h,z),Vector3(x,h,z+1),Vector3(x+1,h,z+1),Vector3(x+1,h,z),Vector3.UP,Color.WHITE)
-					var west := ground_height(x-1,z)
-					var east := ground_height(x+1,z)
-					var north := ground_height(x,z-1)
-					var south := ground_height(x,z+1)
+					var west := ground_height(x-1,z) if x > -25 else 0.0
+					var east := ground_height(x+1,z) if x < 24 else 0.0
+					var north := ground_height(x,z-1) if z > -25 else 0.0
+					var south := ground_height(x,z+1) if z < 24 else 0.0
 					if h > west: add_quad(st,Vector3(x,west,z),Vector3(x,west,z+1),Vector3(x,h,z+1),Vector3(x,h,z),Vector3.LEFT,Color.WHITE)
 					if h > east: add_quad(st,Vector3(x+1,east,z+1),Vector3(x+1,east,z),Vector3(x+1,h,z),Vector3(x+1,h,z+1),Vector3.RIGHT,Color.WHITE)
 					if h > north: add_quad(st,Vector3(x+1,north,z),Vector3(x,north,z),Vector3(x,h,z),Vector3(x+1,h,z),Vector3.FORWARD,Color.WHITE)
@@ -114,7 +117,7 @@ func build_grove_assets() -> void:
 	rng.seed = 71902
 	for i in 74:
 		var p := Vector2(rng.randf_range(-16,16),rng.randf_range(-15,12))
-		if layout.path_distance(p) < 1.65 or p.length() < 2.4: continue
+		if layout.path_distance(p) < 1.65 or p.length() < 4.1: continue
 		var path := FOREST_ASSET_PATH + ("shrub_fern.glb" if i%3 == 0 else "shrub_leaf.glb")
 		place_asset(path,Vector3(p.x,ground_height(p.x,p.y),p.y),rng.randf_range(0.65,1.2),rng.randf_range(0,TAU),false)
 
@@ -128,7 +131,7 @@ func place_asset(path: String, at: Vector3, scale_value: float, angle: float, tr
 	instance.rotation.y = angle
 	forest.add_child(instance)
 	for node in instance.find_children("*","MeshInstance3D",true,false):
-		if "Leaves" in str(node.name) or "Leaf" in str(node.name) or "Fern" in str(node.name): node.material_override = canopy_material
+		node.material_override = canopy_material
 		if not tree: node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	if tree:
 		var body := StaticBody3D.new()
@@ -178,7 +181,7 @@ func build_forest_grass() -> void:
 			var distance := layout.path_distance(p)
 			if distance < 1.28 or p.length() < 1.8: continue
 			var grouping := sin(p.x*0.61+sin(p.y*0.52))*sin(p.y*0.34-0.5)
-			if rng.randf() > 0.58+grouping*0.29: continue
+			if rng.randf() > 0.49+grouping*0.40: continue
 			var height_scale := rng.randf_range(0.68,1.18) if distance > 2 else rng.randf_range(0.46,0.70)
 			# XZ stay unit scale: v4 wind's transpose basis relies on this contract.
 			var basis := Basis(Vector3.UP,rng.randf_range(0,TAU)).scaled(Vector3(1,height_scale,1))
@@ -208,16 +211,19 @@ func build_ruins() -> void:
 	for row in 5:
 		for col in 5:
 			if row > 2 and col in [1,2,3]: continue
-			var at := Vector3(3.7+col*0.77+(0.18 if row%2 else 0.0),1.5+row*0.46+0.23,-6.3)
+			var x := 3.7+col*0.77+(0.18 if row%2 else 0.0)
+			var at := Vector3(x,ground_height(x,-6.3)+row*0.46+0.23,-6.3)
 			var tint := Color("899494").lerp(Color("616f70"),rng.randf()*0.65)
 			stone_box(st,at,Vector3(0.74,0.435,0.8),tint,true)
 	for x in [3.72,6.88]:
-		stone_box(st,Vector3(x,4.02,-6.3),Vector3(1.05,0.22,1.04),Color("a0aa98"),true)
-		stone_box(st,Vector3(x,1.65,-6.3),Vector3(1.03,0.30,1.02),Color("788b70"),true)
+		var base := ground_height(x,-6.3)
+		stone_box(st,Vector3(x,base+2.52,-6.3),Vector3(1.05,0.22,1.04),Color("a0aa98"),true)
+		stone_box(st,Vector3(x,base+0.15,-6.3),Vector3(1.03,0.30,1.02),Color("788b70"),true)
 	for col in 4:
 		for row in 3:
 			if col > 1 and row > 1: continue
-			stone_box(st,Vector3(6.8,1.75+row*0.45,-5.5+col*0.75),Vector3(0.8,0.43,0.72),Color("7c8880"),true)
+			var z := -5.5+col*0.75
+			stone_box(st,Vector3(6.8,ground_height(6.8,z)+0.25+row*0.45,z),Vector3(0.8,0.43,0.72),Color("7c8880"),true)
 	# Fallen slabs and irregular paving stones echo the ruin without obstructing the lane.
 	for i in 22:
 		var p := Vector2(rng.randf_range(2.7,7.4),rng.randf_range(-5.5,-2.5))
@@ -253,6 +259,7 @@ func set_forest_stage(stage: int) -> void:
 	if not forest_ready: return
 	forest_stage = clampi(stage,0,2)
 	super.set_review_stage(3)
+	$Sun.shadow_blur = previous_shadow_blur
 	var enabled := forest_stage > 0
 	forest.visible = enabled
 	$Terrain.visible = not enabled
@@ -268,14 +275,14 @@ func set_forest_stage(stage: int) -> void:
 	RenderingServer.directional_soft_shadow_filter_set_quality(saved_shadow_quality as RenderingServer.ShadowQuality)
 	if forest_stage == 2:
 		var env: Environment = $WorldEnvironment.environment
-		env.ambient_light_color = Color(0.57,0.70,0.85)
-		env.ambient_light_energy = 0.58
+		env.ambient_light_color = Color(0.45,0.63,0.90)
+		env.ambient_light_energy = 0.32
 		env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 		env.tonemap_exposure = 1.0
 		env.tonemap_white = 4.0
 		$Sun.rotation_degrees = Vector3(-55,-38,0)
-		$Sun.light_color = Color(1.0,0.92,0.74)
-		$Sun.light_energy = 1.9
+		$Sun.light_color = Color(1.0,0.95,0.84)
+		$Sun.light_energy = 1.65
 		$Sun.shadow_opacity = 0.80
 		$Sun.shadow_bias = 0.035
 		$Sun.shadow_normal_bias = 0.8
@@ -283,6 +290,10 @@ func set_forest_stage(stage: int) -> void:
 		RenderingServer.directional_shadow_atlas_set_size(2048,true)
 		RenderingServer.directional_soft_shadow_filter_set_quality(RenderingServer.SHADOW_QUALITY_SOFT_MEDIUM)
 	review_label.text = "FOREST STUDY · " + ["PREVIOUS VERSION","NEW GROVE / PREVIOUS LIGHT","SUNLIT GROVE"][forest_stage] + "\nF1 before · F2 grove · F4 light · Tab compare · WASD/Shift · T/K zombies"
+
+func set_review_stage(stage: int) -> void:
+	if forest_ready: set_forest_stage(stage)
+	else: super.set_review_stage(stage)
 
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)

@@ -221,11 +221,12 @@ def trunk_mesh(variant):
 def trees(asset_collection, mats):
     specs = {
         'tree_oak_a': [
-            (.12,.08,3.74,1.13,1.02,.82,2.7),
-            (.25,.20,4.37,.83,.79,.43,2.4),
-            (-.99,.02,3.30,.85,.83,.57,2.5),
-            (1.10,-.14,3.64,.80,.76,.58,2.5),
-            (-.28,1.04,3.38,.87,.72,.58,2.5),
+            (-.08,.14,3.94,1.18,1.02,.69,2.7),
+            (-.51,.27,4.39,.85,.79,.43,2.4),
+            (-1.07,-.06,3.31,.85,.83,.57,2.5),
+            (1.07,.21,3.95,.79,.76,.51,2.5),
+            (1.10,-.40,3.29,.66,.60,.45,2.5),
+            (-.28,1.04,3.58,.87,.72,.58,2.5),
             (.22,-.97,3.18,.93,.64,.60,2.4),
             (-1.23,-.72,2.80,.53,.54,.43,2.2),
             (1.32,.60,3.08,.52,.52,.42,2.2),
@@ -251,9 +252,28 @@ def trees(asset_collection, mats):
         collection = bpy.data.collections.new(name)
         asset_collection.children.link(collection)
         variant = name[-1]
-        cell = (.225,.225,.225)
-        holes = [(-.54,-.91,3.18,.30,.27,.23), (.72,.83,3.15,.28,.28,.29)] if variant == 'a' else [(-.46,-.8,3.01,.28,.26,.22)]
+        cell = (.18,.18,.18)
+        lobes = [p[:6] + (min(p[6], 2.05),) for p in lobes]
+        holes = [(-.54,-.91,3.18,.30,.27,.23), (.72,.83,3.15,.28,.28,.29),
+                 (.03,-.36,2.64,.57,.73,.39)] if variant == 'a' else [(-.46,-.8,3.01,.28,.26,.22)]
         cells = occupancy(lobes,cell,2.10,holes)
+        # Small, attached outer leaf sprays interrupt the regular ellipsoid steps.
+        # Only extend side-facing boundary cells with two supports below/behind;
+        # retain broad readable clumps, never isolated noise or needle geometry.
+        sprays=set()
+        for i,j,k in sorted(cells):
+            if k < 13 or k > 25:
+                continue
+            h=stable_hash(i,j,k,31 if variant=='a' else 47)
+            if h % 21 != 0:
+                continue
+            for dx,dy in ((1,0),(-1,0),(0,1),(0,-1)):
+                if (i+dx,j+dy,k) not in cells and (i,j,k-1) in cells:
+                    sprays.add((i+dx,j+dy,k))
+                    if h % 4 == 0:
+                        sprays.add((i+dx,j+dy,k-1))
+                    break
+        cells.update(sprays)
         leaf_geometry, raw_faces = voxel_mesh(cells,cell,(0,0,0),5 if variant=='a' else 9)
         bark = trunk_mesh(variant).mesh('Bark', collection, mats['bark'],BARK)
         leaf = leaf_geometry.mesh('Leaves',collection,mats['leaf'],LEAVES)
@@ -270,9 +290,9 @@ def leaf_strip(g, origin, angle, length, peak, width, color):
     forward = Vector((math.cos(angle),math.sin(angle),0))
     side = Vector((-math.sin(angle),math.cos(angle),0))
     # Squared plan silhouette, one uninterrupted top with a chunky lower rim.
-    shape = [(0,-.28),(.16,-.28),(.16,-.65),(.38,-.65),(.38,-1),(.61,-1),
-             (.61,-.78),(.83,-.78),(.83,-.36),(1,-.36),(1,.36),(.83,.36),
-             (.83,.78),(.61,.78),(.61,1),(.38,1),(.38,.65),(.16,.65),(.16,.28),(0,.28)]
+    shape = [(0,-.48),(.16,-.48),(.16,-.70),(.38,-.70),(.38,-1),(.61,-1),
+             (.61,-.80),(.83,-.80),(.83,-.48),(1,-.48),(1,.48),(.83,.48),
+             (.83,.80),(.61,.80),(.61,1),(.38,1),(.38,.70),(.16,.70),(.16,.48),(0,.48)]
     # Two slabs plus broad square tips. Profile peaks near halfway.
     # Each strip is a closed extruded polygon, triangulated by glTF exporter.
     points=[]
@@ -391,7 +411,7 @@ def studio(assets):
     scene.world.use_nodes=True
     bg=scene.world.node_tree.nodes.get('Background')
     bg.inputs['Color'].default_value=(.45,.56,.65,1)
-    bg.inputs['Strength'].default_value=.50
+    bg.inputs['Strength'].default_value=.30
     # Collection offset preserves mesh-local geometry and export origins.
     offsets={'tree_oak_a':(-2.65,.3,0),'tree_oak_b':(2.0,.0,0),
              'shrub_fern':(-1.55,-2.80,0),'shrub_leaf':(.65,-2.70,0)}
@@ -404,7 +424,7 @@ def studio(assets):
     bpy.ops.object.light_add(type='AREA',location=(-3,-4,9))
     key=bpy.context.object
     key.name='STUDIO_WarmKey'
-    key.data.energy=1350
+    key.data.energy=650
     key.data.shape='DISK'
     key.data.size=5.0
     key.data.color=(1.0,.91,.75)
@@ -412,7 +432,7 @@ def studio(assets):
     bpy.ops.object.light_add(type='AREA',location=(4,2,6))
     fill=bpy.context.object
     fill.name='STUDIO_CoolRim'
-    fill.data.energy=950
+    fill.data.energy=400
     fill.data.size=5
     fill.data.color=(.68,.81,1.0)
     look_at(fill,(0,0,2))
@@ -421,10 +441,10 @@ def studio(assets):
     camera.name='DIAGNOSTIC_ElevatedGameplayAngle'
     look_at(camera,(0,0,2.05))
     camera.data.type='ORTHO'
-    camera.data.ortho_scale=11.4
+    camera.data.ortho_scale=12.2
     scene.camera=camera
     scene.render.image_settings.file_format='PNG'
-    scene.render.filepath=str(HERE/'diagnostic_contact_sheet.png')
+    scene.render.filepath=str(HERE/'diagnostic_contact_sheet_final.png')
     bpy.ops.wm.save_as_mainfile(filepath=str(HERE/'forest_canopy_v2.blend'))
     bpy.ops.render.render(write_still=True)
 
@@ -449,10 +469,31 @@ def audit_glb(path):
     assert tris < (3500 if path.stem.startswith('tree') else 700),(path.name,tris)
     assert len(prims)==(2 if path.stem.startswith('tree') else 1)
     assert len(set(names))==len(names)
+    # Read binary accessor values, not merely the presence of a COLOR_0 label.
+    binary_start=20+json_len+8
+    maximum_color_error=0.0
+    for prim in prims:
+        acc=accessors[prim['attributes']['COLOR_0']]
+        bv=doc['bufferViews'][acc['bufferView']]
+        components={'VEC3':3,'VEC4':4}[acc['type']]
+        code,size,divisor={5126:('f',4,1),5123:('H',2,65535),5121:('B',1,255)}[acc['componentType']]
+        stride=bv.get('byteStride',components*size)
+        start=binary_start+bv.get('byteOffset',0)+acc.get('byteOffset',0)
+        matname=doc['materials'][prim['material']]['name']
+        palette=BARK if 'Bark' in matname else (FERN if 'Fern' in matname else LEAVES)
+        allowed=[tuple(srgb_linear(x) for x in rgb(h)[:3]) for h in palette]
+        for n in range(acc['count']):
+            color=struct.unpack_from('<'+code*components,raw,start+n*stride)
+            color=tuple(x/divisor for x in color)
+            error=min(max(abs(color[q]-entry[q]) for q in range(3)) for entry in allowed)
+            maximum_color_error=max(maximum_color_error,error)
+            assert error < 3e-5,(path.name,matname,color,error)
+            assert components==3 or abs(color[3]-1.0)<1e-6
     return {'file':path.name,'bytes':len(raw),'triangles':tris,'mesh_names':names,
             'primitive_count':len(prims),'material_count':len(doc['materials']),
             'bounds_gltf_min':mins,'bounds_gltf_max':maxs,'COLOR_0':True,
-            'all_opaque_single_sided':True,'textures':0,'validation':'PASS'}
+            'all_opaque_single_sided':True,'textures':0,
+            'max_linear_COLOR_0_palette_error':maximum_color_error,'validation':'PASS'}
 
 
 def main():

@@ -2,9 +2,9 @@
 
 2026-10-09 · Asia/Saigon. Mục tiêu **30 FPS (33.3 ms/frame)** do người dùng xác nhận; chưa chỉ định điện thoại tối thiểu. Hướng đã chấp nhận và đề xuất nằm riêng trong [ART_DIRECTION.md](ART_DIRECTION.md). Kết quả mỹ thuật của cảnh mới **chờ người dùng đánh giá**.
 
-## Hiện trạng đã kiểm tra
+## Baseline kiểm tra trước các study
 
-Repo chứa cả nguồn asset (`blender`, `exports`) và game. `game` là prototype 2D, `godot_test` là test asset; đích hiện tại là `game_mobile_3d`. `project.godot` chọn **Grassland_50x50.tscn**, renderer **Mobile**. Đã chạy executable xác nhận **Godot 4.7.2 stable / D3D12 / RTX 4070 Ti SUPER** và **Blender 5.2.2 LTS**. Các tài liệu cũ mô tả `Grassland.tscn` hoặc `CuboidGameplayTest.tscn` làm scene mặc định không còn phản ánh cấu hình này.
+Repo chứa cả nguồn asset (`blender`, `exports`) và game. `game` là prototype 2D, `godot_test` là test asset; đích hiện tại là `game_mobile_3d`, renderer **Mobile**. Baseline đầu phiên là Grassland_50x50; theo yêu cầu tiếp theo của người dùng, `project.godot` nay chọn **ForestQualitySlice.tscn** để F5 review trực tiếp. Đã chạy executable xác nhận **Godot 4.7.2 stable / D3D12 / RTX 4070 Ti SUPER** và **Blender 5.2.2 LTS**. Tài liệu cũ về main scene cần đối chiếu lại setting này.
 
 | Thành phần | Sự thật trong tài nguyên/code hiện tại |
 |---|---|
@@ -13,7 +13,7 @@ Repo chứa cả nguồn asset (`blender`, `exports`) và game. `game` là proto
 | Zombie | `CuboidZombie.tscn` → `zombie_animation_secondary.gd` + `zombie_animation_v2.glb`; 72 tam giác, 10 joints; roughness .59. Attack hiện là procedural lunge, chưa có pose attack tác giả đầy đủ. |
 | Môi trường | 50×50, 25 terrain chunks; 695 grass patches, 56 rocks, 312 flower clumps, 48 dirt props ở seed 8055. Manifest scatter có 18 mẫu, chưa tìm thấy asset cây. V4 có 36 lá cỏ chữ nhật/216 tam giác mỗi patch. |
 | Ánh sáng | `setup_presentation` ghi đè Gameplay.tres bằng bản sao: sun 1.10, ambient .52, Linear; sương tắt. Không kết luận từ `.tres` dùng chung vì script có override. |
-| Công cụ | Godot console/headless/GPU và viewport PNG/Movie Maker đã chạy. Blender MCP kết nối được; scene đang trống chưa lưu, không đụng scene của người dùng. Blender background chỉ dùng mã hoá clip Godot, không phải bằng chứng render asset bằng Blender trong lượt này. |
+| Công cụ | Godot console/headless/GPU và viewport PNG/Movie Maker đã chạy. Blender background dùng scene riêng để tạo/render asset V2 và mã hoá clip Godot; không sửa scene Blender đang mở của người dùng. Phân biệt ảnh Blender diagnostic với ảnh gameplay Godot. |
 | Điện thoại | ADB trong sandbox không khởi động; kiểm tra ngoài sandbox thành công nhưng **danh sách thiết bị rỗng**. Chưa có export_presets.cfg; thư mục export_templates dự án rỗng. Chưa build/chạy Android hoặc iOS; máy Windows không có môi trường Xcode để xác thực iOS. |
 
 Pipeline hiện tại: `.blend` tác giả → script export GLB/manifest/hash → `.glb.import` và post-import adapter → PackedScene/Skeleton → các lớp animation runtime. Đổi trục Blender Z-up sang glTF/Godot Y-up một lần. R15 giữ rest rig R13, lọc lower tracks, phối upper carry/recoil. Đừng sửa trực tiếp cache `.godot` hay ghi đè nguồn đã chọn. Xem [R15 integration](../superpowers/plans/2026-10-08-combat-strafe-game-review.md), [V4](../GRASSLAND_V4.md), [scatter source](../../blender/environment/studies/environment_scatter_set_v1/README.md).
@@ -92,7 +92,7 @@ Scene [QualitySlice.tscn](../../game_mobile_3d/scenes/QualitySlice.tscn) kế th
 | F4 / stage 2 | Ambient .52→.34, màu (.53,.69,.78); sun 1.12, (1,.92,.79), shadow opacity .86. |
 | F5 / stage 3 | MSAA2×; các phần khác giữ stage2. Tab so stage0↔3; F3 bị vô hiệu trong study để tránh làm sai baseline. |
 
-WASD/Shift di chuyển; 1/2/3 chọn súng, 0 cất; T/K thêm 1/5 zombie; R về giữa. Launcher [launch_quality_slice.ps1](../../scripts/launch_quality_slice.ps1) mở **có âm thanh** cho người dùng. Test tự động dùng Dummy audio và mute trong process test; không thay bus/project/system audio lâu dài.
+WASD/Shift di chuyển; 1/2/3 chọn súng, 0 cất; T/K thêm 1/5 zombie; R về giữa. Launcher [launch_quality_slice.ps1](../../scripts/launch_quality_slice.ps1) mở **có âm thanh**, mặc định ForestQualitySlice mới; dùng `-Scene QualitySlice` để mở lượt đầu. Test tự động dùng Dummy audio và mute trong process test; không thay bus/project/system audio lâu dài.
 
 Bằng chứng bền trong repo: [so sánh](../validation/quality_slice/comparison.jpg), [stage0](../validation/quality_slice/stage_0.png), [stage1](../validation/quality_slice/stage_1.png), [stage2](../validation/quality_slice/stage_2.png), [stage3](../validation/quality_slice/stage_3.png), [clip Godot 9.1 s](../validation/quality_slice/gameplay.mp4), [12 khung và cận cảnh](../validation/quality_slice/motion_contact_sheet.jpg), [metadata capture](../validation/quality_slice/captures.json), [metadata clip](../validation/quality_slice/movie.json). Clip H.264 không tiếng; AVI gốc/các lượt thử ở `.validation/quality_slice` trong game, bị Git ignore.
 
@@ -100,7 +100,41 @@ Bằng chứng bền trong repo: [so sánh](../validation/quality_slice/comparis
 
 Clip ghi từ production controller/combat, có hai kill, peak 7 effect nodes và 2 projectile nodes. Đã kiểm tra các khung mẫu, không dùng việc tạo file/console sạch để kết luận motion tự nhiên; chưa phân tích liên tục từng frame hay đo contact foot. Chưa sửa gait/attack/VFX trong lượt này.
 
-## Đo hiệu năng và giới hạn bằng chứng
+## Lượt hai: ForestQualitySlice — sau phản hồi chưa đạt kỳ vọng
+
+Người dùng yêu cầu cải thiện tiếp và lưu asset cây để reuse. [Scene mới](../../game_mobile_3d/scenes/ForestQualitySlice.tscn) kế thừa study trước; sau khi xem bản mới, người dùng yêu cầu đặt nó làm main scene để F5 review. Đã đổi đúng `run/main_scene`; animation production giữ nguyên. **Chưa được duyệt toàn bộ mỹ thuật.**
+
+Đã xem thêm ba ảnh có HUD, tách khỏi U1/cinematic; chỉ dùng để phân tích thị giác, không suy thuật toán render:
+
+| Nguồn/ảnh đã xem | Quan sát → áp dụng thử |
+|---|---|
+| [AltChar review](https://www.altchar.com/reviews/minecraft-dungeons-ii-review-judging-a-game-by-its-cubes-aHR4z2P9zHyq), [rừng đêm](https://media.altchar.com/prod/images/article_body_image/e2a0ced5378a-unknown-20260922-083446.webp) | Vách bậc và khối tối ôm lane; cỏ/hoa ở rìa, ánh đèn hướng mắt → thêm lớp địa hình và khoảng chiến đấu rõ. |
+| Cùng bài, [ban ngày](https://media.altchar.com/prod/images/article_body_image/8e1d6cebb7f6-unknown-20260923-153750.webp) | Đá đứng xanh xám, đất ấm, mép cỏ–đất bất quy tắc, mảng cỏ thưa/dày → thay viền path thẳng bằng cụm pixel, cỏ theo cụm, masonry lớn. |
+| [The Nerd Stash review](https://thenerdstash.com/minecraft-dungeons-ii-review-a-necessary-upgrade/), [combat](https://image.thenerdstash.com/2026/09/25175203/Minecraft-Dungeons-2-Exploration.jpg) | Nền ruin xanh lạnh, khoảng trống và điểm cyan/tím/ấm → phân cấp nền và actor; chưa thêm VFX/glow tương ứng. |
+
+F1/stage0 là **QualitySlice cũ stage3**, F2/stage1 thêm hình học/material dưới đèn cũ, F4/stage2 thêm ánh sáng; Tab0↔2. Giữ camera/actor/pose ở ảnh so sánh, MSAA2× cả ba bước. Địa hình 25 chunk có bậc 0.5 m; 11 cây nguyên bản, hai loại bụi, tường đổ/paving, cỏ v4 theo cụm và hoa tập trung. Cỏ giữ XZ scale1/UV2 motion contract, không đổ bóng. Đây là scene thử, chưa là layout map cuối.
+
+Stage2 dùng ambient lạnh (.45,.63,.90)×.32, sun ấm (1,.95,.84)×1.65, Filmic, shadow atlas2048/16-bit và PCF medium. [RenderingServer4.7](https://docs.godotengine.org/en/4.7/classes/class_renderingserver.html) xác nhận atlas/filter là **global trong process**, không riêng viewport; code phục hồi project defaults khi về bước0/1 hoặc thoát. Không dùng PCSS/SSAO/GI/fog/glow. Contact trên terrain là màu vertex giảm nhẹ gần cây/đá, **không phải lightmap/GI**, không thêm bóng gốc cỏ.
+
+Asset tái sử dụng: [README nguồn](../../blender/environment/studies/forest_canopy_v2/README.md) dẫn tới `.blend`, generator, GLB và manifest. Tree A/B:2772/2262 triangle; fern636, leaf shrub310. Màu vertex linear, opaque, rough; chưa có LOD mobile. Đã bắt lỗi default GLB material bỏ qua COLOR_0 khiến cây trắng; post-import script bật vertex color và tránh chuyển sRGB lần hai. Bộ kiểm tra mở lại nguồn và audit GLB nằm cạnh `.blend`. Texture atlas chưa được thử cho cây mới.
+
+Bằng chứng: [so sánh cùng camera](../validation/forest_quality/comparison.jpg), [ảnh cuối](../validation/forest_quality/stage_2.png), [grove](../validation/forest_quality/grove.png), [courtyard](../validation/forest_quality/courtyard.png), [clip Godot9.07s](../validation/forest_quality/gameplay.mp4), [12 khung](../validation/forest_quality/motion_contact_sheet.jpg), metadata/checks cùng thư mục. Clip có2kill, peak7effect/1projectile. Đã xem ảnh/khung mẫu: tầng cây–đất–tường và mép lane rõ hơn; chân/zombie dễ tách hơn lượt đầu. Còn hạn chế: tán bậc khá đều, vài góc có khối tán che nền, không có indirect baked; **không tuyên bố đạt Dungeons II** hay motion đã tự nhiên.
+
+Validation headless + GPU Mobile kiểm tra reuse màu, A/B, fog/bóng cỏ, đi trên terrain và súng thật gây damage. Đã sửa winding sàn, móng tường hở do hardcode độ cao, mép ngoài thiếu mặt. Review code độc lập xác nhận lỗi mép ngoài và không tìm thêm lỗi cụ thể trong phạm vi đã đọc. Không thay actor/weapon/VFX production.
+
+Profile nối tiếp trên RTX4070TiSUPER,1280×720, cùng fixture/thời gian như lượt đầu; editor Godot của người dùng vẫn mở, không có phiên study render khác. Median **idle/combat12**:
+
+| Stage | Draw | Primitives | Render CPU ms | Render GPU ms | Video MiB |
+|---|---:|---:|---:|---:|---:|
+| 0 / study cũ | 121/147 | 142904/144646 | .078/.099 | .151/.216 | 117.40/123.27 |
+| 1 / hình học mới | 151/177 | 225566/227308 | .074/.091 | .174/.225 | 117.40/123.27 |
+| 2 / light mới | 151/177 | 225566/227308 | .074/.090 | .192/.230 | 123.40/129.27 |
+
+Thêm30draw và~82.7kprimitives; atlas2048 tăng bộ đếm6MiB. Stage2 combat wall-clock median .710ms,p95 1.318ms,max2.514ms; không dùng chênh CPU nhỏ để kết luận nhanh hơn. Baseline giữ tài nguyên mới ẩn nên memory không đo riêng giá asset. Toàn bộ dữ liệu là desktop ngắn; **chưa kiểm chứng30FPS/nhiệt/memory trên điện thoại**. Không suy frame time Movie Maker thành tốc độ chơi.
+
+Cách lặp: thay script cũ bằng `res://tests/review_forest_quality.gd`; không arg để chụp, `-- --profile --stage=2` để đo, `-- --clip` với Movie Maker để quay. Encode bằng `package_quality_review.py -- forest_quality` sau dấu `--` của Blender; `package_forest_evidence.py` chỉ copy/composite pixel đã chụp. Test: `res://tests/validate_forest_quality.gd`. Các file lớn trung gian giữ dưới `.validation` bị ignore.
+
+## Đo hiệu năng lượt đầu và giới hạn bằng chứng
 
 Kết quả mới nhất nằm trong `docs/validation/quality_slice/profile_stage_{0,2,3}.json`. Mỗi stage chạy process riêng nối tiếp, Mobile/D3D12, RTX 4070 Ti SUPER, 1280×720, VSync tắt; warmup 3 s, idle 5 s; warmup combat 3 s, combat 8 s. Fixture 12 zombie HP cao giữ tải ổn định, súng/effect/attack thật; không phải khuyến cáo số quái cho điện thoại. Không Movie Maker/readback hoặc phiên capture khác trong cửa sổ đo. Audio dùng Dummy, không đại diện chi phí đầu ra âm thanh của máy thật.
 
@@ -126,6 +160,12 @@ Từ repo root, dùng executable Godot 4.7.2 đã cài, `--path game_mobile_3d -
 
 ## Trạng thái Git và tiếp tục
 
-Kiểm tra 2026-10-09: branch **main**, HEAD ban đầu `faa319de9d7ff1d847679a68160946c0d442aed1`; `.git` bằng common dir, chỉ một checkout/worktree. Thay đổi nằm ngay working tree của main, chưa commit/push; không cần merge/cherry-pick từ worktree khác. Sau review, stage đúng AGENTS, hai tài liệu graphics, thư mục evidence và các file QualitySlice/launcher rồi commit trên main, hoặc dùng một branch review nếu quy trình nhóm yêu cầu. Không tự đổi nhánh hay gộp cả những thay đổi ngoài phạm vi.
+Kiểm tra lại 2026-10-09: branch **main**, một worktree tại repo này, HEAD `ba37e480b5fde54e1f062420c11b5710ed35f2b3` (đã tiến từ HEAD đầu phiên do thay đổi ngoài thao tác commit của thread này). Một phần study trước đã được commit; phần sửa tiếp/source/evidence hiện ở working tree, thread này chưa commit/push. Không cần merge/cherry-pick. Sau review, stage đúng source/runtime asset, study scripts, evidence và docs rồi commit trên main hoặc branch review theo quy trình nhóm; kiểm tra status mới nhất, không gom thay đổi ngoài phạm vi.
 
-Lượt tiếp theo: đo và sửa **một** handoff Walk↔strafe trong clip gameplay/cận chân; sau đó làm một cây tác giả thay proxy; tiếp đến thử bake/contact và mipmap riêng. Người dùng quyết định giữ hướng màu/bố cục sau khi xem bằng chứng. Ghi xác nhận cụ thể vào ART_DIRECTION, không nâng giả thuyết thành quyết định chính thức.
+## Animation nhảy block — Blender V1 chờ review
+
+Theo yêu cầu tiếp theo, đã dựng [nguồn và hướng dẫn Blender](../../blender/animation/studies/block_jump_v1/README.md), [clip góc chéo](../../blender/animation/studies/block_jump_v1/block_jump_gameplay.mp4) và [góc ngang](../../blender/animation/studies/block_jump_v1/block_jump_side.mp4). Video người dùng dài16.367s/30FPS; đã xem các khung nhảy lên khoảng1.47–2.07s và rơi khoảng3.67–4.27s. Quan sát: chân nguyên khối lệch nhịp, tay đối trọng nhẹ, ít lấy đà. Camera bám và chân khuất khiến không đo được chính xác độ cao/contact từ clip.
+
+Bản thử dùng block1m/tốc độ1.5m/s như **giả định tác giả**,104frame/24FPS, hai clip8.667s gồm phát lại. Giữ mesh/UV/weights,13restbones và đầy đủ tay; kiểm tra riêng inset vai32mm đã duyệt vì hash mesh không chứng minh pose này. Tách pose action khỏi quỹ đạo Empty, Root không key. Đã sửa pha rơi trước khi chân sau rời mép;413mẫu quarter-frame không xuyên sàn/block, clearance~1mm. Mở lại `.blend` xác nhận nguồn gốc không đổi, atlas đã pack, không thiếu file. Đã xem các khung MP4 giải mã độc lập cả hai góc; đây là bằng chứng Blender, **chưa tích hợp/kiểm tra nhảy trong Godot**, chưa chứng minh foot planting không trượt hay transition controller. Chờ người dùng review trước bước đó.
+
+Walk↔strafe/foot contact, LightmapGI và mipmap vẫn chưa được xử lý. Chỉ ghi mỹ thuật được duyệt khi người dùng xác nhận cụ thể.

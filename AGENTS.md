@@ -5,4 +5,4 @@
 - Preserve selected character proportions/full arms and hands, original Blender sources, and the established grass/no-fog decisions unless the user changes them. Keep experiments scene-local; research completion does not authorize wholesale renderer/architecture changes.
 - Capture the baseline, change one visual group, compare the same camera/pose and inspect actual Godot pixels. Animation needs an in-game clip. Headless/import success does not prove visual quality; desktop performance does not prove phone performance.
 - User target is 30 FPS; minimum phone remains unspecified. Run automated Godot tests silently with `--audio-driver Dummy` (or a test-process-only mute). User playtest launches must use normal audio; do not persistently mute the project/system.
-
+- Reuse original vegetation from `blender/environment/studies/forest_canopy_v2/README.md` and its linked runtime GLBs; preserve source/generator/import settings. New block-jump animation must be reviewed in Blender before runtime integration (user request 2026-10-09).

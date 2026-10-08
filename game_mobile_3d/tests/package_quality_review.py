@@ -1,9 +1,13 @@
 """Package actual Godot pixels. Run with Blender background; never saves a .blend."""
 from pathlib import Path
 import json
+import sys
 import bpy
 
-root = Path(__file__).resolve().parents[1] / '.validation' / 'quality_slice'
+study = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else 'quality_slice'
+if study not in {'quality_slice', 'forest_quality'}:
+    raise ValueError('Unknown review study')
+root = Path(__file__).resolve().parents[1] / '.validation' / study
 scene = bpy.context.scene
 scene.sequence_editor_create()
 strip = scene.sequence_editor.strips.new_movie('Godot real gameplay', str(root / 'gameplay.avi'), channel=1, frame_start=1)

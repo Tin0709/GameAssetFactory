@@ -10,29 +10,29 @@
   "assets": {
     "tree_oak_a": {
       "voxel_size_m": [
-        0.225,
-        0.225,
-        0.225
+        0.18,
+        0.18,
+        0.18
       ],
-      "filled_leaf_voxels": 1048,
-      "leaf_exposed_quads_before_merge": 982,
-      "leaf_quads_after_merge": 525,
+      "filled_leaf_voxels": 1905,
+      "leaf_exposed_quads_before_merge": 1708,
+      "leaf_quads_after_merge": 1052,
       "file": "tree_oak_a.glb",
-      "triangle_count": 1718,
+      "triangle_count": 2772,
       "bounds_blender_min": [
-        -1.7999999523162842,
-        -1.5750000476837158,
+        -1.9800000190734863,
+        -1.6200000047683716,
         0.0
       ],
       "bounds_blender_max": [
+        1.9800000190734863,
         1.7999999523162842,
-        1.7999999523162842,
-        4.724999904632568
+        4.860000133514404
       ],
       "dimensions_m": [
-        3.5999999046325684,
-        3.375,
-        4.724999904632568
+        3.9600000381469727,
+        3.4199999570846558,
+        4.860000133514404
       ],
       "meshes": [
         {
@@ -46,7 +46,7 @@
         },
         {
           "name": "Leaves",
-          "triangles": 1050,
+          "triangles": 2104,
           "materials": [
             "Forest_Leaf_VertexColor"
           ],
@@ -57,29 +57,29 @@
     },
     "tree_oak_b": {
       "voxel_size_m": [
-        0.225,
-        0.225,
-        0.225
+        0.18,
+        0.18,
+        0.18
       ],
-      "filled_leaf_voxels": 880,
-      "leaf_exposed_quads_before_merge": 856,
-      "leaf_quads_after_merge": 426,
+      "filled_leaf_voxels": 1540,
+      "leaf_exposed_quads_before_merge": 1360,
+      "leaf_quads_after_merge": 797,
       "file": "tree_oak_b.glb",
-      "triangle_count": 1520,
+      "triangle_count": 2262,
       "bounds_blender_min": [
         -1.7999999523162842,
-        -1.5750000476837158,
+        -1.440000057220459,
         0.0
       ],
       "bounds_blender_max": [
+        1.9800000190734863,
         1.7999999523162842,
-        1.5750000476837158,
-        4.275000095367432
+        4.320000171661377
       ],
       "dimensions_m": [
-        3.5999999046325684,
-        3.1500000953674316,
-        4.275000095367432
+        3.7799999713897705,
+        3.240000009536743,
+        4.320000171661377
       ],
       "meshes": [
         {
@@ -93,7 +93,7 @@
         },
         {
           "name": "Leaves",
-          "triangles": 852,
+          "triangles": 1594,
           "materials": [
             "Forest_Leaf_VertexColor"
           ],
@@ -106,18 +106,18 @@
       "file": "shrub_fern.glb",
       "triangle_count": 636,
       "bounds_blender_min": [
-        -0.6120863556861877,
-        -0.658639132976532,
+        -0.6144976019859314,
+        -0.6657724976539612,
         0.0
       ],
       "bounds_blender_max": [
-        0.5922550559043884,
-        0.6401684880256653,
+        0.5946663022041321,
+        0.6473018527030945,
         0.7985000014305115
       ],
       "dimensions_m": [
-        1.2043414115905762,
-        1.2988076210021973,
+        1.2091639041900635,
+        1.3130743503570557,
         0.7985000014305115
       ],
       "meshes": [
@@ -174,8 +174,34 @@
   "validation": [
     {
       "file": "tree_oak_a.glb",
-      "bytes": 131400,
-      "triangles": 1718,
+      "bytes": 213628,
+      "triangles": 2772,
+      "mesh_names": [
+        "Bark",
+        "Leaves"
+      ],
+      "primitive_count": 2,
+      "material_count": 2,
+      "bounds_gltf_min": [
+        -1.9800000190734863,
+        0,
+        -1.7999999523162842
+      ],
+      "bounds_gltf_max": [
+        1.9800000190734863,
+        4.860000133514404,
+        1.6200000047683716
+      ],
+      "COLOR_0": true,
+      "all_opaque_single_sided": true,
+      "textures": 0,
+      "max_linear_COLOR_0_palette_error": 1.1974800562253307e-07,
+      "validation": "PASS"
+    },
+    {
+      "file": "tree_oak_b.glb",
+      "bytes": 173848,
+      "triangles": 2262,
       "mesh_names": [
         "Bark",
         "Leaves"
@@ -188,38 +214,14 @@
         -1.7999999523162842
       ],
       "bounds_gltf_max": [
-        1.7999999523162842,
-        4.724999904632568,
-        1.5750000476837158
+        1.9800000190734863,
+        4.320000171661377,
+        1.440000057220459
       ],
       "COLOR_0": true,
       "all_opaque_single_sided": true,
       "textures": 0,
-      "validation": "PASS"
-    },
-    {
-      "file": "tree_oak_b.glb",
-      "bytes": 115972,
-      "triangles": 1520,
-      "mesh_names": [
-        "Bark",
-        "Leaves"
-      ],
-      "primitive_count": 2,
-      "material_count": 2,
-      "bounds_gltf_min": [
-        -1.7999999523162842,
-        0,
-        -1.5750000476837158
-      ],
-      "bounds_gltf_max": [
-        1.7999999523162842,
-        4.275000095367432,
-        1.5750000476837158
-      ],
-      "COLOR_0": true,
-      "all_opaque_single_sided": true,
-      "textures": 0,
+      "max_linear_COLOR_0_palette_error": 1.1974800562253307e-07,
       "validation": "PASS"
     },
     {
@@ -232,18 +234,19 @@
       "primitive_count": 1,
       "material_count": 1,
       "bounds_gltf_min": [
-        -0.6120863556861877,
+        -0.6144976019859314,
         0,
-        -0.6401684880256653
+        -0.6473018527030945
       ],
       "bounds_gltf_max": [
-        0.5922550559043884,
+        0.5946663022041321,
         0.7985000014305115,
-        0.658639132976532
+        0.6657724976539612
       ],
       "COLOR_0": true,
       "all_opaque_single_sided": true,
       "textures": 0,
+      "max_linear_COLOR_0_palette_error": 7.539689983460107e-08,
       "validation": "PASS"
     },
     {
@@ -268,6 +271,7 @@
       "COLOR_0": true,
       "all_opaque_single_sided": true,
       "textures": 0,
+      "max_linear_COLOR_0_palette_error": 1.1974800562253307e-07,
       "validation": "PASS"
     }
   ]
