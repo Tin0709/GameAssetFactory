@@ -162,10 +162,14 @@ Từ repo root, dùng executable Godot 4.7.2 đã cài, `--path game_mobile_3d -
 
 Kiểm tra lại 2026-10-09: branch **main**, một worktree tại repo này, HEAD `ba37e480b5fde54e1f062420c11b5710ed35f2b3` (đã tiến từ HEAD đầu phiên do thay đổi ngoài thao tác commit của thread này). Một phần study trước đã được commit; phần sửa tiếp/source/evidence hiện ở working tree, thread này chưa commit/push. Không cần merge/cherry-pick. Sau review, stage đúng source/runtime asset, study scripts, evidence và docs rồi commit trên main hoặc branch review theo quy trình nhóm; kiểm tra status mới nhất, không gom thay đổi ngoài phạm vi.
 
-## Animation nhảy block — Blender V1 chờ review
+## Animation nhảy block — Blender V1 và V2 chờ review
 
 Theo yêu cầu tiếp theo, đã dựng [nguồn và hướng dẫn Blender](../../blender/animation/studies/block_jump_v1/README.md), [clip góc chéo](../../blender/animation/studies/block_jump_v1/block_jump_gameplay.mp4) và [góc ngang](../../blender/animation/studies/block_jump_v1/block_jump_side.mp4). Video người dùng dài16.367s/30FPS; đã xem các khung nhảy lên khoảng1.47–2.07s và rơi khoảng3.67–4.27s. Quan sát: chân nguyên khối lệch nhịp, tay đối trọng nhẹ, ít lấy đà. Camera bám và chân khuất khiến không đo được chính xác độ cao/contact từ clip.
 
 Bản thử dùng block1m/tốc độ1.5m/s như **giả định tác giả**,104frame/24FPS, hai clip8.667s gồm phát lại. Giữ mesh/UV/weights,13restbones và đầy đủ tay; kiểm tra riêng inset vai32mm đã duyệt vì hash mesh không chứng minh pose này. Tách pose action khỏi quỹ đạo Empty, Root không key. Đã sửa pha rơi trước khi chân sau rời mép;413mẫu quarter-frame không xuyên sàn/block, clearance~1mm. Mở lại `.blend` xác nhận nguồn gốc không đổi, atlas đã pack, không thiếu file. Đã xem các khung MP4 giải mã độc lập cả hai góc; đây là bằng chứng Blender, **chưa tích hợp/kiểm tra nhảy trong Godot**, chưa chứng minh foot planting không trượt hay transition controller. Chờ người dùng review trước bước đó.
+
+Sau khi xem V1, người dùng yêu cầu giống clip hơn và nhắc **chỉ thêm nhảy, giữ nguyên animation cũ**. So khung dày cho thấy f49–61 (lên) và f115–125 (xuống) giữ gần cùng dáng một chân dài/một chân cao; f360–370 ở lượt khác dẫn bằng phía đối diện. Đây là quan sát silhouette, không là góc joint3D chính xác. V1 khép chân quá thẳng khi rơi/contact; V2 thử bắt pha bước lệch nhanh rồi giữ gần yên trong không trung, nhả lại nhịp lúc đáp, thân/tay ít dao động. Không chạy chân hết nhịp trong không trung chỉ vì gọi nó là running jump.
+
+[V2 riêng](../../blender/animation/studies/block_jump_v2/README.md) chứa bốn clip nhảy mới (lên/xuống, hai chân dẫn), `.blend` và clip hai góc; V1 giữ để A/B. Đoạn di chuyển trước/sau là **preview-only**, không dùng để thay Walk/Sprint cũ. Quỹ đạo1m/tốc độ1.5m/s và tham số giữ pha là giả định thử, chưa là physics/runtime được duyệt. Kiểm tra cả pha gốc và lệch8frame; không giữ pha gần lúc hai chân song song. Vai32mm phải kiểm tra ở pose, không chỉ hash mesh. Mọi tích hợp Godot vẫn chờ review của người dùng.
 
 Walk↔strafe/foot contact, LightmapGI và mipmap vẫn chưa được xử lý. Chỉ ghi mỹ thuật được duyệt khi người dùng xác nhận cụ thể.

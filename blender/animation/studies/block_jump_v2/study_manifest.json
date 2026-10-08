@@ -1,0 +1,633 @@
+{
+  "status": "PENDING USER ARTISTIC REVIEW",
+  "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_combat_strafe_r14_pass2_study.blend",
+  "source_sha256": "048c70d251db64d92483cb4ff9543434e81f61d1681af0330dba42da527b1e08",
+  "source_rig": "R12_Hold_Unarmed_Rig",
+  "source_mesh": "R11_R12_Hold_Unarmed_R9W1_Author_Mesh",
+  "mesh_geometry_weights_uv_sha256": "834cb41457659151f0496952fa348f10f6178e0802df206e502d516bdfece285",
+  "rest_bone_signature": {
+    "Root": {
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        0.16874998807907104
+      ],
+      "parent": null,
+      "deform": false,
+      "connected": false
+    },
+    "Hips": {
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.6749999523162842
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        0.0,
+        0.0,
+        0.6749999523162842
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        0.7874999642372131
+      ],
+      "parent": "Root",
+      "deform": false,
+      "connected": false
+    },
+    "Spine": {
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.7874999642372131
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        0.0,
+        0.0,
+        0.7874999642372131
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.068750023841858
+      ],
+      "parent": "Hips",
+      "deform": false,
+      "connected": false
+    },
+    "Chest": {
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          1.068750023841858
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        0.0,
+        0.0,
+        1.068750023841858
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.3499999046325684
+      ],
+      "parent": "Spine",
+      "deform": true,
+      "connected": false
+    },
+    "Neck": {
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          1.3499999046325684
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        0.0,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.40625
+      ],
+      "parent": "Chest",
+      "deform": false,
+      "connected": false
+    },
+    "Head": {
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          1.3499999046325684
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        0.0,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.7999999523162842
+      ],
+      "parent": "Neck",
+      "deform": true,
+      "connected": false
+    },
+    "UpperArm.L": {
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742277657347586e-08,
+          0.3374999761581421
+        ],
+        [
+          8.742277657347586e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0,
+          1.3499999046325684
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        0.3374999761581421,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "parent": "Chest",
+      "deform": true,
+      "connected": false
+    },
+    "ForeArm.L": {
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742276236262114e-08,
+          0.3374999761581421
+        ],
+        [
+          8.742276236262114e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.9999999403953552,
+          0.0,
+          1.0124999284744263
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "tail": [
+        0.3374999761581421,
+        0.0,
+        0.675000011920929
+      ],
+      "parent": "UpperArm.L",
+      "deform": true,
+      "connected": true
+    },
+    "UpperArm.R": {
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742277657347586e-08,
+          -0.3374999761581421
+        ],
+        [
+          8.742277657347586e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0,
+          1.3499999046325684
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        -0.3374999761581421,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        -0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "parent": "Chest",
+      "deform": true,
+      "connected": false
+    },
+    "ForeArm.R": {
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742276236262114e-08,
+          -0.3374999761581421
+        ],
+        [
+          8.742276236262114e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.9999999403953552,
+          0.0,
+          1.0124999284744263
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        -0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "tail": [
+        -0.3374999761581421,
+        0.0,
+        0.675000011920929
+      ],
+      "parent": "UpperArm.R",
+      "deform": true,
+      "connected": true
+    },
+    "WeaponCarrier": {
+      "matrix": [
+        [
+          -0.9975640177726746,
+          -0.06889767944812775,
+          -0.010912107303738594,
+          -0.09206697344779968
+        ],
+        [
+          0.06975644826889038,
+          -0.9852824807167053,
+          -0.15605364739894867,
+          -0.4564836323261261
+        ],
+        [
+          2.3283064365386963e-07,
+          -0.15643471479415894,
+          0.9876883029937744,
+          0.9688228368759155
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        -0.09206697344779968,
+        -0.4564836323261261,
+        0.9688228368759155
+      ],
+      "tail": [
+        -0.10446855425834656,
+        -0.6338344812393188,
+        0.9406645894050598
+      ],
+      "parent": "Chest",
+      "deform": false,
+      "connected": false
+    },
+    "Leg.L": {
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742277657347586e-08,
+          0.11249999701976776
+        ],
+        [
+          8.742277657347586e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0,
+          0.6749999523162842
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        0.11249999701976776,
+        0.0,
+        0.6749999523162842
+      ],
+      "tail": [
+        0.11249999701976776,
+        0.0,
+        0.0
+      ],
+      "parent": "Hips",
+      "deform": true,
+      "connected": false
+    },
+    "Leg.R": {
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742277657347586e-08,
+          -0.11249999701976776
+        ],
+        [
+          8.742277657347586e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0,
+          0.6749999523162842
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "head": [
+        -0.11249999701976776,
+        0.0,
+        0.6749999523162842
+      ],
+      "tail": [
+        -0.11249999701976776,
+        0.0,
+        0.0
+      ],
+      "parent": "Hips",
+      "deform": true,
+      "connected": false
+    }
+  },
+  "selected_mesh_signature_preserved": true,
+  "selected_rest_rig_preserved": true,
+  "source_file_unchanged": true,
+  "protected_v1_sha256": {
+    "block_jump_v1_review.blend": "a2cc3854abf0b3addb4a7ce76563fe83c10e0a8f3502a5a458b43e82c27f704e",
+    "block_jump_gameplay.mp4": "9c8048fd3fee2eda499cadda8127a436f9eb16b7dc88867f3f34adbbb35deb58",
+    "block_jump_side.mp4": "1b4e4e6caa6729be2fd26b7d4de85a01d075bee76c1718715359b165a0f57c32"
+  },
+  "fps": 24,
+  "frames": [
+    1,
+    208
+  ],
+  "preview_reset_frame": 105,
+  "entry_phase_offsets": [
+    0,
+    8
+  ],
+  "gait_extremum_rule": "Nextphase k*8+0.5 from entry;3frame catch then0.025frame/frame drift. No fixed anatomical lead.",
+  "plateau_phases": {
+    "up": [
+      24.5,
+      24.75
+    ],
+    "down": [
+      72.5,
+      72.7
+    ]
+  },
+  "block_height_m": 1.0,
+  "block_height_is_authored_test_assumption": true,
+  "horizontal_preview_speed_mps": 1.5,
+  "pose_actions": [
+    "BlockJump_Up_V2",
+    "BlockHop_Down_V2",
+    "BlockJump_Up_V2_OppositeLead",
+    "BlockHop_Down_V2_OppositeLead",
+    "PREVIEW_ONLY_ContinuousJumpReview_V2"
+  ],
+  "preview_travel_action": "PREVIEW_ONLY_StudyTravel_V2",
+  "cameras": [
+    "Gameplay_Oblique_FIXED",
+    "Side_Diagnostic_FIXED"
+  ],
+  "validation": {
+    "quarter_frame_samples": 829,
+    "floor_min_z": 0.000999925658106804,
+    "platform_min_clearance": 0.001000046730041504,
+    "max_forearm_angle": 0.0,
+    "failures": 0,
+    "collision_check": "Evaluated final mesh polygons clipped to block XY footprint, minimum Z against top; all mesh vertices against floor. No bone-origin-only test."
+  },
+  "preview_safety_lift": {
+    "max_m": 7.247924793674088e-08,
+    "affected_samples": 96
+  },
+  "approved_shoulders": {
+    "inward_per_side_m": 0.032,
+    "source_action": "R12_Hold_Unarmed_Upper",
+    "source_pose_location": {
+      "UpperArm.L": [
+        0.03200000151991844,
+        0.0,
+        2.797528875220223e-09
+      ],
+      "UpperArm.R": [
+        -0.03200000151991844,
+        0.0,
+        -2.797528875220223e-09
+      ]
+    },
+    "maximum_authored_pose_translation_error_m": 0.0
+  },
+  "additive_scope": {
+    "only_new_jump_clips_proposed": true,
+    "original_file_and_all_old_animation_bytes_unchanged": true,
+    "loaded_source_hold_action_unchanged": true,
+    "loaded_source_hold_action_sha256": "e596a30effb993449fde4ec2220d026ded80d4da4e2e494d5ba4e536af69c00a",
+    "custom_run_in_out_preview_only": true,
+    "preview_body_action": "PREVIEW_ONLY_ContinuousJumpReview_V2",
+    "no_production_walk_sprint_idle_weapon_combat_updates": true
+  },
+  "airborne_asymmetry_validation": {
+    "plateau_samples": 74,
+    "minimum_leg_foreaft_split_deg": 38.126579844344796,
+    "minimum_arm_foreaft_split_deg": 23.638479503493773,
+    "maximum_phase8_left_right_swap_angle_error_radians": 2.220446049250313e-16,
+    "strong_opposed_legs_on_all_plateau_samples": true,
+    "offset8_mirrors_entry_selected_lead": true
+  }
+}

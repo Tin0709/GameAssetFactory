@@ -1,0 +1,84 @@
+[
+  {
+    "file": "block_jump_gameplay.mp4",
+    "sha256": "b4eace17aed4cca849bcb011beddfbf6c8d492f4f4150d03a4c75c7e78a14458",
+    "fps": 24.0,
+    "frames": 208,
+    "decoded_all_frames": 208,
+    "size": [
+      960,
+      540
+    ],
+    "duration_s": 8.666666666666666,
+    "second_journey_offset8_opposite_lead": true,
+    "phase_comparison_compression_included": [
+      {
+        "first_frame": 22,
+        "opposite_frame": 126,
+        "mean_pixel_difference": 1.7915412808641975
+      },
+      {
+        "first_frame": 28,
+        "opposite_frame": 132,
+        "mean_pixel_difference": 1.890588348765432
+      },
+      {
+        "first_frame": 79,
+        "opposite_frame": 183,
+        "mean_pixel_difference": 1.8812776491769547
+      },
+      {
+        "first_frame": 83,
+        "opposite_frame": 187,
+        "mean_pixel_difference": 1.9067264660493828
+      },
+      {
+        "first_frame": 87,
+        "opposite_frame": 191,
+        "mean_pixel_difference": 1.7694425154320987
+      }
+    ],
+    "encoded_pixel_sheet": ".validation\\block_jump_gameplay_encoded_sheet.jpg"
+  },
+  {
+    "file": "block_jump_side.mp4",
+    "sha256": "9f7cf634247d9a8ffa5ed41edf58da8c10ecd6ac888ea03d8b0e7b1765feccbc",
+    "fps": 24.0,
+    "frames": 208,
+    "decoded_all_frames": 208,
+    "size": [
+      960,
+      540
+    ],
+    "duration_s": 8.666666666666666,
+    "second_journey_offset8_opposite_lead": true,
+    "phase_comparison_compression_included": [
+      {
+        "first_frame": 22,
+        "opposite_frame": 126,
+        "mean_pixel_difference": 1.1203710133744855
+      },
+      {
+        "first_frame": 28,
+        "opposite_frame": 132,
+        "mean_pixel_difference": 1.069085648148148
+      },
+      {
+        "first_frame": 79,
+        "opposite_frame": 183,
+        "mean_pixel_difference": 1.0658596965020577
+      },
+      {
+        "first_frame": 83,
+        "opposite_frame": 187,
+        "mean_pixel_difference": 1.1237512860082304
+      },
+      {
+        "first_frame": 87,
+        "opposite_frame": 191,
+        "mean_pixel_difference": 1.1780182613168724
+      }
+    ],
+    "encoded_pixel_sheet": ".validation\\block_jump_side_encoded_sheet.jpg"
+  }
+]
