@@ -9,14 +9,14 @@
   ],
   "mesh_local_bounds_blender": [
     [
-      -0.4054724872112274,
-      -0.3959939479827881,
+      -0.45728471875190735,
+      -0.4500481188297272,
       0.0
     ],
     [
-      0.3854694366455078,
-      0.3487025797367096,
-      0.43420201539993286
+      0.43864214420318604,
+      0.3883327543735504,
+      0.47103241086006165
     ]
   ],
   "triangles": 100,
@@ -57,14 +57,23 @@
   "grass_source": "blender\\environment\\studies\\grass_block_reference_v4\\grass_block_reference_v4.blend",
   "grass_source_sha256": "35f15fedee3d499c59174dba8ea8877e91f365efc9eb92f22f0d3eae44b918c7",
   "grass_reuse": "Appended original v4 object; low version shares same mesh, display Z scale .65 only",
-  "glb": "game_mobile_3d\\assets\\environment\\meadow_flowers_v1\\white_flower_patch_1m.glb",
-  "glb_sha256": "0f9ba95c5cde3a00e755ac7d59dc49e9a25701b96a0d875cb6adfc7c3b6a327f",
+  "glb": "blender\\environment\\studies\\dungeons_ground_style_v2\\exports\\white_flower_patch_1m_v1.glb",
+  "glb_sha256": "fc6b9ad353744985115c45effa014d06e26e34bbd8299d53bf8d742c7ce3c4ea",
   "preservation_fingerprint_digest": "cec5b726e2f2f87154017b384a9d142b476e0d525f7457bed0f843407db81d90",
   "baseline_blend_sha256": "b84090ce4e9b238b2b201abaa80424b430394e01e45c43f961d92b05fcb4c096",
   "preservation_method": "Independent pre-edit backup baseline; recursive authored RNA values excluding session_uid, forced image cache load, mesh/material/node/UV/color/image hashes; all existing data preserved",
   "grass_reuse_audit": "Fresh v4 library geometry/UV/color/shape keys, material nodes and packed atlas compared independently",
   "blender_diagnostic_images": [
-    ".validation/flower_patch_v1/blender_flowers_detail.png",
-    ".validation/flower_patch_v1/blender_flowers_grass_diagnostic.png"
-  ]
+    ".validation/flower_patch_v1/blender_flowers_enlarged_cupped_detail.png",
+    ".validation/flower_patch_v1/blender_all_four_plants_revised.png"
+  ],
+  "user_requested_head_revision": {
+    "head_scale_factor": 1.5,
+    "petal_upward_cup_degrees": 12,
+    "unchanged": "Five roots, stems, leaves, head-centre heights, UV metadata, colours and material",
+    "baseline_head_coordinates": "white_flower_head_revision_v1.json; canonical original heads make reapplication noncumulative",
+    "pre_revision_fingerprint": "989ffd77073c1084ce592339a61ef44b31de981579c039036c9748e5e1975991",
+    "original_white_glb_sha256": "0f9ba95c5cde3a00e755ac7d59dc49e9a25701b96a0d875cb6adfc7c3b6a327f"
+  },
+  "export_scope": "Blender study only; user requested review before game integration"
 }

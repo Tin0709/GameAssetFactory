@@ -1,0 +1,33 @@
+{
+  "status": "User-requested single connected planar gold head; review pending",
+  "report": {
+    "status": "PASS",
+    "gold_shared_edge_components": 28,
+    "one_continuous_planar_ngon_per_head": true,
+    "triangles": 1120,
+    "source_faces": 112,
+    "vertices": 1344,
+    "changed_inner_base_vertices": 224,
+    "bounds_blender": [
+      [
+        -0.6227045655250549,
+        -0.6084151864051819,
+        0.0
+      ],
+      [
+        0.5938904285430908,
+        0.587437629699707,
+        1.350000023841858
+      ]
+    ],
+    "preservation_changes": [
+      [
+        "meshes",
+        "ENV_TallGoldenGrass_1m_V1_PlanarMesh"
+      ]
+    ],
+    "baseline_digest": "144be2720217c7b60820fc2f88e916daeef7ad113fc08162dbac75cd7bff0d2c",
+    "retained": "all stems, outer tips, shaft, UVs, colors, materials, objects, white source"
+  },
+  "sha256": "956712f96913aa7afe0e783d1d8946a160f1afa278d0f3c11d20c4df67be5dfc"
+}

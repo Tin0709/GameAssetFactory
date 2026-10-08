@@ -26,7 +26,7 @@ assert len(m.loop_triangles) <= 220
 assert len(m.polygons) == 50 and all(len(p.vertices) == 4 for p in m.polygons)
 lo = [min(v.co[k] for v in m.vertices) for k in range(3)]
 hi = [max(v.co[k] for v in m.vertices) for k in range(3)]
-assert all(-.5 <= lo[k] < hi[k] <= .5 for k in (0, 1)) and abs(lo[2]) < 1e-8 and .28 <= hi[2] <= .46
+assert all(-.5 <= lo[k] < hi[k] <= .5 for k in (0, 1)) and abs(lo[2]) < 1e-8 and .28 <= hi[2] <= .5
 assert not m.materials[0].use_backface_culling
 bsdf = m.materials[0].node_tree.nodes.get('Principled BSDF')
 assert bsdf.inputs['Roughness'].default_value >= .95 and bsdf.inputs['Metallic'].default_value == 0
@@ -78,7 +78,7 @@ for payload in (old_nodes, new_nodes):
             node['image'] = {'size': list(img.size), 'pixels_sha256': digest(list(img.pixels)), 'packed_sha256': hashlib.sha256(img.packed_file.data).hexdigest() if img.packed_file else None}
 assert old_nodes == new_nodes, 'Appended v4 grass material/atlas must match original source'
 
-glb_path = ROOT / 'game_mobile_3d/assets/environment/meadow_flowers_v1/white_flower_patch_1m.glb'
+glb_path = HERE / 'exports/white_flower_patch_1m_v1.glb'
 raw = glb_path.read_bytes()
 assert raw[:4] == b'glTF'
 jlen, jtype = struct.unpack_from('<II', raw, 12)
@@ -140,12 +140,16 @@ for i, position in enumerate(attrs['POSITION']):
     max_error = max(max_error, error)
 manifest = json.loads((HERE / 'white_flowers_v1_manifest.json').read_text())
 assert manifest['glb_sha256'] == hashlib.sha256(raw).hexdigest()
+revision_report = None
+if (HERE/'white_flower_head_revision_v1.json').exists():
+    from white_flower_head_revision_audit import audit_revision
+    revision_report = audit_revision()
 report = {'status': 'PASS', 'triangles': len(m.loop_triangles), 'quads': len(m.polygons), 'authored_vertices': len(m.vertices),
           'mesh_local_bounds_blender': [lo, hi], 'flower_face_counts': counts,
           'original_data_changes': changes, 'original_datablocks_checked': {k: len(v) for k,v in baseline['data'].items()},
           'original_fingerprint_digest': digest(baseline['data']), 'grass_source_sha256': baseline['grass_source_sha256'],
           'appended_grass_source_geometry_uv_colors_shape_keys_material_atlas_equal': True,
           'source_corner_to_glb_max_error': max_error, 'source_corner_to_glb_normal_max_error': max_normal_error,
-          'glb_sha256': manifest['glb_sha256'], 'glb_vertices': len(attrs['POSITION'])}
+          'glb_sha256': manifest['glb_sha256'], 'glb_vertices': len(attrs['POSITION']), 'authorized_head_revision_audit': revision_report}
 (EVIDENCE / 'validation_source_and_glb.json').write_text(json.dumps(report, indent=2))
 print(json.dumps(report, indent=2))

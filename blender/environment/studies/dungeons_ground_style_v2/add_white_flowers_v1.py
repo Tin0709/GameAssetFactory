@@ -4,6 +4,7 @@ Run through Blender MCP in the current connected window. Baseline backup must ex
 Rejects re-running over the authored collection; editing is intentionally explicit.
 """
 import bpy
+assert not bpy.app.background, 'Source writes require the connected foreground Blender session'
 import hashlib
 import json
 import math
@@ -14,7 +15,7 @@ from mathutils import Vector
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 EVIDENCE = ROOT / '.validation/flower_patch_v1'
-OUT = ROOT / 'game_mobile_3d/assets/environment/meadow_flowers_v1'
+OUT = HERE / 'exports'
 sys.path.insert(0, str(HERE))
 from flower_preservation import compare, digest, mesh_content
 
@@ -136,7 +137,7 @@ for selected in list(bpy.context.selected_objects):
     selected.select_set(False)
 obj.select_set(True)
 bpy.context.view_layer.objects.active = obj
-export_path = OUT / 'white_flower_patch_1m.glb'
+export_path = OUT / 'white_flower_patch_1m_v1.glb'
 bpy.ops.export_scene.gltf(filepath=str(export_path), export_format='GLB', use_selection=True,
     export_yup=True, export_texcoords=True, export_normals=True, export_materials='EXPORT',
     export_vertex_color='NAME', export_vertex_color_name='Color', export_all_vertex_colors=False,
@@ -224,3 +225,4 @@ for area in bpy.context.screen.areas:
         break
 bpy.ops.wm.save_as_mainfile(filepath=str(HERE / 'dungeons_ground_style_v2.blend'))
 result = manifest
+

@@ -7,8 +7,6 @@ var v3_missing_assets: Array[String] = []
 @export var review_atmosphere := true
 @export_range(0.0,0.30,0.01) var review_warmth := .05
 var warmth_lut: GradientTexture1D
-const MEADOW_FLOWERS := "res://assets/environment/meadow_flowers_v1/white_flower_patch_1m.glb"
-var meadow_flower_material: ShaderMaterial
 
 func _ready() -> void:
 	super._ready()
@@ -87,36 +85,6 @@ func build_forest_grass() -> void:
 			var basis:=Basis(Vector3.UP,rng.randf_range(0,TAU)).scaled(Vector3(1,height_scale,1))
 			transforms.append(Transform3D(basis,Vector3(p.x,ground_height(p.x,p.y),p.y)))
 	scatter_batch(mesh_from_scene(GRASS),transforms,forest_blade_material,"MeadowBroadGrass",true)
-
-func build_flower_accents() -> void:
-	meadow_flower_material = ShaderMaterial.new()
-	meadow_flower_material.shader = preload("res://materials/meadow_flowers_v1.gdshader")
-	if not ResourceLoader.exists(MEADOW_FLOWERS):
-		push_error("Missing authored meadow flower block: " + MEADOW_FLOWERS)
-		return
-	var centers := [Vector2(-3.8,-2.5),Vector2(4.0,-2.0),Vector2(-5.7,4.5),Vector2(4.8,4.8),Vector2(-5.3,-7.0)]
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 9291
-	var transforms: Array[Transform3D] = []
-	var occupied: Dictionary = {}
-	for center in centers:
-		for i in 6:
-			var candidate: Vector2 = center + Vector2(rng.randfn(0,.55),rng.randfn(0,.55))
-			var p := Vector2(floorf(candidate.x)+.5,floorf(candidate.y)+.5)
-			var angle := float(rng.randi_range(0,3))*PI*.5
-			if occupied.has(p) or layout.path_distance(p)<1.55 or p.length()<2.0: continue
-			occupied[p] = true
-			# Quarter turns preserve the full 1x1 metre terrain-cell footprint.
-			transforms.append(Transform3D(Basis(Vector3.UP,angle),Vector3(p.x,ground_height(p.x,p.y),p.y)))
-	var first_bucket := forest.get_child_count()
-	scatter_batch(mesh_from_scene(load(MEADOW_FLOWERS)),transforms,meadow_flower_material,"MeadowWhiteFlowers",false)
-	for i in range(first_bucket,forest.get_child_count()):
-		forest.get_child(i).name = "MeadowWhiteFlowers_%02d" % (i-first_bucket)
-
-func _physics_process(delta: float) -> void:
-	super._physics_process(delta)
-	if meadow_flower_material != null:
-		motion.publish(meadow_flower_material)
 
 func set_forest_stage(stage: int) -> void:
 	super.set_forest_stage(stage)

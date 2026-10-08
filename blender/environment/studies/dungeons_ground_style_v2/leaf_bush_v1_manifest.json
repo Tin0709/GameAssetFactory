@@ -1,0 +1,129 @@
+{
+  "status": "Earlier bulk assembly retained as hidden comparison; latest request is individual1m leaf modules",
+  "object": "ENV_LeafBush_3x3x2m_V1",
+  "source_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\environment\\studies\\dungeons_ground_style_v2\\dungeons_ground_style_v2.blend",
+  "export": "exports/leaf_bush_3x3x2m_v1.glb",
+  "sha256": "1608d3d9af21467dae855e473f855e37c806be7eed74d597a0fe1b143243e6da",
+  "palette_srgb": [
+    "#30492a",
+    "#3b532d",
+    "#485f32",
+    "#566c38",
+    "#66783f",
+    "#737f49",
+    "#868b56",
+    "#8e8957",
+    "#99925e"
+  ],
+  "texture": "textures/leaf_bush_v1_original_clusters.png",
+  "texture_sha256": "15f1a3c21a55301069f6203f40166d76f61cb0b6d3b5ca91ad644ad54ee8ac78",
+  "texture_generation": "Original dense layered smaller angular olive leaf marks; restrained pale gold;32texels/m unchanged",
+  "cell_coordinates": [
+    [
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      2,
+      0
+    ],
+    [
+      0,
+      2,
+      1
+    ],
+    [
+      1,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      0
+    ],
+    [
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      2,
+      0
+    ],
+    [
+      1,
+      2,
+      1
+    ],
+    [
+      2,
+      1,
+      0
+    ],
+    [
+      2,
+      1,
+      1
+    ],
+    [
+      2,
+      2,
+      0
+    ],
+    [
+      2,
+      2,
+      1
+    ]
+  ],
+  "source_units": "1 metre per cuboid block, constant32texels/m all axes",
+  "actor_reference_sha256": "a2922240bf3d8bd0fe282942905c0502abbf0177f32b24d4544a72a02a3b7b52",
+  "audit": {
+    "status": "PASS",
+    "bounds_blender": [
+      [
+        -1.5,
+        -1.5,
+        0.0
+      ],
+      [
+        1.5,
+        1.5,
+        2.0
+      ]
+    ],
+    "dimensions_m": [
+      3,
+      3,
+      2
+    ],
+    "occupied_unit_blocks": 12,
+    "exterior_quads": 36,
+    "triangles": 72,
+    "texels_per_m": 32,
+    "texel_density_max_error": 1.1444091796875e-05,
+    "atlas_size": [
+      336,
+      224
+    ],
+    "texture_filter": "Closest",
+    "prior_data_preserved": true,
+    "scope": "Blender-only study",
+    "glb_sha256": "211c72994e3162c45b3ea13078d5d7ca26a4de1d8221a9f5b05eca476d1026c4",
+    "one_surface": true,
+    "embedded_original_leaf_texture": true,
+    "source_binary_position_uv_agreement": true,
+    "nearest_sampler": {
+      "magFilter": 9728,
+      "minFilter": 9984,
+      "wrapS": 33071,
+      "wrapT": 33071
+    }
+  },
+  "silhouette": "Contiguous2\u00d72 upper mass with offset back shoulder; inset front corners avoid a full-width staircase ledge",
+  "current_refinement": "refine_leaf_bush_v1.py"
+}
