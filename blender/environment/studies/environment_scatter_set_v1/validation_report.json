@@ -1,0 +1,499 @@
+{
+  "passed": true,
+  "checks": {
+    "exactly_one_scene": true,
+    "18_new_mesh_assets": true,
+    "category_counts": true,
+    "rock_sizes": true,
+    "flower_colors": true,
+    "all_mesh_pivots_scales_rotations_uvs_dimensions": true,
+    "all_asset_metadata": true,
+    "no_modifiers_or_animation": true,
+    "no_linked_external_libraries": true,
+    "all_images_packed_opaque": true,
+    "all_image_textures_nearest": true,
+    "welded_closed_rock_dirt_surfaces": true,
+    "three_static_v4_reference_objects": true,
+    "source_v4_unchanged": true,
+    "all_production_environment_files_unchanged": true
+  },
+  "counts": {
+    "rock": 6,
+    "dirt": 4,
+    "flower": 8
+  },
+  "assets": [
+    {
+      "name": "ENV_Rock_Small_01",
+      "dimensions_m": [
+        0.30000001192092896,
+        0.2460000067949295,
+        0.15000000596046448
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Rock_Small_02",
+      "dimensions_m": [
+        0.4000000059604645,
+        0.328000009059906,
+        0.20000000298023224
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Rock_Medium_01",
+      "dimensions_m": [
+        0.5799999833106995,
+        0.475600004196167,
+        0.28999999165534973
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Rock_Medium_02",
+      "dimensions_m": [
+        0.6800000071525574,
+        0.5576000213623047,
+        0.3400000035762787
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Rock_Large_01",
+      "dimensions_m": [
+        0.8600000143051147,
+        0.7052000164985657,
+        0.4300000071525574
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Rock_Large_02",
+      "dimensions_m": [
+        0.949999988079071,
+        0.7789999842643738,
+        0.4749999940395355
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Ground_Flat_Tile",
+      "dimensions_m": [
+        0.6499999761581421,
+        0.6499999761581421,
+        0.11999999731779099
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Ground_Broken_Edge",
+      "dimensions_m": [
+        0.8500000238418579,
+        0.6499999761581421,
+        0.17000000178813934
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Ground_Raised_Core",
+      "dimensions_m": [
+        0.8999999761581421,
+        0.800000011920929,
+        0.20000000298023224
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Ground_Stepped_Chunk",
+      "dimensions_m": [
+        1.0,
+        0.75,
+        0.23000000417232513
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Flowers_Purple_01",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.3402727246284485
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Flowers_Purple_02",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.37500739097595215
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Flowers_Yellow_01",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.3376651406288147
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Flowers_Yellow_02",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.39182034134864807
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Flowers_White_01",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.33928027749061584
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Flowers_White_02",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.400978147983551
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Flowers_Red_01",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.3128175139427185
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ENV_Flowers_Red_02",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.348904550075531
+      ],
+      "bottom_center_pivot": true,
+      "identity_scale": true,
+      "identity_rotation": true,
+      "uv_valid": true,
+      "size_brief_met": true,
+      "no_modifiers": true,
+      "asset_metadata": true,
+      "nonmanifold_edges": 0
+    }
+  ],
+  "images": [
+    {
+      "name": "ENV_Atlas_128_Reference_V4",
+      "size": [
+        128,
+        128
+      ],
+      "packed": true,
+      "source": "FILE",
+      "alpha_all_one": true
+    },
+    {
+      "name": "SCATTER_Palette_128_Opaque",
+      "size": [
+        128,
+        128
+      ],
+      "packed": true,
+      "source": "FILE",
+      "alpha_all_one": true
+    }
+  ],
+  "source_after_sha256": "35f15fedee3d499c59174dba8ea8877e91f365efc9eb92f22f0d3eae44b918c7",
+  "production_preservation": [
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\dirt_block_v4_environment_atlas_v4.png",
+      "before": "3ffaea7bbee2b4d89dfd20f307e8f04fa48535e5e2a1c6926f8c41c418793d7a",
+      "after": "3ffaea7bbee2b4d89dfd20f307e8f04fa48535e5e2a1c6926f8c41c418793d7a",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\dirt_block_v4_environment_atlas_v4.png.import",
+      "before": "7ec0c93525c5a78daf3716e80a9bd61f557b8472f7fe8d1c55c3f3f987672bb5",
+      "after": "7ec0c93525c5a78daf3716e80a9bd61f557b8472f7fe8d1c55c3f3f987672bb5",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\dirt_block_v4.glb",
+      "before": "694516f21555b16c69dc8d652ac79208fd75640e0457cb0e72a5dc48c3fa5950",
+      "after": "694516f21555b16c69dc8d652ac79208fd75640e0457cb0e72a5dc48c3fa5950",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\dirt_block_v4.glb.import",
+      "before": "5138bd3380d77e8e047c77dd4b0668f342b025ab448e2415bd7fb1b88692ccfd",
+      "after": "5138bd3380d77e8e047c77dd4b0668f342b025ab448e2415bd7fb1b88692ccfd",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\environment_atlas_64.png",
+      "before": "e97583f5073ad5b0f9d46256bd6f770fcbec0f71a89d1ea4a2d329c89fc6e20c",
+      "after": "e97583f5073ad5b0f9d46256bd6f770fcbec0f71a89d1ea4a2d329c89fc6e20c",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\environment_atlas_64.png.import",
+      "before": "061365269aaab7625254cdc6857261c10f1b943451df0be30c07f083e5e8d3dc",
+      "after": "061365269aaab7625254cdc6857261c10f1b943451df0be30c07f083e5e8d3dc",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\environment_atlas_v4.png",
+      "before": "3ffaea7bbee2b4d89dfd20f307e8f04fa48535e5e2a1c6926f8c41c418793d7a",
+      "after": "3ffaea7bbee2b4d89dfd20f307e8f04fa48535e5e2a1c6926f8c41c418793d7a",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\environment_atlas_v4.png.import",
+      "before": "03bd779d45a73e76854957d6035d88e6ac903055c3267be01532e0276e21691f",
+      "after": "03bd779d45a73e76854957d6035d88e6ac903055c3267be01532e0276e21691f",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\export_manifest_v4.json",
+      "before": "6557feeb3e5280ac7fb1b465e9d549d0b20b05eb6e703b97c355cb315e5c5190",
+      "after": "6557feeb3e5280ac7fb1b465e9d549d0b20b05eb6e703b97c355cb315e5c5190",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\export_manifest.json",
+      "before": "0a1c035d28225f098e764fe833908772100cd005b2dd90bb28beb3a8b1df26e2",
+      "after": "0a1c035d28225f098e764fe833908772100cd005b2dd90bb28beb3a8b1df26e2",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_dirt_block_v3_environment_atlas_64.png",
+      "before": "e97583f5073ad5b0f9d46256bd6f770fcbec0f71a89d1ea4a2d329c89fc6e20c",
+      "after": "e97583f5073ad5b0f9d46256bd6f770fcbec0f71a89d1ea4a2d329c89fc6e20c",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_dirt_block_v3_environment_atlas_64.png.import",
+      "before": "99a4dad627f1e1aab253b328e3bdc2ac913daaec90e7a33a848ffe370948831e",
+      "after": "99a4dad627f1e1aab253b328e3bdc2ac913daaec90e7a33a848ffe370948831e",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_dirt_block_v3.glb",
+      "before": "77b208d90b878aa8de626f229329c727c1547a64c3f706ccad88ba1098307485",
+      "after": "77b208d90b878aa8de626f229329c727c1547a64c3f706ccad88ba1098307485",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_dirt_block_v3.glb.import",
+      "before": "cc74963f5163a9a43a931fc4ab66190e6e079b950be8f307f8ef3b0e1577c8d6",
+      "after": "cc74963f5163a9a43a931fc4ab66190e6e079b950be8f307f8ef3b0e1577c8d6",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_dirt_block_v4_environment_atlas_v4.png",
+      "before": "65cae85cee8de75860c53a19c2dccd726009c87569c5154ec598c7afbda435d8",
+      "after": "65cae85cee8de75860c53a19c2dccd726009c87569c5154ec598c7afbda435d8",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_dirt_block_v4_environment_atlas_v4.png.import",
+      "before": "ddafa3b9b1716bb0fc739b07121ae994137f48ca3853cc575ae80707048b297b",
+      "after": "ddafa3b9b1716bb0fc739b07121ae994137f48ca3853cc575ae80707048b297b",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_dirt_block_v4.glb",
+      "before": "38b53df1630fb0d7be5ec3516b9f73a92dee56914512237070b5fc4218351207",
+      "after": "38b53df1630fb0d7be5ec3516b9f73a92dee56914512237070b5fc4218351207",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_dirt_block_v4.glb.import",
+      "before": "d0e1f4ef8a905c0db47be3406b381b46bd817b675a8a9f448a8353cd53728655",
+      "after": "d0e1f4ef8a905c0db47be3406b381b46bd817b675a8a9f448a8353cd53728655",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_patch_v3_environment_atlas_64.png",
+      "before": "e97583f5073ad5b0f9d46256bd6f770fcbec0f71a89d1ea4a2d329c89fc6e20c",
+      "after": "e97583f5073ad5b0f9d46256bd6f770fcbec0f71a89d1ea4a2d329c89fc6e20c",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_patch_v3_environment_atlas_64.png.import",
+      "before": "aad56e861721595954ec32b22acfeb7e164079537ba5ba20f68a361a2fffd1a7",
+      "after": "aad56e861721595954ec32b22acfeb7e164079537ba5ba20f68a361a2fffd1a7",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_patch_v3.glb",
+      "before": "03b79ca2c79efc69087f354c42872d47c032e2c17440dca2d00ff3eccd371ba3",
+      "after": "03b79ca2c79efc69087f354c42872d47c032e2c17440dca2d00ff3eccd371ba3",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_patch_v3.glb.import",
+      "before": "42f28c698e2e7a5cbeba9519cd96e4b679f9cbc41cd39be095fc3e58f0f643c0",
+      "after": "42f28c698e2e7a5cbeba9519cd96e4b679f9cbc41cd39be095fc3e58f0f643c0",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_patch_v4_environment_atlas_v4.png",
+      "before": "65cae85cee8de75860c53a19c2dccd726009c87569c5154ec598c7afbda435d8",
+      "after": "65cae85cee8de75860c53a19c2dccd726009c87569c5154ec598c7afbda435d8",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_patch_v4_environment_atlas_v4.png.import",
+      "before": "bcd264bbd961a7b6aff9516727f1a246759f2638834be90d413837a1d5889d30",
+      "after": "bcd264bbd961a7b6aff9516727f1a246759f2638834be90d413837a1d5889d30",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_patch_v4.glb",
+      "before": "a8e8a95897ab45bfd7bf73e928f3f9c70300eb5eb724b68756cf5024bebb7548",
+      "after": "a8e8a95897ab45bfd7bf73e928f3f9c70300eb5eb724b68756cf5024bebb7548",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\game_mobile_3d\\assets\\environment\\grassland\\grass_patch_v4.glb.import",
+      "before": "f955030055aefa02058b3404422bcfec077227ed309b176b72b332c4e9462c41",
+      "after": "f955030055aefa02058b3404422bcfec077227ed309b176b72b332c4e9462c41",
+      "unchanged": true
+    }
+  ],
+  "fresh_reopen": true,
+  "scene_name": "ENV_Scatter_Set_V1_Showcase",
+  "artistic_status": "AWAITING HUMAN REVIEW"
+}

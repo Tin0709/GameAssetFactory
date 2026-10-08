@@ -1,0 +1,272 @@
+{
+  "study": "environment_scatter_set_v1.blend",
+  "source_reference": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\environment\\studies\\grass_block_reference_v4\\grass_block_reference_v4.blend",
+  "source_sha256": "35f15fedee3d499c59174dba8ea8877e91f365efc9eb92f22f0d3eae44b918c7",
+  "new_assets": [
+    {
+      "name": "ENV_Rock_Small_01",
+      "category": "rock",
+      "variant": "small",
+      "dimensions_m": [
+        0.30000001192092896,
+        0.2460000067949295,
+        0.15000000596046448
+      ],
+      "vertices": 32,
+      "triangles": 60,
+      "mesh": "ENV_Rock_Small_01 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Rock_Small_01.png"
+    },
+    {
+      "name": "ENV_Rock_Small_02",
+      "category": "rock",
+      "variant": "small",
+      "dimensions_m": [
+        0.4000000059604645,
+        0.328000009059906,
+        0.20000000298023224
+      ],
+      "vertices": 32,
+      "triangles": 60,
+      "mesh": "ENV_Rock_Small_02 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Rock_Small_02.png"
+    },
+    {
+      "name": "ENV_Rock_Medium_01",
+      "category": "rock",
+      "variant": "medium",
+      "dimensions_m": [
+        0.5799999833106995,
+        0.475600004196167,
+        0.28999999165534973
+      ],
+      "vertices": 46,
+      "triangles": 88,
+      "mesh": "ENV_Rock_Medium_01 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Rock_Medium_01.png"
+    },
+    {
+      "name": "ENV_Rock_Medium_02",
+      "category": "rock",
+      "variant": "medium",
+      "dimensions_m": [
+        0.6800000071525574,
+        0.5576000213623047,
+        0.3400000035762787
+      ],
+      "vertices": 44,
+      "triangles": 84,
+      "mesh": "ENV_Rock_Medium_02 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Rock_Medium_02.png"
+    },
+    {
+      "name": "ENV_Rock_Large_01",
+      "category": "rock",
+      "variant": "large",
+      "dimensions_m": [
+        0.8600000143051147,
+        0.7052000164985657,
+        0.4300000071525574
+      ],
+      "vertices": 48,
+      "triangles": 92,
+      "mesh": "ENV_Rock_Large_01 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Rock_Large_01.png"
+    },
+    {
+      "name": "ENV_Rock_Large_02",
+      "category": "rock",
+      "variant": "large",
+      "dimensions_m": [
+        0.949999988079071,
+        0.7789999842643738,
+        0.4749999940395355
+      ],
+      "vertices": 46,
+      "triangles": 88,
+      "mesh": "ENV_Rock_Large_02 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Rock_Large_02.png"
+    },
+    {
+      "name": "ENV_Ground_Flat_Tile",
+      "category": "dirt",
+      "variant": "1",
+      "dimensions_m": [
+        0.6499999761581421,
+        0.6499999761581421,
+        0.11999999731779099
+      ],
+      "vertices": 32,
+      "triangles": 60,
+      "mesh": "ENV_Ground_Flat_Tile \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Ground_Flat_Tile.png"
+    },
+    {
+      "name": "ENV_Ground_Broken_Edge",
+      "category": "dirt",
+      "variant": "2",
+      "dimensions_m": [
+        0.8500000238418579,
+        0.6499999761581421,
+        0.17000000178813934
+      ],
+      "vertices": 28,
+      "triangles": 52,
+      "mesh": "ENV_Ground_Broken_Edge \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Ground_Broken_Edge.png"
+    },
+    {
+      "name": "ENV_Ground_Raised_Core",
+      "category": "dirt",
+      "variant": "3",
+      "dimensions_m": [
+        0.8999999761581421,
+        0.800000011920929,
+        0.20000000298023224
+      ],
+      "vertices": 36,
+      "triangles": 68,
+      "mesh": "ENV_Ground_Raised_Core \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Ground_Raised_Core.png"
+    },
+    {
+      "name": "ENV_Ground_Stepped_Chunk",
+      "category": "dirt",
+      "variant": "4",
+      "dimensions_m": [
+        1.0,
+        0.75,
+        0.23000000417232513
+      ],
+      "vertices": 46,
+      "triangles": 88,
+      "mesh": "ENV_Ground_Stepped_Chunk \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Ground_Stepped_Chunk.png"
+    },
+    {
+      "name": "ENV_Flowers_Purple_01",
+      "category": "flower",
+      "variant": "purple",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.3402727246284485
+      ],
+      "vertices": 392,
+      "triangles": 588,
+      "mesh": "ENV_Flowers_Purple_01 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Flowers_Purple_01.png"
+    },
+    {
+      "name": "ENV_Flowers_Purple_02",
+      "category": "flower",
+      "variant": "purple",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.37500739097595215
+      ],
+      "vertices": 520,
+      "triangles": 780,
+      "mesh": "ENV_Flowers_Purple_02 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Flowers_Purple_02.png"
+    },
+    {
+      "name": "ENV_Flowers_Yellow_01",
+      "category": "flower",
+      "variant": "yellow",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.3376651406288147
+      ],
+      "vertices": 392,
+      "triangles": 588,
+      "mesh": "ENV_Flowers_Yellow_01 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Flowers_Yellow_01.png"
+    },
+    {
+      "name": "ENV_Flowers_Yellow_02",
+      "category": "flower",
+      "variant": "yellow",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.39182034134864807
+      ],
+      "vertices": 520,
+      "triangles": 780,
+      "mesh": "ENV_Flowers_Yellow_02 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Flowers_Yellow_02.png"
+    },
+    {
+      "name": "ENV_Flowers_White_01",
+      "category": "flower",
+      "variant": "white",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.33928027749061584
+      ],
+      "vertices": 392,
+      "triangles": 588,
+      "mesh": "ENV_Flowers_White_01 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Flowers_White_01.png"
+    },
+    {
+      "name": "ENV_Flowers_White_02",
+      "category": "flower",
+      "variant": "white",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.400978147983551
+      ],
+      "vertices": 520,
+      "triangles": 780,
+      "mesh": "ENV_Flowers_White_02 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Flowers_White_02.png"
+    },
+    {
+      "name": "ENV_Flowers_Red_01",
+      "category": "flower",
+      "variant": "red",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.3128175139427185
+      ],
+      "vertices": 392,
+      "triangles": 588,
+      "mesh": "ENV_Flowers_Red_01 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Flowers_Red_01.png"
+    },
+    {
+      "name": "ENV_Flowers_Red_02",
+      "category": "flower",
+      "variant": "red",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.348904550075531
+      ],
+      "vertices": 520,
+      "triangles": 780,
+      "mesh": "ENV_Flowers_Red_02 \u2022 native mesh",
+      "thumbnail": "thumbnails/ENV_Flowers_Red_02.png"
+    }
+  ],
+  "counts": {
+    "rock": 6,
+    "dirt": 4,
+    "flower": 8
+  },
+  "renders": [
+    "overview",
+    "rocks",
+    "ground",
+    "flowers",
+    "v4_compatibility"
+  ],
+  "artistic_status": "AWAITING HUMAN REVIEW"
+}

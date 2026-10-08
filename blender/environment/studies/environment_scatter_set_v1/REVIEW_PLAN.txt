@@ -1,0 +1,16 @@
+Environment Scatter Set V1 — Blender review only
+
+Approved brief: Minecraft/voxel environment set matching Grass Reference V4.
+Create 6 rocks (2 small, 2 medium, 2 larger), 4 dirt/ground variants, and 8 compact flower clumps (2 purple, 2 yellow, 2 white, 2 red).
+One dedicated showcase scene; clean category and color grouping, labels, neutral presentation, clear lights. Include copied V4 grass reference for scale/style.
+Use 1 metre grass block scale, bottom-centred pivots, organized reusable meshes/collections, packed materials/textures.
+Preserve all original Blender and Godot assets. No exports, no Godot changes.
+
+Plan:
+1. Author native geometry and showcase in isolated study folder using GPT-6.1 Sol Medium.
+2. Render overview/category details, reopen and validate assets, review silhouette/material/scale consistency.
+3. Preserve dirty current Blender session as recovery copy, open review scene for the user.
+4. Stop for human artistic review.
+
+Ruling: Dedicated study folder supplies isolation; no Git operations or production migration are needed for this reversible art study.
+ARTISTIC STATUS: AWAITING HUMAN REVIEW.
