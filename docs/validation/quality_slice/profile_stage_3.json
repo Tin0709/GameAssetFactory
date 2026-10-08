@@ -1,0 +1,93 @@
+{
+	"combat_12_fixture": {
+		"draws": {
+			"max": 150.0,
+			"median": 147.0,
+			"p95": 149.0
+		},
+		"frame_interval_ms": {
+			"max": 15.745,
+			"median": 0.713,
+			"p95": 1.132
+		},
+		"living_zombies": {
+			"max": 12.0,
+			"median": 12.0,
+			"p95": 12.0
+		},
+		"primitives": {
+			"max": 144810.0,
+			"median": 144646.0,
+			"p95": 144786.0
+		},
+		"render_cpu_ms": {
+			"max": 0.479000002145767,
+			"median": 0.0949999988079071,
+			"p95": 0.120999999344349
+		},
+		"render_gpu_ms": {
+			"max": 1.64400005340576,
+			"median": 0.128999993205071,
+			"p95": 0.148000001907349
+		},
+		"samples": 10307,
+		"seconds": 8.000885,
+		"static_memory_before_sampling_bytes": 84303958.0,
+		"video_memory_bytes": {
+			"max": 124878848.0,
+			"median": 124354560.0,
+			"p95": 124878848.0
+		}
+	},
+	"device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+	"engine": "4.7.2-stable (official)",
+	"idle": {
+		"draws": {
+			"max": 121.0,
+			"median": 121.0,
+			"p95": 121.0
+		},
+		"frame_interval_ms": {
+			"max": 15.299,
+			"median": 0.497,
+			"p95": 0.732
+		},
+		"living_zombies": {
+			"max": 0.0,
+			"median": 0.0,
+			"p95": 0.0
+		},
+		"primitives": {
+			"max": 142904.0,
+			"median": 142904.0,
+			"p95": 142904.0
+		},
+		"render_cpu_ms": {
+			"max": 0.768999993801117,
+			"median": 0.0780000016093254,
+			"p95": 0.096000000834465
+		},
+		"render_gpu_ms": {
+			"max": 1.52799999713898,
+			"median": 0.100000001490116,
+			"p95": 0.116999998688698
+		},
+		"samples": 9134,
+		"seconds": 5.000359,
+		"static_memory_before_sampling_bytes": 80620378.0,
+		"video_memory_bytes": {
+			"max": 118194176.0,
+			"median": 118194176.0,
+			"p95": 118194176.0
+		}
+	},
+	"note": "Serial desktop uncapped wall-clock sampling; no image readback or movie. 3s warmups, 5s idle, 8s combat. Frame interval includes scheduling; GPU timing is Godot viewport timing, not full device instrumentation. No thermal/mobile inference.",
+	"phone_verified": false,
+	"renderer": "mobile",
+	"resolution": [
+		1280,
+		720
+	],
+	"stage": 3,
+	"target_fps": 30
+}

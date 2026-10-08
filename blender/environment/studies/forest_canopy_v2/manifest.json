@@ -1,0 +1,274 @@
+{
+  "version": 2,
+  "authoring_status": "ORIGINAL STUDY - NOT USER APPROVED",
+  "reference_use": "Original broadleaf forest interpretation; no copied game assets or textures.",
+  "source": "forest_canopy_v2.blend",
+  "unit": "metres",
+  "origin": "bottom centre of trunk / rooted shrub",
+  "color_pipeline": "Palette values are sRGB; Blender Color.color_srgb writes linear float Color; glTF COLOR_0 stores linear albedo. Material multiplies white baseColor by vertex color.",
+  "rendering": "Opaque, single-sided, flat-normal vertex-colored meshes. No textures; no transparent cards.",
+  "assets": {
+    "tree_oak_a": {
+      "voxel_size_m": [
+        0.225,
+        0.225,
+        0.225
+      ],
+      "filled_leaf_voxels": 1048,
+      "leaf_exposed_quads_before_merge": 982,
+      "leaf_quads_after_merge": 525,
+      "file": "tree_oak_a.glb",
+      "triangle_count": 1718,
+      "bounds_blender_min": [
+        -1.7999999523162842,
+        -1.5750000476837158,
+        0.0
+      ],
+      "bounds_blender_max": [
+        1.7999999523162842,
+        1.7999999523162842,
+        4.724999904632568
+      ],
+      "dimensions_m": [
+        3.5999999046325684,
+        3.375,
+        4.724999904632568
+      ],
+      "meshes": [
+        {
+          "name": "Bark",
+          "triangles": 668,
+          "materials": [
+            "Forest_Bark_VertexColor"
+          ],
+          "color_attribute": "Color",
+          "flat_normals": true
+        },
+        {
+          "name": "Leaves",
+          "triangles": 1050,
+          "materials": [
+            "Forest_Leaf_VertexColor"
+          ],
+          "color_attribute": "Color",
+          "flat_normals": true
+        }
+      ]
+    },
+    "tree_oak_b": {
+      "voxel_size_m": [
+        0.225,
+        0.225,
+        0.225
+      ],
+      "filled_leaf_voxels": 880,
+      "leaf_exposed_quads_before_merge": 856,
+      "leaf_quads_after_merge": 426,
+      "file": "tree_oak_b.glb",
+      "triangle_count": 1520,
+      "bounds_blender_min": [
+        -1.7999999523162842,
+        -1.5750000476837158,
+        0.0
+      ],
+      "bounds_blender_max": [
+        1.7999999523162842,
+        1.5750000476837158,
+        4.275000095367432
+      ],
+      "dimensions_m": [
+        3.5999999046325684,
+        3.1500000953674316,
+        4.275000095367432
+      ],
+      "meshes": [
+        {
+          "name": "Bark",
+          "triangles": 668,
+          "materials": [
+            "Forest_Bark_VertexColor"
+          ],
+          "color_attribute": "Color",
+          "flat_normals": true
+        },
+        {
+          "name": "Leaves",
+          "triangles": 852,
+          "materials": [
+            "Forest_Leaf_VertexColor"
+          ],
+          "color_attribute": "Color",
+          "flat_normals": true
+        }
+      ]
+    },
+    "shrub_fern": {
+      "file": "shrub_fern.glb",
+      "triangle_count": 636,
+      "bounds_blender_min": [
+        -0.6120863556861877,
+        -0.658639132976532,
+        0.0
+      ],
+      "bounds_blender_max": [
+        0.5922550559043884,
+        0.6401684880256653,
+        0.7985000014305115
+      ],
+      "dimensions_m": [
+        1.2043414115905762,
+        1.2988076210021973,
+        0.7985000014305115
+      ],
+      "meshes": [
+        {
+          "name": "Leaves",
+          "triangles": 636,
+          "materials": [
+            "Forest_Fern_VertexColor"
+          ],
+          "color_attribute": "Color",
+          "flat_normals": true
+        }
+      ]
+    },
+    "shrub_leaf": {
+      "voxel_size_m": [
+        0.14,
+        0.14,
+        0.14
+      ],
+      "filled_leaf_voxels": 180,
+      "leaf_exposed_quads_before_merge": 272,
+      "leaf_quads_after_merge": 155,
+      "file": "shrub_leaf.glb",
+      "triangle_count": 310,
+      "bounds_blender_min": [
+        -0.5600000023841858,
+        -0.5600000023841858,
+        0.0
+      ],
+      "bounds_blender_max": [
+        0.699999988079071,
+        0.5600000023841858,
+        0.8399999737739563
+      ],
+      "dimensions_m": [
+        1.2599999904632568,
+        1.1200000047683716,
+        0.8399999737739563
+      ],
+      "meshes": [
+        {
+          "name": "Leaves",
+          "triangles": 310,
+          "materials": [
+            "Forest_Leaf_VertexColor"
+          ],
+          "color_attribute": "Color",
+          "flat_normals": true
+        }
+      ]
+    }
+  },
+  "validation": [
+    {
+      "file": "tree_oak_a.glb",
+      "bytes": 131400,
+      "triangles": 1718,
+      "mesh_names": [
+        "Bark",
+        "Leaves"
+      ],
+      "primitive_count": 2,
+      "material_count": 2,
+      "bounds_gltf_min": [
+        -1.7999999523162842,
+        0,
+        -1.7999999523162842
+      ],
+      "bounds_gltf_max": [
+        1.7999999523162842,
+        4.724999904632568,
+        1.5750000476837158
+      ],
+      "COLOR_0": true,
+      "all_opaque_single_sided": true,
+      "textures": 0,
+      "validation": "PASS"
+    },
+    {
+      "file": "tree_oak_b.glb",
+      "bytes": 115972,
+      "triangles": 1520,
+      "mesh_names": [
+        "Bark",
+        "Leaves"
+      ],
+      "primitive_count": 2,
+      "material_count": 2,
+      "bounds_gltf_min": [
+        -1.7999999523162842,
+        0,
+        -1.5750000476837158
+      ],
+      "bounds_gltf_max": [
+        1.7999999523162842,
+        4.275000095367432,
+        1.5750000476837158
+      ],
+      "COLOR_0": true,
+      "all_opaque_single_sided": true,
+      "textures": 0,
+      "validation": "PASS"
+    },
+    {
+      "file": "shrub_fern.glb",
+      "bytes": 52068,
+      "triangles": 636,
+      "mesh_names": [
+        "Leaves"
+      ],
+      "primitive_count": 1,
+      "material_count": 1,
+      "bounds_gltf_min": [
+        -0.6120863556861877,
+        0,
+        -0.6401684880256653
+      ],
+      "bounds_gltf_max": [
+        0.5922550559043884,
+        0.7985000014305115,
+        0.658639132976532
+      ],
+      "COLOR_0": true,
+      "all_opaque_single_sided": true,
+      "textures": 0,
+      "validation": "PASS"
+    },
+    {
+      "file": "shrub_leaf.glb",
+      "bytes": 25480,
+      "triangles": 310,
+      "mesh_names": [
+        "Leaves"
+      ],
+      "primitive_count": 1,
+      "material_count": 1,
+      "bounds_gltf_min": [
+        -0.5600000023841858,
+        0,
+        -0.5600000023841858
+      ],
+      "bounds_gltf_max": [
+        0.699999988079071,
+        0.8399999737739563,
+        0.5600000023841858
+      ],
+      "COLOR_0": true,
+      "all_opaque_single_sided": true,
+      "textures": 0,
+      "validation": "PASS"
+    }
+  ]
+}

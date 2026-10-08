@@ -1,0 +1,28 @@
+{
+  "date_local": "2026-10-09",
+  "engine": "Godot 4.7.2 stable",
+  "quality_slice_gpu": {
+    "failures": [],
+    "renderer": "mobile"
+  },
+  "quality_slice_headless": {
+    "failures": [],
+    "note": "Earlier run this turn; final material reuse checked again on GPU."
+  },
+  "grassland_e2_headless": {
+    "passed": true,
+    "failures": []
+  },
+  "grassland_motion_headless": {
+    "checks": 308,
+    "failures": []
+  },
+  "grassland_e2_gpu_review": {
+    "renderer": "mobile",
+    "failures": []
+  },
+  "visual_review": "Four matched stage PNGs, diagnostic closeup, shadow probes and 12 decoded movie frames inspected. No continuous frame-by-frame foot-contact analysis.",
+  "audio": "All automatic game runs use Dummy driver/process-only mute; interactive launcher uses normal audio.",
+  "phone_verified": false,
+  "art_approved": false
+}

@@ -1,0 +1,18 @@
+{
+	"camera": {
+		"position": "(12.0, 16.00002, 16.0)",
+		"projection": "orthographic",
+		"rotation": "(-36.31588, 36.8699, 0.0)",
+		"size": 14.5
+	},
+	"device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+	"engine": "4.7.2-stable (official)",
+	"note": "Same frozen actors, camera and wind phase across stage_0..3. Detail camera is diagnostic only. PNGs are direct Godot viewport readbacks.",
+	"phone_verified": false,
+	"renderer": "mobile",
+	"resolution": [
+		1280,
+		720
+	],
+	"target_fps": 30
+}

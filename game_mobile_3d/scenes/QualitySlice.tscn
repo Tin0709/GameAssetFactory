@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/Grassland_50x50.tscn" id="base"]
+[ext_resource type="Script" path="res://scripts/quality_slice.gd" id="review"]
+
+[node name="QualitySlice" instance=ExtResource("base")]
+script = ExtResource("review")
