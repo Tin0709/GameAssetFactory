@@ -15,6 +15,7 @@ Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; b�
 | Lưu cây/bụi cây để reuse; nhảy lên/xuống block phải làm và review trong Blender trước | Yêu cầu trực tiếp 2026-10-09. Chưa phê duyệt bộ cây mới hoặc motion nhảy. |
 | ForestQualitySlice là scene chính để mở project và bấm F5 review | Yêu cầu trực tiếp tiếp theo ngày 2026-10-09; cho phép đổi `run/main_scene`, không đồng nghĩa đã duyệt mọi chi tiết mỹ thuật. |
 | Chỉ bổ sung animation nhảy; giữ nguyên toàn bộ animation cũ | Người dùng nhắc rõ trong lúc review nhảy ngày 2026-10-09. Không thay Walk/Sprint/Idle/weapon/combat bằng các đoạn di chuyển minh hoạ trong study. |
+| **Yêu cầu mới nhất: tạm bỏ nhảy trong game; tự đi lên bậc mượt bằng animation cũ** | Người dùng đổi hướng sau khi cho phép thử tích hợp. Giữ study Blender V2 để bổ sung nhảy sau; không bật clip nhảy hoặc xung lực bật lên trong game hiện tại. |
 
 Việc tích hợp R13/R15 được cho phép không đồng nghĩa mọi chuyển động đã được duyệt là tự nhiên. Những dòng “AWAITING HUMAN REVIEW” ở các báo cáo cũ vẫn cần được tôn trọng. Không gán phần trăm giống game tham chiếu.
 
@@ -39,7 +40,7 @@ Tham chiếu chính U1: tán cây tối làm khung, cỏ thấp dày xen cụm l
 
 - **Lượt đầu đã thử:** scene riêng kế thừa 50×50; actor/đất/cỏ/đá hiện có, bốn cây proxy opaque; ít hoa hơn, ambient giảm, sun ấm, MSAA 2×. Giữ bản gốc bằng F1 và từng bước bằng F2/F4/F5. Kết quả chỉ chứng minh được các thay đổi cụ thể trong ảnh, chưa đạt chất lượng mục tiêu cuối.
 - **Lượt hai đã thử:** ForestQualitySlice dùng cây tác giả, địa hình bậc, tường đá đổ, cỏ theo cụm; so hình học dưới đèn cũ rồi đèn mới với PCF/Filmic. F1 bản QualitySlice trước, F2 hình học mới/đèn cũ, F4 bản mới, Tab A/B. Camera/tỷ lệ actor giữ nguyên. Bộ cây có màu vertex, chưa phải texture atlas chuẩn cuối; xem [nguồn Blender, GLB và cách reuse](../../blender/environment/studies/forest_canopy_v2/README.md).
-- **Animation nhảy:** người dùng đã xem V1 và yêu cầu gần clip gốc hơn, chưa duyệt motion. V2 giữ dáng chân lệch trong không trung, tay gọn không đối xứng và thân yên hơn; chỉ bổ sung các clip nhảy. Controller, toàn bộ gait/weapon/combat cũ và export nhân vật production giữ nguyên. Walk↔strafe/foot contact vẫn là vấn đề riêng còn mở.
+- **Di chuyển lên bậc:** theo yêu cầu mới nhất, dùng chuyển động lên bậc liên tục và gait R15 cũ. Motion nhảy V2 được lưu riêng để dùng sau, chưa duyệt nghệ thuật và không hoạt động trong game. Không sửa các clip gait/weapon/combat hoặc GLB nhân vật cũ. Walk↔strafe/foot contact vẫn là vấn đề riêng còn mở.
 - **Ánh sáng bake:** chỉ thử ở một khu terrain/prop cố định đã chuẩn bị UV2. Actor dùng probe và bóng trực tiếp. Không unwrap đè UV2 của cỏ vì UV2 đang chứa gốc uốn. Chưa bake trong lượt này.
 - **Nếu vượt 33.3 ms trên điện thoại:** đo pass gây tốn, thử tắt MSAA hoặc giảm 3D render scale, giảm mật độ vật trang trí và số caster. Giữ silhouette nhân vật và nhịp combat trước. Đây là thứ tự thử, chưa phải cấu hình tối thiểu đã chứng minh.
 - **Chưa có lý do đổi engine:** Mobile hỗ trợ các công cụ cơ bản cần cho hướng này. Nâng engine, đổi renderer/engine hoặc thay cấu trúc map là đề xuất riêng cần bài toán, chi phí, lợi ích và bằng chứng thiết bị.

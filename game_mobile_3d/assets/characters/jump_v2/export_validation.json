@@ -1,0 +1,132 @@
+{
+  "status": "EXPORT_VALIDATED_RUNTIME_POSES_ONLY",
+  "source_json_sha256": "dda5bd2886f1e8801cf00d2fff00c97893ee89a59bf2b8e8c839036f6e2745be",
+  "sample_rate_hz": 96,
+  "clips": {
+    "BlockJump_Up_V2": {
+      "samples": 81,
+      "length": 0.8333333333333334,
+      "events": {
+        "takeoff": 0.08333333333333333,
+        "hold_start": 0.20833333333333334,
+        "contact": 0.625,
+        "end": 0.8333333333333334
+      },
+      "max_quaternion_norm_squared_error": 2.387778750279068e-07
+    },
+    "BlockHop_Down_V2": {
+      "samples": 73,
+      "length": 0.75,
+      "events": {
+        "takeoff": 0.08333333333333333,
+        "hold_start": 0.20833333333333334,
+        "contact": 0.5416666666666666,
+        "end": 0.75
+      },
+      "max_quaternion_norm_squared_error": 2.387778750279068e-07
+    },
+    "BlockJump_Up_V2_OppositeLead": {
+      "samples": 81,
+      "length": 0.8333333333333334,
+      "events": {
+        "takeoff": 0.08333333333333333,
+        "hold_start": 0.20833333333333334,
+        "contact": 0.625,
+        "end": 0.8333333333333334
+      },
+      "max_quaternion_norm_squared_error": 2.387778750279068e-07
+    },
+    "BlockHop_Down_V2_OppositeLead": {
+      "samples": 73,
+      "length": 0.75,
+      "events": {
+        "takeoff": 0.08333333333333333,
+        "hold_start": 0.20833333333333334,
+        "contact": 0.5416666666666666,
+        "end": 0.75
+      },
+      "max_quaternion_norm_squared_error": 2.387778750279068e-07
+    }
+  },
+  "checks": {
+    "rest_errors": {
+      "Hips": {
+        "source_production_global_rest_matrix_error": 0.0,
+        "native_glb_local_rest_matrix_error": 0.0
+      },
+      "Leg.L": {
+        "source_production_global_rest_matrix_error": 0.0,
+        "native_glb_local_rest_matrix_error": 0.0
+      },
+      "Leg.R": {
+        "source_production_global_rest_matrix_error": 0.0,
+        "native_glb_local_rest_matrix_error": 0.0
+      },
+      "Spine": {
+        "source_production_global_rest_matrix_error": 0.0,
+        "native_glb_local_rest_matrix_error": 0.0
+      },
+      "Chest": {
+        "source_production_global_rest_matrix_error": 0.0,
+        "native_glb_local_rest_matrix_error": 0.0
+      },
+      "Neck": {
+        "source_production_global_rest_matrix_error": 0.0,
+        "native_glb_local_rest_matrix_error": 0.0
+      },
+      "Head": {
+        "source_production_global_rest_matrix_error": 0.0,
+        "native_glb_local_rest_matrix_error": 0.0
+      },
+      "Arm.L": {
+        "source_production_global_rest_matrix_error": 2.1316282072803006e-14,
+        "native_glb_local_rest_matrix_error": 0.0
+      },
+      "Arm.R": {
+        "source_production_global_rest_matrix_error": 2.1316282072803006e-14,
+        "native_glb_local_rest_matrix_error": 0.0
+      }
+    },
+    "maximum_global_pose_reconstruction_error": 4.76837158203125e-07,
+    "maximum_rigid_vertex_reconstruction_error_m": 5.405651672845201e-07,
+    "maximum_forearm_local_angle_radians": 0.0,
+    "maximum_unit_scale_error": 1.7881393432617188e-07,
+    "maximum_shoulder_inset_error_m": 5.245208739568241e-09,
+    "minimum_leg_plateau_split_degrees": 38.1265812339833,
+    "sample_count": 308,
+    "preview_parent_influence": 0.0
+  },
+  "production_rest_compatible": true,
+  "json_readback_validated": true,
+  "source_and_old_glb_protection": {
+    "all_saved_sources_and_old_character_glbs_unchanged": true,
+    "all_loaded_original_actions_unchanged": true,
+    "protected_file_sha256": {
+      "blender/animation/studies/block_jump_v2/block_jump_v2_review.blend": "6a2860658e05dd580d5c45ec955efcd9f82cd5dcfb7637db829a78781394ac08",
+      "blender/characters/player/cuboid/player_combat_strafe_r14_pass2_study.blend": "048c70d251db64d92483cb4ff9543434e81f61d1681af0330dba42da527b1e08",
+      "blender/animation/studies/block_jump_v1/block_jump_v1_review.blend": "a2cc3854abf0b3addb4a7ce76563fe83c10e0a8f3502a5a458b43e82c27f704e",
+      "game_mobile_3d/assets/characters/player_animation_v2.glb": "7ce729a043c3d122d579af3213f235fc34ce6913c2bbac5e16cb7067ad652b57",
+      "game_mobile_3d/assets/characters/player_cuboid_animated_v1.glb": "60784ef8d3452a35a62995f46e66dad73bd9647dc241efb4f3d4b48f0abd9a61",
+      "game_mobile_3d/assets/characters/player_cuboid_animated_v2.glb": "0483795008df409446bf6ee4a69a8356bbec4cc5b9a7d5e00652f24d96c4baaf",
+      "game_mobile_3d/assets/characters/player_cuboid_animated_v3.glb": "e3b2b48ba84250de9b6448bfcb94bc6f73bb8f0746c0f82ad4a6df40d1baaa73",
+      "game_mobile_3d/assets/characters/player_cuboid_animated_v4.glb": "b4c9a9b2d7b16106012be1ff23df5169eb617fadcae2fe02a211070367ef3d13",
+      "game_mobile_3d/assets/characters/player_cuboid_animated_v5.glb": "a2a9ad1e5c052c0ae6e83d3bbaeed4eb33e8a0b274dc8b60eb7cc195b02aefed",
+      "game_mobile_3d/assets/characters/player_cuboid_v6.glb": "32ddd45c79d10964ae6b592771cc3968784145c3c1465c4bc67e9cc9bdd4c33e",
+      "game_mobile_3d/assets/characters/zombie_animation_v2.glb": "91cb14fc7ace936dbaa452da5916d3059553f6c0173f07a9d61c9dbd3c41c823",
+      "game_mobile_3d/assets/characters/zombie_cuboid_v2.glb": "05b9fc1f411fd34a10576e7418dc4042675ea20f64ed346b81750e51b2a4e563",
+      "game_mobile_3d/assets/characters/r13/body_raw.glb": "490358e2bb8214b3a3eba7a14577ae8c1acdcaf6a70b4cda7ff40fb57c3d63e7",
+      "game_mobile_3d/assets/characters/r13/pistol.glb": "969c588ff640e7eb2de247c601b810673fbe2053aa661092ee86be00abd83fea",
+      "game_mobile_3d/assets/characters/r13/player_r13.glb": "4bc43dd0be92b017d7d279c19e9838792024452f86b1967ea2e5ea85d0a179f3",
+      "game_mobile_3d/assets/characters/r13/rifle.glb": "dbf5886316fc4db6e2de57a88a4b82c05ac84afc85d16518800e4fdef3355d6f",
+      "game_mobile_3d/assets/characters/r13/shotgun.glb": "e2c115f62655fe6b5a3786a0a57a86f11145b3194625685cbaa329ab75a6c990",
+      "game_mobile_3d/assets/characters/r15/player_r15_combat_strafe_v1.glb": "a2922240bf3d8bd0fe282942905c0502abbf0177f32b24d4544a72a02a3b7b52",
+      "game_mobile_3d/assets/characters/r13/source.json": "a9f0ee9a49df4e98cd93e6d3be277934390fc434a11686a581bc16c25976d10d",
+      "game_mobile_3d/assets/characters/r15/source.json": "879f49ba80146602b89d9278c06cc5ca489edd003533bc6b4654d001933451cc"
+    },
+    "no_old_animation_replaced": true,
+    "no_root_weaponcarrier_scale_or_previewtravel_channels": true,
+    "arms_straight_and_full_length_compatible": true,
+    "shoulder_inset_m": 0.032
+  },
+  "runtime_visual_review_required": true
+}
