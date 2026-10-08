@@ -1,0 +1,272 @@
+{
+  "fresh_source_open": "PASS",
+  "source_sha256": "996439dde96614db8f66c114f12b4667dae6ee28eae794e100ed9bc5372e6ede",
+  "assets": {
+    "tree_oak_a": {
+      "meshes": [
+        "tree_oak_a__Bark",
+        "tree_oak_a__Leaves"
+      ],
+      "source_geometry_checks": [
+        {
+          "mesh": "tree_oak_a__Bark",
+          "triangles": 272,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 0.8414160355319187,
+          "closed_components": 8,
+          "component_volumes_m3": [
+            0.03134148603749053,
+            0.030080766409810163,
+            0.03095376443525311,
+            0.02795822569532902,
+            0.5191264578909152,
+            0.07492410812604554,
+            0.07445815189688194,
+            0.0522906117888245
+          ],
+          "all_flat_normals": true
+        },
+        {
+          "mesh": "tree_oak_a__Leaves",
+          "triangles": 3522,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 12.565124824851727,
+          "closed_components": 1,
+          "component_volumes_m3": [
+            12.565126088059852
+          ],
+          "all_flat_normals": true
+        }
+      ],
+      "export": {
+        "file": "tree_oak_a.glb",
+        "bytes": 235780,
+        "triangles": 3794,
+        "mesh_names": [
+          "Bark",
+          "Leaves"
+        ],
+        "materials": 2,
+        "bounds_gltf_min": [
+          -1.649999976158142,
+          0.0,
+          -1.9500000476837158
+        ],
+        "bounds_gltf_max": [
+          1.9500000476837158,
+          4.949999809265137,
+          1.7999999523162842
+        ],
+        "max_linear_color_error": 9.63244743967806e-08,
+        "max_unit_normal_error": 2.3465778320463926e-07,
+        "opaque_single_sided": true,
+        "textures": 0,
+        "collision_embedded": false,
+        "sha256": "5ee954d793bd231f7c411209bae1b7c703167efe80d4d4b846515495d0829539",
+        "validation": "PASS"
+      },
+      "leaf_base_height_m": 2.0999999046325684,
+      "validation": "PASS"
+    },
+    "tree_oak_b": {
+      "meshes": [
+        "tree_oak_b__Bark",
+        "tree_oak_b__Leaves"
+      ],
+      "source_geometry_checks": [
+        {
+          "mesh": "tree_oak_b__Bark",
+          "triangles": 272,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 0.699795568386555,
+          "closed_components": 8,
+          "component_volumes_m3": [
+            0.3898131370639629,
+            0.07625703471664265,
+            0.06660321236995513,
+            0.043346457359196684,
+            0.03134148603749055,
+            0.030080766409810163,
+            0.03095376443525311,
+            0.02795822569532902
+          ],
+          "all_flat_normals": true
+        },
+        {
+          "mesh": "tree_oak_b__Leaves",
+          "triangles": 3010,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 9.368999864280207,
+          "closed_components": 1,
+          "component_volumes_m3": [
+            9.369000044806551
+          ],
+          "all_flat_normals": true
+        }
+      ],
+      "export": {
+        "file": "tree_oak_b.glb",
+        "bytes": 203792,
+        "triangles": 3282,
+        "mesh_names": [
+          "Bark",
+          "Leaves"
+        ],
+        "materials": 2,
+        "bounds_gltf_min": [
+          -1.7999999523162842,
+          0.0,
+          -1.7999999523162842
+        ],
+        "bounds_gltf_max": [
+          1.649999976158142,
+          4.349999904632568,
+          1.5
+        ],
+        "max_linear_color_error": 9.63244743967806e-08,
+        "max_unit_normal_error": 2.504816689619105e-07,
+        "opaque_single_sided": true,
+        "textures": 0,
+        "collision_embedded": false,
+        "sha256": "7a236157211c46a330e64059f606a2b708f941646be719fde7b1f5d8fd799fb5",
+        "validation": "PASS"
+      },
+      "leaf_base_height_m": 1.7999999523162842,
+      "validation": "PASS"
+    },
+    "shrub_leaf": {
+      "meshes": [
+        "shrub_leaf__Leaves"
+      ],
+      "source_geometry_checks": [
+        {
+          "mesh": "shrub_leaf__Leaves",
+          "triangles": 534,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 0.40780800623559876,
+          "closed_components": 1,
+          "component_volumes_m3": [
+            0.4078080148901788
+          ],
+          "all_flat_normals": true
+        }
+      ],
+      "export": {
+        "file": "shrub_leaf.glb",
+        "bytes": 34864,
+        "triangles": 534,
+        "mesh_names": [
+          "Leaves"
+        ],
+        "materials": 1,
+        "bounds_gltf_min": [
+          -0.47999998927116394,
+          0.0,
+          -0.6000000238418579
+        ],
+        "bounds_gltf_max": [
+          0.7200000286102295,
+          0.8399999737739563,
+          0.47999998927116394
+        ],
+        "max_linear_color_error": 9.63244743967806e-08,
+        "max_unit_normal_error": 0,
+        "opaque_single_sided": true,
+        "textures": 0,
+        "collision_embedded": false,
+        "sha256": "803b1f779f5ec9cfa28c8768c504dd2023fa30c0c83e3ee8171e7a236b4b7ebc",
+        "validation": "PASS"
+      },
+      "leaf_base_height_m": 0.0,
+      "validation": "PASS"
+    },
+    "shrub_fern": {
+      "meshes": [
+        "shrub_fern__Leaves"
+      ],
+      "source_geometry_checks": [
+        {
+          "mesh": "shrub_fern__Leaves",
+          "triangles": 444,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 0.0628797562947946,
+          "closed_components": 10,
+          "component_volumes_m3": [
+            0.008311968438799035,
+            0.006703200994536472,
+            0.003273983828876226,
+            0.003273984527216572,
+            0.002303999848663807,
+            0.007775709598111766,
+            0.00871415762170121,
+            0.006971327647382473,
+            0.008177903372294772,
+            0.007373518913482256
+          ],
+          "all_flat_normals": true
+        }
+      ],
+      "export": {
+        "file": "shrub_fern.glb",
+        "bytes": 42424,
+        "triangles": 444,
+        "mesh_names": [
+          "Leaves"
+        ],
+        "materials": 1,
+        "bounds_gltf_min": [
+          -0.6206067204475403,
+          0.0,
+          -0.6377302408218384
+        ],
+        "bounds_gltf_max": [
+          0.5926604866981506,
+          0.7573038935661316,
+          0.6256029605865479
+        ],
+        "max_linear_color_error": 8.473861751179257e-08,
+        "max_unit_normal_error": 2.268488170642513e-07,
+        "opaque_single_sided": true,
+        "textures": 0,
+        "collision_embedded": false,
+        "sha256": "de8b455695a973b6d9ed4450cfbe3400594a5acb247c4fdff1003cd5d6487dcc",
+        "validation": "PASS"
+      },
+      "leaf_base_height_m": 0.0,
+      "validation": "PASS"
+    }
+  },
+  "v2_preservation": {
+    "forest_canopy_v2.blend": "SHA256 matches previous recorded audit",
+    "tree_oak_a.glb": "SHA256 matches previous recorded audit",
+    "tree_oak_b.glb": "SHA256 matches previous recorded audit",
+    "shrub_fern.glb": "SHA256 matches previous recorded audit",
+    "shrub_leaf.glb": "SHA256 matches previous recorded audit"
+  },
+  "art_status": "Awaiting user art review; Blender diagnostic is not gameplay evidence.",
+  "native_godot_import_contract": "All four import configs point to the local linear-color native material hook; engine validation belongs to parent integration."
+}

@@ -1,0 +1,6663 @@
+{
+	"checks": [
+		{
+			"check": "Original R15 animation writer active",
+			"passed": true
+		},
+		{
+			"check": "Deferred jump library is not loaded",
+			"passed": true
+		},
+		{
+			"check": "Reached 0.5m top without jump",
+			"passed": true
+		},
+		{
+			"check": "No apex above 0.5m top",
+			"passed": true
+		},
+		{
+			"check": "Reached 1.0m top without jump",
+			"passed": true
+		},
+		{
+			"check": "No apex above 1.0m top",
+			"passed": true
+		},
+		{
+			"check": "Walked up actual forest terrace",
+			"passed": true
+		}
+	],
+	"engine": "4.7.2-stable (official)",
+	"failures": [],
+	"frames": [
+		{
+			"floor": false,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.01999998092651,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 1
+		},
+		{
+			"floor": false,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.01499998569489,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 2
+		},
+		{
+			"floor": false,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00499999523163,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 3
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 4
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 5
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 6
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 7
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 8
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 9
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 10
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 11
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 12
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 13
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 14
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 15
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 16
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 17
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 18
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 19
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00013673305511,
+				0.0
+			],
+			"section": "",
+			"step": false,
+			"tick": 20
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 21
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 22
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 23
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 24
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 25
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 26
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 27
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 28
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 29
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 30
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 31
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 32
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 33
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 34
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 35
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 36
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 37
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 38
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 39
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 40
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 41
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 42
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 43
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 44
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 45
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 46
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 47
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 48
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 49
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 50
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.0116666667163372
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 51
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.0350045040249825
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 52
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.0700045078992844
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 53
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.116671174764633
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 54
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.17500451207161
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 55
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.245004504919052
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 56
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.315837860107422
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 57
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.386671185493469
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 58
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.457504510879517
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 59
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.528337836265564
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 60
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.599171161651611
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 61
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.670004487037659
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 62
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.740837812423706
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 63
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.811671137809753
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 64
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.882504463195801
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 65
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.953337788581848
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 66
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.0241711139679
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 67
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.09500753879547
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 68
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.16584086418152
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 69
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.23667418956757
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 70
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.30750751495361
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 71
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.37834084033966
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 72
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.44917416572571
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 73
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.52000749111176
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 74
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.5908408164978
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 75
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00420105457306,
+				-1.66171085834503
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 76
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.01541090011597,
+				-1.69906425476074
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 77
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.03306186199188,
+				-1.69907176494598
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 78
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.05630469322205,
+				-1.69907188415527
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 79
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.08429217338562,
+				-1.69906377792358
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 80
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.11617684364319,
+				-1.69907176494598
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 81
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.1511116027832,
+				-1.69906389713287
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 82
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.18824934959412,
+				-1.6990659236908
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 83
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.22674262523651,
+				-1.69906723499298
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 84
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.26585125923157,
+				-1.70160150527954
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 85
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.3044068813324,
+				-1.71837961673737
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 86
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.34231567382813,
+				-1.71893072128296
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 87
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.37732660770416,
+				-1.74673116207123
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 88
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.41050839424133,
+				-1.78331983089447
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 89
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.44662463665009,
+				-1.82272660732269
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 90
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.47621858119965,
+				-1.87265932559967
+			],
+			"section": "0.5 m / unarmed",
+			"step": true,
+			"tick": 91
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49849212169647,
+				-1.93625009059906
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 92
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.50195145606995,
+				-2.00682353973389
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 93
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.07765698432922
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 94
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.14849042892456
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 95
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.2193238735199
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 96
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.29015731811523
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 97
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.36099076271057
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 98
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.43182420730591
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 99
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.50265765190125
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 100
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.57349109649658
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 101
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.64432454109192
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 102
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.71515798568726
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 103
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.78599143028259
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 104
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.85682487487793
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 105
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.91099143028259
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 106
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.94849133491516
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 107
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.96932458877563
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 108
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 109
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 110
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 111
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 112
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 113
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 114
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 115
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 116
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 117
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 118
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 119
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 120
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 121
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 122
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 123
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 124
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 125
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 126
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 127
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 128
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 129
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 130
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 131
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 132
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 133
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 134
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.97349119186401
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 135
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.96182441711426
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 136
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.93849110603333
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 137
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.90349102020264
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 138
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.85682439804077
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 139
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.79849100112915
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 140
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.72849106788635
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 141
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.65765762329102
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 142
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.58682417869568
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 143
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.51599073410034
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 144
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.445157289505
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 145
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.37432384490967
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 146
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.30349040031433
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 147
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.23265695571899
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 148
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.16182351112366
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 149
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.09099006652832
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 150
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49980306625366,
+				-2.02015662193298
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 151
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.49589681625366,
+				-1.94932329654694
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 152
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.47441244125366,
+				-1.87838041782379
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 153
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.43027186393738,
+				-1.80726718902588
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 154
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.43027186393738,
+				-1.73606240749359
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 155
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.42527186870575,
+				-1.66522908210754
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 156
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.41527187824249,
+				-1.5943957567215
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 157
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.40027189254761,
+				-1.52356243133545
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 158
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.38027191162109,
+				-1.4527291059494
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 159
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.35527193546295,
+				-1.38189578056335
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 160
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.32527196407318,
+				-1.31106245517731
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 161
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.29027199745178,
+				-1.24022912979126
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 162
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.25027203559875,
+				-1.16939580440521
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 163
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.2052720785141,
+				-1.09856247901917
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 164
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.15527212619781,
+				-1.02772915363312
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 165
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.10027205944061,
+				-0.95689582824707
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 166
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.04027211666107,
+				-0.886062502861023
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 167
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.815229177474976
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 168
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.744395852088928
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 169
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.673562526702881
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 170
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.602729201316834
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 171
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.531895875930786
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 172
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.461062550544739
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 173
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.390229225158691
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 174
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.319395899772644
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 175
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.248562559485435
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 176
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.177729219198227
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 177
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.106895878911018
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 178
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				-0.0360625386238098
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 179
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.0347708016633987
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 180
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.105604141950607
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 181
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.176437482237816
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 182
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.247270822525024
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 183
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.318104147911072
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 184
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.388937473297119
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 185
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.459770798683167
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 186
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.530604124069214
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 187
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.601437449455261
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 188
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.672270774841309
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 189
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.743104100227356
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 190
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.813937425613403
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 191
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.884770750999451
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 192
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				0.955604076385498
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 193
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.02643740177155
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 194
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.09727072715759
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 195
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.16810405254364
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 196
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.23893737792969
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 197
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.29310405254364
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 198
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.3306040763855
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 199
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35143744945526
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 200
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 201
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 202
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 203
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 204
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 205
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 206
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 207
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 208
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 209
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 210
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 211
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 212
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 213
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 214
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 215
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 216
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 217
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 218
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 219
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 220
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 221
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 222
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 223
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 224
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 225
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 226
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 227
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 228
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 229
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 230
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 231
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 232
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 233
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093591213226,
+				1.35560417175293
+			],
+			"section": "0.5 m / unarmed",
+			"step": false,
+			"tick": 234
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 235
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 236
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 237
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 238
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 239
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 240
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 241
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 242
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 243
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 244
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 245
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 246
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 247
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 248
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 249
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 250
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 251
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 252
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 253
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 254
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 255
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 256
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 257
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 258
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 259
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 260
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 261
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 262
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 263
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00027346611023,
+				0.0
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 264
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.0116666667163372
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 265
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.0350045040249825
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 266
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.0700045078992844
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 267
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.116671174764633
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 268
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.17500451207161
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 269
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.245004504919052
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 270
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.315837860107422
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 271
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.386671185493469
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 272
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.457504510879517
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 273
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.528337836265564
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 274
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.599171161651611
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 275
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.670004487037659
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 276
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.740837812423706
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 277
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.811671137809753
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 278
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.882504463195801
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 279
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-0.953337788581848
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 280
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.0241711139679
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 281
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.09500753879547
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 282
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.16584086418152
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 283
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.23667418956757
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 284
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.30750751495361
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 285
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.37834084033966
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 286
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.44917416572571
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 287
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.52000749111176
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 288
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00027346611023,
+				-1.5908408164978
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 289
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00813484191895,
+				-1.66174697875977
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 290
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.03055679798126,
+				-1.69906008243561
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 291
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.06586837768555,
+				-1.699063539505
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 292
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.11236667633057,
+				-1.6990681886673
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 293
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.16835677623749,
+				-1.69906830787659
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 294
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.23214364051819,
+				-1.69906365871429
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 295
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.30203247070313,
+				-1.69906365871429
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 296
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.3763279914856,
+				-1.69906365871429
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 297
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.45333552360535,
+				-1.69906485080719
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 298
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.53136014938354,
+				-1.69906365871429
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 299
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.60870671272278,
+				-1.69906365871429
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 300
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.68368029594421,
+				-1.69906365871429
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 301
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.75458598136902,
+				-1.6990659236908
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 302
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.81972885131836,
+				-1.71073257923126
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 303
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.87741386890411,
+				-1.73406589031219
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 304
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.92594623565674,
+				-1.76906585693359
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 305
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.96363079547882,
+				-1.81573247909546
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 306
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.98877263069153,
+				-1.87406587600708
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 307
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.99967682361603,
+				-1.94406592845917
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 308
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.01489925384521
+			],
+			"section": "1.0 m / rifle",
+			"step": true,
+			"tick": 309
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.08573269844055
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 310
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.15656614303589
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 311
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.22739958763123
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 312
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.29823303222656
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 313
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.3690664768219
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 314
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.43989992141724
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 315
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.51073336601257
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 316
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.58156681060791
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 317
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.65240025520325
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 318
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.72323369979858
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 319
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.77740025520325
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 320
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.81490015983582
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 321
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.83573341369629
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 322
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 323
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 324
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 325
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 326
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 327
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 328
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 329
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 330
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 331
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 332
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 333
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 334
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 335
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 336
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 337
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 338
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 339
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 340
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 341
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 342
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 343
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 344
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 345
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 346
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 347
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 348
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.83990001678467
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 349
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				2.0,
+				-2.82823324203491
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 350
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.80489993095398
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 351
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.76989984512329
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 352
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.72323322296143
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 353
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.6648998260498
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 354
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.59489989280701
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 355
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.52406644821167
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 356
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.45323300361633
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 357
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.382399559021
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 358
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.31156611442566
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 359
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.24073266983032
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 360
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.16989922523499
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 361
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.09906578063965
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 362
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				2.0,
+				-2.02823233604431
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 363
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.99726557731628,
+				-1.95739901065826
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 364
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.97812497615814,
+				-1.88648569583893
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 365
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.93671870231628,
+				-1.8154708147049
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 366
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.93671870231628,
+				-1.74420642852783
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 367
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.93171870708466,
+				-1.67337310314178
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 368
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.9217187166214,
+				-1.60253977775574
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 369
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.90671873092651,
+				-1.53170645236969
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 370
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.88671875,
+				-1.46087312698364
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 371
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.86171877384186,
+				-1.3900398015976
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 372
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.83171880245209,
+				-1.31920647621155
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 373
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.79671883583069,
+				-1.2483731508255
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 374
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.75671887397766,
+				-1.17753982543945
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 375
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.71171891689301,
+				-1.10670650005341
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 376
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.66171896457672,
+				-1.03587317466736
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 377
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.60671889781952,
+				-0.965039849281311
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 378
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.54671895503998,
+				-0.894206523895264
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 379
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.48171901702881,
+				-0.823373198509216
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 380
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.41171896457672,
+				-0.752539873123169
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 381
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.33671891689301,
+				-0.681706547737122
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 382
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.25671887397766,
+				-0.610873222351074
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 383
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.17171883583069,
+				-0.540039896965027
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 384
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.08171880245209,
+				-0.469206571578979
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 385
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				-0.398373246192932
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 386
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				-0.327539920806885
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 387
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				-0.256706595420837
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 388
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				-0.185873255133629
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 389
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				-0.11503991484642
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 390
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				-0.0442065745592117
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 391
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.0266267657279968
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 392
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.0974601060152054
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 393
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.168293446302414
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 394
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.239126786589623
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 395
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.309960126876831
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 396
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.380793452262878
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 397
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.451626777648926
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 398
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.522460103034973
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 399
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.593293428421021
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 400
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.664126753807068
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 401
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.734960079193115
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 402
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.805793404579163
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 403
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.87662672996521
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 404
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				0.947460055351257
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 405
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.0182933807373
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 406
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.08912670612335
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 407
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.1599600315094
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 408
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.23079335689545
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 409
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.30162668228149
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 410
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.37246000766754
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 411
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.42662668228149
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 412
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.46412670612335
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 413
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48496007919312
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 414
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 415
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 416
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 417
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 418
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 419
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 420
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 421
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 422
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 423
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 424
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 425
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 426
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 427
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 428
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 429
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 430
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 431
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 432
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 433
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 434
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 435
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 436
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 437
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 438
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 439
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 440
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 441
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 442
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 443
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 444
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 445
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 446
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 447
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				0.0,
+				1.00093543529511,
+				1.48912680149078
+			],
+			"section": "1.0 m / rifle",
+			"step": false,
+			"tick": 448
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 449
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 450
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 451
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 452
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 453
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 454
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 455
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 456
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 457
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 458
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 459
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 460
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 461
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 462
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 463
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 464
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 465
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 466
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 467
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 468
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 469
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 470
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 471
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.0
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 472
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.01166677474976
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 473
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.03500318527222
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 474
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.07000327110291
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 475
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.11666989326477
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 476
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.17500329017639
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 477
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.24500322341919
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 478
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.31583666801453
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 479
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.38667011260986
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 480
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.4575035572052
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 481
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.52833700180054
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 482
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.59917044639587
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 483
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.67000389099121
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 484
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.74083733558655
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 485
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.81167078018188
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 486
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.88250422477722
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 487
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-2.95333766937256
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 488
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-3.0241711139679
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 489
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-3.09500455856323
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 490
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-3.16583800315857
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 491
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-3.23667144775391
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 492
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-3.30750489234924
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 493
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-3.37833833694458
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 494
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-3.44917178153992
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 495
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-3.52000522613525
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 496
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00027346611023,
+				-3.59083867073059
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 497
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.00420105457306,
+				-3.66170883178711
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 498
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.01541090011597,
+				-3.69905853271484
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 499
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.03306198120117,
+				-3.69905829429626
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 500
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.05630469322205,
+				-3.69905805587769
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 501
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.08429205417633,
+				-3.69905829429626
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 502
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.11617684364319,
+				-3.69905805587769
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 503
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.1511116027832,
+				-3.69905805587769
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 504
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.18824923038483,
+				-3.69905805587769
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 505
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.22674262523651,
+				-3.69905805587769
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 506
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.26585364341736,
+				-3.70142555236816
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 507
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.3044068813324,
+				-3.7181396484375
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 508
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.3423011302948,
+				-3.71875286102295
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 509
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.37732660770416,
+				-3.74653172492981
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 510
+		},
+		{
+			"floor": false,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.41049635410309,
+				-3.78322815895081
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 511
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.44663178920746,
+				-3.82262396812439
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 512
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.47622323036194,
+				-3.8725643157959
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": true,
+			"tick": 513
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.49868977069855,
+				-3.93602156639099
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 514
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50185608863831,
+				-4.00663566589355
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 515
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.07746887207031
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 516
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.14830207824707
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 517
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.21913528442383
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 518
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.28996849060059
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 519
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.36080169677734
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 520
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.4316349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 521
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.50246810913086
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 522
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.5566349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 523
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.59413480758667
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 524
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.61496829986572
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 525
+		},
+		{
+			"floor": true,
+			"gait": "Walk",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 526
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 527
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 528
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 529
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 530
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 531
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 532
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 533
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 534
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 535
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 536
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 537
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 538
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 539
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 540
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 541
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 542
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 543
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 544
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 545
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 546
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 547
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 548
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 549
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 550
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 551
+		},
+		{
+			"floor": true,
+			"gait": "Idle",
+			"position": [
+				10.0,
+				1.50029361248016,
+				-4.6191349029541
+			],
+			"section": "Actual forest terrace / 0.5 m",
+			"step": false,
+			"tick": 552
+		}
+	],
+	"gpu": "NVIDIA GeForce RTX 4070 Ti SUPER",
+	"note": "Actual production controller and original R15 visual in ForestQualitySlice. Temporary .5m/1m fixtures; offline movie, no phone/performance claim. Jump animation is disabled by user request.",
+	"renderer": "mobile"
+}

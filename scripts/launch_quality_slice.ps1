@@ -1,6 +1,6 @@
 param(
     [string]$GodotPath = 'C:\Users\ADMIN\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64.exe',
-    [ValidateSet('ForestQualitySlice','QualitySlice')][string]$Scene = 'ForestQualitySlice'
+    [ValidateSet('ForestMeadowV3','ForestQualitySlice','QualitySlice')][string]$Scene = 'ForestMeadowV3'
 )
 $ErrorActionPreference = 'Stop'
 $qualityProject = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\game_mobile_3d')).Path

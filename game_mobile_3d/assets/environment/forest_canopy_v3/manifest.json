@@ -1,0 +1,323 @@
+{
+  "version": 3,
+  "status": "Original authored assets; awaiting user art review",
+  "source": "forest_canopy_v3.blend",
+  "units": "metres",
+  "origin": "local bottom centre at trunk / rooted shrub",
+  "axis": "Blender Z-up to glTF Y-up once at export",
+  "surface": "Opaque closed leaf volumes; flat normals; linear COLOR_0; no bitmap textures or cutout cards",
+  "reference": "New user gameplay screenshot informed mass/leaf scale; no reference geometry or imagery copied.",
+  "v2_preserved": true,
+  "assets": {
+    "tree_oak_a": {
+      "leaf_cell_m": [
+        0.15,
+        0.15,
+        0.15
+      ],
+      "bulk_clumps": 5,
+      "surface_leaf_patches": 83,
+      "manifold_edge_fills": 11,
+      "exposed_voxel_faces": 2400,
+      "merged_surface_polygons": 1260,
+      "leaf_voxels": 3723,
+      "source_mesh_checks": [
+        {
+          "mesh": "Bark",
+          "triangles": 272,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 0.8414160355319187,
+          "closed_components": 8,
+          "component_volumes_m3": [
+            0.07492410812604554,
+            0.07445815189688194,
+            0.0522906117888245,
+            0.03134148603749055,
+            0.030080766409810163,
+            0.03095376443525311,
+            0.02795822569532902,
+            0.5191264578909152
+          ],
+          "all_flat_normals": true
+        },
+        {
+          "mesh": "Leaves",
+          "triangles": 3522,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 12.565124824851727,
+          "closed_components": 1,
+          "component_volumes_m3": [
+            12.565126088059852
+          ],
+          "all_flat_normals": true
+        }
+      ],
+      "export": {
+        "file": "tree_oak_a.glb",
+        "bytes": 235780,
+        "triangles": 3794,
+        "mesh_names": [
+          "Bark",
+          "Leaves"
+        ],
+        "materials": 2,
+        "bounds_gltf_min": [
+          -1.649999976158142,
+          0.0,
+          -1.9500000476837158
+        ],
+        "bounds_gltf_max": [
+          1.9500000476837158,
+          4.949999809265137,
+          1.7999999523162842
+        ],
+        "max_linear_color_error": 9.63244743967806e-08,
+        "max_unit_normal_error": 2.3465778320463926e-07,
+        "opaque_single_sided": true,
+        "textures": 0,
+        "collision_embedded": false,
+        "sha256": "5ee954d793bd231f7c411209bae1b7c703167efe80d4d4b846515495d0829539",
+        "validation": "PASS"
+      },
+      "bounds_blender_min": [
+        -1.649999976158142,
+        -1.7999999523162842,
+        0.0
+      ],
+      "bounds_blender_max": [
+        1.9500000476837158,
+        1.9500000476837158,
+        4.949999809265137
+      ]
+    },
+    "tree_oak_b": {
+      "leaf_cell_m": [
+        0.15,
+        0.15,
+        0.15
+      ],
+      "bulk_clumps": 4,
+      "surface_leaf_patches": 68,
+      "manifold_edge_fills": 10,
+      "exposed_voxel_faces": 1984,
+      "merged_surface_polygons": 1083,
+      "leaf_voxels": 2776,
+      "source_mesh_checks": [
+        {
+          "mesh": "Bark.001",
+          "triangles": 272,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 0.699795568386555,
+          "closed_components": 8,
+          "component_volumes_m3": [
+            0.04334645735919669,
+            0.03134148603749055,
+            0.030080766409810163,
+            0.03095376443525311,
+            0.02795822569532902,
+            0.3898131370639628,
+            0.07625703471664265,
+            0.06660321236995513
+          ],
+          "all_flat_normals": true
+        },
+        {
+          "mesh": "Leaves.001",
+          "triangles": 3010,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 9.368999864280207,
+          "closed_components": 1,
+          "component_volumes_m3": [
+            9.36900004480655
+          ],
+          "all_flat_normals": true
+        }
+      ],
+      "export": {
+        "file": "tree_oak_b.glb",
+        "bytes": 203792,
+        "triangles": 3282,
+        "mesh_names": [
+          "Bark",
+          "Leaves"
+        ],
+        "materials": 2,
+        "bounds_gltf_min": [
+          -1.7999999523162842,
+          0.0,
+          -1.7999999523162842
+        ],
+        "bounds_gltf_max": [
+          1.649999976158142,
+          4.349999904632568,
+          1.5
+        ],
+        "max_linear_color_error": 9.63244743967806e-08,
+        "max_unit_normal_error": 2.504816689619105e-07,
+        "opaque_single_sided": true,
+        "textures": 0,
+        "collision_embedded": false,
+        "sha256": "7a236157211c46a330e64059f606a2b708f941646be719fde7b1f5d8fd799fb5",
+        "validation": "PASS"
+      },
+      "bounds_blender_min": [
+        -1.7999999523162842,
+        -1.5,
+        0.0
+      ],
+      "bounds_blender_max": [
+        1.649999976158142,
+        1.7999999523162842,
+        4.349999904632568
+      ]
+    },
+    "shrub_leaf": {
+      "leaf_cell_m": [
+        0.12,
+        0.12,
+        0.12
+      ],
+      "bulk_clumps": 4,
+      "surface_leaf_patches": 9,
+      "manifold_edge_fills": 0,
+      "exposed_voxel_faces": 340,
+      "merged_surface_polygons": 198,
+      "leaf_voxels": 236,
+      "source_mesh_checks": [
+        {
+          "mesh": "Leaves.002",
+          "triangles": 534,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 0.40780800623559876,
+          "closed_components": 1,
+          "component_volumes_m3": [
+            0.407808014890179
+          ],
+          "all_flat_normals": true
+        }
+      ],
+      "export": {
+        "file": "shrub_leaf.glb",
+        "bytes": 34864,
+        "triangles": 534,
+        "mesh_names": [
+          "Leaves"
+        ],
+        "materials": 1,
+        "bounds_gltf_min": [
+          -0.47999998927116394,
+          0.0,
+          -0.6000000238418579
+        ],
+        "bounds_gltf_max": [
+          0.7200000286102295,
+          0.8399999737739563,
+          0.47999998927116394
+        ],
+        "max_linear_color_error": 9.63244743967806e-08,
+        "max_unit_normal_error": 0,
+        "opaque_single_sided": true,
+        "textures": 0,
+        "collision_embedded": false,
+        "sha256": "803b1f779f5ec9cfa28c8768c504dd2023fa30c0c83e3ee8171e7a236b4b7ebc",
+        "validation": "PASS"
+      },
+      "bounds_blender_min": [
+        -0.47999998927116394,
+        -0.47999998927116394,
+        0.0
+      ],
+      "bounds_blender_max": [
+        0.7200000286102295,
+        0.6000000238418579,
+        0.8399999737739563
+      ]
+    },
+    "shrub_fern": {
+      "broad_leaf_fronds": 9,
+      "smallest_tip_width_m": 0.145,
+      "source_mesh_checks": [
+        {
+          "mesh": "Leaves.003",
+          "triangles": 444,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "zero_area_faces": 0,
+          "zero_area_triangles": 0,
+          "triangulated_nonmanifold_edges": 0,
+          "signed_volume_m3": 0.0628797562947946,
+          "closed_components": 10,
+          "component_volumes_m3": [
+            0.007775709598111766,
+            0.00871415762170121,
+            0.006971327647382473,
+            0.008177903372294772,
+            0.007373518913482256,
+            0.008311968438799033,
+            0.006703200994536472,
+            0.003273983828876226,
+            0.003273984527216572,
+            0.002303999848663807
+          ],
+          "all_flat_normals": true
+        }
+      ],
+      "export": {
+        "file": "shrub_fern.glb",
+        "bytes": 42424,
+        "triangles": 444,
+        "mesh_names": [
+          "Leaves"
+        ],
+        "materials": 1,
+        "bounds_gltf_min": [
+          -0.6206067204475403,
+          0.0,
+          -0.6377302408218384
+        ],
+        "bounds_gltf_max": [
+          0.5926604866981506,
+          0.7573038935661316,
+          0.6256029605865479
+        ],
+        "max_linear_color_error": 8.473861751179257e-08,
+        "max_unit_normal_error": 2.268488170642513e-07,
+        "opaque_single_sided": true,
+        "textures": 0,
+        "collision_embedded": false,
+        "sha256": "de8b455695a973b6d9ed4450cfbe3400594a5acb247c4fdff1003cd5d6487dcc",
+        "validation": "PASS"
+      },
+      "bounds_blender_min": [
+        -0.6206067204475403,
+        -0.6256029605865479,
+        0.0
+      ],
+      "bounds_blender_max": [
+        0.5926604866981506,
+        0.6377302408218384,
+        0.7573038935661316
+      ]
+    }
+  }
+}

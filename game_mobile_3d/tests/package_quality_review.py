@@ -5,7 +5,7 @@ import sys
 import bpy
 
 study = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else 'quality_slice'
-if study not in {'quality_slice', 'forest_quality'}:
+if study not in {'quality_slice', 'forest_quality', 'forest_meadow_v3'}:
     raise ValueError('Unknown review study')
 root = Path(__file__).resolve().parents[1] / '.validation' / study
 scene = bpy.context.scene

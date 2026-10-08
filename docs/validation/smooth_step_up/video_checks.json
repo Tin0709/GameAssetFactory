@@ -1,0 +1,23 @@
+{
+  "decoded_frames": 276,
+  "fps": 30.0,
+  "seconds": 9.2,
+  "sample_frames": [
+    30,
+    38,
+    44,
+    50,
+    86,
+    91,
+    135,
+    143,
+    151,
+    158,
+    194,
+    201,
+    238,
+    248,
+    264
+  ],
+  "note": "Actual encoded Godot video; original walk/run, smooth step up, no jump animation. Offline capture is not a performance benchmark."
+}
