@@ -43,14 +43,32 @@ func run() -> void:
 	var camera_size: float = level.get_node("Camera3D").size
 	for stage in [0,1,2,0,2]:
 		level.set_forest_stage(stage)
-		check(not level.get_node("WorldEnvironment").environment.fog_enabled,"Fog remains deferred")
+		check(level.get_node("WorldEnvironment").environment.fog_enabled==(stage==2),"Thin haze enabled only for final V3 stage")
+		check(not level.get_node("WorldEnvironment").environment.volumetric_fog_enabled,"Mobile review retains non-volumetric fog")
+		check(level.get_node("WorldEnvironment").environment.adjustment_enabled==(stage==2),"Warm grade only applies to current V3 presentation")
 		check(level.get_node("WorldEnvironment").environment.glow_enabled==(stage==2),"User-requested bloom only in final V3 light stage")
 		check(level.get_node("Camera3D").size == camera_size,"Comparison retains gameplay zoom")
 		check(level.get_node("Terrain").visible == (stage == 0),"Exactly one terrain presentation visible")
 		check(level.forest.visible == (stage > 0),"Forest visibility follows comparison")
 		check(level.get_node("Ground").collision_layer == (1 if stage == 0 else 0),"Baseline floor collision restored")
 		for grass in level.forest_grass:
-			check(grass.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,"Grass never casts shadows")
+			check(grass.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_DOUBLE_SIDED,"Temporary V3 grass shadow review is enabled")
+	level.set_grass_shadows(false)
+	level.set_forest_stage(0);level.set_forest_stage(2)
+	for grass in level.forest_grass:
+		check(grass.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,"Grass shadow opt-out survives stage comparison")
+	var shadow_key:=InputEventKey.new()
+	shadow_key.physical_keycode=KEY_G;shadow_key.pressed=true
+	level._unhandled_input(shadow_key)
+	for grass in level.forest_grass:
+		check(grass.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_DOUBLE_SIDED,"G restores temporary grass shadows")
+	level.set_atmosphere(false)
+	level.set_forest_stage(0);level.set_forest_stage(2)
+	check(not level.get_node("WorldEnvironment").environment.fog_enabled,"Haze opt-out survives stage comparison")
+	var haze_key:=InputEventKey.new()
+	haze_key.physical_keycode=KEY_H;haze_key.pressed=true
+	level._unhandled_input(haze_key)
+	check(level.get_node("WorldEnvironment").environment.fog_enabled,"H restores thin haze")
 	check(shared_env.ambient_light_energy == original_ambient,"Shared Environment remains untouched")
 	var boundary_ray := PhysicsRayQueryParameters3D.create(Vector3(-26,1.5,-24.5),Vector3(-24,1.5,-24.5),1)
 	check(not level.get_world_3d().direct_space_state.intersect_ray(boundary_ray).is_empty(),"Exterior terrace has a closed side and collision")

@@ -2,6 +2,11 @@ extends "res://scripts/forest_quality_slice.gd"
 ## Third, scene-local study. V2 and its sources remain available unchanged.
 const MEADOW_ASSETS := "res://assets/environment/forest_canopy_v3/"
 var v3_missing_assets: Array[String] = []
+## Temporary user-requested review; not an approved mobile quality default.
+@export var review_grass_shadows := true
+@export var review_atmosphere := true
+@export_range(0.0,0.30,0.01) var review_warmth := .05
+var warmth_lut: GradientTexture1D
 
 func _ready() -> void:
 	super._ready()
@@ -99,4 +104,73 @@ func set_forest_stage(stage: int) -> void:
 		$Sun.light_energy=1.32
 		$Sun.light_color=Color(1.0,.97,.91)
 		$Sun.shadow_opacity=.66
-	review_label.text="FOREST V3 · "+["EARLY QUALITY STUDY","MEADOW / PREVIOUS LIGHT","LEAFY MEADOW"][forest_stage]+"\nF1 early study · F2 geometry · F4 sunlight · Tab compare · WASD/Shift · T/K zombies"
+	set_grass_shadows(review_grass_shadows)
+	set_atmosphere(review_atmosphere)
+	set_warmth(review_warmth)
+
+func set_grass_shadows(enabled: bool) -> void:
+	review_grass_shadows=enabled
+	for grass in forest_grass:
+		# Broad grass consists of planes: cast from both sides as the blades sway.
+		grass.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_DOUBLE_SIDED if enabled else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_update_review_label()
+
+func set_atmosphere(enabled: bool) -> void:
+	review_atmosphere=enabled
+	var env: Environment=$WorldEnvironment.environment
+	env.fog_enabled=enabled and forest_stage==2
+	if env.fog_enabled:
+		# Bounded depth haze for the current orthographic gameplay camera.
+		# Native non-volumetric fog: no claim of shadowed light shafts or GI.
+		env.fog_mode=Environment.FOG_MODE_DEPTH
+		env.fog_depth_begin=16.0
+		env.fog_depth_end=44.0
+		env.fog_depth_curve=1.5
+		env.fog_density=.18
+		env.fog_light_color=Color(.82,.79,.69)
+		env.fog_light_energy=.75
+		env.fog_sun_scatter=.12
+		env.fog_height_density=0.0
+		env.fog_aerial_perspective=0.0
+		env.fog_sky_affect=0.0
+	_update_review_label()
+
+func _update_review_label() -> void:
+	if is_instance_valid(review_label):
+		review_label.text="FOREST V3 · "+["EARLY QUALITY STUDY","MEADOW / PREVIOUS LIGHT","LEAFY MEADOW"][forest_stage]+"\nF1 early study · F2 geometry · F4 sunlight · Tab compare · WASD/Shift · T/K zombies\nG grass shadows: "+("ON" if review_grass_shadows else "OFF")+" · H thin haze: "+("ON" if review_atmosphere and forest_stage==2 else "OFF")+" · Warmth +%d%% (review)" % roundi(review_warmth*100.0 if forest_stage==2 else 0.0)
+
+func set_warmth(strength: float) -> void:
+	review_warmth=clampf(strength,0.0,.30)
+	var env: Environment=$WorldEnvironment.environment
+	env.adjustment_enabled=forest_stage==2 and review_warmth>0.0
+	if env.adjustment_enabled:
+		# Percentage is grade blend strength, not physical temperature change.
+		# Warm midtones; protect black/white and balance neutral-grey luminance.
+		var offsets:=PackedFloat32Array()
+		var colors:=PackedColorArray()
+		var green_balance:=-(.2126*.30-.0722*.40)/.7152
+		for i in 65:
+			var value:=float(i)/64.0
+			var amount:=4.0*value*(1.0-value)*review_warmth
+			offsets.append(value)
+			colors.append(Color(value+.30*amount,value+green_balance*amount,value-.40*amount,1.0))
+		var curve:=Gradient.new()
+		curve.offsets=offsets;curve.colors=colors
+		warmth_lut=GradientTexture1D.new()
+		warmth_lut.width=256;warmth_lut.use_hdr=true;warmth_lut.gradient=curve
+		env.adjustment_brightness=1.0
+		env.adjustment_contrast=1.0
+		env.adjustment_saturation=1.0
+		env.adjustment_color_correction=warmth_lut
+	_update_review_label()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_G:
+		set_grass_shadows(not review_grass_shadows)
+		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_H:
+		set_atmosphere(not review_atmosphere)
+		get_viewport().set_input_as_handled()
+		return
+	super._unhandled_input(event)

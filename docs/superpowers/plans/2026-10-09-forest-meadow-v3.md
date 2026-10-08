@@ -13,3 +13,7 @@ Latest user request: after completing smooth step ascent, substantially improve 
 5. Update graphics research/art-direction/asset reuse links with verified methods, proposals and remaining gaps; final Git/worktree check. F5 opens latest gameplay study with normal audio; automated tests silent.
 
 No style is marked approved without explicit confirmation. No commit/push requested.
+
+Completed: matched V2 capture; authored/imported V3 vegetation; main-scene integration; gameplay/collision/animation preservation checks; actual Godot video, desktop profile and reusable research documents. Phone performance and human art approval remain open.
+
+Subsequent user steering: soften glare and add slight bloom, lift the overly dark trial, temporarily enable grass shadows (G), then add thin sunlit haze (H). These requests override the initial no-shadow/no-fog study constraints within V3. Keep a clear near-player region, compare frozen views, and retain native Mobile depth fog rather than changing renderers. Current parameters are for review.

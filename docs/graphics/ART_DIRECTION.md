@@ -1,6 +1,6 @@
 # Hướng mỹ thuật — zombie sinh tồn khối hộp
 
-Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; bằng chứng, nguồn và cách tái hiện ở [RESEARCH.md](RESEARCH.md). Người dùng đánh giá QualitySlice đầu chưa đạt kỳ vọng; **ForestQualitySlice mới vẫn chờ review**, không là phong cách đã duyệt.
+Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; bằng chứng, nguồn và cách tái hiện ở [RESEARCH.md](RESEARCH.md). Người dùng đánh giá các lượt đầu chưa đạt kỳ vọng; **ForestMeadowV3 hiện tại vẫn chờ review**, không là phong cách đã duyệt.
 
 ## Điều đã được người dùng chấp nhận hoặc yêu cầu
 
@@ -15,6 +15,10 @@ Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; b�
 | Lưu cây/bụi cây để reuse; nhảy lên/xuống block phải làm và review trong Blender trước | Yêu cầu trực tiếp 2026-10-09. Chưa phê duyệt bộ cây mới hoặc motion nhảy. |
 | ForestQualitySlice là scene chính để mở project và bấm F5 review | Yêu cầu trực tiếp tiếp theo ngày 2026-10-09; cho phép đổi `run/main_scene`, không đồng nghĩa đã duyệt mọi chi tiết mỹ thuật. |
 | **Mọi cập nhật đồ họa đi vào gameplay chính để F5 review liên tục** | Yêu cầu mới nhất ngày2026-10-09. Scene hiện tại là ForestMeadowV3; giữ V2 để đối chiếu. Đưa vào gameplay không đồng nghĩa người dùng đã duyệt mỹ thuật. |
+| Nắng dịu, hơi bloom; tránh cả chói lẫn quá tối | Người dùng phản hồi V3 đầu quá chói, lượt giảm sáng tiếp theo quá tối. Đây là mục tiêu chỉnh, không phải phê duyệt bộ thông số hiện tại. |
+| **Tạm bật bóng cỏ để review** | Yêu cầu tiếp theo ngày 2026-10-09 thay thế quy tắc không bóng cỏ trong bản thử V3; mặc định bật, G bật/tắt. Chưa quyết định giữ lâu dài hoặc áp dụng trên điện thoại. |
+| **Thử không khí có lớp sương mỏng, nắng dịu để tự nhiên hơn** | Yêu cầu tiếp theo cùng ngày, [ảnh tham chiếu](references/user-dungeons2-atmosphere-2026-10-09.png). Thay thế việc hoãn sương trong study V3; H bật/tắt. Đây là mục tiêu hình ảnh được yêu cầu, không xác nhận Dungeons II dùng fog cụ thể hoặc duyệt thông số thử. |
+| **Mức tăng sắc ấm hiện tại chỉ +5%** | Người dùng đã xem +15% và thấy quá ấm, yêu cầu giảm còn +5%. Đây là strength của color grade thử, không phải tăng độ sáng hoặc phần trăm nhiệt độ vật lý. Kết quả +5% vẫn chờ review. |
 | Chỉ bổ sung animation nhảy; giữ nguyên toàn bộ animation cũ | Người dùng nhắc rõ trong lúc review nhảy ngày 2026-10-09. Không thay Walk/Sprint/Idle/weapon/combat bằng các đoạn di chuyển minh hoạ trong study. |
 | **Yêu cầu mới nhất: tạm bỏ nhảy trong game; tự đi lên bậc mượt bằng animation cũ** | Người dùng đổi hướng sau khi cho phép thử tích hợp. Giữ study Blender V2 để bổ sung nhảy sau; không bật clip nhảy hoặc xung lực bật lên trong game hiện tại. |
 
@@ -33,7 +37,7 @@ Tham chiếu chính U1: tán cây tối làm khung, cỏ thấp dày xen cụm l
 | Hình học | Cạnh cứng, tỷ lệ nhất quán; bevel chỉ khi nhìn thấy ở camera gameplay. Quy ước block 1 m, origin giữa đáy. Cây QualitySlice là proxy, chưa là chuẩn asset cây. | Silhouette trước texture; kiểm tra normals, mặt kín, tỷ lệ GLB trong engine. |
 | Texture | Giữ cụm pixel có ý đồ, tránh nhiễu li ti/nhẫn đồng tâm; đồng nhất mật độ chi tiết giữa cỏ–đá–súng–nhân vật theo khoảng nhìn. | Xem cả cận và gameplay; pan chậm để thấy shimmer, thử mipmap riêng với atlas padding trước khi áp dụng. |
 | Vật liệu | Môi trường chủ yếu matte; phản sáng nhẹ chỉ nơi cần đọc mặt/kim loại. Không sửa roughness nhân vật chỉ để khớp một screenshot. | Cùng vật thể dưới key/fill và bóng, kiểm tra highlight không làm mất palette. |
-| Ánh sáng | Một sun có bóng, ambient lạnh vừa đủ đọc mặt tối; điều chỉnh light/value trước hậu kỳ. Tôn trọng sương đang hoãn. | Kiểm tra mảng sáng tối, chân tiếp đất, tự bóng/đứt bóng. Đừng dùng blur để che shadow acne. |
+| Ánh sáng | Một sun có bóng, ambient lạnh vừa đủ đọc mặt tối; điều chỉnh light/value trước hậu kỳ. Theo yêu cầu mới, thử haze mỏng tăng theo khoảng cách, giữ vùng actor rõ. | Kiểm tra mảng sáng tối, chân tiếp đất, tự bóng/đứt bóng và bật/tắt haze cùng camera. Đừng dùng blur để che shadow acne. |
 | Animation | Đọc được tư thế chịu lực → đẩy → hồi; kiểm tra chân cuối cùng trong world space sau mọi lớp blend/recoil. Không tăng bounce trước khi xử lý tiếp xúc chân. | Clip start/walk/stop, forward–diagonal–side, backward–diagonal–side, sprint–release–draw, recoil–settle. |
 | Combat/VFX | Muzzle/impact sắc, ngắn; hồi thân chậm hơn cú giật súng; silhouette khối/pixel thống nhất. Không tăng diện tích flash che mục tiêu. | Xem cùng cảnh một và nhiều zombie; tách nhịp anticipation, sát thương và recovery. |
 
@@ -41,6 +45,7 @@ Tham chiếu chính U1: tán cây tối làm khung, cỏ thấp dày xen cụm l
 
 - **Lượt đầu đã thử:** scene riêng kế thừa 50×50; actor/đất/cỏ/đá hiện có, bốn cây proxy opaque; ít hoa hơn, ambient giảm, sun ấm, MSAA 2×. Giữ bản gốc bằng F1 và từng bước bằng F2/F4/F5. Kết quả chỉ chứng minh được các thay đổi cụ thể trong ảnh, chưa đạt chất lượng mục tiêu cuối.
 - **Lượt hai đã thử:** ForestQualitySlice dùng cây tác giả, địa hình bậc, tường đá đổ, cỏ theo cụm; so hình học dưới đèn cũ rồi đèn mới với PCF/Filmic. F1 bản QualitySlice trước, F2 hình học mới/đèn cũ, F4 bản mới, Tab A/B. Camera/tỷ lệ actor giữ nguyên. Bộ cây có màu vertex, chưa phải texture atlas chuẩn cuối; xem [nguồn Blender, GLB và cách reuse](../../blender/environment/studies/forest_canopy_v2/README.md).
+- **Lượt ba đang review:** ForestMeadowV3 có tán lá chia cụm bất đối xứng, cỏ thấp và đầu lá dịu, mép cỏ–đất ngắt quãng, vách đất/đá phân tầng. [Bộ cây V3 tái sử dụng](../../blender/environment/studies/forest_canopy_v3/README.md). Ánh sáng đã nâng lại giữa hai mức bị phản hồi chói/tối, thêm bloom nhẹ, bóng cỏ và haze mỏng theo yêu cầu tiếp theo. F1 là QualitySlice đầu, không phải V2; G so bóng cỏ, H so haze trong V3. Chưa duyệt hình ảnh.
 - **Di chuyển lên bậc:** theo yêu cầu mới nhất, dùng chuyển động lên bậc liên tục và gait R15 cũ. Motion nhảy V2 được lưu riêng để dùng sau, chưa duyệt nghệ thuật và không hoạt động trong game. Không sửa các clip gait/weapon/combat hoặc GLB nhân vật cũ. Walk↔strafe/foot contact vẫn là vấn đề riêng còn mở.
 - **Ánh sáng bake:** chỉ thử ở một khu terrain/prop cố định đã chuẩn bị UV2. Actor dùng probe và bóng trực tiếp. Không unwrap đè UV2 của cỏ vì UV2 đang chứa gốc uốn. Chưa bake trong lượt này.
 - **Nếu vượt 33.3 ms trên điện thoại:** đo pass gây tốn, thử tắt MSAA hoặc giảm 3D render scale, giảm mật độ vật trang trí và số caster. Giữ silhouette nhân vật và nhịp combat trước. Đây là thứ tự thử, chưa phải cấu hình tối thiểu đã chứng minh.

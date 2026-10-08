@@ -1,0 +1,21 @@
+{
+	"art_approved": false,
+	"device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+	"engine": "4.7.2-stable (official)",
+	"grass_shadows": true,
+	"kills": 2,
+	"last_content_frame": 272,
+	"missing_v3_assets": [],
+	"note": "Offline Movie Maker at 30 FPS; real production controller/animation/combat. Not a speed measurement.",
+	"peak_effect_nodes": 7,
+	"peak_projectiles": 1,
+	"phone_verified": false,
+	"renderer": "mobile",
+	"resolution": [
+		1280,
+		720
+	],
+	"target_fps": 30,
+	"thin_haze": true,
+	"warmth": 0.05
+}

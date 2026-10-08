@@ -1,0 +1,96 @@
+{
+	"art_approved": false,
+	"combat_12_fixture": {
+		"draws": {
+			"max": 180.0,
+			"median": 177.0,
+			"p95": 179.0
+		},
+		"frame_interval_ms": {
+			"max": 57.789,
+			"median": 0.707,
+			"p95": 1.372
+		},
+		"living_zombies": {
+			"max": 12.0,
+			"median": 12.0,
+			"p95": 12.0
+		},
+		"primitives": {
+			"max": 274228.0,
+			"median": 274064.0,
+			"p95": 274204.0
+		},
+		"render_cpu_ms": {
+			"max": 0.455000013113022,
+			"median": 0.100000001490116,
+			"p95": 0.126000002026558
+		},
+		"render_gpu_ms": {
+			"max": 0.727999985218048,
+			"median": 0.150999993085861,
+			"p95": 0.352999985218048
+		},
+		"samples": 9862,
+		"seconds": 8.000384,
+		"static_memory_before_sampling_bytes": 94487932.0,
+		"video_memory_bytes": {
+			"max": 151674880.0,
+			"median": 151150592.0,
+			"p95": 151674880.0
+		}
+	},
+	"device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+	"engine": "4.7.2-stable (official)",
+	"grass_shadows": false,
+	"idle": {
+		"draws": {
+			"max": 151.0,
+			"median": 151.0,
+			"p95": 151.0
+		},
+		"frame_interval_ms": {
+			"max": 23.457,
+			"median": 0.515,
+			"p95": 1.105
+		},
+		"living_zombies": {
+			"max": 0.0,
+			"median": 0.0,
+			"p95": 0.0
+		},
+		"primitives": {
+			"max": 272322.0,
+			"median": 272322.0,
+			"p95": 272322.0
+		},
+		"render_cpu_ms": {
+			"max": 0.44200000166893,
+			"median": 0.0860000029206276,
+			"p95": 0.109999999403954
+		},
+		"render_gpu_ms": {
+			"max": 1.10800004005432,
+			"median": 0.284999996423721,
+			"p95": 0.294999986886978
+		},
+		"samples": 8236,
+		"seconds": 5.000117,
+		"static_memory_before_sampling_bytes": 90905222.0,
+		"video_memory_bytes": {
+			"max": 144990208.0,
+			"median": 144990208.0,
+			"p95": 144990208.0
+		}
+	},
+	"missing_v3_assets": [],
+	"note": "Serial desktop uncapped wall-clock sampling; no image readback or movie. 3s warmups, 5s idle, 8s combat. Frame interval includes scheduling; GPU timing is Godot viewport timing, not full device instrumentation. No thermal/mobile inference.",
+	"phone_verified": false,
+	"renderer": "mobile",
+	"resolution": [
+		1280,
+		720
+	],
+	"stage": 2,
+	"target_fps": 30
+}

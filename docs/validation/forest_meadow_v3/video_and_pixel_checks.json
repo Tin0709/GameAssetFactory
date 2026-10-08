@@ -1,0 +1,38 @@
+{
+  "decoded_frames": 272,
+  "fps": 30.0,
+  "seconds": 9.066666666666666,
+  "resolution": [
+    1280,
+    720
+  ],
+  "art_approved": false,
+  "phone_verified": false,
+  "bloom": {
+    "mean_absolute_rgb_delta_8bit": 0.3476222511574074,
+    "max_rgb_delta_8bit": 7.0,
+    "changed_pixel_fraction": 0.7176117621527778
+  },
+  "grass_shadows": {
+    "mean_absolute_rgb_delta_8bit": 2.118937717013889,
+    "max_rgb_delta_8bit": 49.0,
+    "changed_pixel_fraction": 0.2656608072916667
+  },
+  "haze": {
+    "mean_absolute_rgb_delta_8bit": 4.577335792824074,
+    "max_rgb_delta_8bit": 55.0,
+    "changed_pixel_fraction": 0.8332020399305555
+  },
+  "warmth": {
+    "mean_absolute_rgb_delta_8bit": 2.746738642939815,
+    "max_rgb_delta_8bit": 6.0,
+    "changed_pixel_fraction": 1.0,
+    "strength": 0.05,
+    "mean_rgb_channel_shift_8bit": [
+      3.3962141927083334,
+      -0.5374772135416667,
+      -4.306522352430555
+    ],
+    "mean_luma_shift_8bit": 0.026700520399305625
+  }
+}
