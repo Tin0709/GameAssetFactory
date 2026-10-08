@@ -1,4 +1,6 @@
-# Grassland look-dev review
+# Archived v3 grassland look-dev review
+
+This report records the earlier v3 pass. The user's later request authorized adoption of broad v4 grass in the actual game, removed all grass shadows/root shade maps, and added a bare dirt review sample. Use [GRASSLAND_V4.md](GRASSLAND_V4.md) for the current controls, behavior, captures and measurements; the historical figures below do not describe the active v4 runtime.
 
 ARTISTIC STATUS: AWAITING HUMAN REVIEW.
 

@@ -78,9 +78,9 @@ func run() -> void:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var roots := [Vector2.ZERO, Vector2.ZERO, Vector2(0, 0.78), Vector2(1.5, 0), Vector2(-0.1726, 0), Vector2(-0.1724, 0), Vector2.ZERO, Vector2.ZERO]
-	var heights := [0.0, 0.6, 0.6, 0.6, 0.6, 0.6, 0.39, 0.132]
+	var heights := [0.0, 0.36, 0.36, 0.36, 0.36, 0.36, 0.234, 0.0792]
 	for i in range(8):
-		var t: float = heights[i] / 0.6
+		var t: float = heights[i] / 0.36
 		for corner in [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 0), Vector2(1, 1), Vector2(0, 1)]:
 			tool.set_normal(Vector3.UP)
 			tool.set_uv(Vector2((i + corner.x) / 8.0, corner.y))
@@ -96,14 +96,14 @@ func run() -> void:
 	check(styled.wind[1].x > current.wind[1].x * 2.4, "New wind is visibly stronger")
 	check(styled.walk[1].x > current.walk[1].x * 1.6, "New player splay is stronger")
 	check(current.sprint[2].length() < 0.002 and styled.sprint[2].length() > 0.002, "New influence reaches blades beyond original radius")
-	check(styled.combined[1].x < 0.211 and styled.combined[1].x > 0.18, "Combined bend is capped near 20cm")
+	check(styled.combined[1].x < 0.185 and styled.combined[1].x > 0.17, "Combined bend is capped at half the short blade height")
 	check(styled.sprint[3].length() < 0.002, "Distant grass remains unaffected")
 	check(styled.sprint[4].distance_to(styled.sprint[5]) < 0.005, "Cancellation stays continuous")
 	check(styled.recovery[1].x > 0.03 and styled.recovery[1].x < styled.sprint[1].x * 0.8, "Player splay fades softly")
 	check(styled.expired[1].length() < 0.002, "Original 0.8 second recovery retained")
 	check(styled.wind[7].length() < styled.wind[6].length() and styled.wind[6].length() < styled.wind[1].length(), "Lower rings bend less than tips")
 	var tip: Vector3 = styled.combined[1]
-	check(absf(Vector2(tip.x, tip.y + 0.6).length() - 0.6) < 0.005, "Bend shortens arc without stretching blade")
+	check(absf(Vector2(tip.x, tip.y + 0.36).length() - 0.36) < 0.005, "Bend shortens arc without stretching blade")
 	var report := {"checks": checks, "failures": failures, "current_wind_m": current.wind[1].x, "new_wind_m": styled.wind[1].x,
 		"current_walk_m": current.walk[1].x, "new_walk_m": styled.walk[1].x, "new_combined_m": styled.combined[1].x}
 	FileAccess.open("res://.validation/lookdev_gpu.json", FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))

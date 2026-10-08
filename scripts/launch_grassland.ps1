@@ -7,7 +7,7 @@ if (-not (Test-Path -LiteralPath $GodotPath -PathType Leaf)) { throw "Set -Godot
 $reviewOutput = Join-Path $projectPath '.validation'
 New-Item -ItemType Directory -Force -Path $reviewOutput | Out-Null
 $env:APPDATA = Join-Path $projectPath '.godot\validation_appdata'
-$liveLog = Join-Path $reviewOutput 'grassland_live.log'
+$liveLog = (Join-Path $reviewOutput 'grassland_live.log').Replace('\', '/')
 # This visible game window is the requested final review deliverable.
 # D3D12 avoids this workstation's unavailable Vulkan surface extension.
 $gameProcess = Start-Process -FilePath $GodotPath -ArgumentList @(

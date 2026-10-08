@@ -1,0 +1,14 @@
+{
+  "all_checks_passed": true,
+  "dimensions_m": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "authored_vertices": 8,
+  "triangles": 12,
+  "no_grass_cap": true,
+  "existing_v4_mesh_exports_unchanged": true,
+  "existing_atlas_texels_unchanged_below_row104": true,
+  "atlas_preservation_verified_in_builder": true
+}

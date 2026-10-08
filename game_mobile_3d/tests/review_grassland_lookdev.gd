@@ -2,7 +2,7 @@ extends SceneTree
 ## Paired actual renderer captures. Freeze simulation only across each paired view.
 var level: Node3D
 var player: CharacterBody3D
-const OUT := "res://.validation/grassland_lookdev"
+const OUT := "res://.validation/grassland_v4"
 
 func _initialize() -> void:
 	call_deferred("run")
@@ -26,7 +26,7 @@ func paired(label: String) -> void:
 
 func run() -> void:
 	DirAccess.make_dir_recursive_absolute(OUT)
-	level = load("res://scenes/GrasslandLookDev.tscn").instantiate()
+	level = load("res://scenes/Grassland.tscn").instantiate()
 	root.add_child(level)
 	current_scene = level
 	player = level.get_node("Actors/Player")
@@ -74,5 +74,26 @@ func run() -> void:
 	await paired("08_detail_wind_only")
 	await tick(60)
 	await paired("09_detail_wind_next_phase")
+	# The soil asset is reviewed in its dedicated peaceful scene, under the same
+	# scene-local sun/fill as the actual game. The playable map stays all grass.
+	level.queue_free()
+	await tick(3)
+	level = load("res://scenes/GrasslandLookDev.tscn").instantiate()
+	root.add_child(level)
+	current_scene = level
+	player = level.get_node("Actors/Player")
+	level.get_node("HUD").visible = false
+	await tick(10)
+	level.set_process(false)
+	camera = level.get_node("Camera3D")
+	camera.size = 6.0
+	camera.position = level.camera_offset + Vector3(0, 1, 0)
+	player.global_position = Vector3(0, 1.02, 1.8)
+	player.velocity = Vector3.ZERO
+	await tick(10)
+	await paired("10_soil_sample")
+	level.set_quality(false)
+	level.set_soil_review(false)
+	await capture("11_soil_sample_hidden_mobile")
 	print("LOOKDEV_CAPTURE_COMPLETE enemies=" + str(get_nodes_in_group("zombies").size()))
 	quit()

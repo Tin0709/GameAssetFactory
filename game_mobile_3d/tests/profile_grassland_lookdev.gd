@@ -44,7 +44,7 @@ func run() -> void:
 		push_error("Use --look=current|mobile|high")
 		quit(1)
 		return
-	level = load("res://scenes/GrasslandLookDev.tscn").instantiate()
+	level = load("res://scenes/Grassland.tscn").instantiate()
 	root.add_child(level)
 	current_scene = level
 	level.set_quality(mode == "high")
@@ -74,6 +74,6 @@ func run() -> void:
 		"device": RenderingServer.get_video_adapter_name(), "renderer": RenderingServer.get_current_rendering_method(),
 		"resolution": root.size, "grass_patches": level.grass_transforms.size(), "terrain_triangles": level.terrain_triangles,
 		"note": "Warm desktop, one appearance per process, serial runs, uncapped, no screenshot readback. CPU monitor updates once per second. Target-phone measurements required."}
-	FileAccess.open("res://.validation/lookdev_profile_" + mode + ".json", FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
+	FileAccess.open("res://.validation/v4_profile_" + mode + ".json", FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
 	print(JSON.stringify(report))
 	quit()

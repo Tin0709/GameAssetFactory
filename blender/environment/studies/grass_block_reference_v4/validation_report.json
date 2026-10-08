@@ -1,0 +1,35 @@
+{
+  "all_checks_passed": true,
+  "blade_count": 36,
+  "triangles": 216,
+  "height_range_m": [
+    0.28209301829338074,
+    0.4794924557209015
+  ],
+  "width_range_m": [
+    0.12035459575530381,
+    0.19922708512615342
+  ],
+  "tip_width_ratio": 1,
+  "root_error_m": 0,
+  "preview_wind_max_m": 0.018288580513559565,
+  "v3_source_sha256": "f1243780e7197d6b3495a43e9e19a145f5e4693bec08c8c502611ba1a2cc20be",
+  "block_dimensions_m": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "grass_cap_depth_multiplier": 1.15,
+  "grass_cap_depths_old_m": [
+    0.125,
+    0.1875,
+    0.25
+  ],
+  "grass_cap_depths_new_m": [
+    0.14375,
+    0.215625,
+    0.2875
+  ],
+  "exported_glb_rest_vertices_masks_uv2_square_tips_verified": true,
+  "exported_top_vertices": 72
+}

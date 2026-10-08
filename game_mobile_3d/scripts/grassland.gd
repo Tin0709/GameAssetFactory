@@ -2,10 +2,15 @@ extends Node3D
 ## Flat 40x40 source-asset terrain, chunked instancing and one shared grass motion provider.
 const WIDTH := 40
 const CHUNK_SIZE := 10
-const BLOCK = preload("res://assets/environment/grassland/grass_dirt_block_v3.glb")
-const GRASS = preload("res://assets/environment/grassland/grass_patch_v3.glb")
-const GRASS_SHADER = preload("res://materials/grassland_grass.gdshader")
-const ATLAS = preload("res://assets/environment/grassland/environment_atlas_64.png")
+const BLOCK = preload("res://assets/environment/grassland/grass_dirt_block_v4.glb")
+const GRASS = preload("res://assets/environment/grassland/grass_patch_v4.glb")
+const GRASS_SHADER = preload("res://materials/lookdev_grass.gdshader")
+const PREVIOUS_GRASS = preload("res://assets/environment/grassland/grass_patch_v3.glb")
+const PREVIOUS_BLOCK = preload("res://assets/environment/grassland/grass_dirt_block_v3.glb")
+const PREVIOUS_SHADER = preload("res://materials/grassland_grass.gdshader")
+const PREVIOUS_ATLAS = preload("res://assets/environment/grassland/environment_atlas_64.png")
+const LOOK_TERRAIN = preload("res://materials/lookdev_terrain.gdshader")
+const ATLAS = preload("res://assets/environment/grassland/environment_atlas_v4.png")
 const MOTION = preload("res://scripts/grassland_motion.gd")
 @export_range(0.0, 1.0) var grass_coverage := 0.25
 @export var grass_seed := 8055
@@ -25,6 +30,22 @@ var combat: Node
 var animation_test_enemy: CharacterBody3D
 const REVIEW_ENEMY = preload("res://scenes/characters/CuboidZombie.tscn")
 const REVIEW_ENEMY_SCRIPT = preload("res://scripts/animation_test_enemy.gd")
+
+# Both appearances own local materials; shared Gameplay.tres is never mutated.
+const SUN_PROPERTIES := ["rotation", "light_color", "light_energy", "light_angular_distance", "shadow_enabled", "shadow_bias", "shadow_blur", "shadow_normal_bias", "shadow_opacity", "directional_shadow_mode", "directional_shadow_max_distance", "directional_shadow_blend_splits"]
+var new_look := true
+var high_quality := false
+var original_environment: Environment
+var styled_environment: Environment
+var original_grass: ShaderMaterial
+var styled_grass: ShaderMaterial
+var styled_terrain: ShaderMaterial
+var original_sun := {}
+var terrain_states: Array[Dictionary] = []
+var grass_states: Array[Dictionary] = []
+var previous_mesh: Mesh
+var new_mesh: Mesh
+
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
 
@@ -70,6 +91,8 @@ func _ready() -> void:
 		player.equip_test_weapon(1)
 		toggle_animation_test_enemy()
 
+	setup_presentation()
+
 func toggle_animation_test_enemy() -> void:
 	if is_instance_valid(animation_test_enemy):
 		combat.living_zombies.erase(animation_test_enemy)
@@ -112,7 +135,8 @@ func build_distribution() -> void:
 		var basis := Basis(Vector3.UP, rng.randf_range(0, TAU)).scaled(Vector3(1, rng.randf_range(0.94, 1.06), 1))
 		grass_transforms.append(Transform3D(basis, center))
 
-func build_terrain(mesh: Mesh) -> void:
+func build_terrain(mesh: Mesh, populate := true) -> Array[Mesh]:
+	var built: Array[Mesh] = []
 	var arrays := mesh.surface_get_arrays(0)
 	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
 	var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
@@ -149,12 +173,17 @@ func build_terrain(mesh: Mesh) -> void:
 							tool.set_uv(uvs[idx])
 							tool.add_vertex(vertices[idx] + offset)
 			tool.index()
+			var combined := tool.commit()
+			built.append(combined)
+			if not populate: continue
 			var chunk := MeshInstance3D.new()
 			chunk.name = "Chunk_%d_%d" % [cx, cz]
-			chunk.mesh = tool.commit()
+			chunk.mesh = combined
 			chunk.material_override = material
 			chunk.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			$Terrain.add_child(chunk)
+
+	return built
 
 func build_grass() -> void:
 	var buckets: Array[Array] = []
@@ -186,6 +215,7 @@ func _physics_process(delta: float) -> void:
 		reset_player()
 	motion.advance(delta, player.global_position, player.get_real_velocity(), player.walk_speed, player.run_speed)
 	motion.publish(grass_material)
+	if styled_terrain: styled_terrain.set_shader_parameter("player_position", player.global_position)
 
 func _process(delta: float) -> void:
 	# Preserve the production camera's projection/rotation/scale and follow the larger map.
@@ -206,4 +236,91 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_F7:
 			toggle_animation_test_enemy()
 			get_viewport().set_input_as_handled()
+		match event.physical_keycode:
+			KEY_F1: set_look(false)
+			KEY_F2: set_look(true)
+			KEY_TAB: set_look(not new_look)
+			KEY_F3: set_quality(not high_quality)
 	# Existing AnimationWeaponDebug owns 1/2/3; avoid a second equip/reset.
+
+func setup_presentation() -> void:
+	original_environment = $WorldEnvironment.environment.duplicate()
+	original_environment.fog_enabled = false
+	for property in SUN_PROPERTIES: original_sun[property] = $Sun.get(property)
+	new_mesh = grass_mesh
+	var previous = PREVIOUS_GRASS.instantiate()
+	var meshes := previous.find_children("*", "MeshInstance3D", true, false)
+	previous_mesh = previous.mesh if previous is MeshInstance3D else meshes[0].mesh
+	previous.free()
+	original_grass = ShaderMaterial.new()
+	original_grass.shader = PREVIOUS_SHADER
+	original_grass.set_shader_parameter("atlas", PREVIOUS_ATLAS)
+	original_grass.set_shader_parameter("wind_direction", wind_direction)
+	original_grass.set_shader_parameter("wind_strength", wind_strength)
+	styled_grass = grass_material
+	var previous_ground := StandardMaterial3D.new()
+	previous_ground.albedo_texture = PREVIOUS_ATLAS
+	previous_ground.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	previous_ground.roughness = 0.9
+	previous_ground.metallic_specular = 0.08
+	var previous_block = PREVIOUS_BLOCK.instantiate()
+	var block_meshes := previous_block.find_children("*", "MeshInstance3D", true, false)
+	var source_mesh: Mesh = previous_block.mesh if previous_block is MeshInstance3D else block_meshes[0].mesh
+	var new_triangles := terrain_triangles
+	var previous_chunks := build_terrain(source_mesh, false)
+	terrain_triangles = new_triangles
+	previous_block.free()
+	for i in range($Terrain.get_child_count()):
+		var chunk = $Terrain.get_child(i)
+		terrain_states.append({"node": chunk, "material": previous_ground, "previous_mesh": previous_chunks[i], "new_mesh": chunk.mesh})
+	for chunk in $Grass.get_children():
+		grass_states.append({"node": chunk})
+	styled_environment = original_environment.duplicate()
+	styled_environment.background_color = Color(0.50, 0.62, 0.65)
+	styled_environment.ambient_light_color = Color(0.63, 0.75, 0.84)
+	styled_environment.ambient_light_energy = 0.52
+	styled_environment.fog_enabled = false
+	styled_environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
+	styled_terrain = ShaderMaterial.new()
+	styled_terrain.shader = LOOK_TERRAIN
+	styled_terrain.set_shader_parameter("atlas", ATLAS)
+	set_look(true)
+
+func set_look(enabled: bool) -> void:
+	new_look = enabled
+	$WorldEnvironment.environment = styled_environment if enabled else original_environment
+	grass_material = styled_grass if enabled else original_grass
+	grass_mesh = new_mesh if enabled else previous_mesh
+	motion.publish(grass_material)
+	for state in terrain_states:
+		state.node.material_override = styled_terrain if enabled else state.material
+		state.node.mesh = state.new_mesh if enabled else state.previous_mesh
+		state.node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for state in grass_states:
+		state.node.multimesh.mesh = grass_mesh
+		state.node.material_override = grass_material
+		state.node.extra_cull_margin = 0.22 if enabled else 0.15
+		# Absolute invariant: quality controls only the player's sun shadow.
+		state.node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if enabled:
+		$Sun.rotation_degrees = Vector3(-48, -42, 0)
+		$Sun.light_color = Color(1.0, 0.94, 0.82)
+		$Sun.light_energy = 1.10
+		$Sun.light_angular_distance = 0.0
+		$Sun.shadow_bias = 0.025
+		$Sun.shadow_blur = 0.5 if high_quality else 0.3
+		$Sun.shadow_normal_bias = 0.45
+		$Sun.shadow_opacity = 0.78
+		$Sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
+		$Sun.directional_shadow_max_distance = 29.0
+		$Sun.directional_shadow_blend_splits = false
+	else:
+		for property in original_sun: $Sun.set(property, original_sun[property])
+	update_help()
+
+func set_quality(high: bool) -> void:
+	high_quality = high
+	set_look(new_look)
+
+func update_help() -> void:
+	$HUD/Help.text = "GRASSLAND 40 × 40 · %s\nF1 Previous v3 · F2 New v4 · Tab A/B · F3 Player shadow\nWASD move · Shift sprint · R center\nF7 combat target · 1/2/3 pistol/rifle/shotgun\nARTISTIC STATUS: AWAITING HUMAN REVIEW" % ("V4 / PLAYER DETAIL" if new_look and high_quality else ("V4 / MOBILE" if new_look else "PREVIOUS V3"))

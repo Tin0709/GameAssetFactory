@@ -48,8 +48,9 @@ func run() -> void:
 			check(masks[i].r == 0 and masks[i].g == 0, "Exported roots have exactly zero bend mask")
 		max_height = maxf(max_height, vertices[i].y)
 		if masks[i].g > 0.999: min_height = minf(min_height, vertices[i].y)
-	check(root_vertices >= 98 and min_height > 0.48 and max_height < 0.70, "Approved 49-blade geometry and heights retained")
-	check(level.grass_mesh.get_faces().size() / 3 == 294, "Actual 294 triangle grass patch")
+	var manifest = JSON.parse_string(FileAccess.get_file_as_string("res://assets/environment/grassland/export_manifest_v4.json"))
+	check(root_vertices >= 64 and min_height >= 0.27 and max_height <= 0.49, "Broad squat v4 geometry and heights retained")
+	check(level.grass_mesh.get_faces().size() / 3 == int(manifest.grass_triangles), "Imported triangle count matches validated Blender v4 manifest")
 	check(level.terrain_triangles < 16000, "Internal terrain faces removed for efficient rendering")
 	var top_cells := {}
 	var top_triangles := 0
@@ -73,7 +74,7 @@ func run() -> void:
 	for i in range(vertices.size()):
 		if vertices[i].y < 0.0001:
 			var decoded := Vector3(roots[i].x - 0.5, 0, roots[i].y - 0.5)
-			check(decoded.distance_to(vertices[i]) < 0.046, "Imported blade root UV2 maps back within the half blade width")
+			check(decoded.distance_to(vertices[i]) < 0.105, "Imported blade root UV2 maps back within the broad half blade width")
 	for transform: Transform3D in level.grass_transforms:
 		check(is_equal_approx(transform.origin.y, 1.0), "Grass root plane planted at Y=1")
 		check(Vector2(transform.origin.x, transform.origin.z).length() > 1.4, "Spawn clearing excludes grass")
