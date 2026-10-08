@@ -1,0 +1,117 @@
+{
+  "study": "Dungeons grass style V1",
+  "artistic_status": "awaiting human review",
+  "assets": [
+    {
+      "name": "ENV_GrassBlock_DI_Study_V1",
+      "dimensions_m": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "pivot": "bottom center",
+      "materials": [
+        "MAT_Meadow_Atlas_Opaque"
+      ]
+    },
+    {
+      "name": "ENV_Grass_DI_Study_V1",
+      "dimensions_m": [
+        0.5799999833106995,
+        0.5799999833106995,
+        0.46000000834465027
+      ],
+      "triangles": 4,
+      "pivot": "bottom center",
+      "materials": [
+        "MAT_Meadow_Atlas_Cutout"
+      ]
+    },
+    {
+      "name": "ENV_TallGrass_DI_Study_V1",
+      "dimensions_m": [
+        0.7200000286102295,
+        0.7200000286102295,
+        0.949999988079071
+      ],
+      "triangles": 4,
+      "pivot": "bottom center",
+      "materials": [
+        "MAT_Meadow_Atlas_Cutout"
+      ]
+    }
+  ],
+  "atlas": {
+    "path": "textures/meadow_atlas.png",
+    "size": [
+      128,
+      128
+    ],
+    "gutters_px": 2,
+    "regions": {
+      "grass_top": [
+        2,
+        2,
+        32,
+        32
+      ],
+      "dirt": [
+        38,
+        2,
+        32,
+        32
+      ],
+      "grass_side": [
+        74,
+        2,
+        32,
+        32
+      ],
+      "short_grass": [
+        2,
+        38,
+        32,
+        32
+      ],
+      "tall_grass": [
+        38,
+        38,
+        32,
+        64
+      ]
+    },
+    "filter": "Closest",
+    "packed": true
+  },
+  "reference_paths_hashes": {
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\references\\resource_packs\\dungeons_ii_style\\extracted\\assets\\minecraft\\textures\\block\\dirt.png": "667cb56474ef89c4923a044a8901201b02032d18b3cc45ef785a7094660fe136",
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\references\\resource_packs\\dungeons_ii_style\\extracted\\assets\\minecraft\\textures\\block\\grass_block_top.png": "f74e56e267853b1061f6f4cc59b3ab7d81dbf6690ae534a12f06bf77efbc6017",
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\references\\resource_packs\\dungeons_ii_style\\extracted\\assets\\minecraft\\textures\\block\\grass_block_side.png": "14b2077f3cfcaa2d9ad2a86b0ac47d617e579fcb62a097aa2c08a1d46aa166f1",
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\references\\resource_packs\\dungeons_ii_style\\extracted\\assets\\minecraft\\textures\\block\\grass_block_side_overlay.png": "679b14f21e8a44daa41bd91526af27af2670acf41c78371b55829242988bf7dc",
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\references\\resource_packs\\dungeons_ii_style\\extracted\\assets\\minecraft\\textures\\block\\short_grass.png": "bbffa540577107a281bb14fce9fd30884bbe55acf4fbb6c5925800f8350941f8",
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\references\\resource_packs\\dungeons_ii_style\\extracted\\assets\\minecraft\\textures\\block\\tall_grass_bottom.png": "2b0869b8bc5b1cdc17ff6f50c1fe1a10ea3f01520c15e8c1d88c2fb29aa05352",
+    "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\references\\resource_packs\\dungeons_ii_style\\extracted\\assets\\minecraft\\textures\\block\\tall_grass_top.png": "158c4290a44d178d643ac1d271945d44a169e60a787c041237b5cbe746468797"
+  },
+  "texture_hashes": {
+    "dirt.png": "b8faf0872d3c544b6a8b892ccc85899ce233a3a95bf59c2fe7360491ec296c12",
+    "grass_side.png": "59256b5c0f605e706a6dae4a1c995248ed86e0149a9b806585cc130a82ebd5dd",
+    "grass_top.png": "b43c3712b59af72e642f8b729db65134f796b01cc05b8ed0604dbe0cf8d335d9",
+    "meadow_atlas.png": "ee5534df1493fd567060099f30cbbb4ea2e5407a008f8158d6b6b4cc4c2b278f",
+    "short_grass.png": "1317561da5415ed9dd6f89285acc0c5ccc8536f08056196d1a65683f41421800",
+    "tall_grass.png": "d06f77b2f46e1e6ad61c792190767d9745fb87f5ab373a2a31145d8a173060bb"
+  },
+  "export_hashes": {
+    "grass_block_di_study_v1.glb": "05d4410d663b63135d4dca76ce1b8636874596a1b09b86374f73f6b28401a19b",
+    "grass_di_study_v1.glb": "05cc7737c05fb322a378ba750f988654f20cdf6ccdac0fa0947723f756267c04",
+    "tall_grass_di_study_v1.glb": "3a930d0a86bbe650184561869f9ccc207a90d08ea529e2aee1fb7cf80f441405"
+  },
+  "originality_notes": [
+    "No source pixel data was sampled during generation. References were inspected in a seven-image board only.",
+    "New quantized periodic analytic fields generate broad independent color patches; authored polygon blade coordinates define new cutout silhouettes.",
+    "Hash differences demonstrate distinct files, not by themselves artistic originality.",
+    "Only original atlas is used by asset materials and embedded into GLBs."
+  ],
+  "units": "metres; Blender Z up / glTF Y up",
+  "source_reference_hashes_unchanged": true
+}

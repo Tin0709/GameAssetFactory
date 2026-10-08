@@ -1,0 +1,186 @@
+{
+  "entries": [
+    {
+      "state": "minecraft:dirt",
+      "id": "minecraft:dirt",
+      "properties": {},
+      "count": 2511,
+      "supported": true,
+      "asset": {
+        "path": "blender/environment/studies/dungeons_ground_style_v2/exports/dirt_block_di_study_v2.glb",
+        "sha256": "9f0eaeddda2b19033def297249540f1486292df00bb12de2eb3df06372401b89",
+        "dimensions_gltf_xyz_m": [
+          1.0,
+          1,
+          1.0
+        ],
+        "bounds_min": [
+          -0.5,
+          0,
+          -0.5
+        ],
+        "bounds_max": [
+          0.5,
+          1,
+          0.5
+        ],
+        "pivot": "bottom center",
+        "orientation": "glTF +Y up, identity node",
+        "triangles": 12,
+        "alpha_mode": "OPAQUE",
+        "double_sided": true,
+        "material": "original embedded 128px meadow atlas; nearest filtering"
+      },
+      "reason": "existing matching reusable asset"
+    },
+    {
+      "state": "minecraft:grass_block[snowy=false]",
+      "id": "minecraft:grass_block",
+      "properties": {
+        "snowy": "false"
+      },
+      "count": 2489,
+      "supported": true,
+      "asset": {
+        "path": "blender/environment/studies/dungeons_ground_style_v2/exports/grass_block_di_study_v1.glb",
+        "sha256": "0252b5c112040face70c88a6f64dc498375bc87d4d40bc1bdeac13855df84bfc",
+        "dimensions_gltf_xyz_m": [
+          1.0,
+          1,
+          1.0
+        ],
+        "bounds_min": [
+          -0.5,
+          0,
+          -0.5
+        ],
+        "bounds_max": [
+          0.5,
+          1,
+          0.5
+        ],
+        "pivot": "bottom center",
+        "orientation": "glTF +Y up, identity node",
+        "triangles": 12,
+        "alpha_mode": "OPAQUE",
+        "double_sided": true,
+        "material": "original embedded 128px meadow atlas; nearest filtering"
+      },
+      "reason": "existing matching reusable asset"
+    },
+    {
+      "state": "minecraft:short_grass",
+      "id": "minecraft:short_grass",
+      "properties": {},
+      "count": 512,
+      "supported": true,
+      "asset": {
+        "path": "blender/environment/studies/dungeons_ground_style_v2/exports/grass_di_study_v1.glb",
+        "sha256": "a58a30cdba887250ed4fca4bc869cafbecead2bf108f5742a3386d8a67551799",
+        "dimensions_gltf_xyz_m": [
+          0.5799999833106995,
+          0.46000000834465027,
+          0.5799999833106995
+        ],
+        "bounds_min": [
+          -0.28999999165534973,
+          0,
+          -0.28999999165534973
+        ],
+        "bounds_max": [
+          0.28999999165534973,
+          0.46000000834465027,
+          0.28999999165534973
+        ],
+        "pivot": "bottom center",
+        "orientation": "glTF +Y up, identity node",
+        "triangles": 4,
+        "alpha_mode": "MASK",
+        "double_sided": true,
+        "material": "original embedded 128px meadow atlas; nearest filtering"
+      },
+      "reason": "existing matching reusable asset"
+    },
+    {
+      "state": "minecraft:stone",
+      "id": "minecraft:stone",
+      "properties": {},
+      "count": 20,
+      "supported": true,
+      "asset": {
+        "path": "blender/environment/studies/dungeons_ground_style_v2/exports/stone_block_di_study_v2.glb",
+        "sha256": "fb30523568b36d8790ac4ec0e44ff08f9b1b142fae13cc89665e66fe52951ef0",
+        "dimensions_gltf_xyz_m": [
+          1.0,
+          1,
+          1.0
+        ],
+        "bounds_min": [
+          -0.5,
+          0,
+          -0.5
+        ],
+        "bounds_max": [
+          0.5,
+          1,
+          0.5
+        ],
+        "pivot": "bottom center",
+        "orientation": "glTF +Y up, identity node",
+        "triangles": 12,
+        "alpha_mode": "OPAQUE",
+        "double_sided": true,
+        "material": "original embedded 128px meadow atlas; nearest filtering"
+      },
+      "reason": "existing matching reusable asset"
+    },
+    {
+      "state": "minecraft:tall_grass[half=lower]",
+      "id": "minecraft:tall_grass",
+      "properties": {
+        "half": "lower"
+      },
+      "count": 50,
+      "supported": false,
+      "asset": null,
+      "reason": "No authored lower/upper tall-grass shape variant. Existing whole tuft is 0.95m high, not a two-cell plant; do not duplicate it in both cells or silently stretch it."
+    },
+    {
+      "state": "minecraft:tall_grass[half=upper]",
+      "id": "minecraft:tall_grass",
+      "properties": {
+        "half": "upper"
+      },
+      "count": 50,
+      "supported": false,
+      "asset": null,
+      "reason": "No authored lower/upper tall-grass shape variant. Existing whole tuft is 0.95m high, not a two-cell plant; do not duplicate it in both cells or silently stretch it."
+    }
+  ],
+  "air": "empty cell; no geometry",
+  "candidate_whole_tall_grass": {
+    "path": "blender/environment/studies/dungeons_ground_style_v2/exports/tall_grass_di_study_v1.glb",
+    "sha256": "d7e48138cc898a7d7cccc27c3d6bc0618333072a7a64b71ca2eb1b825009fc5c",
+    "dimensions_gltf_xyz_m": [
+      0.7200000286102295,
+      0.949999988079071,
+      0.7200000286102295
+    ],
+    "bounds_min": [
+      -0.36000001430511475,
+      0,
+      -0.36000001430511475
+    ],
+    "bounds_max": [
+      0.36000001430511475,
+      0.949999988079071,
+      0.36000001430511475
+    ],
+    "pivot": "bottom center",
+    "orientation": "glTF +Y up, identity node",
+    "triangles": 4,
+    "alpha_mode": "MASK",
+    "double_sided": true,
+    "material": "original embedded 128px meadow atlas; nearest filtering"
+  }
+}

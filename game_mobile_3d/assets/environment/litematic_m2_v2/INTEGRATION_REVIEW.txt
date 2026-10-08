@@ -1,0 +1,80 @@
+M2 V3 VISUAL INTEGRATION — 2026-10-08
+
+Texture style approved by the user. Future blocks must follow:
+blender/environment/studies/dungeons_ground_style_v2/STYLE_APPROVED_V3.txt
+
+Five native V3 GLBs replace the displayed grass block, dirt, stone,
+short grass and paired two-block tall grass in LitematicMapPreview.tscn.
+Original authored texture pixels are preserved in a 256 x 128 atlas.
+Four grass-top arrangements and rotations affect UVs only.
+Source data, 15,000 logical cells, coordinates, counts, collision,
+character, locomotion and combat remain unchanged.
+The previous litematic_m2_v1 package remains available.
+
+Lighting approximates the Blender review's warm key, cool fill,
+matte surfaces and AgX contrast. It uses the real Mobile renderer.
+This is a real-time approximation, not identical Cycles area-light GI.
+No SSAO, SDFGI, volumetric fog or glow added.
+
+Stripe diagnosis: terrain shadow acne. With the original 0.025 depth
+bias, unoccluded terrain received incorrect self-shadows. The actual
+rendered comparison reproduced this in all three review cameras.
+A 0.1 depth bias removes the incorrect self-shadow pattern. Medium
+PCF filtering and 1.2 blur smooth legitimate character/block shadows.
+
+Grass shadows added at the user's request: all 512 short and 50 tall
+plants cast double-sided alpha-cutout silhouettes onto the terrain.
+The existing wind and player-bend vertex deformation also drives the
+shadow pass. No added mesh, texture, collision or duplicate shadow prop.
+Warm key shadows remain filtered; cool fill remains shadow-free.
+
+Blender 5 exported a white material COLOR_0 and authored plant bend
+weights as COLOR_1. Export normalization now maps the authored weights
+to COLOR_0, preserving anchored roots and existing wind interaction.
+
+Verification:
+- independent source/intermediate/V1/V2 cells match: 0 mismatches;
+- 9 atlas regions exactly match approved original texture pixels;
+- 5 native exports and registry hashes validated;
+- 5,448 exposed faces / 10,896 terrain triangles preserved;
+- 2,500 terrain-column rays and 4 outside rays pass;
+- 512 short plants and 50 paired tall plants, exact transforms;
+- bend attribute mismatches: 0;
+- unoccluded terrain self-shadow regression: 0 affected samples
+  across gameplay (107), overhead (588), isometric (588);
+- production walk/sprint, weapons, stone collision, wind/recovery pass;
+- no changes to the production character/controller/main scene.
+
+Evidence: .validation/m2_blender_lighting/audit_v3.json,
+shadow_surface_before.json, shadow_surface_validation.json,
+rendered_review/review_report.json and rendered PNGs.
+Actual mesh/collision validation: .validation/m2_litematic/godot_validation.json.
+
+Runtime has a sandbox user:// shader-cache warning. Verification uses
+absolute log paths; no gameplay/script/import failures remain.
+Desktop Mobile-renderer testing does not establish phone performance.
+Lighting appearance remains awaiting human review.
+
+DUNGEONS PALETTE ADDENDUM — latest user references, 2026-10-08
+After comparing the grassy bridge screenshot and Shady Forest Village:
+- reduce yellow cast while preserving warm sunlight;
+- cooler blue fill/ambient and stronger readable cast shadows;
+- continuous broad warm/cool tint on grass top faces only;
+- plant tint follows the fresher green family;
+- moderate AgX contrast 1.33 and saturation 1.03 (avoid neon greens);
+- original atlas pixels, dirt/stone/side vertex colors and map stay intact.
+Active environment: m2_dungeons_daylight_v3.tres.
+Previous studio environment: m2_blender_daylight_v2.tres (preserved).
+
+Evidence distinctions:
+The earlier studio + grass-shadow version passed actual GPU geometry,
+collision and shadow regressions. Shadow-only wind frames confirmed
+9,119 changing pixels; 23,870 darkened pixels confirmed visible grass shadows.
+Palette variants were rendered on the actual Mobile/D3D12 renderer.
+The last stored palette softens saturation/tint from variant 5 in response
+to the additional Shady Forest Village reference. It has passed headless
+import and native vertex-color/source preservation checks. Its final live
+appearance still needs human review; no new final GPU frame is claimed.
+
+The user pressed Escape to stop Computer Use. Window control stopped.
+Reopen LitematicMapPreview.tscn with F6 to load the saved latest settings.

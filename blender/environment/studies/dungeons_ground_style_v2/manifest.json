@@ -1,0 +1,555 @@
+{
+  "study": "Dungeons Ground Style V2",
+  "scene": "REVIEW_DungeonsGround_Style_V2",
+  "artistic_status": "awaiting human review",
+  "assets": [
+    {
+      "name": "ENV_GrassBlock_DI_Study_V1",
+      "dimensions_m": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "pivot": "bottom center"
+    },
+    {
+      "name": "ENV_Grass_DI_Study_V1",
+      "dimensions_m": [
+        0.5799999833106995,
+        0.5799999833106995,
+        0.46000000834465027
+      ],
+      "triangles": 4,
+      "pivot": "bottom center"
+    },
+    {
+      "name": "ENV_TallGrass_DI_Study_V1",
+      "dimensions_m": [
+        0.7200000286102295,
+        0.7200000286102295,
+        0.949999988079071
+      ],
+      "triangles": 4,
+      "pivot": "bottom center"
+    },
+    {
+      "name": "ENV_DirtBlock_DI_Study_V2",
+      "dimensions_m": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "pivot": "bottom center"
+    },
+    {
+      "name": "ENV_StoneBlock_DI_Study_V2",
+      "dimensions_m": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "pivot": "bottom center"
+    }
+  ],
+  "atlas": {
+    "path": "textures/meadow_atlas.png",
+    "size": [
+      128,
+      128
+    ],
+    "stone_region": [
+      74,
+      38,
+      32,
+      32
+    ],
+    "gutter": 2,
+    "previous_regions": {
+      "grass_top": [
+        2,
+        2,
+        32,
+        32
+      ],
+      "dirt": [
+        38,
+        2,
+        32,
+        32
+      ],
+      "grass_side": [
+        74,
+        2,
+        32,
+        32
+      ],
+      "short_grass": [
+        2,
+        38,
+        32,
+        32
+      ],
+      "tall_grass": [
+        38,
+        38,
+        32,
+        64
+      ]
+    }
+  },
+  "stone_palette_srgb_author_values": [
+    [
+      116,
+      114,
+      108
+    ],
+    [
+      124,
+      122,
+      115
+    ],
+    [
+      132,
+      130,
+      122
+    ],
+    [
+      140,
+      138,
+      129
+    ],
+    [
+      148,
+      146,
+      136
+    ]
+  ],
+  "reference_hashes": {
+    "stone.png": "5f5aa24b8bc36b6b20b21f9f012b6663a2af98d6b4d42be68b98235b4bfead65",
+    "dirt.png": "667cb56474ef89c4923a044a8901201b02032d18b3cc45ef785a7094660fe136"
+  },
+  "originality_notes": [
+    "Original V1 meshes/UVs retained exactly; all existing atlas region pixels preserved.",
+    "Six dirt faces reuse the original V1 independently authored dirt region.",
+    "New independently computed stone color clusters; source stone/dirt references read-only.",
+    "V2 omits a repeated tiling platform to keep one five-asset primary presentation clear; full V1 tiling study remains untouched."
+  ],
+  "V1_file_hashes_before": {
+    "author_study.py": "8c645a58093fd4f41a149a9deb0705d3d96dd6ffb2ae2cc2608fd6c9a439ef5c",
+    "closeup.png": "3a5106f1991be7318983415a886b851be5a07b8ba6e056b7d380baa69738c321",
+    "dungeons_grass_style_v1.blend": "d6d6d6ac0325a17e5e975b0469ea8874d0b798c66f5f089ea8aa924a142869d9",
+    "dungeons_grass_style_v1.blend1": "0a50a288189109cffbe564cd6355401e28c1a1c9e45bbaf6c1e11dc135a15c82",
+    "index.html": "0ffdd1e7dc3fc1f716ea39972399ef9c278b7d63b1c3ef31c1e19d0c2de1b184",
+    "manifest.json": "627aebfb7d46edbb4a3e51d1dad100c3c96288a0cd737b5ef0c95b9f66934a09",
+    "showcase.png": "66b2fc0104c31db29aa77006540f35835e4e9d3afeea9af8dc69a44bab526def",
+    "tiling.png": "5a5942b53588ccfd1463221a10d4343d14f3ab60143290a1d3f03a3bae45ee3c",
+    "verify_study.py": "4fbb59fa9c8bd8923507c0faf62afd1d1ff48e939b91f1cb6c33be90cd989589",
+    "exports\\grass_block_di_study_v1.glb": "05d4410d663b63135d4dca76ce1b8636874596a1b09b86374f73f6b28401a19b",
+    "exports\\grass_di_study_v1.glb": "05cc7737c05fb322a378ba750f988654f20cdf6ccdac0fa0947723f756267c04",
+    "exports\\tall_grass_di_study_v1.glb": "3a930d0a86bbe650184561869f9ccc207a90d08ea529e2aee1fb7cf80f441405",
+    "textures\\dirt.png": "b8faf0872d3c544b6a8b892ccc85899ce233a3a95bf59c2fe7360491ec296c12",
+    "textures\\grass_side.png": "59256b5c0f605e706a6dae4a1c995248ed86e0149a9b806585cc130a82ebd5dd",
+    "textures\\grass_top.png": "b43c3712b59af72e642f8b729db65134f796b01cc05b8ed0604dbe0cf8d335d9",
+    "textures\\meadow_atlas.png": "ee5534df1493fd567060099f30cbbb4ea2e5407a008f8158d6b6b4cc4c2b278f",
+    "textures\\short_grass.png": "1317561da5415ed9dd6f89285acc0c5ccc8536f08056196d1a65683f41421800",
+    "textures\\tall_grass.png": "d06f77b2f46e1e6ad61c792190767d9745fb87f5ab373a2a31145d8a173060bb"
+  },
+  "V1_original_geometry": {
+    "ENV_GrassBlock_DI_Study_V1": {
+      "vertices": [
+        [
+          -0.5,
+          -0.5,
+          0.0
+        ],
+        [
+          0.5,
+          -0.5,
+          0.0
+        ],
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          -0.5,
+          0.5,
+          0.0
+        ],
+        [
+          -0.5,
+          -0.5,
+          1.0
+        ],
+        [
+          0.5,
+          -0.5,
+          1.0
+        ],
+        [
+          0.5,
+          0.5,
+          1.0
+        ],
+        [
+          -0.5,
+          0.5,
+          1.0
+        ]
+      ],
+      "faces": [
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          0,
+          1,
+          5,
+          4
+        ],
+        [
+          1,
+          2,
+          6,
+          5
+        ],
+        [
+          2,
+          3,
+          7,
+          6
+        ],
+        [
+          3,
+          0,
+          4,
+          7
+        ]
+      ],
+      "uv": [
+        [
+          0.296875,
+          0.015625
+        ],
+        [
+          0.546875,
+          0.015625
+        ],
+        [
+          0.546875,
+          0.265625
+        ],
+        [
+          0.296875,
+          0.265625
+        ],
+        [
+          0.015625,
+          0.015625
+        ],
+        [
+          0.265625,
+          0.015625
+        ],
+        [
+          0.265625,
+          0.265625
+        ],
+        [
+          0.015625,
+          0.265625
+        ],
+        [
+          0.578125,
+          0.015625
+        ],
+        [
+          0.828125,
+          0.015625
+        ],
+        [
+          0.828125,
+          0.265625
+        ],
+        [
+          0.578125,
+          0.265625
+        ],
+        [
+          0.578125,
+          0.015625
+        ],
+        [
+          0.828125,
+          0.015625
+        ],
+        [
+          0.828125,
+          0.265625
+        ],
+        [
+          0.578125,
+          0.265625
+        ],
+        [
+          0.578125,
+          0.015625
+        ],
+        [
+          0.828125,
+          0.015625
+        ],
+        [
+          0.828125,
+          0.265625
+        ],
+        [
+          0.578125,
+          0.265625
+        ],
+        [
+          0.578125,
+          0.015625
+        ],
+        [
+          0.828125,
+          0.015625
+        ],
+        [
+          0.828125,
+          0.265625
+        ],
+        [
+          0.578125,
+          0.265625
+        ]
+      ]
+    },
+    "ENV_Grass_DI_Study_V1": {
+      "vertices": [
+        [
+          -0.28999999165534973,
+          0.0,
+          0.0
+        ],
+        [
+          0.28999999165534973,
+          0.0,
+          0.0
+        ],
+        [
+          0.28999999165534973,
+          0.0,
+          0.46000000834465027
+        ],
+        [
+          -0.28999999165534973,
+          0.0,
+          0.46000000834465027
+        ],
+        [
+          0.0,
+          -0.28999999165534973,
+          0.0
+        ],
+        [
+          0.0,
+          0.28999999165534973,
+          0.0
+        ],
+        [
+          0.0,
+          0.28999999165534973,
+          0.46000000834465027
+        ],
+        [
+          0.0,
+          -0.28999999165534973,
+          0.46000000834465027
+        ]
+      ],
+      "faces": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ]
+      ],
+      "uv": [
+        [
+          0.015625,
+          0.296875
+        ],
+        [
+          0.265625,
+          0.296875
+        ],
+        [
+          0.265625,
+          0.546875
+        ],
+        [
+          0.015625,
+          0.546875
+        ],
+        [
+          0.015625,
+          0.296875
+        ],
+        [
+          0.265625,
+          0.296875
+        ],
+        [
+          0.265625,
+          0.546875
+        ],
+        [
+          0.015625,
+          0.546875
+        ]
+      ]
+    },
+    "ENV_TallGrass_DI_Study_V1": {
+      "vertices": [
+        [
+          -0.36000001430511475,
+          0.0,
+          0.0
+        ],
+        [
+          0.36000001430511475,
+          0.0,
+          0.0
+        ],
+        [
+          0.36000001430511475,
+          0.0,
+          0.949999988079071
+        ],
+        [
+          -0.36000001430511475,
+          0.0,
+          0.949999988079071
+        ],
+        [
+          0.0,
+          -0.36000001430511475,
+          0.0
+        ],
+        [
+          0.0,
+          0.36000001430511475,
+          0.0
+        ],
+        [
+          0.0,
+          0.36000001430511475,
+          0.949999988079071
+        ],
+        [
+          0.0,
+          -0.36000001430511475,
+          0.949999988079071
+        ]
+      ],
+      "faces": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ]
+      ],
+      "uv": [
+        [
+          0.296875,
+          0.296875
+        ],
+        [
+          0.546875,
+          0.296875
+        ],
+        [
+          0.546875,
+          0.796875
+        ],
+        [
+          0.296875,
+          0.796875
+        ],
+        [
+          0.296875,
+          0.296875
+        ],
+        [
+          0.546875,
+          0.296875
+        ],
+        [
+          0.546875,
+          0.796875
+        ],
+        [
+          0.296875,
+          0.796875
+        ]
+      ]
+    }
+  },
+  "texture_hashes": {
+    "dirt.png": "b8faf0872d3c544b6a8b892ccc85899ce233a3a95bf59c2fe7360491ec296c12",
+    "grass_side.png": "59256b5c0f605e706a6dae4a1c995248ed86e0149a9b806585cc130a82ebd5dd",
+    "grass_top.png": "b43c3712b59af72e642f8b729db65134f796b01cc05b8ed0604dbe0cf8d335d9",
+    "meadow_atlas.png": "b6666e2f4a108222c3e32f9504190dad581a6aad350a882e5f00170c98ad03b2",
+    "short_grass.png": "1317561da5415ed9dd6f89285acc0c5ccc8536f08056196d1a65683f41421800",
+    "stone.png": "995f2309c1f66f899c3c7316dc5a62c375a0ce81921cc5e2998ad50c55896efe",
+    "tall_grass.png": "d06f77b2f46e1e6ad61c792190767d9745fb87f5ab373a2a31145d8a173060bb"
+  },
+  "export_hashes": {
+    "dirt_block_di_study_v2.glb": "9f0eaeddda2b19033def297249540f1486292df00bb12de2eb3df06372401b89",
+    "grass_block_di_study_v1.glb": "0252b5c112040face70c88a6f64dc498375bc87d4d40bc1bdeac13855df84bfc",
+    "grass_di_study_v1.glb": "a58a30cdba887250ed4fca4bc869cafbecead2bf108f5742a3386d8a67551799",
+    "stone_block_di_study_v2.glb": "fb30523568b36d8790ac4ec0e44ff08f9b1b142fae13cc89665e66fe52951ef0",
+    "tall_grass_di_study_v1.glb": "d7e48138cc898a7d7cccc27c3d6bc0618333072a7a64b71ca2eb1b825009fc5c"
+  },
+  "preview_paths": [
+    "showcase.png",
+    "blocks_comparison.png"
+  ],
+  "validation": {
+    "status": "PASS",
+    "checks": 80,
+    "evidence": ".validation/dungeons_grass_style_v1/v2-verification.json",
+    "preview_visual_inspection": [
+      "showcase.png",
+      "blocks_comparison.png"
+    ]
+  }
+}

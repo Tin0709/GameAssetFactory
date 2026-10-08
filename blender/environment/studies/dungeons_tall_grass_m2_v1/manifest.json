@@ -1,0 +1,58 @@
+{
+  "asset": "ENV_TallGrass_M2_V1",
+  "artistic_status": "awaiting human review",
+  "blender_source": "tall_grass_m2_v1.blend",
+  "native_gltf": "tall_grass_m2_v1.glb",
+  "height_m": 1.95,
+  "dimensions_blender_xyz_m": [
+    0.9,
+    0.9,
+    1.95
+  ],
+  "dimensions_gltf_xyz_m": [
+    0.9,
+    1.95,
+    0.9
+  ],
+  "triangles": 32,
+  "geometry": "two crossed cards with 8 vertical segments each",
+  "pivot": "bottom center (0,0,0)",
+  "axis": "native glTF +Y up",
+  "motion_attributes": {
+    "COLOR_0": "FLOAT_COLOR (t\u00b2,t,0,1)",
+    "TEXCOORD_1": [
+      0.5,
+      0.5
+    ]
+  },
+  "atlas": {
+    "path": "meadow_m2_atlas.png",
+    "size": [
+      128,
+      128
+    ],
+    "changed_region_blender_bottom_up": [
+      38,
+      38,
+      32,
+      64
+    ],
+    "all_other_pixels": "exact V2 preservation",
+    "old_four_assets_uvs": "unchanged"
+  },
+  "material": {
+    "alphaMode": "MASK",
+    "alphaCutoff": 0.5,
+    "doubleSided": true,
+    "filter": "nearest",
+    "packed_texture": true
+  },
+  "review_render": "review_render.png",
+  "reference": {
+    "study": "dungeons_ground_style_v2",
+    "short_height_m": 0.46,
+    "prototype_tall_height_m": 0.95,
+    "originals": "preserved"
+  },
+  "originality": "Independently authored 7 angular blades with connected crown, varied long tips and lower fans, exact original short-grass palette; no duplicated tuft or copied source alpha."
+}

@@ -1,0 +1,54 @@
+{
+  "entries": [
+    {
+      "state": "minecraft:dirt",
+      "count": 2511,
+      "supported": true,
+      "asset": "res://assets/environment/litematic_m2_v1/dirt_block_di_study_v2.glb",
+      "sha256": "9f0eaeddda2b19033def297249540f1486292df00bb12de2eb3df06372401b89",
+      "render": "solid"
+    },
+    {
+      "state": "minecraft:grass_block[snowy=false]",
+      "count": 2489,
+      "supported": true,
+      "asset": "res://assets/environment/litematic_m2_v1/grass_block_di_study_v1.glb",
+      "sha256": "0252b5c112040face70c88a6f64dc498375bc87d4d40bc1bdeac13855df84bfc",
+      "render": "solid"
+    },
+    {
+      "state": "minecraft:stone",
+      "count": 20,
+      "supported": true,
+      "asset": "res://assets/environment/litematic_m2_v1/stone_block_di_study_v2.glb",
+      "sha256": "fb30523568b36d8790ac4ec0e44ff08f9b1b142fae13cc89665e66fe52951ef0",
+      "render": "solid"
+    },
+    {
+      "state": "minecraft:short_grass",
+      "count": 512,
+      "supported": true,
+      "asset": "res://assets/environment/litematic_m2_v1/grass_di_study_v1.glb",
+      "sha256": "a58a30cdba887250ed4fca4bc869cafbecead2bf108f5742a3386d8a67551799",
+      "render": "plant"
+    },
+    {
+      "state": "minecraft:tall_grass[half=lower]",
+      "count": 50,
+      "supported": true,
+      "asset": "res://assets/environment/litematic_m2_v1/tall_grass_m2_v1.glb",
+      "sha256": "bdf37f598123a354b091e00b708bf34fff6c72158bd2ce1ffbf6db840468c2f6",
+      "render": "plant"
+    },
+    {
+      "state": "minecraft:tall_grass[half=upper]",
+      "count": 50,
+      "supported": true,
+      "asset": "res://assets/environment/litematic_m2_v1/tall_grass_m2_v1.glb",
+      "sha256": "bdf37f598123a354b091e00b708bf34fff6c72158bd2ce1ffbf6db840468c2f6",
+      "render": "paired_occupancy"
+    }
+  ],
+  "unsupported": [],
+  "historical_source_audit": "minecraft_maps/m2_v1/source_audit.json (preflight status only)"
+}

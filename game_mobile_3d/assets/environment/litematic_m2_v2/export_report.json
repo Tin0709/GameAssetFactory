@@ -1,0 +1,27 @@
+[
+  {
+    "file": "grass_block_di_v3.glb",
+    "sha256": "c6d7191aa31176d1f1837de485c8cbcce91d7fe98c821aacd4667d027c012979",
+    "triangles": 12
+  },
+  {
+    "file": "dirt_block_di_v3.glb",
+    "sha256": "5c410c5ddac3bf6bf41cf5784fced98d16f640fd5485f5a96c92cede17710e63",
+    "triangles": 12
+  },
+  {
+    "file": "stone_block_di_v3.glb",
+    "sha256": "802dd6427bca4b70b347197f7f054b9fc2fdb0a35acb27a31b0916522d2225d0",
+    "triangles": 12
+  },
+  {
+    "file": "grass_di_v3.glb",
+    "sha256": "00f21b92290f17df0b684779c406dc8c6a5c6932370d5aebd2b6ebc4b9a663de",
+    "triangles": 16
+  },
+  {
+    "file": "tall_grass_2block_di_v3.glb",
+    "sha256": "d8ffa97e90ebb8bd4b82ce263d78c89e9f312b45ca167a473bc1d5e645767eb8",
+    "triangles": 16
+  }
+]

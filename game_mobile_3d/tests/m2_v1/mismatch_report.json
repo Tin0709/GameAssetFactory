@@ -1,0 +1,9 @@
+{
+  "source_vs_independent_decode_mismatches": 0,
+  "conflicting_cells": [],
+  "identical_overlaps": [],
+  "tall_grass_pair_errors": [],
+  "godot_placement_mismatches": null,
+  "godot_state_mismatches": null,
+  "note": "Godot counts and placement not validated: no map imported because of missing assets."
+}

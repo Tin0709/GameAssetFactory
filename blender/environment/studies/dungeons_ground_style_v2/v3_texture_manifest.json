@@ -1,0 +1,24 @@
+{
+  "style": "original angular pixel cluster study, pack palette/layout reference only",
+  "texture_size": "32px blocks; 32x64 tall",
+  "reference_sha256": {
+    "grass_block_top": "f74e56e267853b1061f6f4cc59b3ab7d81dbf6690ae534a12f06bf77efbc6017",
+    "grass_block_side": "14b2077f3cfcaa2d9ad2a86b0ac47d617e579fcb62a097aa2c08a1d46aa166f1",
+    "dirt": "667cb56474ef89c4923a044a8901201b02032d18b3cc45ef785a7094660fe136",
+    "stone": "5f5aa24b8bc36b6b20b21f9f012b6663a2af98d6b4d42be68b98235b4bfead65",
+    "short_grass": "bbffa540577107a281bb14fce9fd30884bbe55acf4fbb6c5925800f8350941f8",
+    "tall_grass_top": "158c4290a44d178d643ac1d271945d44a169e60a787c041237b5cbe746468797",
+    "tall_grass_bottom": "2b0869b8bc5b1cdc17ff6f50c1fe1a10ea3f01520c15e8c1d88c2fb29aa05352"
+  },
+  "texture_sha256": {
+    "dirt.png": "29170ee1017c23f2d33034e9518450a1cd6194018566c6ef2eb67ff97be699f3",
+    "grass.png": "118c580845eb3edf19956d75bdfb46e10c92f999d33f003ea9fa6833ed273e20",
+    "grass_side.png": "d7d695b1df9088b9f984a4dc0eedbdaf83fe60e1c5af03e1203bebe765734507",
+    "grass_top_0.png": "233a13378f5376d523005dba8ee317e17b1621a5fd6c39ac1adc6fbfbcd293da",
+    "grass_top_1.png": "a6b7f45256d3673e1d0e8530b4e7f0c8db2765524917c56ca5cc22346d38239e",
+    "grass_top_2.png": "c3fa9cf03be48a2378f678bc4e8bf020267e4e93ce84a02709c2103aa4929050",
+    "grass_top_3.png": "ed62caa9f9e278fb95a6aabd95989661ef13a723ad87174a60fce4a9e0088938",
+    "stone.png": "c9c556b86fd553727c6d5e4e80ab44d1cdea44c17408671cf1fda413764ce169",
+    "tall_grass.png": "a26bbc87f1de063c72fa2a8ca1dd514f9027ecf0f88a0c755dfc8fe378ff2481"
+  }
+}

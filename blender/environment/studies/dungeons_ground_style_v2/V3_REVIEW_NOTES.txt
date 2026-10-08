@@ -1,0 +1,13 @@
+DUNGEONS GROUND V3 — AWAITING HUMAN REVIEW
+
+Saved in the existing dungeons_ground_style_v2.blend and the same live Blender window.
+Old objects retain their positions/meshes/UVs/materials/packed textures. Backup: .validation/dungeons_ground_v3/original_v2_before_append.blend.
+New collection: REVIEW_DungeonsII_V3. New blocks at X7/9/11, Y0. Grass specimens at Y3.2. Assembled ground patch behind at Y6.5..10.5.
+
+Six native assets: GrassBlock, DirtBlock, StoneBlock (1m cubes/12tri); ShortGrass .46m; TallGrass .95m; two-block TallGrass1.95m (16tri/plant). Bottom-centre origins. Original packed nearest textures, four grass-top color-layout variations. Resource-pack textures only read as style references; no source pixel copies.
+
+Cameras in Scene Properties > Camera: CAM_V3_Showcase (new set), CAM_V3_AB (old/new), CAM_V3_Tiling (assembled terrain). Numpad0 enters camera view.
+
+Visual change: remove concentric rounded noise, use stepped irregular rectangular color clusters, stronger green grass, warm dirt and cooler blue-gray stone; wider squared grass blades. Lightly varied original texture layouts preserve the pack vibe.
+
+Review-only. Godot map/production GLBs/materials unchanged. Crossed cards remain visibly planar at certain close angles. Texture tiling/variation is previewed in Blender; gameplay look awaits a separately approved migration.

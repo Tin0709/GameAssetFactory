@@ -1,0 +1,23 @@
+[gd_resource type="Environment" format=3]
+
+[resource]
+background_mode = 1
+background_color = Color(0.24, 0.31, 0.32, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.53, 0.66, 0.78, 1)
+ambient_light_energy = 0.18
+ambient_light_sky_contribution = 0.0
+reflected_light_source = 1
+tonemap_mode = 4
+tonemap_exposure = 1.0
+tonemap_agx_contrast = 1.33
+adjustment_enabled = true
+adjustment_saturation = 1.03
+adjustment_contrast = 1.0
+ssr_enabled = false
+ssao_enabled = false
+ssil_enabled = false
+sdfgi_enabled = false
+glow_enabled = false
+fog_enabled = false
+volumetric_fog_enabled = false

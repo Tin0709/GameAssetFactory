@@ -1,0 +1,17 @@
+# Exact M2 package
+
+Run `res://scenes/maps/m2_v1/LitematicMapPreview.tscn` explicitly. The project's previous Grassland default and production character assets/scripts are unchanged.
+
+`runtime_map.json` schema 1 stores `cells` as `[global_x,global_y,global_z,canonical_state]`, including air. Coordinates are already schematic-global in the saved reader output. Region origin is provenance only; it must not be added again. `source_min=[0,0,0]`, `dimensions=[50,6,50]`, and region `origin/signed_size/local_min` remain available. Cell cubes span `[x,x+1] × [y,y+1] × [z,z+1]`; bottom-center native meshes use `(x+0.5,y,z+0.5)` without rotations or mirroring.
+
+Registry entries explicitly render lower tall states as whole plants and upper states as paired logical occupancy. All 15,000 cells are retained; 5,632 occupied includes 100 tall half cells. There are 5,020 opaque solid cells, 512 short plants and 50 whole tall plants. Upper cells create no geometry. `missing_assets.json` is the final complete coverage report; the earlier source audit's blocked status records its historical preflight.
+
+The four original native GLBs are byte-identical copies. Their original UV regions remain intact in the new shared atlas. Tall grass is the approved 1.95 m, 32-triangle native GLB. Short grass remains 0.46 m and four triangles. Its runtime mesh copy adds COLOR.r=t², COLOR.g=t, UV2=(0.5,0.5); originals are unchanged. The M2 grass shader preserves the existing global motion equations and adds alpha sampling/scissor. One shared motion history publishes the same clock and trail to both materials; tall gains and maximum bend are larger. No per-plant physics or animation nodes.
+
+Opaque native triangles are culled only against opaque neighboring cells, including across 10 m chunk boundaries. Normals and UVs are preserved. All 5,448 exposed faces, including bottom and underground exposures, form 10,896 triangles and 25 static concave collision chunks. Vegetation uses 47 spatial MultiMesh batches.
+
+The scene reuses CuboidPlayer and combat services. Camera defaults retain production orthographic size 14.5, orientation, and follow offset (12,15,16). Enemy controls start disabled; enabling them permits manual spawning only. Spawn and XP elevations use exact terrain heights. The production controller cannot climb a one-metre abrupt stone edge, and exact collision preserves that behavior.
+
+Diagnostics: `get_map_summary()`, `cells`, `runtime`, `player`, `motion`, `vegetation`, `grass_material`, `tall_grass_material`, `surface_height(x,z)`, `reset_player()`, `set_review_view("gameplay"|"overhead"|"isometric")`, `set_enemies_enabled(bool)`, `spawn_review_enemies(count)`. V cycles review views; R resets; T/K manually spawn 1/5 when enabled. `Terrain` contains actual committed chunk meshes and collision children; each vegetation node records `source_state` metadata.
+
+Validation: run `res://tests/validate_litematic_m2.gd` with a real renderer for actual MultiMesh transform readback. Godot's dummy headless rendering backend returns zero instance transforms, so it cannot establish that part of accuracy. Full test compares every state/coordinate, reconstructs face keys from committed mesh vertices/normals, compares actual MultiMesh origins, casts 2,504 collision rays, tests asymmetric axes and malformed packages, and exercises production fall/walk/wall collision, camera, shared motion, and manual spawning. Headless data/collision checks and GPU readback evidence are recorded separately in `.validation/m2_litematic/`.

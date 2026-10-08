@@ -1,0 +1,69 @@
+M2 - Litematica reconstruction preflight
+STATUS: STOPPED AT MISSING-ASSET GATE. Godot reconstruction is NOT complete.
+
+Source: minecraft_maps/source/Testing.litematic
+SHA256: fc6d7a14c8682efba343249bd54fbba9d19b8e2de2ba6fe36a9de5aa66bc7ef4
+Metadata name: Unnamed; author: IAmNotTin.
+Format version 7; Minecraft data version 4671.
+Actual enclosing dimensions: X50 / Y6 / Z50; one region Unnamed.
+Region origin: (0,0,0); signed size: (50,6,50).
+Inclusive bounds: (0,0,0) through (49,5,49).
+
+Source contents: 15,000 total cells; 5,632 occupied; 9,368 air.
+Five occupied block IDs; six occupied state variants (seven with air).
+  dirt: 2,511
+  grass_block[snowy=false]: 2,489
+  short_grass: 512
+  stone: 20
+  tall_grass[half=lower]: 50
+  tall_grass[half=upper]: 50
+All 50 tall-grass lower/upper pairs are valid in the source.
+
+Existing-asset mapping, from dungeons_ground_style_v2/exports:
+  dirt -> dirt_block_di_study_v2.glb
+  grass_block[snowy=false] -> grass_block_di_study_v1.glb
+  short_grass -> grass_di_study_v1.glb
+  stone -> stone_block_di_study_v2.glb
+Verified actual native GLB bounds, bottom-center pivots, identity node
+orientation, UV/material assignment, embedded original atlas and nearest
+filtering. The three cubes are exactly 1x1x1 m / 12 triangles.
+Short grass is approximately 0.58 x 0.46 x 0.58 m / 4 triangles / MASK.
+
+MISSING: authored tall_grass lower and upper shape variants.
+The existing tall_grass_di_study_v1.glb is a whole 0.95m-high tuft.
+It has no lower/upper halves matching a two-cell plant. Treating it as both
+states would repeat the complete plant twice; omitting upper or silently
+stretching it would change the recorded shape. No final fallback applied.
+100 occupied source cells are affected, representing 50 two-cell plants.
+
+Lossless intermediate: map_data.json records every region cell including
+air, full states, region offsets/signed sizes, and global occupied cells.
+No independent per-region normalization. For later import, documented plan
+uses a single schematic bounding origin: (x-ox,y-oy,z-oz), without swapping
+or mirroring axes. Bottom-center assets translate by (+0.5,0,+0.5).
+1 block = 1 Godot unit. The asymmetric Godot orientation test was NOT run.
+
+Validation: Litemapy 0.11.0b0 installed into isolated workspace Python venv.
+nbtlib reads complete source metadata. A separately implemented continuous
+packed-long decoder matched all 15,000 coordinate/state cells against
+Litemapy. Counts and dimensions match source metadata. Zero conflicts,
+zero duplicate overlapping cells, zero tall-grass pairing errors.
+Synthetic checks cover negative X/Y/Z sizes and offsets, values crossing
+64-bit word boundaries, and multi-region air/solid conflicts and duplicates.
+See source_audit.json, asset_registry.json and mismatch_report.json.
+
+Godot imported blocks: 0. LitematicMapPreview.tscn: NOT CREATED.
+Godot placement/state mismatch count: NOT MEASURED, not zero.
+Rendering/collision representation: NOT IMPLEMENTED.
+Player/camera/terrain collision/vegetation effects: NOT PLAY-TESTED.
+Performance: NOT PROFILED. No playable accuracy claims are made.
+No placeholder preview was created; no existing scene, Player, controller,
+animation, weapons or production environment files were modified.
+The existing 50x50 Grassland map remains the current map.
+
+Next prerequisite: prepare a coherent reusable two-cell tall-grass asset
+with lower/upper variants, then resume the M2 exact-placement import.
+Do not recreate the four already-covered assets.
+
+Parser reference: https://github.com/SmylerMC/litemapy
+Coordinate reference: https://github.com/SmylerMC/litemapy/blob/master/docs/source/litematics.rst

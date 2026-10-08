@@ -1,0 +1,110 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/litematic_m2_map.gd" id="map"]
+[ext_resource type="PackedScene" path="res://scenes/characters/CuboidPlayer.tscn" id="player"]
+[ext_resource type="Environment" path="res://assets/environment/litematic_m2_v2/m2_dungeons_daylight_v3.tres" id="environment"]
+
+[ext_resource type="Script" path="res://scripts/litematic_m2_combat.gd" id="combat"]
+[ext_resource type="Script" path="res://scripts/litematic_m2_spawn.gd" id="spawn"]
+[ext_resource type="Script" path="res://scripts/combat_audio.gd" id="audio"]
+
+[node name="LitematicM2" type="Node3D"]
+script = ExtResource("map")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("environment")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(12, 16, 16)
+rotation_degrees = Vector3(-36.31588642394517, 36.86989764584402, 0)
+projection = 1
+size = 14.5
+near = 0.1
+far = 60.0
+current = true
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-42, -45, 0)
+light_color = Color(1, 0.98, 0.90, 1)
+light_energy = 1.5
+light_specular = 0.25
+light_angular_distance = 0.0
+shadow_enabled = true
+shadow_bias = 0.1
+shadow_normal_bias = 0.45
+shadow_opacity = 0.93
+shadow_blur = 1.2
+directional_shadow_mode = 0
+directional_shadow_max_distance = 32.0
+
+[node name="StudioFill" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-50.20593, 120.96375, 0)
+light_color = Color(0.68, 0.82, 1, 1)
+light_energy = 0.16
+light_specular = 0.0
+shadow_enabled = false
+
+[node name="Terrain" type="Node3D" parent="."]
+
+[node name="Grass" type="Node3D" parent="."]
+
+[node name="Actors" type="Node3D" parent="."]
+
+[node name="Player" parent="Actors" instance=ExtResource("player")]
+position = Vector3(0, 1.02, 0)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Help" type="Label" parent="HUD"]
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 680.0
+offset_bottom = 120.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 0.92, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.13, 0.06, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="Status" type="Label" parent="HUD"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -42.0
+offset_right = 900.0
+offset_bottom = -14.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 0.92, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.13, 0.06, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="Scatter" type="Node3D" parent="."]
+
+[node name="Combat" type="Node" parent="."]
+script = ExtResource("combat")
+combat_enabled = false
+
+[node name="Projectiles" type="Node3D" parent="Combat"]
+
+[node name="Pickups" type="Node3D" parent="Combat"]
+
+[node name="Effects" type="Node3D" parent="Combat"]
+
+[node name="Audio" type="Node" parent="Combat"]
+script = ExtResource("audio")
+
+[node name="SpawnDirector" type="Node" parent="."]
+script = ExtResource("spawn")
+enabled = false
+initial_active_target = 0
+
+[node name="Defeated" type="Label" parent="HUD"]
+visible = false
+offset_left = 430.0
+offset_top = 290.0
+text = "DEFEATED — R to center"
+theme_override_font_sizes/font_size = 28
+

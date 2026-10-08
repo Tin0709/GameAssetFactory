@@ -1,0 +1,30 @@
+{
+  "status": "STOP_MISSING_ASSET_STATES",
+  "missing_state_variants": [
+    {
+      "state": "minecraft:tall_grass[half=lower]",
+      "id": "minecraft:tall_grass",
+      "properties": {
+        "half": "lower"
+      },
+      "count": 50,
+      "supported": false,
+      "asset": null,
+      "reason": "No authored lower/upper tall-grass shape variant. Existing whole tuft is 0.95m high, not a two-cell plant; do not duplicate it in both cells or silently stretch it."
+    },
+    {
+      "state": "minecraft:tall_grass[half=upper]",
+      "id": "minecraft:tall_grass",
+      "properties": {
+        "half": "upper"
+      },
+      "count": 50,
+      "supported": false,
+      "asset": null,
+      "reason": "No authored lower/upper tall-grass shape variant. Existing whole tuft is 0.95m high, not a two-cell plant; do not duplicate it in both cells or silently stretch it."
+    }
+  ],
+  "affected_occupied_cells": 100,
+  "unpaired_tall_grass": [],
+  "action": "Stop before Godot import; do not substitute placeholders as final."
+}

@@ -1,0 +1,13 @@
+DUNGEONS GROUND V3 — APPROVED STYLE DIRECTION
+User approval: 2026-10-08, Asia/Saigon.
+The user likes the new V3 texture graphics and requires future blocks to follow this style.
+
+Use the V3 textures and native meshes in this folder as the primary authored standard.
+Angular irregular rectangular pixel clusters; clean limited palette; avoid concentric circles, smooth ring noise and fine speckling.
+Green grass with broad squared blades; warm brown/ochre dirt; cool blue-gray stone.
+Block scale 1 x 1 x 1 metre. Bottom-centre origins. Low-poly geometry, nearest-filtered original packed textures.
+Four grass-top arrangements reduce obvious repetition. Match their color ranges for future variations.
+Resource pack remains reference-only; author original pixel layouts.
+Reference renders: v3_showcase.png, v3_tiling.png and v3_ab.png.
+
+Current task also explicitly authorizes replacing the map's displayed blocks/grass with V3 and transferring the Blender lighting feel into Godot. Preserve exact source coordinates, collision and player systems.

@@ -1,0 +1,95 @@
+{
+  "source": "minecraft_maps/source/Testing.litematic",
+  "source_sha256": "fc6d7a14c8682efba343249bd54fbba9d19b8e2de2ba6fe36a9de5aa66bc7ef4",
+  "parser_versions": {
+    "litemapy": "0.11.0b0",
+    "nbtlib": "2.0.4",
+    "numpy": "2.5.3"
+  },
+  "metadata": {
+    "Name": "Unnamed",
+    "Author": "IAmNotTin",
+    "Description": "",
+    "RegionCount": 1,
+    "TotalVolume": 15000,
+    "TotalBlocks": 5632,
+    "TimeCreated": 1791425288008,
+    "TimeModified": 1791425288008,
+    "EnclosingSize": {
+      "x": 50,
+      "y": 6,
+      "z": 50
+    }
+  },
+  "format_version": 7,
+  "minecraft_data_version": 4671,
+  "dimensions": [
+    50,
+    6,
+    50
+  ],
+  "bounds_inclusive": {
+    "min": [
+      0,
+      0,
+      0
+    ],
+    "max": [
+      49,
+      5,
+      49
+    ]
+  },
+  "region_count": 1,
+  "cells_including_air": 15000,
+  "air_cells": 9368,
+  "occupied_blocks": 5632,
+  "occupied_unique_ids": 5,
+  "occupied_state_variants": 6,
+  "counts_by_id": {
+    "minecraft:dirt": 2511,
+    "minecraft:grass_block": 2489,
+    "minecraft:short_grass": 512,
+    "minecraft:stone": 20,
+    "minecraft:tall_grass": 100
+  },
+  "counts_by_state": {
+    "minecraft:dirt": 2511,
+    "minecraft:grass_block[snowy=false]": 2489,
+    "minecraft:short_grass": 512,
+    "minecraft:stone": 20,
+    "minecraft:tall_grass[half=lower]": 50,
+    "minecraft:tall_grass[half=upper]": 50
+  },
+  "conflicts": [],
+  "identical_overlaps": [],
+  "unpaired_tall_grass": [],
+  "coordinate_plan": {
+    "status": "documented only; Godot orientation test NOT run",
+    "one_global_origin": [
+      0,
+      0,
+      0
+    ],
+    "cell_transform": "g=(x-ox,y-oy,z-oz); no axis swap or mirror",
+    "bottom_center_asset_translation": "(gx+0.5,gy,gz+0.5)",
+    "scale": "1 block = 1 Godot unit",
+    "axes": "+X east, +Y up, +Z south; north -Z"
+  },
+  "source_decoding_validation": {
+    "all_region_cells_independently_equal": true,
+    "metadata_counts_match": true,
+    "synthetic_cases": {
+      "negative_xyz_offsets_and_sizes": "PASS",
+      "long_word_boundary_6bit_palette": "PASS",
+      "multi_region_air_solid_conflict_and_same_state_duplicate": "PASS"
+    }
+  },
+  "godot_reconstruction_validation": {
+    "status": "NOT RUN — asset coverage gate blocked",
+    "imported_blocks": 0,
+    "scene_created": false,
+    "playable_test": false
+  },
+  "status": "STOP_MISSING_ASSET_STATES"
+}

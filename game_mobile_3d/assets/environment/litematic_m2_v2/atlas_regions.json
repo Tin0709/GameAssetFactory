@@ -1,0 +1,63 @@
+{
+  "size": [
+    256,
+    128
+  ],
+  "blender_bottom_up_regions": {
+    "grass_top_0": [
+      2,
+      2,
+      32,
+      32
+    ],
+    "grass_top_1": [
+      38,
+      2,
+      32,
+      32
+    ],
+    "grass_top_2": [
+      74,
+      2,
+      32,
+      32
+    ],
+    "grass_top_3": [
+      110,
+      2,
+      32,
+      32
+    ],
+    "dirt": [
+      146,
+      2,
+      32,
+      32
+    ],
+    "stone": [
+      182,
+      2,
+      32,
+      32
+    ],
+    "grass_side": [
+      218,
+      2,
+      32,
+      32
+    ],
+    "grass": [
+      2,
+      38,
+      32,
+      32
+    ],
+    "tall_grass": [
+      38,
+      38,
+      32,
+      64
+    ]
+  },
+  "source": "approved V3 original textures"
+}

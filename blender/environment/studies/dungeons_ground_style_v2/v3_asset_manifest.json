@@ -1,0 +1,104 @@
+{
+  "status": "TEXTURE STYLE APPROVED BY USER — 2026-10-08",
+  "assets": [
+    {
+      "name": "ENV_GrassBlock_DI_V3",
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "location": [
+        7.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "ENV_DirtBlock_DI_V3",
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "location": [
+        9.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "ENV_StoneBlock_DI_V3",
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "location": [
+        11.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "ENV_Grass_DI_V3",
+      "dimensions": [
+        0.6200000047683716,
+        0.6200000047683716,
+        0.46000000834465027
+      ],
+      "triangles": 16,
+      "location": [
+        7.0,
+        3.200000047683716,
+        1.0
+      ]
+    },
+    {
+      "name": "ENV_TallGrass_DI_V3",
+      "dimensions": [
+        0.7799999713897705,
+        0.7799999713897705,
+        0.949999988079071
+      ],
+      "triangles": 16,
+      "location": [
+        9.0,
+        3.200000047683716,
+        1.0
+      ]
+    },
+    {
+      "name": "ENV_TallGrass_2Block_DI_V3",
+      "dimensions": [
+        0.8999999761581421,
+        0.8999999761581421,
+        1.9500000476837158
+      ],
+      "triangles": 16,
+      "location": [
+        11.0,
+        3.200000047683716,
+        1.0
+      ]
+    }
+  ],
+  "old_object_count": 23,
+  "old_objects_preserved": true,
+  "scene": "REVIEW_DungeonsGround_Style_V2",
+  "collection": "REVIEW_DungeonsII_V3",
+  "mobile": "12 triangles/cube, 16/plant; original packed nearest textures; versioned Godot V3 export",
+  "source_texture_manifest": "v3_texture_manifest.json",
+  "saved_review_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\environment\\studies\\dungeons_ground_style_v2\\dungeons_ground_style_v2.blend",
+  "visible_camera": "CAM_V3_Showcase",
+  "comparison_camera": "CAM_V3_AB",
+  "tiling_camera": "CAM_V3_Tiling",
+  "verification": ".validation/dungeons_ground_v3/verification.json",
+  "preserved_old_objects": 23,
+  "preserved_old_packed_images": 7,
+  "game_integration": true,
+  "game_asset_package": "game_mobile_3d/assets/environment/litematic_m2_v2/"
+}
