@@ -1,0 +1,410 @@
+{
+  "source": "blender/environment/studies/environment_scatter_set_v1/environment_scatter_set_v1.blend",
+  "source_sha256": "e8ef41ecee881d36458d2d7979879f36bf7f0024f0677911f55b62c7f659206c",
+  "source_unchanged": true,
+  "coordinate_system": "glTF/Godot Y-up metres; bottom-center origin",
+  "atlas": "scatter_atlas_v1.png",
+  "atlas_sha256": "5c6536cc4301d53ed5c1389ef1b35b3e4faefe00e759f43358ab1e8154ef9515",
+  "assets": [
+    {
+      "name": "ENV_Flowers_Purple_01",
+      "category": "flower",
+      "variant": "purple",
+      "file": "env_flowers_purple_01.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_flowers_purple_01.glb",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3402727246284485,
+        0.3408176898956299
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.3402727246284485
+      ],
+      "triangles": 588,
+      "sha256": "f5b475bacc167acff15f44ef0971e7d047a9963d147d1fac1d8fd8ee6e1e20dc"
+    },
+    {
+      "name": "ENV_Flowers_Purple_02",
+      "category": "flower",
+      "variant": "purple",
+      "file": "env_flowers_purple_02.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_flowers_purple_02.glb",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.37500739097595215,
+        0.4375305473804474
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.37500739097595215
+      ],
+      "triangles": 780,
+      "sha256": "65059380b9f999a15365a9ee0748327549d10aa725c031968d1f906e88513ed8"
+    },
+    {
+      "name": "ENV_Flowers_Red_01",
+      "category": "flower",
+      "variant": "red",
+      "file": "env_flowers_red_01.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_flowers_red_01.glb",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3128175139427185,
+        0.3408176898956299
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.3128175139427185
+      ],
+      "triangles": 588,
+      "sha256": "8a6554576f53da31723ac1ac07160afea1c39bc167f8860a0045db726d535bd1"
+    },
+    {
+      "name": "ENV_Flowers_Red_02",
+      "category": "flower",
+      "variant": "red",
+      "file": "env_flowers_red_02.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_flowers_red_02.glb",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.348904550075531,
+        0.4375305473804474
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.348904550075531
+      ],
+      "triangles": 780,
+      "sha256": "6cbcaf4402cca6bc05be5087881c40b948d7bf0f111123491c9d11e0c011a6a9"
+    },
+    {
+      "name": "ENV_Flowers_White_01",
+      "category": "flower",
+      "variant": "white",
+      "file": "env_flowers_white_01.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_flowers_white_01.glb",
+      "dimensions_m": [
+        0.321610689163208,
+        0.33928027749061584,
+        0.3408176898956299
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.33928027749061584
+      ],
+      "triangles": 588,
+      "sha256": "6df9aec68bcd20e49541609a657571645c235b06acadb18de7a5d107c0cadbe3"
+    },
+    {
+      "name": "ENV_Flowers_White_02",
+      "category": "flower",
+      "variant": "white",
+      "file": "env_flowers_white_02.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_flowers_white_02.glb",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.400978147983551,
+        0.4375305473804474
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.400978147983551
+      ],
+      "triangles": 780,
+      "sha256": "40ed9eb5bb9caebecc8c965f146523a00236024f3f9b230e7a735b22eb29bb13"
+    },
+    {
+      "name": "ENV_Flowers_Yellow_01",
+      "category": "flower",
+      "variant": "yellow",
+      "file": "env_flowers_yellow_01.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_flowers_yellow_01.glb",
+      "dimensions_m": [
+        0.321610689163208,
+        0.3376651406288147,
+        0.3408176898956299
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.321610689163208,
+        0.3408176898956299,
+        0.3376651406288147
+      ],
+      "triangles": 588,
+      "sha256": "19b2f2163088d7b9bc5ad98b566e25d9af21b209da918232bb7f43919ffe9b36"
+    },
+    {
+      "name": "ENV_Flowers_Yellow_02",
+      "category": "flower",
+      "variant": "yellow",
+      "file": "env_flowers_yellow_02.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_flowers_yellow_02.glb",
+      "dimensions_m": [
+        0.43007856607437134,
+        0.39182034134864807,
+        0.4375305473804474
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.43007856607437134,
+        0.4375305473804474,
+        0.39182034134864807
+      ],
+      "triangles": 780,
+      "sha256": "11b6e570414452139456dc4b372c41381ceb000defbfab4191200de30795b02d"
+    },
+    {
+      "name": "ENV_Ground_Broken_Edge",
+      "category": "dirt",
+      "variant": "2",
+      "file": "env_ground_broken_edge.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_ground_broken_edge.glb",
+      "dimensions_m": [
+        0.8500000238418579,
+        0.17000000178813934,
+        0.6499999761581421
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.8500000238418579,
+        0.6499999761581421,
+        0.17000000178813934
+      ],
+      "triangles": 52,
+      "sha256": "ae1815cf1ee9226e3c1910d358dc78ad05112263eee732d6dc7e1aef84eff9e4"
+    },
+    {
+      "name": "ENV_Ground_Flat_Tile",
+      "category": "dirt",
+      "variant": "1",
+      "file": "env_ground_flat_tile.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_ground_flat_tile.glb",
+      "dimensions_m": [
+        0.6499999761581421,
+        0.11999999731779099,
+        0.6499999761581421
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.6499999761581421,
+        0.6499999761581421,
+        0.11999999731779099
+      ],
+      "triangles": 60,
+      "sha256": "70b42e562277e6f98108f5a877a57306eadfc956d939bbeca63b487ea796c88c"
+    },
+    {
+      "name": "ENV_Ground_Raised_Core",
+      "category": "dirt",
+      "variant": "3",
+      "file": "env_ground_raised_core.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_ground_raised_core.glb",
+      "dimensions_m": [
+        0.8999999761581421,
+        0.20000000298023224,
+        0.800000011920929
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.8999999761581421,
+        0.800000011920929,
+        0.20000000298023224
+      ],
+      "triangles": 68,
+      "sha256": "b612ca18cc62aa4c24891be0e12a9369bde5f776bee4f35edd3b8eb21c232443"
+    },
+    {
+      "name": "ENV_Ground_Stepped_Chunk",
+      "category": "dirt",
+      "variant": "4",
+      "file": "env_ground_stepped_chunk.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_ground_stepped_chunk.glb",
+      "dimensions_m": [
+        1.0,
+        0.23000000417232513,
+        0.75
+      ],
+      "source_dimensions_blender_xyz_m": [
+        1.0,
+        0.75,
+        0.23000000417232513
+      ],
+      "triangles": 88,
+      "sha256": "aee44c42abb91d824884587905c12027dbd4163a8d96f85813c7f89fb1405663"
+    },
+    {
+      "name": "ENV_Rock_Large_01",
+      "category": "rock",
+      "variant": "large",
+      "file": "env_rock_large_01.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_rock_large_01.glb",
+      "dimensions_m": [
+        0.8600000143051147,
+        0.4300000071525574,
+        0.7052000164985657
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.8600000143051147,
+        0.7052000164985657,
+        0.4300000071525574
+      ],
+      "triangles": 92,
+      "sha256": "737c720a90a0227e2b0300bc4b44e8fdbabab76f768ec63aef6e06962f0fccc8"
+    },
+    {
+      "name": "ENV_Rock_Large_02",
+      "category": "rock",
+      "variant": "large",
+      "file": "env_rock_large_02.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_rock_large_02.glb",
+      "dimensions_m": [
+        0.949999988079071,
+        0.4749999940395355,
+        0.7789999842643738
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.949999988079071,
+        0.7789999842643738,
+        0.4749999940395355
+      ],
+      "triangles": 88,
+      "sha256": "79291b6cca6bb937b6c6301b58ccbc3867aa2bd52b8e057ae0dbd58db609bd1a"
+    },
+    {
+      "name": "ENV_Rock_Medium_01",
+      "category": "rock",
+      "variant": "medium",
+      "file": "env_rock_medium_01.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_rock_medium_01.glb",
+      "dimensions_m": [
+        0.5799999833106995,
+        0.28999999165534973,
+        0.475600004196167
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.5799999833106995,
+        0.475600004196167,
+        0.28999999165534973
+      ],
+      "triangles": 88,
+      "sha256": "c5c977cfb95206970b73a1e8ee26d7edf868bc63c00733132b67a41a71d09cbe"
+    },
+    {
+      "name": "ENV_Rock_Medium_02",
+      "category": "rock",
+      "variant": "medium",
+      "file": "env_rock_medium_02.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_rock_medium_02.glb",
+      "dimensions_m": [
+        0.6800000071525574,
+        0.3400000035762787,
+        0.5576000213623047
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.6800000071525574,
+        0.5576000213623047,
+        0.3400000035762787
+      ],
+      "triangles": 84,
+      "sha256": "65f212be10af587136f099b55f80908ae50c10b71dc1875628551e84837a8b88"
+    },
+    {
+      "name": "ENV_Rock_Small_01",
+      "category": "rock",
+      "variant": "small",
+      "file": "env_rock_small_01.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_rock_small_01.glb",
+      "dimensions_m": [
+        0.30000001192092896,
+        0.15000000596046448,
+        0.2460000067949295
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.30000001192092896,
+        0.2460000067949295,
+        0.15000000596046448
+      ],
+      "triangles": 60,
+      "sha256": "174cde5046511c2528360b7206b056a1881d18faf9caaf075ba0726f84966a99"
+    },
+    {
+      "name": "ENV_Rock_Small_02",
+      "category": "rock",
+      "variant": "small",
+      "file": "env_rock_small_02.glb",
+      "res_path": "res://assets/environment/grassland/scatter_v1/env_rock_small_02.glb",
+      "dimensions_m": [
+        0.4000000059604645,
+        0.20000000298023224,
+        0.328000009059906
+      ],
+      "source_dimensions_blender_xyz_m": [
+        0.4000000059604645,
+        0.328000009059906,
+        0.20000000298023224
+      ],
+      "triangles": 60,
+      "sha256": "110eafd4c9f73cd7ee9ac26e7eaf3f1bda55b4ea35a7b419ac69bb531953de9e"
+    }
+  ],
+  "preserved_existing_assets": [
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/dirt_block_v4.glb",
+      "sha256": "694516f21555b16c69dc8d652ac79208fd75640e0457cb0e72a5dc48c3fa5950"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/dirt_block_v4_environment_atlas_v4.png",
+      "sha256": "3ffaea7bbee2b4d89dfd20f307e8f04fa48535e5e2a1c6926f8c41c418793d7a"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/environment_atlas_64.png",
+      "sha256": "e97583f5073ad5b0f9d46256bd6f770fcbec0f71a89d1ea4a2d329c89fc6e20c"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/environment_atlas_v4.png",
+      "sha256": "3ffaea7bbee2b4d89dfd20f307e8f04fa48535e5e2a1c6926f8c41c418793d7a"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/export_manifest.json",
+      "sha256": "0a1c035d28225f098e764fe833908772100cd005b2dd90bb28beb3a8b1df26e2"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/export_manifest_v4.json",
+      "sha256": "6557feeb3e5280ac7fb1b465e9d549d0b20b05eb6e703b97c355cb315e5c5190"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/grass_dirt_block_v3.glb",
+      "sha256": "77b208d90b878aa8de626f229329c727c1547a64c3f706ccad88ba1098307485"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/grass_dirt_block_v3_environment_atlas_64.png",
+      "sha256": "e97583f5073ad5b0f9d46256bd6f770fcbec0f71a89d1ea4a2d329c89fc6e20c"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/grass_dirt_block_v4.glb",
+      "sha256": "38b53df1630fb0d7be5ec3516b9f73a92dee56914512237070b5fc4218351207"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/grass_dirt_block_v4_environment_atlas_v4.png",
+      "sha256": "65cae85cee8de75860c53a19c2dccd726009c87569c5154ec598c7afbda435d8"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/grass_patch_v3.glb",
+      "sha256": "03b79ca2c79efc69087f354c42872d47c032e2c17440dca2d00ff3eccd371ba3"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/grass_patch_v3_environment_atlas_64.png",
+      "sha256": "e97583f5073ad5b0f9d46256bd6f770fcbec0f71a89d1ea4a2d329c89fc6e20c"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/grass_patch_v4.glb",
+      "sha256": "a8e8a95897ab45bfd7bf73e928f3f9c70300eb5eb724b68756cf5024bebb7548"
+    },
+    {
+      "file": "game_mobile_3d/assets/environment/grassland/grass_patch_v4_environment_atlas_v4.png",
+      "sha256": "65cae85cee8de75860c53a19c2dccd726009c87569c5154ec598c7afbda435d8"
+    }
+  ]
+}

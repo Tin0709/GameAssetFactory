@@ -36,7 +36,7 @@ script = ExtResource("animation")
 [node name="Model" parent="Player/Visual" unique_id=768990729 instance=ExtResource("model")]
 
 [node name="Floor" type="MeshInstance3D" parent="." unique_id=1941120067]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.14013052, 0.052642822, 0.043783665)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.14288807, 0.06317115, 0.038735628)
 mesh = SubResource("Floor")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1070919513]

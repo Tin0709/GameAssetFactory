@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Cyan Sanctum | Mobile 3D"
-run/main_scene="res://scenes/Grassland.tscn"
+run/main_scene="res://scenes/Grassland_50x50.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 
 [display]
