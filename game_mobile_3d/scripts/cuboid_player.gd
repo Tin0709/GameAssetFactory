@@ -11,19 +11,16 @@ extends CharacterBody3D
 @export var run_cycle_speed: float = 2.8
 @export var turn_speed: float = 16.0
 @export var gravity: float = 18.0
-@export var auto_step_jump_enabled: bool = true
-@export var auto_step_jump_min_height: float = 0.12
-@export var auto_step_jump_max_height: float = 1.05
-## Extra apex height above the measured top, also used for capsule clearance.
-@export var auto_step_jump_clearance: float = 0.18
+@export var smooth_step_up_enabled: bool = true
+@export var smooth_step_up_min_height: float = 0.12
+@export var smooth_step_up_max_height: float = 1.05
+@export var smooth_step_up_duration: float = 0.32
 @export var max_hp: int = 100
 @export var hurt_grace_period: float = 0.35
 @onready var visual: Node3D = $Visual
 signal health_changed(hp: int, maximum: int)
 signal exp_changed(value: int)
 signal defeated
-signal block_jump_started(ascending: bool, rise: float)
-signal block_jump_landed()
 var current_hp: int = 100
 var experience: int = 0
 var total_experience: int = 0
@@ -38,10 +35,10 @@ var current_speed: float = 0.0
 var fast_sprinting: bool = false
 const FEEDBACK = preload("res://scripts/character_damage_feedback.gd")
 var damage_feedback: Node3D
-const AUTO_STEP_JUMP = preload("res://scripts/auto_step_jump.gd")
-var _auto_step_jump := AUTO_STEP_JUMP.new()
-var block_jump_active: bool:
-	get: return _auto_step_jump.active
+const SMOOTH_STEP_UP = preload("res://scripts/smooth_step_up.gd")
+var _smooth_step_up := SMOOTH_STEP_UP.new()
+var smooth_step_active: bool:
+	get: return _smooth_step_up.active
 
 func _ready() -> void:
 	current_hp = max_hp
@@ -77,7 +74,7 @@ func take_damage(amount: int, direction: Vector3 = Vector3.ZERO) -> bool:
 	health_changed.emit(current_hp, max_hp)
 	if current_hp == 0:
 		is_dead = true
-		_auto_step_jump.reset()
+		_smooth_step_up.reset()
 		velocity = Vector3.ZERO
 		visual.freeze_animation()
 		defeated.emit()
@@ -96,7 +93,7 @@ func _physics_process(delta: float) -> void:
 	hurt_remaining = maxf(0.0, hurt_remaining - delta)
 	if is_dead:
 		fast_sprinting = false
-		_auto_step_jump.reset()
+		_smooth_step_up.reset()
 		return
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction := Vector3(input.x, 0.0, input.y)
@@ -109,20 +106,19 @@ func _physics_process(delta: float) -> void:
 	horizontal = horizontal.move_toward(desired, (deceleration if direction.is_zero_approx() else acceleration) * delta)
 	velocity.x = horizontal.x
 	velocity.z = horizontal.y
-	if is_on_floor():
-		velocity.y = 0.0
-	else:
-		velocity.y -= gravity * delta
 	var was_grounded := is_on_floor()
-	var step_rise := _auto_step_jump.before_move(self, direction, delta, gravity, auto_step_jump_enabled, auto_step_jump_min_height, auto_step_jump_max_height, auto_step_jump_clearance, speed)
-	if step_rise > 0.0:
-		velocity.y = sqrt(2.0 * gravity * (step_rise + maxf(auto_step_jump_clearance, 0.04)))
-		block_jump_started.emit(true, step_rise)
+	var stepping := _smooth_step_up.before_move(self, direction, delta, smooth_step_up_enabled, smooth_step_up_min_height, smooth_step_up_max_height, smooth_step_up_duration)
+	if not stepping:
+		if is_on_floor(): velocity.y = 0.0
+		else: velocity.y -= gravity * delta
 	move_and_slide()
-	if not was_grounded and is_on_floor(): visual.landing_response()
-	var jump_event := _auto_step_jump.after_move(self, was_grounded)
-	if jump_event == 1: block_jump_started.emit(false, 0.0)
-	elif jump_event == 2: block_jump_landed.emit()
+	if not stepping and not was_grounded and is_on_floor(): visual.landing_response()
+	_smooth_step_up.after_move(self)
 	var actual_speed := Vector2(get_real_velocity().x, get_real_velocity().z).length()
 	current_speed = actual_speed
-	visual.update_motion(get_real_velocity(), target if can_fire_moving() else null, delta)
+	var visual_velocity := get_real_velocity()
+	if smooth_step_active:
+		# Keep the existing walking clip moving while the capsule meets the riser.
+		visual_velocity.x = desired.x
+		visual_velocity.z = desired.y
+	visual.update_motion(visual_velocity, target if can_fire_moving() else null, delta)

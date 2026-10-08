@@ -36,8 +36,8 @@ else:
     count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     # Sample approach/rise/top/descent from the actual physical capture.
     metadata = json.loads((ROOT / 'capture.json').read_text(encoding='utf-8'))
-    chosen = [30, 38, 44, 50, 86, 91, 135, 143, 151, 158, 194, 201]
-    sheet = Image.new('RGB', (1280, 4 * 265), '#161c20')
+    chosen = [30, 38, 44, 50, 86, 91, 135, 143, 151, 158, 194, 201, 238, 248, 264]
+    sheet = Image.new('RGB', (1280, 5 * 265), '#161c20')
     draw = ImageDraw.Draw(sheet)
     for i, frame in enumerate(chosen):
         cap.set(cv2.CAP_PROP_POS_FRAMES, frame)

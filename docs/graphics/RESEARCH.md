@@ -160,7 +160,7 @@ Từ repo root, dùng executable Godot 4.7.2 đã cài, `--path game_mobile_3d -
 
 ## Trạng thái Git và tiếp tục
 
-Kiểm tra lại 2026-10-09: branch **main**, một worktree tại repo này, HEAD `ba37e480b5fde54e1f062420c11b5710ed35f2b3` (đã tiến từ HEAD đầu phiên do thay đổi ngoài thao tác commit của thread này). Một phần study trước đã được commit; phần sửa tiếp/source/evidence hiện ở working tree, thread này chưa commit/push. Không cần merge/cherry-pick. Sau review, stage đúng source/runtime asset, study scripts, evidence và docs rồi commit trên main hoặc branch review theo quy trình nhóm; kiểm tra status mới nhất, không gom thay đổi ngoài phạm vi.
+Kiểm tra lại 2026-10-09: branch **main**, một worktree tại repo này, HEAD `2417030f65a9d1e0977dcd3ab28e28d6d0b0ac54` (đã tiến từ HEAD đầu phiên do thay đổi ngoài thao tác commit của thread này). Một phần study trước đã được commit; phần sửa tiếp/source/evidence hiện ở working tree, thread này chưa commit/push. Không cần merge/cherry-pick. Sau review, stage đúng source/runtime asset, study scripts, evidence và docs rồi commit trên main hoặc branch review theo quy trình nhóm; kiểm tra status mới nhất, không gom thay đổi ngoài phạm vi.
 
 ## Animation nhảy block — Blender V1 và V2 chờ review
 
@@ -177,3 +177,13 @@ Kết quả V2:829mẫu quarter-frame,0lỗi xuyên sàn/block; hai chân dẫn 
 **Yêu cầu mới nhất thay thế thử nghiệm nhảy:** sau khi cho phép tích hợp thử, người dùng yêu cầu tạm bỏ nhảy trong game và chỉ đi lên bậc mượt bằng animation cũ. Đã tháo lớp nhảy khỏi CuboidPlayer/Visual, trả về R15. [JSON nhảy được giữ riêng](../../game_mobile_3d/assets/characters/jump_v2/README.md), không được player nạp. Export96Hz đã kiểm tra ánh xạ13→11bone, vai32mm, không Root/WeaponCarrier/scale/travel; sai số tái dựng mesh tối đa5.41e−7m và hash nguồn/GLB cũ không đổi. Khi làm nhảy lại phải kiểm tra riêng continuity ở tiếp đất sớm và lúc holster nhường quyền điều khiển tay; trial runtime đã chỉ ra các biên này, không coi study là controller hoàn thiện.
 
 Walk↔strafe/foot contact, LightmapGI và mipmap vẫn chưa được xử lý. Chỉ ghi mỹ thuật được duyệt khi người dùng xác nhận cụ thể.
+
+## Đi lên bậc, không dùng animation nhảy
+
+Theo yêu cầu mới nhất, `smooth_step_up.gd` nhận diện mặt đứng gần chân, kiểm tra mặt trên đủ rộng và khoảng trống cho capsule; chỉ xét collision world, không coi quái là bậc. Khi người chơi tiếp tục đi, controller nâng capsule qua `move_and_slide` theo đường lên có gia tốc/giảm tốc, đích là mặt bậc; không ghi trực tiếp vị trí hoặc tạo xung lực nhảy. Tham số thử hiện tại: bậc .12–1.05m, thời gian .32s. Đây là lựa chọn triển khai, không phải số đo từ clip Minecraft hoặc quyết định mỹ thuật đã duyệt.
+
+CuboidPlayer dùng nguyên script R15 và GLB cũ, không nạp thư viện nhảy. Trong đoạn capsule gặp mặt bậc, animation nhận hướng/tốc độ đi mong muốn để giữ nhịp bước; collision và tốc độ combat vẫn dựa vào chuyển động thật. Không thay keyframe, proportions, tay hoặc các clip súng. Dừng/đổi ngược hướng/reset/chết/tắt tính năng phải huỷ điều khiển lên bậc; đi xuống giữ gravity trước đó.
+
+Đã quay Mobile/D3D12 bằng `tests/review_smooth_step_up.gd`, bậc thử tạm .5m/1m đặt trong ForestQualitySlice, tay không/cầm rifle và một bậc terrain thật. Kiểm tra runtime xác nhận R15 hoạt động, không có thư viện jump, đến đúng mặt bậc và không có đỉnh bay vượt mặt trên. Đã xem các khung giải mã MP4; clip offline30FPS không chứng minh tốc độ trên điện thoại. Chân vẫn dùng gait cũ, chưa có foot IK hoặc bằng chứng contact hoàn hảo trên mọi bậc. Tán cây che actor ở cuối đoạn terrain thật là hạn chế bố cục hiện có, chưa sửa trong lượt controller này.
+
+Kiểm tra hồi quy R15:7818checks/0lỗi (so cả keyframe cũ và torso twist); movement/weapons:798checks/0lỗi. SHA của20file nguồn/GLB/JSON được bảo vệ vẫn khớp export manifest. Các con số thời gian từ headless suite không dùng làm benchmark. Test tự động dùng Dummy audio riêng process; cấu hình project không bị mute, F5 giữ âm thanh bình thường.
