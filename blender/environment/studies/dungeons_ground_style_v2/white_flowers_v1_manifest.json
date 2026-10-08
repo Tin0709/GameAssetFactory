@@ -1,0 +1,70 @@
+{
+  "status": "Original editable V1, awaiting user art review",
+  "source_blend": "blender\\environment\\studies\\dungeons_ground_style_v2\\dungeons_ground_style_v2.blend",
+  "collection": "FLOWERS_White_1Block_V1",
+  "object": "ENV_WhiteFlowerPatch_1m_V1",
+  "placement_footprint_m": [
+    1,
+    1
+  ],
+  "mesh_local_bounds_blender": [
+    [
+      -0.4054724872112274,
+      -0.3959939479827881,
+      0.0
+    ],
+    [
+      0.3854694366455078,
+      0.3487025797367096,
+      0.43420201539993286
+    ]
+  ],
+  "triangles": 100,
+  "quads": 50,
+  "authored_vertices": 200,
+  "flowers": 5,
+  "parts_per_flower": {
+    "stem_quads": 3,
+    "rectangular_white_petals": 4,
+    "square_yellow_centre": 1,
+    "blunt_green_leaves": 2
+  },
+  "palette_srgb": {
+    "white": "#f3f4e9",
+    "white_cool": "#e7eee4",
+    "yellow": "#e8bf42",
+    "stem": "#4c7c3b",
+    "leaf": "#628947"
+  },
+  "vertex_color_storage": "FLOAT_COLOR, linear albedo via color_srgb assignment; exported COLOR_0",
+  "material": "One opaque matte double-sided material; no textures or thickness",
+  "UV0_source": [
+    "normalized stem/rigid leaf attachment; all head/petal vertices exactly 1",
+    "head centre height in metres"
+  ],
+  "UV0_gltf": [
+    "same normalized attachment",
+    "1 - head centre height (glTF V flip)"
+  ],
+  "UV2_source": "flower root Blender XY + (0.5,0.5)",
+  "UV2_godot": "root local XZ = imported UV2 - (0.5,0.5)",
+  "runtime_transform": "Identity; Z-up -> Y-up once; no camera/light/rig/animation/collision",
+  "display_location_blender": [
+    15.0,
+    3.200000047683716,
+    1.0
+  ],
+  "grass_source": "blender\\environment\\studies\\grass_block_reference_v4\\grass_block_reference_v4.blend",
+  "grass_source_sha256": "35f15fedee3d499c59174dba8ea8877e91f365efc9eb92f22f0d3eae44b918c7",
+  "grass_reuse": "Appended original v4 object; low version shares same mesh, display Z scale .65 only",
+  "glb": "game_mobile_3d\\assets\\environment\\meadow_flowers_v1\\white_flower_patch_1m.glb",
+  "glb_sha256": "0f9ba95c5cde3a00e755ac7d59dc49e9a25701b96a0d875cb6adfc7c3b6a327f",
+  "preservation_fingerprint_digest": "cec5b726e2f2f87154017b384a9d142b476e0d525f7457bed0f843407db81d90",
+  "baseline_blend_sha256": "b84090ce4e9b238b2b201abaa80424b430394e01e45c43f961d92b05fcb4c096",
+  "preservation_method": "Independent pre-edit backup baseline; recursive authored RNA values excluding session_uid, forced image cache load, mesh/material/node/UV/color/image hashes; all existing data preserved",
+  "grass_reuse_audit": "Fresh v4 library geometry/UV/color/shape keys, material nodes and packed atlas compared independently",
+  "blender_diagnostic_images": [
+    ".validation/flower_patch_v1/blender_flowers_detail.png",
+    ".validation/flower_patch_v1/blender_flowers_grass_diagnostic.png"
+  ]
+}
