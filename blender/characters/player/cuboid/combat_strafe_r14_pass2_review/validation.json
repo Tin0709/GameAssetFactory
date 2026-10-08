@@ -413,11 +413,11 @@
         "Forward"
       ],
       "max_twist_deg": 1.5000053999218799,
-      "floor_min_m": 0.0019703335128724575,
-      "max_world_foot_delta_per_384hz_sample_m": 0.022098326114039876,
-      "max_near_ground_foot_speed_mps": 2.0563079369276003,
+      "floor_min_m": 0.0019703200086951256,
+      "max_world_foot_delta_per_384hz_sample_m": 0.02209831922028758,
+      "max_near_ground_foot_speed_mps": 1.2577812434542197,
       "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
-      "max_near_ground_centroid_excursion_m": 0.13989218284058438,
+      "max_near_ground_centroid_excursion_m": 0.014164990024817598,
       "handoff_phases": [
         0.0,
         0.0
@@ -431,11 +431,11 @@
         "Forward"
       ],
       "max_twist_deg": 1.5000052037665386,
-      "floor_min_m": 0.0019703335128724575,
+      "floor_min_m": 0.0019701607525348663,
       "max_world_foot_delta_per_384hz_sample_m": 0.023340929359294514,
       "max_near_ground_foot_speed_mps": 1.2540712593367056,
       "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
-      "max_near_ground_centroid_excursion_m": 0.04073020296385305,
+      "max_near_ground_centroid_excursion_m": 0.014164962969472322,
       "handoff_phases": [
         0.25,
         0.5
@@ -449,11 +449,11 @@
         "Backward"
       ],
       "max_twist_deg": 1.5000053104882443,
-      "floor_min_m": 0.0019326681504026055,
+      "floor_min_m": 0.0019295094534754753,
       "max_world_foot_delta_per_384hz_sample_m": 0.024497997060958517,
-      "max_near_ground_foot_speed_mps": 2.4149526383160627,
+      "max_near_ground_foot_speed_mps": 1.6726439325448377,
       "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
-      "max_near_ground_centroid_excursion_m": 0.18995331577336316,
+      "max_near_ground_centroid_excursion_m": 0.04225052198154249,
       "handoff_phases": [
         0.5,
         0.0
@@ -467,11 +467,11 @@
         "Backward"
       ],
       "max_twist_deg": 1.5000052037665386,
-      "floor_min_m": 0.0016181208193302155,
-      "max_world_foot_delta_per_384hz_sample_m": 0.022187733106553174,
-      "max_near_ground_foot_speed_mps": 4.848888754068028,
+      "floor_min_m": 0.0016177203506231308,
+      "max_world_foot_delta_per_384hz_sample_m": 0.02241421371745209,
+      "max_near_ground_foot_speed_mps": 4.848883443733651,
       "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
-      "max_near_ground_centroid_excursion_m": 0.22930376758971224,
+      "max_near_ground_centroid_excursion_m": 0.17261464393947024,
       "handoff_phases": [
         0.75,
         0.5
@@ -484,11 +484,11 @@
         "BackwardRight"
       ],
       "max_twist_deg": 1.5000053999218799,
-      "floor_min_m": 0.001963658258318901,
-      "max_world_foot_delta_per_384hz_sample_m": 0.024077420849069907,
-      "max_near_ground_foot_speed_mps": 3.5977304727434127,
+      "floor_min_m": 0.0018425896996632218,
+      "max_world_foot_delta_per_384hz_sample_m": 0.02407756636259479,
+      "max_near_ground_foot_speed_mps": 0.8607330288790911,
       "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
-      "max_near_ground_centroid_excursion_m": 0.13600502662716266,
+      "max_near_ground_centroid_excursion_m": 0.0029690848533730912,
       "handoff_phases": [
         0.0
       ]
@@ -500,11 +500,11 @@
         "BackwardLeft"
       ],
       "max_twist_deg": 1.5000053999218799,
-      "floor_min_m": 0.001973401755094528,
-      "max_world_foot_delta_per_384hz_sample_m": 0.02262145755060228,
-      "max_near_ground_foot_speed_mps": 1.5440286002233372,
+      "floor_min_m": 0.001973342150449753,
+      "max_world_foot_delta_per_384hz_sample_m": 0.023354212927664035,
+      "max_near_ground_foot_speed_mps": 0.8607559261919986,
       "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
-      "max_near_ground_centroid_excursion_m": 0.034763871744510615,
+      "max_near_ground_centroid_excursion_m": 0.005175256072520909,
       "handoff_phases": [
         0.25
       ]
@@ -519,11 +519,11 @@
         "ForwardRight"
       ],
       "max_twist_deg": 1.5000053999218799,
-      "floor_min_m": 0.001711714081466198,
-      "max_world_foot_delta_per_384hz_sample_m": 0.025060972965599563,
-      "max_near_ground_foot_speed_mps": 4.66887080844338,
+      "floor_min_m": 0.001777511090040207,
+      "max_world_foot_delta_per_384hz_sample_m": 0.028431637525191837,
+      "max_near_ground_foot_speed_mps": 2.2442367398667686,
       "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
-      "max_near_ground_centroid_excursion_m": 0.3113167003524086,
+      "max_near_ground_centroid_excursion_m": 0.023293970409687725,
       "handoff_phases": [
         0.5,
         0.0,
@@ -540,10 +540,10 @@
       ],
       "max_twist_deg": 1.5000053999218799,
       "floor_min_m": 0.001774083822965622,
-      "max_world_foot_delta_per_384hz_sample_m": 0.024078245171710082,
+      "max_world_foot_delta_per_384hz_sample_m": 0.024078250273353256,
       "max_near_ground_foot_speed_mps": 5.389137762613681,
       "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
-      "max_near_ground_centroid_excursion_m": 0.19722349477086984,
+      "max_near_ground_centroid_excursion_m": 0.1972238105656355,
       "handoff_phases": [
         0.375,
         0.0
@@ -557,11 +557,11 @@
         "Left"
       ],
       "max_twist_deg": 1.5000053826338349,
-      "floor_min_m": 0.0007009021937847137,
-      "max_world_foot_delta_per_384hz_sample_m": 0.030701876492958087,
-      "max_near_ground_foot_speed_mps": 11.789520573295906,
+      "floor_min_m": 0.0007010214030742645,
+      "max_world_foot_delta_per_384hz_sample_m": 0.03070185608241224,
+      "max_near_ground_foot_speed_mps": 11.7895127356463,
       "note": "Smooth shared-phase pose blends. Contact locking is not guaranteed during vector changes; existing forward/back Walk endpoints are comparison baselines.",
-      "max_near_ground_centroid_excursion_m": 0.6846425131300261,
+      "max_near_ground_centroid_excursion_m": 0.6846427824703459,
       "handoff_phases": [
         0.0,
         0.875
