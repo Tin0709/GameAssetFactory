@@ -11,7 +11,7 @@ func _post_import(scene: Node) -> Object:
 		if library.has_animation(name):library.remove_animation(name)
 		library.add_animation(name,old_player.get_animation(name).duplicate(true))
 	old.free()
-	for name in ["Combat_StrafeLeft_V1","Combat_StrafeRight_V1"]:
+	for name in ["Combat_StrafeLeft_V2","Combat_StrafeRight_V2","Combat_StrafeForwardLeft_V1","Combat_StrafeForwardRight_V1","Combat_StrafeBackwardLeft_V1","Combat_StrafeBackwardRight_V1"]:
 		assert(library.has_animation(name))
 		var clip:=library.get_animation(name)
 		clip.loop_mode=Animation.LOOP_LINEAR

@@ -9,7 +9,7 @@ New-Item -ItemType Directory -Force -Path $reviewOutput | Out-Null
 $previousAppData = $env:APPDATA
 try {
     $env:APPDATA = Join-Path $projectPath '.godot\validation_appdata'
-    $liveLog = Join-Path $reviewOutput 'grassland_lookdev_live.log'
+    $liveLog = (Join-Path $reviewOutput 'grassland_lookdev_live.log').Replace('\', '/')
     # Visible interactive review is the intended output of this launcher.
     $gameProcess = Start-Process -FilePath $GodotPath -ArgumentList @(
         '--path', ('"' + $projectPath + '"'),

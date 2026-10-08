@@ -33,8 +33,12 @@
     "R12_Pistol_Idle",
     "R12_Rifle_Idle",
     "R12_Shotgun_Idle",
-    "Combat_StrafeLeft_V1",
-    "Combat_StrafeRight_V1"
+    "Combat_StrafeLeft_V2",
+    "Combat_StrafeRight_V2",
+    "Combat_StrafeForwardLeft_V1",
+    "Combat_StrafeForwardRight_V1",
+    "Combat_StrafeBackwardLeft_V1",
+    "Combat_StrafeBackwardRight_V1"
   ],
-  "native_strafe_source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_combat_strafe_r14_v1_study.blend"
+  "native_strafe_source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\characters\\player\\cuboid\\player_combat_strafe_r14_pass2_study.blend"
 }

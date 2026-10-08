@@ -52,12 +52,14 @@ func run() -> void:
 		check(level.get_node("Sun").rotation == sun.rotation and level.get_node("Sun").light_energy == sun.light_energy, "Current restores original lighting")
 		for chunk in level.get_node("Grass").get_children():
 			check(chunk.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF, "Current restores grass shadow state")
+			check(is_equal_approx(chunk.extra_cull_margin, 0.15), "Current restores original culling margin")
 		for chunk in level.get_node("Terrain").get_children():
 			check(chunk.material_override is StandardMaterial3D, "Current restores original terrain material")
 		level.set_quality(true)
 		level.set_look(true)
 		for chunk in level.get_node("Grass").get_children():
 			check(chunk.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_DOUBLE_SIDED, "High casts blade shadows")
+			check(chunk.extra_cull_margin >= 0.20, "New expanded bend stays within culling margin")
 		level.set_quality(false)
 	check(level.find_children("*", "Node", true, false).size() == count, "Repeated switching does not accumulate nodes")
 	check(camera.rotation == camera_rotation and camera.size == camera_size, "Switching preserves gameplay camera")
@@ -72,6 +74,15 @@ func run() -> void:
 	await tick(80)
 	check(level.motion.active_count == 0, "Interaction history recovers")
 	check(get_nodes_in_group("zombies").is_empty(), "No enemies")
+	level.toggle_animation_test_enemy()
+	await tick(2)
+	check(get_nodes_in_group("zombies").is_empty(), "Inherited combat toggle cannot spawn an enemy in look-dev")
+	var combat_key := InputEventKey.new()
+	combat_key.physical_keycode = KEY_F7
+	combat_key.pressed = true
+	Input.parse_input_event(combat_key)
+	await tick(2)
+	check(get_nodes_in_group("zombies").is_empty(), "F7 cannot spawn an enemy in look-dev")
 	check(is_equal_approx(environment.ambient_light_energy, 0.65) and is_equal_approx(sun.light_energy, 1.25), "Production resources were not mutated")
 	level.queue_free()
 	await tick(2)

@@ -21,6 +21,10 @@ var grass_mesh: Mesh
 var motion = MOTION.new()
 var camera_offset := Vector3.ZERO
 var status_elapsed := 0.0
+var combat: Node
+var animation_test_enemy: CharacterBody3D
+const REVIEW_ENEMY = preload("res://scenes/characters/CuboidZombie.tscn")
+const REVIEW_ENEMY_SCRIPT = preload("res://scripts/animation_test_enemy.gd")
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
 
@@ -50,7 +54,41 @@ func _ready() -> void:
 	motion.publish(grass_material)
 	# No spawner or combat director exists in this scene; the unchanged player handles no targets.
 	player.get_node("Pistol").enabled = false
-	$HUD/Help.text = "GRASSLAND 40 × 40\nWASD move  ·  Shift sprint  ·  R return to center\nARTISTIC STATUS: AWAITING HUMAN REVIEW"
+	$HUD/Help.text = "GRASSLAND 40 × 40\nWASD move · Shift sprint · R center\nF7 combat target · 1/2/3 pistol/rifle/shotgun\nARTISTIC STATUS: AWAITING HUMAN REVIEW"
+	# Optional scene-local review service uses the unchanged production targeting,
+	# weapon behavior and firing pipeline; peaceful startup has no target.
+	combat = Node.new()
+	combat.name = "CombatDirector"
+	combat.set_script(preload("res://scripts/combat_director.gd"))
+	for child_name in ["Projectiles", "Pickups", "Effects"]:
+		var child := Node3D.new(); child.name = child_name; combat.add_child(child)
+	var audio := Node.new(); audio.name = "Audio"
+	audio.set_script(preload("res://scripts/combat_audio.gd")); audio.silent_test = true; combat.add_child(audio)
+	add_child(combat)
+	combat.combat_enabled = false
+	if "--combat-review" in OS.get_cmdline_user_args():
+		player.equip_test_weapon(1)
+		toggle_animation_test_enemy()
+
+func toggle_animation_test_enemy() -> void:
+	if is_instance_valid(animation_test_enemy):
+		combat.living_zombies.erase(animation_test_enemy)
+		animation_test_enemy.queue_free(); animation_test_enemy = null
+		combat.combat_enabled = false
+		for bullet in combat.projectiles.get_children(): bullet.queue_free()
+	else:
+		combat.combat_enabled = true
+		animation_test_enemy = REVIEW_ENEMY.instantiate()
+		animation_test_enemy.set_script(REVIEW_ENEMY_SCRIPT)
+		animation_test_enemy.name = "AnimationTestEnemy"
+		$Actors.add_child(animation_test_enemy)
+		animation_test_enemy.global_position = player.global_position + Vector3(0,0,-3)
+		combat.register_zombie(animation_test_enemy)
+	player.get_node("Pistol").enabled = true
+	player.get_node("Pistol").cached_frame = -1
+
+func select_test_weapon(index: int) -> void:
+	player.equip_test_weapon(index)
 
 func build_distribution() -> void:
 	grass_transforms.clear()
@@ -164,3 +202,8 @@ func reset_player() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reset_test"): reset_player()
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_F7:
+			toggle_animation_test_enemy()
+			get_viewport().set_input_as_handled()
+	# Existing AnimationWeaponDebug owns 1/2/3; avoid a second equip/reset.

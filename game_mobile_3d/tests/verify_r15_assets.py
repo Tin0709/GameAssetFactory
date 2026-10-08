@@ -20,7 +20,7 @@ assert new['nodes']==old['nodes'] and new['skins']==old['skins']
 assert new['meshes']==old['meshes'] and new['materials']==old['materials']
 for i in range(len(old['accessors'])):assert raw(old,ob,i)==raw(new,nb,i)
 assert new['animations'][:len(old['animations'])]==old['animations']
-assert len(new['animations'])==32
+assert len(new['animations'])==36
 source=json.loads((ASSETS/'r15/source.json').read_text())
 assert hashlib.sha256(Path(source['source']).read_bytes()).hexdigest()==source['source_sha256']
 assert all(source['protection'].values())
@@ -42,15 +42,15 @@ for data,hz in [(upper,48),(source,192)]:
                 error=min(max(abs(x-y) for x,y in zip(actual,native)),max(abs(x+y) for x,y in zip(actual,native))) if prop=='q' else max(abs(x-y) for x,y in zip(actual,native))
                 assert error<1e-6,(name,bone,i,error)
         if name.startswith('Combat_'):
-            assert clip['length']==20/24 and len(clip['samples'])==161
+            assert clip['length']==16/48 and len(clip['samples'])==65
             assert expected=={(n,'rotation') for n in ['Hips','Leg.L','Leg.R','Spine']}|{(n,'translation') for n in ['Hips','Leg.L','Leg.R']}
             for bone,channels in clip['samples'][0].items():
                 for prop,value in channels.items():assert max(abs(x-y) for x,y in zip(value,clip['samples'][-1][bone][prop]))<1e-5
-assert source['clips']['Combat_StrafeLeft_V1']['action_sha256']!=source['clips']['Combat_StrafeRight_V1']['action_sha256']
-report={'passed':True,'clips':32,'original_geometry_rest_skin_materials_and_12_clips_unchanged':True,
-        'native_r12_r13_clips_embedded':18,'native_strafe_clips':2,'duration_seconds':20/24,
+assert source['clips']['Combat_StrafeLeft_V2']['action_sha256']!=source['clips']['Combat_StrafeRight_V2']['action_sha256']
+report={'passed':True,'clips':36,'original_geometry_rest_skin_materials_and_12_clips_unchanged':True,
+        'native_r12_r13_clips_embedded':18,'native_strafe_clips':6,'duration_seconds':16/48,
         'strafe_tracks':['Hips position/rotation','Leg.L position/rotation','Leg.R position/rotation','Spine rotation'],
         'native_samples_match_glb':True,'source_unchanged':True,'left_and_right_distinct_authored_actions':True}
 out=ROOT/'.validation/r15';out.mkdir(parents=True,exist_ok=True)
 (out/'asset_validation.json').write_text(json.dumps(report,indent=2))
-print('PASS R15 GLB: 32 clips, native sample parity, unchanged R13 mesh/rest/skin/materials and 12 existing clips; source preserved')
+print('PASS R15 GLB: 36 clips, native sample parity, unchanged R13 mesh/rest/skin/materials and 12 existing clips; source preserved')

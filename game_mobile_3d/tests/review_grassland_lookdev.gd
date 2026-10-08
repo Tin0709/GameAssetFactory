@@ -30,6 +30,8 @@ func run() -> void:
 	root.add_child(level)
 	current_scene = level
 	player = level.get_node("Actors/Player")
+	# Startup/capture readback FPS is unsuitable performance evidence.
+	level.get_node("HUD/Status").visible = false
 	await tick(60)
 	await paired("01_standing")
 	Input.action_press("move_forward")
@@ -57,5 +59,20 @@ func run() -> void:
 	camera.position = patch.origin + level.camera_offset
 	await tick(15)
 	await paired("05_detail")
+	# Show a real production-controller passage close to the same grass patch.
+	Input.action_press("move_forward")
+	Input.action_press("sprint")
+	await tick(9)
+	await paired("06_detail_splay")
+	Input.action_release("move_forward")
+	Input.action_release("sprint")
+	await tick(10)
+	await paired("07_detail_wind_next")
+	player.global_position = patch.origin + Vector3(3, 0.02, 3)
+	player.velocity = Vector3.ZERO
+	await tick(60)
+	await paired("08_detail_wind_only")
+	await tick(60)
+	await paired("09_detail_wind_next_phase")
 	print("LOOKDEV_CAPTURE_COMPLETE enemies=" + str(get_nodes_in_group("zombies").size()))
 	quit()

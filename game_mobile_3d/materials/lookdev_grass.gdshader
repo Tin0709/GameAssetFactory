@@ -9,7 +9,10 @@ uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform vec2 wind_direction = vec2(1.0, 0.0);
 uniform float wind_strength : hint_range(0.0, 2.0) = 1.0;
 uniform float wind_phase = 0.0;
-uniform float interaction_radius : hint_range(0.2, 1.5) = 0.65;
+uniform float interaction_radius : hint_range(0.2, 1.5) = 0.90;
+uniform float review_wind_gain : hint_range(1.0, 4.0) = 3.0;
+uniform float review_interaction_gain : hint_range(1.0, 3.0) = 1.85;
+uniform float review_max_bend : hint_range(0.1, 0.25) = 0.20;
 uniform vec4 motion_start[8]; // start XZ, age from birth, tip strength (metres)
 uniform vec4 motion_end[8];   // end XZ, age from last movement, attack seconds
 
@@ -55,8 +58,8 @@ void vertex() {
 	// Approved four-second Blender loop: 1.8cm along wind, 0.7cm crosswind.
 	vec2 breeze = (direction * 0.018 * sin(wind_phase + spatial_phase - 0.28 * t)
 		- crosswind * 0.007 * sin(wind_phase + spatial_phase + PI / 3.0 - 0.23 * t)) * wind_strength * variation;
-	vec2 offset = (breeze + player_bend(world_root.xz)) * bend_mask;
-	offset *= min(1.0, 0.115 / max(length(offset), 0.0001));
+	vec2 offset = (breeze * review_wind_gain + player_bend(world_root.xz) * review_interaction_gain) * bend_mask;
+	offset *= min(1.0, review_max_bend / max(length(offset), 0.0001));
 	// Convert world bend through the instance basis; rotations keep shared wind coherent.
 	// Patch X/Z scales are unity, so transpose is the cheaper inverse for XZ wind.
 	vec3 local_offset = transpose(mat3(MODEL_MATRIX)) * vec3(offset.x, 0.0, offset.y);
@@ -72,8 +75,8 @@ void vertex() {
 void fragment() {
 	vec3 source = texture(atlas, UV).rgb;
 	float field = sin(root_position.x * 0.24 + sin(root_position.z * 0.21)) * sin(root_position.z * 0.17 - 0.7);
-	vec3 palette = mix(vec3(0.88, 1.00, 0.81), vec3(1.08, 1.02, 0.72), field * 0.5 + 0.5);
-	float root_to_tip = mix(0.72, 1.17, smoothstep(0.0, 1.0, blade_height));
+	vec3 palette = mix(vec3(0.52, 0.70, 0.65), vec3(0.82, 0.89, 0.65), field * 0.5 + 0.5);
+	float root_to_tip = mix(0.65, 1.12, smoothstep(0.0, 1.0, blade_height));
 	ALBEDO = source * palette * root_to_tip * mix(0.95, 1.05, patch_variation);
 	// Both sides receive useful sky/key light. Upward bias preserves blade facets
 	// while avoiding nearly black backface triangles on the gameplay camera.

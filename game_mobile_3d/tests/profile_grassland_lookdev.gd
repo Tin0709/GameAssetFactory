@@ -9,16 +9,22 @@ func _initialize() -> void:
 		if arg.begins_with("--look="): mode = arg.trim_prefix("--look=")
 	call_deferred("run")
 
-func tick(count: int, record := false) -> void:
-	for i in range(count):
+func sample_window(seconds: float, moving := false) -> void:
+	var started := Time.get_ticks_msec()
+	var direction := 1
+	while Time.get_ticks_msec() - started < seconds * 1000.0:
 		await process_frame
-		if record:
-			var rid := root.get_viewport_rid()
-			values.append({"process_ms": Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
-				"render_cpu_ms": RenderingServer.viewport_get_measured_render_time_cpu(rid),
-				"render_gpu_ms": RenderingServer.viewport_get_measured_render_time_gpu(rid),
-				"draw_calls": Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
-				"primitives": Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)})
+		if moving:
+			if level.player.position.x > 6.0: direction = -1
+			elif level.player.position.x < -6.0: direction = 1
+			Input.action_release("move_left" if direction == 1 else "move_right")
+			Input.action_press("move_right" if direction == 1 else "move_left")
+		var rid := root.get_viewport_rid()
+		values.append({"process_ms": Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
+			"render_cpu_ms": RenderingServer.viewport_get_measured_render_time_cpu(rid),
+			"render_gpu_ms": RenderingServer.viewport_get_measured_render_time_gpu(rid),
+			"draw_calls": Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
+			"primitives": Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)})
 
 func summarize() -> Dictionary:
 	var result := {}
@@ -45,13 +51,14 @@ func run() -> void:
 	level.set_look(mode != "current")
 	RenderingServer.viewport_set_measure_render_time(root.get_viewport_rid(), true)
 	await create_timer(3.0).timeout
-	await tick(240, true)
+	await sample_window(3.0)
 	var idle := summarize()
-	Input.action_press("move_forward")
+	Input.action_press("move_right")
 	Input.action_press("sprint")
 	await create_timer(1.2).timeout
-	await tick(240, true)
-	Input.action_release("move_forward")
+	await sample_window(3.0, true)
+	Input.action_release("move_right")
+	Input.action_release("move_left")
 	Input.action_release("sprint")
 	var sprint := summarize()
 	level.reset_player()
@@ -61,7 +68,7 @@ func run() -> void:
 	camera.position = Vector3(40, 51, 54)
 	camera.far = 160
 	await create_timer(2.1).timeout
-	await tick(240, true)
+	await sample_window(3.0)
 	var overview := summarize()
 	var report := {"appearance": mode, "idle": idle, "sprinting": sprint, "whole_map": overview,
 		"device": RenderingServer.get_video_adapter_name(), "renderer": RenderingServer.get_current_rendering_method(),

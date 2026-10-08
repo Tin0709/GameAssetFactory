@@ -2,7 +2,7 @@ extends "res://scripts/grassland.gd"
 ## Review-only presentation. Original resources/state are captured before any styling.
 const LOOK_GRASS = preload("res://materials/lookdev_grass.gdshader")
 const LOOK_TERRAIN = preload("res://materials/lookdev_terrain.gdshader")
-const SUN_PROPERTIES := ["rotation", "light_color", "light_energy", "light_angular_distance", "shadow_enabled", "shadow_bias", "shadow_normal_bias", "shadow_opacity", "directional_shadow_mode", "directional_shadow_max_distance", "directional_shadow_blend_splits"]
+const SUN_PROPERTIES := ["rotation", "light_color", "light_energy", "light_angular_distance", "shadow_enabled", "shadow_bias", "shadow_blur", "shadow_normal_bias", "shadow_opacity", "directional_shadow_mode", "directional_shadow_max_distance", "directional_shadow_blend_splits"]
 var new_look := true
 var high_quality := false
 var original_environment: Environment
@@ -22,7 +22,7 @@ func _ready() -> void:
 	for chunk in $Terrain.get_children():
 		terrain_states.append({"node": chunk, "material": chunk.material_override, "shadow": chunk.cast_shadow})
 	for chunk in $Grass.get_children():
-		grass_states.append({"node": chunk, "material": chunk.material_override, "shadow": chunk.cast_shadow})
+		grass_states.append({"node": chunk, "material": chunk.material_override, "shadow": chunk.cast_shadow, "cull_margin": chunk.extra_cull_margin})
 	styled_environment = original_environment.duplicate()
 	styled_environment.background_color = Color(0.52, 0.61, 0.64)
 	styled_environment.ambient_light_color = Color(0.66, 0.77, 0.91)
@@ -66,13 +66,15 @@ func set_look(enabled: bool) -> void:
 		state.node.cast_shadow = state.shadow
 	for state in grass_states:
 		state.node.material_override = styled_grass if enabled else state.material
+		state.node.extra_cull_margin = 0.24 if enabled else state.cull_margin
 		state.node.cast_shadow = (GeometryInstance3D.SHADOW_CASTING_SETTING_DOUBLE_SIDED if high_quality else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF) if enabled else state.shadow
 	if enabled:
 		$Sun.rotation_degrees = Vector3(-48, -42, 0)
 		$Sun.light_color = Color(1.0, 0.88, 0.69)
 		$Sun.light_energy = 1.25
-		$Sun.light_angular_distance = 0.35
+		$Sun.light_angular_distance = 0.0
 		$Sun.shadow_bias = 0.025
+		$Sun.shadow_blur = 0.3
 		$Sun.shadow_normal_bias = 0.65
 		$Sun.shadow_opacity = 0.84
 		$Sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
@@ -92,6 +94,11 @@ func update_help() -> void:
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
 	styled_terrain.set_shader_parameter("player_position", player.global_position)
+
+func toggle_animation_test_enemy() -> void:
+	# The base map may offer a combat animation review; this environmental review
+	# must remain peaceful for both its inherited F7 handler and --combat-review.
+	pass
 
 func _unhandled_input(event: InputEvent) -> void:
 	super._unhandled_input(event)

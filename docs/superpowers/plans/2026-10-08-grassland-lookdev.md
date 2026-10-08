@@ -15,7 +15,7 @@
 - Create a separate review/look-dev scene first. Do not modify production defaults or approved Blender sources.
 - Keep 40 × 40 terrain and production player/controller/camera. No enemies or gameplay/combat redesign.
 - Warm directional sun and cool fill; readable greens and player silhouette; soft grounded shadows; subtle atmosphere.
-- Preserve wind, proximity response, anchored roots, movement history and motion masks.
+- Preserve anchored roots, movement history, continuous recovery and motion masks. Following the user's live feedback, deepen both block-top and blade greens, strengthen wind and increase player-driven splay in the new review appearance only. Current A/B keeps the approved motion unchanged.
 - No blind SSAO/SSIL/SDFGI/glow/volumetric enabling. Use Mobile-supported, cheap alternatives.
 - A/B must restore the actual original environment/materials/shadow settings without accumulating nodes or resources.
 - Changing appearance or quality must not change instance counts, collision, controls or player animation.
@@ -24,18 +24,19 @@
 
 ## Task 1: Integrated review scene
 
-- [ ] Write a focused test proving review scene availability, A/B isolation and unchanged gameplay; run it failing before implementation.
-- [ ] Create `scenes/GrasslandLookDev.tscn` and focused review-only script/material files. Provide clearly labeled current/new A/B controls and mobile/high-review options only when they improve the result.
-- [ ] Render paired standing, moving, grass-detail and boundary/camera views. Inspect actual pixels and iterate on lighting/material appearance.
-- [ ] Verify no errors, no enemies, movement and A/B restoration; run existing Grassland contract/motion/shader checks as relevant.
-- [ ] Measure warm current/new desktop rendering and document costs, mobile tradeoffs and limitations.
-- [ ] Write `docs/GRASSLAND_LOOKDEV.md` with all nine requested deliverables and exact review controls. Add a review launcher, preserving `project.godot` and previous launcher.
+- [x] Write a focused test proving review scene availability, A/B isolation and unchanged gameplay; run it failing before implementation.
+- [x] Create `scenes/GrasslandLookDev.tscn` and focused review-only script/material files. Provide clearly labeled current/new A/B controls and mobile/high-review options only when they improve the result.
+- [x] Render paired standing, moving, grass-detail and boundary/camera views. Inspect actual pixels and iterate on lighting/material appearance.
+- [x] Apply the user's darker reference palette and stronger wind/player splay feedback, with review-only shader controls and anchored-root verification.
+- [x] Verify no errors, no enemies, movement and A/B restoration; run existing Grassland contract/motion/shader checks as relevant.
+- [x] Measure warm current/new desktop rendering and document costs, mobile tradeoffs and limitations.
+- [x] Write `docs/GRASSLAND_LOOKDEV.md` with all nine requested deliverables and exact review controls. Add a review launcher, preserving `project.godot` and previous launcher.
 
 ## Task 2: Final review and launch
 
-- [ ] Separate read-only code review, fix material issues with focused regression evidence.
-- [ ] Root inspects final rendered comparisons, checks production diff isolation and launches normal review game visibly. Do not leave a capture harness running.
-- [ ] Stop with ARTISTIC STATUS: AWAITING HUMAN REVIEW. Production stays unchanged.
+- [x] Separate read-only code review, fix material issues with focused regression evidence.
+- [x] Root inspects final rendered comparisons, checks production diff isolation and launches normal review game visibly. Do not leave a capture harness running.
+- [x] Stop with ARTISTIC STATUS: AWAITING HUMAN REVIEW. Production stays unchanged.
 
 ## Execution notes
 
