@@ -2,6 +2,14 @@
 
 Current source is `dungeons_ground_style_v2.blend`. Authored edits/save described below used the foreground Blender MCP; background runs only read saved source, never save it or reload the live window. **Later user authorization integrates the selected saved blocks/plants into WorldMap**: see [runtime reuse/mapping](../../../../game_mobile_3d/assets/maps/world_map/README.md) and its18asset manifest. Source study exports and Blender wind previews below are preserved; runtime uses separate shaders. Artistic approval remains pending. Historical “Blender-only/no game integration” statements below describe their original study stages.
 
+## Periwinkle flowers, 0.8 block — Blender review 2026-10-09
+
+`FLOWERS_Periwinkle_08Block_V1` adds `ENV_PeriwinkleFlowerPatch_08m_V1` at `(23,0,1)`, beside the existing flower row. Seven thin-stemmed flowers each have eight stepped blue/lavender petals and a darker violet centre. The requested 1.5× enlargement affects mesh X/Y, leaves, petals and spread; total height stays exactly **0.8 m**. Bounds are approximately **1.150 × 1.197 × 0.800 m**, with a reserved 1.5 m square footprint, identity object scale, 504 triangles and one shared matte vertex-colour material. Both stem-height and root UV metadata are retained. `add_periwinkle_flowers_v1.py` is the additive generator; live backups and preservation measurements are in `.validation/periwinkle_flowers_v1/`.
+
+The same Blender window uses uniform `studio.exr` Material Preview lighting, reduced to **0.65** intensity after the user found the first preview too bright. This changes viewport presentation only; existing scene lights, materials, meshes and game graphics remain unchanged. The new flower is **Blender-only, awaiting human review**, and has not been integrated into Godot.
+
+Latest comfort revision: the user still found 0.65 too bright. Viewport studio intensity is now **0.30**, with a dark matte presentation floor using `REVIEW_Studio_Charcoal_Soft_V2` and dark viewport background. Original `Studio_Charcoal` material is preserved; only the review floor's assignment changes. Asset materials, scene lights and Godot remain unchanged. Live pre-edit backup: `.validation/viewport_comfort/before_dim_review_v2.blend`.
+
 ## White flowers
 
 `FLOWERS_White_1Block_V1` contains editable `ENV_WhiteFlowerPatch_1m_V1`: five flowers, four blunt white planar petals and one flat yellow centre each, thin segmented stems and two leaves. The latest requested revision enlarges heads only **1.5×**, with **12° upward petal cup**; stems, leaves, head-centre heights, roots, UVs, colours and material remain exact. Every face is an individual zero-thickness plane, matte opaque and double-sided. The patch has **200 vertices /50quads /100triangles**, one mesh and one material.

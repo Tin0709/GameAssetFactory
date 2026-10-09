@@ -1,6 +1,6 @@
 extends Node
 ## WorldMap-only look. Source textures, GLBs, shared environments and actors stay intact.
-const PRESET=preload("res://assets/graphics/meadow_daylight_v3/preset.tres")
+const PRESET=preload("res://assets/graphics/meadow_daylight_v4/preset.tres")
 const MOTION=preload("res://scripts/grassland_motion.gd")
 var level: Node3D
 var motion=MOTION.new()
