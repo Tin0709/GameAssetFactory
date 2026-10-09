@@ -1,0 +1,36 @@
+{
+	"failures": [],
+	"samples": [
+		{
+			"candidate": 0,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 0.0
+		},
+		{
+			"candidate": 1,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 0.0
+		},
+		{
+			"candidate": 2,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 0.0
+		},
+		{
+			"candidate": 3,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 0.0
+		},
+		{
+			"candidate": 4,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 0.0
+		},
+		{
+			"candidate": 5,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 0.0
+		}
+	],
+	"wall_changed_grid_samples": 183
+}

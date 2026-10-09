@@ -1,0 +1,31 @@
+{
+	"cutaway_include": "res://materials/world_map_surface.gdshaderinc",
+	"device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+	"failures": [
+		"Ground contact should be clearly readable",
+		"Wall foot should shade upward from contact",
+		"Concave wall corner should have local depth",
+		"Ground shadow must wrap around an isolated block's sharp corner",
+		"Ground contact must stay continuous across the corner cell boundary"
+	],
+	"linear_pixel_values": {
+		"above_neighbour": 1.0,
+		"concave": 1.0,
+		"convex": 1.0,
+		"diagonal_far": 1.0,
+		"diagonal_tip": 1.0,
+		"flat_left": 1.0,
+		"flat_right": 1.0,
+		"ground_clear": 1.0,
+		"ground_corner": 0.871367216110229,
+		"ground_foot": 0.871367216110229,
+		"tip_cardinal": 0.871367216110229,
+		"vertical_above": 1.0,
+		"vertical_below": 1.0,
+		"wall_clear": 1.0,
+		"wall_foot": 0.904661238193512
+	},
+	"maximum_cutaway_delta": 0.0,
+	"renderer": "mobile",
+	"shader_include": "res://materials/world_map_surface.gdshaderinc"
+}

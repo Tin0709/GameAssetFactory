@@ -1,0 +1,73 @@
+{
+  "phone_verified": false,
+  "synthetic_game_frames": false,
+  "views": {
+    "gameplay": {
+      "mean_abs_rgb_delta_255": [
+        0.0006868489583333334,
+        0.0008463541666666667,
+        0.0006911892361111111
+      ],
+      "changed_pixels": 85
+    },
+    "stairs": {
+      "mean_abs_rgb_delta_255": [
+        1.3861024305555556,
+        1.523611111111111,
+        1.352931857638889
+      ],
+      "changed_pixels": 238731
+    },
+    "stone": {
+      "mean_abs_rgb_delta_255": [
+        1.2231467013888888,
+        1.3446538628472222,
+        1.2166547309027778
+      ],
+      "changed_pixels": 214224
+    },
+    "cliffs": {
+      "mean_abs_rgb_delta_255": [
+        0.6887532552083333,
+        0.7280002170138888,
+        0.6226725260416667
+      ],
+      "changed_pixels": 121132
+    },
+    "grove": {
+      "mean_abs_rgb_delta_255": [
+        0.08600368923611111,
+        0.10155707465277777,
+        0.062109375
+      ],
+      "changed_pixels": 20283
+    }
+  },
+  "probe": {
+    "cutaway_include": "res://materials/world_map_surface_v4.gdshaderinc",
+    "device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "failures": [],
+    "linear_pixel_values": {
+      "above_neighbour": 1.0,
+      "concave": 0.723055124282837,
+      "convex": 1.0,
+      "diagonal_far": 1.0,
+      "diagonal_tip": 0.701101899147034,
+      "flat_left": 1.0,
+      "flat_right": 1.0,
+      "ground_clear": 1.0,
+      "ground_corner": 0.701101899147034,
+      "ground_foot": 0.701101899147034,
+      "tip_cardinal": 0.701101899147034,
+      "vertical_above": 0.723055124282837,
+      "vertical_below": 0.723055124282837,
+      "wall_clear": 1.0,
+      "wall_foot": 0.7304607629776
+    },
+    "maximum_cutaway_delta": 0.0,
+    "renderer": "mobile",
+    "shader_include": "res://materials/world_map_surface_v4.gdshaderinc"
+  },
+  "source_glbs_preserved": 18,
+  "frozen_v1_sha256": "a6521b281f82bd3ab9be46a62d303cf968affb842b658a4d4120508f868963a4"
+}

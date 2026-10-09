@@ -20,8 +20,10 @@
 
 ## Execution
 
-- [ ] Add a GPU contact probe covering foot fade, wall concavity, convex edge, flat seams and vertical continuity. Observe expected V3 failures; capture reproducible real-map baseline.
-- [ ] Add V4 shaders/preset, strengthen bounded contact falloff and wall concavity from actual height neighbours; keep grass-root sampling consistent. Switch WorldMap only.
-- [ ] Run GPU probe, same-camera comparison, existing seam and map regressions. Inspect actual pixels, update RESEARCH and make F5 review ready.
+- [x] Add a GPU contact probe covering foot fade, wall concavity, convex edge, flat seams and vertical continuity. V3 failed the three new depth criteria; captured real-map baseline.
+- [x] Add V4 shaders/preset; opaque/cutaway mismatch reproduced then corrected. Matching ground/plant root sampling retained. Switched WorldMap only.
+- [x] Run GPU probe, same-camera comparison, seam and map regressions. Actual pixels inspected and RESEARCH updated; F5 ready.
+
+Follow-up user defect: a bright hole at a sharp block tip. Two added GPU criteria reproduced missing diagonal contact. Added distance-to-footprint falloff for diagonal neighbours;15samples/14criteria pass, flat/convex cases unchanged. Six seam cases pass;7094map checks pass.18source GLBs and frozen ZIP retain hashes. No artistic or phone-performance approval claimed.
 
 Ruling: Work in the current checkout because the user reviews this exact project with F5; preserve unrelated live Blender edits and avoid a detached review copy. No commit or deployment is requested.
