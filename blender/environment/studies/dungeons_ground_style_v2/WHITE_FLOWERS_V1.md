@@ -1,6 +1,6 @@
 # Blender plant studies V1
 
-Current source is the already open `dungeons_ground_style_v2.blend`. Every authored edit and save ran through the foreground Blender MCP, in that same window. The window reflects the saved changes immediately; no Revert or reload is required. Background Blender runs only read saved source to audit/render, never save source or reload the live window. These assets are **Blender-only studies awaiting artistic review**; current exports are local to this study, with no game integration.
+Current source is `dungeons_ground_style_v2.blend`. Authored edits/save described below used the foreground Blender MCP; background runs only read saved source, never save it or reload the live window. **Later user authorization integrates the selected saved blocks/plants into WorldMap**: see [runtime reuse/mapping](../../../../game_mobile_3d/assets/maps/world_map/README.md) and its18asset manifest. Source study exports and Blender wind previews below are preserved; runtime uses separate shaders. Artistic approval remains pending. Historical “Blender-only/no game integration” statements below describe their original study stages.
 
 ## White flowers
 

@@ -24,6 +24,14 @@ func run() -> void:
 		level.get_node("Sun").shadow_normal_bias=1.2
 		prefix="bias_probe"
 	if level.get_node_or_null("ReferenceLook")!=null:level.look.freeze_motion()
+	if "--no-variation" in args:
+		for item: Array in level.look.terrain_materials:item[3].set_shader_parameter("grass_variation_strength",0.0)
+		level.geometry.reset_cutaway_materials()
+		prefix="no_variation"
+	if "--no-contact" in args:
+		for item: Array in level.look.terrain_materials:item[3].set_shader_parameter("contact_shade_strength",0.0)
+		level.geometry.reset_cutaway_materials()
+		prefix="no_contact"
 	level.set_process(false)
 	level.player.set_physics_process(false)
 	level.player.visual.set_process(false)

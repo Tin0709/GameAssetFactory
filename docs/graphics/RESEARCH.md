@@ -1,5 +1,7 @@
 # Nghiên cứu đồ hoạ và bằng chứng thực nghiệm
 
+**Trạng thái mới nhất:** F5 mở WorldMap, xem [lượt WorldMap hiện tại](#worldmap--map-litematica-và-lượt-review-hiện-tại). Các mục “Blender-only”, GameplayMap/ForestMeadow là lịch sử trước yêu cầu tích hợp map mới; không dùng chúng thay cho trạng thái scene hiện tại.
+
 2026-10-09 · Asia/Saigon. Mục tiêu **30 FPS (33.3 ms/frame)** do người dùng xác nhận; chưa chỉ định điện thoại tối thiểu. Hướng đã chấp nhận và đề xuất nằm riêng trong [ART_DIRECTION.md](ART_DIRECTION.md). Kết quả mỹ thuật của cảnh mới **chờ người dùng đánh giá**.
 
 ## Baseline kiểm tra trước các study

@@ -1,6 +1,7 @@
 shader_type spatial;
 render_mode cull_disabled, diffuse_lambert, specular_disabled;
 #include "res://materials/world_map_wind.gdshaderinc"
+#include "res://materials/world_map_clouds.gdshaderinc"
 uniform int plant_kind = 0; // short blades / flower / golden tall stems
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform bool use_albedo_texture = false;
@@ -43,6 +44,7 @@ void fragment() {
 		ALBEDO=mix(vec3(luma),source,0.88);
 	}
 	vec3 face=FRONT_FACING ? NORMAL : -NORMAL;
+	ALBEDO*=world_cloud_shade(plant_root);
 	vec3 up=(VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz;
 	float soft=plant_kind==0 ? 0.72 : (plant_kind==2 ? 0.50 : 0.18);
 	NORMAL=normalize(mix(face,up,soft));

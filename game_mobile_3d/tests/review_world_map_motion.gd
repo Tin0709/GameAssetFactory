@@ -72,7 +72,30 @@ func run() -> void:
 	check(level.player.position.x> -27.0,"Player walks fully through real full/half leaf cluster")
 	check(level.player.position.y<3.1,"Leaf cluster does not lift the player onto a solid box")
 	var last:=Engine.get_frames_drawn()
+	level.player.set_physics_process(false);level.player.visual.set_process(false)
+	look.freeze_motion(0.0)
+	check(look.path_edge_cells>100,"Path border field contains real grass/dirt contacts")
+	check(not look.actor_materials.is_empty(),"Actor has reversible cloud-shade material copies")
+	look.publish_clouds(0.0);await capture("cloud_time_0")
+	look.publish_clouds(30.0);await capture("cloud_time_30")
+	var changing_points:=0
+	var darkest:=1.0
+	for x in range(-45,46,5):
+		for z in range(-45,46,5):
+			var point:=Vector3(x,3,z)
+			var first: float=look.cloud_shade(point,0.0)
+			var second: float=look.cloud_shade(point,30.0)
+			check(first>=.8 and first<=1.0 and second>=.8 and second<=1.0,"Cloud shade stays bounded")
+			if absf(first-second)>.025:changing_points+=1
+			darkest=minf(darkest,minf(first,second))
+	check(changing_points>50 and darkest<.83,"Scattered cloud shade moves across the full map")
+	check(is_equal_approx(level.get_node("Sun").shadow_opacity,.68*1.15),"Requested shadow opacity is 15 percent stronger")
+	level.set_reference_look(false)
+	for item: Array in look.actor_materials:check(item[0].get_surface_override_material(item[1])==item[2],"Cloud A/B restores actor original materials")
+	level.set_reference_look(true)
 	var report: Dictionary={"checks":checks,"failures":failures,"first_content_frame":content_start,"last_content_frame":last,"landmarks":landmarks,"actual_player_end":var_to_str(level.player.position),"offline_movie_fps":30,"phone_verified":false,"audio":"Dummy in test process only"}
+	report["path_edge_cells"]=look.path_edge_cells
+	report["cloud_changing_sample_points"]=changing_points
 	FileAccess.open(OUT+"movie.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("WORLD_MAP_MOTION "+JSON.stringify(report))
 	for failure in failures:push_error(failure)

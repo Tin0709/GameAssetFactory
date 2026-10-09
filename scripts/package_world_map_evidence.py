@@ -12,7 +12,7 @@ OUT = ROOT / "docs/validation/world_map"
 OUT.mkdir(parents=True, exist_ok=True)
 for name in ["baseline_gameplay.png", "review_gameplay.png", "review_cliffs.png", "review_leaf_walk.png",
              "review_topdown_diagnostic.png", "review_isometric_diagnostic.png", "gameplay.mp4",
-             "gpu_checks.json", "headless_checks.json", "movie.json"]:
+             "gpu_checks.json", "headless_checks.json", "movie.json", "pre_path_blend.png"]:
     shutil.copyfile(RAW / name, OUT / name)
 
 def panel(paths, labels, output, width=640):
@@ -27,6 +27,7 @@ def panel(paths, labels, output, width=640):
 
 panel([OUT/"baseline_gameplay.png", OUT/"review_gameplay.png"],
       ["BEFORE - initial import", "REVIEW - softer ground / sky fill / plant light"], OUT/"comparison.jpg")
+panel([OUT/"pre_path_blend.png",OUT/"review_gameplay.png"],["BEFORE - hard path border","REVIEW - grass / dirt transition"],OUT/"path_comparison.jpg")
 capture = cv2.VideoCapture(str(OUT/"gameplay.mp4"))
 count, fps = int(capture.get(cv2.CAP_PROP_FRAME_COUNT)), capture.get(cv2.CAP_PROP_FPS)
 assert capture.isOpened() and count >= 290 and abs(fps-30) < .1
@@ -51,7 +52,8 @@ for path in frames:path.unlink()
 metrics = {"delivered_mp4_frames": count, "fps": fps, "duration_s": count/fps,
            "decoded_frames": [60,100,140,204,230,275], "synthetic_frames": False, "phone_verified": False}
 for label, a, b in [("wind", "wind_phase_0.png", "wind_phase_1.png"),
-                    ("player_reaction", "passage_on.png", "passage_off.png")]:
+                    ("player_reaction", "passage_on.png", "passage_off.png"),
+                    ("cloud_shade", "cloud_time_0.png", "cloud_time_30.png")]:
     first = np.asarray(Image.open(RAW/a).convert("RGB"),dtype=np.int16)
     second = np.asarray(Image.open(RAW/b).convert("RGB"),dtype=np.int16)
     delta = np.max(abs(first-second),axis=2)

@@ -1,6 +1,6 @@
 # Hướng mỹ thuật — zombie sinh tồn khối hộp
 
-Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; bằng chứng, nguồn và cách tái hiện ở [RESEARCH.md](RESEARCH.md). Người dùng đánh giá các lượt đầu chưa đạt kỳ vọng; **ForestMeadowV3 hiện tại vẫn chờ review**, không là phong cách đã duyệt.
+Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; bằng chứng, nguồn và cách tái hiện ở [RESEARCH.md](RESEARCH.md). **Gameplay chính hiện tại là WorldMap; màu/ánh sáng mới vẫn chờ review**, không là phong cách đã duyệt. ForestMeadowV3 và GameplayMap được giữ làm lịch sử so sánh.
 
 ## Điều đã được người dùng chấp nhận hoặc yêu cầu
 
@@ -14,7 +14,7 @@ Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; b�
 | Mục tiêu 30 FPS, test tự động không tiếng, trả lại tiếng khi người dùng test | Xác nhận trực tiếp trong chat 2026-10-09. Chưa chọn điện thoại tối thiểu. |
 | Lưu cây/bụi cây để reuse; nhảy lên/xuống block phải làm và review trong Blender trước | Yêu cầu trực tiếp 2026-10-09. Chưa phê duyệt bộ cây mới hoặc motion nhảy. |
 | ForestQualitySlice là scene chính để mở project và bấm F5 review | Yêu cầu trực tiếp tiếp theo ngày 2026-10-09; cho phép đổi `run/main_scene`, không đồng nghĩa đã duyệt mọi chi tiết mỹ thuật. |
-| **Mọi cập nhật đồ họa đi vào gameplay chính để F5 review liên tục** | Yêu cầu ngày2026-10-09. Yêu cầu tiếp theo bắt đầu map chính thức phẳng 100 × 100 block cỏ: scene chính hiện tại là GameplayMap; giữ ForestMeadowV3 và V2 để đối chiếu. Đưa vào gameplay không đồng nghĩa người dùng đã duyệt mỹ thuật. |
+| **Mọi cập nhật đồ họa đi vào gameplay chính để F5 review liên tục** | Yêu cầu ngày2026-10-09. Mới nhất: dựng đúng `World Map.litematic`, dùng asset từ `dungeons_ground_style_v2.blend`; scene chính là **WorldMap**, thay nền thử GameplayMap. Giữ các scene trước để đối chiếu. Đưa vào gameplay không đồng nghĩa đã duyệt mỹ thuật. |
 | **Nền cỏ dịu, vành vách đất–đá và cột thấp phía trong** | Yêu cầu tiếp theo: [cỏ ô liu ít tương phản](references/user_flat_grass_2026-10-09.png), [vách cao nhấp nhô bao quanh map](references/user_map_cliffs_2026-10-09.png), từ 10 block trở lên; thêm cột phía trong từ 2 block. Vật cản che nhân vật cần mờ đi như ảnh người dùng. GameplayMap đang thực hiện để review, chưa duyệt kết quả. |
 | Nắng dịu, hơi bloom; tránh cả chói lẫn quá tối | Người dùng phản hồi V3 đầu quá chói, lượt giảm sáng tiếp theo quá tối. Đây là mục tiêu chỉnh, không phải phê duyệt bộ thông số hiện tại. |
 | **Tạm bật bóng cỏ để review** | Yêu cầu tiếp theo ngày 2026-10-09 thay thế quy tắc không bóng cỏ trong bản thử V3; mặc định bật, G bật/tắt. Chưa quyết định giữ lâu dài hoặc áp dụng trên điện thoại. |
@@ -24,6 +24,8 @@ Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; b�
 | **Yêu cầu mới nhất: tạm bỏ nhảy trong game; tự đi lên bậc mượt bằng animation cũ** | Người dùng đổi hướng sau khi cho phép thử tích hợp. Giữ study Blender V2 để bổ sung nhảy sau; không bật clip nhảy hoặc xung lực bật lên trong game hiện tại. |
 
 Việc tích hợp R13/R15 được cho phép không đồng nghĩa mọi chuyển động đã được duyệt là tự nhiên. Những dòng “AWAITING HUMAN REVIEW” ở các báo cáo cũ vẫn cần được tôn trọng. Không gán phần trăm giống game tham chiếu.
+
+**Yêu cầu mới nhất cho WorldMap:** bám [màu/ánh sáng, cỏ/hoa](references/user-world-map-look-2026-10-09.png), [mặt đất mượt](references/user-world-map-ground-2026-10-09.png), mép đường đất hòa vào cỏ và chút noise màu nhẹ trên toàn map. Lá đi xuyên được; cỏ/hoa phản ứng khi đi qua rồi hồi lại. Tăng biên độ gió50% cho cỏ cao/lá,100% cho cỏ nhỏ/hoa; tăng độ đậm bóng15%; thêm bóng mây thưa trôi, không vẽ mây. Đây là các **yêu cầu đã xác nhận**, còn kết quả/thông số hiện tại vẫn là bản thử. Giữ+5%warmth, exposure.96, vị trí block/hoa và toàn bộ nguồn Blender. Xem [hợp đồng map và reuse](../../game_mobile_3d/assets/maps/world_map/README.md).
 
 ## Đề xuất hướng hình ảnh: khoảng chiến đấu sáng trong môi trường xanh trầm
 
