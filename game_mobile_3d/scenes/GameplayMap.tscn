@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/Grassland_50x50.tscn" id="base"]
+[ext_resource type="Script" path="res://scripts/gameplay_map.gd" id="map"]
+[ext_resource type="Environment" path="res://environment/GameplayMap.tres" id="environment"]
+
+[sub_resource type="BoxShape3D" id="floor"]
+size = Vector3(100, 1, 100)
+
+[node name="GameplayMap" instance=ExtResource("base")]
+script = ExtResource("map")
+
+[node name="WorldEnvironment" parent="."]
+environment = ExtResource("environment")
+
+[node name="Sun" parent="."]
+rotation_degrees = Vector3(-55, -38, 0)
+light_color = Color(1, 0.97, 0.91, 1)
+light_energy = 1.32
+shadow_enabled = true
+shadow_bias = 0.035
+shadow_normal_bias = 0.8
+shadow_opacity = 0.66
+shadow_blur = 1.1
+directional_shadow_mode = 0
+directional_shadow_max_distance = 29.0
+
+[node name="CollisionShape3D" parent="Ground"]
+shape = SubResource("floor")
+
+[node name="Help" parent="HUD"]
+text = "MAP 100 × 100\nWASD di chuyển · Shift chạy · R về giữa map"
+
+[node name="Status" parent="HUD"]
+visible = false

@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://materials/gameplay_grass_ground.gdshader" id="shader"]
+[ext_resource type="Texture2D" path="res://assets/environment/litematic_m2_v2/grass_block_di_v3_meadow_m2_atlas.png" id="atlas"]
+
+[resource]
+shader = ExtResource("shader")
+shader_parameter/atlas = ExtResource("atlas")
+shader_parameter/smooth_atlas = ExtResource("atlas")
+shader_parameter/ground_color = Color(0.266667, 0.360784, 0.2, 1)
+shader_parameter/texture_contrast = 0.065
