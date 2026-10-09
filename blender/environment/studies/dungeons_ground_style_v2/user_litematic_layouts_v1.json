@@ -1,0 +1,479 @@
+{
+  "designs": [
+    {
+      "source_file": "C:\\Users\\ADMIN\\AppData\\Roaming\\PrismLauncher\\instances\\Tin PLay 1.21.11 Tesst\\minecraft\\schematics\\Bush design.litematic",
+      "source_sha256": "a896423c7f45c43bc3c9951fdbccaf9c67305bb27b78111ff13385e67580b3e0",
+      "version": 7,
+      "minecraft_data_version": 4671,
+      "metadata": {
+        "Name": "Unnamed",
+        "Author": "IAmNotTin",
+        "Description": "",
+        "RegionCount": 1,
+        "TotalVolume": 18,
+        "TotalBlocks": 6,
+        "TimeCreated": 1791506764320,
+        "TimeModified": 1791506764320,
+        "EnclosingSize": {
+          "x": 3,
+          "y": 2,
+          "z": 3
+        }
+      },
+      "axis_transform": "Blender(X,Y,Z)=(MinecraftX,-MinecraftZ,MinecraftY); rotation, no reflection",
+      "unit_m": 1,
+      "regions": [
+        {
+          "name": "Unnamed",
+          "size": [
+            3,
+            2,
+            3
+          ],
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "palette": [
+            {
+              "Name": "minecraft:air"
+            },
+            {
+              "Name": "minecraft:oak_leaves",
+              "Properties": {
+                "distance": "7",
+                "persistent": "true",
+                "waterlogged": "false"
+              }
+            }
+          ],
+          "bits_per_entry": 2,
+          "volume": 18,
+          "nonair_count": 6
+        }
+      ],
+      "cells": [
+        {
+          "region": "Unnamed",
+          "index": 0,
+          "minecraft_xyz": [
+            0,
+            0,
+            0
+          ],
+          "blender_bottom_center": [
+            0,
+            0,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        },
+        {
+          "region": "Unnamed",
+          "index": 1,
+          "minecraft_xyz": [
+            1,
+            0,
+            0
+          ],
+          "blender_bottom_center": [
+            1,
+            0,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        },
+        {
+          "region": "Unnamed",
+          "index": 4,
+          "minecraft_xyz": [
+            1,
+            0,
+            1
+          ],
+          "blender_bottom_center": [
+            1,
+            -1,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        },
+        {
+          "region": "Unnamed",
+          "index": 5,
+          "minecraft_xyz": [
+            2,
+            0,
+            1
+          ],
+          "blender_bottom_center": [
+            2,
+            -1,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        },
+        {
+          "region": "Unnamed",
+          "index": 7,
+          "minecraft_xyz": [
+            1,
+            0,
+            2
+          ],
+          "blender_bottom_center": [
+            1,
+            -2,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        },
+        {
+          "region": "Unnamed",
+          "index": 13,
+          "minecraft_xyz": [
+            1,
+            1,
+            1
+          ],
+          "blender_bottom_center": [
+            1,
+            -1,
+            1
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        }
+      ]
+    },
+    {
+      "source_file": "C:\\Users\\ADMIN\\AppData\\Roaming\\PrismLauncher\\instances\\Tin PLay 1.21.11 Tesst\\minecraft\\schematics\\111.litematic",
+      "source_sha256": "c119e3511faf52b0bd55195b94e482287c2fc3b5bc0bcc1b635436452036321b",
+      "version": 7,
+      "minecraft_data_version": 4671,
+      "metadata": {
+        "Name": "Unnamed",
+        "Author": "IAmNotTin",
+        "Description": "",
+        "RegionCount": 1,
+        "TotalVolume": 24,
+        "TotalBlocks": 9,
+        "TimeCreated": 1791506976313,
+        "TimeModified": 1791506976313,
+        "EnclosingSize": {
+          "x": 3,
+          "y": 2,
+          "z": 4
+        }
+      },
+      "axis_transform": "Blender(X,Y,Z)=(MinecraftX,-MinecraftZ,MinecraftY); rotation, no reflection",
+      "unit_m": 1,
+      "regions": [
+        {
+          "name": "Unnamed",
+          "size": [
+            3,
+            2,
+            4
+          ],
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "palette": [
+            {
+              "Name": "minecraft:air"
+            },
+            {
+              "Name": "minecraft:oak_leaves",
+              "Properties": {
+                "distance": "7",
+                "persistent": "true",
+                "waterlogged": "false"
+              }
+            },
+            {
+              "Name": "minecraft:oak_slab",
+              "Properties": {
+                "type": "bottom",
+                "waterlogged": "false"
+              }
+            }
+          ],
+          "bits_per_entry": 2,
+          "volume": 24,
+          "nonair_count": 9
+        }
+      ],
+      "cells": [
+        {
+          "region": "Unnamed",
+          "index": 1,
+          "minecraft_xyz": [
+            1,
+            0,
+            0
+          ],
+          "blender_bottom_center": [
+            1,
+            0,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_slab",
+            "Properties": {
+              "type": "bottom",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 0.5,
+          "slab_type": "bottom"
+        },
+        {
+          "region": "Unnamed",
+          "index": 2,
+          "minecraft_xyz": [
+            2,
+            0,
+            0
+          ],
+          "blender_bottom_center": [
+            2,
+            0,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        },
+        {
+          "region": "Unnamed",
+          "index": 3,
+          "minecraft_xyz": [
+            0,
+            0,
+            1
+          ],
+          "blender_bottom_center": [
+            0,
+            -1,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        },
+        {
+          "region": "Unnamed",
+          "index": 4,
+          "minecraft_xyz": [
+            1,
+            0,
+            1
+          ],
+          "blender_bottom_center": [
+            1,
+            -1,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        },
+        {
+          "region": "Unnamed",
+          "index": 5,
+          "minecraft_xyz": [
+            2,
+            0,
+            1
+          ],
+          "blender_bottom_center": [
+            2,
+            -1,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_slab",
+            "Properties": {
+              "type": "bottom",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 0.5,
+          "slab_type": "bottom"
+        },
+        {
+          "region": "Unnamed",
+          "index": 6,
+          "minecraft_xyz": [
+            0,
+            0,
+            2
+          ],
+          "blender_bottom_center": [
+            0,
+            -2,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_slab",
+            "Properties": {
+              "type": "bottom",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 0.5,
+          "slab_type": "bottom"
+        },
+        {
+          "region": "Unnamed",
+          "index": 7,
+          "minecraft_xyz": [
+            1,
+            0,
+            2
+          ],
+          "blender_bottom_center": [
+            1,
+            -2,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        },
+        {
+          "region": "Unnamed",
+          "index": 10,
+          "minecraft_xyz": [
+            1,
+            0,
+            3
+          ],
+          "blender_bottom_center": [
+            1,
+            -3,
+            0
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_slab",
+            "Properties": {
+              "type": "bottom",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 0.5,
+          "slab_type": "bottom"
+        },
+        {
+          "region": "Unnamed",
+          "index": 16,
+          "minecraft_xyz": [
+            1,
+            1,
+            1
+          ],
+          "blender_bottom_center": [
+            1,
+            -1,
+            1
+          ],
+          "block_state": {
+            "Name": "minecraft:oak_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          },
+          "height_m": 1,
+          "slab_type": null
+        }
+      ]
+    }
+  ]
+}

@@ -30,7 +30,7 @@ Both rest GLBs export only the selected canonical asset at origin, one mesh/one 
 
 `REVIEW_Blender_Strong_Wind_V1` contains **four independent mesh copies**: white flowers, original-height grass, .65-height grass, golden meadow grass. They carry a live frame-change wind preview, **96frames at24FPS =4seconds**, with roots fixed, each head and white leaf rigid, and all faces planar. Grass motion amplitudes `.036/.016m` are twice the original copied v4 `.018/.008m`. The golden/white wind uses bounded rotation and stronger visible sway; maximum audited vertex travel is .2242m. Canonical rest meshes/exports and the quiet grass reference remain intact. No geometry-node groups or original driver/key data were edited.
 
-Use Timeline Play in the current window. The preview range is frames1–96. After opening this file in a future session, run the saved text `RUN_Blender_Strong_Wind_V1` once to register its local handler; current session already has it active. Motion is **Blender-only**, not runtime approval. Saved rest exports contain none of this preview motion.
+Use Timeline Play in the current window. The preview range is frames1–96. After opening this file in a future session, run the saved text `RUN_Blender_Strong_Wind_V1` once to register its local handler; the latest read found playback stopped and its handler unregistered; run that text before playing wind again. Motion is **Blender-only**, not runtime approval. Saved rest exports contain none of this preview motion.
 
 ## Source helpers and evidence
 
@@ -39,3 +39,63 @@ Live builders/revision helpers assert `not bpy.app.background`, target this exac
 Read-only audits first observed missing-model failures, then compare source corners with binary GLB positions/normals/UVs/linear colours and meaningful original-data fingerprints. Phase backups and reports are under ignored `.validation/flower_patch_v1`. Current reports: `validation_source_and_glb.json`, `validation_connected_golden_source_glb.json`, `validation_blender_strong_wind.json`. Original91objects/37meshes/14materials/16images/5cameras/4lights remain unchanged; original source digest `cec5b726e2f2f87154017b384a9d142b476e0d525f7457bed0f843407db81d90`. Current connected-head pre-edit digest `144be2720217c7b60820fc2f88e916daeef7ad113fc08162dbac75cd7bff0d2c`; only the authorized golden mesh changed in that phase. Wind phase preserves all prior authored data. Audited roots drift0m, head/leaf pair-distance error<4.45e−7m, face planarity<2.63e−7m, loop frame1==97 exactly.
 
 Actual source pixels: `blender_golden_connected_shoulder_detail.png`, `blender_current_four_plants.png`, and `blender_only_stronger_wind.gif` in the evidence directory. These show Blender studies; they do not establish Godot or phone performance.
+
+## Current modular leaf blocks and archived plus assembly
+
+The earlier bulk3×3×2m bush remains **PAUSED, frozen and hidden**. The current library is `LEAF_MODULES_1Block_V1`, with separate A/B/C1m cores. The previous image-inferred `LEAF_CLUSTER_Plus_6Blocks_V1` combines five lower cells `(0,0,0),(±1,0,0),(0,±1,0)` and one uppercentre `(0,0,1)`, with a 3×3m footprint and 2m height. It is now hidden for comparison; the two exact schematic assemblies described below are the active review. These are Blender studies awaiting visual review; no game integration was performed.
+
+Latest appearance uses the supplied512×512 PNG's **exact pixel layout**, with the subsequent requested lighter greens and transparent black. Original input is preserved byte for byte as `textures/leaf_modules_user_provided_512.png`, SHA256 `843cebc821ccb8fdd19cd709ef648890eac2cb5fb561c50b7fbd41d3afca7ed7`. All six gold RGB levels remain unchanged. Only the four green levels are remapped, darkest to lightest, to colors read from the unchanged V3 `grass_top_0.png`:
+
+| Source RGB | Current RGB |
+| --- | --- |
+| 32,77,11 | 70,112,47 |
+| 38,96,13 | 76,122,49 |
+| 43,109,14 | 84,130,52 |
+| 52,131,17 | 97,143,60 |
+
+The current derived RGBA PNG is `textures/leaf_modules_user_pattern_grass_green_cutout.png`. Alpha is0 exactly where the original RGB is black and1 elsewhere; black occupies30.46875% of the input. No blur, noise, veins or replacement pattern was generated for this current texture. It uses nearest filtering, direct image RGB and double-sided native **MASK**, cutoff.5. Source `Color` attributes remain preserved author data but are omitted from current leaf GLBs so they cannot double-tint the texture. The whole logical0–1 tile maps once to each1m cube face, without variant phase or half-tile wrapping. Active UV layer `UV_UserLeafTile_1RepeatPerMetre` gives512texels/m technically, or16coarse pixel cells/m in this supplied bitmap.
+
+Each1m core keeps its actual geometric holes and small internal clumps. A reversible Mask modifier `REVIEW_Temporarily_Omit_Protruding_Leaves` omits original `leaf_part1` edge/top sprigs. All original `*_CrossBranches` objects remain hidden in viewport/render; their authored2× fixed-root planes and UVs remain intact for restoration. They are absent from current exports. These archived large branches are superseded by the new small bushy layers.
+
+Current `*_BushyFoliage` children contain52small cutout quads:10on each side and12on top, staggered and tilted to soften the cubic outline. They share the current outer texture/material. Separate `*_DenseInterior` children add36crossed internal cutout quads, all strictly inside the1m core. Their isolated material multiplies **linear albedo by.88**; current gold and green pixel positions remain identical. The glTF material carries `[.88,.88,.88,1]`. No world, lighting, exposure, AO or original asset material was changed.
+
+| Module | Current triangles | Full foliage X/Y/Z span (m) |
+| --- | ---: | --- |
+| A | 2176 | 1.350456 /1.348945 /1.180056 |
+| B | 2156 | 1.334731 /1.314140 /1.176785 |
+| C | 2138 | 1.329496 /1.305528 /1.165683 |
+
+The grid core remains1×1×1m with bottom-centred origin and identity rest export. A/B/C review centres are25.5,27.6,29.7m X, separated2.1m on neutral ground beside a copied1.8m R15 rest actor. Full plant row, original scene camera/lights, original grass sources, white flowers, golden meadow grass and existing wind previews remain preserved.
+
+The earlier six-cell plus assembly is now a frozen, hidden comparison. It uses isolated copied cores with internal facing sides omitted at occupied neighbours. Bushy layers appear only on exposed sides; dense interiors share their library meshes. The former four tiny coplanar sprig overlaps were fixed with0.15mm offsets on three assembly-only archived sprig cards; those sprigs are currently masked. Current raw core overlap audit reports0positive-area pairs. Structural bounds remain `[-1.5,-1.5,0]…[1.5,1.5,2]`; full foliage bounds are `[-1.666870,-1.655897,0]…[1.670809,1.683637,2.176785]`. The assembly contains9834current triangles. Foliage overhang and intentional noncoplanar interpenetration are separate from the metre grid.
+
+Reuse `exports/leaf_block_1m_v1_a.glb`, `_b.glb`, `_c.glb`. Current exports include the **evaluated core plus BushyFoliage and DenseInterior**:3meshes/3surfaces,2nativeMASKmaterials,1embedded packed PNG. No old CrossBranches, original part1 sprigs, rig, morph, animation, camera, lights or collision is included. Outer material factor iswhite; interior factor is.88linear. These leaf UVs are texture coordinates and do not use the flower wind metadata. Leaf modules are static; existing stronger plant-wind previews remain separate Blender-only studies. No mobile performance claim is made.
+
+## Leaf-module reproduction and evidence
+
+Foreground authoring stages are preserved as source helpers. `add_leaf_modules_v1.py` and `refine_dense_leaf_modules_v1.py` describe the earlier18cell geometric core; their old vertex-colour export contract is historical. `add_textured_leaf_branches_v1.py` and `revise_leaf_pattern_and_2x_branches_v1.py` describe the now-hidden large branch stage. `add_leaf_plus_6blocks_v1.py`, `apply_exact_user_leaf_texture_v1.py`, `apply_black_leaf_cutout_v1.py`, `apply_grass_green_leaf_cutout_v1.py`, `temporarily_omit_leaf_protrusions_v1.py`, `add_bushy_leaf_layers_v1.py` and `add_dense_leaf_interior_v1.py` reproduce the successive requested corrections from their recorded phase baselines. They assert foreground execution and this exact source path, reject duplicate generation and preserve original data. Do not replay an earlier phase on the current file. To refresh current rest exports, run `export_current_leaf_modules_v1.py` through the connected foreground MCP; it selects only the current three meshes, applies evaluation for export and uses `export_vertex_color='NONE'`.
+
+Current authoritative audit is `validate_bushy_leaf_modules_v1.py`; the old module/branch/pattern audits dispatch to it when current interior objects exist. Its fresh-open source/GLB report is `.validation/flower_patch_v1/validation_latest_bushy_leaf_modules.json`. It verifies original input bytes/RGBA, exact permitted green remap, unchanged gold/layout, black cutout, source UV face mapping and physical density, evaluated Mask geometry, planar bounded bushy/interior cards, nativeMASK/nearest/embeddedPNG, white/.88factors, identity transforms, source-corner/binary agreement, six-cell grid, internal-face removal, and phase preservation. Latest additive bushy/dense phases preserve all prior authored data exactly.
+
+Actual current source pixels in the ignored evidence directory: `blender_leaf_module_a_bushy_dense_current.png`, same-camera `blender_leaf_module_a_bushy_before_dense_interior.png`, `blender_leaf_modules_bushy_dense_calibration.png`, and `blender_leaf_plus_bushy_dense_angle_a.png`/`_b.png`. The detail pair uses ortho2.1 to include the foliage envelope. All authored changes are live in the same saved Blender window; no Revert is needed. Background Blender processes only loaded source for these audits/renders and never saved the source.
+
+## Current exact user schematic assemblies
+
+The active review now contains **two separately translated designs from the supplied litematic files**, replacing the inferred plus layout. `USER_BushDesign_Litematic_V1` has six full leaf blocks with a structural 3×3×2m envelope. `USER_111_Litematic_V1` has five full blocks and four bottom half slabs with a structural 3×4×2m envelope. Each Minecraft block is one metre; the right-handed mapping is Minecraft(X,Y,Z) → Blender(X,-Z,Y). Stored Minecraft coordinates and slab states are preserved in `user_litematic_layouts_v1.json` and `user_schematic_bushes_v1_manifest.json`. Only display translations and horizontal recentering are added. The original inferred plus and paused bulk bush remain hidden comparisons.
+
+The supplied files are copied byte-for-byte into `schematics/Bush design.litematic` and `schematics/111.litematic`. Their SHA-256 values are respectively `a896423c7f45c43bc3c9951fdbccaf9c67305bb27b78111ff13385e67580b3e0` and `c119e3511faf52b0bd55195b94e482287c2fc3b5bc0bcc1b635436452036321b`. Schematic data are layout provenance only. The container interpretation was checked against the [Litematica container source](https://github.com/maruohon/litematica/tree/ornithe/1.12.2/src/main/java/litematica/schematic/container); it does not authorize executing block content.
+
+`LEAF_MODULES_HalfBlock_V1` adds separate editable A/B/C slab templates with **1×1×.5m cores**, bottom-centred origins and identity rest transforms. Full templates remain unchanged. Slab side geometry is clipped to .5m and side UV height spans 0… .5; the top retains the full XY tile. Bushy top rise is halved above the new .5m core. Each slab has 32 outer cutout planes and 18 interior planes. All edges retain 512 technical texels/m (16 coarse image cells/m); the vertical image is cropped physically rather than squashed. Actual slab foliage height is .583… .590m, with modest lateral overhang separately from the unit core.
+
+Assemblies use isolated core copies and exposed outer leaf layers, with linked interior meshes. Full-to-bottom-slab contacts remove only the occluded lower half; the seven exposed upper half sides in `111` remain. Complete facing contacts are removed. The focused audit finds zero positive-area coplanar core face overlaps. Intentional noncoplanar foliage interpenetration remains. The current green remap, black transparency, unchanged gold pattern, nearest two MASK materials and .88 linear interior factor are shared with the full modules. No old large branch cards are restored.
+
+| Design | Full / half blocks | Current triangles | Actual foliage X/Y/Z span (m) |
+| --- | --- | ---: | --- |
+| Bush design | 6 / 0 | 9924 | 3.350456 / 3.348945 / 2.180056 |
+| 111 | 5 / 4 | 12406 | 3.350456 / 4.348945 / 2.180056 |
+
+Half-template study exports are `exports/leaf_slab_1x1x05m_v1_a.glb`, `_b.glb` and `_c.glb`: respectively 1382, 1450 and 1318 triangles, three meshes/surfaces, two MASK materials and one embedded PNG. There are no vertex colours in the binary, rig, morph, animation, camera or lights. Assemblies are editable Blender studies and are not integrated into the game.
+
+`add_user_schematic_bushes_v1.py` is the foreground-only, exact-file guarded authoring stage; `leaf_planar_geometry_v1.py` preserves corner UVs/colours during partial clipping. `validate_user_schematic_bushes_v1.py` is the focused read-only background audit. Its report is `.validation/flower_patch_v1/validation_user_schematic_bushes.json`. It verifies all 15 cell transforms and stored states, physical UV density, half source/GLB corners and embedded image, partial-contact preservation, and every prior authored fingerprint. On fresh open it temporarily evaluates the newly hidden old-plus collection to eliminate stale derived bounds/world-matrix caches, then restores its flags. No prior data are excluded. The sole prior collection visibility change is the explicitly superseded plus comparison becoming hidden.
+
+Current actual source pixels are `.validation/flower_patch_v1/blender_user_two_exact_schematic_bushes.png` and `blender_user_111_full_and_half_leaf_detail.png`. The overview includes metre marks, the standalone half leaf and the copied real 1.8m R15 actor. Both new collections are framed together in the current material-preview window. Source changes were authored and saved only through live MCP in this exact blend; no Revert or manual reload is needed. Background processes only read source for validation and rendering. This is Blender-only review, not artistic approval or phone-performance evidence.

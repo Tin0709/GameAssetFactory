@@ -1,0 +1,784 @@
+{
+  "status": "Exact two user schematics, current leaf style; artistic review pending",
+  "designs": [
+    {
+      "name": "USER_BushDesign_Litematic_V1",
+      "source_file": "C:\\Users\\ADMIN\\AppData\\Roaming\\PrismLauncher\\instances\\Tin PLay 1.21.11 Tesst\\minecraft\\schematics\\Bush design.litematic",
+      "stored_source": "schematics/Bush design.litematic",
+      "source_sha256": "a896423c7f45c43bc3c9951fdbccaf9c67305bb27b78111ff13385e67580b3e0",
+      "axis_transform": "Blender(X,Y,Z)=(MinecraftX,-MinecraftZ,MinecraftY); rotation, no reflection",
+      "display_root": [
+        36,
+        9,
+        0
+      ],
+      "source_recenter_offset": [
+        1.0,
+        -1.0,
+        0.0
+      ],
+      "structural_bounds_local": [
+        [
+          -1.5,
+          -1.5,
+          0.0
+        ],
+        [
+          1.5,
+          1.5,
+          2.0
+        ]
+      ],
+      "cells": [
+        {
+          "object": "USER_BushDesign_Litematic_V1_Cell_0",
+          "blender_local_bottom_center": [
+            -1.0,
+            1.0,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            0,
+            0,
+            0
+          ],
+          "source_bottom_center": [
+            0,
+            0,
+            0
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "0": [
+              [
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_BushDesign_Litematic_V1_Cell_1",
+          "blender_local_bottom_center": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            1,
+            0,
+            0
+          ],
+          "source_bottom_center": [
+            1,
+            0,
+            0
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "1": [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            "3": [
+              [
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_BushDesign_Litematic_V1_Cell_2",
+          "blender_local_bottom_center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            1,
+            0,
+            1
+          ],
+          "source_bottom_center": [
+            1,
+            -1,
+            0
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "2": [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            "0": [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            "3": [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            "4": [
+              [
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_BushDesign_Litematic_V1_Cell_3",
+          "blender_local_bottom_center": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            2,
+            0,
+            1
+          ],
+          "source_bottom_center": [
+            2,
+            -1,
+            0
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "1": [
+              [
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_BushDesign_Litematic_V1_Cell_4",
+          "blender_local_bottom_center": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            1,
+            0,
+            2
+          ],
+          "source_bottom_center": [
+            1,
+            -2,
+            0
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "2": [
+              [
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_BushDesign_Litematic_V1_Cell_5",
+          "blender_local_bottom_center": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "source_minecraft_xyz": [
+            1,
+            1,
+            1
+          ],
+          "source_bottom_center": [
+            1,
+            -1,
+            1
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "5": [
+              [
+                0,
+                1
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "USER_111_Litematic_V1",
+      "source_file": "C:\\Users\\ADMIN\\AppData\\Roaming\\PrismLauncher\\instances\\Tin PLay 1.21.11 Tesst\\minecraft\\schematics\\111.litematic",
+      "stored_source": "schematics/111.litematic",
+      "source_sha256": "c119e3511faf52b0bd55195b94e482287c2fc3b5bc0bcc1b635436452036321b",
+      "axis_transform": "Blender(X,Y,Z)=(MinecraftX,-MinecraftZ,MinecraftY); rotation, no reflection",
+      "display_root": [
+        42,
+        9,
+        0
+      ],
+      "source_recenter_offset": [
+        1.0,
+        -1.5,
+        0.0
+      ],
+      "structural_bounds_local": [
+        [
+          -1.5,
+          -2.0,
+          0.0
+        ],
+        [
+          1.5,
+          2.0,
+          2.0
+        ]
+      ],
+      "cells": [
+        {
+          "object": "USER_111_Litematic_V1_Cell_0",
+          "blender_local_bottom_center": [
+            0.0,
+            1.5,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            1,
+            0,
+            0
+          ],
+          "source_bottom_center": [
+            1,
+            0,
+            0
+          ],
+          "height_m": 0.5,
+          "slab_type": "bottom",
+          "contact_intervals": {
+            "0": [
+              [
+                0.0,
+                0.5
+              ]
+            ],
+            "3": [
+              [
+                0.0,
+                0.5
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_111_Litematic_V1_Cell_1",
+          "blender_local_bottom_center": [
+            1.0,
+            1.5,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            2,
+            0,
+            0
+          ],
+          "source_bottom_center": [
+            2,
+            0,
+            0
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "1": [
+              [
+                0.0,
+                0.5
+              ]
+            ],
+            "3": [
+              [
+                0.0,
+                0.5
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_111_Litematic_V1_Cell_2",
+          "blender_local_bottom_center": [
+            -1.0,
+            0.5,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            0,
+            0,
+            1
+          ],
+          "source_bottom_center": [
+            0,
+            -1,
+            0
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "0": [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            "3": [
+              [
+                0.0,
+                0.5
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_111_Litematic_V1_Cell_3",
+          "blender_local_bottom_center": [
+            0.0,
+            0.5,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            1,
+            0,
+            1
+          ],
+          "source_bottom_center": [
+            1,
+            -1,
+            0
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "2": [
+              [
+                0.0,
+                0.5
+              ]
+            ],
+            "1": [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            "0": [
+              [
+                0.0,
+                0.5
+              ]
+            ],
+            "3": [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            "4": [
+              [
+                0,
+                1
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_111_Litematic_V1_Cell_4",
+          "blender_local_bottom_center": [
+            1.0,
+            0.5,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            2,
+            0,
+            1
+          ],
+          "source_bottom_center": [
+            2,
+            -1,
+            0
+          ],
+          "height_m": 0.5,
+          "slab_type": "bottom",
+          "contact_intervals": {
+            "2": [
+              [
+                0.0,
+                0.5
+              ]
+            ],
+            "1": [
+              [
+                0.0,
+                0.5
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_111_Litematic_V1_Cell_5",
+          "blender_local_bottom_center": [
+            -1.0,
+            -0.5,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            0,
+            0,
+            2
+          ],
+          "source_bottom_center": [
+            0,
+            -2,
+            0
+          ],
+          "height_m": 0.5,
+          "slab_type": "bottom",
+          "contact_intervals": {
+            "2": [
+              [
+                0.0,
+                0.5
+              ]
+            ],
+            "0": [
+              [
+                0.0,
+                0.5
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_111_Litematic_V1_Cell_6",
+          "blender_local_bottom_center": [
+            0.0,
+            -0.5,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            1,
+            0,
+            2
+          ],
+          "source_bottom_center": [
+            1,
+            -2,
+            0
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "2": [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            "1": [
+              [
+                0.0,
+                0.5
+              ]
+            ],
+            "3": [
+              [
+                0.0,
+                0.5
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_111_Litematic_V1_Cell_7",
+          "blender_local_bottom_center": [
+            0.0,
+            -1.5,
+            0.0
+          ],
+          "source_minecraft_xyz": [
+            1,
+            0,
+            3
+          ],
+          "source_bottom_center": [
+            1,
+            -3,
+            0
+          ],
+          "height_m": 0.5,
+          "slab_type": "bottom",
+          "contact_intervals": {
+            "2": [
+              [
+                0.0,
+                0.5
+              ]
+            ]
+          }
+        },
+        {
+          "object": "USER_111_Litematic_V1_Cell_8",
+          "blender_local_bottom_center": [
+            0.0,
+            0.5,
+            1.0
+          ],
+          "source_minecraft_xyz": [
+            1,
+            1,
+            1
+          ],
+          "source_bottom_center": [
+            1,
+            -1,
+            1
+          ],
+          "height_m": 1,
+          "slab_type": null,
+          "contact_intervals": {
+            "5": [
+              [
+                0,
+                1
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "half_sources": [
+    {
+      "variant": "A",
+      "object": "ENV_LeafSlab_1x1x05m_V1_A",
+      "core_m": [
+        1,
+        1,
+        0.5
+      ],
+      "bushy_planes": 32,
+      "interior_planes": 18
+    },
+    {
+      "variant": "B",
+      "object": "ENV_LeafSlab_1x1x05m_V1_B",
+      "core_m": [
+        1,
+        1,
+        0.5
+      ],
+      "bushy_planes": 32,
+      "interior_planes": 18
+    },
+    {
+      "variant": "C",
+      "object": "ENV_LeafSlab_1x1x05m_V1_C",
+      "core_m": [
+        1,
+        1,
+        0.5
+      ],
+      "bushy_planes": 32,
+      "interior_planes": 18
+    }
+  ],
+  "half_method": "Core sides clipped to.5, top surface moved to.5; lower exterior/interior layer kept, top exterior tilted rise halved. PhysicalUVdensity512/m retained without verticaltile squash",
+  "partial_contacts": "Full-to-bottomslab sides clip only occludedlower.5m; exposedupperhalf retained. Top/bottom side contacts only when actualheightintervals touch.",
+  "old_plus": "Frozen comparison collection hidden; oldbulk remainspaused",
+  "baseline_digest": "55d10bcc99c7c2954a464886a889032e2dd4f55889752f4f8088f9bd53139358",
+  "scope": "Live sameBlenderfile/window, no game integration",
+  "current_audit": {
+    "path": ".validation/flower_patch_v1/validation_user_schematic_bushes.json",
+    "status": "PASS",
+    "prior_authored_data_preserved": true,
+    "only_prior_visibility_change": "LEAF_CLUSTER_Plus_6Blocks_V1 hidden",
+    "hidden_evaluation_note": "Fresh audit evaluates the comparison collection before exact fingerprint comparison; no authored fields excluded"
+  },
+  "review_images": [
+    ".validation/flower_patch_v1/blender_user_two_exact_schematic_bushes.png",
+    ".validation/flower_patch_v1/blender_user_111_full_and_half_leaf_detail.png"
+  ],
+  "measured_current_designs": [
+    {
+      "name": "USER_BushDesign_Litematic_V1",
+      "cells": 6,
+      "full_cells": 6,
+      "half_cells": 0,
+      "structural_bounds": [
+        [
+          -1.5,
+          -1.5,
+          0.0
+        ],
+        [
+          1.5,
+          1.5,
+          2.0
+        ]
+      ],
+      "foliage_bounds": [
+        [
+          -1.689389705657959,
+          -1.6653072834014893,
+          0.0
+        ],
+        [
+          1.6610660552978516,
+          1.6836373805999756,
+          2.180056095123291
+        ]
+      ],
+      "triangles": 9924,
+      "partial_full_to_slab_sides_kept": 0,
+      "coplanar_core_overlap_pairs": 0,
+      "source_sha256": "a896423c7f45c43bc3c9951fdbccaf9c67305bb27b78111ff13385e67580b3e0"
+    },
+    {
+      "name": "USER_111_Litematic_V1",
+      "cells": 9,
+      "full_cells": 5,
+      "half_cells": 4,
+      "structural_bounds": [
+        [
+          -1.5,
+          -2.0,
+          0.0
+        ],
+        [
+          1.5,
+          2.0,
+          2.0
+        ]
+      ],
+      "foliage_bounds": [
+        [
+          -1.689389705657959,
+          -2.1653072834014893,
+          0.0
+        ],
+        [
+          1.6610660552978516,
+          2.1836373805999756,
+          2.180056095123291
+        ]
+      ],
+      "triangles": 12406,
+      "partial_full_to_slab_sides_kept": 7,
+      "coplanar_core_overlap_pairs": 0,
+      "source_sha256": "c119e3511faf52b0bd55195b94e482287c2fc3b5bc0bcc1b635436452036321b"
+    }
+  ],
+  "half_export_audit": [
+    {
+      "variant": "A",
+      "core_m": [
+        1,
+        1,
+        0.5
+      ],
+      "full_foliage_bounds": [
+        [
+          -0.6851192116737366,
+          -0.6653072237968445,
+          0.0
+        ],
+        [
+          0.6610660552978516,
+          0.6836373805999756,
+          0.5900280475616455
+        ]
+      ],
+      "triangles": 1382,
+      "UV_density_max_error": 0.000811100764906314,
+      "source_binary_errors_position_uv_normal": [
+        1.4901161193847656e-08,
+        5.960464477539063e-08,
+        4.9427151679992676e-05
+      ],
+      "sha256": "213d708f4f7f72ba4310783bd9515c4b38f81b093fc653c9fa775cbe8cb1c3f8"
+    },
+    {
+      "variant": "B",
+      "core_m": [
+        1,
+        1,
+        0.5
+      ],
+      "full_foliage_bounds": [
+        [
+          -0.663922131061554,
+          -0.6346292495727539,
+          0.0
+        ],
+        [
+          0.6703855395317078,
+          0.6554388403892517,
+          0.5883926749229431
+        ]
+      ],
+      "triangles": 1450,
+      "UV_density_max_error": 0.0005600456078127536,
+      "source_binary_errors_position_uv_normal": [
+        0,
+        5.960464477539063e-08,
+        5.111098289489746e-05
+      ],
+      "sha256": "9b1651a528baf38c1d7f1da73acb6fb5ce3f34ca81af2872e9113b6ec1e73198"
+    },
+    {
+      "variant": "C",
+      "core_m": [
+        1,
+        1,
+        0.5
+      ],
+      "full_foliage_bounds": [
+        [
+          -0.6574304103851318,
+          -0.6286457777023315,
+          0.0
+        ],
+        [
+          0.6587779521942139,
+          0.6496303677558899,
+          0.5828415155410767
+        ]
+      ],
+      "triangles": 1318,
+      "UV_density_max_error": 0.0005600456078127536,
+      "source_binary_errors_position_uv_normal": [
+        2.9802322387695312e-08,
+        5.960464477539063e-08,
+        5.085766315460205e-05
+      ],
+      "sha256": "f4b4d33a998bfa46d08a3d7538da9de9a895d058213c2d1f3b1ed1ed32cf4daa"
+    }
+  ]
+}

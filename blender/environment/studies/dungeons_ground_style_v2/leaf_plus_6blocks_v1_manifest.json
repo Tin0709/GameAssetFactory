@@ -1,0 +1,292 @@
+{
+  "status": "New user-requested plus assembly; pending artistic review; older bulk remains frozen",
+  "cells": [
+    {
+      "cell": [
+        0,
+        0,
+        0
+      ],
+      "variant": "A",
+      "object": "ENV_LeafCluster_Plus_Cell_0",
+      "branch_object": "ENV_LeafCluster_Plus_Cell_0_CrossBranches",
+      "blocked_sides": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "cell": [
+        1,
+        0,
+        0
+      ],
+      "variant": "B",
+      "object": "ENV_LeafCluster_Plus_Cell_1",
+      "branch_object": "ENV_LeafCluster_Plus_Cell_1_CrossBranches",
+      "blocked_sides": [
+        1
+      ]
+    },
+    {
+      "cell": [
+        -1,
+        0,
+        0
+      ],
+      "variant": "C",
+      "object": "ENV_LeafCluster_Plus_Cell_2",
+      "branch_object": "ENV_LeafCluster_Plus_Cell_2_CrossBranches",
+      "blocked_sides": [
+        0
+      ]
+    },
+    {
+      "cell": [
+        0,
+        1,
+        0
+      ],
+      "variant": "A",
+      "object": "ENV_LeafCluster_Plus_Cell_3",
+      "branch_object": "ENV_LeafCluster_Plus_Cell_3_CrossBranches",
+      "blocked_sides": [
+        3
+      ]
+    },
+    {
+      "cell": [
+        0,
+        -1,
+        0
+      ],
+      "variant": "C",
+      "object": "ENV_LeafCluster_Plus_Cell_4",
+      "branch_object": "ENV_LeafCluster_Plus_Cell_4_CrossBranches",
+      "blocked_sides": [
+        2
+      ]
+    },
+    {
+      "cell": [
+        0,
+        0,
+        1
+      ],
+      "variant": "B",
+      "object": "ENV_LeafCluster_Plus_Cell_5",
+      "branch_object": "ENV_LeafCluster_Plus_Cell_5_CrossBranches",
+      "blocked_sides": [
+        5
+      ]
+    }
+  ],
+  "structural_core_m": [
+    3,
+    3,
+    2
+  ],
+  "placement": "Five lower blocks in plus/cross and one upper centre,1m steps",
+  "internal_treatment": "Assembly-only copied cores omit occupied-neighbour core sides; copied branch sides omitted at occupied neighbours. Library geometry/materials unchanged. Exposed branch planes retain2xscale.",
+  "display_locations": {
+    "ENV_LeafBlock_1m_V1_B": [
+      27.600000381469727,
+      3.200000047683716,
+      0.0
+    ],
+    "ENV_LeafBlock_1m_V1_C": [
+      29.700000762939453,
+      3.200000047683716,
+      0.0
+    ],
+    "REVIEW_LeafModule_B_1m_Core_Wire": [
+      27.600000381469727,
+      3.200000047683716,
+      0.5
+    ],
+    "REVIEW_LeafModule_C_1m_Core_Wire": [
+      29.700000762939453,
+      3.200000047683716,
+      0.5
+    ],
+    "REVIEW_LeafModule_B_Label": [
+      27.05000114440918,
+      2.25,
+      0.014999999664723873
+    ],
+    "REVIEW_LeafModule_C_Label": [
+      29.150001525878906,
+      2.25,
+      0.014999999664723873
+    ],
+    "REVIEW_LeafModules_R15_Rest_Rig": [
+      32.099998474121094,
+      3.200000047683716,
+      0.0
+    ],
+    "ENV_LeafBlock_1m_V1_B_CrossBranches": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "ENV_LeafBlock_1m_V1_C_CrossBranches": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "REVIEW_LeafModules_R15_Rest_1p8m": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "display_root": [
+    36,
+    3.2,
+    0
+  ],
+  "scope": "Blender only, no game export/integration",
+  "historical_initial_assembly_audit": {
+    "status": "PASS",
+    "occupied_cells": 6,
+    "grid_step_m": 1,
+    "structural_bounds": [
+      [
+        -1.5,
+        -1.5,
+        0
+      ],
+      [
+        1.5,
+        1.5,
+        2
+      ]
+    ],
+    "foliage_bounds_local": [
+      [
+        -1.8970789909362793,
+        -1.9063849449157715,
+        0.0
+      ],
+      [
+        1.8949520587921143,
+        1.885561466217041,
+        2.427006721496582
+      ]
+    ],
+    "directed_internal_faces_removed": 10,
+    "cells": [
+      {
+        "cell": [
+          0,
+          0,
+          0
+        ],
+        "variant": "A",
+        "blocked_sides": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "core_triangles": 882,
+        "branch_triangles": 0
+      },
+      {
+        "cell": [
+          1,
+          0,
+          0
+        ],
+        "variant": "B",
+        "blocked_sides": [
+          1
+        ],
+        "core_triangles": 2040,
+        "branch_triangles": 36
+      },
+      {
+        "cell": [
+          -1,
+          0,
+          0
+        ],
+        "variant": "C",
+        "blocked_sides": [
+          0
+        ],
+        "core_triangles": 2040,
+        "branch_triangles": 36
+      },
+      {
+        "cell": [
+          0,
+          1,
+          0
+        ],
+        "variant": "A",
+        "blocked_sides": [
+          3
+        ],
+        "core_triangles": 2064,
+        "branch_triangles": 36
+      },
+      {
+        "cell": [
+          0,
+          -1,
+          0
+        ],
+        "variant": "C",
+        "blocked_sides": [
+          2
+        ],
+        "core_triangles": 2062,
+        "branch_triangles": 36
+      },
+      {
+        "cell": [
+          0,
+          0,
+          1
+        ],
+        "variant": "B",
+        "blocked_sides": [
+          5
+        ],
+        "core_triangles": 2034,
+        "branch_triangles": 44
+      }
+    ],
+    "total_triangles": 11310,
+    "prior_data_preserved_except_documented_display_translation": true,
+    "baseline_digest": "bf3bb821e4482948b3b75be524877b0b09231e9dcf3de047a953bdb9cc878c24"
+  },
+  "current_audit": {
+    "status": "PASS",
+    "structural_core_m": [
+      3,
+      3,
+      2
+    ],
+    "active_foliage_bounds": [
+      [
+        -1.666870355606079,
+        -1.6558973789215088,
+        0.0
+      ],
+      [
+        1.6708091497421265,
+        1.6836373805999756,
+        2.176785469055176
+      ]
+    ],
+    "total_triangles": 9834,
+    "coplanar_core_overlap_pairs": 0
+  },
+  "current_leaf_manifest": "leaf_modules_v1_manifest.json"
+}

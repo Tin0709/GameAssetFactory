@@ -1,0 +1,375 @@
+{
+  "status": "Latest requested lighter grass greens, unchanged user pixel layout/gold, black transparent; awaiting visual review",
+  "source_PNG": "textures/leaf_modules_user_provided_512.png",
+  "source_sha256": "843cebc821ccb8fdd19cd709ef648890eac2cb5fb561c50b7fbd41d3afca7ed7",
+  "current_core_PNG": "textures/leaf_modules_user_pattern_grass_green_cutout.png",
+  "current_core_sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37",
+  "current_core_image": "IMG_LeafModules_UserPattern_GrassGreenCutout",
+  "green_RGBA_map": [
+    {
+      "source": [
+        32,
+        77,
+        11,
+        255
+      ],
+      "target": [
+        70,
+        112,
+        47,
+        255
+      ]
+    },
+    {
+      "source": [
+        38,
+        96,
+        13,
+        255
+      ],
+      "target": [
+        76,
+        122,
+        49,
+        255
+      ]
+    },
+    {
+      "source": [
+        43,
+        109,
+        14,
+        255
+      ],
+      "target": [
+        84,
+        130,
+        52,
+        255
+      ]
+    },
+    {
+      "source": [
+        52,
+        131,
+        17,
+        255
+      ],
+      "target": [
+        97,
+        143,
+        60,
+        255
+      ]
+    }
+  ],
+  "palette_provenance": "Four ordered colors sampled from unchanged live grass_top_0.png / DI_V3_grass_top_0",
+  "pattern": "Exact supplied pixel positions and categories; only four greenRGB values remapped. All six goldRGB values unchanged.",
+  "alpha": "Core blackRGB\u21920, all nonblack\u21921; branches existing sprite mask AND nonblack; no translucent values",
+  "materials": "Both core and branch nativeMASK,nearest,double-sided,directRGB,basefactorwhite,noCOLOR_0",
+  "sourceUV": "UV_UserLeafTile_1RepeatPerMetre; wholelogicalface0..1,512texels/m,16coarsecells/m",
+  "preservation": "All geometry,sourceColor,UVs,2xbranchroots/crossangles,6cellplusgrid,earlierplants/wind/pausedbulk unchanged in latest palette phase",
+  "scope": "Live sameblend/window,local study restexports,no game",
+  "phase_record_historical": true,
+  "current_manifest": "leaf_modules_v1_manifest.json",
+  "current_validator": "validate_bushy_leaf_modules_v1.py",
+  "current_contract": "3meshes/3surfaces,2MASK,1PNG;outergrass-green+unchangedgold;interior.88linear;oldlargebranches/sprigshidden",
+  "current_audit": {
+    "status": "PASS",
+    "modules": [
+      {
+        "variant": "A",
+        "core_m": [
+          1,
+          1,
+          1
+        ],
+        "active_foliage_bounds": [
+          [
+            -0.6893897652626038,
+            -0.6653072237968445,
+            0.0
+          ],
+          [
+            0.6610660552978516,
+            0.6836373805999756,
+            1.180056095123291
+          ]
+        ],
+        "bushy_quads": 52,
+        "interior_quads": 36,
+        "interior_linear_albedo_factor": 0.88,
+        "total_triangles": 2176,
+        "export_meshes_surfaces": [
+          3,
+          3
+        ],
+        "materials": 2,
+        "embedded_images": 1,
+        "all_surfaces_MASK": true,
+        "texels_per_m": 512,
+        "coarse_pixel_cells_per_m": 16,
+        "UV_density_error_max": 0.00018118600098659954,
+        "evaluated_source_binary_errors_position_uv_normal": [
+          0,
+          5.21540641784668e-08,
+          5.429983139038086e-05
+        ],
+        "sha256": "f8770906332abb36a818d69f3ed2e75c02883d247725fdd1afae88c263d4e17d"
+      },
+      {
+        "variant": "B",
+        "core_m": [
+          1,
+          1,
+          1
+        ],
+        "active_foliage_bounds": [
+          [
+            -0.663922131061554,
+            -0.6587010025978088,
+            0.0
+          ],
+          [
+            0.6708091497421265,
+            0.6554388403892517,
+            1.1767853498458862
+          ]
+        ],
+        "bushy_quads": 52,
+        "interior_quads": 36,
+        "interior_linear_albedo_factor": 0.88,
+        "total_triangles": 2156,
+        "export_meshes_surfaces": [
+          3,
+          3
+        ],
+        "materials": 2,
+        "embedded_images": 1,
+        "all_surfaces_MASK": true,
+        "texels_per_m": 512,
+        "coarse_pixel_cells_per_m": 16,
+        "UV_density_error_max": 0.00015541239821459385,
+        "evaluated_source_binary_errors_position_uv_normal": [
+          0,
+          5.21540641784668e-08,
+          5.1781535148620605e-05
+        ],
+        "sha256": "d3eb88d2aba4dc4ce71219c3b35f7e2188fb781820776090a39da44a71a48a2d"
+      },
+      {
+        "variant": "C",
+        "core_m": [
+          1,
+          1,
+          1
+        ],
+        "active_foliage_bounds": [
+          [
+            -0.6668703556060791,
+            -0.6558973789215088,
+            0.0
+          ],
+          [
+            0.6626256704330444,
+            0.6496303677558899,
+            1.1656830310821533
+          ]
+        ],
+        "bushy_quads": 52,
+        "interior_quads": 36,
+        "interior_linear_albedo_factor": 0.88,
+        "total_triangles": 2138,
+        "export_meshes_surfaces": [
+          3,
+          3
+        ],
+        "materials": 2,
+        "embedded_images": 1,
+        "all_surfaces_MASK": true,
+        "texels_per_m": 512,
+        "coarse_pixel_cells_per_m": 16,
+        "UV_density_error_max": 0.00016301073901558993,
+        "evaluated_source_binary_errors_position_uv_normal": [
+          0,
+          5.960464477539063e-08,
+          5.085766315460205e-05
+        ],
+        "sha256": "91cdad6811ee24f19b7a3b825e9005ea80c393d3d40f4a1be2248e61b7ffaef9"
+      }
+    ],
+    "core_pattern_palette_alpha_preservation": {
+      "status": "PASS",
+      "modules": [
+        {
+          "variant": "A",
+          "active_core_bounds": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              1.0
+            ]
+          ],
+          "core_triangles": 2000
+        },
+        {
+          "variant": "B",
+          "active_core_bounds": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              1.0
+            ]
+          ],
+          "core_triangles": 1980
+        },
+        {
+          "variant": "C",
+          "active_core_bounds": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              1.0
+            ]
+          ],
+          "core_triangles": 1962
+        }
+      ],
+      "original_source_PNG_sha256": "843cebc821ccb8fdd19cd709ef648890eac2cb5fb561c50b7fbd41d3afca7ed7",
+      "current_RGBA_exact_four_green_remap_gold_preserved_black_cutout": true,
+      "core_RGBA_alpha_values": [
+        0,
+        1
+      ],
+      "core_transparent_fraction": 0.3046875,
+      "packed_embedded_current_PNG_match": true,
+      "UV_density_max_error": 0.00040555000765607474,
+      "assembly_active_bounds": [
+        [
+          -1.5,
+          -1.5,
+          0.0
+        ],
+        [
+          1.5,
+          1.5,
+          2.0
+        ]
+      ],
+      "assembly_active_triangles": 8962,
+      "raw_sprigs_cross_branches_preserved_but_hidden": true,
+      "preservation_changes": [
+        [
+          "objects",
+          "ENV_LeafBlock_1m_V1_A"
+        ],
+        [
+          "objects",
+          "ENV_LeafBlock_1m_V1_A_CrossBranches"
+        ],
+        [
+          "objects",
+          "ENV_LeafBlock_1m_V1_B"
+        ],
+        [
+          "objects",
+          "ENV_LeafBlock_1m_V1_B_CrossBranches"
+        ],
+        [
+          "objects",
+          "ENV_LeafBlock_1m_V1_C"
+        ],
+        [
+          "objects",
+          "ENV_LeafBlock_1m_V1_C_CrossBranches"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_0"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_0_CrossBranches"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_1"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_1_CrossBranches"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_2"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_2_CrossBranches"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_3"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_3_CrossBranches"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_4"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_4_CrossBranches"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_5"
+        ],
+        [
+          "objects",
+          "ENV_LeafCluster_Plus_Cell_5_CrossBranches"
+        ]
+      ],
+      "baseline_digest": "477638cd3b94df11eebe4d3e54f878f56449ecadd8972ccc55af9feac96b18f2",
+      "scope": "Current visible core-only Blender study; no game/bulk changes"
+    },
+    "assembly_structural_core_m": [
+      3,
+      3,
+      2
+    ],
+    "assembly_active_foliage_bounds": [
+      [
+        -1.666870355606079,
+        -1.6558973789215088,
+        0.0
+      ],
+      [
+        1.6708091497421265,
+        1.6836373805999756,
+        2.176785469055176
+      ]
+    ],
+    "assembly_total_triangles": 9834,
+    "assembly_coplanar_core_overlap_pairs": 0,
+    "prior_authored_data_preserved_in_both_additive_layer_phases": true,
+    "scope": "Latest Blender-only bushy exterior +slightly darker denser interior, no game/bulk changes"
+  }
+}

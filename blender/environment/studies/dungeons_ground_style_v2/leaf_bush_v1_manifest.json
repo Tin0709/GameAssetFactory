@@ -1,5 +1,5 @@
 {
-  "status": "Earlier bulk assembly retained as hidden comparison; latest request is individual1m leaf modules",
+  "status": "PAUSED by user; frozen hidden bulk comparison, individual1m modules are active",
   "object": "ENV_LeafBush_3x3x2m_V1",
   "source_file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\environment\\studies\\dungeons_ground_style_v2\\dungeons_ground_style_v2.blend",
   "export": "exports/leaf_bush_3x3x2m_v1.glb",
@@ -105,7 +105,7 @@
     "exterior_quads": 36,
     "triangles": 72,
     "texels_per_m": 32,
-    "texel_density_max_error": 1.1444091796875e-05,
+    "texel_density_max_error": 1.1444091796875E-05,
     "atlas_size": [
       336,
       224
@@ -124,6 +124,6 @@
       "wrapT": 33071
     }
   },
-  "silhouette": "Contiguous2\u00d72 upper mass with offset back shoulder; inset front corners avoid a full-width staircase ledge",
+  "silhouette": "Contiguous2×2 upper mass with offset back shoulder; inset front corners avoid a full-width staircase ledge",
   "current_refinement": "refine_leaf_bush_v1.py"
 }
