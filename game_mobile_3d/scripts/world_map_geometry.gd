@@ -2,7 +2,7 @@ extends Node3D
 ## Reconstructs authored meshes on the schematic grid, without scattering or grading.
 const CHUNK_SIZE := 10
 const ASSET_DIRECTORY := "res://assets/environment/world_map_v1/"
-const CUTAWAY_SHADER = preload("res://materials/world_map_cutaway.gdshader")
+const LOOK_PRESET = preload("res://assets/graphics/meadow_daylight_v1/preset.tres")
 const EPSILON := 0.00001
 const FACE_DIRECTIONS := [Vector3i.LEFT, Vector3i.RIGHT, Vector3i.FORWARD, Vector3i.BACK, Vector3i.DOWN, Vector3i.UP]
 
@@ -537,7 +537,7 @@ func update_cutaway(player_position: Vector3, camera_position: Vector3, enabled:
 
 func _make_cutaway_material(native: Material) -> ShaderMaterial:
 	var material := ShaderMaterial.new()
-	material.shader = CUTAWAY_SHADER
+	material.shader = LOOK_PRESET.cutaway_shader
 	material.set_shader_parameter("cutaway_enabled", true)
 	if native is BaseMaterial3D:
 		material.set_shader_parameter("use_albedo_texture", native.albedo_texture != null)
@@ -548,7 +548,7 @@ func _make_cutaway_material(native: Material) -> ShaderMaterial:
 		material.set_shader_parameter("native_specular", native.metallic_specular)
 		material.set_shader_parameter("use_vertex_color", native.vertex_color_use_as_albedo)
 	elif native is ShaderMaterial:
-		for parameter: String in ["atlas", "smooth_atlas", "smooth_sampling", "use_albedo_texture", "albedo_tint", "native_roughness", "native_metallic", "native_specular", "use_vertex_color", "ground_grade", "texture_contrast", "grass_variation_strength", "contact_shade_strength", "path_blending", "path_surface_map", "path_grass_atlas", "path_dirt_atlas", "path_map_origin", "path_map_size", "clouds_enabled", "cloud_time", "cloud_field"]:
+		for parameter: String in ["atlas", "smooth_atlas", "smooth_sampling", "use_albedo_texture", "albedo_tint", "native_roughness", "native_metallic", "native_specular", "use_vertex_color", "ground_grade", "texture_contrast", "grass_variation_strength", "contact_shade_strength", "plant_soil_strength", "path_blending", "path_surface_map", "path_grass_atlas", "path_dirt_atlas", "path_map_origin", "path_map_size", "clouds_enabled", "cloud_time", "cloud_field"]:
 			var value: Variant = native.get_shader_parameter(parameter)
 			if value != null:
 				material.set_shader_parameter(parameter, value)

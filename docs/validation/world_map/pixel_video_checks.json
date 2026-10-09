@@ -13,11 +13,39 @@
   "synthetic_frames": false,
   "phone_verified": false,
   "wind": {
-    "pixels_changed_over_8": 191031,
-    "mean_absolute_rgb": 6.044347511574074
+    "pixels_changed_over_8": 218523,
+    "mean_absolute_rgb": 7.618518156828704,
+    "comparison_threshold": 8,
+    "changed_above_threshold": 218523
   },
   "player_reaction": {
-    "pixels_changed_over_8": 543,
-    "mean_absolute_rgb": 0.017821180555555555
+    "pixels_changed_over_8": 630,
+    "mean_absolute_rgb": 0.022393663194444444,
+    "comparison_threshold": 8,
+    "changed_above_threshold": 630
+  },
+  "cloud_shade": {
+    "pixels_changed_over_8": 1377,
+    "mean_absolute_rgb": 0.4993804253472222,
+    "comparison_threshold": 8,
+    "changed_above_threshold": 1377
+  },
+  "contact_shade": {
+    "pixels_changed_over_8": 46244,
+    "mean_absolute_rgb": 0.9637358940972223,
+    "comparison_threshold": 2,
+    "changed_above_threshold": 118221
+  },
+  "grass_variation": {
+    "pixels_changed_over_8": 0,
+    "mean_absolute_rgb": 0.5774287471064815,
+    "comparison_threshold": 2,
+    "changed_above_threshold": 73831
+  },
+  "plant_soil": {
+    "pixels_changed_over_8": 18386,
+    "mean_absolute_rgb": 0.2511310040509259,
+    "comparison_threshold": 2,
+    "changed_above_threshold": 31720
   }
 }

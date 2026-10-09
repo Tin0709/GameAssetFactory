@@ -32,6 +32,10 @@ func run() -> void:
 		for item: Array in level.look.terrain_materials:item[3].set_shader_parameter("contact_shade_strength",0.0)
 		level.geometry.reset_cutaway_materials()
 		prefix="no_contact"
+	if "--no-soil" in args:
+		for item: Array in level.look.terrain_materials:item[3].set_shader_parameter("plant_soil_strength",0.0)
+		level.geometry.reset_cutaway_materials()
+		prefix="no_soil"
 	level.set_process(false)
 	level.player.set_physics_process(false)
 	level.player.visual.set_process(false)
@@ -55,5 +59,23 @@ func run() -> void:
 		level.set_review_view("gameplay")
 		level.geometry.update_cutaway(level.player.position,camera.position)
 		await capture(prefix+"_"+spec[0])
+	if prefix=="review":
+		await capture("contact_on")
+		for item: Array in level.look.terrain_materials:item[3].set_shader_parameter("contact_shade_strength",0.0)
+		level.geometry.reset_cutaway_materials()
+		level.geometry.update_cutaway(level.player.position,camera.position)
+		await capture("contact_off")
+		for item: Array in level.look.terrain_materials:item[3].set_shader_parameter("contact_shade_strength",.13)
+		level.player.position=level.spawn_position
+		level.set_review_view("gameplay")
+		level.geometry.reset_cutaway_materials()
+		level.geometry.update_cutaway(level.player.position,camera.position)
+		await capture("variation_on")
+		for item: Array in level.look.terrain_materials:item[3].set_shader_parameter("grass_variation_strength",0.0)
+		await capture("variation_off")
+		for item: Array in level.look.terrain_materials:item[3].set_shader_parameter("grass_variation_strength",.16)
+		await capture("soil_on")
+		for item: Array in level.look.terrain_materials:item[3].set_shader_parameter("plant_soil_strength",0.0)
+		await capture("soil_off")
 	level.queue_free();await process_frame
 	quit()

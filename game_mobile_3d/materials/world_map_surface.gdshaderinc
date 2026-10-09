@@ -9,14 +9,15 @@ uniform vec2 path_map_origin = vec2(0.0);
 uniform vec2 path_map_size = vec2(1.0);
 uniform float grass_variation_strength = 0.16;
 uniform float contact_shade_strength = 0.13;
+uniform float plant_soil_strength = 0.75;
 vec3 grade_surface_kind(vec3 source, int grade, float contrast) {
 	if (grade == 0) return source;
 	bool green = source.g > source.r * 1.13 && source.g > source.b * 1.35;
 	vec3 center = vec3(0.24, 0.15, 0.065);
-	vec3 target = vec3(0.245, 0.171, 0.082);
+	vec3 target = vec3(0.285, 0.180, 0.075);
 	if (grade == 1 && green) {
 		center = vec3(0.0856, 0.2168, 0.0342);
-		target = vec3(0.125, 0.218, 0.067);
+		target = vec3(0.107, 0.235, 0.070);
 	} else if (grade == 3) {
 		center = vec3(0.24, 0.27, 0.27);
 		target = vec3(0.180, 0.230, 0.245);
@@ -35,11 +36,42 @@ vec3 vary_grass_surface(vec3 color,vec3 world) {
 	float variation=(macro*0.72+detail*0.28-0.5)*grass_variation_strength;
 	return color*vec3(1.0+variation,1.0+variation*0.83,1.0+variation*0.55);
 }
+vec3 plant_soil_speckles(vec3 grass,vec3 soil,vec3 world,vec4 field) {
+	if (field.a<1.5 || abs(field.g-world.y)>0.02) return grass;
+	vec2 cell=floor(world.xz),local=fract(world.xz)-0.5;
+	vec2 jitter=vec2(edge_hash(cell+7.0),edge_hash(cell+19.0))-0.5;
+	float radius=length((local-jitter*0.12)*vec2(1.0,1.1));
+	float fade=1.0-smoothstep(0.18,0.58,radius);
+	vec2 patch=floor(world.xz*12.0)/12.0;
+	float spots=smoothstep(0.38,0.64,edge_noise(patch*7.7+vec2(13.0,41.0)));
+	// Root earth stays dark when the sunlit path palette is lifted.
+	return mix(grass,soil*vec3(0.72,0.78,0.86),spots*fade*plant_soil_strength);
+}
 float surface_height_at(vec2 world_xz) {
 	vec2 cell=floor(world_xz)-path_map_origin;
 	if (any(lessThan(cell,vec2(0.0))) || any(greaterThanEqual(cell,path_map_size))) return -10000.0;
 	vec4 data=texture(path_surface_map,(cell+0.5)/path_map_size);
 	return data.a>0.5 ? data.g : -10000.0;
+}
+float plant_contact_shade(vec3 world) {
+	float shade=0.0;
+	// Include neighbouring cells: the soft footprint must cross block boundaries.
+	for (int z=-1;z<=1;z++) {
+		for (int x=-1;x<=1;x++) {
+			vec2 cell=floor(world.xz)+vec2(float(x),float(z));
+			vec2 grid=cell-path_map_origin;
+			if (any(lessThan(grid,vec2(0.0))) || any(greaterThanEqual(grid,path_map_size))) continue;
+			vec4 patch=texture(path_surface_map,(grid+0.5)/path_map_size);
+			if (patch.a<1.5 || abs(patch.g-world.y)>0.02) continue;
+			vec2 jitter=(vec2(edge_hash(cell+7.0),edge_hash(cell+19.0))-0.5)*0.12;
+			float distance_to_root=length((world.xz-cell-0.5-jitter)*vec2(1.0,1.08));
+			float falloff=1.0-smoothstep(0.24,0.78,distance_to_root);
+			float strength=patch.a<2.5 ? 0.30 : (patch.a<3.5 ? 0.23 : 0.28);
+			// Max, not addition: adjacent patches form a continuous bed, never black rings.
+			shade=max(shade,falloff*strength);
+		}
+	}
+	return shade;
 }
 float terrain_contact_shade(vec3 world,vec3 normal) {
 	if (!path_blending || ground_grade==0 || contact_shade_strength<=0.0) return 1.0;
@@ -47,12 +79,7 @@ float terrain_contact_shade(vec3 world,vec3 normal) {
 	float plant_contact=0.0;
 	if (normal.y>0.9) {
 		vec2 local=fract(world.xz);
-		vec2 grid=floor(world.xz)-path_map_origin;
-		vec4 field=texture(path_surface_map,(grid+0.5)/path_map_size);
-		if (field.a>1.5 && abs(field.g-world.y)<0.02) {
-			float radius=length((local-0.5)*vec2(1.0,1.08));
-			plant_contact=(1.0-smoothstep(0.16,0.50,radius))*0.08;
-		}
+		plant_contact=plant_contact_shade(world);
 		const vec2 directions[4]=vec2[4](vec2(-1,0),vec2(1,0),vec2(0,-1),vec2(0,1));
 		vec4 distances=vec4(local.x,1.0-local.x,local.y,1.0-local.y);
 		for (int i=0;i<4;i++) {
@@ -74,6 +101,10 @@ vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	vec2 grid=floor(world.xz)-path_map_origin;
 	if (any(lessThan(grid,vec2(0.0))) || any(greaterThanEqual(grid,path_map_size))) return original;
 	vec4 field=texture(path_surface_map,(grid+0.5)/path_map_size);
+	if (ground_grade==1 && field.a>1.5) {
+		vec3 soil=grade_surface_kind(texture(path_dirt_atlas,world.xz).rgb,2,texture_contrast);
+		original=plant_soil_speckles(original,soil,world,field);
+	}
 	int mask=int(round(field.r));
 	if (mask==0 || abs(field.g-world.y)>0.02) return original;
 	vec2 local=fract(world.xz);
@@ -92,5 +123,6 @@ vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	vec3 grass=grade_surface_kind(texture(path_grass_atlas,world.xz).rgb,1,texture_contrast);
 	grass=vary_grass_surface(grass,world);
 	vec3 soil=grade_surface_kind(texture(path_dirt_atlas,world.xz).rgb,2,texture_contrast);
+	grass=plant_soil_speckles(grass,soil,world,field);
 	return mix(grass,soil,dirt);
 }

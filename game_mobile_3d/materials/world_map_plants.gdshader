@@ -36,19 +36,23 @@ void fragment() {
 	vec3 source=plant_kind==0 ? texture(atlas,UV).rgb : COLOR.rgb*albedo_tint.rgb;
 	if (plant_kind==0) {
 		float field=0.5+0.5*sin(plant_root.x*0.23+sin(plant_root.z*0.18))*sin(plant_root.z*0.27);
-		vec3 green=source*vec3(1.05,0.97,1.05)*mix(0.92,1.08,smoothstep(0.0,1.0,tip));
-		float straw=smoothstep(0.42,0.85,field)*smoothstep(0.45,0.90,tip)*0.45;
-		ALBEDO=mix(green,vec3(0.35,0.33,0.14),straw);
+		vec3 green=source*vec3(0.96,1.00,1.13)*mix(0.90,1.08,smoothstep(0.0,1.0,tip));
+		float straw=smoothstep(0.42,0.85,field)*smoothstep(0.45,0.90,tip)*0.50;
+		ALBEDO=mix(green,vec3(0.43,0.35,0.12),straw);
 	} else {
 		float luma=dot(source,vec3(0.2126,0.7152,0.0722));
 		ALBEDO=mix(vec3(luma),source,0.88);
+		// Warm the authored seed heads only; flower petal palettes stay distinct.
+		if (plant_kind==2 && source.r>source.g*0.86 && source.r>source.b*1.45) {
+			ALBEDO*=vec3(1.02,0.96,0.76);
+		}
 	}
 	vec3 face=FRONT_FACING ? NORMAL : -NORMAL;
 	ALBEDO*=world_cloud_shade(plant_root);
 	// Contact darkening is confined to attached roots, never the flower heads.
-	ALBEDO*=mix(0.87,1.0,smoothstep(0.0,0.38,tip));
+	ALBEDO*=mix(0.70,1.0,smoothstep(0.0,0.40,tip));
 	vec3 up=(VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz;
-	float soft=plant_kind==0 ? 0.72 : (plant_kind==2 ? 0.50 : 0.18);
+	float soft=plant_kind==0 ? 0.58 : (plant_kind==2 ? 0.50 : 0.18);
 	NORMAL=normalize(mix(face,up,soft));
 	ROUGHNESS=1.0;
 	SPECULAR=0.0;

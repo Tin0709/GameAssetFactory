@@ -1,10 +1,13 @@
 {
 	"actual_player_end": "Vector3(-25.346645, 3.0002735, 7.5)",
 	"audio": "Dummy in test process only",
-	"checks": 1904,
+	"checks": 2274,
+	"cloud_changing_sample_points": 206,
 	"failures": [],
 	"first_content_frame": 14,
 	"landmarks": {
+		"cloud_time_0": 293,
+		"cloud_time_30": 294,
 		"leaf_area_cut": 204,
 		"passage_off": 108,
 		"passage_on": 107,
@@ -14,5 +17,6 @@
 	},
 	"last_content_frame": 292,
 	"offline_movie_fps": 30,
+	"path_edge_cells": 1336,
 	"phone_verified": false
 }

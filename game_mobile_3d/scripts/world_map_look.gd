@@ -1,8 +1,6 @@
 extends Node
 ## WorldMap-only look. Source textures, GLBs, shared environments and actors stay intact.
-const GROUND=preload("res://materials/world_map_ground.gdshader")
-const PLANTS=preload("res://materials/world_map_plants.gdshader")
-const LEAVES=preload("res://materials/world_map_leaves.gdshader")
+const PRESET=preload("res://assets/graphics/meadow_daylight_v1/preset.tres")
 const MOTION=preload("res://scripts/grassland_motion.gd")
 var level: Node3D
 var motion=MOTION.new()
@@ -39,7 +37,7 @@ func setup(map: Node3D) -> void:
 	saved_shadow_size=int(ProjectSettings.get_setting("rendering/lights_and_shadows/directional_shadow/size",1024))
 	saved_shadow_16bit=bool(ProjectSettings.get_setting("rendering/lights_and_shadows/directional_shadow/16_bits",true))
 	saved_shadow_quality=int(ProjectSettings.get_setting("rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality",1))
-	for property: String in ["light_energy","light_color","shadow_opacity","shadow_blur","shadow_bias","shadow_normal_bias"]:
+	for property: String in PRESET.sun_settings:
 		baseline_sun[property]=level.get_node("Sun").get(property)
 	for chunk: MeshInstance3D in level.geometry.terrain_chunks:
 		for index in chunk.mesh.get_surface_count():
@@ -72,18 +70,18 @@ func make_material(native: BaseMaterial3D,kind: String) -> ShaderMaterial:
 	if materials.has(key):return materials[key]
 	var material:=ShaderMaterial.new()
 	if kind=="terrain":
-		material.shader=GROUND
+		material.shader=PRESET.ground_shader
 		var name_lower:=native.resource_name.to_lower()
 		var grade:=3 if "stone" in name_lower else (1 if "grass" in name_lower else 2)
 		material.set_shader_parameter("ground_grade",grade)
 		material.set_shader_parameter("texture_contrast",.38 if grade!=3 else .42)
 		material.set_shader_parameter("use_vertex_color",native.vertex_color_use_as_albedo)
 	elif kind.begins_with("leaf"):
-		material.shader=LEAVES
+		material.shader=PRESET.leaves_shader
 		material.set_shader_parameter("wind_strength",1.5)
 		wind_materials.append(material)
 	else:
-		material.shader=PLANTS
+		material.shader=PRESET.plants_shader
 		material.set_shader_parameter("plant_kind",0 if kind=="short_grass" else (2 if kind=="tall_grass" else 1))
 		material.set_shader_parameter("wind_strength",1.5 if kind=="tall_grass" else 2.0)
 		wind_materials.append(material)
@@ -186,33 +184,16 @@ func set_stage(value: int) -> void:
 	for item: Array in terrain_materials:item[0].surface_set_material(item[1],item[2] if stage==0 else item[3])
 	for item: Array in plant_meshes:item[0].mesh=item[1] if stage==0 else item[2]
 	for item: Array in actor_materials:item[0].set_surface_override_material(item[1],item[2] if stage==0 else item[3])
-	var environment: Environment=baseline_environment.duplicate()
+	var environment: Environment=(PRESET.environment if stage==2 else baseline_environment).duplicate()
 	level.get_node("WorldEnvironment").environment=environment
 	var sun: DirectionalLight3D=level.get_node("Sun")
 	for property: String in baseline_sun:sun.set(property,baseline_sun[property])
 	RenderingServer.directional_shadow_atlas_set_size(saved_shadow_size,saved_shadow_16bit)
 	RenderingServer.directional_soft_shadow_filter_set_quality(saved_shadow_quality as RenderingServer.ShadowQuality)
 	if stage==2:
-		# Keep +5% LUT and exposure fixed; balance direct light against cool sky fill.
-		environment.ambient_light_color=Color(.71,.78,.86)
-		environment.ambient_light_energy=.53
-		environment.glow_bloom=.04
-		environment.glow_intensity=.40
-		environment.glow_hdr_threshold=.95
-		environment.fog_depth_begin=20.0
-		environment.fog_depth_end=60.0
-		environment.fog_depth_curve=1.7
-		environment.fog_density=.13
-		environment.fog_light_color=Color(.77,.82,.79)
-		environment.fog_light_energy=.75
-		sun.light_energy=1.18
-		sun.light_color=Color(1.0,.97,.92)
-		sun.shadow_opacity=.782 # User requested +15% relative to .68; exposure stays fixed.
-		sun.shadow_blur=1.25
-		sun.shadow_bias=.12
-		sun.shadow_normal_bias=1.2
-		RenderingServer.directional_shadow_atlas_set_size(2048,false)
-		RenderingServer.directional_soft_shadow_filter_set_quality(RenderingServer.SHADOW_QUALITY_SOFT_MEDIUM)
+		for property: String in PRESET.sun_settings:sun.set(property,PRESET.sun_settings[property])
+		RenderingServer.directional_shadow_atlas_set_size(PRESET.shadow_atlas_size,PRESET.shadow_16bit)
+		RenderingServer.directional_soft_shadow_filter_set_quality(PRESET.shadow_quality as RenderingServer.ShadowQuality)
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)
 

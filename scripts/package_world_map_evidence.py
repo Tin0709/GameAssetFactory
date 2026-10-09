@@ -53,12 +53,33 @@ metrics = {"delivered_mp4_frames": count, "fps": fps, "duration_s": count/fps,
            "decoded_frames": [60,100,140,204,230,275], "synthetic_frames": False, "phone_verified": False}
 for label, a, b in [("wind", "wind_phase_0.png", "wind_phase_1.png"),
                     ("player_reaction", "passage_on.png", "passage_off.png"),
-                    ("cloud_shade", "cloud_time_0.png", "cloud_time_30.png")]:
+                    ("cloud_shade", "cloud_time_0.png", "cloud_time_30.png"),
+                    ("contact_shade", "contact_on.png", "contact_off.png"),
+                    ("grass_variation", "variation_on.png", "variation_off.png"),
+                    ("plant_soil", "soil_on.png", "soil_off.png")]:
     first = np.asarray(Image.open(RAW/a).convert("RGB"),dtype=np.int16)
     second = np.asarray(Image.open(RAW/b).convert("RGB"),dtype=np.int16)
     delta = np.max(abs(first-second),axis=2)
     metrics[label] = {"pixels_changed_over_8": int((delta>8).sum()), "mean_absolute_rgb": float(abs(first-second).mean())}
-    assert (delta>8).sum()>50, f"No visible native {label} effect"
+    threshold = 2 if label in {"contact_shade", "grass_variation", "plant_soil"} else 8
+    metrics[label]["comparison_threshold"]=threshold
+    metrics[label]["changed_above_threshold"]=int((delta>threshold).sum())
+    assert (delta>threshold).sum()>50, f"No visible native {label} effect"
     panel([RAW/a, RAW/b], [a,b], OUT/(label+"_comparison.jpg"))
 (OUT/"pixel_video_checks.json").write_text(json.dumps(metrics,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(metrics,indent=2))
+
+# Preserve the immediate previous look, not just the original raw import.
+depth = OUT / "light_depth"
+if (depth / "before_gameplay.png").exists():
+    for view in ["gameplay", "leaf_walk", "cliffs"]:
+        shutil.copyfile(RAW / f"review_{view}.png", depth / f"after_{view}.png")
+        panel([depth / f"before_{view}.png", depth / f"after_{view}.png"],
+              ["BEFORE - previous gameplay look", "REVIEW - sunlight / cool shade / meadow palette"],
+              depth / f"comparison_{view}.jpg")
+    panel([depth / "before_leaf_walk.png", depth / "lighting_leaf_walk.png", depth / "after_leaf_walk.png"],
+          ["BEFORE", "LIGHT ONLY", "LIGHT + MATERIALS"], depth / "stages.jpg")
+    panel([depth / "before_root_contact.png", depth / "after_gameplay.png"],
+          ["BEFORE - faint roots", "REVIEW - soft contact around roots"], depth / "root_contact.jpg")
+    panel([depth / "seams/before.png", depth / "seams/after.png"],
+          ["BUG - cliff fade affects floor", "FIX - floor opaque / upper walls still fade"], depth / "seams/comparison.jpg")

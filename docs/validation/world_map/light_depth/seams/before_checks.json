@@ -1,0 +1,41 @@
+{
+	"failures": [
+		"Cliff fade changes walkable floor at candidate 0",
+		"Cliff fade changes walkable floor at candidate 1",
+		"Cliff fade changes walkable floor at candidate 2",
+		"Cliff fade changes walkable floor at candidate 3",
+		"Cliff fade changes walkable floor at candidate 4"
+	],
+	"samples": [
+		{
+			"candidate": 0,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 31.0000057518482
+		},
+		{
+			"candidate": 1,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 25.9999984502792
+		},
+		{
+			"candidate": 2,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 29.9999982118607
+		},
+		{
+			"candidate": 3,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 24.9999985098839
+		},
+		{
+			"candidate": 4,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 28.0000059306622
+		},
+		{
+			"candidate": 5,
+			"ground_pixel": "(659, 455)",
+			"maximum_rgb_delta": 0.0
+		}
+	]
+}

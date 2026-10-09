@@ -27,6 +27,10 @@ Việc tích hợp R13/R15 được cho phép không đồng nghĩa mọi chuy�
 
 **Yêu cầu mới nhất cho WorldMap:** bám [màu/ánh sáng, cỏ/hoa](references/user-world-map-look-2026-10-09.png), [mặt đất mượt](references/user-world-map-ground-2026-10-09.png), mép đường đất hòa vào cỏ và chút noise màu nhẹ trên toàn map. Lá đi xuyên được; cỏ/hoa phản ứng khi đi qua rồi hồi lại. Tăng biên độ gió50% cho cỏ cao/lá,100% cho cỏ nhỏ/hoa; tăng độ đậm bóng15%; thêm bóng mây thưa trôi, không vẽ mây. Đây là các **yêu cầu đã xác nhận**, còn kết quả/thông số hiện tại vẫn là bản thử. Giữ+5%warmth, exposure.96, vị trí block/hoa và toàn bộ nguồn Blender. Xem [hợp đồng map và reuse](../../game_mobile_3d/assets/maps/world_map/README.md).
 
+Yêu cầu tiếp theo bổ sung bóng tiếp xúc nhẹ tại chân bậc, gốc cỏ/hoa và đốm đất quanh bụi. Người dùng thấy lượt đốm đất đầu quá ít/nhạt, yêu cầu **nhiều và đậm hơn**; bản hiện tại tăng mật độ và đất nâu sẫm, mép thưa dần, vẫn chờ review.
+
+Lượt tiếp theo dùng [ảnh chiều sâu ánh sáng](references/user-world-map-depth-2026-10-09.png): thử nắng dịu tách khỏi bóng mát xanh, nền bớt ô liu, đường đất vàng hơn và đầu cỏ cao bớt trắng. Người dùng yêu cầu [bóng sát gốc cỏ rõ hơn](references/user-world-map-root-contact-2026-10-09.png) để bụi có cảm giác cắm vào đất; bóng lan mềm qua ranh giới ô, không viền vuông. Đây vẫn là **bản thử chờ review**, không tăng LUT ấm vượt .05. Các đường vuông do làm mờ vách ảnh hưởng nền là lỗi cần sửa, không là hiệu ứng mỹ thuật.
+
 ## Đề xuất hướng hình ảnh: khoảng chiến đấu sáng trong môi trường xanh trầm
 
 Tham chiếu chính U1: tán cây tối làm khung, cỏ thấp dày xen cụm lá cao, hoa hồng/tím thưa, công trình đá xám; ánh sáng ấm và lớp xa sáng/nhạt hơn. Những đặc điểm này là phân tích ảnh để thử, không phải toàn bộ đã được duyệt thành quy tắc. Ảnh góc thấp không HUD có badge ESRB, phù hợp tham chiếu không khí/material; chưa xác định là gameplay hay cinematic. Giữ camera chơi hiện tại trong lượt thử.
@@ -45,6 +49,8 @@ Tham chiếu chính U1: tán cây tối làm khung, cỏ thấp dày xen cụm l
 | Combat/VFX | Muzzle/impact sắc, ngắn; hồi thân chậm hơn cú giật súng; silhouette khối/pixel thống nhất. Không tăng diện tích flash che mục tiêu. | Xem cùng cảnh một và nhiều zombie; tách nhịp anticipation, sát thương và recovery. |
 
 ## Lựa chọn thực hiện và đường lui
+
+- **Bộ dùng lại đã được yêu cầu lưu:** [Meadow Daylight V1](../../game_mobile_3d/assets/graphics/meadow_daylight_v1/README.md), preset đang dùng ở gameplay và snapshot V1 cố định cho map sau. Đây là xác nhận lưu/tái sử dụng đồ họa hiện tại; không tự nâng trạng thái mọi thử nghiệm thành đã duyệt mỹ thuật hoặc hiệu năng.
 
 - **Lượt đầu đã thử:** scene riêng kế thừa 50×50; actor/đất/cỏ/đá hiện có, bốn cây proxy opaque; ít hoa hơn, ambient giảm, sun ấm, MSAA 2×. Giữ bản gốc bằng F1 và từng bước bằng F2/F4/F5. Kết quả chỉ chứng minh được các thay đổi cụ thể trong ảnh, chưa đạt chất lượng mục tiêu cuối.
 - **Lượt hai đã thử:** ForestQualitySlice dùng cây tác giả, địa hình bậc, tường đá đổ, cỏ theo cụm; so hình học dưới đèn cũ rồi đèn mới với PCF/Filmic. F1 bản QualitySlice trước, F2 hình học mới/đèn cũ, F4 bản mới, Tab A/B. Camera/tỷ lệ actor giữ nguyên. Bộ cây có màu vertex, chưa phải texture atlas chuẩn cuối; xem [nguồn Blender, GLB và cách reuse](../../blender/environment/studies/forest_canopy_v2/README.md).

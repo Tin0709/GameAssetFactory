@@ -15,7 +15,8 @@ uniform bool use_vertex_color = false;
 uniform vec4 albedo_tint : source_color = vec4(1.0);
 uniform float native_roughness = 1.0;
 uniform float native_metallic = 0.0;
-uniform float native_specular = 0.5;
+// Match the opaque shader: unset ShaderMaterial parameters are null when copied.
+uniform float native_specular = 0.0;
 
 void vertex() {
 	cutaway_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -29,7 +30,11 @@ void fragment() {
 	if (use_vertex_color) color *= COLOR;
 	ALBEDO = shade_world_surface(color.rgb,cutaway_world,surface_top)*world_cloud_shade(cutaway_world);
 	ALBEDO*=terrain_contact_shade(cutaway_world,surface_normal);
-	ALPHA = color.a * cliff_visibility();
+	// Chunk bounds include low ground beside high walls. Fade only above the
+	// player's lower body; otherwise transparent floor exposes buried faces and
+	// draws a rectangular seam where the neighbouring chunk stays opaque.
+	float wall_height=smoothstep(cutaway_start.y-0.3,cutaway_start.y+0.3,cutaway_world.y);
+	ALPHA = color.a * mix(1.0,cliff_visibility(),wall_height);
 	ROUGHNESS = native_roughness;
 	METALLIC = native_metallic;
 	SPECULAR = native_specular;
