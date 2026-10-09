@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
+[ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
+
+[node name="WorldMap" instance=ExtResource("base")]
+script = ExtResource("map")
+
+[node name="Ground" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape3D" parent="Ground"]
+disabled = true
+
+[node name="Camera3D" parent="."]
+far = 180.0
+
+[node name="Help" parent="HUD"]
+text = "WORLD MAP"

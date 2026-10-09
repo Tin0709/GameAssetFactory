@@ -1,0 +1,3704 @@
+{
+  "schema": 1,
+  "status": "source and binary audit passed; runtime visual review is separate",
+  "source_blend": "blender/environment/studies/dungeons_ground_style_v2/dungeons_ground_style_v2.blend",
+  "source_sha256_before": "b4b7346c004af950c9cb3159e29bce1e8488beea291270ccb7b442fae0232127",
+  "blender_version": "5.2.2 LTS",
+  "metres_per_block": 1,
+  "coordinate_conversion": "Blender (X,Y,Z) -> glTF/Godot (X,Z,-Y), once; every mesh node identity",
+  "source_policy": "Saved blend opened in background with scripts disabled; duplicate evaluated/rest meshes only; no save or live-window operation",
+  "godot_import_hook": "native_asset_import.gd",
+  "godot_import_contract": "Keep texture RGB/UV/MASK, linear COLOR_0 albedo for flowers/tall grass only; short grass COLOR_0 is bend data. No lightmap unwrap, LOD generation or mesh compression. Embedded images uncompressed.",
+  "assets": {
+    "grass_block": {
+      "file": "grass_block.glb",
+      "sha256": "f8e9e547eef1651c628c047b49e296fa14035211c4ddee9db245d3ef3c540c16",
+      "byte_length": 5516,
+      "contract": "texture",
+      "bounds_godot": [
+        [
+          -0.5,
+          0.0,
+          -0.5
+        ],
+        [
+          0.5,
+          1.0,
+          0.5
+        ]
+      ],
+      "dimensions_godot": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "surface_count": 3,
+      "meshes": [
+        {
+          "source_object": "ENV_GrassBlock_DI_V3",
+          "node": "grass_block",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_GrassBlock_DI_V3",
+            "source_mesh": "ENV_GrassBlock_DI_V3_Mesh",
+            "location": [
+              7.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              1.0
+            ]
+          ],
+          "triangles": 12,
+          "surfaces": [
+            {
+              "material": "DI_V3_dirt",
+              "triangles": 2,
+              "vertices": 4,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            },
+            {
+              "material": "DI_V3_grass_top_0",
+              "triangles": 2,
+              "vertices": 4,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            },
+            {
+              "material": "DI_V3_grass_side",
+              "triangles": 8,
+              "vertices": 16,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 0,
+            "TEXCOORD_0": 0
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "DI_V3_dirt",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "DI_V3_grass_top_0",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 1
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "DI_V3_grass_side",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 2
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "dirt.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "29170ee1017c23f2d33034e9518450a1cd6194018566c6ef2eb67ff97be699f3",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        },
+        {
+          "name": "grass_top_0.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "233a13378f5376d523005dba8ee317e17b1621a5fd6c39ac1adc6fbfbcd293da",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        },
+        {
+          "name": "grass_side.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "d7d695b1df9088b9f984a4dc0eedbdaf83fe60e1c5af03e1203bebe765734507",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "dirt",
+          "mime_type": "image/png",
+          "sha256": "29170ee1017c23f2d33034e9518450a1cd6194018566c6ef2eb67ff97be699f3"
+        },
+        {
+          "name": "grass_top_0",
+          "mime_type": "image/png",
+          "sha256": "233a13378f5376d523005dba8ee317e17b1621a5fd6c39ac1adc6fbfbcd293da"
+        },
+        {
+          "name": "grass_side",
+          "mime_type": "image/png",
+          "sha256": "d7d695b1df9088b9f984a4dc0eedbdaf83fe60e1c5af03e1203bebe765734507"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "grass_slab": {
+      "file": "grass_slab.glb",
+      "sha256": "1ebab3fc308f50817e519489e7b977187b42084c448ae1f76df9f15b0ad39ef4",
+      "byte_length": 5520,
+      "contract": "texture",
+      "bounds_godot": [
+        [
+          -0.5,
+          0.0,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "dimensions_godot": [
+        1.0,
+        0.5,
+        1.0
+      ],
+      "triangles": 12,
+      "surface_count": 3,
+      "meshes": [
+        {
+          "source_object": "ENV_GrassSlab_DI_V3",
+          "node": "grass_slab",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_GrassSlab_DI_V3",
+            "source_mesh": "ENV_GrassSlab_DI_V3_Mesh",
+            "location": [
+              7.0,
+              -3.799999952316284,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              0.5
+            ]
+          ],
+          "triangles": 12,
+          "surfaces": [
+            {
+              "material": "DI_V3_dirt",
+              "triangles": 2,
+              "vertices": 4,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            },
+            {
+              "material": "DI_V3_grass_top_0",
+              "triangles": 2,
+              "vertices": 4,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            },
+            {
+              "material": "DI_V3_grass_side",
+              "triangles": 8,
+              "vertices": 16,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 0,
+            "TEXCOORD_0": 0
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "DI_V3_dirt",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "DI_V3_grass_top_0",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 1
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "DI_V3_grass_side",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 2
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "dirt.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "29170ee1017c23f2d33034e9518450a1cd6194018566c6ef2eb67ff97be699f3",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        },
+        {
+          "name": "grass_top_0.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "233a13378f5376d523005dba8ee317e17b1621a5fd6c39ac1adc6fbfbcd293da",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        },
+        {
+          "name": "grass_side.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "d7d695b1df9088b9f984a4dc0eedbdaf83fe60e1c5af03e1203bebe765734507",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "dirt",
+          "mime_type": "image/png",
+          "sha256": "29170ee1017c23f2d33034e9518450a1cd6194018566c6ef2eb67ff97be699f3"
+        },
+        {
+          "name": "grass_top_0",
+          "mime_type": "image/png",
+          "sha256": "233a13378f5376d523005dba8ee317e17b1621a5fd6c39ac1adc6fbfbcd293da"
+        },
+        {
+          "name": "grass_side",
+          "mime_type": "image/png",
+          "sha256": "d7d695b1df9088b9f984a4dc0eedbdaf83fe60e1c5af03e1203bebe765734507"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "dirt_block": {
+      "file": "dirt_block.glb",
+      "sha256": "cb56080580b0e5444594e910f44c47287c3dd4dca020a72bfe34355eb1c975bc",
+      "byte_length": 2660,
+      "contract": "texture",
+      "bounds_godot": [
+        [
+          -0.5,
+          0.0,
+          -0.5
+        ],
+        [
+          0.5,
+          1.0,
+          0.5
+        ]
+      ],
+      "dimensions_godot": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "ENV_DirtBlock_DI_V3",
+          "node": "dirt_block",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_DirtBlock_DI_V3",
+            "source_mesh": "ENV_DirtBlock_DI_V3_Mesh",
+            "location": [
+              9.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              1.0
+            ]
+          ],
+          "triangles": 12,
+          "surfaces": [
+            {
+              "material": "DI_V3_dirt",
+              "triangles": 12,
+              "vertices": 24,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 0,
+            "TEXCOORD_0": 0
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "DI_V3_dirt",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "dirt.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "29170ee1017c23f2d33034e9518450a1cd6194018566c6ef2eb67ff97be699f3",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "dirt",
+          "mime_type": "image/png",
+          "sha256": "29170ee1017c23f2d33034e9518450a1cd6194018566c6ef2eb67ff97be699f3"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "dirt_slab": {
+      "file": "dirt_slab.glb",
+      "sha256": "0bc39799422cff7966f04a9834fc7fc3393df825c43c434b0ae11cdaefa6bc87",
+      "byte_length": 2660,
+      "contract": "texture",
+      "bounds_godot": [
+        [
+          -0.5,
+          0.0,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "dimensions_godot": [
+        1.0,
+        0.5,
+        1.0
+      ],
+      "triangles": 12,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "ENV_DirtSlab_DI_V3",
+          "node": "dirt_slab",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_DirtSlab_DI_V3",
+            "source_mesh": "ENV_DirtSlab_DI_V3_Mesh",
+            "location": [
+              9.0,
+              -3.799999952316284,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              0.5
+            ]
+          ],
+          "triangles": 12,
+          "surfaces": [
+            {
+              "material": "DI_V3_dirt",
+              "triangles": 12,
+              "vertices": 24,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 0,
+            "TEXCOORD_0": 0
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "DI_V3_dirt",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "dirt.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "29170ee1017c23f2d33034e9518450a1cd6194018566c6ef2eb67ff97be699f3",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "dirt",
+          "mime_type": "image/png",
+          "sha256": "29170ee1017c23f2d33034e9518450a1cd6194018566c6ef2eb67ff97be699f3"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "stone_block": {
+      "file": "stone_block.glb",
+      "sha256": "7c75f839fe96d4ee027257cfa9991939fe48b2f9a46aa0a10efb88e1978dfac3",
+      "byte_length": 2724,
+      "contract": "texture",
+      "bounds_godot": [
+        [
+          -0.5,
+          0.0,
+          -0.5
+        ],
+        [
+          0.5,
+          1.0,
+          0.5
+        ]
+      ],
+      "dimensions_godot": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "triangles": 12,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "ENV_StoneBlock_DI_V3",
+          "node": "stone_block",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_StoneBlock_DI_V3",
+            "source_mesh": "ENV_StoneBlock_DI_V3_Mesh",
+            "location": [
+              11.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              1.0
+            ]
+          ],
+          "triangles": 12,
+          "surfaces": [
+            {
+              "material": "DI_V3_stone",
+              "triangles": 12,
+              "vertices": 24,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 0,
+            "TEXCOORD_0": 0
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "DI_V3_stone",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "stone.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "c9c556b86fd553727c6d5e4e80ab44d1cdea44c17408671cf1fda413764ce169",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "stone",
+          "mime_type": "image/png",
+          "sha256": "c9c556b86fd553727c6d5e4e80ab44d1cdea44c17408671cf1fda413764ce169"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "stone_slab": {
+      "file": "stone_slab.glb",
+      "sha256": "bcfbb389a61434d19a42fd50ae06763d127bbc5cea3ecdc2d58c78d28d55ae8d",
+      "byte_length": 2724,
+      "contract": "texture",
+      "bounds_godot": [
+        [
+          -0.5,
+          0.0,
+          -0.5
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "dimensions_godot": [
+        1.0,
+        0.5,
+        1.0
+      ],
+      "triangles": 12,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "ENV_StoneSlab_DI_V3",
+          "node": "stone_slab",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_StoneSlab_DI_V3",
+            "source_mesh": "ENV_StoneSlab_DI_V3_Mesh",
+            "location": [
+              11.0,
+              -3.799999952316284,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              0.5
+            ]
+          ],
+          "triangles": 12,
+          "surfaces": [
+            {
+              "material": "DI_V3_stone",
+              "triangles": 12,
+              "vertices": 24,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 0,
+            "TEXCOORD_0": 0
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "DI_V3_stone",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "stone.png",
+          "size": [
+            32,
+            32
+          ],
+          "sha256": "c9c556b86fd553727c6d5e4e80ab44d1cdea44c17408671cf1fda413764ce169",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 1024
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "stone",
+          "mime_type": "image/png",
+          "sha256": "c9c556b86fd553727c6d5e4e80ab44d1cdea44c17408671cf1fda413764ce169"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "leaf_a": {
+      "file": "leaf_a.glb",
+      "sha256": "488bbb822191e13a396b83b999e1369f31965b302a3f00b70adbe53fba222294",
+      "byte_length": 163400,
+      "contract": "leaf",
+      "bounds_godot": [
+        [
+          -0.6893897652626038,
+          0.0,
+          -0.6836373805999756
+        ],
+        [
+          0.6610660552978516,
+          1.180056095123291,
+          0.6653072237968445
+        ]
+      ],
+      "dimensions_godot": [
+        1.3504558205604553,
+        1.180056095123291,
+        1.34894460439682
+      ],
+      "triangles": 2176,
+      "surface_count": 3,
+      "meshes": [
+        {
+          "source_object": "ENV_LeafBlock_1m_V1_A",
+          "node": "leaf_a__core",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafBlock_1m_V1_A",
+            "source_mesh": "ENV_LeafBlock_1m_V1_A_PlanarLeafMesh",
+            "location": [
+              25.5,
+              3.200000047683716,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [
+              "REVIEW_Temporarily_Omit_Protruding_Leaves"
+            ],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              1.0
+            ]
+          ],
+          "triangles": 2000,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 2000,
+              "vertices": 4000,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.960464477539063e-08,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafBlock_1m_V1_A_BushyFoliage",
+          "node": "leaf_a__bushy",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafBlock_1m_V1_A_BushyFoliage",
+            "source_mesh": "ENV_LeafBlock_1m_V1_A_BushyLayerPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafBlock_1m_V1_A",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.6893897652626038,
+              -0.6653072237968445,
+              0.0011905431747436523
+            ],
+            [
+              0.6610660552978516,
+              0.6836373805999756,
+              1.180056095123291
+            ]
+          ],
+          "triangles": 104,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 104,
+              "vertices": 208,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.315244197845459e-05,
+            "TEXCOORD_0": 5.21540641784668e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafBlock_1m_V1_A_DenseInterior",
+          "node": "leaf_a__interior",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafBlock_1m_V1_A_DenseInterior",
+            "source_mesh": "ENV_LeafBlock_1m_V1_A_DenseInteriorPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafBlock_1m_V1_A",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.4596956968307495,
+              -0.44491857290267944,
+              0.07953356206417084
+            ],
+            [
+              0.43978387117385864,
+              0.4632341265678406,
+              0.8792569041252136
+            ]
+          ],
+          "triangles": 72,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_Interior_088Linear",
+              "triangles": 72,
+              "vertices": 144,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.429983139038086e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_LeafModules_V1_DirectLeafPattern",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "MAT_LeafModules_V1_Interior_088Linear",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            0.8799999952316284,
+            0.8799999952316284,
+            0.8799999952316284,
+            1
+          ],
+          "base_color_texture": {
+            "index": 1
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "IMG_LeafModules_UserPattern_GrassGreenCutout",
+          "size": [
+            512,
+            512
+          ],
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 182272,
+            "0.0": 79872
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "leaf_modules_user_pattern_grass_green_cutout",
+          "mime_type": "image/png",
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "leaf_b": {
+      "file": "leaf_b.glb",
+      "sha256": "dbfd44b65637000a9377fdfcf7e561c0978984d962fa84891d01a7d8a880b0d1",
+      "byte_length": 162000,
+      "contract": "leaf",
+      "bounds_godot": [
+        [
+          -0.663922131061554,
+          0.0,
+          -0.6554388403892517
+        ],
+        [
+          0.6708091497421265,
+          1.1767853498458862,
+          0.6587010025978088
+        ]
+      ],
+      "dimensions_godot": [
+        1.3347312808036804,
+        1.1767853498458862,
+        1.3141398429870605
+      ],
+      "triangles": 2156,
+      "surface_count": 3,
+      "meshes": [
+        {
+          "source_object": "ENV_LeafBlock_1m_V1_B",
+          "node": "leaf_b__core",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafBlock_1m_V1_B",
+            "source_mesh": "ENV_LeafBlock_1m_V1_B_PlanarLeafMesh",
+            "location": [
+              27.600000381469727,
+              3.200000047683716,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [
+              "REVIEW_Temporarily_Omit_Protruding_Leaves"
+            ],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              1.0
+            ]
+          ],
+          "triangles": 1980,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 1980,
+              "vertices": 3960,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.960464477539063e-08,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafBlock_1m_V1_B_BushyFoliage",
+          "node": "leaf_b__bushy",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafBlock_1m_V1_B_BushyFoliage",
+            "source_mesh": "ENV_LeafBlock_1m_V1_B_BushyLayerPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafBlock_1m_V1_B",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.663922131061554,
+              -0.6587010025978088,
+              0.015508204698562622
+            ],
+            [
+              0.6708091497421265,
+              0.6554388403892517,
+              1.1767853498458862
+            ]
+          ],
+          "triangles": 104,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 104,
+              "vertices": 208,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.1781535148620605e-05,
+            "TEXCOORD_0": 5.21540641784668e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafBlock_1m_V1_B_DenseInterior",
+          "node": "leaf_b__interior",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafBlock_1m_V1_B_DenseInterior",
+            "source_mesh": "ENV_LeafBlock_1m_V1_B_DenseInteriorPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafBlock_1m_V1_B",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.4479520320892334,
+              -0.44621938467025757,
+              0.09187713265419006
+            ],
+            [
+              0.44890162348747253,
+              0.4484913647174835,
+              0.8773640990257263
+            ]
+          ],
+          "triangles": 72,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_Interior_088Linear",
+              "triangles": 72,
+              "vertices": 144,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 4.846230149269104e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_LeafModules_V1_DirectLeafPattern",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "MAT_LeafModules_V1_Interior_088Linear",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            0.8799999952316284,
+            0.8799999952316284,
+            0.8799999952316284,
+            1
+          ],
+          "base_color_texture": {
+            "index": 1
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "IMG_LeafModules_UserPattern_GrassGreenCutout",
+          "size": [
+            512,
+            512
+          ],
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 182272,
+            "0.0": 79872
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "leaf_modules_user_pattern_grass_green_cutout",
+          "mime_type": "image/png",
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "leaf_c": {
+      "file": "leaf_c.glb",
+      "sha256": "83246255c9a25c38fa45354a35feaebbb148111eb770f717b152c0642df69442",
+      "byte_length": 160740,
+      "contract": "leaf",
+      "bounds_godot": [
+        [
+          -0.6668703556060791,
+          0.0,
+          -0.6496303677558899
+        ],
+        [
+          0.6626256704330444,
+          1.1656830310821533,
+          0.6558973789215088
+        ]
+      ],
+      "dimensions_godot": [
+        1.3294960260391235,
+        1.1656830310821533,
+        1.3055277466773987
+      ],
+      "triangles": 2138,
+      "surface_count": 3,
+      "meshes": [
+        {
+          "source_object": "ENV_LeafBlock_1m_V1_C",
+          "node": "leaf_c__core",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafBlock_1m_V1_C",
+            "source_mesh": "ENV_LeafBlock_1m_V1_C_PlanarLeafMesh",
+            "location": [
+              29.700000762939453,
+              3.200000047683716,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [
+              "REVIEW_Temporarily_Omit_Protruding_Leaves"
+            ],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              1.0
+            ]
+          ],
+          "triangles": 1962,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 1962,
+              "vertices": 3924,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.960464477539063e-08,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafBlock_1m_V1_C_BushyFoliage",
+          "node": "leaf_c__bushy",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafBlock_1m_V1_C_BushyFoliage",
+            "source_mesh": "ENV_LeafBlock_1m_V1_C_BushyLayerPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafBlock_1m_V1_C",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.6668703556060791,
+              -0.6558973789215088,
+              0.002971649169921875
+            ],
+            [
+              0.6626256704330444,
+              0.6496303677558899,
+              1.1656830310821533
+            ]
+          ],
+          "triangles": 104,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 104,
+              "vertices": 208,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.014240741729736e-05,
+            "TEXCOORD_0": 5.960464477539063e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafBlock_1m_V1_C_DenseInterior",
+          "node": "leaf_c__interior",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafBlock_1m_V1_C_DenseInterior",
+            "source_mesh": "ENV_LeafBlock_1m_V1_C_DenseInteriorPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafBlock_1m_V1_C",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.4452880024909973,
+              -0.4523027539253235,
+              0.08796995878219604
+            ],
+            [
+              0.45695817470550537,
+              0.4548749327659607,
+              0.8677133917808533
+            ]
+          ],
+          "triangles": 72,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_Interior_088Linear",
+              "triangles": 72,
+              "vertices": 144,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.085766315460205e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_LeafModules_V1_DirectLeafPattern",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "MAT_LeafModules_V1_Interior_088Linear",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            0.8799999952316284,
+            0.8799999952316284,
+            0.8799999952316284,
+            1
+          ],
+          "base_color_texture": {
+            "index": 1
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "IMG_LeafModules_UserPattern_GrassGreenCutout",
+          "size": [
+            512,
+            512
+          ],
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 182272,
+            "0.0": 79872
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "leaf_modules_user_pattern_grass_green_cutout",
+          "mime_type": "image/png",
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "leaf_slab_a": {
+      "file": "leaf_slab_a.glb",
+      "sha256": "1f0db4299f8a23359dc87a8f56aa2fed8cacc0da566599089bf7b8db23d01f0d",
+      "byte_length": 107832,
+      "contract": "leaf",
+      "bounds_godot": [
+        [
+          -0.6851192116737366,
+          0.0,
+          -0.6836373805999756
+        ],
+        [
+          0.6610660552978516,
+          0.5900280475616455,
+          0.6653072237968445
+        ]
+      ],
+      "dimensions_godot": [
+        1.3461852669715881,
+        0.5900280475616455,
+        1.34894460439682
+      ],
+      "triangles": 1382,
+      "surface_count": 3,
+      "meshes": [
+        {
+          "source_object": "ENV_LeafSlab_1x1x05m_V1_A",
+          "node": "leaf_slab_a__core",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafSlab_1x1x05m_V1_A",
+            "source_mesh": "ENV_LeafSlab_1x1x05m_V1_A_Core",
+            "location": [
+              25.5,
+              7.800000190734863,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              0.5
+            ]
+          ],
+          "triangles": 1282,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 1282,
+              "vertices": 2564,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 1.4901161193847656e-08,
+            "NORMAL": 5.960464477539063e-08,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafSlab_1x1x05m_V1_A_BushyFoliage",
+          "node": "leaf_slab_a__bushy",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafSlab_1x1x05m_V1_A_BushyFoliage",
+            "source_mesh": "ENV_LeafSlab_1x1x05m_V1_A_BushyLayerPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafSlab_1x1x05m_V1_A",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.6851192116737366,
+              -0.6653072237968445,
+              0.0011905431747436523
+            ],
+            [
+              0.6610660552978516,
+              0.6836373805999756,
+              0.5900280475616455
+            ]
+          ],
+          "triangles": 64,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 64,
+              "vertices": 128,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 4.9427151679992676e-05,
+            "TEXCOORD_0": 5.960464477539063e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafSlab_1x1x05m_V1_A_DenseInterior",
+          "node": "leaf_slab_a__interior",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafSlab_1x1x05m_V1_A_DenseInterior",
+            "source_mesh": "ENV_LeafSlab_1x1x05m_V1_A_DenseInteriorPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafSlab_1x1x05m_V1_A",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.45103490352630615,
+              -0.4433690905570984,
+              0.07953356206417084
+            ],
+            [
+              0.43978387117385864,
+              0.4632341265678406,
+              0.4690222442150116
+            ]
+          ],
+          "triangles": 36,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_Interior_088Linear",
+              "triangles": 36,
+              "vertices": 72,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 4.141032695770264e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_LeafModules_V1_DirectLeafPattern",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "MAT_LeafModules_V1_Interior_088Linear",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            0.8799999952316284,
+            0.8799999952316284,
+            0.8799999952316284,
+            1
+          ],
+          "base_color_texture": {
+            "index": 1
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "IMG_LeafModules_UserPattern_GrassGreenCutout",
+          "size": [
+            512,
+            512
+          ],
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 182272,
+            "0.0": 79872
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "leaf_modules_user_pattern_grass_green_cutout",
+          "mime_type": "image/png",
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "leaf_slab_b": {
+      "file": "leaf_slab_b.glb",
+      "sha256": "0449b3c4718f0fde60c5588ecddff3b2ca2a15f2195af1f4da0fb26bcb54540d",
+      "byte_length": 112588,
+      "contract": "leaf",
+      "bounds_godot": [
+        [
+          -0.663922131061554,
+          0.0,
+          -0.6554388403892517
+        ],
+        [
+          0.6703855395317078,
+          0.5883926749229431,
+          0.6346292495727539
+        ]
+      ],
+      "dimensions_godot": [
+        1.3343076705932617,
+        0.5883926749229431,
+        1.2900680899620056
+      ],
+      "triangles": 1450,
+      "surface_count": 3,
+      "meshes": [
+        {
+          "source_object": "ENV_LeafSlab_1x1x05m_V1_B",
+          "node": "leaf_slab_b__core",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafSlab_1x1x05m_V1_B",
+            "source_mesh": "ENV_LeafSlab_1x1x05m_V1_B_Core",
+            "location": [
+              27.600000381469727,
+              7.800000190734863,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              0.5
+            ]
+          ],
+          "triangles": 1350,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 1350,
+              "vertices": 2700,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.960464477539063e-08,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafSlab_1x1x05m_V1_B_BushyFoliage",
+          "node": "leaf_slab_b__bushy",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafSlab_1x1x05m_V1_B_BushyFoliage",
+            "source_mesh": "ENV_LeafSlab_1x1x05m_V1_B_BushyLayerPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafSlab_1x1x05m_V1_B",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.663922131061554,
+              -0.6346292495727539,
+              0.015508204698562622
+            ],
+            [
+              0.6703855395317078,
+              0.6554388403892517,
+              0.5883926749229431
+            ]
+          ],
+          "triangles": 64,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 64,
+              "vertices": 128,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.111098289489746e-05,
+            "TEXCOORD_0": 5.960464477539063e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafSlab_1x1x05m_V1_B_DenseInterior",
+          "node": "leaf_slab_b__interior",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafSlab_1x1x05m_V1_B_DenseInterior",
+            "source_mesh": "ENV_LeafSlab_1x1x05m_V1_B_DenseInteriorPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafSlab_1x1x05m_V1_B",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.4479520320892334,
+              -0.432681679725647,
+              0.09187713265419006
+            ],
+            [
+              0.44890162348747253,
+              0.4484913647174835,
+              0.49076706171035767
+            ]
+          ],
+          "triangles": 36,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_Interior_088Linear",
+              "triangles": 36,
+              "vertices": 72,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 4.846230149269104e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_LeafModules_V1_DirectLeafPattern",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "MAT_LeafModules_V1_Interior_088Linear",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            0.8799999952316284,
+            0.8799999952316284,
+            0.8799999952316284,
+            1
+          ],
+          "base_color_texture": {
+            "index": 1
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "IMG_LeafModules_UserPattern_GrassGreenCutout",
+          "size": [
+            512,
+            512
+          ],
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 182272,
+            "0.0": 79872
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "leaf_modules_user_pattern_grass_green_cutout",
+          "mime_type": "image/png",
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "leaf_slab_c": {
+      "file": "leaf_slab_c.glb",
+      "sha256": "99c05458aafa8798a32c72dfd707ee94e26c21c13773107ae47e56dfb34168dc",
+      "byte_length": 103348,
+      "contract": "leaf",
+      "bounds_godot": [
+        [
+          -0.6574304103851318,
+          0.0,
+          -0.6496303677558899
+        ],
+        [
+          0.6587779521942139,
+          0.5828415155410767,
+          0.6286457777023315
+        ]
+      ],
+      "dimensions_godot": [
+        1.3162083625793457,
+        0.5828415155410767,
+        1.2782761454582214
+      ],
+      "triangles": 1318,
+      "surface_count": 3,
+      "meshes": [
+        {
+          "source_object": "ENV_LeafSlab_1x1x05m_V1_C",
+          "node": "leaf_slab_c__core",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafSlab_1x1x05m_V1_C",
+            "source_mesh": "ENV_LeafSlab_1x1x05m_V1_C_Core",
+            "location": [
+              29.700000762939453,
+              7.800000190734863,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.5,
+              -0.5,
+              0.0
+            ],
+            [
+              0.5,
+              0.5,
+              0.5
+            ]
+          ],
+          "triangles": 1218,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 1218,
+              "vertices": 2436,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 2.9802322387695312e-08,
+            "NORMAL": 2.2706137770001078e-07,
+            "TEXCOORD_0": 5.960464477539063e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafSlab_1x1x05m_V1_C_BushyFoliage",
+          "node": "leaf_slab_c__bushy",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafSlab_1x1x05m_V1_C_BushyFoliage",
+            "source_mesh": "ENV_LeafSlab_1x1x05m_V1_C_BushyLayerPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafSlab_1x1x05m_V1_C",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.6574304103851318,
+              -0.6286457777023315,
+              0.002971649169921875
+            ],
+            [
+              0.6587779521942139,
+              0.6496303677558899,
+              0.5828415155410767
+            ]
+          ],
+          "triangles": 64,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_DirectLeafPattern",
+              "triangles": 64,
+              "vertices": 128,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 4.8844143748283386e-05,
+            "TEXCOORD_0": 4.470348358154297e-08
+          }
+        },
+        {
+          "source_object": "ENV_LeafSlab_1x1x05m_V1_C_DenseInterior",
+          "node": "leaf_slab_c__interior",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_LeafSlab_1x1x05m_V1_C_DenseInterior",
+            "source_mesh": "ENV_LeafSlab_1x1x05m_V1_C_DenseInteriorPlanes",
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": "ENV_LeafSlab_1x1x05m_V1_C",
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.4452880024909973,
+              -0.4480280578136444,
+              0.08796995878219604
+            ],
+            [
+              0.44778358936309814,
+              0.43717795610427856,
+              0.4839738607406616
+            ]
+          ],
+          "triangles": 36,
+          "surfaces": [
+            {
+              "material": "MAT_LeafModules_V1_Interior_088Linear",
+              "triangles": 36,
+              "vertices": 72,
+              "attributes": [
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.085766315460205e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_LeafModules_V1_DirectLeafPattern",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        },
+        {
+          "name": "MAT_LeafModules_V1_Interior_088Linear",
+          "alpha_mode": "MASK",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            0.8799999952316284,
+            0.8799999952316284,
+            0.8799999952316284,
+            1
+          ],
+          "base_color_texture": {
+            "index": 1
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "IMG_LeafModules_UserPattern_GrassGreenCutout",
+          "size": [
+            512,
+            512
+          ],
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 182272,
+            "0.0": 79872
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "leaf_modules_user_pattern_grass_green_cutout",
+          "mime_type": "image/png",
+          "sha256": "774f032dc1d986998c392b8629978fbabe03c48f55cbd5d1aa2d7459c5860a37"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "flower_white": {
+      "file": "flower_white.glb",
+      "sha256": "de2ecafb94c55b056aa40de059bcda6f19737974ad40936c034b880ee8e07255",
+      "byte_length": 11820,
+      "contract": "linear_color",
+      "bounds_godot": [
+        [
+          -0.45728471875190735,
+          0.0,
+          -0.3883327543735504
+        ],
+        [
+          0.43864214420318604,
+          0.47103241086006165,
+          0.4500481188297272
+        ]
+      ],
+      "dimensions_godot": [
+        0.8959268629550934,
+        0.47103241086006165,
+        0.8383808732032776
+      ],
+      "triangles": 100,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "ENV_WhiteFlowerPatch_1m_V1",
+          "node": "flower_white",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_WhiteFlowerPatch_1m_V1",
+            "source_mesh": "ENV_WhiteFlowerPatch_1m_V1_PlanarMesh",
+            "location": [
+              15.0,
+              3.200000047683716,
+              1.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.45728471875190735,
+              -0.4500481188297272,
+              0.0
+            ],
+            [
+              0.43864214420318604,
+              0.3883327543735504,
+              0.47103241086006165
+            ]
+          ],
+          "triangles": 100,
+          "surfaces": [
+            {
+              "material": "MAT_WhiteFlower_V1_LinearVertexAlbedo",
+              "triangles": 100,
+              "vertices": 200,
+              "attributes": [
+                "COLOR_0",
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0",
+                "TEXCOORD_1"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.647540092468262e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08,
+            "TEXCOORD_1": 2.9802322387695312e-08,
+            "COLOR_0": 7.248664235182112e-06
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_WhiteFlower_V1_LinearVertexAlbedo",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": null,
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [],
+      "embedded_images": [],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "flower_blue": {
+      "file": "flower_blue.glb",
+      "sha256": "7a83fe3e8b1a72f298ca1ff53242ac5bb6cdcd3fb805ba7af94542ce79196750",
+      "byte_length": 11816,
+      "contract": "linear_color",
+      "bounds_godot": [
+        [
+          -0.45728471875190735,
+          0.0,
+          -0.3883327543735504
+        ],
+        [
+          0.43864214420318604,
+          0.47103241086006165,
+          0.4500481188297272
+        ]
+      ],
+      "dimensions_godot": [
+        0.8959268629550934,
+        0.47103241086006165,
+        0.8383808732032776
+      ],
+      "triangles": 100,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "ENV_BlueFlowerPatch_1m_V1",
+          "node": "flower_blue",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_BlueFlowerPatch_1m_V1",
+            "source_mesh": "ENV_BlueFlowerPatch_1m_V1_PlanarMesh",
+            "location": [
+              17.0,
+              0.0,
+              1.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.45728471875190735,
+              -0.4500481188297272,
+              0.0
+            ],
+            [
+              0.43864214420318604,
+              0.3883327543735504,
+              0.47103241086006165
+            ]
+          ],
+          "triangles": 100,
+          "surfaces": [
+            {
+              "material": "MAT_WhiteFlower_V1_LinearVertexAlbedo",
+              "triangles": 100,
+              "vertices": 200,
+              "attributes": [
+                "COLOR_0",
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0",
+                "TEXCOORD_1"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.647540092468262e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08,
+            "TEXCOORD_1": 2.9802322387695312e-08,
+            "COLOR_0": 5.822690753609638e-06
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_WhiteFlower_V1_LinearVertexAlbedo",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": null,
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [],
+      "embedded_images": [],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "flower_red": {
+      "file": "flower_red.glb",
+      "sha256": "d05dd7202ab18eb35d81260efc8bb74455455f5b4b3378d3ee5c63c3de287ae1",
+      "byte_length": 11816,
+      "contract": "linear_color",
+      "bounds_godot": [
+        [
+          -0.45728471875190735,
+          0.0,
+          -0.3883327543735504
+        ],
+        [
+          0.43864214420318604,
+          0.47103241086006165,
+          0.4500481188297272
+        ]
+      ],
+      "dimensions_godot": [
+        0.8959268629550934,
+        0.47103241086006165,
+        0.8383808732032776
+      ],
+      "triangles": 100,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "ENV_RedFlowerPatch_1m_V1",
+          "node": "flower_red",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_RedFlowerPatch_1m_V1",
+            "source_mesh": "ENV_RedFlowerPatch_1m_V1_PlanarMesh",
+            "location": [
+              19.0,
+              0.0,
+              1.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.45728471875190735,
+              -0.4500481188297272,
+              0.0
+            ],
+            [
+              0.43864214420318604,
+              0.3883327543735504,
+              0.47103241086006165
+            ]
+          ],
+          "triangles": 100,
+          "surfaces": [
+            {
+              "material": "MAT_WhiteFlower_V1_LinearVertexAlbedo",
+              "triangles": 100,
+              "vertices": 200,
+              "attributes": [
+                "COLOR_0",
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0",
+                "TEXCOORD_1"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.647540092468262e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08,
+            "TEXCOORD_1": 2.9802322387695312e-08,
+            "COLOR_0": 6.930555423778628e-06
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_WhiteFlower_V1_LinearVertexAlbedo",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": null,
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [],
+      "embedded_images": [],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "flower_yellow": {
+      "file": "flower_yellow.glb",
+      "sha256": "068292f6d7be581ca25da1196458b5f5158ffb7ad9d6f53e5a43d5bca9d1ce72",
+      "byte_length": 11820,
+      "contract": "linear_color",
+      "bounds_godot": [
+        [
+          -0.45728471875190735,
+          0.0,
+          -0.3883327543735504
+        ],
+        [
+          0.43864214420318604,
+          0.47103241086006165,
+          0.4500481188297272
+        ]
+      ],
+      "dimensions_godot": [
+        0.8959268629550934,
+        0.47103241086006165,
+        0.8383808732032776
+      ],
+      "triangles": 100,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "ENV_YellowFlowerPatch_1m_V1",
+          "node": "flower_yellow",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_YellowFlowerPatch_1m_V1",
+            "source_mesh": "ENV_YellowFlowerPatch_1m_V1_PlanarMesh",
+            "location": [
+              21.0,
+              0.0,
+              1.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.45728471875190735,
+              -0.4500481188297272,
+              0.0
+            ],
+            [
+              0.43864214420318604,
+              0.3883327543735504,
+              0.47103241086006165
+            ]
+          ],
+          "triangles": 100,
+          "surfaces": [
+            {
+              "material": "MAT_WhiteFlower_V1_LinearVertexAlbedo",
+              "triangles": 100,
+              "vertices": 200,
+              "attributes": [
+                "COLOR_0",
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0",
+                "TEXCOORD_1"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.647540092468262e-05,
+            "TEXCOORD_0": 2.9802322387695312e-08,
+            "TEXCOORD_1": 2.9802322387695312e-08,
+            "COLOR_0": 6.289217040423428e-06
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_WhiteFlower_V1_LinearVertexAlbedo",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": null,
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [],
+      "embedded_images": [],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "tall_grass": {
+      "file": "tall_grass.glb",
+      "sha256": "73ec8f19ab5c3ad285aefce92e608da9fce552ebeb55f8a8f719005cc79554ae",
+      "byte_length": 72864,
+      "contract": "linear_color",
+      "bounds_godot": [
+        [
+          -0.6227045655250549,
+          0.0,
+          -0.587437629699707
+        ],
+        [
+          0.5938904285430908,
+          1.350000023841858,
+          0.6084151864051819
+        ]
+      ],
+      "dimensions_godot": [
+        1.2165949940681458,
+        1.350000023841858,
+        1.195852816104889
+      ],
+      "triangles": 1120,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "ENV_TallGoldenGrass_1m_V1",
+          "node": "tall_grass",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "ENV_TallGoldenGrass_1m_V1",
+            "source_mesh": "ENV_TallGoldenGrass_1m_V1_PlanarMesh",
+            "location": [
+              21.0,
+              3.200000047683716,
+              1.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": false
+          },
+          "bounds_blender": [
+            [
+              -0.6227045655250549,
+              -0.6084151864051819,
+              0.0
+            ],
+            [
+              0.5938904285430908,
+              0.587437629699707,
+              1.350000023841858
+            ]
+          ],
+          "triangles": 1120,
+          "surfaces": [
+            {
+              "material": "MAT_TallGoldenGrass_V1_LinearVertexAlbedo",
+              "triangles": 1120,
+              "vertices": 1344,
+              "attributes": [
+                "COLOR_0",
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0",
+                "TEXCOORD_1"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.5342912673950195e-05,
+            "TEXCOORD_0": 0,
+            "TEXCOORD_1": 2.9802322387695312e-08,
+            "COLOR_0": 7.523106630102916e-06
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "MAT_TallGoldenGrass_V1_LinearVertexAlbedo",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": null,
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [],
+      "embedded_images": [],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    },
+    "short_grass": {
+      "file": "short_grass.glb",
+      "sha256": "321ce0cd2ca3750f8177a3c24e204660ae0347ef680f1ec85bcd2fbba0101d15",
+      "byte_length": 37536,
+      "contract": "bend_data",
+      "bounds_godot": [
+        [
+          -0.5082321166992188,
+          0.0,
+          -0.5087777376174927
+        ],
+        [
+          0.5268169641494751,
+          0.4794924557209015,
+          0.5223070979118347
+        ]
+      ],
+      "dimensions_godot": [
+        1.0350490808486938,
+        0.4794924557209015,
+        1.0310848355293274
+      ],
+      "triangles": 216,
+      "surface_count": 1,
+      "meshes": [
+        {
+          "source_object": "REVIEW_Original_Grass_V4",
+          "node": "short_grass",
+          "native_mesh_transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation_quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ]
+          },
+          "source_display_transform_removed": {
+            "source_object": "REVIEW_Original_Grass_V4",
+            "source_mesh": "ENV_Square_Leaves_36x4_Rings_V4",
+            "location": [
+              17.0,
+              3.200000047683716,
+              1.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "parent": null,
+            "evaluated_modifiers": [],
+            "shape_key_basis_used": true
+          },
+          "bounds_blender": [
+            [
+              -0.5082321166992188,
+              -0.5223070979118347,
+              0.0
+            ],
+            [
+              0.5268169641494751,
+              0.5087777376174927,
+              0.4794924557209015
+            ]
+          ],
+          "triangles": 216,
+          "surfaces": [
+            {
+              "material": "ENV_Reference_Meadow_Opaque_V4",
+              "triangles": 216,
+              "vertices": 432,
+              "attributes": [
+                "COLOR_0",
+                "NORMAL",
+                "POSITION",
+                "TEXCOORD_0",
+                "TEXCOORD_1"
+              ]
+            }
+          ],
+          "source_to_binary_max_error": {
+            "POSITION": 0,
+            "NORMAL": 5.099177360534668e-05,
+            "TEXCOORD_0": 0,
+            "TEXCOORD_1": 2.9802322387695312e-08,
+            "COLOR_0": 7.477492955820786e-06
+          }
+        }
+      ],
+      "materials": [
+        {
+          "name": "ENV_Reference_Meadow_Opaque_V4",
+          "alpha_mode": "OPAQUE",
+          "alpha_cutoff": 0.5,
+          "double_sided": true,
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": {
+            "index": 0
+          },
+          "roughness": 1,
+          "metallic": 0
+        }
+      ],
+      "source_images": [
+        {
+          "name": "ENV_Atlas_128_Reference_V4",
+          "size": [
+            128,
+            128
+          ],
+          "sha256": "3ffaea7bbee2b4d89dfd20f307e8f04fa48535e5e2a1c6926f8c41c418793d7a",
+          "colorspace": "sRGB",
+          "alpha_counts": {
+            "1.0": 16384
+          },
+          "interpolation": "Closest"
+        }
+      ],
+      "embedded_images": [
+        {
+          "name": "environment_atlas_v4",
+          "mime_type": "image/png",
+          "sha256": "3ffaea7bbee2b4d89dfd20f307e8f04fa48535e5e2a1c6926f8c41c418793d7a"
+        }
+      ],
+      "binary_corner_audit": "PASS",
+      "native_transforms_identity": true
+    }
+  },
+  "source_sha256_after": "b4b7346c004af950c9cb3159e29bce1e8488beea291270ccb7b442fae0232127",
+  "source_unchanged": true
+}
