@@ -120,6 +120,13 @@ func build_path_map() -> void:
 		var kind:=1 if str(entry.kind).begins_with("grass_") else (2 if str(entry.kind).begins_with("dirt_") else 0)
 		tops[key]=Vector2(kind,height)
 	var directions: Array[Vector2i]=[Vector2i(-1,-1),Vector2i(0,-1),Vector2i(1,-1),Vector2i(-1,0),Vector2i(1,0),Vector2i(-1,1),Vector2i(0,1),Vector2i(1,1)]
+	var plant_contacts: Dictionary={}
+	for cell: Array in level.runtime.cells:
+		var entry: Dictionary=level.runtime.palette[cell[3]]
+		if entry.category!="plant":continue
+		var key:=Vector2i(cell[0],cell[2])
+		if tops.has(key) and is_equal_approx(tops[key].y,float(cell[1])+float(level.runtime.offset[1])):
+			plant_contacts[key]=2 if entry.kind=="short_grass" else (4 if entry.kind=="tall_grass" else 3)
 	for key: Vector2i in tops:
 		var value: Vector2=tops[key]
 		var mask:=0
@@ -128,7 +135,7 @@ func build_path_map() -> void:
 				var other: Vector2=tops.get(key+directions[index],Vector2.ZERO)
 				if other.x>0 and other.x!=value.x and is_equal_approx(other.y,value.y):mask|=1<<index
 		if mask!=0:path_edge_cells+=1
-		path_map_image.set_pixel(key.x-bounds.min[0],key.y-bounds.min[2],Color(mask,value.y,value.x,1))
+		path_map_image.set_pixel(key.x-bounds.min[0],key.y-bounds.min[2],Color(mask,value.y,value.x,float(plant_contacts.get(key,1))))
 	path_map=ImageTexture.create_from_image(path_map_image)
 
 func configure_path_materials() -> void:

@@ -45,6 +45,8 @@ void fragment() {
 	}
 	vec3 face=FRONT_FACING ? NORMAL : -NORMAL;
 	ALBEDO*=world_cloud_shade(plant_root);
+	// Contact darkening is confined to attached roots, never the flower heads.
+	ALBEDO*=mix(0.87,1.0,smoothstep(0.0,0.38,tip));
 	vec3 up=(VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz;
 	float soft=plant_kind==0 ? 0.72 : (plant_kind==2 ? 0.50 : 0.18);
 	NORMAL=normalize(mix(face,up,soft));

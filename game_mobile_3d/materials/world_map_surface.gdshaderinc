@@ -44,8 +44,15 @@ float surface_height_at(vec2 world_xz) {
 float terrain_contact_shade(vec3 world,vec3 normal) {
 	if (!path_blending || ground_grade==0 || contact_shade_strength<=0.0) return 1.0;
 	float occlusion=0.0;
+	float plant_contact=0.0;
 	if (normal.y>0.9) {
 		vec2 local=fract(world.xz);
+		vec2 grid=floor(world.xz)-path_map_origin;
+		vec4 field=texture(path_surface_map,(grid+0.5)/path_map_size);
+		if (field.a>1.5 && abs(field.g-world.y)<0.02) {
+			float radius=length((local-0.5)*vec2(1.0,1.08));
+			plant_contact=(1.0-smoothstep(0.16,0.50,radius))*0.08;
+		}
 		const vec2 directions[4]=vec2[4](vec2(-1,0),vec2(1,0),vec2(0,-1),vec2(0,1));
 		vec4 distances=vec4(local.x,1.0-local.x,local.y,1.0-local.y);
 		for (int i=0;i<4;i++) {
@@ -58,7 +65,7 @@ float terrain_contact_shade(vec3 world,vec3 normal) {
 		float above=world.y-neighbour;
 		if (above>=-0.02 && above<0.32) occlusion=(1.0-smoothstep(0.0,0.32,max(above,0.0)))*0.75;
 	}
-	return 1.0-occlusion*contact_shade_strength;
+	return (1.0-occlusion*contact_shade_strength)*(1.0-plant_contact);
 }
 vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	vec3 original=grade_surface_kind(source,ground_grade,texture_contrast);
