@@ -11,6 +11,7 @@ var map_ready := false
 var view_mode := "gameplay"
 var build_msec := 0
 var border_bodies: Array[StaticBody3D] = []
+var look
 @onready var player: CharacterBody3D = $Actors/Player
 
 func _ready() -> void:
@@ -45,7 +46,10 @@ func _ready() -> void:
 	map_ready=true
 	reset_player()
 	set_review_view("gameplay")
-	$HUD/Help.text="WORLD MAP\nWASD di chuyển · Shift chạy · R về điểm bắt đầu\nV xem toàn map · H bật/tắt sương"
+	look=load("res://scripts/world_map_look.gd").new()
+	look.name="ReferenceLook"
+	add_child(look);look.setup(self)
+	$HUD/Help.text="WORLD MAP\nWASD di chuyển · Shift chạy · R về điểm bắt đầu\nV xem toàn map · H sương · B so màu/ánh sáng"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -64,7 +68,7 @@ func source_to_world(cell: Vector3i) -> Vector3:
 func index_columns() -> void:
 	for cell: Vector3i in geometry.cells:
 		var entry: Dictionary=runtime.palette[geometry.cells[cell]]
-		if entry.category not in ["terrain","leaf"]:continue
+		if entry.category!="terrain":continue
 		var column:=Vector2i(cell.x,cell.z)
 		var low:=float(cell.y)+float(entry.base_y_offset)
 		var high:=low+float(entry.height)
@@ -148,7 +152,7 @@ func set_review_view(mode: String) -> void:
 	view_mode=mode
 	var camera: Camera3D=$Camera3D
 	if mode=="gameplay":
-		camera.size=14.5;camera.far=180.0
+		camera.size=14.5;camera.far=72.0
 		camera.rotation_degrees=Vector3(-36.315886,36.869898,0)
 		camera.position=player.position+CAMERA_OFFSET
 	else:
@@ -161,9 +165,13 @@ func set_review_view(mode: String) -> void:
 func update_status() -> void:
 	$HUD/Defeated.visible=player.is_dead
 
+func set_reference_look(enabled: bool) -> void:
+	look.set_stage(2 if enabled else 0)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not map_ready:return
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode==KEY_H:$WorldEnvironment.environment.fog_enabled=not $WorldEnvironment.environment.fog_enabled
 		if event.physical_keycode==KEY_V:set_review_view("overview" if view_mode=="gameplay" else "gameplay")
+		if event.physical_keycode==KEY_B:set_reference_look(look.stage==0)

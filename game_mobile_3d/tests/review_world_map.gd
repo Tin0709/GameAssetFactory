@@ -17,6 +17,13 @@ func run() -> void:
 	var args:=OS.get_cmdline_user_args()
 	var prefix:="baseline" if "--baseline" in args else "review"
 	if "--baseline" in args and level.has_method("set_reference_look"):level.set_reference_look(false)
+	if "--materials" in args:level.look.set_stage(1);prefix="materials"
+	if "--no-shadows" in args:level.get_node("Sun").shadow_enabled=false;prefix="no_shadows"
+	if "--bias-probe" in args:
+		level.get_node("Sun").shadow_bias=.12
+		level.get_node("Sun").shadow_normal_bias=1.2
+		prefix="bias_probe"
+	if level.get_node_or_null("ReferenceLook")!=null:level.look.freeze_motion()
 	level.set_process(false)
 	level.player.set_physics_process(false)
 	level.player.visual.set_process(false)
@@ -32,7 +39,7 @@ func run() -> void:
 	await capture(prefix+"_isometric_diagnostic")
 	env.fog_enabled=saved_fog
 	# Shared camera coordinates make before/after views reproducible.
-	for spec: Array in [["west_grove",Vector2(-26,6)],["cliffs",Vector2(24,-17)],["flowers",Vector2(-4,-8)]]:
+	for spec: Array in [["west_grove",Vector2(-26,6)],["cliffs",Vector2(40,-31)],["flowers",Vector2(-4,-8)],["leaf_walk",Vector2(-31,7)]]:
 		var point: Vector2=spec[1]
 		var height: float=level.surface_height(point.x,point.y)
 		if not is_finite(height):continue

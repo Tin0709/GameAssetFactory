@@ -4,6 +4,7 @@ const CHUNK_SIZE := 10
 const ASSET_DIRECTORY := "res://assets/environment/world_map_v1/"
 const CUTAWAY_SHADER = preload("res://materials/world_map_cutaway.gdshader")
 const EPSILON := 0.00001
+const FACE_DIRECTIONS := [Vector3i.LEFT, Vector3i.RIGHT, Vector3i.FORWARD, Vector3i.BACK, Vector3i.DOWN, Vector3i.UP]
 
 var cells: Dictionary[Vector3i, int] = {}
 var terrain_triangles := 0
@@ -17,8 +18,12 @@ var build_errors: Array[String] = []
 var _palette: Array = []
 var _offset := Vector3.ZERO
 var _occupied_halves: Dictionary[Vector3i, bool] = {}
+var _leaf_halves: Dictionary[Vector3i, Vector3i] = {}
+var _leaf_cluster_roots: Dictionary[Vector3i, float] = {}
 var _parts: Dictionary = {}
 var _terrain_sources: Dictionary = {}
+var _leaf_sources: Dictionary = {}
+var _leaf_variants: Dictionary = {}
 var _cutaway_chunks: Array[Dictionary] = []
 
 
@@ -67,14 +72,20 @@ func build(runtime: Dictionary) -> void:
 					if _occupied_halves.has(key):
 						build_errors.append("Overlapping terrain at half-cell %s." % key)
 					_occupied_halves[key] = true
+			else:
+				for half in roundi(height * 2.0):
+					_leaf_halves[Vector3i(cell.x, cell.y * 2 + roundi(base * 2.0) + half, cell.z)] = cell
 	if not build_errors.is_empty():
 		return
 	for kind: String in used_kinds:
 		_load_parts(kind)
 		if used_kinds[kind] == "terrain" and _parts.has(kind):
 			_cache_terrain(kind)
+		elif used_kinds[kind] == "leaf" and _parts.has(kind):
+			_cache_leaf(kind)
 	if not build_errors.is_empty():
 		return
+	_index_leaf_clusters()
 	for chunk: Vector2i in chunks:
 		_build_chunk(chunk, chunks[chunk])
 	set_meta("terrain_triangles", terrain_triangles)
@@ -88,8 +99,12 @@ func _clear_geometry() -> void:
 		child.queue_free()
 	cells.clear()
 	_occupied_halves.clear()
+	_leaf_halves.clear()
+	_leaf_cluster_roots.clear()
 	_parts.clear()
 	_terrain_sources.clear()
+	_leaf_sources.clear()
+	_leaf_variants.clear()
 	_cutaway_chunks.clear()
 	terrain_chunks.clear()
 	vegetation_batches.clear()
@@ -106,6 +121,47 @@ func _chunk_at(cell: Vector3i) -> Vector2i:
 
 func _placement(cell: Vector3i, entry: Dictionary) -> Vector3:
 	return Vector3(cell) + _offset + Vector3(0.5, float(entry.get("base_y_offset", 0.0)), 0.5)
+
+
+func _index_leaf_clusters() -> void:
+	# Half-voxel adjacency joins touching full/slab modules, including stacked ones.
+	# Every module in a cluster receives the same world-space wind root height.
+	var visited: Dictionary[Vector3i, bool] = {}
+	for first: Vector3i in _leaf_halves:
+		if visited.has(first):
+			continue
+		var pending: Array[Vector3i] = [first]
+		var owners: Dictionary[Vector3i, bool] = {}
+		var minimum_y := first.y
+		visited[first] = true
+		while not pending.is_empty():
+			var half: Vector3i = pending.pop_back()
+			minimum_y = mini(minimum_y, half.y)
+			owners[_leaf_halves[half]] = true
+			for direction: Vector3i in FACE_DIRECTIONS:
+				var neighbour := half + direction
+				if _leaf_halves.has(neighbour) and not visited.has(neighbour):
+					visited[neighbour] = true
+					pending.append(neighbour)
+		for owner: Vector3i in owners:
+			_leaf_cluster_roots[owner] = minimum_y * 0.5 + _offset.y
+
+
+func _leaf_contact_mask(cell: Vector3i, entry: Dictionary) -> int:
+	var height_halves := roundi(float(entry.height) * 2.0)
+	var base := Vector3i(cell.x, cell.y * 2 + roundi(float(entry.base_y_offset) * 2.0), cell.z)
+	var mask := 0
+	for face in FACE_DIRECTIONS.size():
+		var direction: Vector3i = FACE_DIRECTIONS[face]
+		if direction.y == 0:
+			for half in height_halves:
+				if _leaf_halves.has(base + direction + Vector3i(0, half, 0)):
+					mask |= 1 << (face * 2 + half)
+		else:
+			var neighbour := base + Vector3i(0, height_halves if direction.y > 0 else -1, 0)
+			if _leaf_halves.has(neighbour):
+				mask |= 1 << (face * 2)
+	return mask
 
 
 func _load_parts(kind: String) -> void:
@@ -201,6 +257,102 @@ func _source_vertex(arrays: Array, index: int, transform: Transform3D) -> Array:
 	return [vertex, normal, uv, uv2, color, tangent]
 
 
+func _cache_leaf(kind: String) -> void:
+	var parts: Array = []
+	var height := 0.5 if kind == "leaf_slab" else 1.0
+	for part: Dictionary in _parts[kind]:
+		var mesh: Mesh = part.mesh
+		var surfaces: Array[Dictionary] = []
+		for surface_index in mesh.get_surface_count():
+			var arrays := mesh.surface_get_arrays(surface_index)
+			var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+			var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+			var faces: Dictionary = {}
+			var interior: Array = []
+			var count := indices.size() if not indices.is_empty() else vertices.size()
+			for index in range(0, count, 3):
+				var triangle: Array = []
+				for corner in 3:
+					var source_index := indices[index + corner] if not indices.is_empty() else index + corner
+					triangle.append(_source_vertex(arrays, source_index, part.transform))
+				var face := _leaf_boundary_face(triangle, height)
+				if face < 0:
+					interior.append_array(triangle)
+					continue
+				if not faces.has(face):
+					faces[face] = {"whole": [], "lower": [], "upper": []}
+				faces[face].whole.append_array(triangle)
+				if FACE_DIRECTIONS[face].y == 0:
+					faces[face].lower.append_array(_clip_triangle(triangle, 0.5, true))
+					faces[face].upper.append_array(_clip_triangle(triangle, 0.5, false))
+			surfaces.append({"material": mesh.surface_get_material(surface_index), "interior": interior, "faces": faces})
+		parts.append(surfaces)
+	_leaf_sources[kind] = parts
+
+
+func _leaf_boundary_face(triangle: Array, height: float) -> int:
+	# Only exact core boundary faces participate. Foliage overhang and interior
+	# cards keep the native geometry even when two neighbouring bushes interleave.
+	for vertex: Array in triangle:
+		var point: Vector3 = vertex[0]
+		if absf(point.x) > 0.5 + EPSILON or absf(point.z) > 0.5 + EPSILON or point.y < -EPSILON or point.y > height + EPSILON:
+			return -1
+	for face in FACE_DIRECTIONS.size():
+		var direction: Vector3 = FACE_DIRECTIONS[face]
+		var coordinate := height if direction.y > 0 else (0.0 if direction.y < 0 else 0.5)
+		var on_plane := true
+		for vertex: Array in triangle:
+			if absf(direction.dot(vertex[0]) - coordinate) > EPSILON:
+				on_plane = false
+				break
+		if on_plane:
+			return face
+	return -1
+
+
+func _leaf_parts_for_contacts(kind: String, mask: int) -> Array:
+	if mask == 0:
+		return _parts[kind]
+	var key := "%s:%d" % [kind, mask]
+	if _leaf_variants.has(key):
+		return _leaf_variants[key]
+	var parts: Array[Dictionary] = []
+	for part_index in _parts[kind].size():
+		var surfaces: Array = _leaf_sources[kind][part_index]
+		var changed := false
+		for surface: Dictionary in surfaces:
+			for face: int in surface.faces:
+				if ((mask >> (face * 2)) & 3) != 0:
+					changed = true
+		if not changed:
+			parts.append(_parts[kind][part_index])
+			continue
+		var mesh := ArrayMesh.new()
+		for surface: Dictionary in surfaces:
+			var selected: Array = surface.interior.duplicate()
+			for face: int in surface.faces:
+				var hidden: int = (mask >> (face * 2)) & 3
+				var triangles: Dictionary = surface.faces[face]
+				if hidden == 0:
+					selected.append_array(triangles.whole)
+				elif FACE_DIRECTIONS[face].y == 0 and kind != "leaf_slab":
+					if hidden == 1:
+						selected.append_array(triangles.upper)
+					elif hidden == 2:
+						selected.append_array(triangles.lower)
+			if selected.is_empty():
+				continue
+			var st := SurfaceTool.new()
+			st.begin(Mesh.PRIMITIVE_TRIANGLES)
+			st.set_material(surface.material)
+			_emit_triangles(st, selected, Vector3.ZERO, false)
+			st.index()
+			st.commit(mesh)
+		parts.append({"mesh": mesh, "transform": Transform3D.IDENTITY})
+	_leaf_variants[key] = parts
+	return parts
+
+
 func _clip_triangle(triangle: Array, height: float, keep_below: bool) -> Array:
 	# Sutherland-Hodgman clipping interpolates authored UVs at the half-block seam.
 	var polygon: Array = []
@@ -230,11 +382,6 @@ func _build_chunk(chunk: Vector2i, chunk_cells: Array) -> void:
 	var origin := Vector3(chunk.x * CHUNK_SIZE, 0, chunk.y * CHUNK_SIZE)
 	var builders: Dictionary = {}
 	var plants: Dictionary = {}
-	var leaf_body := StaticBody3D.new()
-	leaf_body.name = "LeafCollision_%d_%d" % [chunk.x, chunk.y]
-	leaf_body.position = origin
-	leaf_body.collision_layer = 1
-	leaf_body.collision_mask = 0
 	for cell: Vector3i in chunk_cells:
 		var entry: Dictionary = _palette[cells[cell]]
 		var kind := str(entry.kind)
@@ -243,25 +390,16 @@ func _build_chunk(chunk: Vector2i, chunk_cells: Array) -> void:
 		if entry.category == "terrain":
 			_emit_cell(builders, kind, cell, entry, placement)
 		else:
-			if not plants.has(kind):
-				plants[kind] = []
-			plants[kind].append(placement)
+			var mask := _leaf_contact_mask(cell, entry) if entry.category == "leaf" else -1
+			var group := "%s:%d" % [kind, mask]
+			if not plants.has(group):
+				plants[group] = {"kind": kind, "mask": mask, "placements": [], "roots": []}
+			plants[group].placements.append(placement)
 			if entry.category == "leaf":
-				var height := float(entry.height)
-				var collision := CollisionShape3D.new()
-				var box := BoxShape3D.new()
-				box.size = Vector3(1, height, 1)
-				collision.shape = box
-				collision.position = placement + Vector3(0, height * 0.5, 0)
-				leaf_body.add_child(collision)
-				leaf_collision_count += 1
-	if leaf_body.get_child_count() > 0:
-		add_child(leaf_body)
-	else:
-		leaf_body.free()
+				plants[group].roots.append(_leaf_cluster_roots[cell])
 	_finish_terrain(chunk, origin, builders)
-	for kind: String in plants:
-		_build_multimeshes(chunk, origin, kind, plants[kind])
+	for group: Dictionary in plants.values():
+		_build_multimeshes(chunk, origin, group.kind, group.placements, group.mask, group.roots)
 
 
 func _emit_cell(builders: Dictionary, kind: String, cell: Vector3i, entry: Dictionary, placement: Vector3) -> void:
@@ -297,7 +435,7 @@ func _emit_cell(builders: Dictionary, kind: String, cell: Vector3i, entry: Dicti
 			_emit_triangles(builders[key], selected, placement)
 
 
-func _emit_triangles(st: SurfaceTool, vertices: Array, placement: Vector3) -> void:
+func _emit_triangles(st: SurfaceTool, vertices: Array, placement: Vector3, count_terrain: bool = true) -> void:
 	for index in range(0, vertices.size(), 3):
 		var a: Vector3 = vertices[index][0]
 		var b: Vector3 = vertices[index + 1][0]
@@ -313,8 +451,9 @@ func _emit_triangles(st: SurfaceTool, vertices: Array, placement: Vector3) -> vo
 			st.set_color(vertex[4])
 			st.set_tangent(vertex[5])
 			st.add_vertex(vertex[0] + placement)
-		terrain_triangles += 1
-		terrain_face_area += area
+		if count_terrain:
+			terrain_triangles += 1
+			terrain_face_area += area
 
 
 func _finish_terrain(chunk: Vector2i, origin: Vector3, builders: Dictionary) -> void:
@@ -347,21 +486,27 @@ func _finish_terrain(chunk: Vector2i, origin: Vector3, builders: Dictionary) -> 
 	_cutaway_chunks.append({"visual": visual, "caster": caster, "active": false, "materials": []})
 
 
-func _build_multimeshes(chunk: Vector2i, origin: Vector3, kind: String, placements: Array) -> void:
+func _build_multimeshes(chunk: Vector2i, origin: Vector3, kind: String, placements: Array, contact_mask: int = -1, wind_roots: Array = []) -> void:
 	var part_index := 0
-	for part: Dictionary in _parts[kind]:
+	var parts: Array = _parts[kind] if contact_mask < 0 else _leaf_parts_for_contacts(kind, contact_mask)
+	for part: Dictionary in parts:
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.use_custom_data = not wind_roots.is_empty()
 		mm.mesh = part.mesh
 		mm.instance_count = placements.size()
 		for index in placements.size():
 			mm.set_instance_transform(index, Transform3D(Basis.IDENTITY, placements[index]) * part.transform)
+			if mm.use_custom_data:
+				mm.set_instance_custom_data(index, Color(wind_roots[index], 0, 0, 0))
 		var visual := MultiMeshInstance3D.new()
-		visual.name = "%s_%d_%d_%d" % [kind, chunk.x, chunk.y, part_index]
+		visual.name = "%s_%d_%d_%d_%d" % [kind, chunk.x, chunk.y, part_index, contact_mask]
 		visual.multimesh = mm
 		visual.position = origin
 		visual.set_meta("kind", kind)
 		visual.set_meta("source_part", part_index)
+		if contact_mask >= 0:
+			visual.set_meta("leaf_contact_mask", contact_mask)
 		add_child(visual)
 		vegetation_batches.append(visual)
 		part_index += 1
@@ -402,4 +547,21 @@ func _make_cutaway_material(native: Material) -> ShaderMaterial:
 		material.set_shader_parameter("native_metallic", native.metallic)
 		material.set_shader_parameter("native_specular", native.metallic_specular)
 		material.set_shader_parameter("use_vertex_color", native.vertex_color_use_as_albedo)
+	elif native is ShaderMaterial:
+		for parameter: String in ["atlas", "smooth_atlas", "smooth_sampling", "use_albedo_texture", "albedo_tint", "native_roughness", "native_metallic", "native_specular", "use_vertex_color", "ground_grade", "texture_contrast"]:
+			var value: Variant = native.get_shader_parameter(parameter)
+			if value != null:
+				material.set_shader_parameter(parameter, value)
 	return material
+
+
+func reset_cutaway_materials() -> void:
+	# Scene-local A/B material edits must also invalidate any cached fade copies.
+	for item: Dictionary in _cutaway_chunks:
+		var visual: MeshInstance3D = item.visual
+		for surface in visual.mesh.get_surface_count():
+			visual.set_surface_override_material(surface, null)
+		visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		item.caster.visible = false
+		item.active = false
+		item.materials.clear()

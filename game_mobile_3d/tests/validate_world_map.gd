@@ -40,7 +40,7 @@ func run() -> void:
 	check(ProjectSettings.get_setting("application/run/main_scene")=="res://scenes/WorldMap.tscn","F5 uses authored World Map")
 	check(geometry.cells.size()==42996,"All original non-air cells retained logically")
 	check(absf(geometry.terrain_face_area-float(manifest.expected_terrain_faces.total_area_m2))<.01,"Rendered area matches independent half-voxel audit")
-	check(geometry.leaf_collision_count==117,"117 full/half leaf cores collide")
+	check(geometry.leaf_collision_count==0,"User requested walk-through leaves: no solid cores")
 	var expected_counts: Dictionary={}
 	for cell: Array in data.cells:
 		var entry: Dictionary=data.palette[int(cell[3])]

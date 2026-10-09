@@ -1,5 +1,6 @@
 extends SceneTree
 ## Measures rendered triangles, including contacts that span spatial chunks.
+## Use Mobile/D3D12 with Dummy audio; headless dummy cannot read MultiMesh transforms.
 const GEOMETRY = preload("res://scripts/world_map_geometry.gd")
 const FULL := {"kind": "leaf", "category": "leaf", "height": 1.0, "base_y_offset": 0.0}
 const SLAB := {"kind": "leaf_slab", "category": "leaf", "height": 0.5, "base_y_offset": 0.0}
@@ -74,15 +75,24 @@ func check_pair(records: Array, contact_x: float, label: String, expected_upper:
 	check(geometry.terrain_triangles == 0 and geometry.terrain_face_area == 0, label + " leaves terrain counters unchanged")
 	var source_core_count := 0
 	for batch: MultiMeshInstance3D in geometry.vegetation_batches:
+		var part: int = batch.get_meta("source_part")
+		var kind: String = batch.get_meta("kind")
+		var native: Mesh = geometry.get("_parts")[kind][part].mesh
+		if part != 1:
+			check(batch.multimesh.mesh == native, label + " preserves native foliage mesh " + str(part))
+		for surface in batch.multimesh.mesh.get_surface_count():
+			check(batch.multimesh.mesh.surface_get_material(surface) == native.surface_get_material(surface), label + " preserves native materials")
 		if batch.get_meta("source_part") == 0:
 			source_core_count += batch.multimesh.instance_count
 	check(source_core_count == 2, label + " keeps both logical core instances")
 	geometry.free()
 
 func run() -> void:
+	if DisplayServer.get_name() == "headless":
+		push_error("Leaf contact measurements require a real rendering backend; headless dummy returns identity MultiMesh transforms.")
+		quit(2)
+		return
 	var isolated = await fixture([[0, 0, 0, 0]])
-	for batch: MultiMeshInstance3D in isolated.vegetation_batches:
-		print("LEAF_SOURCE ", batch.name, " transform=", batch.transform * batch.multimesh.get_instance_transform(0), " aabb=", batch.multimesh.mesh.get_aabb(), " vertices=", batch.multimesh.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].slice(0, 4))
 	var upper_baseline := plane_area(isolated, 0, 1.0, 0.5, 1.0)
 	var lower_baseline := plane_area(isolated, 0, 1.0, 0.0, 0.5)
 	check(upper_baseline > 0.1 and lower_baseline > 0.1, "Source leaf has measurable contact geometry")
@@ -99,12 +109,22 @@ func run() -> void:
 	var stacked = await fixture([[0, 0, 0, 0], [0, 1, 0, 1]])
 	check(plane_area(stacked, 1, 1.0, 0.0, 2.0) < 0.00001, "Vertical full/slab removes shared top/bottom")
 	stacked.free()
+	var clusters = await fixture([[9, 3, 0, 0], [10, 3, 0, 0], [10, 4, 0, 0], [12, 5, 0, 1]])
+	for batch: MultiMeshInstance3D in clusters.vegetation_batches:
+		check(batch.multimesh.use_custom_data, "Leaf batch enables custom wind data")
+		for instance in batch.multimesh.instance_count:
+			var origin: Vector3 = batch.transform * batch.multimesh.get_instance_transform(instance).origin
+			var root_height := batch.multimesh.get_instance_custom_data(instance).r
+			check(is_equal_approx(root_height, 3.0 if origin.x < 11.0 else 5.0), "Stacked/cross-chunk cluster shares correct minimum world height")
+	check(clusters.find_children("*", "StaticBody3D", true, false).is_empty(), "Leaf fixtures contain no collision bodies")
+	clusters.free()
 	var actual = GEOMETRY.new()
 	root.add_child(actual)
 	actual.build(JSON.parse_string(FileAccess.get_file_as_string("res://assets/maps/world_map/runtime.json")))
 	await process_frame
 	check(actual.build_errors.is_empty(), "Actual map builds")
 	check(actual.leaf_collision_count == 0, "Actual map leaves are walk-through")
+	check(actual.placement_counts.get("leaf", 0) + actual.placement_counts.get("leaf_slab", 0) == 117, "Actual map retains all 117 leaf placements")
 	# The reported adjacent source pair is translated by (-77,0,-56).
 	var actual_contact := plane_area(actual, 0, -31.0, 3.0, 4.0)
 	# Other exposed faces can share X; verify this pair in an isolated exact fixture.
