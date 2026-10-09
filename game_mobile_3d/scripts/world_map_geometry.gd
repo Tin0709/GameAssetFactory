@@ -2,7 +2,7 @@ extends Node3D
 ## Reconstructs authored meshes on the schematic grid, without scattering or grading.
 const CHUNK_SIZE := 10
 const ASSET_DIRECTORY := "res://assets/environment/world_map_v1/"
-const LOOK_PRESET = preload("res://assets/graphics/meadow_daylight_v4/preset.tres")
+const LOOK_PRESET = preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const EPSILON := 0.00001
 const FACE_DIRECTIONS := [Vector3i.LEFT, Vector3i.RIGHT, Vector3i.FORWARD, Vector3i.BACK, Vector3i.DOWN, Vector3i.UP]
 

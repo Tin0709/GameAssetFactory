@@ -1,0 +1,33 @@
+{
+	"cutaway_include": "res://materials/world_map_surface_v4.gdshaderinc",
+	"device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+	"failures": [
+		"Contact core should anchor the block directly to its support",
+		"Contact core should recover quickly rather than form a broad dark skirt",
+		"Outer ground should not carry a wide floating halo",
+		"Wall foot shade should not darken half the riser"
+	],
+	"linear_pixel_values": {
+		"above_neighbour": 1.0,
+		"concave": 0.723055124282837,
+		"convex": 1.0,
+		"diagonal_far": 1.0,
+		"diagonal_tip": 0.701101899147034,
+		"flat_left": 1.0,
+		"flat_right": 1.0,
+		"ground_clear": 1.0,
+		"ground_corner": 0.701101899147034,
+		"ground_foot": 0.701101899147034,
+		"ground_near": 0.723055124282837,
+		"ground_outer": 0.879622459411621,
+		"tip_cardinal": 0.701101899147034,
+		"vertical_above": 0.723055124282837,
+		"vertical_below": 0.723055124282837,
+		"wall_clear": 1.0,
+		"wall_foot": 0.7304607629776,
+		"wall_outer": 0.921581923961639
+	},
+	"maximum_cutaway_delta": 0.0,
+	"renderer": "mobile",
+	"shader_include": "res://materials/world_map_surface_v4.gdshaderinc"
+}

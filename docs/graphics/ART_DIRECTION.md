@@ -54,6 +54,8 @@ Tham chiếu chính U1: tán cây tối làm khung, cỏ thấp dày xen cụm l
 
 ## Lựa chọn thực hiện và đường lui
 
+- **Mốc đồ họa lưu mới nhất để dùng nhiều map Litematica:** theo yêu cầu trực tiếp, lấy [Meadow Daylight V5](../../game_mobile_3d/assets/graphics/meadow_daylight_v5/README.md) làm điểm xuất phát. Snapshot `exports/graphics/meadow_daylight_v5.zip` giữ nguyên công thức và source hashes; trường shading phải được dựng lại từ từng map. Không ghi đè V1/V5 và không suy diễn yêu cầu reuse thành duyệt mỹ thuật/hiệu năng.
+
 - **Bộ dùng lại đã được yêu cầu lưu:** [Meadow Daylight V1](../../game_mobile_3d/assets/graphics/meadow_daylight_v1/README.md), preset đang dùng ở gameplay và snapshot V1 cố định cho map sau. Đây là xác nhận lưu/tái sử dụng đồ họa hiện tại; không tự nâng trạng thái mọi thử nghiệm thành đã duyệt mỹ thuật hoặc hiệu năng.
 
 - **Lượt đầu đã thử:** scene riêng kế thừa 50×50; actor/đất/cỏ/đá hiện có, bốn cây proxy opaque; ít hoa hơn, ambient giảm, sun ấm, MSAA 2×. Giữ bản gốc bằng F1 và từng bước bằng F2/F4/F5. Kết quả chỉ chứng minh được các thay đổi cụ thể trong ảnh, chưa đạt chất lượng mục tiêu cuối.

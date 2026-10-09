@@ -1,0 +1,77 @@
+{
+  "phone_verified": false,
+  "synthetic_frames": false,
+  "views": {
+    "gameplay": {
+      "mean_abs_rgb_delta_255": [
+        0.0006868489583333334,
+        0.00027886284722222223,
+        0.00014322916666666667
+      ],
+      "changed_pixels": 13
+    },
+    "stairs": {
+      "mean_abs_rgb_delta_255": [
+        1.05576171875,
+        1.1656987847222222,
+        1.0387543402777777
+      ],
+      "changed_pixels": 199827
+    },
+    "stone": {
+      "mean_abs_rgb_delta_255": [
+        0.95041015625,
+        1.0423404947916666,
+        0.9406293402777778
+      ],
+      "changed_pixels": 181176
+    },
+    "cliffs": {
+      "mean_abs_rgb_delta_255": [
+        0.5137120225694445,
+        0.5484299045138888,
+        0.47526801215277775
+      ],
+      "changed_pixels": 102393
+    },
+    "grove": {
+      "mean_abs_rgb_delta_255": [
+        0.07430230034722222,
+        0.08951714409722222,
+        0.05432834201388889
+      ],
+      "changed_pixels": 18946
+    }
+  },
+  "probe": {
+    "cutaway_include": "res://materials/world_map_surface_v5.gdshaderinc",
+    "device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "failures": [],
+    "linear_pixel_values": {
+      "above_neighbour": 1.0,
+      "concave": 0.723055124282837,
+      "convex": 1.0,
+      "diagonal_far": 1.0,
+      "diagonal_tip": 0.651405692100525,
+      "flat_left": 1.0,
+      "flat_right": 1.0,
+      "ground_clear": 1.0,
+      "ground_corner": 0.623960375785828,
+      "ground_foot": 0.651405692100525,
+      "ground_near": 0.896269381046295,
+      "ground_outer": 1.0,
+      "tip_cardinal": 0.651405692100525,
+      "vertical_above": 0.723055124282837,
+      "vertical_below": 0.723055124282837,
+      "wall_clear": 1.0,
+      "wall_foot": 0.723055124282837,
+      "wall_outer": 1.0
+    },
+    "maximum_cutaway_delta": 0.0,
+    "renderer": "mobile",
+    "shader_include": "res://materials/world_map_surface_v5.gdshaderinc"
+  },
+  "preserved_source_glbs": 18,
+  "frozen_v1_sha256": "a6521b281f82bd3ab9be46a62d303cf968affb842b658a4d4120508f868963a4",
+  "sun_settings_unchanged": true
+}
