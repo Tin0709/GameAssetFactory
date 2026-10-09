@@ -89,6 +89,30 @@ func run() -> void:
 	var start: Vector3=player.position
 	Input.action_press("move_right");await tick(30);Input.action_release("move_right");await tick(20)
 	check(player.position.distance_to(start)>1.0,"WASD moves on authored map")
+	# Exercise a real authored half-step, not an extra test platform.
+	var step_found:=false
+	var stepped:=false
+	for column: Vector2i in scene.columns:
+		var high: float=scene.columns[column]
+		if not is_equal_approx(fposmod(high,1.0),.5):continue
+		var target: Vector3=scene.source_to_world(Vector3i(column.x,0,column.y));target.y=high
+		if absf(target.x)>45 or absf(target.z)>45 or not scene.clear_standing_space(column,high):continue
+		for direction: Vector2i in [Vector2i.LEFT,Vector2i.RIGHT,Vector2i.UP,Vector2i.DOWN]:
+			var low: float=scene.columns.get(column+direction,-INF)
+			if not is_equal_approx(high-low,.5) or not scene.clear_standing_space(column+direction,low):continue
+			step_found=true
+			player.position=target+Vector3(direction.x,-.48,direction.y);player.velocity=Vector3.ZERO
+			await tick(12)
+			var action: String="move_right" if direction.x<0 else ("move_left" if direction.x>0 else ("move_backward" if direction.y<0 else "move_forward"))
+			Input.action_press(action)
+			for step_tick in 40:
+				await physics_frame
+				if absf(player.position.y-high)<.025 and Vector2(player.position.x-target.x,player.position.z-target.z).length()<.45:
+					stepped=true;break
+			Input.action_release(action)
+			break
+		if step_found:break
+	check(step_found and stepped,"Existing controller walks smoothly onto an actual mapped half-block")
 	# Real character at high clear altitude tests each side/corner without terrain masking the boundary.
 	for direction in [Vector2(1,0),Vector2(-1,0),Vector2(0,1),Vector2(0,-1),Vector2(1,1),Vector2(-1,1),Vector2(1,-1),Vector2(-1,-1)]:
 		player.position=Vector3(direction.x*48.5,58,direction.y*48.5);player.velocity=Vector3.ZERO

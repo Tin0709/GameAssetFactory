@@ -1,0 +1,23 @@
+{
+  "delivered_mp4_frames": 292,
+  "fps": 30.0,
+  "duration_s": 9.733333333333333,
+  "decoded_frames": [
+    60,
+    100,
+    140,
+    204,
+    230,
+    275
+  ],
+  "synthetic_frames": false,
+  "phone_verified": false,
+  "wind": {
+    "pixels_changed_over_8": 191031,
+    "mean_absolute_rgb": 6.044347511574074
+  },
+  "player_reaction": {
+    "pixels_changed_over_8": 543,
+    "mean_absolute_rgb": 0.017821180555555555
+  }
+}

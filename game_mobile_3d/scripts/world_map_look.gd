@@ -46,7 +46,7 @@ func setup(map: Node3D) -> void:
 			copies[key]=review
 		plant_meshes.append([batch.multimesh,native,copies[key]])
 		# Bound all wind/player deformation so chunk culling cannot trim tips.
-		batch.extra_cull_margin=.3
+		batch.extra_cull_margin=.65 if kind=="tall_grass" else .3
 	previous_position=level.player.position
 	set_stage(2)
 

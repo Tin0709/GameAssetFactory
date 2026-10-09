@@ -1,0 +1,18 @@
+{
+	"actual_player_end": "Vector3(-25.346645, 3.0002735, 7.5)",
+	"audio": "Dummy in test process only",
+	"checks": 1904,
+	"failures": [],
+	"first_content_frame": 14,
+	"landmarks": {
+		"leaf_area_cut": 204,
+		"passage_off": 108,
+		"passage_on": 107,
+		"walk_through_grass_flowers": 76,
+		"wind_phase_0": 15,
+		"wind_phase_1": 16
+	},
+	"last_content_frame": 292,
+	"offline_movie_fps": 30,
+	"phone_verified": false
+}

@@ -1,0 +1,29 @@
+{
+	"build_msec": 848,
+	"checks": 7093,
+	"column_raycasts": 394,
+	"failures": [],
+	"native_transform_readback": true,
+	"phone_verified": false,
+	"placement_counts": {
+		"dirt_block": 12677,
+		"dirt_slab": 40,
+		"flower_blue": 36,
+		"flower_red": 26,
+		"flower_white": 64,
+		"flower_yellow": 257,
+		"grass_block": 8617,
+		"grass_slab": 238,
+		"leaf": 73,
+		"leaf_slab": 44,
+		"short_grass": 2158,
+		"stone_block": 17538,
+		"stone_slab": 106,
+		"tall_grass": 363
+	},
+	"renderer": "mobile",
+	"source_sha256": "055e5e363c65fd6380fb452347279d23dc7780b977773fba700afdf256dad5ae",
+	"terrain_area_m2": 32974.0,
+	"terrain_chunks": 143,
+	"terrain_triangles": 67694
+}

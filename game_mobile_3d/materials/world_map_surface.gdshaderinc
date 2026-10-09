@@ -8,7 +8,7 @@ vec3 shade_world_surface(vec3 source) {
 	vec3 target = vec3(0.245, 0.171, 0.082);
 	if (ground_grade == 1 && green) {
 		center = vec3(0.0856, 0.2168, 0.0342);
-		target = vec3(0.120, 0.190, 0.067);
+		target = vec3(0.125, 0.218, 0.067);
 	} else if (ground_grade == 3) {
 		center = vec3(0.24, 0.27, 0.27);
 		target = vec3(0.180, 0.230, 0.245);
