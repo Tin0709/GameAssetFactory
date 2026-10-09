@@ -1,6 +1,6 @@
 extends Node
 ## WorldMap-only look. Source textures, GLBs, shared environments and actors stay intact.
-const PRESET=preload("res://assets/graphics/meadow_daylight_v1/preset.tres")
+const PRESET=preload("res://assets/graphics/meadow_daylight_v3/preset.tres")
 const MOTION=preload("res://scripts/grassland_motion.gd")
 var level: Node3D
 var motion=MOTION.new()
@@ -145,6 +145,18 @@ func configure_path_materials() -> void:
 		if native.resource_name=="DI_V3_dirt":dirt=item[3].get_shader_parameter("atlas")
 	for item: Array in terrain_materials:
 		var material: ShaderMaterial=item[3]
+		material.set_shader_parameter("path_blending",grass!=null and dirt!=null)
+		material.set_shader_parameter("path_surface_map",path_map)
+		material.set_shader_parameter("path_map_origin",path_map_origin)
+		material.set_shader_parameter("path_map_size",path_map_size)
+		material.set_shader_parameter("path_grass_atlas",grass)
+		material.set_shader_parameter("path_dirt_atlas",dirt)
+	# Short/tall grass adopt the ground palette; flower colors stay unchanged.
+	for material: ShaderMaterial in wind_materials:
+		if material.shader!=PRESET.plants_shader or material.get_shader_parameter("plant_kind") not in [0,2]:continue
+		material.set_shader_parameter("ground_blending",grass!=null and dirt!=null)
+		material.set_shader_parameter("ground_grade",1)
+		material.set_shader_parameter("texture_contrast",.38)
 		material.set_shader_parameter("path_blending",grass!=null and dirt!=null)
 		material.set_shader_parameter("path_surface_map",path_map)
 		material.set_shader_parameter("path_map_origin",path_map_origin)

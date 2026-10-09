@@ -1,6 +1,6 @@
 # Meadow Daylight V1 — bộ đồ họa tái sử dụng
 
-Lưu theo yêu cầu người dùng ngày 2026-10-09. **Đã yêu cầu lưu để dùng cho map sau**; không tự suy diễn rằng mọi chi tiết mỹ thuật hoặc hiệu năng điện thoại đã được duyệt. Gameplay chính WorldMap dùng trực tiếp `preset.tres`; môi trường được duplicate khi chạy để không sửa resource chung.
+Lưu theo yêu cầu người dùng ngày 2026-10-09. **Đã yêu cầu lưu để dùng cho map sau**; không tự suy diễn rằng mọi chi tiết mỹ thuật hoặc hiệu năng điện thoại đã được duyệt. WorldMap nay thử [V3 hòa màu cỏ cao](../meadow_daylight_v3/README.md), kế tiếp [V2 cỏ thấp](../meadow_daylight_v2/README.md); cả hai giữ nguyên đèn/environment V1. Preset và ZIP V1 được bảo toàn; môi trường được duplicate khi chạy để không sửa resource chung.
 
 ## Có gì trong bản lưu
 

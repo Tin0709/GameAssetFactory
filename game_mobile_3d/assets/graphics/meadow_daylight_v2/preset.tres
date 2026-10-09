@@ -1,0 +1,31 @@
+[gd_resource type="Resource" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/environment_look_preset.gd" id="script"]
+[ext_resource type="Environment" path="res://assets/graphics/meadow_daylight_v1/environment.tres" id="environment"]
+[ext_resource type="Shader" path="res://materials/world_map_ground.gdshader" id="ground"]
+[ext_resource type="Shader" path="res://materials/world_map_plants_v2.gdshader" id="plants"]
+[ext_resource type="Shader" path="res://materials/world_map_leaves.gdshader" id="leaves"]
+[ext_resource type="Shader" path="res://materials/world_map_cutaway.gdshader" id="cutaway"]
+
+[resource]
+resource_name = "Meadow Daylight V2 — Grass Blend Review"
+script = ExtResource("script")
+environment = ExtResource("environment")
+sun_settings = {
+"light_energy": 1.5,
+"light_color": Color(1, 0.975, 0.925, 1),
+"rotation_degrees": Vector3(-50, -38, 0),
+"shadow_enabled": true,
+"directional_shadow_mode": 0,
+"directional_shadow_max_distance": 29.0,
+"shadow_opacity": 0.782,
+"shadow_blur": 1.25,
+"shadow_bias": 0.12,
+"shadow_normal_bias": 1.2
+}
+shadow_atlas_size = 2048
+shadow_16bit = false
+ground_shader = ExtResource("ground")
+plants_shader = ExtResource("plants")
+leaves_shader = ExtResource("leaves")
+cutaway_shader = ExtResource("cutaway")

@@ -33,6 +33,8 @@ Lượt tiếp theo dùng [ảnh chiều sâu ánh sáng](references/user-world-
 
 ## Đề xuất hướng hình ảnh: khoảng chiến đấu sáng trong môi trường xanh trầm
 
+**Xác nhận mới nhất về cỏ (2026-10-09):** sau khi thử hòa chân cỏ thấp với màu/shading nền và chuyển xanh nhẹ lên ngọn, người dùng nói “rất đẹp” và gửi [ảnh kết quả](references/user-world-map-short-grass-approved-2026-10-09.png). Đây là xác nhận cho phần cỏ thấp của V2, không phải duyệt lại toàn bộ ánh sáng/hiệu năng. Người dùng yêu cầu áp dụng tương tự cho cỏ cao; V3 giữ bông vàng, hoa và cỏ thấp đã thích, còn phần thân/lá cỏ cao mới chờ review. Chi tiết và ảnh/clip ở [RESEARCH](RESEARCH.md#worldmap--map-litematica-và-lượt-review-hiện-tại).
+
 Tham chiếu chính U1: tán cây tối làm khung, cỏ thấp dày xen cụm lá cao, hoa hồng/tím thưa, công trình đá xám; ánh sáng ấm và lớp xa sáng/nhạt hơn. Những đặc điểm này là phân tích ảnh để thử, không phải toàn bộ đã được duyệt thành quy tắc. Ảnh góc thấp không HUD có badge ESRB, phù hợp tham chiếu không khí/material; chưa xác định là gameplay hay cinematic. Giữ camera chơi hiện tại trong lượt thử.
 
 Đề xuất, **chưa duyệt**: camera chéo từ trên xuống, nhân vật đọc rõ giữa một vùng nền ít chi tiết; cụm cây/đá tạo khung và lớp gần–giữa–xa. Xanh trầm ở tán cây, xanh dịu ở đất cỏ, đường đất ấm dẫn mắt. Bóng tạo các mảng lớn; điểm phát sáng dành cho tương tác/đòn đánh. Không tăng độ bóng, neon hoặc số chi tiết trên toàn cảnh để tìm cảm giác “hoàn thiện”.
