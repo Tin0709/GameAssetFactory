@@ -1,0 +1,158 @@
+{
+  "source_files_unchanged": true,
+  "source_actions_unchanged": 312,
+  "catalog_selections_passed": 37,
+  "missing_images": [],
+  "results": [
+    {
+      "label": "Idle / Unarmed",
+      "selection_valid": true
+    },
+    {
+      "label": "Idle / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Idle / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Idle / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Walk / Unarmed",
+      "selection_valid": true
+    },
+    {
+      "label": "Walk / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Walk / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Walk / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Sprint / Unarmed",
+      "selection_valid": true
+    },
+    {
+      "label": "Sprint / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Sprint / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Sprint / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Walk turning / Unarmed",
+      "selection_valid": true
+    },
+    {
+      "label": "Walk turning / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Walk turning / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Walk turning / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Sprint turning / Unarmed",
+      "selection_valid": true
+    },
+    {
+      "label": "Sprint turning / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Sprint turning / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Sprint turning / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Holster / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Draw / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Holster / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Draw / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Holster / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Draw / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe Left",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe Right",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe ForwardLeft",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe ForwardRight",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe BackwardLeft",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe BackwardRight",
+      "selection_valid": true
+    },
+    {
+      "label": "BlockJump_Up_V2",
+      "selection_valid": true
+    },
+    {
+      "label": "BlockJump_Up_V2_OppositeLead",
+      "selection_valid": true
+    },
+    {
+      "label": "BlockHop_Down_V2",
+      "selection_valid": true
+    },
+    {
+      "label": "BlockHop_Down_V2_OppositeLead",
+      "selection_valid": true
+    },
+    {
+      "label": "Jump journey / both leads",
+      "selection_valid": true
+    }
+  ],
+  "render": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\review_preview.png",
+  "gameplay_modified": false
+}
