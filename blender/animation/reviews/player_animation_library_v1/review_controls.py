@@ -79,9 +79,9 @@ class PLAYER_REVIEW_PT_library(bpy.types.Panel):
         box=layout.box();box.label(text=selected['label'])
         box.label(text=f"{selected['duration_seconds']:.3f} s / {selected['fps']} FPS")
         if selected.get('review_rig'):
-            box.label(text='NEW: flat jump / Blender only',icon='INFO')
-            box.label(text='F12 apex / F19 contact / F25 recover')
-            box.label(text='Carrier = preview height only')
+            box.label(text=selected.get('review_note','Flat jump / Blender review'),icon='INFO')
+            box.label(text=selected.get('phase_note','F12 apex / F19 contact / F25 recover'))
+            box.label(text=selected.get('carrier_note','Carrier = preview height only'))
         elif selected['group']=='Jump (study only)':box.label(text='Study only - deferred in game',icon='INFO')
         elif selected['group']=='Holster & Draw':box.label(text='5.25x transition speed (game)')
         else:box.label(text='In-place; original source keys')

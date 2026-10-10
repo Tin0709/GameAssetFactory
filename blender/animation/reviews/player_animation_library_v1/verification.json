@@ -1,7 +1,7 @@
 {
   "source_files_unchanged": true,
   "source_actions_unchanged": 312,
-  "catalog_selections_passed": 54,
+  "catalog_selections_passed": 59,
   "missing_images": [],
   "results": [
     {
@@ -218,6 +218,26 @@
     },
     {
       "label": "Jump Default V001 / Flat Ground",
+      "selection_valid": true
+    },
+    {
+      "label": "Jump / Stationary V002",
+      "selection_valid": true
+    },
+    {
+      "label": "Jump / Walking V002",
+      "selection_valid": true
+    },
+    {
+      "label": "Jump / Running V002",
+      "selection_valid": true
+    },
+    {
+      "label": "Walk + Jump LOOP V003",
+      "selection_valid": true
+    },
+    {
+      "label": "Run + Jump LOOP V003",
       "selection_valid": true
     }
   ],

@@ -52,7 +52,7 @@ for e in m['catalog']:
         for direction in ['SIDE','FRONT','BACK','THREE_QUARTER']:
             bpy.ops.player_review.camera(direction=direction)
             assert sc.camera.name==json.loads(sc['review_cameras'])[direction]
-        assert rig.parent.name=='JD1_PREVIEW_ONLY_Carrier'
+        assert rig.parent.name==e.get('review_carrier','JD1_PREVIEW_ONLY_Carrier')
     elif e['group']=='Jump (study only)':
         travel=bpy.data.objects['PREVIEW_ONLY_WorldTravel']
         positions=[]

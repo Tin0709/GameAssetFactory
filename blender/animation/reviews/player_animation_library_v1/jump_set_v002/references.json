@@ -1,0 +1,62 @@
+{
+  "stationary": {
+    "original_path": "C:\\Users\\ADMIN\\Videos\\Screen Recordings\\Đứng im một chỗ nhảy.mp4",
+    "copy": "references/stationary/source.mp4",
+    "sha256": "fa245c718916084e963a0706e937a0c52d7d2189eed9d1eefb38da7eebf05d23",
+    "fps": 30.0,
+    "frames": 322,
+    "width": 484,
+    "height": 532,
+    "seconds": 10.733333333333333,
+    "preview": {
+      "file": "jump_stationary_1x.mp4",
+      "frames": 171,
+      "fps": 30,
+      "size": [
+        1440,
+        650
+      ],
+      "source_motion_seconds": 0.8666666666666667
+    }
+  },
+  "walk": {
+    "original_path": "C:\\Users\\ADMIN\\Videos\\Screen Recordings\\Vừa đi bộ vừa nhảy.mp4",
+    "copy": "references/walk/source.mp4",
+    "sha256": "ac92296d9514c24297bf9f693d25357904d948c79b5d93d910143e3dcc25fab8",
+    "fps": 30.0,
+    "frames": 489,
+    "width": 426,
+    "height": 670,
+    "seconds": 16.3,
+    "preview": {
+      "file": "jump_walk_1x.mp4",
+      "frames": 177,
+      "fps": 30,
+      "size": [
+        1440,
+        650
+      ],
+      "source_motion_seconds": 0.9333333333333333
+    }
+  },
+  "run": {
+    "original_path": "C:\\Users\\ADMIN\\Videos\\Screen Recordings\\Vừa chạy vừa nhảy.mp4",
+    "copy": "references/run/source.mp4",
+    "sha256": "be15cab70b485e1453a898454a46cb133938747e01fc1d8fbf2516c17822c6db",
+    "fps": 30.0,
+    "frames": 375,
+    "width": 432,
+    "height": 566,
+    "seconds": 12.5,
+    "preview": {
+      "file": "jump_run_1x.mp4",
+      "frames": 171,
+      "fps": 30,
+      "size": [
+        1440,
+        650
+      ],
+      "source_motion_seconds": 0.8666666666666667
+    }
+  }
+}

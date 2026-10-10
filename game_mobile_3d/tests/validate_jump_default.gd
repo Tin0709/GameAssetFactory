@@ -1,4 +1,5 @@
 extends SceneTree
+## Historical jump regression suite, now checks the active V002 stationary jump.
 var failures: Array[String] = []
 var checks: Array = []
 func _initialize() -> void: call_deferred("run")
@@ -25,18 +26,18 @@ func run() -> void:
 		for i in 65:
 			await tick(1); peak = maxf(peak, player.position.y)
 			if i==10:check(not player.is_on_floor() and not player.request_jump(),"No second jump while airborne")
-		check(absf(peak-start.y-.63)<.03, "Authored 0.63m apex within 3cm")
+		check(absf(peak-start.y-.58)<.03, "V002 stationary 0.58m apex within 3cm")
 		check(player.is_on_floor() and not player.jump_active, "Jump lands and recovers")
 		check(absf(player.position.y-start.y) < .04, "Flat landing returns to ground")
 		Input.action_press("jump");await tick(65)
 		check(not player.jump_active,"Holding Space does not auto-repeat jumps")
 		Input.action_release("jump");await tick(2)
-		check(player.visual.samples.has("Jump_Default_v001"), "New authored pose loaded")
+		check(player.visual.samples.has("Jump_Default_v001"), "Archived Default V001 pose retained")
 		check(player.visual.skeleton.find_bone("ForeArm.R") >= 0, "Authored elbow motion supported")
 		check(player.visual.combat_strafe_clips.size() == 6, "Six existing combat clips retained")
-		var old_model: Node=load("res://assets/characters/r15/player_r15_combat_strafe_v1.glb").instantiate()
+		var old_model: Node=load("res://assets/characters/jump_default_v001/player_r15_jump_default_v001.glb").instantiate()
 		var old_player: AnimationPlayer=old_model.find_child("AnimationPlayer",true,false)
-		var new_model: Node=load("res://assets/characters/jump_default_v001/player_r15_jump_default_v001.glb").instantiate()
+		var new_model: Node=load("res://assets/characters/jump_set_v002/player_r15_jump_set_v002.glb").instantiate()
 		var new_player: AnimationPlayer=new_model.find_child("AnimationPlayer",true,false)
 		var preserved:=true
 		for name in old_player.get_animation_list():
@@ -87,9 +88,9 @@ func run() -> void:
 		ceiling.free();level.reset_player();await tick(4)
 		player.request_jump();await tick(15);player.is_dead=true;player.visual.freeze_animation();await tick(1)
 		check(player.is_dead and not player.jump_active and player.visual.frozen,"Death cancels jump without reviving animation")
-	DirAccess.make_dir_recursive_absolute("res://.validation/jump_default_v001")
-	FileAccess.open("res://.validation/jump_default_v001/checks.json", FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures},"\t"))
-	print("JUMP_DEFAULT_CHECKS ", checks.size(), " failures=", failures)
+	DirAccess.make_dir_recursive_absolute("res://.validation/jump_set_v002")
+	FileAccess.open("res://.validation/jump_set_v002/regression_checks.json", FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures},"\t"))
+	print("JUMP_REGRESSION_CHECKS ", checks.size(), " failures=", failures)
 	level.queue_free(); await process_frame; await process_frame
 	if "--orphans" in OS.get_cmdline_user_args(): Node.print_orphan_nodes()
 	quit(0 if failures.is_empty() else 1)

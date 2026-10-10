@@ -1,0 +1,35 @@
+{
+  "stationary": {
+    "decoded_frames": 171,
+    "fps": 30.0,
+    "size": [
+      1440,
+      650
+    ],
+    "seconds": 5.7,
+    "sha256": "84a8452589ced9550846e6ebc7558546877d74654e9427b028b364308faf392e",
+    "all_frames_decode": true
+  },
+  "walk": {
+    "decoded_frames": 177,
+    "fps": 30.0,
+    "size": [
+      1440,
+      650
+    ],
+    "seconds": 5.9,
+    "sha256": "bdf9cfa17fd403960c419aae84e07c121c9370b9f2c3fd23d7c5477a5bc3cb68",
+    "all_frames_decode": true
+  },
+  "run": {
+    "decoded_frames": 171,
+    "fps": 30.0,
+    "size": [
+      1440,
+      650
+    ],
+    "seconds": 5.7,
+    "sha256": "dba19d576c907e2bfe77fb598dbc87990ef972f460cb3f25318d0493e3e81896",
+    "all_frames_decode": true
+  }
+}

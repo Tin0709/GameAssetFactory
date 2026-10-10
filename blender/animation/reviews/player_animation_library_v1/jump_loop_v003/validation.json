@@ -1,0 +1,122 @@
+{
+  "preserved_actions": 320,
+  "original_scene_timing_unchanged": true,
+  "baseline_overlap_m": {
+    "Head / UpperArm.L": 0,
+    "Head / UpperArm.R": 0,
+    "Head / Leg.L": 0,
+    "Head / Leg.R": 0,
+    "Head / ForeArm.L": 0,
+    "Head / ForeArm.R": 0,
+    "Chest / ForeArm.L": -0.0038750171661376953,
+    "Chest / ForeArm.R": -0.0038750171661376953,
+    "UpperArm.L / UpperArm.R": 0,
+    "UpperArm.L / Leg.L": 0,
+    "UpperArm.L / Leg.R": 0,
+    "UpperArm.L / ForeArm.R": 0,
+    "UpperArm.R / Leg.L": 0,
+    "UpperArm.R / Leg.R": 0,
+    "UpperArm.R / ForeArm.L": 0,
+    "Leg.L / Leg.R": -1.9670125084303436e-08,
+    "Leg.L / ForeArm.L": -5.960464477539063e-08,
+    "Leg.L / ForeArm.R": 0,
+    "Leg.R / ForeArm.L": 0,
+    "Leg.R / ForeArm.R": -5.960464477539063e-08,
+    "ForeArm.L / ForeArm.R": 0
+  },
+  "cases": {
+    "walk": {
+      "channel_endpoint_error": 0,
+      "channel_tangent_error_per_frame": 5.219626225891338e-07,
+      "min_floor_z_m": 0.000299996230751276,
+      "max_ground_gap_m": 0.0011830319417640567,
+      "new_overlaps": [],
+      "camera_bounds": {
+        "JL3_WALK_THREE_QUARTER": [
+          0.3681507110595703,
+          0.14844992756843567,
+          0.6223035454750061,
+          0.8580522537231445
+        ],
+        "JL3_WALK_SIDE": [
+          0.40081986784935,
+          0.12740321457386017,
+          0.6078185439109802,
+          0.8680044412612915
+        ],
+        "JL3_WALK_FRONT": [
+          0.39275357127189636,
+          0.12962527573108673,
+          0.6072555780410767,
+          0.8640528321266174
+        ],
+        "JL3_WALK_BACK": [
+          0.39274463057518005,
+          0.1276474893093109,
+          0.6072465777397156,
+          0.8653472065925598
+        ]
+      },
+      "repeat_pose_error_m": 2.384185791015625e-07,
+      "samples": 673,
+      "airborne_leg_sweep_deg": 43.182826008462605,
+      "checks": {
+        "loop_position": true,
+        "loop_tangent": true,
+        "three_repeats_identical": true,
+        "no_floor_penetration": true,
+        "ground_clearance": true,
+        "air_footwork_continues": true,
+        "no_new_overlap": true,
+        "framing": true
+      }
+    },
+    "run": {
+      "channel_endpoint_error": 0,
+      "channel_tangent_error_per_frame": 1.0178333042440424e-06,
+      "min_floor_z_m": 0.0002999939024448395,
+      "max_ground_gap_m": 0.0012134835124015808,
+      "new_overlaps": [],
+      "camera_bounds": {
+        "JL3_RUN_THREE_QUARTER": [
+          0.3592124581336975,
+          0.14205069839954376,
+          0.6311964988708496,
+          0.8740382194519043
+        ],
+        "JL3_RUN_SIDE": [
+          0.38060927391052246,
+          0.12752942740917206,
+          0.619391679763794,
+          0.8936091065406799
+        ],
+        "JL3_RUN_FRONT": [
+          0.39296141266822815,
+          0.12873464822769165,
+          0.6070494055747986,
+          0.8862870931625366
+        ],
+        "JL3_RUN_BACK": [
+          0.39295077323913574,
+          0.12130949646234512,
+          0.6070387959480286,
+          0.888844907283783
+        ]
+      },
+      "repeat_pose_error_m": 3.5762786865234375e-07,
+      "samples": 625,
+      "airborne_leg_sweep_deg": 53.34886761627854,
+      "checks": {
+        "loop_position": true,
+        "loop_tangent": true,
+        "three_repeats_identical": true,
+        "no_floor_penetration": true,
+        "ground_clearance": true,
+        "air_footwork_continues": true,
+        "no_new_overlap": true,
+        "framing": true
+      }
+    }
+  },
+  "failures": []
+}

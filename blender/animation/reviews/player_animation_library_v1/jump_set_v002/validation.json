@@ -1,0 +1,162 @@
+{
+  "preserved_actions": 314,
+  "old_scene_timing_unchanged": true,
+  "idle_overlap_baseline_m": {
+    "Head / UpperArm.L": 0,
+    "Head / UpperArm.R": 0,
+    "Head / Leg.L": 0,
+    "Head / Leg.R": 0,
+    "Head / ForeArm.L": 0,
+    "Head / ForeArm.R": 0,
+    "Chest / ForeArm.L": -0.0038750171661376953,
+    "Chest / ForeArm.R": -0.0038750171661376953,
+    "UpperArm.L / UpperArm.R": 0,
+    "UpperArm.L / Leg.L": 0,
+    "UpperArm.L / Leg.R": 0,
+    "UpperArm.L / ForeArm.R": 0,
+    "UpperArm.R / Leg.L": 0,
+    "UpperArm.R / Leg.R": 0,
+    "UpperArm.R / ForeArm.L": 0,
+    "Leg.L / Leg.R": -1.9670125084303436e-08,
+    "Leg.L / ForeArm.L": -5.960464477539063e-08,
+    "Leg.L / ForeArm.R": 0,
+    "Leg.R / ForeArm.L": 0,
+    "Leg.R / ForeArm.R": -5.960464477539063e-08,
+    "ForeArm.L / ForeArm.R": 0
+  },
+  "cases": {
+    "stationary": {
+      "samples": 3329,
+      "min_floor_z_m": 9.999999747378752e-05,
+      "max_ground_gap_m": 2.526212488436659e-12,
+      "min_air_z_m": 0.0012295563938096166,
+      "support_y_drift_m": 0,
+      "camera_bounds": {
+        "JS2_STATIONARY_THREE_QUARTER": [
+          0.37316301465034485,
+          0.14326786994934082,
+          0.6188011765480042,
+          0.9233495593070984
+        ],
+        "JS2_STATIONARY_SIDE": [
+          0.40325087308883667,
+          0.11653634160757065,
+          0.5613962411880493,
+          0.9447422623634338
+        ],
+        "JS2_STATIONARY_FRONT": [
+          0.38690873980522156,
+          0.12551026046276093,
+          0.6136975884437561,
+          0.9427386522293091
+        ],
+        "JS2_STATIONARY_BACK": [
+          0.3863025903701782,
+          0.12551026046276093,
+          0.6130914688110352,
+          0.9446029663085938
+        ]
+      },
+      "new_overlaps": [],
+      "max_arc_error_m": 5.889892578103684e-07,
+      "checks": {
+        "no_floor_penetration": true,
+        "ground_clearance": true,
+        "support_center_stable": true,
+        "airborne": true,
+        "carrier_curve": true,
+        "no_new_overlap": true,
+        "framing": true
+      }
+    },
+    "walk": {
+      "samples": 3585,
+      "min_floor_z_m": 9.926129132509232e-05,
+      "max_ground_gap_m": 9.853794947266578e-05,
+      "min_air_z_m": 0.0012593255378305912,
+      "support_y_drift_m": 1.4901161193847656e-07,
+      "camera_bounds": {
+        "JS2_WALK_THREE_QUARTER": [
+          0.30083516240119934,
+          0.08191628009080887,
+          0.6915233135223389,
+          0.85064297914505
+        ],
+        "JS2_WALK_SIDE": [
+          0.21608543395996094,
+          0.18843577802181244,
+          0.7800179123878479,
+          0.8640397191047668
+        ],
+        "JS2_WALK_FRONT": [
+          0.4063279926776886,
+          0.13623173534870148,
+          0.594549298286438,
+          0.862303614616394
+        ],
+        "JS2_WALK_BACK": [
+          0.40545085072517395,
+          0.1370191127061844,
+          0.5936721563339233,
+          0.8617829084396362
+        ]
+      },
+      "new_overlaps": [],
+      "max_arc_error_m": 5.83177804935886e-07,
+      "checks": {
+        "no_floor_penetration": true,
+        "ground_clearance": true,
+        "support_center_stable": true,
+        "airborne": true,
+        "carrier_curve": true,
+        "no_new_overlap": true,
+        "framing": true
+      }
+    },
+    "run": {
+      "samples": 3329,
+      "min_floor_z_m": 9.70037654042244e-05,
+      "max_ground_gap_m": 0.00020424399301409722,
+      "min_air_z_m": 0.0014437474310398102,
+      "support_y_drift_m": 5.364418029785156e-07,
+      "camera_bounds": {
+        "JS2_RUN_THREE_QUARTER": [
+          0.2669433057308197,
+          0.05410303547978401,
+          0.7272950410842896,
+          0.8499387502670288
+        ],
+        "JS2_RUN_SIDE": [
+          0.11178740859031677,
+          0.23763008415699005,
+          0.8882124423980713,
+          0.8166414499282837
+        ],
+        "JS2_RUN_FRONT": [
+          0.41892674565315247,
+          0.14742261171340942,
+          0.5819286108016968,
+          0.8175939321517944
+        ],
+        "JS2_RUN_BACK": [
+          0.41807153820991516,
+          0.1570926159620285,
+          0.5810734033584595,
+          0.8159593343734741
+        ]
+      },
+      "new_overlaps": [],
+      "max_arc_error_m": 6.656758866352419e-07,
+      "checks": {
+        "no_floor_penetration": true,
+        "ground_clearance": true,
+        "support_center_stable": true,
+        "airborne": true,
+        "carrier_curve": true,
+        "no_new_overlap": true,
+        "framing": true
+      }
+    }
+  },
+  "failures": []
+}

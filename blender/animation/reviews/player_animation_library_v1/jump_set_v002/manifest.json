@@ -1,0 +1,1210 @@
+{
+  "cases": {
+    "stationary": {
+      "label": "Jump / Stationary V002",
+      "action": "Jump_Stationary_v002",
+      "end": 27,
+      "take": 5,
+      "land": 21,
+      "height": 0.58,
+      "speed": 0,
+      "scale": 3.9,
+      "travel_distance_m": 0.0,
+      "flight_distance_m": 0.0,
+      "ground_contact_margin_m": 0.0001,
+      "launch_carrier_z": 0.0001,
+      "contact_carrier_z": 0.0001,
+      "carrier_sample_step": 0.015625,
+      "kind": "stationary",
+      "scene": "JS2_STATIONARY_REVIEW",
+      "rig": "JS2_STATIONARY_Rig",
+      "mesh": "JS2_STATIONARY_Mesh",
+      "carrier": "JS2_STATIONARY_PREVIEW_ONLY_Carrier",
+      "slot": "OBJS2_STATIONARY_Rig",
+      "travel_action": "PREVIEW_ONLY_Jump_Stationary_v002_Travel",
+      "cameras": {
+        "THREE_QUARTER": "JS2_STATIONARY_THREE_QUARTER",
+        "SIDE": "JS2_STATIONARY_SIDE",
+        "FRONT": "JS2_STATIONARY_FRONT",
+        "BACK": "JS2_STATIONARY_BACK"
+      },
+      "markers": {
+        "1": "ENTRY / IDLE",
+        "5": "LAST SUPPORT",
+        "6": "AIRBORNE",
+        "13": "APEX / HELD STRIDE",
+        "21": "FIRST CONTACT",
+        "23": "ABSORB",
+        "27": "RETURN TO IDLE"
+      }
+    },
+    "walk": {
+      "label": "Jump / Walking V002",
+      "action": "Jump_Walk_v002",
+      "end": 29,
+      "take": 7,
+      "land": 23,
+      "height": 0.58,
+      "speed": 2.0,
+      "scale": 4.8,
+      "pre": [
+        -28,
+        14,
+        34,
+        -18
+      ],
+      "post": [
+        18,
+        -32,
+        -18,
+        30
+      ],
+      "travel_distance_m": 1.8557233701149622,
+      "flight_distance_m": 1.0666666666666667,
+      "ground_contact_margin_m": 0.0001,
+      "launch_carrier_z": 0.0018275847494602204,
+      "contact_carrier_z": 0.0018275847494602204,
+      "carrier_sample_step": 0.015625,
+      "kind": "walk",
+      "scene": "JS2_WALK_REVIEW",
+      "rig": "JS2_WALK_Rig",
+      "mesh": "JS2_WALK_Mesh",
+      "carrier": "JS2_WALK_PREVIEW_ONLY_Carrier",
+      "slot": "OBJS2_WALK_Rig",
+      "travel_action": "PREVIEW_ONLY_Jump_Walk_v002_Travel",
+      "cameras": {
+        "THREE_QUARTER": "JS2_WALK_THREE_QUARTER",
+        "SIDE": "JS2_WALK_SIDE",
+        "FRONT": "JS2_WALK_FRONT",
+        "BACK": "JS2_WALK_BACK"
+      },
+      "markers": {
+        "1": "ENTRY / WALK STRIDE",
+        "7": "LAST SUPPORT",
+        "8": "AIRBORNE",
+        "15": "APEX / HELD STRIDE",
+        "23": "FIRST CONTACT",
+        "25": "ABSORB",
+        "29": "RETURN TO STRIDE"
+      }
+    },
+    "run": {
+      "label": "Jump / Running V002",
+      "action": "Jump_Run_v002",
+      "end": 27,
+      "take": 5,
+      "land": 21,
+      "height": 0.64,
+      "speed": 4.0,
+      "scale": 5.7,
+      "pre": [
+        -42,
+        22,
+        44,
+        -28
+      ],
+      "post": [
+        24,
+        -44,
+        -34,
+        42
+      ],
+      "travel_distance_m": 3.3550884281595548,
+      "flight_distance_m": 2.1333333333333333,
+      "ground_contact_margin_m": 0.0001,
+      "launch_carrier_z": -0.026094818317890168,
+      "contact_carrier_z": -0.012498950415849686,
+      "carrier_sample_step": 0.015625,
+      "kind": "run",
+      "scene": "JS2_RUN_REVIEW",
+      "rig": "JS2_RUN_Rig",
+      "mesh": "JS2_RUN_Mesh",
+      "carrier": "JS2_RUN_PREVIEW_ONLY_Carrier",
+      "slot": "OBJS2_RUN_Rig",
+      "travel_action": "PREVIEW_ONLY_Jump_Run_v002_Travel",
+      "cameras": {
+        "THREE_QUARTER": "JS2_RUN_THREE_QUARTER",
+        "SIDE": "JS2_RUN_SIDE",
+        "FRONT": "JS2_RUN_FRONT",
+        "BACK": "JS2_RUN_BACK"
+      },
+      "markers": {
+        "1": "ENTRY / RUN STRIDE",
+        "5": "LAST SUPPORT",
+        "6": "AIRBORNE",
+        "13": "APEX / HELD STRIDE",
+        "21": "FIRST CONTACT",
+        "23": "ABSORB",
+        "27": "RETURN TO STRIDE"
+      }
+    }
+  },
+  "fps": 30,
+  "height_H": 1.8,
+  "source_rig": "JD1_Player_Rig",
+  "source_mesh": "JD1_Player_Mesh",
+  "preserved_action_hashes": {
+    "BlockHop_Down_V2": "158477734e6c43c86039c8748df9774d91269a76dd6f1041502401b4c744adb1",
+    "BlockHop_Down_V2_OppositeLead": "065a857e9209eb9437f6a9eaa68bd777842e357826ddb1c4d0afa50923cbfad5",
+    "BlockJump_Up_V2": "e0409b014067d11976f4c4ffe435ea9dec9c5aeb09873a4901038c2062cbb00e",
+    "BlockJump_Up_V2_OppositeLead": "17a8e4a3f997125049e9f9573f9eff7f0507c18efb3b00f30680fbbe76a2ecf6",
+    "Combat_StrafeBackwardLeft_V1": "bf1dcdb27c5b76224733db15d2e51508045b02d5d4aa90bdda5a3544cdedc137",
+    "Combat_StrafeBackwardRight_V1": "0825cd66338860cbf5a68a8423c68b00e52dc42231af17d6ac27d2ce5e4396f6",
+    "Combat_StrafeForwardLeft_V1": "f75a5c0f80b123924b0dd98ce7ca247e65edbe8252bde49281202e195e8377d3",
+    "Combat_StrafeForwardRight_V1": "cf66261380a7dc4f7d92f5d290a82e5aa694ce8343b0cde39d2ada8873d17876",
+    "Combat_StrafeLeft_V1": "c51195553e02493c0d549ff3ea2a8439c24cb84f8ba24ba7987561f6ba59c8d4",
+    "Combat_StrafeLeft_V2": "e74e6c0e2a113dfabf14ffaeb5d43530c60afdd044dcba37dc8f96ae16d516aa",
+    "Combat_StrafeRight_V1": "76bb27e7195efbcf6c3769dde2eda26fee952f25941ae7cbf5f5bc2e1a06cbca",
+    "Combat_StrafeRight_V2": "5c68cc49cc3839364ebcbc44b542090a60acfda9e5f8195a4a65a767db3d500f",
+    "Draw_LongGun_V1": "827dd074fa275013e4a354c3831ed57c0ec0b0a1acabce2c35894c36c9020314",
+    "Draw_LongGun_V2": "cd4e9c83cd6685d6b351dcbe7d02912c56ab583e3bd50c8d3f2692c8a840a384",
+    "Draw_LongGun_V3_Final": "1495a4ebf48c92a41ce91777b72aa42514a487ba5985dcf22b1ef578817596a5",
+    "Holster_LongGun_V1": "d0e5316cce93bf0de437c1515d0f0fc2a84bf0c8246e078d781b6755b6b6633b",
+    "Holster_LongGun_V2": "b66346063cfd322ff2bfcada15f0eb88a92ef05a6d7d0c55674fd48c0a00476f",
+    "Holster_LongGun_V3_Final": "8c0fcf0ef543efd0407ff3d2e3075c65c7b5b7effbcd00c9e2d8e34667fef4c2",
+    "HolsterLongGun": "8c0fcf0ef543efd0407ff3d2e3075c65c7b5b7effbcd00c9e2d8e34667fef4c2",
+    "Idle": "bf1a88d67844cb88e175e906c705a82b6348863c3f531ae545b9f4b44cb6e94c",
+    "Jump_Default_v001": "d2761f5fe58317dd47b7b703f763aedd46a9802169fdbfa243a61731b5433890",
+    "LongGunAimAround_ElbowStudy_V2": "78931a01b36802a2c3735c3269a181a5a5945643b5fc8abeb403ccc4aee0b641",
+    "LongGunAimAround_LeftRight_V1": "8c9db39ee0788c40f37d0148b6167b4a67c4311ecb84f775b33774e9e53e2a9c",
+    "LongGunAimAround_LeftRight_V2": "1f369823028a0ab6812ab243c6ce1edc9a94b82cec020c46faafa05bf804c0cc",
+    "LongGunAimAround_LeftRight_V3": "e23daf4912eccfcf1a3729cc3cd0738abe26608cd5c9a341171e04f963f70413",
+    "LongGunAimAround_OneArmStudy_V1": "49a6f162c0c1e0ac4e2daa598dc07fe872dd65c335b9a321f9549c8aab6c0a0d",
+    "LongGunAimAround_RightEyeStudy_V1": "94e2cd64490cef84b7c63d9c86a6d0f0fac9b02b86cfdbae378d1effdb4e1be6",
+    "LongGunAimAround_SimpleR11": "51ad5e96a4947313a4b2001cdfbadbf8dc0fdb150866caf8b8f957eef98ae861",
+    "LongGunAimAround_SimpleR11_CenterFitR11": "b438819de39e8a53ef3172b56d135c2f999de9139c4fa92c74dcf1a7e9641ace",
+    "LongGunAimAround_SimpleR11_CenterFitR11_Inward1cm": "b585ea2b9611dbc94b4519779c43b0dd07e21e740e1f7abd937f9c3ff4b318b9",
+    "LongGunAimBias_RigV2_Study_V1": "16406b872e2c560ac9c40addb84b1db9497651ecc5e9b9304c9d9932c9836d82",
+    "LongGunAimBias_Study_V1": "b62e90e3bcd4a804a7e2846cac6287c2116bbc97bfc7f2fd50bac921c9118b90",
+    "LongGunHold_ElbowStudy_V2": "e224dccae27815604dda7b0dd42a1896750107b99742e41d5992719fbb8873a2",
+    "LongGunHold_OneArmStudy_V1": "d7158e623663dde61698f7bb10803fadc04d8c03862f0abee89a2c1bb2d968d2",
+    "LongGunHold_ReferenceStudy_V1": "33e19a31b6782edf8f1b47af44d98f5c267fde7a38fac54dbd43adb303eafa21",
+    "LongGunHold_RightEyeStudy_V1": "3338db49f8fdc35da6d5c6098b0fe6bc249117cb3607cf79aa8fa5fef9e51260",
+    "LongGunHold_RigV2_Study_V1": "55998ff5d38e803c92693d20cdf13aea8a6a9850c0d163d28f91b5b8514e95a4",
+    "LongGunHold_SimpleR11": "2547f44698fb0bd3f075c6de4ed834bf6807e8ab1ab5813ea4309dc8cc28f8da",
+    "LongGunHold_SimpleR11_CenterFitR11": "3e31c974b01d1b628b21abad700908b0eaceedb5edf1c9479612da45d9f2e9cb",
+    "LongGunHold_SimpleR11_CenterFitR11_Inward1cm": "6c3dd8db01ea134883949577b2143644b08e7d933aeef339b13bf44d10930d57",
+    "LongGunHold_V2": "986b721bf1feee2cac6827cd379ede05323341c444f0d553f53b021fd8811cbb",
+    "LongGunMove_ElbowStudy_V2": "ffec65c755751d14ce5f6ddf660b18bdac081585bd2c0bef3aabe278d10727be",
+    "LongGunMove_OneArmStudy_V1": "6782ddf66dcde09e5a2e94208ccc5cdf2e0f889e876518ec6e3592063fe1db26",
+    "LongGunMove_RightEyeStudy_V1": "41c8c20b5a343dc5599fc02ce4132c1dcd3c0d3141b63466d7c918f30b242861",
+    "LongGunMove_SimpleR11": "b8e2a6bf27d29b69a0f0e76f5486efa7d136aba1d8533538aec895cc5012fb12",
+    "LongGunMove_WalkSwayR11": "6d5b96d8894cefb357497aa095ea7a2657ef09ccb800f49439f5ee5f3954b6cd",
+    "LongGunMove_WalkSwayR11_CenterFitR11": "31832744ad30cec02acc2ab746a88df97c9ec61693ac3a915ad3704afd482460",
+    "LongGunMove_WalkSwayR11_CenterFitR11_Inward1cm": "673b362c369867622b615c8aed43189db7300b8f0ed9f153ad29c5f1180e7329",
+    "LongGunReady_LivingRef_V1": "f021bfc218c7e130352cbbb895815f5b28e3460d845559ec31b09a4aeb84d9c8",
+    "LongGunReady_LivingRef_V2": "8392b3cbc901a562775f368498a5d7fec752cebfd3c2c84fea52c68f46a59939",
+    "LongGunReady_Loop_V1": "f991a95e232d7c3dae5e6b60cec8fa27eb1442780f4d7178a1a4aca000c87af0",
+    "LongGunReady_Move_V1": "410a0a727b3a09c6a06424f24b5d24b9614d42cbb7153852c8d07e7df91f2d4a",
+    "LongGunReady_Move_V2": "58e520a16d5ef431a8497ff589f098d7e561dda99ffb570faf8e9b8beb5e8cd2",
+    "LongGunReady_Run_V1": "692b7290c26f5727f3c4c04ea5d7bd2dea645eb89ec4997d3c2a8abd91bf3dd2",
+    "LongGunReady_Run_V1.001": "692b7290c26f5727f3c4c04ea5d7bd2dea645eb89ec4997d3c2a8abd91bf3dd2",
+    "PistolAimAround_ElbowStudy_V2": "89fde87c0042461d8ca4ca2c5472aa55bc758204d4438de3dc992c6f4ef9de68",
+    "PistolAimAround_OneArmStudy_V1": "7d59d3750e232ccec46691757453da2497b81fcfcb1b03b633cb4265fcdc796b",
+    "PistolAimAround_RightEyeStudy_V1": "af593c2918cefcc42575036b13fd6aa39fc486d34331f7ca67f5425dde768534",
+    "PistolAimAround_SimpleR11": "641b3f2a9927339a329f5d115d610bf2b243009824a7f9c608042176064f3abd",
+    "PistolAimAround_SimpleR11_OneHand": "eddff30cfa64b2f9d69695477694ab7b6c15157bd6fbdc52477e523efa9361a9",
+    "PistolHold_ElbowStudy_V2": "1afa3224ed1dd3539495027c4ca69131af6438c99ffa73f3156f4211a2455795",
+    "PistolHold_OneArmStudy_V1": "f552a3a9b2fd220430148ee5aab21c9bc28864dc8a3d880f3c632a467a9383ea",
+    "PistolHold_RightEyeStudy_V1": "21d0b93cfa4fb0af6dd9a85d4440f744599cd5b6b79c07d1934a75beb3ce116f",
+    "PistolHold_SimpleR11": "3e2f1889928d16fda2c335f60b3f6abf8c1e6451d11049bd8f91bb6c6764bf97",
+    "PistolHold_SimpleR11_OneHand": "1e347f802202d3b4d070f46a986aac009da5fa65f22e5ade6b85740448eb094b",
+    "PistolMove_ElbowStudy_V2": "ee9ab5a1a967a1f50e5248cb9bb2424d7399d94bdb32a66b712a2a4d9f6174c6",
+    "PistolMove_OneArmStudy_V1": "9f2e5047455f69853b228a47d9bafe95315218f84f04b7d72a080508494fd7eb",
+    "PistolMove_RightEyeStudy_V1": "516c2c8d33c389a4e602e9ce9e768a8d668e0b8fdbcc2d15428f7b1a5632f6ab",
+    "PistolMove_SimpleR11": "9fa696f593a019194b75bd7dbdd4305c59a10f1d8621dff4be0fc0f391293fc0",
+    "PistolMove_WalkSwayR11": "2738e3326cad0d9e5ed708f55460bcaf9e358e95423fc670e27f36633ef26c36",
+    "PistolMove_WalkSwayR11_OneHand": "c20a14686e0177d060a70073c235384b3614f0d0b223adff251ca98324ca65d8",
+    "Player_Idle": "aa7ba59cfb68cd2994f83bddfd4225b007201aed5df882cec8a502e83bff87a1",
+    "Player_Run_Blocky_V1": "ccc28c75c6461d3ea77a74932e581c142b2b53e6997d7982d3273e3e7b1b96c7",
+    "Player_Run_Blocky_V2": "c97c91d0c106c8219edd10cf93d48d9990caf14a541e3edc84e188966549eae1",
+    "Player_Run_Blocky_V3": "764bce354575d248523ed760046fd8fd3db6a567461849faf1943767386c977a",
+    "Player_Run_Blocky_V4": "2a53d55783aeb2728e6545357459bae4aef337d1eb9db0f5f49501ee34b07f7c",
+    "Player_Run_Blocky_V5": "f5735c6c2227145e6838fc9f86b478ef55ac30889b7b0438d44d1019c0c43394",
+    "Player_Run_Blocky_V6": "e9b28dc40950b09414c67a03528fb8fae8756411e80427e287875b9dff35f182",
+    "Player_Run_Blocky_V7_Final": "803d5ceac893b1e4f47e17622b288227a6b8506907e6d1151ead43d5d406dd2a",
+    "PREVIEW_ONLY_ContinuousJumpReview_V2": "13106c3e178e1a278ee876998899bb70a42328d9cd1adfae435ad89158f39263",
+    "PREVIEW_ONLY_E2_Run_Phase0_A": "7a5b9b00ebe139679753fa80f6453244155ec54a3deebd9b58820ac369ce5165",
+    "PREVIEW_ONLY_E2_Run_Phase0_B": "60c1ebc1578d4bbcf3cd4226b1cf1efe52dc36c9a97bc39fd0a9caf6ef7eae83",
+    "PREVIEW_ONLY_E2_Run_Phase0_C": "5314abcbed08fb6d0efb0b11b506a4e5f382ef1337fc10ea49087f64d5a39031",
+    "PREVIEW_ONLY_Jump_Default_v001_Travel": "4b45e7ce2f4d38e65e76d51be4e3e47438eac8afecb51f818ccfe9db0b0f4eaa",
+    "PREVIEW_ONLY_R10WH1_Pistol_TURN": "b64ccc5ccf6acd915dda04402d3e7df7c5eec888e66d717976320405f8bf6bf4",
+    "PREVIEW_ONLY_R10WH1_Rifle_TURN": "19af9356d40a0345983e4936774301ea5d6e423e2e109a345c1ca4cf7ebe507c",
+    "PREVIEW_ONLY_R10WH1_Shotgun_TURN": "750bfaf1d1d53e31dd1226e97d66695f84b07bb3487a6029e2907600cf0449db",
+    "PREVIEW_ONLY_R10WH2_Pistol_TURN": "f95a59dc4076cc31fa39dd963e008b30f210fbe008022a9d4b2dd2edca5866ea",
+    "PREVIEW_ONLY_R10WH2_Rifle_TURN": "746d042b6a41bfefa9dcf5adbdb5f709ac1e870ed382d4ed33a303d1ddcb93bf",
+    "PREVIEW_ONLY_R10WH2_Shotgun_TURN": "da592a8434782db111e606ad9488c6a454d39443cce6b26d1e6c0255bf16c16e",
+    "PREVIEW_ONLY_R14_A_LateralTravel": "2212d3e0d390242207cfcb15c3daebc36f5f591edf57cf56070564f959f2c0bb",
+    "PREVIEW_ONLY_R14_B_LateralTravel": "2212d3e0d390242207cfcb15c3daebc36f5f591edf57cf56070564f959f2c0bb",
+    "PREVIEW_ONLY_R14_C_LateralTravel": "4251500ec3bc7a7c9dfa63356fb860b5055b774556272beae445da1009e6c6d3",
+    "PREVIEW_ONLY_R14_ContinuousTravel": "1f52cee66a9bff732fba8defd8c0caf9393a04337e51e274dda2f616f6a294ca",
+    "PREVIEW_ONLY_R14_Overview_A": "de1e0c5575bdfe387e356ec2b5a1c53a18d110b30c1af5e5c4e978cead7411f8",
+    "PREVIEW_ONLY_R14_Overview_B": "2212d3e0d390242207cfcb15c3daebc36f5f591edf57cf56070564f959f2c0bb",
+    "PREVIEW_ONLY_R14_Overview_C": "036e5f8eacf2f2da5ef1898df270e074c8a905b7ddba5722e3cda707aa718df6",
+    "PREVIEW_ONLY_R14_Right_Stop_Left_Right": "ae3ea00622756a3e50da06417dbe1b062e8307af61f731df50661b1ffea81073",
+    "PREVIEW_ONLY_R14P2_R14_P2_AB_0_PreviewTravel_Travel": "98b8afc1cc4bd048f38da0f14408a6e25947d3c8942cdbf079121d83733c8044",
+    "PREVIEW_ONLY_R14P2_R14_P2_AB_1_PreviewTravel_Travel": "01f4a91e627609dbf7a0390c9ac6283fbf7ab30712cf61388eb3d972284fb4ec",
+    "PREVIEW_ONLY_R14P2_R14_P2_BackwardLeft_PreviewTravel_Travel": "5c98a5c5f8df7eaec17d88d9bf29dde67cec5337697aec8be3a3a1db0b3e017b",
+    "PREVIEW_ONLY_R14P2_R14_P2_BackwardRight_PreviewTravel_Travel": "12612eeb1c7dfdf38bda26d137bc42d170f566d8665d5688456ad4ffe290dbb3",
+    "PREVIEW_ONLY_R14P2_R14_P2_ForwardLeft_PreviewTravel_Travel": "7b45ed01719de02c471fc7202f16e519a48210c4fa82a4285199d36096298fea",
+    "PREVIEW_ONLY_R14P2_R14_P2_ForwardRight_PreviewTravel_Travel": "446ceed7320f150b13ce84c5c87a295944df237b6a4426537d2d8397f56c53dd",
+    "PREVIEW_ONLY_R14P2_R14_P2_Lab_BackwardLeft_PreviewTravel_Travel": "2da6e98ba7a24efd7d9a7a0212950bd2b9db989a446fc0b1dd831120c14336c4",
+    "PREVIEW_ONLY_R14P2_R14_P2_Lab_BackwardRight_PreviewTravel_Travel": "abc8e19514118d2dbc34db5fa8ef05db8f113717b3a660ea8606af6ceed5c5bc",
+    "PREVIEW_ONLY_R14P2_R14_P2_Lab_ForwardLeft_PreviewTravel_Travel": "f6a440aaf8d965e029d5aec64d630237a37fece47bfb185b9e31c41baf037a66",
+    "PREVIEW_ONLY_R14P2_R14_P2_Lab_ForwardRight_PreviewTravel_Travel": "1911de7c4c573bd4af1f9a8a0ff55e9c8538a2f06625e55ceca106bd1f62e871",
+    "PREVIEW_ONLY_R14P2_R14_P2_Lab_Left_PreviewTravel_Travel": "422c3f0e1fb32cc361f1a907f8c3abe59edad8122985393ee6485a4f29785381",
+    "PREVIEW_ONLY_R14P2_R14_P2_Lab_Right_PreviewTravel_Travel": "8ab51c7120432a10a9aa684119d67a007d5541489065567f262a47c049be2b82",
+    "PREVIEW_ONLY_R14P2_R14_P2_Left_PreviewTravel_Travel": "0244ae5b64d2f9bb3aff70fdddf99ece8241880058efde2b7894f724bea7d7a4",
+    "PREVIEW_ONLY_R14P2_R14_P2_Right_PreviewTravel_Travel": "75d4a2068b6e804e714d4e771cb07fa26c4abfd8e45fff39c4df5647902d5430",
+    "PREVIEW_ONLY_R14P2_R14_P2_Show_BackwardLeft_PreviewTravel_Travel": "fb6a0f4770fc14c2e822e1a51e8990d7c07099c7cf3163e463eb1d0cac8c4566",
+    "PREVIEW_ONLY_R14P2_R14_P2_Show_BackwardRight_PreviewTravel_Travel": "7b9110ca556186586f767c07a36f522b1669db32f16a518289365fda0997dc7d",
+    "PREVIEW_ONLY_R14P2_R14_P2_Show_ForwardLeft_PreviewTravel_Travel": "e1acc6836464502e04e370a3ffffe263a1824f84e6b2e4cc607138fce8255f72",
+    "PREVIEW_ONLY_R14P2_R14_P2_Show_ForwardRight_PreviewTravel_Travel": "e9263c5ecdc9b441103336b7fbac5959094f6ec77ddef5c7032466facac15eb0",
+    "PREVIEW_ONLY_R14P2_R14_P2_Show_Left_PreviewTravel_Travel": "0244ae5b64d2f9bb3aff70fdddf99ece8241880058efde2b7894f724bea7d7a4",
+    "PREVIEW_ONLY_R14P2_R14_P2_Show_Right_PreviewTravel_Travel": "fb9968daf2baaa051919a20066ad3c991b87eb15b4592551588a002f4327a8e4",
+    "PREVIEW_ONLY_R14P2_Transition_1": "a6caaa05c78878122ca68085063093b09c5bd2acd229b90da4bc7566b08154a0",
+    "PREVIEW_ONLY_R14P2_Transition_2": "4e42f83b686107cde872c4031f323cb4b0f1b4f2bd125bbb289e471f2b57920a",
+    "PREVIEW_ONLY_R14P2_Transition_3": "37bb087fd22120efa85bd7192c03485e2e8b1214f4c763ffaecd4b7c294ebace",
+    "PREVIEW_ONLY_R14P2_Transition_4": "c8ba274f4fd68c868ab8ce0f2332d8a203c091c7b08c2c982860bab35eac5a03",
+    "PREVIEW_ONLY_R14P2_Transition_5": "9f68db36d73576f25274ad5022535ff76b2abd76be94ad29d3d92fac92d2a8d0",
+    "PREVIEW_ONLY_R14P2_Transition_6": "a2469faedd4bf37250442dbf9def18e106f9e4fa822014358c2dcb7c1198bb5c",
+    "PREVIEW_ONLY_R14P2_Transition_7": "3dfaaf1aca0be658c85bab3ba273f82c0c295d1a28528cddcd85bb6ab22e1dbf",
+    "PREVIEW_ONLY_R14P2_Transition_8": "22e5bbe5c6d0d4eded59223ccb46f5ff9c7da03ed9a2958f13c17a6ad3b466f7",
+    "PREVIEW_ONLY_R14P2_Transition_9": "89748e660fd5af369ac1130af255a0d34d715c2778a83c5915b8b65794ce286b",
+    "PREVIEW_ONLY_R14P2_TransitionTravel_1": "8f9da45958d3d679677093098711e0ff13264a2b7aa2ae293fa4b98fbcf9c804",
+    "PREVIEW_ONLY_R14P2_TransitionTravel_2": "e35b69ac84798c34974bc33a2c86bdb3876e943fa39a2036cf3057d043579ffb",
+    "PREVIEW_ONLY_R14P2_TransitionTravel_3": "dd807c657721fdf0a8b2aedc087e144c4850fd79ca9165246d169debd3703142",
+    "PREVIEW_ONLY_R14P2_TransitionTravel_4": "57b1f6f6157ebdf4260bcbcaea2739e1b34dac3d470eda2020a41246c71b734f",
+    "PREVIEW_ONLY_R14P2_TransitionTravel_5": "448f21630eeff0935249549466d9dd697ec2a997d8ea98f8efd01c6a6771a0d8",
+    "PREVIEW_ONLY_R14P2_TransitionTravel_6": "e1a25654715348480cb10802d24d978f625135bb1560bbb8bcba11371a52e861",
+    "PREVIEW_ONLY_R14P2_TransitionTravel_7": "61c725452078acf08dc6b23965deaffc0fdab0062238e0a1d502b8f900f390cb",
+    "PREVIEW_ONLY_R14P2_TransitionTravel_8": "b07eeb685933fb955182333a50ec038cc7da28cd8075474a355e89d34ef86ccc",
+    "PREVIEW_ONLY_R14P2_TransitionTravel_9": "678ca015ac147a8276a644245b750e4d876bdb186b286542ca3e7bfb5e4b2caf",
+    "PREVIEW_ONLY_R9W1_R8_Local": "40ac710cc86c6805ea7dbd9fc2a83d1bb358564207c7600eb07dc18483346d70",
+    "PREVIEW_ONLY_R9W1_R8_Move": "8a6b95b84997717c347281882cfde61e848f9b02715bdaff98736c43bf8e2ef4",
+    "PREVIEW_ONLY_R9W1_R8_Ready": "47e05dcc3bb7da6c2d770b23f961998207cb837931012df21689e7c904d870a4",
+    "PREVIEW_ONLY_R9W1_R8_Steering": "78ab4e3973e9e45e5e8815da369119908c5770bde7c7ea5c93064f96a0f881bf",
+    "PREVIEW_ONLY_R9W1_Steering_Local": "dc9bb0409c7342de56e74f42962d5949483e38ab38c985ad6baa5a14bf526d01",
+    "PREVIEW_ONLY_R9W2_A_Move": "9ecfbc162d6b8cb90f3c7c2a10ebad2d06e82df64863b00d48028fefd2aafc41",
+    "PREVIEW_ONLY_R9W2_A_Ready": "be3fb36d621a95ff6db5314b963e01ac9e3f904d89eac046e3b7502abeb7b543",
+    "PREVIEW_ONLY_R9W2_A_Steering": "75418aeca474c27540c947437c7afbb116d803e6acd97a8532648ec78ebefe34",
+    "PREVIEW_ONLY_R9W2_B_Move": "58feaf7066f8ec542428d137c0601f210df7952db718006f19f72270c9454ca3",
+    "PREVIEW_ONLY_R9W2_B_Ready": "4c3ff4a85d5ec47c29317f8be7055b245d38342df45e34f9960f9859231716bf",
+    "PREVIEW_ONLY_R9W2_B_Steering": "36f117ad12bbbff9b509b72052366c53ad67677fd71c5ced52bb1988c5f538b3",
+    "PREVIEW_ONLY_R9W4_COMPACT_Pistol_AimAround": "46993b90207e78ac1f4c550cb4c4d3931aa7827b7a88f0bfa8c248ad5ad236f3",
+    "PREVIEW_ONLY_R9W4_COMPACT_Pistol_Hold": "9bfc57c9e9f9bfeac591d68ffaccb3dfc469adcb9202a2fad3c09aee23cd265e",
+    "PREVIEW_ONLY_R9W4_COMPACT_Pistol_Move": "75933fcd66f8caa2b398af1a9dd57ef176b484d93405efe3b785c4fde9b3d3d3",
+    "PREVIEW_ONLY_R9W4_COMPACT_Shotgun_AimAround": "34a27f80696071f194c7e1c3be764f0c455530b5e806be3afabb91812759056b",
+    "PREVIEW_ONLY_R9W4_COMPACT_Shotgun_Hold": "ba9018656759ec1bf5373ec4f83a2326341ca738da89a9d67589d4c05f06c9d4",
+    "PREVIEW_ONLY_R9W4_COMPACT_Shotgun_Move": "69d3882d48a12ecdf216057d75bcf7de3df76fa953112a871ed3a65f87026f7c",
+    "PREVIEW_ONLY_R9W4_Pistol_ONEARM_TURN_RESPONSE": "75bce608a2a4241a31c0b9ac1c930867123ff3c970b7333682e352b04f8f4385",
+    "PREVIEW_ONLY_R9W4_Rifle_ONEARM_TURN_RESPONSE": "572176cac8217f7f80715f38a5c65e6dddbbb2f12a0be76c9a284bc553083f81",
+    "PREVIEW_ONLY_R9W4_Shotgun_ONEARM_TURN_RESPONSE": "1ec219ad7dee6b16de2d2cc5a129dec24102510654a65e6d713fd874552d8e23",
+    "PREVIEW_ONLY_R9W4_Sprint_LOWER": "394da111a433ee3fbf8a70346405d5db0d699a8fedf571d982e02df74f9a7686",
+    "PREVIEW_ONLY_R9W4_Sprint_V3_TURN_LOWER": "736494c5419f02056cae1c1b48bf43ea2d171270c9fd12e09694d6ee11a99a5b",
+    "PREVIEW_ONLY_R9W4_Walk_LOWER": "e846cb3b1ac3eab6e7175ff370133422274caf1e7e2f48ddc1d7da9218c9a9c0",
+    "PREVIEW_ONLY_R9W4_Walk_V3_TURN_LOWER": "122c7e655368dc2170657329cd42b6c4816362cbef6acf04c158f91814a15cc4",
+    "PREVIEW_ONLY_StudyTravel_V2": "eb2f00afbe307ecb9e0790722e6bae728da80da18c0405ebdf7a77691dcd0f63",
+    "R10WH1_Pistol_Turn_CloseCameraAction": "121b945675355eb249a089c406c786bf36c2eadfce10a9981bcd7d5184da7c03",
+    "R10WH1_Rifle_Turn_CloseCameraAction": "121b945675355eb249a089c406c786bf36c2eadfce10a9981bcd7d5184da7c03",
+    "R10WH1_Shotgun_Turn_CloseCameraAction": "121b945675355eb249a089c406c786bf36c2eadfce10a9981bcd7d5184da7c03",
+    "R12_Hold_Pistol_Upper": "5b04193f07c9bcbdb94adeb19c51397e1065acae08cce30404ab8b1c4863df1e",
+    "R12_Hold_Pistol_Upper_Pistol30Low": "55eb06a0fb2b27ed0ab338590031925b4606b735626142e5d07262ce7507ae5e",
+    "R12_Hold_Rifle_Upper": "6d2e3ac74cdb0f243c0a8f55e8a286313f0e501347075e37c0bc36e0bc5de2d1",
+    "R12_Hold_Rifle_Upper_Center10": "2e6022fd8212d2e85592c1e18e754e3fc0e0b6771f15f0dcc95b75dc580ec42c",
+    "R12_Hold_Shotgun_Upper": "24abca529754f2c9f2179dc6c0c2c042dbf0c3e3a853947a5823110c2860a89d",
+    "R12_Hold_Shotgun_Upper_Size15": "2457d1bc5bb255b9a4e78b4526e90dab6b36202e67f5d193b97e919b1a0ec835",
+    "R12_Hold_Shotgun_Upper_Size15_Center10": "ac0af135f79c1a6b23dea1307c4975d7a3204b2850592fdc36f0122331824471",
+    "R12_Hold_Unarmed_Upper": "e596a30effb993449fde4ec2220d026ded80d4da4e2e494d5ba4e536af69c00a",
+    "R12_Sprint_NativeYaw_InPlace": "123f9ee604d50ada59d45636e6e56ace86fc207625e0aef84e641540ce83b608",
+    "R12_Sprint_Pistol_Turn_Upper": "2b89eea4bc00aa1a01826f494d1d87c12ef5ccbf06034aa25f8c50098b5b3afa",
+    "R12_Sprint_Pistol_Turn_Upper_Foreaft30": "dcbfdaf9b1697cc8d5ea72ffada153c3f9d451f8fbde97b76c27b126f1079fa1",
+    "R12_Sprint_Pistol_Turn_Upper_Foreaft30_Pistol30Low": "85546524e9020d0cce4adccc805028110475cf6600f517fc2e37aeda9071d0ee",
+    "R12_Sprint_Pistol_Upper": "48893878b77b84a033845dcfd2f7197291b9440ff37c25046f9b188b36dcc143",
+    "R12_Sprint_Pistol_Upper_Foreaft30": "212226556c1733bc4324ab96608106b4de05ba89105df21865f6a031f3795b3b",
+    "R12_Sprint_Pistol_Upper_Foreaft30_Pistol30Low": "fc6fb3b87d8c370b69c32e9bdd35b77b3ed965bcbfb4782cb7fb44e5f5ef9cfa",
+    "R12_Sprint_Rifle_Turn_Upper": "67240bf641d443a5ef851bcb5b4b40548638c8a575a37839adb81061e60360e9",
+    "R12_Sprint_Rifle_Turn_Upper_Foreaft30": "80fe264e7c8b8a4a294738b0dc2ffad0132bf05fb54e9f2e5e19b53c6021a2f7",
+    "R12_Sprint_Rifle_Turn_Upper_Foreaft30_Center10": "d359786c167f031aa49eacf1783bb62261c2cc691a66f1ffad79e4dc5f36fa24",
+    "R12_Sprint_Rifle_Upper": "d5b75d176acadf9517337ec4ea75c6c098e7d0a4ed783626500af23a67f7add6",
+    "R12_Sprint_Rifle_Upper_Foreaft30": "b790df05c484195dedfedb286a36d7dd9a81d344b1a63884cbd7bc55249ff6d6",
+    "R12_Sprint_Rifle_Upper_Foreaft30_Center10": "6b3e708a1d1e0b8032f5749b7ec540bd302bd42247e859be30470b0732247159",
+    "R12_Sprint_Shotgun_Turn_Upper": "9ed023e971db5104f3bfff7249956b7e5b558786c47b17c3e3c56f1d8d6eaa9f",
+    "R12_Sprint_Shotgun_Turn_Upper_Size15": "7096562b7a77e991791a1b948e96d7ef1e71c0f01c87df3d12e3370cfd2b163b",
+    "R12_Sprint_Shotgun_Turn_Upper_Size15_Foreaft30": "33c591cbbe3bbca37b8cc0cee87fde31067a2beeb5a9f9e7e0df88114bafbb99",
+    "R12_Sprint_Shotgun_Turn_Upper_Size15_Foreaft30_Center10": "e97fc8cf84fd84d0787b01e6138e50ab0f7bbe6021ce6039fc39d99d68503654",
+    "R12_Sprint_Shotgun_Upper": "6281076f127d563994a22bf19d86a599d0ea41c23c5730010c522ad8ca440757",
+    "R12_Sprint_Shotgun_Upper_Size15": "c70e6fa8287ce17a578387ce170150f3a0630bb940e3300ea4f3273fdd569277",
+    "R12_Sprint_Shotgun_Upper_Size15_Foreaft30": "52f09d81d9749fa2e31f583a5515684ebda72917f692cc3ea1b0694e3c5f7144",
+    "R12_Sprint_Shotgun_Upper_Size15_Foreaft30_Center10": "e7feed2c77c9bbafe177981845dcf67b3e4f18ab0d2dda280c6bd885333b8ee0",
+    "R12_Sprint_Unarmed_Turn_Upper": "738611f793194918f4056d719da48e39683477120a1af7838ecbd8b4122386d7",
+    "R12_Sprint_Unarmed_Turn_Upper_Foreaft30": "2ccfcc34bbc7887d048ca1d0ba7fa53c06069ca0c7cba81b2e77d49deaec09a2",
+    "R12_Sprint_Unarmed_Upper": "81cb48cbafc4f9b6d376b08f194a98eaa9c282e686245f62d70ab727da7c0eb3",
+    "R12_Sprint_Unarmed_Upper_Foreaft30": "8b65a500a88e226bc4e420d28b8f073044a3dfa20bbbfe4827cce81eea4e8c0b",
+    "R12_Walk_NativeYaw_InPlace": "123f9ee604d50ada59d45636e6e56ace86fc207625e0aef84e641540ce83b608",
+    "R12_Walk_Pistol_Turn_Upper": "db30b2badf7db466867ccf5746d427e60be562e8775c60a4270c06ac463fe22f",
+    "R12_Walk_Pistol_Turn_Upper_Foreaft30": "8543ed1ba1c0467bca02dab47124bde35224f40d31ed74e3c22e95d0d5ebf4b5",
+    "R12_Walk_Pistol_Turn_Upper_Foreaft30_Pistol30Low": "80d453cdf2fb733b1779418be6f39f1c9ef293204042d8d29529470a36987e18",
+    "R12_Walk_Pistol_Upper": "d57b3fc14633d524ded521f3c0e486a5f6da1269701209f0177627b8480fae19",
+    "R12_Walk_Pistol_Upper_Foreaft30": "0327205eeb9a37e3e2b62175d7a227e6934b365a3a1e01ec012bf447f6c26780",
+    "R12_Walk_Pistol_Upper_Foreaft30_Pistol30Low": "235418e4054363f9e3b644b7781e439147b2eed83c98f802dc2a4644a538905f",
+    "R12_Walk_Rifle_Turn_Upper": "df8c1504ce0bb63bbc8b282ced3e63354e82fbf07ed05bd578d6dfaaff8aa79d",
+    "R12_Walk_Rifle_Turn_Upper_Foreaft30": "319ba66d7003b923f85e39c91c9b7a73a0f0be6cbc3426cbbadf9c7f7a6920bf",
+    "R12_Walk_Rifle_Turn_Upper_Foreaft30_Center10": "0cd6efe2bf45fb02ae29aaf755ccd6e6aacee9450cf359907a24a73c5fa3d081",
+    "R12_Walk_Rifle_Upper": "d19fabcb6b14562dc90c1276c761798504cd42b5cfbde240a6f7be9c0eee1398",
+    "R12_Walk_Rifle_Upper_Foreaft30": "b71059a0ae8983bb60929f83d8ccfc85e790deb0a02ba40a5f325ad14fb194f3",
+    "R12_Walk_Rifle_Upper_Foreaft30_Center10": "e48e8af49fde417890d562112f758b40f8fd6dffdbe446d44cfa5ed1c9618828",
+    "R12_Walk_Shotgun_Turn_Upper": "5e58d45735d07273b765482f837dd5fd1a501c156b08abbb476bc15ff4a0cdbb",
+    "R12_Walk_Shotgun_Turn_Upper_Size15": "636463a62c9921d67edcf2803025e845ac42a70b56771d56460ca4660c0c9102",
+    "R12_Walk_Shotgun_Turn_Upper_Size15_Foreaft30": "4ada8880ef0cb871067b2e46380b3ab14346d004b3b41034d3b08bbfd5ca4dd8",
+    "R12_Walk_Shotgun_Turn_Upper_Size15_Foreaft30_Center10": "1e1217278587d3aa2209a60349c2862f972754ab999f7b0e7000f3ff2da06488",
+    "R12_Walk_Shotgun_Upper": "2931dc5e0909efe986de119ecd50f6816b6b45ad8c3c3d03930d4a6c837f01d1",
+    "R12_Walk_Shotgun_Upper_Size15": "5350801efe1bde2d71051cbd928a496007ef15a983f0b9b4bc19ba006959a189",
+    "R12_Walk_Shotgun_Upper_Size15_Foreaft30": "be0d0797feb0d950ccebd55ea9948cded5ffeea565da70ee3966eb1c7a87a56d",
+    "R12_Walk_Shotgun_Upper_Size15_Foreaft30_Center10": "828a944dbde94bf748ab275ecceba6d7e71dade058770dd91887ecc7f4362bdf",
+    "R12_Walk_Unarmed_Turn_Upper": "5cf44ce0737c3b273afb4c9f9b7475ae5f5f1af9c5886b1597c573c2856a1eda",
+    "R12_Walk_Unarmed_Turn_Upper_Foreaft30": "ab986ac31b74df43c4d8fb033023e8a4961f156b59f6552c5b0df3fcf1d48aef",
+    "R12_Walk_Unarmed_Upper": "e29d6eb7e1c53945e330bbd531f41130d0fa3c6d0e59fb44cef2ae325f3a9205",
+    "R12_Walk_Unarmed_Upper_Foreaft30": "bc0ef12c3eff36fedf7fdf7da23591a3d3fb0d03861bc6d307d0bb96598bab82",
+    "R13_Pistol_Holster_ClearArc": "22eaf33c0590e59b1084edd084b7ed1f399cf02cbd40625b1c6776813d31aa30",
+    "R13_Pistol_Holster_ClearArc.001": "57930cdbae30a7fbc8e0ec08a5fb0c4369e0c33f89694aca7f1dab4ada114174",
+    "R13_Pistol_Holster_ClearArc.002": "c2dab676cbf2ae48c16875b775b22dcc48ec20343f9fce6e8850b5ec58f9824f",
+    "R13_Pistol_Holster_ClearArc.003": "2667b401cc65b4ec3f16aeb445cd14361a6af40054d10db9c170b951b140ba73",
+    "R13_Pistol_Holster_HorizontalBack": "3314a70f4e0162d6f1459d76bc673440c70168409cc05f51590c39852f9218a1",
+    "R13_Pistol_Holster_Review": "4b568fe43b6df1ef7533730c4189e997dd9e3dfd547886a0073da50dcde85c91",
+    "R13_Pistol_Holster_RightHip": "b781c1769c31ed8df8905e2ad9d34c0c2f4cfaa5e64716d63fc032f95f232288",
+    "R13_Pistol_Holster_RightHip.001": "c188084b25dabc3e57aee925bef421049f6e9875e0029d579cbe016d97a48f09",
+    "R13_Pistol_Holster_RightHip.002": "17b456a327318049764dead53ad57f14142bd57cc875037c7ae34d3c1a8e2142",
+    "R13_Pistol_Holster_RightHip.003": "d69d555b2d7449823add460804a9d6f39dd8a97d34e515811db8de8198960401",
+    "R13_Pistol_Holster_RightHipInset": "87a92b70fbb3e51d99c3c6d0c7b77bc04e5b735528e7b55f3bb6d82f0f972efd",
+    "R13_Pistol_Holster_RightHipInset_Final": "91d3c183271932a3001318e5145d8ddafe6e7bcc995365fe594dc8c4b255fbee",
+    "R13_Pistol_Holster_RightHipInset_UpperReview": "2f094fee37e99633564a48761b66ff7db67bf7ea67a1bd17f3afa2d169d1abda",
+    "R13_Rifle_Holster_ClearArc": "357a0a68815acc4a231cee1d6f219d2e3f301dbafc2590ecd14de6bda28f9d2c",
+    "R13_Rifle_Holster_ClearArc.001": "1f7002e5e47a16810191a4a4468603e97d559ef5b72a0abc9cd53cda92859b08",
+    "R13_Rifle_Holster_ClearArc.002": "81ce6e4a8ff78ad20096c1d636850984154e193a28e43ef98de653249f359f81",
+    "R13_Rifle_Holster_ClearArc.003": "b43a636ebb0f61d55827b8c290de11b66bdcc4b9a9c5260c72c034bca8f3fdc7",
+    "R13_Rifle_Holster_HorizontalBack": "3c5693379e2ba646ee01193025f028a0fbb9997415a3e3708ce1f5a525e17b20",
+    "R13_Rifle_Holster_HorizontalBack.001": "14b8052fc023fe82204edffe1ac04b077f83af83d6985927fdf8d475bfbdba94",
+    "R13_Rifle_Holster_HorizontalBack.002": "77f68d7a031ba07555a9a3ee54dc16e40c1131019ace2aaf8c2702b5b6512a08",
+    "R13_Rifle_Holster_HorizontalBack.003": "675e3e98f9a9600ddc13ff7f0913a9577eaaf5cc74b6c17b311cac0171310b34",
+    "R13_Rifle_Holster_HorizontalBack.004": "6225dac1ddf2a087db3b472fdee5e14ef6c866857523d6e1525f46127efc5e9d",
+    "R13_Rifle_Holster_MuzzleDownBack": "2db9f2a6ee6c4f194d5a2fb40c55b77d7445540d50679050a8fb4ef83955ceb7",
+    "R13_Rifle_Holster_MuzzleDownBack_Final": "b214ef3ea2f9f065cc21497e7323859f0f1d0c3175089e35729cdb37eb2e60a1",
+    "R13_Rifle_Holster_Review": "a8db8c6eebcda1cef2e398504fa839b2cbea4f3e8300e22346908313f21e8738",
+    "R13_Rifle_Holster_UpperBack_Final": "1d6c39929327fa89dbda3b39b0a562feee67bba8c5435b1ed1c9fee349a8ea2f",
+    "R13_Shotgun_Holster_ClearArc": "5ede7fb60dc78bec64d98ea75a1d96e3c1569d5b3c222f7742be9df71cd43397",
+    "R13_Shotgun_Holster_ClearArc.001": "df50ed07b1b6308676c665e75484fb9a799ff2bb5bf4de7f0313190c4506f16b",
+    "R13_Shotgun_Holster_ClearArc.002": "06ed8dbb09f9d81fa3e7c611517c0c9862bcdde9ea9cd56bfd7987c2c4a8a076",
+    "R13_Shotgun_Holster_ClearArc.003": "2dc2c31535c44360274153961ab87cfddb0945ae23264c38f0ab607629ac2a56",
+    "R13_Shotgun_Holster_HorizontalBack": "61fcbbc3e690fe99420b0c903edfe35ca55bf1c3573f7831202a175b6c551c72",
+    "R13_Shotgun_Holster_HorizontalBack.001": "e2238cd5eba5a9a0a12b253bcf7c0aad96ce923afc306073d84272b09c22474d",
+    "R13_Shotgun_Holster_HorizontalBack.002": "a071fad3d642c633beaf78f874859d936475ddbb86289ee9f8d54891f0d450c8",
+    "R13_Shotgun_Holster_HorizontalBack.003": "92e748fec4ca57e4067600c22cc9f1d7cc98aa73e64b339a4662601a2daf26b8",
+    "R13_Shotgun_Holster_HorizontalBack.004": "37b9b0b09ad1075c9436528ff1749a84bf7bb9bf44e3e81f0ff86c9b5b310930",
+    "R13_Shotgun_Holster_MuzzleDownBack": "f62c3246834751677bb16de7d07d7f079ae3d1e3529738c3a3b4084efe039080",
+    "R13_Shotgun_Holster_MuzzleDownBack_Final": "f15af78b4d5321746a56dfa15428ccde1e3fbda9ceae7d3038ff14df39bbd12f",
+    "R13_Shotgun_Holster_Review": "4eec32a779c84ea1134ebe7e181b42f4a67ca42ddbc95db2445ce266f1f7fe0f",
+    "R13_Shotgun_Holster_UpperBack_Final": "5a60b45e971c21983a1bdfdd589bfdd8f146b4d394bcf6141f1e9b6b1ea7d78b",
+    "R14P2_BackwardLeft_FrontAction": "27f63b42c786518110e429e031fede15effca4dd09f5c040dc8906ccbd17fb92",
+    "R14P2_BackwardLeft_GameplayAction": "c7f6ca8fd4e5d17468c0876cd4472ccf85907ffb5fe138867cf4cf922991004b",
+    "R14P2_BackwardLeft_SideAction": "40cd6d0883896289ea9907de32b6c2e8d08575a7efe2e9a6b186d0ad0cbb78c1",
+    "R14P2_BackwardLeft_ThreeQuarterAction": "95e6990cde0904746cd0a8d8fcbcae7ac40183a3b703064ca621a1b3b51f6106",
+    "R14P2_BackwardRight_FrontAction": "87038748b6e92fe50b02a6aa7e957ac4368e1a438675b51a5600ce0a2c070168",
+    "R14P2_BackwardRight_GameplayAction": "6d029a4c38eaa495af558dedbeb54490f2ec6f809884feb66561736f4d48a176",
+    "R14P2_BackwardRight_SideAction": "c508c6931a96f496eef0f0c83977b51ba6dc67f4b538f4de07b7dae8ce84fab0",
+    "R14P2_BackwardRight_ThreeQuarterAction": "72122c66020ae0b63b4ff29450b24895d5380d9bda182c543a8ca33f4b8de779",
+    "R14P2_ForwardLeft_FrontAction": "e132239db691ec5801703d7d05b19342a6ff6cfabf44aae544ca12459ba31387",
+    "R14P2_ForwardLeft_GameplayAction": "4852e6c43b5051bfd8be71749cf21c81a23b6e6fa982f496fbcda1607a5baeb9",
+    "R14P2_ForwardLeft_SideAction": "27680b4336a4c79c6d7c1b6d4c0d680f0a22a6f5c0866522a7040c68a3dda27f",
+    "R14P2_ForwardLeft_ThreeQuarterAction": "03a7c4a5885ad474dbab714a671bf37eda18886aae6c69114ffec5296b98be32",
+    "R14P2_ForwardRight_FrontAction": "be20e58bdc9e7a69ba5123f3973153206c69a5a395efdb5e5e55f240b2809fdf",
+    "R14P2_ForwardRight_GameplayAction": "d719159f4516823ef50cc07ba639c2aade97a415f07892394c0589ec1f26264b",
+    "R14P2_ForwardRight_SideAction": "f1de2598aadfc40392b319a3df78fcb6b29c58a4956338859a609d96846c0d72",
+    "R14P2_ForwardRight_ThreeQuarterAction": "1e2a0d162c42788f21e9efb47319baeac3ac88a8262187b6b5af2467a36ca675",
+    "R14P2_Left_FrontAction": "19d3bb4db66a3d583b2760100d021f6599120e478f73be9452700f2b82d15572",
+    "R14P2_Left_GameplayAction": "febe1d38e02dd52ede3cc0c9c4b6c37514e5be1064920b49a8d1c2b8e31a2ef0",
+    "R14P2_Left_SideAction": "cf594b052cfc7226e544d519d0bdca54e59f0f3b78a3ac03ea9988e927d1c4a7",
+    "R14P2_Left_ThreeQuarterAction": "469ee5451b2487789c8b514db13ae6c9d4950f11d0da3dcd64f4c81407e28420",
+    "R14P2_Right_FrontAction": "799b29a5ad8d1e0e2a1fd5197130996193a1184c5c8e54506bb8d56b643b520e",
+    "R14P2_Right_GameplayAction": "363e80ce3548d0dc29c19f89ae300951e085d936b32758277fc02ee51a968709",
+    "R14P2_Right_SideAction": "649abe553d86b74f87995c059f240b00cd856850c181835f367a9a6539b47b76",
+    "R14P2_Right_ThreeQuarterAction": "686c5595f6cc6b2d6829d88ea89bb806880159eec296e16153b7850af774ab03",
+    "R9W4_SOURCE_PREVIEW_ONLY_R3_Sprint_Path": "844f42aefb22a3ee33889669dd9984b7c527d9f9de467e780170f4e724f587df",
+    "R9W4_SOURCE_PREVIEW_ONLY_R3_Walk_Path": "aed79d2de45f0b517f0b23e620e1afe1f0f22f6de01811c975ccc8005d721a3e",
+    "R9W4_SOURCE_Sprint_ReferenceStudy_V2": "4671ce6c0ddb4633d7d96e795ccf6e62d0bfdb6dc7e50805e0d891f50da42e23",
+    "R9W4_SOURCE_Sprint_TurnLeft_Reference_V3": "3b28c97bc875ca2ba26df58c10b1af0c2ba296de087876425f72165b242cadd5",
+    "R9W4_SOURCE_Sprint_TurnRight_Reference_V3": "7ae55fe8729156c651191e40950bf68f6f6d304c41c4126e72c7d151cde42a00",
+    "R9W4_SOURCE_Walk_ReferenceStudy_V2": "bad7ca08ea00b3137e92ea710c99261e677401194920629f6e8d5c6d63138267",
+    "R9W4_SOURCE_Walk_TurnLeft_Reference_V3": "1af921fd127702bc5a284eec7d22df6d1d1335254ead83dbbe01a2784745a86a",
+    "R9W4_SOURCE_Walk_TurnRight_Reference_V3": "ad03745861c0073d4f7651c68fb1eea4643e95ee5441b0783bc68f81163f9e9a",
+    "Run": "65b20d26e8e80a9b2a29acb80dea194fb123d215678c10e0ea13b1683c2c4e0d",
+    "ShotgunAimAround_ElbowStudy_V2": "e9bdd8331a2bb4ae4f427dbe623a5e964131c1cb432e6080f229e23fbc8afc76",
+    "ShotgunAimAround_OneArmStudy_V1": "aa5635a12244e9acb5e4a182f8afb4d3e7a98a244d4842237fb77102d16f6e71",
+    "ShotgunAimAround_RightEyeStudy_V1": "474ada781b4e2ed39f2c4ed0b32d165cc72e47c6e171940ada8e9cf7eb2756e8",
+    "ShotgunAimAround_SimpleR11": "e3f95498c10de33b2bd83b5b5794ebf153d43322a4c877f9972f7bdbd4b448f1",
+    "ShotgunAimAround_SimpleR11_CenterFitR11": "2d625d35bc7492fcc8104f713f0acc869e7812e3a3b8b6e08a037a674c54167a",
+    "ShotgunAimAround_SimpleR11_CenterFitR11_Inward1cm": "dcc77c1d21377cf7b499a1e0aebf4b6a9c36ae2eca87b0329fa624b37c6e4b6d",
+    "ShotgunHold_ElbowStudy_V2": "bfdcb86f6bd0bde13da5dc62e09605c8f85932b1706d1980b7752e75507fcc21",
+    "ShotgunHold_OneArmStudy_V1": "af47add5ce22ccea1f160f25d8119af8de93bbf93200e1c7123c683e391d9d55",
+    "ShotgunHold_RightEyeStudy_V1": "ed0cbd8ab37f9b6c232369d2f0999d3a42a368c710595ab1cd4a9695be6eeaa5",
+    "ShotgunHold_SimpleR11": "574703f5d825015b2b19b1722b43b7ba533cc85d4fac8f62ac729181ffcf3a4e",
+    "ShotgunHold_SimpleR11_CenterFitR11": "114b83ffbc52c01b5c0b5080dd89e73d7db0df9f07856ad1c1fe5e0fb5b4e094",
+    "ShotgunHold_SimpleR11_CenterFitR11_Inward1cm": "58c37bbf144bf60348772be520977bf0d6d895f1f12bb993411f444904893dac",
+    "ShotgunMove_ElbowStudy_V2": "a92ee466aa6cb0e35646588727eb06628bde7ea5ef7e70d881f6bd5bb6b71a72",
+    "ShotgunMove_OneArmStudy_V1": "562f73674eb062c5160325f8fedae1976c8db84d6d4bcd31b5b179b49c2de919",
+    "ShotgunMove_RightEyeStudy_V1": "b3feb26f91e1a0ee7e8a58300fa00675d42cbccce445776c5b4c0b0b64954a3e",
+    "ShotgunMove_SimpleR11": "398cbf505b602143e4a75920d716a777e0c9a7e75919a81785016b8f24ed1d03",
+    "ShotgunMove_WalkSwayR11": "32d1b70da57f4f8b65ad3d39b8bb8ac6141ca88f52e70eb155005b3622e08537",
+    "ShotgunMove_WalkSwayR11_CenterFitR11": "597fc41ac1f26b55338496ee19d4bf5a226114542b6ab9d47c1f07f6c77b53dc",
+    "ShotgunMove_WalkSwayR11_CenterFitR11_Inward1cm": "aedb6955da66e1990333dafbabb6aea48a6409ea8d76f45557137df0abbb79d8",
+    "Walk_ReferenceStudy_V2": "bad7ca08ea00b3137e92ea710c99261e677401194920629f6e8d5c6d63138267"
+  },
+  "old_scene_timing": {
+    "BLOCK_JUMP_V2_REVIEW": [
+      24,
+      1.0,
+      178,
+      196
+    ],
+    "E2_Run_ABC_Detail": [
+      24,
+      1.0,
+      1,
+      160
+    ],
+    "E2_Run_ABC_GameplayScale": [
+      24,
+      1.0,
+      1,
+      160
+    ],
+    "JUMP_DEFAULT_V001_REVIEW": [
+      30,
+      1.0,
+      1,
+      25
+    ],
+    "PLAYER_ANIMATION_LIBRARY_V1": [
+      24,
+      1.0,
+      1,
+      21
+    ],
+    "Player_Cuboid_Classic_Asset": [
+      24,
+      1.0,
+      1,
+      16
+    ],
+    "R10WH1_PROBE_PISTOL": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R10WH1_PROBE_RIFLE": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R10WH1_PROBE_SHOTGUN": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R10WH1_REVIEW_PISTOL_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R10WH1_REVIEW_PISTOL_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R10WH1_REVIEW_PISTOL_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R10WH1_REVIEW_PISTOL_SPRINT": [
+      24,
+      1.0,
+      1,
+      832
+    ],
+    "R10WH1_REVIEW_PISTOL_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R10WH1_REVIEW_RIFLE_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R10WH1_REVIEW_RIFLE_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R10WH1_REVIEW_RIFLE_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R10WH1_REVIEW_RIFLE_SPRINT": [
+      24,
+      1.0,
+      1,
+      832
+    ],
+    "R10WH1_REVIEW_RIFLE_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R10WH1_REVIEW_SHOTGUN_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R10WH1_REVIEW_SHOTGUN_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R10WH1_REVIEW_SHOTGUN_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R10WH1_REVIEW_SHOTGUN_SPRINT": [
+      24,
+      1.0,
+      1,
+      832
+    ],
+    "R10WH1_REVIEW_SHOTGUN_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R10WH2_AB_PISTOL_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R10WH2_AB_PISTOL_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R10WH2_AB_PISTOL_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R10WH2_AB_PISTOL_SPRINT": [
+      24,
+      1.0,
+      1,
+      832
+    ],
+    "R10WH2_AB_PISTOL_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R10WH2_AB_RIFLE_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R10WH2_AB_RIFLE_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R10WH2_AB_RIFLE_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R10WH2_AB_RIFLE_SPRINT": [
+      24,
+      1.0,
+      1,
+      832
+    ],
+    "R10WH2_AB_RIFLE_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R10WH2_AB_SHOTGUN_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R10WH2_AB_SHOTGUN_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R10WH2_AB_SHOTGUN_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R10WH2_AB_SHOTGUN_SPRINT": [
+      24,
+      1.0,
+      1,
+      832
+    ],
+    "R10WH2_AB_SHOTGUN_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R10WH2_PROBE_PISTOL": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R10WH2_PROBE_RIFLE": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R10WH2_PROBE_SHOTGUN": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R10WH2_SHOWCASE_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R10WH2_SHOWCASE_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R11_ARCHIVE_PRE_WALK_ONLY_SPRINT": [
+      24,
+      1.0,
+      1,
+      208
+    ],
+    "R11_AUTHOR_PISTOL": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R11_AUTHOR_RIFLE": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R11_AUTHOR_SHOTGUN": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R11_SHOWCASE_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R11_SHOWCASE_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R11_SHOWCASE_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R11_SHOWCASE_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R11_WALK_PISTOL": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R11_WALK_RIFLE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R11_WALK_SHOTGUN": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R12_HOLD_ALL": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R12_SPRINT_ALL": [
+      24,
+      1.0,
+      1,
+      52
+    ],
+    "R12_SPRINT_TURN_ALL": [
+      24,
+      1.0,
+      145,
+      240
+    ],
+    "R12_WALK_ALL": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R12_WALK_TURN_ALL": [
+      24,
+      1.0,
+      145,
+      240
+    ],
+    "R13_STOW_FRONT_REVIEW": [
+      24,
+      1.0,
+      1,
+      124
+    ],
+    "R13_STOW_REVIEW": [
+      24,
+      1.0,
+      1,
+      124
+    ],
+    "R14_00_ABC_COMPARISON": [
+      24,
+      1.0,
+      1,
+      80
+    ],
+    "R14_A_EXISTING_WALK_SIDEWAYS": [
+      24,
+      1.0,
+      1,
+      80
+    ],
+    "R14_B_STRAFE_RIGHT": [
+      24,
+      1.0,
+      1,
+      80
+    ],
+    "R14_C_STRAFE_LEFT": [
+      24,
+      1.0,
+      1,
+      80
+    ],
+    "R14_D_RIGHT_STOP_LEFT_RIGHT": [
+      24,
+      1.0,
+      1,
+      268
+    ],
+    "R14P2_00_SIX_DIRECTION_SHOWCASE": [
+      48,
+      1.0,
+      1,
+      32
+    ],
+    "R14P2_01_AB_SAME_GAME_SPEED": [
+      48,
+      1.0,
+      1,
+      32
+    ],
+    "R14P2_02_LAB_SPEED_4_25": [
+      48,
+      1.0,
+      1,
+      20
+    ],
+    "R14P2_BackwardLeft": [
+      48,
+      1.0,
+      1,
+      32
+    ],
+    "R14P2_BackwardRight": [
+      48,
+      1.0,
+      1,
+      32
+    ],
+    "R14P2_ForwardLeft": [
+      48,
+      1.0,
+      1,
+      32
+    ],
+    "R14P2_ForwardRight": [
+      48,
+      1.0,
+      1,
+      32
+    ],
+    "R14P2_Left": [
+      48,
+      1.0,
+      1,
+      32
+    ],
+    "R14P2_Right": [
+      48,
+      1.0,
+      1,
+      32
+    ],
+    "R14P2_T1_Right_ForwardRight_Forward": [
+      48,
+      1.0,
+      1,
+      96
+    ],
+    "R14P2_T2_Left_ForwardLeft_Forward": [
+      48,
+      1.0,
+      1,
+      108
+    ],
+    "R14P2_T3_Right_BackwardRight_Backward": [
+      48,
+      1.0,
+      1,
+      120
+    ],
+    "R14P2_T4_Left_BackwardLeft_Backward": [
+      48,
+      1.0,
+      1,
+      132
+    ],
+    "R14P2_T5_ForwardRight_BackwardRight": [
+      48,
+      1.0,
+      1,
+      64
+    ],
+    "R14P2_T6_ForwardLeft_BackwardLeft": [
+      48,
+      1.0,
+      1,
+      72
+    ],
+    "R14P2_T7_ForwardRight_BackwardRight_BackwardLeft_ForwardLeft_ForwardRight": [
+      48,
+      1.0,
+      1,
+      200
+    ],
+    "R14P2_T8_Forward_ForwardRight_Right": [
+      48,
+      1.0,
+      1,
+      132
+    ],
+    "R14P2_T9_Backward_BackwardLeft_Left": [
+      48,
+      1.0,
+      1,
+      96
+    ],
+    "R14P2_WALK_SAMPLER": [
+      48,
+      1.0,
+      1,
+      32
+    ],
+    "R7W1_AUTHORING": [
+      24,
+      1.0,
+      1,
+      48
+    ],
+    "R7W1_COMPARISON": [
+      24,
+      1.0,
+      1,
+      48
+    ],
+    "R8A1_AUTHORING": [
+      24,
+      1.0,
+      1,
+      48
+    ],
+    "R8A1_COMPARISON": [
+      24,
+      1.0,
+      1,
+      48
+    ],
+    "R8A1_LEGACY": [
+      24,
+      1.0,
+      1,
+      48
+    ],
+    "R9W1_AUTHORING": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R9W1_REVIEW_LOCAL": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W1_REVIEW_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R9W1_REVIEW_READY": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R9W1_REVIEW_STEERING": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W2_DIAGNOSIS": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R9W2_REVIEW_FIGURE8": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W2_REVIEW_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R9W2_REVIEW_READY": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R9W2_REVIEW_SWEEP": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W2_REVIEW_WALK_LOCAL": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W3_DIAGNOSIS": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R9W3_REVIEW_CONTACT": [
+      24,
+      1.0,
+      176,
+      211
+    ],
+    "R9W3_REVIEW_FIGURE8": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W3_REVIEW_SWEEP": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W3_REVIEW_WALK_LOCAL": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W4_ASSETS": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R9W4_PROBE_PISTOL": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R9W4_PROBE_RIFLE": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R9W4_PROBE_SHOTGUN": [
+      24,
+      1.0,
+      1,
+      250
+    ],
+    "R9W4_REVIEW_PISTOL_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W4_REVIEW_PISTOL_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R9W4_REVIEW_PISTOL_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R9W4_REVIEW_PISTOL_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R9W4_REVIEW_RIFLE_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W4_REVIEW_RIFLE_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R9W4_REVIEW_RIFLE_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R9W4_REVIEW_RIFLE_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R9W4_REVIEW_SHOTGUN_AIMAROUND": [
+      24,
+      1.0,
+      1,
+      288
+    ],
+    "R9W4_REVIEW_SHOTGUN_HOLD": [
+      24,
+      1.0,
+      1,
+      96
+    ],
+    "R9W4_REVIEW_SHOTGUN_MOVE": [
+      24,
+      1.0,
+      1,
+      64
+    ],
+    "R9W4_REVIEW_SHOTGUN_TURN": [
+      24,
+      1.0,
+      1,
+      456
+    ],
+    "R9W4_REVIEW_SPRINT_ALL": [
+      24,
+      1.0,
+      1,
+      832
+    ]
+  },
+  "scope": "Three new Blender-only Actions plus separate preview carriers; preserve current game and every previous Action",
+  "status": "Awaiting user review; not measured Minecraft physics; not exported to runtime"
+}

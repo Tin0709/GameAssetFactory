@@ -8,7 +8,7 @@
   },
   "source_action_count": 306,
   "retained_source_actions": 312,
-  "catalog_entries": 54,
+  "catalog_entries": 59,
   "catalog": [
     {
       "id": "0",
@@ -671,6 +671,91 @@
       "fps": 30,
       "duration_seconds": 0.8,
       "status": "New Blender-only study; awaiting user review"
+    },
+    {
+      "id": "jump_stationary_v002",
+      "label": "Jump / Stationary V002",
+      "group": "Jump (study only)",
+      "scene": "JS2_STATIONARY_REVIEW",
+      "review_rig": "JS2_STATIONARY_Rig",
+      "review_carrier": "JS2_STATIONARY_PREVIEW_ONLY_Carrier",
+      "action": "Jump_Stationary_v002",
+      "start": 1,
+      "end": 27,
+      "fps": 30,
+      "duration_seconds": 0.8666666666666667,
+      "status": "New three-reference Blender study; awaiting human review; not integrated into game",
+      "review_note": "New stationary jump / Blender only",
+      "phase_note": "F13 apex / F21 contact / F27 end",
+      "carrier_note": "Carrier = preview height + travel"
+    },
+    {
+      "id": "jump_walk_v002",
+      "label": "Jump / Walking V002",
+      "group": "Jump (study only)",
+      "scene": "JS2_WALK_REVIEW",
+      "review_rig": "JS2_WALK_Rig",
+      "review_carrier": "JS2_WALK_PREVIEW_ONLY_Carrier",
+      "action": "Jump_Walk_v002",
+      "start": 1,
+      "end": 29,
+      "fps": 30,
+      "duration_seconds": 0.9333333333333333,
+      "status": "New three-reference Blender study; awaiting human review; not integrated into game",
+      "review_note": "New walk jump / Blender only",
+      "phase_note": "F15 apex / F23 contact / F29 end",
+      "carrier_note": "Carrier = preview height + travel"
+    },
+    {
+      "id": "jump_run_v002",
+      "label": "Jump / Running V002",
+      "group": "Jump (study only)",
+      "scene": "JS2_RUN_REVIEW",
+      "review_rig": "JS2_RUN_Rig",
+      "review_carrier": "JS2_RUN_PREVIEW_ONLY_Carrier",
+      "action": "Jump_Run_v002",
+      "start": 1,
+      "end": 27,
+      "fps": 30,
+      "duration_seconds": 0.8666666666666667,
+      "status": "New three-reference Blender study; awaiting human review; not integrated into game",
+      "review_note": "New run jump / Blender only",
+      "phase_note": "F13 apex / F21 contact / F27 end",
+      "carrier_note": "Carrier = preview height + travel"
+    },
+    {
+      "id": "jump_walk_loop_v003",
+      "label": "Walk + Jump LOOP V003",
+      "group": "Jump (study only)",
+      "scene": "JL3_WALK_REVIEW",
+      "review_rig": "JL3_WALK_Rig",
+      "review_carrier": "JL3_WALK_PREVIEW_ONLY_Carrier",
+      "action": "Jump_Walk_Loop_v003",
+      "start": 1,
+      "end": 84,
+      "fps": 30,
+      "duration_seconds": 2.8,
+      "review_note": "Continuous footwork / Blender study",
+      "phase_note": "Loop 0.933 s / 3 continuous cycles",
+      "carrier_note": "No pause / Root travel = preview only",
+      "status": "Loop pose/tangents checked; pending visual review and future runtime phase integration"
+    },
+    {
+      "id": "jump_run_loop_v003",
+      "label": "Run + Jump LOOP V003",
+      "group": "Jump (study only)",
+      "scene": "JL3_RUN_REVIEW",
+      "review_rig": "JL3_RUN_Rig",
+      "review_carrier": "JL3_RUN_PREVIEW_ONLY_Carrier",
+      "action": "Jump_Run_Loop_v003",
+      "start": 1,
+      "end": 78,
+      "fps": 30,
+      "duration_seconds": 2.6,
+      "review_note": "Continuous footwork / Blender study",
+      "phase_note": "Loop 0.867 s / 3 continuous cycles",
+      "carrier_note": "No pause / Root travel = preview only",
+      "status": "Loop pose/tangents checked; pending visual review and future runtime phase integration"
     }
   ],
   "source_action_hashes": {
@@ -1425,6 +1510,21 @@
   "runtime_transition_rate": 5.25,
   "scope": "Blender review only; 312 prior Actions unchanged; adds flat-jump pose and separate preview-carrier Actions; no game integration",
   "jump_default_v001": "jump_default_v001/manifest.json",
-  "default_review": "jump_default_v001",
-  "total_actions": 314
+  "default_review": "jump_run_loop_v003",
+  "total_actions": 324,
+  "jump_set_v002": {
+    "manifest": "jump_set_v002/manifest.json",
+    "cases": [
+      "stationary",
+      "walk",
+      "run"
+    ],
+    "preserved_previous_actions": 314,
+    "blender_only": true
+  },
+  "jump_loop_v003": {
+    "manifest": "jump_loop_v003/manifest.json",
+    "preserved_previous_actions": 320,
+    "runtime_integrated": false
+  }
 }
