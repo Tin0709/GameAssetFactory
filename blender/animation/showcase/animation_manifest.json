@@ -112,6 +112,42 @@
         "Leg.L": "XYZ",
         "Leg.R": "XYZ"
       }
+    },
+    {
+      "action": "Jump_Takeoff_Test",
+      "source": "blender/animation/reviews/player_animation_library_v1/jump_takeoff_test/jump_takeoff_review.blend",
+      "source_sha256": "2f5a9eec11e589317c521d55956a4c58a37de2a7fb662fea94907a822b0282af",
+      "source_rig": "JT_Test_Rig",
+      "source_mesh": "JT_Test_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+      "action_frame_range": [
+        1.0,
+        24.0
+      ],
+      "start": 1,
+      "end": 24,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      }
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

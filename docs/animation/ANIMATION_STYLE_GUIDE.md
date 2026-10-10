@@ -4,6 +4,8 @@ Research date: **2026-10-10, Asia/Saigon**. Target: our original mobile-first ga
 
 ## 1. What this research establishes
 
+**Approved project direction — 2026-10-10:** the user explicitly approved `Expressive_Arm_Motion_Test`, `Run_Expressive_Test`, `LowerBody_Recovery_Test` and the Animation Showcase. Ground preparation and motion absorption should retain the recovery test's subtle **“nhúng nhúng”** feeling: soft but controlled, light but weighted, alive, and blocky. Carry a small appealing weight shift/dip into future push-off and landing work; avoid exaggerated squats, rubber deformation, floppy follow-through and robotic timing. This is an approved artistic preference for our character, not a claim about the reference game's implementation or blanket approval of future clips. See [the central review workflow](ANIMATION_WORKFLOW.md).
+
 The strongest inspected reference is the sequel hero's complete **walk, run, jump and jump-land GIF sequences**, supported by selected official gameplay-trailer pixels. They show that straight-edged limbs can remain visually rigid while their orientation, spacing, rhythm and relationship to the torso change substantially. Expression comes from articulated **relationships between blocks**, not necessarily from bending or stretching the blocks themselves.
 
 For our game, prioritize readable arm/leg separation, a distinct running stride, an asymmetric airborne silhouette, and uninterrupted support-to-flight-to-support transitions. A wide swing must still look attached to the shoulder, respect weapon grips and read at the gameplay camera. More amplitude alone is not a quality improvement.

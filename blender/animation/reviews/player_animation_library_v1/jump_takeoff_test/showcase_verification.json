@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "selection_switches": 10,
+  "max_source_vertex_error_m": 1.4057727354849284e-07,
+  "slots_ranges_timing_match": true,
+  "pending_status_preserved": true,
+  "approved_actions_sources_and_godot_unchanged": true,
+  "one_rig_one_character_plus_floor": true
+}

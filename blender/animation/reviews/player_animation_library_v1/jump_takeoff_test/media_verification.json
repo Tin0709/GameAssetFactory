@@ -1,0 +1,57 @@
+{
+  "jump_takeoff_1x": {
+    "frames": 24,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 0.8,
+    "sha256": "36c0556432a6f2ec992dab71dd7dedf51f328e14c0da8188d510fa7e8e44a215",
+    "max_mean_rgb_decode_error": 1.4047634601593018
+  },
+  "front_1x": {
+    "frames": 24,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 0.8,
+    "sha256": "9795baa9714cff7c35ee97acfd4a1594c93079c53f28a1944a577276c38b6696",
+    "max_mean_rgb_decode_error": null
+  },
+  "three_quarter_1x": {
+    "frames": 24,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 0.8,
+    "sha256": "8d99d741c38ffab2de043f70d32e96f6205f6d8cdec1e2f9b0551e683b9ed999",
+    "max_mean_rgb_decode_error": null
+  },
+  "side_1x": {
+    "frames": 24,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 0.8,
+    "sha256": "de2245cdc2e39892a03883070b386e731e47d30c2c05e950864f2a1bfaa4d906",
+    "max_mean_rgb_decode_error": null
+  },
+  "jump_takeoff_review": {
+    "frames": 108,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 3.6,
+    "sha256": "f5ff72e39e3df0b3f7698614ed6cc7a0b12398e364d50ce5584c09d0a3c412ed",
+    "max_mean_rgb_decode_error": null
+  }
+}

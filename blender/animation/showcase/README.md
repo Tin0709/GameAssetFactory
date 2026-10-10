@@ -7,10 +7,11 @@ Open **Animation_Showcase.blend** (or double-click **Open_Showcase.cmd**). In th
 | Expressive_Arm_Motion_Test | 1–24 | 30 FPS | User approved |
 | Run_Expressive_Test | 1–18 | 30 FPS | User approved |
 | LowerBody_Recovery_Test | 1–48 | 30 FPS | User approved |
+| Jump_Takeoff_Test | 1–24 | 30 FPS | Pending review |
 
 Selection resets the full pose before binding the original Action and its Blender 5.2 slot. The run retains its frame-19 closing key, outside the 18-frame playback range. Arm/recovery are one-shots: repeating them resets to the beginning; they are not seamless cycles.
 
-The viewer contains exactly these three independent Actions, one character/rig and the original textured review stage. Textures are packed. Source studies, production assets and Godot remain unchanged. This is a Blender review workspace; runtime behavior is not established here. Jump Takeoff is deferred until the viewer review.
+The user has approved this viewer. It now contains the three approved references plus the pending [Jump Takeoff study](../reviews/player_animation_library_v1/jump_takeoff_test/README.md), one character/rig and the original textured review stage. Textures are packed. Source studies, production assets and Godot remain unchanged. This is a Blender review workspace; runtime behavior is not established here. Takeoff ends in early flight; no full arc or landing has been authored in that study.
 
 ## Persistent controls
 
@@ -36,6 +37,8 @@ Only matching rest rigs and pose rotation modes, one OBJECT slot/layer/strip/cha
 ## Validation and maintenance
 
 `verification.json` records a fresh Blender-process reopen, 18 selection transitions, original slot/range/timing checks and exact evaluated geometry agreement at integer and half frames. `refresh_verification.json` covers selective import, incompatible-rig rollback, duplicate/changed-source rejection and pending status. `registration_verification.json` covers pending registration and duplicate refusal. Actual GUI playback, pause, restart, looping and one-shot stopping were checked; evidence and protected-file hashes are in `.validation/animation_showcase/`.
+
+Those initial reports cover the original three-entry build. The [takeoff showcase verification](../reviews/player_animation_library_v1/jump_takeoff_test/showcase_verification.json) covers the current four-entry viewer and switching between all references and pending takeoff. Its adjacent `verify_showcase.py` is the check to run for this library revision.
 
 The three `preview_*.png` renders match the corresponding source-study pixels exactly. `viewer_screenshot.png` shows the saved review interface. All 1,716 protected source/runtime files retained their SHA256 hashes.
 

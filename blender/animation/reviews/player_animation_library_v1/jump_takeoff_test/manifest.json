@@ -1,0 +1,18 @@
+{
+  "action": "Jump_Takeoff_Test",
+  "frames": [
+    1,
+    24
+  ],
+  "fps": 30,
+  "last_support_frame": 19,
+  "status": "pending",
+  "rig_changes": [],
+  "original_actions": {
+    "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+    "LowerBody_Recovery_Test": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+    "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1"
+  },
+  "scope": "Ready through early flight; no apex, descent or landing.",
+  "source_showcase_sha256": "44d592424978842ae1d8c411fd309c47c429e630809efba30cc99b4411ad03b0"
+}
