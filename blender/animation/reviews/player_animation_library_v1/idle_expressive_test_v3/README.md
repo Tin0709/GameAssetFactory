@@ -17,6 +17,8 @@ This is the quick stance/breath checkpoint requested by “let me review.” Ful
 
 ## Latest requested adjustments
 
+Additional user steering adds restrained up/down head attention only while facing forward: a5° upward glance and4° chin dip in the shorter center interval, then a gentler4°/3° pair in the later rest. Returns are smooth and the seam remains quiet; side-look range/speed, breathing, legs and rig are preserved.
+
 Latest middle-pause correction halves the straight-ahead interval between looks from60.5 to30.25frames (about2.02 to1.01seconds), moving the second look30.25frames earlier without changing turn speed/range, four-second breathing, leg stance or eight-second loop. Quiet rest across the seam remains.
 
 Latest explicit side-view request: character LEFT slightly forward and RIGHT slightly back (opposed 3.75° whole-leg pitch; latest requested50% increase), both15° outward yaw, as subsequently requested. Unequal mainly sideways opening remains L3°/R8°, with hip bias and torso counterbalance. Twenty-five millimetres of clearance per proximal leg from the original sideways-only base (16mm more than the5° candidate) prevents the yawed rigid blocks intersecting. Fixed lowest sole corners; no invented ankle/knee or flattened boots.

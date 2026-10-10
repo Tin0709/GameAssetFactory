@@ -10,5 +10,7 @@ for row,frame in enumerate([45,111]):
  for col,view in enumerate(['front','three_quarter','side']):
   im=Image.open(OUT/'attention_frames'/f'{view}_{frame:04d}.png').convert('RGB');assert im.size==(640,640);sheet.paste(im,(col*640,row*700+60));draw.text((col*640+18,row*700+18),f'{view.replace("_"," ").title()} / look {row+1} / Pending v3',font=font,fill='white')
 sheet.save(OUT/'lookaround_three_views.jpg',quality=94)
-p=OUT/'README.md';t=p.read_text(encoding='utf8').replace('- [Leg closeups](stance_legs_checkpoint.jpg).','- [Leg closeups](stance_legs_checkpoint.jpg).\n- [Both stronger looks: front / three-quarter / side](lookaround_three_views.jpg).');p.write_text(t,encoding='utf8')
+p=OUT/'README.md';t=p.read_text(encoding='utf8')
+if '(lookaround_three_views.jpg)' not in t:t=t.replace('- [Leg closeups](stance_legs_checkpoint.jpg).','- [Leg closeups](stance_legs_checkpoint.jpg).\n- [Both stronger looks: front / three-quarter / side](lookaround_three_views.jpg).')
+p.write_text(t,encoding='utf8')
 print('Packaged six source-bound attention poses')
