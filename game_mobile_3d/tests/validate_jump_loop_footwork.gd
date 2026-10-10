@@ -4,6 +4,8 @@ var results: Array=[]
 func _initialize() -> void:call_deferred("run")
 func tick() -> void:
 	await physics_frame;await process_frame
+	# process_frame is emitted before Node._process; measure the finished pose.
+	await create_timer(0.0).timeout
 func check(ok: bool, text: String) -> void:
 	if not ok:failures.append(text);push_error(text)
 func run() -> void:
@@ -21,6 +23,7 @@ func run() -> void:
 			p.request_jump()
 			var lo:=INF;var hi:=-INF;var min_floor:=INF;var maximum_pose_step:=0.0
 			var previous:Quaternion=p.visual.skeleton.get_bone_pose_rotation(p.visual.leg_right)
+			var maximum_source_error:=0.0
 			var history:Array=[]
 			for i in 60:
 				await tick()
@@ -28,6 +31,9 @@ func run() -> void:
 				var l:Vector3=s.get_bone_global_pose(p.visual.leg_left)*Vector3(0,.675,0)
 				var r:Vector3=s.get_bone_global_pose(p.visual.leg_right)*Vector3(0,.675,0)
 				var pose:Quaternion=s.get_bone_pose_rotation(p.visual.leg_right)
+				if p.visual.jump_active and p.visual.jump_blend>.999:
+					for bone in [p.visual.leg_left,p.visual.leg_right]:
+						maximum_source_error=maxf(maximum_source_error,s.get_bone_pose_rotation(bone).angle_to(p.visual.jump_pose.rotation(bone,p.visual.jump_time)))
 				maximum_pose_step=maxf(maximum_pose_step,previous.angle_to(pose));previous=pose
 				# Include the entire airborne interval: the authored walk crosses
 				# its feet near takeoff/contact, outside the old V002 middle window.
@@ -43,6 +49,7 @@ func run() -> void:
 			var tag:String=kind+(" armed" if armed else " unarmed")
 			check(lo<-.04 and hi>.04,tag+": legs exchange stride during flight")
 			check(min_floor>=-.015,tag+": supported sole penetration below 1.5cm")
+			check(maximum_source_error<.001,tag+": full-weight legs follow the authored V003 clip")
 			results.append({"case":tag,"air_stride_min":lo,"air_stride_max":hi,"ground_sole_min":min_floor,"maximum_pose_step_deg":rad_to_deg(maximum_pose_step),"history":history})
 			Input.action_release("move_right");Input.action_release("sprint")
 	FileAccess.open("res://.validation/jump_loop_v003/moving_footwork.json",FileAccess.WRITE).store_string(JSON.stringify({"cases":results,"failures":failures},"\t"))

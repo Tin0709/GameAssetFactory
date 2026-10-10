@@ -1,0 +1,71 @@
+{
+  "samples": 567,
+  "min_floor_z_m": 0.0002971864305436611,
+  "min_air_z_m": 0.0014142487198114395,
+  "max_ground_gap_m": 4.566696286201503e-06,
+  "support_center_y_drift_m": 1.4990568161010742e-05,
+  "neutral_error_m": 0,
+  "new_overlaps": [],
+  "baseline_overlaps_m": {
+    "Head / UpperArm.L": 0,
+    "Head / UpperArm.R": 0,
+    "Head / Leg.L": 0,
+    "Head / Leg.R": 0,
+    "Head / ForeArm.L": 0,
+    "Head / ForeArm.R": 0,
+    "Chest / ForeArm.L": -0.0038750171661376953,
+    "Chest / ForeArm.R": -0.0038750171661376953,
+    "UpperArm.L / UpperArm.R": 0,
+    "UpperArm.L / Leg.L": 0,
+    "UpperArm.L / Leg.R": 0,
+    "UpperArm.L / ForeArm.R": 0,
+    "UpperArm.R / Leg.L": 0,
+    "UpperArm.R / Leg.R": 0,
+    "UpperArm.R / ForeArm.L": 0,
+    "Leg.L / Leg.R": -1.9670125084303436e-08,
+    "Leg.L / ForeArm.L": -5.960464477539063e-08,
+    "Leg.L / ForeArm.R": 0,
+    "Leg.R / ForeArm.L": 0,
+    "Leg.R / ForeArm.R": -5.960464477539063e-08,
+    "ForeArm.L / ForeArm.R": 0
+  },
+  "camera_bounds": {
+    "JGIF4_THREE_QUARTER": [
+      0.28441303968429565,
+      0.21245118975639343,
+      0.7248382568359375,
+      0.8617901802062988
+    ],
+    "JGIF4_SIDE": [
+      0.38727301359176636,
+      0.1808699369430542,
+      0.7146264314651489,
+      0.8485192656517029
+    ],
+    "JGIF4_FRONT": [
+      0.2990564703941345,
+      0.1921442300081253,
+      0.7090018391609192,
+      0.8613616228103638
+    ],
+    "JGIF4_BACK": [
+      0.29099833965301514,
+      0.1826707124710083,
+      0.7009437084197998,
+      0.8327423930168152
+    ]
+  },
+  "preserved_actions": 324,
+  "changed_originals": [],
+  "checks": {
+    "old_data_preserved": true,
+    "neutral_endpoints": true,
+    "no_floor_penetration": true,
+    "ground_clearance": true,
+    "support_center_stable": true,
+    "airborne": true,
+    "no_new_nonadjacent_overlap": true,
+    "camera_framing": true
+  },
+  "failures": []
+}

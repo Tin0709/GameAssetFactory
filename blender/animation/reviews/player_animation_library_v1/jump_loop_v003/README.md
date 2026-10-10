@@ -88,3 +88,12 @@ checks all selections. Intermediate files are under `.validation/jump_loop_v003/
 `build_loops.py` creates only new scenes/Actions and rejects name collisions.
 `integrate_library.py` exposes them additively; render/package/encode scripts never
 save render settings over the shared library. **Pending human visual review.**
+
+## Subsequent runtime integration request
+
+The user subsequently requested these two loops in main WorldMap and a jump above
+one block. See [runtime V003](../../../../../game_mobile_3d/assets/characters/jump_loop_v003/README.md).
+`export_runtime.py` reads this saved library without changing it; a versioned GLB
+appends two clips to V002. Runtime physics uses a 1.20 m arc independently of the
+preview. Earlier Blender-only statements above describe the original study scope.
+Integration does not establish artistic approval.

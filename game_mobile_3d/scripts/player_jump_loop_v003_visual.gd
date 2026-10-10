@@ -6,6 +6,10 @@ var jump_pose: RefCounted
 var jump_arm_weight := 1.0
 var jump_duration := 26.0/30.0
 var jump_blend := 0.0
+var _transition_pose:RefCounted
+var _transition_time:=0.0
+var _transition_elapsed:=1.0
+const TRANSITION_DURATION:=4.0/30.0
 
 func _is_additional_authored_bone(rig: Skeleton3D, bone: int) -> bool:
 	var name:=rig.get_bone_name(bone)
@@ -19,17 +23,23 @@ func _ready() -> void:
 	jump_pose=samples["Jump_Stationary_v002"]
 
 func select_jump(action: String, duration: float) -> void:
+	if jump_pose!=null and jump_pose!=samples[action] and jump_blend>0.0:
+		_transition_pose=jump_pose;_transition_time=jump_time;_transition_elapsed=0.0
 	jump_pose=samples[action];jump_duration=duration
 
 func set_jump_state(active: bool, time: float, immediate: bool=false) -> void:
 	jump_active=active;jump_time=time
-	if immediate:jump_blend=1.0 if active else 0.0
+	if immediate:
+		jump_blend=1.0 if active else 0.0
+		_transition_pose=null
 
 func _preserve_grip() -> bool:
 	return weapon_equipped and (socket.current_attachment in [&"hand",&"carrier"] or r13_mode!=&"" or r13_exit_time>=0.0)
 
 func _process(delta: float) -> void:
 	if not frozen:
+		_transition_elapsed+=delta
+		if _transition_elapsed>=TRANSITION_DURATION:_transition_pose=null
 		jump_blend=move_toward(jump_blend,1.0 if jump_active else 0.0,delta/(2.0/30.0 if jump_active else 4.0/30.0))
 		if socket!=null:jump_arm_weight=move_toward(jump_arm_weight,0.0 if _preserve_grip() else 1.0,delta/.08)
 	super._process(delta)
@@ -50,6 +60,14 @@ func _evaluate(delta: float) -> void:
 		if preserve_grip and name in ["Spine","Chest","Neck","Head"]:
 			p=skeleton.get_bone_pose_position(bone)+p-jump_pose.position(bone,0.0)
 			q=(skeleton.get_bone_pose_rotation(bone)*jump_pose.rotation(bone,0.0).inverse()*q).normalized()
+		if _transition_pose!=null:
+			var old_p:Vector3=_transition_pose.position(bone,_transition_time)
+			var old_q:Quaternion=_transition_pose.rotation(bone,_transition_time)
+			if preserve_grip and name in ["Spine","Chest","Neck","Head"]:
+				old_p=skeleton.get_bone_pose_position(bone)+old_p-_transition_pose.position(bone,0.0)
+				old_q=(skeleton.get_bone_pose_rotation(bone)*_transition_pose.rotation(bone,0.0).inverse()*old_q).normalized()
+			var u:=smoothstep(0.0,TRANSITION_DURATION,_transition_elapsed)
+			p=old_p.lerp(p,u);q=old_q.slerp(q,u).normalized()
 		skeleton.set_bone_pose_position(bone,skeleton.get_bone_pose_position(bone).lerp(p,bone_weight))
 		skeleton.set_bone_pose_rotation(bone,skeleton.get_bone_pose_rotation(bone).slerp(q,bone_weight).normalized())
 	# Support must correspond to the final blended pose, including armed torso.

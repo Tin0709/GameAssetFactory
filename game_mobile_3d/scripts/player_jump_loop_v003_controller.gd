@@ -15,6 +15,8 @@ var _vertical_speed := 0.0
 var _jump_gravity := 0.0
 var _pose_time := 0.0
 var _contact_pose_time := 0.0
+var _recovery_elapsed := 0.0
+var _recovery_duration := 0.0
 
 func _running_repeat() -> bool:
 	return Input.is_action_pressed("jump") and Input.is_action_pressed("sprint") and not Input.get_vector("move_left","move_right","move_forward","move_backward").is_zero_approx()
@@ -53,11 +55,12 @@ func _before_vertical_move(direction: Vector3, delta: float) -> bool:
 	if not jump_active:return super._before_vertical_move(direction,delta)
 	jump_time+=delta
 	if _landed:
-		var u:float=clampf((jump_time-jump_profile.contact)/(jump_profile.end-jump_profile.contact),0.0,1.0)
+		_recovery_elapsed+=delta
+		var u:float=clampf(_recovery_elapsed/_recovery_duration,0.0,1.0)
 		# A raised block may contact early. Advance from the current pose smoothly
 		# into recovery instead of snapping directly to the authored contact key.
 		_pose_time=lerpf(_contact_pose_time,jump_profile.end,u)
-		if jump_time>=jump_profile.end-.000001:
+		if _recovery_elapsed>=_recovery_duration-.000001:
 			if is_on_floor() and _running_repeat():
 				# End/start match in V003. Keep the visual blend active at this wrap.
 				_begin_jump()
@@ -72,8 +75,9 @@ func _before_vertical_move(direction: Vector3, delta: float) -> bool:
 		_airborne=true
 		velocity.y=_vertical_speed-_jump_gravity*delta*.5
 		_vertical_speed-=_jump_gravity*delta
-		# Over a drop, defer recovery until actual collision; no second air jump.
-		_pose_time=minf(jump_time,jump_profile.contact-1.0/120.0)
+		# Continue moving footwork over extended drops without restarting physics.
+		# The nonperiodic stationary pose still waits for actual floor contact.
+		_pose_time=minf(jump_time,jump_profile.contact-1.0/120.0) if jump_kind==&"stationary" else fposmod(jump_time,jump_profile.end)
 	visual.set_jump_state(true,_pose_time)
 	return false
 
@@ -84,4 +88,6 @@ func _after_vertical_move(was_grounded: bool, stepping: bool) -> void:
 		if is_on_ceiling():_vertical_speed=minf(_vertical_speed,0.0)
 		if is_on_floor():
 			_landed=true;_contact_pose_time=_pose_time
+			_recovery_elapsed=0.0
+			_recovery_duration=maxf(jump_profile.end-_contact_pose_time,jump_profile.end-jump_profile.contact)
 			jump_time=jump_profile.contact;velocity.y=0.0
