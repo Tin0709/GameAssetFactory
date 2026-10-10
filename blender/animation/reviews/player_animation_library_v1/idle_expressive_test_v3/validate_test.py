@@ -31,7 +31,7 @@ for j in range(report['samples']):
         for view in ['FRONT','THREE_QUARTER','SIDE']:
             q=[world_to_camera_view(s,bpy.data.objects['Showcase_'+view],p) for p in v];b=report['camera_bounds'].setdefault(view,[1,1,0,0]);b[:]=[min(b[0],min(x.x for x in q)),min(b[1],min(x.y for x in q)),max(b[2],max(x.x for x in q)),max(b[3],max(x.y for x in q))]
     if j%16==0:report['frames'].append({'frame':f,'vertices':[list(p) for p in v]})
-sample(60);report['world_deformation_angles_deg_at_observation']={n:[math.degrees(x) for x in (r.pose.bones[n].matrix@r.data.bones[n].matrix_local.inverted()).to_euler('XYZ')] for n in ['Hips','Spine','Chest','Head']}
+sample(45);report['world_deformation_angles_deg_at_observation']={n:[math.degrees(x) for x in (r.pose.bones[n].matrix@r.data.bones[n].matrix_local.inverted()).to_euler('XYZ')] for n in ['Hips','Spine','Chest','Head']}
 close=sample(CLOSE);report['loop_pose_error_m']=max((p-q).length for p,q in zip(initial,close))
 prev=sample(CLOSE-.0625);nxt=sample(1.0625)
 report['loop_finite_vertex_velocity_difference_m_per_s']=max(((q-p)/.0625-(p-b)/.0625).length*30 for b,p,q in zip(prev,initial,nxt))
@@ -51,7 +51,7 @@ for item in old['frames']:
 report['v2_source_vertex_error_m']=error;report['v2_original_action_sha256']=ui.action_signature(r.animation_data.action)
 r.animation_data.action=a;r.animation_data.action_slot=a.slots[0]
 report['observation_world_angles']={}
-for phase,frame in [('first',65),('second',158)]:
+for phase,frame in [('first',45),('second',111)]:
     sample(frame)
     report['observation_world_angles'][phase]={n:[math.degrees(x) for x in (r.pose.bones[n].matrix@r.data.bones[n].matrix_local.inverted()).to_euler('XYZ')] for n in ['Hips','Chest','Head']}
 sample(1)
@@ -65,7 +65,7 @@ report['asymmetric_support_valid']=all(len(ids)>=1 for ids in report['support_co
 report['body_breathing_rise_m']=report['hip_xyz_range_m'][2][1]-report['hip_xyz_range_m'][2][0]
 report['facial_controls_absent']=m.data.shape_keys is None and not any('eye' in b.name.lower() or 'face' in b.name.lower() for b in r.pose.bones)
 before=json.loads((TMP/'backup_manifest.json').read_text());allowed={str(ROOT/p) for p in before['authorized_metadata_changes']};protected=[p for p in before['files'] if p not in allowed];report['protected_files_unchanged']=all(hashlib.sha256(Path(p).read_bytes()).hexdigest()==before['files'][p] for p in protected);report['protected_file_count']=len(protected)
-report['head_led_torso_turn_readable']=20<report['observation_world_angles']['first']['Head'][2]<30 and -30<report['observation_world_angles']['second']['Head'][2]<-18 and 3<report['observation_world_angles']['first']['Chest'][2]<10 and -10<report['observation_world_angles']['second']['Chest'][2]<-2
+report['head_led_torso_turn_readable']=45<report['observation_world_angles']['first']['Head'][2]<60 and -55<report['observation_world_angles']['second']['Head'][2]<-38 and 5<report['observation_world_angles']['first']['Chest'][2]<15 and -15<report['observation_world_angles']['second']['Chest'][2]<-4
 report['sampled_source_unchanged_during_validation']=hashlib.sha256(Path(bpy.data.filepath).read_bytes()).hexdigest()==report['sampled_source_sha256']
 report['passed']=report['sampled_source_unchanged_during_validation'] and report['head_led_torso_turn_readable'] and report['max_rigid_error_m']<2e-6 and report['max_full_sole_drift_m']<1e-5 and report['max_full_sole_height_error_m']<1e-5 and report['minimum_floor_clearance_m']>0 and not report['nonadjacent_overlaps'] and report['loop_pose_error_m']<1e-6 and report['loop_finite_vertex_velocity_difference_m_per_s']<.001 and report['loop_channel_tangent_difference']<.0001 and report['cycles_modifiers_on_all_tracks'] and report['root_static'] and report['no_scale_tracks'] and report['original_actions_unchanged'] and report['appearance_rest_weights_uv_materials_images_lights_unchanged'] and report['v2_source_vertex_error_m']<2e-6 and .39<report['sole_center_separation_m']<.42 and .0239<report['body_breathing_rise_m']<.0241 and report['asymmetric_support_valid'] and report['protected_files_unchanged'] and all(min(b[:2])>0 and max(b[2:])<1 for b in report['camera_bounds'].values())
 (OUT/('lookaround_validation.json' if candidate else 'validation.json')).write_text(json.dumps(report,indent=2),encoding='utf8');print(json.dumps({k:v for k,v in report.items() if k!='frames'}),flush=True);assert report['passed']

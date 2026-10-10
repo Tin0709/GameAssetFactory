@@ -103,6 +103,8 @@
   "relaxed_leg": "Leg.R / character right / lateral8deg, backward3.75deg, outward yaw15deg / fixed lowest corner",
   "support_logic": "Pelvis positive-X bias28mm; unequal sideways opening remains primary; latest user asks slight character-left forward/right backward and requested15deg toe-out. Static leg matrices; no rig edits",
   "breathing": "Latest user request:4X original amplitude (double previous2X),24mm hips +7.2mm rigid chest lift; doubled breath-only shoulder/head/torso terms. Same4second timing; fixed feet, no scale",
+  "lookaround": "2X head/arm attention amplitude with delayed torso/shoulder support; 2X gesture speed around F25/F125. Rest gaps retained; breathing timing/amplitude and planted legs unchanged",
+  "center_pause": "Latest user correction:head-neutral middle interval halved60.5->30.25frames (2.0167->1.0083s). Second attention group shifted30.25frames earlier; first look, gesture range/duration, breathing, leg matrices and8s loop unchanged. Quiet seam rest retained",
   "face_controls": "No facial bones or shape keys; head articulation only",
   "scope": "Current v3 stance/breath review checkpoint; preserve v2/v1 and all other studies; no Godot edits/export."
 }

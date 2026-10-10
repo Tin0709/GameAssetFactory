@@ -33,6 +33,6 @@ for f in range(1,481):
  old=Image.open(oldfolder/f'{(f-1)%240+1:03d}.png').convert('RGB');new=Image.open(native).convert('RGB');assert old.size==new.size
  canvas=Image.new('RGB',(1280,700),'#17212a');draw=ImageDraw.Draw(canvas)
  canvas.paste(old,(0,60));canvas.paste(new,(640,60))
- draw.text((18,18),'Preserved v2 / original speed',font=font,fill='white');draw.text((658,18),'Latest v3 / 2X breathing / Pending',font=font,fill='white')
+ draw.text((18,18),'Preserved v2 / original speed',font=font,fill='white');draw.text((658,18),'Latest v3 / 2X looks + speed / Pending',font=font,fill='white')
  canvas.save(comparison/f'{f:04d}.png')
 print('CHECKPOINT AND MATCHED THREE-QUARTER COMPARISON FRAMES READY')
