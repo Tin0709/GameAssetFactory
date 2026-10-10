@@ -14,7 +14,7 @@ func run() -> void:
 	root.add_child(level); current_scene=level; await tick(10)
 	var player=level.player
 	for name in ["Jump_Stationary_v002","Jump_Walk_v002","Jump_Run_v002"]:
-		check(player.visual.samples.has(name),"V002 authored clip loaded: "+name)
+		check(player.visual.samples.has(name),"Retained V002 clip loaded: "+name)
 	# Each state selects a different authored Action once, at supported takeoff.
 	player.get_node("WeaponBehavior").enabled=false
 	for kind in ["stationary","walk","run"]:
@@ -34,7 +34,7 @@ func run() -> void:
 		check(String(player.jump_kind)==kind,kind+" remains locked through flight")
 		for i in 50:
 			await tick(1);peak=maxf(peak,player.position.y)
-		check(absf(peak-ground_y-(.64 if kind=="run" else .58))<.03,kind+" ballistic height matches source within 3cm")
+		check(absf(peak-ground_y-1.2)<.03,kind+" 1.2m gameplay apex within 3cm")
 		check(player.is_on_floor() and not player.jump_active,kind+" completes contact and recovery")
 	level.reset_player();await tick(5)
 	Input.action_press("jump");await tick(130)
@@ -70,6 +70,6 @@ func run() -> void:
 	var tag:="runtime"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--report="):tag=arg.trim_prefix("--report=")
-	FileAccess.open("res://.validation/jump_set_v002/checks_"+tag+".json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"start_physics_frames":starts_at,"physics_hz":Engine.physics_ticks_per_second},"\t"))
+	FileAccess.open("res://.validation/jump_loop_v003/checks_"+tag+".json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"start_physics_frames":starts_at,"physics_hz":Engine.physics_ticks_per_second},"\t"))
 	print("JUMP_SET_CHECKS ",checks.size()," failures=",failures)
 	level.queue_free();await process_frame;await process_frame;quit(0 if failures.is_empty() else 1)

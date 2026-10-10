@@ -38,7 +38,7 @@ def run():
         prefix='JL3_'+kind.upper()
         # Lighting must remain identical as the review travels and wraps.
         light_offsets={}
-        for t in [0,period if False else c['period'],2*c['period']]:
+        for t in [0,c['period'],2*c['period']]:
             sc.frame_set(1+t);bpy.context.view_layer.update()
             for suffix in ['Key','Fill','Rim']:
                 ob=bpy.data.objects[prefix+'_'+suffix]

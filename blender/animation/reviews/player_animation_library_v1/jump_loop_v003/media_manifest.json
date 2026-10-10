@@ -1,0 +1,34 @@
+{
+  "reference": {
+    "source": "C:\\Users\\ADMIN\\Videos\\Screen Recordings\\Screen Recording 2026-10-10 131138.mp4",
+    "sha256": "9210e2beffaeb729bc0f5691ac669b5241c727a5cd851f387a3911e33ef1487e",
+    "frames": 218,
+    "fps": 30,
+    "size": [
+      324,
+      364
+    ]
+  },
+  "previews": {
+    "walk": {
+      "file": "walk_loop_1x.mp4",
+      "frames": 84,
+      "fps": 30,
+      "size": [
+        1280,
+        586
+      ],
+      "cycles": 3
+    },
+    "run": {
+      "file": "run_loop_1x.mp4",
+      "frames": 78,
+      "fps": 30,
+      "size": [
+        1280,
+        586
+      ],
+      "cycles": 3
+    }
+  }
+}

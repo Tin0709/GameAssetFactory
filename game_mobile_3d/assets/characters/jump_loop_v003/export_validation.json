@@ -1,0 +1,29 @@
+{
+  "protected_sha256": {
+    "blender\\animation\\reviews\\player_animation_library_v1\\player_animation_library_v1.blend": "31582a265cbaa8eb503233c8542444cbb176308dc8b09ab1e4c10843850eb62b",
+    "game_mobile_3d\\assets\\characters\\jump_set_v002\\player_r15_jump_set_v002.glb": "e9a9a0116b5cb3f4f0b481f08dd2b2b5153454fd737605a8caab78d9eb9232ac"
+  },
+  "output_sha256": "1f8abf1ecf57c7b85fb6253af1a388d45a682061b2bdd8eef23c9772055cc469",
+  "preserved_old_clips": 40,
+  "new_clips": {
+    "walk": {
+      "action": "Jump_Walk_Loop_v003",
+      "samples": 113,
+      "vertex_reconstruction_error_m": 8.350718289793212e-07,
+      "minimum_source_sole_height_m": 0.00029966907459311187,
+      "tracks": 22
+    },
+    "run": {
+      "action": "Jump_Run_Loop_v003",
+      "samples": 105,
+      "vertex_reconstruction_error_m": 6.109476089477539e-07,
+      "minimum_source_sole_height_m": 0.0002996369148604572,
+      "tracks": 22
+    }
+  },
+  "geometry_skin_uv_material_binary_unchanged": true,
+  "preview_carrier_exported": false,
+  "root_motion": false,
+  "vertical_support_correction_baked": true,
+  "artistic_status": "AWAITING HUMAN REVIEW"
+}

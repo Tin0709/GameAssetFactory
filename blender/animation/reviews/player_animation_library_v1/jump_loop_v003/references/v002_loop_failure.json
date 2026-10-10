@@ -1,0 +1,12 @@
+{
+  "walk": {
+    "max_endpoint_channel_mismatch": 0.27925269305706024,
+    "right_leg_endpoint_mismatch_deg": 9.99999970909292,
+    "air_held_8_frames_range_deg": 2.84979397835027
+  },
+  "run": {
+    "max_endpoint_channel_mismatch": 0.3490658700466156,
+    "right_leg_endpoint_mismatch_deg": 8.000002499350005,
+    "air_held_8_frames_range_deg": 4.999999000772815
+  }
+}

@@ -8,17 +8,19 @@ choose a group, then a clip; Front/Back/Side/3/4 change the review camera.
 The current native full-arm character and resized/centered pistol, rifle and
 shotgun are assembled from the R14 pass2 source used for the production R15
 export. Existing upper-body Actions and lower-body NLA remain layered as
-authored. The saved review now opens **Jump / Stationary V002**;
+authored. The latest additions are **Walk/Run + Jump LOOP V003**;
 **Walk / Rifle** and all earlier selections remain available.
 This is an animation library, not the Godot combat controller: runtime aiming,
 blends, automatic targeting and procedural turn limits are not simulated here.
 
-There are **57 selectable reviews**: 12 idle/walk/sprint weapon variants,
+There are **59 selectable reviews**: 12 idle/walk/sprint weapon variants,
 8 turning variants, 6 holster/draw slices, 18 armed combat strafe combinations,
 4 jump pose clips, the full jump journey, 4 short jump journey slices and the
 [flat-ground Jump Default V001](jump_default_v001/README.md), plus the new
 [Stationary / Walking / Running V002](jump_set_v002/README.md) from the user's
-three separate videos. These three entries have individual scenes, phase markers
+three separate videos, and the [Walk/Run + Jump loops V003](jump_loop_v003/README.md).
+V003 keeps footwork moving through the air and joins position/tangents continuously;
+its previews show three cycles without holds. The previous three entries have individual scenes, phase markers
 and preview travel; their addition does not alter existing game animations. In
 **Combat Strafe**, choose **Weapon** (Pistol/Rifle/Shotgun), then one of six
 authored directions. The original lower-body Actions are layered with each
@@ -48,9 +50,9 @@ sidebar is missing. No global auto-execution/trust preference is changed.
 and exact review ranges/FPS. `verify_review.py` reopens and checks every
 selection and the source data, then renders `review_preview.png`. Sources
 and game assets are never saved over. Existing animation keys are not redesigned.
-The flat jump adds two Actions, and the three V002 jumps add six more
-(320 Actions total), in their own scenes at 30 FPS; old clips retain their FPS.
-The fresh-open audit covers all 57 selections, verifies evaluated ready
+The flat jump adds two Actions, V002 adds six, and V003 adds four
+(324 Actions total), in their own scenes at 30 FPS; old clips retain their FPS.
+The fresh-open audit covers all 59 selections, verifies evaluated ready
 arm/carrier channels for all 18 armed strafes and vertical/horizontal travel in
 the jump journey slices. Additional rendered checks are `strafe_pistol_preview.png`,
 `strafe_shotgun_preview.png` and `jump_preview.png`. `additional_reviews.py` is

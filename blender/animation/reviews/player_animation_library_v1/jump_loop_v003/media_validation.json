@@ -1,0 +1,44 @@
+{
+  "walk": {
+    "decoded_frames": 84,
+    "fps": 30.0,
+    "size": [
+      1280,
+      586
+    ],
+    "seconds": 2.8,
+    "cuts_or_holds_added": false,
+    "rendered_equivalent_phase_pixel_mae_0_255": {
+      "gameplay": [
+        0.0007478841145833334,
+        0.00108642578125
+      ],
+      "side": [
+        0.00163330078125,
+        0.00124267578125
+      ]
+    },
+    "sha256": "1c4e0d2ac0112f46a851d033ce880419cd79e61dfe8341bfc7b00cd226541302"
+  },
+  "run": {
+    "decoded_frames": 78,
+    "fps": 30.0,
+    "size": [
+      1280,
+      586
+    ],
+    "seconds": 2.6,
+    "cuts_or_holds_added": false,
+    "rendered_equivalent_phase_pixel_mae_0_255": {
+      "gameplay": [
+        0.0010343424479166666,
+        0.0008829752604166667
+      ],
+      "side": [
+        0.002508951822916667,
+        0.0029443359375
+      ]
+    },
+    "sha256": "f6852345c91dafdd160dd0de60fa93ff90627fe64446e536bc17da970943fa95"
+  }
+}

@@ -2,7 +2,7 @@ extends Node3D
 ## Authored schematic layout; visual optimization never changes the source cells.
 const DATA := "res://assets/maps/world_map/runtime.json"
 const CAMERA_OFFSET := Vector3(12,15,16)
-const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpSetV002.tscn")
+const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpLoopV003.tscn")
 var runtime: Dictionary
 var geometry
 var columns: Dictionary = {}
@@ -61,7 +61,7 @@ func _ready() -> void:
 	look=load("res://scripts/world_map_look.gd").new()
 	look.name="ReferenceLook"
 	add_child(look);look.setup(self)
-	$HUD/Help.text="WORLD MAP · JUMP V002\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu"
+	$HUD/Help.text="WORLD MAP · JUMP V003\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])

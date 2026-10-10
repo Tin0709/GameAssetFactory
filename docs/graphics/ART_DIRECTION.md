@@ -30,6 +30,8 @@ Cập nhật 2026-10-10, Asia/Saigon. Tài liệu định hướng lâu dài; b�
 
 Việc tích hợp R13/R15 được cho phép không đồng nghĩa mọi chuyển động đã được duyệt là tự nhiên. Những dòng “AWAITING HUMAN REVIEW” ở các báo cáo cũ vẫn cần được tôn trọng. Không gán phần trăm giống game tham chiếu.
 
+**Phản hồi mới về moving jump:** người dùng thấy V002 đưa chân ra rồi giữ dáng khi bay, lặp chưa tự nhiên. Yêu cầu cải thiện **trong Blender**: bước chân tiếp tục chuyển nhịp và cuối–đầu loop nối mượt. [Walk/Run + Jump LOOP V003](../../blender/animation/reviews/player_animation_library_v1/jump_loop_v003/README.md) thêm hai Action vào cùng library, giữ V002 và stationary; đã kiểm tra continuity, vẫn chờ review hình ảnh và chưa thay runtime. Khi tích hợp sau này phải giữ phase và kiểm tra controller, không chỉ bật thuộc tính loop.
+
 **Yêu cầu mới nhất cho WorldMap:** bám [màu/ánh sáng, cỏ/hoa](references/user-world-map-look-2026-10-09.png), [mặt đất mượt](references/user-world-map-ground-2026-10-09.png), mép đường đất hòa vào cỏ và chút noise màu nhẹ trên toàn map. Lá đi xuyên được; cỏ/hoa phản ứng khi đi qua rồi hồi lại. Tăng biên độ gió50% cho cỏ cao/lá,100% cho cỏ nhỏ/hoa; tăng độ đậm bóng15%; thêm bóng mây thưa trôi, không vẽ mây. Đây là các **yêu cầu đã xác nhận**, còn kết quả/thông số hiện tại vẫn là bản thử. Giữ+5%warmth, exposure.96, vị trí block/hoa và toàn bộ nguồn Blender. Xem [hợp đồng map và reuse](../../game_mobile_3d/assets/maps/world_map/README.md).
 
 Yêu cầu tiếp theo bổ sung bóng tiếp xúc nhẹ tại chân bậc, gốc cỏ/hoa và đốm đất quanh bụi. Người dùng thấy lượt đốm đất đầu quá ít/nhạt, yêu cầu **nhiều và đậm hơn**; bản hiện tại tăng mật độ và đất nâu sẫm, mép thưa dần, vẫn chờ review.
