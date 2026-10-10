@@ -27,17 +27,18 @@ def composed(j,comparison=False,view=None):
             d.text((16,y+689),f'F{frame:03d} | '+('Unchanged Action, source and render frames; no retiming or frozen padding.' if mode=='v1' else 'Wider planted stance / two distinct interests / quiet rigid breath / closing key excluded'),font=SMALL,fill=(178,219,218))
     return im
 def run():
-    v=json.loads((OUT/'validation.json').read_text());assert v['passed'] and v['v1_source_vertex_error_m']<2e-6
-    assert hashlib.sha256((OUT/'idle_expressive_v2_review.blend').read_bytes()).hexdigest()==v['sampled_source_sha256']
+    validation=json.loads((OUT/'validation.json').read_text());assert validation['passed'] and validation['v1_source_vertex_error_m']<2e-6
+    assert hashlib.sha256((OUT/'idle_expressive_v2_review.blend').read_bytes()).hexdigest()==validation['sampled_source_sha256']
     for view in VIEWS:assert all((OUT/'frames'/view/f'{f:03d}.png').exists() for f in range(1,P+1))
     checks={};samples=[]
     generators={'idle_v2_all_views_1x':lambda j:composed(j),'comparison_all_views_1x':lambda j:composed(j,True),'comparison_three_quarter_1x':lambda j:composed(j,True,'three_quarter')}
     generators.update({v+'_1x':lambda j,v=v:raw('v2',v,1+j%P) for v in VIEWS})
     for name,make in generators.items():
         folder=TMP/'encode'/name;folder.mkdir(parents=True,exist_ok=True)
-        for j in range(COUNT):make(j).save(folder/f'{j+1:04d}.png')
-        with (TMP/(name+'.log')).open('w') as log:
-            subprocess.run([sys.argv[1],'-b','--factory-startup','--python-exit-code','1','--python',str(OUT.parent/'lowerbody_recovery_test/encode_review.py'),'--',str(folder),str(OUT/(name+'.mp4')),str(COUNT)],check=True,stdout=log,stderr=subprocess.STDOUT)
+        if '--verify-existing' not in sys.argv:
+            for j in range(COUNT):make(j).save(folder/f'{j+1:04d}.png')
+            with (TMP/(name+'.log')).open('w') as log:
+                subprocess.run([sys.argv[1],'-b','--factory-startup','--python-exit-code','1','--python',str(OUT.parent/'lowerbody_recovery_test/encode_review.py'),'--',str(folder),str(OUT/(name+'.mp4')),str(COUNT)],check=True,stdout=log,stderr=subprocess.STDOUT)
         cap=cv2.VideoCapture(str(OUT/(name+'.mp4')));fps=cap.get(cv2.CAP_PROP_FPS);errors=[];n=0
         while True:
             ok,frame=cap.read()
@@ -58,6 +59,6 @@ def run():
     for j,im in enumerate(samples):sheet.paste(im,(j%2*800,j//2*450))
     sheet.save(OUT/'decoded_comparison_samples.jpg',quality=95)
     checks['comparison']='Preserved Idle_Expressive_Test: 144 frames/30FPS/4.8s. V2:240frames/30FPS/8s. Both original speed; matching stage. Two complete v2 loops, no closing-key hold.'
-    checks['source_sha256']=v['sampled_source_sha256'];checks['action_sha256']=v['sampled_action_sha256']
+    checks['source_sha256']=validation['sampled_source_sha256'];checks['action_sha256']=validation['sampled_action_sha256']
     (OUT/'media_verification.json').write_text(json.dumps(checks,indent=2),encoding='utf8')
 if __name__=='__main__':run()
