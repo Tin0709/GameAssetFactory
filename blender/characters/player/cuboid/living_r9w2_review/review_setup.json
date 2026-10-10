@@ -1,8 +1,0 @@
-{
-  "scene": "R9W2_REVIEW_SWEEP",
-  "frame": 49,
-  "rig": "R9W2_SWEEP_C_Rig",
-  "action": "LongGunAimAround_LeftRight_V2",
-  "reference_board": "R9W1_CROSSBOW_REFERENCE",
-  "status": "AWAITING HUMAN REVIEW"
-}
