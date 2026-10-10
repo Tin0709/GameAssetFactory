@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "entries": [
+    [
+      "Expressive_Arm_Motion_Test",
+      "approved"
+    ],
+    [
+      "Run_Expressive_Test",
+      "approved"
+    ],
+    [
+      "LowerBody_Recovery_Test",
+      "approved"
+    ],
+    [
+      "Jump_Takeoff_Test",
+      "approved"
+    ],
+    [
+      "Jump_AirPose_Test",
+      "pending"
+    ]
+  ],
+  "switches": 15,
+  "max_source_vertex_error_m": 1.4057727354849284e-07,
+  "preview_floor_applied_and_reset": true,
+  "rig_identity_preserved": true,
+  "protected_files_unchanged": 1717,
+  "approved_takeoff_source_preserved": true,
+  "slots_ranges_timing_and_partial_pose_reset": true
+}

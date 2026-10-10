@@ -6,7 +6,7 @@
   ],
   "fps": 30,
   "last_support_frame": 19,
-  "status": "pending",
+  "status": "approved",
   "rig_changes": [],
   "original_actions": {
     "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
@@ -14,5 +14,6 @@
     "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1"
   },
   "scope": "Ready through early flight; no apex, descent or landing.",
-  "source_showcase_sha256": "44d592424978842ae1d8c411fd309c47c429e630809efba30cc99b4411ad03b0"
+  "source_showcase_sha256": "44d592424978842ae1d8c411fd309c47c429e630809efba30cc99b4411ad03b0",
+  "approval_note": "Explicit user approval 2026-10-10: satisfied with expressive motion and soft, subtle compression before takeoff. Preserve this Action."
 }

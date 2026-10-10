@@ -1,0 +1,41 @@
+{
+  "action": "Jump_Landing_Impact_Test",
+  "frames": [
+    1,
+    56
+  ],
+  "fps": 30,
+  "status": "approved",
+  "rig_changes": [],
+  "original_actions": {
+    "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+    "Jump_AirPose_Test": "eb3b79fd05e5f175e6b5590745f3a38efa43015a635e6eb011abe73377c818e4",
+    "Jump_Landing_Test": "8836c180e39c2b93e47e96a1077360705cffd5c33a729aa91ce93d0b47bf9076",
+    "Jump_Takeoff_Test": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+    "LowerBody_Recovery_Test": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+    "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1"
+  },
+  "airpose_frame": 22,
+  "contact_frames": {
+    "L": 9,
+    "R": 10
+  },
+  "foot_bases": {
+    "L": [
+      0.12800000607967377,
+      -0.10499999672174454,
+      0.0
+    ],
+    "R": [
+      -0.12800000607967377,
+      0.07000000029802322,
+      0.0
+    ]
+  },
+  "canonical_hip_height_m": 0.674,
+  "maximum_compression_frame": 14,
+  "rebound_frame": 30,
+  "root_static": true,
+  "scope": "Separate forceful landing comparison; original landing unchanged; world travel stays in preview/physics.",
+  "approval_note": "Explicit user approval 2026-10-10; preferred landing baseline. Softer Jump_Landing_Test preserved unchanged as alternate."
+}

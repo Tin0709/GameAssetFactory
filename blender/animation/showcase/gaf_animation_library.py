@@ -43,6 +43,8 @@ def load_manifest():
 def validate_timing(e):
     if any(type(e[k]) is not int for k in ['start','end','fps']):raise ValueError('Playback frame bounds and FPS must be integers; use fps_base for fractional rates')
     if not (1<=e['start']<=e['end']<=1048574 and 1<=e['fps']<=32767 and isinstance(e['fps_base'],(int,float)) and math.isfinite(e['fps_base']) and 1e-5<=e['fps_base']<=1e6):raise ValueError('Invalid frame range or timing')
+    floor=e.get('preview_floor_z_m',0.0)
+    if type(floor) not in [int,float] or not math.isfinite(floor) or not -10<=floor<=10:raise ValueError('Invalid preview floor height')
 
 def validate_action(action,entry,rig):
     validate_timing(entry)
@@ -72,6 +74,8 @@ def activate(scene,index):
     rig.animation_data.action=a;rig.animation_data.action_slot=a.slots[0]
     scene.frame_start=e['start'];scene.frame_end=e['end'];scene.render.fps=e['fps'];scene.render.fps_base=e['fps_base']
     scene.use_preview_range=False;scene.sync_mode='NONE';scene.frame_set(e['start'])
+    floor=bpy.data.objects.get('Showcase_FixedFloor')
+    if floor:floor.location.z=e.get('preview_floor_z_m',0.0)
     for window in bpy.context.window_manager.windows:
         if window.scene==scene:
             window.view_layer.objects.active=rig

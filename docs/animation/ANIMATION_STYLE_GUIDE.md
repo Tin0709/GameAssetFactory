@@ -154,7 +154,11 @@ Saved screenshots and exact media-element timestamps: [web_samples.json](referen
 
 ## 4. Artistic principles for our original implementation
 
+**Subsequent user-approved direction, 2026-10-10:** `Jump_Takeoff_Test` is approved, including its expressive release and soft, subtle pre-launch compression. `Jump_AirPose_Test` is also explicitly approved for its expressive airborne motion. Preserve silhouette, independent rigid limb articulation, controlled asymmetry and restrained overlap. Keep **“nhúng nhúng”** primarily around ground support, preparation, landing absorption and recovery; do not introduce artificial contact bounce or a duplicate physics trajectory into flight. See [animation progress](ANIMATION_PROGRESS.md); the new Landing study remains pending review. Landing should restore actual sole support before the key soft dip, then give one small recovery overshoot with delayed arm/head response; preserve rigid blocks and measure support stability without inventing knee or ankle articulation.
+
 Everything in this section is **P**, informed by section 3 rather than attributed to the original developers.
+
+**Current exploratory comparison:** `Jump_Landing_Impact_Test` pushes force, depth and torso/arm response while preserving the original soft Landing Action. Both landing entries are pending; the heavier amplitude is not an approved replacement or a measured reference-game parameter. Preserve stable rigid sole support, one controlled rebound and slower settling rather than repeated spring motion.
 
 1. **Rigid shape, flexible assembly.** Keep each intended rigid segment's lengths, right angles and flat faces stable. Pose the connected masses so the assembly feels alive. Avoid accidental shear, soft weighting across an intended hard seam or animated limb scale.
 2. **Silhouette before amplitude.** At the key gesture, the hand and leg directions should be apparent without relying on texture. A larger swing that hides behind the chest is less useful than a smaller arc projected into open screen space.

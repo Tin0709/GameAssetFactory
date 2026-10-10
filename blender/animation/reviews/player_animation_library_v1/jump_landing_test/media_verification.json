@@ -1,0 +1,69 @@
+{
+  "jump_landing_1x": {
+    "frames": 44,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 1.4666666666666666,
+    "max_mean_rgb_decode_error": 1.3604294061660767,
+    "sha256": "431b55a0f9574f6285110fa2a26206c4a0df1d0217ed426f07250fa5f729ed2d"
+  },
+  "takeoff_airpose_landing_1x": {
+    "frames": 88,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 2.933333333333333,
+    "max_mean_rgb_decode_error": 1.3643132448196411,
+    "sha256": "9a7a84fecaa69e95e7f7b4916e339a9f93ae81f732b87c7679fe19136a1ae0b1"
+  },
+  "takeoff_airpose_landing_review": {
+    "frames": 208,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 6.933333333333334,
+    "max_mean_rgb_decode_error": 1.3643132448196411,
+    "sha256": "d895cd8d9b874bbefd6b72674386b02ab5aeb836eceb366dd9217ae04b074853"
+  },
+  "front_1x": {
+    "frames": 44,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.4666666666666666,
+    "max_mean_rgb_decode_error": 1.3112484216690063,
+    "sha256": "f9448f8e772113bb3bb895dbd33dd77aeb9a4c979dd123620a8f02cada7b18fd"
+  },
+  "three_quarter_1x": {
+    "frames": 44,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.4666666666666666,
+    "max_mean_rgb_decode_error": 1.292982578277588,
+    "sha256": "73ce8b0f6538c790dffa18ad43b2ed279c83950b662b6abedc0c42fd6c937c91"
+  },
+  "side_1x": {
+    "frames": 44,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.4666666666666666,
+    "max_mean_rgb_decode_error": 1.2086238861083984,
+    "sha256": "26fdb11bbf71778d528b35944b4d2fa23b9ac26119ae42763535fb0b55482c4e"
+  },
+  "approved_phase_review_pixels_preserved": true
+}

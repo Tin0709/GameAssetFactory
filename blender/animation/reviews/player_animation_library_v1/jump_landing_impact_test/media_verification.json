@@ -1,0 +1,137 @@
+{
+  "jump_landing_impact_1x": {
+    "frames": 56,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 1.8666666666666667,
+    "max_mean_rgb_decode_error": 1.3582805395126343,
+    "sha256": "3ca0d490a340c558891690a29ecc990fc9c7f41613936a4d8dd01cae4d271edd"
+  },
+  "comparison_all_views_1x": {
+    "frames": 56,
+    "fps": 30.0,
+    "size": [
+      1920,
+      1440
+    ],
+    "duration_s": 1.8666666666666667,
+    "max_mean_rgb_decode_error": 1.3456465005874634,
+    "sha256": "d4d0d79a7f8efdeea51cfa40254702acba5eb76e6d1b51734e0d930959acef19"
+  },
+  "impact_front_1x": {
+    "frames": 56,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.8666666666666667,
+    "max_mean_rgb_decode_error": 1.3205468654632568,
+    "sha256": "c8fa3b405c091b10a0020b08ee61a45cddfa7b67603cefbf290e421ab468543b"
+  },
+  "comparison_front_1x": {
+    "frames": 56,
+    "fps": 30.0,
+    "size": [
+      1280,
+      720
+    ],
+    "duration_s": 1.8666666666666667,
+    "max_mean_rgb_decode_error": 1.3895142078399658,
+    "sha256": "3cb9df61587473a9b1f33ac86a2da34906c7bddca486be605bb7a87d2bbfc7a8"
+  },
+  "impact_three_quarter_1x": {
+    "frames": 56,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.8666666666666667,
+    "max_mean_rgb_decode_error": 1.2958146333694458,
+    "sha256": "566bb2512f752c2013d9adceb1ac7ae0e8b025023766101b4b2e2fa4fcdaa35e"
+  },
+  "comparison_three_quarter_1x": {
+    "frames": 56,
+    "fps": 30.0,
+    "size": [
+      1280,
+      720
+    ],
+    "duration_s": 1.8666666666666667,
+    "max_mean_rgb_decode_error": 1.3901164531707764,
+    "sha256": "6f684639ccef62caae78ecae747bec25a5c431640915d1012932f8aecbde7bab"
+  },
+  "impact_side_1x": {
+    "frames": 56,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.8666666666666667,
+    "max_mean_rgb_decode_error": 1.2095662355422974,
+    "sha256": "68968904fe40145347d4db5d42898d4c2da2039765de08006962cca2182b71d0"
+  },
+  "comparison_side_1x": {
+    "frames": 56,
+    "fps": 30.0,
+    "size": [
+      1280,
+      720
+    ],
+    "duration_s": 1.8666666666666667,
+    "max_mean_rgb_decode_error": 1.3021596670150757,
+    "sha256": "5b4bf181fce56791fa1e652a5dc04ff33a7474a4fd852efb479c0b4dd1275f48"
+  },
+  "baseline_all_views_1x": {
+    "frames": 44,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 1.4666666666666666,
+    "max_mean_rgb_decode_error": 1.3604294061660767,
+    "sha256": "431b55a0f9574f6285110fa2a26206c4a0df1d0217ed426f07250fa5f729ed2d"
+  },
+  "baseline_front_1x": {
+    "frames": 44,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.4666666666666666,
+    "max_mean_rgb_decode_error": 1.3112484216690063,
+    "sha256": "f9448f8e772113bb3bb895dbd33dd77aeb9a4c979dd123620a8f02cada7b18fd"
+  },
+  "baseline_three_quarter_1x": {
+    "frames": 44,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.4666666666666666,
+    "max_mean_rgb_decode_error": 1.292982578277588,
+    "sha256": "73ce8b0f6538c790dffa18ad43b2ed279c83950b662b6abedc0c42fd6c937c91"
+  },
+  "baseline_side_1x": {
+    "frames": 44,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.4666666666666666,
+    "max_mean_rgb_decode_error": 1.2086238861083984,
+    "sha256": "26fdb11bbf71778d528b35944b4d2fa23b9ac26119ae42763535fb0b55482c4e"
+  },
+  "baseline_review_pixels_preserved": true,
+  "baseline_sample_rerender_pixel_exact": true,
+  "baseline_videos_byte_exact": true
+}

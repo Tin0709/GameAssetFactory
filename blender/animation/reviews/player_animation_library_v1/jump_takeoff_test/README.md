@@ -1,6 +1,6 @@
-# Jump_Takeoff_Test — pending review
+# Jump_Takeoff_Test — user approved
 
-**24 frames at 30 FPS (0.8 s playback). Takeoff only:** ready, anticipation, soft compression, upward push, liftoff and early flight. There is no apex, descent or landing. The Animation Showcase and the three reference tests are user approved; this new Action remains **pending**.
+**24 frames at 30 FPS (0.8 s playback). Takeoff only:** ready, anticipation, soft compression, upward push, liftoff and early flight. There is no apex, descent or landing. The Animation Showcase and the three reference tests are user approved; the user explicitly approved this Action on 2026-10-10, including its expressive motion and soft, subtle pre-launch compression.
 
 ## Review
 
@@ -9,7 +9,7 @@
 - Individual views: [front](front_1x.mp4), [three-quarter](three_quarter_1x.mp4), [side](side_1x.mp4).
 - [Key poses](takeoff_pose_sheet.jpg), [same-setup compression comparison](compression_comparison.jpg), complete [front](front_all_frames.jpg), [three-quarter](three_quarter_all_frames.jpg) and [side](side_all_frames.jpg) sheets.
 - [Saved Blender study](jump_takeoff_review.blend): `JUMP_TAKEOFF_REVIEW`, `JT_Test_Rig`, `JT_Test_Mesh`, independent Action `Jump_Takeoff_Test`.
-- Also available in [Animation Showcase](../../../showcase/Animation_Showcase.blend), N → Animation Library, visibly **PENDING**. Select it and Play; loop is initially off so it stops in early flight.
+- Also available in [Animation Showcase](../../../showcase/Animation_Showcase.blend), N → Animation Library, visibly **APPROVED**. Select it and Play; loop is initially off so it stops in early flight.
 
 ## Approved baseline carried forward
 
@@ -33,7 +33,7 @@
 
 **Still limited:** the unchanged whole-leg cuboids have no knee articulation or independent toe joint. Compression therefore uses the already approved shallow hip overlap and rigid edge/corner support, limiting how deep a convincing squat can go. The arm passage through push-off is deliberately quick and is the main timing item for user review. An airborne-pose study still needs to refine the sustained silhouette and its eventual handoff; landing and runtime transitions are untested.
 
-**Readiness:** technically ready for a dedicated airborne-pose test, subject to user review of this takeoff. This does not approve the takeoff or establish readiness for full jump production.
+**Subsequent approval and next stage:** the user approved this takeoff and its soft, subtle compression, then requested the separate [Jump_AirPose_Test](../jump_airpose_test/README.md). That new Action remains pending. Takeoff approval does not establish readiness for full jump production.
 
 ## Validation and preservation
 

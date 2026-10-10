@@ -1,0 +1,199 @@
+{
+  "action": "Jump_AirPose_Test",
+  "frames": [
+    1,
+    22
+  ],
+  "fps": 30,
+  "status": "approved",
+  "rig_changes": [],
+  "original_actions": {
+    "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+    "Jump_Takeoff_Test": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+    "LowerBody_Recovery_Test": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+    "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1"
+  },
+  "in_place": true,
+  "canonical_hip_height_m": 0.674,
+  "takeoff_frame": 24,
+  "pose_start": {
+    "Root": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "Hips": {
+      "location": [
+        0.006000000052154064,
+        -0.0009999573230743408,
+        0.02199999988079071
+      ],
+      "rotation_euler": [
+        -0.03490658476948738,
+        -0.01745329238474369,
+        -0.01745329238474369
+      ]
+    },
+    "Spine": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_quaternion": [
+        0.9996392726898193,
+        -0.02619323693215847,
+        0.0033637760207057,
+        0.004889336880296469
+      ]
+    },
+    "Chest": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_quaternion": [
+        0.9998381733894348,
+        -0.017452239990234375,
+        0.004362644627690315,
+        7.615024514961988e-05
+      ]
+    },
+    "Neck": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "Head": {
+      "location": [
+        1.7462298274040222e-10,
+        1.1920928955078125e-07,
+        0.0
+      ],
+      "rotation_quaternion": [
+        0.9975482821464539,
+        0.06983783096075058,
+        0.0004902345244772732,
+        0.004464424680918455
+      ]
+    },
+    "UpperArm.L": {
+      "location": [
+        0.03200000151991844,
+        0.0,
+        2.797528875220223e-09
+      ],
+      "rotation_quaternion": [
+        0.6527829170227051,
+        0.6878896951675415,
+        -0.23016466200351715,
+        0.21841810643672943
+      ]
+    },
+    "ForeArm.L": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "UpperArm.R": {
+      "location": [
+        -0.03200000151991844,
+        0.0,
+        -2.797528875220223e-09
+      ],
+      "rotation_quaternion": [
+        0.5803480744361877,
+        0.7428116202354431,
+        0.2630434036254883,
+        -0.20551203191280365
+      ]
+    },
+    "ForeArm.R": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "WeaponCarrier": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "Leg.L": {
+      "location": [
+        -0.0019993856549263,
+        -3.612041473388672e-05,
+        -3.3661723136901855e-05
+      ],
+      "rotation_euler": [
+        0.36619916558265686,
+        -0.034273311495780945,
+        0.01866907626390457
+      ]
+    },
+    "Leg.R": {
+      "location": [
+        0.0019993856549263,
+        3.618001937866211e-05,
+        3.3661723136901855e-05
+      ],
+      "rotation_euler": [
+        -0.2795519530773163,
+        0.0006116416770964861,
+        0.017439886927604675
+      ]
+    }
+  },
+  "preview_offset_m": [
+    0,
+    0,
+    0.19708331918716426
+  ],
+  "preview_entry_velocity_m_per_frame": [
+    8.850172162055969e-05,
+    -0.00020650029182434082,
+    0.012847900390625
+  ],
+  "preview_settle_frames": 6,
+  "scope": "Airborne articulation only; no physical trajectory, landing or combined production Action.",
+  "approval_note": "Explicit user approval received 2026-10-10 Asia/Saigon: happy with its expressive airborne motion; approved before requesting Jump_Landing_Test."
+}

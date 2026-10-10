@@ -1,0 +1,41 @@
+{
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\showcase\\Animation_Showcase.blend",
+  "start_frame": 1,
+  "action": "Jump_Landing_Test",
+  "range": [
+    1,
+    44
+  ],
+  "fps": 30.0,
+  "entries": [
+    [
+      "Expressive_Arm_Motion_Test",
+      "approved"
+    ],
+    [
+      "Run_Expressive_Test",
+      "approved"
+    ],
+    [
+      "LowerBody_Recovery_Test",
+      "approved"
+    ],
+    [
+      "Jump_Takeoff_Test",
+      "approved"
+    ],
+    [
+      "Jump_AirPose_Test",
+      "approved"
+    ],
+    [
+      "Jump_Landing_Test",
+      "pending"
+    ]
+  ],
+  "mid_frame": 9,
+  "mid_playing": true,
+  "end_frame": 44,
+  "end_playing": false,
+  "passed": true
+}

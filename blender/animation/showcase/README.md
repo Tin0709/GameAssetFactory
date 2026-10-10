@@ -7,11 +7,20 @@ Open **Animation_Showcase.blend** (or double-click **Open_Showcase.cmd**). In th
 | Expressive_Arm_Motion_Test | 1–24 | 30 FPS | User approved |
 | Run_Expressive_Test | 1–18 | 30 FPS | User approved |
 | LowerBody_Recovery_Test | 1–48 | 30 FPS | User approved |
-| Jump_Takeoff_Test | 1–24 | 30 FPS | Pending review |
+| Jump_Takeoff_Test | 1–24 | 30 FPS | User approved |
+| Jump_AirPose_Test | 1–22 | 30 FPS | User approved |
+| Jump_Landing_Test | 1–44 | 30 FPS | Pending review |
+| Jump_Landing_Impact_Test | 1–56 | 30 FPS | Pending comparison review |
 
 Selection resets the full pose before binding the original Action and its Blender 5.2 slot. The run retains its frame-19 closing key, outside the 18-frame playback range. Arm/recovery are one-shots: repeating them resets to the beginning; they are not seamless cycles.
 
-The user has approved this viewer. It now contains the three approved references plus the pending [Jump Takeoff study](../reviews/player_animation_library_v1/jump_takeoff_test/README.md), one character/rig and the original textured review stage. Textures are packed. Source studies, production assets and Godot remain unchanged. This is a Blender review workspace; runtime behavior is not established here. Takeoff ends in early flight; no full arc or landing has been authored in that study.
+The user has approved this viewer and five existing tests, including [Jump Takeoff](../reviews/player_animation_library_v1/jump_takeoff_test/README.md) and [Jump AirPose](../reviews/player_animation_library_v1/jump_airpose_test/README.md). The new [Jump Landing](../reviews/player_animation_library_v1/jump_landing_test/README.md) is pending. There is one character/rig and the original textured review stage. Textures are packed. Original saved sources, production assets and Godot remain unchanged. This is a Blender review workspace; runtime behavior is not established here. No combined full production jump is authored.
+
+AirPose is in place: it has no animated trajectory or midair ground-contact bounce. Its optional manifest `preview_floor_z_m` lowers only the preview floor to show flight clearly, and selection resets that floor for other clips. Character transforms and Action content remain unchanged. A separate two-Action video in its README shows continuity from approved takeoff with presentation travel kept outside the pose.
+
+Landing uses the normal floor and identity rig transform. Its hips animate local ground absorption/recovery; world descent appears only in the temporary three-Action review linked from its README. It remains a one-shot study, not a seamless loop or integrated gameplay jump.
+
+[Impact Landing](../reviews/player_animation_library_v1/jump_landing_impact_test/README.md) is a separate, heavier comparison. The original Landing Action and source files stay unchanged. Select either independently; both remain pending. The comparison videos retain original timing and label the soft baseline's hold after its frame 44 while the longer variant continues to frame 56.
 
 ## Persistent controls
 
@@ -38,7 +47,11 @@ Only matching rest rigs and pose rotation modes, one OBJECT slot/layer/strip/cha
 
 `verification.json` records a fresh Blender-process reopen, 18 selection transitions, original slot/range/timing checks and exact evaluated geometry agreement at integer and half frames. `refresh_verification.json` covers selective import, incompatible-rig rollback, duplicate/changed-source rejection and pending status. `registration_verification.json` covers pending registration and duplicate refusal. Actual GUI playback, pause, restart, looping and one-shot stopping were checked; evidence and protected-file hashes are in `.validation/animation_showcase/`.
 
-Those initial reports cover the original three-entry build. The [takeoff showcase verification](../reviews/player_animation_library_v1/jump_takeoff_test/showcase_verification.json) covers the current four-entry viewer and switching between all references and pending takeoff. Its adjacent `verify_showcase.py` is the check to run for this library revision.
+Those initial reports cover the original three-entry build. The [takeoff showcase verification](../reviews/player_animation_library_v1/jump_takeoff_test/showcase_verification.json) covers the earlier four-entry viewer, when takeoff was pending. It remains historical evidence for that revision.
+
+The [AirPose showcase verification](../reviews/player_animation_library_v1/jump_airpose_test/showcase_verification.json) covers the historical five-entry viewer when AirPose was pending. The [Landing showcase verification](../reviews/player_animation_library_v1/jump_landing_test/showcase_verification.json) covers the historical six-entry viewer, five approved references, pending Landing, 19 switching transitions and stage reset.
+
+The current [Impact showcase verification](../reviews/player_animation_library_v1/jump_landing_impact_test/showcase_verification.json) extends that record to seven entries, including two separate pending landing studies. Use its adjacent `verify_showcase.py` for current switching/reopen checks. The six-entry report remains historical evidence and its files are preserved.
 
 The three `preview_*.png` renders match the corresponding source-study pixels exactly. `viewer_screenshot.png` shows the saved review interface. All 1,716 protected source/runtime files retained their SHA256 hashes.
 

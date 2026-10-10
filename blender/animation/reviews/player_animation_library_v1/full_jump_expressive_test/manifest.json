@@ -1,0 +1,71 @@
+{
+  "action": "Full_Jump_Expressive_Test",
+  "frames": [
+    1,
+    93
+  ],
+  "fps": 30,
+  "status": "pending",
+  "original_actions": {
+    "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+    "Jump_AirPose_Test": "eb3b79fd05e5f175e6b5590745f3a38efa43015a635e6eb011abe73377c818e4",
+    "Jump_Landing_Impact_Test": "e870f735519b6aeb810b776ecce6ac944c00357e3127914286fc3f4ff137e55f",
+    "Jump_Landing_Test": "8836c180e39c2b93e47e96a1077360705cffd5c33a729aa91ce93d0b47bf9076",
+    "Jump_Takeoff_Test": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+    "LowerBody_Recovery_Test": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+    "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1"
+  },
+  "rig_changes": [],
+  "root_static": true,
+  "in_place": true,
+  "phase_boundaries": {
+    "takeoff_to_air": 24,
+    "air_to_approach": 38
+  },
+  "last_support_frame": 19,
+  "contact_frames": {
+    "L": 46,
+    "R": 47
+  },
+  "foot_bases": {
+    "L": [
+      0.128,
+      -0.105,
+      0
+    ],
+    "R": [
+      -0.128,
+      0.07,
+      0
+    ]
+  },
+  "takeoff_foot_bases": {
+    "L": [
+      0.1145,
+      0.045,
+      0
+    ],
+    "R": [
+      -0.1145,
+      -0.045,
+      0
+    ]
+  },
+  "compression_frames": {
+    "preparation": 14,
+    "impact": 51
+  },
+  "rebound_frame": 67,
+  "air_source_time_map": "1+t+7*quintic_smooth(t/14), t=full_frame-24; endpoint rate 1",
+  "preview_only": {
+    "file": "full_jump_preview.blend",
+    "parent": "Review_Only_Jump_Travel",
+    "action": "PREVIEW_ONLY_FullJump_Height",
+    "release": 19,
+    "contact": 46,
+    "apex_frame": 32.5,
+    "height_m": 0.58,
+    "scope": "Presentation only, not registered or export-ready. Controller physics must replace this travel."
+  },
+  "scope": "First complete expressive jump study, pending review; no export or Godot integration."
+}
