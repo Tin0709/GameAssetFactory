@@ -102,7 +102,7 @@
   "support_leg": "Leg.L / character left / lateral3deg, forward3.75deg, outward yaw15deg / fixed lowest corner",
   "relaxed_leg": "Leg.R / character right / lateral8deg, backward3.75deg, outward yaw15deg / fixed lowest corner",
   "support_logic": "Pelvis positive-X bias28mm; unequal sideways opening remains primary; latest user asks slight character-left forward/right backward and requested15deg toe-out. Static leg matrices; no rig edits",
-  "breathing": "Latest user request:2X amplitude,12mm hips +3.6mm rigid chest lift; doubled breath-only shoulder/head/torso terms. Same4second timing; fixed feet, no scale",
+  "breathing": "Latest user request:4X original amplitude (double previous2X),24mm hips +7.2mm rigid chest lift; doubled breath-only shoulder/head/torso terms. Same4second timing; fixed feet, no scale",
   "face_controls": "No facial bones or shape keys; head articulation only",
   "scope": "Current v3 stance/breath review checkpoint; preserve v2/v1 and all other studies; no Godot edits/export."
 }

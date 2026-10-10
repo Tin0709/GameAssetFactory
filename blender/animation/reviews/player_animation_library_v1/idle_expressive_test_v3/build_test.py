@@ -31,15 +31,15 @@ def inherited_design(f):
     shoulder_b=.5-.5*math.cos(2*math.pi*(f-6)/120)
     head_b=.5-.5*math.cos(2*math.pi*(f-10)/120)
     return {'hip':Vector((-.002+.011*hip_l-.010*hip_r,-.001+.001*hip_l-.0005*hip_r,.6716)),
-      'pelvis':(1.1+.2*breath,1.0*hip_l-.9*hip_r,.1-.28*hip_l+.24*hip_r),
-      'spine':1.25+.46*breath,'spine_yaw':1.2*body_l-1.05*body_r,
-      'chest':.8+.84*breath,'chest_yaw':3.5*body_l-3.1*body_r,'chest_lift':.0036*breath,
+      'pelvis':(1.1+.4*breath,1.0*hip_l-.9*hip_r,.1-.28*hip_l+.24*hip_r),
+      'spine':1.25+.92*breath,'spine_yaw':1.2*body_l-1.05*body_r,
+      'chest':.8+1.68*breath,'chest_yaw':3.5*body_l-3.1*body_r,'chest_lift':.0072*breath,
       'arm_r':-5.8+2.5*arm_r-2.0*arm2_r+8*clear_r,
       'arm_l':5.2-2.2*arm_l+2.0*arm2_l-8*clear_l,
       'spread_r':11.8+1.3*arm_r+.7*arm2_r,'spread_l':10.8+.8*arm_l+1.2*arm2_l,
-      'shoulder_r':.0014*shoulder_b-.0175*left-.014*right-.006*arm2_r,
-      'shoulder_l':.0012*shoulder_b-.014*left-.0175*right,
-      'head_pitch':1.4-.9*left+1.25*right+.36*head_b,
+      'shoulder_r':.0028*shoulder_b-.0175*left-.014*right-.006*arm2_r,
+      'shoulder_l':.0024*shoulder_b-.014*left-.0175*right,
+      'head_pitch':1.4-.9*left+1.25*right+.72*head_b,
       'head_yaw':-.3+26*left-23*right,'head_roll':-.65*left+.55*right}
 
 def design(f):
@@ -48,7 +48,7 @@ def design(f):
     # Positive X (Leg.L) supports; final requested review adds slight left-forward/right-back and 15deg toe-out.
     d['hip'].x=.028+.45*(d['hip'].x+.002)
     d['hip'].y=-.006+.5*(d['hip'].y+.001)
-    d['hip'].z+=.012*(.5-.5*math.cos(2*math.pi*(f-1)/120))
+    d['hip'].z+=.024*(.5-.5*math.cos(2*math.pi*(f-1)/120))
     d['pelvis']=(d['pelvis'][0],d['pelvis'][1]+.4,d['pelvis'][2]+.55)
     d['spread_l']+=.6
     d['spread_r']+=.5
@@ -77,7 +77,8 @@ def pose(r,f):
     b=r.pose.bones['Chest'];bpy.context.view_layer.update()
     mat=b.matrix.copy();mat.translation.z+=d['chest_lift'];b.matrix=mat
     for side in ['L','R']:
-        b=r.pose.bones['UpperArm.'+side];b.location+=b.bone.matrix_local.to_3x3().inverted()@Vector((0,0,d['shoulder_'+side.lower()]))
+        # Small resting clearance keeps the stronger breath from touching the head on return.
+        b=r.pose.bones['UpperArm.'+side];b.location+=b.bone.matrix_local.to_3x3().inverted()@Vector((-.0045 if side=='R' else 0,0,d['shoulder_'+side.lower()]))
     bpy.context.view_layer.update()
     b=r.pose.bones['Head'];b.matrix=Matrix.Translation(b.head)@Euler((math.radians(d['head_pitch']),math.radians(d['head_roll']),math.radians(d['head_yaw'])),'XYZ').to_matrix().to_4x4()@b.bone.matrix_local.to_3x3().to_4x4()
     bpy.context.view_layer.update()
@@ -124,7 +125,7 @@ def build():
     for f,label in [(1,'ASYMMETRIC SUPPORTED REST'),(25,'FIRST HEAD-LED LOOK'),(49,'OBSERVE / BODY FOLLOWS'),(76,'RETURN / REST'),(125,'SECOND INTEREST'),(146,'SHORTER LOWER LOOK'),(165,'HEAD RETURNS'),(218,'SETTLED REST'),(241,'CLOSING KEY / EXCLUDED')]:s.timeline_markers.new(label,frame=f)
     s.camera=bpy.data.objects['Showcase_THREE_QUARTER'];bpy.data.objects['Showcase_FixedFloor'].location.z=0;r.location=(0,0,0);s.frame_set(1)
     s['purpose']='Pending v3 / asymmetric support Idle / two-sided curious head / transform-only breath / no gameplay integration'
-    data={'action':NAME,'status':'pending','playback_frames':[1,P],'closing_key':CLOSE,'fps':FPS,'period_s':P/FPS,'seamless_loop':True,'in_place':True,'original_actions':original,'rig_changes':[],'fixed_foot_matrices':{side:[list(x) for x in mat] for side,mat in FEET.items()},'stance_placements':placements,'support_leg':'Leg.L / character left / lateral3deg, forward3.75deg, outward yaw15deg / fixed lowest corner','relaxed_leg':'Leg.R / character right / lateral8deg, backward3.75deg, outward yaw15deg / fixed lowest corner','support_logic':'Pelvis positive-X bias28mm; unequal sideways opening remains primary; latest user asks slight character-left forward/right backward and requested15deg toe-out. Static leg matrices; no rig edits','breathing':'Latest user request:2X amplitude,12mm hips +3.6mm rigid chest lift; doubled breath-only shoulder/head/torso terms. Same4second timing; fixed feet, no scale','face_controls':'No facial bones or shape keys; head articulation only','scope':'Current v3 stance/breath review checkpoint; preserve v2/v1 and all other studies; no Godot edits/export.'}
+    data={'action':NAME,'status':'pending','playback_frames':[1,P],'closing_key':CLOSE,'fps':FPS,'period_s':P/FPS,'seamless_loop':True,'in_place':True,'original_actions':original,'rig_changes':[],'fixed_foot_matrices':{side:[list(x) for x in mat] for side,mat in FEET.items()},'stance_placements':placements,'support_leg':'Leg.L / character left / lateral3deg, forward3.75deg, outward yaw15deg / fixed lowest corner','relaxed_leg':'Leg.R / character right / lateral8deg, backward3.75deg, outward yaw15deg / fixed lowest corner','support_logic':'Pelvis positive-X bias28mm; unequal sideways opening remains primary; latest user asks slight character-left forward/right backward and requested15deg toe-out. Static leg matrices; no rig edits','breathing':'Latest user request:4X original amplitude (double previous2X),24mm hips +7.2mm rigid chest lift; doubled breath-only shoulder/head/torso terms. Same4second timing; fixed feet, no scale','face_controls':'No facial bones or shape keys; head articulation only','scope':'Current v3 stance/breath review checkpoint; preserve v2/v1 and all other studies; no Godot edits/export.'}
     (OUT/'manifest.json').write_text(json.dumps(data,indent=2),encoding='utf8')
     bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'idle_expressive_v3_review.blend'));print('BUILT SEPARATE V3 IDLE',flush=True)
 if __name__=='__main__':build()

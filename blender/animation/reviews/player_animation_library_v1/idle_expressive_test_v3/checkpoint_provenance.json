@@ -1,6 +1,6 @@
 {
-  "source_sha256": "d4fb3cd802df1edda4b8175501fbdcaeb076012a3f19c4e8ffe87f20d6dc581d",
-  "action_sha256": "e2fe6362a2b7950af034ecb552c63a4ac5aab75f46a11fb8e819124eb31de07b",
+  "source_sha256": "bb59363198c2afef9143c8cc16ba3a52c5bd8ff1a3e844027ed5a0cd16024e65",
+  "action_sha256": "ab2ae718b5ce239dc956bf9803c5668b5636d3956b3abeb6e955a89d5ee6de96",
   "fps": 30,
   "range": [
     1,
@@ -8,12 +8,12 @@
   ],
   "presentation": "Current saved source, original cameras/lights/materials. Three-view stance stills; eight-second three-quarter motion checkpoint. Full polished comparison package deferred for requested stance review.",
   "frames": {
-    "checkpoint_frames/front_0001.png": "834f649bb35267edab091e904a8bb7dc3271e167cee08b99f04a09e490ba96a3",
-    "checkpoint_frames/front_0061.png": "4c2edd74fcef33f055e2f4725a066ebf513ad0f54958749c56ec07cb23a20655",
-    "checkpoint_frames/side_0001.png": "40d3ae7624e3a286c153a340a7459112501dc442da08fcb85936d62f2a866a75",
-    "checkpoint_frames/side_0061.png": "3059853a7840cb0e1c1b3855073b125f54c19db24d1b1880a9e420b186246486",
-    "checkpoint_frames/three_quarter_0001.png": "41ec26dfd89f35c456dae38a762cf8d4b622efc25bf580aba2ed466a8ccbb10f",
-    "checkpoint_frames/three_quarter_0061.png": "07db9c3e130cc232dba9b1423844f1dc2005746b3d8e1dd009127d59442c07ad"
+    "checkpoint_frames/front_0001.png": "18ff18f8c54f17496acfdb17fa9f73ab743d09d9ac55ae56ecf7fd7dfd84952e",
+    "checkpoint_frames/front_0061.png": "da23c90cf08205a0702982d359c1b3c8126e874af36c7e706fe4b88f2a7cb4fd",
+    "checkpoint_frames/side_0001.png": "3c7236c4707907b63d01fd8c765ebbb49452cf9c2b717830307a68df0c7b8798",
+    "checkpoint_frames/side_0061.png": "855f637b7226d089c66d3244d259663abd7b8e672f6090a22a3fdbd7c14b0f73",
+    "checkpoint_frames/three_quarter_0001.png": "a2a26cabf2e2625e204b34be5a10c3a8023e02d8dbea7e6613af55c19adf57ea",
+    "checkpoint_frames/three_quarter_0061.png": "dc16ee66dbf81863ab5bca7e0dd5890fc20c44a7614d0699ef4c9d464e36fdc9"
   },
   "stills_complete": true,
   "complete": false
