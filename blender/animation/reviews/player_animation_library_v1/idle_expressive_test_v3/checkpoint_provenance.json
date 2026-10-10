@@ -1,0 +1,10 @@
+{
+  "source_sha256": "e18a5d4c3f05c0dd8fd9e2b8737068ea8af48e82082c6e697a8ee24ee6470baf",
+  "action_sha256": "1202abbc4e3016b7d9f106d899ba794f373d90bdc8a3d0ae0b7898fa48d959ee",
+  "fps": 30,
+  "range": [
+    1,
+    240
+  ],
+  "presentation": "Current saved source, original cameras/lights/materials. Three-view stance stills; eight-second three-quarter motion checkpoint. Full polished comparison package deferred for requested stance review."
+}

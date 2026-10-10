@@ -31,24 +31,24 @@ def inherited_design(f):
     shoulder_b=.5-.5*math.cos(2*math.pi*(f-6)/120)
     head_b=.5-.5*math.cos(2*math.pi*(f-10)/120)
     return {'hip':Vector((-.002+.011*hip_l-.010*hip_r,-.001+.001*hip_l-.0005*hip_r,.6716)),
-      'pelvis':(1.1+.1*breath,1.0*hip_l-.9*hip_r,.1-.28*hip_l+.24*hip_r),
-      'spine':1.25+.23*breath,'spine_yaw':1.2*body_l-1.05*body_r,
-      'chest':.8+.42*breath,'chest_yaw':3.5*body_l-3.1*body_r,'chest_lift':.0018*breath,
+      'pelvis':(1.1+.2*breath,1.0*hip_l-.9*hip_r,.1-.28*hip_l+.24*hip_r),
+      'spine':1.25+.46*breath,'spine_yaw':1.2*body_l-1.05*body_r,
+      'chest':.8+.84*breath,'chest_yaw':3.5*body_l-3.1*body_r,'chest_lift':.0036*breath,
       'arm_r':-5.8+2.5*arm_r-2.0*arm2_r+8*clear_r,
       'arm_l':5.2-2.2*arm_l+2.0*arm2_l-8*clear_l,
       'spread_r':11.8+1.3*arm_r+.7*arm2_r,'spread_l':10.8+.8*arm_l+1.2*arm2_l,
-      'shoulder_r':.0007*shoulder_b-.0175*left-.014*right-.006*arm2_r,
-      'shoulder_l':.0006*shoulder_b-.014*left-.0175*right,
-      'head_pitch':1.4-.9*left+1.25*right+.18*head_b,
+      'shoulder_r':.0014*shoulder_b-.0175*left-.014*right-.006*arm2_r,
+      'shoulder_l':.0012*shoulder_b-.014*left-.0175*right,
+      'head_pitch':1.4-.9*left+1.25*right+.36*head_b,
       'head_yaw':-.3+26*left-23*right,'head_roll':-.65*left+.55*right}
 
 def design(f):
     d=inherited_design(f)
     # Maintain the same quiet performance on a single, persistent support bias.
-    # Positive X (Leg.L) supports; latest user correction opens whole legs SIDEWAYS, not in a running stagger.
+    # Positive X (Leg.L) supports; final requested review adds slight left-forward/right-back and 5deg toe-out.
     d['hip'].x=.028+.45*(d['hip'].x+.002)
     d['hip'].y=-.006+.5*(d['hip'].y+.001)
-    d['hip'].z+=.006*(.5-.5*math.cos(2*math.pi*(f-1)/120))
+    d['hip'].z+=.012*(.5-.5*math.cos(2*math.pi*(f-1)/120))
     d['pelvis']=(d['pelvis'][0],d['pelvis'][1]+.4,d['pelvis'][2]+.55)
     d['spread_l']+=.6
     d['spread_r']+=.5
@@ -87,9 +87,10 @@ def build():
     s=bpy.context.scene;r=bpy.data.objects['IEV2_Test_Rig'];m=bpy.data.objects['IEV2_Test_Mesh']
     original={a.name:ui.action_signature(a) for a in bpy.data.actions};assert len(original)==10
     reset(r);bpy.context.view_layer.update()
-    placements={'L':{'top':(.1325,0,.675),'yaw':0.0,'pitch':0.0,'lean':-3.0},'R':{'top':(-.0925,0,.675),'yaw':0.0,'pitch':0.0,'lean':8.0}}
-    # Latest supplied standing reference: unequal SIDEWAYS whole-leg opening; no forward/backward running stagger.
-    # Zero external toe rotation, no invented ankle/knee or animated foot pivot. Both rigid soles contact along fixed edges.
+    # Nine millimetres extra clearance per hip prevents the yawed solid blocks intersecting.
+    placements={'L':{'top':(.1415,0,.675),'yaw':5.0,'pitch':-2.5,'lean':-3.0},'R':{'top':(-.1015,0,.675),'yaw':-5.0,'pitch':2.5,'lean':8.0}}
+    # Keep sideways opening primary; latest explicit user instruction adds a small opposed fore/aft angle and 5deg toe-out.
+    # Character LEFT is forward, RIGHT back. No invented ankle/knee or animated foot pivot; fixed lowest corner contacts.
     for side,d in placements.items():
         b=r.pose.bones['Leg.'+side];rest=b.bone.matrix_local
         rot=Matrix.Rotation(math.radians(d['yaw']),4,'Z')@Matrix.Rotation(math.radians(d['lean']),4,'Y')@Matrix.Rotation(math.radians(d['pitch']),4,'X')
@@ -123,7 +124,7 @@ def build():
     for f,label in [(1,'ASYMMETRIC SUPPORTED REST'),(25,'FIRST HEAD-LED LOOK'),(49,'OBSERVE / BODY FOLLOWS'),(76,'RETURN / REST'),(125,'SECOND INTEREST'),(146,'SHORTER LOWER LOOK'),(165,'HEAD RETURNS'),(218,'SETTLED REST'),(241,'CLOSING KEY / EXCLUDED')]:s.timeline_markers.new(label,frame=f)
     s.camera=bpy.data.objects['Showcase_THREE_QUARTER'];bpy.data.objects['Showcase_FixedFloor'].location.z=0;r.location=(0,0,0);s.frame_set(1)
     s['purpose']='Pending v3 / asymmetric support Idle / two-sided curious head / transform-only breath / no gameplay integration'
-    data={'action':NAME,'status':'pending','playback_frames':[1,P],'closing_key':CLOSE,'fps':FPS,'period_s':P/FPS,'seamless_loop':True,'in_place':True,'original_actions':original,'rig_changes':[],'fixed_foot_matrices':{side:[list(x) for x in mat] for side,mat in FEET.items()},'stance_placements':placements,'support_leg':'Leg.L / positive-X / restrained3deg lateral lean / fixed sole edge','relaxed_leg':'Leg.R / whole solid leg8deg SIDEWAYS / zero pitch and toe-out / fixed sole edge','support_logic':'Pelvis positive-X bias28mm; unequal sideways whole-leg opening; proximal leg pair20mm toward support; no front/back stagger. Static leg matrices; no rig edits','breathing':'User-requested slow body rise/settle:6mm hips +1.8mm rigid chest lift over4seconds; fixed feet, no scale','face_controls':'No facial bones or shape keys; head articulation only','scope':'Separate v3; preserve all current Idle and other studies, no Godot edits/export.'}
+    data={'action':NAME,'status':'pending','playback_frames':[1,P],'closing_key':CLOSE,'fps':FPS,'period_s':P/FPS,'seamless_loop':True,'in_place':True,'original_actions':original,'rig_changes':[],'fixed_foot_matrices':{side:[list(x) for x in mat] for side,mat in FEET.items()},'stance_placements':placements,'support_leg':'Leg.L / character left / lateral3deg, forward2.5deg, outward yaw5deg / fixed lowest corner','relaxed_leg':'Leg.R / character right / lateral8deg, backward2.5deg, outward yaw5deg / fixed lowest corner','support_logic':'Pelvis positive-X bias28mm; unequal sideways opening remains primary; latest user asks slight character-left forward/right backward and small5deg toe-out. Static leg matrices; no rig edits','breathing':'Latest user request:2X amplitude,12mm hips +3.6mm rigid chest lift; doubled breath-only shoulder/head/torso terms. Same4second timing; fixed feet, no scale','face_controls':'No facial bones or shape keys; head articulation only','scope':'Current v3 stance/breath review checkpoint; preserve v2/v1 and all other studies; no Godot edits/export.'}
     (OUT/'manifest.json').write_text(json.dumps(data,indent=2),encoding='utf8')
     bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'idle_expressive_v3_review.blend'));print('BUILT SEPARATE V3 IDLE',flush=True)
 if __name__=='__main__':build()

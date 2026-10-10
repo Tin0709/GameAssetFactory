@@ -1,64 +1,46 @@
-# Idle Expressive v3 — support-led standing refinement
+# Idle Expressive v3 — stance and stronger breathing checkpoint
 
-2026-10-11. **Pending user review.** Separate Action `Idle_Expressive_Test_v3`; v2/v1 and every earlier Action, source and review remain preserved. Blender-only artistic study, not production-ready or Godot-validated.
+2026-10-11. **Pending user review.** Independent `Idle_Expressive_Test_v3`; v2/v1 and every approved Action/source remain unchanged. This is a Blender artistic study, not Godot production validation.
 
-Open the existing [Animation Showcase](../../../showcase/Animation_Showcase.blend), select **Idle_Expressive_Test_v3** in N → Animation Library, enable Loop and Play. Both earlier Idle versions remain selectable. [Separate authoring source](idle_expressive_v3_review.blend) uses the same rest rig, mesh, materials, packed textures, lights and three cameras.
+Open the existing [Animation Showcase](../../../showcase/Animation_Showcase.blend), select **Idle_Expressive_Test_v3** in N → Animation Library, enable Loop and Play. [Authoring source](idle_expressive_v3_review.blend). Playback **1–240 at30FPS**, eight seconds; closing key241 excluded. Same character rest rig, rigid mesh, materials, textures, cameras and lighting.
 
-Playback **1–240 at 30 FPS**, eight seconds. Closing key **241 is excluded** from playback. Each review video shows two complete loops at original speed, with no retiming, closing-key hold or padding.
+## Current review
 
-## Review
+- [Original-speed three-quarter preview](stance_breath_three_quarter_1x.mp4), two eight-second loops.
+- [Front / three-quarter / side stance checkpoint](stance_checkpoint.jpg).
+- [Leg closeups](stance_legs_checkpoint.jpg).
+- [Saved-source checks](validation.json), [measured stance angles](clean_stance_orientation.json), [Showcase reopen/switch checks](showcase_verification.json), [actual GUI playback](gui_playback.json) and [checkpoint preservation audit](checkpoint_verification.json).
 
-- [V3 front / three-quarter / side together](idle_v3_all_views_1x.mp4).
-- [V2 versus v3 — all three matching views](comparison_all_views_1x.mp4).
-- [V2 versus v3 — three-quarter comparison](comparison_three_quarter_1x.mp4).
-- Individual [front](front_1x.mp4), [three-quarter](three_quarter_1x.mp4), [side](side_1x.mp4).
-- [Front stance comparison](stance_comparison_front.jpg).
-- [Three-view key poses](idle_v3_pose_sheet.jpg) and [decoded comparison samples](decoded_comparison_samples.jpg).
+This is the quick stance/breath checkpoint requested by “let me review.” Full polished front/side motion and matched v2 comparison videos are deferred for stance-direction review. Obsolete working renders are archived privately; none is presented as the current result. V2 remains directly selectable for comparison in the same Showcase.
 
-V2's unchanged source reproduces its saved evaluated vertices within 0.000369 mm on the v3 study rig. Its original PNGs are reused at the same camera, lighting and timing; both versions have the same 240-frame period. No appearance adjustments make either version look better.
+## Latest requested adjustments
 
-## How the stance changed
+Latest explicit side-view request: character LEFT slightly forward and RIGHT slightly back (opposed 2.5° whole-leg pitch), both only 5° outward yaw. Unequal mainly sideways opening remains L3°/R8°, with hip bias and torso counterbalance. Nine millimetres of extra clearance per proximal leg prevents the yawed rigid blocks intersecting. Fixed lowest sole corners; no invented ankle/knee or flattened boots.
 
-V2 placed two upright parallel legs at X ±140.5mm. The latest [standing image and user correction](references/sideways_stance_target.png) clarify the target: the whole legs open **mainly sideways**, rather than reaching forward like a running step. V3 keeps **Leg.L** as firmer support (character left, screen right in front view), with a more relaxed **Leg.R**. Both foot width edges face forward: **zero external toe-out yaw**. Both feet stay at the same depth; forward/backward leg pitch is zero.
+Latest user request doubles breathing amplitude, not speed: 12mm hip/body rise plus 3.6mm rigid chest lift, with doubled breath-only shoulder/head/torso response over the same four-second period. Feet remain fixed; two unequal looks and eight-second loop timing are unchanged.
 
-| Relationship | V2 | Latest corrected v3 |
-| --- | --- | --- |
-| Support leg | Upright, equally weighted appearance | Whole Leg.L opens sideways 3°; hips biased 28mm toward support |
-| Relaxed leg | Upright parallel to support | Whole rigid Leg.R opens sideways 8°; no forward reach |
-| Placement logic | Both legs translated outward equally | Proximal leg pair follows hip bias by 20mm; unequal lateral angles open the base |
-| Torso/pelvis | Mostly centered over wider feet | Restrained support-side rise, torso counterbalance and unequal arms |
-| Breathing | Tiny 1.8mm chest lift | Slow 6mm hip/body rise plus existing chest lift over four seconds; legs fixed |
+The stance opens mainly laterally, rather than a full running stride. Small opposed fore/aft angles now make the legs distinguishable from the side. The support-side pelvis/torso relationship and unequal arms remain. The fixed whole-leg matrices are compensated against body movement; all sole vertices stay stationary. Corner contact is an artistic rigid-block compromise, not anatomical full-flat support.
 
-**Contact and rigid-leg limitation:** both angled boots rest along fixed outer sole edges. Their inner sole edges rise with the solid blocks; neither boot is deformed or flattened, and no ankle/knee joint is invented. Every sole vertex remains stationary. A 0.4mm numerical stage margin is retained. This is stable artistic edge contact rather than full-flat anatomical foot support. The upright-foot, forward-reaching and earlier yawed working passes were archived under `.validation/idle_expressive_test_v3/` before this explicit correction. None is approved.
+Both observation moments retain v2 timing: first head-led look begins F25, observes F49–75, returns by F104; second begins F125, observes F146–164, returns by F194. Body/arms settle by F218. Quiet rest spans the seamless boundary. World head yaw remains approximately +25.7°/−23.3°. No facial controls or blink were invented.
 
-The user's final emphasis is each leg's **angle relative to the body**, not independent foot placement. The proximal leg pair follows the supported pelvis, and the restrained torso lean counterbalances above it. [Measured authored body/leg axes](relative_body_angles.json) compare rest, both observing poses and breathing extrema: the firmer leg stays closer to the torso axis, the relaxed leg opens farther sideways, and neither reaches forward. These are our authored angles, not exact 3D angles recovered from a single reference image.
+**Evaluation:** doubled slow rise/settle and chest/shoulder response make breathing more readable without increasing its frequency. Unequal lateral angles, a small left-forward/right-back relationship and restrained outward rotation address the latest pose request. Artistically this remains Pending. Rigid corner contacts and future stance entry/exit need gameplay evaluation; static support checks cannot prove natural crossfades into a moving gait.
 
-## Retained performance and evaluation
+## Validation and safety
 
-Two unequal head-led interests remain: first look begins F25, observes F49–75 and returns toward center by F104; the second begins F125, observes F146–164 and returns by F194. Torso, hips and arms follow with their original staggered timing and settle by F218. Comfortable rest spans the loop seam. World head yaw remains approximately +25.7° / −23.3°, with restrained chin/tilt response.
+Dense saved-source validation samples3,841 poses at1/16-frame intervals for fixed sole drift, floor clearance, rigid dimensions, nonadjacent intersections, framing and pose/velocity loop continuity. Original ten Action signatures, v2 evaluated geometry, rest bones, skin weights, UVs, materials, packed images and lights are compared with preserved baselines. The current library has eleven independent entries, with v3 still Pending.
 
-The independent four-second breathing-like layer retains a maximum 1.8 mm rigid chest lift, tiny shoulder response and delayed head life. The user-requested slow body rise and settle has6mm hip excursion; feet remain compensated and fixed. No facial controls, blink, scaling, deformation, new rig controls or random motion were added.
+The checkpoint Showcase verifier checks every entry and41 transitions, comparing first/middle/last saved-source geometry samples after each switch. Actual interactive playback is observed across two wraps after reopening, then paused/restarted. The audit checks all6,822 protected original files, including every v2/v1 study, Full Jump and Godot file. Hashes bind each report and media preview to the current saved source/Action.
 
-**Assessment:** the sideways opening now addresses the user's distinction directly: a relaxed open standing base, without the previous forward-reaching running-step impression. Unequal solid-leg angles and hip/torso bias give support logic while zero toe-out keeps boot orientation clean. The slow small breathing rise adds body life without a landing-style bounce. Two-sided curiosity and delayed shoulder/arm response remain calm. This is an artistic interpretation of a still reference with different proportions/camera, not a measured reconstruction. Rigid sole-edge contact and future stance entry/exit remain limitations for gameplay validation.
+Backups, working-tree snapshots and concurrent-file hash guards are under `.validation/idle_expressive_test_v3/`, especially `before_stance_review_revision`, `before_stance_review_registration` and `before_stance_review_showcase_save`. The initial5° yaw candidate failed upper-leg intersection checks and is preserved in `failed_yaw_clearance`; the corrected candidate adds only9mm proximal clearance per leg. Earlier v3 candidates are also archived. Only the current explicitly revised Pending v3 is replaced; all ten earlier central Actions/entries remain exact.
 
-The [supplied GIF](references/idle_stance_reference.gif) was decoded as 81 frames / 3.38 seconds, with frame delays and SHA256 recorded in [metadata](references/metadata.json). Its visible asymmetric leg relationship and head-led observation informed v3. V2's established eight-second original timing is preserved rather than copying the GIF's timing. [User v2 screenshot](references/user_v2_front.png) records the parallel-leg comparison.
+## Future gameplay contract
 
-## Validation and preservation
+- Preserve in-place identity root, same rest bones, rotation modes and Blender5.2 slot conventions. Controller physics owns travel.
+- Validate support transfer/replant and actual locomotion phase when leaving this asymmetric stance; do not assume a blind crossfade keeps contacts planted.
+- Observation/rest must interrupt promptly on input. Check pose AND velocity, both lead directions and both observing phases in Godot.
+- Define chest/head/arm masks and weapon grip ownership before layering. Empty-handed Blender review proves no weapon-layer compatibility.
+- Blender artistic approval is distinct from Godot gameplay/transition readiness and measured target-phone30FPS. Continue one animation at a time; no Walk, Godot or Full Jump work is authorized here.
 
-[Clean stance orientation](clean_stance_orientation.json) measures actual forward sole-edge yaw, sideways whole-leg lean, zero front/back stagger, fixed contacts and body breathing from evaluated geometry. [Saved-source validation](validation.json) samples 3,841 poses at 1/16-frame spacing: all sole vertices remain fixed within 0.000359 mm, minimum stage clearance is about 0.400 mm, cuboid dimensions remain unchanged and sampled nonadjacent blocks do not intersect. Adjacent shoulder/hip/head joins are reviewed visually; SAT is not used to prohibit their intended overlap. Pose continuity at F1/F241 is exact; channel tangents match within 2.3e−9, and the finite vertex velocity difference across the seam is 0.118 mm/s at a 1/16-frame interval. The gentle4-second body breathing cycle has no root travel or scale tracks. Original ten Action signatures, original rest rig/weights/UV/materials/textures/lights and v2 evaluated poses match.
+## Helpers
 
-[Render provenance](render_provenance.json) binds the source, Action, stage/cameras and 720 PNGs. [Media checks](media_verification.json) decode every frame of all six 480-frame / 30 FPS videos against the composed source images. [Showcase checks](showcase_verification.json) cover fresh reopening, all eleven entries, original slots/ranges/FPS and source-geometry agreement after switching. [GUI playback](gui_playback.json) observes two actual wraps after reopening, then Pause and Restart. [Final preservation audit](preservation_verification.json) compares original working bytes including all v2/v1, Full Jump and Godot files. Earlier study reports remain historical evidence and are not edited.
-
-Backups and current-hash / working-tree guards are under `.validation/idle_expressive_test_v3/`, including the previous viewer/manifest and unsaved foreground Showcase snapshots. The intersecting first pose, diagnostic renders, splayed working pass subsequent upright candidate and forward-reaching pass were archived before the latest sideways-leg/breath correction; none is a separate library animation. Registration adds only this compatible named Pending Action. The explicit in-task correction replaces only the current unapproved v3 candidate under exact old/new hash guards, preserving its backup and all ten earlier library entries. It imports no second character or rig.
-
-## Future gameplay transition contract
-
-- In-place, identity rig/root, unchanged rest bones, pose rotation modes, original Action slot conventions. Physics/controller owns world travel.
-- Full-body Idle owns hip, legs, chest, head and arms here. Weapon-ready layers must define arm/chest/head masks and grip ownership before use; no weapon compatibility is claimed from empty-handed review.
-- Do not blindly crossfade the asymmetric static soles into locomotion. Author or validate a short support transfer/replant against actual gait phase and controller direction, including the opposite lead. This does not authorize creating Walk or transition Actions now.
-- Input should interrupt observation/rest promptly. Test departure from both looks and rest, including pose and velocity continuity, actual foot contacts and readable face orientation.
-- Artistic approval remains separate from Godot gameplay/transition validation and measured target-phone 30 FPS. Neither is performed or claimed here. Continue one animation at a time.
-
-## Reproduce this study
-
-`build_test.py` starts from the preserved v2 source and refuses to overwrite its unique v3 output. `validate_test.py` operates on the saved v3 source. `render_review.py` refuses mismatched source/stage provenance before reusing PNGs; `package_review.py` requires completed provenance and passing source validation. `register_pending.py` and `update_showcase.py` record the initial Pending registration. `correct_pending_registration.py` and `update_corrected_showcase.py` apply only the explicit current-v3 sideways-leg/breath correction, refusing approved entries and preserving the backed-up candidate; all use file hashes, compatibility checks and backups. `verify_showcase.py`, `verify_gui_playback.py` and `verify_preservation.py` check the saved result. These task-local helpers do not rebuild the rig or change Godot.
+`build_test.py` starts from preserved v2 and refuses an existing v3 destination. `validate_test.py` checks the saved source. `render_checkpoint.py` creates the current three-view stills and three-quarter motion with source/Action provenance. `correct_pending_registration.py` / `update_corrected_showcase.py` update only the explicitly revised Pending v3 under backups and concurrent hash guards. `verify_showcase.py -- checkpoint` selects the documented representative geometry scope; `verify_gui_playback.py` observes interactive playback. Full-render helpers remain available for the later polished review package.

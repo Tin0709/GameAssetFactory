@@ -19,6 +19,7 @@ for target in re.findall(r'\]\(([^)]+)\)',(OUT/'README.md').read_text()):
     if not target.startswith(('http','app:')) and not (OUT/target).resolve().exists():missing.append(target)
 assert not missing,missing
 orientation=json.loads((OUT/'clean_stance_orientation.json').read_text());assert orientation['passed'] and orientation['source_sha256']==source_hash and orientation['action_sha256']==action_hash
+body_angles=json.loads((OUT/'relative_body_angles.json').read_text());assert body_angles['source_sha256']==source_hash and body_angles['action_sha256']==action_hash
 live=json.loads((OUT/'final_live_snapshot.json').read_text())
 assert live['showcase_sha256']==hashlib.sha256((ROOT/'blender/animation/showcase/Animation_Showcase.blend').read_bytes()).hexdigest() and live['manifest_sha256']==hashlib.sha256((ROOT/'blender/animation/showcase/animation_manifest.json').read_bytes()).hexdigest(),'Library changed after final foreground snapshot'
 assert live['active_action']=='Idle_Expressive_Test_v3' and live['entries']==11 and live['loop'] and live['range']==[1,240]
