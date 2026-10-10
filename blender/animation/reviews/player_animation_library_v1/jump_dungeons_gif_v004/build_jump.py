@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 import math
+from datetime import datetime
 from pathlib import Path
 from mathutils import Euler, Matrix, Vector
 
@@ -48,6 +49,17 @@ def original_data():
     snapshot['texts'] = {t.name: p.digest(t.as_string()) for t in bpy.data.texts}
     snapshot['timing'] = {s.name: [s.render.fps, s.render.fps_base, s.frame_start, s.frame_end]
                           for s in bpy.data.scenes}
+    snapshot['object_bindings'] = {o.name: p.digest({
+        'data': o.data.name if o.data else None,
+        'parent': o.parent.name if o.parent else None,
+        'parent_inverse': [list(r) for r in o.matrix_parent_inverse],
+        'armature_modifiers': [(m.name, m.object.name if m.object else None)
+                              for m in o.modifiers if m.type == 'ARMATURE'],
+        'action': o.animation_data.action.name if o.animation_data and o.animation_data.action else None,
+        'slot': o.animation_data.action_slot.identifier if o.animation_data and o.animation_data.action_slot else None,
+        'unanimated_transform': None if o.animation_data else
+            [list(o.location), list(o.rotation_euler), list(o.rotation_quaternion), list(o.scale)],
+    }) for o in bpy.data.objects}
     return snapshot
 
 
@@ -168,6 +180,8 @@ def build():
     assert SCENE not in bpy.data.scenes and ACTION not in bpy.data.actions
     TMP.mkdir(parents=True, exist_ok=True)
     backup = TMP / 'live_before_jump_gif_v004.blend'
+    if backup.exists():
+        backup = TMP / ('live_before_jump_gif_v004_' + datetime.now().strftime('%Y%m%d_%H%M%S') + '.blend')
     assert not backup.exists(), 'Preserve an existing backup.'
     baseline = original_data()
     (TMP/'original_data.json').write_text(json.dumps(baseline, indent=2))
