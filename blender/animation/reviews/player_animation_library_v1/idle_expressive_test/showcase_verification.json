@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "entries": [
+    [
+      "Expressive_Arm_Motion_Test",
+      "approved"
+    ],
+    [
+      "Run_Expressive_Test",
+      "approved"
+    ],
+    [
+      "LowerBody_Recovery_Test",
+      "approved"
+    ],
+    [
+      "Jump_Takeoff_Test",
+      "approved"
+    ],
+    [
+      "Jump_AirPose_Test",
+      "approved"
+    ],
+    [
+      "Jump_Landing_Test",
+      "pending"
+    ],
+    [
+      "Jump_Landing_Impact_Test",
+      "approved"
+    ],
+    [
+      "Full_Jump_Expressive_Test",
+      "pending"
+    ],
+    [
+      "Idle_Expressive_Test",
+      "pending"
+    ]
+  ],
+  "switches": 33,
+  "max_source_vertex_error_m": 2.4755668231600746e-07,
+  "preview_floor_applied_and_reset": true,
+  "rig_identity_preserved": true,
+  "protected_files_unchanged": 5256,
+  "all_previous_actions_and_sources_preserved": true,
+  "idle_seamless_loop": true,
+  "closing_key_excluded_from_playback": true,
+  "slots_ranges_timing_and_partial_pose_reset": true,
+  "one_rig_one_character_mesh": true
+}

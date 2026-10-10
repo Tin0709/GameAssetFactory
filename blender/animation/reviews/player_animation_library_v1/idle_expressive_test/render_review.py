@@ -2,10 +2,10 @@
 import bpy,json,sys
 from pathlib import Path
 OUT=Path(__file__).resolve().parent;s=bpy.context.scene;r=bpy.data.objects['IE_Test_Rig'];s.render.use_persistent_data=True
-a=bpy.data.actions['Idle_Expressive_Test'];keys=[1,12,20,29,40,48,58,65,76,88,96]
-for batch in ([] if 'old_only' in sys.argv else [keys,[] if 'keys' in sys.argv else [f for f in range(1,97) if f not in keys]]):
+a=bpy.data.actions['Idle_Expressive_Test'];candidate='candidate' in sys.argv;data=json.loads((OUT/('lookaround_manifest.json' if candidate else 'manifest.json')).read_text());P=data['playback_frames'][1];mode='new_lookaround' if candidate else 'new';keys=[1,22,30,37,52,62,72,90,109,124,P]
+for batch in ([] if 'old_only' in sys.argv else [keys,[] if 'keys' in sys.argv else [f for f in range(1,P+1) if f not in keys]]):
     for view in ['FRONT','THREE_QUARTER','SIDE']:
-        s.camera=bpy.data.objects['Showcase_'+view];folder=OUT/'frames/new'/view.lower();folder.mkdir(parents=True,exist_ok=True)
+        s.camera=bpy.data.objects['Showcase_'+view];folder=OUT/'frames'/mode/view.lower();folder.mkdir(parents=True,exist_ok=True)
         for f in batch:
             p=folder/f'{f:03d}.png'
             if p.exists():continue
