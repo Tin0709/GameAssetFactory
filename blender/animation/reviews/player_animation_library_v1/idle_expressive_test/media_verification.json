@@ -1,0 +1,81 @@
+{
+  "idle_all_views_1x": {
+    "frames": 288,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 9.6,
+    "complete_loops": 2,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.2649247646331787,
+    "sha256": "188457c28e967a20eb6116209c440021ae3bc156b6f1b2cf9ad830a2f561271a"
+  },
+  "comparison_all_views_1x": {
+    "frames": 288,
+    "fps": 30.0,
+    "size": [
+      1920,
+      1440
+    ],
+    "duration_s": 9.6,
+    "complete_loops": 2,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.2299704551696777,
+    "sha256": "5d9e27a8552c112d06a3ce587003933b6cd4d9624eba9e75fac8d00cbf8d1470"
+  },
+  "comparison_three_quarter_1x": {
+    "frames": 288,
+    "fps": 30.0,
+    "size": [
+      1280,
+      720
+    ],
+    "duration_s": 9.6,
+    "complete_loops": 2,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.286626935005188,
+    "sha256": "932807533b1f3e10c6f61b74b318c9a9f247cbb48424c3bf83037f074e8797bc"
+  },
+  "front_1x": {
+    "frames": 288,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 9.6,
+    "complete_loops": 2,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.2460269927978516,
+    "sha256": "1775bbbc364436dc76d005cf8acdc01982f0c39ca3f4f5d48329d9a66d517ecf"
+  },
+  "three_quarter_1x": {
+    "frames": 288,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 9.6,
+    "complete_loops": 2,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.2086613178253174,
+    "sha256": "26d1033f26c9fd3231a2f78ece1aae573b8afb3daad9c75fdf6247ccadd068db"
+  },
+  "side_1x": {
+    "frames": 288,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 9.6,
+    "complete_loops": 2,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.1179752349853516,
+    "sha256": "eab18916f43291ded83a9e332a9f9d347e5e94cd703e8d27ad67ca3c3d0d4585"
+  },
+  "comparison_baseline": "Actual R12_Hold_Unarmed_Upper: 96 frames at native 24 FPS (4 s), sampled at 30 FPS for comparison without retiming; new loop 144 frames at 30 FPS (4.8 s)."
+}

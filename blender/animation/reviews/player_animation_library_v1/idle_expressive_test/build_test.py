@@ -34,7 +34,7 @@ def design(f):
       'spine':1.3+.25*breath,'spine_yaw':1.6*follow,'chest':1+.55*breath,'chest_yaw':4.2*follow,
       'arm_r':-5.8+2.8*arm_r,'arm_l':5.2-2.4*arm_l-8*arm_clear,
       'spread_r':13.5+1.5*arm_r,'spread_l':12.0+.9*arm_l,
-      'shoulder_r':.0002+.0008*arm_r-.014*head,'shoulder_l':.0001+.0005*arm_l-.014*head,
+      'shoulder_r':.0002+.0008*arm_r-.0175*head,'shoulder_l':.0001+.0005*arm_l-.014*head,
       'head_pitch':1.5-1.8*head,'head_yaw':-.3+27*head,'head_roll':-.5*head}
 
 def reset(r):
@@ -50,7 +50,7 @@ def pose(r,f):
     # Idle needs no replant or boot rocking. Compensate existing leg pose channels
     # to retain exactly fixed rigid boots while the hips transfer a little load.
     for side in ['L','R']:r.pose.bones['Leg.'+side].matrix=FEET[side]
-    for name,angles in [('Spine',(d['spine'],d['hip'].x*12,d['spine_yaw'])),('Chest',(d['chest'],-d['hip'].x*18,d['chest_yaw'])),('UpperArm.R',(d['arm_r'],0,-d['spread_r'])),('UpperArm.L',(d['arm_l'],0,d['spread_l']))]:
+    for name,angles in [('Spine',(d['spine'],d['spine_yaw'],d['hip'].x*13+.5*d['spine_yaw']/1.6)),('Chest',(d['chest'],d['chest_yaw'],d['hip'].x*16+d['chest_yaw']/4.2)),('UpperArm.R',(d['arm_r'],0,-d['spread_r'])),('UpperArm.L',(d['arm_l'],0,d['spread_l']))]:
         b=r.pose.bones[name];e=Euler(tuple(math.radians(x) for x in angles),'ZXY' if 'UpperArm' in name else 'XYZ')
         if b.rotation_mode=='QUATERNION':b.rotation_quaternion=e.to_quaternion()
         else:b.rotation_euler=e

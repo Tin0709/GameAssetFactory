@@ -1,0 +1,17 @@
+{
+  "source_sha256": "28d66ce1855326e83decd4e1bb9d2811ab5729f37342719b6d3fdd069c59c6b4",
+  "action_sha256": "022eedd0bd5ff65dc644c636b9d247cf3cafccb1b5403948be45ec0ecfe105d7",
+  "new_frames": {
+    "front": 144,
+    "three_quarter": 144,
+    "side": 144
+  },
+  "old_frames": {
+    "front": 120,
+    "three_quarter": 120,
+    "side": 120
+  },
+  "stage": "Original Showcase cameras/lighting/materials; same stage for original and expressive Idle; no retiming",
+  "render_log": ".validation/idle_expressive_test/render_axis.log",
+  "source_candidate_bytes_identical_to_registered_source": true
+}

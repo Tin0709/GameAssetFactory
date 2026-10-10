@@ -1,5 +1,5 @@
 """Saved Idle contact/shape/loop/old baseline/appearance preservation checks."""
-import bpy,json,sys,hashlib,ast
+import bpy,json,sys,hashlib,ast,math
 from pathlib import Path
 from itertools import combinations
 from mathutils import Vector,Matrix
@@ -17,7 +17,7 @@ def separation(n,k,v):
     axes=[r.pose.bones[x].matrix.to_3x3().col[i].normalized() for x in [n,k] for i in range(3)];axes+=[x.cross(y).normalized() for x in axes[:3] for y in axes[3:6] if x.cross(y).length>1e-6]
     aa,bb=[[v[i] for i in groups[x]] for x in [n,k]]
     return max(max(min(p.dot(ax) for p in aa)-max(p.dot(ax) for p in bb),min(p.dot(ax) for p in bb)-max(p.dot(ax) for p in aa)) for ax in axes)
-initial=sample(1);report={'samples':P*16+1,'max_rigid_error_m':0,'max_full_sole_drift_m':0,'max_full_sole_height_error_m':0,'minimum_floor_clearance_m':1,'nonadjacent_overlaps':{},'camera_bounds':{},'frames':[]};hips=[];head=[];leglocations=[]
+initial=sample(1);report={'sampled_source_sha256':hashlib.sha256(Path(bpy.data.filepath).read_bytes()).hexdigest(),'sampled_action_sha256':ui.action_signature(a),'samples':P*16+1,'max_rigid_error_m':0,'max_full_sole_drift_m':0,'max_full_sole_height_error_m':0,'minimum_floor_clearance_m':1,'nonadjacent_overlaps':{},'camera_bounds':{},'frames':[]};hips=[];head=[];leglocations=[]
 for j in range(report['samples']):
     f=1+j/16;v=sample(f);hips.append(list(r.pose.bones['Hips'].head));head.append(list(r.pose.bones['Head'].head));leglocations.extend(r.pose.bones['Leg.'+side].location.length for side in soles)
     report['max_rigid_error_m']=max(report['max_rigid_error_m'],max(abs((v[i]-v[k]).length-d) for i,k,d in distances));report['minimum_floor_clearance_m']=min(report['minimum_floor_clearance_m'],min(p.z for p in v))
@@ -31,6 +31,7 @@ for j in range(report['samples']):
         for view in ['FRONT','THREE_QUARTER','SIDE']:
             q=[world_to_camera_view(s,bpy.data.objects['Showcase_'+view],p) for p in v];b=report['camera_bounds'].setdefault(view,[1,1,0,0]);b[:]=[min(b[0],min(x.x for x in q)),min(b[1],min(x.y for x in q)),max(b[2],max(x.x for x in q)),max(b[3],max(x.y for x in q))]
     if j%16==0:report['frames'].append({'frame':f,'vertices':[list(p) for p in v]})
+sample(60);report['world_deformation_angles_deg_at_observation']={n:[math.degrees(x) for x in (r.pose.bones[n].matrix@r.data.bones[n].matrix_local.inverted()).to_euler('XYZ')] for n in ['Hips','Spine','Chest','Head']}
 close=sample(CLOSE);report['loop_pose_error_m']=max((p-q).length for p,q in zip(initial,close))
 prev=sample(CLOSE-.0625);nxt=sample(1.0625)
 report['loop_finite_vertex_velocity_difference_m_per_s']=max(((q-p)/.0625-(p-b)/.0625).length*30 for b,p,q in zip(prev,initial,nxt))
@@ -54,5 +55,7 @@ report['old_baseline_source_vertex_error_m']=old_error
 report['old_idle_measured_static']=all(x['vertices']==old['samples'][0]['vertices'] for x in old['samples'])
 report['old_comparison_samples']=len(old['samples'])
 before=json.loads((TMP/'backup_manifest.json').read_text());allowed={str(ROOT/p) for p in before['authorized_metadata_changes']};protected=[p for p in before['files'] if p not in allowed];report['protected_files_unchanged']=all(hashlib.sha256(Path(p).read_bytes()).hexdigest()==before['files'][p] for p in protected);report['protected_file_count']=len(protected)
-report['passed']=report['max_rigid_error_m']<2e-6 and report['max_full_sole_drift_m']<1e-5 and report['max_full_sole_height_error_m']<1e-5 and report['minimum_floor_clearance_m']>0 and not report['nonadjacent_overlaps'] and report['loop_pose_error_m']<1e-6 and report['loop_finite_vertex_velocity_difference_m_per_s']<.001 and report['loop_channel_tangent_difference']<.0001 and report['cycles_modifiers_on_all_tracks'] and report['root_static'] and report['no_scale_tracks'] and report['original_actions_unchanged'] and report['appearance_rest_weights_uv_materials_images_lights_unchanged'] and report['old_baseline_source_vertex_error_m']<2e-6 and report['protected_files_unchanged'] and all(min(b[:2])>0 and max(b[2:])<1 for b in report['camera_bounds'].values())
+report['head_led_torso_turn_readable']=20<report['world_deformation_angles_deg_at_observation']['Head'][2]<30 and 3<report['world_deformation_angles_deg_at_observation']['Chest'][2]<10 and abs(report['world_deformation_angles_deg_at_observation']['Chest'][1])<3
+report['sampled_source_unchanged_during_validation']=hashlib.sha256(Path(bpy.data.filepath).read_bytes()).hexdigest()==report['sampled_source_sha256']
+report['passed']=report['sampled_source_unchanged_during_validation'] and report['head_led_torso_turn_readable'] and report['max_rigid_error_m']<2e-6 and report['max_full_sole_drift_m']<1e-5 and report['max_full_sole_height_error_m']<1e-5 and report['minimum_floor_clearance_m']>0 and not report['nonadjacent_overlaps'] and report['loop_pose_error_m']<1e-6 and report['loop_finite_vertex_velocity_difference_m_per_s']<.001 and report['loop_channel_tangent_difference']<.0001 and report['cycles_modifiers_on_all_tracks'] and report['root_static'] and report['no_scale_tracks'] and report['original_actions_unchanged'] and report['appearance_rest_weights_uv_materials_images_lights_unchanged'] and report['old_baseline_source_vertex_error_m']<2e-6 and report['protected_files_unchanged'] and all(min(b[:2])>0 and max(b[2:])<1 for b in report['camera_bounds'].values())
 (OUT/('lookaround_validation.json' if candidate else 'validation.json')).write_text(json.dumps(report,indent=2),encoding='utf8');print(json.dumps({k:v for k,v in report.items() if k!='frames'}),flush=True);assert report['passed']

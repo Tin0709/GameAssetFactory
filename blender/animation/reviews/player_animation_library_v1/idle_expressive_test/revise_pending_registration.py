@@ -12,11 +12,14 @@ sys.path.insert(0,str(ROOT/'blender/animation/showcase'));import gaf_animation_l
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
 assert Path(bpy.data.filepath)==OUT/'idle_expressive_lookaround_candidate.blend'
-assert json.loads((OUT/'lookaround_validation.json').read_text())['passed']
-snapshot=json.loads((TMP/'quiet_pass/snapshot.json').read_text())['files']
+validation=json.loads((OUT/'lookaround_validation.json').read_text());assert validation['passed']
+assert validation['sampled_source_sha256']==sha(Path(bpy.data.filepath))
+assert validation['sampled_action_sha256']==ui.action_signature(bpy.data.actions['Idle_Expressive_Test'])
+baseline='lookaround_lean_pass' if 'axis_refine' in sys.argv else 'quiet_pass'
+snapshot=json.loads((TMP/baseline/'snapshot.json').read_text())['files']
 manifest_path=ROOT/'blender/animation/showcase/animation_manifest.json'
 viewer=manifest_path.with_name('Animation_Showcase.blend')
-manifest=json.loads(manifest_path.read_text());old_manifest=json.loads((TMP/'quiet_pass/animation_manifest.json').read_text())
+manifest=json.loads(manifest_path.read_text());old_manifest=json.loads((TMP/baseline/'animation_manifest.json').read_text())
 assert manifest==old_manifest,'Concurrent manifest change; inspect and preserve it before refining'
 old=manifest['animations'][-1];assert old['action']=='Idle_Expressive_Test' and old['status']=='pending'
 source=ROOT/old['source']
@@ -27,7 +30,7 @@ assert all(ui.action_signature(bpy.data.actions[e['action']])==e['action_sha256'
 entry=dict(old);entry.update(source_sha256=sha(Path(bpy.data.filepath)),action_sha256=ui.action_signature(a),action_frame_range=list(a.frame_range),end=144,closing_key=145,period_s=4.8,seamless_loop=True,
     refinement_note='Explicit user steering: keep this same Pending Action name; add head-led curious LookAround, observation/rest pauses and delayed body response. Earlier working passes backed up. Not an approved Action overwrite.')
 ui.validate_action(a,entry,r)
-backup=TMP/'before_lookaround_promotion';backup.mkdir(exist_ok=False)
+backup=TMP/('before_axis_promotion' if baseline=='lookaround_lean_pass' else 'before_lookaround_promotion');backup.mkdir(exist_ok=False)
 for p in [source,viewer,manifest_path]:shutil.copy2(p,backup/p.name)
 manifest['animations'][-1]=entry
 temp=source.with_suffix('.blend.new');shutil.copy2(Path(bpy.data.filepath),temp);temp.replace(source)

@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "protected_files": 5256,
+  "changed_protected_files": [],
+  "godot_files_unchanged": 1712,
+  "full_jump_files_unchanged": 600,
+  "original_idle_source_unchanged": true,
+  "original_eight_manifest_entries_identical": true,
+  "idle_status": "pending",
+  "source_and_action_hashes_bound_to_validation_and_showcase": true,
+  "gui_reopening_and_two_loops_passed": true,
+  "six_original_speed_videos_decoded": true,
+  "git_head_now": "85f4333768c0679ebb9799a4dc35c8f67c9e655c",
+  "concurrency_note": "External Updates commits occurred during work; preserved them. Audit uses original working bytes, including pre-existing Full Jump work. No Git reset, checkout, commit or index mutation was performed by this task."
+}

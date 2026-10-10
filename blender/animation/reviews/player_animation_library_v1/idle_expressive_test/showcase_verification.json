@@ -40,13 +40,20 @@
     ]
   ],
   "switches": 33,
-  "max_source_vertex_error_m": 2.4755668231600746e-07,
+  "max_source_vertex_error_m": 1.4057727354849284e-07,
   "preview_floor_applied_and_reset": true,
   "rig_identity_preserved": true,
   "protected_files_unchanged": 5256,
   "all_previous_actions_and_sources_preserved": true,
   "idle_seamless_loop": true,
   "closing_key_excluded_from_playback": true,
+  "idle_playback": [
+    1,
+    144
+  ],
+  "idle_closing_key": 145,
+  "idle_source_sha256": "28d66ce1855326e83decd4e1bb9d2811ab5729f37342719b6d3fdd069c59c6b4",
+  "idle_action_sha256": "022eedd0bd5ff65dc644c636b9d247cf3cafccb1b5403948be45ec0ecfe105d7",
   "slots_ranges_timing_and_partial_pose_reset": true,
   "one_rig_one_character_mesh": true
 }
