@@ -15,6 +15,12 @@ Main scene: `res://scenes/WorldMap.tscn` (F5). B compares the imported/native lo
 
 ## Reproduce / reuse
 
+Latest movement override2026-10-10: [Jump + Land V004](../../characters/jump_gif_v004/README.md)
+now runs for stationary/walking/running. Grounded moving stride is retained;
+airborne/contact transitions blend without forcing neutral legs first. Camera holds
+ground Y during flight and still follows X/Z. Earlier V001–V003 stay archived;
+terrain placement, collisions and V5 graphics are unchanged. Awaiting user review.
+
 From repository root (use installed Python, Blender and Godot executable paths):
 
 ```text

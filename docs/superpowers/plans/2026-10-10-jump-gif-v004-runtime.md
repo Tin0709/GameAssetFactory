@@ -47,12 +47,12 @@ Interface: existing `request_jump/cancel_jump`, visual `select_jump/set_jump_sta
 plus `begin_landing(from_time:float, contact:float)`; one new 120 Hz pose clip,
 frame1 time0, takeoff5/30, contact22/30, end35/30 seconds.
 
-- [ ] Add runtime checks for all three profiles, 1.2m apex, straight elbows,
+- [x] Add runtime checks for all three profiles, 1.2m apex, straight elbows,
   source pose matching, preserved imported clips, recovery/repeat/reset and blocks.
-- [ ] Run against current WorldMap and observe missing V004/profile failures.
-- [ ] Export foreground-only using a temporary cloned rig; derive sole support
+- [x] Run against current WorldMap and observe missing V004/profile failures.
+- [x] Export foreground-only using a temporary cloned rig; derive sole support
   separately, exclude carrier/arc/Root/scale; preserve base binary and 42 old clips.
-- [ ] Integrate versioned scene and nonperiodic contact handling; import and pass
+- [x] Integrate versioned scene and nonperiodic contact handling; import and pass
   checks at 30/60 render FPS and 60 Hz physics.
 
 ### Task 2: Camera anchor and actual runtime review
@@ -63,15 +63,32 @@ Files: modify `scripts/world_map.gd`; new `tests/validate_jump_gif_v004.gd`,
 Interface: `_camera_ground_y` stores the supported anchor. Horizontal follow is
 exact; vertical settling uses frame-independent exponential smoothing on support.
 
-- [ ] Observe RED camera height drift during a stationary jump.
-- [ ] Implement hold/settle/reset anchor, retain overview and cutaway target.
-- [ ] Check stationary and moving camera, original terrain 1m ascent, early contact,
+- [x] Observe RED camera height drift during a stationary jump.
+- [x] Implement hold/settle/reset anchor, retain overview and cutaway target.
+- [x] Check stationary and moving camera, original terrain 1m ascent, early contact,
   ceiling/drop, release/reset/death and weapon regression with Dummy audio.
-- [ ] Render real Mobile WorldMap video, fully decode and inspect pixels; do not
+- [x] Render real Mobile WorldMap video, fully decode and inspect pixels; do not
   infer runtime quality from Blender/import alone. Document measured limits.
-- [ ] Request one final read-only review and fix important findings; final save
+- [x] Request one final read-only review and fix important findings; final save
   same live Blender library and verify F5 main scene/config.
 
 Ruling: execute inline in the existing requested workspace, without a redundant
 approval gate or commits; direct user authorization and visible F5 integration
 take precedence over skill defaults for handoff/worktree/commit ceremonies.
+
+## Follow-up feedback and evidence
+
+- User144458: moving landing legs held parallel; RED landing stride0 degrees.
+- User145052: moving takeoff overwrote stride with neutral opening pose; RED
+  comparison against the same underlying live gait phase failed walk/run.
+- Final visual layer retains Hips/legs on grounded gait, blends to V0047/30s
+  after lift-off; releases to continuous gait immediately on contact over6/30s.
+  Latching avoids a second pose switch when slowing during recovery.
+- Core31 and edge31 checks pass at30/60FPS. All42 older imported clips preserved;
+  import43, WorldMap1052 and smooth-step100 checks pass. Dummy audio per test.
+- Actual Mobile/D3D12 footage fully decoded872frames/30FPS/1280x720. Inspected
+  transition sheets, seven capture sections, held runs and original1m terrace.
+  Foreground Blender validation567samples still preserves324oldActions,326total;
+  temporary video-encode scene removed, same live review scene restored.
+- Final read-only reviewer found no material code defect; no artistic approval
+  or phone-performance verification implied. See runtime README and RESEARCH.
