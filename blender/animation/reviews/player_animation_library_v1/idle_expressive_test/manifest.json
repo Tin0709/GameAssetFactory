@@ -3,11 +3,11 @@
   "status": "pending",
   "playback_frames": [
     1,
-    96
+    144
   ],
-  "closing_key": 97,
+  "closing_key": 145,
   "fps": 30,
-  "period_s": 3.2,
+  "period_s": 4.8,
   "seamless_loop": true,
   "in_place": true,
   "original_actions": {
@@ -88,5 +88,5 @@
     "source_fps": 24,
     "period_s": 4.0
   },
-  "scope": "Only relaxed supported unarmed Idle. No Walk, Full Jump changes, Godot edits or approval."
+  "scope": "User-requested purposeful LookAround in same pending supported unarmed Idle. No Walk, Full Jump changes, Godot edits or approval."
 }

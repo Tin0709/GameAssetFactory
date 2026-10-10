@@ -12,7 +12,7 @@ Open **Animation_Showcase.blend** (or double-click **Open_Showcase.cmd**). In th
 | Jump_Landing_Test | 1–44 | 30 FPS | Preserved softer alternate; no explicit approval |
 | Jump_Landing_Impact_Test | 1–56 | 30 FPS | User approved; preferred landing baseline |
 | Full_Jump_Expressive_Test | 1–93 | 30 FPS | Pending review |
-| Idle_Expressive_Test | 1–96; closing key 97 | 30 FPS / 3.2 s seamless loop | Pending review |
+| Idle_Expressive_Test | 1–144; closing key 145 | 30 FPS / 4.8 s seamless loop | Pending review |
 
 Selection resets the full pose before binding the original Action and its Blender 5.2 slot. The run retains its frame-19 closing key, outside the 18-frame playback range. Arm/recovery are one-shots: repeating them resets to the beginning; they are not seamless cycles.
 
@@ -28,7 +28,7 @@ Landing uses the normal floor and identity rig transform. Its hips animate local
 
 The latest [higher Full Jump review preview V002](../reviews/player_animation_library_v1/full_jump_expressive_test/higher_preview_v002/README.md) raises only Blender presentation height to 0.72 m. It preserves the registered in-place Action and original 0.58 m preview. No additional library Action/import or status change is required; use its separate preview/video for elevation review.
 
-[Idle Expressive](../reviews/player_animation_library_v1/idle_expressive_test/README.md) is a new **Pending** seamless standing loop: 96 playback frames at 30 FPS, closing key 97 excluded. Turn on **Loop playback**. It uses small weight shifts and independent shoulders with fixed full soles; the original Idle remains in its source library. Same-stage original-speed comparisons and validation are linked from its README. Full Jump and its review previews are unchanged.
+[Idle Expressive](../reviews/player_animation_library_v1/idle_expressive_test/README.md) is a new **Pending** seamless standing loop: 144 playback frames at 30 FPS, closing key 145 excluded. Turn on **Loop playback**. It adds a head-led curious glance, observing/rest pauses, delayed torso/arms and small weight shifts with fixed full soles; the original Idle remains in its source library. Same-stage original-speed comparisons and validation are linked from its README. Full Jump and its review previews are unchanged.
 
 ## Persistent controls
 

@@ -27,11 +27,12 @@ def design(f):
     hip_follow=C([(1,0,0),(31,0,0),(52,1,0),(75,1,0),(116,0,0),(145,0,0)])
     arm_r=C([(1,0,0),(32,0,0),(54,1,0),(77,.94,-.008),(120,0,0),(145,0,0)])
     arm_l=C([(1,0,0),(35,0,0),(59,1,0),(80,.9,-.012),(124,0,0),(145,0,0)])
+    arm_clear=C([(1,0,0),(24,0,0),(39,1,0),(70,1,0),(111,0,0),(145,0,0)])
     breath=C([(1,.15,0),(18,.15,0),(48,1,0),(68,.85,-.01),(102,0,0),(123,0,0),(145,.15,0)])
     return {'hip':Vector((-.003+.013*hip_follow,-.001+.0015*hip_follow,.6715+.0013*breath-.0006*hip_follow)),
       'pelvis':(1.1+.15*breath,1.2*hip_follow,.1-.35*hip_follow),
       'spine':1.3+.25*breath,'spine_yaw':1.6*follow,'chest':1+.55*breath,'chest_yaw':4.2*follow,
-      'arm_r':-5.8+2.8*arm_r,'arm_l':5.2-2.4*arm_l,
+      'arm_r':-5.8+2.8*arm_r,'arm_l':5.2-2.4*arm_l-8*arm_clear,
       'spread_r':13.5+1.5*arm_r,'spread_l':12.0+.9*arm_l,
       'shoulder_r':.0002+.0008*arm_r-.014*head,'shoulder_l':.0001+.0005*arm_l-.014*head,
       'head_pitch':1.5-1.8*head,'head_yaw':-.3+27*head,'head_roll':-.5*head}

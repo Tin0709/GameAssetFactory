@@ -308,18 +308,18 @@
     {
       "action": "Idle_Expressive_Test",
       "source": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/idle_expressive_review.blend",
-      "source_sha256": "6553a73e1bd44816dce6e5005b1e3b9e3166f7bff69efca3023b60e3fd47ebdd",
+      "source_sha256": "1c40a140aaade578cc00cc1040da2960999b8fc37ced4338b5140a16a0ae97fb",
       "source_rig": "IE_Test_Rig",
       "source_mesh": "IE_Test_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "395c49207f95ba54b5c40e8b60927a8a11aa2d71384704cd8e8136f6e3190866",
+      "action_sha256": "632586518e76b1a45724a6029b9c5709b382b45d18f0e7c04c82fd6e44989c86",
       "action_frame_range": [
         1.0,
-        97.0
+        145.0
       ],
       "start": 1,
-      "end": 96,
+      "end": 144,
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
@@ -340,12 +340,13 @@
         "Leg.L": "XYZ",
         "Leg.R": "XYZ"
       },
-      "closing_key": 97,
-      "period_s": 3.2,
+      "closing_key": 145,
+      "period_s": 4.8,
       "in_place": true,
       "review_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/idle_all_views_1x.mp4",
       "comparison_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/comparison_all_views_1x.mp4",
-      "presentation_note": "Both full soles remain planted; static root; closing key97 excluded from playback1\u201396. No preview travel."
+      "presentation_note": "Both full soles remain planted; static root; closing key97 excluded from playback1\u201396. No preview travel.",
+      "refinement_note": "Explicit user steering: keep this same Pending Action name; add head-led curious LookAround, observation/rest pauses and delayed body response. Earlier working passes backed up. Not an approved Action overwrite."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

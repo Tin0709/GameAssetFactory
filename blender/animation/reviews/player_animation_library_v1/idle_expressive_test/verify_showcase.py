@@ -8,7 +8,7 @@ assert bpy.data.filepath.endswith('Animation_Showcase.blend') and hasattr(bpy.ty
 s=bpy.context.scene;r=bpy.data.objects[ui.RIG];m=bpy.data.objects['Showcase_Player_Mesh']
 entries=json.loads((ROOT/'blender/animation/showcase/animation_manifest.json').read_text())['animations']
 assert len(entries)==len(s.gaf_clips)==len(bpy.data.actions)==9
-assert [e['status'] for e in entries]==['approved']*5+['pending','approved','pending','pending'];assert entries[-1]['action']=='Idle_Expressive_Test' and entries[-1]['seamless_loop'] and entries[-1]['closing_key']==97
+assert [e['status'] for e in entries]==['approved']*5+['pending','approved','pending','pending'];assert entries[-1]['action']=='Idle_Expressive_Test' and entries[-1]['seamless_loop'] and entries[-1]['closing_key']==145
 assert len(bpy.data.armatures)==1 and len(bpy.data.meshes)==2
 baseline=json.loads((ROOT/'.validation/animation_showcase/source_audit.json').read_text())
 for action,folder in [('Jump_Takeoff_Test','jump_takeoff_test'),('Jump_AirPose_Test','jump_airpose_test'),('Jump_Landing_Test','jump_landing_test'),('Jump_Landing_Impact_Test','jump_landing_impact_test'),('Full_Jump_Expressive_Test','full_jump_expressive_test'),('Idle_Expressive_Test','idle_expressive_test')]:

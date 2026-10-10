@@ -90,7 +90,7 @@ Each brief identifies the smallest useful next study. Proposed Action names are 
 
 ### 4.1 Idle and subtle character movement
 
-**Implementation record (2026-10-10, pending):** [Idle_Expressive_Test](../../blender/animation/reviews/player_animation_library_v1/idle_expressive_test/README.md) applies this brief as a 3.2-second seamless loop: quiet load shifts, fixed full soles, rigid torso rotations and staggered arm/head response. Original Idle and all jump studies stay preserved. Only explicit user review can approve it; future character Actions, including experiments, must register Pending in the existing central Showcase before delivery.
+**Implementation record (2026-10-10, pending):** [Idle_Expressive_Test](../../blender/animation/reviews/player_animation_library_v1/idle_expressive_test/README.md) applies this brief as a 4.8-second seamless look-around loop: head-led curiosity, intentional pauses, quiet load shifts, fixed full soles, rigid torso rotations and staggered arm/head response. Original Idle and all jump studies stay preserved. Only explicit user review can approve it; future character Actions, including experiments, must register Pending in the existing central Showcase before delivery.
 
 **Purpose / anchors:** alert, comfortable readiness; A1 F1/F24, A3 F33–48 and A6 F42–56. These are neutral/settle anchors, not evidence of a complete idle cycle. E5 supports studying performed idle behavior, but its avatar findings do not establish our amplitude or personality.
 
