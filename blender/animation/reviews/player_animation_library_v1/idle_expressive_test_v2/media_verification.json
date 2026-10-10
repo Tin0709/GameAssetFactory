@@ -1,0 +1,89 @@
+{
+  "idle_v2_all_views_1x": {
+    "frames": 480,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 16.0,
+    "v2_complete_loops": 2,
+    "v1_native_period_frames": null,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.2673921585083008,
+    "sha256": "5c2b848d0b55f654b1bd11a6e72fef4d1060d1a52e2a0450a7edf6179b4aa210"
+  },
+  "comparison_all_views_1x": {
+    "frames": 480,
+    "fps": 30.0,
+    "size": [
+      1920,
+      1440
+    ],
+    "duration_s": 16.0,
+    "v2_complete_loops": 2,
+    "v1_native_period_frames": 144,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.2594300508499146,
+    "sha256": "1196e72f619feffb93605af442179873fe2fdd93b79fbf6b870db84f95982d93"
+  },
+  "comparison_three_quarter_1x": {
+    "frames": 480,
+    "fps": 30.0,
+    "size": [
+      1280,
+      720
+    ],
+    "duration_s": 16.0,
+    "v2_complete_loops": 2,
+    "v1_native_period_frames": 144,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.2987438440322876,
+    "sha256": "f74dab02d3679296629875f4fdc03599c9c22546312cb3ace1e60ebec4fa4f43"
+  },
+  "front_1x": {
+    "frames": 480,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 16.0,
+    "v2_complete_loops": 2,
+    "v1_native_period_frames": null,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.241844892501831,
+    "sha256": "83843b6ae63d0350487a407e8584d7ca6481df00af2a5c6de565ad8865048643"
+  },
+  "three_quarter_1x": {
+    "frames": 480,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 16.0,
+    "v2_complete_loops": 2,
+    "v1_native_period_frames": null,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.2151399850845337,
+    "sha256": "9e2a789386a151c4530805caed9c06be3103bdfd40380af5343365956bc67396"
+  },
+  "side_1x": {
+    "frames": 480,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 16.0,
+    "v2_complete_loops": 2,
+    "v1_native_period_frames": null,
+    "closing_key_excluded": true,
+    "max_mean_rgb_decode_error": 1.1147069931030273,
+    "sha256": "ee415b6257c4273924cec05e693ad64619730ea2454bb5e24bdddf99ded6bd0b"
+  },
+  "comparison": "Preserved Idle_Expressive_Test: 144 frames/30FPS/4.8s. V2:240frames/30FPS/8s. Both original speed; matching stage. Two complete v2 loops, no closing-key hold.",
+  "source_sha256": "3101c726f3825b2484a04ce36761440a6c1359d313b189677f815f3de6a16f6a",
+  "action_sha256": "b7a9604d881b782b73531be95cb5f607a3d9eac805da3b862449c3a2986b8b69"
+}

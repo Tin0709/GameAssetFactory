@@ -14,6 +14,7 @@ Open **Animation_Showcase.blend** (or double-click **Open_Showcase.cmd**). In th
 | Full_Jump_Expressive_Test | 1–93 | 30 FPS | Pending review |
 | Idle_Expressive_Test | 1–144; closing key 145 | 30 FPS / 4.8 s seamless loop | Pending review |
 | Idle_Expressive_Test_v2 | 1–240; closing key 241 | 30 FPS / 8 s seamless loop | Pending review |
+| Idle_Expressive_Test_v3 | 1–240; closing key 241 | 30 FPS / 8 s seamless loop | Pending review |
 
 Selection resets the full pose before binding the original Action and its Blender 5.2 slot. The run retains its frame-19 closing key, outside the 18-frame playback range. Arm/recovery are one-shots: repeating them resets to the beginning; they are not seamless cycles.
 
@@ -33,7 +34,9 @@ The latest [higher Full Jump review preview V002](../reviews/player_animation_li
 
 ## Persistent controls
 
-[Idle Expressive v2](../reviews/player_animation_library_v1/idle_expressive_test_v2/README.md) is a separate Pending comparison with two unequal curious looks, quiet transform-only chest breathing and a slightly wider fully planted stance. Select either Idle independently; v1 stays unchanged. Playback 1–240 at 30 FPS, closing key241 excluded; Loop playback enabled. The current library has ten entries. Source/reopen/switch/playback and original-speed comparison evidence is linked from the v2 README.
+[Idle Expressive v2](../reviews/player_animation_library_v1/idle_expressive_test_v2/README.md) is a separate Pending comparison with two unequal curious looks, quiet transform-only chest breathing and a slightly wider fully planted stance. Select either Idle independently; v1 stays unchanged. Playback 1–240 at 30 FPS, closing key241 excluded; Loop playback enabled. The v2 library had ten entries; all remain preserved. Source/reopen/switch/playback and original-speed comparison evidence is linked from the v2 README.
+
+[Idle Expressive v3](../reviews/player_animation_library_v1/idle_expressive_test_v3/README.md) is the latest separate Pending stance comparison. Latest image steering gives Leg.L firm flat support and Leg.R a relaxed whole-block forward/side angle, with zero toe-out rotation and fixed corner contact. Hips and torso balance the stance. A gentle slow6mm body breathing rise over4s joins v2's two unequal looks and eight-second loop. The current library has eleven independent entries. V2/v1 and all their source/review files remain unchanged. Use the v3 README for matched original-speed front/three-quarter/side comparisons and fresh save/reopen/playback evidence.
 
 **Gameplay priority:** Blender approval establishes artistic direction, not production readiness. Every approved animation must eventually pass actual Godot gameplay/transition validation, including responsiveness, pose/velocity continuity, feet/locomotion phase, physics ownership, weapon layers and target-device 30 FPS. Idle v2's wider stance needs a compatible entry/exit support transition; this viewer does not prove that integration. Keep development one animation at a time.
 
@@ -74,4 +77,4 @@ The three `preview_*.png` renders match the corresponding source-study pixels ex
 
 Run Blender with the saved showcase and `--background --python-exit-code 1 --python verify_showcase.py` after library code changes; its current baseline expects the initial three entries. Extend its source samples for future registrations. `test_import_safety.py` checks timing rejection, rotation-mode compatibility and detection of evaluation edits. `build_showcase.py` is the initial builder, not the refresh workflow: it refuses to overwrite an existing viewer. Follow [the project animation workflow](../../../docs/animation/ANIMATION_WORKFLOW.md) for later sessions.
 
-The current [Idle showcase verification](../reviews/player_animation_library_v1/idle_expressive_test/showcase_verification.json) extends the library to nine entries. The adjacent GUI playback and media reports cover reopening/looping and decoded original-speed comparisons; previous reports remain historical evidence.
+The historical v1 [Idle showcase verification](../reviews/player_animation_library_v1/idle_expressive_test/showcase_verification.json) extends the library to nine entries. The adjacent GUI playback and media reports cover reopening/looping and decoded original-speed comparisons; previous reports remain historical evidence.

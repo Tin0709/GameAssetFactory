@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "source_sha256": "a971f350fe0ae825c7aaa5922e9fb41ec5d25f38a8f0ee816f923b0283289b35",
+  "action_sha256": "b3f41f16c96e3a9eb84be794842726a74795284125ef0496fb22efb71a2d4856",
+  "measured_foot_yaw_ranges_deg": {
+    "L": [
+      0.0,
+      0.0
+    ],
+    "R": [
+      0.0,
+      0.0
+    ]
+  },
+  "whole_leg_lean_ranges_deg": {
+    "L": [
+      0.0,
+      6.356331155547711e-07
+    ],
+    "R": [
+      9.988271709469304,
+      9.988275329472282
+    ]
+  },
+  "support_full_flat_sole": true,
+  "relaxed_contact": "Fixed corner of angled rigid block; full sole not artificially flattened.",
+  "stable_sole_drift_m": 3.585273770639919e-07,
+  "width_m": 0.29487012326717377,
+  "body_breathing_rise_m": 0.0059999823570251465,
+  "support": "Latest user reference: whole relaxed leg forward8/lateral6deg; zero toe-out; support leg firm. Slow6mm body rise over4s. No invented joints."
+}

@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "protected_files": 6076,
+  "changed_protected_files": [],
+  "godot_files_unchanged": 1712,
+  "full_jump_files_unchanged": 600,
+  "entire_idle_v1_study_unchanged": true,
+  "idle_v1_files_unchanged": 820,
+  "original_nine_manifest_entries_identical": true,
+  "status": "pending",
+  "source_sha256": "3101c726f3825b2484a04ce36761440a6c1359d313b189677f815f3de6a16f6a",
+  "action_sha256": "b7a9604d881b782b73531be95cb5f607a3d9eac805da3b862449c3a2986b8b69",
+  "source_and_action_hashes_bound_to_validation_showcase_gui_media": true,
+  "gui_two_loops_and_restart_passed": true,
+  "six_original_speed_videos_decoded": true,
+  "permanent_gameplay_priority_recorded": true,
+  "one_animation_at_a_time_preserved": true,
+  "gameplay_validation": "Not performed or claimed; separate authorization required.",
+  "git_head_now": "aa0c3db18b3a5070a128ed049683698235f550cc",
+  "concurrency_note": "Initial original working bytes audited, not moving Git HEAD. No reset, checkout, commit or index mutation by this task."
+}
