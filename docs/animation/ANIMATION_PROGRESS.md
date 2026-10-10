@@ -1,6 +1,6 @@
 # Animation progress
 
-Updated 2026-10-10, Asia/Saigon. Only explicit user review establishes artistic approval.
+Updated 2026-10-11, Asia/Saigon. Only explicit user review establishes artistic approval. Blender approval is artistic validation; production readiness additionally requires actual Godot gameplay and transition validation.
 
 | Animation / workspace | Frames at 30 FPS | Status |
 | --- | --- | --- |
@@ -14,8 +14,13 @@ Updated 2026-10-10, Asia/Saigon. Only explicit user review establishes artistic 
 | Jump_Landing_Impact_Test | 1–56 | **User approved; preferred landing baseline** |
 | Full_Jump_Expressive_Test | 1–93 | **Pending user review** |
 | Idle_Expressive_Test | 1–144; retain closing key 145 | **Pending user review**; seamless 4.8-second look-around loop |
+| Idle_Expressive_Test_v2 | 1–240; retain closing key 241 | **Pending user review**; separate eight-second two-sided observation, wider planted stance and quiet rigid breathing |
 
 The takeoff approval was explicitly received before the airborne request. Its approved Action and saved Blender source remain unchanged; metadata and the showcase now reflect that approval.
+
+**Separate Idle v2 comparison — 2026-10-11:** the user requested [Idle_Expressive_Test_v2](../../blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v2/README.md), preserving the entire current Idle/source/review unchanged. Two unequal head-led observations with center/rest pauses, subtle rigid chest/shoulder breath and a 28 mm outward placement per fixed foot give a more open curious stance. New independent Action, Pending in the same Showcase; eight seconds/30 FPS, closing key 241 excluded. No facial deformation, rig rebuild, Walk, Full Jump/preview edit, Godot change or automatic approval. Original-speed matched-stage comparisons are linked from the study.
+
+**Permanent user priority, 2026-10-11:** seamless, responsive, natural Godot integration is the highest animation-development priority. Design for pose/velocity continuity, support/locomotion phase, consistent rig/transforms, interruptions, physics-aware takeoff/contact, weapon layers and measured mobile 30 FPS. Every approved animation must eventually pass gameplay/transition validation; Blender alone cannot establish production readiness. Continue one animation at a time. Idle v2 records wider-stance entry/exit support and weapon masking as unvalidated future integration work.
 
 [Jump AirPose review](../../blender/animation/reviews/player_animation_library_v1/jump_airpose_test/README.md) develops wide arm silhouettes, staggered overlap and asymmetric rigid legs. A temporary three-view video continues the approved takeoff into the separate AirPose Action. AirPose contains no root/hip travel or artificial airborne bounce; preview presentation is separate. Its original delivery contained no landing or combined production jump and made no Godot change.
 

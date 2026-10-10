@@ -6,6 +6,8 @@ Research expansion: **2026-10-10, Asia/Saigon**. Scope: reusable research and fu
 
 ## 1. How to use this knowledge base
 
+**Permanent gameplay priority (explicit user requirement, 2026-10-11):** design all studies with responsive Godot integration and smooth pose/velocity transitions in mind, retaining consistent rig/transforms, support/locomotion phase, physics ownership, weapon-layer compatibility and a measured 30 FPS mobile target. Blender approval is artistic approval only. Every approved animation must eventually pass actual gameplay and transition validation before production readiness. Continue one animation at a time; integration/export remains a separate authorized task. See the permanent gates and per-study transition record in [Animation Workflow](ANIMATION_WORKFLOW.md).
+
 For a future short animation request, read the relevant category brief below, inspect its named approved Action and frame ranges, then follow section 9. The brief is a starting design hypothesis, not a substitute for reviewing actual motion. Preserve character proportions, full arms/hands, textures, mesh identity, rest rig, independent Actions, original slots and existing Godot behavior.
 
 Read alongside:
@@ -89,6 +91,8 @@ Use the hips/torso as a *visual mass proxy*, not a measured center of mass. A st
 Each brief identifies the smallest useful next study. Proposed Action names are examples, not created assets. No durations below should be taken as approved gameplay timing. Begin with readable phases, then choose timing against intended speed, input response and reference evidence.
 
 ### 4.1 Idle and subtle character movement
+
+**Separate comparison (2026-10-11, pending):** [Idle_Expressive_Test_v2](../../blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v2/README.md) preserves the first Idle and adds two unequal head-led observations, comfortable pauses, quiet rigid chest breathing and a modest wider fixed stance in an eight-second loop. Its transition contract records stance/replant, interruption and weapon-mask work still required in Godot. It is registered in the same Showcase, Pending; no runtime validation or approval is implied.
 
 **Implementation record (2026-10-10, pending):** [Idle_Expressive_Test](../../blender/animation/reviews/player_animation_library_v1/idle_expressive_test/README.md) applies this brief as a 4.8-second seamless look-around loop: head-led curiosity, intentional pauses, quiet load shifts, fixed full soles, rigid torso rotations and staggered arm/head response. Original Idle and all jump studies stay preserved. Only explicit user review can approve it; future character Actions, including experiments, must register Pending in the existing central Showcase before delivery.
 

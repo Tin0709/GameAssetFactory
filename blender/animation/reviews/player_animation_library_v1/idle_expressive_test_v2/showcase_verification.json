@@ -1,0 +1,64 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "entries": [
+    [
+      "Expressive_Arm_Motion_Test",
+      "approved"
+    ],
+    [
+      "Run_Expressive_Test",
+      "approved"
+    ],
+    [
+      "LowerBody_Recovery_Test",
+      "approved"
+    ],
+    [
+      "Jump_Takeoff_Test",
+      "approved"
+    ],
+    [
+      "Jump_AirPose_Test",
+      "approved"
+    ],
+    [
+      "Jump_Landing_Test",
+      "pending"
+    ],
+    [
+      "Jump_Landing_Impact_Test",
+      "approved"
+    ],
+    [
+      "Full_Jump_Expressive_Test",
+      "pending"
+    ],
+    [
+      "Idle_Expressive_Test",
+      "pending"
+    ],
+    [
+      "Idle_Expressive_Test_v2",
+      "pending"
+    ]
+  ],
+  "switches": 37,
+  "max_source_vertex_error_m": 3.6863436927953305e-07,
+  "preview_floor_applied_and_reset": true,
+  "rig_identity_preserved": true,
+  "protected_files_unchanged": 6076,
+  "previous_nine_entries_identical": true,
+  "all_previous_actions_and_sources_preserved": true,
+  "v2_seamless_loop": true,
+  "closing_key_excluded_from_playback": true,
+  "v2_playback": [
+    1,
+    240
+  ],
+  "v2_closing_key": 241,
+  "v2_source_sha256": "3101c726f3825b2484a04ce36761440a6c1359d313b189677f815f3de6a16f6a",
+  "v2_action_sha256": "b7a9604d881b782b73531be95cb5f607a3d9eac805da3b862449c3a2986b8b69",
+  "slots_ranges_timing_and_partial_pose_reset": true,
+  "one_rig_one_character_mesh": true
+}

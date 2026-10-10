@@ -13,6 +13,7 @@ Open **Animation_Showcase.blend** (or double-click **Open_Showcase.cmd**). In th
 | Jump_Landing_Impact_Test | 1–56 | 30 FPS | User approved; preferred landing baseline |
 | Full_Jump_Expressive_Test | 1–93 | 30 FPS | Pending review |
 | Idle_Expressive_Test | 1–144; closing key 145 | 30 FPS / 4.8 s seamless loop | Pending review |
+| Idle_Expressive_Test_v2 | 1–240; closing key 241 | 30 FPS / 8 s seamless loop | Pending review |
 
 Selection resets the full pose before binding the original Action and its Blender 5.2 slot. The run retains its frame-19 closing key, outside the 18-frame playback range. Arm/recovery are one-shots: repeating them resets to the beginning; they are not seamless cycles.
 
@@ -31,6 +32,10 @@ The latest [higher Full Jump review preview V002](../reviews/player_animation_li
 [Idle Expressive](../reviews/player_animation_library_v1/idle_expressive_test/README.md) is a new **Pending** seamless standing loop: 144 playback frames at 30 FPS, closing key 145 excluded. Turn on **Loop playback**. It adds a head-led curious glance, observing/rest pauses, delayed torso/arms and small weight shifts with fixed full soles; the original Idle remains in its source library. Same-stage original-speed comparisons and validation are linked from its README. Full Jump and its review previews are unchanged.
 
 ## Persistent controls
+
+[Idle Expressive v2](../reviews/player_animation_library_v1/idle_expressive_test_v2/README.md) is a separate Pending comparison with two unequal curious looks, quiet transform-only chest breathing and a slightly wider fully planted stance. Select either Idle independently; v1 stays unchanged. Playback 1–240 at 30 FPS, closing key241 excluded; Loop playback enabled. The current library has ten entries. Source/reopen/switch/playback and original-speed comparison evidence is linked from the v2 README.
+
+**Gameplay priority:** Blender approval establishes artistic direction, not production readiness. Every approved animation must eventually pass actual Godot gameplay/transition validation, including responsiveness, pose/velocity continuity, feet/locomotion phase, physics ownership, weapon layers and target-device 30 FPS. Idle v2's wider stance needs a compatible entry/exit support transition; this viewer does not prove that integration. Keep development one animation at a time.
 
 `gaf_animation_library.py` is installed and enabled as **GameAssetFactory Animation Library** in this computer's Blender 5.2 preferences. Normal reopening needs no script execution. Automatic execution of scripts embedded in Blender files remains disabled. No executable text is embedded in the viewer.
 

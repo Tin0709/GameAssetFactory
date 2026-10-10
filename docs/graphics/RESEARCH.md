@@ -1,5 +1,7 @@
 # Nghiên cứu đồ hoạ và bằng chứng thực nghiệm
 
+**Current Blender-only Idle comparison, 2026-10-11:** [Idle_Expressive_Test_v2](../../blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v2/README.md) is a separate Pending eight-second/30-FPS loop, retaining every v1 file/Action. Two unequal curious looks, restrained head/chin attention, tiny rigid chest breathing and 28 mm wider placement per planted foot; original-speed matching-stage comparisons. Same central Showcase registration; no facial/mesh deformation, rig rebuild, other animation or Godot change. Permanent instructions now prioritize actual responsive Godot transitions, support/phase, physics, weapon layers and mobile 30 FPS. Artistic Blender approval never establishes production readiness; wider-stance entry/exit remains an explicit future gameplay check.
+
 **Current Blender-only animation recreation, 2026-10-10:** [Idle_Expressive_Test](../../blender/animation/reviews/player_animation_library_v1/idle_expressive_test/README.md), pending user review, is the only new animation in this task. It applies the completed expansion/style research and approved Arm/Run/Recovery standards in a quiet 4.8-second planted look-around loop; original-speed old/new front/three-quarter/side comparisons accompany it. Every future character Action must register Pending in the same existing Animation Showcase under AGENTS/workflow. Original Idle, all Full Jump files/previews and Godot remain unchanged; this does not establish runtime blending or small-screen visual approval.
 
 
