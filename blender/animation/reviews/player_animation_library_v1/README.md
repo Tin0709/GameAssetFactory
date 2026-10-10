@@ -12,9 +12,16 @@ authored. The default is **Walk / Rifle**, in place on a neutral review stage.
 This is an animation library, not the Godot combat controller: runtime aiming,
 blends, automatic targeting and procedural turn limits are not simulated here.
 
-There are **37 selectable reviews**: 12 idle/walk/sprint weapon variants,
-8 turning variants, 6 holster/draw slices, 6 authored combat strafe directions,
-4 jump pose clips and the full jump journey. Holster/draw use the game's
+There are **53 selectable reviews**: 12 idle/walk/sprint weapon variants,
+8 turning variants, 6 holster/draw slices, 18 armed combat strafe combinations,
+4 jump pose clips, the full jump journey and 4 short jump journey slices. In
+**Combat Strafe**, choose **Weapon** (Pistol/Rifle/Shotgun), then one of six
+authored directions. The original lower-body Actions are layered with each
+weapon's existing ready pose; these are Blender compositions, not new gameplay
+clips. In **Jump (study only)**, choose **Jump up/down / lead A** or
+**opposite lead** for actual block/world travel. Pose-only entries remain available.
+Short slices loop with a preview reset; they are not seamless locomotion loops.
+Holster/draw use the game's
 5.25x timing (126 FPS for the unchanged 24 FPS source slices); their duration is
 about 0.365 seconds. Other groups retain their source FPS. Turn and jump
 journeys retain their original demonstration context. Pose-only jump entries
@@ -36,6 +43,11 @@ sidebar is missing. No global auto-execution/trust preference is changed.
 and exact review ranges/FPS. `verify_review.py` reopens and checks every
 selection and the source data, then renders `review_preview.png`. Sources
 and game assets are never saved over. No animation keys are redesigned.
+The latest fresh-open audit passes all 53 selections, verifies evaluated ready
+arm/carrier channels for all 18 armed strafes and vertical/horizontal travel in
+the jump journey slices. Additional rendered checks are `strafe_pistol_preview.png`,
+`strafe_shotgun_preview.png` and `jump_preview.png`. `additional_reviews.py` is
+used by both the original builder and the additive `extend_review.py` updater.
 
 Sources:
 

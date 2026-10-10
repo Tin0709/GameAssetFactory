@@ -104,11 +104,10 @@ for kind in ['Pistol','Rifle','Shotgun']:
     key='Stow_'+kind;clone_actor('R13_'+kind+'_Rig',key)
     entry('Holster / '+kind,'Holster & Draw',key,12,58,126,status='Native source slice; 5.25x game transition rate')
     entry('Draw / '+kind,'Holster & Draw',key,66,112,126,status='Native source slice; 5.25x game transition rate')
-clone_actor('R14_P2_Right_Rig','Combat')
-for direction in ['Left','Right','ForwardLeft','ForwardRight','BackwardLeft','BackwardRight']:
-    name='Combat_Strafe'+direction+('_V2' if direction in ['Left','Right'] else '_V1')
-    entry('Strafe '+direction,'Combat Strafe','Combat',1,17,48,action=name,
-          status='Authored six-direction family + unchanged rifle-ready NLA; in-place review')
+import sys
+sys.path.insert(0, str(OUT))
+from additional_reviews import add_armed_strafes, add_jump_slices
+add_armed_strafes(sc,catalog,actors,clone_actor,entry,assign)
 clone_actor('BlockJump_Study_Rig','Jump')
 for a in ['BlockJump_Up_V2','BlockJump_Up_V2_OppositeLead','BlockHop_Down_V2','BlockHop_Down_V2_OppositeLead']:
     lo,hi=bpy.data.actions[a].frame_range
@@ -119,6 +118,7 @@ for a in ['BlockJump_Up_V2','BlockJump_Up_V2_OppositeLead','BlockHop_Down_V2','B
 catalog.append({'id':str(len(catalog)),'label':'Jump journey / both leads','group':'Jump (study only)',
                 'scene':'BLOCK_JUMP_V2_REVIEW','start':1,'end':208,'fps':24,
                 'duration_seconds':207/24,'status':'Original Blender journey; preview-only travel, not in-game'})
+add_jump_slices(catalog)
 
 def mat(name,color):
     m=bpy.data.materials.new(name);m.diffuse_color=(*color,1);m.use_nodes=True

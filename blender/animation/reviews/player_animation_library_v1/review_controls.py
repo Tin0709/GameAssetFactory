@@ -52,7 +52,9 @@ class PLAYER_REVIEW_OT_camera(bpy.types.Operator):
         from mathutils import Vector
         sc=context.scene
         if sc.name!=SCENE:
-            sc=review_scene();context.window.scene=sc
+            # Keep the original block journey visible rather than switching to an empty stage.
+            sc.camera=bpy.data.objects['Side_Diagnostic_FIXED' if self.direction=='SIDE' else 'Gameplay_Oblique_FIXED']
+            set_view();return {'FINISHED'}
         loc={'FRONT':(0,-7,2.5),'BACK':(0,7,2.5),'SIDE':(7,0,2.5),'THREE_QUARTER':(3,-6,3)}[self.direction]
         sc.camera.location=loc
         sc.camera.rotation_euler=(Vector((0,0,.95))-sc.camera.location).to_track_quat('-Z','Y').to_euler()
@@ -74,10 +76,11 @@ class PLAYER_REVIEW_PT_library(bpy.types.Panel):
         row=layout.row(align=True)
         for text,d in [('3/4','THREE_QUARTER'),('Front','FRONT'),('Back','BACK'),('Side','SIDE')]:
             op=row.operator('player_review.camera',text=text);op.direction=d
-        layout.prop(context.scene,'player_review_group',text='Group')
-        group=context.scene.player_review_group
+        layout.prop(sc,'player_review_group',text='Group')
+        group=sc.player_review_group
+        if group=='Combat Strafe':layout.prop(sc,'player_review_weapon',text='Weapon')
         for e in catalog:
-            if e['group']==group:
+            if e['group']==group and (group!='Combat Strafe' or e.get('weapon','Rifle')==sc.player_review_weapon):
                 op=layout.operator('player_review.select',text=e['label'],depress=e['id']==selected['id'])
                 op.clip_id=e['id']
         layout.separator();layout.label(text='Archive: original Scene dropdown')
@@ -92,4 +95,5 @@ for cls in classes:
     bpy.utils.register_class(cls)
 bpy.types.Scene.player_review_group=EnumProperty(name='Group',items=[(g,g,g) for g in [
     'Locomotion','Turning','Holster & Draw','Combat Strafe','Jump (study only)']])
+bpy.types.Scene.player_review_weapon=EnumProperty(name='Weapon',items=[(g,g,g) for g in ['Pistol','Rifle','Shotgun']],default='Rifle')
 set_view()

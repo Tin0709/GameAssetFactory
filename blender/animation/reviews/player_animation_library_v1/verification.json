@@ -1,7 +1,7 @@
 {
   "source_files_unchanged": true,
   "source_actions_unchanged": 312,
-  "catalog_selections_passed": 37,
+  "catalog_selections_passed": 53,
   "missing_images": [],
   "results": [
     {
@@ -109,30 +109,6 @@
       "selection_valid": true
     },
     {
-      "label": "Strafe Left",
-      "selection_valid": true
-    },
-    {
-      "label": "Strafe Right",
-      "selection_valid": true
-    },
-    {
-      "label": "Strafe ForwardLeft",
-      "selection_valid": true
-    },
-    {
-      "label": "Strafe ForwardRight",
-      "selection_valid": true
-    },
-    {
-      "label": "Strafe BackwardLeft",
-      "selection_valid": true
-    },
-    {
-      "label": "Strafe BackwardRight",
-      "selection_valid": true
-    },
-    {
       "label": "BlockJump_Up_V2",
       "selection_valid": true
     },
@@ -150,6 +126,94 @@
     },
     {
       "label": "Jump journey / both leads",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe Left / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe Right / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe ForwardLeft / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe ForwardRight / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe BackwardLeft / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe BackwardRight / Pistol",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe Left / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe Right / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe ForwardLeft / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe ForwardRight / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe BackwardLeft / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe BackwardRight / Rifle",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe Left / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe Right / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe ForwardLeft / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe ForwardRight / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe BackwardLeft / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Strafe BackwardRight / Shotgun",
+      "selection_valid": true
+    },
+    {
+      "label": "Jump up / lead A",
+      "selection_valid": true
+    },
+    {
+      "label": "Jump down / lead A",
+      "selection_valid": true
+    },
+    {
+      "label": "Jump up / opposite lead",
+      "selection_valid": true
+    },
+    {
+      "label": "Jump down / opposite lead",
       "selection_valid": true
     }
   ],

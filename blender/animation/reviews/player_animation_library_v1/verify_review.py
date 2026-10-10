@@ -33,6 +33,26 @@ for e in m['catalog']:
         if e['group'] in ['Locomotion','Combat Strafe'] and not e['label'].startswith('Idle'):
             assert any(abs(a-b)>1e-4 for a,b in zip(poses[0],poses[1])),(e['label'],'No evaluated leg motion')
         if e.get('action'):assert rig.animation_data.action.name==e['action']
+        if e['group']=='Combat Strafe':
+            upper=bpy.data.actions[actor['ready_action']]
+            strip=rig.animation_data.nla_tracks[0].strips[0]
+            assert strip.action==upper and not strip.mute and strip.influence==1
+            # Validate the evaluated ready arms/carrier, not just presence of an NLA strip.
+            for f in [1,5,9,13,17]:
+                sc.frame_set(f);bpy.context.view_layer.update()
+                for c in curves(upper):
+                    if any('"'+n+'"' in c.data_path for n in ['UpperArm.L','UpperArm.R','ForeArm.L','ForeArm.R','WeaponCarrier','Chest']):
+                        actual=rig.path_resolve(c.data_path)[c.array_index]
+                        expected=c.evaluate(1+(f-1)/2)
+                        assert abs(actual-expected)<1e-4,(e['label'],c.data_path,actual,expected)
+    elif e['group']=='Jump (study only)':
+        travel=bpy.data.objects['PREVIEW_ONLY_WorldTravel']
+        positions=[]
+        for f in range(e['start'],e['end']+1):
+            sc.frame_set(f);bpy.context.view_layer.update()
+            positions.append(tuple(travel.matrix_world.translation))
+        assert max(p[2] for p in positions)-min(p[2] for p in positions)>.9,(e['label'],'Missing vertical travel')
+        assert max(p[1] for p in positions)-min(p[1] for p in positions)>.9,(e['label'],'Missing horizontal travel')
     results.append({'label':e['label'],'selection_valid':True})
 missing=[im.filepath for im in bpy.data.images if im.source=='FILE' and not im.packed_file and im.filepath and not Path(bpy.path.abspath(im.filepath)).exists()]
 assert not missing,missing
@@ -43,6 +63,14 @@ bpy.context.scene.frame_set(5)
 bpy.context.scene.render.resolution_percentage=65
 bpy.context.scene.render.filepath=str(OUT/'review_preview.png')
 bpy.ops.render.render(write_still=True)
+for label,frame,filename in [('Strafe Right / Pistol',5,'strafe_pistol_preview.png'),
+                            ('Strafe Left / Shotgun',5,'strafe_shotgun_preview.png'),
+                            ('Jump up / lead A',27,'jump_preview.png')]:
+    e=next(e for e in m['catalog'] if e['label']==label)
+    bpy.ops.player_review.select(clip_id=e['id']);sc=bpy.context.scene
+    sc.frame_set(frame);sc.render.resolution_percentage=65
+    sc.render.filepath=str(OUT/filename)
+    bpy.ops.render.render(write_still=True)
 report={'source_files_unchanged':True,'source_actions_unchanged':len(m['source_action_hashes']),
         'catalog_selections_passed':len(results),'missing_images':missing,'results':results,
         'render':str(OUT/'review_preview.png'),'gameplay_modified':False}
