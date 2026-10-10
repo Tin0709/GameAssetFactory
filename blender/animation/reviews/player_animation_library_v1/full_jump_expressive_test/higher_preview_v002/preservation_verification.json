@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "protected_files_unchanged": 3002,
+  "changed_paths": [
+    "AGENTS.md",
+    "blender\\animation\\reviews\\player_animation_library_v1\\full_jump_expressive_test\\README.md",
+    "blender\\animation\\showcase\\README.md",
+    "docs\\animation\\ANIMATION_PROGRESS.md",
+    "docs\\graphics\\RESEARCH.md"
+  ],
+  "changes_only_authorized_documentation": true,
+  "original_in_place_source_preserved": true,
+  "original_preview_and_videos_preserved": true,
+  "showcase_and_library_manifest_preserved": true,
+  "all_eight_registered_source_hashes_match": true,
+  "godot_unchanged": true,
+  "new_preview_sha256": "dea4ef46dcc1471de33fee3c41af81c2e2a0f96f8ca7a747e27aebca0e40d716"
+}

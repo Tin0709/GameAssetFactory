@@ -2,6 +2,8 @@
 
 **93 frames at 30 FPS (3.10 seconds), one independent in-place Action.** This is the first complete expressive jump study, using approved Takeoff, AirPose and the now-approved preferred Impact Landing. The softer original Landing remains preserved as an alternate. No existing Action, rig, character asset or Godot file is changed.
 
+**Latest review presentation:** the user finds the motion good but the original elevation too low. [Higher preview V002](higher_preview_v002/README.md) raises only temporary review height from 0.58 m to 0.72 m, preserving this in-place Action, timing, original preview and all original media. No second motion variant was needed. Full Jump and the higher presentation remain pending explicit approval.
+
 ## Review
 
 - [Full jump, all three views at original speed](full_jump_all_views_1x.mp4).

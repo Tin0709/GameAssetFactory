@@ -1,0 +1,40 @@
+{
+  "status": "pending_presentation_review",
+  "pose_action": "Full_Jump_Expressive_Test",
+  "pose_action_unchanged": true,
+  "skeletal_motion_variant_created": false,
+  "original_preview": "../full_jump_preview.blend",
+  "original_height_m": 0.58,
+  "height_m": 0.72,
+  "increase_m": 0.14,
+  "increase_percent": 24.13793103448276,
+  "height_ratio": 1.2413793103448276,
+  "frames": [
+    1,
+    93
+  ],
+  "fps": 30,
+  "last_support_frame": 19,
+  "contact_frames": {
+    "L": 46,
+    "R": 47
+  },
+  "apex_frame": 32.5,
+  "landing_compression_frame": 51,
+  "rebound_frame": 67,
+  "preview_parent": "Review_Only_Jump_Travel",
+  "preview_action": "PREVIEW_ONLY_FullJump_Height_V002",
+  "original_action_signatures": {
+    "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+    "Full_Jump_Expressive_Test": "b119534f13f7db19862dfd2d7485595e9372ad0da0cb1e300e9c966fd00f0b99",
+    "Jump_AirPose_Test": "eb3b79fd05e5f175e6b5590745f3a38efa43015a635e6eb011abe73377c818e4",
+    "Jump_Landing_Impact_Test": "e870f735519b6aeb810b776ecce6ac944c00357e3127914286fc3f4ff137e55f",
+    "Jump_Landing_Test": "8836c180e39c2b93e47e96a1077360705cffd5c33a729aa91ce93d0b47bf9076",
+    "Jump_Takeoff_Test": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+    "LowerBody_Recovery_Test": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+    "PREVIEW_ONLY_FullJump_Height": "28d37b3c17f3bedf4be4aac0040b6c4e5ab04be90bf67c9444b9d3cc1ea17205",
+    "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1"
+  },
+  "cameras_lighting_materials_unchanged": true,
+  "scope": "Only external preview Z elevation increases. No retiming, limb/hip changes, new skeletal Action, library import or Godot modification. Original preview and source remain unchanged."
+}

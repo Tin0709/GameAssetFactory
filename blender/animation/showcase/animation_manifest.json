@@ -304,6 +304,48 @@
       "review_preview": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_test/full_jump_preview.blend",
       "review_video": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_test/full_jump_all_views_1x.mp4",
       "presentation_note": "Showcase plays in-place poses; world height exists only in the separate Blender review preview, never in this Action."
+    },
+    {
+      "action": "Idle_Expressive_Test",
+      "source": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/idle_expressive_review.blend",
+      "source_sha256": "6553a73e1bd44816dce6e5005b1e3b9e3166f7bff69efca3023b60e3fd47ebdd",
+      "source_rig": "IE_Test_Rig",
+      "source_mesh": "IE_Test_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "395c49207f95ba54b5c40e8b60927a8a11aa2d71384704cd8e8136f6e3190866",
+      "action_frame_range": [
+        1.0,
+        97.0
+      ],
+      "start": 1,
+      "end": 96,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "closing_key": 97,
+      "period_s": 3.2,
+      "in_place": true,
+      "review_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/idle_all_views_1x.mp4",
+      "comparison_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/comparison_all_views_1x.mp4",
+      "presentation_note": "Both full soles remain planted; static root; closing key97 excluded from playback1\u201396. No preview travel."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

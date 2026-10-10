@@ -1,0 +1,33 @@
+{
+  "fresh_reopen": true,
+  "action": "Full_Jump_Expressive_Test",
+  "frames": [
+    1,
+    93
+  ],
+  "fps": 30,
+  "samples": [
+    {
+      "frame": 9,
+      "playing": true,
+      "height": 0.0
+    },
+    {
+      "frame": 28,
+      "playing": true,
+      "height": 0.6399999856948853
+    },
+    {
+      "frame": 43,
+      "playing": true,
+      "height": 0.2844444513320923
+    },
+    {
+      "frame": 57,
+      "playing": true,
+      "height": 0.0
+    }
+  ],
+  "passed": true,
+  "reset_to_first_frame": true
+}

@@ -1,0 +1,92 @@
+{
+  "action": "Idle_Expressive_Test",
+  "status": "pending",
+  "playback_frames": [
+    1,
+    96
+  ],
+  "closing_key": 97,
+  "fps": 30,
+  "period_s": 3.2,
+  "seamless_loop": true,
+  "in_place": true,
+  "original_actions": {
+    "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+    "Full_Jump_Expressive_Test": "b119534f13f7db19862dfd2d7485595e9372ad0da0cb1e300e9c966fd00f0b99",
+    "Jump_AirPose_Test": "eb3b79fd05e5f175e6b5590745f3a38efa43015a635e6eb011abe73377c818e4",
+    "Jump_Landing_Impact_Test": "e870f735519b6aeb810b776ecce6ac944c00357e3127914286fc3f4ff137e55f",
+    "Jump_Landing_Test": "8836c180e39c2b93e47e96a1077360705cffd5c33a729aa91ce93d0b47bf9076",
+    "Jump_Takeoff_Test": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+    "LowerBody_Recovery_Test": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+    "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1"
+  },
+  "rig_changes": [],
+  "fixed_foot_matrices": {
+    "L": [
+      [
+        -1.0,
+        0.0,
+        -8.742277657347586e-08,
+        0.11249999701976776
+      ],
+      [
+        8.742277657347586e-08,
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0,
+        0.6753999590873718
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "R": [
+      [
+        -1.0,
+        0.0,
+        -8.742277657347586e-08,
+        -0.11249999701976776
+      ],
+      [
+        8.742277657347586e-08,
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0,
+        0.6753999590873718
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "support": "Both full soles fixed throughout at 0.4 mm review margin; no replant or rocking",
+  "old_idle": {
+    "source": "blender/animation/reviews/player_animation_library_v1/player_animation_library_v1.blend",
+    "source_sha256": "a8209172b085539a21d73f52c598b20eef8327484914987852f7f88ba06d9bff",
+    "action": "R12_Hold_Unarmed_Upper",
+    "slot": "OBR12_Hold_Unarmed_Rig",
+    "range": [
+      1.0,
+      97.0
+    ],
+    "source_fps": 24,
+    "period_s": 4.0
+  },
+  "scope": "Only relaxed supported unarmed Idle. No Walk, Full Jump changes, Godot edits or approval."
+}

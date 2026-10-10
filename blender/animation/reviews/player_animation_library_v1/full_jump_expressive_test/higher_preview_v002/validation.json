@@ -1,0 +1,40 @@
+{
+  "appearance_and_binding_unchanged": true,
+  "all_nine_original_actions_unchanged": true,
+  "no_new_skeletal_action": true,
+  "same_action_slots": true,
+  "same_93_frame_30fps_timing": true,
+  "height_only_change": true,
+  "samples": 1473,
+  "max_height_ratio_error_m": 6.98813076294158e-08,
+  "minimum_floor_clearance_m": 0.00039853155612945557,
+  "minimum_supported_floor_clearance_m": 0.00039853155612945557,
+  "camera_bounds": {
+    "FRONT": [
+      0.211638942360878,
+      0.09547500312328339,
+      0.8089746832847595,
+      0.9654530882835388
+    ],
+    "THREE_QUARTER": [
+      0.16053661704063416,
+      0.09143722057342529,
+      0.7841564416885376,
+      0.966400682926178
+    ],
+    "SIDE": [
+      0.2660382390022278,
+      0.08920052647590637,
+      0.643031120300293,
+      0.9702540040016174
+    ]
+  },
+  "max_grounded_travel_m": 0,
+  "apex_height_m": 0.7199999690055847,
+  "apex_frame": 32.5,
+  "single_rise_and_descent": true,
+  "cameras_and_phase_markers_unchanged": true,
+  "protected_files_unchanged": true,
+  "protected_file_count": 3002,
+  "passed": true
+}

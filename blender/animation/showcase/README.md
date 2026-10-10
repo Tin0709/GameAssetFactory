@@ -12,6 +12,7 @@ Open **Animation_Showcase.blend** (or double-click **Open_Showcase.cmd**). In th
 | Jump_Landing_Test | 1–44 | 30 FPS | Preserved softer alternate; no explicit approval |
 | Jump_Landing_Impact_Test | 1–56 | 30 FPS | User approved; preferred landing baseline |
 | Full_Jump_Expressive_Test | 1–93 | 30 FPS | Pending review |
+| Idle_Expressive_Test | 1–96; closing key 97 | 30 FPS / 3.2 s seamless loop | Pending review |
 
 Selection resets the full pose before binding the original Action and its Blender 5.2 slot. The run retains its frame-19 closing key, outside the 18-frame playback range. Arm/recovery are one-shots: repeating them resets to the beginning; they are not seamless cycles.
 
@@ -25,6 +26,10 @@ Landing uses the normal floor and identity rig transform. Its hips animate local
 
 [Full Jump Expressive](../reviews/player_animation_library_v1/full_jump_expressive_test/README.md) is a new **pending** 93-frame Action. The showcase previews its gameplay-friendly in-place poses. To see elevation, open its separate `full_jump_preview.blend` or review video; that file alone adds a clearly named parent/height Action, which must not be registered or exported. The reusable Action contains grounded compression but no flight trajectory.
 
+The latest [higher Full Jump review preview V002](../reviews/player_animation_library_v1/full_jump_expressive_test/higher_preview_v002/README.md) raises only Blender presentation height to 0.72 m. It preserves the registered in-place Action and original 0.58 m preview. No additional library Action/import or status change is required; use its separate preview/video for elevation review.
+
+[Idle Expressive](../reviews/player_animation_library_v1/idle_expressive_test/README.md) is a new **Pending** seamless standing loop: 96 playback frames at 30 FPS, closing key 97 excluded. Turn on **Loop playback**. It uses small weight shifts and independent shoulders with fixed full soles; the original Idle remains in its source library. Same-stage original-speed comparisons and validation are linked from its README. Full Jump and its review previews are unchanged.
+
 ## Persistent controls
 
 `gaf_animation_library.py` is installed and enabled as **GameAssetFactory Animation Library** in this computer's Blender 5.2 preferences. Normal reopening needs no script execution. Automatic execution of scripts embedded in Blender files remains disabled. No executable text is embedded in the viewer.
@@ -32,6 +37,8 @@ Landing uses the normal floor and identity rig transform. Its hips animate local
 On another machine, install this Python file once through **Preferences → Add-ons → Install from Disk**, enable the add-on and save preferences, then open the viewer. Keep the folder at its repository location for registration/refresh. The saved Actions can play without source files; refreshing checks their recorded sources. If the panel is unavailable, the native Action Editor can inspect the saved Actions; use the panel for automatic pose reset and timing.
 
 ## Register a future test
+
+**Permanent rule:** EVERY new character animation, including experiments, pending tests and separately named revisions, must register in this existing `Animation_Showcase.blend` before delivery. Never create per-animation showcase files. Check current file hashes/working-tree changes for concurrent work and back up the latest viewer/manifest before each update. Preserve every independent Action and slot; report incompatibility without modifying the rig. Keep new entries Pending, set correct playback/closing-key/loop metadata, verify selection/playback/save/close/reopen and update the manifest and Progress.
 
 1. Save a separate study with a uniquely named, baked rig-only Action. Preserve the existing player rest rig and mesh binding. Back up the source before authoring. Registration does not save or modify that source.
 2. From the repository root, run Blender in the background with the source study, registration script and six arguments: **Action name, rig object, mesh object, first playback frame, last playback frame, FPS**. For example, in PowerShell:
@@ -56,8 +63,10 @@ The [AirPose showcase verification](../reviews/player_animation_library_v1/jump_
 
 The historical [Impact showcase verification](../reviews/player_animation_library_v1/jump_landing_impact_test/showcase_verification.json) extends that record to seven entries, including two separate pending landing studies. Its checks describe the earlier seven-entry state. The six-entry report remains historical evidence and its files are preserved.
 
-The current [Full Jump showcase verification](../reviews/player_animation_library_v1/full_jump_expressive_test/showcase_verification.json) covers eight entries, six approved tests, the softer alternate and pending Full Jump. Its adjacent `verify_showcase.py` checks current switching/reopening against all eight source samples; its GUI report checks actual playback through F93.
+The historical [Full Jump showcase verification](../reviews/player_animation_library_v1/full_jump_expressive_test/showcase_verification.json) covers eight entries, six approved tests, the softer alternate and pending Full Jump. Its adjacent `verify_showcase.py` checks current switching/reopening against all eight source samples; its GUI report checks actual playback through F93.
 
 The three `preview_*.png` renders match the corresponding source-study pixels exactly. `viewer_screenshot.png` shows the saved review interface. All 1,716 protected source/runtime files retained their SHA256 hashes.
 
 Run Blender with the saved showcase and `--background --python-exit-code 1 --python verify_showcase.py` after library code changes; its current baseline expects the initial three entries. Extend its source samples for future registrations. `test_import_safety.py` checks timing rejection, rotation-mode compatibility and detection of evaluation edits. `build_showcase.py` is the initial builder, not the refresh workflow: it refuses to overwrite an existing viewer. Follow [the project animation workflow](../../../docs/animation/ANIMATION_WORKFLOW.md) for later sessions.
+
+The current [Idle showcase verification](../reviews/player_animation_library_v1/idle_expressive_test/showcase_verification.json) extends the library to nine entries. The adjacent GUI playback and media reports cover reopening/looping and decoded original-speed comparisons; previous reports remain historical evidence.
