@@ -15,8 +15,12 @@ baseline=json.loads((ROOT/'.validation/animation_showcase/source_audit.json').re
 for action,folder in [('Jump_Takeoff_Test','jump_takeoff_test'),('Jump_AirPose_Test','jump_airpose_test'),('Jump_Landing_Test','jump_landing_test'),('Jump_Landing_Impact_Test','jump_landing_impact_test'),('Full_Jump_Expressive_Test','full_jump_expressive_test'),('Idle_Expressive_Test','idle_expressive_test'),('Idle_Expressive_Test_v2','idle_expressive_test_v2'),('Idle_Expressive_Test_v3','idle_expressive_test_v3')]:
     baseline[action]={'samples':json.loads((OUT.parent/folder/'validation.json').read_text())['frames']}
 maximum=0;switches=0;geometry_samples=0;checkpoint='checkpoint' in sys.argv
-for i in [n for old in range(10) for n in [10,old,10]]+list(range(9,-1,-1))+[10]:
-    s.gaf_active_index=i;ui.activate(s,i);e=entries[i];a=r.animation_data.action
+order=[10]+list(range(10))+[10,9,10,0,10] if checkpoint else [n for old in range(10) for n in [10,old,10]]+list(range(9,-1,-1))+[10]
+for i in order:
+    if s.gaf_active_index==i:ui.activate(s,i)
+    else:s.gaf_active_index=i
+    assert not s.gaf_error,s.gaf_error
+    e=entries[i];a=r.animation_data.action
     assert a.name==e['action'] and r.animation_data.action_slot.identifier==e['slot_identifier']
     assert [s.frame_start,s.frame_end,s.render.fps,s.render.fps_base]==[e['start'],e['end'],e['fps'],e['fps_base']]
     assert ui.action_signature(a)==e['action_sha256']

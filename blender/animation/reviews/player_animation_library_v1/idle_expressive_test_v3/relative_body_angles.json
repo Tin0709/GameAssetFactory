@@ -1,7 +1,7 @@
 {
-  "source_sha256": "e18a5d4c3f05c0dd8fd9e2b8737068ea8af48e82082c6e697a8ee24ee6470baf",
-  "action_sha256": "1202abbc4e3016b7d9f106d899ba794f373d90bdc8a3d0ae0b7898fa48d959ee",
-  "note": "Measured authored pose, not recovered reference angles. Mainly sideways unequal whole-leg lean, LEFT slightly forward/RIGHT back, small5deg outward yaw. Compare fixed legs against changing hip/chest lean with2X breathing; body counterbalance retained.",
+  "source_sha256": "d4fb3cd802df1edda4b8175501fbdcaeb076012a3f19c4e8ffe87f20d6dc581d",
+  "action_sha256": "e2fe6362a2b7950af034ecb552c63a4ac5aab75f46a11fb8e819124eb31de07b",
+  "note": "Measured authored pose, not recovered reference angles. Mainly sideways unequal whole-leg lean, LEFT slightly forward/RIGHT back (3.75deg each,50% increase), latest requested15deg outward yaw. Compare fixed legs against changing hip/chest lean with2X breathing; body counterbalance retained.",
   "samples": [
     {
       "frame": 1,
@@ -19,17 +19,17 @@
           "front_back_tilt_deg": -1.4214576268341677
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.2062908196944835,
-          "front_back_tilt_deg": 2.2326511513387075
+          "sideways_tilt_deg": -3.8678347681976963,
+          "front_back_tilt_deg": 2.8528604913249023
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.7538955378904015,
-          "front_back_tilt_deg": -3.21499307433704
+          "sideways_tilt_deg": 6.764889596728277,
+          "front_back_tilt_deg": -5.728008732724499
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -3.2289887714211805,
-        "Leg.R": 7.731197586163704
+        "Leg.L": -3.8905327199243933,
+        "Leg.R": 6.742191645001579
       },
       "hip_x_m": 0.02800000086426735
     },
@@ -49,17 +49,17 @@
           "front_back_tilt_deg": -0.81646062693277
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.2062908196944835,
-          "front_back_tilt_deg": 2.2326511513387075
+          "sideways_tilt_deg": -3.867834306896884,
+          "front_back_tilt_deg": 2.852860577932471
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.753896385167085,
-          "front_back_tilt_deg": -3.2149932894048487
+          "sideways_tilt_deg": 6.7648895532499145,
+          "front_back_tilt_deg": -5.728010702262305
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -2.611151825230505,
-        "Leg.R": 8.349035379631063
+        "Leg.L": -3.272695312432906,
+        "Leg.R": 7.360028547713893
       },
       "hip_x_m": 0.029795359820127487
     },
@@ -79,17 +79,17 @@
           "front_back_tilt_deg": -0.8873410154950991
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.2062912462358084,
-          "front_back_tilt_deg": 2.2326509377234687
+          "sideways_tilt_deg": -3.867834306896884,
+          "front_back_tilt_deg": 2.8528599369394794
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.75389507641855,
-          "front_back_tilt_deg": -3.21499223584386
+          "sideways_tilt_deg": 6.764889979262492,
+          "front_back_tilt_deg": -5.728009846854972
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -2.5398063055498445,
-        "Leg.R": 8.420380017104513
+        "Leg.L": -3.20134936621092,
+        "Leg.R": 7.431374919948456
       },
       "hip_x_m": 0.032656263560056686
     },
@@ -109,17 +109,17 @@
           "front_back_tilt_deg": -0.8994910435640511
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.206291224119901,
-          "front_back_tilt_deg": 2.232651070974424
+          "sideways_tilt_deg": -3.8678345375472762,
+          "front_back_tilt_deg": 2.8528603209643464
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.7538955378904015,
-          "front_back_tilt_deg": -3.2149928592692305
+          "sideways_tilt_deg": 6.764889979262492,
+          "front_back_tilt_deg": -5.728009419151306
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -2.5600082529002677,
-        "Leg.R": 8.400178509110034
+        "Leg.L": -3.221551566327643,
+        "Leg.R": 7.4111729504821255
       },
       "hip_x_m": 0.03294999897480011
     },
@@ -139,17 +139,17 @@
           "front_back_tilt_deg": -1.454559482831206
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.206290606423821,
-          "front_back_tilt_deg": 2.232651364953947
+          "sideways_tilt_deg": -3.8678347681976963,
+          "front_back_tilt_deg": 2.8528609186536142
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.753893843337026,
-          "front_back_tilt_deg": -3.2149928592692305
+          "sideways_tilt_deg": 6.76488829695144,
+          "front_back_tilt_deg": -5.728010359048805
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -3.232807849846613,
-        "Leg.R": 7.727376599914234
+        "Leg.L": -3.894352011620488,
+        "Leg.R": 6.738371053528649
       },
       "hip_x_m": 0.02805234119296074
     },
@@ -169,17 +169,17 @@
           "front_back_tilt_deg": -2.8444272811750317
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.2062903931531586,
-          "front_back_tilt_deg": 2.232651578569186
+          "sideways_tilt_deg": -3.8678341111066534,
+          "front_back_tilt_deg": 2.8528603209643464
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.753893381865272,
-          "front_back_tilt_deg": -3.214992881047249
+          "sideways_tilt_deg": 6.764887870938887,
+          "front_back_tilt_deg": -5.728009931345165
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -3.8319960859751596,
-        "Leg.R": 7.128187689043271
+        "Leg.L": -4.4935398039286545,
+        "Leg.R": 6.139182178116886
       },
       "hip_x_m": 0.026576172560453415
     },
@@ -199,17 +199,17 @@
           "front_back_tilt_deg": -2.9377576410001107
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.2062906285397643,
-          "front_back_tilt_deg": 2.232651018087756
+          "sideways_tilt_deg": -3.867834733337481,
+          "front_back_tilt_deg": 2.85286015060381
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.7538942291419115,
-          "front_back_tilt_deg": -3.2149926659794525
+          "sideways_tilt_deg": 6.764889148976546,
+          "front_back_tilt_deg": -5.728009503641523
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -3.884092350908567,
-        "Leg.R": 7.076092506773109
+        "Leg.L": -4.545636455706283,
+        "Leg.R": 6.087087426607743
       },
       "hip_x_m": 0.02369336038827896
     },
@@ -229,17 +229,17 @@
           "front_back_tilt_deg": -2.3045597516865537
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.2062905843078755,
-          "front_back_tilt_deg": 2.2326512845896755
+          "sideways_tilt_deg": -3.8678345375472762,
+          "front_back_tilt_deg": 2.8528601073000024
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.753896385167085,
-          "front_back_tilt_deg": -3.2149928592692305
+          "sideways_tilt_deg": 6.764891257300216,
+          "front_back_tilt_deg": -5.728009846854972
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -3.676776326775419,
-        "Leg.R": 7.2834106426995415
+        "Leg.L": -4.33832028001482,
+        "Leg.R": 6.294405514832673
       },
       "hip_x_m": 0.02383333258330822
     },
@@ -259,17 +259,17 @@
           "front_back_tilt_deg": -1.6006543784993033
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.206290606423821,
-          "front_back_tilt_deg": 2.232652005799664
+          "sideways_tilt_deg": -3.8678345375472762,
+          "front_back_tilt_deg": 2.8528598936356593
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.7538942291419115,
-          "front_back_tilt_deg": -3.214992881047249
+          "sideways_tilt_deg": 6.764888744703224,
+          "front_back_tilt_deg": -5.728010015835347
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -3.2325494390109406,
-        "Leg.R": 7.727635396554792
+        "Leg.L": -3.894093370134396,
+        "Leg.R": 6.738629912116105
       },
       "hip_x_m": 0.02800000086426735
     },
@@ -289,17 +289,17 @@
           "front_back_tilt_deg": -1.4259539396338967
         },
         "Leg.L": {
-          "sideways_tilt_deg": -3.2062908196944835,
-          "front_back_tilt_deg": 2.2326511513387075
+          "sideways_tilt_deg": -3.8678345375472762,
+          "front_back_tilt_deg": 2.8528603209643464
         },
         "Leg.R": {
-          "sideways_tilt_deg": 7.753895999362308,
-          "front_back_tilt_deg": -3.214992622423387
+          "sideways_tilt_deg": 6.764890001001648,
+          "front_back_tilt_deg": -5.728009075937881
         }
       },
       "leg_relative_to_chest_deg": {
-        "Leg.L": -3.2289963199882474,
-        "Leg.R": 7.731190499068544
+        "Leg.L": -3.89054003784104,
+        "Leg.R": 6.742184500707884
       },
       "hip_x_m": 0.02800000086426735
     }

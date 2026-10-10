@@ -5,8 +5,8 @@ from PIL import Image,ImageDraw,ImageFont
 OUT=Path(__file__).resolve().parent;ROOT=OUT.parents[4]
 font=ImageFont.truetype('C:/Windows/Fonts/arial.ttf',25)
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
-v=json.loads((OUT/'validation.json').read_text());assert v['passed']
-assert sha(OUT/'idle_expressive_v3_review.blend')==v['sampled_source_sha256']
+stamp=json.loads((OUT/'checkpoint_provenance.json').read_text())
+assert sha(OUT/'idle_expressive_v3_review.blend')==stamp['source_sha256']
 frames=OUT/'checkpoint_frames'
 views=['front','three_quarter','side']
 sheet=Image.new('RGB',(1920,700),'#17212a');d=ImageDraw.Draw(sheet)
@@ -18,11 +18,11 @@ for i,view in enumerate(views):
  box=(180,330,465,555) if view!='side' else (220,330,405,555)
  crop=im.crop(box);crop.thumbnail((380,340));legs.paste(crop,((i*400)+(400-crop.width)//2,65))
  ld.text((i*400+18,18),view.replace('_',' ').title(),font=font,fill='white')
-ld.text((18,380),'Left slightly forward / right back / 5 deg outward; fixed rigid soles',font=font,fill='white')
+ld.text((18,380),'Left slightly forward / right back / 15 deg outward; fixed rigid soles',font=font,fill='white')
 sheet.save(OUT/'stance_checkpoint.jpg',quality=94);legs.save(OUT/'stance_legs_checkpoint.jpg',quality=95)
 if 'stills' in __import__('sys').argv:
  print('STILLS PACKAGED');raise SystemExit
-stamp=json.loads((OUT/'checkpoint_provenance.json').read_text());assert stamp['complete']
+v=json.loads((OUT/'validation.json').read_text());assert v['passed'] and stamp['complete']
 assert stamp['source_sha256']==v['sampled_source_sha256'] and stamp['action_sha256']==v['sampled_action_sha256']
 assert all(sha(OUT/p)==h for p,h in stamp['frames'].items())
 encoded=ROOT/'.validation/idle_expressive_test_v3/checkpoint_encode_frames';encoded.mkdir()

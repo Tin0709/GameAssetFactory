@@ -26,22 +26,22 @@
   "fixed_foot_matrices": {
     "L": [
       [
-        -0.9948294162750244,
-        0.05588880181312561,
-        0.08479850739240646,
-        0.14149999618530273
+        -0.964601993560791,
+        0.06737196445465088,
+        0.25495845079421997,
+        0.1574999988079071
       ],
       [
-        -0.08703618496656418,
-        -0.038896363228559494,
-        -0.9954455494880676,
-        0.0
+        -0.25846418738365173,
+        -0.0496581494808197,
+        -0.9647436141967773,
+        1.862645149230957e-09
       ],
       [
-        -0.05233590304851532,
-        -0.9976790547370911,
-        0.04355959594249725,
-        0.6846215724945068
+        -0.05233590677380562,
+        -0.9964913725852966,
+        0.06531359255313873,
+        0.6862671971321106
       ],
       [
         0.0,
@@ -52,22 +52,22 @@
     ],
     "R": [
       [
-        -0.9864997863769531,
-        -0.13470982015132904,
-        -0.09312039613723755,
-        -0.1014999970793724
+        -0.956525444984436,
+        -0.11721539497375488,
+        -0.2670571506023407,
+        -0.11749999970197678
       ],
       [
-        0.08630761504173279,
-        0.055571578443050385,
-        -0.9947174787521362,
+        0.25630027055740356,
+        0.099118173122406,
+        -0.9615018367767334,
         0.0
       ],
       [
         0.13917303085327148,
-        -0.9893255233764648,
-        -0.04319486767053604,
-        0.6887111067771912
+        -0.9881478548049927,
+        -0.06476671993732452,
+        0.6903429627418518
       ],
       [
         0.0,
@@ -80,28 +80,28 @@
   "stance_placements": {
     "L": {
       "top": [
-        0.1415,
+        0.1575,
         0,
         0.675
       ],
-      "yaw": 5.0,
-      "pitch": -2.5,
+      "yaw": 15.0,
+      "pitch": -3.75,
       "lean": -3.0
     },
     "R": {
       "top": [
-        -0.1015,
+        -0.1175,
         0,
         0.675
       ],
-      "yaw": -5.0,
-      "pitch": 2.5,
+      "yaw": -15.0,
+      "pitch": 3.75,
       "lean": 8.0
     }
   },
-  "support_leg": "Leg.L / character left / lateral3deg, forward2.5deg, outward yaw5deg / fixed lowest corner",
-  "relaxed_leg": "Leg.R / character right / lateral8deg, backward2.5deg, outward yaw5deg / fixed lowest corner",
-  "support_logic": "Pelvis positive-X bias28mm; unequal sideways opening remains primary; latest user asks slight character-left forward/right backward and small5deg toe-out. Static leg matrices; no rig edits",
+  "support_leg": "Leg.L / character left / lateral3deg, forward3.75deg, outward yaw15deg / fixed lowest corner",
+  "relaxed_leg": "Leg.R / character right / lateral8deg, backward3.75deg, outward yaw15deg / fixed lowest corner",
+  "support_logic": "Pelvis positive-X bias28mm; unequal sideways opening remains primary; latest user asks slight character-left forward/right backward and requested15deg toe-out. Static leg matrices; no rig edits",
   "breathing": "Latest user request:2X amplitude,12mm hips +3.6mm rigid chest lift; doubled breath-only shoulder/head/torso terms. Same4second timing; fixed feet, no scale",
   "face_controls": "No facial bones or shape keys; head articulation only",
   "scope": "Current v3 stance/breath review checkpoint; preserve v2/v1 and all other studies; no Godot edits/export."

@@ -1,31 +1,31 @@
 {
   "passed": true,
-  "source_sha256": "e18a5d4c3f05c0dd8fd9e2b8737068ea8af48e82082c6e697a8ee24ee6470baf",
-  "action_sha256": "1202abbc4e3016b7d9f106d899ba794f373d90bdc8a3d0ae0b7898fa48d959ee",
+  "source_sha256": "d4fb3cd802df1edda4b8175501fbdcaeb076012a3f19c4e8ffe87f20d6dc581d",
+  "action_sha256": "e2fe6362a2b7950af034ecb552c63a4ac5aab75f46a11fb8e819124eb31de07b",
   "measured_foot_yaw_ranges_deg": {
     "L": [
-      4.999995041199203,
-      5.000000151178808
+      14.999991457396687,
+      15.000003451695529
     ],
     "R": [
-      -5.000000793500356,
-      -4.999997143224101
+      -15.000002399567338,
+      -14.999992154629068
     ]
   },
   "whole_leg_lean_ranges_deg": {
     "L": [
-      3.904389341452776,
-      3.904391629614081
+      4.801005509232996,
+      4.801009373669736
     ],
     "R": [
-      8.3790933248807,
-      8.379099439557635
+      8.830113127929906,
+      8.830119305779286
     ]
   },
-  "forward_stagger_m": 0.06376585364341736,
+  "forward_stagger_m": 0.10042400658130646,
   "contact": "Both fixed lowest sole corners of rigid angled blocks; no invented ankle or flattened soles.",
-  "stable_sole_drift_m": 2.4586915969848633e-07,
-  "width_m": 0.37165404856204987,
+  "stable_sole_drift_m": 3.03925246810483e-07,
+  "width_m": 0.3995964825153351,
   "body_breathing_rise_m": 0.012000024318695068,
-  "support": "Explicit latest review: mainly sideways L3/R8deg; LEFT slightly forward/RIGHT slightly back, both5deg outward. Breathing amplitude2X:12mm body rise and3.6mm chest lift over unchanged4s. No invented joints."
+  "support": "Explicit latest review: mainly sideways L3/R8deg; LEFT slightly forward/RIGHT slightly back, both15deg outward. Breathing amplitude2X:12mm body rise and3.6mm chest lift over unchanged4s. No invented joints."
 }

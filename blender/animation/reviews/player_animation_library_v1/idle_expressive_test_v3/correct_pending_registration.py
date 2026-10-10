@@ -5,7 +5,7 @@ from mathutils import Matrix
 OUT=Path(__file__).resolve().parent;ROOT=OUT.parents[4];SHOW=ROOT/'blender/animation/showcase';TMP=ROOT/'.validation/idle_expressive_test_v3'
 sys.path.insert(0,str(SHOW));import gaf_animation_library as ui
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
-previous=json.loads((TMP/'before_stance_review_revision/animation_manifest.json').read_text());guard=json.loads((TMP/'before_stance_review_revision/current_guard.json').read_text())
+previous=json.loads((TMP/'before_outward15_revision/animation_manifest.json').read_text());guard=json.loads((TMP/'before_outward15_revision/current_guard.json').read_text())
 assert all(sha(Path(p))==h for p,h in guard.items()),'Concurrent library change before correction'
 manifest=json.loads((SHOW/'animation_manifest.json').read_text());assert manifest==previous
 entry=manifest['animations'][-1];assert entry['action']=='Idle_Expressive_Test_v3' and entry['status']=='pending'
@@ -14,9 +14,9 @@ v=json.loads((OUT/'validation.json').read_text());assert v['passed'] and v['samp
 assert ui.rest_signature(r.data)==manifest['rig_sha256'] and {b.name:b.rotation_mode for b in r.pose.bones}==manifest['rotation_modes']
 assert m.parent==r and any(x.type=='ARMATURE' and x.object==r for x in m.modifiers) and r.matrix_world==Matrix.Identity(4)
 assert not any(b.constraints for b in r.pose.bones) and not r.animation_data.nla_tracks and not r.animation_data.drivers
-entry.update({'source_sha256':v['sampled_source_sha256'],'action_sha256':v['sampled_action_sha256'],'slot_identifier':a.slots[0].identifier,'action_frame_range':list(a.frame_range),'presentation_note':'Latest explicit review request: mainly sideways whole-leg opening L3/R8deg; character LEFT slightly forward/RIGHT slightly back (opposed2.5deg pitch), both5deg outward yaw. Fixed lowest sole corners. Breathing amplitude2X:12mm hip/body rise and3.6mm rigid chest lift over unchanged4s. Static root, playback1-240, closing241 excluded. V2 unchanged.','revision_note':'Explicit latest user stance and2X breathing correction within unapproved v3; previous candidate and viewer archived. No approved Action replaced.'})
+entry.update({'source_sha256':v['sampled_source_sha256'],'action_sha256':v['sampled_action_sha256'],'slot_identifier':a.slots[0].identifier,'action_frame_range':list(a.frame_range),'presentation_note':'Latest explicit review request: mainly sideways whole-leg opening L3/R8deg; character LEFT slightly forward/RIGHT slightly back (opposed3.75deg pitch,50% more than2.5deg), both15deg outward yaw. Fixed lowest sole corners. Breathing amplitude2X:12mm hip/body rise and3.6mm rigid chest lift over unchanged4s. Static root, playback1-240, closing241 excluded. V2 unchanged.','revision_note':'User liked the direction, requested50% greater fore/aft whole-leg angles and subsequently15deg outward yaw;2X breathing and other performance retained. Extra leg clearance prevents interpenetration. Prior candidates and viewer archived. Current v3 remains Pending; no approved Action replaced.'})
 ui.validate_action(a,entry,r)
-backup=TMP/'before_stance_review_registration';backup.mkdir()
+backup=TMP/'before_outward15_registration';backup.mkdir()
 for name in ['Animation_Showcase.blend','animation_manifest.json']:shutil.copy2(SHOW/name,backup/name)
 (backup/'working_tree.txt').write_text(subprocess.check_output(['git','status','--porcelain=v1'],cwd=ROOT,text=True),encoding='utf8')
 assert manifest['animations'][:-1]==previous['animations'][:-1]

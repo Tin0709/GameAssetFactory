@@ -6,10 +6,10 @@ sys.path.insert(0,str(SHOW));import gaf_animation_library as ui
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
 g=json.loads((TMP/'clean_registration_guard.json').read_text())
 assert Path(bpy.data.filepath).resolve()==(SHOW/'Animation_Showcase.blend').resolve() and sha(Path(bpy.data.filepath))==g['showcase_sha256_before'] and sha(SHOW/'animation_manifest.json')==g['manifest_sha256_after']
-old=json.loads((TMP/'before_stance_review_revision/animation_manifest.json').read_text())['animations'];assert len(old)==11 and old[-1]['action']=='Idle_Expressive_Test_v3' and old[-1]['status']=='pending'
+old=json.loads((TMP/'before_outward15_revision/animation_manifest.json').read_text())['animations'];assert len(old)==11 and old[-1]['action']=='Idle_Expressive_Test_v3' and old[-1]['status']=='pending'
 original={a.name:ui.action_signature(a) for a in bpy.data.actions};assert original['Idle_Expressive_Test_v3']==g['previous_v3_action_sha256']
 assert all(original[e['action']]==e['action_sha256'] for e in old)
-backup=TMP/'before_stance_review_showcase_save';backup.mkdir();shutil.copy2(Path(bpy.data.filepath),backup/'Animation_Showcase.blend')
+backup=TMP/'before_outward15_showcase_save';backup.mkdir();shutil.copy2(Path(bpy.data.filepath),backup/'Animation_Showcase.blend')
 (backup/'working_tree.txt').write_text(subprocess.check_output(['git','status','--porcelain=v1'],cwd=ROOT,text=True),encoding='utf8')
 r=bpy.data.objects[ui.RIG];r.animation_data.action=None
 bpy.data.actions.remove(bpy.data.actions['Idle_Expressive_Test_v3'])
