@@ -1,0 +1,47 @@
+{
+  "full_jump_all_views_1x": {
+    "frames": 93,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 3.1,
+    "max_mean_rgb_decode_error": 1.3629841804504395,
+    "sha256": "10eda28e2884df58bb7dc17cc96c0fd46d513bb7da0d47d028ecfb9df9435987"
+  },
+  "front_1x": {
+    "frames": 93,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 3.1,
+    "max_mean_rgb_decode_error": 1.3288663625717163,
+    "sha256": "21e3a7dd0f22d38b2b299c0e19cab032d68ed3ce0be8618c3a002a72ab65d121"
+  },
+  "three_quarter_1x": {
+    "frames": 93,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 3.1,
+    "max_mean_rgb_decode_error": 1.2790958881378174,
+    "sha256": "f31850efcee9ce6f449a1737af5c3708c89a7f15f6e1e7ca11b7e167dbcf091a"
+  },
+  "side_1x": {
+    "frames": 93,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 3.1,
+    "max_mean_rgb_decode_error": 1.2665339708328247,
+    "sha256": "b8a7871a56e29463d86303d21470abc741ae096dc944642cfcc1bb29eb1fb395"
+  },
+  "passed": true
+}

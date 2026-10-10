@@ -10,8 +10,9 @@ Updated 2026-10-10, Asia/Saigon. Only explicit user review establishes artistic 
 | LowerBody_Recovery_Test | 1–48 | User approved |
 | Jump_Takeoff_Test | 1–24 | **User approved**: expressive motion and soft, subtle compression before takeoff |
 | Jump_AirPose_Test | 1–22 | **User approved**: happy with its expressive airborne motion |
-| Jump_Landing_Test | 1–44 | **Pending user review** |
-| Jump_Landing_Impact_Test | 1–56 | **Pending comparison review** |
+| Jump_Landing_Test | 1–44 | Preserved softer alternate; no explicit approval recorded |
+| Jump_Landing_Impact_Test | 1–56 | **User approved; preferred landing baseline** |
+| Full_Jump_Expressive_Test | 1–93 | **Pending user review** |
 
 The takeoff approval was explicitly received before the airborne request. Its approved Action and saved Blender source remain unchanged; metadata and the showcase now reflect that approval.
 
@@ -21,6 +22,9 @@ Approved direction: expressive rigid block articulation, strong silhouettes, con
 
 The user subsequently approved AirPose and requested only [Jump Landing](../../blender/animation/reviews/player_animation_library_v1/jump_landing_test/README.md): approach, staggered contact, soft absorption, restrained rebound and recovery. The approved AirPose Action/source stay unchanged. The three-Action review keeps presentation descent outside the exportable landing Action; there is no full jump trajectory or gameplay integration.
 
-Use [the central Animation Library](../../blender/animation/showcase/README.md) and [registration workflow](ANIMATION_WORKFLOW.md). Keep Landing pending until the user reviews it. Full production jump integration remains a separate task.
+Use [the central Animation Library](../../blender/animation/showcase/README.md) and [registration workflow](ANIMATION_WORKFLOW.md). Keep the softer Landing preserved as an alternate. Full production jump integration remains a separate task.
 
-The user described the current Landing as good and requested a separate, stronger [Impact Landing comparison](../../blender/animation/reviews/player_animation_library_v1/jump_landing_impact_test/README.md). The original Landing Action and every file in its study stay unchanged. Impact pushes absorption speed/depth, weight transfer, torso/arm reaction and a slower settle. This is exploratory comparison, not approval of the variant or replacement of the soft baseline; both entries remain pending until explicit approval.
+The user described the current Landing as good and requested a separate, stronger [Impact Landing comparison](../../blender/animation/reviews/player_animation_library_v1/jump_landing_impact_test/README.md). The original Landing Action and every file in its study stay unchanged. Impact pushes absorption speed/depth, weight transfer, torso/arm reaction and a slower settle. The user subsequently explicitly approved Impact Landing and selected it as the preferred landing baseline. Its source and Action stay unchanged; original softer Landing remains preserved as an alternate.
+
+
+The latest request explicitly records **Jump Takeoff, Jump AirPose and Jump Landing Impact as approved** and creates [Full Jump Expressive](../../blender/animation/reviews/player_animation_library_v1/full_jump_expressive_test/README.md), **pending**. The new 93-frame/30-FPS Action preserves grounded preparation and heavy absorption, smoothly shortens the middle air section and retains both shared pose/motion boundaries. Flight height is removed from reusable pose data and supplied only in a separate Blender review parent; the showcase stores the in-place Action. Original-speed front/three-quarter/side videos and saved-file, support, rigidity, source, showcase and playback checks accompany it. No Godot change, export or automatic approval.

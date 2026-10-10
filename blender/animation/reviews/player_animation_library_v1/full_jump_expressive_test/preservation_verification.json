@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "protected_files_unchanged": 2695,
+  "changed_paths": [
+    "AGENTS.md",
+    "blender\\animation\\reviews\\player_animation_library_v1\\jump_landing_impact_test\\manifest.json",
+    "blender\\animation\\reviews\\player_animation_library_v1\\jump_landing_impact_test\\README.md",
+    "blender\\animation\\showcase\\animation_manifest.json",
+    "blender\\animation\\showcase\\Animation_Showcase.blend",
+    "blender\\animation\\showcase\\README.md",
+    "docs\\animation\\ANIMATION_PROGRESS.md",
+    "docs\\animation\\ANIMATION_STYLE_GUIDE.md",
+    "docs\\animation\\ANIMATION_WORKFLOW.md",
+    "docs\\graphics\\RESEARCH.md"
+  ],
+  "all_changed_paths_authorized_metadata": true,
+  "all_eight_source_hashes_match_manifest": true,
+  "old_landing_and_impact_sources_unchanged": true,
+  "godot_unchanged": true
+}

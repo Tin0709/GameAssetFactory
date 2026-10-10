@@ -299,7 +299,11 @@
         "WeaponCarrier": "QUATERNION",
         "Leg.L": "XYZ",
         "Leg.R": "XYZ"
-      }
+      },
+      "in_place": true,
+      "review_preview": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_test/full_jump_preview.blend",
+      "review_video": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_test/full_jump_all_views_1x.mp4",
+      "presentation_note": "Showcase plays in-place poses; world height exists only in the separate Blender review preview, never in this Action."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

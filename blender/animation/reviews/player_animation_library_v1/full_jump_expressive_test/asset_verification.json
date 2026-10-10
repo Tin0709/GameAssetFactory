@@ -1,0 +1,51 @@
+{
+  "full_jump_expressive_review.blend": {
+    "appearance_and_binding_identical": true,
+    "approved_actions_identical": true,
+    "full_action_signature": "b119534f13f7db19862dfd2d7485595e9372ad0da0cb1e300e9c966fd00f0b99",
+    "asset_fingerprints": {
+      "mesh_weights_uvs": "9dc36cb5dd97a398802db5242a2af342e75c632c4ff75d5bf8ba28a7ecc0fdcd",
+      "materials": "05d8c2f600397c7a3645fdfa35aeb7fa6275028d9f5e6dba056895d6afdf284f",
+      "packed_images": "5fd2413eff2e5f9f6a2fbc2c12eb5dd1ee1800367c7b8eeb145d667d0c2f6e2b",
+      "rest_rig": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+      "lights": "9f86d9ab5640425b0046c7bf8b77387232d3604c97e212ea2761bc7d2cb00d80",
+      "binding": [
+        [
+          "ARMATURE",
+          true,
+          true,
+          false
+        ]
+      ]
+    }
+  },
+  "actual_preview": {
+    "separate_parent_and_action": true,
+    "single_rise_and_descent": true,
+    "minimum_floor_clearance_m": 0.00039853155612945557,
+    "maximum_bake_error_m": 0.00109362430870533,
+    "height_m": 0.5799999833106995,
+    "zero_travel_during_support": true
+  },
+  "full_jump_preview.blend": {
+    "appearance_and_binding_identical": true,
+    "approved_actions_identical": true,
+    "full_action_signature": "b119534f13f7db19862dfd2d7485595e9372ad0da0cb1e300e9c966fd00f0b99",
+    "asset_fingerprints": {
+      "mesh_weights_uvs": "9dc36cb5dd97a398802db5242a2af342e75c632c4ff75d5bf8ba28a7ecc0fdcd",
+      "materials": "05d8c2f600397c7a3645fdfa35aeb7fa6275028d9f5e6dba056895d6afdf284f",
+      "packed_images": "5fd2413eff2e5f9f6a2fbc2c12eb5dd1ee1800367c7b8eeb145d667d0c2f6e2b",
+      "rest_rig": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+      "lights": "9f86d9ab5640425b0046c7bf8b77387232d3604c97e212ea2761bc7d2cb00d80",
+      "binding": [
+        [
+          "ARMATURE",
+          true,
+          true,
+          false
+        ]
+      ]
+    }
+  },
+  "passed": true
+}

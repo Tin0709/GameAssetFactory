@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "entries": [
+    [
+      "Expressive_Arm_Motion_Test",
+      "approved"
+    ],
+    [
+      "Run_Expressive_Test",
+      "approved"
+    ],
+    [
+      "LowerBody_Recovery_Test",
+      "approved"
+    ],
+    [
+      "Jump_Takeoff_Test",
+      "approved"
+    ],
+    [
+      "Jump_AirPose_Test",
+      "approved"
+    ],
+    [
+      "Jump_Landing_Test",
+      "pending"
+    ],
+    [
+      "Jump_Landing_Impact_Test",
+      "approved"
+    ],
+    [
+      "Full_Jump_Expressive_Test",
+      "pending"
+    ]
+  ],
+  "switches": 31,
+  "max_source_vertex_error_m": 1.4057727354849284e-07,
+  "preview_floor_applied_and_reset": true,
+  "rig_identity_preserved": true,
+  "protected_files_unchanged": 2695,
+  "approved_takeoff_and_airpose_sources_preserved": true,
+  "slots_ranges_timing_and_partial_pose_reset": true,
+  "one_rig_one_character_mesh": true
+}

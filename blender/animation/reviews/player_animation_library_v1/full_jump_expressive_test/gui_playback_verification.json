@@ -1,0 +1,15 @@
+{
+  "fresh_gui_reopen": true,
+  "action": "Full_Jump_Expressive_Test",
+  "range": [
+    1,
+    93
+  ],
+  "fps": 30,
+  "started_frame": 1,
+  "mid_frame": 8,
+  "playing_mid": true,
+  "end_frame": 93,
+  "playing_end": false,
+  "passed": true
+}
