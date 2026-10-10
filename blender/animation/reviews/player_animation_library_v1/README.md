@@ -8,13 +8,15 @@ choose a group, then a clip; Front/Back/Side/3/4 change the review camera.
 The current native full-arm character and resized/centered pistol, rifle and
 shotgun are assembled from the R14 pass2 source used for the production R15
 export. Existing upper-body Actions and lower-body NLA remain layered as
-authored. The default is **Walk / Rifle**, in place on a neutral review stage.
+authored. The saved review now opens **Jump Default V001 / Flat Ground**;
+**Walk / Rifle** and all earlier selections remain available.
 This is an animation library, not the Godot combat controller: runtime aiming,
 blends, automatic targeting and procedural turn limits are not simulated here.
 
-There are **53 selectable reviews**: 12 idle/walk/sprint weapon variants,
+There are **54 selectable reviews**: 12 idle/walk/sprint weapon variants,
 8 turning variants, 6 holster/draw slices, 18 armed combat strafe combinations,
-4 jump pose clips, the full jump journey and 4 short jump journey slices. In
+4 jump pose clips, the full jump journey, 4 short jump journey slices and the
+new [flat-ground Jump Default V001](jump_default_v001/README.md). In
 **Combat Strafe**, choose **Weapon** (Pistol/Rifle/Shotgun), then one of six
 authored directions. The original lower-body Actions are layered with each
 weapon's existing ready pose; these are Blender compositions, not new gameplay
@@ -42,8 +44,10 @@ sidebar is missing. No global auto-execution/trust preference is changed.
 `review_manifest.json` records source hashes, Action hashes, actor bindings
 and exact review ranges/FPS. `verify_review.py` reopens and checks every
 selection and the source data, then renders `review_preview.png`. Sources
-and game assets are never saved over. No animation keys are redesigned.
-The latest fresh-open audit passes all 53 selections, verifies evaluated ready
+and game assets are never saved over. Existing animation keys are not redesigned.
+The new flat jump adds a pose Action and separate preview-carrier Action
+(314 Actions total), in its own scene at 30 FPS; old clips retain their FPS.
+The latest fresh-open audit passes all 54 selections, verifies evaluated ready
 arm/carrier channels for all 18 armed strafes and vertical/horizontal travel in
 the jump journey slices. Additional rendered checks are `strafe_pistol_preview.png`,
 `strafe_shotgun_preview.png` and `jump_preview.png`. `additional_reviews.py` is

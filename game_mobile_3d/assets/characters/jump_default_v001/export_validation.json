@@ -1,0 +1,26 @@
+{
+  "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\player_animation_library_v1.blend",
+  "protected_sha256": {
+    "blender\\animation\\reviews\\player_animation_library_v1\\player_animation_library_v1.blend": "2083b962b02ee50152a6324e0b5c209eae79872b71b7fee947d204d5a947d5c2",
+    "game_mobile_3d\\assets\\characters\\r15\\player_r15_combat_strafe_v1.glb": "a2922240bf3d8bd0fe282942905c0502abbf0177f32b24d4544a72a02a3b7b52"
+  },
+  "output_sha256": "cbda9b3717cc33a93cbd28b83f8847f92c904d76739b31a3f7b0d8d6a6f7f036",
+  "preserved_old_clips": 36,
+  "new_clip": "Jump_Default_v001",
+  "sample_count": 97,
+  "maximum_vertex_reconstruction_error_m": 6.419616707723741e-07,
+  "vertex_bindings": {
+    "Head": 24,
+    "Chest": 24,
+    "Leg.L": 24,
+    "Leg.R": 24,
+    "Arm.L": 24,
+    "ForeArm.L": 24,
+    "Arm.R": 24,
+    "ForeArm.R": 24
+  },
+  "unchanged_geometry_uv_normals_indices_materials": true,
+  "preview_carrier_exported": false,
+  "root_motion": false,
+  "artistic_status": "AWAITING HUMAN REVIEW"
+}

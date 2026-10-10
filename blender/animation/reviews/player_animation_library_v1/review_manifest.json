@@ -8,7 +8,7 @@
   },
   "source_action_count": 306,
   "retained_source_actions": 312,
-  "catalog_entries": 53,
+  "catalog_entries": 54,
   "catalog": [
     {
       "id": "0",
@@ -658,6 +658,19 @@
       "duration_seconds": 0.75,
       "status": "Original block journey slice with world travel; Blender only",
       "id": "52"
+    },
+    {
+      "id": "jump_default_v001",
+      "label": "Jump Default V001 / Flat Ground",
+      "group": "Jump (study only)",
+      "scene": "JUMP_DEFAULT_V001_REVIEW",
+      "review_rig": "JD1_Player_Rig",
+      "action": "Jump_Default_v001",
+      "start": 1,
+      "end": 25,
+      "fps": 30,
+      "duration_seconds": 0.8,
+      "status": "New Blender-only study; awaiting user review"
     }
   ],
   "source_action_hashes": {
@@ -1410,5 +1423,8 @@
   },
   "gameplay_unchanged": true,
   "runtime_transition_rate": 5.25,
-  "scope": "Blender review only; no new animation keys or game integration"
+  "scope": "Blender review only; 312 prior Actions unchanged; adds flat-jump pose and separate preview-carrier Actions; no game integration",
+  "jump_default_v001": "jump_default_v001/manifest.json",
+  "default_review": "jump_default_v001",
+  "total_actions": 314
 }

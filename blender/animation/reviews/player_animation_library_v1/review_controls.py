@@ -1,4 +1,4 @@
-"""Review UI only: select existing actors/actions without editing their keys."""
+"""Review UI: select archived clips and isolated new studies without editing keys."""
 import bpy, json
 from bpy.props import StringProperty, EnumProperty
 
@@ -39,6 +39,10 @@ class PLAYER_REVIEW_OT_select(bpy.types.Operator):
             for ob in context.selected_objects:ob.select_set(False)
             rig.select_set(True)
         context.window.scene=target
+        if e.get('review_rig'):
+            rig=bpy.data.objects[e['review_rig']]
+            for ob in context.selected_objects:ob.select_set(False)
+            context.view_layer.objects.active=rig;rig.select_set(True)
         target.frame_start=e['start'];target.frame_end=e['end'];target.render.fps=e['fps']
         target.render.fps_base=1;target.use_preview_range=False
         scene['review_selected']=e['id'];target.frame_set(e['start'])
@@ -51,6 +55,10 @@ class PLAYER_REVIEW_OT_camera(bpy.types.Operator):
     def execute(self,context):
         from mathutils import Vector
         sc=context.scene
+        if sc.get('review_cameras'):
+            camera_names=json.loads(sc['review_cameras'])
+            sc.camera=bpy.data.objects[camera_names[self.direction]]
+            set_view();return {'FINISHED'}
         if sc.name!=SCENE:
             # Keep the original block journey visible rather than switching to an empty stage.
             sc.camera=bpy.data.objects['Side_Diagnostic_FIXED' if self.direction=='SIDE' else 'Gameplay_Oblique_FIXED']
@@ -65,12 +73,16 @@ class PLAYER_REVIEW_PT_library(bpy.types.Panel):
     bl_idname='PLAYER_REVIEW_PT_library';bl_space_type='VIEW_3D';bl_region_type='UI';bl_category='Player Review'
     def draw(self,context):
         layout=self.layout;sc=review_scene();catalog=entries()
-        layout.label(text='Blender review - existing animations')
+        layout.label(text='Blender animation review')
         layout.label(text='Space: play / pause',icon='PLAY')
         selected=next((e for e in catalog if e['id']==sc.get('review_selected')),catalog[0])
         box=layout.box();box.label(text=selected['label'])
         box.label(text=f"{selected['duration_seconds']:.3f} s / {selected['fps']} FPS")
-        if selected['group']=='Jump (study only)':box.label(text='Study only - deferred in game',icon='INFO')
+        if selected.get('review_rig'):
+            box.label(text='NEW: flat jump / Blender only',icon='INFO')
+            box.label(text='F12 apex / F19 contact / F25 recover')
+            box.label(text='Carrier = preview height only')
+        elif selected['group']=='Jump (study only)':box.label(text='Study only - deferred in game',icon='INFO')
         elif selected['group']=='Holster & Draw':box.label(text='5.25x transition speed (game)')
         else:box.label(text='In-place; original source keys')
         row=layout.row(align=True)

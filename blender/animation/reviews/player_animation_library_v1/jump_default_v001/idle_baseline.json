@@ -1,0 +1,314 @@
+{
+  "Root": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "XYZ",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  },
+  "Hips": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "XYZ",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  },
+  "Spine": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "QUATERNION",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  },
+  "Chest": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "QUATERNION",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  },
+  "Neck": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "QUATERNION",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  },
+  "Head": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "QUATERNION",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  },
+  "UpperArm.L": {
+    "location": [
+      0.03200000151991844,
+      0.0,
+      2.797528875220223e-09
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "QUATERNION",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  },
+  "ForeArm.L": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "QUATERNION",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "UpperArm.R": {
+    "location": [
+      -0.03200000151991844,
+      0.0,
+      -2.797528875220223e-09
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "QUATERNION",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  },
+  "ForeArm.R": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "QUATERNION",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "WeaponCarrier": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "QUATERNION",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "Leg.L": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "XYZ",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  },
+  "Leg.R": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation_mode": "XYZ",
+    "rotation_quaternion": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "rotation_euler": [
+      0.0,
+      -0.0,
+      0.0
+    ]
+  }
+}

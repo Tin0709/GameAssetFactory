@@ -1,0 +1,20 @@
+[
+  {
+    "file": "jump_gameplay_1x.mp4",
+    "decoded_frames": 165,
+    "fps": 30.0,
+    "seconds": 5.5,
+    "width": 960,
+    "height": 1024,
+    "fourcc": "h264"
+  },
+  {
+    "file": "jump_side_1x.mp4",
+    "decoded_frames": 165,
+    "fps": 30.0,
+    "seconds": 5.5,
+    "width": 960,
+    "height": 1024,
+    "fourcc": "h264"
+  }
+]

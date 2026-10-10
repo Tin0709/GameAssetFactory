@@ -1,6 +1,6 @@
 # Hướng mỹ thuật — zombie sinh tồn khối hộp
 
-Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; bằng chứng, nguồn và cách tái hiện ở [RESEARCH.md](RESEARCH.md). **Gameplay chính hiện tại là WorldMap; màu/ánh sáng mới vẫn chờ review**, không là phong cách đã duyệt. ForestMeadowV3 và GameplayMap được giữ làm lịch sử so sánh.
+Cập nhật 2026-10-10, Asia/Saigon. Tài liệu định hướng lâu dài; bằng chứng, nguồn và cách tái hiện ở [RESEARCH.md](RESEARCH.md). **Gameplay chính hiện tại là WorldMap; màu/ánh sáng mới vẫn chờ review**, không là phong cách đã duyệt. ForestMeadowV3 và GameplayMap được giữ làm lịch sử so sánh.
 
 ## Điều đã được người dùng chấp nhận hoặc yêu cầu
 
@@ -22,6 +22,9 @@ Cập nhật 2026-10-09, Asia/Saigon. Tài liệu định hướng lâu dài; b�
 | **Mức tăng sắc ấm hiện tại chỉ +5%** | Người dùng đã xem +15% và thấy quá ấm, yêu cầu giảm còn +5%. Đây là strength của color grade thử, không phải tăng độ sáng hoặc phần trăm nhiệt độ vật lý. Kết quả +5% vẫn chờ review. |
 | Chỉ bổ sung animation nhảy; giữ nguyên toàn bộ animation cũ | Người dùng nhắc rõ trong lúc review nhảy ngày 2026-10-09. Không thay Walk/Sprint/Idle/weapon/combat bằng các đoạn di chuyển minh hoạ trong study. |
 | **Yêu cầu mới nhất: tạm bỏ nhảy trong game; tự đi lên bậc mượt bằng animation cũ** | Người dùng đổi hướng sau khi cho phép thử tích hợp. Giữ study Blender V2 để bổ sung nhảy sau; không bật clip nhảy hoặc xung lực bật lên trong game hiện tại. |
+| **2026-10-10: thêm một cú nhảy thường đẹp trong Blender và Player Animation Library** | Dùng brief, video 10,33–11,00 s và ảnh người dùng; giữ nhân vật, rig và toàn bộ Action cũ. [Jump Default V001](../../blender/animation/reviews/player_animation_library_v1/jump_default_v001/README.md) là bản mới chờ review, pose và quỹ đạo preview riêng. Yêu cầu này chưa cho phép bật nhảy lại trong Godot. |
+
+**Yêu cầu mới nhất 2026-10-10:** tích hợp Jump Default V001 vào WorldMap để review, tạm dùng **SPACE**. Yêu cầu này thay thế việc hoãn nhảy cho scene chính; V2 block-jump cũ vẫn giữ riêng. Giữ lên bậc mượt, các animation và hệ súng hiện tại. Kết quả runtime chưa được duyệt mỹ thuật; xem bằng chứng trong RESEARCH.
 
 Việc tích hợp R13/R15 được cho phép không đồng nghĩa mọi chuyển động đã được duyệt là tự nhiên. Những dòng “AWAITING HUMAN REVIEW” ở các báo cáo cũ vẫn cần được tôn trọng. Không gán phần trăm giống game tham chiếu.
 

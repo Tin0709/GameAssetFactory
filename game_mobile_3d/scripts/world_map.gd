@@ -2,6 +2,7 @@ extends Node3D
 ## Authored schematic layout; visual optimization never changes the source cells.
 const DATA := "res://assets/maps/world_map/runtime.json"
 const CAMERA_OFFSET := Vector3(12,15,16)
+const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpReview.tscn")
 var runtime: Dictionary
 var geometry
 var columns: Dictionary = {}
@@ -13,6 +14,17 @@ var build_msec := 0
 var border_bodies: Array[StaticBody3D] = []
 var look
 @onready var player: CharacterBody3D = $Actors/Player
+
+func _enter_tree() -> void:
+	# Swap before child _ready callbacks. A nested inherited scene replacement
+	# leaves the previous Player orphaned in Godot 4.7; free it explicitly.
+	var actors: Node=$Actors
+	var previous: Node3D=actors.get_node("Player")
+	var index:=previous.get_index()
+	var replacement: Node3D=JUMP_REVIEW_PLAYER.instantiate()
+	replacement.name=previous.name;replacement.transform=previous.transform
+	actors.remove_child(previous);previous.free()
+	actors.add_child(replacement);actors.move_child(replacement,index)
 
 func _ready() -> void:
 	process_physics_priority=2
@@ -49,7 +61,7 @@ func _ready() -> void:
 	look=load("res://scripts/world_map_look.gd").new()
 	look.name="ReferenceLook"
 	add_child(look);look.setup(self)
-	$HUD/Help.text="WORLD MAP\nWASD di chuyển · Shift chạy · R về điểm bắt đầu\nV xem toàn map · H sương · B so màu/ánh sáng"
+	$HUD/Help.text="WORLD MAP · JUMP REVIEW\nWASD di chuyển · Shift chạy · SPACE nhảy · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -138,6 +150,7 @@ func reset_player() -> void:
 		get_tree().call_deferred("reload_current_scene");return
 	player.position=spawn_position
 	player.velocity=Vector3.ZERO
+	if player.has_method("cancel_jump"):player.cancel_jump()
 
 func _physics_process(_delta: float) -> void:
 	if map_ready and player.position.y<float(runtime.border.min[1])-1.0:reset_player()

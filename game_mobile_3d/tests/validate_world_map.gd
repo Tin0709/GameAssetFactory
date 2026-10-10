@@ -70,7 +70,7 @@ func run() -> void:
 	check(scene.get_node("InvisibleBorder").find_children("*","GeometryInstance3D",true,false).is_empty(),"Boundary is invisible")
 	var player: CharacterBody3D=scene.player
 	check(player.is_on_floor() and absf(player.position.y-3.0)<.02,"Safe central spawn settles at source height")
-	check(player.visual.get_script().resource_path=="res://scripts/player_combat_strafe_r15.gd" and player.smooth_step_up_enabled,"Existing R15 and smooth step retained")
+	check(player.visual.get_script().get_base_script().resource_path=="res://scripts/player_combat_strafe_r15.gd" and player.smooth_step_up_enabled,"Jump extends existing R15 and retains smooth step")
 	check(not player.visual.animation_player.has_animation_library("jump_v2"),"Jump animation remains deferred")
 	var space:=scene.get_world_3d().direct_space_state
 	# Original column heights vs real rendered terrain colliders across the map.

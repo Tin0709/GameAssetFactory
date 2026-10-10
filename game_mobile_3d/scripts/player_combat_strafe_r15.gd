@@ -112,6 +112,9 @@ func combat_torso_twist() -> float:
 	return wrapf(_combat_bone_yaw(chest)-_combat_bone_yaw(hips),-PI,PI)
 func _evaluate(delta: float) -> void:
 	super._evaluate(delta)
+	_limit_combat_twist()
+
+func _limit_combat_twist() -> void:
 	if skeleton==null or (not combat_facing_active and combat_strafe_weight<=0):return
 	var twist:=combat_torso_twist()
 	# Identity through 12°, then a C1 soft shoulder asymptotically below 20°.

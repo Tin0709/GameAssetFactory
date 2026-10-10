@@ -1,5 +1,5 @@
 """Fresh-open source/key preservation and selectable catalog audit."""
-import bpy, json, math, hashlib
+import bpy, json, math, hashlib, sys
 from pathlib import Path
 OUT=Path(__file__).resolve().parent
 ROOT=OUT.parents[3]
@@ -45,6 +45,14 @@ for e in m['catalog']:
                         actual=rig.path_resolve(c.data_path)[c.array_index]
                         expected=c.evaluate(1+(f-1)/2)
                         assert abs(actual-expected)<1e-4,(e['label'],c.data_path,actual,expected)
+    elif e.get('review_rig'):
+        rig=bpy.data.objects[e['review_rig']]
+        assert rig.animation_data.action.name==e['action']
+        assert sc.get('review_cameras')
+        for direction in ['SIDE','FRONT','BACK','THREE_QUARTER']:
+            bpy.ops.player_review.camera(direction=direction)
+            assert sc.camera.name==json.loads(sc['review_cameras'])[direction]
+        assert rig.parent.name=='JD1_PREVIEW_ONLY_Carrier'
     elif e['group']=='Jump (study only)':
         travel=bpy.data.objects['PREVIEW_ONLY_WorldTravel']
         positions=[]
@@ -57,6 +65,15 @@ for e in m['catalog']:
 missing=[im.filepath for im in bpy.data.images if im.source=='FILE' and not im.packed_file and im.filepath and not Path(bpy.path.abspath(im.filepath)).exists()]
 assert not missing,missing
 assert bpy.data.texts.get('START_HERE_review_controls.py')
+
+if '--skip-renders' in sys.argv:
+    report={'source_files_unchanged':True,'source_actions_unchanged':len(m['source_action_hashes']),
+            'catalog_selections_passed':len(results),'missing_images':missing,'results':results,
+            'render':'Skipped; dedicated jump previews render both cameras separately.','gameplay_modified':False}
+    (OUT/'verification.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+    print(json.dumps({k:v for k,v in report.items() if k!='results'}))
+    # Exit this verification script normally; leave Blender to close normally.
+    raise SystemExit(0)
 default=next(e for e in m['catalog'] if e['label']=='Walk / Rifle')
 bpy.ops.player_review.select(clip_id=default['id'])
 bpy.context.scene.frame_set(5)

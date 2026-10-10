@@ -1,7 +1,7 @@
 {
   "source_files_unchanged": true,
   "source_actions_unchanged": 312,
-  "catalog_selections_passed": 53,
+  "catalog_selections_passed": 54,
   "missing_images": [],
   "results": [
     {
@@ -215,8 +215,12 @@
     {
       "label": "Jump down / opposite lead",
       "selection_valid": true
+    },
+    {
+      "label": "Jump Default V001 / Flat Ground",
+      "selection_valid": true
     }
   ],
-  "render": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\review_preview.png",
+  "render": "Skipped; dedicated jump previews render both cameras separately.",
   "gameplay_modified": false
 }

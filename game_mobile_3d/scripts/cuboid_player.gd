@@ -107,12 +107,9 @@ func _physics_process(delta: float) -> void:
 	velocity.x = horizontal.x
 	velocity.z = horizontal.y
 	var was_grounded := is_on_floor()
-	var stepping := _smooth_step_up.before_move(self, direction, delta, smooth_step_up_enabled, smooth_step_up_min_height, smooth_step_up_max_height, smooth_step_up_duration)
-	if not stepping:
-		if is_on_floor(): velocity.y = 0.0
-		else: velocity.y -= gravity * delta
+	var stepping := _before_vertical_move(direction, delta)
 	move_and_slide()
-	if not stepping and not was_grounded and is_on_floor(): visual.landing_response()
+	_after_vertical_move(was_grounded, stepping)
 	_smooth_step_up.after_move(self)
 	var actual_speed := Vector2(get_real_velocity().x, get_real_velocity().z).length()
 	current_speed = actual_speed
@@ -122,3 +119,13 @@ func _physics_process(delta: float) -> void:
 		visual_velocity.x = desired.x
 		visual_velocity.z = desired.y
 	visual.update_motion(visual_velocity, target if can_fire_moving() else null, delta)
+
+func _before_vertical_move(direction: Vector3, delta: float) -> bool:
+	var stepping := _smooth_step_up.before_move(self, direction, delta, smooth_step_up_enabled, smooth_step_up_min_height, smooth_step_up_max_height, smooth_step_up_duration)
+	if not stepping:
+		if is_on_floor(): velocity.y = 0.0
+		else: velocity.y -= gravity * delta
+	return stepping
+
+func _after_vertical_move(was_grounded: bool, stepping: bool) -> void:
+	if not stepping and not was_grounded and is_on_floor(): visual.landing_response()

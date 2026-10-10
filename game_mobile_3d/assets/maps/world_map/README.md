@@ -11,7 +11,7 @@ Main scene: `res://scenes/WorldMap.tscn` (F5). B compares the imported/native lo
 - Warped Slab→grass half; Granite Slab→dirt half; Oak Slab→leaf half; Coarse Dirt→dirt; Dandelion→yellow; Azure Bluet/Oxeye Daisy→white; Cornflower→blue.
 - Present additional states: stone slab→stone half, oak leaves→leaf A, poppy→red. Tall-grass lower/upper pair→one tall patch. Unknown states fail import rather than silently disappear. No random planting or layout changes.
 - Half-block placement preserves top/bottom/double state. Terrain contacts clip only hidden portions, including across10m chunks. Leaf cores also remove shared contacts but retain authored outer/interior foliage.
-- **Latest user override:** all117leaf blocks are walk-through. Terrain and invisible perimeter still collide. Existing smooth-step controller and old animations remain; jump stays deferred.
+- **Latest user override:** all117leaf blocks are walk-through. Terrain and invisible perimeter still collide. Existing smooth-step controller and old animations remain. On 2026-10-10 the user requested [Jump Default V001](../../characters/jump_default_v001/README.md) in main gameplay, temporarily triggered with **SPACE**, pending artistic review. Earlier V2 block-jumps remain deferred.
 
 ## Reproduce / reuse
 

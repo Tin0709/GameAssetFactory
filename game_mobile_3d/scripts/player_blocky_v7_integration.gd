@@ -12,6 +12,7 @@ func _ready() -> void:
 	assert(new_player.has_animation("Idle") and new_player.has_animation("Run"))
 	for i in new_skeleton.get_bone_count():
 		if new_skeleton.get_bone_name(i) == "WeaponCarrier": continue
+		if _is_additional_authored_bone(new_skeleton, i): continue
 		var old_index := old_skeleton.find_bone(new_skeleton.get_bone_name(i))
 		assert(old_index >= 0 and new_skeleton.get_bone_rest(i).is_equal_approx(old_skeleton.get_bone_rest(old_index)), "Incompatible legacy rest basis")
 	# Existing weapon handling requires this non-deforming attachment. Preserve
@@ -28,3 +29,6 @@ func _ready() -> void:
 		library.add_animation(name, old_player.get_animation(name).duplicate(true))
 	source.free()
 	super._ready()
+
+func _is_additional_authored_bone(_skeleton: Skeleton3D, _bone: int) -> bool:
+	return false

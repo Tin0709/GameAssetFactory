@@ -1,0 +1,131 @@
+{
+  "source_action_hashes_unchanged": 312,
+  "source_files_unchanged": [
+    "blender\\characters\\player\\cuboid\\player_combat_strafe_r14_pass2_study.blend",
+    "blender\\animation\\studies\\block_jump_v2\\block_jump_v2_review.blend",
+    "game_mobile_3d\\assets\\characters\\r15\\player_r15_combat_strafe_v1.glb"
+  ],
+  "shared_original_mesh_and_materials": true,
+  "rest_rig_unchanged": true,
+  "sample_count": 97,
+  "subframe_step": 0.25,
+  "max_carrier_parabola_error_m": 1.127166409098379e-07,
+  "max_grounded_sole_displacement_m": 0,
+  "min_sampled_airborne_sole_height_m": 0.042199164628982544,
+  "contacts": {
+    "1.0": {
+      "Leg.L": 0.0,
+      "Leg.R": 0.0
+    },
+    "3.0": {
+      "Leg.L": 0.0,
+      "Leg.R": 0.0
+    },
+    "5.0": {
+      "Leg.L": 0.0,
+      "Leg.R": 0.0
+    },
+    "6.0": {
+      "Leg.L": 0.15990637242794037,
+      "Leg.R": 0.15850314497947693
+    },
+    "9.0": {
+      "Leg.L": 0.506278932094574,
+      "Leg.R": 0.6255823373794556
+    },
+    "12.0": {
+      "Leg.L": 0.6228342056274414,
+      "Leg.R": 0.7697330713272095
+    },
+    "16.0": {
+      "Leg.L": 0.4149972200393677,
+      "Leg.R": 0.476776123046875
+    },
+    "19.0": {
+      "Leg.L": 0.0,
+      "Leg.R": 0.0
+    },
+    "21.0": {
+      "Leg.L": 0.0,
+      "Leg.R": 0.0
+    },
+    "25.0": {
+      "Leg.L": 0.0,
+      "Leg.R": 0.0
+    }
+  },
+  "new_nonadjacent_penetrations_beyond_idle": [],
+  "idle_baseline_overlap_m": {
+    "Head / UpperArm.L": 0,
+    "Head / UpperArm.R": 0,
+    "Head / Leg.L": 0,
+    "Head / Leg.R": 0,
+    "Head / ForeArm.L": 0,
+    "Head / ForeArm.R": 0,
+    "Chest / ForeArm.L": -0.0038750171661376953,
+    "Chest / ForeArm.R": -0.0038750171661376953,
+    "UpperArm.L / UpperArm.R": 0,
+    "UpperArm.L / Leg.L": 0,
+    "UpperArm.L / Leg.R": 0,
+    "UpperArm.L / ForeArm.R": 0,
+    "UpperArm.R / Leg.L": 0,
+    "UpperArm.R / Leg.R": 0,
+    "UpperArm.R / ForeArm.L": 0,
+    "Leg.L / Leg.R": -1.9670125084303436e-08,
+    "Leg.L / ForeArm.L": -5.960464477539063e-08,
+    "Leg.L / ForeArm.R": 0,
+    "Leg.R / ForeArm.L": 0,
+    "Leg.R / ForeArm.R": -5.960464477539063e-08,
+    "ForeArm.L / ForeArm.R": 0
+  },
+  "numeric_penetration_tolerance_m": 1e-05,
+  "minimum_part_clearance_m": {
+    "Head / UpperArm.L": 0.0,
+    "Head / UpperArm.R": 0.0,
+    "Head / Leg.L": 0.6509572513750754,
+    "Head / Leg.R": 0.5845729141576128,
+    "Head / ForeArm.L": 0.31136688360129483,
+    "Head / ForeArm.R": 0.15248213219456375,
+    "Chest / ForeArm.L": -0.0038750171661376953,
+    "Chest / ForeArm.R": -0.0038750171661376953,
+    "UpperArm.L / UpperArm.R": 0.44224997341692074,
+    "UpperArm.L / Leg.L": 0.2961178421974182,
+    "UpperArm.L / Leg.R": 0.3080918788909912,
+    "UpperArm.L / ForeArm.R": 0.44224997341692074,
+    "UpperArm.R / Leg.L": 0.3079741597175598,
+    "UpperArm.R / Leg.R": 0.2831002586508893,
+    "UpperArm.R / ForeArm.L": 0.44224997341692074,
+    "Leg.L / Leg.R": -2.4646656271443135e-08,
+    "Leg.L / ForeArm.L": -5.960464477539063e-08,
+    "Leg.L / ForeArm.R": 0.22112497687339783,
+    "Leg.R / ForeArm.L": 0.22112497687339783,
+    "Leg.R / ForeArm.R": -5.960464477539063e-08,
+    "ForeArm.L / ForeArm.R": 0.4422499734169172
+  },
+  "camera_frame_bounds": {
+    "JD1_Gameplay": [
+      0.22524721920490265,
+      0.15514490008354187,
+      0.7506586313247681,
+      0.8451318740844727
+    ],
+    "JD1_Side": [
+      0.2713461220264435,
+      0.08720584958791733,
+      0.5887406468391418,
+      0.9133675694465637
+    ],
+    "JD1_Front": [
+      0.2629106938838959,
+      0.0922064408659935,
+      0.8096261620521545,
+      0.908768355846405
+    ]
+  },
+  "pose_and_travel_separate_single_slot_actions": true,
+  "pose_root_channels_absent": true,
+  "first_last_evaluated_pose_match": true,
+  "no_cycle_modifiers": true,
+  "gameplay_modified": false,
+  "limitations": "No knees/ankles: ground compression uses torso/arms only. Existing idle Chest/ForeArm overlap about 3.875 mm is preserved. Head/UpperArm new overlaps corrected with an 8 mm pose-only shoulder glide; neutral restores original 32 mm inset. Adjacent rigid joints excluded from SAT. Not a runtime/mobile test."
+}

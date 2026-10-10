@@ -1,0 +1,170 @@
+TẠO POSE VÀ ANIMATION NHẢY TRONG BLENDER — NHÂN VẬT HIỆN TẠI
+
+Ta muốn mình trực tiếp tạo một animation nhảy thường thật chỉn chu cho nhân vật hiện tại trong Blender, lấy cảm hứng từ tư thế và cảm giác chuyển động trong các ảnh/video Minecraft Dungeons II ta đính kèm. Hãy thực hiện bằng kết nối Blender hiện có, hoàn thành bản xem thử và tự kiểm tra chuyển động.
+
+PHẠM VI
+
+- Làm một cú nhảy cơ bản trên mặt phẳng: chuẩn bị ngắn → đạp đất → lên cao → chuyển qua đỉnh → rơi → tiếp đất → hồi về. Ưu tiên chất lượng một animation.
+- Giữ đúng nhân vật của ta: đầu, tóc, mặt, áo, tỉ lệ cơ thể, chiều dài tay/chân, hình dáng khối và vật liệu hiện có. Không biến nhân vật thành nhân vật mặc giáp trong ảnh.
+- Công việc lần này nằm trong Blender. Chưa triển khai controller, AnimationTree hoặc thay đổi scene gameplay Godot; chưa cần xuất nhiều clip hay nhiều hướng nhảy.
+- Đọc hướng dẫn project và các file liên quan trực tiếp đến nhân vật/animation. Không quét hoặc tái cấu trúc toàn bộ kho asset.
+
+1. DÙNG THAM CHIẾU ĐÚNG CÁCH
+
+Ta cung cấp:
+- image(20261010-035739).png: hình nhân vật hiện tại, dùng để giữ nhận diện và tỉ lệ.
+- image(20261010-035817).png: tư thế nhảy tham chiếu ở góc máy thấp, dùng để học silhouette, sự mở của tay và sự lệch nhau của chân.
+- Screen Recording 2026-10-10 110207.mp4: dùng để học nhịp chuyển động ở góc gameplay.
+- Jump_Reference_Frames.png nếu có: các khung hình trích từ chính video trên.
+
+Trong video, ưu tiên cú nhảy thường khoảng 10,33–11,00 giây: thân bật lên, hai tay mở, hai chân lệch cao thấp, giữ dáng rõ trong lúc bay, rồi thu người và hồi về nhanh. Một số đoạn khác có chuyển động giống lộn người; không ghép chúng vào cú nhảy cơ bản này.
+
+Ở đoạn đã chọn, theo phía màn hình: tay cầm kiếm nằm bên trái và nâng cạnh đầu; tay còn lại mở sang phải; bàn chân bên phải thấp hơn, bàn chân bên trái cao hơn. Ảnh tĩnh có phía cầm kiếm khác trên màn hình. Hãy xác định hướng nhân vật trước khi chuyển thành tên bone trái/phải; không sao chép nhầm hai hệ quy chiếu.
+
+Đây là bản ghi màn hình 30 fps, không chứng minh fps animation gốc. Bụi và góc nhìn che một phần chân; không khẳng định frame tiếp xúc đầu tiên hoặc góc gối gốc chỉ từ video. Các mốc frame, góc và độ cao dưới đây là thiết kế khởi điểm của chúng ta, không phải dữ liệu nội bộ của Mojang.
+
+Nếu không đọc được một file tham chiếu, nói rõ file nào; tiếp tục phần có thể làm với tài liệu đã đọc được, không giả vờ đã xem.
+
+2. KIỂM TRA NHÂN VẬT VÀ TẠO BẢN REVIEW GỌN
+
+Trước khi đặt keyframe, kiểm tra ngắn gọn:
+- Phiên bản Blender; object/armature đúng của nhân vật; hệ trục và hướng nhìn trước.
+- Root, pelvis, spine/chest, head, tay và chân; bone điều khiển và bone biến dạng; IK/FK, constraints, driver nếu có.
+- Có thực sự có khớp khuỷu, gối, cổ chân hay mỗi chi chỉ là một khối cứng.
+- Cách gắn mesh hiện tại, rest pose, các Actions/Action slots và NLA đang có.
+- Chiều cao H của nhân vật ở thế đứng và vị trí mặt sàn dưới lòng bàn chân. Mọi tỉ lệ chiều cao dưới đây dùng H này.
+
+Dùng đúng model và rig hiện có để tạo bản review riêng, gọn, theo cấu trúc project hiện tại. Chỉ đưa nhân vật và dependency cần thiết vào scene review, không sao chép toàn bộ kho asset. Tạo Action mới có tên rõ, chẳng hạn Jump_Default_v001; giữ các animation và rest pose đang hoạt động.
+
+Nếu rig có khớp gối/khuỷu phù hợp, dùng chúng. Nếu chân/tay là khối nguyên, tạo bản tốt nhất bằng các khớp thật sự có. Nếu không có cơ chế hợp lệ để hạ hông và giữ điểm tựa, bỏ phần hạ hông đó, diễn tả lấy đà/nhận lực bằng thân và tay trong giới hạn rig. Không ép hai chân nguyên khối cố định dưới sàn trong khi hạ pelvis, dù chỉ một khoảng nhỏ. Không tự re-rig, đổi tỉ lệ, kéo giãn mesh hoặc automatic-weight toàn bộ nhân vật để ép đạt góc số. Nếu thiếu một khớp làm giới hạn silhouette, ghi rõ giới hạn và đề xuất thay đổi nhỏ nhất riêng trong báo cáo.
+
+3. DỰNG POSE TRÊN KHÔNG TRƯỚC
+
+Pose chính cần có cảm giác nhân vật chủ động bật nhảy, linh hoạt, mạnh và vẫn giữ chất khối vuông. Thiết kế tư thế trên không dễ đọc từ camera gameplay và nhìn nghiêng.
+
+Chọn rõ một chân co cao (chân A) và một chân thấp hơn (chân B), giữ lựa chọn đó xuyên suốt cú nhảy. Các góc sau là khoảng gợi ý theo giải phẫu, không phải lệnh gán trực tiếp vào local Euler X/Y/Z của bone. Bắt đầu ở đầu thấp của các khoảng; chỉ tăng nếu silhouette và cấu trúc nhân vật cho phép. Chân nguyên khối dùng góc hông nhỏ hơn phù hợp với hình học thực tế.
+
+- Chân A: đưa đùi ra trước và nâng cao rõ; thử khoảng 55–75 độ so với hướng buông tự nhiên. Nếu có gối, thử co 60–90 độ, rồi giảm nếu chân đâm vào thân hoặc silhouette quá chật.
+- Chân B: thấp hơn và hơi lùi sau; thử xoay đùi về sau 10–20 độ, gối co nhẹ 15–30 độ nếu có. Tránh cả hai chân duỗi song song hoặc cùng co cao bằng nhau.
+- Hai tay: mở ra để có khoảng trống với thân. Một tay cao hơn, một tay thấp hơn; thử góc nâng cánh tay khoảng 70–100 độ và 50–80 độ tính từ tư thế buông xuống. Điều chỉnh thêm hướng ra trước/ra bên; không biến thành T-pose đối xứng.
+- Nếu có khuỷu, co nhẹ khoảng 15–35 độ để bàn tay không cứng đơ. Nếu nhân vật đang không có vũ khí, tạo pose tay không tương ứng; không cần thêm kiếm hoặc áo giáp chỉ để giống ảnh. Nếu đã có vũ khí, giữ đúng tay cầm hiện tại và kiểm tra vật thể không xuyên đầu/thân.
+- Hông/thân: nghiêng tới trước nhẹ khoảng 8–15 độ, xoay vai tương đối với hông khoảng 5–10 độ nếu rig cho phép. Hạn chế xoắn quá mạnh làm các khối vỡ dáng.
+- Đầu: còn hướng nhìn về phía di chuyển; bù một phần độ cúi của thân bằng cổ/đầu. Không khóa đầu tuyệt đối theo world và không để đầu gật cùng biên độ với thân.
+
+Đánh giá silhouette trước các con số: tay không nhập vào thân, chân cao không bị đầu/thân che mất, hai chân không chập thành một cột. Giữ thể tích các khối; thể hiện nén/duỗi bằng khớp và tư thế, không scale nhân vật như cao su.
+
+Không sao chép độ phóng đại của ảnh góc thấp một cách máy móc vào camera nhìn từ trên. Dùng ảnh cho dáng chính và dùng video cho độ gọn, nhịp đi vào/thoát pose.
+
+4. TIMELINE KHỞI ĐIỂM CHO MỘT ACTION LIỀN MẠCH
+
+Dùng 30 fps trong scene review riêng. F1 đến F25 có 24 khoảng frame, tương đương 0,80 giây. Nếu cần giữ fps khác của project, đổi mốc theo thời gian tương đương và báo lại; không đổi fps toàn project khiến các clip cũ đổi tốc độ.
+
+F1 — 0,000 s — Thế đứng chuẩn bị:
+Nhân vật ở thế đứng sẵn sàng, bàn chân có điểm tựa, tay thả tự nhiên theo idle hiện tại. Không khởi đầu bằng rest/T-pose.
+
+F3 — 0,067 s — Nén lấy đà ngắn:
+Hông xuống vừa phải, thân hơi tới trước, tay hơi lùi để chuẩn bị vung. Với rig có gối, thử hông thấp hơn khoảng 3–5% H; giảm thêm nếu rig hạn chế. Giữ chân trụ ổn định trên sàn.
+
+F5 — 0,133 s — Đạp đất, frame cuối còn điểm tựa:
+Thân vươn lên, chân trụ đẩy, tay bắt đầu đi lên. Hông/thân dẫn chuyển động; tay theo sau một chút. Không đồng thời bật tất cả các bone vào pose trên không.
+
+F6 — 0,167 s — Frame đầu hoàn toàn rời đất:
+Nhả khóa chân đúng lúc. Hai chân bắt đầu tách chức năng: chân A co lên, chân B ở thấp hơn/hơi sau. Kiểm tra thực tế cả hai bàn chân đã rời sàn trong scene được đánh giá.
+
+F9 — 0,267 s — Vào dáng trên không:
+Silhouette chính đã rõ: hai tay mở lệch nhau, một chân co cao, chân còn lại thấp hơn. Nhân vật tiếp tục đi lên nhưng giảm tốc độ lên.
+
+F12 — 0,367 s — Đỉnh quỹ đạo:
+Pose mạnh nhất nằm quanh mốc này. Tốc độ lên/xuống đổi dấu trơn, không chèn đoạn đóng băng nhân vật. Tay/đầu có chuyển động nhỏ nối tiếp; không đạp chân như đang chạy trên không.
+
+F16 — 0,500 s — Rơi và chuẩn bị nhận lực:
+Thân xuống nhanh dần. Chân co cao mở dần để đưa chân về dưới trọng tâm. Tay hạ dần nhưng vẫn có độ mở. Giữ đặc điểm pose cho đến tương đối muộn, tránh trở về idle khi còn đang bay.
+
+F19 — 0,600 s — Tiếp xúc đầu tiên:
+Chân tiếp đất đã ở đúng vị trí trên mặt sàn, không xuyên sàn. Đây là contact, chưa phải tư thế nén sâu nhất. Thân còn phản ứng tiếp xuống sau khi chân có điểm tựa. Với bản cơ bản, có thể cho hai chân nhận lực gần đồng thời; ưu tiên ổn định và không trượt.
+
+F21 — 0,667 s — Nén tiếp đất:
+Hông/thân thấp thêm sau contact, gối/khuỷu nhận lực nếu có. Thử nén hông khoảng 5–8% H rồi chỉnh theo rig; không cần ngồi xổm sâu. Tay và đầu kết thúc chuyển động trễ hơn thân khoảng 1–2 frame nếu nhìn tự nhiên. Bàn chân trụ giữ ổn định, không trượt hoặc chui xuống đất.
+
+F25 — 0,800 s — Hồi về:
+Trở về pose có thể nối với idle, hết residual rotation/offset không mong muốn. Hồi về có damping, tránh bật thêm một cú nảy rõ hoặc lắc qua lại nhiều lần. Đây là clip một lần; không tạo loop khiến chân tự nhảy lại.
+
+Đây là bảng để bắt đầu blocking, không phải khóa cứng kết quả. Được tinh chỉnh mốc/góc khi playback cho thấy chưa đẹp, nhưng phải giữ thứ tự lấy đà → rời đất → đỉnh → contact → nén → hồi về và báo các thay đổi chính. Cảnh preview không quyết định thời gian khóa input của gameplay tương lai.
+
+5. TÁCH POSE KHỎI QUỸ ĐẠO XEM THỬ
+
+Action của nhân vật chứa tư thế tay/chân/thân/đầu và phần nén/hồi của pelvis. Root dành cho gameplay giữ nguyên transform nền tương đối của rig; không tự apply/zero các transform đang cần thiết của asset.
+
+Tạo một cơ chế preview riêng để đưa toàn bộ nhân vật lên/xuống, ví dụ một parent/carrier chỉ dùng cho scene review. Carrier có animation/controller riêng, tách khỏi Action pose của nhân vật, kể cả khi Blender cho phép nhiều object dùng chung một Action có slots. Nó phải mang đúng toàn bộ rig và controls liên quan, không dịch mesh và armature hai lần. Không ghi toàn bộ độ cao cú nhảy thêm một lần vào pelvis hoặc root animation.
+
+Bản mặc định nhảy tại chỗ, không cần dịch ngang. Mốc mặt sàn giữ cố định. Nếu dùng quỹ đạo đối xứng đơn giản, có thể bắt đầu với:
+- Khoảng bay của carrier: F5–F19; T = 14/30 giây.
+- Độ cao carrier h = khoảng 0,30–0,40 H, khởi đầu 0,35 H.
+- Trong khoảng này: u = (frame - 5) / 14; Z_preview = 4 × h × u × (1 - u).
+- Carrier về cao độ nền ở F5 và F19, đạt đỉnh ở F12, giữ cao độ nền trước/sau khoảng đó.
+
+Nếu chọn công thức này, dùng đường cong giải tích, tangent được chỉnh đúng hoặc mẫu đủ chính xác; không chỉ đặt ba keyframe với Auto Clamped rồi mặc định chúng tạo đúng parabola. Đây là gợi ý cho quỹ đạo preview cùng cao độ xuất phát/tiếp đất, không phải số đo của game tham chiếu. Kiểm tra bề mặt tiếp xúc thật của bàn chân trong evaluated scene: carrier ở cao độ nền không tự đảm bảo bàn chân chạm sàn. Điều chỉnh pose contact để tương thích với cả quỹ đạo và hình học tại F5/F19. Nếu đổi thời gian/độ cao/đỉnh, chỉnh chúng nhất quán; không gán ba giá trị mâu thuẫn rồi gọi là quỹ đạo vật lý.
+
+Sau này controller Godot có thể đảm nhiệm chuyển động trong không gian và va chạm. Bản pose được giữ riêng để tránh cộng độ cao hai lần. Chưa cần triển khai chuyện đó trong lượt này. Khi xuất sau này, phải loại trừ dependency/chuyển động carrier thật sự; chỉ ẩn carrier khỏi camera không đảm bảo nó không đi vào bản export.
+
+6. BLOCKING, NỘI SUY VÀ ĐỘ MƯỢT
+
+- Block các pose chính trước; kiểm tra ở góc 3/4, góc nhìn nghiêng và góc gameplay. Sau đó mới tinh chỉnh interpolation và các pose chuyển tiếp.
+- Đạp đất nhanh, lên chậm dần, qua đỉnh tự nhiên, xuống nhanh dần, tiếp đất có nén và hồi gọn. Không dùng cùng một kiểu ease-in/ease-out đều cho mọi đoạn.
+- Giữ đường đi của bàn tay, bàn chân, đầu và góc khối thân liên tục. Kiểm tra cả frame ở giữa hai keyframe, không chỉ các pose đẹp.
+- Dùng Graph Editor để xử lý overshoot, đổi hướng bất ngờ và Euler flip nếu xảy ra. Việc bật Bézier/Auto Clamped không tự thay cho chỉnh timing và contact.
+- Chuyển động nối tiếp nhẹ: thân/hông dẫn, tay theo, đầu ổn định có độ trễ hợp lý. Không thêm rung ngẫu nhiên hoặc chuyển động phụ quá lớn.
+- Nếu rig có IK, dùng cho pha còn điểm tựa; nhả khi rời đất và nối lại êm lúc tiếp đất. Kiểm tra pole/bend direction và switching, không tạo knee pop.
+- Nếu constraints cần bake ở bước xuất sau này, giữ source rig chỉnh được; bake evaluated motion sang Action/bản export riêng. Không xóa constraints hoặc ghi đè các Action đang hoạt động để làm sạch một cách tùy tiện.
+- Dùng API tương thích phiên bản Blender thực tế; kiểm tra Action được gán vào đúng object và slot nếu phiên bản đó dùng slots.
+
+7. BẢN XEM THỬ VÀ TIÊU CHÍ ĐẠT
+
+Tạo scene review đơn giản: nền trung tính, sàn có thể nhìn rõ điểm chạm và bóng, camera cố định, đủ khung để không cắt tay/chân ở đỉnh. Dùng vật liệu hiện có; không cần hiệu ứng bụi, ánh sáng điện ảnh hoặc motion blur để đánh giá chuyển động.
+
+Xuất:
+- Một video tốc độ 1× ở góc gameplay dự kiến. Nếu chưa có thông số camera, dùng góc 3/4 nhìn từ trên và ghi rõ đây là camera tạm.
+- Một video hoặc góc nhìn nghiêng tốc độ 1× để xem quỹ đạo và chân tiếp đất.
+- Có thể thêm 0,5× để soi chuyển tiếp; không dùng slow motion làm bằng chứng duy nhất.
+- Một ảnh contact sheet có nhãn các pose F3, F5, F9, F12, F16, F19, F21, F25.
+
+Trong video có thể lặp playback 3 lần, xen một đoạn đứng yên ngắn để dễ xem; không biến Action thành animation tự lặp. Kiểm tra cả khi nhân vật hiển thị nhỏ như trên màn hình điện thoại.
+
+Chỉ xem là đạt khi:
+1. Ở một khung hình trên không, có thể nhận ra đang nhảy và nhìn rõ hai chân khác vai trò.
+2. Pose bật lên, pose bay và pose tiếp đất khác nhau rõ; nhân vật không chỉ giữ nguyên pose chạy rồi bị kéo lên xuống.
+3. Có cảm giác đạp đất, trọng lượng và nhận lực; đỉnh không bị đứng hình.
+4. Không xuyên thân, vũ khí, chân; không trượt chân trụ, knee pop, giật hướng hoặc lệch root sau clip.
+5. Các khối giữ hình dạng và nhận diện nhân vật hiện tại.
+6. Bản xem thử đúng ở tốc độ thật, không phụ thuộc bụi, blur hoặc camera rung để trông mượt.
+
+Tự xem video/frame đã xuất, sửa các lỗi nhìn thấy trong phạm vi animation rồi xuất lại nếu cần. Không báo hoàn thành chỉ vì đã có keyframe hoặc render được một ảnh tĩnh.
+
+8. BÀN GIAO
+
+Lưu file .blend review gọn, các preview và ghi chú ngắn trong vị trí phù hợp của project. Trả về đường dẫn thật và cho ta biết:
+- Object/rig đã dùng, Action/slot, fps, khoảng frame và các marker.
+- Pose chính nằm ở đâu và cách Play/xem nó trong Blender.
+- Bộ phận nào tạo quỹ đạo preview, bộ phận nào giữ animation pose.
+- Những giới hạn rig thực sự gặp và điều gì đã thay đổi.
+- Những gì đã kiểm tra bằng hình/video, phần nào chưa kiểm tra được.
+
+Nếu render hoặc lưu một đầu ra thất bại, báo chính xác phần còn thiếu. Kết thúc lượt này với một cú nhảy hoàn chỉnh có thể xem và chỉnh trong Blender.
+
+NGUỒN ĐỐI CHIẾU — KHÔNG CẦN RESEARCH LẠI NẾU KHÔNG CÓ VẤN ĐỀ CỤ THỂ
+
+- Mojang, New gameplay systems in Minecraft Dungeons II, mục Jump!?!. Xác nhận jump là tính năng riêng bên cạnh dodge roll; không công bố rig hoặc frame count:
+https://www.minecraft.net/en-us/article/minecraft-dungeons-ii-gameplay-systems
+
+- Official Xbox Podcast, đoạn thảo luận Adding the jump feature ở chương 3:48. Đây là nguồn giải thích cơ chế, không phải bảng keyframe:
+https://news.xbox.com/en-us/2026/09/26/minecraft-dungeons-ii-the-sift-new-mechanics-better-exploration-and-more-official-xbox-podcast/
+
+- Godot: ví dụ jump bằng vận tốc và controller, để tham khảo cách phân trách nhiệm về sau:
+https://docs.godotengine.org/en/stable/getting_started/first_3d_game/06.jump_and_squash.html
+
+- Godot: AnimationTree và chuyển trạng thái theo điều kiện, cho bước tích hợp sau:
+https://docs.godotengine.org/en/stable/tutorials/animation/animation_tree.html
+
+- Blender: lưu ý API Actions theo phiên bản khi viết script:
+https://developer.blender.org/docs/release_notes/4.4/python_api/
+https://developer.blender.org/docs/release_notes/5.0/python_api/

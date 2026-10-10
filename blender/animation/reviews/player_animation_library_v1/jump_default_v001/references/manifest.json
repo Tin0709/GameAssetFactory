@@ -1,0 +1,18 @@
+{
+  "provenance": "User-provided references; not original game animation data",
+  "recording": {
+    "fps": 30,
+    "frames": 516,
+    "seconds": 17.2,
+    "reviewed_interval_s": [
+      10.33,
+      11.0
+    ]
+  },
+  "files": {
+    "user_brief.txt": "67e8235ca7d35baa7de39ef9666a553d6a42b585b5a6d8e40ee88743e9ae1eec",
+    "user_contact_sheet.png": "2ca2e01c95b1c4177d4ea95610e6f44efa2e0b62ed08b1c9c75be1913f3ef41e",
+    "user_jump_video.mp4": "5cbef5c58b0d4c964156d282196d155ffc83f670bd16c2009a1809fffecd6d63",
+    "user_pose_reference.png": "9f0f895a7a5d0bc6703ec206feeaa0181c552ae5ad6a413485f6f33d34dfc0f7"
+  }
+}
