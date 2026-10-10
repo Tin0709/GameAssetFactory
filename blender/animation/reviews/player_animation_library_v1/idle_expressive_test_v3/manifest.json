@@ -26,22 +26,22 @@
   "fixed_foot_matrices": {
     "L": [
       [
-        -1.0,
-        0.0,
-        -8.742277657347586e-08,
-        0.11249999701976776
+        -0.9986295104026794,
+        0.05233589932322502,
+        -8.730296485737199e-08,
+        0.13249999284744263
       ],
       [
         8.742277657347586e-08,
         0.0,
         -1.0,
-        0.004999999888241291
+        0.0
       ],
       [
-        0.0,
-        -1.0,
-        0.0,
-        0.6753999590873718
+        -0.05233589932322502,
+        -0.9986295104026794,
+        -4.5753494326561395e-09,
+        0.6803627014160156
       ],
       [
         0.0,
@@ -52,22 +52,22 @@
     ],
     "R": [
       [
-        -0.9945218563079834,
-        -0.10351131856441498,
-        0.014547472819685936,
-        -0.11249999701976776
-      ],
-      [
-        8.657197980710407e-08,
-        -0.13917303085327148,
         -0.9902680516242981,
-        -0.005000002682209015
+        -0.13917303085327148,
+        -8.657197980710407e-08,
+        -0.0925000011920929
       ],
       [
-        0.10452856868505478,
-        -0.9848431944847107,
-        0.13841064274311066,
-        0.6924997568130493
+        8.742277657347586e-08,
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.13917303085327148,
+        -0.9902680516242981,
+        1.2166892382481365e-08,
+        0.6844878196716309
       ],
       [
         0.0,
@@ -80,28 +80,28 @@
   "stance_placements": {
     "L": {
       "top": [
-        0.1125,
-        0.005,
+        0.1325,
+        0,
         0.675
       ],
       "yaw": 0.0,
       "pitch": 0.0,
-      "lean": 0.0
+      "lean": -3.0
     },
     "R": {
       "top": [
-        -0.1125,
-        -0.005,
+        -0.0925,
+        0,
         0.675
       ],
       "yaw": 0.0,
-      "pitch": -8.0,
-      "lean": 6.0
+      "pitch": 0.0,
+      "lean": 8.0
     }
   },
-  "support_leg": "Leg.L / positive-X / flat full sole",
-  "relaxed_leg": "Leg.R / whole solid leg forward 8deg and lateral6deg / zero toe-out / fixed corner contact",
-  "support_logic": "Pelvis positive-X bias28mm; firm support and relaxed solid-leg diagonal; static leg matrices; no rig edits",
+  "support_leg": "Leg.L / positive-X / restrained3deg lateral lean / fixed sole edge",
+  "relaxed_leg": "Leg.R / whole solid leg8deg SIDEWAYS / zero pitch and toe-out / fixed sole edge",
+  "support_logic": "Pelvis positive-X bias28mm; unequal sideways whole-leg opening; proximal leg pair20mm toward support; no front/back stagger. Static leg matrices; no rig edits",
   "breathing": "User-requested slow body rise/settle:6mm hips +1.8mm rigid chest lift over4seconds; fixed feet, no scale",
   "face_controls": "No facial bones or shape keys; head articulation only",
   "scope": "Separate v3; preserve all current Idle and other studies, no Godot edits/export."

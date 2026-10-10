@@ -1,0 +1,307 @@
+{
+  "source_sha256": "49f9153dfa09ead427f9c05c5e47d5843acec5e8d31b80d9748124a8b3b170a5",
+  "action_sha256": "3a603388cd0caf28cf64c0119587b0faff42243cf46e4bd0777f1a962ca6fd6f",
+  "note": "Measured authored pose, not a recovered reference rig or exact reference 3D angles. Fixed unequal sideways leg angles are checked against changing hip/chest lean. Both legs zero front/back tilt; body counterbalance retained.",
+  "samples": [
+    {
+      "frame": 1,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.6423197135954963,
+          "front_back_tilt_deg": -1.1000423955238294
+        },
+        "Chest": {
+          "sideways_tilt_deg": 0.022697951726697068,
+          "front_back_tilt_deg": -3.1452982256571262
+        },
+        "Head": {
+          "sideways_tilt_deg": 0.34261223550271946,
+          "front_back_tilt_deg": -1.4116483074988526
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.9999972425338064,
+          "front_back_tilt_deg": 1.0686816749328349e-07
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.999997479515577,
+          "front_back_tilt_deg": 0.0
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -3.0226951942605034,
+        "Leg.R": 7.97729952778888
+      },
+      "hip_x_m": 0.02800000086426735
+    },
+    {
+      "frame": 49,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.5325957128822142,
+          "front_back_tilt_deg": -1.1903967395993904
+        },
+        "Chest": {
+          "sideways_tilt_deg": -0.6298275950441888,
+          "front_back_tilt_deg": -3.8331189942084416
+        },
+        "Head": {
+          "sideways_tilt_deg": 0.0032671543307418796,
+          "front_back_tilt_deg": -0.6985477999059314
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.999997029382905,
+          "front_back_tilt_deg": 2.1373633498656698e-07
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.999994838007779,
+          "front_back_tilt_deg": 1.0777051646044163e-07
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -2.3701694343387163,
+        "Leg.R": 8.629822433051968
+      },
+      "hip_x_m": 0.029795359820127487
+    },
+    {
+      "frame": 61,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.35853512822392186,
+          "front_back_tilt_deg": -1.199694919928149
+        },
+        "Chest": {
+          "sideways_tilt_deg": -0.7230928710140195,
+          "front_back_tilt_deg": -3.9169632075043133
+        },
+        "Head": {
+          "sideways_tilt_deg": 0.020325909140077,
+          "front_back_tilt_deg": -0.7339877377125243
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.9999966030811027,
+          "front_back_tilt_deg": 2.1373633498656698e-07
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.999997004226411,
+          "front_back_tilt_deg": 1.0777052294719373e-07
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -2.2769037320670833,
+        "Leg.R": 8.723089875240431
+      },
+      "hip_x_m": 0.032656263560056686
+    },
+    {
+      "frame": 65,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.34070378864854023,
+          "front_back_tilt_deg": -1.198570605531188
+        },
+        "Chest": {
+          "sideways_tilt_deg": -0.7030414392607786,
+          "front_back_tilt_deg": -3.9091262970211202
+        },
+        "Head": {
+          "sideways_tilt_deg": 0.02325049015392201,
+          "front_back_tilt_deg": -0.7400637429670742
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.9999966374999585,
+          "front_back_tilt_deg": 1.0686816111470294e-07
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.999997004226411,
+          "front_back_tilt_deg": 0.0
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -2.29695519823918,
+        "Leg.R": 8.70303844348719
+      },
+      "hip_x_m": 0.03294999897480011
+    },
+    {
+      "frame": 115,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.6391383322418784,
+          "front_back_tilt_deg": -1.1024873946312488
+        },
+        "Chest": {
+          "sideways_tilt_deg": 0.026378508337949403,
+          "front_back_tilt_deg": -3.1635271226793384
+        },
+        "Head": {
+          "sideways_tilt_deg": 0.342525373787828,
+          "front_back_tilt_deg": -1.4281985750988113
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.9999966030811027,
+          "front_back_tilt_deg": 0.0
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.999994838007779,
+          "front_back_tilt_deg": 0.0
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -3.026375111419052,
+        "Leg.R": 7.973616329669829
+      },
+      "hip_x_m": 0.02805234119296074
+    },
+    {
+      "frame": 146,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.7236503408127184,
+          "front_back_tilt_deg": -1.1371474450037937
+        },
+        "Chest": {
+          "sideways_tilt_deg": 0.6341565525606817,
+          "front_back_tilt_deg": -3.4339211648438033
+        },
+        "Head": {
+          "sideways_tilt_deg": -0.23420786261099605,
+          "front_back_tilt_deg": -2.817080828390937
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.99999642434907,
+          "front_back_tilt_deg": 1.0686816111470294e-07
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.9999953132967905,
+          "front_back_tilt_deg": 0.0
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -3.6341529769097516,
+        "Leg.R": 7.365838760736109
+      },
+      "hip_x_m": 0.026576172560453415
+    },
+    {
+      "frame": 158,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.8890924529493685,
+          "front_back_tilt_deg": -1.1680210763058423
+        },
+        "Chest": {
+          "sideways_tilt_deg": 0.7048593042101006,
+          "front_back_tilt_deg": -3.686931877139247
+        },
+        "Head": {
+          "sideways_tilt_deg": -0.25435421226188903,
+          "front_back_tilt_deg": -2.8637456543306827
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.9999974556847073,
+          "front_back_tilt_deg": 1.0686816749328349e-07
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.999996158761603,
+          "front_back_tilt_deg": 0.0
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -3.704856759894808,
+        "Leg.R": 7.295136854551503
+      },
+      "hip_x_m": 0.02369336038827896
+    },
+    {
+      "frame": 181,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.8812991787106217,
+          "front_back_tilt_deg": -1.2001075798700296
+        },
+        "Chest": {
+          "sideways_tilt_deg": 0.5028242838848482,
+          "front_back_tilt_deg": -3.920109306116146
+        },
+        "Head": {
+          "sideways_tilt_deg": 0.22004506366642013,
+          "front_back_tilt_deg": -2.1367165087602027
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.9999972425338064,
+          "front_back_tilt_deg": -2.1373633498656698e-07
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.99999663405072,
+          "front_back_tilt_deg": -1.0777052943394658e-07
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -3.5028215264186544,
+        "Leg.R": 7.497172350165871
+      },
+      "hip_x_m": 0.02383333258330822
+    },
+    {
+      "frame": 218,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.6420956530125979,
+          "front_back_tilt_deg": -1.1321250006105463
+        },
+        "Chest": {
+          "sideways_tilt_deg": 0.02447545216315697,
+          "front_back_tilt_deg": -3.385901663994899
+        },
+        "Head": {
+          "sideways_tilt_deg": 0.3421426813751268,
+          "front_back_tilt_deg": -1.5012459318769598
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.999997029382905,
+          "front_back_tilt_deg": -1.0686816749328349e-07
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.999997849691216,
+          "front_back_tilt_deg": 1.0777052294719373e-07
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -3.024472481546062,
+        "Leg.R": 7.975522397528058
+      },
+      "hip_x_m": 0.02800000086426735
+    },
+    {
+      "frame": 240,
+      "axes": {
+        "Hips": {
+          "sideways_tilt_deg": -0.6423192332894805,
+          "front_back_tilt_deg": -1.100110902534169
+        },
+        "Chest": {
+          "sideways_tilt_deg": 0.02270171212793516,
+          "front_back_tilt_deg": -3.145812095461369
+        },
+        "Head": {
+          "sideways_tilt_deg": 0.3426002716602301,
+          "front_back_tilt_deg": -1.4138960823385953
+        },
+        "Leg.L": {
+          "sideways_tilt_deg": -2.999996816232004,
+          "front_back_tilt_deg": 0.0
+        },
+        "Leg.R": {
+          "sideways_tilt_deg": 7.999997004226411,
+          "front_back_tilt_deg": -1.0777052294719373e-07
+        }
+      },
+      "leg_relative_to_chest_deg": {
+        "Leg.L": -3.0226985283599395,
+        "Leg.R": 7.977295292098476
+      },
+      "hip_x_m": 0.02800000086426735
+    }
+  ]
+}

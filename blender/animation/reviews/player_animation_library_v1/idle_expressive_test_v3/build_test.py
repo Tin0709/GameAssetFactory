@@ -45,7 +45,7 @@ def inherited_design(f):
 def design(f):
     d=inherited_design(f)
     # Maintain the same quiet performance on a single, persistent support bias.
-    # Positive X (Leg.L) supports; the other solid leg reaches forward and sideways, with zero toe-out.
+    # Positive X (Leg.L) supports; latest user correction opens whole legs SIDEWAYS, not in a running stagger.
     d['hip'].x=.028+.45*(d['hip'].x+.002)
     d['hip'].y=-.006+.5*(d['hip'].y+.001)
     d['hip'].z+=.006*(.5-.5*math.cos(2*math.pi*(f-1)/120))
@@ -87,9 +87,9 @@ def build():
     s=bpy.context.scene;r=bpy.data.objects['IEV2_Test_Rig'];m=bpy.data.objects['IEV2_Test_Mesh']
     original={a.name:ui.action_signature(a) for a in bpy.data.actions};assert len(original)==10
     reset(r);bpy.context.view_layer.update()
-    placements={'L':{'top':(.1125,.005,.675),'yaw':0.0,'pitch':0.0,'lean':0.0},'R':{'top':(-.1125,-.005,.675),'yaw':0.0,'pitch':-8.0,'lean':6.0}}
-    # Latest supplied standing reference: one firm flat support, one whole rigid leg angled forward/outward.
-    # No external toe rotation, invented ankle/knee or animated foot pivot. Relaxed sole contacts at a fixed corner.
+    placements={'L':{'top':(.1325,0,.675),'yaw':0.0,'pitch':0.0,'lean':-3.0},'R':{'top':(-.0925,0,.675),'yaw':0.0,'pitch':0.0,'lean':8.0}}
+    # Latest supplied standing reference: unequal SIDEWAYS whole-leg opening; no forward/backward running stagger.
+    # Zero external toe rotation, no invented ankle/knee or animated foot pivot. Both rigid soles contact along fixed edges.
     for side,d in placements.items():
         b=r.pose.bones['Leg.'+side];rest=b.bone.matrix_local
         rot=Matrix.Rotation(math.radians(d['yaw']),4,'Z')@Matrix.Rotation(math.radians(d['lean']),4,'Y')@Matrix.Rotation(math.radians(d['pitch']),4,'X')
@@ -123,7 +123,7 @@ def build():
     for f,label in [(1,'ASYMMETRIC SUPPORTED REST'),(25,'FIRST HEAD-LED LOOK'),(49,'OBSERVE / BODY FOLLOWS'),(76,'RETURN / REST'),(125,'SECOND INTEREST'),(146,'SHORTER LOWER LOOK'),(165,'HEAD RETURNS'),(218,'SETTLED REST'),(241,'CLOSING KEY / EXCLUDED')]:s.timeline_markers.new(label,frame=f)
     s.camera=bpy.data.objects['Showcase_THREE_QUARTER'];bpy.data.objects['Showcase_FixedFloor'].location.z=0;r.location=(0,0,0);s.frame_set(1)
     s['purpose']='Pending v3 / asymmetric support Idle / two-sided curious head / transform-only breath / no gameplay integration'
-    data={'action':NAME,'status':'pending','playback_frames':[1,P],'closing_key':CLOSE,'fps':FPS,'period_s':P/FPS,'seamless_loop':True,'in_place':True,'original_actions':original,'rig_changes':[],'fixed_foot_matrices':{side:[list(x) for x in mat] for side,mat in FEET.items()},'stance_placements':placements,'support_leg':'Leg.L / positive-X / flat full sole','relaxed_leg':'Leg.R / whole solid leg forward 8deg and lateral6deg / zero toe-out / fixed corner contact','support_logic':'Pelvis positive-X bias28mm; firm support and relaxed solid-leg diagonal; static leg matrices; no rig edits','breathing':'User-requested slow body rise/settle:6mm hips +1.8mm rigid chest lift over4seconds; fixed feet, no scale','face_controls':'No facial bones or shape keys; head articulation only','scope':'Separate v3; preserve all current Idle and other studies, no Godot edits/export.'}
+    data={'action':NAME,'status':'pending','playback_frames':[1,P],'closing_key':CLOSE,'fps':FPS,'period_s':P/FPS,'seamless_loop':True,'in_place':True,'original_actions':original,'rig_changes':[],'fixed_foot_matrices':{side:[list(x) for x in mat] for side,mat in FEET.items()},'stance_placements':placements,'support_leg':'Leg.L / positive-X / restrained3deg lateral lean / fixed sole edge','relaxed_leg':'Leg.R / whole solid leg8deg SIDEWAYS / zero pitch and toe-out / fixed sole edge','support_logic':'Pelvis positive-X bias28mm; unequal sideways whole-leg opening; proximal leg pair20mm toward support; no front/back stagger. Static leg matrices; no rig edits','breathing':'User-requested slow body rise/settle:6mm hips +1.8mm rigid chest lift over4seconds; fixed feet, no scale','face_controls':'No facial bones or shape keys; head articulation only','scope':'Separate v3; preserve all current Idle and other studies, no Godot edits/export.'}
     (OUT/'manifest.json').write_text(json.dumps(data,indent=2),encoding='utf8')
     bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'idle_expressive_v3_review.blend'));print('BUILT SEPARATE V3 IDLE',flush=True)
 if __name__=='__main__':build()
