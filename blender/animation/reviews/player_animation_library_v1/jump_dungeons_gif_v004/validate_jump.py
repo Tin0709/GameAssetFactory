@@ -60,8 +60,21 @@ def run(builder):
     # Include between-key samples (1/128 offset) as well as exact phase boundaries.
     frames = sorted(set([1,6,14.5,23,25,32,36]+[1+i/16+1/128 for i in range(35*16) if 1+i/16+1/128<36]))
     support = {}
+    seam_pairs = []
+    for side in ['L','R']:
+        for a in groups['UpperArm.'+side]:
+            for b in groups['ForeArm.'+side]:
+                if (mesh.data.vertices[a].co-mesh.data.vertices[b].co).length < 1e-7:
+                    seam_pairs.append((a,b))
+    assert len(seam_pairs) == 8
+    report['max_elbow_seam_gap_m'] = 0
+    report['max_elbow_bend_degrees'] = 0
     for f in frames:
         coords = evaluate(f)
+        report['max_elbow_seam_gap_m'] = max(report['max_elbow_seam_gap_m'],
+            max((coords[a]-coords[b]).length for a,b in seam_pairs))
+        report['max_elbow_bend_degrees'] = max(report['max_elbow_bend_degrees'],
+            max(math.degrees(rig.pose.bones['ForeArm.'+side].rotation_quaternion.angle) for side in ['L','R']))
         low = min(v.z for v in coords)
         report['samples'] += 1
         report['min_floor_z_m'] = min(report['min_floor_z_m'],low)
@@ -100,6 +113,7 @@ def run(builder):
         'no_floor_penetration':report['min_floor_z_m']>=-1e-5,
         'ground_clearance':report['max_ground_gap_m']<.0005,
         'support_center_stable':report['support_center_y_drift_m']<.00005,
+        'straight_arms':report['max_elbow_bend_degrees']<.01 and report['max_elbow_seam_gap_m']<1e-6,
         'airborne':report['min_air_z_m']>0,
         'no_new_nonadjacent_overlap':not report['new_overlaps'],
         'camera_framing':all(min(b[:2])>.025 and max(b[2:])<.975 for b in report['camera_bounds'].values())}

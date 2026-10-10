@@ -798,11 +798,12 @@
     "end": 36,
     "fps": 30,
     "duration_seconds": 1.1666666666666667,
-    "review_note": "Combined Jump + Jump Land GIF study",
+    "review_note": "Jump + Jump Land GIF / straight arms",
     "phase_note": "F6 push / F23 contact / F25 absorb",
     "carrier_note": "Pose separate from preview arc/support",
     "status": "Blender-only / awaiting user review"
   },
   "backup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\jump_dungeons_gif_v004\\live_before_jump_gif_v004_20261010_142228.blend",
-  "status": "Blender only / awaiting user review / no runtime changes"
+  "status": "Blender only / awaiting user review / no runtime changes",
+  "straight_arms": true
 }

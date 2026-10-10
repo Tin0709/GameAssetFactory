@@ -8,17 +8,24 @@ choose a group, then a clip; Front/Back/Side/3/4 change the review camera.
 The current native full-arm character and resized/centered pistol, rifle and
 shotgun are assembled from the R14 pass2 source used for the production R15
 export. Existing upper-body Actions and lower-body NLA remain layered as
-authored. The latest additions are **Walk/Run + Jump LOOP V003**;
+authored. The latest addition is **Jump + Land / Dungeons GIF V004** with straight arms;
 **Walk / Rifle** and all earlier selections remain available.
 This is an animation library, not the Godot combat controller: runtime aiming,
 blends, automatic targeting and procedural turn limits are not simulated here.
 
-There are **59 selectable reviews**: 12 idle/walk/sprint weapon variants,
+There are **60 selectable reviews**: 12 idle/walk/sprint weapon variants,
 8 turning variants, 6 holster/draw slices, 18 armed combat strafe combinations,
 4 jump pose clips, the full jump journey, 4 short jump journey slices and the
 [flat-ground Jump Default V001](jump_default_v001/README.md), plus the new
 [Stationary / Walking / Running V002](jump_set_v002/README.md) from the user's
-three separate videos, and the [Walk/Run + Jump loops V003](jump_loop_v003/README.md).
+three separate videos, the [Walk/Run + Jump loops V003](jump_loop_v003/README.md),
+and [Jump + Jump Land GIF V004](jump_dungeons_gif_v004/README.md).
+V004 combines anticipation, airborne posing and landing/recovery, with both arms
+straight throughout as requested. Its two Actions keep pose separate from preview
+arc/support and preserve all 324 earlier Actions.
+The later user request activates V004 for all three movement states in WorldMap;
+[runtime composition and camera behavior](../../../../game_mobile_3d/assets/characters/jump_gif_v004/README.md)
+are reviewed separately from this neutral-to-neutral Blender preview.
 V003 keeps footwork moving through the air and joins position/tangents continuously;
 its previews show three cycles without holds. The previous three entries have individual scenes, phase markers
 and preview travel; their addition does not alter existing game animations. In
@@ -50,13 +57,15 @@ sidebar is missing. No global auto-execution/trust preference is changed.
 and exact review ranges/FPS. `verify_review.py` reopens and checks every
 selection and the source data, then renders `review_preview.png`. Sources
 and game assets are never saved over. Existing animation keys are not redesigned.
-The flat jump adds two Actions, V002 adds six, and V003 adds four
-(324 Actions total), in their own scenes at 30 FPS; old clips retain their FPS.
-The fresh-open audit covers all 59 selections, verifies evaluated ready
+The flat jump adds two Actions, V002 adds six, V003 adds four and V004 adds two
+(326 Actions total), in their own scenes at 30 FPS; old clips retain their FPS.
+The earlier fresh-open audit covers the 59 pre-V004 selections, verifies evaluated ready
 arm/carrier channels for all 18 armed strafes and vertical/horizontal travel in
 the jump journey slices. Additional rendered checks are `strafe_pistol_preview.png`,
 `strafe_shotgun_preview.png` and `jump_preview.png`. `additional_reviews.py` is
 used by both the original builder and the additive `extend_review.py` updater.
+V004 has its own live geometry, straight-arm seam, preservation and rendered-media
+checks in the linked guide; it has not been integrated into Godot.
 
 Sources:
 

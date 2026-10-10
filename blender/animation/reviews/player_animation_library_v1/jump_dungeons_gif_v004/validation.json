@@ -31,31 +31,33 @@
   },
   "camera_bounds": {
     "JGIF4_THREE_QUARTER": [
-      0.28441303968429565,
+      0.2819717824459076,
       0.21245118975639343,
-      0.7248382568359375,
+      0.7278860211372375,
       0.8617901802062988
     ],
     "JGIF4_SIDE": [
-      0.38727301359176636,
+      0.38787949085235596,
       0.1808699369430542,
-      0.7146264314651489,
+      0.7246143221855164,
       0.8485192656517029
     ],
     "JGIF4_FRONT": [
-      0.2990564703941345,
+      0.30054014921188354,
       0.1921442300081253,
-      0.7090018391609192,
+      0.7103139162063599,
       0.8613616228103638
     ],
     "JGIF4_BACK": [
-      0.29099833965301514,
+      0.28968629240989685,
       0.1826707124710083,
-      0.7009437084197998,
+      0.6994600296020508,
       0.8327423930168152
     ]
   },
   "preserved_actions": 324,
+  "max_elbow_seam_gap_m": 3.5762786865234375e-07,
+  "max_elbow_bend_degrees": 0,
   "changed_originals": [],
   "checks": {
     "old_data_preserved": true,
@@ -63,6 +65,7 @@
     "no_floor_penetration": true,
     "ground_clearance": true,
     "support_center_stable": true,
+    "straight_arms": true,
     "airborne": true,
     "no_new_nonadjacent_overlap": true,
     "camera_framing": true

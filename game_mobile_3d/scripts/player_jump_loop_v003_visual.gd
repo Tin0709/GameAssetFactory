@@ -44,6 +44,9 @@ func _process(delta: float) -> void:
 		if socket!=null:jump_arm_weight=move_toward(jump_arm_weight,0.0 if _preserve_grip() else 1.0,delta/.08)
 	super._process(delta)
 
+func _jump_bone_weight(_name:String,weight:float) -> float:
+	return weight
+
 func _evaluate(delta: float) -> void:
 	super._evaluate(delta)
 	if jump_blend<=0.0 or jump_pose==null or frozen:return
@@ -51,7 +54,7 @@ func _evaluate(delta: float) -> void:
 	var preserve_grip:=_preserve_grip()
 	var upper_heading:=_combat_bone_yaw(chest)
 	for name in ["Hips","Leg.L","Leg.R","Spine","Chest","Neck","Head","Arm.L","Arm.R","ForeArm.L","ForeArm.R"]:
-		var bone_weight:=weight
+		var bone_weight:=_jump_bone_weight(name,weight)
 		if name in ["Arm.L","Arm.R","ForeArm.L","ForeArm.R"]:bone_weight*=jump_arm_weight
 		if bone_weight<=0.0:continue
 		var bone:=skeleton.find_bone(name)

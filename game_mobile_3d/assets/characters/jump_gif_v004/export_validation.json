@@ -1,0 +1,17 @@
+{
+  "protected_sha256": {
+    "blender\\animation\\reviews\\player_animation_library_v1\\player_animation_library_v1.blend": "a8209172b085539a21d73f52c598b20eef8327484914987852f7f88ba06d9bff",
+    "game_mobile_3d\\assets\\characters\\jump_loop_v003\\player_r15_jump_loop_v003.glb": "1f8abf1ecf57c7b85fb6253af1a388d45a682061b2bdd8eef23c9772055cc469"
+  },
+  "output_sha256": "d5e9e136e17eb8d6795bcb915987e27ef6fe4971894611e25efb9962a1b9804e",
+  "preserved_old_clips": 42,
+  "new_clip": "Jump_DungeonsII_Combined_v004",
+  "samples": 141,
+  "tracks": 22,
+  "vertex_reconstruction_error_m": 6.404926830541839e-07,
+  "geometry_skin_uv_material_binary_unchanged": true,
+  "preview_carrier_exported": false,
+  "root_motion": false,
+  "straight_arms": true,
+  "artistic_status": "AWAITING HUMAN REVIEW"
+}

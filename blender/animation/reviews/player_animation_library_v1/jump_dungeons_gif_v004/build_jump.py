@@ -108,7 +108,8 @@ def animate_pose(rig, idle):
         rotations = {'Spine':(lean*.35,0,0), 'Chest':(lean*.65,twist,0),
             'Head':(head,-twist*.4,0), 'Leg.R':(right,0,0), 'Leg.L':(left,0,0),
             'UpperArm.R':(rp,0,rs), 'UpperArm.L':(lp,0,ls),
-            'ForeArm.R':(re,0,0), 'ForeArm.L':(le,0,0)}
+            # Latest user revision: rigid straight arms, swing only at shoulders.
+            'ForeArm.R':(0,0,0), 'ForeArm.L':(0,0,0)}
         for name, angles in rotations.items():
             bone = rig.pose.bones[name]
             bone.location = idle[name]['location']
@@ -300,6 +301,7 @@ def build():
                 'travel_action':carrier.animation_data.action.name,'cameras':cameras,'markers':markers,
                 'take':TAKE,'contact':CONTACT,'end':END,'height_m':HEIGHT,'fps':30,'support':support,
                 'old_actions':len(baseline['actions']),'old_catalog':old_catalog,'entry':entry,
-                'backup':str(backup),'status':'Blender only / awaiting user review / no runtime changes'}
+                'backup':str(backup),'straight_arms':True,
+                'status':'Blender only / awaiting user review / no runtime changes'}
     (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2))
     return {k:manifest[k] for k in ['scene','pose_action','old_actions','take','contact','end','backup']}

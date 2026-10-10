@@ -1,0 +1,43 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/player_jump_gif_v004_controller.gd" id="1_player"]
+[ext_resource type="Script" path="res://scripts/player_jump_gif_v004_visual.gd" id="2_animation"]
+[ext_resource type="PackedScene" path="res://assets/characters/jump_gif_v004/player_r15_jump_gif_v004.glb" id="3_model"]
+[ext_resource type="Script" path="res://scripts/auto_pistol.gd" id="4_pistol"]
+
+[ext_resource type="Script" path="res://scripts/animation_weapon_debug.gd" id="5_debug"]
+[ext_resource type="Script" path="res://scripts/weapon_behavior.gd" id="6_behavior"]
+
+[sub_resource type="CapsuleShape3D" id="BodyShape"]
+radius = 0.30
+height = 1.80
+
+[node name="CuboidPlayer" type="CharacterBody3D" groups=["player"]]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_player")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("BodyShape")
+
+[node name="Visual" type="Node3D" parent="."]
+script = ExtResource("2_animation")
+animation_prefix = "Player"
+authored_locomotion = true
+generic_weapon_carry = true
+long_gun_carry_v2 = true
+
+[node name="Model" parent="Visual" instance=ExtResource("3_model")]
+
+[node name="Pistol" type="Node3D" parent="."]
+script = ExtResource("4_pistol")
+
+[node name="WeaponDebug" type="Node" parent="."]
+script = ExtResource("5_debug")
+
+[node name="WeaponBehavior" type="Node" parent="."]
+script = ExtResource("6_behavior")
+
+
+

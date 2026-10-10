@@ -1,0 +1,13 @@
+{
+  "file": "jump_land_1x.mp4",
+  "sha256": "68c2c3852ff62d2e376911106a364b482f905e6be0e529244d6448fa10358bff",
+  "decoded_frames": 108,
+  "fps": 30.0,
+  "size": [
+    1280,
+    736
+  ],
+  "duration_seconds": 3.6,
+  "blender_only": true,
+  "straight_arms": true
+}

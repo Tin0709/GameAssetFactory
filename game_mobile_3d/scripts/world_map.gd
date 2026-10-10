@@ -2,7 +2,7 @@ extends Node3D
 ## Authored schematic layout; visual optimization never changes the source cells.
 const DATA := "res://assets/maps/world_map/runtime.json"
 const CAMERA_OFFSET := Vector3(12,15,16)
-const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpLoopV003.tscn")
+const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 var runtime: Dictionary
 var geometry
 var columns: Dictionary = {}
@@ -13,6 +13,7 @@ var view_mode := "gameplay"
 var build_msec := 0
 var border_bodies: Array[StaticBody3D] = []
 var look
+var _camera_ground_y := NAN
 @onready var player: CharacterBody3D = $Actors/Player
 
 func _enter_tree() -> void:
@@ -61,7 +62,7 @@ func _ready() -> void:
 	look=load("res://scripts/world_map_look.gd").new()
 	look.name="ReferenceLook"
 	add_child(look);look.setup(self)
-	$HUD/Help.text="WORLD MAP · JUMP V003\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu"
+	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -149,16 +150,24 @@ func reset_player() -> void:
 	if player.is_dead:
 		get_tree().call_deferred("reload_current_scene");return
 	player.position=spawn_position
+	_camera_ground_y=spawn_position.y
 	player.velocity=Vector3.ZERO
 	if player.has_method("cancel_jump"):player.cancel_jump()
 
 func _physics_process(_delta: float) -> void:
 	if map_ready and player.position.y<float(runtime.border.min[1])-1.0:reset_player()
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not map_ready:return
+	if not is_finite(_camera_ground_y):_camera_ground_y=player.global_position.y
+	# Hold the last supported elevation through the jump. Horizontal tracking
+	# remains exact; a different landing elevation settles without a camera pop.
+	var jumping:bool=player.get("jump_active")==true
+	var landed:bool=player.get("_landed")==true
+	if (player.is_on_floor() or player.smooth_step_active) and (not jumping or landed):
+		_camera_ground_y=lerpf(_camera_ground_y,player.global_position.y,1.0-exp(-delta/.16))
 	if view_mode=="gameplay":
-		$Camera3D.position=player.global_position+CAMERA_OFFSET
+		$Camera3D.position=Vector3(player.global_position.x,_camera_ground_y,player.global_position.z)+CAMERA_OFFSET
 		geometry.update_cutaway(player.global_position,$Camera3D.global_position)
 
 func set_review_view(mode: String) -> void:
@@ -167,7 +176,7 @@ func set_review_view(mode: String) -> void:
 	if mode=="gameplay":
 		camera.size=14.5;camera.far=72.0
 		camera.rotation_degrees=Vector3(-36.315886,36.869898,0)
-		camera.position=player.position+CAMERA_OFFSET
+		camera.position=Vector3(player.global_position.x,_camera_ground_y,player.global_position.z)+CAMERA_OFFSET
 	else:
 		camera.far=300.0;camera.size=150.0
 		camera.position=Vector3(-8.5,140,-1)

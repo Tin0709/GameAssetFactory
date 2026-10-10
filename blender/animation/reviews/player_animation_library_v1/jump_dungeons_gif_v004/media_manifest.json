@@ -1,0 +1,13 @@
+{
+  "file": "jump_land_1x.mp4",
+  "fps": 30,
+  "frames": 108,
+  "size": [
+    1280,
+    736
+  ],
+  "source_frames_per_jump": 36,
+  "repeats": 3,
+  "kind": "Blender-only sequential renders, no Godot footage",
+  "reference_metadata": "references/references.json"
+}

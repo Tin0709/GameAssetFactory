@@ -8,7 +8,7 @@
   },
   "source_action_count": 306,
   "retained_source_actions": 312,
-  "catalog_entries": 59,
+  "catalog_entries": 60,
   "catalog": [
     {
       "id": "0",
@@ -756,6 +756,23 @@
       "phase_note": "Loop 0.867 s / 3 continuous cycles",
       "carrier_note": "No pause / Root travel = preview only",
       "status": "Loop pose/tangents checked; pending visual review and future runtime phase integration"
+    },
+    {
+      "id": "jump_dungeons_gif_v004",
+      "label": "Jump + Land / Dungeons GIF V004",
+      "group": "Jump (study only)",
+      "scene": "JGIF4_JUMP_LAND_REVIEW",
+      "review_rig": "JGIF4_Player_Rig",
+      "review_carrier": "JGIF4_PREVIEW_ONLY_Carrier",
+      "action": "Jump_DungeonsII_Combined_v004",
+      "start": 1,
+      "end": 36,
+      "fps": 30,
+      "duration_seconds": 1.1666666666666667,
+      "review_note": "Jump + Jump Land GIF / straight arms",
+      "phase_note": "F6 push / F23 contact / F25 absorb",
+      "carrier_note": "Pose separate from preview arc/support",
+      "status": "Blender-only / awaiting user review"
     }
   ],
   "source_action_hashes": {
@@ -1508,10 +1525,10 @@
   },
   "gameplay_unchanged": true,
   "runtime_transition_rate": 5.25,
-  "scope": "Blender review only; 312 prior Actions unchanged; adds flat-jump pose and separate preview-carrier Actions; no game integration",
+  "scope": "Blender review library; all 324 pre-V004 Actions unchanged; V004 adds pose and separate preview support/arc; no V004 game integration",
   "jump_default_v001": "jump_default_v001/manifest.json",
-  "default_review": "jump_run_loop_v003",
-  "total_actions": 324,
+  "default_review": "jump_dungeons_gif_v004",
+  "total_actions": 326,
   "jump_set_v002": {
     "manifest": "jump_set_v002/manifest.json",
     "cases": [
@@ -1526,5 +1543,10 @@
     "manifest": "jump_loop_v003/manifest.json",
     "preserved_previous_actions": 320,
     "runtime_integrated": false
+  },
+  "jump_dungeons_gif_v004": {
+    "manifest": "jump_dungeons_gif_v004/manifest.json",
+    "scope": "Combined GIF Jump + Land / straight arms / Blender only",
+    "validation": "jump_dungeons_gif_v004/validation.json"
   }
 }
