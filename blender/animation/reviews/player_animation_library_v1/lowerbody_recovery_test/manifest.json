@@ -1,0 +1,24 @@
+{
+  "action": "LowerBody_Recovery_Test",
+  "frames": [
+    1,
+    48
+  ],
+  "fps": 30,
+  "rig_changes": [],
+  "scene": "LOWERBODY_RECOVERY_REVIEW",
+  "source": {
+    "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\run_expressive_test\\run_expressive_review.blend",
+    "actions": 328,
+    "files": {
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\run_expressive_test\\run_expressive_review.blend": "721875d67a2d6f88c195f7c8468c025a0fec2517294edc2435d22a2fa43d0218",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\expressive_arm_motion_test\\expressive_arm_motion_review.blend": "86da6b8822de3b9155da32a58acaabd592a3a3c929bb87d1a1d464be9989cf4a",
+      "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\player_animation_library_v1.blend": "a8209172b085539a21d73f52c598b20eef8327484914987852f7f88ba06d9bff"
+    },
+    "disk_backup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\lowerbody_recovery_test\\approved_run_disk_before_test.blend",
+    "live_backup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\lowerbody_recovery_test\\live_before_test.blend"
+  },
+  "status": "Arm and run exploratory steps explicitly approved; lower-body test pending review",
+  "support": "L planted throughout; R unloaded/replanted F7-13; both feet supported during absorption/recovery",
+  "root_motion": false
+}

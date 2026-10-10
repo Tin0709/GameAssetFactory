@@ -1,0 +1,57 @@
+{
+  "lowerbody_recovery_1x": {
+    "frames": 48,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 1.6,
+    "sha256": "69f4a61935bcd98f4190ad8360df568d444d4246683ca8686b84df264e0e3154",
+    "max_mean_rgb_error": 1.3154641389846802
+  },
+  "front_1x": {
+    "frames": 48,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.6,
+    "sha256": "00f6b7154fffaed0f5fadd48f3094a76161c5236ada4cf3805225ce43bbfbd6e",
+    "max_mean_rgb_error": null
+  },
+  "three_quarter_1x": {
+    "frames": 48,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.6,
+    "sha256": "2c9f852d6abbcd00d932f7f10c670943b5ef3bb1eaccd14443225f1e385d0779",
+    "max_mean_rgb_error": null
+  },
+  "side_1x": {
+    "frames": 48,
+    "fps": 30.0,
+    "size": [
+      640,
+      640
+    ],
+    "duration_s": 1.6,
+    "sha256": "160343a9b36081230e246adc32ae037d57831ce0af6c8abee0db5d099f1d41c4",
+    "max_mean_rgb_error": null
+  },
+  "lowerbody_recovery_review": {
+    "frames": 189,
+    "fps": 30.0,
+    "size": [
+      1920,
+      720
+    ],
+    "duration_s": 6.3,
+    "sha256": "349384d5fc55dce755357dbbd7e8771dfa04b2a67e9fca8ad61564b62cf0370e",
+    "max_mean_rgb_error": null
+  }
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "file": "tech_rig_sample.png",
+    "url": "https://player.vimeo.com/video/1114051076?app_id=122963&dnt=1",
+    "media": [
+      {
+        "duration": 93.533337,
+        "paused": true,
+        "readyState": 4,
+        "time": 11.557841
+      }
+    ]
+  },
+  {
+    "file": "howling_pose_sample.png",
+    "url": "https://player.vimeo.com/video/593926976?app_id=122963&dnt=1&h=ac85e63e8b",
+    "media": [
+      {
+        "duration": 68.99999799999998,
+        "paused": true,
+        "readyState": 4,
+        "time": 25.360962
+      }
+    ]
+  },
+  {
+    "file": "echoing_pose_sample.png",
+    "url": "https://player.vimeo.com/video/593933829?app_id=122963&dnt=1&h=0cc38bb8a6",
+    "media": [
+      {
+        "duration": 108.08332999999996,
+        "paused": true,
+        "readyState": 4,
+        "time": 45.103786
+      }
+    ]
+  },
+  {
+    "file": "jungle_gameplay_sample.png",
+    "url": "https://player.vimeo.com/video/593916205?app_id=122963&dnt=1&h=06bd3a92e8",
+    "media": [
+      {
+        "duration": 42.175999,
+        "paused": true,
+        "readyState": 4,
+        "time": 11.897735
+      }
+    ]
+  },
+  {
+    "file": "trailer_gameplay_sample.png",
+    "url": "https://www.youtube.com/watch?v=vBNE3bKMpu8&themeRefresh=1",
+    "media": [
+      {
+        "duration": 94.281,
+        "paused": true,
+        "readyState": 4,
+        "time": 48.7191
+      }
+    ]
+  },
+  {
+    "file": "trailer_38s.png",
+    "url": "https://www.youtube.com/watch?v=vBNE3bKMpu8&themeRefresh=1",
+    "media": [
+      {
+        "duration": 94.281,
+        "paused": true,
+        "readyState": 4,
+        "time": 38.7191
+      }
+    ]
+  },
+  {
+    "file": "jungle_pose_sample.png",
+    "url": "https://player.vimeo.com/video/593916205?app_id=122963&dnt=1&h=06bd3a92e8",
+    "media": [
+      {
+        "duration": 42.175999,
+        "paused": true,
+        "readyState": 4,
+        "time": 21.958333
+      }
+    ]
+  },
+  {
+    "file": "trailer_28s.png",
+    "url": "https://www.youtube.com/watch?v=vBNE3bKMpu8&themeRefresh=1",
+    "media": [
+      {
+        "duration": 94.281,
+        "paused": true,
+        "readyState": 4,
+        "time": 28.719099
+      }
+    ]
+  }
+]

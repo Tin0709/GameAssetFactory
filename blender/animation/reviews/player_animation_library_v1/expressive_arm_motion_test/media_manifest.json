@@ -1,0 +1,18 @@
+{
+  "views": [
+    "front",
+    "three_quarter"
+  ],
+  "source_frames_each": 24,
+  "fps": 30,
+  "mp4_frames": 72,
+  "repeats": 3,
+  "clip_seconds": 2.4,
+  "action_key_span_seconds": 0.7666666666666667,
+  "encoded_one_pass_seconds": 0.8,
+  "size": [
+    1280,
+    720
+  ],
+  "kind": "Actual Blender Cycles renders; no runtime integration"
+}

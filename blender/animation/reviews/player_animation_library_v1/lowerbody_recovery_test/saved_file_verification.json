@@ -1,0 +1,50 @@
+{
+  "samples": 753,
+  "rig_changes": [],
+  "max_rigid_distance_error_m": 2.344013284583113e-07,
+  "min_sole_z_m": 0.0003962665796279907,
+  "max_support_height_error_m": 0.00048738718032836914,
+  "max_contact_corner_xy_error_m": 1.2091959484083356e-05,
+  "max_leg_local_translation_m": 0.14904697201306844,
+  "overlaps": {},
+  "camera_bounds": {
+    "FRONT": [
+      0.2494271844625473,
+      0.1619185507297516,
+      0.7303735017776489,
+      0.8153427839279175
+    ],
+    "THREE_QUARTER": [
+      0.22145897150039673,
+      0.16063331067562103,
+      0.7301861643791199,
+      0.8225841522216797
+    ],
+    "SIDE": [
+      0.31971970200538635,
+      0.1530352234840393,
+      0.628332793712616,
+      0.8181611895561218
+    ]
+  },
+  "unsupported_samples": 0,
+  "hip_height_range_m": [
+    0.5479999780654907,
+    0.6850000023841858
+  ],
+  "hip_compression_from_ready_m": 0.1260000467300415,
+  "hip_lateral_range_m": [
+    -0.03999999910593033,
+    0.04800000041723251
+  ],
+  "maximum_adjacent_sample_displacement_m": 0.008059906647490745,
+  "old_actions": 328,
+  "actions_now": 329,
+  "changed_originals": [],
+  "source_files_unchanged": true,
+  "same_mesh": true,
+  "same_rest": true,
+  "no_scale_tracks": true,
+  "root_static": true,
+  "verified_saved_file": true
+}

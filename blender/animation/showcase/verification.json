@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "actions": [
+    "Expressive_Arm_Motion_Test",
+    "Run_Expressive_Test",
+    "LowerBody_Recovery_Test"
+  ],
+  "selection_switches": 18,
+  "max_source_vertex_error_m": 0,
+  "sources_and_godot_unchanged": true,
+  "automatic_addon_registration": true,
+  "autoexec_unchanged": true,
+  "version": "5.2.2 LTS"
+}

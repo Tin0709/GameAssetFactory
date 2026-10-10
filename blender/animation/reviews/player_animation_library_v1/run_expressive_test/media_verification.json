@@ -1,0 +1,10 @@
+{
+  "decoded_frames": 108,
+  "fps": 30.0,
+  "max_mean_absolute_pixel_error": 1.37641179561615,
+  "all_108_source_frames_present": true,
+  "size": [
+    1920,
+    720
+  ]
+}

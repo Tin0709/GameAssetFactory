@@ -1,0 +1,46 @@
+{
+  "action": "Run_Expressive_Test",
+  "scene": "RUN_EXPRESSIVE_REVIEW",
+  "period_frames": 18,
+  "closing_frame": 19,
+  "fps": 30,
+  "duty_each_leg": 0.34,
+  "diagnostic_speed_m_s": 2.900075496405382,
+  "source": {
+    "backup": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\run_expressive_test\\live_before_run.blend",
+    "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\expressive_arm_motion_test\\expressive_arm_motion_review.blend",
+    "sha256": "86da6b8822de3b9155da32a58acaabd592a3a3c929bb87d1a1d464be9989cf4a",
+    "actions": 327,
+    "baseline_rig_nla": [
+      [
+        "UNCHANGED GAIT CLOCK / SOURCE POSES",
+        [
+          [
+            "PREVIEW_ONLY_R9W4_Sprint_LOWER",
+            "REPLACE"
+          ]
+        ]
+      ]
+    ]
+  },
+  "rig_changes": [],
+  "status": "Run test pending user review; arm proof explicitly approved",
+  "lower_body": "Rigid whole-leg support rotation plus bounded translation into torso; no knee/ankle or scale changes",
+  "file": "run_expressive_review.blend",
+  "actions_total": 328,
+  "previous_actions_preserved": 327,
+  "swing_leg_angles_deg": [
+    -58,
+    46
+  ],
+  "support_leg_angles_deg": [
+    25,
+    -25
+  ],
+  "support_margin_m": 0.0004,
+  "sample_interval_frames": 0.125,
+  "loop_interpolation": "periodic Bezier with matching endpoint tangents",
+  "approved_reference": "Expressive_Arm_Motion_Test approved by user as proof of capability",
+  "run_status": "pending user review",
+  "blend_sha256": "721875d67a2d6f88c195f7c8468c025a0fec2517294edc2435d22a2fa43d0218"
+}

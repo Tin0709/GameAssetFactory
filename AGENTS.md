@@ -1,5 +1,7 @@
 # Project guidance
 
+- Central animation review workspace: `blender/animation/showcase/Animation_Showcase.blend`. Read its `README.md` and `docs/animation/ANIMATION_WORKFLOW.md` before future animation work. Register new compatible tests as **pending**, refresh/save the library, and mark approved only after explicit user confirmation. Preserve independent Actions, original Blender 5.2 slots, production rigs/sources and Godot. Never bulk-import legacy Actions. Arm Motion, Run Expressive and LowerBody Recovery are explicitly approved exploratory references. Finish the viewer for review before beginning Jump Takeoff; do not infer permission to start it from viewer completion.
+
 - Before graphics, environment, camera, material, character, animation, VFX or mobile-performance work, read `docs/graphics/ART_DIRECTION.md` and the relevant sections of `docs/graphics/RESEARCH.md`. Follow their links to existing asset guides; do not duplicate the research into new reports.
 - Inspect current `game_mobile_3d/project.godot`, scene resources and script inheritance. Older reports can describe superseded scenes/assets. Distinguish user-approved decisions, proposals, source observations and measured results; only explicit user confirmation establishes artistic approval.
 - Preserve selected character proportions/full arms and hands, original Blender sources, and the established grass/no-fog decisions unless the user changes them. Keep experiments scene-local; research completion does not authorize wholesale renderer/architecture changes.

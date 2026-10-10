@@ -1,0 +1,52 @@
+{
+  "samples": 185,
+  "max_segment_distance_error_m": 2.4166705736572425e-07,
+  "max_elbow_seam_gap_m": 2.6656007498500226e-07,
+  "max_foot_drift_m": 0,
+  "camera_bounds": {
+    "FRONT": [
+      0.16456063091754913,
+      0.1365145593881607,
+      0.812806248664856,
+      0.8437364101409912
+    ],
+    "THREE_QUARTER": [
+      0.1323932409286499,
+      0.13166794180870056,
+      0.8281858563423157,
+      0.8522664308547974
+    ]
+  },
+  "neutral_return_error_m": 0.0,
+  "changed_originals": [
+    [
+      "images",
+      "M4A1_Original_Atlas_64.001"
+    ],
+    [
+      "images",
+      "M4A1_Original_Atlas_64.002"
+    ],
+    [
+      "images",
+      "Player_Cuboid_V5_Face_Atlas_64.001"
+    ]
+  ],
+  "verified_image_path_rebases_only": [
+    "M4A1_Original_Atlas_64.001",
+    "M4A1_Original_Atlas_64.002",
+    "Player_Cuboid_V5_Face_Atlas_64.001"
+  ],
+  "unexpected_original_changes": [],
+  "original_library_hash_unchanged": true,
+  "old_action_count": 326,
+  "total_actions": 327,
+  "same_mesh_datablock": true,
+  "same_rest_matrices": true,
+  "no_nla_or_drivers": true,
+  "action_range": [
+    1.0,
+    24.0
+  ],
+  "fresh_saved_file_verified": true
+}

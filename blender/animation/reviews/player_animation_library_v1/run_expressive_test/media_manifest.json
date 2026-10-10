@@ -1,0 +1,18 @@
+{
+  "video": "run_expressive_1x.mp4",
+  "views": [
+    "front",
+    "three_quarter",
+    "side"
+  ],
+  "size": [
+    1920,
+    720
+  ],
+  "fps": 30,
+  "frames": 108,
+  "cycles": 6,
+  "period_frames": 18,
+  "closing_frame_19_excluded": true,
+  "kind": "Actual sequential Blender renders; no Godot integration"
+}

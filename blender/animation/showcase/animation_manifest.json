@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "title": "GameAssetFactory Animation Library",
+  "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+  "actor_rig": "Showcase_Player_Rig",
+  "actor_mesh": "Showcase_Player_Mesh",
+  "animations": [
+    {
+      "action": "Expressive_Arm_Motion_Test",
+      "source": "blender/animation/reviews/player_animation_library_v1/expressive_arm_motion_test/expressive_arm_motion_review.blend",
+      "source_sha256": "86da6b8822de3b9155da32a58acaabd592a3a3c929bb87d1a1d464be9989cf4a",
+      "source_rig": "EAM_Player_Rig",
+      "source_mesh": "EAM_Player_Mesh",
+      "source_armature": "EAM_Unmodified_RestRig",
+      "slot_identifier": "OBEAM_Player_Rig",
+      "action_sha256": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+      "action_frame_range": [
+        1.0,
+        24.0
+      ],
+      "start": 1,
+      "end": 24,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "approved",
+      "approval_note": "Explicit user approval in the 2026-10-10 viewer/takeoff request; exploratory test only.",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      }
+    },
+    {
+      "action": "Run_Expressive_Test",
+      "source": "blender/animation/reviews/player_animation_library_v1/run_expressive_test/run_expressive_review.blend",
+      "source_sha256": "721875d67a2d6f88c195f7c8468c025a0fec2517294edc2435d22a2fa43d0218",
+      "source_rig": "RUN_Test_Rig",
+      "source_mesh": "RUN_Test_Mesh",
+      "source_armature": "RUN_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1",
+      "action_frame_range": [
+        1.0,
+        19.0
+      ],
+      "start": 1,
+      "end": 18,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "approved",
+      "approval_note": "Explicit user approval in the 2026-10-10 viewer/takeoff request; exploratory test only.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      }
+    },
+    {
+      "action": "LowerBody_Recovery_Test",
+      "source": "blender/animation/reviews/player_animation_library_v1/lowerbody_recovery_test/lowerbody_recovery_review.blend",
+      "source_sha256": "75f7855cd3b05481aed6326a4ee534ee9960da9e3f886a466db8b25204d3daf8",
+      "source_rig": "LB_Test_Rig",
+      "source_mesh": "LB_Test_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBLB_Test_Rig",
+      "action_sha256": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+      "action_frame_range": [
+        1.0,
+        48.0
+      ],
+      "start": 1,
+      "end": 48,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "approved",
+      "approval_note": "Explicit user approval in the 2026-10-10 viewer/takeoff request; exploratory test only.",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      }
+    }
+  ],
+  "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
+  "rotation_modes": {
+    "Root": "XYZ",
+    "Hips": "XYZ",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "XYZ",
+    "Leg.R": "XYZ"
+  }
+}

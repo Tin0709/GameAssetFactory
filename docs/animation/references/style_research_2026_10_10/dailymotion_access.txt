@@ -1,0 +1,5 @@
+2026-10-10 Asia/Saigon
+URL: https://www.dailymotion.com/video/xbfhi7u
+Initial browser player and post-reload AX state both reported: Unable to play media.
+Post-reload page also displayed Join Dailymotion sign-in overlay.
+No gameplay pixels or timestamps from this recording were analyzed.

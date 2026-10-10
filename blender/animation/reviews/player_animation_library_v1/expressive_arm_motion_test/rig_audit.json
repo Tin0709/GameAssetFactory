@@ -1,0 +1,282 @@
+{
+  "actions": 326,
+  "mesh": "R8A1_Articulated_Block_Mesh.199",
+  "verts": 64,
+  "rig_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "parent": "JD1_PREVIEW_ONLY_Carrier",
+  "bones": [
+    {
+      "name": "Root",
+      "parent": null,
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        0.16874998807907104
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "Hips",
+      "parent": "Root",
+      "head": [
+        0.0,
+        0.0,
+        0.6749999523162842
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        0.7874999642372131
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "Spine",
+      "parent": "Hips",
+      "head": [
+        0.0,
+        0.0,
+        0.7874999642372131
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.068750023841858
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "Chest",
+      "parent": "Spine",
+      "head": [
+        0.0,
+        0.0,
+        1.068750023841858
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.3499999046325684
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "Neck",
+      "parent": "Chest",
+      "head": [
+        0.0,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.40625
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "Head",
+      "parent": "Neck",
+      "head": [
+        0.0,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.7999999523162842
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "UpperArm.L",
+      "parent": "Chest",
+      "head": [
+        0.3374999761581421,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "ForeArm.L",
+      "parent": "UpperArm.L",
+      "head": [
+        0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "tail": [
+        0.3374999761581421,
+        0.0,
+        0.675000011920929
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "UpperArm.R",
+      "parent": "Chest",
+      "head": [
+        -0.3374999761581421,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        -0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "ForeArm.R",
+      "parent": "UpperArm.R",
+      "head": [
+        -0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "tail": [
+        -0.3374999761581421,
+        0.0,
+        0.675000011920929
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "WeaponCarrier",
+      "parent": "Chest",
+      "head": [
+        -0.09206697344779968,
+        -0.4564836323261261,
+        0.9688228368759155
+      ],
+      "tail": [
+        -0.10446855425834656,
+        -0.6338344812393188,
+        0.9406645894050598
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "Leg.L",
+      "parent": "Hips",
+      "head": [
+        0.11249999701976776,
+        0.0,
+        0.6749999523162842
+      ],
+      "tail": [
+        0.11249999701976776,
+        0.0,
+        0.0
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "Leg.R",
+      "parent": "Hips",
+      "head": [
+        -0.11249999701976776,
+        0.0,
+        0.6749999523162842
+      ],
+      "tail": [
+        -0.11249999701976776,
+        0.0,
+        0.0
+      ],
+      "constraints": [],
+      "locks": [
+        false,
+        false,
+        false
+      ]
+    }
+  ],
+  "weights": {
+    "non_unit_or_multiple": 0
+  },
+  "modifiers": [
+    [
+      "ARMATURE",
+      "JD1_Player_Rig"
+    ]
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "online_url": "https://minecraft.wiki/w/File:Player_Jump_Land_(Dungeons_II).gif",
+  "online_sha256": "50b4b82537a4ffdf91ec5e2d5ef616dbef6ca7ec0db3201172ab9016cf85ffca",
+  "local_sha256": "76afcb91f3f5a7e82c7faad7d7c24993dbe030e61d93e33856b6bece84514cbb",
+  "frame_count_equal": true,
+  "frames": [
+    {
+      "frame": 0,
+      "rgba_equal": false,
+      "alpha_equal": true,
+      "visible_rgb_equal": true,
+      "delay_equal": true
+    },
+    {
+      "frame": 1,
+      "rgba_equal": false,
+      "alpha_equal": true,
+      "visible_rgb_equal": true,
+      "delay_equal": true
+    },
+    {
+      "frame": 2,
+      "rgba_equal": false,
+      "alpha_equal": true,
+      "visible_rgb_equal": true,
+      "delay_equal": true
+    },
+    {
+      "frame": 3,
+      "rgba_equal": false,
+      "alpha_equal": true,
+      "visible_rgb_equal": true,
+      "delay_equal": true
+    },
+    {
+      "frame": 4,
+      "rgba_equal": false,
+      "alpha_equal": true,
+      "visible_rgb_equal": true,
+      "delay_equal": true
+    },
+    {
+      "frame": 5,
+      "rgba_equal": false,
+      "alpha_equal": true,
+      "visible_rgb_equal": true,
+      "delay_equal": true
+    },
+    {
+      "frame": 6,
+      "rgba_equal": false,
+      "alpha_equal": true,
+      "visible_rgb_equal": true,
+      "delay_equal": true
+    },
+    {
+      "frame": 7,
+      "rgba_equal": false,
+      "alpha_equal": true,
+      "visible_rgb_equal": true,
+      "delay_equal": true
+    }
+  ]
+}

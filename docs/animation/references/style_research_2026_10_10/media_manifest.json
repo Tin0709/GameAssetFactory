@@ -1,0 +1,243 @@
+[
+  {
+    "id": "Player_Jump_(Dungeons_II)",
+    "path": "blender/animation/reviews/player_animation_library_v1/jump_dungeons_gif_v004/references/Player_Jump_(Dungeons_II).gif",
+    "sha256": "43948585444626346368812c9a3b3366e0476ad2455ceb3d47b80def133b0d84",
+    "frames": [
+      {
+        "frame": 0,
+        "start_ms": 0,
+        "duration_ms": 40
+      },
+      {
+        "frame": 1,
+        "start_ms": 40,
+        "duration_ms": 40
+      },
+      {
+        "frame": 2,
+        "start_ms": 80,
+        "duration_ms": 50
+      },
+      {
+        "frame": 3,
+        "start_ms": 130,
+        "duration_ms": 40
+      },
+      {
+        "frame": 4,
+        "start_ms": 170,
+        "duration_ms": 40
+      },
+      {
+        "frame": 5,
+        "start_ms": 210,
+        "duration_ms": 40
+      },
+      {
+        "frame": 6,
+        "start_ms": 250,
+        "duration_ms": 40
+      },
+      {
+        "frame": 7,
+        "start_ms": 290,
+        "duration_ms": 40
+      },
+      {
+        "frame": 8,
+        "start_ms": 330,
+        "duration_ms": 50
+      },
+      {
+        "frame": 9,
+        "start_ms": 380,
+        "duration_ms": 40
+      },
+      {
+        "frame": 10,
+        "start_ms": 420,
+        "duration_ms": 40
+      },
+      {
+        "frame": 11,
+        "start_ms": 460,
+        "duration_ms": 40
+      },
+      {
+        "frame": 12,
+        "start_ms": 500,
+        "duration_ms": 40
+      }
+    ],
+    "duration_ms": 540,
+    "sheet": "Player_Jump_(Dungeons_II).jpg",
+    "provenance": "Existing user-provided GIF; filename identifies Dungeons II; original web URL not recorded."
+  },
+  {
+    "id": "Player_Jump_Land_(Dungeons_II)",
+    "path": "blender/animation/reviews/player_animation_library_v1/jump_dungeons_gif_v004/references/Player_Jump_Land_(Dungeons_II).gif",
+    "sha256": "76afcb91f3f5a7e82c7faad7d7c24993dbe030e61d93e33856b6bece84514cbb",
+    "frames": [
+      {
+        "frame": 0,
+        "start_ms": 0,
+        "duration_ms": 40
+      },
+      {
+        "frame": 1,
+        "start_ms": 40,
+        "duration_ms": 40
+      },
+      {
+        "frame": 2,
+        "start_ms": 80,
+        "duration_ms": 50
+      },
+      {
+        "frame": 3,
+        "start_ms": 130,
+        "duration_ms": 40
+      },
+      {
+        "frame": 4,
+        "start_ms": 170,
+        "duration_ms": 40
+      },
+      {
+        "frame": 5,
+        "start_ms": 210,
+        "duration_ms": 40
+      },
+      {
+        "frame": 6,
+        "start_ms": 250,
+        "duration_ms": 40
+      },
+      {
+        "frame": 7,
+        "start_ms": 290,
+        "duration_ms": 130
+      }
+    ],
+    "duration_ms": 420,
+    "sheet": "Player_Jump_Land_(Dungeons_II).jpg",
+    "provenance": "Existing user-provided GIF; filename identifies Dungeons II; original web URL not recorded."
+  },
+  {
+    "id": "stationary",
+    "path": "blender/animation/reviews/player_animation_library_v1/jump_set_v002/references/stationary/source.mp4",
+    "sha256": "fa245c718916084e963a0706e937a0c52d7d2189eed9d1eefb38da7eebf05d23",
+    "fps": 30.0,
+    "decoded_frames": 322,
+    "duration_s": 10.733333333333333,
+    "sampled_frames": [
+      0,
+      15,
+      30,
+      45,
+      60,
+      75,
+      90,
+      105,
+      120,
+      135,
+      150,
+      165,
+      180,
+      195,
+      210,
+      225,
+      240,
+      255,
+      270,
+      285,
+      300,
+      315
+    ],
+    "sheet": "stationary_overview.jpg",
+    "provenance": "Existing user screen recording; original web URL/build not recorded. Identity must be judged from pixels, not earlier study conclusions."
+  },
+  {
+    "id": "walk",
+    "path": "blender/animation/reviews/player_animation_library_v1/jump_set_v002/references/walk/source.mp4",
+    "sha256": "ac92296d9514c24297bf9f693d25357904d948c79b5d93d910143e3dcc25fab8",
+    "fps": 30.0,
+    "decoded_frames": 489,
+    "duration_s": 16.3,
+    "sampled_frames": [
+      0,
+      15,
+      30,
+      45,
+      60,
+      75,
+      90,
+      105,
+      120,
+      135,
+      150,
+      165,
+      180,
+      195,
+      210,
+      225,
+      240,
+      255,
+      270,
+      285,
+      300,
+      315,
+      330,
+      345,
+      360,
+      375,
+      390,
+      405,
+      420,
+      435,
+      450,
+      465,
+      480
+    ],
+    "sheet": "walk_overview.jpg",
+    "provenance": "Existing user screen recording; original web URL/build not recorded. Identity must be judged from pixels, not earlier study conclusions."
+  },
+  {
+    "id": "run",
+    "path": "blender/animation/reviews/player_animation_library_v1/jump_set_v002/references/run/source.mp4",
+    "sha256": "be15cab70b485e1453a898454a46cb133938747e01fc1d8fbf2516c17822c6db",
+    "fps": 30.0,
+    "decoded_frames": 375,
+    "duration_s": 12.5,
+    "sampled_frames": [
+      0,
+      15,
+      30,
+      45,
+      60,
+      75,
+      90,
+      105,
+      120,
+      135,
+      150,
+      165,
+      180,
+      195,
+      210,
+      225,
+      240,
+      255,
+      270,
+      285,
+      300,
+      315,
+      330,
+      345,
+      360
+    ],
+    "sheet": "run_overview.jpg",
+    "provenance": "Existing user screen recording; original web URL/build not recorded. Identity must be judged from pixels, not earlier study conclusions."
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "duplicate_rejected": true,
+  "changed_source_rejected": true,
+  "missing_action_restored": true,
+  "incompatible_rig_rolled_back": true,
+  "compatible_action_imported_without_actor_duplication": true,
+  "new_status_preserved_pending": true
+}

@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-10 Asia/Saigon",
+  "guide_words": 6833,
+  "local_links_checked": 22,
+  "missing_links": [],
+  "verified_gif_cycles": [
+    "run",
+    "walk",
+    "jump",
+    "land"
+  ],
+  "saved_video_samples": 8,
+  "landing_visible_frames_and_delays_match": true,
+  "tracked_changes": [],
+  "new_files": 27,
+  "scope": "Only docs/animation files; no game or Blender changes; no new runtime or phone tests."
+}

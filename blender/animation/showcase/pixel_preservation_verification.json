@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "render_comparisons": [
+    {
+      "preview": "preview_1.png",
+      "source": "blender\\animation\\reviews\\player_animation_library_v1\\expressive_arm_motion_test\\frames\\three_quarter\\014.png",
+      "identical_pixels": true
+    },
+    {
+      "preview": "preview_2.png",
+      "source": "blender\\animation\\reviews\\player_animation_library_v1\\run_expressive_test\\frames\\test\\three_quarter\\008.png",
+      "identical_pixels": true
+    },
+    {
+      "preview": "preview_3.png",
+      "source": "blender\\animation\\reviews\\player_animation_library_v1\\lowerbody_recovery_test\\frames\\three_quarter\\018.png",
+      "identical_pixels": true
+    }
+  ],
+  "protected_files_unchanged": 1716,
+  "installed_addon_matches_project": true
+}

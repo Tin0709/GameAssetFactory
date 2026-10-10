@@ -1,0 +1,404 @@
+[
+  {
+    "id": "run",
+    "source_file": "docs/animation/references/style_research_2026_10_10/run_reference.gif",
+    "page_url": "https://minecraft.wiki/w/File:Player_Master_Run_(Dungeons_II).gif",
+    "sha256": "3f7c62dd2959141d6da860142e76f8ee6fe9b74ee0f30f6e13c224a3b23ad481",
+    "dimensions": [
+      1024,
+      1024
+    ],
+    "duration_ms": 580,
+    "frame_count": 14,
+    "frames": [
+      {
+        "frame": 0,
+        "start_ms": 0,
+        "duration_ms": 40
+      },
+      {
+        "frame": 1,
+        "start_ms": 40,
+        "duration_ms": 40
+      },
+      {
+        "frame": 2,
+        "start_ms": 80,
+        "duration_ms": 50
+      },
+      {
+        "frame": 3,
+        "start_ms": 130,
+        "duration_ms": 40
+      },
+      {
+        "frame": 4,
+        "start_ms": 170,
+        "duration_ms": 40
+      },
+      {
+        "frame": 5,
+        "start_ms": 210,
+        "duration_ms": 40
+      },
+      {
+        "frame": 6,
+        "start_ms": 250,
+        "duration_ms": 40
+      },
+      {
+        "frame": 7,
+        "start_ms": 290,
+        "duration_ms": 40
+      },
+      {
+        "frame": 8,
+        "start_ms": 330,
+        "duration_ms": 50
+      },
+      {
+        "frame": 9,
+        "start_ms": 380,
+        "duration_ms": 40
+      },
+      {
+        "frame": 10,
+        "start_ms": 420,
+        "duration_ms": 40
+      },
+      {
+        "frame": 11,
+        "start_ms": 460,
+        "duration_ms": 40
+      },
+      {
+        "frame": 12,
+        "start_ms": 500,
+        "duration_ms": 40
+      },
+      {
+        "frame": 13,
+        "start_ms": 540,
+        "duration_ms": 40
+      }
+    ],
+    "constant_crop_xyxy": [
+      312,
+      182,
+      789,
+      829
+    ],
+    "sheet": "run_cycle.jpg",
+    "timing_scope": "GIF display delays, not original engine key times",
+    "rights": "Mojang imagery; reference analysis only, never runtime asset or keyframe source."
+  },
+  {
+    "id": "walk",
+    "source_file": "docs/animation/references/style_research_2026_10_10/walk_reference.gif",
+    "page_url": "https://minecraft.wiki/w/File:Player_Master_Walk_(Dungeons_II).gif",
+    "sha256": "842eb6f32105aa8f96051a528b1b908d03858b3cc6df72484b115f4e57ea1381",
+    "dimensions": [
+      1024,
+      1024
+    ],
+    "duration_ms": 1120,
+    "frame_count": 27,
+    "frames": [
+      {
+        "frame": 0,
+        "start_ms": 0,
+        "duration_ms": 40
+      },
+      {
+        "frame": 1,
+        "start_ms": 40,
+        "duration_ms": 40
+      },
+      {
+        "frame": 2,
+        "start_ms": 80,
+        "duration_ms": 50
+      },
+      {
+        "frame": 3,
+        "start_ms": 130,
+        "duration_ms": 40
+      },
+      {
+        "frame": 4,
+        "start_ms": 170,
+        "duration_ms": 40
+      },
+      {
+        "frame": 5,
+        "start_ms": 210,
+        "duration_ms": 40
+      },
+      {
+        "frame": 6,
+        "start_ms": 250,
+        "duration_ms": 40
+      },
+      {
+        "frame": 7,
+        "start_ms": 290,
+        "duration_ms": 40
+      },
+      {
+        "frame": 8,
+        "start_ms": 330,
+        "duration_ms": 50
+      },
+      {
+        "frame": 9,
+        "start_ms": 380,
+        "duration_ms": 40
+      },
+      {
+        "frame": 10,
+        "start_ms": 420,
+        "duration_ms": 40
+      },
+      {
+        "frame": 11,
+        "start_ms": 460,
+        "duration_ms": 40
+      },
+      {
+        "frame": 12,
+        "start_ms": 500,
+        "duration_ms": 40
+      },
+      {
+        "frame": 13,
+        "start_ms": 540,
+        "duration_ms": 40
+      },
+      {
+        "frame": 14,
+        "start_ms": 580,
+        "duration_ms": 50
+      },
+      {
+        "frame": 15,
+        "start_ms": 630,
+        "duration_ms": 40
+      },
+      {
+        "frame": 16,
+        "start_ms": 670,
+        "duration_ms": 40
+      },
+      {
+        "frame": 17,
+        "start_ms": 710,
+        "duration_ms": 40
+      },
+      {
+        "frame": 18,
+        "start_ms": 750,
+        "duration_ms": 40
+      },
+      {
+        "frame": 19,
+        "start_ms": 790,
+        "duration_ms": 40
+      },
+      {
+        "frame": 20,
+        "start_ms": 830,
+        "duration_ms": 50
+      },
+      {
+        "frame": 21,
+        "start_ms": 880,
+        "duration_ms": 40
+      },
+      {
+        "frame": 22,
+        "start_ms": 920,
+        "duration_ms": 40
+      },
+      {
+        "frame": 23,
+        "start_ms": 960,
+        "duration_ms": 40
+      },
+      {
+        "frame": 24,
+        "start_ms": 1000,
+        "duration_ms": 40
+      },
+      {
+        "frame": 25,
+        "start_ms": 1040,
+        "duration_ms": 40
+      },
+      {
+        "frame": 26,
+        "start_ms": 1080,
+        "duration_ms": 40
+      }
+    ],
+    "constant_crop_xyxy": [
+      323,
+      176,
+      724,
+      808
+    ],
+    "sheet": "walk_cycle.jpg",
+    "timing_scope": "GIF display delays, not original engine key times",
+    "rights": "Mojang imagery; reference analysis only, never runtime asset or keyframe source."
+  },
+  {
+    "id": "jump",
+    "source_file": "blender/animation/reviews/player_animation_library_v1/jump_dungeons_gif_v004/references/Player_Jump_(Dungeons_II).gif",
+    "page_url": "https://minecraft.wiki/w/File:Player_Jump_(Dungeons_II).gif",
+    "sha256": "43948585444626346368812c9a3b3366e0476ad2455ceb3d47b80def133b0d84",
+    "dimensions": [
+      1024,
+      1024
+    ],
+    "duration_ms": 540,
+    "frame_count": 13,
+    "frames": [
+      {
+        "frame": 0,
+        "start_ms": 0,
+        "duration_ms": 40
+      },
+      {
+        "frame": 1,
+        "start_ms": 40,
+        "duration_ms": 40
+      },
+      {
+        "frame": 2,
+        "start_ms": 80,
+        "duration_ms": 50
+      },
+      {
+        "frame": 3,
+        "start_ms": 130,
+        "duration_ms": 40
+      },
+      {
+        "frame": 4,
+        "start_ms": 170,
+        "duration_ms": 40
+      },
+      {
+        "frame": 5,
+        "start_ms": 210,
+        "duration_ms": 40
+      },
+      {
+        "frame": 6,
+        "start_ms": 250,
+        "duration_ms": 40
+      },
+      {
+        "frame": 7,
+        "start_ms": 290,
+        "duration_ms": 40
+      },
+      {
+        "frame": 8,
+        "start_ms": 330,
+        "duration_ms": 50
+      },
+      {
+        "frame": 9,
+        "start_ms": 380,
+        "duration_ms": 40
+      },
+      {
+        "frame": 10,
+        "start_ms": 420,
+        "duration_ms": 40
+      },
+      {
+        "frame": 11,
+        "start_ms": 460,
+        "duration_ms": 40
+      },
+      {
+        "frame": 12,
+        "start_ms": 500,
+        "duration_ms": 40
+      }
+    ],
+    "constant_crop_xyxy": [
+      274,
+      162,
+      736,
+      811
+    ],
+    "sheet": "jump_cycle.jpg",
+    "timing_scope": "GIF display delays, not original engine key times",
+    "rights": "Mojang imagery; reference analysis only, never runtime asset or keyframe source."
+  },
+  {
+    "id": "land",
+    "source_file": "blender/animation/reviews/player_animation_library_v1/jump_dungeons_gif_v004/references/Player_Jump_Land_(Dungeons_II).gif",
+    "page_url": "https://minecraft.wiki/w/File:Player_Jump_Land_(Dungeons_II).gif",
+    "sha256": "76afcb91f3f5a7e82c7faad7d7c24993dbe030e61d93e33856b6bece84514cbb",
+    "dimensions": [
+      1024,
+      1024
+    ],
+    "duration_ms": 420,
+    "frame_count": 8,
+    "frames": [
+      {
+        "frame": 0,
+        "start_ms": 0,
+        "duration_ms": 40
+      },
+      {
+        "frame": 1,
+        "start_ms": 40,
+        "duration_ms": 40
+      },
+      {
+        "frame": 2,
+        "start_ms": 80,
+        "duration_ms": 50
+      },
+      {
+        "frame": 3,
+        "start_ms": 130,
+        "duration_ms": 40
+      },
+      {
+        "frame": 4,
+        "start_ms": 170,
+        "duration_ms": 40
+      },
+      {
+        "frame": 5,
+        "start_ms": 210,
+        "duration_ms": 40
+      },
+      {
+        "frame": 6,
+        "start_ms": 250,
+        "duration_ms": 40
+      },
+      {
+        "frame": 7,
+        "start_ms": 290,
+        "duration_ms": 130
+      }
+    ],
+    "constant_crop_xyxy": [
+      283,
+      176,
+      733,
+      777
+    ],
+    "sheet": "land_cycle.jpg",
+    "timing_scope": "GIF display delays, not original engine key times",
+    "rights": "Mojang imagery; reference analysis only, never runtime asset or keyframe source."
+  }
+]
