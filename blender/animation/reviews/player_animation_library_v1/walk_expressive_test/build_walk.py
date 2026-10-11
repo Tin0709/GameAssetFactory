@@ -17,10 +17,13 @@ def foot(u,side):
 def design(u):
  u%=1;w=2*math.pi*u
  # Receiving dips follow contact; longer support and no flight distinguish walk from Run.
- hip=Vector((.006+.034*math.sin(w-.12),-.006,.652+.011*math.cos(2*w-.9)))
- return {'hip':hip,'pelvis':(1.5,1.7*math.cos(w-.08),.4-1.4*math.sin(w-.12)),
- 'spine':(1.8+.4*math.cos(2*w-1.1),-2.6*math.cos(w-.25),.9*math.sin(w-.3)),
- 'chest':(1.3+.55*math.cos(2*w-1.3),-1.4*math.cos(w-.35),.35*math.sin(w-.45)),
+ hip=Vector((.006+.038*math.sin(w-.12),-.006,.652+.011*math.cos(2*w-.9)))
+ # Let the rigid torso inherit the pelvis instead of cancelling its gait sway.
+ # Local Y turns around world vertical; local Z supplies the lateral balance.
+ # Delayed, partial upper-body opposition keeps the support rhythm readable.
+ return {'hip':hip,'pelvis':(1.5,-3.6*math.cos(w-.08),.4-2.6*math.sin(w-.12)),
+ 'spine':(1.8+.4*math.cos(2*w-1.1),1.4*math.cos(w-.25),.65*math.sin(w-.3)),
+ 'chest':(1.3+.55*math.cos(2*w-1.3),.6*math.cos(w-.35),.25*math.sin(w-.45)),
  'head':(1.4+.38*math.cos(2*w-1.55),.2+.3*math.sin(w-.5),.65*math.cos(w-.55))}
 def sole_matrix(pb,socket,base,lift,side):
  yaw=math.radians(5 if side=='L' else -5);lean=math.radians(-2 if side=='L' else 3.5)
@@ -64,7 +67,7 @@ def pose(r,u):
   openness=spread+2*(.5+.5*math.cos(phase))
   b=r.pose.bones['UpperArm.'+side];b.rotation_quaternion=Euler((math.radians(pitch),0,math.radians(openness*(1 if side=='L' else -1))),'ZXY').to_quaternion()
   # Existing full arms stay straight, with restrained delayed shoulder life.
-  b.location+=b.bone.matrix_local.to_3x3().inverted()@Vector((-.0045 if side=='R' else 0,0,-(.008 if side=='L' else .006)+.0015*math.cos(2*phase-.3)))
+  b.location+=b.bone.matrix_local.to_3x3().inverted()@Vector((.005 if side=='L' else -.005,0,-(.010 if side=='L' else .008)+.0015*math.cos(2*phase-.3)))
  bpy.context.view_layer.update()
  b=r.pose.bones['Head'];b.matrix=Matrix.Translation(b.head)@Euler(tuple(math.radians(x) for x in d['head']),'XYZ').to_matrix().to_4x4()@b.bone.matrix_local.to_3x3().to_4x4()
  bpy.context.view_layer.update()
