@@ -25,9 +25,10 @@ print('THREE VIEW STANCE STILLS READY',flush=True)
 stamp['frames']={p.relative_to(OUT).as_posix():sha(p) for p in folder.glob('*.png')};stamp['stills_complete']=len(stamp['frames'])==6;stamp['complete']=False
 (OUT/'checkpoint_provenance.json').write_text(json.dumps(stamp,indent=2))
 if 'stills' in sys.argv:raise SystemExit
-s.camera=bpy.data.objects['Showcase_THREE_QUARTER'];motion=folder/'three_quarter';motion.mkdir()
+s.camera=bpy.data.objects['Showcase_THREE_QUARTER'];motion=folder/'three_quarter';motion.mkdir(exist_ok=True)
 for f in range(1,241):
  p=motion/f'{f:04d}.png'
+ if p.exists():continue
  if f in [1,61]:
   import shutil;shutil.copy2(folder/f'three_quarter_{f:04d}.png',p)
  else:

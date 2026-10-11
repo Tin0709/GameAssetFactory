@@ -21,6 +21,10 @@ Right and left refer to the viewer looking at the character from the FRONT camer
 
 The diagonal world-head yaw is+22°/−22° and pitch−7.6°/+9.4°. Side observations retain the expressive+51.7°/−46.3° range. The center keys keep pitch velocity rather than stopping. Observation holds use subframes:7.5frames at30FPS. Head position follows the breathing body; world gaze orientation stays fixed during each hold, avoiding a perpetual nod. Delayed torso/hip/shoulder/arm reactions support the two side looks. A smooth60mm shoulder pose allowance through the gaze sequence keeps the corners of the tilted solid head clear; resting8/6mm shoulder offsets remain. No facial controls or rig changes were invented.
 
+## Raised hands during upward glances
+
+The latest user correction keeps terminal hand centers above roughly half the character height during both upward phases (F53–82 and F143–172). Existing upper arms prepare22°/24° forward with20°/21° spread; the existing solid forearm blocks bend72°/70° at the elbows. Slightly offset preparation starts before the upward head motion, holds through it, then relaxes with overlap during the downward look. The measured terminal hand centers stay at least45mm above the midpoint between sole and head extremes. The head/shoulder clearance allowance stays; this avoids excessive sideways arm spread or dropping the hands. No rig, dimensions, weights or facial controls change.
+
 ## Preserved stance and breathing
 
 Character LEFT slightly forward, RIGHT slightly back (opposed3.75° whole-leg pitch),15° outward yaw each, unequal mainly sideways opening L3°/R8°,25mm proximal clearance per leg and28mm hip support bias. Leg matrices and all sole vertices stay fixed. Rigid angled blocks contact on their lowest corners; no fake knees/ankles, flattened boots or mesh scaling.
@@ -37,13 +41,15 @@ The latest stronger breathing stays **48mm hip/body excursion plus14.4mm rigid c
 
 The video review is a native-rendered three-quarter checkpoint and matching v2 comparison, accompanied by front/side stills. A full updated front/side motion comparison set remains deferred for the ongoing stance review; it is not claimed complete.
 
-**Evaluation:** the gaze now has specific destinations and four short observation beats. Continuous center crossings connect the observations, while the quiet loop rest prevents an endless scanning rhythm. The head no longer repeatedly nods while facing forward. Strong breathing and the established stance remain. The rigid shoulder/head clearance remains an authoring constraint; gameplay and weapon-layer blending are still unvalidated. Artistic approval stays with the user.
+**Evaluation:** the gaze now has specific destinations and four short observation beats. Continuous center crossings connect the observations, while the quiet loop rest prevents an endless scanning rhythm. The head no longer repeatedly nods while facing forward, and the hands now remain raised during upward glances. Strong breathing and the established stance remain. The rigid shoulder/head clearance remains an authoring constraint; gameplay and weapon-layer blending are still unvalidated. Artistic approval stays with the user.
 
 ## Validation and safety
 
 [Dense saved-source geometry/loop checks](validation.json), [actual gaze/hold/pass-through checks](lookaround_refinement_verification.json), [measured stance](clean_stance_orientation.json), [fresh Showcase switching/reopen checks](showcase_verification.json), [interactive playback](gui_playback.json), [media decoding](checkpoint_media_verification.json) and [preservation audit](checkpoint_verification.json) bind to the current source/Action hashes.
 
-Backups are under `.validation/idle_expressive_test_v3/before_directional_gaze_revision`, including the complete prior study, previous Showcase/manifest and working-tree snapshot. The foreground session is separately preserved. The first diagonal candidate failed head/shoulder clearance and is archived under `directional_gaze_failed_clearance`; it was never registered. Hash guards protect the central file from concurrent edits. Only the user-requested Pending v3 is revised; every earlier library Action/source is retained.
+Latest backups are under `.validation/idle_expressive_test_v3/before_upward_hands_revision`, preserving the complete prior passing directional-gaze study and registered viewer. Earlier backups are under `.validation/idle_expressive_test_v3/before_directional_gaze_revision`, including the complete prior study, previous Showcase/manifest and working-tree snapshot. The foreground session is separately preserved. The first diagonal candidate failed head/shoulder clearance and is archived under `directional_gaze_failed_clearance`; it was never registered. Hash guards protect the central file from concurrent edits. Only the user-requested Pending v3 is revised; every earlier library Action/source is retained.
+
+Unchanged native frames may be reused only after matching evaluated geometry, cameras, lighting, world, color/render settings and appearance, with original image hashes verified. Every changed hand-motion frame is rendered anew. [Reuse provenance](unchanged_frame_reuse.json) identifies the exact reused frames. Videos and reports bind to the latest saved Action/source.
 
 ## Future gameplay contract
 

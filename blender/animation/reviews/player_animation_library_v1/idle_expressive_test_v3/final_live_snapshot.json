@@ -1,6 +1,6 @@
 {
-  "showcase_sha256": "6f46da161f53665c335bc48f4710d4c935f0d21b31de4000fd1663082cbe8574",
-  "manifest_sha256": "6d4ec25b711e2c3214b74695c02c6a98baa40bb3bbe9201d434f051682dacb34",
+  "showcase_sha256": "04d954440e9d718a4449abd22b91e1b1e148282b2fed48f90a06b7beb373ceb3",
+  "manifest_sha256": "594840752c2444c5a31e2b6f5e6213cbd0ca112a6ce357770d4968a39779c1b4",
   "active_action": "Idle_Expressive_Test_v3",
   "slot": "OBRUN_Test_Rig",
   "entries": 11,
@@ -11,5 +11,6 @@
   "fps": 30,
   "loop": true,
   "frame": 1,
-  "playing": false
+  "playing": true,
+  "view": "FRONT"
 }

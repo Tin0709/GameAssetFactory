@@ -41,5 +41,19 @@ for j in range(1921):
  d=design(f);b=.5-.5*math.cos(2*math.pi*(f-1)/120)
  assert abs(d['hip'].z-(.6716+.048*b-.036))<1e-7 and abs(d['chest_lift']-.0144*b)<1e-10
 assert all(h['duration_s']==.25 for h in holds)
+mesh=bpy.data.objects['IEV3_Test_Mesh'];tips={}
+for side in ['L','R']:
+ ids=[v.index for v in mesh.data.vertices if any(w.group==mesh.vertex_groups['ForeArm.'+side].index and w.weight>.99 for w in v.groups)]
+ z=min(mesh.data.vertices[i].co.z for i in ids);tips[side]=[i for i in ids if abs(mesh.data.vertices[i].co.z-z)<1e-6]
+hand_margins={}
+for start,end in [(53,82),(143,172)]:
+ margin={'L':10,'R':10}
+ for j in range(int((end-start)*8)+1):
+  f=start+j/8;sample(f);evaluated=mesh.evaluated_get(bpy.context.evaluated_depsgraph_get());vv=[evaluated.matrix_world@v.co for v in evaluated.data.vertices]
+  half=(min(p.z for p in vv)+max(p.z for p in vv))/2
+  for side,ids in tips.items():margin[side]=min(margin[side],sum(vv[i].z for i in ids)/len(ids)-half)
+ assert min(margin.values())>.005,margin
+ hand_margins[f'{start}-{end}']=margin
 report={'passed':True,'source_sha256':hashlib.sha256(Path(bpy.data.filepath).read_bytes()).hexdigest(),'action_sha256':ui.action_signature(a),'sequence':'viewer right -> center pass-through -> top right -> bottom left -> viewer left -> center pass-through -> top right -> bottom left -> rest','holds':holds,'center_pass_throughs':centers,'screen_directions':directions,'prior_leg_matrices_preserved':True,'breathing_48mm_hips_14_4mm_chest_four_seconds_preserved':True,'no_previous_vertical_nodding_passages':True,'world_head_hold_note':'Head position follows rigid body breathing; world gaze orientation stays fixed during each .25s observation.'}
+report.update({'hands_above_half_character_height_during_both_upward_phases':True,'minimum_terminal_hand_center_margin_above_midheight_m':hand_margins,'hand_height_definition':'Mean of four terminal forearm/hand-end vertices versus halfway between current sole minimum and head maximum. Existing elbow bones only; no facial/hand rig invention.'})
 (OUT/'lookaround_refinement_verification.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))

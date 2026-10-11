@@ -1,7 +1,7 @@
 {
   "passed": true,
-  "source_sha256": "10d2bccd8654540edf91008ed608241b8712158a70224b49b41679323dca1258",
-  "action_sha256": "5eec2439459783697bf30629e5c180812b047058a43a011b410f1c05adb41091",
+  "source_sha256": "f704d99a3d1ca5a5fedd237238dbb8946a3e18267caabdf66647e9d0f5427bc9",
+  "action_sha256": "a54b00a672c2995132c2289b2cf666391837b1a5bd6baf2dea319de013c83172",
   "sequence": "viewer right -> center pass-through -> top right -> bottom left -> viewer left -> center pass-through -> top right -> bottom left -> rest",
   "holds": [
     {
@@ -150,5 +150,17 @@
   "prior_leg_matrices_preserved": true,
   "breathing_48mm_hips_14_4mm_chest_four_seconds_preserved": true,
   "no_previous_vertical_nodding_passages": true,
-  "world_head_hold_note": "Head position follows rigid body breathing; world gaze orientation stays fixed during each .25s observation."
+  "world_head_hold_note": "Head position follows rigid body breathing; world gaze orientation stays fixed during each .25s observation.",
+  "hands_above_half_character_height_during_both_upward_phases": true,
+  "minimum_terminal_hand_center_margin_above_midheight_m": {
+    "53-82": {
+      "L": 0.04520318261347711,
+      "R": 0.05310553661547601
+    },
+    "143-172": {
+      "L": 0.04717617086134851,
+      "R": 0.055232751881703734
+    }
+  },
+  "hand_height_definition": "Mean of four terminal forearm/hand-end vertices versus halfway between current sole minimum and head maximum. Existing elbow bones only; no facial/hand rig invention."
 }
