@@ -1,5 +1,6 @@
 """Measure the requested half sway against the immediately preceding saved walk."""
-import bpy,sys,json,math,hashlib,runpy
+import bpy,sys,json,math,hashlib,ast
+from mathutils import Vector
 from pathlib import Path
 OUT=Path(__file__).resolve().parent;ROOT=OUT.parents[4];BACK=ROOT/'.validation/walk_expressive_test/before_quieter_sway/walk_expressive_test';NEW=OUT/'walk_expressive_review.blend'
 sys.path.insert(0,str(ROOT/'blender/animation/showcase'));import gaf_animation_library as ui
@@ -15,7 +16,11 @@ span=lambda d,i:d['hip_xyz_ranges_m'][i][1]-d['hip_xyz_ranges_m'][i][0]
 assert abs(span(after,0)/span(before,0)-.5)<1e-4
 for n in after['world_lateral_roll_span_deg']:assert abs(after['world_lateral_roll_span_deg'][n]/before['world_lateral_roll_span_deg'][n]-.5)<.01
 assert max(abs(after['hip_xyz_ranges_m'][i][j]-before['hip_xyz_ranges_m'][i][j]) for i in [1,2] for j in [0,1])<1e-6
-old=runpy.run_path(str(BACK/'build_walk.py'));new=runpy.run_path(str(OUT/'build_walk.py'))
+def foot_design(path):
+ tree=ast.parse(path.read_text());ns={'math':math,'Vector':Vector,'RATE':1.08}
+ exec(compile(ast.Module(body=[n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name in ['smooth','foot']],type_ignores=[]),str(path),'exec'),ns)
+ return ns
+old=foot_design(BACK/'build_walk.py');new=foot_design(OUT/'build_walk.py')
 for j in range(289):
  for side in ['L','R']:
   o=old['foot'](j/288,side);n=new['foot'](j/288,side)

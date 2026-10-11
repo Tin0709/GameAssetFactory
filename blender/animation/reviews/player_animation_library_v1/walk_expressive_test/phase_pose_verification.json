@@ -1,18 +1,18 @@
 {
   "passed": true,
-  "source_sha256": "7efbd793b4520a842769ede42cfd06f4187459a125a56e86579b3e778ebf08da",
-  "action_sha256": "c48eebc5d7dc0791aac16626267903932cd0c91652ce2e830aacfd8870af03e1",
+  "source_sha256": "4f0e61f3c6fbca14cbb3b7896a34ab8f0b011a50ebef11922bdfd5c4b75fad20",
+  "action_sha256": "15f8e76ac8ca19051bc2865ffeacc145ac2e003ec1eed8672cd8ecb72e6f20ef",
   "both_contact_poses": [
     {
       "frame": 1,
       "L": {
         "hand_y_relative_shoulder_m": 0.23559653013944626,
-        "sole_y_relative_hip_m": -0.29354413971304893,
+        "sole_y_relative_hip_m": -0.29354396276175976,
         "arm_opposes_same_side_leg": true
       },
       "R": {
         "hand_y_relative_shoulder_m": -0.14645278453826904,
-        "sole_y_relative_hip_m": 0.2049618219025433,
+        "sole_y_relative_hip_m": 0.20496343215927482,
         "arm_opposes_same_side_leg": true
       }
     },
@@ -20,12 +20,12 @@
       "frame": 19,
       "L": {
         "hand_y_relative_shoulder_m": -0.1962006911635399,
-        "sole_y_relative_hip_m": 0.2152205714955926,
+        "sole_y_relative_hip_m": 0.21522128768265247,
         "arm_opposes_same_side_leg": true
       },
       "R": {
         "hand_y_relative_shoulder_m": 0.3123137503862381,
-        "sole_y_relative_hip_m": -0.3035208284854889,
+        "sole_y_relative_hip_m": -0.3035202044993639,
         "arm_opposes_same_side_leg": true
       }
     }

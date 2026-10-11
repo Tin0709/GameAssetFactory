@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "source_sha256": "4f0e61f3c6fbca14cbb3b7896a34ab8f0b011a50ebef11922bdfd5c4b75fad20",
+  "action_sha256": "15f8e76ac8ca19051bc2865ffeacc145ac2e003ec1eed8672cd8ecb72e6f20ef",
+  "archived_source_sha256": "1692af325d42e7bb159132bc1dd8a6444fea6c23360cfdf108b867b98cb6ffc5",
+  "before": {
+    "hip_xyz_ranges_m": [
+      [
+        -0.031997743993997574,
+        0.04399774223566055
+      ],
+      [
+        -0.02399999275803566,
+        0.011999991722404957
+      ],
+      [
+        0.6410014629364014,
+        0.6629985570907593
+      ]
+    ],
+    "world_lateral_roll_span_deg": {
+      "Hips": 5.199681502148841,
+      "Spine": 3.9150450089008566,
+      "Chest": 3.4345977632945237
+    }
+  },
+  "after": {
+    "hip_xyz_ranges_m": [
+      [
+        -0.012998871505260468,
+        0.024998871609568596
+      ],
+      [
+        -0.02399999275803566,
+        0.011999991722404957
+      ],
+      [
+        0.6410014629364014,
+        0.6629985570907593
+      ]
+    ],
+    "world_lateral_roll_span_deg": {
+      "Hips": 2.5998408577961265,
+      "Spine": 1.9515833881628377,
+      "Chest": 1.7015217316339142
+    }
+  },
+  "lateral_hip_and_body_roll_halved": true,
+  "before_track_spacing_m": 0.29,
+  "after_track_spacing_m": 0.27,
+  "inward_anchor_shift_per_leg_m": 0.01,
+  "fore_aft_vertical_contact_timing_preserved": true,
+  "support_and_intersections_pass_saved_source_checks": true,
+  "rig_changes": []
+}

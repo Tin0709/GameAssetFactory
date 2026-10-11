@@ -1,4 +1,4 @@
-**Latest Walk refinement — Pending,2026-10-11:** lateral hip travel and dynamic pelvis/spine/chest side-roll are halved against the previous delivered walk. Current hip ranges:38mm sideways,36mm fore/aft,22mm vertical. Foot tracks are0.27m apart,10mm inward per leg from0.29m;5° toe angles, lateral leg lean, support/stride timing and straight opposing arms remain. Previous complete source/reviews/Showcase are safely preserved in `.validation/walk_expressive_test/before_quieter_sway/`. Review only; no new approval or Godot change.
+**Latest Walk refinement — Pending,2026-10-11:** lateral hip travel and dynamic pelvis/spine/chest side-roll are halved against the previous delivered walk. Current hip ranges:38mm sideways,36mm fore/aft,22mm vertical. Foot tracks are0.27m apart,10mm inward per leg from0.29m;5° toe angles, support/stride timing and straight opposing arms remain. Previous complete source/reviews/Showcase are safely preserved in `.validation/walk_expressive_test/before_quieter_sway/`. Review only; no new approval or Godot change.
 
 # Project guidance
 

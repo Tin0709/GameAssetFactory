@@ -11,7 +11,7 @@ assert v['passed'] and v['source_sha256']==sha(Path(bpy.data.filepath)) and v['a
 assert ui.rest_signature(r.data)==manifest['rig_sha256']
 walk=manifest['animations'][-1];assert walk['action']=='Walk_Expressive_Test' and walk['status']=='pending'
 walk['source_sha256']=v['source_sha256'];walk['action_sha256']=v['action_sha256']
-walk['presentation_note']+=' Latest Pending refinement: lateral hip travel and dynamic torso side-roll halved; walking tracks narrowed from0.29m to0.27m. Fore/aft response, vertical receiving, stride timing,5deg toe-out and ground support retained.'
+walk['presentation_note']+=' Latest Pending refinement: lateral hip travel and dynamic torso side-roll halved; walking tracks narrowed from0.29m to0.27m. Fore/aft response, vertical receiving, stride timing,5deg toe-out and ground support retained. Whole-leg lateral lean eased to-0.25deg/+0.375deg after a measured thigh-clearance check.'
 ui.validate_action(a,walk,r);assert manifest['animations'][:-1]==before['animations'][:-1]
 (TMP/'working_tree_before_hip_registration.txt').write_text(subprocess.check_output(['git','status','--porcelain=v1'],cwd=ROOT,text=True),encoding='utf8')
 temp=manifest_path.with_suffix('.json.tmp');temp.write_text(json.dumps(manifest,indent=2));temp.replace(manifest_path)
