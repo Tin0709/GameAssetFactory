@@ -438,12 +438,12 @@
     {
       "action": "Walk_Expressive_Test",
       "source": "blender/animation/reviews/player_animation_library_v1/walk_expressive_test/walk_expressive_review.blend",
-      "source_sha256": "e44679269cb30d56607fe9b659869c3bde30c9a67d56d881c84b3a906235ceec",
+      "source_sha256": "1692af325d42e7bb159132bc1dd8a6444fea6c23360cfdf108b867b98cb6ffc5",
       "source_rig": "WEX_Test_Rig",
       "source_mesh": "WEX_Test_Mesh",
       "source_armature": "WEX_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "b74c186ba3e6c34df59c25742d3b01a44c0c8222a4c83a5c968615351f12d0f2",
+      "action_sha256": "1a2198923e4c500108ac44d0f1b83828e954398b84ab286260045e8f4ed0e2d9",
       "action_frame_range": [
         1.0,
         37.0
@@ -480,7 +480,7 @@
         "L": 0.6,
         "R": 0.62
       },
-      "presentation_note": "In-place 36-frame/30FPS expressive walk, closing37 excluded. Nominal speed0.9m/s; controller owns travel. Approved Idle v3 posture anchor; support-aware replants required for start/stop. Full-body absolute tracks, straight arms; weapon-layer/runtime transition validation outstanding."
+      "presentation_note": "In-place 36-frame/30FPS expressive walk, closing37 excluded. Nominal speed0.9m/s; controller owns travel. Approved Idle v3 posture anchor; support-aware replants required for start/stop. Full-body absolute tracks, straight arms; weapon-layer/runtime transition validation outstanding. User-requested Pending refinement: stronger support-led pelvic sway and twist carried into rigid torso, steady gaze; feet/support timing unchanged. Additional user-requested Pending refinement:36mm fore/aft waist travel synchronized with receiving/reaching foot phases combines with76mm lateral sway into small diagonal body motion. Ground anchors, timing and static root unchanged. Latest user-requested Pending refinement:walking tracks narrowed from0.36m to0.32m (20mm inward per leg). Diagonal waist path, gait timing, toe angles and ground support logic preserved. Latest user-requested Pending correction:0.29m tracks approximately halve the visible gap of the0.36m stance shown in the viewport. Mild lateral whole-leg lean reduced to-0.5deg/+0.75deg to prevent rigid thigh intersections;5deg toe-out, diagonal waist path, stride timing and ground support logic preserved."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

@@ -3,7 +3,7 @@ import json,hashlib,cv2,numpy as np
 from PIL import Image,ImageDraw
 OUT=Path(__file__).resolve().parent;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();proof=json.loads((OUT/'package_provenance.json').read_text())
 assert sha(OUT/'walk_expressive_review.blend')==proof['source_sha256']
-names={'front':'walk_front_1x','three_quarter':'walk_three_quarter_1x','side':'walk_side_1x','three_views':'walk_three_views_1x','travel':'walk_contact_travel_1x'}
+names={'front':'walk_front_1x','three_quarter':'walk_three_quarter_1x','side':'walk_side_1x','three_views':'walk_three_views_1x','travel':'walk_contact_travel_1x','comparison':'hip_response_comparison_1x'}
 report={'passed':True,'source_sha256':proof['source_sha256'],'action_sha256':proof['action_sha256'],'videos':{}}
 sheet=Image.new('RGB',(1280,1010),'#17212a');draw=ImageDraw.Draw(sheet)
 for view,name in names.items():

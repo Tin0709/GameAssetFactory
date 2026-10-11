@@ -1,6 +1,7 @@
 {
-  "source_sha256": "e44679269cb30d56607fe9b659869c3bde30c9a67d56d881c84b3a906235ceec",
-  "action_sha256": "b74c186ba3e6c34df59c25742d3b01a44c0c8222a4c83a5c968615351f12d0f2",
+  "source_sha256": "1692af325d42e7bb159132bc1dd8a6444fea6c23360cfdf108b867b98cb6ffc5",
+  "action_sha256": "1a2198923e4c500108ac44d0f1b83828e954398b84ab286260045e8f4ed0e2d9",
+  "comparison_previous_source_sha256": "e44679269cb30d56607fe9b659869c3bde30c9a67d56d881c84b3a906235ceec",
   "fps": 30,
   "videos": {
     "front": {
@@ -27,6 +28,11 @@
       "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\walk_expressive_test\\encode\\travel",
       "frames": 108,
       "complete_loops": 3
+    },
+    "comparison": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\walk_expressive_test\\encode\\comparison",
+      "frames": 144,
+      "complete_loops": 4
     }
   },
   "native_closing_frame_excluded": true,

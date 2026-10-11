@@ -34,7 +34,7 @@
   "rig_changes": [],
   "approved_idle_source_sha256": "ef9a450d8087a77f4f923e456c16562c286f43e2f73a5335faeb9cfe53028255",
   "motion_ownership": "Root/object identity. Controller owns forward -Y travel; stance sole anchors move backward +Y at0.9m/s. Review travel is temporary presentation only.",
-  "stance": "Approved Idle v3 upper-body posture, straight full arms and support-led balance. Dynamic walking tracks0.36m apart,5deg toe-out; idle0.40m/15deg stance must replant into these tracks at start/stop.",
+  "stance": "Approved Idle v3 upper-body posture, straight full arms and support-led balance. Dynamic walking tracks0.27m apart,5deg toe-out; idle0.40m/15deg stance must replant into these tracks at start/stop.",
   "layering": "Full-body absolute baked Action, not additive. Future weapon masks must coordinate Chest/shoulders without replacing hips/legs.",
   "transition_contract": "Loop begins left receiving contact while right remains in support; opposite contactF19. Preserve phase for future Walk/Run. Idle v3 fixed support cannot safely transition by generic crossfade; separately author/test start/stop or support-aware replants. No runtime readiness claim."
 }

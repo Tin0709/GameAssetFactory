@@ -20,10 +20,25 @@ assert live['active_action']=='Walk_Expressive_Test' and live['slot']==walk['slo
 for filename,count in [('render_provenance.json',108),('travel_provenance.json',108)]:
  proof=json.loads((OUT/filename).read_text());assert proof['source_sha256']==source and proof['action_sha256']==walk['action_sha256'] and len(proof['frames'])==count
  assert all(sha(OUT/p)==h for p,h in proof['frames'].items())
-assert len(media['videos'])==5
+quiet=json.loads((OUT/'quieter_refinement_verification.json').read_text())
+assert quiet['passed'] and quiet['source_sha256']==source and quiet['action_sha256']==walk['action_sha256']
+assert quiet['archived_source_sha256']==sha(TMP/'before_quieter_sway/walk_expressive_test/walk_expressive_review.blend')
+assert quiet['lateral_hip_and_body_roll_halved'] and quiet['after_track_spacing_m']==.27
+assert len(media['videos'])==6
 for name,item in media['videos'].items():assert sha(OUT/item['path'])==item['sha256'] and item['fps']==30 and item['frames']==(108 if name=='travel' else 144)
 for p in OUT.glob('*.py'):ast.parse(p.read_text(encoding='utf8'))
 missing=[p for p in re.findall(r'\]\(([^)]+)\)',(OUT/'README.md').read_text()) if not p.startswith(('http','app:')) and p!='final_verification.json' and not (OUT/p).resolve().exists()];assert not missing,missing
 progress=(ROOT/'docs/animation/ANIMATION_PROGRESS.md').read_text();assert '**User approved; preferred idle baseline**' in progress and '| Walk_Expressive_Test |' in progress
 report={'passed':True,'source_sha256':source,'action_sha256':walk['action_sha256'],'approved_idle_source_sha256':base['approved_idle_source_sha256'],'approved_idle_and_all_previous_action_source_bytes_preserved':True,'idle_v3_explicitly_approved_preferred_baseline':True,'walk_pending':True,'previous_eleven_entries_preserved_except_explicit_idle_approval':True,'protected_original_files':len(protected),'changed_protected_files':changed,'godot_files_unchanged':sum('game_mobile_3d' in Path(p).parts for p in protected),'idle_v3_files_unchanged':sum('idle_expressive_test_v3' in Path(p).parts for p in protected),'full_jump_files_unchanged':sum('full_jump_expressive_test' in Path(p).parts for p in protected),'rig_and_appearance_unchanged':True,'support_drift_m':v['maximum_support_drift_m'],'support_height_error_m':v['maximum_support_height_error_m'],'loop_pose_error_m':v['loop_pose_error_m'],'loop_velocity_finite_difference_m_s':v['loop_finite_vertex_velocity_difference_m_s'],'loop_tangent_difference':v['loop_channel_tangent_difference'],'dense_samples':v['samples'],'source_geometry_switch_samples':show['geometry_samples'],'showcase_switches':show['switches'],'gui_three_wraps_pause_restart':True,'same_showcase_saved_and_reopened':True,'review_views':['front','three_quarter','side'],'five_original_speed_review_videos_verified':True,'gameplay_status':'Blender-only Pending walk. No Godot integration, export, weapon-layer or phone-performance validation. Idle/start/stop/replant and Walk/Run phase compatibility documented, not proven runtime transitions.','showcase_sha256':live['showcase_sha256'],'manifest_sha256':live['manifest_sha256']}
+report.pop('five_original_speed_review_videos_verified')
+report['six_original_speed_review_videos_verified']=True
+report['user_requested_support_led_body_response_verified']=True
+report['successful_first_walk_archived_before_refinement']=True
+report['user_requested_diagonal_waist_path_verified']=True
+report['hip_sway_candidate_archived_before_fore_aft_refinement']=True
+report['user_requested_narrower_walking_tracks_verified']=True
+report['diagonal_candidate_archived_before_stance_refinement']=True
+report['current_track_spacing_m']=quiet['after_track_spacing_m']
+report['lateral_body_sway_halved_against_previous_delivered_walk']=True
+report['intermediate_032m_candidate_archived']=True
 (OUT/'final_verification.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))

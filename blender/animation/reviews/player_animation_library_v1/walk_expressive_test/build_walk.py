@@ -13,20 +13,22 @@ def foot(u,side):
  else:
   t=(q-duty)/(1-duty);y=a+RATE*(1-duty)*t-RATE*smooth(t)
   lift=(.072 if side=='L' else .066)*math.sin(math.pi*t)**2
- return q,duty,Vector(((.18 if side=='L' else -.18)+.006,y,0)),lift
+ return q,duty,Vector(((.135 if side=='L' else -.135)+.006,y,0)),lift
 def design(u):
  u%=1;w=2*math.pi*u
  # Receiving dips follow contact; longer support and no flight distinguish walk from Run.
- hip=Vector((.006+.038*math.sin(w-.12),-.006,.652+.011*math.cos(2*w-.9)))
+ # Small fore/aft receiving and reaching motion combines with the support sway
+ # into diagonal waist travel; ground anchors and controller travel stay separate.
+ hip=Vector((.006+.019*math.sin(w-.12),-.006+.018*math.sin(2*w-.35),.652+.011*math.cos(2*w-.9)))
  # Let the rigid torso inherit the pelvis instead of cancelling its gait sway.
  # Local Y turns around world vertical; local Z supplies the lateral balance.
  # Delayed, partial upper-body opposition keeps the support rhythm readable.
- return {'hip':hip,'pelvis':(1.5,-3.6*math.cos(w-.08),.4-2.6*math.sin(w-.12)),
- 'spine':(1.8+.4*math.cos(2*w-1.1),1.4*math.cos(w-.25),.65*math.sin(w-.3)),
- 'chest':(1.3+.55*math.cos(2*w-1.3),.6*math.cos(w-.35),.25*math.sin(w-.45)),
+ return {'hip':hip,'pelvis':(1.5,-3.6*math.cos(w-.08),.4-1.3*math.sin(w-.12)),
+ 'spine':(1.8+.4*math.cos(2*w-1.1),1.4*math.cos(w-.25),.325*math.sin(w-.3)),
+ 'chest':(1.3+.55*math.cos(2*w-1.3),.6*math.cos(w-.35),.125*math.sin(w-.45)),
  'head':(1.4+.38*math.cos(2*w-1.55),.2+.3*math.sin(w-.5),.65*math.cos(w-.55))}
 def sole_matrix(pb,socket,base,lift,side):
- yaw=math.radians(5 if side=='L' else -5);lean=math.radians(-2 if side=='L' else 3.5)
+ yaw=math.radians(5 if side=='L' else -5);lean=math.radians(-.25 if side=='L' else .375)
  yaw_matrix=Matrix.Rotation(yaw,3,'Z')
  def calc(pitch):
   rot=yaw_matrix@Matrix.Rotation(lean,3,'Y')@Matrix.Rotation(pitch,3,'X')
@@ -102,7 +104,7 @@ def build():
  s.camera=bpy.data.objects['Showcase_THREE_QUARTER'];s.frame_set(1)
  s['purpose']='Pending expressive walk / in-place / approved Idle v3 posture anchor / no gameplay integration'
  s['diagnostic_travel_speed_m_s']=SPEED
- data={'action':NAME,'status':'pending','playback_frames':[1,P],'closing_key':P+1,'fps':FPS,'period_s':PERIOD,'seamless_loop':True,'nominal_speed_m_s':SPEED,'support_duty':{'L':.60,'R':.62},'contact_frames':{'L':1,'R':19},'original_actions':original,'rig_changes':[],'approved_idle_source_sha256':baseline['approved_idle_source_sha256'],'motion_ownership':'Root/object identity. Controller owns forward -Y travel; stance sole anchors move backward +Y at0.9m/s. Review travel is temporary presentation only.','stance':'Approved Idle v3 upper-body posture, straight full arms and support-led balance. Dynamic walking tracks0.36m apart,5deg toe-out; idle0.40m/15deg stance must replant into these tracks at start/stop.','layering':'Full-body absolute baked Action, not additive. Future weapon masks must coordinate Chest/shoulders without replacing hips/legs.','transition_contract':'Loop begins left receiving contact while right remains in support; opposite contactF19. Preserve phase for future Walk/Run. Idle v3 fixed support cannot safely transition by generic crossfade; separately author/test start/stop or support-aware replants. No runtime readiness claim.'}
+ data={'action':NAME,'status':'pending','playback_frames':[1,P],'closing_key':P+1,'fps':FPS,'period_s':PERIOD,'seamless_loop':True,'nominal_speed_m_s':SPEED,'support_duty':{'L':.60,'R':.62},'contact_frames':{'L':1,'R':19},'original_actions':original,'rig_changes':[],'approved_idle_source_sha256':baseline['approved_idle_source_sha256'],'motion_ownership':'Root/object identity. Controller owns forward -Y travel; stance sole anchors move backward +Y at0.9m/s. Review travel is temporary presentation only.','stance':'Approved Idle v3 upper-body posture, straight full arms and support-led balance. Dynamic walking tracks0.27m apart,5deg toe-out; idle0.40m/15deg stance must replant into these tracks at start/stop.','layering':'Full-body absolute baked Action, not additive. Future weapon masks must coordinate Chest/shoulders without replacing hips/legs.','transition_contract':'Loop begins left receiving contact while right remains in support; opposite contactF19. Preserve phase for future Walk/Run. Idle v3 fixed support cannot safely transition by generic crossfade; separately author/test start/stop or support-aware replants. No runtime readiness claim.'}
  (OUT/'manifest.json').write_text(json.dumps(data,indent=2));bpy.ops.wm.save_as_mainfile(filepath=str(destination))
  print('BUILT WALK / PRESERVED ELEVEN ACTIONS',flush=True)
 if __name__=='__main__':build()

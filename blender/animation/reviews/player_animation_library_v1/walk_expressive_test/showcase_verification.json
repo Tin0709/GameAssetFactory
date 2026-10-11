@@ -60,8 +60,8 @@
   "slots_ranges_fps_and_pose_reset": true,
   "preview_floor_reset": true,
   "loop_enabled": true,
-  "walk_source_sha256": "e44679269cb30d56607fe9b659869c3bde30c9a67d56d881c84b3a906235ceec",
-  "walk_action_sha256": "b74c186ba3e6c34df59c25742d3b01a44c0c8222a4c83a5c968615351f12d0f2",
-  "showcase_sha256": "e7ea778e78e66f63c4d56f15f69fa8d46d2336d67085de52fb7c365fb02a38ba",
-  "manifest_sha256": "01d61d9e00a5b16e9f6627c5fd2369dab42edc9ee14c5e0958914ba21fcf9be6"
+  "walk_source_sha256": "1692af325d42e7bb159132bc1dd8a6444fea6c23360cfdf108b867b98cb6ffc5",
+  "walk_action_sha256": "1a2198923e4c500108ac44d0f1b83828e954398b84ab286260045e8f4ed0e2d9",
+  "showcase_sha256": "bc53917587750f03a8c03b20184aba739c6e57a919a42dd2ae21e69d4d989112",
+  "manifest_sha256": "46f0302c737b2f7b058dde8d763dcda7b873a4b97054f1acefd6ec2e196390ad"
 }

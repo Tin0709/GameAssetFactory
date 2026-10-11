@@ -1,47 +1,47 @@
 {
   "passed": true,
-  "source_sha256": "e44679269cb30d56607fe9b659869c3bde30c9a67d56d881c84b3a906235ceec",
-  "action_sha256": "b74c186ba3e6c34df59c25742d3b01a44c0c8222a4c83a5c968615351f12d0f2",
+  "source_sha256": "7efbd793b4520a842769ede42cfd06f4187459a125a56e86579b3e778ebf08da",
+  "action_sha256": "c48eebc5d7dc0791aac16626267903932cd0c91652ce2e830aacfd8870af03e1",
   "both_contact_poses": [
     {
       "frame": 1,
       "L": {
-        "hand_y_relative_shoulder_m": 0.2341361865401268,
-        "sole_y_relative_hip_m": -0.3088154473807663,
+        "hand_y_relative_shoulder_m": 0.23559653013944626,
+        "sole_y_relative_hip_m": -0.29354413971304893,
         "arm_opposes_same_side_leg": true
       },
       "R": {
-        "hand_y_relative_shoulder_m": -0.1453058049082756,
-        "sole_y_relative_hip_m": 0.20893152058124542,
+        "hand_y_relative_shoulder_m": -0.14645278453826904,
+        "sole_y_relative_hip_m": 0.2049618219025433,
         "arm_opposes_same_side_leg": true
       }
     },
     {
       "frame": 19,
       "L": {
-        "hand_y_relative_shoulder_m": -0.19513192772865295,
-        "sole_y_relative_hip_m": 0.21918873209506273,
+        "hand_y_relative_shoulder_m": -0.1962006911635399,
+        "sole_y_relative_hip_m": 0.2152205714955926,
         "arm_opposes_same_side_leg": true
       },
       "R": {
-        "hand_y_relative_shoulder_m": 0.3107502907514572,
-        "sole_y_relative_hip_m": -0.3187549712602049,
+        "hand_y_relative_shoulder_m": 0.3123137503862381,
+        "sole_y_relative_hip_m": -0.3035208284854889,
         "arm_opposes_same_side_leg": true
       }
     }
   ],
   "head_world_rotation_ranges_deg": [
     [
-      1.0200814954654112,
-      1.7799180559579388
+      1.0200817089088228,
+      1.779916988740881
     ],
     [
-      -0.09999947895704764,
+      -0.09999924550331625,
       0.4999995692399935
     ],
     [
-      -0.6499930313735593,
-      0.6499943653948816
+      -0.6499928179301478,
+      0.6499931380952652
     ]
   ],
   "nominal_speed_m_s": 0.9,
@@ -51,5 +51,5 @@
   },
   "double_support_fraction": 0.22,
   "flight_fraction": 0,
-  "approved_idle_relationship": "Same rig, relaxed forward torso, straight full arms, support-led hips and restrained head. Walking uses dynamic5deg toe-out/0.36m tracks versus fixed idle15deg/~0.40m; needs support-aware replant for starts/stops."
+  "approved_idle_relationship": "Same rig, relaxed forward torso, straight full arms, support-led hips and restrained head. Walking uses dynamic5deg toe-out/0.27m tracks versus fixed idle15deg/~0.40m; needs support-aware replant for starts/stops."
 }

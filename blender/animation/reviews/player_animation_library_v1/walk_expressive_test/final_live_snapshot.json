@@ -1,6 +1,4 @@
 {
-  "showcase_sha256": "e7ea778e78e66f63c4d56f15f69fa8d46d2336d67085de52fb7c365fb02a38ba",
-  "manifest_sha256": "01d61d9e00a5b16e9f6627c5fd2369dab42edc9ee14c5e0958914ba21fcf9be6",
   "active_action": "Walk_Expressive_Test",
   "slot": "OBRUN_Test_Rig",
   "entries": 12,
@@ -10,7 +8,11 @@
   ],
   "fps": 30,
   "loop": true,
-  "frame": 1,
-  "playing": true,
-  "view": "THREE_QUARTER"
+  "playing": false,
+  "frame": 15,
+  "view": "Showcase_FRONT",
+  "showcase_sha256": "bc53917587750f03a8c03b20184aba739c6e57a919a42dd2ae21e69d4d989112",
+  "manifest_sha256": "46f0302c737b2f7b058dde8d763dcda7b873a4b97054f1acefd6ec2e196390ad",
+  "source_sha256": "1692af325d42e7bb159132bc1dd8a6444fea6c23360cfdf108b867b98cb6ffc5",
+  "action_sha256": "1a2198923e4c500108ac44d0f1b83828e954398b84ab286260045e8f4ed0e2d9"
 }

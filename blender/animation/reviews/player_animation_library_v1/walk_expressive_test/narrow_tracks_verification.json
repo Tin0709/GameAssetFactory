@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "source_sha256": "1692af325d42e7bb159132bc1dd8a6444fea6c23360cfdf108b867b98cb6ffc5",
+  "action_sha256": "1a2198923e4c500108ac44d0f1b83828e954398b84ab286260045e8f4ed0e2d9",
+  "archived_source_sha256": "9a64f23500fe94b1ce40a35f64617e974fcc93bcd99c4ac44643ffc3bd071909",
+  "before_track_spacing_m": 0.36,
+  "after_track_spacing_m": 0.29,
+  "inward_support_shift_per_leg_m": 0.035,
+  "approximate_visible_sole_gap_before_m": 0.135,
+  "approximate_visible_sole_gap_after_m": 0.065,
+  "lateral_whole_leg_lean_degrees": {
+    "L": -0.5,
+    "R": 0.75
+  },
+  "maximum_planted_anchor_offset_error_m": 1.7924996017305673e-07,
+  "maximum_vertex_offset_errors_m": {
+    "Head": 0.0,
+    "Chest": 0.0,
+    "UpperArm.L": 0.0,
+    "UpperArm.R": 0.0,
+    "ForeArm.L": 0.0,
+    "ForeArm.R": 0.0
+  },
+  "diagonal_waist_upper_body_and_ground_anchor_yz_unchanged": true,
+  "reduced_lateral_leg_lean_prevents_thigh_crossing": true,
+  "rig_changes": []
+}
