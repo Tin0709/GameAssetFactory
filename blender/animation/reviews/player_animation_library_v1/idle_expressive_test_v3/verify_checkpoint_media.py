@@ -15,8 +15,8 @@ for name,folder in [('stance_breath_three_quarter_1x','checkpoint_encode_frames'
   f+=1;ref=cv2.imread(str(ROOT/'.validation/idle_expressive_test_v3'/folder/f'{f:04d}.png'))
   assert img.shape==ref.shape
   errors.append(float(np.abs(img.astype(np.int16)-ref.astype(np.int16)).mean()))
-  if name=='stance_breath_three_quarter_1x' and f in [1,45,74,86,111,129,189,207]:
-   i=[1,45,74,86,111,129,189,207].index(f);tile=Image.fromarray(cv2.cvtColor(img,cv2.COLOR_BGR2RGB));tile.thumbnail((320,320));sheet.paste(tile,((i%4)*320,20+(i//4)*330));draw.text(((i%4)*320+8,(i//4)*330+4),f'Decoded frame {f}',fill='white')
+  if name=='stance_breath_three_quarter_1x' and f in [1,32,53,70,92,120,160,182]:
+   i=[1,32,53,70,92,120,160,182].index(f);tile=Image.fromarray(cv2.cvtColor(img,cv2.COLOR_BGR2RGB));tile.thumbnail((320,320));sheet.paste(tile,((i%4)*320,20+(i//4)*330));draw.text(((i%4)*320+8,(i//4)*330+4),f'Decoded frame {f}',fill='white')
  cap.release();assert f==declared==480 and abs(fps-30)<1e-6 and max(errors)<5
  report[name]={'frames':f,'fps':fps,'duration_s':f/fps,'complete_loops':2,'maximum_mean_pixel_error':max(errors),'sha256':sha(p)}
 sheet.save(OUT/'checkpoint_motion_samples.jpg',quality=94)

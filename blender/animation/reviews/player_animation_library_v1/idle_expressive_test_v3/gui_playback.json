@@ -1,0 +1,1239 @@
+{
+  "passed": true,
+  "reopened_before_playback": true,
+  "active_action": "Idle_Expressive_Test_v3",
+  "source_sha256": "10d2bccd8654540edf91008ed608241b8712158a70224b49b41679323dca1258",
+  "action_sha256": "5eec2439459783697bf30629e5c180812b047058a43a011b410f1c05adb41091",
+  "range": [
+    1,
+    240
+  ],
+  "fps": 30,
+  "period_s": 8,
+  "loop_enabled": true,
+  "observed_wraps": 2,
+  "samples": [
+    {
+      "t_s": 0.061472900000808295,
+      "frame": 2,
+      "playing": true
+    },
+    {
+      "t_s": 0.12474269999802345,
+      "frame": 4,
+      "playing": true
+    },
+    {
+      "t_s": 0.1875681999954395,
+      "frame": 6,
+      "playing": true
+    },
+    {
+      "t_s": 0.24923349999880884,
+      "frame": 8,
+      "playing": true
+    },
+    {
+      "t_s": 0.3195073999959277,
+      "frame": 10,
+      "playing": true
+    },
+    {
+      "t_s": 0.38308149999647867,
+      "frame": 12,
+      "playing": true
+    },
+    {
+      "t_s": 0.444162799998594,
+      "frame": 14,
+      "playing": true
+    },
+    {
+      "t_s": 0.5101243999961298,
+      "frame": 16,
+      "playing": true
+    },
+    {
+      "t_s": 0.5790718999996898,
+      "frame": 18,
+      "playing": true
+    },
+    {
+      "t_s": 0.644339200000104,
+      "frame": 20,
+      "playing": true
+    },
+    {
+      "t_s": 0.710508199998003,
+      "frame": 22,
+      "playing": true
+    },
+    {
+      "t_s": 0.7769908999980544,
+      "frame": 24,
+      "playing": true
+    },
+    {
+      "t_s": 0.8434284999966621,
+      "frame": 26,
+      "playing": true
+    },
+    {
+      "t_s": 0.9097222999989754,
+      "frame": 28,
+      "playing": true
+    },
+    {
+      "t_s": 0.9772691999969538,
+      "frame": 30,
+      "playing": true
+    },
+    {
+      "t_s": 1.0441417999973055,
+      "frame": 32,
+      "playing": true
+    },
+    {
+      "t_s": 1.11049649999768,
+      "frame": 34,
+      "playing": true
+    },
+    {
+      "t_s": 1.1772391999984393,
+      "frame": 36,
+      "playing": true
+    },
+    {
+      "t_s": 1.2443091999957687,
+      "frame": 38,
+      "playing": true
+    },
+    {
+      "t_s": 1.3106857999955537,
+      "frame": 40,
+      "playing": true
+    },
+    {
+      "t_s": 1.3770356999957585,
+      "frame": 42,
+      "playing": true
+    },
+    {
+      "t_s": 1.4436614999940502,
+      "frame": 44,
+      "playing": true
+    },
+    {
+      "t_s": 1.5103524999940419,
+      "frame": 46,
+      "playing": true
+    },
+    {
+      "t_s": 1.5822711000000709,
+      "frame": 48,
+      "playing": true
+    },
+    {
+      "t_s": 1.6443796999956248,
+      "frame": 50,
+      "playing": true
+    },
+    {
+      "t_s": 1.7109121999965282,
+      "frame": 52,
+      "playing": true
+    },
+    {
+      "t_s": 1.7778437999950256,
+      "frame": 54,
+      "playing": true
+    },
+    {
+      "t_s": 1.8439698000001954,
+      "frame": 56,
+      "playing": true
+    },
+    {
+      "t_s": 1.911092299997108,
+      "frame": 58,
+      "playing": true
+    },
+    {
+      "t_s": 1.977510999997321,
+      "frame": 60,
+      "playing": true
+    },
+    {
+      "t_s": 2.044401299994206,
+      "frame": 62,
+      "playing": true
+    },
+    {
+      "t_s": 2.1115131999977166,
+      "frame": 64,
+      "playing": true
+    },
+    {
+      "t_s": 2.176248099996883,
+      "frame": 66,
+      "playing": true
+    },
+    {
+      "t_s": 2.2440729000009014,
+      "frame": 68,
+      "playing": true
+    },
+    {
+      "t_s": 2.310910000000149,
+      "frame": 70,
+      "playing": true
+    },
+    {
+      "t_s": 2.378161299995554,
+      "frame": 72,
+      "playing": true
+    },
+    {
+      "t_s": 2.4445923999955994,
+      "frame": 74,
+      "playing": true
+    },
+    {
+      "t_s": 2.510563399999228,
+      "frame": 76,
+      "playing": true
+    },
+    {
+      "t_s": 2.5774982000002638,
+      "frame": 78,
+      "playing": true
+    },
+    {
+      "t_s": 2.6445060999976704,
+      "frame": 80,
+      "playing": true
+    },
+    {
+      "t_s": 2.7108678999939,
+      "frame": 82,
+      "playing": true
+    },
+    {
+      "t_s": 2.778183499998704,
+      "frame": 84,
+      "playing": true
+    },
+    {
+      "t_s": 2.8451988999950117,
+      "frame": 86,
+      "playing": true
+    },
+    {
+      "t_s": 2.9116097999940393,
+      "frame": 88,
+      "playing": true
+    },
+    {
+      "t_s": 2.977480399997148,
+      "frame": 90,
+      "playing": true
+    },
+    {
+      "t_s": 3.047407899997779,
+      "frame": 92,
+      "playing": true
+    },
+    {
+      "t_s": 3.1114869999946677,
+      "frame": 94,
+      "playing": true
+    },
+    {
+      "t_s": 3.177085099996475,
+      "frame": 96,
+      "playing": true
+    },
+    {
+      "t_s": 3.2451731999972253,
+      "frame": 98,
+      "playing": true
+    },
+    {
+      "t_s": 3.31092229999922,
+      "frame": 100,
+      "playing": true
+    },
+    {
+      "t_s": 3.3782567999951425,
+      "frame": 102,
+      "playing": true
+    },
+    {
+      "t_s": 3.4434612999975798,
+      "frame": 104,
+      "playing": true
+    },
+    {
+      "t_s": 3.510886500000197,
+      "frame": 106,
+      "playing": true
+    },
+    {
+      "t_s": 3.577592800000275,
+      "frame": 108,
+      "playing": true
+    },
+    {
+      "t_s": 3.6439793999961694,
+      "frame": 110,
+      "playing": true
+    },
+    {
+      "t_s": 3.712688399995386,
+      "frame": 112,
+      "playing": true
+    },
+    {
+      "t_s": 3.7787819000004674,
+      "frame": 114,
+      "playing": true
+    },
+    {
+      "t_s": 3.844307999999728,
+      "frame": 116,
+      "playing": true
+    },
+    {
+      "t_s": 3.9127799999987474,
+      "frame": 118,
+      "playing": true
+    },
+    {
+      "t_s": 3.9782233999940217,
+      "frame": 120,
+      "playing": true
+    },
+    {
+      "t_s": 4.044863899995107,
+      "frame": 122,
+      "playing": true
+    },
+    {
+      "t_s": 4.110738299998047,
+      "frame": 124,
+      "playing": true
+    },
+    {
+      "t_s": 4.17867909999768,
+      "frame": 126,
+      "playing": true
+    },
+    {
+      "t_s": 4.24456239999563,
+      "frame": 128,
+      "playing": true
+    },
+    {
+      "t_s": 4.3130160000000615,
+      "frame": 130,
+      "playing": true
+    },
+    {
+      "t_s": 4.3774715999970795,
+      "frame": 132,
+      "playing": true
+    },
+    {
+      "t_s": 4.445388799998909,
+      "frame": 134,
+      "playing": true
+    },
+    {
+      "t_s": 4.511900599994988,
+      "frame": 136,
+      "playing": true
+    },
+    {
+      "t_s": 4.579019199998584,
+      "frame": 138,
+      "playing": true
+    },
+    {
+      "t_s": 4.644388199994864,
+      "frame": 140,
+      "playing": true
+    },
+    {
+      "t_s": 4.709612699996796,
+      "frame": 142,
+      "playing": true
+    },
+    {
+      "t_s": 4.7782355999952415,
+      "frame": 144,
+      "playing": true
+    },
+    {
+      "t_s": 4.844982199996593,
+      "frame": 146,
+      "playing": true
+    },
+    {
+      "t_s": 4.911206500000844,
+      "frame": 148,
+      "playing": true
+    },
+    {
+      "t_s": 4.977169899997534,
+      "frame": 150,
+      "playing": true
+    },
+    {
+      "t_s": 5.044373500000802,
+      "frame": 152,
+      "playing": true
+    },
+    {
+      "t_s": 5.1121559999955934,
+      "frame": 154,
+      "playing": true
+    },
+    {
+      "t_s": 5.178548099996988,
+      "frame": 156,
+      "playing": true
+    },
+    {
+      "t_s": 5.2444135999976425,
+      "frame": 158,
+      "playing": true
+    },
+    {
+      "t_s": 5.31182479999552,
+      "frame": 160,
+      "playing": true
+    },
+    {
+      "t_s": 5.3787315000008675,
+      "frame": 162,
+      "playing": true
+    },
+    {
+      "t_s": 5.445638799996232,
+      "frame": 164,
+      "playing": true
+    },
+    {
+      "t_s": 5.512466499996663,
+      "frame": 166,
+      "playing": true
+    },
+    {
+      "t_s": 5.578815599998052,
+      "frame": 168,
+      "playing": true
+    },
+    {
+      "t_s": 5.645746199996211,
+      "frame": 170,
+      "playing": true
+    },
+    {
+      "t_s": 5.712907999994059,
+      "frame": 172,
+      "playing": true
+    },
+    {
+      "t_s": 5.781998399994336,
+      "frame": 174,
+      "playing": true
+    },
+    {
+      "t_s": 5.846301499994297,
+      "frame": 176,
+      "playing": true
+    },
+    {
+      "t_s": 5.912660299996787,
+      "frame": 178,
+      "playing": true
+    },
+    {
+      "t_s": 5.977532599994447,
+      "frame": 180,
+      "playing": true
+    },
+    {
+      "t_s": 6.0462454999942565,
+      "frame": 182,
+      "playing": true
+    },
+    {
+      "t_s": 6.112323800000013,
+      "frame": 184,
+      "playing": true
+    },
+    {
+      "t_s": 6.184807300000102,
+      "frame": 186,
+      "playing": true
+    },
+    {
+      "t_s": 6.246155399996496,
+      "frame": 188,
+      "playing": true
+    },
+    {
+      "t_s": 6.312503099994501,
+      "frame": 190,
+      "playing": true
+    },
+    {
+      "t_s": 6.378934499996831,
+      "frame": 192,
+      "playing": true
+    },
+    {
+      "t_s": 6.445258199993987,
+      "frame": 194,
+      "playing": true
+    },
+    {
+      "t_s": 6.512665599999309,
+      "frame": 196,
+      "playing": true
+    },
+    {
+      "t_s": 6.578999400000612,
+      "frame": 198,
+      "playing": true
+    },
+    {
+      "t_s": 6.644923199994082,
+      "frame": 200,
+      "playing": true
+    },
+    {
+      "t_s": 6.712972599998466,
+      "frame": 202,
+      "playing": true
+    },
+    {
+      "t_s": 6.778939899995748,
+      "frame": 204,
+      "playing": true
+    },
+    {
+      "t_s": 6.8473776999962865,
+      "frame": 206,
+      "playing": true
+    },
+    {
+      "t_s": 6.913603399996646,
+      "frame": 208,
+      "playing": true
+    },
+    {
+      "t_s": 6.979584199994861,
+      "frame": 210,
+      "playing": true
+    },
+    {
+      "t_s": 7.0470209999984945,
+      "frame": 212,
+      "playing": true
+    },
+    {
+      "t_s": 7.113465499998711,
+      "frame": 214,
+      "playing": true
+    },
+    {
+      "t_s": 7.17996359999961,
+      "frame": 216,
+      "playing": true
+    },
+    {
+      "t_s": 7.2480164999942644,
+      "frame": 218,
+      "playing": true
+    },
+    {
+      "t_s": 7.312072199994873,
+      "frame": 220,
+      "playing": true
+    },
+    {
+      "t_s": 7.378688899996632,
+      "frame": 222,
+      "playing": true
+    },
+    {
+      "t_s": 7.446942599999602,
+      "frame": 224,
+      "playing": true
+    },
+    {
+      "t_s": 7.511944899997616,
+      "frame": 226,
+      "playing": true
+    },
+    {
+      "t_s": 7.584364199996344,
+      "frame": 228,
+      "playing": true
+    },
+    {
+      "t_s": 7.649199599996791,
+      "frame": 230,
+      "playing": true
+    },
+    {
+      "t_s": 7.712055899995903,
+      "frame": 232,
+      "playing": true
+    },
+    {
+      "t_s": 7.779200799996033,
+      "frame": 234,
+      "playing": true
+    },
+    {
+      "t_s": 7.848112399995443,
+      "frame": 236,
+      "playing": true
+    },
+    {
+      "t_s": 7.911892500000249,
+      "frame": 238,
+      "playing": true
+    },
+    {
+      "t_s": 7.982208299996273,
+      "frame": 240,
+      "playing": true
+    },
+    {
+      "t_s": 8.047523399996862,
+      "frame": 2,
+      "playing": true
+    },
+    {
+      "t_s": 8.113092199993844,
+      "frame": 4,
+      "playing": true
+    },
+    {
+      "t_s": 8.180815799998527,
+      "frame": 6,
+      "playing": true
+    },
+    {
+      "t_s": 8.254129499997362,
+      "frame": 8,
+      "playing": true
+    },
+    {
+      "t_s": 8.318601399994805,
+      "frame": 10,
+      "playing": true
+    },
+    {
+      "t_s": 8.379520999995293,
+      "frame": 12,
+      "playing": true
+    },
+    {
+      "t_s": 8.446221399994101,
+      "frame": 14,
+      "playing": true
+    },
+    {
+      "t_s": 8.513001699997403,
+      "frame": 16,
+      "playing": true
+    },
+    {
+      "t_s": 8.577970799997274,
+      "frame": 18,
+      "playing": true
+    },
+    {
+      "t_s": 8.649791199997708,
+      "frame": 20,
+      "playing": true
+    },
+    {
+      "t_s": 8.712620699996478,
+      "frame": 22,
+      "playing": true
+    },
+    {
+      "t_s": 8.77938919999724,
+      "frame": 24,
+      "playing": true
+    },
+    {
+      "t_s": 8.847114699994563,
+      "frame": 26,
+      "playing": true
+    },
+    {
+      "t_s": 8.912796899996465,
+      "frame": 28,
+      "playing": true
+    },
+    {
+      "t_s": 8.980041199996776,
+      "frame": 30,
+      "playing": true
+    },
+    {
+      "t_s": 9.04682049999974,
+      "frame": 32,
+      "playing": true
+    },
+    {
+      "t_s": 9.11362409999856,
+      "frame": 34,
+      "playing": true
+    },
+    {
+      "t_s": 9.183926499994413,
+      "frame": 36,
+      "playing": true
+    },
+    {
+      "t_s": 9.249299499999324,
+      "frame": 38,
+      "playing": true
+    },
+    {
+      "t_s": 9.314569099995424,
+      "frame": 40,
+      "playing": true
+    },
+    {
+      "t_s": 9.379761399999552,
+      "frame": 42,
+      "playing": true
+    },
+    {
+      "t_s": 9.447420799995598,
+      "frame": 44,
+      "playing": true
+    },
+    {
+      "t_s": 9.5129042999979,
+      "frame": 46,
+      "playing": true
+    },
+    {
+      "t_s": 9.579893999994965,
+      "frame": 48,
+      "playing": true
+    },
+    {
+      "t_s": 9.64671009999438,
+      "frame": 50,
+      "playing": true
+    },
+    {
+      "t_s": 9.713753299998643,
+      "frame": 52,
+      "playing": true
+    },
+    {
+      "t_s": 9.77943889999733,
+      "frame": 54,
+      "playing": true
+    },
+    {
+      "t_s": 9.84597919999942,
+      "frame": 56,
+      "playing": true
+    },
+    {
+      "t_s": 9.912295599999197,
+      "frame": 58,
+      "playing": true
+    },
+    {
+      "t_s": 9.978946299997915,
+      "frame": 60,
+      "playing": true
+    },
+    {
+      "t_s": 10.046716199998627,
+      "frame": 62,
+      "playing": true
+    },
+    {
+      "t_s": 10.11107759999868,
+      "frame": 64,
+      "playing": true
+    },
+    {
+      "t_s": 10.179042899995693,
+      "frame": 66,
+      "playing": true
+    },
+    {
+      "t_s": 10.246891999995569,
+      "frame": 68,
+      "playing": true
+    },
+    {
+      "t_s": 10.310805099994468,
+      "frame": 70,
+      "playing": true
+    },
+    {
+      "t_s": 10.378713099999004,
+      "frame": 72,
+      "playing": true
+    },
+    {
+      "t_s": 10.44702509999479,
+      "frame": 74,
+      "playing": true
+    },
+    {
+      "t_s": 10.511806799993792,
+      "frame": 76,
+      "playing": true
+    },
+    {
+      "t_s": 10.57906599999842,
+      "frame": 78,
+      "playing": true
+    },
+    {
+      "t_s": 10.648433700000169,
+      "frame": 80,
+      "playing": true
+    },
+    {
+      "t_s": 10.713078199994925,
+      "frame": 82,
+      "playing": true
+    },
+    {
+      "t_s": 10.779202599995187,
+      "frame": 84,
+      "playing": true
+    },
+    {
+      "t_s": 10.848074099994847,
+      "frame": 86,
+      "playing": true
+    },
+    {
+      "t_s": 10.912198799996986,
+      "frame": 88,
+      "playing": true
+    },
+    {
+      "t_s": 10.979129999999714,
+      "frame": 90,
+      "playing": true
+    },
+    {
+      "t_s": 11.046656599995913,
+      "frame": 92,
+      "playing": true
+    },
+    {
+      "t_s": 11.110497199995734,
+      "frame": 94,
+      "playing": true
+    },
+    {
+      "t_s": 11.179006699996535,
+      "frame": 96,
+      "playing": true
+    },
+    {
+      "t_s": 11.246295099997951,
+      "frame": 98,
+      "playing": true
+    },
+    {
+      "t_s": 11.313073099998292,
+      "frame": 100,
+      "playing": true
+    },
+    {
+      "t_s": 11.379836899999646,
+      "frame": 102,
+      "playing": true
+    },
+    {
+      "t_s": 11.44664229999762,
+      "frame": 104,
+      "playing": true
+    },
+    {
+      "t_s": 11.514475199997833,
+      "frame": 106,
+      "playing": true
+    },
+    {
+      "t_s": 11.578301999994437,
+      "frame": 108,
+      "playing": true
+    },
+    {
+      "t_s": 11.646210799997789,
+      "frame": 110,
+      "playing": true
+    },
+    {
+      "t_s": 11.712538100000529,
+      "frame": 112,
+      "playing": true
+    },
+    {
+      "t_s": 11.777848099998664,
+      "frame": 114,
+      "playing": true
+    },
+    {
+      "t_s": 11.846757799998159,
+      "frame": 116,
+      "playing": true
+    },
+    {
+      "t_s": 11.91308449999633,
+      "frame": 118,
+      "playing": true
+    },
+    {
+      "t_s": 11.979088199994294,
+      "frame": 120,
+      "playing": true
+    },
+    {
+      "t_s": 12.045618899996043,
+      "frame": 122,
+      "playing": true
+    },
+    {
+      "t_s": 12.113793099997565,
+      "frame": 124,
+      "playing": true
+    },
+    {
+      "t_s": 12.181168099996285,
+      "frame": 126,
+      "playing": true
+    },
+    {
+      "t_s": 12.246536399994511,
+      "frame": 128,
+      "playing": true
+    },
+    {
+      "t_s": 12.31593520000024,
+      "frame": 130,
+      "playing": true
+    },
+    {
+      "t_s": 12.378673100000015,
+      "frame": 132,
+      "playing": true
+    },
+    {
+      "t_s": 12.444953699996404,
+      "frame": 134,
+      "playing": true
+    },
+    {
+      "t_s": 12.512183999999252,
+      "frame": 136,
+      "playing": true
+    },
+    {
+      "t_s": 12.578496199996152,
+      "frame": 138,
+      "playing": true
+    },
+    {
+      "t_s": 12.645393799997692,
+      "frame": 140,
+      "playing": true
+    },
+    {
+      "t_s": 12.714684499995201,
+      "frame": 142,
+      "playing": true
+    },
+    {
+      "t_s": 12.778550799994264,
+      "frame": 144,
+      "playing": true
+    },
+    {
+      "t_s": 12.846309699998528,
+      "frame": 146,
+      "playing": true
+    },
+    {
+      "t_s": 12.912075499996718,
+      "frame": 148,
+      "playing": true
+    },
+    {
+      "t_s": 12.978350599994883,
+      "frame": 150,
+      "playing": true
+    },
+    {
+      "t_s": 13.045646200000192,
+      "frame": 152,
+      "playing": true
+    },
+    {
+      "t_s": 13.115590099994733,
+      "frame": 154,
+      "playing": true
+    },
+    {
+      "t_s": 13.190859599999385,
+      "frame": 156,
+      "playing": true
+    },
+    {
+      "t_s": 13.256304899994575,
+      "frame": 158,
+      "playing": true
+    },
+    {
+      "t_s": 13.31999150000047,
+      "frame": 160,
+      "playing": true
+    },
+    {
+      "t_s": 13.385407099995064,
+      "frame": 162,
+      "playing": true
+    },
+    {
+      "t_s": 13.447057599994878,
+      "frame": 164,
+      "playing": true
+    },
+    {
+      "t_s": 13.51295069999469,
+      "frame": 166,
+      "playing": true
+    },
+    {
+      "t_s": 13.579241299994464,
+      "frame": 168,
+      "playing": true
+    },
+    {
+      "t_s": 13.64671449999878,
+      "frame": 170,
+      "playing": true
+    },
+    {
+      "t_s": 13.71097379999992,
+      "frame": 172,
+      "playing": true
+    },
+    {
+      "t_s": 13.77902009999525,
+      "frame": 174,
+      "playing": true
+    },
+    {
+      "t_s": 13.84490150000056,
+      "frame": 176,
+      "playing": true
+    },
+    {
+      "t_s": 13.912096299995028,
+      "frame": 178,
+      "playing": true
+    },
+    {
+      "t_s": 13.981228699994972,
+      "frame": 180,
+      "playing": true
+    },
+    {
+      "t_s": 14.0480294999943,
+      "frame": 182,
+      "playing": true
+    },
+    {
+      "t_s": 14.112735199996678,
+      "frame": 184,
+      "playing": true
+    },
+    {
+      "t_s": 14.178112999994482,
+      "frame": 186,
+      "playing": true
+    },
+    {
+      "t_s": 14.24512490000052,
+      "frame": 188,
+      "playing": true
+    },
+    {
+      "t_s": 14.311347999995633,
+      "frame": 190,
+      "playing": true
+    },
+    {
+      "t_s": 14.381789399994886,
+      "frame": 192,
+      "playing": true
+    },
+    {
+      "t_s": 14.4455100999985,
+      "frame": 194,
+      "playing": true
+    },
+    {
+      "t_s": 14.512264400000277,
+      "frame": 196,
+      "playing": true
+    },
+    {
+      "t_s": 14.578706299995247,
+      "frame": 198,
+      "playing": true
+    },
+    {
+      "t_s": 14.646099599995068,
+      "frame": 200,
+      "playing": true
+    },
+    {
+      "t_s": 14.71292519999406,
+      "frame": 202,
+      "playing": true
+    },
+    {
+      "t_s": 14.778630099994189,
+      "frame": 204,
+      "playing": true
+    },
+    {
+      "t_s": 14.845936899997469,
+      "frame": 206,
+      "playing": true
+    },
+    {
+      "t_s": 14.912294899993867,
+      "frame": 208,
+      "playing": true
+    },
+    {
+      "t_s": 14.982262999998056,
+      "frame": 210,
+      "playing": true
+    },
+    {
+      "t_s": 15.04573839999648,
+      "frame": 212,
+      "playing": true
+    },
+    {
+      "t_s": 15.112039599996933,
+      "frame": 214,
+      "playing": true
+    },
+    {
+      "t_s": 15.178781099995831,
+      "frame": 216,
+      "playing": true
+    },
+    {
+      "t_s": 15.245861600000353,
+      "frame": 218,
+      "playing": true
+    },
+    {
+      "t_s": 15.312272199997096,
+      "frame": 220,
+      "playing": true
+    },
+    {
+      "t_s": 15.378276399998867,
+      "frame": 222,
+      "playing": true
+    },
+    {
+      "t_s": 15.445693099994969,
+      "frame": 224,
+      "playing": true
+    },
+    {
+      "t_s": 15.511598799996136,
+      "frame": 226,
+      "playing": true
+    },
+    {
+      "t_s": 15.580905099996016,
+      "frame": 228,
+      "playing": true
+    },
+    {
+      "t_s": 15.6492117999951,
+      "frame": 230,
+      "playing": true
+    },
+    {
+      "t_s": 15.715524699997331,
+      "frame": 232,
+      "playing": true
+    },
+    {
+      "t_s": 15.780687599995872,
+      "frame": 234,
+      "playing": true
+    },
+    {
+      "t_s": 15.852198599997791,
+      "frame": 236,
+      "playing": true
+    },
+    {
+      "t_s": 15.912339299997257,
+      "frame": 238,
+      "playing": true
+    },
+    {
+      "t_s": 15.978893299994525,
+      "frame": 240,
+      "playing": true
+    },
+    {
+      "t_s": 16.04787889999716,
+      "frame": 2,
+      "playing": true
+    },
+    {
+      "t_s": 16.112779499999306,
+      "frame": 4,
+      "playing": true
+    },
+    {
+      "t_s": 16.1794430000009,
+      "frame": 6,
+      "playing": true
+    },
+    {
+      "t_s": 16.24423139999999,
+      "frame": 8,
+      "playing": true
+    }
+  ],
+  "observed_duration_s": 16.24423139999999,
+  "paused_and_restarted_to_first_frame": true
+}

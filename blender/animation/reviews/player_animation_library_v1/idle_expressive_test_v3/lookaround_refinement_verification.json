@@ -1,43 +1,154 @@
 {
   "passed": true,
-  "source_sha256": "f5855bbf76ad49048c882fe8b26cc1d5cd792c785618fe221d4027137b6e0435",
-  "attention_amplitude_ratio": 2,
-  "gesture_duration_ratio": 0.5,
-  "historical_ratio_reference_sha256": "c72e8db2ae8597777f0d26288550c749243c8881ca146fbbb63382cf5b260edd",
-  "current_side_gesture_range_and_duration_unchanged": true,
-  "maximum_current_attention_degree_errors": {
-    "head_yaw": 0,
-    "arm_l": 0,
-    "arm_r": 0,
-    "spine_yaw": 0,
-    "chest_yaw": 0
-  },
-  "middle_head_neutral_frames_before": 60.5,
-  "middle_head_neutral_frames_after": 30.25,
-  "middle_pause_duration_ratio": 0.5,
-  "middle_pause_seconds_before": 2.0166666666666666,
-  "middle_pause_seconds_after": 1.0083333333333333,
-  "second_attention_shift_frames": -30.25,
-  "neutral_head_pitch_offsets_deg": {
-    "74": -5.0,
-    "86": 4.0,
-    "189": -4.0,
-    "207": 3.0000000000000004
-  },
-  "neutral_glances_only_when_facing_forward": true,
-  "leg_matrices_and_placements_unchanged": true,
-  "breathing_hip_and_chest_curves_unchanged": true,
-  "loop_period_s": 8,
-  "first_head_observe_frames": [
-    37,
-    50
+  "source_sha256": "10d2bccd8654540edf91008ed608241b8712158a70224b49b41679323dca1258",
+  "action_sha256": "5eec2439459783697bf30629e5c180812b047058a43a011b410f1c05adb41091",
+  "sequence": "viewer right -> center pass-through -> top right -> bottom left -> viewer left -> center pass-through -> top right -> bottom left -> rest",
+  "holds": [
+    {
+      "frames": [
+        67,
+        74.5
+      ],
+      "duration_s": 0.25,
+      "world_head_yaw_pitch_deg": [
+        22,
+        -7.6
+      ],
+      "maximum_angle_error_deg": 6.873212512914506e-06
+    },
+    {
+      "frames": [
+        89,
+        96.5
+      ],
+      "duration_s": 0.25,
+      "world_head_yaw_pitch_deg": [
+        -22,
+        9.4
+      ],
+      "maximum_angle_error_deg": 8.580759804033278e-06
+    },
+    {
+      "frames": [
+        157,
+        164.5
+      ],
+      "duration_s": 0.25,
+      "world_head_yaw_pitch_deg": [
+        22,
+        -7.6
+      ],
+      "maximum_angle_error_deg": 8.580759804033278e-06
+    },
+    {
+      "frames": [
+        179,
+        186.5
+      ],
+      "duration_s": 0.25,
+      "world_head_yaw_pitch_deg": [
+        -22,
+        9.4
+      ],
+      "maximum_angle_error_deg": 8.580759804033278e-06
+    }
   ],
-  "first_head_return_frame": 64.5,
-  "second_head_observe_frames": [
-    105.25,
-    114.25
+  "center_pass_throughs": [
+    {
+      "frame": 53,
+      "world_yaw_deg": 8.537896253583135e-07,
+      "pitch_speed_deg_s": -16.456794390012117,
+      "hold_frames": 0
+    },
+    {
+      "frame": 143,
+      "world_yaw_deg": 5.3361851584894594e-08,
+      "pitch_speed_deg_s": -16.529715197138497,
+      "hold_frames": 0
+    }
   ],
-  "second_head_return_frame": 129.25,
-  "secondary_settled_frame": 141.25,
-  "preserved_rest_across_seam": true
+  "screen_directions": [
+    {
+      "frame": 32,
+      "label": "viewer_right",
+      "front_camera_gaze_delta": [
+        0.08407348394393921,
+        0.007896184921264648
+      ],
+      "head_angles_deg": [
+        -0.40000085067509955,
+        -0.950000019321378,
+        51.7000036015768
+      ]
+    },
+    {
+      "frame": 70,
+      "label": "top_right",
+      "front_camera_gaze_delta": [
+        0.0397036075592041,
+        0.0154685378074646
+      ],
+      "head_angles_deg": [
+        -7.600001862118317,
+        -0.35000007733005095,
+        22.000000043023345
+      ]
+    },
+    {
+      "frame": 92,
+      "label": "bottom_left",
+      "front_camera_gaze_delta": [
+        -0.039894819259643555,
+        -0.01559668779373169
+      ],
+      "head_angles_deg": [
+        9.399999180132212,
+        1.0499997517424768,
+        -21.99999662792876
+      ]
+    },
+    {
+      "frame": 120,
+      "label": "viewer_left",
+      "front_camera_gaze_delta": [
+        -0.0774088203907013,
+        -0.0012958049774169922
+      ],
+      "head_angles_deg": [
+        3.9000000231500227,
+        1.4499999620873418,
+        -46.30000140225137
+      ]
+    },
+    {
+      "frame": 160,
+      "label": "top_right",
+      "front_camera_gaze_delta": [
+        0.0397036075592041,
+        0.015468597412109375
+      ],
+      "head_angles_deg": [
+        -7.6000010083446705,
+        -0.3500002640930361,
+        22.000001750570636
+      ]
+    },
+    {
+      "frame": 182,
+      "label": "bottom_left",
+      "front_camera_gaze_delta": [
+        -0.03989478945732117,
+        -0.015596747398376465
+      ],
+      "head_angles_deg": [
+        9.39999747258492,
+        1.0499993248556538,
+        -21.99999833547605
+      ]
+    }
+  ],
+  "prior_leg_matrices_preserved": true,
+  "breathing_48mm_hips_14_4mm_chest_four_seconds_preserved": true,
+  "no_previous_vertical_nodding_passages": true,
+  "world_head_hold_note": "Head position follows rigid body breathing; world gaze orientation stays fixed during each .25s observation."
 }

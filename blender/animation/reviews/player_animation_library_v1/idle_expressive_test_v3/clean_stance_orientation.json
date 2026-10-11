@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "source_sha256": "10d2bccd8654540edf91008ed608241b8712158a70224b49b41679323dca1258",
+  "action_sha256": "5eec2439459783697bf30629e5c180812b047058a43a011b410f1c05adb41091",
+  "measured_foot_yaw_ranges_deg": {
+    "L": [
+      14.999991457396687,
+      15.000003451695529
+    ],
+    "R": [
+      -15.000002532437446,
+      -14.999993013513187
+    ]
+  },
+  "whole_leg_lean_ranges_deg": {
+    "L": [
+      4.801005482767491,
+      4.80100936043697
+    ],
+    "R": [
+      8.830113934961995,
+      8.830119305779286
+    ]
+  },
+  "forward_stagger_m": 0.10042399913072586,
+  "contact": "Both fixed lowest sole corners of rigid angled blocks; no invented ankle or flattened soles.",
+  "stable_sole_drift_m": 4.2081354763679415e-07,
+  "width_m": 0.3995964825153351,
+  "body_breathing_rise_m": 0.0480000376701355,
+  "support": "Explicit latest review: mainly sideways L3/R8deg; LEFT slightly forward/RIGHT slightly back, both15deg outward. Breathing amplitude8X original (double previous4X):48mm body rise and14.4mm chest lift over unchanged4s. No invented joints."
+}

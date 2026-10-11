@@ -1,0 +1,30 @@
+{
+  "source_sha256": "10d2bccd8654540edf91008ed608241b8712158a70224b49b41679323dca1258",
+  "action_sha256": "5eec2439459783697bf30629e5c180812b047058a43a011b410f1c05adb41091",
+  "frames": {
+    "front_0032.png": "10d37cfe2e2a3cd3428693344fcc8ef02658e967cd91f671d8c53e91062f6ec3",
+    "front_0070.png": "36dd3eae93ab10bf799eb8fcf11c182797d639865ff771a7bba04baec6de0d69",
+    "front_0092.png": "7d27b65398ef8305f24dc3360746cb743199fbbc337c883e7c5dd6c9d4d439b0",
+    "front_0120.png": "8567ea4fd669f8b6b2df3cceb6920e760505592c34a294ca59af733a79d7645b",
+    "side_0032.png": "29ac061764e98a69d5cb30e5003561f389b8a0bf7c5561dd6c2f4b479ce50a66",
+    "side_0070.png": "236a0c67dcce3a5b3f7565c22a5399a1da0a4d48ff25431b557cf6bfacaa9941",
+    "side_0092.png": "3b762467abee9660667a79a673eb5ba316bbebbdb6c9a8383c1429e663eab9b4",
+    "side_0120.png": "ea8853f69af8a2638d7bf9d569fa81e9253d61e4665e6a1188ed91c0bfbf3a3b",
+    "three_quarter_0032.png": "bafc5915a867b6ba55f575b97fdaee4a1184be9e113a41ff8c7a7ec89cc8afa7",
+    "three_quarter_0070.png": "b4a2955f6a2a78c75db3f20b094d63ad3966d99e67b8df94bb27c664257ede0f",
+    "three_quarter_0092.png": "50550dd8644045026fe1806a9c6fbe34a2512af5a28c2f8e92d54fca9f2fc97a",
+    "three_quarter_0120.png": "8707df57edb1c077855ea843e04df6dd10bd302295075e1bf01d3422813ca995"
+  },
+  "views": [
+    "front",
+    "three_quarter",
+    "side"
+  ],
+  "poses": [
+    32,
+    70,
+    92,
+    120
+  ],
+  "original_cameras_lights_materials": true
+}
