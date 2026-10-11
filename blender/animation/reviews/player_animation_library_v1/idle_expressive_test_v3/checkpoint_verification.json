@@ -1,7 +1,7 @@
 {
   "passed": true,
-  "source_sha256": "f704d99a3d1ca5a5fedd237238dbb8946a3e18267caabdf66647e9d0f5427bc9",
-  "action_sha256": "a54b00a672c2995132c2289b2cf666391837b1a5bd6baf2dea319de013c83172",
+  "source_sha256": "ef9a450d8087a77f4f923e456c16562c286f43e2f73a5335faeb9cfe53028255",
+  "action_sha256": "f1b1152e742f0f2fe8b5a734b6f6d684f0d8b090442004cea631f8efb5614059",
   "protected_original_files": 6822,
   "changed_protected_files": [],
   "godot_files_unchanged": 1712,
@@ -24,8 +24,8 @@
   "two_original_speed_three_quarter_videos": true,
   "full_polished_front_side_comparison_set": "Deferred for requested stance review; not claimed complete.",
   "gameplay_validation": "Not performed; Blender-only Pending study.",
-  "showcase_sha256": "04d954440e9d718a4449abd22b91e1b1e148282b2fed48f90a06b7beb373ceb3",
-  "manifest_sha256": "594840752c2444c5a31e2b6f5e6213cbd0ca112a6ce357770d4968a39779c1b4",
+  "showcase_sha256": "3b09b388384be7ded871e2c110131e4c75278cd57a98f8895282047a09b9434d",
+  "manifest_sha256": "c4b46815d71b98ce78155241875b57909159deb39cb75643a215ba8ab2c454b8",
   "concurrency_note": "Compared original working bytes, not moving app-generated Git HEAD. No task git reset/index/commit operations.",
   "directional_gaze_sequence": "viewer right -> center pass-through -> top right -> bottom left -> viewer left -> center pass-through -> top right -> bottom left -> rest",
   "four_exact_quarter_second_directional_holds": true,
@@ -35,8 +35,10 @@
   "prior_leg_matrices_preserved": true,
   "current_stronger_breathing_preserved": true,
   "twelve_three_view_attention_stills_bound_to_current_source": true,
-  "raised_hands_above_midheight_during_both_upward_phases": true,
-  "minimum_hand_center_margin_m": 0.04520318261347711,
+  "full_arms_straight_throughout_loop": true,
+  "small_shoulder_driven_upward_gesture": true,
+  "upward_shoulder_drop_allowance_m": 0.03,
+  "waist_height_lift_removed": true,
   "verified_unchanged_native_frames_reused": 128,
   "changed_hand_motion_frames_rendered": 112
 }

@@ -1,7 +1,7 @@
 """Reuse only byte-verified frames with identical evaluated pose and presentation."""
 import bpy,json,hashlib,shutil,runpy
 from pathlib import Path
-OUT=Path(__file__).resolve().parent;ROOT=OUT.parents[4];OLD=ROOT/'.validation/idle_expressive_test_v3/before_upward_hands_revision/study'
+OUT=Path(__file__).resolve().parent;ROOT=OUT.parents[4];OLD=ROOT/'.validation/idle_expressive_test_v3/before_straight_arm_revision/study'
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
 def environment():
  s=bpy.context.scene

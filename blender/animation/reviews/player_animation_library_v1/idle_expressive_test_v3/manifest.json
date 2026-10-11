@@ -106,8 +106,8 @@
   "lookaround": "Viewer-front sequence: right, center pass-through, top-right .25s, bottom-left .25s, left, center pass-through, top-right .25s, bottom-left .25s; settle to neutral. Side gestures retain expressive head/arm range with delayed torso/shoulder/hip support.",
   "center_pause": "No center hold at F53 or F143; pitch velocity -.55deg/frame at both pass-throughs.",
   "neutral_head_life": "Old vertical nodding passages removed. Four directional holds: F67-74.5, F89-96.5, F157-164.5, F179-186.5. Exact world head orientation held for7.5frames/.25s; stronger4s body/chest breathing unchanged.",
-  "shoulder_clearance": "60mm lower pose allowance during directional gaze (additional to resting8/6mm); smoothly relax/return, keeping solid head corners clear. No rest rig edit.",
-  "upward_hands": "Latest user steering: terminal hands above half character height during upward diagonals; prepare early with upper-arm22/24deg forward and20/21deg spread, existing forearm72/70deg bend. Hold through upward gaze; overlap back to relaxed rest. No rig edit.",
+  "shoulder_clearance": "Animated shoulder-drop allowance60mm through gaze, reduced to30mm during upward gestures (additional to resting8/6mm); smooth overlap keeps rigid head corners clear. Both full arms straight; no rest rig edit.",
+  "upward_hands": "Explicit user clarification: limit downward drop and keep gesture small, NOT waist-height hands. Both full arms stay straight throughout; forearms retain rest alignment. Upward-glance shoulder allowance30mm instead of60mm, whole-arm6deg forward and18/20deg spread. Existing timing, gaze, breathing and stance preserved.",
   "face_controls": "No facial bones or shape keys; head articulation only",
   "scope": "Current v3 stance/breath review checkpoint; preserve v2/v1 and all other studies; no Godot edits/export."
 }

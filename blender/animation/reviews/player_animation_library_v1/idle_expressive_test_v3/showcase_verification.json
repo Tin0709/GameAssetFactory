@@ -61,8 +61,8 @@
     240
   ],
   "v3_closing_key": 241,
-  "v3_source_sha256": "f704d99a3d1ca5a5fedd237238dbb8946a3e18267caabdf66647e9d0f5427bc9",
-  "v3_action_sha256": "a54b00a672c2995132c2289b2cf666391837b1a5bd6baf2dea319de013c83172",
+  "v3_source_sha256": "ef9a450d8087a77f4f923e456c16562c286f43e2f73a5335faeb9cfe53028255",
+  "v3_action_sha256": "f1b1152e742f0f2fe8b5a734b6f6d684f0d8b090442004cea631f8efb5614059",
   "slots_ranges_timing_and_partial_pose_reset": true,
   "one_rig_one_character_mesh": true,
   "geometry_scope": "First, middle and last saved-source geometry samples for every switch",

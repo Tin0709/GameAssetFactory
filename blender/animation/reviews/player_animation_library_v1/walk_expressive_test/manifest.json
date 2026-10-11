@@ -1,0 +1,40 @@
+{
+  "action": "Walk_Expressive_Test",
+  "status": "pending",
+  "playback_frames": [
+    1,
+    36
+  ],
+  "closing_key": 37,
+  "fps": 30,
+  "period_s": 1.2,
+  "seamless_loop": true,
+  "nominal_speed_m_s": 0.9,
+  "support_duty": {
+    "L": 0.6,
+    "R": 0.62
+  },
+  "contact_frames": {
+    "L": 1,
+    "R": 19
+  },
+  "original_actions": {
+    "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+    "Full_Jump_Expressive_Test": "b119534f13f7db19862dfd2d7485595e9372ad0da0cb1e300e9c966fd00f0b99",
+    "Idle_Expressive_Test": "022eedd0bd5ff65dc644c636b9d247cf3cafccb1b5403948be45ec0ecfe105d7",
+    "Idle_Expressive_Test_v2": "b7a9604d881b782b73531be95cb5f607a3d9eac805da3b862449c3a2986b8b69",
+    "Idle_Expressive_Test_v3": "f1b1152e742f0f2fe8b5a734b6f6d684f0d8b090442004cea631f8efb5614059",
+    "Jump_AirPose_Test": "eb3b79fd05e5f175e6b5590745f3a38efa43015a635e6eb011abe73377c818e4",
+    "Jump_Landing_Impact_Test": "e870f735519b6aeb810b776ecce6ac944c00357e3127914286fc3f4ff137e55f",
+    "Jump_Landing_Test": "8836c180e39c2b93e47e96a1077360705cffd5c33a729aa91ce93d0b47bf9076",
+    "Jump_Takeoff_Test": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+    "LowerBody_Recovery_Test": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+    "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1"
+  },
+  "rig_changes": [],
+  "approved_idle_source_sha256": "ef9a450d8087a77f4f923e456c16562c286f43e2f73a5335faeb9cfe53028255",
+  "motion_ownership": "Root/object identity. Controller owns forward -Y travel; stance sole anchors move backward +Y at0.9m/s. Review travel is temporary presentation only.",
+  "stance": "Approved Idle v3 upper-body posture, straight full arms and support-led balance. Dynamic walking tracks0.36m apart,5deg toe-out; idle0.40m/15deg stance must replant into these tracks at start/stop.",
+  "layering": "Full-body absolute baked Action, not additive. Future weapon masks must coordinate Chest/shoulders without replacing hips/legs.",
+  "transition_contract": "Loop begins left receiving contact while right remains in support; opposite contactF19. Preserve phase for future Walk/Run. Idle v3 fixed support cannot safely transition by generic crossfade; separately author/test start/stop or support-aware replants. No runtime readiness claim."
+}

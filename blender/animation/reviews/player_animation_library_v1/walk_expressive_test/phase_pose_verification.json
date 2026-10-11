@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "source_sha256": "e44679269cb30d56607fe9b659869c3bde30c9a67d56d881c84b3a906235ceec",
+  "action_sha256": "b74c186ba3e6c34df59c25742d3b01a44c0c8222a4c83a5c968615351f12d0f2",
+  "both_contact_poses": [
+    {
+      "frame": 1,
+      "L": {
+        "hand_y_relative_shoulder_m": 0.2341361865401268,
+        "sole_y_relative_hip_m": -0.3088154473807663,
+        "arm_opposes_same_side_leg": true
+      },
+      "R": {
+        "hand_y_relative_shoulder_m": -0.1453058049082756,
+        "sole_y_relative_hip_m": 0.20893152058124542,
+        "arm_opposes_same_side_leg": true
+      }
+    },
+    {
+      "frame": 19,
+      "L": {
+        "hand_y_relative_shoulder_m": -0.19513192772865295,
+        "sole_y_relative_hip_m": 0.21918873209506273,
+        "arm_opposes_same_side_leg": true
+      },
+      "R": {
+        "hand_y_relative_shoulder_m": 0.3107502907514572,
+        "sole_y_relative_hip_m": -0.3187549712602049,
+        "arm_opposes_same_side_leg": true
+      }
+    }
+  ],
+  "head_world_rotation_ranges_deg": [
+    [
+      1.0200814954654112,
+      1.7799180559579388
+    ],
+    [
+      -0.09999947895704764,
+      0.4999995692399935
+    ],
+    [
+      -0.6499930313735593,
+      0.6499943653948816
+    ]
+  ],
+  "nominal_speed_m_s": 0.9,
+  "support_duty": {
+    "L": 0.6,
+    "R": 0.62
+  },
+  "double_support_fraction": 0.22,
+  "flight_fraction": 0,
+  "approved_idle_relationship": "Same rig, relaxed forward torso, straight full arms, support-led hips and restrained head. Walking uses dynamic5deg toe-out/0.36m tracks versus fixed idle15deg/~0.40m; needs support-aware replant for starts/stops."
+}

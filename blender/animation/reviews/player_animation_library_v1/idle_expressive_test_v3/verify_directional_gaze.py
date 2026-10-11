@@ -34,10 +34,14 @@ for f,label in [(32,'viewer_right'),(70,'top_right'),(92,'bottom_left'),(120,'vi
  if label=='top_right':assert dy>0
  if label=='bottom_left':assert dy<0
  directions.append({'frame':f,'label':label,'front_camera_gaze_delta':[dx,dy],'head_angles_deg':angles})
+maximum_forearm_rest_error=0.;maximum_arm_alignment_error=0.
 for j in range(1921):
  f=1+j/8;sample(f)
  for side in ['L','R']:
   prior=Matrix(old['fixed_foot_matrices'][side]);assert max(abs(x-y) for row1,row2 in zip(r.pose.bones['Leg.'+side].matrix,prior) for x,y in zip(row1,row2))<2e-6
+  fore=r.pose.bones['ForeArm.'+side];upper=r.pose.bones['UpperArm.'+side]
+  maximum_forearm_rest_error=max(maximum_forearm_rest_error,max(abs(x-y) for x,y in zip(fore.rotation_quaternion,(1,0,0,0))))
+  maximum_arm_alignment_error=max(maximum_arm_alignment_error,((fore.tail-fore.head).normalized()-(upper.tail-upper.head).normalized()).length)
  d=design(f);b=.5-.5*math.cos(2*math.pi*(f-1)/120)
  assert abs(d['hip'].z-(.6716+.048*b-.036))<1e-7 and abs(d['chest_lift']-.0144*b)<1e-10
 assert all(h['duration_s']==.25 for h in holds)
@@ -45,15 +49,23 @@ mesh=bpy.data.objects['IEV3_Test_Mesh'];tips={}
 for side in ['L','R']:
  ids=[v.index for v in mesh.data.vertices if any(w.group==mesh.vertex_groups['ForeArm.'+side].index and w.weight>.99 for w in v.groups)]
  z=min(mesh.data.vertices[i].co.z for i in ids);tips[side]=[i for i in ids if abs(mesh.data.vertices[i].co.z-z)<1e-6]
-hand_margins={}
+assert maximum_forearm_rest_error<1e-7 and maximum_arm_alignment_error<2e-6,(maximum_forearm_rest_error,maximum_arm_alignment_error)
+sample(1);evaluated=mesh.evaluated_get(bpy.context.evaluated_depsgraph_get());vv=[evaluated.matrix_world@v.co for v in evaluated.data.vertices]
+rest_hand_height={side:sum(vv[i].z for i in ids)/len(ids) for side,ids in tips.items()}
+hand_relative_rest={}
 for start,end in [(53,82),(143,172)]:
  margin={'L':10,'R':10}
  for j in range(int((end-start)*8)+1):
   f=start+j/8;sample(f);evaluated=mesh.evaluated_get(bpy.context.evaluated_depsgraph_get());vv=[evaluated.matrix_world@v.co for v in evaluated.data.vertices]
-  half=(min(p.z for p in vv)+max(p.z for p in vv))/2
-  for side,ids in tips.items():margin[side]=min(margin[side],sum(vv[i].z for i in ids)/len(ids)-half)
- assert min(margin.values())>.005,margin
- hand_margins[f'{start}-{end}']=margin
+  for side,ids in tips.items():margin[side]=min(margin[side],sum(vv[i].z for i in ids)/len(ids)-rest_hand_height[side])
+ hand_relative_rest[f'{start}-{end}']=margin
+ assert min(margin.values())>0,margin
+for start,end in [(67,74.5),(157,164.5)]:
+ for j in range(int((end-start)*8)+1):
+  d=design(start+j/8)
+  for side,spread in [('l',18),('r',20)]:
+   assert abs(d['shoulder_'+side]+.030)<1e-9
+   assert abs(d['arm_'+side]-6)<1e-9 and abs(d['spread_'+side]-spread)<1e-9
 report={'passed':True,'source_sha256':hashlib.sha256(Path(bpy.data.filepath).read_bytes()).hexdigest(),'action_sha256':ui.action_signature(a),'sequence':'viewer right -> center pass-through -> top right -> bottom left -> viewer left -> center pass-through -> top right -> bottom left -> rest','holds':holds,'center_pass_throughs':centers,'screen_directions':directions,'prior_leg_matrices_preserved':True,'breathing_48mm_hips_14_4mm_chest_four_seconds_preserved':True,'no_previous_vertical_nodding_passages':True,'world_head_hold_note':'Head position follows rigid body breathing; world gaze orientation stays fixed during each .25s observation.'}
-report.update({'hands_above_half_character_height_during_both_upward_phases':True,'minimum_terminal_hand_center_margin_above_midheight_m':hand_margins,'hand_height_definition':'Mean of four terminal forearm/hand-end vertices versus halfway between current sole minimum and head maximum. Existing elbow bones only; no facial/hand rig invention.'})
+report.update({'full_arms_straight_throughout_loop':True,'maximum_forearm_rest_quaternion_error':maximum_forearm_rest_error,'maximum_upperarm_forearm_direction_difference':maximum_arm_alignment_error,'upward_shoulder_drop_allowance_m':.030,'previous_shoulder_drop_allowance_m':.060,'upward_drop_ratio':.5,'small_shoulder_driven_gesture':True,'upward_whole_arm_pitch_deg':6,'upward_arm_spread_deg':{'L':18,'R':20},'waist_height_lift_removed':True,'minimum_terminal_hand_height_relative_to_relaxed_frame1_m':hand_relative_rest,'hand_height_definition':'Mean of four terminal forearm/hand-end vertices relative to frame1. User clarified limit downward drop with a small gesture, not raise hands to mid-body. Forearms stay in straight rest alignment; separate 8/6mm resting shoulder offsets remain.'})
 (OUT/'lookaround_refinement_verification.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))
