@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "source_sha256": "e44679269cb30d56607fe9b659869c3bde30c9a67d56d881c84b3a906235ceec",
+  "action_sha256": "b74c186ba3e6c34df59c25742d3b01a44c0c8222a4c83a5c968615351f12d0f2",
+  "videos": {
+    "front": {
+      "path": "walk_front_1x.mp4",
+      "sha256": "c75f829d5db3d6d7827dec9c5be57cc028c543bff3af221428ba14a8e0aee44c",
+      "frames": 144,
+      "fps": 30.0,
+      "duration_s": 4.8,
+      "complete_loops": 4,
+      "max_mean_pixel_error": 1.3200130208333334
+    },
+    "three_quarter": {
+      "path": "walk_three_quarter_1x.mp4",
+      "sha256": "43ce8baf7bc1b12743f3bfc495df9cd235b467845e75e880f737659f9182375f",
+      "frames": 144,
+      "fps": 30.0,
+      "duration_s": 4.8,
+      "complete_loops": 4,
+      "max_mean_pixel_error": 1.3379549153645833
+    },
+    "side": {
+      "path": "walk_side_1x.mp4",
+      "sha256": "910df748453a497dce98045ed4291f57804dd6f8ef47cf128e6bd02baaf82f3a",
+      "frames": 144,
+      "fps": 30.0,
+      "duration_s": 4.8,
+      "complete_loops": 4,
+      "max_mean_pixel_error": 1.1987703450520832
+    },
+    "three_views": {
+      "path": "walk_three_views_1x.mp4",
+      "sha256": "529dc22f800cf928ff09e201a88fe8a9a5af0e9965a09c928d4b5d2f55e04e06",
+      "frames": 144,
+      "fps": 30.0,
+      "duration_s": 4.8,
+      "complete_loops": 4,
+      "max_mean_pixel_error": 1.2408866567460317
+    },
+    "travel": {
+      "path": "walk_contact_travel_1x.mp4",
+      "sha256": "ee4d4228b0108d767f9880bdfd77f044c5cdf4a275348a229b57ade06420018b",
+      "frames": 108,
+      "fps": 30.0,
+      "duration_s": 3.6,
+      "complete_loops": 3,
+      "max_mean_pixel_error": 1.2008113606770834
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 **Pending user review.** Independent `Walk_Expressive_Test` in the existing [Animation Showcase](../../../showcase/Animation_Showcase.blend). The latest **Idle_Expressive_Test_v3 is explicitly approved and the preferred idle baseline**, confirmed2026-10-11. Earlier idle versions and all previous Actions remain preserved.
 
-Playback **F1–36 at30FPS**, closing keyF37 excluded: **1.2seconds per loop**, left contactF1 and right contactF19. Turn on Loop playback. Original Blender5.2 slot `OBWEX_Test_Rig`; verify the actual manifest if the source rig is renamed. Source [walk_expressive_review.blend](walk_expressive_review.blend) contains an unchanged rest rig, packed character textures and original review stage.
+Playback **F1–36 at30FPS**, closing keyF37 excluded: **1.2seconds per loop**, left contactF1 and right contactF19. Turn on Loop playback. Original Blender5.2 slot `OBRUN_Test_Rig` is preserved even though the study actor is named `WEX_Test_Rig`. Source [walk_expressive_review.blend](walk_expressive_review.blend) contains an unchanged rest rig, packed character textures and original review stage.
 
 ## Review
 

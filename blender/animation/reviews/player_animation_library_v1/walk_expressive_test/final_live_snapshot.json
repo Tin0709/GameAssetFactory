@@ -1,0 +1,16 @@
+{
+  "showcase_sha256": "e7ea778e78e66f63c4d56f15f69fa8d46d2336d67085de52fb7c365fb02a38ba",
+  "manifest_sha256": "01d61d9e00a5b16e9f6627c5fd2369dab42edc9ee14c5e0958914ba21fcf9be6",
+  "active_action": "Walk_Expressive_Test",
+  "slot": "OBRUN_Test_Rig",
+  "entries": 12,
+  "range": [
+    1,
+    36
+  ],
+  "fps": 30,
+  "loop": true,
+  "frame": 1,
+  "playing": true,
+  "view": "THREE_QUARTER"
+}

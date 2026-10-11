@@ -1,0 +1,34 @@
+{
+  "source_sha256": "e44679269cb30d56607fe9b659869c3bde30c9a67d56d881c84b3a906235ceec",
+  "action_sha256": "b74c186ba3e6c34df59c25742d3b01a44c0c8222a4c83a5c968615351f12d0f2",
+  "fps": 30,
+  "videos": {
+    "front": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\walk_expressive_test\\encode\\front",
+      "frames": 144,
+      "complete_loops": 4
+    },
+    "three_quarter": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\walk_expressive_test\\encode\\three_quarter",
+      "frames": 144,
+      "complete_loops": 4
+    },
+    "side": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\walk_expressive_test\\encode\\side",
+      "frames": 144,
+      "complete_loops": 4
+    },
+    "three_views": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\walk_expressive_test\\encode\\three_views",
+      "frames": 144,
+      "complete_loops": 4
+    },
+    "travel": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\walk_expressive_test\\encode\\travel",
+      "frames": 108,
+      "complete_loops": 3
+    }
+  },
+  "native_closing_frame_excluded": true,
+  "idle_source_hash_verified": true
+}
