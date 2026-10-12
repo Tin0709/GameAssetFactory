@@ -13,7 +13,7 @@ source=(ROOT/args.source).resolve();source.relative_to(ROOT/'blender/weapons')
 assert source.is_file() and source.suffix=='.blend'
 with bpy.data.libraries.load(str(source),link=False) as (src,dst):assert 'WEAPON_EXPORT' in src.collections,'Provide one WEAPON_EXPORT collection with grip-centered root'
 mf=HERE/'weapon_manifest.json';manifest=json.loads(mf.read_text())
-assert all(e['id']!=args.id and e['source']!=source.relative_to(ROOT).as_posix() for e in manifest['weapons']),'Existing entries are immutable; create a distinct version'
+assert all(e['id']!=args.id and e['source']!=source.relative_to(ROOT).as_posix() for e in manifest['weapons']+manifest.get('archived_weapons',[])),'Existing entries are immutable; create a distinct version'
 backup=ROOT/'.validation/weapon_showcase_v2'/('registration_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S'));backup.mkdir(parents=True)
 for name in ['weapon_manifest.json','Weapon_Showcase.blend']:shutil.copy2(HERE/name,backup/name)
 manifest['weapons'].append({'id':args.id,'kind':args.kind,'label':args.label,'source':source.relative_to(ROOT).as_posix(),'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'status':'Pending','status_note':'New registration; awaiting explicit visual approval.'})

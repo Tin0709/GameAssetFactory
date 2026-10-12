@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "active_ids": [
+    "pistol_stylized_v2",
+    "rifle_stylized_v2",
+    "shotgun_stylized_v2"
+  ],
+  "archived_entries": 16,
+  "preserved_source_and_export_files": 35,
+  "changed_files": [],
+  "backup": ".validation\\weapon_showcase_v2\\list_cleanup_20261012_172503"
+}

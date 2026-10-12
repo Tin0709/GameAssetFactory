@@ -18,8 +18,10 @@ finally:guard.release()
 lib.register()
 bpy.ops.wm.open_mainfile(filepath=str(HERE/'Weapon_Showcase.blend'))
 s=bpy.context.scene
-assert len(s.gaf_weapons)>=16
 manifest=json.loads((HERE/'weapon_manifest.json').read_text())
+assert len(s.gaf_weapons)==len(manifest['weapons'])>0
+assert {e['id'] for e in lib.entries(s)}=={e['id'] for e in manifest['weapons']}
+assert not ({e['id'] for e in lib.entries(s)} & {e['id'] for e in manifest.get('archived_weapons',[])})
 if manifest.get('default_selection'):
  assert lib.entries(s)[s.gaf_weapon_index]['id']==manifest['default_selection'],'Saved library must open with the latest registered weapon selected'
 from types import SimpleNamespace

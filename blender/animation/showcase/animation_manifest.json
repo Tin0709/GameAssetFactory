@@ -648,12 +648,12 @@
     {
       "action": "Rifle_Ready_V2_Test",
       "source": "blender/animation/reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/rifle_hold_review.blend",
-      "source_sha256": "fe4942918f4d8eed4e91cb123d81a08593ac539318461bd2ec222f422aa96009",
+      "source_sha256": "93fee6e4049744ed36b6433902c747caf78a1423b2c2a8f834cfc0203b2f03aa",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "bcea14407a9f05a2752093272ad5c3e1ecc8d86e2a0d5402f8a2f8c79a766e7d",
+      "action_sha256": "706afb2b2d08bcfb283dcfa4a066e986e4b764a25d7376353ecc7d19e4615575",
       "action_frame_range": [
         1.0,
         121.0
@@ -687,12 +687,12 @@
     {
       "action": "Rifle_Aim_Hold_V2_Test",
       "source": "blender/animation/reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/rifle_hold_review.blend",
-      "source_sha256": "fe4942918f4d8eed4e91cb123d81a08593ac539318461bd2ec222f422aa96009",
+      "source_sha256": "93fee6e4049744ed36b6433902c747caf78a1423b2c2a8f834cfc0203b2f03aa",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "67b0083825bade735e161ad4e379ceb1a3819e6eded24eee5643862cebf4f5c1",
+      "action_sha256": "9bf20f4a53d7530fedaf45d5a838a92e6d02b89c946714200e65f5ef066fe11f",
       "action_frame_range": [
         1.0,
         121.0
@@ -726,7 +726,7 @@
     {
       "action": "Rifle_Back_Holster_V2_Test",
       "source": "blender/animation/reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/rifle_hold_review.blend",
-      "source_sha256": "fe4942918f4d8eed4e91cb123d81a08593ac539318461bd2ec222f422aa96009",
+      "source_sha256": "93fee6e4049744ed36b6433902c747caf78a1423b2c2a8f834cfc0203b2f03aa",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",

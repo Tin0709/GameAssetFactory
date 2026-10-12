@@ -85,8 +85,8 @@ class GAF_PT_weapon_library(bpy.types.Panel):
  def poll(cls,context):return bool(context.scene.get('weapon_manifest_snapshot'))
  def draw(self,context):
   l=self.layout;s=context.scene
-  l.label(text='Current designs first; scroll for history')
-  l.template_list('GAF_UL_weapons','',s,'gaf_weapons',s,'gaf_weapon_index',rows=10)
+  l.label(text='Select a weapon')
+  l.template_list('GAF_UL_weapons','',s,'gaf_weapons',s,'gaf_weapon_index',rows=min(10,max(3,len(s.gaf_weapons))))
   if not s.gaf_weapons:return
   e=entries(s)[s.gaf_weapon_index];b=l.box();b.label(text=e['label']);b.label(text=e['status']+' | '+e['kind']);b.label(text=e['source'].split('/')[-1])
   l.prop(s,'gaf_fit_mode',text='Preview')

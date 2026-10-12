@@ -5,61 +5,6 @@
   "default_selection": "shotgun_stylized_v2",
   "weapons": [
     {
-      "id": "rifle_v1",
-      "label": "Rifle \u2014 Original V1",
-      "kind": "Rifle",
-      "source": "blender/weapons/m4a1_blocky/m4a1_blocky_v1.blend",
-      "status": "Pending",
-      "status_note": "Preserved historical asset; no individual model approval inferred.",
-      "collection": "WEAPON_rifle_v1",
-      "root": "rifle_v1__M4A1_Blocky_Root",
-      "source_sha256": "d15e23b666941ce12c49e78329d97a2b32ec095782edebbf525c6c186bfe67f9"
-    },
-    {
-      "id": "rifle_v2",
-      "label": "Rifle \u2014 Legacy V2",
-      "kind": "Rifle",
-      "source": "blender/weapons/m4a1_blocky/m4a1_blocky_v2.blend",
-      "status": "Pending",
-      "status_note": "Preserved historical asset; no individual model approval inferred.",
-      "collection": "WEAPON_rifle_v2",
-      "root": "rifle_v2__M4A1_Blocky_Root",
-      "source_sha256": "c81a79e84a885331836d6869474540fa0ac238d20cfc5c9e80403945b562a966"
-    },
-    {
-      "id": "rifle_v3",
-      "label": "Rifle \u2014 Legacy V3",
-      "kind": "Rifle",
-      "source": "blender/weapons/m4a1_blocky/m4a1_blocky_v3.blend",
-      "status": "Pending",
-      "status_note": "Preserved historical asset; no individual model approval inferred.",
-      "collection": "WEAPON_rifle_v3",
-      "root": "rifle_v3__M4A1_Blocky_Root",
-      "source_sha256": "0f658869f69527606b09265b0cf3a9277fcc7bb4deef4302baca22d237234239"
-    },
-    {
-      "id": "rifle_v4",
-      "label": "Rifle \u2014 Legacy V4",
-      "kind": "Rifle",
-      "source": "blender/weapons/m4a1_blocky/m4a1_blocky_v4.blend",
-      "status": "Pending",
-      "status_note": "Preserved historical asset; no individual model approval inferred.",
-      "collection": "WEAPON_rifle_v4",
-      "root": "rifle_v4__M4A1_Blocky_Root",
-      "source_sha256": "1e20da10e5049119951c44201ef31dec413244e9081f10f167e554cefab42fb4"
-    },
-    {
-      "id": "rifle_production_r13",
-      "label": "Rifle \u2014 Production R13",
-      "kind": "Rifle",
-      "source": "game_mobile_3d/assets/characters/r13/rifle.glb",
-      "status": "Approved",
-      "status_note": "Existing approved geometry/mounts per player_weapon_socket_r13.gd; status applies only to this preserved production model.",
-      "collection": "WEAPON_rifle_production_r13",
-      "root": "rifle_production_r13__rifle_production_r13_GripRoot",
-      "source_sha256": "dbf5886316fc4db6e2de57a88a4b82c05ac84afc85d16518800e4fdef3355d6f"
-    },
-    {
       "id": "rifle_stylized_v2",
       "label": "Rifle \u2014 Stylized V2 (Preferred)",
       "kind": "Rifle",
@@ -124,6 +69,86 @@
           1.0
         ]
       ]
+    },
+    {
+      "id": "pistol_stylized_v2",
+      "kind": "Pistol",
+      "label": "Pistol \u2014 Stylized V2",
+      "source": "blender/weapons/pistol_stylized_v2/Pistol_Stylized_V2.blend",
+      "source_sha256": "82a1e358e340c52b1de22042efaac26821e531e025d7ab12570fbe32cd80cf8e",
+      "status": "Pending",
+      "status_note": "Pending visual review; original Korth-inspired design, muted brown grip, closed trigger joints.",
+      "collection": "WEAPON_pistol_stylized_v2",
+      "root": "pistol_stylized_v2__Pistol_Stylized_V2"
+    },
+    {
+      "id": "shotgun_stylized_v2",
+      "kind": "Shotgun",
+      "label": "Shotgun \u2014 Stylized V2",
+      "source": "blender/weapons/shotgun_stylized_v2/Shotgun_Stylized_V2.blend",
+      "source_sha256": "761893a1354f5a56051a2ef7f0c88599b227efbe8002a6b67d92084f9de373d5",
+      "status": "Pending",
+      "status_note": "Pending Stevens-inspired original; lower tube and pump raised for a close barrel gap.",
+      "collection": "WEAPON_shotgun_stylized_v2",
+      "root": "shotgun_stylized_v2__Shotgun_Stylized_V2"
+    }
+  ],
+  "preferred_rifle": "rifle_stylized_v2",
+  "archived_weapons": [
+    {
+      "id": "rifle_v1",
+      "label": "Rifle \u2014 Original V1",
+      "kind": "Rifle",
+      "source": "blender/weapons/m4a1_blocky/m4a1_blocky_v1.blend",
+      "status": "Pending",
+      "status_note": "Preserved historical asset; no individual model approval inferred.",
+      "collection": "WEAPON_rifle_v1",
+      "root": "rifle_v1__M4A1_Blocky_Root",
+      "source_sha256": "d15e23b666941ce12c49e78329d97a2b32ec095782edebbf525c6c186bfe67f9"
+    },
+    {
+      "id": "rifle_v2",
+      "label": "Rifle \u2014 Legacy V2",
+      "kind": "Rifle",
+      "source": "blender/weapons/m4a1_blocky/m4a1_blocky_v2.blend",
+      "status": "Pending",
+      "status_note": "Preserved historical asset; no individual model approval inferred.",
+      "collection": "WEAPON_rifle_v2",
+      "root": "rifle_v2__M4A1_Blocky_Root",
+      "source_sha256": "c81a79e84a885331836d6869474540fa0ac238d20cfc5c9e80403945b562a966"
+    },
+    {
+      "id": "rifle_v3",
+      "label": "Rifle \u2014 Legacy V3",
+      "kind": "Rifle",
+      "source": "blender/weapons/m4a1_blocky/m4a1_blocky_v3.blend",
+      "status": "Pending",
+      "status_note": "Preserved historical asset; no individual model approval inferred.",
+      "collection": "WEAPON_rifle_v3",
+      "root": "rifle_v3__M4A1_Blocky_Root",
+      "source_sha256": "0f658869f69527606b09265b0cf3a9277fcc7bb4deef4302baca22d237234239"
+    },
+    {
+      "id": "rifle_v4",
+      "label": "Rifle \u2014 Legacy V4",
+      "kind": "Rifle",
+      "source": "blender/weapons/m4a1_blocky/m4a1_blocky_v4.blend",
+      "status": "Pending",
+      "status_note": "Preserved historical asset; no individual model approval inferred.",
+      "collection": "WEAPON_rifle_v4",
+      "root": "rifle_v4__M4A1_Blocky_Root",
+      "source_sha256": "1e20da10e5049119951c44201ef31dec413244e9081f10f167e554cefab42fb4"
+    },
+    {
+      "id": "rifle_production_r13",
+      "label": "Rifle \u2014 Production R13",
+      "kind": "Rifle",
+      "source": "game_mobile_3d/assets/characters/r13/rifle.glb",
+      "status": "Approved",
+      "status_note": "Existing approved geometry/mounts per player_weapon_socket_r13.gd; status applies only to this preserved production model.",
+      "collection": "WEAPON_rifle_production_r13",
+      "root": "rifle_production_r13__rifle_production_r13_GripRoot",
+      "source_sha256": "dbf5886316fc4db6e2de57a88a4b82c05ac84afc85d16518800e4fdef3355d6f"
     },
     {
       "id": "pistol_v1",
@@ -245,29 +270,7 @@
       "status_note": "Preserved early compact candidate, superseded by user reference steering.",
       "collection": "WEAPON_rifle_stylized_v2_compact",
       "root": "rifle_stylized_v2_compact__Rifle_Stylized_V2"
-    },
-    {
-      "id": "pistol_stylized_v2",
-      "kind": "Pistol",
-      "label": "Pistol \u2014 Stylized V2",
-      "source": "blender/weapons/pistol_stylized_v2/Pistol_Stylized_V2.blend",
-      "source_sha256": "82a1e358e340c52b1de22042efaac26821e531e025d7ab12570fbe32cd80cf8e",
-      "status": "Pending",
-      "status_note": "Pending visual review; original Korth-inspired design, muted brown grip, closed trigger joints.",
-      "collection": "WEAPON_pistol_stylized_v2",
-      "root": "pistol_stylized_v2__Pistol_Stylized_V2"
-    },
-    {
-      "id": "shotgun_stylized_v2",
-      "kind": "Shotgun",
-      "label": "Shotgun \u2014 Stylized V2",
-      "source": "blender/weapons/shotgun_stylized_v2/Shotgun_Stylized_V2.blend",
-      "source_sha256": "761893a1354f5a56051a2ef7f0c88599b227efbe8002a6b67d92084f9de373d5",
-      "status": "Pending",
-      "status_note": "Pending Stevens-inspired original; lower tube and pump raised for a close barrel gap.",
-      "collection": "WEAPON_shotgun_stylized_v2",
-      "root": "shotgun_stylized_v2__Shotgun_Stylized_V2"
     }
   ],
-  "preferred_rifle": "rifle_stylized_v2"
+  "list_policy": "Only the three current Stylized V2 designs are listed as of 2026-10-12; older entries archived by user request. Future new designs register in this same active list."
 }

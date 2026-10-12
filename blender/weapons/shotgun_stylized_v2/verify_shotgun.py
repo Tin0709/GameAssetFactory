@@ -46,7 +46,7 @@ if '--asset-only' not in sys.argv:
  manifest=json.loads((SHOW/'weapon_manifest.json').read_text());entry=next(e for e in manifest['weapons'] if e['id']=='shotgun_stylized_v2')
  assert entry['status']=='Pending' and entry['source_sha256']==hashlib.sha256((HERE/'Shotgun_Stylized_V2.blend').read_bytes()).hexdigest()
  old=json.loads((VAL/'manifest_before.json').read_text())
- for e in old['weapons']:assert next(x for x in manifest['weapons'] if x['id']==e['id'])==e,('Existing entry changed',e['id'])
+ for e in old['weapons']:assert next(x for x in manifest['weapons']+manifest.get('archived_weapons',[]) if x['id']==e['id'])==e,('Existing entry changed',e['id'])
  for key,value in old.items():
   if key not in ['weapons','default_selection']:assert manifest[key]==value,('Library metadata changed',key)
  assert manifest['default_selection']=='shotgun_stylized_v2'
