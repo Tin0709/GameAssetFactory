@@ -4,7 +4,7 @@ var scripted_input := false
 var requested_direction := Vector2.ZERO
 var requested_run := false
 var analog_strength := 1.0
-@export_range(1.0,2.0,.1) var review_pace := 2.0
+@export_range(1.0,2.0,.1) var review_pace := 1.5
 func _ready() -> void:
 	super._ready()
 	$Pistol.enabled=false
@@ -25,7 +25,7 @@ func _physics_process(delta: float) -> void:
 	visual.review_pace=review_pace
 	var speed:=(run_speed if fast_sprinting else walk_speed)*review_pace
 	var desired:=stick.limit_length()*speed*analog_strength
-	# Double speed in half the ramp time, without changing global physics time.
+	# Match speed and ramp time without changing global physics time.
 	var planar:=Vector2(velocity.x,velocity.z).move_toward(desired,(deceleration if stick.is_zero_approx() else acceleration)*review_pace*review_pace*delta)
 	velocity=Vector3(planar.x,-.2 if is_on_floor() else velocity.y-gravity*delta,planar.y)
 	move_and_slide()

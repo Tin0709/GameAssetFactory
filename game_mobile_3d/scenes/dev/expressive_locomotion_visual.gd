@@ -5,7 +5,7 @@ const EXPRESSIVE_NAMES=["Idle_Expressive_Test_v3","Walk_Expressive_Test","Run_Ex
 const WALK_STRIDE:=1.08
 const RUN_STRIDE:=1.54
 const REPLANT_SECONDS:=.44
-var review_pace:=2.0
+var review_pace:=1.5
 var expressive_clips: Dictionary={}
 var gait_phase:=.28
 var gait_run_weight:=0.0
@@ -131,7 +131,7 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 	if settling:
 		settle_time+=delta*review_pace
 		if settle_time>=REPLANT_SECONDS:settling=false;foot_support=[true,true]
-	elif not move_requested:attention_time=fposmod(attention_time+delta*review_pace,8.0)
+	elif not move_requested:attention_time=fposmod(attention_time+delta,8.0)
 	support_left=_support(0);support_right=_support(1)
 
 func _support(side: int) -> bool:
@@ -142,7 +142,7 @@ func _support(side: int) -> bool:
 func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	if not move_requested:
 		var clip: RefCounted=expressive_clips[EXPRESSIVE_NAMES[0]]
-		return Transform3D(Basis(clip.rotation(bone,fposmod(attention_time+ahead*review_pace,8.0))),clip.position(bone,fposmod(attention_time+ahead*review_pace,8.0)))
+		return Transform3D(Basis(clip.rotation(bone,fposmod(attention_time+ahead,8.0))),clip.position(bone,fposmod(attention_time+ahead,8.0)))
 	var wp: RefCounted=expressive_clips[EXPRESSIVE_NAMES[1]]
 	var rp: RefCounted=expressive_clips[EXPRESSIVE_NAMES[2]]
 	var phase:=fposmod(gait_phase+ahead*gait_frequency,1.0)

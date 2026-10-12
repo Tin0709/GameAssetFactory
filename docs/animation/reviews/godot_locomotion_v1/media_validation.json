@@ -1,4 +1,5 @@
 {
+  "movie": "gameplay_pace1_5x_1x.mp4",
   "frames": 547,
   "fps": 30.0,
   "duration_seconds": 18.233333333333334,
@@ -6,7 +7,9 @@
     1280,
     720
   ],
-  "source_avi_sha256": "cf9099a6fd2108f248d7862247e4e08c4e2f0510acaa0bb0bead4cb18519a08b",
+  "source_avi_sha256": "f1d5032cf15b8e92198aac4418b6d5f46783f9a3c149f4bb443bc914a0a25760",
   "renderer": "Godot 4.7.2 Mobile / D3D12",
-  "timing": "Original action timing, time_scale 1, physics 60Hz, rendered 30FPS offline. Not a phone performance measurement."
+  "review_pace": 1.5,
+  "idle_pace": 1.0,
+  "timing": "Original-speed recording of 1.5x movement/gait and normal Idle. Engine time_scale 1, physics 60Hz, rendered 30FPS offline. Not a phone performance measurement."
 }

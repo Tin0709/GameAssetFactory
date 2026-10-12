@@ -47,9 +47,9 @@ func _ready() -> void:
 	var panel:=VBoxContainer.new();panel.position=Vector2(22,16);canvas.add_child(panel)
 	var title:=Label.new();title.text="EXPRESSIVE LOCOMOTION  |  GODOT TEST";title.add_theme_font_size_override("font_size",24);panel.add_child(title)
 	status=Label.new();status.add_theme_font_size_override("font_size",19);panel.add_child(status)
-	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: rifle layer   T: 1× / 2× pace\nFlat-ground review only · no Jump · production unchanged";panel.add_child(help)
+	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: rifle layer   T: compare pace\nIdle: normal speed · no Jump · production unchanged";panel.add_child(help)
 	var controls:=HBoxContainer.new();panel.add_child(controls)
-	for label in ["Front","3/4","Side","Demo","Reset","Rifle layer","1× / 2× pace"]:
+	for label in ["Front","3/4","Side","Demo","Reset","Rifle layer","Compare pace"]:
 		var button:=Button.new();button.text=label;controls.add_child(button)
 		button.pressed.connect(_button.bind(label))
 	var slider:=HSlider.new();slider.min_value=.2;slider.max_value=1;slider.step=.05;slider.value=1;slider.custom_minimum_size=Vector2(260,24);controls.add_child(slider)
@@ -62,6 +62,7 @@ func _ready() -> void:
 	for i in actor.visual.skeleton.get_bone_count():_previous_q.append(actor.visual.skeleton.get_bone_pose_rotation(i))
 	_update_camera(1)
 	if "--expressive-pace-1" in OS.get_cmdline_user_args():actor.review_pace=1.0;actor.visual.review_pace=1.0
+	if "--expressive-pace-2" in OS.get_cmdline_user_args():actor.review_pace=2.0;actor.visual.review_pace=2.0
 	if "--expressive-demo" in OS.get_cmdline_user_args():call_deferred("run_demo")
 
 func _button(label: String) -> void:
@@ -72,7 +73,7 @@ func _button(label: String) -> void:
 		"Demo":if not demo_running:run_demo()
 		"Reset":reset_actor()
 		"Rifle layer":_armed=not _armed;actor.set_review_weapon(_armed)
-		"1× / 2× pace":actor.review_pace=1.0 if actor.review_pace>1.0 else 2.0
+		"Compare pace":actor.review_pace=1.0 if actor.review_pace>=2.0 else actor.review_pace+.5
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event.is_pressed() or event.is_echo():return
 	match event.physical_keycode:
@@ -82,14 +83,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_F9:_button("Demo")
 		KEY_R:_button("Reset")
 		KEY_E:_button("Rifle layer")
-		KEY_T:_button("1× / 2× pace")
+		KEY_T:_button("Compare pace")
 func _update_camera(_delta: float) -> void:
 	var target:=actor.global_position+Vector3(0,.95,0)
 	camera.position=target+camera_offset;camera.look_at(target)
 func _process(delta: float) -> void:
 	_elapsed+=delta;_update_camera(delta)
 	var v=actor.visual
-	status.text="%s · %.0f× pace\nSpeed %.2f m/s   Run %.0f%%   Phase %.3f   Support %s%s\n%s"%[section,actor.review_pace,actor.current_speed,v.gait_run_weight*100,v.gait_phase,"L " if v.support_left else "","R" if v.support_right else "",("Idle look-around" if not v.move_requested and not v.settling else ("Single-foot replant" if v.settling else "Distance-driven gait"))]
+	status.text="%s · %.1f× travel / gait · Idle 1×\nSpeed %.2f m/s   Run %.0f%%   Phase %.3f   Support %s%s\n%s"%[section,actor.review_pace,actor.current_speed,v.gait_run_weight*100,v.gait_phase,"L " if v.support_left else "","R" if v.support_right else "",("Idle look-around" if not v.move_requested and not v.settling else ("Single-foot replant" if v.settling else "Distance-driven gait"))]
 	if delta>.00001 and _measured_sequence!=v.pose_sequence:
 		_measured_sequence=v.pose_sequence
 		var elapsed: float=v.pose_delta
