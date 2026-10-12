@@ -19,6 +19,20 @@ var layer_was_equipped:=false
 var layer_release_age:=.30
 var layer_release_q: Array[Vector3]=[]
 var layer_release_p: Array[Vector3]=[]
+var turn_twist_guard_enabled:=true
+
+func _limit_leg_twist(q: Quaternion, reference: Quaternion) -> Quaternion:
+	if not turn_twist_guard_enabled:return q
+	# Keep the support aim/rigid leg axis, but allow a planted toe pivot before
+	# the cached world heading winds behind the turning pelvis. This is axial
+	# articulation only; it does not delay input, change gait or invent a joint.
+	var axis:=Basis(q).y.normalized()
+	var forward:=Basis(reference).z
+	forward=(forward-axis*forward.dot(axis)).normalized()
+	if forward.length_squared()<.5:return q
+	var twist:=forward.signed_angle_to(Basis(q).z,axis)
+	var bounded:=clampf(twist,-deg_to_rad(35),deg_to_rad(35))
+	return (Quaternion(axis,bounded-twist)*q).normalized()
 
 func _process(delta: float) -> void:
 	if polish_enabled and layer_was_equipped and not weapon_equipped and not _q.is_empty():
@@ -212,6 +226,9 @@ func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Qu
 	# Carry the solved offset into the inherited swing release instead of
 	# jumping straight back to the body-relative authored leg orientation.
 	q=landing_q.slerp(q,weight).normalized()
+	var clean_q:=_limit_leg_twist(q,original_q)
+	if clean_q.angle_to(q)>.00001:foot_rotations[side]=clean_q
+	q=clean_q
 	support_aim[side]=(q*original_q.inverse()).normalized()
 	return q
 
@@ -226,7 +243,9 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	var original_fraction:=1-exp(-25*review_pace*delta)
 	var fraction:=lerpf(original_fraction,minf(original_fraction,8*delta/maxf(angle,.00001)),weight)
 	support_aim[side]=support_aim[side].slerp(Quaternion.IDENTITY,fraction).normalized()
-	swing_world_q[side]=(support_aim[side]*_leg_world_rotation(bone)).normalized()
+	var reference:=_leg_world_rotation(bone)
+	swing_world_q[side]=_limit_leg_twist((support_aim[side]*reference).normalized(),reference)
+	support_aim[side]=(swing_world_q[side]*reference.inverse()).normalized()
 	swing_active[side]=true
 	return swing_world_q[side]
 
