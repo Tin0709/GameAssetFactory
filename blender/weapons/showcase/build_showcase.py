@@ -129,6 +129,8 @@ for e in spec:assert hashlib.sha256((ROOT/e['source']).read_bytes()).hexdigest()
 staged=TMP/'Weapon_Showcase.staging.blend'
 bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str(staged))
 assert (hashlib.sha256(TARGET.read_bytes()).hexdigest() if TARGET.exists() else None)==initial_target_hash,'Showcase changed while saving staging file'
+assert (hashlib.sha256(MANIFEST.read_bytes()).hexdigest() if MANIFEST.exists() else None)==initial_manifest_hash,'Manifest changed while saving staging file'
+for e in spec:assert hashlib.sha256((ROOT/e['source']).read_bytes()).hexdigest()==e['source_sha256'],'Source changed while saving staging file: '+e['source']
 shutil.copy2(staged,TARGET)
 MANIFEST.write_text(json.dumps(manifest,indent=2))
 print('SHOWCASE_BUILT',len(spec),'entries; static fit only; zero Actions')

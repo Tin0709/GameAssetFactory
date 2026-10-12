@@ -13,3 +13,5 @@ Rifle: grip-centered +Y forward / +Z up; layered faceted receiver, six broad gua
 5. Reopen a fresh Blender process, exercise every entry/view/mode and reload magazine hierarchy, roundtrip the GLB, compare all protected hashes, inspect actual rendered pixels, document limitations and launch instructions.
 
 Execution: inline, authorized by the supplied implementation workflow. Production integration and animation edits require subsequent user visual approval.
+
+Latest steering: user rejected the compact rifle and asked to closely match the attached M4A1 image, then requested cleaner numbers and closure of the carry-handle/receiver gap. Preserve compact V2 as the seventeenth entry. Current result is 1.20m long, 0.3618m tall, 1,140 triangles and one clean-markings atlas. Static holster source capture is F62, not loop-closing F125. Pending V2 alone trials the requested10° horizontal-back fit; original55° production mount stays preserved. Single-writer locking, final hash comparisons, Windows path normalization and projected camera framing cover review findings.

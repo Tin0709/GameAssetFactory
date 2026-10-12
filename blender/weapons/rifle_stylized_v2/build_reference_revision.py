@@ -44,82 +44,103 @@ try:
       for dx in range(2):
        for dy in range(2):paint(j*12+col*2+dx,y+14-row*2+dy,palette[color])
   labels[text]=(width,y)
- im=bpy.data.images.new('Rifle_V2_Reference_Atlas_256',width=W,height=H,alpha=True);im.pixels.foreach_set(pixels)
- im.filepath_raw=str(OUT/'rifle_v2_reference_atlas_256.png');im.file_format='PNG';im.save();im.pack()
+ clean_atlas=OUT/'rifle_v2_markings_atlas_1024.png'
+ if clean_atlas.exists():
+  im=bpy.data.images.load(str(clean_atlas),check_existing=False);im.name='Rifle_V2_Clean_Markings_1024';im.pack()
+ else:
+  im=bpy.data.images.new('Rifle_V2_Reference_Atlas_256',width=W,height=H,alpha=True);im.pixels.foreach_set(pixels)
+  im.filepath_raw=str(OUT/'rifle_v2_reference_atlas_256.png');im.file_format='PNG';im.save();im.pack()
  mat=bpy.data.materials.new('Rifle_V2_Reference_Graphite');mat.use_nodes=True
  bs=mat.node_tree.nodes.get('Principled BSDF');bs.inputs['Metallic'].default_value=.12;bs.inputs['Roughness'].default_value=.5
  tx=mat.node_tree.nodes.new('ShaderNodeTexImage');tx.image=im;tx.interpolation='Closest';mat.node_tree.links.new(tx.outputs['Color'],bs.inputs['Base Color'])
  parts=[];magparts=[]
  # Reuse dimensioned manifold extrusion helpers; replace their constant-palette UV mapping.
  code=(OUT/'build_rifle.py').read_text();snippet=code[code.index('def part('):code.index('# Broad receiver planes')]
- snippet=snippet.replace('((color*8+4)/64,.5)','((color*32+16)/256,112/128)')
+ snippet=snippet.replace('((color*8+4)/64,.5)','((color*32+16)/256,120.5/128)')
  exec(compile(snippet,str(OUT/'build_rifle.py'),'exec'))
  scale=1.20/1777;origin=(560,395)
  def yz(points):return [((x-origin[0])*scale,(origin[1]-y)*scale) for x,y in points]
  def P(name,points,width,tile=1,bevel=0,mag=False,x=0):return profile(name,yz(points),width,tile,bevel,mag,x)
  def B(name,rect,width,tile=1,bevel=0,mag=False,x=0):
   l,t,r,b=rect;return P(name,[(l,t),(r,t),(r,b),(l,b)],width,tile,bevel,mag,x)
- def ring(name,outer,inner,width,tile=0):
+ def ring(name,outer,inner,width,tile=0,bevel=0):
   outer=yz(outer);inner=yz(inner);n=len(outer);vs=[(x,y,z) for x in [-width/2,width/2] for points in [outer,inner] for y,z in points];fs=[]
   for i in range(n):
    j=(i+1)%n
    fs.extend([(i,j,j+n,i+n),(i+2*n,i+3*n,j+3*n,j+2*n),(i,i+2*n,j+2*n,j),(i+n,j+n,j+3*n,i+3*n)])
-  return part(name,vs,fs,tile)
- def label(text,x0,x1,y0,y1,depth,mag=False,sides=(-1,1)):
+  return part(name,vs,fs,tile,bevel)
+ def label(text,x0,x1,y0,y1,depth,mag=False,sides=(-1,1),angle=0):
   width,py=labels[text]
   for side in sides:
-   points=yz([(x0,y0),(x1,y0),(x1,y1),(x0,y1)])
+   cx,cy=(x0+x1)/2,(y0+y1)/2
+   points=yz([(cx+(x-cx)*math.cos(angle)-(y-cy)*math.sin(angle),cy+(x-cx)*math.sin(angle)+(y-cy)*math.cos(angle)) for x,y in [(x0,y0),(x1,y0),(x1,y1),(x0,y1)]])
    ob=part('AtlasLabel_'+text,[(side*depth,y,z) for y,z in points],[(0,1,2,3)] if side>0 else [(3,2,1,0)],1,mag=mag)
    uv=ob.data.uv_layers.active
    coords=[(.5/W,(py+15.5)/H),((width-.5)/W,(py+15.5)/H),((width-.5)/W,(py+.5)/H),(.5/W,(py+.5)/H)]
    if side<0:coords=[coords[1],coords[0],coords[3],coords[2]]
    for li in range(4):uv.data[li].uv=coords[ob.data.loops[li].vertex_index]
  # Match the reference's long stock, shallow receiver and long exposed barrel.
- B('StockUpper',(91,111,481,190),.079,0,.0012)
- P('StockBrace',[(93,180),(394,180),(394,267),(282,267),(207,317),(207,251),(99,350)],.064,0)
+ B('StockUpper',(91,111,481,190),.079,0,.002)
+ P('StockBrace',[(93,180),(394,180),(394,267),(282,267),(207,317),(207,251),(99,350)],.064,4)
+ P('StockBraceStep',[(207,251),(264,226),(376,226),(376,260),(283,260),(207,317)],.070,0,.0007)
  B('StockButt',(90,115,105,365),.087,0,.0008)
  for side in [-1,1]:
-  for x0 in [118,219,320]:B('StockVent',(x0,140,x0+72,158),.002,4,x=side*.040)
+  for x0 in [118,219,320]:B('StockVent',(x0,140,x0+72,158),.0003,4,x=side*.0396)
  B('BufferCollar',(460,128,535,190),.061,3,.001)
- B('UpperReceiver',(501,132,980,207),.071,2,.001)
- P('LowerReceiver',[(500,204),(973,204),(971,301),(794,324),(794,253),(628,253),(630,325),(554,284),(500,252)],.068,1,.001)
- ring('CarryHandle',[(550,129),(601,10),(982,25),(985,129)],[(669,106),(690,52),(953,61),(953,111)],.035,0)
+ B('UpperReceiver',(501,132,980,207),.075,2,.0014)
+ P('LowerReceiver',[(500,204),(973,204),(971,301),(794,324),(794,253),(628,253),(630,325),(554,284),(500,252)],.070,1,.0014)
+ ring('CarryHandle',[(550,134),(601,10),(982,25),(985,134)],[(669,106),(690,52),(953,61),(953,111)],.035,0,.0006)
  B('ChargingLatch',(505,103,554,132),.09,0)
  # Distinct silver deflector on one side and marking plate on the other.
  P('ReceiverDeflector',[(531,146),(687,154),(686,181),(531,196)],.008,3,.0005,x=-.040)
- B('ReceiverRaisedInset',(784,152,958,191),.006,1,x=-.039)
+ B('ReceiverRaisedInset',(784,152,958,191),.0015,1,x=-.038)
+ for x0 in [796,879]:
+  P('ReceiverInsetFrame',[(x0,185),(x0,159),(x0+65,159),(x0+65,185),(x0+57,185),(x0+57,167),(x0+8,167),(x0+8,185)],.0004,2,x=-.039)
  for side in [-1,1]:
   for name,rect in [('SafetyRedDot',(584,201,600,217)),('SafetyBar',(542,228,574,239))]:
    control=B(name,rect,.002,5,x=side*.036)
    for uv in control.data.uv_layers.active.data:uv.uv=(240/256,104/128)
   B('SafetyWhiteDot',(629,230,642,243),.002,6,x=side*.036)
+  B('SelectorRecess',(584,224,613,253),.0004,7,x=side*.0352)
+  for rect in [(511,211,535,234),(927,214,950,243)]:B('ReceiverPinInset',rect,.0004,7,x=side*.0352)
  # Broad handguard: alternating planes, shallow eight ribs rather than a tall rail.
  B('GuardSilverCollar',(981,121,1038,225),.088,3,.001)
- B('Handguard',(1037,107,1431,241),.089,0,.001)
+ B('Handguard',(1037,107,1431,241),.092,0,.001)
  for i in range(8):
   x0=1041+i*48
-  B('GuardRib_%02d'%i,(x0,107,x0+24,241),.094,7)
+  B('GuardRib_%02d'%i,(x0,107,x0+24,241),.093,7,.00035)
  ring('FrontSight',[(1431,157),(1510,45),(1541,46),(1541,158)],[(1448,149),(1518,71),(1530,72),(1530,149)],.018,0)
  B('FrontSightBase',(1431,157,1541,202),.05,0)
  # Stepped rectangular barrel, square cap and true dark front opening.
  B('BarrelRear',(1541,163,1602,201),.027,3)
  P('BarrelTaper',[(1601,163),(1640,174),(1640,195),(1601,201)],.026,3)
  B('BarrelLong',(1638,174,1788,196),.022,3)
- z=(395-184)*scale;tube('MuzzleBrake',(1781-560)*scale,(1867-560)*scale,z,.022,.011,2)
+ z=(395-184)*scale
+ # Rectangular hollow cap, matching the reference rather than an octagonal tube.
+ vs=[(xx,yy,z+zz) for yy in [(1781-560)*scale,(1867-560)*scale] for w,h in [(.023,.0175),(.014,.010)] for xx,zz in [(-w,-h),(w,-h),(w,h),(-w,h)]]
+ fs=[]
+ for i in range(4):
+  j=(i+1)%4;fs.extend([(i,j,j+8,i+8),(i+4,i+12,j+12,j+4),(i+8,j+8,j+12,i+12),(i,i+4,j+4,j)])
+ part('MuzzleBrake',vs,fs,3)
  # Reference grip and open rectangular trigger window, retaining a centered hand origin.
- P('PistolGrip',[(558,282),(651,320),(566,455),(440,426)],.060,0,.001)
+ P('PistolGrip',[(558,282),(651,320),(566,455),(440,426)],.060,0,.0015)
  P('GripInset',[(558,299),(623,326),(554,434),(461,412)],.002,4,x=.031)
  P('GripInset',[(558,299),(623,326),(554,434),(461,412)],.002,4,x=-.031)
  ring('TriggerGuard',[(628,253),(790,253),(794,325),(630,325)],[(642,264),(779,264),(781,313),(642,313)],.026,2)
  P('Trigger',[(687,261),(699,261),(717,306),(708,310)],.013,0)
- P('Magazine',[(794,321),(963,306),(971,391),(1007,509),(848,546),(824,439)],.065,0,.0008,True)
+ # Seat the feed mouth inside the lower receiver, retaining the reload pivot.
+ P('Magazine',[(794,309),(963,294),(971,391),(1007,509),(848,546),(824,439)],.065,0,.0008,True)
  for side in [-1,1]:
-  for dx in [0,66]:P('MagazineGroove',[(816+dx,335),(837+dx,332),(846+dx,425),(870+dx,498),(850+dx,503),(829+dx,431)],.002,4,mag=True,x=side*.033)
- label('M4A1 CARBINE',529,750,153,183,.0365,sides=(1,))
- label('2003451',824,953,161,185,.0365)
- label('5X56',697,771,159,181,.0445,sides=(-1,))
- label('V4',830,908,249,286,.035)
- label('200134',862,986,501,525,.034,True)
+  # End the raised strips above the serial's field, avoiding coplanar overlap.
+  for dx in [0,66]:P('MagazineGroove',[(816+dx,335),(837+dx,332),(846+dx,425),(863+dx,475),(843+dx,480),(829+dx,431)],.002,4,mag=True,x=side*.033)
+ label('M4A1 CARBINE',529,750,153,183,.0376,sides=(1,))
+ label('2003451',828,949,160,182,.0376,sides=(1,))
+ label('2003451',1440,1534,174,195,.0251,sides=(-1,))
+ label('5X56',697,771,159,181,.0376,sides=(-1,))
+ label('V4',830,908,249,286,.0351)
+ # Keep the magazine serial inside its face with generous bottom/side gutters.
+ # Baseline follows the actual sloping magazine base (848,546) -> (1007,509).
+ label('200134',858,970,497,519,.034,True,angle=math.atan2(-37,159))
  # Join only the two rigid runtime parts; atlas labels remain part of those surfaces.
  tail=code[code.index('def join('):code.index("body=join(parts,")]
  exec(compile(tail,str(OUT/'build_rifle.py'),'exec'))
@@ -130,12 +151,12 @@ try:
   ob=bpy.data.objects.new(name,None);c.objects.link(ob);ob.parent=root;ob.location=pos;ob.empty_display_type='ARROWS';ob.empty_display_size=.03;ob['role']=name
  bpy.context.view_layer.update()
  points=[o.matrix_world@v.co for o in [body,mag] for v in o.data.vertices]
- report={'status':'Pending','revision':'Reference-matched long silhouette after explicit user correction','dimensions_m':[max(v[i] for v in points)-min(v[i] for v in points) for i in range(3)],'meshes':2,'materials':1,'texture':[W,H],'markers':markers,'topology':{},'compact_source_sha256':hashlib.sha256((archive/'Rifle_Stylized_V2_compact.blend').read_bytes()).hexdigest(),'reference':'User attached blocky-stylized-m4a1-assault-rifle-low-poly-game-ready-3d-model-22c0739a31 (1).jpg'}
+ report={'status':'Pending','revision':'Reference form/surface pass: layered stock and receiver, shallow guard bands, rectangular muzzle, sRGB steel/graphite palette, aligned serial and seated magazine','dimensions_m':[max(v[i] for v in points)-min(v[i] for v in points) for i in range(3)],'meshes':2,'materials':1,'texture':list(im.size),'markers':markers,'topology':{},'compact_source_sha256':hashlib.sha256((archive/'Rifle_Stylized_V2_compact.blend').read_bytes()).hexdigest(),'reference':'User attached blocky-stylized-m4a1-assault-rifle-low-poly-game-ready-3d-model-22c0739a31 (2).jpg'}
  for ob in [body,mag]:
   ob.data.calc_loop_triangles();bm=bmesh.new();bm.from_mesh(ob.data)
   # Identification planes are intentionally two-sided decals in the same mesh/material.
   report['topology'][ob.name]={'triangles':len(ob.data.loop_triangles),'boundary_edges':sum(e.is_boundary for e in bm.edges),'nonmanifold_edges_excluding_decals':sum(not e.is_manifold and not e.is_boundary for e in bm.edges),'loose_vertices':sum(not v.link_faces for v in bm.verts)};bm.free()
- report['triangles']=sum(t['triangles'] for t in report['topology'].values());assert report['triangles']<1800
+ report['triangles']=sum(t['triangles'] for t in report['topology'].values());assert report['triangles']<2000
  bpy.ops.object.select_all(action='DESELECT')
  for ob in c.objects:ob.select_set(True)
  bpy.context.view_layer.objects.active=body

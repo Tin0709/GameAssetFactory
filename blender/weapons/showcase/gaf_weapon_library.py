@@ -34,7 +34,7 @@ def view(scene,direction):
  e=entries(scene)[scene.gaf_weapon_index];obs=list(bpy.data.collections[e['collection']].objects)
  if scene.gaf_fit_mode!='STANDALONE':obs+=list(bpy.data.collections['FIT_'+e['kind']+'_'+scene.gaf_fit_mode].objects)
  bpy.context.view_layer.update();center,dims=bounds(obs)
- dirs={'LEFT':(-1,0,0),'RIGHT':(1,0,0),'FRONT':(0,1,0),'BACK':(0,-1,0),'THREE_QUARTER':(1.5,-1.9,1.0)}
+ dirs={'LEFT':(-1,0,0),'RIGHT':(1,0,0),'FRONT':(0,1,0),'BACK':(0,-1,0),'THREE_QUARTER':(1.5,-1.9,1.0),'REFERENCE':(3,-.4,.55),'REFERENCE_LEFT':(-3,-.4,.55)}
  if scene.gaf_fit_mode!='STANDALONE':dirs['THREE_QUARTER']=(1.5,-2.2,.8);dirs['FRONT']=(0,-1,0);dirs['BACK']=(0,1,0)
  cam=bpy.data.objects['Weapon_Review_Camera'];cam.location=center+Vector(dirs[direction]).normalized()*max(2,max(dims)*2)
  cam.rotation_euler=(center-cam.location).to_track_quat('-Z','Y').to_euler()

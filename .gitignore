@@ -57,3 +57,6 @@ venv/
 
 # Generated validation data
 .validation/
+
+# Transient single-writer guard for weapon-library updates
+blender/weapons/showcase/.weapon_library.lock

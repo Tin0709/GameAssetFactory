@@ -67,7 +67,7 @@
       "status_note": "Pending reference-matched long revision requested by user; compact checkpoint preserved.",
       "collection": "WEAPON_rifle_stylized_v2",
       "root": "rifle_stylized_v2__Rifle_Stylized_V2",
-      "source_sha256": "8a02122848113fc0fb552f4d253571957f12f70841a8d60975437a8109d4f57c",
+      "source_sha256": "adc06c8698a25460f7e537841dc1fe820a5a912e8523da633fcc882c67ca711b",
       "holster_preview_matrix": [
         [
           0,

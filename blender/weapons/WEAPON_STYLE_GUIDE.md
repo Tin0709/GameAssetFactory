@@ -1,5 +1,9 @@
 # Weapon style guide
 
+## Permanent review workflow — 2026-10-12
+
+Register every new model/version in `showcase/Weapon_Showcase.blend` through [the central workflow](showcase/README.md). New entries are Pending, retain all prior models, and require explicit artistic approval before production replacement. Character-fit previews reuse existing poses without changing approved Actions. The latest user-directed `Rifle_Stylized_V2` overrides the earlier compact rifle design for that Pending candidate only: closely match the attached long M4A1 silhouette, clean markings and connected carry-handle/receiver joint. Preserve its compact checkpoint and all production versions.
+
 The blocky M4A1 V2 (geometry-clean successor: V3; current readability revision: V4) is the style anchor for this game's weapon family. Preserve its chunky cuboid forms, charcoal/cool-gray palette, crisp pixel accents, and restrained light edges. Future weapons should read as distinct silhouettes while belonging to the same visual world.
 
 ## Shape and readability

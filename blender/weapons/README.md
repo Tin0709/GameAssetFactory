@@ -1,5 +1,7 @@
 # Blocky weapon family
 
+**Permanent review library (2026-10-12):** [Weapon Showcase](showcase/README.md) now contains all twelve source versions, three production R13 models, Pending `Rifle_Stylized_V2` and its preserved compact checkpoint. Open `showcase/Open_Weapon_Showcase.cmd`, then N → Weapon Library. The latest V2 matches the user's supplied longer M4A1 proportions; [current review and progress](WEAPON_PROGRESS.md). Every future weapon version must register in this SAME showcase as Pending through `showcase/register_weapon.py`; never create per-weapon showcases or replace approved assets without explicit approval.
+
 Latest readable set: [Pistol V3, M4A1 V4 and Shotgun V3](WEAPON_REFINEMENT.md), with validated GLBs and side/isometric previews.
 
 Latest geometry-clean revisions: [Pistol V2, M4A1 V3 and Shotgun V2](GEOMETRY_CLEANUP.md). That report links the current GLBs, trigger close-ups and isometric previews. The original family versions below remain preserved.
