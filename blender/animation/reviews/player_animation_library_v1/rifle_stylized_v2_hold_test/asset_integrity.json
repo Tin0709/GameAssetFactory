@@ -1,0 +1,8 @@
+{
+  "character_and_floor_mesh_uv_weights_exact": true,
+  "existing_materials_images_exact": true,
+  "existing_lighting_exact": true,
+  "rifle_original_geometry_uv_materials_texture_and_local_transforms_exact": true,
+  "rifle_uniform_scale": 1.0,
+  "one_character_one_rig_two_weapon_meshes": true
+}
