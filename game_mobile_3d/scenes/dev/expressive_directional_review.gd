@@ -5,8 +5,17 @@ func _ready() -> void:
 	jump_review_note="Jump V2 test baseline approved"
 	review_title="DIRECTIONAL MOVEMENT · TEST"
 	super._ready()
+	if jump_enabled and not "--expressive-pace-1" in OS.get_cmdline_user_args() and not "--expressive-pace-2" in OS.get_cmdline_user_args():
+		actor.review_pace=2.25;actor.visual.review_pace=2.25
+	if jump_enabled and "--expressive-pace-1_5" in OS.get_cmdline_user_args():actor.review_pace=1.5;actor.visual.review_pace=1.5
 	if jump_enabled and "--expressive-direction-original" in OS.get_cmdline_user_args():actor.visual.directional_enabled=false
 	if jump_enabled and "--expressive-fall-original" in OS.get_cmdline_user_args():actor.visual.fall_wave_enabled=false
+
+func _button(label: String) -> void:
+	if jump_enabled and label=="Compare pace":
+		actor.review_pace=1.0 if actor.review_pace>=2.25 else (1.5 if actor.review_pace<1.5 else 2.25)
+		return
+	super._button(label)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	super._unhandled_key_input(event)
@@ -26,7 +35,7 @@ func run_demo() -> void:
 	await tick(35,"Approved Idle1x · directional test Pending")
 	for sprint in [false,true]:
 		actor.requested_direction=Vector2(0,1);actor.requested_run=sprint
-		await tick(55,"Run1.5x approach" if sprint else "Walk1.5x approach")
+		await tick(55,"Run approach" if sprint else "Walk approach")
 		for pair in [[45,45],[135,90],[315,180]]:
 			var radians:=deg_to_rad(float(pair[0]));actor.requested_direction=Vector2(sin(radians),cos(radians))
 			await tick(55,"%s · %d degree direction change"%["Run" if sprint else "Walk",pair[1]])

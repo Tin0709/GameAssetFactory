@@ -32,6 +32,10 @@ func _ground_turn_weight() -> float:
 func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	var result:=super._target_pose(bone,ahead)
 	var name:=skeleton.get_bone_name(bone)
+	if fall_wave_enabled and fall_wave_weight>0 and bone in [leg_left,leg_right]:
+		# Opposing whole-block flutter; no knee/ankle or airborne root bounce.
+		var phase: float=(jump_age+ahead)*TAU*1.7+(0.0 if bone==leg_left else PI)
+		result.basis=Basis(Vector3.RIGHT,deg_to_rad(8)*sin(phase)*fall_wave_weight)*result.basis
 	if fall_wave_enabled and fall_wave_weight>0 and name in ["Arm.L","Arm.R","ForeArm.L","ForeArm.R"]:
 		# Reuse the approved above-head airborne articulation. Small staggered
 		# shoulder arcs retain height and straight solid arms, rather than elbow flaps.
