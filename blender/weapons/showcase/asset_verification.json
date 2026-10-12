@@ -1,6 +1,6 @@
 {
   "export": {
-    "triangles": 1112,
+    "triangles": 1140,
     "meshes": 2,
     "surfaces": 2,
     "materials": 1,
@@ -43,7 +43,7 @@
         "intersecting_triangle_pairs": 26
       },
       "ForeArm.R": {
-        "intersecting_triangle_pairs": 84
+        "intersecting_triangle_pairs": 86
       },
       "UpperArm.L": {
         "intersecting_triangle_pairs": 0
@@ -88,10 +88,10 @@
         "intersecting_triangle_pairs": 0
       },
       "UpperArm.L": {
-        "intersecting_triangle_pairs": 44
+        "intersecting_triangle_pairs": 0
       },
       "ForeArm.L": {
-        "intersecting_triangle_pairs": 18
+        "intersecting_triangle_pairs": 0
       },
       "Chest": {
         "intersecting_triangle_pairs": 0
