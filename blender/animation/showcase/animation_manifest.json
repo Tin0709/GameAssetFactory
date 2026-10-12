@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/rebound_v005/walk_snappy_review.blend",
-      "source_sha256": "c83167a92961f801023917cd144e17a35bbf265f3189b3f179e3240ebc73cc51",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/stride_v006/walk_snappy_review.blend",
+      "source_sha256": "e4872e379288f918822084199a8405386a303e59696264a727284d0ba18db26a",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "f53d83f1d0c9a0b434ef08d69bfba5f679d1247ad866e41b0d2a10606f8860a0",
+      "action_sha256": "af3b30ba72a87af480811e9a49367331ceaccb9fb09592bd3a629f3c8e50f1bb",
       "action_frame_range": [
         1.0,
         31.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Springier body rebound:36.25mm soft contact load/80ms (75%less than145mm),101.25mm hip range including15mm hop, faster140ms rise, brief light top and slower settle; restrained torso/shoulder/head lag. Tiny rebound-only waist gap plus15mm whole-character micro-hop requested by user;120ms hop window each step, nominal24%flight. Fore/aft step reach12% longer, same180mm piston lift/close tracks/1s cadence. Prior source and19 other Actions preserved. Pending Blender-only; no Running/Godot changes.",
+      "approval_note": "Longer forward/back steps:additional12% versus v005 (25.44% total over original piston); same close tracks. Stepping piston lift+50%,180to270mm. More readable whole-character hop15to35mm over140ms. Softer downward load36.25mm/80ms retained (75%less than stronger145mm probe); torso/head/arm curves exact except common hip lift. Earlier sources/reviews and19 other Actions preserved; Pending Blender-only, no Run/Godot.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",

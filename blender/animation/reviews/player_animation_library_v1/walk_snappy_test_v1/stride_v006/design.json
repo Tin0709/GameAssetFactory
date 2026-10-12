@@ -11,24 +11,24 @@
   "nominal_speed_m_s": 1.279488,
   "leg_tracks_m": 0.27,
   "support_duty": {
-    "L": 0.52,
-    "R": 0.54
+    "L": 0.5,
+    "R": 0.52
   },
   "double_support": 0.3,
-  "flight": 0.24,
+  "flight": 0.28,
   "contact_frames": {
     "L": 1,
     "R": 16
   },
-  "hip_vertical_range_m": 0.10125,
+  "hip_vertical_range_m": 0.12125,
   "contact_drop_m": 0.03625,
   "compression_time_s": 0.08,
-  "vertical_sole_lift_m": 0.18,
+  "vertical_sole_lift_m": 0.27,
   "lift_peak_swing_fraction": [
     0.36,
     0.44
   ],
-  "non_leg_curves_exact": true,
+  "non_leg_curves_exact": false,
   "leg_motion": "Lower piston pull: rigid leg translates upward 180mm, then advances while lowering. Upper end remains covered at waist; no knee, stretch or rig modification.",
   "transition": "Stylized15mm micro-hop adds brief flight and extra receiving events. Existing LEFT0/RIGHT.5 main contacts retained; future runtime blends must account for flight. Blender-only Pending.",
   "rebound_peak_time_s": 0.22,
@@ -36,12 +36,12 @@
   "leg_world_motion_preserved": false,
   "fore_aft_stride_multiplier": 1.2544,
   "intentional_waist_gap": "Small rebound-only separation from planted leg; rigid geometry and180mm piston lift retained, fore/aft reach increased12%.",
-  "hop_height_m": 0.015,
+  "hop_height_m": 0.035,
   "hop_window_each_step_s": [
     0.17,
-    0.29
+    0.31
   ],
-  "body_motion": "Exact v005 softer36.25mm contact dip,15mm whole-character hop and torso/head/arm reaction. Only leg location/rotation curves changed for longer fore/aft reach.",
+  "body_motion": "Same v005 softer36.25mm contact dip and exact torso/head/arm channels. Common whole-character lift increased15to35mm over140ms, with longer fore/aft leg reach.",
   "base_stride_support_duty": {
     "L": 0.64,
     "R": 0.66
@@ -49,5 +49,7 @@
   "downward_snap_reduction_fraction": 0.75,
   "previous_stronger_drop_m": 0.145,
   "additional_stride_multiplier_vs_v005": 1.12,
-  "non_leg_curves_sha256": "7f870fa4c68e930db5db5405f41bc287397ad7996d9d6c504a35cbfe08e22e8f"
+  "fixed_channels_sha256": "f3c4932b62384e0b6ce32196a2e71bde4d082f40a5e8a52f3d6eb98e6e2e5c88",
+  "additional_piston_lift_multiplier": 1.5,
+  "body_motion_relative_to_common_hop_exact": true
 }
