@@ -1,0 +1,75 @@
+{
+  "source_sha256": "5aad1d7832b56b522cc4cf23efd45848e8b5ac48608192d0c7babe793b479712",
+  "action_sha256": "d89bb78da01e3e79d6a3ad24ee82e6df30571e038f978a4f73e089c82de8932a",
+  "samples": 961,
+  "nominal_speed_m_s": 1.02,
+  "max_rigid_error_m": 2.4559331834872467e-07,
+  "minimum_floor_clearance_m": 0.00012840703129768372,
+  "maximum_support_drift_m": 2.1689652999274358e-06,
+  "maximum_support_height_error_m": 3.2565832138061715e-06,
+  "nonadjacent_overlaps": {
+    "Head/UpperArm.L": {
+      "frame": 12.375,
+      "depth_m": -0.0014791644207434729
+    },
+    "Head/UpperArm.R": {
+      "frame": 27.0,
+      "depth_m": -0.0005903531455260236
+    }
+  },
+  "maximum_waist_separation_m": {
+    "L": -0.001286679063923657,
+    "R": -0.0009724815026856959
+  },
+  "camera_bounds": {
+    "FRONT": [
+      0.29402926564216614,
+      0.15122820436954498,
+      0.7047201991081238,
+      0.8153571486473083
+    ],
+    "THREE_QUARTER": [
+      0.2664981782436371,
+      0.14498457312583923,
+      0.7333059906959534,
+      0.8227648735046387
+    ],
+    "SIDE": [
+      0.24140633642673492,
+      0.1512119621038437,
+      0.6575796604156494,
+      0.8152574300765991
+    ]
+  },
+  "unsupported_samples": [],
+  "loop_pose_error_m": 0.0,
+  "loop_finite_vertex_velocity_difference_m_s": 0.005612735551256957,
+  "loop_velocity_finite_step_frames": 0.01,
+  "loop_channel_tangent_difference": 1.27861989076411e-06,
+  "hip_xyz_range_m": [
+    [
+      -0.008999936282634735,
+      0.020999936386942863
+    ],
+    [
+      -0.02599966526031494,
+      0.013999664224684238
+    ],
+    [
+      0.5499975681304932,
+      0.6800001263618469
+    ]
+  ],
+  "maximum_leg_local_translation_m": 0.13110678281190388,
+  "maximum_straight_arm_direction_error": 2.0485709734063626e-07,
+  "cycles_modifiers_on_all_tracks": true,
+  "no_scale_tracks": true,
+  "root_static": true,
+  "mid_rise_vertical_velocity_m_s": 0.3508408334018664,
+  "contact_vertical_velocity_m_s": -0.2800000942382308,
+  "contact_drop_m": 0.10999999999999965,
+  "compression_time_s": 0.08,
+  "rig_rest_exact": true,
+  "passed": false,
+  "all_19_previous_actions_exact": true
+}
