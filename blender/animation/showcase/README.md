@@ -219,3 +219,13 @@ Select `Rifle_Ready_V2_v4_Test` for both arms straight and the steeper muzzle-do
 ### Latest Rifle Ready grip correction — Pending
 
 Select `Rifle_Ready_V2_v5_Test`: centered right-hand grip and straight right arm/rifle reaching farther toward the support hand. The SAME Showcase now contains22 independent Actions; earlier Ready versions and Aim/Back Holster remain unchanged. F1–120/30FPS, closing121 excluded. [Matching three-view comparison and fit notes](../reviews/player_animation_library_v1/rifle_ready_v5_test/README.md). No Godot integration.
+
+
+### Latest Rifle Ready alignment — Pending
+
+Select **Rifle_Ready_V2_v8_Test**: the barrel follows the straight right arm diagonal, grip centered, with more forward torso clearance. This latest clarification supersedes the earlier perpendicular request. The SAME Showcase now has25 independent Actions; all older Ready alternatives, Aim and Back Holster are preserved. F1–120/30FPS; closing121 excluded. [Latest three-view comparison and validation](../reviews/player_animation_library_v1/rifle_ready_v8_test/README.md). Reopen this exact file in a fresh Blender window if the list is stale. No Godot integration.
+
+
+### Rifle Ready step one — Pending
+
+Select **Rifle_Ready_V2_v9_Test**: idle-derived standing, rifle pointing down in the right hand, left arm relaxed. Right arm stays straight with a modest forward shoulder carry for floor clearance. All26 independent entries remain selectable. F1–120/30FPS, closing121 excluded. [Step-one review and comparison](../reviews/player_animation_library_v1/rifle_ready_v9_test/README.md). Reopen this exact file if an older Blender window shows a stale list. No Aim/Back Holster refinement or Godot integration.
