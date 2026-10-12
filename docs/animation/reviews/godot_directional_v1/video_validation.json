@@ -1,0 +1,11 @@
+{
+  "frames": 709,
+  "fps": 30,
+  "seconds": 23.633333333333333,
+  "retimed": false,
+  "renderer": "Actual Godot Mobile/D3D12",
+  "source_movies": {
+    "gameplay_review.avi": "2f5d705edca0cbafdc5f7b083824bd9875084146f1a0f2d780a5b1b41b4e0b90",
+    "original_review.avi": "d79bde5c99fdf7b88d28202a72c106ea9ed0d4a5a76e49303bc314a06f3b2df6"
+  }
+}

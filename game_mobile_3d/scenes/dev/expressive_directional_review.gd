@@ -6,15 +6,18 @@ func _ready() -> void:
 	review_title="DIRECTIONAL MOVEMENT · TEST"
 	super._ready()
 	if jump_enabled and "--expressive-direction-original" in OS.get_cmdline_user_args():actor.visual.directional_enabled=false
+	if jump_enabled and "--expressive-fall-original" in OS.get_cmdline_user_args():actor.visual.fall_wave_enabled=false
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	super._unhandled_key_input(event)
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_V:
 		actor.visual.directional_enabled=not actor.visual.directional_enabled;actor.visual.pose_dirty=true
+	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_F:
+		actor.visual.fall_wave_enabled=not actor.visual.fall_wave_enabled;actor.visual.pose_dirty=true
 
 func _process(delta: float) -> void:
 	super._process(delta)
-	if jump_enabled:status.text+="\nTurns: %s · V compares"%["Refined" if actor.visual.directional_enabled else "Original"]
+	if jump_enabled:status.text+="\nTurns: %s · V compares\nFalling arms: %s · F compares"%["Refined" if actor.visual.directional_enabled else "Original","Raised wave" if actor.visual.fall_wave_enabled else "Original"]
 
 func run_demo() -> void:
 	if not jump_enabled:super.run_demo();return
@@ -39,5 +42,8 @@ func run_demo() -> void:
 	actor.request_jump();await tick(20,"Reversal jump · launch")
 	actor.requested_direction=Vector2(0,1);await tick(95,"180 degree airborne reversal · live landing gait")
 	actor.requested_direction=Vector2.ZERO;await tick(55,"Recover to normal Idle")
+	for view in [["Front",Vector3(0,1.5,6)],["Three-quarter",Vector3(4,3.1,5)],["Side",Vector3(6,1.5,0)]]:
+		camera_offset=view[1];actor.requested_run=false;actor.review_drop(6)
+		await tick(120,"%s · falling hands above head · staggered waves"%view[0])
 	actor.scripted_input=false;demo_running=false;section="Manual review"
 	if "--expressive-demo" in OS.get_cmdline_user_args():get_tree().quit()

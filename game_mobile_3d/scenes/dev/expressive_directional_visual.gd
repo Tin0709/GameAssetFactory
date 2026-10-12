@@ -4,6 +4,13 @@ var directional_enabled:=true
 var travel_bias:=0.0
 var turn_lean:=0.0
 var turn_twist:=0.0
+var fall_wave_enabled:=true
+var fall_wave_weight:=0.0
+
+func advance_jump(state: String, age: float, vy: float, launch: float, to_floor: float, delta: float) -> void:
+	super.advance_jump(state,age,vy,launch,to_floor,delta)
+	# Physics descent gates this shoulder gesture; no extra elevation/flight clock.
+	fall_wave_weight=_smooth5(falling_time/.20)*_smooth5((to_floor-.05)/.14) if state=="AIR" and vy<0 else 0.0
 
 func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) -> void:
 	super.drive_locomotion(world_velocity,requested,delta)
@@ -24,6 +31,15 @@ func _ground_turn_weight() -> float:
 
 func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	var result:=super._target_pose(bone,ahead)
+	var name:=skeleton.get_bone_name(bone)
+	if fall_wave_enabled and fall_wave_weight>0 and name in ["Arm.L","Arm.R","ForeArm.L","ForeArm.R"]:
+		# Reuse the approved above-head airborne articulation. Small staggered
+		# shoulder arcs retain height and straight solid arms, rather than elbow flaps.
+		var raised:=Basis(jump_clip.rotation(bone,31.5/30.0))
+		if name in ["Arm.L","Arm.R"]:
+			var phase: float=(jump_age+ahead)*TAU*2.0+(0.0 if name=="Arm.L" else 2.0)
+			raised=Basis.from_euler(Vector3(deg_to_rad(3)*sin(phase+.6),deg_to_rad(12)*sin(phase),deg_to_rad(10)*(1 if name=="Arm.L" else -1)))*raised
+		result.basis=Basis(result.basis.get_rotation_quaternion().slerp(raised.get_rotation_quaternion(),fall_wave_weight).normalized())
 	var weight:=_ground_turn_weight()
 	if weight==0 or not move_requested:return result
 	if bone in [leg_left,leg_right]:
