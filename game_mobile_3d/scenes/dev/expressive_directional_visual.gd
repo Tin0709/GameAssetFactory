@@ -78,6 +78,10 @@ func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Qu
 		var gap:=swing_world_q[side].angle_to(receiving)
 		var limit:=deg_to_rad(600)*review_pace*delta
 		receiving=swing_world_q[side].slerp(receiving,minf(1,limit/maxf(gap,.00001))).normalized()
+		if gap>limit:
+			_set_world_leg_rotation(bone,receiving)
+			var sole:=_sole_world(bone)
+			foot_anchors[side]=Vector3(sole.x,0,sole.z);target=foot_anchors[side]
 		foot_rotations[side]=receiving;swing_active[side]=false
 	var q:=receiving
 	for iteration in 2:

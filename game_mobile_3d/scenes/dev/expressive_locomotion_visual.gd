@@ -271,6 +271,7 @@ func _evaluate(delta: float) -> void:
 			# This is a one-link adjustment, with no invented knee/ankle or scale.
 			var original_q:=_leg_world_rotation(bone)
 			_set_world_leg_rotation(bone,_contact_leg_rotation(side,bone,target,original_q,delta))
+			target=foot_anchors[side]
 			sole=_sole_world(bone)
 		else:
 			_set_world_leg_rotation(bone,_swing_leg_rotation(side,bone,delta))

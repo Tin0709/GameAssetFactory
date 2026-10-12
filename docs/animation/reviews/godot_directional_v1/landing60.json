@@ -198,49 +198,49 @@
 		}
 	],
 	"failures": [],
-	"running_extra_drop_m": 0.0399958789348602,
-	"stationary_extra_drop_m": 0.0199921131134033,
+	"running_extra_drop_m": 0.0399994552135468,
+	"stationary_extra_drop_m": 0.0199981927871704,
 	"versions": [
 		{
-			"max_joint_step": 33.3184721487388,
+			"max_joint_step": 33.4819185755773,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.000000000000000111022302462516,
+			"phase_error": 0.0000000000000000832667268468867,
 			"running": {
 				"case": "Running",
 				"flight_seconds": 0.716666666666664,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.526408111909404,
+				"impact_hip_min": 0.526070616673678,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19968402385712
+				"peak_y": 1.2008683681488
 			},
-			"speed": 3.46498465538025,
+			"speed": 5.19750547409058,
 			"stationary": {
 				"case": "Stationary",
 				"flight_seconds": 0.716666666666664,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.526868619024754,
+				"impact_hip_min": 0.526277460157871,
 				"launch_delay": 0.233333333333333,
 				"peak_y": 1.20080614089966
 			}
 		},
 		{
-			"max_joint_step": 33.3184721487388,
+			"max_joint_step": 33.4819185755773,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.000000000000000111022302462516,
+			"phase_error": 0.0000000000000000832667268468867,
 			"running": {
 				"case": "Running",
 				"flight_seconds": 0.716666666666664,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.486412232974544,
+				"impact_hip_min": 0.486071161460131,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19968402385712
+				"peak_y": 1.2008683681488
 			},
-			"speed": 3.46498465538025,
+			"speed": 5.19750547409058,
 			"stationary": {
 				"case": "Stationary",
 				"flight_seconds": 0.716666666666664,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.50687650591135,
+				"impact_hip_min": 0.506279267370701,
 				"launch_delay": 0.233333333333333,
 				"peak_y": 1.20080614089966
 			}
