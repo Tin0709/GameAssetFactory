@@ -6,6 +6,8 @@ var turn_lean:=0.0
 var turn_twist:=0.0
 var fall_wave_enabled:=true
 var fall_wave_weight:=0.0
+var swing_active: Array[bool]=[false,false]
+var swing_world_q: Array[Quaternion]=[Quaternion.IDENTITY,Quaternion.IDENTITY]
 
 func advance_jump(state: String, age: float, vy: float, launch: float, to_floor: float, delta: float) -> void:
 	super.advance_jump(state,age,vy,launch,to_floor,delta)
@@ -70,6 +72,13 @@ func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Qu
 	# receiving orientation retains toe heading instead of inheriting body yaw.
 	var origin: Vector3=(skeleton.global_transform*skeleton.get_bone_global_pose(bone)).origin
 	var receiving:=foot_rotations[side]
+	if not foot_support[side] and swing_active[side]:
+		# At faster cadence a reversal offset may survive until receiving.
+		# Keep that step's actual outgoing orientation instead of resetting it.
+		var gap:=swing_world_q[side].angle_to(receiving)
+		var limit:=deg_to_rad(600)*review_pace*delta
+		receiving=swing_world_q[side].slerp(receiving,minf(1,limit/maxf(gap,.00001))).normalized()
+		foot_rotations[side]=receiving;swing_active[side]=false
 	var q:=receiving
 	for iteration in 2:
 		var basis:=Basis(q)
@@ -85,6 +94,7 @@ func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Qu
 func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	var weight:=_ground_turn_weight()
 	if weight<=0:
+		swing_active[side]=false
 		return super._swing_leg_rotation(side,bone,delta)
 	# A large pivot offset needs the swing interval to unwind. Bound its
 	# angular release, without slowing the capsule or restarting the stride.
@@ -92,4 +102,6 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	var original_fraction:=1-exp(-25*review_pace*delta)
 	var fraction:=lerpf(original_fraction,minf(original_fraction,8*delta/maxf(angle,.00001)),weight)
 	support_aim[side]=support_aim[side].slerp(Quaternion.IDENTITY,fraction).normalized()
-	return (support_aim[side]*_leg_world_rotation(bone)).normalized()
+	swing_world_q[side]=(support_aim[side]*_leg_world_rotation(bone)).normalized()
+	swing_active[side]=true
+	return swing_world_q[side]

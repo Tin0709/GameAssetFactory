@@ -23,7 +23,10 @@ func observe(scene: Node, ticks: int, record: Dictionary) -> void:
 		for side in 2:
 			var p: Vector3=v.last_sole[side]
 			var world_q: Quaternion=v._leg_world_rotation([v.leg_left,v.leg_right][side])
+			if rad_to_deg(world_q.angle_to(previous_q[side]))>record.leg_step_degrees:
+				record.worst_leg={"side":side,"support":v.foot_support[side],"previous_support":previous_support[side],"phase":v.gait_phase,"jump":v.jump_state,"age":v.jump_age,"aim_degrees":rad_to_deg(v.support_aim[side].angle_to(Quaternion.IDENTITY))}
 			record.leg_step_degrees=maxf(record.leg_step_degrees,rad_to_deg(world_q.angle_to(previous_q[side])))
+			record.leg_rate_per_pace=maxf(record.get("leg_rate_per_pace",0.0),rad_to_deg(world_q.angle_to(previous_q[side]))/maxf(v.pose_delta*v.review_pace,.00001))
 			if v.foot_support[side] and previous_support[side] and previous_ids[side]==v.contact_ids[side] and not v.settling:
 				var distance:=p.distance_to(previous_feet[side])
 				record.slip_m+=distance;record.peak_slip_m=maxf(record.peak_slip_m,distance)
@@ -62,7 +65,7 @@ func run() -> void:
 					check(record.phase_error<.06,"Turn preserves shared stride phase")
 					check(record.penetration_m<.008,"Turn maintains sole clearance")
 					check(record.yaw_step_degrees<20,"Turn does not snap body heading")
-					check(record.leg_step_degrees<45,"Support-to-swing leg release avoids a large rotation reset")
+					check(record.leg_rate_per_pace<900,"Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard")
 					check(float(record.support_frames)/record.frames>(.65 if sprint else .80),"Turn retains authored support rather than hiding slip in flight")
 		actor.requested_direction=Vector2.ZERO;await scene.tick(55)
 		check(not v.move_requested and not v.settling,"Directional stop returns to planted Idle")
@@ -80,11 +83,11 @@ func run() -> void:
 				var record:={"run":sprint,"degrees":degrees,"slip_m":0.0,"peak_slip_m":0.0,"plant_rotation_degrees":0.0,"leg_step_degrees":0.0,"penetration_m":0.0,"phase_error":0.0,"yaw_step_degrees":0.0,"frames":0,"support_frames":0}
 				await observe(scene,50,record);jumps.append(record)
 				check(actor.current_speed>(3.4 if sprint else 1.3) and not v.settling,"Turning jump rejoins responsive gait")
-				check(record.leg_step_degrees<45,"Landing turn solver handoff avoids a large leg reset")
+				check(record.leg_rate_per_pace<900,"Landing handoff stays within the same elapsed-time and pace-normalized rotation guard")
 				check(record.penetration_m<.008,"Turning landing maintains sole clearance")
 		var total:=0.0;var peak:=0.0;var clamps:=0
 		for record in cases:total+=record.slip_m;peak=maxf(peak,record.peak_slip_m);clamps+=record.clamps
-		versions.append({"directional":enabled,"cases":cases,"jumps":jumps,"total_planted_slip_m":total,"peak_slip_m":peak,"clamps":clamps})
+		versions.append({"directional":enabled,"pace":v.review_pace,"cases":cases,"jumps":jumps,"total_planted_slip_m":total,"peak_slip_m":peak,"clamps":clamps})
 		scene.queue_free();await process_frame
 	check(versions[1].total_planted_slip_m<versions[0].total_planted_slip_m*.70,"Refinement reduces matched turn planted sliding by at least30percent")
 	for i in versions[0].cases.size():
