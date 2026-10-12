@@ -1,0 +1,31 @@
+[
+  {
+    "right_hand": [
+      0.11443763971328735,
+      -0.4592413902282715,
+      0.868504524230957
+    ],
+    "remaining_wristward_rifle_offset_m": 0.005,
+    "extra_right_hand_forward_reach_from_v15_m": 0.0366,
+    "rifle_forward": [
+      0.6536489725112915,
+      -0.5199999809265137,
+      -0.5498572587966919
+    ],
+    "left_hand": [
+      0.3921944797039032,
+      -0.4475923776626587,
+      0.6648056507110596
+    ],
+    "left_arm_direction": [
+      0.10000000149011612,
+      -0.6150000095367432,
+      -0.7821604609489441
+    ],
+    "right_shoulder_lowering_m": 0.1,
+    "left_shoulder_lowering_m": 0.16,
+    "right_shoulder_forward_m": 0.105,
+    "left_shoulder_forward_m": 0.04,
+    "front_barrel_downward_degrees": 40.07094421197186
+  }
+]

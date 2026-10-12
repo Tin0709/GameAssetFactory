@@ -259,3 +259,8 @@ Select **Rifle_Ready_V2_v14_Test**: higher forward diagonal Ready, straight arms
 ### Rifle Ready actual chest clearance — Pending
 
 Select **Rifle_Ready_V2_v15_Test**: arm/rifle forward reach increased97.6mm at the hand, same front diagonal, left hand below rifle with intentional14mm gap. All32 entries remain available; F1–120/30FPS, closing121 excluded. [Review, side clearance comparison and validation](../reviews/player_animation_library_v1/rifle_ready_v15_test/README.md). Aim/Back Holster and Godot unchanged.
+
+
+### Rifle Ready a little farther forward — Pending
+
+Select **Rifle_Ready_V2_v16_Test**: another36.6mm forward reach at right hand, same front diagonal, left hand below rifle with intentional18mm gap. All33 entries remain available; F1–120/30FPS, closing121 excluded. [Review and v15/v16 comparison](../reviews/player_animation_library_v1/rifle_ready_v16_test/README.md). Aim/Back Holster and Godot unchanged.
