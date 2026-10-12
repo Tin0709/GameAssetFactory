@@ -1,0 +1,47 @@
+{
+  "READY": {
+    "shotgun_production_r13": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.L": 0,
+      "UpperArm.R": 24,
+      "Leg.L": 0,
+      "Leg.R": 0,
+      "ForeArm.L": 0,
+      "ForeArm.R": 29
+    },
+    "shotgun_stylized_v2": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.L": 0,
+      "UpperArm.R": 0,
+      "Leg.L": 0,
+      "Leg.R": 0,
+      "ForeArm.L": 0,
+      "ForeArm.R": 30
+    }
+  },
+  "HOLSTER": {
+    "shotgun_production_r13": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.L": 0,
+      "UpperArm.R": 0,
+      "Leg.L": 0,
+      "Leg.R": 0,
+      "ForeArm.L": 0,
+      "ForeArm.R": 0
+    },
+    "shotgun_stylized_v2": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.L": 0,
+      "UpperArm.R": 0,
+      "Leg.L": 0,
+      "Leg.R": 0,
+      "ForeArm.L": 0,
+      "ForeArm.R": 0
+    }
+  },
+  "note": "Static triangle-pair diagnostics only; grip contact may be expected. Not penetration depth, gameplay or mobile validation."
+}

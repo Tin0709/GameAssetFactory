@@ -6,6 +6,7 @@ from bpy.app.handlers import persistent
 from bpy.props import StringProperty,IntProperty,BoolProperty,CollectionProperty
 
 SCENE_TAG='gaf_animation_showcase';RIG='Showcase_Player_Rig';BASELINE='GAF_Neutral_Pose.json'
+PREVIEW_PROPS={'rifle_stylized_v2':('GAF_Rifle_V2_Preview','GAF_Rifle_V2_Attachment','WeaponCarrier')}
 _switching=False
 
 def curves(action):
@@ -62,10 +63,25 @@ def validate_action(action,entry,rig):
         if not 0<=c.array_index<len(values):raise ValueError('Invalid bone transform channel')
         if c.data_path.endswith('scale') and any(abs(k.co.y-1)>1e-6 for k in c.keyframe_points):raise ValueError('Animated limb scaling is not supported')
 
+def validate_preview_prop(entry,rig):
+    key=entry.get('preview_prop')
+    if key is None:return
+    if key not in PREVIEW_PROPS:raise ValueError('Unknown preview prop: '+str(key))
+    collection,name,bone=PREVIEW_PROPS[key];c=bpy.data.collections.get(collection);o=bpy.data.objects.get(name)
+    if c is None or o is None or o.name not in c.all_objects:raise ValueError('Registered preview prop is missing; refresh the library')
+    if o.parent!=rig or o.parent_type!='BONE' or o.parent_bone!=bone:raise ValueError('Preview prop attachment is incompatible')
+    if not any(x.type=='MESH' for x in c.all_objects):raise ValueError('Preview prop has no visible model')
+
+def show_preview_prop(scene,entry):
+    for key,(collection,_,_) in PREVIEW_PROPS.items():
+        c=bpy.data.collections.get(collection)
+        if c:c.hide_render=c.hide_viewport=(entry.get('preview_prop')!=key)
+
 def activate(scene,index):
     if not scene.get(SCENE_TAG) or not scene.gaf_clips:return
     e=json.loads(scene.gaf_clips[index].entry_json);rig=bpy.data.objects[RIG];a=bpy.data.actions[e['action']]
     validate_action(a,e,rig)
+    validate_preview_prop(e,rig)
     # Partial Actions must not inherit a previous clip's unkeyed legs/chest.
     rig.animation_data_create();rig.animation_data.action=None
     neutral=json.loads(bpy.data.texts[BASELINE].as_string())
@@ -74,6 +90,7 @@ def activate(scene,index):
     rig.animation_data.action=a;rig.animation_data.action_slot=a.slots[0]
     scene.frame_start=e['start'];scene.frame_end=e['end'];scene.render.fps=e['fps'];scene.render.fps_base=e['fps_base']
     scene.use_preview_range=False;scene.sync_mode='NONE';scene.frame_set(e['start'])
+    show_preview_prop(scene,e)
     floor=bpy.data.objects.get('Showcase_FixedFloor')
     if floor:floor.location.z=e.get('preview_floor_z_m',0.0)
     for window in bpy.context.window_manager.windows:
@@ -91,7 +108,7 @@ def refresh(scene,import_missing=True):
     global _switching
     data=load_manifest();rig=bpy.data.objects[RIG]
     if rest_signature(rig.data)!=data['rig_sha256']:raise ValueError('Showcase rig differs from the registered rest rig')
-    new_actions=[]
+    new_actions=[];new_props=[]
     try:
         # Validate the complete request before replacing the visible list/selection.
         for e in data['animations']:
@@ -111,8 +128,31 @@ def refresh(scene,import_missing=True):
                 finally:
                     if imported_armature:bpy.data.armatures.remove(imported_armature)
             validate_action(action,e,rig)
+            key=e.get('preview_prop')
+            if key is not None:
+                if key not in PREVIEW_PROPS:raise ValueError('Unknown preview prop: '+str(key))
+                collection,name,bone=PREVIEW_PROPS[key]
+                if collection not in bpy.data.collections:
+                    # Import only the prop assembly, never another character or rig.
+                    with bpy.data.libraries.load(str(source),link=False) as (src,dst):
+                        if collection not in src.collections:raise ValueError('Preview prop collection missing from source')
+                        dst.collections=[collection]
+                    c=dst.collections[0];new_props.append(c)
+                    scene.collection.children.link(c)
+                    o=bpy.data.objects[name]
+                    if any(x.type=='ARMATURE' for x in c.all_objects):raise ValueError('Preview prop must not contain a rig')
+                    # Library loading can pull the source parent as a dependency. Rebind to the existing rig.
+                    imported_parent=o.parent;inverse=o.matrix_parent_inverse.copy();basis=o.matrix_basis.copy()
+                    o.parent=rig;o.parent_type='BONE';o.parent_bone=bone;o.matrix_parent_inverse=inverse;o.matrix_basis=basis
+                    if imported_parent and imported_parent!=rig and imported_parent.users==0:
+                        armature=imported_parent.data;bpy.data.objects.remove(imported_parent)
+                        if armature.users==0:bpy.data.armatures.remove(armature)
+                validate_preview_prop(e,rig)
     except Exception:
         for action in new_actions:bpy.data.actions.remove(action)
+        for c in new_props:
+            for o in list(c.all_objects):bpy.data.objects.remove(o,do_unlink=True)
+            bpy.data.collections.remove(c)
         raise
     current=rig.animation_data.action.name if rig.animation_data and rig.animation_data.action else None
     _switching=True
@@ -175,6 +215,7 @@ class GAF_PT_animation_library(bpy.types.Panel):
             item=s.gaf_clips[s.gaf_active_index];e=json.loads(item.entry_json)
             box=layout.box();box.label(text=item.action);box.label(text=f"F{e['start']}–{e['end']}  |  {e['fps']/e['fps_base']:g} FPS  |  {item.status.upper()}")
             box.label(text='Seamless cycle' if e.get('seamless_loop') else 'One-shot; replay resets to start',icon='INFO')
+            if e.get('preview_prop'):box.label(text='Rifle Stylized V2 attached',icon='OUTLINER_OB_MESH')
         row=layout.row(align=True);row.operator('gaf.play_pause',text='Pause' if context.screen.is_animation_playing else 'Play',icon='PAUSE' if context.screen.is_animation_playing else 'PLAY');row.operator('gaf.restart',text='Restart',icon='REW')
         layout.prop(s,'gaf_loop',text='Loop playback')
         row=layout.row(align=True)

@@ -1,0 +1,132 @@
+{
+  "name": "Shotgun_Stylized_V2",
+  "status": "Pending",
+  "dimensions_m": {
+    "width": 0.05250000022351742,
+    "length": 0.9779676496982574,
+    "height": 0.19662900269031525
+  },
+  "triangles": 1084,
+  "meshes": 2,
+  "materials": 1,
+  "texture": [
+    64,
+    64
+  ],
+  "palette_srgb": [
+    [
+      42,
+      48,
+      57
+    ],
+    [
+      106,
+      123,
+      135
+    ],
+    [
+      143,
+      159,
+      170
+    ],
+    [
+      105,
+      117,
+      126
+    ],
+    [
+      25,
+      31,
+      40
+    ],
+    [
+      107,
+      77,
+      62
+    ],
+    [
+      79,
+      59,
+      44
+    ],
+    [
+      50,
+      57,
+      68
+    ]
+  ],
+  "markers": {
+    "RightHandGrip": [
+      0,
+      0,
+      0
+    ],
+    "LeftHandGuide": [
+      0,
+      0.356,
+      0.038
+    ],
+    "Muzzle": [
+      0,
+      0.767,
+      0.073
+    ],
+    "AimReference": [
+      0,
+      0.74,
+      0.089
+    ],
+    "RecoilPivot": [
+      0,
+      0,
+      0
+    ],
+    "HolsterAttach": [
+      0,
+      0,
+      0
+    ],
+    "Grip_Point": [
+      0,
+      0,
+      0
+    ],
+    "Support_Hand_Point": [
+      0,
+      0.356,
+      0.038
+    ],
+    "Muzzle_Point": [
+      0,
+      0.767,
+      0.073
+    ],
+    "ReloadPort": [
+      0.0225,
+      0.123,
+      0.06
+    ],
+    "PumpReference": [
+      0,
+      0.356,
+      0.038
+    ]
+  },
+  "topology": {
+    "Shotgun_V2_Base": {
+      "triangles": 828,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "signed_volume": 0.001714257647838017
+    },
+    "Shotgun_V2_Pump": {
+      "triangles": 256,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "signed_volume": 0.0002799261977189698
+    }
+  },
+  "reference_url": "https://sketchfab.com/3d-models/low-poly-stevens-model-520a-275af36ee49545f3bdf117329f72745f",
+  "reference_note": "Original geometry inspired by supplied image; online page returned 403",
+  "workflow": "55mm independent pump; markers for later aim/recoil/reload/holster; no Action or runtime edits"
+}

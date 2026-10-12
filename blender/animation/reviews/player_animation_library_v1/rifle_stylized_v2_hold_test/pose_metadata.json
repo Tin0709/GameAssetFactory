@@ -1,0 +1,26 @@
+{
+  "Rifle_Ready_V2_Test": {
+    "range": [
+      1,
+      120
+    ],
+    "closing": 121,
+    "fps": 30
+  },
+  "Rifle_Aim_Hold_V2_Test": {
+    "range": [
+      1,
+      120
+    ],
+    "closing": 121,
+    "fps": 30
+  },
+  "Rifle_Back_Holster_V2_Test": {
+    "range": [
+      1,
+      120
+    ],
+    "closing": 121,
+    "fps": 30
+  }
+}

@@ -2,7 +2,7 @@
   "schema": 1,
   "title": "GameAssetFactory Weapon Library",
   "approval_policy": "New assets start Pending; explicit user approval only. Production is preserved separately.",
-  "default_selection": "pistol_stylized_v2",
+  "default_selection": "shotgun_stylized_v2",
   "weapons": [
     {
       "id": "rifle_v1",
@@ -256,6 +256,17 @@
       "status_note": "Pending visual review; original Korth-inspired design, muted brown grip, closed trigger joints.",
       "collection": "WEAPON_pistol_stylized_v2",
       "root": "pistol_stylized_v2__Pistol_Stylized_V2"
+    },
+    {
+      "id": "shotgun_stylized_v2",
+      "kind": "Shotgun",
+      "label": "Shotgun \u2014 Stylized V2",
+      "source": "blender/weapons/shotgun_stylized_v2/Shotgun_Stylized_V2.blend",
+      "source_sha256": "85048a9a2852e190f3535ca30f3144e73576079ea282c093cd4a9d438b1294ca",
+      "status": "Pending",
+      "status_note": "New registration; awaiting explicit visual approval.",
+      "collection": "WEAPON_shotgun_stylized_v2",
+      "root": "shotgun_stylized_v2__Shotgun_Stylized_V2"
     }
   ],
   "preferred_rifle": "rifle_stylized_v2"

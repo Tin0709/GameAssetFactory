@@ -67,7 +67,8 @@ class GAF_UL_weapons(bpy.types.UIList):
  def filter_items(self,context,data,propname):
   items=getattr(data,propname);spec=entries(data)
   flags=bpy.types.UI_UL_list.filter_items_by_name(self.filter_name,self.bitflag_filter_item,items,'name') if self.filter_name else []
-  current=['pistol_stylized_v2','rifle_stylized_v2']
+  latest=json.loads(data['weapon_manifest_snapshot']).get('default_selection')
+  current=list(dict.fromkeys([latest,'shotgun_stylized_v2','pistol_stylized_v2','rifle_stylized_v2']))
   order=sorted(range(len(items)),key=lambda i:(current.index(spec[i]['id']) if spec[i]['id'] in current else len(current),i))
   remap=[0]*len(order)
   for display,index in enumerate(order):remap[index]=display

@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "triangles": 1084,
+  "parts": {
+    "Shotgun_V2_Base": 828,
+    "Shotgun_V2_Pump": 256
+  },
+  "materials": 1,
+  "texture": [
+    64,
+    64
+  ],
+  "markers": 11,
+  "pump_travel_m": 0.055,
+  "protected_files": 37,
+  "changed": [],
+  "actions": 0
+}

@@ -25,7 +25,9 @@ if manifest.get('default_selection'):
 from types import SimpleNamespace
 flags,order=lib.GAF_UL_weapons.filter_items(SimpleNamespace(filter_name='',bitflag_filter_item=1),bpy.context,s,'gaf_weapons')
 assert sorted(order)==list(range(len(s.gaf_weapons)))
-for identifier,position in [('pistol_stylized_v2',0),('rifle_stylized_v2',1)]:
+current=list(dict.fromkeys([manifest.get('default_selection'),'shotgun_stylized_v2','pistol_stylized_v2','rifle_stylized_v2']))
+current=[identifier for identifier in current if any(e['id']==identifier for e in lib.entries(s))]
+for position,identifier in enumerate(current):
  assert order[next(i for i,e in enumerate(lib.entries(s)) if e['id']==identifier)]==position
 for kind in ['Rifle','Pistol','Shotgun']:
  ready=s['fit_'+kind+'_READY'];holster=s['fit_'+kind+'_HOLSTER']
