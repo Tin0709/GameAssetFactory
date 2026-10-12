@@ -1,18 +1,13 @@
 {
-  "source_sha256": "aa3465097e567cd03864997b7022ac62bc2433cb9c3f777fa1683dd8f9861561",
-  "action_sha256": "4a0c9bd828b5a2c2bcbdb4d816ceb14376c363a388a02da072f392a6dfed6012",
+  "source_sha256": "8a032299b9c405ed6516e6434ebf031fa8d088f2f433cc1e026b42a6ca34f793",
+  "action_sha256": "189888f7a2b305b7622d7c9bf90c460b0324a800ce655d6e4aac71fb76f9feb5",
   "samples": 961,
   "nominal_speed_m_s": 1.02,
-  "max_rigid_error_m": 2.621529642254927e-07,
-  "minimum_floor_clearance_m": 0.0003976263105869293,
-  "maximum_support_drift_m": 1.5231210543249881e-06,
-  "maximum_support_height_error_m": 2.373689413070698e-06,
-  "nonadjacent_overlaps": {
-    "UpperArm.L/Leg.L": {
-      "frame": 23.75,
-      "depth_m": -0.00020381412468850613
-    }
-  },
+  "max_rigid_error_m": 2.4559331834872467e-07,
+  "minimum_floor_clearance_m": 0.0003991760313510895,
+  "maximum_support_drift_m": 3.2889608923497257e-06,
+  "maximum_support_height_error_m": 8.239686489105416e-07,
+  "nonadjacent_overlaps": {},
   "maximum_waist_separation_m": {
     "L": -0.001286679063923657,
     "R": -0.0009724815026856959
@@ -20,13 +15,13 @@
   "camera_bounds": {
     "FRONT": [
       0.29188719391822815,
-      0.15116120874881744,
+      0.15109872817993164,
       0.7068624496459961,
       0.8153572082519531
     ],
     "THREE_QUARTER": [
       0.26457759737968445,
-      0.14501874148845673,
+      0.1449674665927887,
       0.7351981997489929,
       0.8227649331092834
     ],
@@ -56,7 +51,7 @@
       0.6800001263618469
     ]
   ],
-  "maximum_leg_local_translation_m": 0.5082061154492333,
+  "maximum_leg_local_translation_m": 0.19055580095770727,
   "maximum_straight_arm_direction_error": 2.2302015940987714e-07,
   "cycles_modifiers_on_all_tracks": true,
   "no_scale_tracks": true,
@@ -67,22 +62,22 @@
   "compression_time_s": 0.08,
   "peak_lifted_sole": {
     "L": {
-      "minimum_z_m": 0.5004037618637085,
-      "maximum_z_m": 0.5016428828239441,
-      "frame": 24.96875,
-      "pitch_deg": 0.06553906316224963
+      "minimum_z_m": 0.1804010570049286,
+      "maximum_z_m": 0.18187721073627472,
+      "frame": 24.09375,
+      "pitch_deg": 0.1259032307529971
     },
     "R": {
-      "minimum_z_m": 0.5004075765609741,
-      "maximum_z_m": 0.5023413300514221,
+      "minimum_z_m": 0.1804017722606659,
+      "maximum_z_m": 0.18233555555343628,
       "frame": 10.28125,
       "pitch_deg": 0.11743557062184232
     }
   },
   "maximum_character_height_m": 1.811592936515808,
   "minimum_raised_sole_height_fraction": {
-    "L": 0.276223069640646,
-    "R": 0.2762251753550086
+    "L": 0.09958145307846557,
+    "R": 0.09958184789990855
   },
   "maximum_swing_pitch_deg": {
     "L": 26.577483329729816,
@@ -92,6 +87,6 @@
   "non_leg_evaluated_matrix_max_difference": 0.0,
   "non_leg_matrix_comparison_samples": 121,
   "rig_rest_exact": true,
-  "passed": false,
+  "passed": true,
   "all_19_previous_actions_exact": true
 }

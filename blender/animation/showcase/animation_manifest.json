@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/lift_impact_v003/walk_snappy_review.blend",
-      "source_sha256": "1e1300a03b9c02f96360544a6fb53e7f928a833f1309fd5c094208e44567b54b",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/piston_v004/walk_snappy_review.blend",
+      "source_sha256": "8a032299b9c405ed6516e6434ebf031fa8d088f2f433cc1e026b42a6ca34f793",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "b4ac65c62a2eda826feefe23ac3066577301a80213bbb8e8e8552443cc20e8e9",
+      "action_sha256": "189888f7a2b305b7622d7c9bf90c460b0324a800ce655d6e4aac71fb76f9feb5",
       "action_frame_range": [
         1.0,
         31.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Focused user-directed whole-leg high lift / strong contact drop / rebound experiment. Same1s cadence/close contact tracks/support phases; 110mm drop in80ms /130mm body range; restrained step-linked backward lean and alternating torso counter-rotation. Earlier Snappy sources/reviews preserved.19 other Actions exact; Running research-only; rifle idle paused; no Godot/gameplay changes.",
+      "approval_note": "Lowered 180mm piston pull followed by advancing descent; replaces rejected disappearing-leg recovery. All non-leg curves, strong body contact snap, torso, head and arms exact from v003. Previous Snappy sources/reviews and19 other Actions preserved. Pending Blender-only experiment; no Running or Godot changes.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
