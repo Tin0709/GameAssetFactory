@@ -102,9 +102,9 @@ func _stride_distance() -> float:
 
 func jump_transition(value: String) -> void:
 	if polish_enabled and value=="GROUND" and jump_state=="LAND" and move_requested:
-		# Landing has already blended completely into the moving gait. Keep
-		# its live support/swing state instead of receiving the same foot again.
-		jump_state=value;jump_age=0;pose_dirty=true;attention_time=0
+		# The gait is already fully restored. Preserve its support and velocity
+		# instead of starting a second inertialization at an arbitrary stride phase.
+		jump_state=value;jump_age=0;attention_time=0
 		settling=false;landing_replant=false
 		return
 	swing_active=[false,false]
@@ -138,10 +138,11 @@ func _ground_turn_weight() -> float:
 func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	var result:=super._target_pose(bone,ahead)
 	var name:=skeleton.get_bone_name(bone)
-	if polish_enabled and move_requested and jump_state=="GROUND" and run_body_mean.has(bone):
+	if polish_enabled and move_requested and jump_state in ["GROUND","LAND"] and run_body_mean.has(bone):
 		# Soften cyclic lateral shake only; retain mean posture, sagittal
 		# weight transfer, forward lean and the grounded vertical rhythm.
-		var amount: float=.20*gait_run_weight
+		var release:=1.0 if jump_state=="GROUND" else _smooth5((jump_age+ahead-.65)/.20)
+		var amount: float=.20*gait_run_weight*release
 		var angles:=result.basis.get_euler();var mean: Vector3=run_body_mean[bone].angles
 		angles.y=lerpf(angles.y,mean.y,amount);angles.z=lerpf(angles.z,mean.z,amount)
 		result.basis=Basis.from_euler(angles)

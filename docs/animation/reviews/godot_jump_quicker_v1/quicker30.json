@@ -1,0 +1,415 @@
+{
+	"cases": [
+		{
+			"mode": "Stationary",
+			"pace": 1.5,
+			"versions": [
+				{
+					"flight_seconds": 0.716666666666664,
+					"maximum_air_frame": 44.9845877441157,
+					"peak_m": 1.19843685626984,
+					"rate": 1.0
+				},
+				{
+					"flight_seconds": 0.616666666666664,
+					"maximum_air_frame": 44.3388167401491,
+					"peak_m": 1.19984924793243,
+					"rate": 1.18
+				}
+			]
+		},
+		{
+			"mode": "Walk",
+			"pace": 1.5,
+			"versions": [
+				{
+					"flight_seconds": 0.716666666666702,
+					"maximum_air_frame": 44.9844102310678,
+					"peak_m": 1.19879508018494,
+					"rate": 1.0
+				},
+				{
+					"flight_seconds": 0.616666666666697,
+					"maximum_air_frame": 44.3388167401491,
+					"peak_m": 1.20021283626556,
+					"rate": 1.18
+				}
+			]
+		},
+		{
+			"mode": "Run",
+			"pace": 1.5,
+			"versions": [
+				{
+					"flight_seconds": 0.716666666666635,
+					"maximum_air_frame": 44.9844063771169,
+					"peak_m": 1.19880294799805,
+					"rate": 1.0
+				},
+				{
+					"flight_seconds": 0.633333333333297,
+					"maximum_air_frame": 44.3388167401491,
+					"peak_m": 1.20022666454315,
+					"rate": 1.18
+				}
+			]
+		},
+		{
+			"mode": "Stationary",
+			"pace": 2.25,
+			"versions": [
+				{
+					"flight_seconds": 0.716666666666626,
+					"maximum_air_frame": 44.9845877441157,
+					"peak_m": 1.19843685626984,
+					"rate": 1.0
+				},
+				{
+					"flight_seconds": 0.616666666666632,
+					"maximum_air_frame": 44.3388167401491,
+					"peak_m": 1.19984924793243,
+					"rate": 1.18
+				}
+			]
+		},
+		{
+			"mode": "Walk",
+			"pace": 2.25,
+			"versions": [
+				{
+					"flight_seconds": 0.716666666666626,
+					"maximum_air_frame": 44.9847598469695,
+					"peak_m": 1.19808709621429,
+					"rate": 1.0
+				},
+				{
+					"flight_seconds": 0.633333333333297,
+					"maximum_air_frame": 44.3388167401491,
+					"peak_m": 1.1995769739151,
+					"rate": 1.18
+				}
+			]
+		},
+		{
+			"mode": "Run",
+			"pace": 2.25,
+			"versions": [
+				{
+					"flight_seconds": 0.716666666666626,
+					"maximum_air_frame": 44.9846084699631,
+					"peak_m": 1.19839489459991,
+					"rate": 1.0
+				},
+				{
+					"flight_seconds": 0.616666666666632,
+					"maximum_air_frame": 44.3388167401491,
+					"peak_m": 1.19874835014343,
+					"rate": 1.18
+				}
+			]
+		}
+	],
+	"checks": [
+		{
+			"check": "Test actor offers independent jump flight timing",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Flight is moderately shorter without an exaggerated timing change",
+			"passed": true
+		},
+		{
+			"check": "Comparison keeps matching jump height",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Flight is moderately shorter without an exaggerated timing change",
+			"passed": true
+		},
+		{
+			"check": "Comparison keeps matching jump height",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Flight is moderately shorter without an exaggerated timing change",
+			"passed": true
+		},
+		{
+			"check": "Comparison keeps matching jump height",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Flight is moderately shorter without an exaggerated timing change",
+			"passed": true
+		},
+		{
+			"check": "Comparison keeps matching jump height",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Flight is moderately shorter without an exaggerated timing change",
+			"passed": true
+		},
+		{
+			"check": "Comparison keeps matching jump height",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Physical launch remains responsive",
+			"passed": true
+		},
+		{
+			"check": "Physics collision owns quicker touchdown",
+			"passed": true
+		},
+		{
+			"check": "Quicker flight preserves1.2m physical height",
+			"passed": true
+		},
+		{
+			"check": "Strong airborne arm silhouette still develops",
+			"passed": true
+		},
+		{
+			"check": "Original impact/recovery returns to live gait",
+			"passed": true
+		},
+		{
+			"check": "Flight is moderately shorter without an exaggerated timing change",
+			"passed": true
+		},
+		{
+			"check": "Comparison keeps matching jump height",
+			"passed": true
+		},
+		{
+			"check": "Flight rate is latched until contact; comparison changes next jump",
+			"passed": true
+		},
+		{
+			"check": "Unprepared falls retain original gravity and gesture timing",
+			"passed": true
+		}
+	],
+	"failures": []
+}

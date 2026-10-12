@@ -1,0 +1,86 @@
+[
+  {
+    "suite": "quicker",
+    "fps": 30,
+    "exit": 0,
+    "checks": 75,
+    "failures": []
+  },
+  {
+    "suite": "jump",
+    "fps": 30,
+    "exit": 0,
+    "checks": 77,
+    "failures": []
+  },
+  {
+    "suite": "jump_1_5",
+    "fps": 30,
+    "exit": 0,
+    "checks": 77,
+    "failures": []
+  },
+  {
+    "suite": "turns",
+    "fps": 30,
+    "exit": 0,
+    "checks": 249,
+    "failures": []
+  },
+  {
+    "suite": "layers",
+    "fps": 30,
+    "exit": 0,
+    "checks": 95,
+    "failures": []
+  },
+  {
+    "suite": "fall",
+    "fps": 30,
+    "exit": 0,
+    "checks": 185,
+    "failures": []
+  },
+  {
+    "suite": "quicker",
+    "fps": 60,
+    "exit": 0,
+    "checks": 75,
+    "failures": []
+  },
+  {
+    "suite": "jump",
+    "fps": 60,
+    "exit": 0,
+    "checks": 77,
+    "failures": []
+  },
+  {
+    "suite": "jump_1_5",
+    "fps": 60,
+    "exit": 0,
+    "checks": 77,
+    "failures": []
+  },
+  {
+    "suite": "turns",
+    "fps": 60,
+    "exit": 0,
+    "checks": 249,
+    "failures": []
+  },
+  {
+    "suite": "layers",
+    "fps": 60,
+    "exit": 0,
+    "checks": 95,
+    "failures": []
+  },
+  {
+    "suite": "fall",
+    "fps": 60,
+    "exit": 0,
+    "checks": 185,
+    "failures": []
+  }
+]
