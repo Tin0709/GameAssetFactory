@@ -229,3 +229,8 @@ Select **Rifle_Ready_V2_v8_Test**: the barrel follows the straight right arm dia
 ### Rifle Ready step one — Pending
 
 Select **Rifle_Ready_V2_v9_Test**: idle-derived standing, rifle pointing down in the right hand, left arm relaxed. Right arm stays straight with a modest forward shoulder carry for floor clearance. All26 independent entries remain selectable. F1–120/30FPS, closing121 excluded. [Step-one review and comparison](../reviews/player_animation_library_v1/rifle_ready_v9_test/README.md). Reopen this exact file if an older Blender window shows a stale list. No Aim/Back Holster refinement or Godot integration.
+
+
+### Rifle Ready grip/arm correction — Pending
+
+Select **Rifle_Ready_V2_v10_Test**: actual modeled grip seated in the right block hand, with the barrel following the straight right arm downward. The idle-derived body/arms are unchanged from v9. All27 independent entries remain selectable; F1–120/30FPS, closing121 excluded. [Review, comparison and remaining physical barrel/grip offset](../reviews/player_animation_library_v1/rifle_ready_v10_test/README.md). No Aim/Back Holster refinement or Godot integration.

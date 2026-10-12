@@ -1,0 +1,13 @@
+# Rifle Ready v10 — grip/arm alignment correction, Pending
+
+Select **Rifle_Ready_V2_v10_Test** in the SAME `blender/animation/showcase/Animation_Showcase.blend`. All prior Ready versions remain available. This continues the one-hand downward-rifle checkpoint: left arm relaxed, no two-hand posing or gameplay integration.
+
+The previous numeric check verified parallel arm/weapon axes, but missed the visually offset grip seating. Inspection of the actual rifle mesh found the pistol-grip component centered at weapon-local `(0, -0.0042, 0.01639)`, while the old hand target was `(0, 0, -0.07)`, about86.5mm away. The revised Action centers the **modeled pistol grip** inside the right block hand, bringing the rifle closer to the arm line. The actual long barrel shaft and both solid arm segments remain parallel, with zero elbow bend. Only WeaponCarrier transforms changed relative to v9; every other bone's evaluated pose is unchanged across all121 sampled frames.
+
+The rifle's physical barrel sits above its pistol grip. A small parallel offset therefore remains; this correction does not claim literal barrel/arm centerline collinearity, which would bury the stock in the arm or move the grip away from the hand. No geometry, proportions, scale, materials or rest rig were altered. The full-length rifle remains downward and clears the floor by about0.15m at rest. Small stock/upper-arm seating and intentional solid-hand grip contact remain; triangle-pair counts do not prove penetration depth or moving-layer compatibility.
+
+[Front](revised_front.png) · [Three-quarter](revised_three_quarter.png) · [Side](revised_side.png) · [Matched v9/v10 comparison](ready_comparison.png)
+
+F1–120 at30FPS, four-second restrained-breathing loop; closing F121 excluded. 675 fresh reopen, switching/slots/visibility/timing, actual barrel geometry, actual grip center, body preservation, ground clearance, planted support, scale and seam checks passed. [Full validation](validation.json), [loop pose/velocity](loop_quality.json), [actual GUI play/wrap/pause/restart](gui_playback.json), [all27 Actions retained after inactive scratch save/reopen](inactive_action_retention.json), [contact diagnostics](intersection_diagnostics.json), [protected-file audit](preservation.json).
+
+Backups: `.validation/rifle_ready_v10/before/`. [Source](rifle_ready_v10_review.blend). Source SHA256 `ad8162e1d83ef1134dc52fe226f014816b8a9e0357ae29feba98abf6bb07c075`; Action SHA256 `bb6c847f52f92bb9b87cd31e6cee86d69e8e8e399fc71d9d37cb29f277f764cf`. Existing26 Action signatures and manifest entries are exact; approved animations, earlier Ready studies, Aim/Back Holster, Weapon Showcase and Godot are preserved. **Pending user review; stop at this step.**
