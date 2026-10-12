@@ -32,8 +32,8 @@ func _ready() -> void:
 	world.environment=env;add_child(world)
 	var sun:=DirectionalLight3D.new();sun.rotation_degrees=Vector3(-52,-35,0);sun.light_energy=1.35;sun.shadow_enabled=true;sun.directional_shadow_max_distance=25;add_child(sun)
 	var ground:=StaticBody3D.new();ground.name="ReviewGround";add_child(ground)
-	var shape:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(100,.2,100);shape.shape=box;shape.position.y=-.1;ground.add_child(shape)
-	var floor_mesh:=MeshInstance3D.new();var plane:=PlaneMesh.new();plane.size=Vector2(100,100);floor_mesh.mesh=plane
+	var shape:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(500,.2,500);shape.shape=box;shape.position.y=-.1;ground.add_child(shape)
+	var floor_mesh:=MeshInstance3D.new();var plane:=PlaneMesh.new();plane.size=Vector2(500,500);floor_mesh.mesh=plane
 	var material:=StandardMaterial3D.new();material.albedo_color=Color(.32,.37,.38);material.roughness=1;floor_mesh.material_override=material;ground.add_child(floor_mesh)
 	var lines:=MeshInstance3D.new();var mesh:=ImmediateMesh.new();var line_material:=StandardMaterial3D.new();line_material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;line_material.albedo_color=Color(.38,.43,.44)
 	mesh.surface_begin(Mesh.PRIMITIVE_LINES,line_material)
@@ -47,9 +47,9 @@ func _ready() -> void:
 	var panel:=VBoxContainer.new();panel.position=Vector2(22,16);canvas.add_child(panel)
 	var title:=Label.new();title.text="EXPRESSIVE LOCOMOTION  |  GODOT TEST";title.add_theme_font_size_override("font_size",24);panel.add_child(title)
 	status=Label.new();status.add_theme_font_size_override("font_size",19);panel.add_child(status)
-	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: upper-body rifle layer\nFlat-ground review only · no Jump · production unchanged";panel.add_child(help)
+	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: rifle layer   T: 1× / 2× pace\nFlat-ground review only · no Jump · production unchanged";panel.add_child(help)
 	var controls:=HBoxContainer.new();panel.add_child(controls)
-	for label in ["Front","3/4","Side","Demo","Reset","Rifle layer"]:
+	for label in ["Front","3/4","Side","Demo","Reset","Rifle layer","1× / 2× pace"]:
 		var button:=Button.new();button.text=label;controls.add_child(button)
 		button.pressed.connect(_button.bind(label))
 	var slider:=HSlider.new();slider.min_value=.2;slider.max_value=1;slider.step=.05;slider.value=1;slider.custom_minimum_size=Vector2(260,24);controls.add_child(slider)
@@ -61,6 +61,7 @@ func _ready() -> void:
 		button.button_up.connect(func():Input.action_release(pair[1]))
 	for i in actor.visual.skeleton.get_bone_count():_previous_q.append(actor.visual.skeleton.get_bone_pose_rotation(i))
 	_update_camera(1)
+	if "--expressive-pace-1" in OS.get_cmdline_user_args():actor.review_pace=1.0;actor.visual.review_pace=1.0
 	if "--expressive-demo" in OS.get_cmdline_user_args():call_deferred("run_demo")
 
 func _button(label: String) -> void:
@@ -71,6 +72,7 @@ func _button(label: String) -> void:
 		"Demo":if not demo_running:run_demo()
 		"Reset":reset_actor()
 		"Rifle layer":_armed=not _armed;actor.set_review_weapon(_armed)
+		"1× / 2× pace":actor.review_pace=1.0 if actor.review_pace>1.0 else 2.0
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event.is_pressed() or event.is_echo():return
 	match event.physical_keycode:
@@ -80,13 +82,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_F9:_button("Demo")
 		KEY_R:_button("Reset")
 		KEY_E:_button("Rifle layer")
+		KEY_T:_button("1× / 2× pace")
 func _update_camera(_delta: float) -> void:
 	var target:=actor.global_position+Vector3(0,.95,0)
 	camera.position=target+camera_offset;camera.look_at(target)
 func _process(delta: float) -> void:
 	_elapsed+=delta;_update_camera(delta)
 	var v=actor.visual
-	status.text="%s\nSpeed %.2f m/s   Run %.0f%%   Phase %.3f   Support %s%s\n%s"%[section,actor.current_speed,v.gait_run_weight*100,v.gait_phase,"L " if v.support_left else "","R" if v.support_right else "",("Idle look-around" if not v.move_requested and not v.settling else ("Single-foot replant" if v.settling else "Distance-driven gait"))]
+	status.text="%s · %.0f× pace\nSpeed %.2f m/s   Run %.0f%%   Phase %.3f   Support %s%s\n%s"%[section,actor.review_pace,actor.current_speed,v.gait_run_weight*100,v.gait_phase,"L " if v.support_left else "","R" if v.support_right else "",("Idle look-around" if not v.move_requested and not v.settling else ("Single-foot replant" if v.settling else "Distance-driven gait"))]
 	if delta>.00001 and _measured_sequence!=v.pose_sequence:
 		_measured_sequence=v.pose_sequence
 		var elapsed: float=v.pose_delta
@@ -136,12 +139,14 @@ func run_validation(test: SceneTree) -> void:
 		actor.requested_run=true
 		var phase_before: float=actor.visual.gait_phase
 		await tick(1,"Walk to Run")
-		test.check(fposmod(actor.visual.gait_phase-phase_before,1)<.06,"Walk to Run preserves continuous gait phase")
+		test.check(fposmod(actor.visual.gait_phase-phase_before,1)<.06*actor.review_pace,"Walk to Run preserves continuous gait phase")
 		await tick(70,"Run stable support and flight")
-		test.check(absf(actor.current_speed-2.31)<.03,"Run reaches source matching speed")
+		test.check(absf(actor.current_speed-2.31*actor.review_pace)<.03,"Run reaches pace-scaled stride matching speed")
+		test.check(absf(actor.visual.gait_frequency-1.5*actor.review_pace)<.01,"Run cadence matches travel at selected pace")
 		actor.requested_run=false
 		await tick(40,"Run to Walk deceleration")
-		test.check(absf(actor.current_speed-.9)<.03,"Walk reaches source matching speed")
+		test.check(absf(actor.current_speed-.9*actor.review_pace)<.03,"Walk reaches pace-scaled stride matching speed")
+		test.check(absf(actor.visual.gait_frequency-actor.review_pace/1.2)<.01,"Walk cadence matches travel at selected pace")
 		actor.requested_direction=Vector2.ZERO
 		await tick(50,"Stop / individual replant")
 		test.check(not actor.visual.settling and not actor.visual.move_requested,"Stop settles back to planted Idle")
@@ -179,7 +184,7 @@ func run_validation(test: SceneTree) -> void:
 	test.check(_sections["Run stable support and flight"].max_sole_speed_mps<.005,"Stable Run contact-center drift under 5mm/s")
 	test.check(_sections["Run to Walk deceleration"].max_sole_speed_mps<.02,"Run to Walk contact-center drift under 20mm/s")
 	test.check(_max_floor_penetration<.008,"Flat-floor soles do not penetrate more than 8mm")
-	test.check(_max_angle_step<35,"No one-frame joint rotation reset above 35 degrees")
+	test.check(_max_angle_step<35*actor.review_pace,"Joint rotation steps remain within the pace-scaled original bound")
 	test.check(actor.visual.transition_count>=16,"Both starts/stops and short taps exercised")
 
 func run_demo() -> void:

@@ -5,6 +5,7 @@ const EXPRESSIVE_NAMES=["Idle_Expressive_Test_v3","Walk_Expressive_Test","Run_Ex
 const WALK_STRIDE:=1.08
 const RUN_STRIDE:=1.54
 const REPLANT_SECONDS:=.44
+var review_pace:=2.0
 var expressive_clips: Dictionary={}
 var gait_phase:=.28
 var gait_run_weight:=0.0
@@ -88,11 +89,11 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 	var old_yaw:=rotation.y
 	if movement_speed>.015:
 		var target_yaw:=atan2(planar.x,planar.z)
-		rotation.y+=clampf(wrapf(target_yaw-rotation.y,-PI,PI),-4.5*delta,4.5*delta)
+		rotation.y+=clampf(wrapf(target_yaw-rotation.y,-PI,PI),-4.5*review_pace*delta,4.5*review_pace*delta)
 	turn_rate=wrapf(rotation.y-old_yaw,-PI,PI)/maxf(delta,.001)
 	# Pose blend is speed based, not a button-state crossfade. Both clocks share phase.
-	var desired_run:=smoothstep(.9,2.31,movement_speed)
-	gait_run_weight=move_toward(gait_run_weight,desired_run,delta/0.12)
+	var desired_run:=smoothstep(.9,2.31,movement_speed/review_pace)
+	gait_run_weight=move_toward(gait_run_weight,desired_run,delta*review_pace/0.12)
 	var was_moving:=move_requested
 	move_requested=requested or movement_speed>.025
 	if move_requested and not was_moving:
@@ -121,11 +122,16 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 				# Latch duty at receiving contact. Deceleration must not turn a
 				# foot already in flight back into support halfway through swing.
 				stance_duty[side]=lerpf(.60 if side==0 else .62,.42 if side==0 else .43,gait_run_weight)
+			else:
+				# Accelerating may release support earlier as Run gains weight.
+				# Never prolong a contact into the airborne Run pose; decelerating
+				# still cannot re-ground a foot that has already left support.
+				stance_duty[side]=minf(stance_duty[side],lerpf(.60 if side==0 else .62,.42 if side==0 else .43,gait_run_weight))
 	reference_phase=gait_phase;reference_sprint_weight=gait_run_weight
 	if settling:
-		settle_time+=delta
+		settle_time+=delta*review_pace
 		if settle_time>=REPLANT_SECONDS:settling=false;foot_support=[true,true]
-	elif not move_requested:attention_time=fposmod(attention_time+delta,8.0)
+	elif not move_requested:attention_time=fposmod(attention_time+delta*review_pace,8.0)
 	support_left=_support(0);support_right=_support(1)
 
 func _support(side: int) -> bool:
@@ -136,7 +142,7 @@ func _support(side: int) -> bool:
 func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	if not move_requested:
 		var clip: RefCounted=expressive_clips[EXPRESSIVE_NAMES[0]]
-		return Transform3D(Basis(clip.rotation(bone,fposmod(attention_time+ahead,8.0))),clip.position(bone,fposmod(attention_time+ahead,8.0)))
+		return Transform3D(Basis(clip.rotation(bone,fposmod(attention_time+ahead*review_pace,8.0))),clip.position(bone,fposmod(attention_time+ahead*review_pace,8.0)))
 	var wp: RefCounted=expressive_clips[EXPRESSIVE_NAMES[1]]
 	var rp: RefCounted=expressive_clips[EXPRESSIVE_NAMES[2]]
 	var phase:=fposmod(gait_phase+ahead*gait_frequency,1.0)
@@ -154,7 +160,7 @@ func _r13_pose(kind: String, bone: int) -> Transform3D:
 	return result
 
 func _process(delta: float) -> void:
-	review_weapon_weight=move_toward(review_weapon_weight,1.0 if weapon_equipped else 0.0,delta/.30)
+	review_weapon_weight=move_toward(review_weapon_weight,1.0 if weapon_equipped else 0.0,delta*review_pace/.30)
 	super._process(delta)
 
 func _apply_weapon_carry() -> void:
@@ -204,7 +210,7 @@ func _evaluate_locomotion_pose(delta: float) -> bool:
 			_offset_vq[i]=(_final_vq[i] if planted else _vq[i])-_rotvec(future.basis.get_rotation_quaternion()*target.basis.get_rotation_quaternion().inverse())/.004
 		pose_dirty=false
 	transition_age+=delta
-	var damping:=24.0 if move_requested else 18.0
+	var damping:=(24.0 if move_requested else 18.0)*review_pace
 	var falloff:=exp(-damping*transition_age)
 	for i in skeleton.get_bone_count():
 		var target:=_target_pose(i)
@@ -265,17 +271,17 @@ func _evaluate(delta: float) -> void:
 			# This is a one-link adjustment, with no invented knee/ankle or scale.
 			var original_q:=_leg_world_rotation(bone)
 			var aim:=Quaternion.IDENTITY
-			if transition_age<.45 or absf(turn_rate)>.3:
+			if transition_age<.45/review_pace or absf(turn_rate)>.3*review_pace:
 				var global_pose:=skeleton.global_transform*skeleton.get_bone_global_pose(bone)
 				var sole_center:=global_pose*Vector3(0,.675,0)
 				var destination:=target+Vector3(0,sole_center.y-sole.y,0)
 				var axis:=global_pose.basis.y.normalized()
 				aim=Quaternion(axis,(destination-global_pose.origin).normalized()).normalized()
-			support_aim[side]=support_aim[side].slerp(aim,1.0-exp(-20*delta)).normalized()
+			support_aim[side]=support_aim[side].slerp(aim,1.0-exp(-20*review_pace*delta)).normalized()
 			_set_world_leg_rotation(bone,(support_aim[side]*original_q).normalized())
 			sole=_sole_world(bone)
 		else:
-			support_aim[side]=support_aim[side].slerp(Quaternion.IDENTITY,1.0-exp(-25*delta)).normalized()
+			support_aim[side]=support_aim[side].slerp(Quaternion.IDENTITY,1.0-exp(-25*review_pace*delta)).normalized()
 			_set_world_leg_rotation(bone,(support_aim[side]*_leg_world_rotation(bone)).normalized())
 			sole=_sole_world(bone);target=sole
 			target.y=maxf(sole.y,0.0)

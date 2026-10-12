@@ -14,13 +14,19 @@ func run() -> void:
 	await physics_frame
 	await process_frame
 	var actor = scene.actor
-	check(actor.get("review_pace")==2.0,"Review defaults to twice the original gameplay and animation pace")
+	var expected_pace:=1.0 if "--expressive-pace-1" in OS.get_cmdline_user_args() else 2.0
+	check(actor.get("review_pace")==expected_pace,"Review defaults to twice pace and supports original 1x comparison")
 	check(actor.visual.expressive_clips.size()==3,"Exactly three approved expressive clips loaded")
 	check(not actor.has_method("request_jump"),"No jump controller integrated")
 	check(actor.walk_speed==.9 and actor.run_speed==2.31,"Controller speeds match approved gait distances")
 	var texture: Texture2D=load("res://assets/characters/expressive_locomotion_v1/approved_atlas_64.png")
-	var source:=Image.load_from_file("res://assets/characters/expressive_locomotion_v1/approved_atlas_64.png")
+	var source:=Image.new();source.load_png_from_buffer(FileAccess.get_file_as_bytes("res://assets/characters/expressive_locomotion_v1/approved_atlas_64.png"))
 	check(texture.get_image().get_data()==source.get_data(),"Imported 64px atlas preserves approved pixels losslessly")
+	var attention_before: float=actor.visual.attention_time
+	var tick_before:=Engine.get_physics_frames()
+	await scene.tick(12,"Idle pace verification")
+	var seconds:=float(Engine.get_physics_frames()-tick_before)/Engine.physics_ticks_per_second
+	check(absf(fposmod(actor.visual.attention_time-attention_before,8.0)/seconds-expected_pace)<.05,"Idle gestures and breathing advance at the selected pace")
 	await scene.run_validation(self)
 	var out := "res://.validation/expressive_locomotion_v1"
 	DirAccess.make_dir_recursive_absolute(out)
