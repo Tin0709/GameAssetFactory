@@ -1,0 +1,17 @@
+{
+  "protected_files": 6881,
+  "unchanged": 6874,
+  "changed": [
+    "AGENTS.md",
+    "game_mobile_3d/scenes/dev/ExpressiveDirectionalPlayer.tscn",
+    "game_mobile_3d/scenes/dev/expressive_directional_review.gd",
+    "game_mobile_3d/scenes/dev/expressive_jump_actor.gd",
+    "game_mobile_3d/scenes/dev/expressive_jump_review.gd",
+    "docs/animation/ANIMATION_PROGRESS.md",
+    "docs/animation/ANIMATION_WORKFLOW.md"
+  ],
+  "unexpected_changed": [],
+  "missing": [],
+  "blender_and_production_preserved": true,
+  "prior_reviews_preserved": true
+}

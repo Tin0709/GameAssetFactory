@@ -1,0 +1,28 @@
+{
+  "fps": 30,
+  "frames": 373,
+  "seconds": 12.433333333333334,
+  "retimed": false,
+  "renderer": "Actual Godot Mobile/D3D12",
+  "source_hashes": {
+    "before.avi": "e31c021ebbdf1b4d88a694e6da4ebf0c18f97f9de11ab850c4629e6aa22aea4f",
+    "after.avi": "af16c085beccdc9fde95065bbbcee39c09a0e60a70b9e00eb20cbf409a5a5eac"
+  },
+  "encoded_verified": {
+    "before_1x.mp4": {
+      "decoded_frames": 373,
+      "fps": 30.0,
+      "sha256": "ff739a0ec27c9f0810e83bb5b053b5cf7bc990e0d8e021f63a72fd385309694b"
+    },
+    "after_1x.mp4": {
+      "decoded_frames": 373,
+      "fps": 30.0,
+      "sha256": "2417bde2b55d39a9abaa6f52e098309d901b9c102c7ae28b9c657edfb0c77d40"
+    },
+    "comparison_1x.mp4": {
+      "decoded_frames": 373,
+      "fps": 30.0,
+      "sha256": "993c76ba1bbb80559674e67afb4d1ab43b5e34280820b466e12217e9b2741a29"
+    }
+  }
+}

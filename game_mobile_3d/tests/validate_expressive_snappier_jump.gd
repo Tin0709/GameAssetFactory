@@ -12,6 +12,13 @@ func run() -> void:
 	check(actor.get("jump_flight_speed")!=null,"Test actor offers independent jump flight timing")
 	if actor.get("jump_flight_speed")==null:quit(1);return
 	check(is_equal_approx(actor.jump_flight_speed,1.4) and is_equal_approx(actor.jump_height,1.35),"New test default is snappier and modestly higher")
+	await scene.tick(2)
+	check(is_equal_approx(scene.camera.size,12.5),"Default camera uses requested closer gameplay framing")
+	var event:=InputEventKey.new();event.physical_keycode=KEY_J;event.pressed=true
+	for expected in [1.18,1.0,1.4]:
+		scene._unhandled_key_input(event)
+		check(is_equal_approx(actor.jump_flight_speed,expected),"J preserves all three timing comparisons")
+	check(is_equal_approx(actor.jump_height,1.35),"J restores the higher candidate height")
 	for pace in [1.5,2.25]:
 		for mode in ["Stationary","Walk","Run"]:
 			var versions: Array=[]
@@ -37,6 +44,8 @@ func run() -> void:
 	# A comparison key change in midair must not alter that flight's gravity.
 	actor.requested_direction=Vector2.ZERO;await scene.tick(60);actor.jump_flight_speed=1.4;actor.request_jump();await scene._wait_state("AIR",35)
 	var gravity_before: float=actor._flight_gravity();actor.jump_flight_speed=1.0
+	var camera_y: float=scene.camera.position.y;await scene.tick(4)
+	check(absf(scene.camera.position.y-camera_y)<.001,"Gameplay camera stays grounded during launch")
 	check(is_equal_approx(actor._flight_gravity(),gravity_before),"Flight rate is latched until contact; comparison changes next jump")
 	await scene._wait_state("LAND",90);await scene.tick(60)
 	actor.jump_flight_speed=1.4;actor.review_drop(6);await scene.tick(2)

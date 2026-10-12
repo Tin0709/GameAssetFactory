@@ -90,15 +90,18 @@ func _jump_case(test: SceneTree, name: String, move: Vector2, run: bool, height:
 	var launch_time: float=actor.simulation_time
 	test.check(launch_time-start_time<=.26,"Launch responds within 260ms including sampling: "+name)
 	var peak: float=actor.position.y;var phase_before: float=actor.visual.gait_phase
+	var phase_travel:=0.0
 	var limit:=Engine.get_physics_frames()+120
 	while actor.jump_state=="AIR" and Engine.get_physics_frames()<limit:
 		peak=maxf(peak,actor.position.y);await tick(1,name+" flight")
+		phase_travel+=wrapf(actor.visual.gait_phase-phase_before,-.5,.5)
+		phase_before=actor.visual.gait_phase
 	test.check(actor.jump_state=="LAND" and actor.is_on_floor(),"Collision, not fixed clip duration, starts landing: "+name)
 	var contact_time: float=actor.simulation_time
 	var flight: float=actor.simulation_time-launch_time
 	test.check(flight<1.1 and flight>.15,"Flight duration follows the ballistic test: "+name)
 	test.check(absf(peak-start_pos.y-height)<.025,"Capsule elevation matches physics height without a duplicate animation arc: "+name)
-	if not move.is_zero_approx():test.check(absf(wrapf(actor.visual.gait_phase-phase_before,-.5,.5))>.01,"Moving gait clock advances through flight: "+name)
+	if not move.is_zero_approx():test.check(phase_travel>.01,"Moving gait clock advances through flight: "+name)
 	await tick(9,name+" impact")
 	var impact_hip_min:=100.0
 	for sample in jump_samples:

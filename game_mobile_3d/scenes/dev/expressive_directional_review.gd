@@ -1,5 +1,8 @@
 extends "res://scenes/dev/expressive_jump_review.gd"
 
+var gameplay_camera:=true
+var camera_ground_y:=0.0
+
 func _ready() -> void:
 	review_player_scene="res://scenes/dev/ExpressiveDirectionalPlayer.tscn"
 	jump_review_note="Jump V2 test baseline approved"
@@ -20,6 +23,7 @@ func _ready() -> void:
 	if jump_enabled and "--expressive-quicker-demo" in OS.get_cmdline_user_args():call_deferred("run_quicker_demo")
 
 func _button(label: String) -> void:
+	if label in ["Front","3/4","Side"]:gameplay_camera=false
 	if jump_enabled and label=="Compare pace":
 		actor.review_pace=1.0 if actor.review_pace>=2.25 else (1.5 if actor.review_pace<1.5 else 2.25)
 		return
@@ -38,12 +42,24 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_J:
 		actor.jump_flight_speed=1.18 if actor.jump_flight_speed>1.3 else (1.0 if actor.jump_flight_speed>1.0 else 1.4)
 		actor.jump_height=1.35 if actor.jump_flight_speed>1.3 else 1.2
+	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_C:
+		gameplay_camera=not gameplay_camera
+
+func _update_camera(delta: float) -> void:
+	if not gameplay_camera:
+		camera.size=5.3;super._update_camera(delta);return
+	if actor.is_on_floor() and actor.jump_state!="AIR":
+		camera_ground_y=lerpf(camera_ground_y,actor.global_position.y,1.0-exp(-delta/.16))
+	camera.size=12.5;camera.far=72.0
+	camera.position=Vector3(actor.global_position.x,camera_ground_y,actor.global_position.z)+Vector3(12,15,16)
+	camera.rotation_degrees=Vector3(-36.315886,36.869898,0)
 
 func _process(delta: float) -> void:
 	super._process(delta)
 	if jump_enabled:status.text+="\nTurns: %s · V compares\nFalling limbs: %s · F compares\nRun stride: %s · G compares"%["Refined" if actor.visual.directional_enabled else "Original","Raised wave" if actor.visual.fall_wave_enabled else "Original","Longer" if actor.visual.run_stride_scale>1.0 else "Original"]
 	if jump_enabled:status.text+="\nPolish: %s · K before/after · T pace"%["After" if actor.visual.polish_enabled else "Before"]
 	if jump_enabled:status.text+="\nJump: %s · J compares next launch"%["Snappier + higher" if actor.jump_flight_speed>1.3 else ("Quicker V1" if actor.jump_flight_speed>1.0 else "Original")]
+	if jump_enabled:status.text+="\nCamera: %s · C gameplay/detail"%["Gameplay" if gameplay_camera else "Detail"]
 
 func run_quicker_demo() -> void:
 	demo_running=true;actor.scripted_input=true
