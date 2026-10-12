@@ -1,0 +1,1 @@
+Test-only fresh export from the preferred Rifle Stylized V2 source. Geometry/texture payload preserved exactly. Open scenes/dev/RifleStylizedV2IntegrationTest.tscn with F6. Never replace R13 production assets implicitly. See blender/weapons/rifle_stylized_v2/godot_integration/README.md in the repository for mount, markers, pending clearances and validation.

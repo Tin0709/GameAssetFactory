@@ -1,4 +1,6 @@
-# Rifle_Stylized_V2 — Pending
+# Rifle_Stylized_V2 — Preferred rifle reference
+
+**2026-10-12: explicitly selected as the preferred rifle model and future animation reference.** Source geometry/materials/proportions remain unchanged. Godot integration is a separate Pending candidate; production replacement has not been authorized. See [Godot preparation and fit review](godot_integration/README.md). Historical Pending build notes below are retained.
 
 Latest user steering replaces the early compact silhouette with proportions matched closely to the attached M4A1 reference: 1.20m length, flatter 0.3618m height, longer stock/barrel, shallow layered receiver, open carry handle, broad ribbing, triangular sight and curved detachable magazine. Markings use a small packed atlas; no reference geometry or texture file was imported.
 

@@ -26,6 +26,10 @@ pixel=(32*64+44)*4
 assert max(abs(images[0].pixels[pixel+i]-value/255) for i,value in enumerate((107,77,62)))<.005,'Grip panel swatch must match the requested muted brown'
 frame=bpy.data.objects['Pistol_V2_Frame'];uv=frame.data.uv_layers.active
 assert sum(p.area for p in frame.data.polygons if abs(uv.data[p.loop_start].uv.x-44/64)<1e-6)>.01,'Brown swatch must cover the grip panels'
+for name in ['TriggerGuard','Trigger']:
+ group=frame.vertex_groups[name].index
+ top=max(v.co.z for v in frame.data.vertices if any(w.group==group and w.weight>.5 for w in v.groups))
+ assert top>=.0699,(name,'Upper joint must overlap the frame and close the visible gap')
 for part,travel in [('Pistol_V2_Slide',(0,-.018,0)),('Pistol_V2_Magazine',(0,-.035,-.11))]:
  bpy.context.view_layer.update()
  o=bpy.data.objects[part];before=o.location.copy();others={m.name:m.matrix_local.copy() for m in meshes if m!=o}

@@ -1,0 +1,29 @@
+{
+  "baseline_files": 7112,
+  "owned_existing_changes": [
+    "blender/weapons/WEAPON_PROGRESS.md",
+    "blender/weapons/rifle_stylized_v2/README.md",
+    "blender/weapons/showcase/build_showcase.py",
+    "blender/weapons/showcase/gaf_weapon_library.py",
+    "blender/weapons/showcase/library_verification.json",
+    "blender/weapons/showcase/README.md",
+    "blender/weapons/showcase/weapon_manifest.json",
+    "blender/weapons/showcase/Weapon_Showcase.blend",
+    "AGENTS.md"
+  ],
+  "generated_python_caches": [
+    "blender/weapons/showcase/__pycache__/gaf_weapon_library.cpython-313.pyc"
+  ],
+  "concurrent_existing_changes_preserved": [
+    "blender/weapons/pistol_stylized_v2/verify_pistol.py",
+    "blender/weapons/showcase/register_weapon.py",
+    "blender/weapons/showcase/test_library.py"
+  ],
+  "chosen_blend_and_original_glb_unchanged": true,
+  "all_approved_animation_and_animation_showcase_unchanged": true,
+  "all_existing_Godot_files_unchanged": true,
+  "previous_rifle_assets_unchanged": true,
+  "weapon_library_entries": 18,
+  "preferred_rifle": "rifle_stylized_v2",
+  "production_replacement": false
+}

@@ -1,12 +1,14 @@
 # Permanent Weapon Showcase
 
+**Latest rifle selection — 2026-10-12:** Rifle Stylized V2 is the explicitly selected preferred model/reference. Its ready and10deg back previews now use uniform1.05 scale, preserving source proportions instead of legacy width compression. All other weapon geometry and mount behavior are preserved. The concurrent Pistol Stylized V2 registration/default selection remains intact. Actual Godot test uses the existing55deg Chest mount, not the10deg showcase alternative. [Candidate, rendered fit, validation and remaining overlap limits](../rifle_stylized_v2/godot_integration/README.md). Selection is not production-replacement approval.
+
 Open **Open_Weapon_Showcase.cmd**. It launches `Weapon_Showcase.blend` in a separate Blender 5.2 window and explicitly loads the local sidebar script on every launch. Press **N → Weapon Library**, select a row, and choose **Standalone**, **Character ready**, or **Character holster**. Left / Right / Front / Back / 3/4 set the inspection angle; normal orbit, pan and zoom remain available.
 
 The launcher does not install an add-on, change preferences, enable global automatic script execution, or replace Animation Showcase. Opening the blend directly without the launcher preserves all native `WEAPON_…` collections and the selected model; the custom panel requires the launcher (or explicitly running `gaf_weapon_library.py`). This is deliberate and visible, not an implicit dependency on auto-executed embedded text.
 
 ## Registered models
 
-17 independent entries: M4A1 blocky V1–V4, Pistol V1–V4, Shotgun V1–V4, three preserved production R13 GLBs, current `Rifle_Stylized_V2`, and its early compact checkpoint. `weapon_manifest.json` records the actual source path and SHA256 for every entry. Historical versions remain Pending where individual approval was not recorded; the production entries retain their existing approved-geometry status. Both V2 candidates are Pending.
+18 independent entries (including concurrently registered Pistol Stylized V2): M4A1 blocky V1–V4, Pistol V1–V4, Shotgun V1–V4, three preserved production R13 GLBs, current `Rifle_Stylized_V2`, and its early compact checkpoint. `weapon_manifest.json` records the actual source path and SHA256 for every entry. Historical versions remain Pending where individual approval was not recorded; the production entries retain their existing approved-geometry status. Rifle Stylized V2 is the user-selected Preferred rifle reference; its compact checkpoint stays Pending. Gameplay integration remains Pending.
 
 ## Current rifle review — 2026-10-12
 

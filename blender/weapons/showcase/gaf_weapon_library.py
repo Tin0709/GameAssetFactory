@@ -64,6 +64,14 @@ def fill(scene):
 class GAF_WeaponItem(bpy.types.PropertyGroup):
  collection:StringProperty();status:StringProperty();kind:StringProperty()
 class GAF_UL_weapons(bpy.types.UIList):
+ def filter_items(self,context,data,propname):
+  items=getattr(data,propname);spec=entries(data)
+  flags=bpy.types.UI_UL_list.filter_items_by_name(self.filter_name,self.bitflag_filter_item,items,'name') if self.filter_name else []
+  current=['pistol_stylized_v2','rifle_stylized_v2']
+  order=sorted(range(len(items)),key=lambda i:(current.index(spec[i]['id']) if spec[i]['id'] in current else len(current),i))
+  remap=[0]*len(order)
+  for display,index in enumerate(order):remap[index]=display
+  return flags,remap
  def draw_item(self,context,layout,data,item,icon,active_data,active_propname,index):
   row=layout.row();row.label(text=item.name,icon='OUTLINER_OB_MESH');row.label(text=item.status)
 class GAF_OT_weapon_view(bpy.types.Operator):
@@ -76,6 +84,7 @@ class GAF_PT_weapon_library(bpy.types.Panel):
  def poll(cls,context):return bool(context.scene.get('weapon_manifest_snapshot'))
  def draw(self,context):
   l=self.layout;s=context.scene
+  l.label(text='Current designs first; scroll for history')
   l.template_list('GAF_UL_weapons','',s,'gaf_weapons',s,'gaf_weapon_index',rows=10)
   if not s.gaf_weapons:return
   e=entries(s)[s.gaf_weapon_index];b=l.box();b.label(text=e['label']);b.label(text=e['status']+' | '+e['kind']);b.label(text=e['source'].split('/')[-1])

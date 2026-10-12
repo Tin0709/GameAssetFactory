@@ -22,6 +22,10 @@ assert len(s.gaf_weapons)>=16
 manifest=json.loads((HERE/'weapon_manifest.json').read_text())
 if manifest.get('default_selection'):
  assert lib.entries(s)[s.gaf_weapon_index]['id']==manifest['default_selection'],'Saved library must open with the latest registered weapon selected'
+ui=lib.GAF_UL_weapons(bpy.context);flags,order=ui.filter_items(bpy.context,s,'gaf_weapons')
+assert sorted(order)==list(range(len(s.gaf_weapons)))
+for identifier,position in [('pistol_stylized_v2',0),('rifle_stylized_v2',1)]:
+ assert order[next(i for i,e in enumerate(lib.entries(s)) if e['id']==identifier)]==position
 for kind in ['Rifle','Pistol','Shotgun']:
  ready=s['fit_'+kind+'_READY'];holster=s['fit_'+kind+'_HOLSTER']
  assert max(abs(ready[i][3]-holster[i][3]) for i in range(3))>.15,('Holster snapshot is still ready',kind)
