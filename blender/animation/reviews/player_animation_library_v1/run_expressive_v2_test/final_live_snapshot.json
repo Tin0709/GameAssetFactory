@@ -1,0 +1,20 @@
+{
+  "showcase_sha256": "b50460cf84504679822df12942867da16bcb5ec4cd6eb5f6a8413099a921ac34",
+  "manifest_sha256": "30878aa1a147960f9514c1100a6d8abd78f2547d0e44960c0ab8b73609097b04",
+  "active_action": "Run_Expressive_v2_Test",
+  "action_sha256": "2f26a2503e1478ca6c5fddfb406ce20a4054b4c7247d8d97574759fe69c782ee",
+  "source_sha256": "ebc8865077bbb8ed3e5ef0a8c89121c1d1e49b6933a6cc961539dbfcb52e5b5e",
+  "slot": "OBRUN_Test_Rig",
+  "entries": 13,
+  "range": [
+    1,
+    22
+  ],
+  "fps": 30,
+  "loop": true,
+  "frame": 1,
+  "playing": false,
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\showcase\\Animation_Showcase.blend",
+  "walk_status": "approved",
+  "run_status": "pending"
+}

@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "source_sha256": "f7244760901f5055e39fa5e3d9c9203506598c6c4492ce553536b8c26b9d0eeb",
+  "action_sha256": "4983a96d54648229d71fd7aff87ec9090498d6bb72bc1568f02d63cf8a209342",
+  "previous_action_sha256": "2f26a2503e1478ca6c5fddfb406ce20a4054b4c7247d8d97574759fe69c782ee",
+  "normalized_phase_samples": 441,
+  "non_arm_bones_compared": [
+    "Root",
+    "Hips",
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "WeaponCarrier",
+    "Leg.L",
+    "Leg.R"
+  ],
+  "maximum_non_arm_matrix_difference": 5.960464477539062e-07,
+  "arm_pitch_excursion_deg": {
+    "Run_Expressive_v2_Test": {
+      "L": 77.999670906373,
+      "R": 83.99926126198801
+    },
+    "Run_Expressive_v3_Test": {
+      "L": 93.59959757443951,
+      "R": 100.79910190306401
+    }
+  },
+  "arm_excursion_ratio": {
+    "L": 1.199999903676413,
+    "R": 1.1999998617687653
+  },
+  "cadence_ratio": 1.1,
+  "track_spacing_m": 0.27,
+  "toe_out_deg": {
+    "L": 3,
+    "R": 5
+  },
+  "hip_range_mm": {
+    "lateral": 26,
+    "fore_aft": 50,
+    "vertical": 43
+  },
+  "nominal_controller_speed_m_s": 2.31,
+  "contact_frames": {
+    "L": 1,
+    "R": 11
+  },
+  "support_duty": {
+    "L": 0.42,
+    "R": 0.43
+  },
+  "flight_fraction": 0.15,
+  "previous_source_preserved": true
+}
