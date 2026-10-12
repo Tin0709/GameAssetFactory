@@ -1,0 +1,64 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "frames": [
+    1,
+    30
+  ],
+  "fps": 30,
+  "period_s": 1,
+  "closing_key": 31,
+  "nominal_speed_m_s": 1.279488,
+  "leg_tracks_m": 0.27,
+  "support_duty": {
+    "L": 0.5,
+    "R": 0.52
+  },
+  "double_support": 0.3,
+  "flight": 0.28,
+  "contact_frames": {
+    "L": 1,
+    "R": 16
+  },
+  "hip_vertical_range_m": 0.12125,
+  "contact_drop_m": 0.03625,
+  "compression_time_s": 0.08,
+  "vertical_sole_lift_m": 0.27,
+  "lift_peak_swing_fraction": [
+    0.36,
+    0.44
+  ],
+  "non_leg_curves_exact": false,
+  "leg_motion": "Lower piston pull: rigid leg translates upward 180mm, then advances while lowering. Upper end remains covered at waist; no knee, stretch or rig modification.",
+  "transition": "Stylized15mm micro-hop adds brief flight and extra receiving events. Existing LEFT0/RIGHT.5 main contacts retained; future runtime blends must account for flight. Blender-only Pending.",
+  "rebound_peak_time_s": 0.22,
+  "rebound_peak_height_m": 0.71,
+  "leg_world_motion_preserved": true,
+  "fore_aft_stride_multiplier": 1.2544,
+  "intentional_waist_gap": "Small rebound-only separation from planted leg; rigid geometry and180mm piston lift retained, fore/aft reach increased12%.",
+  "hop_height_m": 0.035,
+  "hop_window_each_step_s": [
+    0.17,
+    0.31
+  ],
+  "body_motion": "Centered hips/spine/chest/head with step-following yaw: same side advances with forward leg. No lateral drift or roll. Sagittal pitch/vertical rebound and whole-leg paths retained from v006; arm/forearm/root curves exact.",
+  "base_stride_support_duty": {
+    "L": 0.64,
+    "R": 0.66
+  },
+  "downward_snap_reduction_fraction": 0.75,
+  "previous_stronger_drop_m": 0.145,
+  "additional_stride_multiplier_vs_v005": 1.12,
+  "additional_piston_lift_multiplier": 1.5,
+  "body_motion_relative_to_common_hop_exact": true,
+  "body_lateral_translation": false,
+  "body_lateral_roll": false,
+  "body_yaw": true,
+  "body_yaw_amplitude_deg": {
+    "Hips": 5,
+    "Spine": 6.5,
+    "Chest": 8,
+    "Head": 3
+  },
+  "body_center_x_m": 0.006
+}

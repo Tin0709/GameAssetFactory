@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/stride_v006/walk_snappy_review.blend",
-      "source_sha256": "e4872e379288f918822084199a8405386a303e59696264a727284d0ba18db26a",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/centered_v007/walk_snappy_review.blend",
+      "source_sha256": "07dc37822fe19059d2598e0ee6cdd484caa34ae2a2cc4392479a0ad5f2c1aba2",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "af3b30ba72a87af480811e9a49367331ceaccb9fb09592bd3a629f3c8e50f1bb",
+      "action_sha256": "958af19c6996c509f1ef2333e331e55e087b33a01339772c0915e75a59bcab58",
       "action_frame_range": [
         1.0,
         31.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Longer forward/back steps:additional12% versus v005 (25.44% total over original piston); same close tracks. Stepping piston lift+50%,180to270mm. More readable whole-character hop15to35mm over140ms. Softer downward load36.25mm/80ms retained (75%less than stronger145mm probe); torso/head/arm curves exact except common hip lift. Earlier sources/reviews and19 other Actions preserved; Pending Blender-only, no Run/Godot.",
+      "approval_note": "Centered body:no lateral hips/spine/chest/head drift or roll; step-following yaw5/6.5/8/3deg hips/spine/chest/head makes same side follow forward leg; sagittal pitch/vertical bounce retained. Exact previous leg world paths retain35mm whole-character hop/270mm piston lift/25.44%longer fore-aft stride, same close tracks. Soft36.25mm landing retained. Arm/forearm/root channels and19 other Actions preserved. Pending Blender-only, no Run/Godot.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
