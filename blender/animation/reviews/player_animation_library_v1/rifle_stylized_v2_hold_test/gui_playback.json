@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "entries": 18,
+  "results": [
+    {
+      "action": "Rifle_Ready_V2_Test",
+      "playing": true,
+      "advanced_from": 118,
+      "to": 77,
+      "elapsed": 2.7672591999980796,
+      "wrapped": true
+    },
+    {
+      "action": "Rifle_Aim_Hold_V2_Test",
+      "playing": true,
+      "advanced_from": 118,
+      "to": 81,
+      "elapsed": 2.7841662999999244,
+      "wrapped": true
+    },
+    {
+      "action": "Rifle_Back_Holster_V2_Test",
+      "playing": true,
+      "advanced_from": 118,
+      "to": 62,
+      "elapsed": 2.159996599999431,
+      "wrapped": true
+    }
+  ]
+}

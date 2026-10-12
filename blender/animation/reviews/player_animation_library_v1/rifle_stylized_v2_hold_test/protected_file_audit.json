@@ -1,0 +1,17 @@
+{
+  "baseline_files": 7405,
+  "changed_existing_files": [
+    "blender/animation/showcase/animation_manifest.json",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/gaf_animation_library.py",
+    "blender/weapons/WEAPON_PROGRESS.md",
+    "blender/weapons/pistol_stylized_v2/verify_pistol.py",
+    "blender/weapons/showcase/gaf_weapon_library.py",
+    "blender/weapons/showcase/library_verification.json",
+    "blender/weapons/showcase/README.md",
+    "blender/weapons/showcase/register_weapon.py",
+    "blender/weapons/showcase/test_library.py",
+    "blender/weapons/showcase/weapon_manifest.json",
+    "blender/weapons/showcase/Weapon_Showcase.blend"
+  ]
+}

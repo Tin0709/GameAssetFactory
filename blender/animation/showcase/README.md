@@ -193,3 +193,12 @@ Current locomotion review: approved Idle v3 and exact refined Walk; Run v3 appro
 | Walk_Expressive_Test | 1–36; closing37 excluded | Approved current refined Walk |
 | Run_Expressive_v2_Test | 1–22; closing23 excluded | Pending; preserved comparison |
 | Run_Expressive_v3_Test | 1–20; closing21 excluded | Approved; preferred run baseline |
+
+
+### Rifle Stylized V2 holding review — Pending
+
+The SAME showcase now contains 18 independent Actions. Select `Rifle_Ready_V2_Test`, `Rifle_Aim_Hold_V2_Test`, or `Rifle_Back_Holster_V2_Test` in **N → Animation Library**. Each plays F1–120 at 30 FPS and shows the actual Rifle Stylized V2 on the existing character. Use Front / 3/4 / Side, Play, Restart and Loop. Selecting an older unarmed Action hides the rifle automatically.
+
+If an already-open Blender window still lists only 15 Actions, save any personal unsaved edits separately, then reopen this exact `Animation_Showcase.blend`; an open window does not reload changes saved by another process. The updated installed Animation Library addon loads automatically on a fresh Blender launch. No embedded script execution is required.
+
+[Review, renders and fit limitations](../reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/README.md). The separate Weapon Showcase still contains the preferred rifle model. These entries do not authorize Godot integration.
