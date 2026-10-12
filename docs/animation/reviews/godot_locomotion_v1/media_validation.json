@@ -11,5 +11,12 @@
   "renderer": "Godot 4.7.2 Mobile / D3D12",
   "review_pace": 1.5,
   "idle_pace": 1.0,
-  "timing": "Original-speed recording of 1.5x movement/gait and normal Idle. Engine time_scale 1, physics 60Hz, rendered 30FPS offline. Not a phone performance measurement."
+  "timing": "Original-speed recording of 1.5x movement/gait and normal Idle. Engine time_scale 1, physics 60Hz, rendered 30FPS offline. Not a phone performance measurement.",
+  "decoded_mp4_frames": 547,
+  "mp4_sha256": "30f5bcf225f62d71072da44f6c2dfea068aabdbb666f982cf032fa442c475356",
+  "runtime_script_sha256": {
+    "game_mobile_3d/scenes/dev/expressive_locomotion_actor.gd": "5d6e1d9b2d3f3b7da6774cc8557494c577875f03ebd7fcded7e02b16f6d7aa53",
+    "game_mobile_3d/scenes/dev/expressive_locomotion_test.gd": "8be0d08a540fb564661ecd39fbf64dacead2e9c267bef74a725ad105f01e6ece",
+    "game_mobile_3d/scenes/dev/expressive_locomotion_visual.gd": "52292a73d627b0b3776d6b6f79d982cd79f05d8c8533ef6b305596ee4f6082dd"
+  }
 }

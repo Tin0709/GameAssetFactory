@@ -1,0 +1,19 @@
+{
+  "baseline_files": 6686,
+  "unchanged_protected_files": 6683,
+  "allowed_documentation_changes": [
+    "docs/animation/ANIMATION_PROGRESS.md",
+    "docs/animation/ANIMATION_WORKFLOW.md",
+    "AGENTS.md"
+  ],
+  "unexpected_changes": {},
+  "production_godot_files_byte_unchanged": true,
+  "blender_sources_showcase_manifest_byte_unchanged": true,
+  "runtime_checks_per_fps": {
+    "30": 41,
+    "60": 41
+  },
+  "offline_movie_frames": 547,
+  "phone_performance_measured": false,
+  "status": "PENDING USER GAMEPLAY REVIEW"
+}

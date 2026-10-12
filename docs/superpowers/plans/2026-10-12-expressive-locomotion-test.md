@@ -9,11 +9,13 @@ Use a shared normalized gait phase (LEFT receiving 0, RIGHT receiving .5), strid
 Files: new assets/characters/expressive_locomotion_v1 exporter/library/README; new scenes/dev/ExpressiveLocomotionTest.tscn, test controller/visual/scene scripts; new tests/validate_expressive_locomotion.gd; isolated review evidence. Update existing animation progress/workflow/AGENTS after verification. No project.godot or existing production script edits.
 
 Implementation and validation:
-- [ ] Capture concurrency hashes and back up documentation.
-- [ ] Add failing runtime test for approved clips, immediate response, continuous phase, contacts, stop/restart, both leads and upper-body layer isolation.
-- [ ] Export exact approved Actions read-only; verify rest/slots, geometry, durations and loop endpoints/velocity.
-- [ ] Implement isolated pose writer/controller, individual foot replant, scene and input controls.
-- [ ] Run real Godot tests at 30 and 60 render FPS, inspect runtime pixels, capture original-speed review, repair observed defects.
-- [ ] Document controls, contact and transition measurements, remaining rigid-leg/turn/weapon/mobile limits. Verify protected file hashes and reopen the test scene. Pending gameplay review only.
+- [x] Capture concurrency hashes and back up documentation.
+- [x] Add failing runtime test for approved clips, immediate response, continuous phase, contacts, stop/restart, both leads and upper-body layer isolation.
+- [x] Export exact approved Actions read-only; verify rest/slots, geometry, durations and loop endpoints/velocity.
+- [x] Implement isolated pose writer/controller, individual foot replant, scene and input controls.
+- [x] Run real Godot tests at 30 and 60 render FPS, inspect runtime pixels, capture original-speed review, repair observed defects.
+- [x] Document controls, contact and transition measurements, remaining rigid-leg/turn/weapon/mobile limits. Verify protected file hashes and reopen the test scene. Pending gameplay review only.
 
 Review focus: short taps during both idle observation directions; stopping from both support legs; acceleration across support/flight duty changes; 90/180-degree turns; weapon masks keeping the same lower gait. Flat-ground prototype only. Slope/terrain, actual weapon combat transitions and physical phone performance need subsequent validation.
+
+Latest review refinement: 1.5x movement/cadence, normal-speed Idle; 1x and 2x comparison modes preserved. Fresh 41 checks per run at 30/60 FPS, no production promotion.
