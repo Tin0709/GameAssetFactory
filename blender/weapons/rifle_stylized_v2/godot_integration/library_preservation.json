@@ -1,0 +1,10 @@
+{
+  "mesh_datablocks_unchanged": 33,
+  "packed_images_unchanged": 19,
+  "materials_unchanged": 19,
+  "registered_sources_hash_match": 17,
+  "concurrent_pistol_source_revised_after_registration": [
+    "pistol_stylized_v2"
+  ],
+  "all_rifle_sources_hash_match": true
+}

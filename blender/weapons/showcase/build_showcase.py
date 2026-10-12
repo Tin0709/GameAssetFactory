@@ -74,10 +74,10 @@ for entry in spec:
   # Latest brief asks for a nearly horizontal back carry. Original source/production
   # actually uses 55 degrees; retain that on original entries, trial 10 only on V2.
   angle=math.radians(10);co=math.cos(angle);si=math.sin(angle)
-  entry['holster_preview_matrix']=[[0,1.05*co,1.05*si,0],[-1.05,0,0,.24],[0,-1.05*si,1.05*co,1.02],[0,0,0,1]]
+  entry.setdefault('holster_preview_matrix',[[0,1.05*co,1.05*si,0],[-1.05,0,0,.24],[0,-1.05*si,1.05*co,1.02],[0,0,0,1]])
   ready=Matrix(fit['Rifle_READY']);ready=Matrix.Translation(ready.translation)@ready.to_3x3().normalized().to_4x4()@Matrix.Diagonal(Vector((1.05,1.05,1.05,1)))
-  entry['ready_preview_matrix']=[list(row) for row in ready]
-  entry['holster_preview_note']='Pending 10-degree horizontal back fit, as requested; original production 55-degree mount preserved separately.'
+  entry.setdefault('ready_preview_matrix',[list(row) for row in ready])
+  entry.setdefault('holster_preview_note','Pending 10-degree horizontal back fit, as requested; original production 55-degree mount preserved separately.')
  source=ROOT/entry['source'];digest=hashlib.sha256(source.read_bytes()).hexdigest()
  if entry.get('source_sha256'):assert entry['source_sha256']==digest,('Source changed; inspect before refresh',entry['source'])
  collection=bpy.data.collections.new('WEAPON_'+entry['id']);s.collection.children.link(collection);collection['weapon_entry']=entry['id'];entry['collection']=collection.name
@@ -106,7 +106,8 @@ for entry in spec:
  entry['root']=root.name;entry['source_sha256']=digest
  collection.hide_viewport=collection.hide_render=True
 assert not bpy.data.actions
-manifest={'schema':1,'title':'GameAssetFactory Weapon Library','approval_policy':'New assets start Pending; explicit user approval only. Production is preserved separately.','default_selection':default_selection,'weapons':spec}
+manifest=dict(saved_manifest) if MANIFEST.exists() else {}
+manifest.update({'schema':1,'title':'GameAssetFactory Weapon Library','approval_policy':'New assets start Pending; explicit user approval only. Production is preserved separately.','default_selection':default_selection,'weapons':spec})
 s['weapon_manifest_snapshot']=json.dumps(manifest)
 world=bpy.data.worlds.new('Neutral graphite studio');world.use_nodes=True;s.world=world
 world.node_tree.nodes['Background'].inputs[0].default_value=(.16,.18,.21,1);world.node_tree.nodes['Background'].inputs[1].default_value=.5

@@ -251,9 +251,9 @@
       "kind": "Pistol",
       "label": "Pistol \u2014 Stylized V2",
       "source": "blender/weapons/pistol_stylized_v2/Pistol_Stylized_V2.blend",
-      "source_sha256": "85057917a62ff586f0f31c53fa5c518134aba9311389ff81008321b1c9929b9c",
+      "source_sha256": "82a1e358e340c52b1de22042efaac26821e531e025d7ab12570fbe32cd80cf8e",
       "status": "Pending",
-      "status_note": "New registration; awaiting explicit visual approval.",
+      "status_note": "Pending visual review; original Korth-inspired design, muted brown grip, closed trigger joints.",
       "collection": "WEAPON_pistol_stylized_v2",
       "root": "pistol_stylized_v2__Pistol_Stylized_V2"
     }

@@ -22,7 +22,8 @@ assert len(s.gaf_weapons)>=16
 manifest=json.loads((HERE/'weapon_manifest.json').read_text())
 if manifest.get('default_selection'):
  assert lib.entries(s)[s.gaf_weapon_index]['id']==manifest['default_selection'],'Saved library must open with the latest registered weapon selected'
-ui=lib.GAF_UL_weapons(bpy.context);flags,order=ui.filter_items(bpy.context,s,'gaf_weapons')
+from types import SimpleNamespace
+flags,order=lib.GAF_UL_weapons.filter_items(SimpleNamespace(filter_name='',bitflag_filter_item=1),bpy.context,s,'gaf_weapons')
 assert sorted(order)==list(range(len(s.gaf_weapons)))
 for identifier,position in [('pistol_stylized_v2',0),('rifle_stylized_v2',1)]:
  assert order[next(i for i,e in enumerate(lib.entries(s)) if e['id']==identifier)]==position

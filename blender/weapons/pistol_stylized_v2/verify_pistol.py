@@ -54,8 +54,9 @@ if '--asset-only' not in sys.argv:
  manifest=json.loads((SHOW/'weapon_manifest.json').read_text())
  entry=next(e for e in manifest['weapons'] if e['id']=='pistol_stylized_v2')
  assert entry['kind']=='Pistol' and entry['status']=='Pending' and entry['source_sha256']==hashlib.sha256(source.read_bytes()).hexdigest()
- old=json.loads((ROOT/'.validation/pistol_stylized_v2/manifest_before.json').read_text())
+ old=json.loads((ROOT/'.validation/pistol_stylized_v2/manifest_before_refinement.json').read_text())
  for e in old['weapons']:
+  if e['id']=='pistol_stylized_v2':continue
   current=next(x for x in manifest['weapons'] if x['id']==e['id'])
   assert all(current[k]==v for k,v in e.items()),('Existing entry changed',e['id'])
 report={'passed':True,'triangles':tris,'mesh_triangles':topology,'materials':1,'surfaces':3,'texture':[64,64],'markers':len(asset['markers']),'rigid_part_travel':'18mm slide; magazine extraction; stationary parts unchanged','protected_files':len(baseline),'changed':changed,'actions':0}

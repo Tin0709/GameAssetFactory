@@ -111,4 +111,15 @@ def unregister():
  if loaded in bpy.app.handlers.load_post:bpy.app.handlers.load_post.remove(loaded)
  for n in ['gaf_weapons','gaf_weapon_index','gaf_fit_mode']:delattr(bpy.types.Scene,n)
  for cls in reversed(CLASSES):bpy.utils.unregister_class(cls)
-if __name__=='__main__':register()
+def show_library_panel():
+ for window in bpy.context.window_manager.windows:
+  if not window.scene.get('weapon_manifest_snapshot'):continue
+  for area in window.screen.areas:
+   if area.type!='VIEW_3D':continue
+   area.spaces.active.show_region_ui=True
+   for region in area.regions:
+    if region.type=='UI':region.active_panel_category='Weapon Library'
+   area.tag_redraw()
+if __name__=='__main__':
+ register()
+ if not bpy.app.background:bpy.app.timers.register(show_library_panel,first_interval=.5)
