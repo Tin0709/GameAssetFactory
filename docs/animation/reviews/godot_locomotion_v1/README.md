@@ -1,3 +1,5 @@
+**Current scene update — 2026-10-12:** the same isolated F6 scene now includes physics-driven Pending Jump V2. See [the jump gameplay review](../godot_jump_v1/README.md) for Space/jump controls and latest evidence. The locomotion-only records and clips below remain preserved historical checkpoints. Walk/Run stay 1.5x and Idle 1x. Production remains unchanged.
+
 # Expressive locomotion gameplay test — Pending
 
 Open `game_mobile_3d/scenes/dev/ExpressiveLocomotionTest.tscn` in Godot and press **F6 (Run Current Scene)**. F5 still runs the unchanged WorldMap. This separate flat-ground scene uses the approved Idle v3, refined Walk and Run v3; it does not replace production locomotion or integrate Jump.

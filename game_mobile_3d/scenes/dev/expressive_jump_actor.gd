@@ -44,17 +44,21 @@ func _physics_process(delta: float) -> void:
 	jump_buffer=maxf(0,jump_buffer-delta)
 	var launched:=false
 	if jump_state=="PREP" and jump_age>=PREP_SECONDS and grounded:
-		launch_velocity=sqrt(2*gravity*jump_height);velocity.y=launch_velocity
+		launch_velocity=sqrt(2*gravity*jump_height)
+		# Half-step launch gravity avoids adding an extra physics tick of height.
+		velocity.y=launch_velocity-gravity*delta*.5
 		jump_count+=1;launched=true;_state("AIR")
 	elif grounded:velocity.y=-.2
 	else:velocity.y-=gravity*delta
 	velocity.x=planar.x;velocity.z=planar.y
 	var incoming_y:=velocity.y
 	move_and_slide()
-	if not is_on_floor() and jump_state in ["GROUND","PREP"]:
+	if not is_on_floor() and jump_state in ["GROUND","PREP","LAND"]:
 		launch_velocity=maxf(velocity.y,1.0);_state("AIR")
 	if not grounded and is_on_floor() and not launched and jump_state=="AIR":
 		impact_velocity=absf(incoming_y);_state("LAND")
+		# An eligible pre-contact press survives the brief impact absorption.
+		if jump_buffer>0:jump_buffer=maxf(jump_buffer,.13)
 	if jump_state=="LAND" and jump_age>=.85:_state("GROUND")
 	current_speed=Vector2(get_real_velocity().x,get_real_velocity().z).length()
 	_probe_floor()
@@ -67,7 +71,15 @@ func _physics_process(delta: float) -> void:
 func _probe_floor() -> void:
 	var query:=PhysicsRayQueryParameters3D.create(global_position+Vector3(0,.12,0),global_position-Vector3(0,80,0),1,[get_rid()])
 	var hit:=get_world_3d().direct_space_state.intersect_ray(query)
-	if not hit.is_empty():floor_y=hit.position.y
+	if not is_on_floor() and not hit.is_empty():floor_y=hit.position.y
+	if is_on_floor():
+		# A capsule can still be supported at a ledge while its center ray has
+		# crossed the edge. Actual supporting collision owns the contact plane.
+		# Keep the last contact plane if this tick reports floor support without
+		# a fresh upward collision; a center ray beyond the ledge is not contact.
+		for i in get_slide_collision_count():
+			var collision:=get_slide_collision(i)
+			if collision.get_normal().dot(Vector3.UP)>.65:floor_y=collision.get_position().y;break
 	var height:=maxf(0,global_position.y-floor_y)
 	time_to_contact=(velocity.y+sqrt(velocity.y*velocity.y+2*gravity*height))/gravity
 

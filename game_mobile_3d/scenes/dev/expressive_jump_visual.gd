@@ -10,16 +10,22 @@ var contact_floor_y:=0.0
 var falling_time:=0.0
 var landing_replant:=false
 var last_jump_frame:=1.0
+var fall_entry:=false
 
 func _ready() -> void:
 	super._ready()
 	jump_clip=Sampler.new(JUMP_LIBRARY.get_animation("Full_Jump_Expressive_v2_Test"),skeleton)
 
 func jump_transition(value: String) -> void:
+	var previous_state:=jump_state
 	jump_state=value;jump_age=0;pose_dirty=true
 	settling=false;landing_replant=false;support_aim=[Quaternion.IDENTITY,Quaternion.IDENTITY]
 	if value=="PREP":jump_frame=7.0;falling_time=0
-	if value=="AIR":jump_frame=maxf(jump_frame,19.0)
+	if value=="AIR":
+		fall_entry=previous_state!="PREP";falling_time=0
+		# No launch impulse on a ledge fall: enter the lowered-arm approach,
+		# rather than raising settled arms back into the main airborne peak.
+		jump_frame=43.0 if fall_entry else 19.0
 	if value=="LAND":jump_frame=46.0;foot_support=[false,false]
 	if value=="GROUND":foot_support=[false,false];attention_time=0.0
 
@@ -50,6 +56,7 @@ func advance_jump(state: String, age: float, vy: float, launch: float, to_floor:
 			else:
 				falling_time+=delta
 				target=lerpf(33.0,41.5,1-exp(-falling_time*5))
+				if fall_entry:target=lerpf(43.0,44.0,1-exp(-falling_time*2))
 				target=lerpf(target,45.0,_smooth5(1-to_floor/.20))
 			# A short/early flight may omit part of the large air gesture. Do not
 			# cram the entire silhouette change into a few30FPS samples.
@@ -96,3 +103,11 @@ func begin_landing_replant() -> void:
 	replant_first=0 if last_sole[0].y>last_sole[1].y else 1
 	for side in 2:
 		replant_from[side]=last_sole[side];replant_q[side]=_leg_world_rotation([leg_left,leg_right][side])
+
+func _limit_contact_correction(correction: Vector3) -> Vector3:
+	# During impact-to-stride release, horizontal anchor demand may exceed the
+	# safety radius. Keep sole clearance first, then release excess horizontal
+	# anchoring inside that same radius instead of driving the boot underground.
+	var vertical:=clampf(correction.y,-.14,.14)
+	var planar:=Vector2(correction.x,correction.z).limit_length(sqrt(maxf(0,.14*.14-vertical*vertical)))
+	return Vector3(planar.x,vertical,planar.y)

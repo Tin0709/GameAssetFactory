@@ -47,14 +47,21 @@ func _ready() -> void:
 	camera=Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=5.3;camera.current=true;camera.far=80;add_child(camera)
 	var canvas:=CanvasLayer.new();add_child(canvas)
 	var panel:=VBoxContainer.new();panel.position=Vector2(22,16);canvas.add_child(panel)
-	var title:=Label.new();title.text="EXPRESSIVE LOCOMOTION  |  GODOT TEST";title.add_theme_font_size_override("font_size",24);panel.add_child(title)
-	status=Label.new();status.add_theme_font_size_override("font_size",19);panel.add_child(status)
-	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: rifle layer   T: compare pace\n"+("Space: jump · L: drop test · Jump V2 Pending" if jump_enabled else "Idle: normal speed · no Jump · production unchanged");panel.add_child(help)
+	var title:=Label.new();title.text="EXPRESSIVE JUMP · GAMEPLAY TEST" if jump_enabled else "EXPRESSIVE LOCOMOTION  |  GODOT TEST";title.add_theme_font_size_override("font_size",20 if jump_enabled else 24);panel.add_child(title)
+	status=Label.new();status.add_theme_font_size_override("font_size",15 if jump_enabled else 19)
+	if jump_enabled:status.custom_minimum_size.x=410;status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	panel.add_child(status)
+	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: rifle layer   T: compare pace\n"+("Space: jump · L: drop test · Jump V2 Pending" if jump_enabled else "Idle: normal speed · no Jump · production unchanged")
+	if jump_enabled:help.custom_minimum_size.x=410;help.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	panel.add_child(help)
 	var controls:=HBoxContainer.new();panel.add_child(controls)
-	for label in ["Front","3/4","Side","Demo","Reset","Rifle layer","Compare pace"]:
+	var labels:=["Front","3/4","Side","Demo","Reset"] if jump_enabled else ["Front","3/4","Side","Demo","Reset","Rifle layer","Compare pace"]
+	for label in labels:
 		var button:=Button.new();button.text=label;controls.add_child(button)
 		button.pressed.connect(_button.bind(label))
-	var slider:=HSlider.new();slider.min_value=.2;slider.max_value=1;slider.step=.05;slider.value=1;slider.custom_minimum_size=Vector2(260,24);controls.add_child(slider)
+	var slider:=HSlider.new();slider.min_value=.2;slider.max_value=1;slider.step=.05;slider.value=1;slider.custom_minimum_size=Vector2(260,24)
+	if jump_enabled:panel.add_child(slider)
+	else:controls.add_child(slider)
 	slider.value_changed.connect(func(value:float):actor.analog_strength=value)
 	var touch:=HBoxContainer.new();touch.position=Vector2(22,620);canvas.add_child(touch)
 	for pair in [["←","move_left"],["↑","move_forward"],["↓","move_backward"],["→","move_right"],["RUN","sprint"]]:

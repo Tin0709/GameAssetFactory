@@ -1,0 +1,23 @@
+{
+  "protected_files": 6726,
+  "unchanged_files": 6716,
+  "allowed_existing_changes": [
+    "game_mobile_3d/tests/validate_expressive_jump.gd",
+    "game_mobile_3d/tests/validate_expressive_locomotion.gd",
+    "game_mobile_3d/scenes/dev/ExpressiveLocomotionTest.tscn",
+    "game_mobile_3d/scenes/dev/expressive_locomotion_test.gd",
+    "game_mobile_3d/scenes/dev/expressive_locomotion_visual.gd",
+    "blender/animation/showcase/animation_manifest.json",
+    "docs/animation/ANIMATION_PROGRESS.md",
+    "docs/animation/ANIMATION_WORKFLOW.md",
+    "docs/animation/reviews/godot_locomotion_v1/README.md",
+    "AGENTS.md"
+  ],
+  "unexpected_changes": [],
+  "all_blender_sources_and_showcase_byte_identical": true,
+  "manifest_change": "Only existing Pending Jump V2 gameplay_validation metadata; all other entries/statuses/hashes unchanged",
+  "production_project_and_worldmap_byte_identical": true,
+  "backup": ".validation/expressive_jump_v1/backup",
+  "new_action_authored": false,
+  "production_promoted": false
+}

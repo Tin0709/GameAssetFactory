@@ -291,7 +291,7 @@ func _evaluate(delta: float) -> void:
 		# Rigid leg translations only. Large pivot/micro-tap corrections release
 		# safely instead of pulling the hip joint apart; exposed in test metrics.
 		if correction.length()>.14:
-			correction=correction.limit_length(.14);correction_clamps+=1
+			correction=_limit_contact_correction(correction);correction_clamps+=1
 			foot_anchors[side]=sole+correction
 		var parent:=skeleton.get_bone_parent(bone)
 		var parent_basis:=skeleton.global_basis*skeleton.get_bone_global_pose(parent).basis
@@ -305,6 +305,9 @@ func _evaluate(delta: float) -> void:
 			_final_vp[bone]=(p-_final_p[bone])/delta;_final_vq[bone]=_rotvec(q*_final_q[bone].inverse())/delta
 		_final_p[bone]=p;_final_q[bone]=q
 	if socket!=null:socket.on_skeleton_update();socket.sync_transport_sockets()
+
+func _limit_contact_correction(correction: Vector3) -> Vector3:
+	return correction.limit_length(.14)
 
 func _set_world_leg_rotation(bone: int, q: Quaternion) -> void:
 	var parent:=skeleton.get_bone_parent(bone)
