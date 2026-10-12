@@ -1,5 +1,31 @@
-{
-  "forward_slide_along_right_arm_m": 0.025,
-  "remaining_wristward_grip_offset_m": 0.005,
-  "character_pose": "All character curves copied unchanged from v13; only WeaponCarrier authored"
-}
+[
+  {
+    "right_hand": [
+      0.16101175546646118,
+      -0.32504138350486755,
+      0.8293258547782898
+    ],
+    "remaining_wristward_rifle_offset_m": 0.005,
+    "forward_slide_from_v13_m": 0.025,
+    "rifle_forward": [
+      0.7300000190734863,
+      -0.30000001192092896,
+      -0.6140846610069275
+    ],
+    "left_hand": [
+      0.4531944990158081,
+      -0.279842346906662,
+      0.6013869643211365
+    ],
+    "left_arm_direction": [
+      0.20000000298023224,
+      -0.3400000035762787,
+      -0.918912410736084
+    ],
+    "right_shoulder_lowering_m": 0.1,
+    "left_shoulder_lowering_m": 0.14,
+    "right_shoulder_forward_m": 0.105,
+    "left_shoulder_forward_m": 0.04,
+    "front_barrel_downward_degrees": 40.07094409192992
+  }
+]

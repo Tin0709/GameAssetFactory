@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "frames_checked": 121,
+  "front_view_downward_angle_degrees": 40.070940021430616,
+  "left_arm_front_outward_angle_degrees": 8.196855427497603,
+  "left_forearm_rifle_triangle_overlaps": 0,
+  "unwanted_head_chest_leg_cross_arm_overlaps": 0,
+  "minimum_vertex_to_surface_gap_m": 0.014113244600594044,
+  "maximum_vertex_to_surface_gap_m": 0.01411336101591587,
+  "remaining_rifle_wristward_offset_m": 0.005,
+  "forward_slide_from_v13_m": 0.025,
+  "maximum_slide_error_m": 2.019759267569629e-07,
+  "measurement_note": "Bidirectional mesh vertex-to-surface samples; no triangle intersections. Surface gap samples are not a full edge-edge distance solve.",
+  "left_palm_center_below_rear_handguard_underside_min_m": 0.05252319574356079,
+  "left_palm_center_below_rear_handguard_underside_max_m": 0.052523791790008545
+}

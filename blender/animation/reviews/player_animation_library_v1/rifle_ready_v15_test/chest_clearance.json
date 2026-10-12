@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "frames_checked": 121,
+  "right_palm_forward_gain_m": [
+    0.0976000428199768,
+    0.09760016202926636
+  ],
+  "receiver_forward_depth_gain_m": [
+    0.10840153694152832,
+    0.10840165615081787
+  ],
+  "receiver_depth_ahead_of_chest_front_m": {
+    "Rifle_Ready_V2_v14_Test": [
+      0.2050432562828064,
+      0.20504339039325714
+    ],
+    "Rifle_Ready_V2_v15_Test": [
+      0.3134448528289795,
+      0.31344497203826904
+    ]
+  },
+  "sampled_rifle_chest_surface_gap_m": {
+    "Rifle_Ready_V2_v14_Test": [
+      0.057742342352867126,
+      0.05774247273802757
+    ],
+    "Rifle_Ready_V2_v15_Test": [
+      0.10835673660039902,
+      0.10835687816143036
+    ]
+  },
+  "right_shoulder_unchanged": true,
+  "front_diagonal_unchanged": true,
+  "measurement_note": "Receiver depth uses local(0,0,.142) guide and frontmost world-Y chest vertex plane; not a minimum surface distance. Rifle/chest distances separately use bidirectional vertex-to-surface samples, not an exact edge-edge minimum."
+}

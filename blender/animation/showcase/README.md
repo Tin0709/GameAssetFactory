@@ -249,3 +249,13 @@ Select **Rifle_Ready_V2_v12_Test**: straight right arm/rifle8deg farther down, l
 ### Rifle Ready four-view reference / higher rifle seating — Pending
 
 Select **Rifle_Ready_V2_v13_Test**: steeper low diagonal carry, near-vertical straight left arm with intentional11mm hovering gap, rifle30mm higher along right hand/arm. All30 independent entries remain available; F1–120/30FPS, closing121 excluded. [Review, five directions and v12/v13 comparison](../reviews/player_animation_library_v1/rifle_ready_v13_test/README.md). No Aim/Back Holster refinement or Godot integration.
+
+
+### Rifle Ready latest reference / left hand below rifle — Pending
+
+Select **Rifle_Ready_V2_v14_Test**: higher forward diagonal Ready, straight arms, left hand slightly below rifle with intentional12mm hovering gap. All31 entries remain available; F1–120/30FPS, closing121 excluded. [Review, front/three-quarter/side and v13/v14 comparison](../reviews/player_animation_library_v1/rifle_ready_v14_test/README.md). No Aim/Back Holster or Godot changes.
+
+
+### Rifle Ready actual chest clearance — Pending
+
+Select **Rifle_Ready_V2_v15_Test**: arm/rifle forward reach increased97.6mm at the hand, same front diagonal, left hand below rifle with intentional14mm gap. All32 entries remain available; F1–120/30FPS, closing121 excluded. [Review, side clearance comparison and validation](../reviews/player_animation_library_v1/rifle_ready_v15_test/README.md). Aim/Back Holster and Godot unchanged.
