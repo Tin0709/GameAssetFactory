@@ -740,8 +740,8 @@
       "end": 120,
       "fps": 30,
       "fps_base": 1.0,
-      "status": "pending",
-      "approval_note": "Same retained v16: latest user request brings LEFT hand visibly closer underneath rifle; full arm stays straight. Right arm/rifle and every non-left bone preserved exactly;70mm shoulderward seating,11deg cumulative lift and29.07deg diagonal retained. All17 other Actions preserved. Pending Blender review.",
+      "status": "approved",
+      "approval_note": "Explicit human approval2026-10-13 of CURRENT same-v16 Ready pose, shoulder_support_v006 source22017e77d5a722d087c46bd839e38fbec5a30ac5a56bb4b326e86cbbbbee3fde / Actione12357dab1a854a4642f293e8049747f7e17b426ff69f1a4c331327b47e91743. Preferred Rifle Ready pose baseline. Preserve all previous sources/checkpoints; this is Blender artistic approval only, no gameplay replacement or Godot integration approval.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
