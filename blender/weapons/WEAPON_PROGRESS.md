@@ -2,7 +2,9 @@
 
 # Weapon progress — 2026-10-12
 
-**Pending visual review:** permanent `showcase/Weapon_Showcase.blend` with 17 selectable versions, reliable repository-local launcher, five inspection angles, static ready/stowed character fit and backed-up manifest registration for future weapons.
+**Pistol_Stylized_V2 — Pending:** original Korth-inspired family design, 1,204 triangles, frame/slide/magazine, one 64×64 atlas/material and ten attachment nodes. Latest requested refinements give the grip muted brown panels and close the trigger/guard upper joints. Registered in the SAME Weapon_Showcase.blend, now 18 entries; current pistol/rifle appear first and the launcher opens N → Weapon Library. Concurrent Preferred rifle selection, preview transforms and metadata are preserved. Standalone/held/holster/parts renders and preservation results: [pistol README](pistol_stylized_v2/README.md). All 35 protected file hashes match; 270 library selections pass. Existing hip holster mount still intersects the character and is documented as unresolved. No production or animation edits by this pistol task; stop for visual review.
+
+**Pending visual review:** permanent `showcase/Weapon_Showcase.blend` with 18 selectable versions, reliable repository-local launcher, five inspection angles, static ready/stowed character fit and backed-up manifest registration for future weapons.
 
 `Rifle_Stylized_V2` initially used a compact original silhouette. User rejected its short appearance and explicitly asked to match the attached M4A1. Current revision is 1.20m × 0.093m × 0.3618m, 1,620 triangles, separate magazine, one 1024×512 atlas/material; compact candidate remains selectable. Latest refinements add stock/receiver layering and chamfers, shallow guard bands, clean larger lettering, a serial parallel to the magazine base, two evenly spaced curved magazine bands with aligned ends, and closed handle/magazine joints. The barrel and matching fittings are darker gray; the rectangular muzzle cap is about 30% shorter and thinner. No artistic approval or production replacement is implied.
 
