@@ -91,5 +91,12 @@
     ]
   ],
   "arm_weapon_common_transform": true,
-  "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\rifle_ready_idle_expressive_test\\rifle_ready_idle_review.blend"
+  "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\rifle_ready_idle_expressive_test\\rifle_ready_idle_review.blend",
+  "shoulder_clearance_response": {
+    "maximum_common_drop_m": 0.058,
+    "maximum_forward_m": 0.01,
+    "head_translation_m": 0,
+    "purpose": "Keep square head clear of high left shoulder; both arms/rifle share transform."
+  },
+  "motion_interpolation": "quintic gesture paths, baked every frame with clamped Bezier/CYCLES"
 }

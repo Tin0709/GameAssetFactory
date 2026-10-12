@@ -1,3 +1,5 @@
+**APPROVED2026-10-13:** current `Rifle_Ready_V2_v16_Test` in shoulder_support_v006 is the preferred Ready baseline. [Exact approval](APPROVAL.md)
+
 # Rifle Ready v16 — closer left-hand support, Pending
 
 Open the SAME `blender/animation/showcase/Animation_Showcase.blend`, N → Animation Library → **Rifle_Ready_V2_v16_Test**. Only one Ready entry,18 total Actions. This is another checkpoint of the same Action, not v17 or a duplicate entry.

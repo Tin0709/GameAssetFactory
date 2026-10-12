@@ -1,3 +1,5 @@
+**Rifle Ready approved + new Rifle Idle Pending (2026-10-13):**19 entries in this SAME Showcase. Keep approved `Rifle_Ready_V2_v16_Test`; select new `Rifle_Ready_Idle_Expressive_Test` for the eight-second look-around. [Three-view original-speed review and evaluation](../reviews/player_animation_library_v1/rifle_ready_idle_expressive_test/README.md).
+
 **Latest Rifle Ready v16 (2026-10-13, Pending):** [closer left support, higher muzzle and closer shoulder seating](../reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v006/README.md). Same retained entry,18 total.
 
 **Latest Rifle Ready v16 review (2026-10-13, Pending):** same retained Ready entry with closer shoulder seating and lifted underside support. [Review](../reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v003/README.md).18 entries total; no other Action or Godot changes.
