@@ -57,6 +57,14 @@ func _is_additional_authored_bone(rig: Skeleton3D, bone: int) -> bool:
 	return rig.get_bone_name(bone) in ["ForeArm.L","ForeArm.R"]
 func _ready() -> void:
 	super._ready()
+	# The reused runtime atlas is VRAM-compressed and damages 64px face colors.
+	# Use an exact, lossless test-only atlas on instance-local material copies.
+	var atlas:=load("res://assets/characters/expressive_locomotion_v1/approved_atlas_64.png") as Texture2D
+	for instance in meshes:
+		for surface in instance.mesh.get_surface_count():
+			var material: BaseMaterial3D=instance.mesh.surface_get_material(surface).duplicate()
+			material.albedo_texture=atlas;material.texture_filter=BaseMaterial3D.TEXTURE_FILTER_NEAREST
+			instance.set_surface_override_material(surface,material)
 	for name in EXPRESSIVE_NAMES:
 		expressive_clips[name]=Sampler.new(APPROVED.get_animation(name),skeleton)
 	for i in skeleton.get_bone_count():

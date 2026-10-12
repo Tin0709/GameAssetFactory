@@ -14,9 +14,13 @@ func run() -> void:
 	await physics_frame
 	await process_frame
 	var actor = scene.actor
+	check(actor.get("review_pace")==2.0,"Review defaults to twice the original gameplay and animation pace")
 	check(actor.visual.expressive_clips.size()==3,"Exactly three approved expressive clips loaded")
 	check(not actor.has_method("request_jump"),"No jump controller integrated")
 	check(actor.walk_speed==.9 and actor.run_speed==2.31,"Controller speeds match approved gait distances")
+	var texture: Texture2D=load("res://assets/characters/expressive_locomotion_v1/approved_atlas_64.png")
+	var source:=Image.load_from_file("res://assets/characters/expressive_locomotion_v1/approved_atlas_64.png")
+	check(texture.get_image().get_data()==source.get_data(),"Imported 64px atlas preserves approved pixels losslessly")
 	await scene.run_validation(self)
 	var out := "res://.validation/expressive_locomotion_v1"
 	DirAccess.make_dir_recursive_absolute(out)
