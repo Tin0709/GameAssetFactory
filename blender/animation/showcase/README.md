@@ -244,3 +244,8 @@ Select **Rifle_Ready_V2_v11_Test**: corrected right-hand grip and straight arm/b
 ### Rifle Ready lower muzzle / hovering hand — Pending
 
 Select **Rifle_Ready_V2_v12_Test**: straight right arm/rifle8deg farther down, left hand deliberately close without touching. All29 independent entries remain selectable; F1–120/30FPS, closing121 excluded. [Latest review, clearance evidence and comparison](../reviews/player_animation_library_v1/rifle_ready_v12_test/README.md). No Aim/Back Holster refinement or Godot integration.
+
+
+### Rifle Ready four-view reference / higher rifle seating — Pending
+
+Select **Rifle_Ready_V2_v13_Test**: steeper low diagonal carry, near-vertical straight left arm with intentional11mm hovering gap, rifle30mm higher along right hand/arm. All30 independent entries remain available; F1–120/30FPS, closing121 excluded. [Review, five directions and v12/v13 comparison](../reviews/player_animation_library_v1/rifle_ready_v13_test/README.md). No Aim/Back Holster refinement or Godot integration.
