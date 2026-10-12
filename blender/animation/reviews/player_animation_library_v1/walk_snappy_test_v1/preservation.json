@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "protected_files_exact": 5024,
+  "changed_protected_files": [],
+  "previous_manifest_entries_exact": 19,
+  "paused_rifle_idle_source_action_reviews_exact": true,
+  "approved_sources_exact": true,
+  "godot_and_weapon_showcase_exact": true,
+  "new_run_action_created": false,
+  "entries": 20
+}

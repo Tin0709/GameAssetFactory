@@ -1,0 +1,33 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "frames": [
+    1,
+    30
+  ],
+  "closing_key": 31,
+  "fps": 30,
+  "period_s": 1.0,
+  "nominal_speed_m_s": 1.02,
+  "leg_tracks_m": 0.27,
+  "support_duty": {
+    "L": 0.64,
+    "R": 0.66
+  },
+  "double_support": 0.3,
+  "flight": 0,
+  "contact_frames": {
+    "L": 1,
+    "R": 16
+  },
+  "receiving_low_frames": [
+    3.1,
+    18.1
+  ],
+  "hip_vertical_range_m": 0.035,
+  "hip_lateral_range_m": 0.03,
+  "hip_fore_aft_range_m": 0.04,
+  "rig_unchanged": true,
+  "source_motion": "Original procedural contact-driven design; reference video pixels studied, no model/curve extraction.",
+  "transition": "Shared LEFT=0 RIGHT=.5 support phases. Absolute in-place Action; future start/stop replants and speed-matched phase-aware blending required. No runtime readiness claim."
+}
