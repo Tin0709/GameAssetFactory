@@ -19,18 +19,21 @@ func run() -> void:
 			for degrees in [90,-90,180,0,45,-45,180,90,-90,0,180,0]:
 				actor.requested_direction=Vector2(sin(deg_to_rad(degrees)),cos(deg_to_rad(degrees)))
 				var start: Vector3=actor.position
+				var initial_velocity: Vector3=actor.velocity
+				var response:=0.0
 				for tick in 6:
 					var old: Vector3=actor.position;var old_phase: float=v.gait_phase
 					await scene.tick(1)
 					worst_acceleration=maxf(worst_acceleration,absf(v.turn_rate-previous_rate)/maxf(actor.simulation_time-previous_time,.00001));previous_time=actor.simulation_time
 					distance+=actor.position.distance_to(old);previous_rate=v.turn_rate
+					response=maxf(response,(actor.velocity-initial_velocity).length())
 					trace.append({"yaw":v.rotation.y,"rate":v.turn_rate,"phase_delta":wrapf(v.gait_phase-old_phase,-.5,.5),"position":actor.position})
-				minimum_response=minf(minimum_response,actor.position.distance_to(start))
+				minimum_response=minf(minimum_response,response)
 			actor.requested_direction=Vector2(0,1);await scene.tick(75)
 			var final_error:=absf(wrapf(v.rotation.y,-PI,PI))
 			cases.append({"pace":pace,"run":sprint,"maximum_yaw_acceleration":worst_acceleration,"distance":distance,"minimum_input_response":minimum_response,"final_heading_error":final_error,"trace":trace})
 			check(worst_acceleration<120,"Spam turns avoid instantaneous full-speed yaw reversals")
-			check(minimum_response>.015,"Every rapid input change keeps physical movement responsive")
+			check(minimum_response>.05,"Every rapid input change immediately changes physical velocity")
 			check(final_error<.015,"Visual facing settles to the requested heading without residual spin")
 	var out:="res://.validation/expressive_turn_spin_v1";DirAccess.make_dir_recursive_absolute(out)
 	FileAccess.open(out+"/rapid_turns.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"cases":cases},"\t"))

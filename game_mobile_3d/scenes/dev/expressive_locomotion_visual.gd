@@ -6,6 +6,8 @@ const WALK_STRIDE:=1.08
 const RUN_STRIDE:=1.54
 const REPLANT_SECONDS:=.44
 var review_pace:=1.5
+var walk_speed_scale:=1.0
+var run_speed_scale:=1.0
 var expressive_clips: Dictionary={}
 var gait_phase:=.28
 var gait_run_weight:=0.0
@@ -93,7 +95,7 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 	else:_rest_facing(delta)
 	turn_rate=wrapf(rotation.y-old_yaw,-PI,PI)/maxf(delta,.001)
 	# Pose blend is speed based, not a button-state crossfade. Both clocks share phase.
-	var desired_run:=smoothstep(.9,2.31,movement_speed/review_pace)
+	var desired_run:=smoothstep(.9*walk_speed_scale,2.31*run_speed_scale,movement_speed/review_pace)
 	gait_run_weight=move_toward(gait_run_weight,desired_run,delta*review_pace/0.12)
 	var was_moving:=move_requested
 	move_requested=requested or movement_speed>.025

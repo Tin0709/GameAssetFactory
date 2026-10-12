@@ -7,6 +7,8 @@
 jump_height = 2.0
 jump_flight_speed = 2.15
 running_air_speed_scale = 1.15
+walk_motion_speed_scale = 1.5
+run_motion_speed_scale = 1.15
 
 [node name="Visual" parent="."]
 script = ExtResource("visual")

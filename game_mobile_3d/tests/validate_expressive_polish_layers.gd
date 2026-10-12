@@ -23,6 +23,7 @@ func run() -> void:
 			actor.review_drop(6)
 			var previous: Array=[]
 			for bone in v.r13_mask:previous.append(v.skeleton.get_bone_pose_rotation(bone))
+			var previous_target: Array=previous.duplicate()
 			var peak:=0.0;var worst: Dictionary={};var landed:=false;var waving:=false;var scale_error:=0.0;var support_while_air:=false
 			var events: Array=[];var contact_faded:=false;var contact_seen:=false
 			var end_tick:=Engine.get_physics_frames()+170
@@ -44,9 +45,11 @@ func run() -> void:
 				for index in v.r13_mask.size():
 					var bone: int=v.r13_mask[index];var q: Quaternion=v.skeleton.get_bone_pose_rotation(bone)
 					var angle:=rad_to_deg(previous[index].angle_to(q))
+					var native_q: Quaternion=(v._from_rotvec(v.weapon_rotation_offsets[index])*v.weapon_base_q[index]).normalized()
 					if v.skeleton.get_bone_name(bone) not in ["WeaponSocket","WeaponCarrier"] and angle>peak:
-						peak=angle;worst={"bone":v.skeleton.get_bone_name(bone),"state":actor.jump_state,"age":actor.jump_age,"weight":v.review_weapon_weight,"events":events.duplicate(),"offset":v.weapon_rotation_offsets[index]}
+						peak=angle;worst={"bone":v.skeleton.get_bone_name(bone),"state":actor.jump_state,"age":actor.jump_age,"weight":v.review_weapon_weight,"events":events.duplicate(),"offset":v.weapon_rotation_offsets[index],"native_step":rad_to_deg(previous_target[index].angle_to(native_q)),"entry_age":v.layer_entry_age}
 					previous[index]=q
+					previous_target[index]=native_q
 				for bone in [v.leg_left,v.leg_right]:scale_error=maxf(scale_error,(v.skeleton.get_bone_pose_scale(bone)-Vector3.ONE).length())
 				landed=landed or actor.jump_state=="LAND"
 				if actor.jump_state=="LAND" and not contact_seen:

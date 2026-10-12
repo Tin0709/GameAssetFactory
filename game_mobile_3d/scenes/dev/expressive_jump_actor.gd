@@ -3,6 +3,9 @@ extends "res://scenes/dev/expressive_locomotion_actor.gd"
 @export var jump_height:=1.2
 @export_range(1.0,2.4,.01) var jump_flight_speed:=1.0
 @export_range(1.0,1.3,.01) var running_air_speed_scale:=1.0
+@export var walk_motion_speed_scale:=1.0
+@export var run_motion_speed_scale:=1.0
+var faster_locomotion_enabled:=true
 var _active_flight_speed:=1.0
 var _prepared_flight:=false
 const PREP_SECONDS:=.20
@@ -24,8 +27,7 @@ func request_jump() -> void:
 	jump_buffer=BUFFER_SECONDS
 
 func _state(value: String) -> void:
-	if value=="AIR":_prepared_flight=jump_state=="PREP"
-	else:_prepared_flight=false
+	_prepared_flight=false
 	if value!="AIR" or jump_state!="PREP":_active_flight_speed=1.0
 	jump_state=value;jump_age=0.0
 	jump_events.append({"event":value,"time":simulation_time,"position":[position.x,position.y,position.z],"vy":velocity.y,"phase":visual.gait_phase,"speed":current_speed,"jump":jump_count})
@@ -43,7 +45,10 @@ func _physics_process(delta: float) -> void:
 	if joy.length()>stick.length():stick=joy
 	fast_sprinting=sprint and stick.length_squared()>.001
 	visual.review_pace=review_pace
+	visual.walk_speed_scale=walk_motion_speed_scale if faster_locomotion_enabled else 1.0
+	visual.run_speed_scale=run_motion_speed_scale if faster_locomotion_enabled else 1.0
 	var desired:=stick.limit_length()*(run_speed if fast_sprinting else walk_speed)*review_pace*analog_strength
+	desired*=visual.run_speed_scale if fast_sprinting else visual.walk_speed_scale
 	if fast_sprinting and jump_state=="AIR" and _prepared_flight:desired*=running_air_speed_scale
 	var planar:=Vector2(velocity.x,velocity.z).move_toward(desired,(deceleration if stick.is_zero_approx() else acceleration)*review_pace*review_pace*delta)
 	var grounded:=is_on_floor()
@@ -59,7 +64,7 @@ func _physics_process(delta: float) -> void:
 		launch_velocity=sqrt(2*flight_gravity*jump_height)
 		# Half-step launch gravity avoids adding an extra physics tick of height.
 		velocity.y=launch_velocity-flight_gravity*delta*.5
-		jump_count+=1;launched=true;_state("AIR")
+		jump_count+=1;launched=true;_state("AIR");_prepared_flight=true
 	elif grounded:velocity.y=-.2
 	else:velocity.y-=_flight_gravity()*delta
 	velocity.x=planar.x;velocity.z=planar.y

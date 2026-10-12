@@ -31,6 +31,12 @@ var run_release_velocity: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
 var run_raw_sole: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
 var rapid_turn_smoothing_enabled:=true
 var facing_velocity:=0.0
+var layer_entry_age:=.30
+var layer_entry_pending:=false
+var layer_entry_shown_q: Array[Quaternion]=[]
+var layer_entry_shown_p: Array[Vector3]=[]
+var layer_entry_q: Array[Vector3]=[]
+var layer_entry_p: Array[Vector3]=[]
 
 func _advance_facing(target_yaw: float,delta: float) -> void:
 	if not rapid_turn_smoothing_enabled:
@@ -64,6 +70,10 @@ func _limit_leg_twist(q: Quaternion, reference: Quaternion) -> Quaternion:
 	return (Quaternion(axis,bounded-twist)*q).normalized()
 
 func _process(delta: float) -> void:
+	if polish_enabled and not layer_was_equipped and weapon_equipped and not _q.is_empty():
+		layer_entry_age=0;layer_entry_pending=true;layer_entry_shown_q.clear();layer_entry_shown_p.clear()
+		for bone in r13_mask:
+			layer_entry_shown_q.append(skeleton.get_bone_pose_rotation(bone));layer_entry_shown_p.append(skeleton.get_bone_pose_position(bone))
 	if polish_enabled and layer_was_equipped and not weapon_equipped and not _q.is_empty():
 		# Capture the displayed partial/full layer, not its stale unwrapped
 		# target. A shortest relative rotation avoids a long-way exit spin.
@@ -73,6 +83,7 @@ func _process(delta: float) -> void:
 			layer_release_p.append(skeleton.get_bone_pose_position(bone)-_p[bone])
 	layer_was_equipped=weapon_equipped
 	layer_release_age=minf(.30,layer_release_age+delta)
+	layer_entry_age=minf(.30,layer_entry_age+delta)
 	super._process(delta)
 
 func _weapon_release_active() -> bool:
@@ -87,6 +98,25 @@ func _apply_weapon_carry() -> void:
 			skeleton.set_bone_pose_rotation(bone,(_from_rotvec(layer_release_q[index]*weight)*skeleton.get_bone_pose_rotation(bone)).normalized())
 	elif polish_enabled and not weapon_equipped:
 		return
+	elif polish_enabled and weapon_equipped:
+		# Blend from the displayed pose to the full native carry target. Capture
+		# the shortest target-relative residual once, rather than re-unwrapping
+		# a live fall-base→carry log through pi as the unarmed shoulders rotate.
+		var weight:=review_weapon_weight;review_weapon_weight=1.0
+		super._apply_weapon_carry();review_weapon_weight=weight
+		if layer_entry_pending:
+			layer_entry_q.clear();layer_entry_p.clear()
+			for index in r13_mask.size():
+				var bone:=r13_mask[index]
+				layer_entry_q.append(_rotvec(layer_entry_shown_q[index]*skeleton.get_bone_pose_rotation(bone).inverse()))
+				layer_entry_p.append(layer_entry_shown_p[index]-skeleton.get_bone_pose_position(bone))
+			layer_entry_pending=false
+		if layer_entry_age<.30 and layer_entry_q.size()==r13_mask.size():
+			var residual:=1-_smooth5(layer_entry_age/.30)
+			for index in r13_mask.size():
+				var bone:=r13_mask[index]
+				skeleton.set_bone_pose_rotation(bone,(_from_rotvec(layer_entry_q[index]*residual)*skeleton.get_bone_pose_rotation(bone)).normalized())
+				skeleton.set_bone_pose_position(bone,skeleton.get_bone_pose_position(bone)+layer_entry_p[index]*residual)
 	else:super._apply_weapon_carry()
 
 func _pose_damping() -> float:
@@ -150,7 +180,7 @@ func _evaluate_locomotion_pose(delta: float) -> bool:
 	return evaluated
 
 func _stride_distance() -> float:
-	return lerpf(WALK_STRIDE,RUN_STRIDE*run_stride_scale,gait_run_weight)
+	return lerpf(WALK_STRIDE*sqrt(walk_speed_scale),RUN_STRIDE*run_stride_scale*sqrt(run_speed_scale),gait_run_weight)
 
 func jump_transition(value: String) -> void:
 	if value!="GROUND" or jump_state!="LAND":run_release_active=[false,false]
@@ -175,7 +205,7 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 		# At the fast candidate pace, finish push-off before the planted leg
 		# reaches its translation cap. Receiving phases stay0LEFT/.5RIGHT;
 		# Walk and the accepted1.5x Run support schedule remain unchanged.
-		var earlier:=.04*smoothstep(1.5,2.25,review_pace)
+		var earlier:=.04*smoothstep(1.5,2.25,review_pace*sqrt(run_speed_scale))
 		for side in 2:
 			stance_duty[side]=minf(stance_duty[side],lerpf(.60 if side==0 else .62,(.42 if side==0 else .43)-earlier,gait_run_weight))
 	if not directional_enabled or not move_requested or settling or not was_moving:
@@ -212,7 +242,8 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 		var weight:=1.0 if jump_state=="GROUND" else _smooth5((jump_age-.08)/.24)
 		var rest:=skeleton.get_bone_rest(bone).basis
 		var pitch: float=(result.basis*rest.inverse()).get_euler().x
-		result.basis=Basis(Vector3.RIGHT,pitch*(run_stride_scale-1)*gait_run_weight*weight)*result.basis
+		var stride_scale:=lerpf(sqrt(walk_speed_scale),run_stride_scale*sqrt(run_speed_scale),gait_run_weight)
+		result.basis=Basis(Vector3.RIGHT,pitch*(stride_scale-1)*weight)*result.basis
 	if run_orbit_enabled and move_requested and bone in [leg_left,leg_right] and jump_state in ["GROUND","LAND"]:
 		var side:=0 if bone==leg_left else 1
 		var phase:=fposmod(gait_phase+ahead*gait_frequency+side*.5,1)
@@ -327,7 +358,7 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	swing_world_q[side]=_limit_leg_twist((support_aim[side]*reference).normalized(),reference)
 	support_aim[side]=(swing_world_q[side]*reference.inverse()).normalized()
 	swing_active[side]=true
-	var may_capture:=run_release_enabled and review_pace>1.5 and gait_run_weight>.25
+	var may_capture:=run_release_enabled and review_pace*sqrt(run_speed_scale)>1.5 and gait_run_weight>.25
 	if move_requested and (may_capture or run_release_active[side]):
 		# Contact translations used to disappear at liftoff even though rotation
 		# released smoothly. Carry the outgoing foot position/velocity through a
@@ -336,7 +367,7 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 		var raw:=_sole_world(bone)
 		if foot_support[side] and may_capture:
 			run_release_active[side]=true;run_release_age[side]=0
-			run_release_duration[side]=clampf(.45*(1-stance_duty[side])/maxf(gait_frequency,.01),.06,.14)
+			run_release_duration[side]=clampf(.65*(1-stance_duty[side])/maxf(gait_frequency,.01),.06,.14)
 			run_release_offset[side]=(last_sole[side]-raw).limit_length(.14)
 			run_release_velocity[side]=-(raw-run_raw_sole[side])/maxf(delta,.00001)
 		if run_release_active[side]:
