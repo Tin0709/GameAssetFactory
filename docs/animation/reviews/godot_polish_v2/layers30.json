@@ -1,0 +1,534 @@
+{
+	"cases": [
+		{
+			"contact_faded": true,
+			"events": [
+				"equip in fall",
+				"release before contact",
+				"equip during recovery",
+				"interrupt recovery equip",
+				"re-equip during release",
+				"release interrupted re-equip"
+			],
+			"maximum_upper_step_degrees": 44.6170154700035,
+			"pace": 1.5,
+			"scale_error": 0.0,
+			"weapon": 0,
+			"worst": {
+				"age": 0.766666666666667,
+				"bone": "Arm.R",
+				"events": [
+					"equip in fall",
+					"release before contact"
+				],
+				"offset": "(0.092609, -1.716432, -2.684667)",
+				"state": "AIR",
+				"weight": 0.444444444444444
+			}
+		},
+		{
+			"contact_faded": true,
+			"events": [
+				"equip in fall",
+				"release before contact",
+				"equip during recovery",
+				"interrupt recovery equip",
+				"re-equip during release",
+				"release interrupted re-equip"
+			],
+			"maximum_upper_step_degrees": 49.8135497490489,
+			"pace": 1.5,
+			"scale_error": 0.0,
+			"weapon": 1,
+			"worst": {
+				"age": 0.733333333333334,
+				"bone": "Arm.L",
+				"events": [
+					"equip in fall",
+					"release before contact"
+				],
+				"offset": "(-0.339783, -1.69044, -2.743426)",
+				"state": "AIR",
+				"weight": 0.555555555555555
+			}
+		},
+		{
+			"contact_faded": true,
+			"events": [
+				"equip in fall",
+				"release before contact",
+				"equip during recovery",
+				"interrupt recovery equip",
+				"re-equip during release",
+				"release interrupted re-equip"
+			],
+			"maximum_upper_step_degrees": 49.813532673576,
+			"pace": 1.5,
+			"scale_error": 0.0,
+			"weapon": 2,
+			"worst": {
+				"age": 0.733333333333334,
+				"bone": "Arm.L",
+				"events": [
+					"equip in fall",
+					"release before contact"
+				],
+				"offset": "(0.319085, 1.587469, 2.576313)",
+				"state": "AIR",
+				"weight": 0.555555555555555
+			}
+		},
+		{
+			"contact_faded": true,
+			"events": [
+				"equip in fall",
+				"release before contact",
+				"equip during recovery",
+				"interrupt recovery equip",
+				"re-equip during release",
+				"release interrupted re-equip"
+			],
+			"maximum_upper_step_degrees": 53.4307393863122,
+			"pace": 2.25,
+			"scale_error": 0.0,
+			"weapon": 0,
+			"worst": {
+				"age": 0.0666666666666667,
+				"bone": "Arm.R",
+				"events": [],
+				"offset": "(0.054542, 2.215513, -2.173647)",
+				"state": "AIR",
+				"weight": 0.0
+			}
+		},
+		{
+			"contact_faded": true,
+			"events": [
+				"equip in fall",
+				"release before contact",
+				"equip during recovery",
+				"interrupt recovery equip",
+				"re-equip during release",
+				"release interrupted re-equip"
+			],
+			"maximum_upper_step_degrees": 53.4307393863122,
+			"pace": 2.25,
+			"scale_error": 0.0,
+			"weapon": 1,
+			"worst": {
+				"age": 0.0666666666666667,
+				"bone": "Arm.R",
+				"events": [],
+				"offset": "(0.015123, 1.679375, -2.634156)",
+				"state": "AIR",
+				"weight": 0.0
+			}
+		},
+		{
+			"contact_faded": true,
+			"events": [
+				"equip in fall",
+				"release before contact",
+				"equip during recovery",
+				"interrupt recovery equip",
+				"re-equip during release",
+				"release interrupted re-equip"
+			],
+			"maximum_upper_step_degrees": 53.4307393863122,
+			"pace": 2.25,
+			"scale_error": 0.0,
+			"weapon": 2,
+			"worst": {
+				"age": 0.0666666666666667,
+				"bone": "Arm.R",
+				"events": [],
+				"offset": "(0.015123, 1.679375, -2.634156)",
+				"state": "AIR",
+				"weight": 0.0
+			}
+		}
+	],
+	"checks": [
+		{
+			"check": "Weapon0 fall/equip/release/recovery stays below strict60deg guard at1.50x",
+			"passed": true
+		},
+		{
+			"check": "Weapon fall returns to responsive running by actual contact",
+			"passed": true
+		},
+		{
+			"check": "Unarmed fall gesture survives weapon release without false support",
+			"passed": true
+		},
+		{
+			"check": "Gesture releases before landing; rigid legs preserved",
+			"passed": true
+		},
+		{
+			"check": "All six weapon events occur in matched physical phases; falling gesture faded at first contact",
+			"passed": true
+		},
+		{
+			"check": "Weapon1 fall/equip/release/recovery stays below strict60deg guard at1.50x",
+			"passed": true
+		},
+		{
+			"check": "Weapon fall returns to responsive running by actual contact",
+			"passed": true
+		},
+		{
+			"check": "Unarmed fall gesture survives weapon release without false support",
+			"passed": true
+		},
+		{
+			"check": "Gesture releases before landing; rigid legs preserved",
+			"passed": true
+		},
+		{
+			"check": "All six weapon events occur in matched physical phases; falling gesture faded at first contact",
+			"passed": true
+		},
+		{
+			"check": "Weapon2 fall/equip/release/recovery stays below strict60deg guard at1.50x",
+			"passed": true
+		},
+		{
+			"check": "Weapon fall returns to responsive running by actual contact",
+			"passed": true
+		},
+		{
+			"check": "Unarmed fall gesture survives weapon release without false support",
+			"passed": true
+		},
+		{
+			"check": "Gesture releases before landing; rigid legs preserved",
+			"passed": true
+		},
+		{
+			"check": "All six weapon events occur in matched physical phases; falling gesture faded at first contact",
+			"passed": true
+		},
+		{
+			"check": "Weapon0 fall/equip/release/recovery stays below strict60deg guard at2.25x",
+			"passed": true
+		},
+		{
+			"check": "Weapon fall returns to responsive running by actual contact",
+			"passed": true
+		},
+		{
+			"check": "Unarmed fall gesture survives weapon release without false support",
+			"passed": true
+		},
+		{
+			"check": "Gesture releases before landing; rigid legs preserved",
+			"passed": true
+		},
+		{
+			"check": "All six weapon events occur in matched physical phases; falling gesture faded at first contact",
+			"passed": true
+		},
+		{
+			"check": "Weapon1 fall/equip/release/recovery stays below strict60deg guard at2.25x",
+			"passed": true
+		},
+		{
+			"check": "Weapon fall returns to responsive running by actual contact",
+			"passed": true
+		},
+		{
+			"check": "Unarmed fall gesture survives weapon release without false support",
+			"passed": true
+		},
+		{
+			"check": "Gesture releases before landing; rigid legs preserved",
+			"passed": true
+		},
+		{
+			"check": "All six weapon events occur in matched physical phases; falling gesture faded at first contact",
+			"passed": true
+		},
+		{
+			"check": "Weapon2 fall/equip/release/recovery stays below strict60deg guard at2.25x",
+			"passed": true
+		},
+		{
+			"check": "Weapon fall returns to responsive running by actual contact",
+			"passed": true
+		},
+		{
+			"check": "Unarmed fall gesture survives weapon release without false support",
+			"passed": true
+		},
+		{
+			"check": "Gesture releases before landing; rigid legs preserved",
+			"passed": true
+		},
+		{
+			"check": "All six weapon events occur in matched physical phases; falling gesture faded at first contact",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Quieter Run retains vertical and sagittal weight transfer",
+			"passed": true
+		},
+		{
+			"check": "Run lateral excursion is reduced20percent",
+			"passed": true
+		}
+	],
+	"failures": []
+}

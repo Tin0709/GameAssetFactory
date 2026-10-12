@@ -1,0 +1,16 @@
+{
+  "fps": 30,
+  "frames": 1219,
+  "seconds": 40.63333333333333,
+  "retimed": false,
+  "renderer": "Godot Mobile/D3D12",
+  "matched_demo": true,
+  "paces": [
+    2.25,
+    1.5
+  ],
+  "movies": {
+    "before.avi": "a74c4dcfa00e5c418b0434f4b918e8069598edb2e22e5bba69c765ba7f74a1f2",
+    "after.avi": "5b88e25866adef90bbbb57ce2c2639abce9aea57fd0b6cf4d693f91fae562fd7"
+  }
+}

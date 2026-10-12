@@ -1,0 +1,17 @@
+{
+  "protected_files": 6833,
+  "unchanged": 6827,
+  "allowed_changed": [
+    "game_mobile_3d/scenes/dev/expressive_directional_review.gd",
+    "game_mobile_3d/scenes/dev/expressive_directional_visual.gd",
+    "game_mobile_3d/scenes/dev/expressive_locomotion_visual.gd",
+    "docs/animation/ANIMATION_PROGRESS.md",
+    "docs/animation/ANIMATION_WORKFLOW.md",
+    "AGENTS.md"
+  ],
+  "unexpected_changed": [],
+  "missing": [],
+  "all_blender_animation_unchanged": true,
+  "production_unchanged": true,
+  "prior_reviews_unchanged": true
+}

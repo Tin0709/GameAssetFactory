@@ -11,6 +11,8 @@ func _ready() -> void:
 	if jump_enabled and "--expressive-direction-original" in OS.get_cmdline_user_args():actor.visual.directional_enabled=false
 	if jump_enabled and "--expressive-fall-original" in OS.get_cmdline_user_args():actor.visual.fall_wave_enabled=false
 	if jump_enabled and "--expressive-stride-original" in OS.get_cmdline_user_args():actor.visual.run_stride_scale=1.0
+	if jump_enabled and "--expressive-polish-before" in OS.get_cmdline_user_args():actor.visual.polish_enabled=false
+	if jump_enabled and "--expressive-polish-demo" in OS.get_cmdline_user_args():call_deferred("run_polish_demo")
 
 func _button(label: String) -> void:
 	if jump_enabled and label=="Compare pace":
@@ -26,10 +28,45 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		actor.visual.fall_wave_enabled=not actor.visual.fall_wave_enabled;actor.visual.pose_dirty=true
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_G:
 		actor.visual.run_stride_scale=1.0 if actor.visual.run_stride_scale>1.0 else 1.2;actor.visual.pose_dirty=true
+	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_K:
+		actor.visual.polish_enabled=not actor.visual.polish_enabled;actor.visual.pose_dirty=true
 
 func _process(delta: float) -> void:
 	super._process(delta)
 	if jump_enabled:status.text+="\nTurns: %s · V compares\nFalling limbs: %s · F compares\nRun stride: %s · G compares"%["Refined" if actor.visual.directional_enabled else "Original","Raised wave" if actor.visual.fall_wave_enabled else "Original","Longer" if actor.visual.run_stride_scale>1.0 else "Original"]
+	if jump_enabled:status.text+="\nPolish: %s · K before/after · T pace"%["After" if actor.visual.polish_enabled else "Before"]
+
+func run_polish_demo() -> void:
+	demo_running=true;actor.scripted_input=true;reset_actor();actor.position.x=-12
+	for pace in [2.25,1.5]:
+		actor.requested_direction=Vector2.ZERO;actor.requested_run=false
+		reset_actor();actor.position.x=-12
+		actor.review_pace=pace
+		camera_offset=Vector3(4,3.1,5)
+		await tick(30,"Idle1x · candidate%.2fx / accepted1.5x comparison"%pace)
+		for sprint in [false,true]:
+			actor.requested_direction=Vector2(0,1);actor.requested_run=sprint
+			await tick(45,"%s%.2fx · approach"%["Run" if sprint else "Walk",pace])
+			for heading in [90,270]:
+				var angle:=deg_to_rad(heading);actor.requested_direction=Vector2(sin(angle),cos(angle))
+				await tick(50,"%s%.2fx · sharp%d degree turn"%["Run" if sprint else "Walk",pace,90 if heading==90 else 180])
+			actor.requested_direction=Vector2.ZERO;await tick(35,"Responsive stop / support recovery")
+		camera_offset=Vector3(6,1.5,0);actor.requested_run=true;actor.requested_direction=Vector2(0,1)
+		await tick(60,"Side · longer stride / quieter Run body")
+		actor.request_jump();await tick(20,"Jump · live physics")
+		actor.requested_direction=Vector2(-1,0);await tick(90,"Turning jump / heavy contact back into Run")
+		actor.requested_direction=Vector2.ZERO;await tick(40,"Settle before weapon review")
+		actor.set_review_weapon(true);await tick(25,"Rifle equip · independent upper-body clock")
+		for view in [["Front",Vector3(0,1.5,6)],["Three-quarter",Vector3(4,3.1,5)],["Side",Vector3(6,1.5,0)]]:
+			camera_offset=view[1];actor.review_drop(6)
+			await tick(30,"%s · rifle carry during fall"%view[0])
+			actor.set_review_weapon(false);await tick(90,"%s · release to wider flutter / natural landing"%view[0])
+			actor.set_review_weapon(true);await tick(25,"Weapon recovery · no gait-paced arm reset")
+		actor.set_review_weapon(false);await tick(30,"Return to relaxed Idle1x")
+		camera_offset=Vector3(4,3.1,5);actor.review_drop(6)
+		await tick(120,"Unarmed · full above-head waves / wider flutter / natural contact")
+	actor.scripted_input=false;demo_running=false;section="Manual review"
+	if "--expressive-polish-demo" in OS.get_cmdline_user_args():get_tree().quit()
 
 func run_demo() -> void:
 	if not jump_enabled:super.run_demo();return

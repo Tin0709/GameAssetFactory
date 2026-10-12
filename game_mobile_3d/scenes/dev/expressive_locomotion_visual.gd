@@ -163,8 +163,17 @@ func _r13_pose(kind: String, bone: int) -> Transform3D:
 	return result
 
 func _process(delta: float) -> void:
-	review_weapon_weight=move_toward(review_weapon_weight,1.0 if weapon_equipped else 0.0,delta*review_pace/.30)
+	review_weapon_weight=move_toward(review_weapon_weight,1.0 if weapon_equipped else 0.0,delta*_weapon_blend_rate())
 	super._process(delta)
+
+func _weapon_blend_rate() -> float:
+	return review_pace/.30
+
+func _pose_damping() -> float:
+	return (24.0 if move_requested else 18.0)*review_pace
+
+func _weapon_release_active() -> bool:
+	return false
 
 func _apply_weapon_carry() -> void:
 	if expressive_clips.is_empty():super._apply_weapon_carry();return
@@ -213,7 +222,7 @@ func _evaluate_locomotion_pose(delta: float) -> bool:
 			_offset_vq[i]=(_final_vq[i] if planted else _vq[i])-_rotvec(future.basis.get_rotation_quaternion()*target.basis.get_rotation_quaternion().inverse())/.004
 		pose_dirty=false
 	transition_age+=delta
-	var damping:=(24.0 if move_requested else 18.0)*review_pace
+	var damping:=_pose_damping()
 	var falloff:=exp(-damping*transition_age)
 	for i in skeleton.get_bone_count():
 		var target:=_target_pose(i)
@@ -224,7 +233,7 @@ func _evaluate_locomotion_pose(delta: float) -> bool:
 			_vp[i]=(p-_p[i])/delta;_vq[i]=_rotvec(q*_q[i].inverse())/delta
 		_p[i]=p;_q[i]=q
 		skeleton.set_bone_pose_position(i,p);skeleton.set_bone_pose_rotation(i,q)
-	if review_weapon_weight>0:_apply_firing_recoil();_apply_weapon_carry()
+	if review_weapon_weight>0 or _weapon_release_active():_apply_firing_recoil();_apply_weapon_carry()
 	return true
 
 func _sole_world(bone: int) -> Vector3:
