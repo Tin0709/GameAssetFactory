@@ -53,5 +53,7 @@ func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Qu
 		var corner_drop:=.1125*(absf(basis.x.y)+absf(basis.z.y))
 		var destination:=target+Vector3(0,contact_floor_y+corner_drop,0)
 		q=(Quaternion(Basis(receiving).y.normalized(),(destination-origin).normalized())*receiving).normalized()
-	support_aim[side]=Quaternion.IDENTITY
+	# Carry the solved offset into the inherited swing release instead of
+	# jumping straight back to the body-relative authored leg orientation.
+	support_aim[side]=(q*original_q.inverse()).normalized()
 	return q

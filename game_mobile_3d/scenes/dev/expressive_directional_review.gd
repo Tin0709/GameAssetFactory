@@ -19,6 +19,7 @@ func _process(delta: float) -> void:
 func run_demo() -> void:
 	if not jump_enabled:super.run_demo();return
 	demo_running=true;actor.scripted_input=true;reset_actor()
+	actor.position.x=-8
 	await tick(35,"Approved Idle1x · directional test Pending")
 	for sprint in [false,true]:
 		actor.requested_direction=Vector2(0,1);actor.requested_run=sprint

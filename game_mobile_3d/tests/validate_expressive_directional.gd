@@ -21,6 +21,8 @@ func observe(scene: Node, ticks: int, record: Dictionary) -> void:
 		if v.foot_support[0] or v.foot_support[1]:record.support_frames+=1
 		for side in 2:
 			var p: Vector3=v.last_sole[side]
+			var world_q: Quaternion=v._leg_world_rotation([v.leg_left,v.leg_right][side])
+			record.leg_step_degrees=maxf(record.leg_step_degrees,rad_to_deg(world_q.angle_to(previous_q[side])))
 			if v.foot_support[side] and previous_support[side] and previous_ids[side]==v.contact_ids[side] and not v.settling:
 				var distance:=p.distance_to(previous_feet[side])
 				record.slip_m+=distance;record.peak_slip_m=maxf(record.peak_slip_m,distance)
@@ -44,20 +46,22 @@ func run() -> void:
 		for sprint in [false,true]:
 			for degrees in [45,90,180]:
 				for lead in [.15,.65]:
-					actor.requested_direction=Vector2.ZERO;actor.requested_run=false;scene.reset_actor();await scene.tick(40)
+					actor.requested_direction=Vector2.ZERO;actor.requested_run=false;scene.reset_actor();actor.position.x=-12;await scene.tick(40)
 					actor.requested_direction=Vector2(0,1);actor.requested_run=sprint;await scene.tick(45)
 					v.gait_phase=lead;v.foot_support[0]=false;v.foot_support[1]=false;v.pose_dirty=true;await scene.tick(3)
-					var record:={"run":sprint,"degrees":degrees,"lead":lead,"slip_m":0.0,"peak_slip_m":0.0,"plant_rotation_degrees":0.0,"penetration_m":0.0,"phase_error":0.0,"yaw_step_degrees":0.0,"frames":0,"support_frames":0}
+					var record:={"run":sprint,"degrees":degrees,"lead":lead,"slip_m":0.0,"peak_slip_m":0.0,"plant_rotation_degrees":0.0,"leg_step_degrees":0.0,"penetration_m":0.0,"phase_error":0.0,"yaw_step_degrees":0.0,"frames":0,"support_frames":0}
 					var clamps: int=v.correction_clamps;var before: Vector3=actor.velocity
 					var angle:=deg_to_rad(degrees)*(1 if lead<.5 else -1)
 					actor.requested_direction=Vector2(sin(angle),cos(angle))
 					await observe(scene,2,record)
 					check((actor.velocity-before).length()>.05,"Input immediately changes velocity: %s %d lead%.2f"%["Run" if sprint else "Walk",degrees,lead])
 					await observe(scene,34,record)
-					record.clamps=v.correction_clamps-clamps;cases.append(record)
+					record.clamps=v.correction_clamps-clamps
+					record.final_position=actor.position;record.final_phase=v.gait_phase;cases.append(record)
 					check(record.phase_error<.06,"Turn preserves shared stride phase")
 					check(record.penetration_m<.008,"Turn maintains sole clearance")
 					check(record.yaw_step_degrees<20,"Turn does not snap body heading")
+					check(record.leg_step_degrees<45,"Support-to-swing leg release avoids a large rotation reset")
 					check(float(record.support_frames)/record.frames>(.65 if sprint else .80),"Turn retains authored support rather than hiding slip in flight")
 		actor.requested_direction=Vector2.ZERO;await scene.tick(55)
 		check(not v.move_requested and not v.settling,"Directional stop returns to planted Idle")
@@ -77,6 +81,9 @@ func run() -> void:
 		versions.append({"directional":enabled,"cases":cases,"total_planted_slip_m":total,"peak_slip_m":peak,"clamps":clamps})
 		scene.queue_free();await process_frame
 	check(versions[1].total_planted_slip_m<versions[0].total_planted_slip_m*.70,"Refinement reduces matched turn planted sliding by at least30percent")
+	for i in versions[0].cases.size():
+		check(versions[0].cases[i].final_position.distance_to(versions[1].cases[i].final_position)<.00001,"Refined capsule follows exactly the original responsive turn path")
+		check(absf(versions[0].cases[i].final_phase-versions[1].cases[i].final_phase)<.00001,"Refinement preserves the original gait progression")
 	var out:="res://.validation/expressive_directional_v1";DirAccess.make_dir_recursive_absolute(out)
 	FileAccess.open(out+"/runtime_validation.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"versions":versions},"\t"))
 	print("EXPRESSIVE_DIRECTIONAL_CHECKS ",checks.size()," failures ",failures.size())
