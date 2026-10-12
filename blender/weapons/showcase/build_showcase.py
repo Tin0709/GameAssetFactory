@@ -1,10 +1,15 @@
 """Manifest-driven build. Sources are read-only; existing showcase is backed up."""
-import bpy,json,sys,hashlib,shutil,datetime
+import bpy,json,sys,hashlib,shutil,datetime,atexit
 from pathlib import Path
 from mathutils import Vector,Matrix
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
 sys.path.insert(0,str(HERE));import gaf_weapon_library as lib
+from library_safety import UpdateLock
+if not globals().get('_WEAPON_LOCK_HELD',False):
+ update_lock=UpdateLock(HERE).acquire();atexit.register(update_lock.release)
 TARGET=HERE/'Weapon_Showcase.blend';MANIFEST=HERE/'weapon_manifest.json'
+initial_target_hash=hashlib.sha256(TARGET.read_bytes()).hexdigest() if TARGET.exists() else None
+initial_manifest_hash=hashlib.sha256(MANIFEST.read_bytes()).hexdigest() if MANIFEST.exists() else None
 TMP=ROOT/'.validation/weapon_showcase_v2';TMP.mkdir(parents=True,exist_ok=True)
 if TARGET.exists():
  backup=TMP/('backup_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S'));backup.mkdir()
@@ -21,7 +26,7 @@ def capture_fits():
   root=next(o for o in bpy.data.objects if o.type=='EMPTY' and 'Stow_'+kind in o.name and o.name.endswith(('Blocky_Root','Blocky_Pistol_Root','Blocky_Shotgun_Root')))
   scene=next(s for s in bpy.data.scenes if rig.name in s.objects);bpy.context.window.scene=scene
   report[kind]={'scene':scene.name,'rig':rig.name,'mesh':mesh.name,'action':rig.animation_data.action.name,'groups':[g.name for g in mesh.vertex_groups], 'group_vertices':{g.name:[v.index for v in mesh.data.vertices if any(w.group==g.index and w.weight>.5 for w in v.groups)] for g in mesh.vertex_groups}}
-  for mode,frame in [('READY',1),('HOLSTER',int(rig.animation_data.action.frame_range[1]))]:
+  for mode,frame in [('READY',1),('HOLSTER',62)]:
    print('SNAPSHOT',kind,mode,frame,flush=True)
    scene.frame_set(frame);bpy.context.view_layer.update();dg=bpy.context.evaluated_depsgraph_get()
    evaluated=mesh.evaluated_get(dg);data=bpy.data.meshes.new_from_object(evaluated,preserve_all_data_layers=True,depsgraph=dg)
@@ -91,7 +96,7 @@ for entry in spec:
  collection.hide_viewport=collection.hide_render=True
 assert not bpy.data.actions
 manifest={'schema':1,'title':'GameAssetFactory Weapon Library','approval_policy':'New assets start Pending; explicit user approval only. Production is preserved separately.','weapons':spec}
-MANIFEST.write_text(json.dumps(manifest,indent=2));s['weapon_manifest_snapshot']=json.dumps(manifest)
+s['weapon_manifest_snapshot']=json.dumps(manifest)
 world=bpy.data.worlds.new('Neutral graphite studio');world.use_nodes=True;s.world=world
 world.node_tree.nodes['Background'].inputs[0].default_value=(.16,.18,.21,1);world.node_tree.nodes['Background'].inputs[1].default_value=.5
 studio=bpy.data.collections.new('PREVIEW_STUDIO');s.collection.children.link(studio)
@@ -111,5 +116,13 @@ for screen in bpy.data.screens:
   if area.type=='VIEW_3D':
    sp=area.spaces.active;sp.show_region_ui=True;sp.overlay.show_overlays=False;sp.shading.type='MATERIAL'
 text=bpy.data.texts.new('START_HERE.txt');text.write('Open using Open_Weapon_Showcase.cmd to load Weapon Library reliably. N > Weapon Library. Select a weapon; choose standalone / ready / holster. Orbit normally. Direct opening retains all models in WEAPON_ collections. New assets remain Pending. Production and Animation_Showcase are unchanged. See README.md.')
-bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str(TARGET))
+# Compare again immediately before committing, including edits made outside this builder.
+assert (hashlib.sha256(TARGET.read_bytes()).hexdigest() if TARGET.exists() else None)==initial_target_hash,'Showcase changed during build; preserving concurrent edits'
+assert (hashlib.sha256(MANIFEST.read_bytes()).hexdigest() if MANIFEST.exists() else None)==initial_manifest_hash,'Manifest changed during build; preserving concurrent edits'
+for e in spec:assert hashlib.sha256((ROOT/e['source']).read_bytes()).hexdigest()==e['source_sha256'],'Source changed during build: '+e['source']
+staged=TMP/'Weapon_Showcase.staging.blend'
+bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str(staged))
+assert (hashlib.sha256(TARGET.read_bytes()).hexdigest() if TARGET.exists() else None)==initial_target_hash,'Showcase changed while saving staging file'
+shutil.copy2(staged,TARGET)
+MANIFEST.write_text(json.dumps(manifest,indent=2))
 print('SHOWCASE_BUILT',len(spec),'entries; static fit only; zero Actions')

@@ -1,0 +1,23 @@
+{
+  "original_files": 6903,
+  "changed_existing_files": [
+    "AGENTS.md",
+    "game_mobile_3d/tests/validate_expressive_polish.gd",
+    "game_mobile_3d/tests/validate_expressive_polish_layers.gd",
+    "game_mobile_3d/tests/validate_expressive_snappier_jump.gd",
+    "game_mobile_3d/scenes/dev/ExpressiveDirectionalPlayer.tscn",
+    "game_mobile_3d/scenes/dev/expressive_directional_review.gd",
+    "game_mobile_3d/scenes/dev/expressive_directional_visual.gd",
+    "game_mobile_3d/scenes/dev/expressive_jump_actor.gd",
+    "game_mobile_3d/scenes/dev/expressive_jump_review.gd",
+    "game_mobile_3d/scenes/dev/expressive_locomotion_visual.gd",
+    "docs/animation/ANIMATION_PROGRESS.md",
+    "docs/animation/ANIMATION_WORKFLOW.md"
+  ],
+  "unexpected_changes": [],
+  "all_blender_animation_and_showcase_unchanged": true,
+  "production_resources_unchanged": true,
+  "backup": ".validation/expressive_turn_spin_v1/before",
+  "whole_bank_before": ".validation/expressive_turn_spin_v1/before_whole_body_bank.gd",
+  "status": "Pending"
+}

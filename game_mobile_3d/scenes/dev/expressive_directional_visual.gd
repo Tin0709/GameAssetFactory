@@ -310,8 +310,7 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 		result.basis=steer*motion*steer.inverse()*rest.basis
 		result.origin=rest.origin+steer*(result.origin-rest.origin)
 	if bone==hips:
-		result.basis=Basis.from_euler(Vector3(0,turn_twist,0)*weight)*result.basis
-		if not whole_body_bank_enabled:result.basis=Basis(Vector3.BACK,turn_lean*.45*weight)*result.basis
+		result.basis=Basis.from_euler(Vector3(0,turn_twist,0 if whole_body_bank_enabled else turn_lean*.45)*weight)*result.basis
 		result.origin.y-=.004*clampf(absf(turn_lean)/deg_to_rad(6),0,1)*weight
 	elif bone==chest:result.basis=Basis.from_euler(Vector3(0,-turn_twist*1.5,0 if whole_body_bank_enabled else turn_lean*.55)*weight)*result.basis
 	elif skeleton.get_bone_name(bone)=="Head":result.basis=Basis.from_euler(Vector3(0,turn_twist*.25,-turn_lean*(.20 if whole_body_bank_enabled else .35))*weight)*result.basis

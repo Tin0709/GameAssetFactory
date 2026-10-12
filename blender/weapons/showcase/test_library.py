@@ -6,10 +6,22 @@ from pathlib import Path
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import gaf_weapon_library as lib
+from library_safety import protected_category,UpdateLock
+assert protected_category('blender\\weapons\\approved.blend')=='weapons'
+assert protected_category('blender\\animation\\showcase\\Animation_Showcase.blend')=='animations'
+assert protected_category('game_mobile_3d\\assets\\characters\\r13\\rifle.glb')=='production_characters'
+guard=UpdateLock(HERE).acquire()
+try:
+ try:UpdateLock(HERE).acquire();raise AssertionError('Concurrent writer accepted')
+ except RuntimeError:pass
+finally:guard.release()
 lib.register()
 bpy.ops.wm.open_mainfile(filepath=str(HERE/'Weapon_Showcase.blend'))
 s=bpy.context.scene
 assert len(s.gaf_weapons)>=16
+for kind in ['Rifle','Pistol','Shotgun']:
+ ready=s['fit_'+kind+'_READY'];holster=s['fit_'+kind+'_HOLSTER']
+ assert max(abs(ready[i][3]-holster[i][3]) for i in range(3))>.15,('Holster snapshot is still ready',kind)
 checks=0
 for i,item in enumerate(s.gaf_weapons):
  s.gaf_weapon_index=i

@@ -4,6 +4,7 @@ from mathutils import Matrix,Vector
 from mathutils.bvhtree import BVHTree
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2];TMP=ROOT/'.validation/weapon_showcase_v2'
 sys.path.insert(0,str(HERE));import gaf_weapon_library as lib
+from library_safety import protected_category
 lib.register();bpy.ops.wm.open_mainfile(filepath=str(HERE/'Weapon_Showcase.blend'));s=bpy.context.scene
 report={};source=HERE.parent/'rifle_stylized_v2'
 raw=(source/'Rifle_Stylized_V2.glb').read_bytes();ln=struct.unpack_from('<I',raw,12)[0];g=json.loads(raw[20:20+ln]);nodes={n['name']:n for n in g['nodes']}
@@ -45,7 +46,7 @@ baseline=json.loads((TMP/'protected_hashes.json').read_text());changed=[]
 for rel,hash in baseline.items():
  p=ROOT/rel
  if not p.exists() or hashlib.sha256(p.read_bytes()).hexdigest()!=hash:changed.append(rel)
-report['preservation']={'files_checked':len(baseline),'changed_since_baseline':changed,'weapon_sources_unchanged':not any(x.startswith('blender/weapons/') for x in changed),'animation_sources_unchanged':not any(x.startswith('blender/animation/') for x in changed),'production_character_assets_unchanged':not any(x.startswith('game_mobile_3d/assets/characters/') for x in changed)}
+report['preservation']={'files_checked':len(baseline),'changed_since_baseline':changed,'weapon_sources_unchanged':not any(protected_category(x)=='weapons' for x in changed),'animation_sources_unchanged':not any(protected_category(x)=='animations' for x in changed),'production_character_assets_unchanged':not any(protected_category(x)=='production_characters' for x in changed)}
 assert all(report['preservation'][k] for k in ['weapon_sources_unchanged','animation_sources_unchanged','production_character_assets_unchanged'])
 report['note']='Other tasks may concurrently edit Godot scripts. This task writes only new weapon/showcase files and weapon documentation.'
 (HERE/'asset_verification.json').write_text(json.dumps(report,indent=2));print('ASSET_VERIFIED',json.dumps(report))

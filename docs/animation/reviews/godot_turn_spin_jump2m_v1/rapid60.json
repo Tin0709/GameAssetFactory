@@ -3,10 +3,10 @@
 		{
 			"distance": 0.836239484895486,
 			"final_heading_error": 0.00000000074208816869259,
-			"maximum_lean_degrees": 5.1059999447451,
+			"maximum_lean_degrees": 4.11475842827034,
 			"maximum_yaw_acceleration": 75.0005722045901,
 			"minimum_input_response": 1.23140490055084,
-			"minimum_lean_degrees": -4.89752368094036,
+			"minimum_lean_degrees": -4.15271088358705,
 			"pace": 1.5,
 			"run": false,
 			"trace": [
@@ -447,10 +447,10 @@
 		{
 			"distance": 1.8636358869262,
 			"final_heading_error": 0.0000000000885519088611453,
-			"maximum_lean_degrees": 4.12383533913391,
+			"maximum_lean_degrees": 3.19591006437264,
 			"maximum_yaw_acceleration": 75.0001430511477,
 			"minimum_input_response": 1.34999966621399,
-			"minimum_lean_degrees": -4.32449502278714,
+			"minimum_lean_degrees": -3.431166832838,
 			"pace": 1.5,
 			"run": true,
 			"trace": [
@@ -891,10 +891,10 @@
 		{
 			"distance": 1.84289953240659,
 			"final_heading_error": 0.0000000001827285961431,
-			"maximum_lean_degrees": 6.11628888454715,
+			"maximum_lean_degrees": 5.35661814821202,
 			"maximum_yaw_acceleration": 112.500429153437,
 			"minimum_input_response": 2.77066087722778,
-			"minimum_lean_degrees": -4.70609329085842,
+			"minimum_lean_degrees": -3.80744290329043,
 			"pace": 2.25,
 			"run": false,
 			"trace": [
@@ -1335,10 +1335,10 @@
 		{
 			"distance": 2.88420677930117,
 			"final_heading_error": 0.000000000141974876299855,
-			"maximum_lean_degrees": 3.92354795507103,
+			"maximum_lean_degrees": 3.15200151657503,
 			"maximum_yaw_acceleration": 112.500214576716,
 			"minimum_input_response": 3.03749966621399,
-			"minimum_lean_degrees": -6.72681027083236,
+			"minimum_lean_degrees": -5.49382115969368,
 			"pace": 2.25,
 			"run": true,
 			"trace": [
@@ -1791,7 +1791,7 @@
 			"passed": true
 		},
 		{
-			"check": "Body banks both left and right, then settles upright on straight travel",
+			"check": "Whole visual rig banks both left and right, then settles upright on straight travel",
 			"passed": true
 		},
 		{
@@ -1807,7 +1807,7 @@
 			"passed": true
 		},
 		{
-			"check": "Body banks both left and right, then settles upright on straight travel",
+			"check": "Whole visual rig banks both left and right, then settles upright on straight travel",
 			"passed": true
 		},
 		{
@@ -1823,7 +1823,7 @@
 			"passed": true
 		},
 		{
-			"check": "Body banks both left and right, then settles upright on straight travel",
+			"check": "Whole visual rig banks both left and right, then settles upright on straight travel",
 			"passed": true
 		},
 		{
@@ -1839,7 +1839,7 @@
 			"passed": true
 		},
 		{
-			"check": "Body banks both left and right, then settles upright on straight travel",
+			"check": "Whole visual rig banks both left and right, then settles upright on straight travel",
 			"passed": true
 		}
 	],

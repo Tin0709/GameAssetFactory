@@ -1,37 +1,61 @@
-# Faster jump, smoother fast Run and repeated turns — Pending
+# Whole-body turning bank, fast Run and snappy 2m jump — Pending
 
-Open `game_mobile_3d/scenes/dev/ExpressiveLocomotionTest.tscn` and press **F6**. This remains the isolated gameplay lab; production F5/WorldMap, Blender Actions and the central Showcase are unchanged.
+Open game_mobile_3d/scenes/dev/ExpressiveLocomotionTest.tscn and press **F6**. F5/WorldMap and production resources remain unchanged. WASD/arrows move, Shift runs, Space jumps.
 
-WASD/arrows move, Shift runs, Space jumps. Default Walk/Run is **2.25×**, Idle **1×**. T compares1/1.5/2.25×. C toggles gameplay/detail framing;1/2/3 select close front/three-quarter/side views. The gameplay camera retains WorldMap's angle/offset but is now orthographic **11.25**,10% closer than the previous12.5 view, ground-anchored during flight.
+## Latest correction: visibly bank the entire character
 
-## Review clips
+The earlier lean mainly articulated hips and chest. The visible rig now banks as one unit into left/right turns, up to12 degrees at strong Run turns. The low0.45m pivot limits rigid-leg reach demands while hips, shoulders and head clearly tilt together. The capsule stays upright and controls remain immediate. World-foot contact solving remains active; restrained20% head counter-roll preserves readability. Bank eases back to upright on straight travel and fades across takeoff/landing without a state-boundary reset.
 
-Actual Godot Mobile/D3D12 recordings at30FPS, played at original speed; no video retiming. The2.25× locomotion setting is the runtime candidate speed, not accelerated footage.
+[Whole-body bank versus previous hips/chest lean](bank_comparison_1x.mp4) changes only this banking treatment. Both sides use matching inputs, timing, camera, speeds, facing smoothing and foot adapters. Previous code is safely preserved in .validation/expressive_turn_spin_v1/before_whole_body_bank.gd; --expressive-turn-bank-original reproduces its pose-only treatment.
 
-- [Current gameplay: stationary, walking and running jumps](gameplay_1x.mp4)
-- [Previous2m flight versus sharper2m flight](jump_comparison_1x.mp4)
-- [Repeated rapid turns before/after](rapid_comparison_1x.mp4)
-- [Fast Run foot-path/release comparison](run_comparison_1x.mp4)
-- [Leg-heading/turn comparison](turn_comparison_1x.mp4)
+## Controls and speed comparisons
 
-The jump comparison uses matching cameras, inputs and the new running-flight boost on both sides. The rapid-turn comparison changes only visual facing smoothing. The Run comparison keeps the same2.25× travel speed and approved arm motion; its earlier side disables the rounded foot-path and translation-release adapters. The turn comparison preserves the captured pre-guard test and contrasts the combined refined result.
+Default base pace is2.25, plus the latest requested Walk+50% and Run+15% candidate multipliers. Ground speeds: Walk3.0375m/s, Run5.977m/s. Prepared running jumps gain another15% horizontally while airborne, reaching6.874m/s; landing returns through ordinary acceleration. Walking jumps, unprepared falls and PREP ledge losses receive no running-flight bonus.
 
-## What changed
+- **T:**1x/accepted1.5x/2.25x base pace. Accepted1.5x retains Walk1.35m/s and Run3.465m/s.
+- **Y:** latest faster candidate versus preceding2.25x travel speeds (Walk2.025m/s, Run5.1975m/s).
+- **J:**2m factors2.15/1.9/1.7, then1.35m/1.4,1.2m/1.18 and original1.2m/1.0. Changes latch at the next intentional launch.
+- **C:** gameplay/detail camera;1/2/3 choose detail front/three-quarter/side.
+- **U/P:** visual facing smoothing / axial leg-pivot guard comparisons.
+- **N/O:** rounded Run foot-path / support-to-swing translation-release comparisons.
+- Existing V/F/G/K/B/E/L controls retain directional/fall/stride/polish/landing/weapon/drop comparisons.
 
-**Jump:**2m physical height with flight factor2.15, versus retained1.9 and1.7 candidates. Measured flight is0.433s at both30/60renderFPS, reaching1.9999–2.0007m. Launch gravity/velocity scale together; collision determines touchdown. The soft0.20s preparation and heavy0.85s recovery retain their existing timing. Arms still reach the lifted airborne section. **Running prepared jumps gain15% horizontal speed while airborne**: at2.25×, about5.20→5.98m/s, returning through normal acceleration to5.20m/s after contact. Walking jumps and unprepared falls keep their existing horizontal speed; air steering remains live. Midair J comparisons affect the next launch only.
+Idle stays at normal speed. Gameplay camera uses WorldMap's angle and offset with orthographic11.25,10% closer than the preceding12.5 framing, ground-anchored during flight.
 
-J cycles2m factors2.15/1.9/1.7, then1.35m factor1.4,1.2m factor1.18, and original1.2m factor1.0. Earlier timings remain available.
+## Original-speed Godot review
 
-**Turns:** cached planted toe headings could wind behind the rotating pelvis. The rigid-leg axial pivot guard limits that twist to35° relative to the authored reference without changing the support aim. Measured horizontal heading error stays below51.7° in repeated reversal stress; axial and horizontal projection are different measures. P compares the guard. Rapid input changes previously reversed full body-yaw speed in one physics tick. The visible rig now accelerates/brakes its facing velocity over approximately90ms, using the shortest heading difference. Capsule input, acceleration and gait remain immediate. U compares smoothing. Peak measured yaw acceleration falls from roughly704–1215 to75–112.5rad/s² across the matched cases.
+Actual Godot Mobile/D3D12 capture at30FPS, no footage retiming:
 
-**Fast Run:** planted translation used to disappear at liftoff, causing a visible foot-path discontinuity. A short bounded cubic release carries the outgoing foot motion into swing. Above1.5×, push-off ends slightly earlier: full2.25× Run support38%LEFT/39%RIGHT,23%total flight, receiving phase0LEFT/.5RIGHT unchanged. O compares release. N compares a bounded, partial rounded sagittal foot-path blend: backward support travel, rising forward recovery, then descent. Whole cuboids remain rigid; no invented knee/ankle, wider tracks or new Action. The posing offset is at most65mm. It is a rounded running path rather than a literal wheel rotation.
+- [Latest gameplay and physics-driven jumps](gameplay_1x.mp4)
+- [Whole-body bank comparison](bank_comparison_1x.mp4)
+- [Faster Walk/Run comparison](speed_comparison_1x.mp4)
+- [Rapid-turn facing comparison](rapid_comparison_1x.mp4)
+- [Rounded Run foot recovery/release comparison](run_comparison_1x.mp4)
+- [Turn axial guard and facing comparison](turn_comparison_1x.mp4)
+- [Previous1.9 versus current2.15 flight factor, both2m](jump_comparison_1x.mp4)
 
-Carried release and floor corrections share the existing140mm joint correction radius relative to the current posed/inertial base;65mm foot-path posing is separately bounded. Release survives Run→Walk and transfers through T/N/O comparisons. Early moving landing carries its outgoing support rotation into swing instead of dropping the offset abruptly. A test-local support-height safety lift, at most35mm, prevents initial impact poses from exceeding that correction budget; heavy landing compression/rebound remain.
+The speed comparison changes candidate travel/reach/cadence together. Rapid-turn comparison changes facing smoothing only. Run comparison keeps current travel/arm motion but disables the rounded recovery and translation-release adapters on the previous side. Turn comparison disables axial guard and rapid smoothing on its previous side. Jump comparison uses the same running-flight bonus and camera on both sides.
 
-## Validation and limits
+## Preserved mechanics and targeted fixes
 
-**2236 checks pass across24 suites at30/60renderFPS with60Hz physics.** Evidence: [summary](checks_summary.json). Coverage includes2m flight/height, all J variants, repeated/early/long falls, both locomotion paces,45/90/180° turns, spam turns, landing handoffs, Run release/interruption, falling gestures and weapon equip/release/recovery. The strict60° upper-body and900°/s/pace leg continuity guards remain unchanged. The ballistic test now compares against the actual height/gravity/flight factor instead of an obsolete minimum0.15s duration. The ledge-loss fixture rebases contact caches when positioning at the outgoing edge, isolating support loss during recovery.
+Jump height and contact are physics-driven:2m apex, measured1.9999–2.0007m, about0.433s flight. Gravity and launch velocity scale together; unprepared falls keep normal gravity. Soft0.20s preparation and heavy0.85s recovery retain their timing and expressive arm poses.
 
-The ground-contact solver is still an approximation for rigid single-block legs: toe pivot, sole-corner rocking and anchor release remain possible during extreme reversals. In the matched2.25× turn suite, peak same-contact sole displacement is about12.5mm at60FPS; this is not a full-sole lock or terrain guarantee. Rounded recovery is intentionally restrained. General terrain, full combat coverage and actual phone performance remain unverified. Artistic/gameplay review is still required; do not promote to production or begin Combat Strafe.
+Faster Run shares additional speed between reach and cadence through square-root scaling, preserving close tracks and rigid legs. The rounded recovery moves backward during support and forward/up/down during swing with contact tangents; its partial pose offset is bounded65mm. Full fast Run support is36%LEFT/37%RIGHT with27% total flight; receiving phase0LEFT/.5RIGHT remains shared with Walk. Accepted1.5x keeps42%/43% support.
 
-Before-state scripts/reviews and intermediate checkpoints are preserved under `.validation/expressive_turn_spin_v1/`. [Preservation audit](preservation.json) protects6903 existing files, including every Blender animation/Showcase file and all production resources. No new Blender Action was created; central registration is therefore unchanged. Latest review remains Pending.
+A short cubic release carries outgoing foot position/velocity through liftoff. Carried release plus floor correction shares the existing140mm joint safety radius relative to the posed/inertial base. Earlier landing support rotation carries into swing; a bounded35mm support-height safety lift prevents deep poses exceeding the correction budget. No invented knees/ankles, scale deformation, root export arc or new Blender Action.
+
+Cached leg axial twist is limited35deg relative to the authored reference. Visual facing accelerates/brakes over roughly90ms rather than reversing full yaw speed in one tick. Capsule input, gait progression and movement acceleration are unchanged by turning polish.
+
+Weapon entry captures the displayed pose relative to the full native carry target once, using shortest-arc residual decay over0.30s. A1500deg/s displayed angular budget prevents combined native motion and catch-up producing a30FPS pop; a short tail catches the live target instead of snapping at blend completion. Production weapon scripts remain unchanged.
+
+## Validation and honest limits
+
+2282 checks across24 suites pass at30 and60 renderFPS with60Hz physics. [Evidence](checks_summary.json) covers starts/stops, both paces,45/90/180deg turns, rapid reversals, shared gait, Run release and interruptions, prepared/unprepared jumps, repeated/early/long falls, landing while moving, weapons and falling gestures. Whole-Visual roll is now measured in the rapid-turn test, including both signs and upright settling.
+
+The60deg upper-body and900deg/s/pace leg continuity guards remain unchanged. Release acceleration uses a revised speed-normalized criterion: raw acceleration divided by run-speed-scale^1.5 must remain below300m/s^2. Both raw and normalized values are retained; current60FPS raw341m/s^2 exceeds the former absolute300 limit. It must not be represented as passing the old absolute guard. Ballistic duration is compared to height/gravity with two physics ticks tolerance; gait progress accumulates phase increments. Ledge fixture relocation rebases contact caches.
+
+Peak same-contact sole releases in the matched hard-turn cases remain about137mm at30FPS /44mm at60FPS for the fast candidate, and117/89mm at accepted1.5x. These are visible safety releases, not perfectly planted feet. Across matched turns the refined solver reduces accumulated sliding by at least30% against its disabled comparison, but rigid cuboid corners and extreme reversals remain limitations. Terrain, full combat coverage and actual phone30FPS performance remain unverified.
+
+All checkpoints and original clips remain in .validation/expressive_turn_spin_v1. [Preservation audit](preservation.json) checks6903 original files, including the approved Blender animation library/Showcase and production resources. Concurrent weapon-showcase work is outside this task and preserved. No new Blender Action was created, so central animation registration is unchanged.
+
+Pending user review only. Do not promote to production or begin Combat Strafe.

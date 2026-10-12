@@ -1,0 +1,44 @@
+[
+  {
+    "file": "bank_comparison_1x.mp4",
+    "fps": 30.0,
+    "decoded_frames": 235,
+    "sha256": "0f3ec4e39bc3ef20d5870e118232b4b3ff6854b14f314b86b3eb73cfbdf32f67"
+  },
+  {
+    "file": "turn_comparison_1x.mp4",
+    "fps": 30.0,
+    "decoded_frames": 235,
+    "sha256": "1b12926391f02346f00ab9252585cd202ae8bbff38d57e44d7eb3b4cc7d0aa33"
+  },
+  {
+    "file": "run_comparison_1x.mp4",
+    "fps": 30.0,
+    "decoded_frames": 99,
+    "sha256": "ce08ab75ada4dc140f3175f3801c57f2ebea39ec2640e717042c7d84e6633980"
+  },
+  {
+    "file": "rapid_comparison_1x.mp4",
+    "fps": 30.0,
+    "decoded_frames": 215,
+    "sha256": "ef6d2a492cad5383e7f1797c8412b3a0a41f6e726aa4047c30509a54ceffa118"
+  },
+  {
+    "file": "speed_comparison_1x.mp4",
+    "fps": 30.0,
+    "decoded_frames": 159,
+    "sha256": "ab30688b99e156249c1089e4976df24a0130e80c2fd15a3302696f5c6a29b064"
+  },
+  {
+    "file": "jump_comparison_1x.mp4",
+    "fps": 30.0,
+    "decoded_frames": 373,
+    "sha256": "39dc7bdcceec0bffd5642df29ea21f7e1d79db1ea48d350ed5f64f8248254191"
+  },
+  {
+    "file": "gameplay_1x.mp4",
+    "fps": 30.0,
+    "decoded_frames": 373,
+    "sha256": "5af8be93b1ea9c21020aed3f87a024d7deb89d1fb1ecec13993a50c14b657da9"
+  }
+]

@@ -73,6 +73,8 @@
 			"pace": 1.5,
 			"peak_release_acceleration": 197.053055763245,
 			"peak_release_velocity_jump": 3.28421759605408,
+			"speed_normalized_acceleration": 197.053055763245,
+			"speed_scale": 1.0,
 			"worst_release": {
 				"age": 0.0,
 				"duration": 0.1,
@@ -201,6 +203,8 @@
 			"pace": 2.25,
 			"peak_release_acceleration": 340.980033874512,
 			"peak_release_velocity_jump": 5.6830005645752,
+			"speed_normalized_acceleration": 276.491757479937,
+			"speed_scale": 1.15,
 			"worst_release": {
 				"age": 0.0833333333333333,
 				"duration": 0.135772490468151,
