@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "frames_checked": 121,
+  "other17_actions_exact": true,
+  "right_arm_weapon_body_head_legs_max_matrix_difference": 0,
+  "left_palm_retreat_toward_body_m": [
+    0.039650022983551025,
+    0.03965011239051819
+  ],
+  "left_palm_rise_m": [
+    0.021332383155822754,
+    0.02133268117904663
+  ],
+  "left_shoulder_rise_m": [
+    0.04999983310699463,
+    0.05000007152557373
+  ],
+  "max_elbow_bend_rad": 0
+}
