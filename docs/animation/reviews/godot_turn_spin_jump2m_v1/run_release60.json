@@ -1,0 +1,209 @@
+{
+	"cases": [
+		{
+			"events": [
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.963178087216199,
+					"release_speed": 2.86941312253475,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.463177292162049,
+					"release_speed": 3.28422077000141,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.963177142177733,
+					"release_speed": 2.86036737263203,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.463178024300275,
+					"release_speed": 3.10958012938499,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.963178390369388,
+					"release_speed": 2.83795259892941,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.463178498413837,
+					"release_speed": 3.27932417392731,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.963175252883862,
+					"release_speed": 2.74125449359417,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.463174586852269,
+					"release_speed": 3.2842044532299,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.963172888709717,
+					"release_speed": 2.70300954580307,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.463171190567164,
+					"release_speed": 3.28130051493645,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.963169492424612,
+					"release_speed": 2.87089414894581,
+					"side": 1
+				}
+			],
+			"pace": 1.5,
+			"peak_release_acceleration": 197.053055763245,
+			"peak_release_velocity_jump": 3.28421759605408,
+			"worst_release_speed": 3.28422077000141
+		},
+		{
+			"events": [
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.939366230646834,
+					"release_speed": 0.0000286102294921875,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.454991257660061,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.970615768650142,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.439366004319522,
+					"release_speed": 0.0000286102294921875,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.954991547384063,
+					"release_speed": 0.000000894069671630859,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.470617090464152,
+					"release_speed": 0.000000894069671630859,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.939367068117207,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.454992095139765,
+					"release_speed": 0.000000894069671630859,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.970616606120341,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.439366583773396,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.954992126837937,
+					"release_speed": 0.000000894069671630859,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.470617669902478,
+					"release_speed": 0.00000178813934326172,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.939367131560193,
+					"release_speed": 0.000114444410428405,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.454986998162925,
+					"release_speed": 0.000000894069671630859,
+					"side": 0
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.970606864765656,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0166666666666667,
+					"phase": 0.43935323014038,
+					"release_speed": 0.000000894069671630859,
+					"side": 0
+				}
+			],
+			"pace": 2.25,
+			"peak_release_acceleration": 267.833805084229,
+			"peak_release_velocity_jump": 4.46389675140381,
+			"worst_release_speed": 0.000114444410428405
+		}
+	],
+	"checks": [
+		{
+			"check": "Straight Run reaches support-to-swing events",
+			"passed": true
+		},
+		{
+			"check": "Run lifts from support smoothly rather than dropping contact translation instantly",
+			"passed": true
+		},
+		{
+			"check": "Foot velocity ramps through the release instead of moving its discontinuity a few frames later",
+			"passed": true
+		},
+		{
+			"check": "Straight Run reaches support-to-swing events",
+			"passed": true
+		},
+		{
+			"check": "Run lifts from support smoothly rather than dropping contact translation instantly",
+			"passed": true
+		},
+		{
+			"check": "Foot velocity ramps through the release instead of moving its discontinuity a few frames later",
+			"passed": true
+		}
+	],
+	"failures": []
+}

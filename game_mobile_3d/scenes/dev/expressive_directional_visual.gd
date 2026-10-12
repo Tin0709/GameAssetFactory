@@ -22,6 +22,7 @@ var layer_release_p: Array[Vector3]=[]
 var turn_twist_guard_enabled:=true
 var landing_clearance_lift:=0.0
 var run_release_enabled:=true
+var run_orbit_enabled:=true
 var run_release_active: Array[bool]=[false,false]
 var run_release_age: Array[float]=[0.0,0.0]
 var run_release_duration: Array[float]=[.1,.1]
@@ -192,6 +193,23 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 		var rest:=skeleton.get_bone_rest(bone).basis
 		var pitch: float=(result.basis*rest.inverse()).get_euler().x
 		result.basis=Basis(Vector3.RIGHT,pitch*(run_stride_scale-1)*gait_run_weight*weight)*result.basis
+	if run_orbit_enabled and move_requested and bone in [leg_left,leg_right] and jump_state in ["GROUND","LAND"]:
+		var side:=0 if bone==leg_left else 1
+		var phase:=fposmod(gait_phase+ahead*gait_frequency+side*.5,1)
+		var duty: float=stance_duty[side]
+		var stride:=_stride_distance()
+		var z:=stride*(duty*.5-phase);var rise:=0.0
+		if phase>duty:
+			var u: float=(phase-duty)/(1-duty)
+			# Rounded forward recovery with backward tangent at both contacts:
+			# the foot enters/leaves support at zero nominal world velocity.
+			z=-stride*duty*.5+stride*duty*(3*u*u-2*u*u*u)-stride*(1-duty)*(2*u*u*u-3*u*u+u)
+			rise=.12*pow(sin(PI*u),2)
+		var center:=result.origin+result.basis*Vector3(0,.675,0)
+		var ground_y: float=-super._target_pose(hips,ahead).origin.y+.1125*(absf(result.basis.x.y)+absf(result.basis.z.y))
+		var offset:=Vector3(0,ground_y+rise-center.y,z-center.z).limit_length(.10)
+		var release:=1.0 if jump_state=="GROUND" else _smooth5((jump_age+ahead-.20)/.20)
+		result.origin+=offset*.65*gait_run_weight*smoothstep(1.5,2.25,review_pace)*release
 	if fall_wave_enabled and fall_wave_weight>0 and bone in [leg_left,leg_right]:
 		# Opposing whole-block flutter; no knee/ankle or airborne root bounce.
 		var phase: float=(jump_age+ahead)*TAU*1.7+(0.0 if bone==leg_left else PI)
@@ -276,7 +294,7 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	swing_world_q[side]=_limit_leg_twist((support_aim[side]*reference).normalized(),reference)
 	support_aim[side]=(swing_world_q[side]*reference.inverse()).normalized()
 	swing_active[side]=true
-	if run_release_enabled and gait_run_weight>.25 and move_requested:
+	if run_release_enabled and review_pace>1.5 and gait_run_weight>.25 and move_requested:
 		# Contact translations used to disappear at liftoff even though rotation
 		# released smoothly. Carry the outgoing foot position/velocity through a
 		# short cubic release, while leaving the gait and capsule clocks untouched.

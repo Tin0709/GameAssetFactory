@@ -1,0 +1,383 @@
+{
+	"cases": [
+		{
+			"events": [
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256780684661275,
+					"release_speed": 2.54921078681946,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.525677531440724,
+					"release_speed": 2.68113300204277,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256771234296933,
+					"release_speed": 2.58721299469471,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.525678005552235,
+					"release_speed": 2.68595695495605,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256783716213485,
+					"release_speed": 2.50675275921822,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.525679253750043,
+					"release_speed": 2.73200199007988,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256749761091075,
+					"release_speed": 2.49830313026905,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.525674310077515,
+					"release_speed": 2.73139715194702,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256726119349626,
+					"release_speed": 2.5871803611517,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.52567091379241,
+					"release_speed": 2.65187904238701,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256692156498581,
+					"release_speed": 2.50828787684441,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.525668549618265,
+					"release_speed": 2.71016277372837,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256668514757132,
+					"release_speed": 2.49625146389008,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.525665153333161,
+					"release_speed": 2.64017924666405,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256711960228055,
+					"release_speed": 2.53018163144588,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.52567517457405,
+					"release_speed": 2.72232212126255,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256801851944948,
+					"release_speed": 2.49643832445145,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.525684163958576,
+					"release_speed": 2.64826968312263,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.025688142509821,
+					"release_speed": 2.49656461179256,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.525694185199465,
+					"release_speed": 2.64048837125301,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0256981637507101,
+					"release_speed": 2.49851234257221,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.525701110232755,
+					"release_speed": 2.71438367664814,
+					"side": 0
+				}
+			],
+			"pace": 1.5,
+			"peak_release_acceleration": 81.9595742225647,
+			"peak_release_velocity_jump": 2.73198580741882,
+			"worst_release_speed": 2.73200199007988
+		},
+		{
+			"events": [
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0443663517421187,
+					"release_speed": 0.00000178813934326172,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.513116071360185,
+					"release_speed": 0.000000894069671630859,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0756156317197693,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.544365609363493,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0131161030585298,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.481866596753567,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0443671892031599,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.513116650814232,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0756172432482766,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.544366704859349,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0131166825124032,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.481867176207441,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0443677686414854,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.513116198215236,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0756105981454877,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.544355931420698,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0131022967954215,
+					"release_speed": 0.0000018431718018519,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.481849694269659,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0443461583989373,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.513092523773661,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0755879558034264,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.544336385377177,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0130848149509266,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.48183118032565,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.044330740753469,
+					"release_speed": 0.000000894069671630859,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.513082266625759,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0755787307550377,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.544326128229275,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0130766220020511,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.481826083675315,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0443287404327684,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.513076137922553,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0755746662819539,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.544319999557164,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				}
+			],
+			"pace": 2.25,
+			"peak_release_acceleration": 296.675119400024,
+			"peak_release_velocity_jump": 9.88917064666748,
+			"worst_release_speed": 0.0000018431718018519
+		}
+	],
+	"checks": [
+		{
+			"check": "Straight Run reaches support-to-swing events",
+			"passed": true
+		},
+		{
+			"check": "Run lifts from support smoothly rather than dropping contact translation instantly",
+			"passed": true
+		},
+		{
+			"check": "Foot velocity ramps through the release instead of moving its discontinuity a few frames later",
+			"passed": true
+		},
+		{
+			"check": "Straight Run reaches support-to-swing events",
+			"passed": true
+		},
+		{
+			"check": "Run lifts from support smoothly rather than dropping contact translation instantly",
+			"passed": true
+		},
+		{
+			"check": "Foot velocity ramps through the release instead of moving its discontinuity a few frames later",
+			"passed": true
+		}
+	],
+	"failures": []
+}

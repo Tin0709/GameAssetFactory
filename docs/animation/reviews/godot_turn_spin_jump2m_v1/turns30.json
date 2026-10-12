@@ -1,0 +1,1985 @@
+{
+	"checks": [
+		{
+			"check": "Input immediately changes velocity: Walk 45 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 45 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 90 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 90 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 180 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 180 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 45 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 45 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 90 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 90 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 180 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 180 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Directional stop returns to planted Idle",
+			"passed": true
+		},
+		{
+			"check": "Idle invalidates all earlier swing orientations",
+			"passed": true
+		},
+		{
+			"check": "Turn-stop-idle and interrupted-replant restarts remain responsive",
+			"passed": true
+		},
+		{
+			"check": "Turn-stop-idle and interrupted-replant restarts remain responsive",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 45 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 45 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 90 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 90 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 180 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Walk 180 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 45 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 45 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 90 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 90 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 180 lead0.15",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Input immediately changes velocity: Run 180 lead0.65",
+			"passed": true
+		},
+		{
+			"check": "Turn preserves shared stride phase",
+			"passed": true
+		},
+		{
+			"check": "Turn maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turn does not snap body heading",
+			"passed": true
+		},
+		{
+			"check": "Support-to-swing rotation stays within the same elapsed-time and pace-normalized guard",
+			"passed": true
+		},
+		{
+			"check": "Turn retains authored support rather than hiding slip in flight",
+			"passed": true
+		},
+		{
+			"check": "Directional stop returns to planted Idle",
+			"passed": true
+		},
+		{
+			"check": "Idle invalidates all earlier swing orientations",
+			"passed": true
+		},
+		{
+			"check": "Turn-stop-idle and interrupted-replant restarts remain responsive",
+			"passed": true
+		},
+		{
+			"check": "Turn-stop-idle and interrupted-replant restarts remain responsive",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Turning jump launches",
+			"passed": true
+		},
+		{
+			"check": "Airborne turn input remains immediate",
+			"passed": true
+		},
+		{
+			"check": "Turning jump lands by physics",
+			"passed": true
+		},
+		{
+			"check": "Turning jump rejoins responsive gait",
+			"passed": true
+		},
+		{
+			"check": "Landing handoff stays within the same elapsed-time and pace-normalized rotation guard",
+			"passed": true
+		},
+		{
+			"check": "Turning landing maintains sole clearance",
+			"passed": true
+		},
+		{
+			"check": "Polish reduces previous refined turn sliding by at least30percent",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		},
+		{
+			"check": "Refined capsule follows exactly the original responsive turn path",
+			"passed": true
+		},
+		{
+			"check": "Refinement preserves the original gait progression",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"versions": [
+		{
+			"cases": [
+				{
+					"clamps": 0,
+					"degrees": 45,
+					"final_phase": 0.395589565313071,
+					"final_position": "(-11.16569, 0.000841, 2.506266)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 348.993820422057,
+					"leg_step_degrees": 26.1745365316543,
+					"peak_slip_m": 0.0,
+					"penetration_m": 0.0,
+					"phase_error": 0.000180329805538969,
+					"plant_rotation_degrees": 20.6416290963641,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.0,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.56666666666667,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.395590460152961,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373259271747
+				},
+				{
+					"clamps": 0,
+					"degrees": 45,
+					"final_phase": 0.895588630777495,
+					"final_position": "(-12.83431, 0.000781, 2.506267)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 330.471508525141,
+					"leg_step_degrees": 24.7853631393856,
+					"peak_slip_m": 0.000000238418579101563,
+					"penetration_m": 0.0,
+					"phase_error": 0.000180947927781082,
+					"plant_rotation_degrees": 21.1726506911232,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.000000715255737304688,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.56666666666667,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.895589842030719,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373259271747
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.366990517183875,
+					"final_position": "(-10.86427, -0.001643, 1.716108)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 341.412902393071,
+					"leg_step_degrees": 25.6059676794803,
+					"peak_slip_m": 0.00000095367431640625,
+					"penetration_m": 0.0,
+					"phase_error": 0.00339105541323438,
+					"plant_rotation_degrees": 20.8077905233976,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.00000107288360595703,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.6,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.429501290232735,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373310498166
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.866992103002578,
+					"final_position": "(-13.13573, 0.000737, 1.716107)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 325.821993851438,
+					"leg_step_degrees": 24.4366495388579,
+					"peak_slip_m": 0.000000119209289550781,
+					"penetration_m": 0.0,
+					"phase_error": 0.00339193843820755,
+					"plant_rotation_degrees": 21.1720837854221,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.00000095367431640625,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.6,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.929501992972054,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373310498166
+				},
+				{
+					"clamps": 0,
+					"degrees": 180,
+					"final_phase": 0.275000689499082,
+					"final_position": "(-12.0, -0.000264, 0.6581)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 467.126336205794,
+					"leg_step_degrees": 35.0344752154345,
+					"peak_slip_m": 0.000000119209289550781,
+					"penetration_m": 0.0,
+					"phase_error": 0.00781251324547663,
+					"plant_rotation_degrees": 22.6754818462755,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.000000596046447753906,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.8,
+						"aim_degrees": 30.5691058568499,
+						"jump": "GROUND",
+						"phase": 0.712500508478037,
+						"previous_support": true,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373310498166
+				},
+				{
+					"clamps": 0,
+					"degrees": 180,
+					"final_phase": 0.775000689499082,
+					"final_position": "(-12.0, -0.000264, 0.6581)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 433.865272935393,
+					"leg_step_degrees": 32.5398954701545,
+					"peak_slip_m": 0.000000133280039449346,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00781251324547652,
+					"plant_rotation_degrees": 24.5681050671712,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.000000708481643130199,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.86666666666666,
+						"aim_degrees": 2.33229679847803,
+						"jump": "GROUND",
+						"phase": 0.337500499647563,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373310498166
+				},
+				{
+					"clamps": 0,
+					"degrees": 45,
+					"final_phase": 0.0099611657349552,
+					"final_position": "(-10.00539, 0.000802, 6.221364)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 625.753381565838,
+					"leg_step_degrees": 46.9315036174378,
+					"peak_slip_m": 0.00000095367431640625,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00123143661483052,
+					"plant_rotation_degrees": 23.2356563959595,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.00000154972076416016,
+					"support_frames": 14,
+					"worst_leg": {
+						"age": 1.86666666666666,
+						"aim_degrees": 0.0559529096807445,
+						"jump": "GROUND",
+						"phase": 0.353711068009562,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 11.9244721020884
+				},
+				{
+					"clamps": 0,
+					"degrees": 45,
+					"final_phase": 0.509959273168339,
+					"final_position": "(-13.99461, -0.00288, 6.221361)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 610.031743203491,
+					"leg_step_degrees": 45.7523807402618,
+					"peak_slip_m": 0.00000095367431640625,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00123143661483051,
+					"plant_rotation_degrees": 23.2740608421152,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.00000119943055665317,
+					"support_frames": 13,
+					"worst_leg": {
+						"age": 1.86666666666666,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.853707739097679,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 11.9245267436018
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.960848861364993,
+					"final_position": "(-9.467804, -0.001942, 4.515361)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 588.197313206956,
+					"leg_step_degrees": 44.1147984905217,
+					"peak_slip_m": 0.0,
+					"penetration_m": 0.0,
+					"phase_error": 0.00189195020403952,
+					"plant_rotation_degrees": 22.3943939487201,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.0,
+					"support_frames": 14,
+					"worst_leg": {
+						"age": 2.06666666666666,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.867099278667968,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 15.6663229369882
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.460849944401543,
+					"final_position": "(-14.5322, 0.000818, 4.515361)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 613.54696836173,
+					"leg_step_degrees": 46.0160226271297,
+					"peak_slip_m": 0.000000476837158203125,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00189195020403952,
+					"plant_rotation_degrees": 22.2628479204002,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.00000131130218505859,
+					"support_frames": 14,
+					"worst_leg": {
+						"age": 2.06666666666666,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.367099329605005,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 15.6668693521218
+				},
+				{
+					"clamps": 1,
+					"degrees": 180,
+					"final_phase": 0.696263010658968,
+					"final_position": "(-12.0, -0.002459, 2.503687)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 659.87281747653,
+					"leg_step_degrees": 49.4904613107398,
+					"peak_slip_m": 0.0168066918849945,
+					"penetration_m": 0.0,
+					"phase_error": 0.00781262362444847,
+					"plant_rotation_degrees": 27.5565433479363,
+					"releases": [
+						{
+							"aim": [
+								0.0,
+								50.3978382815976
+							],
+							"bias": -0.799999650308879,
+							"correction": "(-0.020882, -0.099704, 0.113177)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.858910138972434,
+							"turn": -10.1249885559082
+						}
+					],
+					"run": true,
+					"slip_m": 0.0168066918849945,
+					"support_frames": 15,
+					"worst_leg": {
+						"age": 1.96666666666666,
+						"aim_degrees": 0.698855937891566,
+						"jump": "GROUND",
+						"phase": 0.321263131758657,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373037290599
+				},
+				{
+					"clamps": 0,
+					"degrees": 180,
+					"final_phase": 0.196263010658967,
+					"final_position": "(-12.0, -0.002459, 2.503687)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 635.209641867937,
+					"leg_step_degrees": 47.6407231400953,
+					"peak_slip_m": 0.0000000596046447753906,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00781262362444841,
+					"plant_rotation_degrees": 24.6319963642148,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.000000119209289550781,
+					"support_frames": 15,
+					"worst_leg": {
+						"age": 1.96666666666666,
+						"aim_degrees": 0.189745630010503,
+						"jump": "GROUND",
+						"phase": 0.821263131758657,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3374130120867
+				}
+			],
+			"clamps": 1,
+			"jumps": [
+				{
+					"degrees": 45,
+					"frames": 25,
+					"leg_rate_per_pace": 271.092006774288,
+					"leg_step_degrees": 20.3319005080716,
+					"peak_slip_m": 0.192818000912666,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.0000009345244916803,
+					"plant_rotation_degrees": 18.7723121884638,
+					"run": false,
+					"slip_m": 0.315561577088033,
+					"support_frames": 24,
+					"worst_leg": {
+						"age": 0.516666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.361091581874098,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.00120211329392224
+				},
+				{
+					"degrees": 90,
+					"frames": 25,
+					"leg_rate_per_pace": 271.143119356576,
+					"leg_step_degrees": 20.3357339517432,
+					"peak_slip_m": 0.170623302459717,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.000000441513803080273,
+					"plant_rotation_degrees": 19.0609696431669,
+					"run": false,
+					"slip_m": 0.286580292508006,
+					"support_frames": 24,
+					"worst_leg": {
+						"age": 0.55,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.449057718828031,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.0
+				},
+				{
+					"degrees": 180,
+					"frames": 25,
+					"leg_rate_per_pace": 262.222801231351,
+					"leg_step_degrees": 19.6667100923513,
+					"peak_slip_m": 0.110093131661415,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.000000883024973238888,
+					"plant_rotation_degrees": 12.0840330050627,
+					"run": false,
+					"slip_m": 0.224420435232105,
+					"support_frames": 24,
+					"worst_leg": {
+						"age": 0.816666666666668,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.853554186640236,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 5.96324691904137
+				},
+				{
+					"degrees": 45,
+					"frames": 25,
+					"leg_rate_per_pace": 614.817201408974,
+					"leg_step_degrees": 46.1112901056731,
+					"peak_slip_m": 0.126865237951279,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.000000731079114690836,
+					"plant_rotation_degrees": 20.6859536089829,
+					"run": true,
+					"slip_m": 0.196412168543887,
+					"support_frames": 19,
+					"worst_leg": {
+						"age": 0.716666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.337307196556369,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.000874264213761632
+				},
+				{
+					"degrees": 90,
+					"frames": 25,
+					"leg_rate_per_pace": 625.494699534672,
+					"leg_step_degrees": 46.9121024651004,
+					"peak_slip_m": 0.124279595911503,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.000000258025657159933,
+					"plant_rotation_degrees": 20.0423346382089,
+					"run": true,
+					"slip_m": 0.191131144762039,
+					"support_frames": 20,
+					"worst_leg": {
+						"age": 0.716666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.352065945901915,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.0
+				},
+				{
+					"degrees": 180,
+					"frames": 25,
+					"leg_rate_per_pace": 609.070553448893,
+					"leg_step_degrees": 45.6802915086669,
+					"peak_slip_m": 0.0875996425747871,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00000206378844265498,
+					"plant_rotation_degrees": 27.0685604826847,
+					"run": true,
+					"slip_m": 0.173436355792319,
+					"support_frames": 19,
+					"worst_leg": {
+						"age": 0.816666666666668,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.334250577870208,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3374130120867
+				}
+			],
+			"pace": 2.25,
+			"peak_slip_m": 0.0168066918849945,
+			"polish": false,
+			"total_planted_slip_m": 0.0168149178895405
+		},
+		{
+			"cases": [
+				{
+					"clamps": 0,
+					"degrees": 45,
+					"final_phase": 0.395589565313071,
+					"final_position": "(-11.16569, 0.000841, 2.506266)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 348.993820422057,
+					"leg_step_degrees": 26.1745365316543,
+					"peak_slip_m": 0.0,
+					"penetration_m": 0.0,
+					"phase_error": 0.000180329805538969,
+					"plant_rotation_degrees": 20.6416290963641,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.0,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.56666666666667,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.395590460152961,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373259271747
+				},
+				{
+					"clamps": 0,
+					"degrees": 45,
+					"final_phase": 0.895588630777495,
+					"final_position": "(-12.83431, 0.000781, 2.506267)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 330.471508525141,
+					"leg_step_degrees": 24.7853631393856,
+					"peak_slip_m": 0.000000476837158203125,
+					"penetration_m": 0.0,
+					"phase_error": 0.000180947927781082,
+					"plant_rotation_degrees": 21.1726506911232,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.00000095367431640625,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.56666666666667,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.895589842030719,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373259271747
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.366990517183875,
+					"final_position": "(-10.86427, -0.001643, 1.716108)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 341.413107298746,
+					"leg_step_degrees": 25.6059830474059,
+					"peak_slip_m": 0.00000095367431640625,
+					"penetration_m": 0.0,
+					"phase_error": 0.00339105541323438,
+					"plant_rotation_degrees": 20.8077905233976,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.00000119209289550781,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.6,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.429501290232735,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373310498166
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.866992103002578,
+					"final_position": "(-13.13573, 0.000737, 1.716107)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 325.821993851438,
+					"leg_step_degrees": 24.4366495388579,
+					"peak_slip_m": 0.000000119209289550781,
+					"penetration_m": 0.0,
+					"phase_error": 0.00339193843820755,
+					"plant_rotation_degrees": 21.1720837854221,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.000000715255737304688,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.6,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.929501992972054,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373310498166
+				},
+				{
+					"clamps": 0,
+					"degrees": 180,
+					"final_phase": 0.275000689499082,
+					"final_position": "(-12.0, -0.000264, 0.6581)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 467.126336205794,
+					"leg_step_degrees": 35.0344752154345,
+					"peak_slip_m": 0.00000095367431640625,
+					"penetration_m": 0.0,
+					"phase_error": 0.00781251324547663,
+					"plant_rotation_degrees": 22.6754818462755,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.00000274181365966797,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.8,
+						"aim_degrees": 30.5691058568499,
+						"jump": "GROUND",
+						"phase": 0.712500508478037,
+						"previous_support": true,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373310498166
+				},
+				{
+					"clamps": 0,
+					"degrees": 180,
+					"final_phase": 0.775000689499082,
+					"final_position": "(-12.0, -0.000264, 0.6581)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 433.278286478123,
+					"leg_step_degrees": 32.4958714858592,
+					"peak_slip_m": 0.000000119209289550781,
+					"penetration_m": 0.0,
+					"phase_error": 0.00781251324547652,
+					"plant_rotation_degrees": 24.5940478331862,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.00000101327896118164,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.86666666666666,
+						"aim_degrees": 2.31747998373415,
+						"jump": "GROUND",
+						"phase": 0.337500499647563,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373310498166
+				},
+				{
+					"clamps": 0,
+					"degrees": 45,
+					"final_phase": 0.0099611657349552,
+					"final_position": "(-10.00539, 0.000802, 6.221364)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 625.657531244485,
+					"leg_step_degrees": 46.9243148433364,
+					"peak_slip_m": 0.0000000596046447753906,
+					"penetration_m": 0.0,
+					"phase_error": 0.00123143661483052,
+					"plant_rotation_degrees": 23.4248014095501,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.0000000596046447753906,
+					"support_frames": 14,
+					"worst_leg": {
+						"age": 1.86666666666666,
+						"aim_degrees": 0.0559529096807445,
+						"jump": "GROUND",
+						"phase": 0.353711068009562,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 11.9244721020884
+				},
+				{
+					"clamps": 0,
+					"degrees": 45,
+					"final_phase": 0.509959273168339,
+					"final_position": "(-13.99461, -0.00288, 6.221361)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 609.94386143617,
+					"leg_step_degrees": 45.7457896077128,
+					"peak_slip_m": 0.0,
+					"penetration_m": 0.0,
+					"phase_error": 0.00123143661483051,
+					"plant_rotation_degrees": 23.4604942706053,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.0,
+					"support_frames": 13,
+					"worst_leg": {
+						"age": 1.86666666666666,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.853707739097679,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 11.9245267436018
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.960848861364993,
+					"final_position": "(-9.467804, -0.001942, 4.515361)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 588.095634457511,
+					"leg_step_degrees": 44.1071725843134,
+					"peak_slip_m": 0.0,
+					"penetration_m": 0.0,
+					"phase_error": 0.00189195020403952,
+					"plant_rotation_degrees": 22.5745640937413,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.0,
+					"support_frames": 14,
+					"worst_leg": {
+						"age": 2.06666666666666,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.867099278667968,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 15.6663229369882
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.460849944401543,
+					"final_position": "(-14.5322, 0.000818, 4.515361)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 613.44278520959,
+					"leg_step_degrees": 46.0082088907193,
+					"peak_slip_m": 0.0,
+					"penetration_m": 0.0,
+					"phase_error": 0.00189195020403952,
+					"plant_rotation_degrees": 22.3704660885102,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.0,
+					"support_frames": 14,
+					"worst_leg": {
+						"age": 2.06666666666666,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.367099329605005,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 15.6668693521218
+				},
+				{
+					"clamps": 0,
+					"degrees": 180,
+					"final_phase": 0.696263010658968,
+					"final_position": "(-12.0, -0.002459, 2.503687)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 663.91824745274,
+					"leg_step_degrees": 49.7938685589555,
+					"peak_slip_m": 0.000000480548010273196,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00781262362444847,
+					"plant_rotation_degrees": 27.5192112414803,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.00000125540839235327,
+					"support_frames": 15,
+					"worst_leg": {
+						"age": 1.96666666666666,
+						"aim_degrees": 0.726315859675956,
+						"jump": "GROUND",
+						"phase": 0.321263131758657,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3373037290599
+				},
+				{
+					"clamps": 0,
+					"degrees": 180,
+					"final_phase": 0.196263010658967,
+					"final_position": "(-12.0, -0.002459, 2.503687)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 632.562989099151,
+					"leg_step_degrees": 47.4422241824364,
+					"peak_slip_m": 0.0,
+					"penetration_m": 0.0,
+					"phase_error": 0.00781262362444841,
+					"plant_rotation_degrees": 24.8728578626535,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.0,
+					"support_frames": 15,
+					"worst_leg": {
+						"age": 1.96666666666666,
+						"aim_degrees": 0.189745630010503,
+						"jump": "GROUND",
+						"phase": 0.821263131758657,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3374130120867
+				}
+			],
+			"clamps": 0,
+			"jumps": [
+				{
+					"degrees": 45,
+					"frames": 25,
+					"leg_rate_per_pace": 271.092006774288,
+					"leg_step_degrees": 20.3319005080716,
+					"peak_slip_m": 0.192818000912666,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.0000009345244916803,
+					"plant_rotation_degrees": 18.7723121884638,
+					"run": false,
+					"slip_m": 0.315561577088033,
+					"support_frames": 25,
+					"worst_leg": {
+						"age": 0.516666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.361091581874098,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.00120211329392224
+				},
+				{
+					"degrees": 90,
+					"frames": 25,
+					"leg_rate_per_pace": 271.143119356576,
+					"leg_step_degrees": 20.3357339517432,
+					"peak_slip_m": 0.170623302459717,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.000000441513803080273,
+					"plant_rotation_degrees": 19.0609696431669,
+					"run": false,
+					"slip_m": 0.286580352112651,
+					"support_frames": 25,
+					"worst_leg": {
+						"age": 0.55,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.449057718828031,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.0
+				},
+				{
+					"degrees": 180,
+					"frames": 25,
+					"leg_rate_per_pace": 262.222801231351,
+					"leg_step_degrees": 19.6667100923513,
+					"peak_slip_m": 0.110093131661415,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.000000883024973238888,
+					"plant_rotation_degrees": 12.0840330050627,
+					"run": false,
+					"slip_m": 0.2244205089075,
+					"support_frames": 25,
+					"worst_leg": {
+						"age": 0.816666666666668,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.853554186640236,
+						"previous_support": false,
+						"side": 0,
+						"support": false
+					},
+					"yaw_step_degrees": 5.96324691904137
+				},
+				{
+					"degrees": 45,
+					"frames": 25,
+					"leg_rate_per_pace": 614.810507823588,
+					"leg_step_degrees": 46.1107880867691,
+					"peak_slip_m": 0.126865237951279,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.000000731079114690836,
+					"plant_rotation_degrees": 20.7029232139758,
+					"run": true,
+					"slip_m": 0.196412369193673,
+					"support_frames": 20,
+					"worst_leg": {
+						"age": 0.716666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.337307196556369,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.000874264213761632
+				},
+				{
+					"degrees": 90,
+					"frames": 25,
+					"leg_rate_per_pace": 625.48673098064,
+					"leg_step_degrees": 46.911504823548,
+					"peak_slip_m": 0.124279595911503,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.000000258025657159933,
+					"plant_rotation_degrees": 20.0611996206964,
+					"run": true,
+					"slip_m": 0.191131144762039,
+					"support_frames": 21,
+					"worst_leg": {
+						"age": 0.716666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.352065945901915,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.0
+				},
+				{
+					"degrees": 180,
+					"frames": 25,
+					"leg_rate_per_pace": 608.942737842224,
+					"leg_step_degrees": 45.6707053381668,
+					"peak_slip_m": 0.0875996425747871,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00000206378844265498,
+					"plant_rotation_degrees": 27.0685604826847,
+					"run": true,
+					"slip_m": 0.173433773804391,
+					"support_frames": 20,
+					"worst_leg": {
+						"age": 0.816666666666668,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.334250577870208,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.3374130120867
+				}
+			],
+			"pace": 2.25,
+			"peak_slip_m": 0.00000095367431640625,
+			"polish": true,
+			"total_planted_slip_m": 0.00000793112860719702
+		}
+	]
+}
