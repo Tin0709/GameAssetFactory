@@ -250,6 +250,8 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	return swing_world_q[side]
 
 func _limit_contact_correction(correction: Vector3) -> Vector3:
+	if "--expressive-contact-diagnostics" in OS.get_cmdline_user_args() and jump_state=="LAND" and correction.y>.14:
+		print("LAND_CAP ",jump_age," ",gait_phase," ",correction)
 	if collect_contact_diagnostics and jump_state=="GROUND" and move_requested:
 		release_trace.append({"phase":gait_phase,"load":pivot_load,"correction":correction,"turn":turn_rate,"bias":travel_bias,"aim":[rad_to_deg(support_aim[0].angle_to(Quaternion.IDENTITY)),rad_to_deg(support_aim[1].angle_to(Quaternion.IDENTITY))]})
 	return super._limit_contact_correction(correction)

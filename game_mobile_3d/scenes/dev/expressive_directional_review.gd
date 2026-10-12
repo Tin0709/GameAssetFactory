@@ -15,6 +15,7 @@ func _ready() -> void:
 	if jump_enabled and "--expressive-fall-original" in OS.get_cmdline_user_args():actor.visual.fall_wave_enabled=false
 	if jump_enabled and "--expressive-stride-original" in OS.get_cmdline_user_args():actor.visual.run_stride_scale=1.0
 	if jump_enabled and "--expressive-polish-before" in OS.get_cmdline_user_args():actor.visual.polish_enabled=false
+	if jump_enabled and "--expressive-turn-pivot-original" in OS.get_cmdline_user_args():actor.visual.turn_twist_guard_enabled=false
 	if jump_enabled and "--expressive-jump-original" in OS.get_cmdline_user_args():
 		actor.jump_flight_speed=1.0;actor.jump_height=1.2
 	if jump_enabled and "--expressive-jump-quicker-v1" in OS.get_cmdline_user_args():
