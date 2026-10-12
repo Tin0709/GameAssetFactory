@@ -1,0 +1,39 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "frames": [
+    1,
+    30
+  ],
+  "fps": 30,
+  "period_s": 1,
+  "closing_key": 31,
+  "nominal_speed_m_s": 1.02,
+  "leg_tracks_m": 0.27,
+  "support_duty": {
+    "L": 0.64,
+    "R": 0.66
+  },
+  "double_support": 0.3,
+  "flight": 0,
+  "contact_frames": {
+    "L": 1,
+    "R": 16
+  },
+  "hip_vertical_range_m": 0.195,
+  "contact_drop_m": 0.145,
+  "compression_time_s": 0.08,
+  "vertical_sole_lift_m": 0.18,
+  "lift_peak_swing_fraction": [
+    0.36,
+    0.44
+  ],
+  "non_leg_curves_exact": false,
+  "leg_motion": "Lower piston pull: rigid leg translates upward 180mm, then advances while lowering. Upper end remains covered at waist; no knee, stretch or rig modification.",
+  "transition": "Same receiving phases; pose translation/waist occlusion require future runtime/weapon/transition review. Blender-only Pending.",
+  "rebound_peak_time_s": 0.22,
+  "rebound_peak_height_m": 0.71,
+  "leg_world_motion_preserved": true,
+  "intentional_waist_gap": "Small rebound-only separation from planted leg; no changes to rigid geometry or lower piston trajectory.",
+  "body_motion": "Fast soft load; spring upward in140ms; short light top, slower settle. Restrained delayed torso/shoulder/head reactions prevent uniform rigid bob."
+}
