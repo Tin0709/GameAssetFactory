@@ -1,0 +1,10 @@
+{
+  "baseline_files": 7817,
+  "changed": [
+    "blender/animation/showcase/animation_manifest.json",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/Animation_Showcase.blend1"
+  ],
+  "missing": [],
+  "unexpected_changes": []
+}

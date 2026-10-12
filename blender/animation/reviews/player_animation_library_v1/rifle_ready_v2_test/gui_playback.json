@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "entries_after_fresh_reopen": 19,
+  "action": "Rifle_Ready_V2_v2_Test",
+  "frame_advanced_from": 119,
+  "to": 89,
+  "loop_wrapped": true,
+  "play_pause_restart": true
+}
