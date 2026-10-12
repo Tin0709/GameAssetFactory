@@ -1,15 +1,16 @@
 {
   "status": "Pending",
+  "revision": "Reference-matched long silhouette after explicit user correction",
   "dimensions_m": [
-    0.11800000071525574,
-    1.0099999904632568,
-    0.48399999737739563
+    0.09399999678134918,
+    1.2000000178813934,
+    0.36177705228328705
   ],
   "meshes": 2,
   "materials": 1,
   "texture": [
-    64,
-    64
+    256,
+    128
   ],
   "markers": {
     "RightHandGrip": [
@@ -24,13 +25,13 @@
     ],
     "Muzzle": [
       0,
-      0.687,
-      0.18
+      0.8832864378165447,
+      0.14248733821046708
     ],
     "AimReference": [
       0,
-      0.454,
-      0.3
+      0.6577377602701182,
+      0.22622397298818234
     ],
     "RecoilPivot": [
       0,
@@ -54,21 +55,25 @@
     ],
     "Muzzle_Point": [
       0,
-      0.687,
-      0.18
+      0.8832864378165447,
+      0.14248733821046708
     ]
   },
   "topology": {
     "Rifle_V2_Body": {
-      "triangles": 960,
-      "nonmanifold_edges": 0,
+      "triangles": 996,
+      "boundary_edges": 24,
+      "nonmanifold_edges_excluding_decals": 0,
       "loose_vertices": 0
     },
     "Rifle_V2_Magazine": {
-      "triangles": 168,
-      "nonmanifold_edges": 0,
+      "triangles": 144,
+      "boundary_edges": 8,
+      "nonmanifold_edges_excluding_decals": 0,
       "loose_vertices": 0
     }
   },
-  "triangles": 1128
+  "compact_source_sha256": "63101d7513b7e0814207ab39b94754aa38b56ebfd7a9e1058a532c1b7ba78f73",
+  "reference": "User attached blocky-stylized-m4a1-assault-rifle-low-poly-game-ready-3d-model-22c0739a31 (1).jpg",
+  "triangles": 1140
 }

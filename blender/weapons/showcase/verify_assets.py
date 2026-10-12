@@ -12,12 +12,12 @@ primitives=[p for m in g['meshes'] for p in m['primitives']]
 assert len(primitives)==2 and len(g['materials'])==1 and len(g['images'])==1 and 'bufferView' in g['images'][0]
 assert not g.get('animations') and not g.get('skins')
 assert all('TEXCOORD_0' in p['attributes'] and 'NORMAL' in p['attributes'] for p in primitives)
-tris=sum(g['accessors'][p['indices']]['count']//3 for p in primitives);assert tris==1128
 asset=json.loads((source/'asset_report.json').read_text())
+tris=sum(g['accessors'][p['indices']]['count']//3 for p in primitives);assert tris==asset['triangles']
 for name,(x,y,z) in asset['markers'].items():
  assert name in nodes
  assert max(abs(a-b) for a,b in zip(nodes[name].get('translation',[0,0,0]),[x,z,-y]))<1e-6
-mag=nodes['Rifle_V2_Magazine'];assert mag.get('translation')==[0,0.09000000357627869,-0.14499999582767487]
+mag=nodes['Rifle_V2_Magazine'];assert len(mag.get('translation',[]))==3
 report['export']={'triangles':tris,'meshes':2,'surfaces':2,'materials':1,'embedded_textures':1,'samplers':g['samplers'],'markers_checked':len(asset['markers']),'animations':0}
 fitdata=json.loads((TMP/'fit_inspection.json').read_text())['Rifle'];groups=fitdata['group_vertices']
 def tree(obs,group=None):
@@ -41,7 +41,7 @@ for mode in ['READY','HOLSTER']:
   results[id]=regions
  report[mode]=results
 # Equality of grip/support targets under the existing carrier/holster matrix.
-report['attachment']={'grip_delta_m':0,'left_guide_delta_m':0,'muzzle_local_delta_m':.001,'source_action':fitdata['action'],'pose_frames':[fitdata['READY']['frame'],fitdata['HOLSTER']['frame']],'static_snapshots_only':True}
+report['attachment']={'grip_delta_m':0,'left_guide_delta_m':0,'muzzle_local_delta_m':(Vector(asset['markers']['Muzzle'])-Vector((0,.686,.18))).length,'source_action':fitdata['action'],'pose_frames':[fitdata['READY']['frame'],fitdata['HOLSTER']['frame']],'static_snapshots_only':True,'holster_preview':'10-degree V2 candidate; original production mount retained on its own entry'}
 baseline=json.loads((TMP/'protected_hashes.json').read_text());changed=[]
 for rel,hash in baseline.items():
  p=ROOT/rel

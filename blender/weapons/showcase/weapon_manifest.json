@@ -64,10 +64,37 @@
       "kind": "Rifle",
       "source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
       "status": "Pending",
-      "status_note": "New original asset; awaiting explicit visual approval.",
+      "status_note": "Pending reference-matched long revision requested by user; compact checkpoint preserved.",
       "collection": "WEAPON_rifle_stylized_v2",
       "root": "rifle_stylized_v2__Rifle_Stylized_V2",
-      "source_sha256": "63101d7513b7e0814207ab39b94754aa38b56ebfd7a9e1058a532c1b7ba78f73"
+      "source_sha256": "8a02122848113fc0fb552f4d253571957f12f70841a8d60975437a8109d4f57c",
+      "holster_preview_matrix": [
+        [
+          0,
+          1.0340481406628184,
+          0.18233058655027687,
+          0
+        ],
+        [
+          -0.8925,
+          0,
+          0,
+          0.17
+        ],
+        [
+          0,
+          -0.18233058655027687,
+          1.0340481406628184,
+          1.02
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "holster_preview_note": "Pending 10-degree horizontal back fit, as requested; original production 55-degree mount preserved separately."
     },
     {
       "id": "pistol_v1",
@@ -178,6 +205,17 @@
       "collection": "WEAPON_shotgun_production_r13",
       "root": "shotgun_production_r13__shotgun_production_r13_GripRoot",
       "source_sha256": "e2c115f62655fe6b5a3786a0a57a86f11145b3194625685cbaa329ab75a6c990"
+    },
+    {
+      "id": "rifle_stylized_v2_compact",
+      "label": "Rifle \u2014 Stylized V2 compact checkpoint",
+      "kind": "Rifle",
+      "source": "blender/weapons/rifle_stylized_v2/compact_checkpoint/Rifle_Stylized_V2_compact.blend",
+      "source_sha256": "63101d7513b7e0814207ab39b94754aa38b56ebfd7a9e1058a532c1b7ba78f73",
+      "status": "Pending",
+      "status_note": "Preserved early compact candidate, superseded by user reference steering.",
+      "collection": "WEAPON_rifle_stylized_v2_compact",
+      "root": "rifle_stylized_v2_compact__Rifle_Stylized_V2"
     }
   ]
 }

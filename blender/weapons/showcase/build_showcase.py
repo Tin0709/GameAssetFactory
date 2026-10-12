@@ -1,5 +1,5 @@
 """Manifest-driven build. Sources are read-only; existing showcase is backed up."""
-import bpy,json,sys,hashlib,shutil,datetime,atexit
+import bpy,json,sys,hashlib,shutil,datetime,atexit,math
 from pathlib import Path
 from mathutils import Vector,Matrix
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
@@ -67,6 +67,12 @@ else:
   spec.append({'id':kind.lower()+'_production_r13','label':kind+' — Production R13','kind':kind,'source':'game_mobile_3d/assets/characters/r13/'+kind.lower()+'.glb','status':'Approved','status_note':'Existing approved geometry/mounts per player_weapon_socket_r13.gd; status applies only to this preserved production model.'})
  spec.insert(5,{'id':'rifle_stylized_v2','label':'Rifle — Stylized V2','kind':'Rifle','source':'blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend','status':'Pending','status_note':'New original asset; awaiting explicit visual approval.'})
 for entry in spec:
+ if entry['id']=='rifle_stylized_v2':
+  # Latest brief asks for a nearly horizontal back carry. Original source/production
+  # actually uses 55 degrees; retain that on original entries, trial 10 only on V2.
+  angle=math.radians(10);co=math.cos(angle);si=math.sin(angle)
+  entry['holster_preview_matrix']=[[0,1.05*co,1.05*si,0],[-.8925,0,0,.24],[0,-1.05*si,1.05*co,1.02],[0,0,0,1]]
+  entry['holster_preview_note']='Pending 10-degree horizontal back fit, as requested; original production 55-degree mount preserved separately.'
  source=ROOT/entry['source'];digest=hashlib.sha256(source.read_bytes()).hexdigest()
  if entry.get('source_sha256'):assert entry['source_sha256']==digest,('Source changed; inspect before refresh',entry['source'])
  collection=bpy.data.collections.new('WEAPON_'+entry['id']);s.collection.children.link(collection);collection['weapon_entry']=entry['id'];entry['collection']=collection.name

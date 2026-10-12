@@ -1,6 +1,6 @@
 {
   "export": {
-    "triangles": 1128,
+    "triangles": 1112,
     "meshes": 2,
     "surfaces": 2,
     "materials": 1,
@@ -40,10 +40,10 @@
         "intersecting_triangle_pairs": 0
       },
       "UpperArm.R": {
-        "intersecting_triangle_pairs": 20
+        "intersecting_triangle_pairs": 26
       },
       "ForeArm.R": {
-        "intersecting_triangle_pairs": 74
+        "intersecting_triangle_pairs": 84
       },
       "UpperArm.L": {
         "intersecting_triangle_pairs": 0
@@ -62,10 +62,10 @@
         "intersecting_triangle_pairs": 0
       },
       "UpperArm.R": {
-        "intersecting_triangle_pairs": 17
+        "intersecting_triangle_pairs": 0
       },
       "ForeArm.R": {
-        "intersecting_triangle_pairs": 104
+        "intersecting_triangle_pairs": 6
       },
       "UpperArm.L": {
         "intersecting_triangle_pairs": 0
@@ -82,16 +82,16 @@
         "intersecting_triangle_pairs": 0
       },
       "UpperArm.R": {
-        "intersecting_triangle_pairs": 20
+        "intersecting_triangle_pairs": 0
       },
       "ForeArm.R": {
-        "intersecting_triangle_pairs": 74
+        "intersecting_triangle_pairs": 0
       },
       "UpperArm.L": {
-        "intersecting_triangle_pairs": 0
+        "intersecting_triangle_pairs": 44
       },
       "ForeArm.L": {
-        "intersecting_triangle_pairs": 0
+        "intersecting_triangle_pairs": 18
       },
       "Chest": {
         "intersecting_triangle_pairs": 0
@@ -101,13 +101,14 @@
   "attachment": {
     "grip_delta_m": 0,
     "left_guide_delta_m": 0,
-    "muzzle_local_delta_m": 0.001,
+    "muzzle_local_delta_m": 0.20082115038257511,
     "source_action": "R13_Rifle_Holster_UpperBack_Final",
     "pose_frames": [
       1,
-      125
+      62
     ],
-    "static_snapshots_only": true
+    "static_snapshots_only": true,
+    "holster_preview": "10-degree V2 candidate; original production mount retained on its own entry"
   },
   "preservation": {
     "files_checked": 535,
