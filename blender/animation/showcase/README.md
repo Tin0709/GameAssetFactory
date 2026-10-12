@@ -1,3 +1,5 @@
+**Latest Rifle Ready v16 review (2026-10-13, Pending):** same retained Ready entry with closer shoulder seating and lifted underside support. [Review](../reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v003/README.md).18 entries total; no other Action or Godot changes.
+
 **Latest retained Rifle Ready v16:** LEFT arm now tucked closer to torso and raised toward head in the same Action. Only one Ready entry;18 total. [Current review and comparison](../reviews/player_animation_library_v1/rifle_ready_v16_test/left_arm_tuck_v001/README.md). Earlier pose notes below are historical.
 
 **Active Rifle Ready library — 2026-10-12:** only **Rifle_Ready_V2_v16_Test** remains, per user selection and explicit deletion request. The15 superseded Ready Actions were removed from this Showcase and manifest;18 total entries remain. Aim/Hold, Back Holster and all other animations are unchanged. Earlier notes below are historical and do not describe the current Ready list. A pre-cleanup backup is in `.validation/rifle_ready_cleanup_v16/before/`. v16 retains its existing Pending status.
