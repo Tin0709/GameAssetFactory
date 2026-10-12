@@ -12,5 +12,28 @@
   "movies": {
     "before.avi": "a74c4dcfa00e5c418b0434f4b918e8069598edb2e22e5bba69c765ba7f74a1f2",
     "after.avi": "5b88e25866adef90bbbb57ce2c2639abce9aea57fd0b6cf4d693f91fae562fd7"
-  }
+  },
+  "encoded_verified": [
+    {
+      "file": "before_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 1219,
+      "seconds": 40.63333333333333,
+      "sha256": "7e668fe110c808ddd1e4235850907d0942f9b27dabb769a4543e80d9f857dfc2"
+    },
+    {
+      "file": "after_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 1219,
+      "seconds": 40.63333333333333,
+      "sha256": "26359689dda36170070e2d27c368781accbb4e27a39832a95e0974ba3c31bcab"
+    },
+    {
+      "file": "comparison_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 1219,
+      "seconds": 40.63333333333333,
+      "sha256": "d6498ba1a6e291e9949a50f89335853d2967e3cf82c9017b06e36056cd030579"
+    }
+  ]
 }
