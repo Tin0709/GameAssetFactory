@@ -1,6 +1,8 @@
 extends "res://scenes/dev/expressive_locomotion_actor.gd"
 ## Isolated jump physics. No production controller or authored Action changes.
 @export var jump_height:=1.2
+@export_range(1.0,1.3,.01) var jump_flight_speed:=1.0
+var _active_flight_speed:=1.0
 const PREP_SECONDS:=.20
 const BUFFER_SECONDS:=.14
 var jump_state:="GROUND"
@@ -20,6 +22,7 @@ func request_jump() -> void:
 	jump_buffer=BUFFER_SECONDS
 
 func _state(value: String) -> void:
+	if value!="AIR" or jump_state!="PREP":_active_flight_speed=1.0
 	jump_state=value;jump_age=0.0
 	jump_events.append({"event":value,"time":simulation_time,"position":[position.x,position.y,position.z],"vy":velocity.y,"phase":visual.gait_phase,"speed":current_speed,"jump":jump_count})
 	visual.jump_transition(value)
@@ -44,12 +47,16 @@ func _physics_process(delta: float) -> void:
 	jump_buffer=maxf(0,jump_buffer-delta)
 	var launched:=false
 	if jump_state=="PREP" and jump_age>=PREP_SECONDS and grounded:
-		launch_velocity=sqrt(2*gravity*jump_height)
+		# Scale acceleration and launch together: shorter physics flight at
+		# the same height. Latch the candidate so midair comparisons cannot pop.
+		_active_flight_speed=jump_flight_speed
+		var flight_gravity:=_flight_gravity()
+		launch_velocity=sqrt(2*flight_gravity*jump_height)
 		# Half-step launch gravity avoids adding an extra physics tick of height.
-		velocity.y=launch_velocity-gravity*delta*.5
+		velocity.y=launch_velocity-flight_gravity*delta*.5
 		jump_count+=1;launched=true;_state("AIR")
 	elif grounded:velocity.y=-.2
-	else:velocity.y-=gravity*delta
+	else:velocity.y-=_flight_gravity()*delta
 	velocity.x=planar.x;velocity.z=planar.y
 	var incoming_y:=velocity.y
 	move_and_slide()
@@ -81,7 +88,11 @@ func _probe_floor() -> void:
 			var collision:=get_slide_collision(i)
 			if collision.get_normal().dot(Vector3.UP)>.65:floor_y=collision.get_position().y;break
 	var height:=maxf(0,global_position.y-floor_y)
-	time_to_contact=(velocity.y+sqrt(velocity.y*velocity.y+2*gravity*height))/gravity
+	var flight_gravity:=_flight_gravity()
+	time_to_contact=(velocity.y+sqrt(velocity.y*velocity.y+2*flight_gravity*height))/flight_gravity
+
+func _flight_gravity() -> float:
+	return gravity*_active_flight_speed*_active_flight_speed
 
 func review_drop(height: float=6.0) -> void:
 	position=Vector3(0,height,0);velocity=Vector3.ZERO
@@ -89,6 +100,7 @@ func review_drop(height: float=6.0) -> void:
 	visual.foot_support[0]=false;visual.foot_support[1]=false;visual.settling=false
 
 func reset_jump() -> void:
+	_active_flight_speed=1.0
 	jump_buffer=0;velocity=Vector3.ZERO;floor_y=0;time_to_contact=10
 	jump_state="GROUND";jump_age=0;visual.jump_transition("GROUND")
 	visual.contact_floor_y=0;visual.settling=false

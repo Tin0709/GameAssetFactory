@@ -101,6 +101,12 @@ func _stride_distance() -> float:
 	return lerpf(WALK_STRIDE,RUN_STRIDE*run_stride_scale,gait_run_weight)
 
 func jump_transition(value: String) -> void:
+	if polish_enabled and value=="GROUND" and jump_state=="LAND" and move_requested:
+		# Landing has already blended completely into the moving gait. Keep
+		# its live support/swing state instead of receiving the same foot again.
+		jump_state=value;jump_age=0;pose_dirty=true;attention_time=0
+		settling=false;landing_replant=false
+		return
 	swing_active=[false,false]
 	super.jump_transition(value)
 

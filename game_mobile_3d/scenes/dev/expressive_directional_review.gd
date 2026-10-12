@@ -12,7 +12,9 @@ func _ready() -> void:
 	if jump_enabled and "--expressive-fall-original" in OS.get_cmdline_user_args():actor.visual.fall_wave_enabled=false
 	if jump_enabled and "--expressive-stride-original" in OS.get_cmdline_user_args():actor.visual.run_stride_scale=1.0
 	if jump_enabled and "--expressive-polish-before" in OS.get_cmdline_user_args():actor.visual.polish_enabled=false
+	if jump_enabled and "--expressive-jump-original" in OS.get_cmdline_user_args():actor.jump_flight_speed=1.0
 	if jump_enabled and "--expressive-polish-demo" in OS.get_cmdline_user_args():call_deferred("run_polish_demo")
+	if jump_enabled and "--expressive-quicker-demo" in OS.get_cmdline_user_args():call_deferred("run_quicker_demo")
 
 func _button(label: String) -> void:
 	if jump_enabled and label=="Compare pace":
@@ -30,11 +32,27 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		actor.visual.run_stride_scale=1.0 if actor.visual.run_stride_scale>1.0 else 1.2;actor.visual.pose_dirty=true
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_K:
 		actor.visual.polish_enabled=not actor.visual.polish_enabled;actor.visual.pose_dirty=true
+	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_J:
+		actor.jump_flight_speed=1.0 if actor.jump_flight_speed>1.0 else 1.18
 
 func _process(delta: float) -> void:
 	super._process(delta)
 	if jump_enabled:status.text+="\nTurns: %s · V compares\nFalling limbs: %s · F compares\nRun stride: %s · G compares"%["Refined" if actor.visual.directional_enabled else "Original","Raised wave" if actor.visual.fall_wave_enabled else "Original","Longer" if actor.visual.run_stride_scale>1.0 else "Original"]
 	if jump_enabled:status.text+="\nPolish: %s · K before/after · T pace"%["After" if actor.visual.polish_enabled else "Before"]
+	if jump_enabled:status.text+="\nJump: %s · J compares next launch"%["Quicker" if actor.jump_flight_speed>1.0 else "Previous"]
+
+func run_quicker_demo() -> void:
+	demo_running=true;actor.scripted_input=true
+	for mode in ["Stationary","Walk","Run"]:
+		actor.requested_direction=Vector2.ZERO;actor.requested_run=false;reset_actor();actor.position.x=-12
+		camera_offset=Vector3(6,1.5,0) if mode=="Walk" else Vector3(4,3.1,5)
+		await tick(35,"%s · preserved ready posture"%mode)
+		actor.requested_direction=Vector2.ZERO if mode=="Stationary" else Vector2(0,1);actor.requested_run=mode=="Run"
+		await tick(35,"%s · approach at current locomotion pace"%mode)
+		actor.request_jump();await tick(140,"%s · quicker physics flight / original impact timing"%mode)
+		actor.requested_direction=Vector2.ZERO;await tick(35,"Stable recovery")
+	demo_running=false;actor.scripted_input=false
+	if "--expressive-quicker-demo" in OS.get_cmdline_user_args():get_tree().quit()
 
 func run_polish_demo() -> void:
 	demo_running=true;actor.scripted_input=true;reset_actor();actor.position.x=-12
