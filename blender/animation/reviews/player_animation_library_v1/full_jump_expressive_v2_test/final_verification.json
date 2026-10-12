@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "source_sha256": "78d572941a2bdca68479c60ecf3e9c3529d87822ad2fee7c6b1089beb527fea6",
+  "action_sha256": "26f632d2dce3d15b5eca4f87d189048f24d23a3de547a3618e18d2705f97d28b",
+  "pending_full_jump_v2": true,
+  "run_v3_explicitly_approved_preferred_source_and_action_unchanged": true,
+  "original_full_jump_and_all_previous_sources_actions_reviews_unchanged": true,
+  "arm_only_working_checkpoint_preserved": true,
+  "protected_original_files": 7734,
+  "changed_protected_files": [],
+  "godot_files_unchanged": 1710,
+  "original_full_jump_files_unchanged": 600,
+  "run_v3_files_unchanged": 152,
+  "rig_appearance_materials_unchanged": true,
+  "hand_center_above_head_m": {
+    "L": 0.027950525283813477,
+    "R": 0.051481008529663086
+  },
+  "airborne_leg_gap_m": {
+    "old": 0.3767993748188019,
+    "new": 0.5264620780944824,
+    "increase": 0.14966270327568054
+  },
+  "landing_compression_m": 0.14799997711181645,
+  "landing_anchor_error_m": 3.512271674933485e-07,
+  "outside_window_pose_error_m": 0.0,
+  "showcase_saved_reopened_switched_and_played": true,
+  "four_original_speed_review_videos_verified": true,
+  "showcase_sha256": "df8a3b117e3ddf59ec6871bd5f5163859763922d37d00f63d8594bdecc98139e",
+  "manifest_sha256": "b6f1b470b206919d4fef3194f42d7a54aeebfb221cb956760f09c9732a091e57",
+  "gameplay_status": "Blender-only Pending review; no Godot/export/runtime readiness claim."
+}

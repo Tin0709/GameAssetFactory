@@ -1,0 +1,17 @@
+{
+  "active_action": "Full_Jump_Expressive_v2_Test",
+  "slot": "OBRUN_Test_Rig",
+  "entries": 15,
+  "range": [
+    1,
+    93
+  ],
+  "fps": 30,
+  "loop": false,
+  "playing": false,
+  "frame": 1,
+  "showcase_sha256": "df8a3b117e3ddf59ec6871bd5f5163859763922d37d00f63d8594bdecc98139e",
+  "manifest_sha256": "b6f1b470b206919d4fef3194f42d7a54aeebfb221cb956760f09c9732a091e57",
+  "all_action_signatures_match": true,
+  "preferred_run_status": "approved"
+}

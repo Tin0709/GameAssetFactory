@@ -1,0 +1,78 @@
+{
+  "action": "Full_Jump_Expressive_v2_Test",
+  "status": "pending",
+  "frames": [
+    1,
+    93
+  ],
+  "fps": 30,
+  "in_place": true,
+  "seamless_loop": false,
+  "original_actions": {
+    "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+    "Full_Jump_Expressive_Test": "b119534f13f7db19862dfd2d7485595e9372ad0da0cb1e300e9c966fd00f0b99",
+    "Idle_Expressive_Test": "022eedd0bd5ff65dc644c636b9d247cf3cafccb1b5403948be45ec0ecfe105d7",
+    "Idle_Expressive_Test_v2": "b7a9604d881b782b73531be95cb5f607a3d9eac805da3b862449c3a2986b8b69",
+    "Idle_Expressive_Test_v3": "f1b1152e742f0f2fe8b5a734b6f6d684f0d8b090442004cea631f8efb5614059",
+    "Jump_AirPose_Test": "eb3b79fd05e5f175e6b5590745f3a38efa43015a635e6eb011abe73377c818e4",
+    "Jump_Landing_Impact_Test": "e870f735519b6aeb810b776ecce6ac944c00357e3127914286fc3f4ff137e55f",
+    "Jump_Landing_Test": "8836c180e39c2b93e47e96a1077360705cffd5c33a729aa91ce93d0b47bf9076",
+    "Jump_Takeoff_Test": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+    "LowerBody_Recovery_Test": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+    "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1",
+    "Run_Expressive_v2_Test": "2f26a2503e1478ca6c5fddfb406ce20a4054b4c7247d8d97574759fe69c782ee",
+    "Run_Expressive_v3_Test": "4983a96d54648229d71fd7aff87ec9090498d6bb72bc1568f02d63cf8a209342",
+    "Walk_Expressive_Test": "15f8e76ac8ca19051bc2865ffeacc145ac2e003ec1eed8672cd8ecb72e6f20ef"
+  },
+  "arm_only_window": [
+    18,
+    45
+  ],
+  "arm_target_pitch_deg": 160,
+  "arm_target_spread_deg": {
+    "L": 30,
+    "R": 32
+  },
+  "peak_plateau_frames": {
+    "L": [
+      31.5,
+      34.5
+    ],
+    "R": [
+      30.5,
+      33.5
+    ]
+  },
+  "rig_changes": [],
+  "last_support_frame": 19,
+  "contact_frames": {
+    "L": 46,
+    "R": 47
+  },
+  "impact_frame": 51,
+  "rebound_frame": 67,
+  "preview_height_m": 0.72,
+  "motion_ownership": "Same existing in-place root/object pose.0.72m presentation elevation only; no trajectory added to rig Action.",
+  "scope": "User-steered higher arms, wider airborne legs and harder soft landing. Original Full Jump preserved; same93frame timing, contact frames and controlled rebound.",
+  "airborne_leg_opening_added_deg_each": 8,
+  "airborne_leg_opening_window": [
+    20,
+    44
+  ],
+  "additional_impact_compression_m": 0.028,
+  "impact_window": [
+    46,
+    65
+  ],
+  "additional_torso_pitch_deg": {
+    "pelvis": 1.5,
+    "spine": 1.7,
+    "chest": 1.2
+  },
+  "additional_arm_impact_pitch_deg": {
+    "L": -8,
+    "R": -10
+  },
+  "arm_only_checkpoint_preserved": ".validation/full_jump_expressive_v2_test/before_wider_legs_heavier_landing",
+  "landing_note": "Fixed receiving contactsF46/F47; faster deeper loading, no added rebound, exact original settled motion fromF65 onward."
+}

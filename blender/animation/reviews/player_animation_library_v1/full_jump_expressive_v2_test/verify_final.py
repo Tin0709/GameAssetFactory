@@ -1,0 +1,25 @@
+"""Final protected-source, approval, central-library and source-bound media proof."""
+from pathlib import Path
+import json,hashlib,ast,re
+O=Path(__file__).resolve().parent;R=O.parents[4];T=R/'.validation/full_jump_expressive_v2_test';S=R/'blender/animation/showcase';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();b=json.loads((T/'baseline.json').read_text());guard=json.loads((T/'steering_guard.json').read_text())
+protected=[p for p in b['files'] if p not in b['allowed_metadata_changes']];changed=[p for p in protected if not (R/p).is_file() or sha(R/p)!=b['files'][p]];assert not changed,changed
+entries=json.loads((S/'animation_manifest.json').read_text())['animations'];assert len(entries)==15
+for before,after in zip(b['original_entries'],entries):
+ assert sha(R/after['source'])==before['source_sha256']==after['source_sha256'] and before['action_sha256']==after['action_sha256']
+ if before['action']=='Run_Expressive_v3_Test':assert after['status']=='approved' and after['preferred_run_baseline'] and {k:v for k,v in before.items() if k not in ['status','approval_note','preferred_run_baseline']}=={k:v for k,v in after.items() if k not in ['status','approval_note','preferred_run_baseline']}
+ else:assert before==after
+a=entries[-1];assert a['action']=='Full_Jump_Expressive_v2_Test' and a['status']=='pending' and not a['seamless_loop'] and [a['start'],a['end'],a['fps']]==[1,93,30]
+source=sha(O/'full_jump_expressive_v2_review.blend');v=json.loads((O/'validation.json').read_text());show=json.loads((O/'showcase_verification.json').read_text());gui=json.loads((O/'gui_playback.json').read_text());media=json.loads((O/'media_verification.json').read_text());live=json.loads((O/'final_live_snapshot.json').read_text());framing=json.loads((O/'framing_verification.json').read_text())
+assert all(x['passed'] and x['source_sha256']==source for x in [v,show,gui,media,framing]) and source==a['source_sha256']
+assert all(x['action_sha256']==a['action_sha256'] for x in [v,show,gui,media]);assert gui['one_shot_stopped_at_end'] and gui['observed_wraps']>=1 and gui['paused_restarted']
+assert live['active_action']==a['action'] and live['entries']==15 and live['range']==[1,93] and live['fps']==30 and not live['loop'] and not live['playing'] and live['frame']==1 and live['all_action_signatures_match'] and live['preferred_run_status']=='approved'
+assert live['showcase_sha256']==show['showcase_sha256']==sha(S/'Animation_Showcase.blend') and live['manifest_sha256']==show['manifest_sha256']==sha(S/'animation_manifest.json')
+p=json.loads((O/'render_provenance.json').read_text());assert p['source_sha256']==source and p['action_sha256']==a['action_sha256'] and len(p['frames'])==len(p['rendered_frames'])==279 and all(sha(O/f)==h for f,h in p['frames'].items())
+package=json.loads((O/'package_provenance.json').read_text());assert package['source_sha256']==source and package['original_speed'] and len(media['videos'])==4
+for name,x in media['videos'].items():assert sha(O/x['path'])==x['sha256'] and x['fps']==30 and x['frames']==93
+assert sha(T/'before_wider_legs_heavier_landing/full_jump_expressive_v2_review.blend')==guard['source_sha256']
+for file in O.glob('*.py'):ast.parse(file.read_text(encoding='utf8'))
+assert not [p for p in re.findall(r'\]\(([^)]+)\)',(O/'README.md').read_text()) if not p.startswith(('http','app:')) and p!='final_verification.json' and not (O/p).resolve().exists()]
+progress=(R/'docs/animation/ANIMATION_PROGRESS.md').read_text();assert '| Full_Jump_Expressive_v2_Test |' in progress and '**User approved; preferred run baseline**' in progress
+report={'passed':True,'source_sha256':source,'action_sha256':a['action_sha256'],'pending_full_jump_v2':True,'run_v3_explicitly_approved_preferred_source_and_action_unchanged':True,'original_full_jump_and_all_previous_sources_actions_reviews_unchanged':True,'arm_only_working_checkpoint_preserved':True,'protected_original_files':len(protected),'changed_protected_files':changed,'godot_files_unchanged':sum('game_mobile_3d' in Path(p).parts for p in protected),'original_full_jump_files_unchanged':sum('full_jump_expressive_test' in Path(p).parts for p in protected),'run_v3_files_unchanged':sum('run_expressive_v3_test' in Path(p).parts for p in protected),'rig_appearance_materials_unchanged':v['rig_appearance_rest_weights_uv_materials_images_lights_unchanged'],'hand_center_above_head_m':{k:x['hand_center_above_head_m'] for k,x in v['peak'].items()},'airborne_leg_gap_m':v['airborne_sole_center_gap_m'],'landing_compression_m':v['landing_compression_m'],'landing_anchor_error_m':v['maximum_landing_anchor_xy_error_m'],'outside_window_pose_error_m':v['outside_window_vertex_error_m'],'showcase_saved_reopened_switched_and_played':True,'four_original_speed_review_videos_verified':True,'showcase_sha256':show['showcase_sha256'],'manifest_sha256':show['manifest_sha256'],'gameplay_status':'Blender-only Pending review; no Godot/export/runtime readiness claim.'}
+(O/'final_verification.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))

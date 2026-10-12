@@ -1,0 +1,39 @@
+{
+  "clips": {
+    "Idle_Expressive_Test_v3": {
+      "duration": 8.0,
+      "samples": 961,
+      "rest_error": 5.960464477539063e-08,
+      "reconstruction_error_m": 7.30612914093212e-07,
+      "loop_position_error_m": 0.0,
+      "loop_rotation_error_rad": 0.0,
+      "source_sha256": "ef9a450d8087a77f4f923e456c16562c286f43e2f73a5335faeb9cfe53028255",
+      "action_sha256": "f1b1152e742f0f2fe8b5a734b6f6d684f0d8b090442004cea631f8efb5614059"
+    },
+    "Walk_Expressive_Test": {
+      "duration": 1.2,
+      "samples": 145,
+      "rest_error": 5.960464477539063e-08,
+      "reconstruction_error_m": 6.07850493620966e-07,
+      "loop_position_error_m": 0.0,
+      "loop_rotation_error_rad": 0.0,
+      "source_sha256": "4f0e61f3c6fbca14cbb3b7896a34ab8f0b011a50ebef11922bdfd5c4b75fad20",
+      "action_sha256": "15f8e76ac8ca19051bc2865ffeacc145ac2e003ec1eed8672cd8ecb72e6f20ef"
+    },
+    "Run_Expressive_v3_Test": {
+      "duration": 0.6666666666666666,
+      "samples": 81,
+      "rest_error": 5.960464477539063e-08,
+      "reconstruction_error_m": 6.006850114687196e-07,
+      "loop_position_error_m": 0.0,
+      "loop_rotation_error_rad": 0.0,
+      "source_sha256": "f7244760901f5055e39fa5e3d9c9203506598c6c4492ce553536b8c26b9d0eeb",
+      "action_sha256": "4983a96d54648229d71fd7aff87ec9090498d6bb72bc1568f02d63cf8a209342"
+    }
+  },
+  "base_model": "game_mobile_3d\\assets\\characters\\jump_gif_v004\\player_r15_jump_gif_v004.glb",
+  "base_model_sha256": "d5e9e136e17eb8d6795bcb915987e27ef6fe4971894611e25efb9962a1b9804e",
+  "rig_modified": false,
+  "root_motion": false,
+  "new_character_actions": false
+}

@@ -1,0 +1,23 @@
+{
+  "Idle_Expressive_Test_v3": {
+    "max_rest_vertex_error_m": 7.450580596923828e-08,
+    "runtime_vertices": 192,
+    "source_vertices": 64,
+    "embedded_atlas_byte_identical": true,
+    "texture_sha256": "fbd7699ed4edb4254d3ccc0401d8fda4d9e89b06062b9c6588d2ff58e9cfc8bf"
+  },
+  "Walk_Expressive_Test": {
+    "max_rest_vertex_error_m": 7.450580596923828e-08,
+    "runtime_vertices": 192,
+    "source_vertices": 64,
+    "embedded_atlas_byte_identical": true,
+    "texture_sha256": "fbd7699ed4edb4254d3ccc0401d8fda4d9e89b06062b9c6588d2ff58e9cfc8bf"
+  },
+  "Run_Expressive_v3_Test": {
+    "max_rest_vertex_error_m": 7.450580596923828e-08,
+    "runtime_vertices": 192,
+    "source_vertices": 64,
+    "embedded_atlas_byte_identical": true,
+    "texture_sha256": "fbd7699ed4edb4254d3ccc0401d8fda4d9e89b06062b9c6588d2ff58e9cfc8bf"
+  }
+}

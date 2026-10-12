@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "entries": 14,
+  "switches": 21,
+  "geometry_samples": 88,
+  "maximum_source_geometry_error_m": 1.7381583373678036e-07,
+  "all_thirteen_existing_entries_and_actions_unchanged": true,
+  "one_rig_one_character_mesh": true,
+  "slots_ranges_fps_reset_and_loop": true,
+  "source_sha256": "f7244760901f5055e39fa5e3d9c9203506598c6c4492ce553536b8c26b9d0eeb",
+  "action_sha256": "4983a96d54648229d71fd7aff87ec9090498d6bb72bc1568f02d63cf8a209342",
+  "showcase_sha256": "c3dff4ed287c4def0e58092ecbb59a3526c39ebc32068165fa8fe908f193a4fc",
+  "manifest_sha256": "276f0d3227c3b15183d03c66ef7c01a52701aaf79b9cbf950558d4bb38bc152b"
+}

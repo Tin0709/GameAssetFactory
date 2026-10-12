@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "source_sha256": "f7244760901f5055e39fa5e3d9c9203506598c6c4492ce553536b8c26b9d0eeb",
+  "action_sha256": "4983a96d54648229d71fd7aff87ec9090498d6bb72bc1568f02d63cf8a209342",
+  "pending": true,
+  "cadence_ratio": 1.1,
+  "arm_excursion_ratio": {
+    "L": 1.199999903676413,
+    "R": 1.1999998617687653
+  },
+  "non_arm_maximum_matrix_difference": 5.960464477539062e-07,
+  "previous_run_v2_source_action_reviews_and_entry_unchanged": true,
+  "all_thirteen_previous_entries_actions_and_sources_unchanged": true,
+  "protected_original_files": 7582,
+  "changed_protected_files": [],
+  "godot_files_unchanged": 1710,
+  "run_v2_files_unchanged": 185,
+  "rig_appearance_materials_and_assets_unchanged": true,
+  "support_drift_m": 2.535471531323198e-06,
+  "support_height_error_m": 7.708305120468159e-06,
+  "loop_pose_error_m": 0.0,
+  "loop_tangent_difference": 3.0038653739128396e-06,
+  "showcase_saved_reopened_switched_and_played": true,
+  "six_original_speed_videos_decoded": true,
+  "showcase_sha256": "c3dff4ed287c4def0e58092ecbb59a3526c39ebc32068165fa8fe908f193a4fc",
+  "manifest_sha256": "276f0d3227c3b15183d03c66ef7c01a52701aaf79b9cbf950558d4bb38bc152b",
+  "gameplay_status": "Blender-only Pending review. No Godot, export or runtime readiness claim."
+}

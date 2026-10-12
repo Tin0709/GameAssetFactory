@@ -1,0 +1,28 @@
+{
+  "source_sha256": "78d572941a2bdca68479c60ecf3e9c3529d87822ad2fee7c6b1089beb527fea6",
+  "action_sha256": "26f632d2dce3d15b5eca4f87d189048f24d23a3de547a3618e18d2705f97d28b",
+  "original_preview_sha256": "dea4ef46dcc1471de33fee3c41af81c2e2a0f96f8ca7a747e27aebca0e40d716",
+  "preview_height_m": 0.7190123200416565,
+  "fps": 30,
+  "frames": {
+    "frames/three_quarter/033.png": "90c4a63a0996029ef494e82eed33c0f52f02f006480a342d33e8643299cdd0d6",
+    "frames/three_quarter/051.png": "0e075326178a2e2dba2a648afbb3fe2b475be7b6f3c0e7e8f324a4ca45ffb768",
+    "frames/front/033.png": "7cd48363dfd16b6e3aa03b024d961c0593bef5afb42bd575425d199f2ef63612",
+    "frames/front/051.png": "a90c1748b74da2606fa1511833aed826a8cceed78114a2f3a996ce5c6f84cc52",
+    "frames/side/033.png": "00a04b79b6450f0e8a3a16daaf2330a423c8a64ecd6aa9df218c726481c510f8",
+    "frames/side/051.png": "8b560bd936607b103bc8b4c4f551bf981ed4f9e5dcfdc07c4d5c0ccbb559fc84"
+  },
+  "rendered_frames": [
+    "frames/three_quarter/033.png",
+    "frames/three_quarter/051.png",
+    "frames/front/033.png",
+    "frames/front/051.png",
+    "frames/side/033.png",
+    "frames/side/051.png"
+  ],
+  "reused_unchanged_frames": [],
+  "matching_camera_pixel_checks": {},
+  "temporary_elevation_only": true,
+  "camera_ortho_scale": 3.15,
+  "camera_note": "All frames freshly rendered, consistent extra headroom for raised hands; original cameras/files unchanged."
+}

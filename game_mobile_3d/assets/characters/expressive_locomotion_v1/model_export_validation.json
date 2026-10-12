@@ -1,0 +1,9 @@
+{
+  "base_sha256": "d5e9e136e17eb8d6795bcb915987e27ef6fe4971894611e25efb9962a1b9804e",
+  "output_sha256": "d5e9e136e17eb8d6795bcb915987e27ef6fe4971894611e25efb9962a1b9804e",
+  "corrected_uv_vertices": 0,
+  "max_old_to_approved_uv_difference": 0,
+  "only_uv_accessor_changed": true,
+  "geometry_skin_rig_texture_old_animations_unchanged": true,
+  "source": "blender/animation/reviews/player_animation_library_v1/run_expressive_v3_test/run_expressive_v3_review.blend"
+}

@@ -1,0 +1,12 @@
+{
+  "frames": 547,
+  "fps": 30.0,
+  "duration_seconds": 18.233333333333334,
+  "resolution": [
+    1280,
+    720
+  ],
+  "source_avi_sha256": "99409e3f64652b5dd243baaa4e7b97f1973c4c14d97469f57f45efbf3af14580",
+  "renderer": "Godot 4.7.2 Mobile / D3D12",
+  "timing": "Original action timing, time_scale 1, physics 60Hz, rendered 30FPS offline. Not a phone performance measurement."
+}

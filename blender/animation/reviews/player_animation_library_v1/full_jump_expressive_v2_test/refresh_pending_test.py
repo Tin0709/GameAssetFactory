@@ -1,0 +1,9 @@
+"""Refresh only the explicitly user-steered Pending working study; archive exists."""
+import bpy,json,sys,hashlib,subprocess
+from pathlib import Path
+O=Path(__file__).resolve().parent;R=O.parents[4];T=R/'.validation/full_jump_expressive_v2_test';S=R/'blender/animation/showcase';sys.path.insert(0,str(S));import gaf_animation_library as ui
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();guard=json.loads((T/'steering_guard.json').read_text());v=json.loads((O/'validation.json').read_text());assert v['passed'] and sha(Path(bpy.data.filepath))==v['source_sha256']
+assert sha(S/'Animation_Showcase.blend')==guard['showcase_sha256'] and sha(S/'animation_manifest.json')==guard['manifest_sha256'],'Concurrent library edit'
+p=S/'animation_manifest.json';data=json.loads(p.read_text());e=data['animations'][-1];assert e['action']=='Full_Jump_Expressive_v2_Test' and e['status']=='pending' and e['action_sha256']==guard['action_sha256']
+e.update({'source_sha256':v['source_sha256'],'action_sha256':v['action_sha256'],'presentation_note':'User-steered pending refinement: hands slightly above head,8deg added airborne opening per leg,28mm deeper soft landing compression with stronger torso/arm reaction. Same93frames/30FPS, receiving contactsF46/F47 and original rebound/recovery fromF65. Original Full Jump and earlier previews preserved; arm-only working checkpoint archived. Temporary0.72m elevation and review camera headroom are never baked into rig Action.'})
+temp=p.with_suffix('.json.tmp');temp.write_text(json.dumps(data,indent=2));temp.replace(p);(T/'pending_refresh_guard.json').write_text(json.dumps({'showcase_before':guard['showcase_sha256'],'manifest_after':sha(p),'source_sha256':v['source_sha256'],'action_sha256':v['action_sha256']},indent=2));(T/'working_tree_before_pending_refresh.txt').write_text(subprocess.check_output(['git','status','--porcelain=v1'],cwd=R,text=True),encoding='utf8');print('UPDATED ONLY PENDING STUDY METADATA')

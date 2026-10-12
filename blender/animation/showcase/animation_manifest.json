@@ -560,8 +560,8 @@
       "end": 20,
       "fps": 30,
       "fps_base": 1.0,
-      "status": "pending",
-      "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+      "status": "approved",
+      "approval_note": "Explicit user approval2026-10-12; preferred run baseline. Preserve original Run and v2 for comparison. Blender artistic approval; actual Godot transition/mobile validation outstanding.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
@@ -602,7 +602,48 @@
       ],
       "review_video": "blender/animation/reviews/player_animation_library_v1/run_expressive_v3_test/run_v3_three_views_1x.mp4",
       "presentation_note": "Separate comparison refinement: cadence +10%, straight-arm pitch excursion +20% against saved Run v2. Same normalized hip/torso/head/leg poses, 0.27m tracks, saved L3/R5deg toe-out and controlled26mm lateral hip range. F1\u201320 at30FPS; closing21 excluded. Controller owns forward travel at nominal2.31m/s; preview travel is temporary only.",
-      "gameplay_validation": "Pending artistic review. Shared rig, LEFT phase0 / RIGHT phase0.5. Actual Godot transitions, speed-aware contact blending, input interruption, weapon layers and measured mobile30FPS remain outstanding."
+      "gameplay_validation": "Pending artistic review. Shared rig, LEFT phase0 / RIGHT phase0.5. Actual Godot transitions, speed-aware contact blending, input interruption, weapon layers and measured mobile30FPS remain outstanding.",
+      "preferred_run_baseline": true
+    },
+    {
+      "action": "Full_Jump_Expressive_v2_Test",
+      "source": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_v2_test/full_jump_expressive_v2_review.blend",
+      "source_sha256": "78d572941a2bdca68479c60ecf3e9c3529d87822ad2fee7c6b1089beb527fea6",
+      "source_rig": "FJ2_Test_Rig",
+      "source_mesh": "FJ2_Test_Mesh",
+      "source_armature": "FJ2_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "26f632d2dce3d15b5eca4f87d189048f24d23a3de547a3618e18d2705f97d28b",
+      "action_frame_range": [
+        1.0,
+        93.0
+      ],
+      "start": 1,
+      "end": 93,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "in_place": true,
+      "review_video": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_v2_test/full_jump_v2_three_views_1x.mp4",
+      "presentation_note": "User-steered pending refinement: hands slightly above head,8deg added airborne opening per leg,28mm deeper soft landing compression with stronger torso/arm reaction. Same93frames/30FPS, receiving contactsF46/F47 and original rebound/recovery fromF65. Original Full Jump and earlier previews preserved; arm-only working checkpoint archived. Temporary0.72m elevation and review camera headroom are never baked into rig Action.",
+      "gameplay_validation": "Pending artistic review. No Godot changes/export; actual physics/controller/transition/mobile validation still outstanding."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

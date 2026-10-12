@@ -1,0 +1,27 @@
+{
+  "source_sha256": "78d572941a2bdca68479c60ecf3e9c3529d87822ad2fee7c6b1089beb527fea6",
+  "action_sha256": "26f632d2dce3d15b5eca4f87d189048f24d23a3de547a3618e18d2705f97d28b",
+  "fps": 30,
+  "videos": {
+    "front": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\full_jump_expressive_v2_test\\encode\\front",
+      "frames": 93
+    },
+    "three_quarter": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\full_jump_expressive_v2_test\\encode\\three_quarter",
+      "frames": 93
+    },
+    "side": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\full_jump_expressive_v2_test\\encode\\side",
+      "frames": 93
+    },
+    "three_views": {
+      "folder": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\full_jump_expressive_v2_test\\encode\\three_views",
+      "frames": 93
+    }
+  },
+  "original_speed": true,
+  "all_new_frames_rendered": true,
+  "preview_height_m": 0.7190123200416565,
+  "camera_ortho_scale": 3.15
+}
