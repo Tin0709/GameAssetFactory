@@ -1,0 +1,9 @@
+{
+  "Rifle_Ready_V2_v3_Test": {
+    "loop_velocity_difference_m_s": 0.0002691506127743191,
+    "near_seam_angular_speed_rad_s": 0,
+    "max_world_scale_error": 7.152557373046875e-07,
+    "max_leg_matrix_drift": 1.1920928955078125e-07,
+    "max_one_frame_local_rotation_rad": 0
+  }
+}

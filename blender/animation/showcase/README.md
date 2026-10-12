@@ -202,3 +202,10 @@ The SAME showcase now contains 18 independent Actions. Select `Rifle_Ready_V2_Te
 If an already-open Blender window still lists only 15 Actions, save any personal unsaved edits separately, then reopen this exact `Animation_Showcase.blend`; an open window does not reload changes saved by another process. The updated installed Animation Library addon loads automatically on a fresh Blender launch. No embedded script execution is required.
 
 [Review, renders and fit limitations](../reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/README.md). The separate Weapon Showcase still contains the preferred rifle model. These entries do not authorize Godot integration.
+
+
+### Ready-only reference refinement — Pending
+
+The SAME showcase now has20 independent Actions. Select `Rifle_Ready_V2_v3_Test` for the latest higher diagonal hold with controlled tucked elbows and reduced elbow end-cap exposure. `Rifle_Ready_V2_v2_Test` preserves the straight-arm comparison; original Ready, Aim and Back Holster remain unchanged. All new Ready comparisons remain Pending. Reopen this exact file in a fresh Blender window if an older open list does not show them.
+
+[Latest Ready review and matching three-view comparison](../reviews/player_animation_library_v1/rifle_ready_v3_test/README.md). F1–120 at30FPS, loop closing121 excluded. No Godot integration is authorized.
