@@ -20,6 +20,13 @@ base=bpy.data.objects['Shotgun_V2_Base'];pump=bpy.data.objects['Shotgun_V2_Pump'
 points=[o.matrix_world@v.co for o in meshes for v in o.data.vertices]
 length=max(p.y for p in points)-min(p.y for p in points);assert .85<=length<=1.0,length
 assert max(p.x for p in points)-min(p.x for p in points)<.08
+def region(name):
+ group=base.vertex_groups[name].index
+ return [v.co for v in base.data.vertices if any(w.group==group and w.weight>.5 for w in v.groups)]
+barrel_bottom=min(v.z for v in region('HollowLongBarrel'))
+tube_gap=barrel_bottom-max(v.z for v in region('MagazineTube'))
+pump_gap=barrel_bottom-max((pump.matrix_local@v.co).z for v in pump.data.vertices)
+assert 0<tube_gap<.003 and 0<pump_gap<.0015,('Barrel/lower assembly gap is too wide',tube_gap,pump_gap)
 guide=bpy.data.objects['LeftHandGuide'].location;pp=[pump.matrix_local@v.co for v in pump.data.vertices]
 assert min(p.y for p in pp)<guide.y<max(p.y for p in pp) and min(p.z for p in pp)<guide.z<max(p.z for p in pp)
 bpy.context.view_layer.update();saved=base.matrix_local.copy();pos=pump.location.copy();pump.location.y-=.055;bpy.context.view_layer.update()

@@ -1,6 +1,7 @@
 """Persistent, scene-local Animation Library controls for GameAssetFactory."""
 bl_info={'name':'GameAssetFactory Animation Library','author':'GameAssetFactory','version':(1,0,0),'blender':(5,2,0),'location':'3D View > N > Animation Library','description':'Select and review independent character Actions','category':'Animation'}
 import bpy,json,hashlib,re,math
+from mathutils import Matrix
 from pathlib import Path
 from bpy.app.handlers import persistent
 from bpy.props import StringProperty,IntProperty,BoolProperty,CollectionProperty
@@ -134,19 +135,21 @@ def refresh(scene,import_missing=True):
                 collection,name,bone=PREVIEW_PROPS[key]
                 if collection not in bpy.data.collections:
                     # Import only the prop assembly, never another character or rig.
-                    with bpy.data.libraries.load(str(source),link=False) as (src,dst):
-                        if collection not in src.collections:raise ValueError('Preview prop collection missing from source')
-                        dst.collections=[collection]
-                    c=dst.collections[0];new_props.append(c)
+                    prop_source=(root()/e['preview_prop_source']).resolve()
+                    if not prop_source.is_relative_to(root()) or hashlib.sha256(prop_source.read_bytes()).hexdigest()!=e['preview_prop_source_sha256']:raise ValueError('Preview prop source missing or changed')
+                    with bpy.data.libraries.load(str(prop_source),link=False) as (src,dst):
+                        if 'WEAPON_EXPORT' not in src.collections:raise ValueError('Preview prop collection missing from source')
+                        dst.collections=['WEAPON_EXPORT']
+                    c=dst.collections[0];c.name=collection;new_props.append(c)
                     scene.collection.children.link(c)
-                    o=bpy.data.objects[name]
+                    o=next(x for x in c.all_objects if x.name=='Rifle_Stylized_V2');o.name=name
                     if any(x.type=='ARMATURE' for x in c.all_objects):raise ValueError('Preview prop must not contain a rig')
-                    # Library loading can pull the source parent as a dependency. Rebind to the existing rig.
-                    imported_parent=o.parent;inverse=o.matrix_parent_inverse.copy();basis=o.matrix_basis.copy()
-                    o.parent=rig;o.parent_type='BONE';o.parent_bone=bone;o.matrix_parent_inverse=inverse;o.matrix_basis=basis
-                    if imported_parent and imported_parent!=rig and imported_parent.users==0:
-                        armature=imported_parent.data;bpy.data.objects.remove(imported_parent)
-                        if armature.users==0:bpy.data.armatures.remove(armature)
+                    o.parent=rig;o.parent_type='BONE';o.parent_bone=bone
+                    o.matrix_parent_inverse=Matrix.Translation((0,-rig.data.bones[bone].length,0));o.matrix_basis=Matrix.Identity(4)
+                    c['gaf_preview_prop']=key
+                    for child in c.all_objects:
+                        child.hide_render=child.type!='MESH'
+                        if child.type=='EMPTY':child.empty_display_size=.025
                 validate_preview_prop(e,rig)
     except Exception:
         for action in new_actions:bpy.data.actions.remove(action)
