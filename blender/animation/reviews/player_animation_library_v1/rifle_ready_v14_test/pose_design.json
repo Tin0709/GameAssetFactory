@@ -1,0 +1,5 @@
+{
+  "forward_slide_along_right_arm_m": 0.025,
+  "remaining_wristward_grip_offset_m": 0.005,
+  "character_pose": "All character curves copied unchanged from v13; only WeaponCarrier authored"
+}
