@@ -34,6 +34,7 @@ func _button(label: String) -> void:
 	if label in ["Front","3/4","Side"]:gameplay_camera=false
 	if jump_enabled and label=="Compare pace":
 		actor.review_pace=1.0 if actor.review_pace>=2.25 else (1.5 if actor.review_pace<1.5 else 2.25)
+		actor.visual.pose_dirty=true;actor.visual.run_release_active=[false,false]
 		return
 	super._button(label)
 
@@ -56,8 +57,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		actor.visual.turn_twist_guard_enabled=not actor.visual.turn_twist_guard_enabled
 	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_O:
 		actor.visual.run_release_enabled=not actor.visual.run_release_enabled
+		actor.visual.pose_dirty=true;actor.visual.run_release_active=[false,false]
 	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_N:
 		actor.visual.run_orbit_enabled=not actor.visual.run_orbit_enabled
+		actor.visual.pose_dirty=true;actor.visual.run_release_active=[false,false]
 
 func _update_camera(delta: float) -> void:
 	if not gameplay_camera:

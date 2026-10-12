@@ -13,11 +13,15 @@ func run() -> void:
 		actor.requested_direction=Vector2.ZERO;scene.reset_actor();await scene.tick(60)
 		actor.review_pace=pace;actor.requested_run=true;actor.requested_direction=Vector2(0,1);await scene.tick(60)
 		var feet: Array=v.last_sole.duplicate();var support: Array=v.foot_support.duplicate()
-		var events: Array=[];var worst:=0.0;var release_age: Array[float]=[1.0,1.0]
+		var events: Array=[];var worst:=0.0;var release_age: Array[float]=[1.0,1.0];var maximum_joint_offset:=0.0
 		var previous_velocity: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO];var peak_velocity_jump:=0.0;var peak_acceleration:=0.0
 		for sample in 180:
 			await scene.tick(1)
 			for side in 2:
+				var bone: int=[v.leg_left,v.leg_right][side]
+				var parent: int=v.skeleton.get_bone_parent(bone)
+				var basis: Basis=v.skeleton.global_basis*v.skeleton.get_bone_global_pose(parent).basis
+				maximum_joint_offset=maxf(maximum_joint_offset,(basis*(v.skeleton.get_bone_pose_position(bone)-v._p[bone])).length())
 				var speed: float=v.last_sole[side].distance_to(feet[side])/v.pose_delta
 				var velocity: Vector3=(v.last_sole[side]-feet[side])/v.pose_delta
 				if support[side] and not v.foot_support[side]:
@@ -28,10 +32,11 @@ func run() -> void:
 					peak_acceleration=maxf(peak_acceleration,(velocity-previous_velocity[side]).length()/v.pose_delta)
 				release_age[side]+=v.pose_delta;previous_velocity[side]=velocity
 				feet[side]=v.last_sole[side];support[side]=v.foot_support[side]
-		cases.append({"pace":pace,"worst_release_speed":worst,"peak_release_velocity_jump":peak_velocity_jump,"peak_release_acceleration":peak_acceleration,"events":events})
+		cases.append({"pace":pace,"worst_release_speed":worst,"peak_release_velocity_jump":peak_velocity_jump,"peak_release_acceleration":peak_acceleration,"maximum_combined_joint_offset":maximum_joint_offset,"events":events})
 		check(not events.is_empty(),"Straight Run reaches support-to-swing events")
 		check(worst<4.5,"Run lifts from support smoothly rather than dropping contact translation instantly")
 		check(peak_acceleration<300,"Foot velocity ramps through the release instead of moving its discontinuity a few frames later")
+		check(maximum_joint_offset<.1401,"Carried swing and floor corrections share the same140mm joint budget")
 	var out:="res://.validation/expressive_turn_spin_v1";DirAccess.make_dir_recursive_absolute(out)
 	FileAccess.open(out+"/run_release.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"cases":cases},"\t"))
 	print("RUN_RELEASE_CHECKS ",checks.size()," failures ",failures.size());quit(0 if failures.is_empty() else 1)

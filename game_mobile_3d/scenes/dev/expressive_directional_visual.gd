@@ -294,13 +294,14 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	swing_world_q[side]=_limit_leg_twist((support_aim[side]*reference).normalized(),reference)
 	support_aim[side]=(swing_world_q[side]*reference.inverse()).normalized()
 	swing_active[side]=true
-	if run_release_enabled and review_pace>1.5 and gait_run_weight>.25 and move_requested:
+	var may_capture:=run_release_enabled and review_pace>1.5 and gait_run_weight>.25
+	if move_requested and (may_capture or run_release_active[side]):
 		# Contact translations used to disappear at liftoff even though rotation
 		# released smoothly. Carry the outgoing foot position/velocity through a
 		# short cubic release, while leaving the gait and capsule clocks untouched.
 		_set_world_leg_rotation(bone,swing_world_q[side])
 		var raw:=_sole_world(bone)
-		if foot_support[side]:
+		if foot_support[side] and may_capture:
 			run_release_active[side]=true;run_release_age[side]=0
 			run_release_duration[side]=clampf(.45*(1-stance_duty[side])/maxf(gait_frequency,.01),.06,.14)
 			run_release_offset[side]=(last_sole[side]-raw).limit_length(.14)

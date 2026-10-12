@@ -291,14 +291,16 @@ func _evaluate(delta: float) -> void:
 			target.y=maxf(sole.y,0.0)
 		foot_support[side]=support
 		var correction:=target-sole
-		maximum_correction=maxf(maximum_correction,correction.length())
-		# Rigid leg translations only. Large pivot/micro-tap corrections release
-		# safely instead of pulling the hip joint apart; exposed in test metrics.
-		if correction.length()>.14:
-			correction=_limit_contact_correction(correction);correction_clamps+=1
-			foot_anchors[side]=sole+correction
 		var parent:=skeleton.get_bone_parent(bone)
 		var parent_basis:=skeleton.global_basis*skeleton.get_bone_global_pose(parent).basis
+		var carried:=parent_basis*(skeleton.get_bone_pose_position(bone)-_p[bone])
+		var combined:=carried+correction
+		maximum_correction=maxf(maximum_correction,combined.length())
+		# Rigid leg translations only. Large pivot/micro-tap corrections release
+		# safely instead of pulling the hip joint apart; exposed in test metrics.
+		if combined.length()>.14:
+			correction=_limit_contact_correction(combined)-carried;correction_clamps+=1
+			foot_anchors[side]=sole+correction
 		skeleton.set_bone_pose_position(bone,skeleton.get_bone_pose_position(bone)+parent_basis.inverse()*correction)
 		skeleton.force_update_all_bone_transforms()
 		var corrected:=_sole_world(bone)
