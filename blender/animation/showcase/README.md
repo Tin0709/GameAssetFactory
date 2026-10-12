@@ -239,3 +239,8 @@ Select **Rifle_Ready_V2_v10_Test**: actual modeled grip seated in the right bloc
 ### Rifle Ready diagonal reference pose — Pending
 
 Select **Rifle_Ready_V2_v11_Test**: corrected right-hand grip and straight arm/barrel carried diagonally across the torso, with straight left-hand support. All28 independent entries remain selectable; F1–120/30FPS, closing121 excluded. [Latest reference-pose review and comparison](../reviews/player_animation_library_v1/rifle_ready_v11_test/README.md). Reopen this exact file if the list is stale. No Aim/Back Holster refinement or Godot integration.
+
+
+### Rifle Ready lower muzzle / hovering hand — Pending
+
+Select **Rifle_Ready_V2_v12_Test**: straight right arm/rifle8deg farther down, left hand deliberately close without touching. All29 independent entries remain selectable; F1–120/30FPS, closing121 excluded. [Latest review, clearance evidence and comparison](../reviews/player_animation_library_v1/rifle_ready_v12_test/README.md). No Aim/Back Holster refinement or Godot integration.

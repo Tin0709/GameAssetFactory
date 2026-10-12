@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "frames_checked": 121,
+  "extra_front_view_downward_angle_degrees": 7.999990968358546,
+  "left_forearm_rifle_triangle_overlaps": 0,
+  "minimum_vertex_to_surface_gap_m": 0.015672966837882996,
+  "maximum_vertex_to_surface_gap_m": 0.015673158690333366,
+  "measurement_note": "Bidirectional mesh vertex-to-surface samples; no triangle intersections. Surface gap samples are not a full edge-edge distance solve."
+}
