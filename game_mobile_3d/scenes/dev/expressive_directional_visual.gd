@@ -8,6 +8,14 @@ var fall_wave_enabled:=true
 var fall_wave_weight:=0.0
 var swing_active: Array[bool]=[false,false]
 var swing_world_q: Array[Quaternion]=[Quaternion.IDENTITY,Quaternion.IDENTITY]
+var run_stride_scale:=1.2
+
+func _stride_distance() -> float:
+	return lerpf(WALK_STRIDE,RUN_STRIDE*run_stride_scale,gait_run_weight)
+
+func jump_transition(value: String) -> void:
+	swing_active=[false,false]
+	super.jump_transition(value)
 
 func advance_jump(state: String, age: float, vy: float, launch: float, to_floor: float, delta: float) -> void:
 	super.advance_jump(state,age,vy,launch,to_floor,delta)
@@ -15,7 +23,10 @@ func advance_jump(state: String, age: float, vy: float, launch: float, to_floor:
 	fall_wave_weight=_smooth5(falling_time/.20)*_smooth5((to_floor-.05)/.14) if state=="AIR" and vy<0 else 0.0
 
 func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) -> void:
+	var was_moving:=move_requested
 	super.drive_locomotion(world_velocity,requested,delta)
+	if not directional_enabled or not move_requested or settling or not was_moving:
+		swing_active=[false,false]
 	var planar:=Vector2(world_velocity.x,world_velocity.z)
 	var desired_bias:=0.0
 	if planar.length()>.1:desired_bias=clampf(wrapf(atan2(planar.x,planar.y)-rotation.y,-PI,PI),-.9,.9)
@@ -34,10 +45,16 @@ func _ground_turn_weight() -> float:
 func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	var result:=super._target_pose(bone,ahead)
 	var name:=skeleton.get_bone_name(bone)
+	if move_requested and bone in [leg_left,leg_right] and jump_state in ["GROUND","LAND"]:
+		var weight:=1.0 if jump_state=="GROUND" else _smooth5((jump_age-.08)/.24)
+		var rest:=skeleton.get_bone_rest(bone).basis
+		var pitch: float=(result.basis*rest.inverse()).get_euler().x
+		result.basis=Basis(Vector3.RIGHT,pitch*(run_stride_scale-1)*gait_run_weight*weight)*result.basis
 	if fall_wave_enabled and fall_wave_weight>0 and bone in [leg_left,leg_right]:
 		# Opposing whole-block flutter; no knee/ankle or airborne root bounce.
 		var phase: float=(jump_age+ahead)*TAU*1.7+(0.0 if bone==leg_left else PI)
-		result.basis=Basis(Vector3.RIGHT,deg_to_rad(8)*sin(phase)*fall_wave_weight)*result.basis
+		var opening:=deg_to_rad(5)*(1 if bone==leg_left else -1)
+		result.basis=Basis.from_euler(Vector3(deg_to_rad(8)*sin(phase),0,opening)*fall_wave_weight)*result.basis
 	if fall_wave_enabled and fall_wave_weight>0 and name in ["Arm.L","Arm.R","ForeArm.L","ForeArm.R"]:
 		# Reuse the approved above-head airborne articulation. Small staggered
 		# shoulder arcs retain height and straight solid arms, rather than elbow flaps.
@@ -65,6 +82,7 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Quaternion, delta: float) -> Quaternion:
 	var weight:=_ground_turn_weight()
 	if weight<=0 or not move_requested:
+		swing_active[side]=false
 		return super._contact_leg_rotation(side,bone,target,original_q,delta)
 	var landing_q:=original_q
 	if weight<1:landing_q=super._contact_leg_rotation(side,bone,target,original_q,delta)

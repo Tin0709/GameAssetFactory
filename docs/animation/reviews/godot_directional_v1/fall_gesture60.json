@@ -709,7 +709,15 @@
 			"passed": true
 		},
 		{
+			"check": "Both descending legs open outward as solid blocks",
+			"passed": true
+		},
+		{
 			"check": "Falling leg gesture preserves rigid limb position and scale",
+			"passed": true
+		},
+		{
+			"check": "Both descending legs open outward as solid blocks",
 			"passed": true
 		},
 		{

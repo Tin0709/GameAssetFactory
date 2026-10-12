@@ -202,9 +202,9 @@
 	"stationary_extra_drop_m": 0.0199981927871704,
 	"versions": [
 		{
-			"max_joint_step": 33.4819185755773,
+			"max_joint_step": 33.4779194998182,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.0000000000000000832667268468867,
+			"phase_error": 0.0000000000000000624500451351651,
 			"running": {
 				"case": "Running",
 				"flight_seconds": 0.716666666666664,
@@ -224,9 +224,9 @@
 			}
 		},
 		{
-			"max_joint_step": 33.4819185755773,
+			"max_joint_step": 33.4779194998182,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.0000000000000000832667268468867,
+			"phase_error": 0.0000000000000000624500451351651,
 			"running": {
 				"case": "Running",
 				"flight_seconds": 0.716666666666664,

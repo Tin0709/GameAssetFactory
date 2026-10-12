@@ -52,6 +52,8 @@ func run() -> void:
 		v.fall_wave_enabled=true;var pose: Transform3D=v._target_pose(bone)
 		leg_changes.append(old.basis.get_rotation_quaternion().angle_to(pose.basis.get_rotation_quaternion()))
 		check(old.origin.is_equal_approx(pose.origin) and pose.basis.get_scale().is_equal_approx(Vector3.ONE),"Falling leg gesture preserves rigid limb position and scale")
+		var opening: float=(pose.basis*old.basis.inverse()).get_euler().z*(1 if bone==v.leg_left else -1)
+		check(opening>deg_to_rad(4),"Both descending legs open outward as solid blocks")
 	check(leg_changes[0]>deg_to_rad(3) and leg_changes[1]>deg_to_rad(3),"Both falling legs have a readable whole-leg flutter")
 	v.advance_jump("AIR",1,-8,6.5,.04,1.0/60)
 	check(v.fall_wave_weight<.001,"Wave releases before contact for the existing heavy landing")

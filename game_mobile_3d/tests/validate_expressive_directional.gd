@@ -69,6 +69,13 @@ func run() -> void:
 					check(float(record.support_frames)/record.frames>(.65 if sprint else .80),"Turn retains authored support rather than hiding slip in flight")
 		actor.requested_direction=Vector2.ZERO;await scene.tick(55)
 		check(not v.move_requested and not v.settling,"Directional stop returns to planted Idle")
+		check(not v.swing_active[0] and not v.swing_active[1],"Idle invalidates all earlier swing orientations")
+		for idle_ticks in [8,60]:
+			actor.requested_direction=Vector2(1,0);actor.requested_run=true;await scene.tick(35)
+			actor.requested_direction=Vector2(-1,0);await scene.tick(10)
+			actor.requested_direction=Vector2.ZERO;await scene.tick(idle_ticks)
+			actor.requested_direction=Vector2(0,1);await scene.tick(25)
+			check(actor.current_speed>3.4 and v.move_requested,"Turn-stop-idle and interrupted-replant restarts remain responsive")
 		var jumps: Array=[]
 		for sprint in [false,true]:
 			for degrees in [45,90,180]:

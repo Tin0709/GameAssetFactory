@@ -10,6 +10,7 @@ func _ready() -> void:
 	if jump_enabled and "--expressive-pace-1_5" in OS.get_cmdline_user_args():actor.review_pace=1.5;actor.visual.review_pace=1.5
 	if jump_enabled and "--expressive-direction-original" in OS.get_cmdline_user_args():actor.visual.directional_enabled=false
 	if jump_enabled and "--expressive-fall-original" in OS.get_cmdline_user_args():actor.visual.fall_wave_enabled=false
+	if jump_enabled and "--expressive-stride-original" in OS.get_cmdline_user_args():actor.visual.run_stride_scale=1.0
 
 func _button(label: String) -> void:
 	if jump_enabled and label=="Compare pace":
@@ -23,10 +24,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		actor.visual.directional_enabled=not actor.visual.directional_enabled;actor.visual.pose_dirty=true
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_F:
 		actor.visual.fall_wave_enabled=not actor.visual.fall_wave_enabled;actor.visual.pose_dirty=true
+	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_G:
+		actor.visual.run_stride_scale=1.0 if actor.visual.run_stride_scale>1.0 else 1.2;actor.visual.pose_dirty=true
 
 func _process(delta: float) -> void:
 	super._process(delta)
-	if jump_enabled:status.text+="\nTurns: %s · V compares\nFalling arms: %s · F compares"%["Refined" if actor.visual.directional_enabled else "Original","Raised wave" if actor.visual.fall_wave_enabled else "Original"]
+	if jump_enabled:status.text+="\nTurns: %s · V compares\nFalling limbs: %s · F compares\nRun stride: %s · G compares"%["Refined" if actor.visual.directional_enabled else "Original","Raised wave" if actor.visual.fall_wave_enabled else "Original","Longer" if actor.visual.run_stride_scale>1.0 else "Original"]
 
 func run_demo() -> void:
 	if not jump_enabled:super.run_demo();return
@@ -51,6 +54,10 @@ func run_demo() -> void:
 	actor.request_jump();await tick(20,"Reversal jump · launch")
 	actor.requested_direction=Vector2(0,1);await tick(95,"180 degree airborne reversal · live landing gait")
 	actor.requested_direction=Vector2.ZERO;await tick(55,"Recover to normal Idle")
+	camera_offset=Vector3(6,1.5,0);actor.requested_direction=Vector2(0,1);actor.requested_run=true
+	await tick(90,"Side · longer reaching Run stride · close leg tracks")
+	camera_offset=Vector3(4,3.1,5);await tick(90,"Three-quarter · expressive Run at requested pace")
+	actor.requested_direction=Vector2.ZERO;await tick(30,"Controlled stop before falling review")
 	for view in [["Front",Vector3(0,1.5,6)],["Three-quarter",Vector3(4,3.1,5)],["Side",Vector3(6,1.5,0)]]:
 		camera_offset=view[1];actor.requested_run=false;actor.review_drop(6)
 		await tick(120,"%s · falling hands above head · staggered waves"%view[0])

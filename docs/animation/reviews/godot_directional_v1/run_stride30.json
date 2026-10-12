@@ -1,0 +1,181 @@
+{
+	"checks": [
+		{
+			"check": "Run exposes an independent longer-stride comparison",
+			"passed": true
+		},
+		{
+			"check": "Latest pace is2.25x original; Idle unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Run whole-leg sagittal articulation increases20percent",
+			"passed": true
+		},
+		{
+			"check": "Longer stride does not widen leg tracks or translate the limb",
+			"passed": true
+		},
+		{
+			"check": "Run whole-leg sagittal articulation increases20percent",
+			"passed": true
+		},
+		{
+			"check": "Longer stride does not widen leg tracks or translate the limb",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Run whole-leg sagittal articulation increases20percent",
+			"passed": true
+		},
+		{
+			"check": "Longer stride does not widen leg tracks or translate the limb",
+			"passed": true
+		},
+		{
+			"check": "Run whole-leg sagittal articulation increases20percent",
+			"passed": true
+		},
+		{
+			"check": "Longer stride does not widen leg tracks or translate the limb",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Run whole-leg sagittal articulation increases20percent",
+			"passed": true
+		},
+		{
+			"check": "Longer stride does not widen leg tracks or translate the limb",
+			"passed": true
+		},
+		{
+			"check": "Run whole-leg sagittal articulation increases20percent",
+			"passed": true
+		},
+		{
+			"check": "Longer stride does not widen leg tracks or translate the limb",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Run whole-leg sagittal articulation increases20percent",
+			"passed": true
+		},
+		{
+			"check": "Longer stride does not widen leg tracks or translate the limb",
+			"passed": true
+		},
+		{
+			"check": "Run whole-leg sagittal articulation increases20percent",
+			"passed": true
+		},
+		{
+			"check": "Longer stride does not widen leg tracks or translate the limb",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Longer Run leaves Walk and body pose targets unchanged",
+			"passed": true
+		},
+		{
+			"check": "Distance cadence uses1.848m Run stride instead of merely speeding steps",
+			"passed": true
+		},
+		{
+			"check": "Walk stride stays1.08m",
+			"passed": true
+		}
+	],
+	"failures": []
+}

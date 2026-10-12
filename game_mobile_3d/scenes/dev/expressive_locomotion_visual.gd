@@ -113,7 +113,7 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 		for i in 2:
 			replant_from[i]=last_sole[i];replant_q[i]=_leg_world_rotation([leg_left,leg_right][i])
 	# Distance locking scales cadence below either nominal speed, including decel.
-	gait_frequency=movement_speed/lerpf(WALK_STRIDE,RUN_STRIDE,gait_run_weight)
+	gait_frequency=movement_speed/_stride_distance()
 	if move_requested:
 		var previous_phase:=gait_phase
 		gait_phase=fposmod(gait_phase+delta*gait_frequency,1.0)
@@ -133,6 +133,9 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 		if settle_time>=REPLANT_SECONDS:settling=false;foot_support=[true,true]
 	elif not move_requested:attention_time=fposmod(attention_time+delta,8.0)
 	support_left=_support(0);support_right=_support(1)
+
+func _stride_distance() -> float:
+	return lerpf(WALK_STRIDE,RUN_STRIDE,gait_run_weight)
 
 func _support(side: int) -> bool:
 	if not move_requested:return true
