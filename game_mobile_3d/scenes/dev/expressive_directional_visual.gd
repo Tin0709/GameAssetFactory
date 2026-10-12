@@ -37,6 +37,8 @@ var layer_entry_shown_q: Array[Quaternion]=[]
 var layer_entry_shown_p: Array[Vector3]=[]
 var layer_entry_q: Array[Vector3]=[]
 var layer_entry_p: Array[Vector3]=[]
+var layer_frame_q: Array[Quaternion]=[]
+var layer_entry_tracking:=false
 
 func _advance_facing(target_yaw: float,delta: float) -> void:
 	if not rapid_turn_smoothing_enabled:
@@ -71,9 +73,11 @@ func _limit_leg_twist(q: Quaternion, reference: Quaternion) -> Quaternion:
 
 func _process(delta: float) -> void:
 	if polish_enabled and not layer_was_equipped and weapon_equipped and not _q.is_empty():
-		layer_entry_age=0;layer_entry_pending=true;layer_entry_shown_q.clear();layer_entry_shown_p.clear()
+		layer_entry_age=0;layer_entry_pending=true;layer_entry_tracking=true;layer_entry_shown_q.clear();layer_entry_shown_p.clear()
 		for bone in r13_mask:
 			layer_entry_shown_q.append(skeleton.get_bone_pose_rotation(bone));layer_entry_shown_p.append(skeleton.get_bone_pose_position(bone))
+	layer_frame_q.clear()
+	for bone in r13_mask:layer_frame_q.append(skeleton.get_bone_pose_rotation(bone))
 	if polish_enabled and layer_was_equipped and not weapon_equipped and not _q.is_empty():
 		# Capture the displayed partial/full layer, not its stale unwrapped
 		# target. A shortest relative rotation avoids a long-way exit spin.
@@ -111,12 +115,23 @@ func _apply_weapon_carry() -> void:
 				layer_entry_q.append(_rotvec(layer_entry_shown_q[index]*skeleton.get_bone_pose_rotation(bone).inverse()))
 				layer_entry_p.append(layer_entry_shown_p[index]-skeleton.get_bone_pose_position(bone))
 			layer_entry_pending=false
-		if layer_entry_age<.30 and layer_entry_q.size()==r13_mask.size():
+		if layer_entry_tracking and layer_entry_q.size()==r13_mask.size():
 			var residual:=1-_smooth5(layer_entry_age/.30)
+			var caught_up:=layer_entry_age>=.30
 			for index in r13_mask.size():
 				var bone:=r13_mask[index]
-				skeleton.set_bone_pose_rotation(bone,(_from_rotvec(layer_entry_q[index]*residual)*skeleton.get_bone_pose_rotation(bone)).normalized())
+				var native_q:=skeleton.get_bone_pose_rotation(bone)
+				var desired_q:=(_from_rotvec(layer_entry_q[index]*residual)*native_q).normalized()
+				# Fast native carry motion and entry correction share one angular
+				# travel budget. Follow the live target on the shortest arc; any small
+				# remainder catches up after the entry clock instead of snapping at1.
+				var gap:=layer_frame_q[index].angle_to(desired_q)
+				var limit:=deg_to_rad(1500)*pose_delta
+				if gap>limit:
+					desired_q=layer_frame_q[index].slerp(desired_q,limit/gap).normalized();caught_up=false
+				skeleton.set_bone_pose_rotation(bone,desired_q)
 				skeleton.set_bone_pose_position(bone,skeleton.get_bone_pose_position(bone)+layer_entry_p[index]*residual)
+			layer_entry_tracking=not caught_up
 	else:super._apply_weapon_carry()
 
 func _pose_damping() -> float:
@@ -205,7 +220,7 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 		# At the fast candidate pace, finish push-off before the planted leg
 		# reaches its translation cap. Receiving phases stay0LEFT/.5RIGHT;
 		# Walk and the accepted1.5x Run support schedule remain unchanged.
-		var earlier:=.04*smoothstep(1.5,2.25,review_pace*sqrt(run_speed_scale))
+		var earlier:=.06*smoothstep(1.5,2.25,review_pace*sqrt(run_speed_scale))
 		for side in 2:
 			stance_duty[side]=minf(stance_duty[side],lerpf(.60 if side==0 else .62,(.42 if side==0 else .43)-earlier,gait_run_weight))
 	if not directional_enabled or not move_requested or settling or not was_moving:
@@ -218,7 +233,7 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 	var energy:=clampf(movement_speed/(2.31*review_pace),0,1)
 	var turn:=clampf(turn_rate/(4.5*review_pace),-1,1)
 	var response:=1-exp(-12*delta)
-	turn_lean=lerpf(turn_lean,-turn*deg_to_rad(lerpf(3,6,energy))*clampf(movement_speed/.8,0,1),response)
+	turn_lean=lerpf(turn_lean,-turn*deg_to_rad(lerpf(4,8,energy))*clampf(movement_speed/.8,0,1),response)
 	turn_twist=lerpf(turn_twist,turn*deg_to_rad(2)*clampf(movement_speed/.8,0,1),response)
 
 func _ground_turn_weight() -> float:

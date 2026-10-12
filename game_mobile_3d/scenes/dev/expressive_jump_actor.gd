@@ -45,8 +45,11 @@ func _physics_process(delta: float) -> void:
 	if joy.length()>stick.length():stick=joy
 	fast_sprinting=sprint and stick.length_squared()>.001
 	visual.review_pace=review_pace
-	visual.walk_speed_scale=walk_motion_speed_scale if faster_locomotion_enabled else 1.0
-	visual.run_speed_scale=run_motion_speed_scale if faster_locomotion_enabled else 1.0
+	# T retains the previously accepted1.5x pace exactly. The new additional
+	# multipliers belong to the fast2.25x candidate; Y compares that candidate.
+	var faster_candidate:=faster_locomotion_enabled and review_pace>=2.25
+	visual.walk_speed_scale=walk_motion_speed_scale if faster_candidate else 1.0
+	visual.run_speed_scale=run_motion_speed_scale if faster_candidate else 1.0
 	var desired:=stick.limit_length()*(run_speed if fast_sprinting else walk_speed)*review_pace*analog_strength
 	desired*=visual.run_speed_scale if fast_sprinting else visual.walk_speed_scale
 	if fast_sprinting and jump_state=="AIR" and _prepared_flight:desired*=running_air_speed_scale
