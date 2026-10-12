@@ -209,3 +209,8 @@ If an already-open Blender window still lists only 15 Actions, save any personal
 The SAME showcase now has20 independent Actions. Select `Rifle_Ready_V2_v3_Test` for the latest higher diagonal hold with controlled tucked elbows and reduced elbow end-cap exposure. `Rifle_Ready_V2_v2_Test` preserves the straight-arm comparison; original Ready, Aim and Back Holster remain unchanged. All new Ready comparisons remain Pending. Reopen this exact file in a fresh Blender window if an older open list does not show them.
 
 [Latest Ready review and matching three-view comparison](../reviews/player_animation_library_v1/rifle_ready_v3_test/README.md). F1–120 at30FPS, loop closing121 excluded. No Godot integration is authorized.
+
+
+### Latest Rifle Ready reference sheet — Pending
+
+Select `Rifle_Ready_V2_v4_Test` for both arms straight and the steeper muzzle-down hold. The SAME Showcase now contains21 independent Actions, preserving all earlier Ready versions and unchanged Aim/Back Holster. F1–120/30FPS, closing121 excluded. [Latest three-view Ready comparison and fit notes](../reviews/player_animation_library_v1/rifle_ready_v4_test/README.md). Reopen this exact file if an older window displays a stale list. No Godot integration.
