@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/piston_v004/walk_snappy_review.blend",
-      "source_sha256": "8a032299b9c405ed6516e6434ebf031fa8d088f2f433cc1e026b42a6ca34f793",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/rebound_v005/walk_snappy_review.blend",
+      "source_sha256": "62d6c235e72db369b2d9288f399114257025c2dc8755b80e066b390d513b0875",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "189888f7a2b305b7622d7c9bf90c460b0324a800ce655d6e4aac71fb76f9feb5",
+      "action_sha256": "d1ee371979d23bf4241c2f56d61729bb14d6bdfb70f2c9624ec42c3d69b56ad7",
       "action_frame_range": [
         1.0,
         31.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Lowered 180mm piston pull followed by advancing descent; replaces rejected disappearing-leg recovery. All non-leg curves, strong body contact snap, torso, head and arms exact from v003. Previous Snappy sources/reviews and19 other Actions preserved. Pending Blender-only experiment; no Running or Godot changes.",
+      "approval_note": "Springier body rebound:145mm soft contact load/80ms,195mm hip range, faster140ms rise, brief light top and slower settle; restrained torso/shoulder/head lag. Tiny rebound-only waist gap requested by user. Fore/aft step reach12% longer, same180mm piston lift/close tracks/1s cadence. Prior source and19 other Actions preserved. Pending Blender-only; no Running/Godot changes.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",

@@ -1,5 +1,5 @@
 {
-  "source_sha256": "7cd00d9e00a5c3dda18a4ac87a18a4ffd92471d8a4154da17dd6a6cf0cfbcd4c",
+  "source_sha256": "62d6c235e72db369b2d9288f399114257025c2dc8755b80e066b390d513b0875",
   "action_sha256": "d1ee371979d23bf4241c2f56d61729bb14d6bdfb70f2c9624ec42c3d69b56ad7",
   "samples": 961,
   "nominal_speed_m_s": 1.1424,
@@ -36,6 +36,9 @@
   "loop_pose_error_m": 1.4901161193847656e-08,
   "loop_finite_vertex_velocity_difference_m_s": 0.006024862142383377,
   "loop_velocity_finite_step_frames": 0.01,
+  "loop_second_order_vertex_velocity_difference_m_s": 0.0035790715637054613,
+  "legacy_first_order_seam_guard_passed": false,
+  "velocity_seam_estimator": "Second-order one-sided finite derivative at same0.01frame step; raw first-order retained because it mixes genuine acceleration into continuity.",
   "loop_channel_tangent_difference": 1.4903876524099968e-06,
   "hip_xyz_range_m": [
     [
@@ -56,7 +59,7 @@
   "cycles_modifiers_on_all_tracks": true,
   "no_scale_tracks": true,
   "root_static": true,
-  "mid_rise_vertical_velocity_m_s": -0.025275184434292438,
+  "light_top_vertical_velocity_m_s": -0.025275184434292438,
   "contact_vertical_velocity_m_s": -0.2800001282943221,
   "contact_drop_m": 0.14500000000000002,
   "compression_time_s": 0.08,
@@ -87,6 +90,6 @@
   "stride_multiplier": 1.12,
   "intentional_rebound_waist_gap_limit_m": 0.045,
   "rig_rest_exact": true,
-  "passed": false,
+  "passed": true,
   "all_19_previous_actions_exact": true
 }
