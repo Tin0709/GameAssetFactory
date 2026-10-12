@@ -35,13 +35,14 @@ func run() -> void:
 					peak_acceleration=maxf(peak_acceleration,(velocity-previous_velocity[side]).length()/v.pose_delta)
 				release_age[side]+=v.pose_delta;previous_velocity[side]=velocity
 				feet[side]=v.last_sole[side];support[side]=v.foot_support[side]
-		cases.append({"pace":pace,"worst_release_speed":worst,"peak_release_velocity_jump":peak_velocity_jump,"peak_release_acceleration":peak_acceleration,"maximum_combined_joint_offset":maximum_joint_offset,"events":events,"worst_release":worst_release})
+		var acceleration_scale: float=pow(v.run_speed_scale,1.5)
+		cases.append({"pace":pace,"worst_release_speed":worst,"peak_release_velocity_jump":peak_velocity_jump,"peak_release_acceleration":peak_acceleration,"speed_normalized_acceleration":peak_acceleration/acceleration_scale,"speed_scale":v.run_speed_scale,"maximum_combined_joint_offset":maximum_joint_offset,"events":events,"worst_release":worst_release})
 		check(not events.is_empty(),"Straight Run reaches support-to-swing events")
 		check(worst<4.5,"Run lifts from support smoothly rather than dropping contact translation instantly")
-		# The new speed candidate changes physical acceleration by speed squared.
-		# Compare geometric release smoothness at the prior nominal travel rate;
-		# preserve raw acceleration above rather than hiding the faster motion.
-		check(peak_acceleration/(v.run_speed_scale*v.run_speed_scale)<300,"Speed-normalized foot velocity ramps through release without a delayed discontinuity")
+		# Reach and cadence each scale sqrt(speed). For an otherwise similar
+		# phase curve acceleration scales reach*cadence² = speed^1.5. This is a
+		# revised normalized criterion; retain raw results for honest comparison.
+		check(peak_acceleration/acceleration_scale<300,"Speed-normalized foot velocity ramps through release without a delayed discontinuity")
 		check(maximum_joint_offset<.1401,"Carried swing and floor corrections share the same140mm joint budget")
 	for interruption in ["Walk","Pace","Orbit","Release","Speed"]:
 		actor.requested_direction=Vector2.ZERO;scene.reset_actor();await scene.tick(60)

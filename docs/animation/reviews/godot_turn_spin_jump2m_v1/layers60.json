@@ -10,23 +10,22 @@
 				"re-equip during release",
 				"release interrupted re-equip"
 			],
-			"maximum_upper_step_degrees": 29.3279887676723,
+			"maximum_upper_step_degrees": 23.4314318156869,
 			"pace": 1.5,
 			"scale_error": 0.0,
 			"weapon": 0,
 			"worst": {
-				"age": 0.45,
+				"age": 0.733333333333334,
 				"bone": "Arm.R",
+				"entry_age": 0.3,
 				"events": [
 					"equip in fall",
-					"release before contact",
-					"equip during recovery",
-					"interrupt recovery equip",
-					"re-equip during release"
+					"release before contact"
 				],
-				"offset": "(0.067442, 2.013971, -2.324652)",
-				"state": "LAND",
-				"weight": 0.0555555555555556
+				"native_step": 0.0,
+				"offset": "(0.149091, -1.718552, -2.654002)",
+				"state": "AIR",
+				"weight": 0.555555555555555
 			}
 		},
 		{
@@ -39,23 +38,22 @@
 				"re-equip during release",
 				"release interrupted re-equip"
 			],
-			"maximum_upper_step_degrees": 29.3279887676723,
+			"maximum_upper_step_degrees": 25.9652168468028,
 			"pace": 1.5,
 			"scale_error": 0.0,
 			"weapon": 1,
 			"worst": {
-				"age": 0.45,
-				"bone": "Arm.R",
+				"age": 0.733333333333334,
+				"bone": "Arm.L",
+				"entry_age": 0.3,
 				"events": [
 					"equip in fall",
-					"release before contact",
-					"equip during recovery",
-					"interrupt recovery equip",
-					"re-equip during release"
+					"release before contact"
 				],
-				"offset": "(0.067442, 2.013971, -2.324652)",
-				"state": "LAND",
-				"weight": 0.0555555555555556
+				"native_step": 0.0,
+				"offset": "(-0.380112, -1.69493, -2.749649)",
+				"state": "AIR",
+				"weight": 0.555555555555555
 			}
 		},
 		{
@@ -68,23 +66,22 @@
 				"re-equip during release",
 				"release interrupted re-equip"
 			],
-			"maximum_upper_step_degrees": 29.3279887676723,
+			"maximum_upper_step_degrees": 25.9651844034042,
 			"pace": 1.5,
 			"scale_error": 0.0,
 			"weapon": 2,
 			"worst": {
-				"age": 0.45,
-				"bone": "Arm.R",
+				"age": 0.733333333333334,
+				"bone": "Arm.L",
+				"entry_age": 0.3,
 				"events": [
 					"equip in fall",
-					"release before contact",
-					"equip during recovery",
-					"interrupt recovery equip",
-					"re-equip during release"
+					"release before contact"
 				],
-				"offset": "(0.067442, 2.013971, -2.324652)",
-				"state": "LAND",
-				"weight": 0.0555555555555556
+				"native_step": 0.0,
+				"offset": "(0.354221, 1.57948, 2.562358)",
+				"state": "AIR",
+				"weight": 0.555555555555555
 			}
 		},
 		{
@@ -97,14 +94,16 @@
 				"re-equip during release",
 				"release interrupted re-equip"
 			],
-			"maximum_upper_step_degrees": 31.272106492268,
+			"maximum_upper_step_degrees": 31.4225140879809,
 			"pace": 2.25,
 			"scale_error": 0.0,
 			"weapon": 0,
 			"worst": {
-				"age": 0.05,
+				"age": 0.0333333333333333,
 				"bone": "Arm.R",
+				"entry_age": 0.3,
 				"events": [],
+				"native_step": 0.0,
 				"offset": "(0.056037, 2.33811, -2.04157)",
 				"state": "AIR",
 				"weight": 0.0
@@ -120,15 +119,17 @@
 				"re-equip during release",
 				"release interrupted re-equip"
 			],
-			"maximum_upper_step_degrees": 31.272106492268,
+			"maximum_upper_step_degrees": 26.1725079654708,
 			"pace": 2.25,
 			"scale_error": 0.0,
 			"weapon": 1,
 			"worst": {
 				"age": 0.05,
-				"bone": "Arm.R",
+				"bone": "Arm.L",
+				"entry_age": 0.3,
 				"events": [],
-				"offset": "(0.015123, 1.679375, -2.634156)",
+				"native_step": 0.0,
+				"offset": "(1.45181, 0.027665, -0.237468)",
 				"state": "AIR",
 				"weight": 0.0
 			}
@@ -143,15 +144,17 @@
 				"re-equip during release",
 				"release interrupted re-equip"
 			],
-			"maximum_upper_step_degrees": 31.272106492268,
+			"maximum_upper_step_degrees": 31.4225140879809,
 			"pace": 2.25,
 			"scale_error": 0.0,
 			"weapon": 2,
 			"worst": {
-				"age": 0.05,
+				"age": 0.0333333333333333,
 				"bone": "Arm.R",
+				"entry_age": 0.3,
 				"events": [],
-				"offset": "(0.015123, 1.679375, -2.634156)",
+				"native_step": 0.0,
+				"offset": "(0.017186, 1.710236, -2.613726)",
 				"state": "AIR",
 				"weight": 0.0
 			}

@@ -15,35 +15,27 @@
 			"run": true
 		},
 		{
-			"air_speed": 2.02500343322754,
-			"ground_speed": 2.02500343322754,
+			"air_speed": 3.03750491142273,
+			"ground_speed": 3.03750491142273,
 			"pace": 2.25,
-			"recovery_speed": 2.02497482299805,
+			"recovery_speed": 3.03749060630798,
 			"run": false
 		},
 		{
-			"air_speed": 5.97713422775269,
-			"ground_speed": 5.19749116897583,
+			"air_speed": 6.87369298934937,
+			"ground_speed": 5.97711992263794,
 			"pace": 2.25,
-			"recovery_speed": 5.19750547409058,
+			"recovery_speed": 5.97713422775269,
 			"run": true
 		}
 	],
 	"checks": [
 		{
-			"check": "Only running flight gains15percent horizontal speed",
+			"check": "Requested faster Walk/Run speed and accepted1.5x comparison are exact",
 			"passed": true
 		},
 		{
-			"check": "Boosted flight retains the existing directional acceleration",
-			"passed": true
-		},
-		{
-			"check": "Landing returns to normal locomotion speed",
-			"passed": true
-		},
-		{
-			"check": "Unprepared falls keep their existing horizontal speed",
+			"check": "Speed calibration preserves Walk and Run pose identities",
 			"passed": true
 		},
 		{
@@ -63,6 +55,22 @@
 			"passed": true
 		},
 		{
+			"check": "Losing support during preparation does not invent a launch",
+			"passed": true
+		},
+		{
+			"check": "Preparation interrupted by a ledge fall receives no running jump boost",
+			"passed": true
+		},
+		{
+			"check": "Requested faster Walk/Run speed and accepted1.5x comparison are exact",
+			"passed": true
+		},
+		{
+			"check": "Speed calibration preserves Walk and Run pose identities",
+			"passed": true
+		},
+		{
 			"check": "Only running flight gains15percent horizontal speed",
 			"passed": true
 		},
@@ -79,6 +87,22 @@
 			"passed": true
 		},
 		{
+			"check": "Losing support during preparation does not invent a launch",
+			"passed": true
+		},
+		{
+			"check": "Preparation interrupted by a ledge fall receives no running jump boost",
+			"passed": true
+		},
+		{
+			"check": "Requested faster Walk/Run speed and accepted1.5x comparison are exact",
+			"passed": true
+		},
+		{
+			"check": "Speed calibration preserves Walk and Run pose identities",
+			"passed": true
+		},
+		{
 			"check": "Only running flight gains15percent horizontal speed",
 			"passed": true
 		},
@@ -92,6 +116,46 @@
 		},
 		{
 			"check": "Unprepared falls keep their existing horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Losing support during preparation does not invent a launch",
+			"passed": true
+		},
+		{
+			"check": "Preparation interrupted by a ledge fall receives no running jump boost",
+			"passed": true
+		},
+		{
+			"check": "Requested faster Walk/Run speed and accepted1.5x comparison are exact",
+			"passed": true
+		},
+		{
+			"check": "Speed calibration preserves Walk and Run pose identities",
+			"passed": true
+		},
+		{
+			"check": "Only running flight gains15percent horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Boosted flight retains the existing directional acceleration",
+			"passed": true
+		},
+		{
+			"check": "Landing returns to normal locomotion speed",
+			"passed": true
+		},
+		{
+			"check": "Unprepared falls keep their existing horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Losing support during preparation does not invent a launch",
+			"passed": true
+		},
+		{
+			"check": "Preparation interrupted by a ledge fall receives no running jump boost",
 			"passed": true
 		}
 	],

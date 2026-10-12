@@ -16,6 +16,7 @@ func run() -> void:
 			var previous_rate: float=v.turn_rate;var worst_acceleration:=0.0;var distance:=0.0;var minimum_response:=100.0
 			var trace: Array=[]
 			var previous_time: float=actor.simulation_time
+			var minimum_lean:=0.0;var maximum_lean:=0.0
 			for degrees in [90,-90,180,0,45,-45,180,90,-90,0,180,0]:
 				actor.requested_direction=Vector2(sin(deg_to_rad(degrees)),cos(deg_to_rad(degrees)))
 				var start: Vector3=actor.position
@@ -27,14 +28,16 @@ func run() -> void:
 					worst_acceleration=maxf(worst_acceleration,absf(v.turn_rate-previous_rate)/maxf(actor.simulation_time-previous_time,.00001));previous_time=actor.simulation_time
 					distance+=actor.position.distance_to(old);previous_rate=v.turn_rate
 					response=maxf(response,(actor.velocity-initial_velocity).length())
+					minimum_lean=minf(minimum_lean,v.body_bank);maximum_lean=maxf(maximum_lean,v.body_bank)
 					trace.append({"yaw":v.rotation.y,"rate":v.turn_rate,"phase_delta":wrapf(v.gait_phase-old_phase,-.5,.5),"position":actor.position})
 				minimum_response=minf(minimum_response,response)
 			actor.requested_direction=Vector2(0,1);await scene.tick(75)
 			var final_error:=absf(wrapf(v.rotation.y,-PI,PI))
-			cases.append({"pace":pace,"run":sprint,"maximum_yaw_acceleration":worst_acceleration,"distance":distance,"minimum_input_response":minimum_response,"final_heading_error":final_error,"trace":trace})
+			cases.append({"pace":pace,"run":sprint,"maximum_yaw_acceleration":worst_acceleration,"distance":distance,"minimum_input_response":minimum_response,"final_heading_error":final_error,"minimum_lean_degrees":rad_to_deg(minimum_lean),"maximum_lean_degrees":rad_to_deg(maximum_lean),"trace":trace})
 			check(worst_acceleration<120,"Spam turns avoid instantaneous full-speed yaw reversals")
 			check(minimum_response>.05,"Every rapid input change immediately changes physical velocity")
 			check(final_error<.015,"Visual facing settles to the requested heading without residual spin")
+			check(minimum_lean<-.005 and maximum_lean>.005 and absf(v.body_bank)<.005 and absf(v.rotation.z-v.body_bank)<.00001,"Whole visual rig banks both left and right, then settles upright on straight travel")
 	var out:="res://.validation/expressive_turn_spin_v1";DirAccess.make_dir_recursive_absolute(out)
 	FileAccess.open(out+"/rapid_turns.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"cases":cases},"\t"))
 	print("RAPID_TURN_CHECKS ",checks.size()," failures ",failures.size());quit(0 if failures.is_empty() else 1)

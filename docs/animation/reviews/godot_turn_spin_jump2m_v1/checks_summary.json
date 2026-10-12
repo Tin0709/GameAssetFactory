@@ -66,21 +66,21 @@
     "suite": "run_release",
     "fps": 30,
     "exit": 0,
-    "checks": 20,
+    "checks": 23,
     "failures": []
   },
   {
     "suite": "rapid",
     "fps": 30,
     "exit": 0,
-    "checks": 12,
+    "checks": 16,
     "failures": []
   },
   {
     "suite": "run_jump",
     "fps": 30,
     "exit": 0,
-    "checks": 16,
+    "checks": 32,
     "failures": []
   },
   {
@@ -150,21 +150,21 @@
     "suite": "run_release",
     "fps": 60,
     "exit": 0,
-    "checks": 20,
+    "checks": 23,
     "failures": []
   },
   {
     "suite": "rapid",
     "fps": 60,
     "exit": 0,
-    "checks": 12,
+    "checks": 16,
     "failures": []
   },
   {
     "suite": "run_jump",
     "fps": 60,
     "exit": 0,
-    "checks": 16,
+    "checks": 32,
     "failures": []
   }
 ]

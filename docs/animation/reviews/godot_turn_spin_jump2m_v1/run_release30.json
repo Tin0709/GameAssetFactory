@@ -139,244 +139,284 @@
 			"pace": 1.5,
 			"peak_release_acceleration": 81.9595742225647,
 			"peak_release_velocity_jump": 2.73198580741882,
+			"worst_release": {
+				"age": 0.0,
+				"duration": 0.1,
+				"offset": "(0.0, 0.0, 0.0)",
+				"offset_velocity": "(0.0, 0.0, 0.0)",
+				"phase": 0.525679253750043,
+				"previous_velocity": "(0.000001, 0.0, 0.000029)",
+				"side": 0,
+				"support": false,
+				"velocity": "(0.054295, 2.265276, 1.526241)"
+			},
 			"worst_release_speed": 2.73200199007988
 		},
 		{
 			"events": [
 				{
 					"delta": 0.0333333333333333,
-					"phase": 0.0443663517421187,
+					"phase": 0.506365517283441,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.00904442592193755,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.511722372116898,
+					"release_speed": 0.0000143120979601008,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0144005589541223,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.517079708203503,
+					"release_speed": 0.00000199920059174019,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.019758857452884,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.522437525489503,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0251157123133605,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.527793899137218,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0304730483865987,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.533151716423218,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0358308656725987,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.538507128212899,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0411853150742634,
+					"release_speed": 0.000000894069671630859,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.543860615226547,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.046539764475928,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.549218913725309,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0518971005866728,
 					"release_speed": 0.00000178813934326172,
 					"side": 1
 				},
 				{
 					"delta": 0.0333333333333333,
-					"phase": 0.513116071360185,
+					"phase": 0.554575287448037,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0572553991496749,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.55993647330357,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0626185099097221,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.464759904533193,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.0679739213086736,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.470117240708178,
+					"release_speed": 0.0,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.9727963900218,
+					"release_speed": 0.00000044703483581543,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.475475539335421,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.978149876988937,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.480827101719245,
+					"release_speed": 0.00000044703483581543,
+					"side": 0
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.983504326449554,
+					"release_speed": 0.0,
+					"side": 1
+				},
+				{
+					"delta": 0.0333333333333333,
+					"phase": 0.486189250540957,
 					"release_speed": 0.000000894069671630859,
 					"side": 0
 				},
 				{
 					"delta": 0.0333333333333333,
-					"phase": 0.0756156317197693,
+					"phase": 0.988864550430992,
 					"release_speed": 0.0,
 					"side": 1
 				},
 				{
 					"delta": 0.0333333333333333,
-					"phase": 0.544365609363493,
+					"phase": 0.491545624841848,
 					"release_speed": 0.0,
 					"side": 0
 				},
 				{
 					"delta": 0.0333333333333333,
-					"phase": 0.0131161030585298,
+					"phase": 0.994226699252704,
 					"release_speed": 0.00000044703483581543,
 					"side": 1
 				},
 				{
 					"delta": 0.0333333333333333,
-					"phase": 0.481866596753567,
-					"release_speed": 0.0,
+					"phase": 0.496905848823286,
+					"release_speed": 0.00000178813934326172,
 					"side": 0
 				},
 				{
 					"delta": 0.0333333333333333,
-					"phase": 0.0443671892031599,
+					"phase": 0.999583073553594,
 					"release_speed": 0.0,
 					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.513116650814232,
-					"release_speed": 0.0,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0756172432482766,
-					"release_speed": 0.0,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.544366704859349,
-					"release_speed": 0.00000044703483581543,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0131166825124032,
-					"release_speed": 0.0,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.481867176207441,
-					"release_speed": 0.00000044703483581543,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0443677686414854,
-					"release_speed": 0.00000044703483581543,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.513116198215236,
-					"release_speed": 0.00000044703483581543,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0756105981454877,
-					"release_speed": 0.0,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.544355931420698,
-					"release_speed": 0.00000044703483581543,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0131022967954215,
-					"release_speed": 0.0000018431718018519,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.481849694269659,
-					"release_speed": 0.00000044703483581543,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0443461583989373,
-					"release_speed": 0.00000044703483581543,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.513092523773661,
-					"release_speed": 0.0,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0755879558034264,
-					"release_speed": 0.00000044703483581543,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.544336385377177,
-					"release_speed": 0.0,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0130848149509266,
-					"release_speed": 0.0,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.48183118032565,
-					"release_speed": 0.0,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.044330740753469,
-					"release_speed": 0.000000894069671630859,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.513082266625759,
-					"release_speed": 0.0,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0755787307550377,
-					"release_speed": 0.0,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.544326128229275,
-					"release_speed": 0.0,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0130766220020511,
-					"release_speed": 0.0,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.481826083675315,
-					"release_speed": 0.0,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0443287404327684,
-					"release_speed": 0.0,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.513076137922553,
-					"release_speed": 0.0,
-					"side": 0
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.0755746662819539,
-					"release_speed": 0.00000044703483581543,
-					"side": 1
-				},
-				{
-					"delta": 0.0333333333333333,
-					"phase": 0.544319999557164,
-					"release_speed": 0.00000044703483581543,
-					"side": 0
 				}
 			],
-			"maximum_combined_joint_offset": 0.11345898360014,
+			"maximum_combined_joint_offset": 0.140000000596046,
 			"pace": 2.25,
-			"peak_release_acceleration": 296.675119400024,
-			"peak_release_velocity_jump": 9.88917064666748,
-			"worst_release_speed": 0.0000018431718018519
+			"peak_release_acceleration": 294.530096054077,
+			"peak_release_velocity_jump": 9.81766986846924,
+			"worst_release": {
+				"age": 0.1,
+				"duration": 0.135772490468151,
+				"offset": "(0.000366, -0.057914, -0.108063)",
+				"offset_velocity": "(0.107654, -1.367277, -2.654972)",
+				"phase": 0.269045581008426,
+				"previous_velocity": "(-0.111737, 1.893201, 4.689102)",
+				"side": 1,
+				"support": false,
+				"velocity": "(0.124365, 0.417986, 14.39243)"
+			},
+			"worst_release_speed": 0.0000143120979601008
 		},
 		{
 			"interruption": "Walk",
-			"maximum_combined_joint_offset": 0.0687351003289223,
-			"maximum_leg_step_degrees": 19.5215532045629,
-			"phase_travel": 1.55104318447192
+			"maximum_combined_joint_offset": 0.0615083016455173,
+			"maximum_leg_step_degrees": 33.5862223943925,
+			"phase_travel": 1.87134899800421
 		},
 		{
 			"interruption": "Pace",
-			"maximum_combined_joint_offset": 0.109731033444405,
-			"maximum_leg_step_degrees": 44.600783525441,
-			"phase_travel": 1.36300433552956
+			"maximum_combined_joint_offset": 0.0646107196807861,
+			"maximum_leg_step_degrees": 44.0915963379111,
+			"phase_travel": 1.58997390309863
 		},
 		{
 			"interruption": "Orbit",
-			"maximum_combined_joint_offset": 0.109731033444405,
-			"maximum_leg_step_degrees": 46.8788360287478,
-			"phase_travel": 2.25000004753343
+			"maximum_combined_joint_offset": 0.090745285153389,
+			"maximum_leg_step_degrees": 57.3217000809825,
+			"phase_travel": 2.41285678848691
 		},
 		{
 			"interruption": "Release",
-			"maximum_combined_joint_offset": 0.0687350928783417,
-			"maximum_leg_step_degrees": 46.9283446549467,
-			"phase_travel": 2.25000004753343
+			"maximum_combined_joint_offset": 0.0188143011182547,
+			"maximum_leg_step_degrees": 57.3217000809825,
+			"phase_travel": 2.41285678848691
+		},
+		{
+			"interruption": "Speed",
+			"maximum_combined_joint_offset": 0.0888536870479584,
+			"maximum_leg_step_degrees": 54.0745291118155,
+			"phase_travel": 2.25246628644364
 		}
 	],
 	"checks": [
@@ -389,7 +429,7 @@
 			"passed": true
 		},
 		{
-			"check": "Foot velocity ramps through the release instead of moving its discontinuity a few frames later",
+			"check": "Speed-normalized foot velocity ramps through release without a delayed discontinuity",
 			"passed": true
 		},
 		{
@@ -405,7 +445,7 @@
 			"passed": true
 		},
 		{
-			"check": "Foot velocity ramps through the release instead of moving its discontinuity a few frames later",
+			"check": "Speed-normalized foot velocity ramps through release without a delayed discontinuity",
 			"passed": true
 		},
 		{
@@ -458,6 +498,18 @@
 		},
 		{
 			"check": "Interrupted release preserves pose continuity and live gait: Release",
+			"passed": true
+		},
+		{
+			"check": "Interruption probe catches a carried foot in swing: Speed",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release remains within the shared contact budget: Speed",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release preserves pose continuity and live gait: Speed",
 			"passed": true
 		}
 	],

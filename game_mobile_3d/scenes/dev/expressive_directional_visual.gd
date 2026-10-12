@@ -31,6 +31,8 @@ var run_release_velocity: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
 var run_raw_sole: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
 var rapid_turn_smoothing_enabled:=true
 var facing_velocity:=0.0
+var body_bank:=0.0
+var whole_body_bank_enabled:=not OS.get_cmdline_user_args().has("--expressive-turn-bank-original")
 var layer_entry_age:=.30
 var layer_entry_pending:=false
 var layer_entry_shown_q: Array[Quaternion]=[]
@@ -235,6 +237,15 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 	var response:=1-exp(-12*delta)
 	turn_lean=lerpf(turn_lean,-turn*deg_to_rad(lerpf(6,12,energy))*clampf(movement_speed/.8,0,1),response)
 	turn_twist=lerpf(turn_twist,turn*deg_to_rad(2)*clampf(movement_speed/.8,0,1),response)
+	# Bank the entire visible rig about a low support pivot. The capsule
+	# remains upright; existing world-contact solving still owns planted feet.
+	# Fade across takeoff/landing rather than clearing roll on a state boundary.
+	body_bank=lerpf(body_bank,turn_lean*_ground_turn_weight() if whole_body_bank_enabled else 0.0,1-exp(-20*delta))
+	rotation.z=body_bank
+	# A low pivot keeps the rigid single-link legs within their safe contact
+	# reach while the hips, shoulders and head still bank together visibly.
+	var support_pivot:=Vector3(0,.45,0)
+	position=Basis(Vector3.UP,rotation.y)*(support_pivot-Basis(Vector3.BACK,body_bank)*support_pivot)
 
 func _ground_turn_weight() -> float:
 	if not directional_enabled or jump_state in ["AIR","PREP"]:return 0
@@ -299,10 +310,11 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 		result.basis=steer*motion*steer.inverse()*rest.basis
 		result.origin=rest.origin+steer*(result.origin-rest.origin)
 	if bone==hips:
-		result.basis=Basis.from_euler(Vector3(0,turn_twist,turn_lean*.45)*weight)*result.basis
+		result.basis=Basis.from_euler(Vector3(0,turn_twist,0)*weight)*result.basis
+		if not whole_body_bank_enabled:result.basis=Basis(Vector3.BACK,turn_lean*.45*weight)*result.basis
 		result.origin.y-=.004*clampf(absf(turn_lean)/deg_to_rad(6),0,1)*weight
-	elif bone==chest:result.basis=Basis.from_euler(Vector3(0,-turn_twist*1.5,turn_lean*.55)*weight)*result.basis
-	elif skeleton.get_bone_name(bone)=="Head":result.basis=Basis.from_euler(Vector3(0,turn_twist*.25,-turn_lean*.35)*weight)*result.basis
+	elif bone==chest:result.basis=Basis.from_euler(Vector3(0,-turn_twist*1.5,0 if whole_body_bank_enabled else turn_lean*.55)*weight)*result.basis
+	elif skeleton.get_bone_name(bone)=="Head":result.basis=Basis.from_euler(Vector3(0,turn_twist*.25,-turn_lean*(.20 if whole_body_bank_enabled else .35))*weight)*result.basis
 	return result
 
 func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Quaternion, delta: float) -> Quaternion:

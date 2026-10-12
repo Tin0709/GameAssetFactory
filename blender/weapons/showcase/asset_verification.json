@@ -1,0 +1,124 @@
+{
+  "export": {
+    "triangles": 1128,
+    "meshes": 2,
+    "surfaces": 2,
+    "materials": 1,
+    "embedded_textures": 1,
+    "samplers": [
+      {
+        "magFilter": 9728,
+        "minFilter": 9984
+      }
+    ],
+    "markers_checked": 9,
+    "animations": 0
+  },
+  "READY": {
+    "rifle_production_r13": {
+      "Head": {
+        "intersecting_triangle_pairs": 0
+      },
+      "UpperArm.R": {
+        "intersecting_triangle_pairs": 17
+      },
+      "ForeArm.R": {
+        "intersecting_triangle_pairs": 104
+      },
+      "UpperArm.L": {
+        "intersecting_triangle_pairs": 0
+      },
+      "ForeArm.L": {
+        "intersecting_triangle_pairs": 0
+      },
+      "Chest": {
+        "intersecting_triangle_pairs": 0
+      }
+    },
+    "rifle_stylized_v2": {
+      "Head": {
+        "intersecting_triangle_pairs": 0
+      },
+      "UpperArm.R": {
+        "intersecting_triangle_pairs": 20
+      },
+      "ForeArm.R": {
+        "intersecting_triangle_pairs": 74
+      },
+      "UpperArm.L": {
+        "intersecting_triangle_pairs": 0
+      },
+      "ForeArm.L": {
+        "intersecting_triangle_pairs": 0
+      },
+      "Chest": {
+        "intersecting_triangle_pairs": 0
+      }
+    }
+  },
+  "HOLSTER": {
+    "rifle_production_r13": {
+      "Head": {
+        "intersecting_triangle_pairs": 0
+      },
+      "UpperArm.R": {
+        "intersecting_triangle_pairs": 17
+      },
+      "ForeArm.R": {
+        "intersecting_triangle_pairs": 104
+      },
+      "UpperArm.L": {
+        "intersecting_triangle_pairs": 0
+      },
+      "ForeArm.L": {
+        "intersecting_triangle_pairs": 0
+      },
+      "Chest": {
+        "intersecting_triangle_pairs": 0
+      }
+    },
+    "rifle_stylized_v2": {
+      "Head": {
+        "intersecting_triangle_pairs": 0
+      },
+      "UpperArm.R": {
+        "intersecting_triangle_pairs": 20
+      },
+      "ForeArm.R": {
+        "intersecting_triangle_pairs": 74
+      },
+      "UpperArm.L": {
+        "intersecting_triangle_pairs": 0
+      },
+      "ForeArm.L": {
+        "intersecting_triangle_pairs": 0
+      },
+      "Chest": {
+        "intersecting_triangle_pairs": 0
+      }
+    }
+  },
+  "attachment": {
+    "grip_delta_m": 0,
+    "left_guide_delta_m": 0,
+    "muzzle_local_delta_m": 0.001,
+    "source_action": "R13_Rifle_Holster_UpperBack_Final",
+    "pose_frames": [
+      1,
+      125
+    ],
+    "static_snapshots_only": true
+  },
+  "preservation": {
+    "files_checked": 535,
+    "changed_since_baseline": [
+      "game_mobile_3d\\scenes\\dev\\expressive_directional_visual.gd",
+      "game_mobile_3d\\tests\\validate_expressive_rapid_turns.gd",
+      "game_mobile_3d\\tests\\validate_expressive_run_release.gd"
+    ],
+    "weapon_sources_unchanged": true,
+    "animation_sources_unchanged": true,
+    "production_character_assets_unchanged": true
+  },
+  "note": "Other tasks may concurrently edit Godot scripts. This task writes only new weapon/showcase files and weapon documentation."
+}

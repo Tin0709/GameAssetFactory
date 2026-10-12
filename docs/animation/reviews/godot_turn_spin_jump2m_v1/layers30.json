@@ -17,10 +17,12 @@
 			"worst": {
 				"age": 0.766666666666667,
 				"bone": "Arm.R",
+				"entry_age": 0.3,
 				"events": [
 					"equip in fall",
 					"release before contact"
 				],
+				"native_step": 0.0,
 				"offset": "(0.092609, -1.716432, -2.684667)",
 				"state": "AIR",
 				"weight": 0.444444444444444
@@ -43,10 +45,12 @@
 			"worst": {
 				"age": 0.733333333333334,
 				"bone": "Arm.L",
+				"entry_age": 0.3,
 				"events": [
 					"equip in fall",
 					"release before contact"
 				],
+				"native_step": 0.0,
 				"offset": "(-0.339783, -1.69044, -2.743426)",
 				"state": "AIR",
 				"weight": 0.555555555555555
@@ -69,10 +73,12 @@
 			"worst": {
 				"age": 0.733333333333334,
 				"bone": "Arm.L",
+				"entry_age": 0.3,
 				"events": [
 					"equip in fall",
 					"release before contact"
 				],
+				"native_step": 0.0,
 				"offset": "(0.319085, 1.587469, 2.576313)",
 				"state": "AIR",
 				"weight": 0.555555555555555
@@ -88,14 +94,16 @@
 				"re-equip during release",
 				"release interrupted re-equip"
 			],
-			"maximum_upper_step_degrees": 53.4307393863122,
+			"maximum_upper_step_degrees": 55.1293971876106,
 			"pace": 2.25,
 			"scale_error": 0.0,
 			"weapon": 0,
 			"worst": {
 				"age": 0.0666666666666667,
 				"bone": "Arm.R",
+				"entry_age": 0.3,
 				"events": [],
+				"native_step": 0.0,
 				"offset": "(0.054542, 2.215513, -2.173647)",
 				"state": "AIR",
 				"weight": 0.0
@@ -111,17 +119,22 @@
 				"re-equip during release",
 				"release interrupted re-equip"
 			],
-			"maximum_upper_step_degrees": 53.4307393863122,
+			"maximum_upper_step_degrees": 49.9801892893243,
 			"pace": 2.25,
 			"scale_error": 0.0,
 			"weapon": 1,
 			"worst": {
-				"age": 0.0666666666666667,
-				"bone": "Arm.R",
-				"events": [],
-				"offset": "(0.015123, 1.679375, -2.634156)",
+				"age": 0.733333333333334,
+				"bone": "Arm.L",
+				"entry_age": 0.3,
+				"events": [
+					"equip in fall",
+					"release before contact"
+				],
+				"native_step": 0.0,
+				"offset": "(-0.326818, -1.65389, -2.770437)",
 				"state": "AIR",
-				"weight": 0.0
+				"weight": 0.555555555555555
 			}
 		},
 		{
@@ -134,15 +147,17 @@
 				"re-equip during release",
 				"release interrupted re-equip"
 			],
-			"maximum_upper_step_degrees": 53.4307393863122,
+			"maximum_upper_step_degrees": 55.1293971876106,
 			"pace": 2.25,
 			"scale_error": 0.0,
 			"weapon": 2,
 			"worst": {
 				"age": 0.0666666666666667,
 				"bone": "Arm.R",
+				"entry_age": 0.3,
 				"events": [],
-				"offset": "(0.015123, 1.679375, -2.634156)",
+				"native_step": 0.0,
+				"offset": "(0.017186, 1.710236, -2.613726)",
 				"state": "AIR",
 				"weight": 0.0
 			}

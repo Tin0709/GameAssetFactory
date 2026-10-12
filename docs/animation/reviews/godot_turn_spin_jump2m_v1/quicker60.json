@@ -77,15 +77,15 @@
 			"pace": 2.25,
 			"versions": [
 				{
-					"flight_seconds": 0.616666666666632,
-					"maximum_air_frame": 44.3388167401491,
-					"peak_m": 1.19957709312439,
+					"flight_seconds": 0.633333333333297,
+					"maximum_air_frame": 45.0,
+					"peak_m": 1.1994571685791,
 					"rate": 1.18
 				},
 				{
 					"flight_seconds": 0.433333333333309,
 					"maximum_air_frame": 36.9577324375302,
-					"peak_m": 2.00013065338135,
+					"peak_m": 2.00015234947205,
 					"rate": 2.15
 				}
 			]
@@ -97,13 +97,13 @@
 				{
 					"flight_seconds": 0.616666666666632,
 					"maximum_air_frame": 44.3388167401491,
-					"peak_m": 1.19888186454773,
+					"peak_m": 1.19980084896088,
 					"rate": 1.18
 				},
 				{
 					"flight_seconds": 0.433333333333309,
 					"maximum_air_frame": 36.9577324375302,
-					"peak_m": 1.99998044967651,
+					"peak_m": 1.99982810020447,
 					"rate": 2.15
 				}
 			]

@@ -204,16 +204,16 @@
 		{
 			"max_joint_step": 57.4281622395755,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.00246546485207298,
+			"phase_error": 0.00328268403584375,
 			"running": {
 				"case": "Running",
 				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.526085745892487,
+				"impact_hip_min": 0.52608573785983,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19284403324127
+				"peak_y": 1.19264781475067
 			},
-			"speed": 5.19744825363159,
+			"speed": 5.97713422775269,
 			"stationary": {
 				"case": "Stationary",
 				"flight_seconds": 0.333333333333332,
@@ -226,16 +226,16 @@
 		{
 			"max_joint_step": 57.4281622395755,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.00246546485207298,
+			"phase_error": 0.00328268403584375,
 			"running": {
 				"case": "Running",
 				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.486086350283585,
+				"impact_hip_min": 0.486086342250928,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19284403324127
+				"peak_y": 1.19264781475067
 			},
-			"speed": 5.19744825363159,
+			"speed": 5.97713422775269,
 			"stationary": {
 				"case": "Stationary",
 				"flight_seconds": 0.333333333333332,

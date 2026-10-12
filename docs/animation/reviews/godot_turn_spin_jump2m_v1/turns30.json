@@ -897,7 +897,7 @@
 			"passed": true
 		},
 		{
-			"check": "Polish reduces previous refined turn sliding by at least30percent",
+			"check": "Polish reduces turn sliding by30percent or both variants stay below1mm total solver noise",
 			"passed": true
 		},
 		{
@@ -1004,171 +1004,193 @@
 				{
 					"clamps": 0,
 					"degrees": 45,
-					"final_phase": 0.395589565313071,
-					"final_position": "(-11.16569, 0.000841, 2.506266)",
+					"final_phase": 0.672194860064988,
+					"final_position": "(-10.77654, -0.002088, 3.72041)",
 					"frames": 18,
 					"lead": 0.15,
-					"leg_rate_per_pace": 296.71102182263,
-					"leg_step_degrees": 22.2533266366972,
-					"peak_slip_m": 0.000000119209289550781,
-					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.000180329805538969,
-					"plant_rotation_degrees": 8.99525326897466,
+					"leg_rate_per_pace": 378.454657507451,
+					"leg_step_degrees": 28.3840993130588,
+					"peak_slip_m": 0.000000238418579101563,
+					"penetration_m": 0.0,
+					"phase_error": 0.00134925020288777,
+					"plant_rotation_degrees": 12.2974772703993,
 					"releases": [],
 					"run": false,
-					"slip_m": 0.000000357627868652344,
+					"slip_m": 0.00000095367431640625,
 					"support_frames": 18,
 					"worst_leg": {
-						"age": 1.6,
+						"age": 2.0,
 						"aim_degrees": 0.0,
 						"jump": "GROUND",
-						"phase": 0.458090330641634,
+						"phase": 0.442555585414148,
 						"previous_support": false,
 						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 12.5334517684868
+					"yaw_step_degrees": 12.1017035582192
 				},
 				{
 					"clamps": 0,
 					"degrees": 45,
-					"final_phase": 0.895588630777495,
-					"final_position": "(-12.83431, 0.000781, 2.506267)",
+					"final_phase": 0.172188124794088,
+					"final_position": "(-13.22345, 0.000181, 3.720404)",
 					"frames": 18,
 					"lead": 0.65,
-					"leg_rate_per_pace": 259.537717264835,
-					"leg_step_degrees": 19.4653287948627,
-					"peak_slip_m": 0.0000000596046447753906,
-					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.000180947927781082,
-					"plant_rotation_degrees": 9.94929750733662,
-					"releases": [],
-					"run": false,
-					"slip_m": 0.0000000596046447753906,
-					"support_frames": 18,
-					"worst_leg": {
-						"age": 1.6,
-						"aim_degrees": 0.0,
-						"jump": "GROUND",
-						"phase": 0.958090337991487,
-						"previous_support": false,
-						"side": 0,
-						"support": false
-					},
-					"yaw_step_degrees": 12.5335328769832
-				},
-				{
-					"clamps": 0,
-					"degrees": 90,
-					"final_phase": 0.366990517183875,
-					"final_position": "(-10.86427, -0.001643, 1.716108)",
-					"frames": 18,
-					"lead": 0.15,
-					"leg_rate_per_pace": 331.938063976429,
-					"leg_step_degrees": 24.8953547982322,
+					"leg_rate_per_pace": 371.390853100526,
+					"leg_step_degrees": 27.8543139825395,
 					"peak_slip_m": 0.000000238418579101563,
 					"penetration_m": 0.0,
-					"phase_error": 0.00339105541323438,
-					"plant_rotation_degrees": 13.1608123277152,
+					"phase_error": 0.00134889271081055,
+					"plant_rotation_degrees": 12.2800517502793,
 					"releases": [],
 					"run": false,
-					"slip_m": 0.000000596046447753906,
+					"slip_m": 0.000000476837158203125,
 					"support_frames": 18,
 					"worst_leg": {
-						"age": 1.6,
-						"aim_degrees": 0.0,
+						"age": 1.76666666666667,
+						"aim_degrees": 0.707759036113825,
 						"jump": "GROUND",
-						"phase": 0.429501290232735,
+						"phase": 0.406732764206025,
 						"previous_support": false,
 						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 19.3373242196275
+					"yaw_step_degrees": 12.1017471006752
 				},
 				{
 					"clamps": 0,
 					"degrees": 90,
-					"final_phase": 0.866992103002578,
-					"final_position": "(-13.13573, 0.000737, 1.716107)",
-					"frames": 18,
-					"lead": 0.65,
-					"leg_rate_per_pace": 316.02413302165,
-					"leg_step_degrees": 23.7018099766237,
-					"peak_slip_m": 0.000000119209289550781,
-					"penetration_m": 0.0,
-					"phase_error": 0.00339193843820755,
-					"plant_rotation_degrees": 13.0683990144713,
-					"releases": [],
-					"run": false,
-					"slip_m": 0.000000417232513427734,
-					"support_frames": 18,
-					"worst_leg": {
-						"age": 1.6,
-						"aim_degrees": 0.0,
-						"jump": "GROUND",
-						"phase": 0.929501992972054,
-						"previous_support": false,
-						"side": 0,
-						"support": false
-					},
-					"yaw_step_degrees": 19.3373242196275
-				},
-				{
-					"clamps": 3,
-					"degrees": 180,
-					"final_phase": 0.275000689499082,
-					"final_position": "(-12.0, -0.000264, 0.6581)",
+					"final_phase": 0.619937590436382,
+					"final_position": "(-10.36772, -0.00288, 2.594903)",
 					"frames": 18,
 					"lead": 0.15,
-					"leg_rate_per_pace": 469.314273469921,
-					"leg_step_degrees": 35.1985705102441,
-					"peak_slip_m": 0.0222860667854548,
-					"penetration_m": 0.0,
-					"phase_error": 0.00781251324547663,
-					"plant_rotation_degrees": 24.2002191256433,
-					"releases": [
-						{
-							"aim": [
-								0.0,
-								50.9464493210168
-							],
-							"bias": -0.216588552790233,
-							"correction": "(-0.083684, -0.114844, 0.058935)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.962500656385469,
-							"turn": -3.09229373931885
-						},
-						{
-							"aim": [
-								0.0,
-								49.8236720893988
-							],
-							"bias": -0.0995339473062238,
-							"correction": "(-0.087548, -0.105169, 0.069822)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.0250006519703097,
-							"turn": -1.81757926940918
-						},
-						{
-							"aim": [
-								2.13460038804659,
-								49.2971976930797
-							],
-							"bias": -0.0585037787728986,
-							"correction": "(-0.082885, -0.09853, 0.074684)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.0875006475551508,
-							"turn": -1.06833457946777
-						}
-					],
+					"leg_rate_per_pace": 386.333440086141,
+					"leg_step_degrees": 28.9750080064606,
+					"peak_slip_m": 0.000000238418579101563,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00387391332680054,
+					"plant_rotation_degrees": 12.4426418421505,
+					"releases": [],
 					"run": false,
-					"slip_m": 0.0539690442383289,
+					"slip_m": 0.000000834465026855469,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 2.0,
+						"aim_degrees": 0.69097165843355,
+						"jump": "GROUND",
+						"phase": 0.390298637227997,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.1795058686651
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.119931621250219,
+					"final_position": "(-13.63227, 0.000838, 2.594903)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 399.5853731138,
+					"leg_step_degrees": 29.968902983535,
+					"peak_slip_m": 0.00000095367431640625,
+					"penetration_m": 0.0,
+					"phase_error": 0.00387392233920592,
+					"plant_rotation_degrees": 12.0225741091373,
+					"releases": [],
+					"run": false,
+					"slip_m": 0.0000019073486328125,
 					"support_frames": 18,
 					"worst_leg": {
 						"age": 1.8,
-						"aim_degrees": 28.09699060375,
+						"aim_degrees": 0.274112406782978,
 						"jump": "GROUND",
-						"phase": 0.712500508478037,
+						"phase": 0.431017645625049,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.1794443969626
+				},
+				{
+					"clamps": 5,
+					"degrees": 180,
+					"final_phase": 0.45129083223487,
+					"final_position": "(-12.0, -0.002633, 1.139063)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 511.019408542019,
+					"leg_step_degrees": 38.3264556406514,
+					"peak_slip_m": 0.173016548156738,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00637898047743732,
+					"plant_rotation_degrees": 28.1115047557363,
+					"releases": [
+						{
+							"aim": [
+								1.58560248244396,
+								54.087585018414
+							],
+							"bias": -0.9,
+							"correction": "(-0.08287, -0.097296, 0.102362)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.762372350376921,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								0.240662729261604,
+								56.2549782118829
+							],
+							"bias": -0.9,
+							"correction": "(-0.094794, -0.117288, 0.110925)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.838918848361155,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								0.0,
+								52.0400923807301
+							],
+							"bias": -0.816590221720286,
+							"correction": "(-0.105496, -0.145501, 0.137021)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.915465346345389,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								0.0,
+								45.0228277444453
+							],
+							"bias": -0.616590221720286,
+							"correction": "(-0.06329, -0.115789, 0.083608)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.992011844329623,
+							"turn": -9.06975746154785
+						},
+						{
+							"aim": [
+								0.0884693258953794,
+								42.5759261346665
+							],
+							"bias": -0.416590221720286,
+							"correction": "(-0.075524, -0.102667, 0.10683)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.0685583423138579,
+							"turn": -5.31975746154785
+						}
+					],
+					"run": false,
+					"slip_m": 0.335338581353426,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.76666666666667,
+						"aim_degrees": 25.6187179351134,
+						"jump": "GROUND",
+						"phase": 0.685825672144899,
 						"previous_support": true,
 						"side": 0,
 						"support": false
@@ -1176,83 +1198,94 @@
 					"yaw_step_degrees": 19.3373310498166
 				},
 				{
-					"clamps": 2,
+					"clamps": 3,
 					"degrees": 180,
-					"final_phase": 0.775000689499082,
-					"final_position": "(-12.0, -0.000264, 0.6581)",
+					"final_phase": 0.95129083223487,
+					"final_position": "(-12.0, -0.002633, 1.139063)",
 					"frames": 18,
 					"lead": 0.65,
-					"leg_rate_per_pace": 438.83059278902,
-					"leg_step_degrees": 32.9122944591765,
-					"peak_slip_m": 0.0405838936567307,
-					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00781251324547652,
-					"plant_rotation_degrees": 25.2316067186192,
+					"leg_rate_per_pace": 550.820286873517,
+					"leg_step_degrees": 41.3115215155138,
+					"peak_slip_m": 0.136345431208611,
+					"penetration_m": 0.0,
+					"phase_error": 0.00637898047743732,
+					"plant_rotation_degrees": 30.7523700775651,
 					"releases": [
 						{
 							"aim": [
-								52.7217555051811,
+								52.7605202438155,
+								0.933770315914664
+							],
+							"bias": 0.6,
+							"correction": "(-0.110812, -0.128009, -0.082469)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.393235864072431,
+							"turn": 8.78681838512421
+						},
+						{
+							"aim": [
+								48.3208323965101,
+								0.14265252956011
+							],
+							"bias": 0.4,
+							"correction": "(-0.098792, -0.132153, -0.085064)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.46978240711868,
+							"turn": 5.12380421161652
+						},
+						{
+							"aim": [
+								45.1373324507859,
 								0.0
 							],
-							"bias": 0.204711937904358,
-							"correction": "(-0.095664, -0.12075, -0.061471)",
+							"bias": 0.2,
+							"correction": "(-0.08344, -0.099276, -0.083859)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.440617356992044,
-							"turn": 3.04822504520416
+							"phase": 0.546328995226944,
+							"turn": 3.01165759563446
 						},
 						{
 							"aim": [
-								50.5460397262086,
-								0.0
+								49.5531282963746,
+								8.73383375490794
 							],
-							"bias": 0.0981157422065735,
-							"correction": "(-0.090082, -0.108825, -0.066227)",
+							"bias": -0.816566618280955,
+							"correction": "(-0.017361, -0.142608, 0.135211)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.503117352576886,
-							"turn": 1.79167896509171
+							"phase": 0.415465346345389,
+							"turn": -10.1250028610229
 						},
 						{
 							"aim": [
-								49.4914209523182,
-								0.0791293690406109
+								43.8160186954686,
+								1.33939870885733
 							],
-							"bias": 0.0576702505350113,
-							"correction": "(-0.086284, -0.10136, -0.071865)",
+							"bias": -0.616566618280955,
+							"correction": "(-0.009167, -0.115966, 0.139359)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.565617348161727,
-							"turn": 1.05310901999474
+							"phase": 0.492011844329624,
+							"turn": -9.06942844390869
 						},
 						{
 							"aim": [
-								45.1782999254277,
-								0.0
+								41.5056593973876,
+								0.201741189760977
 							],
-							"bias": -0.0995298941903791,
-							"correction": "(-0.008936, -0.096906, 0.104995)",
+							"bias": -0.416566618280955,
+							"correction": "(-0.006598, -0.122095, 0.162697)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.52500065197031,
-							"turn": -1.81750774383545
-						},
-						{
-							"aim": [
-								44.4578618170585,
-								0.209356730623623
-							],
-							"bias": -0.0585013945871076,
-							"correction": "(-0.009168, -0.106798, 0.130785)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.587500647555151,
-							"turn": -1.06829166412354
+							"phase": 0.568558342313858,
+							"turn": -5.31942844390869
 						}
 					],
 					"run": false,
-					"slip_m": 0.0449185068719089,
+					"slip_m": 0.291899867355824,
 					"support_frames": 18,
 					"worst_leg": {
 						"age": 1.86666666666666,
-						"aim_degrees": 2.65829617803403,
+						"aim_degrees": 8.73383375490794,
 						"jump": "GROUND",
-						"phase": 0.337500499647563,
+						"phase": 0.415465346345389,
 						"previous_support": false,
 						"side": 1,
 						"support": false
@@ -1260,230 +1293,331 @@
 					"yaw_step_degrees": 19.3373310498166
 				},
 				{
-					"clamps": 0,
+					"clamps": 3,
 					"degrees": 45,
-					"final_phase": 0.0099611657349552,
-					"final_position": "(-10.00539, 0.000802, 6.221364)",
+					"final_phase": 0.143047797413081,
+					"final_position": "(-9.747303, 0.000798, 7.095185)",
 					"frames": 18,
 					"lead": 0.15,
-					"leg_rate_per_pace": 626.637891063354,
-					"leg_step_degrees": 46.9978418297516,
+					"leg_rate_per_pace": 688.293189078359,
+					"leg_step_degrees": 51.6219891808769,
 					"peak_slip_m": 0.000000476837158203125,
 					"penetration_m": 0.0,
-					"phase_error": 0.00123143661483052,
-					"plant_rotation_degrees": 20.7908840976545,
+					"phase_error": 0.000804480220901432,
+					"plant_rotation_degrees": 24.3209341814868,
 					"releases": [
 						{
 							"aim": [
-								30.4375700738138,
-								0.0
-							],
-							"bias": 0.8,
-							"correction": "(-0.123275, 0.00427, -0.06622)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.518122416786578,
-							"turn": 10.1250028610229
-						},
-						{
-							"aim": [
-								15.1586827873053,
-								0.828034665333783
+								38.9025650216691,
+								0.331022343360318
 							],
 							"bias": 0.9,
-							"correction": "(-0.139439, -0.003679, -0.011964)",
+							"correction": "(-0.115774, -0.039092, -0.068324)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.606866509092695,
+							"phase": 0.59343243040653,
 							"turn": 10.1250028610229
 						},
 						{
 							"aim": [
-								0.0559529096807445,
-								41.8019769092449
+								1.27962452177937,
+								28.2919942121012
 							],
-							"bias": 0.804712414741516,
-							"correction": "(-0.024899, -0.122375, -0.114059)",
+							"bias": 0.8,
+							"correction": "(-0.053952, -0.058383, -0.115242)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.888116452670487,
+							"phase": 0.892437724895046,
 							"turn": 10.1249992847443
 						},
 						{
 							"aim": [
-								0.0,
-								26.5230827925473
+								1.58560248244396,
+								0.0
 							],
-							"bias": 0.604712414741516,
-							"correction": "(-0.020442, -0.055155, -0.127044)",
+							"bias": 0.112746632216472,
+							"correction": "(0.036271, -0.031605, -0.131474)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.981866422395145,
-							"turn": 8.90347480773926
+							"phase": 0.448193709153645,
+							"turn": 2.05885156989098
+						},
+						{
+							"aim": [
+								0.240662729261604,
+								0.0
+							],
+							"bias": 0.187973125385775,
+							"correction": "(0.049503, -0.040704, -0.124469)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.543376129517467,
+							"turn": 3.43255296349525
+						},
+						{
+							"aim": [
+								0.0,
+								2.15213241642896
+							],
+							"bias": 0.0689715992466861,
+							"correction": "(-0.129435, -0.039988, -0.03532)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.0371546756065237,
+							"turn": 1.25947952270508
 						}
 					],
 					"run": true,
 					"slip_m": 0.00000095367431640625,
 					"support_frames": 14,
 					"worst_leg": {
-						"age": 1.86666666666666,
-						"aim_degrees": 0.131221234148528,
-						"jump": "GROUND",
-						"phase": 0.353711068009562,
-						"previous_support": false,
-						"side": 1,
-						"support": false
-					},
-					"yaw_step_degrees": 9.72085841545096
-				},
-				{
-					"clamps": 0,
-					"degrees": 45,
-					"final_phase": 0.509959273168339,
-					"final_position": "(-13.99461, -0.00288, 6.221361)",
-					"frames": 18,
-					"lead": 0.65,
-					"leg_rate_per_pace": 610.143712771285,
-					"leg_step_degrees": 45.7607784578464,
-					"peak_slip_m": 0.00000095367431640625,
-					"penetration_m": 0.0,
-					"phase_error": 0.00123143661483051,
-					"plant_rotation_degrees": 20.8135398351315,
-					"releases": [
-						{
-							"aim": [
-								0.14265252956011,
-								6.24911851033673
-							],
-							"bias": -0.163321793079376,
-							"correction": "(0.002792, -0.012314, 0.139429)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.0381224167865781,
-							"turn": -2.98239827156067
-						}
-					],
-					"run": true,
-					"slip_m": 0.00000101327896118164,
-					"support_frames": 13,
-					"worst_leg": {
-						"age": 1.86666666666666,
+						"age": 2.0,
 						"aim_degrees": 0.0,
 						"jump": "GROUND",
-						"phase": 0.853707739097679,
+						"phase": 0.841440801115203,
 						"previous_support": false,
 						"side": 0,
 						"support": false
 					},
-					"yaw_step_degrees": 9.72038883994552
+					"yaw_step_degrees": 8.76153273331328
 				},
 				{
-					"clamps": 0,
-					"degrees": 90,
-					"final_phase": 0.960848861364993,
-					"final_position": "(-9.467804, -0.001942, 4.515361)",
+					"clamps": 2,
+					"degrees": 45,
+					"final_phase": 0.64304822202624,
+					"final_position": "(-14.2527, -0.002818, 7.095186)",
 					"frames": 18,
-					"lead": 0.15,
-					"leg_rate_per_pace": 588.187750942118,
-					"leg_step_degrees": 44.1140813206588,
+					"lead": 0.65,
+					"leg_rate_per_pace": 690.94794700496,
+					"leg_step_degrees": 51.821096025372,
 					"peak_slip_m": 0.000000238418579101563,
 					"penetration_m": 0.0,
-					"phase_error": 0.00189195020403952,
-					"plant_rotation_degrees": 21.0998391670236,
-					"releases": [],
+					"phase_error": 0.000804328747330357,
+					"plant_rotation_degrees": 24.6640965457666,
+					"releases": [
+						{
+							"aim": [
+								0.335717938332143,
+								0.265408184459443
+							],
+							"bias": -0.187940566348566,
+							"correction": "(-0.052051, -0.039612, -0.12378)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.0433762809910383,
+							"turn": -3.43195840716362
+						},
+						{
+							"aim": [
+								2.11525857297759,
+								0.0
+							],
+							"bias": -0.0689666052652766,
+							"correction": "(0.123393, -0.049318, -0.044068)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.537154931802724,
+							"turn": -1.25939011573792
+						}
+					],
 					"run": true,
 					"slip_m": 0.000000238418579101563,
 					"support_frames": 14,
 					"worst_leg": {
-						"age": 2.06666666666666,
+						"age": 2.0,
 						"aim_degrees": 0.0,
 						"jump": "GROUND",
-						"phase": 0.867099278667968,
-						"previous_support": false,
-						"side": 0,
-						"support": false
-					},
-					"yaw_step_degrees": 13.2383238757375
-				},
-				{
-					"clamps": 0,
-					"degrees": 90,
-					"final_phase": 0.460849944401543,
-					"final_position": "(-14.5322, 0.000818, 4.515361)",
-					"frames": 18,
-					"lead": 0.65,
-					"leg_rate_per_pace": 613.569781193558,
-					"leg_step_degrees": 46.0177335895168,
-					"peak_slip_m": 0.000000476837158203125,
-					"penetration_m": 0.0,
-					"phase_error": 0.00189195020403952,
-					"plant_rotation_degrees": 21.0893053077762,
-					"releases": [],
-					"run": true,
-					"slip_m": 0.000000536441802978516,
-					"support_frames": 14,
-					"worst_leg": {
-						"age": 2.06666666666666,
-						"aim_degrees": 0.0,
-						"jump": "GROUND",
-						"phase": 0.367099329605005,
+						"phase": 0.341441053289322,
 						"previous_support": false,
 						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 13.2382419134675
+					"yaw_step_degrees": 8.76111438422662
 				},
 				{
-					"clamps": 3,
-					"degrees": 180,
-					"final_phase": 0.696263010658968,
-					"final_position": "(-12.0, -0.002459, 2.503687)",
+					"clamps": 1,
+					"degrees": 90,
+					"final_phase": 0.093051187740409,
+					"final_position": "(-9.196223, 0.000794, 5.224499)",
 					"frames": 18,
 					"lead": 0.15,
-					"leg_rate_per_pace": 666.212325856569,
-					"leg_step_degrees": 49.9659244392427,
-					"peak_slip_m": 0.00116022315341979,
+					"leg_rate_per_pace": 678.354580817073,
+					"leg_step_degrees": 50.8765935612805,
+					"peak_slip_m": 0.0000000596046447753906,
 					"penetration_m": 0.0,
-					"phase_error": 0.00781262362444847,
-					"plant_rotation_degrees": 31.3279159679762,
+					"phase_error": 0.00153248194575983,
+					"plant_rotation_degrees": 20.7644102844316,
+					"releases": [
+						{
+							"aim": [
+								1.58708281922485,
+								0.0
+							],
+							"bias": 0.0923115482198649,
+							"correction": "(0.029015, -0.027106, -0.134251)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.445730233987787,
+							"turn": 1.68568901717663
+						}
+					],
+					"run": true,
+					"slip_m": 0.0000000596046447753906,
+					"support_frames": 12,
+					"worst_leg": {
+						"age": 1.86666666666666,
+						"aim_degrees": 0.137056110009996,
+						"jump": "GROUND",
+						"phase": 0.389301822429561,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 11.9898096916888
+				},
+				{
+					"clamps": 2,
+					"degrees": 90,
+					"final_phase": 0.593049936035469,
+					"final_position": "(-14.80378, -0.002879, 5.224501)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 656.336099989703,
+					"leg_step_degrees": 49.2252074992277,
+					"peak_slip_m": 0.000000480548010273196,
+					"penetration_m": 0.0,
+					"phase_error": 0.00153247628044725,
+					"plant_rotation_degrees": 20.5048528506873,
 					"releases": [
 						{
 							"aim": [
 								0.0,
-								52.0606034388076
+								1.74898797118836
 							],
-							"bias": -0.799999407819473,
-							"correction": "(-0.012813, -0.086953, 0.11014)",
+							"bias": -0.0923151356744223,
+							"correction": "(-0.027912, -0.024837, -0.134922)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.858910138972434,
-							"turn": -10.1249992847443
+							"phase": 0.945730233987787,
+							"turn": -1.68575473129749
 						},
 						{
 							"aim": [
-								0.0,
-								36.781726397583
+								0.0559529096807445,
+								0.268340976975597
 							],
-							"bias": -0.9,
-							"correction": "(-0.104717, -0.039322, 0.084191)",
+							"bias": -0.17017069103197,
+							"correction": "(-0.039484, -0.032738, -0.130266)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.946262865816557,
-							"turn": -10.1250028610229
-						},
-						{
-							"aim": [
-								0.820437734068583,
-								21.5027998374869
-							],
-							"bias": -0.9,
-							"correction": "(-0.095891, -0.084066, -0.057774)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.0400129645555642,
-							"turn": -10.1250028610229
+							"phase": 0.0374536147542088,
+							"turn": -3.10746520757675
 						}
 					],
 					"run": true,
-					"slip_m": 0.001160699990578,
-					"support_frames": 15,
+					"slip_m": 0.000000480548010273196,
+					"support_frames": 12,
+					"worst_leg": {
+						"age": 2.03333333333333,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.391978276335716,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 11.9897823709321
+				},
+				{
+					"clamps": 7,
+					"degrees": 180,
+					"final_phase": 0.727869584207421,
+					"final_position": "(-12.0, -0.002818, 3.109443)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 807.622786583329,
+					"leg_step_degrees": 60.5717089937497,
+					"peak_slip_m": 0.0,
+					"penetration_m": 0.0,
+					"phase_error": 0.00638006046400676,
+					"plant_rotation_degrees": 33.3981189846504,
+					"releases": [
+						{
+							"aim": [
+								1.58658955150073,
+								0.0
+							],
+							"bias": 0.00000495703443448292,
+							"correction": "(0.004619, -0.023478, -0.13794)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.444260926506217,
+							"turn": 0.0000905197521205992
+						},
+						{
+							"aim": [
+								0.243893275336888,
+								0.0
+							],
+							"bias": 0.00000291363448923221,
+							"correction": "(0.002759, -0.025024, -0.137718)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.534360575919394,
+							"turn": 0.0000532055082658189
+						},
+						{
+							"aim": [
+								0.896129570285547,
+								34.5739053144168
+							],
+							"bias": -0.9,
+							"correction": "(-0.108044, -0.054933, 0.070063)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.0262332316513803,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								24.1714930575415,
+								19.2950436411178
+							],
+							"bias": -0.9,
+							"correction": "(-0.063984, -0.112358, -0.053681)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.12465592847461,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								37.2453596384434,
+								4.01600395601352
+							],
+							"bias": -0.9,
+							"correction": "(-0.047694, -0.105017, -0.079351)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.225191517713602,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								21.6864909450252,
+								0.615484941335098
+							],
+							"bias": -0.516592605906077,
+							"correction": "(-0.01819, -0.037683, 0.133601)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.426262575883323,
+							"turn": -7.19480037689209
+						},
+						{
+							"aim": [
+								6.40762500285793,
+								0.0969132939991531
+							],
+							"bias": -0.316592605906077,
+							"correction": "(-0.00488, -0.053884, 0.129123)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.526798165120434,
+							"turn": -4.0334415435791
+						}
+					],
+					"run": true,
+					"slip_m": 0.0,
+					"support_frames": 16,
 					"worst_leg": {
 						"age": 1.96666666666666,
-						"aim_degrees": 0.953675835033609,
+						"aim_degrees": 4.01600395601352,
 						"jump": "GROUND",
-						"phase": 0.321263131758657,
+						"phase": 0.325726986646211,
 						"previous_support": false,
 						"side": 1,
 						"support": false
@@ -1491,83 +1625,83 @@
 					"yaw_step_degrees": 19.3373310498166
 				},
 				{
-					"clamps": 1,
+					"clamps": 3,
 					"degrees": 180,
-					"final_phase": 0.196263010658967,
-					"final_position": "(-12.0, -0.002459, 2.503687)",
+					"final_phase": 0.227869584207421,
+					"final_position": "(-12.0, -0.002818, 3.109443)",
 					"frames": 18,
 					"lead": 0.65,
-					"leg_rate_per_pace": 627.889409392273,
-					"leg_step_degrees": 47.0917057044205,
-					"peak_slip_m": 0.000000476837158203125,
+					"leg_rate_per_pace": 739.717819943168,
+					"leg_step_degrees": 55.4788364957376,
+					"peak_slip_m": 0.00000095367431640625,
 					"penetration_m": 0.0,
-					"phase_error": 0.00781262362444841,
-					"plant_rotation_degrees": 26.4472096361522,
+					"phase_error": 0.00638006046400681,
+					"plant_rotation_degrees": 28.1292700777675,
 					"releases": [
 						{
 							"aim": [
-								30.1720089037891,
-								0.0
+								37.9998599002035,
+								0.331022343360318
 							],
-							"bias": 0.8,
-							"correction": "(-0.12574, 0.003276, -0.061472)",
+							"bias": 0.9,
+							"correction": "(-0.117536, -0.041421, -0.063793)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.518122416786578,
+							"phase": 0.59343243040653,
 							"turn": 10.1250028610229
 						},
 						{
 							"aim": [
-								0.0559529096807445,
-								41.4678201493858
+								1.14123880605768,
+								27.7164090481023
 							],
 							"bias": 0.8,
-							"correction": "(-0.023849, -0.121972, -0.110817)",
+							"correction": "(-0.048009, -0.059292, -0.117386)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.888116452670487,
+							"phase": 0.892437724895046,
 							"turn": 10.1249992847443
 						},
 						{
 							"aim": [
-								0.0,
-								26.188948230803
-							],
-							"bias": 0.6,
-							"correction": "(-0.019506, -0.054001, -0.127685)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.981866422395145,
-							"turn": 8.250732421875
-						},
-						{
-							"aim": [
-								0.676085527941772,
-								10.9100626518419
-							],
-							"bias": 0.4,
-							"correction": "(0.021019, -0.090847, -0.104427)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.0756164566269772,
-							"turn": 4.83788967132568
-						},
-						{
-							"aim": [
-								26.5257448587763,
+								23.756989367381,
 								0.0
 							],
 							"bias": -0.9,
-							"correction": "(-0.107719, -0.032422, 0.083339)",
+							"correction": "(-0.112635, -0.056522, 0.06098)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.446262865816557,
+							"phase": 0.526233231651381,
 							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								8.47799365161948,
+								1.73008766381617
+							],
+							"bias": -0.9,
+							"correction": "(-0.099534, -0.098452, 0.000394)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.62465592847461,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								0.0,
+								24.4658895786947
+							],
+							"bias": -0.516594751673289,
+							"correction": "(-0.131273, -0.026267, 0.040956)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.926262575883323,
+							"turn": -7.19482898712158
 						}
 					],
 					"run": true,
-					"slip_m": 0.000000476837158203125,
-					"support_frames": 15,
+					"slip_m": 0.0000019073486328125,
+					"support_frames": 16,
 					"worst_leg": {
 						"age": 1.96666666666666,
-						"aim_degrees": 0.262442628379615,
+						"aim_degrees": 1.30025606866275,
 						"jump": "GROUND",
-						"phase": 0.821263131758657,
+						"phase": 0.825726986646212,
 						"previous_support": false,
 						"side": 0,
 						"support": false
@@ -1575,140 +1709,140 @@
 					"yaw_step_degrees": 19.3373310498166
 				}
 			],
-			"clamps": 9,
+			"clamps": 26,
 			"jumps": [
 				{
 					"degrees": 45,
 					"frames": 25,
-					"leg_rate_per_pace": 272.103489488475,
-					"leg_step_degrees": 20.4077617116356,
-					"peak_slip_m": 0.083506278693676,
+					"leg_rate_per_pace": 388.707750445421,
+					"leg_step_degrees": 29.1530812834066,
+					"peak_slip_m": 0.218326017260551,
 					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00000249824406184374,
-					"plant_rotation_degrees": 9.64642472142346,
+					"phase_error": 0.000000507694145515658,
+					"plant_rotation_degrees": 19.2915499993573,
 					"run": false,
-					"slip_m": 0.199256448073356,
+					"slip_m": 0.275929547842679,
+					"support_frames": 25,
+					"worst_leg": {
+						"age": 0.666666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.380496674242831,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.275038057498073
+				},
+				{
+					"degrees": 90,
+					"frames": 25,
+					"leg_rate_per_pace": 411.895559658697,
+					"leg_step_degrees": 30.8921669744023,
+					"peak_slip_m": 0.202495977282524,
+					"penetration_m": 0.0,
+					"phase_error": 0.0000000450620147862679,
+					"plant_rotation_degrees": 14.130783713448,
+					"run": false,
+					"slip_m": 0.214089562185109,
+					"support_frames": 25,
+					"worst_leg": {
+						"age": 0.366666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.444647334545735,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.999202034059505
+				},
+				{
+					"degrees": 180,
+					"frames": 25,
+					"leg_rate_per_pace": 394.295391601625,
+					"leg_step_degrees": 29.5721543701219,
+					"peak_slip_m": 0.142129898071289,
+					"penetration_m": 0.0000000298023223876953,
+					"phase_error": 0.00000288396969883031,
+					"plant_rotation_degrees": 21.8857053649996,
+					"run": false,
+					"slip_m": 0.377254836726934,
 					"support_frames": 25,
 					"worst_leg": {
 						"age": 0.566666666666667,
 						"aim_degrees": 0.0,
 						"jump": "LAND",
-						"phase": 0.361082643372618,
+						"phase": 0.435778623733867,
 						"previous_support": false,
 						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 0.270776019455986
-				},
-				{
-					"degrees": 90,
-					"frames": 25,
-					"leg_rate_per_pace": 271.424158873625,
-					"leg_step_degrees": 20.3568119155219,
-					"peak_slip_m": 0.105562701821327,
-					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00000706425411754752,
-					"plant_rotation_degrees": 8.35611404852248,
-					"run": false,
-					"slip_m": 0.175259710063699,
-					"support_frames": 25,
-					"worst_leg": {
-						"age": 0.666666666666667,
-						"aim_degrees": 0.0,
-						"jump": "LAND",
-						"phase": 0.448961033644652,
-						"previous_support": false,
-						"side": 1,
-						"support": false
-					},
-					"yaw_step_degrees": 0.983875089561997
-				},
-				{
-					"degrees": 180,
-					"frames": 25,
-					"leg_rate_per_pace": 335.893130549919,
-					"leg_step_degrees": 25.191984791244,
-					"peak_slip_m": 0.245165899395943,
-					"penetration_m": 0.0,
-					"phase_error": 0.000000883024973238888,
-					"plant_rotation_degrees": 20.6195880759125,
-					"run": false,
-					"slip_m": 0.298515878617764,
-					"support_frames": 25,
-					"worst_leg": {
-						"age": 0.0333333333333333,
-						"aim_degrees": 0.0559529096807445,
-						"jump": "LAND",
-						"phase": 0.0409536351891778,
-						"previous_support": false,
-						"side": 0,
-						"support": true
-					},
-					"yaw_step_degrees": 19.3373037290599
+					"yaw_step_degrees": 19.3373310498166
 				},
 				{
 					"degrees": 45,
 					"frames": 25,
-					"leg_rate_per_pace": 609.229605787365,
-					"leg_step_degrees": 45.6922204340524,
-					"peak_slip_m": 0.0542555749416351,
+					"leg_rate_per_pace": 705.915987828881,
+					"leg_step_degrees": 52.9436990871661,
+					"peak_slip_m": 0.172487512230873,
 					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00246540894285918,
-					"plant_rotation_degrees": 20.0768441689904,
+					"phase_error": 0.00328279230550423,
+					"plant_rotation_degrees": 22.4471332543964,
 					"run": true,
-					"slip_m": 0.102731616236042,
+					"slip_m": 0.221417166292667,
 					"support_frames": 20,
 					"worst_leg": {
-						"age": 0.666666666666667,
+						"age": 0.4,
 						"aim_degrees": 0.0,
 						"jump": "LAND",
-						"phase": 0.854965570782212,
+						"phase": 0.843340210976931,
 						"previous_support": false,
 						"side": 0,
 						"support": false
 					},
-					"yaw_step_degrees": 0.562862229122411
+					"yaw_step_degrees": 0.725967146502315
 				},
 				{
 					"degrees": 90,
 					"frames": 25,
-					"leg_rate_per_pace": 598.130958197444,
-					"leg_step_degrees": 44.8598218648083,
-					"peak_slip_m": 0.0143545120954514,
+					"leg_rate_per_pace": 684.950722171527,
+					"leg_step_degrees": 51.3713041628645,
+					"peak_slip_m": 0.0488457903265953,
 					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00246546485207289,
-					"plant_rotation_degrees": 18.3666672536567,
+					"phase_error": 0.000797816778073002,
+					"plant_rotation_degrees": 18.7867819442205,
 					"run": true,
-					"slip_m": 0.0143550485372543,
-					"support_frames": 21,
+					"slip_m": 0.0750368125736713,
+					"support_frames": 16,
 					"worst_leg": {
-						"age": 0.333333333333333,
+						"age": 0.466666666666667,
 						"aim_degrees": 0.0,
 						"jump": "LAND",
-						"phase": 0.847896730976134,
+						"phase": 0.383271823048819,
 						"previous_support": false,
-						"side": 0,
+						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 4.62633301165976
+					"yaw_step_degrees": 7.46867525362554
 				},
 				{
 					"degrees": 180,
 					"frames": 25,
-					"leg_rate_per_pace": 625.147316113485,
-					"leg_step_degrees": 46.8860487085114,
-					"peak_slip_m": 0.0000019073486328125,
-					"penetration_m": 0.0,
-					"phase_error": 0.00316784574317566,
-					"plant_rotation_degrees": 25.0058296929626,
+					"leg_rate_per_pace": 699.244987601124,
+					"leg_step_degrees": 52.4433740700843,
+					"peak_slip_m": 0.143006667494774,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00607353170741769,
+					"plant_rotation_degrees": 22.9226015055412,
 					"run": true,
-					"slip_m": 0.00000333786010742188,
-					"support_frames": 21,
+					"slip_m": 0.14935299102217,
+					"support_frames": 17,
 					"worst_leg": {
-						"age": 0.666666666666667,
+						"age": 0.5,
 						"aim_degrees": 0.0,
 						"jump": "LAND",
-						"phase": 0.354988873689372,
+						"phase": 0.377715847909638,
 						"previous_support": false,
 						"side": 1,
 						"support": false
@@ -1717,146 +1851,180 @@
 				}
 			],
 			"pace": 2.25,
-			"peak_slip_m": 0.0405838936567307,
+			"peak_slip_m": 0.173016548156738,
 			"polish": false,
-			"total_planted_slip_m": 0.100052900263108
+			"total_planted_slip_m": 0.627246260628567
 		},
 		{
 			"cases": [
 				{
 					"clamps": 0,
 					"degrees": 45,
-					"final_phase": 0.395589565313071,
-					"final_position": "(-11.16569, 0.000841, 2.506266)",
+					"final_phase": 0.672194860064988,
+					"final_position": "(-10.77654, -0.002088, 3.72041)",
 					"frames": 18,
 					"lead": 0.15,
-					"leg_rate_per_pace": 296.71102182263,
-					"leg_step_degrees": 22.2533266366972,
-					"peak_slip_m": 0.0000000596046447753906,
-					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.000180329805538969,
-					"plant_rotation_degrees": 8.99525326897466,
+					"leg_rate_per_pace": 378.454657507451,
+					"leg_step_degrees": 28.3840993130588,
+					"peak_slip_m": 0.000000238418579101563,
+					"penetration_m": 0.0,
+					"phase_error": 0.00134925020288777,
+					"plant_rotation_degrees": 12.2974772703993,
 					"releases": [],
 					"run": false,
-					"slip_m": 0.000000119209289550781,
+					"slip_m": 0.00000143051147460938,
 					"support_frames": 18,
 					"worst_leg": {
-						"age": 1.6,
+						"age": 2.0,
 						"aim_degrees": 0.0,
 						"jump": "GROUND",
-						"phase": 0.458090330641634,
+						"phase": 0.442555585414148,
 						"previous_support": false,
 						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 12.5334517684868
+					"yaw_step_degrees": 12.1017035582192
 				},
 				{
 					"clamps": 0,
 					"degrees": 45,
-					"final_phase": 0.895588630777495,
-					"final_position": "(-12.83431, 0.000781, 2.506267)",
+					"final_phase": 0.172188124794088,
+					"final_position": "(-13.22345, 0.000181, 3.720404)",
 					"frames": 18,
 					"lead": 0.65,
-					"leg_rate_per_pace": 259.537170849702,
-					"leg_step_degrees": 19.4652878137276,
-					"peak_slip_m": 0.000000238418579101563,
-					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.000180947927781082,
-					"plant_rotation_degrees": 9.94929750733662,
-					"releases": [],
-					"run": false,
-					"slip_m": 0.000000536441802978516,
-					"support_frames": 18,
-					"worst_leg": {
-						"age": 1.6,
-						"aim_degrees": 0.0,
-						"jump": "GROUND",
-						"phase": 0.958090337991487,
-						"previous_support": false,
-						"side": 0,
-						"support": false
-					},
-					"yaw_step_degrees": 12.5335328769832
-				},
-				{
-					"clamps": 0,
-					"degrees": 90,
-					"final_phase": 0.366990517183875,
-					"final_position": "(-10.86427, -0.001643, 1.716108)",
-					"frames": 18,
-					"lead": 0.15,
-					"leg_rate_per_pace": 331.938063976429,
-					"leg_step_degrees": 24.8953547982322,
-					"peak_slip_m": 0.000000238418579101563,
+					"leg_rate_per_pace": 371.390853100526,
+					"leg_step_degrees": 27.8543139825395,
+					"peak_slip_m": 0.0,
 					"penetration_m": 0.0,
-					"phase_error": 0.00339105541323438,
-					"plant_rotation_degrees": 13.1608123277152,
+					"phase_error": 0.00134889271081055,
+					"plant_rotation_degrees": 12.2800517502793,
 					"releases": [],
 					"run": false,
-					"slip_m": 0.000000596046447753906,
+					"slip_m": 0.0,
 					"support_frames": 18,
 					"worst_leg": {
-						"age": 1.6,
-						"aim_degrees": 0.0,
+						"age": 1.76666666666667,
+						"aim_degrees": 0.707759036113825,
 						"jump": "GROUND",
-						"phase": 0.429501290232735,
+						"phase": 0.406732764206025,
 						"previous_support": false,
 						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 19.3373242196275
+					"yaw_step_degrees": 12.1017471006752
 				},
 				{
 					"clamps": 0,
 					"degrees": 90,
-					"final_phase": 0.866992103002578,
-					"final_position": "(-13.13573, 0.000737, 1.716107)",
+					"final_phase": 0.619937590436382,
+					"final_position": "(-10.36772, -0.00288, 2.594903)",
 					"frames": 18,
-					"lead": 0.65,
-					"leg_rate_per_pace": 316.02413302165,
-					"leg_step_degrees": 23.7018099766237,
-					"peak_slip_m": 0.000000119209289550781,
-					"penetration_m": 0.0,
-					"phase_error": 0.00339193843820755,
-					"plant_rotation_degrees": 13.0683990144713,
+					"lead": 0.15,
+					"leg_rate_per_pace": 386.333075809385,
+					"leg_step_degrees": 28.9749806857039,
+					"peak_slip_m": 0.000000238418579101563,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00387391332680054,
+					"plant_rotation_degrees": 12.4426418421505,
 					"releases": [],
 					"run": false,
-					"slip_m": 0.000000417232513427734,
+					"slip_m": 0.00000107288360595703,
 					"support_frames": 18,
 					"worst_leg": {
-						"age": 1.6,
-						"aim_degrees": 0.0,
+						"age": 2.0,
+						"aim_degrees": 0.69097165843355,
 						"jump": "GROUND",
-						"phase": 0.929501992972054,
+						"phase": 0.390298637227997,
 						"previous_support": false,
-						"side": 0,
+						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 19.3373242196275
+					"yaw_step_degrees": 19.1795058686651
 				},
 				{
 					"clamps": 0,
-					"degrees": 180,
-					"final_phase": 0.275000689499082,
-					"final_position": "(-12.0, -0.000264, 0.6581)",
+					"degrees": 90,
+					"final_phase": 0.119931621250219,
+					"final_position": "(-13.63227, 0.000838, 2.594903)",
 					"frames": 18,
-					"lead": 0.15,
-					"leg_rate_per_pace": 469.314273469921,
-					"leg_step_degrees": 35.1985705102441,
-					"peak_slip_m": 0.000000119209289550781,
+					"lead": 0.65,
+					"leg_rate_per_pace": 399.584644560288,
+					"leg_step_degrees": 29.9688483420216,
+					"peak_slip_m": 0.00000095367431640625,
 					"penetration_m": 0.0,
-					"phase_error": 0.00781251324547663,
-					"plant_rotation_degrees": 24.2002515690419,
+					"phase_error": 0.00387392233920592,
+					"plant_rotation_degrees": 12.0225741091373,
 					"releases": [],
 					"run": false,
-					"slip_m": 0.000000536441802978516,
+					"slip_m": 0.00000238418579101563,
 					"support_frames": 18,
 					"worst_leg": {
 						"age": 1.8,
-						"aim_degrees": 28.097019632054,
+						"aim_degrees": 0.274112406782978,
 						"jump": "GROUND",
-						"phase": 0.712500508478037,
+						"phase": 0.431017645625049,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 19.1794443969626
+				},
+				{
+					"clamps": 3,
+					"degrees": 180,
+					"final_phase": 0.45129083223487,
+					"final_position": "(-12.0, -0.002633, 1.139063)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 511.019408542019,
+					"leg_step_degrees": 38.3264556406514,
+					"peak_slip_m": 0.111447021365166,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00637898047743732,
+					"plant_rotation_degrees": 28.2234669241584,
+					"releases": [
+						{
+							"aim": [
+								0.0,
+								55.1179327150887
+							],
+							"bias": -0.816590221720286,
+							"correction": "(-0.105406, -0.126422, 0.135402)",
+							"load": "(-0.045831, -0.050332, 0.058874)",
+							"phase": 0.915465346345389,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								0.0,
+								50.1746891712241
+							],
+							"bias": -0.616590221720286,
+							"correction": "(-0.086602, -0.121595, 0.112854)",
+							"load": "(-0.044593, -0.052294, 0.05811)",
+							"phase": 0.992011844329623,
+							"turn": -9.06975746154785
+						},
+						{
+							"aim": [
+								2.13386678304105,
+								45.8579344836952
+							],
+							"bias": -0.416590221720286,
+							"correction": "(-0.0809, -0.092636, 0.111794)",
+							"load": "(-0.0423, -0.053794, 0.058454)",
+							"phase": 0.0685583423138579,
+							"turn": -5.31975746154785
+						}
+					],
+					"run": false,
+					"slip_m": 0.217339634782405,
+					"support_frames": 18,
+					"worst_leg": {
+						"age": 1.76666666666667,
+						"aim_degrees": 25.6187179351134,
+						"jump": "GROUND",
+						"phase": 0.685825672144899,
 						"previous_support": true,
 						"side": 0,
 						"support": false
@@ -1864,27 +2032,83 @@
 					"yaw_step_degrees": 19.3373310498166
 				},
 				{
-					"clamps": 0,
+					"clamps": 3,
 					"degrees": 180,
-					"final_phase": 0.775000689499082,
-					"final_position": "(-12.0, -0.000264, 0.6581)",
+					"final_phase": 0.95129083223487,
+					"final_position": "(-12.0, -0.002633, 1.139063)",
 					"frames": 18,
 					"lead": 0.65,
-					"leg_rate_per_pace": 436.637965461663,
-					"leg_step_degrees": 32.7478474096247,
-					"peak_slip_m": 0.000000133280039449346,
-					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00781251324547652,
-					"plant_rotation_degrees": 25.1224620032297,
-					"releases": [],
+					"leg_rate_per_pace": 550.822609137835,
+					"leg_step_degrees": 41.3116956853376,
+					"peak_slip_m": 0.0830826535820961,
+					"penetration_m": 0.0,
+					"phase_error": 0.00637898047743732,
+					"plant_rotation_degrees": 30.7520388133903,
+					"releases": [
+						{
+							"aim": [
+								51.1786279414731,
+								0.137056110009996
+							],
+							"bias": 0.4,
+							"correction": "(-0.086205, -0.104231, -0.073019)",
+							"load": "(-0.054229, -0.055221, -0.045934)",
+							"phase": 0.46978240711868,
+							"turn": 5.12380421161652
+						},
+						{
+							"aim": [
+								49.8350853355019,
+								0.0
+							],
+							"bias": 0.2,
+							"correction": "(-0.103414, -0.094928, -0.099392)",
+							"load": "(-0.051865, -0.054085, -0.049848)",
+							"phase": 0.546328995226944,
+							"turn": 3.01165759563446
+						},
+						{
+							"aim": [
+								49.6717106256498,
+								8.7329338774848
+							],
+							"bias": -0.816566618280955,
+							"correction": "(-0.012095, -0.105836, 0.095899)",
+							"load": "(-0.006232, -0.037843, 0.038095)",
+							"phase": 0.415465346345389,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								48.0097616760456,
+								1.33881419407476
+							],
+							"bias": -0.616566618280955,
+							"correction": "(-0.012276, -0.11134, 0.162463)",
+							"load": "(-0.005606, -0.051365, 0.064868)",
+							"phase": 0.492011844329624,
+							"turn": -9.06942844390869
+						},
+						{
+							"aim": [
+								44.2935342958172,
+								0.201741189760977
+							],
+							"bias": -0.416566618280955,
+							"correction": "(-0.0092, -0.107713, 0.172268)",
+							"load": "(-0.003938, -0.051456, 0.073734)",
+							"phase": 0.568558342313858,
+							"turn": -5.31942844390869
+						}
+					],
 					"run": false,
-					"slip_m": 0.00000055051255287708,
+					"slip_m": 0.16615085478756,
 					"support_frames": 18,
 					"worst_leg": {
 						"age": 1.86666666666666,
-						"aim_degrees": 2.60474066475196,
+						"aim_degrees": 8.7329338774848,
 						"jump": "GROUND",
-						"phase": 0.337500499647563,
+						"phase": 0.415465346345389,
 						"previous_support": false,
 						"side": 1,
 						"support": false
@@ -1892,231 +2116,308 @@
 					"yaw_step_degrees": 19.3373310498166
 				},
 				{
-					"clamps": 1,
+					"clamps": 3,
 					"degrees": 45,
-					"final_phase": 0.0099611657349552,
-					"final_position": "(-10.00539, 0.000802, 6.221364)",
+					"final_phase": 0.143047797413081,
+					"final_position": "(-9.747303, 0.000798, 7.095185)",
 					"frames": 18,
 					"lead": 0.15,
-					"leg_rate_per_pace": 626.46067042169,
-					"leg_step_degrees": 46.9845502816267,
-					"peak_slip_m": 0.0,
+					"leg_rate_per_pace": 688.193377247288,
+					"leg_step_degrees": 51.6145032935466,
+					"peak_slip_m": 0.000000476837158203125,
 					"penetration_m": 0.0,
-					"phase_error": 0.00123143661483052,
-					"plant_rotation_degrees": 20.9352794193505,
+					"phase_error": 0.000804480220901432,
+					"plant_rotation_degrees": 24.3856655917983,
 					"releases": [
 						{
 							"aim": [
-								30.3174987632995,
-								0.0
-							],
-							"bias": 0.8,
-							"correction": "(-0.12271, 0.005255, -0.067191)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.518122416786578,
-							"turn": 10.1250028610229
-						},
-						{
-							"aim": [
-								15.0385892786763,
-								0.828034665333783
+								38.9565542519634,
+								0.326259166868306
 							],
 							"bias": 0.9,
-							"correction": "(-0.139266, -0.00306, -0.013983)",
+							"correction": "(-0.115471, -0.038107, -0.069385)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.606866509092695,
+							"phase": 0.59343243040653,
 							"turn": 10.1250028610229
 						},
 						{
 							"aim": [
-								0.0,
-								26.5964048732874
+								1.64234801423354,
+								0.0
 							],
-							"bias": 0.604712414741516,
-							"correction": "(-0.019296, -0.043669, -0.131608)",
-							"load": "(-0.004999, -0.019197, -0.019916)",
-							"phase": 0.981866422395145,
-							"turn": 8.90347480773926
+							"bias": 0.112746632216472,
+							"correction": "(0.033338, -0.0318, -0.132202)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.448193709153645,
+							"turn": 2.05885156989098
 						},
 						{
 							"aim": [
-								0.0,
-								20.9763015355056
-							],
-							"bias": 0.0561389884901502,
-							"correction": "(-0.127963, -0.03751, -0.042644)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.978710161292839,
-							"turn": 1.02514743804932
-						}
-					],
-					"run": true,
-					"slip_m": 0.0,
-					"support_frames": 14,
-					"worst_leg": {
-						"age": 1.86666666666666,
-						"aim_degrees": 0.131221234148528,
-						"jump": "GROUND",
-						"phase": 0.353711068009562,
-						"previous_support": false,
-						"side": 1,
-						"support": false
-					},
-					"yaw_step_degrees": 9.72085841545096
-				},
-				{
-					"clamps": 0,
-					"degrees": 45,
-					"final_phase": 0.509959273168339,
-					"final_position": "(-13.99461, -0.00288, 6.221361)",
-					"frames": 18,
-					"lead": 0.65,
-					"leg_rate_per_pace": 610.019539932174,
-					"leg_step_degrees": 45.7514654949131,
-					"peak_slip_m": 0.000000476837158203125,
-					"penetration_m": 0.0,
-					"phase_error": 0.00123143661483051,
-					"plant_rotation_degrees": 20.9573084869711,
-					"releases": [
-						{
-							"aim": [
-								0.14265252956011,
-								6.07773497679595
-							],
-							"bias": -0.163321793079376,
-							"correction": "(0.005493, -0.012588, 0.139325)",
-							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.0381224167865781,
-							"turn": -2.98239827156067
-						}
-					],
-					"run": true,
-					"slip_m": 0.000000536441802978516,
-					"support_frames": 13,
-					"worst_leg": {
-						"age": 1.86666666666666,
-						"aim_degrees": 0.0,
-						"jump": "GROUND",
-						"phase": 0.853707739097679,
-						"previous_support": false,
-						"side": 0,
-						"support": false
-					},
-					"yaw_step_degrees": 9.72038883994552
-				},
-				{
-					"clamps": 0,
-					"degrees": 90,
-					"final_phase": 0.960848861364993,
-					"final_position": "(-9.467804, -0.001942, 4.515361)",
-					"frames": 18,
-					"lead": 0.15,
-					"leg_rate_per_pace": 588.09317558941,
-					"leg_step_degrees": 44.1069881692058,
-					"peak_slip_m": 0.000000476837158203125,
-					"penetration_m": 0.0,
-					"phase_error": 0.00189195020403952,
-					"plant_rotation_degrees": 21.3407365239554,
-					"releases": [
-						{
-							"aim": [
-								7.50916717634632,
+								0.253337772772576,
 								0.0
 							],
-							"bias": 0.163323238492012,
-							"correction": "(-0.025735, -0.003277, 0.137575)",
+							"bias": 0.187973125385775,
+							"correction": "(0.046275, -0.041284, -0.125516)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.518122416786578,
-							"turn": 2.98242419958115
+							"phase": 0.543376129517467,
+							"turn": 3.43255296349525
+						},
+						{
+							"aim": [
+								0.0559529096807445,
+								2.38900849948688
+							],
+							"bias": 0.0689715992466861,
+							"correction": "(-0.129102, -0.040315, -0.036157)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.0371546756065237,
+							"turn": 1.25947952270508
 						}
 					],
 					"run": true,
-					"slip_m": 0.000000476837158203125,
+					"slip_m": 0.000000715255737304688,
 					"support_frames": 14,
 					"worst_leg": {
-						"age": 2.06666666666666,
+						"age": 2.0,
 						"aim_degrees": 0.0,
 						"jump": "GROUND",
-						"phase": 0.867099278667968,
+						"phase": 0.841440801115203,
 						"previous_support": false,
 						"side": 0,
 						"support": false
 					},
-					"yaw_step_degrees": 13.2383238757375
-				},
-				{
-					"clamps": 0,
-					"degrees": 90,
-					"final_phase": 0.460849944401543,
-					"final_position": "(-14.5322, 0.000818, 4.515361)",
-					"frames": 18,
-					"lead": 0.65,
-					"leg_rate_per_pace": 613.471927350049,
-					"leg_step_degrees": 46.0103945512537,
-					"peak_slip_m": 0.000000476837158203125,
-					"penetration_m": 0.0,
-					"phase_error": 0.00189195020403952,
-					"plant_rotation_degrees": 21.3334350517326,
-					"releases": [],
-					"run": true,
-					"slip_m": 0.000000476837158203125,
-					"support_frames": 14,
-					"worst_leg": {
-						"age": 2.06666666666666,
-						"aim_degrees": 0.0,
-						"jump": "GROUND",
-						"phase": 0.367099329605005,
-						"previous_support": false,
-						"side": 1,
-						"support": false
-					},
-					"yaw_step_degrees": 13.2382419134675
+					"yaw_step_degrees": 8.76153273331328
 				},
 				{
 					"clamps": 2,
-					"degrees": 180,
-					"final_phase": 0.696263010658968,
-					"final_position": "(-12.0, -0.002459, 2.503687)",
+					"degrees": 45,
+					"final_phase": 0.64304822202624,
+					"final_position": "(-14.2527, -0.002818, 7.095186)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 690.828737436646,
+					"leg_step_degrees": 51.8121553077484,
+					"peak_slip_m": 0.000000238418579101563,
+					"penetration_m": 0.0,
+					"phase_error": 0.000804328747330357,
+					"plant_rotation_degrees": 24.7195252384285,
+					"releases": [
+						{
+							"aim": [
+								0.328649386232267,
+								0.276953045106189
+							],
+							"bias": -0.187940566348566,
+							"correction": "(-0.049129, -0.040228, -0.124772)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.0433762809910383,
+							"turn": -3.43195840716362
+						},
+						{
+							"aim": [
+								2.34935391526966,
+								0.0
+							],
+							"bias": -0.0689666052652766,
+							"correction": "(0.123174, -0.049624, -0.044336)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.537154931802724,
+							"turn": -1.25939011573792
+						}
+					],
+					"run": true,
+					"slip_m": 0.000000238418579101563,
+					"support_frames": 14,
+					"worst_leg": {
+						"age": 2.0,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.341441053289322,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 8.76111438422662
+				},
+				{
+					"clamps": 0,
+					"degrees": 90,
+					"final_phase": 0.093051187740409,
+					"final_position": "(-9.196223, 0.000794, 5.224499)",
 					"frames": 18,
 					"lead": 0.15,
-					"leg_rate_per_pace": 669.268289095016,
-					"leg_step_degrees": 50.1951216821262,
-					"peak_slip_m": 0.00000095367431640625,
+					"leg_rate_per_pace": 677.80620769591,
+					"leg_step_degrees": 50.8354655771933,
+					"peak_slip_m": 0.000000715255737304688,
 					"penetration_m": 0.0,
-					"phase_error": 0.00781262362444847,
-					"plant_rotation_degrees": 31.1732292587483,
+					"phase_error": 0.00153248194575983,
+					"plant_rotation_degrees": 20.8488228848365,
+					"releases": [],
+					"run": true,
+					"slip_m": 0.000000715255737304688,
+					"support_frames": 12,
+					"worst_leg": {
+						"age": 1.86666666666666,
+						"aim_degrees": 0.14265252956011,
+						"jump": "GROUND",
+						"phase": 0.389301822429561,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 11.9898096916888
+				},
+				{
+					"clamps": 2,
+					"degrees": 90,
+					"final_phase": 0.593049936035469,
+					"final_position": "(-14.80378, -0.002879, 5.224501)",
+					"frames": 18,
+					"lead": 0.65,
+					"leg_rate_per_pace": 656.270439104482,
+					"leg_step_degrees": 49.2202829328362,
+					"peak_slip_m": 0.000000238418579101563,
+					"penetration_m": 0.0,
+					"phase_error": 0.00153247628044725,
+					"plant_rotation_degrees": 20.6040476880034,
 					"releases": [
 						{
 							"aim": [
 								0.0,
-								36.9190405206569
+								1.8191914302421
+							],
+							"bias": -0.0923151356744223,
+							"correction": "(-0.026479, -0.025007, -0.13518)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.945730233987787,
+							"turn": -1.68575473129749
+						},
+						{
+							"aim": [
+								0.0395646811852521,
+								0.279764815207987
+							],
+							"bias": -0.17017069103197,
+							"correction": "(-0.037488, -0.033223, -0.130732)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.0374536147542088,
+							"turn": -3.10746520757675
+						}
+					],
+					"run": true,
+					"slip_m": 0.000000238418579101563,
+					"support_frames": 12,
+					"worst_leg": {
+						"age": 2.03333333333333,
+						"aim_degrees": 0.0,
+						"jump": "GROUND",
+						"phase": 0.391978276335716,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 11.9897823709321
+				},
+				{
+					"clamps": 7,
+					"degrees": 180,
+					"final_phase": 0.727869584207421,
+					"final_position": "(-12.0, -0.002818, 3.109443)",
+					"frames": 18,
+					"lead": 0.15,
+					"leg_rate_per_pace": 808.324019338117,
+					"leg_step_degrees": 60.6243014503588,
+					"peak_slip_m": 0.000000238418579101563,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00638006046400676,
+					"plant_rotation_degrees": 33.2260221232281,
+					"releases": [
+						{
+							"aim": [
+								1.64472940237635,
+								0.0
+							],
+							"bias": 0.00000495703443448292,
+							"correction": "(0.003489, -0.023301, -0.138003)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.444260926506217,
+							"turn": 0.0000905197521205992
+						},
+						{
+							"aim": [
+								0.253337772772576,
+								0.0
+							],
+							"bias": 0.00000291363448923221,
+							"correction": "(0.001796, -0.025014, -0.137736)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.534360575919394,
+							"turn": 0.0000532055082658189
+						},
+						{
+							"aim": [
+								1.49042838539318,
+								34.6345949602869
 							],
 							"bias": -0.9,
-							"correction": "(-0.108964, -0.032123, 0.081823)",
-							"load": "(-0.002263, -0.022878, 0.021586)",
-							"phase": 0.946262865816557,
+							"correction": "(-0.111063, -0.050683, 0.068529)",
+							"load": "(-0.001796, -0.012814, 0.012987)",
+							"phase": 0.0262332316513803,
 							"turn": -10.1250028610229
 						},
 						{
 							"aim": [
-								21.8289601533752,
-								0.14265252956011
+								24.6805897450649,
+								19.3556820605692
 							],
-							"bias": -0.416592605906077,
-							"correction": "(-0.014824, -0.030773, 0.135769)",
+							"bias": -0.9,
+							"correction": "(-0.067189, -0.1121, -0.050191)",
+							"load": "(-0.000653, -0.00466, 0.004723)",
+							"phase": 0.12465592847461,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								37.677498877041,
+								4.07669445565731
+							],
+							"bias": -0.9,
+							"correction": "(-0.051192, -0.105868, -0.075969)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.415012972469805,
-							"turn": -5.31980037689209
+							"phase": 0.225191517713602,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								22.1149094380723,
+								0.624323259481947
+							],
+							"bias": -0.516592605906077,
+							"correction": "(-0.014658, -0.039759, 0.133433)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.426262575883323,
+							"turn": -7.19480037689209
+						},
+						{
+							"aim": [
+								6.83598202420257,
+								0.0969132939991531
+							],
+							"bias": -0.316592605906077,
+							"correction": "(-0.000067, -0.061209, 0.125911)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.526798165120434,
+							"turn": -4.0334415435791
 						}
 					],
 					"run": true,
-					"slip_m": 0.00000214576721191406,
-					"support_frames": 15,
+					"slip_m": 0.000000298023223876953,
+					"support_frames": 16,
 					"worst_leg": {
 						"age": 1.96666666666666,
-						"aim_degrees": 0.974781439734065,
+						"aim_degrees": 4.07669445565731,
 						"jump": "GROUND",
-						"phase": 0.321263131758657,
+						"phase": 0.325726986646211,
 						"previous_support": false,
 						"side": 1,
 						"support": false
@@ -2124,83 +2425,83 @@
 					"yaw_step_degrees": 19.3373310498166
 				},
 				{
-					"clamps": 1,
+					"clamps": 3,
 					"degrees": 180,
-					"final_phase": 0.196263010658967,
-					"final_position": "(-12.0, -0.002459, 2.503687)",
+					"final_phase": 0.227869584207421,
+					"final_position": "(-12.0, -0.002818, 3.109443)",
 					"frames": 18,
 					"lead": 0.65,
-					"leg_rate_per_pace": 625.565642432851,
-					"leg_step_degrees": 46.9174231824638,
-					"peak_slip_m": 0.0,
-					"penetration_m": 0.0,
-					"phase_error": 0.00781262362444841,
-					"plant_rotation_degrees": 26.7253349391551,
+					"leg_rate_per_pace": 737.133549568802,
+					"leg_step_degrees": 55.2850162176602,
+					"peak_slip_m": 0.00000095367431640625,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00638006046400681,
+					"plant_rotation_degrees": 27.8342946980822,
 					"releases": [
 						{
 							"aim": [
-								30.0522176310308,
-								0.0
+								38.0530226776083,
+								0.326259166868306
 							],
-							"bias": 0.8,
-							"correction": "(-0.12521, 0.004259, -0.062484)",
+							"bias": 0.9,
+							"correction": "(-0.117288, -0.040414, -0.064887)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.518122416786578,
+							"phase": 0.59343243040653,
 							"turn": 10.1250028610229
 						},
 						{
 							"aim": [
-								14.7733286369751,
-								0.827088844216294
+								1.14943972881675,
+								27.6980904807484
 							],
-							"bias": 0.9,
-							"correction": "(-0.139706, -0.003689, -0.00828)",
+							"bias": 0.8,
+							"correction": "(-0.044513, -0.053875, -0.12131)",
+							"load": "(-0.007775, -0.018982, -0.01277)",
+							"phase": 0.892437724895046,
+							"turn": 10.1249992847443
+						},
+						{
+							"aim": [
+								23.6718203235255,
+								0.0
+							],
+							"bias": -0.9,
+							"correction": "(-0.112217, -0.058933, 0.059449)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.606866509092695,
-							"turn": 10.1250028610229
+							"phase": 0.526233231651381,
+							"turn": -10.1250028610229
+						},
+						{
+							"aim": [
+								8.39292791437521,
+								1.73008766381617
+							],
+							"bias": -0.9,
+							"correction": "(-0.097193, -0.100732, -0.00256)",
+							"load": "(0.0, 0.0, 0.0)",
+							"phase": 0.62465592847461,
+							"turn": -10.1250028610229
 						},
 						{
 							"aim": [
 								0.0,
-								26.2415338572229
+								24.3389880790105
 							],
-							"bias": 0.6,
-							"correction": "(-0.018408, -0.043929, -0.131649)",
-							"load": "(-0.00371, -0.015139, -0.016103)",
-							"phase": 0.981866422395145,
-							"turn": 8.250732421875
-						},
-						{
-							"aim": [
-								0.926195529403414,
-								10.9625893678802
-							],
-							"bias": 0.4,
-							"correction": "(0.020372, -0.08584, -0.108704)",
-							"load": "(-0.001778, -0.007258, -0.00772)",
-							"phase": 0.0756164566269772,
-							"turn": 4.83788967132568
-						},
-						{
-							"aim": [
-								26.408982774915,
-								0.0
-							],
-							"bias": -0.9,
-							"correction": "(-0.107823, -0.034573, 0.082334)",
+							"bias": -0.516594751673289,
+							"correction": "(-0.132147, -0.023212, 0.039979)",
 							"load": "(0.0, 0.0, 0.0)",
-							"phase": 0.446262865816557,
-							"turn": -10.1250028610229
+							"phase": 0.926262575883323,
+							"turn": -7.19482898712158
 						}
 					],
 					"run": true,
-					"slip_m": 0.0,
-					"support_frames": 15,
+					"slip_m": 0.00000107288360595703,
+					"support_frames": 16,
 					"worst_leg": {
 						"age": 1.96666666666666,
-						"aim_degrees": 0.262442628379615,
+						"aim_degrees": 1.28694392324869,
 						"jump": "GROUND",
-						"phase": 0.821263131758657,
+						"phase": 0.825726986646212,
 						"previous_support": false,
 						"side": 0,
 						"support": false
@@ -2208,140 +2509,140 @@
 					"yaw_step_degrees": 19.3373310498166
 				}
 			],
-			"clamps": 4,
+			"clamps": 23,
 			"jumps": [
 				{
 					"degrees": 45,
 					"frames": 25,
-					"leg_rate_per_pace": 272.103489488475,
-					"leg_step_degrees": 20.4077617116356,
-					"peak_slip_m": 0.083506278693676,
+					"leg_rate_per_pace": 388.707750445421,
+					"leg_step_degrees": 29.1530812834066,
+					"peak_slip_m": 0.218325063586235,
 					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00000249824406184374,
-					"plant_rotation_degrees": 9.64642472142346,
+					"phase_error": 0.000000507694145515658,
+					"plant_rotation_degrees": 19.2914270559523,
 					"run": false,
-					"slip_m": 0.199256269259422,
+					"slip_m": 0.275926005095243,
+					"support_frames": 25,
+					"worst_leg": {
+						"age": 0.666666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.380496674242831,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.275038057498073
+				},
+				{
+					"degrees": 90,
+					"frames": 25,
+					"leg_rate_per_pace": 411.895559658697,
+					"leg_step_degrees": 30.8921669744023,
+					"peak_slip_m": 0.202495619654655,
+					"penetration_m": 0.0,
+					"phase_error": 0.0000000450620147862679,
+					"plant_rotation_degrees": 14.1308955577957,
+					"run": false,
+					"slip_m": 0.214089292303385,
+					"support_frames": 25,
+					"worst_leg": {
+						"age": 0.366666666666667,
+						"aim_degrees": 0.0,
+						"jump": "LAND",
+						"phase": 0.444647334545735,
+						"previous_support": false,
+						"side": 1,
+						"support": false
+					},
+					"yaw_step_degrees": 0.999202034059505
+				},
+				{
+					"degrees": 180,
+					"frames": 25,
+					"leg_rate_per_pace": 394.295391601625,
+					"leg_step_degrees": 29.5721543701219,
+					"peak_slip_m": 0.142129898071289,
+					"penetration_m": 0.0000000596046447753906,
+					"phase_error": 0.00000288396969883031,
+					"plant_rotation_degrees": 21.8858146480264,
+					"run": false,
+					"slip_m": 0.377243390772492,
 					"support_frames": 25,
 					"worst_leg": {
 						"age": 0.566666666666667,
 						"aim_degrees": 0.0,
 						"jump": "LAND",
-						"phase": 0.361082643372618,
+						"phase": 0.435778623733867,
 						"previous_support": false,
 						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 0.270776019455986
-				},
-				{
-					"degrees": 90,
-					"frames": 25,
-					"leg_rate_per_pace": 271.424158873625,
-					"leg_step_degrees": 20.3568119155219,
-					"peak_slip_m": 0.105562701821327,
-					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00000706425411754752,
-					"plant_rotation_degrees": 8.35611404852248,
-					"run": false,
-					"slip_m": 0.175259762330683,
-					"support_frames": 25,
-					"worst_leg": {
-						"age": 0.666666666666667,
-						"aim_degrees": 0.0,
-						"jump": "LAND",
-						"phase": 0.448961033644652,
-						"previous_support": false,
-						"side": 1,
-						"support": false
-					},
-					"yaw_step_degrees": 0.983875089561997
-				},
-				{
-					"degrees": 180,
-					"frames": 25,
-					"leg_rate_per_pace": 335.897410801799,
-					"leg_step_degrees": 25.192305810135,
-					"peak_slip_m": 0.245154738426209,
-					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.000000883024973238888,
-					"plant_rotation_degrees": 20.6190058022858,
-					"run": false,
-					"slip_m": 0.298503432422876,
-					"support_frames": 25,
-					"worst_leg": {
-						"age": 0.0333333333333333,
-						"aim_degrees": 0.0559529096807445,
-						"jump": "LAND",
-						"phase": 0.0409536351891778,
-						"previous_support": false,
-						"side": 0,
-						"support": true
-					},
-					"yaw_step_degrees": 19.3373037290599
+					"yaw_step_degrees": 19.3373310498166
 				},
 				{
 					"degrees": 45,
 					"frames": 25,
-					"leg_rate_per_pace": 609.229605787365,
-					"leg_step_degrees": 45.6922204340524,
-					"peak_slip_m": 0.0542555749416351,
+					"leg_rate_per_pace": 705.915987828881,
+					"leg_step_degrees": 52.9436990871661,
+					"peak_slip_m": 0.172487512230873,
 					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00246540894285918,
-					"plant_rotation_degrees": 20.07736155582,
+					"phase_error": 0.00328279230550423,
+					"plant_rotation_degrees": 22.4798088793857,
 					"run": true,
-					"slip_m": 0.102731521715803,
+					"slip_m": 0.221416927874088,
 					"support_frames": 20,
 					"worst_leg": {
-						"age": 0.666666666666667,
+						"age": 0.4,
 						"aim_degrees": 0.0,
 						"jump": "LAND",
-						"phase": 0.854965570782212,
+						"phase": 0.843340210976931,
 						"previous_support": false,
 						"side": 0,
 						"support": false
 					},
-					"yaw_step_degrees": 0.562862229122411
+					"yaw_step_degrees": 0.725967146502315
 				},
 				{
 					"degrees": 90,
 					"frames": 25,
-					"leg_rate_per_pace": 598.130684989878,
-					"leg_step_degrees": 44.8598013742408,
-					"peak_slip_m": 0.0143561763688922,
+					"leg_rate_per_pace": 684.950722171527,
+					"leg_step_degrees": 51.3713041628645,
+					"peak_slip_m": 0.0488457903265953,
 					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00246546485207289,
-					"plant_rotation_degrees": 18.3666672536567,
+					"phase_error": 0.000797816778073002,
+					"plant_rotation_degrees": 18.7756658113463,
 					"run": true,
-					"slip_m": 0.0143567724153399,
-					"support_frames": 21,
+					"slip_m": 0.0750369317829609,
+					"support_frames": 16,
 					"worst_leg": {
-						"age": 0.333333333333333,
+						"age": 0.466666666666667,
 						"aim_degrees": 0.0,
 						"jump": "LAND",
-						"phase": 0.847896730976134,
+						"phase": 0.383271823048819,
 						"previous_support": false,
-						"side": 0,
+						"side": 1,
 						"support": false
 					},
-					"yaw_step_degrees": 4.62633301165976
+					"yaw_step_degrees": 7.46867525362554
 				},
 				{
 					"degrees": 180,
 					"frames": 25,
-					"leg_rate_per_pace": 625.147316113485,
-					"leg_step_degrees": 46.8860487085114,
-					"peak_slip_m": 0.0000019073486328125,
+					"leg_rate_per_pace": 699.244987601124,
+					"leg_step_degrees": 52.4433740700843,
+					"peak_slip_m": 0.143002599477768,
 					"penetration_m": 0.0000000596046447753906,
-					"phase_error": 0.00316784574317566,
-					"plant_rotation_degrees": 25.0058296929626,
+					"phase_error": 0.00607353170741769,
+					"plant_rotation_degrees": 22.9227415244191,
 					"run": true,
-					"slip_m": 0.00000536441802978516,
-					"support_frames": 21,
+					"slip_m": 0.149348863400519,
+					"support_frames": 17,
 					"worst_leg": {
-						"age": 0.666666666666667,
+						"age": 0.5,
 						"aim_degrees": 0.0,
 						"jump": "LAND",
-						"phase": 0.354988873689372,
+						"phase": 0.377715847909638,
 						"previous_support": false,
 						"side": 1,
 						"support": false
@@ -2350,9 +2651,9 @@
 				}
 			],
 			"pace": 2.25,
-			"peak_slip_m": 0.00000095367431640625,
+			"peak_slip_m": 0.111447021365166,
 			"polish": true,
-			"total_planted_slip_m": 0.00000639176774086536
+			"total_planted_slip_m": 0.383498655406299
 		}
 	]
 }
