@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "source_sha256": "ebc8865077bbb8ed3e5ef0a8c89121c1d1e49b6933a6cc961539dbfcb52e5b5e",
+  "action_sha256": "2f26a2503e1478ca6c5fddfb406ce20a4054b4c7247d8d97574759fe69c782ee",
+  "contact_poses": [
+    {
+      "frame": 1,
+      "L": {
+        "hand_y_relative_shoulder_m": 0.43014247715473175,
+        "sole_y_relative_hip_m": -0.28861203603446484,
+        "opposition": true
+      },
+      "R": {
+        "hand_y_relative_shoulder_m": -0.3212480917572975,
+        "sole_y_relative_hip_m": 0.4144984786398709,
+        "opposition": true
+      }
+    },
+    {
+      "frame": 12,
+      "L": {
+        "hand_y_relative_shoulder_m": -0.358156718313694,
+        "sole_y_relative_hip_m": 0.4190973644144833,
+        "opposition": true
+      },
+      "R": {
+        "hand_y_relative_shoulder_m": 0.48689325898885727,
+        "sole_y_relative_hip_m": -0.2957120221108198,
+        "opposition": true
+      }
+    }
+  ],
+  "head_world_rotation_ranges_deg": [
+    [
+      2.650010518240574,
+      3.7499890052958555
+    ],
+    [
+      -0.19999163413703602,
+      0.49999140502950123
+    ],
+    [
+      -0.7500005011183274,
+      0.7500001275923571
+    ]
+  ],
+  "support_fractions": {
+    "L": 0.42045454545454547,
+    "R": 0.42954545454545456,
+    "both": 0.0,
+    "flight": 0.15
+  },
+  "walk_to_run_phase": {
+    "left_contact": {
+      "walk_frame": 1,
+      "run_frame": 1,
+      "normalized_phase": 0
+    },
+    "right_contact": {
+      "walk_frame": 19,
+      "run_frame": 12,
+      "normalized_phase": 0.5
+    }
+  },
+  "walk_nominal_speed_m_s": 0.9,
+  "run_nominal_speed_m_s": 2.1,
+  "blend_readiness": "Shared rig and contact phase; not runtime-proven. Walk double support22% versus Run flight15% needs contact-aware phase/speed blending, replant and interruption checks."
+}

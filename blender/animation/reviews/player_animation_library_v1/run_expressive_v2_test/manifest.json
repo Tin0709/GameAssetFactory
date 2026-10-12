@@ -1,0 +1,51 @@
+{
+  "action": "Run_Expressive_v2_Test",
+  "status": "pending",
+  "playback_frames": [
+    1,
+    22
+  ],
+  "closing_key": 23,
+  "fps": 30,
+  "period_s": 0.7333333333333333,
+  "seamless_loop": true,
+  "nominal_speed_m_s": 2.1,
+  "support_duty": {
+    "L": 0.42,
+    "R": 0.43
+  },
+  "contact_frames": {
+    "L": 1,
+    "R": 12
+  },
+  "flight_intervals_frames": [
+    [
+      10.24,
+      12
+    ],
+    [
+      21.46,
+      23
+    ]
+  ],
+  "original_actions": {
+    "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+    "Full_Jump_Expressive_Test": "b119534f13f7db19862dfd2d7485595e9372ad0da0cb1e300e9c966fd00f0b99",
+    "Idle_Expressive_Test": "022eedd0bd5ff65dc644c636b9d247cf3cafccb1b5403948be45ec0ecfe105d7",
+    "Idle_Expressive_Test_v2": "b7a9604d881b782b73531be95cb5f607a3d9eac805da3b862449c3a2986b8b69",
+    "Idle_Expressive_Test_v3": "f1b1152e742f0f2fe8b5a734b6f6d684f0d8b090442004cea631f8efb5614059",
+    "Jump_AirPose_Test": "eb3b79fd05e5f175e6b5590745f3a38efa43015a635e6eb011abe73377c818e4",
+    "Jump_Landing_Impact_Test": "e870f735519b6aeb810b776ecce6ac944c00357e3127914286fc3f4ff137e55f",
+    "Jump_Landing_Test": "8836c180e39c2b93e47e96a1077360705cffd5c33a729aa91ce93d0b47bf9076",
+    "Jump_Takeoff_Test": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+    "LowerBody_Recovery_Test": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+    "Run_Expressive_Test": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1",
+    "Walk_Expressive_Test": "15f8e76ac8ca19051bc2865ffeacc145ac2e003ec1eed8672cd8ecb72e6f20ef"
+  },
+  "rig_changes": [],
+  "approved_walk_source_sha256": "4f0e61f3c6fbca14cbb3b7896a34ab8f0b011a50ebef11922bdfd5c4b75fad20",
+  "motion_ownership": "Root/object identity. Controller owns forward -Y travel; lowest sole support moves backward +Y at2.1m/s. Run gait loading/flight height is local pose motion, not jump physics.",
+  "stance": "Same0.27m track spacing as approved Walk,3deg toe-out, mild unequal whole-leg lean. Straight full arms; no knees/ankles invented.",
+  "layering": "Full-body absolute baked Action. Future weapon layer must coordinate Chest/shoulders without replacing support hips/legs.",
+  "transition_contract": "Normalized phase0 is LEFT receiving contact;0.5 RIGHT receiving. Align WalkF1/19 to RunF1/12; match support phase, adapt speed/contact and compare velocity, not only pose. Idle requires support-aware replant; no generic contact-safe crossfade claim."
+}

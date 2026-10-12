@@ -1,0 +1,63 @@
+{
+  "passed": true,
+  "source_sha256": "ebc8865077bbb8ed3e5ef0a8c89121c1d1e49b6933a6cc961539dbfcb52e5b5e",
+  "action_sha256": "2f26a2503e1478ca6c5fddfb406ce20a4054b4c7247d8d97574759fe69c782ee",
+  "videos": {
+    "front": {
+      "path": "run_v2_front_1x.mp4",
+      "sha256": "9435d986f05e01b370f15c8b8f1b5de99132e51b44d40555cb8be8fc24047d83",
+      "frames": 132,
+      "fps": 30.0,
+      "duration_s": 4.4,
+      "max_mean_pixel_error": 1.3222639973958332
+    },
+    "three_quarter": {
+      "path": "run_v2_three_quarter_1x.mp4",
+      "sha256": "35671fa4d3abf3cd9315ef610970aaacc3588e5b1ebca3cd7588f1bf8711df5c",
+      "frames": 132,
+      "fps": 30.0,
+      "duration_s": 4.4,
+      "max_mean_pixel_error": 1.3431486002604167
+    },
+    "side": {
+      "path": "run_v2_side_1x.mp4",
+      "sha256": "49c305f21a82b9175c900b6a0cd39b4da300001143481ee1df3d9f45cecb53e5",
+      "frames": 132,
+      "fps": 30.0,
+      "duration_s": 4.4,
+      "max_mean_pixel_error": 1.25937255859375
+    },
+    "three_views": {
+      "path": "run_v2_three_views_1x.mp4",
+      "sha256": "b7d713cb2b1fa620b197ded91ab3cfec8e3aa44f117d0e6afc7a1455564afbf6",
+      "frames": 132,
+      "fps": 30.0,
+      "duration_s": 4.4,
+      "max_mean_pixel_error": 1.2633621031746032
+    },
+    "travel": {
+      "path": "run_v2_contact_travel_1x.mp4",
+      "sha256": "cc3ead5340a1b26a6bd611b775d0107ab8013a844706772d468f83fef6f45198",
+      "frames": 66,
+      "fps": 30.0,
+      "duration_s": 2.2,
+      "max_mean_pixel_error": 1.2690364583333333
+    },
+    "old_comparison": {
+      "path": "old_run_vs_run_v2_1x.mp4",
+      "sha256": "c6473ed6bdcdffd5f9ecbaa96a847202d65c0d7f73689678e1a9af831d55e3cf",
+      "frames": 198,
+      "fps": 30.0,
+      "duration_s": 6.6,
+      "max_mean_pixel_error": 1.3112477678571428
+    },
+    "walk_comparison": {
+      "path": "walk_vs_run_v2_1x.mp4",
+      "sha256": "6dfa41376831ddf5d848769fd908649e3ed8f832871ed1ca972c18170eaaf15a",
+      "frames": 396,
+      "fps": 30.0,
+      "duration_s": 13.2,
+      "max_mean_pixel_error": 1.2901227678571427
+    }
+  }
+}

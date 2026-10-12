@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "entries": [
+    [
+      "Expressive_Arm_Motion_Test",
+      "approved"
+    ],
+    [
+      "Run_Expressive_Test",
+      "approved"
+    ],
+    [
+      "LowerBody_Recovery_Test",
+      "approved"
+    ],
+    [
+      "Jump_Takeoff_Test",
+      "approved"
+    ],
+    [
+      "Jump_AirPose_Test",
+      "approved"
+    ],
+    [
+      "Jump_Landing_Test",
+      "pending"
+    ],
+    [
+      "Jump_Landing_Impact_Test",
+      "approved"
+    ],
+    [
+      "Full_Jump_Expressive_Test",
+      "pending"
+    ],
+    [
+      "Idle_Expressive_Test",
+      "pending"
+    ],
+    [
+      "Idle_Expressive_Test_v2",
+      "pending"
+    ],
+    [
+      "Idle_Expressive_Test_v3",
+      "approved"
+    ],
+    [
+      "Walk_Expressive_Test",
+      "approved"
+    ],
+    [
+      "Run_Expressive_v2_Test",
+      "pending"
+    ]
+  ],
+  "switches": 20,
+  "geometry_samples": 85,
+  "max_source_vertex_error_m": 1.7120130796843852e-07,
+  "all_twelve_previous_actions_and_sources_preserved": true,
+  "only_walk_approval_metadata_changed": true,
+  "one_rig_one_character_mesh": true,
+  "slots_ranges_fps_and_pose_reset": true,
+  "preview_floor_reset": true,
+  "loop_enabled": true,
+  "source_sha256": "ebc8865077bbb8ed3e5ef0a8c89121c1d1e49b6933a6cc961539dbfcb52e5b5e",
+  "action_sha256": "2f26a2503e1478ca6c5fddfb406ce20a4054b4c7247d8d97574759fe69c782ee",
+  "showcase_sha256": "b50460cf84504679822df12942867da16bcb5ec4cd6eb5f6a8413099a921ac34",
+  "manifest_sha256": "30878aa1a147960f9514c1100a6d8abd78f2547d0e44960c0ab8b73609097b04"
+}
