@@ -725,13 +725,13 @@
     },
     {
       "action": "Rifle_Ready_V2_v16_Test",
-      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v003/rifle_ready_v16_review.blend",
-      "source_sha256": "4bdd64879a666c1d5d25b2868151fe0c87d07d7b56dcd8b0ae1a685bf796ef98",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v004/rifle_ready_v16_review.blend",
+      "source_sha256": "744f0d91a5d5122dcf1810b250be08817d1012984fcfb99a9636d256d8902697",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "8347e39db2d3766a7ac32ab693d29bf0181d094307d532464308a29c75f1c0eb",
+      "action_sha256": "d350b1a7c927660e689137fbc3c723b04b8d91a56aa2f3f78acdc5784632403a",
       "action_frame_range": [
         1.0,
         121.0
@@ -741,7 +741,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "User requested same retained v16: rifle another25mm toward right shoulder (50mm total), prior6deg upward angle retained; left block hand brought visibly inward/up beneath rifle with sub-millimeter near-contact. Both arms straight; body/head/legs/root/breathing unchanged. Current request supersedes deliberate left-hand hover. One Rifle Ready entry; Pending Blender review.",
+      "approval_note": "Same retained v16: user requested rifle closer again toward RIGHT shoulder. Rifle-only20mm slide along unchanged whole-right-arm axis,70mm total from pre-refinement; both arms and all other bones unchanged. Prior6deg lift retained. Left near-support and other17 Actions preserved. Pending Blender review.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
