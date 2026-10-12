@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "snappy_front_1x.mp4",
+      "decoded_frames": 180,
+      "fps": 30.0,
+      "duration_s": 6.0,
+      "size": [
+        576,
+        576
+      ],
+      "nonblank": true,
+      "speed": 1
+    },
+    {
+      "file": "snappy_three_quarter_1x.mp4",
+      "decoded_frames": 180,
+      "fps": 30.0,
+      "duration_s": 6.0,
+      "size": [
+        576,
+        576
+      ],
+      "nonblank": true,
+      "speed": 1
+    },
+    {
+      "file": "snappy_side_1x.mp4",
+      "decoded_frames": 180,
+      "fps": 30.0,
+      "duration_s": 6.0,
+      "size": [
+        576,
+        576
+      ],
+      "nonblank": true,
+      "speed": 1
+    },
+    {
+      "file": "approved_three_quarter_1x.mp4",
+      "decoded_frames": 180,
+      "fps": 30.0,
+      "duration_s": 6.0,
+      "size": [
+        576,
+        576
+      ],
+      "nonblank": true,
+      "speed": 1
+    },
+    {
+      "file": "walk_snappy_three_views_1x.mp4",
+      "decoded_frames": 180,
+      "fps": 30.0,
+      "duration_s": 6.0,
+      "size": [
+        1728,
+        624
+      ],
+      "nonblank": true,
+      "speed": 1
+    },
+    {
+      "file": "approved_vs_snappy_1x.mp4",
+      "decoded_frames": 180,
+      "fps": 30.0,
+      "duration_s": 6.0,
+      "size": [
+        1152,
+        624
+      ],
+      "nonblank": true,
+      "speed": 1
+    },
+    {
+      "file": "previous_vs_rebound_1x.mp4",
+      "decoded_frames": 180,
+      "fps": 30.0,
+      "duration_s": 6.0,
+      "size": [
+        1152,
+        624
+      ],
+      "nonblank": true,
+      "speed": 1
+    },
+    {
+      "file": "stronger_vs_softer_1x.mp4",
+      "decoded_frames": 180,
+      "fps": 30.0,
+      "duration_s": 6.0,
+      "size": [
+        1152,
+        624
+      ],
+      "nonblank": true,
+      "speed": 1
+    }
+  ]
+}

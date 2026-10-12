@@ -12,6 +12,7 @@ Forward/backward foot reach is **12% longer**, with unchanged0.27m contact track
 
 - [Front / three-quarter / side, original speed](walk_snappy_three_views_1x.mp4)
 - [Previous lower piston versus softer spring/hop, original speed](previous_vs_rebound_1x.mp4)
+- [Stronger145mm load versus softer36.25mm load, original speed](stronger_vs_softer_1x.mp4)
 - [Approved Walk versus experiment, original speed](approved_vs_snappy_1x.mp4)
 - [All30frames](cycle_inspection.png)
 - [Rebound front](rebound_front.png), [three-quarter](rebound_three_quarter.png), [side](rebound_side.png)
