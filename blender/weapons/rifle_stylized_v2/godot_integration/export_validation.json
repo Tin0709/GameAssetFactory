@@ -1,0 +1,13 @@
+{
+  "source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
+  "candidate_sha256": "57923786e5ebc0918ab8647e57ef4c60baa0f49e9cbb974f11b37d6d08a1a230",
+  "geometry_uv_normals_texture_binary_payload_identical_to_existing_export": true,
+  "material_definitions_identical": true,
+  "markers_checked": 9,
+  "triangles": 1620,
+  "meshes": 2,
+  "materials": 1,
+  "images": 1,
+  "skins": 0,
+  "animations": 0
+}

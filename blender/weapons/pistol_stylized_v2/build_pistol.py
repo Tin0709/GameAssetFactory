@@ -12,7 +12,7 @@ bpy.ops.wm.read_factory_settings(use_empty=True);s=bpy.context.scene;s.unit_sett
 c=bpy.data.collections.new('WEAPON_EXPORT');s.collection.children.link(c)
 root=bpy.data.objects.new('Pistol_Stylized_V2',None);c.objects.link(root)
 root['review_status']='Pending';root['forward']='+Y';root['origin']='RightHandGrip'
-palette=[(42,48,57),(106,123,135),(143,159,170),(105,117,126),(25,31,40),(242,163,49),(239,242,242),(50,57,68)]
+palette=[(42,48,57),(106,123,135),(143,159,170),(105,117,126),(25,31,40),(107,77,62),(239,242,242),(50,57,68)]
 im=bpy.data.images.new('Pistol_V2_RifleFamily_Palette',width=64,height=64,alpha=True);im.colorspace_settings.name='sRGB'
 im.pixels.foreach_set([v for y in range(64) for x in range(64) for v in (*[n/255 for n in palette[x//8]],1)])
 im.filepath_raw=str(HERE/'pistol_v2_palette_64.png');im.file_format='PNG';im.save();im.pack()
@@ -96,7 +96,7 @@ for a in [0,32]:
   j=(i+1)%8;fs.append((a+i,a+i+8,a+j+8,a+j))
 part('AngledGripOpenMagwell',vs,fs,0)
 for side in [-1,1]:
- P('GripPanel',[(-.017,.054),(.043,.054),(.030,.012),(.001,-.060),(-.048,-.064),(-.030,-.010)],.0026,7,.0007,x=side*.0175)
+ P('GripPanel',[(-.017,.054),(.043,.054),(.030,.012),(.001,-.060),(-.048,-.064),(-.030,-.010)],.0026,5,.0007,x=side*.0175)
  for dy in [0,.018]:P('GripPanelChannel',[(dy-.017,.030),(dy-.012,.030),(dy-.032,-.039),(dy-.037,-.039)],.0004,4,x=side*.019)
  pin('GripPanelFastener',-.036,-.054,side*.0194,.0026)
  B('MagazineRelease',.032,.037,.040,.045,.0007,3,x=side*.019)

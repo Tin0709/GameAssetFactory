@@ -74,7 +74,9 @@ for entry in spec:
   # Latest brief asks for a nearly horizontal back carry. Original source/production
   # actually uses 55 degrees; retain that on original entries, trial 10 only on V2.
   angle=math.radians(10);co=math.cos(angle);si=math.sin(angle)
-  entry['holster_preview_matrix']=[[0,1.05*co,1.05*si,0],[-.8925,0,0,.24],[0,-1.05*si,1.05*co,1.02],[0,0,0,1]]
+  entry['holster_preview_matrix']=[[0,1.05*co,1.05*si,0],[-1.05,0,0,.24],[0,-1.05*si,1.05*co,1.02],[0,0,0,1]]
+  ready=Matrix(fit['Rifle_READY']);ready=Matrix.Translation(ready.translation)@ready.to_3x3().normalized().to_4x4()@Matrix.Diagonal(Vector((1.05,1.05,1.05,1)))
+  entry['ready_preview_matrix']=[list(row) for row in ready]
   entry['holster_preview_note']='Pending 10-degree horizontal back fit, as requested; original production 55-degree mount preserved separately.'
  source=ROOT/entry['source'];digest=hashlib.sha256(source.read_bytes()).hexdigest()
  if entry.get('source_sha256'):assert entry['source_sha256']==digest,('Source changed; inspect before refresh',entry['source'])

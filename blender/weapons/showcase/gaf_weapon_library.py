@@ -17,7 +17,8 @@ def activate(scene):
   if c.get('weapon_entry'):c.hide_viewport=c.hide_render=(c.name!=entry['collection'])
   if c.get('fit_kind'):c.hide_viewport=c.hide_render=(c.get('fit_kind')!=entry['kind'] or c.get('fit_mode')!=mode)
  root=root_of(entry)
- root.matrix_world=Matrix.Identity(4) if mode=='STANDALONE' else Matrix(entry['holster_preview_matrix'] if mode=='HOLSTER' and entry.get('holster_preview_matrix') else scene['fit_'+entry['kind']+'_'+mode])
+ override=entry.get('holster_preview_matrix') if mode=='HOLSTER' else entry.get('ready_preview_matrix')
+ root.matrix_world=Matrix.Identity(4) if mode=='STANDALONE' else Matrix(override if override else scene['fit_'+entry['kind']+'_'+mode])
  bpy.context.view_layer.update()
  for o in bpy.context.selected_objects:o.select_set(False)
  root.select_set(True);bpy.context.view_layer.objects.active=root

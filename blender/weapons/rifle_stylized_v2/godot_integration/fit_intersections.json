@@ -1,0 +1,38 @@
+{
+  "READY": {
+    "rifle_production_r13": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.R": 17,
+      "ForeArm.R": 104,
+      "UpperArm.L": 0,
+      "ForeArm.L": 0
+    },
+    "rifle_stylized_v2": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.R": 31,
+      "ForeArm.R": 110,
+      "UpperArm.L": 0,
+      "ForeArm.L": 0
+    }
+  },
+  "HOLSTER": {
+    "rifle_production_r13": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.R": 0,
+      "ForeArm.R": 6,
+      "UpperArm.L": 0,
+      "ForeArm.L": 0
+    },
+    "rifle_stylized_v2": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.R": 0,
+      "ForeArm.R": 13,
+      "UpperArm.L": 0,
+      "ForeArm.L": 0
+    }
+  }
+}

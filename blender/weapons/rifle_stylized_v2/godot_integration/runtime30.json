@@ -1,0 +1,213 @@
+{
+  "checks": [
+    {
+      "check": "Right trigger-grip target matches preserved R13",
+      "passed": true
+    },
+    {
+      "check": "Left support target matches preserved R13",
+      "passed": true
+    },
+    {
+      "check": "Ready mount uses uniform scale preserving model proportions",
+      "passed": true
+    },
+    {
+      "check": "Back mount uses uniform scale preserving model proportions",
+      "passed": true
+    },
+    {
+      "check": "Exported marker: RightHandGrip",
+      "passed": true
+    },
+    {
+      "check": "Exported marker: LeftHandGuide",
+      "passed": true
+    },
+    {
+      "check": "Exported marker: Muzzle",
+      "passed": true
+    },
+    {
+      "check": "Exported marker: AimReference",
+      "passed": true
+    },
+    {
+      "check": "Exported marker: RecoilPivot",
+      "passed": true
+    },
+    {
+      "check": "Exported marker: HolsterAttach",
+      "passed": true
+    },
+    {
+      "check": "Exported marker: Grip_Point",
+      "passed": true
+    },
+    {
+      "check": "Exported marker: Support_Hand_Point",
+      "passed": true
+    },
+    {
+      "check": "Exported marker: Muzzle_Point",
+      "passed": true
+    },
+    {
+      "check": "Idle grip remains attached to active socket",
+      "passed": true
+    },
+    {
+      "check": "Idle support marker follows native support target",
+      "passed": true
+    },
+    {
+      "check": "Idle preserves uniform mount and rigid model",
+      "passed": true
+    },
+    {
+      "check": "Walk grip remains attached to active socket",
+      "passed": true
+    },
+    {
+      "check": "Walk support marker follows native support target",
+      "passed": true
+    },
+    {
+      "check": "Walk preserves uniform mount and rigid model",
+      "passed": true
+    },
+    {
+      "check": "Run grip remains attached to active socket",
+      "passed": true
+    },
+    {
+      "check": "Run support marker follows native support target",
+      "passed": true
+    },
+    {
+      "check": "Run preserves uniform mount and rigid model",
+      "passed": true
+    },
+    {
+      "check": "Turn grip remains attached to active socket",
+      "passed": true
+    },
+    {
+      "check": "Turn support marker follows native support target",
+      "passed": true
+    },
+    {
+      "check": "Turn preserves uniform mount and rigid model",
+      "passed": true
+    },
+    {
+      "check": "Jump grip remains attached to active socket",
+      "passed": true
+    },
+    {
+      "check": "Jump support marker follows native support target",
+      "passed": true
+    },
+    {
+      "check": "Jump preserves uniform mount and rigid model",
+      "passed": true
+    },
+    {
+      "check": "Fall grip remains attached to active socket",
+      "passed": true
+    },
+    {
+      "check": "Fall support marker follows native support target",
+      "passed": true
+    },
+    {
+      "check": "Fall preserves uniform mount and rigid model",
+      "passed": true
+    },
+    {
+      "check": "Recovery grip remains attached to active socket",
+      "passed": true
+    },
+    {
+      "check": "Recovery support marker follows native support target",
+      "passed": true
+    },
+    {
+      "check": "Recovery preserves uniform mount and rigid model",
+      "passed": true
+    },
+    {
+      "check": "Rifle stows on Chest back attachment",
+      "passed": true
+    },
+    {
+      "check": "Back rifle visible",
+      "passed": true
+    },
+    {
+      "check": "Back fit leaves relaxed native arms",
+      "passed": true
+    },
+    {
+      "check": "Back anchor position preserved",
+      "passed": true
+    },
+    {
+      "check": "Back fit preserves proportions",
+      "passed": true
+    },
+    {
+      "check": "Previous production model remains selectable",
+      "passed": true
+    },
+    {
+      "check": "V2 selection restores independent model and sockets",
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "samples": [
+    {
+      "phase": "Idle",
+      "socket_grip_error_m": 0.0,
+      "socket_support_error_m": 2.3853496600168e-07,
+      "uniform_scale_error": 0.0
+    },
+    {
+      "phase": "Walk",
+      "socket_grip_error_m": 0.0,
+      "socket_support_error_m": 4.91544255964982e-07,
+      "uniform_scale_error": 0.0
+    },
+    {
+      "phase": "Run",
+      "socket_grip_error_m": 0.0,
+      "socket_support_error_m": 1.90740684047341e-06,
+      "uniform_scale_error": 0.0
+    },
+    {
+      "phase": "Turn",
+      "socket_grip_error_m": 0.0,
+      "socket_support_error_m": 1.91107028513215e-06,
+      "uniform_scale_error": 0.0
+    },
+    {
+      "phase": "Jump",
+      "socket_grip_error_m": 0.0,
+      "socket_support_error_m": 1.9073486328125e-06,
+      "uniform_scale_error": 0.0
+    },
+    {
+      "phase": "Fall",
+      "socket_grip_error_m": 0.0,
+      "socket_support_error_m": 9.53790731728077e-07,
+      "uniform_scale_error": 0.0
+    },
+    {
+      "phase": "Recovery",
+      "socket_grip_error_m": 0.0,
+      "socket_support_error_m": 1.90735227079131e-06,
+      "uniform_scale_error": 0.0
+    }
+  ]
+}
