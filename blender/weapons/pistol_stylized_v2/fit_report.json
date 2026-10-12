@@ -1,0 +1,47 @@
+{
+  "READY": {
+    "pistol_production_r13": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.L": 0,
+      "UpperArm.R": 0,
+      "Leg.L": 0,
+      "Leg.R": 0,
+      "ForeArm.L": 0,
+      "ForeArm.R": 22
+    },
+    "pistol_stylized_v2": {
+      "Head": 0,
+      "Chest": 0,
+      "UpperArm.L": 0,
+      "UpperArm.R": 0,
+      "Leg.L": 0,
+      "Leg.R": 0,
+      "ForeArm.L": 0,
+      "ForeArm.R": 54
+    }
+  },
+  "HOLSTER": {
+    "pistol_production_r13": {
+      "Head": 0,
+      "Chest": 79,
+      "UpperArm.L": 0,
+      "UpperArm.R": 0,
+      "Leg.L": 0,
+      "Leg.R": 32,
+      "ForeArm.L": 0,
+      "ForeArm.R": 79
+    },
+    "pistol_stylized_v2": {
+      "Head": 0,
+      "Chest": 124,
+      "UpperArm.L": 0,
+      "UpperArm.R": 0,
+      "Leg.L": 0,
+      "Leg.R": 33,
+      "ForeArm.L": 0,
+      "ForeArm.R": 145
+    }
+  },
+  "note": "Triangle-pair diagnostics in two static existing poses; grip contact is expected. No gameplay, transitions, recoil or mobile certification."
+}

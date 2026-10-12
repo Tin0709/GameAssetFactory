@@ -61,11 +61,11 @@
     },
     {
       "id": "rifle_stylized_v2",
-      "label": "Rifle \u2014 Stylized V2",
+      "label": "Rifle \u2014 Stylized V2 (Preferred)",
       "kind": "Rifle",
       "source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
-      "status": "Pending",
-      "status_note": "Pending reference-matched long revision requested by user; compact checkpoint preserved.",
+      "status": "Preferred",
+      "status_note": "Explicitly selected by user2026-10-12 as primary rifle model/reference. Godot candidate alignment and integration remain Pending; production replacement not authorized.",
       "collection": "WEAPON_rifle_stylized_v2",
       "root": "rifle_stylized_v2__Rifle_Stylized_V2",
       "source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
@@ -95,7 +95,9 @@
           1
         ]
       ],
-      "holster_preview_note": "Pending 10-degree horizontal back fit, as requested; original production 55-degree mount preserved separately."
+      "holster_preview_note": "Pending 10-degree horizontal back fit, as requested; original production 55-degree mount preserved separately.",
+      "preferred_reference": true,
+      "integration_status": "Pending"
     },
     {
       "id": "pistol_v1",
@@ -229,5 +231,6 @@
       "collection": "WEAPON_pistol_stylized_v2",
       "root": "pistol_stylized_v2__Pistol_Stylized_V2"
     }
-  ]
+  ],
+  "preferred_rifle": "rifle_stylized_v2"
 }

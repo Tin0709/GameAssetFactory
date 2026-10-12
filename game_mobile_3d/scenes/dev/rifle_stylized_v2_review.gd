@@ -21,6 +21,9 @@ func _ready() -> void:
 	select_rifle(true)
 	gameplay_camera=false;camera.size=5.3
 	review_title="RIFLE STYLIZED V2 · ALIGNMENT TEST"
+	for label: Label in find_children("*","Label",true,false):
+		if label.text.begins_with("DIRECTIONAL MOVEMENT"):label.text=review_title
+		elif label!=status and label.text.begins_with("WASD / arrows"):label.hide()
 
 func proportion_preserving(mount: Transform3D) -> Transform3D:
 	# Existing mount narrows X to .8925 versus1.05 on Y/Z. Keep its orientation

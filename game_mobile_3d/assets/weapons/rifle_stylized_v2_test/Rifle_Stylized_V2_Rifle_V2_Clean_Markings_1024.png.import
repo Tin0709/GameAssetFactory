@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bo7gvt0wpgcxj"
-path="res://.godot/imported/Rifle_Stylized_V2_Rifle_V2_Clean_Markings_1024.png-c9e412ffdeaaeb0cd442107af9f386bf.ctex"
+path.s3tc="res://.godot/imported/Rifle_Stylized_V2_Rifle_V2_Clean_Markings_1024.png-c9e412ffdeaaeb0cd442107af9f386bf.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "b601eef0c40fc39c16b0c1d0d7e84050"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/weapons/rifle_stylized_v2_test/Rifle_Stylized_V2_Rifle_V2_Clean_Markings_1024.png"
-dest_files=["res://.godot/imported/Rifle_Stylized_V2_Rifle_V2_Clean_Markings_1024.png-c9e412ffdeaaeb0cd442107af9f386bf.ctex"]
+dest_files=["res://.godot/imported/Rifle_Stylized_V2_Rifle_V2_Clean_Markings_1024.png-c9e412ffdeaaeb0cd442107af9f386bf.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0
