@@ -234,3 +234,8 @@ Select **Rifle_Ready_V2_v9_Test**: idle-derived standing, rifle pointing down in
 ### Rifle Ready grip/arm correction — Pending
 
 Select **Rifle_Ready_V2_v10_Test**: actual modeled grip seated in the right block hand, with the barrel following the straight right arm downward. The idle-derived body/arms are unchanged from v9. All27 independent entries remain selectable; F1–120/30FPS, closing121 excluded. [Review, comparison and remaining physical barrel/grip offset](../reviews/player_animation_library_v1/rifle_ready_v10_test/README.md). No Aim/Back Holster refinement or Godot integration.
+
+
+### Rifle Ready diagonal reference pose — Pending
+
+Select **Rifle_Ready_V2_v11_Test**: corrected right-hand grip and straight arm/barrel carried diagonally across the torso, with straight left-hand support. All28 independent entries remain selectable; F1–120/30FPS, closing121 excluded. [Latest reference-pose review and comparison](../reviews/player_animation_library_v1/rifle_ready_v11_test/README.md). Reopen this exact file if the list is stale. No Aim/Back Holster refinement or Godot integration.
