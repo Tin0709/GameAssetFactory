@@ -4,7 +4,8 @@
 [ext_resource type="Script" path="res://scenes/dev/expressive_directional_visual.gd" id="visual"]
 
 [node name="ExpressiveDirectionalPlayer" instance=ExtResource("base")]
-jump_flight_speed = 1.18
+jump_height = 1.35
+jump_flight_speed = 1.4
 
 [node name="Visual" parent="."]
 script = ExtResource("visual")

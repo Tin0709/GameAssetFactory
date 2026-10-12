@@ -7,5 +7,22 @@
   "source_hashes": {
     "before.avi": "8d79aede7662fc67275d88fed967907aa5e215db981feb1735f3ce37af2c4f66",
     "after.avi": "4577a5b1d6f143488910b63dfb6c973c975c72d6c63b7c170da4945ffff86e37"
+  },
+  "encoded_verified": {
+    "before_1x.mp4": {
+      "decoded_frames": 373,
+      "fps": 30.0,
+      "sha256": "d78db083d9f4abc989e4adf9777f057dd47fa0e849c8701f2a2e8f3ff4d3e15c"
+    },
+    "after_1x.mp4": {
+      "decoded_frames": 373,
+      "fps": 30.0,
+      "sha256": "347b3161009df88c3ed493085f43209dbb85994ba62a4e0b59eee80a3f8c1125"
+    },
+    "comparison_1x.mp4": {
+      "decoded_frames": 373,
+      "fps": 30.0,
+      "sha256": "3e10b8d5d5d9c360a0c11554b91e02fb15a22bdd890704535fa5abe481a3c92c"
+    }
   }
 }
