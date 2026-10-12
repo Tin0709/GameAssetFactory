@@ -725,13 +725,13 @@
     },
     {
       "action": "Rifle_Ready_V2_v16_Test",
-      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/left_arm_tuck_v001/rifle_ready_v16_review.blend",
-      "source_sha256": "94575a2234776d432dbfb5fa5a02094042eb792b66b51e955332ec2a4a5bd73f",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v002/rifle_ready_v16_review.blend",
+      "source_sha256": "f41266f86d63cc2c7fbedab6de74cfec03da8d4575e53e06a944b25221eaca48",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "7bf9bf1510ded8e2bdbeaeff618860b3a571ae142efb5a018d084dc2d3670a1e",
+      "action_sha256": "b400a9a17fa9f16bf2068ca83d87020cb6e0e1e8c820e467e68e3bf8c0fc1235",
       "action_frame_range": [
         1.0,
         121.0
@@ -741,7 +741,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "User requested refinement in same retained v16: left arm closer to body and slightly higher toward head. Left palm39.7mm back/21.3mm up, shoulder50mm up; both arms straight. Right arm/rifle/body/head/legs unchanged. Only one Rifle Ready entry; Pending Blender review.",
+      "approval_note": "User requested same retained v16: rifle25mm toward right shoulder, whole straight right arm/barrel6deg upward, left block hand supporting underside at about1.5mm near-contact. Both arms straight; body/head/legs/root/breathing unchanged. Current request supersedes deliberate left-hand hover. One Rifle Ready entry; Pending Blender review.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
