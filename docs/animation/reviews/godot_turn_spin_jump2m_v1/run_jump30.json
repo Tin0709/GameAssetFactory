@@ -1,0 +1,99 @@
+{
+	"cases": [
+		{
+			"air_speed": 1.35000216960907,
+			"ground_speed": 1.34999859333038,
+			"pace": 1.5,
+			"recovery_speed": 1.35000216960907,
+			"run": false
+		},
+		{
+			"air_speed": 3.98474669456482,
+			"ground_speed": 3.464998960495,
+			"pace": 1.5,
+			"recovery_speed": 3.46498465538025,
+			"run": true
+		},
+		{
+			"air_speed": 2.02500343322754,
+			"ground_speed": 2.02500343322754,
+			"pace": 2.25,
+			"recovery_speed": 2.02497482299805,
+			"run": false
+		},
+		{
+			"air_speed": 5.97713422775269,
+			"ground_speed": 5.19749116897583,
+			"pace": 2.25,
+			"recovery_speed": 5.19750547409058,
+			"run": true
+		}
+	],
+	"checks": [
+		{
+			"check": "Only running flight gains15percent horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Boosted flight retains the existing directional acceleration",
+			"passed": true
+		},
+		{
+			"check": "Landing returns to normal locomotion speed",
+			"passed": true
+		},
+		{
+			"check": "Unprepared falls keep their existing horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Only running flight gains15percent horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Boosted flight retains the existing directional acceleration",
+			"passed": true
+		},
+		{
+			"check": "Landing returns to normal locomotion speed",
+			"passed": true
+		},
+		{
+			"check": "Unprepared falls keep their existing horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Only running flight gains15percent horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Boosted flight retains the existing directional acceleration",
+			"passed": true
+		},
+		{
+			"check": "Landing returns to normal locomotion speed",
+			"passed": true
+		},
+		{
+			"check": "Unprepared falls keep their existing horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Only running flight gains15percent horizontal speed",
+			"passed": true
+		},
+		{
+			"check": "Boosted flight retains the existing directional acceleration",
+			"passed": true
+		},
+		{
+			"check": "Landing returns to normal locomotion speed",
+			"passed": true
+		},
+		{
+			"check": "Unprepared falls keep their existing horizontal speed",
+			"passed": true
+		}
+	],
+	"failures": []
+}

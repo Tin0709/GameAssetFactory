@@ -6,6 +6,7 @@
 [node name="ExpressiveDirectionalPlayer" instance=ExtResource("base")]
 jump_height = 2.0
 jump_flight_speed = 2.15
+running_air_speed_scale = 1.15
 
 [node name="Visual" parent="."]
 script = ExtResource("visual")

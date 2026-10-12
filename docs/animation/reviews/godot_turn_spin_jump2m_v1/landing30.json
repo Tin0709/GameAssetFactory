@@ -198,51 +198,51 @@
 		}
 	],
 	"failures": [],
-	"running_extra_drop_m": 0.0399637818336487,
-	"stationary_extra_drop_m": 0.0198961496353149,
+	"running_extra_drop_m": 0.039999395608902,
+	"stationary_extra_drop_m": 0.0199993848800659,
 	"versions": [
 		{
-			"max_joint_step": 58.0603508887735,
+			"max_joint_step": 57.4281622395755,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.000000516041982742688,
+			"phase_error": 0.00246546485207298,
 			"running": {
 				"case": "Running",
-				"flight_seconds": 0.399999999999999,
+				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.526138331973925,
+				"impact_hip_min": 0.526085745892487,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19782292842865
+				"peak_y": 1.19284403324127
 			},
-			"speed": 5.19750547409058,
+			"speed": 5.19744825363159,
 			"stationary": {
 				"case": "Stationary",
-				"flight_seconds": 0.399999999999999,
+				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.526640481315553,
+				"impact_hip_min": 0.526276834309101,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19828200340271
+				"peak_y": 1.19324839115143
 			}
 		},
 		{
-			"max_joint_step": 58.0603508887735,
+			"max_joint_step": 57.4281622395755,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.000000516041982742688,
+			"phase_error": 0.00246546485207298,
 			"running": {
 				"case": "Running",
-				"flight_seconds": 0.399999999999999,
+				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.486174550140277,
+				"impact_hip_min": 0.486086350283585,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19782292842865
+				"peak_y": 1.19284403324127
 			},
-			"speed": 5.19750547409058,
+			"speed": 5.19744825363159,
 			"stationary": {
 				"case": "Stationary",
-				"flight_seconds": 0.399999999999999,
+				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.506744331680238,
+				"impact_hip_min": 0.506277449429035,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19828200340271
+				"peak_y": 1.19324839115143
 			}
 		}
 	]

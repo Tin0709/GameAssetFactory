@@ -2,7 +2,9 @@ extends "res://scenes/dev/expressive_locomotion_actor.gd"
 ## Isolated jump physics. No production controller or authored Action changes.
 @export var jump_height:=1.2
 @export_range(1.0,2.4,.01) var jump_flight_speed:=1.0
+@export_range(1.0,1.3,.01) var running_air_speed_scale:=1.0
 var _active_flight_speed:=1.0
+var _prepared_flight:=false
 const PREP_SECONDS:=.20
 const BUFFER_SECONDS:=.14
 var jump_state:="GROUND"
@@ -22,6 +24,8 @@ func request_jump() -> void:
 	jump_buffer=BUFFER_SECONDS
 
 func _state(value: String) -> void:
+	if value=="AIR":_prepared_flight=jump_state=="PREP"
+	else:_prepared_flight=false
 	if value!="AIR" or jump_state!="PREP":_active_flight_speed=1.0
 	jump_state=value;jump_age=0.0
 	jump_events.append({"event":value,"time":simulation_time,"position":[position.x,position.y,position.z],"vy":velocity.y,"phase":visual.gait_phase,"speed":current_speed,"jump":jump_count})
@@ -40,6 +44,7 @@ func _physics_process(delta: float) -> void:
 	fast_sprinting=sprint and stick.length_squared()>.001
 	visual.review_pace=review_pace
 	var desired:=stick.limit_length()*(run_speed if fast_sprinting else walk_speed)*review_pace*analog_strength
+	if fast_sprinting and jump_state=="AIR" and _prepared_flight:desired*=running_air_speed_scale
 	var planar:=Vector2(velocity.x,velocity.z).move_toward(desired,(deceleration if stick.is_zero_approx() else acceleration)*review_pace*review_pace*delta)
 	var grounded:=is_on_floor()
 	if jump_buffer>0 and grounded and (jump_state=="GROUND" or jump_state=="LAND" and jump_age>=.10):
@@ -101,6 +106,7 @@ func review_drop(height: float=6.0) -> void:
 
 func reset_jump() -> void:
 	_active_flight_speed=1.0
+	_prepared_flight=false
 	jump_buffer=0;velocity=Vector3.ZERO;floor_y=0;time_to_contact=10
 	jump_state="GROUND";jump_age=0;visual.jump_transition("GROUND")
 	visual.contact_floor_y=0;visual.settling=false

@@ -158,7 +158,10 @@ func run_jump_validation(test: SceneTree) -> void:
 	test.check(actor.floor_y>.65,"Landing support height follows the raised platform")
 	# Put this ledge-loss probe at the platform's outgoing edge. Its purpose is
 	# support loss DURING recovery, independent of the preceding flight length.
-	actor.position.z=5.3
+	var fixture_offset:=Vector3(0,0,5.3-actor.position.z)
+	actor.position+=fixture_offset
+	for cache in [actor.visual.foot_anchors,actor.visual.last_sole,actor.visual.replant_from,actor.visual.run_raw_sole]:
+		for side in cache.size():cache[side]+=fixture_offset
 	test.check(await _wait_state("AIR",50),"Running off the platform during recovery immediately restores AIR")
 	test.check(await _wait_state("LAND",70),"Second physical contact after the ledge triggers a new impact")
 	test.check(actor.floor_y<.01,"Contact plane returns to the actual lower floor")

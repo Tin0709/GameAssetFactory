@@ -198,51 +198,51 @@
 		}
 	],
 	"failures": [],
-	"running_extra_drop_m": 0.039999395608902,
+	"running_extra_drop_m": 0.0399994254112244,
 	"stationary_extra_drop_m": 0.0199989676475525,
 	"versions": [
 		{
-			"max_joint_step": 34.3470576566077,
+			"max_joint_step": 34.3753756209066,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.0000000000000000763278329429795,
+			"phase_error": 0.0000000000000000971445146547012,
 			"running": {
 				"case": "Running",
-				"flight_seconds": 0.383333333333332,
+				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.526096467627212,
+				"impact_hip_min": 0.526096486486495,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19893026351929
+				"peak_y": 1.20050072669983
 			},
 			"speed": 5.19750547409058,
 			"stationary": {
 				"case": "Stationary",
-				"flight_seconds": 0.383333333333332,
+				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.526377624832094,
+				"impact_hip_min": 0.526377625763416,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19884157180786
+				"peak_y": 1.20040893554688
 			}
 		},
 		{
-			"max_joint_step": 34.3470576566077,
+			"max_joint_step": 34.3753756209066,
 			"max_penetration": 0.0000000596046447753906,
-			"phase_error": 0.0000000000000000763278329429795,
+			"phase_error": 0.0000000000000000971445146547012,
 			"running": {
 				"case": "Running",
-				"flight_seconds": 0.383333333333332,
+				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.48609707201831,
+				"impact_hip_min": 0.48609706107527,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19893026351929
+				"peak_y": 1.20050072669983
 			},
 			"speed": 5.19750547409058,
 			"stationary": {
 				"case": "Stationary",
-				"flight_seconds": 0.383333333333332,
+				"flight_seconds": 0.333333333333332,
 				"height_setting": 1.2,
-				"impact_hip_min": 0.506378657184541,
+				"impact_hip_min": 0.506378658115864,
 				"launch_delay": 0.233333333333333,
-				"peak_y": 1.19884157180786
+				"peak_y": 1.20040893554688
 			}
 		}
 	]

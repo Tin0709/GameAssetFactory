@@ -265,7 +265,9 @@ func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Qu
 	var weight:=_ground_turn_weight()
 	if weight<=0 or not move_requested:
 		swing_active[side]=false
-		return super._contact_leg_rotation(side,bone,target,original_q,delta)
+		var contact_q:=super._contact_leg_rotation(side,bone,target,original_q,delta)
+		swing_world_q[side]=contact_q
+		return contact_q
 	var landing_q:=original_q
 	if weight<1:landing_q=super._contact_leg_rotation(side,bone,target,original_q,delta)
 	# Solve the existing single solid leg toward its world support. The cached
@@ -295,6 +297,7 @@ func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Qu
 	var clean_q:=_limit_leg_twist(q,original_q)
 	if clean_q.angle_to(q)>.00001:foot_rotations[side]=clean_q
 	q=clean_q
+	swing_world_q[side]=q
 	support_aim[side]=(q*original_q.inverse()).normalized()
 	return q
 
@@ -303,7 +306,17 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	if weight<=0:
 		swing_active[side]=false
 		run_release_active[side]=false
-		return super._swing_leg_rotation(side,bone,delta)
+		var reference:=_leg_world_rotation(bone)
+		var q:=super._swing_leg_rotation(side,bone,delta)
+		if jump_state=="LAND" and move_requested:
+			# Early impact still uses the base landing solve. Carry its receiving
+			# orientation into swing rather than dropping a large pivot offset
+			# as the moving gait regains weight around260ms after contact.
+			var gap:=swing_world_q[side].angle_to(q)
+			q=swing_world_q[side].slerp(q,minf(1,deg_to_rad(700)*review_pace*delta/maxf(gap,.00001))).normalized()
+			support_aim[side]=(q*reference.inverse()).normalized()
+		swing_world_q[side]=q
+		return q
 	# A large pivot offset needs the swing interval to unwind. Bound its
 	# angular release, without slowing the capsule or restarting the stride.
 	var angle:=support_aim[side].angle_to(Quaternion.IDENTITY)

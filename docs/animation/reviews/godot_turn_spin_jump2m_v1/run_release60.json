@@ -69,6 +69,7 @@
 					"side": 1
 				}
 			],
+			"maximum_combined_joint_offset": 0.0329767428338528,
 			"pace": 1.5,
 			"peak_release_acceleration": 197.053055763245,
 			"peak_release_velocity_jump": 3.28421759605408,
@@ -173,10 +174,35 @@
 					"side": 0
 				}
 			],
+			"maximum_combined_joint_offset": 0.0517493635416031,
 			"pace": 2.25,
 			"peak_release_acceleration": 267.833805084229,
 			"peak_release_velocity_jump": 4.46389675140381,
 			"worst_release_speed": 0.000114444410428405
+		},
+		{
+			"interruption": "Walk",
+			"maximum_combined_joint_offset": 0.0262264795601368,
+			"maximum_leg_step_degrees": 9.85384902878028,
+			"phase_travel": 0.80104258051563
+		},
+		{
+			"interruption": "Pace",
+			"maximum_combined_joint_offset": 0.0320027992129326,
+			"maximum_leg_step_degrees": 20.4034518622693,
+			"phase_travel": 0.854437431645771
+		},
+		{
+			"interruption": "Orbit",
+			"maximum_combined_joint_offset": 0.0468405075371265,
+			"maximum_leg_step_degrees": 24.4655770975402,
+			"phase_travel": 1.12499937871666
+		},
+		{
+			"interruption": "Release",
+			"maximum_combined_joint_offset": 0.023459305986762,
+			"maximum_leg_step_degrees": 25.092200850112,
+			"phase_travel": 1.12499937871666
 		}
 	],
 	"checks": [
@@ -193,6 +219,10 @@
 			"passed": true
 		},
 		{
+			"check": "Carried swing and floor corrections share the same140mm joint budget",
+			"passed": true
+		},
+		{
 			"check": "Straight Run reaches support-to-swing events",
 			"passed": true
 		},
@@ -202,6 +232,58 @@
 		},
 		{
 			"check": "Foot velocity ramps through the release instead of moving its discontinuity a few frames later",
+			"passed": true
+		},
+		{
+			"check": "Carried swing and floor corrections share the same140mm joint budget",
+			"passed": true
+		},
+		{
+			"check": "Interruption probe catches a carried foot in swing: Walk",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release remains within the shared contact budget: Walk",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release preserves pose continuity and live gait: Walk",
+			"passed": true
+		},
+		{
+			"check": "Interruption probe catches a carried foot in swing: Pace",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release remains within the shared contact budget: Pace",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release preserves pose continuity and live gait: Pace",
+			"passed": true
+		},
+		{
+			"check": "Interruption probe catches a carried foot in swing: Orbit",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release remains within the shared contact budget: Orbit",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release preserves pose continuity and live gait: Orbit",
+			"passed": true
+		},
+		{
+			"check": "Interruption probe catches a carried foot in swing: Release",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release remains within the shared contact budget: Release",
+			"passed": true
+		},
+		{
+			"check": "Interrupted release preserves pose continuity and live gait: Release",
 			"passed": true
 		}
 	],

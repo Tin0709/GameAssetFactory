@@ -11,10 +11,10 @@
 					"rate": 1.18
 				},
 				{
-					"flight_seconds": 0.483333333333332,
-					"maximum_air_frame": 38.9881820605274,
-					"peak_m": 2.00038576126099,
-					"rate": 1.9
+					"flight_seconds": 0.433333333333332,
+					"maximum_air_frame": 36.2077324375302,
+					"peak_m": 2.00022268295288,
+					"rate": 2.15
 				}
 			]
 		},
@@ -29,10 +29,10 @@
 					"rate": 1.18
 				},
 				{
-					"flight_seconds": 0.483333333333357,
-					"maximum_air_frame": 38.9881820605274,
-					"peak_m": 2.00076031684875,
-					"rate": 1.9
+					"flight_seconds": 0.433333333333355,
+					"maximum_air_frame": 36.2077324375302,
+					"peak_m": 2.00059819221497,
+					"rate": 2.15
 				}
 			]
 		},
@@ -41,16 +41,16 @@
 			"pace": 1.5,
 			"versions": [
 				{
-					"flight_seconds": 0.633333333333352,
+					"flight_seconds": 0.616666666666697,
 					"maximum_air_frame": 44.3388167401491,
 					"peak_m": 1.20022666454315,
 					"rate": 1.18
 				},
 				{
-					"flight_seconds": 0.483333333333306,
-					"maximum_air_frame": 38.9881820605274,
-					"peak_m": 2.00079083442688,
-					"rate": 1.9
+					"flight_seconds": 0.433333333333309,
+					"maximum_air_frame": 36.2077324375302,
+					"peak_m": 2.00062990188599,
+					"rate": 2.15
 				}
 			]
 		},
@@ -65,10 +65,10 @@
 					"rate": 1.18
 				},
 				{
-					"flight_seconds": 0.483333333333306,
-					"maximum_air_frame": 38.9881820605274,
-					"peak_m": 2.00038576126099,
-					"rate": 1.9
+					"flight_seconds": 0.433333333333309,
+					"maximum_air_frame": 36.2077324375302,
+					"peak_m": 2.00022268295288,
+					"rate": 2.15
 				}
 			]
 		},
@@ -83,10 +83,10 @@
 					"rate": 1.18
 				},
 				{
-					"flight_seconds": 0.483333333333306,
-					"maximum_air_frame": 38.9881820605274,
-					"peak_m": 2.0002818107605,
-					"rate": 1.9
+					"flight_seconds": 0.433333333333309,
+					"maximum_air_frame": 36.2077324375302,
+					"peak_m": 2.00013065338135,
+					"rate": 2.15
 				}
 			]
 		},
@@ -95,16 +95,16 @@
 			"pace": 2.25,
 			"versions": [
 				{
-					"flight_seconds": 0.616666666666632,
+					"flight_seconds": 0.633333333333297,
 					"maximum_air_frame": 44.3388167401491,
 					"peak_m": 1.19874835014343,
 					"rate": 1.18
 				},
 				{
-					"flight_seconds": 0.483333333333306,
-					"maximum_air_frame": 38.9881820605274,
-					"peak_m": 2.00001406669617,
-					"rate": 1.9
+					"flight_seconds": 0.433333333333309,
+					"maximum_air_frame": 36.2077324375302,
+					"peak_m": 1.99991536140442,
+					"rate": 2.15
 				}
 			]
 		}
@@ -115,7 +115,7 @@
 			"passed": true
 		},
 		{
-			"check": "New test default is extra snappy at requested2m height",
+			"check": "New test default is sharpest at requested2m height",
 			"passed": true
 		},
 		{
@@ -123,23 +123,27 @@
 			"passed": true
 		},
 		{
-			"check": "J preserves all five timing comparisons",
+			"check": "J preserves all six timing comparisons",
 			"passed": true
 		},
 		{
-			"check": "J preserves all five timing comparisons",
+			"check": "J preserves all six timing comparisons",
 			"passed": true
 		},
 		{
-			"check": "J preserves all five timing comparisons",
+			"check": "J preserves all six timing comparisons",
 			"passed": true
 		},
 		{
-			"check": "J preserves all five timing comparisons",
+			"check": "J preserves all six timing comparisons",
 			"passed": true
 		},
 		{
-			"check": "J preserves all five timing comparisons",
+			"check": "J preserves all six timing comparisons",
+			"passed": true
+		},
+		{
+			"check": "J preserves all six timing comparisons",
 			"passed": true
 		},
 		{
@@ -187,7 +191,7 @@
 			"passed": true
 		},
 		{
-			"check": "Two-metre flight remains shorter than QuickerV1",
+			"check": "Two-metre flight reaches the explicitly requested sharper timing",
 			"passed": true
 		},
 		{
@@ -235,7 +239,7 @@
 			"passed": true
 		},
 		{
-			"check": "Two-metre flight remains shorter than QuickerV1",
+			"check": "Two-metre flight reaches the explicitly requested sharper timing",
 			"passed": true
 		},
 		{
@@ -283,7 +287,7 @@
 			"passed": true
 		},
 		{
-			"check": "Two-metre flight remains shorter than QuickerV1",
+			"check": "Two-metre flight reaches the explicitly requested sharper timing",
 			"passed": true
 		},
 		{
@@ -331,7 +335,7 @@
 			"passed": true
 		},
 		{
-			"check": "Two-metre flight remains shorter than QuickerV1",
+			"check": "Two-metre flight reaches the explicitly requested sharper timing",
 			"passed": true
 		},
 		{
@@ -379,7 +383,7 @@
 			"passed": true
 		},
 		{
-			"check": "Two-metre flight remains shorter than QuickerV1",
+			"check": "Two-metre flight reaches the explicitly requested sharper timing",
 			"passed": true
 		},
 		{
@@ -427,7 +431,7 @@
 			"passed": true
 		},
 		{
-			"check": "Two-metre flight remains shorter than QuickerV1",
+			"check": "Two-metre flight reaches the explicitly requested sharper timing",
 			"passed": true
 		},
 		{
