@@ -1,6 +1,6 @@
 {
   "export": {
-    "triangles": 1140,
+    "triangles": 1620,
     "meshes": 2,
     "surfaces": 2,
     "materials": 1,
@@ -40,10 +40,10 @@
         "intersecting_triangle_pairs": 0
       },
       "UpperArm.R": {
-        "intersecting_triangle_pairs": 26
+        "intersecting_triangle_pairs": 23
       },
       "ForeArm.R": {
-        "intersecting_triangle_pairs": 86
+        "intersecting_triangle_pairs": 101
       },
       "UpperArm.L": {
         "intersecting_triangle_pairs": 0

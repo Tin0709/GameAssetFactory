@@ -43,7 +43,12 @@ try:
      if bit=='1':
       for dx in range(2):
        for dy in range(2):paint(j*12+col*2+dx,y+14-row*2+dy,palette[color])
-  labels[text]=(width,y)
+  labels[text]=(width,y,0)
+ labels['SightSerial']=(84,20,160)
+ for py in range(20,36):
+  for px in range(84):
+   color=pixels[(py*W+px)*4:(py*W+px)*4+4]
+   paint(160+px,py,palette[0] if color==list(palette[2]) else color)
  clean_atlas=OUT/'rifle_v2_markings_atlas_1024.png'
  if clean_atlas.exists():
   im=bpy.data.images.load(str(clean_atlas),check_existing=False);im.name='Rifle_V2_Clean_Markings_1024';im.pack()
@@ -70,25 +75,25 @@ try:
    fs.extend([(i,j,j+n,i+n),(i+2*n,i+3*n,j+3*n,j+2*n),(i,i+2*n,j+2*n,j),(i+n,j+n,j+3*n,i+3*n)])
   return part(name,vs,fs,tile,bevel)
  def label(text,x0,x1,y0,y1,depth,mag=False,sides=(-1,1),angle=0):
-  width,py=labels[text]
+  width,py,px=labels[text]
   for side in sides:
    cx,cy=(x0+x1)/2,(y0+y1)/2
    points=yz([(cx+(x-cx)*math.cos(angle)-(y-cy)*math.sin(angle),cy+(x-cx)*math.sin(angle)+(y-cy)*math.cos(angle)) for x,y in [(x0,y0),(x1,y0),(x1,y1),(x0,y1)]])
    ob=part('AtlasLabel_'+text,[(side*depth,y,z) for y,z in points],[(0,1,2,3)] if side>0 else [(3,2,1,0)],1,mag=mag)
    uv=ob.data.uv_layers.active
-   coords=[(.5/W,(py+15.5)/H),((width-.5)/W,(py+15.5)/H),((width-.5)/W,(py+.5)/H),(.5/W,(py+.5)/H)]
+   coords=[((px+.5)/W,(py+15.5)/H),((px+width-.5)/W,(py+15.5)/H),((px+width-.5)/W,(py+.5)/H),((px+.5)/W,(py+.5)/H)]
    if side<0:coords=[coords[1],coords[0],coords[3],coords[2]]
    for li in range(4):uv.data[li].uv=coords[ob.data.loops[li].vertex_index]
  # Match the reference's long stock, shallow receiver and long exposed barrel.
- B('StockUpper',(91,111,481,190),.079,0,.002)
+ B('StockUpper',(91,111,481,190),.079,0,.0025)
  P('StockBrace',[(93,180),(394,180),(394,267),(282,267),(207,317),(207,251),(99,350)],.064,4)
  P('StockBraceStep',[(207,251),(264,226),(376,226),(376,260),(283,260),(207,317)],.070,0,.0007)
  B('StockButt',(90,115,105,365),.087,0,.0008)
  for side in [-1,1]:
   for x0 in [118,219,320]:B('StockVent',(x0,140,x0+72,158),.0003,4,x=side*.0396)
  B('BufferCollar',(460,128,535,190),.061,3,.001)
- B('UpperReceiver',(501,132,980,207),.075,2,.0014)
- P('LowerReceiver',[(500,204),(973,204),(971,301),(794,324),(794,253),(628,253),(630,325),(554,284),(500,252)],.070,1,.0014)
+ B('UpperReceiver',(501,132,980,207),.075,2,.002)
+ P('LowerReceiver',[(500,204),(973,204),(971,301),(794,324),(794,253),(628,253),(630,325),(554,284),(500,252)],.070,1,.0018)
  ring('CarryHandle',[(550,134),(601,10),(982,25),(985,134)],[(669,106),(690,52),(953,61),(953,111)],.035,0,.0006)
  B('ChargingLatch',(505,103,554,132),.09,0)
  # Distinct silver deflector on one side and marking plate on the other.
@@ -101,41 +106,45 @@ try:
    control=B(name,rect,.002,5,x=side*.036)
    for uv in control.data.uv_layers.active.data:uv.uv=(240/256,104/128)
   B('SafetyWhiteDot',(629,230,642,243),.002,6,x=side*.036)
-  B('SelectorRecess',(584,224,613,253),.0004,7,x=side*.0352)
-  for rect in [(511,211,535,234),(927,214,950,243)]:B('ReceiverPinInset',rect,.0004,7,x=side*.0352)
+  for name,rect in [('SelectorRecess',(584,224,613,253)),('ReceiverPinInset',(511,211,535,234)),('ReceiverPinInset',(927,214,950,243))]:
+   inset=B(name,rect,.0004,7,x=side*.0352)
+   for uv in inset.data.uv_layers.active.data:uv.uv=(.9375,.625)
  # Broad handguard: alternating planes, shallow eight ribs rather than a tall rail.
  B('GuardSilverCollar',(981,121,1038,225),.088,3,.001)
  B('Handguard',(1037,107,1431,241),.092,0,.001)
  for i in range(8):
   x0=1041+i*48
-  B('GuardRib_%02d'%i,(x0,107,x0+24,241),.093,7,.00035)
+  B('GuardRib_%02d'%i,(x0,106,x0+24,242),.093,7,.00035)
  ring('FrontSight',[(1431,157),(1510,45),(1541,46),(1541,158)],[(1448,149),(1518,71),(1530,72),(1530,149)],.018,0)
  B('FrontSightBase',(1431,157,1541,202),.05,0)
  # Stepped rectangular barrel, square cap and true dark front opening.
  B('BarrelRear',(1541,163,1602,201),.027,3)
  P('BarrelTaper',[(1601,163),(1640,174),(1640,195),(1601,201)],.026,3)
- B('BarrelLong',(1638,174,1788,196),.022,3)
+ B('BarrelLong',(1638,174,1812,196),.022,3)
  z=(395-184)*scale
  # Rectangular hollow cap, matching the reference rather than an octagonal tube.
- vs=[(xx,yy,z+zz) for yy in [(1781-560)*scale,(1867-560)*scale] for w,h in [(.023,.0175),(.014,.010)] for xx,zz in [(-w,-h),(w,-h),(w,h),(-w,h)]]
+ vs=[(xx,yy,z+zz) for yy in [(1809-560)*scale,(1867-560)*scale] for w,h in [(.016,.0125),(.009,.007)] for xx,zz in [(-w,-h),(w,-h),(w,h),(-w,h)]]
  fs=[]
  for i in range(4):
   j=(i+1)%4;fs.extend([(i,j,j+8,i+8),(i+4,i+12,j+12,j+4),(i+8,j+8,j+12,i+12),(i,i+4,j+4,j)])
  part('MuzzleBrake',vs,fs,3)
  # Reference grip and open rectangular trigger window, retaining a centered hand origin.
- P('PistolGrip',[(558,282),(651,320),(566,455),(440,426)],.060,0,.0015)
+ P('PistolGrip',[(558,282),(651,320),(566,455),(440,426)],.060,0,.002)
  P('GripInset',[(558,299),(623,326),(554,434),(461,412)],.002,4,x=.031)
  P('GripInset',[(558,299),(623,326),(554,434),(461,412)],.002,4,x=-.031)
  ring('TriggerGuard',[(628,253),(790,253),(794,325),(630,325)],[(642,264),(779,264),(781,313),(642,313)],.026,2)
  P('Trigger',[(687,261),(699,261),(717,306),(708,310)],.013,0)
  # Seat the feed mouth inside the lower receiver, retaining the reload pivot.
  P('Magazine',[(794,309),(963,294),(971,391),(1007,509),(848,546),(824,439)],.065,0,.0008,True)
+ # Two matched bands share the same curved cross-sections and equal edge margins.
+ # Their lower ends are parallel to the magazine base and clear of its serial.
+ sections=[((801,344),(968,329)),((820,430),(980,400)),((838,498),(997,461))]
+ def band_edge(u):return [(a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u) for a,b in sections]
  for side in [-1,1]:
-  # End the raised strips above the serial's field, avoiding coplanar overlap.
-  for dx in [0,66]:P('MagazineGroove',[(816+dx,335),(837+dx,332),(846+dx,425),(863+dx,475),(843+dx,480),(829+dx,431)],.002,4,mag=True,x=side*.033)
+  for index,u in enumerate([.28,.72]):P('MagazineBand_%d'%index,band_edge(u-.06)+list(reversed(band_edge(u+.06))),.0004,4,mag=True,x=side*.0328)
  label('M4A1 CARBINE',529,750,153,183,.0376,sides=(1,))
  label('2003451',828,949,160,182,.0376,sides=(1,))
- label('2003451',1440,1534,174,195,.0251,sides=(-1,))
+ label('SightSerial',1440,1534,174,195,.0251,sides=(-1,))
  label('5X56',697,771,159,181,.0376,sides=(-1,))
  label('V4',830,908,249,286,.0351)
  # Keep the magazine serial inside its face with generous bottom/side gutters.
@@ -165,8 +174,8 @@ try:
  for screen in bpy.data.screens:
   for area in screen.areas:
    if area.type=='VIEW_3D':
-    sp=area.spaces.active;sp.shading.type='MATERIAL';sp.overlay.show_overlays=False;sp.region_3d.view_location=(0,.25,.07);sp.region_3d.view_distance=1.75
-    sp.region_3d.view_rotation=Vector((-1,0,0)).to_track_quat('Z','Y');sp.region_3d.view_perspective='ORTHO'
+    sp=area.spaces.active;sp.shading.type='MATERIAL';sp.overlay.show_overlays=False;sp.region_3d.view_location=(0,.28,.08);sp.region_3d.view_distance=1.40
+    sp.region_3d.view_rotation=Vector((-3,-.4,.55)).to_track_quat('Z','Y');sp.region_3d.view_perspective='ORTHO'
  bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str(TARGET))
  (OUT/'asset_report.json').write_text(json.dumps(report,indent=2))
  assert manifestpath.read_bytes()==oldmanifest,'Concurrent manifest edit; preserved instead of overwriting'
