@@ -214,3 +214,8 @@ The SAME showcase now has20 independent Actions. Select `Rifle_Ready_V2_v3_Test`
 ### Latest Rifle Ready reference sheet — Pending
 
 Select `Rifle_Ready_V2_v4_Test` for both arms straight and the steeper muzzle-down hold. The SAME Showcase now contains21 independent Actions, preserving all earlier Ready versions and unchanged Aim/Back Holster. F1–120/30FPS, closing121 excluded. [Latest three-view Ready comparison and fit notes](../reviews/player_animation_library_v1/rifle_ready_v4_test/README.md). Reopen this exact file if an older window displays a stale list. No Godot integration.
+
+
+### Latest Rifle Ready grip correction — Pending
+
+Select `Rifle_Ready_V2_v5_Test`: centered right-hand grip and straight right arm/rifle reaching farther toward the support hand. The SAME Showcase now contains22 independent Actions; earlier Ready versions and Aim/Back Holster remain unchanged. F1–120/30FPS, closing121 excluded. [Matching three-view comparison and fit notes](../reviews/player_animation_library_v1/rifle_ready_v5_test/README.md). No Godot integration.

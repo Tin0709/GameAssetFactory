@@ -1,0 +1,12 @@
+{
+  "baseline_files": 7405,
+  "changed": [
+    "blender/animation/showcase/README.md",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/animation_manifest.json",
+    "AGENTS.md",
+    "docs/animation/ANIMATION_PROGRESS.md"
+  ],
+  "missing": [],
+  "unexpected_changes": []
+}
