@@ -12,6 +12,10 @@
   ],
   "markers": 11,
   "pump_travel_m": 0.055,
+  "barrel_gap_m": {
+    "lower_tube": 0.0024507716298103333,
+    "pump": 0.0007895678281784058
+  },
   "protected_files": 37,
   "changed": [],
   "actions": 0

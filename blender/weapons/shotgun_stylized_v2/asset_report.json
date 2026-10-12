@@ -64,7 +64,7 @@
     "LeftHandGuide": [
       0,
       0.356,
-      0.038
+      0.0483
     ],
     "Muzzle": [
       0,
@@ -94,7 +94,7 @@
     "Support_Hand_Point": [
       0,
       0.356,
-      0.038
+      0.0483
     ],
     "Muzzle_Point": [
       0,
@@ -109,7 +109,7 @@
     "PumpReference": [
       0,
       0.356,
-      0.038
+      0.0483
     ]
   },
   "topology": {
@@ -117,13 +117,13 @@
       "triangles": 828,
       "boundary_edges": 0,
       "nonmanifold_edges": 0,
-      "signed_volume": 0.001714257647838017
+      "signed_volume": 0.001712898032902363
     },
     "Shotgun_V2_Pump": {
       "triangles": 256,
       "boundary_edges": 0,
       "nonmanifold_edges": 0,
-      "signed_volume": 0.0002799261977189698
+      "signed_volume": 0.0002222531595339259
     }
   },
   "reference_url": "https://sketchfab.com/3d-models/low-poly-stevens-model-520a-275af36ee49545f3bdf117329f72745f",

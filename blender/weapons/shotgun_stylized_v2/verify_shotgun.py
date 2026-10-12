@@ -50,5 +50,5 @@ if '--asset-only' not in sys.argv:
  for key,value in old.items():
   if key not in ['weapons','default_selection']:assert manifest[key]==value,('Library metadata changed',key)
  assert manifest['default_selection']=='shotgun_stylized_v2'
-report={'passed':True,'triangles':triangles,'parts':count,'materials':1,'texture':[64,64],'markers':len(asset['markers']),'pump_travel_m':.055,'protected_files':len(baseline),'changed':changed,'actions':0}
+report={'passed':True,'triangles':triangles,'parts':count,'materials':1,'texture':[64,64],'markers':len(asset['markers']),'pump_travel_m':.055,'barrel_gap_m':{'lower_tube':tube_gap,'pump':pump_gap},'protected_files':len(baseline),'changed':changed,'actions':0}
 (HERE/'verification.json').write_text(json.dumps(report,indent=2));print('SHOTGUN_VERIFIED',json.dumps(report))

@@ -345,7 +345,7 @@
       "in_place": true,
       "review_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/idle_all_views_1x.mp4",
       "comparison_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/comparison_all_views_1x.mp4",
-      "presentation_note": "Both full soles remain planted; static root; closing key97 excluded from playback1–96. No preview travel.",
+      "presentation_note": "Both full soles remain planted; static root; closing key97 excluded from playback1\u201396. No preview travel.",
       "refinement_note": "Explicit user steering: keep this same Pending Action name; add head-led curious LookAround, observation/rest pauses and delayed body response. Earlier working passes backed up. Not an approved Action overwrite."
     },
     {
@@ -388,7 +388,7 @@
       "in_place": true,
       "review_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v2/idle_v2_all_views_1x.mp4",
       "comparison_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v2/comparison_three_quarter_1x.mp4",
-      "presentation_note": "Both full soles fixed 28 mm farther outward per side; static root; playback1–240, closing key241 excluded. No travel. Separate v2; original Idle preserved.",
+      "presentation_note": "Both full soles fixed 28 mm farther outward per side; static root; playback1\u2013240, closing key241 excluded. No travel. Separate v2; original Idle preserved.",
       "gameplay_validation": "Not production-ready. Requires stance/replant transitions, interruption response, weapon-layer ownership and actual Godot/mobile validation."
     },
     {
@@ -601,7 +601,7 @@
         ]
       ],
       "review_video": "blender/animation/reviews/player_animation_library_v1/run_expressive_v3_test/run_v3_three_views_1x.mp4",
-      "presentation_note": "Separate comparison refinement: cadence +10%, straight-arm pitch excursion +20% against saved Run v2. Same normalized hip/torso/head/leg poses, 0.27m tracks, saved L3/R5deg toe-out and controlled26mm lateral hip range. F1–20 at30FPS; closing21 excluded. Controller owns forward travel at nominal2.31m/s; preview travel is temporary only.",
+      "presentation_note": "Separate comparison refinement: cadence +10%, straight-arm pitch excursion +20% against saved Run v2. Same normalized hip/torso/head/leg poses, 0.27m tracks, saved L3/R5deg toe-out and controlled26mm lateral hip range. F1\u201320 at30FPS; closing21 excluded. Controller owns forward travel at nominal2.31m/s; preview travel is temporary only.",
       "gameplay_validation": "Pending artistic review. Shared rig, LEFT phase0 / RIGHT phase0.5. Actual Godot transitions, speed-aware contact blending, input interruption, weapon layers and measured mobile30FPS remain outstanding.",
       "preferred_run_baseline": true
     },
@@ -644,6 +644,123 @@
       "review_video": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_v2_test/full_jump_v2_three_views_1x.mp4",
       "presentation_note": "User-steered pending refinement: hands slightly above head,8deg added airborne opening per leg,28mm deeper soft landing compression with stronger torso/arm reaction. Same93frames/30FPS, receiving contactsF46/F47 and original rebound/recovery fromF65. Original Full Jump and earlier previews preserved; arm-only working checkpoint archived. Temporary0.72m elevation and review camera headroom are never baked into rig Action.",
       "gameplay_validation": "Pending user gameplay review. Existing isolated ExpressiveLocomotionTest now offers B Heavier/Original landing comparison: runtime-only20/40mm additional contact hip dip, unchanged physics/gait/input.49 matched comparison checks plus77 jump checks at30/60renderFPS. Source/Action/Showcase/native library unchanged. Review and limitations: docs/animation/reviews/godot_jump_heavier_v1/README.md. No production promotion."
+    },
+    {
+      "action": "Rifle_Ready_V2_Test",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/rifle_hold_review.blend",
+      "source_sha256": "fe4942918f4d8eed4e91cb123d81a08593ac539318461bd2ec222f422aa96009",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "bcea14407a9f05a2752093272ad5c3e1ecc8d86e2a0d5402f8a2f8c79a766e7d",
+      "action_frame_range": [
+        1.0,
+        121.0
+      ],
+      "start": 1,
+      "end": 120,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Pending explicit Blender holding-pose review. No gameplay replacement or integration approval.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_prop": "rifle_stylized_v2",
+      "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+      "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"
+    },
+    {
+      "action": "Rifle_Aim_Hold_V2_Test",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/rifle_hold_review.blend",
+      "source_sha256": "fe4942918f4d8eed4e91cb123d81a08593ac539318461bd2ec222f422aa96009",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "67b0083825bade735e161ad4e379ceb1a3819e6eded24eee5643862cebf4f5c1",
+      "action_frame_range": [
+        1.0,
+        121.0
+      ],
+      "start": 1,
+      "end": 120,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Pending explicit Blender holding-pose review. No gameplay replacement or integration approval.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_prop": "rifle_stylized_v2",
+      "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+      "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"
+    },
+    {
+      "action": "Rifle_Back_Holster_V2_Test",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/rifle_hold_review.blend",
+      "source_sha256": "fe4942918f4d8eed4e91cb123d81a08593ac539318461bd2ec222f422aa96009",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "d0b65ccccf2b1c90a13d20da1ff8f411d7ad14feaf3568b64c101e88e780b0ee",
+      "action_frame_range": [
+        1.0,
+        121.0
+      ],
+      "start": 1,
+      "end": 120,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Pending explicit Blender holding-pose review. No gameplay replacement or integration approval.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_prop": "rifle_stylized_v2",
+      "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+      "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

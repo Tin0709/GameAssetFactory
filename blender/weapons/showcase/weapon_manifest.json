@@ -262,9 +262,9 @@
       "kind": "Shotgun",
       "label": "Shotgun \u2014 Stylized V2",
       "source": "blender/weapons/shotgun_stylized_v2/Shotgun_Stylized_V2.blend",
-      "source_sha256": "85048a9a2852e190f3535ca30f3144e73576079ea282c093cd4a9d438b1294ca",
+      "source_sha256": "761893a1354f5a56051a2ef7f0c88599b227efbe8002a6b67d92084f9de373d5",
       "status": "Pending",
-      "status_note": "New registration; awaiting explicit visual approval.",
+      "status_note": "Pending Stevens-inspired original; lower tube and pump raised for a close barrel gap.",
       "collection": "WEAPON_shotgun_stylized_v2",
       "root": "shotgun_stylized_v2__Shotgun_Stylized_V2"
     }

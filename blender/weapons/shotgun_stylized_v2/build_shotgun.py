@@ -79,41 +79,43 @@ box('BoltFace',.098,.147,.052,.068,.0005,3,x=.0221)
 profile('BoltHandle',[(.142,.050),(.157,.049),(.160,.045),(.157,.041),(.147,.042)],.006,0,x=.024)
 # Thin steel barrel and lower magazine tube remain distinct in the silhouette.
 tube('HollowLongBarrel',.181,.767,.073,.013,0,bore=.0085)
-tube('MagazineTube',.183,.568,.039,.010,7)
-tube('TubeFrontCap',.559,.580,.039,.011,0)
-box('BarrelTubeBridge',.548,.559,.038,.067,.012,0)
-box('PumpActionBar',.180,.459,.029,.034,.0025,3,x=-.013)
+tube('MagazineTube',.183,.568,.0493,.010,7)
+tube('TubeFrontCap',.559,.580,.0493,.011,0)
+box('BarrelTubeBridge',.548,.559,.0483,.067,.012,0)
+box('PumpActionBar',.180,.459,.0393,.0443,.0025,3,x=-.013)
 profile('FrontSight',[(.742,.084),(.751,.084),(.751,.089),(.747,.090)],.006,3)
 # Connected open guard and hooked trigger; no detached upper joints.
 ring('TriggerGuard',[(.038,.022),(.092,.022),(.098,.006),(.093,-.014),(.080,-.025),(.053,-.023),(.040,-.010),(.034,.006)],[(.046,.014),(.085,.014),(.090,.004),(.086,-.009),(.077,-.017),(.057,-.015),(.047,-.006),(.042,.005)],.014,0)
 profile('Trigger',[(.065,.022),(.071,.022),(.069,.004),(.074,-.006),(.070,-.010),(.062,.001)],.007,3)
 # Hollow fore-end with broad shallow grooves, genuinely separate for pumping.
-cross=[(-.018,.018),(.018,.018),(.024,.024),(.024,.050),(.018,.056),(-.018,.056),(-.024,.050),(-.024,.024)]
+cross=[(-.018,.0283),(.018,.0283),(.024,.0343),(.024,.0545),(.018,.0602),(-.018,.0602),(-.024,.0545),(-.024,.0343)]
 ys=[.255,.263,.283,.286,.317,.320,.351,.354,.385,.388,.419,.422,.451,.459]
 vs=[];fs=[];colors=[]
 for index,y in enumerate(ys):
  scale=.94 if index in [0,len(ys)-1] else (.985 if index in [2,3,4,5,6,7,8,9,10,11] else 1)
- vs.extend((x*scale,y,.038+(z-.038)*scale) for x,z in cross)
+ vs.extend((x*scale,y,.0483+(z-.0483)*scale) for x,z in cross)
 for k in range(len(ys)-1):
  for i in range(8):
   j=(i+1)%8;fs.append((k*8+i,k*8+j,(k+1)*8+j,(k+1)*8+i));colors.append(6 if k in [2,4,6,8,10] else 5)
 outer_end=(len(ys)-1)*8;inner0=len(vs)
-for y in [ys[0],ys[-1]]:vs.extend((math.cos((i+.5)*math.tau/8)*.0108,y,.039+math.sin((i+.5)*math.tau/8)*.0108) for i in range(8))
+for y in [ys[0],ys[-1]]:vs.extend((math.cos((i+.5)*math.tau/8)*.0108,y,.0493+math.sin((i+.5)*math.tau/8)*.0108) for i in range(8))
 for i in range(8):
  j=(i+1)%8;fs.extend([(inner0+i,inner0+8+i,inner0+8+j,inner0+j),(i,inner0+i,inner0+j,j),(outer_end+i,outer_end+j,inner0+8+j,inner0+8+i)]);colors.extend([6,6,6])
 mesh('WoodPumpWithOpenTubeChannel',vs,fs,kind='Pump',tiles=colors)
 def join(objects,name,pivot):
  bpy.ops.object.select_all(action='DESELECT')
  for o in objects:o.select_set(True)
- bpy.context.view_layer.objects.active=objects[0];bpy.ops.object.join();o=bpy.context.object;o.name=name
+ bpy.context.view_layer.objects.active=objects[0]
+ if len(objects)>1:bpy.ops.object.join()
+ o=bpy.context.object;o.name=name
  for v in o.data.vertices:v.co-=pivot
  o.parent=root;o.location=pivot
  for poly in o.data.polygons:poly.material_index=0
  while len(o.data.materials)>1:o.data.materials.pop(index=len(o.data.materials)-1)
  return o
 base=join(parts['Base'],'Shotgun_V2_Base',Vector((0,0,0)))
-pump=join(parts['Pump'],'Shotgun_V2_Pump',Vector((0,.356,.038)));pump['role']='Independent fore-end; reference pumping travel local Y -55mm'
-markers={'RightHandGrip':(0,0,0),'LeftHandGuide':(0,.356,.038),'Muzzle':(0,.767,.073),'AimReference':(0,.740,.089),'RecoilPivot':(0,0,0),'HolsterAttach':(0,0,0),'Grip_Point':(0,0,0),'Support_Hand_Point':(0,.356,.038),'Muzzle_Point':(0,.767,.073),'ReloadPort':(.0225,.123,.060),'PumpReference':(0,.356,.038)}
+pump=join(parts['Pump'],'Shotgun_V2_Pump',Vector((0,.356,.0483)));pump['role']='Independent fore-end; reference pumping travel local Y -55mm'
+markers={'RightHandGrip':(0,0,0),'LeftHandGuide':(0,.356,.0483),'Muzzle':(0,.767,.073),'AimReference':(0,.740,.089),'RecoilPivot':(0,0,0),'HolsterAttach':(0,0,0),'Grip_Point':(0,0,0),'Support_Hand_Point':(0,.356,.0483),'Muzzle_Point':(0,.767,.073),'ReloadPort':(.0225,.123,.060),'PumpReference':(0,.356,.0483)}
 for name,pos in markers.items():
  o=bpy.data.objects.new(name,None);c.objects.link(o);o.parent=root;o.location=pos;o.empty_display_type='ARROWS';o.empty_display_size=.014
 bpy.context.view_layer.update();meshes=[base,pump];points=[o.matrix_world@v.co for o in meshes for v in o.data.vertices];topology={}
