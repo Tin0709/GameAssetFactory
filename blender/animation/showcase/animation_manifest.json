@@ -725,13 +725,13 @@
     },
     {
       "action": "Rifle_Ready_V2_v16_Test",
-      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/rifle_ready_v16_review.blend",
-      "source_sha256": "bab0ba220d6801f94a46072e38bc1f1434f70c0e50e18b9cc83e47b2aa92280d",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/left_arm_tuck_v001/rifle_ready_v16_review.blend",
+      "source_sha256": "94575a2234776d432dbfb5fa5a02094042eb792b66b51e955332ec2a4a5bd73f",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "6b52ded845d407dc4e0e9effcda22c52f1dde7664499e923ee2ab3c508ed015c",
+      "action_sha256": "7bf9bf1510ded8e2bdbeaeff618860b3a571ae142efb5a018d084dc2d3670a1e",
       "action_frame_range": [
         1.0,
         121.0
@@ -741,7 +741,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Another small forward refinement toward supplied reference: straight right arm/rifle reaches36.6mm farther forward than preserved v15, same front diagonal and grip seating. Left hand follows below with deliberate small gap. Body/legs/head and four-second breathing retained; Pending Blender review.",
+      "approval_note": "User requested refinement in same retained v16: left arm closer to body and slightly higher toward head. Left palm39.7mm back/21.3mm up, shoulder50mm up; both arms straight. Right arm/rifle/body/head/legs unchanged. Only one Rifle Ready entry; Pending Blender review.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
