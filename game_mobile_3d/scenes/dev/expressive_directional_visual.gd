@@ -20,6 +20,14 @@ var layer_release_age:=.30
 var layer_release_q: Array[Vector3]=[]
 var layer_release_p: Array[Vector3]=[]
 var turn_twist_guard_enabled:=true
+var landing_clearance_lift:=0.0
+var run_release_enabled:=true
+var run_release_active: Array[bool]=[false,false]
+var run_release_age: Array[float]=[0.0,0.0]
+var run_release_duration: Array[float]=[.1,.1]
+var run_release_offset: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
+var run_release_velocity: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
+var run_raw_sole: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
 
 func _limit_leg_twist(q: Quaternion, reference: Quaternion) -> Quaternion:
 	if not turn_twist_guard_enabled:return q
@@ -109,12 +117,22 @@ func _evaluate_locomotion_pose(delta: float) -> bool:
 		var parent:=skeleton.get_bone_parent(hips)
 		var basis:=skeleton.global_basis*skeleton.get_bone_global_pose(parent).basis
 		skeleton.set_bone_pose_position(hips,skeleton.get_bone_pose_position(hips)+basis.inverse()*pivot_load)
+		# A physics-driven contact can interrupt any airborne leg phase. Keep
+		# the body's support height compatible with the existing140mm joint
+		# translation limit rather than letting a deep outgoing sole clip the floor.
+		skeleton.force_update_all_bone_transforms()
+		var needed:=0.0
+		if jump_state=="LAND":
+			for bone in [leg_left,leg_right]:needed=maxf(needed,-_sole_world(bone).y-.135)
+		landing_clearance_lift=maxf(clampf(needed,0,.035),move_toward(landing_clearance_lift,0,.25*delta))
+		skeleton.set_bone_pose_position(hips,skeleton.get_bone_pose_position(hips)+basis.inverse()*Vector3.UP*landing_clearance_lift)
 	return evaluated
 
 func _stride_distance() -> float:
 	return lerpf(WALK_STRIDE,RUN_STRIDE*run_stride_scale,gait_run_weight)
 
 func jump_transition(value: String) -> void:
+	if value!="GROUND" or jump_state!="LAND":run_release_active=[false,false]
 	if polish_enabled and value=="GROUND" and jump_state=="LAND" and move_requested:
 		# The gait is already fully restored. Preserve its support and velocity
 		# instead of starting a second inertialization at an arbitrary stride phase.
@@ -132,8 +150,16 @@ func advance_jump(state: String, age: float, vy: float, launch: float, to_floor:
 func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) -> void:
 	var was_moving:=move_requested
 	super.drive_locomotion(world_velocity,requested,delta)
+	if run_release_enabled and move_requested:
+		# At the fast candidate pace, finish push-off before the planted leg
+		# reaches its translation cap. Receiving phases stay0LEFT/.5RIGHT;
+		# Walk and the accepted1.5x Run support schedule remain unchanged.
+		var earlier:=.04*smoothstep(1.5,2.25,review_pace)
+		for side in 2:
+			stance_duty[side]=minf(stance_duty[side],lerpf(.60 if side==0 else .62,(.42 if side==0 else .43)-earlier,gait_run_weight))
 	if not directional_enabled or not move_requested or settling or not was_moving:
 		swing_active=[false,false]
+		run_release_active=[false,false]
 	var planar:=Vector2(world_velocity.x,world_velocity.z)
 	var desired_bias:=0.0
 	if planar.length()>.1:desired_bias=clampf(wrapf(atan2(planar.x,planar.y)-rotation.y,-PI,PI),-.9,.9)
@@ -196,6 +222,8 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	return result
 
 func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Quaternion, delta: float) -> Quaternion:
+	run_release_active[side]=false
+	run_raw_sole[side]=_sole_world(bone)
 	var weight:=_ground_turn_weight()
 	if weight<=0 or not move_requested:
 		swing_active[side]=false
@@ -236,6 +264,7 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	var weight:=_ground_turn_weight()
 	if weight<=0:
 		swing_active[side]=false
+		run_release_active[side]=false
 		return super._swing_leg_rotation(side,bone,delta)
 	# A large pivot offset needs the swing interval to unwind. Bound its
 	# angular release, without slowing the capsule or restarting the stride.
@@ -247,11 +276,33 @@ func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
 	swing_world_q[side]=_limit_leg_twist((support_aim[side]*reference).normalized(),reference)
 	support_aim[side]=(swing_world_q[side]*reference.inverse()).normalized()
 	swing_active[side]=true
+	if run_release_enabled and gait_run_weight>.25 and move_requested:
+		# Contact translations used to disappear at liftoff even though rotation
+		# released smoothly. Carry the outgoing foot position/velocity through a
+		# short cubic release, while leaving the gait and capsule clocks untouched.
+		_set_world_leg_rotation(bone,swing_world_q[side])
+		var raw:=_sole_world(bone)
+		if foot_support[side]:
+			run_release_active[side]=true;run_release_age[side]=0
+			run_release_duration[side]=clampf(.45*(1-stance_duty[side])/maxf(gait_frequency,.01),.06,.14)
+			run_release_offset[side]=(last_sole[side]-raw).limit_length(.14)
+			run_release_velocity[side]=-(raw-run_raw_sole[side])/maxf(delta,.00001)
+		if run_release_active[side]:
+			var duration:=run_release_duration[side]
+			var u:=clampf(run_release_age[side]/duration,0,1)
+			var offset:=run_release_offset[side]*(2*u*u*u-3*u*u+1)+run_release_velocity[side]*duration*(u*u*u-2*u*u+u)
+			# Same rigid-joint safety radius; keep the swing sole clear as well.
+			offset.y=maxf(offset.y,-raw.y);offset=offset.limit_length(.14)
+			var parent:=skeleton.get_bone_parent(bone)
+			var basis:=skeleton.global_basis*skeleton.get_bone_global_pose(parent).basis
+			skeleton.set_bone_pose_position(bone,skeleton.get_bone_pose_position(bone)+basis.inverse()*offset)
+			run_release_age[side]+=delta
+			if u>=1:run_release_active[side]=false
+		run_raw_sole[side]=raw
+	else:run_release_active[side]=false
 	return swing_world_q[side]
 
 func _limit_contact_correction(correction: Vector3) -> Vector3:
-	if "--expressive-contact-diagnostics" in OS.get_cmdline_user_args() and jump_state=="LAND" and correction.y>.14:
-		print("LAND_CAP ",jump_age," ",gait_phase," ",correction)
 	if collect_contact_diagnostics and jump_state=="GROUND" and move_requested:
 		release_trace.append({"phase":gait_phase,"load":pivot_load,"correction":correction,"turn":turn_rate,"bias":travel_bias,"aim":[rad_to_deg(support_aim[0].angle_to(Quaternion.IDENTITY)),rad_to_deg(support_aim[1].angle_to(Quaternion.IDENTITY))]})
 	return super._limit_contact_correction(correction)
