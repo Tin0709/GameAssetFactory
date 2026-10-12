@@ -14,6 +14,8 @@ The launcher does not install an add-on, change preferences, enable global autom
 
 New original Stevens-inspired `Shotgun_Stylized_V2`: long faceted barrel, stepped receiver, brown traditional stock and independently moving wood pump. 0.978m long, 1,084 triangles, two rigid meshes, one material/64×64 atlas. Selected initially in this SAME showcase. [Source/export, previews, pump travel and validation](../shotgun_stylized_v2/README.md). Existing ready pose needs future left-hand alignment to the pump; static stowed preview is available. No character Action or production edit.
 
+Latest requested correction raises the lower assembly10.3mm: barrel/tube gap2.45mm and barrel/wood-pump gap0.79mm, with55mm pump travel preserved. Earlier wider-gap candidate is backed up; other entries are unchanged.
+
 ## Current rifle review — 2026-10-12
 
 The new **Pistol_Stylized_V2** is independently selectable as **Pending**, with a muted brown grip and closed trigger joints. See [its source, export, previews and fit limitations](../pistol_stylized_v2/README.md). Future registrations default to the newly registered weapon in this SAME library.

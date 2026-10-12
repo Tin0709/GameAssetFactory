@@ -147,7 +147,8 @@ def refresh(scene,import_missing=True):
                     o.parent=rig;o.parent_type='BONE';o.parent_bone=bone
                     o.matrix_parent_inverse=Matrix.Translation((0,-rig.data.bones[bone].length,0));o.matrix_basis=Matrix.Identity(4)
                     c['gaf_preview_prop']=key
-                    for child in c.all_objects:
+                    for child in list(c.all_objects):
+                        if child is None:raise ValueError('Preview prop contains an invalid object')
                         child.hide_render=child.type!='MESH'
                         if child.type=='EMPTY':child.empty_display_size=.025
                 validate_preview_prop(e,rig)
