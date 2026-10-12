@@ -2,6 +2,13 @@ extends "res://scenes/dev/expressive_jump_review.gd"
 
 var gameplay_camera:=true
 var camera_ground_y:=0.0
+const JUMP_REVIEW_VARIANTS=[Vector2(2.15,2.0),Vector2(1.9,2.0),Vector2(1.7,2.0),Vector2(1.4,1.35),Vector2(1.18,1.2),Vector2(1.0,1.2)]
+const JUMP_REVIEW_LABELS=["2m sharpest","2m extra snappy","2m previous","1.35m snappy","Quicker V1","Original"]
+
+func _jump_review_index() -> int:
+	for index in JUMP_REVIEW_VARIANTS.size():
+		if is_equal_approx(actor.jump_flight_speed,JUMP_REVIEW_VARIANTS[index].x):return index
+	return 0
 
 func _ready() -> void:
 	review_player_scene="res://scenes/dev/ExpressiveDirectionalPlayer.tscn"
@@ -27,6 +34,8 @@ func _ready() -> void:
 		actor.jump_flight_speed=1.4;actor.jump_height=1.35
 	if jump_enabled and "--expressive-jump-2m-previous" in OS.get_cmdline_user_args():
 		actor.jump_flight_speed=1.7;actor.jump_height=2.0
+	if jump_enabled and "--expressive-jump-extra-snappy" in OS.get_cmdline_user_args():
+		actor.jump_flight_speed=1.9;actor.jump_height=2.0
 	if jump_enabled and "--expressive-polish-demo" in OS.get_cmdline_user_args():call_deferred("run_polish_demo")
 	if jump_enabled and "--expressive-quicker-demo" in OS.get_cmdline_user_args():call_deferred("run_quicker_demo")
 
@@ -49,8 +58,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_K:
 		actor.visual.polish_enabled=not actor.visual.polish_enabled;actor.visual.pose_dirty=true
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_J:
-		actor.jump_flight_speed=1.7 if actor.jump_flight_speed>1.8 else (1.4 if actor.jump_flight_speed>1.5 else (1.18 if actor.jump_flight_speed>1.3 else (1.0 if actor.jump_flight_speed>1.0 else 1.9)))
-		actor.jump_height=2.0 if actor.jump_flight_speed>1.5 else (1.35 if actor.jump_flight_speed>1.3 else 1.2)
+		var variant: Vector2=JUMP_REVIEW_VARIANTS[(_jump_review_index()+1)%JUMP_REVIEW_VARIANTS.size()]
+		actor.jump_flight_speed=variant.x;actor.jump_height=variant.y
 	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_C:
 		gameplay_camera=not gameplay_camera
 	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_P:
@@ -75,7 +84,7 @@ func _process(delta: float) -> void:
 	super._process(delta)
 	if jump_enabled:status.text+="\nTurns: %s · V compares\nFalling limbs: %s · F compares\nRun stride: %s · G compares"%["Refined" if actor.visual.directional_enabled else "Original","Raised wave" if actor.visual.fall_wave_enabled else "Original","Longer" if actor.visual.run_stride_scale>1.0 else "Original"]
 	if jump_enabled:status.text+="\nPolish: %s · K before/after · T pace"%["After" if actor.visual.polish_enabled else "Before"]
-	if jump_enabled:status.text+="\nJump: %s · J compares next launch"%["2m extra snappy" if actor.jump_flight_speed>1.8 else ("2m previous" if actor.jump_flight_speed>1.5 else ("1.35m snappy" if actor.jump_flight_speed>1.3 else ("Quicker V1" if actor.jump_flight_speed>1.0 else "Original")))]
+	if jump_enabled:status.text+="\nJump: %s · J compares next launch"%JUMP_REVIEW_LABELS[_jump_review_index()]
 	if jump_enabled:status.text+="\nCamera: %s · C gameplay/detail"%["Gameplay" if gameplay_camera else "Detail"]
 	if jump_enabled:status.text+="\nLeg pivot: %s · P compares"%["Clean" if actor.visual.turn_twist_guard_enabled else "Previous"]
 	if jump_enabled:status.text+="\nRun liftoff: %s · O compares"%["Smooth" if actor.visual.run_release_enabled else "Previous"]
