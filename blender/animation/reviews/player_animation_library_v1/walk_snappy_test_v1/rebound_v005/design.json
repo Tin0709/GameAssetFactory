@@ -8,7 +8,7 @@
   "fps": 30,
   "period_s": 1,
   "closing_key": 31,
-  "nominal_speed_m_s": 1.02,
+  "nominal_speed_m_s": 1.1424,
   "leg_tracks_m": 0.27,
   "support_duty": {
     "L": 0.64,
@@ -33,7 +33,8 @@
   "transition": "Same receiving phases; pose translation/waist occlusion require future runtime/weapon/transition review. Blender-only Pending.",
   "rebound_peak_time_s": 0.22,
   "rebound_peak_height_m": 0.71,
-  "leg_world_motion_preserved": true,
-  "intentional_waist_gap": "Small rebound-only separation from planted leg; no changes to rigid geometry or lower piston trajectory.",
+  "leg_world_motion_preserved": false,
+  "fore_aft_stride_multiplier": 1.12,
+  "intentional_waist_gap": "Small rebound-only separation from planted leg; rigid geometry and180mm piston lift retained, fore/aft reach increased12%.",
   "body_motion": "Fast soft load; spring upward in140ms; short light top, slower settle. Restrained delayed torso/shoulder/head reactions prevent uniform rigid bob."
 }
