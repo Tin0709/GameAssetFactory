@@ -23,6 +23,7 @@ var _max_scale_error:=0.0
 var _max_hip_gap:=0.0
 var _armed:=false
 var _phase_cases: Array=[]
+var jump_enabled:=true
 func _ready() -> void:
 	process_priority=100
 	var world:=WorldEnvironment.new();var env:=Environment.new()
@@ -41,13 +42,14 @@ func _ready() -> void:
 		mesh.surface_add_vertex(Vector3(i,.002,-30));mesh.surface_add_vertex(Vector3(i,.002,30))
 		mesh.surface_add_vertex(Vector3(-30,.002,i));mesh.surface_add_vertex(Vector3(30,.002,i))
 	mesh.surface_end();lines.mesh=mesh;add_child(lines)
-	actor=preload("res://scenes/dev/ExpressiveLocomotionPlayer.tscn").instantiate();add_child(actor)
+	var player_path:="res://scenes/dev/ExpressiveJumpPlayer.tscn" if jump_enabled else "res://scenes/dev/ExpressiveLocomotionPlayer.tscn"
+	actor=load(player_path).instantiate();add_child(actor)
 	camera=Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=5.3;camera.current=true;camera.far=80;add_child(camera)
 	var canvas:=CanvasLayer.new();add_child(canvas)
 	var panel:=VBoxContainer.new();panel.position=Vector2(22,16);canvas.add_child(panel)
 	var title:=Label.new();title.text="EXPRESSIVE LOCOMOTION  |  GODOT TEST";title.add_theme_font_size_override("font_size",24);panel.add_child(title)
 	status=Label.new();status.add_theme_font_size_override("font_size",19);panel.add_child(status)
-	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: rifle layer   T: compare pace\nIdle: normal speed · no Jump · production unchanged";panel.add_child(help)
+	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: rifle layer   T: compare pace\n"+("Space: jump · L: drop test · Jump V2 Pending" if jump_enabled else "Idle: normal speed · no Jump · production unchanged");panel.add_child(help)
 	var controls:=HBoxContainer.new();panel.add_child(controls)
 	for label in ["Front","3/4","Side","Demo","Reset","Rifle layer","Compare pace"]:
 		var button:=Button.new();button.text=label;controls.add_child(button)
@@ -112,7 +114,8 @@ func _process(delta: float) -> void:
 
 func reset_actor() -> void:
 	actor.position=Vector3.ZERO;actor.velocity=Vector3.ZERO
-	actor.visual.foot_support=[false,false];actor.visual.pose_dirty=true
+	if actor.has_method("reset_jump"):actor.reset_jump()
+	actor.visual.foot_support[0]=false;actor.visual.foot_support[1]=false;actor.visual.pose_dirty=true
 	actor.visual.attention_time=0;actor.visual.contact_drift=0
 	section="Manual review"
 

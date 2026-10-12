@@ -1,0 +1,21 @@
+{
+  "clips": {
+    "Full_Jump_Expressive_v2_Test": {
+      "duration": 3.066666666666667,
+      "samples": 369,
+      "rest_error": 5.960464477539063e-08,
+      "reconstruction_error_m": 7.158763497748562e-07,
+      "loop_position_error_m": 0.005955031230094624,
+      "loop_rotation_error_rad": 0.22488699853420258,
+      "source_sha256": "78d572941a2bdca68479c60ecf3e9c3529d87822ad2fee7c6b1089beb527fea6",
+      "action_sha256": "26f632d2dce3d15b5eca4f87d189048f24d23a3de547a3618e18d2705f97d28b"
+    }
+  },
+  "base_model": "game_mobile_3d\\assets\\characters\\jump_gif_v004\\player_r15_jump_gif_v004.glb",
+  "base_model_sha256": "d5e9e136e17eb8d6795bcb915987e27ef6fe4971894611e25efb9962a1b9804e",
+  "rig_modified": false,
+  "root_motion": false,
+  "new_character_actions": false,
+  "review_status": "pending",
+  "preview_elevation_exported": false
+}

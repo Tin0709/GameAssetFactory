@@ -10,6 +10,7 @@ func run() -> void:
 	check(ResourceLoader.exists(path),"Isolated playable expressive locomotion scene exists")
 	if not ResourceLoader.exists(path): quit(1);return
 	var scene = load(path).instantiate()
+	scene.jump_enabled=false
 	root.add_child(scene);current_scene=scene
 	await physics_frame
 	await process_frame

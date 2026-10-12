@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/dev/ExpressiveLocomotionPlayer.tscn" id="base"]
+[ext_resource type="Script" path="res://scenes/dev/expressive_jump_actor.gd" id="actor"]
+[ext_resource type="Script" path="res://scenes/dev/expressive_jump_visual.gd" id="visual"]
+
+[node name="ExpressiveJumpPlayer" instance=ExtResource("base")]
+script = ExtResource("actor")
+
+[node name="Visual" parent="."]
+script = ExtResource("visual")
