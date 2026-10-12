@@ -25,7 +25,7 @@ The body advances its leading side with each step while staying over a fixed lat
 
 ## Checks and limits
 
-961subframe samples verify fixed lateral body centers (maximum range below0.0002mm), negligible body roll and step-following yaw error below0.00009°. All121sampled leg world poses match v006 within0.00018mm. Arm/forearm/root channels and all19other Actions remain exact. Rest rig, meshes, weights and materials are unchanged.
+961subframe samples verify fixed lateral body centers (maximum range below0.0002mm), negligible body roll and step-following yaw error below0.00009°. All121sampled leg world pose matrices match v006 within1.8e-7 per component. Arm/forearm/root channels and all19other Actions remain exact. Rest rig, meshes, weights and materials are unchanged.
 
 Rigid length error is below0.00186mm, nominal-travel support-edge drift below0.00306mm, with positive floor clearance, no nonadjacent block overlap and no unexpected support loss. The intended hops add approximately252ms thresholded airborne time per one-second cycle; nominal support is50/52%, double support30%, flight28%. Primary receiving phases LEFT0/RIGHT0.5 remain, with additional hop touchdowns. Nominal travel1.279488m/s is used only for contact checks and is separate from the in-place Action.
 
