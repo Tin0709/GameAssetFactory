@@ -13,7 +13,7 @@ func run() -> void:
 	if actor.get("jump_flight_speed")==null:quit(1);return
 	check(is_equal_approx(actor.jump_flight_speed,2.15) and is_equal_approx(actor.jump_height,2.0),"New test default is sharpest at requested2m height")
 	await scene.tick(2)
-	check(is_equal_approx(scene.camera.size,12.5),"Default camera uses requested closer gameplay framing")
+	check(is_equal_approx(scene.camera.size,11.25),"Default camera uses requested closer gameplay framing")
 	var event:=InputEventKey.new();event.physical_keycode=KEY_J;event.pressed=true
 	for expected in [1.9,1.7,1.4,1.18,1.0,2.15]:
 		scene._unhandled_key_input(event)

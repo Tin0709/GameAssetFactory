@@ -80,7 +80,7 @@ func _update_camera(delta: float) -> void:
 		camera.size=5.3;super._update_camera(delta);return
 	if actor.is_on_floor() and actor.jump_state!="AIR":
 		camera_ground_y=lerpf(camera_ground_y,actor.global_position.y,1.0-exp(-delta/.16))
-	camera.size=12.5;camera.far=72.0
+	camera.size=11.25;camera.far=72.0
 	camera.position=Vector3(actor.global_position.x,camera_ground_y,actor.global_position.z)+Vector3(12,15,16)
 	camera.rotation_degrees=Vector3(-36.315886,36.869898,0)
 

@@ -15,13 +15,14 @@ func run() -> void:
 			actor.review_pace=pace;actor.requested_run=sprint;actor.requested_direction=Vector2(0,1);await scene.tick(45)
 			var previous_rate: float=v.turn_rate;var worst_acceleration:=0.0;var distance:=0.0;var minimum_response:=100.0
 			var trace: Array=[]
+			var previous_time: float=actor.simulation_time
 			for degrees in [90,-90,180,0,45,-45,180,90,-90,0,180,0]:
 				actor.requested_direction=Vector2(sin(deg_to_rad(degrees)),cos(deg_to_rad(degrees)))
 				var start: Vector3=actor.position
 				for tick in 6:
 					var old: Vector3=actor.position;var old_phase: float=v.gait_phase
 					await scene.tick(1)
-					worst_acceleration=maxf(worst_acceleration,absf(v.turn_rate-previous_rate)*60)
+					worst_acceleration=maxf(worst_acceleration,absf(v.turn_rate-previous_rate)/maxf(actor.simulation_time-previous_time,.00001));previous_time=actor.simulation_time
 					distance+=actor.position.distance_to(old);previous_rate=v.turn_rate
 					trace.append({"yaw":v.rotation.y,"rate":v.turn_rate,"phase_delta":wrapf(v.gait_phase-old_phase,-.5,.5),"position":actor.position})
 				minimum_response=minf(minimum_response,actor.position.distance_to(start))
