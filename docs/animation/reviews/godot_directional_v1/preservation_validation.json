@@ -1,0 +1,44 @@
+{
+  "status": "Pending directional/falling/pace/stride review",
+  "approved_scope": "Jump V2/heavier landing direction as test baseline only; production requires separate approval",
+  "protected_files": 6765,
+  "unchanged_files": 6759,
+  "allowed_changes": [
+    "game_mobile_3d/scenes/dev/ExpressiveLocomotionTest.tscn",
+    "game_mobile_3d/scenes/dev/expressive_locomotion_test.gd",
+    "game_mobile_3d/scenes/dev/expressive_locomotion_visual.gd",
+    "docs/animation/ANIMATION_PROGRESS.md",
+    "docs/animation/ANIMATION_WORKFLOW.md",
+    "AGENTS.md"
+  ],
+  "unexpected_changes": [],
+  "entire_blender_animation_folder_and_manifest_and_showcase_unchanged": true,
+  "native_export_and_approved_actions_unchanged": true,
+  "prior_delivered_reviews_unchanged": true,
+  "production_and_jump_physics_unchanged": true,
+  "baseline_backup": ".validation/expressive_directional_v1/before",
+  "known_fast_stress_failures_30": [
+    "60.69degree weapon-arm recovery step exceeds unchanged60degree guard"
+  ],
+  "known_fast_stress_failures_60": [],
+  "videos": {
+    "gameplay_1x.mp4": {
+      "frames": 814,
+      "fps": 30.0,
+      "decoded_frames": 814,
+      "sha256": "69be056c537e5fa1ec2f834d6b31cf1b10e1d881bfb7c9926377836d75a23287"
+    },
+    "original_1x.mp4": {
+      "frames": 814,
+      "fps": 30.0,
+      "decoded_frames": 814,
+      "sha256": "1d4e395842e50eb9365db0daefddcb2bb4efaba79f71819db09f83bd6d109494"
+    },
+    "comparison_1x.mp4": {
+      "frames": 814,
+      "fps": 30.0,
+      "decoded_frames": 814,
+      "sha256": "a7d37d4e653f8c645ed5242e4cd62acb674c2e88fe0b3c3f872daaf92b9b1019"
+    }
+  }
+}
