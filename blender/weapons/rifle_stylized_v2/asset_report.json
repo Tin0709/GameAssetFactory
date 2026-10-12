@@ -1,0 +1,74 @@
+{
+  "status": "Pending",
+  "dimensions_m": [
+    0.11800000071525574,
+    1.0099999904632568,
+    0.48399999737739563
+  ],
+  "meshes": 2,
+  "materials": 1,
+  "texture": [
+    64,
+    64
+  ],
+  "markers": {
+    "RightHandGrip": [
+      0,
+      0,
+      0
+    ],
+    "LeftHandGuide": [
+      0,
+      0.375,
+      0.125
+    ],
+    "Muzzle": [
+      0,
+      0.687,
+      0.18
+    ],
+    "AimReference": [
+      0,
+      0.454,
+      0.3
+    ],
+    "RecoilPivot": [
+      0,
+      0,
+      0
+    ],
+    "HolsterAttach": [
+      0,
+      0,
+      0
+    ],
+    "Grip_Point": [
+      0,
+      0,
+      0
+    ],
+    "Support_Hand_Point": [
+      0,
+      0.375,
+      0.125
+    ],
+    "Muzzle_Point": [
+      0,
+      0.687,
+      0.18
+    ]
+  },
+  "topology": {
+    "Rifle_V2_Body": {
+      "triangles": 960,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    },
+    "Rifle_V2_Magazine": {
+      "triangles": 168,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    }
+  },
+  "triangles": 1128
+}
