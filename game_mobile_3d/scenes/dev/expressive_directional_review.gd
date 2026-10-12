@@ -26,6 +26,7 @@ func _ready() -> void:
 	if jump_enabled and "--expressive-turn-pivot-original" in OS.get_cmdline_user_args():actor.visual.turn_twist_guard_enabled=false
 	if jump_enabled and "--expressive-run-release-original" in OS.get_cmdline_user_args():actor.visual.run_release_enabled=false
 	if jump_enabled and "--expressive-run-orbit-original" in OS.get_cmdline_user_args():actor.visual.run_orbit_enabled=false
+	if jump_enabled and "--expressive-rapid-turn-original" in OS.get_cmdline_user_args():actor.visual.rapid_turn_smoothing_enabled=false
 	if jump_enabled and "--expressive-jump-original" in OS.get_cmdline_user_args():
 		actor.jump_flight_speed=1.0;actor.jump_height=1.2
 	if jump_enabled and "--expressive-jump-quicker-v1" in OS.get_cmdline_user_args():
@@ -70,6 +71,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_N:
 		actor.visual.run_orbit_enabled=not actor.visual.run_orbit_enabled
 		actor.visual.pose_dirty=true;actor.visual.run_release_active=[false,false]
+	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_U:
+		actor.visual.rapid_turn_smoothing_enabled=not actor.visual.rapid_turn_smoothing_enabled
+		actor.visual.facing_velocity=actor.visual.turn_rate
 
 func _update_camera(delta: float) -> void:
 	if not gameplay_camera:
@@ -89,6 +93,7 @@ func _process(delta: float) -> void:
 	if jump_enabled:status.text+="\nLeg pivot: %s · P compares"%["Clean" if actor.visual.turn_twist_guard_enabled else "Previous"]
 	if jump_enabled:status.text+="\nRun liftoff: %s · O compares"%["Smooth" if actor.visual.run_release_enabled else "Previous"]
 	if jump_enabled:status.text+="\nRun foot arc: %s · N compares"%["Rounded" if actor.visual.run_orbit_enabled else "Previous"]
+	if jump_enabled:status.text+="\nRapid turns: %s · U compares"%["Smooth" if actor.visual.rapid_turn_smoothing_enabled else "Previous"]
 
 func run_quicker_demo() -> void:
 	demo_running=true;actor.scripted_input=true

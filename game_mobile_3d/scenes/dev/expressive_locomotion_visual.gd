@@ -89,7 +89,8 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 	var old_yaw:=rotation.y
 	if movement_speed>.015:
 		var target_yaw:=atan2(planar.x,planar.z)
-		rotation.y+=clampf(wrapf(target_yaw-rotation.y,-PI,PI),-4.5*review_pace*delta,4.5*review_pace*delta)
+		_advance_facing(target_yaw,delta)
+	else:_rest_facing(delta)
 	turn_rate=wrapf(rotation.y-old_yaw,-PI,PI)/maxf(delta,.001)
 	# Pose blend is speed based, not a button-state crossfade. Both clocks share phase.
 	var desired_run:=smoothstep(.9,2.31,movement_speed/review_pace)
@@ -133,6 +134,12 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 		if settle_time>=REPLANT_SECONDS:settling=false;foot_support=[true,true]
 	elif not move_requested:attention_time=fposmod(attention_time+delta,8.0)
 	support_left=_support(0);support_right=_support(1)
+
+func _advance_facing(target_yaw: float,delta: float) -> void:
+	rotation.y+=clampf(wrapf(target_yaw-rotation.y,-PI,PI),-4.5*review_pace*delta,4.5*review_pace*delta)
+
+func _rest_facing(_delta: float) -> void:
+	pass
 
 func _stride_distance() -> float:
 	return lerpf(WALK_STRIDE,RUN_STRIDE,gait_run_weight)

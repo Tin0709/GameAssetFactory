@@ -37,6 +37,33 @@ func run() -> void:
 		check(worst<4.5,"Run lifts from support smoothly rather than dropping contact translation instantly")
 		check(peak_acceleration<300,"Foot velocity ramps through the release instead of moving its discontinuity a few frames later")
 		check(maximum_joint_offset<.1401,"Carried swing and floor corrections share the same140mm joint budget")
+	for interruption in ["Walk","Pace","Orbit","Release"]:
+		actor.requested_direction=Vector2.ZERO;scene.reset_actor();await scene.tick(60)
+		actor.review_pace=2.25;v.run_release_enabled=true;v.run_orbit_enabled=true
+		actor.requested_run=true;actor.requested_direction=Vector2(0,1);await scene.tick(60)
+		var wait:=0
+		while not (v.run_release_active[0] or v.run_release_active[1]) and wait<90:await scene.tick(1);wait+=1
+		check(wait<90,"Interruption probe catches a carried foot in swing: "+interruption)
+		var previous_q: Array=[v.skeleton.get_bone_pose_rotation(v.leg_left),v.skeleton.get_bone_pose_rotation(v.leg_right)]
+		var initial_phase: float=v.gait_phase;var travel:=0.0;var maximum:=0.0;var angle:=0.0
+		match interruption:
+			"Walk":actor.requested_run=false
+			"Pace":scene._button("Compare pace")
+			"Orbit","Release":
+				var event:=InputEventKey.new();event.pressed=true;event.physical_keycode=KEY_N if interruption=="Orbit" else KEY_O
+				scene._unhandled_key_input(event)
+		for sample in 24:
+			await scene.tick(1)
+			travel+=wrapf(v.gait_phase-initial_phase,-.5,.5);initial_phase=v.gait_phase
+			for side in 2:
+				var bone: int=[v.leg_left,v.leg_right][side];var parent: int=v.skeleton.get_bone_parent(bone)
+				var basis: Basis=v.skeleton.global_basis*v.skeleton.get_bone_global_pose(parent).basis
+				maximum=maxf(maximum,(basis*(v.skeleton.get_bone_pose_position(bone)-v._p[bone])).length())
+				var q: Quaternion=v.skeleton.get_bone_pose_rotation(bone)
+				angle=maxf(angle,rad_to_deg(previous_q[side].angle_to(q)));previous_q[side]=q
+		cases.append({"interruption":interruption,"maximum_combined_joint_offset":maximum,"maximum_leg_step_degrees":angle,"phase_travel":travel})
+		check(maximum<.1401,"Interrupted release remains within the shared contact budget: "+interruption)
+		check(angle<60 and travel>0,"Interrupted release preserves pose continuity and live gait: "+interruption)
 	var out:="res://.validation/expressive_turn_spin_v1";DirAccess.make_dir_recursive_absolute(out)
 	FileAccess.open(out+"/run_release.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"cases":cases},"\t"))
 	print("RUN_RELEASE_CHECKS ",checks.size()," failures ",failures.size());quit(0 if failures.is_empty() else 1)

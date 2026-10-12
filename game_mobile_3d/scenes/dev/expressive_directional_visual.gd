@@ -29,6 +29,26 @@ var run_release_duration: Array[float]=[.1,.1]
 var run_release_offset: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
 var run_release_velocity: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
 var run_raw_sole: Array[Vector3]=[Vector3.ZERO,Vector3.ZERO]
+var rapid_turn_smoothing_enabled:=true
+var facing_velocity:=0.0
+
+func _advance_facing(target_yaw: float,delta: float) -> void:
+	if not rapid_turn_smoothing_enabled:
+		super._advance_facing(target_yaw,delta);facing_velocity=turn_rate;return
+	# Only the visible rig rotates on this clock. Capsule velocity/input and
+	# gait phase stay immediate. Acceleration limits prevent spammed direction
+	# changes from reversing the body's full angular speed in a single tick.
+	var error:=wrapf(target_yaw-rotation.y,-PI,PI)
+	var maximum:=4.5*review_pace
+	var desired:=clampf(error*14,-maximum,maximum)
+	facing_velocity=move_toward(facing_velocity,desired,maximum/.09*delta)
+	# Keep velocity continuous when an input moves the target past the current
+	# heading; clamping the angle at that crossing would recreate a sudden stop.
+	rotation.y+=facing_velocity*delta
+
+func _rest_facing(delta: float) -> void:
+	facing_velocity=move_toward(facing_velocity,0,4.5*review_pace/.09*delta)
+	if rapid_turn_smoothing_enabled:rotation.y+=facing_velocity*delta
 
 func _limit_leg_twist(q: Quaternion, reference: Quaternion) -> Quaternion:
 	if not turn_twist_guard_enabled:return q

@@ -99,7 +99,8 @@ func _jump_case(test: SceneTree, name: String, move: Vector2, run: bool, height:
 	test.check(actor.jump_state=="LAND" and actor.is_on_floor(),"Collision, not fixed clip duration, starts landing: "+name)
 	var contact_time: float=actor.simulation_time
 	var flight: float=actor.simulation_time-launch_time
-	test.check(flight<1.1 and flight>.15,"Flight duration follows the ballistic test: "+name)
+	var expected_flight: float=2*sqrt(2*actor.gravity*height)/actor.gravity/actor.jump_flight_speed
+	test.check(absf(flight-expected_flight)<2.0/60.0,"Flight duration follows the ballistic test: "+name)
 	test.check(absf(peak-start_pos.y-height)<.025,"Capsule elevation matches physics height without a duplicate animation arc: "+name)
 	if not move.is_zero_approx():test.check(phase_travel>.01,"Moving gait clock advances through flight: "+name)
 	await tick(9,name+" impact")
@@ -155,6 +156,9 @@ func run_jump_validation(test: SceneTree) -> void:
 	actor.request_jump();test.check(await _wait_state("AIR",35),"Platform jump launches")
 	test.check(await _wait_state("LAND",100),"Raised platform causes actual early collision landing")
 	test.check(actor.floor_y>.65,"Landing support height follows the raised platform")
+	# Put this ledge-loss probe at the platform's outgoing edge. Its purpose is
+	# support loss DURING recovery, independent of the preceding flight length.
+	actor.position.z=5.3
 	test.check(await _wait_state("AIR",50),"Running off the platform during recovery immediately restores AIR")
 	test.check(await _wait_state("LAND",70),"Second physical contact after the ledge triggers a new impact")
 	test.check(actor.floor_y<.01,"Contact plane returns to the actual lower floor")
