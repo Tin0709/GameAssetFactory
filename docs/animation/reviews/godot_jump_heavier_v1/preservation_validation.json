@@ -1,0 +1,32 @@
+{
+  "protected_files": 6753,
+  "unchanged_files": 6748,
+  "allowed_changes": [
+    "game_mobile_3d/scenes/dev/expressive_jump_review.gd",
+    "game_mobile_3d/scenes/dev/expressive_jump_visual.gd",
+    "blender/animation/showcase/animation_manifest.json",
+    "docs/animation/ANIMATION_PROGRESS.md",
+    "AGENTS.md"
+  ],
+  "unexpected_changes": [],
+  "all_blender_sources_actions_showcase_unchanged": true,
+  "native_export_unchanged": true,
+  "old_review_unchanged": true,
+  "production_unchanged": true,
+  "status": "Pending",
+  "backup": ".validation/expressive_jump_heavier_landing_v1/before",
+  "videos": {
+    "gameplay_1x.mp4": {
+      "frames": 504,
+      "fps": 30.0,
+      "decoded_frames": 504,
+      "sha256": "33a8d2cfee72093272479bb0b7a7fa84df551ddd593ee7395518c45dd28bf88c"
+    },
+    "comparison_1x.mp4": {
+      "frames": 504,
+      "fps": 30.0,
+      "decoded_frames": 504,
+      "sha256": "ecb2937e5990dc5c4c67d8767e926a00aa3012f45e15c669582d3ebfa58b1c85"
+    }
+  }
+}

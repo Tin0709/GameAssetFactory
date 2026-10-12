@@ -643,7 +643,7 @@
       "in_place": true,
       "review_video": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_v2_test/full_jump_v2_three_views_1x.mp4",
       "presentation_note": "User-steered pending refinement: hands slightly above head,8deg added airborne opening per leg,28mm deeper soft landing compression with stronger torso/arm reaction. Same93frames/30FPS, receiving contactsF46/F47 and original rebound/recovery fromF65. Original Full Jump and earlier previews preserved; arm-only working checkpoint archived. Temporary0.72m elevation and review camera headroom are never baked into rig Action.",
-      "gameplay_validation": "Pending human gameplay review. Read-only physics-event-driven export in the isolated ExpressiveLocomotionTest scene: 77 checks at30/60renderFPS, 60Hz physics; source/Action/Showcase unchanged. Actual original-speed review and contact/weapon/terrain/mobile limits: docs/animation/reviews/godot_jump_v1/README.md. No production promotion."
+      "gameplay_validation": "Pending user gameplay review. Existing isolated ExpressiveLocomotionTest now offers B Heavier/Original landing comparison: runtime-only20/40mm additional contact hip dip, unchanged physics/gait/input.49 matched comparison checks plus77 jump checks at30/60renderFPS. Source/Action/Showcase/native library unchanged. Review and limitations: docs/animation/reviews/godot_jump_heavier_v1/README.md. No production promotion."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

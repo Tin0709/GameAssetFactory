@@ -1,0 +1,53 @@
+{
+  "frames": 504,
+  "fps": 30,
+  "seconds": 16.8,
+  "retimed": false,
+  "standing_sample": {
+    "age": 0.15,
+    "contact_clamps": 0,
+    "floor": 0.0,
+    "frame": 52.3864776234568,
+    "hip_y": 0.508442379534245,
+    "phase": 0.28,
+    "settling": false,
+    "sole_y": [
+      0.0,
+      0.0
+    ],
+    "speed": 0.0,
+    "state": "LAND",
+    "support": [
+      true,
+      true
+    ],
+    "time": 2.21666666666666,
+    "vy": 0.0,
+    "y": 0.000182949006557465,
+    "z": 0.0
+  },
+  "running_sample": {
+    "age": 0.116666666666667,
+    "contact_clamps": 8,
+    "floor": 0.0,
+    "frame": 51.0860811836356,
+    "hip_y": 0.487247334152926,
+    "phase": 0.108907840208273,
+    "settling": false,
+    "sole_y": [
+      5.96046447753906e-08,
+      0.0
+    ],
+    "speed": 3.46498465538025,
+    "state": "LAND",
+    "support": [
+      true,
+      false
+    ],
+    "time": 6.88333333333331,
+    "vy": 0.0,
+    "y": 0.000702901452314109,
+    "z": 9.08696460723877
+  },
+  "source_avi_sha256": "d65b3ed48a41aedbcee03915960425aed02e82edaaea78a47f38ead171dedbea"
+}

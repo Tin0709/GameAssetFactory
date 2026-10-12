@@ -1,0 +1,249 @@
+{
+	"checks": [
+		{
+			"check": "Compact grounded preparation: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Actual impulse starts flight: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Launch responds within 260ms including sampling: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Collision, not fixed clip duration, starts landing: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Flight duration follows the ballistic test: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Capsule elevation matches physics height without a duplicate animation arc: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Impact reaches heavy compression after contact: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Recovery returns to the live locomotion system: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Compact grounded preparation: Running",
+			"passed": true
+		},
+		{
+			"check": "Horizontal control stays live during preparation: Running",
+			"passed": true
+		},
+		{
+			"check": "Actual impulse starts flight: Running",
+			"passed": true
+		},
+		{
+			"check": "Launch responds within 260ms including sampling: Running",
+			"passed": true
+		},
+		{
+			"check": "Collision, not fixed clip duration, starts landing: Running",
+			"passed": true
+		},
+		{
+			"check": "Flight duration follows the ballistic test: Running",
+			"passed": true
+		},
+		{
+			"check": "Capsule elevation matches physics height without a duplicate animation arc: Running",
+			"passed": true
+		},
+		{
+			"check": "Moving gait clock advances through flight: Running",
+			"passed": true
+		},
+		{
+			"check": "Impact reaches heavy compression after contact: Running",
+			"passed": true
+		},
+		{
+			"check": "Recovery returns to the live locomotion system: Running",
+			"passed": true
+		},
+		{
+			"check": "Moving landing keeps input and gait active: Running",
+			"passed": true
+		},
+		{
+			"check": "Planted soles stay clear in landing comparison",
+			"passed": true
+		},
+		{
+			"check": "Compression never slows horizontal Run",
+			"passed": true
+		},
+		{
+			"check": "Compression never resets the gait clock",
+			"passed": true
+		},
+		{
+			"check": "Compact grounded preparation: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Actual impulse starts flight: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Launch responds within 260ms including sampling: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Collision, not fixed clip duration, starts landing: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Flight duration follows the ballistic test: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Capsule elevation matches physics height without a duplicate animation arc: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Impact reaches heavy compression after contact: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Recovery returns to the live locomotion system: Stationary",
+			"passed": true
+		},
+		{
+			"check": "Compact grounded preparation: Running",
+			"passed": true
+		},
+		{
+			"check": "Horizontal control stays live during preparation: Running",
+			"passed": true
+		},
+		{
+			"check": "Actual impulse starts flight: Running",
+			"passed": true
+		},
+		{
+			"check": "Launch responds within 260ms including sampling: Running",
+			"passed": true
+		},
+		{
+			"check": "Collision, not fixed clip duration, starts landing: Running",
+			"passed": true
+		},
+		{
+			"check": "Flight duration follows the ballistic test: Running",
+			"passed": true
+		},
+		{
+			"check": "Capsule elevation matches physics height without a duplicate animation arc: Running",
+			"passed": true
+		},
+		{
+			"check": "Moving gait clock advances through flight: Running",
+			"passed": true
+		},
+		{
+			"check": "Impact reaches heavy compression after contact: Running",
+			"passed": true
+		},
+		{
+			"check": "Recovery returns to the live locomotion system: Running",
+			"passed": true
+		},
+		{
+			"check": "Moving landing keeps input and gait active: Running",
+			"passed": true
+		},
+		{
+			"check": "Planted soles stay clear in landing comparison",
+			"passed": true
+		},
+		{
+			"check": "Compression never slows horizontal Run",
+			"passed": true
+		},
+		{
+			"check": "Compression never resets the gait clock",
+			"passed": true
+		},
+		{
+			"check": "Stationary landing has a measurably deeper hip dip",
+			"passed": true
+		},
+		{
+			"check": "Running landing has at least25mm additional compression",
+			"passed": true
+		},
+		{
+			"check": "Running compression strengthens more than stationary compression",
+			"passed": true
+		},
+		{
+			"check": "Landing refinement leaves physical flight timing unchanged",
+			"passed": true
+		},
+		{
+			"check": "Landing refinement adds no duplicate jump trajectory",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"running_extra_drop_m": 0.0396285355091095,
+	"stationary_extra_drop_m": 0.0197004079818726,
+	"versions": [
+		{
+			"max_joint_step": 44.3811178115442,
+			"max_penetration": 0.0000000596046447753906,
+			"phase_error": 0.000000309632749551092,
+			"running": {
+				"case": "Running",
+				"flight_seconds": 0.733333333333331,
+				"height_setting": 1.2,
+				"impact_hip_min": 0.52687589568086,
+				"launch_delay": 0.233333333333333,
+				"peak_y": 1.19884943962097
+			},
+			"speed": 3.46498465538025,
+			"stationary": {
+				"case": "Stationary",
+				"flight_seconds": 0.733333333333331,
+				"height_setting": 1.2,
+				"impact_hip_min": 0.528142787516117,
+				"launch_delay": 0.233333333333333,
+				"peak_y": 1.19876170158386
+			}
+		},
+		{
+			"max_joint_step": 44.3811178115442,
+			"max_penetration": 0.0000000596046447753906,
+			"phase_error": 0.000000309632749551092,
+			"running": {
+				"case": "Running",
+				"flight_seconds": 0.733333333333331,
+				"height_setting": 1.2,
+				"impact_hip_min": 0.48724736017175,
+				"launch_delay": 0.233333333333333,
+				"peak_y": 1.19884943962097
+			},
+			"speed": 3.46498465538025,
+			"stationary": {
+				"case": "Stationary",
+				"flight_seconds": 0.733333333333331,
+				"height_setting": 1.2,
+				"impact_hip_min": 0.508442379534245,
+				"launch_delay": 0.233333333333333,
+				"peak_y": 1.19876170158386
+			}
+		}
+	]
+}

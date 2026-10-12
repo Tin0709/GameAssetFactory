@@ -20,6 +20,7 @@ var _maximum_flight_phase_error:=0.0
 func _ready() -> void:
 	super._ready()
 	if not jump_enabled:return
+	if "--expressive-landing-original" in OS.get_cmdline_user_args():actor.visual.heavier_landing=false
 	var platform:=StaticBody3D.new();platform.name="EarlyLandingPlatform";platform.position=Vector3(3,.35,4);add_child(platform)
 	var collision:=CollisionShape3D.new();var shape:=BoxShape3D.new();shape.size=Vector3(3,.7,3);collision.shape=shape;platform.add_child(collision)
 	var model:=MeshInstance3D.new();var mesh:=BoxMesh.new();mesh.size=shape.size;model.mesh=mesh
@@ -35,6 +36,8 @@ func _ready() -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	super._unhandled_key_input(event)
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_L:actor.review_drop(6)
+	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_B:
+		actor.visual.heavier_landing=not actor.visual.heavier_landing;actor.visual.pose_dirty=true
 
 func _update_camera(_delta: float) -> void:
 	if not jump_enabled:super._update_camera(_delta);return
@@ -47,7 +50,7 @@ func _process(delta: float) -> void:
 	super._process(delta)
 	if not jump_enabled:return
 	var v=actor.visual
-	status.text+="\nJump %s · pose F%.1f · vertical %.2f m/s"%[actor.jump_state,v.jump_frame,actor.velocity.y]
+	status.text+="\nJump %s · pose F%.1f · vertical %.2f m/s\nLanding: %s · B compares"%[actor.jump_state,v.jump_frame,actor.velocity.y,"Heavier" if v.heavier_landing else "Original"]
 	if _jump_sequence==v.pose_sequence:return
 	_jump_sequence=v.pose_sequence
 	if actor.jump_state in ["AIR","LAND"] and _last_jump_state in ["AIR","LAND"] and v.move_requested and _last_jump_moving:
@@ -91,16 +94,20 @@ func _jump_case(test: SceneTree, name: String, move: Vector2, run: bool, height:
 	while actor.jump_state=="AIR" and Engine.get_physics_frames()<limit:
 		peak=maxf(peak,actor.position.y);await tick(1,name+" flight")
 	test.check(actor.jump_state=="LAND" and actor.is_on_floor(),"Collision, not fixed clip duration, starts landing: "+name)
+	var contact_time: float=actor.simulation_time
 	var flight: float=actor.simulation_time-launch_time
 	test.check(flight<1.1 and flight>.15,"Flight duration follows the ballistic test: "+name)
 	test.check(absf(peak-start_pos.y-height)<.025,"Capsule elevation matches physics height without a duplicate animation arc: "+name)
 	if not move.is_zero_approx():test.check(absf(wrapf(actor.visual.gait_phase-phase_before,-.5,.5))>.01,"Moving gait clock advances through flight: "+name)
 	await tick(9,name+" impact")
+	var impact_hip_min:=100.0
+	for sample in jump_samples:
+		if sample.time>=contact_time and sample.state=="LAND":impact_hip_min=minf(impact_hip_min,sample.hip_y)
 	test.check(actor.visual.jump_frame>=51 and actor.visual.jump_frame<=55,"Impact reaches heavy compression after contact: "+name)
 	await tick(48,name+" recovery")
 	test.check(actor.jump_state=="GROUND","Recovery returns to the live locomotion system: "+name)
 	if not move.is_zero_approx():test.check(actor.current_speed>1.0 and not actor.visual.settling,"Moving landing keeps input and gait active: "+name)
-	var record:={"case":name,"flight_seconds":flight,"launch_delay":launch_time-start_time,"peak_y":peak,"height_setting":height}
+	var record:={"case":name,"flight_seconds":flight,"launch_delay":launch_time-start_time,"peak_y":peak,"height_setting":height,"impact_hip_min":impact_hip_min}
 	jump_cases.append(record);return record
 
 func run_jump_validation(test: SceneTree) -> void:

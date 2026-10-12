@@ -11,6 +11,8 @@ var falling_time:=0.0
 var landing_replant:=false
 var last_jump_frame:=1.0
 var fall_entry:=false
+var heavier_landing:=true
+var landing_run_weight:=0.0
 
 func _ready() -> void:
 	super._ready()
@@ -26,7 +28,9 @@ func jump_transition(value: String) -> void:
 		# No launch impulse on a ledge fall: enter the lowered-arm approach,
 		# rather than raising settled arms back into the main airborne peak.
 		jump_frame=43.0 if fall_entry else 19.0
-	if value=="LAND":jump_frame=46.0;foot_support=[false,false]
+	if value=="LAND":
+		jump_frame=46.0;foot_support=[false,false]
+		landing_run_weight=gait_run_weight
 	if value=="GROUND":foot_support=[false,false];attention_time=0.0
 
 func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) -> void:
@@ -85,7 +89,15 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 			elif bone in [hips,chest] or skeleton.get_bone_name(bone)=="Spine":weight=1-_smooth5((jump_age-.14)/.40)
 			else:weight=1-_smooth5((jump_age-.18)/.47)
 		else:weight=1-_smooth5((jump_age-.40)/.45)
-	return Transform3D(Basis(locomotion.basis.get_rotation_quaternion().slerp(pose.basis.get_rotation_quaternion(),weight).normalized()),locomotion.origin.lerp(pose.origin,weight))
+	var result:=Transform3D(Basis(locomotion.basis.get_rotation_quaternion().slerp(pose.basis.get_rotation_quaternion(),weight).normalized()),locomotion.origin.lerp(pose.origin,weight))
+	if heavier_landing and jump_state=="LAND":
+		# A contact-only pose accent, after the normal gait blend. Legs and
+		# horizontal physics keep their original clocks and release schedule.
+		var age:=jump_age+ahead
+		var load:=_smooth5(age/.10)*(1-_smooth5((age-.16)/.24))
+		if bone==hips:result.origin.y-=lerpf(.020,.040,landing_run_weight)*load
+		if bone==chest:result.basis=Basis(Vector3.RIGHT,deg_to_rad(lerpf(1.5,3.0,landing_run_weight))*load)*result.basis
+	return result
 
 func _support(side: int) -> bool:
 	if jump_state=="AIR":return false
