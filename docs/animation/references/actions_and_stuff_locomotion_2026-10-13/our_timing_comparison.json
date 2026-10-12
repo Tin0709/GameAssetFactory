@@ -1,0 +1,11 @@
+{
+  "provenance": "Analytical samples of our original authoring functions, not source video tracking.",
+  "same_period_s": 1,
+  "old_vertical_range_m": 0.03500000000000003,
+  "new_vertical_range_m": 0.03500000000000003,
+  "old_contact_velocity_m_s": -3.95294907917787e-08,
+  "new_contact_velocity_m_s": -0.12000003035139704,
+  "old_mid_rise_velocity_m_s": 5.4345417055401404e-09,
+  "new_mid_rise_velocity_m_s": 0.13000000137486367,
+  "new_curve_C2_at_authored_knots": "Quintic Hermite shared first derivatives and zero second derivatives; baking checked separately."
+}

@@ -95,6 +95,10 @@ Current `Walk_Snappy_Test_v1` is a1s/30-frame loop, with closingF31 excluded. LE
 
 **Focused refinement after this study:** preserve the first Snappy source/reviews; keep the same Pending Action name and20-entry Showcase. Change only the pelvis height timing design and the contact-driven leg placements required to maintain ground reach. Replace the old zero-velocity mid-rise with continuous through-velocity, and carry downward velocity across receiving/loop contact. Retain the same height extrema, cadence, tracks, foot-target timing and arm/torso/head design. This is a flow refinement rather than another speed increase. Revalidate the whole evaluated character because changing hips affects the hierarchy.
 
+![Our original receiving-flow comparison](references/actions_and_stuff_locomotion_2026-10-13/our_walk_receiving_flow_comparison.png)
+
+**M — our curves only:** same1s period and35mm height range. Previous contact/mid-rise vertical speed was effectively0; the refinement carries−0.12m/s through receiving contact and+0.13m/s through the mid-rise. True height extrema retain zero vertical velocity. These values describe our analytical design, not Oreville's animation. [Own timing measurements](references/actions_and_stuff_locomotion_2026-10-13/our_timing_comparison.json)
+
 ## 7. Godot transition design priorities — future, not implemented
 
 | Situation | Original practical recommendation | Evidence/limits |
