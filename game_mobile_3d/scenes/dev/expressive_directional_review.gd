@@ -1,0 +1,42 @@
+extends "res://scenes/dev/expressive_jump_review.gd"
+
+func _ready() -> void:
+	review_player_scene="res://scenes/dev/ExpressiveDirectionalPlayer.tscn"
+	jump_review_note="Jump V2 test baseline approved"
+	review_title="DIRECTIONAL MOVEMENT · TEST"
+	super._ready()
+	if jump_enabled and "--expressive-direction-original" in OS.get_cmdline_user_args():actor.visual.directional_enabled=false
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	super._unhandled_key_input(event)
+	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_V:
+		actor.visual.directional_enabled=not actor.visual.directional_enabled;actor.visual.pose_dirty=true
+
+func _process(delta: float) -> void:
+	super._process(delta)
+	if jump_enabled:status.text+="\nTurns: %s · V compares"%["Refined" if actor.visual.directional_enabled else "Original"]
+
+func run_demo() -> void:
+	if not jump_enabled:super.run_demo();return
+	demo_running=true;actor.scripted_input=true;reset_actor()
+	await tick(35,"Approved Idle1x · directional test Pending")
+	for sprint in [false,true]:
+		actor.requested_direction=Vector2(0,1);actor.requested_run=sprint
+		await tick(55,"Run1.5x approach" if sprint else "Walk1.5x approach")
+		for pair in [[45,45],[135,90],[315,180]]:
+			var radians:=deg_to_rad(float(pair[0]));actor.requested_direction=Vector2(sin(radians),cos(radians))
+			await tick(55,"%s · %d degree direction change"%["Run" if sprint else "Walk",pair[1]])
+		actor.requested_direction=Vector2.ZERO;await tick(45,"Stop · individual support recovery")
+	camera_offset=Vector3(6,1.5,0)
+	actor.requested_direction=Vector2(0,1);actor.requested_run=true;await tick(40,"Side · Run to turning jump")
+	actor.request_jump();await tick(20,"Jump · physics-driven launch")
+	actor.requested_direction=Vector2(1,0);await tick(95,"90 degree airborne turn · heavy landing into Run")
+	actor.requested_direction=Vector2.ZERO;await tick(45,"Planted recovery")
+	camera_offset=Vector3(0,1.5,6)
+	actor.requested_direction=Vector2(0,1);await tick(40,"Front · running reversal")
+	actor.requested_direction=Vector2(0,-1);await tick(65,"180 degree Run reversal · responsive control")
+	actor.request_jump();await tick(20,"Reversal jump · launch")
+	actor.requested_direction=Vector2(0,1);await tick(95,"180 degree airborne reversal · live landing gait")
+	actor.requested_direction=Vector2.ZERO;await tick(55,"Recover to normal Idle")
+	actor.scripted_input=false;demo_running=false;section="Manual review"
+	if "--expressive-demo" in OS.get_cmdline_user_args():get_tree().quit()

@@ -270,15 +270,7 @@ func _evaluate(delta: float) -> void:
 			# leg toward support before applying the small remaining translation.
 			# This is a one-link adjustment, with no invented knee/ankle or scale.
 			var original_q:=_leg_world_rotation(bone)
-			var aim:=Quaternion.IDENTITY
-			if transition_age<.45/review_pace or absf(turn_rate)>.3*review_pace:
-				var global_pose:=skeleton.global_transform*skeleton.get_bone_global_pose(bone)
-				var sole_center:=global_pose*Vector3(0,.675,0)
-				var destination:=target+Vector3(0,sole_center.y-sole.y,0)
-				var axis:=global_pose.basis.y.normalized()
-				aim=Quaternion(axis,(destination-global_pose.origin).normalized()).normalized()
-			support_aim[side]=support_aim[side].slerp(aim,1.0-exp(-20*review_pace*delta)).normalized()
-			_set_world_leg_rotation(bone,(support_aim[side]*original_q).normalized())
+			_set_world_leg_rotation(bone,_contact_leg_rotation(side,bone,target,original_q,delta))
 			sole=_sole_world(bone)
 		else:
 			support_aim[side]=support_aim[side].slerp(Quaternion.IDENTITY,1.0-exp(-25*review_pace*delta)).normalized()
@@ -308,6 +300,17 @@ func _evaluate(delta: float) -> void:
 
 func _limit_contact_correction(correction: Vector3) -> Vector3:
 	return correction.limit_length(.14)
+
+func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Quaternion, delta: float) -> Quaternion:
+	var aim:=Quaternion.IDENTITY
+	if transition_age<.45/review_pace or absf(turn_rate)>.3*review_pace:
+		var global_pose:=skeleton.global_transform*skeleton.get_bone_global_pose(bone)
+		var sole:=_sole_world(bone)
+		var sole_center:=global_pose*Vector3(0,.675,0)
+		var destination:=target+Vector3(0,sole_center.y-sole.y,0)
+		aim=Quaternion(global_pose.basis.y.normalized(),(destination-global_pose.origin).normalized()).normalized()
+	support_aim[side]=support_aim[side].slerp(aim,1.0-exp(-20*review_pace*delta)).normalized()
+	return (support_aim[side]*original_q).normalized()
 
 func _set_world_leg_rotation(bone: int, q: Quaternion) -> void:
 	var parent:=skeleton.get_bone_parent(bone)

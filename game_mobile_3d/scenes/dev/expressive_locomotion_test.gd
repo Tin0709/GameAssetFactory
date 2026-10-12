@@ -24,6 +24,9 @@ var _max_hip_gap:=0.0
 var _armed:=false
 var _phase_cases: Array=[]
 var jump_enabled:=true
+var review_player_scene:="res://scenes/dev/ExpressiveJumpPlayer.tscn"
+var jump_review_note:="Jump V2 Pending"
+var review_title:="EXPRESSIVE JUMP · GAMEPLAY TEST"
 func _ready() -> void:
 	process_priority=100
 	var world:=WorldEnvironment.new();var env:=Environment.new()
@@ -42,16 +45,16 @@ func _ready() -> void:
 		mesh.surface_add_vertex(Vector3(i,.002,-30));mesh.surface_add_vertex(Vector3(i,.002,30))
 		mesh.surface_add_vertex(Vector3(-30,.002,i));mesh.surface_add_vertex(Vector3(30,.002,i))
 	mesh.surface_end();lines.mesh=mesh;add_child(lines)
-	var player_path:="res://scenes/dev/ExpressiveJumpPlayer.tscn" if jump_enabled else "res://scenes/dev/ExpressiveLocomotionPlayer.tscn"
+	var player_path:=review_player_scene if jump_enabled else "res://scenes/dev/ExpressiveLocomotionPlayer.tscn"
 	actor=load(player_path).instantiate();add_child(actor)
 	camera=Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=5.3;camera.current=true;camera.far=80;add_child(camera)
 	var canvas:=CanvasLayer.new();add_child(canvas)
 	var panel:=VBoxContainer.new();panel.position=Vector2(22,16);canvas.add_child(panel)
-	var title:=Label.new();title.text="EXPRESSIVE JUMP · GAMEPLAY TEST" if jump_enabled else "EXPRESSIVE LOCOMOTION  |  GODOT TEST";title.add_theme_font_size_override("font_size",20 if jump_enabled else 24);panel.add_child(title)
+	var title:=Label.new();title.text=review_title if jump_enabled else "EXPRESSIVE LOCOMOTION  |  GODOT TEST";title.add_theme_font_size_override("font_size",20 if jump_enabled else 24);panel.add_child(title)
 	status=Label.new();status.add_theme_font_size_override("font_size",15 if jump_enabled else 19)
 	if jump_enabled:status.custom_minimum_size.x=410;status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	panel.add_child(status)
-	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: rifle layer   T: compare pace\n"+("Space: jump · L: drop test · Jump V2 Pending" if jump_enabled else "Idle: normal speed · no Jump · production unchanged")
+	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   R: reset   F9: demo\n1: front   2: three-quarter   3: side   E: rifle layer   T: compare pace\n"+("Space: jump · L: drop test · "+jump_review_note if jump_enabled else "Idle: normal speed · no Jump · production unchanged")
 	if jump_enabled:help.custom_minimum_size.x=410;help.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	panel.add_child(help)
 	var controls:=HBoxContainer.new();panel.add_child(controls)
