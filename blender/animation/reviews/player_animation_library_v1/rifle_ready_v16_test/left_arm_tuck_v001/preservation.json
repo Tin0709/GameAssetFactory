@@ -1,0 +1,13 @@
+{
+  "baseline_files": 7636,
+  "changed": [
+    "AGENTS.md",
+    "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/README.md",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/README.md",
+    "blender/animation/showcase/animation_manifest.json",
+    "docs/animation/ANIMATION_PROGRESS.md"
+  ],
+  "missing": [],
+  "unexpected": []
+}
