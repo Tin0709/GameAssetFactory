@@ -2,6 +2,7 @@
   "schema": 1,
   "title": "GameAssetFactory Weapon Library",
   "approval_policy": "New assets start Pending; explicit user approval only. Production is preserved separately.",
+  "default_selection": "pistol_stylized_v2",
   "weapons": [
     {
       "id": "rifle_v1",
@@ -216,6 +217,17 @@
       "status_note": "Preserved early compact candidate, superseded by user reference steering.",
       "collection": "WEAPON_rifle_stylized_v2_compact",
       "root": "rifle_stylized_v2_compact__Rifle_Stylized_V2"
+    },
+    {
+      "id": "pistol_stylized_v2",
+      "kind": "Pistol",
+      "label": "Pistol \u2014 Stylized V2",
+      "source": "blender/weapons/pistol_stylized_v2/Pistol_Stylized_V2.blend",
+      "source_sha256": "85057917a62ff586f0f31c53fa5c518134aba9311389ff81008321b1c9929b9c",
+      "status": "Pending",
+      "status_note": "New registration; awaiting explicit visual approval.",
+      "collection": "WEAPON_pistol_stylized_v2",
+      "root": "pistol_stylized_v2__Pistol_Stylized_V2"
     }
   ]
 }

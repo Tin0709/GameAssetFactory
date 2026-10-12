@@ -19,6 +19,9 @@ lib.register()
 bpy.ops.wm.open_mainfile(filepath=str(HERE/'Weapon_Showcase.blend'))
 s=bpy.context.scene
 assert len(s.gaf_weapons)>=16
+manifest=json.loads((HERE/'weapon_manifest.json').read_text())
+if manifest.get('default_selection'):
+ assert lib.entries(s)[s.gaf_weapon_index]['id']==manifest['default_selection'],'Saved library must open with the latest registered weapon selected'
 for kind in ['Rifle','Pistol','Shotgun']:
  ready=s['fit_'+kind+'_READY'];holster=s['fit_'+kind+'_HOLSTER']
  assert max(abs(ready[i][3]-holster[i][3]) for i in range(3))>.15,('Holster snapshot is still ready',kind)

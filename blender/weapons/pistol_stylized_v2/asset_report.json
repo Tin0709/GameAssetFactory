@@ -1,0 +1,133 @@
+{
+  "status": "Pending",
+  "name": "Pistol_Stylized_V2",
+  "dimensions_m": {
+    "width": 0.04144999943673611,
+    "length": 0.2735986262559891,
+    "height": 0.21899999678134918
+  },
+  "triangles": 1204,
+  "meshes": 3,
+  "materials": 1,
+  "texture": [
+    64,
+    64
+  ],
+  "topology": {
+    "Pistol_V2_Frame": {
+      "triangles": 804,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "signed_volume": 0.00046374969707610355
+    },
+    "Pistol_V2_Slide": {
+      "triangles": 344,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "signed_volume": 0.0002926211561077739
+    },
+    "Pistol_V2_Magazine": {
+      "triangles": 56,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "signed_volume": 0.00010199835644503308
+    }
+  },
+  "markers": {
+    "RightHandGrip": [
+      0,
+      0,
+      0
+    ],
+    "LeftHandGuide": [
+      0,
+      0.034,
+      0
+    ],
+    "Muzzle": [
+      0,
+      0.208,
+      0.103
+    ],
+    "AimReference": [
+      0,
+      0.18,
+      0.134
+    ],
+    "RecoilPivot": [
+      0,
+      0,
+      0
+    ],
+    "HolsterAttach": [
+      0,
+      0,
+      0
+    ],
+    "Grip_Point": [
+      0,
+      0,
+      0
+    ],
+    "Support_Hand_Point": [
+      0,
+      0.034,
+      0
+    ],
+    "Muzzle_Point": [
+      0,
+      0.208,
+      0.103
+    ],
+    "MagazineFeed": [
+      0,
+      0.013,
+      0.05
+    ]
+  },
+  "palette_srgb": [
+    [
+      42,
+      48,
+      57
+    ],
+    [
+      106,
+      123,
+      135
+    ],
+    [
+      143,
+      159,
+      170
+    ],
+    [
+      105,
+      117,
+      126
+    ],
+    [
+      25,
+      31,
+      40
+    ],
+    [
+      242,
+      163,
+      49
+    ],
+    [
+      239,
+      242,
+      242
+    ],
+    [
+      50,
+      57,
+      68
+    ]
+  ],
+  "reference": "User attached Korth 9mm silhouette and Sketchfab URL; original redesigned geometry, not a downloaded mesh",
+  "source_reference_url": "https://sketchfab.com/3d-models/low-poly-korth-9mm-dfbc4819b85745e4b882590ba770e37b",
+  "workflow": "Rigid slide and magazine; no character or weapon Action; static existing-pose fit only"
+}

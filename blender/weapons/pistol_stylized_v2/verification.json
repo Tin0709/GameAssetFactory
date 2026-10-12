@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "triangles": 1204,
+  "mesh_triangles": {
+    "Pistol_V2_Slide": 344,
+    "Pistol_V2_Frame": 804,
+    "Pistol_V2_Magazine": 56
+  },
+  "materials": 1,
+  "surfaces": 3,
+  "texture": [
+    64,
+    64
+  ],
+  "markers": 10,
+  "rigid_part_travel": "18mm slide; magazine extraction; stationary parts unchanged",
+  "protected_files": 35,
+  "changed": [],
+  "actions": 0
+}

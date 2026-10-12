@@ -17,6 +17,7 @@ assert all(e['id']!=args.id and e['source']!=source.relative_to(ROOT).as_posix()
 backup=ROOT/'.validation/weapon_showcase_v2'/('registration_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S'));backup.mkdir(parents=True)
 for name in ['weapon_manifest.json','Weapon_Showcase.blend']:shutil.copy2(HERE/name,backup/name)
 manifest['weapons'].append({'id':args.id,'kind':args.kind,'label':args.label,'source':source.relative_to(ROOT).as_posix(),'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'status':'Pending','status_note':'New registration; awaiting explicit visual approval.'})
+manifest['default_selection']=args.id
 try:
  mf.write_text(json.dumps(manifest,indent=2));written_manifest_hash=hashlib.sha256(mf.read_bytes()).hexdigest()
  runpy.run_path(str(HERE/'build_showcase.py'),run_name='__main__',init_globals={'_WEAPON_LOCK_HELD':True})

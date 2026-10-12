@@ -59,8 +59,11 @@ for me in dst.meshes:
  o=bpy.data.objects.new(me.name,me);c.objects.link(o);c.hide_viewport=c.hide_render=True
 for k,matrix in fit.items():s['fit_'+k]=matrix
 
-if MANIFEST.exists():spec=json.loads(MANIFEST.read_text())['weapons']
+if MANIFEST.exists():
+ saved_manifest=json.loads(MANIFEST.read_text());spec=saved_manifest['weapons']
+ default_selection=saved_manifest.get('default_selection','rifle_stylized_v2')
 else:
+ default_selection='rifle_stylized_v2'
  spec=[]
  for kind,folder,stem in [('Rifle','m4a1_blocky','m4a1_blocky'),('Pistol','pistol','blocky_pistol'),('Shotgun','shotgun','blocky_shotgun')]:
   for v in range(1,5):spec.append({'id':kind.lower()+'_v'+str(v),'label':kind+' — '+('Original V1' if v==1 else 'Legacy V'+str(v)),'kind':kind,'source':f'blender/weapons/{folder}/{stem}_v{v}.blend','status':'Pending','status_note':'Preserved historical asset; no individual model approval inferred.'})
@@ -101,7 +104,7 @@ for entry in spec:
  entry['root']=root.name;entry['source_sha256']=digest
  collection.hide_viewport=collection.hide_render=True
 assert not bpy.data.actions
-manifest={'schema':1,'title':'GameAssetFactory Weapon Library','approval_policy':'New assets start Pending; explicit user approval only. Production is preserved separately.','weapons':spec}
+manifest={'schema':1,'title':'GameAssetFactory Weapon Library','approval_policy':'New assets start Pending; explicit user approval only. Production is preserved separately.','default_selection':default_selection,'weapons':spec}
 s['weapon_manifest_snapshot']=json.dumps(manifest)
 world=bpy.data.worlds.new('Neutral graphite studio');world.use_nodes=True;s.world=world
 world.node_tree.nodes['Background'].inputs[0].default_value=(.16,.18,.21,1);world.node_tree.nodes['Background'].inputs[1].default_value=.5
@@ -114,7 +117,7 @@ s.render.engine='CYCLES';s.cycles.samples=24;s.cycles.use_denoising=True
 s.render.resolution_x=1400;s.render.resolution_y=1000;s.render.resolution_percentage=100
 s.render.image_settings.file_format='PNG';s.render.image_settings.color_mode='RGBA';s.render.film_transparent=False
 s.view_settings.view_transform='AgX'
-lib.fill(s);s.gaf_weapon_index=next(i for i,e in enumerate(spec) if e['id']=='rifle_stylized_v2');lib.activate(s)
+lib.fill(s);s.gaf_weapon_index=next(i for i,e in enumerate(spec) if e['id']==default_selection);lib.activate(s)
 for image in bpy.data.images:
  if image.source=='FILE' and not image.packed_file:image.pack()
 for screen in bpy.data.screens:
