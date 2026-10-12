@@ -1,3 +1,5 @@
+**Latest Rifle Ready v16 (2026-10-13, Pending):** [closer left support, higher muzzle and closer shoulder seating](../reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v006/README.md). Same retained entry,18 total.
+
 **Latest Rifle Ready v16 review (2026-10-13, Pending):** same retained Ready entry with closer shoulder seating and lifted underside support. [Review](../reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v003/README.md).18 entries total; no other Action or Godot changes.
 
 **Latest retained Rifle Ready v16:** LEFT arm now tucked closer to torso and raised toward head in the same Action. Only one Ready entry;18 total. [Current review and comparison](../reviews/player_animation_library_v1/rifle_ready_v16_test/left_arm_tuck_v001/README.md). Earlier pose notes below are historical.

@@ -1,3 +1,5 @@
+**Latest same-v16 review — 2026-10-13, Pending:** [left hand farther forward and higher beneath the rifle](shoulder_support_v006/README.md), retaining the closer shoulder seating and higher muzzle. Same `Rifle_Ready_V2_v16_Test`, one Ready/18 total.
+
 **Latest same-v16 refinement — 2026-10-13, Pending:** [closer shoulder seating and lifted left-hand support](shoulder_support_v003/README.md). Select the same `Rifle_Ready_V2_v16_Test` in the existing Showcase. Only one Ready entry,18 total; earlier source/review checkpoints remain historical comparisons.
 
 **Latest same-v16 refinement:** [Left arm closer to body and higher — current review](left_arm_tuck_v001/README.md). This supersedes the pose shown below. Only v16 remains in the active Showcase; older Ready entries were removed by user request.

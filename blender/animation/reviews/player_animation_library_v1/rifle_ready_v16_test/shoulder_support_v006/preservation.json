@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "protected_files_checked": 4984,
+  "intentional_changes": [
+    "AGENTS.md",
+    "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/README.md",
+    "blender/animation/showcase/animation_manifest.json",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/README.md",
+    "docs/animation/ANIMATION_PROGRESS.md"
+  ],
+  "unexpected_changes": [],
+  "missing_files": [],
+  "previous_v003_v004_v005_sources_and_reviews_preserved": true
+}
