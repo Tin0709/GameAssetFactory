@@ -725,13 +725,13 @@
     },
     {
       "action": "Rifle_Ready_V2_v16_Test",
-      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v004/rifle_ready_v16_review.blend",
-      "source_sha256": "744f0d91a5d5122dcf1810b250be08817d1012984fcfb99a9636d256d8902697",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v005/rifle_ready_v16_review.blend",
+      "source_sha256": "96d040462cfd73c08a01b3d09617d6d80cf4f5cb33d905fba5d6863a713a6887",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "d350b1a7c927660e689137fbc3c723b04b8d91a56aa2f3f78acdc5784632403a",
+      "action_sha256": "b6872621ddc057ef7fff733d7fd18be08922c10b32cd3ab540015e5dc47d0a88",
       "action_frame_range": [
         1.0,
         121.0
@@ -741,7 +741,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Same retained v16: user requested rifle closer again toward RIGHT shoulder. Rifle-only20mm slide along unchanged whole-right-arm axis,70mm total from pre-refinement; both arms and all other bones unchanged. Prior6deg lift retained. Left near-support and other17 Actions preserved. Pending Blender review.",
+      "approval_note": "Same retained v16: latest user steering lifts muzzle/right full straight arm another5deg;70mm total shoulderward rifle seating retained. Straight left support follows as needed, no body/head/legs/root/breathing changes. All17 other Actions preserved. Pending Blender review.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
