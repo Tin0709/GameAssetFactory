@@ -1,7 +1,7 @@
 extends "res://scenes/dev/expressive_locomotion_actor.gd"
 ## Isolated jump physics. No production controller or authored Action changes.
 @export var jump_height:=1.2
-@export_range(1.0,1.5,.01) var jump_flight_speed:=1.0
+@export_range(1.0,1.8,.01) var jump_flight_speed:=1.0
 var _active_flight_speed:=1.0
 const PREP_SECONDS:=.20
 const BUFFER_SECONDS:=.14

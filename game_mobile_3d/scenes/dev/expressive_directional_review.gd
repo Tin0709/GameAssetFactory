@@ -19,6 +19,8 @@ func _ready() -> void:
 		actor.jump_flight_speed=1.0;actor.jump_height=1.2
 	if jump_enabled and "--expressive-jump-quicker-v1" in OS.get_cmdline_user_args():
 		actor.jump_flight_speed=1.18;actor.jump_height=1.2
+	if jump_enabled and "--expressive-jump-snappier-v2" in OS.get_cmdline_user_args():
+		actor.jump_flight_speed=1.4;actor.jump_height=1.35
 	if jump_enabled and "--expressive-polish-demo" in OS.get_cmdline_user_args():call_deferred("run_polish_demo")
 	if jump_enabled and "--expressive-quicker-demo" in OS.get_cmdline_user_args():call_deferred("run_quicker_demo")
 
@@ -40,10 +42,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_K:
 		actor.visual.polish_enabled=not actor.visual.polish_enabled;actor.visual.pose_dirty=true
 	if jump_enabled and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_J:
-		actor.jump_flight_speed=1.18 if actor.jump_flight_speed>1.3 else (1.0 if actor.jump_flight_speed>1.0 else 1.4)
-		actor.jump_height=1.35 if actor.jump_flight_speed>1.3 else 1.2
+		actor.jump_flight_speed=1.4 if actor.jump_flight_speed>1.5 else (1.18 if actor.jump_flight_speed>1.3 else (1.0 if actor.jump_flight_speed>1.0 else 1.7))
+		actor.jump_height=2.0 if actor.jump_flight_speed>1.5 else (1.35 if actor.jump_flight_speed>1.3 else 1.2)
 	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_C:
 		gameplay_camera=not gameplay_camera
+	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_P:
+		actor.visual.turn_twist_guard_enabled=not actor.visual.turn_twist_guard_enabled
 
 func _update_camera(delta: float) -> void:
 	if not gameplay_camera:
@@ -58,8 +62,9 @@ func _process(delta: float) -> void:
 	super._process(delta)
 	if jump_enabled:status.text+="\nTurns: %s · V compares\nFalling limbs: %s · F compares\nRun stride: %s · G compares"%["Refined" if actor.visual.directional_enabled else "Original","Raised wave" if actor.visual.fall_wave_enabled else "Original","Longer" if actor.visual.run_stride_scale>1.0 else "Original"]
 	if jump_enabled:status.text+="\nPolish: %s · K before/after · T pace"%["After" if actor.visual.polish_enabled else "Before"]
-	if jump_enabled:status.text+="\nJump: %s · J compares next launch"%["Snappier + higher" if actor.jump_flight_speed>1.3 else ("Quicker V1" if actor.jump_flight_speed>1.0 else "Original")]
+	if jump_enabled:status.text+="\nJump: %s · J compares next launch"%["2m snappy" if actor.jump_flight_speed>1.5 else ("1.35m snappy" if actor.jump_flight_speed>1.3 else ("Quicker V1" if actor.jump_flight_speed>1.0 else "Original"))]
 	if jump_enabled:status.text+="\nCamera: %s · C gameplay/detail"%["Gameplay" if gameplay_camera else "Detail"]
+	if jump_enabled:status.text+="\nLeg pivot: %s · P compares"%["Clean" if actor.visual.turn_twist_guard_enabled else "Previous"]
 
 func run_quicker_demo() -> void:
 	demo_running=true;actor.scripted_input=true
