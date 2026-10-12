@@ -14,6 +14,10 @@ func run() -> void:
 			actor.requested_direction=Vector2.ZERO;scene.reset_actor();actor.position.x=-12;await scene.tick(55)
 			actor.review_pace=pace;actor.requested_run=sprint;actor.requested_direction=Vector2(0,1);await scene.tick(45)
 			var ground_speed: float=actor.current_speed;actor.request_jump();await scene._wait_state("AIR",30);await scene.tick(8)
+			var candidate_scale: float=(1.15 if sprint else 1.5) if pace>=2.25 else 1.0
+			var expected_ground: float=(actor.run_speed if sprint else actor.walk_speed)*pace*candidate_scale
+			check(absf(ground_speed-expected_ground)<.015,"Requested faster Walk/Run speed and accepted1.5x comparison are exact")
+			check(v_gait_matches(actor,sprint),"Speed calibration preserves Walk and Run pose identities")
 			var air_speed: float=actor.current_speed
 			check(absf(air_speed/ground_speed-(1.15 if sprint else 1.0))<.015,"Only running flight gains15percent horizontal speed")
 			actor.requested_direction=Vector2(1,0);await scene.tick(5)
@@ -33,3 +37,6 @@ func run() -> void:
 	var out:="res://.validation/expressive_turn_spin_v1";DirAccess.make_dir_recursive_absolute(out)
 	FileAccess.open(out+"/run_jump_speed.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"cases":cases},"\t"))
 	print("RUN_JUMP_SPEED_CHECKS ",checks.size()," failures ",failures.size());quit(0 if failures.is_empty() else 1)
+
+func v_gait_matches(actor: Node,sprint: bool) -> bool:
+	return actor.visual.gait_run_weight>.99 if sprint else actor.visual.gait_run_weight<.01

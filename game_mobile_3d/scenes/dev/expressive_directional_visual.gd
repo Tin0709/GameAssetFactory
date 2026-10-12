@@ -233,7 +233,7 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 	var energy:=clampf(movement_speed/(2.31*review_pace),0,1)
 	var turn:=clampf(turn_rate/(4.5*review_pace),-1,1)
 	var response:=1-exp(-12*delta)
-	turn_lean=lerpf(turn_lean,-turn*deg_to_rad(lerpf(4,8,energy))*clampf(movement_speed/.8,0,1),response)
+	turn_lean=lerpf(turn_lean,-turn*deg_to_rad(lerpf(6,12,energy))*clampf(movement_speed/.8,0,1),response)
 	turn_twist=lerpf(turn_twist,turn*deg_to_rad(2)*clampf(movement_speed/.8,0,1),response)
 
 func _ground_turn_weight() -> float:

@@ -43,9 +43,9 @@ func run() -> void:
 		# preserve raw acceleration above rather than hiding the faster motion.
 		check(peak_acceleration/(v.run_speed_scale*v.run_speed_scale)<300,"Speed-normalized foot velocity ramps through release without a delayed discontinuity")
 		check(maximum_joint_offset<.1401,"Carried swing and floor corrections share the same140mm joint budget")
-	for interruption in ["Walk","Pace","Orbit","Release"]:
+	for interruption in ["Walk","Pace","Orbit","Release","Speed"]:
 		actor.requested_direction=Vector2.ZERO;scene.reset_actor();await scene.tick(60)
-		actor.review_pace=2.25;v.run_release_enabled=true;v.run_orbit_enabled=true
+		actor.review_pace=2.25;actor.faster_locomotion_enabled=true;v.run_release_enabled=true;v.run_orbit_enabled=true
 		actor.requested_run=true;actor.requested_direction=Vector2(0,1);await scene.tick(60)
 		var wait:=0
 		while not (v.run_release_active[0] or v.run_release_active[1]) and wait<90:await scene.tick(1);wait+=1
@@ -55,8 +55,8 @@ func run() -> void:
 		match interruption:
 			"Walk":actor.requested_run=false
 			"Pace":scene._button("Compare pace")
-			"Orbit","Release":
-				var event:=InputEventKey.new();event.pressed=true;event.physical_keycode=KEY_N if interruption=="Orbit" else KEY_O
+			"Orbit","Release","Speed":
+				var event:=InputEventKey.new();event.pressed=true;event.physical_keycode=KEY_Y if interruption=="Speed" else (KEY_N if interruption=="Orbit" else KEY_O)
 				scene._unhandled_key_input(event)
 		for sample in 24:
 			await scene.tick(1)

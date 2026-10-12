@@ -15,6 +15,7 @@ func _ready() -> void:
 	jump_review_note="Jump V2 test baseline approved"
 	review_title="DIRECTIONAL MOVEMENT · TEST"
 	super._ready()
+	status.add_theme_font_size_override("font_size",14)
 	if jump_enabled and not "--expressive-pace-1" in OS.get_cmdline_user_args() and not "--expressive-pace-2" in OS.get_cmdline_user_args():
 		actor.review_pace=2.25;actor.visual.review_pace=2.25
 	if jump_enabled and "--expressive-pace-1_5" in OS.get_cmdline_user_args():actor.review_pace=1.5;actor.visual.review_pace=1.5
@@ -77,6 +78,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		actor.visual.facing_velocity=actor.visual.turn_rate
 	if event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_Y:
 		actor.faster_locomotion_enabled=not actor.faster_locomotion_enabled
+		actor.visual.pose_dirty=true;actor.visual.run_release_active.fill(false)
 
 func _update_camera(delta: float) -> void:
 	if not gameplay_camera:
@@ -89,6 +91,7 @@ func _update_camera(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	super._process(delta)
+	status.text=status.text.replace("travel / gait","base pace")
 	if jump_enabled:status.text+="\nTurns: %s · V compares\nFalling limbs: %s · F compares\nRun stride: %s · G compares"%["Refined" if actor.visual.directional_enabled else "Original","Raised wave" if actor.visual.fall_wave_enabled else "Original","Longer" if actor.visual.run_stride_scale>1.0 else "Original"]
 	if jump_enabled:status.text+="\nPolish: %s · K before/after · T pace"%["After" if actor.visual.polish_enabled else "Before"]
 	if jump_enabled:status.text+="\nJump: %s · J compares next launch"%JUMP_REVIEW_LABELS[_jump_review_index()]
