@@ -1,37 +1,28 @@
 {
-  "source_sha256": "5aad1d7832b56b522cc4cf23efd45848e8b5ac48608192d0c7babe793b479712",
-  "action_sha256": "d89bb78da01e3e79d6a3ad24ee82e6df30571e038f978a4f73e089c82de8932a",
+  "source_sha256": "1e1300a03b9c02f96360544a6fb53e7f928a833f1309fd5c094208e44567b54b",
+  "action_sha256": "b4ac65c62a2eda826feefe23ac3066577301a80213bbb8e8e8552443cc20e8e9",
   "samples": 961,
   "nominal_speed_m_s": 1.02,
   "max_rigid_error_m": 2.4559331834872467e-07,
   "minimum_floor_clearance_m": 0.00012840703129768372,
   "maximum_support_drift_m": 2.1689652999274358e-06,
   "maximum_support_height_error_m": 3.2565832138061715e-06,
-  "nonadjacent_overlaps": {
-    "Head/UpperArm.L": {
-      "frame": 12.375,
-      "depth_m": -0.0014791644207434729
-    },
-    "Head/UpperArm.R": {
-      "frame": 27.0,
-      "depth_m": -0.0005903531455260236
-    }
-  },
+  "nonadjacent_overlaps": {},
   "maximum_waist_separation_m": {
     "L": -0.001286679063923657,
     "R": -0.0009724815026856959
   },
   "camera_bounds": {
     "FRONT": [
-      0.29402926564216614,
+      0.29188719391822815,
       0.15122820436954498,
-      0.7047201991081238,
+      0.7068624496459961,
       0.8153571486473083
     ],
     "THREE_QUARTER": [
-      0.2664981782436371,
+      0.26457759737968445,
       0.14498457312583923,
-      0.7333059906959534,
+      0.7351981997489929,
       0.8227648735046387
     ],
     "SIDE": [
@@ -43,7 +34,7 @@
   },
   "unsupported_samples": [],
   "loop_pose_error_m": 0.0,
-  "loop_finite_vertex_velocity_difference_m_s": 0.005612735551256957,
+  "loop_finite_vertex_velocity_difference_m_s": 0.005458952494552283,
   "loop_velocity_finite_step_frames": 0.01,
   "loop_channel_tangent_difference": 1.27861989076411e-06,
   "hip_xyz_range_m": [
@@ -61,7 +52,7 @@
     ]
   ],
   "maximum_leg_local_translation_m": 0.13110678281190388,
-  "maximum_straight_arm_direction_error": 2.0485709734063626e-07,
+  "maximum_straight_arm_direction_error": 2.2302015940987714e-07,
   "cycles_modifiers_on_all_tracks": true,
   "no_scale_tracks": true,
   "root_static": true,
@@ -69,7 +60,24 @@
   "contact_vertical_velocity_m_s": -0.2800000942382308,
   "contact_drop_m": 0.10999999999999965,
   "compression_time_s": 0.08,
+  "peak_lifted_sole": {
+    "L": {
+      "minimum_z_m": 0.5645782351493835,
+      "maximum_z_m": 0.790419340133667,
+      "frame": 26.15625
+    },
+    "R": {
+      "minimum_z_m": 0.5405028462409973,
+      "maximum_z_m": 0.7664209008216858,
+      "frame": 11.40625
+    }
+  },
+  "maximum_character_height_m": 1.8115930557250977,
+  "minimum_raised_sole_height_fraction": {
+    "L": 0.3116473831499695,
+    "R": 0.29835776005702275
+  },
   "rig_rest_exact": true,
-  "passed": false,
+  "passed": true,
   "all_19_previous_actions_exact": true
 }
