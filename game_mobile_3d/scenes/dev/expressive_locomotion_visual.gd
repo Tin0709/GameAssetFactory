@@ -273,8 +273,7 @@ func _evaluate(delta: float) -> void:
 			_set_world_leg_rotation(bone,_contact_leg_rotation(side,bone,target,original_q,delta))
 			sole=_sole_world(bone)
 		else:
-			support_aim[side]=support_aim[side].slerp(Quaternion.IDENTITY,1.0-exp(-25*review_pace*delta)).normalized()
-			_set_world_leg_rotation(bone,(support_aim[side]*_leg_world_rotation(bone)).normalized())
+			_set_world_leg_rotation(bone,_swing_leg_rotation(side,bone,delta))
 			sole=_sole_world(bone);target=sole
 			target.y=maxf(sole.y,0.0)
 		foot_support[side]=support
@@ -311,6 +310,10 @@ func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Qu
 		aim=Quaternion(global_pose.basis.y.normalized(),(destination-global_pose.origin).normalized()).normalized()
 	support_aim[side]=support_aim[side].slerp(aim,1.0-exp(-20*review_pace*delta)).normalized()
 	return (support_aim[side]*original_q).normalized()
+
+func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
+	support_aim[side]=support_aim[side].slerp(Quaternion.IDENTITY,1.0-exp(-25*review_pace*delta)).normalized()
+	return (support_aim[side]*_leg_world_rotation(bone)).normalized()
 
 func _set_world_leg_rotation(bone: int, q: Quaternion) -> void:
 	var parent:=skeleton.get_bone_parent(bone)

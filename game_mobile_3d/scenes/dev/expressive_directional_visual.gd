@@ -41,8 +41,11 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	return result
 
 func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Quaternion, delta: float) -> Quaternion:
-	if not directional_enabled or not move_requested or _ground_turn_weight()<.99:
+	var weight:=_ground_turn_weight()
+	if weight<=0 or not move_requested:
 		return super._contact_leg_rotation(side,bone,target,original_q,delta)
+	var landing_q:=original_q
+	if weight<1:landing_q=super._contact_leg_rotation(side,bone,target,original_q,delta)
 	# Solve the existing single solid leg toward its world support. The cached
 	# receiving orientation retains toe heading instead of inheriting body yaw.
 	var origin: Vector3=(skeleton.global_transform*skeleton.get_bone_global_pose(bone)).origin
@@ -55,5 +58,18 @@ func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Qu
 		q=(Quaternion(Basis(receiving).y.normalized(),(destination-origin).normalized())*receiving).normalized()
 	# Carry the solved offset into the inherited swing release instead of
 	# jumping straight back to the body-relative authored leg orientation.
+	q=landing_q.slerp(q,weight).normalized()
 	support_aim[side]=(q*original_q.inverse()).normalized()
 	return q
+
+func _swing_leg_rotation(side: int, bone: int, delta: float) -> Quaternion:
+	var weight:=_ground_turn_weight()
+	if weight<=0:
+		return super._swing_leg_rotation(side,bone,delta)
+	# A large pivot offset needs the swing interval to unwind. Bound its
+	# angular release, without slowing the capsule or restarting the stride.
+	var angle:=support_aim[side].angle_to(Quaternion.IDENTITY)
+	var original_fraction:=1-exp(-25*review_pace*delta)
+	var fraction:=lerpf(original_fraction,minf(original_fraction,8*delta/maxf(angle,.00001)),weight)
+	support_aim[side]=support_aim[side].slerp(Quaternion.IDENTITY,fraction).normalized()
+	return (support_aim[side]*_leg_world_rotation(bone)).normalized()

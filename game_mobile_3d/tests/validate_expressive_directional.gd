@@ -15,7 +15,8 @@ func observe(scene: Node, ticks: int, record: Dictionary) -> void:
 	var previous_q: Array=[]
 	for bone in [v.leg_left,v.leg_right]:previous_q.append(v._leg_world_rotation(bone))
 	var phase: float=v.gait_phase;var yaw: float=v.rotation.y
-	for i in ticks:
+	var end_tick:=Engine.get_physics_frames()+ticks
+	while Engine.get_physics_frames()<end_tick:
 		await scene.tick(1)
 		record.frames+=1
 		if v.foot_support[0] or v.foot_support[1]:record.support_frames+=1
@@ -65,20 +66,25 @@ func run() -> void:
 					check(float(record.support_frames)/record.frames>(.65 if sprint else .80),"Turn retains authored support rather than hiding slip in flight")
 		actor.requested_direction=Vector2.ZERO;await scene.tick(55)
 		check(not v.move_requested and not v.settling,"Directional stop returns to planted Idle")
-		for degrees in [45,90,180]:
-			actor.requested_direction=Vector2(0,1);actor.requested_run=true;await scene.tick(35)
-			actor.request_jump();check(await scene._wait_state("AIR",35),"Turning jump launches")
-			await scene.tick(8)
-			var velocity_before: Vector3=actor.velocity;var angle:=deg_to_rad(degrees)
-			actor.requested_direction=Vector2(sin(angle),cos(angle))
-			await scene.tick(2)
-			check((actor.velocity-velocity_before).length()>.05,"Airborne turn input remains immediate")
-			check(await scene._wait_state("LAND",90),"Turning jump lands by physics")
-			await scene.tick(45)
-			check(actor.current_speed>3.4 and not v.settling,"Turning jump rejoins responsive Run")
+		var jumps: Array=[]
+		for sprint in [false,true]:
+			for degrees in [45,90,180]:
+				actor.requested_direction=Vector2(0,1);actor.requested_run=sprint;await scene.tick(35)
+				actor.request_jump();check(await scene._wait_state("AIR",35),"Turning jump launches")
+				await scene.tick(8)
+				var velocity_before: Vector3=actor.velocity;var angle:=deg_to_rad(degrees)
+				actor.requested_direction=Vector2(sin(angle),cos(angle))
+				await scene.tick(2)
+				check((actor.velocity-velocity_before).length()>.05,"Airborne turn input remains immediate")
+				check(await scene._wait_state("LAND",90),"Turning jump lands by physics")
+				var record:={"run":sprint,"degrees":degrees,"slip_m":0.0,"peak_slip_m":0.0,"plant_rotation_degrees":0.0,"leg_step_degrees":0.0,"penetration_m":0.0,"phase_error":0.0,"yaw_step_degrees":0.0,"frames":0,"support_frames":0}
+				await observe(scene,50,record);jumps.append(record)
+				check(actor.current_speed>(3.4 if sprint else 1.3) and not v.settling,"Turning jump rejoins responsive gait")
+				check(record.leg_step_degrees<45,"Landing turn solver handoff avoids a large leg reset")
+				check(record.penetration_m<.008,"Turning landing maintains sole clearance")
 		var total:=0.0;var peak:=0.0;var clamps:=0
 		for record in cases:total+=record.slip_m;peak=maxf(peak,record.peak_slip_m);clamps+=record.clamps
-		versions.append({"directional":enabled,"cases":cases,"total_planted_slip_m":total,"peak_slip_m":peak,"clamps":clamps})
+		versions.append({"directional":enabled,"cases":cases,"jumps":jumps,"total_planted_slip_m":total,"peak_slip_m":peak,"clamps":clamps})
 		scene.queue_free();await process_frame
 	check(versions[1].total_planted_slip_m<versions[0].total_planted_slip_m*.70,"Refinement reduces matched turn planted sliding by at least30percent")
 	for i in versions[0].cases.size():
