@@ -1,0 +1,30 @@
+{
+  "front": {
+    "fps": 30.0,
+    "frames": 240.0,
+    "decoded_frames": 240,
+    "duration_s": 8.0,
+    "file_bytes": 348236
+  },
+  "three_quarter": {
+    "fps": 30.0,
+    "frames": 240.0,
+    "decoded_frames": 240,
+    "duration_s": 8.0,
+    "file_bytes": 346529
+  },
+  "side": {
+    "fps": 30.0,
+    "frames": 240.0,
+    "decoded_frames": 240,
+    "duration_s": 8.0,
+    "file_bytes": 289418
+  },
+  "three_views": {
+    "fps": 30.0,
+    "frames": 240.0,
+    "decoded_frames": 240,
+    "duration_s": 8.0
+  },
+  "passed": true
+}

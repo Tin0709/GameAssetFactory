@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "entries": 19,
+  "action": "Rifle_Ready_Idle_Expressive_Test",
+  "frame_advanced_from": 239,
+  "to": 89,
+  "loop_wrapped": true,
+  "play_pause_restart": true,
+  "ready_status": "approved",
+  "idle_status": "pending"
+}

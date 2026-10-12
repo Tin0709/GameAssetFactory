@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "existing_actions_exact": 18,
+  "entries": 19,
+  "new_action": "Rifle_Ready_Idle_Expressive_Test",
+  "new_status": "pending",
+  "ready_status": "approved",
+  "rig_unchanged": true,
+  "action_sha256": "e39e22caaf9ecabd57c2b350fe9d2abc52ee492b270305c5d1f92a7596a72326",
+  "source_sha256": "cdd79ede4d3153ce0c17cd90fe5589fc9c72956da30aeac880f02babea72b3ba"
+}

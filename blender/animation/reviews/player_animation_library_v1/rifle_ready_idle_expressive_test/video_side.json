@@ -1,0 +1,11 @@
+{
+  "view": "side",
+  "file": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\rifle_ready_idle_expressive_test\\rifle_ready_idle_side_1x.mp4",
+  "frames": 240,
+  "fps": 30,
+  "duration_s": 8,
+  "speed": 1,
+  "closing_frame_excluded": 241,
+  "renderer": "Eevee24samples576px",
+  "elapsed_s": 41.793983697891235
+}
