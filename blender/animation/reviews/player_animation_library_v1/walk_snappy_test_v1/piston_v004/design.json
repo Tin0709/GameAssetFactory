@@ -1,0 +1,35 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "frames": [
+    1,
+    30
+  ],
+  "fps": 30,
+  "period_s": 1,
+  "closing_key": 31,
+  "nominal_speed_m_s": 1.02,
+  "leg_tracks_m": 0.27,
+  "support_duty": {
+    "L": 0.64,
+    "R": 0.66
+  },
+  "double_support": 0.3,
+  "flight": 0,
+  "contact_frames": {
+    "L": 1,
+    "R": 16
+  },
+  "hip_vertical_range_m": 0.13,
+  "contact_drop_m": 0.11,
+  "compression_time_s": 0.08,
+  "vertical_sole_lift_m": 0.5,
+  "lift_peak_swing_fraction": [
+    0.4,
+    0.52
+  ],
+  "non_leg_curves_exact": true,
+  "non_leg_curves_sha256": "e318fb4b7d2b194dcdced518e18017ddcd79e30300f0e9d2043975c9688363d7",
+  "leg_motion": "Rigid block translated upward into torso silhouette, then forward and down. Intentional adjacent upper-leg/torso occlusion; no scale, knee or rig modification.",
+  "transition": "Same receiving phases; large pose translation and occlusion require future runtime/weapon/transition review. Blender-only Pending."
+}
