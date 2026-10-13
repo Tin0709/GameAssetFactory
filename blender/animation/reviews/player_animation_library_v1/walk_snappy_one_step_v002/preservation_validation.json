@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "protected_files": 6041,
+  "allowed_updates": [
+    "AGENTS.md",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/README.md",
+    "blender/animation/showcase/animation_manifest.json",
+    "docs/animation/ANIMATION_PROGRESS.md"
+  ],
+  "all22_old_actions_and_entries_exact": true,
+  "v001_v028_sources_reviews_exact": true,
+  "approved_animations_unchanged": true,
+  "godot_unchanged": true
+}

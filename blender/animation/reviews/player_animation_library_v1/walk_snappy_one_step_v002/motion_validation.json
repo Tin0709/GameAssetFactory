@@ -1,0 +1,61 @@
+{
+  "source_sha256": "e5c60a13b89e3fcdf8b273860a2cc52ee4c0b62ad286d639cfda8ca6942e5cb1",
+  "action_sha256": "4b4a853133f89e1afb05a79e34557d013d4f9100678ad53eb3130f2ffec31c6f",
+  "samples": 2689,
+  "max_rigid_error_m": 2.4007419463512036e-07,
+  "min_floor_clearance_m": 0.0003998279571533203,
+  "min_head_chest_gap_m": 0.03378078545210883,
+  "max_waist_gap_m": 0.060177357474458404,
+  "max_ground_anchor_drift_m": 1.8201105752879633e-06,
+  "max_straight_arm_error": 2.2745635393967848e-07,
+  "unsupported_samples": 0,
+  "nonadjacent_overlaps": {},
+  "camera_bounds": {
+    "FRONT": [
+      0.2926725745201111,
+      0.15024453401565552,
+      0.7005801200866699,
+      0.8637234568595886
+    ],
+    "THREE_QUARTER": [
+      0.25787073373794556,
+      0.14223268628120422,
+      0.736406683921814,
+      0.869321346282959
+    ],
+    "SIDE": [
+      0.33286911249160767,
+      0.15165963768959045,
+      0.6578782796859741,
+      0.8644430637359619
+    ]
+  },
+  "one_shot": true,
+  "seamless_loop": false,
+  "all22_previous_actions_exact": true,
+  "rig_rest_exact": true,
+  "no_cycles_modifiers": true,
+  "no_scale_tracks": true,
+  "passed": true,
+  "four_step_endpoint_pose_difference_m": 0.0,
+  "junctions": [
+    {
+      "time_s": 0.35,
+      "tiny_step_velocity_difference_m_s": 0.0180100738164641,
+      "second_order_velocity_difference_m_s": 0.0025664627720845923,
+      "finite_step_s": 0.0003333333333333333
+    },
+    {
+      "time_s": 0.7,
+      "tiny_step_velocity_difference_m_s": 0.010259100483690801,
+      "second_order_velocity_difference_m_s": 0.003450286568365837,
+      "finite_step_s": 0.0003333333333333333
+    },
+    {
+      "time_s": 1.05,
+      "tiny_step_velocity_difference_m_s": 0.018201388698342407,
+      "second_order_velocity_difference_m_s": 0.0027294762472761416,
+      "finite_step_s": 0.0003333333333333333
+    }
+  ]
+}

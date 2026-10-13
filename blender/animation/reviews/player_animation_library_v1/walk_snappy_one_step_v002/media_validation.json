@@ -1,0 +1,63 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "v002_four_steps_front_1x.mp4",
+      "fps": 30.0,
+      "frames": 43,
+      "codec": "h264",
+      "sha256": "6168e50af211faeab10e671b1fe095a09be1c5ae4d464712458c19fdebbbb59d"
+    },
+    {
+      "file": "v002_four_steps_three_quarter_1x.mp4",
+      "fps": 30.0,
+      "frames": 43,
+      "codec": "h264",
+      "sha256": "079a467895abd4efa39d9952561fa153adf54ccd4fe88b81ef91a48ca614094c"
+    },
+    {
+      "file": "v002_four_steps_side_1x.mp4",
+      "fps": 30.0,
+      "frames": 43,
+      "codec": "h264",
+      "sha256": "fc536c299947c44925f1c07a02c728c1f1f60e09f20e6560bb8a05cc86695f7c"
+    },
+    {
+      "file": "v028_actual_front_1x.mp4",
+      "fps": 30.0,
+      "frames": 43,
+      "codec": "h264",
+      "sha256": "caa96f0a905d54a8808ffed0895c80eae876a6247b868919969d2c6ac56e9518"
+    },
+    {
+      "file": "reference_v028_v002_four_steps_1x.mp4",
+      "fps": 30.0,
+      "frames": 43,
+      "codec": "h264",
+      "sha256": "892360df95923b777b5b24950a5bc9d0ea9c6d4eacb0efbc6ca45e770be58754"
+    },
+    {
+      "file": "v002_four_steps_three_views_1x.mp4",
+      "fps": 30.0,
+      "frames": 43,
+      "codec": "h264",
+      "sha256": "4d0acc7be2098858ca56890581129a43a56663f9c538aba04858f4b80d66092f"
+    },
+    {
+      "file": "v001_actual_front_1x.mp4",
+      "fps": 30.0,
+      "frames": 13,
+      "codec": "h264",
+      "sha256": "5adcd02c4caaa2c5de61922383027ccc68a777ff41d376dd9b303bcc825fae8b"
+    },
+    {
+      "file": "reference_v028_v001_v002_first_step_1x.mp4",
+      "fps": 30.0,
+      "frames": 13,
+      "codec": "h264",
+      "sha256": "8b4568901b5c5c509030760bf1e21bc4d02d44a574e5e242ef309c7d1e9c2986"
+    }
+  ],
+  "total_decoded_frames": 284,
+  "no_added_holds_or_replay_pauses": true
+}

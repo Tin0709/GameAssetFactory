@@ -936,6 +936,56 @@
         "R": 11.5
       },
       "presentation_note": "Reference original F30-40 at30FPS, fresh read-only V028 export and this study.1x moving segments; endpoint holds/replay cuts labelled. Static normalized phase sheets only. Rigid grounded support limits upward recovery; see study report."
+    },
+    {
+      "action": "Walk_Snappy_OneStep_Study_v002",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_one_step_v002/walk_one_step_v002_review.blend",
+      "source_sha256": "e5c60a13b89e3fcdf8b273860a2cc52ee4c0b62ad286d639cfda8ca6942e5cb1",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "4b4a853133f89e1afb05a79e34557d013d4f9100678ad53eb3130f2ffec31c6f",
+      "action_frame_range": [
+        1.0,
+        43.0
+      ],
+      "start": 1,
+      "end": 43,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Focused step v002, FOUR continuous alternating steps for rhythm review, not a production walk. Same0.35s step cadence/1.59936m/s nominal travel/80mm hip range/290mm piston.55ms load, concentrated smooth recovery and swing/braking,45ms shoulder/arm and60ms head-pitch follow-through. Grounded support throughout. All22 older Actions/entries including v001/V028 exact.",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "nominal_speed_m_s": 1.59936,
+      "contact_frames": {
+        "L": 1,
+        "R": 11.5
+      },
+      "presentation_note": "1.4s uninterrupted original-speed reference/V028/v002 review and three views; no holds/replays/time normalization. Actual v001 is compared in a separate first-step clip because it has no authored continuation. Static normalized phase sheets are diagnostic only. Rig waist-gap tradeoff remains; no artistic-match or runtime approval claim.",
+      "review_contact_frames": [
+        1,
+        11.5,
+        22,
+        32.5,
+        43
+      ],
+      "review_steps": 4
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

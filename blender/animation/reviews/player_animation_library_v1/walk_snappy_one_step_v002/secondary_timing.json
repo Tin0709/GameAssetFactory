@@ -1,0 +1,12 @@
+{
+  "v001": {
+    "head_recovery_pitch_trough_s": 0.175,
+    "lift_crest_s": 0.14479166666666668,
+    "lift_crest_m": 0.29040011763572693
+  },
+  "v002": {
+    "head_recovery_pitch_trough_s": 0.20989583333333334,
+    "lift_crest_s": 0.125,
+    "lift_crest_m": 0.2904001474380493
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "reference_source": "C:\\Users\\ADMIN\\Desktop\\SnappyMotionReferences\\Snappy_Walk_Run_Reference_Analysis\\SourceVideos\\Walking_Reference_Original.mp4",
+  "reference_sha256": "2b4930b899230814606fc3f6ce341e6966b82a91d6a5d4a665e3057938beab0c",
+  "reference_decoded_frames": 304,
+  "reference_fps": 30,
+  "reference_frames": [
+    30,
+    72
+  ],
+  "continuous_review_frames": 43,
+  "continuous_motion_span_s": 1.4,
+  "encoded_review_duration_s": 1.4333333333333333,
+  "no_holds": true,
+  "no_replay_pauses": true,
+  "no_moving_time_normalization": true,
+  "reference_contact_uncertainty_frames": 1,
+  "first_step_phase_mapping": "Reference30+i, models1+1.05*i;11 static phase samples",
+  "v001_review": "Actual13-frame one-shot shown separately at1x; not extended or repeated",
+  "measured": {
+    "v028": {
+      "hip_min_time_s": 0.06999999999999999,
+      "hip_max_time_s": 0.175,
+      "hip_range_m": [
+        0.6799999475479126,
+        0.8299999833106995
+      ],
+      "max_hip_up_speed_m_s": 2.911341190338163,
+      "max_swing_forward_speed_m_s": 9.834136068820975,
+      "swing_peak_time_s": 0.16499999999999998,
+      "sole_passes_hips_time_s": 0.175,
+      "chest_load_pitch_peak_time_s": 0.05333333333333334,
+      "head_load_pitch_peak_time_s": 0.034999999999999996
+    },
+    "v001": {
+      "hip_min_time_s": 0.059895833333333336,
+      "hip_max_time_s": 0.14010416666666667,
+      "hip_range_m": [
+        0.6650000214576721,
+        0.7450000047683716
+      ],
+      "max_hip_up_speed_m_s": 1.637420654296875,
+      "max_swing_forward_speed_m_s": 8.465999364852934,
+      "swing_peak_time_s": 0.16197916666666667,
+      "sole_passes_hips_time_s": 0.16302083333333334,
+      "chest_load_pitch_peak_time_s": 0.09010416666666667,
+      "head_load_pitch_peak_time_s": 0.1
+    },
+    "v002": {
+      "hip_min_time_s": 0.0546875,
+      "hip_max_time_s": 0.16458333333333333,
+      "hip_range_m": [
+        0.6650000810623169,
+        0.7450000047683716
+      ],
+      "max_hip_up_speed_m_s": 1.9765663146972656,
+      "max_swing_forward_speed_m_s": 9.325479269027738,
+      "swing_peak_time_s": 0.1609375,
+      "sole_passes_hips_time_s": 0.15520833333333334,
+      "chest_load_pitch_peak_time_s": 0.08020833333333334,
+      "head_load_pitch_peak_time_s": 0.11510416666666666
+    }
+  }
+}
