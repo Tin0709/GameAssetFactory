@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "access_date": "2026-10-14",
+  "research_scope": "Public sources only; no animation implementation",
+  "sources": [
+    {
+      "id": "S01",
+      "title": "Actions & Stuff Content Guide",
+      "url": "https://guides.orevillestudios.com/Actions-Stuff-Content-Guide-23fd70150598804aab49f4d6f3f9974a",
+      "authority": "official Oreville",
+      "access_status": "accessible text",
+      "scope": "Overview and changelog index",
+      "limits": [
+        "No embedded video viewing",
+        "Live guide version may change"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "S01"
+    },
+    {
+      "id": "S01a",
+      "title": "Oreville product route",
+      "url": "https://orevillestudios.com/actions-&-stuff",
+      "authority": "official Oreville",
+      "access_status": "accessible redirect",
+      "scope": "Redirect text and guide destination",
+      "limits": [
+        "Not an additional behavior source"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "S01a"
+    },
+    {
+      "id": "S02",
+      "title": "General",
+      "url": "https://guides.orevillestudios.com/General-23fd70150598811aa3a8d653e02b1322",
+      "authority": "official Oreville",
+      "access_status": "accessible text",
+      "scope": "Entire short overview",
+      "aliases": [
+        "https://guides.orevillestudios.com/Animations-23fd70150598811aa3a8d653e02b1322"
+      ],
+      "limits": [
+        "Feature claims; no quantitative timing"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "S02"
+    },
+    {
+      "id": "S03",
+      "title": "Actions & Stuff 1.10",
+      "url": "https://guides.orevillestudios.com/1-10-341d7015059880c68287ce0877d3a123",
+      "authority": "official Oreville",
+      "access_status": "accessible text",
+      "scope": "Actions, Player Movement, settings, audio, relevant fixes",
+      "limits": [
+        "Release-specific behavior claims",
+        "No independent gameplay verification"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "S03"
+    },
+    {
+      "id": "S04",
+      "title": "Actions & Stuff 1.6",
+      "url": "https://guides.orevillestudios.com/1-6-284d70150598807a8682eda71a1155f2",
+      "authority": "official Oreville",
+      "access_status": "accessible text",
+      "scope": "Relevant player additions, mounted limitations, fixes",
+      "limits": [
+        "Later versions may alter defaults or conditions"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "S04"
+    },
+    {
+      "id": "S05",
+      "title": "Actions & Stuff 1.11",
+      "url": "https://guides.orevillestudios.com/1-11-381d70150598800cb925e0917df0e363",
+      "authority": "official Oreville",
+      "access_status": "accessible text",
+      "scope": "Relevant Bugs Fixed and Creators; mob/player scope distinction",
+      "limits": [
+        "Fix claims untested here",
+        "Mob motion is not ordinary player evidence"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "S05"
+    },
+    {
+      "id": "S06",
+      "title": "Creators",
+      "url": "https://guides.orevillestudios.com/Creators-23fd7015059881aa8dd8cecb7f948f58",
+      "authority": "official Oreville",
+      "access_status": "accessible text",
+      "scope": "Entire guide and public compatibility snippets",
+      "limits": [
+        "Public extension API, not core implementation"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "S06"
+    },
+    {
+      "id": "S07",
+      "title": "Actions & Stuff 1.12",
+      "url": "https://guides.orevillestudios.com/1-12-3f1d701505988092ad6bc9ae1e56b682",
+      "authority": "official Oreville",
+      "access_status": "accessible text",
+      "scope": "Movement settings, player sitting, relevant bug fixes",
+      "limits": [
+        "Current documented release at access",
+        "Unknown local-reference version"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "S07"
+    },
+    {
+      "id": "S08",
+      "title": "Let's Play: Actions & Stuff",
+      "url": "https://www.minecraft.net/en-us/article/let-s-play--actions---stuff",
+      "authority": "official Minecraft editorial",
+      "access_status": "accessible text",
+      "publication_date": "2025-06-02",
+      "scope": "Article prose",
+      "limits": [
+        "Editorial reception",
+        "No video or screenshot motion measurement"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "S08"
+    },
+    {
+      "id": "C01",
+      "title": "Is Actions and Stuff worth it?",
+      "url": "https://www.reddit.com/r/MinecraftBedrockers/comments/1kf6f3k/is_actions_and_stuff_worth_it/",
+      "authority": "community self-report",
+      "access_status": "accessible text",
+      "scope": "Three selected comments; see PUBLIC_SOURCES.md",
+      "limits": [
+        "Convenience selection",
+        "Unverified configurations",
+        "Relative dates only"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "C01"
+    },
+    {
+      "id": "C02",
+      "title": "is actions and stuff worth it it's 10 dollars",
+      "url": "https://www.reddit.com/r/minecraftbedrock/comments/1snfcko/is_actions_and_stuff_worth_it_its_10_dollars/",
+      "authority": "community self-report",
+      "access_status": "accessible text",
+      "scope": "Three selected comments; see PUBLIC_SOURCES.md",
+      "limits": [
+        "Convenience selection",
+        "Unverified configurations",
+        "Relative dates only"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "C02"
+    },
+    {
+      "id": "C03",
+      "title": "my opinion fr",
+      "url": "https://www.reddit.com/r/MinecraftMemes/comments/1ldxbjb/my_opinion_fr/",
+      "authority": "community",
+      "access_status": "partial open; targeted retrieval internal errors",
+      "scope": "Search excerpt and limited page response",
+      "limits": [
+        "Excluded from qualitative sample"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "C03"
+    },
+    {
+      "id": "C04",
+      "title": "Unpopular opinion I really don't like animation mods",
+      "url": "https://www.reddit.com/r/Minecraft/comments/1wfffua/unpopular_opinion_i_really_dont_like_animation/",
+      "authority": "community",
+      "access_status": "search excerpt; open timeout",
+      "scope": "Discovery only",
+      "limits": [
+        "Excluded from qualitative sample"
+      ],
+      "access_date": "2026-10-14",
+      "retrieval": "web text search/open/find; no media playback",
+      "evidence_location": "PUBLIC_SOURCES.md",
+      "evidence_section_id": "C04"
+    }
+  ],
+  "search_audit": {
+    "status": "Bounded search completed; no verified directly relevant animator interview found",
+    "query_families": [
+      "\"Actions & Stuff\" animator interview",
+      "\"Oreville\" animation interview",
+      "\"Actions & Stuff\" developer animation system",
+      "\"Actions & Stuff\" behind the scenes",
+      "\"Oreville Studios\" player animation controller",
+      "\"Actions & Stuff\" animation Blockbench developer",
+      "\"Actions & Stuff\" developer Molang"
+    ],
+    "excluded_categories": [
+      "Unverified social mirrors",
+      "Download and redistribution sites",
+      "Unofficial Java port internals",
+      "Unrelated interview results"
+    ],
+    "not_accessed": [
+      "Private Discord",
+      "Original keyframes or proprietary animation files",
+      "Paid pack internals",
+      "Remote video pixels or audio"
+    ]
+  },
+  "community_sample": {
+    "threads": 2,
+    "selected_comments": 6,
+    "selection": "Convenience sample contrasting reception and practical context",
+    "population_inference": false
+  },
+  "protected_scope": {
+    "writes": [
+      "PUBLIC_SOURCES.md",
+      "source_register_public.json"
+    ],
+    "production_changes": false,
+    "animation_changes": false,
+    "commits": false
+  }
+}

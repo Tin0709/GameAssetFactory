@@ -1,0 +1,342 @@
+{
+  "audit_date": "2026-10-14",
+  "scope": "Research-only local source audit; no Blender/Godot launch, rendering, tests, resource or status edits",
+  "fresh_actions": [
+    "read current source and reports",
+    "inspect three existing frame sheets",
+    "hash source text, reports and sheets",
+    "sum existing suite check counts"
+  ],
+  "not_performed": [
+    "fresh motion measurements",
+    "watch local videos",
+    "listen to audio",
+    "run Godot suites",
+    "open/render/save blend",
+    "create WalkV029",
+    "change rig/Showcase/gameplay"
+  ],
+  "sources": [
+    {
+      "path": "docs/animation/ANIMATION_STYLE_GUIDE.md",
+      "sha256": "ff3a5d353d2b3c4d78b1f2ddd5a2c7b4018bcaee298a1a686243a0f1e3d5d539",
+      "bytes": 52944,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "docs/animation/ANIMATION_EXPANSION_GUIDE.md",
+      "sha256": "cf9c0491d5e2f91388c5d3075abe496a00cbbd8730421acfb4036ed3ef7b942d",
+      "bytes": 78374,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "docs/animation/ACTIONS_AND_STUFF_LOCOMOTION_STUDY.md",
+      "sha256": "440d8a3d5e19c3b74e020e4a1dfa3734fc860675d99b68b257d3b5bb4df4014b",
+      "bytes": 20526,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "docs/animation/WALK_SNAPPY_V028_MOTION_MATCHING_STUDY.md",
+      "sha256": "e22f4a3b252c429a55303f8e36f0b4396510dd87c358156f8d29675df922ee3e",
+      "bytes": 12155,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "blender/animation/showcase/animation_manifest.json",
+      "sha256": "497196ab048c6e26147593bc962b278fd15912d43e392be6fa96e95c28474625",
+      "bytes": 45273,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/project.godot",
+      "sha256": "27882c76352ac6583313876f0b71525a5e24f507b73c1fb162ee47891653bee7",
+      "bytes": 3454,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/world_map.gd",
+      "sha256": "450e76ffab8a7a7f60caaada2a3013e781083a63e3a1ca19b122972190ee1700",
+      "bytes": 8824,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/cuboid_player.gd",
+      "sha256": "1c283426b0ec7f601ebaceb7970fb56e33a975f33d0d452fadcc553bb2b46b19",
+      "bytes": 5179,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/player_jump_gif_v004_controller.gd",
+      "sha256": "aa6fc0b339c6dd338f13275e210203dbde99c673704e51de27a0c8487897fbe0",
+      "bytes": 2616,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/player_jump_gif_v004_visual.gd",
+      "sha256": "a2b5f0eb847e0dda4858be04ec5e70386438d4187802fb55e762ca6af93e9c76",
+      "bytes": 2123,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/player_jump_loop_v003_controller.gd",
+      "sha256": "a9bfd480306b9e994a7165fd00554b0221202453ba591114c816741f645a27c9",
+      "bytes": 4243,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/player_jump_loop_v003_visual.gd",
+      "sha256": "d50365dfe9c27deb867ad9162b939c9febbd7f80c99ea7a6d34b34303c33686c",
+      "bytes": 4376,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/player_combat_strafe_r15.gd",
+      "sha256": "3c337491af305c57d8620d6d29d07f6ac321f471307782dc896de80b9123f797",
+      "bytes": 7580,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/player_weapon_r13_integration.gd",
+      "sha256": "323577224816b56cde3d59ced3ba4312b511f01454da59c9f0441f7b0b21cb9e",
+      "bytes": 11765,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/player_reference_locomotion_r6p.gd",
+      "sha256": "c350b33634cdede47ec10d78fb3cf742f3120b3364f15ae414f2e62178e454db",
+      "bytes": 5580,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/player_animation_v2.gd",
+      "sha256": "a79ef12088374e439a03b68955639b7dabcc944afaaf9dee1038edbe518304c3",
+      "bytes": 22844,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scripts/combat_audio.gd",
+      "sha256": "29c83436c97898f79e9651b01f860ca08617fb68057b78036bdfe3f6717478c7",
+      "bytes": 2443,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scenes/dev/expressive_locomotion_visual.gd",
+      "sha256": "3688adcc0707c2c672db66d800bc66a0ee125684c7517c4cfce0677303476a9f",
+      "bytes": 17289,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scenes/dev/expressive_jump_visual.gd",
+      "sha256": "97951f9bb6a86185582c032227788b472f336ef2d89d604e7909b66754a08c48",
+      "bytes": 5779,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scenes/dev/expressive_directional_visual.gd",
+      "sha256": "8c43dad69af17028cd98bf079b53795fd290c87f00aec15b59b72d6e202968c6",
+      "bytes": 23450,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scenes/dev/expressive_locomotion_actor.gd",
+      "sha256": "5d6e1d9b2d3f3b7da6774cc8557494c577875f03ebd7fcded7e02b16f6d7aa53",
+      "bytes": 2358,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/scenes/dev/expressive_jump_actor.gd",
+      "sha256": "05eeba954126cb7a58cd806c06d057eb0143ebc69c78b70b4ffc745e1c021005",
+      "bytes": 6078,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/tests/validate_locomotion_stop.gd",
+      "sha256": "777ff64b853174ed4830a0c058530d70f7d8bfa50b0689966ef95e4cd50c7dc4",
+      "bytes": 10203,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/tests/validate_expressive_locomotion.gd",
+      "sha256": "7ef974c8f5e1f894a3e5b398c86e67e3870075e30358975624b1674c5702113a",
+      "bytes": 2545,
+      "access": "fresh source/text read; no execution"
+    },
+    {
+      "path": "game_mobile_3d/tests/validate_expressive_turn_spin.gd",
+      "sha256": "1bbf52cdbc2aecbda9f1fbb80711663485ce34616c9a55e547703d6fa0c73bc7",
+      "bytes": 2186,
+      "access": "fresh source/text read; no execution"
+    }
+  ],
+  "historical_motion_reports": [
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/walk_expressive_test/validation.json",
+      "evidence_type": "historical saved validation; not rerun",
+      "report_sha256": "4fe5abbfdef3c677e4292b696fe31e5b532f118bf0c3f1d2f72777bbc18a7aae",
+      "source_sha256_as_reported": "4f0e61f3c6fbca14cbb3b7896a34ab8f0b011a50ebef11922bdfd5c4b75fad20",
+      "action_sha256_as_reported": "15f8e76ac8ca19051bc2865ffeacc145ac2e003ec1eed8672cd8ecb72e6f20ef",
+      "samples": 1153,
+      "passed_as_reported": true,
+      "one_shot": null,
+      "seamless_loop": null,
+      "nominal_speed_m_s": 0.9,
+      "max_waist_gap_m": null,
+      "maximum_waist_separation_m": {
+        "L": -0.032760287867859006,
+        "R": -0.033509697881527245
+      },
+      "max_ground_anchor_drift_m": null,
+      "maximum_support_drift_m": 1.6405145374870824E-06,
+      "unsupported_sample_count": 0,
+      "junctions": null
+    },
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/soft_landing_v027/motion_validation.json",
+      "evidence_type": "historical saved validation; not rerun",
+      "report_sha256": "9e5a6d5da9fc9c8384d4befac94dcb3d37bab8aaf9db0d8494c050fcadbc6365",
+      "source_sha256_as_reported": "0ff3dbeff6d101dc87dbe70e6b9eb8ec2de0150d165974f5a88422556b881901",
+      "action_sha256_as_reported": "8d9d809cc0078f98b1f6b6b43f6a7c8365c70bc11160e9efb9bdaaf42fbd5cb6",
+      "samples": 673,
+      "passed_as_reported": true,
+      "one_shot": null,
+      "seamless_loop": null,
+      "nominal_speed_m_s": 1.59936,
+      "max_waist_gap_m": null,
+      "maximum_waist_separation_m": {
+        "L": 0.05971139806206338,
+        "R": 0.056070766411721706
+      },
+      "max_ground_anchor_drift_m": null,
+      "maximum_support_drift_m": 1.4600536212131124E-06,
+      "unsupported_sample_count": 406,
+      "junctions": null
+    },
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/walk_snappy_v028_motion_study/motion_validation.json",
+      "evidence_type": "historical saved validation; not rerun",
+      "report_sha256": "c5485466ddd43da0b547fccc741320bb04532f14c230d4a9068616e3be748263",
+      "source_sha256_as_reported": "2da9e6335be107568e9696fa39fd68d1516083f42bccade44f247bc5823329b8",
+      "action_sha256_as_reported": "e02b38c6f560300c2869aedd18e6a0a2eb9a000796b9498c041d75355b5b9deb",
+      "samples": 673,
+      "passed_as_reported": true,
+      "one_shot": null,
+      "seamless_loop": null,
+      "nominal_speed_m_s": 1.59936,
+      "max_waist_gap_m": null,
+      "maximum_waist_separation_m": {
+        "L": 0.03654005564749241,
+        "R": 0.03745215234812349
+      },
+      "max_ground_anchor_drift_m": null,
+      "maximum_support_drift_m": 9.807321988452496E-07,
+      "unsupported_sample_count": 464,
+      "junctions": null
+    },
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/walk_snappy_one_step_v001/motion_validation.json",
+      "evidence_type": "historical saved validation; not rerun",
+      "report_sha256": "96d04bbf43be5d7341db33d8c94c02a2dd01b07ab6c60fbd5b4de0a95372f3fd",
+      "source_sha256_as_reported": "6d294b3e62f22bf2b1ad0803e2697b51914d00da4d734c23aaec6d4d3188d946",
+      "action_sha256_as_reported": "6807d45fd103e94c8c6e70d8314d26e417d4bd255073320acc7d79b925d688b7",
+      "samples": 769,
+      "passed_as_reported": true,
+      "one_shot": true,
+      "seamless_loop": false,
+      "nominal_speed_m_s": null,
+      "max_waist_gap_m": 0.06170334280614043,
+      "maximum_waist_separation_m": null,
+      "max_ground_anchor_drift_m": 1.1735197998250014E-06,
+      "maximum_support_drift_m": null,
+      "unsupported_sample_count": 0,
+      "junctions": null
+    },
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/walk_snappy_one_step_v002/motion_validation.json",
+      "evidence_type": "historical saved validation; not rerun",
+      "report_sha256": "a65d95d0a8231725d66580041628f69c99b2aaf39353205f14c4eed7f7a2d470",
+      "source_sha256_as_reported": "e5c60a13b89e3fcdf8b273860a2cc52ee4c0b62ad286d639cfda8ca6942e5cb1",
+      "action_sha256_as_reported": "4b4a853133f89e1afb05a79e34557d013d4f9100678ad53eb3130f2ffec31c6f",
+      "samples": 2689,
+      "passed_as_reported": true,
+      "one_shot": true,
+      "seamless_loop": false,
+      "nominal_speed_m_s": null,
+      "max_waist_gap_m": 0.060177357474458404,
+      "maximum_waist_separation_m": null,
+      "max_ground_anchor_drift_m": 1.8201105752879633E-06,
+      "maximum_support_drift_m": null,
+      "unsupported_sample_count": 0,
+      "junctions": [
+        {
+          "time_s": 0.35,
+          "tiny_step_velocity_difference_m_s": 0.0180100738164641,
+          "second_order_velocity_difference_m_s": 0.0025664627720845923,
+          "finite_step_s": 0.0003333333333333333
+        },
+        {
+          "time_s": 0.7,
+          "tiny_step_velocity_difference_m_s": 0.010259100483690801,
+          "second_order_velocity_difference_m_s": 0.003450286568365837,
+          "finite_step_s": 0.0003333333333333333
+        },
+        {
+          "time_s": 1.05,
+          "tiny_step_velocity_difference_m_s": 0.018201388698342407,
+          "second_order_velocity_difference_m_s": 0.0027294762472761416,
+          "finite_step_s": 0.0003333333333333333
+        }
+      ]
+    }
+  ],
+  "fresh_pixel_inspection": [
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/walk_snappy_one_step_v002/normalized_first_step_1.jpg",
+      "sha256": "1dec0dd1ec9fa8cee4aabf9c0bd81cc15db12815174d026a2f7aa63a1ffcc242",
+      "access": "fresh view_image pixels of existing sheet",
+      "scope": "static silhouettes and ordered phases; not native-speed viewing"
+    },
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/walk_snappy_one_step_v002/normalized_first_step_2.jpg",
+      "sha256": "f467ad4b25542442f70e34e8cb4c0190c546e8f593b1884b1434d0c9eb6af44b",
+      "access": "fresh view_image pixels of existing sheet",
+      "scope": "static silhouettes and ordered phases; not native-speed viewing"
+    },
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/walk_snappy_v028_motion_study/synchronized_frames_2.jpg",
+      "sha256": "ab8b7844dcc8c6283951b158c6c55e5125b47ae607431c9ccdf74f27eea27b9d",
+      "access": "fresh view_image pixels of existing sheet",
+      "scope": "static silhouettes and ordered phases; not native-speed viewing"
+    }
+  ],
+  "historical_runtime_summary": {
+    "path": "docs/animation/reviews/godot_turn_spin_jump2m_v1/checks_summary.json",
+    "sha256": "fd28728e42c39547636eadd5fd8572df323a3e625c0c3651873b7a68a098766a",
+    "suites": 24,
+    "checks": 2282.0,
+    "all_exits_zero": true,
+    "rerun": false,
+    "limits": [
+      "render30/60FPS with60Hz physics in isolated lab",
+      "hard-turn same-contact releases retained",
+      "normalized acceleration guard differs from previous absolute guard",
+      "no artistic/phone certification"
+    ]
+  },
+  "runtime_paths": {
+    "main": "project.godot:18 -> WorldMap.tscn -> world_map.gd:5,19 -> CuboidPlayerJumpGifV004.tscn",
+    "main_controller": "V004 -> V003 -> cuboid_player",
+    "main_visual": "V004 -> V003 -> R15 -> R13 -> R6p -> ReadyE3 -> DrawD5 -> HolsterD2 -> BlockyV7 -> player_animation_v2 -> cuboid_animation",
+    "expressive_lab": "ExpressiveLocomotionTest -> directional review -> ExpressiveDirectionalPlayer -> ExpressiveJumpPlayer; separate from F5 actor",
+    "main_phase": "R6p40-46: normalized clip-time clock while moving; not distance driven",
+    "lab_phase": "expressive_locomotion_visual118-133: actual speed/stride distance clock with support duty latching",
+    "audio_search_scope": "game_mobile_3d/scripts and scenes/dev .gd files; no footstep dispatcher found; combat_audio stream register has no footstep event"
+  },
+  "unknowns": [
+    "Oreville hidden rig/curves/IK/state graph",
+    "exact pack version of local recordings",
+    "reference true3D contact and flight",
+    "exact reference shoulder/head delays",
+    "native-speed artistic preference from this sub-audit",
+    "target phone performance"
+  ]
+}
