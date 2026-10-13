@@ -1,0 +1,54 @@
+[
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\ACTIONS_AND_STUFF_PLAYER_DEEP_RESEARCH.md",
+    "sha256": "2ddf3e191d49d420dfe475ef36444253696a2163173eaf3394c14df116dcd8c0"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\README.md",
+    "sha256": "1bf8fc7810a3e5ee8ab7f14e70f87362f0ced9d791ba0b03eb2d5a680b25b3a8"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\ANIMATION_STYLE_GUIDE.md",
+    "sha256": "ff3a5d353d2b3c4d78b1f2ddd5a2c7b4018bcaee298a1a686243a0f1e3d5d539"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\ANIMATION_EXPANSION_GUIDE.md",
+    "sha256": "cf9c0491d5e2f91388c5d3075abe496a00cbbd8730421acfb4036ed3ef7b942d"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\frame_observations.csv",
+    "sha256": "5900df067245b89d6871ba6a6160a0adfd8831f6e4e1b3c9652f5980e7664aab"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\cycles.json",
+    "sha256": "9d42e1480b41356e2fba34565eff080c537e184a54da4d71e01ed36931d149f5"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\measurement_limits.json",
+    "sha256": "174645ca8c99f230d19109db6fb071139d2430011ba25e2952876d65b9954bf3"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\walk_cycle_1_F30_50.jpg",
+    "sha256": "e6cc26d63480ff4bd43a5935e28b9a5a75b31671bd234b0be208965922c506c6"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\walk_cycle_2_F50_70.jpg",
+    "sha256": "d43d821c8d08ece87918bad342a1424fb132f52643dc08d929360729d79c9ff1"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\walk_cycle_3_F70_90.jpg",
+    "sha256": "4f790346a93b1e733b341afa708ef18f1c76ec1125d33431cd34e9c29e64c0f0"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\reference_timeline.png",
+    "sha256": "6902497e62f5ebe528c5ae20fe2b0e41fc322771a148d2a6aac8497d30e11732"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\walk_screen_proxy_curves.png",
+    "sha256": "7a0bda0ed81af5851918e77400a99037d595db455521e362fc8ee61cfaa4da9f"
+  },
+  {
+    "path": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\docs\\animation\\research\\actions_and_stuff_deep_2026_10_14\\walk_limb_proxies.png",
+    "sha256": "f285e0360ad4cd4ca5550d0e35beab2a6ad8f4a4e99e8f20b99de7eae24aa545"
+  }
+]

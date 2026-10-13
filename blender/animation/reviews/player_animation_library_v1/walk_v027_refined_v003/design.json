@@ -20,5 +20,22 @@
   "clock_blend": "sin(pi*x)^4 only after vertical support release; zero lead at next contact",
   "body_head_arm_curves_and_world_poses_exact": true,
   "lowest_sole_height_envelope_exact_from_v002": true,
-  "action_sha256": "1980fb7da676154c20f426d1ab43001da50315c37f10d9369424b0efcc73d960"
+  "action_sha256": "1980fb7da676154c20f426d1ab43001da50315c37f10d9369424b0efcc73d960",
+  "recovery_only_outward_clearance_limit_m": 0.004,
+  "track_probe": {
+    "tracks_m": 0.267,
+    "leg_width_m": 0.225,
+    "nominal_gap_m": 0.04200000000000001,
+    "probes": [
+      {
+        "tracks_m": 0.265,
+        "minimum_leg_separation_m": -0.0006808885373175144
+      },
+      {
+        "tracks_m": 0.267,
+        "minimum_leg_separation_m": 0.001311462838202715
+      }
+    ]
+  },
+  "zero_gap_rejected_by_user": true
 }

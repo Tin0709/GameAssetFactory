@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "protected_files": 6565,
+  "same_action_and27_entries": true,
+  "all26_other_actions_and_entries_exact": true,
+  "previous_v003_source_and_reviews_exact": true,
+  "leg_world_motion_and_cadence_preserved": true,
+  "body_compression_multiplier": 1.25,
+  "godot_unchanged": true,
+  "rig_unchanged": true
+}

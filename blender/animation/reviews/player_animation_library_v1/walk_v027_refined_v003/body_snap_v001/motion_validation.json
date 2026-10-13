@@ -1,0 +1,82 @@
+{
+  "source_sha256": "890d2fd97de5be46c7438cf7f6dfb1ab01f32265e6ebf38e156a13ac17edb34e",
+  "action_sha256": "0dbeafec0e7a3e1679798ddad7a7fdcc0c6dd93fdac1578d75d63e7eb472296a",
+  "samples": 1345,
+  "max_rigid_error_m": 2.524420341654121e-07,
+  "min_floor_clearance_m": 0.00039724260568618774,
+  "min_head_chest_gap_m": 0.004634893673937768,
+  "max_waist_gap_m": 0.072947505133925,
+  "max_ground_anchor_drift_m": 2.817432890525731e-06,
+  "max_straight_arm_error": 2.4755668231600746e-07,
+  "unsupported_samples": 812,
+  "nonadjacent_overlaps": {},
+  "camera_bounds": {
+    "FRONT": [
+      0.2894043028354645,
+      0.14849884808063507,
+      0.7114432454109192,
+      0.8696901798248291
+    ],
+    "THREE_QUARTER": [
+      0.2628454864025116,
+      0.1410023272037506,
+      0.7303844690322876,
+      0.8764640688896179
+    ],
+    "SIDE": [
+      0.3262731730937958,
+      0.15173137187957764,
+      0.6667170524597168,
+      0.8692508935928345
+    ]
+  },
+  "one_shot": false,
+  "seamless_loop": true,
+  "all26_previous_actions_exact": true,
+  "rig_rest_exact": true,
+  "cycles_modifiers_valid": true,
+  "no_scale_tracks": true,
+  "passed": true,
+  "four_step_endpoint_pose_difference_m": 1.3328003749250113e-07,
+  "junctions": [
+    {
+      "time_s": 0.35,
+      "tiny_step_velocity_difference_m_s": 0.02632112026161862,
+      "second_order_velocity_difference_m_s": 0.007083492321173165,
+      "finite_step_s": 0.0003333333333333333
+    }
+  ],
+  "internal_contact_legacy_guard_passed": false,
+  "isolation_samples": 449,
+  "all_unaffected_curves_exact": true,
+  "max_authored_body_response_error": 3.5762786865234375e-07,
+  "max_lowest_sole_height_difference_m": 2.384185791015625e-07,
+  "airborne_mask_changes": 0,
+  "max_leg_world_matrix_error": 2.384185791015625e-07,
+  "max_leg_rotation_error_rad": 0.0,
+  "compression_checks": [
+    {
+      "contact_s": 0,
+      "old_compression_m": 0.041864633560180664,
+      "new_compression_m": 0.05233079195022583,
+      "multiplier": 1.25
+    },
+    {
+      "contact_s": 0.35,
+      "old_compression_m": 0.041864633560180664,
+      "new_compression_m": 0.05233079195022583,
+      "multiplier": 1.25
+    }
+  ],
+  "compression25_percent_verified": true,
+  "loop_playback_frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "loop_pose_error_m": 1.3328003749250113e-07,
+  "loop_raw_first_order_velocity_difference_m_s": 0.011670948652325193,
+  "loop_second_order_velocity_difference_m_s": 0.00421957212205677,
+  "loop_second_order_guard_passed": true,
+  "raw_first_order_legacy_guard_passed": false
+}

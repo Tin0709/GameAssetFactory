@@ -1,0 +1,27 @@
+{
+  "reference_source": "C:\\Users\\ADMIN\\Desktop\\walking.mp4",
+  "reference_sha256": "2b4930b899230814606fc3f6ce341e6966b82a91d6a5d4a665e3057938beab0c",
+  "reference_frames": 304,
+  "review_frames": 63,
+  "fps": 30,
+  "continuous_steps": 6,
+  "no_holds": true,
+  "native_speed": true,
+  "diagnostic_phase_mapping": "ReferenceF30+i; both modelF1+1.05i. Static phase normalization only; all videos1x. Reference cadence drift retained.",
+  "measured": {
+    "Before v003": {
+      "hip_min_m": 0.6803615093231201,
+      "hip_max_m": 0.8210371732711792,
+      "peak_hip_down_m_s": 1.2880516052246094,
+      "peak_hip_up_m_s": 2.278842926025419
+    },
+    "Updated v003": {
+      "hip_min_m": 0.669895350933075,
+      "hip_max_m": 0.8232913613319397,
+      "peak_hip_down_m_s": 1.2880516052246094,
+      "peak_hip_up_m_s": 2.6042175292969034
+    }
+  },
+  "measurement_grid_s": 0.0015625,
+  "interpretation": "User requested same v003 Action and25% more downward snap. Contact-to-trough compression increases from41.8646 to52.3308mm. Small2.5mm overshoot and close delayed head; exact leg world motion, cadence and spacing. No new proprietary keys or rig deformation."
+}

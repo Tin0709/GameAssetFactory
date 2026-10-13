@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "entries": 27,
+  "same_action_updated_in_place": true,
+  "other_actions_exact": 26,
+  "other_manifest_entries_exact": true,
+  "status": "pending",
+  "previous_v003_source_preserved": true,
+  "action_sha256": "0dbeafec0e7a3e1679798ddad7a7fdcc0c6dd93fdac1578d75d63e7eb472296a",
+  "source_sha256": "890d2fd97de5be46c7438cf7f6dfb1ab01f32265e6ebf38e156a13ac17edb34e",
+  "playback": [
+    1,
+    21
+  ],
+  "closing_key": 22
+}
