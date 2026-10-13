@@ -1,0 +1,32 @@
+{
+  "action": "Walk_Snappy_LegTiming_Test_v001",
+  "status": "pending",
+  "baseline": "Walk_Snappy_OneStep_Study_v002",
+  "frames": [
+    1,
+    42
+  ],
+  "closing_key": 43,
+  "fps": 30,
+  "step_s": 0.35,
+  "loop_duration_s": 1.4,
+  "nominal_speed_m_s": 1.59936,
+  "phase_lead_s": 0.02,
+  "lead_rise_window_s": [
+    0.03,
+    0.07
+  ],
+  "lead_constant_window_s": [
+    0.07,
+    0.18
+  ],
+  "lead_decay_window_s": [
+    0.18,
+    0.35
+  ],
+  "contact_compensation": "Y only: cancel stance travel difference, then C2 fade to zero by source step .095s",
+  "all_nonleg_curves_exact": true,
+  "nonleg_signature": "daa3ab7f1a39bd2631b701be856a2264a8e5952a0bf1c332fde4c85894823653",
+  "all23_previous_actions_exact": true,
+  "action_sha256": "c8c8480e52d86ad7bb22ae047e33b35238ef507d87078ef906fa6d0871a64d51"
+}
