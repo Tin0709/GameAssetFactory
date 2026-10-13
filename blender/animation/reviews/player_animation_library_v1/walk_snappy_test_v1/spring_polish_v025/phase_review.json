@@ -1,0 +1,54 @@
+{
+  "primary_contact_frames": [
+    1,
+    11.5
+  ],
+  "cycle_duration_s": 0.7,
+  "previous_nominal_sample_after_contact_s": 0.0455,
+  "body_cycles_per_stride": 2,
+  "body_peak_phases": [
+    0.33,
+    0.83
+  ],
+  "body_trough_phases": [
+    0.08,
+    0.58
+  ],
+  "peak_clearance_samples": [
+    {
+      "phase": 0.296,
+      "frame": 7.215999999999999,
+      "minimum_entire_character_floor_gap_m": 0.13790203630924225,
+      "hip_z_m": 0.8430913090705872
+    },
+    {
+      "phase": 0.784,
+      "frame": 17.464000000000002,
+      "minimum_entire_character_floor_gap_m": 0.13790032267570496,
+      "hip_z_m": 0.8374013900756836
+    }
+  ],
+  "lowering_samples": [
+    {
+      "phase": 0.42,
+      "lowering_leg": "R",
+      "hip_down_velocity_m_s": -1.4117785862513952,
+      "receiving_shoulder_velocity_m_s": -1.8971306937081476,
+      "other_shoulder_velocity_m_s": -0.9613377707345145
+    },
+    {
+      "phase": 0.92,
+      "lowering_leg": "L",
+      "hip_down_velocity_m_s": -1.4117785862513952,
+      "receiving_shoulder_velocity_m_s": -1.8673283713204523,
+      "other_shoulder_velocity_m_s": -1.0039125170026508
+    }
+  ],
+  "shoulder_height_difference_L_minus_R_m": [
+    -0.07314825057983398,
+    0.06960320472717285
+  ],
+  "minimum_head_chest_separating_axis_gap_m": 0.0009012966183945537,
+  "head_chest_clearance_samples": 337,
+  "passed": true
+}
