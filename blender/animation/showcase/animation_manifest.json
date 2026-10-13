@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/landing_head_v016/walk_snappy_review.blend",
-      "source_sha256": "4c83aae1b1304fc3db5f621dfa28e723b55efd7d26365322b95492bb47a7f0d0",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/body_independent_v018/walk_snappy_review.blend",
+      "source_sha256": "22e3a43c56c31cada8fee28e93f3ee493ac83aa3f310f6910a1ce91a0bf15492",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "1403a942245f2bb27f520fc93728289f7f4288d10e33879212efc6dbbc13861d",
+      "action_sha256": "d63abb1037cee52cd9c9ea2ba9f514211df619468e85ea049feb604827b8d1c4",
       "action_frame_range": [
         1.0,
         25.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Stronger receiving-side fall hips/spine/chest/head4/5.2/6.5/2.6deg, delayed32mm head lift and bounded2.2deg pitch response. Same24frames/30FPS/.8s walking speed,25%stronger bounce/137.5mm hop,84.961mm load (+25%extra landing depth), freer head40ms delay, smooth270mm piston/sole paths/tracks/yaw. Arm/root local curves exact current source.19other Actions and all previous sources preserved. Pending Blender only.",
+      "approval_note": "Stronger receiving-side fall hips/spine/chest/head4/5.2/6.5/2.6deg, delayed32mm head lift and bounded2.2deg pitch response. Same24frames/30FPS/.8s walking speed,25%stronger bounce/137.5mm hop,84.961mm load (+25%extra landing depth) over52ms, body-only smoother rounded rebound35%blend, leg world paths/commonhop unchanged, freer head40ms delay, smooth270mm piston/sole paths/tracks/yaw. Arm/root local curves exact current source.19other Actions and all previous sources preserved. Pending Blender only.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
