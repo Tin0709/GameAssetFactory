@@ -1,0 +1,102 @@
+[
+  {
+    "action": "Walk_Snappy_OneStep_Study_v002",
+    "start_time": 0,
+    "end_time": 1.4,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.006143273661174712,
+    "worst_groups": [
+      "ForeArm.R"
+    ]
+  },
+  {
+    "action": "Walk_Snappy_OneStep_Study_v002",
+    "start_time": 0,
+    "end_time": 0.7,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.005214427106738552,
+    "worst_groups": [
+      "ForeArm.R"
+    ]
+  },
+  {
+    "action": "Walk_Snappy_OneStep_Study_v002",
+    "start_time": 0.35,
+    "end_time": 1.05,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.002715161676238814,
+    "worst_groups": [
+      "ForeArm.L"
+    ]
+  },
+  {
+    "action": "Walk_Snappy_OneStep_Study_v002",
+    "start_time": 0.7,
+    "end_time": 1.4,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.0036733100266767987,
+    "worst_groups": [
+      "UpperArm.L"
+    ]
+  },
+  {
+    "action": "Walk_Snappy_OneStep_Study_v002",
+    "start_time": 0.03333333333333333,
+    "end_time": 0.7333333333333333,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.004500644069428404,
+    "worst_groups": [
+      "UpperArm.R"
+    ]
+  },
+  {
+    "action": "Walk_Snappy_LegTiming_Test_v001",
+    "start_time": 0,
+    "end_time": 1.4,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.006143273661174712,
+    "worst_groups": [
+      "ForeArm.R"
+    ]
+  },
+  {
+    "action": "Walk_Snappy_LegTiming_Test_v001",
+    "start_time": 0,
+    "end_time": 0.7,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.005214427106738552,
+    "worst_groups": [
+      "ForeArm.R"
+    ]
+  },
+  {
+    "action": "Walk_Snappy_LegTiming_Test_v001",
+    "start_time": 0.35,
+    "end_time": 1.05,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.002715161676238814,
+    "worst_groups": [
+      "ForeArm.L"
+    ]
+  },
+  {
+    "action": "Walk_Snappy_LegTiming_Test_v001",
+    "start_time": 0.7,
+    "end_time": 1.4,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.0036733100266767987,
+    "worst_groups": [
+      "UpperArm.L"
+    ]
+  },
+  {
+    "action": "Walk_Snappy_LegTiming_Test_v001",
+    "start_time": 0.03333333333333333,
+    "end_time": 0.7333333333333333,
+    "pose_error_m": 0.0,
+    "velocity_error_m_s": 0.004500644069428404,
+    "worst_groups": [
+      "UpperArm.R"
+    ]
+  }
+]

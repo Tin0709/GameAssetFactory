@@ -1,12 +1,12 @@
 {
-  "source_sha256": "15e68bd82a5768c8daa0d5c5ac54d66067637dfcc0b42ab72c32ed16c358d216",
-  "action_sha256": "c8c8480e52d86ad7bb22ae047e33b35238ef507d87078ef906fa6d0871a64d51",
+  "source_sha256": "24f18208240279e4865979b5b116830c857ec3d13e50ca2370abfa28cfd4406f",
+  "action_sha256": "f231b92435d21e8d8d17fb820181a6137fa3559ec3054e6171a5d19c63fac18d",
   "samples": 2689,
   "max_rigid_error_m": 2.4007419463512036e-07,
-  "min_floor_clearance_m": 0.00039928779006004333,
+  "min_floor_clearance_m": 0.00039938464760780334,
   "min_head_chest_gap_m": 0.03378078545210883,
   "max_waist_gap_m": 0.06017723826516885,
-  "max_ground_anchor_drift_m": 2.578149687045294e-06,
+  "max_ground_anchor_drift_m": 2.5358155659050534e-06,
   "max_straight_arm_error": 2.2745635393967848e-07,
   "unsupported_samples": 0,
   "nonadjacent_overlaps": {},
@@ -30,8 +30,8 @@
       0.8644430637359619
     ]
   },
-  "one_shot": true,
-  "seamless_loop": false,
+  "one_shot": false,
+  "seamless_loop": true,
   "all23_previous_actions_exact": true,
   "rig_rest_exact": true,
   "no_cycles_modifiers": true,
@@ -63,9 +63,14 @@
   "max_nonleg_world_matrix_error": 0.0,
   "max_time_mapped_leg_position_error_m": 1.7944340935537725e-07,
   "max_time_mapped_leg_rotation_error_rad": 0.0,
-  "maximum_contact_validity_Y_correction_m": 0.02282570791870752,
+  "maximum_contact_validity_Y_correction_m": 0.031986844080465815,
+  "loop_playback_frames": [
+    22,
+    42
+  ],
+  "closing_key": 43,
   "loop_pose_error_m": 0.0,
-  "loop_raw_first_order_velocity_difference_m_s": 0.016663549558425698,
-  "loop_second_order_velocity_difference_m_s": 0.006143273661174712,
-  "loop_second_order_guard_passed": false
+  "loop_raw_first_order_velocity_difference_m_s": 0.015195239480749984,
+  "loop_second_order_velocity_difference_m_s": 0.0036733100266767987,
+  "loop_second_order_guard_passed": true
 }

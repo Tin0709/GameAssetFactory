@@ -1,0 +1,87 @@
+{
+  "reference_source": "C:\\Users\\ADMIN\\Desktop\\walking.mp4",
+  "reference_sha256": "2b4930b899230814606fc3f6ce341e6966b82a91d6a5d4a665e3057938beab0c",
+  "reference_decoded_frames": 304,
+  "review_frames": 63,
+  "review_s": 2.1,
+  "continuous_model_steps": 6,
+  "fps": 30,
+  "no_holds": true,
+  "no_time_normalization_in_videos": true,
+  "reference_exchange_evidence": "F33-35 /53-55 /73-75,15-25%full cycle /30-50%step; pose families, not exact contacts",
+  "phase_mapping": "ReferenceF30+i; V028 F1+1.05i; control/test F22+1.05i",
+  "authored_release_s": {
+    "control": 0.065,
+    "timing": 0.045
+  },
+  "measured": {
+    "control": {
+      "L": {
+        "release_above_0_5mm_s": 0.06718750000000001,
+        "lift_crest_s": 0.12552083333333336,
+        "lift_crest_m": 0.2904001474380493,
+        "passing_s": 0.1552083333333334,
+        "peak_forward_speed_m_s": 9.325711727141865,
+        "sole_Y_range_m": [
+          -0.3621140122413635,
+          0.33503344655036926
+        ]
+      },
+      "R": {
+        "release_above_0_5mm_s": 0.0671875,
+        "lift_crest_s": 0.125,
+        "lift_crest_m": 0.2904001474380493,
+        "passing_s": 0.15520833333333334,
+        "peak_forward_speed_m_s": 9.325479269027738,
+        "sole_Y_range_m": [
+          -0.36211419105529785,
+          0.3350333273410797
+        ]
+      }
+    },
+    "timing": {
+      "L": {
+        "release_above_0_5mm_s": 0.04739583333333336,
+        "lift_crest_s": 0.10520833333333335,
+        "lift_crest_m": 0.29040029644966125,
+        "passing_s": 0.13541666666666669,
+        "peak_forward_speed_m_s": 9.326090812683141,
+        "sole_Y_range_m": [
+          -0.36211416125297546,
+          0.3350139558315277
+        ]
+      },
+      "R": {
+        "release_above_0_5mm_s": 0.04739583333333333,
+        "lift_crest_s": 0.10520833333333333,
+        "lift_crest_m": 0.2904002070426941,
+        "passing_s": 0.13541666666666666,
+        "peak_forward_speed_m_s": 9.325883388519323,
+        "sole_Y_range_m": [
+          -0.3621143698692322,
+          0.33501386642456055
+        ]
+      }
+    }
+  },
+  "native30_worst_sole_displacement": {
+    "control": {
+      "side": "R",
+      "video_frame_pair": [
+        4,
+        5
+      ],
+      "displacement_m": 0.2942305033195649,
+      "interval_s": 0.03333333333333333
+    },
+    "timing": {
+      "side": "L",
+      "video_frame_pair": [
+        14,
+        15
+      ],
+      "displacement_m": 0.29625618217932187,
+      "interval_s": 0.03333333333333333
+    }
+  }
+}

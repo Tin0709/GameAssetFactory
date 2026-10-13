@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "controls": [
+    {
+      "label": "v028",
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\walk_snappy_v028_motion_study\\walk_snappy_v028_review.blend",
+      "source_sha256": "2da9e6335be107568e9696fa39fd68d1516083f42bccade44f247bc5823329b8",
+      "action_sha256": "e02b38c6f560300c2869aedd18e6a0a2eb9a000796b9498c041d75355b5b9deb",
+      "review_start_frame": 1,
+      "rendered_frames": 63,
+      "fps": 30,
+      "temporary_repeat_only": true,
+      "read_only": true
+    },
+    {
+      "label": "control_v002",
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\walk_snappy_one_step_v002\\walk_one_step_v002_review.blend",
+      "source_sha256": "e5c60a13b89e3fcdf8b273860a2cc52ee4c0b62ad286d639cfda8ca6942e5cb1",
+      "action_sha256": "4b4a853133f89e1afb05a79e34557d013d4f9100678ad53eb3130f2ffec31c6f",
+      "review_start_frame": 22,
+      "rendered_frames": 63,
+      "fps": 30,
+      "temporary_repeat_only": true,
+      "read_only": true
+    }
+  ]
+}
