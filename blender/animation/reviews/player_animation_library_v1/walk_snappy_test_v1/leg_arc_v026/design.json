@@ -63,5 +63,29 @@
   "common_hop_m": 0.1375,
   "lift_curve_exact_from": "v025",
   "support_motion_exact": true,
-  "action_sha256": "e0a67106bd7d2f6a533e4884210978889fd8c8a95c385c8a19bfbf7d18444362"
+  "action_sha256": "e0a67106bd7d2f6a533e4884210978889fd8c8a95c385c8a19bfbf7d18444362",
+  "source_sha256": "4fc765d58722ecbee30b449b78c5a2a794d1fd85df2b10143268a7ed20eb237e",
+  "body_head_arm_root_world_matrix_max_error": 0.0,
+  "support_world_matrix_max_error": 1.1920928955078125e-07,
+  "body_excursion_m": 0.15,
+  "body_z_range_m": [
+    0.68,
+    0.83
+  ],
+  "body_cycles_per_stride": 2,
+  "body_roll_yaw_unchanged_from": "v025",
+  "contact_frames": {
+    "L": 1,
+    "R": 11.5
+  },
+  "leg_tracks_m": 0.27,
+  "source_reference": "User recording analyzed as consecutive silhouettes; original curves/rig not known",
+  "fore_aft_jerk_reduction_percent": {
+    "L": 24.63843467783804,
+    "R": 26.263600631134175
+  },
+  "pitch_jerk_reduction_percent": {
+    "L": 54.23645523179206,
+    "R": 56.15826867063485
+  }
 }

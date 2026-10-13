@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "protected_existing_files_checked": 5809,
+  "allowed_existing_changes": [
+    "AGENTS.md",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/README.md",
+    "blender/animation/showcase/animation_manifest.json",
+    "docs/animation/ANIMATION_PROGRESS.md"
+  ],
+  "all19_other_actions_and_manifest_entries_exact": true,
+  "all_previous_sources_reviews_preserved": true,
+  "approved_actions_paused_rifle_idle_rig_godot_production_weapon_showcase_exact": true,
+  "reports_passed": [
+    "motion_validation",
+    "comparison_validation",
+    "registration",
+    "showcase_validation",
+    "appearance_validation",
+    "gui_playback",
+    "phase_review",
+    "media_validation"
+  ],
+  "review_links_verified": 23
+}
