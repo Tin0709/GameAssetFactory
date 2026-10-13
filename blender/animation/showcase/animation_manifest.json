@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/leg_arc_v026/walk_snappy_review.blend",
-      "source_sha256": "4fc765d58722ecbee30b449b78c5a2a794d1fd85df2b10143268a7ed20eb237e",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/soft_landing_v027/walk_snappy_review.blend",
+      "source_sha256": "0ff3dbeff6d101dc87dbe70e6b9eb8ec2de0150d165974f5a88422556b881901",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "e0a67106bd7d2f6a533e4884210978889fd8c8a95c385c8a19bfbf7d18444362",
+      "action_sha256": "8d9d809cc0078f98b1f6b6b43f6a7c8365c70bc11160e9efb9bdaaf42fbd5cb6",
       "action_frame_range": [
         1.0,
         22.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Leg-only continuous recovery refinement versus v025: optimized C2 quintic forward path preserves push/receive endpoints, extrema and passing position; softened14ms swing pitch with exact support. Evaluated foot-center jerk24.6-26.3%lower; leg-pitch jerk54.2-56.2%lower. Body/head/arms/root exact, same21frame cadence/270mm piston/137.5mm hop/1.59936m/s diagnostic travel.19other Actions and previous versions preserved. Pending Blender review.",
+      "approval_note": "Leg-only softer vertical arrival versus v026. Vertical lift begins31.5ms earlier with same ascent duration and20-21%longer piston descent; sixth-order arrival. Actual sole downward RMS speed in final100ms34.5-34.7%lower, peakdown31.4-33.2%lower. Body/head/arms/root and leg rotations exact; fore-aft paths/cadence/travel unchanged.270mm net piston and137.5mm common hop retained, but combined peak sole height37-41mm lower due to different phase overlap.19other Actions/previous versions preserved. Pending Blender review.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
@@ -843,10 +843,10 @@
         "R": 11.5
       },
       "support_duty": {
-        "L": 0.64,
-        "R": 0.66
+        "L": 0.595,
+        "R": 0.615
       },
-      "presentation_note": "In-place21frames/30FPS, closing22excluded. Continuous lifted-leg arc with quieter changes in speed/tilt; exact v025 body/head rhythm, supported world leg poses and existing reach/contact timing. No scaling, rig or Godot edits."
+      "presentation_note": "In-place21frames/30FPS, closing22excluded, same1.59936m/s diagnostic travel and receivingF1/F11.5. Earlier vertical release gives feet longer to settle without slowing walk/body. Exact v026 torso/head rhythm, leg rotations and fore-aft trajectory; grounded support preserved until new release. No scaling, rig or Godot edits."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

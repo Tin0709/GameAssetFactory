@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "samples": 1024,
+  "timing_speed_and_nonleg_curves_exact": true,
+  "timing": {
+    "start": 1,
+    "end": 21,
+    "fps": 30,
+    "range": [
+      1.0,
+      22.0
+    ],
+    "speed": 1.59936,
+    "fixed": "313fbcdf654d3abc89959d632ec8781b64dbeb798aee5c92e97fc1319ebb1a0c"
+  },
+  "nonleg_world_matrix_max_error": 0.0,
+  "support_world_matrix_max_error": 1.7881393432617188e-07,
+  "leg_world_orientation_max_error": 0.0,
+  "leg_world_horizontal_center_max_error_m": 2.9802322387695312e-08,
+  "all_nonleg_world_motion_preserved": true,
+  "landing_metrics": {
+    "L": {
+      "final100ms_vertical_speed_rms": {
+        "before": 2.8044668020340557,
+        "after": 1.8381867170503001,
+        "ratio": 0.6554496261881506
+      },
+      "final100ms_peak_down_speed_m_s": {
+        "before": 4.8784294693754955,
+        "after": 3.259068335922646,
+        "ratio": 0.6680568728894324
+      },
+      "actual_peak_sole_height_m": {
+        "before": 0.40737876296043396,
+        "after": 0.37019509077072144
+      },
+      "piston_peak_to_ground_duration_s": {
+        "before": 0.15749999999999997,
+        "after": 0.189,
+        "ratio": 1.2000000000000002
+      },
+      "earlier_vertical_release_s": 0.0315
+    },
+    "R": {
+      "final100ms_vertical_speed_rms": {
+        "before": 3.132764408023174,
+        "after": 2.0460016172302575,
+        "ratio": 0.6530978237592141
+      },
+      "final100ms_peak_down_speed_m_s": {
+        "before": 5.170268754491651,
+        "after": 3.54517914436156,
+        "ratio": 0.6856856602051296
+      },
+      "actual_peak_sole_height_m": {
+        "before": 0.40734532475471497,
+        "after": 0.36678633093833923
+      },
+      "piston_peak_to_ground_duration_s": {
+        "before": 0.14874999999999997,
+        "after": 0.17966666666666664,
+        "ratio": 1.207843137254902
+      },
+      "earlier_vertical_release_s": 0.0315
+    }
+  },
+  "measurement": "Matched evaluated minimum sole height; same final100ms before receiving, including unchanged common hop. FFT derivatives above60Hz omitted equally. Earlier lift releases vertical support31.5ms earlier; horizontal path/cadence unchanged.",
+  "body_head_motion_unchanged": true,
+  "common_hop_unchanged": true
+}

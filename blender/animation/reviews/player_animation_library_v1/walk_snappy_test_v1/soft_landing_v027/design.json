@@ -1,0 +1,26 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "version": "soft_landing_v027",
+  "body_head_arm_root_local_curves_exact": true,
+  "leg_rotation_curves_exact": true,
+  "fore_aft_leg_motion_exact": true,
+  "frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "fps": 30,
+  "period_s": 0.7,
+  "speed_m_s": 1.59936,
+  "earlier_vertical_release_s": 0.0315,
+  "support_duty": {
+    "L": 0.595,
+    "R": 0.615
+  },
+  "net_piston_lift_m": 0.27,
+  "common_leg_hop_m": 0.1375,
+  "vertical_curve": "270mm normalized t^3*(1-t)^6; earlier vertical release, same ascent duration and longer descent",
+  "lift_peak_swing_fraction": 0.3333333333333333,
+  "action_sha256": "8d9d809cc0078f98b1f6b6b43f6a7c8365c70bc11160e9efb9bdaaf42fbd5cb6"
+}
