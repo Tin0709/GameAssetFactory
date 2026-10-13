@@ -1,0 +1,59 @@
+{
+  "reference_source": "C:\\Users\\ADMIN\\Desktop\\walking.mp4",
+  "reference_sha256": "2b4930b899230814606fc3f6ce341e6966b82a91d6a5d4a665e3057938beab0c",
+  "reference_frames": 304,
+  "review_frames": 63,
+  "fps": 30,
+  "continuous_steps": 6,
+  "no_holds": true,
+  "native_speed": true,
+  "diagnostic_phase_mapping": "ReferenceF30+i; both modelF1+1.05i. Static phase normalization only; all videos1x. Reference cadence drift retained.",
+  "measured": {
+    "Previous v002": {
+      "R": {
+        "peak_sole_m": 0.33373400568962097,
+        "peak_down_m_s": 3.2501792907714986,
+        "final100ms_down_rms_m_s": 1.747898020256533,
+        "vertical_acceleration_rms_m_s2": 79.13618704249997,
+        "passing_s": 0.1859375,
+        "peak_forward_m_s": 6.660594940185572
+      },
+      "L": {
+        "peak_sole_m": 0.3398067355155945,
+        "peak_down_m_s": 3.1799507141112855,
+        "final100ms_down_rms_m_s": 1.6106642188019178,
+        "vertical_acceleration_rms_m_s2": 74.96583922297566,
+        "passing_s": 0.17656250000000007,
+        "peak_forward_m_s": 6.176548004150522
+      },
+      "body": {
+        "minimum_m": 0.6803615093231201,
+        "maximum_m": 0.8210371732711792
+      }
+    },
+    "Restored / snap v003": {
+      "R": {
+        "peak_sole_m": 0.3337339162826538,
+        "peak_down_m_s": 3.250217437744155,
+        "final100ms_down_rms_m_s": 1.7478981702622318,
+        "vertical_acceleration_rms_m_s2": 79.1361904221247,
+        "passing_s": 0.178125,
+        "peak_forward_m_s": 7.6634311676025
+      },
+      "L": {
+        "peak_sole_m": 0.33980679512023926,
+        "peak_down_m_s": 3.1799793243407777,
+        "final100ms_down_rms_m_s": 1.6106639299457346,
+        "vertical_acceleration_rms_m_s2": 74.96582204031303,
+        "passing_s": 0.16875000000000007,
+        "peak_forward_m_s": 7.060563564300438
+      },
+      "body": {
+        "minimum_m": 0.6803615093231201,
+        "maximum_m": 0.8210371732711792
+      }
+    }
+  },
+  "measurement_grid_s": 0.0015625,
+  "interpretation": "User rejected zero gap. Restore natural pre-zero leg roll/yaw on267mm tracks,42mm nominal gap versus45mm before. Up to4mm recovery-only outward clearance prevents passing pinch. Original v002 body/head/arms and lowest-sole Z exact.10ms additional airborne leg phase lead; no cadence increase or proprietary keys."
+}
