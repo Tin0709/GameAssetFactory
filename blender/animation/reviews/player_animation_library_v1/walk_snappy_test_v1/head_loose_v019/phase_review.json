@@ -1,0 +1,43 @@
+{
+  "primary_contact_frames": [
+    1,
+    13
+  ],
+  "cycle_duration_s": 0.8,
+  "load_after_contact_s": 0.052000000000000005,
+  "peak_clearance_samples": [
+    {
+      "phase": 0.296,
+      "frame": 8.104,
+      "minimum_entire_character_floor_gap_m": 0.137902170419693,
+      "hip_z_m": 0.8863759636878967
+    },
+    {
+      "phase": 0.784,
+      "frame": 19.816000000000003,
+      "minimum_entire_character_floor_gap_m": 0.13790051639080048,
+      "hip_z_m": 0.8863745927810669
+    }
+  ],
+  "lowering_samples": [
+    {
+      "phase": 0.42,
+      "lowering_leg": "R",
+      "hip_down_velocity_m_s": -2.03549861907959,
+      "receiving_shoulder_velocity_m_s": -2.4512410163879395,
+      "other_shoulder_velocity_m_s": -1.6309320926666258
+    },
+    {
+      "phase": 0.92,
+      "lowering_leg": "L",
+      "hip_down_velocity_m_s": -1.9729137420654295,
+      "receiving_shoulder_velocity_m_s": -2.3618340492248535,
+      "other_shoulder_velocity_m_s": -1.6048550605773924
+    }
+  ],
+  "shoulder_height_difference_L_minus_R_m": [
+    -0.07315242290496826,
+    0.06959879398345947
+  ],
+  "passed": true
+}

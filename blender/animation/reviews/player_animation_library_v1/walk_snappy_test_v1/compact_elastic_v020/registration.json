@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "entries": 20,
+  "previous_other_actions_exact": 19,
+  "new_status": "pending",
+  "previous_pending_source_preserved": true,
+  "previous_pending_action_sha256": "efbe29c7859c41b1df69675b0a06be5d535de89bc2f08451ea4f98a2b5d8d662",
+  "action_sha256": "ef7621ffbba9a511f558da3df886ec8f5f8f31a7a0d04427b98eb1ade4127cb4",
+  "source_sha256": "fc2f31e8f795fb933026e5a1290ff183adbb48e051eb527a5ea44e4674f42ebb",
+  "slot_identifier": "OBRUN_Test_Rig"
+}

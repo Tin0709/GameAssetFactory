@@ -47,7 +47,7 @@
       0.5
     ]
   },
-  "body_motion": "More receiving-side fall: hips/spine/chest/head4/5.2/6.5/2.6deg.32mm delayed head rebound and bounded2.2deg pitch response. Current24frame/.8s speed, hip bounce25%stronger, extra25%landing depth softened52ms; body-only35%rounded rebound. Leg world paths/commonhop and current speed unchanged.",
+  "body_motion": "More receiving-side fall: hips/spine/chest/head4/5.2/6.5/2.6deg.32mm delayed head rebound and bounded2.2deg pitch response. Current24frame/.8s speed, hip bounce25%stronger, extra25%landing depth softened52ms; body-only20%rounded rebound. Leg world paths/commonhop and current speed unchanged.",
   "base_stride_support_duty": {
     "L": 0.64,
     "R": 0.66
@@ -101,8 +101,8 @@
   "head_delay_phase": 0.05,
   "head_pitch_limit_deg": 2.2,
   "landing_compression_extra_multiplier": 1.25,
-  "body_rebound_arc": "35%rounded earlier arc blended into torso only, legs unchanged in world space",
-  "body_secondary_independence_blend": 0.35,
+  "body_rebound_arc": "20%rounded earlier arc blended into torso only; legs unchanged fromv016",
+  "body_secondary_independence_blend": 0.2,
   "leg_world_motion_preserved_from": "landing_head_v016",
   "hop_arc": "unchanged leg commonhop fromv016",
   "load_time_s": 0.052

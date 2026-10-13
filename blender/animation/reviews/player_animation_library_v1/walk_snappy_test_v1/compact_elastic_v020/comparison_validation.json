@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "samples": 193,
+  "cycle_frames": 21,
+  "cycle_duration_s": 0.7,
+  "previous_cycle_duration_s": 0.8,
+  "step_reach_multiplier": 0.875,
+  "cadence_multiplier": 1.1428571428571428,
+  "diagnostic_travel_speed_preserved_m_s": 1.59936,
+  "distance_per_cycle_m": 1.1195519999999999,
+  "previous_distance_per_cycle_m": 1.279488,
+  "tracks_lift_recovery_phase_and_common_hop_preserved": true,
+  "reach_formula_error_m": 1.4901161193847656e-08,
+  "body_height_formula_error_m": 7.705328364249198e-07,
+  "arm_root_channels_exact_after_matching_retime": true,
+  "head_secondary_lift_range_m": [
+    0.0051563117920115885,
+    0.05387703542010169
+  ],
+  "head_response": "Smooth bounded inertial head lift driven by delayed torso height; pitch reacts to delayed torso velocity.",
+  "head_height_history_delay_s": 0.055999999999999994,
+  "head_pitch_limit_deg": 3.5,
+  "extra_body_delayed_rebound_range_m": [
+    -0.011990366539057051,
+    0.011855550601266418
+  ],
+  "body_delay_s": 0.020999999999999998,
+  "body_spine_chest_pitch_limits_deg": [
+    0.8,
+    1.4
+  ],
+  "base_body_independent_rebound_blend": 0.2
+}

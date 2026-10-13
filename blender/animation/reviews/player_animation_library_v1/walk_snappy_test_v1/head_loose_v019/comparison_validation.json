@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "samples": 193,
+  "timing_and_speed_exact": true,
+  "timing": {
+    "start": 1,
+    "end": 24,
+    "fps": 30,
+    "range": [
+      1.0,
+      25.0
+    ],
+    "speed": 1.59936,
+    "fixed": "ecb68adba12cc89ff02718d4f10b0e0dde163c6eb99fb085321c05184dc0233a"
+  },
+  "hip_bounce_amplitude_multiplier": 1.25,
+  "additional_landing_compression_multiplier": 1.25,
+  "landing_compression_m": 0.0849609375,
+  "hip_vertical_relation_max_error_m": 7.373055996851008e-07,
+  "sole_paths_preserved_except_requested_common_hop_reshaping": true,
+  "sole_relation_max_error_m": 3.839445397503571e-06,
+  "sole_comparison_tolerance_m": 1e-05,
+  "head_secondary_lift_range_m": [
+    0.0,
+    0.03999984264373779
+  ],
+  "head_delay_s": 0.05600000000000001,
+  "head_lift_formula_error_m": 4.045371964068323e-07,
+  "head_pitch_formula_error_rad": 7.553732207093988e-08,
+  "receiving_side_comparison": [
+    {
+      "phase": 0.0,
+      "old_shoulder_height_difference_m": 0.056728243827819824,
+      "new_shoulder_height_difference_m": 0.07315242290496826
+    },
+    {
+      "phase": 0.5,
+      "old_shoulder_height_difference_m": 0.053175926208496094,
+      "new_shoulder_height_difference_m": 0.06959879398345947
+    }
+  ],
+  "leg_world_motion_preserved_from_v016": true,
+  "leg_world_matrix_max_error": 1.1920928955078125e-07,
+  "body_only_independent_rebound_range_m": [
+    -0.0012955981765651132,
+    0.01220208896744887
+  ],
+  "load_time_s": 0.052,
+  "body_rebound_blend": 0.2
+}

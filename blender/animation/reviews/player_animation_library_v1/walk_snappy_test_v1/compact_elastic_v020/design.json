@@ -1,0 +1,48 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "fps": 30,
+  "period_s": 0.7,
+  "nominal_speed_m_s": 1.59936,
+  "root_motion": false,
+  "step_reach_multiplier_vs_v019": 0.875,
+  "cadence_multiplier_vs_v019": 1.1428571428571428,
+  "travel_speed_preserved": true,
+  "leg_tracks_m": 0.27,
+  "net_piston_lift_m": 0.27,
+  "common_hop_height_m": 0.1375,
+  "base_support_duty": {
+    "L": 0.64,
+    "R": 0.66
+  },
+  "measured_intentional_flight_time_s": 0.42291666666666666,
+  "contact_frames": {
+    "L": 1,
+    "R": 11.5
+  },
+  "contact_drop_m": 0.08184416762840341,
+  "nominal_load_time_s": 0.0455,
+  "body_z_range_m": [
+    0.5765303373336792,
+    0.885229229927063
+  ],
+  "body_motion": "20%rounded rebound plus bounded12mm delayed response; independent spine/chest pitch0.8/1.4deg. Hips/torso centerXfixed. Receiving-side tilt4/5.2/6.5/2.6deg retained.",
+  "head_motion": "Smooth5-55mm inertial lift from delayed torso height,3.5deg bounded pitch reacts to delayed torso velocity; delayed receiving-side head tilt.",
+  "head_height_history_delay_s": 0.056,
+  "body_history_delay_s": 0.021,
+  "head_lift_measured_range_m": [
+    0.0051563117920115885,
+    0.05387703542010169
+  ],
+  "arm_root_curves_exact_after_retime": true,
+  "all_19_other_actions_preserved": true,
+  "body_waist_gap_limit_m": 0.075,
+  "reference": "Original user video study preserved; this refinement uses original rig/curves only.",
+  "source_sha256": "fc2f31e8f795fb933026e5a1290ff183adbb48e051eb527a5ea44e4674f42ebb",
+  "action_sha256": "ef7621ffbba9a511f558da3df886ec8f5f8f31a7a0d04427b98eb1ade4127cb4"
+}

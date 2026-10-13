@@ -803,23 +803,23 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/body_independent_v018/walk_snappy_review.blend",
-      "source_sha256": "22e3a43c56c31cada8fee28e93f3ee493ac83aa3f310f6910a1ce91a0bf15492",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/compact_elastic_v020/walk_snappy_review.blend",
+      "source_sha256": "fc2f31e8f795fb933026e5a1290ff183adbb48e051eb527a5ea44e4674f42ebb",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "d63abb1037cee52cd9c9ea2ba9f514211df619468e85ea049feb604827b8d1c4",
+      "action_sha256": "ef7621ffbba9a511f558da3df886ec8f5f8f31a7a0d04427b98eb1ade4127cb4",
       "action_frame_range": [
         1.0,
-        25.0
+        22.0
       ],
       "start": 1,
-      "end": 24,
+      "end": 21,
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Stronger receiving-side fall hips/spine/chest/head4/5.2/6.5/2.6deg, delayed32mm head lift and bounded2.2deg pitch response. Same24frames/30FPS/.8s walking speed,25%stronger bounce/137.5mm hop,84.961mm load (+25%extra landing depth) over52ms, body-only smoother rounded rebound35%blend, leg world paths/commonhop unchanged, freer head40ms delay, smooth270mm piston/sole paths/tracks/yaw. Arm/root local curves exact current source.19other Actions and all previous sources preserved. Pending Blender only.",
+      "approval_note": "12.5%shorter fore/aft reach with21frames/30FPS/.7s cycle (14.286%quicker cadence), preserving1.59936m/s diagnostic travel. Same270mm piston lift/137.5mm commonhop/0.27mtracks. Body has extra12mm bounded delayed rebound and subtle independent spine/chest pitch; head5-55mm smooth inertial response with delayed3.5deg pitch. Stronger receiving-side follow retained.19otherActions and all previoussources preserved. Pending Blender only.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
@@ -836,17 +836,17 @@
         "Leg.L": "XYZ",
         "Leg.R": "XYZ"
       },
-      "closing_key": 37,
-      "nominal_speed_m_s": 0.9,
+      "closing_key": 22,
+      "nominal_speed_m_s": 1.59936,
       "contact_frames": {
         "L": 1,
-        "R": 19
+        "R": 11.5
       },
       "support_duty": {
-        "L": 0.6,
-        "R": 0.62
+        "L": 0.64,
+        "R": 0.66
       },
-      "presentation_note": "In-place 36-frame/30FPS expressive walk, closing37 excluded. Nominal speed0.9m/s; controller owns travel. Approved Idle v3 posture anchor; support-aware replants required for start/stop. Full-body absolute tracks, straight arms; weapon-layer/runtime transition validation outstanding. User-requested Pending refinement: stronger support-led pelvic sway and twist carried into rigid torso, steady gaze; feet/support timing unchanged. Additional user-requested Pending refinement:36mm fore/aft waist travel synchronized with receiving/reaching foot phases combines with76mm lateral sway into small diagonal body motion. Ground anchors, timing and static root unchanged. Latest user-requested Pending refinement:walking tracks narrowed from0.36m to0.32m (20mm inward per leg). Diagonal waist path, gait timing, toe angles and ground support logic preserved. Latest user-requested Pending correction:0.29m tracks approximately halve the visible gap of the0.36m stance shown in the viewport. Mild lateral whole-leg lean reduced to-0.5deg/+0.75deg to prevent rigid thigh intersections;5deg toe-out, diagonal waist path, stride timing and ground support logic preserved. Latest Pending refinement: lateral hip travel and dynamic torso side-roll halved; walking tracks narrowed from0.29m to0.27m. Fore/aft response, vertical receiving, stride timing,5deg toe-out and ground support retained. Whole-leg lateral lean eased to-0.25deg/+0.375deg after a measured thigh-clearance check."
+      "presentation_note": "Pending in-place21frame/30FPS snappy walk, closing22excluded.12.5%shorter sagittal reach and14.286%faster cadence preserve diagnostic travel1.59936m/s; rootstatic. Base support duty64%/66% is interrupted by intentional137.5mm flight, not actual grounded duty. Strong receiving-side follow, independent body rebound and inertial head response. Blender review only; runtime transitions unvalidated."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
