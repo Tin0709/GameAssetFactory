@@ -1,0 +1,51 @@
+{
+  "reference_source": "C:\\Users\\ADMIN\\Desktop\\walking.mp4",
+  "reference_sha256": "2b4930b899230814606fc3f6ce341e6966b82a91d6a5d4a665e3057938beab0c",
+  "reference_frames": 304,
+  "review_frames": 63,
+  "fps": 30,
+  "continuous_steps": 6,
+  "no_holds": true,
+  "native_speed": true,
+  "diagnostic_phase_mapping": "ReferenceF30+i; both modelF1+1.05i. Static phase normalization only; all videos1x. Reference cadence drift retained.",
+  "measured": {
+    "Previous v001": {
+      "R": {
+        "peak_sole_m": 0.3667948544025421,
+        "peak_down_m_s": 3.8265705108642294,
+        "final100ms_down_rms_m_s": 2.0476190936915266,
+        "vertical_acceleration_rms_m_s2": 84.92091028146012
+      },
+      "L": {
+        "peak_sole_m": 0.3702003061771393,
+        "peak_down_m_s": 3.6618423461914773,
+        "final100ms_down_rms_m_s": 1.8403820046530392,
+        "vertical_acceleration_rms_m_s2": 78.74174068398044
+      },
+      "body": {
+        "minimum_m": 0.680000901222229,
+        "maximum_m": 0.8299993872642517
+      }
+    },
+    "Softer / spring v002": {
+      "R": {
+        "peak_sole_m": 0.33373400568962097,
+        "peak_down_m_s": 3.2501792907714986,
+        "final100ms_down_rms_m_s": 1.747898020256533,
+        "vertical_acceleration_rms_m_s2": 79.13618704249997
+      },
+      "L": {
+        "peak_sole_m": 0.3398067355155945,
+        "peak_down_m_s": 3.1799507141112855,
+        "final100ms_down_rms_m_s": 1.6106642188019178,
+        "vertical_acceleration_rms_m_s2": 74.96583922297566
+      },
+      "body": {
+        "minimum_m": 0.6803615093231201,
+        "maximum_m": 0.8210371732711792
+      }
+    }
+  },
+  "measurement_grid_s": 0.0015625,
+  "interpretation": "User requested softer steps, springier jelly-like body and zero lateral gap. No proprietary animation keys; body is an original periodic damped response to receive/recover/settle events. Rig blocks are not scaled."
+}

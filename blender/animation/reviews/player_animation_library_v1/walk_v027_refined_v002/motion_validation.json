@@ -1,30 +1,30 @@
 {
-  "source_sha256": "34be64978622283499f391b8328dcb2038f720a7df1a71c953024c6c7750391e",
-  "action_sha256": "b372f269e134d4bf1499951a0bb2f3a61d76a232d3b46ee6f9bb22c28bf6bed9",
+  "source_sha256": "fd251d5ded1945d8bb563bd60f0443256dbc5c5c98f76e8e6f569733ecdb2de1",
+  "action_sha256": "24c09273498ba144438cfd11d0ef174cb06aaa010000a9780cbd41c9e0f2a722",
   "samples": 1345,
   "max_rigid_error_m": 2.524420341654121e-07,
   "min_floor_clearance_m": 0.0003973301500082016,
   "min_head_chest_gap_m": 0.003909794060746208,
-  "max_waist_gap_m": 0.07345358468592167,
-  "max_ground_anchor_drift_m": 2.544416907915148e-06,
+  "max_waist_gap_m": 0.07303217519074678,
+  "max_ground_anchor_drift_m": 7.243286467622793e-06,
   "max_straight_arm_error": 2.5288109106536417e-07,
   "unsupported_samples": 812,
   "nonadjacent_overlaps": {},
   "camera_bounds": {
     "FRONT": [
       0.2894043028354645,
-      0.1491350531578064,
+      0.14856436848640442,
       0.7114432454109192,
       0.8689491748809814
     ],
     "THREE_QUARTER": [
       0.2628454864025116,
-      0.1402837038040161,
+      0.13953477144241333,
       0.7303844690322876,
       0.875714898109436
     ],
     "SIDE": [
-      0.32965752482414246,
+      0.3279818296432495,
       0.15284287929534912,
       0.6631692051887512,
       0.8685427904129028
@@ -38,13 +38,13 @@
   "rig_rest_exact": true,
   "cycles_modifiers_valid": true,
   "no_scale_tracks": true,
-  "passed": false,
+  "passed": true,
   "four_step_endpoint_pose_difference_m": 1.6049041769309353e-07,
   "junctions": [
     {
       "time_s": 0.35,
-      "tiny_step_velocity_difference_m_s": 0.5424182583359719,
-      "second_order_velocity_difference_m_s": 22.075273957277886,
+      "tiny_step_velocity_difference_m_s": 0.02632112026161862,
+      "second_order_velocity_difference_m_s": 0.0074358436751717615,
       "finite_step_s": 0.0003333333333333333
     }
   ],
@@ -66,9 +66,9 @@
   ],
   "closing_key": 22,
   "loop_pose_error_m": 1.6049041769309353e-07,
-  "loop_raw_first_order_velocity_difference_m_s": 19.22848845904761,
-  "loop_second_order_velocity_difference_m_s": 22.10853283240626,
-  "loop_second_order_guard_passed": false,
+  "loop_raw_first_order_velocity_difference_m_s": 0.011670948652325193,
+  "loop_second_order_velocity_difference_m_s": 0.003512567510705565,
+  "loop_second_order_guard_passed": true,
   "raw_first_order_legacy_guard_passed": false,
   "nominal_leg_track_spacing_m": 0.225,
   "leg_width_m": 0.225,
