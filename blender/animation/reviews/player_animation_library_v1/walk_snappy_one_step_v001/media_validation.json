@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "one_step_front_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 13,
+      "codec": "h264",
+      "sha256": "c390735b9b127fdd046877ef8ad9f53e9345a63f46b7ce9e0cc1d5b5834231bd"
+    },
+    {
+      "file": "one_step_side_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 13,
+      "codec": "h264",
+      "sha256": "70333029dcaa69c7e3256ce079624ad5267c004e627fcc2001a4e0d27874ab43"
+    },
+    {
+      "file": "one_step_three_quarter_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 13,
+      "codec": "h264",
+      "sha256": "1583d4c10d134107dc065d86473e89500acf50932721953a22752be86fe4852f"
+    },
+    {
+      "file": "v028_actual_front_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 13,
+      "codec": "h264",
+      "sha256": "807a2f0df06ce982d05600cc145ed7f43fd37721585ac5aa7a672b2166a43d3c"
+    },
+    {
+      "file": "reference_v028_study_uncut_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 13,
+      "codec": "h264",
+      "sha256": "1dde26208e34a2753a5166450c48a464d3c7158e699e1a92926240e925aed188"
+    },
+    {
+      "file": "reference_v028_study_review_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 168,
+      "codec": "h264",
+      "sha256": "e98cb448e951ba9dcecc89727f2f155cc87686bd25d1d8360518e2a905a5602f"
+    },
+    {
+      "file": "one_step_three_views_review_1x.mp4",
+      "fps": 30.0,
+      "decoded_frames": 168,
+      "codec": "h264",
+      "sha256": "0297c041f5359dfd3fd6aa742fde41194efb106061ac6fdf6fcf5129af905ccf"
+    }
+  ],
+  "total_decoded_frames": 401
+}

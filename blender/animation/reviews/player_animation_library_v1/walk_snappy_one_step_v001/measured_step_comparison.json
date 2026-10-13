@@ -1,0 +1,12 @@
+{
+  "v028": {
+    "peak_forward_sole_speed_m_s": 9.834136068820975,
+    "peak_forward_sole_speed_time_s": 0.16499999999999998,
+    "right_sole_passes_hips_s": 0.175
+  },
+  "study": {
+    "peak_forward_sole_speed_m_s": 8.465999364852934,
+    "peak_forward_sole_speed_time_s": 0.16197916666666667,
+    "right_sole_passes_hips_s": 0.16302083333333334
+  }
+}
