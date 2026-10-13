@@ -1,0 +1,111 @@
+{
+  "reference_cycle": {
+    "start_frame": 30,
+    "closing_frame": 50,
+    "frames": 20,
+    "fps": 30,
+    "duration_s": 0.6666666666666666,
+    "contact_candidates": [
+      30,
+      40,
+      50
+    ],
+    "contact_uncertainty_frames": 1,
+    "selected_reason": "Two repeating front steps before larger camera/background change afterF50; originalF28-91 consecutive sheets also inspected."
+  },
+  "observed_phases": [
+    {
+      "frames": [
+        30,
+        31
+      ],
+      "phase": [
+        0,
+        0.05
+      ],
+      "event": "Extended receiving-like silhouette; placement/contact candidate, not certified sole contact"
+    },
+    {
+      "frames": [
+        31,
+        33
+      ],
+      "phase": [
+        0.05,
+        0.15
+      ],
+      "event": "Sharp cap/chest lowering; body low nearF32, cap remains low throughF33"
+    },
+    {
+      "frames": [
+        33,
+        35
+      ],
+      "phase": [
+        0.15,
+        0.25
+      ],
+      "event": "Brisk upward recovery and compact leg exchange"
+    },
+    {
+      "frames": [
+        35,
+        39
+      ],
+      "phase": [
+        0.25,
+        0.45
+      ],
+      "event": "Upper arc; opposite leg becomes long/readable, head tilt and arms continue reacting"
+    },
+    {
+      "frames": [
+        39,
+        40
+      ],
+      "phase": [
+        0.45,
+        0.5
+      ],
+      "event": "Next receiving-like placement; pattern repeatsF40-50"
+    }
+  ],
+  "v027_measured": {
+    "cycle_frames": 21,
+    "duration_s": 0.7,
+    "receiving": [
+      0,
+      0.5
+    ],
+    "hip_trough": [
+      0.08,
+      0.58
+    ],
+    "hip_crest": [
+      0.33,
+      0.83
+    ],
+    "common_hop_crest": [
+      0.296,
+      0.784
+    ],
+    "net_piston_crest": [
+      0.2433333333,
+      0.73
+    ],
+    "note": "Different limbs/events have different clocks; long six-order vertical ease was intentionally introduced in v027."
+  },
+  "three_differences": [
+    "Body spacing: reference short low/recovery episode followed by readable upper arc; V027 broad symmetric cosine distribution has little contrast between receiving and travel.",
+    "Leg exchange: reference compact passing/exchange over aboutF33-35 then readable extension; V027 horizontal passing occurs later around .30cycle, with prolonged vertical recovery/arrival.",
+    "Phase coherence: V027 body crest .33, common-hop crest .296, net piston .243 and arm/head delays are not organized around one receiving/release/passing event. Reference visibly clusters body recovery and leg exchange before its upper arc; exact 3D causal mechanism remains unknown."
+  ],
+  "focused_strategy": "Original shared receiving-step timing: receive0, load.085-.10, recover/release.15, passing/crest.25, upper arc.25-.33, controlled placement.43-.50. Preserve0.7s cadence,1.59936m/s diagnostic travel,0.680-0.830m body height and original proportions. No copied original curves.",
+  "limitations": [
+    "Reference cap/chest are2D screen proxies; camera correction approximate, not world COM. Raw/corrected curves shown separately.",
+    "Chest logo changes visibility; isolatedF38/F48 centroid kinks are not trusted as acceleration events.",
+    "Shoe-color candidates and shirt-hem tracking rejected for contact/body inference.",
+    "First long-baseline tracking afterF50 failed under camera/parallax; primary repeat restrictedF30-50.",
+    "Foot planting and flight percentage cannot be measured confidently from this front moving-camera clip."
+  ]
+}
