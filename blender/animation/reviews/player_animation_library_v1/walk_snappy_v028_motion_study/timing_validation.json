@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "body_before": {
+    "range_m": [
+      0.6800000433722797,
+      0.829999971085144
+    ],
+    "trough_phase": 0.080078125,
+    "crest_phase": 0.330078125,
+    "maximum_up_speed_m_s": 1.3721105968940202,
+    "maximum_down_speed_m_s": 1.3721108540533222,
+    "upper_quarter_time_fraction": 0.36279296875
+  },
+  "body_after": {
+    "range_m": [
+      0.680000000594883,
+      0.8300000000000001
+    ],
+    "trough_phase": 0.10009765625,
+    "crest_phase": 0.25,
+    "maximum_up_speed_m_s": 2.914770913206277,
+    "maximum_down_speed_m_s": 1.3660901190421881,
+    "upper_quarter_time_fraction": 0.42529296875
+  },
+  "body_amplitude_and_playback_speed_preserved": true,
+  "phase_warps": {
+    "L": {
+      "source_passing_phase": 0.7796626413544556,
+      "desired_passing_phase": 0.75,
+      "forward_warp_amplitude": 0.03515158121807359,
+      "minimum_phase_derivative": 0.7018993813944376,
+      "support_duty": 0.595
+    },
+    "R": {
+      "source_passing_phase": 0.7921273341671713,
+      "desired_passing_phase": 0.75,
+      "forward_warp_amplitude": 0.05576055005541896,
+      "minimum_phase_derivative": 0.5025615463699352,
+      "support_duty": 0.615
+    }
+  },
+  "body_common_hop_piston_crests_aligned_at": [
+    0.25,
+    0.75
+  ],
+  "reference_receiving_candidates": [
+    30,
+    40,
+    50
+  ],
+  "reference_uncertainty_frames": 1,
+  "interpretation": "Reference-informed event adaptation, not a claimed metric/curve match to proprietary3D animation. Technical checks establish invariants and continuity only."
+}

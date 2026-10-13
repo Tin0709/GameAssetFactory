@@ -32,23 +32,23 @@
     {
       "phase": 0.42,
       "lowering_leg": "R",
-      "hip_down_velocity_m_s": -0.9890113558088031,
-      "receiving_shoulder_velocity_m_s": -1.1776174817766463,
-      "other_shoulder_velocity_m_s": -0.7987022399902345
+      "hip_down_velocity_m_s": -0.9945460728236608,
+      "receiving_shoulder_velocity_m_s": -1.1835779462541853,
+      "other_shoulder_velocity_m_s": -0.8038112095424108
     },
     {
       "phase": 0.92,
       "lowering_leg": "L",
-      "hip_down_velocity_m_s": -0.9890113558088031,
-      "receiving_shoulder_velocity_m_s": -1.1886869158063618,
-      "other_shoulder_velocity_m_s": -0.8004052298409599
+      "hip_down_velocity_m_s": -0.9945460728236608,
+      "receiving_shoulder_velocity_m_s": -1.193795885358538,
+      "other_shoulder_velocity_m_s": -0.8063656943184989
     }
   ],
   "shoulder_height_difference_L_minus_R_m": [
-    -0.037285804748535156,
+    -0.037285685539245605,
     0.03283846378326416
   ],
-  "minimum_head_chest_separating_axis_gap_m": 0.0048248385428451,
+  "minimum_head_chest_separating_axis_gap_m": 0.004828190430998802,
   "head_chest_clearance_samples": 337,
   "passed": true
 }

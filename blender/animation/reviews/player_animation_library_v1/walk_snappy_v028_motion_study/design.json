@@ -33,7 +33,7 @@
     [
       0.33,
       0.828,
-      -0.08
+      -0.04
     ],
     [
       0.43,
@@ -60,7 +60,7 @@
     [
       0.33,
       0.135,
-      -0.08
+      -0.04
     ],
     [
       0.43,
@@ -95,5 +95,5 @@
   },
   "preserved_v027_action_sha256": "8d9d809cc0078f98b1f6b6b43f6a7c8365c70bc11160e9efb9bdaaf42fbd5cb6",
   "all20_previous_actions_exact": true,
-  "action_sha256": "5daef6878dc137eda1f1284eda1862d30ceefdc37d5a404e86f4d4529eac9016"
+  "action_sha256": "e02b38c6f560300c2869aedd18e6a0a2eb9a000796b9498c041d75355b5b9deb"
 }
