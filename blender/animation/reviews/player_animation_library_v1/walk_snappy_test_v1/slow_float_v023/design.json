@@ -1,0 +1,50 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "fps": 30,
+  "period_s": 0.7,
+  "nominal_speed_m_s": 1.59936,
+  "root_motion": false,
+  "leg_world_motion_preserved_from": "slower_bounce_v022",
+  "leg_rotation_curves_exact": true,
+  "leg_tracks_m": 0.27,
+  "net_piston_lift_m": 0.27,
+  "common_leg_hop_height_m": 0.1375,
+  "contact_frames": {
+    "L": 1,
+    "R": 11.5
+  },
+  "body_cycles_per_two_steps": 1,
+  "body_frequency_hz": 1.4285714285714286,
+  "body_curve": "Analytic periodic sine; continuous position/velocity/acceleration at loop.",
+  "body_mean_height_m": 0.7,
+  "body_excursion_m": 0.13,
+  "body_peak_phase": 0.25,
+  "body_trough_phase": 0.75,
+  "body_z_range_m": [
+    0.6349999904632568,
+    0.7649999856948853
+  ],
+  "receiving_roll_and_yaw_unchanged": true,
+  "head_height_history_delay_s": 0.0945,
+  "head_lift_authored_range_m": [
+    0.002787662585703329,
+    0.08721233741429667
+  ],
+  "head_pitch_limit_deg": 4,
+  "head_pitch_history_delay_s": 0.0595,
+  "head_lift_smoothing_sigma_s": 0.028,
+  "head_pitch_smoothing_sigma_s": 0.035,
+  "head_roll_smoothing_sigma_s": 0.035,
+  "head_world_fundamental_lag_s": 0.08301125341981087,
+  "arm_root_local_curves_exact": true,
+  "body_waist_gap_limit_m": 0.075,
+  "previous_per_step_absorption_superseded": true,
+  "source_sha256": "337c4bec31363adf37aa0df12626f8514dddee06266a55cd239fcc14a2b8cd18",
+  "action_sha256": "3bb8835bbba0b2e14203ed2e08d482ff03da945153d673592658aca2e9b452fe"
+}
