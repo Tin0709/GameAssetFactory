@@ -1148,6 +1148,60 @@
       ],
       "review_steps": 6,
       "baseline_action": "Walk_Snappy_V027_Refined_Test_v001"
+    },
+    {
+      "action": "Walk_Snappy_V027_Refined_Test_v003",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/walk_v027_refined_review.blend",
+      "source_sha256": "0b6ac0eb6399d382dedbf2292e6091a2b6c98ed9f7d99f01725a0f00bdd8fca6",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "1980fb7da676154c20f426d1ab43001da50315c37f10d9369424b0efcc73d960",
+      "action_frame_range": [
+        1.0,
+        22.0
+      ],
+      "start": 1,
+      "end": 21,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "User rejected zero gap and requested original natural leg motion with a slightly smaller gap and clearer snap. Separate v003 keeps exact v002 body/head/arms and lowest-sole vertical trajectory; restores v001 roll/yaw,267mm tracks/42mm nominal gap versus270/45mm.10ms additional airborne phase lead, unchanged contacts/cadence. Up to4mm recovery-only outward clearance avoids passing pinch. All26 older Actions/entries and Godot unchanged.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "closing_key": 22,
+      "nominal_speed_m_s": 1.59936,
+      "contact_frames": {
+        "L": 1,
+        "R": 11.5
+      },
+      "support_duty": {
+        "L": 0.595,
+        "R": 0.615
+      },
+      "presentation_note": "Six uninterrupted native30FPS steps; v002/v003 A-B plus actual reference and three views; static normalized phases/native side strips. No production changes; Pending artistic review.",
+      "review_contact_frames": [
+        1,
+        11.5,
+        22
+      ],
+      "review_steps": 6,
+      "baseline_action": "Walk_Snappy_V027_Refined_Test_v002"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
