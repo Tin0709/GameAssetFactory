@@ -1094,6 +1094,60 @@
       ],
       "review_steps": 6,
       "baseline_action": "Walk_Snappy_Test_v1"
+    },
+    {
+      "action": "Walk_Snappy_V027_Refined_Test_v002",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v002/walk_v027_refined_review.blend",
+      "source_sha256": "fd251d5ded1945d8bb563bd60f0443256dbc5c5c98f76e8e6f569733ecdb2de1",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "24c09273498ba144438cfd11d0ef174cb06aaa010000a9780cbd41c9e0f2a722",
+      "action_frame_range": [
+        1.0,
+        22.0
+      ],
+      "start": 1,
+      "end": 21,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "User requested softer steps, jelly-like body bounce and zero lateral gap. Separate v002 from V027 refinement v001. Swing-only22ms vertical smoothing and12ms lead; forward pitch/timing and cadence retained. Body uses a damped event response bounded within12mm of original rhythm, with close35ms head follow. Parallel sagittal legs on225mm tracks equal225mm block width: zero gap without crossing. Sideways leg roll/yaw removed for collision-free narrow preview; support Y compensation preserves planted corners. All25 prior Actions unchanged.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "closing_key": 22,
+      "nominal_speed_m_s": 1.59936,
+      "contact_frames": {
+        "L": 1,
+        "R": 11.5
+      },
+      "support_duty": {
+        "L": 0.595,
+        "R": 0.615
+      },
+      "presentation_note": "Six continuous native30FPS steps; previous v001/new v002 A-B, actual reference, front/three-quarter/side. Foot placement checked and rigid blocks retained. Pending artistic preview of zero lateral spacing; no Godot or production edits.",
+      "review_contact_frames": [
+        1,
+        11.5,
+        22
+      ],
+      "review_steps": 6,
+      "baseline_action": "Walk_Snappy_V027_Refined_Test_v001"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
