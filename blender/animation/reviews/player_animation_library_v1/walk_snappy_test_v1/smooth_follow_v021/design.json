@@ -1,0 +1,57 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "fps": 30,
+  "period_s": 0.7,
+  "nominal_speed_m_s": 1.59936,
+  "root_motion": false,
+  "step_reach_multiplier_vs_v019": 0.875,
+  "cadence_multiplier_vs_v019": 1.1428571428571428,
+  "travel_speed_preserved": true,
+  "leg_tracks_m": 0.27,
+  "net_piston_lift_m": 0.27,
+  "common_hop_height_m": 0.1375,
+  "base_support_duty": {
+    "L": 0.64,
+    "R": 0.66
+  },
+  "measured_intentional_flight_time_s": 0.42291666666666666,
+  "contact_frames": {
+    "L": 1,
+    "R": 11.5
+  },
+  "contact_drop_m": 0.08184416762840341,
+  "nominal_load_time_s": 0.0455,
+  "body_z_range_m": [
+    0.5765303373336792,
+    0.885229229927063
+  ],
+  "body_motion": "Periodic smoothing of body acceleration, same vertical excursion and unchanged receiving-side torso tilt; torso pitch softened.",
+  "head_motion": "Reaction to the smoothed torso with softer lift/pitch/tilt, preserving delayed follow-through.",
+  "head_height_history_delay_s": 0.056,
+  "body_history_delay_s": 0.021,
+  "head_lift_measured_range_m": [
+    0.0051563117920115885,
+    0.05387703542010169
+  ],
+  "arm_root_curves_exact_after_retime": true,
+  "all_19_other_actions_preserved": true,
+  "body_waist_gap_limit_m": 0.075,
+  "reference": "Original user video study preserved; this refinement uses original rig/curves only.",
+  "source_sha256": null,
+  "action_sha256": "b91d826396f546721a5b23d74238fd603edc5b71f8acabb7415a5b3e2564dcc6",
+  "body_smoothing_sigma_s": 0.012,
+  "torso_pitch_smoothing_sigma_s": 0.014,
+  "head_lift_smoothing_sigma_s": 0.02,
+  "head_pitch_smoothing_sigma_s": 0.022,
+  "head_roll_smoothing_sigma_s": 0.018,
+  "body_vertical_range_preserved": true,
+  "leg_world_motion_preserved_from": "compact_elastic_v020",
+  "head_pitch_limit_deg": 3.25,
+  "fixed_channels_sha256": "6223ed298bdfe84d72d61babbf342be46c383bcbb554edf4569e08c06443e363"
+}
