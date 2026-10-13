@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "protected_files": 6340,
+  "all24_prior_actions_and_entries_exact": true,
+  "preferred_v027_exact": true,
+  "all_nonleg_curves_and_world_poses_exact": true,
+  "sole_height_envelope_preserved": true,
+  "godot_unchanged": true,
+  "research_unchanged": true,
+  "approved_animations_unchanged": true
+}
