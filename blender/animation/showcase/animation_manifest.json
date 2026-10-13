@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/side_follow_v014/walk_snappy_review.blend",
-      "source_sha256": "647b0542cf4dcfe0a23324a646c7956022cb7a5517869e63e0785ee3d2cd162e",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/side_head_v015/walk_snappy_review.blend",
+      "source_sha256": "be4eafa201f04aee99344d0ae2aa2a0d54e0258cf8b281e69b6b9458bda34ae1",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "25d7e226c3ec7abd65a8b2c49e8cc4b0415a758403fe1b94a81f21cdd8d3e29b",
+      "action_sha256": "e2e2c4965eab3ca6da20b72be1343d220532cd91592139fb3c5087cace0dc456",
       "action_frame_range": [
         1.0,
         25.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "25%faster whole walk:24frames/.8s at30FPS, closing25excluded.110mm visiblehop, contact-driven land/dip/rise with passing leg,54.375mm load. Receiving-side downward follow hips/spine/chest/head3/4/5/2deg with delays, body centers fixedX. Smooth piston targets/270mm lift/stride/tracks retained; arms/root retimed exact.19other Actions/all previous sources preserved. Pending Blender only.",
+      "approval_note": "Stronger receiving-side fall hips/spine/chest/head4/5.2/6.5/2.6deg, delayed17.5mm head lift and bounded1.2deg pitch response. Same24frames/30FPS/.8s walking speed,25%stronger bounce/137.5mm hop,67.969mm load, smooth270mm piston/sole paths/tracks/yaw. Arm/root local curves exact current source.19other Actions and all previous sources preserved. Pending Blender only.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
