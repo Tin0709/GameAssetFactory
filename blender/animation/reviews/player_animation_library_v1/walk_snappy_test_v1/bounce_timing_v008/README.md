@@ -1,0 +1,13 @@
+# Elastic bounce timing checkpoint — Pending
+
+User recording: `C:/Users/ADMIN/Desktop/Screen Recording 2026-10-13 052636.mp4`, 241 decoded frames, 30 FPS, 8.033 seconds. Consecutive front F0–47 and back F100–123 inspected; whole-clip overview every10 frames.
+
+Observed: compact low-body silhouettes around F7–8 / F17–18, brisk rebound over several frames, softer upper arc, alternating rigid-leg recovery and side-following body turn. Front/back camera movement prevents exact metric contact, flight or center-of-mass measurements. Labels in the [annotated phases](reference_annotated_phases.jpg) describe visible poses; original rig/curves are unknown. [Front continuation](reference_front_continuation.jpg), [back cycle](reference_back_cycle.jpg), [analysis data](reference_analysis.json).
+
+The prior35mm hop returned to ground before the next primary foot placement. This experiment retains35mm amplitude but replaces the140ms symmetric pulse with an80ms upward release and220ms return into the next contact. Softer36.25mm/80ms receiving load,270mm piston lift,25.44%longer fore/aft stride,0.27m tracks, centered body yaw and all torso/head/arm/root local curves remain. Hip range is about120.5mm, close to the prior121.1mm; this is primarily a timing change.
+
+Evaluation: the push/top/settle reads more connected and the foot now lands with the next receiving phase. Longer airborne duration is a deliberate artistic trial, not measured reference physics. Thresholded flight575ms per1s cycle makes this a stylized hopping walk; Godot support/flight/start-stop/weapon blending remains unvalidated. The leg recovery still has a mid-swing hesitation; the user's next request is to smooth it while preserving this checkpoint.
+
+[Front / 3/4 / side at1x](walk_snappy_three_views_1x.mp4), [previous vs new bounce at1x](previous_vs_bounce_1x.mp4), [approved Walk comparison](approved_vs_snappy_1x.mp4), [overhead](snappy_overhead_1x.mp4), [Blender source](walk_snappy_review.blend), [full-cycle inspection](cycle_inspection.jpg).
+
+961subframe checks pass: no floor penetration/nonadjacent overlap/unexpected support loss, grounded drift0.00423mm; intentional waist gaps29–31mm under45mm. Loop pose/tangents pass, second-order seam0.00287m/s under0.006. Raw first-order estimator remains reported separately.110Showcase checks, all20entries/slots/views/save/reopen/inactive retention and GUI play/wrap/restart pass.8videos/1440frames decode at30FPS/1x. All19other Actions and manifest entries, approved Walk/Run/Rifle Ready, paused Rifle Idle, rig/meshes/materials, Weapon Showcase, Godot and production remain exact. Same Pending Action in same central Showcase. All previous sources/reviews preserved.

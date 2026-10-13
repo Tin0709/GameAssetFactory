@@ -1,0 +1,52 @@
+{
+  "L": {
+    "previous": {
+      "maximum_target_speed_m_s": 8.17186079672867,
+      "maximum_target_vertical_speed_m_s": 3.9062481066913004,
+      "maximum_target_acceleration_m_s2": 341.23656394170166,
+      "mid_swing_forward_min_speed_m_s": 5.182723742917819e-06,
+      "fore_aft_target_range_m": [
+        -0.4221741557121277,
+        0.41938164830207825
+      ],
+      "maximum_piston_lift_m": 0.27
+    },
+    "new": {
+      "maximum_target_speed_m_s": 6.295902558923718,
+      "maximum_target_vertical_speed_m_s": 3.515623183917506,
+      "maximum_target_acceleration_m_s2": 147.4333375678817,
+      "mid_swing_forward_min_speed_m_s": 2.6388804117838545,
+      "fore_aft_target_range_m": [
+        -0.4448610246181488,
+        0.4264003336429596
+      ],
+      "maximum_piston_lift_m": 0.2699999999607242
+    }
+  },
+  "R": {
+    "previous": {
+      "maximum_target_speed_m_s": 8.828590748924775,
+      "maximum_target_vertical_speed_m_s": 4.136027407090256,
+      "maximum_target_acceleration_m_s2": 399.61606648942717,
+      "mid_swing_forward_min_speed_m_s": 5.487590848561553e-06,
+      "fore_aft_target_range_m": [
+        -0.43426138162612915,
+        0.4312496781349182
+      ],
+      "maximum_piston_lift_m": 0.27
+    },
+    "new": {
+      "maximum_target_speed_m_s": 6.779692958950734,
+      "maximum_target_vertical_speed_m_s": 3.722424547679031,
+      "maximum_target_acceleration_m_s2": 165.7493463019093,
+      "mid_swing_forward_min_speed_m_s": 2.7941086713005516,
+      "fore_aft_target_range_m": [
+        -0.45442336797714233,
+        0.43761157989501953
+      ],
+      "maximum_piston_lift_m": 0.2699999999607242
+    }
+  },
+  "scope": "Analytic sole target trajectory during swing excluding common hop. Finite differences4096samples; not center-of-mass, biomechanics or runtime certification.",
+  "passed": true
+}

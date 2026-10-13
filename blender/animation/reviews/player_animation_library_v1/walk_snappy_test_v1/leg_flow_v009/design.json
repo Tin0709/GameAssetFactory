@@ -1,0 +1,70 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "frames": [
+    1,
+    30
+  ],
+  "fps": 30,
+  "period_s": 1,
+  "closing_key": 31,
+  "nominal_speed_m_s": 1.279488,
+  "leg_tracks_m": 0.27,
+  "support_duty": {
+    "L": 0.34,
+    "R": 0.36
+  },
+  "double_support": 0.3,
+  "flight": 0.6,
+  "contact_frames": {
+    "L": 1,
+    "R": 16
+  },
+  "hip_vertical_range_m": null,
+  "contact_drop_m": 0.03625,
+  "compression_time_s": 0.08,
+  "vertical_sole_lift_m": 0.27,
+  "lift_peak_swing_fraction": [
+    0.36,
+    0.44
+  ],
+  "non_leg_curves_exact": true,
+  "leg_motion": "Lower piston pull: rigid leg translates upward 180mm, then advances while lowering. Upper end remains covered at waist; no knee, stretch or rig modification.",
+  "transition": "Stylized15mm micro-hop adds brief flight and extra receiving events. Existing LEFT0/RIGHT.5 main contacts retained; future runtime blends must account for flight. Blender-only Pending.",
+  "rebound_peak_time_s": 0.25,
+  "rebound_peak_height_m": 0.71,
+  "leg_world_motion_preserved": false,
+  "fore_aft_stride_multiplier": 1.2544,
+  "intentional_waist_gap": "Small rebound-only separation from planted leg; rigid geometry and180mm piston lift retained, fore/aft reach increased12%.",
+  "hop_height_m": 0.035,
+  "hop_window_each_step_s": [
+    0.2,
+    0.5
+  ],
+  "body_motion": "Same softer load, brisk asymmetric hop release80ms followed by220ms descent into next foot contact. Body apex/piston recovery synchronized; all torso/head/arm/root local curves and lateral/yaw treatment retained.",
+  "base_stride_support_duty": {
+    "L": 0.64,
+    "R": 0.66
+  },
+  "downward_snap_reduction_fraction": 0.75,
+  "previous_stronger_drop_m": 0.145,
+  "additional_stride_multiplier_vs_v005": 1.12,
+  "additional_piston_lift_multiplier": 1.5,
+  "body_motion_relative_to_common_hop_exact": true,
+  "body_lateral_translation": false,
+  "body_lateral_roll": false,
+  "body_yaw": true,
+  "body_yaw_amplitude_deg": {
+    "Hips": 5,
+    "Spine": 6.5,
+    "Chest": 8,
+    "Head": 3
+  },
+  "body_center_x_m": 0.006,
+  "hop_apex_after_contact_s": 0.28,
+  "hop_rise_s": 0.08,
+  "hop_descent_s": 0.22,
+  "reference": "User Screen Recording2026-10-13 052636.mp4:241frames/30FPS, observed front and back step phases; visible compression/rebound, exact physical flight not established.",
+  "leg_recovery": "One continuous C2 fore/aft recovery arc with stance-matched endpoint velocities; smooth270mm lift crest at40%of swing, continuous longer lowering without the old lift plateau/mid-forward stop. Same duty/stride/hop/body curves.",
+  "fixed_channels_sha256": "f34d8849bf4d4ca785ff95401f57be2fde29cf0ed86b55c4fcde7ad9505a0f90"
+}

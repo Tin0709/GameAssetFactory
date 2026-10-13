@@ -1,0 +1,34 @@
+{
+  "video": "C:\\Users\\ADMIN\\Desktop\\Screen Recording 2026-10-13 052636.mp4",
+  "sha256": "b7257e8fea64e0ea2327b85c7e2441d6bfda2168c35ce7b07ea173e63949248e",
+  "decoded_frames": 241,
+  "fps": 30,
+  "duration_s": 8.033333333333333,
+  "frame_size": [
+    592,
+    624
+  ],
+  "consecutive_inspected_ranges": [
+    [
+      0,
+      47
+    ],
+    [
+      100,
+      123
+    ]
+  ],
+  "overview_sample_every_frames": 10,
+  "observations": [
+    "Repeated compact low-body phases aroundF7-8 andF17-18, followed by brisk upper-body rise over several frames.",
+    "Rigid leg recovery/piston-like lift and alternating side rotation visible.",
+    "Body/head do not reverse at a uniform speed: quick release, softer upper arc, then clear receiving silhouette.",
+    "Back view confirms alternating upper-body turn and vertical rhythm."
+  ],
+  "uncertainties": [
+    "Front/back perspective, moving camera and terrain prevent exact metric COM or sole-contact measurement.",
+    "Visible low silhouette is receiving-like; exact touchdown and two-foot flight cannot be certified.",
+    "No inference of original rig, animation curves or proprietary key data."
+  ],
+  "candidate_change": "Shape timing rather than amplitude: retain~121mm hip range/35mm common hop, change140ms symmetric hop to300ms asymmetric80ms release/220ms return, reaching ground at the next primary contact. Longer aerial interval is artistic experiment, not a measured copy of reference physics."
+}

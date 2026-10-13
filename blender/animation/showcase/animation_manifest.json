@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/centered_v007/walk_snappy_review.blend",
-      "source_sha256": "07dc37822fe19059d2598e0ee6cdd484caa34ae2a2cc4392479a0ad5f2c1aba2",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/bounce_strength_v010/walk_snappy_review.blend",
+      "source_sha256": "714b7d47c01461353aa7300dcae169f0d6ce1b8baeed5c132434ab3b8a16dff3",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "958af19c6996c509f1ef2333e331e55e087b33a01339772c0915e75a59bcab58",
+      "action_sha256": "49830fe1d282d891096a41f06ec5b75a6bc316cbbaec6830a0b8e79e2654b704",
       "action_frame_range": [
         1.0,
         31.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Centered body:no lateral hips/spine/chest/head drift or roll; step-following yaw5/6.5/8/3deg hips/spine/chest/head makes same side follow forward leg; sagittal pitch/vertical bounce retained. Exact previous leg world paths retain35mm whole-character hop/270mm piston lift/25.44%longer fore-aft stride, same close tracks. Soft36.25mm landing retained. Arm/forearm/root channels and19 other Actions preserved. Pending Blender-only, no Run/Godot.",
+      "approval_note": "Stronger smoother hop50mm (+15mm) with100ms C2 eased release/200msreturn. Retain exact smooth piston leg targets/270mm lift/soft36.25mm load/close tracks/stride/cadence/centered yaw. Only common hip/leg hop differs; torso/head/arm/root curves and19other Actions exact. Pending Blender only.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
