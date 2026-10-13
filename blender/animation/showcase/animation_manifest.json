@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/smooth_follow_v021/walk_snappy_review.blend",
-      "source_sha256": "89b542c8cf7ce137a6f1879428bc838628dd50d05449256c3bd7d518f2126cb2",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/slower_bounce_v022/walk_snappy_review.blend",
+      "source_sha256": "4c75bbee017655be0c6c48af3acd76c9825ed9f412f75df7e5b469e141cc9d17",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "fc1b263e845e845408f4c6d374aea9eaedc43270965bec4072f54deab1811d1c",
+      "action_sha256": "8ff9228c1ace46d19b6b6588d943d0d2ce68b0cfd0e5a29a91836a68781fe899",
       "action_frame_range": [
         1.0,
         22.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Leg world motion,21frames/30FPS/.7s cadence and1.59936m/s diagnostic travel preserved fromv020. Body vertical acceleration smoothed with20ms periodic filter/5.6ms additional settle delay while retaining bounce range; torso pitch18ms, head lift25ms/head pitch26ms/head tilt18ms smoothing. Head reacts to softened body, with restrained3.25deg pitch. No rig/scaling/production edit.19other Actions and all previous sources preserved. Pending Blender review.",
+      "approval_note": "Leg world motion,21frames/30FPS/.7s cadence and1.59936m/s diagnostic travel preserved fromv021. Body vertical acceleration smoothed with35ms periodic filter/8.4ms total settle delay with10%softer vertical excursion; torso pitch25ms, head lift32ms/head pitch34ms/head tilt24ms smoothing. Head reacts to softened body, with restrained3.25deg pitch. No rig/scaling/production edit.19other Actions and all previous sources preserved. Pending Blender review.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
@@ -846,7 +846,7 @@
         "L": 0.64,
         "R": 0.66
       },
-      "presentation_note": "Pending in-place21frame/30FPS walk, closing22excluded. Leg world motion, tracks, lift, cadence and1.59936m/s diagnostic travel preserved fromv020. Upper body gets a broader, slightly slower72ms absorption/rebound and smooth delayed head response. Global vertical body excursion preserved. Blender only; Godot transitions unvalidated."
+      "presentation_note": "Pending in-place21frame/30FPS walk, closing22excluded. Leg world motion, tracks, lift, cadence and1.59936m/s diagnostic travel preserved fromv021. Upper body gets a broader, slightly slower absorption/rebound and smooth delayed head response. Body vertical excursion10%softer;2mm lower attachment seating retains the waist-gap guard. Blender only; Godot transitions unvalidated."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

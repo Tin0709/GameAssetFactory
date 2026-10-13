@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "samples": 512,
+  "leg_world_matrix_max_error": 2.384185791015625e-07,
+  "leg_world_motion_preserved": true,
+  "timing_cadence_speed_fixed_channels_exact": true,
+  "timing": {
+    "start": 1,
+    "end": 21,
+    "fps": 30,
+    "range": [
+      1.0,
+      22.0
+    ],
+    "speed": 1.59936,
+    "fixed": "6223ed298bdfe84d72d61babbf342be46c383bcbb554edf4569e08c06443e363"
+  },
+  "body_vertical_range_multiplier": 0.9,
+  "body_vertical_range_tolerance_m": 0.0003,
+  "actual_pose_smoothness": {
+    "body": {
+      "velocity": {
+        "before_rms": 1.9866749438761413,
+        "after_rms": 1.7360193505787695,
+        "ratio": 0.8738316028648727
+      },
+      "acceleration": {
+        "before_rms": 41.637135704971115,
+        "after_rms": 33.187111728183574,
+        "ratio": 0.7970555891101154
+      },
+      "jerk": {
+        "before_rms": 1266.2084044836015,
+        "after_rms": 727.7707180512521,
+        "ratio": 0.5747637714883588
+      },
+      "old_vertical_range_m": [
+        0.5765312910079956,
+        0.8852292895317078
+      ],
+      "new_vertical_range_m": [
+        0.5899651646614075,
+        0.8677834272384644
+      ]
+    },
+    "head": {
+      "velocity": {
+        "before_rms": 1.865829687233637,
+        "after_rms": 1.6364890898126063,
+        "ratio": 0.8770838522989408
+      },
+      "acceleration": {
+        "before_rms": 39.07677554076032,
+        "after_rms": 30.942798903053664,
+        "ratio": 0.7918462686558606
+      },
+      "jerk": {
+        "before_rms": 1278.056010219157,
+        "after_rms": 673.6039952773547,
+        "ratio": 0.5270535797267971
+      },
+      "old_vertical_range_m": [
+        1.2886714935302734,
+        1.57638680934906
+      ],
+      "new_vertical_range_m": [
+        1.2994463443756104,
+        1.5607244968414307
+      ]
+    }
+  },
+  "measurement": "Periodic actual evaluated world-height derivatives, frequencies above60Hz omitted to limit floating-point/bake noise; same estimator for both clips. Jerk is rate of acceleration change.",
+  "body_smoothing_sigma_s": 0.035,
+  "head_lift_smoothing_sigma_s": 0.032,
+  "head_pitch_smoothing_sigma_s": 0.034,
+  "body_additional_delay_s": 0.0084
+}
