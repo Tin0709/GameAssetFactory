@@ -401,5 +401,90 @@
   ],
   "exact_adjacent_repeats": [],
   "source_pack_version": "unknown",
-  "playback_speed_and_input": "unknown; encoded fps is not proof of original engine timing"
+  "playback_speed_and_input": "unknown; encoded fps is not proof of original engine timing",
+  "comparison_to_previously_decoded_241_frame_reference": {
+    "report": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\walk_snappy_test_v1\\bounce_timing_v008\\reference_analysis.json",
+    "source": "C:\\Users\\ADMIN\\Desktop\\Screen Recording 2026-10-13 052636.mp4",
+    "sha256": "b7257e8fea64e0ea2327b85c7e2441d6bfda2168c35ce7b07ea173e63949248e",
+    "decoded_frames": 241,
+    "byte_identical": false,
+    "note": "Different files; no independent provenance or pack-version match established"
+  },
+  "crop_rectangles_xyxy": {
+    "primary_and_late": [
+      220,
+      175,
+      610,
+      625
+    ]
+  },
+  "visual_inspection": {
+    "overview_frames": [
+      0,
+      15,
+      30,
+      45,
+      60,
+      75,
+      90,
+      105,
+      120,
+      135,
+      150,
+      165,
+      180,
+      192
+    ],
+    "all_consecutive_frames": [
+      0,
+      192
+    ],
+    "dense_enlarged_intervals": [
+      [
+        0,
+        17
+      ],
+      [
+        18,
+        35
+      ],
+      [
+        144,
+        161
+      ],
+      [
+        162,
+        178
+      ]
+    ],
+    "full_context_interval": [
+      78,
+      95
+    ],
+    "first_villager_frame": 179,
+    "player_locomotion_frames": [
+      0,
+      178
+    ],
+    "candidate_compact_gait_interval": [
+      161,
+      178
+    ],
+    "timing_landmarks": {
+      "broad_same_side_open_stride_pairs": [
+        [
+          6,
+          23
+        ],
+        [
+          15,
+          32
+        ]
+      ],
+      "recorded_pair_difference_frames": 17,
+      "recorded_pair_difference_s": 0.5666666666666667,
+      "uncertainty_frames_at_least": 1,
+      "meaning": "Visual recurrence estimate only; not original clip duration, confirmed contact period, or engine speed"
+    }
+  }
 }
