@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "samples": 193,
+  "timing_and_speed_exact": true,
+  "timing": {
+    "start": 1,
+    "end": 24,
+    "fps": 30,
+    "range": [
+      1.0,
+      25.0
+    ],
+    "speed": 1.59936,
+    "fixed": "ecb68adba12cc89ff02718d4f10b0e0dde163c6eb99fb085321c05184dc0233a"
+  },
+  "hip_bounce_amplitude_multiplier": 1.25,
+  "additional_landing_compression_multiplier": 1.25,
+  "landing_compression_m": 0.0849609375,
+  "hip_vertical_relation_max_error_m": 1.9020969954652855e-07,
+  "sole_paths_preserved_except_requested_25percent_common_hop_increase": true,
+  "sole_relation_max_error_m": 3.7413441879413763e-06,
+  "sole_comparison_tolerance_m": 1e-05,
+  "head_secondary_lift_range_m": [
+    1.1920928955078125e-07,
+    0.03199970722198486
+  ],
+  "head_delay_s": 0.04000000000000001,
+  "head_lift_formula_error_m": 4.6875603306150013e-07,
+  "head_pitch_formula_error_rad": 5.882040566770885e-08,
+  "receiving_side_comparison": [
+    {
+      "phase": 0.0,
+      "old_shoulder_height_difference_m": 0.056728243827819824,
+      "new_shoulder_height_difference_m": 0.07315242290496826
+    },
+    {
+      "phase": 0.5,
+      "old_shoulder_height_difference_m": 0.053175926208496094,
+      "new_shoulder_height_difference_m": 0.06959879398345947
+    }
+  ]
+}
