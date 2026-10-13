@@ -19,36 +19,36 @@
       "phase": 0.296,
       "frame": 7.215999999999999,
       "minimum_entire_character_floor_gap_m": 0.13790203630924225,
-      "hip_z_m": 0.8430913090705872
+      "hip_z_m": 0.8245457410812378
     },
     {
       "phase": 0.784,
       "frame": 17.464000000000002,
       "minimum_entire_character_floor_gap_m": 0.1379004418849945,
-      "hip_z_m": 0.8374013900756836
+      "hip_z_m": 0.8200536966323853
     }
   ],
   "lowering_samples": [
     {
       "phase": 0.42,
       "lowering_leg": "R",
-      "hip_down_velocity_m_s": -1.4117785862513952,
-      "receiving_shoulder_velocity_m_s": -1.6408307211739679,
-      "other_shoulder_velocity_m_s": -1.1903899056570872
+      "hip_down_velocity_m_s": -1.1146068572998047,
+      "receiving_shoulder_velocity_m_s": -1.3436589922223774,
+      "other_shoulder_velocity_m_s": -0.892366681780134
     },
     {
       "phase": 0.92,
       "lowering_leg": "L",
-      "hip_down_velocity_m_s": -1.4117785862513952,
-      "receiving_shoulder_velocity_m_s": -1.6331672668457033,
-      "other_shoulder_velocity_m_s": -1.2099742889404297
+      "hip_down_velocity_m_s": -1.1146068572998047,
+      "receiving_shoulder_velocity_m_s": -1.3351440429687502,
+      "other_shoulder_velocity_m_s": -0.9093965802873885
     }
   ],
   "shoulder_height_difference_L_minus_R_m": [
-    -0.042513489723205566,
-    0.038726091384887695
+    -0.04251360893249512,
+    0.038725852966308594
   ],
-  "minimum_head_chest_separating_axis_gap_m": 0.0031194504408631474,
+  "minimum_head_chest_separating_axis_gap_m": 0.003322602715343237,
   "head_chest_clearance_samples": 337,
   "passed": true
 }
