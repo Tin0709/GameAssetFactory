@@ -986,6 +986,60 @@
         43
       ],
       "review_steps": 4
+    },
+    {
+      "action": "Walk_Snappy_LegTiming_Test_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_leg_timing_v001/walk_leg_timing_review.blend",
+      "source_sha256": "24f18208240279e4865979b5b116830c857ec3d13e50ca2370abfa28cfd4406f",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "f231b92435d21e8d8d17fb820181a6137fa3559ec3054e6171a5d19c63fac18d",
+      "action_frame_range": [
+        1.0,
+        43.0
+      ],
+      "start": 22,
+      "end": 42,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Controlled LEG TIMING ONLY against OneStep v002. All non-leg curves and evaluated world poses exact; same cadence/travel/stride extrema.20ms earlier exchange, original fast-swing spacing, smoothly lengthened braking to unchanged landing. Contact-validity Y correction at most32mm only during late stance/early recovery. All23 older Actions/entries preserved. No Foot Recovery Path experiment, rig or Godot change.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "nominal_speed_m_s": 1.59936,
+      "contact_frames": {
+        "L": 22,
+        "R": 32.5
+      },
+      "presentation_note": "Six uninterrupted1x steps; actual reference/V028/test plus v002 control A/B, normalized static phases and native30FPS strips. Playback uses unchanged second stride F22-42/closing43 to avoid original one-shot arm-edge tangent mismatch; all source keys/non-leg curves retained. Pending artistic review.",
+      "review_contact_frames": [
+        22,
+        32.5,
+        43
+      ],
+      "review_steps": 6,
+      "closing_key": 43,
+      "support_duty": {
+        "L": 0.5642857142857144,
+        "R": 0.5642857142857144
+      },
+      "baseline_action": "Walk_Snappy_OneStep_Study_v002"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
