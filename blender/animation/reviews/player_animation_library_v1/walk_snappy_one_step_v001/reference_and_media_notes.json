@@ -1,0 +1,22 @@
+{
+  "reference_source": "C:\\Users\\ADMIN\\Desktop\\SnappyMotionReferences\\Snappy_Walk_Run_Reference_Analysis\\SourceVideos\\Walking_Reference_Original.mp4",
+  "reference_sha256": "2b4930b899230814606fc3f6ce341e6966b82a91d6a5d4a665e3057938beab0c",
+  "decoded_frames": 304,
+  "fps": 30,
+  "reference_step_frames": [
+    30,
+    40
+  ],
+  "reference_step_duration_s": 0.3333333333333333,
+  "model_step_duration_s": 0.35,
+  "model_nominal_speed_m_s": 1.59936,
+  "normalization": "Static frames only; model phase samples are1+1.05*i, reference source frames30+i; no inferred in-between source frames",
+  "original_speed": "All motion segments30FPS1x; review repeats have labelled0.5s still endpoint pauses and hard restart cuts",
+  "study_hip_range": [
+    0.6650000214576721,
+    0.7450000047683716
+  ],
+  "study_max_swing_speed_m_s": 8.465999364852905,
+  "study_max_world_chest_pitch_deg": 12.499999209479329,
+  "study_min_world_chest_pitch_deg": -2.4999995003864073
+}

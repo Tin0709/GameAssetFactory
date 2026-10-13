@@ -894,6 +894,48 @@
         "R": 0.615
       },
       "presentation_note": "Original-speed and phase-normalized three-way reference/V027/V028 study. V028 has original C2 event curves and monotone swing timing; same rig/proportions. Reference20frame cycle vs our21frames: synchronized diagnostic retimes reference to0.952x and is labelled separately from untouched30FPS1x clips."
+    },
+    {
+      "action": "Walk_Snappy_OneStep_Study_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_one_step_v001/walk_one_step_review.blend",
+      "source_sha256": "6d294b3e62f22bf2b1ad0803e2697b51914d00da4d734c23aaec6d4d3188d946",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "6807d45fd103e94c8c6e70d8314d26e417d4bd255073320acc7d79b925d688b7",
+      "action_frame_range": [
+        1.0,
+        13.0
+      ],
+      "start": 1,
+      "end": 13,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "ONE-STEP study only. Left receiving to right placement at0.35s plus50ms receiving tail. Grounded left support;60ms body load, rapid recovery, earlier swing, explicit braking, event-shaped hip/chest lean,25-35ms delayed arms/head. All21prior Actions including V028 retained exact. No artistic approval or full-cycle/gameplay claim.",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "nominal_speed_m_s": 1.59936,
+      "contact_frames": {
+        "L": 1,
+        "R": 11.5
+      },
+      "presentation_note": "Reference original F30-40 at30FPS, fresh read-only V028 export and this study.1x moving segments; endpoint holds/replay cuts labelled. Static normalized phase sheets only. Rigid grounded support limits upward recovery; see study report."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "source_sha256": "2da9e6335be107568e9696fa39fd68d1516083f42bccade44f247bc5823329b8",
+  "action_sha256": "e02b38c6f560300c2869aedd18e6a0a2eb9a000796b9498c041d75355b5b9deb",
+  "read_only": true,
+  "fps": 30,
+  "frames": 13,
+  "phase_frames": 11
+}

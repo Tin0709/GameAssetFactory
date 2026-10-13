@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "entries": 22,
+  "previous_actions_exact": 21,
+  "previous_manifest_entries_exact": true,
+  "v028_retained_exact": true,
+  "new_action": "Walk_Snappy_OneStep_Study_v001",
+  "new_status": "pending",
+  "seamless_loop": false,
+  "action_sha256": "6807d45fd103e94c8c6e70d8314d26e417d4bd255073320acc7d79b925d688b7",
+  "source_sha256": "6d294b3e62f22bf2b1ad0803e2697b51914d00da4d734c23aaec6d4d3188d946",
+  "slot_identifier": "OBRUN_Test_Rig"
+}

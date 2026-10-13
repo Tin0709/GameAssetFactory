@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "mesh_objects_exact": 4,
+  "materials_exact": 3,
+  "image_resources_exact": 2,
+  "character_rifle_geometry_uv_weights_materials_unchanged": true
+}
