@@ -20,11 +20,7 @@ Access: complete short page. The older [Animations URL](https://guides.orevilles
 
 ### S03 — 1.10: transition intent, controls and feedback
 
-[D] The movement overhaul documents planted-foot jump push-off and landing-to-run blending without a leg reset. Attacking enters a ten-second combat mode with forward-facing body and sideways strafing; backward walk and sneaking sidesteps improve. Stationary camera-driven rotation becomes smoother with partial head/body yaw separation.
-
-Stationary falls use a heavy landing that movement can interrupt; moving landings use a lighter one-handed pose. Sprinting from a fall of at least four blocks selects a roll; falls of at least eight blocks emit impact dust. Airborne crouch selects directional flips; sitting exits through jump or movement. Narrow-surface balancing responds to speed.
-
-Equipment/presentation notes include optional tool geometry, first-person armour visibility and item-swap audio. Step pitch variation and sounds for new actions are documented. Fixes address stale spear charge state, lingering spyglass use, spear interruption on doors, compass-related climbing and speed-run triggering. [1.10](https://guides.orevillestudios.com/1-10-341d7015059880c68287ce0877d3a123)
+[D] The overhaul documents planted-foot launch, landing-to-run without leg reset, movement-interruptible stationary heavy landing, and partial head/body yaw separation. Combat strafe, moving-landing variants, conditional rolls/flips, impact dust and speed-aware balancing broaden the context. Step-pitch variation and action/item-swap sounds accompany visual changes. Fixes address stale equipment states and interruptions. [1.10](https://guides.orevillestudios.com/1-10-341d7015059880c68287ce0877d3a123)
 
 Access: Player Movement, actions, settings, audio and relevant fixes. Limit: behavior descriptions; no blend durations, cancellation priority graph, support thresholds or continuous-input measurements.
 
@@ -102,4 +98,3 @@ Targeted searches combined “Actions & Stuff” or “Oreville” with animator
 - Remote media were neither downloaded nor inspected. No screenshots, trailer frame measurements, audio analysis, proprietary assets or reverse-engineered curves were produced here.
 
 Machine-readable provenance and search/access limits: [source_register_public.json](source_register_public.json).
-

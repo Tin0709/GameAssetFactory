@@ -92,4 +92,3 @@ Consecutive evidence: [F180–209](showcase_turn_land_00.jpg), [F210–239](show
 It adds actual **start-adjacent**, **moving turn**, **rear/three-quarter**, **empty-hand upper-body** and **aerial/landing-like continuity** evidence. It also shows why a generic grounded assumption or a single unchanging gait model is inappropriate for all footage.
 
 It leaves exact contact, foot lock, support/flight percentages, planted-foot takeoff selection, physical scale, original curve timing, native rig mechanics, equipment concurrency and control responsiveness unresolved. The clearest limitation for our adaptation is the reference's bent-arm visual language against our straight-full-arm requirement. No artistic-match or gameplay-completion claim follows from this recording.
-

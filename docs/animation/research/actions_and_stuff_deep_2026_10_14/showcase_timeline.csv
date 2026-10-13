@@ -16,4 +16,3 @@ frame_start,frame_end,time_start_s,time_last_frame_s,visible_sequence,confidence
 "540","545","18.000","18.167","rear view descending/narrowing configuration","high appearance","exact contact unknown"
 "546","617","18.200","20.567","front third-person alternating locomotion","high appearance; low mode","perspective switch at546"
 "618","637","20.600","21.233","first-person camera then white particle puff","high appearance; low cause","perspective switch at618"
-

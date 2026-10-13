@@ -31,4 +31,3 @@ for page in range(math.ceil(len(samples)/24)):
 meta={"path":str(SRC),"sha256":hashlib.sha256(SRC.read_bytes()).hexdigest(),"bytes":SRC.stat().st_size,"fps_reported":fps,"frame_count_declared":declared,"frame_count_decoded":count,"width":w,"height":h,"duration_from_frames_s":count/fps,"last_frame_time_s":(count-1)/fps,"sampled_frames":[i for i,im in samples],"sampling":"Sequential full decode; overview one frame per approximately one second","timestamp_first_ms":timestamps[0],"timestamp_last_ms":timestamps[-1],"clip_speed":"Unknown unless established by visible source UI","audio":"Not inspected"}
 (OUT/"showcase_decode_report.json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
 print(json.dumps(meta,indent=2))
-

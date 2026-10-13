@@ -1,0 +1,21 @@
+{
+  "verified_at_utc": "2026-10-13T22:12:07.182052+00:00",
+  "scope": "Artifact integrity, relative file links, source hashes and Git scope; no engine, motion or artistic certification",
+  "counts": {
+    "json_parsed": 14,
+    "images_decodable": 98,
+    "local_markdown_link_targets": 166,
+    "cycles": 6,
+    "observation_rows": 117,
+    "reference_video_hashes_unchanged": 4,
+    "local_source_hashes_unchanged": 25
+  },
+  "branch": "main",
+  "head": "e909e92b538ce680a57b3adf70f1da7cb29d1fb3",
+  "worktrees": "worktree C:/Users/ADMIN/Desktop/GameAssetFactory\nHEAD e909e92b538ce680a57b3adf70f1da7cb29d1fb3\nbranch refs/heads/main",
+  "baseline_head": "fd593a51",
+  "unexpected_changed_paths": [],
+  "git_diff_check_pass": true,
+  "errors": [],
+  "pass": true
+}

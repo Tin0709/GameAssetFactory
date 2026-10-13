@@ -8,7 +8,7 @@ Mục tiêu: **Expressive Blocky + Snappy Timing + Contact-Driven Bounce + Respo
 
 ## 1. Executive findings
 
-1. **Sự hấp dẫn nằm ở quan hệ giữa các phần của bước chân.** Trong ba chu kỳ Walk và ba chu kỳ Run liên tiếp đã xem từng frame, đoạn thấp/thu gọn ngắn dẫn vào đổi chân–hồi lên nhanh, sau đó là khoảng mở chân dễ đọc hơn. Một sóng nhún đều, hoặc chỉ tăng độ cao/tốc độ, không mô tả được sự tương phản này. Đây là quan sát hình ảnh, chưa phải đường cong gốc của Oreville.
+1. **Giả thuyết mạnh nhất: sức hấp dẫn đến từ quan hệ giữa các phần của bước chân.** Trong ba chu kỳ Walk và ba chu kỳ Run liên tiếp đã xem từng frame, đoạn thấp/thu gọn ngắn dẫn vào đổi chân–hồi lên nhanh, sau đó là khoảng mở chân dễ đọc hơn. Một sóng nhún đều, hoặc chỉ tăng độ cao/tốc độ, không mô tả được sự tương phản này. Thứ tự hình ảnh là quan sát; nguyên nhân tạo cảm giác hấp dẫn là giả thuyết, chưa phải đường cong gốc của Oreville.
 2. **Nhịp Run cần cập nhật so với nghiên cứu cũ.** Đoạn mới đối chiếu F40–91 có các tư thế tương ứng cách khoảng **17 frame / 0,567 s**, không phải 16 frame như ước lượng thô trước đây. Walk F30–90 lặp khoảng **20 frame / 0,667 s**. Chỉ áp dụng cho các đoạn ghi hình này; pack version và tốc độ ghi gốc chưa xác minh.
 3. **Không thể suy ra chiều cao hông, góc xương hay thời gian chống chân chính xác từ các video front/rear hiện có.** Atlas giữ số đo pixel, ứng viên contact và độ tin cậy; không biến bóng dưới chân, chân bị khuất hay chuyển động camera thành bằng chứng về solver/physics.
 4. **Các thử nghiệm của ta đã cải thiện một số vấn đề nhưng đang trả giá về silhouette/attachment.** V027/V028 có common hop; OneStep v001/v002 giữ support nhưng còn piston và khoảng hở eo. Kiểm tra kỹ thuật có thể chấp nhận khoảng hở đó trong giới hạn đã đặt, trong khi mắt người vẫn thấy nhân vật rời khối hoặc nhịp thiếu tự nhiên.
@@ -27,7 +27,7 @@ Quy ước: **D** tài liệu công khai nói rõ; **O** thấy trong ảnh/chu�
 | Microsoft, Blockbench, Blender, Godot, Khronos | API/format/interpolation/blending/export | [Technical strategies](research/actions_and_stuff_deep_2026_10_14/TECHNICAL_STRATEGIES.md), [register](research/actions_and_stuff_deep_2026_10_14/source_register_technical.json). Một số trang Blender chỉ truy cập được văn bản index; không ghi là đã đọc đầy đủ trang. |
 | Walk/Run gốc | Decode mới 304 + 349 frame, 30 FPS; xem 653 frame trong overview; phóng lớn toàn bộ Walk F30–90, Run F40–91 và rear F160–199 mỗi video | [Metadata/hashes](research/actions_and_stuff_deep_2026_10_14/source_media.json), sáu cycle sheets và atlas bên dưới. Video được xem qua chuỗi frame, không có tuyên bố nghe audio hoặc thử điều khiển. |
 | Các animation của ta | Decode mới 652 frame từ 10 video front/side; xem 268 panel liên tiếp chứa đủ một vòng mỗi Walk, toàn bộ v001 và bốn bước v002 | [Comparison ledger](research/actions_and_stuff_deep_2026_10_14/compare_decode.json), [local audit](research/actions_and_stuff_deep_2026_10_14/LOCAL_AUDIT.md). Không mở/save Blender hoặc render lại source. |
-| Hai video bổ sung trong khi nghiên cứu | Ghi hình `2026-10-14 045502` và `2026-10-13 043804` | [Showcase supplement](research/actions_and_stuff_deep_2026_10_14/SHOWCASE_SUPPLEMENT.md), [supplement 2](research/actions_and_stuff_deep_2026_10_14/SUPPLEMENT2.md). Giữ riêng provenance, nhân vật, camera và trạng thái; không nối thành một chu kỳ với clip gốc. |
+| Hai video bổ sung trong khi nghiên cứu | `2026-10-14 045502`: 638 frame, xem liên tiếp 518 frame và lấy mẫu toàn clip mỗi 6 frame. `2026-10-13 043804`: xem toàn bộ 193 frame; player F0–178, cắt sang villager từ F179. Cả hai 30 FPS | [Showcase supplement](research/actions_and_stuff_deep_2026_10_14/SHOWCASE_SUPPLEMENT.md), [supplement 2](research/actions_and_stuff_deep_2026_10_14/SUPPLEMENT2.md). Giữ riêng provenance, nhân vật, camera và trạng thái; không nối thành một chu kỳ với clip gốc. |
 
 Tài liệu nền đã đọc: [Style Guide](ANIMATION_STYLE_GUIDE.md), [Expansion Guide](ANIMATION_EXPANSION_GUIDE.md), [nghiên cứu locomotion trước](ACTIONS_AND_STUFF_LOCOMOTION_STUDY.md), [V028](WALK_SNAPPY_V028_MOTION_MATCHING_STUDY.md), và các source/validation được liệt kê trong local audit. Các báo cáo kiểm tra hình học/gameplay cũ là **bằng chứng lịch sử được đọc**, không phải test vừa chạy lại.
 
@@ -100,7 +100,7 @@ Không dùng phần front cuối F292–348 như bằng chứng running ổn đ�
 
 Timeline là nhãn các **họ tư thế nhìn thấy**, không phải phân vùng stance/flight. Chuẩn hóa theo `100 × (frame − start)/(closing − start)` để so quan hệ; giữ nguyên thời lượng thật, không retime video. Mỗi quan sát có frame/timestamp/pha/confidence trong [CSV](research/actions_and_stuff_deep_2026_10_14/frame_observations.csv) và [cycle contracts](research/actions_and_stuff_deep_2026_10_14/cycles.json).
 
-**M:** trong ba bước đầu được chọn, cap mask hạ khoảng 21,6 / 23,3 / 35,4 pixel ở Walk; Run 15,2 / 30,0 / 23,7 pixel. Sự chênh lệch giữa các chu kỳ là lý do **không** đổi các số này thành mm bounce hoặc mục tiêu amplitude. Cap nghiêng, camera chuyển và perspective đều góp phần. [Số đo/missing data](research/actions_and_stuff_deep_2026_10_14/proxy_statistics.json)
+**M:** chênh lệch centroid cap từ Fstart đến Fstart+3 của mỗi chu kỳ là khoảng 21,6 / 23,3 / 35,4 pixel hướng xuống ở Walk; Run 15,2 / 30,0 / 23,7 pixel. Đây không phải cực trị compression. Sự chênh lệch giữa các chu kỳ là lý do **không** đổi các số này thành mm bounce hoặc mục tiêu amplitude. Cap nghiêng, camera chuyển và perspective đều góp phần. [Số đo/missing data](research/actions_and_stuff_deep_2026_10_14/proxy_statistics.json)
 
 [Walk screen curves](research/actions_and_stuff_deep_2026_10_14/walk_screen_proxy_curves.png) và [Run screen curves](research/actions_and_stuff_deep_2026_10_14/run_screen_proxy_curves.png) hiển thị raw và background-translation-corrected riêng. Correction bằng optical flow không phải calibrated camera solve; drift tích lũy, nhất là chu kỳ 2, bị loại khỏi suy luận world height. Không lấy đạo hàm bậc hai/bậc ba của centroid nhiễu để khẳng định acceleration/jerk gốc.
 
@@ -119,6 +119,10 @@ V027 có các crest body/common-hop/piston lệch nhau theo báo cáo đã lưu.
 Trong engine, capsule/physics giữ quyền điều khiển quỹ đạo. Visual compression không được nâng/hạ collision body thêm một lần hoặc trì hoãn input chỉ để chạy hết một anticipation đẹp. Chất lượng contact phải đo ở pose cuối sau weapon/turn/correction.
 
 ## 8. Upper body, overlap và personality
+
+**Hai nguồn bổ sung làm rõ vai trò của tay và ngữ cảnh.** Trong clip `043804`, F0–35 cho thấy tay cầm đuốc giữ cao còn tay trống đi từ sau thân ra trước áo qua các bước liên tiếp. Các tư thế mở tương ứng F6/23 và F15/32 cách khoảng 17 frame, nhưng đây chỉ là recurrence trong file. F161–178 có đoạn tay trống hạ, chân thu gọn rồi tiếp tục bước; đó là ứng viên đổi cường độ/giảm tốc, chưa xác nhận Run → Walk. Tay cầm đuốc vẫn giữ hình rõ trong đoạn này. [Chuỗi frame và giới hạn](research/actions_and_stuff_deep_2026_10_14/SUPPLEMENT2.md)
+
+Clip `045502` bổ sung tay trống, góc sau/ba phần tư và các đoạn đổi hướng. F75–114 có silhouette tay nâng/gập mạnh; F213–235 có cấu hình chân hẹp kéo dài giống đoạn trên không, rồi F236–249 chuyển qua bụi và phần chân bị địa hình che. Không lấy F242 thấp trong màn hình làm số đo compression lớn. Hình gập/nâng này cũng nhắc rằng không thể khớp mọi silhouette khi ta giữ tay/chân nguyên khối thẳng; cơ chế khớp/rig ẩn của reference vẫn chưa biết. [Các đoạn và ảnh gốc](research/actions_and_stuff_deep_2026_10_14/SHOWCASE_SUPPLEMENT.md)
 
 **O:** cap đổi độ nghiêng trong khi leg silhouette mở/khép; ngực, item và tay trống không giữ cùng hình dạng tương đối suốt bước. [Item/chân Walk](research/actions_and_stuff_deep_2026_10_14/walk_limb_proxies.png) · [Run](research/actions_and_stuff_deep_2026_10_14/run_limb_proxies.png). Item centroid được đo tương đối với vùng áo nên bớt ảnh hưởng camera translation, nhưng vẫn chịu rotation/occlusion; đó không phải wrist joint.
 
@@ -197,7 +201,9 @@ Một test có thể cho qua khoảng hở dưới giới hạn 75 mm nhưng m�
 | Combat strafe / equipment | Gaze/weapon ownership rõ; chân phục vụ hướng thực tế | Aim + moving + draw/holster/use/cancel; không double writer hoặc grip pop |
 | Idle | Nhẹ và có thể ngắt; nhịp thở khác receiving | Vào/ra từ cả hai support, không phase reset gây giật đầu |
 
-Nguồn Oreville mô tả continuity và interruption như mục tiêu hành vi; thuật toán của ta vẫn là P. Chi tiết release/version và các lỗi input-order nằm ở [public evidence](research/actions_and_stuff_deep_2026_10_14/PUBLIC_SOURCES.md).
+**D — 1.10:** Oreville mô tả bật nhảy từ chân đang chống, tiếp đất vào chạy không reset chân, heavy landing tại chỗ có thể ngắt bằng di chuyển, và xoay đầu/thân tách một phần. Đây là hành vi được công bố, không phải thuật toán đã biết hoặc test gameplay vừa thực hiện. Bảng triển khai của ta vẫn là P. Chi tiết release/version và các lỗi input-order nằm ở [public evidence](research/actions_and_stuff_deep_2026_10_14/PUBLIC_SOURCES.md#s03--110-transition-intent-controls-and-feedback).
+
+**O từ video bổ sung:** `045502` F38–74 có đoạn từ dáng gần yên đến bước luân phiên; F75–114 và các đoạn sau có đổi hướng/góc nhìn; F213–250 nối cấu hình giống trên không, dáng thấp bị che và bước tiếp. `043804` F144–178 cho thấy thay đổi hình bước trong khi vẫn giữ đuốc. Đây là evidence cho chuỗi trình bày liên tục, không đủ chứng minh input latency, numeric phase preservation hoặc chân nào thực sự chống. Khi review prototype sau này, dùng toàn đoạn chuyển này thay vì chỉ một pose cuối.
 
 **Audio/VFX/camera:** feedback có thể làm bước thuyết phục hơn nhưng chưa được cô lập bằng thử nghiệm. Không có phân tích nghe audio trong task này. Source audit chưa tìm thấy footstep dispatcher trên runtime đang xét; legacy spring-contact timer không phải event final support. Đề xuất cùng clip/camera: muted → contact audio → FX, mỗi lần thêm một nhóm. Âm thanh chỉ được phát một lần cho contact được chấp nhận, không cả hai clip đang blend; camera không được che mất skating. Khảo sát cộng đồng nhỏ chỉ gợi ý các tiêu chí như sinh động, tùy chọn intensity/texture và hiệu năng, không xác nhận cơ chế gây thích thú.
 
@@ -227,7 +233,7 @@ Thiết kế thí nghiệm dùng **cùng nhân vật, appearance, camera, floor,
 
 - **H:** chuyển động chính cần các phản ứng phụ lệch pha có chức năng để rigid blocks không cùng đảo hướng.
 - **Biến:** event-relative timing/arc của chest, shoulder/arm và head; lower-body world trajectories giữ nguyên. Unarmed trước, thêm một item ở bước review riêng.
-- **Evidence:** cap slope và item/free-arm asymmetry nhìn thấy; exact lag/3D yaw chưa biết. Video bổ sung được dùng để kiểm tra xem bất đối xứng có còn khi tay trống.
+- **Evidence:** cap slope và item/free-arm asymmetry nhìn thấy; clip đuốc F0–35/F144–178 bổ sung carrying qua đổi cường độ, clip tay trống F75–114 bổ sung góc sau/ba phần tư. Exact lag/3D yaw chưa biết; hai skin/camera khác nhau nên không phải controlled equipped/unarmed pair.
 - **Kỳ vọng:** chest nhận/trả, tay còn tiếp arc, đầu có chủ đích và không lắc vô cớ.
 - **Review:** front/side/three-quarter/gameplay, overlay timing theo event; equipped variant phải giữ hai grip nếu có.
 - **Thành công:** silhouette sống động hơn mà head/weapon đọc tốt, không giống các lớp dao động rời. **Thất bại:** chỉ “lắc nhiều hơn”, shoulder rời, mặt nhấp nhô hoặc aim/clearance hỏng.
