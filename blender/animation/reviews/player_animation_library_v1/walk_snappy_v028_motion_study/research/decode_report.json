@@ -1,0 +1,63 @@
+{
+  "walk_original": {
+    "source": "C:\\Users\\ADMIN\\Desktop\\SnappyMotionReferences\\Snappy_Walk_Run_Reference_Analysis\\SourceVideos\\Walking_Reference_Original.mp4",
+    "sha256": "2b4930b899230814606fc3f6ce341e6966b82a91d6a5d4a665e3057938beab0c",
+    "fps": 30.0,
+    "decoded_frames": 304,
+    "size": [
+      246,
+      356
+    ],
+    "duration_s": 10.133333333333333,
+    "duplicate_pairs": [
+      1,
+      139,
+      140,
+      288,
+      289,
+      290,
+      291
+    ]
+  },
+  "walk_new": {
+    "source": "C:\\Users\\ADMIN\\Desktop\\SnappyMotionReferences\\Snappy_Walk_Run_Reference_Analysis\\SourceVideos\\Walking_Reference_New.mp4",
+    "sha256": "b7257e8fea64e0ea2327b85c7e2441d6bfda2168c35ce7b07ea173e63949248e",
+    "fps": 30.0,
+    "decoded_frames": 241,
+    "size": [
+      592,
+      624
+    ],
+    "duration_s": 8.033333333333333,
+    "duplicate_pairs": []
+  },
+  "run_original": {
+    "source": "C:\\Users\\ADMIN\\Desktop\\SnappyMotionReferences\\Snappy_Walk_Run_Reference_Analysis\\SourceVideos\\Running_Reference.mp4",
+    "sha256": "3db973b8dccf5e37d94cb6ed5a7e61fe6f45386c50d438112d058c5c23af55a2",
+    "fps": 30.0,
+    "decoded_frames": 349,
+    "size": [
+      250,
+      380
+    ],
+    "duration_s": 11.633333333333333,
+    "duplicate_pairs": [
+      2,
+      3,
+      145,
+      296
+    ]
+  },
+  "v027_front": {
+    "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\walk_snappy_test_v1\\soft_landing_v027\\snappy_front_1x.mp4",
+    "sha256": "82d994767cc2ae7bd5eb6adad92dd1ad38cc1a502a8083d105eeacec98a3e617",
+    "fps": 30.0,
+    "decoded_frames": 180,
+    "size": [
+      576,
+      576
+    ],
+    "duration_s": 6.0,
+    "duplicate_pairs": []
+  }
+}
