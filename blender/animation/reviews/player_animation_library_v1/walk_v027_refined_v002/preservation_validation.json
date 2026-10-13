@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "protected_files": 6415,
+  "all25_prior_actions_and_entries_exact": true,
+  "preferred_v027_and_v001_exact": true,
+  "godot_unchanged": true,
+  "research_unchanged": true,
+  "rig_unchanged": true
+}

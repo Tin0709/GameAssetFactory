@@ -18,8 +18,8 @@
   "rig_unchanged": true,
   "action_sha256": "24c09273498ba144438cfd11d0ef174cb06aaa010000a9780cbd41c9e0f2a722",
   "body_height_range_m": [
-    0.68,
-    0.83
+    0.6803615093231201,
+    0.8210371732711792
   ],
   "body_event_spring": {
     "dc": 0.7497021114355042,
@@ -317,7 +317,13 @@
   ],
   "head_response_history_s": 0.035,
   "zero_lateral_leg_gap": true,
-  "zero_gap_definition": "all leg vertices stay on own side ofX=.006; projected inner bounds meet plane, centres are not coincident",
-  "leg_Y_orientation_exact": true,
-  "arm_rotation_curves_exact": true
+  "zero_gap_definition": "225mm nominal tracks equal225mm rigid leg width. Pure sagittal leg orientations keep inner planes together without overlaps.",
+  "leg_Y_orientation_exact": false,
+  "arm_rotation_curves_exact": true,
+  "body_maximum_departure_from_preferred_curve_m": 0.012,
+  "body_spring_phase_delay_s": 0.02,
+  "leg_forward_pitch_and_timing_retained": true,
+  "lateral_leg_roll_yaw_removed_for_zero_gap": true,
+  "contact_Y_compensation": "fixed early/late pivot identities with C2 blends while airborne; no discontinuous lowest-corner switching",
+  "pending_artistic_preview": true
 }
