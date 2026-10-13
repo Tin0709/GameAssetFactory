@@ -1,0 +1,86 @@
+{
+  "walk": {
+    "1": {
+      "cap_missing_frames": [],
+      "cap_raw_lowering_first_3_intervals_px": 21.620209296776466,
+      "cap_mask_slope_range_deg": [
+        -5.607446890776683,
+        5.053928116684843
+      ],
+      "camera_cumulative_end_px": [
+        8.007038712501526,
+        4.965646505355835
+      ],
+      "use": "Exploratory screen-space statistics only; not body compression or world rotation."
+    },
+    "2": {
+      "cap_missing_frames": [],
+      "cap_raw_lowering_first_3_intervals_px": 23.329150063107306,
+      "cap_mask_slope_range_deg": [
+        -6.932747071038537,
+        1.5996569346428038
+      ],
+      "camera_cumulative_end_px": [
+        34.18187141418457,
+        -41.567014932632446
+      ],
+      "use": "Exploratory screen-space statistics only; not body compression or world rotation."
+    },
+    "3": {
+      "cap_missing_frames": [],
+      "cap_raw_lowering_first_3_intervals_px": 35.39309307685268,
+      "cap_mask_slope_range_deg": [
+        -5.811806183737542,
+        2.808314741480307
+      ],
+      "camera_cumulative_end_px": [
+        1.5264110565185547,
+        1.5973477363586426
+      ],
+      "use": "Exploratory screen-space statistics only; not body compression or world rotation."
+    }
+  },
+  "run": {
+    "1": {
+      "cap_missing_frames": [
+        50
+      ],
+      "cap_raw_lowering_first_3_intervals_px": 15.22123791992638,
+      "cap_mask_slope_range_deg": [
+        -6.599301658420572,
+        4.5146358603432555
+      ],
+      "camera_cumulative_end_px": [
+        -58.76063346862793,
+        -22.034439086914062
+      ],
+      "use": "Exploratory screen-space statistics only; not body compression or world rotation."
+    },
+    "2": {
+      "cap_missing_frames": [],
+      "cap_raw_lowering_first_3_intervals_px": 30.039831837917347,
+      "cap_mask_slope_range_deg": [
+        -4.6955883477513325,
+        6.777069193050241
+      ],
+      "camera_cumulative_end_px": [
+        -42.06052899360657,
+        -39.25310516357422
+      ],
+      "use": "Exploratory screen-space statistics only; not body compression or world rotation."
+    },
+    "3": {
+      "cap_missing_frames": [],
+      "cap_raw_lowering_first_3_intervals_px": 23.699671592775033,
+      "cap_mask_slope_range_deg": [
+        -1.3143300809582241,
+        11.22585548942124
+      ],
+      "camera_cumulative_end_px": [
+        -174.75532054901123,
+        3.8382110595703125
+      ],
+      "use": "Exploratory screen-space statistics only; not body compression or world rotation."
+    }
+  }
+}

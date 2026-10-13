@@ -5,11 +5,14 @@
     "read current source and reports",
     "inspect three existing frame sheets",
     "hash source text, reports and sheets",
-    "sum existing suite check counts"
+    "sum existing suite check counts",
+    "sequentially decode all652 frames of10 existing model original-speed front/side videos",
+    "create12 consecutive sheets covering complete native cycles/finite studies",
+    "inspect all12 generated sheets,268 front/side panels at134 sample times"
   ],
   "not_performed": [
     "fresh motion measurements",
-    "watch local videos",
+    "real-time local video playback (consecutive decoded sheets only)",
     "listen to audio",
     "run Godot suites",
     "open/render/save blend",
@@ -186,7 +189,7 @@
         "R": -0.033509697881527245
       },
       "max_ground_anchor_drift_m": null,
-      "maximum_support_drift_m": 1.6405145374870824E-06,
+      "maximum_support_drift_m": 1.6405145374870824e-06,
       "unsupported_sample_count": 0,
       "junctions": null
     },
@@ -207,7 +210,7 @@
         "R": 0.056070766411721706
       },
       "max_ground_anchor_drift_m": null,
-      "maximum_support_drift_m": 1.4600536212131124E-06,
+      "maximum_support_drift_m": 1.4600536212131124e-06,
       "unsupported_sample_count": 406,
       "junctions": null
     },
@@ -228,7 +231,7 @@
         "R": 0.03745215234812349
       },
       "max_ground_anchor_drift_m": null,
-      "maximum_support_drift_m": 9.807321988452496E-07,
+      "maximum_support_drift_m": 9.807321988452496e-07,
       "unsupported_sample_count": 464,
       "junctions": null
     },
@@ -245,7 +248,7 @@
       "nominal_speed_m_s": null,
       "max_waist_gap_m": 0.06170334280614043,
       "maximum_waist_separation_m": null,
-      "max_ground_anchor_drift_m": 1.1735197998250014E-06,
+      "max_ground_anchor_drift_m": 1.1735197998250014e-06,
       "maximum_support_drift_m": null,
       "unsupported_sample_count": 0,
       "junctions": null
@@ -263,7 +266,7 @@
       "nominal_speed_m_s": null,
       "max_waist_gap_m": 0.060177357474458404,
       "maximum_waist_separation_m": null,
-      "max_ground_anchor_drift_m": 1.8201105752879633E-06,
+      "max_ground_anchor_drift_m": 1.8201105752879633e-06,
       "maximum_support_drift_m": null,
       "unsupported_sample_count": 0,
       "junctions": [
@@ -338,5 +341,108 @@
     "exact reference shoulder/head delays",
     "native-speed artistic preference from this sub-audit",
     "target phone performance"
-  ]
+  ],
+  "fresh_model_comparison": {
+    "ledger": "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_decode.json",
+    "ledger_sha256": "dd662b94c89dc938e0c4ec91529f7ccc9c9567a1f55bd3b6716706e80e84f31c",
+    "source_video_count": 10,
+    "fresh_decoded_frames": 652,
+    "selected_model_sample_times": 134,
+    "front_side_panels": 268,
+    "new_sheets": 12,
+    "all_new_sheets_actually_inspected": true,
+    "real_time_playback": false,
+    "audio_listening": false,
+    "retimed": false,
+    "per_frame_stabilization": false,
+    "optical_appeal_score": null,
+    "asset_scope": [
+      {
+        "name": "approved_walk",
+        "range": [
+          0,
+          35
+        ],
+        "selected_motion_span_s": 1.1666666666666667,
+        "selected_display_duration_s": 1.2,
+        "authored_cycle_period_s": 1.2,
+        "sheet_paths": [
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_approved_walk_000_013.jpg",
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_approved_walk_014_027.jpg",
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_approved_walk_028_035.jpg"
+        ]
+      },
+      {
+        "name": "v027",
+        "range": [
+          0,
+          20
+        ],
+        "selected_motion_span_s": 0.6666666666666666,
+        "selected_display_duration_s": 0.7,
+        "authored_cycle_period_s": 0.7,
+        "sheet_paths": [
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_v027_000_013.jpg",
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_v027_014_020.jpg"
+        ]
+      },
+      {
+        "name": "v028",
+        "range": [
+          0,
+          20
+        ],
+        "selected_motion_span_s": 0.6666666666666666,
+        "selected_display_duration_s": 0.7,
+        "authored_cycle_period_s": 0.7,
+        "sheet_paths": [
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_v028_000_013.jpg",
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_v028_014_020.jpg"
+        ]
+      },
+      {
+        "name": "onestep_v001",
+        "range": [
+          0,
+          12
+        ],
+        "selected_motion_span_s": 0.4,
+        "selected_display_duration_s": 0.43333333333333335,
+        "authored_cycle_period_s": null,
+        "sheet_paths": [
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_onestep_v001_000_012.jpg"
+        ]
+      },
+      {
+        "name": "onestep_v002",
+        "range": [
+          0,
+          42
+        ],
+        "selected_motion_span_s": 1.4,
+        "selected_display_duration_s": 1.4333333333333333,
+        "authored_cycle_period_s": null,
+        "sheet_paths": [
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_onestep_v002_000_013.jpg",
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_onestep_v002_014_027.jpg",
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_onestep_v002_028_041.jpg",
+          "docs/animation/research/actions_and_stuff_deep_2026_10_14/compare_onestep_v002_042_042.jpg"
+        ]
+      }
+    ],
+    "observations": {
+      "approved_walk": "Quiet height/head presentation and low swing; readable long side strides/narrow passing, more continuous waist seating.",
+      "v027": "Large common-hop recovery visibly lifts both soles; piston silhouette and comparatively upright torso/head remain.",
+      "v028": "Earlier clustered body/leg recovery at native times; raised upper silhouette and whole-body lift remain.",
+      "onestep_v001": "Side chest/head fold and release more legible than front; grounded long support with visible waist seating tradeoff; no full gait cycle exists.",
+      "onestep_v002": "Ordered side-view load/recovery repeats through four steps; front upper silhouette remains comparatively uniform; piston/attachment tradeoff persists."
+    },
+    "ranking_update": "Rank1 explicitly includes swing silhouette/attachment; rank2 recognizes already-authored v001/v002 sequencing rather than assuming further delay/speed is needed.",
+    "limits": [
+      "Existing video identity freshly hashed; no new blend render binds pixels to Action data",
+      "Source1x timing is documented in original review metadata; decode verifies30FPS/count/PTS, not original artistic authoring decisions",
+      "Static sheets support ordered visual comparisons, not experienced native-speed appeal",
+      "half-frame contacts remain authored subframes between actual video samples"
+    ]
+  }
 }

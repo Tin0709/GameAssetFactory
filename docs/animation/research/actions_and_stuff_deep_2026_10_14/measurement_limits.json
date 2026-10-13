@@ -1,0 +1,22 @@
+{
+  "inspection": "All653 source frames inspected in existing numbered overview sheets; newly decoded, hashes match. Detailed all-frame sheets for Walk30–90, Run40–91 and rear160–199 each.",
+  "accepted": [
+    "Decoded frame count/FPS/hash",
+    "source frame/time",
+    "visible pose-order and repeated silhouette intervals",
+    "cap/item/shirt pixel proxies where overlay matches"
+  ],
+  "rejected": [
+    "First unrestricted color mask chose background tower/sky and item as cap; replaced with restricted masks before final data.",
+    "Accumulated background translation is not calibrated camera pose; notably second-cycle drift is retained as diagnostic, not physical height.",
+    "Shoe patches merge/occlude and can pick dark item detail; no continuous foot path/contact/velocity is inferred.",
+    "Shirt lower edge is not an observable hip joint; no 3D hip height or bone angles recovered.",
+    "Finite differences of noisy pixel centroids do not establish source acceleration/jerk or interpolation."
+  ],
+  "pixel_uncertainty": "about2–4px on clear cap edges; larger/unbounded for occluded shirt/item/shoes",
+  "side_convention": "screen left/right primary; anatomical L/R provisional assuming unmirrored front",
+  "sound": "Not listened to or analyzed. No sound attribution from visible dust.",
+  "version_speed": "Pack version/settings/source capture speed unknown; recorded1x30FPS is not independently verified real-game speed.",
+  "peer_review": "Independent second agent visually checked all six cycle sheets and supported20-frame Walk /17-frame Run local repeats, not exact source periods.",
+  "supersedes": "Earlier rough Run16-frame estimate for this selected segment; no claim of universal17-frame run."
+}

@@ -20,7 +20,15 @@
       "shirt_y_raw_px": 152.00205915387497,
       "shirt_y_corrected_px": 152.00205915387497,
       "shirt_screen_slope_deg": -2.005886254345804,
-      "shirt_hem_y_proxy_px": 201.0
+      "shirt_hem_y_proxy_px": 201.0,
+      "item_x_relative_shirt_px": -52.228100210333835,
+      "item_y_relative_shirt_px": 38.67131779630117,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 147.070281124498,
+      "screen_shoe_0_y_px": 301.8293172690763,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -42,7 +50,15 @@
       "shirt_y_raw_px": 156.33416927899685,
       "shirt_y_corrected_px": 156.30279720868435,
       "shirt_screen_slope_deg": -5.655940271281368,
-      "shirt_hem_y_proxy_px": 199.0
+      "shirt_hem_y_proxy_px": 199.0,
+      "item_x_relative_shirt_px": -51.65975039324118,
+      "item_y_relative_shirt_px": 50.157966692591174,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 146.44634146341463,
+      "screen_shoe_0_y_px": 295.77073170731705,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -64,7 +80,15 @@
       "shirt_y_raw_px": 154.66098081023455,
       "shirt_y_corrected_px": 154.56591855437517,
       "shirt_screen_slope_deg": -1.1395786153776666,
-      "shirt_hem_y_proxy_px": 182.0
+      "shirt_hem_y_proxy_px": 182.0,
+      "item_x_relative_shirt_px": -49.189197917973146,
+      "item_y_relative_shirt_px": 60.7787951001296,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 118.6063829787234,
+      "screen_shoe_0_y_px": 252.82978723404256,
+      "screen_shoe_1_x_px": 145.85630498533723,
+      "screen_shoe_1_y_px": 288.2697947214076,
+      "shoe_projected_y_difference_px": 35.44000748736505
     },
     {
       "source": "walk",
@@ -86,7 +110,15 @@
       "shirt_y_raw_px": 150.20978417266187,
       "shirt_y_corrected_px": 149.95793022979078,
       "shirt_screen_slope_deg": -0.4081479221595546,
-      "shirt_hem_y_proxy_px": 173.0
+      "shirt_hem_y_proxy_px": 173.0,
+      "item_x_relative_shirt_px": -54.23455474489667,
+      "item_y_relative_shirt_px": 55.481028548186174,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 116.68108108108108,
+      "screen_shoe_0_y_px": 262.1081081081081,
+      "screen_shoe_1_x_px": 145.3042071197411,
+      "screen_shoe_1_y_px": 284.12297734627833,
+      "shoe_projected_y_difference_px": 22.014869238170206
     },
     {
       "source": "walk",
@@ -108,7 +140,15 @@
       "shirt_y_raw_px": 149.6586951474344,
       "shirt_y_corrected_px": 149.1210917691385,
       "shirt_screen_slope_deg": 5.126548629643775,
-      "shirt_hem_y_proxy_px": 203.0
+      "shirt_hem_y_proxy_px": 203.0,
+      "item_x_relative_shirt_px": -51.95001004813349,
+      "item_y_relative_shirt_px": 34.3833216592883,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 127.40944881889764,
+      "screen_shoe_0_y_px": 271.68503937007875,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -130,7 +170,15 @@
       "shirt_y_raw_px": 143.69937275985663,
       "shirt_y_corrected_px": 142.68853878120368,
       "shirt_screen_slope_deg": 3.8234176032043714,
-      "shirt_hem_y_proxy_px": 195.0
+      "shirt_hem_y_proxy_px": 195.0,
+      "item_x_relative_shirt_px": -47.121089392105205,
+      "item_y_relative_shirt_px": 27.80835350945904,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 125.91588785046729,
+      "screen_shoe_0_y_px": 270.25607476635514,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -152,7 +200,15 @@
       "shirt_y_raw_px": 141.7518627229623,
       "shirt_y_corrected_px": 140.4835977140359,
       "shirt_screen_slope_deg": 6.389508657160662,
-      "shirt_hem_y_proxy_px": 194.0
+      "shirt_hem_y_proxy_px": 194.0,
+      "item_x_relative_shirt_px": -44.68692351506209,
+      "item_y_relative_shirt_px": 23.355535845056806,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 122.58545454545454,
+      "screen_shoe_0_y_px": 268.28727272727275,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -174,7 +230,15 @@
       "shirt_y_raw_px": 140.9453354416083,
       "shirt_y_corrected_px": 139.1895125446509,
       "shirt_screen_slope_deg": 5.130908757390092,
-      "shirt_hem_y_proxy_px": 193.0
+      "shirt_hem_y_proxy_px": 193.0,
+      "item_x_relative_shirt_px": -42.91734067408608,
+      "item_y_relative_shirt_px": 24.04720187182454,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 112.32881355932203,
+      "screen_shoe_0_y_px": 274.02542372881356,
+      "screen_shoe_1_x_px": 141.88888888888889,
+      "screen_shoe_1_y_px": 253.4747474747475,
+      "shoe_projected_y_difference_px": -20.550676254066076
     },
     {
       "source": "walk",
@@ -196,7 +260,15 @@
       "shirt_y_raw_px": 145.23590067340066,
       "shirt_y_corrected_px": 142.98697284175088,
       "shirt_screen_slope_deg": 1.9463053779822233,
-      "shirt_hem_y_proxy_px": 196.0
+      "shirt_hem_y_proxy_px": 196.0,
+      "item_x_relative_shirt_px": -42.16502127574962,
+      "item_y_relative_shirt_px": 24.205044208489113,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 111.61029411764706,
+      "screen_shoe_0_y_px": 285.0147058823529,
+      "screen_shoe_1_x_px": 142.21212121212122,
+      "screen_shoe_1_y_px": 246.04545454545453,
+      "shoe_projected_y_difference_px": -38.969251336898395
     },
     {
       "source": "walk",
@@ -218,7 +290,15 @@
       "shirt_y_raw_px": 150.35298681148177,
       "shirt_y_corrected_px": 147.84665560611373,
       "shirt_screen_slope_deg": -1.3944945240782944,
-      "shirt_hem_y_proxy_px": 198.0
+      "shirt_hem_y_proxy_px": 198.0,
+      "item_x_relative_shirt_px": -42.90011921101913,
+      "item_y_relative_shirt_px": 31.007819049324098,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 111.2622699386503,
+      "screen_shoe_0_y_px": 298.4371165644172,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -240,7 +320,15 @@
       "shirt_y_raw_px": 154.8078665941635,
       "shirt_y_corrected_px": 152.31496312317046,
       "shirt_screen_slope_deg": -3.722859003202716,
-      "shirt_hem_y_proxy_px": 203.0
+      "shirt_hem_y_proxy_px": 203.0,
+      "item_x_relative_shirt_px": -44.5519288343865,
+      "item_y_relative_shirt_px": 36.67489202652615,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 113.01167315175097,
+      "screen_shoe_0_y_px": 305.8988326848249,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -262,7 +350,15 @@
       "shirt_y_raw_px": 157.45735067225039,
       "shirt_y_corrected_px": 154.96425861216127,
       "shirt_screen_slope_deg": -0.05441076631643404,
-      "shirt_hem_y_proxy_px": 198.0
+      "shirt_hem_y_proxy_px": 198.0,
+      "item_x_relative_shirt_px": -43.734883737493234,
+      "item_y_relative_shirt_px": 56.02564252502853,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 114.95894428152492,
+      "screen_shoe_0_y_px": 295.3284457478006,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -284,7 +380,15 @@
       "shirt_y_raw_px": 155.9387434554974,
       "shirt_y_corrected_px": 153.4448195529858,
       "shirt_screen_slope_deg": -7.408219329646132,
-      "shirt_hem_y_proxy_px": 189.0
+      "shirt_hem_y_proxy_px": 189.0,
+      "item_x_relative_shirt_px": -40.50149186511287,
+      "item_y_relative_shirt_px": 63.670933963857465,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 116.4833836858006,
+      "screen_shoe_0_y_px": 287.4743202416918,
+      "screen_shoe_1_x_px": 145.9659090909091,
+      "screen_shoe_1_y_px": 253.64772727272728,
+      "shoe_projected_y_difference_px": -33.82659296896455
     },
     {
       "source": "walk",
@@ -306,7 +410,15 @@
       "shirt_y_raw_px": 153.75767571682314,
       "shirt_y_corrected_px": 151.25679380649905,
       "shirt_screen_slope_deg": -2.769026056083989,
-      "shirt_hem_y_proxy_px": 191.0
+      "shirt_hem_y_proxy_px": 191.0,
+      "item_x_relative_shirt_px": -39.722330680860225,
+      "item_y_relative_shirt_px": 59.71009679502521,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 117.98305084745763,
+      "screen_shoe_0_y_px": 283.85084745762714,
+      "screen_shoe_1_x_px": 145.40136054421768,
+      "screen_shoe_1_y_px": 260.3537414965986,
+      "shoe_projected_y_difference_px": -23.497105961028524
     },
     {
       "source": "walk",
@@ -328,7 +440,15 @@
       "shirt_y_raw_px": 150.64278869190224,
       "shirt_y_corrected_px": 147.9884853796006,
       "shirt_screen_slope_deg": -7.767993617633553,
-      "shirt_hem_y_proxy_px": 204.0
+      "shirt_hem_y_proxy_px": 204.0,
+      "item_x_relative_shirt_px": -43.60197956921263,
+      "item_y_relative_shirt_px": 43.450899671016884,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 119.39306358381504,
+      "screen_shoe_0_y_px": 276.8150289017341,
+      "screen_shoe_1_x_px": 146.26785714285714,
+      "screen_shoe_1_y_px": 264.14642857142854,
+      "shoe_projected_y_difference_px": -12.668600330305537
     },
     {
       "source": "walk",
@@ -350,7 +470,15 @@
       "shirt_y_raw_px": 135.2167135190391,
       "shirt_y_corrected_px": 132.19556602949137,
       "shirt_screen_slope_deg": -7.4654344850778385,
-      "shirt_hem_y_proxy_px": 190.0
+      "shirt_hem_y_proxy_px": 190.0,
+      "item_x_relative_shirt_px": -46.232047022744695,
+      "item_y_relative_shirt_px": 27.007903610853134,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 138.19207920792078,
+      "screen_shoe_0_y_px": 265.9049504950495,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -372,7 +500,15 @@
       "shirt_y_raw_px": 132.0402193784278,
       "shirt_y_corrected_px": 128.7111314057868,
       "shirt_screen_slope_deg": -6.4890658187282755,
-      "shirt_hem_y_proxy_px": 188.0
+      "shirt_hem_y_proxy_px": 188.0,
+      "item_x_relative_shirt_px": -47.063319689303384,
+      "item_y_relative_shirt_px": 19.820216758643852,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 146.90458015267177,
+      "screen_shoe_0_y_px": 265.4236641221374,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -394,7 +530,15 @@
       "shirt_y_raw_px": 131.67507300238915,
       "shirt_y_corrected_px": 127.96655235152551,
       "shirt_screen_slope_deg": -4.985552312971812,
-      "shirt_hem_y_proxy_px": 188.0
+      "shirt_hem_y_proxy_px": 188.0,
+      "item_x_relative_shirt_px": -46.88387942430279,
+      "item_y_relative_shirt_px": 18.955334122292783,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 148.6203288490284,
+      "screen_shoe_0_y_px": 268.34828101644246,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -416,7 +560,15 @@
       "shirt_y_raw_px": 136.63505484460694,
       "shirt_y_corrected_px": 132.42603065370423,
       "shirt_screen_slope_deg": 1.5086926480825678,
-      "shirt_hem_y_proxy_px": 189.0
+      "shirt_hem_y_proxy_px": 189.0,
+      "item_x_relative_shirt_px": -48.272846267596876,
+      "item_y_relative_shirt_px": 22.355389225095138,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.52027027027026,
+      "screen_shoe_0_y_px": 279.59324324324325,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -438,7 +590,15 @@
       "shirt_y_raw_px": 145.81133212778784,
       "shirt_y_corrected_px": 141.1055389854691,
       "shirt_screen_slope_deg": 7.080115001434766,
-      "shirt_hem_y_proxy_px": 196.0
+      "shirt_hem_y_proxy_px": 196.0,
+      "item_x_relative_shirt_px": -47.582496597751714,
+      "item_y_relative_shirt_px": 29.878358593861662,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.77101449275364,
+      "screen_shoe_0_y_px": 298.1840579710145,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -460,7 +620,15 @@
       "shirt_y_raw_px": 151.0444700019168,
       "shirt_y_corrected_px": 146.07882349656097,
       "shirt_screen_slope_deg": 7.155619377728287,
-      "shirt_hem_y_proxy_px": 202.0
+      "shirt_hem_y_proxy_px": 202.0,
+      "item_x_relative_shirt_px": -48.275831707627304,
+      "item_y_relative_shirt_px": 34.444626571291906,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 150.1647254575707,
+      "screen_shoe_0_y_px": 307.56239600665555,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -482,7 +650,15 @@
       "shirt_y_raw_px": 151.0444700019168,
       "shirt_y_corrected_px": 151.0444700019168,
       "shirt_screen_slope_deg": 7.155619377728287,
-      "shirt_hem_y_proxy_px": 202.0
+      "shirt_hem_y_proxy_px": 202.0,
+      "item_x_relative_shirt_px": -48.275831707627304,
+      "item_y_relative_shirt_px": 34.444626571291906,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 150.1647254575707,
+      "screen_shoe_0_y_px": 307.56239600665555,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -504,7 +680,15 @@
       "shirt_y_raw_px": 159.99821149116923,
       "shirt_y_corrected_px": 162.59136449104716,
       "shirt_screen_slope_deg": -1.8613999462793673,
-      "shirt_hem_y_proxy_px": 201.0
+      "shirt_hem_y_proxy_px": 201.0,
+      "item_x_relative_shirt_px": -45.0050732829303,
+      "item_y_relative_shirt_px": 54.49594624982396,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 150.2,
+      "screen_shoe_0_y_px": 299.1514285714286,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -526,7 +710,15 @@
       "shirt_y_raw_px": 156.0133478616181,
       "shirt_y_corrected_px": 162.2062780831757,
       "shirt_screen_slope_deg": -0.5920296540771102,
-      "shirt_hem_y_proxy_px": 183.0
+      "shirt_hem_y_proxy_px": 183.0,
+      "item_x_relative_shirt_px": -43.497126000966915,
+      "item_y_relative_shirt_px": 60.11578126751104,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 119.93150684931507,
+      "screen_shoe_0_y_px": 254.02739726027397,
+      "screen_shoe_1_x_px": 148.23546511627907,
+      "screen_shoe_1_y_px": 290.5029069767442,
+      "shoe_projected_y_difference_px": 36.47550971647024
     },
     {
       "source": "walk",
@@ -548,7 +740,15 @@
       "shirt_y_raw_px": 148.7642715137745,
       "shirt_y_corrected_px": 162.0131786030079,
       "shirt_screen_slope_deg": 0.12354142238283668,
-      "shirt_hem_y_proxy_px": 172.0
+      "shirt_hem_y_proxy_px": 172.0,
+      "item_x_relative_shirt_px": -46.8200540073629,
+      "item_y_relative_shirt_px": 54.696688034673286,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 119.86335403726709,
+      "screen_shoe_0_y_px": 259.9130434782609,
+      "screen_shoe_1_x_px": 146.96934865900383,
+      "screen_shoe_1_y_px": 282.8429118773946,
+      "shoe_projected_y_difference_px": 22.92986839913374
     },
     {
       "source": "walk",
@@ -570,7 +770,15 @@
       "shirt_y_raw_px": 146.0570006785795,
       "shirt_y_corrected_px": 166.39691881517618,
       "shirt_screen_slope_deg": 7.998541892417358,
-      "shirt_hem_y_proxy_px": 200.0
+      "shirt_hem_y_proxy_px": 200.0,
+      "item_x_relative_shirt_px": -49.62699236245676,
+      "item_y_relative_shirt_px": 34.270892496494696,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 129.8150183150183,
+      "screen_shoe_0_y_px": 267.0,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -592,7 +800,15 @@
       "shirt_y_raw_px": 136.48055853920516,
       "shirt_y_corrected_px": 164.11669554787215,
       "shirt_screen_slope_deg": 7.45918709696025,
-      "shirt_hem_y_proxy_px": 188.0
+      "shirt_hem_y_proxy_px": 188.0,
+      "item_x_relative_shirt_px": -45.909322333729506,
+      "item_y_relative_shirt_px": 24.69892864028202,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 126.78557114228457,
+      "screen_shoe_0_y_px": 262.7875751503006,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -614,7 +830,15 @@
       "shirt_y_raw_px": 132.30411255411255,
       "shirt_y_corrected_px": 165.46752464822876,
       "shirt_screen_slope_deg": 9.176243828493696,
-      "shirt_hem_y_proxy_px": 184.0
+      "shirt_hem_y_proxy_px": 184.0,
+      "item_x_relative_shirt_px": -42.23917748917749,
+      "item_y_relative_shirt_px": 19.78452380952382,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 123.0860655737705,
+      "screen_shoe_0_y_px": 260.10655737704917,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -636,7 +860,15 @@
       "shirt_y_raw_px": 130.45801687763714,
       "shirt_y_corrected_px": 167.1721606306889,
       "shirt_screen_slope_deg": 6.618502943931427,
-      "shirt_hem_y_proxy_px": 183.0
+      "shirt_hem_y_proxy_px": 183.0,
+      "item_x_relative_shirt_px": -41.81661365901236,
+      "item_y_relative_shirt_px": 18.92891779572969,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 113.90552584670232,
+      "screen_shoe_0_y_px": 266.5329768270945,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -658,7 +890,15 @@
       "shirt_y_raw_px": 135.75899280575538,
       "shirt_y_corrected_px": 174.78078092602516,
       "shirt_screen_slope_deg": 5.134340004476972,
-      "shirt_hem_y_proxy_px": 184.0
+      "shirt_hem_y_proxy_px": 184.0,
+      "item_x_relative_shirt_px": -40.920828854158046,
+      "item_y_relative_shirt_px": 19.51686926321014,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 113.67166666666667,
+      "screen_shoe_0_y_px": 277.33666666666664,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -680,7 +920,15 @@
       "shirt_y_raw_px": 143.22922374429223,
       "shirt_y_corrected_px": 183.5845854443502,
       "shirt_screen_slope_deg": 4.5452573306556205,
-      "shirt_hem_y_proxy_px": 191.0
+      "shirt_hem_y_proxy_px": 191.0,
+      "item_x_relative_shirt_px": -41.41660315171491,
+      "item_y_relative_shirt_px": 25.81776873691078,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 113.61320754716981,
+      "screen_shoe_0_y_px": 290.92075471698115,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -702,7 +950,15 @@
       "shirt_y_raw_px": 156.79927338782926,
       "shirt_y_corrected_px": 197.71867431823392,
       "shirt_screen_slope_deg": 5.521349495081807,
-      "shirt_hem_y_proxy_px": 203.0
+      "shirt_hem_y_proxy_px": 203.0,
+      "item_x_relative_shirt_px": -44.21463461481483,
+      "item_y_relative_shirt_px": 35.05899432870618,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 113.4198250728863,
+      "screen_shoe_0_y_px": 300.09037900874637,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -724,7 +980,15 @@
       "shirt_y_raw_px": 161.0851316101494,
       "shirt_y_corrected_px": 202.2900888569298,
       "shirt_screen_slope_deg": -5.955698527119607,
-      "shirt_hem_y_proxy_px": 200.0
+      "shirt_hem_y_proxy_px": 200.0,
+      "item_x_relative_shirt_px": -42.2756656697362,
+      "item_y_relative_shirt_px": 55.911066108481776,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 114.09265175718849,
+      "screen_shoe_0_y_px": 296.9936102236422,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -746,7 +1010,15 @@
       "shirt_y_raw_px": 162.86535054416603,
       "shirt_y_corrected_px": 204.6029066440577,
       "shirt_screen_slope_deg": -6.743582581614737,
-      "shirt_hem_y_proxy_px": 198.0
+      "shirt_hem_y_proxy_px": 198.0,
+      "item_x_relative_shirt_px": -40.35075506098103,
+      "item_y_relative_shirt_px": 61.90129864303901,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 115.08053691275168,
+      "screen_shoe_0_y_px": 289.3859060402685,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -768,7 +1040,15 @@
       "shirt_y_raw_px": 157.75453172205437,
       "shirt_y_corrected_px": 199.8272876548623,
       "shirt_screen_slope_deg": -5.940940355719937,
-      "shirt_hem_y_proxy_px": 197.0
+      "shirt_hem_y_proxy_px": 197.0,
+      "item_x_relative_shirt_px": -40.72318731117825,
+      "item_y_relative_shirt_px": 59.37046827794563,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 115.96756756756757,
+      "screen_shoe_0_y_px": 279.36756756756756,
+      "screen_shoe_1_x_px": 145.21978021978023,
+      "screen_shoe_1_y_px": 260.64835164835165,
+      "shoe_projected_y_difference_px": -18.719215919215912
     },
     {
       "source": "walk",
@@ -790,7 +1070,15 @@
       "shirt_y_raw_px": 149.89995302959136,
       "shirt_y_corrected_px": 191.9933045129364,
       "shirt_screen_slope_deg": -6.135835292853058,
-      "shirt_hem_y_proxy_px": 202.0
+      "shirt_hem_y_proxy_px": 202.0,
+      "item_x_relative_shirt_px": -41.96790554761469,
+      "item_y_relative_shirt_px": 43.600536686373374,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 133.11019283746558,
+      "screen_shoe_0_y_px": 266.88980716253445,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -812,7 +1100,15 @@
       "shirt_y_raw_px": 137.59612555174104,
       "shirt_y_corrected_px": 179.70056826738588,
       "shirt_screen_slope_deg": -4.472327255025976,
-      "shirt_hem_y_proxy_px": 191.0
+      "shirt_hem_y_proxy_px": 191.0,
+      "item_x_relative_shirt_px": -43.77873001445249,
+      "item_y_relative_shirt_px": 33.04840154708998,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 137.0922693266833,
+      "screen_shoe_0_y_px": 263.5960099750623,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -834,7 +1130,15 @@
       "shirt_y_raw_px": 131.98506707162744,
       "shirt_y_corrected_px": 174.08975643129236,
       "shirt_screen_slope_deg": -5.466217293229416,
-      "shirt_hem_y_proxy_px": 187.0
+      "shirt_hem_y_proxy_px": 187.0,
+      "item_x_relative_shirt_px": -45.47559394390153,
+      "item_y_relative_shirt_px": 27.739051244641047,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 116.24545454545455,
+      "screen_shoe_0_y_px": 249.64545454545456,
+      "screen_shoe_1_x_px": 145.93290734824282,
+      "screen_shoe_1_y_px": 264.06389776357827,
+      "shoe_projected_y_difference_px": 14.418443218123713
     },
     {
       "source": "walk",
@@ -856,7 +1160,15 @@
       "shirt_y_raw_px": 130.08537859007834,
       "shirt_y_corrected_px": 172.19001454398153,
       "shirt_screen_slope_deg": -5.5844417486141085,
-      "shirt_hem_y_proxy_px": 185.0
+      "shirt_hem_y_proxy_px": 185.0,
+      "item_x_relative_shirt_px": -45.882314370295504,
+      "item_y_relative_shirt_px": 25.328002532980207,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 146.7048710601719,
+      "screen_shoe_0_y_px": 264.0315186246418,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -878,7 +1190,15 @@
       "shirt_y_raw_px": 131.07496529384545,
       "shirt_y_corrected_px": 173.1570063190072,
       "shirt_screen_slope_deg": 3.231213487879271,
-      "shirt_hem_y_proxy_px": 182.0
+      "shirt_hem_y_proxy_px": 182.0,
+      "item_x_relative_shirt_px": -47.198029466036175,
+      "item_y_relative_shirt_px": 27.004309904342534,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 147.86754966887418,
+      "screen_shoe_0_y_px": 272.0430463576159,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -900,7 +1220,15 @@
       "shirt_y_raw_px": 137.12097440132123,
       "shirt_y_corrected_px": 178.96409330734235,
       "shirt_screen_slope_deg": 7.63464090604302,
-      "shirt_hem_y_proxy_px": 186.0
+      "shirt_hem_y_proxy_px": 186.0,
+      "item_x_relative_shirt_px": -46.35661514108753,
+      "item_y_relative_shirt_px": 33.35010866913092,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.07818181818183,
+      "screen_shoe_0_y_px": 284.9327272727273,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -922,7 +1250,15 @@
       "shirt_y_raw_px": 146.52012974623165,
       "shirt_y_corrected_px": 188.0871446788641,
       "shirt_screen_slope_deg": 5.546732726792238,
-      "shirt_hem_y_proxy_px": 196.0
+      "shirt_hem_y_proxy_px": 196.0,
+      "item_x_relative_shirt_px": -47.18141311845949,
+      "item_y_relative_shirt_px": 40.413716407614515,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 148.92307692307693,
+      "screen_shoe_0_y_px": 296.9230769230769,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -944,7 +1280,15 @@
       "shirt_y_raw_px": 146.52012974623165,
       "shirt_y_corrected_px": 146.52012974623165,
       "shirt_screen_slope_deg": 5.546732726792238,
-      "shirt_hem_y_proxy_px": 196.0
+      "shirt_hem_y_proxy_px": 196.0,
+      "item_x_relative_shirt_px": -47.18141311845949,
+      "item_y_relative_shirt_px": 40.413716407614515,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 148.92307692307693,
+      "screen_shoe_0_y_px": 296.9230769230769,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -966,7 +1310,15 @@
       "shirt_y_raw_px": 156.88590308370044,
       "shirt_y_corrected_px": 156.5674779051726,
       "shirt_screen_slope_deg": -2.8766211313783825,
-      "shirt_hem_y_proxy_px": 198.0
+      "shirt_hem_y_proxy_px": 198.0,
+      "item_x_relative_shirt_px": -46.928794977926884,
+      "item_y_relative_shirt_px": 53.82474874459845,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.25757575757575,
+      "screen_shoe_0_y_px": 293.6868686868687,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -988,7 +1340,15 @@
       "shirt_y_raw_px": 157.6115681233933,
       "shirt_y_corrected_px": 157.12060442595984,
       "shirt_screen_slope_deg": -1.396581607658326,
-      "shirt_hem_y_proxy_px": 187.0
+      "shirt_hem_y_proxy_px": 187.0,
+      "item_x_relative_shirt_px": -44.44911430457809,
+      "item_y_relative_shirt_px": 60.1403444449127,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.00278551532034,
+      "screen_shoe_0_y_px": 290.47632311977713,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1010,7 +1370,15 @@
       "shirt_y_raw_px": 157.7348944781729,
       "shirt_y_corrected_px": 156.64288707956754,
       "shirt_screen_slope_deg": 1.7704392557603081,
-      "shirt_hem_y_proxy_px": 179.67999999999984
+      "shirt_hem_y_proxy_px": 179.67999999999984,
+      "item_x_relative_shirt_px": -49.56312952606963,
+      "item_y_relative_shirt_px": 49.93892965270646,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 148.31726907630522,
+      "screen_shoe_0_y_px": 284.95180722891564,
+      "screen_shoe_1_x_px": 184.18589743589743,
+      "screen_shoe_1_y_px": 196.05128205128204,
+      "shoe_projected_y_difference_px": -88.9005251776336
     },
     {
       "source": "walk",
@@ -1032,7 +1400,15 @@
       "shirt_y_raw_px": 155.30639887902848,
       "shirt_y_corrected_px": 154.2165696725618,
       "shirt_screen_slope_deg": 7.943273122248322,
-      "shirt_hem_y_proxy_px": 208.0
+      "shirt_hem_y_proxy_px": 208.0,
+      "item_x_relative_shirt_px": -49.54662910160211,
+      "item_y_relative_shirt_px": 30.081565269499038,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 134.3356807511737,
+      "screen_shoe_0_y_px": 271.73708920187795,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1054,7 +1430,15 @@
       "shirt_y_raw_px": 144.76686151079136,
       "shirt_y_corrected_px": 143.83407194665867,
       "shirt_screen_slope_deg": 7.1373402713068375,
-      "shirt_hem_y_proxy_px": 196.0
+      "shirt_hem_y_proxy_px": 196.0,
+      "item_x_relative_shirt_px": -47.66361900170587,
+      "item_y_relative_shirt_px": 22.742416839724115,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 129.75402298850574,
+      "screen_shoe_0_y_px": 268.3448275862069,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1076,7 +1460,15 @@
       "shirt_y_raw_px": 138.6428093645485,
       "shirt_y_corrected_px": 137.80465957855301,
       "shirt_screen_slope_deg": 9.264232225291599,
-      "shirt_hem_y_proxy_px": 190.0
+      "shirt_hem_y_proxy_px": 190.0,
+      "item_x_relative_shirt_px": -44.19505199981674,
+      "item_y_relative_shirt_px": 18.138012553259728,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 122.275,
+      "screen_shoe_0_y_px": 267.221875,
+      "screen_shoe_1_x_px": 146.11702127659575,
+      "screen_shoe_1_y_px": 250.29787234042553,
+      "shoe_projected_y_difference_px": -16.924002659574484
     },
     {
       "source": "walk",
@@ -1098,7 +1490,15 @@
       "shirt_y_raw_px": 133.97285464098073,
       "shirt_y_corrected_px": 133.23910548975087,
       "shirt_screen_slope_deg": 6.188629546191774,
-      "shirt_hem_y_proxy_px": 185.0
+      "shirt_hem_y_proxy_px": 185.0,
+      "item_x_relative_shirt_px": -43.74216050551428,
+      "item_y_relative_shirt_px": 19.07038860226251,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 120.54771784232365,
+      "screen_shoe_0_y_px": 266.7904564315353,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1120,7 +1520,15 @@
       "shirt_y_raw_px": 134.77954820492133,
       "shirt_y_corrected_px": 134.09585074283942,
       "shirt_screen_slope_deg": 5.19963797002119,
-      "shirt_hem_y_proxy_px": 184.0
+      "shirt_hem_y_proxy_px": 184.0,
+      "item_x_relative_shirt_px": -41.74439905132188,
+      "item_y_relative_shirt_px": 21.27009718514961,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 118.26996197718631,
+      "screen_shoe_0_y_px": 274.6425855513308,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1142,7 +1550,15 @@
       "shirt_y_raw_px": 139.59222759390107,
       "shirt_y_corrected_px": 138.90833939695588,
       "shirt_screen_slope_deg": 1.6265851355064578,
-      "shirt_hem_y_proxy_px": 187.0
+      "shirt_hem_y_proxy_px": 187.0,
+      "item_x_relative_shirt_px": -42.408364311441474,
+      "item_y_relative_shirt_px": 25.72848953757304,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 117.7561475409836,
+      "screen_shoe_0_y_px": 285.3913934426229,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1164,7 +1580,15 @@
       "shirt_y_raw_px": 147.42565969062784,
       "shirt_y_corrected_px": 146.7262075288389,
       "shirt_screen_slope_deg": 2.6270733212650894,
-      "shirt_hem_y_proxy_px": 195.0
+      "shirt_hem_y_proxy_px": 195.0,
+      "item_x_relative_shirt_px": -43.91430355581723,
+      "item_y_relative_shirt_px": 33.2171974522293,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 118.82697947214076,
+      "screen_shoe_0_y_px": 293.0263929618768,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1186,7 +1610,15 @@
       "shirt_y_raw_px": 154.46926536731635,
       "shirt_y_corrected_px": 153.61934247188483,
       "shirt_screen_slope_deg": 3.007616141857102,
-      "shirt_hem_y_proxy_px": 195.0
+      "shirt_hem_y_proxy_px": 195.0,
+      "item_x_relative_shirt_px": -43.98599593369822,
+      "item_y_relative_shirt_px": 49.34401663460858,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 117.53684210526316,
+      "screen_shoe_0_y_px": 289.1684210526316,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1208,7 +1640,15 @@
       "shirt_y_raw_px": 156.14730077120822,
       "shirt_y_corrected_px": 155.12391214701694,
       "shirt_screen_slope_deg": -6.0462049779569735,
-      "shirt_hem_y_proxy_px": 189.0
+      "shirt_hem_y_proxy_px": 189.0,
+      "item_x_relative_shirt_px": -41.26903135900565,
+      "item_y_relative_shirt_px": 61.071554447647,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 117.29588014981273,
+      "screen_shoe_0_y_px": 283.19101123595505,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1230,7 +1670,15 @@
       "shirt_y_raw_px": 158.17604166666666,
       "shirt_y_corrected_px": 157.10298568407694,
       "shirt_screen_slope_deg": -6.632620043982191,
-      "shirt_hem_y_proxy_px": 194.0
+      "shirt_hem_y_proxy_px": 194.0,
+      "item_x_relative_shirt_px": -41.24112794406281,
+      "item_y_relative_shirt_px": 60.822976979064435,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 116.56652360515021,
+      "screen_shoe_0_y_px": 281.3605150214592,
+      "screen_shoe_1_x_px": 144.35353535353536,
+      "screen_shoe_1_y_px": 254.76767676767676,
+      "shoe_projected_y_difference_px": -26.592838253782446
     },
     {
       "source": "walk",
@@ -1252,7 +1700,15 @@
       "shirt_y_raw_px": 156.5802769006558,
       "shirt_y_corrected_px": 155.04467170847136,
       "shirt_screen_slope_deg": -7.898591499371798,
-      "shirt_hem_y_proxy_px": 208.0
+      "shirt_hem_y_proxy_px": 208.0,
+      "item_x_relative_shirt_px": -43.324232800183665,
+      "item_y_relative_shirt_px": 46.44516341245574,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 134.64335664335664,
+      "screen_shoe_0_y_px": 270.7808857808858,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1274,7 +1730,15 @@
       "shirt_y_raw_px": 145.20737683776116,
       "shirt_y_corrected_px": 143.4913574457476,
       "shirt_screen_slope_deg": -5.762167682706413,
-      "shirt_hem_y_proxy_px": 198.0
+      "shirt_hem_y_proxy_px": 198.0,
+      "item_x_relative_shirt_px": -44.6009865113796,
+      "item_y_relative_shirt_px": 34.59713444043433,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 136.49686847599165,
+      "screen_shoe_0_y_px": 273.3382045929019,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1296,7 +1760,15 @@
       "shirt_y_raw_px": 138.78172999191594,
       "shirt_y_corrected_px": 137.09811359215092,
       "shirt_screen_slope_deg": -4.6105244280348705,
-      "shirt_hem_y_proxy_px": 193.0
+      "shirt_hem_y_proxy_px": 193.0,
+      "item_x_relative_shirt_px": -44.03435267006755,
+      "item_y_relative_shirt_px": 27.917120582796713,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 113.42307692307692,
+      "screen_shoe_0_y_px": 256.03846153846155,
+      "screen_shoe_1_x_px": 143.97280966767372,
+      "screen_shoe_1_y_px": 272.02416918429003,
+      "shoe_projected_y_difference_px": 15.985707645828484
     },
     {
       "source": "walk",
@@ -1318,7 +1790,15 @@
       "shirt_y_raw_px": 132.21290663845542,
       "shirt_y_corrected_px": 130.55548957951072,
       "shirt_screen_slope_deg": -5.634590962702897,
-      "shirt_hem_y_proxy_px": 188.0
+      "shirt_hem_y_proxy_px": 188.0,
+      "item_x_relative_shirt_px": -46.06676658144522,
+      "item_y_relative_shirt_px": 27.144993975726607,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 146.49630996309963,
+      "screen_shoe_0_y_px": 271.01845018450183,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1340,7 +1820,15 @@
       "shirt_y_raw_px": 132.8391364902507,
       "shirt_y_corrected_px": 131.21712172927963,
       "shirt_screen_slope_deg": 1.296576283590737,
-      "shirt_hem_y_proxy_px": 182.0
+      "shirt_hem_y_proxy_px": 182.0,
+      "item_x_relative_shirt_px": -47.964644522639574,
+      "item_y_relative_shirt_px": 29.052249277539573,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 147.71544715447155,
+      "screen_shoe_0_y_px": 276.3609756097561,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1362,7 +1850,15 @@
       "shirt_y_raw_px": 136.28691723146437,
       "shirt_y_corrected_px": 134.67628838815688,
       "shirt_screen_slope_deg": 4.682477060484752,
-      "shirt_hem_y_proxy_px": 186.0
+      "shirt_hem_y_proxy_px": 186.0,
+      "item_x_relative_shirt_px": -47.47342826616401,
+      "item_y_relative_shirt_px": 33.68729628065529,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 148.1958041958042,
+      "screen_shoe_0_y_px": 285.4458041958042,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "walk",
@@ -1384,7 +1880,15 @@
       "shirt_y_raw_px": 143.41795366795367,
       "shirt_y_corrected_px": 141.82060593159503,
       "shirt_screen_slope_deg": 1.3219303005582594,
-      "shirt_hem_y_proxy_px": 193.0
+      "shirt_hem_y_proxy_px": 193.0,
+      "item_x_relative_shirt_px": -48.005198908930254,
+      "item_y_relative_shirt_px": 40.076076182792605,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.68668407310705,
+      "screen_shoe_0_y_px": 293.6005221932115,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     }
   ],
   "run": [
@@ -1408,7 +1912,15 @@
       "shirt_y_raw_px": 183.00836820083683,
       "shirt_y_corrected_px": 183.00836820083683,
       "shirt_screen_slope_deg": 2.247847542987468,
-      "shirt_hem_y_proxy_px": 221.0
+      "shirt_hem_y_proxy_px": 221.0,
+      "item_x_relative_shirt_px": -41.16354448399947,
+      "item_y_relative_shirt_px": 27.518335298242363,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 124.27651515151516,
+      "screen_shoe_0_y_px": 300.375,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1430,7 +1942,15 @@
       "shirt_y_raw_px": 185.39394957983194,
       "shirt_y_corrected_px": 188.2960415598124,
       "shirt_screen_slope_deg": -5.311780419108559,
-      "shirt_hem_y_proxy_px": 210.03999999999996
+      "shirt_hem_y_proxy_px": 210.03999999999996,
+      "item_x_relative_shirt_px": -39.07592037575486,
+      "item_y_relative_shirt_px": 47.661183500015966,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 125.09417040358744,
+      "screen_shoe_0_y_px": 293.2825112107623,
+      "screen_shoe_1_x_px": 152.52941176470588,
+      "screen_shoe_1_y_px": 243.41176470588235,
+      "shoe_projected_y_difference_px": -49.870746504879975
     },
     {
       "source": "run",
@@ -1452,7 +1972,15 @@
       "shirt_y_raw_px": 182.9542715349167,
       "shirt_y_corrected_px": 186.0509741106003,
       "shirt_screen_slope_deg": -8.154973668726232,
-      "shirt_hem_y_proxy_px": 210.0
+      "shirt_hem_y_proxy_px": 210.0,
+      "item_x_relative_shirt_px": -40.52609194594599,
+      "item_y_relative_shirt_px": 53.82096796397792,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 125.80540540540541,
+      "screen_shoe_0_y_px": 283.36756756756756,
+      "screen_shoe_1_x_px": 150.74242424242425,
+      "screen_shoe_1_y_px": 257.57575757575756,
+      "shoe_projected_y_difference_px": -25.79180999181
     },
     {
       "source": "run",
@@ -1474,7 +2002,15 @@
       "shirt_y_raw_px": 174.9402985074627,
       "shirt_y_corrected_px": 178.35520787025567,
       "shirt_screen_slope_deg": -11.18215929616069,
-      "shirt_hem_y_proxy_px": 219.0
+      "shirt_hem_y_proxy_px": 219.0,
+      "item_x_relative_shirt_px": -40.77228877557077,
+      "item_y_relative_shirt_px": 38.58257215499788,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 126.07865168539325,
+      "screen_shoe_0_y_px": 271.65168539325845,
+      "screen_shoe_1_x_px": 149.03370786516854,
+      "screen_shoe_1_y_px": 265.62359550561797,
+      "shoe_projected_y_difference_px": -6.028089887640476
     },
     {
       "source": "run",
@@ -1496,7 +2032,15 @@
       "shirt_y_raw_px": 161.77704437110378,
       "shirt_y_corrected_px": 169.0754147324319,
       "shirt_screen_slope_deg": -7.584429565399972,
-      "shirt_hem_y_proxy_px": 206.0
+      "shirt_hem_y_proxy_px": 206.0,
+      "item_x_relative_shirt_px": -42.474411080338555,
+      "item_y_relative_shirt_px": 29.370543140722134,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 124.66666666666667,
+      "screen_shoe_0_y_px": 263.11538461538464,
+      "screen_shoe_1_x_px": 149.08294930875576,
+      "screen_shoe_1_y_px": 266.7235023041475,
+      "shoe_projected_y_difference_px": 3.6081176887628317
     },
     {
       "source": "run",
@@ -1518,7 +2062,15 @@
       "shirt_y_raw_px": 154.830788278993,
       "shirt_y_corrected_px": 162.38167252581917,
       "shirt_screen_slope_deg": -6.143016927908486,
-      "shirt_hem_y_proxy_px": 205.0
+      "shirt_hem_y_proxy_px": 205.0,
+      "item_x_relative_shirt_px": -43.59483978689765,
+      "item_y_relative_shirt_px": 23.621266515527537,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.35227272727272,
+      "screen_shoe_0_y_px": 265.8219696969697,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1540,7 +2092,15 @@
       "shirt_y_raw_px": 152.64256026600165,
       "shirt_y_corrected_px": 163.041146539195,
       "shirt_screen_slope_deg": -2.947482998523215,
-      "shirt_hem_y_proxy_px": 204.0
+      "shirt_hem_y_proxy_px": 204.0,
+      "item_x_relative_shirt_px": -42.12498635565966,
+      "item_y_relative_shirt_px": 23.403455446680738,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.66666666666666,
+      "screen_shoe_0_y_px": 266.76428571428573,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1562,7 +2122,15 @@
       "shirt_y_raw_px": 152.24278846153845,
       "shirt_y_corrected_px": 164.19771018395056,
       "shirt_screen_slope_deg": -2.2671317716860537,
-      "shirt_hem_y_proxy_px": 204.0
+      "shirt_hem_y_proxy_px": 204.0,
+      "item_x_relative_shirt_px": -42.70303073152337,
+      "item_y_relative_shirt_px": 25.115312673652454,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.4493670886076,
+      "screen_shoe_0_y_px": 270.084388185654,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1584,7 +2152,15 @@
       "shirt_y_raw_px": 160.9563416188655,
       "shirt_y_corrected_px": 172.902565831512,
       "shirt_screen_slope_deg": 2.550216421025813,
-      "shirt_hem_y_proxy_px": 202.0
+      "shirt_hem_y_proxy_px": 202.0,
+      "item_x_relative_shirt_px": -43.004007539163396,
+      "item_y_relative_shirt_px": 29.270632065345012,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.31187122736418,
+      "screen_shoe_0_y_px": 283.9456740442656,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1606,7 +2182,15 @@
       "shirt_y_raw_px": 174.61000510464524,
       "shirt_y_corrected_px": 186.5765616537175,
       "shirt_screen_slope_deg": -0.48840680629868594,
-      "shirt_hem_y_proxy_px": 216.0
+      "shirt_hem_y_proxy_px": 216.0,
+      "item_x_relative_shirt_px": -44.56940697873138,
+      "item_y_relative_shirt_px": 35.08875492453055,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 144.62569832402235,
+      "screen_shoe_0_y_px": 300.4106145251397,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1628,7 +2212,15 @@
       "shirt_y_raw_px": null,
       "shirt_y_corrected_px": null,
       "shirt_screen_slope_deg": null,
-      "shirt_hem_y_proxy_px": null
+      "shirt_hem_y_proxy_px": null,
+      "item_x_relative_shirt_px": null,
+      "item_y_relative_shirt_px": null,
+      "shoe_components": 0,
+      "screen_shoe_0_x_px": null,
+      "screen_shoe_0_y_px": null,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1650,7 +2242,15 @@
       "shirt_y_raw_px": 179.60115606936415,
       "shirt_y_corrected_px": 196.0598696008583,
       "shirt_screen_slope_deg": 4.708080374589792,
-      "shirt_hem_y_proxy_px": 194.0
+      "shirt_hem_y_proxy_px": 194.0,
+      "item_x_relative_shirt_px": -41.203202402520844,
+      "item_y_relative_shirt_px": 38.80289510334373,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 127.7012987012987,
+      "screen_shoe_0_y_px": 259.0,
+      "screen_shoe_1_x_px": 148.33519553072625,
+      "screen_shoe_1_y_px": 283.0893854748603,
+      "shoe_projected_y_difference_px": 24.089385474860308
     },
     {
       "source": "run",
@@ -1672,7 +2272,15 @@
       "shirt_y_raw_px": 171.66732804232805,
       "shirt_y_corrected_px": 193.7370034878847,
       "shirt_screen_slope_deg": 9.64458719045037,
-      "shirt_hem_y_proxy_px": 217.0
+      "shirt_hem_y_proxy_px": 217.0,
+      "item_x_relative_shirt_px": -44.80214741398953,
+      "item_y_relative_shirt_px": 16.72740879977721,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 135.1969696969697,
+      "screen_shoe_0_y_px": 267.5090909090909,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1694,7 +2302,15 @@
       "shirt_y_raw_px": 152.62975071516144,
       "shirt_y_corrected_px": 173.71711491193878,
       "shirt_screen_slope_deg": -3.1778687794072398,
-      "shirt_hem_y_proxy_px": 179.0
+      "shirt_hem_y_proxy_px": 179.0,
+      "item_x_relative_shirt_px": -37.22923381084395,
+      "item_y_relative_shirt_px": 16.65673577132506,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 128.10283687943263,
+      "screen_shoe_0_y_px": 265.04609929078015,
+      "screen_shoe_1_x_px": 149.95454545454547,
+      "screen_shoe_1_y_px": 257.59090909090907,
+      "shoe_projected_y_difference_px": -7.455190199871083
     },
     {
       "source": "run",
@@ -1716,7 +2332,15 @@
       "shirt_y_raw_px": 148.05137690094534,
       "shirt_y_corrected_px": 168.61071070221487,
       "shirt_screen_slope_deg": -6.5537314787807786,
-      "shirt_hem_y_proxy_px": 178.0
+      "shirt_hem_y_proxy_px": 178.0,
+      "item_x_relative_shirt_px": -34.5864560039569,
+      "item_y_relative_shirt_px": 14.87517677137103,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 125.63147410358566,
+      "screen_shoe_0_y_px": 264.90239043824704,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1738,7 +2362,15 @@
       "shirt_y_raw_px": 149.45527831094049,
       "shirt_y_corrected_px": 169.6968325711944,
       "shirt_screen_slope_deg": -7.365107852984416,
-      "shirt_hem_y_proxy_px": 184.0
+      "shirt_hem_y_proxy_px": 184.0,
+      "item_x_relative_shirt_px": -35.78730570923186,
+      "item_y_relative_shirt_px": 14.887858943961476,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 125.42830188679245,
+      "screen_shoe_0_y_px": 269.77358490566036,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1760,7 +2392,15 @@
       "shirt_y_raw_px": 161.85041158103888,
       "shirt_y_corrected_px": 181.52884786033576,
       "shirt_screen_slope_deg": 0.40102234306294593,
-      "shirt_hem_y_proxy_px": 204.0
+      "shirt_hem_y_proxy_px": 204.0,
+      "item_x_relative_shirt_px": -39.811655975021296,
+      "item_y_relative_shirt_px": 10.777588418961102,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 125.10162601626017,
+      "screen_shoe_0_y_px": 282.6117886178862,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1782,7 +2422,15 @@
       "shirt_y_raw_px": 169.6220393916729,
       "shirt_y_corrected_px": 191.65647847858696,
       "shirt_screen_slope_deg": -0.7989114750573125,
-      "shirt_hem_y_proxy_px": 212.0
+      "shirt_hem_y_proxy_px": 212.0,
+      "item_x_relative_shirt_px": -41.44316734877212,
+      "item_y_relative_shirt_px": 15.021392243715837,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 124.48818897637796,
+      "screen_shoe_0_y_px": 298.40944881889766,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1804,7 +2452,15 @@
       "shirt_y_raw_px": 169.6220393916729,
       "shirt_y_corrected_px": 169.6220393916729,
       "shirt_screen_slope_deg": -0.7989114750573125,
-      "shirt_hem_y_proxy_px": 212.0
+      "shirt_hem_y_proxy_px": 212.0,
+      "item_x_relative_shirt_px": -41.44316734877212,
+      "item_y_relative_shirt_px": 15.021392243715837,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 124.48818897637796,
+      "screen_shoe_0_y_px": 298.40944881889766,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1826,7 +2482,15 @@
       "shirt_y_raw_px": 179.9829853054911,
       "shirt_y_corrected_px": 180.16083412140907,
       "shirt_screen_slope_deg": 2.538116530042112,
-      "shirt_hem_y_proxy_px": 219.0
+      "shirt_hem_y_proxy_px": 219.0,
+      "item_x_relative_shirt_px": -42.34520358390995,
+      "item_y_relative_shirt_px": 28.35145178060162,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 124.85882352941177,
+      "screen_shoe_0_y_px": 296.28627450980395,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1848,7 +2512,15 @@
       "shirt_y_raw_px": 184.14931825739941,
       "shirt_y_corrected_px": 186.7842288408955,
       "shirt_screen_slope_deg": -5.65230437135119,
-      "shirt_hem_y_proxy_px": 209.0
+      "shirt_hem_y_proxy_px": 209.0,
+      "item_x_relative_shirt_px": -41.668876182112285,
+      "item_y_relative_shirt_px": 49.55941960667826,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 124.26422764227642,
+      "screen_shoe_0_y_px": 292.4756097560976,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1870,7 +2542,15 @@
       "shirt_y_raw_px": 182.96137931034482,
       "shirt_y_corrected_px": 187.68747641727842,
       "shirt_screen_slope_deg": -7.835027869883128,
-      "shirt_hem_y_proxy_px": 211.0
+      "shirt_hem_y_proxy_px": 211.0,
+      "item_x_relative_shirt_px": -41.361249471975796,
+      "item_y_relative_shirt_px": 50.87356588630249,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 124.50592885375494,
+      "screen_shoe_0_y_px": 285.34387351778656,
+      "screen_shoe_1_x_px": 148.19424460431654,
+      "screen_shoe_1_y_px": 260.8561151079137,
+      "shoe_projected_y_difference_px": -24.487758409872868
     },
     {
       "source": "run",
@@ -1892,7 +2572,15 @@
       "shirt_y_raw_px": 173.76326929338978,
       "shirt_y_corrected_px": 179.15393244036244,
       "shirt_screen_slope_deg": -8.404950758284324,
-      "shirt_hem_y_proxy_px": 218.0
+      "shirt_hem_y_proxy_px": 218.0,
+      "item_x_relative_shirt_px": -39.65283170102448,
+      "item_y_relative_shirt_px": 37.23257270245222,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 145.2074074074074,
+      "screen_shoe_0_y_px": 268.162962962963,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1914,7 +2602,15 @@
       "shirt_y_raw_px": 154.14744110479285,
       "shirt_y_corrected_px": 159.53186340703894,
       "shirt_screen_slope_deg": -3.9999794069834453,
-      "shirt_hem_y_proxy_px": 204.0
+      "shirt_hem_y_proxy_px": 204.0,
+      "item_x_relative_shirt_px": -41.94407768027064,
+      "item_y_relative_shirt_px": 20.49223025670949,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 147.91836734693877,
+      "screen_shoe_0_y_px": 263.8945578231293,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1936,7 +2632,15 @@
       "shirt_y_raw_px": 148.72942135289324,
       "shirt_y_corrected_px": 155.72761318638933,
       "shirt_screen_slope_deg": -2.58307852442122,
-      "shirt_hem_y_proxy_px": 201.0
+      "shirt_hem_y_proxy_px": 201.0,
+      "item_x_relative_shirt_px": -40.77832520613933,
+      "item_y_relative_shirt_px": 19.178958535374903,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.96353166986563,
+      "screen_shoe_0_y_px": 266.66602687140113,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1958,7 +2662,15 @@
       "shirt_y_raw_px": 157.19557195571954,
       "shirt_y_corrected_px": 167.12982946304376,
       "shirt_screen_slope_deg": 2.956239351985707,
-      "shirt_hem_y_proxy_px": 200.0
+      "shirt_hem_y_proxy_px": 200.0,
+      "item_x_relative_shirt_px": -42.36997884378843,
+      "item_y_relative_shirt_px": 24.586828044280452,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 150.975,
+      "screen_shoe_0_y_px": 282.0769230769231,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -1980,7 +2692,15 @@
       "shirt_y_raw_px": 170.40649782553083,
       "shirt_y_corrected_px": 183.85503755941755,
       "shirt_screen_slope_deg": 1.154168275124356,
-      "shirt_hem_y_proxy_px": 212.0
+      "shirt_hem_y_proxy_px": 212.0,
+      "item_x_relative_shirt_px": -44.29279974849514,
+      "item_y_relative_shirt_px": 31.005818104857383,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 150.44972067039106,
+      "screen_shoe_0_y_px": 296.463687150838,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2002,7 +2722,15 @@
       "shirt_y_raw_px": 178.49032800672833,
       "shirt_y_corrected_px": 196.64080255506818,
       "shirt_screen_slope_deg": -2.4672195858767414,
-      "shirt_hem_y_proxy_px": 214.0
+      "shirt_hem_y_proxy_px": 214.0,
+      "item_x_relative_shirt_px": -46.15708235659025,
+      "item_y_relative_shirt_px": 42.17917553937096,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 150.59362549800798,
+      "screen_shoe_0_y_px": 294.1752988047809,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2024,7 +2752,15 @@
       "shirt_y_raw_px": 181.8067284586337,
       "shirt_y_corrected_px": 200.94118127845792,
       "shirt_screen_slope_deg": 4.497173649951733,
-      "shirt_hem_y_proxy_px": 199.0
+      "shirt_hem_y_proxy_px": 199.0,
+      "item_x_relative_shirt_px": -46.511171726148476,
+      "item_y_relative_shirt_px": 43.90992287531293,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 150.29249011857706,
+      "screen_shoe_0_y_px": 289.9367588932806,
+      "screen_shoe_1_x_px": 180.53076923076924,
+      "screen_shoe_1_y_px": 218.03076923076924,
+      "shoe_projected_y_difference_px": -71.90598966251139
     },
     {
       "source": "run",
@@ -2046,7 +2782,15 @@
       "shirt_y_raw_px": 178.67878585723815,
       "shirt_y_corrected_px": 200.75981765655456,
       "shirt_screen_slope_deg": 10.401305844922728,
-      "shirt_hem_y_proxy_px": 225.0
+      "shirt_hem_y_proxy_px": 225.0,
+      "item_x_relative_shirt_px": -47.768008055923545,
+      "item_y_relative_shirt_px": 19.306996133283178,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 127.40186915887851,
+      "screen_shoe_0_y_px": 267.0747663551402,
+      "screen_shoe_1_x_px": 148.78494623655914,
+      "screen_shoe_1_y_px": 279.18817204301075,
+      "shoe_projected_y_difference_px": 12.113405687870568
     },
     {
       "source": "run",
@@ -2068,7 +2812,15 @@
       "shirt_y_raw_px": 156.16325742956388,
       "shirt_y_corrected_px": 184.9959524368881,
       "shirt_screen_slope_deg": -3.815354971336244,
-      "shirt_hem_y_proxy_px": 184.0
+      "shirt_hem_y_proxy_px": 184.0,
+      "item_x_relative_shirt_px": -38.02939483256394,
+      "item_y_relative_shirt_px": 17.831155978257357,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 133.32413793103447,
+      "screen_shoe_0_y_px": 267.33103448275864,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2090,7 +2842,15 @@
       "shirt_y_raw_px": 152.63212025316454,
       "shirt_y_corrected_px": 184.41498005541064,
       "shirt_screen_slope_deg": -4.107856927054584,
-      "shirt_hem_y_proxy_px": 181.0
+      "shirt_hem_y_proxy_px": 181.0,
+      "item_x_relative_shirt_px": -36.01042485651388,
+      "item_y_relative_shirt_px": 15.964153038760912,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 131.96124031007753,
+      "screen_shoe_0_y_px": 264.21188630490957,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2112,7 +2872,15 @@
       "shirt_y_raw_px": 147.61882845188285,
       "shirt_y_corrected_px": 183.15159670139457,
       "shirt_screen_slope_deg": -6.1578220669510255,
-      "shirt_hem_y_proxy_px": 178.0
+      "shirt_hem_y_proxy_px": 178.0,
+      "item_x_relative_shirt_px": -32.351200991786754,
+      "item_y_relative_shirt_px": 13.833023399968994,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 122.18980169971671,
+      "screen_shoe_0_y_px": 264.8441926345609,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2134,7 +2902,15 @@
       "shirt_y_raw_px": 148.68902891030393,
       "shirt_y_corrected_px": 187.1357986246594,
       "shirt_screen_slope_deg": -10.089486045166858,
-      "shirt_hem_y_proxy_px": 186.0
+      "shirt_hem_y_proxy_px": 186.0,
+      "item_x_relative_shirt_px": -35.34259945638743,
+      "item_y_relative_shirt_px": 15.702783955193155,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 120.50474383301707,
+      "screen_shoe_0_y_px": 271.7552182163188,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2156,7 +2932,15 @@
       "shirt_y_raw_px": 161.52950955943476,
       "shirt_y_corrected_px": 200.42345334605585,
       "shirt_screen_slope_deg": 0.45093299565247463,
-      "shirt_hem_y_proxy_px": 203.0
+      "shirt_hem_y_proxy_px": 203.0,
+      "item_x_relative_shirt_px": -40.15278737560382,
+      "item_y_relative_shirt_px": 11.20543019960138,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 119.73244781783681,
+      "screen_shoe_0_y_px": 283.7362428842505,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2178,7 +2962,15 @@
       "shirt_y_raw_px": 175.47859631657542,
       "shirt_y_corrected_px": 214.73170148014964,
       "shirt_screen_slope_deg": 1.9889455105318996,
-      "shirt_hem_y_proxy_px": 215.3199999999997
+      "shirt_hem_y_proxy_px": 215.3199999999997,
+      "item_x_relative_shirt_px": -43.00798092978759,
+      "item_y_relative_shirt_px": 27.53381503094232,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 121.75975975975976,
+      "screen_shoe_0_y_px": 293.0690690690691,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2200,7 +2992,15 @@
       "shirt_y_raw_px": 175.47859631657542,
       "shirt_y_corrected_px": 175.47859631657542,
       "shirt_screen_slope_deg": 1.9889455105318996,
-      "shirt_hem_y_proxy_px": 215.3199999999997
+      "shirt_hem_y_proxy_px": 215.3199999999997,
+      "item_x_relative_shirt_px": -43.00798092978759,
+      "item_y_relative_shirt_px": 27.53381503094232,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 121.75975975975976,
+      "screen_shoe_0_y_px": 293.0690690690691,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2222,7 +3022,15 @@
       "shirt_y_raw_px": 179.0239219389361,
       "shirt_y_corrected_px": 178.43339154342829,
       "shirt_screen_slope_deg": -5.171107903657206,
-      "shirt_hem_y_proxy_px": 207.0
+      "shirt_hem_y_proxy_px": 207.0,
+      "item_x_relative_shirt_px": -42.35489111834103,
+      "item_y_relative_shirt_px": 43.92258461128225,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 122.60082304526749,
+      "screen_shoe_0_y_px": 290.4238683127572,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2244,7 +3052,15 @@
       "shirt_y_raw_px": 183.22849551643972,
       "shirt_y_corrected_px": 180.21616641487722,
       "shirt_screen_slope_deg": -6.454999108938876,
-      "shirt_hem_y_proxy_px": 211.0
+      "shirt_hem_y_proxy_px": 211.0,
+      "item_x_relative_shirt_px": -42.72682846877467,
+      "item_y_relative_shirt_px": 51.35318595997859,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 125.02403846153847,
+      "screen_shoe_0_y_px": 287.8701923076923,
+      "screen_shoe_1_x_px": 149.85365853658536,
+      "screen_shoe_1_y_px": 264.1463414634146,
+      "shoe_projected_y_difference_px": -23.723850844277706
     },
     {
       "source": "run",
@@ -2266,7 +3082,15 @@
       "shirt_y_raw_px": 182.66564605021432,
       "shirt_y_corrected_px": 184.29748198771432,
       "shirt_screen_slope_deg": -9.610161820609532,
-      "shirt_hem_y_proxy_px": 227.0
+      "shirt_hem_y_proxy_px": 227.0,
+      "item_x_relative_shirt_px": -42.1606678433774,
+      "item_y_relative_shirt_px": 39.84784875947426,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 125.84328358208955,
+      "screen_shoe_0_y_px": 283.4179104477612,
+      "screen_shoe_1_x_px": 150.62043795620437,
+      "screen_shoe_1_y_px": 269.7883211678832,
+      "shoe_projected_y_difference_px": -13.629589279877962
     },
     {
       "source": "run",
@@ -2288,7 +3112,15 @@
       "shirt_y_raw_px": 163.70029239766083,
       "shirt_y_corrected_px": 165.35011844746552,
       "shirt_screen_slope_deg": -7.313190095374815,
-      "shirt_hem_y_proxy_px": 210.0
+      "shirt_hem_y_proxy_px": 210.0,
+      "item_x_relative_shirt_px": -42.85540172896009,
+      "item_y_relative_shirt_px": 25.236229341469596,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 140.06028368794327,
+      "screen_shoe_0_y_px": 270.54609929078015,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2310,7 +3142,15 @@
       "shirt_y_raw_px": 155.36993517017828,
       "shirt_y_corrected_px": 155.65368761158453,
       "shirt_screen_slope_deg": -8.52698548625821,
-      "shirt_hem_y_proxy_px": 206.0
+      "shirt_hem_y_proxy_px": 206.0,
+      "item_x_relative_shirt_px": -42.085743511782866,
+      "item_y_relative_shirt_px": 17.057713408633077,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 148.7386018237082,
+      "screen_shoe_0_y_px": 265.9817629179331,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2332,7 +3172,15 @@
       "shirt_y_raw_px": 151.27788805081383,
       "shirt_y_corrected_px": 152.05320238186852,
       "shirt_screen_slope_deg": -4.693863205319353,
-      "shirt_hem_y_proxy_px": 202.0
+      "shirt_hem_y_proxy_px": 202.0,
+      "item_x_relative_shirt_px": -40.15857445825182,
+      "item_y_relative_shirt_px": 16.338333511995273,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.2825278810409,
+      "screen_shoe_0_y_px": 267.042750929368,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2354,7 +3202,15 @@
       "shirt_y_raw_px": 154.51828245555183,
       "shirt_y_corrected_px": 160.51350645457526,
       "shirt_screen_slope_deg": 0.09531745949059556,
-      "shirt_hem_y_proxy_px": 201.0
+      "shirt_hem_y_proxy_px": 201.0,
+      "item_x_relative_shirt_px": -41.16540682368584,
+      "item_y_relative_shirt_px": 21.235400032173203,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 148.84163701067615,
+      "screen_shoe_0_y_px": 275.62455516014234,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2376,7 +3232,15 @@
       "shirt_y_raw_px": 165.2106487464461,
       "shirt_y_corrected_px": 174.75705072398517,
       "shirt_screen_slope_deg": 2.060229490681007,
-      "shirt_hem_y_proxy_px": 208.0
+      "shirt_hem_y_proxy_px": 208.0,
+      "item_x_relative_shirt_px": -45.15144867811381,
+      "item_y_relative_shirt_px": 28.25430118202314,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 148.57928118393235,
+      "screen_shoe_0_y_px": 294.69767441860466,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2398,7 +3262,15 @@
       "shirt_y_raw_px": 175.9841516469857,
       "shirt_y_corrected_px": 187.19576053370446,
       "shirt_screen_slope_deg": -2.862952513798025,
-      "shirt_hem_y_proxy_px": 207.0
+      "shirt_hem_y_proxy_px": 207.0,
+      "item_x_relative_shirt_px": -48.37600400007038,
+      "item_y_relative_shirt_px": 44.07782233924229,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 149.13114754098362,
+      "screen_shoe_0_y_px": 291.41803278688525,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2420,7 +3292,15 @@
       "shirt_y_raw_px": 180.57567964731814,
       "shirt_y_corrected_px": 191.1474722498572,
       "shirt_screen_slope_deg": 4.373454523959938,
-      "shirt_hem_y_proxy_px": 197.0
+      "shirt_hem_y_proxy_px": 197.0,
+      "item_x_relative_shirt_px": -48.31230486178552,
+      "item_y_relative_shirt_px": 42.49760006671224,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 148.65745856353593,
+      "screen_shoe_0_y_px": 287.414364640884,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2442,7 +3322,15 @@
       "shirt_y_raw_px": 177.46233148295005,
       "shirt_y_corrected_px": 187.17892999369224,
       "shirt_screen_slope_deg": 4.244846473189029,
-      "shirt_hem_y_proxy_px": 193.15999999999985
+      "shirt_hem_y_proxy_px": 193.15999999999985,
+      "item_x_relative_shirt_px": -41.428468337031475,
+      "item_y_relative_shirt_px": 37.98113723274699,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 124.67375886524823,
+      "screen_shoe_0_y_px": 266.6595744680851,
+      "screen_shoe_1_x_px": 150.1965811965812,
+      "screen_shoe_1_y_px": 286.1025641025641,
+      "shoe_projected_y_difference_px": 19.442989634478977
     },
     {
       "source": "run",
@@ -2464,7 +3352,15 @@
       "shirt_y_raw_px": 177.9262086513995,
       "shirt_y_corrected_px": 186.915588534212,
       "shirt_screen_slope_deg": 9.682475500189213,
-      "shirt_hem_y_proxy_px": 224.0
+      "shirt_hem_y_proxy_px": 224.0,
+      "item_x_relative_shirt_px": -45.01469931111525,
+      "item_y_relative_shirt_px": 15.934766958356619,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 122.425,
+      "screen_shoe_0_y_px": 274.865,
+      "screen_shoe_1_x_px": 147.12745098039215,
+      "screen_shoe_1_y_px": 280.9019607843137,
+      "shoe_projected_y_difference_px": 6.036960784313692
     },
     {
       "source": "run",
@@ -2486,7 +3382,15 @@
       "shirt_y_raw_px": 162.3231750531538,
       "shirt_y_corrected_px": 170.10279617742137,
       "shirt_screen_slope_deg": 10.925212439245293,
-      "shirt_hem_y_proxy_px": 209.0
+      "shirt_hem_y_proxy_px": 209.0,
+      "item_x_relative_shirt_px": -37.19076569175155,
+      "item_y_relative_shirt_px": 9.447774667516597,
+      "shoe_components": 2,
+      "screen_shoe_0_x_px": 120.90397350993378,
+      "screen_shoe_0_y_px": 267.5198675496689,
+      "screen_shoe_1_x_px": 147.8372093023256,
+      "screen_shoe_1_y_px": 261.30232558139534,
+      "shoe_projected_y_difference_px": -6.217541968273565
     },
     {
       "source": "run",
@@ -2508,7 +3412,15 @@
       "shirt_y_raw_px": 149.01321398124466,
       "shirt_y_corrected_px": 153.38362108573685,
       "shirt_screen_slope_deg": -6.829687993589641,
-      "shirt_hem_y_proxy_px": 177.0
+      "shirt_hem_y_proxy_px": 177.0,
+      "item_x_relative_shirt_px": -32.79999496050294,
+      "item_y_relative_shirt_px": 17.228165329100165,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 119.51028037383178,
+      "screen_shoe_0_y_px": 263.74766355140184,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2530,7 +3442,15 @@
       "shirt_y_raw_px": 151.0406891495601,
       "shirt_y_corrected_px": 148.80162970131792,
       "shirt_screen_slope_deg": -10.856319445970394,
-      "shirt_hem_y_proxy_px": 186.0
+      "shirt_hem_y_proxy_px": 186.0,
+      "item_x_relative_shirt_px": -35.42329077209581,
+      "item_y_relative_shirt_px": 19.495807200804848,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 119.51097178683385,
+      "screen_shoe_0_y_px": 272.0266457680251,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2552,7 +3472,15 @@
       "shirt_y_raw_px": 165.67489816700612,
       "shirt_y_corrected_px": 165.97314645802174,
       "shirt_screen_slope_deg": -3.4675980558927626,
-      "shirt_hem_y_proxy_px": 207.0
+      "shirt_hem_y_proxy_px": 207.0,
+      "item_x_relative_shirt_px": -41.521553291046615,
+      "item_y_relative_shirt_px": 21.084827233451534,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 119.74285714285715,
+      "screen_shoe_0_y_px": 291.781512605042,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     },
     {
       "source": "run",
@@ -2574,7 +3502,15 @@
       "shirt_y_raw_px": 174.52969543147208,
       "shirt_y_corrected_px": 170.69148437190177,
       "shirt_screen_slope_deg": 1.9632072058944228,
-      "shirt_hem_y_proxy_px": 216.0
+      "shirt_hem_y_proxy_px": 216.0,
+      "item_x_relative_shirt_px": -42.4687820525384,
+      "item_y_relative_shirt_px": 35.658206756430104,
+      "shoe_components": 1,
+      "screen_shoe_0_x_px": 123.0802752293578,
+      "screen_shoe_0_y_px": 291.63761467889907,
+      "screen_shoe_1_x_px": null,
+      "screen_shoe_1_y_px": null,
+      "shoe_projected_y_difference_px": null
     }
   ]
 }
