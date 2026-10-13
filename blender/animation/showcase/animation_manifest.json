@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/step_elastic_v024/walk_snappy_review.blend",
-      "source_sha256": "ab68b72d8fbe3727caa45882693777e4af26e619d5b2cfa6cc5baa00fcb27329",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/spring_polish_v025/walk_snappy_review.blend",
+      "source_sha256": "2855b0206676e5747b86bf2e174e15b11bf01649200abe1012d9777586057878",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "355ae1891a12860f3031b7c5092866d1c6db5c3c59d99ab7c1d4fe7321aa8108",
+      "action_sha256": "ba2c6b8427f79888b4d3cf04176bcd93bd4752f95890ec0115913c197482e6fb",
       "action_frame_range": [
         1.0,
         22.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Latest user supersedes slow two-step float: elastic slime-like dip/rebound in time with each leg step. Two continuous170mm body pulses per21frame stride, load56ms after receiving. Head restrained to8-36mm authored separation/2.5deg pitch with soft delay. Leg world motion/cadence/1.59936m/s exact fromv023.19other Actions and all versions preserved. Pending Blender review.",
+      "approval_note": "Latest user requests lighter, softer steps after inspecting reference:150mm body excursion versus170mm in v024,20%rounded crest easing. Same56ms loading and step rhythm. Head authored8-36mm offset/2.5deg pitch retained, 18ms fore-aft smoothing with broad swing-only blend and earlier rounded lift crest with fifth-order landing ease; roll40%/yaw35%quieter with25ms smoothing; planted leg transforms, cadence and1.59936m/s preserved fromv024.19other Actions and previous sources unchanged. Pending Blender review.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
@@ -846,7 +846,7 @@
         "L": 0.64,
         "R": 0.66
       },
-      "presentation_note": "In-place21frame/30FPS, closing22excluded. Body now rebounds on each step with rounded loading/crest; head stays closer. Existing rigid proportions, leg steps, contacts and diagnostic travel preserved. No rig scaling or Godot changes."
+      "presentation_note": "In-place21frame/30FPS, closing22excluded. Body rebounds on every step with lighter receiving compression and rounded crest. Head stays close; smoother lifted-leg recovery, preserved support poses, contacts, cadence and diagnostic travel. No scaling, rig or Godot edits."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

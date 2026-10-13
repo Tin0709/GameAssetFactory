@@ -1,5 +1,6 @@
 {
   "action": "Walk_Snappy_Test_v1",
+  "version": "spring_polish_v025",
   "status": "pending",
   "frames": [
     1,
@@ -10,51 +11,57 @@
   "period_s": 0.7,
   "nominal_speed_m_s": 1.59936,
   "root_motion": false,
-  "step_reach_multiplier_vs_v019": 0.875,
-  "cadence_multiplier_vs_v019": 1.1428571428571428,
-  "travel_speed_preserved": true,
+  "previous_checkpoint": "step_elastic_v024",
+  "leg_world_motion_preserved": false,
+  "support_world_motion_preserved": true,
+  "support_world_matrix_max_error": 1.7881393432617188e-07,
   "leg_tracks_m": 0.27,
   "net_piston_lift_m": 0.27,
-  "common_hop_height_m": 0.1375,
-  "base_support_duty": {
-    "L": 0.64,
-    "R": 0.66
-  },
-  "measured_intentional_flight_time_s": 0.42291666666666666,
+  "common_leg_hop_height_m": 0.1375,
   "contact_frames": {
     "L": 1,
     "R": 11.5
   },
-  "contact_drop_m": 0.08184416762840341,
-  "nominal_load_time_s": 0.0455,
+  "support_duty": {
+    "L": 0.64,
+    "R": 0.66
+  },
+  "fore_aft_filter_sigma_s": 0.018,
+  "fore_aft_filter_blend": "sin(pi*t)^4 during swing only; zero during support",
+  "lift_curve": "0.270 * t^3*(1-t)^5 / normalized peak",
+  "lift_peak_swing_fraction": 0.375,
+  "landing_vertical_derivatives": "velocity/acceleration/jerk vanish at swing end; common hop unchanged",
+  "body_cycles_per_two_steps": 2,
+  "body_curve": "0.680 + 0.150*(w+0.20*w*(1-w)); w=(1-cos(4*pi*(u-.08)))/2",
+  "body_excursion_m": 0.15,
+  "body_peak_phases": [
+    0.33,
+    0.83
+  ],
+  "body_trough_phases": [
+    0.08,
+    0.58
+  ],
   "body_z_range_m": [
-    0.5765303373336792,
-    0.885229229927063
+    0.680000901222229,
+    0.8299993872642517
   ],
-  "body_motion": "Periodic smoothing of body acceleration, same vertical excursion and unchanged receiving-side torso tilt; torso pitch softened.",
-  "head_motion": "Reaction to the smoothed torso with softer lift/pitch/tilt, preserving delayed follow-through.",
-  "head_height_history_delay_s": 0.056,
-  "body_history_delay_s": 0.021,
-  "head_lift_measured_range_m": [
-    0.0051563117920115885,
-    0.05387703542010169
+  "body_roll_amplitude_multiplier": 0.6,
+  "body_yaw_amplitude_multiplier": 0.65,
+  "torso_roll_yaw_smoothing_sigma_s": 0.025,
+  "head_height_history_delay_s": 0.07,
+  "head_lift_authored_range_m": [
+    0.008286247776101185,
+    0.035713755998048755
   ],
-  "arm_root_curves_exact_after_retime": true,
-  "all_19_other_actions_preserved": true,
-  "body_waist_gap_limit_m": 0.075,
-  "reference": "Original user video study preserved; this refinement uses original rig/curves only.",
-  "source_sha256": null,
-  "action_sha256": "ba2c6b8427f79888b4d3cf04176bcd93bd4752f95890ec0115913c197482e6fb",
-  "body_cycle_harmonic": 2,
-  "body_minimum_height_m": 0.66,
-  "body_excursion_m": 0.19,
-  "crest_rounding": 0.2,
-  "torso_pitch_smoothing_sigma_s": 0.025,
-  "head_lift_smoothing_sigma_s": 0.032,
-  "head_pitch_smoothing_sigma_s": 0.034,
-  "head_roll_smoothing_sigma_s": 0.024,
-  "body_vertical_range_preserved": false,
-  "leg_world_motion_preserved_from": "step_elastic_v024",
   "head_pitch_limit_deg": 2.5,
-  "fixed_channels_sha256": "6223ed298bdfe84d72d61babbf342be46c383bcbb554edf4569e08c06443e363"
+  "head_pitch_history_delay_s": 0.049,
+  "head_lift_smoothing_sigma_s": 0.028,
+  "head_pitch_roll_smoothing_sigma_s": 0.035,
+  "head_world_step_harmonic_lag_s": 0.008846110943400577,
+  "head_chest_minimum_separating_axis_gap_m": 0.003322602715343237,
+  "arm_root_local_curves_exact": true,
+  "no_animated_scaling": true,
+  "source_sha256": "2855b0206676e5747b86bf2e174e15b11bf01649200abe1012d9777586057878",
+  "action_sha256": "ba2c6b8427f79888b4d3cf04176bcd93bd4752f95890ec0115913c197482e6fb"
 }
