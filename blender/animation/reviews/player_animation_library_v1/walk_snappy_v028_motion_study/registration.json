@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "entries": 21,
+  "previous_actions_exact": 20,
+  "previous_manifest_entries_exact": true,
+  "v027_retained_exact": true,
+  "new_action": "Walk_Snappy_Test_v028",
+  "new_status": "pending",
+  "action_sha256": "e02b38c6f560300c2869aedd18e6a0a2eb9a000796b9498c041d75355b5b9deb",
+  "source_sha256": "2da9e6335be107568e9696fa39fd68d1516083f42bccade44f247bc5823329b8",
+  "slot_identifier": "OBRUN_Test_Rig"
+}

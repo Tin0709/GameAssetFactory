@@ -847,6 +847,53 @@
         "R": 0.615
       },
       "presentation_note": "In-place21frames/30FPS, closing22excluded, same1.59936m/s diagnostic travel and receivingF1/F11.5. Earlier vertical release gives feet longer to settle without slowing walk/body. Exact v026 torso/head rhythm, leg rotations and fore-aft trajectory; grounded support preserved until new release. No scaling, rig or Godot edits."
+    },
+    {
+      "action": "Walk_Snappy_Test_v028",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_v028_motion_study/walk_snappy_v028_review.blend",
+      "source_sha256": "2da9e6335be107568e9696fa39fd68d1516083f42bccade44f247bc5823329b8",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "e02b38c6f560300c2869aedd18e6a0a2eb9a000796b9498c041d75355b5b9deb",
+      "action_frame_range": [
+        1.0,
+        22.0
+      ],
+      "start": 1,
+      "end": 21,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Separate reference-informed V028; original Walk_Snappy_Test_v1/V027 unchanged. One receiving-step phase strategy:70ms load, brisk recovery/passing/crest at.25cycle, readable upper arc and controlled placement. Same0.7s cadence/1.59936m/s diagnostic travel/0.680-0.830m hip range.20prior Actions/entries preserved. Camera/2D contact uncertainties documented; no claim of reference match or gameplay readiness.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "closing_key": 22,
+      "nominal_speed_m_s": 1.59936,
+      "contact_frames": {
+        "L": 1,
+        "R": 11.5
+      },
+      "support_duty": {
+        "L": 0.595,
+        "R": 0.615
+      },
+      "presentation_note": "Original-speed and phase-normalized three-way reference/V027/V028 study. V028 has original C2 event curves and monotone swing timing; same rig/proportions. Reference20frame cycle vs our21frames: synchronized diagnostic retimes reference to0.952x and is labelled separately from untouched30FPS1x clips."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

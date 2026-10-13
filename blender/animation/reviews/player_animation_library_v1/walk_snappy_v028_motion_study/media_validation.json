@@ -1,0 +1,81 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "reference_selected_uncut_1x.mp4",
+      "frames": 63,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 2.1
+    },
+    {
+      "file": "three_way_original_speed.mp4",
+      "frames": 63,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 2.1
+    },
+    {
+      "file": "three_way_phase_sync.mp4",
+      "frames": 63,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 2.1
+    },
+    {
+      "file": "v027_front_1x.mp4",
+      "frames": 63,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 2.1
+    },
+    {
+      "file": "v027_side_1x.mp4",
+      "frames": 63,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 2.1
+    },
+    {
+      "file": "v027_three_quarter_1x.mp4",
+      "frames": 63,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 2.1
+    },
+    {
+      "file": "v028_front_1x.mp4",
+      "frames": 63,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 2.1
+    },
+    {
+      "file": "v028_side_1x.mp4",
+      "frames": 63,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 2.1
+    },
+    {
+      "file": "v028_three_quarter_1x.mp4",
+      "frames": 63,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 2.1
+    },
+    {
+      "file": "v028_three_views_1x.mp4",
+      "frames": 126,
+      "fps": 30.0,
+      "nonblank": true,
+      "duration_s": 4.2
+    }
+  ],
+  "phase_sync_reference_rate": 0.9523809523809523,
+  "original_speed_reference_rate": 1,
+  "reference_original_fps": 30,
+  "sync_pose_phase_images": 20,
+  "phase_uncertainty_source_frames": 1,
+  "framing": "Uniform fixed model crop/scale for both candidates; approximate front angle, original character proportions retained. No per-frame registration or camera motion hidden."
+}
