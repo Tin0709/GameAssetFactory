@@ -1,0 +1,71 @@
+{
+  "source_sha256": "15e68bd82a5768c8daa0d5c5ac54d66067637dfcc0b42ab72c32ed16c358d216",
+  "action_sha256": "c8c8480e52d86ad7bb22ae047e33b35238ef507d87078ef906fa6d0871a64d51",
+  "samples": 2689,
+  "max_rigid_error_m": 2.4007419463512036e-07,
+  "min_floor_clearance_m": 0.00039928779006004333,
+  "min_head_chest_gap_m": 0.03378078545210883,
+  "max_waist_gap_m": 0.06017723826516885,
+  "max_ground_anchor_drift_m": 2.578149687045294e-06,
+  "max_straight_arm_error": 2.2745635393967848e-07,
+  "unsupported_samples": 0,
+  "nonadjacent_overlaps": {},
+  "camera_bounds": {
+    "FRONT": [
+      0.2926725745201111,
+      0.15023687481880188,
+      0.7005801200866699,
+      0.8637234568595886
+    ],
+    "THREE_QUARTER": [
+      0.25787073373794556,
+      0.14221693575382233,
+      0.736406683921814,
+      0.869321346282959
+    ],
+    "SIDE": [
+      0.3328654170036316,
+      0.15165959298610687,
+      0.6578706502914429,
+      0.8644430637359619
+    ]
+  },
+  "one_shot": true,
+  "seamless_loop": false,
+  "all23_previous_actions_exact": true,
+  "rig_rest_exact": true,
+  "no_cycles_modifiers": true,
+  "no_scale_tracks": true,
+  "passed": true,
+  "four_step_endpoint_pose_difference_m": 0.0,
+  "junctions": [
+    {
+      "time_s": 0.35,
+      "tiny_step_velocity_difference_m_s": 0.0180100738164641,
+      "second_order_velocity_difference_m_s": 0.0025664627720845923,
+      "finite_step_s": 0.0003333333333333333
+    },
+    {
+      "time_s": 0.7,
+      "tiny_step_velocity_difference_m_s": 0.010259100483690801,
+      "second_order_velocity_difference_m_s": 0.003450286568365837,
+      "finite_step_s": 0.0003333333333333333
+    },
+    {
+      "time_s": 1.05,
+      "tiny_step_velocity_difference_m_s": 0.018201388698342407,
+      "second_order_velocity_difference_m_s": 0.0027294762472761416,
+      "finite_step_s": 0.0003333333333333333
+    }
+  ],
+  "isolation_samples": 897,
+  "all_nonleg_curves_exact": true,
+  "max_nonleg_world_matrix_error": 0.0,
+  "max_time_mapped_leg_position_error_m": 1.7944340935537725e-07,
+  "max_time_mapped_leg_rotation_error_rad": 0.0,
+  "maximum_contact_validity_Y_correction_m": 0.02282570791870752,
+  "loop_pose_error_m": 0.0,
+  "loop_raw_first_order_velocity_difference_m_s": 0.016663549558425698,
+  "loop_second_order_velocity_difference_m_s": 0.006143273661174712,
+  "loop_second_order_guard_passed": false
+}
