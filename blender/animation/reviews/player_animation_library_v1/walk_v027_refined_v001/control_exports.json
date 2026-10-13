@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "controls": [
+    {
+      "label": "v027",
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\walk_snappy_test_v1\\soft_landing_v027\\walk_snappy_review.blend",
+      "source_sha256": "0ff3dbeff6d101dc87dbe70e6b9eb8ec2de0150d165974f5a88422556b881901",
+      "action_sha256": "8d9d809cc0078f98b1f6b6b43f6a7c8365c70bc11160e9efb9bdaaf42fbd5cb6",
+      "review_start_frame": 1,
+      "rendered_frames": 63,
+      "fps": 30,
+      "temporary_repeat_only": true,
+      "read_only": true
+    }
+  ]
+}
