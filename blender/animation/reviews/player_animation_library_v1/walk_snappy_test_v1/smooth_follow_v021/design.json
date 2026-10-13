@@ -44,7 +44,7 @@
   "body_waist_gap_limit_m": 0.075,
   "reference": "Original user video study preserved; this refinement uses original rig/curves only.",
   "source_sha256": null,
-  "action_sha256": "b91d826396f546721a5b23d74238fd603edc5b71f8acabb7415a5b3e2564dcc6",
+  "action_sha256": "d7392e6dc6962a4e4a5cb2e75b16dced862dedc7118002ee9c63de1e9164804d",
   "body_smoothing_sigma_s": 0.012,
   "torso_pitch_smoothing_sigma_s": 0.014,
   "head_lift_smoothing_sigma_s": 0.02,

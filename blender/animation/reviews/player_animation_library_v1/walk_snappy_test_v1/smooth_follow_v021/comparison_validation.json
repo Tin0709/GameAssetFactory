@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "samples": 512,
+  "leg_world_matrix_max_error": 9.655952453613281e-06,
+  "leg_world_motion_preserved": true,
+  "timing_cadence_speed_fixed_channels_exact": true,
+  "timing": {
+    "start": 1,
+    "end": 21,
+    "fps": 30,
+    "range": [
+      1.0,
+      22.0
+    ],
+    "speed": 1.59936,
+    "fixed": "6223ed298bdfe84d72d61babbf342be46c383bcbb554edf4569e08c06443e363"
+  },
+  "body_vertical_range_preserved_within_m": 0.0003,
+  "actual_pose_smoothness": {
+    "body": {
+      "acceleration": {
+        "before_rms": 65.80759840036787,
+        "after_rms": 47.55061852805302,
+        "ratio": 0.7225703366161318
+      },
+      "jerk": {
+        "before_rms": 8366.823986610292,
+        "after_rms": 2157.8765952094204,
+        "ratio": 0.25790868777241427
+      },
+      "old_vertical_range_m": [
+        0.576535701751709,
+        0.8852237462997437
+      ],
+      "new_vertical_range_m": [
+        0.5765356421470642,
+        0.8852272033691406
+      ]
+    },
+    "head": {
+      "acceleration": {
+        "before_rms": 63.86849179351113,
+        "after_rms": 45.60366935930585,
+        "ratio": 0.7140245225571313
+      },
+      "jerk": {
+        "before_rms": 7568.03019533093,
+        "after_rms": 2235.4973442837922,
+        "ratio": 0.29538694833207385
+      },
+      "old_vertical_range_m": [
+        1.2936131954193115,
+        1.5754863023757935
+      ],
+      "new_vertical_range_m": [
+        1.2904952764511108,
+        1.576372504234314
+      ]
+    }
+  },
+  "measurement": "Periodic actual evaluated world-height derivatives, frequencies above60Hz omitted to limit floating-point/bake noise; same estimator for both clips. Jerk is rate of acceleration change.",
+  "body_smoothing_sigma_s": 0.012,
+  "head_lift_smoothing_sigma_s": 0.02,
+  "head_pitch_smoothing_sigma_s": 0.022
+}
