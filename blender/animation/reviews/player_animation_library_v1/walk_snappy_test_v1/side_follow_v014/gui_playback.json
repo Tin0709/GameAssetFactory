@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "entries": 20,
+  "action": "Walk_Snappy_Test_v1",
+  "frame_advanced_from": 23,
+  "to": 17,
+  "loop_wrapped": true,
+  "play_pause_restart": true,
+  "ready_status": "approved",
+  "snappy_status": "pending",
+  "latest_cycle_frames": 24,
+  "review_playing_after_check": true
+}

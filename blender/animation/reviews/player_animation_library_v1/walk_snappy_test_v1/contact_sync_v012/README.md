@@ -1,0 +1,3 @@
+# Contact-synchronized bounce checkpoint — Pending
+
+User chose foot lands → body dips → body rises as the other leg comes through. Single body-height curve uses53.3ms receiving dip and incoming-leg40%passing phase for crest (0.296/0.284s after alternating contacts).75mm common hop, total body range1.5xv010; smooth piston targets/upper local curves retained. Source/motion validation and registration preserved;3/4 and side original-speed renders preserved. User then requested more visible floor clearance before the full review package was finalized. Next review is visible_hop_v013. Preserve this intermediate source, no production approval.

@@ -803,23 +803,23 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/bounce_strength_v010/walk_snappy_review.blend",
-      "source_sha256": "714b7d47c01461353aa7300dcae169f0d6ce1b8baeed5c132434ab3b8a16dff3",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/side_follow_v014/walk_snappy_review.blend",
+      "source_sha256": "647b0542cf4dcfe0a23324a646c7956022cb7a5517869e63e0785ee3d2cd162e",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "49830fe1d282d891096a41f06ec5b75a6bc316cbbaec6830a0b8e79e2654b704",
+      "action_sha256": "25d7e226c3ec7abd65a8b2c49e8cc4b0415a758403fe1b94a81f21cdd8d3e29b",
       "action_frame_range": [
         1.0,
-        31.0
+        25.0
       ],
       "start": 1,
-      "end": 30,
+      "end": 24,
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Stronger smoother hop50mm (+15mm) with100ms C2 eased release/200msreturn. Retain exact smooth piston leg targets/270mm lift/soft36.25mm load/close tracks/stride/cadence/centered yaw. Only common hip/leg hop differs; torso/head/arm/root curves and19other Actions exact. Pending Blender only.",
+      "approval_note": "25%faster whole walk:24frames/.8s at30FPS, closing25excluded.110mm visiblehop, contact-driven land/dip/rise with passing leg,54.375mm load. Receiving-side downward follow hips/spine/chest/head3/4/5/2deg with delays, body centers fixedX. Smooth piston targets/270mm lift/stride/tracks retained; arms/root retimed exact.19other Actions/all previous sources preserved. Pending Blender only.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",

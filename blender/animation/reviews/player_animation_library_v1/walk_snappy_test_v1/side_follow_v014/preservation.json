@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "protected_existing_files_checked": 5508,
+  "allowed_existing_changes": [
+    "AGENTS.md",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/README.md",
+    "blender/animation/showcase/animation_manifest.json",
+    "docs/animation/ANIMATION_PROGRESS.md"
+  ],
+  "all_19_other_actions_exact": true,
+  "all_19_other_manifest_entries_exact": true,
+  "previous_snappy_sources_reviews_exact": true,
+  "paused_rifle_idle_exact": true,
+  "approved_actions_rig_godot_production_weapon_showcase_exact": true,
+  "reports_passed": [
+    "motion_validation",
+    "registration",
+    "showcase_validation",
+    "appearance_validation",
+    "gui_playback",
+    "media_validation"
+  ],
+  "review_links_verified": 22
+}
