@@ -1,0 +1,67 @@
+{
+  "action": "Walk_Snappy_Test_v1",
+  "status": "pending",
+  "version": "leg_arc_v026",
+  "body_head_arm_root_local_curves_exact": true,
+  "frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "fps": 30,
+  "period_s": 0.7,
+  "speed_m_s": 1.59936,
+  "leg_paths": {
+    "L": {
+      "knots": [
+        0.0,
+        0.057373046875,
+        0.4,
+        0.8798828125,
+        1.0
+      ],
+      "positions": [
+        0.35825663999999996,
+        0.3730752766132355,
+        -0.01800491288304329,
+        -0.38902148604393005,
+        -0.35825663999999996
+      ],
+      "optimized_passing_velocity_and_accelerations": [
+        -1.4826187183208932,
+        -11.094042634997077,
+        2.048628415830138,
+        4.8506030108542735
+      ]
+    },
+    "R": {
+      "knots": [
+        0.0,
+        0.054931640625,
+        0.4,
+        0.884765625,
+        1.0
+      ],
+      "positions": [
+        0.36945216,
+        0.3828871250152588,
+        -0.017347007989883423,
+        -0.39740273356437683,
+        -0.36945216
+      ],
+      "optimized_passing_velocity_and_accelerations": [
+        -1.5116615312506865,
+        -11.043267175427887,
+        2.0758755445943553,
+        4.827161536066694
+      ]
+    }
+  },
+  "swing_pitch_filter_sigma_s": 0.014,
+  "swing_pitch_blend": "1-(1-sin(pi*t)^4)^2",
+  "net_piston_lift_m": 0.27,
+  "common_hop_m": 0.1375,
+  "lift_curve_exact_from": "v025",
+  "support_motion_exact": true,
+  "action_sha256": "e0a67106bd7d2f6a533e4884210978889fd8c8a95c385c8a19bfbf7d18444362"
+}

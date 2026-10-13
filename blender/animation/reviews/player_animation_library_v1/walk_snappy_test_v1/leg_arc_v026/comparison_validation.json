@@ -1,0 +1,132 @@
+{
+  "passed": true,
+  "samples": 512,
+  "timing_speed_and_nonleg_curves_exact": true,
+  "timing": {
+    "start": 1,
+    "end": 21,
+    "fps": 30,
+    "range": [
+      1.0,
+      22.0
+    ],
+    "speed": 1.59936,
+    "fixed": "313fbcdf654d3abc89959d632ec8781b64dbeb798aee5c92e97fc1319ebb1a0c"
+  },
+  "nonleg_world_matrix_max_error": 0.0,
+  "support_world_matrix_max_error": 1.1920928955078125e-07,
+  "all_nonleg_world_motion_preserved": true,
+  "leg_smoothness": {
+    "L": {
+      "fore_aft_foot_center": {
+        "velocity": {
+          "before": 2.4365192943912097,
+          "after": 2.517748837393767,
+          "ratio": 1.0333383540978087
+        },
+        "acceleration": {
+          "before": 49.87632621631858,
+          "after": 42.24481441040127,
+          "ratio": 0.8469913005857992
+        },
+        "jerk": {
+          "before": 2622.113065095357,
+          "after": 1976.0654503727806,
+          "ratio": 0.7536156532216196
+        },
+        "old_range": [
+          -0.3733593225479126,
+          0.35818955302238464
+        ],
+        "new_range": [
+          -0.3733595013618469,
+          0.35818883776664734
+        ]
+      },
+      "swing_pitch": {
+        "velocity": {
+          "before": 3.7405859980970075,
+          "after": 3.6038248733816296,
+          "ratio": 0.9634385829426314
+        },
+        "acceleration": {
+          "before": 146.86280702177183,
+          "after": 99.40760842167671,
+          "ratio": 0.6768739508495158
+        },
+        "jerk": {
+          "before": 18093.488410009948,
+          "after": 8280.221668645418,
+          "ratio": 0.4576354476820794
+        },
+        "old_range": [
+          -0.5355632901191711,
+          0.520785927772522
+        ],
+        "new_range": [
+          -0.5352383852005005,
+          0.5207230448722839
+        ]
+      },
+      "fore_aft_extrema_error_m": 7.748603820800781e-07,
+      "lift_extrema_error_m": 0.0
+    },
+    "R": {
+      "fore_aft_foot_center": {
+        "velocity": {
+          "before": 2.5298255026968,
+          "after": 2.6183305893387883,
+          "ratio": 1.034984660620917
+        },
+        "acceleration": {
+          "before": 54.76328590017612,
+          "after": 46.0305528461411,
+          "ratio": 0.8405367225415716
+        },
+        "jerk": {
+          "before": 3074.91880299957,
+          "after": 2267.3344088481113,
+          "ratio": 0.7373639936886582
+        },
+        "old_range": [
+          -0.38096654415130615,
+          0.3670090436935425
+        ],
+        "new_range": [
+          -0.38096654415130615,
+          0.36701056361198425
+        ]
+      },
+      "swing_pitch": {
+        "velocity": {
+          "before": 3.903807762915476,
+          "after": 3.7545744562048666,
+          "ratio": 0.9617723730844887
+        },
+        "acceleration": {
+          "before": 159.76637591028526,
+          "after": 106.17949298403371,
+          "ratio": 0.6645922358760734
+        },
+        "jerk": {
+          "before": 20488.987731830322,
+          "after": 8982.726953495636,
+          "ratio": 0.43841731329365147
+        },
+        "old_range": [
+          -0.5491990447044373,
+          0.5378023386001587
+        ],
+        "new_range": [
+          -0.5488919615745544,
+          0.5377474427223206
+        ]
+      },
+      "fore_aft_extrema_error_m": 1.5497207641601562e-06,
+      "lift_extrema_error_m": 0.0
+    }
+  },
+  "measurement": "Matched evaluated sole-center position and whole-leg pitch; periodic FFT derivatives above60Hz omitted equally for both clips. Full-cycle RMS includes unchanged support; no original-rig inference.",
+  "body_head_motion_unchanged": true,
+  "lift_and_common_hop_unchanged": true
+}
