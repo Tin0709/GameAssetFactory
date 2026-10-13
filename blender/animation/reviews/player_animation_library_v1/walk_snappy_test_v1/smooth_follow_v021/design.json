@@ -25,11 +25,11 @@
     "L": 1,
     "R": 11.5
   },
-  "contact_drop_m": 0.08184416762840341,
-  "nominal_load_time_s": 0.0455,
+  "contact_drop_m": 0.08913336658392523,
+  "nominal_load_time_s": null,
   "body_z_range_m": [
-    0.5765303373336792,
-    0.885229229927063
+    0.5765326023101807,
+    0.8852243423461914
   ],
   "body_motion": "Periodic smoothing of body acceleration, same vertical excursion and unchanged receiving-side torso tilt; torso pitch softened.",
   "head_motion": "Reaction to the smoothed torso with softer lift/pitch/tilt, preserving delayed follow-through.",
@@ -43,15 +43,20 @@
   "all_19_other_actions_preserved": true,
   "body_waist_gap_limit_m": 0.075,
   "reference": "Original user video study preserved; this refinement uses original rig/curves only.",
-  "source_sha256": null,
-  "action_sha256": "d7392e6dc6962a4e4a5cb2e75b16dced862dedc7118002ee9c63de1e9164804d",
-  "body_smoothing_sigma_s": 0.012,
-  "torso_pitch_smoothing_sigma_s": 0.014,
-  "head_lift_smoothing_sigma_s": 0.02,
-  "head_pitch_smoothing_sigma_s": 0.022,
+  "source_sha256": "89b542c8cf7ce137a6f1879428bc838628dd50d05449256c3bd7d518f2126cb2",
+  "action_sha256": "fc1b263e845e845408f4c6d374aea9eaedc43270965bec4072f54deab1811d1c",
+  "body_smoothing_sigma_s": 0.02,
+  "torso_pitch_smoothing_sigma_s": 0.018,
+  "head_lift_smoothing_sigma_s": 0.025,
+  "head_pitch_smoothing_sigma_s": 0.026,
   "head_roll_smoothing_sigma_s": 0.018,
   "body_vertical_range_preserved": true,
   "leg_world_motion_preserved_from": "compact_elastic_v020",
   "head_pitch_limit_deg": 3.25,
-  "fixed_channels_sha256": "6223ed298bdfe84d72d61babbf342be46c383bcbb554edf4569e08c06443e363"
+  "fixed_channels_sha256": "6223ed298bdfe84d72d61babbf342be46c383bcbb554edf4569e08c06443e363",
+  "body_additional_delay_s": 0.0056,
+  "compression_time_s": 0.07220458984375,
+  "leg_rotation_curves_exact": true,
+  "leg_world_matrix_comparison_tolerance": 1e-05,
+  "body_range_preserved": true
 }

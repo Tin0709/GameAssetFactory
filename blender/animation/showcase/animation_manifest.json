@@ -803,13 +803,13 @@
     },
     {
       "action": "Walk_Snappy_Test_v1",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/compact_elastic_v020/walk_snappy_review.blend",
-      "source_sha256": "fc2f31e8f795fb933026e5a1290ff183adbb48e051eb527a5ea44e4674f42ebb",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/smooth_follow_v021/walk_snappy_review.blend",
+      "source_sha256": "89b542c8cf7ce137a6f1879428bc838628dd50d05449256c3bd7d518f2126cb2",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "ef7621ffbba9a511f558da3df886ec8f5f8f31a7a0d04427b98eb1ade4127cb4",
+      "action_sha256": "fc1b263e845e845408f4c6d374aea9eaedc43270965bec4072f54deab1811d1c",
       "action_frame_range": [
         1.0,
         22.0
@@ -819,7 +819,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "12.5%shorter fore/aft reach with21frames/30FPS/.7s cycle (14.286%quicker cadence), preserving1.59936m/s diagnostic travel. Same270mm piston lift/137.5mm commonhop/0.27mtracks. Body has extra12mm bounded delayed rebound and subtle independent spine/chest pitch; head5-55mm smooth inertial response with delayed3.5deg pitch. Stronger receiving-side follow retained.19otherActions and all previoussources preserved. Pending Blender only.",
+      "approval_note": "Leg world motion,21frames/30FPS/.7s cadence and1.59936m/s diagnostic travel preserved fromv020. Body vertical acceleration smoothed with20ms periodic filter/5.6ms additional settle delay while retaining bounce range; torso pitch18ms, head lift25ms/head pitch26ms/head tilt18ms smoothing. Head reacts to softened body, with restrained3.25deg pitch. No rig/scaling/production edit.19other Actions and all previous sources preserved. Pending Blender review.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
@@ -846,7 +846,7 @@
         "L": 0.64,
         "R": 0.66
       },
-      "presentation_note": "Pending in-place21frame/30FPS snappy walk, closing22excluded.12.5%shorter sagittal reach and14.286%faster cadence preserve diagnostic travel1.59936m/s; rootstatic. Base support duty64%/66% is interrupted by intentional137.5mm flight, not actual grounded duty. Strong receiving-side follow, independent body rebound and inertial head response. Blender review only; runtime transitions unvalidated."
+      "presentation_note": "Pending in-place21frame/30FPS walk, closing22excluded. Leg world motion, tracks, lift, cadence and1.59936m/s diagnostic travel preserved fromv020. Upper body gets a broader, slightly slower72ms absorption/rebound and smooth delayed head response. Global vertical body excursion preserved. Blender only; Godot transitions unvalidated."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

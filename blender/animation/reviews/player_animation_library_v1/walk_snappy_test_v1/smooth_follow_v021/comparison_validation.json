@@ -1,7 +1,7 @@
 {
   "passed": true,
   "samples": 512,
-  "leg_world_matrix_max_error": 9.655952453613281e-06,
+  "leg_world_matrix_max_error": 7.655471563339233e-07,
   "leg_world_motion_preserved": true,
   "timing_cadence_speed_fixed_channels_exact": true,
   "timing": {
@@ -18,48 +18,59 @@
   "body_vertical_range_preserved_within_m": 0.0003,
   "actual_pose_smoothness": {
     "body": {
+      "velocity": {
+        "before_rms": 2.087054837251113,
+        "after_rms": 1.9866749438761413,
+        "ratio": 0.9519035668908521
+      },
       "acceleration": {
         "before_rms": 65.80759840036787,
-        "after_rms": 47.55061852805302,
-        "ratio": 0.7225703366161318
+        "after_rms": 41.637135704971115,
+        "ratio": 0.6327101537979597
       },
       "jerk": {
         "before_rms": 8366.823986610292,
-        "after_rms": 2157.8765952094204,
-        "ratio": 0.25790868777241427
+        "after_rms": 1266.2084044836015,
+        "ratio": 0.15133680432502908
       },
       "old_vertical_range_m": [
         0.576535701751709,
         0.8852237462997437
       ],
       "new_vertical_range_m": [
-        0.5765356421470642,
-        0.8852272033691406
+        0.5765312910079956,
+        0.8852292895317078
       ]
     },
     "head": {
+      "velocity": {
+        "before_rms": 1.9627640860929794,
+        "after_rms": 1.865829687233637,
+        "ratio": 0.9506133215162413
+      },
       "acceleration": {
         "before_rms": 63.86849179351113,
-        "after_rms": 45.60366935930585,
-        "ratio": 0.7140245225571313
+        "after_rms": 39.07677554076032,
+        "ratio": 0.6118318194689297
       },
       "jerk": {
         "before_rms": 7568.03019533093,
-        "after_rms": 2235.4973442837922,
-        "ratio": 0.29538694833207385
+        "after_rms": 1278.056010219157,
+        "ratio": 0.1688756489116084
       },
       "old_vertical_range_m": [
         1.2936131954193115,
         1.5754863023757935
       ],
       "new_vertical_range_m": [
-        1.2904952764511108,
-        1.576372504234314
+        1.2886714935302734,
+        1.57638680934906
       ]
     }
   },
   "measurement": "Periodic actual evaluated world-height derivatives, frequencies above60Hz omitted to limit floating-point/bake noise; same estimator for both clips. Jerk is rate of acceleration change.",
-  "body_smoothing_sigma_s": 0.012,
-  "head_lift_smoothing_sigma_s": 0.02,
-  "head_pitch_smoothing_sigma_s": 0.022
+  "body_smoothing_sigma_s": 0.02,
+  "head_lift_smoothing_sigma_s": 0.025,
+  "head_pitch_smoothing_sigma_s": 0.026,
+  "body_additional_delay_s": 0.0056
 }

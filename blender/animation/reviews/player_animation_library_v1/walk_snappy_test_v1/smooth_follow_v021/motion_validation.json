@@ -1,35 +1,35 @@
 {
-  "source_sha256": "ef871b3a2e2ac5bfcc3d0c29f0a3c19b3167bcbc655e6ce3eee4c6a880914277",
-  "action_sha256": "d7392e6dc6962a4e4a5cb2e75b16dced862dedc7118002ee9c63de1e9164804d",
+  "source_sha256": "89b542c8cf7ce137a6f1879428bc838628dd50d05449256c3bd7d518f2126cb2",
+  "action_sha256": "fc1b263e845e845408f4c6d374aea9eaedc43270965bec4072f54deab1811d1c",
   "samples": 673,
   "nominal_speed_m_s": 1.59936,
-  "max_rigid_error_m": 2.2232691037071817e-06,
-  "minimum_floor_clearance_m": 0.0003966633230447769,
-  "maximum_support_drift_m": 2.0021780563884854e-06,
-  "maximum_support_height_error_m": 3.3366769552231027e-06,
+  "max_rigid_error_m": 2.69411272013631e-07,
+  "minimum_floor_clearance_m": 0.00039694271981716156,
+  "maximum_support_drift_m": 1.0431515461649728e-06,
+  "maximum_support_height_error_m": 3.057280182838459e-06,
   "nonadjacent_overlaps": {},
   "maximum_waist_separation_m": {
-    "L": 0.06778771696554031,
-    "R": 0.06884641872602515
+    "L": 0.06768134972662665,
+    "R": 0.07193203603310394
   },
   "camera_bounds": {
     "FRONT": [
-      0.2810855805873871,
-      0.1488201767206192,
-      0.7208234667778015,
-      0.892716646194458
+      0.2810903787612915,
+      0.1488204151391983,
+      0.7208208441734314,
+      0.8925957083702087
     ],
     "THREE_QUARTER": [
-      0.2597191631793976,
-      0.14153654873371124,
-      0.7281014919281006,
-      0.8985416293144226
+      0.2597512900829315,
+      0.1415366381406784,
+      0.7282132506370544,
+      0.8984752893447876
     ],
     "SIDE": [
-      0.32620906829833984,
-      0.1516595035791397,
-      0.6689625382423401,
-      0.8923788070678711
+      0.32620930671691895,
+      0.15165959298610687,
+      0.668962299823761,
+      0.892093300819397
     ]
   },
   "unsupported_samples": [
@@ -849,13 +849,13 @@
     21.84375,
     21.875
   ],
-  "loop_pose_error_m": 1.3328003749250113e-07,
-  "loop_finite_vertex_velocity_difference_m_s": 0.01760681759005627,
+  "loop_pose_error_m": 1.2489448945403256e-07,
+  "loop_finite_vertex_velocity_difference_m_s": 0.015312623493888105,
   "loop_velocity_finite_step_frames": 0.01,
-  "loop_second_order_vertex_velocity_difference_m_s": 0.004235758275344849,
+  "loop_second_order_vertex_velocity_difference_m_s": 0.0023940374563329015,
   "legacy_first_order_seam_guard_passed": false,
   "velocity_seam_estimator": "Second-order one-sided finite derivative at same0.01frame step; raw first-order retained because it mixes genuine acceleration into continuity.",
-  "loop_channel_tangent_difference": 7.567119588276772e-06,
+  "loop_channel_tangent_difference": 8.073357574661655e-06,
   "hip_xyz_range_m": [
     [
       0.006000000052154064,
@@ -866,46 +866,47 @@
       0.01399946678429842
     ],
     [
-      0.5765308737754822,
-      0.8852283358573914
+      0.5765326023101807,
+      0.8852243423461914
     ]
   ],
-  "maximum_leg_local_translation_m": 0.20665594730584372,
-  "maximum_straight_arm_direction_error": 2.1696418193818683e-07,
+  "maximum_leg_local_translation_m": 0.21791396216506984,
+  "maximum_straight_arm_direction_error": 2.2302015940987714e-07,
   "cycles_modifiers_on_all_tracks": true,
   "no_scale_tracks": true,
   "root_static": true,
-  "light_top_vertical_velocity_m_s": -0.21456203353713885,
-  "contact_vertical_velocity_m_per_cycle": -0.937633961956008,
-  "contact_vertical_velocity_m_s": -1.339477088508583,
-  "contact_drop_m": 0.07793334297456922,
-  "compression_time_s": 0.0455,
+  "light_top_vertical_velocity_m_s": -0.16934434537192136,
+  "contact_vertical_velocity_m_per_cycle": -1.0373217274872726,
+  "contact_vertical_velocity_m_s": -1.4818881821246752,
+  "previous_nominal_load_sample_drop_m": 0.07290198401153103,
+  "contact_drop_m": 0.08913336658392523,
+  "compression_time_s": 0.07220458984375,
   "peak_lifted_sole": {
     "L": {
-      "minimum_z_m": 0.4079017639160156,
-      "maximum_z_m": 0.40921109914779663,
+      "minimum_z_m": 0.40790218114852905,
+      "maximum_z_m": 0.40921151638031006,
       "frame": 17.46875,
-      "pitch_deg": -0.08342497023942508
+      "pitch_deg": -0.08342488340705903
     },
     "R": {
-      "minimum_z_m": 0.4079027771949768,
-      "maximum_z_m": 0.40954238176345825,
+      "minimum_z_m": 0.40790343284606934,
+      "maximum_z_m": 0.4095430374145508,
       "frame": 7.21875,
-      "pitch_deg": -0.04253306936724121
+      "pitch_deg": -0.042533003206839774
     }
   },
-  "maximum_character_height_m": 2.028986930847168,
+  "maximum_character_height_m": 2.0282225608825684,
   "minimum_raised_sole_height_fraction": {
-    "L": 0.20103715687597032,
-    "R": 0.20103765627739364
+    "L": 0.20111312684098778,
+    "R": 0.20111374398112045
   },
   "peak_piston_sole_excluding_whole_body_hop_m": {
-    "L": 0.27040176549247197,
-    "R": 0.2704027775583343
+    "L": 0.2704021827249854,
+    "R": 0.27040343320942684
   },
   "maximum_swing_pitch_deg": {
-    "L": 30.68563160942888,
-    "R": 31.46664878529529
+    "L": 30.68558690991276,
+    "R": 31.466596224091745
   },
   "arm_forearm_root_channels_exact_current_speed": true,
   "stride_multiplier": 1.0976,
@@ -932,45 +933,45 @@
       0.006000000052154064
     ],
     "Spine": [
-      0.0059999870136380196,
-      0.006000011693686247
+      0.005999987944960594,
+      0.0060000112280249596
     ],
     "Chest": [
-      0.0059999823570251465,
-      0.006000025197863579
+      0.005999971181154251,
+      0.00600002147257328
     ],
     "Head": [
-      -0.024613572284579277,
-      0.03666802868247032
+      -0.02454407513141632,
+      0.03660094738006592
     ]
   },
   "maximum_body_roll_rad": {
     "Hips": 0.06981316208839417,
-    "Spine": 0.0907571092247963,
+    "Spine": 0.0907571017742157,
     "Chest": 0.11344641447067261,
-    "Head": 0.04454571381211281
+    "Head": 0.04454570263624191
   },
   "body_yaw_ranges_deg": {
     "Hips": [
-      -4.803998611689659,
+      -4.803999038576482,
       5.000078828608739
     ],
     "Spine": [
       -6.245176637411989,
-      6.500087408086504
+      6.5000878349733275
     ],
     "Chest": [
       -7.6863858258724065,
-      8.000077631430875
+      8.00007848520452
     ],
     "Head": [
       -2.8824021552215573,
-      3.000031246220694
+      3.0000303924470475
     ]
   },
   "maximum_step_following_yaw_error_rad": 4.862693037677168e-06,
   "body_roll_matches_receiving_leg": true,
   "rig_rest_exact": true,
-  "passed": false,
+  "passed": true,
   "all_19_previous_actions_exact": true
 }
