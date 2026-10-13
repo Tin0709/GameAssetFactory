@@ -11,8 +11,8 @@
   "fps": 30,
   "cycle_s": 0.7,
   "nominal_speed_m_s": 1.59936,
-  "tracks_m": 0.269,
-  "nominal_gap_m": 0.04400000000000001,
+  "tracks_m": 0.267,
+  "nominal_gap_m": 0.04200000000000001,
   "original_tracks_m": 0.27,
   "original_nominal_gap_m": 0.045,
   "natural_leg_roll_yaw_restored": true,
@@ -20,5 +20,5 @@
   "clock_blend": "sin(pi*x)^4 only after vertical support release; zero lead at next contact",
   "body_head_arm_curves_and_world_poses_exact": true,
   "lowest_sole_height_envelope_exact_from_v002": true,
-  "action_sha256": "63421d3933c4de4bef959d9393574f2c1ede809851480b6b7da3c8364c683fd4"
+  "action_sha256": "1980fb7da676154c20f426d1ab43001da50315c37f10d9369424b0efcc73d960"
 }
