@@ -22,5 +22,68 @@
   "common_leg_hop_m": 0.1375,
   "vertical_curve": "270mm normalized t^3*(1-t)^6; earlier vertical release, same ascent duration and longer descent",
   "lift_peak_swing_fraction": 0.3333333333333333,
-  "action_sha256": "8d9d809cc0078f98b1f6b6b43f6a7c8365c70bc11160e9efb9bdaaf42fbd5cb6"
+  "action_sha256": "8d9d809cc0078f98b1f6b6b43f6a7c8365c70bc11160e9efb9bdaaf42fbd5cb6",
+  "source_sha256": "0ff3dbeff6d101dc87dbe70e6b9eb8ec2de0150d165974f5a88422556b881901",
+  "body_head_arm_root_world_matrix_max_error": 0.0,
+  "leg_orientation_world_matrix_max_error": 0.0,
+  "leg_horizontal_center_max_error_m": 2.9802322387695312e-08,
+  "grounded_support_world_matrix_max_error": 1.7881393432617188e-07,
+  "body_excursion_m": 0.15,
+  "body_z_range_m": [
+    0.68,
+    0.83
+  ],
+  "body_cycles_per_stride": 2,
+  "body_roll_yaw_unchanged_from": "v026",
+  "contact_frames": {
+    "L": 1,
+    "R": 11.5
+  },
+  "leg_tracks_m": 0.27,
+  "landing_metrics": {
+    "L": {
+      "final100ms_vertical_speed_rms": {
+        "before": 2.8044668020340557,
+        "after": 1.8381867170503001,
+        "ratio": 0.6554496261881506
+      },
+      "final100ms_peak_down_speed_m_s": {
+        "before": 4.8784294693754955,
+        "after": 3.259068335922646,
+        "ratio": 0.6680568728894324
+      },
+      "actual_peak_sole_height_m": {
+        "before": 0.40737876296043396,
+        "after": 0.37019509077072144
+      },
+      "piston_peak_to_ground_duration_s": {
+        "before": 0.15749999999999997,
+        "after": 0.189,
+        "ratio": 1.2000000000000002
+      },
+      "earlier_vertical_release_s": 0.0315
+    },
+    "R": {
+      "final100ms_vertical_speed_rms": {
+        "before": 3.132764408023174,
+        "after": 2.0460016172302575,
+        "ratio": 0.6530978237592141
+      },
+      "final100ms_peak_down_speed_m_s": {
+        "before": 5.170268754491651,
+        "after": 3.54517914436156,
+        "ratio": 0.6856856602051296
+      },
+      "actual_peak_sole_height_m": {
+        "before": 0.40734532475471497,
+        "after": 0.36678633093833923
+      },
+      "piston_peak_to_ground_duration_s": {
+        "before": 0.14874999999999997,
+        "after": 0.17966666666666664,
+        "ratio": 1.207843137254902
+      },
+      "earlier_vertical_release_s": 0.0315
+    }
+  }
 }
