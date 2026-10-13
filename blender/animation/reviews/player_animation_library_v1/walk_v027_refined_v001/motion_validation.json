@@ -1,0 +1,68 @@
+{
+  "source_sha256": "f23745e76cf472ad7606512cec399cf521db070cd795c257ad43e64f8092ddc1",
+  "action_sha256": "8ca1695f08e3775e11df4c772112ca42765775161075563727cb3e6fbb3de5e6",
+  "samples": 1345,
+  "max_rigid_error_m": 2.524420341654121e-07,
+  "min_floor_clearance_m": 0.00039730221033096313,
+  "min_head_chest_gap_m": 0.0033214705472346395,
+  "max_waist_gap_m": 0.05972706901957281,
+  "max_ground_anchor_drift_m": 2.460779131100912e-06,
+  "max_straight_arm_error": 2.4755668231600746e-07,
+  "unsupported_samples": 812,
+  "nonadjacent_overlaps": {},
+  "camera_bounds": {
+    "FRONT": [
+      0.2894043028354645,
+      0.1484975665807724,
+      0.7114432454109192,
+      0.8717472553253174
+    ],
+    "THREE_QUARTER": [
+      0.2628454864025116,
+      0.1409292221069336,
+      0.7303844690322876,
+      0.8785304427146912
+    ],
+    "SIDE": [
+      0.3262743651866913,
+      0.15165948867797852,
+      0.6667219400405884,
+      0.8711304068565369
+    ]
+  },
+  "one_shot": false,
+  "seamless_loop": true,
+  "all24_previous_actions_exact": true,
+  "rig_rest_exact": true,
+  "cycles_modifiers_valid": true,
+  "no_scale_tracks": true,
+  "passed": false,
+  "four_step_endpoint_pose_difference_m": 1.5269146510898468e-07,
+  "junctions": [
+    {
+      "time_s": 0.35,
+      "tiny_step_velocity_difference_m_s": 0.02157377334597168,
+      "second_order_velocity_difference_m_s": 0.0062052557585694675,
+      "finite_step_s": 0.0003333333333333333
+    }
+  ],
+  "isolation_samples": 449,
+  "all_nonleg_curves_exact": true,
+  "max_nonleg_world_matrix_error": 0.0,
+  "max_lowest_sole_height_difference_m": 2.384185791015625e-07,
+  "airborne_mask_changes": 0,
+  "max_time_mapped_leg_position_error_m": 1.78901224511662e-07,
+  "max_time_mapped_leg_rotation_error_rad": 0.0,
+  "maximum_contact_validity_Y_correction_m": 0.0319872,
+  "maximum_vertical_envelope_compensation_m": 0.10049108415842056,
+  "loop_playback_frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "loop_pose_error_m": 1.5269146510898468e-07,
+  "loop_raw_first_order_velocity_difference_m_s": 0.012534844042054571,
+  "loop_second_order_velocity_difference_m_s": 0.00425418080306813,
+  "loop_second_order_guard_passed": true,
+  "raw_first_order_legacy_guard_passed": false
+}

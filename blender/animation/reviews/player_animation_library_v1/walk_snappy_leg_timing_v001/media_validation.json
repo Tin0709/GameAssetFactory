@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "control_v002_front_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "862e854d621ec5d4963377515a2c296b1d4e43eadcd2e17675b6591fac3321d9"
+    },
+    {
+      "file": "control_v002_side_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "4839d22e7f64ef1a469387b8a634f109be4c2a05a2ea1be00947d213ebc40a1d"
+    },
+    {
+      "file": "controlled_four_way_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "c75a3cbdd7010f986e3f7c9452b4d9d910845a0471d6f17052e2004d4c6aa329"
+    },
+    {
+      "file": "isolated_side_AB_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "7a93cdb632f183334fed28475f512b0c8458b196a46907b3d81bfd1ebb4c5c81"
+    },
+    {
+      "file": "leg_timing_front_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "240bcf67b4241e3e9ac369163011e81069b68ad07077cb888aa5f8d3c8ac1505"
+    },
+    {
+      "file": "leg_timing_side_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "5133ab217a42eba8fc68d3da10faa150e1afaa53cab183348c9c35e40706ffc9"
+    },
+    {
+      "file": "leg_timing_three_quarter_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "cd5b36cb455ff3443527668fd4cf1feea33a9f62632f12bd24e6fbab4bd8ccf4"
+    },
+    {
+      "file": "leg_timing_three_views_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "1da71f10fca14c8e92cb160cdcd731fb032844d22747274fd62fd8180f8015ce"
+    },
+    {
+      "file": "reference_v028_leg_timing_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "7420d788f1c8777127bec895401a778fbd5841ce87adf0dddb6367b9a0efcc1c"
+    },
+    {
+      "file": "v028_front_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "09113a3761b06b236b8aef1856c04c813e304d54df65da61f79d88199960332d"
+    },
+    {
+      "file": "v028_side_1x.mp4",
+      "fps": 30.0,
+      "frames": 63,
+      "codec": "h264",
+      "sha256": "3e791215ba2f478a4205c708ede40b470933652907f7ad70cefb777c0b233a44"
+    }
+  ],
+  "total_frames": 693,
+  "six_uninterrupted_steps": true
+}

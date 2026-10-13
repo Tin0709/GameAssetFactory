@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "protected_files": 6251,
+  "all23_prior_actions_and_entries_exact": true,
+  "all_nonleg_curves_and_world_poses_exact": true,
+  "godot_unchanged": true,
+  "research_unchanged": true,
+  "approved_animations_unchanged": true,
+  "foot_recovery_path_experiment_not_started": true
+}
