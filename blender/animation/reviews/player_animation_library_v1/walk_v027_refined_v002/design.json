@@ -1,0 +1,20 @@
+{
+  "action": "Walk_Snappy_V027_Refined_Test_v002",
+  "status": "pending",
+  "baseline": "Walk_Snappy_V027_Refined_Test_v001",
+  "frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "fps": 30,
+  "cycle_s": 0.7,
+  "nominal_speed_m_s": 1.59936,
+  "height_smoothing_sigma_s": 0.022,
+  "height_advance_max_s": 0.012,
+  "swing_only_blend": "sin(pi*x)^4",
+  "body_head_arm_curves_exact": true,
+  "leg_XY_orientation_exact": true,
+  "rig_unchanged": true,
+  "action_sha256": "bbd80e75bcdb92a99f69641c25756613b6f4c7bbe5dd19a771623ecdd8cacc55"
+}
