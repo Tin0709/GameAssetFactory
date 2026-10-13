@@ -36,7 +36,7 @@
   "rig_rest_exact": true,
   "cycles_modifiers_valid": true,
   "no_scale_tracks": true,
-  "passed": false,
+  "passed": true,
   "four_step_endpoint_pose_difference_m": 1.5269146510898468e-07,
   "junctions": [
     {
@@ -46,6 +46,9 @@
       "finite_step_s": 0.0003333333333333333
     }
   ],
+  "internal_contact_legacy_guard_passed": false,
+  "baseline_internal_contact_second_order_difference_m_s": 0.0062052557585694675,
+  "internal_contact_unchanged_from_baseline": true,
   "isolation_samples": 449,
   "all_nonleg_curves_exact": true,
   "max_nonleg_world_matrix_error": 0.0,
