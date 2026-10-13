@@ -1040,6 +1040,60 @@
         "R": 0.5642857142857144
       },
       "baseline_action": "Walk_Snappy_OneStep_Study_v002"
+    },
+    {
+      "action": "Walk_Snappy_V027_Refined_Test_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v001/walk_v027_refined_review.blend",
+      "source_sha256": "f23745e76cf472ad7606512cec399cf521db070cd795c257ad43e64f8092ddc1",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "8ca1695f08e3775e11df4c772112ca42765775161075563727cb3e6fbb3de5e6",
+      "action_frame_range": [
+        1.0,
+        22.0
+      ],
+      "start": 1,
+      "end": 21,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "User selected original Walk_Snappy_Test_v1 / V027 as preferred direction. This separate refinement advances fore/aft exchange about20ms, preserving all nonleg curves/world poses and actual lowest-sole height envelope. Original V027 stays unchanged. Prior artistic approval status is not changed.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "closing_key": 22,
+      "nominal_speed_m_s": 1.59936,
+      "contact_frames": {
+        "L": 1,
+        "R": 11.5
+      },
+      "support_duty": {
+        "L": 0.595,
+        "R": 0.615
+      },
+      "presentation_note": "Six uninterrupted native30FPS steps; preferred V027/new A-B, original-reference comparison, three views, normalized static phase sheets. Same21frame cadence/travel/body/head/arms/hop/soft vertical landing. Contact-valid Y compensation <=32mm; Z compensation preserves original sole-height envelope. Pending review, no production/Godot edits.",
+      "review_contact_frames": [
+        1,
+        11.5,
+        22
+      ],
+      "review_steps": 6,
+      "baseline_action": "Walk_Snappy_Test_v1"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

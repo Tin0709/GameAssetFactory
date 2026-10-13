@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "entries": 25,
+  "previous_actions_exact": 24,
+  "previous_manifest_entries_exact": true,
+  "status": "pending",
+  "action_sha256": "8ca1695f08e3775e11df4c772112ca42765775161075563727cb3e6fbb3de5e6",
+  "source_sha256": "f23745e76cf472ad7606512cec399cf521db070cd795c257ad43e64f8092ddc1",
+  "playback": [
+    1,
+    21
+  ],
+  "closing_key": 22
+}

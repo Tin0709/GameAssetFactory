@@ -29,21 +29,40 @@
     },
     "refinement": {
       "L": {
-        "passing_s": 0.17552083333333335,
-        "peak_forward_speed_m_s": 6.17758512496917,
+        "passing_s": 0.17656250000000007,
+        "peak_forward_speed_m_s": 6.176545619964731,
         "Y_range_m": [
           -0.3733639717102051,
-          0.3536601662635803
+          0.3536376655101776
         ]
       },
       "R": {
-        "passing_s": 0.18489583333333334,
-        "peak_forward_speed_m_s": 6.662671566009536,
+        "passing_s": 0.1859375,
+        "peak_forward_speed_m_s": 6.660592555999781,
         "Y_range_m": [
           -0.38096797466278076,
-          0.36111268401145935
+          0.3610389232635498
         ]
       }
+    }
+  },
+  "measurement_grid_s": 0.0015625,
+  "native30_worst_sole_displacement": {
+    "v027": {
+      "displacement_m": 0.2231576893099932,
+      "side": "R",
+      "video_frame_pair": [
+        6,
+        7
+      ]
+    },
+    "refinement": {
+      "displacement_m": 0.2160550809211625,
+      "side": "R",
+      "video_frame_pair": [
+        4,
+        5
+      ]
     }
   },
   "phase_lead_ms": 20,
