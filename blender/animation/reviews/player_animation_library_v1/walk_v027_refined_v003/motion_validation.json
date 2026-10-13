@@ -1,0 +1,71 @@
+{
+  "source_sha256": "0b6ac0eb6399d382dedbf2292e6091a2b6c98ed9f7d99f01725a0f00bdd8fca6",
+  "action_sha256": "1980fb7da676154c20f426d1ab43001da50315c37f10d9369424b0efcc73d960",
+  "samples": 1345,
+  "max_rigid_error_m": 2.524420341654121e-07,
+  "min_floor_clearance_m": 0.00039730221033096313,
+  "min_head_chest_gap_m": 0.003909794060746208,
+  "max_waist_gap_m": 0.07170574693009257,
+  "max_ground_anchor_drift_m": 2.698272792368867e-06,
+  "max_straight_arm_error": 2.5288109106536417e-07,
+  "unsupported_samples": 812,
+  "nonadjacent_overlaps": {},
+  "camera_bounds": {
+    "FRONT": [
+      0.2894043028354645,
+      0.14849884808063507,
+      0.7114432454109192,
+      0.8689491748809814
+    ],
+    "THREE_QUARTER": [
+      0.2628454864025116,
+      0.1410023272037506,
+      0.7303844690322876,
+      0.875714898109436
+    ],
+    "SIDE": [
+      0.3262731730937958,
+      0.15173140168190002,
+      0.6667170524597168,
+      0.8685427904129028
+    ]
+  },
+  "one_shot": false,
+  "seamless_loop": true,
+  "all26_previous_actions_exact": true,
+  "rig_rest_exact": true,
+  "cycles_modifiers_valid": true,
+  "no_scale_tracks": true,
+  "passed": true,
+  "four_step_endpoint_pose_difference_m": 1.6049041769309353e-07,
+  "junctions": [
+    {
+      "time_s": 0.35,
+      "tiny_step_velocity_difference_m_s": 0.02632112026161862,
+      "second_order_velocity_difference_m_s": 0.0074358436751717615,
+      "finite_step_s": 0.0003333333333333333
+    }
+  ],
+  "internal_contact_legacy_guard_passed": false,
+  "baseline_internal_contact_second_order_difference_m_s": 0.0074358436751717615,
+  "internal_contact_unchanged_from_baseline": true,
+  "isolation_samples": 449,
+  "all_nonleg_curves_exact": true,
+  "max_nonleg_world_matrix_error": 0.0,
+  "max_lowest_sole_height_difference_m": 2.682209014892578e-07,
+  "airborne_mask_changes": 0,
+  "max_time_mapped_leg_position_error_m": 2.3848405372975275e-07,
+  "max_time_mapped_leg_rotation_error_rad": 0.0,
+  "maximum_lateral_translation_adjustment_m": 0.0024998471280473465,
+  "maximum_vertical_envelope_compensation_m": 0.0334089994430542,
+  "loop_playback_frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "loop_pose_error_m": 1.6049041769309353e-07,
+  "loop_raw_first_order_velocity_difference_m_s": 0.011670948652325193,
+  "loop_second_order_velocity_difference_m_s": 0.004220312061655179,
+  "loop_second_order_guard_passed": true,
+  "raw_first_order_legacy_guard_passed": false
+}
