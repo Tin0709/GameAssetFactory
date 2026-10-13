@@ -1,0 +1,24 @@
+{
+  "action": "Walk_Snappy_V027_Refined_Test_v003",
+  "status": "pending",
+  "body_baseline": "Walk_Snappy_V027_Refined_Test_v002",
+  "leg_spatial_baseline": "Walk_Snappy_V027_Refined_Test_v001",
+  "frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "fps": 30,
+  "cycle_s": 0.7,
+  "nominal_speed_m_s": 1.59936,
+  "tracks_m": 0.269,
+  "nominal_gap_m": 0.04400000000000001,
+  "original_tracks_m": 0.27,
+  "original_nominal_gap_m": 0.045,
+  "natural_leg_roll_yaw_restored": true,
+  "additional_airborne_phase_lead_s": 0.01,
+  "clock_blend": "sin(pi*x)^4 only after vertical support release; zero lead at next contact",
+  "body_head_arm_curves_and_world_poses_exact": true,
+  "lowest_sole_height_envelope_exact_from_v002": true,
+  "action_sha256": "63421d3933c4de4bef959d9393574f2c1ede809851480b6b7da3c8364c683fd4"
+}
