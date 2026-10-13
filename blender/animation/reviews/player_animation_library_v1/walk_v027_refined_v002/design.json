@@ -16,7 +16,7 @@
   "body_head_arm_curves_exact": false,
   "leg_XY_orientation_exact": false,
   "rig_unchanged": true,
-  "action_sha256": "8cc104631dd0d49d01eae4a55adf4c7f9f0ca647ff0c36e0e2455d7f0bbf2ce3",
+  "action_sha256": "6477c58c5768b5657eec0340b1b8e0b2e9f267ee322aa2416d5535e07cc53f77",
   "body_height_range_m": [
     0.68,
     0.83
