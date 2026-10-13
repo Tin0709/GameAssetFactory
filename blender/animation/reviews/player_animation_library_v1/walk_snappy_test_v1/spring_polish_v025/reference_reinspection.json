@@ -1,0 +1,26 @@
+{
+  "file": "C:\\Users\\ADMIN\\Desktop\\Screen Recording 2026-10-13 052636.mp4",
+  "sha256": "b7257e8fea64e0ea2327b85c7e2441d6bfda2168c35ce7b07ea173e63949248e",
+  "decoded_frames": 241,
+  "fps": 30.0,
+  "consecutive_sheets": [
+    [
+      0,
+      23
+    ],
+    [
+      24,
+      47
+    ],
+    [
+      100,
+      123
+    ]
+  ],
+  "observations": [
+    "Front F6-9 and F16-19 show receiving-like lowering then rounded recovery, rather than a foot stopping followed by an unrelated body drop.",
+    "The lifted leg descends continuously over several frames; the upper-body/shoulder response continues through the receiving phase.",
+    "Front perspective and moving terrain obscure precise sole contact."
+  ],
+  "implementation": "Earlier rounded lift crest and progressive low-speed final descent; uninterrupted fore-aft recovery with support endpoint velocity preserved. Original curves/rig cannot be inferred from footage."
+}

@@ -44,7 +44,7 @@
   "body_waist_gap_limit_m": 0.075,
   "reference": "Original user video study preserved; this refinement uses original rig/curves only.",
   "source_sha256": null,
-  "action_sha256": "00ca726161dd85102e878b32f5b7db94be1bd929182056a4ec77b7aee5de8243",
+  "action_sha256": "50333b500b4584bad71abff12469545f5e74a54a2e39963ebea46053dd2ce0f2",
   "body_cycle_harmonic": 2,
   "body_minimum_height_m": 0.66,
   "body_excursion_m": 0.19,
