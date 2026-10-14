@@ -2,12 +2,13 @@
 import bpy,sys,json,importlib
 from pathlib import Path
 OUT=Path(__file__).resolve().parent
+TARGET=(OUT.parent if OUT.parent.name=='showcase' else OUT)/'Mobs_Animation_Library.blend'
 sys.path.insert(0,str(OUT))
 assert (OUT/'gaf_mobs_animation_library.py').exists(),'Dedicated mob library add-on is missing'
 if 'gaf_mobs_animation_library' in sys.modules:sys.modules.pop('gaf_mobs_animation_library').unregister()
 import gaf_mobs_animation_library as lib
 lib.register()
-bpy.ops.wm.open_mainfile(filepath=str(OUT/'Mobs_Animation_Library.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(TARGET))
 s=bpy.context.scene;r=bpy.data.objects['Zombie_Cuboid_Rig']
 assert len(s.mobs_clips)==2 and s.mobs_mob=='Zombie'
 assert lib.mob_items(s,None) is lib.mob_items(s,None),'Enum callback must retain stable item/string references'
@@ -43,7 +44,7 @@ saved=lib.registry(bpy.context.scene)
 assert next(c for c in saved['clips'] if c['action']=='Zombie_Idle_Original_V1')['status']=='Approved'
 assert next(c for c in saved['clips'] if c['action']=='Zombie_Idle_Original_V2')['status']=='Pending'
 assert lib.action_signature(bpy.data.actions['Zombie_Idle_Original_V1'])==sig
-bpy.ops.wm.open_mainfile(filepath=str(OUT/'Mobs_Animation_Library.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(TARGET))
 s=bpy.context.scene;r=bpy.data.objects['Zombie_Cuboid_Rig']
 
 # No common skeleton or shared bone-name assumption: one unrelated bone.
@@ -74,7 +75,7 @@ else:raise AssertionError('Object-transform Action was silently accepted')
 assert lib.registry(s)==before
 
 # Restore original fresh file; status/revision fixture changes must never leak.
-bpy.ops.wm.open_mainfile(filepath=str(OUT/'Mobs_Animation_Library.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(TARGET))
 s=bpy.context.scene
 assert len(s.mobs_clips)==2
 assert all(c.status=='Pending' for c in s.mobs_clips)

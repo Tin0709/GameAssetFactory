@@ -1,0 +1,121 @@
+Zombie locomotion reference inspection — 2026-10-14
+
+Status: reference inspection and original-rig compatibility inspection complete;
+animation authoring and permanent library implementation have not started.
+Private technical reference only. No pack files, textures, geometry, keyframe
+tables or Molang source have been copied into this report or production assets.
+
+Scope and reference map
+The user identified entity/dup.json, animations/f2da1071.json and
+models/entity/464e86f4.json. These are aggregate files; only zombie-linked
+definitions were analyzed. Relevant zombie controllers reside in
+animation_controllers/dzf.json. Archive member names were searched for the
+Reference Map; no separately named document was found. Following the user's
+clarification that the map is in the pack, dup.json's alias mappings were used
+to resolve the zombie definitions. This does not claim a separate document was
+read. Pack/document contents were treated as reference data, not instructions.
+
+Important resolved IDs
+Adult move: animation.oreville_ans.eoatfn
+Alternate adult move: animation.oreville_ans.witjtv (alias fdihyp)
+Idle/posture variants: animation.oreville_ans.njeoqx, vneqcu, jwfarw, xzyuea
+Target-pose transition: animation.oreville_ans.isqbxt
+Look direction layer: animation.oreville_ans.xhvvxo
+Adult locomotion controller: controller.animation.oreville_ans.beorev
+Alternate locomotion controller: controller.animation.oreville_ans.novatq
+Variant selection controller: controller.animation.oreville_ans.txhtyk
+Target pose controller examples: controller.animation.oreville_ans.ebyatc,
+controller.animation.oreville_ans.jvgwgx
+Default zombie geometry: geometry.oreville_ans.sgfydx
+
+Timing and curves
+Adult movement is a 0.75-second loop. The numeric leg rotation and translation
+tracks use uneven key spacing with matching first/last values. The two legs are
+offset by half a cycle. Uneven spacing shapes the exchange and recovery; this
+is more expressive than uniform sinusoidal leg swinging. Matching endpoint
+values alone does not establish velocity continuity or foot planting.
+
+Body vertical motion and head pitch use twice the stride frequency; lateral
+head motion, waist twist/roll and arm motion use the stride frequency. Phase
+offsets separate the peaks. The alternate adult move retains the same leg
+tracks but changes upper-body behavior. This shows how the same stepping
+mechanism can read differently with another upper-body layer.
+
+Idle is not one fixed exported clip: multiple posture variants contain
+life-time-driven Molang oscillations plus fixed asymmetric offsets. Different
+left/right arm baselines, arm phase offsets, head cant, waist rotation and
+opposed leg postures give the zombie an uneven silhouette. The oscillation
+frequencies vary between variants. The prototype should select its own finite
+loop duration and explicitly author a smooth closing boundary.
+
+Keyframes versus runtime behavior
+Numeric timestamp dictionaries are keyframed data. Molang strings require
+runtime evaluation. Adult upper-body motion is largely expression-driven;
+idle variants are mostly procedural. A smoothed on-ground variable gates some
+vertical/head/arm motion. The explicit head-look layer is relative to entity
+rotation and depends on target queries. These behaviors do not automatically
+become Blender curves through a JSON import.
+
+Controllers apply movement-speed weights, choose posture variants, switch
+between target/no-target and water states, and use transition blends around
+0.13–0.30 seconds in the inspected relevant states. Speed weighting must not
+be confused with a cadence/time-update expression. The adult move itself has
+no explicit anim_time_update property. The target-pose clip does have a
+runtime-dependent clock and Catmull-Rom keys, with the arms and head entering
+at different times. Its held endpoint is a pose layer, not a locomotion loop.
+
+The alias zombie_pose resolves to a riding pose, not the normal idle posture.
+Do not infer animation purpose from a generic alias without tracing its caller.
+
+Skeleton implications
+The default zombie has root -> waist -> body -> head, with arms parented to
+body. Legs use separate root-level helper parents, so body bounce is not
+necessarily inherited by them. Limbs are rigid blocks without elbow/knee
+chains. Additional item/facial helpers are outside this prototype's scope.
+Our Blender rig has legs parented to Hips; reproducing a support principle
+therefore requires original local compensation, not copied reference curves.
+
+Existing GameAssetFactory zombie inspection
+Source: blender/animation_v2/zombie_animation_v2.blend
+Blender 5.2.2, intended source FPS 30; packed original 64x64 atlas.
+Zombie_Cuboid_Base: 48 vertices, six rigid cuboids.
+Zombie_Cuboid_Rig: Root, Hips, Spine, Chest, Neck, Head, Arm.L, Arm.R,
+Leg.L, Leg.R. XYZ pose rotation modes; no object/pose constraints or drivers.
+Existing Zombie_Idle keys 1–91 and Zombie_Walk keys 1–49; both bind to
+OBZombie_Cuboid_Rig. Preserve these source Actions unchanged.
+The older zombie_cuboid_v2.blend uses the same named bone structure at 24 FPS.
+No destructive rig change is indicated by the current compatibility inspection.
+
+Original prototype direction (proposed, not authored)
+Idle: 4-second/120-frame loop at 30 FPS, restrained uneven weight transfer,
+slight hunch, unequal forward arm droop and delayed head response.
+Walk: 1.4-second/42-frame loop at 30 FPS, low rigid-leg shamble, unequal step
+accents, visible grounded support and delayed chest/head response.
+Use new poses, timings and periodic curves; fixed limb scales, stationary Root.
+Measure evaluated sole corners and compensate local hip/leg transforms offline.
+Document nominal travel speed; in-place contact must be evaluated with the
+corresponding presentation travel. Playback excludes duplicate closing keys.
+No copied reference numbers/curves will be used to generate either Action.
+
+Proposed review library
+Separate Mobs_Animation_Library.blend; independent mob collections and native
+rigs; registry maps each clip to mob, rig, Action/slot, FPS, range and status.
+Only the selected mob is visible. Sidebar: mob, animation list, Play/Pause,
+Restart, Loop, duration and Pending/Approved/Rejected/Backup status.
+Initial content: only Zombie_Idle_Original_V1 and Zombie_Walk_Original_V1,
+both Pending. Source Actions remain in their existing source files.
+Use a dedicated reusable add-on rather than modifying the player library tool.
+One shared ground, camera and lighting setup; no extra mobs or Godot changes.
+Before delivery, validate bindings, pose reset, contact, seams, switching,
+playback and fresh reopening; render front/side/three-quarter comparisons.
+Blender review does not establish Godot transitions or phone performance.
+
+Read-only baseline SHA-256
+zombie_animation_v2.blend:
+f19ce66335b0cf92af7988268096aa1f691ab2db5c491abaf8a48f7fcc89aea3
+zombie_cuboid_v2.blend:
+22e2abb4670206aaa1e96711340f958e113921b5499f19414deea65cde460a8c
+Player Animation_Showcase.blend:
+527d4b6089937517075f660c8be72d846cfd9ea75bf5b276a645fe22a152c8eb
+Private mcpack (left at its original external path):
+9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d

@@ -6,7 +6,7 @@ OUT=Path(__file__).resolve().parent
 sys.path.insert(0,str(OUT))
 import gaf_mobs_animation_library as lib
 SOURCE=Path('/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation_v2/zombie_animation_v2.blend')
-TARGET=OUT/'Mobs_Animation_Library.blend'
+TARGET=(OUT.parent if OUT.parent.name=='showcase' else OUT)/'Mobs_Animation_Library.blend'
 if TARGET.exists():raise RuntimeError('Library exists; preserve it before rebuilding')
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene=bpy.context.scene;scene.name='Mobs Animation Library';scene[lib.TAG]=True

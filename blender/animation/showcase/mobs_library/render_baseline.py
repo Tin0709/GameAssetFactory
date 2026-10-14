@@ -3,7 +3,7 @@ import bpy,sys
 from pathlib import Path
 OUT=Path(__file__).resolve().parent
 sys.path.insert(0,str(OUT));import gaf_mobs_animation_library as lib
-bpy.ops.wm.open_mainfile(filepath=str(OUT/'Mobs_Animation_Library.blend'))
+bpy.ops.wm.open_mainfile(filepath=str((OUT.parent if OUT.parent.name=='showcase' else OUT)/'Mobs_Animation_Library.blend'))
 s=bpy.context.scene;r=bpy.data.objects['Zombie_Cuboid_Rig']
 source='/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation_v2/zombie_animation_v2.blend'
 with bpy.data.libraries.load(source,link=False) as (src,dst):dst.actions=['Zombie_Idle','Zombie_Walk']

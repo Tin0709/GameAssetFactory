@@ -3,7 +3,7 @@ import bpy, json, math, sys
 from pathlib import Path
 
 OUT=Path(__file__).resolve().parent
-TARGET=OUT/'Mobs_Animation_Library.blend'
+TARGET=(OUT.parent if OUT.parent.name=='showcase' else OUT)/'Mobs_Animation_Library.blend'
 SOURCE=Path('/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation_v2/zombie_animation_v2.blend')
 assert TARGET.exists(), 'Mobs Animation Library has not been created'
 bpy.ops.wm.open_mainfile(filepath=str(SOURCE))

@@ -3,7 +3,7 @@ import bpy,sys,json
 from pathlib import Path
 OUT=Path(__file__).resolve().parent
 sys.path.insert(0,str(OUT));import gaf_mobs_animation_library as lib
-lib.register();bpy.ops.wm.open_mainfile(filepath=str(OUT/'Mobs_Animation_Library.blend'))
+lib.register();bpy.ops.wm.open_mainfile(filepath=str((OUT.parent if OUT.parent.name=='showcase' else OUT)/'Mobs_Animation_Library.blend'))
 s=bpy.context.scene;r=bpy.data.objects['Zombie_Cuboid_Rig'];s.cycles.samples=8
 s.render.resolution_x=448;s.render.resolution_y=448;s.render.resolution_percentage=100
 reviews=OUT/'review';frames=OUT/'motion_frames';frames.mkdir(exist_ok=True)
