@@ -1,5 +1,11 @@
 # Blender plant studies V1
 
+## ShortGrass_Fluffy_v1 — 2026-10-14, PENDING REVIEW
+
+The existing `dungeons_ground_style_v2.blend` is now the explicitly requested central review location for future vegetation. [ShortGrass_Fluffy_v1](short_grass_fluffy_v1/README.md) adds four original pixel-art grass colors and a32-tuft demonstration patch in `Vegetation_Grass_Pending`, preserving all existing environment data. Six cards /24triangles per tuft, one shared original atlas/material, green anchored roots and pastel tips. The viewport matches Mobs Material Preview (`forest.exr`, intensity1); actual scene lighting/cameras remain unchanged. Native appendable library, fourGLBs, Godot material wrappers, low/elevated/opposing previews and validation reports are in that package. No main-map integration or prior grass replacement; stop for visual review.
+
+This addition used a backed-up separate Blender process because an unrelated unsaved animation library was open. Fresh-open checks preserve311objects,157meshes,27materials,24images,10cameras,6lights,1world,31collections,1text and4armatures exactly. Historical foreground-only authoring descriptions below refer to those earlier plant edits.
+
 Current source is `dungeons_ground_style_v2.blend`. Authored edits/save described below used the foreground Blender MCP; background runs only read saved source, never save it or reload the live window. **Later user authorization integrates the selected saved blocks/plants into WorldMap**: see [runtime reuse/mapping](../../../../game_mobile_3d/assets/maps/world_map/README.md) and its18asset manifest. Source study exports and Blender wind previews below are preserved; runtime uses separate shaders. Artistic approval remains pending. Historical “Blender-only/no game integration” statements below describe their original study stages.
 
 ## Periwinkle flowers, 0.8 block — Blender review 2026-10-09

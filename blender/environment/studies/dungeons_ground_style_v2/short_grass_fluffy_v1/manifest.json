@@ -425,5 +425,21 @@
   ],
   "lighting": "Existing scene/world/lights unchanged for renders. Saved viewport matches live Mobs: MATERIAL forest.exr intensity1, scene lights/world off, overlays/shadows/cavity off.",
   "baseline_preserved_before_save": true,
-  "native_asset": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/ShortGrass_Fluffy_v1.blend"
+  "native_asset": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/ShortGrass_Fluffy_v1.blend",
+  "native_library_use": "File > Append; objects at placement origin, central environment is primary review scene",
+  "footprint_m": [
+    0.476195782,
+    0.474423721
+  ],
+  "godot_ready_scenes": [
+    "ShortGrass_Fluffy_v1_SoftYellow.tscn",
+    "ShortGrass_Fluffy_v1_DustyPink.tscn",
+    "ShortGrass_Fluffy_v1_Lavender.tscn",
+    "ShortGrass_Fluffy_v1_SageGreen.tscn"
+  ],
+  "godot_material_contract": "Use shared companion shader via wrappers for upward two-sided foliage lighting; standard GLB PBR is fallback. Shadow casting disabled on tufts.",
+  "preservation_fresh_open": "PASS, zero differences to existing datablock fingerprints",
+  "source_sha256": "4a8e188e4f45150b896880250ca1b2ea78f4d6b6abad65e49da7fb3cf48c0530",
+  "backup_path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/.validation/short_grass_fluffy_v1/before_dungeons_ground_style_v2.blend",
+  "viewport_lighting": "MATERIAL, forest.exr, intensity1.0; scene lights/world off; overlays/shadows/cavity off"
 }

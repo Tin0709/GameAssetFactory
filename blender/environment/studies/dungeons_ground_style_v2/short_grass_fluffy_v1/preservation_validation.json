@@ -1,0 +1,124 @@
+{
+  "mode": "saved",
+  "filepath": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/environment/studies/dungeons_ground_style_v2/dungeons_ground_style_v2.blend",
+  "original_data_differences": [],
+  "extended_differences": [],
+  "preserved_datablocks": {
+    "objects": 311,
+    "meshes": 157,
+    "materials": 27,
+    "images": 24,
+    "cameras": 10,
+    "lights": 6,
+    "worlds": 1,
+    "scenes": 1
+  },
+  "preserved_extended": {
+    "collections": 31,
+    "texts": 1,
+    "actions": 0,
+    "armatures": 4
+  },
+  "viewports": [
+    {
+      "screen": "Animation",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    },
+    {
+      "screen": "Animation",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    },
+    {
+      "screen": "Geometry Nodes",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    },
+    {
+      "screen": "Layout",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    },
+    {
+      "screen": "Modeling",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    },
+    {
+      "screen": "Scripting",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    },
+    {
+      "screen": "Sculpting",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    },
+    {
+      "screen": "Shading",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    },
+    {
+      "screen": "Texture Paint",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    },
+    {
+      "screen": "UV Editing",
+      "studio": "forest.exr",
+      "intensity": 1.0,
+      "type": "MATERIAL",
+      "use_scene_lights": false,
+      "use_scene_world": false,
+      "overlays": false
+    }
+  ],
+  "masters": [
+    "ShortGrass_Fluffy_v1_SoftYellow",
+    "ShortGrass_Fluffy_v1_DustyPink",
+    "ShortGrass_Fluffy_v1_Lavender",
+    "ShortGrass_Fluffy_v1_SageGreen"
+  ],
+  "root_collection": "Vegetation_Grass_Pending",
+  "status": "PASS",
+  "source_sha256": "4a8e188e4f45150b896880250ca1b2ea78f4d6b6abad65e49da7fb3cf48c0530",
+  "backup_sha256": "136e976f78480435319cbed7dc05c56f2db214af50256ecb365c7c9b786a4919"
+}
