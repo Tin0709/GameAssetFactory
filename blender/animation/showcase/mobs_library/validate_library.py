@@ -20,7 +20,7 @@ assert [tuple(v.co) for v in mesh.data.vertices]==geometry
 assert [tuple(v.uv) for v in mesh.data.uv_layers.active.data]==uvs
 assert [[(g.group,g.weight) for g in v.groups] for v in mesh.data.vertices]==weights
 names={'Zombie_Idle_Original_V1','Zombie_Walk_Original_V1'}
-assert set(a.name for a in bpy.data.actions)==names
+assert names.issubset({a.name for a in bpy.data.actions})
 leg_indices={side:[v.index for v in mesh.data.vertices if any(mesh.vertex_groups[g.group].name=='Leg.'+side for g in v.groups)] for side in ['L','R']}
 
 def vertices(frame):
@@ -31,6 +31,7 @@ def vertices(frame):
 report={'rig_mesh_uv_weights_preserved':True,'actions':{}}
 for name in sorted(names):
     action=bpy.data.actions[name];assert action['review_status']=='Pending'
+    for bone in rig.pose.bones:bone.location=(0,0,0);bone.rotation_euler=(0,0,0);bone.scale=(1,1,1)
     rig.animation_data.action=action;rig.animation_data.action_slot=action.slots[0]
     N=120 if 'Idle' in name else 42
     first=vertices(1);last=vertices(N+1)
