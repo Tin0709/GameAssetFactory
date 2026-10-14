@@ -1,0 +1,86 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "before_bounce_front_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "720ae3d4ddf60e10fdb19e746c215837f6c4c73243c9752fc53f7017ddec7cb8"
+    },
+    {
+      "file": "before_bounce_side_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "2c734472109d65ccf20121bcd510512100eac27cf6200fdf596e657912ee625a"
+    },
+    {
+      "file": "before_expressive_bounce_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "721031dece9245e9230cdcf15990c8a51d9dc99a218607ee0affcbe4f7e22421"
+    },
+    {
+      "file": "expressive_front_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "e3d5bb832fdddadde770dafed668bc24941639de36a3a4db5e54f0855c9656e9"
+    },
+    {
+      "file": "expressive_side_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "7462ddb8e94d68da1875b4666192f4749db729de5974bae1cc090d9cb656eb43"
+    },
+    {
+      "file": "expressive_snappy_side_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "d6fec33ead6f860a18d0a591411b61f91b0d46f9ba4a1322dd319b7e18bd5db7"
+    },
+    {
+      "file": "reference_expressive_snappy_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "2b973fab7b6f4caf9e3cbeaf3d4a33035d664317030b8c927b25233a7428bfe7"
+    },
+    {
+      "file": "run_snappy_three_views_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "384a0d1e26833a937ca4ee767549713cc759e6530f04398545ef01a785647c1e"
+    },
+    {
+      "file": "snappy_front_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "f70f15b3d9e22b43f94d078f3a9a0b94a98a8795b77022ee8a88be1b65257a58"
+    },
+    {
+      "file": "snappy_side_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "f0c37e106ef01c7a92c8145a69856e530225651044e4778319c32ba154109c6b"
+    },
+    {
+      "file": "snappy_three_quarter_1x.mp4",
+      "frames": 85,
+      "fps": 30.0,
+      "codec": "h264",
+      "sha256": "c063c019e51f79e2fa7e79be67337be1f7d9ace7b44ab43f7a36eca835af7cf4"
+    }
+  ],
+  "total_frames": 935,
+  "continuous_cycles": 5,
+  "no_holds": true,
+  "native_speed": true
+}

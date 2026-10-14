@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "controls": [
+    {
+      "label": "snappy",
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\run_snappy_test_v001\\elastic_drive_v001\\run_snappy_review.blend",
+      "source_sha256": "33a62f5ba58a5743c1bc820f53fa2c77050a7292d5580fd815d3a6a8e85dd663",
+      "action_sha256": "8e835f91c686d41bb1846fb0d7ddc151dc55a9178f87e27d845fc54f972cb156",
+      "review_frames": 85,
+      "fps": 30,
+      "period_frames": 17,
+      "cycles": 5.0,
+      "native_speed": true,
+      "read_only": true
+    },
+    {
+      "label": "expressive",
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\run_snappy_elastic_drive_v001\\before\\blender\\animation\\showcase\\Animation_Showcase.blend",
+      "source_sha256": "3aedce3670c6a124cee22f22e3850f2f6ae98fa9025296e45e3adf956838b21b",
+      "action_sha256": "4983a96d54648229d71fd7aff87ec9090498d6bb72bc1568f02d63cf8a209342",
+      "review_frames": 85,
+      "fps": 30,
+      "period_frames": 20,
+      "cycles": 4.25,
+      "native_speed": true,
+      "read_only": true
+    },
+    {
+      "label": "before_bounce",
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\run_snappy_test_v001\\grounded_smooth_v001\\run_snappy_review.blend",
+      "source_sha256": "0dd1fe610d3547f43bb6227e3a2fa732f655c669473dd6b05754d5c5f44646da",
+      "action_sha256": "4c0417318e05630ce3b9a489dae865fe70d30bf41f948835092cae7a098957d0",
+      "review_frames": 85,
+      "fps": 30,
+      "period_frames": 17,
+      "cycles": 5.0,
+      "native_speed": true,
+      "read_only": true
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "passed": true,
+  "measured": {
+    "before": {
+      "hip_range_m": [
+        0.6278247237205505,
+        0.7374963760375977
+      ],
+      "vertical_excursion_m": 0.10967165231704712,
+      "peak_both_feet_clearance_m": 0.07341999560594559,
+      "peak_hip_up_m_s": 1.3965225219726562,
+      "peak_hip_down_m_s": 1.5070724487306961,
+      "designed_flight_ms": [
+        62.333333333333336,
+        56.66666666666664
+      ],
+      "designed_flight_fraction": 0.20999999999999996,
+      "contact_to_minimum_drop_m": 0.0515972375869751,
+      "trough_time_ms": 51.5625,
+      "crest_time_ms": 188.54166666666666
+    },
+    "initial_grounded": {
+      "hip_range_m": [
+        0.6259999871253967,
+        0.7379999160766602
+      ],
+      "vertical_excursion_m": 0.11199992895126343,
+      "peak_both_feet_clearance_m": 0.08090158551931381,
+      "peak_hip_up_m_s": 1.455230712890625,
+      "peak_hip_down_m_s": 1.7451095581056961,
+      "designed_flight_ms": [
+        62.333333333333336,
+        56.66666666666664
+      ],
+      "designed_flight_fraction": 0.20999999999999996,
+      "contact_to_minimum_drop_m": 0.054000020027160645,
+      "trough_time_ms": 50.0,
+      "crest_time_ms": 190.10416666666666
+    },
+    "updated": {
+      "hip_range_m": [
+        0.6219902038574219,
+        0.7457228899002075
+      ],
+      "vertical_excursion_m": 0.12373268604278564,
+      "peak_both_feet_clearance_m": 0.07342004776000977,
+      "peak_hip_up_m_s": 2.020225524902571,
+      "peak_hip_down_m_s": 1.5688705444338211,
+      "designed_flight_ms": [
+        62.333333333333336,
+        56.66666666666664
+      ],
+      "designed_flight_fraction": 0.20999999999999996,
+      "contact_to_minimum_drop_m": 0.0507168173789978,
+      "trough_time_ms": 46.09375,
+      "crest_time_ms": 158.07291666666669
+    }
+  },
+  "feet_preservation": {
+    "passed": true,
+    "paired_samples": 2177,
+    "errors": {
+      "L": {
+        "head_position_m": 2.41491063634637e-07,
+        "sole_center_m": 2.9950963321688443e-07,
+        "sole_height_m": 2.980232238769531e-07,
+        "orientation_degrees": 1.707547292539857e-05
+      },
+      "R": {
+        "head_position_m": 2.412147942149747e-07,
+        "sole_center_m": 3.1150199413846245e-07,
+        "sole_height_m": 3.129243850708008e-07,
+        "orientation_degrees": 1.707547292539857e-05
+      }
+    }
+  },
+  "shared_character_lift_removed": true,
+  "cadence_frames": 17,
+  "fps": 30,
+  "nominal_speed_m_s": 2.5,
+  "interpretation": "Jump-like feel addressed by removing shared lift and restoring brief flight, while moving the rhythmic contrast into receiving compression and upper-body recovery. Technical measurements do not establish artistic approval."
+}

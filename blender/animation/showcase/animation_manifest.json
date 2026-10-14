@@ -1227,12 +1227,12 @@
         "Leg.R": "XYZ"
       },
       "action": "Run_Snappy_Test_v001",
-      "source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_rebound_v001/run_snappy_review.blend",
-      "source_sha256": "6d00da71d37fc982bbfe4692a05ad572ab01871256335700d2516ad1ed2af5a2",
+      "source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/elastic_drive_v001/run_snappy_review.blend",
+      "source_sha256": "33a62f5ba58a5743c1bc820f53fa2c77050a7292d5580fd815d3a6a8e85dd663",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
-      "action_sha256": "3d289106b9a23a635864435d05348ad7e71a1fbd815614cfd63f287759598956",
+      "action_sha256": "8e835f91c686d41bb1846fb0d7ddc151dc55a9178f87e27d845fc54f972cb156",
       "action_frame_range": [
         1.0,
         18.0
@@ -1243,7 +1243,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Pending. User rejects jump-like feel. Remove shared whole-character lift; restore39/40% support and62/57ms flight. Compact112mm hip response,54mm receiving dip50ms then quick elastic recovery; small delayed spine/chest reaction, smooth original arm/head and swing-only leg articulation. Same17-frame cadence/contacts/nominal2.5m/s. Previous sources and all27 older Actions preserved.",
+      "approval_note": "Pending. User requests more jelly-like body rebound and clearer running rather than walking. Event-shaped receiving/recovery with10ms rounding,5deg additional hip forward lean,12% stronger arm pitch and restrained delayed torso/shoulder/head. Prior low world foot paths and brief62/57ms flight preserved, same17-frame cadence/2.5m/s. All older sources and27 other Actions unchanged.",
       "seamless_loop": true,
       "period_s": 0.5666666666666667,
       "in_place": true,
@@ -1266,14 +1266,20 @@
           18
         ]
       ],
-      "review_video": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_rebound_v001/run_snappy_three_views_1x.mp4",
-      "presentation_note": "Five uninterrupted17-frame cycles at30FPS1x. Weight-led receiving/rebound with brief low flight; no shared jump arc. Previous jumping version/approved Expressive Run/actual reference comparisons. Existing camera framing retained. Godot unchanged.",
+      "review_video": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/elastic_drive_v001/run_snappy_three_views_1x.mp4",
+      "presentation_note": "Five uninterrupted17-frame cycles at30FPS1x. Weight-led receiving/rebound with brief low flight; no shared jump arc. Previous compact version/approved Expressive Run/actual reference comparisons. Existing camera framing retained. Godot unchanged.",
       "gameplay_validation": "Blender-only Pending; phase0LEFT and0.5RIGHT receiving. Root/object static, controller owns -Y travel. Arbitrary speed, Walk/Run transitions, starts/stops, turns/slopes, weapons and mobile performance not tested.",
-      "previous_revision_source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/double_smooth_v001/run_snappy_review.blend",
-      "previous_revision_source_sha256": "16760ee2c567ce9abcde64dff2084ae098588de55117c5f146fd7fdc2778e5f9",
-      "previous_revision_action_sha256": "074b21d002bec36d83208be57ab378096b061892da95d6ad90306e0213921314",
-      "body_vertical_range_m": 0.112,
-      "shared_whole_character_lift": false
+      "previous_revision_source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/run_snappy_review.blend",
+      "previous_revision_source_sha256": "0dd1fe610d3547f43bb6227e3a2fa732f655c669473dd6b05754d5c5f44646da",
+      "previous_revision_action_sha256": "4c0417318e05630ce3b9a489dae865fe70d30bf41f948835092cae7a098957d0",
+      "body_vertical_range_m": 0.12373268604278564,
+      "shared_whole_character_lift": false,
+      "additional_hip_forward_lean_degrees": 5.0,
+      "body_rebound_events_ms": {
+        "trough_time_ms": 46.09375,
+        "crest_time_ms": 158.07291666666669
+      },
+      "previous_world_foot_motion_preserved": true
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

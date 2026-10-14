@@ -1,0 +1,34 @@
+# Run V1 — compact, smoother spring rebound
+
+2026-10-14 · **Pending artistic review** · same `Run_Snappy_Test_v001`, index27/28.
+
+The user rejected the previous jump-like motion and requested an especially smooth bounce. The large shared whole-character lift is removed. Foot support is restored to39% LEFT /40% RIGHT, with only62.33/56.67ms flight per step. The cadence remains17frames/30FPS, .5667s per stride and2.5m/s diagnostic travel. All older sources and Actions, the provisional Walking baseline, rig and Godot files are preserved.
+
+## Review at original speed
+
+[Front / three-quarter / side — five continuous cycles](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/run_snappy_three_views_1x.mp4) · [Previous jump-like Run / approved Expressive Run / updated Run](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/before_expressive_bounce_1x.mp4) · [Actual Running reference / approved Run / updated Run](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/reference_expressive_snappy_1x.mp4) · [Approved Run / updated Run, side](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/expressive_snappy_side_1x.mp4).
+
+Every video is85frames at30FPS, with no inserted holds or replay pauses. New and previous Run V1 show five uninterrupted cycles. Approved Expressive Run v3 retains its20-frame cadence; the original Running referenceF40–124 is not retimed. Only [phase sheet1](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/phase_aligned_1.jpg) / [sheet2](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/phase_aligned_2.jpg) use normalized gait phases, rounded to the nearest reference frame. Model cameras use the same existing3.08m framing. [All85 native frames](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/all85_native_frames.jpg) and [consecutive30FPS frames](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/native30_sequence_2.jpg) expose the spacing between poses.
+
+## What changed
+
+- **Bounce comes from weight reception:** a short receiving compression, brisk recovery and rounded return replace the tall shared jump arc. Actual hip excursion is109.67mm, compared with546.00mm previously. The receiving dip is51.60mm, with the first trough at51.56ms and crest at188.54ms. This is an event-shaped quintic profile with periodic8ms rounding, rather than a generic sine.
+- **Compact flight:** designed flight falls from71.04% to21% of the stride. The maximum lower-of-the-two-feet clearance falls from489.55mm to73.42mm. The character spends more time receiving and pushing through the planted foot.
+- **Smooth, decisive legs:**20ms filtering affects unloaded world leg targets only, with74ms opening and102ms gathering gates into the landing. Grounded targets remain unchanged. Moderate airborne pitch retains a readable run silhouette without the previous high floating split. No knees, scale changes or limb deformation.
+- **Connected upper body:**18ms torso and22ms arm/head angular filtering round the arcs. Small spine/chest responses use14/26ms history and0.6/0.9degree limits. Shoulders react using18ms history, bounded to2mm; head history is25ms, adding only2–10mm of lift so the head stays close. These are authored parameters, not measured reference lags.
+
+Compared with the initial compact draft preserved in `grounded_rebound_v001`, this polish reduces peak downward hip speed from1.745 to1.507m/s while retaining the cadence and receiving impulse. The smaller clearance and longer foot gathering address the previous leaping silhouette and sharp transitions. The footage is intended to read as a compact springing run. Whether the rebound is satisfying is still an artistic judgement; technical checks do not establish a reference match. The original recording's moving camera prevents precise support/flight or physical height measurement, and rigid legs cannot reproduce knee articulation.
+
+![Timing curves](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/timing_curves.png)
+
+## Validation and preservation
+
+Saved-source2177 subframe samples pass: no floor penetration/nonadjacent overlaps or unexpected support loss; planted sole drift0.002288mm; rigidity error0.000250mm; positive head/chest clearance5.046mm. Maximum waist separation40.684mm remains below the historical75mm bound; the separated-block waist seam remains a visual tradeoff. Root/object stay static, all scale stays1. Loop pose difference0; second-order velocity seam0.002737m/s passes0.006. Raw first-order estimate0.099034m/s retains legacy pass=False and is reported separately. Cyclic endpoint tangents are checked.
+
+36 targeted Showcase checks cover seven representative entries, slots, timing, props, all views and inactive reopen. All28 Actions are retained and all27 prior Action signatures/manifest entries are exact. Actual hidden GUI playback completes two wraps, pause and restart. Eleven H264 videos decode935frames at30FPS. All7211 protected files remain exact, including older sources/reviews/backups and Godot files. Mesh geometry, UVs, weights, materials, images and rig rest remain unchanged.
+
+[Foot-contact / future blending contract](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/phase_contract.json) · [Motion checks](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/motion_validation.json) · [Measured before/after](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/bounce_validation.json) · [Showcase checks](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/showcase_validation.json).
+
+Source SHA:0dd1fe610d3547f43bb6227e3a2fa732f655c669473dd6b05754d5c5f44646da. Action SHA:4c0417318e05630ce3b9a489dae865fe70d30bf41f948835092cae7a098957d0.
+
+Reopen [Animation_Showcase.blend](C:/Users/ADMIN/Desktop/GameAssetFactory/blender/animation/showcase/Animation_Showcase.blend) and select `Run_Snappy_Test_v001` (**Pending**) to load this saved revision. **Stopped for artistic review.**

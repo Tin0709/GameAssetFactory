@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "protected_files": 7317,
+  "all27_older_actions_and_entries_exact": true,
+  "previous_run_sources_reviews_exact": true,
+  "walk_provisional_record_unchanged": true,
+  "rig_godot_unchanged": true,
+  "camera_framing_unchanged": true,
+  "source_sha256": "33a62f5ba58a5743c1bc820f53fa2c77050a7292d5580fd815d3a6a8e85dd663",
+  "action_sha256": "8e835f91c686d41bb1846fb0d7ddc151dc55a9178f87e27d845fc54f972cb156",
+  "stopped_for_review": true
+}

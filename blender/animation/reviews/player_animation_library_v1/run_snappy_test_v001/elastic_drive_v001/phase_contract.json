@@ -1,0 +1,58 @@
+{
+  "action": "Run_Snappy_Test_v001",
+  "status": "pending",
+  "fps": 30,
+  "playback_frames": [
+    1,
+    17
+  ],
+  "closing_key_excluded": 18,
+  "period_s": 0.5666666666666667,
+  "nominal_speed_m_s": 2.5,
+  "in_place": true,
+  "forward_axis": "-Y",
+  "contacts_phase": {
+    "L": 0.0,
+    "R": 0.5
+  },
+  "contacts_frames": {
+    "L": 1,
+    "R": 9.5
+  },
+  "releases_phase": {
+    "L": 0.39,
+    "R": 0.9
+  },
+  "flight_phase": [
+    [
+      0.39,
+      0.5
+    ],
+    [
+      0.9,
+      1.0
+    ]
+  ],
+  "flight_ms": [
+    62.333333333333336,
+    56.66666666666664
+  ],
+  "support_duty": {
+    "L": 0.39,
+    "R": 0.4
+  },
+  "body_range_m": [
+    0.6219902038574219,
+    0.7457228899002075
+  ],
+  "receiving_drop_m": 0.0507168173789978,
+  "shared_whole_character_lift": false,
+  "body_events_ms": {
+    "first_trough": 46.09375,
+    "first_crest": 158.07291666666669
+  },
+  "additional_hip_forward_lean_degrees": 5.0,
+  "previous_world_foot_motion_preserved": true,
+  "ownership": "Absolute full-body local pose. Root/object static; controller owns world travel/collision. Do not apply visual body bounce a second time to the capsule.",
+  "transition_limits": "LEFT0/RIGHT0.5 alignment with Walk does not guarantee foot lock. Contact-aware speed/phase blending, replant, turns, slopes, interruptions and weapon layers require future Godot review. None implemented here."
+}

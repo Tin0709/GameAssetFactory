@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "entries": 28,
+  "previous_actions_exact": 27,
+  "previous_manifest_entries_exact": true,
+  "status": "pending",
+  "previous_run_v1_source_preserved": true,
+  "provisional_walk_preserved": true,
+  "action_sha256": "8e835f91c686d41bb1846fb0d7ddc151dc55a9178f87e27d845fc54f972cb156",
+  "source_sha256": "33a62f5ba58a5743c1bc820f53fa2c77050a7292d5580fd815d3a6a8e85dd663"
+}
