@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "frames": [
+    {
+      "frame": 10,
+      "rmse": 1.8585619010341963,
+      "sha256": "1f34e3ca2a53ebcd685669287a992b036a96a1d391267fa059f0055e895f8c4a"
+    },
+    {
+      "frame": 11,
+      "rmse": 1.7848069727429046,
+      "sha256": "3db364862d86e434925a948eb880a6e97834dec40cdd4d9b29eeaae635ea9cec"
+    },
+    {
+      "frame": 17,
+      "rmse": 1.8234363130975277,
+      "sha256": "66573bc95f0992c0e7b09580a35a3adae9e0155ed49f0087093e1c83a46752b1"
+    },
+    {
+      "frame": 18,
+      "rmse": 1.816802011811076,
+      "sha256": "5ac3ddb686cd78c4e4ae9b7d273129a3b4eb049bfe64ad13b7286121fb24db7e"
+    }
+  ],
+  "loop_boundary_frames": [
+    17,
+    18
+  ]
+}

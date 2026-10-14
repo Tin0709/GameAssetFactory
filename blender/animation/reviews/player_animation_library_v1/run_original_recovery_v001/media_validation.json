@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "name": "candidate_front_1x",
+      "width": 640,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30,
+      "path": "candidate_front_1x.mp4",
+      "sha256": "447338808c8c707c91fcdd6c78af11ffa28abe97f25685a1508ec22333c68b26",
+      "bytes": 340552,
+      "decoded_metadata_verified": true
+    },
+    {
+      "name": "approved_vs_candidate_front_1x",
+      "width": 1280,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30,
+      "path": "approved_vs_candidate_front_1x.mp4",
+      "sha256": "e615604c11e2619f1786825b44aca969678d224519d7b82a16474df38153ca04",
+      "bytes": 659409,
+      "decoded_metadata_verified": true
+    },
+    {
+      "name": "candidate_three_quarter_1x",
+      "width": 640,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30,
+      "path": "candidate_three_quarter_1x.mp4",
+      "sha256": "e95f0e13f891c1be8824be802bca59113875917694441564f5efd66655254df9",
+      "bytes": 404160,
+      "decoded_metadata_verified": true
+    },
+    {
+      "name": "approved_vs_candidate_three_quarter_1x",
+      "width": 1280,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30,
+      "path": "approved_vs_candidate_three_quarter_1x.mp4",
+      "sha256": "95a2f92ede2db0cd75217fa3a8509a9cc91ac594206ee21ff4cd0f0880591954",
+      "bytes": 779505,
+      "decoded_metadata_verified": true
+    },
+    {
+      "name": "candidate_side_1x",
+      "width": 640,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30,
+      "path": "candidate_side_1x.mp4",
+      "sha256": "dc3d45ec08337dacff995372afdeffd5305c587b4f6ad9c63cc2945e0bc0e903",
+      "bytes": 330786,
+      "decoded_metadata_verified": true
+    },
+    {
+      "name": "approved_vs_candidate_side_1x",
+      "width": 1280,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30,
+      "path": "approved_vs_candidate_side_1x.mp4",
+      "sha256": "2df3dc234c0c64dbd7a08cc5fb2bfebe1f3c37f8e8a8823ff60e2d2c8e014c33",
+      "bytes": 643211,
+      "decoded_metadata_verified": true
+    },
+    {
+      "name": "candidate_three_views_1x",
+      "width": 1920,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30,
+      "path": "candidate_three_views_1x.mp4",
+      "sha256": "09bd5692b345af2808bc71deb3c3abbb5e04798b9f5c98387fc82459defd0be6",
+      "bytes": 1023806,
+      "decoded_metadata_verified": true
+    }
+  ],
+  "timing": "102 frames at30FPS, six uninterrupted17-frame cycles; closing18 excluded. No cadence retime or holds. Own approved/candidate renders only.",
+  "no_blend_saved": true
+}

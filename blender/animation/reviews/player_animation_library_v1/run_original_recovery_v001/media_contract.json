@@ -1,0 +1,68 @@
+{
+  "videos": [
+    {
+      "name": "candidate_front_1x",
+      "width": 640,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30
+    },
+    {
+      "name": "approved_vs_candidate_front_1x",
+      "width": 1280,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30
+    },
+    {
+      "name": "candidate_three_quarter_1x",
+      "width": 640,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30
+    },
+    {
+      "name": "approved_vs_candidate_three_quarter_1x",
+      "width": 1280,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30
+    },
+    {
+      "name": "candidate_side_1x",
+      "width": 640,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30
+    },
+    {
+      "name": "approved_vs_candidate_side_1x",
+      "width": 1280,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30
+    },
+    {
+      "name": "candidate_three_views_1x",
+      "width": 1920,
+      "height": 690,
+      "unique_frames": 17,
+      "cycles": 6,
+      "frames": 102,
+      "fps": 30
+    }
+  ],
+  "timing": "102 frames at30FPS, six uninterrupted17-frame cycles; closing18 excluded. No cadence retime or holds. Own approved/candidate renders only."
+}
