@@ -1,0 +1,40 @@
+{
+  "experiment": "Run_Snappy_LegRecovery_Test_v001",
+  "source_status": "pending",
+  "gameplay_decision": "rejected_at_30fps",
+  "reason": "Sharper exchange creates excessively large displayed leg steps at target30FPS. Do not promote or replace approved Run.",
+  "source": {
+    "samples": 2177,
+    "supported_vertex_difference_m": 0.0,
+    "upper_body_world_difference_m": 0.0,
+    "sole_height_difference_m": 1.3262033462524414e-06,
+    "second_order_seam_m_s": 0.0025656839941051736,
+    "raw_first_order_seam_m_s": 0.1192265708511974,
+    "raw_legacy_pass": false
+  },
+  "runtime": {
+    "30": {
+      "checks": 1021,
+      "failures": 45,
+      "passed": false,
+      "baseline_steady_leg_step_deg": 58.8477692472385,
+      "candidate_steady_leg_step_deg": 81.2929866335726,
+      "maximum_floor_penetration_m": 0.000503838062286377,
+      "maximum_planted_speed_m_s": 5.72483918404032e-05,
+      "AB_hip_target_error_m": 0.0,
+      "paired_jump_request_phase_difference": 0.0
+    },
+    "60": {
+      "checks": 1021,
+      "failures": 0,
+      "passed": true,
+      "baseline_steady_leg_step_deg": 31.3633134233498,
+      "candidate_steady_leg_step_deg": 47.750569657422,
+      "maximum_floor_penetration_m": 0.000302374362945557,
+      "maximum_planted_speed_m_s": 0.000114472350105643,
+      "AB_hip_target_error_m": 0.0,
+      "paired_jump_request_phase_difference": 0.0
+    }
+  },
+  "independent_review": "Read-only fresh reviewer; fixed test coverage for direct Run stops, explicit phase timeout, equal start-foot fixtures and live A/B guards. Adjacent torso/leg penetration is not certified by the source SAT suite."
+}

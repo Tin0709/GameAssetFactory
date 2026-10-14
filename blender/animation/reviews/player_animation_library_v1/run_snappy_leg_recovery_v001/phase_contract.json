@@ -1,0 +1,26 @@
+{
+  "action": "Run_Snappy_LegRecovery_Test_v001",
+  "baseline": "Run_Snappy_Test_v001",
+  "status": "pending",
+  "gameplay_decision": "rejected_at_30fps",
+  "duration_s": 0.5666666666666667,
+  "fps": 30,
+  "playback_frames": [
+    1,
+    17
+  ],
+  "closing_key_excluded": 18,
+  "nominal_speed_m_s": 2.5,
+  "support_duty": {
+    "L": 0.39,
+    "R": 0.4
+  },
+  "contact_phase": {
+    "L": 0.0,
+    "R": 0.5
+  },
+  "source_maximum_phase_advance": 0.08,
+  "upper_body": "Exact baseline curves",
+  "vertical_sole_envelope_difference_m": 1.3262033462524414e-06,
+  "ownership": "Absolute local pose; capsule owns travel/collision/jump. Same sole writer and support profiles. Runtime A/B blends only two leg samples for140ms; approved Run default."
+}
