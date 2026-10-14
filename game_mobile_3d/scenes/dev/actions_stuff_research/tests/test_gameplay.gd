@@ -47,6 +47,7 @@ func run() -> void:
 	check(max_scale>1.065,"Source leg stretch appears in gameplay")
 	check(contacts>2 and max_contact_speed<.04,"Run support corner remains planted "+str(max_contact_speed))
 	check(steady_clamps==0,"Steady source Run stays inside contact correction budget")
+	check(v.correction_clamps==0,"Idle replant releases stale rolling-contact anchors")
 	check(not v.move_requested and not v.settling,"Release movement settles to Idle")
 	check(absf(v.skeleton.get_bone_pose_scale(v.leg_left).y-1.)<.0001,"Stop returns leg scale smoothly to one")
 	var life: float=v.entity_lifetime;scene.reset_player()

@@ -110,7 +110,7 @@ func _set_world_leg_rotation(bone: int,q: Quaternion) -> void:
 	var parent_q: Quaternion=(skeleton.global_basis*skeleton.get_bone_global_pose(parent).basis).orthonormalized().get_rotation_quaternion()
 	skeleton.set_bone_pose_rotation(bone,(parent_q.inverse()*q).normalized());skeleton.force_update_all_bone_transforms()
 func _contact_leg_rotation(side: int,bone: int,target: Vector3,original_q: Quaternion,delta: float) -> Quaternion:
-	if absf(turn_rate)>.5 or transition_age<.18:
+	if not move_requested or absf(turn_rate)>.5 or transition_age<.18:
 		rolling_used[side]=false;rolling_corner[side]=-1
 		return super._contact_leg_rotation(side,bone,target,original_q,delta)
 	var transform:=skeleton.global_transform*skeleton.get_bone_global_pose(bone)
