@@ -312,14 +312,16 @@ class MOBS_PT_library(bpy.types.Panel):
                 split=c['action'].rfind('_',0,26)+1
                 box.label(text=c['action'][:split]);box.label(text=c['action'][split:])
             else:box.label(text=c['action'])
-            box.label(text=f"{c.get('duration_s',(c['end']-c['start']+1)/c['fps']):.3f} s  |  {c['fps']} FPS  |  F{c['start']}–{c['end']}")
+            box.label(text=f"{c.get('duration_s',(c['end']-c['start']+1)/c['fps']):.3f} s  |  {c['fps']} FPS  |  F{c['start']}–{c.get('end_exact',c['end'])}")
             box.label(text='Status: '+c['status'],icon='TIME' if c['status']=='Pending' else 'INFO')
             if c.get('research_only'):
                 box.label(text='RESEARCH ONLY — do not export',icon='ERROR')
                 source=bpy.data.actions.get(c['action'])
                 if source and source.get('source_stride_seconds',0):box.label(text=f"Stride: {source['source_stride_seconds']:.2f} s")
                 if source and source.get('verification_status'):box.label(text=source['verification_status'])
-                if source and source.get('source_animation_id'):box.label(text=source['source_animation_id'])
+                if source and source.get('source_animation_id'):
+                    box.label(text='Actions & Stuff 1.12 / private')
+                    box.label(text='Animation: '+source['source_animation_id'].rsplit('.',1)[-1])
                 if source and source.get('source_animation_id'):box.operator('mobs.show_findings')
             l.prop(s,'mobs_seconds',text='Time (seconds)')
             if 'duration_s' in c:
