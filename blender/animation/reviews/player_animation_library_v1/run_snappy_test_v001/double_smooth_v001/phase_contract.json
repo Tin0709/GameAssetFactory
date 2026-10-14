@@ -1,0 +1,49 @@
+{
+  "action": "Run_Snappy_Test_v001",
+  "status": "pending",
+  "fps": 30,
+  "playback_frames": [
+    1,
+    17
+  ],
+  "closing_key_excluded": 18,
+  "period_s": 0.5666666666666667,
+  "nominal_speed_m_s": 2.5,
+  "in_place": true,
+  "forward_axis": "-Y",
+  "contacts_phase": {
+    "L": 0.0,
+    "R": 0.5
+  },
+  "contacts_frames": {
+    "L": 1,
+    "R": 9.5
+  },
+  "releases_phase": {
+    "L": 0.14481540013988667,
+    "R": 0.6448154001398867
+  },
+  "flight_phase": [
+    [
+      0.14481540013988667,
+      0.5
+    ],
+    [
+      0.6448154001398867,
+      1.0
+    ]
+  ],
+  "support_duty": {
+    "L": 0.14481540013988667,
+    "R": 0.14481540013988667
+  },
+  "body_range_m": [
+    0.642,
+    1.188
+  ],
+  "body_contact_height_m": 0.686,
+  "body_load_depth_m": 0.044,
+  "body_load_time_s": 0.04533333333333334,
+  "ownership": "Absolute full-body local pose; Root/object static, controller owns world travel/collision. Do not apply visual hop a second time to the capsule.",
+  "transition_limits": "Shared LEFT0/RIGHT0.5 with Walk does not guarantee foot lock. Flight/release timing and much larger visual excursion need contact-aware phase/speed blending, support-aware replant, interruptions, weapon layers, turns/slopes and actual gameplay/mobile review. None implemented here."
+}
