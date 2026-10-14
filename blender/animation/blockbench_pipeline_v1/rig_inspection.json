@@ -1,0 +1,3400 @@
+{
+  "path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/showcase/Animation_Showcase.blend",
+  "rig": "Showcase_Player_Rig",
+  "mesh": "Showcase_Player_Mesh",
+  "world": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "units": {
+    "system": "METRIC",
+    "scale": 1.0
+  },
+  "bones": [
+    {
+      "name": "Root",
+      "parent": null,
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        0.16874998807907104
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "XYZ",
+      "deform": false,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "Hips",
+      "parent": "Root",
+      "head": [
+        0.0,
+        0.0,
+        0.6749999523162842
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        0.7874999642372131
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.6749999523162842
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "XYZ",
+      "deform": false,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "Spine",
+      "parent": "Hips",
+      "head": [
+        0.0,
+        0.0,
+        0.7874999642372131
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.068750023841858
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.7874999642372131
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "QUATERNION",
+      "deform": false,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "Chest",
+      "parent": "Spine",
+      "head": [
+        0.0,
+        0.0,
+        1.068750023841858
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.3499999046325684
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          1.068750023841858
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "QUATERNION",
+      "deform": true,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "Neck",
+      "parent": "Chest",
+      "head": [
+        0.0,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.40625
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          1.3499999046325684
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "QUATERNION",
+      "deform": false,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "Head",
+      "parent": "Neck",
+      "head": [
+        0.0,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        0.0,
+        0.0,
+        1.7999999523162842
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          1.3499999046325684
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "QUATERNION",
+      "deform": true,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "UpperArm.L",
+      "parent": "Chest",
+      "head": [
+        0.3374999761581421,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742277657347586e-08,
+          0.3374999761581421
+        ],
+        [
+          8.742277657347586e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0,
+          1.3499999046325684
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "QUATERNION",
+      "deform": true,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "ForeArm.L",
+      "parent": "UpperArm.L",
+      "head": [
+        0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "tail": [
+        0.3374999761581421,
+        0.0,
+        0.675000011920929
+      ],
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742276236262114e-08,
+          0.3374999761581421
+        ],
+        [
+          8.742276236262114e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.9999999403953552,
+          0.0,
+          1.0124999284744263
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "QUATERNION",
+      "deform": true,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "UpperArm.R",
+      "parent": "Chest",
+      "head": [
+        -0.3374999761581421,
+        0.0,
+        1.3499999046325684
+      ],
+      "tail": [
+        -0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742277657347586e-08,
+          -0.3374999761581421
+        ],
+        [
+          8.742277657347586e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0,
+          1.3499999046325684
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "QUATERNION",
+      "deform": true,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "ForeArm.R",
+      "parent": "UpperArm.R",
+      "head": [
+        -0.3374999761581421,
+        0.0,
+        1.0124999284744263
+      ],
+      "tail": [
+        -0.3374999761581421,
+        0.0,
+        0.675000011920929
+      ],
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742276236262114e-08,
+          -0.3374999761581421
+        ],
+        [
+          8.742276236262114e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.9999999403953552,
+          0.0,
+          1.0124999284744263
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "QUATERNION",
+      "deform": true,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "WeaponCarrier",
+      "parent": "Chest",
+      "head": [
+        -0.09206697344779968,
+        -0.4564836323261261,
+        0.9688228368759155
+      ],
+      "tail": [
+        -0.10446855425834656,
+        -0.6338344812393188,
+        0.9406645894050598
+      ],
+      "matrix": [
+        [
+          -0.9975640177726746,
+          -0.06889767944812775,
+          -0.010912107303738594,
+          -0.09206697344779968
+        ],
+        [
+          0.06975644826889038,
+          -0.9852824807167053,
+          -0.15605364739894867,
+          -0.4564836323261261
+        ],
+        [
+          2.3283064365386963e-07,
+          -0.15643471479415894,
+          0.9876883029937744,
+          0.9688228368759155
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "QUATERNION",
+      "deform": false,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "Leg.L",
+      "parent": "Hips",
+      "head": [
+        0.11249999701976776,
+        0.0,
+        0.6749999523162842
+      ],
+      "tail": [
+        0.11249999701976776,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742277657347586e-08,
+          0.11249999701976776
+        ],
+        [
+          8.742277657347586e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0,
+          0.6749999523162842
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "XYZ",
+      "deform": true,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    },
+    {
+      "name": "Leg.R",
+      "parent": "Hips",
+      "head": [
+        -0.11249999701976776,
+        0.0,
+        0.6749999523162842
+      ],
+      "tail": [
+        -0.11249999701976776,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          -8.742277657347586e-08,
+          -0.11249999701976776
+        ],
+        [
+          8.742277657347586e-08,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0,
+          0.6749999523162842
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "mode": "XYZ",
+      "deform": true,
+      "inherit_scale": "FULL",
+      "local_location": true,
+      "inherit_rotation": true,
+      "constraints": []
+    }
+  ],
+  "mesh_world": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "vertices": [
+    [
+      -0.22499999403953552,
+      -0.22499999403953552,
+      1.350000023841858
+    ],
+    [
+      0.22499999403953552,
+      -0.22499999403953552,
+      1.350000023841858
+    ],
+    [
+      0.22499999403953552,
+      0.22499999403953552,
+      1.350000023841858
+    ],
+    [
+      -0.22499999403953552,
+      0.22499999403953552,
+      1.350000023841858
+    ],
+    [
+      -0.22499999403953552,
+      -0.22499999403953552,
+      1.7999999523162842
+    ],
+    [
+      0.22499999403953552,
+      -0.22499999403953552,
+      1.7999999523162842
+    ],
+    [
+      0.22499999403953552,
+      0.22499999403953552,
+      1.7999999523162842
+    ],
+    [
+      -0.22499999403953552,
+      0.22499999403953552,
+      1.7999999523162842
+    ],
+    [
+      -0.22499999403953552,
+      -0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      0.22499999403953552,
+      -0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      0.22499999403953552,
+      0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      -0.22499999403953552,
+      0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      -0.22499999403953552,
+      -0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      0.22499999403953552,
+      -0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      0.22499999403953552,
+      0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      -0.22499999403953552,
+      0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      0.0,
+      -0.11249999701976776,
+      0.0
+    ],
+    [
+      0.22499999403953552,
+      -0.11249999701976776,
+      0.0
+    ],
+    [
+      0.22499999403953552,
+      0.11249999701976776,
+      0.0
+    ],
+    [
+      0.0,
+      0.11249999701976776,
+      0.0
+    ],
+    [
+      0.0,
+      -0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      0.22499999403953552,
+      -0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      0.22499999403953552,
+      0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      0.0,
+      0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      -0.22499999403953552,
+      -0.11249999701976776,
+      0.0
+    ],
+    [
+      0.0,
+      -0.11249999701976776,
+      0.0
+    ],
+    [
+      0.0,
+      0.11249999701976776,
+      0.0
+    ],
+    [
+      -0.22499999403953552,
+      0.11249999701976776,
+      0.0
+    ],
+    [
+      -0.22499999403953552,
+      -0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      0.0,
+      -0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      0.0,
+      0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      -0.22499999403953552,
+      0.11249999701976776,
+      0.675000011920929
+    ],
+    [
+      0.25312498211860657,
+      -0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      0.4218749701976776,
+      -0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      0.421875,
+      0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      0.25312501192092896,
+      0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      0.25312498211860657,
+      -0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      0.4218749701976776,
+      -0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      0.421875,
+      0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      0.25312501192092896,
+      0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      0.25312498211860657,
+      -0.11249999701976776,
+      0.6749999523162842
+    ],
+    [
+      0.4218749701976776,
+      -0.11249999701976776,
+      0.6749999523162842
+    ],
+    [
+      0.421875,
+      0.11249999701976776,
+      0.6749999523162842
+    ],
+    [
+      0.25312501192092896,
+      0.11249999701976776,
+      0.6749999523162842
+    ],
+    [
+      0.25312498211860657,
+      -0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      0.4218749701976776,
+      -0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      0.421875,
+      0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      0.25312501192092896,
+      0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      -0.421875,
+      -0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      -0.25312501192092896,
+      -0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      -0.25312498211860657,
+      0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      -0.4218749701976776,
+      0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      -0.421875,
+      -0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      -0.25312501192092896,
+      -0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      -0.25312498211860657,
+      0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      -0.4218749701976776,
+      0.11249999701976776,
+      1.350000023841858
+    ],
+    [
+      -0.421875,
+      -0.11249999701976776,
+      0.6749999523162842
+    ],
+    [
+      -0.25312501192092896,
+      -0.11249999701976776,
+      0.6749999523162842
+    ],
+    [
+      -0.25312498211860657,
+      0.11249999701976776,
+      0.6749999523162842
+    ],
+    [
+      -0.4218749701976776,
+      0.11249999701976776,
+      0.6749999523162842
+    ],
+    [
+      -0.421875,
+      -0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      -0.25312501192092896,
+      -0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      -0.25312498211860657,
+      0.11249999701976776,
+      1.0125000476837158
+    ],
+    [
+      -0.4218749701976776,
+      0.11249999701976776,
+      1.0125000476837158
+    ]
+  ],
+  "polygons": [
+    [
+      0,
+      1,
+      5,
+      4
+    ],
+    [
+      1,
+      2,
+      6,
+      5
+    ],
+    [
+      2,
+      3,
+      7,
+      6
+    ],
+    [
+      3,
+      0,
+      4,
+      7
+    ],
+    [
+      4,
+      5,
+      6,
+      7
+    ],
+    [
+      3,
+      2,
+      1,
+      0
+    ],
+    [
+      8,
+      9,
+      13,
+      12
+    ],
+    [
+      9,
+      10,
+      14,
+      13
+    ],
+    [
+      10,
+      11,
+      15,
+      14
+    ],
+    [
+      11,
+      8,
+      12,
+      15
+    ],
+    [
+      12,
+      13,
+      14,
+      15
+    ],
+    [
+      11,
+      10,
+      9,
+      8
+    ],
+    [
+      16,
+      17,
+      21,
+      20
+    ],
+    [
+      17,
+      18,
+      22,
+      21
+    ],
+    [
+      18,
+      19,
+      23,
+      22
+    ],
+    [
+      19,
+      16,
+      20,
+      23
+    ],
+    [
+      20,
+      21,
+      22,
+      23
+    ],
+    [
+      19,
+      18,
+      17,
+      16
+    ],
+    [
+      24,
+      25,
+      29,
+      28
+    ],
+    [
+      25,
+      26,
+      30,
+      29
+    ],
+    [
+      26,
+      27,
+      31,
+      30
+    ],
+    [
+      27,
+      24,
+      28,
+      31
+    ],
+    [
+      28,
+      29,
+      30,
+      31
+    ],
+    [
+      27,
+      26,
+      25,
+      24
+    ],
+    [
+      32,
+      33,
+      37,
+      36
+    ],
+    [
+      33,
+      34,
+      38,
+      37
+    ],
+    [
+      34,
+      35,
+      39,
+      38
+    ],
+    [
+      35,
+      32,
+      36,
+      39
+    ],
+    [
+      36,
+      37,
+      38,
+      39
+    ],
+    [
+      35,
+      34,
+      33,
+      32
+    ],
+    [
+      40,
+      41,
+      45,
+      44
+    ],
+    [
+      41,
+      42,
+      46,
+      45
+    ],
+    [
+      42,
+      43,
+      47,
+      46
+    ],
+    [
+      43,
+      40,
+      44,
+      47
+    ],
+    [
+      44,
+      45,
+      46,
+      47
+    ],
+    [
+      43,
+      42,
+      41,
+      40
+    ],
+    [
+      48,
+      49,
+      53,
+      52
+    ],
+    [
+      49,
+      50,
+      54,
+      53
+    ],
+    [
+      50,
+      51,
+      55,
+      54
+    ],
+    [
+      51,
+      48,
+      52,
+      55
+    ],
+    [
+      52,
+      53,
+      54,
+      55
+    ],
+    [
+      51,
+      50,
+      49,
+      48
+    ],
+    [
+      56,
+      57,
+      61,
+      60
+    ],
+    [
+      57,
+      58,
+      62,
+      61
+    ],
+    [
+      58,
+      59,
+      63,
+      62
+    ],
+    [
+      59,
+      56,
+      60,
+      63
+    ],
+    [
+      60,
+      61,
+      62,
+      63
+    ],
+    [
+      59,
+      58,
+      57,
+      56
+    ]
+  ],
+  "weights": [
+    [
+      [
+        "Head",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Head",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Head",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Head",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Head",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Head",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Head",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Head",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Chest",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Chest",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Chest",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Chest",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Chest",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Chest",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Chest",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Chest",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "Leg.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.L",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "UpperArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.R",
+        1.0
+      ]
+    ],
+    [
+      [
+        "ForeArm.R",
+        1.0
+      ]
+    ]
+  ],
+  "mesh_modifiers": [
+    [
+      "ARMATURE",
+      "Showcase_Player_Rig"
+    ]
+  ],
+  "neutral": {
+    "Root": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "XYZ",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "Hips": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "XYZ",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "Spine": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "QUATERNION",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "Chest": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "QUATERNION",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "Neck": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "QUATERNION",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "Head": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "QUATERNION",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "UpperArm.L": {
+      "location": [
+        0.03200000151991844,
+        0.0,
+        2.797528875220223e-09
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "QUATERNION",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "ForeArm.L": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "QUATERNION",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "UpperArm.R": {
+      "location": [
+        -0.03200000151991844,
+        0.0,
+        -2.797528875220223e-09
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "QUATERNION",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "ForeArm.R": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "QUATERNION",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "WeaponCarrier": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "QUATERNION",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "Leg.L": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "XYZ",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "Leg.R": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_mode": "XYZ",
+      "rotation_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ]
+    }
+  },
+  "manifest": {
+    "schema": 1,
+    "title": "GameAssetFactory Animation Library",
+    "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+    "actor_rig": "Showcase_Player_Rig",
+    "actor_mesh": "Showcase_Player_Mesh",
+    "animations": [
+      {
+        "action": "Expressive_Arm_Motion_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/expressive_arm_motion_test/expressive_arm_motion_review.blend",
+        "source_sha256": "86da6b8822de3b9155da32a58acaabd592a3a3c929bb87d1a1d464be9989cf4a",
+        "source_rig": "EAM_Player_Rig",
+        "source_mesh": "EAM_Player_Mesh",
+        "source_armature": "EAM_Unmodified_RestRig",
+        "slot_identifier": "OBEAM_Player_Rig",
+        "action_sha256": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
+        "action_frame_range": [
+          1.0,
+          24.0
+        ],
+        "start": 1,
+        "end": 24,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval in the 2026-10-10 viewer/takeoff request; exploratory test only.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        }
+      },
+      {
+        "action": "Run_Expressive_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/run_expressive_test/run_expressive_review.blend",
+        "source_sha256": "721875d67a2d6f88c195f7c8468c025a0fec2517294edc2435d22a2fa43d0218",
+        "source_rig": "RUN_Test_Rig",
+        "source_mesh": "RUN_Test_Mesh",
+        "source_armature": "RUN_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "e35ae1d3ef539bd04cf140ebbe1326e8535eca2089394789399ec8c69cb2e4c1",
+        "action_frame_range": [
+          1.0,
+          19.0
+        ],
+        "start": 1,
+        "end": 18,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval in the 2026-10-10 viewer/takeoff request; exploratory test only.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        }
+      },
+      {
+        "action": "LowerBody_Recovery_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/lowerbody_recovery_test/lowerbody_recovery_review.blend",
+        "source_sha256": "75f7855cd3b05481aed6326a4ee534ee9960da9e3f886a466db8b25204d3daf8",
+        "source_rig": "LB_Test_Rig",
+        "source_mesh": "LB_Test_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBLB_Test_Rig",
+        "action_sha256": "de6d0f1ed6dadc2ee37859eeca8ac97c6122ddae7a98331f36c961ee0142a493",
+        "action_frame_range": [
+          1.0,
+          48.0
+        ],
+        "start": 1,
+        "end": 48,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval in the 2026-10-10 viewer/takeoff request; exploratory test only.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        }
+      },
+      {
+        "action": "Jump_Takeoff_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/jump_takeoff_test/jump_takeoff_review.blend",
+        "source_sha256": "2f5a9eec11e589317c521d55956a4c58a37de2a7fb662fea94907a822b0282af",
+        "source_rig": "JT_Test_Rig",
+        "source_mesh": "JT_Test_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "16067791d97b6302e3854371cfe39794a7fe2c6e3b2f694e64273381fea8db52",
+        "action_frame_range": [
+          1.0,
+          24.0
+        ],
+        "start": 1,
+        "end": 24,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval 2026-10-10: satisfied with expressive motion and soft, subtle compression before takeoff. Preserve this Action.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        }
+      },
+      {
+        "action": "Jump_AirPose_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/jump_airpose_test/jump_airpose_review.blend",
+        "source_sha256": "15f4f4aaff5f34cdedf3f0fd5d083d520c5b9197da5ef285cedfac191cda6d27",
+        "source_rig": "AP_Test_Rig",
+        "source_mesh": "AP_Test_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "eb3b79fd05e5f175e6b5590745f3a38efa43015a635e6eb011abe73377c818e4",
+        "action_frame_range": [
+          1.0,
+          22.0
+        ],
+        "start": 1,
+        "end": 22,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval received 2026-10-10 Asia/Saigon: happy with its expressive airborne motion; approved before requesting Jump_Landing_Test.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "preview_floor_z_m": -0.19708331918716426,
+        "in_place": true,
+        "review_sequence": "blender/animation/reviews/player_animation_library_v1/jump_airpose_test/takeoff_to_airpose_review.mp4"
+      },
+      {
+        "action": "Jump_Landing_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/jump_landing_test/jump_landing_review.blend",
+        "source_sha256": "94b7737c9c517ba62742c4c18f1a42b9e212e6b24312c3019657e9450adb6959",
+        "source_rig": "JL_Test_Rig",
+        "source_mesh": "JL_Test_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "8836c180e39c2b93e47e96a1077360705cffd5c33a729aa91ce93d0b47bf9076",
+        "action_frame_range": [
+          1.0,
+          44.0
+        ],
+        "start": 1,
+        "end": 44,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "in_place": true,
+        "physics_owned_world_travel": true,
+        "review_sequence": "blender/animation/reviews/player_animation_library_v1/jump_landing_test/takeoff_airpose_landing_1x.mp4",
+        "variant_note": "Preserved softer alternate; not overwritten. Explicit artistic approval has not been recorded."
+      },
+      {
+        "action": "Jump_Landing_Impact_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/jump_landing_impact_test/jump_landing_impact_review.blend",
+        "source_sha256": "3d8eb81bf5e6cd1dca7dad5cd89c728c67d6da2015fc4df7db8cecc8643e0479",
+        "source_rig": "JI_Test_Rig",
+        "source_mesh": "JI_Test_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "e870f735519b6aeb810b776ecce6ac944c00357e3127914286fc3f4ff137e55f",
+        "action_frame_range": [
+          1.0,
+          56.0
+        ],
+        "start": 1,
+        "end": 56,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval, 2026-10-10: preferred landing baseline for Full_Jump_Expressive_Test; original softer Landing preserved as alternate.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "preferred_landing_baseline": true
+      },
+      {
+        "action": "Full_Jump_Expressive_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_test/full_jump_expressive_review.blend",
+        "source_sha256": "8b63975da6f49cd244d2c1eb61593dc27e7e1c6d843970521b05c7090f3cbb3c",
+        "source_rig": "FJ_Test_Rig",
+        "source_mesh": "FJ_Test_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "b119534f13f7db19862dfd2d7485595e9372ad0da0cb1e300e9c966fd00f0b99",
+        "action_frame_range": [
+          1.0,
+          93.0
+        ],
+        "start": 1,
+        "end": 93,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "in_place": true,
+        "review_preview": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_test/full_jump_preview.blend",
+        "review_video": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_test/full_jump_all_views_1x.mp4",
+        "presentation_note": "Showcase plays in-place poses; world height exists only in the separate Blender review preview, never in this Action."
+      },
+      {
+        "action": "Idle_Expressive_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/idle_expressive_review.blend",
+        "source_sha256": "28d66ce1855326e83decd4e1bb9d2811ab5729f37342719b6d3fdd069c59c6b4",
+        "source_rig": "IE_Test_Rig",
+        "source_mesh": "IE_Test_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "022eedd0bd5ff65dc644c636b9d247cf3cafccb1b5403948be45ec0ecfe105d7",
+        "action_frame_range": [
+          1.0,
+          145.0
+        ],
+        "start": 1,
+        "end": 144,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 145,
+        "period_s": 4.8,
+        "in_place": true,
+        "review_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/idle_all_views_1x.mp4",
+        "comparison_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test/comparison_all_views_1x.mp4",
+        "presentation_note": "Both full soles remain planted; static root; closing key97 excluded from playback1\u201396. No preview travel.",
+        "refinement_note": "Explicit user steering: keep this same Pending Action name; add head-led curious LookAround, observation/rest pauses and delayed body response. Earlier working passes backed up. Not an approved Action overwrite."
+      },
+      {
+        "action": "Idle_Expressive_Test_v2",
+        "source": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v2/idle_expressive_v2_review.blend",
+        "source_sha256": "3101c726f3825b2484a04ce36761440a6c1359d313b189677f815f3de6a16f6a",
+        "source_rig": "IEV2_Test_Rig",
+        "source_mesh": "IEV2_Test_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "b7a9604d881b782b73531be95cb5f607a3d9eac805da3b862449c3a2986b8b69",
+        "action_frame_range": [
+          1.0,
+          241.0
+        ],
+        "start": 1,
+        "end": 240,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 241,
+        "period_s": 8.0,
+        "in_place": true,
+        "review_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v2/idle_v2_all_views_1x.mp4",
+        "comparison_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v2/comparison_three_quarter_1x.mp4",
+        "presentation_note": "Both full soles fixed 28 mm farther outward per side; static root; playback1\u2013240, closing key241 excluded. No travel. Separate v2; original Idle preserved.",
+        "gameplay_validation": "Not production-ready. Requires stance/replant transitions, interruption response, weapon-layer ownership and actual Godot/mobile validation."
+      },
+      {
+        "action": "Idle_Expressive_Test_v3",
+        "source": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v3/idle_expressive_v3_review.blend",
+        "source_sha256": "ef9a450d8087a77f4f923e456c16562c286f43e2f73a5335faeb9cfe53028255",
+        "source_rig": "IEV3_Test_Rig",
+        "source_mesh": "IEV3_Test_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "f1b1152e742f0f2fe8b5a734b6f6d684f0d8b090442004cea631f8efb5614059",
+        "action_frame_range": [
+          1.0,
+          241.0
+        ],
+        "start": 1,
+        "end": 240,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval2026-10-11: current Idle v3 is the preferred idle baseline; earlier idle versions remain preserved for comparison. Blender artistic approval only; Godot gameplay validation outstanding.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 241,
+        "period_s": 8.0,
+        "in_place": true,
+        "review_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v3/idle_v3_all_views_1x.mp4",
+        "comparison_video": "blender/animation/reviews/player_animation_library_v1/idle_expressive_test_v3/comparison_three_quarter_1x.mp4",
+        "presentation_note": "Current Pending v3: viewer-front right -> center pass-through -> top-right .25s -> bottom-left .25s -> left -> center pass-through -> top-right .25s -> bottom-left .25s, then smooth rest. Four exact7.5frame directional holds. Previous nodding passages replaced. Latest explicit correction: both full arms straight, no elbow bend. User means limit downward drop and keep gesture small, NOT waist-height hands. Upward-glance shoulder drop allowance halved60mm->30mm; whole-arm6deg forward,18/20deg spread; smooth relaxed overlap.48mm hip rise/14.4mm chest lift,4s breathing, planted asymmetric legs, same8s loop/30FPS/closing241. No rig change.",
+        "gameplay_validation": "Not production-ready. Requires stance/replant transitions, interruption response, weapon-layer ownership and actual Godot/mobile validation.",
+        "revision_note": "Explicit user refinement of Pending v3 only. Prior nodding version safely archived. Original ten Actions/entries and approved sources preserved. No Godot changes."
+      },
+      {
+        "action": "Walk_Expressive_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_expressive_test/walk_expressive_review.blend",
+        "source_sha256": "4f0e61f3c6fbca14cbb3b7896a34ab8f0b011a50ebef11922bdfd5c4b75fad20",
+        "source_rig": "WEX_Test_Rig",
+        "source_mesh": "WEX_Test_Mesh",
+        "source_armature": "WEX_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "15f8e76ac8ca19051bc2865ffeacc145ac2e003ec1eed8672cd8ecb72e6f20ef",
+        "action_frame_range": [
+          1.0,
+          37.0
+        ],
+        "start": 1,
+        "end": 36,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval2026-10-12 of the CURRENT refined version; preferred Walk baseline. Exact source/Action preserved. Blender artistic approval; actual Godot transition/mobile validation outstanding.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 37,
+        "nominal_speed_m_s": 0.9,
+        "contact_frames": {
+          "L": 1,
+          "R": 19
+        },
+        "support_duty": {
+          "L": 0.6,
+          "R": 0.62
+        },
+        "presentation_note": "In-place 36-frame/30FPS expressive walk, closing37 excluded. Nominal speed0.9m/s; controller owns travel. Approved Idle v3 posture anchor; support-aware replants required for start/stop. Full-body absolute tracks, straight arms; weapon-layer/runtime transition validation outstanding. User-requested Pending refinement: stronger support-led pelvic sway and twist carried into rigid torso, steady gaze; feet/support timing unchanged. Additional user-requested Pending refinement:36mm fore/aft waist travel synchronized with receiving/reaching foot phases combines with76mm lateral sway into small diagonal body motion. Ground anchors, timing and static root unchanged. Latest user-requested Pending refinement:walking tracks narrowed from0.36m to0.32m (20mm inward per leg). Diagonal waist path, gait timing, toe angles and ground support logic preserved. Latest user-requested Pending correction:0.29m tracks approximately halve the visible gap of the0.36m stance shown in the viewport. Mild lateral whole-leg lean reduced to-0.5deg/+0.75deg to prevent rigid thigh intersections;5deg toe-out, diagonal waist path, stride timing and ground support logic preserved. Latest Pending refinement: lateral hip travel and dynamic torso side-roll halved; walking tracks narrowed from0.29m to0.27m. Fore/aft response, vertical receiving, stride timing,5deg toe-out and ground support retained. Whole-leg lateral lean eased to-0.25deg/+0.375deg after a measured thigh-clearance check."
+      },
+      {
+        "action": "Run_Expressive_v2_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/run_expressive_v2_test/run_expressive_v2_review.blend",
+        "source_sha256": "ebc8865077bbb8ed3e5ef0a8c89121c1d1e49b6933a6cc961539dbfcb52e5b5e",
+        "source_rig": "RN2_Test_Rig",
+        "source_mesh": "RN2_Test_Mesh",
+        "source_armature": "RN2_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "2f26a2503e1478ca6c5fddfb406ce20a4054b4c7247d8d97574759fe69c782ee",
+        "action_frame_range": [
+          1.0,
+          23.0
+        ],
+        "start": 1,
+        "end": 22,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 23,
+        "period_s": 0.7333333333333333,
+        "in_place": true,
+        "nominal_speed_m_s": 2.1,
+        "contact_frames": {
+          "L": 1,
+          "R": 12
+        },
+        "support_duty": {
+          "L": 0.42,
+          "R": 0.43
+        },
+        "flight_intervals_frames": [
+          [
+            10.24,
+            12
+          ],
+          [
+            21.46,
+            23
+          ]
+        ],
+        "review_video": "blender/animation/reviews/player_animation_library_v1/run_expressive_v2_test/run_v2_three_views_1x.mp4",
+        "presentation_note": "Separate22-frame Run v2,30FPS, closing23 excluded.0.27m tracks,3deg toe-out; loading/push/brief flight, restrained side sway, stronger fore/aft response, straight independent arms. Root/object static; controller owns forward -Y travel at nominal2.1m/s. Phase0LEFT receiving,0.5RIGHT receiving matches approved Walk phase; preview travel is temporary and is not registered.",
+        "gameplay_validation": "Blender-only Pending. Phase contract documented; contact-aware speed/phase blending, input interruption, idle replant, weapon masks, turns/slopes and measured30FPS phone validation remain unimplemented."
+      },
+      {
+        "action": "Run_Expressive_v3_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/run_expressive_v3_test/run_expressive_v3_review.blend",
+        "source_sha256": "f7244760901f5055e39fa5e3d9c9203506598c6c4492ce553536b8c26b9d0eeb",
+        "source_rig": "RN3_Test_Rig",
+        "source_mesh": "RN3_Test_Mesh",
+        "source_armature": "RN3_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "4983a96d54648229d71fd7aff87ec9090498d6bb72bc1568f02d63cf8a209342",
+        "action_frame_range": [
+          1.0,
+          21.0
+        ],
+        "start": 1,
+        "end": 20,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval2026-10-12; preferred run baseline. Preserve original Run and v2 for comparison. Blender artistic approval; actual Godot transition/mobile validation outstanding.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 21,
+        "period_s": 0.6666666666666666,
+        "in_place": true,
+        "nominal_speed_m_s": 2.31,
+        "contact_frames": {
+          "L": 1,
+          "R": 11
+        },
+        "support_duty": {
+          "L": 0.42,
+          "R": 0.43
+        },
+        "flight_intervals_frames": [
+          [
+            9.4,
+            11
+          ],
+          [
+            19.6,
+            21
+          ]
+        ],
+        "review_video": "blender/animation/reviews/player_animation_library_v1/run_expressive_v3_test/run_v3_three_views_1x.mp4",
+        "presentation_note": "Separate comparison refinement: cadence +10%, straight-arm pitch excursion +20% against saved Run v2. Same normalized hip/torso/head/leg poses, 0.27m tracks, saved L3/R5deg toe-out and controlled26mm lateral hip range. F1\u201320 at30FPS; closing21 excluded. Controller owns forward travel at nominal2.31m/s; preview travel is temporary only.",
+        "gameplay_validation": "Pending artistic review. Shared rig, LEFT phase0 / RIGHT phase0.5. Actual Godot transitions, speed-aware contact blending, input interruption, weapon layers and measured mobile30FPS remain outstanding.",
+        "preferred_run_baseline": true
+      },
+      {
+        "action": "Full_Jump_Expressive_v2_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_v2_test/full_jump_expressive_v2_review.blend",
+        "source_sha256": "78d572941a2bdca68479c60ecf3e9c3529d87822ad2fee7c6b1089beb527fea6",
+        "source_rig": "FJ2_Test_Rig",
+        "source_mesh": "FJ2_Test_Mesh",
+        "source_armature": "FJ2_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "26f632d2dce3d15b5eca4f87d189048f24d23a3de547a3618e18d2705f97d28b",
+        "action_frame_range": [
+          1.0,
+          93.0
+        ],
+        "start": 1,
+        "end": 93,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "in_place": true,
+        "review_video": "blender/animation/reviews/player_animation_library_v1/full_jump_expressive_v2_test/full_jump_v2_three_views_1x.mp4",
+        "presentation_note": "User-steered pending refinement: hands slightly above head,8deg added airborne opening per leg,28mm deeper soft landing compression with stronger torso/arm reaction. Same93frames/30FPS, receiving contactsF46/F47 and original rebound/recovery fromF65. Original Full Jump and earlier previews preserved; arm-only working checkpoint archived. Temporary0.72m elevation and review camera headroom are never baked into rig Action.",
+        "gameplay_validation": "Pending user gameplay review. Existing isolated ExpressiveLocomotionTest now offers B Heavier/Original landing comparison: runtime-only20/40mm additional contact hip dip, unchanged physics/gait/input.49 matched comparison checks plus77 jump checks at30/60renderFPS. Source/Action/Showcase/native library unchanged. Review and limitations: docs/animation/reviews/godot_jump_heavier_v1/README.md. No production promotion."
+      },
+      {
+        "action": "Rifle_Aim_Hold_V2_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/rifle_hold_review.blend",
+        "source_sha256": "93fee6e4049744ed36b6433902c747caf78a1423b2c2a8f834cfc0203b2f03aa",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "9bf20f4a53d7530fedaf45d5a838a92e6d02b89c946714200e65f5ef066fe11f",
+        "action_frame_range": [
+          1.0,
+          121.0
+        ],
+        "start": 1,
+        "end": 120,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Pending explicit Blender holding-pose review. No gameplay replacement or integration approval.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "preview_prop": "rifle_stylized_v2",
+        "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+        "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"
+      },
+      {
+        "action": "Rifle_Back_Holster_V2_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/rifle_stylized_v2_hold_test/rifle_hold_review.blend",
+        "source_sha256": "93fee6e4049744ed36b6433902c747caf78a1423b2c2a8f834cfc0203b2f03aa",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "d0b65ccccf2b1c90a13d20da1ff8f411d7ad14feaf3568b64c101e88e780b0ee",
+        "action_frame_range": [
+          1.0,
+          121.0
+        ],
+        "start": 1,
+        "end": 120,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Pending explicit Blender holding-pose review. No gameplay replacement or integration approval.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "preview_prop": "rifle_stylized_v2",
+        "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+        "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"
+      },
+      {
+        "action": "Rifle_Ready_V2_v16_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v006/rifle_ready_v16_review.blend",
+        "source_sha256": "22017e77d5a722d087c46bd839e38fbec5a30ac5a56bb4b326e86cbbbbee3fde",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "e12357dab1a854a4642f293e8049747f7e17b426ff69f1a4c331327b47e91743",
+        "action_frame_range": [
+          1.0,
+          121.0
+        ],
+        "start": 1,
+        "end": 120,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit human approval2026-10-13 of CURRENT same-v16 Ready pose, shoulder_support_v006 source22017e77d5a722d087c46bd839e38fbec5a30ac5a56bb4b326e86cbbbbee3fde / Actione12357dab1a854a4642f293e8049747f7e17b426ff69f1a4c331327b47e91743. Preferred Rifle Ready pose baseline. Preserve all previous sources/checkpoints; this is Blender artistic approval only, no gameplay replacement or Godot integration approval.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "preview_prop": "rifle_stylized_v2",
+        "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+        "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"
+      },
+      {
+        "action": "Rifle_Ready_Idle_Expressive_Test",
+        "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_expressive_test/rifle_ready_idle_review.blend",
+        "source_sha256": "cdd79ede4d3153ce0c17cd90fe5589fc9c72956da30aeac880f02babea72b3ba",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "e39e22caaf9ecabd57c2b350fe9d2abc52ee492b270305c5d1f92a7596a72326",
+        "action_frame_range": [
+          1.0,
+          241.0
+        ],
+        "start": 1,
+        "end": 240,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "New separate Rifle Ready Idle LookAround; grounded8-second loop, two unequal head-led looks, restrained delayed torso/shoulder response and common rigid hand/weapon motion. Exact approved Ready holding structure and4-second breathing retained. Current Ready remains Approved. Pending explicit Blender motion review; no Godot/gameplay integration.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "preview_prop": "rifle_stylized_v2",
+        "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+        "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"
+      },
+      {
+        "action": "Walk_Snappy_Test_v1",
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_test_v1/soft_landing_v027/walk_snappy_review.blend",
+        "source_sha256": "0ff3dbeff6d101dc87dbe70e6b9eb8ec2de0150d165974f5a88422556b881901",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "8d9d809cc0078f98b1f6b6b43f6a7c8365c70bc11160e9efb9bdaaf42fbd5cb6",
+        "action_frame_range": [
+          1.0,
+          22.0
+        ],
+        "start": 1,
+        "end": 21,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Leg-only softer vertical arrival versus v026. Vertical lift begins31.5ms earlier with same ascent duration and20-21%longer piston descent; sixth-order arrival. Actual sole downward RMS speed in final100ms34.5-34.7%lower, peakdown31.4-33.2%lower. Body/head/arms/root and leg rotations exact; fore-aft paths/cadence/travel unchanged.270mm net piston and137.5mm common hop retained, but combined peak sole height37-41mm lower due to different phase overlap.19other Actions/previous versions preserved. Pending Blender review.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 22,
+        "nominal_speed_m_s": 1.59936,
+        "contact_frames": {
+          "L": 1,
+          "R": 11.5
+        },
+        "support_duty": {
+          "L": 0.595,
+          "R": 0.615
+        },
+        "presentation_note": "In-place21frames/30FPS, closing22excluded, same1.59936m/s diagnostic travel and receivingF1/F11.5. Earlier vertical release gives feet longer to settle without slowing walk/body. Exact v026 torso/head rhythm, leg rotations and fore-aft trajectory; grounded support preserved until new release. No scaling, rig or Godot edits."
+      },
+      {
+        "action": "Walk_Snappy_Test_v028",
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_v028_motion_study/walk_snappy_v028_review.blend",
+        "source_sha256": "2da9e6335be107568e9696fa39fd68d1516083f42bccade44f247bc5823329b8",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "e02b38c6f560300c2869aedd18e6a0a2eb9a000796b9498c041d75355b5b9deb",
+        "action_frame_range": [
+          1.0,
+          22.0
+        ],
+        "start": 1,
+        "end": 21,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Separate reference-informed V028; original Walk_Snappy_Test_v1/V027 unchanged. One receiving-step phase strategy:70ms load, brisk recovery/passing/crest at.25cycle, readable upper arc and controlled placement. Same0.7s cadence/1.59936m/s diagnostic travel/0.680-0.830m hip range.20prior Actions/entries preserved. Camera/2D contact uncertainties documented; no claim of reference match or gameplay readiness.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 22,
+        "nominal_speed_m_s": 1.59936,
+        "contact_frames": {
+          "L": 1,
+          "R": 11.5
+        },
+        "support_duty": {
+          "L": 0.595,
+          "R": 0.615
+        },
+        "presentation_note": "Original-speed and phase-normalized three-way reference/V027/V028 study. V028 has original C2 event curves and monotone swing timing; same rig/proportions. Reference20frame cycle vs our21frames: synchronized diagnostic retimes reference to0.952x and is labelled separately from untouched30FPS1x clips."
+      },
+      {
+        "action": "Walk_Snappy_OneStep_Study_v001",
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_one_step_v001/walk_one_step_review.blend",
+        "source_sha256": "6d294b3e62f22bf2b1ad0803e2697b51914d00da4d734c23aaec6d4d3188d946",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "6807d45fd103e94c8c6e70d8314d26e417d4bd255073320acc7d79b925d688b7",
+        "action_frame_range": [
+          1.0,
+          13.0
+        ],
+        "start": 1,
+        "end": 13,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "ONE-STEP study only. Left receiving to right placement at0.35s plus50ms receiving tail. Grounded left support;60ms body load, rapid recovery, earlier swing, explicit braking, event-shaped hip/chest lean,25-35ms delayed arms/head. All21prior Actions including V028 retained exact. No artistic approval or full-cycle/gameplay claim.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "nominal_speed_m_s": 1.59936,
+        "contact_frames": {
+          "L": 1,
+          "R": 11.5
+        },
+        "presentation_note": "Reference original F30-40 at30FPS, fresh read-only V028 export and this study.1x moving segments; endpoint holds/replay cuts labelled. Static normalized phase sheets only. Rigid grounded support limits upward recovery; see study report."
+      },
+      {
+        "action": "Walk_Snappy_OneStep_Study_v002",
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_one_step_v002/walk_one_step_v002_review.blend",
+        "source_sha256": "e5c60a13b89e3fcdf8b273860a2cc52ee4c0b62ad286d639cfda8ca6942e5cb1",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "4b4a853133f89e1afb05a79e34557d013d4f9100678ad53eb3130f2ffec31c6f",
+        "action_frame_range": [
+          1.0,
+          43.0
+        ],
+        "start": 1,
+        "end": 43,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Focused step v002, FOUR continuous alternating steps for rhythm review, not a production walk. Same0.35s step cadence/1.59936m/s nominal travel/80mm hip range/290mm piston.55ms load, concentrated smooth recovery and swing/braking,45ms shoulder/arm and60ms head-pitch follow-through. Grounded support throughout. All22 older Actions/entries including v001/V028 exact.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "nominal_speed_m_s": 1.59936,
+        "contact_frames": {
+          "L": 1,
+          "R": 11.5
+        },
+        "presentation_note": "1.4s uninterrupted original-speed reference/V028/v002 review and three views; no holds/replays/time normalization. Actual v001 is compared in a separate first-step clip because it has no authored continuation. Static normalized phase sheets are diagnostic only. Rig waist-gap tradeoff remains; no artistic-match or runtime approval claim.",
+        "review_contact_frames": [
+          1,
+          11.5,
+          22,
+          32.5,
+          43
+        ],
+        "review_steps": 4
+      },
+      {
+        "action": "Walk_Snappy_LegTiming_Test_v001",
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_snappy_leg_timing_v001/walk_leg_timing_review.blend",
+        "source_sha256": "24f18208240279e4865979b5b116830c857ec3d13e50ca2370abfa28cfd4406f",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "f231b92435d21e8d8d17fb820181a6137fa3559ec3054e6171a5d19c63fac18d",
+        "action_frame_range": [
+          1.0,
+          43.0
+        ],
+        "start": 22,
+        "end": 42,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Controlled LEG TIMING ONLY against OneStep v002. All non-leg curves and evaluated world poses exact; same cadence/travel/stride extrema.20ms earlier exchange, original fast-swing spacing, smoothly lengthened braking to unchanged landing. Contact-validity Y correction at most32mm only during late stance/early recovery. All23 older Actions/entries preserved. No Foot Recovery Path experiment, rig or Godot change.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "nominal_speed_m_s": 1.59936,
+        "contact_frames": {
+          "L": 22,
+          "R": 32.5
+        },
+        "presentation_note": "Six uninterrupted1x steps; actual reference/V028/test plus v002 control A/B, normalized static phases and native30FPS strips. Playback uses unchanged second stride F22-42/closing43 to avoid original one-shot arm-edge tangent mismatch; all source keys/non-leg curves retained. Pending artistic review.",
+        "review_contact_frames": [
+          22,
+          32.5,
+          43
+        ],
+        "review_steps": 6,
+        "closing_key": 43,
+        "support_duty": {
+          "L": 0.5642857142857144,
+          "R": 0.5642857142857144
+        },
+        "baseline_action": "Walk_Snappy_OneStep_Study_v002"
+      },
+      {
+        "action": "Walk_Snappy_V027_Refined_Test_v001",
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v001/walk_v027_refined_review.blend",
+        "source_sha256": "f23745e76cf472ad7606512cec399cf521db070cd795c257ad43e64f8092ddc1",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "8ca1695f08e3775e11df4c772112ca42765775161075563727cb3e6fbb3de5e6",
+        "action_frame_range": [
+          1.0,
+          22.0
+        ],
+        "start": 1,
+        "end": 21,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "User selected original Walk_Snappy_Test_v1 / V027 as preferred direction. This separate refinement advances fore/aft exchange about20ms, preserving all nonleg curves/world poses and actual lowest-sole height envelope. Original V027 stays unchanged. Prior artistic approval status is not changed.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 22,
+        "nominal_speed_m_s": 1.59936,
+        "contact_frames": {
+          "L": 1,
+          "R": 11.5
+        },
+        "support_duty": {
+          "L": 0.595,
+          "R": 0.615
+        },
+        "presentation_note": "Six uninterrupted native30FPS steps; preferred V027/new A-B, original-reference comparison, three views, normalized static phase sheets. Same21frame cadence/travel/body/head/arms/hop/soft vertical landing. Contact-valid Y compensation <=32mm; Z compensation preserves original sole-height envelope. Pending review, no production/Godot edits.",
+        "review_contact_frames": [
+          1,
+          11.5,
+          22
+        ],
+        "review_steps": 6,
+        "baseline_action": "Walk_Snappy_Test_v1"
+      },
+      {
+        "action": "Walk_Snappy_V027_Refined_Test_v002",
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v002/walk_v027_refined_review.blend",
+        "source_sha256": "fd251d5ded1945d8bb563bd60f0443256dbc5c5c98f76e8e6f569733ecdb2de1",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "24c09273498ba144438cfd11d0ef174cb06aaa010000a9780cbd41c9e0f2a722",
+        "action_frame_range": [
+          1.0,
+          22.0
+        ],
+        "start": 1,
+        "end": 21,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "User requested softer steps, jelly-like body bounce and zero lateral gap. Separate v002 from V027 refinement v001. Swing-only22ms vertical smoothing and12ms lead; forward pitch/timing and cadence retained. Body uses a damped event response bounded within12mm of original rhythm, with close35ms head follow. Parallel sagittal legs on225mm tracks equal225mm block width: zero gap without crossing. Sideways leg roll/yaw removed for collision-free narrow preview; support Y compensation preserves planted corners. All25 prior Actions unchanged.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 22,
+        "nominal_speed_m_s": 1.59936,
+        "contact_frames": {
+          "L": 1,
+          "R": 11.5
+        },
+        "support_duty": {
+          "L": 0.595,
+          "R": 0.615
+        },
+        "presentation_note": "Six continuous native30FPS steps; previous v001/new v002 A-B, actual reference, front/three-quarter/side. Foot placement checked and rigid blocks retained. Pending artistic preview of zero lateral spacing; no Godot or production edits.",
+        "review_contact_frames": [
+          1,
+          11.5,
+          22
+        ],
+        "review_steps": 6,
+        "baseline_action": "Walk_Snappy_V027_Refined_Test_v001"
+      },
+      {
+        "action": "Walk_Snappy_V027_Refined_Test_v003",
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/lower_step_v001/walk_v027_refined_review.blend",
+        "source_sha256": "d68ba6c7961851c7eb358d4e614e8006eae75db20903f8bc0b82d26a9c791ea5",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBRUN_Test_Rig",
+        "action_sha256": "30dd70cd05dfe918ac17f52d8ccc847014d8c40a8176c0e316fdb3c3b2267034",
+        "action_frame_range": [
+          1.0,
+          22.0
+        ],
+        "start": 1,
+        "end": 21,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval2026-10-14: current displayed Snappy Walk v003 and Run V001 are approved artistic baselines. Exact Action/source preserved. Separate Godot gameplay test authorized; production locomotion not replaced.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 22,
+        "nominal_speed_m_s": 1.59936,
+        "contact_frames": {
+          "L": 1,
+          "R": 11.5
+        },
+        "support_duty": {
+          "L": 0.595,
+          "R": 0.615
+        },
+        "presentation_note": "Before/after same-v003 comparison plus actual reference and three native1x views, six continuous steps.27 Showcase entries remain; no new Action name or production/Godot changes.",
+        "review_contact_frames": [
+          1,
+          11.5,
+          22
+        ],
+        "review_steps": 6,
+        "baseline_action": "Walk_Snappy_V027_Refined_Test_v003",
+        "previous_revision_source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/body_snap_v001/walk_v027_refined_review.blend",
+        "previous_revision_source_sha256": "890d2fd97de5be46c7438cf7f6dfb1ab01f32265e6ebf38e156a13ac17edb34e",
+        "previous_revision_action_sha256": "0dbeafec0e7a3e1679798ddad7a7fdcc0c6dd93fdac1578d75d63e7eb472296a",
+        "revision": "lower_step_v001",
+        "body_compression_multiplier": 1.25,
+        "leg_recovery_height_multiplier": 0.5
+      },
+      {
+        "slot_identifier": "OBRUN_Test_Rig",
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "action": "Run_Snappy_Test_v001",
+        "source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/elastic_drive_v001/run_snappy_review.blend",
+        "source_sha256": "33a62f5ba58a5743c1bc820f53fa2c77050a7292d5580fd815d3a6a8e85dd663",
+        "source_rig": "Showcase_Player_Rig",
+        "source_mesh": "Showcase_Player_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "action_sha256": "8e835f91c686d41bb1846fb0d7ddc151dc55a9178f87e27d845fc54f972cb156",
+        "action_frame_range": [
+          1.0,
+          18.0
+        ],
+        "start": 1,
+        "end": 17,
+        "closing_key": 18,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "approved",
+        "approval_note": "Explicit user approval2026-10-14: current displayed Snappy Walk v003 and Run V001 are approved artistic baselines. Exact Action/source preserved. Separate Godot gameplay test authorized; production locomotion not replaced.",
+        "seamless_loop": true,
+        "period_s": 0.5666666666666667,
+        "in_place": true,
+        "nominal_speed_m_s": 2.5,
+        "contact_frames": {
+          "L": 1,
+          "R": 9.5
+        },
+        "support_duty": {
+          "L": 0.39,
+          "R": 0.4
+        },
+        "flight_intervals_frames": [
+          [
+            7.63,
+            9.5
+          ],
+          [
+            16.3,
+            18
+          ]
+        ],
+        "review_video": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/elastic_drive_v001/run_snappy_three_views_1x.mp4",
+        "presentation_note": "Five uninterrupted17-frame cycles at30FPS1x. Weight-led receiving/rebound with brief low flight; no shared jump arc. Previous compact version/approved Expressive Run/actual reference comparisons. Existing camera framing retained. Godot unchanged.",
+        "gameplay_validation": "Blender-only Pending; phase0LEFT and0.5RIGHT receiving. Root/object static, controller owns -Y travel. Arbitrary speed, Walk/Run transitions, starts/stops, turns/slopes, weapons and mobile performance not tested.",
+        "previous_revision_source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_smooth_v001/run_snappy_review.blend",
+        "previous_revision_source_sha256": "0dd1fe610d3547f43bb6227e3a2fa732f655c669473dd6b05754d5c5f44646da",
+        "previous_revision_action_sha256": "4c0417318e05630ce3b9a489dae865fe70d30bf41f948835092cae7a098957d0",
+        "body_vertical_range_m": 0.12373268604278564,
+        "shared_whole_character_lift": false,
+        "additional_hip_forward_lean_degrees": 5.0,
+        "body_rebound_events_ms": {
+          "trough_time_ms": 46.09375,
+          "crest_time_ms": 158.07291666666669
+        },
+        "previous_world_foot_motion_preserved": true
+      }
+    ],
+    "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
+    "rotation_modes": {
+      "Root": "XYZ",
+      "Hips": "XYZ",
+      "Spine": "QUATERNION",
+      "Chest": "QUATERNION",
+      "Neck": "QUATERNION",
+      "Head": "QUATERNION",
+      "UpperArm.L": "QUATERNION",
+      "ForeArm.L": "QUATERNION",
+      "UpperArm.R": "QUATERNION",
+      "ForeArm.R": "QUATERNION",
+      "WeaponCarrier": "QUATERNION",
+      "Leg.L": "XYZ",
+      "Leg.R": "XYZ"
+    },
+    "provisional_walk_baseline": {
+      "action": "Walk_Snappy_V027_Refined_Test_v003",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/lower_step_v001/walk_v027_refined_review.blend",
+      "source_sha256": "d68ba6c7961851c7eb358d4e614e8006eae75db20903f8bc0b82d26a9c791ea5",
+      "action_sha256": "30dd70cd05dfe918ac17f52d8ccc847014d8c40a8176c0e316fdb3c3b2267034",
+      "accepted_date": "2026-10-14",
+      "production_approved": false,
+      "note": "User accepts current state as provisional Walking baseline; preserve current source and all backups. Entry remains Pending, not final production approval."
+    },
+    "snappy_artistic_approvals": {
+      "date": "2026-10-14",
+      "user_statement": "2 of these is approve",
+      "scope": "Current Blender artistic baselines. Godot test review pending; no production promotion.",
+      "production_approved": false,
+      "actions": {
+        "Walk_Snappy_V027_Refined_Test_v003": {
+          "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/lower_step_v001/walk_v027_refined_review.blend",
+          "source_sha256": "d68ba6c7961851c7eb358d4e614e8006eae75db20903f8bc0b82d26a9c791ea5",
+          "action_sha256": "30dd70cd05dfe918ac17f52d8ccc847014d8c40a8176c0e316fdb3c3b2267034",
+          "status": "approved"
+        },
+        "Run_Snappy_Test_v001": {
+          "source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/elastic_drive_v001/run_snappy_review.blend",
+          "source_sha256": "33a62f5ba58a5743c1bc820f53fa2c77050a7292d5580fd815d3a6a8e85dd663",
+          "action_sha256": "8e835f91c686d41bb1846fb0d7ddc151dc55a9178f87e27d845fc54f972cb156",
+          "status": "approved"
+        }
+      }
+    }
+  },
+  "objects": [
+    [
+      "Showcase_Player_Rig",
+      "ARMATURE"
+    ],
+    [
+      "Showcase_Player_Mesh",
+      "MESH"
+    ],
+    [
+      "Showcase_FixedFloor",
+      "MESH"
+    ],
+    [
+      "Showcase_Key",
+      "LIGHT"
+    ],
+    [
+      "Showcase_Fill",
+      "LIGHT"
+    ],
+    [
+      "Showcase_Rim",
+      "LIGHT"
+    ],
+    [
+      "Showcase_FRONT",
+      "CAMERA"
+    ],
+    [
+      "Showcase_THREE_QUARTER",
+      "CAMERA"
+    ],
+    [
+      "Showcase_SIDE",
+      "CAMERA"
+    ],
+    [
+      "GAF_Rifle_V2_Attachment",
+      "EMPTY"
+    ],
+    [
+      "Rifle_V2_Body",
+      "MESH"
+    ],
+    [
+      "Rifle_V2_Magazine",
+      "MESH"
+    ],
+    [
+      "RightHandGrip",
+      "EMPTY"
+    ],
+    [
+      "LeftHandGuide",
+      "EMPTY"
+    ],
+    [
+      "Muzzle",
+      "EMPTY"
+    ],
+    [
+      "AimReference",
+      "EMPTY"
+    ],
+    [
+      "RecoilPivot",
+      "EMPTY"
+    ],
+    [
+      "HolsterAttach",
+      "EMPTY"
+    ],
+    [
+      "Grip_Point",
+      "EMPTY"
+    ],
+    [
+      "Support_Hand_Point",
+      "EMPTY"
+    ],
+    [
+      "Muzzle_Point",
+      "EMPTY"
+    ]
+  ],
+  "animation": {
+    "action": "Run_Snappy_Test_v001",
+    "nla": 0,
+    "drivers": 0
+  }
+}

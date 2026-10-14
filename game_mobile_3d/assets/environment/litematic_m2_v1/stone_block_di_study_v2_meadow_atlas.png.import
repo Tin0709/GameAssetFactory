@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bha0y5xi1063h"
-path="res://.godot/imported/stone_block_di_study_v2_meadow_atlas.png-47c84dccb8cc9f7db474d9a8753228a1.ctex"
+path.s3tc="res://.godot/imported/stone_block_di_study_v2_meadow_atlas.png-47c84dccb8cc9f7db474d9a8753228a1.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "a50154e7d989c41c296d57e3ba543123"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/environment/litematic_m2_v1/stone_block_di_study_v2_meadow_atlas.png"
-dest_files=["res://.godot/imported/stone_block_di_study_v2_meadow_atlas.png-47c84dccb8cc9f7db474d9a8753228a1.ctex"]
+dest_files=["res://.godot/imported/stone_block_di_study_v2_meadow_atlas.png-47c84dccb8cc9f7db474d9a8753228a1.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

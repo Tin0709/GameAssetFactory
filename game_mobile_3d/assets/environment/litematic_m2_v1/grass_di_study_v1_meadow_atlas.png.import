@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bvxqdv3rfnu08"
-path="res://.godot/imported/grass_di_study_v1_meadow_atlas.png-3deb9df4a41ff33803214ae397c29b7a.ctex"
+path.s3tc="res://.godot/imported/grass_di_study_v1_meadow_atlas.png-3deb9df4a41ff33803214ae397c29b7a.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "a50154e7d989c41c296d57e3ba543123"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/environment/litematic_m2_v1/grass_di_study_v1_meadow_atlas.png"
-dest_files=["res://.godot/imported/grass_di_study_v1_meadow_atlas.png-3deb9df4a41ff33803214ae397c29b7a.ctex"]
+dest_files=["res://.godot/imported/grass_di_study_v1_meadow_atlas.png-3deb9df4a41ff33803214ae397c29b7a.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0
