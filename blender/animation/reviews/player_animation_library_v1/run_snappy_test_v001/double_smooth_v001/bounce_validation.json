@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "range_multiplier": 2.0000002183320307,
+  "vertical_range_before_m": 0.27300000190734863,
+  "vertical_range_after_m": 0.546000063419342,
+  "contact_height_before_m": 0.6859999895095825,
+  "contact_height_after_m": 0.6859999895095825,
+  "minimum_before_m": 0.6420000195503235,
+  "minimum_after_m": 0.6420000195503235,
+  "measured": {
+    "before": {
+      "hip_range_m": 0.27300000190734863,
+      "amplitude_normalized_hip_jerk_rms_s3": 17336.051148596645,
+      "peak_foreaft_sole_speed_m_s": {
+        "L": 7.470130920409019,
+        "R": 7.578020095825224
+      }
+    },
+    "updated": {
+      "hip_range_m": 0.546000063419342,
+      "amplitude_normalized_hip_jerk_rms_s3": 11435.230812333899,
+      "peak_foreaft_sole_speed_m_s": {
+        "L": 7.540912628174283,
+        "R": 7.8671264648435795
+      }
+    }
+  },
+  "jerk_method": "Actual evaluated samples, periodic20ms fifth-order Savitzky-Golay derivative; jerk normalized by excursion. Diagnostic only, not proof of artistic smoothness.",
+  "leg_pitch_ranges_deg": {
+    "L": [
+      -47.09223845917573,
+      43.13944747704385
+    ],
+    "R": [
+      -47.858404684038156,
+      42.390787027024174
+    ]
+  },
+  "fps": 30,
+  "period_frames": 17,
+  "nominal_speed_m_s": 2.5
+}
