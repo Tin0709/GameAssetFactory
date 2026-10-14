@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/dev/actions_stuff_research/walk_run_test.gd" id="test"]
+
+[node name="ActionsStuffWalkRunTest" type="Node3D"]
+script = ExtResource("test")
