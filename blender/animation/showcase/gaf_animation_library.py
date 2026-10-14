@@ -409,10 +409,10 @@ def draw_focus_selector(layout,scene):
     for e in library_entries(scene,False):
         row=box.row(align=True)
         if e['kind']=='action':
-            row.operator('gaf.select_action',text=e['label'],icon='ACTION',depress=bool(scene==home and active and active.name==e['id'])).action_name=e['id']
+            row.operator('gaf.select_action',text=e['label'],icon='CHECKMARK' if e['status']=='approved' else 'TIME',depress=bool(scene==home and active and active.name==e['id'])).action_name=e['id']
         else:
             row.operator('gaf.open_review_sequence',text=e['label'],icon='SCENE_DATA',depress=scene.get(REVIEW_TAG)==e['id']).sequence_id=e['id']
-        row.label(text=e['status'].title(),icon='CHECKMARK' if e['status']=='approved' else 'TIME')
+            box.label(text=e['status'].upper()+' — RESEARCH SEQUENCE',icon='CHECKMARK' if e['status']=='approved' else 'TIME')
     return True
 
 class GAF_PT_animation_library(bpy.types.Panel):
