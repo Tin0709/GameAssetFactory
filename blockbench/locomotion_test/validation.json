@@ -1,0 +1,105 @@
+{
+  "blockbench_version": "5.2.2",
+  "format": "free",
+  "animation_capable": true,
+  "bone_keyframe_channels": [
+    "rotation",
+    "position",
+    "scale"
+  ],
+  "bone_count": 7,
+  "cube_count": 6,
+  "animation_count": 0,
+  "keyframe_count": 0,
+  "feet_grounded": true,
+  "limbs_single_piece": true,
+  "arm_widths": [
+    3,
+    3
+  ],
+  "pivots": {
+    "Root": [
+      0,
+      0,
+      0
+    ],
+    "Body": [
+      0,
+      12,
+      0
+    ],
+    "Head": [
+      0,
+      24,
+      0
+    ],
+    "RightArm": [
+      -5.5,
+      24,
+      0
+    ],
+    "LeftArm": [
+      5.5,
+      24,
+      0
+    ],
+    "RightLeg": [
+      -2,
+      12,
+      0
+    ],
+    "LeftLeg": [
+      2,
+      12,
+      0
+    ]
+  },
+  "hierarchy": {
+    "Root": null,
+    "Body": "Root",
+    "Head": "Body",
+    "RightArm": "Body",
+    "LeftArm": "Body",
+    "RightLeg": "Root",
+    "LeftLeg": "Root"
+  },
+  "transform_checks": {
+    "Root": {
+      "rotation_pivot_fixed": true,
+      "geometry_rotates": true,
+      "position_animatable": true
+    },
+    "Body": {
+      "rotation_pivot_fixed": true,
+      "geometry_rotates": true,
+      "position_animatable": true
+    },
+    "Head": {
+      "rotation_pivot_fixed": true,
+      "geometry_rotates": true,
+      "position_animatable": true
+    },
+    "RightArm": {
+      "rotation_pivot_fixed": true,
+      "geometry_rotates": true,
+      "position_animatable": true
+    },
+    "LeftArm": {
+      "rotation_pivot_fixed": true,
+      "geometry_rotates": true,
+      "position_animatable": true
+    },
+    "RightLeg": {
+      "rotation_pivot_fixed": true,
+      "geometry_rotates": true,
+      "position_animatable": true
+    },
+    "LeftLeg": {
+      "rotation_pivot_fixed": true,
+      "geometry_rotates": true,
+      "position_animatable": true
+    }
+  },
+  "neutral_restored": true,
+  "timeline_still_empty": true
+}

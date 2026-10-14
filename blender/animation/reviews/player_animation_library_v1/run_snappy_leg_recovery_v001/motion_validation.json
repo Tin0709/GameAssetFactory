@@ -5886,6 +5886,8 @@
   },
   "loop_pose_error_m": 0.0,
   "loop_second_order_velocity_error_m_s": 0.0025656839941051736,
+  "loop_raw_first_order_velocity_error_m_s": 0.1192265708511974,
+  "raw_first_order_under_legacy_006_guard": false,
   "source_sha256": "30074b5a40f63765988184ba9191ba72b12564a76f770bcd2f89637fc5a60872",
   "action_sha256": "e6ff38f45c6ce0d3a65af0081c1748312125538bf39102a465e47ba481bb2e47",
   "passed": true
