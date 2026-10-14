@@ -158,6 +158,9 @@ def validate_review_sequence(entry):
     for name in cameras.values():
         camera=bpy.data.objects.get(name)
         if camera is None or camera.type!='CAMERA' or name not in scene.objects:raise ValueError('Registered review camera is missing')
+    if 'hud_root' in entry:
+        hud=bpy.data.objects.get(entry['hud_root'])
+        if hud is None or hud.type!='EMPTY' or hud.name not in scene.objects or hud.parent is None or hud.parent.name not in cameras.values():raise ValueError('Review HUD requires an Empty parented to a registered camera in its scene')
     home=bpy.data.scenes.get(entry['return_scene'])
     if home is None or not home.get(SCENE_TAG):raise ValueError('Review sequence return library is missing')
     return scene
@@ -290,6 +293,11 @@ def refresh(scene,import_missing=True):
 def view(scene,direction):
     name=json.loads(scene[REVIEW_ENTRY])['cameras'][direction] if scene.get(REVIEW_TAG) else 'Showcase_'+direction
     scene.camera=bpy.data.objects[name]
+    if scene.get(REVIEW_TAG):
+        entry=json.loads(scene[REVIEW_ENTRY])
+        if entry.get('hud_root'):
+            hud=bpy.data.objects[entry['hud_root']];hud.parent=scene.camera
+            hud.matrix_parent_inverse=Matrix.Identity(4);hud.matrix_basis=Matrix.Identity(4)
     for window in bpy.context.window_manager.windows:
         if window.scene==scene:
             for area in window.screen.areas:
