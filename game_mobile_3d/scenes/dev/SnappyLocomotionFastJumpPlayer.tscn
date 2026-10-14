@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/dev/ExpressiveDirectionalPlayer.tscn" id="base"]
+[ext_resource type="Script" path="res://scenes/dev/snappy_fast_jump_visual.gd" id="visual"]
+
+[node name="SnappyLocomotionFastJumpPlayer" instance=ExtResource("base")]
+review_pace = 2.25
+
+[node name="Visual" parent="."]
+script = ExtResource("visual")

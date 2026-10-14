@@ -4,6 +4,8 @@ const SNAPPY=preload("res://assets/characters/snappy_locomotion_v1/snappy_librar
 const SNAPPY_NAMES=["Walk_Snappy_V027_Refined_Test_v003","Run_Snappy_Test_v001"]
 const SNAPPY_WALK_STRIDE:=1.59936*.7
 const SNAPPY_RUN_STRIDE:=2.5*17.0/30.0
+var walk_anchor:=1.59936
+var run_anchor:=2.5
 var snappy_clips: Dictionary={}
 var source_profiles: Dictionary={}
 var snappy_enabled:=true
@@ -112,7 +114,7 @@ func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) ->
 	turn_rate=wrapf(rotation.y-old_yaw,-PI,PI)/maxf(delta,.001)
 	var desired_bias:=clampf(wrapf(atan2(planar.x,planar.z)-rotation.y,-PI,PI),-.9,.9) if movement_speed>.1 else 0.0
 	travel_bias=move_toward(travel_bias,desired_bias,6*delta)
-	var desired_run:=smoothstep(1.59936,2.5,movement_speed)
+	var desired_run:=smoothstep(walk_anchor,run_anchor,movement_speed)
 	var receiving_distance:=minf(minf(gait_phase,1.0-gait_phase),absf(gait_phase-.5))
 	# Begin a gait handoff near a shared receiving event, then complete it on
 	# one short clock. Never wait for a pose before moving the capsule.
@@ -160,11 +162,17 @@ func _rest_facing(delta: float) -> void:
 	facing_velocity=move_toward(facing_velocity,0,4.5/.09*delta)
 	rotation.y+=facing_velocity*delta
 
+func _support_adaptation_active() -> bool:
+	return move_requested
+
+func _use_cached_contact_solve() -> bool:
+	return move_requested
+
 func _evaluate_locomotion_pose(delta: float) -> bool:
 	var evaluated:=super._evaluate_locomotion_pose(delta)
 	if snappy_clips.is_empty() or foot_anchors.size()!=2:return evaluated
 	var desired:=Vector3.ZERO
-	if move_requested:
+	if _support_adaptation_active():
 		skeleton.force_update_all_bone_transforms()
 		for side in 2:
 			if not foot_support[side] or not _support(side):continue
@@ -219,7 +227,7 @@ func _limit_twist(q: Quaternion, reference: Quaternion) -> Quaternion:
 func _contact_leg_rotation(side: int, bone: int, target: Vector3, original_q: Quaternion, _delta: float) -> Quaternion:
 	release_active[side]=false
 	previous_raw[side]=_sole_world(bone)
-	if not move_requested:return super._contact_leg_rotation(side,bone,target,original_q,_delta)
+	if not _use_cached_contact_solve():return super._contact_leg_rotation(side,bone,target,original_q,_delta)
 	# Reuse the existing directional lab's one-link support solve. Cached toe
 	# heading and two corner-height iterations avoid translating an already
 	# planted leg beyond its joint limit while the body turns over that foot.

@@ -1,4 +1,5 @@
 extends Node3D
+var review_player_scene_path:="res://scenes/dev/SnappyLocomotionPlayer.tscn"
 var actor: CharacterBody3D
 var camera: Camera3D
 var status: Label
@@ -35,7 +36,7 @@ func _ready() -> void:
 		lines.surface_add_vertex(Vector3(i,.002,-60));lines.surface_add_vertex(Vector3(i,.002,60))
 		lines.surface_add_vertex(Vector3(-60,.002,i));lines.surface_add_vertex(Vector3(60,.002,i))
 	lines.surface_end();grid.mesh=lines;add_child(grid)
-	actor=load("res://scenes/dev/SnappyLocomotionPlayer.tscn").instantiate();add_child(actor)
+	actor=load(review_player_scene_path).instantiate();add_child(actor)
 	camera=Camera3D.new();camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=4.5;camera.far=100;camera.current=true;add_child(camera)
 	var canvas:=CanvasLayer.new();add_child(canvas)
 	var panel:=VBoxContainer.new();panel.position=Vector2(22,16);canvas.add_child(panel)
