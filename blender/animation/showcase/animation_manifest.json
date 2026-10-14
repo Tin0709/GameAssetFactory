@@ -1284,7 +1284,7 @@
     {
       "action": "BB_Neutral_Test_v001",
       "source": "blender/animation/blockbench_pipeline_v1/blockbench_import_source_v001.blend",
-      "source_sha256": "fd183e8457d81ce10727da06098ad9dab8cc683b267cbc185ae195d5d5955fb5",
+      "source_sha256": "14aceb499acb59753d2fef0ee49cfff26f26f558c5ed35835c6a86fb07d254db",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
@@ -1316,14 +1316,14 @@
         "Leg.L": "XYZ",
         "Leg.R": "XYZ"
       },
-      "blockbench_contract_sha256": "26037ffa57a4036c6ff911a277b00144ada09b84b2e937d8b4d49da4d664a1a3",
+      "blockbench_contract_sha256": "00b9f31808fcc882e7ace3a474436983b6b2ac146d9c8273fd13e62239d434ed",
       "blockbench_samples": "blender/animation/blockbench_pipeline_v1/samples/BB_Neutral_Test_v001.samples.json",
-      "blockbench_samples_sha256": "5918c4c84e6ad6605a8fe668f523cc1934ef5fbd6359a98016d2625ac3e4fe06"
+      "blockbench_samples_sha256": "f9ca11d40322ca6067026608a11c2c3ad62c48060d2237c6cf42b721fd3d22cc"
     },
     {
       "action": "BB_RightArm_Test_v001",
       "source": "blender/animation/blockbench_pipeline_v1/blockbench_import_source_v001.blend",
-      "source_sha256": "fd183e8457d81ce10727da06098ad9dab8cc683b267cbc185ae195d5d5955fb5",
+      "source_sha256": "14aceb499acb59753d2fef0ee49cfff26f26f558c5ed35835c6a86fb07d254db",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
@@ -1355,14 +1355,14 @@
         "Leg.L": "XYZ",
         "Leg.R": "XYZ"
       },
-      "blockbench_contract_sha256": "26037ffa57a4036c6ff911a277b00144ada09b84b2e937d8b4d49da4d664a1a3",
+      "blockbench_contract_sha256": "00b9f31808fcc882e7ace3a474436983b6b2ac146d9c8273fd13e62239d434ed",
       "blockbench_samples": "blender/animation/blockbench_pipeline_v1/samples/BB_RightArm_Test_v001.samples.json",
-      "blockbench_samples_sha256": "afc6e817eac439d741feb5e5948abb85a66034d4366a6d5f2f005769e71dc758"
+      "blockbench_samples_sha256": "b97cebc71f3b6f5f81c5338cde95fb6b83bb2478a46a6e821861f33006c2decf"
     },
     {
       "action": "BB_LeftArm_Test_v001",
       "source": "blender/animation/blockbench_pipeline_v1/blockbench_import_source_v001.blend",
-      "source_sha256": "fd183e8457d81ce10727da06098ad9dab8cc683b267cbc185ae195d5d5955fb5",
+      "source_sha256": "14aceb499acb59753d2fef0ee49cfff26f26f558c5ed35835c6a86fb07d254db",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
@@ -1394,14 +1394,14 @@
         "Leg.L": "XYZ",
         "Leg.R": "XYZ"
       },
-      "blockbench_contract_sha256": "26037ffa57a4036c6ff911a277b00144ada09b84b2e937d8b4d49da4d664a1a3",
+      "blockbench_contract_sha256": "00b9f31808fcc882e7ace3a474436983b6b2ac146d9c8273fd13e62239d434ed",
       "blockbench_samples": "blender/animation/blockbench_pipeline_v1/samples/BB_LeftArm_Test_v001.samples.json",
-      "blockbench_samples_sha256": "dccbd675dd37dfaddf96501ebf65f0851a00ec91e0d14d95fef312f774f24413"
+      "blockbench_samples_sha256": "c2e82e061001e8bb026f2e68911c3cb7e45d5204c82fb54aa596232b87eb27c1"
     },
     {
       "action": "BB_HeadTurn_Test_v001",
       "source": "blender/animation/blockbench_pipeline_v1/blockbench_import_source_v001.blend",
-      "source_sha256": "fd183e8457d81ce10727da06098ad9dab8cc683b267cbc185ae195d5d5955fb5",
+      "source_sha256": "14aceb499acb59753d2fef0ee49cfff26f26f558c5ed35835c6a86fb07d254db",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
@@ -1433,19 +1433,19 @@
         "Leg.L": "XYZ",
         "Leg.R": "XYZ"
       },
-      "blockbench_contract_sha256": "26037ffa57a4036c6ff911a277b00144ada09b84b2e937d8b4d49da4d664a1a3",
+      "blockbench_contract_sha256": "00b9f31808fcc882e7ace3a474436983b6b2ac146d9c8273fd13e62239d434ed",
       "blockbench_samples": "blender/animation/blockbench_pipeline_v1/samples/BB_HeadTurn_Test_v001.samples.json",
-      "blockbench_samples_sha256": "c096eaf1043a6d5426a37439ac4ef4a1fd912adf16eca10f1f9597a3187f9ba9"
+      "blockbench_samples_sha256": "8e56f0c3c5a45c806eed339957d122445dbb04d566ca89653c3cd36920d45f69"
     },
     {
       "action": "BB_Rifle_Ready_Pose_v001",
       "source": "blender/animation/blockbench_pipeline_v1/blockbench_import_source_v001.blend",
-      "source_sha256": "fd183e8457d81ce10727da06098ad9dab8cc683b267cbc185ae195d5d5955fb5",
+      "source_sha256": "14aceb499acb59753d2fef0ee49cfff26f26f558c5ed35835c6a86fb07d254db",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBShowcase_Player_Rig",
-      "action_sha256": "04496a69403c105ab09cebf672e94166830e1197a9059b0e0d11317ef02a0ada",
+      "action_sha256": "0756ec4cb79965c0b3dbdb37e611823660ccf3cbd3dc2eb3ad606ad1f053aca0",
       "action_frame_range": [
         1.0,
         31.0
@@ -1472,9 +1472,9 @@
         "Leg.L": "XYZ",
         "Leg.R": "XYZ"
       },
-      "blockbench_contract_sha256": "26037ffa57a4036c6ff911a277b00144ada09b84b2e937d8b4d49da4d664a1a3",
+      "blockbench_contract_sha256": "00b9f31808fcc882e7ace3a474436983b6b2ac146d9c8273fd13e62239d434ed",
       "blockbench_samples": "blender/animation/blockbench_pipeline_v1/samples/BB_Rifle_Ready_Pose_v001.samples.json",
-      "blockbench_samples_sha256": "df4ee0bab7edfef7abc495991c6611e79d380d0b6f10123f0979ce694634e5d8",
+      "blockbench_samples_sha256": "2dc662cc43751a4dc8a1aea472bda5605eadecf1af1017333dd3c750e3bf18a5",
       "preview_prop": "rifle_stylized_v2",
       "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
       "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"

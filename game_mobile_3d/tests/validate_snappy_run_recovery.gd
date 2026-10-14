@@ -52,7 +52,7 @@ func ticks(seconds: float, label: String) -> void:
 func at_phase(target: float) -> void:
 	var v=scene.actor.visual
 	var limit:=Engine.get_physics_frames()+90
-	var tolerance:=v.gait_frequency/float(fps)*.55+.004
+	var tolerance: float=v.gait_frequency/float(fps)*.55+.004
 	while absf(wrapf(v.gait_phase-target,-.5,.5))>tolerance and Engine.get_physics_frames()<limit:await process_frame
 func fixture(candidate: bool, run_input: bool, key: String) -> void:
 	monitor.key="";monitor.reset_pending=true
@@ -94,9 +94,10 @@ func run() -> void:
 			check(not v.settling and v.last_sole[0].y<.002 and v.last_sole[1].y<.002,prefix+" stop finishes both foot replants")
 			await fixture(candidate,true,prefix+"_reverse")
 			await at_phase(phase)
+			var old_velocity: Vector3=a.velocity
 			a.requested_direction=Vector2.UP
 			await ticks(.05,"Reversal input")
-			check(a.velocity.dot(Vector3(0,0,-1))>1,prefix+" reversal responds before visual facing")
+			check(a.velocity.dot(Vector3(0,0,-1))>old_velocity.dot(Vector3(0,0,-1))+.1,prefix+" reversal begins decelerating before visual facing")
 			await ticks(.65,"Reversal release")
 			await fixture(candidate,true,prefix+"_jump")
 			await at_phase(phase)

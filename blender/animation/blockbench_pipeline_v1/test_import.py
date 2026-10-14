@@ -28,6 +28,19 @@ class ImportTests(unittest.TestCase):
   a=bridge.import_clip(self.rig,self.clip,self.contract);self.rig.animation_data.action=a;self.rig.animation_data.action_slot=a.slots[0];bpy.context.scene.frame_set(1)
   head=self.rig.pose.bones['Head'];expected=Matrix.Translation(head.bone.head_local)@Matrix.Rotation(.6,4,'Z')@head.bone.matrix_local.to_3x3().to_4x4()
   self.assertLess(max(abs(head.matrix[i][j]-expected[i][j]) for i in range(4) for j in range(4)),2e-6)
+ def test_parent_child_rotations_and_translations_use_actual_rest_bases(self):
+  local={b['name']:Matrix.Translation(b['origin']) for b in self.contract['bones']}
+  posed={}
+  for b in self.contract['bones']:
+   n=b['name'];parent=b['parent'];lr=local[parent].inverted()@local[n] if parent else local[n]
+   motion=Matrix.Identity(4) if b['locked'] else Matrix.Translation((.04,-.02,.03))@Matrix.Rotation(.21,4,'X')@Matrix.Rotation(-.13,4,'Y')@Matrix.Rotation(.07,4,'Z')
+   posed[n]=(posed[parent] if parent else Matrix.Identity(4))@lr@motion
+  for sample in self.clip['samples']:sample['matrices']={n:list(map(list,m)) for n,m in posed.items()}
+  a=bridge.import_clip(self.rig,self.clip,self.contract);self.rig.animation_data.action=a;self.rig.animation_data.action_slot=a.slots[0];bpy.context.scene.frame_set(1);bpy.context.view_layer.update()
+  C=Matrix(self.contract['blender_to_blockbench'])
+  for n,m in posed.items():
+   expected=C.inverted()@m@local[n].inverted()@C@self.rig.data.bones[n].matrix_local
+   self.assertLess(bridge.delta(self.rig.pose.bones[n].matrix,expected),2e-6,n)
  def test_bent_forearm_rejected_before_action_creation(self):
   rest=Matrix(self.clip['rest']['ForeArm.R']);self.clip['samples'][1]['matrices']['ForeArm.R']=list(map(list,rest@Matrix.Rotation(.2,4,'X')))
   count=len(bpy.data.actions)

@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "path": "candidate_front_1x.mp4",
+      "frames": 85,
+      "fps": 30,
+      "duration_s": 2.8333333333333335,
+      "cycles": 5,
+      "audio": false,
+      "sha256": "8071ad53b694c6d25c3bb8d7647bd1ff51d3bb4e8da8ca707bd56bded8d79af4"
+    },
+    {
+      "path": "approved_vs_candidate_front_1x.mp4",
+      "frames": 85,
+      "fps": 30,
+      "duration_s": 2.8333333333333335,
+      "cycles": 5,
+      "audio": false,
+      "sha256": "4cb9a936df72205df17aa5810ed4769da488f79614314296d239a5a8b0d54940"
+    },
+    {
+      "path": "candidate_three_quarter_1x.mp4",
+      "frames": 85,
+      "fps": 30,
+      "duration_s": 2.8333333333333335,
+      "cycles": 5,
+      "audio": false,
+      "sha256": "2a7e07ee4132dab43c90f9aa9de1b4475d618e4ef23979ea3630b114bbdf5473"
+    },
+    {
+      "path": "approved_vs_candidate_three_quarter_1x.mp4",
+      "frames": 85,
+      "fps": 30,
+      "duration_s": 2.8333333333333335,
+      "cycles": 5,
+      "audio": false,
+      "sha256": "c555baf133daefba31dd78bd82b66a3050090c89c2522f675b5a63256e41ec71"
+    },
+    {
+      "path": "candidate_side_1x.mp4",
+      "frames": 85,
+      "fps": 30,
+      "duration_s": 2.8333333333333335,
+      "cycles": 5,
+      "audio": false,
+      "sha256": "04ccb7cf64c44ec746ab13b2e383ffc4258d43ad18c0b630e61701824d399851"
+    },
+    {
+      "path": "approved_vs_candidate_side_1x.mp4",
+      "frames": 85,
+      "fps": 30,
+      "duration_s": 2.8333333333333335,
+      "cycles": 5,
+      "audio": false,
+      "sha256": "55cdcc38a2a66ff2102a7e42da9be0e2afa6749edb8834b93b1eef2f619eaf61"
+    },
+    {
+      "path": "candidate_three_views_1x.mp4",
+      "frames": 85,
+      "fps": 30,
+      "duration_s": 2.8333333333333335,
+      "cycles": 5,
+      "audio": false,
+      "sha256": "3c46a3b622add40b8fcfe583fc4f28d859220bffb2d57744b12e6feef0433814"
+    },
+    {
+      "path": "reference_approved_candidate_1x.mp4",
+      "frames": 85,
+      "fps": 30,
+      "duration_s": 2.8333333333333335,
+      "cycles": 5,
+      "audio": false,
+      "sha256": "27b43494399646419f24c7198b9bc8df393341939e4f7821504bf866d82f3e4b"
+    }
+  ],
+  "reference": "references/motion/actions_and_stuff/Running.mp4",
+  "reference_sha256": "3db973b8dccf5e37d94cb6ed5a7e61fe6f45386c50d438112d058c5c23af55a2",
+  "reference_frames_zero_based": [
+    40,
+    124
+  ],
+  "timing": "85 frames, original30FPS;17 unique Action frames repeated5 times, closing18 excluded. No holds or cadence retiming."
+}
