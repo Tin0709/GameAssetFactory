@@ -64,10 +64,15 @@ func _button(label: String) -> void:
 			demo_running=false;actor.scripted_input=false;actor.position=Vector3.ZERO;actor.velocity=Vector3.ZERO
 			actor.current_speed=0;actor.visual.reset_review();section="Manual play"
 
+func _input(event: InputEvent) -> void:
+	# Tab normally navigates GUI focus. Reserve this lab's A/B shortcut before
+	# the HUD consumes it, including after clicking one of its buttons.
+	if event is InputEventKey and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_TAB:
+		_button("Switch style");get_viewport().set_input_as_handled()
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event.is_pressed() or event.is_echo():return
 	match event.physical_keycode:
-		KEY_TAB:_button("Switch style")
 		KEY_1:_button("Front")
 		KEY_2:_button("3/4")
 		KEY_3:_button("Side")

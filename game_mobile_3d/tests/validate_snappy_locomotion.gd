@@ -86,6 +86,14 @@ func run() -> void:
 		await ticks(.05,"Reset result")
 		check(actor.position.length()<.01 and v.last_sole[0].y<.002 and v.last_sole[1].y<.002,"Reset places capsule and both feet at the origin")
 		check(v.snappy_enabled==selected_style,"Reset preserves selected A/B style")
+	var style_button: Button=scene.status.get_parent().get_child(3).get_child(0)
+	style_button.grab_focus()
+	var before_style: bool=v.snappy_enabled
+	var tab:=InputEventKey.new();tab.physical_keycode=KEY_TAB;tab.keycode=KEY_TAB;tab.pressed=true
+	Input.parse_input_event(tab)
+	await ticks(.05,"Keyboard A/B")
+	check(v.snappy_enabled!=before_style,"Tab changes style even while a HUD button has keyboard focus")
+	tab.pressed=false;Input.parse_input_event(tab)
 	metrics=scene.measurements
 	check(metrics.max_floor_penetration_m<.002,"Feet stay above flat floor within2mm tolerance")
 	check(metrics.max_scale_error<.00001,"Rigid block proportions preserved")
