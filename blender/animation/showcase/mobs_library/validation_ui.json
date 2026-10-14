@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "checks": [
+    "switch",
+    "reset",
+    "slots",
+    "status",
+    "revision",
+    "name_collision",
+    "different_skeleton",
+    "empty_mob",
+    "visibility",
+    "fresh_reopen"
+  ],
+  "final_statuses": [
+    "Pending",
+    "Pending"
+  ]
+}

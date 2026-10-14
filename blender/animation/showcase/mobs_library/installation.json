@@ -1,0 +1,13 @@
+{
+  "target": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/showcase/Mobs_Animation_Library.blend",
+  "support": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/showcase/mobs_library",
+  "addon": "/Users/tin/Library/Application Support/Blender/5.2/scripts/addons/gaf_mobs_animation_library.py",
+  "preferences_backup": "/Users/tin/Desktop/Game Dev/GameAssetFactory/.validation/mobs_animation_library_v1/20261014_174304/userpref_before.blend",
+  "protected_file_hashes": {
+    "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/showcase/Animation_Showcase.blend": "ba88d6d822d894b9b97be58362735d1398a52cdc29ce8fc168d81849d60f6cb5",
+    "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation_v2/zombie_animation_v2.blend": "f19ce66335b0cf92af7988268096aa1f691ab2db5c491abaf8a48f7fcc89aea3",
+    "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/characters/enemies/zombie/zombie_cuboid_v2.blend": "22e2abb4670206aaa1e96711340f958e113921b5499f19414deea65cde460a8c"
+  },
+  "protected_files_unchanged": true,
+  "addon_enabled": true
+}

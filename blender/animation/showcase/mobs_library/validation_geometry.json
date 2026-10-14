@@ -1,0 +1,31 @@
+{
+  "rig_mesh_uv_weights_preserved": true,
+  "actions": {
+    "Zombie_Idle_Original_V1": {
+      "samples": 481,
+      "pose_seam_m": 0.0,
+      "velocity_seam_m_s": 0.007456910874395018,
+      "curve_tangent_seam_error_per_frame": 3.208030796260711e-08,
+      "minimum_sole_z_m": 0.0004938999190926552,
+      "support_height_error_m": 6.1000809073448285e-06,
+      "idle_foot_drift_m": 6.335640101830869e-06,
+      "nominal_speed_support_edge_drift_m": 0,
+      "rigidity_length_error_m": 1.3778572227618469e-07,
+      "scale_error": 0,
+      "root_basis_error": 0
+    },
+    "Zombie_Walk_Original_V1": {
+      "samples": 169,
+      "pose_seam_m": 0.0,
+      "velocity_seam_m_s": 0.00644722808980463,
+      "curve_tangent_seam_error_per_frame": 3.549958068893577e-07,
+      "minimum_sole_z_m": 0.0004757232964038849,
+      "support_height_error_m": 2.4276703596115123e-05,
+      "idle_foot_drift_m": 0,
+      "nominal_speed_support_edge_drift_m": 2.4219903466546364e-05,
+      "rigidity_length_error_m": 1.7543290942168e-07,
+      "scale_error": 0,
+      "root_basis_error": 0
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "startup_addon_enabled": true,
+  "fresh_reopening": true,
+  "action_switching_and_motion": true,
+  "initial_statuses": [
+    "Pending",
+    "Pending"
+  ]
+}
