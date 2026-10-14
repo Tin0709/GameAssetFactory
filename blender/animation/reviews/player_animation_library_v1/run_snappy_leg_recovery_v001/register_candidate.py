@@ -18,7 +18,7 @@ name = 'Run_Snappy_LegRecovery_Test_v001'
 validation = json.loads((OUT/'motion_validation.json').read_text())
 assert validation['passed']
 assert validation['source_sha256'] == sha(Path(bpy.data.filepath))
-ledger = json.loads((TMP/'protected_files.json').read_text())
+ledger = json.loads((TMP/'registration_guard.json').read_text())
 for path in ['blender/animation/showcase/Animation_Showcase.blend','blender/animation/showcase/animation_manifest.json']:
     assert sha(ROOT/path) == ledger[path], 'Concurrent library edit: '+path
 old_manifest = json.loads((LIB/'animation_manifest.json').read_text())
@@ -38,19 +38,19 @@ bpy.ops.wm.open_mainfile(filepath=str(LIB/'Animation_Showcase.blend'),load_ui=Fa
 ui.register()
 scene = bpy.context.scene
 before = {a.name:ui.action_signature(a) for a in bpy.data.actions}
-assert len(before) == 28 and all(ui.action_signature(bpy.data.actions[e['action']]) == e['action_sha256'] for e in old_manifest['animations'])
+assert len(before) == len(old_manifest['animations']) and all(ui.action_signature(bpy.data.actions[e['action']]) == e['action_sha256'] for e in old_manifest['animations'])
 assert ui.refresh(scene) == 1
-assert len(scene.gaf_clips) == len(bpy.data.actions) == 29
+assert len(scene.gaf_clips) == len(bpy.data.actions) == len(before)+1
 assert all(ui.action_signature(bpy.data.actions[n]) == h for n,h in before.items())
-scene.gaf_active_index = 28
-ui.activate(scene,28)
+scene.gaf_active_index = len(before)
+ui.activate(scene,len(before))
 ui.view(scene,'THREE_QUARTER')
 scene.gaf_loop=True
 assert sha(LIB/'Animation_Showcase.blend') == ledger['blender/animation/showcase/Animation_Showcase.blend']
 assert sha(LIB/'animation_manifest.json') == manifest_hash
 bpy.ops.wm.save_as_mainfile(filepath=str(LIB/'Animation_Showcase.blend'),relative_remap=False,compress=True)
-report=dict(previous_actions=before, previous_count=28, current_count=29, candidate_status='pending',
+report=dict(previous_actions=before, previous_count=len(before), current_count=len(before)+1, candidate_status='pending',
             previous_entries_exact=True, previous_action_signatures_exact=True,
             showcase_sha256=sha(LIB/'Animation_Showcase.blend'), manifest_sha256=manifest_hash)
 (OUT/'registration.json').write_text(json.dumps(report,indent=2))
-print('REGISTERED_ONE_PENDING_ACTION_ALL_28_PRESERVED',flush=True)
+print('REGISTERED_ONE_PENDING_ACTION_ALL_PREVIOUS_PRESERVED',flush=True)

@@ -1,0 +1,16 @@
+{
+  "saved_action_count": 33,
+  "original_actions_exact": 28,
+  "approved_backups": 12,
+  "pending_imports": 5,
+  "original_armature_count": 1,
+  "selection_transitions": 41,
+  "saved_pose_matrix_error": 1.7881393432617188e-07,
+  "fps": 30,
+  "test_playback": [
+    1,
+    31
+  ],
+  "tests_are_one_shots": true,
+  "save_reopen_verified": true
+}

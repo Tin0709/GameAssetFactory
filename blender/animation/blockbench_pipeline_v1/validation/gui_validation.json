@@ -1,0 +1,8 @@
+{
+  "actual_gui_playback": true,
+  "wraps": 3,
+  "pause": true,
+  "restart": true,
+  "new_process_preserves_other_blender_window": true,
+  "saved_files": false
+}

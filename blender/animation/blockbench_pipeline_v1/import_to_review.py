@@ -1,7 +1,7 @@
 """Background-only reusable review import, backup, Pending registration and refresh.
 Blender -b Animation_Showcase.blend --python-exit-code 1 --python import_to_review.py -- CLIP.samples.json [Unique_Action_Name]
 """
-import bpy,sys,json,hashlib,shutil
+import bpy,sys,json,hashlib,shutil,re
 from pathlib import Path
 HERE=Path(__file__).resolve().parent;SHOWCASE=HERE.parent/'showcase';ROOT=HERE.parents[2]
 sys.path[:0]=[str(HERE),str(SHOWCASE)]
@@ -17,6 +17,8 @@ def run(sample_path,name=None):
     clip=json.loads(Path(sample_path).read_text());contract=json.loads((HERE/'bridge_contract.json').read_text());rig=bpy.data.objects['Showcase_Player_Rig']
     action=bridge.import_clip(rig,clip,contract,name)
     # A unique source is required for each revision; never overwrite existing studies.
+    if not re.fullmatch(r'[A-Za-z0-9_]+',action.name):
+        bpy.data.actions.remove(action);raise ValueError('Review Action names may contain letters, digits and underscores only')
     folder=HERE/'imports'/action.name
     if folder.exists():raise ValueError('Review source already exists; use a new versioned name')
     folder.mkdir(parents=True);source=folder/'source.blend'
