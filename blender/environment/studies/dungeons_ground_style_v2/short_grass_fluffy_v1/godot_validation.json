@@ -1,0 +1,46 @@
+{
+	"failures": [],
+	"main_game_modified": false,
+	"renderer": "mobile",
+	"rendering_device": "Apple M2 Pro (Apple8)",
+	"scope": "Isolated candidate fixture; static material, no wind, no phone performance claim",
+	"status": "PASS",
+	"variants": [
+		{
+			"aabb": "[P: (-0.234093, -0.012, -0.236172), S: (0.476196, 0.4, 0.474424)]",
+			"native_alpha_scissor": 0.5,
+			"native_cull": 2,
+			"native_filter": 2,
+			"triangles": 24,
+			"variant": "SoftYellow",
+			"vertices": 36
+		},
+		{
+			"aabb": "[P: (-0.234093, -0.012, -0.236172), S: (0.476196, 0.4, 0.474424)]",
+			"native_alpha_scissor": 0.5,
+			"native_cull": 2,
+			"native_filter": 2,
+			"triangles": 24,
+			"variant": "DustyPink",
+			"vertices": 36
+		},
+		{
+			"aabb": "[P: (-0.234093, -0.012, -0.236172), S: (0.476196, 0.4, 0.474424)]",
+			"native_alpha_scissor": 0.5,
+			"native_cull": 2,
+			"native_filter": 2,
+			"triangles": 24,
+			"variant": "Lavender",
+			"vertices": 36
+		},
+		{
+			"aabb": "[P: (-0.234093, -0.012, -0.236172), S: (0.476196, 0.4, 0.474424)]",
+			"native_alpha_scissor": 0.5,
+			"native_cull": 2,
+			"native_filter": 2,
+			"triangles": 24,
+			"variant": "SageGreen",
+			"vertices": 36
+		}
+	]
+}

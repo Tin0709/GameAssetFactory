@@ -36,6 +36,9 @@ mat.node_tree.links.new(tex.outputs['Alpha'],clip.inputs[0]);mat.node_tree.links
 # World-up thin-foliage shading on both faces. The engine companion material
 # implements the same normal explicitly; no extra light or emission is added.
 normal=mat.node_tree.nodes.new('ShaderNodeCombineXYZ');normal.name='Foliage_World_Up_Normal';normal.inputs['Z'].default_value=1
+geometry=mat.node_tree.nodes.new('ShaderNodeNewGeometry')
+facing=mat.node_tree.nodes.new('ShaderNodeMath');facing.operation='MULTIPLY_ADD';facing.inputs[1].default_value=-2;facing.inputs[2].default_value=1
+mat.node_tree.links.new(geometry.outputs['Backfacing'],facing.inputs[0]);mat.node_tree.links.new(facing.outputs[0],normal.inputs['Z'])
 mat.node_tree.links.new(normal.outputs[0],bs.inputs['Normal'])
 names=['SoftYellow','DustyPink','Lavender','SageGreen'];objects=[]
 specs=[{'az':30,'height':.40,'width':.46,'radius':0,'lean':.018},
@@ -135,6 +138,16 @@ for obj in objects:
     path=exports/(obj.name+'.glb')
     bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_yup=True,export_normals=True,export_texcoords=True,export_materials='EXPORT',export_vertex_color='NONE',export_animations=False,export_morph=False,export_skins=False,export_cameras=False,export_lights=False,export_extras=True,export_apply=False)
     obj.location=loc;export_reports.append({'variant':obj['color_variation'],'path':str(path.relative_to(ROOT)),'bytes':path.stat().st_size})
+
+# Blender thin foliage: let opposite-side light through the zero-thickness leaf
+# rather than treating it as an opaque wall. Clip BOTH lighting lobes. Exported
+# PBR fallback stays portable; the supplied Godot shader uses world-up lighting.
+trans=mat.node_tree.nodes.new('ShaderNodeBsdfTranslucent');trans.name='Thin_Foliage_Backside_Light'
+mat.node_tree.links.new(tex.outputs['Color'],trans.inputs['Color']);mat.node_tree.links.new(normal.outputs[0],trans.inputs['Normal'])
+add=mat.node_tree.nodes.new('ShaderNodeAddShader');mat.node_tree.links.new(bs.outputs[0],add.inputs[0]);mat.node_tree.links.new(trans.outputs[0],add.inputs[1])
+transparent=mat.node_tree.nodes.new('ShaderNodeBsdfTransparent');mix=mat.node_tree.nodes.new('ShaderNodeMixShader')
+mat.node_tree.links.new(clip.outputs[0],mix.inputs[0]);mat.node_tree.links.new(transparent.outputs[0],mix.inputs[1]);mat.node_tree.links.new(add.outputs[0],mix.inputs[2]);mat.node_tree.links.new(mix.outputs[0],mat.node_tree.nodes['Material Output'].inputs['Surface'])
+mat['thin_foliage_lighting']='Blender diffuse+transmitted light, binary mask, no emission. Godot companion shader uses world-up normal on both sides; standard GLB PBR is fallback.'
 
 # Standalone appendable asset-library file; central scene remains review home.
 locations=[o.location.copy() for o in objects]

@@ -1,0 +1,101 @@
+{
+  "status": "PASS",
+  "variants": [
+    {
+      "file": "ShortGrass_Fluffy_v1_DustyPink.glb",
+      "sha256": "dafe64ee3612fec59e1275a01b2cbce2adaaa02342ee803be481dd3054710ff2",
+      "bytes": 5044,
+      "vertices": 36,
+      "triangles": 24,
+      "bounds_godot": {
+        "min": [
+          -0.23409318923950195,
+          -0.012000000104308128,
+          -0.23617230355739594
+        ],
+        "max": [
+          0.24210259318351746,
+          0.3880000114440918,
+          0.23825141787528992
+        ]
+      },
+      "alpha": "MASK .5",
+      "double_sided": true,
+      "filter": "NEAREST / NEAREST_MIPMAP_NEAREST",
+      "wind_root_weights_zero": true,
+      "original_atlas_embedded": true
+    },
+    {
+      "file": "ShortGrass_Fluffy_v1_Lavender.glb",
+      "sha256": "f572144a2b41a3c0276cc75386e0a318aabe514abf077e4cc1530ad1fba9ae57",
+      "bytes": 5040,
+      "vertices": 36,
+      "triangles": 24,
+      "bounds_godot": {
+        "min": [
+          -0.23409318923950195,
+          -0.012000000104308128,
+          -0.23617230355739594
+        ],
+        "max": [
+          0.24210259318351746,
+          0.3880000114440918,
+          0.23825141787528992
+        ]
+      },
+      "alpha": "MASK .5",
+      "double_sided": true,
+      "filter": "NEAREST / NEAREST_MIPMAP_NEAREST",
+      "wind_root_weights_zero": true,
+      "original_atlas_embedded": true
+    },
+    {
+      "file": "ShortGrass_Fluffy_v1_SageGreen.glb",
+      "sha256": "487a7fbcaaba2d771eaaa101847d3dbc2cf52d51a709febb54addaf1814ee067",
+      "bytes": 5044,
+      "vertices": 36,
+      "triangles": 24,
+      "bounds_godot": {
+        "min": [
+          -0.23409318923950195,
+          -0.012000000104308128,
+          -0.23617230355739594
+        ],
+        "max": [
+          0.24210259318351746,
+          0.3880000114440918,
+          0.23825141787528992
+        ]
+      },
+      "alpha": "MASK .5",
+      "double_sided": true,
+      "filter": "NEAREST / NEAREST_MIPMAP_NEAREST",
+      "wind_root_weights_zero": true,
+      "original_atlas_embedded": true
+    },
+    {
+      "file": "ShortGrass_Fluffy_v1_SoftYellow.glb",
+      "sha256": "a883229856bef4c741378edca155873dd6164039939bebd56e229b21dbd3743b",
+      "bytes": 5048,
+      "vertices": 36,
+      "triangles": 24,
+      "bounds_godot": {
+        "min": [
+          -0.23409318923950195,
+          -0.012000000104308128,
+          -0.23617230355739594
+        ],
+        "max": [
+          0.24210259318351746,
+          0.3880000114440918,
+          0.23825141787528992
+        ]
+      },
+      "alpha": "MASK .5",
+      "double_sided": true,
+      "filter": "NEAREST / NEAREST_MIPMAP_NEAREST",
+      "wind_root_weights_zero": true,
+      "original_atlas_embedded": true
+    }
+  ]
+}

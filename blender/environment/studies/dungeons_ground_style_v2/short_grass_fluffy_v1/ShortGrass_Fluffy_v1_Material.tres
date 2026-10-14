@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="ShortGrass_Fluffy_v1.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="ShortGrass_Fluffy_v1_Atlas.png" id="2_atlas"]
+
+[resource]
+resource_name = "ShortGrass_Fluffy_v1_PixelCutout_UpwardLit"
+shader = ExtResource("1_shader")
+shader_parameter/grass_atlas = ExtResource("2_atlas")
