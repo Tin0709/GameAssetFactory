@@ -1208,6 +1208,67 @@
       "revision": "lower_step_v001",
       "body_compression_multiplier": 1.25,
       "leg_recovery_height_multiplier": 0.5
+    },
+    {
+      "slot_identifier": "OBRUN_Test_Rig",
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "action": "Run_Snappy_Test_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/run_snappy_review.blend",
+      "source_sha256": "81edea51cb206f1acfefa62df8b32fa6a317f169118144d5360096714f696e98",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "action_sha256": "dbba2b08b4372635fa438a62078680ce5836b16472c583a1b4a7bf9da3d280ac",
+      "action_frame_range": [
+        1.0,
+        18.0
+      ],
+      "start": 1,
+      "end": 17,
+      "closing_key": 18,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Separate Run Snappy V1, awaiting artistic review. Existing27 Actions and all earlier source versions preserved.",
+      "seamless_loop": true,
+      "period_s": 0.5666666666666667,
+      "in_place": true,
+      "nominal_speed_m_s": 2.5,
+      "contact_frames": {
+        "L": 1,
+        "R": 9.5
+      },
+      "support_duty": {
+        "L": 0.39,
+        "R": 0.4
+      },
+      "flight_intervals_frames": [
+        [
+          7.63,
+          9.5
+        ],
+        [
+          16.3,
+          18
+        ]
+      ],
+      "review_video": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/run_snappy_three_views_1x.mp4",
+      "presentation_note": "Five uninterrupted17-frame cycles at30FPS1x. Short contact-driven absorption, concentrated leg recovery, controlled placement and brief designed flight. Larger straight-arm arcs and delayed upper-body response. Actual source Running comparison and approved Expressive Run v3 comparison retain native playback.",
+      "gameplay_validation": "Blender-only Pending; phase0LEFT and0.5RIGHT receiving. Root/object static, controller owns -Y travel. Arbitrary speed, Walk/Run transitions, starts/stops, turns/slopes, weapons and mobile performance not tested."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
@@ -1225,5 +1286,14 @@
     "WeaponCarrier": "QUATERNION",
     "Leg.L": "XYZ",
     "Leg.R": "XYZ"
+  },
+  "provisional_walk_baseline": {
+    "action": "Walk_Snappy_V027_Refined_Test_v003",
+    "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/lower_step_v001/walk_v027_refined_review.blend",
+    "source_sha256": "d68ba6c7961851c7eb358d4e614e8006eae75db20903f8bc0b82d26a9c791ea5",
+    "action_sha256": "30dd70cd05dfe918ac17f52d8ccc847014d8c40a8176c0e316fdb3c3b2267034",
+    "accepted_date": "2026-10-14",
+    "production_approved": false,
+    "note": "User accepts current state as provisional Walking baseline; preserve current source and all backups. Entry remains Pending, not final production approval."
   }
 }
