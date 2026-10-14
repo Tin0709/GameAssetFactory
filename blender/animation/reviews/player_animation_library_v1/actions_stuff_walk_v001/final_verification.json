@@ -1,0 +1,82 @@
+{
+  "saved_library_verification.json": {
+    "fresh_saved_library_reopened": true,
+    "prior_actions_preserved": 326,
+    "prior_armatures_preserved": 271,
+    "prior_meshes_uv_weights_preserved": 1382,
+    "prior_catalog_entries_preserved": 60,
+    "new_action_count": 327,
+    "selection_transitions": 4,
+    "slot_bound": true,
+    "playback": [
+      1,
+      24
+    ],
+    "closing_key": 25,
+    "fps": 30,
+    "loop_pose_seam_error": 0.0
+  },
+  "source_verification.json": {
+    "source_reopened": true,
+    "matrix_sample_count": 242,
+    "maximum_bone_matrix_error": 2.7179718017578125e-05,
+    "loop_pose_seam_error": 0.0,
+    "floor_z": -0.03799999877810478,
+    "lowest_leg_vertex_z_range": {
+      "L": [
+        -0.03778740018606186,
+        0.11526293307542801
+      ],
+      "R": [
+        -0.037787288427352905,
+        0.11526293307542801
+      ]
+    },
+    "scale_range": [
+      1,
+      1
+    ],
+    "geometry_samples": 241,
+    "note": "Faithful source movement; floor and support observations are reported without changing source keyframes."
+  },
+  "central_registration.json": {
+    "registered_pending": true,
+    "entries": 35,
+    "prior_actions_preserved": 34,
+    "active_action": "Walk_ActionsStuff_Source_Test_v001",
+    "appended_action_count": 1
+  },
+  "gui_playback_verification.json": {
+    "native_gui_playback": true,
+    "observed_wraps": 3,
+    "observed_frame_count": 19,
+    "pause_verified": true,
+    "restart_frame": 1,
+    "active_scene": "ASW_Walking_Review_v001",
+    "active_action": "Walk_ActionsStuff_Source_Test_v001",
+    "fps": 30,
+    "playback": [
+      1,
+      24
+    ],
+    "screenshot_note": "New native Blender window showed the first-run Quick Setup overlay. Animation frames wrapped behind it; no preference changes or UI button clicks were performed."
+  },
+  "outputs": {
+    "blender/animation/reviews/player_animation_library_v1/player_animation_library_v1.blend": {
+      "bytes": 279961564,
+      "sha256": "8fb322564a4cc2f7278b7d10cd80d18c06d4fa9559daf26477187fd74050ec7e"
+    },
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_walk_v001/walk_actions_stuff_review.blend": {
+      "bytes": 18003371,
+      "sha256": "ce855abcfd20bc4716201c2cd5f056d3c483c42e5fd8af854afdd04c263de9a5"
+    },
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_walk_v001/walking_1x.mp4": {
+      "bytes": 226481,
+      "sha256": "246ea86a2ad0980ff3a20615c20fa4bfac103abcd5fa178f94439c8f6ed5eb1a"
+    },
+    "blender/animation/showcase/Animation_Showcase.blend": {
+      "bytes": 17947284,
+      "sha256": "527d4b6089937517075f660c8be72d846cfd9ea75bf5b276a645fe22a152c8eb"
+    }
+  }
+}

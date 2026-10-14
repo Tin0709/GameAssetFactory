@@ -1,0 +1,29 @@
+{
+  "action": "Walk_ActionsStuff_Source_Test_v001",
+  "scene": "ASW_Walking_Review_v001",
+  "source_rig": "ASW_Player_Rig_v001",
+  "source_mesh": "ASW_Player_Mesh_v001",
+  "status": "pending",
+  "source_animation": "animation.oreville_ans.tldiyl",
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "start": 1,
+  "end": 24,
+  "closing_key": 25,
+  "fps": 30,
+  "period_s": 0.8,
+  "preview_floor_z_m": -0.038,
+  "phase_sample_count": 385,
+  "source_model_unit_m": 0.05624999602635702,
+  "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+  "action_sha256": "4a64c34c3c4e607ea2a26054194e57c005352ca91c2aaa8922ded270ff4c96e0",
+  "maximum_basis_scale_error": 2.384185791015625e-07,
+  "maximum_forearm_identity_error": 2.384185791015625e-07,
+  "adaptations": [
+    "Source walking cycle fixed to 0.8 s for preview (normalized forward speed ~0.61035).",
+    "Native 1.8 m proportions, shoulder inset and unchanged rest rig retained.",
+    "Source shoulder pivot two model units below native shoulder cap.",
+    "Source independent leg hierarchy compensated into native hips parent.",
+    "No foot locking, smoothing or procedural ground correction added. Preview floor is 38 mm lower to align the original lowest sole excursion.",
+    "Source body, arm and leg channels at full forward walking weights; other layers/controllers omitted."
+  ]
+}

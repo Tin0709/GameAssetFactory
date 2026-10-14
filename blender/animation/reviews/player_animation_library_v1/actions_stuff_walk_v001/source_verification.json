@@ -1,0 +1,23 @@
+{
+  "source_reopened": true,
+  "matrix_sample_count": 242,
+  "maximum_bone_matrix_error": 2.7179718017578125e-05,
+  "loop_pose_seam_error": 0.0,
+  "floor_z": -0.03799999877810478,
+  "lowest_leg_vertex_z_range": {
+    "L": [
+      -0.03778740018606186,
+      0.11526293307542801
+    ],
+    "R": [
+      -0.037787288427352905,
+      0.11526293307542801
+    ]
+  },
+  "scale_range": [
+    1,
+    1
+  ],
+  "geometry_samples": 241,
+  "note": "Faithful source movement; floor and support observations are reported without changing source keyframes."
+}

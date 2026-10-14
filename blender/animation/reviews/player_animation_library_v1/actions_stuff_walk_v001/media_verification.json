@@ -1,0 +1,9 @@
+{
+  "frames": 144,
+  "fps": 30,
+  "duration_s": 4.8,
+  "cycles": 6,
+  "source_frames_per_cycle": 24,
+  "closing_key_excluded": 25,
+  "output": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/actions_stuff_walk_v001/walking_1x.mp4"
+}

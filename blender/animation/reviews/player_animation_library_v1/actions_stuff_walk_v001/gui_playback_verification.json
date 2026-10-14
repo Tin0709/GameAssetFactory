@@ -1,0 +1,15 @@
+{
+  "native_gui_playback": true,
+  "observed_wraps": 3,
+  "observed_frame_count": 19,
+  "pause_verified": true,
+  "restart_frame": 1,
+  "active_scene": "ASW_Walking_Review_v001",
+  "active_action": "Walk_ActionsStuff_Source_Test_v001",
+  "fps": 30,
+  "playback": [
+    1,
+    24
+  ],
+  "screenshot_note": "New native Blender window showed the first-run Quick Setup overlay. Animation frames wrapped behind it; no preference changes or UI button clicks were performed."
+}

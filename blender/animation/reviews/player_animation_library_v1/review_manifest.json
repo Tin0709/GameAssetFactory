@@ -8,7 +8,7 @@
   },
   "source_action_count": 306,
   "retained_source_actions": 312,
-  "catalog_entries": 60,
+  "catalog_entries": 61,
   "catalog": [
     {
       "id": "0",
@@ -773,6 +773,24 @@
       "phase_note": "F6 push / F23 contact / F25 absorb",
       "carrier_note": "Pose separate from preview arc/support",
       "status": "Blender-only / awaiting user review"
+    },
+    {
+      "id": "asw_walk_source_v001",
+      "label": "Walking / Actions & Stuff source v001 [Pending]",
+      "group": "Locomotion",
+      "actor": null,
+      "scene": "ASW_Walking_Review_v001",
+      "action": "Walk_ActionsStuff_Source_Test_v001",
+      "review_rig": "ASW_Player_Rig_v001",
+      "start": 1,
+      "end": 24,
+      "fps": 30,
+      "duration_seconds": 0.8,
+      "status": "Pending human review",
+      "review_note": "Actions & Stuff walking / native rigid rig",
+      "phase_note": "24 frames / 0.8 s; closing F25 excluded",
+      "carrier_note": "In place / no gameplay export",
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_walk_v001/walk_actions_stuff_review.blend"
     }
   ],
   "source_action_hashes": {
@@ -1527,8 +1545,8 @@
   "runtime_transition_rate": 5.25,
   "scope": "Blender review library; all 324 pre-V004 Actions unchanged; V004 adds pose and separate preview support/arc; no V004 game integration",
   "jump_default_v001": "jump_default_v001/manifest.json",
-  "default_review": "jump_dungeons_gif_v004",
-  "total_actions": 326,
+  "default_review": "asw_walk_source_v001",
+  "total_actions": 327,
   "jump_set_v002": {
     "manifest": "jump_set_v002/manifest.json",
     "cases": [
@@ -1548,5 +1566,53 @@
     "manifest": "jump_dungeons_gif_v004/manifest.json",
     "scope": "Combined GIF Jump + Land / straight arms / Blender only",
     "validation": "jump_dungeons_gif_v004/validation.json"
+  },
+  "actions_stuff_walk_v001": {
+    "action": "Walk_ActionsStuff_Source_Test_v001",
+    "scene": "ASW_Walking_Review_v001",
+    "source_rig": "ASW_Player_Rig_v001",
+    "source_mesh": "ASW_Player_Mesh_v001",
+    "status": "pending",
+    "source_animation": "animation.oreville_ans.tldiyl",
+    "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+    "start": 1,
+    "end": 24,
+    "closing_key": 25,
+    "fps": 30,
+    "period_s": 0.8,
+    "preview_floor_z_m": -0.038,
+    "phase_sample_count": 385,
+    "source_model_unit_m": 0.05624999602635702,
+    "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+    "action_sha256": "4a64c34c3c4e607ea2a26054194e57c005352ca91c2aaa8922ded270ff4c96e0",
+    "maximum_basis_scale_error": 2.384185791015625e-07,
+    "maximum_forearm_identity_error": 2.384185791015625e-07,
+    "adaptations": [
+      "Source walking cycle fixed to 0.8 s for preview (normalized forward speed ~0.61035).",
+      "Native 1.8 m proportions, shoulder inset and unchanged rest rig retained.",
+      "Source shoulder pivot two model units below native shoulder cap.",
+      "Source independent leg hierarchy compensated into native hips parent.",
+      "No foot locking, smoothing or procedural ground correction added. Preview floor is 38 mm lower to align the original lowest sole excursion.",
+      "Source body, arm and leg channels at full forward walking weights; other layers/controllers omitted."
+    ],
+    "source_blend_sha256": "ce855abcfd20bc4716201c2cd5f056d3c483c42e5fd8af854afdd04c263de9a5",
+    "entry": {
+      "id": "asw_walk_source_v001",
+      "label": "Walking / Actions & Stuff source v001 [Pending]",
+      "group": "Locomotion",
+      "actor": null,
+      "scene": "ASW_Walking_Review_v001",
+      "action": "Walk_ActionsStuff_Source_Test_v001",
+      "review_rig": "ASW_Player_Rig_v001",
+      "start": 1,
+      "end": 24,
+      "fps": 30,
+      "duration_seconds": 0.8,
+      "status": "Pending human review",
+      "review_note": "Actions & Stuff walking / native rigid rig",
+      "phase_note": "24 frames / 0.8 s; closing F25 excluded",
+      "carrier_note": "In place / no gameplay export",
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_walk_v001/walk_actions_stuff_review.blend"
+    }
   }
 }

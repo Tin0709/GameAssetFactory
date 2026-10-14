@@ -1,0 +1,17 @@
+{
+  "fresh_saved_library_reopened": true,
+  "prior_actions_preserved": 326,
+  "prior_armatures_preserved": 271,
+  "prior_meshes_uv_weights_preserved": 1382,
+  "prior_catalog_entries_preserved": 60,
+  "new_action_count": 327,
+  "selection_transitions": 4,
+  "slot_bound": true,
+  "playback": [
+    1,
+    24
+  ],
+  "closing_key": 25,
+  "fps": 30,
+  "loop_pose_seam_error": 0.0
+}
