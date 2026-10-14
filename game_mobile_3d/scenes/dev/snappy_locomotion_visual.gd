@@ -37,6 +37,32 @@ func set_snappy(enabled: bool) -> void:
 	snappy_enabled=enabled;style_toggles+=1;pose_dirty=true;transition_count+=1
 	# Preserve capsule, gait phase, receiving IDs and existing contact anchors.
 
+func reset_review() -> void:
+	# Reset is an explicit teleport. Cancel every world-space contact/replant
+	# cache and seed the approved Idle before the same writer evaluates again.
+	move_requested=false;settling=false;settle_time=0;attention_time=0
+	gait_phase=.28;gait_run_weight=0;gait_frequency=0;run_transition_active=false
+	style_weight=1.0 if snappy_enabled else 0.0
+	pivot_load=Vector3.ZERO;travel_bias=0;facing_velocity=0;rotation=Vector3.ZERO
+	support_aim=[Quaternion.IDENTITY,Quaternion.IDENTITY]
+	early_release=[false,false];release_active=[false,false]
+	for side in 2:
+		contact_ids[side]+=1;pivot_contact_ids[side]=-1
+		foot_support[side]=false;foot_anchors[side]=Vector3.ZERO
+		replant_from[side]=Vector3.ZERO;replant_q[side]=Quaternion.IDENTITY
+		last_sole[side]=Vector3.ZERO;previous_raw[side]=Vector3.ZERO
+	for i in skeleton.get_bone_count():
+		var target:=_target_pose(i)
+		_p[i]=target.origin;_q[i]=target.basis.get_rotation_quaternion()
+		_vp[i]=Vector3.ZERO;_vq[i]=Vector3.ZERO
+		_offset_p[i]=Vector3.ZERO;_offset_q[i]=Vector3.ZERO
+		_offset_vp[i]=Vector3.ZERO;_offset_vq[i]=Vector3.ZERO
+		_final_p[i]=_p[i];_final_q[i]=_q[i]
+		_final_vp[i]=Vector3.ZERO;_final_vq[i]=Vector3.ZERO
+		skeleton.set_bone_pose_position(i,_p[i]);skeleton.set_bone_pose_rotation(i,_q[i])
+	pose_dirty=false;transition_age=10;_pending_physics_delta=1.0/60
+	_evaluate(1.0/60)
+
 func _stride_distance() -> float:
 	return lerpf(lerpf(WALK_STRIDE,RUN_STRIDE,gait_run_weight),lerpf(SNAPPY_WALK_STRIDE,SNAPPY_RUN_STRIDE,gait_run_weight),style_weight)
 

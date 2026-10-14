@@ -62,7 +62,7 @@ func _button(label: String) -> void:
 		"Demo":demo_running=not demo_running;demo_time=0;actor.scripted_input=demo_running;actor.requested_direction=Vector2.ZERO;actor.requested_run=false
 		"Reset":
 			demo_running=false;actor.scripted_input=false;actor.position=Vector3.ZERO;actor.velocity=Vector3.ZERO
-			actor.visual.foot_support=[false,false];actor.visual.pose_dirty=true
+			actor.current_speed=0;actor.visual.reset_review();section="Manual play"
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event.is_pressed() or event.is_echo():return
