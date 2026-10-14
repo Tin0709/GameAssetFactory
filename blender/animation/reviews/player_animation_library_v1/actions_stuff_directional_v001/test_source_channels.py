@@ -47,6 +47,14 @@ class SourceChannelTests(unittest.TestCase):
         self.assertAlmostEqual(a['leftleg']['position'][0], .078*.75)
         self.assertAlmostEqual(b['leftleg']['position'][0], 0)
 
+    def test_runtime_unbounded_clock_wraps_all_channels_together(self):
+        expected = self.source.sample(self.snap(phase=.7083, run=1), extras=False)
+        actual = self.source.sample(self.snap(phase=3.7083, run=1), extras=False)
+        for bone in expected:
+            for channel in expected[bone]:
+                for a, b in zip(actual[bone][channel], expected[bone][channel]):
+                    self.assertAlmostEqual(a, b, places=11)
+
     def test_core_run_matches_literal_accepted_profile(self):
         c = self.source.sample(self.snap(phase=.7083, run=1), extras=False)
         self.assertEqual(c['rightleg']['rotation'], [-26.62, 0., 0.])
