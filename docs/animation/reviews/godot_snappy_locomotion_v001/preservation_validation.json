@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "baseline_files": 7430,
+  "bytes_checked": 6396431267,
+  "intentional_changes": [
+    "AGENTS.md",
+    "blender/animation/showcase/animation_manifest.json",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "docs/animation/ANIMATION_PROGRESS.md"
+  ],
+  "unexpected_changes": [],
+  "missing": [],
+  "all_original_godot_files_exact": true,
+  "approved_action_preservation": "approval_validation.json: all28 Action signatures and sources exact"
+}

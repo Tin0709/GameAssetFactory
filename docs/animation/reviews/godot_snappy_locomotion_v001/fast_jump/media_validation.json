@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "original_speed": true,
+  "physics_fps": 60,
+  "renderer": "D3D12 Mobile",
+  "videos": [
+    {
+      "path": "gameplay_expressive_1x.mp4",
+      "frames": 397,
+      "fps": 30.0,
+      "sha256": "6f53f1ed48f309cf3fc0fc08820035d4dde3072c665b7503100d2c11f476d85f"
+    },
+    {
+      "path": "gameplay_snappy_1x.mp4",
+      "frames": 397,
+      "fps": 30.0,
+      "sha256": "119722a62685cf290e958bc66154a350d3b151aaf7918a4a3f28963b3004dea5"
+    },
+    {
+      "path": "gameplay_style_toggle_1x.mp4",
+      "frames": 397,
+      "fps": 30.0,
+      "sha256": "5daf55598dff4294d2662e4c658bb52c74005b03c38aa294f130918894473f3b"
+    },
+    {
+      "path": "snappy_vs_expressive_1x.mp4",
+      "frames": 397,
+      "fps": 30.0,
+      "sha256": "4602beb99a0315d1bf225c31a4319da3e2705707bdcdb807bfe7a9a449a4c7f6"
+    }
+  ]
+}
