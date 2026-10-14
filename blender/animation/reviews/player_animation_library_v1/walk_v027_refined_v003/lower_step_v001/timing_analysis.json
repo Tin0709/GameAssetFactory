@@ -1,0 +1,31 @@
+{
+  "reference_source": "C:\\Users\\ADMIN\\Desktop\\walking.mp4",
+  "reference_sha256": "2b4930b899230814606fc3f6ce341e6966b82a91d6a5d4a665e3057938beab0c",
+  "reference_frames": 304,
+  "review_frames": 63,
+  "fps": 30,
+  "continuous_steps": 6,
+  "no_holds": true,
+  "native_speed": true,
+  "diagnostic_phase_mapping": "ReferenceF30+i; both modelF1+1.05i. Static phase normalization only; all videos1x. Reference cadence drift retained.",
+  "measured": {
+    "Before v003": {
+      "sole_L_peak_m": 0.33980679512023926,
+      "sole_R_peak_m": 0.33373403549194336,
+      "hip_min_m": 0.669895350933075,
+      "hip_max_m": 0.8232913613319397,
+      "peak_hip_down_m_s": 1.2880516052246094,
+      "peak_hip_up_m_s": 2.6042175292969034
+    },
+    "Updated v003": {
+      "sole_L_peak_m": 0.17010344564914703,
+      "sole_R_peak_m": 0.16706715524196625,
+      "hip_min_m": 0.6568126678466797,
+      "hip_max_m": 0.8246698379516602,
+      "peak_hip_down_m_s": 1.2880516052246094,
+      "peak_hip_up_m_s": 3.010940551757841
+    }
+  },
+  "measurement_grid_s": 0.0015625,
+  "interpretation": "User requested same v003 Action and25% more downward snap. Recovery-leg floor clearance halves while planted/support motion is retained. Contact-to-trough compression increases from52.3308 to65.4135mm with1.5mm added rebound. Leg horizontal paths/orientations, cadence and spacing retained. No new proprietary keys or rig deformation."
+}

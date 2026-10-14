@@ -1151,13 +1151,13 @@
     },
     {
       "action": "Walk_Snappy_V027_Refined_Test_v003",
-      "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/body_snap_v001/walk_v027_refined_review.blend",
-      "source_sha256": "890d2fd97de5be46c7438cf7f6dfb1ab01f32265e6ebf38e156a13ac17edb34e",
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/lower_step_v001/walk_v027_refined_review.blend",
+      "source_sha256": "d68ba6c7961851c7eb358d4e614e8006eae75db20903f8bc0b82d26a9c791ea5",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "0dbeafec0e7a3e1679798ddad7a7fdcc0c6dd93fdac1578d75d63e7eb472296a",
+      "action_sha256": "30dd70cd05dfe918ac17f52d8ccc847014d8c40a8176c0e316fdb3c3b2267034",
       "action_frame_range": [
         1.0,
         22.0
@@ -1167,7 +1167,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Same v003 updated in place at user request:25% deeper contact-to-trough body compression,41.8646\u219252.3308mm; C2 recovery with2.5mm overshoot, close35ms delayed head response. All leg world matrices,42mm nominal gap, pitch/roll/yaw, cadence and speed preserved. Previous v003 source/reviews and all26 other Actions remain exact.",
+      "approval_note": "Same v003 in-place update: recovery-leg lowest-sole floor clearance halved, nominal left/right peak339.8/333.7\u2192170.1/167.1mm; support common hop retained. Another25% receiving compression52.3308\u219265.4135mm;1.5mm elastic overshoot. Leg fore/aft/lateral paths and orientations,42mm gap/cadence unchanged. Previous source/reviews and all26 other Actions preserved.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
@@ -1202,11 +1202,12 @@
       ],
       "review_steps": 6,
       "baseline_action": "Walk_Snappy_V027_Refined_Test_v003",
-      "previous_revision_source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/walk_v027_refined_review.blend",
-      "previous_revision_source_sha256": "0b6ac0eb6399d382dedbf2292e6091a2b6c98ed9f7d99f01725a0f00bdd8fca6",
-      "previous_revision_action_sha256": "1980fb7da676154c20f426d1ab43001da50315c37f10d9369424b0efcc73d960",
-      "revision": "body_snap_v001",
-      "body_compression_multiplier": 1.25
+      "previous_revision_source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/body_snap_v001/walk_v027_refined_review.blend",
+      "previous_revision_source_sha256": "890d2fd97de5be46c7438cf7f6dfb1ab01f32265e6ebf38e156a13ac17edb34e",
+      "previous_revision_action_sha256": "0dbeafec0e7a3e1679798ddad7a7fdcc0c6dd93fdac1578d75d63e7eb472296a",
+      "revision": "lower_step_v001",
+      "body_compression_multiplier": 1.25,
+      "leg_recovery_height_multiplier": 0.5
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

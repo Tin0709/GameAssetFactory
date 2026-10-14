@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "controls": [
+    {
+      "label": "before",
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\walk_v027_refined_v003\\body_snap_v001\\walk_v027_refined_review.blend",
+      "source_sha256": "890d2fd97de5be46c7438cf7f6dfb1ab01f32265e6ebf38e156a13ac17edb34e",
+      "action_sha256": "0dbeafec0e7a3e1679798ddad7a7fdcc0c6dd93fdac1578d75d63e7eb472296a",
+      "review_start_frame": 1,
+      "rendered_frames": 63,
+      "fps": 30,
+      "temporary_repeat_only": true,
+      "read_only": true
+    }
+  ]
+}

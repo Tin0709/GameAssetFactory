@@ -1,0 +1,35 @@
+{
+  "action": "Walk_Snappy_V027_Refined_Test_v003",
+  "status": "pending",
+  "same_action_updated_in_place": true,
+  "entries": 27,
+  "frames": [
+    1,
+    21
+  ],
+  "closing_key": 22,
+  "fps": 30,
+  "nominal_speed_m_s": 1.59936,
+  "tracks_m": 0.267,
+  "nominal_gap_m": 0.042,
+  "leg_recovery_height_multiplier": 0.5,
+  "leg_XY_and_rotation_preserved": true,
+  "body_parameters": {
+    "trough_time_s": 0.07500488281239344,
+    "baseline_contact_height_m": 0.7222261428833008,
+    "baseline_trough_height_m": 0.669895350933075,
+    "baseline_compression_m": 0.05233079195022583,
+    "requested_compression_multiplier": 1.25,
+    "rebound_extra_m": 0.0015,
+    "recovery_end_s": 0.135,
+    "rebound_peak_s": 0.175,
+    "settle_end_s": 0.23,
+    "head_additional_lift_m": [
+      -0.002,
+      0.002
+    ],
+    "head_history_s": 0.035
+  },
+  "measured_compression_multiplier": 1.249999715250608,
+  "action_sha256": "30dd70cd05dfe918ac17f52d8ccc847014d8c40a8176c0e316fdb3c3b2267034"
+}

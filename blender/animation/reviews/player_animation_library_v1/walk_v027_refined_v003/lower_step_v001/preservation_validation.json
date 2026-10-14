@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "protected_files": 6640,
+  "same_action_and27_entries": true,
+  "all26_other_actions_and_entries_exact": true,
+  "previous_v003_sources_and_reviews_exact": true,
+  "leg_recovery_clearance_multiplier": 0.5,
+  "body_compression_multiplier": 1.25,
+  "stance_cadence_and_horizontal_foot_paths_preserved": true,
+  "godot_unchanged": true,
+  "rig_unchanged": true
+}
