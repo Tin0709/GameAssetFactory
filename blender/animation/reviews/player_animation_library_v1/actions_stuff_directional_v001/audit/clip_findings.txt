@@ -1,0 +1,74 @@
+ACTIONS & STUFF 1.12 DIRECTIONAL CLIP AUDIT
+Read-only inspection of actual .mcpack plus accepted study source. No repo or Blender changes.
+
+Sources
+Pack: /Users/tin/Desktop/Game Dev/local_references/Actions Stuff 1.12 (resources).mcpack
+Aliases/scripts: entity/dtr.json
+All eight movement clips and auxiliary clips: animations/f2da1071.json
+Movement and layer controllers: animation_controllers/616f2ff7.json
+Raw player aliases, scripts, aliased clips/controllers extracted beside this report for private audit.
+
+Directional identifiers
+                    Forward       Backward      Right         Left
+Walk alias          walk          kzuqni        vwyhwm        pvgbyg
+Walk id suffix      tldiyl        eaqhvv        fpushb        dfajpq
+Run alias           move          pgnnhd        move_right    move_left
+Run id suffix       fngydr        fcsrsv        pmgjno        qzziyu
+Prefix animation.oreville_ans. applies to every suffix.
+All are loop true, length 1, anim_time_update=v.eqhdel.
+Walk clip blend weight=clamp(v.esnrkj*3,0,1); Run=v.esnrkj.
+No override_previous_animation is set on any player-aliased clip.
+
+Runtime controller and phase
+veywgp -> controller.animation.oreville_ans.lhbuwm is ordinary player locomotion.
+Walk state onccai; Run state run. Controller order F, R, L, B, extra layers, oprmcp.
+Let f=v.cknrcn, s=v.mrmeib. Controller weights are:
+ F=f-.25*abs(s); R=s-.25*abs(s); L=-s-.25*abs(s); B=-f-.25*abs(s).
+These source values can be negative. Existing accepted Run explicitly assumes nonpositive weights inactive; source JSON alone does not settle engine clipping semantics. Do not claim this assumption is engine verified.
+At speed threshold esnrkj>.7 and state_time>.2 Walk transitions to Run; Run returns at esnrkj<.6 and state_time>.2. Both states blend_transition=.22 seconds. This is state crossfade, not a direction-triggered phase reset.
+pre_animation[29] runs BEFORE [30]. Direction smoothing in [29] uses the preceding sfdeke/nqexps values; [30] computes the next targets.
+Phase updates before direction smoothing:
+ njrdop=abs(esnrkj+abs(mrmeib)*.25*min(1,esnrkj*3))
+ eqhdel += delta_time*sqrt(njrdop)*1.6
+ if gadjrq is nonzero, eqhdel=gadjrq instead; then gadjrq=0.
+Each loop evaluates q.anim_time=eqhdel modulo 1; keep common phase continuous across all directional changes.
+At straight forward esnrkj=.6103515625, phase rate=1.25/s, matching accepted .8-second Walk period. At esnrkj=1 and no lateral, phase rate=1.6/s, matching accepted Run .625-second core period. At esnrkj=1 and abs(mrmeib)=1, phase rate=1.788854382/s: retaining 1.6/s on strafes is a declared study adaptation, not literal runtime behavior.
+
+Literal clip evaluator minimum
+Eight directional clips only require numeric vectors, scalar expression evaluation, and default linear interpolation between numeric keyframe vectors. No Catmull-Rom/pre/post inside these eight. Missing rotation/position=[0,0,0], missing scale=[1,1,1]. Sample authored keyframe times exactly and densely sample analytical channels.
+Molang trig is degrees. Need sin, cos, atan, min, max, abs, clamp, ternary > test, + - * /. Backward fcsrsv and lateral pmgjno/qzziyu waist position use ternary and atan; accepted Run evaluator lacks both. Do not replace these with generic bounce functions.
+Accumulate source local channel values at their literal weights before forming transforms; do not blend completed actor transforms/quaternions in place of source-channel composition. Holding needs ordered `this` channel semantics. Full runtime may require stateful scripts and additional Molang operators beyond this minimum.
+Run leg scale is authored: vertical model Y peaks 1.07. All four Run clips contain leg rotation, position, scale; all four Walk clips contain leg rotation and position only. Side Run arms omit position while forward/backward Run arms have it.
+Backward Walk is separately authored: swing amplitude 24 degrees vs forward 37.2; waist/head phase offsets differ. Side Walk/Run legs swing chiefly about source Z with +/-5-degree source X offsets. Side arms are distinct poses. Therefore replaying a rotated forward gait is not source adaptation.
+Walk side-loop seam: fpushb leftleg.position at phase0=[.078,.7,0], phase1=[0,.7,0]; dfajpq [.922,.7,0] vs [1,.7,0]. Preserve raw endpoint and evaluate loop boundary explicitly; no silent closing-key replacement.
+
+Auxiliary source layers
+xfltzh -> boabcq root yaw correction [0,-q.body_y_rotation+nthjcy,0], waist yaw [0,upxhvv*-22.5*esnrkj,0], head yaw same correction. It precedes locomotion in rzkmtm/xunqct controller.
+hxfxxu -> ktgnrt Run bank: root/head source Z=-bdjsdw*.03, waist Z=-bdjsdw*.05; weighted esnrkj in Run, absent in Walk state.
+bdjsdw += ((sfdeke>0 ? clamp(q.yaw_speed,-48,48) : 0)-bdjsdw)*5*delta_time.
+bob -> tdrcwc uses life_time in degrees at frequencies122.5 and245, independent of gait phase; no short full-composite loop. Accepted Run retains it, accepted Walk omits it.
+xahrzd -> ucaryc sprint onset is independent state time, hold_on_last_frame length1.25. Endpoint waist X=5; left/right arms [0,+8,-10]/[0,-8,+10]. Onset Catmull-Rom cannot be evaluated with steady-endpoint-only existing Run evaluator. Preserve endpoint when sprint is held; only implement transient if studying sprint state changes.
+holding -> dpjhxl blend_weight=.5: arm X increment=-this*holding_flag, so attenuates existing X by1-.5*flag at that ordered layer. Accepted Run standard item right flag=1, left=0; accepted Walk no holding layer.
+look_at_target -> cndmcx head relative_to.rotation=entity and angles [q.target_x_rotation,wyuvst,0]. Parent rotation must be canceled while head pivot inherits parent translation, then entity/actor yaw applies. Existing Run handles this; accepted Walk inherits parent rotation.
+oprmcp -> przmfq only timeline events at .45 sxqiqn=1 and .95 ywlneb=1. They are step-event flags, not contact constraints. No explicit foot-lock/IK/contact curve exists in the eight movement clips.
+
+Native transform adaptation
+Both studies preserve native 1.8m proportions, source shoulder pivot two model units below shoulder cap, source legs independent of waist/hips. Keep independent source leg matrices and solve away native Hips inheritance.
+Coordinate C=[[-1,0,0],[0,0,1],[0,1,0]], translation=(sourceX,sourceZ,sourceY)*unit.
+Run uses R=C*(Rz(z)*Ry(-y)*Rx(-x))*C^-1; scale diagonal(sourceX,sourceZ,sourceY). Transform T(position)*T(pivot)*R*S*T(-pivot).
+Walk accepted source uses C*BlenderEuler(-x,-y,z,ZYX)*C^-1, with no source scale. This order differs from Run explicit RzRyRx. Preserve per-study transform mode if unchanged accepted straight behavior is mandatory; a unified corrected runtime mode changes accepted Walk.
+Root bank must affect body AND independent source legs. Entity-relative head rotation cancels root/waist/body rotations but keeps transformed head-pivot translation. Root facing derived from source runtime is distinct from trajectory travel direction; legitimate actor yaw does not justify turning forward gait into every direction.
+
+Accepted-study mismatches that must be declared
+Walk: isolated full-weight forward clip, fixed .8s loop, ZYX adaptation, parent-relative head, no bob/holding/turn/controller layers, floor lowered38mm, no contact correction.
+Run: full-weight forward clip plus life-time bob, held sprint endpoint2s, holding attenuation, phase1.6/s, XYZ/exact matrix order, entity-relative head, bank0, terrain0. It is not a full dynamic input runtime.
+Neither existing source evaluator is sufficient as-is for all directional clips/runtime. A faithful adaptation should add literal clip channels and required evaluator operators, keep each accepted transform mode, and declare the differences from complete engine runtime.
+
+Review checks
+Evaluate source numeric channels independently at keyframes and interstitial samples. At pure forward weights ensure new study desired matrices reproduce each accepted profile. Check lateral/backwards poses at fixed common phases0,.125,.25,.375,.5,.625,.75,.875. Check nonuniform Run scales remain. Test direction spam with continuous phase and source weights; detect zeros/NaNs around stop/input reversal. Check raw lateral Walk endpoint seam is preserved. Keep contact-event flags separate from any presentation marker; do not add procedural foot locking.
+
+Primary semantic references consulted
+https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_animation.v1.8.0?view=minecraft-bedrock-stable
+Confirms anim_time_update, override resets affected bones to default pose, entity-relative rotation, interpolation modes.
+https://learn.microsoft.com/en-us/minecraft/creator/documents/animations/animationcontroller?view=minecraft-bedrock-stable
+Confirms ordered controller animations, simple lerp state crossfade, only one state transition per frame. Does not establish negative-weight semantics for this pack.

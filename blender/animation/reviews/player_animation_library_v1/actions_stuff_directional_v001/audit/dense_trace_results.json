@@ -1,0 +1,36 @@
+[
+  {
+    "fps": 30,
+    "samples": 3600,
+    "states": [
+      "onccai",
+      "run"
+    ],
+    "turn_branches": [
+      false,
+      true
+    ],
+    "final_phase": 156.46904670583325,
+    "raw_weight_range": [
+      -1.2498862496357341,
+      1.0
+    ]
+  },
+  {
+    "fps": 60,
+    "samples": 7200,
+    "states": [
+      "onccai",
+      "run"
+    ],
+    "turn_branches": [
+      false,
+      true
+    ],
+    "final_phase": 156.40654427821352,
+    "raw_weight_range": [
+      -1.249766635060818,
+      1.0
+    ]
+  }
+]

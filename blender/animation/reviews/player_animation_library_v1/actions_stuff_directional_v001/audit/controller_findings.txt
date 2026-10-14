@@ -1,0 +1,92 @@
+SOURCE-FAITHFUL PLAYER CONTROLLER AUDIT
+Archive: /Users/tin/Desktop/Game Dev/local_references/Actions Stuff 1.12 (resources).mcpack
+SHA256: 9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d
+Exact JSON excerpts and complete selected clips/controllers: source_excerpts.json
+All array indexes below are zero based.
+
+1. Actual alias chain
+entity/dtr.json is minecraft:player. Its scripts.animate includes rzkmtm weighted by !v.is_paperdoll&&!v.is_first_person&&!q.is_spectator.
+rzkmtm -> controller.animation.oreville_ans.xunqct.
+xunqct.default includes veywgp weighted by !q.any(v.tnlxsa,3,13)?!q.is_gliding-v.jkpkmj.
+veywgp -> controller.animation.oreville_ans.lhbuwm (ordinary ground locomotion).
+The tnlxsa=3 branch is dprsws -> controller.oajpnn. tnlxsa=13 uses zpbnrr -> controller.ofwkgu. These have different clip sets/extra states; do not silently treat all character types identically.
+xunqct also executes xfltzh -> animation.boabcq (root yaw correction), and hsfnbp -> controller.ooprql -> look_at_target -> animation.cndmcx (head targeting).
+
+2. Direction and input are separate from raw keyboard keys
+pre_animation[30] reads local q.movement_direction(0/2); remote players instead derive direction from x/z position deltas when positions differ. The x/z vector is normalized. No W,D,S,A keyboard querying exists in this path. It runs only when esnrkj>0.01; otherwise direction components are zero.
+Let hx=sin(-q.head_y_rotation(0)), hz=cos(q.head_y_rotation(0)), dx=iajodc, dz=qpjczw:
+ sfdeke = dx*hx + dz*hz (forward component)
+ nqexps = -(dx*hz + dz*-hx) (lateral component)
+This defines camera/head-relative inputs, not body-relative inputs.
+pre_animation[29] runs BEFORE [30]; direction smoothing and phase integrate the prior frame directional values. Preserve evaluation order in a simulation.
+
+3. Speed and shared gait phase
+pre_animation[27] measures position delta over elapsed life_time since the last change. lzwweo is horizontal distance/time, obhshf is 3D distance/time. After unchanged position for >0.03s, both decay with factor (1-6*dt). Horizontal velocity components remain until the next changed-position sample.
+ esnrkj += (clamp(lzwweo/4.3,0,1)-esnrkj) * ((rvwafl?18:13)*dt)
+pre_animation[29], absent a nonzero gadjrq override:
+ njrdop = abs(esnrkj + abs(mrmeib)*0.25*min(1,esnrkj*3))
+ eqhdel += dt * sqrt(njrdop) * 1.6
+ ifcvde = mod(eqhdel,1)
+All 8 ordinary Walk/Run directional clips are loop=true, animation_length=1, anim_time_update=v.eqhdel. Phase is global rather than tied to direction or controller state_time. No reset is triggered by W/D/S/A changes, 180 reversals, or the normal onccai<->run transitions. It continues even when direction changes through zero, according to smoothed speed and previous lateral component. At esnrkj=1 and no lateral contribution, the cycle period is 0.625s. This is not per-key restarted playback.
+Actual phase exceptions exist in jump/recovery animations; phase_override_exceptions.json records them. pre_animation[29] copies nonzero gadjrq into eqhdel, then clears gadjrq. Do not generalize the no-reset finding to jumps/recoveries.
+
+4. Actual directional weights and clip aliases
+Let f=cknrcn, s=mrmeib, a=abs(s).
+Raw controller weights, in order, are f-.25*a, s-.25*a, -s-.25*a, -f-.25*a.
+Walk state onccai aliases: walk -> animation.tldiyl; vwyhwm -> animation.fpushb; pvgbyg -> animation.dfajpq; kzuqni -> animation.eaqhvv.
+Run state run aliases: move -> animation.fngydr; move_right -> animation.pmgjno; move_left -> animation.qzziyu; pgnnhd -> animation.fcsrsv.
+All identifiers above have prefix animation.oreville_ans.
+Each Walk clip additionally has blend_weight=clamp(esnrkj*3,0,1). Each Run clip has blend_weight=esnrkj. These are separate from the controller expressions.
+The raw weights are not normalized and can be negative. Pure forward gives [1,0,0,-1]; pure lateral gives [-.25,.75,-1.25,-.25]. The source contains no explicit clamp around these ground weights. Negative-weight skipping/clamping must be labeled as an engine adapter assumption unless tested in Bedrock; do not feed negatives into a generic signed additive sum and call that source proven. Positive-weight clipping is strongly suggested by the intended cardinal blend pattern, but the official pages consulted do not explicitly specify this edge case.
+No directional state transition, discrete per-key turn action, dedicated 180 turn clip, turn-angle threshold, or phase restart exists in this ordinary ground path. Rapid alternation changes smoothed blend weights and torso values; it does not switch per-direction controller states.
+
+5. Walk/Run state transitions
+lhbuwm.initial_state = onccai (Walk).
+onccai -> run when esnrkj>0.7 && q.state_time>0.2.
+run -> onccai when esnrkj<0.6 && q.state_time>0.2.
+Both states blend_transition=0.22 (seconds when leaving state). These give hysteresis and minimum time in state. In steady conditions, thresholds correspond to horizontal speed >3.01 and <2.58 units/s, but do not replace the smoothed esnrkj threshold with raw speed.
+Higher priority transitions exist first: special overrides knxfvl, air when hkmncu>0.05, rvwafl alternate motion, then (in run) special xdchdk when undfyr && lzwweo>6.75 && pack option fyumxp=eysaic. Preserve listed transition priority; only one transition per frame per controller is documented.
+The ordinary states have no on_entry/reset. Alternate rvwafl states set v.vgieqh=1. Air entry resets xgnfpn, not eqhdel. No blend_via_shortest_path field is set on the ground Walk/Run states.
+Because esnrkj is clamp(speed/4.3), ordinary Minecraft speed values can put the controller in its state named run. Do not assume UI labels Walk and Run imply a known Minecraft sprint flag; choose and report simulation speed/state inputs explicitly.
+
+6. Torso/head turn logic
+pre_animation[29] unwraps q.head_y_rotation(0): head delta below -180 adds360; above180 subtracts360. It accumulates into vyjyhz. Current body target error ccwxuc=vyjyhz-nthjcy; tnswmo=min_angle(ccwxuc). If abs(tnswmo)>90, wyuvst=lerp(wyuvst,clamp(tnswmo,-90,90),.05); else wyuvst=tnswmo. The .05 factor is per frame, not dt-scaled.
+ bdjsdw += ((sfdeke>0?clamp(q.yaw_speed,-48,48):0)-bdjsdw)*(5*dt)
+The partial ternary is copied literally in JSON; its absent else is Molang's zero behavior.
+ txtwqb = attack_time==0 ? txtwqb+dt : 0
+ nwocdu = txtwqb<10 || sfdeke<-.3 || blocking || main_hand_item_use_duration || item_is_charged || is_swimming || cthrgf || gddzeg
+ tjbdov = esnrkj>.1 || cthrgf || gddzeg
+While tjbdov:
+ ufojdf += (vyjyhz-ufojdf)*(12*dt)
+ nthjcy = ufojdf + upxhvv*90 (computed before upxhvv's update this frame)
+If nwocdu && hirjne==0:
+ upxhvv *= (1-6*dt)
+ mrmeib += (nqexps-mrmeib)*(8*dt)
+ cknrcn += (sfdeke-cknrcn)*(8*dt)
+Else:
+ upxhvv += ((lzwweo>.1?nqexps*abs(nqexps):0)-upxhvv)*(6*dt)
+ cknrcn += ((sfdeke>-.3?1:-1)-cknrcn)*(8*dt)
+ mrmeib *= (1-6*dt)
+Thus >10s since last attack can enter travel-facing torso behavior with reduced strafe blend. Backward motion (sfdeke<-.3), blocking/items/swimming etc. force the strafe-facing branch. A WDSA test should report its attackless timer/branch or show both; the source changes behavior over 10s.
+At low speed, once unchanged-position timer>.1 && !rvwafl: sfdeke=nqexps=0; cknrcn/mrmeib decay6dt. nthjcy does not automatically integrate a new body target there.
+xfltzh -> animation.boabcq adds root/head Y=-q.body_y_rotation+v.nthjcy; waist Y=-22.5*upxhvv*esnrkj and cape opposite. This explicitly compensates engine body yaw; the source does more than blindly inherit vanilla body rotation.
+look_at_target -> animation.cndmcx sets head rotation relative_to entity to [q.target_x_rotation,wyuvst,0].
+Run hxfxxu -> animation.ktgnrt applies turn roll: root/head Z=-.03*bdjsdw, waist Z=-.05*bdjsdw, with controller weight esnrkj. Walk ordinary onccai has no hxfxxu turn-roll entry.
+
+7. What is missing or engine-owned
+Resource pack source provides no keyboard-to-velocity integration, friction/acceleration, mouse-to-head update law, collision/terrain solver, grounded contact calculation, or exact Bedrock animation evaluation implementation. q.movement_direction, q.position, q.yaw_speed, q.body_y_rotation, q.head_y_rotation and target_x/y_rotation are engine inputs. A near-stationary Blender display needs virtual/query positions and speeds distinct from display root translation; that is a research harness convention.
+There is no foot-lock, plant memory, IK, contact-preserving pivot, reverse-step selection or discrete turn-in-place algorithm in this audited ordinary ground path. Do not invent any and present it as Actions & Stuff. Foot motions here are clip transforms plus weighted blending.
+The exact world/head/entity coordinate mapping, negative weight engine handling, query update tick timing, state-transition interruption blending, and relative_to behavior should remain documented engine adapter limits absent Bedrock traces.
+Use a fixed timestep such as 60fps if simulating, preserve the source Euler dt factors (6,8,12,13,18) and prior-frame ordering, and label timestep as harness setup. Do not replace the source dt factors with arbitrary smoothstep/quaternion response and claim parity.
+
+Official docs consulted (no secondary sources):
+https://learn.microsoft.com/en-us/minecraft/creator/documents/animations/animationcontroller?view=minecraft-bedrock-stable
+Supports ordered transitions, only one transition per frame, pre_animation per-frame calculation, and simple state lerp with leaving-state blend_transition.
+https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_animation.v1.8.0?view=minecraft-bedrock-stable
+Supports anim_time_update time semantics.
+https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_movement.direction?view=minecraft-bedrock-stable
+Describes movement_direction as normalized entity position delta; it is not a key query.
+https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/queryfunctions/query_body_y_rotation?view=minecraft-bedrock-stable
+Describes engine body yaw return value; no body yaw dynamics specification.
+https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_animation_controller.v1.10.0?view=minecraft-bedrock-stable
+Supports blend_via_shortest_path option and state schema.

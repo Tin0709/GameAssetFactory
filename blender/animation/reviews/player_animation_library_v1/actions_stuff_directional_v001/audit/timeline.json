@@ -1,0 +1,106 @@
+[
+  {
+    "start": 0.0,
+    "end": 0.8,
+    "mode": "walk",
+    "kind": "idle",
+    "label": "STANDING / SOURCE IDLE",
+    "context": null
+  },
+  {
+    "start": 0.8,
+    "end": 3.5999999999999996,
+    "mode": "walk",
+    "kind": "keys",
+    "label": "A1 WALK | W D S A | 0.20 > 0.10 > 0.05s",
+    "context": "recent"
+  },
+  {
+    "start": 3.5999999999999996,
+    "end": 6.3999999999999995,
+    "mode": "walk",
+    "kind": "keys",
+    "label": "A2 WALK | SAME KEYS | RELAXED >10s",
+    "context": "relaxed"
+  },
+  {
+    "start": 6.3999999999999995,
+    "end": 8.399999999999999,
+    "mode": "walk",
+    "kind": "circle_fixed",
+    "label": "B1 WALK | CIRCLE INPUT / FIXED LOOK",
+    "context": null
+  },
+  {
+    "start": 8.399999999999999,
+    "end": 10.399999999999999,
+    "mode": "walk",
+    "kind": "circle_look",
+    "label": "B2 WALK | INPUT + LOOK TURN 360",
+    "context": null
+  },
+  {
+    "start": 10.399999999999999,
+    "end": 13.599999999999998,
+    "mode": "walk",
+    "kind": "reverse",
+    "label": "C WALK | W-S THEN A-D REVERSALS",
+    "context": null
+  },
+  {
+    "start": 13.599999999999998,
+    "end": 14.399999999999999,
+    "mode": "walk",
+    "kind": "idle",
+    "label": "WALK RELEASE / SOURCE DECELERATION",
+    "context": null
+  },
+  {
+    "start": 14.399999999999999,
+    "end": 17.2,
+    "mode": "run",
+    "kind": "keys",
+    "label": "A1 RUN | W D S A | 0.20 > 0.10 > 0.05s",
+    "context": "recent"
+  },
+  {
+    "start": 17.2,
+    "end": 20.0,
+    "mode": "run",
+    "kind": "keys",
+    "label": "A2 RUN | SAME KEYS | RELAXED >10s",
+    "context": "relaxed"
+  },
+  {
+    "start": 20.0,
+    "end": 22.0,
+    "mode": "run",
+    "kind": "circle_fixed",
+    "label": "B1 RUN | CIRCLE INPUT / FIXED LOOK",
+    "context": null
+  },
+  {
+    "start": 22.0,
+    "end": 24.0,
+    "mode": "run",
+    "kind": "circle_look",
+    "label": "B2 RUN | INPUT + LOOK TURN 360",
+    "context": null
+  },
+  {
+    "start": 24.0,
+    "end": 27.2,
+    "mode": "run",
+    "kind": "reverse",
+    "label": "C RUN | W-S THEN A-D REVERSALS",
+    "context": null
+  },
+  {
+    "start": 27.2,
+    "end": 28.0,
+    "mode": "run",
+    "kind": "idle",
+    "label": "RUN RELEASE / SOURCE DECELERATION",
+    "context": null
+  }
+]
