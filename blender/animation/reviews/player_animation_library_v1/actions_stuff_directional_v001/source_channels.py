@@ -120,11 +120,11 @@ class SourceChannels:
         return {'alias': alias, 'id': self.aliases[alias], 'controller_weight': controller_weight,
                 'clip_weight': own_weight, 'applied_weight': weight, 'clock': clock}
 
-    def _directional(self, snapshot, mode):
+    def _directional(self, snapshot, mode, clock=None):
         if mode not in DIRECTION_ALIASES:
             raise ValueError('Mode must be walk or run')
-        env = self._environment(snapshot)
-        clock = float(_get(snapshot, 'phase', 0))
+        clock = float(_get(snapshot, 'phase', 0) if clock is None else clock)
+        env = self._environment(snapshot, clock)
         state = self.controller['states']['onccai' if mode == 'walk' else 'run']
         expressions = {alias: expr for row in state['animations'] if isinstance(row, dict)
                        for alias, expr in row.items()}
@@ -154,6 +154,8 @@ class SourceChannels:
         return output
 
     def directional(self, snapshot, mode):
+        # Audit API accepts literal phase1 so an authored endpoint remains
+        # inspectable. Runtime sample below always uses animation-local modulo.
         out, self.last_metadata = self._directional(snapshot, mode.lower())
         return self._check(out)
 
@@ -161,17 +163,18 @@ class SourceChannels:
         run = float(_get(snapshot, 'run_weight', 0))
         if not math.isfinite(run) or not 0 <= run <= 1:
             raise ValueError('Controller run_weight must be in [0,1]')
-        walk, wm = self._directional(snapshot, 'walk')
-        running, rm = self._directional(snapshot, 'run')
+        unbounded = float(_get(snapshot, 'phase', 0))
+        p = unbounded % 1.
+        walk, wm = self._directional(snapshot, 'walk', p)
+        running, rm = self._directional(snapshot, 'run', p)
         out = {bone: {channel: [(1-run)*a+run*b for a, b in zip(walk[bone][channel], running[bone][channel])]
                       for channel in CHANNELS} for bone in BONES}
-        metadata = {'phase': float(_get(snapshot, 'phase', 0)), 'run_weight': run,
+        metadata = {'phase': p, 'unbounded_phase': unbounded, 'run_weight': run,
                     'core': {'walk': wm, 'run': rm}, 'layers': [],
                     'head_relative_to_entity': bool(extras),
                     'negative_weight_adapter': wm['negative_weight_adapter'], 'extras': bool(extras)}
         if extras:
-            env = self._environment(snapshot)
-            p = float(_get(snapshot, 'phase', 0))
+            env = self._environment(snapshot, p)
             layers = metadata['layers']
             layers.append(self._add_clip(out, 'xfltzh', env, p))
             layers.append(self._add_clip(out, 'hxfxxu', env, p, run*float(env.get('v.esnrkj', 0))))
