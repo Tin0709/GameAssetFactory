@@ -109,7 +109,12 @@ for side in ['L', 'R']:
                             lo, flo = mid, fm
                     roots.append((lo + hi) / 2)
                 previous = value
-    times[name] = sorted(set(grid + roots))
+    # Blender's FCurve.update merges keys closer than .01 frame. Leave a
+    # complete interval around each analytical cusp so its value survives.
+    roots = sorted(set(roots))
+    roots = [r for i, r in enumerate(roots) if i == 0 or r-roots[i-1] > .0101]
+    grid = [f for f in grid if not any(abs(f-r) < .0101 for r in roots)]
+    times[name] = sorted(grid + roots)
     cusps[name] = set(roots)
     records[name] = [target(f, side)[0] for f in times[name]]
 

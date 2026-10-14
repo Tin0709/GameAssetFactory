@@ -1,12 +1,15 @@
 extends "res://scenes/dev/expressive_locomotion_visual.gd"
 ## Test-only adapter inside the existing sole pose writer and contact solver.
 const SNAPPY=preload("res://assets/characters/snappy_locomotion_v1/snappy_library.res")
+const RUN_RECOVERY=preload("res://assets/characters/snappy_run_leg_recovery_v001/recovery_library.res")
 const SNAPPY_NAMES=["Walk_Snappy_V027_Refined_Test_v003","Run_Snappy_Test_v001"]
 const SNAPPY_WALK_STRIDE:=1.59936*.7
 const SNAPPY_RUN_STRIDE:=2.5*17.0/30.0
 var walk_anchor:=1.59936
 var run_anchor:=2.5
 var snappy_clips: Dictionary={}
+var recovery_clip: RefCounted
+var run_recovery_enabled:=false
 var source_profiles: Dictionary={}
 var snappy_enabled:=true
 var style_weight:=1.0
@@ -30,6 +33,7 @@ func _ready() -> void:
 	review_pace=1.0
 	super._ready()
 	for name in SNAPPY_NAMES:snappy_clips[name]=Sampler.new(SNAPPY.get_animation(name),skeleton)
+	recovery_clip=Sampler.new(RUN_RECOVERY.get_animation("Run_Snappy_LegRecovery_Test_v001"),skeleton)
 	source_profiles=JSON.parse_string(FileAccess.get_file_as_string("res://assets/characters/snappy_locomotion_v1/snappy_samples.json"))
 	walk_speed_scale=1.59936/.9;run_speed_scale=2.5/2.31
 	pose_dirty=true
@@ -38,6 +42,12 @@ func set_snappy(enabled: bool) -> void:
 	if snappy_enabled==enabled:return
 	snappy_enabled=enabled;style_toggles+=1;pose_dirty=true;transition_count+=1
 	# Preserve capsule, gait phase, receiving IDs and existing contact anchors.
+
+func set_run_recovery(enabled: bool) -> void:
+	if run_recovery_enabled==enabled:return
+	run_recovery_enabled=enabled;pose_dirty=true;transition_count+=1
+	# Same contact/vertical contract and phase; existing inertialization
+	# carries the displayed pose into the selected Run without a second writer.
 
 func reset_review() -> void:
 	# Reset is an explicit teleport. Cancel every world-space contact/replant
@@ -73,6 +83,7 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	if not move_requested or snappy_clips.is_empty():return control
 	var wp: RefCounted=snappy_clips[SNAPPY_NAMES[0]]
 	var rp: RefCounted=snappy_clips[SNAPPY_NAMES[1]]
+	if run_recovery_enabled:rp=recovery_clip
 	var phase:=fposmod(gait_phase+ahead*gait_frequency,1.0)
 	var p: Vector3=wp.position(bone,phase*wp.clip.length).lerp(rp.position(bone,phase*rp.clip.length),gait_run_weight)
 	var q: Quaternion=wp.rotation(bone,phase*wp.clip.length).slerp(rp.rotation(bone,phase*rp.clip.length),gait_run_weight).normalized()

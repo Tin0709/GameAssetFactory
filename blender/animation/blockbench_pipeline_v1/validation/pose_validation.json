@@ -1,0 +1,74 @@
+{
+  "tolerances": {
+    "sample_vertex_m": 2e-06,
+    "between_sample_vertex_m": 0.0001,
+    "rigid_distance_m": 2e-06
+  },
+  "minimal_tests": {
+    "BB_Neutral_Test_v001": {
+      "sample_vertex_error_m": 1.2310379476739693e-07,
+      "between_sample_vertex_error_m": 1.2310379476739693e-07,
+      "bone_matrix_error": 9.313225746154785e-10,
+      "actual_blockbench_corner_error_m": 8.462232866585662e-08,
+      "rigid_distance_error_m": 1.2310379476739693e-07,
+      "forearm_basis_error": 0,
+      "reference_samples": 241,
+      "import_samples": 121,
+      "status": "pending",
+      "action_signature": "43555857131eb90851324c22a3027c9da0bfd59190c8e19453b780396bb978b1"
+    },
+    "BB_RightArm_Test_v001": {
+      "sample_vertex_error_m": 3.589448174967141e-07,
+      "between_sample_vertex_error_m": 4.37231658341725e-06,
+      "bone_matrix_error": 6.98910513463602e-06,
+      "actual_blockbench_corner_error_m": 1.367744784853296e-07,
+      "rigid_distance_error_m": 4.2219998017123395e-07,
+      "forearm_basis_error": 0,
+      "reference_samples": 241,
+      "import_samples": 121,
+      "status": "pending",
+      "action_signature": "b6b61c98029050349dabd9b90f21efe4923769ab43166d679d820085ce94c3aa"
+    },
+    "BB_LeftArm_Test_v001": {
+      "sample_vertex_error_m": 3.577054704474748e-07,
+      "between_sample_vertex_error_m": 3.2679438976938246e-06,
+      "bone_matrix_error": 6.673439727933328e-06,
+      "actual_blockbench_corner_error_m": 1.2644054553268208e-07,
+      "rigid_distance_error_m": 3.6010283153040923e-07,
+      "forearm_basis_error": 0,
+      "reference_samples": 241,
+      "import_samples": 121,
+      "status": "pending",
+      "action_signature": "c526b2f8926b5145b32c1214fb763918d0447f826a334e1b014a08b62ed8e44a"
+    },
+    "BB_HeadTurn_Test_v001": {
+      "sample_vertex_error_m": 1.2310379476739693e-07,
+      "between_sample_vertex_error_m": 1.2310379476739693e-07,
+      "bone_matrix_error": 1.1920928955078125e-07,
+      "actual_blockbench_corner_error_m": 8.462232866585662e-08,
+      "rigid_distance_error_m": 1.2310379476739693e-07,
+      "forearm_basis_error": 0,
+      "reference_samples": 241,
+      "import_samples": 121,
+      "status": "pending",
+      "action_signature": "91f4c4637e63e41d45a54b91c262c92ad7f0aa7e1fd67d22ef32cf3f852884bf"
+    }
+  },
+  "rifle_test": {
+    "sample_vertex_error_m": 4.951133646320149e-07,
+    "between_sample_vertex_error_m": 4.951133646320149e-07,
+    "bone_matrix_error": 2.384185791015625e-07,
+    "actual_blockbench_corner_error_m": 5.840038639982171e-07,
+    "rigid_distance_error_m": 3.708075557162793e-07,
+    "forearm_basis_error": 0,
+    "reference_samples": 241,
+    "import_samples": 121,
+    "status": "pending",
+    "action_signature": "04496a69403c105ab09cebf672e94166830e1197a9059b0e0d11317ef02a0ada"
+  },
+  "original_actions": 28,
+  "original_rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+  "all_original_actions_unchanged": true,
+  "approved_actions_backed_up": 12,
+  "source": "blockbench_import_source_v001.blend"
+}
