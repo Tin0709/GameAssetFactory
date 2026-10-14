@@ -38,7 +38,8 @@ class PoseMonitor extends Node:
 				row.leg_angle_deg=maxf(row.leg_angle_deg,rad_to_deg(q[side].angle_to(previous[side])))
 				if v.foot_support[side] and last_support[side] and last_ids[side]==v.contact_ids[side] and not v.settling:
 					row.planted_speed_m_s=maxf(row.planted_speed_m_s,v.last_sole[side].distance_to(last_sole[side])/v.pose_delta)
-		previous=q;last_sole=v.last_sole.duplicate();last_ids=v.contact_ids.duplicate();last_support=v.foot_support.duplicate();reset_pending=false
+		previous=q;last_sole=v.last_sole.duplicate();last_ids=v.contact_ids.duplicate()
+		last_support=[v.foot_support[0] and not v.settling,v.foot_support[1] and not v.settling];reset_pending=false
 		row.trajectory.append([lab.actor.position.x,lab.actor.position.y,lab.actor.position.z,v.gait_phase,lab.actor.jump_state,v.gait_run_weight])
 
 func _initialize() -> void:call_deferred("run")
@@ -120,6 +121,7 @@ func run() -> void:
 		check(absf(a.current_speed-5.977875)<.04,"Original Run travel speed preserved")
 		check(absf(v.gait_frequency-a.current_speed/(2.5*17/30.*1.2*sqrt(1.15))*.75)<.001,"Current75% cadence preserved")
 	# Exercise live A/B at both support sides without resetting physics or phase.
+	monitor.key="live_AB"
 	for phase in [.08,.31,.58,.81]:
 		await at_phase(phase)
 		var old_phase: float=v.gait_phase

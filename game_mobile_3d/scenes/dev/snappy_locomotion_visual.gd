@@ -10,6 +10,9 @@ var run_anchor:=2.5
 var snappy_clips: Dictionary={}
 var recovery_clip: RefCounted
 var run_recovery_enabled:=false
+var recovery_weight:=0.0
+var recovery_from:=0.0
+var recovery_age:=.14
 var source_profiles: Dictionary={}
 var snappy_enabled:=true
 var style_weight:=1.0
@@ -45,14 +48,15 @@ func set_snappy(enabled: bool) -> void:
 
 func set_run_recovery(enabled: bool) -> void:
 	if run_recovery_enabled==enabled:return
-	run_recovery_enabled=enabled;pose_dirty=true;transition_count+=1
-	# Same contact/vertical contract and phase; existing inertialization
-	# carries the displayed pose into the selected Run without a second writer.
+	run_recovery_enabled=enabled;recovery_from=recovery_weight;recovery_age=0.;transition_count+=1
+	# Only the two leg samples crossfade. Reinitializing full-body inertia
+	# here would disturb the approved torso/hip velocity despite equal poses.
 
 func reset_review() -> void:
 	# Reset is an explicit teleport. Cancel every world-space contact/replant
 	# cache and seed the approved Idle before the same writer evaluates again.
 	move_requested=false;settling=false;settle_time=0;attention_time=0
+	recovery_weight=1.0 if run_recovery_enabled else 0.0;recovery_from=recovery_weight;recovery_age=.14
 	gait_phase=.28;gait_run_weight=0;gait_frequency=0;run_transition_active=false
 	style_weight=1.0 if snappy_enabled else 0.0
 	pivot_load=Vector3.ZERO;travel_bias=0;facing_velocity=0;rotation=Vector3.ZERO
@@ -83,10 +87,14 @@ func _target_pose(bone: int, ahead: float=0.0) -> Transform3D:
 	if not move_requested or snappy_clips.is_empty():return control
 	var wp: RefCounted=snappy_clips[SNAPPY_NAMES[0]]
 	var rp: RefCounted=snappy_clips[SNAPPY_NAMES[1]]
-	if run_recovery_enabled:rp=recovery_clip
 	var phase:=fposmod(gait_phase+ahead*gait_frequency,1.0)
-	var p: Vector3=wp.position(bone,phase*wp.clip.length).lerp(rp.position(bone,phase*rp.clip.length),gait_run_weight)
-	var q: Quaternion=wp.rotation(bone,phase*wp.clip.length).slerp(rp.rotation(bone,phase*rp.clip.length),gait_run_weight).normalized()
+	var run_p: Vector3=rp.position(bone,phase*rp.clip.length)
+	var run_q: Quaternion=rp.rotation(bone,phase*rp.clip.length)
+	if bone in [leg_left,leg_right] and recovery_weight>0:
+		run_p=run_p.lerp(recovery_clip.position(bone,phase*recovery_clip.clip.length),recovery_weight)
+		run_q=run_q.slerp(recovery_clip.rotation(bone,phase*recovery_clip.clip.length),recovery_weight).normalized()
+	var p: Vector3=wp.position(bone,phase*wp.clip.length).lerp(run_p,gait_run_weight)
+	var q: Quaternion=wp.rotation(bone,phase*wp.clip.length).slerp(run_q,gait_run_weight).normalized()
 	var result:=Transform3D(Basis(control.basis.get_rotation_quaternion().slerp(q,style_weight).normalized()),control.origin.lerp(p,style_weight))
 	if bone in [leg_left,leg_right] and absf(travel_bias)>.00001:
 		var rest:=skeleton.get_bone_rest(bone)
@@ -116,6 +124,10 @@ func _authored_support(side: int) -> bool:
 
 func drive_locomotion(world_velocity: Vector3, requested: bool, delta: float) -> void:
 	_pending_physics_delta+=delta
+	recovery_age=minf(recovery_age+delta,.14)
+	var recovery_u:=recovery_age/.14
+	var recovery_ease:=recovery_u*recovery_u*recovery_u*(10.+recovery_u*(-15.+6.*recovery_u))
+	recovery_weight=lerpf(recovery_from,1.0 if run_recovery_enabled else 0.0,recovery_ease)
 	style_weight=move_toward(style_weight,1.0 if snappy_enabled else 0.0,delta/.20)
 	var planar:=Vector3(world_velocity.x,0,world_velocity.z)
 	movement_speed=planar.length()

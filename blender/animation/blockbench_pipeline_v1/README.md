@@ -76,3 +76,5 @@ All **28 existing Actions**, including **12 approved Actions**, retain their con
 - This preserves evaluated poses, not Blockbench's editable curve structure or original keyframe tangents. Exported files retain timestamps, source duration and loop intent. Registration remains conservatively non-seamless until pose AND velocity seams are separately checked. Test clips here are one-shots, not locomotion/weapon layers.
 - Root translation is possible as bone motion, but physics/world travel ownership, gameplay layering, foot contacts, interruption and animation transitions still need separately authorized Godot validation. No Godot, production animation, controller or export changes were made.
 - A static Ready round-trip proves transfer fidelity and straight limbs. It does not establish a new artistic approval, dynamic weapon handling quality, production readiness or mobile performance.
+
+Format reference: [official Blockbench bbmodel documentation](https://www.blockbench.net/wiki/docs/bbmodel/). Implementation behavior was checked against the installed 5.2.2 runtime.
