@@ -7,6 +7,7 @@ from bpy.app.handlers import persistent
 from bpy.props import StringProperty,IntProperty,BoolProperty,CollectionProperty
 
 SCENE_TAG='gaf_animation_showcase';RIG='Showcase_Player_Rig';BASELINE='GAF_Neutral_Pose.json'
+REVIEW_TAG='gaf_review_sequence_id';REVIEW_ENTRY='gaf_review_entry_json'
 PREVIEW_PROPS={'rifle_stylized_v2':('GAF_Rifle_V2_Preview','GAF_Rifle_V2_Attachment','WeaponCarrier')}
 _switching=False
 
@@ -40,6 +41,11 @@ def load_manifest():
     for e in data['animations']:
         if e['status'] not in ['approved','pending']:raise ValueError('Use approved or pending status explicitly')
         validate_timing(e)
+    sequences=data.get('review_sequences',[])
+    if not isinstance(sequences,list):raise ValueError('Review sequences must be a list')
+    ids=[e['id'] for e in sequences]
+    if len(ids)!=len(set(ids)) or any(not isinstance(i,str) or not i for i in ids):raise ValueError('Review sequence IDs must be nonempty and unique')
+    for e in sequences:validate_timing(e)
     return data
 
 def validate_timing(e):
@@ -87,6 +93,95 @@ def show_preview_prop(scene,entry):
     for key,(collection,_,_) in PREVIEW_PROPS.items():
         c=bpy.data.collections.get(collection)
         if c:c.hide_render=c.hide_viewport=(entry.get('preview_prop')!=key)
+
+def review_entries(scene):
+    """Saved data remains usable when a study is opened outside the library folder."""
+    if scene.get(SCENE_TAG):
+        return json.loads(scene.get('gaf_manifest_snapshot','{}')).get('review_sequences',[])
+    if scene.get(REVIEW_TAG):return [json.loads(scene[REVIEW_ENTRY])]
+    return []
+
+def validate_review_sequence(entry):
+    """Validate an isolated research take without widening reusable Action policy."""
+    validate_timing(entry)
+    if entry.get('status')!='pending' or entry.get('research_only') is not True or entry.get('production_eligible') is not False or entry.get('seamless_loop') is not False:
+        raise ValueError('Review sequences must be Pending, nonseamless research only')
+    scene=bpy.data.scenes.get(entry['scene']);rig=bpy.data.objects.get(entry['rig']);mesh=bpy.data.objects.get(entry['mesh']);world=bpy.data.objects.get(entry['world_root'])
+    if scene is None or scene.get(REVIEW_TAG)!=entry['id'] or scene.get(SCENE_TAG):raise ValueError('Registered review scene is missing or incompatible')
+    if rig is None or rig.type!='ARMATURE' or rig.name==RIG or mesh is None or mesh.type!='MESH' or world is None or world.type!='EMPTY':raise ValueError('Review sequence requires its own rig, mesh and presentation Empty')
+    if any(o.name not in scene.objects for o in [rig,mesh,world]):raise ValueError('Review actor is outside the registered scene')
+    native=bpy.data.objects[RIG]
+    if rest_signature(rig.data)!=entry['rig_sha256'] or entry['rig_sha256']!=rest_signature(native.data):raise ValueError('Review sequence rest rig differs from the native rig')
+    if len(rig.pose.bones)!=13 or entry.get('rotation_modes')!={b.name:b.rotation_mode for b in rig.pose.bones}:raise ValueError('Review sequence bone count or rotation modes differ')
+    if rig.parent!=world or world.parent is not None or mesh.parent!=rig or not any(m.type=='ARMATURE' and m.object==rig for m in mesh.modifiers):raise ValueError('Review sequence actor parentage is incompatible')
+    identity=Matrix.Identity(4)
+    if any(abs(rig.matrix_parent_inverse[i][j]-identity[i][j])>1e-6 or abs(rig.matrix_basis[i][j]-identity[i][j])>1e-6 for i in range(4) for j in range(4)) or any(abs(v-1)>1e-6 for v in world.scale):raise ValueError('Review rig basis, parent inverse and presentation scale must be identity')
+    for obj in [rig,mesh,world]:
+        if obj.constraints or (obj.animation_data and (obj.animation_data.nla_tracks or obj.animation_data.drivers)):raise ValueError('Review sequences require baked transforms without constraints, NLA or drivers')
+    if any(b.constraints for b in rig.pose.bones):raise ValueError('Review sequence bone constraints are unsupported')
+    for prefix,obj in [('pose',rig),('presentation',world)]:
+        action=bpy.data.actions.get(entry[prefix+'_action'])
+        if action is None or len(action.slots)!=1 or action.slots[0].target_id_type!='OBJECT' or action.slots[0].identifier!=entry[prefix+'_slot_identifier']:raise ValueError('Review sequence Action slot is incompatible')
+        if len(action.layers)!=1 or len(action.layers[0].strips)!=1 or len(action.layers[0].strips[0].channelbags)!=1 or action.layers[0].strips[0].channelbags[0].slot_handle!=action.slots[0].handle:raise ValueError('Review sequences require one baked layer, strip and channel bag')
+        if action_signature(action)!=entry[prefix+'_action_sha256']:raise ValueError('Review sequence Action signature changed')
+        if not action.frame_range[0]<=entry['start']<=entry['end']<=action.frame_range[1]:raise ValueError('Review sequence playback is outside Action keys')
+        if not curves(action):raise ValueError('Review sequence Action has no keys')
+        for c in curves(action):
+            if c.sampled_points or c.modifiers or not c.keyframe_points:raise ValueError('Review sequences require keyed curves without modifiers')
+            if any(k.interpolation!='LINEAR' or any(not math.isfinite(v) for p in [k.co,k.handle_left,k.handle_right] for v in p) for k in c.keyframe_points):raise ValueError('Review sequence keys must be finite and LINEAR')
+            if prefix=='presentation':
+                if c.data_path not in ['location','rotation_euler'] or not 0<=c.array_index<3:raise ValueError('Presentation Action supports only Empty location and Euler rotation')
+                continue
+            match=re.fullmatch(r'pose\.bones\["([^"\n]+)"\]\.(location|rotation_euler|rotation_quaternion|scale)',c.data_path)
+            if match is None:raise ValueError('Review pose Action supports only bone transforms')
+            bone_name,prop=match.groups()
+            if bone_name not in rig.pose.bones or not 0<=c.array_index<len(rig.path_resolve(c.data_path)):raise ValueError('Invalid review bone transform channel')
+            if bone_name.startswith('ForeArm.'):
+                neutral=1. if (prop=='scale' or (prop=='rotation_quaternion' and c.array_index==0)) else 0.
+                if any(abs(k.co.y-neutral)>1e-6 for k in c.keyframe_points):raise ValueError('Review sequence cannot invent ForeArm articulation')
+            if prop=='scale':
+                low,high=(1.,1.070002) if bone_name in ['Leg.L','Leg.R'] and c.array_index==1 else (1.,1.)
+                if any(k.co.y<low-1e-6 or k.co.y>high for k in c.keyframe_points):raise ValueError('Review scale exceeds the verified leg Y bounds')
+    if entry['pose_action']==entry['presentation_action']:raise ValueError('Pose and presentation Actions must be separate')
+    cameras=entry.get('cameras',{})
+    if set(cameras)!={'FRONT','THREE_QUARTER','SIDE'}:raise ValueError('Review sequence requires Front, 3/4 and Side cameras')
+    for name in cameras.values():
+        camera=bpy.data.objects.get(name)
+        if camera is None or camera.type!='CAMERA' or name not in scene.objects:raise ValueError('Registered review camera is missing')
+    home=bpy.data.scenes.get(entry['return_scene'])
+    if home is None or not home.get(SCENE_TAG):raise ValueError('Review sequence return library is missing')
+    return scene
+
+def stop_playback(context):
+    if context.screen and context.screen.is_animation_playing:
+        with bpy.context.temp_override(window=context.window,screen=context.screen):bpy.ops.screen.animation_cancel(restore_frame=False)
+
+def open_review_sequence(context,sequence_id):
+    entries=[e for scene in bpy.data.scenes if scene.get(SCENE_TAG) for e in review_entries(scene)]
+    entry=next((e for e in entries if e['id']==sequence_id),None)
+    if entry is None:
+        entry=next((e for e in review_entries(context.scene) if e['id']==sequence_id),None)
+    if entry is None:raise ValueError('Review sequence is not registered: '+sequence_id)
+    scene=validate_review_sequence(entry)
+    stop_playback(context);context.window.scene=scene
+    rig=bpy.data.objects[entry['rig']];world=bpy.data.objects[entry['world_root']]
+    for prefix,obj in [('pose',rig),('presentation',world)]:
+        action=bpy.data.actions[entry[prefix+'_action']]
+        obj.animation_data_create();obj.animation_data.action=action;obj.animation_data.action_slot=action.slots[0]
+    scene[REVIEW_ENTRY]=json.dumps(entry)
+    scene.frame_start=entry['start'];scene.frame_end=entry['end'];scene.render.fps=entry['fps'];scene.render.fps_base=entry['fps_base']
+    scene.use_preview_range=False;scene.sync_mode='NONE';scene.gaf_loop=False;scene.gaf_error='';scene.frame_set(entry['start'])
+    for obj in context.window.view_layer.objects:obj.select_set(False)
+    context.window.view_layer.objects.active=rig;rig.select_set(True)
+    view(scene,'THREE_QUARTER')
+    return scene
+
+def return_library(context):
+    entry=json.loads(context.scene[REVIEW_ENTRY]);home=bpy.data.scenes.get(entry['return_scene'])
+    if home is None or not home.get(SCENE_TAG):raise ValueError('Review sequence return library is missing')
+    stop_playback(context);context.window.scene=home
+    for area in context.window.screen.areas:area.tag_redraw()
+    return home
 
 def activate(scene,index):
     if not scene.get(SCENE_TAG) or not scene.gaf_clips:return
