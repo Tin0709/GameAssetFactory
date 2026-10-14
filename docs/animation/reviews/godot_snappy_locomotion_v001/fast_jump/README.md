@@ -1,5 +1,7 @@
 # Snappy Fast + Jump gameplay review — 2026-10-14
 
+**Current speed revision:** user requested25% slower movement. Walk is now2.278125 m/s and Run4.48340625 m/s in both A/B styles. Camera and jump settings unchanged. The movies and reports below preserve the earlier faster review; current speed-check reports are in `.validation/snappy_speed075_20261014`. Previous runtime files are backed up there too.
+
 Open `game_mobile_3d/scenes/dev/SnappyLocomotionFastJumpTest.tscn` in Godot and press **F6**. This separate test matches the actual current ExpressiveLocomotionTest defaults. Production remains unchanged.
 
 | Setting | Matched value |

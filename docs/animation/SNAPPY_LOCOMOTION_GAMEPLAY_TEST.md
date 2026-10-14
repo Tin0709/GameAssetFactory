@@ -2,7 +2,7 @@
 
 Current scene: `game_mobile_3d/scenes/dev/SnappyLocomotionFastJumpTest.tscn`. Open it in Godot and press **F6**.
 
-WASD/arrows move; Shift runs; Space jumps; Tab switches Snappy/Expressive;4 restores the original camera;R resets;F9 demos;F8 caps30/60 FPS. Walk3.0375 m/s, Run5.977875 m/s. Exact existing Expressive camera: orthographic size11.25,25 m relative distance, rotation(-36.315886,36.869898,0), offset(12,15,16). Existing2 m jump reused.
+WASD/arrows move; Shift runs; Space jumps; Tab switches Snappy/Expressive;4 restores the original camera;R resets;F9 demos;F8 caps30/60 FPS. Walk2.278125 m/s, Run4.48340625 m/s (25% slower per latest user request). Exact existing Expressive camera: orthographic size11.25,25 m relative distance, rotation(-36.315886,36.869898,0), offset(12,15,16). Existing2 m jump reused.
 
 [Review movies, checks and evaluation](reviews/godot_snappy_locomotion_v001/fast_jump/README.md). [Preserved native-speed test](reviews/godot_snappy_locomotion_v001/README.md).
 

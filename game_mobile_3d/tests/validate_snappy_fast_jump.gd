@@ -38,10 +38,14 @@ func run() -> void:
 		v.set_snappy(snappy);await ticks(.3,"Fast A/B Idle")
 		a.requested_direction=Vector2.DOWN;a.requested_run=false
 		await ticks(1.2,"Stable fast Walk")
-		check(absf(a.current_speed-3.0375)<.04,"Walk matches actual existing test travel speed")
+		check(absf(a.current_speed-3.0375)<.04,"Original Walk travel speed restored")
+		var walk_stride:=lerpf(1.08,1.59936*.7,v.style_weight)*sqrt(1.5)
+		check(absf(v.gait_frequency-a.current_speed/walk_stride*.75)<.001,"Walk animation cadence25% slower with original travel speed")
 		check(v.gait_run_weight<.001,"Fast Walk does not accidentally select Run")
 		a.requested_run=true;await ticks(1.3,"Stable fast Run")
-		check(absf(a.current_speed-5.977875)<.04,"Run matches actual existing test travel speed")
+		check(absf(a.current_speed-5.977875)<.04,"Original Run travel speed restored")
+		var run_stride:=lerpf(1.54,2.5*17.0/30.0,v.style_weight)*1.2*sqrt(1.15)
+		check(absf(v.gait_frequency-a.current_speed/run_stride*.75)<.001,"Run animation cadence25% slower with original travel speed")
 		check(v.gait_run_weight>.999,"Fast Run reaches full source target")
 		for mode in ["Run","Walk","Idle"]:
 			if mode=="Walk":a.requested_direction=Vector2.DOWN;a.requested_run=false;await ticks(.9,"Before Walk jump")

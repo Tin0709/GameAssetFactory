@@ -4,13 +4,13 @@ var _demo_previous_time:=0.0
 func _ready() -> void:
 	review_player_scene_path="res://scenes/dev/SnappyLocomotionFastJumpPlayer.tscn"
 	super._ready()
-	get_window().title="Snappy Locomotion - Fast + Jump Gameplay Test"
+	get_window().title="Snappy Locomotion - Slower Animation + Original Movement"
 	var panel:=status.get_parent()
 	panel.get_child(0).text="SNAPPY FAST + JUMP · A/B"
 	panel.custom_minimum_size.x=420
 	status.custom_minimum_size.x=420;status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	panel.get_child(2).custom_minimum_size.x=420;panel.get_child(2).autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	panel.get_child(2).text="WASD / arrows: move   Shift: run   Space: jump   Tab: Snappy / Expressive\nSame Expressive test speed + camera · 1–3: details   4: original camera   R: reset   F9: demo   F8:30/60 FPS"
+	panel.get_child(2).text="WASD / arrows: move   Shift: run   Space: jump   Tab: Snappy / Expressive\n25% slower animation · original movement speed · 1–3: details   4: original camera   R: reset   F9: demo   F8:30/60 FPS"
 	var jump_button:=Button.new();jump_button.text="Jump / Space";panel.get_child(3).add_child(jump_button);jump_button.pressed.connect(actor.request_jump)
 	var old_buttons: Node=panel.get_child(3);var grid:=GridContainer.new();grid.columns=4;panel.add_child(grid);panel.move_child(grid,3)
 	for button in old_buttons.get_children():button.reparent(grid)

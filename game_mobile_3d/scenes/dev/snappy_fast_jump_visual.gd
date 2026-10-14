@@ -1,6 +1,7 @@
 extends "res://scenes/dev/snappy_locomotion_visual.gd"
 ## Reuse the existing Expressive jump adapter inside the Snappy sole writer.
 const JUMP_LIBRARY=preload("res://assets/characters/expressive_jump_v1/jump_library.res")
+const LOCOMOTION_CADENCE_SCALE:=.75
 var jump_clip: RefCounted
 var jump_state:="GROUND"
 var jump_age:=0.0
@@ -137,7 +138,9 @@ func _limit_contact_correction(correction: Vector3) -> Vector3:
 	return Vector3(planar.x,vertical,planar.y)
 
 func _stride_distance() -> float:
-	return super._stride_distance()*lerpf(sqrt(1.5),1.2*sqrt(1.15),gait_run_weight)
+	# Slower pose playback at unchanged capsule speed needs more distance
+	# per stride; leave jump physics and the global time scale untouched.
+	return super._stride_distance()*lerpf(sqrt(1.5),1.2*sqrt(1.15),gait_run_weight)/LOCOMOTION_CADENCE_SCALE
 
 func _advance_facing(target_yaw: float,delta: float) -> void:
 	var maximum:=4.5*review_pace
@@ -169,7 +172,7 @@ func _evaluate_locomotion_pose(delta: float) -> bool:
 	if jump_state=="PREP":weight*=1-.35*_smooth5(jump_age/.18)
 	if jump_state=="AIR":weight*=.12
 	if jump_state=="LAND":weight*=_smooth5((jump_age-.08)/.24)
-	var factor:=lerpf(sqrt(1.5),1.2*sqrt(1.15),gait_run_weight)
+	var factor:=lerpf(sqrt(1.5),1.2*sqrt(1.15),gait_run_weight)/LOCOMOTION_CADENCE_SCALE
 	skeleton.force_update_all_bone_transforms()
 	var hip_world: Vector3=(skeleton.global_transform*skeleton.get_bone_global_pose(hips)).origin
 	var forward:=Vector3(sin(rotation.y),0,cos(rotation.y))

@@ -5,6 +5,8 @@
 
 [node name="SnappyLocomotionFastJumpPlayer" instance=ExtResource("base")]
 review_pace = 2.25
+walk_speed = 0.9
+run_speed = 2.31
 
 [node name="Visual" parent="."]
 script = ExtResource("visual")
