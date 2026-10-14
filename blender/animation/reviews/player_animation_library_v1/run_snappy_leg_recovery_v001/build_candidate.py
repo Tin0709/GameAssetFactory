@@ -107,7 +107,10 @@ for side in ['L', 'R']:
                             hi = mid
                         else:
                             lo, flo = mid, fm
-                    roots.append((lo + hi) / 2)
+                    root = (lo + hi) / 2
+                    q = ((root-1)/PERIOD - (0 if side=='L' else .5)) % 1
+                    if abs(phase_warp(q, entry['support_duty'][side])-q) > 1e-10:
+                        roots.append(root)
                 previous = value
     # Blender's FCurve.update merges keys closer than .01 frame. Leave a
     # complete interval around each analytical cusp so its value survives.
@@ -126,6 +129,7 @@ for curve in ui.curves(candidate):
     if name is None:
         continue
     channel = 0 if curve.data_path.endswith('location') else 1
+    original_curve = next(c for c in ui.curves(base) if c.data_path == curve.data_path and c.array_index == curve.array_index)
     values = [row[channel][curve.array_index] for row in records[name]]
     values[-1] = values[0]
     keys = curve.keyframe_points
@@ -133,15 +137,26 @@ for curve in ui.curves(candidate):
     keys.add(len(values))
     for i, (key, value) in enumerate(zip(keys, values)):
         frame = times[name][i]
+        q = ((frame-1)/PERIOD - (0 if name[-1]=='L' else .5)) % 1
+        unchanged = abs(phase_warp(q, entry['support_duty'][name[-1]])-q) < 1e-12
+        if unchanged:
+            original_key = original_curve.keyframe_points[round((frame-1)*64)]
+            key.co = original_key.co
+            key.handle_left_type = original_key.handle_left_type
+            key.handle_right_type = original_key.handle_right_type
+            key.interpolation = original_key.interpolation
+            key.handle_left = original_key.handle_left
+            key.handle_right = original_key.handle_right
+            continue
         left = values[i-1] if i else values[-2]
         right = values[i+1] if i < len(values)-1 else values[1]
         left_t = times[name][i-1] if i else times[name][-2]-PERIOD
         right_t = times[name][i+1] if i < len(values)-1 else times[name][1]+PERIOD
-        slope_left = slope_right = (right-left)/(right_t-left_t)
+        epsilon = min(.0005, (frame-left_t)/4, (right_t-frame)/4)
+        sample_before = target(frame-epsilon, name[-1])[0][channel][curve.array_index]
+        after = target(frame+epsilon, name[-1])[0][channel][curve.array_index]
+        slope_left = slope_right = (after-sample_before)/(2*epsilon)
         if frame in cusps[name]:
-            epsilon = min(.0005, (frame-left_t)/4, (right_t-frame)/4)
-            sample_before = target(frame-epsilon, name[-1])[0][channel][curve.array_index]
-            after = target(frame+epsilon, name[-1])[0][channel][curve.array_index]
             slope_left = (value-sample_before)/epsilon
             slope_right = (after-value)/epsilon
         key.co = (frame, value)

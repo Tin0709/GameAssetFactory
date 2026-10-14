@@ -46,6 +46,10 @@ def check(name):
 for name in ['BB_Neutral_Test_v001','BB_RightArm_Test_v001','BB_LeftArm_Test_v001','BB_HeadTurn_Test_v001']:report['minimal_tests'][name]=check(name)
 # Only proceed to Rifle after all minimal checks pass.
 report['rifle_test']=check('BB_Rifle_Ready_Pose_v001')
+expected=json.loads((HERE/'ready_reference.json').read_text())['blender_pose']
+error=max(bridge.delta(rig.pose.bones[n].matrix,Matrix(m)) for n,m in expected.items())
+assert error<3e-6,('Original Ready reference mismatch',error)
+report['rifle_test']['original_approved_ready_matrix_error']=error
 for n,sig in before.items():assert ui.action_signature(bpy.data.actions[n])==sig,n
 assert ui.rest_signature(rig.data)==resthash
 report['all_original_actions_unchanged']=True;report['approved_actions_backed_up']=12

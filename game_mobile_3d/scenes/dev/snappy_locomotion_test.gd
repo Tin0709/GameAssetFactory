@@ -44,10 +44,11 @@ func _ready() -> void:
 	status=Label.new();status.add_theme_font_size_override("font_size",18);panel.add_child(status)
 	var help:=Label.new();help.text="WASD / arrows: move   Shift: run   Tab: Snappy / Expressive\n1: front   2: three-quarter   3: side   4: follow   R: reset   F9: demo   F8:30/60 FPS";panel.add_child(help)
 	var buttons:=HBoxContainer.new();panel.add_child(buttons)
-	for label in ["Switch style","Front","3/4","Side","Follow","Demo","Reset"]:
+	for label in ["Switch style","Front","3/4","Side","Follow","Demo","Reset","Run A/B"]:
 		var button:=Button.new();button.text=label;buttons.add_child(button);button.pressed.connect(_button.bind(label))
 	for i in actor.visual.skeleton.get_bone_count():_last_q.append(actor.visual.skeleton.get_bone_pose_rotation(i))
 	var args:=OS.get_cmdline_user_args()
+	if "--run-recovery" in args:actor.visual.set_run_recovery(true)
 	if "--capture-snappy" in args:capture_mode="snappy"
 	if "--capture-expressive" in args:capture_mode="expressive";actor.visual.set_snappy(false);actor.visual.style_weight=0
 	if "--capture-toggle" in args:capture_mode="toggle"
@@ -57,6 +58,7 @@ func _ready() -> void:
 func _button(label: String) -> void:
 	match label:
 		"Switch style":actor.visual.set_snappy(not actor.visual.snappy_enabled)
+		"Run A/B":actor.visual.set_run_recovery(not actor.visual.run_recovery_enabled)
 		"Front":camera_mode=1
 		"3/4":camera_mode=2
 		"Side":camera_mode=3
@@ -69,6 +71,8 @@ func _button(label: String) -> void:
 func _input(event: InputEvent) -> void:
 	# Tab normally navigates GUI focus. Reserve this lab's A/B shortcut before
 	# the HUD consumes it, including after clicking one of its buttons.
+	if event is InputEventKey and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_B:
+		_button("Run A/B");get_viewport().set_input_as_handled();return
 	if event is InputEventKey and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_TAB:
 		_button("Switch style");get_viewport().set_input_as_handled()
 
@@ -116,6 +120,7 @@ func _process(_delta: float) -> void:
 	_update_camera()
 	var v=actor.visual
 	status.text="%s · matched travel speed\n%s   Speed %.2fm/s   Run %.0f%%   Phase %.3f   %s\nWalk + Run artistically approved · isolated gameplay test"%["SNAPPY" if v.snappy_enabled else "EXPRESSIVE",section,actor.current_speed,v.gait_run_weight*100,v.gait_phase,("30 FPS review / 1x" if capture_mode!="" else "FPS %.0f"%Engine.get_frames_per_second())]
+	status.text+="\nB / Run A/B: "+("Leg Recovery v001 · PENDING" if v.run_recovery_enabled else "Approved Run")
 	if _sequence==v.pose_sequence:return
 	_sequence=v.pose_sequence
 	var dt: float=v.pose_delta

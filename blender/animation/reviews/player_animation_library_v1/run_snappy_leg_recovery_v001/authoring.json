@@ -4,8 +4,8 @@
   "baseline_source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/elastic_drive_v001/run_snappy_review.blend",
   "baseline_source_sha256": "33a62f5ba58a5743c1bc820f53fa2c77050a7292d5580fd815d3a6a8e85dd663",
   "baseline_action_sha256": "8e835f91c686d41bb1846fb0d7ddc151dc55a9178f87e27d845fc54f972cb156",
-  "action_sha256": "f7b03a8ed2fabfae37e11d0388c035dfe6d8c4a687bb934b7421df6941344ffe",
-  "source_sha256": "015d12d946755546a702e885c2ac5301a1182afd39018a1417e9005694ecf2c6",
+  "action_sha256": "e6ff38f45c6ce0d3a65af0081c1748312125538bf39102a465e47ba481bb2e47",
+  "source_sha256": "30074b5a40f63765988184ba9191ba72b12564a76f770bcd2f89637fc5a60872",
   "original_actions": {
     "Expressive_Arm_Motion_Test": "89513e827db12b7a3f5e27dda973f1a386c0243a16f6b606107d78430dc407d5",
     "Full_Jump_Expressive_Test": "b119534f13f7db19862dfd2d7485595e9372ad0da0cb1e300e9c966fd00f0b99",

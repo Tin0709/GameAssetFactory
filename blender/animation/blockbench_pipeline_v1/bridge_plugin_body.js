@@ -31,7 +31,7 @@
       if(ba.rotation_global || ba.muted && Object.values(ba.muted).some(Boolean)) fail('Global rotation and muted channels are unsupported.');
       for(const k of ba.keyframes) {
         if(k.interpolation==='step') fail('Step/discontinuous keys need a separate bake policy; not supported in v1.');
-        for(const dp of k.data_points)for(const axis of ['x','y','z'])if(dp[axis]!==undefined && !Number.isFinite(Number(dp[axis]))) fail('Molang expressions are unsupported; use numeric keyframes.');
+        for(const dp of k.data_points)for(const axis of ['x','y','z'])if(dp[axis]!==undefined && (!Number.isFinite(Number(dp[axis]))||!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(String(dp[axis])))) fail('Use ordinary decimal literals; Molang and scientific notation are unsupported.');
         if(k.channel==='scale' && k.data_points.some(dp=>['x','y','z'].some(axis=>Number(dp[axis])!==1))) fail('Animated scaling is forbidden.');
         if(c.bones.find(b=>b.uuid===ba.uuid)?.locked && k.data_points.some(dp=>['x','y','z'].some(axis=>Number(dp[axis])!==(k.channel==='scale'?1:0)))) fail('ForeArm motion is forbidden.');
       }
