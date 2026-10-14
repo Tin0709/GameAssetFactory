@@ -1,0 +1,2 @@
+GameAssetFactory auto-commit smoke test.
+Temporary file to verify new-file detection and AI-generated commit messages.
