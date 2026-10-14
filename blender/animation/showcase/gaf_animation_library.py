@@ -257,6 +257,7 @@ def refresh(scene,import_missing=True):
                         child.hide_render=child.type!='MESH'
                         if child.type=='EMPTY':child.empty_display_size=.025
                 validate_preview_prop(e,rig)
+        for e in data.get('review_sequences',[]):validate_review_sequence(e)
     except Exception:
         for action in new_actions:bpy.data.actions.remove(action)
         for c in new_props:
@@ -277,7 +278,8 @@ def refresh(scene,import_missing=True):
     return len(new_actions)
 
 def view(scene,direction):
-    scene.camera=bpy.data.objects['Showcase_'+direction]
+    name=json.loads(scene[REVIEW_ENTRY])['cameras'][direction] if scene.get(REVIEW_TAG) else 'Showcase_'+direction
+    scene.camera=bpy.data.objects[name]
     for window in bpy.context.window_manager.windows:
         if window.scene==scene:
             for area in window.screen.areas:
@@ -313,12 +315,39 @@ class GAF_OT_view(bpy.types.Operator):
     direction:StringProperty(default='THREE_QUARTER')
     def execute(self,context):view(context.scene,self.direction);return {'FINISHED'}
 
+class GAF_OT_open_review_sequence(bpy.types.Operator):
+    bl_idname='gaf.open_review_sequence';bl_label='Open Pending Review Sequence'
+    sequence_id:StringProperty()
+    def execute(self,context):
+        try:open_review_sequence(context,self.sequence_id);return {'FINISHED'}
+        except Exception as error:context.scene.gaf_error=str(error);self.report({'ERROR'},str(error));return {'CANCELLED'}
+
+class GAF_OT_return_library(bpy.types.Operator):
+    bl_idname='gaf.return_library';bl_label='Return to Animation Library'
+    def execute(self,context):
+        try:return_library(context);return {'FINISHED'}
+        except Exception as error:context.scene.gaf_error=str(error);self.report({'ERROR'},str(error));return {'CANCELLED'}
+
 class GAF_PT_animation_library(bpy.types.Panel):
     bl_label='Animation Library';bl_idname='GAF_PT_animation_library';bl_space_type='VIEW_3D';bl_region_type='UI';bl_category='Animation Library'
     @classmethod
-    def poll(cls,context):return bool(context.scene.get(SCENE_TAG))
+    def poll(cls,context):return bool(context.scene.get(SCENE_TAG) or context.scene.get(REVIEW_TAG))
     def draw(self,context):
         layout=self.layout;s=context.scene
+        if s.get(REVIEW_TAG):
+            try:e=json.loads(s[REVIEW_ENTRY])
+            except (KeyError,ValueError):layout.label(text='Review registration is missing',icon='ERROR');return
+            box=layout.box();box.label(text=e.get('label',e['id']));box.label(text='PENDING — SOURCE RESEARCH ONLY',icon='TIME')
+            box.label(text=f"F{e['start']}–{e['end']}  |  {e['fps']/e['fps_base']:g} FPS")
+            box.label(text='Continuous take; replay resets clocks')
+            row=layout.row(align=True);row.operator('gaf.play_pause',text='Pause' if context.screen.is_animation_playing else 'Play',icon='PAUSE' if context.screen.is_animation_playing else 'PLAY');row.operator('gaf.restart',icon='REW')
+            layout.prop(s,'gaf_loop',text='Loop playback')
+            row=layout.row(align=True)
+            for text,direction in [('Front','FRONT'),('3/4','THREE_QUARTER'),('Side','SIDE')]:row.operator('gaf.view',text=text).direction=direction
+            layout.operator('gaf.return_library',icon='BACK')
+            if s.gaf_error:
+                for line in [s.gaf_error[i:i+42] for i in range(0,len(s.gaf_error),42)]:layout.label(text=line,icon='ERROR')
+            return
         layout.template_list('GAF_UL_animations','',s,'gaf_clips',s,'gaf_active_index',rows=5)
         if s.gaf_clips:
             item=s.gaf_clips[s.gaf_active_index];e=json.loads(item.entry_json)
@@ -333,12 +362,16 @@ class GAF_PT_animation_library(bpy.types.Panel):
         row=layout.row(align=True)
         for text,direction in [('Front','FRONT'),('3/4','THREE_QUARTER'),('Side','SIDE')]:row.operator('gaf.view',text=text).direction=direction
         layout.separator();layout.operator('gaf.refresh_library',icon='FILE_REFRESH')
+        sequences=review_entries(s)
+        if sequences:
+            box=layout.box();box.label(text='Pending Research Sequences',icon='TIME')
+            for e in sequences:box.operator('gaf.open_review_sequence',text=e.get('label',e['id']),icon='SCENE_DATA').sequence_id=e['id']
         if s.gaf_error:
             for line in [s.gaf_error[i:i+42] for i in range(0,len(s.gaf_error),42)]:layout.label(text=line,icon='ERROR')
 
 @persistent
 def stop_one_shot(scene,*args):
-    if not scene.get(SCENE_TAG) or scene.gaf_loop or scene.frame_current<scene.frame_end:return
+    if not (scene.get(SCENE_TAG) or scene.get(REVIEW_TAG)) or scene.gaf_loop or scene.frame_current<scene.frame_end:return
     for window in bpy.context.window_manager.windows:
         if window.scene==scene and window.screen.is_animation_playing:
             with bpy.context.temp_override(window=window,screen=window.screen):bpy.ops.screen.animation_cancel(restore_frame=False)
@@ -351,16 +384,22 @@ def loaded(_):
         if not s.get(SCENE_TAG):continue
         try:
             snapshot=json.loads(s['gaf_manifest_snapshot'])
+            saved_frame=s.frame_current;saved_subframe=s.frame_subframe
             _switching=True;s.gaf_clips.clear()
             for e in snapshot['animations']:
                 c=s.gaf_clips.add();c.name=e['action'];c.action=e['action'];c.status=e['status'];c.entry_json=json.dumps(e)
             s.gaf_active_index=min(s.gaf_active_index,len(s.gaf_clips)-1)
             _switching=False
             activate(s,s.gaf_active_index)
+            s.frame_set(saved_frame,subframe=saved_subframe)
         except Exception as error:s.gaf_error=str(error)
         finally:_switching=False
+    for s in bpy.data.scenes:
+        if not s.get(REVIEW_TAG):continue
+        try:validate_review_sequence(json.loads(s[REVIEW_ENTRY]));s.gaf_error=''
+        except Exception as error:s.gaf_error=str(error)
 
-CLASSES=[GAF_Clip,GAF_UL_animations,GAF_OT_refresh,GAF_OT_play,GAF_OT_restart,GAF_OT_view,GAF_PT_animation_library]
+CLASSES=[GAF_Clip,GAF_UL_animations,GAF_OT_refresh,GAF_OT_play,GAF_OT_restart,GAF_OT_view,GAF_OT_open_review_sequence,GAF_OT_return_library,GAF_PT_animation_library]
 def register():
     for cls in CLASSES:bpy.utils.register_class(cls)
     bpy.types.Scene.gaf_clips=CollectionProperty(type=GAF_Clip)
