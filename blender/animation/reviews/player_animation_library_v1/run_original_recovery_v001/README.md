@@ -44,4 +44,6 @@ Adjacent torso/leg overlap is **not collision-clearance certified**. The SAT ove
 
 [Motion validation](motion_validation.json) · [Authorship and original parameters](authoring.json) · [Media validation](media_validation.json) · [Showcase reopen/selection checks](showcase_validation.json) · [Preservation checks](preservation_validation.json).
 
+The saved central Showcase was reopened and all 36 Actions passed source-signature, slot, timing and selection checks; all 35 previous entries remain exact. A separate native Blender GUI window also completed four wraps, pause/restart, then two further wraps. It remains open with the new candidate selected and paused for review. [GUI playback evidence](gui_playback_validation.json) · [Blender screenshot](blender_gui_review.png).
+
 Actions & Stuff was used only for broad coordination principles. The builder reads our approved Run and original authored parameters; it does not read the resource pack, source curves, sampled proprietary poses or source-derived reconstruction. Walking research, all previous Run sources, approved Actions, production assets and Godot are preserved. No gameplay integration or production promotion was performed.
