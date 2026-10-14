@@ -1,0 +1,18 @@
+{
+  "separate_gui_process": true,
+  "candidate": "Run_Original_Recovery_Test_v001",
+  "fps": 30,
+  "range": [
+    1,
+    17
+  ],
+  "wraps": 4,
+  "restart_wraps": 2,
+  "no_blend_save": true,
+  "pause_pass": true,
+  "restart_frame_pass": true,
+  "passed": true,
+  "error": null,
+  "paused": true,
+  "source_action_sha256": "6e29b70bb8b337353caa7856b1031ff8777851ca7be7578ac6dd35e193fa8ffd"
+}

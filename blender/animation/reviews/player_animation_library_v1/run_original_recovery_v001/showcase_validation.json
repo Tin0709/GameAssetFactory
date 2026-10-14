@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "reopened_from_disk": true,
+  "all_actions_selectable": 36,
+  "exact_source_signatures": 36,
+  "slots_and_timing_pass": true,
+  "pose_reset_pass": true,
+  "three_cameras_pass": true,
+  "loop_pose_seam_pass": true,
+  "old_entries_exact": true,
+  "candidate": "Run_Original_Recovery_Test_v001",
+  "candidate_status": "pending",
+  "no_gui_playback_claim": true
+}
