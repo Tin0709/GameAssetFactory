@@ -1762,7 +1762,7 @@
     {
       "id": "actions_stuff_directional_v001",
       "label": "Actions & Stuff Directional Input v001",
-      "status": "pending",
+      "status": "approved",
       "scene": "ASD_Directional_Review_v001",
       "rig": "ASD_Player_Rig_v001",
       "mesh": "ASD_Player_Mesh_v001",
@@ -1839,5 +1839,22 @@
       },
       "source_sha256": "85267f011215de543a60d45f4af5df3f9ae6f8038e93ab34c0052b539377ee29"
     }
-  ]
+  ],
+  "library_focus": {
+    "label": "Actions & Stuff",
+    "entries": [
+      {
+        "kind": "action",
+        "id": "Walk_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Run_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "review_sequence",
+        "id": "actions_stuff_directional_v001"
+      }
+    ]
+  }
 }
