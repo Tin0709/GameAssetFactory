@@ -1,0 +1,111 @@
+{
+  "original": true,
+  "reference_pixels_copied": false,
+  "atlas_size": [
+    128,
+    32
+  ],
+  "base_palette_matches": "DI_V3_grass_top_0",
+  "variants": [
+    {
+      "variant": "SoftYellow",
+      "logical_size": [
+        16,
+        16
+      ],
+      "opaque_pixels": 119,
+      "tip_palette": [
+        [
+          173,
+          178,
+          110
+        ],
+        [
+          195,
+          195,
+          133
+        ],
+        [
+          212,
+          207,
+          153
+        ]
+      ]
+    },
+    {
+      "variant": "DustyPink",
+      "logical_size": [
+        16,
+        16
+      ],
+      "opaque_pixels": 119,
+      "tip_palette": [
+        [
+          173,
+          128,
+          132
+        ],
+        [
+          195,
+          151,
+          151
+        ],
+        [
+          211,
+          176,
+          171
+        ]
+      ]
+    },
+    {
+      "variant": "Lavender",
+      "logical_size": [
+        16,
+        16
+      ],
+      "opaque_pixels": 119,
+      "tip_palette": [
+        [
+          137,
+          133,
+          174
+        ],
+        [
+          160,
+          155,
+          193
+        ],
+        [
+          182,
+          178,
+          211
+        ]
+      ]
+    },
+    {
+      "variant": "SageGreen",
+      "logical_size": [
+        16,
+        16
+      ],
+      "opaque_pixels": 119,
+      "tip_palette": [
+        [
+          130,
+          162,
+          123
+        ],
+        [
+          153,
+          181,
+          145
+        ],
+        [
+          180,
+          200,
+          166
+        ]
+      ]
+    }
+  ]
+}
