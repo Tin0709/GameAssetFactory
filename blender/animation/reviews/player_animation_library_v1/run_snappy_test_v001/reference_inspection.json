@@ -1,0 +1,35 @@
+{
+  "source": "C:\\Users\\ADMIN\\Desktop\\Running.mp4",
+  "sha256": "3db973b8dccf5e37d94cb6ed5a7e61fe6f45386c50d438112d058c5c23af55a2",
+  "frames": 349,
+  "fps": 30,
+  "inspected_stride_frames": [
+    40,
+    57
+  ],
+  "repeat_starts": [
+    40,
+    57,
+    74,
+    91
+  ],
+  "measured_period_s": 0.5666666666666667,
+  "observations": [
+    "F40\u201342 receiving-like lowering and compact exchange",
+    "F42\u201344 quick recovery and opening",
+    "F44\u201349 longer readable open phase",
+    "F49\u201353 opposite receiving/exchange; F53\u201357 opening"
+  ],
+  "limits": [
+    "Ground contact, support duty and flight are not precisely recoverable from moving-camera pixels",
+    "Milliseconds below33.3ms are design choices, not measured reference delays",
+    "Our rigid legs cannot reproduce knee articulation or deforming squash"
+  ],
+  "inputs": {
+    "C:\\Users\\ADMIN\\Desktop\\Running.mp4": "3db973b8dccf5e37d94cb6ed5a7e61fe6f45386c50d438112d058c5c23af55a2",
+    "docs/animation/ACTIONS_AND_STUFF_PLAYER_DEEP_RESEARCH.md": "2ddf3e191d49d420dfe475ef36444253696a2163173eaf3394c14df116dcd8c0",
+    "docs/animation/research/actions_and_stuff_deep_2026_10_14/README.md": "1bf8fc7810a3e5ee8ab7f14e70f87362f0ced9d791ba0b03eb2d5a680b25b3a8",
+    "docs/animation/ANIMATION_STYLE_GUIDE.md": "ff3a5d353d2b3c4d78b1f2ddd5a2c7b4018bcaee298a1a686243a0f1e3d5d539",
+    "docs/animation/ANIMATION_EXPANSION_GUIDE.md": "cf9c0491d5e2f91388c5d3075abe496a00cbbd8730421acfb4036ed3ef7b942d"
+  }
+}
