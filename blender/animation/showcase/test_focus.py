@@ -80,6 +80,15 @@ class LibraryFocusTests(unittest.TestCase):
         self.assertEqual(bpy.data.objects[ui.RIG].animation_data.action.name, WALK)
         self.assertEqual(len(self.home.gaf_clips), 37)
 
+    def test_archive_toggle_preserves_primary_playhead_and_slot(self):
+        ui.select_registered_action(bpy.context, RUN)
+        self.home.frame_set(89, subframe=.25)
+        slot = bpy.data.objects[ui.RIG].animation_data.action_slot
+        self.home.gaf_show_archived = True
+        self.home.gaf_show_archived = False
+        self.assertEqual((self.home.frame_current, self.home.frame_subframe), (89, .25))
+        self.assertEqual(bpy.data.objects[ui.RIG].animation_data.action_slot, slot)
+
     def test_approved_research_remains_playable_but_cannot_be_production(self):
         try:
             self.assertEqual(ui.validate_review_sequence(self.entry), self.review)
@@ -114,7 +123,9 @@ class LibraryFocusTests(unittest.TestCase):
         self.assertEqual([e['label'] for e in entries], [WALK, RUN, LABEL])
 
 
-suite = unittest.defaultTestLoader.loadTestsFromTestCase(LibraryFocusTests)
+args = sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
+suite = (unittest.TestSuite([LibraryFocusTests(args[0])]) if args else
+         unittest.defaultTestLoader.loadTestsFromTestCase(LibraryFocusTests))
 result = unittest.TextTestRunner(verbosity=2).run(suite)
 if not result.wasSuccessful():
     raise AssertionError('Library focus regressions failed')
