@@ -1,5 +1,4 @@
 """Independent literal-source checks for the private directional study adapter."""
-import importlib.util
 import math
 import unittest
 from pathlib import Path
@@ -70,6 +69,8 @@ class SourceChannelTests(unittest.TestCase):
         self.assertAlmostEqual(c['waist']['rotation'][1], -4.5)
         self.assertAlmostEqual(c['rightarm']['rotation'][0], (-37.2+1.6)*.5)
         self.assertAlmostEqual(c['leftarm']['rotation'][0], 37.2+1.6)
+        self.assertAlmostEqual(c['head']['rotation'][0], 1.)
+        self.assertAlmostEqual(c['head']['rotation'][1], math.sin(math.radians(130))*3 + math.sqrt(.5) + 42)
         self.assertTrue(self.source.last_metadata['head_relative_to_entity'])
         self.assertIn('bob', [x['alias'] for x in self.source.last_metadata['layers']])
 
