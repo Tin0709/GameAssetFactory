@@ -14,3 +14,6 @@
 
 Ruling: use new files in existing workspace because source reviews and imported runtime resources are local to this checkout; preserve existing scripts/scene/project settings and protect hashes instead of resetting or copying the large working tree.
 Ruling: A/B shares capsule physics and travel speed. Expressive clip cadence is distance-driven at that matched speed; this is a style comparison, not an exact replay of the old pace2.25 directional/jump lab. No weapon/jump branches enter this test.
+
+## Authorized scope update
+User explicitly approves both current Snappy Blender Actions; record artistic approval without production promotion. User then requests matching the existing Expressive test speed and adding jumping. Preserve the native test/review and add a separate FastJump scene using the existing jump controller/clips, same pose writer and directional stride policy. Do not author new Actions. Validate the faster pace, airborne/landing contact ownership, interruptions, buffered jumps and both styles at30/60FPS.
