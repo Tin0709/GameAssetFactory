@@ -28,30 +28,37 @@
 
 ### Task 1: Preserve and author the independent candidate
 
-- [ ] Record protected hashes, current library backup and actual source curves/geometry.
-- [ ] Define and run candidate preservation/contact tests before the candidate exists (expected missing candidate).
-- [ ] Copy approved Action, author bounded free-leg recovery time warp with world-space height compensation; save new source only.
-- [ ] Verify non-leg curve identity, rig/material preservation, source contacts/clearance/rigidity, loop and faster exchange.
+- [x] Record protected hashes, current library backup and actual source curves/geometry.
+- [x] Define and run candidate preservation/contact tests before the candidate exists (expected missing candidate).
+- [x] Copy approved Action, author bounded free-leg recovery time warp with world-space height compensation; save new source only.
+- [x] Verify non-leg curve identity, rig/material preservation, source contacts/clearance/rigidity, loop and faster exchange.
 
 ### Task 2: Register and produce Blender review
 
-- [ ] Append one Pending manifest entry; import into current Showcase with concurrent-edit guards.
-- [ ] Verify all previous Action signatures/entries, selection/slot/timing/views and reopen/playback.
-- [ ] Render front/three-quarter/side at original30FPS, five uninterrupted17-frame cycles; approved/candidate/reference comparisons.
+- [x] Append one Pending manifest entry; import into current Showcase with concurrent-edit guards.
+- [x] Verify all previous Action signatures/entries, selection/slot/timing/views and reopen/playback.
+- [x] Render front/three-quarter/side at original30FPS, five uninterrupted17-frame cycles; approved/candidate/reference comparisons.
 
 ### Task 3: Integrate A/B and validate in Godot
 
-- [ ] Write failing A/B selection/phase regression test; add separate candidate samples/library and minimal selector inside current writer.
-- [ ] Preserve existing style toggle; add separate candidate toggle with baseline default, no second writer.
-- [ ] Run native and fast/jump suites plus focused both-lead multi-phase transitions at rendered30/60FPS.
-- [ ] Inspect muted original-speed30FPS gameplay A/B before60FPS; reject and disable candidate on skating/pop/bounce/input regression.
+- [x] Write failing A/B selection/phase regression test; add separate candidate samples/library and minimal selector inside current writer.
+- [x] Preserve existing style toggle; add separate candidate toggle with baseline default, no second writer.
+- [x] Run native and fast/jump suites plus focused both-lead multi-phase transitions at rendered30/60FPS.
+- [x] Inspect muted original-speed30FPS gameplay A/B before60FPS; reject and disable candidate on skating/pop/bounce/input regression.
 
 ### Task 4: Final preservation and review handoff
 
-- [ ] Fresh independent review of changes and evidence; address material findings.
-- [ ] Verify all protected files outside the explicit experiment allowlist unchanged and document results/limitations.
-- [ ] Leave approved baseline default, candidate Pending, link Blender and gameplay reviews; stop for user review.
+- [x] Fresh independent review of changes and evidence; address material findings.
+- [x] Verify all protected files outside the explicit experiment allowlist unchanged and document results/limitations.
+- [x] Leave approved baseline default, candidate Pending, link Blender and gameplay reviews; stop for user review.
 
 ## Execution record
 
 - Work in the user's current checkout; existing local changes were recorded and backed up, never reset. No production changes or commits/pushes are required for this review experiment.
+
+- Task1 complete: missing-candidate RED observed; saved-source2177samples GREEN. Exact supported vertices/non-leg curves; corner-switch bake corrected without relaxing5µm envelope guard.
+- Task2 complete: current33-entry library rebaselined after concurrent Blockbench additions; append-only Pending registration34total, all prior signatures exact; eight85-frame30FPS videos and real GUI verification pass.
+- Task3 complete: missing-selector RED observed; selector GREEN. Candidate smoke suites72/native30,72/native60,45/fast30 pass. Focused trials1021checks/FPS:60GREEN,30has45failed displayed-step guards. Candidate rejected rather than promoted.
+- Task4 complete: fresh independent reviewer identified test gaps; fixed equal fixture lead, phase-timeout assertion, directRun stops and liveAB gates. Adjacent leg/torso penetration remains explicitly uncertified; no all-intersections claim. Final preservation/media reports linked in review.
+- Decision: work in the existing checkout with backups/hash guards so the requested central Showcase stays current. Concurrent additions were preserved; no resets or task-owned commits.
+- Decision: keep one authored candidate unchanged after gameplay rejection; no second tuning experiment. The source may be reviewed, but it is unsuitable for target30FPS promotion.
