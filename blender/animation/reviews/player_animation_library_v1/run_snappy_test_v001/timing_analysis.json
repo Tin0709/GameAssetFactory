@@ -1,0 +1,38 @@
+{
+  "fps": 30,
+  "review_frames": 85,
+  "continuous_snappy_cycles": 5,
+  "no_holds": true,
+  "native_speed": true,
+  "phase_sheet_only_normalization": "Reference40+17phase rounded to source frame; approvedRun1+20phase; new1+17phase. Reference rounding error <=0.5/17stride. No comparison video time warping.",
+  "reference_crop": [
+    55,
+    95,
+    220,
+    355
+  ],
+  "model_crop": [
+    130,
+    40,
+    455,
+    540
+  ],
+  "measured": {
+    "hip_range_m": [
+      0.6420000195503235,
+      0.7329999804496765
+    ],
+    "contact_to_trough_m": 0.04399996995925903,
+    "peak_hip_up_m_s": 1.0372924804689774,
+    "peak_hip_down_m_s": 1.5317916870117188,
+    "lowest_sole_peaks_m": {
+      "L": 0.2004002034664154,
+      "R": 0.19040025770664215
+    },
+    "foreaft_sole_peak_speed_m_s": {
+      "L": 7.395429611206481,
+      "R": 7.578020095825224
+    }
+  },
+  "interpretation": "Rapid45ms weight absorption and decisive middle swing contrast with a longer rounded opening/controlled brake. Upper-body response follows the receiving impulse with12/24/32/38ms designed delays. Exact contact/flight and millimetre heights cannot be inferred from the original camera-moving recording."
+}
