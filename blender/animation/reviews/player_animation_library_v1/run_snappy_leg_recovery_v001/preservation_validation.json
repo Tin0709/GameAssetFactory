@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "original_tracked_files": 7521,
+  "protected_files_checked": 7514,
+  "unexpected_changes": [],
+  "invalid_sources": [],
+  "all_previous_33_manifest_entries_exact": true,
+  "original28entries_preserved_plus5concurrent_Blockbench_entries": true,
+  "approved_sources_and_libraries_unchanged": true,
+  "production_gameplay_unchanged": true,
+  "showcase_action_count": 34,
+  "candidate_status": "pending",
+  "source_validation": true,
+  "gui_validation": true
+}

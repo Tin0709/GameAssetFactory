@@ -1,0 +1,90 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/run_snappy_leg_recovery_v001/approved_vs_candidate_three_quarter_1x.mp4",
+      "decoded_frames": 85,
+      "fps": 30,
+      "audio": false,
+      "sha256": "c555baf133daefba31dd78bd82b66a3050090c89c2522f675b5a63256e41ec71"
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/run_snappy_leg_recovery_v001/candidate_three_quarter_1x.mp4",
+      "decoded_frames": 85,
+      "fps": 30,
+      "audio": false,
+      "sha256": "2a7e07ee4132dab43c90f9aa9de1b4475d618e4ef23979ea3630b114bbdf5473"
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/run_snappy_leg_recovery_v001/candidate_three_views_1x.mp4",
+      "decoded_frames": 85,
+      "fps": 30,
+      "audio": false,
+      "sha256": "3c46a3b622add40b8fcfe583fc4f28d859220bffb2d57744b12e6feef0433814"
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/run_snappy_leg_recovery_v001/reference_approved_candidate_1x.mp4",
+      "decoded_frames": 85,
+      "fps": 30,
+      "audio": false,
+      "sha256": "27b43494399646419f24c7198b9bc8df393341939e4f7821504bf866d82f3e4b"
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/run_snappy_leg_recovery_v001/approved_vs_candidate_side_1x.mp4",
+      "decoded_frames": 85,
+      "fps": 30,
+      "audio": false,
+      "sha256": "55cdcc38a2a66ff2102a7e42da9be0e2afa6749edb8834b93b1eef2f619eaf61"
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/run_snappy_leg_recovery_v001/candidate_side_1x.mp4",
+      "decoded_frames": 85,
+      "fps": 30,
+      "audio": false,
+      "sha256": "04ccb7cf64c44ec746ab13b2e383ffc4258d43ad18c0b630e61701824d399851"
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/run_snappy_leg_recovery_v001/approved_vs_candidate_front_1x.mp4",
+      "decoded_frames": 85,
+      "fps": 30,
+      "audio": false,
+      "sha256": "4cb9a936df72205df17aa5810ed4769da488f79614314296d239a5a8b0d54940"
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/run_snappy_leg_recovery_v001/candidate_front_1x.mp4",
+      "decoded_frames": 85,
+      "fps": 30,
+      "audio": false,
+      "sha256": "8071ad53b694c6d25c3bb8d7647bd1ff51d3bb4e8da8ca707bd56bded8d79af4"
+    },
+    {
+      "file": "docs/animation/reviews/godot_snappy_run_leg_recovery_v001/gameplay_approved_30fps_1x.mp4",
+      "decoded_frames": 397,
+      "fps": 30,
+      "audio": false,
+      "sha256": "fb3f7a66cbb608cc022ea487ab5ff54adede98d1ba32d2073e24d02ff25693af"
+    },
+    {
+      "file": "docs/animation/reviews/godot_snappy_run_leg_recovery_v001/approved_vs_candidate_30fps_1x.mp4",
+      "decoded_frames": 397,
+      "fps": 30,
+      "audio": false,
+      "sha256": "59765344838b6518095e8e7d863ffc40dcf3a85f7a5ee21a34968494c9b02e85"
+    },
+    {
+      "file": "docs/animation/reviews/godot_snappy_run_leg_recovery_v001/gameplay_candidate_30fps_1x.mp4",
+      "decoded_frames": 397,
+      "fps": 30,
+      "audio": false,
+      "sha256": "e1082e8774b0d7113109f1f66129334cd17d385ef3ace02267c6d661ed0003f8"
+    }
+  ],
+  "capture_unique_frames_each": 397,
+  "control_trace": {
+    "samples": 396,
+    "maximum_capsule_difference_m": 0.0,
+    "maximum_speed_difference_m_s": 0.0,
+    "maximum_gait_phase_difference": 0.0,
+    "jump_states_match": true
+  }
+}
