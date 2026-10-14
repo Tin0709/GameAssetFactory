@@ -26,12 +26,12 @@
     "peak_hip_up_m_s": 3.7289428710939774,
     "peak_hip_down_m_s": 3.2655715942385086,
     "lowest_sole_peaks_m": {
-      "L": 0.3894299864768982,
-      "R": 0.3851209282875061
+      "L": 0.38866883516311646,
+      "R": 0.3847002685070038
     },
     "foreaft_sole_peak_speed_m_s": {
-      "L": 30.96090316772643,
-      "R": 31.313781738281364
+      "L": 7.470130920409019,
+      "R": 7.578020095825224
     }
   },
   "interpretation": "200% added vertical excursion, with retained45ms weight absorption and decisive middle swing contrast with a longer rounded opening/controlled brake. Upper-body responses use12/24/32/38ms history offsets; these are authored history parameters, not measured output lags. Exact contact/flight and millimetre heights cannot be inferred from the original camera-moving recording."

@@ -4,8 +4,8 @@
     {
       "label": "snappy",
       "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\blender\\animation\\reviews\\player_animation_library_v1\\run_snappy_test_v001\\bounce_200_v001\\run_snappy_review.blend",
-      "source_sha256": "32a0b5bd3662da8d48b8299a419967b5183f4dbdd79b78b3dac0ad859cd68ab2",
-      "action_sha256": "121bd283a79272a5a1ce6234858c7e9b641190b9636f2346e87b5c602836ad5b",
+      "source_sha256": "0909c313684275f83194cea6992949bdc2b3abc48280cf2a1bfc10e7dac5535e",
+      "action_sha256": "ab3828b1552e1dba6d9549a81a57bf01a388a794f1fde01d4d76266e1f0f101b",
       "review_frames": 85,
       "fps": 30,
       "period_frames": 17,
