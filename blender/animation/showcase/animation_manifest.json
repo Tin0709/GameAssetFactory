@@ -1227,12 +1227,12 @@
         "Leg.R": "XYZ"
       },
       "action": "Run_Snappy_Test_v001",
-      "source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/double_smooth_v001/run_snappy_review.blend",
-      "source_sha256": "16760ee2c567ce9abcde64dff2084ae098588de55117c5f146fd7fdc2778e5f9",
+      "source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_rebound_v001/run_snappy_review.blend",
+      "source_sha256": "6d00da71d37fc982bbfe4692a05ad572ab01871256335700d2516ad1ed2af5a2",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
-      "action_sha256": "074b21d002bec36d83208be57ab378096b061892da95d6ad90306e0213921314",
+      "action_sha256": "3d289106b9a23a635864435d05348ad7e71a1fbd815614cfd63f287759598956",
       "action_frame_range": [
         1.0,
         18.0
@@ -1243,7 +1243,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Pending. User asks100% stronger current bounce and smoother overall movement. Hip excursion273\u2192546mm with a continuous C2 contact/rebound/return. Airborne world leg targets filtered12ms; arm/head arcs16ms; restrained delayed shoulder/head response. Same17-frame cadence, contact height and44mm receiving dip; stable rigid feet during support. Previous sources and all27 older Actions preserved.",
+      "approval_note": "Pending. User rejects jump-like feel. Remove shared whole-character lift; restore39/40% support and62/57ms flight. Compact112mm hip response,54mm receiving dip50ms then quick elastic recovery; small delayed spine/chest reaction, smooth original arm/head and swing-only leg articulation. Same17-frame cadence/contacts/nominal2.5m/s. Previous sources and all27 older Actions preserved.",
       "seamless_loop": true,
       "period_s": 0.5666666666666667,
       "in_place": true,
@@ -1253,26 +1253,27 @@
         "R": 9.5
       },
       "support_duty": {
-        "L": 0.14481540013988667,
-        "R": 0.14481540013988667
+        "L": 0.39,
+        "R": 0.4
       },
       "flight_intervals_frames": [
         [
-          3.461861802378073,
+          7.63,
           9.5
         ],
         [
-          11.961861802378074,
+          16.3,
           18
         ]
       ],
-      "review_video": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/double_smooth_v001/run_snappy_three_views_1x.mp4",
-      "presentation_note": "Five uninterrupted17-frame cycles at30FPS1x. Double current vertical excursion, smoother airborne leg exchange and coordinated secondary motion.10% wider review cameras accommodate the larger hop. Native reference/approved Run/previous current Run comparison. Godot unchanged.",
+      "review_video": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/grounded_rebound_v001/run_snappy_three_views_1x.mp4",
+      "presentation_note": "Five uninterrupted17-frame cycles at30FPS1x. Weight-led receiving/rebound with brief low flight; no shared jump arc. Previous jumping version/approved Expressive Run/actual reference comparisons. Existing camera framing retained. Godot unchanged.",
       "gameplay_validation": "Blender-only Pending; phase0LEFT and0.5RIGHT receiving. Root/object static, controller owns -Y travel. Arbitrary speed, Walk/Run transitions, starts/stops, turns/slopes, weapons and mobile performance not tested.",
-      "body_vertical_range_multiplier": 2.0,
-      "previous_revision_source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/bounce_200_v001/run_snappy_review.blend",
-      "previous_revision_source_sha256": "0909c313684275f83194cea6992949bdc2b3abc48280cf2a1bfc10e7dac5535e",
-      "previous_revision_action_sha256": "ab3828b1552e1dba6d9549a81a57bf01a388a794f1fde01d4d76266e1f0f101b"
+      "previous_revision_source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/double_smooth_v001/run_snappy_review.blend",
+      "previous_revision_source_sha256": "16760ee2c567ce9abcde64dff2084ae098588de55117c5f146fd7fdc2778e5f9",
+      "previous_revision_action_sha256": "074b21d002bec36d83208be57ab378096b061892da95d6ad90306e0213921314",
+      "body_vertical_range_m": 0.112,
+      "shared_whole_character_lift": false
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",

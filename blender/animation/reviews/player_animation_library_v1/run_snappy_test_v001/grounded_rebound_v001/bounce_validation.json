@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "measured": {
+    "before": {
+      "hip_range_m": [
+        0.6420000195503235,
+        1.1880000829696655
+      ],
+      "vertical_excursion_m": 0.546000063419342,
+      "peak_both_feet_clearance_m": 0.48954641819000244,
+      "peak_hip_up_m_s": 8.223609924316861,
+      "peak_hip_down_m_s": 7.3371505737309235,
+      "designed_flight_ms": [
+        201.27127325406423,
+        201.2712732540642
+      ],
+      "designed_flight_fraction": 0.7103691997202266,
+      "contact_to_minimum_drop_m": 0.04399996995925903
+    },
+    "updated": {
+      "hip_range_m": [
+        0.6259999871253967,
+        0.7379999160766602
+      ],
+      "vertical_excursion_m": 0.11199992895126343,
+      "peak_both_feet_clearance_m": 0.08090158551931381,
+      "peak_hip_up_m_s": 1.455230712890625,
+      "peak_hip_down_m_s": 1.7451095581056961,
+      "designed_flight_ms": [
+        62.333333333333336,
+        56.66666666666664
+      ],
+      "designed_flight_fraction": 0.20999999999999996,
+      "contact_to_minimum_drop_m": 0.054000020027160645
+    }
+  },
+  "shared_character_lift_removed": true,
+  "cadence_frames": 17,
+  "fps": 30,
+  "nominal_speed_m_s": 2.5,
+  "interpretation": "Jump-like feel addressed by removing shared lift and restoring brief flight, while moving the rhythmic contrast into receiving compression and upper-body recovery. Technical measurements do not establish artistic approval."
+}
