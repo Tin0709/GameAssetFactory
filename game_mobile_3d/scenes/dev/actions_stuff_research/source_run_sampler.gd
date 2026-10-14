@@ -65,7 +65,7 @@ func set_clocks(gait_phase: float,life_time: float) -> void:
 	var head:=_source_transform("head",base.Head.origin)*Transform3D(base.Head)
 	head.origin=(body*Transform3D(base.Head)).origin;desired.Head=head
 	for side in ["L","R"]:
-		var name:="Arm."+side
+		var name: String="Arm."+side
 		var arm:=body*_source_transform("leftarm" if side=="L" else "rightarm",base[name].origin-Vector3(0,2*unit,0))
 		desired[name]=arm*base[name];desired["ForeArm."+side]=arm*base["ForeArm."+side]
 		name="Leg."+side
