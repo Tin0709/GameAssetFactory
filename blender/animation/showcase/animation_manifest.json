@@ -1757,5 +1757,87 @@
         "status": "approved"
       }
     }
-  }
+  },
+  "review_sequences": [
+    {
+      "id": "actions_stuff_directional_v001",
+      "label": "Actions & Stuff Directional Input v001",
+      "status": "pending",
+      "scene": "ASD_Directional_Review_v001",
+      "rig": "ASD_Player_Rig_v001",
+      "mesh": "ASD_Player_Mesh_v001",
+      "pose_action": "ActionsStuff_Directional_Input_Source_Study_v001",
+      "pose_slot_identifier": "OBASD_Player_Rig_v001",
+      "pose_action_sha256": "351d9d671987679e34f6293ddba8e4a97b7452df7e56a467cd1aa44e3070e89a",
+      "world_root": "ASD_PREVIEW_ONLY_WorldRoot",
+      "presentation_action": "PREVIEW_ONLY_ASD_EngineBodyYaw_v001",
+      "presentation_slot_identifier": "OBASD_PREVIEW_ONLY_WorldRoot",
+      "presentation_action_sha256": "5de34398b0f8f5484e95de26c3933a9b1b2f5479debb3c9849e630dff31003b0",
+      "start": 1,
+      "end": 840,
+      "fps": 30,
+      "fps_base": 1.0,
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_directional_v001/directional_input_review.blend",
+      "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+      "rotation_modes": {
+        "Root": "QUATERNION",
+        "Hips": "QUATERNION",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "QUATERNION",
+        "Leg.R": "QUATERNION"
+      },
+      "cameras": {
+        "FRONT": "ASD_FRONT",
+        "THREE_QUARTER": "ASD_THREE_QUARTER",
+        "SIDE": "ASD_SIDE"
+      },
+      "return_scene": "ANIMATION_SHOWCASE",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "directional_weight_adapter": "positive_only_not_normalized",
+      "research_scale_channels": {
+        "Leg.L": {
+          "axis": 1,
+          "min": 1.0,
+          "max": 1.070002
+        },
+        "Leg.R": {
+          "axis": 1,
+          "min": 1.0,
+          "max": 1.070002
+        }
+      },
+      "hud_root": "ASD_HUDRoot",
+      "native_height_adapter": {
+        "type": "phase_independent_direction_strength_envelope",
+        "grid_angles": 16,
+        "magnitudes": [
+          0.0,
+          0.25,
+          0.5,
+          0.75,
+          1.0,
+          1.25,
+          1.5
+        ],
+        "phase_samples_per_clip": 241,
+        "constant_padding_m": 0.005300550643472207,
+        "idle_bob_envelope": true,
+        "run_root_bank_envelope_deg": 1.44,
+        "foot_clamp": false,
+        "changes_source_pose_action": false
+      },
+      "source_sha256": "85267f011215de543a60d45f4af5df3f9ae6f8038e93ab34c0052b539377ee29"
+    }
+  ]
 }

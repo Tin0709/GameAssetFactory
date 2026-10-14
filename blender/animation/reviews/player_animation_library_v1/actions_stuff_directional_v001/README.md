@@ -4,7 +4,7 @@
 
 ## Open and review
 
-Open `../../showcase/Animation_Showcase.blend` (from this folder, the repository file is `blender/animation/showcase/Animation_Showcase.blend`). In the 3D View press **N → Animation Library → Pending Research Sequences → Actions & Stuff Directional Input v001**. Use Play/Pause, Restart and Front / Three Quarter / Side; Return to Animation Library restores the original library scene. The standalone authoring file is `directional_input_review.blend`.
+Open `../../../showcase/Animation_Showcase.blend` (from this folder, the repository file is `blender/animation/showcase/Animation_Showcase.blend`). In the 3D View press **N → Animation Library → Pending Research Sequences → Actions & Stuff Directional Input v001**. Use Play/Pause, Restart and Front / Three Quarter / Side; Return to Animation Library restores the original library scene. The standalone authoring file is `directional_input_review.blend`.
 
 The review is **28 seconds, frames 1–840 at 30 FPS, original speed**, with a closing sample at 841. It is a one-shot sequence, not a seamless reusable locomotion loop; looping is initially off. Core directional gaits retain the source loops. Restart reproduces the same input trace. Baked playback does not execute the source Python evaluator or embedded executable text.
 
