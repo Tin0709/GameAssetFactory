@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "all28_actions_exact": true,
+  "rig_unchanged": true,
+  "source_files_exact": true,
+  "approval": {
+    "Walk_Snappy_V027_Refined_Test_v003": {
+      "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/lower_step_v001/walk_v027_refined_review.blend",
+      "source_sha256": "d68ba6c7961851c7eb358d4e614e8006eae75db20903f8bc0b82d26a9c791ea5",
+      "action_sha256": "30dd70cd05dfe918ac17f52d8ccc847014d8c40a8176c0e316fdb3c3b2267034",
+      "status": "approved"
+    },
+    "Run_Snappy_Test_v001": {
+      "source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/elastic_drive_v001/run_snappy_review.blend",
+      "source_sha256": "33a62f5ba58a5743c1bc820f53fa2c77050a7292d5580fd815d3a6a8e85dd663",
+      "action_sha256": "8e835f91c686d41bb1846fb0d7ddc151dc55a9178f87e27d845fc54f972cb156",
+      "status": "approved"
+    }
+  },
+  "showcase_sha256": "9ebc8c32116beed5fa3a8691314f32829998e0a9bda99752bad69e96a2f99f96",
+  "production_approved": false
+}

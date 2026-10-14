@@ -1,0 +1,58 @@
+{
+  "Walk_Snappy_V027_Refined_Test_v003": {
+    "period_s": 0.7,
+    "hip_range_m": [
+      0.6568126678466797,
+      0.8234981894493103
+    ],
+    "hip_excursion_m": 0.16668552160263062,
+    "flight_fraction_at_2mm_threshold": 0.5357142857142857,
+    "lowest_sole_peaks_m": {
+      "L": 0.16943858563899994,
+      "R": 0.16668860614299774
+    },
+    "cycle_frequency_hz_at_native_speed": 1.4285714285714286
+  },
+  "Run_Snappy_Test_v001": {
+    "period_s": 0.5666666666666667,
+    "hip_range_m": [
+      0.6226786375045776,
+      0.7457215785980225
+    ],
+    "hip_excursion_m": 0.12304294109344482,
+    "flight_fraction_at_2mm_threshold": 0.19117647058823528,
+    "lowest_sole_peaks_m": {
+      "L": 0.20256152749061584,
+      "R": 0.19452916085720062
+    },
+    "cycle_frequency_hz_at_native_speed": 1.7647058823529411
+  },
+  "Walk_Expressive_Test": {
+    "period_s": 1.2,
+    "hip_range_m": [
+      0.6410040855407715,
+      0.6629958748817444
+    ],
+    "hip_excursion_m": 0.0219917893409729,
+    "flight_fraction_at_2mm_threshold": 0.0,
+    "lowest_sole_peaks_m": {
+      "L": 0.07239147275686264,
+      "R": 0.06637167930603027
+    },
+    "cycle_frequency_hz_at_native_speed": 0.8333333333333334
+  },
+  "Run_Expressive_v3_Test": {
+    "period_s": 0.6666666666666666,
+    "hip_range_m": [
+      0.6319987177848816,
+      0.6748499870300293
+    ],
+    "hip_excursion_m": 0.042851269245147705,
+    "flight_fraction_at_2mm_threshold": 0.1,
+    "lowest_sole_peaks_m": {
+      "L": 0.15037626028060913,
+      "R": 0.14034917950630188
+    },
+    "cycle_frequency_hz_at_native_speed": 1.5
+  }
+}

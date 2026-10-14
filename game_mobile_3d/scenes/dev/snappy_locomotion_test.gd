@@ -18,6 +18,7 @@ var _last_section:=""
 var telemetry: Array=[]
 
 func _ready() -> void:
+	get_window().title="Snappy Locomotion - Gameplay A/B Test"
 	process_priority=100
 	var world:=WorldEnvironment.new();var env:=Environment.new()
 	env.background_mode=Environment.BG_COLOR;env.background_color=Color(.12,.17,.21)

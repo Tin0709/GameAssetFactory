@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "gameplay_expressive_1x.mp4",
+      "frames": 397,
+      "fps": 30.0,
+      "sha256": "44d6a3181fde9f1f6a7b2550384650ab3e3b600808827b7a10275210221086d1"
+    },
+    {
+      "file": "gameplay_snappy_1x.mp4",
+      "frames": 397,
+      "fps": 30.0,
+      "sha256": "75d6da2de46295dce93b5c16a052706a5ab015639d5e43022e726415afe21dd9"
+    },
+    {
+      "file": "gameplay_style_toggle_1x.mp4",
+      "frames": 397,
+      "fps": 30.0,
+      "sha256": "7f146db0449564c92023fe1aa4494324b65107ba2dc5f50bc5fcf6c35870c4c4"
+    },
+    {
+      "file": "snappy_vs_expressive_1x.mp4",
+      "frames": 397,
+      "fps": 30.0,
+      "sha256": "3293b652caabc9bffecf20a73ffe9f12f19f6a841930270b6459deeac6d02358"
+    }
+  ],
+  "original_speed": true,
+  "time_scale": 1,
+  "duration_s": 13.233333333333333,
+  "renderer": "Godot4.7.2 D3D12 Mobile / RTX4070TiSUPER",
+  "capture_method": "Deterministic actual gameplay movie, fixed30 render FPS /60Hz physics. Real-time performance and phone performance are not established by offline capture.",
+  "ab_alignment": "Same control sequence and wall-clock video frames; gait phases keep their own style cadence. No phase retiming."
+}
