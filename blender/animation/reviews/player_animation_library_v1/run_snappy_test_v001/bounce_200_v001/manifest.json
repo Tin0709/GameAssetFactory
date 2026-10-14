@@ -66,6 +66,6 @@
   "release_phase": 0.16837654012837933,
   "previous_source_sha256": "81edea51cb206f1acfefa62df8b32fa6a317f169118144d5360096714f696e98",
   "previous_action_sha256": "dbba2b08b4372635fa438a62078680ce5836b16472c583a1b4a7bf9da3d280ac",
-  "leg_pitch_design": "Airborne-only1.65 pitch magnification capped55deg; gate smooth over35mm common-hop clearance. Support/contacts and all limb dimensions preserved. Upper-leg attachment correction only during flight.",
+  "leg_pitch_design": "Airborne-only1.65 pitch magnification capped55deg;68ms opening /57ms gathering gates. Support/contacts and all limb dimensions preserved. Soft positive attachment correction only during flight.",
   "body_design": "User+200% interpreted as3x total vertical excursion. Original44mm receiving dip retained; extra excursion goes into an event-shaped rebound. Whole-leg flight follows the higher body without stretching.17frame cadence and2.5m/s nominal travel unchanged."
 }
