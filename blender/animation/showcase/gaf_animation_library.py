@@ -134,7 +134,8 @@ def focused_index(scene,index):
 
 def archive_visibility_changed(scene,context):
     if not _switching and scene.get(SCENE_TAG) and scene.gaf_clips:
-        scene.gaf_active_index=focused_index(scene,scene.gaf_active_index)
+        index=focused_index(scene,scene.gaf_active_index)
+        if index!=scene.gaf_active_index:scene.gaf_active_index=index
 
 def select_registered_action(context,action_name):
     home=library_home(context.scene)
