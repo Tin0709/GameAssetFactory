@@ -119,6 +119,15 @@ def validate_review_sequence(entry):
     for obj in [rig,mesh,world]:
         if obj.constraints or (obj.animation_data and (obj.animation_data.nla_tracks or obj.animation_data.drivers)):raise ValueError('Review sequences require baked transforms without constraints, NLA or drivers')
     if any(b.constraints for b in rig.pose.bones):raise ValueError('Review sequence bone constraints are unsupported')
+    scale_policy=entry.get('research_scale_channels',{})
+    if 'research_scale_channels' in entry:
+        if (entry.get('source_pack_sha256')!='9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d'
+                or entry.get('directional_weight_adapter')!='positive_only_not_normalized'
+                or not isinstance(scale_policy,dict) or not scale_policy or set(scale_policy)-{'Leg.L','Leg.R'}):raise ValueError('Mixed directional scale requires verified source provenance and leg-only bounds')
+        for rule in scale_policy.values():
+            if (not isinstance(rule,dict) or set(rule)!={'axis','min','max'} or type(rule['axis']) is not int or rule['axis']!=1
+                    or type(rule['min']) not in [int,float] or rule['min']!=1.
+                    or type(rule['max']) not in [int,float] or not math.isfinite(rule['max']) or not 1.<=rule['max']<=1.105002):raise ValueError('Mixed directional leg scale policy exceeds the verified axis or theoretical bounds')
     for prefix,obj in [('pose',rig),('presentation',world)]:
         action=bpy.data.actions.get(entry[prefix+'_action'])
         if action is None or len(action.slots)!=1 or action.slots[0].target_id_type!='OBJECT' or action.slots[0].identifier!=entry[prefix+'_slot_identifier']:raise ValueError('Review sequence Action slot is incompatible')
@@ -141,6 +150,7 @@ def validate_review_sequence(entry):
                 if any(abs(k.co.y-neutral)>1e-6 for k in c.keyframe_points):raise ValueError('Review sequence cannot invent ForeArm articulation')
             if prop=='scale':
                 low,high=(1.,1.070002) if bone_name in ['Leg.L','Leg.R'] and c.array_index==1 else (1.,1.)
+                if bone_name in scale_policy and c.array_index==1:high=scale_policy[bone_name]['max']
                 if any(k.co.y<low-1e-6 or k.co.y>high for k in c.keyframe_points):raise ValueError('Review scale exceeds the verified leg Y bounds')
     if entry['pose_action']==entry['presentation_action']:raise ValueError('Pose and presentation Actions must be separate')
     cameras=entry.get('cameras',{})
