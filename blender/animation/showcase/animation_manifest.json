@@ -1166,8 +1166,8 @@
       "end": 21,
       "fps": 30,
       "fps_base": 1.0,
-      "status": "pending",
-      "approval_note": "Same v003 in-place update: recovery-leg lowest-sole floor clearance halved, nominal left/right peak339.8/333.7\u2192170.1/167.1mm; support common hop retained. Another25% receiving compression52.3308\u219265.4135mm;1.5mm elastic overshoot. Leg fore/aft/lateral paths and orientations,42mm gap/cadence unchanged. Previous source/reviews and all26 other Actions preserved.",
+      "status": "approved",
+      "approval_note": "Explicit user approval2026-10-14: current displayed Snappy Walk v003 and Run V001 are approved artistic baselines. Exact Action/source preserved. Separate Godot gameplay test authorized; production locomotion not replaced.",
       "seamless_loop": true,
       "rotation_modes": {
         "Root": "XYZ",
@@ -1242,8 +1242,8 @@
       "closing_key": 18,
       "fps": 30,
       "fps_base": 1.0,
-      "status": "pending",
-      "approval_note": "Pending. User requests more jelly-like body rebound and clearer running rather than walking. Event-shaped receiving/recovery with10ms rounding,5deg additional hip forward lean,12% stronger arm pitch and restrained delayed torso/shoulder/head. Prior low world foot paths and brief62/57ms flight preserved, same17-frame cadence/2.5m/s. All older sources and27 other Actions unchanged.",
+      "status": "approved",
+      "approval_note": "Explicit user approval2026-10-14: current displayed Snappy Walk v003 and Run V001 are approved artistic baselines. Exact Action/source preserved. Separate Godot gameplay test authorized; production locomotion not replaced.",
       "seamless_loop": true,
       "period_s": 0.5666666666666667,
       "in_place": true,
@@ -1306,5 +1306,25 @@
     "accepted_date": "2026-10-14",
     "production_approved": false,
     "note": "User accepts current state as provisional Walking baseline; preserve current source and all backups. Entry remains Pending, not final production approval."
+  },
+  "snappy_artistic_approvals": {
+    "date": "2026-10-14",
+    "user_statement": "2 of these is approve",
+    "scope": "Current Blender artistic baselines. Godot test review pending; no production promotion.",
+    "production_approved": false,
+    "actions": {
+      "Walk_Snappy_V027_Refined_Test_v003": {
+        "source": "blender/animation/reviews/player_animation_library_v1/walk_v027_refined_v003/lower_step_v001/walk_v027_refined_review.blend",
+        "source_sha256": "d68ba6c7961851c7eb358d4e614e8006eae75db20903f8bc0b82d26a9c791ea5",
+        "action_sha256": "30dd70cd05dfe918ac17f52d8ccc847014d8c40a8176c0e316fdb3c3b2267034",
+        "status": "approved"
+      },
+      "Run_Snappy_Test_v001": {
+        "source": "blender/animation/reviews/player_animation_library_v1/run_snappy_test_v001/elastic_drive_v001/run_snappy_review.blend",
+        "source_sha256": "33a62f5ba58a5743c1bc820f53fa2c77050a7292d5580fd815d3a6a8e85dd663",
+        "action_sha256": "8e835f91c686d41bb1846fb0d7ddc151dc55a9178f87e27d845fc54f972cb156",
+        "status": "approved"
+      }
+    }
   }
 }
