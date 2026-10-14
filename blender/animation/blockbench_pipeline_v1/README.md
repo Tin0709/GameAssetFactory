@@ -66,7 +66,7 @@ Each import has 121 samples. Each comparison uses 241 independently evaluated Bl
 
 Visual validation found two seed-reference problems before final delivery: very small scientific-notation literals were interpreted as Molang expressions, and the initial seed conversion used the wrong Euler naming convention. Decimal quantization and the corrected seed matrix conversion fixed them; a new independent comparison against the approved Ready reference guards the result. Rifle preview extraction also had to enable its hidden collection before evaluating attached mesh world transforms. The importer itself continues to use evaluated matrices. The rejected intermediate is archived under `.validation/blockbench_pipeline_v1/rejected_scientific_literals/`.
 
-All **28 existing Actions**, including **12 approved Actions**, retain their content signatures, slots and original registration entries. The saved showcase contains **33 Actions** and the same single original armature. Complete pre-change showcase/manifest backups, including all approved Actions, are under `.validation/blockbench_pipeline_v1/before/`; the existing registration helper also made timestamped backups under `.validation/animation_showcase/registrations/`.
+All **28 existing Actions**, including **12 approved Actions**, retain their content signatures, slots and original registration entries. The bridge delivery produced **33 Actions** (28 originals + five imports) and the same single original armature. A separate chat subsequently appended another Pending entry; it was preserved, and the final check records the actual current count without requiring unrelated entries to be removed. Complete pre-change showcase/manifest backups, including all approved Actions, are under `.validation/blockbench_pipeline_v1/before/`; the existing registration helper also made timestamped backups under `.validation/animation_showcase/registrations/`.
 
 ## Limits and future animations
 
@@ -78,3 +78,5 @@ All **28 existing Actions**, including **12 approved Actions**, retain their con
 - A static Ready round-trip proves transfer fidelity and straight limbs. It does not establish a new artistic approval, dynamic weapon handling quality, production readiness or mobile performance.
 
 Format reference: [official Blockbench bbmodel documentation](https://www.blockbench.net/wiki/docs/bbmodel/). Implementation behavior was checked against the installed 5.2.2 runtime.
+
+Final code review: the reusable helper leaves viewer saving to the review window, avoiding automatic replacement of a shared `.blend`; distinct pre/post discontinuities are rejected. Both findings were resolved and re-reviewed.

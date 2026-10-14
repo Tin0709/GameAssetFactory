@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "count": 34,
+  "all_entries_slots_timing_valid": true,
+  "three_views": true,
+  "real_gui": true,
+  "wraps": 2,
+  "inactive_reopen": true,
+  "paused_frame": 1
+}
