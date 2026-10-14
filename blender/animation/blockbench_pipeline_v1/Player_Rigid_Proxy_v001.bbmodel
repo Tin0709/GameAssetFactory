@@ -4,7 +4,7 @@
     "model_format": "free",
     "box_uv": false
   },
-  "name": "GAF_Player_Rigid_Proxy_v001",
+  "name": "Player_Rigid_Proxy_v001",
   "model_identifier": "",
   "visible_box": [
     1,
@@ -987,7 +987,7 @@
       "override": false,
       "length": 1,
       "snapping": 30,
-      "selected": true,
+      "selected": false,
       "group_name": "",
       "scope": 0,
       "anim_time_update": "",
@@ -1139,6 +1139,78 @@
               "interpolation": "linear"
             }
           ]
+        },
+        "16f94f12-577e-5ba9-b2bf-f28a6d2d8c41": {
+          "name": "Root",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "3c0557f6-3961-5180-976d-d93cf24f95e0": {
+          "name": "Hips",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "e9d1acb9-c580-50a3-8ed7-ccc684e35434": {
+          "name": "Spine",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "d2bbe433-153c-58be-9ec5-e5bee7d5925c": {
+          "name": "Chest",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "b4e74610-aaea-5f80-8660-99f099ee5901": {
+          "name": "Neck",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "253419a0-07ea-5671-ae4b-05987de95a64": {
+          "name": "Head",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "40ad3fd8-3585-59e4-a4b5-c4c86d7b0f98": {
+          "name": "UpperArm.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "58ac4cfd-6719-56b3-92ea-b5a8647e3e53": {
+          "name": "ForeArm.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "1f3ee01c-aacc-5c54-94c7-90ffcbefd8f8": {
+          "name": "ForeArm.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "f3b24f34-3da6-5530-807d-02c4ffd30991": {
+          "name": "WeaponCarrier",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "689cf123-d20c-532b-90b9-d108b9d87274": {
+          "name": "Leg.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "d5c1fed0-34f5-53a3-9805-d2d436f0cf5f": {
+          "name": "Leg.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
         }
       }
     },
@@ -1206,6 +1278,78 @@
               "interpolation": "linear"
             }
           ]
+        },
+        "16f94f12-577e-5ba9-b2bf-f28a6d2d8c41": {
+          "name": "Root",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "3c0557f6-3961-5180-976d-d93cf24f95e0": {
+          "name": "Hips",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "e9d1acb9-c580-50a3-8ed7-ccc684e35434": {
+          "name": "Spine",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "d2bbe433-153c-58be-9ec5-e5bee7d5925c": {
+          "name": "Chest",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "b4e74610-aaea-5f80-8660-99f099ee5901": {
+          "name": "Neck",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "253419a0-07ea-5671-ae4b-05987de95a64": {
+          "name": "Head",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "58ac4cfd-6719-56b3-92ea-b5a8647e3e53": {
+          "name": "ForeArm.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "bc092742-33ac-5c2f-aff7-72b785820c5f": {
+          "name": "UpperArm.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "1f3ee01c-aacc-5c54-94c7-90ffcbefd8f8": {
+          "name": "ForeArm.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "f3b24f34-3da6-5530-807d-02c4ffd30991": {
+          "name": "WeaponCarrier",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "689cf123-d20c-532b-90b9-d108b9d87274": {
+          "name": "Leg.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "d5c1fed0-34f5-53a3-9805-d2d436f0cf5f": {
+          "name": "Leg.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
         }
       }
     },
@@ -1273,6 +1417,78 @@
               "interpolation": "linear"
             }
           ]
+        },
+        "16f94f12-577e-5ba9-b2bf-f28a6d2d8c41": {
+          "name": "Root",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "3c0557f6-3961-5180-976d-d93cf24f95e0": {
+          "name": "Hips",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "e9d1acb9-c580-50a3-8ed7-ccc684e35434": {
+          "name": "Spine",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "d2bbe433-153c-58be-9ec5-e5bee7d5925c": {
+          "name": "Chest",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "b4e74610-aaea-5f80-8660-99f099ee5901": {
+          "name": "Neck",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "40ad3fd8-3585-59e4-a4b5-c4c86d7b0f98": {
+          "name": "UpperArm.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "58ac4cfd-6719-56b3-92ea-b5a8647e3e53": {
+          "name": "ForeArm.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "bc092742-33ac-5c2f-aff7-72b785820c5f": {
+          "name": "UpperArm.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "1f3ee01c-aacc-5c54-94c7-90ffcbefd8f8": {
+          "name": "ForeArm.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "f3b24f34-3da6-5530-807d-02c4ffd30991": {
+          "name": "WeaponCarrier",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "689cf123-d20c-532b-90b9-d108b9d87274": {
+          "name": "Leg.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "d5c1fed0-34f5-53a3-9805-d2d436f0cf5f": {
+          "name": "Leg.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
         }
       }
     },
@@ -1283,7 +1499,7 @@
       "override": false,
       "length": 1,
       "snapping": 30,
-      "selected": false,
+      "selected": true,
       "group_name": "",
       "scope": 0,
       "anim_time_update": "",
@@ -1390,6 +1606,72 @@
               "interpolation": "linear"
             }
           ]
+        },
+        "16f94f12-577e-5ba9-b2bf-f28a6d2d8c41": {
+          "name": "Root",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "3c0557f6-3961-5180-976d-d93cf24f95e0": {
+          "name": "Hips",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "e9d1acb9-c580-50a3-8ed7-ccc684e35434": {
+          "name": "Spine",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "d2bbe433-153c-58be-9ec5-e5bee7d5925c": {
+          "name": "Chest",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "b4e74610-aaea-5f80-8660-99f099ee5901": {
+          "name": "Neck",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "253419a0-07ea-5671-ae4b-05987de95a64": {
+          "name": "Head",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "58ac4cfd-6719-56b3-92ea-b5a8647e3e53": {
+          "name": "ForeArm.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "1f3ee01c-aacc-5c54-94c7-90ffcbefd8f8": {
+          "name": "ForeArm.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "f3b24f34-3da6-5530-807d-02c4ffd30991": {
+          "name": "WeaponCarrier",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "689cf123-d20c-532b-90b9-d108b9d87274": {
+          "name": "Leg.L",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
+        },
+        "d5c1fed0-34f5-53a3-9805-d2d436f0cf5f": {
+          "name": "Leg.R",
+          "type": "bone",
+          "rotation_global": false,
+          "quaternion_interpolation": false
         }
       }
     }

@@ -22,3 +22,5 @@ for(const [name,pose] of specs){const a=new Animation({name,length:1,loop:'once'
 Modes.options.animate.select();Animation.all[0].select();Timeline.setTime(0);Animator.preview();Canvas.updateAll();return Codecs.project.compile({raw:true});})()'''.replace('CONTRACT',json.dumps(contract))
 (HERE/'create_proxy_in_blockbench.js').write_text(js)
 print('contract',contract['sha256'],'13 groups, 6 rigid cuboids')
+
+(HERE/"gaf_rigid_blender_bridge.js").write_text("const GAF_BRIDGE_CONTRACT="+json.dumps(contract)+";\n"+(HERE/"bridge_plugin_body.js").read_text())

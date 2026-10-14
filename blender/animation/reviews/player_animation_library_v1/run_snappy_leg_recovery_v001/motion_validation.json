@@ -2,9 +2,9 @@
   "samples": 2177,
   "upper_body_curves_exact": true,
   "approved_action_exact": true,
-  "max_supported_vertex_error_m": 2.407356265396403e-07,
-  "max_sole_height_error_m": 0.00017523765563964844,
-  "minimum_floor_m": 0.00039801374077796936,
+  "max_supported_vertex_error_m": 4.437221004539041e-05,
+  "max_sole_height_error_m": 0.0003561079502105713,
+  "minimum_floor_m": 0.00038061512168496847,
   "max_upper_body_world_error_m": 0.0,
   "max_scale_error": 1.1920928955078125e-07,
   "overlaps": {},
@@ -5876,17 +5876,17 @@
     "candidate": {
       "L": {
         "passing_phase": 0.5946691176470589,
-        "peak_exchange_speed_m_s": 14.586843252182007
+        "peak_exchange_speed_m_s": 16.337170600891113
       },
       "R": {
         "passing_phase": 0.6006433823529411,
-        "peak_exchange_speed_m_s": 14.989289045333862
+        "peak_exchange_speed_m_s": 16.694319248199463
       }
     }
   },
   "loop_pose_error_m": 0.0,
   "loop_second_order_velocity_error_m_s": 0.00256383344832439,
-  "source_sha256": "b7ab1d733652bb8ae7f6965ee083d91f5c8910e05796cda574ae307ab625d5ea",
-  "action_sha256": "8c361592782a17d4ab052ac35b8688107a5649b0c92d5aa593ac2dfcaf36ba6f",
+  "source_sha256": "4c0debb48a4e378ac68f6f6034fb0467ffcc85176e0409f0b026b9abe2542b80",
+  "action_sha256": "0d98e9a5385370a5c33798e81d444e10107954fd308d4511602ddb6f89e0b215",
   "passed": false
 }

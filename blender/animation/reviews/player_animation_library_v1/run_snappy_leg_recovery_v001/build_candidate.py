@@ -56,34 +56,33 @@ def target(frame, side):
     u = (frame - 1) / PERIOD
     current = pose(frame)
     offset = 0. if side == 'L' else .5
-    if True:
-        name = 'Leg.' + side
-        q = (u - offset) % 1
-        warped = phase_warp(q, entry['support_duty'][side])
-        world = current[name].copy()
-        if abs(warped - q) > 1e-12:
-            mapped = pose(1 + ((warped + offset) % 1) * PERIOD)[name]
-            old_direction = world.to_3x3().col[1]
-            new_direction = mapped.to_3x3().col[1]
-            old_pitch = math.atan2(old_direction.y, -old_direction.z)
-            new_pitch = math.atan2(new_direction.y, -new_direction.z)
-            angle = (new_pitch - old_pitch + math.pi) % (2 * math.pi) - math.pi
-            rotated = Matrix.Rotation(angle, 4, 'X') @ world
-            old_center = world @ Vector((0, .675, 0))
-            mapped_center = mapped @ Vector((0, .675, 0))
-            new_center = rotated @ Vector((0, .675, 0))
-            rotated.translation.x += old_center.x - new_center.x
-            rotated.translation.y += mapped_center.y - new_center.y
-            rotated.translation.z += min((world @ p).z for p in corners) - min((rotated @ p).z for p in corners)
-            world = rotated
-        bone = rig.data.bones[name]
-        parent = bone.parent
-        basis = bone.convert_local_to_pose(world, bone.matrix_local,
-                                          parent_matrix=current[parent.name],
-                                          parent_matrix_local=parent.matrix_local, invert=True)
-        p, rotation, scale = basis.decompose()
-        assert max(abs(x - 1) for x in scale) < 1e-5
-        return (list(p), list(rotation.to_euler('XYZ'))), world, current[name]
+    name = 'Leg.' + side
+    q = (u - offset) % 1
+    warped = phase_warp(q, entry['support_duty'][side])
+    world = current[name].copy()
+    if abs(warped - q) > 1e-12:
+        mapped = pose(1 + ((warped + offset) % 1) * PERIOD)[name]
+        old_direction = world.to_3x3().col[1]
+        new_direction = mapped.to_3x3().col[1]
+        old_pitch = math.atan2(old_direction.y, -old_direction.z)
+        new_pitch = math.atan2(new_direction.y, -new_direction.z)
+        angle = (new_pitch - old_pitch + math.pi) % (2 * math.pi) - math.pi
+        rotated = Matrix.Rotation(angle, 4, 'X') @ world
+        old_center = world @ Vector((0, .675, 0))
+        mapped_center = mapped @ Vector((0, .675, 0))
+        new_center = rotated @ Vector((0, .675, 0))
+        rotated.translation.x += old_center.x - new_center.x
+        rotated.translation.y += mapped_center.y - new_center.y
+        rotated.translation.z += min((world @ p).z for p in corners) - min((rotated @ p).z for p in corners)
+        world = rotated
+    bone = rig.data.bones[name]
+    parent = bone.parent
+    basis = bone.convert_local_to_pose(world, bone.matrix_local,
+                                      parent_matrix=current[parent.name],
+                                      parent_matrix_local=parent.matrix_local, invert=True)
+    p, rotation, scale = basis.decompose()
+    assert max(abs(x - 1) for x in scale) < 1e-5
+    return (list(p), list(rotation.to_euler('XYZ'))), world, current[name]
 
 # Lowest-corner height is piecewise smooth at sole rocking changes. Insert
 # its actual corner-switch times rather than rounding a cusp between keys.
@@ -136,9 +135,9 @@ for curve in ui.curves(candidate):
         slope_left = slope_right = (right-left)/(right_t-left_t)
         if frame in cusps[name]:
             epsilon = min(.0005, (frame-left_t)/4, (right_t-frame)/4)
-            before = target(frame-epsilon, name[-1])[0][channel][curve.array_index]
+            sample_before = target(frame-epsilon, name[-1])[0][channel][curve.array_index]
             after = target(frame+epsilon, name[-1])[0][channel][curve.array_index]
-            slope_left = (value-before)/epsilon
+            slope_left = (value-sample_before)/epsilon
             slope_right = (after-value)/epsilon
         key.co = (frame, value)
         key.handle_left_type = key.handle_right_type = 'FREE'
