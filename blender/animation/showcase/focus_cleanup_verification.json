@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "normal_startup_addon_registered": true,
+  "default_visible": [
+    "Walk_ActionsStuff_Source_Test_v001",
+    "Run_ActionsStuff_Source_Test_v001",
+    "Actions & Stuff Directional Input v001"
+  ],
+  "directional_status": "approved",
+  "archived_count": 35,
+  "all_registrations": 38,
+  "unchanged_blender_actions": 65,
+  "native_datablocks_exact": true,
+  "all37_action_entries_exact": true,
+  "gait_playback_samples": {
+    "Walk_ActionsStuff_Source_Test_v001": {
+      "frames": [
+        1,
+        12,
+        24
+      ],
+      "slot": "OBASW_Player_Rig_v001",
+      "end": 24,
+      "fps": 30
+    },
+    "Run_ActionsStuff_Source_Test_v001": {
+      "frames": [
+        1,
+        90,
+        180
+      ],
+      "slot": "OBASR_Player_Rig_v001",
+      "end": 180,
+      "fps": 30
+    }
+  },
+  "directional_playback_samples": [
+    1,
+    420,
+    840
+  ],
+  "directional_timing": [
+    1,
+    840,
+    30
+  ],
+  "sequence_cameras_and_return": true,
+  "archived_idle_selectable": true,
+  "no_autoplay": true,
+  "protected_file_hashes": 6075,
+  "all_protected_sources_and_godot_unchanged": true,
+  "unexpected_changes": [],
+  "backup_directory": "/Users/tin/Documents/ChatGPT/New project/experiments/showcase_actions_stuff_focus_v001/backup",
+  "texture_paths_and_packed_images_exact": true,
+  "archive_toggle_preserves_primary_playhead": true,
+  "permanent_focus_recorded": true
+}
