@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "prior_entries_exact": 37,
+  "prior_actions_exact": 37,
+  "review_open_return_cameras": true,
+  "native_samples": 1681,
+  "minimum_sole_clearance_m": 0.0005000829696655273,
+  "forearm_basis_error": 0.0,
+  "display_root_horizontal_translation_m": 0.0,
+  "source_phase_first_last": [
+    0.0,
+    38.03613119579839
+  ],
+  "scale_ranges": {
+    "L": [
+      1.0,
+      1.0672167539596558
+    ],
+    "R": [
+      1.0,
+      1.0675848722457886
+    ]
+  },
+  "controller_states": [
+    "onccai",
+    "run"
+  ],
+  "no_autoplay": true
+}

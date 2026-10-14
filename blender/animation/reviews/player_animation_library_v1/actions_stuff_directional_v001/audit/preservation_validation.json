@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "baseline_files": 2014,
+  "godot_files_unchanged": 1861,
+  "protected_player_source_and_weapon_files_unchanged": true,
+  "authorized_updated_files": [
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/animation_manifest.json",
+    "blender/animation/showcase/gaf_animation_library.py",
+    "docs/animation/ANIMATION_PROGRESS.md"
+  ],
+  "cache_changes": [
+    "blender/animation/showcase/__pycache__/gaf_animation_library.cpython-313.pyc"
+  ],
+  "unrelated_concurrent_mobs_changes_detected_and_left_untouched": [
+    "blender/animation/showcase/Mobs_Animation_Library.blend1",
+    "blender/animation/showcase/Mobs_Animation_Library.blend",
+    "blender/animation/showcase/mobs_library/README.md",
+    "blender/animation/showcase/mobs_library/gaf_mobs_animation_library.py"
+  ]
+}

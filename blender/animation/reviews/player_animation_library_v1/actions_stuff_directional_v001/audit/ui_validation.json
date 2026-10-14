@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "rejections": [
+    "approved research",
+    "production eligible",
+    "signature",
+    "rest",
+    "missing HUD",
+    "HUD parent",
+    "world scale",
+    "missing world parent",
+    "scale bound",
+    "unprovenanced mixed scale",
+    "mixed scale theoretical bound",
+    "wrong mixed scale adapter",
+    "mixed scale axis",
+    "forearm bend",
+    "presentation scale channel"
+  ],
+  "main_state_preserved": true,
+  "snapshot_reopen_outside_library_folder": true,
+  "no_autoplay": true,
+  "old_entries_exact": 37
+}

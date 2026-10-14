@@ -1,0 +1,26 @@
+[
+  {
+    "file": "review/three_quarter_30fps.mp4",
+    "sha256": "f0daa0778e4806c7f73c23e920ba98c98adee6f884a9547b5874602f5609e0b5",
+    "frames": 840,
+    "fps": 30,
+    "duration_s": 28,
+    "decode_ok": true
+  },
+  {
+    "file": "review/front_30fps.mp4",
+    "sha256": "60ad1c88b5dba639c9566327280866f79fb8a0774816070985255880b302020a",
+    "frames": 840,
+    "fps": 30,
+    "duration_s": 28,
+    "decode_ok": true
+  },
+  {
+    "file": "review/side_30fps.mp4",
+    "sha256": "2c1c77e17e4ef9ddc7768806c5eaaa5f46e7bd3d28f7415e8ef4d085764625d7",
+    "frames": 840,
+    "fps": 30,
+    "duration_s": 28,
+    "decode_ok": true
+  }
+]

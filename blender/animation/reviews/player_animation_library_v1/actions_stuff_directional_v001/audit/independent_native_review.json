@@ -1,0 +1,19 @@
+{
+  "samples": 1681,
+  "maximum_bone_matrix_error": 5.960464477539062e-07,
+  "worst": {
+    "frame": 165.5,
+    "bone": "Head"
+  },
+  "maximum_forearm_basis_error": 0.0,
+  "maximum_presentation_xy_translation_m": 0.0,
+  "maximum_height_offset_error_m": 6.961773935110216e-09,
+  "minimum_sole_clearance_m": 0.0005000829696655273,
+  "idle_clearance_range_m": [
+    0.005300714634358883,
+    0.00630022119730711
+  ],
+  "pose_action_matches_raw_study": true,
+  "old_action_signatures_exact": 37,
+  "review_open_return_views": true
+}

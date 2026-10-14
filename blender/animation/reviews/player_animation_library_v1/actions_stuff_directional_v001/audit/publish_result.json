@@ -1,0 +1,8 @@
+{
+  "central_sha256": "cbb2174ed5cbf4775e9b2f1d2b858087fbb9369201be1f2aa32fea89010bd844",
+  "manifest_sha256": "3cf36a87bb6107238783527ea86414ce245e072898492b24340c8684b26e1a10",
+  "installed_addon_sha256": "65efd1734f4393d111a909b7740af859afa67730890fde6dc10bbab8e27e3607",
+  "source_sha256": "85267f011215de543a60d45f4af5df3f9ae6f8038e93ab34c0052b539377ee29",
+  "prior_entries": 37,
+  "sequence": "actions_stuff_directional_v001"
+}
