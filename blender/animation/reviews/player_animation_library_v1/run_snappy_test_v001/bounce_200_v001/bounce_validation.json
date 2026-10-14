@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "vertical_range_before_m": 0.09099996089935303,
+  "vertical_range_after_m": 0.27300000190734863,
+  "range_multiplier": 3.0000013099927556,
+  "contact_height_before_m": 0.6859999895095825,
+  "contact_height_after_m": 0.6859999895095825,
+  "minimum_before_m": 0.6420000195503235,
+  "minimum_after_m": 0.6420000195503235,
+  "leg_pitch_ranges_deg": {
+    "L": [
+      -47.38110764974308,
+      48.70641365063026
+    ],
+    "R": [
+      -48.13088483569206,
+      48.02210041278126
+    ]
+  },
+  "fps": 30,
+  "period_frames": 17,
+  "nominal_speed_m_s": 2.5,
+  "interpretation": "User+200%=3x vertical range; landing contact height and trough retained. Extra excursion is spring recovery, with flight-only whole-leg following and wide pitch spread. No animated limb scale or cadence change."
+}
