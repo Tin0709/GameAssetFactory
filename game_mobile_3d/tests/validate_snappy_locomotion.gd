@@ -73,6 +73,18 @@ func run() -> void:
 		await ticks(.10,"Rapid reversals")
 	actor.requested_direction=Vector2.ZERO;actor.requested_run=false
 	await ticks(1.0,"Final settle")
+	for stop_time in [.16,.36]:
+		actor.scripted_input=true;actor.requested_direction=Vector2.DOWN
+		await ticks(.65,"Reset setup")
+		actor.requested_direction=Vector2.ZERO
+		await ticks(stop_time,"Reset during replant")
+		check(v.settling,"Reset fixture reaches the selected half-replant")
+		var selected_style: bool=v.snappy_enabled
+		scene._button("Reset")
+		check(not v.settling,"Reset cancels old world-space replant targets")
+		await ticks(.05,"Reset result")
+		check(actor.position.length()<.01 and v.last_sole[0].y<.002 and v.last_sole[1].y<.002,"Reset places capsule and both feet at the origin")
+		check(v.snappy_enabled==selected_style,"Reset preserves selected A/B style")
 	metrics=scene.measurements
 	check(metrics.max_floor_penetration_m<.002,"Feet stay above flat floor within2mm tolerance")
 	check(metrics.max_scale_error<.00001,"Rigid block proportions preserved")

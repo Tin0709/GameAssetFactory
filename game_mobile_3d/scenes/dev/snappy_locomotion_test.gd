@@ -108,7 +108,7 @@ func _update_camera() -> void:
 func _process(_delta: float) -> void:
 	_update_camera()
 	var v=actor.visual
-	status.text="%s · matched travel speed\n%s   Speed %.2fm/s   Run %.0f%%   Phase %.3f   FPS %.0f\nWalk + Run artistically approved · isolated gameplay test"%["SNAPPY" if v.snappy_enabled else "EXPRESSIVE",section,actor.current_speed,v.gait_run_weight*100,v.gait_phase,Engine.get_frames_per_second()]
+	status.text="%s · matched travel speed\n%s   Speed %.2fm/s   Run %.0f%%   Phase %.3f   %s\nWalk + Run artistically approved · isolated gameplay test"%["SNAPPY" if v.snappy_enabled else "EXPRESSIVE",section,actor.current_speed,v.gait_run_weight*100,v.gait_phase,("30 FPS review / 1x" if capture_mode!="" else "FPS %.0f"%Engine.get_frames_per_second())]
 	if _sequence==v.pose_sequence:return
 	_sequence=v.pose_sequence
 	var dt: float=v.pose_delta
