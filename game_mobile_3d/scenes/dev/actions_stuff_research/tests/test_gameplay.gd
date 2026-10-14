@@ -22,7 +22,10 @@ func run() -> void:
 		var t:=i*dt
 		actor.requested_direction=Vector2(0,1) if t<12. else Vector2.ZERO
 		actor.requested_run=t>3. and t<9.
-		actor._physics_process(dt);v._evaluate(dt)
+		var desired:=Vector2(0,actor.run_speed if actor.requested_run else actor.walk_speed) if t<12. else Vector2.ZERO
+		var planar:=Vector2(actor.velocity.x,actor.velocity.z).move_toward(desired,(actor.acceleration if t<12. else actor.deceleration)*dt)
+		actor.velocity=Vector3(planar.x,0,planar.y);actor.position+=actor.velocity*dt
+		v.drive_locomotion(actor.velocity,t<12.,dt);v._evaluate(dt)
 		check(is_finite(actor.position.length()),"Finite character movement")
 		if i>int(1./dt):
 			for side in 2:

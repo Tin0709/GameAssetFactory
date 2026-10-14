@@ -13,6 +13,7 @@ func _ready() -> void:
 	_build_environment()
 	player=PLAYER.instantiate();player.name="ResearchPlayer"
 	player.get_node("Visual").set_script(SOURCE_VISUAL)
+	player.get_node("Visual").authored_locomotion=true;player.get_node("Visual").generic_weapon_carry=true;player.get_node("Visual").long_gun_carry_v2=true;player.get_node("Visual").weapon_equipped=false
 	player.review_pace=1.;player.walk_speed=1.8;player.run_speed=5.031;player.acceleration=16.;player.deceleration=20.
 	add_child(player)
 	camera=Camera3D.new();camera.name="GameplayCamera";camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=camera_size;camera.far=150.;add_child(camera);camera.make_current()
