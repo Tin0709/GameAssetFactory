@@ -131,7 +131,10 @@ class MOBS_Clip(bpy.types.PropertyGroup):
 
 class MOBS_UL_clips(bpy.types.UIList):
     def draw_item(self,context,layout,data,item,icon,active_data,active_propname,index):
-        row=layout.row();row.label(text=item.name,icon={'Pending':'TIME','Approved':'CHECKMARK','Rejected':'CANCEL','Backup':'FILE_BACKUP'}.get(item.status,'ACTION'))
+        entry=json.loads(item.entry_json)
+        label=item.name
+        if entry.get('research_only'):label=label.replace('Zombie_','').replace('_ActionsStuff_Source_Test_v001',' / A&S source v001')
+        row=layout.row();row.label(text=label,icon={'Pending':'TIME','Approved':'CHECKMARK','Rejected':'CANCEL','Backup':'FILE_BACKUP'}.get(item.status,'ACTION'))
 
 class MOBS_OT_play(bpy.types.Operator):
     bl_idname='mobs.play_pause';bl_label='Play / Pause'
@@ -205,10 +208,17 @@ class MOBS_PT_library(bpy.types.Panel):
         l.template_list('MOBS_UL_clips','',s,'mobs_clips',s,'mobs_active_index',rows=4)
         c=current(s)
         if c:
-            box=l.box();box.label(text=c['action'])
+            box=l.box()
+            if len(c['action'])>27:
+                split=c['action'].rfind('_',0,26)+1
+                box.label(text=c['action'][:split]);box.label(text=c['action'][split:])
+            else:box.label(text=c['action'])
             box.label(text=f"{(c['end']-c['start']+1)/c['fps']:.2f} s  |  {c['fps']} FPS  |  F{c['start']}–{c['end']}")
             box.label(text='Status: '+c['status'],icon='TIME' if c['status']=='Pending' else 'INFO')
-            if c.get('research_only'):box.label(text='RESEARCH ONLY — do not export',icon='ERROR')
+            if c.get('research_only'):
+                box.label(text='RESEARCH ONLY — do not export',icon='ERROR')
+                source=bpy.data.actions.get(c['action'])
+                if source and source.get('source_stride_seconds',0):box.label(text=f"Stride: {source['source_stride_seconds']:.2f} s")
         else:l.label(text='No animations registered for this mob.')
         row=l.row(align=True);row.enabled=bool(c)
         row.operator('mobs.play_pause',text='Pause' if context.screen.is_animation_playing else 'Play',icon='PAUSE' if context.screen.is_animation_playing else 'PLAY')
