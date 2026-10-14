@@ -223,7 +223,16 @@ class MOBS_PT_library(bpy.types.Panel):
 def loaded(_):
     for scene in bpy.data.scenes:
         if scene.get(TAG):
-            try:rebuild(scene);activate(scene)
+            try:
+                rebuild(scene);activate(scene)
+                for window in bpy.context.window_manager.windows:
+                    if window.scene!=scene:continue
+                    for area in window.screen.areas:
+                        if area.type=='VIEW_3D':
+                            area.spaces.active.show_region_ui=True
+                            for region in area.regions:
+                                if region.type=='UI':region.active_panel_category='Mobs Animation Library'
+                            area.tag_redraw()
             except Exception as exc:scene.mobs_error=str(exc)
 
 @persistent
