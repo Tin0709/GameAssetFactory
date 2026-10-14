@@ -1,0 +1,27 @@
+{
+  "clips": {
+    "Run_Snappy_LegRecovery_Test_v001": {
+      "duration": 0.5666666666666667,
+      "samples": 69,
+      "rest_error": 5.960464477539063e-08,
+      "reconstruction_error_m": 7.362138823888078e-07,
+      "loop_position_error_m": 0.0,
+      "loop_rotation_error_rad": 0.0,
+      "source_sha256": "30074b5a40f63765988184ba9191ba72b12564a76f770bcd2f89637fc5a60872",
+      "action_sha256": "e6ff38f45c6ce0d3a65af0081c1748312125538bf39102a465e47ba481bb2e47",
+      "hip_range_m": [
+        0.6226786375045776,
+        0.7457215785980225
+      ],
+      "feet_near_floor_samples": {
+        "L": 28,
+        "R": 28
+      }
+    }
+  },
+  "base_model": "game_mobile_3d/assets/characters/jump_gif_v004/player_r15_jump_gif_v004.glb",
+  "base_model_sha256": "d5e9e136e17eb8d6795bcb915987e27ef6fe4971894611e25efb9962a1b9804e",
+  "rig_modified": false,
+  "root_motion": false,
+  "new_character_actions": true
+}

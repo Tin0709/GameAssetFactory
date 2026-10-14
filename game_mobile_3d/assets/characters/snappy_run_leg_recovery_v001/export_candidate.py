@@ -17,6 +17,14 @@ def err(a,b):return max(abs(a[r][c]-b[r][c]) for r in range(4) for c in range(4)
 sys.path.insert(0,str(ROOT/'blender/animation/showcase'));import gaf_animation_library as ui
 aliases={'UpperArm.L':'Arm.L','UpperArm.R':'Arm.R'}
 manifest=json.loads(MANIFEST.read_text());records={};report={}
+# Export can proceed independently while another task finishes library registration.
+authoring=ROOT/'blender/animation/reviews/player_animation_library_v1/run_snappy_leg_recovery_v001/authoring.json'
+meta=json.loads(authoring.read_text())
+if not any(e['action']==NAMES[0] for e in manifest['animations']):
+    entry=next(e.copy() for e in manifest['animations'] if e['action']=='Run_Snappy_Test_v001')
+    entry.update(action=NAMES[0],source=str(authoring.parent.relative_to(ROOT)/'run_snappy_leg_recovery_review.blend'),source_sha256=meta['source_sha256'],action_sha256=meta['action_sha256'],status='pending')
+    manifest['animations'].append(entry)
+
 C=Matrix.Rotation(-math.pi/2,4,'X');HZ=120
 for name in NAMES:
     cfg=next(x for x in manifest['animations'] if x['action']==name)

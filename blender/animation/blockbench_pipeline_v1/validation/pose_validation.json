@@ -55,16 +55,17 @@
     }
   },
   "rifle_test": {
-    "sample_vertex_error_m": 4.951133646320149e-07,
-    "between_sample_vertex_error_m": 4.951133646320149e-07,
-    "bone_matrix_error": 2.384185791015625e-07,
-    "actual_blockbench_corner_error_m": 5.840038639982171e-07,
-    "rigid_distance_error_m": 3.708075557162793e-07,
+    "sample_vertex_error_m": 3.042903223136386e-07,
+    "between_sample_vertex_error_m": 3.042903223136386e-07,
+    "bone_matrix_error": 1.7881393432617188e-07,
+    "actual_blockbench_corner_error_m": 2.7028258364226004e-07,
+    "rigid_distance_error_m": 2.6656007498500226e-07,
     "forearm_basis_error": 0,
     "reference_samples": 241,
     "import_samples": 121,
     "status": "pending",
-    "action_signature": "04496a69403c105ab09cebf672e94166830e1197a9059b0e0d11317ef02a0ada"
+    "action_signature": "0756ec4cb79965c0b3dbdb37e611823660ccf3cbd3dc2eb3ad606ad1f053aca0",
+    "original_approved_ready_matrix_error": 4.76837158203125e-07
   },
   "original_actions": 28,
   "original_rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
