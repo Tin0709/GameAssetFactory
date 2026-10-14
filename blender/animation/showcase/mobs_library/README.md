@@ -1,6 +1,6 @@
 # Mobs Animation Library — Zombie V1
 
-Đây là thư viện review mob riêng của GameAssetFactory. Hiện có **bốn Action Pending**: hai bản Original và hai bản tái dựng từ Actions & Stuff theo yêu cầu tiếp theo của bạn. Chưa tích hợp Godot. File player showcase và các Action/source cũ không được ghi bởi tác vụ này.
+Đây là thư viện review mob riêng của GameAssetFactory. Hiện có **năm Action**: bốn Action Idle/Walk giữ nguyên trạng thái Pending và một Attack mới **Reference Only**; thêm một mục kết quả nghiên cứu Hurt, không phải Action. Chưa tích hợp Godot. File player showcase và các Action/source cũ không được ghi bởi tác vụ này.
 
 Để xem hướng giống pack, chọn **Idle / A&S source v001** hoặc **Walk / A&S source v001** trong sidebar. Hai bản này được đánh dấu **RESEARCH ONLY**, không dùng cho production/export/Godot. Chi tiết preset và sai khác ở `research/actions_stuff_zombie_v001/README.md`.
 
@@ -16,7 +16,7 @@ Trong viewport, nhấn **N → Mobs Animation Library**, chọn **Zombie**, rồ
 
 Add-on riêng `gaf_mobs_animation_library.py` đã được cài và bật trong Blender 5.2 của máy này. File không cần Python text tự chạy. Nếu mang sang máy khác hoặc preferences bị reset, mở `mobs_library/Open_Mobs_Animation_Library.command`; launcher nạp bản add-on đi kèm trong phiên Blender đó mà không thay preferences. Có thể cài file `.py` qua Preferences → Add-ons → Install from Disk để giữ giao diện trên máy khác.
 
-## Hai animation mới
+## Hai animation Original ban đầu
 
 | Action | Phát ở 30 FPS | Key đóng vòng, không phát thêm | Định hướng |
 |---|---|---|---|
@@ -29,7 +29,7 @@ Walk là in-place; tốc độ tham chiếu tương lai **0,52 m/s**, stride **0
 
 ## Review và phiên bản
 
-**Set Review Status** hỗ trợ Pending / Approved / Rejected / Backup. Thay đổi trạng thái do người review chủ động chọn; **Ctrl-S** để lưu. **New Revision Copy** tạo một Action mới Pending với tên V2/V3… và giữ nguyên Action cũ. Tên trùng bị từ chối. Không sửa đè Action đã Approved; luôn dùng revision copy trước.
+**Set Review Status** hỗ trợ Pending / Approved / Rejected / Backup / Reference Only. Trạng thái review không gỡ cờ research_only/production_allowed=false. Thay đổi trạng thái do người review chủ động chọn; **Ctrl-S** để lưu. **New Revision Copy** tạo một Action mới Pending với tên V2/V3… và giữ nguyên Action cũ. Tên trùng bị từ chối. Không sửa đè Action đã Approved; luôn dùng revision copy trước.
 
 Registry sống trong scene property `mobs_registry`, gồm mob → collection/rig và clip → native Action/slot/range/FPS/status. Load handler khôi phục danh sách và binding khi mở file. Không có manifest ngoài cần đồng bộ thủ công. `installation.json` và các file validation là bằng chứng của lần bàn giao, không phải nguồn trạng thái review hiện tại.
 
@@ -55,4 +55,17 @@ ID, rig và collection phải riêng; object không được chia sẻ giữa ha
 
 Tangent seam tối đa khoảng 3,6e-7 đơn vị/frame. Sai lệch tốc độ từ phép vi phân mesh float32 ở hai phía seam được ghi riêng trong JSON; nó không phải kết quả đo hiệu năng mobile. UI test có lưu rồi mở lại Approved/revision trong file scratch, kiểm tra binding/reset, trùng tên và một skeleton khác. `validation_gui.json` ghi Play/Pause, Restart, hai lần wrap ở mỗi clip, dừng khi tắt Loop, save/reopen và hai trạng thái Pending. Fixture/test revision không nằm trong file bàn giao.
 
-Chờ bạn review hình ảnh. Chưa chứng minh chuyển Idle↔Walk trong gameplay, terrain, Godot import hoặc hiệu năng điện thoại. Không tạo Chase/Attack/Hit/Death.
+Chờ bạn review hình ảnh. Chưa chứng minh chuyển Idle↔Walk trong gameplay, terrain, Godot import hoặc hiệu năng điện thoại. Giai đoạn Idle/Walk ban đầu không tạo Chase/Attack/Hit/Death. Attack nguồn được bổ sung riêng trong lần cập nhật combat bên dưới; chưa tạo Hurt/Chase/Death.
+
+
+## Zombie combat reference — 2026-10-14
+
+Chọn **Zombie → Attack / A&S reference** để xem `Zombie_Attack_Player_A&S_Reference_v001`, **Reference Only**. Nguồn đã xác minh: `animation.oreville_ans.craixf`, controller `aioksj`; clip 0,75 giây. Preset: adult variant0, đứng tại chỗ, đã giơ tay target, grounded, gaze trung tính. Idle procedural vẫn chạy. Toàn bộ mốc nguồn dạng số thập phân được giữ, Catmull–Rom được tính trước khi bake 960 Hz lên rig nghiên cứu riêng.
+
+Dùng **Play/Pause**, **Restart**, **Loop playback** và **Time (seconds)**. Các nút **Start / Raise / Swing / Follow / End** nhảy đến pose có timestamp chính xác, gồm F23,5 ở cuối. **Front / 3/4 / Side** đổi góc. Panel Play dùng đồng hồ 0,75 giây, không kéo giãn clip thành 23 hoặc 24 frame. Attack là one-shot; bật Loop chỉ lặp để review, không tạo một seam giả. Timeline/Action Editor vẫn cho phép xem curve/key; marker timeline làm tròn để hiển thị và có ghi timestamp nguồn trong tên.
+
+Chọn **Hurt / Hit Reaction — findings → Open Source Findings** để đọc điều tra. Không tìm thấy skeletal Hurt clip trong hệ zombie base/SP0/SP1. Hurt-color renderer chuyển cờ sang âm thanh giáp; không điều khiển pose xương. Không tạo `Zombie_Hurt_A&S_Reference_v001` giả định. Chưa có footage gameplay zombie bị đánh đã xác minh để dựng runtime knockback/hurt transform.
+
+Collection **Research Only — NO EXPORT / REFERENCE_Zombie** chứa bản sao rig/model gốc dùng cho cả ba Action nguồn. Rest rig/model gốc và tất cả Action cũ giữ nguyên. Helper `Reference_RightItem` chỉ thêm trên rig bản sao để giữ kênh vật cầm nguồn; nhân vật không cầm đồ nên helper không có mesh. **Production — Originals Only** view layer loại collection research; `production_clips()`/production manifest chỉ cho phép hai Action Original. Xuất production từ archive Original-only, không dùng All Actions của file review nghiên cứu.
+
+Bằng chứng riêng tư: `research/actions_stuff_zombie_combat_v001/FINDINGS.txt`, `combat_manifest.json`, `validation_combat.json`, `gui_validation_combat.json`. Kiểm tra 738 mẫu matrix, sai số tối đa 0,0001024 phần tử matrix; rig/rest/mesh/UV/weights/atlas gốc nguyên vẹn. Đã chạy GUI phát/dừng, hai lần wrap, scrub fractional, ba camera, mở Hurt findings và mở lại rồi phát tới F23,5. Đây là xác minh dữ liệu nguồn và retarget, không phải chứng nhận khớp từng pixel với Minecraft runtime. Không tạo comparison video, không sửa player/Godot hoặc commit pack.
