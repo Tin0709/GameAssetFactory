@@ -1,0 +1,38 @@
+{
+  "fps": 30,
+  "review_frames": 85,
+  "continuous_snappy_cycles": 5,
+  "no_holds": true,
+  "native_speed": true,
+  "phase_sheet_only_normalization": "Reference40+17phase rounded to source frame; approvedRun1+20phase; new1+17phase. Reference rounding error <=0.5/17stride. No comparison video time warping.",
+  "reference_crop": [
+    35,
+    65,
+    235,
+    355
+  ],
+  "model_crop": [
+    130,
+    40,
+    455,
+    540
+  ],
+  "measured": {
+    "hip_range_m": [
+      0.6420000195503235,
+      0.9150000214576721
+    ],
+    "contact_to_trough_m": 0.04399996995925903,
+    "peak_hip_up_m_s": 3.7289428710939774,
+    "peak_hip_down_m_s": 3.2655715942385086,
+    "lowest_sole_peaks_m": {
+      "L": 0.3894299864768982,
+      "R": 0.3851209282875061
+    },
+    "foreaft_sole_peak_speed_m_s": {
+      "L": 30.96090316772643,
+      "R": 31.313781738281364
+    }
+  },
+  "interpretation": "200% added vertical excursion, with retained45ms weight absorption and decisive middle swing contrast with a longer rounded opening/controlled brake. Upper-body responses use12/24/32/38ms history offsets; these are authored history parameters, not measured output lags. Exact contact/flight and millimetre heights cannot be inferred from the original camera-moving recording."
+}
