@@ -3,6 +3,7 @@ import bpy,sys,json,importlib
 from pathlib import Path
 OUT=Path(__file__).resolve().parent
 TARGET=(OUT.parent if OUT.parent.name=='showcase' else OUT)/'Mobs_Animation_Library.blend'
+if (OUT/'originals/Mobs_Animation_Library_Original_V1.blend').exists():TARGET=OUT/'originals/Mobs_Animation_Library_Original_V1.blend'
 sys.path.insert(0,str(OUT))
 assert (OUT/'gaf_mobs_animation_library.py').exists(),'Dedicated mob library add-on is missing'
 if 'gaf_mobs_animation_library' in sys.modules:sys.modules.pop('gaf_mobs_animation_library').unregister()

@@ -1,0 +1,429 @@
+{
+  "status": "PENDING REVIEW",
+  "primary_review_scene": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/environment/studies/dungeons_ground_style_v2/dungeons_ground_style_v2.blend",
+  "collection": "Vegetation_Grass_Pending",
+  "master_collection": "01_ShortGrass_Fluffy_v1_Four_Colors",
+  "objects": [
+    "ShortGrass_Fluffy_v1_SoftYellow",
+    "ShortGrass_Fluffy_v1_DustyPink",
+    "ShortGrass_Fluffy_v1_Lavender",
+    "ShortGrass_Fluffy_v1_SageGreen"
+  ],
+  "per_tuft": {
+    "cards": 6,
+    "quads": 12,
+    "triangles": 24,
+    "authored_vertices": 36,
+    "meshes": 1,
+    "materials": 1,
+    "textures": 1,
+    "height_above_origin_m": 0.388,
+    "root_penetration_m": 0.012
+  },
+  "shared_atlas": {
+    "pixels": [
+      128,
+      32
+    ],
+    "logical_tile": [
+      16,
+      16
+    ],
+    "padding_each_edge_px": 8,
+    "material": "MAT_ShortGrass_Fluffy_v1_PixelCutout",
+    "image": "IMG_ShortGrass_Fluffy_v1_Original_Atlas"
+  },
+  "demo_tufts": 32,
+  "copied_existing_blocks": 10,
+  "placements": [
+    {
+      "object": "SGF_Patch_00_01_DustyPink",
+      "variant": "DustyPink",
+      "location": [
+        9.166638374328613,
+        -8.790757179260254,
+        1.0
+      ],
+      "scale": 0.8686343447821504
+    },
+    {
+      "object": "SGF_Patch_00_02_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        9.509966850280762,
+        -8.842121124267578,
+        1.0
+      ],
+      "scale": 0.8978155427048456
+    },
+    {
+      "object": "SGF_Patch_00_03_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        10.016508102416992,
+        -8.808639526367188,
+        1.0
+      ],
+      "scale": 0.8450091630214935
+    },
+    {
+      "object": "SGF_Patch_00_04_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        10.290648460388184,
+        -8.77610969543457,
+        1.0
+      ],
+      "scale": 1.0969450283432378
+    },
+    {
+      "object": "SGF_Patch_00_05_Lavender",
+      "variant": "Lavender",
+      "location": [
+        10.797188758850098,
+        -8.849834442138672,
+        1.0
+      ],
+      "scale": 0.9706582788062579
+    },
+    {
+      "object": "SGF_Patch_00_06_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        11.147334098815918,
+        -8.764076232910156,
+        1.0
+      ],
+      "scale": 0.8795747366518152
+    },
+    {
+      "object": "SGF_Patch_01_00_Lavender",
+      "variant": "Lavender",
+      "location": [
+        8.793891906738281,
+        -8.414448738098145,
+        1.0
+      ],
+      "scale": 0.8974829542980419
+    },
+    {
+      "object": "SGF_Patch_01_01_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        9.197900772094727,
+        -8.434115409851074,
+        1.0
+      ],
+      "scale": 0.8896187999416019
+    },
+    {
+      "object": "SGF_Patch_01_02_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        9.48093318939209,
+        -8.335450172424316,
+        1.0
+      ],
+      "scale": 1.1064374697221038
+    },
+    {
+      "object": "SGF_Patch_01_03_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        9.928386688232422,
+        -8.367932319641113,
+        1.0
+      ],
+      "scale": 0.9907484835534055
+    },
+    {
+      "object": "SGF_Patch_01_04_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        10.350020408630371,
+        -8.38106918334961,
+        1.0
+      ],
+      "scale": 0.8389002612540682
+    },
+    {
+      "object": "SGF_Patch_01_05_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        10.707056045532227,
+        -8.364861488342285,
+        1.0
+      ],
+      "scale": 0.8965682144524517
+    },
+    {
+      "object": "SGF_Patch_01_06_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        11.22406005859375,
+        -8.346242904663086,
+        1.0
+      ],
+      "scale": 1.0156473628809115
+    },
+    {
+      "object": "SGF_Patch_02_00_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        8.808876037597656,
+        -8.05202579498291,
+        1.0
+      ],
+      "scale": 1.0239571137079253
+    },
+    {
+      "object": "SGF_Patch_02_01_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        9.132903099060059,
+        -8.014328956604004,
+        1.0
+      ],
+      "scale": 1.1040281679800623
+    },
+    {
+      "object": "SGF_Patch_02_02_Lavender",
+      "variant": "Lavender",
+      "location": [
+        9.597294807434082,
+        -7.978506565093994,
+        1.0
+      ],
+      "scale": 0.9070710188789176
+    },
+    {
+      "object": "SGF_Patch_02_03_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        9.905203819274902,
+        -7.933351516723633,
+        1.0
+      ],
+      "scale": 0.9628457227177946
+    },
+    {
+      "object": "SGF_Patch_02_04_Lavender",
+      "variant": "Lavender",
+      "location": [
+        10.322976112365723,
+        -7.961169242858887,
+        1.0
+      ],
+      "scale": 0.9353833034877105
+    },
+    {
+      "object": "SGF_Patch_02_05_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        10.72718620300293,
+        -7.946732997894287,
+        1.0
+      ],
+      "scale": 1.0745589735755152
+    },
+    {
+      "object": "SGF_Patch_02_06_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        11.200681686401367,
+        -7.989867210388184,
+        1.0
+      ],
+      "scale": 0.8451715873161454
+    },
+    {
+      "object": "SGF_Patch_03_00_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        8.714703559875488,
+        -7.552894592285156,
+        1.0
+      ],
+      "scale": 1.0968784633773774
+    },
+    {
+      "object": "SGF_Patch_03_01_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        9.212632179260254,
+        -7.550076484680176,
+        1.0
+      ],
+      "scale": 1.0043959123616684
+    },
+    {
+      "object": "SGF_Patch_03_02_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        9.540599822998047,
+        -7.544631004333496,
+        1.0
+      ],
+      "scale": 1.0044508027910477
+    },
+    {
+      "object": "SGF_Patch_03_03_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        9.897690773010254,
+        -7.58825159072876,
+        1.0
+      ],
+      "scale": 0.8445916022069558
+    },
+    {
+      "object": "SGF_Patch_03_04_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        10.346056938171387,
+        -7.550331115722656,
+        1.0
+      ],
+      "scale": 0.9809578585785675
+    },
+    {
+      "object": "SGF_Patch_03_05_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        10.788978576660156,
+        -7.551976203918457,
+        1.0
+      ],
+      "scale": 0.987354041045852
+    },
+    {
+      "object": "SGF_Patch_03_06_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        11.17537784576416,
+        -7.65950345993042,
+        1.0
+      ],
+      "scale": 0.9398422363094907
+    },
+    {
+      "object": "SGF_Patch_04_01_SoftYellow",
+      "variant": "SoftYellow",
+      "location": [
+        9.21583080291748,
+        -7.160958290100098,
+        1.0
+      ],
+      "scale": 0.935400333678134
+    },
+    {
+      "object": "SGF_Patch_04_02_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        9.61624813079834,
+        -7.181070804595947,
+        1.0
+      ],
+      "scale": 0.8804160874421993
+    },
+    {
+      "object": "SGF_Patch_04_03_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        9.95649528503418,
+        -7.195390224456787,
+        1.0
+      ],
+      "scale": 1.112701933348654
+    },
+    {
+      "object": "SGF_Patch_04_04_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        10.355718612670898,
+        -7.227939128875732,
+        1.0
+      ],
+      "scale": 0.8486142202588451
+    },
+    {
+      "object": "SGF_Patch_04_05_SageGreen",
+      "variant": "SageGreen",
+      "location": [
+        10.80097484588623,
+        -7.254235744476318,
+        1.0
+      ],
+      "scale": 0.8739532655322187
+    }
+  ],
+  "card_specs": [
+    {
+      "az": 30,
+      "height": 0.4,
+      "width": 0.46,
+      "radius": 0,
+      "lean": 0.018
+    },
+    {
+      "az": 120,
+      "height": 0.375,
+      "width": 0.44,
+      "radius": 0.015,
+      "lean": 0.014
+    },
+    {
+      "az": 12,
+      "height": 0.31,
+      "width": 0.39,
+      "radius": 0.06,
+      "lean": 0.14
+    },
+    {
+      "az": 102,
+      "height": 0.335,
+      "width": 0.37,
+      "radius": 0.06,
+      "lean": 0.14
+    },
+    {
+      "az": 192,
+      "height": 0.3,
+      "width": 0.41,
+      "radius": 0.06,
+      "lean": 0.14
+    },
+    {
+      "az": 282,
+      "height": 0.325,
+      "width": 0.38,
+      "radius": 0.06,
+      "lean": 0.14
+    }
+  ],
+  "exports": [
+    {
+      "variant": "SoftYellow",
+      "path": "blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/exports/ShortGrass_Fluffy_v1_SoftYellow.glb",
+      "bytes": 5048
+    },
+    {
+      "variant": "DustyPink",
+      "path": "blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/exports/ShortGrass_Fluffy_v1_DustyPink.glb",
+      "bytes": 5044
+    },
+    {
+      "variant": "Lavender",
+      "path": "blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/exports/ShortGrass_Fluffy_v1_Lavender.glb",
+      "bytes": 5040
+    },
+    {
+      "variant": "SageGreen",
+      "path": "blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/exports/ShortGrass_Fluffy_v1_SageGreen.glb",
+      "bytes": 5044
+    }
+  ],
+  "lighting": "Existing scene/world/lights unchanged for renders. Saved viewport matches live Mobs: MATERIAL forest.exr intensity1, scene lights/world off, overlays/shadows/cavity off.",
+  "baseline_preserved_before_save": true,
+  "native_asset": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/ShortGrass_Fluffy_v1.blend"
+}
