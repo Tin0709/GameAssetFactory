@@ -1,0 +1,38 @@
+{
+  "fps": 30,
+  "review_frames": 85,
+  "continuous_snappy_cycles": 5,
+  "no_holds": true,
+  "native_speed": true,
+  "phase_sheet_only_normalization": "Reference40+17phase rounded to source frame; approvedRun1+20phase; new1+17phase. Reference rounding error <=0.5/17stride. No comparison video time warping.",
+  "reference_crop": [
+    35,
+    65,
+    235,
+    355
+  ],
+  "model_crop": [
+    130,
+    40,
+    455,
+    540
+  ],
+  "measured": {
+    "hip_range_m": [
+      0.6420000195503235,
+      1.1880000829696655
+    ],
+    "contact_to_trough_m": 0.04399996995925903,
+    "peak_hip_up_m_s": 8.223609924316861,
+    "peak_hip_down_m_s": 7.3371505737309235,
+    "lowest_sole_peaks_m": {
+      "L": 0.6626572608947754,
+      "R": 0.6593381762504578
+    },
+    "foreaft_sole_peak_speed_m_s": {
+      "L": 7.540912628174283,
+      "R": 7.8671264648435795
+    }
+  },
+  "interpretation": "100% stronger current bounce, with retained45ms weight absorption and decisive middle swing contrast with a longer rounded opening/controlled brake. Airborne leg targets use12ms filtering; arm/head angular arcs16ms filtering, shoulder18ms history and head25ms history with bounded2\u201310mm lift. These are authored smoothing/history parameters, not measured reference lags. Exact contact/flight and millimetre heights cannot be inferred from the original camera-moving recording."
+}
