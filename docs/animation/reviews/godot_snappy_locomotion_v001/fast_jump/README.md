@@ -1,6 +1,6 @@
 # Snappy Fast + Jump gameplay review — 2026-10-14
 
-**Current speed revision:** user requested25% slower movement. Walk is now2.278125 m/s and Run4.48340625 m/s in both A/B styles. Camera and jump settings unchanged. The movies and reports below preserve the earlier faster review; current speed-check reports are in `.validation/snappy_speed075_20261014`. Previous runtime files are backed up there too.
+**Current cadence correction:** the user clarified that travel speed was already right and the animation looked too fast. Original Walk3.0375 m/s and Run5.977875 m/s are restored. Locomotion animation cadence is now75% of the original fast test, with distance-per-stride and runtime sagittal reach adjusted together to maintain planted support. Camera/jump settings, global time scale and approved Blender Actions remain unchanged. The movies/reports below preserve the earlier fast review; current checks/backups are in `.validation/snappy_cadence075_20261014`. The earlier movement-speed reduction is superseded.
 
 Open `game_mobile_3d/scenes/dev/SnappyLocomotionFastJumpTest.tscn` in Godot and press **F6**. This separate test matches the actual current ExpressiveLocomotionTest defaults. Production remains unchanged.
 
