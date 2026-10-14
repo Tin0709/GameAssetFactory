@@ -7,7 +7,7 @@
   function validate() {
     if (Blockbench.version!=='5.2.2') fail('This bridge is validated for Blockbench 5.2.2; validate a new version before exporting.');
     if (Format.id!=='free') fail('Open the Generic Model proxy.');
-    if (Group.all.length!==c.bones.length || Cube.all.length!==c.cubes.length || Outliner.elements.length!==c.cubes.length) fail('Proxy topology changed.');
+    if (Group.all.length!==c.bones.length || Cube.all.length!==c.cubes.length || Outliner.elements.length!==c.cubes.length+c.preview_meshes.length) fail('Proxy topology changed.');
     for (const b of c.bones) {
       const g=Group.all.find(g=>g.uuid===b.uuid);
       if (!g || g.name!==b.name || (g.parent==='root'?null:g.parent.name)!==b.parent || !close(g.origin,b.origin) || !close(g.rotation,[0,0,0])) fail('Changed bone name, hierarchy, pivot or rest rotation: '+b.name);
@@ -17,6 +17,7 @@
       const cube=Cube.all.find(v=>v.uuid===q.uuid);
       if(!cube || cube.parent.name!==q.bone || !close(cube.from,q.from) || !close(cube.to,q.to) || !close(cube.origin,q.origin) || !close(cube.rotation,[0,0,0]) || cube.inflate) fail('Changed rigid geometry: '+q.name);
     }
+    for(const q of c.preview_meshes){const m=Mesh.all.find(v=>v.uuid===q.uuid);if(!m||m.parent.name!=='WeaponCarrier'||!m.locked||!close(m.origin,q.origin)||!close(m.rotation,[0,0,0]))fail('Changed rifle reference mesh');}
     return true;
   }
   function sample(animation=Animation.selected, fps=30, rate=120) {
