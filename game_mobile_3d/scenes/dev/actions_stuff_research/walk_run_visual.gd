@@ -36,6 +36,7 @@ func _ready() -> void:
 	# Delete inherited moving sampler slots: no Expressive/Snappy moving fallback.
 	expressive_clips.erase(EXPRESSIVE_NAMES[1]);expressive_clips.erase(EXPRESSIVE_NAMES[2])
 	gait_phase=0.;gait_run_weight=0.;pose_dirty=true
+	stance_duty=[.10,.10]
 func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> void:
 	_pending_physics_delta+=delta;entity_lifetime+=delta
 	var planar:=Vector3(world_velocity.x,0,world_velocity.z)
@@ -49,6 +50,7 @@ func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> v
 	if move_requested and not old_move:
 		settling=false;gait_phase=.5 if next_left else 0.;next_left=not next_left
 		foot_support=[false,false];released=[false,false];rolling_corner=[-1,-1]
+		stance_duty=[lerpf(.10,.26,gait_run_weight),lerpf(.10,.26,gait_run_weight)]
 		support_aim=[Quaternion.IDENTITY,Quaternion.IDENTITY]
 	if not move_requested and old_move:
 		settling=true;settle_time=0.;attention_time=0.
@@ -59,14 +61,18 @@ func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> v
 	gait_frequency=movement_speed/lerpf(WALK_SPEED*WALK_PERIOD,RUN_SPEED*RUN_PERIOD,gait_run_weight)
 	if move_requested:gait_phase=fposmod(gait_phase+delta*gait_frequency,1.)
 	for side in 2:
-		if fposmod(gait_phase-side*.5,1.)<fposmod(previous-side*.5,1.):released[side]=false
+		var local_phase:=fposmod(gait_phase-side*.5,1.)
+		var duty:=lerpf(.10,.26,gait_run_weight)
+		if local_phase<fposmod(previous-side*.5,1.):released[side]=false;stance_duty[side]=duty
+		else:stance_duty[side]=minf(stance_duty[side],duty)
+		if local_phase>=stance_duty[side]:released[side]=true
 	if settling:settle_time=minf(settle_time+delta,REPLANT_SECONDS)
 	elif not move_requested:attention_time=fposmod(attention_time+delta,8.)
 	reference_phase=gait_phase;reference_sprint_weight=gait_run_weight
 	support_left=_support(0);support_right=_support(1)
 func _support(side: int) -> bool:
 	if not move_requested:return true
-	return not released[side] and fposmod(gait_phase-side*.5,1.)<lerpf(.10,.26,gait_run_weight)
+	return not released[side] and fposmod(gait_phase-side*.5,1.)<stance_duty[side]
 func _target_pose(bone: int,ahead: float=0.) -> Transform3D:
 	if source_run==null or not move_requested:return super._target_pose(bone,ahead)
 	var phase:=fposmod(gait_phase+ahead*gait_frequency,1.)
@@ -131,6 +137,12 @@ func _swing_leg_rotation(side: int,bone: int,delta: float) -> Quaternion:
 	var parent_basis:=skeleton.global_basis*skeleton.get_bone_global_pose(skeleton.get_bone_parent(bone)).basis
 	skeleton.set_bone_pose_position(bone,skeleton.get_bone_pose_position(bone)+parent_basis.inverse()*release_offset[side])
 	return super._swing_leg_rotation(side,bone,delta)
+func _limit_contact_correction(correction: Vector3) -> Vector3:
+	# A pivot can exhaust horizontal reach. Preserve floor clearance first,
+	# then fit XZ within the same rigid-joint translation budget.
+	var y:=clampf(correction.y,-.14,.14)
+	var planar:=Vector2(correction.x,correction.z).limit_length(sqrt(maxf(0.,.14*.14-y*y)))
+	return Vector3(planar.x,y,planar.y)
 func contact_point(side: int) -> Vector3:
 	var bone: int=[leg_left,leg_right][side]
 	if not rolling_used[side]:return _sole_world(bone)

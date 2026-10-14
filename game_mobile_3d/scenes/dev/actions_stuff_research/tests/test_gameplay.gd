@@ -54,6 +54,6 @@ func run() -> void:
 	check(v.entity_lifetime==life,"Position reset does not restart source entity lifetime")
 	check(actor.position.length()<.001,"R resets position")
 	var report={"fps":1./dt,"failures":failures,"minimum_foot_y":minimum,"max_leg_step_degrees":max_step,"max_scale_y":max_scale,"run_contact_speed":max_contact_speed,"contact_samples":contacts,"maximum_correction":v.maximum_correction,"correction_clamps":v.correction_clamps,"steady_run_clamps":steady_clamps}
-	var output:="/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_walk_run_scene_v001/gameplay"+str(int(1./dt))+".json"
+	var output:="user://actions_stuff_gameplay"+str(int(1./dt))+".json"
 	FileAccess.open(output,FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("GAMEPLAY_TEST ",JSON.stringify(report));scene.queue_free();quit(0 if failures.is_empty() else 1)

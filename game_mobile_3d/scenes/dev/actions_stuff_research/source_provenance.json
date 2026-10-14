@@ -1,0 +1,16 @@
+{
+  "walk": {
+    "file_sha256": "ce855abcfd20bc4716201c2cd5f056d3c483c42e5fd8af854afdd04c263de9a5",
+    "action_sha256": "4a64c34c3c4e607ea2a26054194e57c005352ca91c2aaa8922ded270ff4c96e0",
+    "evaluated_key_samples": 385,
+    "fixture_samples": 321,
+    "unchanged": true
+  },
+  "run": {
+    "file_sha256": "7dfdd7c2a5cca1f35fb56cfacfd63ee91cc7e1dc72391de650d4666f75b51bfb",
+    "action_sha256": "efb34e9de589d3bfd9497ebb9eb24bf433b7876e7a49010ca949cc1bfbb2c93c",
+    "evaluated_key_samples": 2996,
+    "fixture_samples": 950,
+    "unchanged": true
+  }
+}
