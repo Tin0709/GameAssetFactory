@@ -50,6 +50,7 @@ func run() -> void:
 			await ticks(1.25,"Stable Run %s"%snappy)
 			check(absf(actor.current_speed-2.5)<.03,"Matched Run travel speed: style%s"%snappy)
 			check(v.gait_run_weight>.999,"Unblended Run reached; not diluted by persistent Walk")
+			check(scene.measurements.sections["Stable Run %s"%snappy].latest_body_target_error_m<.003,"Steady body bounce preserves the source target without extra damping")
 			expected_stride=2.5*17/30.0 if snappy else 1.54
 			check(absf(v.gait_frequency-2.5/expected_stride)<.015,"Run cadence follows actual travel: style%s"%snappy)
 			actor.requested_run=false

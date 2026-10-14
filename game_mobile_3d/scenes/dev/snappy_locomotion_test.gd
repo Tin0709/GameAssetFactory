@@ -115,6 +115,9 @@ func _process(_delta: float) -> void:
 	var steady:=section.begins_with("Stable")
 	if not measurements.sections.has(section):measurements.sections[section]={"samples":0,"floor_penetration_m":0.0,"support_speed_m_s":0.0,"correction_clamps":0}
 	var row: Dictionary=measurements.sections[section];row.samples+=1
+	# Measure after the sole writer: SceneTree.process_frame resumes tests
+	# before node processing, when the physics phase can already be ahead.
+	row.latest_body_target_error_m=v.skeleton.get_bone_pose_position(v.hips).distance_to(v._target_pose(v.hips).origin)
 	var new_clamps: int=v.correction_clamps-_last_clamps
 	row.correction_clamps+=new_clamps
 	if steady and _last_section==section:measurements.steady_correction_clamps+=new_clamps
