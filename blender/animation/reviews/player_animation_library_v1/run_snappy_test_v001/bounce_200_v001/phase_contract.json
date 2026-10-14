@@ -1,0 +1,49 @@
+{
+  "action": "Run_Snappy_Test_v001",
+  "fps": 30,
+  "playback_frames": [
+    1,
+    17
+  ],
+  "closing_key_excluded": 18,
+  "period_s": 0.5666666666666667,
+  "in_place": true,
+  "forward_axis": "-Y",
+  "nominal_speed_m_s": 2.5,
+  "contact_phase": {
+    "L": 0.0,
+    "R": 0.5
+  },
+  "contact_frames": {
+    "L": 1,
+    "R": 9.5
+  },
+  "release_phase": {
+    "L": 0.16837654012837933,
+    "R": 0.6683765401283793
+  },
+  "flight_phase": [
+    [
+      0.16837654012837933,
+      0.5
+    ],
+    [
+      0.6683765401283793,
+      1.0
+    ]
+  ],
+  "support_duty": {
+    "L": 0.16837654012837933,
+    "R": 0.16837654012837933
+  },
+  "body_min_max_m": [
+    0.6420000195503235,
+    0.9150000214576721
+  ],
+  "body_contact_height_m": 0.6859999895095825,
+  "body_receiving_drop_m": 0.044,
+  "body_absorption_s": 0.04533333333333333,
+  "pose_ownership": "Absolute full-body Action. Object/Root static; controller owns travel/capsule. Body hop is visual local pose motion.",
+  "transition_limits": "Phase0LEFT /0.5RIGHT agrees with Walk; this does not guarantee foot lock. New flight timing, contact heights, stride, 270mm Run vs267mm Walk tracks and animated lean require contact-aware speed/phase blending and live final-sole checks. Start/stop/replant, interruptions, weapons, turns/slopes and measured mobile30FPS remain untested.",
+  "event_delivery": "Detect crossings of unwrapped normalized contact phase, including fractionalF9.5; never rely on integer-frame equality."
+}

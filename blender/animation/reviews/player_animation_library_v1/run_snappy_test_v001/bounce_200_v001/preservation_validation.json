@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "protected_files": 6830,
+  "all27_older_actions_and_entries_exact": true,
+  "previous_run_v1_source_and_media_exact": true,
+  "current_walk_provisional_not_production": true,
+  "source_sha256": "0909c313684275f83194cea6992949bdc2b3abc48280cf2a1bfc10e7dac5535e",
+  "action_sha256": "ab3828b1552e1dba6d9549a81a57bf01a388a794f1fde01d4d76266e1f0f101b",
+  "body_range_multiplier": 3.0000013099927556,
+  "godot_unchanged": true,
+  "rig_unchanged": true,
+  "stopped_for_review": true
+}
