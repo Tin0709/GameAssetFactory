@@ -15,6 +15,12 @@ func _ready() -> void:
 	var old_buttons: Node=panel.get_child(3);var grid:=GridContainer.new();grid.columns=4;panel.add_child(grid);panel.move_child(grid,3)
 	for button in old_buttons.get_children():button.reparent(grid)
 	old_buttons.queue_free()
+func _input(event: InputEvent) -> void:
+	# Space belongs to jumping even after a mouse click gives a HUD button focus.
+	# Buffer the press here so short taps between physics ticks also register.
+	if event is InputEventKey and event.is_pressed() and not event.is_echo() and event.physical_keycode==KEY_SPACE:
+		actor.request_jump();get_viewport().set_input_as_handled();return
+	super._input(event)
 func _button(label: String) -> void:
 	if label=="Reset":actor.reset_jump()
 	if label=="Demo":_demo_previous_time=0

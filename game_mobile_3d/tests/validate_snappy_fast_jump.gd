@@ -26,6 +26,14 @@ func run() -> void:
 	check(a.jump_height==2.0 and a.jump_flight_speed==2.15,"Exact existing jump height and flight policy")
 	check(scene.camera.size==11.25 and scene.camera.rotation_degrees.distance_to(Vector3(-36.315886,36.869898,0))<.01,"Exact existing gameplay camera angle and zoom")
 	check(Vector2(scene.camera.position.x-a.position.x,scene.camera.position.z-a.position.z).distance_to(Vector2(12,16))<.01,"Exact existing camera distance and offset")
+	var reset_button: Button=scene.status.get_parent().get_child(3).get_child(6)
+	reset_button.grab_focus();scene._button("Reset")
+	var keyboard_before: int=a.jump_count
+	var key:=InputEventKey.new();key.physical_keycode=KEY_SPACE;key.keycode=KEY_SPACE;key.pressed=true
+	Input.parse_input_event(key);await ticks(.15,"Space after focused Reset")
+	key.pressed=false;Input.parse_input_event(key);await ticks(.2,"Keyboard jump")
+	check(a.jump_count==keyboard_before+1 and a.jump_state=="AIR" and not scene.demo_running,"Space jumps once after focused Reset without activating the HUD")
+	scene._button("Reset");a.scripted_input=true
 	for snappy in [true,false]:
 		v.set_snappy(snappy);await ticks(.3,"Fast A/B Idle")
 		a.requested_direction=Vector2.DOWN;a.requested_run=false
@@ -35,7 +43,8 @@ func run() -> void:
 		a.requested_run=true;await ticks(1.3,"Stable fast Run")
 		check(absf(a.current_speed-5.977875)<.04,"Run matches actual existing test travel speed")
 		check(v.gait_run_weight>.999,"Fast Run reaches full source target")
-		for mode in ["Run","Idle"]:
+		for mode in ["Run","Walk","Idle"]:
+			if mode=="Walk":a.requested_direction=Vector2.DOWN;a.requested_run=false;await ticks(.9,"Before Walk jump")
 			if mode=="Idle":a.requested_direction=Vector2.ZERO;a.requested_run=false;await ticks(.9,"Before Idle jump")
 			scene.section="%s jump style%s"%[mode,snappy]
 			var before: int=a.jump_count;a.request_jump()

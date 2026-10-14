@@ -189,9 +189,12 @@ func _evaluate_locomotion_pose(delta: float) -> bool:
 			var basis:=skeleton.global_basis*skeleton.get_bone_global_pose(parent).basis
 			skeleton.set_bone_pose_position(bone,skeleton.get_bone_pose_position(bone)+basis.inverse()*correction)
 			skeleton.force_update_all_bone_transforms()
-	# Existing directional lab landing clearance policy, same35mm bound.
+	# Keep the existing35mm clearance bound during landing and preparation.
+	# Combining the hoppy Walk with the jump's force-gathering pose can lower
+	# a free leg beyond the140mm contact budget before takeoff. Raise the hips
+	# only by that excess rather than clipping the boot through the floor.
 	var needed:=0.0
-	if jump_state=="LAND":
+	if jump_state in ["LAND","PREP"]:
 		for bone in [leg_left,leg_right]:needed=maxf(needed,-_sole_world(bone).y-.135)
 	landing_clearance_lift=maxf(clampf(needed,0,.035),move_toward(landing_clearance_lift,0,.25*delta))
 	var parent:=skeleton.get_bone_parent(hips)
