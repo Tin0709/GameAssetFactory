@@ -57,7 +57,7 @@ def register_clip(scene,mob_id,action,start,end,fps,slot):
                     except Exception:raise ValueError('Action targets a bone absent from this mob rig')
                     if not 0<=curve.array_index<len(values):raise ValueError('Invalid bone transform channel index')
     action.use_fake_user=True;action['review_status']='Pending'
-    data['clips'].append({'mob':mob_id,'action':action.name,'slot':slot.identifier,'start':int(start),'end':int(end),'fps':int(fps),'status':'Pending'})
+    data['clips'].append({'mob':mob_id,'action':action.name,'slot':slot.identifier,'start':int(start),'end':int(end),'fps':int(fps),'status':'Pending','research_only':bool(action.get('research_only',False)),'preview_floor_z_m':float(action.get('preview_floor_z_m',0))})
     store(scene,data)
 
 def current(scene):
@@ -98,6 +98,8 @@ def activate(scene):
             scene.render.fps=clip['fps'];scene.render.fps_base=1
             scene.frame_start=clip['start'];scene.frame_end=clip['end']
             scene.use_preview_range=False;scene.frame_set(clip['start'])
+            ground=bpy.data.objects.get('Preview Ground')
+            if ground:ground.location.z=clip.get('preview_floor_z_m',0)-.0001
             if rig.name in bpy.context.view_layer.objects:
                 for ob in bpy.context.selected_objects:ob.select_set(False)
                 rig.hide_set(False);rig.select_set(True);bpy.context.view_layer.objects.active=rig
@@ -206,6 +208,7 @@ class MOBS_PT_library(bpy.types.Panel):
             box=l.box();box.label(text=c['action'])
             box.label(text=f"{(c['end']-c['start']+1)/c['fps']:.2f} s  |  {c['fps']} FPS  |  F{c['start']}–{c['end']}")
             box.label(text='Status: '+c['status'],icon='TIME' if c['status']=='Pending' else 'INFO')
+            if c.get('research_only'):box.label(text='RESEARCH ONLY — do not export',icon='ERROR')
         else:l.label(text='No animations registered for this mob.')
         row=l.row(align=True);row.enabled=bool(c)
         row.operator('mobs.play_pause',text='Pause' if context.screen.is_animation_playing else 'Play',icon='PAUSE' if context.screen.is_animation_playing else 'PLAY')
