@@ -1,0 +1,24 @@
+{
+  "showcases": {
+    "animation": {
+      "passed": true,
+      "entries": 28,
+      "actions": 28,
+      "action_signatures_exact": true,
+      "source_hashes_exact": true,
+      "selection_slots_playback_ranges_evaluate": true,
+      "source_file_sha256": "9ebc8c32116beed5fa3a8691314f32829998e0a9bda99752bad69e96a2f99f96"
+    },
+    "weapon": {
+      "passed": true,
+      "entries": 3,
+      "all_fit_modes_selectable": true,
+      "source_hashes_exact": true,
+      "source_file_sha256": "16b5b7bdfaba6cdb0c8b69f9ad255a2e6a6498145bf98d5e868bd1b9398243c0"
+    }
+  },
+  "external_dependencies": [],
+  "missing_dependencies": [],
+  "all_blends_scanned": 175,
+  "passed": true
+}

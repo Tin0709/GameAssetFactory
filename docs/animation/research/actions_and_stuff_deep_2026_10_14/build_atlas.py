@@ -10,9 +10,10 @@ import matplotlib.pyplot as plt
 
 OUT=Path(__file__).resolve().parent
 ROOT=OUT.parents[3]
-FONT=ImageFont.truetype('C:/Windows/Fonts/arial.ttf',14)
-SMALL=ImageFont.truetype('C:/Windows/Fonts/arial.ttf',12)
-SOURCES={'walk':Path('C:/Users/ADMIN/Desktop/walking.mp4'), 'run':Path('C:/Users/ADMIN/Desktop/Running.mp4')}
+from portable_inputs import source, font
+FONT=font(14)
+SMALL=font(12)
+SOURCES={'walk':source('walk'), 'run':source('run')}
 def dump(name,data):
     (OUT/name).write_text(json.dumps(data,indent=2,ensure_ascii=False),encoding='utf-8')
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()

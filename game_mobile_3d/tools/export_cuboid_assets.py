@@ -1,7 +1,7 @@
 """Run through Blender MCP; selected actors only, embedded textures, all named actions."""
 import bpy,json,hashlib,struct
 from pathlib import Path
-ROOT=Path(r'C:/Users/ADMIN/Desktop/GameAssetFactory')
+ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'game_mobile_3d/assets/characters'
 records=[]
 for name,source,rig_name,mesh_name,expected in [

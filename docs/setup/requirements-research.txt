@@ -1,0 +1,5 @@
+# Optional analytical tooling; not required to play/edit the Godot project.
+numpy>=2.0,<3
+opencv-python>=4.10,<5
+Pillow>=10.2,<13
+matplotlib>=3.9,<4

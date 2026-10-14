@@ -1,0 +1,32 @@
+{
+  "walk": {
+    "file": "walking.mp4",
+    "sha256": "2b4930b899230814606fc3f6ce341e6966b82a91d6a5d4a665e3057938beab0c",
+    "bytes": 722051,
+    "original_path": "C:\\Users\\ADMIN\\Desktop\\walking.mp4"
+  },
+  "run": {
+    "file": "Running.mp4",
+    "sha256": "3db973b8dccf5e37d94cb6ed5a7e61fe6f45386c50d438112d058c5c23af55a2",
+    "bytes": 853333,
+    "original_path": "C:\\Users\\ADMIN\\Desktop\\Running.mp4"
+  },
+  "showcase": {
+    "file": "Screen Recording 2026-10-14 045502.mp4",
+    "sha256": "52ffe805e77ce21a1d8f40716bcc81f480693d7abfe0e1066c78f71889132abc",
+    "bytes": 2524819,
+    "original_path": "C:\\Users\\ADMIN\\Videos\\Screen Recordings\\Screen Recording 2026-10-14 045502.mp4"
+  },
+  "supplement2": {
+    "file": "Screen Recording 2026-10-13 043804.mp4",
+    "sha256": "2b0f8d5d726b7f22d6d40f4046cc5866a87ab0d0a0623eeb7de9e5249b4cc97e",
+    "bytes": 2164697,
+    "original_path": "C:\\Users\\ADMIN\\Videos\\Screen Recordings\\Screen Recording 2026-10-13 043804.mp4"
+  },
+  "walking_recording_052636": {
+    "file": "Screen Recording 2026-10-13 052636.mp4",
+    "sha256": "b7257e8fea64e0ea2327b85c7e2441d6bfda2168c35ce7b07ea173e63949248e",
+    "bytes": 1783330,
+    "original_path": "C:\\Users\\ADMIN\\Desktop\\Screen Recording 2026-10-13 052636.mp4"
+  }
+}

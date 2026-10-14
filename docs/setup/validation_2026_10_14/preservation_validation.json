@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "baseline_tracked_files": 7491,
+  "intentional_tool_config_doc_changes": [
+    ".gitattributes",
+    ".gitignore",
+    "README.md",
+    "blender/animation/showcase/Open_Showcase.cmd",
+    "blender/characters/player/cuboid/start_mcp.py",
+    "blender/weapons/m4a1_blocky/start_weapon_mcp.py",
+    "blender/weapons/showcase/Open_Weapon_Showcase.cmd",
+    "docs/animation/research/actions_and_stuff_deep_2026_10_14/build_atlas.py",
+    "docs/animation/research/actions_and_stuff_deep_2026_10_14/showcase_decode.py",
+    "docs/animation/research/actions_and_stuff_deep_2026_10_14/showcase_sheets.py",
+    "docs/animation/research/actions_and_stuff_deep_2026_10_14/supplement2_decode.py",
+    "game_mobile_3d/tools/export_cuboid_assets.py",
+    "game_mobile_3d/tools/extract_impact.gd",
+    "scripts/import_world_map.py",
+    "scripts/launch_grassland.ps1",
+    "scripts/launch_grassland_lookdev.ps1",
+    "scripts/launch_quality_slice.ps1"
+  ],
+  "unexpected_changes": [],
+  "missing_tracked_files": [],
+  "all_existing_blend_glb_textures_audio_runtime_controllers_actions_and_research_outputs_exact": true
+}

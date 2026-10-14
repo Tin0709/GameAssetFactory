@@ -1,15 +1,16 @@
 from pathlib import Path
 import cv2,math,json,numpy as np
 from PIL import Image,ImageDraw,ImageFont
-OUT=Path("C:/Users/ADMIN/Desktop/GameAssetFactory/docs/animation/research/actions_and_stuff_deep_2026_10_14")
-SRC=Path("C:/Users/ADMIN/Videos/Screen Recordings/Screen Recording 2026-10-14 045502.mp4")
+from portable_inputs import source, font as portable_font
+OUT=Path(__file__).resolve().parent
+SRC=source('showcase')
 cap=cv2.VideoCapture(str(SRC)); frames=[]
 while True:
  ok,bgr=cap.read()
  if not ok:break
  frames.append(Image.fromarray(cv2.cvtColor(bgr,cv2.COLOR_BGR2RGB)))
 cap.release()
-font=ImageFont.truetype("C:/Windows/Fonts/consola.ttf",14)
+font=portable_font(14, monospace=True)
 def sheet(prefix,ids,perpage=30,cw=200,ch=318,cols=5):
  for p in range(math.ceil(len(ids)/perpage)):
   batch=ids[p*perpage:(p+1)*perpage]

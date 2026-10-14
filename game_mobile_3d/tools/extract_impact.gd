@@ -5,7 +5,8 @@ func _initialize() -> void:
 
 func _extract() -> void:
 	var stream := AudioStreamMP3.new()
-	stream.data = FileAccess.get_file_as_bytes("C:/Users/ADMIN/Desktop/GameAssetFactory/audio/game/Bullet impact.mp3")
+	var source_path := ProjectSettings.globalize_path("res://").path_join("../audio/game/Bullet impact.mp3").simplify_path()
+	stream.data = FileAccess.get_file_as_bytes(source_path)
 	var bus := AudioServer.bus_count
 	AudioServer.add_bus()
 	AudioServer.set_bus_name(bus, "ImpactExtraction")

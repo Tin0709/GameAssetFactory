@@ -18,7 +18,7 @@ import shutil
 
 
 REPO = Path(__file__).resolve().parents[1]
-DEFAULT_SOURCE = Path("C:/Users/ADMIN/AppData/Roaming/PrismLauncher/instances/Tin PLay 1.21.11 Tesst/minecraft/schematics/World Map.litematic")
+DEFAULT_SOURCE = REPO / "game_mobile_3d/assets/maps/world_map/World Map.litematic"
 DEFAULT_OUTPUT = REPO / "game_mobile_3d/assets/maps/world_map"
 AIR = {"minecraft:air", "minecraft:cave_air", "minecraft:void_air"}
 MASK64 = (1 << 64) - 1

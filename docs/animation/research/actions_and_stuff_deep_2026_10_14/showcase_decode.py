@@ -1,9 +1,10 @@
 from pathlib import Path
 import cv2, hashlib, json, math
 from PIL import Image, ImageDraw, ImageFont
-SRC=Path("C:/Users/ADMIN/Videos/Screen Recordings/Screen Recording 2026-10-14 045502.mp4")
-OUT=Path("C:/Users/ADMIN/Desktop/GameAssetFactory/docs/animation/research/actions_and_stuff_deep_2026_10_14")
-font=ImageFont.truetype("C:/Windows/Fonts/consola.ttf",17)
+from portable_inputs import source, font as portable_font
+SRC=source('showcase')
+OUT=Path(__file__).resolve().parent
+font=portable_font(17, monospace=True)
 cap=cv2.VideoCapture(str(SRC))
 fps=cap.get(cv2.CAP_PROP_FPS); declared=int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 w=int(cap.get(cv2.CAP_PROP_FRAME_WIDTH));h=int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))

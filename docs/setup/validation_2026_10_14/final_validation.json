@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "setup_links_checked": 14,
+  "git_diff_whitespace_check": true,
+  "index_empty": true,
+  "head_unchanged_since_external_checkpoint": "c99ec80042749f38e434e6f32ee7eead2d83042a",
+  "stage_commit_push_performed_by_this_task": false,
+  "review": "No blocking issue; no actual macOS hardware validation"
+}

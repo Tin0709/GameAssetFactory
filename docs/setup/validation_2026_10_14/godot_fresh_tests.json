@@ -1,0 +1,776 @@
+{
+  "runtime30.json": {
+    "checks": [
+      {
+        "check": "Separate playable Snappy scene exists",
+        "passed": true
+      },
+      {
+        "check": "Original-speed travel/gait and normal Idle",
+        "passed": true
+      },
+      {
+        "check": "Both Snappy clips and unchanged approved Expressive library loaded",
+        "passed": true
+      },
+      {
+        "check": "One pose writer; imported player stopped; no extra procedural bounce",
+        "passed": true
+      },
+      {
+        "check": "Locomotion-only test, no other animation work",
+        "passed": true
+      },
+      {
+        "check": "Approved Idle continues at1x independently of gait",
+        "passed": true
+      },
+      {
+        "check": "Movement responds immediately: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Matched Walk travel speed: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Full Walk target reached: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Walk cadence follows actual travel: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Walk-Run preserves gait phase",
+        "passed": true
+      },
+      {
+        "check": "Matched Run travel speed: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Unblended Run reached; not diluted by persistent Walk",
+        "passed": true
+      },
+      {
+        "check": "Steady body bounce preserves the source target without extra damping",
+        "passed": true
+      },
+      {
+        "check": "Run cadence follows actual travel: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Stop returns to planted Idle without delaying controls",
+        "passed": true
+      },
+      {
+        "check": "Both feet planted after stop: (0.20284, 0.0, 6.317673) / (-0.196503, 0.0, 6.217214) settlingfalse phase0.75597692489661",
+        "passed": true
+      },
+      {
+        "check": "Movement responds immediately: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Matched Walk travel speed: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Full Walk target reached: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Walk cadence follows actual travel: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Walk-Run preserves gait phase",
+        "passed": true
+      },
+      {
+        "check": "Matched Run travel speed: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Unblended Run reached; not diluted by persistent Walk",
+        "passed": true
+      },
+      {
+        "check": "Steady body bounce preserves the source target without extra damping",
+        "passed": true
+      },
+      {
+        "check": "Run cadence follows actual travel: styletrue",
+        "passed": true
+      },
+      {
+        "check": "Stop returns to planted Idle without delaying controls",
+        "passed": true
+      },
+      {
+        "check": "Both feet planted after stop: (6.317426, 0.0, 6.080975) / (6.217137, 0.0, 6.480296) settlingfalse phase0.23809147241174",
+        "passed": true
+      },
+      {
+        "check": "Movement responds immediately: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Matched Walk travel speed: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Full Walk target reached: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Walk cadence follows actual travel: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Walk-Run preserves gait phase",
+        "passed": true
+      },
+      {
+        "check": "Matched Run travel speed: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Unblended Run reached; not diluted by persistent Walk",
+        "passed": true
+      },
+      {
+        "check": "Steady body bounce preserves the source target without extra damping",
+        "passed": true
+      },
+      {
+        "check": "Run cadence follows actual travel: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Stop returns to planted Idle without delaying controls",
+        "passed": true
+      },
+      {
+        "check": "Both feet planted after stop: (6.486613, 0.0, 12.60033) / (6.087266, 0.0, 12.50132) settlingfalse phase0.5940569148922",
+        "passed": true
+      },
+      {
+        "check": "Movement responds immediately: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Matched Walk travel speed: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Full Walk target reached: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Walk cadence follows actual travel: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Walk-Run preserves gait phase",
+        "passed": true
+      },
+      {
+        "check": "Matched Run travel speed: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Unblended Run reached; not diluted by persistent Walk",
+        "passed": true
+      },
+      {
+        "check": "Steady body bounce preserves the source target without extra damping",
+        "passed": true
+      },
+      {
+        "check": "Run cadence follows actual travel: stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Stop returns to planted Idle without delaying controls",
+        "passed": true
+      },
+      {
+        "check": "Both feet planted after stop: (12.60132, 0.0, 12.36479) / (12.50012, 0.0, 12.76409) settlingfalse phase0.17854227418762",
+        "passed": true
+      },
+      {
+        "check": "A/B never resets gait phase or capsule",
+        "passed": true
+      },
+      {
+        "check": "A/B never resets gait phase or capsule",
+        "passed": true
+      },
+      {
+        "check": "A/B never resets gait phase or capsule",
+        "passed": true
+      },
+      {
+        "check": "A/B never resets gait phase or capsule",
+        "passed": true
+      },
+      {
+        "check": "A/B never resets gait phase or capsule",
+        "passed": true
+      },
+      {
+        "check": "Reset fixture reaches the selected half-replant",
+        "passed": true
+      },
+      {
+        "check": "Reset cancels old world-space replant targets",
+        "passed": true
+      },
+      {
+        "check": "Reset places capsule and both feet at the origin",
+        "passed": true
+      },
+      {
+        "check": "Reset preserves selected A/B style",
+        "passed": true
+      },
+      {
+        "check": "Reset fixture reaches the selected half-replant",
+        "passed": true
+      },
+      {
+        "check": "Reset cancels old world-space replant targets",
+        "passed": true
+      },
+      {
+        "check": "Reset places capsule and both feet at the origin",
+        "passed": true
+      },
+      {
+        "check": "Reset preserves selected A/B style",
+        "passed": true
+      },
+      {
+        "check": "Tab changes style even while a HUD button has keyboard focus",
+        "passed": true
+      },
+      {
+        "check": "Feet stay above flat floor within2mm tolerance",
+        "passed": true
+      },
+      {
+        "check": "Rigid block proportions preserved",
+        "passed": true
+      },
+      {
+        "check": "Steady planted-foot sliding below4cm/s",
+        "passed": true
+      },
+      {
+        "check": "No contact correction caps reached in steady gait",
+        "passed": true
+      },
+      {
+        "check": "Directional support stays inside the rigid joint limit",
+        "passed": true
+      },
+      {
+        "check": "Rapid reversals avoid contact correction caps",
+        "passed": true
+      },
+      {
+        "check": "A/B exercised during idle and movement",
+        "passed": true
+      },
+      {
+        "check": "Pose evaluated once per rendered physics update",
+        "passed": true
+      }
+    ],
+    "engine": {
+      "build": "official",
+      "hash": "ed1daf0bf001b61586d9930840f2f1394092c079",
+      "hex": 263938,
+      "major": 4,
+      "minor": 7,
+      "patch": 2,
+      "status": "stable",
+      "string": "4.7.2-stable (official)",
+      "timestamp": 0
+    },
+    "failures": [],
+    "measurements": {
+      "max_bone_angle_per_frame_deg": 33.2117094618224,
+      "max_correction_m": 0.130066767334938,
+      "max_floor_penetration_m": 5.96046447753906e-08,
+      "max_gait_handoff_wait_s": 0.266666666666667,
+      "max_scale_error": 1.33280039449346e-07,
+      "sections": {
+        "90/180-degree change": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 75,
+          "support_speed_m_s": 2.86102294921875e-05
+        },
+        "A/B idle": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 7.62939453125e-06,
+          "samples": 22,
+          "support_speed_m_s": 1.78813934326172e-06
+        },
+        "Final settle": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 6.1354299418781e-08,
+          "samples": 30,
+          "support_speed_m_s": 2.86102294921875e-05
+        },
+        "Idle": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 2.98023223876953e-07,
+          "samples": 15,
+          "support_speed_m_s": 1.78813934326172e-06
+        },
+        "Input response": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.00465172436088324,
+          "samples": 8,
+          "support_speed_m_s": 1.78813934326172e-06
+        },
+        "Keyboard A/B": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0002022385597229,
+          "samples": 2,
+          "support_speed_m_s": 8.94069671630859e-07
+        },
+        "Moving A/B": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 2.4641687446092e-07,
+          "samples": 90,
+          "support_speed_m_s": 2.86660542769823e-05
+        },
+        "Rapid reversals": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 36,
+          "support_speed_m_s": 0.0
+        },
+        "Reset during replant": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.00852606352418661,
+          "samples": 16,
+          "support_speed_m_s": 4.4703483581543e-07
+        },
+        "Reset result": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 4,
+          "support_speed_m_s": 4.4703483581543e-07
+        },
+        "Reset setup": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 7.21933588465618e-07,
+          "samples": 40,
+          "support_speed_m_s": 1.99920059174019e-06
+        },
+        "Run before A/B": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 7.45629165521677e-07,
+          "samples": 18,
+          "support_speed_m_s": 1.78813934326172e-06
+        },
+        "Run to Walk": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 84,
+          "support_speed_m_s": 2.86102294921875e-05
+        },
+        "Stable Run false": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 76,
+          "support_speed_m_s": 1.78813934326172e-06
+        },
+        "Stable Run true": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 76,
+          "support_speed_m_s": 7.16651356924558e-06
+        },
+        "Stable Walk false": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 66,
+          "support_speed_m_s": 1.47453744148152e-05
+        },
+        "Stable Walk true": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 66,
+          "support_speed_m_s": 3.57627868652344e-06
+        },
+        "Stop and replant": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 3.44367776961008e-07,
+          "samples": 104,
+          "support_speed_m_s": 1.44164403081959e-05
+        },
+        "Walk to Run": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 8,
+          "support_speed_m_s": 1.43051147460938e-05
+        }
+      },
+      "steady_correction_clamps": 0,
+      "steady_support_speed_m_s": 1.47453744148152e-05,
+      "style_toggles": 7,
+      "turn_release_count": 1
+    },
+    "passed": true,
+    "physics_fps": 60,
+    "render_fps": 30
+  },
+  "fast_jump30.json": {
+    "checks": [
+      {
+        "check": "Separate fast/jump test preserves native-speed lab",
+        "passed": true
+      },
+      {
+        "check": "Existing Expressive jump controller reused",
+        "passed": true
+      },
+      {
+        "check": "Exact existing Expressive test pace/scales",
+        "passed": true
+      },
+      {
+        "check": "Exact existing jump height and flight policy",
+        "passed": true
+      },
+      {
+        "check": "Exact existing gameplay camera angle and zoom",
+        "passed": true
+      },
+      {
+        "check": "Exact existing camera distance and offset",
+        "passed": true
+      },
+      {
+        "check": "Space jumps once after focused Reset without activating the HUD",
+        "passed": true
+      },
+      {
+        "check": "Original Walk travel speed restored",
+        "passed": true
+      },
+      {
+        "check": "Walk animation cadence25% slower with original travel speed",
+        "passed": true
+      },
+      {
+        "check": "Fast Walk does not accidentally select Run",
+        "passed": true
+      },
+      {
+        "check": "Original Run travel speed restored",
+        "passed": true
+      },
+      {
+        "check": "Run animation cadence25% slower with original travel speed",
+        "passed": true
+      },
+      {
+        "check": "Fast Run reaches full source target",
+        "passed": true
+      },
+      {
+        "check": "Run jump launches and lands once in styletrue",
+        "passed": true
+      },
+      {
+        "check": "Physics jump preserves existing2m height",
+        "passed": true
+      },
+      {
+        "check": "Jump recovers to locomotion/Idle",
+        "passed": true
+      },
+      {
+        "check": "Walk jump launches and lands once in styletrue",
+        "passed": true
+      },
+      {
+        "check": "Physics jump preserves existing2m height",
+        "passed": true
+      },
+      {
+        "check": "Jump recovers to locomotion/Idle",
+        "passed": true
+      },
+      {
+        "check": "Idle jump launches and lands once in styletrue",
+        "passed": true
+      },
+      {
+        "check": "Physics jump preserves existing2m height",
+        "passed": true
+      },
+      {
+        "check": "Jump recovers to locomotion/Idle",
+        "passed": true
+      },
+      {
+        "check": "Idle landing finishes both foot replants",
+        "passed": true
+      },
+      {
+        "check": "Original Walk travel speed restored",
+        "passed": true
+      },
+      {
+        "check": "Walk animation cadence25% slower with original travel speed",
+        "passed": true
+      },
+      {
+        "check": "Fast Walk does not accidentally select Run",
+        "passed": true
+      },
+      {
+        "check": "Original Run travel speed restored",
+        "passed": true
+      },
+      {
+        "check": "Run animation cadence25% slower with original travel speed",
+        "passed": true
+      },
+      {
+        "check": "Fast Run reaches full source target",
+        "passed": true
+      },
+      {
+        "check": "Run jump launches and lands once in stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Physics jump preserves existing2m height",
+        "passed": true
+      },
+      {
+        "check": "Jump recovers to locomotion/Idle",
+        "passed": true
+      },
+      {
+        "check": "Walk jump launches and lands once in stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Physics jump preserves existing2m height",
+        "passed": true
+      },
+      {
+        "check": "Jump recovers to locomotion/Idle",
+        "passed": true
+      },
+      {
+        "check": "Idle jump launches and lands once in stylefalse",
+        "passed": true
+      },
+      {
+        "check": "Physics jump preserves existing2m height",
+        "passed": true
+      },
+      {
+        "check": "Jump recovers to locomotion/Idle",
+        "passed": true
+      },
+      {
+        "check": "Idle landing finishes both foot replants",
+        "passed": true
+      },
+      {
+        "check": "Reset cancels jump and world-contact caches",
+        "passed": true
+      },
+      {
+        "check": "Rigid geometry unchanged at fast pace and during jumps",
+        "passed": true
+      },
+      {
+        "check": "No visible sole floor penetration through jump transitions",
+        "passed": true
+      },
+      {
+        "check": "Stationary landing/replant stays inside the rigid joint budget",
+        "passed": true
+      },
+      {
+        "check": "Fast steady gait stays inside existing contact limit",
+        "passed": true
+      },
+      {
+        "check": "Fast steady planted feet remain stable",
+        "passed": true
+      }
+    ],
+    "failures": [],
+    "jump_peaks_m": [
+      2.00063691288233,
+      2.00042662769556,
+      2.00054774433374,
+      2.00063691288233,
+      2.00042662769556,
+      2.00054774433374
+    ],
+    "measurements": {
+      "max_bone_angle_per_frame_deg": 127.386197228513,
+      "max_correction_m": 0.167981937527657,
+      "max_floor_penetration_m": 5.96046447753906e-08,
+      "max_gait_handoff_wait_s": 0.133333333333333,
+      "max_scale_error": 1.33280039449346e-07,
+      "sections": {
+        "Before Idle jump": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 54,
+          "support_speed_m_s": 2.01165676116943e-06
+        },
+        "Before Walk jump": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 54,
+          "support_speed_m_s": 7.37268720740758e-06
+        },
+        "Fast A/B Idle": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 18,
+          "support_speed_m_s": 2.01165676116943e-06
+        },
+        "Fast direction changes": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 68,
+          "support_speed_m_s": 7.15255737304688e-06
+        },
+        "Fast settle": {
+          "correction_clamps": 4,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 27,
+          "support_speed_m_s": 2.68220901489258e-06
+        },
+        "Idle jump stylefalse": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 75,
+          "support_speed_m_s": 1.99920059174019e-06
+        },
+        "Idle jump styletrue": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 75,
+          "support_speed_m_s": 1.99920059174019e-06
+        },
+        "Keyboard jump": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0032763674389571,
+          "samples": 6,
+          "support_speed_m_s": 1.99920059174019e-06
+        },
+        "Reset in flight": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.00277294451370835,
+          "samples": 9,
+          "support_speed_m_s": 2.23517417907715e-07
+        },
+        "Run jump stylefalse": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 75,
+          "support_speed_m_s": 2.86102294921875e-05
+        },
+        "Run jump styletrue": {
+          "correction_clamps": 2,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 75,
+          "support_speed_m_s": 2.86137219518423e-05
+        },
+        "Space after focused Reset": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.000775191991124302,
+          "samples": 5,
+          "support_speed_m_s": 1.7916283923114e-06
+        },
+        "Stable fast Run": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 0.0,
+          "latest_body_target_error_m": 0.0,
+          "samples": 78,
+          "support_speed_m_s": 8.94069671630859e-07
+        },
+        "Stable fast Walk": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 72,
+          "support_speed_m_s": 7.38622730978022e-06
+        },
+        "Walk jump stylefalse": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 75,
+          "support_speed_m_s": 1.43330271384912e-05
+        },
+        "Walk jump styletrue": {
+          "correction_clamps": 0,
+          "floor_penetration_m": 5.96046447753906e-08,
+          "latest_body_target_error_m": 0.0,
+          "samples": 75,
+          "support_speed_m_s": 2.86137219518423e-05
+        }
+      },
+      "steady_correction_clamps": 0,
+      "steady_support_speed_m_s": 7.38622730978022e-06,
+      "style_toggles": 1,
+      "turn_release_count": 11
+    },
+    "passed": true,
+    "physics_fps": 60,
+    "render_fps": 30
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "tracked_lfs_paths": 350,
+  "unique_objects": 330,
+  "unique_bytes": 4340893873,
+  "missing_local_objects": [],
+  "corrupt_local_objects": [],
+  "remote_missing": [],
+  "remote_checked": 330,
+  "passed": true
+}

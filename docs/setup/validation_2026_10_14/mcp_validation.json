@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "port": 19876,
+  "response": {
+    "status": "ok",
+    "result": {
+      "version": "5.2.2 LTS",
+      "objects": 3
+    }
+  }
+}

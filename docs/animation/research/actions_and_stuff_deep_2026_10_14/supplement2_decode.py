@@ -5,7 +5,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 BASE = Path(__file__).resolve().parent
-SOURCE = Path(r'C:/Users/ADMIN/Videos/Screen Recordings/Screen Recording 2026-10-13 043804.mp4')
+from portable_inputs import source
+SOURCE = source('supplement2')
 cap = cv2.VideoCapture(str(SOURCE))
 fps = cap.get(cv2.CAP_PROP_FPS)
 reported = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))

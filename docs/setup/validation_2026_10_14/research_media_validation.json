@@ -1,0 +1,27 @@
+{
+  "walk": {
+    "hash_verified": true,
+    "fps": 30.0,
+    "frames": 304
+  },
+  "run": {
+    "hash_verified": true,
+    "fps": 30.0,
+    "frames": 349
+  },
+  "showcase": {
+    "hash_verified": true,
+    "fps": 30.0,
+    "frames": 638
+  },
+  "supplement2": {
+    "hash_verified": true,
+    "fps": 30.0,
+    "frames": 193
+  },
+  "walking_recording_052636": {
+    "hash_verified": true,
+    "fps": 30.0,
+    "frames": 241
+  }
+}

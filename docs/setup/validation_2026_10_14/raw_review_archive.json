@@ -1,0 +1,64 @@
+{
+  "verified": true,
+  "archive_root": "C:\\Users\\ADMIN\\Desktop\\Unuse Files\\GameAssetFactory_Migration_2026_10_14",
+  "files": [
+    {
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\snappy_gameplay_v001\\snappy.avi",
+      "archive": "C:\\Users\\ADMIN\\Desktop\\Unuse Files\\GameAssetFactory_Migration_2026_10_14\\archived_raw_reviews\\.validation\\snappy_gameplay_v001\\snappy.avi",
+      "sha256": "c4a6c4c6e7c78881d0e162f4d5b4428ab3267977ac2bdc9fdd68ed234db8d5ac",
+      "bytes": 25046286,
+      "preserved_final": "docs/animation/reviews/godot_snappy_locomotion_v001/gameplay_snappy_1x.mp4"
+    },
+    {
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\snappy_gameplay_v001\\expressive.avi",
+      "archive": "C:\\Users\\ADMIN\\Desktop\\Unuse Files\\GameAssetFactory_Migration_2026_10_14\\archived_raw_reviews\\.validation\\snappy_gameplay_v001\\expressive.avi",
+      "sha256": "a1393b9084055f2e459dcd0b911edb15eff6ee2511bda76c048cb883e35ed499",
+      "bytes": 25028576,
+      "preserved_final": "docs/animation/reviews/godot_snappy_locomotion_v001/gameplay_expressive_1x.mp4"
+    },
+    {
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\snappy_gameplay_v001\\toggle.avi",
+      "archive": "C:\\Users\\ADMIN\\Desktop\\Unuse Files\\GameAssetFactory_Migration_2026_10_14\\archived_raw_reviews\\.validation\\snappy_gameplay_v001\\toggle.avi",
+      "sha256": "ae5389a1b9e92d2199472269c0ce7f28f98f120a35fa1452ad944671cec246b6",
+      "bytes": 25044534,
+      "preserved_final": "docs/animation/reviews/godot_snappy_locomotion_v001/gameplay_style_toggle_1x.mp4"
+    },
+    {
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\snappy_gameplay_v001\\fast_snappy.avi",
+      "archive": "C:\\Users\\ADMIN\\Desktop\\Unuse Files\\GameAssetFactory_Migration_2026_10_14\\archived_raw_reviews\\.validation\\snappy_gameplay_v001\\fast_snappy.avi",
+      "sha256": "eefe1ee0e74650c18fa9b0524e045fe310d05a36514c05737e1298952ed39ebe",
+      "bytes": 22455862,
+      "preserved_final": "docs/animation/reviews/godot_snappy_locomotion_v001/fast_jump/gameplay_snappy_1x.mp4"
+    },
+    {
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\snappy_gameplay_v001\\fast_expressive.avi",
+      "archive": "C:\\Users\\ADMIN\\Desktop\\Unuse Files\\GameAssetFactory_Migration_2026_10_14\\archived_raw_reviews\\.validation\\snappy_gameplay_v001\\fast_expressive.avi",
+      "sha256": "fbe7b9292e53cab636654ec163fb7a487a9fa6689158d8f99c555af7319301ee",
+      "bytes": 22520154,
+      "preserved_final": "docs/animation/reviews/godot_snappy_locomotion_v001/fast_jump/gameplay_expressive_1x.mp4"
+    },
+    {
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\snappy_gameplay_v001\\fast_toggle.avi",
+      "archive": "C:\\Users\\ADMIN\\Desktop\\Unuse Files\\GameAssetFactory_Migration_2026_10_14\\archived_raw_reviews\\.validation\\snappy_gameplay_v001\\fast_toggle.avi",
+      "sha256": "e2ad6a4e8f822e84683b07788afbe71de6c66f74fe6ecd2bafcbb870af15f858",
+      "bytes": 22467882,
+      "preserved_final": "docs/animation/reviews/godot_snappy_locomotion_v001/fast_jump/gameplay_style_toggle_1x.mp4"
+    },
+    {
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\snappy_gameplay_v001\\fast_ab.avi",
+      "archive": "C:\\Users\\ADMIN\\Desktop\\Unuse Files\\GameAssetFactory_Migration_2026_10_14\\archived_raw_reviews\\.validation\\snappy_gameplay_v001\\fast_ab.avi",
+      "sha256": "ccd877e054ac2ebf0deb5394cd712c27bcd996106d1e5fa6483570523c067a7b",
+      "bytes": 37440602,
+      "preserved_final": "docs/animation/reviews/godot_snappy_locomotion_v001/fast_jump/snappy_vs_expressive_1x.mp4"
+    },
+    {
+      "source": "C:\\Users\\ADMIN\\Desktop\\GameAssetFactory\\.validation\\snappy_gameplay_v001\\forward_debug\\fast_snappy.avi",
+      "archive": "C:\\Users\\ADMIN\\Desktop\\Unuse Files\\GameAssetFactory_Migration_2026_10_14\\archived_raw_reviews\\.validation\\snappy_gameplay_v001\\forward_debug\\fast_snappy.avi",
+      "sha256": "a569cbe392ef16aa16addb429b95dc76d642924611190a5d17056a9d6f141b13",
+      "bytes": 21723492,
+      "preserved_final": "docs/animation/reviews/godot_snappy_locomotion_v001/fast_jump/gameplay_snappy_1x.mp4"
+    }
+  ],
+  "total_bytes": 201727388,
+  "restore": "Copy each archive file back to its source path; SHA256 must match."
+}

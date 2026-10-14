@@ -23,7 +23,7 @@ class PortableLauncherTests(unittest.TestCase):
 
     def test_macos_app_bundle_discovery(self):
         expected = Path('/Applications/Blender.app/Contents/MacOS/Blender')
-        with patch.object(dev.platform, 'system', return_value='Darwin'), patch.object(dev.shutil, 'which', return_value=None), patch.object(dev.Path, 'is_file', lambda p: p == expected), patch.dict(dev.os.environ, {}, clear=True):
+        with patch.object(dev.platform, 'system', return_value='Darwin'), patch.object(dev.shutil, 'which', return_value=None), patch.object(dev.Path, 'is_file', lambda p: p == expected), patch.object(dev.Path, 'home', return_value=Path('/Users/test')), patch.dict(dev.os.environ, {}, clear=True):
             self.assertEqual(dev.find_tool('blender'), expected)
 
     def test_macos_command_does_not_force_windows_gpu_driver(self):
