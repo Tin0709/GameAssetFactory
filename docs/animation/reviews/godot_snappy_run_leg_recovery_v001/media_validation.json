@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "gameplay_approved_30fps_1x.mp4",
+      "fps": 30,
+      "frames": 397,
+      "audio": false,
+      "sha256": "683da882a604e72aae3248ca202ee161122eebe73943896de88512be350054a5"
+    },
+    {
+      "file": "gameplay_candidate_30fps_1x.mp4",
+      "fps": 30,
+      "frames": 397,
+      "audio": false,
+      "sha256": "7809ae66971a938d1c708c9636d93d15ea0135393df769500f53ce464b410171"
+    }
+  ],
+  "comparison": "Same control demo, actual Godot Mobile Metal output, fixed30FPS for reproducibility; original gameplay speed and cadence, muted; desktop performance not benchmarked."
+}

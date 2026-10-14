@@ -55,9 +55,12 @@ func at_phase(target: float) -> void:
 	var limit:=Engine.get_physics_frames()+90
 	var tolerance: float=v.gait_frequency/float(fps)*.55+.004
 	while absf(wrapf(v.gait_phase-target,-.5,.5))>tolerance and Engine.get_physics_frames()<limit:await process_frame
+	check(absf(wrapf(v.gait_phase-target,-.5,.5))<=tolerance,"Requested phase window reached without timeout")
 func fixture(candidate: bool, run_input: bool, key: String) -> void:
 	monitor.key="";monitor.reset_pending=true
 	scene._button("Reset")
+	# Equal start-foot seed for paired trials; never reset a live gait phase.
+	scene.actor.visual.next_left=true
 	scene.actor.scripted_input=true
 	scene.actor.visual.set_run_recovery(candidate)
 	scene.actor.requested_direction=Vector2.DOWN;scene.actor.requested_run=run_input
@@ -93,6 +96,11 @@ func run() -> void:
 			a.requested_direction=Vector2.ZERO
 			await ticks(.75,"Stop and replant")
 			check(not v.settling and v.last_sole[0].y<.002 and v.last_sole[1].y<.002,prefix+" stop finishes both foot replants")
+			await fixture(candidate,true,prefix+"_stop")
+			await at_phase(phase)
+			a.requested_direction=Vector2.ZERO
+			await ticks(.75,"Direct Run to Idle")
+			check(not v.move_requested and not v.settling and v.last_sole[0].y<.002 and v.last_sole[1].y<.002,prefix+" direct Run stop finishes both replants")
 			await fixture(candidate,true,prefix+"_reverse")
 			await at_phase(phase)
 			var old_velocity: Vector3=a.velocity
@@ -141,6 +149,9 @@ func run() -> void:
 			check(row.leg_angle_deg<=maxf(60.,control.leg_angle_deg+5.),key+" no new leg pop beyond baseline/60degree guard")
 			check(row.correction_clamps<=control.correction_clamps,key+" no additional correction clamps")
 			if key.ends_with("steady"):check(row.hip_target_error_m<.00001,key+" approved hip rebound preserved")
+	var live: Dictionary=monitor.rows.live_AB
+	check(live.leg_angle_deg<=60.,"Live Run A/B respects60degree displayed-step guard")
+	check(live.hip_target_error_m<.00001,"Live Run A/B preserves approved hip movement")
 	var out:="res://.validation/run_snappy_leg_recovery_v001"
 	DirAccess.make_dir_recursive_absolute(out)
 	FileAccess.open(out+"/focused%d.json"%fps,FileAccess.WRITE).store_string(JSON.stringify({"passed":failures.is_empty(),"failures":failures,"checks":checks,"phase_results":results,"final_pose_measurements":monitor.rows,"render_fps":fps,"physics_fps":60},"\t"))

@@ -31,6 +31,7 @@ const GAF_BRIDGE_CONTRACT={"preview_meshes": [{"name": "Rifle_V2_Body", "origin"
       if(ba.type!=='bone') fail('Only bone animators are supported; remove effects.');
       if(ba.rotation_global || ba.muted && Object.values(ba.muted).some(Boolean)) fail('Global rotation and muted channels are unsupported.');
       for(const k of ba.keyframes) {
+        if(k.data_points.length>1 && k.data_points.slice(1).some(dp=>['x','y','z'].some(axis=>Number(dp[axis])!==Number(k.data_points[0][axis])))) fail('Distinct pre/post values are discontinuous and unsupported in v1.');
         if(k.interpolation==='step') fail('Step/discontinuous keys need a separate bake policy; not supported in v1.');
         for(const dp of k.data_points)for(const axis of ['x','y','z'])if(dp[axis]!==undefined && (!Number.isFinite(Number(dp[axis]))||!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(String(dp[axis])))) fail('Use ordinary decimal literals; Molang and scientific notation are unsupported.');
         if(k.channel==='scale' && k.data_points.some(dp=>['x','y','z'].some(axis=>Number(dp[axis])!==1))) fail('Animated scaling is forbidden.');

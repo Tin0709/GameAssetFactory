@@ -8,7 +8,7 @@ Created 2026-10-14. Validated with **Blockbench 5.2.2** and **Blender 5.2.2 LTS*
 - `gaf_rigid_blender_bridge.js`: local Blockbench plugin. Exports the selected animation's evaluated transforms.
 - `bridge_contract.json`: measured Blender rest matrices, 13 bone names/parents/pivots, UUIDs, proxy geometry and compatibility hash.
 - `import_blockbench.py`: import core; creates a new Pending Action in memory without changing the rig, active Action, files or review status of older Actions.
-- `import_to_review.py`: background command for future unique review imports. Saves a separate source study, backs up/registers Pending, and refreshes the existing showcase.
+- `import_to_review.py`: background command for future unique review imports. Saves a separate source study, backs up/registers Pending, and leaves shared-showcase saving to the review window.
 - `blockbench_import_source_v001.blend`: source study for the five delivered Actions, using the existing armature/mesh. It is not a second showcase.
 - `validation/`: numerical checks, saved-file/GUI checks, paired preview images and test logs.
 
@@ -28,7 +28,7 @@ Created 2026-10-14. Validated with **Blockbench 5.2.2** and **Blender 5.2.2 LTS*
   -- '/absolute/path/BB_Rifle_Ready_Pose_v002.samples.json'
 ```
 
-An optional second argument supplies a unique Action name. Use letters, digits and underscores. Existing Action names and source folders are refused; revisions never overwrite approved Actions. The helper saves the source under `imports/<Action>/source.blend`, registers **pending**, and refreshes/saves the same `Animation_Showcase.blend`. Close/reopen a previously open showcase to avoid reviewing stale cached data. The helper protects on-disk concurrent changes; save/close any other editing session of the showcase before running it.
+An optional second argument supplies a unique Action name. Use letters, digits and underscores. Existing Action names and source folders are refused; revisions never overwrite approved Actions. The helper saves the source under `imports/<Action>/source.blend`, registers **pending** in its manifest. In the existing showcase window, click **Refresh Library**, review, then save. The helper never writes the shared viewer file. Close/reopen a previously open showcase to avoid reviewing stale cached data. Hash checks detect changes observed during preparation; they are not a filesystem lock. Run one registration at a time and avoid concurrent manual manifest edits. Save the shared viewer from one review window.
 
 6. In Blender, select the clip from **N → Animation Library**. The five supplied tests are at the end of the existing list. Technical checks and importing do not grant artistic approval.
 
@@ -71,7 +71,7 @@ All **28 existing Actions**, including **12 approved Actions**, retain their con
 ## Limits and future animations
 
 - v1 is version-pinned to Blockbench 5.2.2. Revalidate before changing the editor version or proxy contract. Do not rename/reparent bones, edit rest pivots/geometry, convert formats, unlock forearms or add joints.
-- Smooth numeric bone rotation/translation keyframes are supported through evaluated sampling. Molang, scientific-notation strings, animation controllers, effects, blending/override, muted channels, global-rotation mode, animated scale, shear, reflections and step/discontinuous keys are rejected. Ordinary decimal values are required. Constraints, NLA, drivers or a changed Blender rig are rejected.
+- Smooth numeric bone rotation/translation keyframes are supported through evaluated sampling. Molang, scientific-notation strings, animation controllers, effects, blending/override, muted channels, global-rotation mode, animated scale, shear, reflections and step/discontinuous keys (including distinct pre/post values) are rejected. Ordinary decimal values are required. Constraints, NLA, drivers or a changed Blender rig are rejected.
 - Baked transforms match at sample times; interpolation between samples is an approximation. Faster future motion may need 240/480 Hz and new dense reference checks. A manually edited `.bbmodel` must be exported again through this plugin; arbitrary Bedrock/glTF Euler channels are not interchangeable with this sample format.
 - This preserves evaluated poses, not Blockbench's editable curve structure or original keyframe tangents. Exported files retain timestamps, source duration and loop intent. Registration remains conservatively non-seamless until pose AND velocity seams are separately checked. Test clips here are one-shots, not locomotion/weapon layers.
 - Root translation is possible as bone motion, but physics/world travel ownership, gameplay layering, foot contacts, interruption and animation transitions still need separately authorized Godot validation. No Godot, production animation, controller or export changes were made.

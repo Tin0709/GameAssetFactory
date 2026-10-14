@@ -1,0 +1,30 @@
+{
+  "distinct_pre_post_rejected": true,
+  "positive_exports": [
+    {
+      "name": "BB_Neutral_Test_v001",
+      "samples": 121,
+      "valid": true
+    },
+    {
+      "name": "BB_RightArm_Test_v001",
+      "samples": 121,
+      "valid": true
+    },
+    {
+      "name": "BB_LeftArm_Test_v001",
+      "samples": 121,
+      "valid": true
+    },
+    {
+      "name": "BB_HeadTurn_Test_v001",
+      "samples": 121,
+      "valid": true
+    },
+    {
+      "name": "BB_Rifle_Ready_Pose_v001",
+      "samples": 121,
+      "valid": true
+    }
+  ]
+}

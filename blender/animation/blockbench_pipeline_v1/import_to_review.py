@@ -1,4 +1,4 @@
-"""Background-only reusable review import, backup, Pending registration and refresh.
+"""Background-only reusable review import, backup and Pending registration.
 Blender -b Animation_Showcase.blend --python-exit-code 1 --python import_to_review.py -- CLIP.samples.json [Unique_Action_Name]
 """
 import bpy,sys,json,hashlib,shutil,re
@@ -31,12 +31,9 @@ def run(sample_path,name=None):
     for p,d in baseline.items():
         if hashlib.sha256(p.read_bytes()).hexdigest()!=d:raise RuntimeError('Concurrent library change; source retained, nothing registered')
     register_animation.register_entry(action.name,rig.name,'Showcase_Player_Mesh',1,scene.frame_end,clip['fps'])
-    # Re-open the original existing rig; refresh appends the named Action only.
-    bpy.ops.wm.open_mainfile(filepath=str(viewer));ui.register() if not hasattr(bpy.types.Scene,'gaf_clips') else None
-    ui.refresh(bpy.context.scene)
-    if hashlib.sha256(viewer.read_bytes()).hexdigest()!=baseline[viewer]:raise RuntimeError('Concurrent viewer change; Pending source registered, viewer not overwritten')
-    bpy.ops.wm.save_as_mainfile(filepath=str(viewer))
-    print('IMPORTED AND REGISTERED PENDING:',clip['name'],'->',source)
+    # The review window owns saving the shared viewer. Never overwrite its file here.
+    assert hashlib.sha256(viewer.read_bytes()).hexdigest()==baseline[viewer], 'Concurrent viewer change; Pending source retained; this helper never writes the viewer'
+    print('REGISTERED PENDING:',clip['name'],'->',source,'; click Refresh Library and save in the showcase window')
 
 if __name__=='__main__':
     args=sys.argv[sys.argv.index('--')+1:]
