@@ -1,0 +1,159 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/review/Zombie_Idle_Original_V1_THREE_QUARTER_1x.mp4",
+      "fps": 30.0,
+      "frames": 360,
+      "duration_s": 12.0,
+      "decoded_samples": [
+        1,
+        180,
+        360
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/review/Zombie_Idle_Original_V1_FRONT_1x.mp4",
+      "fps": 30.0,
+      "frames": 360,
+      "duration_s": 12.0,
+      "decoded_samples": [
+        1,
+        180,
+        360
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/review/Zombie_Idle_Original_V1_SIDE_1x.mp4",
+      "fps": 30.0,
+      "frames": 360,
+      "duration_s": 12.0,
+      "decoded_samples": [
+        1,
+        180,
+        360
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/review/Zombie_Walk_Original_V1_THREE_QUARTER_1x.mp4",
+      "fps": 30.0,
+      "frames": 126,
+      "duration_s": 4.2,
+      "decoded_samples": [
+        1,
+        63,
+        126
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/review/Zombie_Walk_Original_V1_FRONT_1x.mp4",
+      "fps": 30.0,
+      "frames": 126,
+      "duration_s": 4.2,
+      "decoded_samples": [
+        1,
+        63,
+        126
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/review/Zombie_Walk_Original_V1_SIDE_1x.mp4",
+      "fps": 30.0,
+      "frames": 126,
+      "duration_s": 4.2,
+      "decoded_samples": [
+        1,
+        63,
+        126
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/review/Zombie_Idle_Existing_vs_Original_V1_1x.mp4",
+      "fps": 30.0,
+      "frames": 360,
+      "duration_s": 12.0,
+      "decoded_samples": [
+        1,
+        180,
+        360
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/review/Zombie_Walk_Existing_vs_Original_V1_1x.mp4",
+      "fps": 30.0,
+      "frames": 336,
+      "duration_s": 11.2,
+      "decoded_samples": [
+        1,
+        168,
+        336
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/source_research/review/Zombie_Idle_ActionsStuff_Source_v001_THREE_QUARTER_1x.mp4",
+      "fps": 30.0,
+      "frames": 216,
+      "duration_s": 7.2,
+      "decoded_samples": [
+        1,
+        108,
+        216
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/source_research/review/Zombie_Idle_ActionsStuff_Source_v001_FRONT_1x.mp4",
+      "fps": 30.0,
+      "frames": 216,
+      "duration_s": 7.2,
+      "decoded_samples": [
+        1,
+        108,
+        216
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/source_research/review/Zombie_Idle_ActionsStuff_Source_v001_SIDE_1x.mp4",
+      "fps": 30.0,
+      "frames": 216,
+      "duration_s": 7.2,
+      "decoded_samples": [
+        1,
+        108,
+        216
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/source_research/review/Zombie_Walk_ActionsStuff_Source_v001_THREE_QUARTER_1x.mp4",
+      "fps": 30.0,
+      "frames": 540,
+      "duration_s": 18.0,
+      "decoded_samples": [
+        1,
+        270,
+        540
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/source_research/review/Zombie_Walk_ActionsStuff_Source_v001_FRONT_1x.mp4",
+      "fps": 30.0,
+      "frames": 540,
+      "duration_s": 18.0,
+      "decoded_samples": [
+        1,
+        270,
+        540
+      ]
+    },
+    {
+      "file": "/Users/tin/Documents/ChatGPT/New project/mobs_library/source_research/review/Zombie_Walk_ActionsStuff_Source_v001_SIDE_1x.mp4",
+      "fps": 30.0,
+      "frames": 540,
+      "duration_s": 18.0,
+      "decoded_samples": [
+        1,
+        270,
+        540
+      ]
+    }
+  ]
+}

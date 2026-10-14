@@ -1,0 +1,24 @@
+{
+  "delivered_file": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/showcase/Mobs_Animation_Library.blend",
+  "original_mesh_rest_uv_weights_and_packed_atlas_preserved": true,
+  "four_actions_pending": true,
+  "source_research_count": 2,
+  "original_signatures_preserved": true,
+  "native_bindings_and_timing": true,
+  "research_folder_ignored": true,
+  "central_ignore_rule_exists": true,
+  "central_library_already_git_tracked": true,
+  "git_note": "Ignore rules do not untrack a file. An external checkpoint tracked the central library during this session; this task made no commits and did not rewrite Git history. Keep source-derived clips out of shipping exports.",
+  "action_signatures": {
+    "Zombie_Idle_ActionsStuff_Source_Test_v001": "7524877b1d74863931d9ce4348a5a82c6115318d49d9d1464f06b89fb1f4cdab",
+    "Zombie_Idle_Original_V1": "82115e1778bc62b7234efc18ce2d236d044fdeba53e04cfab9d8c53ade8fc4c8",
+    "Zombie_Walk_ActionsStuff_Source_Test_v001": "d1aa05c16fb06188c88dd30634c9bfdaa4afeea4d84c47576bb9531c20521301",
+    "Zombie_Walk_Original_V1": "19ceea76fa2e185d44523111c1a1222b3d570301ebd17b612dac1e3f61c3d0e1"
+  },
+  "protected_files": {
+    "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/showcase/Animation_Showcase.blend": "ba88d6d822d894b9b97be58362735d1398a52cdc29ce8fc168d81849d60f6cb5",
+    "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation_v2/zombie_animation_v2.blend": "f19ce66335b0cf92af7988268096aa1f691ab2db5c491abaf8a48f7fcc89aea3",
+    "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/characters/enemies/zombie/zombie_cuboid_v2.blend": "22e2abb4670206aaa1e96711340f958e113921b5499f19414deea65cde460a8c"
+  },
+  "library_sha256": "522f320ddfc04dfcc98c6efc49f84dcbcdbd7a16df1848d84ef4f095c8a2d639"
+}

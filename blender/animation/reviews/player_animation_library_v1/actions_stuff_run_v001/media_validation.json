@@ -1,0 +1,106 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "name": "source_front_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 512,
+      "height": 578,
+      "description": "Canonical source clocks, continuous68 samples",
+      "path": "source_front_1x.mp4",
+      "sha256": "0cbda4194720f45efd2a0074b6fe611c6712e5127d64341ec0c2239041b591d8",
+      "bytes": 166538
+    },
+    {
+      "name": "reference_source_approved_front_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Original recorded camera differs from fixed native model camera; no temporal retime",
+      "path": "reference_source_approved_front_1x.mp4",
+      "sha256": "369fdd116016086265ffce7326685f9a2953c3b1ce14cba7748b4f70657531a2",
+      "bytes": 611450
+    },
+    {
+      "name": "source_three_quarter_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 512,
+      "height": 578,
+      "description": "Canonical source clocks, continuous68 samples",
+      "path": "source_three_quarter_1x.mp4",
+      "sha256": "a2a8276850e315c3575ca011011007be7d499eb9dfe04dd5577256f37ddbeb6a",
+      "bytes": 193672
+    },
+    {
+      "name": "reference_source_approved_three_quarter_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Original recorded camera differs from fixed native model camera; no temporal retime",
+      "path": "reference_source_approved_three_quarter_1x.mp4",
+      "sha256": "433c69b2da05b2b4feb1df646c31355d61e72db23d9eaef20ffef869b6cf7bf0",
+      "bytes": 670786
+    },
+    {
+      "name": "source_side_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 512,
+      "height": 578,
+      "description": "Canonical source clocks, continuous68 samples",
+      "path": "source_side_1x.mp4",
+      "sha256": "940eff3ba79eadf27928549191bd9a965f311f278b3a8d2fa9f5a9747ab2969b",
+      "bytes": 167710
+    },
+    {
+      "name": "reference_source_approved_side_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Original recorded camera differs from fixed native model camera; no temporal retime",
+      "path": "reference_source_approved_side_1x.mp4",
+      "sha256": "bb8bdb3130dcad7c3e03530cc7d20e555a7862c299e099653bab1d0084fa5592",
+      "bytes": 609009
+    },
+    {
+      "name": "source_three_views_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Three fixed views of the same canonical take,68 continuous samples",
+      "path": "source_three_views_1x.mp4",
+      "sha256": "5b1fda82c4132bc4cc67e54d4dfe19fd7495440bc90ccf9389fa6c4fb5d32fea",
+      "bytes": 518383
+    },
+    {
+      "name": "source_full_take_1x",
+      "frames": 180,
+      "fps": 30,
+      "width": 512,
+      "height": 578,
+      "description": "Full continuous6-second source study; not a short seamless loop",
+      "path": "source_full_take_1x.mp4",
+      "sha256": "f99f08bf3a7d4dc344d4adafea82750beba34ad3db8f1a86564e59df52888605",
+      "bytes": 508625
+    },
+    {
+      "name": "video_cadence_diagnostic_front",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Diagnostic changes forwardphaseclock only, not source-authentic Action; bob retains nativeclock",
+      "path": "video_cadence_diagnostic_front.mp4",
+      "sha256": "0d16939794b3d1011df92ee91c8f40c2d8254337a28dd1cca809a35641fd0937",
+      "bytes": 607300
+    }
+  ],
+  "no_blend_saved": true,
+  "no_reference_retime": true
+}

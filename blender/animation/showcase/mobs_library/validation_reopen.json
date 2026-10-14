@@ -4,6 +4,8 @@
   "action_switching_and_motion": true,
   "initial_statuses": [
     "Pending",
+    "Pending",
+    "Pending",
     "Pending"
   ]
 }

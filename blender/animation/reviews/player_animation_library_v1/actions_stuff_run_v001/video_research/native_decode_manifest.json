@@ -1,0 +1,3173 @@
+{
+  "decoder" : "macOS AVFoundation AVAssetReader; 32BGRA; CoreImage software renderer; PNG via ImageIO",
+  "duration_s" : 11.646645833333332,
+  "exact_duplicate_frame_pairs" : [
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      144,
+      145
+    ],
+    [
+      295,
+      296
+    ]
+  ],
+  "frame_count" : 349,
+  "frames" : [
+    {
+      "duration_s" : null,
+      "index" : 0,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0000.png",
+      "pts_s" : 0,
+      "pts_timescale" : 30000,
+      "pts_value" : 0,
+      "raw_BGRA_SHA256" : "5b6591be5b5197c58c1149c94709886dad65d2407af081c03c0bd148f5bf4161"
+    },
+    {
+      "duration_s" : null,
+      "index" : 1,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0001.png",
+      "pts_s" : 0.033333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 1000,
+      "raw_BGRA_SHA256" : "61024dbe0e50c80cc5b58be74f78c8d1651d0c3c8c47bc72cc7a3e34a021535c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 2,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0002.png",
+      "pts_s" : 0.066666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 2000,
+      "raw_BGRA_SHA256" : "61024dbe0e50c80cc5b58be74f78c8d1651d0c3c8c47bc72cc7a3e34a021535c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 3,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0003.png",
+      "pts_s" : 0.10000000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 3000,
+      "raw_BGRA_SHA256" : "61024dbe0e50c80cc5b58be74f78c8d1651d0c3c8c47bc72cc7a3e34a021535c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 4,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0004.png",
+      "pts_s" : 0.13333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 4000,
+      "raw_BGRA_SHA256" : "fd2bcf2549dc7eb50973ad7abca82513955e0bb35cc703dae3b389e25a8a008b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 5,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0005.png",
+      "pts_s" : 0.16666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 5000,
+      "raw_BGRA_SHA256" : "d1adde87584e0627c39b86fb52456e9c75b099739d0a27d1d5b6704781baa707"
+    },
+    {
+      "duration_s" : null,
+      "index" : 6,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0006.png",
+      "pts_s" : 0.20000000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 6000,
+      "raw_BGRA_SHA256" : "bb14916c4f5e9ac7ce5e66df32bff9729f180f47fe9a58a2f81d3d101cb120d1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 7,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0007.png",
+      "pts_s" : 0.23333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 7000,
+      "raw_BGRA_SHA256" : "e6aeecad6e2d6be8cdb204f162551577f88d44e89ed52eaaf648f9b2369a8fc8"
+    },
+    {
+      "duration_s" : null,
+      "index" : 8,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0008.png",
+      "pts_s" : 0.26666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 8000,
+      "raw_BGRA_SHA256" : "a6f7cef12b9303abf6d1ec9228d4a280dd40732a1e3b75a536bc9a160f084cf4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 9,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0009.png",
+      "pts_s" : 0.29999999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 9000,
+      "raw_BGRA_SHA256" : "79b3d30e7aa62f500587267356eee698a4c15fa479da848f0f5a4969914518d5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 10,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0010.png",
+      "pts_s" : 0.33333333333333331,
+      "pts_timescale" : 30000,
+      "pts_value" : 10000,
+      "raw_BGRA_SHA256" : "44024fb270fb2f74f607f7774df37512fbbc42f46046f81bc40b8a88ef07f661"
+    },
+    {
+      "duration_s" : null,
+      "index" : 11,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0011.png",
+      "pts_s" : 0.36666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 11000,
+      "raw_BGRA_SHA256" : "19778ac4d85f6830e00bbb328b49bb7667360b1c35ab6ab0513efa08fce5e090"
+    },
+    {
+      "duration_s" : null,
+      "index" : 12,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0012.png",
+      "pts_s" : 0.40000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 12000,
+      "raw_BGRA_SHA256" : "70bcd8eb4ab234c83d39fafbedf6b7646af45e85e94bc8836b76524da0b21dd9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 13,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0013.png",
+      "pts_s" : 0.43333333333333335,
+      "pts_timescale" : 30000,
+      "pts_value" : 13000,
+      "raw_BGRA_SHA256" : "f285642585815e8c30f8d916de3ecca3651252f82a6497697365c5e3471c2d82"
+    },
+    {
+      "duration_s" : null,
+      "index" : 14,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0014.png",
+      "pts_s" : 0.46666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 14000,
+      "raw_BGRA_SHA256" : "151cff13841087194d7fc8312d64350b63681b317635485a2151fa641b12b756"
+    },
+    {
+      "duration_s" : null,
+      "index" : 15,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0015.png",
+      "pts_s" : 0.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 15000,
+      "raw_BGRA_SHA256" : "306a4f03f66ff02e45394d62ed924efc8a51cb013f24362afd2a6a3574f783e5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 16,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0016.png",
+      "pts_s" : 0.53333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 16000,
+      "raw_BGRA_SHA256" : "0b241cad9db9980861ebba6f6e21eb760c63271477af54260f82628d8df2a554"
+    },
+    {
+      "duration_s" : null,
+      "index" : 17,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0017.png",
+      "pts_s" : 0.56666666666666665,
+      "pts_timescale" : 30000,
+      "pts_value" : 17000,
+      "raw_BGRA_SHA256" : "14b4e9e74d799d046a3be6ce8efe6cd00c56e594c1934c68e1cbaea9d6aef72b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 18,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0018.png",
+      "pts_s" : 0.59999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 18000,
+      "raw_BGRA_SHA256" : "fbce7215ce9e8bfd464df68397199d51f869c4a2349e64eeece76ce8d4c3492f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 19,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0019.png",
+      "pts_s" : 0.6333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 19000,
+      "raw_BGRA_SHA256" : "3fc5ba56a9d71ffd7e36f3329b547b516fe46813d7e06e9d3dd075df77f91f8f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 20,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0020.png",
+      "pts_s" : 0.66666666666666663,
+      "pts_timescale" : 30000,
+      "pts_value" : 20000,
+      "raw_BGRA_SHA256" : "f47841a39c49a7bfaede46f34f2aed13a67157c9502a30ad8e561e37e98dbd33"
+    },
+    {
+      "duration_s" : null,
+      "index" : 21,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0021.png",
+      "pts_s" : 0.69999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 21000,
+      "raw_BGRA_SHA256" : "497952d8e6bad7e594474787d1b35ea7d511a7113aea7b6f008addae6fceadff"
+    },
+    {
+      "duration_s" : null,
+      "index" : 22,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0022.png",
+      "pts_s" : 0.73333333333333328,
+      "pts_timescale" : 30000,
+      "pts_value" : 22000,
+      "raw_BGRA_SHA256" : "073893af73afdd02e378b79a3ea1e41a5e9010c9e69b9b379592e1e1819891f5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 23,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0023.png",
+      "pts_s" : 0.76666666666666672,
+      "pts_timescale" : 30000,
+      "pts_value" : 23000,
+      "raw_BGRA_SHA256" : "8af1fd77d1f594f50a13737301f0e1246a30997d6c1417dd5b02e8070905c087"
+    },
+    {
+      "duration_s" : null,
+      "index" : 24,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0024.png",
+      "pts_s" : 0.80000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 24000,
+      "raw_BGRA_SHA256" : "5147662e6a0018cbf91fb82b572ebb47e088ef19179463d007244322759a51d2"
+    },
+    {
+      "duration_s" : null,
+      "index" : 25,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0025.png",
+      "pts_s" : 0.83333333333333337,
+      "pts_timescale" : 30000,
+      "pts_value" : 25000,
+      "raw_BGRA_SHA256" : "0b9ffadbf0a830543fd154034d4a26cbb97e45a2adc2c7f631792bdc1016273f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 26,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0026.png",
+      "pts_s" : 0.8666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 26000,
+      "raw_BGRA_SHA256" : "6fd0c3193bfc5ae24c5f98dbb1a9d32d3c3f9fd2fcc3dc7a03379a2dcc429e1c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 27,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0027.png",
+      "pts_s" : 0.90000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 27000,
+      "raw_BGRA_SHA256" : "bf90f7f8a6e18cdb1a8519fcb29efade40e80b25ff9623f9b8527ec84136a73e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 28,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0028.png",
+      "pts_s" : 0.93333333333333335,
+      "pts_timescale" : 30000,
+      "pts_value" : 28000,
+      "raw_BGRA_SHA256" : "bdc62cd8877ed4a5e8e8ef8446b72df0b78c579d69f97ece67a66455178930b1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 29,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0029.png",
+      "pts_s" : 0.96666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 29000,
+      "raw_BGRA_SHA256" : "4acc1d5e9d8f07316a5d34d68bc995b5b816c4a72df811105af6f1e971ece602"
+    },
+    {
+      "duration_s" : null,
+      "index" : 30,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0030.png",
+      "pts_s" : 1,
+      "pts_timescale" : 30000,
+      "pts_value" : 30000,
+      "raw_BGRA_SHA256" : "3bbe5625a718fc7bebba30f4d183e4d1d065a7359a8030cf180a032d211b8134"
+    },
+    {
+      "duration_s" : null,
+      "index" : 31,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0031.png",
+      "pts_s" : 1.0333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 31000,
+      "raw_BGRA_SHA256" : "ebf8b5a88888fd1313ea33e1eb3eea83277228a8f3cb828c1d709f6b1993eeb4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 32,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0032.png",
+      "pts_s" : 1.0666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 32000,
+      "raw_BGRA_SHA256" : "780a78ca8997cb7c96fff02964a6da97e3f164d0dfe649ccbe543ed5ebd1ab2e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 33,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0033.png",
+      "pts_s" : 1.1000000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 33000,
+      "raw_BGRA_SHA256" : "f8ec6dfa09105ae397e817af620f8cd81be6d9cd0824a62e8f0f5b272447a9ad"
+    },
+    {
+      "duration_s" : null,
+      "index" : 34,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0034.png",
+      "pts_s" : 1.1333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 34000,
+      "raw_BGRA_SHA256" : "f0014c6ccccf99bf311493c090d9f85d64b48bdee47056cb62cafae11ac9bc88"
+    },
+    {
+      "duration_s" : null,
+      "index" : 35,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0035.png",
+      "pts_s" : 1.1666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 35000,
+      "raw_BGRA_SHA256" : "a314fb9e8e9a6ebe95d3cfdf4dc1ed031ef84aca4b70334738c0aaac379e734d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 36,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0036.png",
+      "pts_s" : 1.2,
+      "pts_timescale" : 30000,
+      "pts_value" : 36000,
+      "raw_BGRA_SHA256" : "9b9048748cfbf4dd2c2f42e3bccdf642b5628fd4b470c70e181c60c6d76458fa"
+    },
+    {
+      "duration_s" : null,
+      "index" : 37,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0037.png",
+      "pts_s" : 1.2333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 37000,
+      "raw_BGRA_SHA256" : "290c1bb564388aea7facb933c065f962c42336c300591149a2a5ba780c57ec5a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 38,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0038.png",
+      "pts_s" : 1.2666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 38000,
+      "raw_BGRA_SHA256" : "4638f0b349a329f37e81a16b1beafbca2d845ccc7a5944c4493bde8d076b08bb"
+    },
+    {
+      "duration_s" : null,
+      "index" : 39,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0039.png",
+      "pts_s" : 1.3,
+      "pts_timescale" : 30000,
+      "pts_value" : 39000,
+      "raw_BGRA_SHA256" : "deee65141fbf07ea6de812fb9913788d026aca04892c2a0c1e6a6a2069431d49"
+    },
+    {
+      "duration_s" : null,
+      "index" : 40,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0040.png",
+      "pts_s" : 1.3333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 40000,
+      "raw_BGRA_SHA256" : "4b9832179a34dd2ced0905fd52454512a550ed84c4934daaa55fcc7ada0fa9fa"
+    },
+    {
+      "duration_s" : null,
+      "index" : 41,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0041.png",
+      "pts_s" : 1.3666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 41000,
+      "raw_BGRA_SHA256" : "1a91399e99d200e6966c7a6ad1573db0d7688c6f6a559e362a696f7fc2794f58"
+    },
+    {
+      "duration_s" : null,
+      "index" : 42,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0042.png",
+      "pts_s" : 1.3999999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 42000,
+      "raw_BGRA_SHA256" : "0430bea4428317e026e6a8e9bd091ff082913738931c94e4440daf9872d54b91"
+    },
+    {
+      "duration_s" : null,
+      "index" : 43,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0043.png",
+      "pts_s" : 1.4333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 43000,
+      "raw_BGRA_SHA256" : "edb3c435dd776926f02417a353bbea0657fe9ab04c5d77ba27d34ca94fe1ef84"
+    },
+    {
+      "duration_s" : null,
+      "index" : 44,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0044.png",
+      "pts_s" : 1.4666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 44000,
+      "raw_BGRA_SHA256" : "8e01add866556cbb8559938b453448a35bbcf95d88563d3b13fdd4def86da071"
+    },
+    {
+      "duration_s" : null,
+      "index" : 45,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0045.png",
+      "pts_s" : 1.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 45000,
+      "raw_BGRA_SHA256" : "0cc8ad613de9f99a00d2372e8786e526dd1141c0e13c9ee8464f6759ea90c83f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 46,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0046.png",
+      "pts_s" : 1.5333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 46000,
+      "raw_BGRA_SHA256" : "adff00b0484dba6a8854e70761e1497aefb7bcaa4d39bc8f6ba6fab27b08a10a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 47,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0047.png",
+      "pts_s" : 1.5666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 47000,
+      "raw_BGRA_SHA256" : "39aa747e2e7210ae8fd226ea9a4e94edb5b10faa856c1986ed18b165bf8969fa"
+    },
+    {
+      "duration_s" : null,
+      "index" : 48,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0048.png",
+      "pts_s" : 1.6000000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 48000,
+      "raw_BGRA_SHA256" : "60d99b4e25648407a479d434990a01d5554d6266da2cb1507c8f03973ca90da7"
+    },
+    {
+      "duration_s" : null,
+      "index" : 49,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0049.png",
+      "pts_s" : 1.6333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 49000,
+      "raw_BGRA_SHA256" : "475040ff05454279ba05f8773e6578cdffa9f49d1d85e7bde473c413f6f6b0c6"
+    },
+    {
+      "duration_s" : null,
+      "index" : 50,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0050.png",
+      "pts_s" : 1.6666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 50000,
+      "raw_BGRA_SHA256" : "8bd7b6eea584ff0789b64d3c08ce2dc95fcdbc8dc7895731c8f9073399b1b3e3"
+    },
+    {
+      "duration_s" : null,
+      "index" : 51,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0051.png",
+      "pts_s" : 1.7,
+      "pts_timescale" : 30000,
+      "pts_value" : 51000,
+      "raw_BGRA_SHA256" : "a25f3d484a7dd1af331d92dfed87c04f502b0171e12237b594a11a40460bece6"
+    },
+    {
+      "duration_s" : null,
+      "index" : 52,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0052.png",
+      "pts_s" : 1.7333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 52000,
+      "raw_BGRA_SHA256" : "22cb73b5003d29b3a6fcc5bd2c7364e9b80524b7f96385ff1fb6f958ffdeb9b4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 53,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0053.png",
+      "pts_s" : 1.7666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 53000,
+      "raw_BGRA_SHA256" : "162ce7f9ba536d9b286356d3b1c5fce94b90777958b75eede4e0a5a2e3b096b8"
+    },
+    {
+      "duration_s" : null,
+      "index" : 54,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0054.png",
+      "pts_s" : 1.8,
+      "pts_timescale" : 30000,
+      "pts_value" : 54000,
+      "raw_BGRA_SHA256" : "075d80958141140f69b139ae0a019289d647c99133d9a0ab513a8e94645cbbbd"
+    },
+    {
+      "duration_s" : null,
+      "index" : 55,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0055.png",
+      "pts_s" : 1.8333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 55000,
+      "raw_BGRA_SHA256" : "bda3be1b943b992b5490ed712eb13760210b0b0b3e96135350225dcd8ca84ced"
+    },
+    {
+      "duration_s" : null,
+      "index" : 56,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0056.png",
+      "pts_s" : 1.8666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 56000,
+      "raw_BGRA_SHA256" : "e946da8cb7fc0d18ac956b0cfcc336ab955316d3a27fc0c0fae84a9da8711f0f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 57,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0057.png",
+      "pts_s" : 1.8999999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 57000,
+      "raw_BGRA_SHA256" : "b835d37d581f34aec2ea05c00758bce74ba7da208d159c5169a25ec74ad55dd9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 58,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0058.png",
+      "pts_s" : 1.9333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 58000,
+      "raw_BGRA_SHA256" : "1388c87ec1d5ad72c3b2cb9cd5f7934ef2e7433d944dd281e84cf793af5e60f0"
+    },
+    {
+      "duration_s" : null,
+      "index" : 59,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0059.png",
+      "pts_s" : 1.9666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 59000,
+      "raw_BGRA_SHA256" : "39532d94a233169b6295db3443003070fabd169eabfb140b33cc851e7d3a315b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 60,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0060.png",
+      "pts_s" : 2,
+      "pts_timescale" : 30000,
+      "pts_value" : 60000,
+      "raw_BGRA_SHA256" : "bc1bc9a41546b24c83c803670382d5fe08c2a58da774b5bbcd310b4ab8d8062d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 61,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0061.png",
+      "pts_s" : 2.0333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 61000,
+      "raw_BGRA_SHA256" : "defc3a8950afabb149780a084deb54d329c335c7aabd142b7e84fb2a68be98ba"
+    },
+    {
+      "duration_s" : null,
+      "index" : 62,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0062.png",
+      "pts_s" : 2.0666666666666669,
+      "pts_timescale" : 30000,
+      "pts_value" : 62000,
+      "raw_BGRA_SHA256" : "1880532d6998c3df04b9d32c4cad914b66423990ed3924295f65b1a99e39339b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 63,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0063.png",
+      "pts_s" : 2.1000000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 63000,
+      "raw_BGRA_SHA256" : "f9e6420a10fda5dc268ed1861bec8dbb40f1a55b55a5792bc9a9436e3d2d4736"
+    },
+    {
+      "duration_s" : null,
+      "index" : 64,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0064.png",
+      "pts_s" : 2.1333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 64000,
+      "raw_BGRA_SHA256" : "b37ed9d4cf0211dc351a5424b68a25546162e26d8806dbece4eea494f4952a04"
+    },
+    {
+      "duration_s" : null,
+      "index" : 65,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0065.png",
+      "pts_s" : 2.1666666666666665,
+      "pts_timescale" : 30000,
+      "pts_value" : 65000,
+      "raw_BGRA_SHA256" : "bbf7c329091aaf40e5eac96c1741ac2e90354f7cd7df02026c35103100620288"
+    },
+    {
+      "duration_s" : null,
+      "index" : 66,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0066.png",
+      "pts_s" : 2.2000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 66000,
+      "raw_BGRA_SHA256" : "d383693b4b6c14e340f6a87cc03c41034c82b24ca63fce8d24b61458d50af2a0"
+    },
+    {
+      "duration_s" : null,
+      "index" : 67,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0067.png",
+      "pts_s" : 2.2333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 67000,
+      "raw_BGRA_SHA256" : "f35acd0e03e05903d788104bbc5405c12a3976266a5a2a0f34993c7a5ac5c7ef"
+    },
+    {
+      "duration_s" : null,
+      "index" : 68,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0068.png",
+      "pts_s" : 2.2666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 68000,
+      "raw_BGRA_SHA256" : "f978b09b8030700002ffd06783ab404207f5c2b2ffda95f1094345b979a0a876"
+    },
+    {
+      "duration_s" : null,
+      "index" : 69,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0069.png",
+      "pts_s" : 2.2999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 69000,
+      "raw_BGRA_SHA256" : "50a780f0ee893448fff3f5423cc47554ebadcba719530f15dbc909d470fe1921"
+    },
+    {
+      "duration_s" : null,
+      "index" : 70,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0070.png",
+      "pts_s" : 2.3333333333333335,
+      "pts_timescale" : 30000,
+      "pts_value" : 70000,
+      "raw_BGRA_SHA256" : "0c4d3d782d281e99fd6af02997e5ea1e80e4e4af471a376a1c1feff3b49783f9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 71,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0071.png",
+      "pts_s" : 2.3666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 71000,
+      "raw_BGRA_SHA256" : "8efbc087e9982598d18d5b9f7e36a694c5d96c30199f1879986b40a299126c53"
+    },
+    {
+      "duration_s" : null,
+      "index" : 72,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0072.png",
+      "pts_s" : 2.3999999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 72000,
+      "raw_BGRA_SHA256" : "8d6631324be42dc17df00dfe82632b852bf967db318b57180fa13333af2e7261"
+    },
+    {
+      "duration_s" : null,
+      "index" : 73,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0073.png",
+      "pts_s" : 2.4333333333333331,
+      "pts_timescale" : 30000,
+      "pts_value" : 73000,
+      "raw_BGRA_SHA256" : "b8023c57f98b8399504a89494a9309dda740e833a86f56b5297afd5b6144bdba"
+    },
+    {
+      "duration_s" : null,
+      "index" : 74,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0074.png",
+      "pts_s" : 2.4666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 74000,
+      "raw_BGRA_SHA256" : "b79b12bd9b12eb7a76ed819ca69a05a43208b0f7f3d68e25b11f3c26d14f1dc9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 75,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0075.png",
+      "pts_s" : 2.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 75000,
+      "raw_BGRA_SHA256" : "4b9b94b936372478598e9aeffad8a4839ff1184220b6c05bb7805eec5545361c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 76,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0076.png",
+      "pts_s" : 2.5333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 76000,
+      "raw_BGRA_SHA256" : "25f9b011b43e5f5ec11ae0aafd3d0a5d3291e4de95fa3072e98eae13ea0a99cf"
+    },
+    {
+      "duration_s" : null,
+      "index" : 77,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0077.png",
+      "pts_s" : 2.5666666666666669,
+      "pts_timescale" : 30000,
+      "pts_value" : 77000,
+      "raw_BGRA_SHA256" : "e3bf6c3d178e9634bfc6fb88bef8db877865d3b817feaf882be3e7a55cbe263f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 78,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0078.png",
+      "pts_s" : 2.6000000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 78000,
+      "raw_BGRA_SHA256" : "e566e938a826020c209805d286bf3a858ee4ea1894f0e57cb8fed15fa8f4336b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 79,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0079.png",
+      "pts_s" : 2.6333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 79000,
+      "raw_BGRA_SHA256" : "1bd883e4398f1487fd5debeccad28f65faa57c9a56f53b268a4c31010bf7a455"
+    },
+    {
+      "duration_s" : null,
+      "index" : 80,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0080.png",
+      "pts_s" : 2.6666666666666665,
+      "pts_timescale" : 30000,
+      "pts_value" : 80000,
+      "raw_BGRA_SHA256" : "3aabd3c3386b65704dc54d93c89cecc88cea28c65d66fe99fcaf3a4c70a03615"
+    },
+    {
+      "duration_s" : null,
+      "index" : 81,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0081.png",
+      "pts_s" : 2.7000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 81000,
+      "raw_BGRA_SHA256" : "4b72c2878d8b9a7a73ddd3b779e22c850e57a8c92d8e8091d79c5f8b627802d3"
+    },
+    {
+      "duration_s" : null,
+      "index" : 82,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0082.png",
+      "pts_s" : 2.7333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 82000,
+      "raw_BGRA_SHA256" : "032f4218b1655290769fd7139015c0a4f7d4bf21b9dd22a994243d038f7084ca"
+    },
+    {
+      "duration_s" : null,
+      "index" : 83,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0083.png",
+      "pts_s" : 2.7666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 83000,
+      "raw_BGRA_SHA256" : "529dcee99862b531ddb60516dc400c417cfb9a1c71774d4dfc2758bfa89ab69a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 84,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0084.png",
+      "pts_s" : 2.7999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 84000,
+      "raw_BGRA_SHA256" : "dabcd2b8c00c9a55513224cdc5e9582d8668f1b0f90d8d73580dac1d989bd3f6"
+    },
+    {
+      "duration_s" : null,
+      "index" : 85,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0085.png",
+      "pts_s" : 2.8333333333333335,
+      "pts_timescale" : 30000,
+      "pts_value" : 85000,
+      "raw_BGRA_SHA256" : "9e2af955a29c055f3529ec2c9489993b90d50344dceef90e1858c916d1542ab3"
+    },
+    {
+      "duration_s" : null,
+      "index" : 86,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0086.png",
+      "pts_s" : 2.8666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 86000,
+      "raw_BGRA_SHA256" : "d24564953b4445b025a269c86c27108b34a04388e67e4154c01defe7b3bdb30b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 87,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0087.png",
+      "pts_s" : 2.8999999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 87000,
+      "raw_BGRA_SHA256" : "39451210bfb32e429e363d512df747e453c443795ae11232ce9db5e0a923aae9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 88,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0088.png",
+      "pts_s" : 2.9333333333333331,
+      "pts_timescale" : 30000,
+      "pts_value" : 88000,
+      "raw_BGRA_SHA256" : "5291b1affb7398c4d4acda95e92b69dd4ec1dbbdb14ab8de55fecab90fa55136"
+    },
+    {
+      "duration_s" : null,
+      "index" : 89,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0089.png",
+      "pts_s" : 2.9666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 89000,
+      "raw_BGRA_SHA256" : "43d80413039439ee8741c5bd065316cd833ddc393fc84a4be0fbaaf733ae97bf"
+    },
+    {
+      "duration_s" : null,
+      "index" : 90,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0090.png",
+      "pts_s" : 3,
+      "pts_timescale" : 30000,
+      "pts_value" : 90000,
+      "raw_BGRA_SHA256" : "39f165f8b1d9cba9866968f59cabcb791525b2cddb23b5c3275073af692c5f91"
+    },
+    {
+      "duration_s" : null,
+      "index" : 91,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0091.png",
+      "pts_s" : 3.0333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 91000,
+      "raw_BGRA_SHA256" : "243eadd896dd245df2d4f03ad436b4f03149c57704c038d5657a6b58247a06c8"
+    },
+    {
+      "duration_s" : null,
+      "index" : 92,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0092.png",
+      "pts_s" : 3.0666666666666669,
+      "pts_timescale" : 30000,
+      "pts_value" : 92000,
+      "raw_BGRA_SHA256" : "1a75785c45f337361296d6ef60504020ab5ec0a68c05c6876053e2249a4c62f7"
+    },
+    {
+      "duration_s" : null,
+      "index" : 93,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0093.png",
+      "pts_s" : 3.1000000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 93000,
+      "raw_BGRA_SHA256" : "4e22a6b4b5f64474d4fab5113589bcc3524d3e0f44ef200f4b55c52f2bf9ee72"
+    },
+    {
+      "duration_s" : null,
+      "index" : 94,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0094.png",
+      "pts_s" : 3.1333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 94000,
+      "raw_BGRA_SHA256" : "5cedc67f8bdde8c634d6fc7f0c99c9c4ee9142cd295321e9e374669a763ea336"
+    },
+    {
+      "duration_s" : null,
+      "index" : 95,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0095.png",
+      "pts_s" : 3.1666666666666665,
+      "pts_timescale" : 30000,
+      "pts_value" : 95000,
+      "raw_BGRA_SHA256" : "e93873e55a0b820eb3c58fb08e48800d42a912da039ecaa5f2985016fe9c94f9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 96,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0096.png",
+      "pts_s" : 3.2000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 96000,
+      "raw_BGRA_SHA256" : "ea0af85141fd328b5ad42425c1dd4b0862a29d33ba2c8ba082f1a479749cfcb8"
+    },
+    {
+      "duration_s" : null,
+      "index" : 97,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0097.png",
+      "pts_s" : 3.2333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 97000,
+      "raw_BGRA_SHA256" : "805c44778d37bd9a7abee2abd1befe0ca5cda81e2fd64391b6cb3f5dd46e2d62"
+    },
+    {
+      "duration_s" : null,
+      "index" : 98,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0098.png",
+      "pts_s" : 3.2666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 98000,
+      "raw_BGRA_SHA256" : "1773345cd7a9d7e8297ce1db2a40d7ab69825b514c03fffbc209b0f83831fc1b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 99,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0099.png",
+      "pts_s" : 3.2999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 99000,
+      "raw_BGRA_SHA256" : "367683377b060dfbce8675ef4757e2d944dc019bdcaaeee8c70faa9193d2a0d5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 100,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0100.png",
+      "pts_s" : 3.3333333333333335,
+      "pts_timescale" : 30000,
+      "pts_value" : 100000,
+      "raw_BGRA_SHA256" : "5cc86aa596a797fe5f2147fe4a5bd56dac2fcbf468556bc1bacaa1aac2fe12e5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 101,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0101.png",
+      "pts_s" : 3.3666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 101000,
+      "raw_BGRA_SHA256" : "3eb7cd5bddd5111bdb7aa8a8f49c5a02490418340d31ec444ba74a85d30f94d8"
+    },
+    {
+      "duration_s" : null,
+      "index" : 102,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0102.png",
+      "pts_s" : 3.3999999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 102000,
+      "raw_BGRA_SHA256" : "6c5070f9f42acb9e4bff99c8bf39d77b2111a995cc725bde92d0db337b2e3f6a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 103,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0103.png",
+      "pts_s" : 3.4333333333333331,
+      "pts_timescale" : 30000,
+      "pts_value" : 103000,
+      "raw_BGRA_SHA256" : "97cf9cc3ba233e6102663a040fea20ca65152e90762261e25577966699c84ab9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 104,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0104.png",
+      "pts_s" : 3.4666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 104000,
+      "raw_BGRA_SHA256" : "54e02f74cea01198bf4bd52761f170561fa68a256af1ccf804606e412bd5e3dc"
+    },
+    {
+      "duration_s" : null,
+      "index" : 105,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0105.png",
+      "pts_s" : 3.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 105000,
+      "raw_BGRA_SHA256" : "bd526b0804206d88bc2f0c8584c4d06e1d6c218adb2485482b3c01ab8377709e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 106,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0106.png",
+      "pts_s" : 3.5333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 106000,
+      "raw_BGRA_SHA256" : "44dccc462ac6ba368129f3b3e08ec9bdb479590edc9fbaf6e2df6248919efd95"
+    },
+    {
+      "duration_s" : null,
+      "index" : 107,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0107.png",
+      "pts_s" : 3.5666666666666669,
+      "pts_timescale" : 30000,
+      "pts_value" : 107000,
+      "raw_BGRA_SHA256" : "018b506e1ebae0ff8c75b8e8d967b3646c24fb3f27653f7311b59822221699b2"
+    },
+    {
+      "duration_s" : null,
+      "index" : 108,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0108.png",
+      "pts_s" : 3.6000000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 108000,
+      "raw_BGRA_SHA256" : "13f9f94e485f882fa092836ad112f9231bb7a4097db0bedb9b55c7cccc65654d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 109,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0109.png",
+      "pts_s" : 3.6333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 109000,
+      "raw_BGRA_SHA256" : "37c69f16976bd881b39f83ca3b9ed5bb39b22832c8b319b1e9811e34ef9e534e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 110,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0110.png",
+      "pts_s" : 3.6666666666666665,
+      "pts_timescale" : 30000,
+      "pts_value" : 110000,
+      "raw_BGRA_SHA256" : "68f8682a45134ace02529f4f088e21fa08eb8b4a913a26fc69ad389a09612e96"
+    },
+    {
+      "duration_s" : null,
+      "index" : 111,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0111.png",
+      "pts_s" : 3.7000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 111000,
+      "raw_BGRA_SHA256" : "1473718160317d9c2b3b09de99463d974e823d5f973c7c38f702831ea8161175"
+    },
+    {
+      "duration_s" : null,
+      "index" : 112,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0112.png",
+      "pts_s" : 3.7333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 112000,
+      "raw_BGRA_SHA256" : "703055c9997451308ac3d01514cb39f711f55a27f4529be966a1f5464cc7cf9a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 113,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0113.png",
+      "pts_s" : 3.7666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 113000,
+      "raw_BGRA_SHA256" : "069eeca458be9b42e7a4f81a44cc319ad01d34dfa73d22eaaa3e4e4514b2e83c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 114,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0114.png",
+      "pts_s" : 3.7999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 114000,
+      "raw_BGRA_SHA256" : "b77705e9a52bad73d75cea52849714711184b9f1dfbebdac20aba5e21450b8fd"
+    },
+    {
+      "duration_s" : null,
+      "index" : 115,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0115.png",
+      "pts_s" : 3.8333333333333335,
+      "pts_timescale" : 30000,
+      "pts_value" : 115000,
+      "raw_BGRA_SHA256" : "60992f46189552ec86083723b9f3e76ddf9076c0d61369a194a4e05f9756970c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 116,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0116.png",
+      "pts_s" : 3.8666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 116000,
+      "raw_BGRA_SHA256" : "fe6f6f0b6d12dd516b335f79e930d3a8298d95958bbdb22b5d63c8b079c78fc1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 117,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0117.png",
+      "pts_s" : 3.8999999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 117000,
+      "raw_BGRA_SHA256" : "ba8e314eece3adbb0681435ffb2a500af61dfbf18059d2484a8dbbbaf4166cec"
+    },
+    {
+      "duration_s" : null,
+      "index" : 118,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0118.png",
+      "pts_s" : 3.9333333333333331,
+      "pts_timescale" : 30000,
+      "pts_value" : 118000,
+      "raw_BGRA_SHA256" : "0aeb717693c60e3681b76b98e1aabea497f9fc62ccef1af15e3cbbe59b99dcb5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 119,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0119.png",
+      "pts_s" : 3.9666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 119000,
+      "raw_BGRA_SHA256" : "0b95b19f3d2956d5dec6113314c23da7f6de6b6e9a4b9f103ba159e9f296965e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 120,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0120.png",
+      "pts_s" : 4,
+      "pts_timescale" : 30000,
+      "pts_value" : 120000,
+      "raw_BGRA_SHA256" : "08934dea61ff3b14eed2cdde47280698e5e3ce6850e1135aea8b301498e4bf08"
+    },
+    {
+      "duration_s" : null,
+      "index" : 121,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0121.png",
+      "pts_s" : 4.0333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 121000,
+      "raw_BGRA_SHA256" : "036ce7048727a8076c1a7ee1883f0598d080ffddf0b6bcc033b2c36ff9b4e46d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 122,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0122.png",
+      "pts_s" : 4.0666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 122000,
+      "raw_BGRA_SHA256" : "7aaf057f6869445cab9955e43f1b559963832a8eb2caff56d9b6e46bd3104060"
+    },
+    {
+      "duration_s" : null,
+      "index" : 123,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0123.png",
+      "pts_s" : 4.0999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 123000,
+      "raw_BGRA_SHA256" : "b3d7b5f8bd1c0b416c17f553e8d9fb47b5f59239b99d240b8b2774779af88879"
+    },
+    {
+      "duration_s" : null,
+      "index" : 124,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0124.png",
+      "pts_s" : 4.1333333333333337,
+      "pts_timescale" : 30000,
+      "pts_value" : 124000,
+      "raw_BGRA_SHA256" : "e3064980eaa4025ef5d39a812f5b35d9479901d29ca4cc332808032d2fc56119"
+    },
+    {
+      "duration_s" : null,
+      "index" : 125,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0125.png",
+      "pts_s" : 4.166666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 125000,
+      "raw_BGRA_SHA256" : "479fae75ef75720f772b694079a52cc4d154bc134c64d9749c9d6e8aea00fb70"
+    },
+    {
+      "duration_s" : null,
+      "index" : 126,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0126.png",
+      "pts_s" : 4.2000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 126000,
+      "raw_BGRA_SHA256" : "65da372c848dfec85f1b2be586aaaa918259403523a32de75e6a48c068a43ecc"
+    },
+    {
+      "duration_s" : null,
+      "index" : 127,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0127.png",
+      "pts_s" : 4.2333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 127000,
+      "raw_BGRA_SHA256" : "34f7933d7a43d9c90833547f37b1718a0785e21e5362351a6678fda8b3874847"
+    },
+    {
+      "duration_s" : null,
+      "index" : 128,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0128.png",
+      "pts_s" : 4.2666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 128000,
+      "raw_BGRA_SHA256" : "bc86aa6393a994c38633f7503bb7ae722aabef783f6fa52db35a8ffe2503c98b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 129,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0129.png",
+      "pts_s" : 4.2999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 129000,
+      "raw_BGRA_SHA256" : "a6253df3c989b7c996a726d6e157bd6c47c23b916d167900cabcd34f1db3975e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 130,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0130.png",
+      "pts_s" : 4.333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 130000,
+      "raw_BGRA_SHA256" : "27ec3256a346e22d6f245f5389e22f9ab09801300c17fb617c71a5d6f9a6a2f1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 131,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0131.png",
+      "pts_s" : 4.3666666666666663,
+      "pts_timescale" : 30000,
+      "pts_value" : 131000,
+      "raw_BGRA_SHA256" : "14849aa88c8013148ee10ec3e0148554b6dba72e429fe4feea49809850e423ff"
+    },
+    {
+      "duration_s" : null,
+      "index" : 132,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0132.png",
+      "pts_s" : 4.4000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 132000,
+      "raw_BGRA_SHA256" : "96bf1908931e203461b01ee14ee03d94583411c29ab3084323f4f2a277243a5d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 133,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0133.png",
+      "pts_s" : 4.4333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 133000,
+      "raw_BGRA_SHA256" : "ea7c243f57d90228d1e50b9fe4ae37b7e386096fff4277c8b6a0012d8f89aaa9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 134,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0134.png",
+      "pts_s" : 4.4666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 134000,
+      "raw_BGRA_SHA256" : "3818c4c073095252298987245b4854a1e5e65a3d48f830980d936b3feb9e5443"
+    },
+    {
+      "duration_s" : null,
+      "index" : 135,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0135.png",
+      "pts_s" : 4.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 135000,
+      "raw_BGRA_SHA256" : "f505f013e829cfa691e3b9217402947c590fae97a3611af0612e59e6ef6e3bd7"
+    },
+    {
+      "duration_s" : null,
+      "index" : 136,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0136.png",
+      "pts_s" : 4.5333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 136000,
+      "raw_BGRA_SHA256" : "b6976088a3ea3bb454a1932f6b150cc96c1053913f25a71353fb7f8b0276230a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 137,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0137.png",
+      "pts_s" : 4.5666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 137000,
+      "raw_BGRA_SHA256" : "862e286f53c1cd464162b55d418f78263a85885dadfe3178b76e7eeb492999fa"
+    },
+    {
+      "duration_s" : null,
+      "index" : 138,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0138.png",
+      "pts_s" : 4.5999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 138000,
+      "raw_BGRA_SHA256" : "e497d3e630f20652b728e0cf5a3bf86750428f3eb5615c15dd811ddfb3b0e1ec"
+    },
+    {
+      "duration_s" : null,
+      "index" : 139,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0139.png",
+      "pts_s" : 4.6333333333333337,
+      "pts_timescale" : 30000,
+      "pts_value" : 139000,
+      "raw_BGRA_SHA256" : "4f62a66f8e170e6f0e35187c689081ba541ac81b332607832ed199197dcfd820"
+    },
+    {
+      "duration_s" : null,
+      "index" : 140,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0140.png",
+      "pts_s" : 4.666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 140000,
+      "raw_BGRA_SHA256" : "ebdf38abdf41d2969ab63a5813010db92a9f3ea71f2f81c42b7cea7af8b7a479"
+    },
+    {
+      "duration_s" : null,
+      "index" : 141,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0141.png",
+      "pts_s" : 4.7000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 141000,
+      "raw_BGRA_SHA256" : "2afcde17fa28d7185d6c823b101621e5607e54d3fd368b36343ba272f5ad2c9f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 142,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0142.png",
+      "pts_s" : 4.7333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 142000,
+      "raw_BGRA_SHA256" : "6d3a31fec970ed836ea19bdc3125a5d149edeba4a84a0bd90047d18fc24d7493"
+    },
+    {
+      "duration_s" : null,
+      "index" : 143,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0143.png",
+      "pts_s" : 4.7666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 143000,
+      "raw_BGRA_SHA256" : "8c441fea8ab3609df5ea9501a4e46dc837c9a08c81a09d838fedf24abb5e63d9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 144,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0144.png",
+      "pts_s" : 4.7999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 144000,
+      "raw_BGRA_SHA256" : "3ac9d80638b40a4db403700750b0dac37453c9eb7e7f92b8390bd92786347b8b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 145,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0145.png",
+      "pts_s" : 4.833333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 145000,
+      "raw_BGRA_SHA256" : "3ac9d80638b40a4db403700750b0dac37453c9eb7e7f92b8390bd92786347b8b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 146,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0146.png",
+      "pts_s" : 4.8666666666666663,
+      "pts_timescale" : 30000,
+      "pts_value" : 146000,
+      "raw_BGRA_SHA256" : "53dffb49dbda26af704d04abe059ae553ead4de003b7bac712d95350ea0dacd6"
+    },
+    {
+      "duration_s" : null,
+      "index" : 147,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0147.png",
+      "pts_s" : 4.9000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 147000,
+      "raw_BGRA_SHA256" : "efeb8967d63682566fcf61076deca5915b0f6916fbe079e2af1b8332289b7512"
+    },
+    {
+      "duration_s" : null,
+      "index" : 148,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0148.png",
+      "pts_s" : 4.9333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 148000,
+      "raw_BGRA_SHA256" : "5a97182fa7d22eb982be183dbfb5e667a91636e361c88cd603122f8d3adcc7c2"
+    },
+    {
+      "duration_s" : null,
+      "index" : 149,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0149.png",
+      "pts_s" : 4.9666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 149000,
+      "raw_BGRA_SHA256" : "df6eed6244bd30ad853feb8b689f46a1f6bb3ed177e50a803dae1287bc5e454c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 150,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0150.png",
+      "pts_s" : 5,
+      "pts_timescale" : 30000,
+      "pts_value" : 150000,
+      "raw_BGRA_SHA256" : "86f444eaf5df89e171129d8760bba8eaf8536a78ffebc1356da0288f40bf634e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 151,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0151.png",
+      "pts_s" : 5.0333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 151000,
+      "raw_BGRA_SHA256" : "fd068c208dcf93b983c1f5921f7b393d7e57e6a6a21f92369c295e4816f2a2bb"
+    },
+    {
+      "duration_s" : null,
+      "index" : 152,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0152.png",
+      "pts_s" : 5.0666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 152000,
+      "raw_BGRA_SHA256" : "13aa1c5d4a7dd9d7385c48486b9b41df715fc31185ff77f825aadd7ba1b0d9ce"
+    },
+    {
+      "duration_s" : null,
+      "index" : 153,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0153.png",
+      "pts_s" : 5.0999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 153000,
+      "raw_BGRA_SHA256" : "f6d9a62566cb23e4ada2a1bf56401de0731d9411ee848f4d92cb32611406a724"
+    },
+    {
+      "duration_s" : null,
+      "index" : 154,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0154.png",
+      "pts_s" : 5.1333333333333337,
+      "pts_timescale" : 30000,
+      "pts_value" : 154000,
+      "raw_BGRA_SHA256" : "119c869fea091f42419d5ac50dfd2abf989f278893c5da31b9fe8127993f73c7"
+    },
+    {
+      "duration_s" : null,
+      "index" : 155,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0155.png",
+      "pts_s" : 5.166666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 155000,
+      "raw_BGRA_SHA256" : "be59b85209e5de23116368a19f6944556998c79a22de8f5a2fe11c32186bda19"
+    },
+    {
+      "duration_s" : null,
+      "index" : 156,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0156.png",
+      "pts_s" : 5.2000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 156000,
+      "raw_BGRA_SHA256" : "bed1d53c0d49a8c994e4dcbda94d2377c6ce9da6e906d723454177b5dd49a497"
+    },
+    {
+      "duration_s" : null,
+      "index" : 157,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0157.png",
+      "pts_s" : 5.2333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 157000,
+      "raw_BGRA_SHA256" : "cb7e376f2c2ca4c17696ae9ac81f18c2270687cfac08986bfb320502211400e1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 158,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0158.png",
+      "pts_s" : 5.2666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 158000,
+      "raw_BGRA_SHA256" : "619a0b0d839a46d82784f1884ac45eb3db518dff89dbc2c41b6b3b839417f512"
+    },
+    {
+      "duration_s" : null,
+      "index" : 159,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0159.png",
+      "pts_s" : 5.2999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 159000,
+      "raw_BGRA_SHA256" : "50123a2c6245dc7a0673a8b903443002e31760f01236cb72de357c05de0728a9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 160,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0160.png",
+      "pts_s" : 5.333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 160000,
+      "raw_BGRA_SHA256" : "c12ebf1a067998fb7d94ae5be152b2e1085bd363fa8fda4002ebfba879e23489"
+    },
+    {
+      "duration_s" : null,
+      "index" : 161,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0161.png",
+      "pts_s" : 5.3666666666666663,
+      "pts_timescale" : 30000,
+      "pts_value" : 161000,
+      "raw_BGRA_SHA256" : "303c56470b1529336c5531e3ac797b38f45bc7e09d700242de53dc629f7e4877"
+    },
+    {
+      "duration_s" : null,
+      "index" : 162,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0162.png",
+      "pts_s" : 5.4000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 162000,
+      "raw_BGRA_SHA256" : "db1d53669aebb11eb91795b5129453cb13dcf3aa6c0bf18756fec23f027c54c2"
+    },
+    {
+      "duration_s" : null,
+      "index" : 163,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0163.png",
+      "pts_s" : 5.4333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 163000,
+      "raw_BGRA_SHA256" : "f6749b049ab364391a4769748cf7cec770fb8e31f6bebf8b9e700edb97a86e70"
+    },
+    {
+      "duration_s" : null,
+      "index" : 164,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0164.png",
+      "pts_s" : 5.4666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 164000,
+      "raw_BGRA_SHA256" : "50277f2cf11b54fa76b3b3abe987cc81def27b6bb894b787bdf8bddc266f65ff"
+    },
+    {
+      "duration_s" : null,
+      "index" : 165,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0165.png",
+      "pts_s" : 5.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 165000,
+      "raw_BGRA_SHA256" : "67619871d9043aa42d889025e922c28833df31d99e0864a8f6797d254cc86a16"
+    },
+    {
+      "duration_s" : null,
+      "index" : 166,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0166.png",
+      "pts_s" : 5.5333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 166000,
+      "raw_BGRA_SHA256" : "5e84a0cf50e117ff18fa2b70996d7b77333d2849422f859b1d6466499c61954f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 167,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0167.png",
+      "pts_s" : 5.5666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 167000,
+      "raw_BGRA_SHA256" : "c1bb0105a6bf52eb958fac8fc2cd4e777c5114443cd64e9d5f00f47bc0d77fae"
+    },
+    {
+      "duration_s" : null,
+      "index" : 168,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0168.png",
+      "pts_s" : 5.5999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 168000,
+      "raw_BGRA_SHA256" : "819eb3bed57753d6c586e070644218d1beab10e996936a834b467420fe1430eb"
+    },
+    {
+      "duration_s" : null,
+      "index" : 169,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0169.png",
+      "pts_s" : 5.6333333333333337,
+      "pts_timescale" : 30000,
+      "pts_value" : 169000,
+      "raw_BGRA_SHA256" : "fe6a2ffbe0c795c1d3fced756ea0fc8c2d4a8ec1330e4c58b2ab766e4946f8a2"
+    },
+    {
+      "duration_s" : null,
+      "index" : 170,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0170.png",
+      "pts_s" : 5.666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 170000,
+      "raw_BGRA_SHA256" : "b34466520089c46ce9fe74271ea6ab70f838426799a4c09b4b6bbb43d58da69d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 171,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0171.png",
+      "pts_s" : 5.7000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 171000,
+      "raw_BGRA_SHA256" : "42e22e59b19e29d03813acecab832413514c26bc8a312a20cd0c526525e49acf"
+    },
+    {
+      "duration_s" : null,
+      "index" : 172,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0172.png",
+      "pts_s" : 5.7333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 172000,
+      "raw_BGRA_SHA256" : "3a61feb012185398bf7ab0e105c0e3e0fe656df03549e0583a8d9f2b44a45b08"
+    },
+    {
+      "duration_s" : null,
+      "index" : 173,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0173.png",
+      "pts_s" : 5.7666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 173000,
+      "raw_BGRA_SHA256" : "dcedbdf67ee1e598039d59b90841bc9ab9b563d0d883f0c4c9ae212dbe1104dd"
+    },
+    {
+      "duration_s" : null,
+      "index" : 174,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0174.png",
+      "pts_s" : 5.7999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 174000,
+      "raw_BGRA_SHA256" : "396312c1ab8084fb44935fd14948f007d102f3e0074b09e3cb2f4224207303cb"
+    },
+    {
+      "duration_s" : null,
+      "index" : 175,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0175.png",
+      "pts_s" : 5.833333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 175000,
+      "raw_BGRA_SHA256" : "475008e69c4dfde5faf112e939c80171b5732ab85d756d00d63004fb7d58f7c7"
+    },
+    {
+      "duration_s" : null,
+      "index" : 176,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0176.png",
+      "pts_s" : 5.8666666666666663,
+      "pts_timescale" : 30000,
+      "pts_value" : 176000,
+      "raw_BGRA_SHA256" : "95499be13c258f811846c63f6c24b4e9cc6763200105599d7c42885f836f64a4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 177,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0177.png",
+      "pts_s" : 5.9000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 177000,
+      "raw_BGRA_SHA256" : "ee337709e1bb97cb1cdeeb243bc4df0e53b5f3d7805221ffeca8ecf2bef83b9b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 178,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0178.png",
+      "pts_s" : 5.9333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 178000,
+      "raw_BGRA_SHA256" : "a659640ca89cf6f549a61cbc874ecb0d11a950a7db7ad43cd627085633e2dbd2"
+    },
+    {
+      "duration_s" : null,
+      "index" : 179,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0179.png",
+      "pts_s" : 5.9666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 179000,
+      "raw_BGRA_SHA256" : "d2fe099cde07cb4b67d7f5c4e4d8fc857674e085eeb9ce92fc8e7a4665e22077"
+    },
+    {
+      "duration_s" : null,
+      "index" : 180,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0180.png",
+      "pts_s" : 6,
+      "pts_timescale" : 30000,
+      "pts_value" : 180000,
+      "raw_BGRA_SHA256" : "0d522102aafee068f1e4c8de8026ff865043f1db35463aa37fb7ff91f2a3e920"
+    },
+    {
+      "duration_s" : null,
+      "index" : 181,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0181.png",
+      "pts_s" : 6.0333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 181000,
+      "raw_BGRA_SHA256" : "4992de754428613bc8c3f9cc37ea916795b22d215138b5934a8032c0d1013f32"
+    },
+    {
+      "duration_s" : null,
+      "index" : 182,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0182.png",
+      "pts_s" : 6.0666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 182000,
+      "raw_BGRA_SHA256" : "bfc4a116170de2adeafcc442f5f527c81ea6d6f02a7b114a43d90559215e5e0a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 183,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0183.png",
+      "pts_s" : 6.0999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 183000,
+      "raw_BGRA_SHA256" : "2dd9f19c9d75158460060a9855dc3dadeda6e637ac10da23efb5752d7bea06dd"
+    },
+    {
+      "duration_s" : null,
+      "index" : 184,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0184.png",
+      "pts_s" : 6.1333333333333337,
+      "pts_timescale" : 30000,
+      "pts_value" : 184000,
+      "raw_BGRA_SHA256" : "d3efa79316a4fc19fa7aaa01d3dec299337c2b523a55674c012fbd7fb5c4a3f7"
+    },
+    {
+      "duration_s" : null,
+      "index" : 185,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0185.png",
+      "pts_s" : 6.166666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 185000,
+      "raw_BGRA_SHA256" : "4d0f04fab5fb49ba481d3fd6fe54ef171ef3f323cf103a327d699f6b25aab2ce"
+    },
+    {
+      "duration_s" : null,
+      "index" : 186,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0186.png",
+      "pts_s" : 6.2000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 186000,
+      "raw_BGRA_SHA256" : "20f7bff12b7e8ab273dc6763d1383b7d24d9d9d18a44ed69bc3823a5de8e1c49"
+    },
+    {
+      "duration_s" : null,
+      "index" : 187,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0187.png",
+      "pts_s" : 6.2333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 187000,
+      "raw_BGRA_SHA256" : "64221957091208e577aa824d8bd725c44eb14b43e0e9057f24affce60809a8f9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 188,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0188.png",
+      "pts_s" : 6.2666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 188000,
+      "raw_BGRA_SHA256" : "796da333ae564d71a57db46fa6edbe8757585572d7b24f5c8086fbc1903debb1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 189,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0189.png",
+      "pts_s" : 6.2999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 189000,
+      "raw_BGRA_SHA256" : "641c35bb1bf13cf1104e775b58bd2c14bd7a991326f58f8e7dc8bfdbc3835a90"
+    },
+    {
+      "duration_s" : null,
+      "index" : 190,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0190.png",
+      "pts_s" : 6.333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 190000,
+      "raw_BGRA_SHA256" : "bf1b3b0e276b60702168c5f970d328a17dd0cb733da0466a0cb3da902db5df29"
+    },
+    {
+      "duration_s" : null,
+      "index" : 191,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0191.png",
+      "pts_s" : 6.3666666666666663,
+      "pts_timescale" : 30000,
+      "pts_value" : 191000,
+      "raw_BGRA_SHA256" : "022c3b1d8d7ed4d1fb22720f2773e73ae8e14da11e58347d6aecd6c3e54d0952"
+    },
+    {
+      "duration_s" : null,
+      "index" : 192,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0192.png",
+      "pts_s" : 6.4000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 192000,
+      "raw_BGRA_SHA256" : "34152ff54f0222b4b4f41eda7eda4583070ec9b13cfb977c9acce50a83b5e7ca"
+    },
+    {
+      "duration_s" : null,
+      "index" : 193,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0193.png",
+      "pts_s" : 6.4333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 193000,
+      "raw_BGRA_SHA256" : "bf19539b59726dcfcca18773ddb19faee308999713b43de131d29f226683df95"
+    },
+    {
+      "duration_s" : null,
+      "index" : 194,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0194.png",
+      "pts_s" : 6.4666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 194000,
+      "raw_BGRA_SHA256" : "151aaf704e6ffaf53262f00bf8f5db8ec5626da6154e0dbb9dbb8375f35e52df"
+    },
+    {
+      "duration_s" : null,
+      "index" : 195,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0195.png",
+      "pts_s" : 6.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 195000,
+      "raw_BGRA_SHA256" : "7d6302f04fe2c0018c2a41a7c9c3f6b4f6364832e9456ae4d32210892f06e985"
+    },
+    {
+      "duration_s" : null,
+      "index" : 196,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0196.png",
+      "pts_s" : 6.5333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 196000,
+      "raw_BGRA_SHA256" : "309eb4cf401cf87f8b0424f332fa51ed6cfc7a80cf32145dee77994716595764"
+    },
+    {
+      "duration_s" : null,
+      "index" : 197,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0197.png",
+      "pts_s" : 6.5666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 197000,
+      "raw_BGRA_SHA256" : "5402d8afe846b1152cda276514a4d06234273a7708d9d5494fc4f47e23b7be07"
+    },
+    {
+      "duration_s" : null,
+      "index" : 198,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0198.png",
+      "pts_s" : 6.5999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 198000,
+      "raw_BGRA_SHA256" : "3753f70390e91dfc9726dfabf35281cc7bfd11c483995d9a737d288e9440265d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 199,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0199.png",
+      "pts_s" : 6.6333333333333337,
+      "pts_timescale" : 30000,
+      "pts_value" : 199000,
+      "raw_BGRA_SHA256" : "085ed1790215c5cbc1320a80ebc2f347bdb8377df242b6dbdbc664aee410954f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 200,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0200.png",
+      "pts_s" : 6.666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 200000,
+      "raw_BGRA_SHA256" : "7f228da4ba81cf65a0ccbdf6dad69f5aedb8d3e577985bb53a92fcb80afb9372"
+    },
+    {
+      "duration_s" : null,
+      "index" : 201,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0201.png",
+      "pts_s" : 6.7000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 201000,
+      "raw_BGRA_SHA256" : "d4a123ccb03262448463a88ff3915508e95ab42f696cadbcbe3108a487612087"
+    },
+    {
+      "duration_s" : null,
+      "index" : 202,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0202.png",
+      "pts_s" : 6.7333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 202000,
+      "raw_BGRA_SHA256" : "262320ff3c944babf2f010f529e4568f65f4880e90f7f7629c91299b9e70488d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 203,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0203.png",
+      "pts_s" : 6.7666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 203000,
+      "raw_BGRA_SHA256" : "07a0aad2786cfb08e3cf39525e2f1c88e9b5ef862cdcbe0aa34b8016a51ecca1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 204,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0204.png",
+      "pts_s" : 6.7999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 204000,
+      "raw_BGRA_SHA256" : "b67c92da99ec2ee19100e3173967fd8d627dcdd3eb54cd884b910f0daceecb25"
+    },
+    {
+      "duration_s" : null,
+      "index" : 205,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0205.png",
+      "pts_s" : 6.833333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 205000,
+      "raw_BGRA_SHA256" : "013c6a16442d8c19ca6d670953ac8bdc098e3beabeb0d6344eb9fdadcefafe1c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 206,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0206.png",
+      "pts_s" : 6.8666666666666663,
+      "pts_timescale" : 30000,
+      "pts_value" : 206000,
+      "raw_BGRA_SHA256" : "a5fb506ff68ad0bc874a52042c006282353117d76afce019a8d8a5c1b75a2f8e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 207,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0207.png",
+      "pts_s" : 6.9000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 207000,
+      "raw_BGRA_SHA256" : "a76ccbe64666714f05bb5082c5104533fa8a02b8948a81548f12bfa155dfd767"
+    },
+    {
+      "duration_s" : null,
+      "index" : 208,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0208.png",
+      "pts_s" : 6.9333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 208000,
+      "raw_BGRA_SHA256" : "b590c5bb87724e784f1360a5847519ab3e6fec7dcc09c3b3f68278987ce2e469"
+    },
+    {
+      "duration_s" : null,
+      "index" : 209,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0209.png",
+      "pts_s" : 6.9666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 209000,
+      "raw_BGRA_SHA256" : "ec61428766269b5259d80c9b1212713875d5c5d4cb184899ae50b840f636a7a4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 210,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0210.png",
+      "pts_s" : 7,
+      "pts_timescale" : 30000,
+      "pts_value" : 210000,
+      "raw_BGRA_SHA256" : "4e88fa8e7bc8052e5252c1fc4f6da0434241ea207a5e3eeb827a3c6e7af05cf6"
+    },
+    {
+      "duration_s" : null,
+      "index" : 211,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0211.png",
+      "pts_s" : 7.0333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 211000,
+      "raw_BGRA_SHA256" : "99cd1ee9bcd6c9f6ffec725ab3952955d037c4a2aeafbb5ba1b2bee5441a3918"
+    },
+    {
+      "duration_s" : null,
+      "index" : 212,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0212.png",
+      "pts_s" : 7.0666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 212000,
+      "raw_BGRA_SHA256" : "2ae8ead15e6d3460a924be5721a906ecda21c31661f89453256a40ad9bcbb3ac"
+    },
+    {
+      "duration_s" : null,
+      "index" : 213,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0213.png",
+      "pts_s" : 7.0999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 213000,
+      "raw_BGRA_SHA256" : "30be172ac7ef67f214026f3be1e86db2b14c81a4dac73d3b283ed2b4d0ca7067"
+    },
+    {
+      "duration_s" : null,
+      "index" : 214,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0214.png",
+      "pts_s" : 7.1333333333333337,
+      "pts_timescale" : 30000,
+      "pts_value" : 214000,
+      "raw_BGRA_SHA256" : "8f0e387fcc48eee52617992b9f39106a7aa032e0fee428406be10d889c181adc"
+    },
+    {
+      "duration_s" : null,
+      "index" : 215,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0215.png",
+      "pts_s" : 7.166666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 215000,
+      "raw_BGRA_SHA256" : "afadb41025f089b13646253961d07e0ede2dfec7a3792c0d79e8daf1c07ceb14"
+    },
+    {
+      "duration_s" : null,
+      "index" : 216,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0216.png",
+      "pts_s" : 7.2000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 216000,
+      "raw_BGRA_SHA256" : "0ef43394b4a20f1ea321edb6f7532bd062ced595dfc9dfcde21728f1454b576d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 217,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0217.png",
+      "pts_s" : 7.2333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 217000,
+      "raw_BGRA_SHA256" : "86e2f78fd695bb0fc43d628ca783b09ccbe6351b4fc967cfb47c4b286f4a4e1f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 218,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0218.png",
+      "pts_s" : 7.2666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 218000,
+      "raw_BGRA_SHA256" : "4f750bc7be11660a2910e9a06fa6ac064adfdd672c10ce4a02fbda99c4366c16"
+    },
+    {
+      "duration_s" : null,
+      "index" : 219,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0219.png",
+      "pts_s" : 7.2999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 219000,
+      "raw_BGRA_SHA256" : "6c8212bcafb2de078e1791b4940342771155a23599500fc837d770e146eb92a4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 220,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0220.png",
+      "pts_s" : 7.333333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 220000,
+      "raw_BGRA_SHA256" : "7cdaf8b5c8367b6403ff248943beb52005e00dccf7c9c57525bc155b020fa054"
+    },
+    {
+      "duration_s" : null,
+      "index" : 221,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0221.png",
+      "pts_s" : 7.3666666666666663,
+      "pts_timescale" : 30000,
+      "pts_value" : 221000,
+      "raw_BGRA_SHA256" : "67aee5e1f23f494bdcb858ab1cd569e29b30500d74babaa8ed1fcda4d61f28e0"
+    },
+    {
+      "duration_s" : null,
+      "index" : 222,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0222.png",
+      "pts_s" : 7.4000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 222000,
+      "raw_BGRA_SHA256" : "43640486022d47c52b99ba8f95e9d72b027dbe84b9074c9a7dff3930d7ec5241"
+    },
+    {
+      "duration_s" : null,
+      "index" : 223,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0223.png",
+      "pts_s" : 7.4333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 223000,
+      "raw_BGRA_SHA256" : "b02ab86387dc01433f6f2d26ed9157e32febc50f6adca67a1e4615ecf8cc7a61"
+    },
+    {
+      "duration_s" : null,
+      "index" : 224,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0224.png",
+      "pts_s" : 7.4666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 224000,
+      "raw_BGRA_SHA256" : "ac2d421765d7adcdd43150411562aca16bec74f284a24fff072c173e81ab1f50"
+    },
+    {
+      "duration_s" : null,
+      "index" : 225,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0225.png",
+      "pts_s" : 7.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 225000,
+      "raw_BGRA_SHA256" : "788921d37b7cc30e6966597c3acc4637e811524348d47cd0e8b55cc366b04fc5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 226,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0226.png",
+      "pts_s" : 7.5333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 226000,
+      "raw_BGRA_SHA256" : "75a510f781bb262cc1f9fa99bb1677ea440d9ade9f54e4773c3f417927d5d18f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 227,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0227.png",
+      "pts_s" : 7.5666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 227000,
+      "raw_BGRA_SHA256" : "88884959e3f33349cdde70517e36cc293e1df97f8e255f89a974874ba648fc5b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 228,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0228.png",
+      "pts_s" : 7.5999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 228000,
+      "raw_BGRA_SHA256" : "d35e78b7d854575189b125785ea77b2ed9912d89109419347dd53d2b63edf169"
+    },
+    {
+      "duration_s" : null,
+      "index" : 229,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0229.png",
+      "pts_s" : 7.6333333333333337,
+      "pts_timescale" : 30000,
+      "pts_value" : 229000,
+      "raw_BGRA_SHA256" : "b3e1c09a726946d255022c1281e00bff5ecd91c99c58811dec104697d03f6307"
+    },
+    {
+      "duration_s" : null,
+      "index" : 230,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0230.png",
+      "pts_s" : 7.666666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 230000,
+      "raw_BGRA_SHA256" : "6a37d7a11cb844eb2a9fa3957aabe90e6a6a2b9b01c32fc6b9edb82e9f2c0802"
+    },
+    {
+      "duration_s" : null,
+      "index" : 231,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0231.png",
+      "pts_s" : 7.7000000000000002,
+      "pts_timescale" : 30000,
+      "pts_value" : 231000,
+      "raw_BGRA_SHA256" : "062ddd18aac093fa9a876d0b3c631d1c14ab7ddb8a0bf3afd028af87d0215b56"
+    },
+    {
+      "duration_s" : null,
+      "index" : 232,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0232.png",
+      "pts_s" : 7.7333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 232000,
+      "raw_BGRA_SHA256" : "1572f1330c29b8c75f209c6133b995d78eed17c56382ac2352e59c711afd9566"
+    },
+    {
+      "duration_s" : null,
+      "index" : 233,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0233.png",
+      "pts_s" : 7.7666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 233000,
+      "raw_BGRA_SHA256" : "be9ca32a21e98995bb1c13cc5adaca1936762ef79a058f0c1b7daf271b7c2f19"
+    },
+    {
+      "duration_s" : null,
+      "index" : 234,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0234.png",
+      "pts_s" : 7.7999999999999998,
+      "pts_timescale" : 30000,
+      "pts_value" : 234000,
+      "raw_BGRA_SHA256" : "467a6944686e7a89b4b84fe64fb467b2b85555d4c2f970e1640787eb856adabd"
+    },
+    {
+      "duration_s" : null,
+      "index" : 235,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0235.png",
+      "pts_s" : 7.833333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 235000,
+      "raw_BGRA_SHA256" : "81c21f7c3e755ab4377f6438614cee85ddd126474477f0dbfa56d255d93ddec9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 236,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0236.png",
+      "pts_s" : 7.8666666666666663,
+      "pts_timescale" : 30000,
+      "pts_value" : 236000,
+      "raw_BGRA_SHA256" : "18c82e204e829a45efd1502ffe18b17299c5d840213c56ee2bc981db211a03ad"
+    },
+    {
+      "duration_s" : null,
+      "index" : 237,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0237.png",
+      "pts_s" : 7.9000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 237000,
+      "raw_BGRA_SHA256" : "9ff17eb84006fd8ecb983ef135b3e4d947ebe0711162b94c2c6431784f60a3b1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 238,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0238.png",
+      "pts_s" : 7.9333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 238000,
+      "raw_BGRA_SHA256" : "cf2cbb74f79df1bfc192e04e0cc45e16ca8fdbac0a7b4f5ed144936d8ff8ab09"
+    },
+    {
+      "duration_s" : null,
+      "index" : 239,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0239.png",
+      "pts_s" : 7.9666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 239000,
+      "raw_BGRA_SHA256" : "e0e61f782e071d565444f4d90af3c0d9f55a38f7c458d3252ca58fc3ef0649d1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 240,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0240.png",
+      "pts_s" : 8,
+      "pts_timescale" : 30000,
+      "pts_value" : 240000,
+      "raw_BGRA_SHA256" : "27c37be49ca017ae5728e9eab13ca02d3bd953b59e117ec8309ec7e540d0cd1b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 241,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0241.png",
+      "pts_s" : 8.0333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 241000,
+      "raw_BGRA_SHA256" : "8ea430f3601d943c64d604aec972155ae17ac051348a1805a12f51739b8c805d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 242,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0242.png",
+      "pts_s" : 8.0666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 242000,
+      "raw_BGRA_SHA256" : "167797bc59b20c4ed88c8b7c72e180c759cca1373bd658c9bd00e6e278ec05b9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 243,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0243.png",
+      "pts_s" : 8.0999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 243000,
+      "raw_BGRA_SHA256" : "edfe113884a99ca61fdcdbb9bb9bf8769a2a76fe5319ba51efc732ff7a0636dc"
+    },
+    {
+      "duration_s" : null,
+      "index" : 244,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0244.png",
+      "pts_s" : 8.1333333333333329,
+      "pts_timescale" : 30000,
+      "pts_value" : 244000,
+      "raw_BGRA_SHA256" : "85f76da6192258af290c0100428ae387a384cf93a0f2b20dcfd231135a0cd697"
+    },
+    {
+      "duration_s" : null,
+      "index" : 245,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0245.png",
+      "pts_s" : 8.1666666666666661,
+      "pts_timescale" : 30000,
+      "pts_value" : 245000,
+      "raw_BGRA_SHA256" : "38aa1f5b2e30adbbdff4f5ec7f70622b02d38ff10b1f160a09c4b2a1fdc6dc86"
+    },
+    {
+      "duration_s" : null,
+      "index" : 246,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0246.png",
+      "pts_s" : 8.1999999999999993,
+      "pts_timescale" : 30000,
+      "pts_value" : 246000,
+      "raw_BGRA_SHA256" : "44fdf45b34cd314ef87004695bacabcc44ff7382fa09e228815ee871682180e5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 247,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0247.png",
+      "pts_s" : 8.2333333333333325,
+      "pts_timescale" : 30000,
+      "pts_value" : 247000,
+      "raw_BGRA_SHA256" : "1e2314aeb4793668b1a7411336c70575870c36555f68d88c71b501096ddc8d06"
+    },
+    {
+      "duration_s" : null,
+      "index" : 248,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0248.png",
+      "pts_s" : 8.2666666666666675,
+      "pts_timescale" : 30000,
+      "pts_value" : 248000,
+      "raw_BGRA_SHA256" : "807e460870e299c59e1cdd3678edbc80d57c6b9096bfcceb42f27758755b1ea1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 249,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0249.png",
+      "pts_s" : 8.3000000000000007,
+      "pts_timescale" : 30000,
+      "pts_value" : 249000,
+      "raw_BGRA_SHA256" : "9fc59790c448fb12ad9a5a04e101a185201a05954f958438cc2d9c7030e5975c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 250,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0250.png",
+      "pts_s" : 8.3333333333333339,
+      "pts_timescale" : 30000,
+      "pts_value" : 250000,
+      "raw_BGRA_SHA256" : "689d869a56aa53de6083a1346a1402c76866811516730e2698e0bfe4a91f116c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 251,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0251.png",
+      "pts_s" : 8.3666666666666671,
+      "pts_timescale" : 30000,
+      "pts_value" : 251000,
+      "raw_BGRA_SHA256" : "b8e0ecae06c14e1880e5bd808f58bf33a632804b6d2fae4e607f5b8a24a1d608"
+    },
+    {
+      "duration_s" : null,
+      "index" : 252,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0252.png",
+      "pts_s" : 8.4000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 252000,
+      "raw_BGRA_SHA256" : "be3f1c7da4d93055e92808332ba600f3f4747ffdb128a7cf8ac835087d749ae7"
+    },
+    {
+      "duration_s" : null,
+      "index" : 253,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0253.png",
+      "pts_s" : 8.4333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 253000,
+      "raw_BGRA_SHA256" : "d48d9e789dfd321d39d59b82242291998f146b3a2d26340500d220fcd2611183"
+    },
+    {
+      "duration_s" : null,
+      "index" : 254,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0254.png",
+      "pts_s" : 8.4666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 254000,
+      "raw_BGRA_SHA256" : "764062c332fa4ae18fc207850cb5b3113435a22a7e61d0ec611530a17a1c3fe6"
+    },
+    {
+      "duration_s" : null,
+      "index" : 255,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0255.png",
+      "pts_s" : 8.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 255000,
+      "raw_BGRA_SHA256" : "4bb8ba215c64545bdafd79dd4e39f81083a46130ea3684c43b7371d81c6a46eb"
+    },
+    {
+      "duration_s" : null,
+      "index" : 256,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0256.png",
+      "pts_s" : 8.5333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 256000,
+      "raw_BGRA_SHA256" : "88bae20d117da0f9cf265e8ec0e4261dd36a5bc4c9f1bf17aaea5fd9b59cc913"
+    },
+    {
+      "duration_s" : null,
+      "index" : 257,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0257.png",
+      "pts_s" : 8.5666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 257000,
+      "raw_BGRA_SHA256" : "df1ca32c258f1ebfa1f7c0e79e9d977350be826590f98b92bbce025a3ba2ee55"
+    },
+    {
+      "duration_s" : null,
+      "index" : 258,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0258.png",
+      "pts_s" : 8.5999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 258000,
+      "raw_BGRA_SHA256" : "15d2a70b0cb3820d990681bc5c86468e5ee3018564ef6b3280a18d149dcbbe85"
+    },
+    {
+      "duration_s" : null,
+      "index" : 259,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0259.png",
+      "pts_s" : 8.6333333333333329,
+      "pts_timescale" : 30000,
+      "pts_value" : 259000,
+      "raw_BGRA_SHA256" : "b8cca9b6acb3635c7acc6b77e0a79cded09f24f0765d2be6742eaff3ba1d6931"
+    },
+    {
+      "duration_s" : null,
+      "index" : 260,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0260.png",
+      "pts_s" : 8.6666666666666661,
+      "pts_timescale" : 30000,
+      "pts_value" : 260000,
+      "raw_BGRA_SHA256" : "efdf0e1997e50c03ceca1f557a093008df229288be9372333fac051e62fd6e8e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 261,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0261.png",
+      "pts_s" : 8.6999999999999993,
+      "pts_timescale" : 30000,
+      "pts_value" : 261000,
+      "raw_BGRA_SHA256" : "ae32a62de387228b0689801631725af3754fa2685eae4659af020069411f1bf0"
+    },
+    {
+      "duration_s" : null,
+      "index" : 262,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0262.png",
+      "pts_s" : 8.7333333333333325,
+      "pts_timescale" : 30000,
+      "pts_value" : 262000,
+      "raw_BGRA_SHA256" : "903d8bcd6b09287cf2907c133cb4f10636ea6e8175ed2c3498b923d6240e7d8a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 263,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0263.png",
+      "pts_s" : 8.7666666666666675,
+      "pts_timescale" : 30000,
+      "pts_value" : 263000,
+      "raw_BGRA_SHA256" : "c79354bee86d5443388abae0aa26c1526e067ec316df5e47c02be4ed52d857ca"
+    },
+    {
+      "duration_s" : null,
+      "index" : 264,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0264.png",
+      "pts_s" : 8.8000000000000007,
+      "pts_timescale" : 30000,
+      "pts_value" : 264000,
+      "raw_BGRA_SHA256" : "76282f24b02c68ac82012739b4ce770bf608640db7999a0a8ffcbc4c0b306e42"
+    },
+    {
+      "duration_s" : null,
+      "index" : 265,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0265.png",
+      "pts_s" : 8.8333333333333339,
+      "pts_timescale" : 30000,
+      "pts_value" : 265000,
+      "raw_BGRA_SHA256" : "6ea3a018acafa019aea7839db7aef1982e4f3d4913d85badf5811d74e541003c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 266,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0266.png",
+      "pts_s" : 8.8666666666666671,
+      "pts_timescale" : 30000,
+      "pts_value" : 266000,
+      "raw_BGRA_SHA256" : "390d3342f60107779935890279e73aea07a49e62aa5ded35e8c952441b2a1872"
+    },
+    {
+      "duration_s" : null,
+      "index" : 267,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0267.png",
+      "pts_s" : 8.9000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 267000,
+      "raw_BGRA_SHA256" : "9a6865526272b1761d2feb417a483c3300d2abe171dfac410a2398be8974df06"
+    },
+    {
+      "duration_s" : null,
+      "index" : 268,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0268.png",
+      "pts_s" : 8.9333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 268000,
+      "raw_BGRA_SHA256" : "ec8849a717088c0e3bc550ee75bee9b982c2ccca0a9c8a5c0b42f7c8327f814c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 269,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0269.png",
+      "pts_s" : 8.9666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 269000,
+      "raw_BGRA_SHA256" : "80da5466d3b50d2fcaa67fe4c1367544b2da681d946c07ca2394f94407fe157f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 270,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0270.png",
+      "pts_s" : 9,
+      "pts_timescale" : 30000,
+      "pts_value" : 270000,
+      "raw_BGRA_SHA256" : "3bb4171fb4efe3731704f299f352c23b93513989143eb7b361bfacf707d24bb2"
+    },
+    {
+      "duration_s" : null,
+      "index" : 271,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0271.png",
+      "pts_s" : 9.0333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 271000,
+      "raw_BGRA_SHA256" : "c8bcffd37e372ad15356538018c730413d70788523444ee2dcf10274e0dad6b5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 272,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0272.png",
+      "pts_s" : 9.0666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 272000,
+      "raw_BGRA_SHA256" : "fe6f699021748e64dd37f963a208894b2dcf64022a15a4ecf5c65a664620f8a5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 273,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0273.png",
+      "pts_s" : 9.0999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 273000,
+      "raw_BGRA_SHA256" : "2d86c76670bbfccfa11b63c22f1672ae3e895758e5c944d9464a6bc942c82d88"
+    },
+    {
+      "duration_s" : null,
+      "index" : 274,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0274.png",
+      "pts_s" : 9.1333333333333329,
+      "pts_timescale" : 30000,
+      "pts_value" : 274000,
+      "raw_BGRA_SHA256" : "4fcba8c72da81214abb774dd527a1c379d9b41fd926351b674daa717d1d142dc"
+    },
+    {
+      "duration_s" : null,
+      "index" : 275,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0275.png",
+      "pts_s" : 9.1666666666666661,
+      "pts_timescale" : 30000,
+      "pts_value" : 275000,
+      "raw_BGRA_SHA256" : "65683de5dba9351605e89de6183c93f5b355873f0225219cbbd9684fb02a3c7d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 276,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0276.png",
+      "pts_s" : 9.1999999999999993,
+      "pts_timescale" : 30000,
+      "pts_value" : 276000,
+      "raw_BGRA_SHA256" : "64febb09ecd986236899c4c36e2a51dbbede2593d28c44947a29149a6a416848"
+    },
+    {
+      "duration_s" : null,
+      "index" : 277,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0277.png",
+      "pts_s" : 9.2333333333333325,
+      "pts_timescale" : 30000,
+      "pts_value" : 277000,
+      "raw_BGRA_SHA256" : "7231902976cdf5d40b7257267b4965c7b293dd17374e052ddf9282d6202e50aa"
+    },
+    {
+      "duration_s" : null,
+      "index" : 278,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0278.png",
+      "pts_s" : 9.2666666666666675,
+      "pts_timescale" : 30000,
+      "pts_value" : 278000,
+      "raw_BGRA_SHA256" : "45a0f3dd20a102e72763c9fad8bdd33142f1033130e4bbc18009ecbd8d6ed5a6"
+    },
+    {
+      "duration_s" : null,
+      "index" : 279,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0279.png",
+      "pts_s" : 9.3000000000000007,
+      "pts_timescale" : 30000,
+      "pts_value" : 279000,
+      "raw_BGRA_SHA256" : "af4a5a79cdc191ecade6bbba36976b388489a681542cd55e49cde1b87686f0cf"
+    },
+    {
+      "duration_s" : null,
+      "index" : 280,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0280.png",
+      "pts_s" : 9.3333333333333339,
+      "pts_timescale" : 30000,
+      "pts_value" : 280000,
+      "raw_BGRA_SHA256" : "5094df35cb3caebdc13475a6b91705a16bb617a41b5a85fa3ccbdf61261746f5"
+    },
+    {
+      "duration_s" : null,
+      "index" : 281,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0281.png",
+      "pts_s" : 9.3666666666666671,
+      "pts_timescale" : 30000,
+      "pts_value" : 281000,
+      "raw_BGRA_SHA256" : "f43adb4d2151e9bef65744bd8d3f7004e0bdbe0e6818c89a6329823dd988b4e9"
+    },
+    {
+      "duration_s" : null,
+      "index" : 282,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0282.png",
+      "pts_s" : 9.4000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 282000,
+      "raw_BGRA_SHA256" : "a5ae296b60112c1c84a12d8d6d87c6a9009a5f6d8339c7a54a488528c71d06c7"
+    },
+    {
+      "duration_s" : null,
+      "index" : 283,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0283.png",
+      "pts_s" : 9.4333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 283000,
+      "raw_BGRA_SHA256" : "f170da6c52e9cce35bd416d9ea4821698608974098629bc16fc8bff57aad2a29"
+    },
+    {
+      "duration_s" : null,
+      "index" : 284,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0284.png",
+      "pts_s" : 9.4666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 284000,
+      "raw_BGRA_SHA256" : "a8bb0ae8f2a5399c8270b45109fcf04afab61a5a7da30555f3bd685c183578ba"
+    },
+    {
+      "duration_s" : null,
+      "index" : 285,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0285.png",
+      "pts_s" : 9.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 285000,
+      "raw_BGRA_SHA256" : "813985a0da550c66a3f4159e3ea438bc3b022d4b948db6d911e50bf4b07f5167"
+    },
+    {
+      "duration_s" : null,
+      "index" : 286,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0286.png",
+      "pts_s" : 9.5333333333333332,
+      "pts_timescale" : 30000,
+      "pts_value" : 286000,
+      "raw_BGRA_SHA256" : "6467e515568847461fe3c5d31f9b9d6df8e23964a8f65f7c1a44148fa210be86"
+    },
+    {
+      "duration_s" : null,
+      "index" : 287,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0287.png",
+      "pts_s" : 9.5666666666666664,
+      "pts_timescale" : 30000,
+      "pts_value" : 287000,
+      "raw_BGRA_SHA256" : "4a65bf3b9ffe4947a3c45816e833b77537026fb132721d528a5540f70124043f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 288,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0288.png",
+      "pts_s" : 9.5999999999999996,
+      "pts_timescale" : 30000,
+      "pts_value" : 288000,
+      "raw_BGRA_SHA256" : "39a2d5a96a4d44180b0931829884a457808a6334f79275da66e83bb721df9455"
+    },
+    {
+      "duration_s" : null,
+      "index" : 289,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0289.png",
+      "pts_s" : 9.6333333333333329,
+      "pts_timescale" : 30000,
+      "pts_value" : 289000,
+      "raw_BGRA_SHA256" : "b1fd6d669ae9de0bfa09b8bc74cabb467d9e04ad04043564f9b94e190283dcf8"
+    },
+    {
+      "duration_s" : null,
+      "index" : 290,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0290.png",
+      "pts_s" : 9.6666666666666661,
+      "pts_timescale" : 30000,
+      "pts_value" : 290000,
+      "raw_BGRA_SHA256" : "21bf2146aeda5038f1ce5e95a49549f92d8f255779e01967ad69a58cb9463e6f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 291,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0291.png",
+      "pts_s" : 9.6999999999999993,
+      "pts_timescale" : 30000,
+      "pts_value" : 291000,
+      "raw_BGRA_SHA256" : "6b1eba08aa26fd50715c66f8d87b4402ae3c6a27f88ead4c8ae9d293d1be3b29"
+    },
+    {
+      "duration_s" : null,
+      "index" : 292,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0292.png",
+      "pts_s" : 9.7333333333333325,
+      "pts_timescale" : 30000,
+      "pts_value" : 292000,
+      "raw_BGRA_SHA256" : "d61567c340bd508ab26f78cf3409d7098ea30513233d223cd5adc5cb9195c41d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 293,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0293.png",
+      "pts_s" : 9.7666666666666675,
+      "pts_timescale" : 30000,
+      "pts_value" : 293000,
+      "raw_BGRA_SHA256" : "1436e5232e96f4998921d8f87159a2fd15282ae55bb4cd57db887fc6b6f1648a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 294,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0294.png",
+      "pts_s" : 9.8000000000000007,
+      "pts_timescale" : 30000,
+      "pts_value" : 294000,
+      "raw_BGRA_SHA256" : "42cf3ebd96d9efc5647457e45a9f2c6a6b5a5ef15a492087fabefb941ec402b1"
+    },
+    {
+      "duration_s" : null,
+      "index" : 295,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0295.png",
+      "pts_s" : 9.8333333333333339,
+      "pts_timescale" : 30000,
+      "pts_value" : 295000,
+      "raw_BGRA_SHA256" : "5e5d990e010bb31be8fa43c3e09e14dca0a915c71ef9a65679c51d7540e60d10"
+    },
+    {
+      "duration_s" : null,
+      "index" : 296,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0296.png",
+      "pts_s" : 9.8666666666666671,
+      "pts_timescale" : 30000,
+      "pts_value" : 296000,
+      "raw_BGRA_SHA256" : "5e5d990e010bb31be8fa43c3e09e14dca0a915c71ef9a65679c51d7540e60d10"
+    },
+    {
+      "duration_s" : null,
+      "index" : 297,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0297.png",
+      "pts_s" : 9.9000000000000004,
+      "pts_timescale" : 30000,
+      "pts_value" : 297000,
+      "raw_BGRA_SHA256" : "dca3fbc0431a997eb712157a74b7bdb139c52af40757b32c9fc7959827e1ba6f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 298,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0298.png",
+      "pts_s" : 9.9333333333333336,
+      "pts_timescale" : 30000,
+      "pts_value" : 298000,
+      "raw_BGRA_SHA256" : "7bfe166bffa684e6ade52d5dac0c7ec70061add8ff9f96b09cfcfd00aba6e5ed"
+    },
+    {
+      "duration_s" : null,
+      "index" : 299,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0299.png",
+      "pts_s" : 9.9666666666666668,
+      "pts_timescale" : 30000,
+      "pts_value" : 299000,
+      "raw_BGRA_SHA256" : "19586165b77a73ce9fa9ee4b4f13be4a14c4868b7ca061d448eeaaf8e90f9060"
+    },
+    {
+      "duration_s" : null,
+      "index" : 300,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0300.png",
+      "pts_s" : 10,
+      "pts_timescale" : 30000,
+      "pts_value" : 300000,
+      "raw_BGRA_SHA256" : "3cb1f7d48df488ed5a966367342ff3ac788ab4f7476339db6a2dc80bfa1a76cb"
+    },
+    {
+      "duration_s" : null,
+      "index" : 301,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0301.png",
+      "pts_s" : 10.033333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 301000,
+      "raw_BGRA_SHA256" : "b4874c6a4a1a32b211cfb9637517366ffbfc800625cf15659c83120bec987746"
+    },
+    {
+      "duration_s" : null,
+      "index" : 302,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0302.png",
+      "pts_s" : 10.066666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 302000,
+      "raw_BGRA_SHA256" : "b79688c44a55e479b2ffd615ab5604de81a4f13af252e93465b49ce894369a82"
+    },
+    {
+      "duration_s" : null,
+      "index" : 303,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0303.png",
+      "pts_s" : 10.1,
+      "pts_timescale" : 30000,
+      "pts_value" : 303000,
+      "raw_BGRA_SHA256" : "0e20b9b5ecb952c3e71cc102b1d453f26a0018b5ddc4d0b572a20f800640dfdb"
+    },
+    {
+      "duration_s" : null,
+      "index" : 304,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0304.png",
+      "pts_s" : 10.133333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 304000,
+      "raw_BGRA_SHA256" : "6b5f6378088acd461702813ce08e4447c6125915ae441d1e61405b8628f1b055"
+    },
+    {
+      "duration_s" : null,
+      "index" : 305,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0305.png",
+      "pts_s" : 10.166666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 305000,
+      "raw_BGRA_SHA256" : "e55e2e02fd6ceed17cf94a3387b1d86b9c9796e87918c87aebb276d6142fe05d"
+    },
+    {
+      "duration_s" : null,
+      "index" : 306,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0306.png",
+      "pts_s" : 10.199999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 306000,
+      "raw_BGRA_SHA256" : "1707214b8818a9be381fbec1e59913f70dcfa6e8726de298294bacac7fa5739b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 307,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0307.png",
+      "pts_s" : 10.233333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 307000,
+      "raw_BGRA_SHA256" : "2ec6d3a48cdde2ca4ad6fc9666154272ec6109767d72f66a9cbff6e2bc1e9b90"
+    },
+    {
+      "duration_s" : null,
+      "index" : 308,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0308.png",
+      "pts_s" : 10.266666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 308000,
+      "raw_BGRA_SHA256" : "e476f1c7f4eb68678e1e802100904209c6c1563bee26d741020f23e454a1cee3"
+    },
+    {
+      "duration_s" : null,
+      "index" : 309,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0309.png",
+      "pts_s" : 10.300000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 309000,
+      "raw_BGRA_SHA256" : "1ded276525328a8482a0102e5f1f4102798dc3e4a0e1b73beb911faf51e8c42f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 310,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0310.png",
+      "pts_s" : 10.333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 310000,
+      "raw_BGRA_SHA256" : "082a84785a8f4e21310369e8fb93d32f80434385b006c6109d5251978357ce94"
+    },
+    {
+      "duration_s" : null,
+      "index" : 311,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0311.png",
+      "pts_s" : 10.366666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 311000,
+      "raw_BGRA_SHA256" : "cc0879fa0294da086cc968389ea68aa666b094cdf0caca714eb011d192d71a8c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 312,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0312.png",
+      "pts_s" : 10.4,
+      "pts_timescale" : 30000,
+      "pts_value" : 312000,
+      "raw_BGRA_SHA256" : "e1502d175e1e8661df754d6802baade639b82da4772e9c7a2b49a7cbb50de21c"
+    },
+    {
+      "duration_s" : null,
+      "index" : 313,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0313.png",
+      "pts_s" : 10.433333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 313000,
+      "raw_BGRA_SHA256" : "27f9054b1ce3fc6ef5d2dce2160d6fa5141882a51c0ee73f29157d814e126582"
+    },
+    {
+      "duration_s" : null,
+      "index" : 314,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0314.png",
+      "pts_s" : 10.466666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 314000,
+      "raw_BGRA_SHA256" : "4c9bba99ac20be9c5fc5bee3b2f2370f530a011ae2753580710d19dc9a97e28e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 315,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0315.png",
+      "pts_s" : 10.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 315000,
+      "raw_BGRA_SHA256" : "85112f810dee45039769df73c32e279200502c858d6f1bd5b1ae9a46baad0750"
+    },
+    {
+      "duration_s" : null,
+      "index" : 316,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0316.png",
+      "pts_s" : 10.533333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 316000,
+      "raw_BGRA_SHA256" : "8ed2a8c0defc44030ef53575a397963b45f715296394437a84fe27576796116a"
+    },
+    {
+      "duration_s" : null,
+      "index" : 317,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0317.png",
+      "pts_s" : 10.566666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 317000,
+      "raw_BGRA_SHA256" : "a8e59ad35d3f3f732c2e505431a315af58cde26ee7b797ec7c11e2ca6f0639b2"
+    },
+    {
+      "duration_s" : null,
+      "index" : 318,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0318.png",
+      "pts_s" : 10.6,
+      "pts_timescale" : 30000,
+      "pts_value" : 318000,
+      "raw_BGRA_SHA256" : "b16ae04c3c92d308db976a79e135586dd543e95438a21b15f8986b05f7239435"
+    },
+    {
+      "duration_s" : null,
+      "index" : 319,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0319.png",
+      "pts_s" : 10.633333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 319000,
+      "raw_BGRA_SHA256" : "44afdbcf67f182c769310c0062f70a89970b2c0e1d0e277184f7fe2457f341db"
+    },
+    {
+      "duration_s" : null,
+      "index" : 320,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0320.png",
+      "pts_s" : 10.666666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 320000,
+      "raw_BGRA_SHA256" : "4c6b1771fce492a1afb847bdd1776b3be9c6e04f801cee377cbff28f294e9b0f"
+    },
+    {
+      "duration_s" : null,
+      "index" : 321,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0321.png",
+      "pts_s" : 10.699999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 321000,
+      "raw_BGRA_SHA256" : "2cab1871388ae629a9d86bdc87c0a5edd3d10571bc78a726317f0c4cc7efdbe3"
+    },
+    {
+      "duration_s" : null,
+      "index" : 322,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0322.png",
+      "pts_s" : 10.733333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 322000,
+      "raw_BGRA_SHA256" : "65cc39428179d2b2e94cfa6486de976b7af41f540a963d1ce4893eada57d4336"
+    },
+    {
+      "duration_s" : null,
+      "index" : 323,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0323.png",
+      "pts_s" : 10.766666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 323000,
+      "raw_BGRA_SHA256" : "9b5e501e43728a4df83cd91b84f0a9c3ba4c1191902f18bff0db421e61d403b4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 324,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0324.png",
+      "pts_s" : 10.800000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 324000,
+      "raw_BGRA_SHA256" : "d0137221eb553c736afebdfbca73a1fc51ba361524d7b822c3612d385ffa2266"
+    },
+    {
+      "duration_s" : null,
+      "index" : 325,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0325.png",
+      "pts_s" : 10.833333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 325000,
+      "raw_BGRA_SHA256" : "17402edba908ade64d908972278ef5ef50e2267801e18711eb6f972e5806e935"
+    },
+    {
+      "duration_s" : null,
+      "index" : 326,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0326.png",
+      "pts_s" : 10.866666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 326000,
+      "raw_BGRA_SHA256" : "5ea1a70ec62d2543c2e94e9592390d97bd12d05f41250ad70683d029075d0c16"
+    },
+    {
+      "duration_s" : null,
+      "index" : 327,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0327.png",
+      "pts_s" : 10.9,
+      "pts_timescale" : 30000,
+      "pts_value" : 327000,
+      "raw_BGRA_SHA256" : "3c514658709468980ff82ed94e21208db623e5dbf5cb8d9e7670401aaa33ebdb"
+    },
+    {
+      "duration_s" : null,
+      "index" : 328,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0328.png",
+      "pts_s" : 10.933333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 328000,
+      "raw_BGRA_SHA256" : "3046b0d993c2abb7a5987b08f915a8cd06a31287fb3b9f149bab5883c1572f09"
+    },
+    {
+      "duration_s" : null,
+      "index" : 329,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0329.png",
+      "pts_s" : 10.966666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 329000,
+      "raw_BGRA_SHA256" : "1315763748b2765addea215254a6b392968a6f0a82af9d50623d6438837aa295"
+    },
+    {
+      "duration_s" : null,
+      "index" : 330,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0330.png",
+      "pts_s" : 11,
+      "pts_timescale" : 30000,
+      "pts_value" : 330000,
+      "raw_BGRA_SHA256" : "e9601581af5f303df53911c3607a038b98d412d26e1bcf4798dd124240629550"
+    },
+    {
+      "duration_s" : null,
+      "index" : 331,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0331.png",
+      "pts_s" : 11.033333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 331000,
+      "raw_BGRA_SHA256" : "c9aea9863999bc79a057e6cd48c9c84a9f6819c9b96194c744becf1bf071b5d4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 332,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0332.png",
+      "pts_s" : 11.066666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 332000,
+      "raw_BGRA_SHA256" : "a6fc172352d0fe686de11c53144a6eb8a24132f6ef38c6933e9ab68d5b022235"
+    },
+    {
+      "duration_s" : null,
+      "index" : 333,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0333.png",
+      "pts_s" : 11.1,
+      "pts_timescale" : 30000,
+      "pts_value" : 333000,
+      "raw_BGRA_SHA256" : "ab043d55af4cfb80a48e5e5582e39273b515efc717a51e54e64cae9a17840e7b"
+    },
+    {
+      "duration_s" : null,
+      "index" : 334,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0334.png",
+      "pts_s" : 11.133333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 334000,
+      "raw_BGRA_SHA256" : "f88f1618b79fcfa14898da59fc11cb6c47032531d6bebf5783fea0911f043002"
+    },
+    {
+      "duration_s" : null,
+      "index" : 335,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0335.png",
+      "pts_s" : 11.166666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 335000,
+      "raw_BGRA_SHA256" : "f2321f9851faf20078429f57efe41c4956d935c07eaad6b456c6fbe031fc6675"
+    },
+    {
+      "duration_s" : null,
+      "index" : 336,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0336.png",
+      "pts_s" : 11.199999999999999,
+      "pts_timescale" : 30000,
+      "pts_value" : 336000,
+      "raw_BGRA_SHA256" : "4b3c9d74c7146a00ce1417545e580c78deaccb22495b81e7fcb75b5a4feefd28"
+    },
+    {
+      "duration_s" : null,
+      "index" : 337,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0337.png",
+      "pts_s" : 11.233333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 337000,
+      "raw_BGRA_SHA256" : "bfc39f835bcff1e332c1c169783d850ce95867b0bd59cb6629e0c60b0b68fc84"
+    },
+    {
+      "duration_s" : null,
+      "index" : 338,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0338.png",
+      "pts_s" : 11.266666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 338000,
+      "raw_BGRA_SHA256" : "81d39f9f303790d6c4903717ea8236cf23c704cd091bdf44d1a73ff0b866ceea"
+    },
+    {
+      "duration_s" : null,
+      "index" : 339,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0339.png",
+      "pts_s" : 11.300000000000001,
+      "pts_timescale" : 30000,
+      "pts_value" : 339000,
+      "raw_BGRA_SHA256" : "eceb3097199562c7678ddfff8a1697c8e18d9bbfc9fcb182ba67d652264d5923"
+    },
+    {
+      "duration_s" : null,
+      "index" : 340,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0340.png",
+      "pts_s" : 11.333333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 340000,
+      "raw_BGRA_SHA256" : "05f45b9d41dfc6e992788db00c12bf4ab5672a4aa608d1d3c04e9d13271341b4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 341,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0341.png",
+      "pts_s" : 11.366666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 341000,
+      "raw_BGRA_SHA256" : "e1a951ccd014c15445ca4a338d66ce549503b753bb5920062a5a66eea0298f09"
+    },
+    {
+      "duration_s" : null,
+      "index" : 342,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0342.png",
+      "pts_s" : 11.4,
+      "pts_timescale" : 30000,
+      "pts_value" : 342000,
+      "raw_BGRA_SHA256" : "ebb7045aad08e43cd05c97d82d1ede51555378d198b82914cd45edaf4de50c57"
+    },
+    {
+      "duration_s" : null,
+      "index" : 343,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0343.png",
+      "pts_s" : 11.433333333333334,
+      "pts_timescale" : 30000,
+      "pts_value" : 343000,
+      "raw_BGRA_SHA256" : "e1c51767faa9627288b124c9572e88ec1042e9538c180c8b35b1962c8ccdd152"
+    },
+    {
+      "duration_s" : null,
+      "index" : 344,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0344.png",
+      "pts_s" : 11.466666666666667,
+      "pts_timescale" : 30000,
+      "pts_value" : 344000,
+      "raw_BGRA_SHA256" : "52850fd108a22941fa69958313c8385d66c6c31d2de92bca664188e6e16d42d4"
+    },
+    {
+      "duration_s" : null,
+      "index" : 345,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0345.png",
+      "pts_s" : 11.5,
+      "pts_timescale" : 30000,
+      "pts_value" : 345000,
+      "raw_BGRA_SHA256" : "bdb756a16011f01002b9d95bbe817d1306e9f1333cc7ce07a7a71021d92efdf2"
+    },
+    {
+      "duration_s" : null,
+      "index" : 346,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0346.png",
+      "pts_s" : 11.533333333333333,
+      "pts_timescale" : 30000,
+      "pts_value" : 346000,
+      "raw_BGRA_SHA256" : "11dec2484d4b2ac28c6befe7add4bf69f002fac7a7e124679891647569d0936e"
+    },
+    {
+      "duration_s" : null,
+      "index" : 347,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0347.png",
+      "pts_s" : 11.566666666666666,
+      "pts_timescale" : 30000,
+      "pts_value" : 347000,
+      "raw_BGRA_SHA256" : "6f07e98ba485eff4f91e0f1b3d8ace30ddda8cf970d18c8ab3a4392e26694b23"
+    },
+    {
+      "duration_s" : null,
+      "index" : 348,
+      "png" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_run_source_v001\/video_research\/native_frames\/frame_0348.png",
+      "pts_s" : 11.6,
+      "pts_timescale" : 30000,
+      "pts_value" : 348000,
+      "raw_BGRA_SHA256" : "2a531dca6b46e3a97d401416a7547292f275960835a119a6c6d42c04f50db393"
+    }
+  ],
+  "input" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/references\/motion\/actions_and_stuff\/Running.mp4",
+  "natural_size" : [
+    250,
+    380
+  ],
+  "nominal_fps" : 30.000085830688477,
+  "track_timescale" : 30000
+}

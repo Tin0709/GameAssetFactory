@@ -1,11 +1,33 @@
 {
-  "passed": false,
-  "error": "Traceback (most recent call last):\n  File \"/Users/tin/Documents/ChatGPT/New project/mobs_library/gui_validate.py\", line 31, in tick\n    assert time.monotonic()-state['start']<(s.frame_end/30)*2+12,'Playback failed to complete two native loops'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Playback failed to complete two native loops\n",
-  "state": {
-    "stage": "idle",
-    "wraps": 0,
-    "last": 1,
-    "start": 20194.531299541,
-    "results": []
-  }
+  "passed": true,
+  "checks": [
+    {
+      "clip": "idle",
+      "two_wraps": true,
+      "pause": true
+    },
+    {
+      "clip": "walk",
+      "two_wraps": true,
+      "pause": true
+    },
+    {
+      "clip": "source_idle",
+      "two_wraps": true,
+      "pause": true
+    },
+    {
+      "clip": "source_walk",
+      "two_wraps": true,
+      "pause": true
+    },
+    {
+      "loop_off_stops_at_end": true
+    },
+    {
+      "saved_reopened_sidebar": true,
+      "all_four_pending": true
+    }
+  ],
+  "target": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/showcase/Mobs_Animation_Library.blend"
 }

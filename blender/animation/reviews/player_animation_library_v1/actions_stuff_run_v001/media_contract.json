@@ -1,0 +1,87 @@
+{
+  "videos": [
+    {
+      "name": "source_front_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 512,
+      "height": 578,
+      "description": "Canonical source clocks, continuous68 samples"
+    },
+    {
+      "name": "reference_source_approved_front_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Original recorded camera differs from fixed native model camera; no temporal retime"
+    },
+    {
+      "name": "source_three_quarter_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 512,
+      "height": 578,
+      "description": "Canonical source clocks, continuous68 samples"
+    },
+    {
+      "name": "reference_source_approved_three_quarter_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Original recorded camera differs from fixed native model camera; no temporal retime"
+    },
+    {
+      "name": "source_side_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 512,
+      "height": 578,
+      "description": "Canonical source clocks, continuous68 samples"
+    },
+    {
+      "name": "reference_source_approved_side_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Original recorded camera differs from fixed native model camera; no temporal retime"
+    },
+    {
+      "name": "source_three_views_1x",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Three fixed views of the same canonical take,68 continuous samples"
+    },
+    {
+      "name": "source_full_take_1x",
+      "frames": 180,
+      "fps": 30,
+      "width": 512,
+      "height": 578,
+      "description": "Full continuous6-second source study; not a short seamless loop"
+    },
+    {
+      "name": "video_cadence_diagnostic_front",
+      "frames": 68,
+      "fps": 30,
+      "width": 1536,
+      "height": 578,
+      "description": "Diagnostic changes forwardphaseclock only, not source-authentic Action; bob retains nativeclock"
+    }
+  ],
+  "research_only": true,
+  "reference_window_zero_based": [
+    30,
+    97
+  ],
+  "reference_fps": 30,
+  "no_reference_retime": true,
+  "canonical_source_phase_rate": 1.6,
+  "reference_local_period_frames": 17,
+  "reference_pack_version": "unknown",
+  "no_full_runtime_equality_claim": true
+}

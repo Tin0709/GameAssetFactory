@@ -1,0 +1,19 @@
+source_frame_zero_based,relative_interval,approx_phase_percent,pose_family,leg_observation,upper_observation,contact_confidence
+40,0,0.0,receive-like,screen-left leg extended low; opposed leg foreshortened,low silhouette following return; facing near front,low
+41,1,5.882,load/lower-like,opposite leg gathers/foreshortens,cap and shirt lower in image,low
+42,2,11.765,gather/exchange,leg silhouettes narrow and overlap; opposite sole rises,body starts rising,medium
+43,3,17.647,gather/exchange,compact leg silhouette near exchange,"chest/head image rebounds upward, rolls",medium
+44,4,23.529,upper/return,opposite leg begins opening forward,cap/chest high; roll remains,medium
+45,5,29.412,upper/return,opposite long leg grows; trailing sole tucked higher,"held item large and forward, free arm differs",medium
+46,6,35.294,return/extend,long opposite leg returns toward low extension,upper silhouette remains tilted,medium
+47,7,41.176,return/extend,visible long leg increasingly extended,cap/chest begins lowering,medium
+48,8,47.059,late return,opposite foot extended low,head/chest lowward travel,medium
+49,9,52.941,opposite receive-like,screen-right leg extended low,cap/chest lower; camera yaw changes,low
+50,10,58.824,load/lower-like,other leg begins gathering,compact low body image,low
+51,11,64.706,gather/exchange,soles draw near; raised sole visible,upper silhouette begins rebound,medium
+52,12,70.588,upper/exchange,leg overlap/narrowing transitions into opening,cap/chest rising,medium
+53,13,76.471,upper/return,"opposite leg opens, short trailing shape","body image high, roll changes sign",medium
+54,14,82.353,return/extend,screen-left leg lengthens low,item/free arm opposition persists,medium
+55,15,88.235,return/extend,screen-left leg approaches full low extension,head/chest starts lowering,medium
+56,16,94.118,late return,screen-left long leg low; other tucked,tilt settles toward next receive-like,medium
+57,17,100.0,receive-like endpoint,same visible extended-side family asF40,new same-side recurrence; pose not identical,low

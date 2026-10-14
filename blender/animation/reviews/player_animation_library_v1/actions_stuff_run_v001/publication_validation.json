@@ -1,0 +1,14 @@
+{
+  "published": true,
+  "entries": 37,
+  "old_entries_exact": true,
+  "old_action_signatures_exact": 36,
+  "source_sha256": "7dfdd7c2a5cca1f35fb56cfacfd63ee91cc7e1dc72391de650d4666f75b51bfb",
+  "action_sha256": "efb34e9de589d3bfd9497ebb9eb24bf433b7876e7a49010ca949cc1bfbb2c93c",
+  "central_sha256": "60389f8f80cc91d2be0038eb339a6dcb1a899c7f19765debed81322cb9803f8b",
+  "manifest_sha256": "b676fdbd60baf704e7cc87f3bed31b000cf06e470636c4994a4941807e86437a",
+  "viewer_sha256": "f53c117c1509ba3f5d53658b4a9b9717628891d9e06fe76f53bf3149de759674",
+  "registration_helper_unchanged": true,
+  "correct_preview_floor_z_m": -0.03367406874895096,
+  "backup": "/Users/tin/Desktop/Game Dev/GameAssetFactory/.validation/actions_stuff_run_source_v001/before"
+}

@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "source_sha256": "3db973b8dccf5e37d94cb6ed5a7e61fe6f45386c50d438112d058c5c23af55a2",
+  "original_bytes": 853333,
+  "decoded_frames": 349,
+  "all_pts_verified": "index*1000 ticks at timescale30000",
+  "all_native_png_sizes_and_hashes_verified": 349,
+  "exact_duplicate_pairs_verified": [
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      144,
+      145
+    ],
+    [
+      295,
+      296
+    ]
+  ],
+  "selected_window_display_samples": 68,
+  "selected_window_last_display_index": 97,
+  "selected_window_endpoint_only": 98,
+  "selected_window_no_MAE_below_0_2": true,
+  "selected_window_min_adjacent_RGB_MAE": 5.976,
+  "memo_sha256": "c25cdd8b54a15c77f1f7db17ba7c12ad401e61a46612c6eb4f80850a09047d55"
+}

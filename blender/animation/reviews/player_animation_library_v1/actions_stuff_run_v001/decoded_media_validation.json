@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "decoder": "Blender sequencer H264",
+  "threshold_rgb_rmse": 12,
+  "samples": [
+    {
+      "video": "reference_source_approved_front_1x",
+      "frame": 11,
+      "rmse": 2.161082120265569,
+      "decoded_sha256": "ecb6777da2dabfe63c3511d2c2e6b2184885becd1ecb88975664e022cbea2dec"
+    },
+    {
+      "video": "reference_source_approved_front_1x",
+      "frame": 14,
+      "rmse": 2.112554939465639,
+      "decoded_sha256": "2e907855b074d24ffc367dfcc75011e40ca8da59c389f21df3f27bdc673dd015"
+    },
+    {
+      "video": "reference_source_approved_front_1x",
+      "frame": 28,
+      "rmse": 2.1081032706843947,
+      "decoded_sha256": "a27740a831c499702c2786c38aed83289768c14f0f61cc9b5cfab9df7afdfd95"
+    },
+    {
+      "video": "reference_source_approved_front_1x",
+      "frame": 68,
+      "rmse": 2.273130379017344,
+      "decoded_sha256": "3f6dfd15f9275c8701691d0a6bd2d7dd3765b52a2718fc211670e401ba9d3993"
+    },
+    {
+      "video": "source_full_take_1x",
+      "frame": 1,
+      "rmse": 1.9037962586044337,
+      "decoded_sha256": "f68ba9b4dffb4025c7aca943106af8d4320978c3a2bba454fb4e029a5c0c18fd"
+    },
+    {
+      "video": "source_full_take_1x",
+      "frame": 180,
+      "rmse": 1.9387012823530168,
+      "decoded_sha256": "78c96656aa2fb82807aca89f7e4bace38ba36a6e4452cdce12ea09d15d79df62"
+    }
+  ]
+}

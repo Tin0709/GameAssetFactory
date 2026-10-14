@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "protected_before": 344,
+  "protected_existing_files_exact": 340,
+  "intentional_existing_changes": [
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/animation_manifest.json",
+    "blender/animation/showcase/gaf_animation_library.py",
+    "docs/animation/ANIMATION_PROGRESS.md"
+  ],
+  "all_36_old_manifest_entries_exact": true,
+  "previous_36_action_signatures_verified_in_fresh_showcase": true,
+  "accepted_walk_preserved": true,
+  "approved_run_preserved": true,
+  "player_master_preserved": true,
+  "godot_protected_files_exact": true,
+  "registration_helper_unchanged": true,
+  "pack_hash_exact": true,
+  "original_video_hash_exact": true,
+  "published_source_sha256": "7dfdd7c2a5cca1f35fb56cfacfd63ee91cc7e1dc72391de650d4666f75b51bfb",
+  "nine_video_hashes_exact": true,
+  "independent_runtime_equivalence_claim": false,
+  "research_only": true,
+  "production_eligible": false,
+  "git_after": " M blender/animation/showcase/Animation_Showcase.blend\n M blender/animation/showcase/animation_manifest.json\n M blender/animation/showcase/gaf_animation_library.py\n M blender/animation/showcase/mobs_library/README.md\n M blender/animation/showcase/mobs_library/gui_validate.py\n M blender/animation/showcase/mobs_library/validation_gui.json\n M blender/animation/showcase/mobs_library/validation_reopen.json\n M blender/environment/studies/dungeons_ground_style_v2/dungeons_ground_style_v2.blend\n M blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/ShortGrass_Fluffy_v1_Setup.gd\n D blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/previews/Backface_Normal_Diagnostic.png\n M blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/previews/Opposite_Detail_Existing_Lighting.png\n D blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/previews/Thin_Lighting_Diagnostic.png\n M docs/animation/ANIMATION_PROGRESS.md\n?? blender/animation/reviews/player_animation_library_v1/actions_stuff_run_v001/\n?? blender/animation/showcase/mobs_library/deliver_final_support.py\n?? blender/animation/showcase/mobs_library/final_audit.py\n?? blender/animation/showcase/mobs_library/validation_final.json\n?? blender/animation/showcase/mobs_library/validation_media.json\n?? blender/animation/showcase/mobs_library/verify_media.py\n?? blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/README.md\n?? blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/ShortGrass_Fluffy_v1_DustyPink.tscn\n?? blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/ShortGrass_Fluffy_v1_Lavender.tscn\n?? blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/ShortGrass_Fluffy_v1_SageGreen.tscn\n?? blender/environment/studies/dungeons_ground_style_v2/short_grass_fluffy_v1/ShortGrass_Fluffy_v1_SoftYellow.tscn\n"
+}

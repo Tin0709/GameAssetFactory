@@ -4,7 +4,7 @@
 
 Để xem hướng giống pack, chọn **Idle / A&S source v001** hoặc **Walk / A&S source v001** trong sidebar. Hai bản này được đánh dấu **RESEARCH ONLY**, không dùng cho production/export/Godot. Chi tiết preset và sai khác ở `research/actions_stuff_zombie_v001/README.md`.
 
-File chính nay chứa dữ liệu chuyển động tái dựng riêng tư và được loại khỏi Git bằng local exclude. Hai bản Original vẫn giữ nguyên trong file chính và được lưu riêng tại `originals/Mobs_Animation_Library_Original_V1.blend`, chỉ chứa dữ liệu nguyên bản của ta.
+File chính nay chứa dữ liệu chuyển động tái dựng riêng tư. Thư mục research có local Git exclude. File chính đã được một checkpoint song song đưa vào tracked files; ignore rule không tự bỏ tracking, nên không coi rule này là bảo đảm file chính không được commit. Tác vụ này không tạo commit hoặc sửa lịch sử Git. Không dùng các Action research trong production exports. Hai bản Original vẫn giữ nguyên trong file chính và được lưu riêng tại `originals/Mobs_Animation_Library_Original_V1.blend`, chỉ chứa dữ liệu nguyên bản của ta.
 
 Mở bằng Terminal:
 

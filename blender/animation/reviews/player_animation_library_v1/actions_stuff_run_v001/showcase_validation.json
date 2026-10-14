@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "reopened_from_disk": true,
+  "all_actions_selectable": 37,
+  "previous_action_signatures_exact": 36,
+  "old_manifest_entries_exact": 36,
+  "source_files_hash_checked": 37,
+  "active_slots_timing_rest_and_floor_pass": true,
+  "saved_pending_selection_and_loop_disabled_pass": true,
+  "source_matrix_samples": 942,
+  "maximum_matrix_component_error": 1.6689300537109375e-06,
+  "scale_reset_targets": [
+    "Run_Snappy_Test_v001",
+    "Walk_ActionsStuff_Source_Test_v001",
+    "Idle_Expressive_Test_v3"
+  ],
+  "pose_reset_maximum_error": 0.0,
+  "three_cameras_pass": true,
+  "full_take_seamless": false,
+  "endpoint_matrix_difference": 0.8623651266098022,
+  "no_fabricated_composite_seam": true,
+  "candidate": "Run_ActionsStuff_Source_Test_v001",
+  "candidate_status": "pending",
+  "no_gui_playback_claim": true
+}

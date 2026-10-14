@@ -1,0 +1,18 @@
+{
+  "source_file_sha256": "7dfdd7c2a5cca1f35fb56cfacfd63ee91cc7e1dc72391de650d4666f75b51bfb",
+  "source_action_sha256": "efb34e9de589d3bfd9497ebb9eb24bf433b7876e7a49010ca949cc1bfbb2c93c",
+  "reference_frames_zero_based": [
+    30,
+    97
+  ],
+  "primary_frames": 68,
+  "fps": 30,
+  "source_clock_cycles_s": 1.6,
+  "reference_zero_family_alignment": "ReferenceF40 \u2194 source t2.5/F76; provisional silhouette alignment, not measured contact",
+  "previous_run_alignment": "ReferenceF40 \u2194 previous Run right receiving phase0.5",
+  "all_cameras_same_between_models": true,
+  "source_constant_floor": -0.03367406874895096,
+  "approved_constant_floor": 0,
+  "diagnostic_forward_rate_cycles_s": 1.7647058823529411,
+  "diagnostic_is_not_canonical_source_clock": true
+}

@@ -1,0 +1,21 @@
+{
+  "separate_gui_process": true,
+  "candidate": "Run_ActionsStuff_Source_Test_v001",
+  "fps": 30,
+  "range": [
+    1,
+    180
+  ],
+  "continuous_source_take": true,
+  "loop_disabled": true,
+  "no_blend_save": true,
+  "automatic_end_stop_pass": true,
+  "replay_returns_to_start_pass": true,
+  "pause_pass": true,
+  "passed": true,
+  "error": null,
+  "paused": true,
+  "source_action_sha256": "efb34e9de589d3bfd9497ebb9eb24bf433b7876e7a49010ca949cc1bfbb2c93c",
+  "maximum_frame_seen": 180,
+  "observed_frame_count": 180
+}

@@ -16,6 +16,7 @@ def op(name,**kwargs):
 def playing():return bpy.context.window_manager.windows[0].screen.is_animation_playing
 def begin(index,stage):
     s=bpy.context.scene;s.mobs_active_index=index;s.mobs_loop=True
+    s.sync_mode='NONE'
     op('restart');op('play_pause')
     assert playing()
     state.update(stage=stage,wraps=0,last=1,start=time.monotonic())
@@ -23,6 +24,10 @@ def begin(index,stage):
 def tick():
     try:
         s=bpy.context.scene
+        # macOS can defer drawing of another Blender instance. Force a native
+        # draw/swap without manually advancing frames; playback still owns time.
+        window=bpy.context.window_manager.windows[0]
+        with bpy.context.temp_override(window=window,screen=window.screen):bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP',iterations=1)
         if state['stage']=='start':begin(0,'idle');return .12
         if s.frame_current<state['last']:state['wraps']+=1
         state['last']=s.frame_current

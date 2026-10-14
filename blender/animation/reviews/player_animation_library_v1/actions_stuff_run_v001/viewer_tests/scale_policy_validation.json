@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "checks": [
+    [
+      "legacy scale rejected",
+      false
+    ],
+    [
+      "verified source leg scale allowed",
+      true
+    ],
+    [
+      "head remains restricted",
+      false
+    ],
+    [
+      "source upper bound enforced",
+      false
+    ],
+    [
+      "source lower bound enforced",
+      false
+    ],
+    [
+      "production eligibility blocks exception",
+      false
+    ],
+    [
+      "scale offset cycles rejected",
+      false
+    ]
+  ],
+  "threejs_quaternion_matrix_error": 2.123415470123291e-07,
+  "previous_mathutils_ZYX_difference": 0.35992324352264404
+}

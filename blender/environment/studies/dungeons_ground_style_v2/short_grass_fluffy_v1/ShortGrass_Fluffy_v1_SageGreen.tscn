@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="exports/ShortGrass_Fluffy_v1_SageGreen.glb" id="1_mesh"]
+[ext_resource type="Script" path="ShortGrass_Fluffy_v1_Setup.gd" id="2_setup"]
+
+[node name="ShortGrass_Fluffy_v1_SageGreen" instance=ExtResource("1_mesh")]
+script = ExtResource("2_setup")

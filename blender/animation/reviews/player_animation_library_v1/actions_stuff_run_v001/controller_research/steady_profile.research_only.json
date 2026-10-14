@@ -1,0 +1,519 @@
+{
+  "schema": "actions_stuff_run_steady_research_profile_v1",
+  "research_only": true,
+  "source_pack": "/Users/tin/Desktop/Game Dev/local_references/Actions Stuff 1.12 (resources).mcpack",
+  "source_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "scope": "Regular third-person player; fully settled straight grounded Run; no equipment, turn, head-look input, terrain offsets, water, crawl, sneak, jump, attack, spawn or hurt transient. Positive-direction runtime reconstruction, not verified Bedrock output.",
+  "variables": {
+    "v.tnlxsa": 0,
+    "v.esnrkj": 1,
+    "v.cknrcn": 1,
+    "v.mrmeib": 0,
+    "v.jkpkmj": 0,
+    "v.bdjsdw": 0,
+    "v.upxhvv": 0,
+    "v.gadjrq": 0,
+    "v.trznwu": 0,
+    "v.gynlia": 0,
+    "v.tkterv": 0,
+    "v.rvwafl": 0,
+    "v.gtgvhp": 0,
+    "v.hirjne": 0,
+    "v.hhsumy": 0,
+    "v.fxllpr": 0,
+    "v.gddzeg": 0,
+    "v.yyjpfg": 0,
+    "v.hkmncu": 0,
+    "v.orsuss": 0,
+    "v.jiqwge": 0,
+    "v.is_holding_right": 0,
+    "v.is_holding_left": 0,
+    "v.vbcdda": 0,
+    "v.wfyvyl": 0,
+    "v.wyuvst": 0,
+    "v.jycjqy": "default",
+    "v.nthjcy": "same as q.body_y_rotation",
+    "v.undfyr": 0
+  },
+  "queries": {
+    "q.is_on_ground": 1,
+    "q.vertical_speed": 0,
+    "q.yaw_speed": 0,
+    "q.is_in_ui": 0,
+    "q.is_first_person": 0,
+    "q.is_spectator": 0,
+    "q.is_emoting": 0,
+    "q.is_alive": 1,
+    "q.is_riding": 0,
+    "q.is_swimming": 0,
+    "q.is_crawling": 0,
+    "q.is_gliding": 0,
+    "q.is_sneaking": 0,
+    "q.is_jumping": 0,
+    "q.target_x_rotation": 0,
+    "q.has_cape": "optional; omitted from native rig"
+  },
+  "controller_states": {
+    "rzkmtm": "default",
+    "veywgp": "run",
+    "controller.player_movement.offset": "default",
+    "flkskc": "default",
+    "agyfrv": "default",
+    "cwxfxl": "default",
+    "cmdvzm": "default",
+    "okjrob": "eryuvy if local; hgnodg if remote",
+    "kcexxa": "default",
+    "hsfnbp": "default",
+    "ptaudk": "default",
+    "ybphcg": "default",
+    "rylnkt": "default",
+    "eudgiz": "default",
+    "bjmscc": "wkbbnc",
+    "fxsaqw": "dmamrb"
+  },
+  "clocks": {
+    "run": {
+      "variable": "v.eqhdel",
+      "cycle_phase": "mod(v.eqhdel,1)",
+      "rate_cycles_per_second": 1.6,
+      "period_seconds": 0.625,
+      "equation": "v.eqhdel += q.delta_time * sqrt(abs(v.esnrkj + abs(v.mrmeib)*0.25*min(1,v.esnrkj*3))) * 1.6",
+      "pointer": "entity/dtr.json#/minecraft:client_entity/description/scripts/pre_animation/29"
+    },
+    "bob": {
+      "clock": "q.life_time",
+      "first_harmonic_deg_per_second": 122.5,
+      "second_harmonic_deg_per_second": 245,
+      "period_seconds": 2.938775510204082,
+      "phase_origin": "q.life_time at review frame 0; must be declared if included"
+    },
+    "sprint": {
+      "clock": "local clip seconds since ptvsjb entered",
+      "length_seconds": 1.25,
+      "settled_time_seconds": 1.25,
+      "mode": "hold_on_last_frame"
+    }
+  },
+  "run_controller_raw_weights": {
+    "move": 1,
+    "move_right": 0,
+    "move_left": 0,
+    "pgnnhd": -1,
+    "hxfxxu": 1,
+    "kiggsk": 0,
+    "yonenf": 0,
+    "gcquxx": 0,
+    "oprmcp": 1
+  },
+  "weight_semantics": {
+    "nonpositive_runtime_handling": "UNKNOWN from inspected primary docs; do not treat raw -1 as proven inactive",
+    "reconstruction_assumption": "Use only positive directional contribution: move effective1, pgnnhd assumed inactive. Record this explicitly. No signed subtraction or normalization applied.",
+    "clip_blend_weight": {
+      "move": 1,
+      "bob": 1,
+      "xahrzd": 1,
+      "holding": 0.5
+    }
+  },
+  "material_core_layers": [
+    {
+      "alias": "move",
+      "source": "animations/f2da1071.json#/animations/animation.oreville_ans.fngydr",
+      "weight": 1,
+      "clock": "run",
+      "purpose": "Exact core forward Run curves including native leg positions and Y scales"
+    },
+    {
+      "alias": "bob",
+      "source": "animations/f2da1071.json#/animations/animation.oreville_ans.tdrcwc",
+      "weight": 1,
+      "clock": "bob",
+      "loop_warning": "Not periodic at core Run wrap or 2.5-second four-Run-cycle wrap"
+    }
+  ],
+  "sprint_on": {
+    "q.is_sprinting": 1,
+    "psowex_state": "ptvsjb",
+    "additional_layer": "xahrzd",
+    "steady_rotations_deg": {
+      "waist": [
+        5,
+        0,
+        0
+      ],
+      "leftarm": [
+        0,
+        8,
+        -10
+      ],
+      "rightarm": [
+        0,
+        -8,
+        10
+      ]
+    },
+    "duplicates": "Same values on egjh9waist/leftarm/rightarm, for alternate named skeleton; do not double onto main anatomy"
+  },
+  "sprint_off": {
+    "q.is_sprinting": 0,
+    "psowex_state": "default",
+    "additional_steady_layer": null,
+    "transient": "Immediately after turning sprint off, stop state plays sjvffv/bxtvze for 1.2083s with weight max(1-esnrkj,.001)=.001 at speed1; omit only after finished"
+  },
+  "zero_core_layers": {
+    "humanoid_base_pose": "No bones",
+    "move.arms": "No bones",
+    "move.legs": "No bones",
+    "holding": "-this *0 =0 arm X; .5 blend does not introduce a rotation",
+    "xfltzh": "zero when yaw aligned/upxhvv0",
+    "hxfxxu": "zero when bdjsdw0",
+    "look_at_target": "Numeric zero input, but NOT proven transform no-op: relative_to.rotation=entity. Entity-relative head basis can cancel inherited parent orientation; full head pose requires this convention or an explicit unresolved mismatch label.",
+    "controller.player_movement.offset": "default has no animations",
+    "btwfwj": "gated off for regular tnlxsa0",
+    "pxfdpb": "gated off for regular tnlxsa0"
+  },
+  "blending": {
+    "translation_and_rotation": "Accumulate weighted local per-axis channel contributions first; convert final Euler vector to transform afterwards. Separate sprint matrix multiplication is not equivalent.",
+    "euler_units": "degrees",
+    "euler_documented_order": "X then Y then Z; column-vector composition Rz @ Ry @ Rx",
+    "scale": "No scale from sprint or bob; retain exact move leg scales. General multi-layer scale composition is not runtime-tested.",
+    "primary_source": "https://learn.microsoft.com/en-us/minecraft/creator/documents/animations/animationsoverview?view=minecraft-bedrock-stable",
+    "explicit_right_handed_display_matrix": "For source rx,ry,rz after channel accumulation and Bedrock-to-display X/Y rotation sign flip: Rz(rz) @ Ry(-ry) @ Rx(-rx); then C @ R @ C^-1 to Blender target coordinates.",
+    "blender_equivalent": "mathutils.Euler((-rx,-ry,rz), XYZ), after degree-to-radian conversion, yields this column-vector matrix. Three.js labels the equivalent intrinsic order ZYX. Do not copy the Three.js label into Blender.",
+    "prior_walk_difference": "Parent reported prior accepted Walk builder uses Blender Euler ZYX. New Run study corrects the convention to explicit matrix composition; existing accepted Walk is outside this read-only task and remains untouched.",
+    "primary_code_sources": {
+      "Blockbench_format_default": "https://github.com/JannisX11/blockbench/blob/master/js/io/format.ts#L692",
+      "Blockbench_bedrock_format": "https://github.com/JannisX11/blockbench/blob/master/js/formats/bedrock/bedrock.js#L1489",
+      "Blockbench_source_rotation_signs": "https://github.com/JannisX11/blockbench/blob/master/js/formats/bedrock/bedrock_animation.js#L178",
+      "ThreeJS_matrix": "https://github.com/mrdoob/three.js/blob/dev/src/math/Matrix4.js#L376",
+      "Blender_matrix": "https://github.com/blender/blender/blob/main/source/blender/blenlib/intern/math_rotation_c.cc#L1617"
+    }
+  },
+  "bob_omission_bounds_source_units": {
+    "waist": {
+      "position_x": [
+        -0.25,
+        0.25
+      ],
+      "position_y": [
+        -0.3,
+        0
+      ],
+      "rotation_z_deg": [
+        -1,
+        1
+      ]
+    },
+    "head": {
+      "rotation_x_deg": [
+        -2,
+        2
+      ],
+      "rotation_y_deg": [
+        -1,
+        1
+      ],
+      "rotation_z_deg": [
+        -3,
+        3
+      ]
+    },
+    "leftarm": {
+      "position_y": [
+        -0.05,
+        0.15
+      ],
+      "rotation_z_deg": [
+        -2.4,
+        0.1
+      ]
+    },
+    "rightarm": {
+      "position_y": [
+        -0.05,
+        0.15
+      ],
+      "rotation_z_deg": [
+        -0.1,
+        2.4
+      ]
+    },
+    "bothlegs": {
+      "position_x": [
+        -0.25,
+        0.25
+      ],
+      "rotation_z_deg": [
+        -1.2,
+        1.2
+      ]
+    }
+  },
+  "geometry": {
+    "primary_binding": "geometry.humanoid.custom",
+    "primary_present_in_pack": false,
+    "cape_present_in_pack": false,
+    "fallback_status": "Main skeleton parenting, pivots, bind transforms and skin/proportions external; standard humanoid fallback must remain labeled assumption. Pack helper skeleton supports root\u2192waist\u2192body\u2192arms and root\u2192legs; use source_evidence geometries for explicit corroborating pointers.",
+    "entity_scale": 0.9375
+  },
+  "omissions": [
+    "cape: direct Run RX=5sin(720phi),RY=24sin(360phi+10), plus runtime cape layer; no cape bone on native13 rig",
+    "egjh9* duplicate alternate anatomy names: not extra additive contributions to same native body",
+    "wqleol/owltad: reads cumulative this to variables, returns neutral pos/rot and1scale; no extra primary anatomy transform",
+    "gzxwdv/uivqbf: reproduces accumulated transforms on *4ghq attachment helper geometry, not another primary anatomy layer",
+    "foot helper locators are independent particle-placement bones, do not establish physical stance/contact",
+    "exact geometry, entity-relative head convention, nonpositive weights and full Bedrock evaluation order not verified by Blender reconstruction"
+  ],
+  "bob_exact_main_anatomy_channels": {
+    "waist": {
+      "rotation": [
+        0,
+        0,
+        "-Math.cos(q.life_time*122.5)"
+      ],
+      "position": [
+        "Math.sin(q.life_time*122.5)*0.25",
+        "Math.cos(q.life_time*245)*0.15-0.15",
+        0
+      ]
+    },
+    "head": {
+      "rotation": [
+        "-Math.sin(q.life_time*245)*2",
+        "-Math.sin(q.life_time*122.5-45)",
+        "-Math.cos(q.life_time*122.5-45)*3"
+      ]
+    },
+    "leftarm": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*245)*-1.25-1.15"
+      ],
+      "position": [
+        0,
+        "Math.cos(q.life_time*245)*0.1+0.05",
+        0
+      ]
+    },
+    "rightarm": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*245)*1.25+1.15"
+      ],
+      "position": [
+        0,
+        "Math.cos(q.life_time*245)*0.1+0.05",
+        0
+      ]
+    },
+    "rightleg": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*122.5)*1.2"
+      ],
+      "position": [
+        "Math.sin(q.life_time*122.5)*0.25",
+        0,
+        0
+      ]
+    },
+    "leftleg": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*122.5)*1.2"
+      ],
+      "position": [
+        "Math.sin(q.life_time*122.5)*0.25",
+        0,
+        0
+      ]
+    }
+  },
+  "review_take": {
+    "duration_seconds": 6,
+    "fps": 30,
+    "visible_frames": 180,
+    "loop": false,
+    "run_phase_origin": 0,
+    "life_time_origin": 0,
+    "state_time": "already settled, sprint clip held after 1.25s",
+    "note": "life_time origin0 is an explicitly chosen bob phase; it does not identify the recording phase or imply a new spawned player already settled."
+  },
+  "clock_recurrence": {
+    "core_run_only_seconds": 0.625,
+    "bob_only_seconds": 2.938775510204082,
+    "both_seconds": 720,
+    "run_cycles": 1152,
+    "bob_cycles": 245,
+    "six_second_endpoint": "9.6 Run cycles; bob first harmonic735deg (15deg mod360), second1470deg (30deg mod360); no wrap to initialpose."
+  },
+  "unresolved_head_basis": {
+    "alias": "look_at_target",
+    "pointer": "animations/f2da1071.json#/animations/animation.oreville_ans.cndmcx/bones/head",
+    "relative_to_rotation": "entity",
+    "neutral_input_rotation": [
+      0,
+      0,
+      0
+    ],
+    "primary_preview_evidence": "Blockbench bedrock_animation.js261 sets rotation_global; timeline_animators.js384\u2013387 premultiplies inverse parent world quaternion. This is primary authoring-preview code, not proof of exact current Bedrock multi-animation evaluation order.",
+    "candidate_reconstruction": "Keep head origin inherited under body, while compensating parent rotation so the final cumulative head orientation is entity-relative. Confirm in runtime or retain uncertainty label."
+  },
+  "cape_omission_detail": {
+    "source_core_rotation_deg": [
+      "5*sin(720*phi)",
+      "24*sin(360*phi+10)",
+      0
+    ],
+    "source_runtime_steady_rotation_deg": [
+      "-5-7*min(actual_horizontal_speed,10)",
+      0,
+      0
+    ],
+    "conditions": "q.has_cape true, straight grounded steady, ealvck=0, verticalspeed0; actual horizontal speed >=4.3 when normalizedspeed1. Source script updates cape params only when q.has_cape.",
+    "runtime_pitch_range_for_normalized_speed1_deg": [
+      -75,
+      -35.1
+    ],
+    "total_pitch_range_bound_deg": [
+      -80,
+      -30.1
+    ],
+    "total_yaw_range_deg": [
+      -24,
+      24
+    ],
+    "position_y": "q.get_root_locator_offset(armor_offset.default_neck,1), unknown without runtime geometry; no finite exact mesh error bound",
+    "effect_of_omission": "No cape surface; no ancestor feedback into main body in inspected channels. Visual silhouette difference cannot be measured with absent cape geometry."
+  },
+  "root_layer_order": [
+    {
+      "index": 0,
+      "source": {
+        "xfltzh": "!q.is_gliding&&!q.is_in_ui&&!v.mbqkjf"
+      }
+    },
+    {
+      "index": 1,
+      "source": "cape"
+    },
+    {
+      "index": 2,
+      "source": "controller.player_movement.offset"
+    },
+    {
+      "index": 3,
+      "source": "flkskc"
+    },
+    {
+      "index": 4,
+      "source": {
+        "veywgp": "!q.any(v.tnlxsa,3,13)?!q.is_gliding-v.jkpkmj"
+      }
+    },
+    {
+      "index": 5,
+      "source": {
+        "dprsws": "v.tnlxsa==3?!q.is_gliding-v.jkpkmj"
+      }
+    },
+    {
+      "index": 6,
+      "source": {
+        "zpbnrr": "v.tnlxsa==13?!q.is_gliding-v.jkpkmj"
+      }
+    },
+    {
+      "index": 7,
+      "source": "psowex"
+    },
+    {
+      "index": 8,
+      "source": {
+        "agyfrv": "!q.is_in_ui&&!v.is_paperdoll"
+      }
+    },
+    {
+      "index": 9,
+      "source": "cwxfxl"
+    },
+    {
+      "index": 10,
+      "source": {
+        "cmdvzm": "!q.is_gliding"
+      }
+    },
+    {
+      "index": 11,
+      "source": {
+        "okjrob": "!q.is_gliding"
+      }
+    },
+    {
+      "index": 12,
+      "source": {
+        "ptaudk": "!v.gtgvhp"
+      }
+    },
+    {
+      "index": 13,
+      "source": {
+        "hsfnbp": "!q.is_emoting"
+      }
+    },
+    {
+      "index": 14,
+      "source": {
+        "pyioph": "v.jkpkmj>0"
+      }
+    },
+    {
+      "index": 15,
+      "source": {
+        "bjmscc": "!q.is_in_ui"
+      }
+    },
+    {
+      "index": 16,
+      "source": {
+        "ybphcg": "!v.gtgvhp"
+      }
+    },
+    {
+      "index": 17,
+      "source": {
+        "rylnkt": "v.zagini?1-Math.clamp((q.life_time-v.zagini)/0.25,0,1):1"
+      }
+    },
+    {
+      "index": 18,
+      "source": {
+        "eudgiz": "v.tnlxsa!=4"
+      }
+    },
+    {
+      "index": 19,
+      "source": {
+        "bwdayn": "v.tnlxsa==4"
+      }
+    }
+  ],
+  "head_basis_recommendation": {
+    "source_order": [
+      "xfltzh index0",
+      "veywgp/Run index4",
+      "psowex/sprint index7",
+      "okjrob index11 -> kcexxa index3 -> bob index0",
+      "hsfnbp index13 -> look_at_target entity-relative head"
+    ],
+    "study_handling": "Headpivot inherits body translation and transformed position. Cancel inherited parent rotation; apply accumulated literal source head Run+bob Euler relative to neutral entity basis. No extra counter-twist or inferred look input.",
+    "confidence": "Best-supported authoring-preview semantics. Exact current Bedrock multiple-layer composition/evaluation not validated.",
+    "zero_numeric_look_is_noop": false,
+    "reason": "Basis flag operates independently of numeric zero. Blockbench preview compensates inverse parent world quaternion even when rotation array is zero; source ancestors have nonzero gait yaw/roll and sprint lean."
+  },
+  "optional_held_item_diagnostics": "held_item_profiles.research_only.json; canonical file remains emptyhands"
+}

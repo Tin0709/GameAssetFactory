@@ -62,7 +62,17 @@ def validate_action(action,entry,rig):
         if not re.fullmatch(r'pose\.bones\["[^"\n]+"\]\.(location|rotation_euler|rotation_quaternion|scale)',c.data_path):raise ValueError('Only baked rig pose transforms are supported: '+c.data_path)
         values=rig.path_resolve(c.data_path)
         if not 0<=c.array_index<len(values):raise ValueError('Invalid bone transform channel')
-        if c.data_path.endswith('scale') and any(abs(k.co.y-1)>1e-6 for k in c.keyframe_points):raise ValueError('Animated limb scaling is not supported')
+        if c.data_path.endswith('scale') and any(abs(k.co.y-1)>1e-6 for k in c.keyframe_points):
+            policy=entry.get('research_scale_channels',{})
+            bone_name=c.data_path.split('\"')[1]
+            rule=policy.get(bone_name)
+            eligible=(entry.get('research_only') is True and entry.get('production_eligible') is False
+                      and entry.get('source_animation')=='animation.oreville_ans.fngydr'
+                      and entry.get('source_pack_sha256')=='9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d'
+                      and bone_name in ['Leg.L','Leg.R'] and c.array_index==1 and rule=={'axis':1,'min':1.0,'max':1.070002})
+            if not eligible:raise ValueError('Animated limb scaling is not supported outside the verified research Run leg channels')
+            if c.modifiers or any(k.interpolation!='LINEAR' or not math.isfinite(k.co.y) or k.co.y<rule['min']-1e-6 or k.co.y>rule['max'] for k in c.keyframe_points):
+                raise ValueError('Research leg scale exceeds verified source bounds or uses unsupported interpolation')
 
 def validate_preview_prop(entry,rig):
     key=entry.get('preview_prop')
@@ -221,6 +231,9 @@ class GAF_PT_animation_library(bpy.types.Panel):
             box.label(text='Seamless cycle' if e.get('seamless_loop') else 'One-shot; replay resets to start',icon='INFO')
             if e.get('preview_prop'):box.label(text='Rifle Stylized V2 attached',icon='OUTLINER_OB_MESH')
         row=layout.row(align=True);row.operator('gaf.play_pause',text='Pause' if context.screen.is_animation_playing else 'Play',icon='PAUSE' if context.screen.is_animation_playing else 'PLAY');row.operator('gaf.restart',text='Restart',icon='REW')
+        if s.gaf_clips and json.loads(s.gaf_clips[s.gaf_active_index].entry_json).get('research_only'):
+            layout.label(text='SOURCE RESEARCH ONLY — DO NOT SHIP',icon='INFO')
+            layout.label(text='Continuous take; replay resets clocks')
         layout.prop(s,'gaf_loop',text='Loop playback')
         row=layout.row(align=True)
         for text,direction in [('Front','FRONT'),('3/4','THREE_QUARTER'),('Side','SIDE')]:row.operator('gaf.view',text=text).direction=direction

@@ -1,0 +1,1865 @@
+{
+  "schema": "actions_stuff_run_held_item_profiles_v1",
+  "research_only": true,
+  "source_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "conditions": "Canonical regular grounded Run with neutral item-use, attacks, special motions, hold_up flags and v.orsuss/v.jiqwge all0; nonweapon nonshield nonreadable vanilla Totem; v.undfyr=0 (no movement boost tier).",
+  "flags": {
+    "v.is_holding_right": "External variable, not assigned anywhere in inspected pack JSON. Main/right physical slot used by generic controller; do not identify from screen side alone.",
+    "v.is_holding_left": "External variable, not assigned anywhere in inspected pack JSON. Off/left physical slot used by generic controller."
+  },
+  "variable_updates": {
+    "pointer": "entity/dtr.json#/minecraft:client_entity/description/scripts/pre_animation/29",
+    "right_held": "v.vbcdda=lerp(v.vbcdda,!v.fxllpr&&!v.hhsumy&&v.undfyr==0,0.2)",
+    "right_empty": "v.vbcdda *= 1-9*q.delta_time",
+    "left_held": "v.wfyvyl=lerp(v.wfyvyl,!v.hhsumy,0.2)",
+    "left_empty": "v.wfyvyl *= 1-9*q.delta_time",
+    "held_convergence": "For target1 froma0: a_n=1-(1-a0)*0.8^n; per-frame update, not delta-time-scaled. Fully settled uses exactly1.",
+    "initial_values": {
+      "v.vbcdda": 0,
+      "v.wfyvyl": 0
+    }
+  },
+  "movement_boost_variable": {
+    "pointer": "entity/dtr.json#/minecraft:client_entity/description/scripts/pre_animation/40",
+    "source": "!q.is_in_ui&&!v.is_paperdoll?{q.is_on_ground?{v.azbhyb=q.life_time;};q.life_time-v.azbhyb>0.5?{t.gjn=0;}:{t.ewp=q.ground_speed/(q.is_sneaking?0.3:q.is_sprinting?1.3:1);t.gjn=(t.ewp-4.316406)/0.864258;t.gjn=Math.abs(Math.max(0,Math.round(t.gjn)));};t.gjn!=v.ategwn?{v.vgabdg=q.life_time;v.ategwn=t.gjn;};v.undfyr=q.life_time-v.vgabdg>0.5?t.gjn:0;};",
+    "note": "Normalizedspeed1 does not define undfyr. Require undfyr0 explicitly. Normal grounded q.ground_speed4.3 for sprintoff or5.59 for sprinton produces0. At stable boosted undfyr!=0, main-held attenuation target0; off-held target remains1."
+  },
+  "layer_order": [
+    "xunqct normalRun index4",
+    "xunqct sprint index7",
+    "xunqct okjrob index11",
+    "okjrob kcexxa index3: bob index0 then holding index1",
+    "main held kcexxa/ssulqn fzimtw index2 (neutral after0.3s)",
+    "okjrob wjfipe index5: off held xhexyy (neutral after0.3s)"
+  ],
+  "this_semantics": {
+    "holding_clip_weight": 0.5,
+    "controller_weight": 1,
+    "right_delta_RX": "-0.5 * current_accumulated_rightarm_RX * v.vbcdda",
+    "left_delta_RX": "-0.5 * current_accumulated_leftarm_RX * v.wfyvyl",
+    "right_final_RX": "(1-0.5*v.vbcdda)*RX_before_holding",
+    "left_final_RX": "(1-0.5*v.wfyvyl)*RX_before_holding",
+    "unchanged_channels": "arm Y/Z rotation, arm position/scale; ancestry is still applied afterwards",
+    "why_simple": "Run is the only nonzero armRX layer in canonical profile; sprintarmRX0, bobarmRX0."
+  },
+  "totem_specific_branch": {
+    "pose_found": false,
+    "matches": [
+      {
+        "pointer": "animation_controllers/616f2ff7.json#/animation_controllers/controller.animation.oreville_ans.wducfe/states/totem_of_undying",
+        "definition": {
+          "sound_effects": [
+            {
+              "effect": "oukcug"
+            }
+          ],
+          "transitions": [
+            {
+              "wefber": "v.kgklzy!=q.get_equipped_item_name(0)"
+            },
+            {
+              "alnvmb": "q.state_time>=0.5"
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "animation_controllers/616f2ff7.json#/animation_controllers/controller.animation.oreville_ans.zjeawg/states/totem_of_undying",
+        "definition": {
+          "sound_effects": [
+            {
+              "effect": "ehhnfu"
+            }
+          ],
+          "transitions": [
+            {
+              "wefber": "v.kgklzy!=q.get_equipped_item_name(0)"
+            }
+          ]
+        }
+      }
+    ],
+    "finding": "These Totem states contain only equip sounds/transitions, no pose animation. Generic main/off holding paths apply."
+  },
+  "profiles": {
+    "empty_hands": {
+      "v.is_holding_right": 0,
+      "v.is_holding_left": 0,
+      "v.vbcdda": 0,
+      "v.wfyvyl": 0,
+      "right_RX_multiplier": 1,
+      "left_RX_multiplier": 1,
+      "kcexxa_state": "default",
+      "wjfipe_state": "default"
+    },
+    "mainhand_totem_right": {
+      "v.is_holding_right": 1,
+      "v.is_holding_left": 0,
+      "v.vbcdda": 1,
+      "v.wfyvyl": 0,
+      "right_RX_multiplier": 0.5,
+      "left_RX_multiplier": 1,
+      "kcexxa_state": "ssulqn",
+      "wjfipe_state": "default"
+    },
+    "offhand_totem_left": {
+      "v.is_holding_right": 0,
+      "v.is_holding_left": 1,
+      "v.vbcdda": 0,
+      "v.wfyvyl": 1,
+      "right_RX_multiplier": 1,
+      "left_RX_multiplier": 0.5,
+      "kcexxa_state": "default",
+      "wjfipe_state": "ssulqn"
+    },
+    "both_generic_items": {
+      "v.is_holding_right": 1,
+      "v.is_holding_left": 1,
+      "v.vbcdda": 1,
+      "v.wfyvyl": 1,
+      "right_RX_multiplier": 0.5,
+      "left_RX_multiplier": 0.5,
+      "kcexxa_state": "ssulqn",
+      "wjfipe_state": "ssulqn"
+    }
+  },
+  "exact_arm_formulas_source_degrees_and_units": {
+    "symbols": "phi=mod(1.6*t,1), L=t+declared_life_time_origin, S=1 if settledsprintelse0, aR=v.vbcdda,aL=v.wfyvyl; trigdegrees",
+    "right_rotation": [
+      "-55*(1-0.5*aR)*sin(360*phi+10)",
+      "18*sin(360*phi)-8*S",
+      "1.25*sin(245*L)+1.15+10*S"
+    ],
+    "left_rotation": [
+      "55*(1-0.5*aL)*sin(360*phi+10)",
+      "18*sin(360*phi)+8*S",
+      "-1.25*sin(245*L)-1.15-10*S"
+    ],
+    "both_position": [
+      0,
+      "-0.5*cos(720*phi)+0.1*cos(245*L)+0.05",
+      0
+    ]
+  },
+  "visual_diagnostic_recommendation": "Keep canonical empty-hand take labeled emptyhands. For unknown golden/Totem-like held videoitem, compare explicitly labeled main/right andoff/left variants with identical sourcebodyclock, bobphase, sprintstate andheadbasis; halve selected armRX with actual sourceholding formula. Screen-left is not enough to provehandidentity; no arbitrary armoffsets or posing inferred from item appearance.",
+  "limits": [
+    "Vanilla Totem identity not confirmed from recording",
+    "Character physical hand not confirmed from screen-left alone",
+    "Itemgeometry/attachment transforms are not reconstructed by bone-only diagnostic",
+    "General this/evaluation order is source-supported but full current Bedrock output is not runtimeverified"
+  ],
+  "selected_source": {
+    "holding": {
+      "resource": "animation.oreville_ans.dpjhxl",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.dpjhxl",
+      "definition": {
+        "loop": "hold_on_last_frame",
+        "blend_weight": 0.5,
+        "bones": {
+          "rightarm": {
+            "rotation": [
+              "-this*v.vbcdda",
+              0,
+              0
+            ]
+          },
+          "leftarm": {
+            "rotation": [
+              "-this*v.wfyvyl",
+              0,
+              0
+            ]
+          },
+          "egjh9rightarm": {
+            "rotation": [
+              "-this*v.vbcdda",
+              0,
+              0
+            ]
+          },
+          "egjh9leftarm": {
+            "rotation": [
+              "-this*v.wfyvyl",
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "fzimtw": {
+      "resource": "animation.oreville_ans.utlfik",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.utlfik",
+      "definition": {
+        "animation_length": 0.3,
+        "bones": {
+          "rightarm": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.0667": {
+                "pre": [
+                  2,
+                  5,
+                  0
+                ],
+                "post": [
+                  2,
+                  5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.1333": {
+                "post": [
+                  -1,
+                  -2.5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2667": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "rightitem": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                -45
+              ],
+              "0.0333": {
+                "pre": [
+                  0,
+                  0,
+                  -45
+                ],
+                "post": [
+                  0,
+                  0,
+                  -45
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.1": {
+                "post": [
+                  0,
+                  10,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.1667": {
+                "post": [
+                  0,
+                  -5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2333": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scale": {
+              "0.0": [
+                0.5,
+                0.5,
+                0.5
+              ],
+              "0.0667": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "egjh9rightarm": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.0667": {
+                "pre": [
+                  2,
+                  5,
+                  0
+                ],
+                "post": [
+                  2,
+                  5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.1333": {
+                "post": [
+                  -1,
+                  -2.5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2667": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "xhexyy": {
+      "resource": "animation.oreville_ans.pyhjiu",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.pyhjiu",
+      "definition": {
+        "animation_length": 0.3,
+        "bones": {
+          "leftarm": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.0667": {
+                "pre": [
+                  2,
+                  5,
+                  0
+                ],
+                "post": [
+                  2,
+                  5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.1333": {
+                "post": [
+                  -1,
+                  -2.5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2667": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "leftitem": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                -45
+              ],
+              "0.0333": {
+                "pre": [
+                  0,
+                  0,
+                  -45
+                ],
+                "post": [
+                  0,
+                  0,
+                  -45
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.1": {
+                "post": [
+                  0,
+                  10,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.1667": {
+                "post": [
+                  0,
+                  -5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2333": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scale": {
+              "0.0": [
+                0.5,
+                0.5,
+                0.5
+              ],
+              "0.0667": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "egjh9leftarm": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.0667": {
+                "pre": [
+                  2,
+                  5,
+                  0
+                ],
+                "post": [
+                  2,
+                  5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.1333": {
+                "post": [
+                  -1,
+                  -2.5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.2667": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "afmdju": {
+      "resource": "animation.oreville_ans.kptsoh",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.kptsoh",
+      "definition": {
+        "loop": "hold_on_last_frame",
+        "animation_length": 0.8333,
+        "bones": {
+          "rightitem": {
+            "position": [
+              0,
+              0,
+              "v.gcywxl=Math.lerp(v.gcywxl,v.tjswog*45,0.05);"
+            ]
+          },
+          "rightarm": {
+            "relative_to": {
+              "rotation": "entity"
+            },
+            "rotation": [
+              "-this+Math.cos(Math.min(q.anim_time,0.375)*480)*42-42",
+              "-this+q.target_y_rotation+v.gcywxl",
+              "-this"
+            ],
+            "position": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.125": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.25": {
+                "post": [
+                  0,
+                  0.85,
+                  -1.25
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.375": {
+                "post": [
+                  0,
+                  0.5,
+                  -1.25
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": [
+                0,
+                0.5,
+                -1.25
+              ]
+            }
+          },
+          "leftarm": {
+            "rotation": [
+              "v.is_holding_left?-this*0.5:0",
+              0,
+              0
+            ]
+          },
+          "waist": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.0833": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.25": {
+                "post": [
+                  0,
+                  0,
+                  3
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.4167": {
+                "post": [
+                  0,
+                  0,
+                  -1.5
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5833": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.75": [
+                0,
+                0,
+                0
+              ]
+            },
+            "position": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.1667": {
+                "pre": [
+                  0,
+                  -0.5,
+                  0
+                ],
+                "post": [
+                  0,
+                  -0.5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3333": {
+                "post": [
+                  0,
+                  0.25,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.6667": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "head": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.1667": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3333": {
+                "post": [
+                  0,
+                  0,
+                  6
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": {
+                "post": [
+                  0,
+                  0,
+                  -1.5
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.6667": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.8333": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "egjh9rightarm": {
+            "relative_to": {
+              "rotation": "entity"
+            },
+            "rotation": [
+              "-this+Math.cos(Math.min(q.anim_time,0.375)*480)*42-42",
+              "-this+q.target_y_rotation+v.gcywxl",
+              "-this"
+            ],
+            "position": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.125": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.25": {
+                "post": [
+                  0,
+                  0.85,
+                  -1.25
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.375": {
+                "post": [
+                  0,
+                  0.5,
+                  -1.25
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": [
+                0,
+                0.5,
+                -1.25
+              ]
+            }
+          },
+          "egjh9leftarm": {
+            "rotation": [
+              "v.is_holding_left?-this*0.5:0",
+              0,
+              0
+            ]
+          },
+          "egjh9waist": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.0833": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.25": {
+                "post": [
+                  0,
+                  0,
+                  3
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.4167": {
+                "post": [
+                  0,
+                  0,
+                  -1.5
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5833": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.75": [
+                0,
+                0,
+                0
+              ]
+            },
+            "position": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.1667": {
+                "pre": [
+                  0,
+                  -0.5,
+                  0
+                ],
+                "post": [
+                  0,
+                  -0.5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3333": {
+                "post": [
+                  0,
+                  0.25,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.6667": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "egjh9head": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.1667": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3333": {
+                "post": [
+                  0,
+                  0,
+                  6
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": {
+                "post": [
+                  0,
+                  0,
+                  -1.5
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.6667": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.8333": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "lsiklr": {
+      "resource": "animation.oreville_ans.htayuy",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.htayuy",
+      "definition": {
+        "loop": "hold_on_last_frame",
+        "animation_length": 0.8333,
+        "bones": {
+          "leftitem": {
+            "position": [
+              0,
+              0,
+              "v.gcywxl=Math.lerp(v.gcywxl,v.tjswog*45,0.05);"
+            ]
+          },
+          "leftarm": {
+            "relative_to": {
+              "rotation": "entity"
+            },
+            "rotation": [
+              "-this+Math.cos(Math.min(q.anim_time,0.375)*480)*42-42",
+              "-this+q.target_y_rotation+v.gcywxl",
+              "-this"
+            ],
+            "position": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.125": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.25": {
+                "post": [
+                  0,
+                  0.85,
+                  -1.25
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.375": {
+                "post": [
+                  0,
+                  0.5,
+                  -1.25
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": [
+                0,
+                0.5,
+                -1.25
+              ]
+            }
+          },
+          "waist": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.0833": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.25": {
+                "post": [
+                  0,
+                  0,
+                  3
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.4167": {
+                "post": [
+                  0,
+                  0,
+                  -1.5
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5833": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.75": [
+                0,
+                0,
+                0
+              ]
+            },
+            "position": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.1667": {
+                "pre": [
+                  0,
+                  -0.5,
+                  0
+                ],
+                "post": [
+                  0,
+                  -0.5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3333": {
+                "post": [
+                  0,
+                  0.25,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.6667": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "head": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.1667": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3333": {
+                "post": [
+                  0,
+                  0,
+                  6
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": {
+                "post": [
+                  0,
+                  0,
+                  -1.5
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.6667": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.8333": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "egjh9leftarm": {
+            "relative_to": {
+              "rotation": "entity"
+            },
+            "rotation": [
+              "-this+Math.cos(Math.min(q.anim_time,0.375)*480)*42-42",
+              "-this+q.target_y_rotation+v.gcywxl",
+              "-this"
+            ],
+            "position": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.125": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.25": {
+                "post": [
+                  0,
+                  0.85,
+                  -1.25
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.375": {
+                "post": [
+                  0,
+                  0.5,
+                  -1.25
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": [
+                0,
+                0.5,
+                -1.25
+              ]
+            }
+          },
+          "egjh9waist": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.0833": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.25": {
+                "post": [
+                  0,
+                  0,
+                  3
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.4167": {
+                "post": [
+                  0,
+                  0,
+                  -1.5
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5833": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.75": [
+                0,
+                0,
+                0
+              ]
+            },
+            "position": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.1667": {
+                "pre": [
+                  0,
+                  -0.5,
+                  0
+                ],
+                "post": [
+                  0,
+                  -0.5,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3333": {
+                "post": [
+                  0,
+                  0.25,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.6667": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "egjh9head": {
+            "rotation": {
+              "0.0": [
+                0,
+                0,
+                0
+              ],
+              "0.1667": {
+                "pre": [
+                  0,
+                  0,
+                  0
+                ],
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.3333": {
+                "post": [
+                  0,
+                  0,
+                  6
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.5": {
+                "post": [
+                  0,
+                  0,
+                  -1.5
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.6667": {
+                "post": [
+                  0,
+                  0,
+                  0
+                ],
+                "lerp_mode": "catmullrom"
+              },
+              "0.8333": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "kcexxa": {
+      "resource": "controller.animation.oreville_ans.njvelc",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.njvelc",
+      "definition": {
+        "states": {
+          "default": {
+            "animations": [
+              "bob",
+              "holding",
+              {
+                "afmdju": "v.orsuss&&!q.is_gliding&&!q.is_swimming&&!q.is_emoting"
+              },
+              {
+                "prhiys": "v.jycjqy=='slime'"
+              },
+              {
+                "hxygku": "v.tnlxsa==6"
+              },
+              {
+                "zoqgum": "v.tnlxsa==5"
+              },
+              {
+                "bqvlex": "v.tnlxsa==4"
+              },
+              {
+                "qdyytq": "v.tnlxsa==3"
+              }
+            ],
+            "transitions": [
+              {
+                "ssulqn": "v.is_holding_right"
+              }
+            ]
+          },
+          "ydkyzm": {
+            "on_entry": [
+              "v.nshrzx=q.get_equipped_item_name(0);"
+            ],
+            "animations": [
+              "afmdju",
+              "bob",
+              {
+                "prhiys": "v.jycjqy=='slime'"
+              },
+              {
+                "hxygku": "v.tnlxsa==6"
+              },
+              {
+                "zoqgum": "v.tnlxsa==5"
+              },
+              {
+                "bqvlex": "v.tnlxsa==4"
+              },
+              {
+                "qdyytq": "v.tnlxsa==3"
+              }
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!v.oreville_mainhand_hold_up&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.mainhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+              },
+              {
+                "nxbnll": "q.is_gliding||q.is_swimming||v.gddzeg"
+              },
+              {
+                "default": "v.nshrzx!=q.get_equipped_item_name(0)"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "nxbnll": {
+            "animations": [
+              "bob",
+              {
+                "prhiys": "v.jycjqy=='slime'"
+              },
+              {
+                "hxygku": "v.tnlxsa==6"
+              },
+              {
+                "zoqgum": "v.tnlxsa==5"
+              },
+              {
+                "bqvlex": "v.tnlxsa==4"
+              },
+              {
+                "qdyytq": "v.tnlxsa==3"
+              }
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!v.oreville_mainhand_hold_up&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.mainhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+              },
+              {
+                "ydkyzm": "!q.is_gliding&&!q.is_swimming&&!q.is_emoting&&!v.gddzeg"
+              }
+            ]
+          },
+          "ssulqn": {
+            "on_entry": [
+              "v.nshrzx=q.get_equipped_item_name(0);",
+              "v.zwbsgq=v.ecmehq;",
+              "v.kmvnpf=-1;"
+            ],
+            "animations": [
+              "bob",
+              {
+                "holding": "!v.yyjpfg"
+              },
+              "fzimtw",
+              {
+                "afmdju": "v.orsuss&&!q.is_gliding&&!q.is_swimming&&!q.is_emoting&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shield'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+              },
+              {
+                "prhiys": "v.jycjqy=='slime'"
+              },
+              {
+                "hxygku": "v.tnlxsa==6"
+              },
+              {
+                "zoqgum": "v.tnlxsa==5"
+              },
+              {
+                "bqvlex": "v.tnlxsa==4"
+              },
+              {
+                "qdyytq": "v.tnlxsa==3"
+              }
+            ],
+            "transitions": [
+              {
+                "edebnx": "(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))"
+              },
+              {
+                "tjnuyj": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))"
+              },
+              {
+                "ltqtzr": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))"
+              },
+              {
+                "crwayt": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))&&!q.is_item_equipped('off_hand')"
+              },
+              {
+                "ydkyzm": "v.oreville_mainhand_hold_up||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.mainhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+              },
+              {
+                "lvkwjg": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+              },
+              {
+                "rfcjcg": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))"
+              },
+              {
+                "cfsugb": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_spear','minecraft:is_spear'))"
+              },
+              {
+                "default": "v.kmvnpf<1&&v.noseiv?{v.kmvnpf=v.kmvnpf+1;};return v.nshrzx!=q.get_equipped_item_name(0)||(v.zwbsgq!=v.ecmehq&&v.kmvnpf);"
+              }
+            ]
+          },
+          "edebnx": {
+            "animations": [
+              {
+                "mtgdcm": "!v.is_holding_left-v.jkpkmj"
+              },
+              {
+                "ypjqpd": "v.is_holding_left"
+              },
+              "mshwsb",
+              "fzimtw"
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "ltqtzr": {
+            "animations": [
+              "mshwsb",
+              {
+                "tcucxa": "1-v.jkpkmj"
+              }
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))"
+              },
+              {
+                "ieyepd": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "tjnuyj": {
+            "on_entry": [
+              "v.nshrzx=q.get_equipped_item_name(0);"
+            ],
+            "animations": [
+              {
+                "bphbtz": "1-v.jkpkmj"
+              },
+              {
+                "tjnuyj": "1-v.jkpkmj"
+              },
+              "mshwsb"
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))"
+              },
+              {
+                "ieyepd": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "lvkwjg": {
+            "on_entry": [
+              "v.nshrzx=q.get_equipped_item_name(0);"
+            ],
+            "animations": [
+              "bob",
+              {
+                "qturaa": "1-v.jkpkmj"
+              },
+              {
+                "prhiys": "v.jycjqy=='slime'"
+              },
+              {
+                "hxygku": "v.tnlxsa==6"
+              },
+              {
+                "zoqgum": "v.tnlxsa==5"
+              },
+              {
+                "bqvlex": "v.tnlxsa==4"
+              },
+              {
+                "qdyytq": "v.tnlxsa==3"
+              }
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+              },
+              {
+                "ieyepd": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "rfcjcg": {
+            "on_entry": [
+              "v.nshrzx=q.get_equipped_item_name(0);"
+            ],
+            "animations": [
+              "bob",
+              {
+                "bphbtz": "!v.is_holding_left"
+              },
+              {
+                "shears": "v.is_holding_left?0:1-v.jkpkmj"
+              },
+              {
+                "uyaebq": "v.is_holding_left"
+              },
+              {
+                "prhiys": "v.jycjqy=='slime'"
+              },
+              {
+                "hxygku": "v.tnlxsa==6"
+              },
+              {
+                "zoqgum": "v.tnlxsa==5"
+              },
+              {
+                "bqvlex": "v.tnlxsa==4"
+              },
+              {
+                "qdyytq": "v.tnlxsa==3"
+              }
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))"
+              },
+              {
+                "ieyepd": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "cfsugb": {
+            "on_entry": [
+              "v.nshrzx=q.get_equipped_item_name(0);"
+            ],
+            "animations": [
+              "whatac",
+              "mshwsb",
+              {
+                "prhiys": "v.jycjqy=='slime'"
+              },
+              {
+                "hxygku": "v.tnlxsa==6"
+              },
+              {
+                "zoqgum": "v.tnlxsa==5"
+              },
+              {
+                "bqvlex": "v.tnlxsa==4"
+              },
+              {
+                "qdyytq": "v.tnlxsa==3"
+              }
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_spear','minecraft:is_spear'))"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "crwayt": {
+            "on_entry": [
+              "v.nshrzx=q.get_equipped_item_name(0);"
+            ],
+            "animations": [
+              "bob",
+              "bphbtz",
+              "tvugex",
+              {
+                "prhiys": "v.jycjqy=='slime'"
+              },
+              {
+                "hxygku": "v.tnlxsa==6"
+              },
+              {
+                "zoqgum": "v.tnlxsa==5"
+              },
+              {
+                "bqvlex": "v.tnlxsa==4"
+              },
+              {
+                "qdyytq": "v.tnlxsa==3"
+              }
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "v.nshrzx!=q.get_equipped_item_name(0)||!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))"
+              },
+              {
+                "etuxkz": "q.get_equipped_item_name(1)!=''||q.is_in_water"
+              }
+            ]
+          },
+          "etuxkz": {
+            "animations": [
+              "bob",
+              "bbvbhl",
+              "etuxkz",
+              {
+                "prhiys": "v.jycjqy=='slime'"
+              },
+              {
+                "hxygku": "v.tnlxsa==6"
+              },
+              {
+                "zoqgum": "v.tnlxsa==5"
+              },
+              {
+                "bqvlex": "v.tnlxsa==4"
+              },
+              {
+                "qdyytq": "v.tnlxsa==3"
+              }
+            ],
+            "on_entry": [
+              "v.uwdhym=0;"
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))||(v.uwdhym&&!q.is_in_water&&q.ground_speed==0)"
+              }
+            ],
+            "blend_transition": 0.15
+          },
+          "ieyepd": {
+            "animations": [
+              {
+                "holding": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))?2:1"
+              },
+              "mshwsb",
+              {
+                "zxbclh": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))"
+              }
+            ],
+            "transitions": [
+              {
+                "ltqtzr": "!q.blocking&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))"
+              },
+              {
+                "tjnuyj": "!q.blocking&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))"
+              },
+              {
+                "lvkwjg": "!q.blocking&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+              },
+              {
+                "rfcjcg": "!q.blocking&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))"
+              },
+              {
+                "default": "!v.is_holding_right"
+              },
+              {
+                "ssulqn": "!q.blocking"
+              }
+            ],
+            "blend_transition": 0.16
+          }
+        }
+      }
+    },
+    "wjfipe": {
+      "resource": "controller.animation.oreville_ans.dpcxlx",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.dpcxlx",
+      "definition": {
+        "states": {
+          "default": {
+            "animations": [
+              {
+                "lsiklr": "v.jiqwge&&!q.is_gliding&&!q.is_swimming&&!q.is_emoting&&!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))&&!(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+              }
+            ],
+            "transitions": [
+              {
+                "ssulqn": "v.is_holding_left"
+              }
+            ]
+          },
+          "ydkyzm": {
+            "on_entry": [
+              "v.enkwhe=q.get_equipped_item_name(1);"
+            ],
+            "animations": [
+              "lsiklr"
+            ],
+            "transitions": [
+              {
+                "default": "!v.is_holding_left"
+              },
+              {
+                "ssulqn": "!v.oreville_offhand_hold_up&&!(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.offhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+              },
+              {
+                "nxbnll": "q.is_gliding||q.is_swimming||v.gddzeg"
+              },
+              {
+                "default": "v.enkwhe!=q.get_equipped_item_name(1)"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "nxbnll": {
+            "transitions": [
+              {
+                "default": "!v.is_holding_left"
+              },
+              {
+                "ssulqn": "!v.oreville_offhand_hold_up&&!(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.offhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+              },
+              {
+                "ydkyzm": "!q.is_gliding&&!q.is_swimming&&!q.is_emoting&&!v.gddzeg"
+              }
+            ]
+          },
+          "ssulqn": {
+            "on_entry": [
+              "v.enkwhe=q.get_equipped_item_name(1);"
+            ],
+            "animations": [
+              "xhexyy",
+              {
+                "lsiklr": "v.jiqwge&&!q.is_gliding&&!q.is_swimming&&!q.is_emoting&&!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))&&!(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+              }
+            ],
+            "transitions": [
+              {
+                "ydkyzm": "v.oreville_offhand_hold_up||(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.offhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+              },
+              {
+                "default": "v.enkwhe!=q.get_equipped_item_name(1)"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
