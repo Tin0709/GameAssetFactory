@@ -53,5 +53,7 @@
   "backup_directory": "/Users/tin/Documents/ChatGPT/New project/experiments/showcase_actions_stuff_focus_v001/backup",
   "texture_paths_and_packed_images_exact": true,
   "archive_toggle_preserves_primary_playhead": true,
-  "permanent_focus_recorded": true
+  "permanent_focus_recorded": true,
+  "native_regression_tests_passed": 7,
+  "independent_review": "No Critical or Important findings"
 }
