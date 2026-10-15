@@ -80,6 +80,10 @@ func _has_jump_layers() -> bool:
 	for alias in ["ngeixo","pyhwuc","muiqdc"]:
 		var c: Dictionary=jump_snapshot.controllers[alias]
 		if c.state not in ["default","zhbjho"] or c.outgoing!=null:return true
+	# Sprint landing's authored stop clip outlives the landing controller.
+	# Retain it through its final fade, without changing ordinary ground runs.
+	var sprint: Dictionary=jump_snapshot.controllers.psowex
+	if jump_active and (sprint.state=="stop" or sprint.outgoing=="stop"):return true
 	return false
 
 func _clear_jump_contacts() -> void:
