@@ -73,3 +73,29 @@ func _retarget() -> void:
 	for i in names.size():
 		var name := names[i]
 		if desired.has(name): poses[i] = Transform3D(desired[parents[name]]).affine_inverse()*Transform3D(desired[name]) if parents[name] != "" else desired[name]
+
+func future_snapshot(snapshot: Dictionary, ahead: float) -> Dictionary:
+	## Finite-difference pose probe, no controller transitions or timeline firing.
+	## Freeze state/weights/other smoothed variables; advance authored clip clocks
+	## and age only. Never mutates the live source environment or its snapshot.
+	assert(is_finite(ahead) and ahead >= 0.0)
+	var future: Dictionary = snapshot.duplicate(true)
+	future.life = float(snapshot.get("life",0.0))+ahead
+	future.phase = float(snapshot.get("phase",0.0))+ahead*float(snapshot.get("cadence",0.0))
+	future.phase01 = fposmod(float(future.phase),1.0)
+	future.vars["v.eqhdel"] = future.phase
+	future.vars["v.ifcvde"] = future.phase01
+	if future.has("state_time"): future.state_time = float(future.state_time)+ahead
+	future.query["q.life_time"] = future.life
+	future.query["q.delta_time"] = ahead
+	var environment := _environment(future,0.0)
+	for layer in future.get("layers",[]):
+		var clip: Dictionary = data.clips[layer.alias]
+		environment["q.anim_time"] = float(layer.clock)
+		var clock := float(VM.execute(clip.anim_time_update,environment)) if clip.anim_time_update != null else float(layer.clock)+ahead
+		if clip.loop is bool and clip.loop and clip.animation_length:
+			clock = fposmod(clock,float(clip.animation_length))
+		elif clip.animation_length:
+			clock = minf(clock,float(clip.animation_length))
+		layer.clock = clock
+	return future
