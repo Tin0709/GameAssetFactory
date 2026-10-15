@@ -1,7 +1,7 @@
 extends SceneTree
 ## Frozen Python full-runtime oracle. Run 30/60 rendered frames at 60-Hz source
 ## substeps, compare every variable, local clock, fade, layer and PRS channel.
-const FIXTURES := "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/jump_fixtures.json"
+const FIXTURES := "res://scenes/dev/actions_stuff_research/tests/fixtures/jump_fixtures.json.gz"
 var failures: Array[String] = []
 var max_variable := 0.0
 var max_channel := 0.0
@@ -35,7 +35,7 @@ func run() -> void:
 	actor.get_node("Visual").set_process(false)
 	var rig: Skeleton3D = actor.visual.skeleton
 	var sampler = load(sampler_path).new(rig)
-	var fixtures: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FIXTURES))
+	var fixtures: Dictionary = JSON.parse_string(FileAccess.get_file_as_bytes(FIXTURES).decompress_dynamic(64*1024*1024,FileAccess.COMPRESSION_GZIP).get_string_from_utf8())
 	var samples := 0
 	var seen_states := {}
 	var seen_overrides := {}
