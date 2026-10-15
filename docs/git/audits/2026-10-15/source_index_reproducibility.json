@@ -1,0 +1,31 @@
+{
+  "pack": "/Users/tin/Desktop/Game Dev/local_references/Actions Stuff 1.12 (resources).mcpack",
+  "pack_exists": true,
+  "pack_bytes": 33884235,
+  "pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "index_bytes": 67047538,
+  "index_sha256": "08f3a2261d8d2abb4fd1e3c9f7dba54b77d31971b16e0ac817acd960db43f26a",
+  "index_entries": 7819,
+  "source_pack_paths": 677,
+  "index_prefix_counts": {
+    "animation": 2866,
+    "controller": 1737,
+    "geometry": 3216
+  },
+  "regenerated_entries": 7819,
+  "parsed_data_equal": true,
+  "byte_exact_indent2_serialization": true,
+  "regenerated_sha256": "08f3a2261d8d2abb4fd1e3c9f7dba54b77d31971b16e0ac817acd960db43f26a",
+  "parse_errors": [],
+  "duplicate_ids": [],
+  "missing_ids": [],
+  "extra_ids": [],
+  "changed_data_ids": [],
+  "dependency_notes": [
+    "Index generation is not packaged as a dedicated original generator in repository; this audit reconstruction independently reproduces archive path traversal and flattening.",
+    "Existing build_audit_evidence.py consumes source_index.json and absolute external PACK path.",
+    "Pack is external to repository, proprietary source-derived research input; reproduction requires local matching SHA256 archive.",
+    "Runtime Idle uses its own extracted payload/program and does not load source_index.json.",
+    "No index content is needed for running approved Godot test scene; retain audit provenance and selected evidence if later choosing to externalize generated full index."
+  ]
+}

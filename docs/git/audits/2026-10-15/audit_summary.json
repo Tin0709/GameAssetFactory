@@ -1,0 +1,61 @@
+{
+  "head_start": "39f126e7122208fc77a93bd410de505de18eea5e",
+  "head_end": "39f126e7122208fc77a93bd410de505de18eea5e",
+  "captured_utc": "2026-10-15T02:54:32.780328+00:00",
+  "status": " M game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_idle_source.gd\n",
+  "ordinary_head_above_mib": {
+    "25": 1,
+    "50": 1,
+    "100": 0
+  },
+  "tracked_lfs_paths": 368,
+  "tracked_lfs_unique_objects": 349,
+  "tracked_lfs_unique_bytes": 4838545655,
+  "tracked_lfs_above_mib": {
+    "25": 26,
+    "50": 20,
+    "100": 13
+  },
+  "historical_reachable_lfs_unique_objects": 590,
+  "historical_reachable_lfs_unique_bytes": 9974290509,
+  "local_lfs_unique_objects": 385,
+  "local_lfs_unique_bytes": 5694580347,
+  "head_lfs_not_cached_locally": [],
+  "reachable_lfs_not_cached_locally": 205,
+  "local_lfs_not_reachable": 0,
+  "git_count_objects": "count: 2365\nsize: 189.17 MiB\nin-pack: 29113\npacks: 1\nsize-pack: 7.76 GiB\nprune-packable: 0\ngarbage: 0\nsize-garbage: 0 bytes\n",
+  "core_hooksPath": "",
+  "hooks": [
+    {
+      "path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/.git/hooks/post-commit",
+      "executable": true,
+      "bytes": 356,
+      "sha256": "f3eb4d1f62924c09d481a0563a84b158c66eb2feb3431cfdb3e6760aab4d661d",
+      "text": "#!/bin/sh\ncommand -v git-lfs >/dev/null 2>&1 || { printf >&2 \"\\n%s\\n\\n\" \"This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting the 'post-commit' file in the hooks directory (set by 'core.hookspath'; usually '.git/hooks').\"; exit 2; }\ngit lfs post-commit \"$@\"\n"
+    },
+    {
+      "path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/.git/hooks/post-checkout",
+      "executable": true,
+      "bytes": 360,
+      "sha256": "8d606e58cce98604696a4abcf3ae1ebde6f9f31ac72bb0d44e2444cc39f26030",
+      "text": "#!/bin/sh\ncommand -v git-lfs >/dev/null 2>&1 || { printf >&2 \"\\n%s\\n\\n\" \"This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting the 'post-checkout' file in the hooks directory (set by 'core.hookspath'; usually '.git/hooks').\"; exit 2; }\ngit lfs post-checkout \"$@\"\n"
+    },
+    {
+      "path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/.git/hooks/pre-push",
+      "executable": true,
+      "bytes": 350,
+      "sha256": "a52d0510d0f8c75e27852156ec6f7791f0d8ed65fc58fcc368dd1de0a60a1d74",
+      "text": "#!/bin/sh\ncommand -v git-lfs >/dev/null 2>&1 || { printf >&2 \"\\n%s\\n\\n\" \"This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting the 'pre-push' file in the hooks directory (set by 'core.hookspath'; usually '.git/hooks').\"; exit 2; }\ngit lfs pre-push \"$@\"\n"
+    },
+    {
+      "path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/.git/hooks/post-merge",
+      "executable": true,
+      "bytes": 354,
+      "sha256": "cecb594e8fa65831654fc95e96db9f1249e09c52810c6fbb2b428280aac22158",
+      "text": "#!/bin/sh\ncommand -v git-lfs >/dev/null 2>&1 || { printf >&2 \"\\n%s\\n\\n\" \"This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting the 'post-merge' file in the hooks directory (set by 'core.hookspath'; usually '.git/hooks').\"; exit 2; }\ngit lfs post-merge \"$@\"\n"
+    }
+  ],
+  "attributes": "*.blend filter=lfs diff=lfs merge=lfs -text\n*.fbx filter=lfs diff=lfs merge=lfs -text\n*.glb filter=lfs diff=lfs merge=lfs -text\n*.gltf filter=lfs diff=lfs merge=lfs -text\n*.wav filter=lfs diff=lfs merge=lfs -text\n*.mp3 filter=lfs diff=lfs merge=lfs -text\n*.ogg filter=lfs diff=lfs merge=lfs -text\n*.zip filter=lfs diff=lfs merge=lfs -text\n\n# New/edited portable entry points use explicit line endings. Do not renormalize\n# the whole historical tree or alter existing binary LFS objects.\nscripts/*.py text eol=lf\nscripts/tests/*.py text eol=lf\nscripts/*.ps1 text eol=crlf\nscripts/*.sh text eol=lf\ndocs/setup/*.md text eol=lf\n",
+  "lfs_version": "git-lfs/3.8.0 (GitHub; darwin arm64; go 1.27.1)",
+  "limits": "Remote storage/bandwidth quota, usage and account billing are unavailable from this local audit."
+}

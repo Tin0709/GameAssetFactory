@@ -62,8 +62,10 @@ or the standard LFS pre-push. The hook prefers the Windows `py -3` launcher when
 available, then `python3`, then `python`, and runs the guard from the repository root. Installation
 is local and is not enabled merely by cloning these source files.
 
-No hook has been installed in the working repository as part of adding these
-tools. Tests install hooks only inside disposable temporary Git repositories.
+The local Mac clone now has this pre-commit installed (2026-10-15); invoking
+the actual hook passes and the existing LFS pre-push hash remains unchanged.
+Every other clone, including Windows, must run the installer independently.
+Tests install hooks only inside disposable temporary Git repositories.
 Normal `git commit` honors pre-commit; `--no-verify` and tools that bypass hooks
 do not. The local `com.tin.gameasset-autocommit` LaunchAgent runs
 `~/.local/share/gameasset-autocommit/autocommit.py`. Read-only inspection found

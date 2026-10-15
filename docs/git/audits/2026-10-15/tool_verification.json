@@ -1,0 +1,46 @@
+{
+  "captured_utc": "2026-10-15T03:07:54.975107+00:00",
+  "head_now": "ad495168fd1a524f17eed3c5f81d7babb5aa5528",
+  "suite_exit": 0,
+  "suite_log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_idle_gameplay_v001/guard_audit/git_large_files/tool_test_log.txt",
+  "checks": [
+    {
+      "command": [
+        "sh",
+        "-n",
+        "scripts/git_hooks/pre-commit"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/git_large_file_guard.py"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/install_git_hooks.py",
+        "--dry-run"
+      ],
+      "exit": 0,
+      "stdout": "Would install /Users/tin/Desktop/Game Dev/GameAssetFactory/.git/hooks/pre-commit; existing pre-push and Git config stay unchanged.\n",
+      "stderr": ""
+    }
+  ],
+  "prepush_sha256": "a52d0510d0f8c75e27852156ec6f7791f0d8ed65fc58fcc368dd1de0a60a1d74",
+  "prepush_preserved": true,
+  "actual_precommit_present": false,
+  "autosync_source": "/Users/tin/.local/share/gameasset-autocommit/autocommit.py",
+  "autosync_normal_commit_no_bypass": true,
+  "autosync_alternate_index_supported": true,
+  "actual_daemon_with_hook_tested": false,
+  "canonical_source_index_sha256": "08f3a2261d8d2abb4fd1e3c9f7dba54b77d31971b16e0ac817acd960db43f26a",
+  "agent_git_mutations_performed": false
+}
