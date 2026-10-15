@@ -1,0 +1,138 @@
+{
+  "reachable_player_alias_count": 663,
+  "persona_blink_alias": "controller.animation.persona.blink",
+  "persona_blink_defined_in_pack": false,
+  "persona_blink_in_reachable_player_graph": false,
+  "reachable_player_blink_edges": [],
+  "missing_referenced_aliases": {
+    "look_at_target_ui": "animation.player.look_at_target.ui",
+    "tmxius": "animation.player.riding.arms",
+    "sleeping": "animation.player.sleeping"
+  },
+  "tculwn_normal_and_egjh9_body_curves_equal": true,
+  "idle_clip_metadata": [
+    {
+      "alias": "tculwn",
+      "id": "animation.oreville_ans.jcyjaa",
+      "length": 4.2083,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "qofebb",
+      "id": "animation.oreville_ans.covlms",
+      "length": 4,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "hyopyb",
+      "id": "animation.oreville_ans.uwfmen",
+      "length": 3.3333,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "lsswib",
+      "id": "animation.oreville_ans.crjmdq",
+      "length": 3.8333,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "vmmadd",
+      "id": "animation.oreville_ans.upcdwt",
+      "length": 3.5833,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "sztvzu",
+      "id": "animation.oreville_ans.oznpfw",
+      "length": 2.7917,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "ksxdmq",
+      "id": "animation.oreville_ans.tzwuhb",
+      "length": 5.375,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "iljvrj",
+      "id": "animation.oreville_ans.ugcwbv",
+      "length": 6.5,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "nqwtki",
+      "id": "animation.oreville_ans.cohizd",
+      "length": 4.9583,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "gppwit",
+      "id": "animation.oreville_ans.rdcche",
+      "length": 4.125,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "qsuikd",
+      "id": "animation.oreville_ans.xrbooj",
+      "length": 5.7917,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "ndhbnd",
+      "id": "animation.oreville_ans.vhtneu",
+      "length": 5.3793,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "jwkabt",
+      "id": "animation.oreville_ans.ioecdr",
+      "length": 5.7917,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "rgrypt",
+      "id": "animation.oreville_ans.hxtrev",
+      "length": 3.6667,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "hbadod",
+      "id": "animation.oreville_ans.fizksm",
+      "length": 3.6667,
+      "loop": false,
+      "timeline": null
+    },
+    {
+      "alias": "cpnaoo",
+      "id": "animation.oreville_ans.eeoqqt",
+      "length": 3.6667,
+      "loop": false,
+      "timeline": null
+    }
+  ],
+  "player_head_face_source_paths": [
+    "animation_controllers/616f2ff7.json",
+    "animations/f2da1071.json",
+    "entity/dtr.json",
+    "manifest.json",
+    "materials/entity.material",
+    "models/entity/464e95f8.json",
+    "models/entity/464ef792.json",
+    "render_controllers/464e7f72.json",
+    "texts/en_US.lang"
+  ]
+}

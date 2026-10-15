@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "one_new_pending_action": "Idle_ActionsStuff_Source_Test_v001",
+  "prior_actions_exact": 78,
+  "all_prior_datablocks_exact": true,
+  "old_registrations_exact": true,
+  "old_review_sequences_and_statuses_exact": true,
+  "focus_entries": 11,
+  "all_entries": 46,
+  "archived_entries": 35,
+  "no_ui_code_change": true,
+  "no_existing_blend_saved": true
+}

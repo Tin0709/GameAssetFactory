@@ -1,0 +1,80 @@
+{
+  "duration_s": 9,
+  "hz": 240,
+  "sample_count": 2161,
+  "profile": "ordinary_default_tnlxsa0_unarmed_grounded_local",
+  "seed": 2,
+  "history": {
+    "initial_life": 12.0,
+    "attack_free_age": 12.0,
+    "modified_distance_moved": 1.0,
+    "position": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "head_yaw": 0.0,
+    "body_yaw": 0.0
+  },
+  "random_draws": [
+    {
+      "function": "math.random_integer",
+      "args": [
+        1.0,
+        12.0
+      ],
+      "value": 1,
+      "life": 15.008333333333162
+    }
+  ],
+  "changes": [
+    {
+      "time_s": 0.0,
+      "source_life": 12.004166666666666,
+      "state": "wkbbnc",
+      "outgoing": null
+    },
+    {
+      "time_s": 3.0,
+      "source_life": 15.004166666666496,
+      "state": "ssaxeh",
+      "outgoing": null
+    },
+    {
+      "time_s": 3.004166666666667,
+      "source_life": 15.008333333333162,
+      "state": "blzrmm",
+      "outgoing": null
+    },
+    {
+      "time_s": 3.0083333333333333,
+      "source_life": 15.012499999999829,
+      "state": "tculwn",
+      "outgoing": null
+    },
+    {
+      "time_s": 7.216666666666667,
+      "source_life": 19.220833333332923,
+      "state": "bhsawv",
+      "outgoing": "tculwn"
+    },
+    {
+      "time_s": 7.566666666666666,
+      "source_life": 19.570833333332903,
+      "state": "wkbbnc",
+      "outgoing": null
+    }
+  ],
+  "engine_conventions": [
+    "python_random_MT19937_seeded_integer_inclusive_source_PRNG_unknown",
+    "positive_only_unnormalized_controller_and_clip_weights_engine_unmeasured",
+    "uniform_catmull_duplicate_endpoints",
+    "one_ordered_transition_per_controller_per_step_then_new_state_clock_zero",
+    "linear_outgoing_source_duration_fades_outgoing_clocks_continue",
+    "recursive_source_animation_order_with_each_controller_stepped_once",
+    "this_is_accumulated_same_axis_channel",
+    "source_upstream_skeleton_only_face_and_final_geometry_capture_excluded"
+  ],
+  "first_life": 12.004166666666666,
+  "last_life": 21.004166666666155
+}

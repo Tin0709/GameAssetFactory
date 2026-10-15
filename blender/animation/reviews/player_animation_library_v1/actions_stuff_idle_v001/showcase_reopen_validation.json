@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "fresh_source_reopen": false,
+  "fresh_showcase_reopen": true,
+  "one_new_action": true,
+  "samples": 1139,
+  "max_matrix_component_error": 2.8014183044433594e-06,
+  "max_head_translation_m": 8.345980623666654e-07,
+  "max_forearm_basis_error": 0.0,
+  "lowest_sole_above_constant_floor_m": 0.0005010711029171944,
+  "pending_research_only": true,
+  "not_forced_seamless": true,
+  "all_previous_entries_and_statuses_preserved": true,
+  "all_previous_data_fingerprints_preserved": true,
+  "old_entries_selectable_and_archived_recoverable": true,
+  "no_saves": true
+}

@@ -1,0 +1,54 @@
+{
+  "contract_path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/blockbench_pipeline_v1/bridge_contract.json",
+  "bone_names": [
+    "Root",
+    "Hips",
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "UpperArm.L",
+    "ForeArm.L",
+    "UpperArm.R",
+    "ForeArm.R",
+    "WeaponCarrier",
+    "Leg.L",
+    "Leg.R"
+  ],
+  "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+  "head_proxy": [
+    {
+      "name": "Head",
+      "uuid": "2c7a681e-278b-50eb-855d-8cf8362f39d0",
+      "bone": "Head",
+      "from": [
+        -3.5999999046325684,
+        21.600000381469727,
+        -3.5999999046325684
+      ],
+      "to": [
+        3.5999999046325684,
+        28.799999237060547,
+        3.5999999046325684
+      ],
+      "origin": [
+        0.0,
+        21.599998474121094,
+        -0.0
+      ],
+      "color": 0
+    }
+  ],
+  "source_channels_bones": [
+    "root",
+    "waist",
+    "body",
+    "head",
+    "rightarm",
+    "leftarm",
+    "rightleg",
+    "leftleg"
+  ],
+  "source_channels_path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/immutable_dependencies/source_channels.py",
+  "retarget_path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_retarget.py"
+}

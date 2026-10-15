@@ -1,0 +1,27 @@
+{
+  "pack_path": "/Users/tin/Desktop/Game Dev/local_references/Actions Stuff 1.12 (resources).mcpack",
+  "pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "files": {
+    "entity/dtr.json": {
+      "path": "player_entity.raw.json",
+      "sha256": "e6f3db842fb0dd2b2d770a390e166f0ae95f93659c759c597b5091d5c3a25dd2",
+      "bytes": 86259
+    },
+    "animations/f2da1071.json": {
+      "path": "player_animations.raw.json",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "bytes": 6159725
+    },
+    "animation_controllers/616f2ff7.json": {
+      "path": "player_controllers.raw.json",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "bytes": 630036
+    }
+  },
+  "frozen_dependencies": {
+    "source_channels.py": "a735cb949daa1a0c1550aaf49b3a953bff45eb1c11ddb19934d0ca254a2bd951",
+    "jump_runtime.py": "d8af03b3d31b47b755f13191b617a8fb413d65a225ee1eb5c62751e70306f0c7",
+    "source_simulation.py": "7eb9b55df12313a505aa20aff8173953b40ad60baf8d00e1ae9338aacd38372e",
+    "molang.py": "5275f80846ff22424509a7f65cac3b7ef8ad9a42ade25895402628bf8b74edc0"
+  }
+}
