@@ -92,7 +92,7 @@
       0
     ]
   ],
-  "assembly_clearance": "64mm attention clearance,5.5mm Neck release; original grip preserved; whole upper body and holding frame share11deg ready blade.",
+  "assembly_clearance": "64mm attention clearance,8mm base Neck release plus5.5mm attention release; original grip preserved; whole upper body and holding frame share11deg ready blade.",
   "pelvis_weight_keys": [
     [
       0,
@@ -138,6 +138,6 @@
   "breath": "Original1s holding rebound,4s weight drift informed by crossbow4:1 harmonic structure.10mm pelvis/4mm chest; identical arm/weapon frame suppresses free swing.",
   "common_rigid_holding_assembly": true,
   "authored_independently": true,
-  "base_entry_sha256": "14346fccd37c4db3a687cf46c4b6cd5c0f264bd04a2bc3ec900d98eeb0d5573b",
+  "base_entry_sha256": "c6dca2e48009ef81e55ad3ed020abd838640f0f3f7bef772bcaa5d252368271c",
   "source_keyframes_imported": false
 }
