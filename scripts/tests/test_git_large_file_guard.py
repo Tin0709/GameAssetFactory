@@ -152,6 +152,23 @@ class GitToolTests(unittest.TestCase):
         self.assertIn("new asset.bin", result.stderr)
         self.assertNotIn("old asset.bin", result.stderr)
 
+    def test_guard_uses_inherited_alternate_index_for_autocommit(self):
+        oid = self.stage("blocked.bin", size=100 * MIB + 1)
+        self.git("update-index", "--force-remove", "blocked.bin")
+        self.stage("small.txt")
+        self.assertEqual(self.run_tool().returncode, 0)
+        env = dict(os.environ, GIT_INDEX_FILE=str(self.repo / "snapshot.index"))
+        for args in [["read-tree", "--empty"],
+                     ["update-index", "--add", "--cacheinfo", f"100644,{oid},blocked.bin"]]:
+            result = subprocess.run(["git", *args], cwd=self.repo, env=env,
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+        result = subprocess.run([os.sys.executable, str(GUARD), "--repo", str(self.repo)],
+                                env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertIn("BLOCK", result.stderr)
+        self.assertEqual(self.run_tool().returncode, 0, "Guard changed the real index")
+
     def test_installer_adds_only_precommit_and_is_idempotent(self):
         prepush = self.repo / ".git/hooks/pre-push"
         prepush.write_text("#!/bin/sh\n# existing LFS hook\n")

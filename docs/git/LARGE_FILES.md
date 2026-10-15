@@ -65,10 +65,13 @@ is local and is not enabled merely by cloning these source files.
 No hook has been installed in the working repository as part of adding these
 tools. Tests install hooks only inside disposable temporary Git repositories.
 Normal `git commit` honors pre-commit; `--no-verify` and tools that bypass hooks
-do not. No autosync implementation was found in the repository, the local Game
-Dev script tree or LaunchAgents during the audit, so autosync hook coverage has
-not been established. Confirm its actual commit invocation before relying on
-this hook for that workflow.
+do not. The local `com.tin.gameasset-autocommit` LaunchAgent runs
+`~/.local/share/gameasset-autocommit/autocommit.py`. Read-only inspection found
+normal `git commit --file` with no `--no-verify` or hook-path override. It passes
+a snapshot through `GIT_INDEX_FILE`; the guard preserves that inherited index
+environment. A temporary-repository test covers this alternate-index behavior.
+The actual daemon has not been exercised with an installed hook during tool
+development; the source invocation supports normal hooks.
 
 ## Audit snapshot and LFS impact
 
