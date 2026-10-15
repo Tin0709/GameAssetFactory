@@ -10,7 +10,7 @@ func run() -> void:
 	if not failures.is_empty(): scene.free();quit(1);return
 	var reports:=[]
 	for fps in [30,60]:
-		scene.reset_player();var dt:=1./fps
+		scene.reset_player();var dt: float=1./fps
 		var start: Vector3=scene.camera.global_position
 		var max_y:=0.;var max_step:=0.;var previous: Vector3=start
 		for i in fps*2:
