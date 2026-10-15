@@ -1,0 +1,107 @@
+extends RefCounted
+## Executes JSON ASTs emitted by the audited Python molang._compile.
+## Degree math, ordered assignments and lazy branches match that source subset.
+## Environment keys are flattened v.*, t.*, q.*; q.* calls require Callable.
+static func execute(node: Array, env: Dictionary) -> Variant:
+	return _execute(node, env, {"returned": false, "value": 0.0})
+
+static func _name(value: String) -> String:
+	for pair in [["variable.", "v."], ["query.", "q."], ["temp.", "t."]]:
+		if value.begins_with(pair[0]): return pair[1] + value.substr(pair[0].length())
+	return value
+
+static func _execute(node: Array, env: Dictionary, frame: Dictionary) -> Variant:
+	if frame.returned: return frame.value
+	match node[0]:
+		"literal": return node[1]
+		"variable": return env.get(_name(node[1]), 0.0)
+		"assign":
+			var value = _execute(node[2], env, frame)
+			if frame.returned: return frame.value
+			env[_name(node[1])] = value
+			return value
+		"return":
+			frame.value = _execute(node[1], env, frame)
+			frame.returned = true
+			return frame.value
+		"program":
+			var value: Variant = 0.0
+			for child in node[1]:
+				value = _execute(child, env, frame)
+				if frame.returned: return frame.value
+			return value if node[1].size() == 1 else 0.0
+		"conditional":
+			return _execute(node[2] if _execute(node[1], env, frame) else node[3], env, frame)
+		"unary":
+			var value = _execute(node[2], env, frame)
+			if frame.returned: return frame.value
+			if node[1] == "!": return float(not value)
+			return -value if node[1] == "-" else value
+		"binary":
+			var op: String = node[1]
+			var a = _execute(node[2], env, frame)
+			if frame.returned: return frame.value
+			if op == "&&": return float(bool(a) and bool(_execute(node[3], env, frame)))
+			if op == "||": return float(bool(a) or bool(_execute(node[3], env, frame)))
+			if op == "??": return a if a != null else _execute(node[3], env, frame)
+			var b = _execute(node[3], env, frame)
+			if frame.returned: return frame.value
+			match op:
+				"+": return a + b
+				"-": return a - b
+				"*": return a * b
+				"/": return float(a) / float(b) if b else 0.0
+				"%": return fmod(float(a), float(b)) if b else 0.0
+				"==": return float(_equal(a, b))
+				"!=": return float(not _equal(a, b))
+				"<": return float(a < b)
+				">": return float(a > b)
+				"<=": return float(a <= b)
+				">=": return float(a >= b)
+			push_error("Unsupported Molang binary operator: " + op)
+		"call":
+			var function: String = _name(node[1])
+			var args: Array = []
+			for arg in node[2]:
+				args.append(_execute(arg, env, frame))
+				if frame.returned: return frame.value
+			if function.begins_with("math."): return _math(function.substr(5), args)
+			if function.begins_with("q.") and env.get(function) is Callable:
+				return env[function].callv(args)
+			push_error("Unsupported Molang call or missing Callable: " + function)
+		_: push_error("Unsupported Molang AST node: " + str(node[0]))
+	return 0.0
+
+static func _math(function: String, a: Array) -> Variant:
+	var x: float = float(a[0]) if not a.is_empty() else 0.0
+	match function:
+		"sin": return sin(deg_to_rad(x))
+		"cos": return cos(deg_to_rad(x))
+		"atan": return rad_to_deg(atan(x))
+		"atan2": return rad_to_deg(atan2(x, float(a[1])))
+		"abs": return absf(x)
+		"min": return a.min()
+		"max": return a.max()
+		"pow":
+			var result := pow(x, float(a[1]))
+			return result if is_finite(result) else 0.0
+		"sqrt": return sqrt(x) if x >= 0.0 else 0.0
+		"exp":
+			var result := exp(x)
+			return result if is_finite(result) else 0.0
+		"floor": return floor(x)
+		"ceil": return ceil(x)
+		"round": return floor(x + 0.5)
+		"mod": return fmod(x, float(a[1])) if a[1] else 0.0
+		"clamp": return minf(float(a[2]), maxf(float(a[1]), x))
+		"lerp": return x + (float(a[1]) - x) * float(a[2])
+		"min_angle": return fposmod(x + 180.0, 360.0) - 180.0
+		"sign": return float(x > 0.0) - float(x < 0.0)
+		"hermite_blend": return x * x * (3.0 - 2.0 * x)
+	push_error("Unsupported Molang Math function: " + function)
+	return 0.0
+
+static func _equal(a: Variant, b: Variant) -> bool:
+	# Python permits unlike scalar types in equality (numeric vs string is false).
+	if (a is String) != (b is String): return false
+	return a == b
