@@ -41,6 +41,7 @@ func run() -> void:
    var current: Array=[]
    for bone in [v.leg_left,v.leg_right]:
     var sole: Vector3=v._sole_world(bone);min_floor=minf(min_floor,sole.y);leg_max=maxf(leg_max,v.skeleton.get_bone_pose_scale(bone).y)
+    if sole.y<-.004:print("FLOOR_PROBE ",mode," i=",i," grounded=",q.grounded," capsuleY=",a.position.y," foot=",sole.y," active=",v.jump_active," correction=",v.maximum_correction)
     current.append(v._leg_world_rotation(bone))
    if not previous.is_empty():
     for side in 2:max_leg_step=maxf(max_leg_step,rad_to_deg(Quaternion(previous[side]).angle_to(current[side])))
