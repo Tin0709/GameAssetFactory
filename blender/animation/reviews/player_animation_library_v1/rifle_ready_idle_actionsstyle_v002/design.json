@@ -92,7 +92,7 @@
       0
     ]
   ],
-  "assembly_clearance": "14mm base settle +50mm attention clearance,5.5mm Neck release; original grip preserved,11deg bladed torso and2deg base assembly yaw.",
+  "assembly_clearance": "64mm attention clearance,5.5mm Neck release; original grip preserved; whole upper body and holding frame share11deg ready blade.",
   "pelvis_weight_keys": [
     [
       0,
@@ -138,6 +138,6 @@
   "breath": "Original1s holding rebound,4s weight drift informed by crossbow4:1 harmonic structure.3.5mm pelvis/3mm chest; identical arm/weapon frame suppresses free swing.",
   "common_rigid_holding_assembly": true,
   "authored_independently": true,
-  "base_entry_sha256": "222214758a5982baeffee02752ddb813f9dd7475ebe0374f16608e043476e029",
+  "base_entry_sha256": "109ddc532a36bb354452d3f720f2ce1e9fbd104a0f6ba72a783a350da270aff2",
   "source_keyframes_imported": false
 }
