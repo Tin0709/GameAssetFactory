@@ -72,6 +72,7 @@ func run() -> void:
   await tick(v)
   if i==2:a.requested_jump=false
   if a.last_jump_query.landed:reset_lands+=1
+ print("RESET_RESULT ",reset_lands," ",v.jump_active," ",v.jump_snapshot.controllers)
  check(reset_lands==1 and not v.jump_active,"Jump after reset completes once")
  print("JUMP_GAMEPLAY ",JSON.stringify({"fps":fps,"failures":failures,"trials":reports}))
  scene.free();quit(0 if failures.is_empty() else 1)
