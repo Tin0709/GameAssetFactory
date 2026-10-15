@@ -1,0 +1,200 @@
+{
+  "actual_wall_duration": 6.003897,
+  "display_driver": "macOS",
+  "max_fps": 0,
+  "physics_ticks_per_second": 60,
+  "render_timing_api_available": true,
+  "rendering_method": "mobile",
+  "viewport_size": "(1280.0, 720.0)",
+  "vsync_mode": 1,
+  "window_size": "(1280, 800)",
+  "physics_interpolation_fraction_at_last_frame": 0.371780000000005,
+  "fixed_fps_argument_used": false,
+  "movie_maker_used": false,
+  "phases": {
+    "idle_start": {
+      "frames": 49,
+      "measured_fps": 102.90293466306794,
+      "engine_fps_median": 20.0,
+      "pose_repeated_frames": 21,
+      "head_repeated_frames": 21,
+      "leg_repeated_frames": 44,
+      "physics_frames": 35,
+      "process_ms_mean": 5.641387755102041,
+      "physics_ms_mean": 214.4952448979592,
+      "draw_calls_mean": 6.857142857142857,
+      "render_cpu_ms_mean": 0.19732652642593096,
+      "render_cpu_ms_max": 5.45699977874756,
+      "render_gpu_ms_mean": 0.0,
+      "render_gpu_ms_max": 0.0,
+      "frame_interval_ms_median": 8.5885,
+      "frame_interval_ms_p95": 16.076000000000008,
+      "frame_interval_ms_max": 69.38600000000001,
+      "frame_intervals_over_16_67ms": 2
+    },
+    "jump": {
+      "frames": 132,
+      "measured_fps": 95.0030567777429,
+      "engine_fps_median": 108.0,
+      "pose_repeated_frames": 48,
+      "head_repeated_frames": 48,
+      "leg_repeated_frames": 48,
+      "physics_frames": 83,
+      "process_ms_mean": 13.056818181818182,
+      "physics_ms_mean": 9.632878787878788,
+      "draw_calls_mean": 7.0,
+      "render_cpu_ms_mean": 0.06014393952985604,
+      "render_cpu_ms_max": 0.111000001430511,
+      "render_gpu_ms_mean": 0.0,
+      "render_gpu_ms_max": 0.0,
+      "frame_interval_ms_median": 11.143000000000125,
+      "frame_interval_ms_p95": 21.433000000000035,
+      "frame_interval_ms_max": 21.95500000000017,
+      "frame_intervals_over_16_67ms": 47,
+      "interval_by_pose_advance": {
+        "True": {
+          "count": 84,
+          "mean_ms": 5.156035714285721,
+          "median_ms": 0.7029999999998982,
+          "over_16_67ms": 0
+        },
+        "False": {
+          "count": 47,
+          "mean_ms": 20.123319148936154,
+          "median_ms": 19.95300000000011,
+          "over_16_67ms": 47
+        }
+      }
+    },
+    "run": {
+      "frames": 118,
+      "measured_fps": 119.1765207993587,
+      "engine_fps_median": 120.0,
+      "pose_repeated_frames": 59,
+      "head_repeated_frames": 59,
+      "leg_repeated_frames": 59,
+      "physics_frames": 58,
+      "process_ms_mean": 11.498220338983051,
+      "physics_ms_mean": 6.546457627118644,
+      "draw_calls_mean": 7.406779661016949,
+      "render_cpu_ms_mean": 0.06051694923790834,
+      "render_cpu_ms_max": 0.12899999320507,
+      "render_gpu_ms_mean": 0.0,
+      "render_gpu_ms_max": 0.0,
+      "frame_interval_ms_median": 13.11899999999988,
+      "frame_interval_ms_p95": 14.991999999999894,
+      "frame_interval_ms_max": 15.575999999999812,
+      "frame_intervals_over_16_67ms": 0,
+      "interval_by_pose_advance": {
+        "True": {
+          "count": 59,
+          "mean_ms": 2.679000000000034,
+          "median_ms": 2.7840000000001197,
+          "over_16_67ms": 0
+        },
+        "False": {
+          "count": 58,
+          "mean_ms": 14.201310344827549,
+          "median_ms": 14.21299999999981,
+          "over_16_67ms": 0
+        }
+      }
+    },
+    "run_after_jump": {
+      "frames": 95,
+      "measured_fps": 106.3705792557001,
+      "engine_fps_median": 93.0,
+      "pose_repeated_frames": 41,
+      "head_repeated_frames": 41,
+      "leg_repeated_frames": 41,
+      "physics_frames": 53,
+      "process_ms_mean": 9.854894736842105,
+      "physics_ms_mean": 12.67902105263158,
+      "draw_calls_mean": 7.0,
+      "render_cpu_ms_mean": 0.05372631592970146,
+      "render_cpu_ms_max": 0.0869999974966049,
+      "render_gpu_ms_mean": 0.0,
+      "render_gpu_ms_max": 0.0,
+      "frame_interval_ms_median": 10.648999999999909,
+      "frame_interval_ms_p95": 19.84100000000044,
+      "frame_interval_ms_max": 19.93299999999998,
+      "frame_intervals_over_16_67ms": 24,
+      "interval_by_pose_advance": {
+        "True": {
+          "count": 54,
+          "mean_ms": 3.0805555555555637,
+          "median_ms": 0.5590000000004203,
+          "over_16_67ms": 0
+        },
+        "False": {
+          "count": 40,
+          "mean_ms": 17.933825000000002,
+          "median_ms": 19.27700000000021,
+          "over_16_67ms": 24
+        }
+      }
+    },
+    "stop": {
+      "frames": 121,
+      "measured_fps": 119.94170832975169,
+      "engine_fps_median": 110.0,
+      "pose_repeated_frames": 61,
+      "head_repeated_frames": 68,
+      "leg_repeated_frames": 88,
+      "physics_frames": 60,
+      "process_ms_mean": 9.359446280991735,
+      "physics_ms_mean": 11.18109917355372,
+      "draw_calls_mean": 7.0,
+      "render_cpu_ms_mean": 0.059570248061714084,
+      "render_cpu_ms_max": 0.112000003457069,
+      "render_gpu_ms_mean": 0.0,
+      "render_gpu_ms_max": 0.0,
+      "frame_interval_ms_median": 8.44500000000048,
+      "frame_interval_ms_p95": 15.15700000000031,
+      "frame_interval_ms_max": 17.413999999999596,
+      "frame_intervals_over_16_67ms": 1
+    },
+    "walk": {
+      "frames": 144,
+      "measured_fps": 120.45970117570353,
+      "engine_fps_median": 20.0,
+      "pose_repeated_frames": 72,
+      "head_repeated_frames": 72,
+      "leg_repeated_frames": 73,
+      "physics_frames": 71,
+      "process_ms_mean": 9.466118055555555,
+      "physics_ms_mean": 231.45558333333332,
+      "draw_calls_mean": 7.0,
+      "render_cpu_ms_mean": 0.06469444475240177,
+      "render_cpu_ms_max": 0.14300000667572,
+      "render_gpu_ms_mean": 0.0,
+      "render_gpu_ms_max": 0.0,
+      "frame_interval_ms_median": 4.400999999999988,
+      "frame_interval_ms_p95": 13.98900000000014,
+      "frame_interval_ms_max": 14.931000000000028,
+      "frame_intervals_over_16_67ms": 0,
+      "interval_by_pose_advance": {
+        "True": {
+          "count": 72,
+          "mean_ms": 3.185513888888902,
+          "median_ms": 2.8639999999999777,
+          "over_16_67ms": 0
+        },
+        "False": {
+          "count": 71,
+          "mean_ms": 13.489605633802807,
+          "median_ms": 13.47100000000001,
+          "over_16_67ms": 0
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Editor runtime remained open during this separate6s diagnostic; no isolation or display-certification claim.",
+    "Engine FPS and Performance.TIME_* monitors are periodic/lagged; initial reportedphysics231ms andengineFPS20 coexist with direct120FPS measurement, so elapsed timestamps are primary.",
+    "GPU timing methods exist but all measured GPU values are0; treat GPU timing as unavailable.",
+    "No GPU image readback during measurement, avoiding capture-induced stalls.",
+    "~120Hz rendering repeats60Hz bone poses; this demonstrates cadence rather than a blur shader or proof of user perceptual root cause."
+  ],
+  "conclusion": "No severe sustained render-FPS collapse at1280x800. A120Hz display renders each60Hz simulation pose roughlytwice. Jump reduces render rate to95FPS with sporadiclongframes; further correlation with the userblurpattern is needed before changing anything."
+}

@@ -17,3 +17,7 @@ WASD Walk, Shift Run, Space Jump, R Reset and right-drag/wheel camera controls r
 - Saved Showcase reopened: Approved and exact Action hash verified. All79Action/native before-after fingerprints match; only the Idle manifest entry's approval metadata changed.
 
 No new project, scene, candidate or artistic gate. Research subtree/exportguard remains excluded from normal commercial export. Play this existing scene usingF6; F5/WorldMap remains unchanged. Immutable pre-Idle accepted baseline stays at `docs/animation/baselines/actions_stuff_gameplay_accepted_v001`.
+
+## Reported motion blur — investigation still open
+
+User reported visible blur during fast movement/jumping. Runtime diagnostics show no TAA/FXAA, DOF, motion-blur shader or reduced render scale; avatar uses the approved opaque nearest-filtered64px atlas. An extra standalone run created for this task was closed; the updated existing editor scene remains available. A six-second native diagnostic measured about120FPS while walking/running and95FPS in Jump, while manual source bone poses update at60physicsHz; some Jump frame intervals exceeded20ms. This identifies uneven presentation cadence as a possible contributor, not proof of the user's perceived blur. GPU readback PNG glyph corruption also prevents treating captured artifacts as definitive on-screen blur. Await the user's distinction between trails, texture softness and judder before changing rendering/pose presentation; no unsupported blur effect was toggled and approved animation data remains unchanged.

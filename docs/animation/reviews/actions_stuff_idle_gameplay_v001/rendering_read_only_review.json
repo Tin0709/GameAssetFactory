@@ -1,0 +1,25 @@
+{
+  "status": "No configured avatar motion-blur cause confirmed",
+  "diagnostic": "render_diagnostic_headless.json",
+  "confirmed": {
+    "avatar_texture_filter": "Nearest (0); exact64px approved atlas on instance-local opaque material",
+    "temporal_antialiasing": false,
+    "screen_space_aa": 0,
+    "msaa_3d": 0,
+    "render_scale": 1.0,
+    "scaling_mode": 0,
+    "transparent_background": false,
+    "camera_attributes": null,
+    "depth_of_field": "No CameraAttributes resource; no DOF in scene",
+    "other_postprocess": "glow,fog,SSAO disabled; no motionblur/trails/shaderpostprocess in inspected scene/player code",
+    "project_stretch": "canvas_items,scale1.0,fractionalmode; native live dimensions still require parent runtime capture"
+  },
+  "capture_observation": "Current native_145.png HUD is clean; native_212.png contains missing/overlaid HUD glyphs as well as moving character. This corruption affects2D text and cannot identify avatar-material blur. Headless diagnostic does not validateMetal GPU clearing/readback.",
+  "smallest_justified_scene_fix": null,
+  "next_discriminating_evidence": [
+    "Compare same GPU frame from live window screenshot against get_texture().get_image() capture.",
+    "Inspect actual liveviewport dimensions/TAA/AA/scaling/transparent flags; headless root is64x64 and not representative of window size.",
+    "Use a complete sequential capture or post-draw GPU sync for evidence if readback itself is corrupt."
+  ],
+  "production_project_animation_changes": false
+}
