@@ -62,7 +62,9 @@ func run() -> void:
 				check(snapshot.layers[i].alias == "tculwn","No unapproved gestures")
 				for key in ["clock","controller_weight"]: max_clock = maxf(max_clock,absf(float(snapshot.layers[i][key])-float(row.layers[i][key])))
 			if row.has("channels"):
-				var bc := vector_channels(row.base_channels)
+				ground_sampler.set_snapshot(row.base)
+				compare_channels(ground_sampler.channels,row.base_channels)
+				var bc: Dictionary = ground_sampler.channels.duplicate(true)
 				var before: Dictionary = bc.duplicate(true)
 				sampler.set_composite(bc,row.base,snapshot)
 				check(bc == before,"Composite does not mutate accepted channels")
