@@ -40,6 +40,7 @@ func run() -> void:
 	for case in fixtures.cases:
 		var runtime = load(runtime_path).new(float(case.initial_life))
 		runtime.seed_context(false)
+		for key in case.get("seed_vars",{}): runtime.env[key] = case.seed_vars[key]
 		for row in case.samples:
 			var snapshot: Dictionary
 			for query in row.queries: snapshot = runtime.step(query,1.0/60.0)

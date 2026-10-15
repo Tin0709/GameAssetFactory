@@ -119,6 +119,16 @@ func run() -> void:
 		check(raised_landing and actor.is_on_floor(), "Raised floor triggers actual early landing")
 		actor.reset_jump_motion()
 		check(not query().get("takeoff", false) and not query().get("landed", false), "Reset clears transient jump events")
+		actor.scripted_input = false
+		await tick()
+		Input.action_press("jump")
+		var keyboard_takeoffs := 0
+		for i in int(1.3 * fps):
+			await tick()
+			if query().get("takeoff", false):
+				keyboard_takeoffs += 1
+		Input.action_release("jump")
+		check(keyboard_takeoffs == 1 and actor.is_on_floor(), "Existing jump input action launches once while held")
 	print("JUMP_PHYSICS ", JSON.stringify({"fps": fps, "failures": failures, "trials": reports}))
 	world.free()
 	quit(0 if failures.is_empty() else 1)
