@@ -1,3 +1,5 @@
+**Artistically APPROVED by the user — 2026-10-15.** Approval recorded in the existing Showcase manifest and saved library; all curves/native data and the authoring source `.blend` remain unchanged. Exact approved behavior integrated only in the existing Godot research scene; see `docs/animation/reviews/actions_stuff_idle_gameplay_v001/README.md`. Earlier Pending notes below are historical.
+
 # Actions & Stuff Player Idle v001 — Pending research
 
 Open the existing `blender/animation/showcase/Animation_Showcase.blend`, then choose **Idle_ActionsStuff_Source_Test_v001** in **N → Animation Library → Actions & Stuff**. Press Play; Front / 3/4 / Side remain available. One new Pending Action, F1–270 at30FPS, nine seconds. Older entries remain under Show Archived. The authoring file is `idle_actions_stuff_source_v001.blend`; it is a minimal source study with one character Action, not another Showcase.
