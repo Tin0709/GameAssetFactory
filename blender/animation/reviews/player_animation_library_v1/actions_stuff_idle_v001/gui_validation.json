@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "fresh_published_reopen": true,
+  "two_full_native_plays_reached270": true,
+  "third_play_advanced_to": 94,
+  "pause_pass": true,
+  "restart_pass": true,
+  "idle_pending": true,
+  "action_slot": "OBASI_Idle_Player_Rig_v001",
+  "visible_entries": 11,
+  "all_entries": 46,
+  "archived": 35,
+  "loop_default": false,
+  "window": [
+    1512,
+    949
+  ],
+  "stopped_at_frame": 1,
+  "error": "",
+  "final_showcase_sha256": "adc4a162898bc77f4a720c185e2f0b74631f0c30c4a4c847c18c5dee5990badf",
+  "ui_layout_persisted": true,
+  "current_filepath": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/showcase/Animation_Showcase.blend"
+}
