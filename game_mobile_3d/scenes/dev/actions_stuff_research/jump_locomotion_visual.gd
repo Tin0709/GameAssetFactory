@@ -115,6 +115,15 @@ func _evaluate(delta: float) -> void:
 	skeleton.force_update_all_bone_transforms()
 	for side in 2:
 		var bone: int=[leg_left,leg_right][side]
+		var sole:=_sole_world(bone)
+		# A descending rigid source foot can meet this character's flat floor a
+		# frame before its capsule. Only prevent penetration; do not plant it or
+		# fire the landing controller until move_and_slide reports actual contact.
+		if sole.y<0.:
+			var parent:=skeleton.get_bone_parent(bone)
+			var parent_basis:=skeleton.global_basis*skeleton.get_bone_global_pose(parent).basis
+			skeleton.set_bone_pose_position(bone,skeleton.get_bone_pose_position(bone)+parent_basis.inverse()*Vector3(0.,minf(-sole.y,.14),0.))
+			skeleton.force_update_all_bone_transforms()
 		last_sole[side]=_sole_world(bone)
 		var p:=skeleton.get_bone_pose_position(bone);var q:=skeleton.get_bone_pose_rotation(bone)
 		_final_vp[bone]=(p-_final_p[bone])/delta;_final_vq[bone]=_rotvec(q*_final_q[bone].inverse())/delta
@@ -124,5 +133,12 @@ func _evaluate(delta: float) -> void:
 func reset_contacts() -> void:
 	super.reset_contacts()
 	jump_active=false;jump_grounded=true;_physical_height=0.
+	# Teleport cancels air/landing state but keeps approved gait/lifetime history.
+	var old_life: float=jump_runtime.life
+	var history: Dictionary=jump_runtime.env.duplicate()
 	_initialize_jump_runtime()
+	jump_runtime.life=old_life
+	for key in history:
+		if key.begins_with("v."):jump_runtime.env[key]=history[key]
+	jump_runtime.env["v.hirjne"]=0.
 	_jump_scale_dirty=true;_scale_handoff=true
