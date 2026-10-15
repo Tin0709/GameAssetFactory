@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "protected_existing_files": 6461,
+  "expected_changes": [
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/README.md",
+    "blender/animation/showcase/animation_manifest.json"
+  ],
+  "unexpected_changes": [],
+  "missing": [],
+  "all_old_studies_exact": true,
+  "accepted_godot_baseline_exact": true,
+  "source_pack_untouched": true,
+  "78_prior_action_signatures_exact": true,
+  "current_showcase_actions": 79,
+  "one_new_pending_action": "Idle_ActionsStuff_Source_Test_v001",
+  "old_entries_and_statuses_unchanged": true,
+  "showcase_visible_entries": 11,
+  "archived_entries": 35,
+  "no_godot_integration": true
+}

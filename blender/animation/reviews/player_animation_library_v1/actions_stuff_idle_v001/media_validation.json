@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "original_speed": true,
+  "videos": [
+    {
+      "view": "front",
+      "path": "idle_front_30fps_1x.mp4",
+      "fps": 30,
+      "frames": 270,
+      "duration_s": 9.0,
+      "width": 640,
+      "height": 640,
+      "sha256": "3b8f8ddc3e9a76fa468586f61ae35fc10414902e4ba98fe87ea7ec3ccbab346e",
+      "native_decode_metadata_verified": true
+    },
+    {
+      "view": "three_quarter",
+      "path": "idle_three_quarter_30fps_1x.mp4",
+      "fps": 30,
+      "frames": 270,
+      "duration_s": 9.0,
+      "width": 640,
+      "height": 640,
+      "sha256": "d6f5adee35366c23e1ea909167f32738c6246b29a3d9cbe9b1ad953e56feaab1",
+      "native_decode_metadata_verified": true
+    },
+    {
+      "view": "side",
+      "path": "idle_side_30fps_1x.mp4",
+      "fps": 30,
+      "frames": 270,
+      "duration_s": 9.0,
+      "width": 640,
+      "height": 640,
+      "sha256": "6119a72f3e96463cae4e90d31c87157aafab297694e10a3080fe259f9696e38c",
+      "native_decode_metadata_verified": true
+    }
+  ]
+}
