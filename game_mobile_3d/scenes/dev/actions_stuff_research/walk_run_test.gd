@@ -14,8 +14,9 @@ var orbiting:=false
 # Normal 1.26m jumps fit inside this vertical zone without moving the camera.
 var camera_anchor:=Vector3.ZERO
 var _camera_initialized:=false
+var _camera_vertical_velocity:=0.0
 const CAMERA_HORIZONTAL_RESPONSE:=12.0
-const CAMERA_VERTICAL_RESPONSE:=2.5
+const CAMERA_VERTICAL_RESPONSE:=8.0
 const CAMERA_AIR_UP_ZONE:=1.4
 const CAMERA_AIR_DOWN_ZONE:=1.1
 func _ready() -> void:
@@ -65,7 +66,7 @@ func _process(delta: float) -> void:
 func _update_camera(delta: float=1./60.) -> void:
 	var target:=player.global_position+Vector3(0,.95,0)
 	if not _camera_initialized:
-		camera_anchor=target;_camera_initialized=true
+		camera_anchor=target;_camera_initialized=true;_camera_vertical_velocity=0.
 	var horizontal:=1.-exp(-CAMERA_HORIZONTAL_RESPONSE*delta)
 	camera_anchor.x=lerpf(camera_anchor.x,target.x,horizontal)
 	camera_anchor.z=lerpf(camera_anchor.z,target.z,horizontal)
@@ -74,7 +75,17 @@ func _update_camera(delta: float=1./60.) -> void:
 		# Keep the current anchor until the character leaves the visibility zone.
 		# Long falls/high elevation changes then follow with the same damping.
 		height=clampf(camera_anchor.y,target.y-CAMERA_AIR_UP_ZONE,target.y+CAMERA_AIR_DOWN_ZONE)
-	camera_anchor.y=lerpf(camera_anchor.y,height,1.-exp(-CAMERA_VERTICAL_RESPONSE*delta))
+		if not is_equal_approx(height,camera_anchor.y):
+			# Velocity anticipation only outside the zone keeps long falls readable.
+			# Ordinary jump ascent/descent never drives this branch.
+			height+=player.velocity.y*.25
+	# Exact critically damped spring: position and velocity stay continuous at
+	# takeoff, landing and platform changes; no camera bob or added physics.
+	var offset:=camera_anchor.y-height
+	var spring:=_camera_vertical_velocity+CAMERA_VERTICAL_RESPONSE*offset
+	var decay:=exp(-CAMERA_VERTICAL_RESPONSE*delta)
+	camera_anchor.y=height+(offset+spring*delta)*decay
+	_camera_vertical_velocity=(_camera_vertical_velocity-CAMERA_VERTICAL_RESPONSE*spring*delta)*decay
 	camera.global_position=camera_anchor+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*8.
 	camera.look_at(camera_anchor,Vector3.UP);camera.size=camera_size
 func _unhandled_input(event: InputEvent) -> void:
