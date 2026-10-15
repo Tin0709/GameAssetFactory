@@ -2,7 +2,7 @@ import bpy,sys,json,math,hashlib
 from pathlib import Path
 from mathutils import Matrix,Vector
 R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').is_file());S=Path(__file__).resolve().parent
-sys.path.insert(0,str(S));from motion_design import motion,HEAD,TORSO,DROP,WEIGHT,PERIOD
+sys.path.insert(0,str(S));from motion_design import motion,HEAD,TORSO,WEIGHT,PERIOD
 sys.path.insert(0,str(R/'blender/animation/showcase'));import gaf_animation_library as ui
 O=R/'blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v001';O.mkdir(parents=True,exist_ok=True)
 NAME='Rifle_Ready_Idle_ActionsStyle_v001';source=Path(bpy.data.filepath)

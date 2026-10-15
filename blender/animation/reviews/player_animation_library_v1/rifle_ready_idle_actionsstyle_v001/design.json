@@ -138,6 +138,7 @@
   "breath": "Original asymmetric1.38s inhale/2.48s exhale with a quiet rest,4s cycle;3.5mm pelvis and3mm chest allowance",
   "common_rigid_holding_assembly": true,
   "authored_independently": true,
-  "base_entry_sha256": "f0d4f4978d309ef5b417da8e3f715efa1dd97db62532eeee9923904e9ee517f8",
-  "source_keyframes_imported": false
+  "source_keyframes_imported": false,
+  "candidate_action_sha256": "f0d4f4978d309ef5b417da8e3f715efa1dd97db62532eeee9923904e9ee517f8",
+  "approved_ready_action_sha256": "e12357dab1a854a4642f293e8049747f7e17b426ff69f1a4c331327b47e91743"
 }
