@@ -37,13 +37,18 @@ func run() -> void:
 	var sampler = load(sampler_path).new(rig)
 	var fixtures: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FIXTURES))
 	var samples := 0
+	var seen_states := {}
+	var seen_overrides := {}
 	for case in fixtures.cases:
 		var runtime = load(runtime_path).new(float(case.initial_life))
 		runtime.seed_context(false)
 		for key in case.get("seed_vars",{}): runtime.env[key] = case.seed_vars[key]
 		for row in case.samples:
 			var snapshot: Dictionary
-			for query in row.queries: snapshot = runtime.step(query,1.0/60.0)
+			for query in row.queries:
+				snapshot = runtime.step(query,1.0/60.0)
+				seen_states[snapshot.controllers.ngeixo.state] = true
+				seen_overrides[float(snapshot.vars.get("v.gadjrq",0.0))] = true
 			check(not snapshot.is_empty(),"Runtime sample " + case.name)
 			if snapshot.is_empty():
 				quit(1)
@@ -73,15 +78,29 @@ func run() -> void:
 					var actual: Transform3D = sampler.poses[index]
 					max_position = maxf(max_position,actual.origin.distance_to(expected.origin))
 					for axis in 3: max_basis = maxf(max_basis,actual.basis[axis].distance_to(expected.basis[axis]))
+			if row.has("local"):
+				var future: Dictionary = sampler.future_snapshot(snapshot,.004)
+				check(absf(float(future.life)-float(snapshot.life)-.004) < 1e-10,"Future source age")
+				for i in future.layers.size():
+					var clip: Dictionary = sampler.data.clips[future.layers[i].alias]
+					var expected_clock := float(snapshot.layers[i].clock)+.004
+					if clip.anim_time_update != null:
+						expected_clock = fposmod(float(snapshot.phase)+.004*float(snapshot.cadence),1.0) if future.layers[i].alias != "wjmfbh" else expected_clock
+					if clip.loop is bool and clip.loop and clip.animation_length: expected_clock = fposmod(expected_clock,float(clip.animation_length))
+					elif clip.animation_length: expected_clock = minf(expected_clock,float(clip.animation_length))
+					check(absf(float(future.layers[i].clock)-expected_clock) < 1e-9,"Future authored clip clock " + future.layers[i].alias)
+				check(absf(float(snapshot.life)-float(row.expected.life)) < 1e-10,"Future probe does not mutate live snapshot")
 			samples += 1
 	for row in fixtures.clips:
 		compare_channels(sampler.sample_clip(row.alias,float(row.clock),row.snapshot),row.channels)
+	check(seen_states.has("ypqtmb") and seen_states.has("seridw") and seen_states.has("jump"),"Both sprint takeoff phases plus ordinary jump covered")
+	check(seen_overrides.has(.05) and seen_overrides.has(.55),"Both authored phase overrides covered")
 	check(max_variable < .00000001,"All source variable parity " + str(max_variable))
 	check(max_clock < .00000001,"Source clocks/fades/weights " + str(max_clock))
 	check(max_channel < .00008,"Full source PRS including Catmull " + str(max_channel))
 	check(max_position < .000004,"JumpRetarget local translations " + str(max_position))
 	check(max_basis < .000004,"JumpRetarget inherited root/leg scale and head basis " + str(max_basis))
-	var report := {"failures":failures,"samples":samples,"clip_samples":fixtures.clips.size(),"max_variable":max_variable,"max_clock":max_clock,"max_channel":max_channel,"max_position":max_position,"max_basis":max_basis}
+	var report := {"failures":failures,"samples":samples,"states":seen_states.keys(),"phase_overrides":seen_overrides.keys(),"clip_samples":fixtures.clips.size(),"max_variable":max_variable,"max_clock":max_clock,"max_channel":max_channel,"max_position":max_position,"max_basis":max_basis}
 	print("JUMP_SOURCE_TEST ",JSON.stringify(report))
 	FileAccess.open("/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/source_parity.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	actor.queue_free()
