@@ -1,0 +1,90 @@
+{
+  "states": {
+    "default": {
+      "on_entry": [
+        "v.qamqdm=0;"
+      ],
+      "transitions": [
+        {
+          "fall": "q.vertical_speed<-0.15&&!q.is_in_water"
+        },
+        {
+          "jump": "q.vertical_speed>1&&!q.is_on_ground&&!q.is_in_water"
+        }
+      ]
+    },
+    "fall": {
+      "on_entry": [
+        "v.qamqdm=1;"
+      ],
+      "animations": [
+        "chfyqw"
+      ],
+      "transitions": [
+        {
+          "default": "q.is_in_water"
+        },
+        {
+          "yytrhz": "q.vertical_speed>=-0.15||(q.is_on_ground&&q.state_time>0.25)"
+        },
+        {
+          "qazmxb": "q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "yytrhz": {
+      "animations": [
+        "fthnmp"
+      ],
+      "transitions": [
+        {
+          "default": "q.is_in_water||q.any_animation_finished"
+        },
+        {
+          "fall": "!q.is_on_ground&&q.vertical_speed<-0.15"
+        },
+        {
+          "jump": "q.state_time>0.1&&!q.is_on_ground&&!q.is_in_water&&q.vertical_speed>1"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "qazmxb": {
+      "animations": [
+        {
+          "fthnmp": 0.4
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.is_in_water||q.any_animation_finished"
+        },
+        {
+          "fall": "!q.is_on_ground&&q.vertical_speed<-0.15"
+        },
+        {
+          "jump": "q.state_time>0.1&&!q.is_on_ground&&!q.is_in_water&&q.vertical_speed>1"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "jump": {
+      "animations": [
+        "cxzrui"
+      ],
+      "transitions": [
+        {
+          "default": "q.is_in_water"
+        },
+        {
+          "yytrhz": "q.is_on_ground"
+        },
+        {
+          "fall": "q.vertical_speed<-0.15&&!q.is_in_water"
+        }
+      ],
+      "blend_transition": 0.1
+    }
+  }
+}

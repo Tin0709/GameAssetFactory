@@ -1,0 +1,24 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "jump": "!q.is_on_ground&&q.vertical_speed>0&&!q.is_in_water"
+        }
+      ]
+    },
+    "jump": {
+      "animations": [
+        {
+          "jump": "v.spjcdi"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.is_on_ground||q.is_in_water||(q.vertical_speed<-0.15&&q.state_time>0.16)"
+        }
+      ],
+      "blend_transition": 0.16
+    }
+  }
+}

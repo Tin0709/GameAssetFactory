@@ -1,0 +1,48 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "ptvsjb": "q.is_sprinting&&q.is_on_ground"
+        }
+      ]
+    },
+    "ptvsjb": {
+      "animations": [
+        "xahrzd"
+      ],
+      "transitions": [
+        {
+          "stop": "!q.is_sprinting"
+        },
+        {
+          "zhbjho": "!q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "zhbjho": {
+      "transitions": [
+        {
+          "default": "(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))"
+        },
+        {
+          "stop": "q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "stop": {
+      "animations": [
+        {
+          "sjvffv": "Math.max(1-v.esnrkj,0.001)"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))"
+        }
+      ]
+    }
+  }
+}

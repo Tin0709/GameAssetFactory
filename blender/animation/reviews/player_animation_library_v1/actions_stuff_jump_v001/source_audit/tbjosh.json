@@ -1,0 +1,27 @@
+{
+  "initial_state": "default",
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "jump": "q.is_jump_goal_jumping&&q.is_on_ground"
+        }
+      ]
+    },
+    "jump": {
+      "animations": [
+        "jump"
+      ],
+      "sound_effects": [
+        {
+          "effect": "kypqpn"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished||(!q.is_jump_goal_jumping&&q.is_on_ground)"
+        }
+      ]
+    }
+  }
+}

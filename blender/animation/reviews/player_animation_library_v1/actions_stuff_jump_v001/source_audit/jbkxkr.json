@@ -1,0 +1,58 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "fall": "q.vertical_speed<-0.15&&!q.is_in_water"
+        }
+      ]
+    },
+    "fall": {
+      "animations": [
+        "fall"
+      ],
+      "transitions": [
+        {
+          "default": "q.is_in_water"
+        },
+        {
+          "yytrhz": "q.vertical_speed>=-0.15||(q.is_on_ground&&q.state_time>0.25)"
+        },
+        {
+          "abkvbs": "q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "yytrhz": {
+      "animations": [
+        "yytrhz"
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished"
+        },
+        {
+          "fall": "!q.is_on_ground&&q.vertical_speed<-0.15"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "abkvbs": {
+      "animations": [
+        {
+          "yytrhz": 0.4
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished"
+        },
+        {
+          "fall": "!q.is_on_ground&&q.vertical_speed<-0.15"
+        }
+      ],
+      "blend_transition": 0.1
+    }
+  }
+}

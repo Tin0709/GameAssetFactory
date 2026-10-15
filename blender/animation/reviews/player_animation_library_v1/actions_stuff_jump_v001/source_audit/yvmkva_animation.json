@@ -1,0 +1,47 @@
+{
+  "loop": true,
+  "bones": {
+    "root": {
+      "position": [
+        "!q.is_in_ui&&!v.is_paperdoll?{v.lzygkp=v.lzygkp+((q.main_hand_item_use_duration==0&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))&&!(q.blocking?(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shield'))))-v.lzygkp)*(7*q.delta_time);};",
+        0,
+        0
+      ]
+    },
+    "leftarm": {
+      "rotation": [
+        0,
+        0,
+        -80
+      ]
+    },
+    "rightarm": {
+      "rotation": [
+        0,
+        0,
+        80
+      ]
+    },
+    "egjh9leftarm": {
+      "rotation": [
+        0,
+        0,
+        -80
+      ]
+    },
+    "egjh9rightarm": {
+      "rotation": [
+        0,
+        0,
+        80
+      ]
+    },
+    "egjh9root": {
+      "position": [
+        "!q.is_in_ui&&!v.is_paperdoll?{v.lzygkp=v.lzygkp+((q.main_hand_item_use_duration==0&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))&&!(q.blocking?(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shield'))))-v.lzygkp)*(7*q.delta_time);};",
+        0,
+        0
+      ]
+    }
+  }
+}

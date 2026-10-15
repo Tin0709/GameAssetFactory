@@ -1,0 +1,100 @@
+{
+  "loop": "hold_on_last_frame",
+  "animation_length": 1.75,
+  "bones": {
+    "waist": {
+      "rotation": [
+        "Math.cos(q.life_time*245-90)*2",
+        0,
+        0
+      ]
+    },
+    "leftarm": {
+      "rotation": [
+        "-Math.cos(q.life_time*245+135-22.5-22.5)*2",
+        -7,
+        -7
+      ]
+    },
+    "rightarm": {
+      "rotation": [
+        "-Math.cos(q.life_time*245+135-22.5)*2",
+        7,
+        7
+      ]
+    },
+    "rightleg": {
+      "rotation": [
+        "7-Math.cos(q.life_time*245+135)*2",
+        -0.25,
+        2
+      ],
+      "position": [
+        0,
+        3,
+        -3.25
+      ]
+    },
+    "leftleg": {
+      "rotation": [
+        "5-Math.cos(q.life_time*245+135-22.5)*2",
+        0,
+        0
+      ]
+    },
+    "root": {
+      "position": [
+        0,
+        "Math.cos(q.life_time*245)*0.5",
+        0
+      ]
+    },
+    "egjh9waist": {
+      "rotation": [
+        "Math.cos(q.life_time*245-90)*2",
+        0,
+        0
+      ]
+    },
+    "egjh9leftarm": {
+      "rotation": [
+        "-Math.cos(q.life_time*245+135-22.5-22.5)*2",
+        -7,
+        -7
+      ]
+    },
+    "egjh9rightarm": {
+      "rotation": [
+        "-Math.cos(q.life_time*245+135-22.5)*2",
+        7,
+        7
+      ]
+    },
+    "egjh9root": {
+      "position": [
+        0,
+        "Math.cos(q.life_time*245)*0.5",
+        0
+      ]
+    },
+    "egjh9rightleg": {
+      "rotation": [
+        "7-Math.cos(q.life_time*245+135)*2",
+        -0.25,
+        2
+      ],
+      "position": [
+        0,
+        3,
+        -3.25
+      ]
+    },
+    "egjh9leftleg": {
+      "rotation": [
+        "5-Math.cos(q.life_time*245+135-22.5)*2",
+        0,
+        0
+      ]
+    }
+  }
+}

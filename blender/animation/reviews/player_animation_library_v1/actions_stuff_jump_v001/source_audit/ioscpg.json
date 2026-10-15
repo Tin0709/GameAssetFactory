@@ -1,0 +1,121 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "xzmjxw": "q.is_in_water"
+        },
+        {
+          "move": "q.modified_move_speed>0.8&&(q.vertical_speed<1||q.is_on_ground)"
+        },
+        {
+          "docaaw": "!q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.12
+    },
+    "xzmjxw": {
+      "animations": [
+        "swim",
+        "beblsa"
+      ],
+      "transitions": [
+        {
+          "default": "!q.is_in_water&&q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.16
+    },
+    "move": {
+      "animations": [
+        {
+          "move": "Math.min(1,q.modified_move_speed*1.5)"
+        }
+      ],
+      "transitions": [
+        {
+          "docaaw": "!q.is_on_ground&&q.vertical_speed>2"
+        },
+        {
+          "default": "q.modified_move_speed<0.3&&v.rcgezu"
+        },
+        {
+          "xzmjxw": "q.is_in_water"
+        }
+      ],
+      "blend_transition": 0.16
+    },
+    "docaaw": {
+      "on_entry": [
+        "v.bvhtvp=Math.clamp(q.modified_move_speed*1.5,0.5,1);",
+        "v.cyyrbw=q.modified_move_speed>8.5?2.5:1.5;",
+        "v.taydcs=1;"
+      ],
+      "animations": [
+        {
+          "docaaw": "v.bvhtvp"
+        },
+        {
+          "jump": "v.bvhtvp==0.5?0.5"
+        },
+        {
+          "iivysx": "q.is_on_ground?0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "move": "q.modified_move_speed>0.9&&q.any_animation_finished"
+        },
+        {
+          "qrukzv": "!q.is_on_ground&&q.any_animation_finished"
+        },
+        {
+          "default": "v.rcgezu&&q.state_time>0.25"
+        },
+        {
+          "xzmjxw": "q.is_in_water"
+        }
+      ],
+      "blend_transition": 0.16,
+      "on_exit": [
+        "v.taydcs=0;"
+      ]
+    },
+    "qrukzv": {
+      "on_entry": [
+        "v.ajllrm=Math.clamp(q.modified_move_speed*1.5,0.5,1);",
+        "v.cyyrbw=q.modified_move_speed>8.5?2.5:1.5;",
+        "v.taydcs=1;"
+      ],
+      "animations": [
+        {
+          "docaaw": "v.ajllrm"
+        },
+        {
+          "jump": "v.ajllrm==0.5?0.5"
+        },
+        {
+          "iivysx": "q.is_on_ground?0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "move": "q.modified_move_speed>0.9&&q.any_animation_finished"
+        },
+        {
+          "docaaw": "!q.is_on_ground&&q.any_animation_finished"
+        },
+        {
+          "default": "v.rcgezu&&q.state_time>0.25"
+        },
+        {
+          "xzmjxw": "q.is_in_water"
+        }
+      ],
+      "blend_transition": 0.16,
+      "on_exit": [
+        "v.taydcs=0;"
+      ]
+    }
+  }
+}

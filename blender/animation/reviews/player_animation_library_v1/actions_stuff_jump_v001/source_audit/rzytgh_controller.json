@@ -1,0 +1,116 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "rmybjb": "v.tilzsv=='3d'&&q.is_item_name_any('slot.weapon.mainhand','minecraft:wooden_spear')"
+        },
+        {
+          "vspfew": "v.tilzsv=='3d'&&q.is_item_name_any('slot.weapon.mainhand','minecraft:stone_spear')"
+        },
+        {
+          "ceqlnk": "v.tilzsv=='3d'&&q.is_item_name_any('slot.weapon.mainhand','minecraft:copper_spear')"
+        },
+        {
+          "xwqfbi": "v.tilzsv=='3d'&&q.is_item_name_any('slot.weapon.mainhand','minecraft:iron_spear')"
+        },
+        {
+          "uftkmd": "v.tilzsv=='3d'&&q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_spear')"
+        },
+        {
+          "vqdxoo": "v.tilzsv=='3d'&&q.is_item_name_any('slot.weapon.mainhand','minecraft:diamond_spear')"
+        },
+        {
+          "aomuwi": "v.tilzsv=='3d'&&q.is_item_name_any('slot.weapon.mainhand','minecraft:netherite_spear')"
+        }
+      ],
+      "on_exit": [
+        "v.tilzsv=0;"
+      ]
+    },
+    "rmybjb": {
+      "sound_effects": [
+        {
+          "effect": "ljsmle"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "1"
+        }
+      ]
+    },
+    "vspfew": {
+      "sound_effects": [
+        {
+          "effect": "xphxvl"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "1"
+        }
+      ]
+    },
+    "ceqlnk": {
+      "sound_effects": [
+        {
+          "effect": "spirzx"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "1"
+        }
+      ]
+    },
+    "xwqfbi": {
+      "sound_effects": [
+        {
+          "effect": "xondjs"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "1"
+        }
+      ]
+    },
+    "uftkmd": {
+      "sound_effects": [
+        {
+          "effect": "lfmcmg"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "1"
+        }
+      ]
+    },
+    "vqdxoo": {
+      "sound_effects": [
+        {
+          "effect": "gehwgo"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "1"
+        }
+      ]
+    },
+    "aomuwi": {
+      "sound_effects": [
+        {
+          "effect": "fbussy"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "1"
+        }
+      ]
+    }
+  }
+}

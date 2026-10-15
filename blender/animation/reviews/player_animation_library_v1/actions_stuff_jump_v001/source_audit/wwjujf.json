@@ -1,0 +1,24 @@
+{
+  "states": {
+    "default": {
+      "animations": [
+        {
+          "yytrhz": "v.spjcdi"
+        }
+      ],
+      "transitions": [
+        {
+          "zhbjho": "!q.is_on_ground&&q.state_time>0.416"
+        }
+      ],
+      "blend_transition": 0.12
+    },
+    "zhbjho": {
+      "transitions": [
+        {
+          "default": "q.is_on_ground"
+        }
+      ]
+    }
+  }
+}

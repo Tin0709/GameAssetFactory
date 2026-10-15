@@ -1,0 +1,34 @@
+{
+  "loop": "hold_on_last_frame",
+  "blend_weight": 0.5,
+  "bones": {
+    "rightarm": {
+      "rotation": [
+        "-this*v.vbcdda",
+        0,
+        0
+      ]
+    },
+    "leftarm": {
+      "rotation": [
+        "-this*v.wfyvyl",
+        0,
+        0
+      ]
+    },
+    "egjh9rightarm": {
+      "rotation": [
+        "-this*v.vbcdda",
+        0,
+        0
+      ]
+    },
+    "egjh9leftarm": {
+      "rotation": [
+        "-this*v.wfyvyl",
+        0,
+        0
+      ]
+    }
+  }
+}

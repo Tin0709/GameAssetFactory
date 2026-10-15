@@ -1,0 +1,139 @@
+{
+  "loop": "hold_on_last_frame",
+  "bones": {
+    "waist": {
+      "rotation": [
+        0,
+        0,
+        "-Math.cos(q.life_time*122.5)"
+      ],
+      "position": [
+        "Math.sin(q.life_time*122.5)*0.25",
+        "Math.cos(q.life_time*245)*0.15-0.15",
+        0
+      ]
+    },
+    "head": {
+      "rotation": [
+        "-Math.sin(q.life_time*245)*2",
+        "-Math.sin(q.life_time*122.5-45)",
+        "-Math.cos(q.life_time*122.5-45)*3"
+      ]
+    },
+    "leftarm": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*245)*-1.25-1.15"
+      ],
+      "position": [
+        0,
+        "Math.cos(q.life_time*245)*0.1+0.05",
+        0
+      ]
+    },
+    "rightarm": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*245)*1.25+1.15"
+      ],
+      "position": [
+        0,
+        "Math.cos(q.life_time*245)*0.1+0.05",
+        0
+      ]
+    },
+    "rightleg": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*122.5)*1.2"
+      ],
+      "position": [
+        "Math.sin(q.life_time*122.5)*0.25",
+        0,
+        0
+      ]
+    },
+    "leftleg": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*122.5)*1.2"
+      ],
+      "position": [
+        "Math.sin(q.life_time*122.5)*0.25",
+        0,
+        0
+      ]
+    },
+    "egjh9waist": {
+      "rotation": [
+        0,
+        0,
+        "-Math.cos(q.life_time*122.5)"
+      ],
+      "position": [
+        "Math.sin(q.life_time*122.5)*0.25",
+        "Math.cos(q.life_time*245)*0.15-0.15",
+        0
+      ]
+    },
+    "egjh9leftarm": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*245)*-1.25-1.15"
+      ],
+      "position": [
+        0,
+        "Math.cos(q.life_time*245)*0.1+0.05",
+        0
+      ]
+    },
+    "egjh9rightarm": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*245)*1.25+1.15"
+      ],
+      "position": [
+        0,
+        "Math.cos(q.life_time*245)*0.1+0.05",
+        0
+      ]
+    },
+    "egjh9head": {
+      "rotation": [
+        "-Math.sin(q.life_time*245)*2",
+        "-Math.sin(q.life_time*122.5-45)",
+        "-Math.cos(q.life_time*122.5-45)*3"
+      ]
+    },
+    "egjh9rightleg": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*122.5)*1.2"
+      ],
+      "position": [
+        "Math.sin(q.life_time*122.5)*0.25",
+        0,
+        0
+      ]
+    },
+    "egjh9leftleg": {
+      "rotation": [
+        0,
+        0,
+        "Math.sin(q.life_time*122.5)*1.2"
+      ],
+      "position": [
+        "Math.sin(q.life_time*122.5)*0.25",
+        0,
+        0
+      ]
+    }
+  }
+}

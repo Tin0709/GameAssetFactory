@@ -1,0 +1,57 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "jump": "!q.is_on_ground&&!q.is_in_water&&!v.wujtlp&&v.quwblm==0"
+        }
+      ]
+    },
+    "jump": {
+      "transitions": [
+        {
+          "default": "q.is_in_water||v.wujtlp||v.quwblm!=0"
+        },
+        {
+          "xoaxls": "q.is_on_ground"
+        }
+      ]
+    },
+    "xoaxls": {
+      "transitions": [
+        {
+          "rqfjwy": "q.state_time>0.2&&v.cdrzno"
+        },
+        {
+          "yytrhz": "q.state_time>0.2"
+        }
+      ]
+    },
+    "yytrhz": {
+      "particle_effects": [
+        {
+          "effect": "eksuev",
+          "pre_effect_script": "v.cdrzno=0;v.jcalav=248/255;v.ypfpjf=253/255;v.rbnrwg=183/255;v.jzydng=0.8;"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "1"
+        }
+      ]
+    },
+    "rqfjwy": {
+      "particle_effects": [
+        {
+          "effect": "eksuev",
+          "pre_effect_script": "v.cdrzno=1;v.jcalav=248/255;v.ypfpjf=253/255;v.rbnrwg=183/255;v.jzydng=0.8;"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "1"
+        }
+      ]
+    }
+  }
+}

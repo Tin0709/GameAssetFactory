@@ -1,0 +1,279 @@
+{
+  "initial_state": "uwpoku",
+  "states": {
+    "uwpoku": {
+      "transitions": [
+        {
+          "wkbbnc": "q.modified_distance_moved"
+        }
+      ]
+    },
+    "wkbbnc": {
+      "transitions": [
+        {
+          "ssaxeh": "q.state_time>3"
+        },
+        {
+          "wkbbnc": "v.obhshf>0.25||v.nwocdu"
+        },
+        {
+          "jssmqg": "v.ccwxuc"
+        }
+      ]
+    },
+    "ssaxeh": {
+      "transitions": [
+        {
+          "wkbbnc": "q.is_emoting||q.main_hand_item_use_duration||q.is_sneaking||!q.is_on_ground||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))"
+        },
+        {
+          "blzrmm": "1"
+        }
+      ]
+    },
+    "blzrmm": {
+      "on_entry": [
+        "v.yfuzcx=v.tnlxsa==2?Math.random_integer(1,6);",
+        "v.ngjrwv=Math.random_integer(1,12);",
+        "v.xrtrow=1;"
+      ],
+      "transitions": [
+        {
+          "tesczf": "v.yfuzcx==1"
+        },
+        {
+          "tculwn": "v.ngjrwv==1"
+        },
+        {
+          "qofebb": "v.ngjrwv==2"
+        },
+        {
+          "hyopyb": "v.ngjrwv==3"
+        },
+        {
+          "lsswib": "v.ngjrwv==4"
+        },
+        {
+          "vmmadd": "v.ngjrwv==5"
+        },
+        {
+          "sztvzu": "v.ngjrwv==6"
+        },
+        {
+          "ksxdmq": "v.ngjrwv==7"
+        },
+        {
+          "iljvrj": "v.ngjrwv==8"
+        },
+        {
+          "nqwtki": "v.ngjrwv==9"
+        },
+        {
+          "gppwit": "v.ngjrwv==10"
+        },
+        {
+          "ufgjhm": "v.ngjrwv==11"
+        },
+        {
+          "jfwsbg": "v.ngjrwv==12"
+        }
+      ]
+    },
+    "tesczf": {
+      "animations": [
+        "tesczf"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.all_animations_finished||q.ground_speed||v.nwocdu||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "tculwn": {
+      "animations": [
+        "tculwn"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.any_animation_finished||q.ground_speed||v.nwocdu||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "qofebb": {
+      "animations": [
+        "vrkauw",
+        "qofebb"
+      ],
+      "transitions": [
+        {
+          "tculwn": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_spear','minecraft:is_spear'))"
+        },
+        {
+          "bhsawv": "q.is_emoting||q.all_animations_finished||q.ground_speed||v.nwocdu||q.get_animation_frame||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "hyopyb": {
+      "animations": [
+        "vrkauw",
+        "hyopyb"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.is_emoting||q.all_animations_finished||q.ground_speed||v.nwocdu||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "lsswib": {
+      "animations": [
+        "vrkauw",
+        "lsswib"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.all_animations_finished||q.ground_speed||v.nwocdu||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.16
+    },
+    "vmmadd": {
+      "animations": [
+        "vrkauw",
+        "vmmadd"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.all_animations_finished||q.ground_speed||v.nwocdu||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.16
+    },
+    "sztvzu": {
+      "animations": [
+        "sztvzu"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.any_animation_finished||v.nwocdu||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.16
+    },
+    "ksxdmq": {
+      "animations": [
+        "ksxdmq"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.all_animations_finished||v.nwocdu||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "iljvrj": {
+      "animations": [
+        "iljvrj"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.any_animation_finished||v.nwocdu||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "nqwtki": {
+      "animations": [
+        "nqwtki"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.all_animations_finished||q.ground_speed||v.nwocdu||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.3
+    },
+    "gppwit": {
+      "animations": [
+        "gppwit"
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.all_animations_finished||q.ground_speed||v.nwocdu||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.3
+    },
+    "ufgjhm": {
+      "on_entry": [
+        "v.vbvqoi=q.time_of_day<0.25||q.time_of_day>0.78;"
+      ],
+      "animations": [
+        {
+          "vrkauw": "v.vbvqoi"
+        },
+        {
+          "qsuikd": "v.vbvqoi"
+        },
+        {
+          "ndhbnd": "v.vbvqoi"
+        },
+        {
+          "jwkabt": "!v.vbvqoi"
+        }
+      ],
+      "transitions": [
+        {
+          "bhsawv": "q.is_emoting||q.state_time>5.7917||q.ground_speed||v.nwocdu||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_spear','minecraft:is_spear'))||v.ccwxuc"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "jfwsbg": {
+      "on_entry": [
+        "v.vbvqoi=q.entity_biome_has_any_tags('gilbgc','deep_dark','dxiirn')?-2:q.entity_biome_has_any_tags('nether')?2:q.entity_biome_has_any_tags('desert','jungle','mesa','savanna','qgvfrp')?1;",
+        "v.vbvqoi=v.vbvqoi+(q.armor_texture_slot(1)==0?2:q.armor_texture_slot(1)!=-1?1);"
+      ],
+      "animations": [
+        {
+          "vrkauw": "v.vbvqoi<0"
+        },
+        {
+          "rgrypt": "v.vbvqoi<0"
+        },
+        {
+          "hbadod": "v.vbvqoi<0?-v.vbvqoi"
+        },
+        {
+          "cpnaoo": "v.vbvqoi>0"
+        }
+      ],
+      "transitions": [
+        {
+          "bhsawv": "v.vbvqoi==0||q.is_emoting||q.state_time>3.6667||q.ground_speed||v.nwocdu||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_readable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:writable_book','minecraft:written_book','minecraft:filled_map'))"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "jssmqg": {
+      "transitions": [
+        {
+          "wkbbnc": "q.state_time>0.35"
+        }
+      ]
+    },
+    "bhsawv": {
+      "on_entry": [
+        "v.xrtrow=0;"
+      ],
+      "transitions": [
+        {
+          "wkbbnc": "q.state_time>0.35"
+        }
+      ]
+    }
+  }
+}

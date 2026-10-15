@@ -1,0 +1,280 @@
+{
+  "initial_state": "onccai",
+  "states": {
+    "run": {
+      "animations": [
+        {
+          "move": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "move_right": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "move_left": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "pgnnhd": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "hxfxxu": "v.esnrkj"
+        },
+        {
+          "kiggsk": "Math.max(Math.abs(v.cknrcn),Math.abs(v.mrmeib))*(v.jycjqy=='slime')"
+        },
+        {
+          "yonenf": "Math.max(v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+        },
+        {
+          "gcquxx": "Math.max(-v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+        },
+        "oprmcp"
+      ],
+      "transitions": [
+        {
+          "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+        },
+        {
+          "zhbjho": "v.hkmncu>0.05"
+        },
+        {
+          "rdvwhr": "v.rvwafl&&q.state_time>0.2"
+        },
+        {
+          "xdchdk": "v.undfyr&&v.lzwweo>6.75&&q.is_pack_setting_selected('oreville_ans:fyumxp','eysaic')"
+        },
+        {
+          "onccai": "v.esnrkj<0.6&&q.state_time>0.2"
+        }
+      ],
+      "blend_transition": 0.22
+    },
+    "xdchdk": {
+      "animations": [
+        {
+          "ksoign": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "ijczfy": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "movjvc": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "nlkzpp": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "hxfxxu": "v.esnrkj"
+        },
+        "inxmkt"
+      ],
+      "transitions": [
+        {
+          "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+        },
+        {
+          "zhbjho": "v.hkmncu>0.05"
+        },
+        {
+          "rdvwhr": "v.rvwafl&&q.state_time>0.2"
+        },
+        {
+          "run": "!v.undfyr&&v.lzwweo<4.5||!q.is_pack_setting_selected('oreville_ans:fyumxp','eysaic')"
+        },
+        {
+          "onccai": "v.esnrkj<0.6&&q.state_time>0.2"
+        }
+      ],
+      "blend_transition": 0.22
+    },
+    "onccai": {
+      "animations": [
+        {
+          "walk": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "vwyhwm": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "pvgbyg": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "kzuqni": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "bqirai": "Math.max(Math.abs(v.cknrcn),Math.abs(v.mrmeib))*(v.jycjqy=='slime')"
+        },
+        {
+          "iuktbd": "Math.max(v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+        },
+        {
+          "kgpeib": "Math.max(-v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+        },
+        "oprmcp"
+      ],
+      "transitions": [
+        {
+          "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+        },
+        {
+          "zhbjho": "v.hkmncu>0.05"
+        },
+        {
+          "icxyyv": "v.rvwafl&&q.state_time>0.2"
+        },
+        {
+          "run": "v.esnrkj>0.7&&q.state_time>0.2"
+        }
+      ],
+      "blend_transition": 0.22
+    },
+    "rdvwhr": {
+      "on_entry": [
+        "v.vgieqh=1;"
+      ],
+      "animations": [
+        {
+          "usmlvw": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "move_right": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "move_left": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "bkydlx": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "kiggsk": "Math.max(Math.abs(v.cknrcn),Math.abs(v.mrmeib))*(v.jycjqy=='slime')"
+        },
+        {
+          "yonenf": "Math.max(v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+        },
+        {
+          "gcquxx": "Math.max(-v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+        }
+      ],
+      "transitions": [
+        {
+          "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+        },
+        {
+          "zhbjho": "v.hkmncu>0.05"
+        },
+        {
+          "run": "v.esnrkj>0.7&&!v.rvwafl&&q.state_time>0.1"
+        },
+        {
+          "icxyyv": "v.esnrkj<0.6&&q.state_time>0.1"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "icxyyv": {
+      "on_entry": [
+        "v.vgieqh=1;"
+      ],
+      "animations": [
+        {
+          "icxyyv": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "vwyhwm": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "pvgbyg": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "kzhobv": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+        },
+        {
+          "bqirai": "Math.max(Math.abs(v.cknrcn),Math.abs(v.mrmeib))*(v.jycjqy=='slime')"
+        },
+        {
+          "iuktbd": "Math.max(v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+        },
+        {
+          "kgpeib": "Math.max(-v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+        }
+      ],
+      "transitions": [
+        {
+          "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+        },
+        {
+          "zhbjho": "v.hkmncu>0.05"
+        },
+        {
+          "rdvwhr": "v.esnrkj>0.7&&q.state_time>0.1"
+        },
+        {
+          "onccai": "v.esnrkj<0.6&&!v.rvwafl&&q.state_time>0.1"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "knxfvl": {
+      "transitions": [
+        {
+          "zhbjho": "!q.is_on_ground&&!v.hirjne&&!v.hhsumy&&!(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))&&!v.gddzeg&&!v.gtgvhp&&!v.yyjpfg"
+        },
+        {
+          "rdvwhr": "!v.hirjne&&!v.hhsumy&&!(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))&&!v.gddzeg&&!v.gtgvhp&&!v.yyjpfg&&v.rvwafl"
+        },
+        {
+          "run": "!v.hirjne&&!v.hhsumy&&!(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))&&!v.gddzeg&&!v.gtgvhp&&!v.yyjpfg"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "zhbjho": {
+      "on_entry": [
+        "!q.is_in_ui&&!v.is_paperdoll?{v.xgnfpn=0;};"
+      ],
+      "animations": [
+        {
+          "pkdlkc": "Math.clamp(v.cknrcn,0,1)"
+        },
+        {
+          "hnhukj": "Math.clamp(v.mrmeib,0,1)"
+        },
+        {
+          "txkksi": "Math.clamp(-v.mrmeib,0,1)"
+        },
+        {
+          "xvsgam": "Math.clamp(-v.cknrcn,0,1)"
+        },
+        {
+          "fly": "v.xgnfpn-v.axerqj"
+        },
+        {
+          "qbfoza": "v.xgnfpn-v.axerqj"
+        }
+      ],
+      "transitions": [
+        {
+          "zhbjho": "!q.is_in_ui&&!v.is_paperdoll&&q.state_time>0.4?{v.xgnfpn=v.xgnfpn+((!q.is_in_water&&q.vertical_speed>=0)-v.xgnfpn)*(0.6*q.delta_time);v.cthrgf=v.xgnfpn>=0.5&&q.state_time>=1.15&&!v.rvwafl;};return 0;"
+        },
+        {
+          "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+        },
+        {
+          "rdvwhr": "v.esnrkj>0.7&&q.is_on_ground&&v.rvwafl"
+        },
+        {
+          "run": "v.esnrkj>0.7&&q.is_on_ground"
+        },
+        {
+          "icxyyv": "q.is_on_ground&&v.rvwafl"
+        },
+        {
+          "onccai": "q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.16,
+      "on_exit": [
+        "!q.is_in_ui&&!v.is_paperdoll?{v.cthrgf=0;};"
+      ]
+    }
+  }
+}

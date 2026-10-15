@@ -1,0 +1,94 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "exthrz": "q.is_local_player"
+        },
+        {
+          "acrpyx": "!q.is_local_player"
+        }
+      ]
+    },
+    "exthrz": {
+      "sound_effects": [
+        {
+          "effect": "exthrz"
+        },
+        {
+          "effect": "hondmz"
+        }
+      ],
+      "transitions": [
+        {
+          "fall": "q.vertical_speed<-0.15&&!q.is_in_water"
+        }
+      ]
+    },
+    "acrpyx": {
+      "sound_effects": [
+        {
+          "effect": "acrpyx"
+        },
+        {
+          "effect": "txmwhf"
+        }
+      ],
+      "transitions": [
+        {
+          "fall": "q.vertical_speed<-0.15&&!q.is_in_water"
+        }
+      ]
+    },
+    "fall": {
+      "transitions": [
+        {
+          "default": "q.is_in_water"
+        },
+        {
+          "yytrhz": "q.is_on_ground"
+        }
+      ]
+    },
+    "yytrhz": {
+      "transitions": [
+        {
+          "edatrt": "q.is_local_player&&q.state_time>=0.1"
+        },
+        {
+          "gphhys": "!q.is_local_player&&q.state_time>=0.1"
+        }
+      ]
+    },
+    "edatrt": {
+      "sound_effects": [
+        {
+          "effect": "hondmz"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.is_in_water"
+        },
+        {
+          "fall": "!q.is_on_ground&&q.vertical_speed<-0.15"
+        }
+      ]
+    },
+    "gphhys": {
+      "sound_effects": [
+        {
+          "effect": "txmwhf"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.is_in_water"
+        },
+        {
+          "fall": "!q.is_on_ground&&q.vertical_speed<-0.15"
+        }
+      ]
+    }
+  }
+}

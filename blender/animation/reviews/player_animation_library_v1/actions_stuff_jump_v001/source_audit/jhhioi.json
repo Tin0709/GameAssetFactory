@@ -1,0 +1,22 @@
+{
+  "states": {
+    "default": {
+      "animations": [
+        "yytrhz"
+      ],
+      "transitions": [
+        {
+          "zhbjho": "!q.relative_block_has_any_tag(0,0,0,'rail')&&Math.abs(q.vertical_speed)>1"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "zhbjho": {
+      "transitions": [
+        {
+          "default": "q.relative_block_has_any_tag(0,0,0,'rail')||Math.abs(q.vertical_speed)<1"
+        }
+      ]
+    }
+  }
+}

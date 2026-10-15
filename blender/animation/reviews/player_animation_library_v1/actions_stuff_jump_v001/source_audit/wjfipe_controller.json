@@ -1,0 +1,71 @@
+{
+  "states": {
+    "default": {
+      "animations": [
+        {
+          "lsiklr": "v.jiqwge&&!q.is_gliding&&!q.is_swimming&&!q.is_emoting&&!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))&&!(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+        }
+      ],
+      "transitions": [
+        {
+          "ssulqn": "v.is_holding_left"
+        }
+      ]
+    },
+    "ydkyzm": {
+      "on_entry": [
+        "v.enkwhe=q.get_equipped_item_name(1);"
+      ],
+      "animations": [
+        "lsiklr"
+      ],
+      "transitions": [
+        {
+          "default": "!v.is_holding_left"
+        },
+        {
+          "ssulqn": "!v.oreville_offhand_hold_up&&!(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.offhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+        },
+        {
+          "nxbnll": "q.is_gliding||q.is_swimming||v.gddzeg"
+        },
+        {
+          "default": "v.enkwhe!=q.get_equipped_item_name(1)"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "nxbnll": {
+      "transitions": [
+        {
+          "default": "!v.is_holding_left"
+        },
+        {
+          "ssulqn": "!v.oreville_offhand_hold_up&&!(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.offhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+        },
+        {
+          "ydkyzm": "!q.is_gliding&&!q.is_swimming&&!q.is_emoting&&!v.gddzeg"
+        }
+      ]
+    },
+    "ssulqn": {
+      "on_entry": [
+        "v.enkwhe=q.get_equipped_item_name(1);"
+      ],
+      "animations": [
+        "xhexyy",
+        {
+          "lsiklr": "v.jiqwge&&!q.is_gliding&&!q.is_swimming&&!q.is_emoting&&!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))&&!(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+        }
+      ],
+      "transitions": [
+        {
+          "ydkyzm": "v.oreville_offhand_hold_up||(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.offhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+        },
+        {
+          "default": "v.enkwhe!=q.get_equipped_item_name(1)"
+        }
+      ]
+    }
+  }
+}

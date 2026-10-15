@@ -1,0 +1,36 @@
+{
+  "states": {
+    "default": {
+      "animations": [
+        "jlgdzl",
+        "fndthi",
+        "vhgkyg",
+        {
+          "qsmfqg": "!q.is_in_ui"
+        },
+        "vdahiy",
+        {
+          "sfbfzz": "q.is_on_ground&&!v.apkost"
+        },
+        {
+          "hjdppu": "q.is_on_ground&&v.apkost"
+        }
+      ],
+      "transitions": [
+        {
+          "hweody": "q.is_riding"
+        }
+      ]
+    },
+    "hweody": {
+      "animations": [
+        "yytrhz"
+      ],
+      "transitions": [
+        {
+          "default": "!q.is_riding"
+        }
+      ]
+    }
+  }
+}

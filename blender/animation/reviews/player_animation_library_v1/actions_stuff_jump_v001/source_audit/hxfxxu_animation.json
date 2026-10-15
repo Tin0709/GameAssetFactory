@@ -1,0 +1,47 @@
+{
+  "loop": true,
+  "bones": {
+    "root": {
+      "rotation": [
+        0,
+        0,
+        "-v.bdjsdw*0.03"
+      ]
+    },
+    "waist": {
+      "rotation": [
+        0,
+        0,
+        "-v.bdjsdw*0.05"
+      ]
+    },
+    "head": {
+      "rotation": [
+        0,
+        0,
+        "-v.bdjsdw*0.03"
+      ]
+    },
+    "egjh9root": {
+      "rotation": [
+        0,
+        0,
+        "-v.bdjsdw*0.03"
+      ]
+    },
+    "egjh9waist": {
+      "rotation": [
+        0,
+        0,
+        "-v.bdjsdw*0.05"
+      ]
+    },
+    "egjh9head": {
+      "rotation": [
+        0,
+        0,
+        "-v.bdjsdw*0.03"
+      ]
+    }
+  }
+}

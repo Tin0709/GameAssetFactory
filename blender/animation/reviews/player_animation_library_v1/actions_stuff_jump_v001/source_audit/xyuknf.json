@@ -1,0 +1,51 @@
+{
+  "states": {
+    "default": {
+      "animations": [
+        {
+          "look_at_target": "!q.is_riding"
+        },
+        {
+          "oisssk": "q.is_riding"
+        },
+        {
+          "oyabwp": "q.is_riding"
+        }
+      ],
+      "transitions": [
+        {
+          "move": "q.has_rider"
+        }
+      ]
+    },
+    "move": {
+      "on_entry": [
+        "!q.is_in_ui?{v.toclgf=q.position(0);v.qkrfdi=q.position(2);v.iaxjoy=q.position(0);v.iynnie=q.position(2);};"
+      ],
+      "animations": [
+        "oisssk",
+        "yytrhz",
+        {
+          "oyabwp": "!q.is_riding"
+        },
+        {
+          "walk": "Math.clamp(v.wxfgnb,0.001,1)"
+        },
+        {
+          "run": "Math.clamp(v.ixjhbf,0.001,1)"
+        },
+        {
+          "sprint": "Math.max(v.hqlypb,0.001)"
+        }
+      ],
+      "transitions": [
+        {
+          "move": "!q.is_in_ui?{v.wxfgnb=Math.lerp(v.wxfgnb,v.nkhgzz==0?v.lzwweo,0.1);v.ixjhbf=Math.lerp(v.ixjhbf,v.nkhgzz==1?Math.min(v.lzwweo/3,1),0.1);v.hqlypb=Math.lerp(v.hqlypb,v.nkhgzz==2,0.1);};return 0;"
+        },
+        {
+          "default": "!q.has_rider"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "states": {
+    "default": {
+      "animations": [
+        "yytrhz"
+      ],
+      "transitions": [
+        {
+          "zhbjho": "!q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "zhbjho": {
+      "transitions": [
+        {
+          "default": "q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1
+    }
+  }
+}

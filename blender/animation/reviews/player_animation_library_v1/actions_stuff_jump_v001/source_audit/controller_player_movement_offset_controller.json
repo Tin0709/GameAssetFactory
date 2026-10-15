@@ -1,0 +1,68 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "upatrp": "v.trznwu&&q.is_on_ground"
+        },
+        {
+          "rcdxne": "v.gynlia"
+        },
+        {
+          "dvwvti": "v.tkterv"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "upatrp": {
+      "animations": [
+        {
+          "upatrp": "!q.is_in_ui&&!v.is_paperdoll"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!v.trznwu&&q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "rcdxne": {
+      "animations": [
+        {
+          "rcdxne": "!q.is_in_ui&&!v.is_paperdoll"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!v.gynlia"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "dvwvti": {
+      "animations": [
+        {
+          "dvwvti": "!q.is_in_ui&&!v.is_paperdoll"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!v.tkterv"
+        }
+      ],
+      "blend_transition": {
+        "0.0": 1,
+        "0.0444": 0.70233,
+        "0.0889": 0.47051,
+        "0.1333": 0.2963,
+        "0.1778": 0.17147,
+        "0.2222": 0.08779,
+        "0.2667": 0.03704,
+        "0.3111": 0.01097,
+        "0.3556": 0.00137,
+        "0.4": 0
+      }
+    }
+  }
+}

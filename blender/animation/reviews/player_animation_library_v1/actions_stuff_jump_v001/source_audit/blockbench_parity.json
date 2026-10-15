@@ -1,0 +1,6 @@
+{
+  "samples": 4575,
+  "max_abs_error": 1.4210854715202004e-14,
+  "pass": true,
+  "blockbench_commit": "7c92e27d237e365110030d73e92c5d1605f0d311"
+}

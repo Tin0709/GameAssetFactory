@@ -1,0 +1,41 @@
+{
+  "initial_state": "czjiep",
+  "states": {
+    "czjiep": {
+      "transitions": [
+        {
+          "czbfon": "!q.is_on_ground&&q.vertical_speed<-0.1"
+        }
+      ]
+    },
+    "xvdmyi": {
+      "transitions": [
+        {
+          "kiyrtf": "!q.is_on_ground&&q.vertical_speed<-0.1"
+        }
+      ]
+    },
+    "czbfon": {
+      "animations": [
+        "fall"
+      ],
+      "transitions": [
+        {
+          "xvdmyi": "(q.is_on_ground&&q.vertical_speed>-1)||q.vertical_speed>=-0.15"
+        }
+      ],
+      "blend_transition": 0.22
+    },
+    "kiyrtf": {
+      "animations": [
+        "fall"
+      ],
+      "transitions": [
+        {
+          "czjiep": "(q.is_on_ground&&q.vertical_speed>-1)||q.vertical_speed>=-0.15"
+        }
+      ],
+      "blend_transition": 0.22
+    }
+  }
+}

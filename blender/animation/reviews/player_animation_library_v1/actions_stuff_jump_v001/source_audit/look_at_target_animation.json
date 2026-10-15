@@ -1,0 +1,25 @@
+{
+  "loop": true,
+  "bones": {
+    "head": {
+      "relative_to": {
+        "rotation": "entity"
+      },
+      "rotation": [
+        "q.target_x_rotation",
+        "v.wyuvst",
+        0
+      ]
+    },
+    "egjh9head": {
+      "relative_to": {
+        "rotation": "entity"
+      },
+      "rotation": [
+        "q.target_x_rotation",
+        "v.wyuvst",
+        0
+      ]
+    }
+  }
+}

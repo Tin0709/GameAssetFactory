@@ -1,0 +1,116 @@
+{
+  "loop": true,
+  "blend_weight": "Math.clamp(v.esnrkj,0,1)",
+  "bones": {
+    "waist": {
+      "rotation": [
+        "Math.lerp(-20,40,v.cknrcn*0.5+0.5)",
+        0,
+        "Math.lerp(10,-10,v.mrmeib*0.5+0.5)"
+      ]
+    },
+    "leftarm": {
+      "rotation": [
+        "(v.cknrcn*27.5)",
+        0,
+        "Math.lerp(5,-10,v.mrmeib*0.5+0.5)"
+      ],
+      "position": [
+        0,
+        "Math.lerp(-0.5,-0.5,v.cknrcn*0.5+0.5)",
+        "Math.lerp(-1.25,1.25,v.cknrcn*0.5+0.5)"
+      ]
+    },
+    "rightarm": {
+      "rotation": [
+        "(v.cknrcn*25)",
+        0,
+        "Math.lerp(10,-5,v.mrmeib*0.5+0.5)"
+      ],
+      "position": [
+        0,
+        "Math.lerp(-0.5,-0.5,v.cknrcn*0.5+0.5)",
+        "Math.lerp(-1.25,1.25,v.cknrcn*0.5+0.5)"
+      ]
+    },
+    "rightleg": {
+      "rotation": [
+        "(v.cknrcn*40)",
+        0,
+        "Math.lerp(40,-30,v.mrmeib*0.5+0.5)"
+      ],
+      "position": [
+        "Math.lerp(1,-2,v.mrmeib*0.5+0.5)",
+        "Math.lerp(0,-2,v.cknrcn*0.5+0.5)",
+        "Math.lerp(2.25,-2.25,v.cknrcn*0.5+0.5)"
+      ]
+    },
+    "leftleg": {
+      "rotation": [
+        "(v.cknrcn*50)",
+        0,
+        "Math.lerp(30,-40,v.mrmeib*0.5+0.5)"
+      ],
+      "position": [
+        0,
+        "Math.lerp(0,1,v.mrmeib*0.5+0.5)",
+        0
+      ]
+    },
+    "egjh9waist": {
+      "rotation": [
+        "Math.lerp(-20,40,v.cknrcn*0.5+0.5)",
+        0,
+        "Math.lerp(10,-10,v.mrmeib*0.5+0.5)"
+      ]
+    },
+    "egjh9leftarm": {
+      "rotation": [
+        "(v.cknrcn*27.5)",
+        0,
+        "Math.lerp(5,-10,v.mrmeib*0.5+0.5)"
+      ],
+      "position": [
+        0,
+        "Math.lerp(-0.5,-0.5,v.cknrcn*0.5+0.5)",
+        "Math.lerp(-1.25,1.25,v.cknrcn*0.5+0.5)"
+      ]
+    },
+    "egjh9rightarm": {
+      "rotation": [
+        "(v.cknrcn*25)",
+        0,
+        "Math.lerp(10,-5,v.mrmeib*0.5+0.5)"
+      ],
+      "position": [
+        0,
+        "Math.lerp(-0.5,-0.5,v.cknrcn*0.5+0.5)",
+        "Math.lerp(-1.25,1.25,v.cknrcn*0.5+0.5)"
+      ]
+    },
+    "egjh9rightleg": {
+      "rotation": [
+        "(v.cknrcn*40)",
+        0,
+        "Math.lerp(40,-30,v.mrmeib*0.5+0.5)"
+      ],
+      "position": [
+        "Math.lerp(1,-2,v.mrmeib*0.5+0.5)",
+        "Math.lerp(0,-2,v.cknrcn*0.5+0.5)",
+        "Math.lerp(2.25,-2.25,v.cknrcn*0.5+0.5)"
+      ]
+    },
+    "egjh9leftleg": {
+      "rotation": [
+        "(v.cknrcn*50)",
+        0,
+        "Math.lerp(30,-40,v.mrmeib*0.5+0.5)"
+      ],
+      "position": [
+        0,
+        "Math.lerp(0,1,v.mrmeib*0.5+0.5)",
+        0
+      ]
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "fall": "!q.is_on_ground&&q.vertical_speed<-0.15"
+        }
+      ]
+    },
+    "fall": {
+      "transitions": [
+        {
+          "taekbc": "!v.mqapbe&&q.vertical_speed<-12"
+        },
+        {
+          "rtaoje": "v.mqapbe&&q.vertical_speed<-12"
+        },
+        {
+          "default": "q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.3
+    },
+    "taekbc": {
+      "animations": [
+        "taekbc",
+        "xcccfu"
+      ],
+      "transitions": [
+        {
+          "rtaoje": "v.mqapbe"
+        },
+        {
+          "default": "q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.3
+    },
+    "rtaoje": {
+      "animations": [
+        "rtaoje",
+        "fqparn"
+      ],
+      "transitions": [
+        {
+          "taekbc": "!v.mqapbe"
+        },
+        {
+          "default": "q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.3
+    }
+  }
+}

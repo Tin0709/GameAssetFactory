@@ -1,0 +1,77 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "fall": "q.vertical_speed<-1&&!q.is_on_ground"
+        },
+        {
+          "jump": "q.vertical_speed>1&&!q.is_on_ground"
+        }
+      ]
+    },
+    "fall": {
+      "animations": [
+        "udksfz",
+        "tqwghp"
+      ],
+      "transitions": [
+        {
+          "qazmxb": "q.state_time<0.3&&(q.is_on_ground||v.vzqfgi)"
+        },
+        {
+          "yytrhz": "q.is_on_ground||v.vzqfgi"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "yytrhz": {
+      "animations": [
+        "rpvaaw"
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished"
+        },
+        {
+          "fall": "q.state_time>0.1&&!v.vzqfgi&&q.vertical_speed<-1&&!q.is_on_ground"
+        },
+        {
+          "jump": "q.vertical_speed>1&&q.state_time>0.1&&!q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.4
+    },
+    "qazmxb": {
+      "animations": [
+        "nvwdcq"
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished"
+        },
+        {
+          "fall": "q.state_time>0.1&&!v.vzqfgi&&q.vertical_speed<-1&&!q.is_on_ground"
+        },
+        {
+          "jump": "q.vertical_speed>1&&q.state_time>0.1&&!q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.4
+    },
+    "jump": {
+      "animations": [
+        "fwhrac"
+      ],
+      "transitions": [
+        {
+          "default": "q.is_on_ground"
+        },
+        {
+          "fall": "q.vertical_speed<-1&&q.state_time>0.16"
+        }
+      ],
+      "blend_transition": 0.1
+    }
+  }
+}

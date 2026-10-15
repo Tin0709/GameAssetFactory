@@ -1,0 +1,148 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "ssulqn": "v.is_holding_right"
+        }
+      ]
+    },
+    "ssulqn": {
+      "on_entry": [
+        "v.nshrzx=q.get_equipped_item_name(0);"
+      ],
+      "animations": [
+        "fzimtw"
+      ],
+      "transitions": [
+        {
+          "ltqtzr": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))"
+        },
+        {
+          "ydkyzm": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.mainhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+        },
+        {
+          "lvkwjg": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))&&!q.is_riding_any_entity_of_type('minecraft:boat','minecraft:chest_boat')"
+        },
+        {
+          "rfcjcg": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))&&!q.is_riding_any_entity_of_type('minecraft:boat','minecraft:chest_boat')"
+        },
+        {
+          "default": "v.nshrzx!=q.get_equipped_item_name(0)"
+        }
+      ]
+    },
+    "ltqtzr": {
+      "on_entry": [
+        "v.nshrzx=q.get_equipped_item_name(0);"
+      ],
+      "animations": [
+        "tcucxa"
+      ],
+      "transitions": [
+        {
+          "default": "!v.is_holding_right"
+        },
+        {
+          "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))"
+        },
+        {
+          "ieyepd": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))&&!q.is_riding_any_entity_of_type('minecraft:boat','minecraft:chest_boat')"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "ydkyzm": {
+      "on_entry": [
+        "v.nshrzx=q.get_equipped_item_name(0);"
+      ],
+      "animations": [
+        "pfunsk"
+      ],
+      "transitions": [
+        {
+          "default": "!v.is_holding_right"
+        },
+        {
+          "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_torch')||q.is_item_name_any('slot.weapon.mainhand','minecraft:blaze_powder','minecraft:torch','minecraft:soul_torch','minecraft:copper_torch'))"
+        },
+        {
+          "default": "v.nshrzx!=q.get_equipped_item_name(0)"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "lvkwjg": {
+      "on_entry": [
+        "v.nshrzx=q.get_equipped_item_name(0);"
+      ],
+      "animations": [
+        "bphbtz",
+        "qturaa"
+      ],
+      "transitions": [
+        {
+          "default": "!v.is_holding_right"
+        },
+        {
+          "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))||q.is_riding_any_entity_of_type('minecraft:boat','minecraft:chest_boat')"
+        },
+        {
+          "ieyepd": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "rfcjcg": {
+      "on_entry": [
+        "v.nshrzx=q.get_equipped_item_name(0);"
+      ],
+      "animations": [
+        "bphbtz",
+        {
+          "shears": "!v.is_holding_left"
+        },
+        {
+          "uyaebq": "v.is_holding_left"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!v.is_holding_right"
+        },
+        {
+          "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))||q.is_riding_any_entity_of_type('minecraft:boat','minecraft:chest_boat')"
+        },
+        {
+          "ieyepd": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "ieyepd": {
+      "animations": [
+        {
+          "zxbclh": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))"
+        }
+      ],
+      "transitions": [
+        {
+          "ltqtzr": "!q.blocking&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))"
+        },
+        {
+          "lvkwjg": "!q.blocking&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+        },
+        {
+          "rfcjcg": "!q.blocking&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))"
+        },
+        {
+          "default": "!v.is_holding_right"
+        },
+        {
+          "ssulqn": "!q.blocking||q.is_riding_any_entity_of_type('minecraft:boat','minecraft:chest_boat')"
+        }
+      ],
+      "blend_transition": 0.16
+    }
+  }
+}

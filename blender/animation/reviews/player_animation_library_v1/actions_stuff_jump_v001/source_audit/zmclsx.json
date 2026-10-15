@@ -1,0 +1,38 @@
+{
+  "states": {
+    "default": {
+      "on_entry": [
+        "v.rcgezu=1;"
+      ],
+      "animations": [
+        "yytrhz"
+      ],
+      "transitions": [
+        {
+          "zhbjho": "!q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "zhbjho": {
+      "on_entry": [
+        "v.rcgezu=0;"
+      ],
+      "transitions": [
+        {
+          "xjbrkk": "q.is_on_ground"
+        }
+      ]
+    },
+    "xjbrkk": {
+      "transitions": [
+        {
+          "zhbjho": "!q.is_on_ground"
+        },
+        {
+          "default": "q.state_time>0.15"
+        }
+      ]
+    }
+  }
+}

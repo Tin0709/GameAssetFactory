@@ -1,0 +1,143 @@
+{
+  "initial_state": "sxuoyn",
+  "states": {
+    "default": {
+      "on_entry": [
+        "v.ugxubt=q.health;"
+      ],
+      "transitions": [
+        {
+          "dovmdl": "v.rjwqox&&((v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.hhsumy)"
+        },
+        {
+          "sxuoyn": "v.ugxubt<q.health"
+        },
+        {
+          "nmagsu": "v.rjwqox"
+        }
+      ]
+    },
+    "nmagsu": {
+      "on_entry": [
+        "v.ugxubt=q.health;"
+      ],
+      "animations": [
+        {
+          "xnifpo": "v.is_first_person"
+        },
+        {
+          "hurt": "!v.is_first_person"
+        },
+        {
+          "vlexuo": "!v.is_first_person&&v.jycjqy=='slime'"
+        },
+        {
+          "inwnxn": "!v.is_first_person&&v.tnlxsa==4"
+        }
+      ],
+      "particle_effects": [
+        {
+          "effect": "nmagsu"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.hhsumy"
+        },
+        {
+          "ebniro": "q.state_time>0.49&&v.rjwqox"
+        },
+        {
+          "sxuoyn": "v.ugxubt<q.health"
+        }
+      ],
+      "on_exit": [
+        "v.gjrfbe=0;"
+      ]
+    },
+    "dovmdl": {
+      "on_entry": [
+        "v.ugxubt=q.health;"
+      ],
+      "animations": [
+        "dovmdl"
+      ],
+      "particle_effects": [
+        {
+          "effect": "nmagsu"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished"
+        },
+        {
+          "ebniro": "q.state_time>0.49&&v.rjwqox"
+        },
+        {
+          "sxuoyn": "v.ugxubt<q.health"
+        }
+      ],
+      "on_exit": [
+        "v.gjrfbe=0;"
+      ]
+    },
+    "ebniro": {
+      "on_entry": [
+        "v.ugxubt=q.health;"
+      ],
+      "animations": [
+        {
+          "xnifpo": "v.is_first_person"
+        },
+        {
+          "hurt": "!v.is_first_person"
+        },
+        {
+          "vlexuo": "!v.is_first_person&&v.jycjqy=='slime'"
+        },
+        {
+          "inwnxn": "!v.is_first_person&&v.tnlxsa==4"
+        }
+      ],
+      "particle_effects": [
+        {
+          "effect": "nmagsu"
+        }
+      ],
+      "transitions": [
+        {
+          "nmagsu": "q.state_time>0.49&&v.rjwqox"
+        },
+        {
+          "sxuoyn": "v.ugxubt<q.health"
+        },
+        {
+          "default": "q.any_animation_finished"
+        }
+      ],
+      "on_exit": [
+        "v.gjrfbe=0;"
+      ]
+    },
+    "sxuoyn": {
+      "on_entry": [
+        "v.ugxubt=q.health;"
+      ],
+      "animations": [
+        "sxuoyn"
+      ],
+      "transitions": [
+        {
+          "nmagsu": "v.rjwqox"
+        },
+        {
+          "default": "q.any_animation_finished"
+        }
+      ],
+      "on_exit": [
+        "v.gjrfbe=0;"
+      ]
+    }
+  }
+}

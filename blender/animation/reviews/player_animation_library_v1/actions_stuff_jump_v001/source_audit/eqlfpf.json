@@ -1,0 +1,31 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "fall": "!q.is_on_ground&&!q.is_in_water&&q.vertical_speed!=0"
+        }
+      ],
+      "blend_transition": 0.15
+    },
+    "fall": {
+      "animations": [
+        {
+          "fall": "v.cdgbzp*!v.jwiagl"
+        },
+        {
+          "sihkzp": "!v.cdgbzp*!v.jwiagl"
+        },
+        {
+          "wzcspl": "v.jwiagl"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.is_on_ground||q.is_in_water||q.vertical_speed==0"
+        }
+      ],
+      "blend_transition": 0.4
+    }
+  }
+}

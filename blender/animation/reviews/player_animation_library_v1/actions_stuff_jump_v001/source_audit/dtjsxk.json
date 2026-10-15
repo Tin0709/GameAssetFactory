@@ -1,0 +1,43 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "fall": "!q.is_on_ground&&q.vertical_speed<-0.5"
+        }
+      ]
+    },
+    "fall": {
+      "animations": [
+        "fall"
+      ],
+      "transitions": [
+        {
+          "default": "(q.is_on_ground&&q.vertical_speed>-2&&v.rcgezu)||q.vertical_speed>=-0.15"
+        },
+        {
+          "hwuwvi": "q.is_in_water"
+        }
+      ],
+      "blend_transition": 0.22
+    },
+    "hwuwvi": {
+      "particle_effects": [
+        {
+          "effect": "hwuwvi"
+        },
+        {
+          "effect": "djnihu"
+        },
+        {
+          "effect": "cbcewo"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!q.is_in_water"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "states": {
+    "default": {
+      "on_entry": [
+        "v.rcgezu=1;"
+      ],
+      "animations": [
+        {
+          "yytrhz": "v.cdrzno?0.5:1"
+        }
+      ],
+      "transitions": [
+        {
+          "zhbjho": "!q.is_on_ground&&q.state_time>0.1"
+        }
+      ],
+      "blend_transition": 0.12,
+      "on_exit": [
+        "v.xsvjrb=0;"
+      ]
+    },
+    "zhbjho": {
+      "on_entry": [
+        "v.rcgezu=0;"
+      ],
+      "transitions": [
+        {
+          "xjbrkk": "q.is_on_ground"
+        }
+      ],
+      "on_exit": [
+        "v.cevvww=0;"
+      ]
+    },
+    "xjbrkk": {
+      "transitions": [
+        {
+          "zhbjho": "!q.is_on_ground"
+        },
+        {
+          "default": "q.state_time>0.1"
+        }
+      ]
+    }
+  }
+}

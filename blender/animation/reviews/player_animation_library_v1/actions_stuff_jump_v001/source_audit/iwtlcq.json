@@ -1,0 +1,24 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "fall": "q.vertical_speed<-0.15&&!q.is_on_ground&&q.state_time>0.2"
+        }
+      ]
+    },
+    "fall": {
+      "animations": [
+        {
+          "fall": "v.spjcdi"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "(q.is_on_ground&&q.state_time>0.25)||q.vertical_speed>0"
+        }
+      ],
+      "blend_transition": 0.2
+    }
+  }
+}

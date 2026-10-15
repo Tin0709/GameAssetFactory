@@ -1,0 +1,9 @@
+{
+  "loop": true,
+  "animation_length": 1,
+  "anim_time_update": "v.eqhdel",
+  "timeline": {
+    "0.45": "!q.is_in_ui&&!v.is_paperdoll?{v.sxqiqn=1;};",
+    "0.95": "!q.is_in_ui&&!v.is_paperdoll?{v.ywlneb=1;};"
+  }
+}

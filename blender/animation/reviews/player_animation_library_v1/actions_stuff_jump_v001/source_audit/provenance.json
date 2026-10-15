@@ -1,0 +1,27 @@
+{
+  "archive": "/Users/tin/Desktop/Game Dev/local_references/Actions Stuff 1.12 (resources).mcpack",
+  "archive_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "preservation": "Archive, existing repo, Godot and Blender untouched; only new isolated study files written.",
+  "source_files": [
+    "entity/dtr.json",
+    "animations/f2da1071.json",
+    "animation_controllers/616f2ff7.json"
+  ],
+  "dependency_files": {
+    "molang.py": {
+      "origin": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/actions_stuff_directional_v001/molang.py",
+      "sha256": "5275f80846ff22424509a7f65cac3b7ef8ad9a42ade25895402628bf8b74edc0"
+    },
+    "source_channels.py": {
+      "origin": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/actions_stuff_directional_v001/source_channels.py",
+      "sha256": "a735cb949daa1a0c1550aaf49b3a953bff45eb1c11ddb19934d0ca254a2bd951"
+    },
+    "source_simulation.py": {
+      "origin": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/actions_stuff_directional_v001/source_simulation.py",
+      "sha256": "7eb9b55df12313a505aa20aff8173953b40ad60baf8d00e1ae9338aacd38372e"
+    }
+  },
+  "entity/dtr.json_sha256": "e6f3db842fb0dd2b2d770a390e166f0ae95f93659c759c597b5091d5c3a25dd2",
+  "animations/f2da1071.json_sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+  "animation_controllers/616f2ff7.json_sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f"
+}

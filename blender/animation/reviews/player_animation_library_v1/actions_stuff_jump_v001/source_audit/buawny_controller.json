@@ -1,0 +1,53 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "spyjic": "v.fxllpr==1&&v.poubzo"
+        },
+        {
+          "zdmpmm": "v.fxllpr==1"
+        },
+        {
+          "nvlagq": "v.hhsumy"
+        }
+      ]
+    },
+    "spyjic": {
+      "sound_effects": [
+        {
+          "effect": "qhujgn"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!v.fxllpr"
+        }
+      ]
+    },
+    "zdmpmm": {
+      "sound_effects": [
+        {
+          "effect": "yfpvrt"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!v.fxllpr"
+        }
+      ]
+    },
+    "nvlagq": {
+      "sound_effects": [
+        {
+          "effect": "unkrxg"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!v.hhsumy"
+        }
+      ]
+    }
+  }
+}

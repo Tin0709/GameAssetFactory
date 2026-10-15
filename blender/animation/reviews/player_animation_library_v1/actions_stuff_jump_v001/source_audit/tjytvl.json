@@ -1,0 +1,350 @@
+{
+  "initial_state": "default",
+  "states": {
+    "default": {
+      "on_entry": [
+        "v.hhsumy=0;",
+        "v.fxllpr=0;",
+        "v.yngszr=0;"
+      ],
+      "transitions": [
+        {
+          "zhbjho": "!q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.12
+    },
+    "wwzgzr": {
+      "on_entry": [
+        "v.hhsumy=1;",
+        "v.yngszr=1;",
+        "v.bkiimv=0;"
+      ],
+      "blend_via_shortest_path": true,
+      "animations": [
+        "wwzgzr",
+        "ukckzf",
+        "hxqdkw"
+      ],
+      "transitions": [
+        {
+          "default": "v.qlczor<0.1||q.any_animation_finished||q.is_in_water"
+        },
+        {
+          "eyztea": "!q.is_on_ground&&q.in_range(q.state_time,0,0.05)"
+        },
+        {
+          "ejguut": "(v.hirjne||q.is_jumping)&&q.in_range(q.state_time,0.05,0.2)"
+        },
+        {
+          "rrppmg": "(v.hirjne||q.is_jumping)&&q.state_time>0.6"
+        },
+        {
+          "flwuqu": "q.in_range(q.state_time,0,0.25)&&!q.is_sprinting"
+        },
+        {
+          "zkmqrc": "q.in_range(q.state_time,0.25,0.4)&&!q.is_sprinting"
+        },
+        {
+          "liqruq": "q.in_range(q.state_time,0.4,0.6)&&!q.is_sprinting"
+        }
+      ],
+      "on_exit": [
+        "v.bkiimv=q.state_time;"
+      ]
+    },
+    "eyztea": {
+      "on_entry": [
+        "v.qhbmmm=1;"
+      ],
+      "blend_via_shortest_path": true,
+      "animations": [
+        "wwzgzr",
+        "ukckzf"
+      ],
+      "transitions": [
+        {
+          "zhbjho": "1"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.qhbmmm=0;",
+        "v.hhsumy=0;",
+        "v.yngszr=0;",
+        "v.bkiimv=0;"
+      ]
+    },
+    "ejguut": {
+      "blend_via_shortest_path": true,
+      "animations": [
+        "ejguut",
+        "thqyqq"
+      ],
+      "transitions": [
+        {
+          "zhbjho": "(v.hirjne||q.is_jumping)&&q.state_time>1"
+        },
+        {
+          "cfpejq": "q.is_on_ground&&v.esnrkj>0.5"
+        },
+        {
+          "yytrhz": "q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.hhsumy=0;",
+        "v.yngszr=0;",
+        "v.bkiimv=0;"
+      ]
+    },
+    "rrppmg": {
+      "on_entry": [
+        "v.qhbmmm=1;"
+      ],
+      "blend_via_shortest_path": true,
+      "animations": [
+        "wwzgzr",
+        "ukckzf"
+      ],
+      "transitions": [
+        {
+          "zhbjho": "1"
+        }
+      ],
+      "blend_transition": {
+        "0": 1,
+        "0.03335": 0.99451,
+        "0.06665": 0.9561,
+        "0.1": 0.85185,
+        "0.13335": 0.64883,
+        "0.16665": 0.35117,
+        "0.2": 0.14815,
+        "0.23335": 0.0439,
+        "0.26665": 0.00549,
+        "0.3": 0
+      },
+      "on_exit": [
+        "v.qhbmmm=0;",
+        "v.hhsumy=0;",
+        "v.yngszr=0;",
+        "v.bkiimv=0;"
+      ]
+    },
+    "flwuqu": {
+      "blend_via_shortest_path": true,
+      "animations": [
+        "flwuqu",
+        "neiorb",
+        "hxqdkw"
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished||q.state_time>0.8&&q.is_on_ground&&v.esnrkj>0.5"
+        },
+        {
+          "zhbjho": "(v.hirjne||q.is_jumping)&&q.state_time-v.bkiimv>0.6"
+        }
+      ],
+      "blend_transition": {
+        "0": 1,
+        "0.0222": 0.99451,
+        "0.0444": 0.9561,
+        "0.0666": 0.85185,
+        "0.0889": 0.64883,
+        "0.1111": 0.35117,
+        "0.1333": 0.14815,
+        "0.1555": 0.0439,
+        "0.1777": 0.00549,
+        "0.2": 0
+      },
+      "on_exit": [
+        "v.hhsumy=0;",
+        "v.yngszr=0;",
+        "v.bkiimv=0;"
+      ]
+    },
+    "zkmqrc": {
+      "blend_via_shortest_path": true,
+      "animations": [
+        "zkmqrc",
+        "neiorb"
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished||q.state_time>0.8&&q.is_on_ground&&v.esnrkj>0.5"
+        },
+        {
+          "zhbjho": "(v.hirjne||q.is_jumping)&&q.state_time-v.bkiimv>0.6"
+        }
+      ],
+      "blend_transition": {
+        "0": 1,
+        "0.0222": 0.99451,
+        "0.0444": 0.9561,
+        "0.0666": 0.85185,
+        "0.0889": 0.64883,
+        "0.1111": 0.35117,
+        "0.1333": 0.14815,
+        "0.1555": 0.0439,
+        "0.1777": 0.00549,
+        "0.2": 0
+      },
+      "on_exit": [
+        "v.hhsumy=0;",
+        "v.yngszr=0;",
+        "v.bkiimv=0;"
+      ]
+    },
+    "liqruq": {
+      "blend_via_shortest_path": true,
+      "animations": [
+        "liqruq",
+        "neiorb"
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished||q.state_time>0.8&&q.is_on_ground&&v.esnrkj>0.5"
+        },
+        {
+          "zhbjho": "(v.hirjne||q.is_jumping)&&q.state_time-v.bkiimv>0.6"
+        }
+      ],
+      "blend_transition": {
+        "0": 1,
+        "0.0222": 0.99451,
+        "0.0444": 0.9561,
+        "0.0666": 0.85185,
+        "0.0889": 0.64883,
+        "0.1111": 0.35117,
+        "0.1333": 0.14815,
+        "0.1555": 0.0439,
+        "0.1777": 0.00549,
+        "0.2": 0
+      },
+      "on_exit": [
+        "v.hhsumy=0;",
+        "v.yngszr=0;",
+        "v.bkiimv=0;"
+      ]
+    },
+    "cfpejq": {
+      "animations": [
+        {
+          "srluww": 0.8
+        },
+        {
+          "ebipbw": "0.4*(v.jycjqy=='slime')"
+        },
+        {
+          "yyucpd": "0.8*v.tnlxsa==4"
+        }
+      ],
+      "transitions": [
+        {
+          "zhbjho": "(v.hirjne||q.is_jumping)"
+        },
+        {
+          "default": "q.any_animation_finished"
+        }
+      ],
+      "blend_transition": 0.12
+    },
+    "yytrhz": {
+      "animations": [
+        {
+          "ydsari": 0.8
+        },
+        {
+          "ebipbw": "0.8*(v.jycjqy=='slime')"
+        },
+        {
+          "kzhexa": "0.8*v.tnlxsa==4"
+        },
+        {
+          "aoltyd": "0.8*v.tnlxsa==9"
+        },
+        {
+          "lhdanp": "0.8*v.tnlxsa==13"
+        }
+      ],
+      "transitions": [
+        {
+          "zhbjho": "(v.hirjne||q.is_jumping)"
+        },
+        {
+          "default": "q.any_animation_finished"
+        }
+      ],
+      "blend_transition": 0.12
+    },
+    "aahvsz": {
+      "on_entry": [
+        "v.fxllpr=1;",
+        "v.yngszr=1;",
+        "v.poubzo=!q.is_in_water&&(v.lfltum-q.position(1)>=6);"
+      ],
+      "animations": [
+        "aahvsz",
+        "exrzei",
+        {
+          "hbuhsd": "v.poubzo"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "v.qlczor<0.1||q.any_animation_finished||q.is_in_water||(q.state_time>1.25&&(q.in_range(v.attack_time,0.001,0.1)||q.main_hand_item_use_duration>0))"
+        },
+        {
+          "zhbjho": "q.in_range(q.state_time,0.2,1.25)&&(v.hirjne||q.is_jumping)"
+        },
+        {
+          "puuzne": "q.is_on_ground&&q.in_range(q.state_time,0.2,1.25)&&v.esnrkj>0.25||(q.is_on_ground&&q.in_range(q.state_time,0.2,1.25)&&(q.in_range(v.attack_time,0.001,0.1)||q.main_hand_item_use_duration>0))"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.fxllpr=0;",
+        "v.yngszr=0;"
+      ]
+    },
+    "puuzne": {
+      "on_entry": [
+        "v.fxllpr=2;",
+        "v.yngszr=1;"
+      ],
+      "animations": [
+        "puuzne"
+      ],
+      "transitions": [
+        {
+          "default": "q.any_animation_finished||q.is_in_water"
+        },
+        {
+          "zhbjho": "q.state_time>0.2&&(v.hirjne||q.is_jumping)"
+        }
+      ],
+      "blend_transition": 0.12
+    },
+    "zhbjho": {
+      "on_entry": [
+        "v.lfltum=q.position(1);"
+      ],
+      "transitions": [
+        {
+          "wwzgzr": "(v.lfltum-q.position(1)>3.333)&&q.is_on_ground&&q.is_sprinting&&!q.is_in_water&&v.qlczor>1&&q.is_pack_setting_selected('oreville_ans:fyumxp','nvlagq')"
+        },
+        {
+          "aahvsz": "(v.lfltum-q.position(1)>3.333)&&q.is_on_ground&&!q.is_in_water&&v.qlczor>1&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs')"
+        },
+        {
+          "cfpejq": "q.is_on_ground&&(v.esnrkj>0.5||v.rvwafl)&&v.qlczor>1"
+        },
+        {
+          "yytrhz": "q.is_on_ground||!q.is_alive"
+        }
+      ]
+    }
+  }
+}

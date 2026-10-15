@@ -1,0 +1,83 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "zhbjho": "!q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "ndyglg": {
+      "animations": [
+        "srluww"
+      ],
+      "transitions": [
+        {
+          "zhbjho": "q.vertical_speed<-0.15&&!q.is_on_ground"
+        },
+        {
+          "default": "q.any_animation_finished"
+        },
+        {
+          "pluejt": "q.is_pack_setting_selected('oreville_ans:fyumxp','jwgzkw')&&q.relative_block_has_any_tag(0,-1.5,0,'wood')&&!q.relative_block_has_any_tag(0,-1.5,0,'one_way_collidable')&&!q.is_on_ground&&v.esnrkj<0.3"
+        }
+      ],
+      "blend_transition": 0.16
+    },
+    "yytrhz": {
+      "animations": [
+        {
+          "srluww": 0.5
+        }
+      ],
+      "transitions": [
+        {
+          "zhbjho": "q.vertical_speed<-0.15&&!q.is_on_ground"
+        },
+        {
+          "default": "q.any_animation_finished"
+        },
+        {
+          "pluejt": "q.is_pack_setting_selected('oreville_ans:fyumxp','jwgzkw')&&q.relative_block_has_any_tag(0,-1.5,0,'wood')&&!q.relative_block_has_any_tag(0,-1.5,0,'one_way_collidable')&&!q.is_on_ground&&v.esnrkj<0.3"
+        }
+      ],
+      "blend_transition": 0.16
+    },
+    "zhbjho": {
+      "transitions": [
+        {
+          "ndyglg": "q.vertical_speed<-4&&q.is_on_ground"
+        },
+        {
+          "yytrhz": "q.is_on_ground"
+        },
+        {
+          "pluejt": "q.is_pack_setting_selected('oreville_ans:fyumxp','jwgzkw')&&q.relative_block_has_any_tag(0,-1.5,0,'wood')&&!q.relative_block_has_any_tag(0,-1.5,0,'one_way_collidable')&&!q.is_on_ground&&v.esnrkj<0.3"
+        }
+      ]
+    },
+    "pluejt": {
+      "on_entry": [
+        "v.mbqkjf=1;"
+      ],
+      "animations": [
+        {
+          "zavmgb": "Math.abs(q.vertical_speed)<6&&!v.mijyoc&&(q.main_hand_item_use_duration==0||(!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_bow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:bow'))&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))))"
+        },
+        {
+          "emkqik": "Math.abs(q.vertical_speed)<6"
+        }
+      ],
+      "transitions": [
+        {
+          "yytrhz": "!q.is_pack_setting_selected('oreville_ans:fyumxp','jwgzkw')||((!q.relative_block_has_any_tag(0,-1.5,0,'wood')||q.relative_block_has_any_tag(0,-1.5,0,'one_way_collidable'))&&q.is_local_player)||q.is_on_ground"
+        }
+      ],
+      "blend_transition": 0.16,
+      "on_exit": [
+        "v.mbqkjf=0;"
+      ]
+    }
+  }
+}

@@ -1,0 +1,1520 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "qwqond": "(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "mace": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "fishing_rod": "v.evlypi!='uowpvm'&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "flint_and_steel": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_flint_and_steel')||q.is_item_name_any('slot.weapon.mainhand','minecraft:flint_and_steel'))&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "oyevwx": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_throwable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:snowball','minecraft:wind_charge','minecraft:ender_pearl','minecraft:splash_potion','minecraft:lingering_potion','minecraft:experience_bottle','minecraft:egg','minecraft:blue_egg','minecraft:brown_egg','minecraft:ender_eye'))&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "fmriac": "v.attack_time&&!(v.gddzeg||v.hoiyga)"
+        }
+      ]
+    },
+    "fmriac": {
+      "transitions": [
+        {
+          "zefcct": "((q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_sword','oreville:is_sword'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:stick','minecraft:blaze_rod','minecraft:breeze_rod','minecraft:bone'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_cushion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:black_cushion','minecraft:blue_cushion','minecraft:brown_cushion','minecraft:cyan_cushion','minecraft:gray_cushion','minecraft:green_cushion','minecraft:light_blue_cushion','minecraft:light_gray_cushion','minecraft:lime_cushion','minecraft:magenta_cushion','minecraft:orange_cushion','minecraft:pink_cushion','minecraft:purple_cushion','minecraft:red_cushion','minecraft:white_cushion','minecraft:yellow_cushion')))"
+        },
+        {
+          "ciakok": "(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_trident','oreville:is_trident'))"
+        },
+        {
+          "vdmqkr": "(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_hoe','oreville:is_hoe'))"
+        },
+        {
+          "iovhzd": "(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_pickaxe','oreville:is_pickaxe'))"
+        },
+        {
+          "yafbed": "(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_shovel','oreville:is_shovel'))"
+        },
+        {
+          "kuyjab": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_spear','minecraft:is_spear'))"
+        },
+        {
+          "flint_and_steel": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_flint_and_steel')||q.is_item_name_any('slot.weapon.mainhand','minecraft:flint_and_steel'))"
+        },
+        {
+          "oyevwx": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_throwable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:snowball','minecraft:wind_charge','minecraft:ender_pearl','minecraft:splash_potion','minecraft:lingering_potion','minecraft:experience_bottle','minecraft:egg','minecraft:blue_egg','minecraft:brown_egg','minecraft:ender_eye'))"
+        },
+        {
+          "sotmvv": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))"
+        },
+        {
+          "lasrrf": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))"
+        },
+        {
+          "punch": "1"
+        }
+      ]
+    },
+    "punch": {
+      "animations": [
+        "afmxrw",
+        "spften",
+        "attack"
+      ],
+      "transitions": [
+        {
+          "muqdev": "q.state_time>=0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "default": "((q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_throwable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:snowball','minecraft:wind_charge','minecraft:ender_pearl','minecraft:splash_potion','minecraft:lingering_potion','minecraft:experience_bottle','minecraft:egg','minecraft:blue_egg','minecraft:brown_egg','minecraft:ender_eye'))||(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_shovel','oreville:is_shovel'))||(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_sword','oreville:is_sword'))||(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_pickaxe','oreville:is_pickaxe'))||(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:stick','minecraft:blaze_rod','minecraft:breeze_rod','minecraft:bone'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_cushion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:black_cushion','minecraft:blue_cushion','minecraft:brown_cushion','minecraft:cyan_cushion','minecraft:gray_cushion','minecraft:green_cushion','minecraft:light_blue_cushion','minecraft:light_gray_cushion','minecraft:lime_cushion','minecraft:magenta_cushion','minecraft:orange_cushion','minecraft:pink_cushion','minecraft:purple_cushion','minecraft:red_cushion','minecraft:white_cushion','minecraft:yellow_cushion')))||q.all_animations_finished"
+        },
+        {
+          "pgwnom": "v.evlypi!='uowpvm'&&q.get_animation_frame&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "muqdev": {
+      "animations": [
+        "afmxrw",
+        "spften",
+        "nswqio"
+      ],
+      "transitions": [
+        {
+          "tggbpq": "q.state_time>=0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "default": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_throwable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:snowball','minecraft:wind_charge','minecraft:ender_pearl','minecraft:splash_potion','minecraft:lingering_potion','minecraft:experience_bottle','minecraft:egg','minecraft:blue_egg','minecraft:brown_egg','minecraft:ender_eye'))||(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_trident','oreville:is_trident'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_spear','minecraft:is_spear'))||q.all_animations_finished"
+        },
+        {
+          "pgwnom": "v.evlypi!='uowpvm'&&q.get_animation_frame&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "tggbpq": {
+      "animations": [
+        "afmxrw",
+        "spften",
+        "nswqio"
+      ],
+      "transitions": [
+        {
+          "muqdev": "q.state_time>=0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "default": "(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_shovel','oreville:is_shovel'))||(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_sword','oreville:is_sword'))||(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_pickaxe','oreville:is_pickaxe'))||(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:stick','minecraft:blaze_rod','minecraft:breeze_rod','minecraft:bone'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_cushion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:black_cushion','minecraft:blue_cushion','minecraft:brown_cushion','minecraft:cyan_cushion','minecraft:gray_cushion','minecraft:green_cushion','minecraft:light_blue_cushion','minecraft:light_gray_cushion','minecraft:lime_cushion','minecraft:magenta_cushion','minecraft:orange_cushion','minecraft:pink_cushion','minecraft:purple_cushion','minecraft:red_cushion','minecraft:white_cushion','minecraft:yellow_cushion'))||q.all_animations_finished"
+        },
+        {
+          "pgwnom": "v.evlypi!='uowpvm'&&q.get_animation_frame&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "ciakok": {
+      "animations": [
+        {
+          "afmxrw": "!q.is_riding_any_entity_of_type('minecraft:nautilus','minecraft:zombie_nautilus')"
+        },
+        {
+          "ccdlig": "!q.is_riding"
+        },
+        {
+          "ilbzbh": "!q.is_riding"
+        },
+        {
+          "iipemm": "q.is_riding?Math.clamp(1-v.cketfg,0.001,1)"
+        },
+        {
+          "virzrd": "q.is_riding?Math.clamp(v.cketfg,0.001,1)"
+        },
+        {
+          "wqmnij": "!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>2||!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_trident','oreville:is_trident'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "cbjzqu": "q.state_time>=0.3&&v.attack_time"
+        }
+      ],
+      "blend_transition": 0.115
+    },
+    "cbjzqu": {
+      "animations": [
+        {
+          "afmxrw": "!q.is_riding_any_entity_of_type('minecraft:nautilus','minecraft:zombie_nautilus')"
+        },
+        {
+          "ccdlig": "!q.is_riding"
+        },
+        {
+          "ilbzbh": "!q.is_riding"
+        },
+        {
+          "iipemm": "q.is_riding?Math.clamp(1-v.cketfg,0.001,1)"
+        },
+        {
+          "virzrd": "q.is_riding?Math.clamp(v.cketfg,0.001,1)"
+        },
+        {
+          "wqmnij": "!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>2||!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_trident','oreville:is_trident'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "ciakok": "q.state_time>=0.3&&v.attack_time"
+        }
+      ],
+      "blend_transition": 0.115
+    },
+    "zefcct": {
+      "animations": [
+        "afmxrw",
+        {
+          "ccdlig": "!q.is_riding"
+        },
+        {
+          "smebii": "!q.is_riding"
+        },
+        {
+          "kvpche": "q.is_riding"
+        },
+        {
+          "gocjip": "q.is_item_name_any('slot.weapon.mainhand','minecraft:wooden_sword','minecraft:stick','minecraft:blaze_rod','minecraft:breeze_rod')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "qthbqv": "q.is_item_name_any('slot.weapon.mainhand','minecraft:stone_sword','minecraft:bone')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "cjfoow": "q.is_item_name_any('slot.weapon.mainhand','minecraft:copper_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "vurcjn": "q.is_item_name_any('slot.weapon.mainhand','minecraft:iron_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "dseicy": "q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "ggtlte": "q.is_item_name_any('slot.weapon.mainhand','minecraft:diamond_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "mrgiqu": "q.is_item_name_any('slot.weapon.mainhand','minecraft:netherite_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        }
+      ],
+      "transitions": [
+        {
+          "mace": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))"
+        },
+        {
+          "thdqsk": "q.state_time>=0.3&&v.attack_time&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "default": "!((q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_sword','oreville:is_sword'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:stick','minecraft:blaze_rod','minecraft:breeze_rod','minecraft:bone'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_cushion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:black_cushion','minecraft:blue_cushion','minecraft:brown_cushion','minecraft:cyan_cushion','minecraft:gray_cushion','minecraft:green_cushion','minecraft:light_blue_cushion','minecraft:light_gray_cushion','minecraft:lime_cushion','minecraft:magenta_cushion','minecraft:orange_cushion','minecraft:pink_cushion','minecraft:purple_cushion','minecraft:red_cushion','minecraft:white_cushion','minecraft:yellow_cushion')))||(v.gddzeg||v.hoiyga)"
+        }
+      ],
+      "blend_transition": 0.115
+    },
+    "thdqsk": {
+      "animations": [
+        "afmxrw",
+        {
+          "ccdlig": "!q.is_riding"
+        },
+        {
+          "dtymzj": "!q.is_riding"
+        },
+        {
+          "uoveuo": "q.is_riding"
+        },
+        {
+          "gocjip": "q.is_item_name_any('slot.weapon.mainhand','minecraft:wooden_sword','minecraft:stick','minecraft:blaze_rod','minecraft:breeze_rod')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "qthbqv": "q.is_item_name_any('slot.weapon.mainhand','minecraft:stone_sword','minecraft:bone')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "cjfoow": "q.is_item_name_any('slot.weapon.mainhand','minecraft:copper_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "vurcjn": "q.is_item_name_any('slot.weapon.mainhand','minecraft:iron_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "dseicy": "q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "ggtlte": "q.is_item_name_any('slot.weapon.mainhand','minecraft:diamond_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "mrgiqu": "q.is_item_name_any('slot.weapon.mainhand','minecraft:netherite_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        }
+      ],
+      "transitions": [
+        {
+          "mace": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))"
+        },
+        {
+          "zefcct": "(q.state_time>=0.3&&v.attack_time&&(!q.is_on_ground||q.is_riding)&&!(v.gddzeg||v.hoiyga))||(q.state_time>=0.3&&v.attack_time&&!(v.gddzeg||v.hoiyga)&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_cushion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:black_cushion','minecraft:blue_cushion','minecraft:brown_cushion','minecraft:cyan_cushion','minecraft:gray_cushion','minecraft:green_cushion','minecraft:light_blue_cushion','minecraft:light_gray_cushion','minecraft:lime_cushion','minecraft:magenta_cushion','minecraft:orange_cushion','minecraft:pink_cushion','minecraft:purple_cushion','minecraft:red_cushion','minecraft:white_cushion','minecraft:yellow_cushion')))"
+        },
+        {
+          "eqlzfq": "q.state_time>=0.3&&v.attack_time&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "default": "!((q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_sword','oreville:is_sword'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:stick','minecraft:blaze_rod','minecraft:breeze_rod','minecraft:bone'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_cushion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:black_cushion','minecraft:blue_cushion','minecraft:brown_cushion','minecraft:cyan_cushion','minecraft:gray_cushion','minecraft:green_cushion','minecraft:light_blue_cushion','minecraft:light_gray_cushion','minecraft:lime_cushion','minecraft:magenta_cushion','minecraft:orange_cushion','minecraft:pink_cushion','minecraft:purple_cushion','minecraft:red_cushion','minecraft:white_cushion','minecraft:yellow_cushion')))||(v.gddzeg||v.hoiyga)"
+        }
+      ],
+      "blend_transition": 0.075
+    },
+    "eqlzfq": {
+      "animations": [
+        "afmxrw",
+        {
+          "ccdlig": "!q.is_riding"
+        },
+        "ilbzbh",
+        {
+          "gocjip": "q.is_item_name_any('slot.weapon.mainhand','minecraft:wooden_sword','minecraft:stick','minecraft:blaze_rod','minecraft:breeze_rod')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "qthbqv": "q.is_item_name_any('slot.weapon.mainhand','minecraft:stone_sword','minecraft:bone')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "cjfoow": "q.is_item_name_any('slot.weapon.mainhand','minecraft:copper_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "vurcjn": "q.is_item_name_any('slot.weapon.mainhand','minecraft:iron_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "dseicy": "q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "ggtlte": "q.is_item_name_any('slot.weapon.mainhand','minecraft:diamond_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        },
+        {
+          "mrgiqu": "q.is_item_name_any('slot.weapon.mainhand','minecraft:netherite_sword')&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        }
+      ],
+      "transitions": [
+        {
+          "mace": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))"
+        },
+        {
+          "zefcct": "q.state_time>=0.3&&v.attack_time&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "default": "!((q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_sword','oreville:is_sword'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:stick','minecraft:blaze_rod','minecraft:breeze_rod','minecraft:bone'))||(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_cushion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:black_cushion','minecraft:blue_cushion','minecraft:brown_cushion','minecraft:cyan_cushion','minecraft:gray_cushion','minecraft:green_cushion','minecraft:light_blue_cushion','minecraft:light_gray_cushion','minecraft:lime_cushion','minecraft:magenta_cushion','minecraft:orange_cushion','minecraft:pink_cushion','minecraft:purple_cushion','minecraft:red_cushion','minecraft:white_cushion','minecraft:yellow_cushion')))||(v.gddzeg||v.hoiyga)"
+        }
+      ],
+      "blend_transition": 0.15
+    },
+    "oyevwx": {
+      "animations": [
+        "kcncjx",
+        "oyevwx"
+      ],
+      "transitions": [
+        {
+          "throw": "v.nshrzx==q.get_equipped_item_name(0)&&q.in_range(v.attack_time,0.01,0.2)&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "plxeqv": "q.get_equipped_item_name(0)==''&&q.state_time<2&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_throwable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:snowball','minecraft:wind_charge','minecraft:ender_pearl','minecraft:splash_potion','minecraft:lingering_potion','minecraft:experience_bottle','minecraft:egg','minecraft:blue_egg','minecraft:brown_egg','minecraft:ender_eye'))||(v.gddzeg||v.hoiyga)"
+        }
+      ]
+    },
+    "throw": {
+      "animations": [
+        "kcncjx",
+        "throw"
+      ],
+      "transitions": [
+        {
+          "lbdphr": "v.nshrzx==q.get_equipped_item_name(0)&&q.in_range(v.attack_time,0.01,0.2)&&q.state_time>=0.2&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "plxeqv": "q.get_equipped_item_name(0)==''&&q.in_range(q.state_time,0.2,2)&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "default": "q.state_time>0.3&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_throwable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:snowball','minecraft:wind_charge','minecraft:ender_pearl','minecraft:splash_potion','minecraft:lingering_potion','minecraft:experience_bottle','minecraft:egg','minecraft:blue_egg','minecraft:brown_egg','minecraft:ender_eye'))||(v.gddzeg||v.hoiyga)"
+        }
+      ],
+      "blend_transition": 0.06
+    },
+    "lbdphr": {
+      "animations": [
+        "kcncjx",
+        "throw"
+      ],
+      "transitions": [
+        {
+          "throw": "v.nshrzx==q.get_equipped_item_name(0)&&q.in_range(v.attack_time,0.01,0.2)&&q.state_time>=0.2&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "plxeqv": "q.get_equipped_item_name(0)==''&&q.in_range(q.state_time,0.2,2)&&!(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "default": "q.state_time>0.3&&!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_throwable')||q.is_item_name_any('slot.weapon.mainhand','minecraft:snowball','minecraft:wind_charge','minecraft:ender_pearl','minecraft:splash_potion','minecraft:lingering_potion','minecraft:experience_bottle','minecraft:egg','minecraft:blue_egg','minecraft:brown_egg','minecraft:ender_eye'))||(v.gddzeg||v.hoiyga)"
+        }
+      ],
+      "blend_transition": 0.06
+    },
+    "plxeqv": {
+      "animations": [
+        "afmxrw",
+        "plxeqv"
+      ],
+      "transitions": [
+        {
+          "default": "q.all_animations_finished||q.get_equipped_item_name(0)!=''||(v.attack_time==0&&q.in_range(q.state_time,0.08,0.2))||(v.gddzeg||v.hoiyga)"
+        }
+      ],
+      "blend_transition": 0.16
+    },
+    "fishing_rod": {
+      "on_entry": [
+        "v.cdqddi=-1;"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "pgwnom": "q.get_animation_frame"
+        },
+        {
+          "ydhzuj": "v.cdqddi=v.cdqddi<0&&q.in_range(v.attack_time,0.01,0.2)?q.state_time:v.cdqddi;return v.cdqddi>=0&&q.state_time-v.cdqddi>=0.05;"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "pgwnom": {
+      "on_entry": [
+        "v.zydqvj=q.life_time;",
+        "v.mijyoc=1;"
+      ],
+      "animations": [
+        {
+          "mtgdcm": "1-v.jkpkmj"
+        },
+        {
+          "pgwnom": "1-v.jkpkmj"
+        },
+        {
+          "cehpib": "1-v.jkpkmj"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "smhmom": "!q.get_animation_frame"
+        },
+        {
+          "cobzmn": "q.state_time>0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "bpjnso": {
+      "on_entry": [
+        "v.zydqvj=q.life_time;",
+        "v.mijyoc=1;"
+      ],
+      "animations": [
+        {
+          "mtgdcm": "1-v.jkpkmj"
+        },
+        {
+          "bpjnso": "1-v.jkpkmj"
+        },
+        {
+          "cehpib": "1-v.jkpkmj"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "smhmom": "!q.get_animation_frame"
+        },
+        {
+          "cobzmn": "q.state_time>0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "uopzwf": {
+      "on_entry": [
+        "v.apetyc=q.life_time;",
+        "v.mijyoc=1;"
+      ],
+      "animations": [
+        {
+          "mtgdcm": "1-v.jkpkmj"
+        },
+        {
+          "uopzwf": "1-v.jkpkmj"
+        },
+        {
+          "cehpib": "1-v.jkpkmj"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "smhmom": "!q.get_animation_frame"
+        },
+        {
+          "cobzmn": "q.state_time>0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "smhmom": {
+      "on_entry": [
+        "v.xtehod=q.life_time;",
+        "v.mijyoc=1;",
+        "v.cdqddi=-1;"
+      ],
+      "animations": [
+        {
+          "ejamcj": "1-v.jkpkmj"
+        },
+        {
+          "qvgpyp": "1-v.jkpkmj"
+        },
+        {
+          "smhmom": "1-v.jkpkmj"
+        },
+        {
+          "mmgzov": "1-v.jkpkmj"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "bpjnso": "q.get_animation_frame&&q.state_time<3.625"
+        },
+        {
+          "pgwnom": "q.get_animation_frame&&q.state_time>=3.625"
+        },
+        {
+          "ydhzuj": "v.cdqddi=v.cdqddi<0&&q.state_time>0.2&&q.in_range(v.attack_time,0.01,0.2)?q.state_time:v.cdqddi;return v.cdqddi>=0&&q.state_time-v.cdqddi>=0.05;"
+        },
+        {
+          "fishing_rod": "q.state_time>5.2917"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.mijyoc=v.oreville_mainhand_custom_pos&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))&&q.get_animation_frame&&q.state_time<3.625;",
+        "v.thqhhs=v.oreville_mainhand_custom_pos&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))&&q.get_animation_frame&&q.state_time<3.625;"
+      ]
+    },
+    "ydhzuj": {
+      "animations": [
+        {
+          "ydhzuj": "!v.vtkwho"
+        },
+        {
+          "ioasoc": "q.state_time<=0.05"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "pgwnom": "q.get_animation_frame&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))"
+        },
+        {
+          "hqynlj": "q.state_time>0.6&&v.attack_time||q.state_time>0.25&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "fishing_rod": "q.state_time>1.0333"
+        }
+      ],
+      "blend_transition": 0.075
+    },
+    "hqynlj": {
+      "animations": [
+        {
+          "hqynlj": "!v.vtkwho"
+        },
+        {
+          "ioasoc": "q.state_time<=0.05"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "bpjnso": "q.get_animation_frame&&(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))"
+        },
+        {
+          "ydhzuj": "q.state_time>0.6&&v.attack_time||q.state_time>0.25&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "fishing_rod": "q.state_time>1.3333"
+        }
+      ],
+      "blend_transition": 0.075
+    },
+    "cobzmn": {
+      "blend_via_shortest_path": true,
+      "animations": [
+        {
+          "mtgdcm": "1-v.jkpkmj"
+        },
+        {
+          "uopzwf": "1-v.jkpkmj"
+        },
+        {
+          "cehpib": "1-v.jkpkmj"
+        },
+        {
+          "cobzmn": "1-v.jkpkmj"
+        },
+        {
+          "ioasoc": "q.state_time<=0.05"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "smhmom": "!q.get_animation_frame"
+        },
+        {
+          "etiuec": "q.state_time>0.6&&v.attack_time||q.state_time>0.25&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "uopzwf": "q.state_time>1.0333"
+        }
+      ],
+      "blend_transition": 0.075
+    },
+    "etiuec": {
+      "blend_via_shortest_path": true,
+      "animations": [
+        {
+          "mtgdcm": "1-v.jkpkmj"
+        },
+        {
+          "uopzwf": "1-v.jkpkmj"
+        },
+        {
+          "cehpib": "1-v.jkpkmj"
+        },
+        {
+          "etiuec": "1-v.jkpkmj"
+        },
+        {
+          "ioasoc": "q.state_time<=0.05"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_fishing_rod')||q.is_item_name_any('slot.weapon.mainhand','minecraft:fishing_rod'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "smhmom": "!q.get_animation_frame"
+        },
+        {
+          "cobzmn": "q.state_time>0.6&&v.attack_time||q.state_time>0.25&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "uopzwf": "q.state_time>1.3333"
+        }
+      ],
+      "blend_transition": 0.075
+    },
+    "mace": {
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "bcyrdi": "q.vertical_speed>9&&!q.is_riding"
+        },
+        {
+          "aqfcvc": "v.attack_time&&q.vertical_speed>=-0.15"
+        },
+        {
+          "hjmytu": "v.attack_time"
+        },
+        {
+          "azdvph": "q.is_local_player&&q.vertical_speed<-0.15&&!q.is_in_water&&!q.is_riding"
+        },
+        {
+          "azdvph": "!q.is_local_player&&v.axerqj>0.05&&!q.is_on_ground&&!q.is_in_water&&!q.is_riding"
+        }
+      ]
+    },
+    "bcyrdi": {
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "mace": "q.is_on_ground"
+        },
+        {
+          "azdvph": "q.is_local_player&&q.vertical_speed<-0.15&&!q.is_in_water&&!q.is_riding"
+        },
+        {
+          "azdvph": "!q.is_local_player&&v.axerqj>0.05&&q.state_time>0.1&&!q.is_in_water&&!q.is_riding"
+        }
+      ]
+    },
+    "aqfcvc": {
+      "animations": [
+        {
+          "huqdun": "!q.is_riding"
+        },
+        {
+          "kvpche": "q.is_riding"
+        },
+        {
+          "dopxsq": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "hjmytu": "q.state_time>=0.3&&v.attack_time"
+        },
+        {
+          "mace": "q.state_time>1.4583"
+        },
+        {
+          "bcyrdi": "q.vertical_speed>9&&!q.is_riding"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "azdvph": {
+      "animations": [
+        "tuxedu",
+        {
+          "znxmrl": "Math.max(0.1,v.igxlhx)"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "hjmytu": "v.attack_time&&v.attack_time<0.1"
+        },
+        {
+          "qbiqbl": "q.is_local_player&&(q.is_in_water||q.vertical_speed>=-0.15)&&q.state_time>0.25"
+        },
+        {
+          "qbiqbl": "!q.is_local_player&&(q.is_in_water||q.vertical_speed>0||v.axerqj<0.2)&&q.state_time>0.25"
+        },
+        {
+          "mace": "q.is_local_player&&q.vertical_speed>=-0.15"
+        },
+        {
+          "mace": "!q.is_local_player&&(q.vertical_speed>0||v.axerqj<0.1)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "hjmytu": {
+      "animations": [
+        {
+          "bbvbhl": "q.is_riding"
+        },
+        {
+          "yspduf": "!q.is_riding"
+        },
+        {
+          "uoveuo": "q.is_riding"
+        },
+        {
+          "dopxsq": "(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))&&q.state_time<=0.05&&!q.is_in_ui&&!v.is_paperdoll&&!v.misscd&&q.distance_from_camera<=16"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "aqfcvc": "q.state_time>=0.3&&v.attack_time"
+        },
+        {
+          "azdvph": "q.state_time>=0.3&&v.axerqj>0.2&&!q.is_on_ground&&q.vertical_speed<8&&!q.is_in_water&&!q.is_riding"
+        },
+        {
+          "mace": "q.state_time>1.333"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "qbiqbl": {
+      "animations": [
+        {
+          "gduwtv": 2
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_mace')||q.is_item_name_any('slot.weapon.mainhand','minecraft:mace'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "hjmytu": "v.attack_time"
+        },
+        {
+          "azdvph": "((q.is_local_player&&q.vertical_speed<-0.15)||(!q.is_local_player&&v.axerqj>0.05&&!q.is_on_ground))&&!q.is_in_water"
+        },
+        {
+          "mace": "q.any_animation_finished"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "qwqond": {
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "qwqond.1": "v.is_holding_left||q.is_riding"
+        },
+        {
+          "dxdudb.c": "!q.is_on_ground&&v.attack_time"
+        },
+        {
+          "dxdudb.a": "v.attack_time"
+        }
+      ]
+    },
+    "qwqond.1": {
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "qwqond": "!v.is_holding_left&&!q.is_riding"
+        },
+        {
+          "dxdudb.jbrcdj": "v.attack_time"
+        }
+      ]
+    },
+    "dxdudb.jbrcdj": {
+      "animations": [
+        {
+          "lhmzom": "!q.is_riding"
+        },
+        {
+          "kvpche": "q.is_riding"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "dxdudb.htgavg": "q.state_time>=0.375&&v.attack_time>0.04"
+        },
+        {
+          "dxdudb.qclrte": "q.state_time>=0.375&&v.attack_time"
+        },
+        {
+          "qwqond.1": "q.state_time>5.3571"
+        },
+        {
+          "qwqond": "!v.is_holding_left&&!q.is_riding"
+        }
+      ],
+      "blend_transition": 0.07
+    },
+    "dxdudb.htgavg": {
+      "animations": [
+        {
+          "bbvbhl": "q.is_riding"
+        },
+        {
+          "sgdlzo": "!q.is_riding"
+        },
+        {
+          "uoveuo": "q.is_riding"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "dxdudb.jbrcdj": "q.state_time>=0.375&&v.attack_time"
+        },
+        {
+          "qwqond.1": "q.state_time>2.2917"
+        },
+        {
+          "qwqond": "!v.is_holding_left&&!q.is_riding"
+        }
+      ],
+      "blend_transition": 0.07
+    },
+    "dxdudb.qclrte": {
+      "animations": [
+        {
+          "bbvbhl": "q.is_riding"
+        },
+        {
+          "lhmzom": "!q.is_riding"
+        },
+        {
+          "kvpche": "q.is_riding"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "dxdudb.htgavg": "q.state_time>=0.375&&v.attack_time>0.04"
+        },
+        {
+          "dxdudb.jbrcdj": "q.state_time>=0.375&&v.attack_time"
+        },
+        {
+          "qwqond.1": "q.any_animation_finished"
+        },
+        {
+          "qwqond": "!v.is_holding_left&&!q.is_riding"
+        }
+      ],
+      "blend_transition": 0.07
+    },
+    "dxdudb.a": {
+      "animations": [
+        "kkyulq"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "dxdudb.c": "!q.is_on_ground&&q.in_range(v.attack_time,0.01,0.1)"
+        },
+        {
+          "dxdudb.b": "q.state_time>=0.375&&v.attack_time"
+        },
+        {
+          "qwqond": "q.any_animation_finished"
+        },
+        {
+          "qwqond.1": "v.is_holding_left||q.is_riding"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "dxdudb.b": {
+      "animations": [
+        "kkyulq"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "dxdudb.c": "!q.is_on_ground&&q.in_range(v.attack_time,0.01,0.1)"
+        },
+        {
+          "dxdudb.a": "q.state_time>=0.375&&v.attack_time"
+        },
+        {
+          "qwqond": "q.any_animation_finished"
+        },
+        {
+          "qwqond.1": "v.is_holding_left||q.is_riding"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "dxdudb.c": {
+      "animations": [
+        "mvkirz"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "dxdudb.d": "!q.is_on_ground&&q.state_time>=0.375&&v.attack_time>0.4"
+        },
+        {
+          "dxdudb.a": "q.state_time>=0.375&&v.attack_time>0.4"
+        },
+        {
+          "qwqond": "q.any_animation_finished"
+        },
+        {
+          "qwqond.1": "v.is_holding_left||q.is_riding"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "dxdudb.d": {
+      "animations": [
+        "mvkirz"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_axe','oreville:is_axe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "dxdudb.c": "!q.is_on_ground&&q.state_time>=0.375&&v.attack_time>0.4"
+        },
+        {
+          "dxdudb.a": "q.state_time>=0.375&&v.attack_time>0.4"
+        },
+        {
+          "qwqond": "q.any_animation_finished"
+        },
+        {
+          "qwqond.1": "v.is_holding_left||q.is_riding"
+        }
+      ],
+      "blend_transition": 0.12
+    },
+    "vdmqkr": {
+      "animations": [
+        "bbvbhl",
+        {
+          "cixjgp": "!v.is_holding_left"
+        },
+        {
+          "ousprd": "v.is_holding_left"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>5.5||!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_hoe','oreville:is_hoe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "vdmqkr": "q.state_time>0.7&&v.attack_time"
+        },
+        {
+          "yrmdck": "q.state_time>=0.3&&v.attack_time"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "yrmdck": {
+      "animations": [
+        "bbvbhl",
+        {
+          "giaakz": "!v.is_holding_left"
+        },
+        {
+          "vcidrz": "v.is_holding_left"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>3||!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_hoe','oreville:is_hoe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "vdmqkr": "q.state_time>0.7&&v.attack_time"
+        },
+        {
+          "ydiysr": "q.state_time>=0.3&&v.attack_time"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "ydiysr": {
+      "animations": [
+        "bbvbhl",
+        {
+          "giaakz": "!v.is_holding_left"
+        },
+        {
+          "vcidrz": "v.is_holding_left"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>3||!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_hoe','oreville:is_hoe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "vdmqkr": "q.state_time>0.7&&v.attack_time"
+        },
+        {
+          "yrmdck": "q.state_time>=0.3&&v.attack_time"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "iovhzd": {
+      "animations": [
+        "afmxrw",
+        "vorgpv"
+      ],
+      "transitions": [
+        {
+          "default": "q.all_animations_finished||!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_pickaxe','oreville:is_pickaxe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "iyrdcv": "q.state_time>=0.25&&q.in_range(v.attack_time,0.01,0.4)"
+        }
+      ],
+      "blend_transition": 0.07
+    },
+    "iyrdcv": {
+      "animations": [
+        "afmxrw",
+        "vorgpv"
+      ],
+      "transitions": [
+        {
+          "default": "q.all_animations_finished||!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_pickaxe','oreville:is_pickaxe'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "iovhzd": "q.state_time>=0.25&&q.in_range(v.attack_time,0.01,0.4)"
+        }
+      ],
+      "blend_transition": 0.07
+    },
+    "yafbed": {
+      "animations": [
+        "bbvbhl",
+        {
+          "thaslm": "!v.is_holding_left"
+        },
+        {
+          "rxtbga": "v.is_holding_left"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>5.5||!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_shovel','oreville:is_shovel'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "yafbed": "q.state_time>0.6&&v.attack_time"
+        },
+        {
+          "eutrbz": "q.state_time>=0.375&&v.attack_time"
+        },
+        {
+          "eutrbz": "q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:golden_tier','minecraft:diamond_tier','minecraft:netherite_tier')&&q.state_time>=0.3&&v.attack_time"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "eutrbz": {
+      "animations": [
+        "bbvbhl",
+        {
+          "oprkqi": "!v.is_holding_left"
+        },
+        {
+          "oardtx": "v.is_holding_left"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.all_animations_finished||!(q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:is_shovel','oreville:is_shovel'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "yafbed": "q.state_time>=0.375&&v.attack_time"
+        },
+        {
+          "yafbed": "q.equipped_item_any_tag('slot.weapon.mainhand','minecraft:golden_tier','minecraft:diamond_tier','minecraft:netherite_tier')&&q.state_time>=0.3&&v.attack_time"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "kuyjab": {
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_spear','minecraft:is_spear'))||(q.state_time>=v.mmbudv&&q.cooldown_time_remaining)||(v.gddzeg||v.hoiyga)"
+        }
+      ]
+    },
+    "flint_and_steel": {
+      "animations": [
+        "bphbtz",
+        "ubcyiz"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_flint_and_steel')||q.is_item_name_any('slot.weapon.mainhand','minecraft:flint_and_steel'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "ecnujd": "v.attack_time"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.xcpgvu=0;"
+      ]
+    },
+    "ecnujd": {
+      "animations": [
+        "bphbtz",
+        "ecnujd"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_flint_and_steel')||q.is_item_name_any('slot.weapon.mainhand','minecraft:flint_and_steel'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "glvhfw": "q.in_range(q.state_time,0.3,1.5)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ahswoq": "q.in_range(q.state_time,1.5,4.2125)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "vaknop": "q.state_time>4.2125&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "flint_and_steel": "q.state_time>5"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.xcpgvu=0;"
+      ]
+    },
+    "vaknop": {
+      "animations": [
+        "bphbtz",
+        "ecnujd"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_flint_and_steel')||q.is_item_name_any('slot.weapon.mainhand','minecraft:flint_and_steel'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "glvhfw": "q.in_range(q.state_time,0.3,1.5)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ahswoq": "q.in_range(q.state_time,1.5,4.2125)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ecnujd": "q.state_time>4.2125&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "flint_and_steel": "q.state_time>5"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.xcpgvu=0;"
+      ]
+    },
+    "ahswoq": {
+      "animations": [
+        "bphbtz",
+        "ahswoq"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_flint_and_steel')||q.is_item_name_any('slot.weapon.mainhand','minecraft:flint_and_steel'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "glvhfw": "q.in_range(q.state_time,0.25,1.45)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "phzzls": "q.in_range(q.state_time,1.45,4.175)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ecnujd": "q.state_time>4.175&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "flint_and_steel": "q.state_time>4.95"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.xcpgvu=0;"
+      ]
+    },
+    "phzzls": {
+      "animations": [
+        "bphbtz",
+        "ahswoq"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_flint_and_steel')||q.is_item_name_any('slot.weapon.mainhand','minecraft:flint_and_steel'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "glvhfw": "q.in_range(q.state_time,0.25,1.45)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ahswoq": "q.in_range(q.state_time,1.45,4.175)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ecnujd": "q.state_time>4.175&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "flint_and_steel": "q.state_time>4.95"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.xcpgvu=0;"
+      ]
+    },
+    "glvhfw": {
+      "animations": [
+        "bphbtz",
+        "glvhfw"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_flint_and_steel')||q.is_item_name_any('slot.weapon.mainhand','minecraft:flint_and_steel'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "tatdag": "q.in_range(q.state_time,0.2,1.4)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ahswoq": "q.in_range(q.state_time,1.4,4.125)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ecnujd": "q.state_time>4.125&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "flint_and_steel": "q.state_time>4.9"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.xcpgvu=0;"
+      ]
+    },
+    "tatdag": {
+      "animations": [
+        "bphbtz",
+        "glvhfw"
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_flint_and_steel')||q.is_item_name_any('slot.weapon.mainhand','minecraft:flint_and_steel'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "glvhfw": "q.in_range(q.state_time,0.2,1.4)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ahswoq": "q.in_range(q.state_time,1.4,4.125)&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "ecnujd": "q.state_time>4.125&&q.in_range(v.attack_time,0.01,0.2)"
+        },
+        {
+          "flint_and_steel": "q.state_time>4.9"
+        }
+      ],
+      "blend_transition": 0.1,
+      "on_exit": [
+        "v.xcpgvu=0;"
+      ]
+    },
+    "lasrrf": {
+      "animations": [
+        {
+          "lasrrf": "v.is_holding_left?0.001:1"
+        },
+        {
+          "gxtbmc": "v.is_holding_left?1:0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "jtbyya": "q.state_time>0.8&&v.attack_time"
+        },
+        {
+          "obvmgz": "q.state_time>0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "jtbyya": {
+      "animations": [
+        {
+          "lasrrf": "v.is_holding_left?0.001:1"
+        },
+        {
+          "gxtbmc": "v.is_holding_left?1:0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "lasrrf": "q.state_time>0.8&&v.attack_time"
+        },
+        {
+          "obvmgz": "q.state_time>=0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "obvmgz": {
+      "animations": [
+        {
+          "zuqsru": "v.is_holding_left?0.001:1"
+        },
+        {
+          "pyuhhn": "v.is_holding_left?1:0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "lasrrf": "q.state_time>0.8&&v.attack_time"
+        },
+        {
+          "margoc": "q.state_time>0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "margoc": {
+      "animations": [
+        {
+          "zuqsru": "v.is_holding_left?0.001:1"
+        },
+        {
+          "pyuhhn": "v.is_holding_left?1:0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_shears')||q.is_item_name_any('slot.weapon.mainhand','minecraft:shears'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "lasrrf": "q.state_time>0.8&&v.attack_time"
+        },
+        {
+          "obvmgz": "q.state_time>0.2&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "sotmvv": {
+      "animations": [
+        {
+          "sotmvv": "v.is_holding_left?0.001:1"
+        },
+        {
+          "lnmxra": "v.is_holding_left?1:0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "oggmww": "q.state_time>1.2&&v.attack_time"
+        },
+        {
+          "shvsed": "q.state_time>0.25&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "oggmww": {
+      "animations": [
+        {
+          "sotmvv": "v.is_holding_left?0.001:1"
+        },
+        {
+          "lnmxra": "v.is_holding_left?1:0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "sotmvv": "q.state_time>1.2&&v.attack_time"
+        },
+        {
+          "shvsed": "q.state_time>=0.25&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "shvsed": {
+      "animations": [
+        {
+          "nedxhd": "v.is_holding_left?0.001:1"
+        },
+        {
+          "ygkshq": "v.is_holding_left?1:0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "sotmvv": "q.state_time>1.2&&v.attack_time"
+        },
+        {
+          "lllecg": "q.state_time>0.25&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    },
+    "lllecg": {
+      "animations": [
+        {
+          "nedxhd": "v.is_holding_left?0.001:1"
+        },
+        {
+          "ygkshq": "v.is_holding_left?1:0.001"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_golden_dandelion')||q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_dandelion'))||(v.gddzeg||v.hoiyga)"
+        },
+        {
+          "sotmvv": "q.state_time>1.4&&v.attack_time"
+        },
+        {
+          "shvsed": "q.state_time>0.5&&q.in_range(v.attack_time,0.01,0.2)"
+        }
+      ],
+      "blend_transition": 0.1
+    }
+  }
+}

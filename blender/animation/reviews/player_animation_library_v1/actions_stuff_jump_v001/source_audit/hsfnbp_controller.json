@@ -1,0 +1,181 @@
+{
+  "states": {
+    "default": {
+      "on_entry": [
+        "!q.is_in_ui&&!v.is_paperdoll?{v.htpchf=1;};"
+      ],
+      "animations": [
+        {
+          "look_at_target": "v.tnlxsa!=13"
+        },
+        {
+          "loinjd": "v.tnlxsa==13"
+        }
+      ],
+      "transitions": [
+        {
+          "cbixvs": "q.is_gliding"
+        },
+        {
+          "elytik": "v.yngszr||v.dxlndb"
+        }
+      ],
+      "on_exit": [
+        "v.bwdroh=q.life_time;"
+      ]
+    },
+    "cbixvs": {
+      "on_entry": [
+        "!q.is_in_ui&&!v.is_paperdoll?{v.htpchf=1;};"
+      ],
+      "animations": [
+        "ekwgfb",
+        {
+          "mzllft": "1/Math.max(1,v.gliding_speed_value*0.6)"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!q.is_gliding"
+        },
+        {
+          "evrjlf": "q.is_gliding&&q.is_sneaking&&!v.oggbvj&&q.is_pack_setting_selected('oreville_ans:fyumxp','hfjbef')"
+        }
+      ],
+      "blend_transition": 0.15
+    },
+    "elytik": {
+      "animations": [
+        {
+          "look_at_target": "v.tnlxsa!=13"
+        },
+        {
+          "loinjd": "v.tnlxsa==13"
+        }
+      ],
+      "transitions": [
+        {
+          "yuahkn": "v.dxlndb"
+        },
+        {
+          "zuwmxg": "1"
+        }
+      ],
+      "blend_transition": {
+        "0": 1,
+        "0.03335": 0.99451,
+        "0.06665": 0.9561,
+        "0.1": 0.85185,
+        "0.13335": 0.64883,
+        "0.16665": 0.35117,
+        "0.2": 0.14815,
+        "0.23335": 0.0439,
+        "0.26665": 0.00549,
+        "0.3": 0
+      }
+    },
+    "zuwmxg": {
+      "transitions": [
+        {
+          "default": "!v.yngszr"
+        }
+      ],
+      "blend_transition": {
+        "0.0": 1,
+        "0.0667": 0.99451,
+        "0.1333": 0.9561,
+        "0.2": 0.85185,
+        "0.2667": 0.64883,
+        "0.3333": 0.35117,
+        "0.4": 0.14815,
+        "0.4667": 0.0439,
+        "0.5333": 0.00549,
+        "0.6": 0
+      }
+    },
+    "yuahkn": {
+      "animations": [
+        "yuahkn"
+      ],
+      "transitions": [
+        {
+          "default": "!v.dxlndb"
+        }
+      ],
+      "blend_transition": {
+        "0.0": 1,
+        "0.0667": 0.99451,
+        "0.1333": 0.9561,
+        "0.2": 0.85185,
+        "0.2667": 0.64883,
+        "0.3333": 0.35117,
+        "0.4": 0.14815,
+        "0.4667": 0.0439,
+        "0.5333": 0.00549,
+        "0.6": 0
+      }
+    },
+    "evrjlf": {
+      "on_entry": [
+        "!q.is_in_ui&&!v.is_paperdoll?{v.htpchf=-1;};"
+      ],
+      "blend_via_shortest_path": true,
+      "animations": [
+        "evrjlf",
+        "ekwgfb",
+        {
+          "mzllft": "1/Math.max(1,v.gliding_speed_value*0.6)"
+        },
+        {
+          "cslzxk": "q.is_local_player"
+        },
+        {
+          "kedqbe": "!q.is_local_player"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!q.is_gliding||!q.is_pack_setting_selected('oreville_ans:fyumxp','hfjbef')"
+        },
+        {
+          "cbixvs": "q.is_gliding&&q.all_animations_finished"
+        },
+        {
+          "fpsgkf": "q.is_gliding&&q.is_sneaking&&q.state_time>1.33"
+        }
+      ],
+      "blend_transition": 0.15
+    },
+    "fpsgkf": {
+      "on_entry": [
+        "!q.is_in_ui&&!v.is_paperdoll?{v.htpchf=1;};"
+      ],
+      "blend_via_shortest_path": true,
+      "animations": [
+        "fpsgkf",
+        "ekwgfb",
+        {
+          "mzllft": "1/Math.max(1,v.gliding_speed_value*0.6)"
+        },
+        {
+          "cslzxk": "q.is_local_player"
+        },
+        {
+          "kedqbe": "!q.is_local_player"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!q.is_gliding||!q.is_pack_setting_selected('oreville_ans:fyumxp','hfjbef')"
+        },
+        {
+          "cbixvs": "q.is_gliding&&q.all_animations_finished"
+        },
+        {
+          "evrjlf": "q.is_gliding&&q.is_sneaking&&q.state_time>1.33"
+        }
+      ],
+      "blend_transition": 0.15
+    }
+  }
+}

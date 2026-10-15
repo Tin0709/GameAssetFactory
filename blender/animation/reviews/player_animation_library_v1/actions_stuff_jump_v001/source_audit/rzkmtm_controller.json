@@ -1,0 +1,103 @@
+{
+  "states": {
+    "default": {
+      "animations": [
+        {
+          "xfltzh": "!q.is_gliding&&!q.is_in_ui&&!v.mbqkjf"
+        },
+        "cape",
+        "controller.player_movement.offset",
+        "flkskc",
+        {
+          "veywgp": "!q.any(v.tnlxsa,3,13)?!q.is_gliding-v.jkpkmj"
+        },
+        {
+          "dprsws": "v.tnlxsa==3?!q.is_gliding-v.jkpkmj"
+        },
+        {
+          "zpbnrr": "v.tnlxsa==13?!q.is_gliding-v.jkpkmj"
+        },
+        "psowex",
+        {
+          "agyfrv": "!q.is_in_ui&&!v.is_paperdoll"
+        },
+        "cwxfxl",
+        {
+          "cmdvzm": "!q.is_gliding"
+        },
+        {
+          "okjrob": "!q.is_gliding"
+        },
+        {
+          "ptaudk": "!v.gtgvhp"
+        },
+        {
+          "hsfnbp": "!q.is_emoting"
+        },
+        {
+          "pyioph": "v.jkpkmj>0"
+        },
+        {
+          "bjmscc": "!q.is_in_ui"
+        },
+        {
+          "ybphcg": "!v.gtgvhp"
+        },
+        {
+          "rylnkt": "v.zagini?1-Math.clamp((q.life_time-v.zagini)/0.25,0,1):1"
+        },
+        {
+          "eudgiz": "v.tnlxsa!=4"
+        },
+        {
+          "bwdayn": "v.tnlxsa==4"
+        }
+      ],
+      "transitions": [
+        {
+          "bnyqbz": "!q.is_alive"
+        },
+        {
+          "sykxyi": "q.is_sleeping"
+        },
+        {
+          "zqihwb": "q.is_riding"
+        }
+      ]
+    },
+    "bnyqbz": {
+      "transitions": [
+        {
+          "default": "q.is_alive"
+        }
+      ]
+    },
+    "sykxyi": {
+      "animations": [
+        "sleeping"
+      ],
+      "transitions": [
+        {
+          "default": "!q.is_sleeping"
+        }
+      ]
+    },
+    "zqihwb": {
+      "animations": [
+        "fjtwtc",
+        {
+          "ptaudk": "!q.is_riding_any_entity_of_type('minecraft:boat','minecraft:chest_boat')"
+        },
+        "ybphcg",
+        {
+          "ceotii": "!q.is_riding_any_entity_of_type('minecraft:cushion')"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "!q.is_riding"
+        }
+      ]
+    }
+  }
+}

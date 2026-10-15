@@ -1,0 +1,39 @@
+{
+  "states": {
+    "default": {
+      "animations": [
+        {
+          "idle": "q.is_riding?0.5:1"
+        }
+      ],
+      "transitions": [
+        {
+          "move": "q.has_rider"
+        }
+      ]
+    },
+    "move": {
+      "on_entry": [
+        "!q.is_in_ui?{v.toclgf=q.position(0);v.qkrfdi=q.position(2);v.iaxjoy=q.position(0);v.iynnie=q.position(2);};"
+      ],
+      "animations": [
+        "yytrhz",
+        "idle",
+        {
+          "walk": "Math.max(0.001,v.wxfgnb)"
+        },
+        {
+          "run": "Math.max(0.001,v.ixjhbf*1.3)"
+        }
+      ],
+      "transitions": [
+        {
+          "move": "!q.is_in_ui?{t.x=q.position(0);t.z=q.position(2);v.iaxjoy=v.toclgf;v.iynnie=v.qkrfdi;t.t=q.life_time;t.x!=v.toclgf||t.z!=v.qkrfdi?{t.nng=t.t-v.abjhra;v.abjhra=t.t;t.xhy=t.x-v.toclgf;t.asp=t.z-v.qkrfdi;v.lzwweo=Math.sqrt(t.xhy*t.xhy+t.asp*t.asp)/t.nng;v.xiemzw=t.xhy/t.nng;v.rupatf=t.asp/t.nng;v.toclgf=t.x;v.qkrfdi=t.z;v.txvzcq=0;}:{v.txvzcq=v.txvzcq+q.delta_time;v.txvzcq>0.03?{v.lzwweo=v.lzwweo*(1-6*q.delta_time);};};v.wxfgnb=Math.lerp(v.wxfgnb,v.lzwweo<6?Math.min(v.lzwweo/2,1),0.1);v.ixjhbf=Math.lerp(v.ixjhbf,v.lzwweo>=6?Math.min(v.lzwweo/4.5,1),0.1);};return 0;"
+        },
+        {
+          "default": "!q.has_rider"
+        }
+      ]
+    }
+  }
+}

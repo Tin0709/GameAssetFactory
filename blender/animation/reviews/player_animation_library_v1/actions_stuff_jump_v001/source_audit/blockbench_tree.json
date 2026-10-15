@@ -1,0 +1,3753 @@
+{
+  "sha": "7c92e27d237e365110030d73e92c5d1605f0d311",
+  "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/7c92e27d237e365110030d73e92c5d1605f0d311",
+  "tree": [
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "92375ce02e49e67d7e6184ce6c2266491f702f8e",
+      "size": 11,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/92375ce02e49e67d7e6184ce6c2266491f702f8e"
+    },
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1d962e1e4cfc7480d404678081fae079a5e74375",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/1d962e1e4cfc7480d404678081fae079a5e74375"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "eb983a80cea927ecc8f9d0954486e189b83a50e9",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/eb983a80cea927ecc8f9d0954486e189b83a50e9"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/config.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f2573d84451644fe4064e7afe7995512dbce1196",
+      "size": 455,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f2573d84451644fe4064e7afe7995512dbce1196"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/issue.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "38e594a4aa56ae5773cbe8a437a92aa8be23c59a",
+      "size": 2169,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/38e594a4aa56ae5773cbe8a437a92aa8be23c59a"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/suggestion.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b98d88c6a8698b36e320156abe6b3ed281c93355",
+      "size": 499,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b98d88c6a8698b36e320156abe6b3ed281c93355"
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f9bde73179bc18ef055930212e669af43209316",
+      "size": 184,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1f9bde73179bc18ef055930212e669af43209316"
+    },
+    {
+      "path": ".github/workflows",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b4e58c0c90eb399dc675e5149c4e2f189e46faeb",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/b4e58c0c90eb399dc675e5149c4e2f189e46faeb"
+    },
+    {
+      "path": ".github/workflows/build-linux.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8dc613d268a8a63bc0150601e40c0adb3b9d81cd",
+      "size": 716,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/8dc613d268a8a63bc0150601e40c0adb3b9d81cd"
+    },
+    {
+      "path": ".github/workflows/publish-types.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "20ac9174f2302ba8a135157fe67045cdcb60e376",
+      "size": 696,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/20ac9174f2302ba8a135157fe67045cdcb60e376"
+    },
+    {
+      "path": ".github/workflows/stale.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a07ac6f08d98271310438a6e925c32c8bb14f53e",
+      "size": 994,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a07ac6f08d98271310438a6e925c32c8bb14f53e"
+    },
+    {
+      "path": ".github/workflows/webapp.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2f7415d72ef28639b708f0af4f8c238b61fe1173",
+      "size": 811,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2f7415d72ef28639b708f0af4f8c238b61fe1173"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "13483f0d812478082a55c111fabfb6a8feceab76",
+      "size": 129,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/13483f0d812478082a55c111fabfb6a8feceab76"
+    },
+    {
+      "path": ".travis.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a90f12347648b985f9f169c1aff35b8821c8f337",
+      "size": 320,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a90f12347648b985f9f169c1aff35b8821c8f337"
+    },
+    {
+      "path": ".vscode",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9cac081dc29d1f307770b6c537b74fd461de4a22",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/9cac081dc29d1f307770b6c537b74fd461de4a22"
+    },
+    {
+      "path": ".vscode/launch.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b3df042826c2d0e97a19ccd3ffead2eb29b5b611",
+      "size": 617,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b3df042826c2d0e97a19ccd3ffead2eb29b5b611"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c082db11c5d49e3fbb80a856ac44fd4334d5d85c",
+      "size": 92,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c082db11c5d49e3fbb80a856ac44fd4334d5d85c"
+    },
+    {
+      "path": ".vscode/tasks.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4fee954997001bfeb49cc48ee72602e688785e44",
+      "size": 344,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4fee954997001bfeb49cc48ee72602e688785e44"
+    },
+    {
+      "path": "CNAME",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "926dffab5c5e1091ed2650ed74727140ba03d92c",
+      "size": 18,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/926dffab5c5e1091ed2650ed74727140ba03d92c"
+    },
+    {
+      "path": "CODE_OF_CONDUCT.MD",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3dab22d1673292293921a77ae15e0e5ed9a0bbd8",
+      "size": 5528,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3dab22d1673292293921a77ae15e0e5ed9a0bbd8"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89221024a424bc5946d6bb92ee46569ed8d678ac",
+      "size": 2324,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/89221024a424bc5946d6bb92ee46569ed8d678ac"
+    },
+    {
+      "path": "LICENSE.MD",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e72bfddabc15be5718a7cc061ac10e47741d8219",
+      "size": 35148,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e72bfddabc15be5718a7cc061ac10e47741d8219"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f03d92c37098b5b9c0979d8060cea4258f1a8002",
+      "size": 2484,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f03d92c37098b5b9c0979d8060cea4258f1a8002"
+    },
+    {
+      "path": "assets",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "89daede707cb5a0bd877c6943fc9ed099105de02",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/89daede707cb5a0bd877c6943fc9ed099105de02"
+    },
+    {
+      "path": "assets/armor_stand.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0d47a348aa0e2f63e438bd37ce548ac2b9030404",
+      "size": 664,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0d47a348aa0e2f63e438bd37ce548ac2b9030404"
+    },
+    {
+      "path": "assets/brush.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df02cae01c7672cef2a1b359c6b2261c69eea5c4",
+      "size": 381,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/df02cae01c7672cef2a1b359c6b2261c69eea5c4"
+    },
+    {
+      "path": "assets/brush_outline.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1aaef39bafcbd55d483ab125f1d4a5bf4be4d3ca",
+      "size": 111,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1aaef39bafcbd55d483ab125f1d4a5bf4be4d3ca"
+    },
+    {
+      "path": "assets/brush_outline_circle.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "522e670479dea46c8ecebced08fccd1425b8b4a1",
+      "size": 429,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/522e670479dea46c8ecebced08fccd1425b8b4a1"
+    },
+    {
+      "path": "assets/crafting_table.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9d5466f25a2d29a86ba524aeff221aaed2a15fca",
+      "size": 1572,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9d5466f25a2d29a86ba524aeff221aaed2a15fca"
+    },
+    {
+      "path": "assets/crosshair.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aca65552aa81a0c11665ddfd2776988969ec75ee",
+      "size": 97,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/aca65552aa81a0c11665ddfd2776988969ec75ee"
+    },
+    {
+      "path": "assets/flower_pot.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "13902cd3d6ec885ef9051e1a71da145a8b395816",
+      "size": 378,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/13902cd3d6ec885ef9051e1a71da145a8b395816"
+    },
+    {
+      "path": "assets/fox.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab1f3dd6cb709a6c9b04470c23175a73436cd5e1",
+      "size": 584,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ab1f3dd6cb709a6c9b04470c23175a73436cd5e1"
+    },
+    {
+      "path": "assets/hud.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bdcf437efe6e459bc0abc0e7be831ae7f20cdd7e",
+      "size": 1495,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/bdcf437efe6e459bc0abc0e7be831ae7f20cdd7e"
+    },
+    {
+      "path": "assets/image_editor.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85adb25dd72ec40ac7082ea4ee306a9c7f133ed8",
+      "size": 48678,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/85adb25dd72ec40ac7082ea4ee306a9c7f133ed8"
+    },
+    {
+      "path": "assets/inventory_full.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0476f43202deedb36c532a86ebc7118570be6ff1",
+      "size": 1022,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0476f43202deedb36c532a86ebc7118570be6ff1"
+    },
+    {
+      "path": "assets/inventory_nine.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "481d8fb3f807432f75b03700f74a8a3492e025cb",
+      "size": 386,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/481d8fb3f807432f75b03700f74a8a3492e025cb"
+    },
+    {
+      "path": "assets/item_frame.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "68e9819fb1c9fda9b9513bf22417179d41751eee",
+      "size": 599,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/68e9819fb1c9fda9b9513bf22417179d41751eee"
+    },
+    {
+      "path": "assets/locator.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f63d43e1c76b278d20fa7763748dd89fb5330aad",
+      "size": 244,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f63d43e1c76b278d20fa7763748dd89fb5330aad"
+    },
+    {
+      "path": "assets/logo_cutout.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2670c08b34e209703cc600133161f833359b5802",
+      "size": 9561,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2670c08b34e209703cc600133161f833359b5802"
+    },
+    {
+      "path": "assets/logo_text_white.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e78b306016384f720a82d5db88fad31eb4a5300",
+      "size": 15454,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0e78b306016384f720a82d5db88fad31eb4a5300"
+    },
+    {
+      "path": "assets/missing.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b8125955bec33d126cacd9b9ab095b03d9022d3a",
+      "size": 192,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b8125955bec33d126cacd9b9ab095b03d9022d3a"
+    },
+    {
+      "path": "assets/missing_blend.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cfd6df414a9c7ececf49975c401ddefcb017c724",
+      "size": 1486,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cfd6df414a9c7ececf49975c401ddefcb017c724"
+    },
+    {
+      "path": "assets/netlify-full-logo-dark.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "842ee033f1550fe9210c3e4b3daccb14399b84ad",
+      "size": 5979,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/842ee033f1550fe9210c3e4b3daccb14399b84ad"
+    },
+    {
+      "path": "assets/north.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9cca2aeb604062a94312337dc8d6a83e38774444",
+      "size": 6571,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9cca2aeb604062a94312337dc8d6a83e38774444"
+    },
+    {
+      "path": "assets/null_object.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "893458deba7ef7f581ece09426346cb6b7fd69ad",
+      "size": 235,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/893458deba7ef7f581ece09426346cb6b7fd69ad"
+    },
+    {
+      "path": "assets/oak_shelf.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2dd79677605cdc90a3473931f6f6cdb66d423f7c",
+      "size": 585,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2dd79677605cdc90a3473931f6f6cdb66d423f7c"
+    },
+    {
+      "path": "assets/player_skin.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "517f4098b41999ca51018cba01f1a0dafd7bb6f9",
+      "size": 2261,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/517f4098b41999ca51018cba01f1a0dafd7bb6f9"
+    },
+    {
+      "path": "assets/plugins.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f295ec5ad75497bfb7ecd28ac1d06842c63b7edd",
+      "size": 36011,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f295ec5ad75497bfb7ecd28ac1d06842c63b7edd"
+    },
+    {
+      "path": "assets/poses",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a796c140275491c5526dbb99176a2e6248485512",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/a796c140275491c5526dbb99176a2e6248485512"
+    },
+    {
+      "path": "assets/poses/aiming.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79b0831650eacc737233b1dfe5be51e033e3b660",
+      "size": 3304,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/79b0831650eacc737233b1dfe5be51e033e3b660"
+    },
+    {
+      "path": "assets/poses/crouching.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c28c317d55f7831baaf162d44818731322fba712",
+      "size": 3109,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c28c317d55f7831baaf162d44818731322fba712"
+    },
+    {
+      "path": "assets/poses/jumping.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b4c742d26ef5701cf7cb95039d7249506bf79977",
+      "size": 3235,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b4c742d26ef5701cf7cb95039d7249506bf79977"
+    },
+    {
+      "path": "assets/poses/natural.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "db5dca16b4a3a80ffa72220a65074b6db5a8b352",
+      "size": 2828,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/db5dca16b4a3a80ffa72220a65074b6db5a8b352"
+    },
+    {
+      "path": "assets/poses/none.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e242dfe5112a4347753ec904520e1ba095273a1d",
+      "size": 2252,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e242dfe5112a4347753ec904520e1ba095273a1d"
+    },
+    {
+      "path": "assets/poses/sitting.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4d275ed1129eeff4aa12da1a179f0509c052906",
+      "size": 3035,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d4d275ed1129eeff4aa12da1a179f0509c052906"
+    },
+    {
+      "path": "assets/poses/walking.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e22702471d079edda081a225533a26eb7c2b8a1b",
+      "size": 3235,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e22702471d079edda081a225533a26eb7c2b8a1b"
+    },
+    {
+      "path": "assets/preview_scenes",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c6e4cf48bf21580c4c05b9a2aef8138d59606672",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/c6e4cf48bf21580c4c05b9a2aef8138d59606672"
+    },
+    {
+      "path": "assets/preview_scenes/studio.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cb1324240691f14bda88f6f91cc8e536fba9a5e7",
+      "size": 3833,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cb1324240691f14bda88f6f91cc8e536fba9a5e7"
+    },
+    {
+      "path": "assets/rotate_cursor.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "36c6b2b7b1d125564e214bbfe831bdadb33a9212",
+      "size": 11933,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/36c6b2b7b1d125564e214bbfe831bdadb33a9212"
+    },
+    {
+      "path": "assets/splash_art.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "edd5a88c6bc43c7b2fb871c8f55b803ec96edc7a",
+      "size": 197951,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/edd5a88c6bc43c7b2fb871c8f55b803ec96edc7a"
+    },
+    {
+      "path": "assets/splash_art",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6e55b1feb4e8200e0e441fd88448ac70146814a8",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/6e55b1feb4e8200e0e441fd88448ac70146814a8"
+    },
+    {
+      "path": "assets/splash_art/1.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ffd833339c51ba6ca708e46112ca86e1f1c113fc",
+      "size": 76488,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ffd833339c51ba6ca708e46112ca86e1f1c113fc"
+    },
+    {
+      "path": "assets/splash_art/2.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d817bf6e7337c921264009d5dd88f9bbf99a769",
+      "size": 109574,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1d817bf6e7337c921264009d5dd88f9bbf99a769"
+    },
+    {
+      "path": "assets/splash_art/3.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da11828ce70fa73ba361401f0b38c3f372a3bb88",
+      "size": 42102,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/da11828ce70fa73ba361401f0b38c3f372a3bb88"
+    },
+    {
+      "path": "assets/splash_art/4.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "46ec6bc305b07d169e9e9227df8ae605ef778e3c",
+      "size": 47550,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/46ec6bc305b07d169e9e9227df8ae605ef778e3c"
+    },
+    {
+      "path": "assets/uv_preview.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5d3d15b85d0f9bafdd1a1263ada8c734d1ecc523",
+      "size": 12992,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5d3d15b85d0f9bafdd1a1263ada8c734d1ecc523"
+    },
+    {
+      "path": "assets/vertex.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "767309305ab6eb10e218869c71544113daccc6fb",
+      "size": 1476,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/767309305ab6eb10e218869c71544113daccc6fb"
+    },
+    {
+      "path": "assets/zombie.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cb3a85bd53b94e790f9d8cd6b54abcfb36af4c6",
+      "size": 1111,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6cb3a85bd53b94e790f9d8cd6b54abcfb36af4c6"
+    },
+    {
+      "path": "build.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a472a9bf2ba8b30b47bbe5aadbb876dee3202f5",
+      "size": 4834,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6a472a9bf2ba8b30b47bbe5aadbb876dee3202f5"
+    },
+    {
+      "path": "build",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "990ae92e2237a3ef700e9393ab6aafa67db1b30e",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/990ae92e2237a3ef700e9393ab6aafa67db1b30e"
+    },
+    {
+      "path": "build/background.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dfb68285159943919a93f2c8b0f95618ecf8fe75",
+      "size": 4456,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/dfb68285159943919a93f2c8b0f95618ecf8fe75"
+    },
+    {
+      "path": "build/bbmodel.icns",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "130b02258391e0f340cff0c798204bb708bfe03c",
+      "size": 40137,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/130b02258391e0f340cff0c798204bb708bfe03c"
+    },
+    {
+      "path": "build/bbmodel.ico",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c50c6c4f6f05b79ceb5afa7fe3c2a3bc832137fb",
+      "size": 14680,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c50c6c4f6f05b79ceb5afa7fe3c2a3bc832137fb"
+    },
+    {
+      "path": "build/entitlements.mac.plist",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "31d14536d3241ab1d51ac1f721cb736382ea9628",
+      "size": 308,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/31d14536d3241ab1d51ac1f721cb736382ea9628"
+    },
+    {
+      "path": "build/icon.icns",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da25a0c7da45777bfe0ac97b36a565b02a9a0940",
+      "size": 88408,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/da25a0c7da45777bfe0ac97b36a565b02a9a0940"
+    },
+    {
+      "path": "build/icon.ico",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "03b3d9135691b1bb8e50f5cdb860c5ace9c9778c",
+      "size": 131903,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/03b3d9135691b1bb8e50f5cdb860c5ace9c9778c"
+    },
+    {
+      "path": "build/icon.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2a8f0d52a6aae42c62e0b828747c855311bbb15a",
+      "size": 153314,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2a8f0d52a6aae42c62e0b828747c855311bbb15a"
+    },
+    {
+      "path": "build/installer.nsh",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a50d5ad092012a7d9c1fdf509ab6c2c89d5f24a",
+      "size": 21,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5a50d5ad092012a7d9c1fdf509ab6c2c89d5f24a"
+    },
+    {
+      "path": "build/installerSidebar.bmp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cf2b92bf6e911b14192c467030aed9eae13ffb73",
+      "size": 154542,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cf2b92bf6e911b14192c467030aed9eae13ffb73"
+    },
+    {
+      "path": "build/json.icns",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e2dd49ec9207c7c1a2a77dd3188002d683aeb3d",
+      "size": 38234,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1e2dd49ec9207c7c1a2a77dd3188002d683aeb3d"
+    },
+    {
+      "path": "build/json.ico",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "137d0318916aff7656f12563da79f92c592c5588",
+      "size": 14977,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/137d0318916aff7656f12563da79f92c592c5588"
+    },
+    {
+      "path": "content",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6a8c8d0a16e61fe46135e60fc94f5d69facba078",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/6a8c8d0a16e61fe46135e60fc94f5d69facba078"
+    },
+    {
+      "path": "content/front_page_app.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2681103dab9e054b75dd90ae210cb061229fb4cb",
+      "size": 378126,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2681103dab9e054b75dd90ae210cb061229fb4cb"
+    },
+    {
+      "path": "content/ik_pole.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3780a233dc50cffce3f3cf4cf896cc5665bf61c3",
+      "size": 194667,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3780a233dc50cffce3f3cf4cf896cc5665bf61c3"
+    },
+    {
+      "path": "content/layer_groups.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8003c09aab152d75c217c8c971e9f85a6057ae3",
+      "size": 60451,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a8003c09aab152d75c217c8c971e9f85a6057ae3"
+    },
+    {
+      "path": "content/news.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa0e8807db2be127175756e76158edd1148694f1",
+      "size": 1392,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fa0e8807db2be127175756e76158edd1148694f1"
+    },
+    {
+      "path": "content/reference_images.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9422609e101a65b9056289dbf4063e597198428b",
+      "size": 483616,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9422609e101a65b9056289dbf4063e597198428b"
+    },
+    {
+      "path": "content/screen_space_brush.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1944ebf4bf222aea23a3d97e5285db6b6aef1cb7",
+      "size": 424467,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1944ebf4bf222aea23a3d97e5285db6b6aef1cb7"
+    },
+    {
+      "path": "css",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2ae9ad05286317f621b78102f27408063fe5b58c",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/2ae9ad05286317f621b78102f27408063fe5b58c"
+    },
+    {
+      "path": "css/dialogs.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2fd105e6fbf0225a3fb6157851392cb0c177b907",
+      "size": 59937,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2fd105e6fbf0225a3fb6157851392cb0c177b907"
+    },
+    {
+      "path": "css/fontawesome.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa670997bfc1baf2ecabab56523db4c7b1272220",
+      "size": 133065,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/aa670997bfc1baf2ecabab56523db4c7b1272220"
+    },
+    {
+      "path": "css/general.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "66a45ef12a75199aba14f75906ac30af36ce9691",
+      "size": 19795,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/66a45ef12a75199aba14f75906ac30af36ce9691"
+    },
+    {
+      "path": "css/jquery-ui.min.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4c36e0666b1e13dd9b9712266c6153460d7ddfdb",
+      "size": 11715,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4c36e0666b1e13dd9b9712266c6153460d7ddfdb"
+    },
+    {
+      "path": "css/panels.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3dc04d2c23eca1ec894efa7c0d5e0a9e0e135718",
+      "size": 68000,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3dc04d2c23eca1ec894efa7c0d5e0a9e0e135718"
+    },
+    {
+      "path": "css/prism.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b535f27ec4405d4deea554b927c33ef9ab85dec",
+      "size": 3848,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5b535f27ec4405d4deea554b927c33ef9ab85dec"
+    },
+    {
+      "path": "css/setup.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fc44a1118cd2afa70f5e6e73bf9184eb02aa8a81",
+      "size": 17990,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fc44a1118cd2afa70f5e6e73bf9184eb02aa8a81"
+    },
+    {
+      "path": "css/spectrum.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "02f1aa7c6227db30777bb4559e71a72d9160c3b3",
+      "size": 12552,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/02f1aa7c6227db30777bb4559e71a72d9160c3b3"
+    },
+    {
+      "path": "css/start_screen.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "104aa8d9d250d2f65dffbaa509c87c71f1574ccc",
+      "size": 12755,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/104aa8d9d250d2f65dffbaa509c87c71f1574ccc"
+    },
+    {
+      "path": "css/w3.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f3db0067082879ee327b0d31c6e80a4416de7d3",
+      "size": 2719,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6f3db0067082879ee327b0d31c6e80a4416de7d3"
+    },
+    {
+      "path": "css/window.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9e3a8273ecc62a491d4bc810f6d1e9eba31003b5",
+      "size": 30419,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9e3a8273ecc62a491d4bc810f6d1e9eba31003b5"
+    },
+    {
+      "path": "electron",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ae4bfaf75229939a3b313f37fb66d7bd691ab241",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/ae4bfaf75229939a3b313f37fb66d7bd691ab241"
+    },
+    {
+      "path": "electron/main.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82eb4d56b5b9ce0bb93a22f6ef9c8317838a3d2f",
+      "size": 8452,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/82eb4d56b5b9ce0bb93a22f6ef9c8317838a3d2f"
+    },
+    {
+      "path": "favicon.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "66c77b88d44aa9a6f929a103b2be1fa2b6e9b03d",
+      "size": 11382,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/66c77b88d44aa9a6f929a103b2be1fa2b6e9b03d"
+    },
+    {
+      "path": "font",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "538f3277915f5e5f8b5aefa3438b7be8d521d440",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/538f3277915f5e5f8b5aefa3438b7be8d521d440"
+    },
+    {
+      "path": "font/Assistant-Bold.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c7aa79697a13a165451c28b4e5f29f5df2e52c48",
+      "size": 63092,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c7aa79697a13a165451c28b4e5f29f5df2e52c48"
+    },
+    {
+      "path": "font/Assistant-ExtraBold.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a13e207f1ac5769c0b2876b79bbc5268eca92175",
+      "size": 64740,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a13e207f1ac5769c0b2876b79bbc5268eca92175"
+    },
+    {
+      "path": "font/Assistant-ExtraLight.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1693d097d852ce9d3d86345849e87532def1ca94",
+      "size": 60904,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1693d097d852ce9d3d86345849e87532def1ca94"
+    },
+    {
+      "path": "font/Assistant-Light.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d00dc8a0589a5ec3f5b94f1c752faa8764b450f8",
+      "size": 61892,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d00dc8a0589a5ec3f5b94f1c752faa8764b450f8"
+    },
+    {
+      "path": "font/Assistant-Regular.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87cc8d67a6f68b388bd05060faa9b806c439e6c1",
+      "size": 62024,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/87cc8d67a6f68b388bd05060faa9b806c439e6c1"
+    },
+    {
+      "path": "font/Assistant-SemiBold.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6913d682f86544820b6960ea5d1b3ecb9086e31f",
+      "size": 62888,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6913d682f86544820b6960ea5d1b3ecb9086e31f"
+    },
+    {
+      "path": "font/Montserrat-VariableFont_wght.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "451e69288c17eb9823f8e96f1a2b9621094d2668",
+      "size": 688600,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/451e69288c17eb9823f8e96f1a2b9621094d2668"
+    },
+    {
+      "path": "font/fa-brands-400.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d84512f3897d306409dc5aa5764e6406fe888055",
+      "size": 118072,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d84512f3897d306409dc5aa5764e6406fe888055"
+    },
+    {
+      "path": "font/fa-regular-400.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "452b49c0407e7ec42821f8d8799ad0327e2c2282",
+      "size": 25464,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/452b49c0407e7ec42821f8d8799ad0327e2c2282"
+    },
+    {
+      "path": "font/fa-solid-900.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fec1fae77d486cc8f907b27accca01b59a5b7d90",
+      "size": 157192,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fec1fae77d486cc8f907b27accca01b59a5b7d90"
+    },
+    {
+      "path": "font/icomoon.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24c27619727ff95d61d6ff8dac72bc50e7ce3441",
+      "size": 10976,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/24c27619727ff95d61d6ff8dac72bc50e7ce3441"
+    },
+    {
+      "path": "font/icomoon.woff",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e5cf1cb76fa63c2c453464f68c7ad6daf2bc60c",
+      "size": 11052,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4e5cf1cb76fa63c2c453464f68c7ad6daf2bc60c"
+    },
+    {
+      "path": "font/material-icons.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c57cdcff288f08f1a694908cc72d41603c339a17",
+      "size": 330596,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c57cdcff288f08f1a694908cc72d41603c339a17"
+    },
+    {
+      "path": "icon.icns",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "927ff0cfd0e4e054ed94841c2b85a5ef4a5a4de0",
+      "size": 265985,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/927ff0cfd0e4e054ed94841c2b85a5ef4a5a4de0"
+    },
+    {
+      "path": "icon.ico",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5ea7a9442eb3ca2054db6598af2711145bd9868f",
+      "size": 368019,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5ea7a9442eb3ca2054db6598af2711145bd9868f"
+    },
+    {
+      "path": "icon.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "38db40ce11c0004ecd1c5ea5d7fa69d6cb826f8b",
+      "size": 136798,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/38db40ce11c0004ecd1c5ea5d7fa69d6cb826f8b"
+    },
+    {
+      "path": "icon_full.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "376c90b1479df8f16e6d951fc2aed70e766debaf",
+      "size": 28359,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/376c90b1479df8f16e6d951fc2aed70e766debaf"
+    },
+    {
+      "path": "icon_maskable.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4cb071384933ac506b2fb5d9fc710fcdffaf0530",
+      "size": 23828,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4cb071384933ac506b2fb5d9fc710fcdffaf0530"
+    },
+    {
+      "path": "icons",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6843778b2b57c8ac5399cd7ae4a9c0e7848b0c68",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/6843778b2b57c8ac5399cd7ae4a9c0e7848b0c68"
+    },
+    {
+      "path": "icons/favicon_beta.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcbded9c38e848413cf5fce7a7f557a4cd039d74",
+      "size": 17876,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/dcbded9c38e848413cf5fce7a7f557a4cd039d74"
+    },
+    {
+      "path": "icons/icomoon",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "60e860106c6b446e6f91a7c10c1c66691cbd3026",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/60e860106c6b446e6f91a7c10c1c66691cbd3026"
+    },
+    {
+      "path": "icons/icomoon/armor_stand.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d387f77f128102e00e8863474f81326e05ffd260",
+      "size": 4653,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d387f77f128102e00e8863474f81326e05ffd260"
+    },
+    {
+      "path": "icons/icomoon/armor_stand_small.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cba109a94514c86d1432399a606c50b9c77bac3b",
+      "size": 4646,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cba109a94514c86d1432399a606c50b9c77bac3b"
+    },
+    {
+      "path": "icons/icomoon/baby_zombie.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b95aa5617fa91d3ee0de0a5149718e16d63310b",
+      "size": 3418,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1b95aa5617fa91d3ee0de0a5149718e16d63310b"
+    },
+    {
+      "path": "icons/icomoon/bb_interface.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f239c32c979b4d3bf5fc056daf23fb5de0406f61",
+      "size": 3556,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f239c32c979b4d3bf5fc056daf23fb5de0406f61"
+    },
+    {
+      "path": "icons/icomoon/blockbench_file.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f16be7d5dcfb4740923356e5a540d70cfe508d5e",
+      "size": 4480,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f16be7d5dcfb4740923356e5a540d70cfe508d5e"
+    },
+    {
+      "path": "icons/icomoon/blockbench_inverted.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "08397124b19b6d333eb497f5a9eb9fcf3f07013f",
+      "size": 9559,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/08397124b19b6d333eb497f5a9eb9fcf3f07013f"
+    },
+    {
+      "path": "icons/icomoon/bow.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f100b173b8f44ddf514f5d05223a26414a2bba9e",
+      "size": 4293,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f100b173b8f44ddf514f5d05223a26414a2bba9e"
+    },
+    {
+      "path": "icons/icomoon/collada.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4dbb43483b84a5b2ad34c9a0c626bb1cad7f10d0",
+      "size": 2735,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4dbb43483b84a5b2ad34c9a0c626bb1cad7f10d0"
+    },
+    {
+      "path": "icons/icomoon/create_bitmap.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f9046951de4babe630cb4d7be73b348b5f025d14",
+      "size": 4004,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f9046951de4babe630cb4d7be73b348b5f025d14"
+    },
+    {
+      "path": "icons/icomoon/crossbow.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d67038bc7c9417d53d73b5c9e408e88b9b516c71",
+      "size": 2223,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d67038bc7c9417d53d73b5c9e408e88b9b516c71"
+    },
+    {
+      "path": "icons/icomoon/fbx.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac3a4ac6ea194414cd82f22e60ccdfcd4fa37eb7",
+      "size": 4114,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ac3a4ac6ea194414cd82f22e60ccdfcd4fa37eb7"
+    },
+    {
+      "path": "icons/icomoon/format_bedrock.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "499a444e1546466440c95cfe2b2737d9eb50d4a7",
+      "size": 2466,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/499a444e1546466440c95cfe2b2737d9eb50d4a7"
+    },
+    {
+      "path": "icons/icomoon/format_bedrock_block.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "403c2fa829447441b815468848a779b96d004785",
+      "size": 2811,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/403c2fa829447441b815468848a779b96d004785"
+    },
+    {
+      "path": "icons/icomoon/format_bedrock_entity.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0e22786ae95935b87900cc72c057f59ffd77a5c",
+      "size": 2890,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a0e22786ae95935b87900cc72c057f59ffd77a5c"
+    },
+    {
+      "path": "icons/icomoon/format_bedrock_legacy.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "248b26ecd43c548a0ec6781cbd59925b31483877",
+      "size": 2982,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/248b26ecd43c548a0ec6781cbd59925b31483877"
+    },
+    {
+      "path": "icons/icomoon/format_block.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f5a7cf530416e2736d23db84522c7db05119ed02",
+      "size": 2667,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f5a7cf530416e2736d23db84522c7db05119ed02"
+    },
+    {
+      "path": "icons/icomoon/format_free.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a81dcd16b514575620f5af75273495a889b1f780",
+      "size": 1965,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a81dcd16b514575620f5af75273495a889b1f780"
+    },
+    {
+      "path": "icons/icomoon/format_hytale.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5fe752abd5fd3d393e363dc8947b6c15b06c06c9",
+      "size": 2551,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5fe752abd5fd3d393e363dc8947b6c15b06c06c9"
+    },
+    {
+      "path": "icons/icomoon/format_java.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a6f2953bdddb39739104b2cfa0a9a77a7244f22d",
+      "size": 2607,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a6f2953bdddb39739104b2cfa0a9a77a7244f22d"
+    },
+    {
+      "path": "icons/icomoon/format_optifine.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cbc5485f3c228be3e4ebde7f02ef7eee7cf617d2",
+      "size": 2611,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cbc5485f3c228be3e4ebde7f02ef7eee7cf617d2"
+    },
+    {
+      "path": "icons/icomoon/gizmo.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d73049c6800c357e7523849afd5850a0fa8f2691",
+      "size": 4272,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d73049c6800c357e7523849afd5850a0fa8f2691"
+    },
+    {
+      "path": "icons/icomoon/gltf.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "74645b37bf0e5810e7ac302aa206bf86a8ab2570",
+      "size": 4737,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/74645b37bf0e5810e7ac302aa206bf86a8ab2570"
+    },
+    {
+      "path": "icons/icomoon/ground.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1619e8abedc8498be6ac78157229c4e1dada796e",
+      "size": 3860,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1619e8abedc8498be6ac78157229c4e1dada796e"
+    },
+    {
+      "path": "icons/icomoon/hud.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b90d9bf5ef206fbb23f4d4d594f12d28844abf9f",
+      "size": 8732,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b90d9bf5ef206fbb23f4d4d594f12d28844abf9f"
+    },
+    {
+      "path": "icons/icomoon/icon blockbench.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "06d880382a8d7b6088ec4aef7c9ba9da6cd2ef67",
+      "size": 10216,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/06d880382a8d7b6088ec4aef7c9ba9da6cd2ef67"
+    },
+    {
+      "path": "icons/icomoon/inventory_full.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f81c72cc62bbf62416842fbc0396e5a7e026a203",
+      "size": 3770,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f81c72cc62bbf62416842fbc0396e5a7e026a203"
+    },
+    {
+      "path": "icons/icomoon/inventory_nine.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1bbbd51844835915d63d898422ba1517d304f919",
+      "size": 3575,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1bbbd51844835915d63d898422ba1517d304f919"
+    },
+    {
+      "path": "icons/icomoon/inventory_single.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "082fac0888212f9e60ab48e5b75c245f63c97e4a",
+      "size": 3068,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/082fac0888212f9e60ab48e5b75c245f63c97e4a"
+    },
+    {
+      "path": "icons/icomoon/keyframe.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8dda0a8cc542ace0b91c465caaa7e65a5a92bccc",
+      "size": 527,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/8dda0a8cc542ace0b91c465caaa7e65a5a92bccc"
+    },
+    {
+      "path": "icons/icomoon/keyframe_bezier.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4df8bd6223939daaaf819f2f0c7f3be2f91edbb4",
+      "size": 520,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4df8bd6223939daaaf819f2f0c7f3be2f91edbb4"
+    },
+    {
+      "path": "icons/icomoon/keyframe_discontinuous.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "19abb5bc6bd87dfe765d4b8b0424bed53c379e96",
+      "size": 537,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/19abb5bc6bd87dfe765d4b8b0424bed53c379e96"
+    },
+    {
+      "path": "icons/icomoon/keyframe_discontinuous_bezier.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "228523f8b5f8ef3e6e3714568a460955353011d6",
+      "size": 569,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/228523f8b5f8ef3e6e3714568a460955353011d6"
+    },
+    {
+      "path": "icons/icomoon/keyframe_smooth.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c91deb5eb23f6b5ad74013c2f9aaaab8fd1bc222",
+      "size": 241,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c91deb5eb23f6b5ad74013c2f9aaaab8fd1bc222"
+    },
+    {
+      "path": "icons/icomoon/keyframe_step.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c996c781e6b2e3a7c0cd139ce003e1356df5e80",
+      "size": 702,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6c996c781e6b2e3a7c0cd139ce003e1356df5e80"
+    },
+    {
+      "path": "icons/icomoon/mirror_x.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cab2d799696ad282481934e068c9dd8a14c5ea95",
+      "size": 3422,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cab2d799696ad282481934e068c9dd8a14c5ea95"
+    },
+    {
+      "path": "icons/icomoon/mirror_y.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dfda3b0c35f7dc43a0e06c1d55d53229dc21a8d9",
+      "size": 3472,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/dfda3b0c35f7dc43a0e06c1d55d53229dc21a8d9"
+    },
+    {
+      "path": "icons/icomoon/mirror_z.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9b18b6f74bc77a644c057fbc4f9d82be94d43056",
+      "size": 3427,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9b18b6f74bc77a644c057fbc4f9d82be94d43056"
+    },
+    {
+      "path": "icons/icomoon/objects.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f913d20dea30572cf08d62716a3bd05ab5c50681",
+      "size": 2374,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f913d20dea30572cf08d62716a3bd05ab5c50681"
+    },
+    {
+      "path": "icons/icomoon/optifine_file.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a2be301d63202b9b7e6222e001abfa5979810166",
+      "size": 3475,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a2be301d63202b9b7e6222e001abfa5979810166"
+    },
+    {
+      "path": "icons/icomoon/player.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0906988a6e73f205001343ac9752d89d97402437",
+      "size": 2260,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0906988a6e73f205001343ac9752d89d97402437"
+    },
+    {
+      "path": "icons/icomoon/player_head.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e436ef1c9b89d3b6031dc6a908a211f4cad6a9ab",
+      "size": 3161,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e436ef1c9b89d3b6031dc6a908a211f4cad6a9ab"
+    },
+    {
+      "path": "icons/icomoon/saved.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "74447563fde540c30953dbb2f71ff18c2a7aaa13",
+      "size": 2590,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/74447563fde540c30953dbb2f71ff18c2a7aaa13"
+    },
+    {
+      "path": "icons/icomoon/selection.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8b2e8215a057d5bfec10b1d158516b02247b5bf7",
+      "size": 48107,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/8b2e8215a057d5bfec10b1d158516b02247b5bf7"
+    },
+    {
+      "path": "icons/icomoon/sketchfab.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "725a979f4dcf3d3b37fe683c697e328c6496a97a",
+      "size": 2262,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/725a979f4dcf3d3b37fe683c697e328c6496a97a"
+    },
+    {
+      "path": "icons/icomoon/vertexsnap.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "54e207e22054fc45dfd2d97248f504eb5978fd4b",
+      "size": 3120,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/54e207e22054fc45dfd2d97248f504eb5978fd4b"
+    },
+    {
+      "path": "icons/icomoon/x11.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a7e5f82456700a6b3484d5dadf1d0ec875cacc9",
+      "size": 2184,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6a7e5f82456700a6b3484d5dadf1d0ec875cacc9"
+    },
+    {
+      "path": "icons/icomoon/zombie.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7c845071afd7b7332c9683ec858e27f8ddde8531",
+      "size": 3262,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/7c845071afd7b7332c9683ec858e27f8ddde8531"
+    },
+    {
+      "path": "icons/icon_maskable_beta.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5e96dc7615a207051e787731605d07b55df53484",
+      "size": 23471,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5e96dc7615a207051e787731605d07b55df53484"
+    },
+    {
+      "path": "index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5fa0121ae1111ded3ee33ce28ef2525b077ecb4",
+      "size": 9823,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d5fa0121ae1111ded3ee33ce28ef2525b077ecb4"
+    },
+    {
+      "path": "js",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "797a4f2d8bf6b2b51227c2404e2d8a8fcd4e1228",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/797a4f2d8bf6b2b51227c2404e2d8a8fcd4e1228"
+    },
+    {
+      "path": "js/animations",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c64c990591b0078faf4f43495cb8526dba9a5853",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/c64c990591b0078faf4f43495cb8526dba9a5853"
+    },
+    {
+      "path": "js/animations/animation.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dbf9dbf0ae7267a74814fcbaf807a9c463b55355",
+      "size": 72350,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/dbf9dbf0ae7267a74814fcbaf807a9c463b55355"
+    },
+    {
+      "path": "js/animations/animation_codec.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e4a4f05fae8fc2e8ef14d86c06131f8326832d0",
+      "size": 4306,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0e4a4f05fae8fc2e8ef14d86c06131f8326832d0"
+    },
+    {
+      "path": "js/animations/animation_controllers.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4ebdfa9e208746a2b169e37af5f9c5e3a5208d24",
+      "size": 82366,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4ebdfa9e208746a2b169e37af5f9c5e3a5208d24"
+    },
+    {
+      "path": "js/animations/animation_mode.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "78a0d743daf797388e027507bb31fd844bae2a45",
+      "size": 42836,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/78a0d743daf797388e027507bb31fd844bae2a45"
+    },
+    {
+      "path": "js/animations/animation_transform.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2f471afe27e70efd2594597c8c2ce5f39fd0d894",
+      "size": 7311,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2f471afe27e70efd2594597c8c2ce5f39fd0d894"
+    },
+    {
+      "path": "js/animations/fabrik.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "41f7a9317fc1f90637b66d3a9a05836b296b8bd5",
+      "size": 3941,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/41f7a9317fc1f90637b66d3a9a05836b296b8bd5"
+    },
+    {
+      "path": "js/animations/keyframe.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61eacaa893d93da12a9fe29c813df7586823ed69",
+      "size": 55776,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/61eacaa893d93da12a9fe29c813df7586823ed69"
+    },
+    {
+      "path": "js/animations/mirror_animating.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf4005097d1849ed3ccdbefaeba44bdd7ef6a1d9",
+      "size": 8474,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/bf4005097d1849ed3ccdbefaeba44bdd7ef6a1d9"
+    },
+    {
+      "path": "js/animations/molang.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e036fcc9fcfbf54b68d55f3721cc63cdbeb5e170",
+      "size": 45441,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e036fcc9fcfbf54b68d55f3721cc63cdbeb5e170"
+    },
+    {
+      "path": "js/animations/molang_editor.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ee2a8e91e625696d91978a54be738505b3fb96b6",
+      "size": 2970,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ee2a8e91e625696d91978a54be738505b3fb96b6"
+    },
+    {
+      "path": "js/animations/timeline.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bcad95ce4231dbdbd5aa02ca20e2a3788add3a65",
+      "size": 81134,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/bcad95ce4231dbdbd5aa02ca20e2a3788add3a65"
+    },
+    {
+      "path": "js/animations/timeline_animators.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "851cd595c53d184d50df05776ed92f1bc4fd864a",
+      "size": 37513,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/851cd595c53d184d50df05776ed92f1bc4fd864a"
+    },
+    {
+      "path": "js/api.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "490d44ae6257869d5e8046757d385be82fb90058",
+      "size": 11497,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/490d44ae6257869d5e8046757d385be82fb90058"
+    },
+    {
+      "path": "js/auto_backup.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a65e2caf47cecf1e28ea55ea58730feb50c29666",
+      "size": 7530,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a65e2caf47cecf1e28ea55ea58730feb50c29666"
+    },
+    {
+      "path": "js/boot_loader.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b87a1126a12bddf6422a9a7faeca9b88bce89274",
+      "size": 5552,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b87a1126a12bddf6422a9a7faeca9b88bce89274"
+    },
+    {
+      "path": "js/copy_paste.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad20a7ceda21b1c55fa88224a87613885a1559ca",
+      "size": 15375,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ad20a7ceda21b1c55fa88224a87613885a1559ca"
+    },
+    {
+      "path": "js/desktop.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "edd28a5572579eb4124d04c35aa435ab81ddc32f",
+      "size": 24771,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/edd28a5572579eb4124d04c35aa435ab81ddc32f"
+    },
+    {
+      "path": "js/display_mode",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "96698c5189cff7459dee475208e3d9e7a19b5f20",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/96698c5189cff7459dee475208e3d9e7a19b5f20"
+    },
+    {
+      "path": "js/display_mode/DisplayModePanel.vue",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5364f8124fd1270aa67856a9141550f12cff2690",
+      "size": 12781,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5364f8124fd1270aa67856a9141550f12cff2690"
+    },
+    {
+      "path": "js/display_mode/display_mode.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "78b5e58e9edfc7af72151c6a041fe96289588bf2",
+      "size": 54807,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/78b5e58e9edfc7af72151c6a041fe96289588bf2"
+    },
+    {
+      "path": "js/display_mode/display_references.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5db6ebdc28389b263788eae63251612cfcb0d86",
+      "size": 25766,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d5db6ebdc28389b263788eae63251612cfcb0d86"
+    },
+    {
+      "path": "js/edit_sessions.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2b2d4aee3541e65ca95ce958010c55d6a9532b68",
+      "size": 15124,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2b2d4aee3541e65ca95ce958010c55d6a9532b68"
+    },
+    {
+      "path": "js/file_system.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd6fb11799d28348a202d3ea67640c84138b0579",
+      "size": 21470,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/bd6fb11799d28348a202d3ea67640c84138b0579"
+    },
+    {
+      "path": "js/find_replace.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10bd8b7763aac3d368070cbc9fa4d258d88bc223",
+      "size": 3263,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/10bd8b7763aac3d368070cbc9fa4d258d88bc223"
+    },
+    {
+      "path": "js/formats",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d84c0f0e52b6a0674af981524702d023e264980f",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/d84c0f0e52b6a0674af981524702d023e264980f"
+    },
+    {
+      "path": "js/formats/bbmodel.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "66ccb9124a7157e700a743c729e68e9082e30eb0",
+      "size": 31453,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/66ccb9124a7157e700a743c729e68e9082e30eb0"
+    },
+    {
+      "path": "js/formats/bedrock",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "80952065b016d195021e2ed8a742a27d7886adbc",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/80952065b016d195021e2ed8a742a27d7886adbc"
+    },
+    {
+      "path": "js/formats/bedrock/animation_controller_codec.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "62a3146b48df9c2984391e510ff22ff39bbf1c33",
+      "size": 4843,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/62a3146b48df9c2984391e510ff22ff39bbf1c33"
+    },
+    {
+      "path": "js/formats/bedrock/attachable_preview.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a5a090d66b49a6ec684f46f2a74444f3d23486a9",
+      "size": 10611,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a5a090d66b49a6ec684f46f2a74444f3d23486a9"
+    },
+    {
+      "path": "js/formats/bedrock/bedrock.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f27d89e774003486b1161b0578971f686fece0a8",
+      "size": 55849,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f27d89e774003486b1161b0578971f686fece0a8"
+    },
+    {
+      "path": "js/formats/bedrock/bedrock_animation.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ede0f8c0fecf24628390433b13082c5657b552e4",
+      "size": 25743,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ede0f8c0fecf24628390433b13082c5657b552e4"
+    },
+    {
+      "path": "js/formats/bedrock/bedrock_multi_file.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "735b2411fadadea3b54dd7b0d207fa8757add46e",
+      "size": 14401,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/735b2411fadadea3b54dd7b0d207fa8757add46e"
+    },
+    {
+      "path": "js/formats/bedrock/bedrock_old.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "900f2483688475a83438a4500f0a341e59ad27ff",
+      "size": 11974,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/900f2483688475a83438a4500f0a341e59ad27ff"
+    },
+    {
+      "path": "js/formats/bedrock/bedrock_voxel_shape.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "884b45e91bbf8afcccb52e052795edfd57d21bf4",
+      "size": 10350,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/884b45e91bbf8afcccb52e052795edfd57d21bf4"
+    },
+    {
+      "path": "js/formats/generic.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6729669140308357ee5ea76f539d7d4096ea9061",
+      "size": 924,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6729669140308357ee5ea76f539d7d4096ea9061"
+    },
+    {
+      "path": "js/formats/image.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c10427b9ad908dc4053d19d4e4128e7d78bd543",
+      "size": 8912,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2c10427b9ad908dc4053d19d4e4128e7d78bd543"
+    },
+    {
+      "path": "js/formats/java",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "60119de7df7fcdd657a0aef1aa8c4d8fb159ba0c",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/60119de7df7fcdd657a0aef1aa8c4d8fb159ba0c"
+    },
+    {
+      "path": "js/formats/java/java_block.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89ea0df32bc99d9b55814d0ae7e8879b1e244bf2",
+      "size": 34254,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/89ea0df32bc99d9b55814d0ae7e8879b1e244bf2"
+    },
+    {
+      "path": "js/formats/java/modded_entity.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe3d0f0a0c24b709516c96dbd76b433d926ab62a",
+      "size": 40131,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fe3d0f0a0c24b709516c96dbd76b433d926ab62a"
+    },
+    {
+      "path": "js/formats/minecraft",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8347570899270dc5548c386431f546c0754fba3a",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/8347570899270dc5548c386431f546c0754fba3a"
+    },
+    {
+      "path": "js/formats/minecraft/skin.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2e09259b6a0fc5290f0180b66df8e4efd745e60b",
+      "size": 274037,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2e09259b6a0fc5290f0180b66df8e4efd745e60b"
+    },
+    {
+      "path": "js/formats/optifine",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b0cd813be039ae518b57783c71dddb83ca856582",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/b0cd813be039ae518b57783c71dddb83ca856582"
+    },
+    {
+      "path": "js/formats/optifine/optifine_jem.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d37471ec5fc592f68f95f2f2886dc4390ef1f754",
+      "size": 12350,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d37471ec5fc592f68f95f2f2886dc4390ef1f754"
+    },
+    {
+      "path": "js/formats/optifine/optifine_jpm.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea9673a0bb3e775f840e7de86bc1b12ef5764750",
+      "size": 2768,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ea9673a0bb3e775f840e7de86bc1b12ef5764750"
+    },
+    {
+      "path": "js/formats/standards",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "566cf68e15dd013869909468681dc41ff5774c19",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/566cf68e15dd013869909468681dc41ff5774c19"
+    },
+    {
+      "path": "js/formats/standards/collada.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d54701988a9f8936771fbe13197a022625967063",
+      "size": 27684,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d54701988a9f8936771fbe13197a022625967063"
+    },
+    {
+      "path": "js/formats/standards/fbx.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "52c1f4af069ae0a05b7cf182a0af19a0b0bd1f03",
+      "size": 66202,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/52c1f4af069ae0a05b7cf182a0af19a0b0bd1f03"
+    },
+    {
+      "path": "js/formats/standards/gltf.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2167fa95d5cfebda68b5434b799ab155e1def864",
+      "size": 21079,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2167fa95d5cfebda68b5434b799ab155e1def864"
+    },
+    {
+      "path": "js/formats/standards/obj.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "daba7b16782e00d3e677496732dfe4e7521120d0",
+      "size": 14693,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/daba7b16782e00d3e677496732dfe4e7521120d0"
+    },
+    {
+      "path": "js/formats/standards/stl.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24eefd48a8727950635f56cf0ddb242ff498f432",
+      "size": 948,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/24eefd48a8727950635f56cf0ddb242ff498f432"
+    },
+    {
+      "path": "js/globals.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "53f53b3352a4a1feba62ee7941d03c4d6f3bc82f",
+      "size": 2527,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/53f53b3352a4a1feba62ee7941d03c4d6f3bc82f"
+    },
+    {
+      "path": "js/interface",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3ee8221666c90ca16551812f2f00552e059fe005",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/3ee8221666c90ca16551812f2f00552e059fe005"
+    },
+    {
+      "path": "js/interface/about.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5116df044348ffd5faf97075427e54a9732c4dbc",
+      "size": 6857,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5116df044348ffd5faf97075427e54a9732c4dbc"
+    },
+    {
+      "path": "js/interface/action_control.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cf89e3273dfb766c7336c0d2daf5cee324ed6a76",
+      "size": 13566,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cf89e3273dfb766c7336c0d2daf5cee324ed6a76"
+    },
+    {
+      "path": "js/interface/actions.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1decd5ea8bbaeffb9b0eb62d190192679b72cda",
+      "size": 58522,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b1decd5ea8bbaeffb9b0eb62d190192679b72cda"
+    },
+    {
+      "path": "js/interface/dialog.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb6b17b32a94ccf92a319b9925b347fc8fda752a",
+      "size": 38969,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fb6b17b32a94ccf92a319b9925b347fc8fda752a"
+    },
+    {
+      "path": "js/interface/experimental_settings.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d29130754013c0b93a536e5630d8cc9b9e77d873",
+      "size": 1831,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d29130754013c0b93a536e5630d8cc9b9e77d873"
+    },
+    {
+      "path": "js/interface/form.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7638291c93354704ba3bb1a079aabcf29b87537f",
+      "size": 39092,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/7638291c93354704ba3bb1a079aabcf29b87537f"
+    },
+    {
+      "path": "js/interface/interface.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "edd373d5428a09322b7254e75dd0293625e49ee2",
+      "size": 21377,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/edd373d5428a09322b7254e75dd0293625e49ee2"
+    },
+    {
+      "path": "js/interface/keybinding.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9c4b1b0ae1cafaf1789ec4cf7a693bfa4565d276",
+      "size": 10147,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9c4b1b0ae1cafaf1789ec4cf7a693bfa4565d276"
+    },
+    {
+      "path": "js/interface/keyboard.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25d7940034996b9cc9b1f48abcc066f0a4a7650c",
+      "size": 31226,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/25d7940034996b9cc9b1f48abcc066f0a4a7650c"
+    },
+    {
+      "path": "js/interface/main_tools.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a2bcdd49bdac31024b7d979ae67b89eb25107e22",
+      "size": 9123,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a2bcdd49bdac31024b7d979ae67b89eb25107e22"
+    },
+    {
+      "path": "js/interface/menu.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21469f5a7f8fe9db3773823809e63664e329bb42",
+      "size": 28380,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/21469f5a7f8fe9db3773823809e63664e329bb42"
+    },
+    {
+      "path": "js/interface/menu_bar.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c6b204cc7f21b27a77b41212d5ff5478836b699",
+      "size": 26292,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6c6b204cc7f21b27a77b41212d5ff5478836b699"
+    },
+    {
+      "path": "js/interface/panels.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c3d9f9e128a6a420e71c1e6558e5759491c4e5b6",
+      "size": 50792,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c3d9f9e128a6a420e71c1e6558e5759491c4e5b6"
+    },
+    {
+      "path": "js/interface/pointer_target.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "edd15c4af35b2700e61dd59a49f03b85664e32ad",
+      "size": 1399,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/edd15c4af35b2700e61dd59a49f03b85664e32ad"
+    },
+    {
+      "path": "js/interface/resize_lines.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e7f0f048d534bdc78b95bf9fd72e304b6a8ada6",
+      "size": 9893,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6e7f0f048d534bdc78b95bf9fd72e304b6a8ada6"
+    },
+    {
+      "path": "js/interface/settings.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb4d91ba974d5d974513cde46d0e5abc42f7d1e8",
+      "size": 17117,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/eb4d91ba974d5d974513cde46d0e5abc42f7d1e8"
+    },
+    {
+      "path": "js/interface/settings_window.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7fb1ee96d45b14576e131305064aab8cdea06950",
+      "size": 12798,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/7fb1ee96d45b14576e131305064aab8cdea06950"
+    },
+    {
+      "path": "js/interface/setup_settings.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9db3eec382eeab73b1695284e395225104acc3bd",
+      "size": 21381,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9db3eec382eeab73b1695284e395225104acc3bd"
+    },
+    {
+      "path": "js/interface/shared_actions.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d18c85c88495215bbfb9af794da95ed3b44c3e13",
+      "size": 6392,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d18c85c88495215bbfb9af794da95ed3b44c3e13"
+    },
+    {
+      "path": "js/interface/start_screen.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e356ce42a765d10cf0ca846f5c6082766a7a9da9",
+      "size": 29268,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e356ce42a765d10cf0ca846f5c6082766a7a9da9"
+    },
+    {
+      "path": "js/interface/status_bar.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b4127aed88b6669d6fe88214b7d90295eadcee8e",
+      "size": 6892,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b4127aed88b6669d6fe88214b7d90295eadcee8e"
+    },
+    {
+      "path": "js/interface/themes.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "531880098caf8d22382bc6cdc9aced9016914936",
+      "size": 31002,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/531880098caf8d22382bc6cdc9aced9016914936"
+    },
+    {
+      "path": "js/interface/toast_notification.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "90b99794157eab5a7e55f8a13470b51ef50b9116",
+      "size": 2608,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/90b99794157eab5a7e55f8a13470b51ef50b9116"
+    },
+    {
+      "path": "js/interface/toolbars.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2a6cc7b4f60bb30c9c2394a5416b521b45f1020",
+      "size": 23953,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b2a6cc7b4f60bb30c9c2394a5416b521b45f1020"
+    },
+    {
+      "path": "js/interface/vue_components.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87f509193ce1d60fa024bbc9534ab1d6a9375139",
+      "size": 4821,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/87f509193ce1d60fa024bbc9534ab1d6a9375139"
+    },
+    {
+      "path": "js/io",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2a829fd82a96e0d5c08ddce19b6a2c5aafb6b2b3",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/2a829fd82a96e0d5c08ddce19b6a2c5aafb6b2b3"
+    },
+    {
+      "path": "js/io/codec.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "711e68e635638ac8435969195fd55c98966def78",
+      "size": 11393,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/711e68e635638ac8435969195fd55c98966def78"
+    },
+    {
+      "path": "js/io/extrude_image.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "11d2478541d615f4512522d1edddf6de382ba258",
+      "size": 12993,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/11d2478541d615f4512522d1edddf6de382ba258"
+    },
+    {
+      "path": "js/io/format.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c77e0df4d60086edea4b229b73b1e6275063149d",
+      "size": 21546,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c77e0df4d60086edea4b229b73b1e6275063149d"
+    },
+    {
+      "path": "js/io/io.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "acf1de31b56101c0d08265b8f38bc28139ac6970",
+      "size": 14681,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/acf1de31b56101c0d08265b8f38bc28139ac6970"
+    },
+    {
+      "path": "js/io/model_loader.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2f6baa55f2e57be6774d50124bfe88ca8e186d20",
+      "size": 2307,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2f6baa55f2e57be6774d50124bfe88ca8e186d20"
+    },
+    {
+      "path": "js/io/project.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d7414efbc3e98b9876916518d2c64a460e8b40a3",
+      "size": 44071,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d7414efbc3e98b9876916518d2c64a460e8b40a3"
+    },
+    {
+      "path": "js/io/share.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "097bde464ea7abc0bf467c57105737cb30998159",
+      "size": 9840,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/097bde464ea7abc0bf467c57105737cb30998159"
+    },
+    {
+      "path": "js/languages.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ff482a42affb0136c8170ae5536178b0dcb645e9",
+      "size": 4103,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ff482a42affb0136c8170ae5536178b0dcb645e9"
+    },
+    {
+      "path": "js/lib",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6fd839a9209201c4a1b675f23e3a083b581d0db5",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/6fd839a9209201c4a1b675f23e3a083b581d0db5"
+    },
+    {
+      "path": "js/lib/CSS3DRenderer.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ed3d93382293d9ed2786493ed953f752a4028179",
+      "size": 11888,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ed3d93382293d9ed2786493ed953f752a4028179"
+    },
+    {
+      "path": "js/lib/CanvasFrame.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "547855d319d66bba3d54442c2458c4c89ce9bac6",
+      "size": 4007,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/547855d319d66bba3d54442c2458c4c89ce9bac6"
+    },
+    {
+      "path": "js/lib/GLTFExporter.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c5fa50ce3dcf2d23b0c837ab41ece69f6646a453",
+      "size": 58706,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c5fa50ce3dcf2d23b0c837ab41ece69f6646a453"
+    },
+    {
+      "path": "js/lib/VuePrismEditor.min.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b440b2bdbc4495a8d0be241f2491cb0374eb509",
+      "size": 51197,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/7b440b2bdbc4495a8d0be241f2491cb0374eb509"
+    },
+    {
+      "path": "js/lib/canvas2apng.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79ddfe20017cfc3fc191fee376036e305310f0cb",
+      "size": 21883,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/79ddfe20017cfc3fc191fee376036e305310f0cb"
+    },
+    {
+      "path": "js/lib/easing.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9a04ca9c67072a25f2d02032b5af2d0fac4843aa",
+      "size": 6188,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9a04ca9c67072a25f2d02032b5af2d0fac4843aa"
+    },
+    {
+      "path": "js/lib/gif.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2645b6c0762b563091245018d26db9e167316603",
+      "size": 13754,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2645b6c0762b563091245018d26db9e167316603"
+    },
+    {
+      "path": "js/lib/jquery-ui.min.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5e098f5cf5cb1030c7423cbe61d73af6ae5c5bfe",
+      "size": 119358,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5e098f5cf5cb1030c7423cbe61d73af6ae5c5bfe"
+    },
+    {
+      "path": "js/lib/libs.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a04087af40d464edfdaaa118f220d838f80474ca",
+      "size": 917,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a04087af40d464edfdaaa118f220d838f80474ca"
+    },
+    {
+      "path": "js/lib/lzutf8.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe300463ca68a2ee56c5cc690a91b0a9445e508b",
+      "size": 64123,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fe300463ca68a2ee56c5cc690a91b0a9445e508b"
+    },
+    {
+      "path": "js/lib/molang-prism-syntax.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cf704d36d9c055f1b8fc9b7d7b6478c5294fe285",
+      "size": 473,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cf704d36d9c055f1b8fc9b7d7b6478c5294fe285"
+    },
+    {
+      "path": "js/lib/spectrum.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a63a4dfe3a8e6e4be87c81c402d160146814c286",
+      "size": 67935,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a63a4dfe3a8e6e4be87c81c402d160146814c286"
+    },
+    {
+      "path": "js/main.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c9edb35adffd959906b4a8614ed03a81dd55113",
+      "size": 4061,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3c9edb35adffd959906b4a8614ed03a81dd55113"
+    },
+    {
+      "path": "js/marker_colors.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8d8b7c839d8a0456e900d4d472602b70beddad80",
+      "size": 830,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/8d8b7c839d8a0456e900d4d472602b70beddad80"
+    },
+    {
+      "path": "js/misc.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d35756c20f61598faabf2f824a2c07adc79916e2",
+      "size": 9668,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d35756c20f61598faabf2f824a2c07adc79916e2"
+    },
+    {
+      "path": "js/modeling",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2b417a12cee1e8a8edf20bd40826e964d5bba2a6",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/2b417a12cee1e8a8edf20bd40826e964d5bba2a6"
+    },
+    {
+      "path": "js/modeling/edit.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "310d16feacbba8d92b6bca4a1c54508d8a1f3b43",
+      "size": 627,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/310d16feacbba8d92b6bca4a1c54508d8a1f3b43"
+    },
+    {
+      "path": "js/modeling/generate_bounding_box.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2d6b21218a80717b12ce1592eae144e13abbe28e",
+      "size": 10328,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2d6b21218a80717b12ce1592eae144e13abbe28e"
+    },
+    {
+      "path": "js/modeling/mesh",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5bcbe1070b8fc58384450eec70cd2fdbfa2ed58b",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/5bcbe1070b8fc58384450eec70cd2fdbfa2ed58b"
+    },
+    {
+      "path": "js/modeling/mesh/add_mesh.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f09aa00be5b56c2ac3b4040160a9fdc7a7b2886b",
+      "size": 19246,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f09aa00be5b56c2ac3b4040160a9fdc7a7b2886b"
+    },
+    {
+      "path": "js/modeling/mesh/attach_armature.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "394281ec9107f04eabacb29719d16e9818eba28e",
+      "size": 9852,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/394281ec9107f04eabacb29719d16e9818eba28e"
+    },
+    {
+      "path": "js/modeling/mesh/auto_fix.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "31b680c2ffc50a2154cdbbaa744a727af8f90053",
+      "size": 7192,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/31b680c2ffc50a2154cdbbaa744a727af8f90053"
+    },
+    {
+      "path": "js/modeling/mesh/import_obj.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b10f6c228d4a15e25cc6dbeeae8d5ca7b0e34907",
+      "size": 4414,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b10f6c228d4a15e25cc6dbeeae8d5ca7b0e34907"
+    },
+    {
+      "path": "js/modeling/mesh/knife_tool.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe807088eb9a8263d6cb572aeb9463607c73dc59",
+      "size": 31333,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fe807088eb9a8263d6cb572aeb9463607c73dc59"
+    },
+    {
+      "path": "js/modeling/mesh/loop_cut.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "537838825fd3bb18fd1ccd98bcb41768bd6856a8",
+      "size": 15462,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/537838825fd3bb18fd1ccd98bcb41768bd6856a8"
+    },
+    {
+      "path": "js/modeling/mesh/merge_split.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39fc301b4b87fcdbc81fd34e34425d1e1caa966e",
+      "size": 10726,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/39fc301b4b87fcdbc81fd34e34425d1e1caa966e"
+    },
+    {
+      "path": "js/modeling/mesh/proportional_edit.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd047f979ef15ae6ad2597feaefcc1a6221b0539",
+      "size": 4762,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/bd047f979ef15ae6ad2597feaefcc1a6221b0539"
+    },
+    {
+      "path": "js/modeling/mesh/seam_tool.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f5900f65b72ada2117e1e7a684235f19726b15ea",
+      "size": 1372,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f5900f65b72ada2117e1e7a684235f19726b15ea"
+    },
+    {
+      "path": "js/modeling/mesh/set_vertex_weights.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd0cb69dfb39e2c236980fbe09ca3fb8237b5ef8",
+      "size": 1964,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/dd0cb69dfb39e2c236980fbe09ca3fb8237b5ef8"
+    },
+    {
+      "path": "js/modeling/mesh/util.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "95a1b9c633b1fec6245068e9068c5e02d564645a",
+      "size": 351,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/95a1b9c633b1fec6245068e9068c5e02d564645a"
+    },
+    {
+      "path": "js/modeling/mesh_editing.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "48905d68c48746a2b9e341f291729f957d4a384c",
+      "size": 52856,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/48905d68c48746a2b9e341f291729f957d4a384c"
+    },
+    {
+      "path": "js/modeling/mirror_modeling.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f2e01b5fac784da646332eb53dee92015667fcd",
+      "size": 32814,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0f2e01b5fac784da646332eb53dee92015667fcd"
+    },
+    {
+      "path": "js/modeling/scale.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "731c37db387f16fd29b870126ed3f6bc0a5d1400",
+      "size": 8731,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/731c37db387f16fd29b870126ed3f6bc0a5d1400"
+    },
+    {
+      "path": "js/modeling/spline_editing.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "575c610528f7b0e94ce32ca1b4989f67e7ab9e09",
+      "size": 24427,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/575c610528f7b0e94ce32ca1b4989f67e7ab9e09"
+    },
+    {
+      "path": "js/modeling/transform.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "447e3ae87ab0fb1486a7c855cccfe663857cd5af",
+      "size": 67563,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/447e3ae87ab0fb1486a7c855cccfe663857cd5af"
+    },
+    {
+      "path": "js/modeling/transform",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d183c17ff7ed4b8ba5b05426e61dd322bff3dfed",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/d183c17ff7ed4b8ba5b05426e61dd322bff3dfed"
+    },
+    {
+      "path": "js/modeling/transform/edit_transform.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a89457b91a90cd2fa4b309b4f3e07a5d3f417ee",
+      "size": 15477,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/7a89457b91a90cd2fa4b309b4f3e07a5d3f417ee"
+    },
+    {
+      "path": "js/modeling/transform/transform_gizmo.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "555c1e5b9c489c6c6a3175f4655acf3191a811c7",
+      "size": 49770,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/555c1e5b9c489c6c6a3175f4655acf3191a811c7"
+    },
+    {
+      "path": "js/modeling/transform/transform_modules.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f46acc215fe1319ac3e18c3cc1463507542fc26",
+      "size": 3676,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6f46acc215fe1319ac3e18c3cc1463507542fc26"
+    },
+    {
+      "path": "js/modeling/vertex_snap.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "765dfdd460bf202478d2ae75936fab1c2378b97b",
+      "size": 13060,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/765dfdd460bf202478d2ae75936fab1c2378b97b"
+    },
+    {
+      "path": "js/modeling/weight_paint.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "916135d8db25a3518fb7fc08a6c365ef75cb4eb6",
+      "size": 9806,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/916135d8db25a3518fb7fc08a6c365ef75cb4eb6"
+    },
+    {
+      "path": "js/modes.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "86f7f04d0e0a908742033d952d560d65d2d24fa8",
+      "size": 5904,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/86f7f04d0e0a908742033d952d560d65d2d24fa8"
+    },
+    {
+      "path": "js/multi_file_editing.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6dcadd190b220fef6c49d25a728c98c2215b34a5",
+      "size": 737,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6dcadd190b220fef6c49d25a728c98c2215b34a5"
+    },
+    {
+      "path": "js/native_apis.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d919f802caff7701d44dc0cc6db45a93a97fa75",
+      "size": 8786,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/7d919f802caff7701d44dc0cc6db45a93a97fa75"
+    },
+    {
+      "path": "js/native_apis_web.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3dd0adad716dc0120a8f29a6cec34874a3773f87",
+      "size": 664,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3dd0adad716dc0120a8f29a6cec34874a3773f87"
+    },
+    {
+      "path": "js/outliner",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0d0a36735ecee67738914e7692c6022e6c7eb54c",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/0d0a36735ecee67738914e7692c6022e6c7eb54c"
+    },
+    {
+      "path": "js/outliner/abstract",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b867ea49ca104be376e249fb2783294ef127899d",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/b867ea49ca104be376e249fb2783294ef127899d"
+    },
+    {
+      "path": "js/outliner/abstract/face.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "de87ae72821314c5580d09e43ce312c8b0ad7c63",
+      "size": 3183,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/de87ae72821314c5580d09e43ce312c8b0ad7c63"
+    },
+    {
+      "path": "js/outliner/abstract/outliner_element.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61fd38a5c9320db78b8e37ea8efe3dcf25011b8b",
+      "size": 10370,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/61fd38a5c9320db78b8e37ea8efe3dcf25011b8b"
+    },
+    {
+      "path": "js/outliner/abstract/outliner_node.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b0a0b3b3df6359b96aa6ef3f4716504e7d298183",
+      "size": 11838,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b0a0b3b3df6359b96aa6ef3f4716504e7d298183"
+    },
+    {
+      "path": "js/outliner/collections.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bde983853288a933c97e986b0e5bd22fa545eb3e",
+      "size": 26475,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/bde983853288a933c97e986b0e5bd22fa545eb3e"
+    },
+    {
+      "path": "js/outliner/element_panel.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "28cefe7c6107109397afa39ef0939cb207f6aa3f",
+      "size": 5344,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/28cefe7c6107109397afa39ef0939cb207f6aa3f"
+    },
+    {
+      "path": "js/outliner/outliner.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c05e1ea22a9546fd5d2183952ecb435d59a197c4",
+      "size": 54240,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c05e1ea22a9546fd5d2183952ecb435d59a197c4"
+    },
+    {
+      "path": "js/outliner/types",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "bcb0c8857167aea1c6c275b183a40f2f75cb9fde",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/bcb0c8857167aea1c6c275b183a40f2f75cb9fde"
+    },
+    {
+      "path": "js/outliner/types/armature.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2b99b5f103c02a5c87fe629ca4d4b4bbb20b08d1",
+      "size": 9091,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2b99b5f103c02a5c87fe629ca4d4b4bbb20b08d1"
+    },
+    {
+      "path": "js/outliner/types/armature_bone.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a973850882dd45734f5ee7a74ae1dd13bd8e566",
+      "size": 18641,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5a973850882dd45734f5ee7a74ae1dd13bd8e566"
+    },
+    {
+      "path": "js/outliner/types/billboard.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "71ef956894bd92851ccf55b3e18efedd212b00a9",
+      "size": 22363,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/71ef956894bd92851ccf55b3e18efedd212b00a9"
+    },
+    {
+      "path": "js/outliner/types/bounding_box.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4149cb4239e471a4cfc26fcb615c98ca840d6620",
+      "size": 16687,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4149cb4239e471a4cfc26fcb615c98ca840d6620"
+    },
+    {
+      "path": "js/outliner/types/cube.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70cb939ab827f999f9178fac05839a2ecb005d5b",
+      "size": 53781,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/70cb939ab827f999f9178fac05839a2ecb005d5b"
+    },
+    {
+      "path": "js/outliner/types/group.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b54277b899c9ad8ce387782915493b18fbe1745",
+      "size": 27210,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1b54277b899c9ad8ce387782915493b18fbe1745"
+    },
+    {
+      "path": "js/outliner/types/locator.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0d7affbd52e90dedfe8be1050a65929c93c63dbe",
+      "size": 5126,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0d7affbd52e90dedfe8be1050a65929c93c63dbe"
+    },
+    {
+      "path": "js/outliner/types/mesh.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f9acaac79e3f1506acb13b248429482903b21ddf",
+      "size": 60507,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f9acaac79e3f1506acb13b248429482903b21ddf"
+    },
+    {
+      "path": "js/outliner/types/null_object.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d449a31c94f53ef4a087d566772f3a510d6f43c",
+      "size": 11921,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1d449a31c94f53ef4a087d566772f3a510d6f43c"
+    },
+    {
+      "path": "js/outliner/types/spline_mesh.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "656aa73770250423e8dc1290f30557fac717e6b1",
+      "size": 81926,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/656aa73770250423e8dc1290f30557fac717e6b1"
+    },
+    {
+      "path": "js/outliner/types/texture_mesh.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "47d25261c3338bded966453322d0b24d8e8f58f7",
+      "size": 14674,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/47d25261c3338bded966453322d0b24d8e8f58f7"
+    },
+    {
+      "path": "js/plugin_loader.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b688b37fc96a8e3eb26ed329e1464bef49a748d",
+      "size": 74153,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/7b688b37fc96a8e3eb26ed329e1464bef49a748d"
+    },
+    {
+      "path": "js/predicate_editor.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf14d7b40c7524d2489f8609977b1c65cca740d6",
+      "size": 14205,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/bf14d7b40c7524d2489f8609977b1c65cca740d6"
+    },
+    {
+      "path": "js/preview",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "59cc52d443852e82d848b60799d4ae3c34e67015",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/59cc52d443852e82d848b60799d4ae3c34e67015"
+    },
+    {
+      "path": "js/preview/OrbitControls.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c608ded66ffeaf6359455d1272565f89fca81c45",
+      "size": 20168,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c608ded66ffeaf6359455d1272565f89fca81c45"
+    },
+    {
+      "path": "js/preview/canvas.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d641fa6ca194a0f17b47c02c85b397d740f9476",
+      "size": 33462,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/7d641fa6ca194a0f17b47c02c85b397d740f9476"
+    },
+    {
+      "path": "js/preview/preview.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "56e12a6099b798cab7fc1442e5aa75173d0d30cd",
+      "size": 100371,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/56e12a6099b798cab7fc1442e5aa75173d0d30cd"
+    },
+    {
+      "path": "js/preview/preview_scenes.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "00d21cb3a8e3df0ec63a90f23efd7b63d89e1e3c",
+      "size": 32539,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/00d21cb3a8e3df0ec63a90f23efd7b63d89e1e3c"
+    },
+    {
+      "path": "js/preview/reference_images.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4ce4c98380b0c9a4b5a6cdd1841eb804f0899489",
+      "size": 51121,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4ce4c98380b0c9a4b5a6cdd1841eb804f0899489"
+    },
+    {
+      "path": "js/preview/render_target.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0ea72d7980c71e1decae04e40240059fae3741be",
+      "size": 4321,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0ea72d7980c71e1decae04e40240059fae3741be"
+    },
+    {
+      "path": "js/preview/screenshot.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a12d006311ff3f0d3d63771c18b15fabe925aa26",
+      "size": 34010,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a12d006311ff3f0d3d63771c18b15fabe925aa26"
+    },
+    {
+      "path": "js/shaders",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "dfdcd9db063cac0b63c45b739246197b14b728ed",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/dfdcd9db063cac0b63c45b739246197b14b728ed"
+    },
+    {
+      "path": "js/shaders/brush_outline.frag.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cb17f60e22b08682aee3ffecf893bc84b27acb33",
+      "size": 1733,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cb17f60e22b08682aee3ffecf893bc84b27acb33"
+    },
+    {
+      "path": "js/shaders/brush_outline.vert.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e0ea2475236d2fc95807b59cd2f748635b768f8",
+      "size": 151,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1e0ea2475236d2fc95807b59cd2f748635b768f8"
+    },
+    {
+      "path": "js/shaders/direction_helper.frag.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "067fdca055aee3fcc4b14a998977da13a7658291",
+      "size": 724,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/067fdca055aee3fcc4b14a998977da13a7658291"
+    },
+    {
+      "path": "js/shaders/direction_helper.vert.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d3b0bc3dd3fd83b93c4e3c7dfb26396b2f86ce7a",
+      "size": 600,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d3b0bc3dd3fd83b93c4e3c7dfb26396b2f86ce7a"
+    },
+    {
+      "path": "js/shaders/layered.frag.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a43d6e7824889eff6c777caec564d7d03196ca61",
+      "size": 699,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a43d6e7824889eff6c777caec564d7d03196ca61"
+    },
+    {
+      "path": "js/shaders/layered.vert.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ebc3cb02dcf7cd522596a2f66e54af9864dcfbf6",
+      "size": 644,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ebc3cb02dcf7cd522596a2f66e54af9864dcfbf6"
+    },
+    {
+      "path": "js/shaders/marker.frag.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "83807f38eba6b798f56c32bf7e1ea974286e391a",
+      "size": 428,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/83807f38eba6b798f56c32bf7e1ea974286e391a"
+    },
+    {
+      "path": "js/shaders/marker.vert.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85136b2ff0840bee01f0fc58693318e6cca396da",
+      "size": 643,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/85136b2ff0840bee01f0fc58693318e6cca396da"
+    },
+    {
+      "path": "js/shaders/shader.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "154fd4af16c9f03e810837c3c4d7e73536d15d03",
+      "size": 469,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/154fd4af16c9f03e810837c3c4d7e73536d15d03"
+    },
+    {
+      "path": "js/shaders/solid.frag.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3eb022664b061c2f32e271ec8647703c916d6755",
+      "size": 445,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3eb022664b061c2f32e271ec8647703c916d6755"
+    },
+    {
+      "path": "js/shaders/solid.vert.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f915181cb8ec7d0409057b4b4a0711af58db738",
+      "size": 600,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6f915181cb8ec7d0409057b4b4a0711af58db738"
+    },
+    {
+      "path": "js/shaders/texture.frag.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "075cfb7cc19e36bd44590e404b1e48720cffca03",
+      "size": 1185,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/075cfb7cc19e36bd44590e404b1e48720cffca03"
+    },
+    {
+      "path": "js/shaders/texture.vert.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bdd47b0b74e28279eef4db08471198d5405d202a",
+      "size": 1145,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/bdd47b0b74e28279eef4db08471198d5405d202a"
+    },
+    {
+      "path": "js/shaders/uv_helper.frag.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72cfc8a1242180cf704a2743d9fd219c95d75949",
+      "size": 410,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/72cfc8a1242180cf704a2743d9fd219c95d75949"
+    },
+    {
+      "path": "js/shaders/uv_helper.vert.glsl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "53da1f0542743801fd5af6104cee5b4e4843fb14",
+      "size": 713,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/53da1f0542743801fd5af6104cee5b4e4843fb14"
+    },
+    {
+      "path": "js/texturing",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5808045ed11d04927d13cd0eca2fd1e7638a156c",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/5808045ed11d04927d13cd0eca2fd1e7638a156c"
+    },
+    {
+      "path": "js/texturing/ColorPickerNormal.vue",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "efc21449e6bb3d21e34a4e2fbd425abe77927425",
+      "size": 3208,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/efc21449e6bb3d21e34a4e2fbd425abe77927425"
+    },
+    {
+      "path": "js/texturing/ColorPickerWheel.vue",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f11ee50b0b90176cc62c3eebf5602e27eda103b9",
+      "size": 6226,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f11ee50b0b90176cc62c3eebf5602e27eda103b9"
+    },
+    {
+      "path": "js/texturing/color.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3671b9854cc6056117b9176790d9655a77bdea01",
+      "size": 42426,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3671b9854cc6056117b9176790d9655a77bdea01"
+    },
+    {
+      "path": "js/texturing/edit_image.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2624efc21555409ff3db6428c44aa9c6bb9137ee",
+      "size": 38870,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2624efc21555409ff3db6428c44aa9c6bb9137ee"
+    },
+    {
+      "path": "js/texturing/layers.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65f0443ec3ebac4c3f4f5c95f7e2dc5d961665ce",
+      "size": 44444,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/65f0443ec3ebac4c3f4f5c95f7e2dc5d961665ce"
+    },
+    {
+      "path": "js/texturing/painter.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a1986e0df93a5ec3c599c7422fff597f71b02e8e",
+      "size": 129681,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a1986e0df93a5ec3c599c7422fff597f71b02e8e"
+    },
+    {
+      "path": "js/texturing/texture_flipbook.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8b1a2184a9e4edb6fe81d8572f7b43277b52eeb",
+      "size": 24714,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a8b1a2184a9e4edb6fe81d8572f7b43277b52eeb"
+    },
+    {
+      "path": "js/texturing/texture_generator.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39174a52e11428222ded82522cd36ad3ca82c851",
+      "size": 62068,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/39174a52e11428222ded82522cd36ad3ca82c851"
+    },
+    {
+      "path": "js/texturing/texture_groups.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69ad42d2cb104696d5720de142a0c6b0d4e8943f",
+      "size": 32651,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/69ad42d2cb104696d5720de142a0c6b0d4e8943f"
+    },
+    {
+      "path": "js/texturing/textures.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c7b11f9cda590e773042c6b3f7cdc147b91dded4",
+      "size": 106614,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c7b11f9cda590e773042c6b3f7cdc147b91dded4"
+    },
+    {
+      "path": "js/undo.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d748cd4ef4fdc004296e7c7cb2f7f96989c0d6e",
+      "size": 34880,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1d748cd4ef4fdc004296e7c7cb2f7f96989c0d6e"
+    },
+    {
+      "path": "js/util",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "732600970a2e290fe99222c9a08b333243fd9475",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/732600970a2e290fe99222c9a08b333243fd9475"
+    },
+    {
+      "path": "js/util/array_util.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ec57be54859ca8bb0f333894f2e51890d83eaf3c",
+      "size": 5786,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ec57be54859ca8bb0f333894f2e51890d83eaf3c"
+    },
+    {
+      "path": "js/util/color.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1a69afb755974a1f943dd61d3e91ead17cb42c06",
+      "size": 1369,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1a69afb755974a1f943dd61d3e91ead17cb42c06"
+    },
+    {
+      "path": "js/util/drag_helper.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6af56007b46bee402737640b67208c9434da6dd",
+      "size": 1712,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e6af56007b46bee402737640b67208c9434da6dd"
+    },
+    {
+      "path": "js/util/dynamic_2d_map.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b7614922576f5b6238b6560de9ac7a55e5b4ad24",
+      "size": 339,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b7614922576f5b6238b6560de9ac7a55e5b4ad24"
+    },
+    {
+      "path": "js/util/event_system.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "84f8e6ef40f039f2df042ef0b7687f158b88e7aa",
+      "size": 2026,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/84f8e6ef40f039f2df042ef0b7687f158b88e7aa"
+    },
+    {
+      "path": "js/util/gif.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a3d00802aa1b92a51a321b609c99e5c42039e3b",
+      "size": 2985,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0a3d00802aa1b92a51a321b609c99e5c42039e3b"
+    },
+    {
+      "path": "js/util/global.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2e7e2a107c61b734b25b8efe4a16a4597e010fef",
+      "size": 4188,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2e7e2a107c61b734b25b8efe4a16a4597e010fef"
+    },
+    {
+      "path": "js/util/json.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c6daf4a33297b0c090b40a32479ceab4577e730",
+      "size": 6343,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1c6daf4a33297b0c090b40a32479ceab4577e730"
+    },
+    {
+      "path": "js/util/math_util.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6701427598b23205554a22f074fcdc16666d387e",
+      "size": 3764,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6701427598b23205554a22f074fcdc16666d387e"
+    },
+    {
+      "path": "js/util/molang.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f44b1229e518b76a3f57dd9701e4e2c03755a8a",
+      "size": 3100,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5f44b1229e518b76a3f57dd9701e4e2c03755a8a"
+    },
+    {
+      "path": "js/util/property.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25dc314792ce69a39f67080c59bb42fcad173d39",
+      "size": 7288,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/25dc314792ce69a39f67080c59bb42fcad173d39"
+    },
+    {
+      "path": "js/util/scoped_fs.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a439120361677cb65ac9fbf64b76cb01d79fe9ce",
+      "size": 5232,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a439120361677cb65ac9fbf64b76cb01d79fe9ce"
+    },
+    {
+      "path": "js/util/state_memory.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1072bb9f4beaa606081cceb6df743f3adddc61b",
+      "size": 1484,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b1072bb9f4beaa606081cceb6df743f3adddc61b"
+    },
+    {
+      "path": "js/util/three_custom.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c700631f613689344764b210af7d4fc56c1eba33",
+      "size": 6092,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c700631f613689344764b210af7d4fc56c1eba33"
+    },
+    {
+      "path": "js/util/util.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "542b64c544bd12729b5cd0eb7980f462511b53f5",
+      "size": 23845,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/542b64c544bd12729b5cd0eb7980f462511b53f5"
+    },
+    {
+      "path": "js/util/version_util.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "13939a7e7cd4e9e4626b31156d1c2d9e1cfc1090",
+      "size": 3016,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/13939a7e7cd4e9e4626b31156d1c2d9e1cfc1090"
+    },
+    {
+      "path": "js/util/yaml.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4be31f0397f095222692da542cfa2407455e9506",
+      "size": 1503,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4be31f0397f095222692da542cfa2407455e9506"
+    },
+    {
+      "path": "js/uv",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9fe9db5141776f35d004ea49398b805c423cce5e",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/9fe9db5141776f35d004ea49398b805c423cce5e"
+    },
+    {
+      "path": "js/uv/uv.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc9ff0090fde2ad8850278807e16dc9d02289145",
+      "size": 195854,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/dc9ff0090fde2ad8850278807e16dc9d02289145"
+    },
+    {
+      "path": "js/uv/uv_size.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "092b5d44ac0fd0b87c1489dd29268b56441b0c83",
+      "size": 8117,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/092b5d44ac0fd0b87c1489dd29268b56441b0c83"
+    },
+    {
+      "path": "js/validator.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f156795cb356613a66faf32670cb8e83bb07d57",
+      "size": 11990,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6f156795cb356613a66faf32670cb8e83bb07d57"
+    },
+    {
+      "path": "js/web.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4630d214b84493b1b5d042a4add6735c1de98964",
+      "size": 5236,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4630d214b84493b1b5d042a4add6735c1de98964"
+    },
+    {
+      "path": "keymaps",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b2419b0f3d655d2e8ea4462fde11b239de653dc9",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/b2419b0f3d655d2e8ea4462fde11b239de653dc9"
+    },
+    {
+      "path": "keymaps/blender.bbkeymap",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "02c7b76e2b97c4a406c365d8ac72d575a5e9af78",
+      "size": 8326,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/02c7b76e2b97c4a406c365d8ac72d575a5e9af78"
+    },
+    {
+      "path": "keymaps/cinema4d.bbkeymap",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da1cc9fa26258fdbb5ab0a7ae677cb60cc145bb0",
+      "size": 7469,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/da1cc9fa26258fdbb5ab0a7ae677cb60cc145bb0"
+    },
+    {
+      "path": "keymaps/maya.bbkeymap",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9306d09cdddeb89cb73305e11ed196bd498ba42e",
+      "size": 7392,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9306d09cdddeb89cb73305e11ed196bd498ba42e"
+    },
+    {
+      "path": "lang",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6fb49cab05b6fd9c8d07d8f575df915243397cf1",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/6fb49cab05b6fd9c8d07d8f575df915243397cf1"
+    },
+    {
+      "path": "lang/ar.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "093fc3d2a7e5c23c6fb50080ebfcb9b0d80ef830",
+      "size": 214134,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/093fc3d2a7e5c23c6fb50080ebfcb9b0d80ef830"
+    },
+    {
+      "path": "lang/cz.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "22abbd3e2c17bbd2e564a927aa922d42e99b2213",
+      "size": 180677,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/22abbd3e2c17bbd2e564a927aa922d42e99b2213"
+    },
+    {
+      "path": "lang/de.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c04fabce39784178c2f82559a1b27be606d374af",
+      "size": 185729,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c04fabce39784178c2f82559a1b27be606d374af"
+    },
+    {
+      "path": "lang/en.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b3219216eb52f4c264686e44ac8cf18c59afa19",
+      "size": 169722,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1b3219216eb52f4c264686e44ac8cf18c59afa19"
+    },
+    {
+      "path": "lang/es.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14374ff7c4e2ffa8f4660ef708b7e84ce907a752",
+      "size": 185814,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/14374ff7c4e2ffa8f4660ef708b7e84ce907a752"
+    },
+    {
+      "path": "lang/fr.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8a72b953a6ebff5068a53597bb41a9e489c6d66c",
+      "size": 184446,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/8a72b953a6ebff5068a53597bb41a9e489c6d66c"
+    },
+    {
+      "path": "lang/it.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c6c1b164b27b2c839196b7439b51fee8c7bd2903",
+      "size": 181748,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c6c1b164b27b2c839196b7439b51fee8c7bd2903"
+    },
+    {
+      "path": "lang/ja.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3e950aeafa81b3671dde78c876d3f8b1b3c5d967",
+      "size": 195046,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3e950aeafa81b3671dde78c876d3f8b1b3c5d967"
+    },
+    {
+      "path": "lang/ko.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3bd8c10777ff97c1341ab991a581d70cb9b948f9",
+      "size": 178823,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3bd8c10777ff97c1341ab991a581d70cb9b948f9"
+    },
+    {
+      "path": "lang/nl.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a6e9173ebb50dd824f2d6d1b14fa7bf752ba1738",
+      "size": 175958,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a6e9173ebb50dd824f2d6d1b14fa7bf752ba1738"
+    },
+    {
+      "path": "lang/pl.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a913ce962115c38baf5cc7efaac12ab0005f250a",
+      "size": 175851,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a913ce962115c38baf5cc7efaac12ab0005f250a"
+    },
+    {
+      "path": "lang/pt.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57a6ab49b04513dece95e0c637f0d7ede14bdeb1",
+      "size": 175820,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/57a6ab49b04513dece95e0c637f0d7ede14bdeb1"
+    },
+    {
+      "path": "lang/pt_br.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34d94c8ac07a977a2906365743b7d6b242fb85f4",
+      "size": 181823,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/34d94c8ac07a977a2906365743b7d6b242fb85f4"
+    },
+    {
+      "path": "lang/ru.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b0eeef1a834ac8d4d9b2397a19136175a4f0a39",
+      "size": 230112,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/7b0eeef1a834ac8d4d9b2397a19136175a4f0a39"
+    },
+    {
+      "path": "lang/sv.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "285ee9dcaa2af06f544c10078f5de779b774a96b",
+      "size": 172140,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/285ee9dcaa2af06f544c10078f5de779b774a96b"
+    },
+    {
+      "path": "lang/th.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e219aaa4a6442443d13547d97516beb8d653e24",
+      "size": 285779,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/0e219aaa4a6442443d13547d97516beb8d653e24"
+    },
+    {
+      "path": "lang/tr.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c93d0ca7137abff50315c2cd12d83bcd5b0ef18",
+      "size": 182976,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3c93d0ca7137abff50315c2cd12d83bcd5b0ef18"
+    },
+    {
+      "path": "lang/uk.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc9db50e7439c1ca83c9a3d3ce2b52ef1714ee08",
+      "size": 230720,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/dc9db50e7439c1ca83c9a3d3ce2b52ef1714ee08"
+    },
+    {
+      "path": "lang/vi.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26a5b6f1620758955a88ef8d31b54de002457008",
+      "size": 194669,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/26a5b6f1620758955a88ef8d31b54de002457008"
+    },
+    {
+      "path": "lang/zh.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb7ea2a63e7268be323f577cc0cb16fddf5398b8",
+      "size": 161677,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fb7ea2a63e7268be323f577cc0cb16fddf5398b8"
+    },
+    {
+      "path": "lang/zh_tw.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "558f9f48d8d98aa01f0e2a7d4de3f6fb73e6c0fb",
+      "size": 163498,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/558f9f48d8d98aa01f0e2a7d4de3f6fb73e6c0fb"
+    },
+    {
+      "path": "lib",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ef2e2f1386183d07dfe492b8fc7965c62e10f137",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/ef2e2f1386183d07dfe492b8fc7965c62e10f137"
+    },
+    {
+      "path": "lib/gif.worker.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "269624e61fd7c8b24f6023221c3b179b9df29527",
+      "size": 16636,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/269624e61fd7c8b24f6023221c3b179b9df29527"
+    },
+    {
+      "path": "manifest-beta.webmanifest",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "12c6ce4b19d031300aa0040bf607f4281c23e7eb",
+      "size": 821,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/12c6ce4b19d031300aa0040bf607f4281c23e7eb"
+    },
+    {
+      "path": "manifest.webmanifest",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "431a2c7fb8d6f889b04b3f658fae39a8b15630ed",
+      "size": 774,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/431a2c7fb8d6f889b04b3f658fae39a8b15630ed"
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f0f38372f0f989282f3766ed26e1056d53ec3e3f",
+      "size": 379579,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f0f38372f0f989282f3766ed26e1056d53ec3e3f"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cef8afcfe24431db0af03aaace555447f5c2e1ae",
+      "size": 5400,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cef8afcfe24431db0af03aaace555447f5c2e1ae"
+    },
+    {
+      "path": "scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7747fddf1651289053e988665f28f4f5e1c4e462",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/7747fddf1651289053e988665f28f4f5e1c4e462"
+    },
+    {
+      "path": "scripts/convert_types.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3ff14606a684e2fc20a0b7a0385abbe08a9caf60",
+      "size": 3383,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3ff14606a684e2fc20a0b7a0385abbe08a9caf60"
+    },
+    {
+      "path": "scripts/enable_beta.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f9d259846278d744f63e58304a62b02961dc98ce",
+      "size": 528,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f9d259846278d744f63e58304a62b02961dc98ce"
+    },
+    {
+      "path": "scripts/generate_pwa.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5cb5bab64d2b5843142fb135ce6f53445c472158",
+      "size": 520,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5cb5bab64d2b5843142fb135ce6f53445c472158"
+    },
+    {
+      "path": "scripts/notarize.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d231e8d0eeaad2a7ad9de7c0f48afae4467bb0d8",
+      "size": 555,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/d231e8d0eeaad2a7ad9de7c0f48afae4467bb0d8"
+    },
+    {
+      "path": "scripts/rename_portable.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "48f0428c7d00076f8766411b599128102dec5400",
+      "size": 416,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/48f0428c7d00076f8766411b599128102dec5400"
+    },
+    {
+      "path": "themes",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "143ba95ebbaf42a8ef365955fd5c98d27f9a242b",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/143ba95ebbaf42a8ef365955fd5c98d27f9a242b"
+    },
+    {
+      "path": "themes/contrast.bbtheme",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "38966520dd64ee12cb848bda6152da2193c99904",
+      "size": 2032,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/38966520dd64ee12cb848bda6152da2193c99904"
+    },
+    {
+      "path": "themes/dark.bbtheme",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c130185e5d3cfc36192b9582f385fcf38f7e0d9",
+      "size": 552,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/2c130185e5d3cfc36192b9582f385fcf38f7e0d9"
+    },
+    {
+      "path": "themes/light.bbtheme",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c866b5289a19e2170cdbde124de9df2581dbe99f",
+      "size": 1008,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c866b5289a19e2170cdbde124de9df2581dbe99f"
+    },
+    {
+      "path": "tsconfig.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc90368d8275147e5179cfeed59d27a2d823a690",
+      "size": 702,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/dc90368d8275147e5179cfeed59d27a2d823a690"
+    },
+    {
+      "path": "typedoc.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6604d1a29f3161782b67d9b0496bd7ef99ddef11",
+      "size": 2452,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6604d1a29f3161782b67d9b0496bd7ef99ddef11"
+    },
+    {
+      "path": "typedoc.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab685dc9da4a5db184555015bcd1c616ac04479f",
+      "size": 761,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ab685dc9da4a5db184555015bcd1c616ac04479f"
+    },
+    {
+      "path": "types",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3e41c9b5f5c57924221f189e00ae5fd04c96007d",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/3e41c9b5f5c57924221f189e00ae5fd04c96007d"
+    },
+    {
+      "path": "types/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1316b7ce06fccaa6c6119377d6dbd6b3300c923d",
+      "size": 1061,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1316b7ce06fccaa6c6119377d6dbd6b3300c923d"
+    },
+    {
+      "path": "types/custom",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ecd02560f28406cf4046e64a56aa88cb147e77bb",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/ecd02560f28406cf4046e64a56aa88cb147e77bb"
+    },
+    {
+      "path": "types/custom/animation.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "64d08d8257b86185a6d7f287c25056a3dac6cfac",
+      "size": 6772,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/64d08d8257b86185a6d7f287c25056a3dac6cfac"
+    },
+    {
+      "path": "types/custom/animation_controller.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "373b557a6cc6512ffd64ed8d3f27b437cdd2f33d",
+      "size": 3091,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/373b557a6cc6512ffd64ed8d3f27b437cdd2f33d"
+    },
+    {
+      "path": "types/custom/blockbench.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85e163b20394eb3ad10d15b0eedb4aae6ef3f2ad",
+      "size": 2118,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/85e163b20394eb3ad10d15b0eedb4aae6ef3f2ad"
+    },
+    {
+      "path": "types/custom/canvas.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61c693b4782d339564fde0844f97a34e00bdb3f3",
+      "size": 9092,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/61c693b4782d339564fde0844f97a34e00bdb3f3"
+    },
+    {
+      "path": "types/custom/copy_paste.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3e1e6a05f2b226371f49671db81dfcdaea8d49ca",
+      "size": 1486,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/3e1e6a05f2b226371f49671db81dfcdaea8d49ca"
+    },
+    {
+      "path": "types/custom/cube.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b13fde9408c0d418705e94664e87f3e1f16bae5a",
+      "size": 4013,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/b13fde9408c0d418705e94664e87f3e1f16bae5a"
+    },
+    {
+      "path": "types/custom/desktop.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9e872bbb41135c689f4e9b413a30cf2e0dbfb182",
+      "size": 3057,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9e872bbb41135c689f4e9b413a30cf2e0dbfb182"
+    },
+    {
+      "path": "types/custom/display_mode.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac128d0b0ded77639b0532e4b9f19cf256011b6f",
+      "size": 3607,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/ac128d0b0ded77639b0532e4b9f19cf256011b6f"
+    },
+    {
+      "path": "types/custom/edit_session.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "17da02716b183a1e64e1775119b5021bf349634f",
+      "size": 1002,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/17da02716b183a1e64e1775119b5021bf349634f"
+    },
+    {
+      "path": "types/custom/global.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "47f6a0a454baeef7dd2c92ff6d9961b62297b7b6",
+      "size": 5273,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/47f6a0a454baeef7dd2c92ff6d9961b62297b7b6"
+    },
+    {
+      "path": "types/custom/group.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5271dcdb018d88fc0879a04e1abbbdadfb367d80",
+      "size": 3083,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5271dcdb018d88fc0879a04e1abbbdadfb367d80"
+    },
+    {
+      "path": "types/custom/interface.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd6e8f174dfc4d8bb33ecfba0c825fc0d78f406a",
+      "size": 2332,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/cd6e8f174dfc4d8bb33ecfba0c825fc0d78f406a"
+    },
+    {
+      "path": "types/custom/io.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4eae885e97e7c3c2853c69d652ca37d577ec7eee",
+      "size": 396,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4eae885e97e7c3c2853c69d652ca37d577ec7eee"
+    },
+    {
+      "path": "types/custom/keybind.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e7aaf9f114239053f97bdf1eb43f643c985ba2d4",
+      "size": 4189,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e7aaf9f114239053f97bdf1eb43f643c985ba2d4"
+    },
+    {
+      "path": "types/custom/keyframe.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "694eb1aa2bd60df7d6a71cf5e1cf850ce66f7b09",
+      "size": 2990,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/694eb1aa2bd60df7d6a71cf5e1cf850ce66f7b09"
+    },
+    {
+      "path": "types/custom/libs.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa4f3012f73fe8777980b05fad24253d3cab3339",
+      "size": 280,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fa4f3012f73fe8777980b05fad24253d3cab3339"
+    },
+    {
+      "path": "types/custom/mesh.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23bd1abe8d8cc1fffc680f514715ca8bf509b01d",
+      "size": 6017,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/23bd1abe8d8cc1fffc680f514715ca8bf509b01d"
+    },
+    {
+      "path": "types/custom/misc.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c6d21b20432b63eab9be56dd7c4df5167ee1e326",
+      "size": 7601,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/c6d21b20432b63eab9be56dd7c4df5167ee1e326"
+    },
+    {
+      "path": "types/custom/molang.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97bfc8bd9c3a7ef5d8cce6b25fb9c9d052da6521",
+      "size": 5713,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/97bfc8bd9c3a7ef5d8cce6b25fb9c9d052da6521"
+    },
+    {
+      "path": "types/custom/outliner.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70d9df95b2bf94abfa334e665450e9f0a941fc23",
+      "size": 4023,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/70d9df95b2bf94abfa334e665450e9f0a941fc23"
+    },
+    {
+      "path": "types/custom/painter.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e7ba39be5b00206d26004878aed86514179c55c7",
+      "size": 3318,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e7ba39be5b00206d26004878aed86514179c55c7"
+    },
+    {
+      "path": "types/custom/screencam.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5087a3763dff7097623f878c06e7c9a22a5eee26",
+      "size": 1982,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/5087a3763dff7097623f878c06e7c9a22a5eee26"
+    },
+    {
+      "path": "types/custom/spline_mesh.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fefb7d1a6a40221cb67ab5945ab6bfcdae370461",
+      "size": 6410,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/fefb7d1a6a40221cb67ab5945ab6bfcdae370461"
+    },
+    {
+      "path": "types/custom/texture_group.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "edd61c3958cf1ffb23dd7d03a75c050d5e6daf3a",
+      "size": 1818,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/edd61c3958cf1ffb23dd7d03a75c050d5e6daf3a"
+    },
+    {
+      "path": "types/custom/textures.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f27a31e9acfa72b5e216e44b80c82747e1dcc2fc",
+      "size": 15944,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/f27a31e9acfa72b5e216e44b80c82747e1dcc2fc"
+    },
+    {
+      "path": "types/custom/timeline.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a662922fccce89087aefb803a469aa1ebc683593",
+      "size": 1800,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a662922fccce89087aefb803a469aa1ebc683593"
+    },
+    {
+      "path": "types/custom/undo.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ffa2b83ae29949698c202662c8c9c000175f523",
+      "size": 5364,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9ffa2b83ae29949698c202662c8c9c000175f523"
+    },
+    {
+      "path": "types/custom/util.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cecd7473993ea6a84cd4919a1847dda085ec1fa",
+      "size": 7229,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6cecd7473993ea6a84cd4919a1847dda085ec1fa"
+    },
+    {
+      "path": "types/custom/util",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f3f50c6fa25c4f118aaab78b34486c5c75f4d020",
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/trees/f3f50c6fa25c4f118aaab78b34486c5c75f4d020"
+    },
+    {
+      "path": "types/custom/util/version_util.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6d4efdb9764c88a4e6fdf9f32e7d9f514743b1d2",
+      "size": 808,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/6d4efdb9764c88a4e6fdf9f32e7d9f514743b1d2"
+    },
+    {
+      "path": "types/custom/uveditor.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4009007c5d184051b389d8d88082c58de8f0a6f6",
+      "size": 73,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/4009007c5d184051b389d8d88082c58de8f0a6f6"
+    },
+    {
+      "path": "types/custom/validator.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8a90a2adb980aa65c8278bb8368b438291f91ea",
+      "size": 2425,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/a8a90a2adb980aa65c8278bb8368b438291f91ea"
+    },
+    {
+      "path": "types/documentation.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1def067b659771b881f552d5f01cb42c2483c5ad",
+      "size": 921,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/1def067b659771b881f552d5f01cb42c2483c5ad"
+    },
+    {
+      "path": "types/index.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df2c2874897343303b022117834d51fe013067ac",
+      "size": 87,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/df2c2874897343303b022117834d51fe013067ac"
+    },
+    {
+      "path": "types/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9680b253c5c6c1cc941d50afe12aa144d12a995d",
+      "size": 890,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/9680b253c5c6c1cc941d50afe12aa144d12a995d"
+    },
+    {
+      "path": "types/tsconfig.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5da11124920dad0e01f7092a73cb5c03889336d",
+      "size": 407,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/e5da11124920dad0e01f7092a73cb5c03889336d"
+    },
+    {
+      "path": "types/type_config.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67b08712d8c34b1a2e0db7c11ce67cc4d1a925ed",
+      "size": 861,
+      "url": "https://api.github.com/repos/JannisX11/blockbench/git/blobs/67b08712d8c34b1a2e0db7c11ce67cc4d1a925ed"
+    }
+  ],
+  "truncated": false
+}

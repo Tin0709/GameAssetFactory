@@ -1,0 +1,29 @@
+{
+  "initial_state": "default",
+  "states": {
+    "default": {
+      "animations": [
+        "zqsbox",
+        "vhgkyg",
+        "fyqvie",
+        "look_at_target",
+        "pybruj",
+        {
+          "blinking.step": "q.is_roaring==0"
+        }
+      ],
+      "transitions": [
+        {
+          "bnyqbz": "!q.is_alive"
+        }
+      ]
+    },
+    "bnyqbz": {
+      "animations": [
+        "yytrhz",
+        "unsjoy",
+        "cmhnrv"
+      ]
+    }
+  }
+}

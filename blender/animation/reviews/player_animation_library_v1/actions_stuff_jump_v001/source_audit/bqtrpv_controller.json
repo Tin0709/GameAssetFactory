@@ -1,0 +1,120 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "gczhgd": "q.ticks_since_last_kinetic_weapon_hit>=0&&q.ticks_since_last_kinetic_weapon_hit<=5"
+        }
+      ]
+    },
+    "gczhgd": {
+      "transitions": [
+        {
+          "uedapo": "q.is_item_name_any('slot.weapon.mainhand','minecraft:wooden_spear')"
+        },
+        {
+          "xejgei": "q.is_item_name_any('slot.weapon.mainhand','minecraft:stone_spear')"
+        },
+        {
+          "thjota": "q.is_item_name_any('slot.weapon.mainhand','minecraft:copper_spear')"
+        },
+        {
+          "yakyhn": "q.is_item_name_any('slot.weapon.mainhand','minecraft:iron_spear')"
+        },
+        {
+          "mmqykj": "q.is_item_name_any('slot.weapon.mainhand','minecraft:golden_spear')"
+        },
+        {
+          "qtbidh": "q.is_item_name_any('slot.weapon.mainhand','minecraft:diamond_spear')"
+        },
+        {
+          "gtzlme": "q.is_item_name_any('slot.weapon.mainhand','minecraft:netherite_spear')"
+        }
+      ]
+    },
+    "uedapo": {
+      "sound_effects": [
+        {
+          "effect": "jflewg"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>0.5"
+        }
+      ]
+    },
+    "xejgei": {
+      "sound_effects": [
+        {
+          "effect": "xkhrcs"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>0.5"
+        }
+      ]
+    },
+    "thjota": {
+      "sound_effects": [
+        {
+          "effect": "lcjsqh"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>0.5"
+        }
+      ]
+    },
+    "yakyhn": {
+      "sound_effects": [
+        {
+          "effect": "hozwpn"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>0.5"
+        }
+      ]
+    },
+    "mmqykj": {
+      "sound_effects": [
+        {
+          "effect": "dudbsv"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>0.5"
+        }
+      ]
+    },
+    "qtbidh": {
+      "sound_effects": [
+        {
+          "effect": "gpvsup"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>0.5"
+        }
+      ]
+    },
+    "gtzlme": {
+      "sound_effects": [
+        {
+          "effect": "rgsgli"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "q.state_time>0.5"
+        }
+      ]
+    }
+  }
+}

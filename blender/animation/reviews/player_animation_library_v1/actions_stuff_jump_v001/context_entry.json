@@ -1,0 +1,121 @@
+{
+  "id": "actions_stuff_jump_landing_v001",
+  "label": "Actions & Stuff Jump / Landing v001",
+  "status": "pending",
+  "scene": "ASJ_Jump_Landing_Context_v001",
+  "rig": "ASJ_Context_Player_Rig_v001",
+  "mesh": "ASJ_Context_Player_Mesh_v001",
+  "world_root": "ASJ_PREVIEW_ONLY_CallerPhysics",
+  "pose_action": "ActionsStuff_Jump_Landing_Context_Source_Study_v001",
+  "pose_slot_identifier": "OBASJ_Context_Player_Rig_v001",
+  "pose_action_sha256": "b1ffb6551a22d5c12454d6fce557ce5470659dbdcb9f06162a42843029ae21e8",
+  "presentation_action": "PREVIEW_ONLY_ASJ_CallerPhysicsArc_v001",
+  "presentation_slot_identifier": "OBASJ_PREVIEW_ONLY_CallerPhysics",
+  "presentation_action_sha256": "6512696313ee9ec487ae0275a37c3bd9e6c9a0df4fb46254a504e51e8cd1c81c",
+  "start": 1,
+  "end": 450,
+  "fps": 30,
+  "fps_base": 1.0,
+  "seamless_loop": false,
+  "research_only": true,
+  "production_eligible": false,
+  "source": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_source_v001/jump_actions_stuff_review.blend",
+  "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+  "rotation_modes": {
+    "Root": "QUATERNION",
+    "Hips": "QUATERNION",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "QUATERNION",
+    "Leg.R": "QUATERNION"
+  },
+  "cameras": {
+    "FRONT": "ASJ_Context_FRONT",
+    "THREE_QUARTER": "ASJ_Context_THREE_QUARTER",
+    "SIDE": "ASJ_Context_SIDE"
+  },
+  "return_scene": "ANIMATION_SHOWCASE",
+  "hud_root": "ASJ_Context_HUDRoot",
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "research_scale_profile": "actions_stuff_jump_v001",
+  "source_scale_animations": [
+    "animation.oreville_ans.mykcsi",
+    "animation.oreville_ans.bevrbk",
+    "animation.oreville_ans.nvxqkp",
+    "animation.oreville_ans.xvdslp",
+    "animation.oreville_ans.jmjgft",
+    "animation.oreville_ans.fngydr"
+  ],
+  "research_scale_channels": {
+    "Root": {
+      "axes": [
+        0,
+        1,
+        2
+      ],
+      "min": 0.85,
+      "max": 1.15
+    },
+    "Leg.L": {
+      "axis": 1,
+      "min": 0.95,
+      "max": 1.3
+    },
+    "Leg.R": {
+      "axis": 1,
+      "min": 0.95,
+      "max": 1.3
+    }
+  },
+  "query_profile": {
+    "duration_s": 15.0,
+    "simulation_hz": 240,
+    "holding_right": 0.0,
+    "holding_left": 0.0,
+    "flight_s": 0.6,
+    "apex_m": 1.0,
+    "physics": "caller-declared parabola, not recovered pack physics",
+    "world_xy": "held in place; virtual position supplies source velocity",
+    "walk_query_speed_blocks_s": 2.62451171875,
+    "sprint_query_speed_blocks_s": 5.59,
+    "takeoffs": [
+      {
+        "time_s": 1.2,
+        "state": "jump",
+        "phase01": 0.0
+      },
+      {
+        "time_s": 4.0,
+        "state": "jump",
+        "phase01": 0.19503803430009126
+      },
+      {
+        "time_s": 7.2,
+        "state": "ypqtmb",
+        "phase01": 0.5925765331534132
+      },
+      {
+        "time_s": 9.6,
+        "state": "seridw",
+        "phase01": 0.9233333333326206
+      }
+    ],
+    "floor_z_m": -0.0690576359629631,
+    "floor_alignment": "one constant lowest-sole envelope for complete take; no source pose correction"
+  },
+  "engine_conventions": [
+    "positive_only_unnormalized_weights",
+    "uniform_catmull_duplicate_endpoints",
+    "linear_outgoing_fades",
+    "one_transition_per_controller_per_step",
+    "outgoing_clocks_continue"
+  ],
+  "source_sha256": "a020d0f1e1adc80f1139ccdc998c884ba7a2f6b79cbcb9c9a4f29d98c41b8418"
+}

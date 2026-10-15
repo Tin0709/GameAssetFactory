@@ -1,0 +1,30 @@
+{
+  "states": {
+    "bvvnna": {
+      "animations": [
+        "rdnosj",
+        "eznmli",
+        "yytrhz"
+      ],
+      "transitions": [
+        {
+          "default": "!q.is_casting"
+        }
+      ],
+      "blend_transition": 0.7
+    },
+    "default": {
+      "animations": [
+        {
+          "zygxsz": "!q.is_riding"
+        }
+      ],
+      "transitions": [
+        {
+          "bvvnna": "q.is_casting"
+        }
+      ],
+      "blend_transition": 0.1
+    }
+  }
+}

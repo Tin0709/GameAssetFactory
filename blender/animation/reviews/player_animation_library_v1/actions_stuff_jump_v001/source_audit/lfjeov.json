@@ -1,0 +1,205 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "float": "(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.hhsumy||v.gddzeg"
+        },
+        {
+          "ypqtmb": "q.is_sprinting&&q.is_jumping&&q.in_range(v.ifcvde,0.1,0.6)"
+        },
+        {
+          "seridw": "q.is_sprinting&&q.is_jumping"
+        },
+        {
+          "jump": "!q.is_on_ground&&(q.vertical_speed>0||q.is_in_water)"
+        }
+      ]
+    },
+    "yutray": {
+      "transitions": [
+        {
+          "float": "(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.hhsumy||v.gddzeg"
+        },
+        {
+          "ypqtmb": "q.is_sprinting&&q.vertical_speed>0&&!q.is_on_ground"
+        },
+        {
+          "jump": "!q.is_on_ground&&(q.vertical_speed>0||q.is_in_water)"
+        },
+        {
+          "default": "q.state_time>0.35"
+        }
+      ]
+    },
+    "fmzeml": {
+      "transitions": [
+        {
+          "float": "(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.hhsumy||v.gddzeg"
+        },
+        {
+          "seridw": "q.is_sprinting&&q.vertical_speed>0&&!q.is_on_ground"
+        },
+        {
+          "jump": "!q.is_on_ground&&(q.vertical_speed>0||q.is_in_water)"
+        },
+        {
+          "default": "q.state_time>0.35"
+        }
+      ]
+    },
+    "jump": {
+      "animations": [
+        "jump",
+        {
+          "orsiea": "v.tnlxsa==4"
+        },
+        {
+          "dvjdse": "v.tnlxsa==9"
+        },
+        {
+          "ffopif": "v.tnlxsa==13"
+        }
+      ],
+      "transitions": [
+        {
+          "float": "v.cthrgf||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.hhsumy||v.gddzeg"
+        },
+        {
+          "hihqcy": "q.is_in_water"
+        },
+        {
+          "default": "q.is_on_ground||q.vertical_speed<-7"
+        }
+      ],
+      "blend_transition": 0.2
+    },
+    "ypqtmb": {
+      "on_entry": [
+        "v.hirjne=1;"
+      ],
+      "animations": [
+        "wxzmsp",
+        {
+          "lnscqe": "v.vgieqh"
+        },
+        {
+          "nsfqmy": "0.5*(v.tnlxsa==9)"
+        },
+        {
+          "aaxdxj": "v.tnlxsa==13"
+        }
+      ],
+      "transitions": [
+        {
+          "float": "v.cthrgf||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.hhsumy||v.gddzeg"
+        },
+        {
+          "hihqcy": "q.is_in_water"
+        },
+        {
+          "seridw": "q.state_time>0.4&&q.vertical_speed>1&&q.is_sprinting&&v.hkmncu<1"
+        },
+        {
+          "fmzeml": "q.is_on_ground&&q.vertical_speed>-0.3&&!q.is_jumping"
+        },
+        {
+          "jump": "q.state_time>0.3&&q.in_range(v.hkmncu,0.01,0.15)&&q.is_jumping"
+        }
+      ],
+      "blend_transition": 0.12,
+      "on_exit": [
+        "v.hirjne=0;",
+        "v.gadjrq=0.05;"
+      ]
+    },
+    "seridw": {
+      "on_entry": [
+        "v.hirjne=2;"
+      ],
+      "animations": [
+        "rnmred",
+        {
+          "xyxtfo": "v.vgieqh"
+        },
+        {
+          "vaotnm": "0.5*(v.tnlxsa==9)"
+        },
+        {
+          "rebyum": "v.tnlxsa==13"
+        }
+      ],
+      "transitions": [
+        {
+          "float": "v.cthrgf||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.hhsumy||v.gddzeg"
+        },
+        {
+          "hihqcy": "q.is_in_water"
+        },
+        {
+          "ypqtmb": "q.state_time>0.4&&q.vertical_speed>1&&q.is_sprinting&&v.hkmncu<1"
+        },
+        {
+          "yutray": "q.is_on_ground&&q.vertical_speed>-0.3&&!q.is_jumping"
+        },
+        {
+          "jump": "q.state_time>0.3&&q.in_range(v.hkmncu,0.01,0.15)&&q.is_jumping"
+        }
+      ],
+      "blend_transition": 0.12,
+      "on_exit": [
+        "v.hirjne=0;",
+        "v.gadjrq=0.55;"
+      ]
+    },
+    "float": {
+      "transitions": [
+        {
+          "default": "(!v.cthrgf||q.is_on_ground)&&!(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))&&!v.hhsumy&&!v.gddzeg"
+        }
+      ],
+      "blend_transition": 0.3
+    },
+    "hihqcy": {
+      "animations": [
+        {
+          "wjmfbh": "(1-v.jkpkmj)*0.5"
+        },
+        {
+          "ytimjn": "(1-v.jkpkmj)*0.5*(v.tnlxsa==4)"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "(!v.cthrgf&&!q.is_in_water&&Math.abs(q.vertical_speed)>3)||q.is_on_ground||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.hhsumy||v.gddzeg"
+        },
+        {
+          "vcwrsx": "v.lguaef"
+        }
+      ],
+      "blend_transition": 0.3
+    },
+    "vcwrsx": {
+      "on_entry": [
+        "v.bdcpnd=q.life_time;"
+      ],
+      "animations": [
+        {
+          "wjmfbh": "(1-v.jkpkmj)*(0.5-Math.hermite_blend(Math.clamp((q.life_time-v.bdcpnd)/0.25,0,1))*0.25)"
+        },
+        {
+          "ytimjn": "(1-v.jkpkmj)*(0.5-Math.hermite_blend(Math.clamp((q.life_time-v.bdcpnd)/0.25,0,1))*0.25)*(v.tnlxsa==4)"
+        }
+      ],
+      "transitions": [
+        {
+          "default": "(!v.cthrgf&&!q.is_in_water)||q.is_on_ground"
+        },
+        {
+          "hihqcy": "!v.lguaef"
+        }
+      ],
+      "blend_transition": 0.3
+    }
+  }
+}

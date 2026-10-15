@@ -1,0 +1,21 @@
+{
+  "states": {
+    "default": {
+      "transitions": [
+        {
+          "jhgxiu": "q.has_rider"
+        }
+      ]
+    },
+    "jhgxiu": {
+      "animations": [
+        "yytrhz"
+      ],
+      "transitions": [
+        {
+          "default": "!q.has_rider"
+        }
+      ]
+    }
+  }
+}

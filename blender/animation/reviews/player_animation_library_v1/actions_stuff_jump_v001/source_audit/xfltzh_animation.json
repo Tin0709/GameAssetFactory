@@ -1,0 +1,54 @@
+{
+  "loop": true,
+  "bones": {
+    "root": {
+      "rotation": [
+        0,
+        "-q.body_y_rotation+v.nthjcy",
+        0
+      ]
+    },
+    "waist": {
+      "rotation": [
+        0,
+        "v.upxhvv*-22.5*v.esnrkj",
+        0
+      ]
+    },
+    "cape": {
+      "rotation": [
+        0,
+        "v.upxhvv*22.5*v.esnrkj",
+        0
+      ]
+    },
+    "head": {
+      "rotation": [
+        0,
+        "-q.body_y_rotation+v.nthjcy",
+        0
+      ]
+    },
+    "egjh9root": {
+      "rotation": [
+        0,
+        "-q.body_y_rotation+v.nthjcy",
+        0
+      ]
+    },
+    "egjh9waist": {
+      "rotation": [
+        0,
+        "v.upxhvv*-22.5*v.esnrkj",
+        0
+      ]
+    },
+    "egjh9head": {
+      "rotation": [
+        0,
+        "-q.body_y_rotation+v.nthjcy",
+        0
+      ]
+    }
+  }
+}
