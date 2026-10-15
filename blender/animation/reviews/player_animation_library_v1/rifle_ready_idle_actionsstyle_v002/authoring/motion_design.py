@@ -19,7 +19,7 @@ def motion(t):
  # Original four-to-one weight/rebound rhythm, not literal source100/400deg/s.
  phase=2*math.pi*t/4.;pulse=2*math.pi*t
  h=path(HEAD,t);torso=11.+path(TORSO,t)
- hold=11.+.85*path(TORSO,t-.075)
+ hold=torso
  # Braced crossbow-style shoulders suppress free arm swing; one rigid holding frame.
  attention=math.sqrt(h*h+(torso-11.)**2+(hold-11.)**2)
  return {'head':h,'torso':torso,'hold':hold,'drop':.064*(1-math.exp(-(attention/3.8)**2)),
@@ -27,4 +27,4 @@ def motion(t):
  'breathe':.5-.5*math.cos(pulse),
  'pitch':-.65*h/23.,'roll':.7*math.sin(phase),
  'head_lift':.008+.0055*ramp(attention/4.),'body_pitch':.9*math.sin(pulse),
- 'body_roll':.55*math.sin(phase),'hold_pitch':.70*math.sin(pulse-.18)}
+ 'body_roll':.55*math.sin(phase)}

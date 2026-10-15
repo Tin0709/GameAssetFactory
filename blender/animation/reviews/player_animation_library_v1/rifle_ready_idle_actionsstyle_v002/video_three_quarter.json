@@ -1,0 +1,10 @@
+{
+  "view": "THREE_QUARTER",
+  "fps": 30,
+  "frames": 240,
+  "duration": 8,
+  "closing_frame_excluded": 241,
+  "original_speed": true,
+  "renderer": "BLENDER_EEVEE",
+  "elapsed": 60.817434310913086
+}
