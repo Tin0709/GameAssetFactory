@@ -9,6 +9,7 @@ var idle_future_sampler: RefCounted
 var idle_snapshot: Dictionary={}
 var idle_active:=false
 var _idle_driving:=false
+var presentation: Node
 
 func _ready() -> void:
 	super._ready()
@@ -44,6 +45,10 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
 	# uses its literal .2s fade, plus inherited movement handoff inertialization.
 	if jump_grounded: _update_direction_support(delta)
 	support_left=_support(0);support_right=_support(1)
+	# Resolve every physics pose once, including multiple ticks between renders.
+	# Render presentation consumes these final poses without feeding back into IK.
+	_evaluate(delta)
+	if presentation!=null: presentation.capture()
 
 func _update_direction_support(delta: float) -> void:
 	if not _idle_driving: super._update_direction_support(delta)
