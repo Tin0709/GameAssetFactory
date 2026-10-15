@@ -52,5 +52,114 @@
   },
   "independent_review": "No remaining Critical or Important findings; cold start, Idle orbit and stop independently retested",
   "editor_current_scene_verified": true,
-  "research_release_guard_enabled": true
+  "research_release_guard_enabled": true,
+  "facing_correction": {
+    "passed": true,
+    "date": "2026-10-15",
+    "existing_scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "behavior": "Normal turn-to-travel WASD restored; camera orbit is observational; directional foot response remains active during turns.",
+    "changes": [
+      "Existing bounded 4.5 rad/s heading response",
+      "110mm anticipatory rigid support release",
+      "Rolling contact evaluated after held world-yaw correction"
+    ],
+    "tests": {
+      "final_test_direction_continuity30.log": {
+        "failures": [],
+        "idle_foot_drift_m": 5.96047158296642e-08,
+        "max_stop_height_step_m": 0.0100746788084507
+      },
+      "final_test_direction_facing30.log": {
+        "failures": [],
+        "floor_min": -5.96046447753906e-08,
+        "fps": 30,
+        "steady_facing_errors_deg": [
+          0.0,
+          0.231447816292904,
+          0.0154310226003585,
+          0.231449385926816,
+          0.0137764713514039,
+          0.434511889338633,
+          0.00679319375950864,
+          0.434492217249619
+        ]
+      },
+      "final_test_direction_facing60.log": {
+        "failures": [],
+        "floor_min": -5.96046447753906e-08,
+        "fps": 60,
+        "steady_facing_errors_deg": [
+          0.0,
+          0.273501346414729,
+          0.0162684527749227,
+          0.273503084186819,
+          0.0144806485662469,
+          0.51324178405119,
+          0.0071659427400308,
+          0.513224482972667
+        ]
+      },
+      "final_test_direction_gameplay30.log": {
+        "average_pose_and_controller_ms": 4.00235416666667,
+        "failures": [],
+        "final_phase": 28.0647157692984,
+        "fps": 30,
+        "max_world_leg_step_deg": 48.3708362114238,
+        "maximum_scale": 1.06698834896088,
+        "minimum_foot_y": -1.19209289550781e-07,
+        "side_and_back_used": true,
+        "support_samples": 15
+      },
+      "final_test_direction_gameplay60.log": {
+        "average_pose_and_controller_ms": 3.06353611111111,
+        "failures": [],
+        "final_phase": 27.9383485475878,
+        "fps": 60,
+        "max_world_leg_step_deg": 36.9926119033017,
+        "maximum_scale": 1.06781077384949,
+        "minimum_foot_y": -5.96046447753906e-08,
+        "side_and_back_used": true,
+        "support_samples": 54
+      },
+      "final_test_interruptions30.log": {
+        "cases": 44,
+        "clamps": 0,
+        "maxstep": 23.6472077368513,
+        "min_y": -1.19209289550781e-07,
+        "passed": true
+      },
+      "final_test_support_exchange30.log": {
+        "passed": true
+      },
+      "contact_final30.log": {
+        "contact_samples": 0,
+        "correction_clamps": 0,
+        "failures": [],
+        "fps": 30.0,
+        "max_leg_step_degrees": 23.4417863824686,
+        "max_scale_y": 1.0672949552536,
+        "maximum_correction": 0.134653523564339,
+        "minimum_foot_y": -5.96046447753906e-08,
+        "run_contact_speed": 0.0,
+        "steady_run_clamps": 0,
+        "support_frames": 8
+      },
+      "contact_final60.log": {
+        "contact_samples": 12,
+        "correction_clamps": 0,
+        "failures": [],
+        "fps": 60.0,
+        "max_leg_step_degrees": 13.4673708544593,
+        "max_scale_y": 1.06795585155487,
+        "maximum_correction": 0.113054819405079,
+        "minimum_foot_y": -5.96046447753906e-08,
+        "run_contact_speed": 3.99840118348038e-06,
+        "steady_run_clamps": 0,
+        "support_frames": 24
+      }
+    },
+    "paired_contact_limitation_30_fps": "8 support frames, 0 consecutive same-point pairs; no paired-slip claim at30 FPS.",
+    "independent_review": "No Critical or Important findings;30/60Hz facing and contacts independently checked.",
+    "source_animation_data_changed": false
+  }
 }

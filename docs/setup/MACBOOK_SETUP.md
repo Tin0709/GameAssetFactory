@@ -76,14 +76,14 @@ The launcher supports `--dry-run` to print the exact argument list without launc
 
 ## Five Blender viewers on macOS
 
-Run these from the GameAssetFactory repository root (on this Mac: `cd "/Users/tin/Desktop/Game Dev/GameAssetFactory"`). Each command opens its existing file in the Blender GUI and returns Terminal control immediately. No trailing `&`, watcher, launcher daemon or extra Terminal window is needed.
+Run these exact commands from **any directory** on this Mac. Each command opens its existing file in the Blender GUI and returns Terminal control immediately. No trailing `&`, watcher, launcher daemon or extra Terminal window is needed.
 
 ```sh
-python3 scripts/dev.py blender --viewer asset-style-v2
-python3 scripts/dev.py blender --viewer player-library
-python3 scripts/dev.py blender --viewer animation
-python3 scripts/dev.py blender --viewer weapon
-python3 scripts/dev.py blender --viewer mobs
+python3 "/Users/tin/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py" asset
+python3 "/Users/tin/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py" player
+python3 "/Users/tin/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py" animation
+python3 "/Users/tin/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py" weapon
+python3 "/Users/tin/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py" mobs
 ```
 
 | Viewer | Existing file, relative to the repository |
@@ -92,13 +92,17 @@ python3 scripts/dev.py blender --viewer mobs
 | Player Animation Library V1 | `blender/animation/reviews/player_animation_library_v1/player_animation_library_v1.blend` |
 | Animation Showcase | `blender/animation/showcase/Animation_Showcase.blend` |
 | Weapon Showcase | `blender/weapons/showcase/Weapon_Showcase.blend` |
-| Mobs Animation Library | `blender/animation/showcase/Mobs_Animation_Library.blend` |
+| Mobs Animation Showcase | `blender/animation/showcase/Mobs_Animation_Library.blend` |
 
-From any other directory, replace `scripts/dev.py` with its quoted absolute path, for example `python3 "/Users/tin/Desktop/Game Dev/GameAssetFactory/scripts/dev.py" blender --viewer mobs`. Paths with spaces are passed as individual arguments. `BLENDER_BIN` / `--blender-bin` overrides and `--dry-run` remain available. The older `--showcase animation` / `--showcase weapon` spellings still work.
+`scripts/open_blender_viewer.py` is the standard public entry point, with five positional options: `asset`, `player`, `animation`, `weapon`, `mobs`. It delegates to the shared detached launcher, so the existing `dev.py blender --viewer ...` and `--showcase animation/weapon` commands remain compatible. `BLENDER_BIN` / `--blender-bin` overrides and `--dry-run` remain available. Paths with spaces are passed as individual arguments.
+
+After moving the repository to another Mac or Windows machine, change the absolute script prefix in these commands to that checkout's location. All asset/UI paths inside the launcher are relative to the repository, derived from the script location rather than the Terminal working directory. From the repository root, `python3 scripts/open_blender_viewer.py asset` also works. No shell aliases, login service, Python Console initialization or saved add-on preferences are required: each new Blender launch loads the UI explicitly, including after restarting the Mac.
 
 Each different viewer needs one Blender process. Repeating a command detects that exact executable/file in the process list, reports its PID, requests macOS to bring its window forward and starts no duplicate. Unsaved work is preserved; if macOS declines activation, switch to its existing window. Detection identifies the startup file: if you manually open a different file in that process, close it before relaunching the original viewer. After updating the launcher/UI code, close and reopen any old viewer once to load the new code. The existing Mobs `.command` shortcut delegates to this same launcher.
 
-The three Showcases explicitly register their adjacent repository UI through `scripts/load_showcase_ui.py`, open the N sidebar and restore their saved registries. Select **Animation Library**, **Weapon Library** or **Mobs Animation Library** in that sidebar; press N if you later hide it. No per-user library add-on or embedded Python auto-run is needed. Asset Style V2 and Player Animation Library V1 open as saved, without a Showcase bootstrap.
+Four viewers load existing custom panels through `scripts/load_showcase_ui.py`: **Player Review** for Player Animation Library V1, **Animation Library**, **Weapon Library**, and **Mobs Animation Library** for the three Showcases. Their N sidebars are shown automatically. Select the named tab; press N if you later hide the sidebar. Registration is guarded so rerunning the bootstrap does not register duplicate classes. The Player panel uses the repository's existing `review_controls.py`, also stored in the file as `START_HERE_review_controls.py`; no replacement interface is created. The other three panels restore their saved registries.
+
+Asset Style V2 has no custom review panel. It opens its existing saved workspace without a UI bootstrap. No per-user library add-on or embedded Python auto-run is needed for any of the five commands.
 
 Startup uses factory preferences and disables embedded auto-execution. It never refreshes/imports new Actions, rebuilds assets, saves a `.blend`, writes preferences or changes Godot. For Blender 5.2, the sidebar uses the supported writable [`SpaceView3D.show_region_ui`](https://docs.blender.org/api/5.2/bpy.types.SpaceView3D.html#bpy.types.SpaceView3D.show_region_ui) property and `Area.tag_redraw()`. It does not assign `Region.active_panel_category`: categories are generated during drawing and the assignment can be read-only during startup. The registered tabs remain available without forcing an active category.
 
@@ -119,7 +123,7 @@ export BLENDER_MCP_PORT=9876
 python3 scripts/dev.py bridge --viewer animation
 ```
 
-The five ordinary `blender --viewer ...` commands do not start MCP or bind port 9876, even with several viewers open. Factory startup prevents installed add-ons from starting their own bridges. Existing MCP client configuration stays compatible.
+The five standard `open_blender_viewer.py ...` commands and legacy `dev.py blender --viewer ...` commands do not start MCP or bind port 9876, even with several viewers open. Factory startup prevents installed add-ons from starting their own bridges. Existing MCP client configuration stays compatible.
 
 `bridge --viewer ...` accepts all five viewer names, returns Terminal control immediately and starts the installed bridge only in that viewer, using a Blender timer. If that viewer is already open without MCP, close it first; the launcher will not spawn a duplicate to add a bridge. If the requested port is busy, it reports the conflict before opening a new window and leaves the current bridge untouched. A port claimed between this check and Blender startup is logged as `GAF_MCP_BRIDGE_SKIPPED`; the new window remains a plain viewer. Startup logs contain `GAF_MCP_BRIDGE_READY` when binding succeeds.
 
@@ -179,13 +183,13 @@ Checklist:
 - [ ] First Godot import completes; WorldMap opens with expected terrain/textures/audio.
 - [ ] Snappy and Expressive tests run; camera, move/run/jump and A/B work visually.
 - [ ] All five viewer commands return immediately; repeating one starts no duplicate.
-- [ ] Animation Showcase, Weapon Showcase and Mobs Animation Library show their saved lists in the custom N-panel tabs.
+- [ ] Player Review, Animation Library, Weapon Library and Mobs Animation Library show their saved lists in the custom N-panel tabs.
 - [ ] Viewer selection/playback works without changing approval states.
 - [ ] No pink textures/missing models; source/rig proportions and Actions look unchanged.
 - [ ] MCP reads version/object count from the intended Blender window.
 - [ ] Close review files without saving; `git status --short` contains no unintended asset changes.
 
-Viewer startup validation on2026-10-15:28 standard-library tests passed; all five existing files opened in the macOS Blender5.2.2 GUI. The three custom panels were registered with populated lists, visible sidebars and no reported UI errors. A read-only bridge request on isolated port19876 passed while a second viewer was open; duplicate viewer and busy-port requests created no additional process. SHA256 checks confirmed all five `.blend` files were unchanged. Temporary validation windows were closed without saving. This checks viewer startup, not artistic quality or gameplay.
+Viewer startup validation on2026-10-15:31 standard-library tests passed. All five exact public commands ran from `/tmp`, opened the real files in macOS Blender5.2.2 and returned in0.071–0.096 seconds (GUI loading continues after command exit). Repeating each command reused its original PID. Runtime checks confirmed all four custom panels were registered with visible sidebars and populated saved lists: Player Review61, Animation Library37, Weapon Library3 and Mobs Animation Library6 entries at validation time. Running the bootstrap twice in each GUI session produced no duplicate-registration or read-only-category error. The existing MCP process retained port9876 throughout; a subsequent read-only version/object-count request succeeded. SHA256 checks confirmed all five `.blend` files were unchanged. Temporary validation windows were closed without saving. This checks viewer startup, not artistic quality or gameplay.
 
 For later sessions: stop any automatic checkpoint while authoring/validating; `git pull --ff-only` only on a clean tree; `git lfs pull`; open the repo in Codex; start Godot or the appropriate Showcase/bridge with the commands above. Commit and push only coherent reviewed changes with a single Git writer. Do not run the Windows legacy launchers on Mac.
 

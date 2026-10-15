@@ -163,7 +163,11 @@ func _update_direction_support(delta: float) -> void:
 		_support_elapsed[side]+=delta
 		var yaw_gap:=0.
 		if foot_support[side]:yaw_gap=absf(wrapf(_foot_yaw(pose.basis.orthonormalized().get_rotation_quaternion())-_foot_yaw(foot_rotations[side]),-PI,PI))
-		if _source_support[side] and (height>.04 or rise>.008 or yaw_gap>deg_to_rad(35.) or _support_elapsed[side]>lerpf(.11,.16,gait_run_weight)):
+		var raw_center:=pose*Vector3(0,.675,0)
+		var reach:=Vector2(raw_center.x-foot_anchors[side].x,raw_center.z-foot_anchors[side].z).length()
+		# Release before exhausting the rigid joint's 140mm correction budget.
+		# Holding beyond reach would move an allegedly planted foot in a single tick.
+		if _source_support[side] and (height>.04 or rise>.008 or yaw_gap>deg_to_rad(35.) or (foot_support[side] and reach>.11) or _support_elapsed[side]>lerpf(.11,.16,gait_run_weight)):
 			_source_support[side]=false;_support_rearmed[side]=false;_release_phase[side]=direction_snapshot.phase;released[side]=true
 		if not _support_rearmed[side] and (height>.055 or direction_snapshot.phase-_release_phase[side]>.3):_support_rearmed[side]=true
 		if not _source_support[side] and _support_rearmed[side] and height<.025 and rise<.004:
@@ -212,6 +216,10 @@ func _contact_leg_rotation(side: int,bone: int,target: Vector3,original_q: Quate
 	if not move_requested or absf(turn_rate)>.5 or transition_age<.18:
 		rolling_used[side]=false;rolling_corner[side]=-1
 		return _hold_support_yaw(side,super._contact_leg_rotation(side,bone,target,original_q,delta))
+	# Select/anchor the corner from the final held-yaw orientation, not the raw
+	# source yaw that will be replaced below. Otherwise the tracked point slides.
+	var held_q:=_hold_support_yaw(side,original_q)
+	_set_world_leg_rotation(bone,held_q)
 	var transform:=skeleton.global_transform*skeleton.get_bone_global_pose(bone)
 	var index:=0;var lowest:=INF
 	for i in 4:
@@ -223,7 +231,7 @@ func _contact_leg_rotation(side: int,bone: int,target: Vector3,original_q: Quate
 	rolling_corner[side]=index;rolling_used[side]=true;rolling_raw[side]=_sole_world(bone)
 	foot_anchors[side]=Vector3(rolling_anchor[side].x+center.x-corner.x,0.,rolling_anchor[side].z+center.z-corner.z)
 	support_aim[side]=Quaternion.IDENTITY
-	return _hold_support_yaw(side,original_q)
+	return held_q
 func _hold_support_yaw(side: int,q: Quaternion) -> Quaternion:
 	var gap:=wrapf(_foot_yaw(q)-_foot_yaw(foot_rotations[side]),-PI,PI)
 	return (Quaternion(Vector3.UP,-gap)*q).normalized()

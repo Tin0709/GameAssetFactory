@@ -88,7 +88,7 @@ def blender_command(tool: Path, showcase: str) -> list[str]:
         if stream.read(80).startswith(b'version https://git-lfs.github.com/spec/'):
             raise ValueError(f'Not a restored Blender file: {source}. Run git lfs pull first.')
     command = [str(tool), '--factory-startup', '--disable-autoexec', str(source)]
-    if showcase in {'animation', 'weapon', 'mobs'}:
+    if showcase in {'player-library', 'animation', 'weapon', 'mobs'}:
         command += ['--python', str(ROOT / 'scripts/load_showcase_ui.py')]
     return command
 

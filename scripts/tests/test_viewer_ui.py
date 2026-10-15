@@ -22,6 +22,29 @@ class StartupRegion:
 
 
 class ViewerUIContractTests(unittest.TestCase):
+    def test_player_review_script_self_registers_only_once(self):
+        types = SimpleNamespace()
+        space = SimpleNamespace(show_region_ui=False)
+        area = SimpleNamespace(type='VIEW_3D', spaces=SimpleNamespace(active=space),
+                               regions=[StartupRegion()], tag_redraw=Mock())
+        bpy = SimpleNamespace(data=SimpleNamespace(filepath='player_animation_library_v1.blend'),
+                              types=types, app=SimpleNamespace(background=False),
+                              context=SimpleNamespace(window_manager=SimpleNamespace(windows=[
+                                  SimpleNamespace(screen=SimpleNamespace(areas=[area]))])))
+        library = Mock()
+        def self_register(name):
+            self.assertEqual(name, 'review_controls')
+            types.PLAYER_REVIEW_PT_library = object()
+            return library
+        with patch.dict(sys.modules, {'bpy': bpy}), patch.object(sys, 'path', list(sys.path)), \
+                patch('importlib.import_module', side_effect=self_register) as load:
+            runpy.run_path(str(BOOTSTRAP), run_name='__main__')
+            runpy.run_path(str(BOOTSTRAP), run_name='__main__')
+        load.assert_called_once()
+        library.register.assert_not_called()
+        library.loaded.assert_not_called()
+        self.assertTrue(space.show_region_ui)
+
     def test_three_saved_registries_load_without_refresh_or_category_write(self):
         for filename, panel in [
             ('Animation_Showcase.blend', 'GAF_PT_animation_library'),
