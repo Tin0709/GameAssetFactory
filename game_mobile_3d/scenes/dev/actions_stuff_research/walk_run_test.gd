@@ -14,7 +14,7 @@ func _ready() -> void:
 	player=PLAYER.instantiate();player.name="ResearchPlayer"
 	player.get_node("Visual").set_script(SOURCE_VISUAL)
 	player.get_node("Visual").authored_locomotion=true;player.get_node("Visual").generic_weapon_carry=true;player.get_node("Visual").long_gun_carry_v2=true;player.get_node("Visual").weapon_equipped=false
-	player.review_pace=1.;player.walk_speed=1.8;player.run_speed=5.031;player.acceleration=16.;player.deceleration=20.
+	player.review_pace=1.;player.walk_speed=1.8;player.run_speed=5.031;player.acceleration=32.;player.deceleration=28.
 	add_child(player)
 	camera=Camera3D.new();camera.name="GameplayCamera";camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=camera_size;camera.far=150.;add_child(camera);camera.make_current()
 	var layer:=CanvasLayer.new();add_child(layer)
@@ -44,9 +44,13 @@ func _process(_delta: float) -> void:
 	if player==null:return
 	_update_camera()
 	var visual=player.visual
+	# World-aligned WASD is preserved. Orbit supplies the engine-owned look query;
+	# the pack's body/strafe controller, not this camera, decides body orientation.
+	visual.look_yaw=PI+azimuth-.66
 	var state:="RUN" if visual.gait_run_weight>.98 else ("WALK ↔ RUN" if visual.gait_run_weight>.02 else "WALK")
 	if not visual.move_requested:state="SETTLING" if visual.settling else "IDLE"
-	hud.text="ACTIONS & STUFF · RESEARCH ONLY\n%s   |   %.2f m/s   |   %.2f cycles/s\nWASD Walk · Shift Run · R Reset\nRight-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency]
+	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
+	hud.text="ACTIONS & STUFF · LIVE DIRECTIONAL RESEARCH\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · R Reset\nRight-drag Look/Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.direction_snapshot.get("phase",0.),variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
 func _update_camera() -> void:
 	var target:=player.global_position+Vector3(0,.95,0)
 	camera.global_position=target+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*8.
