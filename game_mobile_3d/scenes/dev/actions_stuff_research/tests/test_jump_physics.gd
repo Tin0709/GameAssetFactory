@@ -42,6 +42,10 @@ func run() -> void:
 	if available:
 		actor.set_script(load(ACTOR_PATH))
 	actor.get_node("Visual").set_script(VISUAL)
+	actor.get_node("Visual").authored_locomotion = true
+	actor.get_node("Visual").generic_weapon_carry = true
+	actor.get_node("Visual").long_gun_carry_v2 = true
+	actor.get_node("Visual").weapon_equipped = false
 	actor.review_pace = 1.
 	actor.walk_speed = 1.8
 	actor.run_speed = 5.031
