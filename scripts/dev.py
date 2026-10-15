@@ -2,15 +2,24 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
 import platform
 import shutil
+import socket
 import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+VIEWERS = {
+    'asset-style-v2': 'blender/environment/studies/dungeons_ground_style_v2/dungeons_ground_style_v2.blend',
+    'player-library': 'blender/animation/reviews/player_animation_library_v1/player_animation_library_v1.blend',
+    'animation': 'blender/animation/showcase/Animation_Showcase.blend',
+    'weapon': 'blender/weapons/showcase/Weapon_Showcase.blend',
+    'mobs': 'blender/animation/showcase/Mobs_Animation_Library.blend',
+}
 SCENES = {
     'snappy': 'res://scenes/dev/SnappyLocomotionFastJumpTest.tscn',
     'expressive': 'res://scenes/dev/ExpressiveLocomotionTest.tscn',
@@ -68,10 +77,99 @@ def godot_command(tool: Path, scene: str | None, editor: bool, headless: bool) -
 
 
 def blender_command(tool: Path, showcase: str) -> list[str]:
-    relative = ('blender/animation/showcase/Animation_Showcase.blend' if showcase == 'animation'
-                else 'blender/weapons/showcase/Weapon_Showcase.blend')
-    return [str(tool), '--factory-startup', '--disable-autoexec', str(ROOT / relative),
-            '--python', str(ROOT / 'scripts/load_showcase_ui.py')]
+    if showcase not in VIEWERS:
+        raise ValueError(f'Unknown viewer: {showcase}')
+    source = ROOT / VIEWERS[showcase]
+    if not source.is_file():
+        raise FileNotFoundError(source)
+    with source.open('rb') as stream:
+        # Blender also supports compressed files (zstd/gzip), without BLENDER
+        # at byte zero. Reject LFS pointers, not valid compressed viewers.
+        if stream.read(80).startswith(b'version https://git-lfs.github.com/spec/'):
+            raise ValueError(f'Not a restored Blender file: {source}. Run git lfs pull first.')
+    command = [str(tool), '--factory-startup', '--disable-autoexec', str(source)]
+    if showcase in {'animation', 'weapon', 'mobs'}:
+        command += ['--python', str(ROOT / 'scripts/load_showcase_ui.py')]
+    return command
+
+
+def viewer_cache() -> Path:
+    base = (Path.home() / 'Library/Caches' if platform.system() == 'Darwin'
+            else Path(os.environ.get('XDG_CACHE_HOME', str(Path.home() / '.cache'))))
+    return base / 'GameAssetFactory/viewers' / hashlib.sha256(str(ROOT).encode()).hexdigest()[:12]
+
+
+def existing_viewer_pid(tool: str, source: Path) -> int | None:
+    """Recognize exact viewer paths, including sessions from the earlier launcher."""
+    if os.name == 'nt':
+        return None
+    listing = subprocess.check_output(['ps', '-axo', 'pid=,command='], text=True, timeout=2)
+    for line in listing.splitlines():
+        fields = line.strip().split(None, 1)
+        if len(fields) != 2 or not fields[1].startswith(tool + ' '):
+            continue
+        command = fields[1]
+        prefix, found, suffix = command.partition(str(source))
+        if found and prefix.endswith(' ') and (not suffix or suffix.startswith(' --')):
+            return int(fields[0])
+    return None
+
+
+def check_mcp_port() -> None:
+    host = os.environ.get('BLENDER_MCP_HOST', 'localhost')
+    port = int(os.environ.get('BLENDER_MCP_PORT', '9876'))
+    if host not in {'localhost', '127.0.0.1'} or not 1 <= port <= 65535:
+        raise ValueError('MCP requires localhost/127.0.0.1 and a port from 1 to 65535.')
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+            probe.bind(('127.0.0.1', port))
+    except OSError as error:
+        raise ValueError(f'MCP port {port} is already in use or unavailable. Use the existing bridge '
+                         'or set BLENDER_MCP_PORT to a free port and match the MCP client.') from error
+
+
+def activate_viewer(pid: int) -> None:
+    """Bring the existing macOS process forward without UI scripting permissions."""
+    if platform.system() != 'Darwin':
+        return
+    script = ('ObjC.import("AppKit"); '
+              f'$.NSRunningApplication.runningApplicationWithProcessIdentifier({pid})'
+              '.activateWithOptions($.NSApplicationActivateIgnoringOtherApps);')
+    try:
+        subprocess.run(['/usr/bin/osascript', '-l', 'JavaScript', '-e', script],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=2)
+    except (OSError, subprocess.TimeoutExpired):
+        pass  # Activation failure must never lead to a duplicate process.
+
+
+def launch_blender(command: list[str], viewer: str, *, bridge: bool) -> int:
+    cache = viewer_cache()
+    cache.mkdir(parents=True, exist_ok=True)
+    # Serialize only the short launch operation, never the Blender session.
+    with (cache / 'launch.lock').open('a') as lock:
+        if os.name != 'nt':
+            import fcntl
+            fcntl.flock(lock, fcntl.LOCK_EX)
+        pid = existing_viewer_pid(command[0], ROOT / VIEWERS[viewer])
+        if bridge:
+            check_mcp_port()
+            addon = Path(os.environ.get('BLENDER_MCP_ADDON', str(Path.home() /
+                         'Library/Application Support/Blender/5.2/extensions/user_default/mcp'))).expanduser()
+            if platform.system() == 'Darwin' and not (addon / 'mcp_to_blender_server.py').is_file():
+                raise FileNotFoundError('Install Blender Lab MCP or set BLENDER_MCP_ADDON to its add-on folder.')
+            if pid:
+                raise ValueError(f'Viewer already open (PID {pid}). Close it before relaunching with MCP; '
+                                 'an existing bridge can be used directly.')
+        elif pid:
+            activate_viewer(pid)
+            print(f'{viewer} is already open (PID {pid}); no additional Blender started.')
+            return 0
+        log = cache / f'{viewer}.log'
+        with log.open('ab', buffering=0) as output:
+            process = subprocess.Popen(command, cwd=ROOT, stdin=subprocess.DEVNULL,
+                                       stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
+        print(f'Opened {viewer} (PID {process.pid}). Terminal is free. Startup log: {log}')
+    return 0
 
 
 def main(argv=None) -> int:
@@ -84,7 +182,10 @@ def main(argv=None) -> int:
     game.add_argument('--dry-run', action='store_true')
     for mode in ['blender', 'bridge']:
         item = sub.add_parser(mode)
-        item.add_argument('--blender-bin'); item.add_argument('--showcase', choices=['animation', 'weapon'], default='animation')
+        item.add_argument('--blender-bin')
+        viewers = item.add_mutually_exclusive_group()
+        viewers.add_argument('--viewer', choices=list(VIEWERS), default=None)
+        viewers.add_argument('--showcase', choices=['animation', 'weapon'], help='Legacy alias for --viewer')
         item.add_argument('--dry-run', action='store_true')
     args = parser.parse_args(argv)
     try:
@@ -97,13 +198,16 @@ def main(argv=None) -> int:
         if args.mode == 'godot':
             command = godot_command(find_tool('godot', args.godot_bin), args.scene, args.editor, args.headless)
         else:
-            command = blender_command(find_tool('blender', args.blender_bin), args.showcase)
+            viewer = args.viewer or args.showcase or 'animation'
+            command = blender_command(find_tool('blender', args.blender_bin), viewer)
             if args.mode == 'bridge':
                 command += ['--python', str(ROOT / 'scripts/start_blender_mcp.py')]
         if args.dry_run:
             print(json.dumps(command, indent=2)); return 0
+        if args.mode in {'blender', 'bridge'}:
+            return launch_blender(command, viewer, bridge=args.mode == 'bridge')
         return subprocess.call(command, cwd=ROOT)
-    except (FileNotFoundError, ValueError) as error:
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
         parser.exit(2, f'{error}\n')
 
 

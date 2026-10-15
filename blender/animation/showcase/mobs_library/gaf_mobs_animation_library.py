@@ -353,11 +353,8 @@ def loaded(_):
                     for area in window.screen.areas:
                         if area.type=='VIEW_3D':
                             area.spaces.active.show_region_ui=True
-                            if not bpy.app.background:
-                                for region in area.regions:
-                                    if region.type=='UI':
-                                        try:region.active_panel_category='Mobs Animation Library'
-                                        except AttributeError:pass
+                            # The registered tab is available in the sidebar;
+                            # its runtime category may not exist yet at load.
                             area.tag_redraw()
             except Exception as exc:scene.mobs_error=str(exc)
 

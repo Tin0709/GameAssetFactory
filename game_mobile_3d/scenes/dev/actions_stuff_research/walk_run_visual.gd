@@ -64,6 +64,27 @@ func _ready() -> void:
 	direction_snapshot=direction_controller.step({"position":Vector3.ZERO,"movement_direction":Vector3.ZERO,"head_y_rotation":-rad_to_deg(look_yaw),"body_y_rotation":-rad_to_deg(look_yaw)},1./60.)
 	entity_lifetime=direction_snapshot.life
 	_cache_direction_poses()
+	_initialize_source_contacts()
+
+func _initialize_source_contacts() -> void:
+	# The inherited setup predates the source engine yaw/pose. Rebase before the
+	# first visible frame, so old Idle world anchors cannot pull feet across 180°.
+	position.y=direction_sampler.height_offset(direction_snapshot)
+	for i in skeleton.get_bone_count():
+		var pose: Transform3D=direction_poses[i]
+		var q:=pose.basis.orthonormalized().get_rotation_quaternion().normalized()
+		skeleton.set_bone_pose_position(i,pose.origin);skeleton.set_bone_pose_rotation(i,q);skeleton.set_bone_pose_scale(i,pose.basis.get_scale())
+		_p[i]=pose.origin;_q[i]=q;_final_p[i]=pose.origin;_final_q[i]=q
+		_vp[i]=Vector3.ZERO;_vq[i]=Vector3.ZERO;_final_vp[i]=Vector3.ZERO;_final_vq[i]=Vector3.ZERO
+		_offset_p[i]=Vector3.ZERO;_offset_q[i]=Vector3.ZERO;_offset_vp[i]=Vector3.ZERO;_offset_vq[i]=Vector3.ZERO
+	skeleton.force_update_all_bone_transforms()
+	for side in 2:
+		var bone: int=[leg_left,leg_right][side];var sole:=_sole_world(bone);var q:=_leg_world_rotation(bone)
+		foot_anchors[side]=Vector3(sole.x,0,sole.z);foot_rotations[side]=q
+		replant_from[side]=sole;replant_q[side]=q;last_sole[side]=sole
+		_source_sole_previous[side]=sole.y
+	foot_support=[false,false];_source_support=[true,true];pose_dirty=false;_scale_dirty=false
+	transition_age=10.;contact_drift=0.;maximum_correction=0.;correction_clamps=0
 func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> void:
 	if direction_controller==null:return
 	_pending_physics_delta+=delta
@@ -98,7 +119,8 @@ func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> v
 	var body_yaw: float=-deg_to_rad(direction_snapshot.vars["v.nthjcy"])
 	turn_rate=wrapf(body_yaw-_previous_body_yaw,-PI,PI)/maxf(delta,.00001);_previous_body_yaw=body_yaw
 	_cache_direction_poses()
-	position.y=direction_sampler.height_offset(direction_snapshot) if move_requested else 0.
+	# Keep the source height field through release; its activation already decays.
+	position.y=direction_sampler.height_offset(direction_snapshot)
 	_update_direction_support(delta)
 	if settling:settle_time=minf(settle_time+delta,REPLANT_SECONDS)
 	elif not move_requested:attention_time=fposmod(attention_time+delta,8.)
@@ -148,13 +170,14 @@ func _support(side: int) -> bool:
 	return _source_support[side] and not released[side]
 
 func _target_pose(bone: int,ahead: float=0.) -> Transform3D:
-	if direction_sampler==null or not move_requested:return super._target_pose(bone,ahead)
+	# Source root compensation must remain active at rest when engine look turns.
+	if direction_sampler==null:return super._target_pose(bone,ahead)
 	var poses: Array=direction_future_poses if ahead>0. else direction_poses
 	var pose: Transform3D=poses[bone]
 	return Transform3D(Basis(pose.basis.orthonormalized().get_rotation_quaternion()),pose.origin)
 
 func _target_leg_scale(bone: int,ahead: float=0.) -> float:
-	if direction_sampler==null or not move_requested:return 1.
+	if direction_sampler==null:return 1.
 	var poses: Array=direction_future_poses if ahead>0. else direction_poses
 	return Transform3D(poses[bone]).basis.get_scale().y
 func _apply_source_scales(delta: float) -> void:
@@ -226,7 +249,6 @@ func _evaluate(delta: float) -> void:
 	if settling and settle_time>=REPLANT_SECONDS:settling=false;foot_support=[true,true]
 func reset_contacts() -> void:
 	_source_support=[false,false];_support_rearmed=[true,true];_source_sole_previous=[0.,0.];_support_elapsed=[0.,0.]
-	position.y=0.
 	move_requested=false;settling=false;gait_run_weight=0.;gait_frequency=0.;pose_dirty=true;_scale_dirty=true
 	rolling_corner=[-1,-1];rolling_used=[false,false];rolling_offset=[Vector3.ZERO,Vector3.ZERO];release_offset=[Vector3.ZERO,Vector3.ZERO]
 	foot_support=[false,false];support_aim=[Quaternion.IDENTITY,Quaternion.IDENTITY];released=[false,false]

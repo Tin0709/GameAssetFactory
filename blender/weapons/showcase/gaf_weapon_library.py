@@ -118,8 +118,7 @@ def show_library_panel():
   for area in window.screen.areas:
    if area.type!='VIEW_3D':continue
    area.spaces.active.show_region_ui=True
-   for region in area.regions:
-    if region.type=='UI':region.active_panel_category='Weapon Library'
+   # Category lists are created by drawing; use the registered sidebar tab.
    area.tag_redraw()
 if __name__=='__main__':
  register()

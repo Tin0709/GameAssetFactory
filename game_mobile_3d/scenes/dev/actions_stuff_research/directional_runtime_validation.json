@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "date": "2026-10-15",
+  "existing_scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+  "blender_showcase_and_approved_source_files_exact": true,
+  "worldmap_project_and_unrelated_godot_exact": true,
+  "original_imported_walk_run_data_exact": true,
+  "baseline_files": 7356,
+  "protected_paths": [
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/animation_manifest.json",
+    "blender/animation/showcase/gaf_animation_library.py",
+    "game_mobile_3d/project.godot",
+    "game_mobile_3d/scenes/WorldMap.tscn",
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_library.res",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_provenance.json",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/run_source_profile.json",
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_walk_v001/walk_actions_stuff_review.blend",
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_directional_v001/directional_input_review.blend",
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_run_v001/run_actions_stuff_review.blend"
+  ],
+  "concurrent_unrelated_blender_edits_left_untouched": [
+    "blender/weapons/showcase/gaf_weapon_library.py",
+    "blender/animation/reviews/player_animation_library_v1/player_animation_library_v1.blend1",
+    "blender/animation/reviews/player_animation_library_v1/player_animation_library_v1.blend",
+    "blender/animation/showcase/mobs_library/gaf_mobs_animation_library.py",
+    "blender/animation/showcase/mobs_library/Open_Mobs_Animation_Library.command"
+  ],
+  "runtime_tests": {
+    "final_test_gameplay30.log": "GAMEPLAY_TEST {\"contact_samples\":4,\"correction_clamps\":0,\"failures\":[],\"fps\":30.0,\"max_leg_step_degrees\":23.9313555591549,\"max_scale_y\":1.0694717168808,\"maximum_correction\":0.103740647435188,\"minimum_foot_y\":-0.0000000596046447753906,\"run_contact_speed\":0.0192043965216726,\"steady_run_clamps\":0}",
+    "final_test_direction_gameplay60.log": "DIRECTION_GAMEPLAY {\"average_pose_and_controller_ms\":2.89616041666667,\"failures\":[],\"final_phase\":27.8826695170784,\"fps\":60,\"max_world_leg_step_deg\":39.1774050036812,\"maximum_scale\":1.06850564479828,\"minimum_foot_y\":-0.0000000596046447753906,\"side_and_back_used\":true,\"support_samples\":54}",
+    "final_test_direction_sampler30.log": "DIRECTION_SAMPLER_TEST {\"failures\":[],\"max_basis\":0.0000003698370960592,\"max_channel\":0.00000764428114052862,\"max_height\":0.00000000273938045858291,\"max_position\":0.000000388614921575936,\"run_parity\":0.0000000842936955791629,\"samples\":275}",
+    "final_test_gameplay60.log": "GAMEPLAY_TEST {\"contact_samples\":28,\"correction_clamps\":0,\"failures\":[],\"fps\":60.0,\"max_leg_step_degrees\":11.9524955144793,\"max_scale_y\":1.06991696357727,\"maximum_correction\":0.133501425385475,\"minimum_foot_y\":-0.0000000596046447753906,\"run_contact_speed\":0.0210052169859409,\"steady_run_clamps\":0}",
+    "final_test_direction_controller30.log": "DIRECTION_CONTROLLER_TEST {\"comparisons\":130664,\"dense_source_max_absolute_error\":0.000000000000028421709430404,\"failures\":[],\"max_absolute_error\":0.00000000149011611383365,\"steps\":1350,\"traces\":10}",
+    "final_test_interruptions30.log": "INTERRUPTION_TEST {\"cases\":44,\"clamps\":28,\"maxstep\":23.2669386623582,\"min_y\":-0.0000000596046447753906,\"passed\":true}",
+    "final_test_source30.log": "SOURCE_TEST {\"failures\":[],\"imported_run_position_error\":0.0000205721735255793,\"imported_run_quaternion_error\":0.000000119209289550781,\"imported_run_scale_error\":0.00000810973688203376,\"max_p\":0.000000776157776272157,\"max_q\":0.000000119209289550781,\"max_s\":0.00000049868822316057,\"poses\":1271}",
+    "final_test_direction_gameplay30.log": "DIRECTION_GAMEPLAY {\"average_pose_and_controller_ms\":3.72538611111111,\"failures\":[],\"final_phase\":27.9190440643991,\"fps\":30,\"max_world_leg_step_deg\":46.5448568538072,\"maximum_scale\":1.06470429897308,\"minimum_foot_y\":-0.0000000596046447753906,\"side_and_back_used\":true,\"support_samples\":15}",
+    "final_test_support_exchange30.log": "SUPPORT_EXCHANGE true"
+  },
+  "cold_idle_stop_regressions": "DIRECTION_CONTINUITY {\"failures\":[],\"idle_foot_drift_m\":0.0000000596047158296642,\"max_stop_height_step_m\":0.0100746788084507}",
+  "native_live_capture": {
+    "actual_input_actions": true,
+    "captured_frames": 420,
+    "driver": "metal",
+    "minimum_foot_y": -5.96046447753906e-08,
+    "phase_resets": 0,
+    "physics_elapsed": 13.9666666666669,
+    "renderer": "mobile",
+    "source_phase": 14.662884707,
+    "source_state": "onccai"
+  },
+  "independent_review": "No remaining Critical or Important findings; cold start, Idle orbit and stop independently retested",
+  "editor_current_scene_verified": true,
+  "research_release_guard_enabled": true
+}
