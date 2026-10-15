@@ -1,0 +1,38 @@
+{
+  "review_type": "read_only_source_bridge_review",
+  "findings": [],
+  "files": {
+    "game_mobile_3d/scenes/dev/actions_stuff_research/idle_locomotion_visual.gd": "6b9116e5e6eec54ad391327036e8c7449f489a977cb17b0f4ee5d7ae47ce1973",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd": "c91f1c9f5f79e3ba3562539e876480d389641a1e7206256b3168181795da4c1d",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_idle_controller.gd": "13b9eb61838f2964815a64cb7b81009c1a896b2d16c9d56fc0141c872a0cb3f6",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_idle_sampler.gd": "cc5adc567e28a31bbf98957e615715b2fd74e694f17a97ff248cdeaa86bbd03d"
+  },
+  "conclusions": {
+    "phase": "Accepted ground/Jump runtimes advance once through existing bridge; private Idle controller receives copied ground snapshots and240Hz own clocks. No source phase or lifetime reset on activation/exit.",
+    "contact": "_idle_driving defers inherited support evaluation until final composed ground/landing pose; dynamic override chain yields one support update per tick. Existing contact solver remains authoritative.",
+    "prs": "Composite adds only approved tculwn onto already evaluated accepted DirectionSampler channels; source bob/root/look/holding are not evaluated twice. Existing unarmed flags0/0 preserved.",
+    "input": "Base actor reads current stick and moves physics before bridge; requested input directly forces source exit even blocked. One input tick interrupt verified by30/60 gameplay logs.",
+    "jump": "Jump/landing own final poses while jump_active; Idle still advances ineligible private state without being composed. No flight contact solver substitution.",
+    "future_cache": "Active Idle updates current and future caches using own nonmutating clock/fade probe. On exit, cached future is explicitly rebuilt with pose_dirty; Jump maintains its own cache precedence.",
+    "camera": "Exact critically damped vertical spring response8/s,1.4m upward and1.1m downward visibility zone. Observed physical peaks1.310902m@30Hz and1.255879m@60Hz fit upward zone; normal jump does not drive vertical anchor. Horizontal response12/s,8m distance, original orbit/zoom bounds preserved.",
+    "git": "Review ran read-only Git status/ls-files commands. Selected bridge files tracked at stage0; no tracking/index changes made. Working tree status was empty at review start."
+  },
+  "fresh_checks": {
+    "camera_comfort": "exit0;30/60Hz normal jump camera vertical range0 and max vertical step0",
+    "idle_source": "exit0;8286 samples542poses119clip samples; no failures"
+  },
+  "existing_evidence_reviewed": [
+    "idle_gameplay_30.log",
+    "idle_gameplay_60.log",
+    "jump_regression_30.log",
+    "jump_regression_60.log",
+    "arms_regression.log",
+    "facing_regression.log"
+  ],
+  "limitations": [
+    "Camera synthetic trajectory test peaks1.256m; actual30Hz jump coverage comes from independent physics test logs plus direct1.4m-zone condition review.",
+    "Ground contact adjustments remain inherited scene adapters; source sampler parity verifies authored PRS before these adjustments."
+  ],
+  "source_edits_made": false,
+  "tracking_edits_made": false
+}
