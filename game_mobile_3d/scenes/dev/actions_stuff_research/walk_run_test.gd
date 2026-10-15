@@ -1,7 +1,8 @@
 extends Node3D
 ## Research scene inside the existing game. F6 here; F5 remains WorldMap.
 const PLAYER=preload("res://scenes/dev/ExpressiveLocomotionPlayer.tscn")
-const SOURCE_VISUAL=preload("res://scenes/dev/actions_stuff_research/walk_run_visual.gd")
+const SOURCE_VISUAL=preload("res://scenes/dev/actions_stuff_research/jump_locomotion_visual.gd")
+const SOURCE_ACTOR=preload("res://scenes/dev/actions_stuff_research/source_jump_actor.gd")
 var player: CharacterBody3D
 var camera: Camera3D
 var hud: Label
@@ -12,6 +13,7 @@ var orbiting:=false
 func _ready() -> void:
 	_build_environment()
 	player=PLAYER.instantiate();player.name="ResearchPlayer"
+	player.set_script(SOURCE_ACTOR)
 	player.get_node("Visual").set_script(SOURCE_VISUAL)
 	player.get_node("Visual").authored_locomotion=true;player.get_node("Visual").generic_weapon_carry=true;player.get_node("Visual").long_gun_carry_v2=true;player.get_node("Visual").weapon_equipped=false
 	player.review_pace=1.;player.walk_speed=1.8;player.run_speed=5.031;player.acceleration=32.;player.deceleration=28.
@@ -47,8 +49,10 @@ func _process(_delta: float) -> void:
 	# Camera orbit is observational; locomotion owns the character's heading.
 	var state:="RUN" if visual.gait_run_weight>.98 else ("WALK ↔ RUN" if visual.gait_run_weight>.02 else "WALK")
 	if not visual.move_requested:state="SETTLING" if visual.settling else "IDLE"
+	if visual.jump_active:
+		state="LANDING" if visual.jump_grounded else ("TAKEOFF / RISE" if player.velocity.y>0 else "AIRBORNE / FALL")
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
-	hud.text="ACTIONS & STUFF · LIVE DIRECTIONAL RESEARCH\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · R Reset\nRight-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.direction_snapshot.get("phase",0.),variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
+	hud.text="ACTIONS & STUFF · LOCOMOTION RESEARCH\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nRight-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
 func _update_camera() -> void:
 	var target:=player.global_position+Vector3(0,.95,0)
 	camera.global_position=target+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*8.
@@ -62,4 +66,4 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and orbiting:
 		azimuth-=event.relative.x*.006;elevation=clampf(elevation+event.relative.y*.004,.15,.75)
 func reset_player() -> void:
-	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.visual.reset_contacts()
+	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.reset_jump_motion();player.visual.reset_contacts()
