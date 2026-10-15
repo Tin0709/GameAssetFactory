@@ -1,0 +1,118 @@
+{
+  "source_sha256": "a2f66226361b8173f81e6737f65c93da612194febdc8207e4210a5a8f6acceb9",
+  "program_sha256": "20e46cbb98c344265c31a890b0b9ea1f3bf1f965f8611c2e9683a79fa2764cdc",
+  "controller_states": {
+    "veywgp": [
+      "knxfvl",
+      "onccai",
+      "run",
+      "zhbjho"
+    ],
+    "psowex": [
+      "default",
+      "ptvsjb",
+      "stop",
+      "zhbjho"
+    ],
+    "pyhwuc": [
+      "cfpejq",
+      "default",
+      "yytrhz",
+      "zhbjho"
+    ],
+    "ngeixo": [
+      "default",
+      "fmzeml",
+      "jump",
+      "seridw",
+      "ypqtmb",
+      "yutray"
+    ],
+    "muiqdc": [
+      "default",
+      "nqtrjo"
+    ]
+  },
+  "layer_aliases": [
+    "bob",
+    "fall",
+    "fly",
+    "hnhukj",
+    "holding",
+    "hxfxxu",
+    "jump",
+    "kzuqni",
+    "look_at_target",
+    "move",
+    "move_left",
+    "move_right",
+    "oprmcp",
+    "pgnnhd",
+    "pkdlkc",
+    "pvgbyg",
+    "qbfoza",
+    "rnmred",
+    "sjvffv",
+    "srluww",
+    "txkksi",
+    "vwyhwm",
+    "walk",
+    "wjmfbh",
+    "wxzmsp",
+    "xahrzd",
+    "xfltzh",
+    "xvsgam",
+    "ydsari"
+  ],
+  "scale_ranges": {
+    "root": [
+      0.9505291633792,
+      1.0494708366208
+    ],
+    "rightleg": [
+      1.0,
+      1.2484849716987962
+    ],
+    "leftleg": [
+      1.0,
+      1.1978666666666666
+    ]
+  },
+  "head_source_position_range": [
+    -1.0337924213250398,
+    0.29284631998780736
+  ],
+  "timeline_events_at_render_samples": 68,
+  "source_parity": {
+    "clip_samples": 326,
+    "failures": [],
+    "max_basis": 4.77877392768278e-07,
+    "max_channel": 3.05919929814991e-05,
+    "max_clock": 5.32907051820075e-15,
+    "max_position": 3.7070381608828e-07,
+    "max_variable": 1.06581410364015e-13,
+    "phase_overrides": [
+      0.0,
+      0.05,
+      0.55
+    ],
+    "samples": 2160,
+    "states": [
+      "default",
+      "jump",
+      "ypqtmb",
+      "fmzeml",
+      "seridw",
+      "yutray"
+    ]
+  },
+  "ground_files_modified": false,
+  "adapters": [
+    "positive_only_unnormalized_weights",
+    "uniform_catmull_duplicate_endpoints",
+    "linear_outgoing_fades",
+    "one_transition_per_controller_per_step",
+    "outgoing_clocks_continue",
+    "future_probe_freezes_states_weights_and_smoothed_vars"
+  ]
+}

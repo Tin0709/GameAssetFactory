@@ -1,0 +1,210 @@
+{
+  "30": {
+    "failures": [],
+    "fps": 30,
+    "trials": [
+      {
+        "air_frames": 22,
+        "landings": 1,
+        "leg_scale_max": 1.2431104183197,
+        "max_leg_step_deg": 3.5918321330828,
+        "min_foot_y": -5.96046447753906e-08,
+        "mode": "stand",
+        "peak_m": 1.31080627441406,
+        "root_scale_min": 0.960937082767487,
+        "source_states": [
+          "ngeixo:jump",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:default",
+          "pyhwuc:yytrhz",
+          "pyhwuc:default"
+        ]
+      },
+      {
+        "air_frames": 22,
+        "landings": 1,
+        "leg_scale_max": 1.24311065673828,
+        "max_leg_step_deg": 21.2279718083058,
+        "min_foot_y": 0.0,
+        "mode": "walk",
+        "peak_m": 1.31090176105499,
+        "root_scale_min": 0.960048735141754,
+        "source_states": [
+          "ngeixo:jump",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:default",
+          "pyhwuc:cfpejq",
+          "pyhwuc:default"
+        ]
+      },
+      {
+        "air_frames": 22,
+        "landings": 1,
+        "leg_scale_max": 1.07065641880035,
+        "max_leg_step_deg": 27.0626609067891,
+        "min_foot_y": -5.96046447753906e-08,
+        "mode": "run",
+        "peak_m": 1.31087696552277,
+        "root_scale_min": 0.960048735141754,
+        "source_states": [
+          "ngeixo:seridw",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:yutray",
+          "pyhwuc:cfpejq",
+          "ngeixo:default",
+          "pyhwuc:default"
+        ]
+      },
+      {
+        "air_frames": 22,
+        "landings": 1,
+        "leg_scale_max": 1.07084274291992,
+        "max_leg_step_deg": 27.6815392248421,
+        "min_foot_y": -5.96046447753906e-08,
+        "mode": "reverse",
+        "peak_m": 1.31088101863861,
+        "root_scale_min": 0.960048735141754,
+        "source_states": [
+          "ngeixo:ypqtmb",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:fmzeml",
+          "pyhwuc:cfpejq",
+          "ngeixo:default",
+          "pyhwuc:default"
+        ]
+      },
+      {
+        "air_frames": 22,
+        "landings": 1,
+        "leg_scale_max": 1.01638007164001,
+        "max_leg_step_deg": 19.5305041674702,
+        "min_foot_y": -5.96046447753906e-08,
+        "mode": "stop_air",
+        "peak_m": 1.31088089942932,
+        "root_scale_min": 0.960937082767487,
+        "source_states": [
+          "ngeixo:seridw",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:yutray",
+          "pyhwuc:yytrhz",
+          "ngeixo:default",
+          "pyhwuc:default"
+        ]
+      }
+    ]
+  },
+  "60": {
+    "failures": [],
+    "fps": 60,
+    "trials": [
+      {
+        "air_frames": 44,
+        "landings": 1,
+        "leg_scale_max": 1.2484849691391,
+        "max_leg_step_deg": 1.76103098207727,
+        "min_foot_y": -5.96046447753906e-08,
+        "mode": "stand",
+        "peak_m": 1.25580561161041,
+        "root_scale_min": 0.950529158115387,
+        "source_states": [
+          "ngeixo:jump",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:default",
+          "pyhwuc:yytrhz",
+          "pyhwuc:default"
+        ]
+      },
+      {
+        "air_frames": 44,
+        "landings": 1,
+        "leg_scale_max": 1.24848484992981,
+        "max_leg_step_deg": 10.6482102745365,
+        "min_foot_y": -5.96046447753906e-08,
+        "mode": "walk",
+        "peak_m": 1.25529158115387,
+        "root_scale_min": 0.950529158115387,
+        "source_states": [
+          "ngeixo:jump",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:default",
+          "pyhwuc:cfpejq",
+          "pyhwuc:default"
+        ]
+      },
+      {
+        "air_frames": 44,
+        "landings": 1,
+        "leg_scale_max": 1.06877708435059,
+        "max_leg_step_deg": 14.1708188672681,
+        "min_foot_y": -5.96046447753906e-08,
+        "mode": "run",
+        "peak_m": 1.25587940216064,
+        "root_scale_min": 0.960048735141754,
+        "source_states": [
+          "ngeixo:seridw",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:yutray",
+          "pyhwuc:cfpejq",
+          "ngeixo:default",
+          "pyhwuc:default"
+        ]
+      },
+      {
+        "air_frames": 44,
+        "landings": 1,
+        "leg_scale_max": 1.06895184516907,
+        "max_leg_step_deg": 13.4614746936583,
+        "min_foot_y": -5.96046447753906e-08,
+        "mode": "reverse",
+        "peak_m": 1.25587940216064,
+        "root_scale_min": 0.960048735141754,
+        "source_states": [
+          "ngeixo:ypqtmb",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:fmzeml",
+          "pyhwuc:cfpejq",
+          "ngeixo:default",
+          "pyhwuc:default"
+        ]
+      },
+      {
+        "air_frames": 44,
+        "landings": 1,
+        "leg_scale_max": 1.01569426059723,
+        "max_leg_step_deg": 9.26055830690546,
+        "min_foot_y": -5.96046447753906e-08,
+        "mode": "stop_air",
+        "peak_m": 1.25587940216064,
+        "root_scale_min": 0.959999978542328,
+        "source_states": [
+          "ngeixo:seridw",
+          "pyhwuc:zhbjho",
+          "muiqdc:default",
+          "muiqdc:nqtrjo",
+          "ngeixo:yutray",
+          "pyhwuc:yytrhz",
+          "ngeixo:default",
+          "pyhwuc:default"
+        ]
+      }
+    ]
+  }
+}

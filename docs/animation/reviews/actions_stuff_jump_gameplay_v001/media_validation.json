@@ -1,0 +1,27 @@
+{
+  "videos": [
+    {
+      "fps": 30,
+      "frames": 340,
+      "duration_seconds": 11.333333333333334,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "d4227b4c5ac9cded137b075c2598901295f384485b6331db4a604716e51c0bb6"
+    },
+    {
+      "fps": 60,
+      "frames": 680,
+      "duration_seconds": 11.333333333333334,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "sha256": "7b49d39fc428230b2184b508931b7f8e285c01a3b1ace4d143a39836e01e0f50"
+    }
+  ],
+  "original_speed": true,
+  "factory_startup": true,
+  "blend_saved": false
+}

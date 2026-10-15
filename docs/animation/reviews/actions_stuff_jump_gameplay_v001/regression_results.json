@@ -1,0 +1,74 @@
+[
+  {
+    "test": "test_unarmed_arms",
+    "fps": null,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_unarmed_arms_fixtures_final.log"
+  },
+  {
+    "test": "test_direction_sampler",
+    "fps": null,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_direction_sampler_fixtures_final.log"
+  },
+  {
+    "test": "test_interruptions",
+    "fps": null,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_interruptions_fixtures_final.log"
+  },
+  {
+    "test": "test_direction_facing",
+    "fps": 30,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_direction_facing_30_final.log"
+  },
+  {
+    "test": "test_direction_facing",
+    "fps": 60,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_direction_facing_60_final.log"
+  },
+  {
+    "test": "test_direction_continuity",
+    "fps": null,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_direction_continuity_fixtures_final.log"
+  },
+  {
+    "test": "test_gameplay",
+    "fps": 30,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_gameplay_30_final.log"
+  },
+  {
+    "test": "test_gameplay",
+    "fps": 60,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_gameplay_60_final.log"
+  },
+  {
+    "test": "test_direction_gameplay",
+    "fps": 30,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_direction_gameplay_30_final.log"
+  },
+  {
+    "test": "test_direction_gameplay",
+    "fps": 60,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_direction_gameplay_60_final.log"
+  },
+  {
+    "test": "test_jump_physics",
+    "fps": 30,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_jump_physics_30_final.log"
+  },
+  {
+    "test": "test_jump_physics",
+    "fps": 60,
+    "exit": 0,
+    "log": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/test_jump_physics_60_final.log"
+  }
+]
