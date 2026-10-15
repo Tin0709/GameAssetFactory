@@ -1,7 +1,9 @@
 #!/bin/sh
 # GameAssetFactory large-file guard v1
 repo_root=$(git rev-parse --show-toplevel) || exit 2
-if command -v python3 >/dev/null 2>&1; then
+if command -v py >/dev/null 2>&1; then
+    exec py -3 "$repo_root/scripts/git_large_file_guard.py" --repo "$repo_root"
+elif command -v python3 >/dev/null 2>&1; then
     exec python3 "$repo_root/scripts/git_large_file_guard.py" --repo "$repo_root"
 elif command -v python >/dev/null 2>&1; then
     exec python "$repo_root/scripts/git_large_file_guard.py" --repo "$repo_root"

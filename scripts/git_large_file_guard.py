@@ -35,7 +35,8 @@ def inspect_staged(repo):
             continue
         metadata, path = record.split(b"\t", 1)
         mode, oid, stage = metadata.split()
-        if path in changed and stage == b"0" and mode != b"160000":
+        # Git does not apply clean filters to symlink target blobs or gitlinks.
+        if path in changed and stage == b"0" and mode not in {b"120000", b"160000"}:
             entries.append((path, oid))
     if not entries:
         return []

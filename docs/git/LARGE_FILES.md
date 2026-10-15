@@ -16,7 +16,8 @@ python3 scripts/git_large_file_guard.py
 
 The guard reads staged **Git blobs**, not the potentially much larger smudged
 working files. It checks added, changed and renamed destinations; deletions and
-unchanged historical files do not block unrelated commits. Filenames use NUL
+unchanged historical files do not block unrelated commits. Symlinks and gitlinks
+are skipped because Git does not clean-filter their contents. Filenames use NUL
 delimiters, including spaces, tabs and newlines. Thresholds are strictly greater
 than the listed size:
 
@@ -57,8 +58,8 @@ python3 scripts/install_git_hooks.py
 The installer adds only `.git/hooks/pre-commit`, or refreshes a hook marked as
 this project's guard. It refuses an unrelated pre-commit, a symlink hook or any
 configured `core.hooksPath`. It does not modify Git configuration, other hooks
-or the standard LFS pre-push. The hook finds Python 3 through `python3`, with
-`python` as a fallback, and runs the guard from the repository root. Installation
+or the standard LFS pre-push. The hook prefers the Windows `py -3` launcher when
+available, then `python3`, then `python`, and runs the guard from the repository root. Installation
 is local and is not enabled merely by cloning these source files.
 
 No hook has been installed in the working repository as part of adding these
