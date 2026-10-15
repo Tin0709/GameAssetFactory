@@ -22,10 +22,10 @@ quats={};eulers={}
 def pivot(p,rot):return Matrix.Translation(p)@rot@Matrix.Translation(-p)
 def rot(angle,axis):return Matrix.Rotation(math.radians(angle),4,axis)
 def targets(t):
- m=motion(t);w=Vector((m['weight'],.001*m['breathe'],.0035*m['breathe']))
+ m=motion(t);w=Vector((m['weight'],.001*m['breathe'],.010*m['breathe']))
  cp=m['body_pitch'];c=B['Chest'].translation
- D=Matrix.Translation(w+Vector((0,0,.003*m['breathe'])))@pivot(c,rot(m['torso'],'Z')@rot(cp,'X')@rot(m['body_roll'],'Y'))
- hold=Matrix.Translation(w+Vector((0,-.008*m['drop']/.064,.003*m['breathe']-m['drop'])))@pivot(c,rot(m['hold'],'Z')@rot(m['hold_pitch'],'X'))
+ D=Matrix.Translation(w+Vector((0,0,.004*m['breathe'])))@pivot(c,rot(m['torso'],'Z')@rot(cp,'X')@rot(m['body_roll'],'Y'))
+ hold=Matrix.Translation(w+Vector((0,-.008*m['drop']/.064,.004*m['breathe']-m['drop'])))@pivot(c,rot(m['hold'],'Z')@rot(m['hold_pitch'],'X'))
  M={n:x.copy() for n,x in B.items()}
  M['Hips']=Matrix.Translation(w)@B['Hips']
  M['Spine']=Matrix.Translation(w+Vector((0,0,.0015*m['breathe'])))@pivot(B['Spine'].translation,rot(.35*m['torso'],'Z'))@B['Spine']
@@ -63,5 +63,5 @@ source_new=O/'rifle_ready_idle_actionsstyle_v002.blend'
 bpy.ops.wm.save_as_mainfile(filepath=str(source_new),check_existing=False)
 entry={'action':NAME,'source':source_new.relative_to(R).as_posix(),'source_sha256':hashlib.sha256(source_new.read_bytes()).hexdigest(),'source_rig':rig.name,'source_mesh':'Showcase_Player_Mesh','source_armature':rig.data.name,'slot_identifier':new.slots[0].identifier,'action_sha256':ui.action_signature(new),'action_frame_range':list(new.frame_range),'start':1,'end':240,'fps':30,'fps_base':1.,'status':'pending','approval_note':'Crossbow-informed custom rifle-ready v002, Pending comparison against v001. Exact relative two-hand hold and actual Rifle Stylized V2 preserved. Independently authored temporal curves; constrained pose adapter described in REFERENCE.md. Blender-only; no Godot before explicit approval.','seamless_loop':True,'rotation_modes':{b.name:b.rotation_mode for b in rig.pose.bones},'preview_prop':'rifle_stylized_v2','preview_prop_source':'blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend','preview_prop_source_sha256':'0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f','original_custom_animation':True,'source_derived_reconstruction':False,'production_eligible':False,'authorship':'Actions & Stuff third-person crossbow primary pose/layering reference; independently authored scan/support curves, approved rifle grip retained. Not a literal reconstruction; arm-angle limitations explicitly documented.'}
 ui.validate_action(new,entry,rig);(S/'candidate_entry.json').write_text(json.dumps(entry,indent=2));(O/'entry.json').write_text(json.dumps(entry,indent=2))
-(O/'design.json').write_text(json.dumps({'duration':8,'head_keys':HEAD,'torso_keys':TORSO,'assembly_clearance':'64mm attention clearance,5.5mm Neck release; original grip preserved; whole upper body and holding frame share11deg ready blade.','pelvis_weight_keys':WEIGHT,'breath':'Original1s holding rebound,4s weight drift informed by crossbow4:1 harmonic structure.3.5mm pelvis/3mm chest; identical arm/weapon frame suppresses free swing.','common_rigid_holding_assembly':True,'authored_independently':True,'base_entry_sha256':entry['action_sha256'],'source_keyframes_imported':False},indent=2))
+(O/'design.json').write_text(json.dumps({'duration':8,'head_keys':HEAD,'torso_keys':TORSO,'assembly_clearance':'64mm attention clearance,5.5mm Neck release; original grip preserved; whole upper body and holding frame share11deg ready blade.','pelvis_weight_keys':WEIGHT,'breath':'Original1s holding rebound,4s weight drift informed by crossbow4:1 harmonic structure.10mm pelvis/4mm chest; identical arm/weapon frame suppresses free swing.','common_rigid_holding_assembly':True,'authored_independently':True,'base_entry_sha256':entry['action_sha256'],'source_keyframes_imported':False},indent=2))
 print('CANDIDATE_BUILT',entry['action_sha256'],flush=True)
