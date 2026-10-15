@@ -92,52 +92,7 @@
       0
     ]
   ],
-  "assembly_clearance_keys": [
-    [
-      0,
-      0
-    ],
-    [
-      0.58,
-      0
-    ],
-    [
-      0.82,
-      0.018
-    ],
-    [
-      1.06,
-      0.064
-    ],
-    [
-      1.95,
-      0.064
-    ],
-    [
-      2.57,
-      0
-    ],
-    [
-      3.48,
-      0
-    ],
-    [
-      3.92,
-      0.058
-    ],
-    [
-      4.67,
-      0.058
-    ],
-    [
-      5.31,
-      0
-    ],
-    [
-      8,
-      0
-    ]
-  ],
+  "assembly_clearance": "Original64mm smooth clearance as a function of combined head/torso/hold attention;5.5mm head/Neck lift; preserves approved head/chest envelope and grip.",
   "pelvis_weight_keys": [
     [
       0,
@@ -183,6 +138,6 @@
   "breath": "Original asymmetric1.38s inhale/2.48s exhale with a quiet rest,4s cycle;3.5mm pelvis and3mm chest allowance",
   "common_rigid_holding_assembly": true,
   "authored_independently": true,
-  "base_entry_sha256": "beeb7706febb864be4e2ac36f49246393b4bc625b1a91e923d0f53d689419665",
+  "base_entry_sha256": "39d8c2b7395545b9efaa3d9bc8a755083649ccdfdb7d2ed7967c6967cd1c6876",
   "source_keyframes_imported": false
 }
