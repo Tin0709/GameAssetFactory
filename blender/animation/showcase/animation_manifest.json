@@ -2285,6 +2285,49 @@
       ],
       "facial_motion": "unsupported by unchanged 13-bone fixed atlas; source facial evidence documented",
       "source_sha256": "97bdfe84cb388c0bab15dd024cbd53846fd1fb1f6ee8575b1ae0db3a796998c1"
+    },
+    {
+      "action": "Rifle_Ready_Idle_ActionsStyle_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v001/rifle_ready_idle_actionsstyle_v001.blend",
+      "source_sha256": "7f2a90319c253b230443c76b96f08af7da471db0b49e612e3ba7527a94262da8",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "f0d4f4978d309ef5b417da8e3f715efa1dd97db62532eeee9923904e9ee517f8",
+      "action_frame_range": [
+        1.0,
+        241.0
+      ],
+      "start": 1,
+      "end": 240,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Original custom rifle-ready idle, pending explicit artistic review. Uses exact approvedReady grip/stance and actual Rifle Stylized V2; no proprietary source keyframes. No Godot integration before approval.",
+      "seamless_loop": true,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_prop": "rifle_stylized_v2",
+      "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+      "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
+      "original_custom_animation": true,
+      "source_derived_reconstruction": false,
+      "production_eligible": false,
+      "authorship": "Original motion profiles; approved Ready pose/rig/rifle. Actions & Stuff reference limited to principles of head lead, delayed body response, purposeful stops and weight."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
@@ -2581,6 +2624,10 @@
       {
         "kind": "action",
         "id": "Idle_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Rifle_Ready_Idle_ActionsStyle_v001"
       }
     ]
   }
