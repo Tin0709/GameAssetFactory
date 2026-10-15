@@ -3,6 +3,8 @@ extends "res://scenes/dev/expressive_locomotion_visual.gd"
 const SOURCE_LIBRARY=preload("res://scenes/dev/actions_stuff_research/source_library.res")
 const ClipSampler=preload("res://scenes/dev/actions_stuff_research/source_clip_sampler.gd")
 const RunSampler=preload("res://scenes/dev/actions_stuff_research/source_run_sampler.gd")
+const DirectionController=preload("res://scenes/dev/actions_stuff_research/source_direction_controller.gd")
+const DirectionSampler=preload("res://scenes/dev/actions_stuff_research/source_direction_sampler.gd")
 const WALK_SPEED:=1.8
 const RUN_SPEED:=5.031
 const WALK_PERIOD:=.8
@@ -14,6 +16,23 @@ var active_walk_action:="Walk_ActionsStuff_Source_Test_v001"
 var active_run_action:="Run_ActionsStuff_Source_Test_v001"
 var source_walk: RefCounted
 var source_run: RefCounted
+var direction_controller: RefCounted
+var direction_sampler: RefCounted
+var direction_future_sampler: RefCounted
+var direction_snapshot: Dictionary={}
+var direction_poses: Array=[]
+var direction_future_poses: Array=[]
+# Engine query adapter: initial view faces W (-Z); orbit changes the look heading.
+var look_yaw:=PI
+var _previous_look_yaw:=PI
+var _previous_body_yaw:=PI
+var _virtual_query_position:=Vector3.ZERO
+var _source_support: Array[bool]=[false,false]
+var _support_rearmed: Array[bool]=[true,true]
+var _source_sole_previous: Array[float]=[0.,0.]
+var _support_elapsed: Array[float]=[0.,0.]
+var _release_phase: Array[float]=[-1.,-1.]
+var _source_clearance: Array[float]=[0.,0.]
 var entity_lifetime:=0.0
 var released: Array[bool]=[false,false]
 var rolling_corner: Array[int]=[-1,-1]
@@ -37,60 +56,107 @@ func _ready() -> void:
 	expressive_clips.erase(EXPRESSIVE_NAMES[1]);expressive_clips.erase(EXPRESSIVE_NAMES[2])
 	gait_phase=0.;gait_run_weight=0.;pose_dirty=true
 	stance_duty=[.10,.10]
+	direction_controller=DirectionController.new(12.)
+	direction_controller.seed_heading(-rad_to_deg(look_yaw))
+	direction_sampler=DirectionSampler.new(skeleton)
+	direction_future_sampler=DirectionSampler.new(skeleton)
+	rotation.y=look_yaw
+	direction_snapshot=direction_controller.step({"position":Vector3.ZERO,"movement_direction":Vector3.ZERO,"head_y_rotation":-rad_to_deg(look_yaw),"body_y_rotation":-rad_to_deg(look_yaw)},1./60.)
+	entity_lifetime=direction_snapshot.life
+	_cache_direction_poses()
 func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> void:
-	_pending_physics_delta+=delta;entity_lifetime+=delta
+	if direction_controller==null:return
+	_pending_physics_delta+=delta
 	var planar:=Vector3(world_velocity.x,0,world_velocity.z)
-	movement_speed=planar.length();var old_yaw:=rotation.y
-	if movement_speed>.015:_advance_facing(atan2(planar.x,planar.z),delta)
-	turn_rate=wrapf(rotation.y-old_yaw,-PI,PI)/maxf(delta,.001)
-	var desired_run:=smoothstep(WALK_SPEED,RUN_SPEED,movement_speed)
-	gait_run_weight=move_toward(gait_run_weight,desired_run,delta/.22)
-	var old_move:=move_requested;move_requested=requested or movement_speed>.025
-	if old_move!=move_requested:_scale_dirty=true;pose_dirty=true;transition_count+=1
-	if move_requested and not old_move:
-		settling=false;gait_phase=.5 if next_left else 0.;next_left=not next_left
-		foot_support=[false,false];released=[false,false];rolling_corner=[-1,-1]
-		stance_duty=[lerpf(.10,.26,gait_run_weight),lerpf(.10,.26,gait_run_weight)]
+	movement_speed=planar.length()
+	var was_moving:=move_requested
+	move_requested=requested or movement_speed>.025
+	if was_moving!=move_requested:
+		pose_dirty=true;_scale_dirty=true;transition_count+=1
+	if move_requested and not was_moving:
+		settling=false;foot_support=[false,false];_source_support=[false,false]
+		_support_rearmed=[true,true];released=[false,false];rolling_corner=[-1,-1]
 		support_aim=[Quaternion.IDENTITY,Quaternion.IDENTITY]
-	if not move_requested and old_move:
+	if not move_requested and was_moving:
 		settling=true;settle_time=0.;attention_time=0.
 		replant_first=0 if last_sole[0].y>last_sole[1].y else 1
 		for side in 2:replant_from[side]=last_sole[side];replant_q[side]=_leg_world_rotation([leg_left,leg_right][side])
-	var previous:=gait_phase
-	# Original periods at nominal travel, distance-locked only below nominal speed.
-	gait_frequency=movement_speed/lerpf(WALK_SPEED*WALK_PERIOD,RUN_SPEED*RUN_PERIOD,gait_run_weight)
-	if move_requested:gait_phase=fposmod(gait_phase+delta*gait_frequency,1.)
-	for side in 2:
-		var local_phase:=fposmod(gait_phase-side*.5,1.)
-		var duty:=lerpf(.10,.26,gait_run_weight)
-		if local_phase<fposmod(previous-side*.5,1.):released[side]=false;stance_duty[side]=duty
-		else:stance_duty[side]=minf(stance_duty[side],duty)
-		if local_phase>=stance_duty[side]:released[side]=true
+	# Actual movement supplies direction. Unit calibration retains the established
+	# Walk/Run travel speeds while feeding the source's own esnrkj speed filter.
+	var query_speed:=movement_speed/WALK_SPEED*(4.3*.6103515625)
+	if movement_speed>WALK_SPEED:query_speed=lerpf(4.3*.6103515625,5.59,clampf((movement_speed-WALK_SPEED)/(RUN_SPEED-WALK_SPEED),0,1))
+	var direction:=planar.normalized() if movement_speed>.00001 else Vector3.ZERO
+	var yaw_rate: float=-rad_to_deg(wrapf(look_yaw-_previous_look_yaw,-PI,PI))/maxf(delta,.00001)
+	_previous_look_yaw=look_yaw;rotation.y=look_yaw
+	# Match approved study's 60Hz authored Euler updates at either render rate.
+	var count:=maxi(1,ceili(delta*60.-.000001));var step:=delta/count
+	for i in count:
+		_virtual_query_position+=direction*query_speed*step
+		direction_snapshot=direction_controller.step({"position":_virtual_query_position,"movement_direction":direction,"head_y_rotation":wrapf(-rad_to_deg(look_yaw),-180.,180.),"body_y_rotation":-rad_to_deg(look_yaw),"yaw_speed":yaw_rate,"target_x_rotation":0.},step)
+	entity_lifetime=direction_snapshot.life
+	gait_phase=fposmod(direction_snapshot.phase,1.);gait_frequency=direction_snapshot.cadence;gait_run_weight=direction_snapshot.run_weight
+	var body_yaw: float=-deg_to_rad(direction_snapshot.vars["v.nthjcy"])
+	turn_rate=wrapf(body_yaw-_previous_body_yaw,-PI,PI)/maxf(delta,.00001);_previous_body_yaw=body_yaw
+	_cache_direction_poses()
+	position.y=direction_sampler.height_offset(direction_snapshot) if move_requested else 0.
+	_update_direction_support(delta)
 	if settling:settle_time=minf(settle_time+delta,REPLANT_SECONDS)
 	elif not move_requested:attention_time=fposmod(attention_time+delta,8.)
 	reference_phase=gait_phase;reference_sprint_weight=gait_run_weight
 	support_left=_support(0);support_right=_support(1)
+
+func _cache_direction_poses() -> void:
+	direction_sampler.set_snapshot(direction_snapshot)
+	direction_poses=direction_sampler.poses.duplicate()
+	if pose_dirty or _scale_dirty or direction_future_poses.is_empty():
+		var future:=direction_snapshot.duplicate(true)
+		future.phase+=.004*float(future.cadence);future.life+=.004
+		direction_future_sampler.set_snapshot(future)
+		direction_future_poses=direction_future_sampler.poses.duplicate()
+
+func _source_global_pose(bone: int) -> Transform3D:
+	var pose: Transform3D=direction_poses[bone]
+	var parent:=skeleton.get_bone_parent(bone)
+	while parent>=0:
+		pose=Transform3D(direction_poses[parent])*pose;parent=skeleton.get_bone_parent(parent)
+	return skeleton.global_transform*pose
+
+func _foot_yaw(q: Quaternion) -> float:
+	var axis:=Basis(q).z
+	return atan2(axis.x,axis.z)
+
+func _update_direction_support(delta: float) -> void:
+	# Scene-owned contact eligibility, not a proprietary controller/IK claim.
+	# A free leg must approach the floor before it can acquire a world anchor.
+	for side in 2:
+		if not move_requested:_source_support[side]=true;continue
+		var bone: int=[leg_left,leg_right][side];var pose:=_source_global_pose(bone)
+		var height:=INF
+		for point in SOLE_POINTS:height=minf(height,(pose*point).y)
+		var rise:=height-_source_sole_previous[side];_source_sole_previous[side]=height;_source_clearance[side]=height
+		_support_elapsed[side]+=delta
+		var yaw_gap:=0.
+		if foot_support[side]:yaw_gap=absf(wrapf(_foot_yaw(pose.basis.orthonormalized().get_rotation_quaternion())-_foot_yaw(foot_rotations[side]),-PI,PI))
+		if _source_support[side] and (height>.04 or rise>.008 or yaw_gap>deg_to_rad(35.) or _support_elapsed[side]>lerpf(.11,.16,gait_run_weight)):
+			_source_support[side]=false;_support_rearmed[side]=false;_release_phase[side]=direction_snapshot.phase;released[side]=true
+		if not _support_rearmed[side] and (height>.055 or direction_snapshot.phase-_release_phase[side]>.3):_support_rearmed[side]=true
+		if not _source_support[side] and _support_rearmed[side] and height<.025 and rise<.004:
+			_source_support[side]=true;_support_elapsed[side]=0.;released[side]=false
+
 func _support(side: int) -> bool:
 	if not move_requested:return true
-	return not released[side] and fposmod(gait_phase-side*.5,1.)<stance_duty[side]
+	return _source_support[side] and not released[side]
+
 func _target_pose(bone: int,ahead: float=0.) -> Transform3D:
-	if source_run==null or not move_requested:return super._target_pose(bone,ahead)
-	var phase:=fposmod(gait_phase+ahead*gait_frequency,1.)
-	source_run.set_clocks(phase+RUN_RECEIVE,entity_lifetime+ahead)
-	var time:=fposmod(phase+WALK_RECEIVE,1.)*WALK_PERIOD
-	var q: Quaternion=source_walk.rotation(bone,time).slerp(source_run.rotation(bone),gait_run_weight).normalized()
-	var p: Vector3=source_walk.position(bone,time).lerp(source_run.position(bone),gait_run_weight)
-	if bone==hips:
-		# Constant preview-floor alignment only. Raw imported clips stay unchanged.
-		var parent:=skeleton.get_bone_parent(bone)
-		var parent_basis:=skeleton.global_basis
-		if parent>=0:parent_basis*=skeleton.get_bone_global_pose(parent).basis
-		p+=parent_basis.inverse()*Vector3.UP*lerpf(.038,.03367406875,gait_run_weight)
-	return Transform3D(Basis(q),p)
+	if direction_sampler==null or not move_requested:return super._target_pose(bone,ahead)
+	var poses: Array=direction_future_poses if ahead>0. else direction_poses
+	var pose: Transform3D=poses[bone]
+	return Transform3D(Basis(pose.basis.orthonormalized().get_rotation_quaternion()),pose.origin)
+
 func _target_leg_scale(bone: int,ahead: float=0.) -> float:
-	if source_run==null or not move_requested:return 1.
-	source_run.set_clocks(gait_phase+ahead*gait_frequency+RUN_RECEIVE,entity_lifetime+ahead)
-	return lerpf(1.,source_run.scale(bone).y,gait_run_weight)
+	if direction_sampler==null or not move_requested:return 1.
+	var poses: Array=direction_future_poses if ahead>0. else direction_poses
+	return Transform3D(poses[bone]).basis.get_scale().y
 func _apply_source_scales(delta: float) -> void:
 	if source_run==null:return
 	if _scale_dirty:
@@ -103,7 +169,7 @@ func _apply_source_scales(delta: float) -> void:
 	for side in 2:
 		var bone: int=[leg_left,leg_right][side]
 		var residual:=(_scale_offset[side]+(_scale_velocity_offset[side]+22.*_scale_offset[side])*_scale_age)*exp(-22.*_scale_age)
-		var value:=clampf(_target_leg_scale(bone)+residual,1.,1.07)
+		var value:=clampf(_target_leg_scale(bone)+residual,1.,1.106)
 		_scale_velocity[side]=(value-_scale_previous[side])/maxf(delta,.00001);_scale_previous[side]=value
 		skeleton.set_bone_pose_scale(bone,Vector3(1,value,1))
 func _evaluate_locomotion_pose(delta: float) -> bool:
@@ -118,7 +184,7 @@ func _set_world_leg_rotation(bone: int,q: Quaternion) -> void:
 func _contact_leg_rotation(side: int,bone: int,target: Vector3,original_q: Quaternion,delta: float) -> Quaternion:
 	if not move_requested or absf(turn_rate)>.5 or transition_age<.18:
 		rolling_used[side]=false;rolling_corner[side]=-1
-		return super._contact_leg_rotation(side,bone,target,original_q,delta)
+		return _hold_support_yaw(side,super._contact_leg_rotation(side,bone,target,original_q,delta))
 	var transform:=skeleton.global_transform*skeleton.get_bone_global_pose(bone)
 	var index:=0;var lowest:=INF
 	for i in 4:
@@ -130,7 +196,10 @@ func _contact_leg_rotation(side: int,bone: int,target: Vector3,original_q: Quate
 	rolling_corner[side]=index;rolling_used[side]=true;rolling_raw[side]=_sole_world(bone)
 	foot_anchors[side]=Vector3(rolling_anchor[side].x+center.x-corner.x,0.,rolling_anchor[side].z+center.z-corner.z)
 	support_aim[side]=Quaternion.IDENTITY
-	return original_q
+	return _hold_support_yaw(side,original_q)
+func _hold_support_yaw(side: int,q: Quaternion) -> Quaternion:
+	var gap:=wrapf(_foot_yaw(q)-_foot_yaw(foot_rotations[side]),-PI,PI)
+	return (Quaternion(Vector3.UP,-gap)*q).normalized()
 func _swing_leg_rotation(side: int,bone: int,delta: float) -> Quaternion:
 	if foot_support[side]:release_offset[side]=rolling_offset[side]
 	release_offset[side]*=exp(-30.*delta)
@@ -156,6 +225,8 @@ func _evaluate(delta: float) -> void:
 		elif not foot_support[side]:rolling_used[side]=false;rolling_corner[side]=-1
 	if settling and settle_time>=REPLANT_SECONDS:settling=false;foot_support=[true,true]
 func reset_contacts() -> void:
+	_source_support=[false,false];_support_rearmed=[true,true];_source_sole_previous=[0.,0.];_support_elapsed=[0.,0.]
+	position.y=0.
 	move_requested=false;settling=false;gait_run_weight=0.;gait_frequency=0.;pose_dirty=true;_scale_dirty=true
 	rolling_corner=[-1,-1];rolling_used=[false,false];rolling_offset=[Vector3.ZERO,Vector3.ZERO];release_offset=[Vector3.ZERO,Vector3.ZERO]
 	foot_support=[false,false];support_aim=[Quaternion.IDENTITY,Quaternion.IDENTITY];released=[false,false]
