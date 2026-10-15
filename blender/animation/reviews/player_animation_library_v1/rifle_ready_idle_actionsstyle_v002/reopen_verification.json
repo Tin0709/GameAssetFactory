@@ -1,0 +1,14 @@
+{
+  "reopened_pending": true,
+  "all_80_prior_actions_exact": true,
+  "previous_registrations_statuses_sequences_unchanged": true,
+  "approved_ready_preserved": true,
+  "loop_matrix_error": 0.0,
+  "action_sha256": "381278f01be90e96f6400debce6c1de0178983fb36155070e24b8e45cfbcd70a",
+  "frame_range": [
+    1,
+    240
+  ],
+  "fps": 30,
+  "actual_rifle_exists": true
+}

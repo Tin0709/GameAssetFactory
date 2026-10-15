@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "protected_godot_and_v001_files_exact": 1953,
+  "previous_showcase_actions_exact": 80,
+  "all_native_showcase_assets_exact": true,
+  "new_action_count": 1,
+  "status": "pending",
+  "new_source_sha256": "709bb5079bc67881516577509b223a823d1b6a7b0f6838d1a0a9f3e4203fb80c",
+  "new_action_sha256": "381278f01be90e96f6400debce6c1de0178983fb36155070e24b8e45cfbcd70a",
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "ordinary_git_history_rewritten": false,
+  "godot_modified": false
+}
