@@ -1,10 +1,11 @@
 extends "res://scenes/dev/expressive_locomotion_visual.gd"
-## Private gameplay research. Both moving motions are the immutable source studies.
+## Private gameplay research. Immutable source studies plus a separate unarmed gameplay profile.
 const SOURCE_LIBRARY=preload("res://scenes/dev/actions_stuff_research/source_library.res")
 const ClipSampler=preload("res://scenes/dev/actions_stuff_research/source_clip_sampler.gd")
 const RunSampler=preload("res://scenes/dev/actions_stuff_research/source_run_sampler.gd")
 const DirectionController=preload("res://scenes/dev/actions_stuff_research/source_direction_controller.gd")
 const DirectionSampler=preload("res://scenes/dev/actions_stuff_research/source_direction_sampler.gd")
+const UNARMED_PROFILE_PATH:="res://scenes/dev/actions_stuff_research/unarmed_gameplay_v001.json"
 const WALK_SPEED:=1.8
 const RUN_SPEED:=5.031
 const WALK_PERIOD:=.8
@@ -14,6 +15,8 @@ const RUN_RECEIVE:=.44
 const SOLE_POINTS: Array[Vector3]=[Vector3(-.1125,.675,-.1125),Vector3(-.1125,.675,.1125),Vector3(.1125,.675,-.1125),Vector3(.1125,.675,.1125)]
 var active_walk_action:="Walk_ActionsStuff_Source_Test_v001"
 var active_run_action:="Run_ActionsStuff_Source_Test_v001"
+var gameplay_walk_version: String
+var gameplay_run_version: String
 var source_walk: RefCounted
 var source_run: RefCounted
 var direction_controller: RefCounted
@@ -61,6 +64,11 @@ func _ready() -> void:
 	direction_controller.seed_heading(-rad_to_deg(look_yaw))
 	direction_sampler=DirectionSampler.new(skeleton)
 	direction_future_sampler=DirectionSampler.new(skeleton)
+	var gameplay_profile: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(UNARMED_PROFILE_PATH))
+	gameplay_walk_version=gameplay_profile.walk.name
+	gameplay_run_version=gameplay_profile.run.name
+	for sampler in [direction_sampler,direction_future_sampler]:
+		sampler.set_item_holding(float(gameplay_profile.holding.right),float(gameplay_profile.holding.left))
 	rotation.y=look_yaw
 	direction_snapshot=direction_controller.step({"position":Vector3.ZERO,"movement_direction":Vector3.ZERO,"head_y_rotation":-rad_to_deg(look_yaw),"body_y_rotation":-rad_to_deg(look_yaw)},1./60.)
 	entity_lifetime=direction_snapshot.life

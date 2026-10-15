@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "research_only": true,
+  "production_eligible": false,
+  "purpose": "Unarmed gameplay correction; preserve full source alternating arm pitch. Source-derived private research remains excluded from releases.",
+  "walk": {
+    "name": "Walk_ActionsStuff_Unarmed_Gameplay_v001",
+    "preserved_source_action": "Walk_ActionsStuff_Source_Test_v001",
+    "source_animation": "animation.oreville_ans.tldiyl"
+  },
+  "run": {
+    "name": "Run_ActionsStuff_Unarmed_Gameplay_v001",
+    "preserved_source_action": "Run_ActionsStuff_Source_Test_v001",
+    "source_animation": "animation.oreville_ans.fngydr"
+  },
+  "holding": {
+    "right": 0.0,
+    "left": 0.0
+  },
+  "source_holding_animation": "animation.oreville_ans.dpjhxl",
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "changes": [
+    "Use unarmed holding flags instead of research study standard right-hand item flag."
+  ],
+  "preserved": [
+    "Source animation/controller data",
+    "Source shared phase and .22s Walk/Run transition",
+    "All source nonarm channels and native leg/contact corrections",
+    "Original asymmetry, bob, source arm offsets and shoulder translation"
+  ],
+  "scope": "Named real-time gameplay profiles, not additional Blender Actions or commercial production animations. Armed behavior not activated or modified in this scene."
+}

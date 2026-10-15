@@ -16,6 +16,15 @@ var names: Array[String] = []
 var poses: Array[Transform3D] = []
 var channels: Dictionary = {}
 var unit := 0.0
+# Preserve the immutable study's standard-item profile by default. Gameplay
+# explicitly selects the unarmed profile; both samples use the same flags.
+var holding_right := 1.0
+var holding_left := 0.0
+
+func set_item_holding(right: float, left: float) -> void:
+	assert(is_finite(right) and is_finite(left) and right >= 0.0 and right <= 1.0 and left >= 0.0 and left <= 1.0)
+	holding_right = right
+	holding_left = left
 
 func _init(rig: Skeleton3D) -> void:
 	data = JSON.parse_string(FileAccess.get_file_as_string(DATA_PATH))
@@ -116,8 +125,8 @@ func set_snapshot(snapshot: Dictionary) -> void:
 	_add_clip(channels,"hxfxxu",env,clock,run_weight*float(env.get("v.esnrkj",0.0)))
 	_add_clip(channels,"xahrzd",env,2.0,run_weight)
 	_add_clip(channels,"bob",env,clock)
-	env["v.vbcdda"] = 1.0
-	env["v.wfyvyl"] = 0.0
+	env["v.vbcdda"] = holding_right
+	env["v.wfyvyl"] = holding_left
 	_add_clip(channels,"holding",env,clock)
 	_add_clip(channels,"look_at_target",env,clock)
 	var desired: Dictionary = base.duplicate()
