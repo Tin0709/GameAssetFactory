@@ -41,7 +41,6 @@ func run() -> void:
    var current: Array=[]
    for bone in [v.leg_left,v.leg_right]:
     var sole: Vector3=v._sole_world(bone);min_floor=minf(min_floor,sole.y);leg_max=maxf(leg_max,v.skeleton.get_bone_pose_scale(bone).y)
-    if sole.y<-.004:print("FLOOR_PROBE ",mode," i=",i," grounded=",q.grounded," capsuleY=",a.position.y," foot=",sole.y," active=",v.jump_active," correction=",v.maximum_correction)
     current.append(v._leg_world_rotation(bone))
    if not previous.is_empty():
     for side in 2:max_leg_step=maxf(max_leg_step,rad_to_deg(Quaternion(previous[side]).angle_to(current[side])))
@@ -55,5 +54,24 @@ func run() -> void:
   check(not v.jump_active,mode+" returns to existing locomotion after recovery")
   check(v.direction_sampler.holding_right==0. and v.jump_sampler.holding_right==0.,mode+" unarmed correction retained")
   reports.append({"mode":mode,"air_frames":air_frames,"landings":landings,"peak_m":actual_peak,"root_scale_min":root_min,"leg_scale_max":leg_max,"min_foot_y":min_floor,"max_leg_step_deg":max_leg_step,"source_states":source_states.keys()})
+ # Reset during an actual running jump, then immediately resume running/jump.
+ a.requested_direction=Vector2(0,-1);a.requested_run=true
+ for i in int(.6*fps):await tick(v)
+ a.requested_jump=true
+ for i in int(.2*fps):await tick(v)
+ var reset_phase: float=v.jump_snapshot.phase
+ var reset_life: float=v.jump_runtime.life
+ scene.reset_player()
+ check(v.jump_runtime.life==reset_life,"Reset keeps source lifetime")
+ check(is_equal_approx(v.jump_runtime.env["v.eqhdel"],reset_phase),"Reset keeps gait phase")
+ for i in 4:await tick(v)
+ check(not v.jump_active,"Reset does not invent landing/fall state")
+ a.requested_jump=true
+ var reset_lands:=0
+ for i in int(2.6*fps):
+  await tick(v)
+  if i==2:a.requested_jump=false
+  if a.last_jump_query.landed:reset_lands+=1
+ check(reset_lands==1 and not v.jump_active,"Jump after reset completes once")
  print("JUMP_GAMEPLAY ",JSON.stringify({"fps":fps,"failures":failures,"trials":reports}))
  scene.free();quit(0 if failures.is_empty() else 1)

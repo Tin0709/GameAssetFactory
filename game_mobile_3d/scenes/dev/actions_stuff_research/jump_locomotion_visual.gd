@@ -15,6 +15,7 @@ var _jump_scale_offsets: Array[Vector3]=[]
 var _jump_scale_age:=10.0
 var _jump_scale_dirty:=false
 var _scale_handoff:=false
+var _jump_driving:=false
 
 func _ready() -> void:
 	super._ready()
@@ -35,7 +36,9 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
 	var was_active:=jump_active
 	var was_grounded:=jump_grounded
 	# Exactly one inherited gait/input/facing update and one eventual pose writer.
+	_jump_driving=true
 	super.drive_locomotion(world_velocity,requested,delta)
+	_jump_driving=false
 	jump_grounded=bool(physics.grounded)
 	var count:=maxi(1,ceili(delta*60.-.000001));var step:=delta/count
 	var planar:=Vector3(world_velocity.x,0,world_velocity.z)
@@ -59,13 +62,19 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
 		settling=false
 		if not jump_grounded or not was_grounded:
 			_clear_jump_contacts()
-		if jump_grounded:_update_direction_support(delta)
 	elif was_active:
 		_cache_direction_poses()
 	if was_active!=jump_active:
 		pose_dirty=true;_jump_scale_dirty=true;_scale_handoff=true;_scale_dirty=true
 		transition_count+=1
 		if jump_grounded:_clear_jump_contacts()
+	if jump_grounded:_update_direction_support(delta)
+	support_left=_support(0);support_right=_support(1)
+
+func _update_direction_support(delta: float) -> void:
+	# The inherited drive samples ground poses. Evaluate contact eligibility
+	# once only, after the bridge has selected the final ground/landing poses.
+	if not _jump_driving:super._update_direction_support(delta)
 
 func _has_jump_layers() -> bool:
 	for alias in ["ngeixo","pyhwuc","muiqdc"]:
