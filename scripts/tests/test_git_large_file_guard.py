@@ -127,6 +127,13 @@ class GitToolTests(unittest.TestCase):
         self.stage("empty.blend", b"")
         self.assertEqual(self.run_tool().returncode, 0)
 
+    def test_symlink_in_lfs_pattern_is_not_filtered(self):
+        self.attributes("*.blend filter=lfs\n")
+        oid = self.git("hash-object", "-w", "--stdin", data=b"real-asset.blend").decode().strip()
+        self.git("update-index", "--add", "--cacheinfo", f"120000,{oid},link.blend")
+        result = self.run_tool()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_unchanged_large_blob_and_deletion_are_skipped(self):
         self.stage("historical.bin", size=101 * MIB)
         self.git("-c", "core.hooksPath=/dev/null", "commit", "-qm", "baseline")
@@ -187,6 +194,26 @@ class GitToolTests(unittest.TestCase):
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("BLOCK", result.stderr)
+
+    @unittest.skipIf(os.name == "nt", "POSIX shim tests the Windows launcher selection")
+    def test_hook_prefers_windows_py_launcher_when_available(self):
+        (self.repo / "scripts").mkdir()
+        shutil.copyfile(GUARD, self.repo / "scripts/git_large_file_guard.py")
+        self.assertEqual(self.run_tool(INSTALLER).returncode, 0)
+        launchers = self.repo / "launchers"
+        launchers.mkdir()
+        launcher = launchers / "py"
+        launcher.write_text('#!/bin/sh\nprintf "%s\\n" "$1" > "$LAUNCHER_LOG"\nshift\nexec "$TEST_PYTHON" "$@"\n')
+        launcher.chmod(0o755)
+        log = self.repo / "launcher_args.txt"
+        env = dict(os.environ, PATH=str(launchers) + os.pathsep + os.environ.get("PATH", ""),
+                   TEST_PYTHON=os.sys.executable, LAUNCHER_LOG=str(log))
+        self.stage("small.txt")
+        result = subprocess.run(["git", "commit", "-qm", "allowed"], cwd=self.repo, env=env,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(log.exists(), "Hook did not select py launcher")
+        self.assertEqual(log.read_text(), "-3\n")
 
 
 if __name__ == "__main__":
