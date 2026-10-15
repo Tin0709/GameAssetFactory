@@ -76,8 +76,11 @@ def bidirectional_gap(pts,trees,a,b):
 def pose_snapshot(r):return {b.name:(r.matrix_world@b.matrix).copy() for b in r.pose.bones}
 def transform_vel(m0,m1,dt):
  v=(m1.translation-m0.translation)/dt;q0=m0.to_quaternion();q1=m1.to_quaternion();dq=q0.rotation_difference(q1)
- if dq.angle>math.pi:dq.negate()
- return v,dq.axis*(dq.angle/dt)
+ # atan2 on quaternion vector remains precise for tiny increments; acos(w)
+ # quantizes near identity in single-precision Blender Quaternion.angle.
+ if dq.w<0:dq.negate()
+ xyz=Vector((dq.x,dq.y,dq.z));sn=xyz.length
+ return v,xyz*(2*math.atan2(sn,dq.w)/(sn*dt)) if sn>1e-12 else Vector((0,0,0))
 def main():
  av=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
  p=argparse.ArgumentParser();p.add_argument('--candidate');p.add_argument('--output',required=True);p.add_argument('--action',default=NEW_ACTION);opt=p.parse_args(av)

@@ -26,5 +26,5 @@ def motion(t):
  'weight':path(WEIGHT,t)+.007*math.sin(phase),
  'breathe':.5-.5*math.cos(pulse),
  'pitch':-.65*h/23.,'roll':.7*math.sin(phase),
- 'head_lift':.0055*ramp(attention/4.),'body_pitch':.9*math.sin(pulse),
+ 'head_lift':.008+.0055*ramp(attention/4.),'body_pitch':.9*math.sin(pulse),
  'body_roll':.55*math.sin(phase),'hold_pitch':.70*math.sin(pulse-.18)}
