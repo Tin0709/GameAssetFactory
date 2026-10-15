@@ -15,3 +15,7 @@ Original orthographic size5.1,8m distance, azimuth.66/elevation.40, orbit/zoom a
 `test_camera_comfort.gd` checks30/60Hz, horizontal tracking, zero normal-jump camera-height change, smooth large elevation changes/long-fall zone recovery, grounded settling and original framing. Native Metal rendering checks full character/feet visibility during the actual standing/moving jump. Flat-ground research cannot certify arbitrary production terrain or every mobile aspect ratio; test the same philosophy against actual level slopes/falls and target screens when main integration is authorized.
 
 Apply this rule to future authorized main-game integrations. Do not change WorldMap or production camera until explicitly requested. No new scene or project is required.
+
+## Render/physics synchronization
+
+The research camera now tracks the same interpolated display root as the character skin; it does not chase discrete60Hz capsule positions on a120Hz display. Authoritative grounded height remains the floor target on landing. This is presentation interpolation only; the camera dead zone/spring, angle/distance, source timing and physics remain unchanged. Reset rebases history immediately. See `docs/animation/reviews/actions_stuff_render_continuity_v001/README.md`.

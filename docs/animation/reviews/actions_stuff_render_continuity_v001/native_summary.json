@@ -1,0 +1,46 @@
+{
+  "walk": {
+    "frames": 132,
+    "held_physics_frames": 66,
+    "display_skin_changed_without_physics": 66,
+    "display_actor_changed_without_physics": 66,
+    "max_upload_error": 0.0,
+    "alpha_range": [
+      0.127719999999997,
+      0.642939999999997
+    ]
+  },
+  "run": {
+    "frames": 120,
+    "held_physics_frames": 60,
+    "display_skin_changed_without_physics": 60,
+    "display_actor_changed_without_physics": 60,
+    "max_upload_error": 0.0,
+    "alpha_range": [
+      0.142939999999997,
+      0.954839999999998
+    ]
+  },
+  "jump": {
+    "frames": 135,
+    "held_physics_frames": 51,
+    "display_skin_changed_without_physics": 51,
+    "display_actor_changed_without_physics": 51,
+    "max_upload_error": 0.0,
+    "alpha_range": [
+      0.0,
+      1.0
+    ]
+  },
+  "after": {
+    "frames": 220,
+    "held_physics_frames": 104,
+    "display_skin_changed_without_physics": 104,
+    "display_actor_changed_without_physics": 55,
+    "max_upload_error": 0.0,
+    "alpha_range": [
+      0.0,
+      0.99576727272727
+    ]
+  }
+}

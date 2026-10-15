@@ -1,0 +1,32 @@
+{
+  "native_check": {
+    "frames": 664,
+    "duration": 6.010747,
+    "approx_fps": 110.46879863684164,
+    "max_upload_error": 0.0,
+    "held_physics_frames_moving": 208,
+    "held_frames_with_display_skin_motion": 208,
+    "held_frames_with_display_root_motion": 208,
+    "physics_hz": 60
+  },
+  "native_30": {
+    "frames": 183,
+    "duration": 6.064465,
+    "approx_fps": 30.175786322453835,
+    "max_upload_error": 0.0,
+    "held_physics_frames_moving": 0,
+    "held_frames_with_display_skin_motion": 0,
+    "held_frames_with_display_root_motion": 0,
+    "physics_hz": 60
+  },
+  "native_60": {
+    "frames": 359,
+    "duration": 6.017943,
+    "approx_fps": 59.654935249469794,
+    "max_upload_error": 0.0,
+    "held_physics_frames_moving": 0,
+    "held_frames_with_display_skin_motion": 0,
+    "held_frames_with_display_root_motion": 0,
+    "physics_hz": 60
+  }
+}
