@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "all_old_datablocks_preserved": true,
+  "old_action_signatures_exact": 65,
+  "focus_entries": 10,
+  "all_registry_entries": 45,
+  "new_actions_pending": 6,
+  "new_context_pending": true,
+  "directional_approved_unchanged": true,
+  "selectors_slots_timing_scale_reset_views_return": true
+}
