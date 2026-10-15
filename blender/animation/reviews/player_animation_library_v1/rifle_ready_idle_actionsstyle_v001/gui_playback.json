@@ -1,0 +1,9 @@
+{
+  "wraps": 2,
+  "min": 2,
+  "max": 238,
+  "samples": 105,
+  "original_fps": 30,
+  "passed": true,
+  "paused_at": 1
+}

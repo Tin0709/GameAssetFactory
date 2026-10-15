@@ -1,0 +1,224 @@
+{
+  "source": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/rifle_ready_v16_test/shoulder_support_v006/rifle_ready_v16_review.blend",
+  "source_sha256": "22017e77d5a722d087c46bd839e38fbec5a30ac5a56bb4b326e86cbbbbee3fde",
+  "candidate": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v001/rifle_ready_idle_actionsstyle_v001.blend",
+  "sampling": "every integer and half-frame F1..241 (481 poses)",
+  "limitations": [
+    "Blender geometry validation only; no Godot transitions or device certification.",
+    "Bidirectional vertex-to-surface gap is sampled, not the exact edge-to-edge minimum.",
+    "Raw triangle counts at approved adjacent joints, rigid block grip and stock contact are diagnostic; relative transform stability preserves their reviewed geometry."
+  ],
+  "baseline": {
+    "rigid_vertices": 64,
+    "vertex_groups": {
+      "Head": 8,
+      "Chest": 8,
+      "UpperArm.L": 8,
+      "UpperArm.R": 8,
+      "Leg.L": 8,
+      "Leg.R": 8,
+      "ForeArm.L": 8,
+      "ForeArm.R": 8
+    },
+    "rigid_weights_exact": true,
+    "source_action_sha256": "e12357dab1a854a4642f293e8049747f7e17b426ff69f1a4c331327b47e91743",
+    "left_support_sampled_gap_range_m": [
+      0.011040402576327324,
+      0.01104146521538496
+    ],
+    "raw_triangle_pairs_max": {
+      "Head|Chest": 13,
+      "Chest|UpperArm.L": 4,
+      "Chest|UpperArm.R": 10,
+      "Chest|Leg.L": 22,
+      "Chest|Leg.R": 14,
+      "UpperArm.L|ForeArm.L": 7,
+      "UpperArm.R|ForeArm.R": 14,
+      "UpperArm.R|Rifle_V2_Body": 54,
+      "ForeArm.R|Rifle_V2_Body": 103,
+      "Rifle_V2_Body|Rifle_V2_Magazine": 18
+    },
+    "cuboid_signed_margin_max_m": {
+      "Head|Chest": 0.004756228649057448,
+      "Head|UpperArm.L": -0.0016073803853942081,
+      "Head|UpperArm.R": -0.0035854990128427744,
+      "Head|Leg.L": -0.609174067620188,
+      "Head|Leg.R": -0.6019880903186277,
+      "Head|ForeArm.L": -0.24760749749839306,
+      "Head|ForeArm.R": -0.1282452598970849,
+      "Chest|UpperArm.L": 0.01876787780884115,
+      "Chest|UpperArm.R": 0.035399967804551125,
+      "Chest|Leg.L": 0.0662623168900609,
+      "Chest|Leg.R": 0.06854868214577436,
+      "Chest|ForeArm.L": -0.09745186939835548,
+      "Chest|ForeArm.R": -0.08326633942488115,
+      "UpperArm.L|UpperArm.R": -0.24701802684828422,
+      "UpperArm.L|Leg.L": -0.28742166608572006,
+      "UpperArm.L|Leg.R": -0.405266426037997,
+      "UpperArm.L|ForeArm.L": 9.685754776000977e-08,
+      "UpperArm.L|ForeArm.R": -0.08487379550933838,
+      "UpperArm.R|Leg.L": -0.2988362858304754,
+      "UpperArm.R|Leg.R": -0.3143019040580839,
+      "UpperArm.R|ForeArm.L": -0.28832882456481457,
+      "UpperArm.R|ForeArm.R": 1.341104507446289e-07,
+      "Leg.L|Leg.R": -0.0013531576842069626,
+      "Leg.L|ForeArm.L": -0.266561783850193,
+      "Leg.L|ForeArm.R": -0.26955838198773563,
+      "Leg.R|ForeArm.L": -0.4052664004266262,
+      "Leg.R|ForeArm.R": -0.304958026856184,
+      "ForeArm.L|ForeArm.R": -0.03479702025651932
+    },
+    "foot_lowest_z_m": {
+      "Leg.L": 0.00040022796019911766,
+      "Leg.R": 0.00039994344115257263
+    },
+    "adjacent_contact_pair_names": [
+      [
+        "Chest",
+        "UpperArm.R"
+      ],
+      [
+        "ForeArm.L",
+        "UpperArm.L"
+      ],
+      [
+        "Chest",
+        "Leg.L"
+      ],
+      [
+        "Chest",
+        "Head"
+      ],
+      [
+        "ForeArm.R",
+        "UpperArm.R"
+      ],
+      [
+        "Chest",
+        "UpperArm.L"
+      ],
+      [
+        "Chest",
+        "Leg.R"
+      ]
+    ],
+    "approved_solid_contact_pair_names": [
+      [
+        "Rifle_V2_Body",
+        "UpperArm.R"
+      ],
+      [
+        "ForeArm.R",
+        "Rifle_V2_Body"
+      ],
+      [
+        "Rifle_V2_Body",
+        "Rifle_V2_Magazine"
+      ]
+    ]
+  },
+  "candidate_sha256": "7f2a90319c253b230443c76b96f08af7da471db0b49e612e3ba7527a94262da8",
+  "passed": true,
+  "failures": [],
+  "evaluated_samples": 481,
+  "topology_weights_rest_geometry_exact": true,
+  "preserved_actions": {
+    "Expressive_Arm_Motion_Test": true,
+    "Full_Jump_Expressive_Test": true,
+    "Full_Jump_Expressive_v2_Test": true,
+    "Idle_Expressive_Test": true,
+    "Idle_Expressive_Test_v2": true,
+    "Idle_Expressive_Test_v3": true,
+    "Jump_AirPose_Test": true,
+    "Jump_Landing_Impact_Test": true,
+    "Jump_Landing_Test": true,
+    "Jump_Takeoff_Test": true,
+    "LowerBody_Recovery_Test": true,
+    "Rifle_Aim_Hold_V2_Test": true,
+    "Rifle_Back_Holster_V2_Test": true,
+    "Rifle_Ready_V2_v16_Test": true,
+    "Run_Expressive_Test": true,
+    "Run_Expressive_v2_Test": true,
+    "Run_Expressive_v3_Test": true,
+    "Walk_Expressive_Test": true
+  },
+  "metrics": {
+    "arm_relative_rifle_matrix_error": 7.152557373046875e-07,
+    "connected_elbow_gap_m": 0.0,
+    "straight_arm_cross_error": 5.040030039932657e-07,
+    "forearm_local_articulation_rad": 0.0,
+    "bone_world_scale_error": 5.960464477539062e-07,
+    "rigid_pair_distance_error_m": 3.7764206511914367e-07,
+    "foot_full_vertex_drift_m": 1.812804499357408e-07,
+    "foot_floor_penetration_m": 5.774199962615967e-08,
+    "attachment_to_carrier_matrix_error": 2.5331974029541016e-07,
+    "left_support_gap_deviation_m": 3.781169652938843e-07,
+    "approved_entry_pose_matrix_error": 4.76837158203125e-07
+  },
+  "limits": {
+    "arm_relative_rifle_matrix_error": 0.0001,
+    "connected_elbow_gap_m": 1e-05,
+    "straight_arm_cross_error": 1e-05,
+    "forearm_local_articulation_rad": 0.0001,
+    "bone_world_scale_error": 1e-05,
+    "rigid_pair_distance_error_m": 1e-05,
+    "foot_full_vertex_drift_m": 1e-05,
+    "foot_floor_penetration_m": 1e-05,
+    "attachment_to_carrier_matrix_error": 1e-05,
+    "left_support_gap_deviation_m": 0.0001,
+    "approved_entry_pose_matrix_error": 0.0001
+  },
+  "left_support_sampled_gap_range_m": [
+    0.011040406301617622,
+    0.011041014455258846
+  ],
+  "loop_pose_matrix_error": 0.0,
+  "loop_one_sided_translation_velocity_difference_m_s": 3.746834423192623e-06,
+  "loop_one_sided_angular_velocity_difference_rad_s": 0,
+  "raw_triangle_pairs_max": {
+    "Head|Chest": 14,
+    "Chest|UpperArm.L": 6,
+    "Chest|UpperArm.R": 10,
+    "Chest|Leg.L": 24,
+    "Chest|Leg.R": 16,
+    "UpperArm.L|ForeArm.L": 18,
+    "UpperArm.R|ForeArm.R": 16,
+    "UpperArm.R|Rifle_V2_Body": 54,
+    "ForeArm.R|Rifle_V2_Body": 103,
+    "Rifle_V2_Body|Rifle_V2_Magazine": 18
+  },
+  "cuboid_signed_margin_max_m": {
+    "Head|Chest": 0.004779247217811644,
+    "Head|UpperArm.L": -0.0010815705172717571,
+    "Head|UpperArm.R": -0.0035285218618810177,
+    "Head|Leg.L": -0.6091743020806462,
+    "Head|Leg.R": -0.6019882695982233,
+    "Head|ForeArm.L": -0.247383588925004,
+    "Head|ForeArm.R": -0.1282453669264214,
+    "Chest|UpperArm.L": 0.019296518290502718,
+    "Chest|UpperArm.R": 0.03578617610037327,
+    "Chest|Leg.L": 0.06626217253506184,
+    "Chest|Leg.R": 0.06885990500450134,
+    "Chest|ForeArm.L": -0.0966029055416584,
+    "Chest|ForeArm.R": -0.08314774419704918,
+    "UpperArm.L|UpperArm.R": -0.24701801082119346,
+    "UpperArm.L|Leg.L": -0.22577907517552376,
+    "UpperArm.L|Leg.R": -0.37257837038487196,
+    "UpperArm.L|ForeArm.L": 1.955777406692505e-07,
+    "UpperArm.L|ForeArm.R": -0.08487400412559509,
+    "UpperArm.R|Leg.L": -0.23611138539854437,
+    "UpperArm.R|Leg.R": -0.2530074801761657,
+    "UpperArm.R|ForeArm.L": -0.288328702095896,
+    "UpperArm.R|ForeArm.R": 1.6577541828155518e-07,
+    "Leg.L|Leg.R": -0.0013531578588299453,
+    "Leg.L|ForeArm.L": -0.22577901184558868,
+    "Leg.L|ForeArm.R": -0.2193464213050902,
+    "Leg.R|ForeArm.L": -0.3725782670080662,
+    "Leg.R|ForeArm.R": -0.24737135972827673,
+    "ForeArm.L|ForeArm.R": -0.034796953201293945
+  },
+  "unwanted_intersections": [],
+  "unwanted_intersection_samples_count": 0,
+  "worsened_adjacent_penetration": {},
+  "source_file_after_sha256": "22017e77d5a722d087c46bd839e38fbec5a30ac5a56bb4b326e86cbbbbee3fde"
+}
