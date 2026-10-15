@@ -55,8 +55,57 @@ def validate_timing(e):
     floor=e.get('preview_floor_z_m',0.0)
     if type(floor) not in [int,float] or not math.isfinite(floor) or not -10<=floor<=10:raise ValueError('Invalid preview floor height')
 
+# Explicit, source-bound exception for this private Jump/Landing reconstruction.
+# Original Run and directional policies below remain unchanged.
+JUMP_SCALE_PROFILE='actions_stuff_jump_v001'
+JUMP_SOURCE_IDS={'animation.oreville_ans.'+n for n in ['mykcsi','bevrbk','nvxqkp','xvdslp','jmjgft','dwzzez']}
+JUMP_ROOT_SOURCE_IDS=JUMP_SOURCE_IDS-{'animation.oreville_ans.dwzzez'}
+
+def jump_scale_policy(entry,sequence=False):
+    if 'research_scale_profile' not in entry:return None
+    if (entry.get('research_scale_profile')!=JUMP_SCALE_PROFILE
+            or entry.get('research_only') is not True or entry.get('production_eligible') is not False
+            or entry.get('source_pack_sha256')!='9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d'):
+        raise ValueError('Jump scale requires the verified private source profile and provenance')
+    if sequence:
+        sources=entry.get('source_scale_animations')
+        if (not isinstance(sources,list) or not sources or any(not isinstance(v,str) for v in sources)
+                or len(sources)!=len(set(sources)) or set(sources)-(JUMP_SOURCE_IDS|{'animation.oreville_ans.fngydr'})
+                or not set(sources)&JUMP_ROOT_SOURCE_IDS):
+            raise ValueError('Jump sequence scale sources must be unique verified Jump/Landing IDs')
+        sources=set(sources)
+    else:
+        source=entry.get('source_animation')
+        if source not in JUMP_SOURCE_IDS:raise ValueError('Unverified Jump/Landing source animation')
+        sources={source}
+    policy=entry.get('research_scale_channels',{})
+    if not isinstance(policy,dict):raise ValueError('Jump scale policy must be a channel map')
+    for bone,rule in policy.items():
+        if not isinstance(rule,dict):raise ValueError('Invalid Jump scale rule')
+        if bone=='Root' and sources&JUMP_ROOT_SOURCE_IDS:
+            if (set(rule)!={'axes','min','max'} or rule['axes']!=[0,1,2]
+                    or any(type(v) is not int for v in rule['axes'])):raise ValueError('Jump Root scale requires axes 0, 1 and 2')
+            low,high=.85,1.15
+        elif bone in ['Leg.L','Leg.R'] and sources&{'animation.oreville_ans.mykcsi','animation.oreville_ans.fngydr'}:
+            if set(rule)!={'axis','min','max'} or type(rule['axis']) is not int or rule['axis']!=1:raise ValueError('Jump leg scale supports only local Y')
+            low,high=(.95,1.30) if 'animation.oreville_ans.mykcsi' in sources else (1.,1.11)
+        else:raise ValueError('Scale channel is not authored by the declared Jump/Landing sources')
+        if (type(rule['min']) not in [int,float] or type(rule['max']) not in [int,float]
+                or not math.isfinite(rule['min']) or not math.isfinite(rule['max'])
+                or not low<=rule['min']<=1.<=rule['max']<=high):raise ValueError('Jump scale policy exceeds verified research bounds')
+    return policy
+
+def validate_jump_scale_curve(curve,policy):
+    bone=curve.data_path.split('"')[1];rule=policy.get(bone)
+    allowed=rule is not None and curve.array_index in rule.get('axes',[rule.get('axis')])
+    low,high=(rule['min'],rule['max']) if allowed else (1.,1.)
+    if (curve.modifiers or any(k.interpolation!='LINEAR' or not math.isfinite(k.co.y)
+            or k.co.y<low-1e-6 or k.co.y>high for k in curve.keyframe_points)):
+        raise ValueError('Jump scale keys exceed declared source bounds or are not finite LINEAR keys')
+
 def validate_action(action,entry,rig):
     validate_timing(entry)
+    jump_policy=jump_scale_policy(entry)
     if entry.get('rotation_modes')!={b.name:b.rotation_mode for b in rig.pose.bones}:raise ValueError('Incompatible pose rotation modes')
     if len(action.slots)!=1 or action.slots[0].target_id_type!='OBJECT':raise ValueError('Viewer requires one rig-only OBJECT Action slot')
     if len(action.layers)!=1 or len(action.layers[0].strips)!=1 or len(action.layers[0].strips[0].channelbags)!=1:raise ValueError('Viewer requires one baked layer, strip and channel bag')
@@ -69,7 +118,14 @@ def validate_action(action,entry,rig):
         if not re.fullmatch(r'pose\.bones\["[^"\n]+"\]\.(location|rotation_euler|rotation_quaternion|scale)',c.data_path):raise ValueError('Only baked rig pose transforms are supported: '+c.data_path)
         values=rig.path_resolve(c.data_path)
         if not 0<=c.array_index<len(values):raise ValueError('Invalid bone transform channel')
-        if c.data_path.endswith('scale') and any(abs(k.co.y-1)>1e-6 for k in c.keyframe_points):
+        if jump_policy is not None:
+            bone_name=c.data_path.split('"')[1]
+            if bone_name.startswith('ForeArm.'):
+                prop=c.data_path.rsplit('.',1)[1]
+                neutral=1. if prop=='scale' or (prop=='rotation_quaternion' and c.array_index==0) else 0.
+                if any(not math.isfinite(k.co.y) or abs(k.co.y-neutral)>1e-6 for k in c.keyframe_points):raise ValueError('Jump reconstruction cannot invent ForeArm articulation')
+            if c.data_path.endswith('scale'):validate_jump_scale_curve(c,jump_policy)
+        elif c.data_path.endswith('scale') and any(abs(k.co.y-1)>1e-6 for k in c.keyframe_points):
             policy=entry.get('research_scale_channels',{})
             bone_name=c.data_path.split('\"')[1]
             rule=policy.get(bone_name)
@@ -164,8 +220,9 @@ def validate_review_sequence(entry):
     for obj in [rig,mesh,world]:
         if obj.constraints or (obj.animation_data and (obj.animation_data.nla_tracks or obj.animation_data.drivers)):raise ValueError('Review sequences require baked transforms without constraints, NLA or drivers')
     if any(b.constraints for b in rig.pose.bones):raise ValueError('Review sequence bone constraints are unsupported')
+    jump_policy=jump_scale_policy(entry,sequence=True)
     scale_policy=entry.get('research_scale_channels',{})
-    if 'research_scale_channels' in entry:
+    if jump_policy is None and 'research_scale_channels' in entry:
         if (entry.get('source_pack_sha256')!='9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d'
                 or entry.get('directional_weight_adapter')!='positive_only_not_normalized'
                 or not isinstance(scale_policy,dict) or not scale_policy or set(scale_policy)-{'Leg.L','Leg.R'}):raise ValueError('Mixed directional scale requires verified source provenance and leg-only bounds')
@@ -193,7 +250,9 @@ def validate_review_sequence(entry):
             if bone_name.startswith('ForeArm.'):
                 neutral=1. if (prop=='scale' or (prop=='rotation_quaternion' and c.array_index==0)) else 0.
                 if any(abs(k.co.y-neutral)>1e-6 for k in c.keyframe_points):raise ValueError('Review sequence cannot invent ForeArm articulation')
-            if prop=='scale':
+            if prop=='scale' and jump_policy is not None:
+                validate_jump_scale_curve(c,jump_policy)
+            elif prop=='scale':
                 low,high=(1.,1.070002) if bone_name in ['Leg.L','Leg.R'] and c.array_index==1 else (1.,1.)
                 if bone_name in scale_policy and c.array_index==1:high=scale_policy[bone_name]['max']
                 if any(k.co.y<low-1e-6 or k.co.y>high for k in c.keyframe_points):raise ValueError('Review scale exceeds the verified leg Y bounds')

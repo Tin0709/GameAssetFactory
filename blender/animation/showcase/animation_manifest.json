@@ -1711,6 +1711,518 @@
       "research_notes": "blender/animation/reviews/player_animation_library_v1/actions_stuff_run_v001/RECONSTRUCTION_NOTES.md",
       "review_sequence": "blender/animation/reviews/player_animation_library_v1/actions_stuff_run_v001/reference_source_approved_front_1x.mp4",
       "research_clock_note": "Six-second continuous take; no fabricated short composite loop. Replay resets declared clocks."
+    },
+    {
+      "action": "Jump_ActionsStuff_Source_Test_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
+      "source_rig": "ASJ_Literal_Player_Rig_v001",
+      "source_mesh": "ASJ_Literal_Player_Mesh_v001",
+      "source_armature": "LB_Test_RestRig.002",
+      "slot_identifier": "OBASJ_Literal_Player_Rig_v001",
+      "action_sha256": "7c217be64fa7810ac5414efaa6c96fd7d1356633e21b8a21873257a68a63840e",
+      "action_frame_range": [
+        1.0,
+        36.000999450683594
+      ],
+      "start": 1,
+      "end": 36,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Literal source phase reconstruction; pending explicit human review; research only, no production promotion.",
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "source_animation": "animation.oreville_ans.mykcsi",
+      "source_alias": "jump",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "research_scale_channels": {
+        "Root": {
+          "axes": [
+            0,
+            1,
+            2
+          ],
+          "min": 0.85,
+          "max": 1.15
+        },
+        "Leg.L": {
+          "axis": 1,
+          "min": 0.95,
+          "max": 1.3
+        },
+        "Leg.R": {
+          "axis": 1,
+          "min": 0.95,
+          "max": 1.3
+        }
+      },
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_floor_z_m": -0.28221518445014954,
+      "source_duration_s": 1.1667,
+      "endpoint_sample_frame": 36.001000000000005,
+      "bake_hz": 240,
+      "authored_key_times_s": [
+        0.0,
+        0.0417,
+        0.0833,
+        0.125,
+        0.1667,
+        0.2083,
+        0.25,
+        0.2917,
+        0.3333,
+        0.375,
+        0.4167,
+        0.4583,
+        0.5,
+        0.5833,
+        0.625,
+        0.6667,
+        0.7083,
+        0.7917,
+        0.8333,
+        0.875,
+        0.9167,
+        1.1667
+      ],
+      "profile": "isolated literal phase; no controller/blend/holding layers",
+      "head_convention": "literal phase parent-relative head; no entity-relative layer",
+      "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
+    },
+    {
+      "action": "SprintJump_A_ActionsStuff_Source_Test_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
+      "source_rig": "ASJ_Literal_Player_Rig_v001",
+      "source_mesh": "ASJ_Literal_Player_Mesh_v001",
+      "source_armature": "LB_Test_RestRig.002",
+      "slot_identifier": "OBASJ_Literal_Player_Rig_v001",
+      "action_sha256": "d5dbb29bb3246c308356f22304fd54625fd56f0316ae955ebb6f97be2333e152",
+      "action_frame_range": [
+        1.0,
+        48.499000549316406
+      ],
+      "start": 1,
+      "end": 48,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Literal source phase reconstruction; pending explicit human review; research only, no production promotion.",
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "source_animation": "animation.oreville_ans.bevrbk",
+      "source_alias": "wxzmsp",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "research_scale_channels": {
+        "Root": {
+          "axes": [
+            0,
+            1,
+            2
+          ],
+          "min": 0.85,
+          "max": 1.15
+        }
+      },
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_floor_z_m": -0.37126959013938904,
+      "source_duration_s": 1.5833,
+      "endpoint_sample_frame": 48.498999999999995,
+      "bake_hz": 240,
+      "authored_key_times_s": [
+        0.0,
+        0.0833,
+        0.125,
+        0.1667,
+        0.2083,
+        0.25,
+        0.3333,
+        0.375,
+        0.5,
+        0.5417,
+        0.5833,
+        0.625,
+        0.6667,
+        0.7083,
+        0.75,
+        0.7917,
+        0.8333,
+        0.875,
+        0.9167,
+        0.9583,
+        1.0,
+        1.125,
+        1.1667,
+        1.2083,
+        1.2917,
+        1.4167,
+        1.4583,
+        1.5417,
+        1.5833
+      ],
+      "profile": "isolated literal phase; no controller/blend/holding layers",
+      "head_convention": "literal phase parent-relative head; no entity-relative layer",
+      "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
+    },
+    {
+      "action": "SprintJump_B_ActionsStuff_Source_Test_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
+      "source_rig": "ASJ_Literal_Player_Rig_v001",
+      "source_mesh": "ASJ_Literal_Player_Mesh_v001",
+      "source_armature": "LB_Test_RestRig.002",
+      "slot_identifier": "OBASJ_Literal_Player_Rig_v001",
+      "action_sha256": "efc919991625a9a636d8f3d53be91dbed0a926e75ad5c4a780b12f2446f6c09d",
+      "action_frame_range": [
+        1.0,
+        48.499000549316406
+      ],
+      "start": 1,
+      "end": 48,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Literal source phase reconstruction; pending explicit human review; research only, no production promotion.",
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "source_animation": "animation.oreville_ans.nvxqkp",
+      "source_alias": "rnmred",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "research_scale_channels": {
+        "Root": {
+          "axes": [
+            0,
+            1,
+            2
+          ],
+          "min": 0.85,
+          "max": 1.15
+        }
+      },
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_floor_z_m": -0.37126959013938904,
+      "source_duration_s": 1.5833,
+      "endpoint_sample_frame": 48.498999999999995,
+      "bake_hz": 240,
+      "authored_key_times_s": [
+        0.0,
+        0.0833,
+        0.125,
+        0.1667,
+        0.2083,
+        0.25,
+        0.3333,
+        0.375,
+        0.5,
+        0.5417,
+        0.5833,
+        0.625,
+        0.6667,
+        0.7083,
+        0.75,
+        0.7917,
+        0.8333,
+        0.875,
+        0.9167,
+        0.9583,
+        1.0,
+        1.125,
+        1.1667,
+        1.2083,
+        1.2917,
+        1.4167,
+        1.4583,
+        1.5417,
+        1.5833
+      ],
+      "profile": "isolated literal phase; no controller/blend/holding layers",
+      "head_convention": "literal phase parent-relative head; no entity-relative layer",
+      "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
+    },
+    {
+      "action": "Landing_Stationary_ActionsStuff_Source_Test_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
+      "source_rig": "ASJ_Literal_Player_Rig_v001",
+      "source_mesh": "ASJ_Literal_Player_Mesh_v001",
+      "source_armature": "LB_Test_RestRig.002",
+      "slot_identifier": "OBASJ_Literal_Player_Rig_v001",
+      "action_sha256": "2c6abffd2144deed3c0354df95ac666fbc458a8e7a195c0bb3c44cb3021febfb",
+      "action_frame_range": [
+        1.0,
+        31.0
+      ],
+      "start": 1,
+      "end": 30,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Literal source phase reconstruction; pending explicit human review; research only, no production promotion.",
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "source_animation": "animation.oreville_ans.xvdslp",
+      "source_alias": "ydsari",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "research_scale_channels": {
+        "Root": {
+          "axes": [
+            0,
+            1,
+            2
+          ],
+          "min": 0.85,
+          "max": 1.15
+        }
+      },
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_floor_z_m": -0.011503514751791954,
+      "source_duration_s": 1.0,
+      "endpoint_sample_frame": 31.0,
+      "bake_hz": 240,
+      "authored_key_times_s": [
+        0.0,
+        0.125,
+        0.1667,
+        0.2917,
+        0.3333,
+        0.375,
+        0.4583,
+        0.5,
+        0.5417,
+        0.625,
+        0.7083,
+        0.7917,
+        0.8333,
+        0.875,
+        0.9583,
+        1.0
+      ],
+      "profile": "isolated literal phase; no controller/blend/holding layers",
+      "head_convention": "literal phase parent-relative head; no entity-relative layer",
+      "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
+    },
+    {
+      "action": "Landing_Moving_ActionsStuff_Source_Test_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
+      "source_rig": "ASJ_Literal_Player_Rig_v001",
+      "source_mesh": "ASJ_Literal_Player_Mesh_v001",
+      "source_armature": "LB_Test_RestRig.002",
+      "slot_identifier": "OBASJ_Literal_Player_Rig_v001",
+      "action_sha256": "9819f14c63bfb1e63525b1445d74ded1b42589e53749e2fa648f29edd1c6b274",
+      "action_frame_range": [
+        1.0,
+        23.5
+      ],
+      "start": 1,
+      "end": 23,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Literal source phase reconstruction; pending explicit human review; research only, no production promotion.",
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "source_animation": "animation.oreville_ans.jmjgft",
+      "source_alias": "srluww",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "research_scale_channels": {
+        "Root": {
+          "axes": [
+            0,
+            1,
+            2
+          ],
+          "min": 0.85,
+          "max": 1.15
+        }
+      },
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_floor_z_m": -0.0005,
+      "source_duration_s": 0.75,
+      "endpoint_sample_frame": 23.5,
+      "bake_hz": 240,
+      "authored_key_times_s": [
+        0.0,
+        0.0625,
+        0.125,
+        0.1875,
+        0.25,
+        0.3125,
+        0.375,
+        0.4375,
+        0.5,
+        0.5625,
+        0.625,
+        0.6875,
+        0.75
+      ],
+      "profile": "isolated literal phase; no controller/blend/holding layers",
+      "head_convention": "literal phase parent-relative head; no entity-relative layer",
+      "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
+    },
+    {
+      "action": "Fall_ActionsStuff_Source_Test_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
+      "source_rig": "ASJ_Literal_Player_Rig_v001",
+      "source_mesh": "ASJ_Literal_Player_Mesh_v001",
+      "source_armature": "LB_Test_RestRig.002",
+      "slot_identifier": "OBASJ_Literal_Player_Rig_v001",
+      "action_sha256": "1272f5498cf233df013dedd2ed7152f5a9373bb0bd791ba7793017c40b62be42",
+      "action_frame_range": [
+        1.0,
+        106.0
+      ],
+      "start": 1,
+      "end": 105,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Literal source phase reconstruction; pending explicit human review; research only, no production promotion.",
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "source_animation": "animation.oreville_ans.dwzzez",
+      "source_alias": "fall",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "research_scale_channels": {},
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_floor_z_m": -0.22549996423721314,
+      "source_duration_s": 3.5,
+      "endpoint_sample_frame": 106.0,
+      "bake_hz": 240,
+      "authored_key_times_s": [
+        0.0,
+        0.1667,
+        0.25,
+        0.2917,
+        0.4167,
+        0.4583,
+        0.5,
+        0.5417,
+        0.5833,
+        0.625,
+        0.7083,
+        0.7917,
+        0.8333,
+        0.9583,
+        1.0,
+        1.0417,
+        1.0833,
+        1.2083,
+        1.25,
+        1.3333,
+        1.375,
+        1.4167,
+        1.4583,
+        1.5,
+        1.625,
+        1.8333,
+        2.0,
+        2.0417,
+        2.125,
+        2.2917,
+        2.3333,
+        2.5833,
+        2.75,
+        2.8333,
+        3.0,
+        3.1667,
+        3.5
+      ],
+      "profile": "isolated literal phase; no controller/blend/holding layers",
+      "head_convention": "literal phase parent-relative head; no entity-relative layer",
+      "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
@@ -1838,6 +2350,127 @@
         "changes_source_pose_action": false
       },
       "source_sha256": "85267f011215de543a60d45f4af5df3f9ae6f8038e93ab34c0052b539377ee29"
+    },
+    {
+      "id": "actions_stuff_jump_landing_v001",
+      "label": "Actions & Stuff Jump / Landing v001",
+      "status": "pending",
+      "scene": "ASJ_Jump_Landing_Context_v001",
+      "rig": "ASJ_Context_Player_Rig_v001",
+      "mesh": "ASJ_Context_Player_Mesh_v001",
+      "world_root": "ASJ_PREVIEW_ONLY_CallerPhysics",
+      "pose_action": "ActionsStuff_Jump_Landing_Context_Source_Study_v001",
+      "pose_slot_identifier": "OBASJ_Context_Player_Rig_v001",
+      "pose_action_sha256": "b1ffb6551a22d5c12454d6fce557ce5470659dbdcb9f06162a42843029ae21e8",
+      "presentation_action": "PREVIEW_ONLY_ASJ_CallerPhysicsArc_v001",
+      "presentation_slot_identifier": "OBASJ_PREVIEW_ONLY_CallerPhysics",
+      "presentation_action_sha256": "6512696313ee9ec487ae0275a37c3bd9e6c9a0df4fb46254a504e51e8cd1c81c",
+      "start": 1,
+      "end": 450,
+      "fps": 30,
+      "fps_base": 1.0,
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
+      "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+      "rotation_modes": {
+        "Root": "QUATERNION",
+        "Hips": "QUATERNION",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "QUATERNION",
+        "Leg.R": "QUATERNION"
+      },
+      "cameras": {
+        "FRONT": "ASJ_Context_FRONT",
+        "THREE_QUARTER": "ASJ_Context_THREE_QUARTER",
+        "SIDE": "ASJ_Context_SIDE"
+      },
+      "return_scene": "ANIMATION_SHOWCASE",
+      "hud_root": "ASJ_Context_HUDRoot",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "source_scale_animations": [
+        "animation.oreville_ans.mykcsi",
+        "animation.oreville_ans.bevrbk",
+        "animation.oreville_ans.nvxqkp",
+        "animation.oreville_ans.xvdslp",
+        "animation.oreville_ans.jmjgft",
+        "animation.oreville_ans.fngydr"
+      ],
+      "research_scale_channels": {
+        "Root": {
+          "axes": [
+            0,
+            1,
+            2
+          ],
+          "min": 0.85,
+          "max": 1.15
+        },
+        "Leg.L": {
+          "axis": 1,
+          "min": 0.95,
+          "max": 1.3
+        },
+        "Leg.R": {
+          "axis": 1,
+          "min": 0.95,
+          "max": 1.3
+        }
+      },
+      "query_profile": {
+        "duration_s": 15.0,
+        "simulation_hz": 240,
+        "holding_right": 0.0,
+        "holding_left": 0.0,
+        "flight_s": 0.6,
+        "apex_m": 1.0,
+        "physics": "caller-declared parabola, not recovered pack physics",
+        "world_xy": "held in place; virtual position supplies source velocity",
+        "walk_query_speed_blocks_s": 2.62451171875,
+        "sprint_query_speed_blocks_s": 5.59,
+        "takeoffs": [
+          {
+            "time_s": 1.2,
+            "state": "jump",
+            "phase01": 0.0
+          },
+          {
+            "time_s": 4.0,
+            "state": "jump",
+            "phase01": 0.19503803430009126
+          },
+          {
+            "time_s": 7.2,
+            "state": "ypqtmb",
+            "phase01": 0.5925765331534132
+          },
+          {
+            "time_s": 9.6,
+            "state": "seridw",
+            "phase01": 0.9233333333326206
+          }
+        ],
+        "floor_z_m": -0.0690576359629631,
+        "floor_alignment": "one constant lowest-sole envelope for complete take; no source pose correction"
+      },
+      "engine_conventions": [
+        "positive_only_unnormalized_weights",
+        "uniform_catmull_duplicate_endpoints",
+        "linear_outgoing_fades",
+        "one_transition_per_controller_per_step",
+        "outgoing_clocks_continue"
+      ],
+      "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
     }
   ],
   "library_focus": {
@@ -1854,6 +2487,34 @@
       {
         "kind": "review_sequence",
         "id": "actions_stuff_directional_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Jump_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "action",
+        "id": "SprintJump_A_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "action",
+        "id": "SprintJump_B_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Landing_Stationary_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Landing_Moving_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Fall_ActionsStuff_Source_Test_v001"
+      },
+      {
+        "kind": "review_sequence",
+        "id": "actions_stuff_jump_landing_v001"
       }
     ]
   }

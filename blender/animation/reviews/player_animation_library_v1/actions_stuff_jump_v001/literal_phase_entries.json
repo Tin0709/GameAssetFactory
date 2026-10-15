@@ -1,7 +1,7 @@
 [
   {
     "action": "Jump_ActionsStuff_Source_Test_v001",
-    "source": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_source_v001/jump_actions_stuff_review.blend",
+    "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
     "source_rig": "ASJ_Literal_Player_Rig_v001",
     "source_mesh": "ASJ_Literal_Player_Mesh_v001",
     "source_armature": "LB_Test_RestRig.002",
@@ -90,11 +90,11 @@
     ],
     "profile": "isolated literal phase; no controller/blend/holding layers",
     "head_convention": "literal phase parent-relative head; no entity-relative layer",
-    "source_sha256": "a020d0f1e1adc80f1139ccdc998c884ba7a2f6b79cbcb9c9a4f29d98c41b8418"
+    "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
   },
   {
     "action": "SprintJump_A_ActionsStuff_Source_Test_v001",
-    "source": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_source_v001/jump_actions_stuff_review.blend",
+    "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
     "source_rig": "ASJ_Literal_Player_Rig_v001",
     "source_mesh": "ASJ_Literal_Player_Mesh_v001",
     "source_armature": "LB_Test_RestRig.002",
@@ -180,11 +180,11 @@
     ],
     "profile": "isolated literal phase; no controller/blend/holding layers",
     "head_convention": "literal phase parent-relative head; no entity-relative layer",
-    "source_sha256": "a020d0f1e1adc80f1139ccdc998c884ba7a2f6b79cbcb9c9a4f29d98c41b8418"
+    "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
   },
   {
     "action": "SprintJump_B_ActionsStuff_Source_Test_v001",
-    "source": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_source_v001/jump_actions_stuff_review.blend",
+    "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
     "source_rig": "ASJ_Literal_Player_Rig_v001",
     "source_mesh": "ASJ_Literal_Player_Mesh_v001",
     "source_armature": "LB_Test_RestRig.002",
@@ -270,11 +270,11 @@
     ],
     "profile": "isolated literal phase; no controller/blend/holding layers",
     "head_convention": "literal phase parent-relative head; no entity-relative layer",
-    "source_sha256": "a020d0f1e1adc80f1139ccdc998c884ba7a2f6b79cbcb9c9a4f29d98c41b8418"
+    "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
   },
   {
     "action": "Landing_Stationary_ActionsStuff_Source_Test_v001",
-    "source": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_source_v001/jump_actions_stuff_review.blend",
+    "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
     "source_rig": "ASJ_Literal_Player_Rig_v001",
     "source_mesh": "ASJ_Literal_Player_Mesh_v001",
     "source_armature": "LB_Test_RestRig.002",
@@ -347,11 +347,11 @@
     ],
     "profile": "isolated literal phase; no controller/blend/holding layers",
     "head_convention": "literal phase parent-relative head; no entity-relative layer",
-    "source_sha256": "a020d0f1e1adc80f1139ccdc998c884ba7a2f6b79cbcb9c9a4f29d98c41b8418"
+    "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
   },
   {
     "action": "Landing_Moving_ActionsStuff_Source_Test_v001",
-    "source": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_source_v001/jump_actions_stuff_review.blend",
+    "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
     "source_rig": "ASJ_Literal_Player_Rig_v001",
     "source_mesh": "ASJ_Literal_Player_Mesh_v001",
     "source_armature": "LB_Test_RestRig.002",
@@ -421,11 +421,11 @@
     ],
     "profile": "isolated literal phase; no controller/blend/holding layers",
     "head_convention": "literal phase parent-relative head; no entity-relative layer",
-    "source_sha256": "a020d0f1e1adc80f1139ccdc998c884ba7a2f6b79cbcb9c9a4f29d98c41b8418"
+    "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
   },
   {
     "action": "Fall_ActionsStuff_Source_Test_v001",
-    "source": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_source_v001/jump_actions_stuff_review.blend",
+    "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
     "source_rig": "ASJ_Literal_Player_Rig_v001",
     "source_mesh": "ASJ_Literal_Player_Mesh_v001",
     "source_armature": "LB_Test_RestRig.002",
@@ -509,6 +509,6 @@
     ],
     "profile": "isolated literal phase; no controller/blend/holding layers",
     "head_convention": "literal phase parent-relative head; no entity-relative layer",
-    "source_sha256": "a020d0f1e1adc80f1139ccdc998c884ba7a2f6b79cbcb9c9a4f29d98c41b8418"
+    "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
   }
 ]

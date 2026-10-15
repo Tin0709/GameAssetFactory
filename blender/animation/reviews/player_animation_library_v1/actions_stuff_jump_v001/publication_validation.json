@@ -1,0 +1,12 @@
+{
+  "published": true,
+  "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a",
+  "showcase_sha256": "2161d6c76a29e3d5a767874a65843fb40faacf7a8bab916430887823ea6c4994",
+  "manifest_sha256": "25998df30710ff2285c0fed74e0febec7711da5cfe45db1710bf545b4319a6d7",
+  "new_pending_actions": 6,
+  "new_pending_context": "actions_stuff_jump_landing_v001",
+  "all65old_actions_and_data_preserved": true,
+  "all37oldregistrations_and_approved_directional_exact": true,
+  "installed_ui_synced": true,
+  "backup": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_source_v001/backup"
+}

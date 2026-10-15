@@ -19,7 +19,7 @@
   "seamless_loop": false,
   "research_only": true,
   "production_eligible": false,
-  "source": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_source_v001/jump_actions_stuff_review.blend",
+  "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
   "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
   "rotation_modes": {
     "Root": "QUATERNION",
@@ -117,5 +117,5 @@
     "one_transition_per_controller_per_step",
     "outgoing_clocks_continue"
   ],
-  "source_sha256": "a020d0f1e1adc80f1139ccdc998c884ba7a2f6b79cbcb9c9a4f29d98c41b8418"
+  "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
 }
