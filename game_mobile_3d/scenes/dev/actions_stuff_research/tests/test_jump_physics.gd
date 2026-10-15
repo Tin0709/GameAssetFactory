@@ -53,10 +53,12 @@ func run() -> void:
 	actor.deceleration = 28.
 	actor.scripted_input = true
 	world.add_child(actor)
+	var initial_landed := false
 	for i in 4:
 		await tick()
+		initial_landed = initial_landed or query().get("landed", false)
 	check(actor.is_on_floor(), "Capsule establishes actual floor contact")
-	check(not query().get("landed", false), "Initial floor acquisition is not a Jump landing")
+	check(not initial_landed, "Initial floor acquisition is not a Jump landing")
 	for mode in ["stand", "walk", "run"]:
 		actor.requested_direction = Vector2.ZERO if mode == "stand" else Vector2(0, -1)
 		actor.requested_run = mode == "run"
@@ -90,7 +92,8 @@ func run() -> void:
 				reverse_speed = actor.velocity.z
 		check(takeoffs == 1, mode + " held jump launches exactly once")
 		check(landings == 1, mode + " produces exactly one collision landing")
-		check(saw_air and peak > .9 and peak < 1.3, mode + " capsule follows gravity with 1.2m nominal height")
+		# Semi-implicit gravity has up to one tick of impulse-height excess at 30Hz.
+		check(saw_air and peak > 1.15 and peak < 1.34, mode + " capsule follows gravity with 1.2m nominal height")
 		check(takeoff_speed > 6.5 and takeoff_speed < 6.6, mode + " launch uses gravity-derived impulse")
 		check(impact < -5., mode + " collision preserves downward impact velocity")
 		check(actor.is_on_floor(), mode + " capsule returns to floor")
