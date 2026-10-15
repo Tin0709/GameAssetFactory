@@ -2,7 +2,7 @@
 
 Pending · research only · Blender reconstruction · 2026-10-15.
 
-Open the existing `blender/animation/showcase/Animation_Showcase.blend`. In **N → Animation Library**, select **Actions & Stuff Jump / Landing v001** for the primary review. Play/Pause, Restart and Front / 3/4 / Side work from that panel. The take is15seconds, frames1–450 at30FPS and original animation speed; looping starts off. **Return to Animation Library** restores the ordinary Action selectors. **Show Archived** retains the35older registrations.
+Open the existing `blender/animation/showcase/Animation_Showcase.blend`. In **N → Animation Library**, select **Actions & Stuff Jump / Landing v001** for the primary review. Play/Pause, Restart and Front / 3/4 / Side work from that panel. The take is15 seconds, frames1–450 at30FPS and original animation speed; looping starts off. **Return to Animation Library** restores the ordinary Action selectors. **Show Archived** retains the35 older registrations.
 
 The six independently selectable source phases are all Pending:
 
@@ -45,7 +45,7 @@ All source-derived material stays private research-only and production-ineligibl
 
 ## Validation and preservation
 
-13 source/evaluator tests;10 new native scale-policy tests plus7 existing focus regressions; independent source audit and fresh-file selection/slot/timing/scale-reset/camera checks. All65pre-existing Blender Action signatures, rigs, meshes, materials, images, texts and object links are preserved. All37previous Action registrations and the Approved directional sequence retain their metadata/playback. The library now has43Action registrations,2research sequences,10focused selectors and35archived registrations.
+13 source/evaluator tests;10 new native scale-policy tests plus7 existing focus regressions; independent source audit and fresh-file selection/slot/timing/scale-reset/camera checks. All65 pre-existing Blender Action signatures, rigs, meshes, materials, images, texts and object links are preserved. All37 previous Action registrations and the Approved directional sequence retain their metadata/playback. The library now has43 Action registrations,2 research sequences,10 focused selectors and35 archived registrations.
 
 Six literal phase native TRS reconstruction errors are below3e−7; contextual pose reconstruction is below4e−7 at bake samples. Fresh saved evaluation results and any between-key approximation limits are in the validation files. These numerical checks support reconstruction fidelity within the declared profile, not automatic artistic approval or commercial licensing.
 
@@ -53,4 +53,4 @@ Reversible backups and build/capture logs are under `/Users/tin/Documents/ChatGP
 
 Primary format semantics: [Microsoft animation overview](https://learn.microsoft.com/en-us/minecraft/creator/documents/animations/animationsoverview?view=minecraft-bedrock-stable), [animation controllers](https://learn.microsoft.com/en-us/minecraft/creator/documents/animations/animationcontroller?view=minecraft-bedrock-stable). Interpolation primary-code evidence is linked in the source audit.
 
-Fresh-file numerical evaluation:1,245literal samples, maxmatrix1.4916e−5, maxheadtranslation0.01216mm;902context samples, maxmatrix8.34465e−7, headtranslation0.000835mm, ForeArm basisidentity, XY0. All9nativeH264videos fullydecoded at640×640/30FPS with correct presentation timestamps;1,640decodedframes total. Primary context videos each450frames/15s.
+Fresh-file numerical evaluation:1,245 literal samples, maxmatrix1.4916e−5, maxheadtranslation0.01216mm;902 context samples, maxmatrix8.34465e−7, headtranslation0.000835mm, ForeArm basisidentity, XY0. All9 nativeH264videos fullydecoded at640×640/30FPS with correct presentation timestamps;1,640 decodedframes total. Primary context videos each450 frames/15s.
