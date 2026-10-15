@@ -12,7 +12,6 @@ var jump_active:=false
 var jump_grounded:=true
 var _physical_height:=0.0
 var _jump_scale_offsets: Array[Vector3]=[]
-var _jump_scale_previous: Array[Vector3]=[]
 var _jump_scale_age:=10.0
 var _jump_scale_dirty:=false
 var _scale_handoff:=false
@@ -22,7 +21,6 @@ func _ready() -> void:
 	_initialize_jump_runtime()
 	for bone in skeleton.get_bone_count():
 		_jump_scale_offsets.append(Vector3.ZERO)
-		_jump_scale_previous.append(skeleton.get_bone_pose_scale(bone))
 
 func _initialize_jump_runtime() -> void:
 	jump_runtime=JumpRuntime.new(12.)
@@ -140,5 +138,6 @@ func reset_contacts() -> void:
 	jump_runtime.life=old_life
 	for key in history:
 		if key.begins_with("v."):jump_runtime.env[key]=history[key]
-	jump_runtime.env["v.hirjne"]=0.
+	for key in ["v.zwgbad","v.eeydlb","v.kggwrp","v.sjlbms","v.bsddha","v.xjryuc","v.lfltum","v.hkmncu","v.axerqj","v.hirjne","v.hhsumy","v.fxllpr","v.yngszr","v.qhbmmm","v.yyjpfg","v.zagini"]:jump_runtime.env[key]=0.
+	for key in ["v.abjhra","v.jcvgdh","v.bueybx"]:jump_runtime.env[key]=old_life
 	_jump_scale_dirty=true;_scale_handoff=true
