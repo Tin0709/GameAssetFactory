@@ -1,0 +1,56 @@
+{
+  "review": "No blocking findings in unarmed profile patch",
+  "verified": {
+    "existing_scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "visual": "walk_run_visual.gd",
+    "sampler_default": {
+      "right": 1,
+      "left": 0
+    },
+    "current_and_future_gameplay_profile": {
+      "right": 0,
+      "left": 0
+    },
+    "weapon_equipped": false,
+    "gameplay_names": [
+      "Walk_ActionsStuff_Unarmed_Gameplay_v001",
+      "Run_ActionsStuff_Unarmed_Gameplay_v001"
+    ],
+    "source_lookup_names_preserved": true,
+    "pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d"
+  },
+  "independently_rerun_tests": {
+    "test_unarmed_arms.gd": {
+      "exit_code": 0,
+      "failures": [],
+      "samples": 2400,
+      "max_arm_error_degrees": 0.0,
+      "max_nonarm_error": 0.0
+    },
+    "test_direction_sampler.gd": {
+      "exit_code": 0,
+      "failures": [],
+      "samples": 275,
+      "max_basis": 3.698370960592e-07,
+      "max_channel": 7.64428114052862e-06,
+      "max_height": 2.73938045858291e-09,
+      "max_position": 3.88614921575936e-07,
+      "run_parity": 8.42936955791629e-08
+    }
+  },
+  "untouched_source_assets_hash_verified": [
+    "source_run_sampler.gd",
+    "source_library.res",
+    "directional_channels.json",
+    "controller_program.json",
+    "run_source_profile.json",
+    "source_direction_controller.gd",
+    "native_height_field.json"
+  ],
+  "limitations": [
+    "SourceDirectionSampler code has intentional profile hook change; captured hash snapshot may postdate that code edit, so it is not evidence that sampler code was unchanged from initial state.",
+    "Source .blend hashes were not available in task context and were not independently checked.",
+    "Independent test reruns prove channel/rest-default parity; no claim of visual equip/unequip coverage.",
+    "2400sample test covers blend5values,direction4values,phase120values at nonzero movement activation, not exhaustive state domain."
+  ]
+}

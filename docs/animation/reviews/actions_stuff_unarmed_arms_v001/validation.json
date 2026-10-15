@@ -1,0 +1,445 @@
+{
+  "passed": true,
+  "source_actions_showcase_unchanged_at_arm_fix": true,
+  "existing_files_changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_visual.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_direction_sampler.gd"
+  ],
+  "source_curve_evidence": {
+    "method": "Evaluated actual compiled directional_channels.json AST and holding AST over1024phases for6authored directional clips x4holding contexts. No runtime or source mutation.",
+    "assertions_passed": 49152,
+    "samples": [
+      {
+        "clip": "walk",
+        "holding_right": 1,
+        "holding_left": 0,
+        "right_X_at_phase025": -17.8,
+        "left_X_at_phase025": 38.800000000000004
+      },
+      {
+        "clip": "walk",
+        "holding_right": 0,
+        "holding_left": 0,
+        "right_X_at_phase025": -35.6,
+        "left_X_at_phase025": 38.800000000000004
+      },
+      {
+        "clip": "walk",
+        "holding_right": 0,
+        "holding_left": 1,
+        "right_X_at_phase025": -35.6,
+        "left_X_at_phase025": 19.400000000000002
+      },
+      {
+        "clip": "walk",
+        "holding_right": 1,
+        "holding_left": 1,
+        "right_X_at_phase025": -17.8,
+        "left_X_at_phase025": 19.400000000000002
+      },
+      {
+        "clip": "move",
+        "holding_right": 1,
+        "holding_left": 0,
+        "right_X_at_phase025": -27.08221320783572,
+        "left_X_at_phase025": 54.16442641567144
+      },
+      {
+        "clip": "move",
+        "holding_right": 0,
+        "holding_left": 0,
+        "right_X_at_phase025": -54.16442641567144,
+        "left_X_at_phase025": 54.16442641567144
+      },
+      {
+        "clip": "move",
+        "holding_right": 0,
+        "holding_left": 1,
+        "right_X_at_phase025": -54.16442641567144,
+        "left_X_at_phase025": 27.08221320783572
+      },
+      {
+        "clip": "move",
+        "holding_right": 1,
+        "holding_left": 1,
+        "right_X_at_phase025": -27.08221320783572,
+        "left_X_at_phase025": 27.08221320783572
+      },
+      {
+        "clip": "kzuqni",
+        "holding_right": 1,
+        "holding_left": 0,
+        "right_X_at_phase025": 12.0,
+        "left_X_at_phase025": -24.0
+      },
+      {
+        "clip": "kzuqni",
+        "holding_right": 0,
+        "holding_left": 0,
+        "right_X_at_phase025": 24.0,
+        "left_X_at_phase025": -24.0
+      },
+      {
+        "clip": "kzuqni",
+        "holding_right": 0,
+        "holding_left": 1,
+        "right_X_at_phase025": 24.0,
+        "left_X_at_phase025": -12.0
+      },
+      {
+        "clip": "kzuqni",
+        "holding_right": 1,
+        "holding_left": 1,
+        "right_X_at_phase025": 12.0,
+        "left_X_at_phase025": -12.0
+      },
+      {
+        "clip": "pgnnhd",
+        "holding_right": 1,
+        "holding_left": 0,
+        "right_X_at_phase025": 2.6047226650039548,
+        "left_X_at_phase025": -5.2094453300079095
+      },
+      {
+        "clip": "pgnnhd",
+        "holding_right": 0,
+        "holding_left": 0,
+        "right_X_at_phase025": 5.2094453300079095,
+        "left_X_at_phase025": -5.2094453300079095
+      },
+      {
+        "clip": "pgnnhd",
+        "holding_right": 0,
+        "holding_left": 1,
+        "right_X_at_phase025": 5.2094453300079095,
+        "left_X_at_phase025": -2.6047226650039548
+      },
+      {
+        "clip": "pgnnhd",
+        "holding_right": 1,
+        "holding_left": 1,
+        "right_X_at_phase025": 2.6047226650039548,
+        "left_X_at_phase025": -2.6047226650039548
+      },
+      {
+        "clip": "move_left",
+        "holding_right": 1,
+        "holding_left": 0,
+        "right_X_at_phase025": 1.0,
+        "left_X_at_phase025": -18.0
+      },
+      {
+        "clip": "move_left",
+        "holding_right": 0,
+        "holding_left": 0,
+        "right_X_at_phase025": 2.0,
+        "left_X_at_phase025": -18.0
+      },
+      {
+        "clip": "move_left",
+        "holding_right": 0,
+        "holding_left": 1,
+        "right_X_at_phase025": 2.0,
+        "left_X_at_phase025": -9.0
+      },
+      {
+        "clip": "move_left",
+        "holding_right": 1,
+        "holding_left": 1,
+        "right_X_at_phase025": 1.0,
+        "left_X_at_phase025": -9.0
+      },
+      {
+        "clip": "move_right",
+        "holding_right": 1,
+        "holding_left": 0,
+        "right_X_at_phase025": 1.0,
+        "left_X_at_phase025": -18.0
+      },
+      {
+        "clip": "move_right",
+        "holding_right": 0,
+        "holding_left": 0,
+        "right_X_at_phase025": 2.0,
+        "left_X_at_phase025": -18.0
+      },
+      {
+        "clip": "move_right",
+        "holding_right": 0,
+        "holding_left": 1,
+        "right_X_at_phase025": 2.0,
+        "left_X_at_phase025": -9.0
+      },
+      {
+        "clip": "move_right",
+        "holding_right": 1,
+        "holding_left": 1,
+        "right_X_at_phase025": 1.0,
+        "left_X_at_phase025": -9.0
+      }
+    ],
+    "cadence_forward_walk_hz": 1.25,
+    "cadence_forward_run_hz": 1.6,
+    "bob_arm_frequency_hz": 0.6805555555555556,
+    "bob_waist_frequency_hz": 0.3402777777777778,
+    "steady_forward_channel_statistics": [
+      {
+        "mode": "idle",
+        "period_s": null,
+        "right_x_before": {
+          "mean_deg": 0,
+          "amplitude_deg": 0
+        },
+        "left_x_before": {
+          "mean_deg": 0,
+          "amplitude_deg": 0
+        },
+        "right_x_legacy": {
+          "mean_deg": 0,
+          "amplitude_deg": 0
+        },
+        "left_x_legacy": {
+          "mean_deg": 0,
+          "amplitude_deg": 0
+        },
+        "phase_expression": "No active locomotion arm X"
+      },
+      {
+        "mode": "walk",
+        "period_s": 0.8,
+        "right_x_before": {
+          "mean_deg": 1.6,
+          "amplitude_deg": 37.2
+        },
+        "left_x_before": {
+          "mean_deg": 1.6,
+          "amplitude_deg": 37.2
+        },
+        "right_x_legacy": {
+          "mean_deg": 0.8,
+          "amplitude_deg": 18.6
+        },
+        "left_x_legacy": {
+          "mean_deg": 1.6,
+          "amplitude_deg": 37.2
+        },
+        "phase_expression": "R=-37.2sin(360p)+1.6;L=37.2sin(360p)+1.6",
+        "right_negative_extremum_phase": 0.25,
+        "left_positive_extremum_phase": 0.25
+      },
+      {
+        "mode": "run",
+        "period_s": 0.625,
+        "right_x_before": {
+          "mean_deg": 0,
+          "amplitude_deg": 55
+        },
+        "left_x_before": {
+          "mean_deg": 0,
+          "amplitude_deg": 55
+        },
+        "right_x_legacy": {
+          "mean_deg": 0,
+          "amplitude_deg": 27.5
+        },
+        "left_x_legacy": {
+          "mean_deg": 0,
+          "amplitude_deg": 55
+        },
+        "phase_expression": "R=-55sin(360p+10);L=55sin(360p+10)",
+        "right_negative_extremum_phase": 0.2222222222222222,
+        "left_positive_extremum_phase": 0.2222222222222222
+      }
+    ],
+    "statistics_context": "Local source Euler X channels, steady forward walk activation1(esnrkj=.6103515625) and run activation1(esnrkj=1), direction weight1, controller run_weight0or1. Periods follow cadence1.6sqrt(njrdop), not hardcoded clip player duration. World transforms include waist/body and bob."
+  },
+  "runtime_tests": {
+    "test_direction_facing30.log": {
+      "failures": [],
+      "floor_min": -5.96046447753906e-08,
+      "fps": 30,
+      "steady_facing_errors_deg": [
+        0.0,
+        0.231447816292904,
+        0.0154310226003585,
+        0.231449385926816,
+        0.0137764713514039,
+        0.434511889338633,
+        0.00679319375950864,
+        0.434492217249619
+      ]
+    },
+    "test_direction_sampler30.log": {
+      "failures": [],
+      "max_basis": 3.698370960592e-07,
+      "max_channel": 7.64428114052862e-06,
+      "max_height": 2.73938045858291e-09,
+      "max_position": 3.88614921575936e-07,
+      "run_parity": 8.42936955791629e-08,
+      "samples": 275
+    },
+    "test_direction_gameplay30.log": {
+      "average_pose_and_controller_ms": 3.61794027777778,
+      "failures": [],
+      "final_phase": 28.0647157692984,
+      "fps": 30,
+      "max_world_leg_step_deg": 48.3708362114238,
+      "maximum_scale": 1.06698834896088,
+      "minimum_foot_y": -1.19209289550781e-07,
+      "side_and_back_used": true,
+      "support_samples": 15
+    },
+    "test_gameplay30.log": {
+      "contact_samples": 0,
+      "correction_clamps": 0,
+      "failures": [],
+      "fps": 30.0,
+      "max_leg_step_degrees": 23.579138071583,
+      "max_scale_y": 1.06895887851715,
+      "maximum_correction": 0.135360449552536,
+      "minimum_foot_y": 0.0,
+      "run_contact_speed": 0.0,
+      "steady_run_clamps": 0,
+      "support_frames": 8
+    },
+    "test_interruptions30.log": {
+      "cases": 44,
+      "clamps": 0,
+      "maxstep": 23.6472077368513,
+      "min_y": -1.19209289550781e-07,
+      "passed": true
+    },
+    "test_direction_facing60.log": {
+      "failures": [],
+      "floor_min": -5.96046447753906e-08,
+      "fps": 60,
+      "steady_facing_errors_deg": [
+        0.0,
+        0.273501346414729,
+        0.0162684527749227,
+        0.273503084186819,
+        0.0144806485662469,
+        0.51324178405119,
+        0.0071659427400308,
+        0.513224482972667
+      ]
+    },
+    "test_direction_continuity30.log": {
+      "failures": [],
+      "idle_foot_drift_m": 5.96047158296642e-08,
+      "max_stop_height_step_m": 0.0100746788084507
+    },
+    "test_direction_gameplay60.log": {
+      "average_pose_and_controller_ms": 2.85975416666667,
+      "failures": [],
+      "final_phase": 27.9383485475878,
+      "fps": 60,
+      "max_world_leg_step_deg": 36.9926119033017,
+      "maximum_scale": 1.06781077384949,
+      "minimum_foot_y": -5.96046447753906e-08,
+      "side_and_back_used": true,
+      "support_samples": 54
+    },
+    "test_gameplay60.log": {
+      "contact_samples": 6,
+      "correction_clamps": 0,
+      "failures": [],
+      "fps": 60.0,
+      "max_leg_step_degrees": 13.4664317034484,
+      "max_scale_y": 1.06737160682678,
+      "maximum_correction": 0.113472290337086,
+      "minimum_foot_y": -5.96046447753906e-08,
+      "run_contact_speed": 3.57627868652344e-06,
+      "steady_run_clamps": 0,
+      "support_frames": 17
+    }
+  },
+  "red_green": {
+    "red": {
+      "failed_as_expected": true,
+      "max_arm_error_degrees": 27.4958114624023,
+      "max_nonarm_error": 0.0,
+      "samples": 2400
+    },
+    "green": {
+      "failures": [],
+      "max_arm_error_degrees": 0.0,
+      "max_nonarm_error": 0.0,
+      "samples": 2400
+    },
+    "scope": "Both actual scene current and derivative/future samplers,5WalkRunblendweights*4directions*120phases; default legacy reference unchanged."
+  },
+  "native_capture": {
+    "actual_input_actions": true,
+    "captured_frames": 197,
+    "driver": "metal",
+    "minimum_foot_y": -5.96046447753906e-08,
+    "phase_resets": 0,
+    "physics_elapsed": 6.53333333333332,
+    "renderer": "mobile",
+    "run_profile": "Run_ActionsStuff_Unarmed_Gameplay_v001",
+    "source_phase": 8.38092509797177,
+    "source_state": "onccai",
+    "unarmed_left_flag": 0.0,
+    "unarmed_right_flag": 0.0,
+    "walk_profile": "Walk_ActionsStuff_Unarmed_Gameplay_v001"
+  },
+  "review": {
+    "review": "No blocking findings in unarmed profile patch",
+    "verified": {
+      "existing_scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+      "visual": "walk_run_visual.gd",
+      "sampler_default": {
+        "right": 1,
+        "left": 0
+      },
+      "current_and_future_gameplay_profile": {
+        "right": 0,
+        "left": 0
+      },
+      "weapon_equipped": false,
+      "gameplay_names": [
+        "Walk_ActionsStuff_Unarmed_Gameplay_v001",
+        "Run_ActionsStuff_Unarmed_Gameplay_v001"
+      ],
+      "source_lookup_names_preserved": true,
+      "pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d"
+    },
+    "independently_rerun_tests": {
+      "test_unarmed_arms.gd": {
+        "exit_code": 0,
+        "failures": [],
+        "samples": 2400,
+        "max_arm_error_degrees": 0.0,
+        "max_nonarm_error": 0.0
+      },
+      "test_direction_sampler.gd": {
+        "exit_code": 0,
+        "failures": [],
+        "samples": 275,
+        "max_basis": 3.698370960592e-07,
+        "max_channel": 7.64428114052862e-06,
+        "max_height": 2.73938045858291e-09,
+        "max_position": 3.88614921575936e-07,
+        "run_parity": 8.42936955791629e-08
+      }
+    },
+    "untouched_source_assets_hash_verified": [
+      "source_run_sampler.gd",
+      "source_library.res",
+      "directional_channels.json",
+      "controller_program.json",
+      "run_source_profile.json",
+      "source_direction_controller.gd",
+      "native_height_field.json"
+    ],
+    "limitations": [
+      "SourceDirectionSampler code has intentional profile hook change; captured hash snapshot may postdate that code edit, so it is not evidence that sampler code was unchanged from initial state.",
+      "Source .blend hashes were not available in task context and were not independently checked.",
+      "Independent test reruns prove channel/rest-default parity; no claim of visual equip/unequip coverage.",
+      "2400sample test covers blend5values,direction4values,phase120values at nonzero movement activation, not exhaustive state domain."
+    ]
+  },
+  "scope": "Unarmed runtime profiles only. No equipped weapon visual claim. Jump/Landing Blender task proceeds separately."
+}
