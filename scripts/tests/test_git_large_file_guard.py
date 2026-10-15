@@ -1,6 +1,7 @@
 """Real temporary Git indexes exercise the optional large-file hook tools."""
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -40,6 +41,7 @@ class GitToolTests(unittest.TestCase):
         else:
             path = self.repo / "fixture.bin"
             with path.open("wb") as stream:
+                stream.write(data)
                 stream.truncate(size)
             oid = self.git("hash-object", "-w", str(path)).decode().strip()
             path.unlink()
@@ -74,11 +76,26 @@ class GitToolTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("REVIEW", result.stderr)
 
+    def test_exact_fifty_and_hundred_do_not_exceed_their_thresholds(self):
+        self.stage("fifty.bin", size=50 * MIB)
+        self.stage("hundred.bin", size=100 * MIB)
+        result = self.run_tool()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("WARN: 'fifty.bin'", result.stderr)
+        self.assertIn("REVIEW: 'hundred.bin'", result.stderr)
+        self.assertNotIn("BLOCK", result.stderr)
+
     def test_block_above_hundred(self):
         self.stage("blocked.bin", size=100 * MIB + 1)
         result = self.run_tool()
         self.assertEqual(result.returncode, 1, result.stderr)
         self.assertIn("BLOCK", result.stderr)
+
+    def test_large_fake_pointer_header_is_an_ordinary_blocked_blob(self):
+        self.stage("fake.txt", POINTER, size=100 * MIB + 1)
+        result = self.run_tool()
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertIn("ordinary staged Git blob", result.stderr)
 
     def test_valid_lfs_pointer_uses_staged_filter_and_not_worktree_size(self):
         self.attributes("*.blend filter=lfs diff=lfs merge=lfs -text\n")
@@ -160,6 +177,16 @@ class GitToolTests(unittest.TestCase):
         result = self.run_tool(INSTALLER, "--dry-run")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse((self.repo / ".git/hooks/pre-commit").exists())
+
+    def test_installed_hook_actually_stops_a_blocked_commit(self):
+        (self.repo / "scripts").mkdir()
+        shutil.copyfile(GUARD, self.repo / "scripts/git_large_file_guard.py")
+        self.assertEqual(self.run_tool(INSTALLER).returncode, 0)
+        self.stage("blocked.bin", size=100 * MIB + 1)
+        result = subprocess.run(["git", "commit", "-qm", "must fail"], cwd=self.repo,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("BLOCK", result.stderr)
 
 
 if __name__ == "__main__":

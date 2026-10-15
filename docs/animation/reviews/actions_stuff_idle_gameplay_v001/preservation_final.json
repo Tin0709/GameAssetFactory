@@ -1,0 +1,11 @@
+{
+  "protected_files": 2134,
+  "authorized_metadata_and_scene_changes": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_idle_v001/README.md",
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_idle_v001/idle_entry.json",
+    "blender/animation/showcase/Animation_Showcase.blend",
+    "blender/animation/showcase/animation_manifest.json"
+  ],
+  "all_other_protected_files_exact": true
+}

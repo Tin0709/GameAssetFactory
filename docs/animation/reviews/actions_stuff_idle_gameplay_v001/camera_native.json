@@ -1,0 +1,7 @@
+{
+  "native_render_backend": "Metal Mobile / Apple M2 Pro",
+  "fps": 30,
+  "actual_jump_peak": 1.31011545658112,
+  "camera_y_range_m": 0.0020046234130806084,
+  "note": "2mm ground capsule settling; no jump-height following"
+}

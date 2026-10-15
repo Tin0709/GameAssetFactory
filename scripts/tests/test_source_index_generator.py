@@ -13,9 +13,9 @@ CANONICAL = ROOT / "blender/animation/reviews/player_animation_library_v1/action
 
 
 class SourceIndexGeneratorTests(unittest.TestCase):
-    def run_generator(self, *args):
+    def run_generator(self, *args, env=None):
         return subprocess.run([os.sys.executable, str(GENERATOR), *map(str, args)],
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
 
     def test_unknown_pack_checksum_fails_without_output(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -44,6 +44,16 @@ class SourceIndexGeneratorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stderr)
         self.assertIn("outside", result.stderr.lower())
         self.assertEqual(hashlib.sha256(CANONICAL.read_bytes()).hexdigest(), before)
+
+    @unittest.skipUnless(PACK.exists(), "Pinned external proprietary pack is not installed")
+    def test_default_output_uses_external_checksum_cache(self):
+        with tempfile.TemporaryDirectory() as folder:
+            env = dict(os.environ, XDG_CACHE_HOME=folder)
+            result = self.run_generator("--pack", PACK, env=env)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            outputs = list(Path(folder).rglob("source_index.json"))
+            self.assertEqual(len(outputs), 1)
+            self.assertIn("9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d", str(outputs[0]))
 
 
 if __name__ == "__main__":

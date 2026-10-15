@@ -29,7 +29,7 @@ def install(repo, dry_run=False):
     if destination.exists() and MARKER not in destination.read_text(errors="replace").splitlines():
         raise RuntimeError("Existing unrelated pre-commit hook preserved; integrate manually.")
     source = Path(__file__).parent / "git_hooks" / "pre-commit"
-    text = source.read_bytes()
+    text = source.read_bytes().replace(b"\r\n", b"\n")
     if dry_run:
         print(f"Would install {destination}; existing pre-push and Git config stay unchanged.")
         return
