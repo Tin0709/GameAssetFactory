@@ -44,13 +44,11 @@ func _process(_delta: float) -> void:
 	if player==null:return
 	_update_camera()
 	var visual=player.visual
-	# World-aligned WASD is preserved. Orbit supplies the engine-owned look query;
-	# the pack's body/strafe controller, not this camera, decides body orientation.
-	visual.look_yaw=PI+azimuth-.66
+	# Camera orbit is observational; locomotion owns the character's heading.
 	var state:="RUN" if visual.gait_run_weight>.98 else ("WALK ↔ RUN" if visual.gait_run_weight>.02 else "WALK")
 	if not visual.move_requested:state="SETTLING" if visual.settling else "IDLE"
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
-	hud.text="ACTIONS & STUFF · LIVE DIRECTIONAL RESEARCH\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · R Reset\nRight-drag Look/Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.direction_snapshot.get("phase",0.),variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
+	hud.text="ACTIONS & STUFF · LIVE DIRECTIONAL RESEARCH\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · R Reset\nRight-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.direction_snapshot.get("phase",0.),variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
 func _update_camera() -> void:
 	var target:=player.global_position+Vector3(0,.95,0)
 	camera.global_position=target+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*8.

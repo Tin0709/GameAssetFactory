@@ -22,7 +22,8 @@ var direction_future_sampler: RefCounted
 var direction_snapshot: Dictionary={}
 var direction_poses: Array=[]
 var direction_future_poses: Array=[]
-# Engine query adapter: initial view faces W (-Z); orbit changes the look heading.
+# Engine query adapter: face travel like the original controller; the source
+# directional clips handle the temporary mismatch while the character turns.
 var look_yaw:=PI
 var _previous_look_yaw:=PI
 var _previous_body_yaw:=PI
@@ -107,6 +108,9 @@ func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> v
 	var query_speed:=movement_speed/WALK_SPEED*(4.3*.6103515625)
 	if movement_speed>WALK_SPEED:query_speed=lerpf(4.3*.6103515625,5.59,clampf((movement_speed-WALK_SPEED)/(RUN_SPEED-WALK_SPEED),0,1))
 	var direction:=planar.normalized() if movement_speed>.00001 else Vector3.ZERO
+	if movement_speed>.015:
+		_advance_facing(atan2(planar.x,planar.z),delta)
+		look_yaw=rotation.y
 	var yaw_rate: float=-rad_to_deg(wrapf(look_yaw-_previous_look_yaw,-PI,PI))/maxf(delta,.00001)
 	_previous_look_yaw=look_yaw;rotation.y=look_yaw
 	# Match approved study's 60Hz authored Euler updates at either render rate.
