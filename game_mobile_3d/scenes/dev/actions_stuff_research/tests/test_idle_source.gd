@@ -9,6 +9,9 @@ func _initialize() -> void:
 var max_clock := 0.0
 var max_channel := 0.0
 var max_native := 0.0
+var max_active_native := 0.0
+func matrix(rows: Array) -> Transform3D:
+	return Transform3D(Basis(Vector3(rows[0][0],rows[1][0],rows[2][0]),Vector3(rows[0][1],rows[1][1],rows[2][1]),Vector3(rows[0][2],rows[1][2],rows[2][2])),Vector3(rows[0][3],rows[1][3],rows[2][3]))
 func vector_channels(raw: Dictionary) -> Dictionary:
 	var out := {}
 	for bone in raw:
@@ -69,6 +72,12 @@ func run() -> void:
 				sampler.set_composite(bc,row.base,snapshot)
 				check(bc == before,"Composite does not mutate accepted channels")
 				compare_channels(sampler.channels,row.channels)
+				if row.has("local"):
+					for name in row.local:
+						var actual: Transform3D = sampler.poses[rig.find_bone(name)]
+						var expected := matrix(row.local[name])
+						max_active_native = maxf(max_active_native,actual.origin.distance_to(expected.origin))
+						for axis in 3: max_active_native = maxf(max_active_native,actual.basis[axis].distance_to(expected.basis[axis]))
 				# Independent baseline native retarget, inactive overlay never changes a bone.
 				if snapshot.layers.is_empty():
 					ground_sampler.set_snapshot(row.base)
@@ -101,11 +110,18 @@ func run() -> void:
 			var result: Dictionary = controller.step(base,mode=="blocked_input",mode!="airborne",1.0/240.0)
 			check(result.layers.is_empty(),"No gesture while requested or ineligible")
 	check(seen.has("tculwn") and seen.has("bhsawv") and seen.has("wkbbnc"),"Gesture, outgoing fade and rearm covered")
+	# Outgoing derivative probes advance the source fade without firing rearm.
+	var fade := {"life":19.0,"vars":{"v.eqhdel":5.0},"layers":[{"alias":"tculwn","state":"tculwn","clock":4.2,"controller_weight":1.0,"state_weight":1.0}],"controllers":{"bjmscc":{"state":"bhsawv","state_time":0.0,"clocks":{},"outgoing":"tculwn","fade_elapsed":0.0,"fade_duration":.2}},"timeline_events":[{}]}
+	var halfway: Dictionary = sampler.future_snapshot(fade,.1)
+	check(absf(float(halfway.layers[0].controller_weight)-.5)<1e-10 and halfway.layers[0].clock==4.2083,"Future derivative has source .2s fade and finite clip clamp")
+	check(sampler.future_snapshot(fade,.21).layers.is_empty(),"Future derivative expires outgoing layer without rearm")
+	check(fade.controllers.bjmscc.fade_elapsed==0.0 and fade.layers[0].clock==4.2,"Future fade probe preserves live controller")
+	check(max_active_native < .000004,"Independent full graph active native retarget " + str(max_active_native))
 	check(sampler.data.clips.keys() == ["tculwn"],"Only approved compiled clip ships")
 	check(max_clock < 1e-8,"Source state clocks/fades/weights " + str(max_clock))
 	check(max_channel < .00008,"Full source graph normal-body channel parity " + str(max_channel))
 	check(max_native < .000004,"Inactive overlay native baseline parity " + str(max_native))
-	var report := {"failures":failures,"samples":samples,"poses":poses,"rendered30":rendered30,"rendered60":rendered60,"clip_samples":fixtures.clips.size(),"states":seen.keys(),"max_clock":max_clock,"max_channel":max_channel,"max_native":max_native}
+	var report := {"failures":failures,"samples":samples,"poses":poses,"rendered30":rendered30,"rendered60":rendered60,"clip_samples":fixtures.clips.size(),"states":seen.keys(),"max_clock":max_clock,"max_channel":max_channel,"max_native":max_native,"max_active_native":max_active_native}
 	print("IDLE_SOURCE_TEST ",JSON.stringify(report))
 	FileAccess.open("/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_idle_gameplay_v001/source_parity.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	actor.queue_free()
