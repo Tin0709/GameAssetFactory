@@ -1,0 +1,10 @@
+{
+  "baseline_files": 2508,
+  "changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/README.md"
+  ],
+  "missing": [],
+  "unexpected_changes": [],
+  "blender_and_production_preserved": true
+}
