@@ -75,7 +75,7 @@ func run() -> void:
 				for name in row.local:
 					var index := rig.find_bone(name)
 					var expected := matrix(row.local[name])
-					var actual: Transform3D = sampler.poses[index]
+					var actual := Transform3D(Basis(sampler.rotation(index))*Basis.from_scale(sampler.scale(index)),sampler.position(index))
 					max_position = maxf(max_position,actual.origin.distance_to(expected.origin))
 					for axis in 3: max_basis = maxf(max_basis,actual.basis[axis].distance_to(expected.basis[axis]))
 			if row.has("local"):
