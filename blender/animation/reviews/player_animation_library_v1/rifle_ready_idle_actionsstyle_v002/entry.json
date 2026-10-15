@@ -1,0 +1,43 @@
+{
+  "action": "Rifle_Ready_Idle_ActionsStyle_v002",
+  "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v002/rifle_ready_idle_actionsstyle_v002.blend",
+  "source_sha256": "644bd44e168824b8552cbc7a0b00099c6caf036f91d42a43bd7157100cd181ca",
+  "source_rig": "Showcase_Player_Rig",
+  "source_mesh": "Showcase_Player_Mesh",
+  "source_armature": "LB_Test_RestRig",
+  "slot_identifier": "OBRUN_Test_Rig",
+  "action_sha256": "222214758a5982baeffee02752ddb813f9dd7475ebe0374f16608e043476e029",
+  "action_frame_range": [
+    1.0,
+    241.0
+  ],
+  "start": 1,
+  "end": 240,
+  "fps": 30,
+  "fps_base": 1.0,
+  "status": "pending",
+  "approval_note": "Crossbow-informed custom rifle-ready v002, Pending comparison against v001. Exact relative two-hand hold and actual Rifle Stylized V2 preserved. Independently authored temporal curves; constrained pose adapter described in REFERENCE.md. Blender-only; no Godot before explicit approval.",
+  "seamless_loop": true,
+  "rotation_modes": {
+    "Root": "XYZ",
+    "Hips": "XYZ",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "XYZ",
+    "Leg.R": "XYZ"
+  },
+  "preview_prop": "rifle_stylized_v2",
+  "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+  "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
+  "original_custom_animation": true,
+  "source_derived_reconstruction": false,
+  "production_eligible": false,
+  "authorship": "Actions & Stuff third-person crossbow primary pose/layering reference; independently authored scan/support curves, approved rifle grip retained. Not a literal reconstruction; arm-angle limitations explicitly documented."
+}
