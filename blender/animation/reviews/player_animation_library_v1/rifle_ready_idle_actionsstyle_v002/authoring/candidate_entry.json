@@ -1,12 +1,12 @@
 {
   "action": "Rifle_Ready_Idle_ActionsStyle_v002",
   "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v002/rifle_ready_idle_actionsstyle_v002.blend",
-  "source_sha256": "be036276be815c251b80100123ec5d7a057740f418d3cf4227297844ddb15d7d",
+  "source_sha256": "709bb5079bc67881516577509b223a823d1b6a7b0f6838d1a0a9f3e4203fb80c",
   "source_rig": "Showcase_Player_Rig",
   "source_mesh": "Showcase_Player_Mesh",
   "source_armature": "LB_Test_RestRig",
   "slot_identifier": "OBRUN_Test_Rig",
-  "action_sha256": "1bac5e8c23ff99c972fb49337e30c79a139d1caa31111408b0dd756d5bda6fb1",
+  "action_sha256": "381278f01be90e96f6400debce6c1de0178983fb36155070e24b8e45cfbcd70a",
   "action_frame_range": [
     1.0,
     241.0
