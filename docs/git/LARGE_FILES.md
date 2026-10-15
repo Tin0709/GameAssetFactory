@@ -112,6 +112,12 @@ commit would preserve the existing 63.94 MiB ordinary blob in earlier history;
 it would not remove that object or reclaim its historical storage. No rewrite,
 force push, deletion or tracking migration is performed by these tools.
 
+## Recommended tracking decision (not executed)
+
+Prefer this full-pack index as a reproducible external cache. Keep the current working copy and checksum evidence; preserve the matching external pack in the existing private reference archive. Before removing current tracking, make the consuming `build_audit_evidence.py` accept an explicit cache path (it currently has local absolute paths). Then, only after the user chooses this option, add the exact generated-file ignore rule and remove only that path from the index with `git rm --cached`. This keeps the on-disk research file and all historical commits; it does not shrink existing clone history. Do not delete related selected evidence or original source/Blender assets.
+
+If versioning every full index is required, use a path-specific LFS rule after checking account capacity. The present payload adds about63.94MiB per distinct index version to LFS and to each download of that version; the earlier ordinary blob remains in Git history. Broad JSON tracking, automatic migration and force-push are unnecessary. Neither option has been applied in this audit.
+
 ## Reproduce the full source index outside the repository
 
 The generator requires the user's local, matching proprietary research input.
