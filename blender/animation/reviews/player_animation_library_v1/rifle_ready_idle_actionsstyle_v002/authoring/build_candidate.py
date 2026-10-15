@@ -25,7 +25,7 @@ def targets(t):
  m=motion(t);w=Vector((m['weight'],.001*m['breathe'],.010*m['breathe']))
  cp=m['body_pitch'];c=B['Chest'].translation
  D=Matrix.Translation(w+Vector((0,0,.004+.004*m['breathe'])))@pivot(c,rot(m['torso'],'Z')@rot(cp,'X')@rot(m['body_roll'],'Y'))
- hold=Matrix.Translation(w+Vector((0,-.008*m['drop']/.064,.004+.004*m['breathe']-m['drop'])))@pivot(c,rot(m['hold'],'Z')@rot(cp,'X')@rot(m['body_roll'],'Y'))
+ hold=Matrix.Translation(w+Vector((.0015*m['drop']/.064,-.008*m['drop']/.064,.004+.004*m['breathe']-m['drop'])))@pivot(c,rot(m['hold'],'Z')@rot(cp,'X')@rot(m['body_roll'],'Y'))
  M={n:x.copy() for n,x in B.items()}
  M['Hips']=Matrix.Translation(w)@B['Hips']
  M['Spine']=Matrix.Translation(w+Vector((0,0,.0015*m['breathe'])))@pivot(B['Spine'].translation,rot(.35*m['torso'],'Z'))@B['Spine']
