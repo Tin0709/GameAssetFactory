@@ -1,0 +1,43 @@
+{
+  "action": "Rifle_Ready_Idle_ActionsStyle_v001",
+  "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v001/rifle_ready_idle_actionsstyle_v001.blend",
+  "source_sha256": "bb197f21a8cada22d3e3d5e1caa02b376c5cd913c2e1ba5a8f7dd541b9122147",
+  "source_rig": "Showcase_Player_Rig",
+  "source_mesh": "Showcase_Player_Mesh",
+  "source_armature": "LB_Test_RestRig",
+  "slot_identifier": "OBRUN_Test_Rig",
+  "action_sha256": "6a91e83ef1819c1589defe863bb31ef5ba93ada34f069f1a61c75c40d1cfc991",
+  "action_frame_range": [
+    1.0,
+    241.0
+  ],
+  "start": 1,
+  "end": 240,
+  "fps": 30,
+  "fps_base": 1.0,
+  "status": "pending",
+  "approval_note": "Original custom rifle-ready idle, pending explicit artistic review. Uses exact approvedReady grip/stance and actual Rifle Stylized V2; no proprietary source keyframes. No Godot integration before approval.",
+  "seamless_loop": true,
+  "rotation_modes": {
+    "Root": "XYZ",
+    "Hips": "XYZ",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "XYZ",
+    "Leg.R": "XYZ"
+  },
+  "preview_prop": "rifle_stylized_v2",
+  "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+  "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
+  "original_custom_animation": true,
+  "source_derived_reconstruction": false,
+  "production_eligible": false,
+  "authorship": "Original motion profiles; approved Ready pose/rig/rifle. Actions & Stuff reference limited to principles of head lead, delayed body response, purposeful stops and weight."
+}
