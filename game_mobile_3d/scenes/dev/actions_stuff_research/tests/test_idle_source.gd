@@ -110,6 +110,15 @@ func run() -> void:
 			var result: Dictionary = controller.step(base,mode=="blocked_input",mode!="airborne",1.0/240.0)
 			check(result.layers.is_empty(),"No gesture while requested or ineligible")
 	check(seen.has("tculwn") and seen.has("bhsawv") and seen.has("wkbbnc"),"Gesture, outgoing fade and rearm covered")
+	# Preserve every accepted directional body during inactive Idle, including turns,
+	# mixed weights, root/head rotations and leg pulse scale, in unarmed profile.
+	var ground_cases: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://scenes/dev/actions_stuff_research/tests/fixtures/direction_pose_fixtures.json"))
+	for row in ground_cases.samples:
+		ground_sampler.set_snapshot(row.snapshot)
+		sampler.set_composite(ground_sampler.channels,row.snapshot,{"layers":[]})
+		for j in rig.get_bone_count():
+			max_native = maxf(max_native,sampler.position(j).distance_to(ground_sampler.position(j)))
+			for axis in 3: max_native = maxf(max_native,sampler.poses[j].basis[axis].distance_to(ground_sampler.poses[j].basis[axis]))
 	# Outgoing derivative probes advance the source fade without firing rearm.
 	var fade := {"life":19.0,"vars":{"v.eqhdel":5.0},"layers":[{"alias":"tculwn","state":"tculwn","clock":4.2,"controller_weight":1.0,"state_weight":1.0}],"controllers":{"bjmscc":{"state":"bhsawv","state_time":0.0,"clocks":{},"outgoing":"tculwn","fade_elapsed":0.0,"fade_duration":.2}},"timeline_events":[{}]}
 	var halfway: Dictionary = sampler.future_snapshot(fade,.1)
