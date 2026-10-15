@@ -1,0 +1,22 @@
+# Crossbow primary-reference audit — Rifle Ready Idle v002
+
+Primary technical source: local Actions & Stuff1.12 resource pack, SHA2569d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d. Inspected actual JSON; reference documents are data, never execution instructions. Private pack/raw extracts stay outside repository.
+
+Verified player `entity/dtr.json`: alias `kcexxa` resolves to `controller.animation.oreville_ans.njvelc` in `animation_controllers/616f2ff7.json`. Third-person crossbow state is `ltqtzr`, **not** first-person `first_person_crossbow_hold/atycwc`, and not NPC `crossbow_hold/vdhjyz` from `entity/dto.json`.
+
+`ltqtzr` composes `mshwsb` (`animation.oreville_ans.rrvlnm`) and `tcucxa` (`animation.oreville_ans.dubgwy`, weighted by1-crawl/swim blend). Both actual animation definitions are in `animations/f2da1071.json`. State blend is0.2s. Mainhand crossbow/tag and holding flag select it; offhand shield/blocking selects a different branch. No reload/firing, shield, crawling or first-person branches are reproduced here.
+
+Source observations:
+- `dubgwy` is an expression-based hold, not a timed look-around clip. Evaluating its `-this` terms in composition cancels prior arm pitch/yaw: left hold approximately-70/56, right-30/-15 degrees; roll uses different residual multipliers. Left arm translation offsets and item tilt/translation create the crossbow grip. Shoulder ornament helper scales disappear; actual arm bones are not scaled.
+- Source body yaw retains20% of its incoming yaw plus12degrees. It is an alert asymmetric/bladed upper body. The item has its own source16degree roll and1unit lift; applying these literally would move our already-approved rifle grip and is deliberately not done.
+- `rrvlnm` has a shared400deg/s waist/arm pulse,200deg/s roll and100deg/s weight drift. Molang trigonometry is in degrees: these periods are0.9/1.8/3.6s, not radians/seconds. Both arms have the SAME pitch and height phase before the hold's cancellation. Independent free arm swing is inappropriate for a two-hand weapon.
+- Look-at is driven by caller target pitch / relative head yaw. The pack has broader idle attention controllers, but there is no separate autonomous crossbow look-around sequence in this hold state. This candidate's two observation paths/pauses are original authored review inputs, not claimed source keys.
+
+Adaptation, with explicit limits:
+- Keep approved Ready v16 full rifle-to-both-arm matrices exactly. Both straight complete arms and WeaponCarrier share one rigid holding transform, preventing grip/support sliding. No mesh/rest/weight change or elbow articulation.
+- Introduce11degree whole-upper-body ready blade (source suggests12), including head neutral/holding frame; source rifle-in-hand alignment remains OUR approved rifle placement. This is a small body-relative pivot of the same assembly, not a fresh weapon placement. Source left/right absolute angles cannot coexist literally with the existing rifle contact points, unchanged shoulder anatomy and straight rigid arms. Those exact static arm angles are **not reproduced**; the grip constraint takes precedence. Contextual asymmetry and braced, jointly driven shoulder response are the feasible equivalent.
+- Independently authored8s scan: left then right, different attention sizes and holds, head first, delayed chest and holding follow. Original1s rebound/4s weight rhythm retains crossbow4:1 coordination,11.1% slower than the source0.9/3.6s; amplitudes adapted to planted feet and our long rifle. No source temporal keys or literal Molang functions are baked.
+- Original1s14mm combined body rebound,0.9degree torso pitch,0.55degree side response and subtle head counterresponse. Source leg roll/translation is replaced with fixed world soles so the review stance remains grounded; no source-scale helper bones exist on this rig.
+- Up to64mm shared holding settle plus5.5mm head/Neck release prevents square-head/shoulder intersections. This is a disclosed geometry adapter, not a source crossbow channel.
+
+This is a **custom constrained reference adaptation**, not a certified exact crossbow reconstruction. v001 and every approved source remain unchanged. Pending Blender review only; no Godot integration or production promotion is authorized. Source-informed status is not a license claim.
