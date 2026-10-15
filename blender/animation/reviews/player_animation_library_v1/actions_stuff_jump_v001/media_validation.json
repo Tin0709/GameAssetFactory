@@ -1,0 +1,202 @@
+{
+  "decoder" : "AVFoundation AVAssetReader BGRA; ImageIO lossless sample PNGs",
+  "passed" : true,
+  "video_count" : 9,
+  "videos" : [
+    {
+      "decoded_samples" : [
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0001.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0037.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0046.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0055.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0121.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0130.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0139.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0217.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0226.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0235.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0289.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0298.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0307.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0361.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_front_30fps_f0450.png"
+      ],
+      "dimensions" : [
+        640,
+        640
+      ],
+      "duration_s" : 15,
+      "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/context_front_30fps.mp4",
+      "fps" : 30,
+      "frames" : 450,
+      "maximum_pts_spacing_error_s" : 1.6583956430338276e-15,
+      "unique_decoded_frame_hashes" : 450
+    },
+    {
+      "decoded_samples" : [
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0001.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0037.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0046.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0055.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0121.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0130.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0139.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0217.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0226.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0235.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0289.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0298.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0307.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0361.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_side_30fps_f0450.png"
+      ],
+      "dimensions" : [
+        640,
+        640
+      ],
+      "duration_s" : 15,
+      "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/context_side_30fps.mp4",
+      "fps" : 30,
+      "frames" : 450,
+      "maximum_pts_spacing_error_s" : 1.6583956430338276e-15,
+      "unique_decoded_frame_hashes" : 450
+    },
+    {
+      "decoded_samples" : [
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0001.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0037.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0046.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0055.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0121.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0130.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0139.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0217.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0226.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0235.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0289.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0298.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0307.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0361.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/context_three_quarter_30fps_f0450.png"
+      ],
+      "dimensions" : [
+        640,
+        640
+      ],
+      "duration_s" : 15,
+      "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/context_three_quarter_30fps.mp4",
+      "fps" : 30,
+      "frames" : 450,
+      "maximum_pts_spacing_error_s" : 1.6583956430338276e-15,
+      "unique_decoded_frame_hashes" : 450
+    },
+    {
+      "decoded_samples" : [
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_fall_front_30fps_f0001.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_fall_front_30fps_f0004.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_fall_front_30fps_f0053.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_fall_front_30fps_f0105.png"
+      ],
+      "dimensions" : [
+        640,
+        640
+      ],
+      "duration_s" : 3.5,
+      "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/literal_fall_front_30fps.mp4",
+      "fps" : 30,
+      "frames" : 105,
+      "maximum_pts_spacing_error_s" : 3.2612801348363973e-16,
+      "unique_decoded_frame_hashes" : 98
+    },
+    {
+      "decoded_samples" : [
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_jump_front_30fps_f0001.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_jump_front_30fps_f0004.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_jump_front_30fps_f0019.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_jump_front_30fps_f0036.png"
+      ],
+      "dimensions" : [
+        640,
+        640
+      ],
+      "duration_s" : 1.2,
+      "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/literal_jump_front_30fps.mp4",
+      "fps" : 30,
+      "frames" : 36,
+      "maximum_pts_spacing_error_s" : 1.1796119636642288e-16,
+      "unique_decoded_frame_hashes" : 32
+    },
+    {
+      "decoded_samples" : [
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_rnmred_front_30fps_f0001.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_rnmred_front_30fps_f0004.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_rnmred_front_30fps_f0025.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_rnmred_front_30fps_f0048.png"
+      ],
+      "dimensions" : [
+        640,
+        640
+      ],
+      "duration_s" : 1.6000000000000001,
+      "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/literal_rnmred_front_30fps.mp4",
+      "fps" : 30,
+      "frames" : 48,
+      "maximum_pts_spacing_error_s" : 1.1796119636642288e-16,
+      "unique_decoded_frame_hashes" : 48
+    },
+    {
+      "decoded_samples" : [
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_srluww_front_30fps_f0001.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_srluww_front_30fps_f0004.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_srluww_front_30fps_f0012.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_srluww_front_30fps_f0023.png"
+      ],
+      "dimensions" : [
+        640,
+        640
+      ],
+      "duration_s" : 0.76700000000000002,
+      "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/literal_srluww_front_30fps.mp4",
+      "fps" : 30,
+      "frames" : 23,
+      "maximum_pts_spacing_error_s" : 4.8572257327350599e-17,
+      "unique_decoded_frame_hashes" : 23
+    },
+    {
+      "decoded_samples" : [
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_wxzmsp_front_30fps_f0001.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_wxzmsp_front_30fps_f0004.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_wxzmsp_front_30fps_f0025.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_wxzmsp_front_30fps_f0048.png"
+      ],
+      "dimensions" : [
+        640,
+        640
+      ],
+      "duration_s" : 1.6000000000000001,
+      "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/literal_wxzmsp_front_30fps.mp4",
+      "fps" : 30,
+      "frames" : 48,
+      "maximum_pts_spacing_error_s" : 1.1796119636642288e-16,
+      "unique_decoded_frame_hashes" : 48
+    },
+    {
+      "decoded_samples" : [
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_ydsari_front_30fps_f0001.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_ydsari_front_30fps_f0004.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_ydsari_front_30fps_f0016.png",
+        "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/decoded_samples\/literal_ydsari_front_30fps_f0030.png"
+      ],
+      "dimensions" : [
+        640,
+        640
+      ],
+      "duration_s" : 1,
+      "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/actions_stuff_jump_source_v001\/media\/literal_ydsari_front_30fps.mp4",
+      "fps" : 30,
+      "frames" : 30,
+      "maximum_pts_spacing_error_s" : 1.0408340855860843e-16,
+      "unique_decoded_frame_hashes" : 30
+    }
+  ]
+}

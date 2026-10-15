@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "fresh_candidate_reopen": true,
+  "all43actions_selectable": true,
+  "original37entries_exact": true,
+  "original65action_signatures_exact": true,
+  "original_datablocks_exact": true,
+  "approved_directional_status_and28second_timing_preserved": true,
+  "focus_entries": 10,
+  "archived_entries": 35,
+  "literal_phase_reports": [
+    {
+      "action": "Jump_ActionsStuff_Source_Test_v001",
+      "samples": 156,
+      "maximum_matrix_component_error": 1.2159347534179688e-05,
+      "maximum_head_translation_error_m": 1.2159347534179688e-05,
+      "maximum_forearm_basis_error": 0.0
+    },
+    {
+      "action": "SprintJump_A_ActionsStuff_Source_Test_v001",
+      "samples": 209,
+      "maximum_matrix_component_error": 1.4916062355041504e-05,
+      "maximum_head_translation_error_m": 2.8017576221721923e-06,
+      "maximum_forearm_basis_error": 0.0
+    },
+    {
+      "action": "SprintJump_B_ActionsStuff_Source_Test_v001",
+      "samples": 209,
+      "maximum_matrix_component_error": 1.490861177444458e-05,
+      "maximum_head_translation_error_m": 2.9124075583482482e-06,
+      "maximum_forearm_basis_error": 0.0
+    },
+    {
+      "action": "Landing_Stationary_ActionsStuff_Source_Test_v001",
+      "samples": 130,
+      "maximum_matrix_component_error": 2.86102294921875e-06,
+      "maximum_head_translation_error_m": 1.6988794206672786e-06,
+      "maximum_forearm_basis_error": 0.0
+    },
+    {
+      "action": "Landing_Moving_ActionsStuff_Source_Test_v001",
+      "samples": 97,
+      "maximum_matrix_component_error": 5.960464477539062e-07,
+      "maximum_head_translation_error_m": 5.960464477539062e-07,
+      "maximum_forearm_basis_error": 0.0
+    },
+    {
+      "action": "Fall_ActionsStuff_Source_Test_v001",
+      "samples": 444,
+      "maximum_matrix_component_error": 8.242204785346985e-07,
+      "maximum_head_translation_error_m": 3.5764765146531853e-07,
+      "maximum_forearm_basis_error": 0.0
+    }
+  ],
+  "maximum_literal_matrix_component_error": 1.4916062355041504e-05,
+  "maximum_literal_head_translation_error_m": 1.2159347534179688e-05,
+  "maximum_literal_forearm_basis_error": 0.0,
+  "context_samples": 902,
+  "context_maximum_matrix_component_error": 8.344650268554688e-07,
+  "context_head_translation_error_m": 8.348740728728494e-07,
+  "context_forearm_basis_error": 0.0,
+  "context_presentation_height_error_m": 2.943439325608921e-08,
+  "context_horizontal_presentation_travel_m": 0.0,
+  "context_runtime_clock_bake": "240Hz dense approximation; no exact interior source-breakpoint insertion for changing composite clocks",
+  "scale_reset_to_preserved_walk_run_idle_pass": true,
+  "cameras_hud_sequence_return_pass": true,
+  "no_autoplay": true,
+  "gui_playback_not_yet_verified": true
+}
