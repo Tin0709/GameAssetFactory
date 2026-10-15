@@ -93,7 +93,7 @@ func _step_controller(alias: String, dt: float) -> Array:
 	var finish_count := 0
 	for animation in c.clocks:
 		var clip: Dictionary = _program.clips[animation]
-		if not ((clip.loop is bool and clip.loop) or clip.loop == "hold_on_last_frame"):
+		if not ((clip.loop is bool and clip.loop) or (clip.loop is String and clip.loop == "hold_on_last_frame")):
 			var finished: bool = clip.animation_length != 0 and c.clocks[animation] >= float(clip.animation_length)
 			any_finished = any_finished or finished
 			all_finished = all_finished and finished
