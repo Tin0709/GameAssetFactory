@@ -1,0 +1,14 @@
+{
+  "published": true,
+  "one_new_pending_action": "Idle_ActionsStuff_Source_Test_v001",
+  "old_action_signatures_exact": 78,
+  "old_entries_and_review_statuses_exact": true,
+  "old_datablocks_exact": true,
+  "showcase_sha256": "0618ac328dc7d7b538ed1e6098ccfc7820d004f35a59ccb6b6b734ebfeeb049e",
+  "source_file_sha256": "97bdfe84cb388c0bab15dd024cbd53846fd1fb1f6ee8575b1ae0db3a796998c1",
+  "source_manifest_sha256": "e46b889c25f15745949566225251499c8c41e4d1608caa2e011d4c8d45e42af4",
+  "backups": "/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_idle_source_v001/backup",
+  "existing_ui_code_unchanged": true,
+  "godot_unchanged": true,
+  "no_new_showcase": true
+}

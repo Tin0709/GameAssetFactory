@@ -1,0 +1,62 @@
+{
+  "action": "Idle_ActionsStuff_Source_Test_v001",
+  "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_idle_v001/idle_actions_stuff_source_v001.blend",
+  "source_rig": "ASI_Idle_Player_Rig_v001",
+  "source_mesh": "ASI_Idle_Player_Mesh_v001",
+  "source_armature": "LB_Test_RestRig.004",
+  "slot_identifier": "OBASI_Idle_Player_Rig_v001",
+  "action_sha256": "36adc95e90e7321b59aaa7b4370425d5b58ccb2824891f8dd54e5fab99e08192",
+  "action_frame_range": [
+    1.0,
+    271.0
+  ],
+  "start": 1,
+  "end": 270,
+  "fps": 30,
+  "fps_base": 1.0,
+  "status": "pending",
+  "approval_note": "One source-derived ordinary Player Idle study; awaits explicit Blender artistic approval; research only.",
+  "seamless_loop": false,
+  "research_only": true,
+  "production_eligible": false,
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "source_profile": "ordinary_default_player_tnlxsa0",
+  "source_controllers": [
+    "controller.animation.oreville_ans.fotixv",
+    "controller.animation.oreville_ans.irkwzk"
+  ],
+  "source_animations": [
+    "animation.oreville_ans.tdrcwc",
+    "animation.oreville_ans.jcyjaa",
+    "animation.oreville_ans.cndmcx",
+    "animation.oreville_ans.boabcq"
+  ],
+  "rotation_modes": {
+    "Root": "XYZ",
+    "Hips": "XYZ",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "XYZ",
+    "Leg.R": "XYZ"
+  },
+  "preview_floor_z_m": -0.010144399479031563,
+  "source_duration_s": 9.0,
+  "endpoint_sample_frame": 271.0,
+  "bake_hz": 240,
+  "random_seed": 2,
+  "random_algorithm_adapter": "Python random.Random randint; Bedrock PRNG not known",
+  "eligible_history": "prior movement (>0 modified_distance_moved), attack-free >=12s; not a never-moved spawn",
+  "caller_head_queries": [
+    0.0,
+    0.0
+  ],
+  "facial_motion": "unsupported by unchanged 13-bone fixed atlas; source facial evidence documented",
+  "source_sha256": "97bdfe84cb388c0bab15dd024cbd53846fd1fb1f6ee8575b1ae0db3a796998c1"
+}
