@@ -1,0 +1,105 @@
+{
+  "passed": true,
+  "base_source_sha256": "b23fb544ee9ab74d325874cbea6b8d189cd582dd5bcee83fabef7ff769f645d1",
+  "base_action_sha256": "d803fbf8f04043c57e0eea3c9d98a6360af8be929b629d4a73eb4a629f8470ce",
+  "candidate_sha256": "fc8aca958d907f50bc5a21f11e46aace8436874b0113cc5a045f768f680633d3",
+  "action_sha256": "b996bdaeb2711490a3c05e0928c6f2c3976cf72d076819c6e5f7b0afb341e97a",
+  "changed_curves": [
+    [
+      "UpperArm.L",
+      "location",
+      0
+    ],
+    [
+      "UpperArm.L",
+      "location",
+      1
+    ],
+    [
+      "UpperArm.L",
+      "location",
+      2
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      0
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      1
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      2
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      3
+    ],
+    [
+      "UpperArm.R",
+      "location",
+      0
+    ],
+    [
+      "UpperArm.R",
+      "location",
+      1
+    ],
+    [
+      "UpperArm.R",
+      "location",
+      2
+    ],
+    [
+      "WeaponCarrier",
+      "location",
+      0
+    ],
+    [
+      "WeaponCarrier",
+      "location",
+      1
+    ],
+    [
+      "WeaponCarrier",
+      "location",
+      2
+    ]
+  ],
+  "all_other_curves_copied_exactly": true,
+  "frames": 2593,
+  "duration_s": 10.8,
+  "arm_drop_range_m": [
+    0.018000006675720215,
+    0.018000006675720215
+  ],
+  "maximum_left_anchor_motion_m": 0.00219048445885415,
+  "maximum_left_shoulder_motion_m": 0.0027941808956204453,
+  "collision_trimmed_samples": 817,
+  "minimum_motion_fraction": 0.00190625,
+  "support_normal_carrier_local": [
+    6.258489406718581e-07,
+    0.7444442510604858,
+    -0.6676847338676453
+  ],
+  "support_tangent_carrier_local": [
+    -6.977988959988579e-07,
+    0.6676845550537109,
+    0.7444443106651306
+  ],
+  "source_clock_support_periods_s": [
+    0.9,
+    1.8
+  ],
+  "source_clock_phase_lags_degrees": [
+    30,
+    20,
+    50
+  ],
+  "source_file_unchanged": true
+}
