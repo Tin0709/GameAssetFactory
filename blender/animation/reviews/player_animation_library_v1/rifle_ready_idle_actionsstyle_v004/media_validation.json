@@ -1,0 +1,38 @@
+[
+  {
+    "decoded_frames" : 324,
+    "distinct_sampled_pixel_hashes" : 324,
+    "duration_s" : 10.800000000000001,
+    "file" : "blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_idle_actionsstyle_v004\/rifle_ready_idle_three_quarter_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 1.6583956430338276e-15,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 324,
+    "distinct_sampled_pixel_hashes" : 324,
+    "duration_s" : 10.800000000000001,
+    "file" : "blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_idle_actionsstyle_v004\/rifle_ready_idle_front_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 1.6583956430338276e-15,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 324,
+    "distinct_sampled_pixel_hashes" : 324,
+    "duration_s" : 10.800000000000001,
+    "file" : "blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_idle_actionsstyle_v004\/rifle_ready_idle_side_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 1.6583956430338276e-15,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 324,
+    "distinct_sampled_pixel_hashes" : 324,
+    "duration_s" : 10.800000000000001,
+    "file" : "blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_idle_actionsstyle_v004\/comparison_v003_left_v004_right_30fps.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 1.6583956430338276e-15,
+    "passed" : true
+  }
+]
