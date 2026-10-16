@@ -1,14 +1,16 @@
 {
+  "passed": true,
   "reopened_pending": true,
-  "all_82_prior_actions_exact": true,
-  "previous_registrations_sequences_exact_except_explicit_v003_approval": true,
-  "approved_ready_preserved": true,
+  "all_other_82_actions_exact": true,
+  "all_native_assets_exact": true,
+  "manifest_only_v004_metadata_updated": true,
+  "v003_approved_and_unchanged": true,
   "loop_matrix_error": 0.0,
-  "action_sha256": "c8349c746f1c0befe0b90eeb22f018ebae15a26ada0f3c227ccc581815403d96",
-  "frame_range": [
+  "action_sha256": "64e4635a30e50df9b74aeaa9f05734c09228ef6ab67f80781a096451f4d11360",
+  "source_sha256": "1de968681972f42c493bf3b8d55fa55841df36be6173f69763e4c620ac6e1cb8",
+  "frames": [
     1,
     324
   ],
-  "fps": 30,
-  "actual_rifle_exists": true
+  "fps": 30
 }

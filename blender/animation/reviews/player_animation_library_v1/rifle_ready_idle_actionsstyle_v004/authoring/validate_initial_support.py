@@ -1,4 +1,4 @@
-"""Independent read-only v003/v004 motion comparison at 30/60FPS poses."""
+"""Historical initial support-stage guard; run before the closer-hold correction."""
 import bpy,json,sys,hashlib,math
 from pathlib import Path
 from mathutils import Vector
@@ -45,5 +45,5 @@ assert metrics['left_anchor_relative_motion_m']>.0005,'No meaningful support mot
 source=R/'blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v003/rifle_ready_idle_actionsstyle_v003.blend'
 assert hashlib.sha256(source.read_bytes()).hexdigest()=='b23fb544ee9ab74d325874cbea6b8d189cd582dd5bcee83fabef7ff769f645d1'
 d={'passed':not failures,'failures':failures,'samples':649,'changed_curves':changed,'unaffected_curves_verbatim':True,'all_key_times_and_interpolation_retained':True,'v003_action_sha256':ui.action_signature(a),'v003_source_byte_exact':True,'metrics':metrics,'limits':limits}
-(O/'refinement_validation.json').write_text(json.dumps(d,indent=2));print(json.dumps(d))
+(O/'initial_support_refinement_validation.json').write_text(json.dumps(d,indent=2));print(json.dumps(d))
 if failures:raise RuntimeError(str(failures))

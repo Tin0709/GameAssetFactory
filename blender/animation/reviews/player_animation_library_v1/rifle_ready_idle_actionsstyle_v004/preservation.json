@@ -2,5 +2,7 @@
   "passed": true,
   "protected_files": 2032,
   "changed_files": [],
-  "godot_and_v001_v002_v003_byte_exact": true
+  "godot_v001_v002_v003_byte_exact": true,
+  "all_other_82_showcase_actions_exact": true,
+  "pending_v004_before_correction_preserved": "/Users/tin/Documents/ChatGPT/New project/experiments/rifle_ready_idle_actionsstyle_v004/closer_hold_revision/before_v004"
 }
