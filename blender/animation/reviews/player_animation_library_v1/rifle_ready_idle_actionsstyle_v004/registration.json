@@ -1,0 +1,12 @@
+{
+  "new_action": "Rifle_Ready_Idle_ActionsStyle_v004",
+  "status": "pending",
+  "all_previous_actions_preserved": 82,
+  "all_existing_native_assets_exact": true,
+  "registered_entries": 48,
+  "visible_entries": 15,
+  "archived_entries": 35,
+  "actual_rifle_visible": true,
+  "active": "Rifle_Ready_Idle_ActionsStyle_v004",
+  "action_sha256": "c8349c746f1c0befe0b90eeb22f018ebae15a26ada0f3c227ccc581815403d96"
+}

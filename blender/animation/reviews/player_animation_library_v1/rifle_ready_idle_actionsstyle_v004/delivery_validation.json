@@ -1,0 +1,20 @@
+{
+  "all_four_videos_decoded": true,
+  "decoded_frames": 1296,
+  "original_speed": true,
+  "fps": 30,
+  "v003_approval_metadata_only": true,
+  "v004_pending": true,
+  "prior_actions_preserved": 82,
+  "protected_files_preserved": 2032,
+  "visible_entries": 15,
+  "archived_entries_preserved": 35,
+  "new_source_MiB": 10.869406700134277,
+  "showcase_MiB": 33.919921875,
+  "lfs": {
+    "both_blend_paths_existing_filter": "lfs",
+    "estimated_new_unique_version_storage_MiB": 44.789,
+    "quota_not_queried": true,
+    "tracking_patterns_unchanged": true
+  }
+}
