@@ -2,19 +2,36 @@
   "passed": true,
   "failures": [],
   "samples": 649,
+  "degrees_toward_torso": 10,
+  "metrics": {
+    "unaffected_world_matrix_error": 0.0,
+    "rigid_assembly_mapping_error": 6.556510925292969e-07,
+    "shoulder_position_error_m": 0.0,
+    "arm_relative_weapon_error": 6.556510925292969e-07,
+    "tuck_angle_error_degrees": 1.4003600167455943e-05
+  },
+  "limits": {
+    "unaffected_world_matrix_error": 1e-06,
+    "rigid_assembly_mapping_error": 2e-06,
+    "shoulder_position_error_m": 2e-06,
+    "arm_relative_weapon_error": 3e-06,
+    "tuck_angle_error_degrees": 0.001
+  },
+  "hand_forward_reach_reduction_m": {
+    "L": [
+      0.09713155834469944,
+      0.09798290894832462
+    ],
+    "R": [
+      0.06513449863996357,
+      0.06566647661384195
+    ]
+  },
+  "all_unaffected_curves_exact": true,
+  "key_times_and_interpolation_exact": true,
+  "support_breathing_relative_to_weapon_exact": true,
+  "v003_action_preserved": true,
   "changed_curves": [
-    [
-      "pose.bones[\"UpperArm.L\"].location",
-      0
-    ],
-    [
-      "pose.bones[\"UpperArm.L\"].location",
-      1
-    ],
-    [
-      "pose.bones[\"UpperArm.L\"].location",
-      2
-    ],
     [
       "pose.bones[\"UpperArm.L\"].rotation_quaternion",
       0
@@ -32,16 +49,20 @@
       3
     ],
     [
-      "pose.bones[\"UpperArm.R\"].location",
+      "pose.bones[\"UpperArm.R\"].rotation_quaternion",
       0
     ],
     [
-      "pose.bones[\"UpperArm.R\"].location",
+      "pose.bones[\"UpperArm.R\"].rotation_quaternion",
       1
     ],
     [
-      "pose.bones[\"UpperArm.R\"].location",
+      "pose.bones[\"UpperArm.R\"].rotation_quaternion",
       2
+    ],
+    [
+      "pose.bones[\"UpperArm.R\"].rotation_quaternion",
+      3
     ],
     [
       "pose.bones[\"WeaponCarrier\"].location",
@@ -54,28 +75,23 @@
     [
       "pose.bones[\"WeaponCarrier\"].location",
       2
+    ],
+    [
+      "pose.bones[\"WeaponCarrier\"].rotation_quaternion",
+      0
+    ],
+    [
+      "pose.bones[\"WeaponCarrier\"].rotation_quaternion",
+      1
+    ],
+    [
+      "pose.bones[\"WeaponCarrier\"].rotation_quaternion",
+      2
+    ],
+    [
+      "pose.bones[\"WeaponCarrier\"].rotation_quaternion",
+      3
     ]
   ],
-  "unaffected_curves_verbatim": true,
-  "all_key_times_and_interpolation_retained": true,
-  "v003_action_sha256": "d803fbf8f04043c57e0eea3c9d98a6360af8be929b629d4a73eb4a629f8470ce",
-  "v003_source_byte_exact": true,
-  "metrics": {
-    "unaffected_world_matrix_error": 0.0,
-    "right_arm_rifle_drop_error_m": 3.6991213522274523e-07,
-    "right_arm_rifle_orientation_scale_error": 0.0,
-    "left_anchor_relative_motion_m": 0.0017875156745480927,
-    "left_whole_arm_angle_degrees": 0.15000722443726247,
-    "left_shoulder_additive_m": 0.002436660936470679,
-    "left_30fps_additive_step_m": 0.00015752773814930754
-  },
-  "limits": {
-    "unaffected_world_matrix_error": 1e-06,
-    "right_arm_rifle_drop_error_m": 1e-06,
-    "right_arm_rifle_orientation_scale_error": 1e-06,
-    "left_anchor_relative_motion_m": 0.003,
-    "left_whole_arm_angle_degrees": 0.151,
-    "left_shoulder_additive_m": 0.004,
-    "left_30fps_additive_step_m": 0.001
-  }
+  "candidate_sha256": "54b0977d3d7b52e2b6c927bd2cde832825221850cd4c4ccb4a99cd734a31cd5b"
 }
