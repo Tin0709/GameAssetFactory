@@ -1,10 +1,9 @@
-"""Private source Idle reconstruction, isolated from accepted locomotion.
-
-Literal upstream player bone channels/controllers from the SHA-pinned archive.
-Engine adapters are explicit: Python MT19937 seeded random integers, one ordered
-transition/controller/frame, linear source-duration outgoing fades, positive-only
-layer weights, uniform Catmull-Rom duplicated endpoints, accumulated-axis ``this``.
-Final Bedrock geometry/face capture pipeline is outside this skeleton study.
+"""Source-derived crossbow graph, using the existing audited source VM.
+Fresh pack payload is mandatory. Mainhand uncharged crossbow, ordinary player0,
+no offhand, dry grounded local, no attack/use or caller look. Only engine-query
+profile/holding flags and rightitem channel coverage differ from the frozen Idle
+harness. Source clips/controllers/pre_animation remain literal archive content.
+See REFERENCE.md for controller/PRNG/interpolation and rig adapter limits.
 """
 import copy
 import math
@@ -91,7 +90,7 @@ class IdleChannels(JumpChannels):
                 'clip_weight':own_weight,'applied_weight':weight,'clock':clock}
 
 class IdleRuntime(JumpRuntime):
-    """Ordinary default tnlxsa=0, grounded local unarmed source controller graph.
+    """Ordinary default tnlxsa=0, grounded local crossbow source controller graph.
 
     Constructor is a fresh neutral history. ``relaxed`` declares prior movement
     and attack-free age; neither helper forces a controller state, random outcome,
@@ -169,7 +168,7 @@ class IdleRuntime(JumpRuntime):
                      'is_swimming','is_crawling','is_gliding','blocking','main_hand_item_use_duration','item_is_charged']:
             if q.get('q.'+name):raise ValueError('Excluded special query '+name)
         if not q['q.is_alive'] or not q['q.is_local_player'] or not q['q.is_on_ground'] or q.get('q.is_in_water'):
-            raise ValueError('Requires alive local unarmed dry grounded ordinary player')
+            raise ValueError('Requires alive local dry grounded ordinary player')
         q.setdefault('q.modified_distance_moved',self.modified_distance_moved)
         q.setdefault('q.ground_speed',0.);q.setdefault('q.is_in_water',0.);q.setdefault('q.is_jumping',0.)
         q.setdefault('q.is_emoting',0.);q.setdefault('q.body_y_rotation',0.);q.setdefault('q.target_x_rotation',0.)
@@ -219,20 +218,3 @@ def serializable_snapshot(snapshot):
        'q.get_equipped_item_name':'empty string','q.armor_texture_slot':-1,
        'q.is_riding_any_entity_of_type':'false','q.is_pack_setting_selected':'false: specials disabled'}
     return row
-
-def sample_primary(duration=9.,hz=240):
-    """One finite naturally selected normal-player Idle; source lifetime persists.
-
-    Includes time0 and endpoint. As in the frozen study, time0 is the first
-    fixed-dt source evaluation, so source life starts at12+1/hz seconds. This is
-    a finite performance, not a seamless9-second loop.
-    """
-    hz=int(hz);duration=float(duration)
-    if hz<=0 or duration<=0 or not math.isfinite(duration):raise ValueError('Positive duration/hz required')
-    r=IdleRuntime.relaxed(seed=2,initial_life=12.)
-    rows=[]
-    for i in range(round(duration*hz)+1):
-        s=serializable_snapshot(r.step(1/hz,idle_query()))
-        s['time_s']=i/hz;s['source_evaluation_offset_s']=1/hz
-        rows.append(s)
-    return rows
