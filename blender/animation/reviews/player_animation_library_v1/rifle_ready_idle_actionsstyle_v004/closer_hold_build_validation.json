@@ -4,8 +4,8 @@
   "frames": 2593,
   "shoulder_pivot_position_error_m": 1.2731557704981462e-07,
   "palm_forward_reach_reduction_m": [
-    -0.0980057812994346,
-    -0.0651110903127119
+    0.0651110903127119,
+    0.0980057812994346
   ],
   "palm_additional_drop_m": [
     0.059926629066467285,
