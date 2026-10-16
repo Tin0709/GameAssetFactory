@@ -2437,12 +2437,12 @@
     {
       "action": "Rifle_Ready_Idle_ActionsStyle_v004",
       "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v004/rifle_ready_idle_actionsstyle_v004.blend",
-      "source_sha256": "d32c828a68361e2920ab3628bf06450495b4782e85923d8e6d77ab105552e1c8",
+      "source_sha256": "1de968681972f42c493bf3b8d55fa55841df36be6173f69763e4c620ac6e1cb8",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "c8349c746f1c0befe0b90eeb22f018ebae15a26ada0f3c227ccc581815403d96",
+      "action_sha256": "64e4635a30e50df9b74aeaa9f05734c09228ef6ab67f80781a096451f4d11360",
       "action_frame_range": [
         1.0,
         325.0
@@ -2452,7 +2452,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Refinement of artistically approved v003: 18 mm lower holding set and restrained breath-driven support movement. Pending Blender review only.",
+      "approval_note": "Pending screenshot correction:10degree shoulder-pivot tuck of the intact holding assembly; existing support breathing and source timing preserved.",
       "seamless_loop": true,
       "research_only": true,
       "production_eligible": false,
@@ -2497,7 +2497,9 @@
       "endpoint_sample_frame": 325,
       "refinement_base": "Rifle_Ready_Idle_ActionsStyle_v003",
       "arm_drop_m": 0.018,
-      "left_support_motion": "0.4..1.6mm pressure release plus\u00b10.8mm tangent,\u00b10.15degree whole straight arm overlap; clocks0.9/1.8s; collision bounded"
+      "left_support_motion": "0.4..1.6mm pressure release plus\u00b10.8mm tangent,\u00b10.15degree whole straight arm overlap; clocks0.9/1.8s; collision bounded",
+      "closer_hold_degrees": 10.0,
+      "shoulder_forward_clearance_m": 0.02
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
