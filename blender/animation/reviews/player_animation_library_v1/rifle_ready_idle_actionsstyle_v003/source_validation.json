@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "checks": 66,
+  "maximum_error": 7.46584224203747e-12,
+  "this_and_layer_order_checked": true,
+  "primary_source_read_directly": "/Users/tin/Desktop/Game Dev/local_references/Actions Stuff 1.12 (resources).mcpack",
+  "gesture_entry_s": 2.0125,
+  "gesture_duration_s": 4.2083,
+  "source_loop_duration_s": 10.8,
+  "random_algorithm_adapter": "Python MT19937 seed139; Bedrock PRNG unknown; source branch selection not manually forced"
+}
