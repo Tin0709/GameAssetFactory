@@ -11,14 +11,16 @@
   "duration_s": 10.8,
   "sample_count": 2636,
   "sampler_hz": 240,
-  "basis_error": 7.152557373046875e-07,
+  "basis_error": 3.635883331298828e-06,
   "forearm_error": 7.152557373046875e-07,
   "adapters_maximum": {
     "left_orientation_projection_degrees": 9.416133794499075,
     "left_shoulder_projection_m": 0.07491407380077314,
-    "leg_floor_lift_m": 0.010032374411821365,
-    "head_clearance_lift_m": 0.0,
-    "holding_clearance_drop_m": 0.0
+    "leg_floor_lift_m": 0.010432374411821365,
+    "head_clearance_lift_m": 0.025,
+    "holding_clearance_drop_m": 0.0,
+    "left_weapon_collision_orientation_degrees": 7.706007251810561,
+    "minimum_left_source_orientation_fraction": 0.001953125
   },
   "source_controller_events": [
     [
@@ -120,8 +122,8 @@
     }
   ],
   "source_loop_channel_error": 7.46584224203747e-12,
-  "candidate_sha256": "99ff3dedc57a215b66f630d9dc5f9de7547edd29c10f630c138097992a03eba3",
-  "action_sha256": "90e4e961fbfbc39bba54870d9958bdf9278b17c6f914bdfcf8af6d530b643eaa",
+  "candidate_sha256": "b23fb544ee9ab74d325874cbea6b8d189cd582dd5bcee83fabef7ff769f645d1",
+  "action_sha256": "d803fbf8f04043c57e0eea3c9d98a6360af8be929b629d4a73eb4a629f8470ce",
   "existing_source_actions_preserved": 18,
   "v002_loaded_or_sampled": false
 }
