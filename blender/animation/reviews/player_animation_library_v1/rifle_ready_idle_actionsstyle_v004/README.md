@@ -1,36 +1,34 @@
-# Rifle Ready Idle ActionsStyle v004
+# Rifle Ready Idle ActionsStyle v004 — closer arm hold
 
-**Pending Blender review.** Exactly one separate candidate, based on the user's artistically approved `Rifle_Ready_Idle_ActionsStyle_v003`. Its source file and all Action curves remain unchanged. v003 approval is recorded in the main manifest; v004 is not approved. Research-only/nonproduction; no Godot integration.
+**Pending Blender review.** The user clarified with a side-view screenshot: reduce the triangle-like gap between arms and body by bringing both straight arms closer to the torso. This is a correction to the SAME v004 candidate, not a new Action. Approved v003 is unchanged. No Godot integration.
 
-Open the existing `blender/animation/showcase/Animation_Showcase.blend`, use the Animation Library sidebar and select `Rifle_Ready_Idle_ActionsStyle_v004`. The actual Rifle Stylized V2 is shown. v003 remains independently selectable as Approved; older entries remain available through Show Archived. Space plays/pauses. F1–324 at30FPS gives10.8seconds; closing key325 is excluded from playback.
+Open the existing `blender/animation/showcase/Animation_Showcase.blend` → Animation Library → `Rifle_Ready_Idle_ActionsStyle_v004`. The actual Rifle Stylized V2 remains attached. The file is left in Side view for this review. Space plays/pauses. F1–324 at30FPS/closing325 excluded;10.8second loop.
 
-## Change versus v003
+## Screenshot correction
 
-| Property | v003 approved base | v004 Pending |
-|---|---|---|
-| Overall holding set | Original height | Arms and rifle lowered18mm in world vertical, same alert angles |
-| Right grip/rifle alignment | Stable rigid relationship | Retained; rifle orientation and motion unchanged apart from constant drop |
-| Left support | Palm locked relative to rifle | Tiny pressure release and overlap; actual relative palm offset up to1.79mm |
-| Left shoulder | Source constrained support | Up to2.44mm new movement and±0.15° whole straight-arm rotation |
-| Head/body/legs | Source-derived v003 | Identical curves and evaluated world transforms |
-| Cadence, pauses, loop |10.8seconds, source timing | Identical; no stretch or key-time edit |
+The intact arms/rifle assembly rotates10° toward the torso around the line joining the two shoulder pivots. This makes the arms more vertical and reduces their forward reach. The rigid shoulder blocks need20mm of constant forward seating clearance relative to the chest to remain within the existing approved joint-contact envelope. This is an explicit block-rig adapter, not extra source animation.
 
-The new support additive is independently authored, not claimed to exist in the original pack. It follows the inherited source waist/idle bob clock (400°/s,0.9s) and shoulder/head rhythm (200°/s,1.8s). Pressure release0.4–1.6mm has a75ms overlap;±0.8mm tangent travel has100ms overlap;±0.15° whole-arm shoulder rotation has125ms overlap. These offsets make the support side breathe with the existing idle without adding new torso/head motion or another rhythm. There is no elbow articulation, forearm bend, scale pulse or loose weapon following. Both arms remain straight. The rifle stays controlled by the right hand.
+After clearance, the left hand is77.1–78.0mm closer to the torso and the right hand45.1–45.7mm closer across the loop. Both hands also descend61–68mm relative to the previous Pending v004. The rifle follows the same10° rotation and retains its exact relationship to the right hand; the left support's existing tiny relative breathing motion is preserved. No elbow bend or forearm articulation is introduced. The correction changes the holding angle, not just its vertical height.
 
-Directions are measured from the actual rifle body and magazine surfaces toward the support palm. The final micro-motion needs no collision clipping at any of the2,593 build samples. Whole-arm rotation pivots near the support palm so shoulder life does not cause a large hand arc. At30FPS the largest new palm-offset step is0.158mm; this is deliberately subtle rather than an exaggerated reanimation.
+The earlier18mm whole-set vertical adjustment is retained. New torso, head, legs or attention timing are not authored. All their F-curves and evaluated world transforms remain unchanged from v003/v004. Existing key times, linear bake/interpolation and loop length remain exact.
 
-## Review
+## Left-support life retained
 
-- `comparison_v003_left_v004_right_30fps.mp4`: same camera/time, v003 left and v004 right,10.8s at original speed.
-- `rifle_ready_idle_three_quarter_30fps_1x.mp4`, `rifle_ready_idle_front_30fps_1x.mp4`, `rifle_ready_idle_side_30fps_1x.mp4`: original-speed views.
-- `build_validation.json`, `refinement_validation.json`, `motion_validation.json`: exact changes, independent base comparison, geometry/loop checks.
+The independently authored support additive follows the inherited0.9s waist/idle bob and1.8s shoulder/head clocks:0.4–1.6mm pressure release with75ms overlap,±0.8mm tangent travel with100ms overlap, and±0.15° whole-arm rotation with125ms overlap. Actual palm motion relative to rifle is≤1.79mm. It remains the same after the tuck because the whole holding assembly is transformed together. Both blocky arms stay straight; right grip remains stable.
 
-## Preservation and limits
+## Reviews
 
-All unaffected F-curves are copied verbatim, including original key times/interpolation/modifiers. The constant arm-set drop requires new local translations for both upper arms and the rifle carrier; only the left upper arm gets the small additional rotation. Forearm local channels remain untouched. Independent649-pose comparison verifies head/body/root/legs unchanged,18mm right-arm/rifle drop and identical orientation. Geometry checks cover rigid weights, straight elbows, actual rifle meshes, feet, adjacent seating and loop pose/velocity boundaries.
+- `comparison_v004_before_after_side_30fps.mp4`: previous v004 left, corrected closer hold right, original speed/same side camera.
+- `comparison_v003_left_v004_right_30fps.mp4`: approved v003 versus current corrected v004, three-quarter camera.
+- `rifle_ready_idle_side_30fps_1x.mp4`, `rifle_ready_idle_three_quarter_30fps_1x.mp4`, `rifle_ready_idle_front_30fps_1x.mp4`: current original-speed views.
+- `build_validation.json`/`closer_hold_build_validation.json`: current corrected build; `initial_support_build_validation.json` is the historical pre-correction build.
+- `refinement_validation.json`: independent649-pose before/after comparison, exact body/head/leg transforms, preserved arm/rifle relations and reduced hand reach.
+- `motion_validation.json`:649-pose rigid geometry, feet, rifle, adjacent seating and loop checks. No tolerance was increased for this correction.
 
-The inherited source reconstruction and its documented adapters remain research-only: asymmetric crossbow hold layers, seeded attention gesture, calibrated rifle grip, head clearance, sole correction and source foot movement are preserved. See the unchanged v003 `REFERENCE.md` for exact source files/controllers and adaptation limits. This refinement does not independently license the underlying source-derived motion or certify gameplay transitions.
+## Source and preservation
 
-All earlier Actions, native rig/mesh/material/texture data and prior study folders are preserved. Backups before the change, including unsaved native session data, are outside the repository under the v004 experiment directory. The existing Godot game and research scene are not modified.
+The underlying v003 source-derived crossbow layers, source clocks, seeded attention gesture and documented rifle/rig adapters are unchanged. See its preserved `REFERENCE.md`. This remains research-only/nonproduction; the new holding-angle correction does not license the source-derived animation for commercial use.
 
-Final validation:83native Actions (82earlier exact),48Action registrations plus2research sequences,15focused entries/35archived. Native save/reopen and two GUI playback wraps pass. All2,032protected Godot and previous rifle study files are byte-exact. Four review videos decode1,296frames at30FPS with continuous timestamps. Both Blender files use existing Git LFS tracking; source10.87MiB and current Showcase33.92MiB. No tracking migration or history rewrite.
+All82other Showcase Actions and native rig/mesh/material/texture data stay exact. No Showcase entry is added or removed;35archived entries remain recoverable. The prior Pending v004 source, all its review files and the unsaved native Showcase are preserved under `/Users/tin/Documents/ChatGPT/New project/experiments/rifle_ready_idle_actionsstyle_v004/closer_hold_revision/`. Godot and approved v001/v002/v003 sources remain protected.
+
+For regeneration, first build the initial support version using `authoring/build_candidate.py` from the pinned v003 source (explicit `--rebuild-pending` required if an output exists); then open that newly built v004 source and run `authoring/close_hold_revision.py`. Both scripts reject modifying an Approved v004. Keep a full Pending backup before regenerating. The current source is the corrected result, so running the correction twice is rejected by its input Action hash. The independent closer-hold validator takes the preserved initial v004 source path after `--`.
