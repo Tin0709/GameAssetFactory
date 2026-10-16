@@ -1,12 +1,12 @@
 {
   "action": "Rifle_Ready_Idle_ActionsStyle_v004",
   "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v004/rifle_ready_idle_actionsstyle_v004.blend",
-  "source_sha256": "54b0977d3d7b52e2b6c927bd2cde832825221850cd4c4ccb4a99cd734a31cd5b",
+  "source_sha256": "1de968681972f42c493bf3b8d55fa55841df36be6173f69763e4c620ac6e1cb8",
   "source_rig": "Showcase_Player_Rig",
   "source_mesh": "Showcase_Player_Mesh",
   "source_armature": "LB_Test_RestRig",
   "slot_identifier": "OBRUN_Test_Rig",
-  "action_sha256": "78d43dece4fd2cad224615d17bfa4b0e576bb8eaf50cdaa11bedbb2ef82081fa",
+  "action_sha256": "64e4635a30e50df9b74aeaa9f05734c09228ef6ab67f80781a096451f4d11360",
   "action_frame_range": [
     1.0,
     325.0
@@ -62,5 +62,6 @@
   "refinement_base": "Rifle_Ready_Idle_ActionsStyle_v003",
   "arm_drop_m": 0.018,
   "left_support_motion": "0.4..1.6mm pressure release plus\u00b10.8mm tangent,\u00b10.15degree whole straight arm overlap; clocks0.9/1.8s; collision bounded",
-  "closer_hold_degrees": 10.0
+  "closer_hold_degrees": 10.0,
+  "shoulder_forward_clearance_m": 0.02
 }

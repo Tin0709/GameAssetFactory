@@ -1,17 +1,23 @@
 {
   "passed": true,
   "degrees_toward_body": 10.0,
+  "shoulder_forward_clearance_m": 0.02,
   "frames": 2593,
-  "shoulder_pivot_position_error_m": 1.2731557704981462e-07,
+  "shoulder_pivot_position_error_m": 1.8176184457373258e-07,
   "palm_forward_reach_reduction_m": [
-    0.0651110903127119,
-    0.0980057812994346
+    0.04511105502024293,
+    0.0780058354139328
   ],
   "palm_additional_drop_m": [
-    0.059926629066467285,
-    0.06900906562805176
+    0.06096053123474121,
+    0.06843352317810059
   ],
   "changed_curves": [
+    [
+      "UpperArm.L",
+      "location",
+      2
+    ],
     [
       "UpperArm.L",
       "rotation_quaternion",
@@ -31,6 +37,11 @@
       "UpperArm.L",
       "rotation_quaternion",
       3
+    ],
+    [
+      "UpperArm.R",
+      "location",
+      2
     ],
     [
       "UpperArm.R",
@@ -91,6 +102,6 @@
   "source_timing_unchanged": true,
   "support_relative_motion_preserved_by_rigid_transform": true,
   "all_other_actions_exact": true,
-  "action_sha256": "78d43dece4fd2cad224615d17bfa4b0e576bb8eaf50cdaa11bedbb2ef82081fa",
-  "candidate_sha256": "54b0977d3d7b52e2b6c927bd2cde832825221850cd4c4ccb4a99cd734a31cd5b"
+  "action_sha256": "64e4635a30e50df9b74aeaa9f05734c09228ef6ab67f80781a096451f4d11360",
+  "candidate_sha256": "1de968681972f42c493bf3b8d55fa55841df36be6173f69763e4c620ac6e1cb8"
 }
