@@ -3,10 +3,11 @@
   "failures": [],
   "samples": 649,
   "degrees_toward_torso": 10,
+  "shoulder_forward_clearance_m": 0.02,
   "metrics": {
     "unaffected_world_matrix_error": 0.0,
     "rigid_assembly_mapping_error": 6.556510925292969e-07,
-    "shoulder_position_error_m": 0.0,
+    "shoulder_position_error_m": 1.3542200268542897e-07,
     "arm_relative_weapon_error": 6.556510925292969e-07,
     "tuck_angle_error_degrees": 1.4003600167455943e-05
   },
@@ -19,12 +20,12 @@
   },
   "hand_forward_reach_reduction_m": {
     "L": [
-      0.09713155834469944,
-      0.09798290894832462
+      0.07713150710333139,
+      0.0779829069506377
     ],
     "R": [
-      0.06513449863996357,
-      0.06566647661384195
+      0.04513451468665153,
+      0.04566644178703427
     ]
   },
   "all_unaffected_curves_exact": true,
@@ -32,6 +33,10 @@
   "support_breathing_relative_to_weapon_exact": true,
   "v003_action_preserved": true,
   "changed_curves": [
+    [
+      "pose.bones[\"UpperArm.L\"].location",
+      2
+    ],
     [
       "pose.bones[\"UpperArm.L\"].rotation_quaternion",
       0
@@ -47,6 +52,10 @@
     [
       "pose.bones[\"UpperArm.L\"].rotation_quaternion",
       3
+    ],
+    [
+      "pose.bones[\"UpperArm.R\"].location",
+      2
     ],
     [
       "pose.bones[\"UpperArm.R\"].rotation_quaternion",
@@ -93,5 +102,5 @@
       3
     ]
   ],
-  "candidate_sha256": "54b0977d3d7b52e2b6c927bd2cde832825221850cd4c4ccb4a99cd734a31cd5b"
+  "candidate_sha256": "1de968681972f42c493bf3b8d55fa55841df36be6173f69763e4c620ac6e1cb8"
 }
