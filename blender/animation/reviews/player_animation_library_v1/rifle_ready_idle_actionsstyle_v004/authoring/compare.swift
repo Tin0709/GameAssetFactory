@@ -14,7 +14,7 @@ let ins=AVMutableVideoCompositionInstruction();ins.timeRange=CMTimeRange(start:.
 let vc=AVMutableVideoComposition();vc.instructions=[ins];vc.renderSize=CGSize(width:1280,height:640);vc.frameDuration=CMTime(value:1,timescale:30)
 let parent=CALayer();parent.frame=CGRect(x:0,y:0,width:1280,height:640)
 let video=CALayer();video.frame=parent.frame;parent.addSublayer(video)
-for (i,title) in ["v003 — approved base","v004 — subtle support life"].enumerated(){
+for (i,title) in ["v003 — approved base","v004 — closer arm hold"].enumerated(){
  let bitmap=NSBitmapImageRep(bitmapDataPlanes:nil,pixelsWide:1248,pixelsHigh:60,bitsPerSample:8,samplesPerPixel:4,hasAlpha:true,isPlanar:false,colorSpaceName:.deviceRGB,bytesPerRow:0,bitsPerPixel:0)!
  NSGraphicsContext.saveGraphicsState();NSGraphicsContext.current=NSGraphicsContext(bitmapImageRep:bitmap)
  NSColor.black.withAlphaComponent(0.65).setFill();NSRect(x:0,y:0,width:1248,height:60).fill()
