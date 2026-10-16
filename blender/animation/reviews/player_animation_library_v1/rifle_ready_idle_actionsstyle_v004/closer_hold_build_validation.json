@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "degrees_toward_body": 10.0,
+  "frames": 2593,
+  "shoulder_pivot_position_error_m": 1.2731557704981462e-07,
+  "palm_forward_reach_reduction_m": [
+    -0.0980057812994346,
+    -0.0651110903127119
+  ],
+  "palm_additional_drop_m": [
+    0.059926629066467285,
+    0.06900906562805176
+  ],
+  "changed_curves": [
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      0
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      1
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      2
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      3
+    ],
+    [
+      "UpperArm.R",
+      "rotation_quaternion",
+      0
+    ],
+    [
+      "UpperArm.R",
+      "rotation_quaternion",
+      1
+    ],
+    [
+      "UpperArm.R",
+      "rotation_quaternion",
+      2
+    ],
+    [
+      "UpperArm.R",
+      "rotation_quaternion",
+      3
+    ],
+    [
+      "WeaponCarrier",
+      "location",
+      0
+    ],
+    [
+      "WeaponCarrier",
+      "location",
+      1
+    ],
+    [
+      "WeaponCarrier",
+      "location",
+      2
+    ],
+    [
+      "WeaponCarrier",
+      "rotation_quaternion",
+      0
+    ],
+    [
+      "WeaponCarrier",
+      "rotation_quaternion",
+      1
+    ],
+    [
+      "WeaponCarrier",
+      "rotation_quaternion",
+      2
+    ],
+    [
+      "WeaponCarrier",
+      "rotation_quaternion",
+      3
+    ]
+  ],
+  "source_timing_unchanged": true,
+  "support_relative_motion_preserved_by_rigid_transform": true,
+  "all_other_actions_exact": true,
+  "action_sha256": "78d43dece4fd2cad224615d17bfa4b0e576bb8eaf50cdaa11bedbb2ef82081fa",
+  "candidate_sha256": "54b0977d3d7b52e2b6c927bd2cde832825221850cd4c4ccb4a99cd734a31cd5b"
+}
