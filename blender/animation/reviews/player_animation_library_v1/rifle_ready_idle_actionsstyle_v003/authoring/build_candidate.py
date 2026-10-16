@@ -16,12 +16,15 @@ assert not any(e['action']==NAME and e['status']=='approved' for e in manifest['
 if source.exists() and not opt.rebuild_pending:raise RuntimeError('Existing Pending candidate preserved; explicit rebuild required')
 rig=bpy.data.objects[ui.RIG];mesh=bpy.data.objects['Showcase_Player_Mesh'];scene=bpy.context.scene
 before={a.name:ui.action_signature(a) for a in bpy.data.actions};scene.frame_set(1);bpy.context.view_layer.update()
+weapon_geometry=[]
+for name in ['Rifle_V2_Body','Rifle_V2_Magazine']:
+ obj=bpy.data.objects[name];obj.data.calc_loop_triangles();weapon_geometry.append(([obj.matrix_world@v.co for v in obj.data.vertices],[tuple(t.vertices) for t in obj.data.loop_triangles]))
 approved={b.name:b.matrix.copy() for b in rig.pose.bones};rest={b.name:b.bone.matrix_local.copy() for b in rig.pose.bones}
 rig.animation_data.action=None
 for n,values in json.loads(bpy.data.texts[ui.BASELINE].as_string()).items():
  for prop,v in values.items():setattr(rig.pose.bones[n],prop,v)
 bpy.context.view_layer.update()
-sampler=Sampler(payload);times=sampler.times();mapper=RifleRetarget(rig,mesh,approved,sampler.value(0.))
+sampler=Sampler(payload);times=sampler.times();mapper=RifleRetarget(rig,mesh,approved,sampler.value(0.),weapon_geometry)
 values=[];basis_error=0.;forearm_error=0.;native_targets=[]
 for t in times:
  M,raw=mapper.desired(sampler.value(t));row={}
