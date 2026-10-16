@@ -19,12 +19,17 @@ rig.animation_data.action=base;rig.animation_data.action_slot=base.slots[0];scen
 B={b.name:b.matrix.copy() for b in rig.pose.bones};wc0=B['WeaponCarrier'];weapons=[]
 for name in ['Rifle_V2_Body','Rifle_V2_Magazine']:
  obj=bpy.data.objects[name];obj.data.calc_loop_triangles();verts=[obj.matrix_world@v.co for v in obj.data.vertices];tris=[tuple(t.vertices) for t in obj.data.loop_triangles];weapons.append((verts,tris))
-# Find the actual support-facing surface normal on the rifle, then use its
-# carrier-local direction for a tiny pressure release. No moving arbitrary axes.
-verts=[mesh.matrix_world@(B['ForeArm.L']@rest['ForeArm.L'].inverted()@v.co) for v in mesh.data.vertices if any(g.group==mesh.vertex_groups['ForeArm.L'].index and g.weight>.99 for g in v.groups)]
-tree=BVHTree.FromPolygons(weapons[0][0],weapons[0][1],all_triangles=True)
-distance,v,p=min((tree.find_nearest(v)[3],v,tree.find_nearest(v)[0]) for v in verts)
-normal_local=(wc0.to_3x3().inverted()@(v-p).normalized()).normalized()
+# Use both actual weapon surfaces toward the support palm, including the
+# magazine. A single far arm-vertex normal can point into the magazine.
+mesh.data.calc_loop_triangles();group=mesh.vertex_groups['ForeArm.L'].index
+ids={v.index for v in mesh.data.vertices if any(g.group==group and g.weight>.99 for g in v.groups)}
+vs=[mesh.matrix_world@(B['ForeArm.L']@rest['ForeArm.L'].inverted()@v.co) for v in mesh.data.vertices]
+tree=BVHTree.FromPolygons(vs,[tuple(t.vertices) for t in mesh.data.loop_triangles if set(t.vertices)<=ids],all_triangles=True)
+normals=[]
+for wvs,wts in weapons:
+ rows=[(tree.find_nearest(p)[3],p,tree.find_nearest(p)[0]) for p in wvs]
+ distance,p,v=min(rows,key=lambda row:row[0]);normals.append((v-p).normalized())
+normal_local=(wc0.to_3x3().inverted()@sum(normals,Vector((0,0,0)))).normalized()
 along_local=Vector((0,1,0));along_local=(along_local-normal_local*along_local.dot(normal_local)).normalized()
 handlocal=Vector((0,rig.data.bones['ForeArm.L'].length*.78,0))
 mesh.data.calc_loop_triangles();left_geometry={}
@@ -79,7 +84,7 @@ rig.animation_data.action=new;rig.animation_data.action_slot=new.slots[0];scene[
 new['refinement_base']=BASE;new['refinement_note']='18mm whole holding-set drop; restrained delayed source-clock support micro motion. Core source curves unchanged.'
 assert all(ui.action_signature(bpy.data.actions[n])==h for n,h in before.items())
 source4=O/'rifle_ready_idle_actionsstyle_v004.blend';bpy.ops.wm.save_as_mainfile(filepath=str(source4),compress=True,check_existing=False)
-e=dict(next(e for e in manifest['animations'] if e['action']==BASE));e.update({'action':NAME,'source':source4.relative_to(ROOT).as_posix(),'source_sha256':hashlib.sha256(source4.read_bytes()).hexdigest(),'action_sha256':ui.action_signature(new),'status':'pending','approval_note':'Refinement of artistically approved v003 visual base.18mm lower holding set and subtle support-side source-clock life; Pending Blender review only.','refinement_base':BASE,'arm_drop_m':ARM_DROP_M,'left_support_motion':'0..1.6mm pressure release plus±1.5mm tangent,±0.20degree whole straight arm overlap; clocks0.9/1.8s; collision bounded','original_custom_animation':False,'research_only':True,'production_eligible':False})
+e=dict(next(e for e in manifest['animations'] if e['action']==BASE));e.update({'action':NAME,'source':source4.relative_to(ROOT).as_posix(),'source_sha256':hashlib.sha256(source4.read_bytes()).hexdigest(),'action_sha256':ui.action_signature(new),'status':'pending','approval_note':'Refinement of artistically approved v003 visual base.18mm lower holding set and subtle support-side source-clock life; Pending Blender review only.','refinement_base':BASE,'arm_drop_m':ARM_DROP_M,'left_support_motion':'0.4..1.6mm pressure release plus±0.8mm tangent,±0.15degree whole straight arm overlap; clocks0.9/1.8s; collision bounded','original_custom_animation':False,'research_only':True,'production_eligible':False})
 ui.validate_action(new,e,rig);(O/'entry.json').write_text(json.dumps(e,indent=2))
 report={'passed':True,'base_source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'base_action_sha256':ui.action_signature(base),'candidate_sha256':e['source_sha256'],'action_sha256':e['action_sha256'],'changed_curves':changed,'all_other_curves_copied_exactly':True,'frames':len(frames),'duration_s':10.8,'arm_drop_range_m':[min_drop,max_drop],'maximum_left_anchor_motion_m':max_offset,'maximum_left_shoulder_motion_m':max_shoulder,'collision_trimmed_samples':trimmed,'minimum_motion_fraction':minimum_fraction,'support_normal_carrier_local':list(normal_local),'support_tangent_carrier_local':list(along_local),'source_clock_support_periods_s':[.9,1.8],'source_clock_phase_lags_degrees':[30,20,50],'source_file_unchanged':True}
 (O/'build_validation.json').write_text(json.dumps(report,indent=2));print('V004_REFINED',json.dumps(report),flush=True)

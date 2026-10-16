@@ -5,6 +5,6 @@ ARM_DROP_M=.018
 # These original micro offsets follow those clocks with30/20/50degree overlap.
 def sample(t):
  life=14.4+t
- return {'pressure_release_m':.0008*(1-math.cos(math.radians(life*400-30))),
-         'along_rifle_m':.0015*math.sin(math.radians(life*200-20)),
-         'shoulder_angle_degrees':.20*math.sin(math.radians(life*400-50))}
+ return {'pressure_release_m':.0004+.0006*(1-math.cos(math.radians(life*400-30))),
+         'along_rifle_m':.0008*math.sin(math.radians(life*200-20)),
+         'shoulder_angle_degrees':.15*math.sin(math.radians(life*400-50))}
