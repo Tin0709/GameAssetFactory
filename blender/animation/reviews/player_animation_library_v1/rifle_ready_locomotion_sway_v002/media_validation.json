@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "videos": [
+    {
+      "decoded_frames": 144,
+      "distinct_sampled_pixel_hashes": 144,
+      "duration_s": 4.8,
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/run_comparison_30fps_1x.mp4",
+      "fps": 29.999998092651367,
+      "max_timestamp_step_error_s": 7.7021722333370235e-16,
+      "passed": true
+    },
+    {
+      "decoded_frames": 144,
+      "distinct_sampled_pixel_hashes": 144,
+      "duration_s": 4.8,
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/run_front_30fps_1x.mp4",
+      "fps": 30,
+      "max_timestamp_step_error_s": 7.7021722333370235e-16,
+      "passed": true
+    },
+    {
+      "decoded_frames": 144,
+      "distinct_sampled_pixel_hashes": 144,
+      "duration_s": 4.8,
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/run_side_30fps_1x.mp4",
+      "fps": 30,
+      "max_timestamp_step_error_s": 7.7021722333370235e-16,
+      "passed": true
+    },
+    {
+      "decoded_frames": 144,
+      "distinct_sampled_pixel_hashes": 144,
+      "duration_s": 4.8,
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/run_three_quarter_30fps_1x.mp4",
+      "fps": 30,
+      "max_timestamp_step_error_s": 7.7021722333370235e-16,
+      "passed": true
+    },
+    {
+      "decoded_frames": 144,
+      "distinct_sampled_pixel_hashes": 144,
+      "duration_s": 4.8,
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/walk_comparison_30fps_1x.mp4",
+      "fps": 29.999998092651367,
+      "max_timestamp_step_error_s": 7.7021722333370235e-16,
+      "passed": true
+    },
+    {
+      "decoded_frames": 144,
+      "distinct_sampled_pixel_hashes": 144,
+      "duration_s": 4.8,
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/walk_front_30fps_1x.mp4",
+      "fps": 30,
+      "max_timestamp_step_error_s": 7.7021722333370235e-16,
+      "passed": true
+    },
+    {
+      "decoded_frames": 144,
+      "distinct_sampled_pixel_hashes": 144,
+      "duration_s": 4.8,
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/walk_side_30fps_1x.mp4",
+      "fps": 30,
+      "max_timestamp_step_error_s": 7.7021722333370235e-16,
+      "passed": true
+    },
+    {
+      "decoded_frames": 144,
+      "distinct_sampled_pixel_hashes": 144,
+      "duration_s": 4.8,
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/walk_three_quarter_30fps_1x.mp4",
+      "fps": 30,
+      "max_timestamp_step_error_s": 7.7021722333370235e-16,
+      "passed": true
+    }
+  ]
+}
