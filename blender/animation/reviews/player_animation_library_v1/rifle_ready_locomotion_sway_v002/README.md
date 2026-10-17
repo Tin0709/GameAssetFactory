@@ -32,7 +32,7 @@ These candidates restore a bounded amount of that lateral character through the 
 
 The torso and shoulders carry the weapon together. The existing world-space head observation is compensated, keeping the gaze stable. Both arms remain straight, the original rifle-relative right grip and small living left-support trajectory are retained, and no independent floppy weapon oscillation is added. Leg curves, root/hips/spine, source leg-length pulses and body bounce retain the approved motion. The only Run seating change is5 mm, explicitly required by the native square-arm/leg clearance check.
 
-The six `*_30fps_1x.mp4` reviews are original-speed4.8 s excerpts from front, three-quarter and side views. The `walk_comparison_30fps_1x.mp4` and `run_comparison_30fps_1x.mp4` show approved v001 on the left and the new Pending candidate on the right, with matching camera, phase, speed and30 FPS. An excerpt does not represent the complete90 s independent bob recurrence.
+The six `*_30fps_1x.mp4` reviews are original-speed4.8 s excerpts from front, three-quarter and side views. The `walk_comparison_30fps_1x.mp4` and `run_comparison_30fps_1x.mp4` show approved v001 on the left and the new Pending candidate on the right, with matching camera, phase, speed and30 FPS. Both approved baselines are freshly rendered from the same saved study using their unchanged Actions; raw baseline movies stay outside Git. An excerpt does not represent the complete90 s independent bob recurrence.
 
 ## Validation scope
 
