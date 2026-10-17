@@ -1,0 +1,32 @@
+{
+  "research_only": true,
+  "gameplay_source": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+  "simulation_fps": 60,
+  "physics_landing_time_s": 4.23333333333333,
+  "sampled_frames": 540,
+  "source_findings": {
+    "animations/f2da1071.json": {
+      "animation.oreville_ans.tldiyl.body.rotation.y": "Math.cos(q.anim_time*360+40)*9.6",
+      "animation.oreville_ans.fngydr.body.rotation.y": "-Math.sin(q.anim_time*360)*24",
+      "animation.oreville_ans.dubgwy.body.rotation.y": "-this*0.8+12"
+    },
+    "holding_controller": "animation_controllers/616f2ff7.json: njvelc / ltqtzr",
+    "interpretation": "Ground crossbow hold retains20% of gait body yaw. Existing gameplay jump/landing core drives Chest more broadly; the rifle holding set follows Chest, which explains the liked lateral movement. No separate rifle spring animation was found or claimed."
+  },
+  "landing_600ms_carrier_vs_ground_range_deg": [
+    11.09368324279786,
+    33.96651864051814,
+    5.4775702953338605
+  ],
+  "adaptation": {
+    "Run": {
+      "extra_gait_yaw_amplitude_deg": 9.0,
+      "lag_s": 0.04
+    },
+    "Walk": {
+      "extra_gait_yaw_amplitude_deg": 4.8,
+      "lag_s": 0.06
+    }
+  },
+  "not_literal_source_behavior": "New Chest-led yaw amounts/delays adapt the liked gameplay cue to steady locomotion. No extra roll or separate weapon-only oscillation is added. Original approved waist roll and rifle-relative support animation are preserved."
+}
