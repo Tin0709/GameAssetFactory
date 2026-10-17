@@ -6,7 +6,7 @@ from pathlib import Path
 R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').exists())
 A=R/'blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v003/authoring'
 sys.path.insert(0,str(A))
-from crossbow_runtime import IdleRuntime,_neutral
+from crossbow_runtime import IdleRuntime,_neutral,Molang
 from source_sampler import query
 from extract_source import extract
 HZ=240
@@ -32,6 +32,12 @@ class Sampler:
    elif clip.get('animation_length'):clock=min(clock,float(clip['animation_length']))
    self.rt.channels._add_clip(out,l['alias'],env,clock,l['controller_weight'])
   return out
+ def gait_position(self,t):
+  env=dict(self.frozen_env);env["q.anim_time"]=(self.row["phase"]+t*self.profile["rate"])%1
+  clip=self.rt.channels.clips[self.rt.channels.aliases[self.profile["clip"]]]
+  v=self.rt.channels._channel(clip,"waist","position",env["q.anim_time"],Molang(env))
+  w=float(Molang(env).eval(clip.get("blend_weight",1)))
+  return [x*w for x in v]
  def times(self):
   D=self.profile['duration'];points={i/HZ for i in range(round(D*HZ)+1)};clip=self.rt.channels.clips[self.rt.channels.aliases[self.profile['clip']]]
   phases={0.,1.}

@@ -3,7 +3,7 @@ Never change the approved base; one common study file, central Showcase registra
 """
 import bpy,sys,math,json,hashlib,time
 from pathlib import Path
-from mathutils import Matrix,Vector
+from mathutils import Matrix,Vector,Euler
 R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').exists());A=Path(__file__).resolve().parent;O=A.parent
 sys.path.insert(0,str(A));sys.path.insert(0,str(R/'blender/animation/showcase'))
 import gaf_animation_library as ui
@@ -32,9 +32,14 @@ footverts={n:[v.co.copy() for v in m.data.vertices if any(g.group==m.vertex_grou
 entries=[];reports=[];out=O/'rifle_ready_locomotion_actionsstyle_v001.blend'
 for kind in ['Walk','Run']:
  start=time.time();sampler=Sampler(payload,kind);times=sampler.times();profile=PROFILE[kind];N='Rifle_Ready_'+kind+'_ActionsStyle_v001';assert N not in bpy.data.actions
- values={n:{'location':[],'rotation_quaternion' if r.pose.bones[n].rotation_mode=='QUATERNION' else 'rotation_euler':[],'scale':[]} for n in rest};previous={};metrics={'sole_lift_max_m':0.,'head_anchor_error_m':0.,'support_delta_max_m':0.,'shear_error':0.,'forearm_identity_error':0.}
+ values={n:{'location':[],'rotation_quaternion' if r.pose.bones[n].rotation_mode=='QUATERNION' else 'rotation_euler':[],'scale':[]} for n in rest};previous={};metrics={'sole_lift_max_m':0.,'head_anchor_error_m':0.,'support_delta_max_m':0.,'shear_error':0.,'forearm_identity_error':0.,'native_upperbody_vertical_adapter_max_m':0.,'head_relative_tilt_correction_max_deg':0.}
  for j,t in enumerate(times):
-  ch=sampler.value(t);M=mapper.desired(ch)
+  ch=sampler.value(t)
+  # Long native rifle + low v004 hold needs a bounded compression adapter.
+  # Scale only source Run gait waist Y, retaining literal phase and independent bob.
+  if kind=='Run':
+   dy=sampler.gait_position(t)[1]*.4;ch['waist']['position'][1]-=dy;metrics['native_upperbody_vertical_adapter_max_m']=max(metrics['native_upperbody_vertical_adapter_max_m'],abs(dy*mapper.unit))
+  M=mapper.desired(ch)
   # Constant static calibration from source crossbow to the APPROVED current rifle setup.
   for side in ['R','L']:
    D=M['UpperArm.'+side]@raw0['UpperArm.'+side].inverted()
@@ -46,6 +51,9 @@ for kind in ['Walk','Run']:
   U=M['UpperArm.L'];F=M['ForeArm.L'];oldP=F@palm;swing=(U.translation-oldP).rotation_difference(socket-P);rotation=swing.to_matrix()@U.to_3x3();U=rotation.to_4x4();U.translation=P-rotation@(leftrel@palm);M['UpperArm.L']=U;M['ForeArm.L']=U@leftrel
   # No floating head: native head pivot remains exactly at torso-top base.
   top=M['Chest']@rest['Chest'].inverted()@Vector((0,0,1.35));M['Head'].translation=top;M['Neck'].translation=top
+  # Our broad square head has no soft neck. Keep yaw, bound torso-relative
+  # pitch/roll to4degrees so the head remains seated without cutting shoulders.
+  C=(M['Chest']@rest['Chest'].inverted()).to_3x3();H=(M['Head']@rest['Head'].inverted()).to_3x3();eul=(C.inverted()@H).to_euler('XYZ');tilt=math.hypot(eul.x,eul.y);fac=min(1.,math.radians(4)/max(tilt,1e-10));metrics['head_relative_tilt_correction_max_deg']=max(metrics['head_relative_tilt_correction_max_deg'],math.degrees(tilt*(1-fac)));Q=C@Euler((eul.x*fac,eul.y*fac,eul.z),'XYZ').to_matrix();M['Head']=Q.to_4x4()@rest['Head'];M['Head'].translation=top
   metrics['head_anchor_error_m']=max(metrics['head_anchor_error_m'],(M['Head'].translation-top).length)
   # Native square boot sole adapter only; source rotation/X/Y and scale retained.
   for n in footverts:
@@ -71,7 +79,7 @@ for kind in ['Walk','Run']:
     # Viewer loops timeline; scale keys are modifier-free per verified source policy.
     fc.update()
  act.use_fake_user=True;act['research_only']=True;act['production_eligible']=False;act['visual_base']=BASE
- e={'action':N,'source':out.relative_to(R).as_posix(),'source_rig':r.name,'source_mesh':m.name,'source_armature':r.data.name,'slot_identifier':slot.identifier,'action_sha256':ui.action_signature(act),'action_frame_range':list(act.frame_range),'start':1,'end':round(profile['duration']*30),'fps':30,'fps_base':1.,'status':'pending','approval_note':'Pending Blender review. Literal crossbow locomotion with approved v004 rifle calibration; research-only.','seamless_loop':True,'research_only':True,'production_eligible':False,'source_derived_reconstruction':True,'original_custom_animation':False,'source_animation':sampler.rt.channels.aliases[profile['clip']],'source_pack_sha256':'9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d','rotation_modes':{b.name:b.rotation_mode for b in r.pose.bones},'preview_prop':'rifle_stylized_v2','bake_hz':HZ,'refinement_base':BASE,'duration_s':profile['duration'],'core_period_s':1/profile['rate'],'phase_rate_cycles_s':profile['rate'],'virtual_source_speed_blocks_s':profile['speed'],'source_life_origin_s':sampler.row['life'],'source_phase_origin':sampler.row['phase'],'endpoint_sample_frame':1+round(profile['duration']*30),'in_place':True,'loop_note':'Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.'}
+ e={'action':N,'source':out.relative_to(R).as_posix(),'source_rig':r.name,'source_mesh':m.name,'source_armature':r.data.name,'slot_identifier':slot.identifier,'action_sha256':ui.action_signature(act),'action_frame_range':list(act.frame_range),'start':1,'end':round(profile['duration']*30),'fps':30,'fps_base':1.,'status':'pending','approval_note':'Pending Blender review. Literal crossbow locomotion with approved v004 rifle calibration; research-only.','seamless_loop':True,'research_only':True,'production_eligible':False,'source_derived_reconstruction':True,'original_custom_animation':False,'source_animation':sampler.rt.channels.aliases[profile['clip']],'source_pack_sha256':'9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d','rotation_modes':{b.name:b.rotation_mode for b in r.pose.bones},'preview_prop':'rifle_stylized_v2','bake_hz':HZ,'refinement_base':BASE,'duration_s':profile['duration'],'core_period_s':1/profile['rate'],'phase_rate_cycles_s':profile['rate'],'virtual_source_speed_blocks_s':profile['speed'],'source_life_origin_s':sampler.row['life'],'source_phase_origin':sampler.row['phase'],'endpoint_sample_frame':1+round(profile['duration']*30),'in_place':True,'native_rig_adapters':{'run_gait_waist_y_fraction':(.6 if kind=='Run' else 1.),'head_torso_relative_tilt_limit_deg':4.,'boot_sole_floor_correction':True},'loop_note':'Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.'}
  if kind=='Run':e['research_scale_channels']={n:{'axis':1,'min':1.0,'max':1.070002} for n in ['Leg.L','Leg.R']}
  ui.validate_action(act,e,r);entries.append(e)
  loop=max(abs(values[n][p][0][i]-values[n][p][-1][i]) for n in values for p in values[n] for i in range(len(values[n][p][0])))
