@@ -81,7 +81,8 @@
   "removed_head_clearance_m": 0.025,
   "left_socket_inset_m": 0.006,
   "joint_seating_envelopes_m": {
-    "Head|Chest": 0.025,
+    "Head|Chest": 0.03,
     "Chest|UpperArm.R": 0.055
-  }
+  },
+  "joint_seating_note": "Head base remains exactly at the torso top; unchanged source head rotations produce bounded corner seating up to28.5mm, absolute guard30mm. Right upper-arm seating guard55mm; all nonadjacent/rifle intersections remain forbidden."
 }

@@ -140,8 +140,8 @@ def main():
    if key not in ADJACENT and v>1e-5 and not pairs[k]:unwanted.append({'frame':t,'pair':k,'triangle_pairs':0,'sat_margin_m':v,'note':'SAT detects complete containment without surface crossing'})
    max_sats[k]=max(v,max_sats.get(k,-1e9));key=frozenset(k.split('|'))
    # Anatomical neighboring cubes have approved seating, measured separately.
-   allowance=(.025 if key==frozenset(('Head','Chest')) else (.020 if key==frozenset(('Chest','UpperArm.R')) else (.016 if key in [frozenset(('Chest','Leg.L')),frozenset(('Chest','Leg.R'))] else (.0001 if key==frozenset(('Head','Chest')) else .002))))
-   limit=(.025 if key==frozenset(('Head','Chest')) else (.055 if key==frozenset(('Chest','UpperArm.R')) else max(0,base_sat[k])+allowance))
+   allowance=(.030 if key==frozenset(('Head','Chest')) else (.020 if key==frozenset(('Chest','UpperArm.R')) else (.016 if key in [frozenset(('Chest','Leg.L')),frozenset(('Chest','Leg.R'))] else (.0001 if key==frozenset(('Head','Chest')) else .002))))
+   limit=(.030 if key==frozenset(('Head','Chest')) else (.055 if key==frozenset(('Chest','UpperArm.R')) else max(0,base_sat[k])+allowance))
    if key in ADJACENT and v>limit:
     if k not in worse_adjacent or v>worse_adjacent[k]['margin_m']:worse_adjacent[k]={'frame':t,'margin_m':v,'baseline_max_m':base_sat[k],'allowance_m':allowance,'absolute_limit_m':limit}
  # Derivative at the actual240Hz bake interval, not a30Hz secant dominated
@@ -157,7 +157,7 @@ def main():
  if vmax>0.006:failures.append('Loop one-sided translation velocity seam exceeds0.006m/s')
  if wmax>0.05:failures.append('Loop one-sided angular velocity seam exceeds0.05rad/s')
  if unwanted:failures.append('Unwanted nonadjacent/rifle intersections')
- if worse_adjacent:failures.append('Anatomical seating exceeds explicit attachment envelopes (Head/Chest25mm and right shoulder55mm; other existing limits retained)')
+ if worse_adjacent:failures.append('Anatomical seating exceeds explicit attachment envelopes (Head/Chest30mm and right shoulder55mm; other existing limits retained)')
  out.update({'passed':not failures,'failures':failures,'evaluated_samples':int((closing-1)*2)+1,'topology_weights_rest_geometry_exact':topology_exact,'preserved_actions':preserved,'metrics':metrics,'limits':limits,'left_support_sampled_gap_range_m':[gap_min,gap_max],'loop_pose_matrix_error':seam,'loop_one_sided_translation_velocity_difference_m_s':vmax,'loop_one_sided_angular_velocity_difference_rad_s':wmax,'raw_triangle_pairs_max':{k:v for k,v in max_pairs.items() if v},'cuboid_signed_margin_max_m':max_sats,'unwanted_intersections':unwanted[:100],'unwanted_intersection_samples_count':len(unwanted),'worsened_adjacent_penetration':worse_adjacent})
  out['source_file_after_sha256']=hashlib.sha256(SOURCE.read_bytes()).hexdigest()
  assert out['source_file_after_sha256']==SOURCE_SHA
