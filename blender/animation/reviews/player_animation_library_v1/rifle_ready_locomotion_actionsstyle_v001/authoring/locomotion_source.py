@@ -17,13 +17,14 @@ class Sampler:
  def __init__(self,payload,kind):
   self.kind=kind;self.profile=PROFILE[kind];self.rt=IdleRuntime(payload,initial_life=0,seed=139,modified_distance_moved=1,attack_free_age=12)
   for i in range(round(14.4*HZ)):self.row=self.rt.step(1/HZ,engine_query(kind,(i+1)/HZ))
+  self.frozen_env=dict(self.rt.env)
   assert self.row['controllers']['veywgp']['state']==self.profile['state']
   assert self.row['controllers']['kcexxa']['state']=='ltqtzr'
   assert not any(x['alias']=='tculwn' and x['applied_weight']>0 for x in self.row['layers'])
   assert abs(self.row['vars']['v.esnrkj']-min(1,self.profile['speed']/4.3))<1e-8
   assert abs(self.row['vars']['v.cknrcn']-1)<1e-8
  def value(self,t):
-  env=dict(self.rt.env);env['q.life_time']=self.row['life']+t;env['v.eqhdel']=self.row['phase']+t*self.profile['rate'];env['v.ifcvde']=env['v.eqhdel']%1
+  env=dict(self.frozen_env);env['q.life_time']=self.row['life']+t;env['v.eqhdel']=self.row['phase']+t*self.profile['rate'];env['v.ifcvde']=env['v.eqhdel']%1
   out=_neutral()
   for l in self.row['layers']:
    clip=self.rt.channels.clips[self.rt.channels.aliases[l['alias']]];clock=l['clock']+t
