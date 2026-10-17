@@ -1,0 +1,104 @@
+{
+  "passed": true,
+  "input_action_sha256": "dc92fe860ba5819de1bf04741c9b1ca5437573eceadeaad3913e1a23908271a5",
+  "candidate_sha256": "b1990be707b1928c027d2b4172c13812b4fb217385969e4fedf1f5823a163d5b",
+  "action_sha256": "88b1ce9fe830f3377a58b8bf1cf04f1f602372f287b559aae8ee28e576d8409b",
+  "changed_curves": [
+    [
+      "Neck",
+      "location",
+      0
+    ],
+    [
+      "Neck",
+      "location",
+      1
+    ],
+    [
+      "Neck",
+      "location",
+      2
+    ],
+    [
+      "UpperArm.L",
+      "location",
+      0
+    ],
+    [
+      "UpperArm.L",
+      "location",
+      1
+    ],
+    [
+      "UpperArm.L",
+      "location",
+      2
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      0
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      1
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      2
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      3
+    ],
+    [
+      "UpperArm.R",
+      "location",
+      1
+    ],
+    [
+      "UpperArm.R",
+      "location",
+      2
+    ],
+    [
+      "WeaponCarrier",
+      "location",
+      0
+    ],
+    [
+      "WeaponCarrier",
+      "location",
+      1
+    ],
+    [
+      "WeaponCarrier",
+      "location",
+      2
+    ]
+  ],
+  "sampled_keys": 2593,
+  "holding_shift_m": {
+    "up": 0.03,
+    "back": 0.02,
+    "total": 0.0360555155027756
+  },
+  "removed_head_lift_m": 0.025,
+  "shoulder_socket_distance_gain_m": {
+    "L": [
+      0.03584537334876717,
+      0.0359787770490186
+    ],
+    "R": [
+      0.0345618354030052,
+      0.03498021963938264
+    ]
+  },
+  "support_relative_palm_error_m": 2.939912625692615e-07,
+  "head_body_anchor_error_m": 7.16654423142979e-07,
+  "all_other_source_actions_exact": true,
+  "source_angles_and_key_times_preserved_except_left_arm_seating": true
+}
