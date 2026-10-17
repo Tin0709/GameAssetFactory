@@ -6,7 +6,7 @@
     "source_mesh": "Showcase_Player_Mesh",
     "source_armature": "LB_Test_RestRig",
     "slot_identifier": "OBRUN_Test_Rig",
-    "action_sha256": "ba45265a5aa257f592b708f1a518ceaa4bf87a7e833ca3a42f1a37d3ce6030df",
+    "action_sha256": "b6140b5f307dd87615bdac7e1edb8d78a582091a2cbbd339dde39fb6e4132071",
     "action_frame_range": [
       1.0,
       217.0
@@ -50,8 +50,13 @@
     "source_phase_origin": 17.939743627575226,
     "endpoint_sample_frame": 217,
     "in_place": true,
+    "native_rig_adapters": {
+      "run_gait_waist_y_fraction": 1.0,
+      "head_torso_relative_tilt_limit_deg": 4.0,
+      "boot_sole_floor_correction": true
+    },
     "loop_note": "Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.",
-    "source_sha256": "20ffaa2eefa542d149f83e4d848c16f86e6d3d22518bebb614315c8c9b78e021"
+    "source_sha256": "c6d4966111ff449f39e2900475287f8af330eb11604720ce94d7e72ed15e6a88"
   },
   {
     "action": "Rifle_Ready_Run_ActionsStyle_v001",
@@ -60,7 +65,7 @@
     "source_mesh": "Showcase_Player_Mesh",
     "source_armature": "LB_Test_RestRig",
     "slot_identifier": "OBRUN_Test_Rig",
-    "action_sha256": "a7e5f637da2b3e588253931ef1731110015fa13b9720794f32427e5a6c2a4712",
+    "action_sha256": "2d9f72446e318c4d0438e4f08778574baf100f7193719f725307a7252cbaad43",
     "action_frame_range": [
       1.0,
       2701.0
@@ -104,6 +109,11 @@
     "source_phase_origin": 22.962871843296135,
     "endpoint_sample_frame": 2701,
     "in_place": true,
+    "native_rig_adapters": {
+      "run_gait_waist_y_fraction": 0.6,
+      "head_torso_relative_tilt_limit_deg": 4.0,
+      "boot_sole_floor_correction": true
+    },
     "loop_note": "Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.",
     "research_scale_channels": {
       "Leg.L": {
@@ -117,6 +127,6 @@
         "max": 1.070002
       }
     },
-    "source_sha256": "20ffaa2eefa542d149f83e4d848c16f86e6d3d22518bebb614315c8c9b78e021"
+    "source_sha256": "c6d4966111ff449f39e2900475287f8af330eb11604720ce94d7e72ed15e6a88"
   }
 ]
