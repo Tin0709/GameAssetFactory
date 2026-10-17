@@ -14,11 +14,12 @@ r = bpy.data.objects[ui.RIG]; s = bpy.context.scene
 rest = {b.name:b.matrix_local.copy() for b in r.data.bones}
 palm = Vector((0, r.data.bones['ForeArm.L'].length*.78, 0))
 before = {a.name:ui.action_signature(a) for a in bpy.data.actions}
-changed = {'Chest': ['rotation_quaternion'], 'Head': ['rotation_quaternion'],
+run_changed = {'Chest': ['rotation_quaternion'], 'Head': ['rotation_quaternion'],
            'UpperArm.L':['location'], 'UpperArm.R':['location'], 'WeaponCarrier':['location']}
 names = {'Walk':'Rifle_Ready_Walk_ActionsStyle_v0012', 'Run':'Rifle_Ready_Run_ActionsStyle_v002'}
 entries=[]; reports=[]; out=O/'rifle_ready_locomotion_sway_v002.blend'
 for kind,name in names.items():
+    changed = run_changed if kind == 'Run' else {'Chest':['rotation_quaternion'], 'Head':['rotation_quaternion']}
     start=time.time(); old='Rifle_Ready_'+kind+'_ActionsStyle_v001'
     e=next(e for e in mf['animations'] if e['action']==old)
     assert e['status']=='approved' and before[old]==e['action_sha256']
@@ -67,7 +68,7 @@ for kind,name in names.items():
         refinement_base=old,holding_sway=SETTINGS[kind],
         adaptation_note='Chest-led gait yaw with unchanged world-space head observation. Original arm, rifle-relative grip, support overlap and waist-roll curves are untouched. New authored adaptation over the approved research bake, not an additional source crossbow clip.')
     entry.pop('source_sha256',None);ui.validate_action(act,entry,r);entries.append(entry)
-    reports.append({'action':name,'base':old,'samples':len(frames),'untouched_curves_exact':count,'metrics':metrics,'seconds':time.time()-start})
+    reports.append({'action':name,'base':old,'samples':len(frames),'untouched_curves_exact':count,'modified_bone_properties':changed,'metrics':metrics,'seconds':time.time()-start})
     print('BUILT',json.dumps(reports[-1]),flush=True)
 assert all(ui.action_signature(bpy.data.actions[n])==h for n,h in before.items())
 r.animation_data.action=bpy.data.actions[names['Run']];r.animation_data.action_slot=r.animation_data.action.slots[0];s['gaf_library_last_action']=r.animation_data.action.name
@@ -76,4 +77,4 @@ bpy.ops.wm.save_as_mainfile(filepath=str(out),compress=True,check_existing=False
 sha=hashlib.sha256(out.read_bytes()).hexdigest()
 for e in entries:e['source_sha256']=sha
 (O/'entries.json').write_text(json.dumps(entries,indent=2)+'\n')
-(O/'build_validation.json').write_text(json.dumps({'passed':True,'original_actions_unchanged':len(before),'modified_bone_properties':changed,'reports':reports},indent=2)+'\n')
+(O/'build_validation.json').write_text(json.dumps({'passed':True,'original_actions_unchanged':len(before),'reports':reports},indent=2)+'\n')
