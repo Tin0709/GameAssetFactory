@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "assets": [
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_actionsstyle_v001/rifle_ready_locomotion_actionsstyle_v001.blend",
+      "bytes": 34881467,
+      "index_is_lfs_pointer": true,
+      "attributes": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_actionsstyle_v001/rifle_ready_locomotion_actionsstyle_v001.blend: filter: lfs"
+    },
+    {
+      "path": "blender/animation/showcase/Animation_Showcase.blend",
+      "bytes": 59009976,
+      "index_is_lfs_pointer": true,
+      "attributes": "blender/animation/showcase/Animation_Showcase.blend: filter: lfs"
+    }
+  ],
+  "current_combined_bytes": 93891443,
+  "impact_note": "Each changed binary revision consumes its full unique LFS object size; existing history/quotas are not migrated or changed. Raw backups/cache remain outside Git.",
+  "history_rewritten": false,
+  "manual_stage_commit_push": false
+}
