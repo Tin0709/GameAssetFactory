@@ -1,22 +1,22 @@
 {
   "passed": true,
   "input_action_sha256": "64e4635a30e50df9b74aeaa9f05734c09228ef6ab67f80781a096451f4d11360",
-  "candidate_sha256": "061cdce10158d4462b0abcb21d827904e371a6aa78d78194391925f2a8fccc7d",
-  "action_sha256": "08e52d0beae0b217986d3200bb8fb46ac1a78529117bf47af2039f4724a5185d",
-  "left_shoulder_target_retraction_m": 0.04,
+  "candidate_sha256": "6694fc4086e0da889f14e3e70dacf89fbf327627182a1a5c66860c3cd34fa4e8",
+  "action_sha256": "dc92fe860ba5819de1bf04741c9b1ca5437573eceadeaad3913e1a23908271a5",
+  "left_shoulder_socket_alignment": 0.85,
   "left_shoulder_actual_depth_reduction_m": [
-    0.0291623089578934,
-    0.029587168013677
+    0.00492159996429109,
+    0.03510684278444387
   ],
   "left_shoulder_additional_lowering_m": [
-    0.015440106391906738,
-    0.01794612407684326
+    0.0025652647018432617,
+    0.019857168197631836
   ],
   "left_whole_arm_rotation_degrees": [
-    3.230630385431372,
-    3.2545298576674813
+    0.5664806285569308,
+    4.06787838898612
   ],
-  "analytical_palm_error_m": 1.3328003749250113e-07,
+  "analytical_palm_error_m": 1.2644054553268208e-07,
   "sampled_keys": 2593,
   "changed_curves": [
     [
