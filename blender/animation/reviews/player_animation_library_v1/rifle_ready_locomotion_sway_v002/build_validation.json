@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "original_actions_unchanged": 85,
+  "modified_bone_properties": {
+    "Chest": [
+      "rotation_quaternion"
+    ],
+    "Head": [
+      "rotation_quaternion"
+    ]
+  },
+  "reports": [
+    {
+      "action": "Rifle_Ready_Walk_ActionsStyle_v0012",
+      "base": "Rifle_Ready_Walk_ActionsStyle_v001",
+      "samples": 1891,
+      "untouched_curves_exact": 118,
+      "metrics": {
+        "head_world_matrix_error": 0.0,
+        "chest_bounce_position_error_m": 1.193256480846328e-07,
+        "right_shoulder_chest_local_error_m": 4.770699320310986e-07,
+        "left_shoulder_chest_local_shift_m": 5.960580891724044e-07
+      },
+      "seconds": 2.9087448120117188
+    },
+    {
+      "action": "Rifle_Ready_Run_ActionsStyle_v002",
+      "base": "Rifle_Ready_Run_ActionsStyle_v001",
+      "samples": 24193,
+      "untouched_curves_exact": 118,
+      "metrics": {
+        "head_world_matrix_error": 0.0,
+        "chest_bounce_position_error_m": 1.194999734487045e-07,
+        "right_shoulder_chest_local_error_m": 5.547556420858587e-07,
+        "left_shoulder_chest_local_shift_m": 5.972094663188382e-07
+      },
+      "seconds": 35.11461877822876
+    }
+  ]
+}
