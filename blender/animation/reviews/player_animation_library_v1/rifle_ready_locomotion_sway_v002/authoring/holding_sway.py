@@ -47,6 +47,7 @@ def apply(kind, t, entry, source, rest, palm):
     # support shoulder at the closest reachable original native socket. This is
     # a whole-arm rotation; no elbow, stretch, mesh or rest-rig alteration.
     P = M['ForeArm.L'] @ palm
+    C = M['Chest'].to_3x3()
     socket = (M['Chest'] @ rest['Chest'].inverted() @ rest['UpperArm.L']).translation + C.col[0].normalized() * .004
     q = (M['UpperArm.L'].translation - P).rotation_difference(socket - P)
     D = Matrix.Translation(P) @ q.to_matrix().to_4x4() @ Matrix.Translation(-P)
