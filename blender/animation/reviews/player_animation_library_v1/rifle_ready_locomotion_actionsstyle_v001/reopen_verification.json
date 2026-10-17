@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "fresh_saved_file_reopen": true,
+  "both_pending": true,
+  "v004_approved_and_source_action_unchanged": true,
+  "old_actions_exact": 83,
+  "native_assets_exact": true,
+  "old_manifest_entries_and_sequences_exact_except_v004_approval": true,
+  "loop_matrix_errors": {
+    "Rifle_Ready_Walk_ActionsStyle_v001": 0.0,
+    "Rifle_Ready_Run_ActionsStyle_v001": 0.0
+  },
+  "action_count": 85,
+  "focused_entries": 17,
+  "archived_entries": 35
+}
