@@ -9,8 +9,8 @@ import math
 from mathutils import Matrix, Vector
 
 SETTINGS = {
-    'Walk': {'yaw_deg': 4.8, 'lag_s': .060, 'roll_deg': 0., 'roll_lag_s': .080},
-    'Run': {'yaw_deg': 9., 'lag_s': .040, 'roll_deg': 0., 'roll_lag_s': .060},
+    'Walk': {'yaw_deg': 4.8, 'lag_s': .060, 'roll_deg': 0., 'roll_lag_s': .080, 'holding_seat_m': -.002},
+    'Run': {'yaw_deg': 9., 'lag_s': .040, 'roll_deg': 0., 'roll_lag_s': .060, 'holding_seat_m': .004},
 }
 HOLD = ['UpperArm.R', 'ForeArm.R', 'WeaponCarrier', 'UpperArm.L', 'ForeArm.L']
 
@@ -37,6 +37,11 @@ def apply(kind, t, entry, source, rest, palm):
     T = Matrix.Translation(pivot) @ Matrix.Rotation(yaw, 4, C.col[1].normalized()) @ Matrix.Translation(-pivot)
     for n in ['Chest', 'Neck'] + HOLD:
         M[n] = T @ M[n]
+    # Millimetre-only native square-block clearance for the stronger twist.
+    # The complete assembly moves together, retaining both original contacts.
+    seat = Matrix.Translation(M['Chest'].to_3x3().col[1].normalized() * SETTINGS[kind]['holding_seat_m'])
+    for n in HOLD:
+        M[n] = seat @ M[n]
     # Retain the approved waist roll, crossbow bob and living left-support
     # curves exactly. An additional holding roll was rejected by the actual
     # rifle/leg geometry probe; the Chest-led yaw is the approved-gameplay cue.

@@ -14,7 +14,8 @@ r = bpy.data.objects[ui.RIG]; s = bpy.context.scene
 rest = {b.name:b.matrix_local.copy() for b in r.data.bones}
 palm = Vector((0, r.data.bones['ForeArm.L'].length*.78, 0))
 before = {a.name:ui.action_signature(a) for a in bpy.data.actions}
-changed = {'Chest': ['rotation_quaternion'], 'Head': ['rotation_quaternion']}
+changed = {'Chest': ['rotation_quaternion'], 'Head': ['rotation_quaternion'],
+           'UpperArm.L':['location'], 'UpperArm.R':['location'], 'WeaponCarrier':['location']}
 names = {'Walk':'Rifle_Ready_Walk_ActionsStyle_v0012', 'Run':'Rifle_Ready_Run_ActionsStyle_v002'}
 entries=[]; reports=[]; out=O/'rifle_ready_locomotion_sway_v002.blend'
 for kind,name in names.items():
