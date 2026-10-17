@@ -27,7 +27,7 @@ for i in range(HZ):ir=idle.step(1/HZ,query())
 raw0=mapper.desired(ir['channels']);leftrel=B['UpperArm.L'].inverted()@B['ForeArm.L']
 normal=Vector((-.645238,.756959,-.102245));tangent=Vector((.760946,.648799,0))
 # Inherit the exact authored v004 support breathing directions (from its build provenance).
-bp=json.loads((R/'blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v004/build_validation.json').read_text());normal=Vector(bp['support_normal_carrier_local']);tangent=Vector(bp['support_tangent_carrier_local']);breath0=breath(0)
+bp=json.loads((R/'blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v004/initial_support_build_validation.json').read_text());normal=Vector(bp['support_normal_carrier_local']);tangent=Vector(bp['support_tangent_carrier_local']);breath0=breath(0)
 footverts={n:[v.co.copy() for v in m.data.vertices if any(g.group==m.vertex_groups[n].index and g.weight>.99 for g in v.groups)] for n in ['Leg.L','Leg.R']}
 entries=[];reports=[];out=O/'rifle_ready_locomotion_actionsstyle_v001.blend'
 for kind in ['Walk','Run']:
