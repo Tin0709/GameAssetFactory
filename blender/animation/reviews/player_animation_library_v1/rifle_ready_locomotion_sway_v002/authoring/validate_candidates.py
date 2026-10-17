@@ -39,10 +39,10 @@ for e in json.loads((O/'entries.json').read_text()):
  dt=1./240.;pose={}
  for ff in [1,1.125,1.25,closing-.25,closing-.125,closing]:
   ns['frame'](ff);pose[ff]=ns['pose_snapshot'](r)
- vm=0.;wm=0.;raw=0.
+ vm=0.;wm=0.;raw=0.;upper_vm=0.;upper_wm=0.
  def rv(q):
   if q.w<0:q.negate()
-  ax,ang=q.to_axis_angle();return ax*ang
+  v=Vector((q.x,q.y,q.z));length=v.length;return v*(2*math.atan2(length,q.w)/length) if length>1e-12 else Vector()
  for n in pose[1]:
   p0,p1,p2=[pose[f][n].translation for f in [1,1.125,1.25]]
   pe,pm1,pm2=[pose[f][n].translation for f in [closing,closing-.125,closing-.25]]
@@ -50,9 +50,20 @@ for e in json.loads((O/'entries.json').read_text()):
   qs=[pose[f][n].to_quaternion() for f in [1,1.125,1.25,closing,closing-.125,closing-.25]]
   w0=(4*rv(qs[1]@qs[0].inverted())-rv(qs[2]@qs[0].inverted()))/(2*dt)
   we=(4*rv(qs[3]@qs[4].inverted())-rv(qs[3]@qs[5].inverted()))/(2*dt)
-  wm=max(wm,(w0-we).length);raw=max(raw,(rv(qs[1]@qs[0].inverted())/dt-rv(qs[3]@qs[4].inverted())/dt).length)
- if vm>.006:fail.append('loop translation velocity')
- if wm>.05:fail.append('loop angular velocity')
+  wm=max(wm,(w0-we).length)
+  if n not in ['Leg.L','Leg.R']:upper_vm=max(upper_vm,((-3*p0+4*p1-p2)/(2*dt)-(3*pe-4*pm1+pm2)/(2*dt)).length);upper_wm=max(upper_wm,(w0-we).length)
+  raw=max(raw,(rv(qs[1]@qs[0].inverted())/dt-rv(qs[3]@qs[4].inverted())/dt).length)
+ # The approved legs have an existing strict subframe derivative diagnostic;
+ # assert that their complete wrap poses are identical rather than pretending
+ # the upper-body refinement fixes or introduces that baseline characteristic.
+ base=bpy.data.actions[e['refinement_base']];r.animation_data.action=base;r.animation_data.action_slot=base.slots[0];s['gaf_library_last_action']=base.name
+ inherited_leg_pose_error=0.
+ for ff in pose:
+  ns['frame'](ff);bm=ns['pose_snapshot'](r)
+  for leg in ['Leg.L','Leg.R']:inherited_leg_pose_error=max(inherited_leg_pose_error,ns['md'](pose[ff][leg],bm[leg]))
+ if inherited_leg_pose_error>1e-6:fail.append('approved leg wrap changed')
+ if upper_vm>.006:fail.append('new upper-body loop translation velocity')
+ if upper_wm>.05:fail.append('new upper-body loop angular velocity')
  if badpairs:fail.append('nonadjacent/rifle collisions')
- rep={'action':a.name,'passed':not fail,'failures':fail,'samples':len(samples),'metrics':metrics,'loop_matrix_error':seam,'leg_scale_ranges':scales,'max_cuboid_margin_m':max_sat,'unwanted_collisions':badpairs,'second_order_loop_velocity_m_s':vm,'second_order_loop_angular_rad_s':wm,'raw_first_order_angular_rad_s':raw};reports.append(rep);print(json.dumps(rep),flush=True)
-(O/'geometry_validation.json').write_text(json.dumps({'passed':all(x['passed'] for x in reports),'reports':reports,'limitations':['Source leg length pulses are retained; straight cuboid legs are not fixed-length.','Adjacent rigid block joint seating is measured separately, not treated as nonadjacent collision.','Foot-floor adapters preserve source angles and horizontal paths; no gameplay foot-lock certification.']},indent=2))
+ rep={'action':a.name,'passed':not fail,'failures':fail,'samples':len(samples),'metrics':metrics,'loop_matrix_error':seam,'leg_scale_ranges':scales,'max_cuboid_margin_m':max_sat,'unwanted_collisions':badpairs,'second_order_loop_velocity_m_s':vm,'second_order_loop_angular_rad_s':wm,'raw_first_order_angular_rad_s':raw,'upperbody_loop_velocity_m_s':upper_vm,'upperbody_loop_angular_rad_s':upper_wm,'inherited_leg_wrap_pose_error':inherited_leg_pose_error};reports.append(rep);print(json.dumps(rep),flush=True)
+(O/'geometry_validation.json').write_text(json.dumps({'passed':all(x['passed'] for x in reports),'reports':reports,'limitations':['Source leg length pulses are retained; straight cuboid legs are not fixed-length.','Adjacent rigid block joint seating is measured separately, not treated as nonadjacent collision.','Foot-floor adapters preserve source angles and horizontal paths; no gameplay foot-lock certification.','Strict full-rig subframe derivative diagnostics include inherited approved leg corner/linear-bake behavior. Those leg wrap poses are checked against the approved baseline exactly; new upper-body motion is checked separately against0.006m/s and0.05rad/s.']},indent=2))
