@@ -6,7 +6,7 @@
     "source_mesh": "Showcase_Player_Mesh",
     "source_armature": "LB_Test_RestRig",
     "slot_identifier": "OBRUN_Test_Rig",
-    "action_sha256": "291a2097c92315e5d48508999b182e1da4855a6f0bcde1b8df93dbd0c50a30ad",
+    "action_sha256": "e5592898f9ddb8c4b1f010107c288b19cf6c64131bfef88631f6e7a127c71bb6",
     "action_frame_range": [
       1.0,
       217.0
@@ -62,14 +62,14 @@
     },
     "loop_note": "Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.",
     "holding_sway": {
-      "yaw_deg": 4.8,
+      "yaw_deg": 3.0,
       "lag_s": 0.06,
       "roll_deg": 0.0,
       "roll_lag_s": 0.08,
-      "holding_seat_m": -0.005
+      "holding_seat_m": 0.0
     },
     "adaptation_note": "Chest-led gait yaw with unchanged world-space head observation. Original arm, rifle-relative grip, support overlap and waist-roll curves are untouched. New authored adaptation over the approved research bake, not an additional source crossbow clip.",
-    "source_sha256": "5ef346e8408b05871e1aed2ba4c54788169990c75641875718ebf949e95c1e11"
+    "source_sha256": "f554501f3ad0a839bf7068bcbd09f26b80f2dc19813488bdb7bf214784b5693e"
   },
   {
     "action": "Rifle_Ready_Run_ActionsStyle_v002",
@@ -153,6 +153,6 @@
       "holding_seat_m": 0.005
     },
     "adaptation_note": "Chest-led gait yaw with unchanged world-space head observation. Original arm, rifle-relative grip, support overlap and waist-roll curves are untouched. New authored adaptation over the approved research bake, not an additional source crossbow clip.",
-    "source_sha256": "5ef346e8408b05871e1aed2ba4c54788169990c75641875718ebf949e95c1e11"
+    "source_sha256": "f554501f3ad0a839bf7068bcbd09f26b80f2dc19813488bdb7bf214784b5693e"
   }
 ]

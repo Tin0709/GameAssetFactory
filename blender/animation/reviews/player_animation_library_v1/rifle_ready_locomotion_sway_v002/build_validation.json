@@ -23,14 +23,30 @@
       "action": "Rifle_Ready_Walk_ActionsStyle_v0012",
       "base": "Rifle_Ready_Walk_ActionsStyle_v001",
       "samples": 1891,
-      "untouched_curves_exact": 109,
+      "untouched_curves_exact": 118,
       "metrics": {
         "head_world_matrix_error": 0.0,
         "chest_bounce_position_error_m": 1.193256480846328e-07,
         "right_shoulder_chest_local_error_m": 0.005000457209898855,
         "left_shoulder_chest_local_shift_m": 0.005000472124292532
       },
-      "seconds": 2.8363327980041504
+      "seconds": 2.8363327980041504,
+      "holding_sway": {
+        "yaw_deg": 3.0,
+        "lag_s": 0.06,
+        "roll_deg": 0.0,
+        "roll_lag_s": 0.08,
+        "holding_seat_m": 0.0
+      },
+      "modified_bone_properties": {
+        "Chest": [
+          "rotation_quaternion"
+        ],
+        "Head": [
+          "rotation_quaternion"
+        ]
+      },
+      "final_walk_refinement": true
     },
     {
       "action": "Rifle_Ready_Run_ActionsStyle_v002",
@@ -45,5 +61,6 @@
       },
       "seconds": 33.9231071472168
     }
-  ]
+  ],
+  "all_existing_actions_and_run_unchanged_in_walk_refinement": true
 }
