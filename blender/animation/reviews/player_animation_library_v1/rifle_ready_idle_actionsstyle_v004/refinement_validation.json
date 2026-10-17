@@ -1,14 +1,12 @@
 {
-  "passed": false,
-  "failures": [
-    "shoulder not closer to anatomical socket"
-  ],
+  "passed": true,
+  "failures": [],
   "samples": 649,
   "metrics": {
     "unaffected_world_matrix_error": 0.0,
-    "palm_world_error_m": 4.27743795347432e-07,
-    "palm_relative_weapon_error_m": 4.2624875129424936e-07,
-    "new_scale_error": 5.960464477539062e-07
+    "palm_world_error_m": 4.256623046721727e-07,
+    "palm_relative_weapon_error_m": 4.2696442550106056e-07,
+    "new_scale_error": 4.76837158203125e-07
   },
   "limits": {
     "unaffected_world_matrix_error": 1e-06,
@@ -17,24 +15,24 @@
     "new_scale_error": 1e-05
   },
   "shoulder_depth_reduction_m": [
-    0.029180125740822405,
-    0.029576313943834975
+    0.004921613934129709,
+    0.035106847557472065
   ],
   "whole_arm_rotation_degrees": [
-    3.2315910162661394,
-    3.2539838704395936
+    0.5674458965131177,
+    4.068106572040466
   ],
   "shoulder_forward_offset_from_socket_before_m": [
     0.09617061796598136,
     0.10269783204421401
   ],
   "shoulder_forward_offset_from_socket_after_m": [
-    0.06699049239978194,
-    0.07316832337528467
+    0.06395147182047367,
+    0.09730372205376625
   ],
   "euclidean_socket_distance_reduction_m": [
-    -0.002363770282602401,
-    0.010609627547280925
+    0.00016034796568806242,
+    0.012503113037635488
   ],
   "changed_curves": [
     [
@@ -70,5 +68,5 @@
   "rifle_right_arm_head_body_legs_exact": true,
   "original_support_palm_motion_exact": true,
   "all_key_times_and_interpolation_exact": true,
-  "candidate_sha256": "061cdce10158d4462b0abcb21d827904e371a6aa78d78194391925f2a8fccc7d"
+  "candidate_sha256": "6694fc4086e0da889f14e3e70dacf89fbf327627182a1a5c66860c3cd34fa4e8"
 }
