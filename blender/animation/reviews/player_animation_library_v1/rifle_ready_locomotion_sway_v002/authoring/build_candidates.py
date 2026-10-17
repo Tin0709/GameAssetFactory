@@ -14,9 +14,7 @@ r = bpy.data.objects[ui.RIG]; s = bpy.context.scene
 rest = {b.name:b.matrix_local.copy() for b in r.data.bones}
 palm = Vector((0, r.data.bones['ForeArm.L'].length*.78, 0))
 before = {a.name:ui.action_signature(a) for a in bpy.data.actions}
-changed = {'Chest': ['rotation_quaternion'], 'Head': ['rotation_quaternion'],
-           'UpperArm.R': ['rotation_quaternion'], 'UpperArm.L':['location','rotation_quaternion'],
-           'WeaponCarrier':['location','rotation_quaternion']}
+changed = {'Chest': ['rotation_quaternion'], 'Head': ['rotation_quaternion']}
 names = {'Walk':'Rifle_Ready_Walk_ActionsStyle_v0012', 'Run':'Rifle_Ready_Run_ActionsStyle_v002'}
 entries=[]; reports=[]; out=O/'rifle_ready_locomotion_sway_v002.blend'
 for kind,name in names.items():
@@ -66,7 +64,7 @@ for kind,name in names.items():
     entry=dict(e);entry.update(action=name,source=out.relative_to(R).as_posix(),action_sha256=ui.action_signature(act),status='pending',
         approval_note='Pending Blender review, requested2026-10-18. Existing approved gameplay landing carry informs this upper-body sway refinement; no gameplay integration.',
         refinement_base=old,holding_sway=SETTINGS[kind],
-        adaptation_note='Chest-led gait yaw with unchanged world-space head observation; tiny delayed rigid holding roll. New authored adaptation over the approved research bake, not an additional source crossbow clip.')
+        adaptation_note='Chest-led gait yaw with unchanged world-space head observation. Original arm, rifle-relative grip, support overlap and waist-roll curves are untouched. New authored adaptation over the approved research bake, not an additional source crossbow clip.')
     entry.pop('source_sha256',None);ui.validate_action(act,entry,r);entries.append(entry)
     reports.append({'action':name,'base':old,'samples':len(frames),'untouched_curves_exact':count,'metrics':metrics,'seconds':time.time()-start})
     print('BUILT',json.dumps(reports[-1]),flush=True)
