@@ -74,24 +74,12 @@
     },
     "adjacent_contact_pair_names": [
       [
-        "Chest",
-        "UpperArm.R"
-      ],
-      [
-        "Chest",
-        "UpperArm.L"
-      ],
-      [
         "ForeArm.R",
         "UpperArm.R"
       ],
       [
-        "ForeArm.L",
-        "UpperArm.L"
-      ],
-      [
         "Chest",
-        "Leg.R"
+        "UpperArm.L"
       ],
       [
         "Chest",
@@ -99,25 +87,37 @@
       ],
       [
         "Chest",
+        "Leg.R"
+      ],
+      [
+        "ForeArm.L",
+        "UpperArm.L"
+      ],
+      [
+        "Chest",
         "Head"
+      ],
+      [
+        "Chest",
+        "UpperArm.R"
       ]
     ],
     "approved_solid_contact_pair_names": [
       [
-        "Rifle_V2_Body",
-        "Rifle_V2_Magazine"
+        "ForeArm.R",
+        "Rifle_V2_Body"
       ],
       [
         "Rifle_V2_Body",
         "UpperArm.R"
       ],
       [
-        "ForeArm.R",
-        "Rifle_V2_Body"
+        "Rifle_V2_Body",
+        "Rifle_V2_Magazine"
       ]
     ]
   },
-  "candidate_sha256": "1de968681972f42c493bf3b8d55fa55841df36be6173f69763e4c620ac6e1cb8",
+  "candidate_sha256": "6694fc4086e0da889f14e3e70dacf89fbf327627182a1a5c66860c3cd34fa4e8",
   "passed": true,
   "failures": [],
   "evaluated_samples": 649,
@@ -145,16 +145,16 @@
   "metrics": {
     "arm_relative_rifle_matrix_error": 8.344650268554688e-07,
     "connected_elbow_gap_m": 0.0,
-    "straight_arm_cross_error": 2.682209014892578e-07,
+    "straight_arm_cross_error": 2.6832436182154874e-07,
     "forearm_local_articulation_rad": 0.0,
-    "bone_world_scale_error": 5.960464477539062e-07,
-    "rigid_pair_distance_error_m": 3.2346900546986745e-07,
+    "bone_world_scale_error": 4.76837158203125e-07,
+    "rigid_pair_distance_error_m": 3.7177776995855893e-07,
     "foot_full_vertex_drift_m": 0.15939826074138772,
     "foot_floor_penetration_m": 1.752923708409071e-07,
     "attachment_to_carrier_matrix_error": 1.7881393432617188e-07,
-    "left_support_gap_deviation_m": 0.0014867912977933884,
+    "left_support_gap_deviation_m": 0.0018950290977954865,
     "approved_entry_pose_matrix_error": 0.2670570929894822,
-    "left_support_anchor_excursion_m": 0.001787517352009712
+    "left_support_anchor_excursion_m": 0.0017875033578770663
   },
   "limits": {
     "arm_relative_rifle_matrix_error": 0.0001,
@@ -168,19 +168,19 @@
     "left_support_anchor_excursion_m": 0.003
   },
   "left_support_sampled_gap_range_m": [
-    0.011240342631936073,
-    0.012527575716376305
+    0.011440452188253403,
+    0.012935813516378403
   ],
   "loop_pose_matrix_error": 0.0,
-  "loop_one_sided_translation_velocity_difference_m_s": 0.003683922921739403,
+  "loop_one_sided_translation_velocity_difference_m_s": 0.003677308218861144,
   "loop_one_sided_angular_velocity_difference_rad_s": 0.0008601184030211832,
   "raw_triangle_pairs_max": {
     "Head|Chest": 14,
-    "Chest|UpperArm.L": 6,
+    "Chest|UpperArm.L": 4,
     "Chest|UpperArm.R": 6,
     "Chest|Leg.L": 24,
     "Chest|Leg.R": 24,
-    "UpperArm.L|ForeArm.L": 18,
+    "UpperArm.L|ForeArm.L": 17,
     "UpperArm.R|ForeArm.R": 16,
     "UpperArm.R|Rifle_V2_Body": 54,
     "ForeArm.R|Rifle_V2_Body": 103,
@@ -188,33 +188,33 @@
   },
   "cuboid_signed_margin_max_m": {
     "Head|Chest": 0.0036168613587506115,
-    "Head|UpperArm.L": -0.03340529836714268,
+    "Head|UpperArm.L": -0.04197084566112608,
     "Head|UpperArm.R": -0.05972703526755274,
     "Head|Leg.L": -0.600463064337321,
     "Head|Leg.R": -0.6129788576495603,
-    "Head|ForeArm.L": -0.36161893606185913,
+    "Head|ForeArm.L": -0.346922040451318,
     "Head|ForeArm.R": -0.23180829097125666,
-    "Chest|UpperArm.L": 0.0027538463473320007,
+    "Chest|UpperArm.L": 0.0013700909912586212,
     "Chest|UpperArm.R": 0.0348470788449049,
     "Chest|Leg.L": 0.08137803454205184,
     "Chest|Leg.R": 0.07465070730778844,
-    "Chest|ForeArm.L": -0.06929109385237098,
+    "Chest|ForeArm.L": -0.06648571975529194,
     "Chest|ForeArm.R": -0.07243464328348637,
-    "UpperArm.L|UpperArm.R": -0.24661104823462665,
-    "UpperArm.L|Leg.L": -0.15997817961033434,
-    "UpperArm.L|Leg.R": -0.21629132190719247,
-    "UpperArm.L|ForeArm.L": 2.093147486448288e-07,
-    "UpperArm.L|ForeArm.R": -0.08481897786259651,
+    "UpperArm.L|UpperArm.R": -0.2504740096628666,
+    "UpperArm.L|Leg.L": -0.15677805396262556,
+    "UpperArm.L|Leg.R": -0.21430467860773206,
+    "UpperArm.L|ForeArm.L": 1.9825529307127e-07,
+    "UpperArm.L|ForeArm.R": -0.08749580755829811,
     "UpperArm.R|Leg.L": -0.21172768309340084,
     "UpperArm.R|Leg.R": -0.1863193530589342,
-    "UpperArm.R|ForeArm.L": -0.2881130836904049,
+    "UpperArm.R|ForeArm.L": -0.29048293828964233,
     "UpperArm.R|ForeArm.R": 1.9371509552001953e-07,
     "Leg.L|Leg.R": -0.007704269595928626,
-    "Leg.L|ForeArm.L": -0.15177620528265834,
+    "Leg.L|ForeArm.L": -0.14958484354428947,
     "Leg.L|ForeArm.R": -0.14790252136299387,
-    "Leg.R|ForeArm.L": -0.21629126509651542,
+    "Leg.R|ForeArm.L": -0.2143045978154987,
     "Leg.R|ForeArm.R": -0.17901442758738995,
-    "ForeArm.L|ForeArm.R": -0.03504663705825806
+    "ForeArm.L|ForeArm.R": -0.03670189343392849
   },
   "unwanted_intersections": [],
   "unwanted_intersection_samples_count": 0,

@@ -1,21 +1,37 @@
 {
   "passed": true,
-  "degrees_toward_body": 10.0,
-  "shoulder_forward_clearance_m": 0.02,
-  "frames": 2593,
-  "shoulder_pivot_position_error_m": 1.8176184457373258e-07,
-  "palm_forward_reach_reduction_m": [
-    0.04511105502024293,
-    0.0780058354139328
+  "input_action_sha256": "64e4635a30e50df9b74aeaa9f05734c09228ef6ab67f80781a096451f4d11360",
+  "candidate_sha256": "6694fc4086e0da889f14e3e70dacf89fbf327627182a1a5c66860c3cd34fa4e8",
+  "action_sha256": "dc92fe860ba5819de1bf04741c9b1ca5437573eceadeaad3913e1a23908271a5",
+  "left_shoulder_socket_alignment": 0.85,
+  "left_shoulder_actual_depth_reduction_m": [
+    0.00492159996429109,
+    0.03510684278444387
   ],
-  "palm_additional_drop_m": [
-    0.06096053123474121,
-    0.06843352317810059
+  "left_shoulder_additional_lowering_m": [
+    0.0025652647018432617,
+    0.019857168197631836
   ],
+  "left_whole_arm_rotation_degrees": [
+    0.5664806285569308,
+    4.06787838898612
+  ],
+  "analytical_palm_error_m": 1.2644054553268208e-07,
+  "sampled_keys": 2593,
   "changed_curves": [
     [
       "UpperArm.L",
       "location",
+      0
+    ],
+    [
+      "UpperArm.L",
+      "location",
+      1
+    ],
+    [
+      "UpperArm.L",
+      "location",
       2
     ],
     [
@@ -35,73 +51,11 @@
     ],
     [
       "UpperArm.L",
-      "rotation_quaternion",
-      3
-    ],
-    [
-      "UpperArm.R",
-      "location",
-      2
-    ],
-    [
-      "UpperArm.R",
-      "rotation_quaternion",
-      0
-    ],
-    [
-      "UpperArm.R",
-      "rotation_quaternion",
-      1
-    ],
-    [
-      "UpperArm.R",
-      "rotation_quaternion",
-      2
-    ],
-    [
-      "UpperArm.R",
-      "rotation_quaternion",
-      3
-    ],
-    [
-      "WeaponCarrier",
-      "location",
-      0
-    ],
-    [
-      "WeaponCarrier",
-      "location",
-      1
-    ],
-    [
-      "WeaponCarrier",
-      "location",
-      2
-    ],
-    [
-      "WeaponCarrier",
-      "rotation_quaternion",
-      0
-    ],
-    [
-      "WeaponCarrier",
-      "rotation_quaternion",
-      1
-    ],
-    [
-      "WeaponCarrier",
-      "rotation_quaternion",
-      2
-    ],
-    [
-      "WeaponCarrier",
       "rotation_quaternion",
       3
     ]
   ],
-  "source_timing_unchanged": true,
-  "support_relative_motion_preserved_by_rigid_transform": true,
-  "all_other_actions_exact": true,
-  "action_sha256": "64e4635a30e50df9b74aeaa9f05734c09228ef6ab67f80781a096451f4d11360",
-  "candidate_sha256": "1de968681972f42c493bf3b8d55fa55841df36be6173f69763e4c620ac6e1cb8"
+  "all_other_curves_verbatim": true,
+  "all_other_source_actions_exact": true,
+  "no_elbow_or_scale_change": true
 }

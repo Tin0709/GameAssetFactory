@@ -61,7 +61,7 @@
   "endpoint_sample_frame": 325,
   "refinement_base": "Rifle_Ready_Idle_ActionsStyle_v003",
   "arm_drop_m": 0.018,
-  "left_support_motion": "0.4..1.6mm pressure release plus\u00b10.8mm tangent,\u00b10.15degree whole straight arm overlap; clocks0.9/1.8s; collision bounded",
+  "left_support_motion": "Original0.9/1.8s support-palm trajectory retained exactly; left whole-arm direction85% toward closest native shoulder socket, retaining15% of prior swing deviation. Straight arms, fixed palm, no rifle/right-arm change.",
   "closer_hold_degrees": 10.0,
   "shoulder_forward_clearance_m": 0.02,
   "left_shoulder_depth_reduction_m": [
@@ -72,5 +72,6 @@
     0.5664806285569308,
     4.06787838898612
   ],
-  "left_shoulder_socket_alignment": 0.85
+  "left_shoulder_socket_alignment": 0.85,
+  "left_support_input_motion": "0.4..1.6mm pressure release plus\u00b10.8mm tangent,\u00b10.15degree whole straight arm overlap; clocks0.9/1.8s; collision bounded"
 }
