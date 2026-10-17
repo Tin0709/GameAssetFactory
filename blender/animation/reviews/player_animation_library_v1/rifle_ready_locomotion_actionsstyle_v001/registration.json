@@ -1,0 +1,12 @@
+{
+  "new_actions": [
+    "Rifle_Ready_Walk_ActionsStyle_v001",
+    "Rifle_Ready_Run_ActionsStyle_v001"
+  ],
+  "both_pending": true,
+  "v004_approved": true,
+  "previous_actions_preserved": 83,
+  "all_native_assets_exact": true,
+  "focused": 17,
+  "archived": 35
+}
