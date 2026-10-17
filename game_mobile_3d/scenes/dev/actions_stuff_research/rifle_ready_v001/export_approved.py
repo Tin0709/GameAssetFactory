@@ -42,5 +42,4 @@ weapon=R/'blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend';wsha=hashli
 for f in fixtures:f['weapon_root_world']=rows(Matrix(f['weapon_body_world'])@body.matrix_world.inverted()@A.inverted())
 assert hashlib.sha256(source.read_bytes()).hexdigest()==sha;assert hashlib.sha256(weapon.read_bytes()).hexdigest()==wsha
 (S/'profile.json').write_text(json.dumps(profile,indent=2));(S/'fixtures.json').write_text(json.dumps(fixtures,separators=(',',':')))
-(D/'profile.json').write_text(json.dumps({k:v for k,v in profile.items() if k!='clips'},indent=2)|'') if False else None
 report={'passed':True,'approved_sources_unchanged':True,'actions':[e['action'] for e in entries.values()],'maximum_carrier_to_right_arm_matrix_error':max_grip,'total_native_samples':sum(e['samples'] for e in profile['clips'].values()),'fixtures':len(fixtures)};(S/'export_validation.json').write_text(json.dumps(report,indent=2));print(json.dumps(report),flush=True)

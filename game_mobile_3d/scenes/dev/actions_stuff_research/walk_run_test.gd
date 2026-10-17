@@ -4,6 +4,9 @@ const PLAYER=preload("res://scenes/dev/ExpressiveLocomotionPlayer.tscn")
 const SOURCE_VISUAL=preload("res://scenes/dev/actions_stuff_research/idle_locomotion_visual.gd")
 const SOURCE_ACTOR=preload("res://scenes/dev/actions_stuff_research/source_jump_actor.gd")
 const RenderPresenter=preload("res://scenes/dev/actions_stuff_research/render_pose_presenter.gd")
+const RIFLE_VISUAL=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd")
+const RiflePresenter=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_presenter.gd")
+@export var rifle_ready:=true
 var presentation: Node
 var player: CharacterBody3D
 var camera: Camera3D
@@ -25,17 +28,18 @@ func _ready() -> void:
 	_build_environment()
 	player=PLAYER.instantiate();player.name="ResearchPlayer"
 	player.set_script(SOURCE_ACTOR)
-	player.get_node("Visual").set_script(SOURCE_VISUAL)
+	player.get_node("Visual").set_script(RIFLE_VISUAL if rifle_ready else SOURCE_VISUAL)
 	player.get_node("Visual").authored_locomotion=true;player.get_node("Visual").generic_weapon_carry=true;player.get_node("Visual").long_gun_carry_v2=true;player.get_node("Visual").weapon_equipped=false
 	player.review_pace=1.;player.walk_speed=1.8;player.run_speed=5.031;player.acceleration=32.;player.deceleration=28.
 	add_child(player)
+	if rifle_ready:player.visual.activate_rifle_ready()
 	camera=Camera3D.new();camera.name="GameplayCamera";camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=camera_size;camera.far=150.;add_child(camera);camera.make_current()
 	var layer:=CanvasLayer.new();add_child(layer)
 	var panel:=PanelContainer.new();panel.position=Vector2(20,20);layer.add_child(panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.055,.88);style.content_margin_left=16;style.content_margin_right=16;style.content_margin_top=12;style.content_margin_bottom=12;style.set_corner_radius_all(6)
 	panel.add_theme_stylebox_override("panel",style)
 	hud=Label.new();hud.add_theme_font_size_override("font_size",18);panel.add_child(hud)
-	presentation=RenderPresenter.new();presentation.name="RenderPosePresentation";add_child(presentation)
+	presentation=RiflePresenter.new() if rifle_ready else RenderPresenter.new();presentation.name="RenderPosePresentation";add_child(presentation)
 	presentation.setup(player,player.visual);player.visual.presentation=presentation
 	_update_camera()
 func _build_environment() -> void:
@@ -63,11 +67,11 @@ func _process(delta: float) -> void:
 	# Camera orbit is observational; locomotion owns the character's heading.
 	var state:="RUN" if visual.gait_run_weight>.98 else ("WALK ↔ RUN" if visual.gait_run_weight>.02 else "WALK")
 	if not visual.move_requested:state="SETTLING" if visual.settling else "IDLE"
-	if visual.idle_active and not visual.move_requested:state="IDLE · LOOK AROUND"
+	if visual.idle_active and not visual.move_requested:state="RIFLE READY · IDLE" if rifle_ready else "IDLE · LOOK AROUND"
 	if visual.jump_active:
 		state="LANDING" if visual.jump_grounded else ("TAKEOFF / RISE" if player.velocity.y>0 else "AIRBORNE / FALL")
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
-	hud.text="ACTIONS & STUFF · LOCOMOTION RESEARCH\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nRight-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
+	hud.text=("RIFLE READY · APPROVED BLENDER SET" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nRight-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
