@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "input_action_sha256": "64e4635a30e50df9b74aeaa9f05734c09228ef6ab67f80781a096451f4d11360",
+  "candidate_sha256": "061cdce10158d4462b0abcb21d827904e371a6aa78d78194391925f2a8fccc7d",
+  "action_sha256": "08e52d0beae0b217986d3200bb8fb46ac1a78529117bf47af2039f4724a5185d",
+  "left_shoulder_target_retraction_m": 0.04,
+  "left_shoulder_actual_depth_reduction_m": [
+    0.0291623089578934,
+    0.029587168013677
+  ],
+  "left_shoulder_additional_lowering_m": [
+    0.015440106391906738,
+    0.01794612407684326
+  ],
+  "left_whole_arm_rotation_degrees": [
+    3.230630385431372,
+    3.2545298576674813
+  ],
+  "analytical_palm_error_m": 1.3328003749250113e-07,
+  "sampled_keys": 2593,
+  "changed_curves": [
+    [
+      "UpperArm.L",
+      "location",
+      0
+    ],
+    [
+      "UpperArm.L",
+      "location",
+      1
+    ],
+    [
+      "UpperArm.L",
+      "location",
+      2
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      0
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      1
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      2
+    ],
+    [
+      "UpperArm.L",
+      "rotation_quaternion",
+      3
+    ]
+  ],
+  "all_other_curves_verbatim": true,
+  "all_other_source_actions_exact": true,
+  "no_elbow_or_scale_change": true
+}
