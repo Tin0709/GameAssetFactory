@@ -2451,8 +2451,8 @@
       "end": 324,
       "fps": 30,
       "fps_base": 1.0,
-      "status": "pending",
-      "approval_note": "Pending both-shoulder/head attachment refinement. Holding assembly30mm up/20mm back; fixed25mm head clearance removed; original angles/timing and rifle contacts preserved.",
+      "status": "approved",
+      "approval_note": "Artistically approved by the user on2026-10-17 as the unchanged visual/structural base for Rifle Ready Walk/Run. Research-only.",
       "seamless_loop": true,
       "research_only": true,
       "production_eligible": false,
@@ -2521,6 +2521,146 @@
         "Chest|UpperArm.R": 0.055
       },
       "joint_seating_note": "Head base remains exactly at the torso top; unchanged source head rotations produce bounded corner seating up to28.5mm, absolute guard30mm. Right upper-arm seating guard55mm; all nonadjacent/rifle intersections remain forbidden."
+    },
+    {
+      "action": "Rifle_Ready_Walk_ActionsStyle_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_actionsstyle_v001/rifle_ready_locomotion_actionsstyle_v001.blend",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "8fa03dae5480184928e98c7bcaa7dbfe283b467a37ff882360fe68ddd6dc5ec9",
+      "action_frame_range": [
+        1.0,
+        217.0
+      ],
+      "start": 1,
+      "end": 216,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Pending Blender review. Literal crossbow locomotion with approved v004 rifle calibration; research-only.",
+      "seamless_loop": true,
+      "research_only": true,
+      "production_eligible": false,
+      "source_derived_reconstruction": true,
+      "original_custom_animation": false,
+      "source_animation": "animation.oreville_ans.tldiyl",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_prop": "rifle_stylized_v2",
+      "bake_hz": 240,
+      "refinement_base": "Rifle_Ready_Idle_ActionsStyle_v004",
+      "duration_s": 7.2,
+      "core_period_s": 0.8,
+      "phase_rate_cycles_s": 1.25,
+      "virtual_source_speed_blocks_s": 2.62451171875,
+      "source_life_origin_s": 14.399999999999503,
+      "source_phase_origin": 17.939743627575226,
+      "endpoint_sample_frame": 217,
+      "in_place": true,
+      "native_rig_adapters": {
+        "run_gait_waist_y_fraction": 1.0,
+        "head_torso_relative_tilt_limit_deg": 4.0,
+        "boot_sole_floor_correction": true,
+        "holding_raise_deg": 0,
+        "holding_seating_drop_m": 0.002,
+        "holding_right_offset_m": 0,
+        "source_leg_angles_horizontal_paths_scale_unchanged": true,
+        "left_socket_target_outset_m": 0.004
+      },
+      "loop_note": "Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.",
+      "source_sha256": "79176f5ad3a3695c5af3d62d6fd4c28b270c6d551548ffdfe8812fb64bca2385"
+    },
+    {
+      "action": "Rifle_Ready_Run_ActionsStyle_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_actionsstyle_v001/rifle_ready_locomotion_actionsstyle_v001.blend",
+      "source_rig": "Showcase_Player_Rig",
+      "source_mesh": "Showcase_Player_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBRUN_Test_Rig",
+      "action_sha256": "f0ce8d3a7bc14375af7e347cadd4481a587ed313c8e57dbd3a4dac793d924405",
+      "action_frame_range": [
+        1.0,
+        2701.0
+      ],
+      "start": 1,
+      "end": 2700,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Pending Blender review. Literal crossbow locomotion with approved v004 rifle calibration; research-only.",
+      "seamless_loop": true,
+      "research_only": true,
+      "production_eligible": false,
+      "source_derived_reconstruction": true,
+      "original_custom_animation": false,
+      "source_animation": "animation.oreville_ans.fngydr",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_prop": "rifle_stylized_v2",
+      "bake_hz": 240,
+      "refinement_base": "Rifle_Ready_Idle_ActionsStyle_v004",
+      "duration_s": 90.0,
+      "core_period_s": 0.625,
+      "phase_rate_cycles_s": 1.6,
+      "virtual_source_speed_blocks_s": 5.59,
+      "source_life_origin_s": 14.399999999999503,
+      "source_phase_origin": 22.962871843296135,
+      "endpoint_sample_frame": 2701,
+      "in_place": true,
+      "native_rig_adapters": {
+        "run_gait_waist_y_fraction": 0.6,
+        "head_torso_relative_tilt_limit_deg": 4.0,
+        "boot_sole_floor_correction": true,
+        "holding_raise_deg": 24,
+        "holding_seating_drop_m": 0.03,
+        "holding_right_offset_m": 0.024,
+        "source_leg_angles_horizontal_paths_scale_unchanged": true,
+        "left_socket_target_outset_m": 0.004
+      },
+      "loop_note": "Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.",
+      "research_scale_channels": {
+        "Leg.L": {
+          "axis": 1,
+          "min": 1.0,
+          "max": 1.070002
+        },
+        "Leg.R": {
+          "axis": 1,
+          "min": 1.0,
+          "max": 1.070002
+        }
+      },
+      "source_sha256": "79176f5ad3a3695c5af3d62d6fd4c28b270c6d551548ffdfe8812fb64bca2385"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
@@ -2833,6 +2973,14 @@
       {
         "kind": "action",
         "id": "Rifle_Ready_Idle_ActionsStyle_v004"
+      },
+      {
+        "kind": "action",
+        "id": "Rifle_Ready_Walk_ActionsStyle_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Rifle_Ready_Run_ActionsStyle_v001"
       }
     ]
   }
