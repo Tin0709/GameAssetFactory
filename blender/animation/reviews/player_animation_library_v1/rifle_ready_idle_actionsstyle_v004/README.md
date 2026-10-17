@@ -20,6 +20,8 @@ These new bounds apply only to this current attachment refinement. Earlier sourc
 
 ## Current reviews and validation
 
+`attachment_rear_three_quarter.png` also shows the current shoulder/neck connection from the rear, matching the second user screenshot direction.
+
 - `comparison_v004_attachment_before_after_30fps.mp4`: previous v004 left, current connected shoulders/head right, same side camera/original speed.
 - `comparison_v003_left_v004_right_30fps.mp4`: approved v003 versus current v004, three-quarter view.
 - `rifle_ready_idle_side_30fps_1x.mp4`, `rifle_ready_idle_three_quarter_30fps_1x.mp4`, `rifle_ready_idle_front_30fps_1x.mp4`: current original-speed views.
