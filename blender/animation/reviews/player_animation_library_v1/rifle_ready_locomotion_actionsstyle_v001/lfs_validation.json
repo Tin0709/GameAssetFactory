@@ -9,12 +9,12 @@
     },
     {
       "path": "blender/animation/showcase/Animation_Showcase.blend",
-      "bytes": 59009976,
+      "bytes": 59009987,
       "index_is_lfs_pointer": true,
       "attributes": "blender/animation/showcase/Animation_Showcase.blend: filter: lfs"
     }
   ],
-  "current_combined_bytes": 93891443,
+  "current_combined_bytes": 93891454,
   "impact_note": "Each changed binary revision consumes its full unique LFS object size; existing history/quotas are not migrated or changed. Raw backups/cache remain outside Git.",
   "history_rewritten": false,
   "manual_stage_commit_push": false

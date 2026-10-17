@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "new_pending_actions": [
+    "Rifle_Ready_Walk_ActionsStyle_v001",
+    "Rifle_Ready_Run_ActionsStyle_v001"
+  ],
+  "approved_base_unchanged": "Rifle_Ready_Idle_ActionsStyle_v004",
+  "old_showcase_actions_preserved": 83,
+  "native_assets_exact": true,
+  "protected_files_unchanged": 2001,
+  "geometry_samples": 5834,
+  "decoded_review_movies": 9,
+  "decoded_review_frames": 1944,
+  "godot_modified": false,
+  "showcase_open_selected": "Rifle_Ready_Walk_ActionsStyle_v001",
+  "playback_fps": 30,
+  "research_only": true,
+  "review_required_before_gameplay_integration": true
+}
