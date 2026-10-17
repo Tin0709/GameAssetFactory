@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "current_required_versions_mib": 159.239,
+  "files": [
+    {
+      "file": "blender/animation/showcase/Animation_Showcase.blend",
+      "bytes": 83487289,
+      "size_mib": 79.62,
+      "index_valid_lfs_pointer": true,
+      "pointer_matches_current_file": true
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/rifle_ready_locomotion_sway_v002.blend",
+      "bytes": 83486533,
+      "size_mib": 79.619,
+      "index_valid_lfs_pointer": true,
+      "pointer_matches_current_file": true
+    }
+  ],
+  "tracking_migration": false,
+  "history_rewrite": false
+}
