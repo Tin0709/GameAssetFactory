@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "protected_files": 2001,
+  "changed_files": [],
+  "godot_and_all_previous_registered_sources_byte_exact": true,
+  "v004_file_sha256": "b1990be707b1928c027d2b4172c13812b4fb217385969e4fedf1f5823a163d5b",
+  "v004_action_sha256": "88b1ce9fe830f3377a58b8bf1cf04f1f602372f287b559aae8ee28e576d8409b",
+  "recovery_backups_outside_git": "/Users/tin/Documents/ChatGPT/New project/experiments/rifle_ready_locomotion_actionsstyle_v001"
+}
