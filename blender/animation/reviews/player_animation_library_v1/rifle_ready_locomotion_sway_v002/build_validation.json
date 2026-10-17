@@ -25,10 +25,11 @@
       "samples": 1891,
       "untouched_curves_exact": 118,
       "metrics": {
-        "head_world_matrix_error": 0.0,
-        "chest_bounce_position_error_m": 1.193256480846328e-07,
-        "right_shoulder_chest_local_error_m": 0.005000457209898855,
-        "left_shoulder_chest_local_shift_m": 0.005000472124292532
+        "head_world_matrix_error": 1.3485550880432129e-06,
+        "chest_bounce_position_error_m": 0.0,
+        "lower_body_world_matrix_error": 0.0,
+        "right_shoulder_chest_local_error_m": 2.7516760397880357e-07,
+        "left_shoulder_chest_local_shift_m": 2.5509399646177873e-07
       },
       "seconds": 2.8363327980041504,
       "holding_sway": {
@@ -54,10 +55,11 @@
       "samples": 24193,
       "untouched_curves_exact": 109,
       "metrics": {
-        "head_world_matrix_error": 0.0,
-        "chest_bounce_position_error_m": 1.194999734487045e-07,
-        "right_shoulder_chest_local_error_m": 0.005000606169646202,
-        "left_shoulder_chest_local_shift_m": 0.005000546513520347
+        "head_world_matrix_error": 1.7881393432617188e-07,
+        "chest_bounce_position_error_m": 0.0,
+        "lower_body_world_matrix_error": 0.0,
+        "right_shoulder_chest_local_error_m": 0.005000233671633823,
+        "left_shoulder_chest_local_shift_m": 0.005000337894213728
       },
       "seconds": 33.9231071472168
     }

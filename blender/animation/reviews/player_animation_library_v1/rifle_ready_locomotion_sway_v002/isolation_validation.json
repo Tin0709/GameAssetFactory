@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "reports": [
+    {
+      "action": "Rifle_Ready_Walk_ActionsStyle_v0012",
+      "passed": true,
+      "paired_poses": 43,
+      "untouched_curves_exact": 118,
+      "metrics": {
+        "head_world_matrix_error": 1.3485550880432129e-06,
+        "chest_bounce_position_error_m": 0.0,
+        "lower_body_world_matrix_error": 0.0,
+        "right_shoulder_chest_local_error_m": 2.7516760397880357e-07,
+        "left_shoulder_chest_local_shift_m": 2.5509399646177873e-07
+      }
+    },
+    {
+      "action": "Rifle_Ready_Run_ActionsStyle_v002",
+      "passed": true,
+      "paired_poses": 43,
+      "untouched_curves_exact": 109,
+      "metrics": {
+        "head_world_matrix_error": 1.7881393432617188e-07,
+        "chest_bounce_position_error_m": 0.0,
+        "lower_body_world_matrix_error": 0.0,
+        "right_shoulder_chest_local_error_m": 0.005000233671633823,
+        "left_shoulder_chest_local_shift_m": 0.005000337894213728
+      }
+    }
+  ]
+}
