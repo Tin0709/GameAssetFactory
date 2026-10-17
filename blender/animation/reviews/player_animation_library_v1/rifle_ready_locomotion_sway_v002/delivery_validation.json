@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "actions": [
+    "Rifle_Ready_Walk_ActionsStyle_v0012",
+    "Rifle_Ready_Run_ActionsStyle_v002"
+  ],
+  "both_pending": true,
+  "artistic_approval_required": true,
+  "research_only": true,
+  "godot_files_changed": false,
+  "previous_actions_preserved": 85,
+  "current_actions": 87,
+  "checks": {
+    "build_validation": true,
+    "geometry_validation": true,
+    "isolation_validation": true,
+    "reopen_verification": true,
+    "gui_playback": true,
+    "media_validation": true,
+    "preservation": true,
+    "lfs_validation": true,
+    "comparison_provenance": true
+  },
+  "review_videos": 8,
+  "decoded_frames": 1152,
+  "native_blender_selected": "Rifle_Ready_Run_ActionsStyle_v002"
+}
