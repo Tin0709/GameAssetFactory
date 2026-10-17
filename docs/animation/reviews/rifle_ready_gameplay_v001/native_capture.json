@@ -1,0 +1,9 @@
+{
+	"collision_landings": 1,
+	"fps": 30,
+	"frames": 240,
+	"physical_peak_height": 1.31090891361237,
+	"rifle_visible": true,
+	"same_scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+	"takeoffs": 1
+}

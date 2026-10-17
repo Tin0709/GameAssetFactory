@@ -1,0 +1,8 @@
+{
+	"failures": [],
+	"fixtures": 33,
+	"maximum_local_transform_error": 0.00000750810158933746,
+	"maximum_support_target_error_m": 0.00000000372529029846191,
+	"maximum_weapon_root_error": 0.00000150943685639504,
+	"passed": true
+}

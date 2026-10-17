@@ -1,0 +1,131 @@
+{
+  "passed": true,
+  "tests": [
+    {
+      "test": "test_camera_comfort.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 0.64
+    },
+    {
+      "test": "test_direction_continuity.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 2.59
+    },
+    {
+      "test": "test_direction_controller.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 1.53
+    },
+    {
+      "test": "test_direction_facing.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 1.8
+    },
+    {
+      "test": "test_direction_gameplay.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 3.07
+    },
+    {
+      "test": "test_direction_sampler.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 0.64
+    },
+    {
+      "test": "test_gameplay.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 2.3
+    },
+    {
+      "test": "test_idle_gameplay.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 4.04
+    },
+    {
+      "test": "test_idle_source.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 6.53
+    },
+    {
+      "test": "test_interruptions.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 27.3
+    },
+    {
+      "test": "test_jump_gameplay.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 7.07
+    },
+    {
+      "test": "test_jump_physics.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 1.32
+    },
+    {
+      "test": "test_jump_source.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 8.53
+    },
+    {
+      "test": "test_render_presentation.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 2.39
+    },
+    {
+      "test": "test_rifle_ready_gameplay.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 2.4
+    },
+    {
+      "test": "test_source.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 0.54
+    },
+    {
+      "test": "test_support_exchange.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 0.54
+    },
+    {
+      "test": "test_unarmed_arms.gd",
+      "exit_code": 0,
+      "passed": true,
+      "errors": [],
+      "elapsed_s": 5.7
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "camera_jump_y_span": 0.0,
+      "failures": [],
+      "fps": 30,
+      "left_support_error_m": 3.82922144126496e-06,
+      "maximum_leg_step_deg": 23.6350636605071,
+      "minimum_foot_y": -5.96046447753906e-08,
+      "right_grip_matrix_error": 2.63865558736143e-06,
+      "support_samples": 214
+    },
+    {
+      "camera_jump_y_span": 0.0,
+      "failures": [],
+      "fps": 60,
+      "left_support_error_m": 3.90671948480303e-06,
+      "maximum_leg_step_deg": 24.1171401196739,
+      "minimum_foot_y": -5.96046447753906e-08,
+      "right_grip_matrix_error": 2.71292515208188e-06,
+      "support_samples": 436
+    }
+  ]
+}
