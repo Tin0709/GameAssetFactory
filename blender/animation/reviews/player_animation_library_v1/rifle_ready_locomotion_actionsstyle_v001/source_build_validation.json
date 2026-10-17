@@ -1,0 +1,124 @@
+{
+  "passed": true,
+  "approved_v004_action_unchanged": true,
+  "reports": [
+    {
+      "action": "Rifle_Ready_Walk_ActionsStyle_v001",
+      "passed": true,
+      "samples": 1891,
+      "duration_s": 7.2,
+      "core_period_s": 0.8,
+      "steady_graph_parity_max_channel_error": 4.3434056351543404e-10,
+      "local_loop_channel_error": 0.0,
+      "metrics": {
+        "sole_lift_max_m": 0.04382629387974739,
+        "head_anchor_error_m": 0.0,
+        "support_delta_max_m": 0.0015495436686416661,
+        "shear_error": 3.5762786865234375e-07,
+        "forearm_identity_error": 2.980232238769531e-07
+      },
+      "layers": [
+        {
+          "alias": "xfltzh",
+          "id": "animation.oreville_ans.boabcq",
+          "weight": 1.0
+        },
+        {
+          "alias": "cape",
+          "id": "animation.oreville_ans.vuslkn",
+          "weight": 1.0
+        },
+        {
+          "alias": "walk",
+          "id": "animation.oreville_ans.tldiyl",
+          "weight": 0.9999999999999984
+        },
+        {
+          "alias": "oprmcp",
+          "id": "animation.oreville_ans.przmfq",
+          "weight": 1.0
+        },
+        {
+          "alias": "mshwsb",
+          "id": "animation.oreville_ans.rrvlnm",
+          "weight": 1.0
+        },
+        {
+          "alias": "tcucxa",
+          "id": "animation.oreville_ans.dubgwy",
+          "weight": 1.0
+        },
+        {
+          "alias": "look_at_target",
+          "id": "animation.oreville_ans.cndmcx",
+          "weight": 1.0
+        }
+      ],
+      "seconds": 7.230972766876221
+    },
+    {
+      "action": "Rifle_Ready_Run_ActionsStyle_v001",
+      "passed": true,
+      "samples": 25057,
+      "duration_s": 90.0,
+      "core_period_s": 0.625,
+      "steady_graph_parity_max_channel_error": 4.304254730413959e-10,
+      "local_loop_channel_error": 0.0,
+      "metrics": {
+        "sole_lift_max_m": 0.03629639067649841,
+        "head_anchor_error_m": 0.0,
+        "support_delta_max_m": 0.0015495898393199411,
+        "shear_error": 3.5762786865234375e-07,
+        "forearm_identity_error": 3.5762786865234375e-07
+      },
+      "layers": [
+        {
+          "alias": "xfltzh",
+          "id": "animation.oreville_ans.boabcq",
+          "weight": 1.0
+        },
+        {
+          "alias": "cape",
+          "id": "animation.oreville_ans.vuslkn",
+          "weight": 1.0
+        },
+        {
+          "alias": "move",
+          "id": "animation.oreville_ans.fngydr",
+          "weight": 0.9999999999999974
+        },
+        {
+          "alias": "hxfxxu",
+          "id": "animation.oreville_ans.ktgnrt",
+          "weight": 0.999999999999999
+        },
+        {
+          "alias": "oprmcp",
+          "id": "animation.oreville_ans.przmfq",
+          "weight": 1.0
+        },
+        {
+          "alias": "xahrzd",
+          "id": "animation.oreville_ans.ucaryc",
+          "weight": 1.0
+        },
+        {
+          "alias": "mshwsb",
+          "id": "animation.oreville_ans.rrvlnm",
+          "weight": 1.0
+        },
+        {
+          "alias": "tcucxa",
+          "id": "animation.oreville_ans.dubgwy",
+          "weight": 1.0
+        },
+        {
+          "alias": "look_at_target",
+          "id": "animation.oreville_ans.cndmcx",
+          "weight": 1.0
+        }
+      ],
+      "seconds": 43.5901939868927
+    }
+  ]
+}
