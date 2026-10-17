@@ -5,7 +5,7 @@ func check(ok: bool,label: String) -> void:
 	if not ok:failures.append(label);push_error(label)
 func _initialize() -> void:call_deferred("run")
 func run() -> void:
-	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(scene)
+	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();scene.rifle_ready=false;root.add_child(scene)
 	var actor=scene.player;var v=actor.visual
 	actor.set_physics_process(false);v.set_process(false)
 	var fps:=60 if OS.get_cmdline_user_args().has("60") else 30

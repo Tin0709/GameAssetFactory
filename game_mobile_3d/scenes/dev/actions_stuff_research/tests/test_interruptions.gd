@@ -3,7 +3,7 @@ var cases: Array=[]
 var results: Array=[]
 func _initialize():call_deferred("run")
 func make_scene():
- var s=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(s)
+ var s=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();s.rifle_ready=false;root.add_child(s)
  s.player.scripted_input=true;s.player.set_physics_process(false);s.player.visual.set_process(false)
  return s
 func measure(v, prev: Array, stats: Dictionary):

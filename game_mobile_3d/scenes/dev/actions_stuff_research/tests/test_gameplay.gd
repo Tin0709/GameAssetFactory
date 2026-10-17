@@ -7,7 +7,7 @@ func run() -> void:
 	var path:="res://scenes/dev/ActionsStuffWalkRunTest.tscn"
 	check(ResourceLoader.exists(path),"Requested playable Actions & Stuff scene is missing")
 	if not ResourceLoader.exists(path):quit(1);return
-	var scene=load(path).instantiate();root.add_child(scene)
+	var scene=load(path).instantiate();scene.rifle_ready=false;root.add_child(scene)
 	await physics_frame;await process_frame
 	var actor=scene.player;var v=actor.visual
 	actor.scripted_input=true

@@ -10,7 +10,7 @@ func tick(v: Node) -> void:
 func run() -> void:
 	var fps:=60 if OS.get_cmdline_user_args().has("60") else 30
 	Engine.physics_ticks_per_second=fps
-	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(scene)
+	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();scene.rifle_ready=false;root.add_child(scene)
 	var a=scene.player;var v=a.visual;a.scripted_input=true;v.set_process(false)
 	check(v.get("idle_controller")!=null,"Existing scene must bind approved Idle overlay")
 	if not failures.is_empty(): scene.free();quit(1);return

@@ -5,7 +5,7 @@ func check(ok: bool,label: String) -> void:
 	if not ok and not failures.has(label):failures.append(label);push_error(label)
 func _initialize() -> void:call_deferred("run")
 func run() -> void:
-	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(scene)
+	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();scene.rifle_ready=false;root.add_child(scene)
 	var actor=scene.player;var v=actor.visual
 	check("direction_snapshot" in v,"Source directional controller must drive this existing scene")
 	if not "direction_snapshot" in v:scene.free();quit(1);return

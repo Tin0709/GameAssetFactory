@@ -1,7 +1,7 @@
 extends SceneTree
 func _initialize() -> void:call_deferred("run")
 func run() -> void:
-	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(scene)
+	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();scene.rifle_ready=false;root.add_child(scene)
 	var v=scene.player.visual;scene.player.set_physics_process(false);v.set_process(false)
 	# The source snapshot now owns phase/activation; setting old viewer fields
 	# by hand would create an unreachable state. Exercise a real gait exchange.
