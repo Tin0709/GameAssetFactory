@@ -1,5 +1,5 @@
 {
-  "source_sha256": "1de968681972f42c493bf3b8d55fa55841df36be6173f69763e4c620ac6e1cb8",
+  "source_sha256": "6694fc4086e0da889f14e3e70dacf89fbf327627182a1a5c66860c3cd34fa4e8",
   "view": "SIDE",
   "fps": 30,
   "frames": 324,
@@ -7,5 +7,5 @@
   "closing_frame_excluded": 325,
   "original_speed": true,
   "renderer": "BLENDER_EEVEE",
-  "elapsed": 77.8108639717102
+  "elapsed": 78.1069929599762
 }
