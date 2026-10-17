@@ -14,7 +14,7 @@ sys.path.insert(0,str(R/'blender/animation/reviews/player_animation_library_v1/r
 from support_motion import sample as breath
 S=Path('/Users/tin/Documents/ChatGPT/New project/experiments/rifle_ready_locomotion_actionsstyle_v001')
 BASE='Rifle_Ready_Idle_ActionsStyle_v004';base=bpy.data.actions[BASE];assert ui.action_signature(base)=='88b1ce9fe830f3377a58b8bf1cf04f1f602372f287b559aae8ee28e576d8409b'
-before={a.name:ui.action_signature(a) for a in bpy.data.actions};r=bpy.data.objects[ui.RIG];m=bpy.data.objects[ui.MESH];s=bpy.context.scene
+before={a.name:ui.action_signature(a) for a in bpy.data.actions};r=bpy.data.objects[ui.RIG];m=bpy.data.objects["Showcase_Player_Mesh"];s=bpy.context.scene
 r.animation_data.action=base;r.animation_data.action_slot=base.slots[0];s['gaf_library_last_action']=BASE;s.frame_set(1);bpy.context.view_layer.update();B={b.name:b.matrix.copy() for b in r.pose.bones};rest={b.name:b.matrix_local.copy() for b in r.data.bones}
 palm=Vector((0,r.data.bones['ForeArm.L'].length*.78,0));anchor=B['WeaponCarrier'].inverted()@(B['ForeArm.L']@palm)
 r.animation_data.action=None
