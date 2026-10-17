@@ -3,38 +3,55 @@
   "failures": [],
   "samples": 649,
   "metrics": {
-    "unaffected_world_matrix_error": 0.0,
-    "palm_world_error_m": 4.256623046721727e-07,
-    "palm_relative_weapon_error_m": 4.2696442550106056e-07,
-    "new_scale_error": 4.76837158203125e-07
+    "core_world_matrix_error": 0.0,
+    "preserved_rotation_scale_error": 0.0,
+    "holding_translation_error_m": 3.899654031301563e-07,
+    "right_grip_matrix_error": 3.688037395477295e-07,
+    "support_relative_palm_error_m": 5.72108053996187e-07,
+    "head_drop_error_m": 2.6316084550697524e-07,
+    "head_body_anchor_error_m": 7.179307129724852e-07
   },
   "limits": {
-    "unaffected_world_matrix_error": 1e-06,
-    "palm_world_error_m": 1e-06,
-    "palm_relative_weapon_error_m": 1e-06,
-    "new_scale_error": 1e-05
+    "core_world_matrix_error": 1e-06,
+    "preserved_rotation_scale_error": 1e-06,
+    "holding_translation_error_m": 1e-06,
+    "right_grip_matrix_error": 2e-06,
+    "support_relative_palm_error_m": 2e-06,
+    "head_drop_error_m": 1e-06,
+    "head_body_anchor_error_m": 1e-06
   },
-  "shoulder_depth_reduction_m": [
-    0.004921613934129709,
-    0.035106847557472065
+  "shoulder_socket_distance_gain_m": {
+    "L": [
+      0.035845417113830824,
+      0.03597748423378565
+    ],
+    "R": [
+      0.034561944076678924,
+      0.03498017416527624
+    ]
+  },
+  "prior_head_body_gap_at_anchor_m": [
+    0.02499938038341314,
+    0.025000452572110508
   ],
-  "whole_arm_rotation_degrees": [
-    0.5674458965131177,
-    4.068106572040466
-  ],
-  "shoulder_forward_offset_from_socket_before_m": [
-    0.09617061796598136,
-    0.10269783204421401
-  ],
-  "shoulder_forward_offset_from_socket_after_m": [
-    0.06395147182047367,
-    0.09730372205376625
-  ],
-  "euclidean_socket_distance_reduction_m": [
-    0.00016034796568806242,
-    0.012503113037635488
-  ],
+  "head_body_anchor_connected": true,
+  "head_rifle_right_arm_angles_exact": true,
+  "body_leg_world_motion_exact": true,
+  "both_weapon_contacts_preserved": true,
+  "all_key_times_and_interpolation_exact": true,
   "changed_curves": [
+    [
+      "pose.bones[\"Neck\"].location",
+      0
+    ],
+    [
+      "pose.bones[\"Neck\"].location",
+      1
+    ],
+    [
+      "pose.bones[\"Neck\"].location",
+      2
+    ],
     [
       "pose.bones[\"UpperArm.L\"].location",
       0
@@ -62,11 +79,27 @@
     [
       "pose.bones[\"UpperArm.L\"].rotation_quaternion",
       3
+    ],
+    [
+      "pose.bones[\"UpperArm.R\"].location",
+      1
+    ],
+    [
+      "pose.bones[\"UpperArm.R\"].location",
+      2
+    ],
+    [
+      "pose.bones[\"WeaponCarrier\"].location",
+      0
+    ],
+    [
+      "pose.bones[\"WeaponCarrier\"].location",
+      1
+    ],
+    [
+      "pose.bones[\"WeaponCarrier\"].location",
+      2
     ]
   ],
-  "only_left_upper_arm_curves_changed": true,
-  "rifle_right_arm_head_body_legs_exact": true,
-  "original_support_palm_motion_exact": true,
-  "all_key_times_and_interpolation_exact": true,
-  "candidate_sha256": "6694fc4086e0da889f14e3e70dacf89fbf327627182a1a5c66860c3cd34fa4e8"
+  "candidate_sha256": "b1990be707b1928c027d2b4172c13812b4fb217385969e4fedf1f5823a163d5b"
 }
