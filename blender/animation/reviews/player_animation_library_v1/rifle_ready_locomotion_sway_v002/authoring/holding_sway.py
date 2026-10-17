@@ -9,7 +9,7 @@ import math
 from mathutils import Matrix, Vector
 
 SETTINGS = {
-    'Walk': {'yaw_deg': 4.8, 'lag_s': .060, 'roll_deg': 0., 'roll_lag_s': .080, 'holding_seat_m': -.005},
+    'Walk': {'yaw_deg': 3., 'lag_s': .060, 'roll_deg': 0., 'roll_lag_s': .080, 'holding_seat_m': 0.},
     'Run': {'yaw_deg': 9., 'lag_s': .040, 'roll_deg': 0., 'roll_lag_s': .060, 'holding_seat_m': .005},
 }
 HOLD = ['UpperArm.R', 'ForeArm.R', 'WeaponCarrier', 'UpperArm.L', 'ForeArm.L']
