@@ -1,0 +1,173 @@
+{
+  "passed": false,
+  "reports": [
+    {
+      "action": "Rifle_Ready_Walk_ActionsStyle_v001",
+      "passed": false,
+      "failures": [
+        "nonadjacent/rifle collisions"
+      ],
+      "samples": 433,
+      "metrics": {
+        "right_grip_matrix_error": 4.4517219066619873e-07,
+        "straight_arm_cross_error": 2.8115454709698567e-07,
+        "forearm_articulation_rad": 0.0,
+        "head_anchor_error_m": 7.161961429417434e-07,
+        "sole_penetration_m": 0.0,
+        "support_palm_delta_m": 0.001549497959736531
+      },
+      "loop_matrix_error": 0.0,
+      "leg_scale_ranges": {
+        "Leg.L": [
+          0.9999997615814209,
+          1.0000001192092896
+        ],
+        "Leg.R": [
+          0.9999997615814209,
+          1.0000001192092896
+        ]
+      },
+      "max_cuboid_margin_m": {
+        "Head|Chest": 0.0477430522441864,
+        "Head|UpperArm.L": 0.001942395232617855,
+        "Head|UpperArm.R": 0.0038741196040064096,
+        "Head|Leg.L": -0.4696073057129979,
+        "Head|Leg.R": -0.47213294461835176,
+        "Head|ForeArm.L": -0.2984237843193114,
+        "Head|ForeArm.R": -0.14649753202684224,
+        "Chest|UpperArm.L": -0.013215030543506145,
+        "Chest|UpperArm.R": 0.050213017500936985,
+        "Chest|Leg.L": 0.18215259723365307,
+        "Chest|Leg.R": 0.17420775099890307,
+        "Chest|ForeArm.L": -0.048579669557511806,
+        "Chest|ForeArm.R": -0.05315637215971947,
+        "UpperArm.L|UpperArm.R": -0.2584943473339081,
+        "UpperArm.L|Leg.L": -0.04489280562847853,
+        "UpperArm.L|Leg.R": -0.22556870663538575,
+        "UpperArm.L|ForeArm.L": 1.8533319234848022e-07,
+        "UpperArm.L|ForeArm.R": -0.09688995406031609,
+        "UpperArm.R|Leg.L": -0.11345883179455996,
+        "UpperArm.R|Leg.R": -0.10159019264392555,
+        "UpperArm.R|ForeArm.L": -0.2943720715120435,
+        "UpperArm.R|ForeArm.R": 1.7299316823482513e-07,
+        "Leg.L|Leg.R": -0.005872603195148596,
+        "Leg.L|ForeArm.L": -0.04016864579170942,
+        "Leg.L|ForeArm.R": -0.058622477401513606,
+        "Leg.R|ForeArm.L": -0.22515377774834633,
+        "Leg.R|ForeArm.R": -0.09680761257186532,
+        "ForeArm.L|ForeArm.R": -0.04160783439874649
+      },
+      "unwanted_collisions": {
+        "Head|UpperArm.R": {
+          "frame": 5.5,
+          "triangle_pairs": 4,
+          "sat_margin_m": 0.0001396462321281433
+        },
+        "Head|UpperArm.L": {
+          "frame": 43.0,
+          "triangle_pairs": 9,
+          "sat_margin_m": 0.00044808629900217056
+        }
+      }
+    },
+    {
+      "action": "Rifle_Ready_Run_ActionsStyle_v001",
+      "passed": false,
+      "failures": [
+        "nonadjacent/rifle collisions"
+      ],
+      "samples": 5401,
+      "metrics": {
+        "right_grip_matrix_error": 5.178153514862061e-07,
+        "straight_arm_cross_error": 2.4934411839666234e-07,
+        "forearm_articulation_rad": 0.0,
+        "head_anchor_error_m": 7.251217997429632e-07,
+        "sole_penetration_m": 0.0,
+        "support_palm_delta_m": 0.0015496311207666817
+      },
+      "loop_matrix_error": 0.0,
+      "leg_scale_ranges": {
+        "Leg.L": [
+          0.9999997615814209,
+          1.0691090822219849
+        ],
+        "Leg.R": [
+          0.9999997615814209,
+          1.0647807121276855
+        ]
+      },
+      "max_cuboid_margin_m": {
+        "Head|Chest": 0.06659583561122417,
+        "Head|UpperArm.L": -0.007642047479748726,
+        "Head|UpperArm.R": 0.011423399206250906,
+        "Head|Leg.L": -0.3283822055964265,
+        "Head|Leg.R": -0.3362018964253366,
+        "Head|ForeArm.L": -0.3409824762493372,
+        "Head|ForeArm.R": -0.18683368375059217,
+        "Chest|UpperArm.L": -0.0041080458322539926,
+        "Chest|UpperArm.R": 0.04328319616615772,
+        "Chest|Leg.L": 0.22500004270659701,
+        "Chest|Leg.R": 0.22500004060566425,
+        "Chest|ForeArm.L": -0.04386120289564133,
+        "Chest|ForeArm.R": -0.05315631162375212,
+        "UpperArm.L|UpperArm.R": -0.2503546419320628,
+        "UpperArm.L|Leg.L": 0.04205698659643531,
+        "UpperArm.L|Leg.R": -0.18200974096544087,
+        "UpperArm.L|ForeArm.L": 2.1606683731079102e-07,
+        "UpperArm.L|ForeArm.R": -0.08741012960672379,
+        "UpperArm.R|Leg.L": -0.06253911321982741,
+        "UpperArm.R|Leg.R": 0.07241878448985517,
+        "UpperArm.R|ForeArm.L": -0.29012541472911835,
+        "UpperArm.R|ForeArm.R": 1.862645149230957e-07,
+        "Leg.L|Leg.R": -0.007038349052891135,
+        "Leg.L|ForeArm.L": 0.056167472345634906,
+        "Leg.L|ForeArm.R": 0.07018670719116926,
+        "Leg.R|ForeArm.L": -0.1521016568876803,
+        "Leg.R|ForeArm.R": 0.10382129249046557,
+        "ForeArm.L|ForeArm.R": -0.03668709099292755
+      },
+      "unwanted_collisions": {
+        "Leg.L|ForeArm.L": {
+          "frame": 1.5,
+          "triangle_pairs": 6,
+          "sat_margin_m": 0.00414901552721858
+        },
+        "Leg.L|ForeArm.R": {
+          "frame": 2.0,
+          "triangle_pairs": 7,
+          "sat_margin_m": 0.025254475884139538
+        },
+        "UpperArm.L|Leg.L": {
+          "frame": 2.5,
+          "triangle_pairs": 7,
+          "sat_margin_m": 0.023908922215923667
+        },
+        "Head|UpperArm.R": {
+          "frame": 5.0,
+          "triangle_pairs": 4,
+          "sat_margin_m": 0.00024523213505744934
+        },
+        "Leg.R|ForeArm.R": {
+          "frame": 11.5,
+          "triangle_pairs": 6,
+          "sat_margin_m": 0.01598870288580656
+        },
+        "UpperArm.R|Leg.R": {
+          "frame": 12.0,
+          "triangle_pairs": 9,
+          "sat_margin_m": 0.016285798279568553
+        },
+        "Leg.L|Rifle_V2_Magazine": {
+          "frame": 44.0,
+          "triangle_pairs": 11,
+          "sat_margin_m": null
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Source leg length pulses are retained; straight cuboid legs are not fixed-length.",
+    "Adjacent rigid block joint seating is measured separately, not treated as nonadjacent collision.",
+    "Foot-floor adapters preserve source angles and horizontal paths; no gameplay foot-lock certification."
+  ]
+}
