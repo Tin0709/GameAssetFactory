@@ -12,6 +12,10 @@ func capture() -> void:
 func prepare(alpha: float) -> void:
  super.prepare(alpha)
  if display_world.is_empty() or visual==null:return
+ # Physics endpoints already contain the final constrained pose, including
+ # inherited jump scale/shear. Re-solving them would change an authoritative
+ # endpoint. Only intermediate render poses need contact reconciliation.
+ if render_alpha<=0. or render_alpha>=1.:return
  var carrier: Transform3D=display_world[visual.arm_right]*visual.carrier_in_right_arm
  display_world[visual.carrier_bone]=carrier;display_world[visual.socket_bone]=carrier
  var anchor:=Vector3(previous.rifle_support).lerp(current.rifle_support,render_alpha)
