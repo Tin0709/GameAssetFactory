@@ -36,6 +36,8 @@ The six `*_30fps_1x.mp4` reviews are original-speed4.8 s excerpts from front, th
 
 ## Validation scope
 
+The saved candidates passed5,834 full-loop geometry poses and86 paired source/candidate poses. Both loop poses close exactly; no new nonadjacent/rifle intersection or floor penetration was found. The preserved support excursion is about1.55mm, and both forearms retain zero elbow articulation. Lower-body world transforms and Chest bounce positions match v001 exactly in the paired audit.
+
 `build_validation.json`, `geometry_validation.json`, `reopen_verification.json`, `gui_playback.json`, `media_validation.json`, and `preservation.json` contain the final measured checks. The geometry audit covers the entire source recurrence, both hand contacts, straight forearms, seated head, floor, nonadjacent intersections and loop poses. New upper-body loop motion is checked separately from inherited source leg subframe derivative diagnostics; approved leg wrap poses are compared exactly against v001. Those existing leg characteristics are preserved, not silently redesigned in an arm-sway refinement.
 
 Godot files, both previously approved source Actions and all other approved data remain unchanged. These source-derived studies are **research-only / not production eligible**; an original added sway layer does not change the licensing status of the underlying research bake.
