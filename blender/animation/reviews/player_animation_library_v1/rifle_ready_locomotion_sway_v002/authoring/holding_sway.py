@@ -14,20 +14,18 @@ SETTINGS = {
 }
 HOLD = ['UpperArm.R', 'ForeArm.R', 'WeaponCarrier', 'UpperArm.L', 'ForeArm.L']
 
-def angles(kind, t, entry):
+def yaw_angle(kind, t, entry):
     p = SETTINGS[kind]
     phase = entry['source_phase_origin'] + t * entry['phase_rate_cycles_s']
     a = 2 * math.pi * (phase - p['lag_s'] * entry['phase_rate_cycles_s'])
-    ar = 2 * math.pi * (phase - p['roll_lag_s'] * entry['phase_rate_cycles_s'])
     # Exact phase convention of the original Walk/Run body-yaw expressions;
-    # the amount, holding-only mask, lag and counter-roll are this refinement.
+    # the amount, upper-body mask and lag are this refinement.
     yaw = p['yaw_deg'] * (math.sin(a) if kind == 'Run' else -math.cos(a + math.radians(40)))
-    roll = p['roll_deg'] * (math.cos(ar) if kind == 'Run' else math.cos(ar + math.radians(45)))
-    return math.radians(yaw), math.radians(roll)
+    return math.radians(yaw)
 
 def apply(kind, t, entry, source, rest, palm):
     M = {n: m.copy() for n, m in source.items()}
-    yaw, roll = angles(kind, t, entry)
+    yaw = yaw_angle(kind, t, entry)
     C = M['Chest'].to_3x3()
     # The liked runtime carry is Chest-led, not a loose weapon-only oscillation.
     # Rotate the upper torso and holding set together about the source body
@@ -45,6 +43,4 @@ def apply(kind, t, entry, source, rest, palm):
     # Retain the approved waist roll, crossbow bob and living left-support
     # curves exactly. An additional holding roll was rejected by the actual
     # rifle/leg geometry probe; the Chest-led yaw is the approved-gameplay cue.
-    if not roll:
-        return M
     return M
