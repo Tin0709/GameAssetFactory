@@ -61,7 +61,7 @@
       "left_socket_target_outset_m": 0.004
     },
     "loop_note": "Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.",
-    "source_sha256": "10c4fd7e88e6d60c1251d2b7062ae3665816dc5929d1c1e4210581b6489dbc28"
+    "source_sha256": "79176f5ad3a3695c5af3d62d6fd4c28b270c6d551548ffdfe8812fb64bca2385"
   },
   {
     "action": "Rifle_Ready_Run_ActionsStyle_v001",
@@ -70,7 +70,7 @@
     "source_mesh": "Showcase_Player_Mesh",
     "source_armature": "LB_Test_RestRig",
     "slot_identifier": "OBRUN_Test_Rig",
-    "action_sha256": "b50e0b0c2e20fd1291d5d99f0b4175b81aa5e34dd921e8deb1c9d1c107c44c30",
+    "action_sha256": "f0ce8d3a7bc14375af7e347cadd4481a587ed313c8e57dbd3a4dac793d924405",
     "action_frame_range": [
       1.0,
       2701.0
@@ -121,7 +121,8 @@
       "holding_raise_deg": 24,
       "holding_seating_drop_m": 0.03,
       "holding_right_offset_m": 0.024,
-      "source_leg_angles_horizontal_paths_scale_unchanged": true
+      "source_leg_angles_horizontal_paths_scale_unchanged": true,
+      "left_socket_target_outset_m": 0.004
     },
     "loop_note": "Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.",
     "research_scale_channels": {
@@ -136,6 +137,6 @@
         "max": 1.070002
       }
     },
-    "source_sha256": "10c4fd7e88e6d60c1251d2b7062ae3665816dc5929d1c1e4210581b6489dbc28"
+    "source_sha256": "79176f5ad3a3695c5af3d62d6fd4c28b270c6d551548ffdfe8812fb64bca2385"
   }
 ]
