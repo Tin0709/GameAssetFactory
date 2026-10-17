@@ -2,11 +2,11 @@
 
 Only upper-body twist and holding overlap change; legs/body bounce stay intact.
 The source crossbow layer cancels 80% of body yaw; restore a bounded portion to
-the weapon/arms, with independently authored lag and restrained counter-roll.
+the upper torso/holding set, with independently authored lag; existing roll is retained.
 This addition is an adaptation, not a newly discovered crossbow source clip.
 """
 import math
-from mathutils import Matrix, Vector
+from mathutils import Matrix
 
 SETTINGS = {
     'Walk': {'yaw_deg': 3., 'lag_s': .060, 'roll_deg': 0., 'roll_lag_s': .080, 'holding_seat_m': 0.},
@@ -47,20 +47,4 @@ def apply(kind, t, entry, source, rest, palm):
     # rifle/leg geometry probe; the Chest-led yaw is the approved-gameplay cue.
     if not roll:
         return M
-    # A much smaller delayed roll supplies hand/weapon overlap. Keep the right
-    # shoulder fixed in the twisting torso rather than detaching it from Chest.
-    pivot = M['UpperArm.R'].translation.copy()
-    T = Matrix.Translation(pivot) @ Matrix.Rotation(roll, 4, M['Chest'].to_3x3().col[2].normalized()) @ Matrix.Translation(-pivot)
-    for n in HOLD:
-        M[n] = T @ M[n]
-    # Keep the source's tiny moving support point in rifle space, and seat the
-    # support shoulder at the closest reachable original native socket. This is
-    # a whole-arm rotation; no elbow, stretch, mesh or rest-rig alteration.
-    P = M['ForeArm.L'] @ palm
-    C = M['Chest'].to_3x3()
-    socket = (M['Chest'] @ rest['Chest'].inverted() @ rest['UpperArm.L']).translation + C.col[0].normalized() * .004
-    q = (M['UpperArm.L'].translation - P).rotation_difference(socket - P)
-    D = Matrix.Translation(P) @ q.to_matrix().to_4x4() @ Matrix.Translation(-P)
-    for n in ['UpperArm.L', 'ForeArm.L']:
-        M[n] = D @ M[n]
     return M

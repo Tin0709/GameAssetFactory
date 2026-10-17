@@ -21,11 +21,13 @@
   "adaptation": {
     "Run": {
       "extra_gait_yaw_amplitude_deg": 9.0,
-      "lag_s": 0.04
+      "lag_s": 0.04,
+      "holding_clearance_up_m": 0.005
     },
     "Walk": {
-      "extra_gait_yaw_amplitude_deg": 4.8,
-      "lag_s": 0.06
+      "extra_gait_yaw_amplitude_deg": 3.0,
+      "lag_s": 0.06,
+      "holding_clearance_up_m": 0.0
     }
   },
   "not_literal_source_behavior": "New Chest-led yaw amounts/delays adapt the liked gameplay cue to steady locomotion. No extra roll or separate weapon-only oscillation is added. Original approved waist roll and rifle-relative support animation are preserved."
