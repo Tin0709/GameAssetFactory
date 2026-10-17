@@ -38,6 +38,8 @@ Explicit native geometry adapters:
 Walk: core stride .8s; full natural composite loop7.2s, F1–216, closing217 excluded.
 Run: core stride .625s; full natural composite loop90s, F1–2700, closing2701 excluded. The long period is the exact recurrence of the source gait and independent crossbow bob (144strides/25bob periods); it avoids forcing a bob reset every stride. Do not arbitrarily shorten the composite before gameplay layering.
 
+Adjacent torso/leg solid seating follows the source root-leg/waist hierarchy: measured maximum about182.2mm Walk and194.1mm Run. This is a source-style overlapping pelvis/leg visual adapter, not a physical anatomy/contact certification. Head/chest and right-shoulder seating remain within the approved v00430/55mm bounds; other nonadjacent/rifle intersections are rejected.
+
 Three review views use original speed30FPS. Each7.2s Run movie is a continuous excerpt, not the full90s composite loop. Side-by-side comparisons label Idle Approved and both locomotion clips Pending. Movies use the same actor/materials/cameras and actual weapon, not video-derived fitting.
 
 ## Review and preservation
