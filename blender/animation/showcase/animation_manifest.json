@@ -2437,12 +2437,12 @@
     {
       "action": "Rifle_Ready_Idle_ActionsStyle_v004",
       "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v004/rifle_ready_idle_actionsstyle_v004.blend",
-      "source_sha256": "1de968681972f42c493bf3b8d55fa55841df36be6173f69763e4c620ac6e1cb8",
+      "source_sha256": "6694fc4086e0da889f14e3e70dacf89fbf327627182a1a5c66860c3cd34fa4e8",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "64e4635a30e50df9b74aeaa9f05734c09228ef6ab67f80781a096451f4d11360",
+      "action_sha256": "dc92fe860ba5819de1bf04741c9b1ca5437573eceadeaad3913e1a23908271a5",
       "action_frame_range": [
         1.0,
         325.0
@@ -2452,7 +2452,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Pending screenshot correction:10degree shoulder-pivot tuck of the intact holding assembly; existing support breathing and source timing preserved.",
+      "approval_note": "Pending left-shoulder seating refinement of the accepted closer hold. Only support upper-arm channels changed; palm, rifle, right arm and core idle retained.",
       "seamless_loop": true,
       "research_only": true,
       "production_eligible": false,
@@ -2497,9 +2497,19 @@
       "endpoint_sample_frame": 325,
       "refinement_base": "Rifle_Ready_Idle_ActionsStyle_v003",
       "arm_drop_m": 0.018,
-      "left_support_motion": "0.4..1.6mm pressure release plus\u00b10.8mm tangent,\u00b10.15degree whole straight arm overlap; clocks0.9/1.8s; collision bounded",
+      "left_support_motion": "Original0.9/1.8s support-palm trajectory retained exactly; left whole-arm direction85% toward closest native shoulder socket, retaining15% of prior swing deviation. Straight arms, fixed palm, no rifle/right-arm change.",
       "closer_hold_degrees": 10.0,
-      "shoulder_forward_clearance_m": 0.02
+      "shoulder_forward_clearance_m": 0.02,
+      "left_shoulder_depth_reduction_m": [
+        0.00492159996429109,
+        0.03510684278444387
+      ],
+      "left_shoulder_whole_arm_rotation_degrees": [
+        0.5664806285569308,
+        4.06787838898612
+      ],
+      "left_shoulder_socket_alignment": 0.85,
+      "left_support_input_motion": "0.4..1.6mm pressure release plus\u00b10.8mm tangent,\u00b10.15degree whole straight arm overlap; clocks0.9/1.8s; collision bounded"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
