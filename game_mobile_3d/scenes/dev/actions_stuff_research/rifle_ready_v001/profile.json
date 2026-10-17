@@ -1,0 +1,150 @@
+{
+	"bones": [
+		"Root",
+		"Hips",
+		"Spine",
+		"Chest",
+		"Neck",
+		"Head",
+		"Arm.L",
+		"ForeArm.L",
+		"Arm.R",
+		"ForeArm.R",
+		"WeaponCarrier",
+		"Leg.L",
+		"Leg.R"
+	],
+	"carrier_in_right_arm": [
+		[
+			-1.00000011920929,
+			0.000000149011611938477,
+			-0.0000000819563865661621,
+			-0.0000000896397978067398
+		],
+		[
+			0.000000178813934326172,
+			1.0,
+			0.000000342726707458496,
+			0.539200127124786
+		],
+		[
+			-0.0000000521540641784668,
+			0.000000357627868652344,
+			-1.0,
+			0.0163896139711142
+		],
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		]
+	],
+	"clips": {
+		"Idle": {
+			"action": "Rifle_Ready_Idle_ActionsStyle_v004",
+			"action_sha256": "88b1ce9fe830f3377a58b8bf1cf04f1f602372f287b559aae8ee28e576d8409b",
+			"duration": 10.8,
+			"loop": true,
+			"phase_origin": 0.0,
+			"phase_rate": 0.0,
+			"row_floats": 134.0,
+			"samples": 2593.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v004/rifle_ready_idle_actionsstyle_v004.blend",
+			"source_sha256": "b1990be707b1928c027d2b4172c13812b4fb217385969e4fedf1f5823a163d5b"
+		},
+		"Run": {
+			"action": "Rifle_Ready_Run_ActionsStyle_v001",
+			"action_sha256": "f0ce8d3a7bc14375af7e347cadd4481a587ed313c8e57dbd3a4dac793d924405",
+			"duration": 90.0,
+			"loop": true,
+			"phase_origin": 0.962871843296135,
+			"phase_rate": 1.6,
+			"row_floats": 134.0,
+			"samples": 24193.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_actionsstyle_v001/rifle_ready_locomotion_actionsstyle_v001.blend",
+			"source_sha256": "79176f5ad3a3695c5af3d62d6fd4c28b270c6d551548ffdfe8812fb64bca2385"
+		},
+		"Walk": {
+			"action": "Rifle_Ready_Walk_ActionsStyle_v001",
+			"action_sha256": "8fa03dae5480184928e98c7bcaa7dbfe283b467a37ff882360fe68ddd6dc5ec9",
+			"duration": 7.2,
+			"loop": true,
+			"phase_origin": 0.939743627575226,
+			"phase_rate": 1.25,
+			"row_floats": 134.0,
+			"samples": 1891.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_actionsstyle_v001/rifle_ready_locomotion_actionsstyle_v001.blend",
+			"source_sha256": "79176f5ad3a3695c5af3d62d6fd4c28b270c6d551548ffdfe8812fb64bca2385"
+		}
+	},
+	"forearm_left_rest": [
+		[
+			1.0,
+			0.0,
+			-0.000000000000014210854715202,
+			0.0
+		],
+		[
+			0.0,
+			0.999999940395355,
+			0.0,
+			0.337499976158142
+		],
+		[
+			0.000000000000014210854715202,
+			0.0,
+			1.0,
+			0.0
+		],
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		]
+	],
+	"palm_forearm_local": [
+		0.0,
+		0.263249933719635,
+		0.0
+	],
+	"production_eligible": false,
+	"research_only": true,
+	"rifle_asset": "res://assets/weapons/rifle_stylized_v2_test/Rifle_Stylized_V2.glb",
+	"schema": 1.0,
+	"shoulder_left_chest_local": [
+		0.337499976158142,
+		0.28124988079071,
+		0.0
+	],
+	"shoulder_outset_m": 0.004,
+	"source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+	"weapon_mount": [
+		[
+			1.0,
+			0.0000000223517400144146,
+			-0.0000000298023223876953,
+			0.0000000216532498598099
+		],
+		[
+			-0.0000000298023223876953,
+			-0.0000000362608076898141,
+			-1.0,
+			0.0000000300351530313492
+		],
+		[
+			0.00000000745058059692383,
+			1.0,
+			-0.0000000511619688836618,
+			0.0000000538420863449574
+		],
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		]
+	],
+	"weapon_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"
+}
