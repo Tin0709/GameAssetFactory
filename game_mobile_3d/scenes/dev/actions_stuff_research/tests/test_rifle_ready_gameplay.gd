@@ -41,7 +41,7 @@ func run() -> void:
   var direction:=Vector2(0,-1)
   if t>5. and t<6.8:direction=Vector2(sin(t*11.),-cos(t*11.))
   elif t>=6.8 and t<7.5:direction=Vector2(0,1)
-  var desired:=direction*(a.run_speed if sprint else a.walk_speed) if moving else Vector2.ZERO
+  var desired: Vector2=direction*(a.run_speed if sprint else a.walk_speed) if moving else Vector2.ZERO
   var planar:=Vector2(a.velocity.x,a.velocity.z).move_toward(desired,(a.acceleration if moving else a.deceleration)*dt)
   a.velocity=Vector3(planar.x,0,planar.y);a.position+=a.velocity*dt;a.current_speed=planar.length()
   var jump_t:=t-8.;var air:=jump_t>0. and jump_t<.74
