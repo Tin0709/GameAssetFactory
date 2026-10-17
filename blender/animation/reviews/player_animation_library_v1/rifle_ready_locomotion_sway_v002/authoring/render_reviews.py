@@ -9,5 +9,6 @@ for kind,name in [('Walk','Rifle_Ready_Walk_ActionsStyle_v0012'),('Run','Rifle_R
  s.frame_set(6);s.render.image_settings.media_type='IMAGE';s.render.image_settings.file_format='PNG'
  for view in ['THREE_QUARTER','FRONT','SIDE']:
   s.camera=bpy.data.objects['Showcase_'+view];s.render.filepath=str(O/(kind.lower()+'_'+view.lower()+'.png'));bpy.ops.render.render(write_still=True)
- s.frame_start=1;s.frame_end=144;s.render.image_settings.media_type='VIDEO';s.render.image_settings.file_format='FFMPEG';s.render.ffmpeg.format='MPEG4';s.render.ffmpeg.codec='H264';s.render.ffmpeg.constant_rate_factor='HIGH' if hasattr(s.render.ffmpeg,'constant_rate_factor') else None
- s.render.ffmpeg.constant_rate_factor='HIGH' if hasattr(s.render.ffmpeg,'constant_rate_factor') else None
+ s.frame_start=1;s.frame_end=144;s.render.image_settings.media_type='VIDEO';s.render.image_settings.file_format='FFMPEG';s.render.ffmpeg.format='MPEG4';s.render.ffmpeg.codec='H264';s.render.ffmpeg.constant_rate_factor='HIGH';s.render.ffmpeg.ffmpeg_preset='GOOD'
+ for view in ['THREE_QUARTER','FRONT','SIDE']:
+  s.camera=bpy.data.objects['Showcase_'+view];s.render.filepath=str(O/(kind.lower()+'_'+view.lower()+'_30fps_1x.mp4'));t=time.time();bpy.ops.render.render(animation=True);print('RENDERED',kind,view,time.time()-t,flush=True)
