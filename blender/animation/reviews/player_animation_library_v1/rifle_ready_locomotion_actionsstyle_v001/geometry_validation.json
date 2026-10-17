@@ -9,12 +9,12 @@
       ],
       "samples": 433,
       "metrics": {
-        "right_grip_matrix_error": 4.4517219066619873e-07,
-        "straight_arm_cross_error": 2.8115454709698567e-07,
+        "right_grip_matrix_error": 4.377216100692749e-07,
+        "straight_arm_cross_error": 2.5463115409962923e-07,
         "forearm_articulation_rad": 0.0,
         "head_anchor_error_m": 7.161961429417434e-07,
         "sole_penetration_m": 0.0,
-        "support_palm_delta_m": 0.001549497959736531
+        "support_palm_delta_m": 0.0015495462502741499
       },
       "loop_matrix_error": 0.0,
       "leg_scale_ranges": {
@@ -29,39 +29,39 @@
       },
       "max_cuboid_margin_m": {
         "Head|Chest": 0.01754411798901856,
-        "Head|UpperArm.L": 0.0007562125101685524,
-        "Head|UpperArm.R": -0.004760304815135896,
+        "Head|UpperArm.L": 0.0006299973465502262,
+        "Head|UpperArm.R": -0.006371783325448632,
         "Head|Leg.L": -0.46960729360580444,
         "Head|Leg.R": -0.47213303882745095,
-        "Head|ForeArm.L": -0.31373363826423883,
-        "Head|ForeArm.R": -0.16700544202467427,
-        "Chest|UpperArm.L": -0.013215030543506145,
-        "Chest|UpperArm.R": 0.050213017500936985,
+        "Head|ForeArm.L": -0.3154042763635516,
+        "Head|ForeArm.R": -0.16900071391137317,
+        "Chest|UpperArm.L": -0.013214994221925735,
+        "Chest|UpperArm.R": 0.05021303612738848,
         "Chest|Leg.L": 0.18215259723365307,
         "Chest|Leg.R": 0.17420775099890307,
-        "Chest|ForeArm.L": -0.048579669557511806,
-        "Chest|ForeArm.R": -0.05315637215971947,
-        "UpperArm.L|UpperArm.R": -0.2584943473339081,
-        "UpperArm.L|Leg.L": -0.04489280562847853,
-        "UpperArm.L|Leg.R": -0.22556870663538575,
-        "UpperArm.L|ForeArm.L": 1.8533319234848022e-07,
-        "UpperArm.L|ForeArm.R": -0.09688995406031609,
-        "UpperArm.R|Leg.L": -0.11345883179455996,
-        "UpperArm.R|Leg.R": -0.10159019264392555,
-        "UpperArm.R|ForeArm.L": -0.2943720715120435,
-        "UpperArm.R|ForeArm.R": 1.7299316823482513e-07,
+        "Chest|ForeArm.L": -0.048579749185591936,
+        "Chest|ForeArm.R": -0.05315637867897749,
+        "UpperArm.L|UpperArm.R": -0.25849431310780346,
+        "UpperArm.L|Leg.L": -0.04380350187420845,
+        "UpperArm.L|Leg.R": -0.2255778848193586,
+        "UpperArm.L|ForeArm.L": 2.0745210349559784e-07,
+        "UpperArm.L|ForeArm.R": -0.09688993636518717,
+        "UpperArm.R|Leg.L": -0.11190540064126253,
+        "UpperArm.R|Leg.R": -0.09982252446934581,
+        "UpperArm.R|ForeArm.L": -0.2943720854818821,
+        "UpperArm.R|ForeArm.R": 1.4901161193847656e-07,
         "Leg.L|Leg.R": -0.005872603195148596,
-        "Leg.L|ForeArm.L": -0.04016864579170942,
-        "Leg.L|ForeArm.R": -0.058622477401513606,
-        "Leg.R|ForeArm.L": -0.22515377774834633,
-        "Leg.R|ForeArm.R": -0.09680761257186532,
-        "ForeArm.L|ForeArm.R": -0.04160783439874649
+        "Leg.L|ForeArm.L": -0.03907561209052801,
+        "Leg.L|ForeArm.R": -0.057197134898160584,
+        "Leg.R|ForeArm.L": -0.22516286186873913,
+        "Leg.R|ForeArm.R": -0.0952226729132235,
+        "ForeArm.L|ForeArm.R": -0.041607871651649475
       },
       "unwanted_collisions": {
         "Head|UpperArm.L": {
-          "frame": 90.5,
-          "triangle_pairs": 5,
-          "sat_margin_m": 1.6393139958381653e-05
+          "frame": 91.0,
+          "triangle_pairs": 7,
+          "sat_margin_m": 0.0003810124471783638
         }
       }
     },
@@ -73,12 +73,12 @@
       ],
       "samples": 5401,
       "metrics": {
-        "right_grip_matrix_error": 5.103647708892822e-07,
-        "straight_arm_cross_error": 2.5636927089222153e-07,
+        "right_grip_matrix_error": 6.556510925292969e-07,
+        "straight_arm_cross_error": 3.384893146634265e-07,
         "forearm_articulation_rad": 0.0,
         "head_anchor_error_m": 8.359604553149059e-07,
         "sole_penetration_m": 0.0,
-        "support_palm_delta_m": 0.0015497449588720948
+        "support_palm_delta_m": 0.001549736036628882
       },
       "loop_matrix_error": 0.0,
       "leg_scale_ranges": {
@@ -93,69 +93,39 @@
       },
       "max_cuboid_margin_m": {
         "Head|Chest": 0.017544186441227794,
-        "Head|UpperArm.L": -0.008018666878342628,
-        "Head|UpperArm.R": 0.0092126696035848,
+        "Head|UpperArm.L": 0.0005157552659511566,
+        "Head|UpperArm.R": -0.016444439184851944,
         "Head|Leg.L": -0.3631626506394241,
         "Head|Leg.R": -0.3761958279646933,
-        "Head|ForeArm.L": -0.34363612718880177,
-        "Head|ForeArm.R": -0.1868331103469245,
-        "Chest|UpperArm.L": -0.004108008579351008,
-        "Chest|UpperArm.R": 0.04328319989144802,
+        "Head|ForeArm.L": -0.32549665682017803,
+        "Head|ForeArm.R": -0.15005460940301418,
+        "Chest|UpperArm.L": -0.005004547536373138,
+        "Chest|UpperArm.R": 0.012248197570443153,
         "Chest|Leg.L": 0.19404134625801817,
         "Chest|Leg.R": 0.18369158171117306,
-        "Chest|ForeArm.L": -0.04386120289564133,
-        "Chest|ForeArm.R": -0.05315632000565529,
-        "UpperArm.L|UpperArm.R": -0.25035464158281684,
-        "UpperArm.L|Leg.L": 0.03822419729213422,
-        "UpperArm.L|Leg.R": -0.18164503620937467,
-        "UpperArm.L|ForeArm.L": 3.0407682061195374e-07,
-        "UpperArm.L|ForeArm.R": -0.0874098613858223,
-        "UpperArm.R|Leg.L": -0.08476100768893957,
-        "UpperArm.R|Leg.R": 0.04457964445464313,
-        "UpperArm.R|ForeArm.L": -0.2901254575699568,
-        "UpperArm.R|ForeArm.R": 2.0116567611694336e-07,
+        "Chest|ForeArm.L": -0.17643405869603157,
+        "Chest|ForeArm.R": -0.15854902938008308,
+        "UpperArm.L|UpperArm.R": -0.25440460070967674,
+        "UpperArm.L|Leg.L": -0.0010397452861070633,
+        "UpperArm.L|Leg.R": -0.17527853697538376,
+        "UpperArm.L|ForeArm.L": 2.384185791015625e-07,
+        "UpperArm.L|ForeArm.R": -0.08038827776908875,
+        "UpperArm.R|Leg.L": -0.11612144019454718,
+        "UpperArm.R|Leg.R": -0.0020598163828253746,
+        "UpperArm.R|ForeArm.L": -0.28905636817216873,
+        "UpperArm.R|ForeArm.R": 2.5331974029541016e-07,
         "Leg.L|Leg.R": -0.007038363954052329,
-        "Leg.L|ForeArm.L": 0.04799812659621239,
-        "Leg.L|ForeArm.R": 0.07011822890490294,
-        "Leg.R|ForeArm.L": -0.1517701130360365,
-        "Leg.R|ForeArm.R": 0.08800556989444885,
-        "ForeArm.L|ForeArm.R": -0.03668708726763725
+        "Leg.L|ForeArm.L": -0.013265008104554,
+        "Leg.L|ForeArm.R": -0.06637618876993656,
+        "Leg.R|ForeArm.L": -0.17170934099704027,
+        "Leg.R|ForeArm.R": -0.0004338303115218878,
+        "ForeArm.L|ForeArm.R": -0.03623005747795105
       },
       "unwanted_collisions": {
-        "Leg.L|ForeArm.L": {
-          "frame": 2.0,
-          "triangle_pairs": 6,
-          "sat_margin_m": 0.02045372769498499
-        },
-        "Leg.L|ForeArm.R": {
-          "frame": 2.5,
-          "triangle_pairs": 9,
-          "sat_margin_m": 0.03237655438715592
-        },
-        "UpperArm.L|Leg.L": {
-          "frame": 3.0,
+        "Head|UpperArm.L": {
+          "frame": 89.5,
           "triangle_pairs": 7,
-          "sat_margin_m": 0.016963691683486104
-        },
-        "Head|UpperArm.R": {
-          "frame": 5.0,
-          "triangle_pairs": 4,
-          "sat_margin_m": 0.00024498673155903816
-        },
-        "Leg.R|ForeArm.R": {
-          "frame": 12.0,
-          "triangle_pairs": 6,
-          "sat_margin_m": 0.022551000118255615
-        },
-        "UpperArm.R|Leg.R": {
-          "frame": 12.5,
-          "triangle_pairs": 9,
-          "sat_margin_m": 0.01382622611708939
-        },
-        "Leg.L|Rifle_V2_Magazine": {
-          "frame": 43.5,
-          "triangle_pairs": 13,
-          "sat_margin_m": null
+          "sat_margin_m": 0.0005156919360160828
         }
       }
     }
