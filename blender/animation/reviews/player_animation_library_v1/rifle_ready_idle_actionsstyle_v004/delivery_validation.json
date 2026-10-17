@@ -1,12 +1,18 @@
 {
   "passed": true,
-  "current_action_sha256": "dc92fe860ba5819de1bf04741c9b1ca5437573eceadeaad3913e1a23908271a5",
-  "current_source_sha256": "6694fc4086e0da889f14e3e70dacf89fbf327627182a1a5c66860c3cd34fa4e8",
+  "current_action_sha256": "88b1ce9fe830f3377a58b8bf1cf04f1f602372f287b559aae8ee28e576d8409b",
+  "current_source_sha256": "b1990be707b1928c027d2b4172c13812b4fb217385969e4fedf1f5823a163d5b",
   "same_pending_v004_refined": true,
-  "only_support_upper_arm_channels_changed": true,
-  "support_palm_trajectory_preserved": true,
-  "rifle_right_arm_and_core_motion_exact": true,
-  "approved_v003_unchanged": true,
+  "both_shoulders_closer": true,
+  "head_anchor_attached": true,
+  "source_head_and_rifle_angles_preserved": true,
+  "both_weapon_contacts_preserved": true,
+  "body_leg_motion_exact": true,
+  "intentional_joint_seating_bounds_m": {
+    "Head|Chest": 0.03,
+    "Chest|UpperArm.R": 0.055
+  },
+  "no_unintended_nonadjacent_or_rifle_intersections": true,
   "other_actions_preserved": 82,
   "protected_files_byte_exact": 2032,
   "native_save_reopen_and_two_wraps": true,
@@ -14,7 +20,7 @@
   "decoded_frames": 1620,
   "fps": 30,
   "original_speed": true,
-  "showcase_MiB": 33.95667362213135,
+  "showcase_MiB": 33.908310890197754,
   "no_godot_changes": true,
-  "previous_pending_backup": "/Users/tin/Documents/ChatGPT/New project/experiments/rifle_ready_idle_actionsstyle_v004/left_shoulder_revision_20261017/before_v004"
+  "previous_pending_backup": "/Users/tin/Documents/ChatGPT/New project/experiments/rifle_ready_idle_actionsstyle_v004/upper_body_attachment_revision_20261017/before_v004"
 }

@@ -6,8 +6,8 @@
   "status": "pending",
   "view": "SIDE",
   "active": "Rifle_Ready_Idle_ActionsStyle_v004",
-  "source_sha256": "6694fc4086e0da889f14e3e70dacf89fbf327627182a1a5c66860c3cd34fa4e8",
-  "action_sha256": "dc92fe860ba5819de1bf04741c9b1ca5437573eceadeaad3913e1a23908271a5",
+  "source_sha256": "b1990be707b1928c027d2b4172c13812b4fb217385969e4fedf1f5823a163d5b",
+  "action_sha256": "88b1ce9fe830f3377a58b8bf1cf04f1f602372f287b559aae8ee28e576d8409b",
   "no_new_entries": 48,
   "visible_entries": 15,
   "archived_entries": 35
