@@ -27,7 +27,7 @@ class Sampler:
   env=dict(self.frozen_env);env['q.life_time']=self.row['life']+t;env['v.eqhdel']=self.row['phase']+t*self.profile['rate'];env['v.ifcvde']=env['v.eqhdel']%1
   out=_neutral()
   for l in self.row['layers']:
-   clip=self.rt.channels.clips[self.rt.channels.aliases[l['alias']]];clock=l['clock']+t
+   clip=self.rt.channels.clips[self.rt.channels.aliases[l['alias']]];clock=(env['v.eqhdel'] if clip.get('anim_time_update')=='v.eqhdel' else l['clock']+t)
    if clip.get('loop') is True and clip.get('animation_length'):clock%=float(clip['animation_length'])
    elif clip.get('animation_length'):clock=min(clock,float(clip['animation_length']))
    self.rt.channels._add_clip(out,l['alias'],env,clock,l['controller_weight'])
