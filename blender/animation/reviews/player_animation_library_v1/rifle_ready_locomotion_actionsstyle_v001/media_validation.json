@@ -1,0 +1,83 @@
+[
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_actionsstyle_v001\/walk_three_quarter_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_actionsstyle_v001\/walk_front_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_actionsstyle_v001\/walk_side_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_actionsstyle_v001\/run_three_quarter_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_actionsstyle_v001\/run_front_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_actionsstyle_v001\/run_side_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_actionsstyle_v001\/idle_walk_run_three_quarter_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_actionsstyle_v001\/idle_walk_run_front_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_actionsstyle_v001\/idle_walk_run_side_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  }
+]
