@@ -6,7 +6,7 @@
     "source_mesh": "Showcase_Player_Mesh",
     "source_armature": "LB_Test_RestRig",
     "slot_identifier": "OBRUN_Test_Rig",
-    "action_sha256": "11b706b4f61a949068e42ed089d875f0127024300cd9dd255d6b9828c3f8fec6",
+    "action_sha256": "8fa03dae5480184928e98c7bcaa7dbfe283b467a37ff882360fe68ddd6dc5ec9",
     "action_frame_range": [
       1.0,
       217.0
@@ -57,10 +57,11 @@
       "holding_raise_deg": 0,
       "holding_seating_drop_m": 0.002,
       "holding_right_offset_m": 0,
-      "source_leg_angles_horizontal_paths_scale_unchanged": true
+      "source_leg_angles_horizontal_paths_scale_unchanged": true,
+      "left_socket_target_outset_m": 0.004
     },
     "loop_note": "Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.",
-    "source_sha256": "0ef2a98397a8f7b882bbcb4ef30212b1412c8beecc46fb4845ee543c69da1dfc"
+    "source_sha256": "10c4fd7e88e6d60c1251d2b7062ae3665816dc5929d1c1e4210581b6489dbc28"
   },
   {
     "action": "Rifle_Ready_Run_ActionsStyle_v001",
@@ -135,6 +136,6 @@
         "max": 1.070002
       }
     },
-    "source_sha256": "0ef2a98397a8f7b882bbcb4ef30212b1412c8beecc46fb4845ee543c69da1dfc"
+    "source_sha256": "10c4fd7e88e6d60c1251d2b7062ae3665816dc5929d1c1e4210581b6489dbc28"
   }
 ]

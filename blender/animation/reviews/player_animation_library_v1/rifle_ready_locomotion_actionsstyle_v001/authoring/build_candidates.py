@@ -59,7 +59,7 @@ for kind in ['Walk','Run']:
   else:T=Matrix.Translation(-C.col[1].normalized()*.002)
   for n in ['UpperArm.L','ForeArm.L','UpperArm.R','ForeArm.R','WeaponCarrier']:M[n]=T@M[n]
   if kind in ['Run','Walk']:
-   P=M['ForeArm.L']@palm;socket=(M['Chest']@rest['Chest'].inverted()@rest['UpperArm.L']).translation+(M['Chest'].to_3x3().col[0].normalized()*.004 if kind=='Walk' else Vector());q=(M['UpperArm.L'].translation-P).rotation_difference(socket-P);D=Matrix.Translation(P)@q.to_matrix().to_4x4()@Matrix.Translation(-P)
+   P=M['ForeArm.L']@palm;socket=(M['Chest']@rest['Chest'].inverted()@rest['UpperArm.L']).translation+M['Chest'].to_3x3().col[0].normalized()*.004;q=(M['UpperArm.L'].translation-P).rotation_difference(socket-P);D=Matrix.Translation(P)@q.to_matrix().to_4x4()@Matrix.Translation(-P)
    for n in ['UpperArm.L','ForeArm.L']:M[n]=D@M[n]
   # No floating head: native head pivot remains exactly at torso-top base.
   top=M['Chest']@rest['Chest'].inverted()@Vector((0,0,1.35));M['Head'].translation=top;M['Neck'].translation=top
