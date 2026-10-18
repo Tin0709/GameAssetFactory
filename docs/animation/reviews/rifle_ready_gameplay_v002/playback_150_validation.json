@@ -1,0 +1,121 @@
+{
+  "playback_multiplier": 1.5,
+  "walk_period_s": 0.5333333333333333,
+  "run_period_s": 0.4166666666666667,
+  "checks": [
+    {
+      "name": "cadence30",
+      "passed": true
+    },
+    {
+      "name": "cadence60",
+      "passed": true
+    },
+    {
+      "name": "rifle30",
+      "passed": true
+    },
+    {
+      "name": "rifle60",
+      "passed": true
+    }
+  ],
+  "regressions": [
+    {
+      "test": "test_render_presentation",
+      "passed": true
+    },
+    {
+      "test": "test_direction_controller",
+      "passed": true
+    },
+    {
+      "test": "test_jump_gameplay",
+      "fps": 30,
+      "passed": true
+    },
+    {
+      "test": "test_jump_gameplay",
+      "fps": 60,
+      "passed": true
+    }
+  ],
+  "preservation": {
+    "showcase_manifest_source_blends_and_runtime_animation_library_unchanged": true,
+    "jump_physics_actor_and_project_settings_unchanged": true,
+    "jump_bridge_only_changes_ground_phase_handoff": [
+      "game_mobile_3d/scenes/dev/actions_stuff_research/jump_locomotion_visual.gd"
+    ]
+  },
+  "native_capture": {
+    "collision_landings": 1,
+    "fps": 30,
+    "frames": 240,
+    "physical_peak_height": 1.31081712245941,
+    "rifle_visible": true,
+    "same_scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "takeoffs": 1
+  },
+  "cadence30": {
+    "failures": [],
+    "fps": 30,
+    "jump_peak": 1.31086242198944,
+    "landings": 1,
+    "states": {
+      "Run": {
+        "cadence_hz": 2.39999999999989,
+        "measured_phase_hz": 2.39999998459593,
+        "speed_m_s": 7.54651975631714,
+        "state": "Run"
+      },
+      "Walk": {
+        "cadence_hz": 1.87499659535813,
+        "measured_phase_hz": 1.87499820153306,
+        "speed_m_s": 2.70000433921814,
+        "state": "Walk"
+      }
+    }
+  },
+  "cadence60": {
+    "failures": [],
+    "fps": 60,
+    "jump_peak": 1.25586032867432,
+    "landings": 1,
+    "states": {
+      "Run": {
+        "cadence_hz": 2.39999999999988,
+        "measured_phase_hz": 2.39999998292965,
+        "speed_m_s": 7.54646253585815,
+        "state": "Run"
+      },
+      "Walk": {
+        "cadence_hz": 1.8749965990022,
+        "measured_phase_hz": 1.87499891763826,
+        "speed_m_s": 2.70000433921814,
+        "state": "Walk"
+      }
+    }
+  },
+  "rifle30": {
+    "camera_jump_y_span": 0.0,
+    "failures": [],
+    "fps": 30,
+    "left_support_error_m": 3.837909844151e-06,
+    "maximum_leg_step_deg": 33.4211162315858,
+    "minimum_foot_y": -5.96046447753906e-08,
+    "moving_shoulder_error_m": 3.00342506420748e-08,
+    "right_grip_matrix_error": 3.72935096493165e-06,
+    "support_samples": 230
+  },
+  "rifle60": {
+    "camera_jump_y_span": 0.0,
+    "failures": [],
+    "fps": 60,
+    "left_support_error_m": 3.93258005715325e-06,
+    "maximum_leg_step_deg": 19.8041317909047,
+    "minimum_foot_y": -5.96046447753906e-08,
+    "moving_shoulder_error_m": 3.00342506420748e-08,
+    "right_grip_matrix_error": 3.85039584216429e-06,
+    "support_samples": 432
+  }
+}
