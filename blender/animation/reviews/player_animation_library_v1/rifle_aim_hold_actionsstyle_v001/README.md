@@ -1,3 +1,5 @@
+**Current Pending v001: user pose reference refinement (2026-10-18).** Open [the current refined review](reference_pose_refinement_20261018/README.md). The source/reviews below preserve the previous Pending pose unchanged; the existing Showcase selects the refined source.
+
 # Rifle Aim / Hold ActionsStyle v001 — Pending Blender review
 
 One new Action: `Rifle_Aim_Hold_ActionsStyle_v001`, with the actual Rifle Stylized V2. Open the existing `blender/animation/showcase/Animation_Showcase.blend`, then **N → Animation Library → Rifle_Aim_Hold_ActionsStyle_v001**. It is in the focused list, marked **Pending**. Use Restart / Play or Space; Front / 3/4 / Side buttons change review view. The saved file opens on the Hold pose at frame85. All previous entries and archived animations remain selectable.
