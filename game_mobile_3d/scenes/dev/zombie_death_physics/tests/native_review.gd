@@ -35,13 +35,14 @@ func run() -> void:
 		key.pressed = true
 		key.physical_keycode = [KEY_F1, KEY_F2, KEY_F3][index]
 		lab._unhandled_input(key)
+		var subject = lab.actor
 		lab.trigger_death()
 		await seconds(0.02)
 		check(lab.actor.dead, "Native UI-selected handoff")
 		for stage in 6:
 			await seconds(0.18)
 			await capture("%s_%d.png" % [["idle_pistol_front", "walk_rifle_side", "attack_shotgun_threequarter"][index], stage])
-		check(lab.actor.maximum_skin_position_error < 0.0002, "Native rendered skin follows physics")
+		check(subject.maximum_skin_position_error < 0.0002, "Native rendered skin follows physics")
 	# A scrolled control-panel screenshot proves the lower controls fit and remain reachable.
 	var scroll: ScrollContainer = lab.find_child("ExperimentControls", true, false) as ScrollContainer
 	check(scroll != null, "Lower UI scroll container exists")
