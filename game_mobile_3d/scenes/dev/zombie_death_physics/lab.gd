@@ -347,7 +347,7 @@ func _process(delta: float) -> void:
 			if motion.core_contacts > 0:
 				if zombie.first_contact_age < 0: zombie.first_contact_age = zombie.age
 			else: zombie.first_contact_age = -1.0
-			if motion.contacts >= 2 and motion.linear < .55 and motion.angular < 1.3:
+			if motion.core_contacts > 0 and motion.contacts >= 2 and motion.linear < .55 and motion.angular < 1.3:
 				zombie.stable_contact_time += delta
 			else: zombie.stable_contact_time = 0.0
 			if zombie.age >= active_physics_duration and zombie.stable_contact_time >= .1:

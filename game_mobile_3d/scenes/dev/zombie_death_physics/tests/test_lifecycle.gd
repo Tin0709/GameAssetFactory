@@ -74,6 +74,25 @@ func run() -> void:
 	check(not lab.actor.corpse_parked,"No midair parked pose")
 	await tick(.5)
 	check(lab.zombies.is_empty(),"Airborne cleanup has a hard bounded deadline")
+	# Perfectly upright zero-hit balance is NOT a landed corpse. A short budget
+	# must not park it from its two boot contacts before any torso impact.
+	lab.corpse_lifetime = 5.0
+	lab.active_physics_duration = .1
+	lab.reset_zombie()
+	var upright = lab.actor
+	upright.player.pause()
+	upright.set_physics_process(false)
+	upright.skeleton.reset_bone_poses()
+	await tick(.05)
+	upright.ragdoll.sample(1.0/120.0)
+	upright.ragdoll.sample(1.0/120.0)
+	var quiet: Resource = lab.pistol_profile.duplicate(true)
+	quiet.linear_impulse=0;quiet.upward_impulse=0;quiet.angular_impulse=0
+	upright.dead = true
+	upright.ragdoll.begin(quiet,Vector3.FORWARD,"Chest",1.5,9.8)
+	upright.set_physics_process(true)
+	await tick(.5)
+	check(not upright.corpse_parked,"Short active budget never parks quiet boot-only balance")
 	# Longer visual review with short active budget may park ONLY after settling.
 	lab.corpse_lifetime = 5.0
 	lab.active_physics_duration = .2
@@ -97,6 +116,7 @@ func run() -> void:
 		check(held.origin.distance_to(before_park[name].origin)<.025,"Park transition preserves fallen world position: "+name)
 		check(held.basis.get_rotation_quaternion().angle_to(before_park[name].basis.get_rotation_quaternion())<.05,"Park transition preserves fallen world angle: "+name)
 	check(parked.corpse_parked,"Grounded settled corpse releases early physics budget")
+	check(parked.first_contact_age>=0,"Parking requires actual core landing, never foot-only balance")
 	check(parked.ragdoll.bodies.is_empty(),"Park removes all bodies rather than sleeping them")
 	var pose: Array = parked.visible_pose.duplicate()
 	await tick(.15)
