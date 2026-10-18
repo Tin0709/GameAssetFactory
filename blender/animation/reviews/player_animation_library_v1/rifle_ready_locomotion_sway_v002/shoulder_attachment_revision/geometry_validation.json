@@ -1,0 +1,96 @@
+{
+  "passed": false,
+  "reports": [
+    {
+      "action": "Rifle_Ready_Run_ActionsStyle_v002",
+      "passed": false,
+      "failures": [
+        "nonadjacent/rifle collisions"
+      ],
+      "samples": 5401,
+      "metrics": {
+        "right_grip_matrix_error": 1.0356307029724121e-06,
+        "straight_arm_cross_error": 3.21326533747432e-07,
+        "forearm_articulation_rad": 0.0,
+        "head_anchor_error_m": 8.357695218962732e-07,
+        "sole_penetration_m": 0.0,
+        "support_palm_delta_m": 0.001549984313489429
+      },
+      "loop_matrix_error": 0.0,
+      "leg_scale_ranges": {
+        "Leg.L": [
+          0.9999997615814209,
+          1.0691090822219849
+        ],
+        "Leg.R": [
+          0.9999997615814209,
+          1.0647807121276855
+        ]
+      },
+      "max_cuboid_margin_m": {
+        "Head|Chest": 0.017545202746987343,
+        "Head|UpperArm.L": -0.0026338701136410236,
+        "Head|UpperArm.R": 0.0024162843474186957,
+        "Head|Leg.L": -0.36316265203640796,
+        "Head|Leg.R": -0.37619583355262876,
+        "Head|ForeArm.L": -0.2843800000846386,
+        "Head|ForeArm.R": -0.1303301346488297,
+        "Chest|UpperArm.L": 0.017058324068784714,
+        "Chest|UpperArm.R": 0.03475955920293927,
+        "Chest|Leg.L": 0.1917501818970777,
+        "Chest|Leg.R": 0.18067613150924444,
+        "Chest|ForeArm.L": -0.1542327287606895,
+        "Chest|ForeArm.R": -0.1285491082817316,
+        "UpperArm.L|UpperArm.R": -0.23205218371003866,
+        "UpperArm.L|Leg.L": 0.006987970322370529,
+        "UpperArm.L|Leg.R": -0.14806950651109219,
+        "UpperArm.L|ForeArm.L": 2.682209014892578e-07,
+        "UpperArm.L|ForeArm.R": -0.09890158474445343,
+        "UpperArm.R|Leg.L": -0.08821905311197042,
+        "UpperArm.R|Leg.R": -0.015662231482565403,
+        "UpperArm.R|ForeArm.L": -0.23205215483903885,
+        "UpperArm.R|ForeArm.R": 2.5331974029541016e-07,
+        "Leg.L|Leg.R": -0.007038363954052329,
+        "Leg.L|ForeArm.L": 0.008619975298643112,
+        "Leg.L|ForeArm.R": -0.03392058564350009,
+        "Leg.R|ForeArm.L": -0.14806943200528622,
+        "Leg.R|ForeArm.R": 0.00027271162980468944,
+        "ForeArm.L|ForeArm.R": -0.04334521293640137
+      },
+      "unwanted_collisions": {
+        "Head|UpperArm.R": {
+          "frame": 6.0,
+          "triangle_pairs": 4,
+          "sat_margin_m": 0.0017605276661925018
+        },
+        "Leg.L|ForeArm.L": {
+          "frame": 41.0,
+          "triangle_pairs": 4,
+          "sat_margin_m": 0.003985695540904999
+        },
+        "UpperArm.L|Leg.L": {
+          "frame": 97.0,
+          "triangle_pairs": 4,
+          "sat_margin_m": 0.0034654345363378525
+        },
+        "Leg.R|ForeArm.R": {
+          "frame": 556.5,
+          "triangle_pairs": 4,
+          "sat_margin_m": 6.524749915115535e-05
+        }
+      },
+      "second_order_loop_velocity_m_s": 0.17074726889784042,
+      "second_order_loop_angular_rad_s": 0.20160092272406344,
+      "raw_first_order_angular_rad_s": 2.2095566514742164,
+      "upperbody_loop_velocity_m_s": 0.0008244776804331601,
+      "upperbody_loop_angular_rad_s": 0.00044283178574737903,
+      "inherited_leg_wrap_pose_error": 0.0
+    }
+  ],
+  "limitations": [
+    "Source leg length pulses are retained; straight cuboid legs are not fixed-length.",
+    "Adjacent rigid block joint seating is measured separately, not treated as nonadjacent collision.",
+    "Foot-floor adapters preserve source angles and horizontal paths; no gameplay foot-lock certification.",
+    "Strict full-rig subframe derivative diagnostics include inherited approved leg corner/linear-bake behavior. Those leg wrap poses are checked against the approved baseline exactly; new upper-body motion is checked separately against0.006m/s and0.05rad/s."
+  ]
+}
