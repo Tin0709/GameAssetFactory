@@ -13,6 +13,7 @@ const RUN_PERIOD:=.625
 const WALK_RECEIVE:=.22
 const RUN_RECEIVE:=.44
 const SOLE_POINTS: Array[Vector3]=[Vector3(-.1125,.675,-.1125),Vector3(-.1125,.675,.1125),Vector3(.1125,.675,-.1125),Vector3(.1125,.675,.1125)]
+var travel_speed_scale:=1. # Scene-local travel tuning; source cadence remains unchanged.
 var active_walk_action:="Walk_ActionsStuff_Source_Test_v001"
 var active_run_action:="Run_ActionsStuff_Source_Test_v001"
 var gameplay_walk_version: String
@@ -113,8 +114,9 @@ func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> v
 		for side in 2:replant_from[side]=last_sole[side];replant_q[side]=_leg_world_rotation([leg_left,leg_right][side])
 	# Actual movement supplies direction. Unit calibration retains the established
 	# Walk/Run travel speeds while feeding the source's own esnrkj speed filter.
-	var query_speed:=movement_speed/WALK_SPEED*(4.3*.6103515625)
-	if movement_speed>WALK_SPEED:query_speed=lerpf(4.3*.6103515625,5.59,clampf((movement_speed-WALK_SPEED)/(RUN_SPEED-WALK_SPEED),0,1))
+	var calibrated_speed:=movement_speed/maxf(travel_speed_scale,.001)
+	var query_speed:=calibrated_speed/WALK_SPEED*(4.3*.6103515625)
+	if calibrated_speed>WALK_SPEED:query_speed=lerpf(4.3*.6103515625,5.59,clampf((calibrated_speed-WALK_SPEED)/(RUN_SPEED-WALK_SPEED),0,1))
 	var direction:=planar.normalized() if movement_speed>.00001 else Vector3.ZERO
 	if movement_speed>.015:
 		_advance_facing(atan2(planar.x,planar.z),delta)

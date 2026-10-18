@@ -7,6 +7,7 @@ const RenderPresenter=preload("res://scenes/dev/actions_stuff_research/render_po
 const RIFLE_VISUAL=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd")
 const RiflePresenter=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_presenter.gd")
 @export var rifle_ready:=true
+@export_range(.1,3.,.05) var movement_speed_multiplier:=1.5
 var presentation: Node
 var player: CharacterBody3D
 var camera: Camera3D
@@ -30,7 +31,9 @@ func _ready() -> void:
 	player.set_script(SOURCE_ACTOR)
 	player.get_node("Visual").set_script(RIFLE_VISUAL if rifle_ready else SOURCE_VISUAL)
 	player.get_node("Visual").authored_locomotion=true;player.get_node("Visual").generic_weapon_carry=true;player.get_node("Visual").long_gun_carry_v2=true;player.get_node("Visual").weapon_equipped=false
-	player.review_pace=1.;player.walk_speed=1.8;player.run_speed=5.031;player.acceleration=32.;player.deceleration=28.
+	# Scale planar travel/response only; retain the approved animation and jump clocks.
+	player.review_pace=1.;player.walk_speed=1.8*movement_speed_multiplier;player.run_speed=5.031*movement_speed_multiplier;player.acceleration=32.*movement_speed_multiplier;player.deceleration=28.*movement_speed_multiplier
+	player.get_node("Visual").travel_speed_scale=movement_speed_multiplier
 	add_child(player)
 	if rifle_ready:player.visual.activate_rifle_ready()
 	camera=Camera3D.new();camera.name="GameplayCamera";camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=camera_size;camera.far=150.;add_child(camera);camera.make_current()
