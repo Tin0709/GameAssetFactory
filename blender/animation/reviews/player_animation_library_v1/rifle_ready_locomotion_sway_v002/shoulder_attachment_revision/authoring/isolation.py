@@ -14,7 +14,11 @@ try:
 finally:ui.action_signature=original_sig
 assert set(after['actions'])==set(before['actions'])
 for k in before:
- if k!='actions':assert after[k]==before[k],k
+ if k not in ['actions','images']:assert after[k]==before[k],k
+# Saving the separate source container remaps image path strings. Compare
+# packed image bytes, dimensions and color spaces independently of paths.
+image_data={i.name:{'size':list(i.size),'colorspace':i.colorspace_settings.name,'packed_sha256':[hashlib.sha256(bytes(f.packed_file.data)).hexdigest() for f in i.packed_files]} for i in bpy.data.images}
+assert image_data==json.loads((S/'before/image_content.json').read_text()),'image pixels changed'
 r=bpy.data.objects[ui.RIG];s=bpy.context.scene;new=bpy.data.actions[N]
 with bpy.data.libraries.load(str(S/'before/study.blend'),link=False) as (src,dst):dst.actions=[N]
 old=dst.actions[0];old.name='_VALIDATION_BEFORE_PENDING_RUN';assert ui.action_signature(old)==before['actions'][N]
