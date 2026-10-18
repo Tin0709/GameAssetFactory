@@ -16,11 +16,11 @@
   },
   "status": {
     "exit_code": 0,
-    "stdout": "?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/aim_front.png\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/aim_front_30fps_1x.mp4\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/aim_side.png\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/aim_side_30fps_1x.mp4\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/aim_three_quarter.png\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/aim_three_quarter_30fps_1x.mp4\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/media_validation.json\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/native_playback_validation.json\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/preservation_validation.json\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/registration.json\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/render_manifest.json\n?? blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/reopen_validation.json\n",
+    "stdout": " M blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/preservation_validation.json\n",
     "stderr": ""
   },
   "new_source_bytes": 12782047,
   "canonical_showcase_bytes": 86288632,
   "media_bytes": 859411,
-  "passed": false
+  "passed": true
 }
