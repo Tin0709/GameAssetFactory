@@ -26,6 +26,10 @@ func run() -> void:
 			zombie.position = Vector3(1.7, 0, -1.2)
 			zombie.rotation.y = 0.43
 			await tick(9 if state == "Attack" else 23)
+			var probe := Node.new()
+			probe.set_script(preload("res://scenes/dev/zombie_death_physics/tests/step_probe.gd"))
+			probe.target = zombie
+			lab.add_child(probe)
 			lab.trigger_death()
 			await tick(1)
 			check(zombie.dead, state + " handoff completed")
@@ -37,10 +41,6 @@ func run() -> void:
 			if state == "Attack":
 				check(absf(zombie.model.position.z) > 0.02, "Attack lunge was not RESET")
 			var root_at_death: Transform3D = zombie.global_transform
-			var probe := Node.new()
-			probe.set_script(preload("res://scenes/dev/zombie_death_physics/tests/step_probe.gd"))
-			probe.target = zombie
-			lab.add_child(probe)
 			await tick(210)
 			var peak_error: float = probe.peak_anchor
 			var low_y: float = probe.minimum_y

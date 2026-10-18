@@ -21,16 +21,16 @@ func run() -> void:
 				lab._load_profile(weapon)
 				lab.reset_zombie()
 				await tick(phase)
-				lab.trigger_death()
-				await tick(1)
 				var z = lab.actor
-				check(z.dead and z.ragdoll.handoff_error < 0.0001, "Phase pose/world handoff")
-				if state == "Walk":
-					check(absf(z.ragdoll.inherited.Hips.linear.z - z.walk_speed) < 0.08, "World travel not lost or double-counted")
 				var probe := Node.new()
 				probe.set_script(preload("res://scenes/dev/zombie_death_physics/tests/step_probe.gd"))
 				probe.target = z
 				lab.add_child(probe)
+				lab.trigger_death()
+				await tick(1)
+				check(z.dead and z.ragdoll.handoff_error < 0.0001, "Phase pose/world handoff")
+				if state == "Walk":
+					check(absf(z.ragdoll.inherited.Hips.linear.z - z.walk_speed) < 0.08, "World travel not lost or double-counted")
 				await tick(240)
 				var peak_anchor: float = probe.peak_anchor
 				var minimum_y: float = probe.minimum_y

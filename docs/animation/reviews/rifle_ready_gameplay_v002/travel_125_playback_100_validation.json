@@ -1,0 +1,85 @@
+{
+  "movement_multiplier": 1.25,
+  "animation_multiplier": 1.0,
+  "checks": [
+    {
+      "name": "cadence30",
+      "passed": true
+    },
+    {
+      "name": "cadence60",
+      "passed": true
+    },
+    {
+      "name": "rifle30",
+      "passed": true
+    },
+    {
+      "name": "rifle60",
+      "passed": true
+    }
+  ],
+  "approved_assets_and_physics_unchanged": true,
+  "cadence30": {
+    "failures": [],
+    "fps": 30,
+    "jump_peak": 1.31087076663971,
+    "landings": 1,
+    "states": {
+      "Run": {
+        "cadence_hz": 1.59999999999993,
+        "measured_phase_hz": 1.59999998973064,
+        "speed_m_s": 6.28875684738159,
+        "state": "Run"
+      },
+      "Walk": {
+        "cadence_hz": 1.24999857047539,
+        "measured_phase_hz": 1.24999973741285,
+        "speed_m_s": 2.2499942779541,
+        "state": "Walk"
+      }
+    }
+  },
+  "cadence60": {
+    "failures": [],
+    "fps": 60,
+    "jump_peak": 1.25586903095245,
+    "landings": 1,
+    "states": {
+      "Run": {
+        "cadence_hz": 1.59999999999992,
+        "measured_phase_hz": 1.59999998861974,
+        "speed_m_s": 6.28875684738159,
+        "state": "Run"
+      },
+      "Walk": {
+        "cadence_hz": 1.24999817811245,
+        "measured_phase_hz": 1.24999899349061,
+        "speed_m_s": 2.2499942779541,
+        "state": "Walk"
+      }
+    }
+  },
+  "rifle30": {
+    "camera_jump_y_span": 0.0,
+    "failures": [],
+    "fps": 30,
+    "left_support_error_m": 3.96314862882718e-06,
+    "maximum_leg_step_deg": 23.6349953586154,
+    "minimum_foot_y": -5.96046447753906e-08,
+    "moving_shoulder_error_m": 3.00342506420748e-08,
+    "right_grip_matrix_error": 3.9160390770121e-06,
+    "support_samples": 231
+  },
+  "rifle60": {
+    "camera_jump_y_span": 0.0,
+    "failures": [],
+    "fps": 60,
+    "left_support_error_m": 3.92854781239294e-06,
+    "maximum_leg_step_deg": 23.5256542752872,
+    "minimum_foot_y": -5.96046447753906e-08,
+    "moving_shoulder_error_m": 3.00342506420748e-08,
+    "right_grip_matrix_error": 2.94923779620149e-06,
+    "support_samples": 468
+  }
+}
