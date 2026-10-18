@@ -344,7 +344,7 @@ func _process(delta: float) -> void:
 		if not zombie.corpse_parked:
 			zombie.corpse_center = zombie.ragdoll.bodies.Chest.global_position
 			var motion: Dictionary = zombie.ragdoll.contact_motion()
-			if motion.contacts > 0:
+			if motion.core_contacts > 0:
 				if zombie.first_contact_age < 0: zombie.first_contact_age = zombie.age
 			else: zombie.first_contact_age = -1.0
 			if motion.contacts >= 2 and motion.linear < .55 and motion.angular < 1.3:
@@ -359,7 +359,7 @@ func _process(delta: float) -> void:
 		var fade := minf(fade_duration,corpse_lifetime)
 		var base_end := corpse_lifetime
 		var hard_end := base_end + airborne_extension
-		var landing_seen: bool = zombie.first_contact_age >= 0 and zombie.age-zombie.first_contact_age >= landing_grace
+		var landing_seen: bool = zombie.corpse_parked or (zombie.first_contact_age >= 0 and zombie.age-zombie.first_contact_age >= landing_grace)
 		# Landing protection may extend the nominal deadline, never indefinitely.
 		if zombie.fade_started < 0 and zombie.age >= base_end-fade and (landing_seen or zombie.age >= hard_end-fade):
 			zombie.fade_started = zombie.age

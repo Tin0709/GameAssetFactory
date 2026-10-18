@@ -253,14 +253,18 @@ func minimum_corner_y() -> float:
 
 func contact_motion() -> Dictionary:
 	var contacts := 0
+	var core_contacts := 0
 	var peak_linear := 0.0
 	var peak_angular := 0.0
-	for body in bodies.values():
+	for name in bodies:
+		var body: PhysicalBone3D = bodies[name]
 		var direct := PhysicsServer3D.body_get_direct_state(body.get_rid())
-		if direct and direct.get_contact_count() > 0: contacts += 1
+		if direct and direct.get_contact_count() > 0:
+			contacts += 1
+			if name in ["Hips","Chest","Head"]: core_contacts += 1
 		peak_linear = maxf(peak_linear,body.linear_velocity.length())
 		peak_angular = maxf(peak_angular,body.angular_velocity.length())
-	return {"contacts":contacts,"linear":peak_linear,"angular":peak_angular}
+	return {"contacts":contacts,"core_contacts":core_contacts,"linear":peak_linear,"angular":peak_angular}
 
 func release(visible_world_pose: Array[Transform3D] = []) -> void:
 	# Called outside the physics integration callback. Free native joints/bodies,

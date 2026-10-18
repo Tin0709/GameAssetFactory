@@ -27,10 +27,20 @@ func run() -> void:
 			lab.reset_zombie()
 			await tick(.2)
 			var subject = lab.actor
+			var saw_fade := false
 			lab.trigger_death()
 			for frame in 260:
 				await tick(1.0/120.0)
 				if lab.actor == null: break
+				if subject.fade_started>=0 and not saw_fade:
+					saw_fade = true
+					var core_contact := false
+					for name in ["Hips","Chest","Head"]:
+						var body: PhysicalBone3D = subject.ragdoll.bodies.get(name)
+						if body:
+							var direct := PhysicsServer3D.body_get_direct_state(body.get_rid())
+							core_contact = core_contact or (direct != null and direct.get_contact_count()>0)
+					check(core_contact or subject.corpse_parked or subject.age>=1.7,"Protect torso landing, not only first boot contact")
 			check(lab.actor==null,"Default cleanup completes for state/weapon")
 			check(subject.age>=1.18 and subject.age<=1.86,"Death lifetime includes fade and respects extension cap")
 			observations.append({"state":state,"weapon":weapon,"cleanup_simulated_seconds":subject.age})
