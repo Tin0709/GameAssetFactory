@@ -1,0 +1,50 @@
+{
+  "failures": [],
+  "observations": [
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 0,
+      "weapon": 0
+    },
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 0,
+      "weapon": 1
+    },
+    {
+      "cleanup_simulated_seconds": 1.475,
+      "state": 0,
+      "weapon": 2
+    },
+    {
+      "cleanup_simulated_seconds": 1.28333333333333,
+      "state": 1,
+      "weapon": 0
+    },
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 1,
+      "weapon": 1
+    },
+    {
+      "cleanup_simulated_seconds": 1.43333333333333,
+      "state": 1,
+      "weapon": 2
+    },
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 2,
+      "weapon": 0
+    },
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 2,
+      "weapon": 1
+    },
+    {
+      "cleanup_simulated_seconds": 1.63333333333333,
+      "state": 2,
+      "weapon": 2
+    }
+  ]
+}

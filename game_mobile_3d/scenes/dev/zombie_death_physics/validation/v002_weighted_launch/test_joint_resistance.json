@@ -1,0 +1,29 @@
+{
+  "failures": [],
+  "results": [
+    {
+      "gain": 0.0,
+      "hz": 120,
+      "linear_momentum": "(-0.0, -0.0, 0.0)",
+      "relative_angular_speed": 0.75772100687027
+    },
+    {
+      "gain": 1.0,
+      "hz": 120,
+      "linear_momentum": "(0.0, -0.0, 0.0)",
+      "relative_angular_speed": 0.0173604022711515
+    },
+    {
+      "gain": 2.5,
+      "hz": 60,
+      "linear_momentum": "(0.0, 0.0, -0.0)",
+      "relative_angular_speed": 0.0121493889018893
+    },
+    {
+      "gain": 2.5,
+      "hz": 120,
+      "linear_momentum": "(-0.0, -0.0, -0.0)",
+      "relative_angular_speed": 0.0218437444418669
+    }
+  ]
+}

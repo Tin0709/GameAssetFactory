@@ -1,0 +1,26 @@
+{
+  "failures": [],
+  "results": [
+    {
+      "initial_velocity": "(0.014271, 1.716903, -2.991861)",
+      "maximum_horizontal_travel_m": 2.6446795463562,
+      "minimum_corner_y": -0.0229285210371017,
+      "peak_anchor_m": 0.00854274909943342,
+      "weapon": 0
+    },
+    {
+      "initial_velocity": "(0.01428, 2.917154, -5.99186)",
+      "maximum_horizontal_travel_m": 6.17717123031616,
+      "minimum_corner_y": -0.0258382856845856,
+      "peak_anchor_m": 0.0134093258529902,
+      "weapon": 1
+    },
+    {
+      "initial_velocity": "(0.01428, 2.917152, -9.990191)",
+      "maximum_horizontal_travel_m": 11.1895503997803,
+      "minimum_corner_y": -0.0706664547324181,
+      "peak_anchor_m": 0.0422034934163094,
+      "weapon": 2
+    }
+  ]
+}

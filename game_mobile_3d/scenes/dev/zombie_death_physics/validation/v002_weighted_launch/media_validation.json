@@ -1,0 +1,13 @@
+{
+  "fps": 30.0,
+  "frames": 282,
+  "duration_seconds": 9.4,
+  "size": [
+    1280,
+    720
+  ],
+  "original_speed": true,
+  "renderer": "Actual Godot Mobile capture; offline encoding, not a benchmark",
+  "blend_saved": false,
+  "sha256": "e40db286d571f38f1b56f124369272b362360a696d621f6aaaddbb4925da7971"
+}

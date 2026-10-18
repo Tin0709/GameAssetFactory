@@ -1,0 +1,97 @@
+{
+  "version": "V002 weighted launch + short corpse lifetime",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "physics_hz": 120,
+  "solver_iterations": 32,
+  "display_fps": 30,
+  "scope": "Isolated lab only; production gameplay, project settings, Blender files and approved Actions unchanged",
+  "protected_files_unchanged": 21,
+  "headless_suites": [
+    "smoke",
+    "handoff9",
+    "extra_phases24",
+    "transfer",
+    "weighted_launch",
+    "joint_resistance",
+    "lifecycle_pool"
+  ],
+  "native_reopen": "PASS Mobile renderer; same UI callbacks and F1-F3 views; 1/4/8 corpse wave cleanup",
+  "lifetime_seconds": 1.2,
+  "active_physics_target_seconds": 1.2,
+  "airborne_extension_cap_seconds": 0.6,
+  "fade_included_seconds": 0.08,
+  "final_lifecycle_observations": [
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 0,
+      "weapon": 0
+    },
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 0,
+      "weapon": 1
+    },
+    {
+      "cleanup_simulated_seconds": 1.475,
+      "state": 0,
+      "weapon": 2
+    },
+    {
+      "cleanup_simulated_seconds": 1.28333333333333,
+      "state": 1,
+      "weapon": 0
+    },
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 1,
+      "weapon": 1
+    },
+    {
+      "cleanup_simulated_seconds": 1.43333333333333,
+      "state": 1,
+      "weapon": 2
+    },
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 2,
+      "weapon": 0
+    },
+    {
+      "cleanup_simulated_seconds": 1.20833333333333,
+      "state": 2,
+      "weapon": 1
+    },
+    {
+      "cleanup_simulated_seconds": 1.63333333333333,
+      "state": 2,
+      "weapon": 2
+    }
+  ],
+  "known_contact_limitation": {
+    "strict_V001_transient_50mm_guard": "One V002 phase failed; retained strict_50mm_precheck.json",
+    "V002_guard": "75mm transient for Shotgun, 50mm for Pistol/Rifle; settled support25mm; no changes to joint or handoff guards",
+    "max_transient_floor_m": 0.0706664547324181,
+    "max_anchor_m": 0.0422034934163094
+  },
+  "native_performance_note": "Short process-monitor window, .12\u2013.82s after hit, 21 samples. Values may repeat/stale over monitor refresh; four/eight results nonmonotonic. No per-body/mobile conclusion.",
+  "source_sha256": {
+    "scenes/dev/zombie_death_physics/lab_zombie.gd": "9a3afa906fd13d7a67a4513eb4cbb8bd9ff6a5fd795f95fa73aefa7c696b70fa",
+    "scenes/dev/zombie_death_physics/lab.gd": "725f8cead101f3071cb374643cf25b8e557fe971427b2d60b129c56422d70e88",
+    "scenes/dev/zombie_death_physics/ragdoll.gd": "03764e2a08d9a3a7d0406e0578723990a96e8361adffea358254f085c6a705dd",
+    "scenes/dev/zombie_death_physics/death_profile.gd": "4632cebd7301dfb57bb9fe63756e8cb072641a0ad8db386adbe7f6f811587426",
+    "scenes/dev/zombie_death_physics/physical_part.gd": "ec11254b2875d957f6eb1e305a0db79e69d92a23b60657dce3b8ea85d509bcd1",
+    "scenes/dev/zombie_death_physics/tests/test_lab.gd": "7afe70907bcb492db7ba64462081693127eaa1d117085d9180ed6e52071750e2",
+    "scenes/dev/zombie_death_physics/tests/step_probe.gd": "b04569648b9ae7fe463cf9e2cc82c0213adab405fbb99e155a13ed392ca26af1",
+    "scenes/dev/zombie_death_physics/tests/test_transfer.gd": "988766626c0b8b1d1e8ae1edd8f326ae426063bdc552d2facc9dc078407f0603",
+    "scenes/dev/zombie_death_physics/tests/review_motion.gd": "37d86842ae08d27afbd754234c95928dac32f68004e5bfaadace451a9145efc5",
+    "scenes/dev/zombie_death_physics/tests/test_weighted_launch.gd": "2d78295556fc32b62b74ce2434341fec578818c28829d77ea02b5830765c543f",
+    "scenes/dev/zombie_death_physics/tests/test_lifecycle.gd": "6b6c40a4ae60c010f824f51016c0f623d444a133a89ef577e32db89dbd3510e7",
+    "scenes/dev/zombie_death_physics/tests/test_handoff.gd": "6c717bcdbdb0f82c00773b0a89b1f6693836f0685b3a42460360d395abe53d91",
+    "scenes/dev/zombie_death_physics/tests/test_joint_resistance.gd": "8ca9e78abcee4bcf234362846027e2755ecb733018cbd7ee2238e3f9dd9e42b3",
+    "scenes/dev/zombie_death_physics/tests/test_states.gd": "efc528ce298e8c9b458403e3338b687aca7d9dde9e616d48fa77e2f178547671",
+    "scenes/dev/zombie_death_physics/tests/native_review.gd": "1075ddbded746e6851b922ff1a5f85e53be3b23267c85a7e60fe49f6d2d0cf67",
+    "scenes/dev/zombie_death_physics/presets/pistol.tres": "aef3e7f400d19eba1e9f84f81fc34d24d87baa317d6b55043f30321af32a3bcc",
+    "scenes/dev/zombie_death_physics/presets/shotgun.tres": "5e35ad0d48dffc996a035616cac6050a88d27ef6dd2a1587365c3f7952c875a8",
+    "scenes/dev/zombie_death_physics/presets/rifle.tres": "ad904e0992280866968f91113fd7a8d9de9c248947c7a9bd57dc582dc1bdfda3"
+  }
+}
