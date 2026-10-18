@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "same_pending_action": "Rifle_Ready_Run_ActionsStyle_v002",
+  "other_actions_exact": 86,
+  "native_assets_exact": true,
+  "all_other_manifest_entries_and_statuses_exact": true,
+  "focused_entries": 19,
+  "archived_entries": 35
+}
