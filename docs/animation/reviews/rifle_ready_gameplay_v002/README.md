@@ -1,3 +1,5 @@
+User follow-up, 2026-10-18: planar movement is now **1.5×**: Walk2.70m/s and Run7.5465m/s; acceleration48/deceleration42m/s². Walk/Run query thresholds are calibrated accordingly, preserving animation state/cadence. Actions/Idle/camera/jump constants remain unchanged. Fast30FPS takeoff floor-flag handling is corrected; actual jump/landing and travel/state checks pass at30/60FPS. The earlier integration measurements below describe the pre-speed-update baseline.
+
 # Approved rifle Walk/Run sway — existing gameplay update
 
 2026-10-18. The user approved the latest Blender results and requested immediate integration. Research-only, not eligible for commercial exports. No new scene/project/candidate.
