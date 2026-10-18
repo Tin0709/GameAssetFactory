@@ -20,7 +20,7 @@ func _physics_process(delta: float) -> void:
 	var planar := Vector2(velocity.x, velocity.z).move_toward(desired, (deceleration if stick.is_zero_approx() else acceleration) * review_pace * review_pace * delta)
 	var jump_pressed := requested_jump and not _scripted_jump_held if scripted_input else Input.is_action_just_pressed("jump")
 	_scripted_jump_held = requested_jump if scripted_input else false
-	var was_grounded := is_on_floor()
+	var was_grounded := is_on_floor() and velocity.y <= 0.
 	var takeoff := was_grounded and jump_pressed
 	var vertical := -.2 if was_grounded else velocity.y - gravity * delta
 	if takeoff:
@@ -29,7 +29,9 @@ func _physics_process(delta: float) -> void:
 	# move_and_slide clears downward velocity on collision; retain it for impact.
 	var incoming_vertical := velocity.y
 	move_and_slide()
-	var grounded := is_on_floor()
+	# Fast horizontal travel can retain a floor flag on the takeoff tick.
+	# Upward velocity means the capsule is departing, not supported by that floor.
+	var grounded := is_on_floor() and velocity.y <= 0.
 	var landed := _floor_initialized and not was_grounded and grounded
 	_floor_initialized = _floor_initialized or grounded
 	var actual_velocity := get_real_velocity()
