@@ -3,34 +3,7 @@
     "decoded_frames" : 144,
     "distinct_sampled_pixel_hashes" : 144,
     "duration_s" : 4.7999999999999998,
-    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_front_30fps_1x.mp4",
-    "fps" : 30,
-    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
-    "passed" : true
-  },
-  {
-    "decoded_frames" : 144,
-    "distinct_sampled_pixel_hashes" : 144,
-    "duration_s" : 4.7999999999999998,
-    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_three_quarter_30fps_1x.mp4",
-    "fps" : 30,
-    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
-    "passed" : true
-  },
-  {
-    "decoded_frames" : 144,
-    "distinct_sampled_pixel_hashes" : 144,
-    "duration_s" : 4.7999999999999998,
-    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_side_30fps_1x.mp4",
-    "fps" : 30,
-    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
-    "passed" : true
-  },
-  {
-    "decoded_frames" : 144,
-    "distinct_sampled_pixel_hashes" : 144,
-    "duration_s" : 4.7999999999999998,
-    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_comparison_three_quarter_30fps_1x.mp4",
+    "file" : "blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_comparison_three_quarter_30fps_1x.mp4",
     "fps" : 29.999998092651367,
     "max_timestamp_step_error_s" : 7.7021722333370235e-16,
     "passed" : true
@@ -39,8 +12,35 @@
     "decoded_frames" : 144,
     "distinct_sampled_pixel_hashes" : 144,
     "duration_s" : 4.7999999999999998,
-    "file" : "\/Users\/tin\/Desktop\/Game Dev\/GameAssetFactory\/blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_shoulder_closeup_comparison_30fps_1x.mp4",
+    "file" : "blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_front_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 144,
+    "distinct_sampled_pixel_hashes" : 144,
+    "duration_s" : 4.7999999999999998,
+    "file" : "blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_shoulder_closeup_comparison_30fps_1x.mp4",
     "fps" : 29.999998092651367,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 144,
+    "distinct_sampled_pixel_hashes" : 144,
+    "duration_s" : 4.7999999999999998,
+    "file" : "blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_side_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 144,
+    "distinct_sampled_pixel_hashes" : 144,
+    "duration_s" : 4.7999999999999998,
+    "file" : "blender\/animation\/reviews\/player_animation_library_v1\/rifle_ready_locomotion_sway_v002\/shoulder_attachment_revision\/run_three_quarter_30fps_1x.mp4",
+    "fps" : 30,
     "max_timestamp_step_error_s" : 7.7021722333370235e-16,
     "passed" : true
   }
