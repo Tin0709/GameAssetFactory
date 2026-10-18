@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "action": "Rifle_Ready_Run_ActionsStyle_v002",
+  "status": "pending",
+  "registered_in_existing_showcase": true,
+  "all_checks": [
+    "build_validation",
+    "geometry_validation",
+    "isolation_validation",
+    "registration",
+    "reopen_verification",
+    "gui_playback"
+  ],
+  "other_actions_unchanged": 86,
+  "native_assets_unchanged": true,
+  "prior_pending_source_and_reviews_intact": true,
+  "godot_unchanged": true,
+  "review_movies": 5,
+  "decoded_video_frames": 720,
+  "lfs": [
+    {
+      "file": "blender/animation/showcase/Animation_Showcase.blend",
+      "size_bytes": 83486082,
+      "lfs_filter": true,
+      "index_pointer_matches_file": true
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/shoulder_attachment_revision/run_shoulders.blend",
+      "size_bytes": 83484181,
+      "lfs_filter": true,
+      "index_pointer_matches_file": true
+    }
+  ],
+  "no_gameplay_integration": true
+}
