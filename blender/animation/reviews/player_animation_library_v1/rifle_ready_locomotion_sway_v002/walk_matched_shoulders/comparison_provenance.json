@@ -1,0 +1,20 @@
+{
+  "fps": 30,
+  "playback_rate": 1,
+  "frames": [
+    1,
+    144
+  ],
+  "run_before_action_sha256": "c3a8e91d72334874ec6fdb70db3f531ca28381bd51ce005cb77494f7fb478f0b",
+  "run_after_action_sha256": "433d33c3b73c9f5aedd0420b2ab27123521270d22373c83fedae464717d9e76b",
+  "walking_reference": "Rifle_Ready_Walk_ActionsStyle_v0012",
+  "walking_action_sha256": "e5592898f9ddb8c4b1f010107c288b19cf6c64131bfef88631f6e7a127c71bb6",
+  "before_after_note": "Identical Run source times/frame numbers; no cadence/core/head/leg edits.",
+  "walk_run_note": "Both clips at native cadence and original speed; this compares shoulder attachment, not synchronized Walk/Run foot phase.",
+  "both_shoulder_stills": [
+    "run_side.png",
+    "run_other_side.png",
+    "run_front.png",
+    "run_three_quarter.png"
+  ]
+}

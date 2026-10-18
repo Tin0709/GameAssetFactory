@@ -1,0 +1,47 @@
+[
+  {
+    "decoded_frames" : 144,
+    "distinct_sampled_pixel_hashes" : 144,
+    "duration_s" : 4.7999999999999998,
+    "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/rifle_run_walk_shoulder_match_20261018\/package\/run_before_after_30fps_1x.mp4",
+    "fps" : 29.999998092651367,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 144,
+    "distinct_sampled_pixel_hashes" : 144,
+    "duration_s" : 4.7999999999999998,
+    "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/rifle_run_walk_shoulder_match_20261018\/package\/run_front_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 144,
+    "distinct_sampled_pixel_hashes" : 144,
+    "duration_s" : 4.7999999999999998,
+    "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/rifle_run_walk_shoulder_match_20261018\/package\/run_side_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 144,
+    "distinct_sampled_pixel_hashes" : 144,
+    "duration_s" : 4.7999999999999998,
+    "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/rifle_run_walk_shoulder_match_20261018\/package\/run_three_quarter_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  },
+  {
+    "decoded_frames" : 144,
+    "distinct_sampled_pixel_hashes" : 144,
+    "duration_s" : 4.7999999999999998,
+    "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/rifle_run_walk_shoulder_match_20261018\/package\/walk_run_shoulders_30fps_1x.mp4",
+    "fps" : 29.999998092651367,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  }
+]

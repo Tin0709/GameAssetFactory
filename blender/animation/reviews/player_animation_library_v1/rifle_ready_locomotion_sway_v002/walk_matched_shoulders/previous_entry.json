@@ -1,0 +1,92 @@
+{
+  "action": "Rifle_Ready_Run_ActionsStyle_v002",
+  "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/shoulder_attachment_revision/run_shoulders.blend",
+  "source_rig": "Showcase_Player_Rig",
+  "source_mesh": "Showcase_Player_Mesh",
+  "source_armature": "LB_Test_RestRig",
+  "slot_identifier": "OBRUN_Test_Rig",
+  "action_sha256": "c3a8e91d72334874ec6fdb70db3f531ca28381bd51ce005cb77494f7fb478f0b",
+  "action_frame_range": [
+    1.0,
+    2701.0
+  ],
+  "start": 1,
+  "end": 2700,
+  "fps": 30,
+  "fps_base": 1.0,
+  "status": "pending",
+  "approval_note": "Pending Blender review, requested2026-10-18. Existing approved gameplay landing carry informs this upper-body sway refinement; no gameplay integration.",
+  "seamless_loop": true,
+  "research_only": true,
+  "production_eligible": false,
+  "source_derived_reconstruction": true,
+  "original_custom_animation": false,
+  "source_animation": "animation.oreville_ans.fngydr",
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "rotation_modes": {
+    "Root": "XYZ",
+    "Hips": "XYZ",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "XYZ",
+    "Leg.R": "XYZ"
+  },
+  "preview_prop": "rifle_stylized_v2",
+  "bake_hz": 240,
+  "refinement_base": "Rifle_Ready_Run_ActionsStyle_v001",
+  "duration_s": 90.0,
+  "core_period_s": 0.625,
+  "phase_rate_cycles_s": 1.6,
+  "virtual_source_speed_blocks_s": 5.59,
+  "source_life_origin_s": 14.399999999999503,
+  "source_phase_origin": 22.962871843296135,
+  "endpoint_sample_frame": 2701,
+  "in_place": true,
+  "native_rig_adapters": {
+    "run_gait_waist_y_fraction": 0.6,
+    "head_torso_relative_tilt_limit_deg": 4.0,
+    "boot_sole_floor_correction": true,
+    "holding_raise_deg": 24,
+    "holding_seating_drop_m": 0.03,
+    "holding_right_offset_m": 0.024,
+    "source_leg_angles_horizontal_paths_scale_unchanged": true,
+    "left_socket_target_outset_m": 0.004
+  },
+  "loop_note": "Natural recurrence of source gait and independent crossbow lifetime clocks. No short-cycle clock reset.",
+  "research_scale_channels": {
+    "Leg.L": {
+      "axis": 1,
+      "min": 1.0,
+      "max": 1.070002
+    },
+    "Leg.R": {
+      "axis": 1,
+      "min": 1.0,
+      "max": 1.070002
+    }
+  },
+  "holding_sway": {
+    "yaw_deg": 9.0,
+    "lag_s": 0.04,
+    "roll_deg": 0.0,
+    "roll_lag_s": 0.06,
+    "holding_seat_m": 0.005
+  },
+  "adaptation_note": "Chest-led gait yaw with unchanged world-space head observation. Original arm, rifle-relative grip, support overlap and waist-roll curves are untouched. New authored adaptation over the approved research bake, not an additional source crossbow clip.",
+  "shoulder_attachment": {
+    "toward_torso_m": 0.01,
+    "up_m": 0.006,
+    "left_whole_arm_roll_deg": 15.0
+  },
+  "refinement_note": "2026-10-18 same Pending Run v002: seat BOTH shoulders closer using10mm torso-ward/6mm up rigid holding offset.15deg axial roll of the whole straight left arm clears the square head, without moving its support palm. Chest-led sway, body/head/legs/cadence and right grip unchanged. Previous v002 source remains intact in parent study file.",
+  "previous_pending_source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/rifle_ready_locomotion_sway_v002.blend",
+  "previous_pending_action_sha256": "1d95d3db75f9eb527f79795b68dff1ea7264fed0b1e2001751e1152590ad5274",
+  "source_sha256": "0148cd049e812ec98b9e4998642470aab32a66940765bba12032cddb7dc9d875"
+}

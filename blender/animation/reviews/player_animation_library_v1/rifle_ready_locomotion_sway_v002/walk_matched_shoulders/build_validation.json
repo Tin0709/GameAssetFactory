@@ -1,0 +1,95 @@
+{
+  "passed": true,
+  "same_pending_action": "Rifle_Ready_Run_ActionsStyle_v002",
+  "other_actions_exact": 86,
+  "untouched_curves_exact": 105,
+  "samples": 24193,
+  "changed_properties": {
+    "UpperArm.R": [
+      "location",
+      "rotation_quaternion"
+    ],
+    "UpperArm.L": [
+      "location",
+      "rotation_quaternion"
+    ],
+    "WeaponCarrier": [
+      "location",
+      "rotation_quaternion"
+    ]
+  },
+  "shoulder_socket_distance_improvement_m": {
+    "L": [
+      0.029240177093100617,
+      0.07347510408096673
+    ],
+    "R": [
+      -0.030571358123569176,
+      0.015415240634708255
+    ]
+  },
+  "left_support_palm_relative_error_m": 4.806779474994697e-07,
+  "settings": {
+    "walking_reference": "Rifle_Ready_Walk_ActionsStyle_v0012",
+    "walking_action_sha256": "e5592898f9ddb8c4b1f010107c288b19cf6c64131bfef88631f6e7a127c71bb6",
+    "walk_shoulder_mean": {
+      "L": [
+        0.349059085647724,
+        0.21064260395514772,
+        0.045092051113174915
+      ],
+      "R": [
+        -0.29959549495034077,
+        0.14516990279077657,
+        0.14210690117460476
+      ]
+    },
+    "run_shoulder_mean": {
+      "L": [
+        0.34044072834833133,
+        0.18890325458838617,
+        0.10097010934839556
+      ],
+      "R": [
+        -0.3254988167191452,
+        0.14415166918391806,
+        0.13302716325883665
+      ]
+    },
+    "relative_shoulder_bob_fraction": 0.15,
+    "carry_pitch_deg": -5.0,
+    "carry_yaw_deg": 5.0,
+    "right_axial_calibration_deg": 10.0,
+    "left_extra_axial_roll_deg": 0.0
+  },
+  "walking_socket_target_max_error_m": {
+    "L": 0.001892194073900818,
+    "R": 3.7814907850174666e-07
+  },
+  "new_chest_local_shoulder_ranges": {
+    "L": {
+      "min": [
+        0.3490777909755707,
+        0.20645160973072052,
+        0.04361680895090103
+      ],
+      "max": [
+        0.34929201006889343,
+        0.21306398510932922,
+        0.048558712005615234
+      ]
+    },
+    "R": {
+      "min": [
+        -0.2995957136154175,
+        0.13978226482868195,
+        0.14179924130439758
+      ],
+      "max": [
+        -0.29959529638290405,
+        0.1505645513534546,
+        0.14240017533302307
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "other_actions_exact": 86,
+  "native_asset_content_exact": true,
+  "source_image_path_note": "Only path strings remapped while saving the separate authoring container; packed pixels, dimensions and color spaces are exact. Native Showcase image paths are not changed.",
+  "paired_evaluated_poses": 45,
+  "metrics": {
+    "core_world_matrix_error": 0.0,
+    "right_grip_relative_matrix_error": 5.364418029785156e-07,
+    "left_palm_relative_rifle_error_m": 6.313680202478285e-07,
+    "left_support_life_excursion_m": 0.0015481060767794156
+  },
+  "godot_and_parent_study_files_unchanged": 1997
+}
