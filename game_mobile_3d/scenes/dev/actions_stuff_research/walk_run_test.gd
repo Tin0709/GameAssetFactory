@@ -7,8 +7,8 @@ const RenderPresenter=preload("res://scenes/dev/actions_stuff_research/render_po
 const RIFLE_VISUAL=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd")
 const RiflePresenter=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_presenter.gd")
 @export var rifle_ready:=true
-@export_range(.1,3.,.05) var movement_speed_multiplier:=1.5
-@export_range(.1,3.,.05) var locomotion_animation_multiplier:=1.5
+@export_range(.1,3.,.05) var movement_speed_multiplier:=1.25
+@export_range(.1,3.,.05) var locomotion_animation_multiplier:=1.0
 var presentation: Node
 var player: CharacterBody3D
 var camera: Camera3D

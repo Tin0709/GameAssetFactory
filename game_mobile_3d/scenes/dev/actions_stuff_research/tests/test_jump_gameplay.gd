@@ -17,7 +17,7 @@ func run() -> void:
  check(a.get("requested_jump")!=null,"Existing scene must bind physical Jump actor")
  if not v.has_method("drive_jump_motion") or a.get("requested_jump")==null:scene.free();quit(1);return
  check(is_equal_approx(scene.camera_size,5.1),"Camera framing remains unchanged")
- check(is_equal_approx(a.walk_speed,2.7) and is_equal_approx(a.run_speed,7.5465) and is_equal_approx(a.acceleration,48.) and is_equal_approx(a.deceleration,42.),"User-requested 1.5x movement speeds/response remain unchanged")
+ check(is_equal_approx(a.walk_speed,2.25) and is_equal_approx(a.run_speed,6.28875) and is_equal_approx(a.acceleration,40.) and is_equal_approx(a.deceleration,35.),"User-requested 1.25x movement speeds/response remain unchanged")
  for i in 5:await tick(v)
  for mode in ["stand","walk","run","reverse","stop_air"]:
   a.requested_direction=Vector2.ZERO if mode=="stand" else Vector2(0,-1);a.requested_run=mode in ["run","reverse","stop_air"]
