@@ -1,0 +1,92 @@
+{
+  "pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "pack_read_directly": true,
+  "references": {
+    "mshwsb": {
+      "id": "animation.oreville_ans.rrvlnm",
+      "file": "animations/f2da1071.json",
+      "sha256_canonical_json": "a189cb88264ef183ed868a9c2a43df060ea067b5bb3d890d5737f4a1bd60eba2"
+    },
+    "tcucxa": {
+      "id": "animation.oreville_ans.dubgwy",
+      "file": "animations/f2da1071.json",
+      "sha256_canonical_json": "a48ef1464fa2526c29961eb2d5c484129bdba36e4b5e7b57ce453be2ddb9201b"
+    },
+    "mhyyzj": {
+      "id": "animation.oreville_ans.jawwtn",
+      "file": "animations/f2da1071.json",
+      "sha256_canonical_json": "9b9a32a1166f30339b8db45ffd9c010d1545d39d1168255ed74d4f82b5fc073a"
+    },
+    "hfnozn": {
+      "id": "animation.oreville_ans.asxvzc",
+      "file": "animations/f2da1071.json",
+      "sha256_canonical_json": "1ad7305a0d59ff9e1a37a970e64f553236c7dd1de9fdb8bd482f652259c5d649"
+    },
+    "ybphcg": {
+      "id": "controller.animation.oreville_ans.knoyhk",
+      "file": "animation_controllers/616f2ff7.json",
+      "sha256_canonical_json": "ad853329c70e5f174c85f7b0ba1f997d1f476d92b916b26861721e8813b5a617"
+    },
+    "kcexxa": {
+      "id": "controller.animation.oreville_ans.njvelc",
+      "file": "animation_controllers/616f2ff7.json",
+      "sha256_canonical_json": "73a1a79bba6b103911bf25cadc2db1ec3a82f5390c14aa4c228b053ff22f3a31"
+    }
+  },
+  "charged_state": {
+    "animations": [
+      "mhyyzj",
+      {
+        "hfnozn": "1-v.jkpkmj"
+      },
+      {
+        "humanoid_base_pose": "q.get_animation_frame>3||q.item_is_charged"
+      }
+    ],
+    "transitions": [
+      {
+        "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))||(!q.any_animation_finished&&q.main_hand_item_use_duration==0)"
+      },
+      {
+        "ikvaib": "q.all_animations_finished&&!q.item_is_charged"
+      },
+      {
+        "btdwij": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+      }
+    ],
+    "blend_transition": 0.1
+  },
+  "base_hold_state": {
+    "animations": [
+      "mshwsb",
+      {
+        "tcucxa": "1-v.jkpkmj"
+      }
+    ],
+    "transitions": [
+      {
+        "default": "!v.is_holding_right"
+      },
+      {
+        "ssulqn": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))"
+      },
+      {
+        "ieyepd": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+      }
+    ],
+    "blend_transition": 0.2
+  },
+  "charged_final_core_rotation_deg": {
+    "rightarm": [
+      -85,
+      -17,
+      0
+    ],
+    "leftarm": [
+      -98,
+      45,
+      1
+    ]
+  },
+  "timing_scope": "Custom raise/lower and long-rifle calibration; the charged source jumps to clip time1.9167, not its loading gesture. Source .9/1.8/3.6s holding rhythms inform original restrained breathing."
+}
