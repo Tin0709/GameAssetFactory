@@ -1,7 +1,7 @@
 import bpy,json,sys,hashlib,math
 from pathlib import Path
 from mathutils import Matrix,Vector
-R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').exists());S=Path(__file__).resolve().parent.parent;sys.path.insert(0,str(S));sys.path.insert(0,str(R/'blender/animation/showcase'));import gaf_animation_library as ui
+R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').exists());S=Path(__file__).resolve().parent.parent;sys.path.insert(0,str(Path(__file__).resolve().parent));sys.path.insert(0,str(R/'blender/animation/showcase'));import gaf_animation_library as ui
 from motion import Motion
 N='Rifle_Aim_Hold_ActionsStyle_v001';
 if any(e['action']==N and e['status']=='approved' for e in json.loads((R/'blender/animation/showcase/animation_manifest.json').read_text())['animations']):raise RuntimeError('Never overwrite an approved Aim Action')
