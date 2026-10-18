@@ -1,0 +1,21 @@
+{
+  "diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "large_file_guard": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "lfs_attributes": {
+    "exit_code": 0,
+    "stdout": "blender/animation/showcase/Animation_Showcase.blend: filter: lfs\nblender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/reference_pose_refinement_20261018/rifle_aim_hold_actionsstyle_v001.blend: filter: lfs\n",
+    "stderr": ""
+  },
+  "new_source_bytes": 12868285,
+  "canonical_version_bytes": 86375277,
+  "ordinary_files_over_25MiB": [],
+  "passed": true
+}

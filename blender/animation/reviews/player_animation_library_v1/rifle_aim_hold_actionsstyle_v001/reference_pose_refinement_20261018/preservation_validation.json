@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "existing_files_checked": 6904,
+  "expected_document_updates": [
+    "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/README.md"
+  ],
+  "unrelated_concurrent_zombie_changes_preserved": [],
+  "unexpected_changes": [],
+  "missing_files": [],
+  "old_pending_source_exact": true,
+  "other_87_showcase_actions_and_native_assets_exact": true,
+  "accepted_player_runtime_unchanged": true,
+  "pack_sha256_unchanged": true
+}
