@@ -1,0 +1,112 @@
+{
+  "source_rig": "Showcase_Player_Rig",
+  "source_mesh": "Showcase_Player_Mesh",
+  "source_armature": "LB_Test_RestRig",
+  "slot_identifier": "OBRUN_Test_Rig",
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "rotation_modes": {
+    "Root": "XYZ",
+    "Hips": "XYZ",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "XYZ",
+    "Leg.R": "XYZ"
+  },
+  "preview_prop": "rifle_stylized_v2",
+  "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+  "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
+  "action": "Rifle_Aim_Hold_ActionsStyle_v001",
+  "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/rifle_aim_hold_actionsstyle_v001.blend",
+  "source_sha256": "9c9d3b2e52ae08798dd7966899b9177caf1605663a158c1aff81cf6c75a15de6",
+  "action_sha256": "55f7db574575eebb3944bc8deb259764cbf7cdd769ae48afe5d2d3de9b7de435",
+  "action_frame_range": [
+    1.0,
+    217.0
+  ],
+  "start": 1,
+  "end": 216,
+  "fps": 30,
+  "fps_base": 1.0,
+  "status": "pending",
+  "approval_note": "One new Blender Aim/Hold candidate requested2026-10-18; Pending visual review. No Godot integration.",
+  "seamless_loop": true,
+  "research_only": true,
+  "production_eligible": false,
+  "source_derived_reconstruction": false,
+  "original_custom_animation": true,
+  "contains_source_derived_base_pose": true,
+  "bake_hz": 240,
+  "source_duration_s": 7.2,
+  "endpoint_sample_frame": 217,
+  "ready_base": "Rifle_Ready_Idle_ActionsStyle_v004",
+  "phases": {
+    "Ready": [
+      1,
+      19
+    ],
+    "Raise": [
+      19,
+      37
+    ],
+    "Hold": [
+      37,
+      145
+    ],
+    "Lower": [
+      145,
+      163
+    ],
+    "Ready_return": [
+      163,
+      217
+    ]
+  },
+  "hold_loop_range": [
+    37,
+    145
+  ],
+  "source_animations": [
+    "animation.oreville_ans.rrvlnm",
+    "animation.oreville_ans.dubgwy",
+    "animation.oreville_ans.jawwtn",
+    "animation.oreville_ans.asxvzc"
+  ],
+  "source_controllers": [
+    "controller.animation.oreville_ans.njvelc",
+    "controller.animation.oreville_ans.knoyhk"
+  ],
+  "rig_adaptations": {
+    "body_blade_deg": 32,
+    "grip": [
+      -0.2968004783,
+      -0.5568960261,
+      1.3805499044
+    ],
+    "weapon_yaw_deg": 0,
+    "weapon_pitch_deg": 0,
+    "weapon_roll_deg": -20,
+    "head_nod_deg": 3,
+    "shoulder_drop_m": 0.03,
+    "support_outward_m": -0.02,
+    "support_back_m": -0.1,
+    "support_up_m": 0.05,
+    "grip_forward_m": 0.035,
+    "left_axial_deg": -5,
+    "right_axial_deg": -4,
+    "right_drop_m": 0.03,
+    "raise_forward_clearance_m": 0.12,
+    "raise_lower_clearance_m": 0.035,
+    "raise_position_exponent": 1.5,
+    "transition_shoulder_drop_m": 0.03,
+    "transition_right_roll_deg": 30,
+    "transition_support_outward_m": 0.02,
+    "transition_left_roll_deg": 0
+  }
+}
