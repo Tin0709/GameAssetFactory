@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scenes/dev/zombie_death_physics/death_profile.gd" id="1"]
+[resource]
+script = ExtResource("1")
+display_name = "Rifle — Medium"
+linear_impulse = 38.0
+angular_impulse = 1.8
+upward_impulse = 0.0
+limit_scale = 1.0
+linear_damping = 0.18
+angular_damping = 0.65

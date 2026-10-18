@@ -1,0 +1,173 @@
+{
+  "failures": [],
+  "trials": [
+    {
+      "minimum_corner_y": -0.0290837734937668,
+      "peak_anchor_m": 0.0124073382467031,
+      "phase_tick": 3,
+      "state": "Walk",
+      "weapon": 0
+    },
+    {
+      "minimum_corner_y": -0.0181840360164642,
+      "peak_anchor_m": 0.0212058462202549,
+      "phase_tick": 3,
+      "state": "Walk",
+      "weapon": 1
+    },
+    {
+      "minimum_corner_y": -0.036278247833252,
+      "peak_anchor_m": 0.0118644600734115,
+      "phase_tick": 3,
+      "state": "Walk",
+      "weapon": 2
+    },
+    {
+      "minimum_corner_y": -0.0306892991065979,
+      "peak_anchor_m": 0.00614440254867077,
+      "phase_tick": 13,
+      "state": "Walk",
+      "weapon": 0
+    },
+    {
+      "minimum_corner_y": -0.0202665030956268,
+      "peak_anchor_m": 0.0116852875798941,
+      "phase_tick": 13,
+      "state": "Walk",
+      "weapon": 1
+    },
+    {
+      "minimum_corner_y": -0.0161742120981216,
+      "peak_anchor_m": 0.0125748915597796,
+      "phase_tick": 13,
+      "state": "Walk",
+      "weapon": 2
+    },
+    {
+      "minimum_corner_y": -0.016340583562851,
+      "peak_anchor_m": 0.00724687660112977,
+      "phase_tick": 36,
+      "state": "Walk",
+      "weapon": 0
+    },
+    {
+      "minimum_corner_y": -0.0262401700019836,
+      "peak_anchor_m": 0.0104943597689271,
+      "phase_tick": 36,
+      "state": "Walk",
+      "weapon": 1
+    },
+    {
+      "minimum_corner_y": -0.021239310503006,
+      "peak_anchor_m": 0.01186253875494,
+      "phase_tick": 36,
+      "state": "Walk",
+      "weapon": 2
+    },
+    {
+      "minimum_corner_y": -0.0184903144836426,
+      "peak_anchor_m": 0.0108931651338935,
+      "phase_tick": 65,
+      "state": "Walk",
+      "weapon": 0
+    },
+    {
+      "minimum_corner_y": -0.026697188615799,
+      "peak_anchor_m": 0.00485073775053024,
+      "phase_tick": 65,
+      "state": "Walk",
+      "weapon": 1
+    },
+    {
+      "minimum_corner_y": -0.0244708657264709,
+      "peak_anchor_m": 0.00988470949232578,
+      "phase_tick": 65,
+      "state": "Walk",
+      "weapon": 2
+    },
+    {
+      "minimum_corner_y": -0.0278241485357285,
+      "peak_anchor_m": 0.00483847362920642,
+      "phase_tick": 3,
+      "state": "Attack",
+      "weapon": 0
+    },
+    {
+      "minimum_corner_y": -0.0235881507396698,
+      "peak_anchor_m": 0.0142517443746328,
+      "phase_tick": 3,
+      "state": "Attack",
+      "weapon": 1
+    },
+    {
+      "minimum_corner_y": -0.0347181707620621,
+      "peak_anchor_m": 0.00946826580911875,
+      "phase_tick": 3,
+      "state": "Attack",
+      "weapon": 2
+    },
+    {
+      "minimum_corner_y": -0.0297190994024277,
+      "peak_anchor_m": 0.0117826424539089,
+      "phase_tick": 13,
+      "state": "Attack",
+      "weapon": 0
+    },
+    {
+      "minimum_corner_y": -0.0165066719055176,
+      "peak_anchor_m": 0.0106071755290031,
+      "phase_tick": 13,
+      "state": "Attack",
+      "weapon": 1
+    },
+    {
+      "minimum_corner_y": -0.0251364409923553,
+      "peak_anchor_m": 0.0098128654062748,
+      "phase_tick": 13,
+      "state": "Attack",
+      "weapon": 2
+    },
+    {
+      "minimum_corner_y": -0.0252714902162552,
+      "peak_anchor_m": 0.0131907518953085,
+      "phase_tick": 36,
+      "state": "Attack",
+      "weapon": 0
+    },
+    {
+      "minimum_corner_y": -0.0245887339115143,
+      "peak_anchor_m": 0.0141310971230268,
+      "phase_tick": 36,
+      "state": "Attack",
+      "weapon": 1
+    },
+    {
+      "minimum_corner_y": -0.0147961974143982,
+      "peak_anchor_m": 0.00547837466001511,
+      "phase_tick": 36,
+      "state": "Attack",
+      "weapon": 2
+    },
+    {
+      "minimum_corner_y": -0.0248511433601379,
+      "peak_anchor_m": 0.0143825560808182,
+      "phase_tick": 65,
+      "state": "Attack",
+      "weapon": 0
+    },
+    {
+      "minimum_corner_y": -0.0201961547136307,
+      "peak_anchor_m": 0.00424197549000382,
+      "phase_tick": 65,
+      "state": "Attack",
+      "weapon": 1
+    },
+    {
+      "minimum_corner_y": -0.0327963680028915,
+      "peak_anchor_m": 0.00779182184487581,
+      "phase_tick": 65,
+      "state": "Attack",
+      "weapon": 2
+    }
+  ]
+}
