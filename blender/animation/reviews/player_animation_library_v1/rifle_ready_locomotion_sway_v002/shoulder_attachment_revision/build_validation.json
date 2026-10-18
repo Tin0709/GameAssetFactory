@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "same_pending_action": "Rifle_Ready_Run_ActionsStyle_v002",
+  "other_actions_exact": 86,
+  "untouched_curves_exact": 113,
+  "samples": 24193,
+  "changed_properties": {
+    "UpperArm.R": [
+      "location"
+    ],
+    "UpperArm.L": [
+      "location",
+      "rotation_quaternion"
+    ],
+    "WeaponCarrier": [
+      "location"
+    ]
+  },
+  "shoulder_socket_distance_improvement_m": {
+    "L": [
+      0.01135917359023536,
+      0.011527947004531539
+    ],
+    "R": [
+      0.010902186631686905,
+      0.011559301986368536
+    ]
+  },
+  "left_support_palm_relative_error_m": 3.945291726253547e-07,
+  "settings": {
+    "toward_torso_m": 0.01,
+    "up_m": 0.006,
+    "left_whole_arm_roll_deg": 15.0
+  }
+}
