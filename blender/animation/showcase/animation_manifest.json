@@ -2736,12 +2736,12 @@
     },
     {
       "action": "Rifle_Ready_Run_ActionsStyle_v002",
-      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/shoulder_attachment_revision/run_shoulders.blend",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/walk_matched_shoulders/run_walk_matched_shoulders.blend",
       "source_rig": "Showcase_Player_Rig",
       "source_mesh": "Showcase_Player_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBRUN_Test_Rig",
-      "action_sha256": "c3a8e91d72334874ec6fdb70db3f531ca28381bd51ce005cb77494f7fb478f0b",
+      "action_sha256": "433d33c3b73c9f5aedd0420b2ab27123521270d22373c83fedae464717d9e76b",
       "action_frame_range": [
         1.0,
         2701.0
@@ -2817,14 +2817,42 @@
       },
       "adaptation_note": "Chest-led gait yaw with unchanged world-space head observation. Original arm, rifle-relative grip, support overlap and waist-roll curves are untouched. New authored adaptation over the approved research bake, not an additional source crossbow clip.",
       "shoulder_attachment": {
-        "toward_torso_m": 0.01,
-        "up_m": 0.006,
-        "left_whole_arm_roll_deg": 15.0
+        "walking_reference": "Rifle_Ready_Walk_ActionsStyle_v0012",
+        "walking_action_sha256": "e5592898f9ddb8c4b1f010107c288b19cf6c64131bfef88631f6e7a127c71bb6",
+        "walk_shoulder_mean": {
+          "L": [
+            0.349059085647724,
+            0.21064260395514772,
+            0.045092051113174915
+          ],
+          "R": [
+            -0.29959549495034077,
+            0.14516990279077657,
+            0.14210690117460476
+          ]
+        },
+        "run_shoulder_mean": {
+          "L": [
+            0.34044072834833133,
+            0.18890325458838617,
+            0.10097010934839556
+          ],
+          "R": [
+            -0.3254988167191452,
+            0.14415166918391806,
+            0.13302716325883665
+          ]
+        },
+        "relative_shoulder_bob_fraction": 0.15,
+        "carry_pitch_deg": -5.0,
+        "carry_yaw_deg": 5.0,
+        "right_axial_calibration_deg": 10.0,
+        "left_extra_axial_roll_deg": 0.0
       },
-      "refinement_note": "2026-10-18 same Pending Run v002: seat BOTH shoulders closer using10mm torso-ward/6mm up rigid holding offset.15deg axial roll of the whole straight left arm clears the square head, without moving its support palm. Chest-led sway, body/head/legs/cadence and right grip unchanged. Previous v002 source remains intact in parent study file.",
-      "previous_pending_source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/rifle_ready_locomotion_sway_v002.blend",
-      "previous_pending_action_sha256": "1d95d3db75f9eb527f79795b68dff1ea7264fed0b1e2001751e1152590ad5274",
-      "source_sha256": "0148cd049e812ec98b9e4998642470aab32a66940765bba12032cddb7dc9d875"
+      "refinement_note": "2026-10-18 same Pending Run v002: use actual Walk v0012 Chest-local shoulder means/envelope for BOTH shoulders. Preserve source Run body/core/legs/head and Chest-led sway. Native carry calibration5deg up/5deg yaw/10deg right-arm axial rotation retains rigid right grip. Closest fixed-palm left support lies within2mm of the Walk socket target. Incoming relative shoulder float retains its clocks at15percent amplitude to match the Walking envelope; torso bounce is unchanged. Not a literal new source controller. Previous pending revision remains intact.",
+      "previous_pending_source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/shoulder_attachment_revision/run_shoulders.blend",
+      "previous_pending_action_sha256": "c3a8e91d72334874ec6fdb70db3f531ca28381bd51ce005cb77494f7fb478f0b",
+      "source_sha256": "8a0d6e6a71811378582d9ce9b2d806320831ac1193a161f789283a2e814ac735"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
