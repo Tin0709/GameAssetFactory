@@ -1,0 +1,17 @@
+{
+  "failures": [],
+  "shotgun_distributions": [
+    {
+      "Corpse_Arm_R": "(0.0, 10.0, -86.00001)"
+    },
+    {
+      "Corpse_Arm_R": "(0.0, 7.0, -60.2)",
+      "Corpse_Chest": "(0.0, 3.0, -25.8)"
+    },
+    {
+      "Corpse_Arm_R": "(0.0, 5.5, -47.3)",
+      "Corpse_Chest": "(0.0, 3.0, -25.8)",
+      "Corpse_Head": "(0.0, 1.5, -12.9)"
+    }
+  ]
+}

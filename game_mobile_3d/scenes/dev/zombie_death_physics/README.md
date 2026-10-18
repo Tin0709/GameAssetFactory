@@ -34,20 +34,20 @@ Verified on **Godot 4.7.2.stable.official.ed1daf0bf**, using the project's DEFAU
 
 Automated tests cover nine state/weapon trials, 24 additional stride/lunge-phase trials, translated/rotated roots, zero-impact position/orientation/linear/angular velocity transfer, evaluated skin/physics agreement, rigid block transforms, ground support, joint attachment, repeated reset, pause/reset while paused, slow motion, 4/8 simultaneous deaths, admission and cleanup. Native rendered tests exercise the same selection signals and view keys. Saved scene is reopened in a fresh process in the actual project; evidence is in `validation/`.
 
-The initial 33-trial 120 Hz sweep observed at most **39.1 mm transient box-corner floor penetration** and **28.0 mm joint-anchor error**. Settled guards are 25 mm for floor support and 20–25 mm for anchors; these are prototype tolerances, not a claim of perfect contact. Limb/torso overlap can occur because self-collision is disabled. Joint ranges rebase at death rather than imposing one universal anatomical rest pose. The legacy rigid torso articulates around its existing Chest origin, not a rebuilt anatomical waist. Near-center passive pistol deaths may fall forward with the zombie's pre-existing lean; the force direction is not a scripted fall direction.
+The final 33-trial 120 Hz sweep sampled every physics tick from release onward and observed at most **39.1 mm transient box-corner floor penetration** and **28.0 mm joint-anchor error**. Settled guards are 25 mm for floor support and 20–25 mm for anchors; these are prototype tolerances, not a claim of perfect contact. Limb/torso overlap can occur because self-collision is disabled. Joint ranges rebase at death rather than imposing one universal anatomical rest pose. The legacy rigid torso articulates around its existing Chest origin, not a rebuilt anatomical waist. Near-center passive pistol deaths may fall forward with the zombie's pre-existing lean; the force direction is not a scripted fall direction.
 
 Inherited speeds are capped at 3 m/s and 10 rad/s to bound fast lunge sampling. Simulated safety caps are 10 m/s and 12 rad/s, not continuous pose tracking. These can limit extreme user impulses; arbitrary slider extremes, airborne hits, slopes, stairs, body-body collision and production transitions remain future validation. Cleanup is an explicit removal, without a dissolve/fade effect.
 
-Short native desktop observations on Apple M2 Pro, 1440×900, Mobile renderer, 30 FPS display / 120 Hz physics (roughly 72 monitor samples over 2.4 s per case):
+Short native desktop observations on Apple M2 Pro, 1440×810 captured viewport, Mobile renderer, 30 FPS display / 120 Hz physics (roughly 72 monitor samples over 2.4 s per case):
 
 | Ragdolls | Physics monitor mean / p95 | Median displayed FPS |
 |---:|---:|---:|
-| 0 (one animated living zombie) | .626 / .684 ms | 30 |
-| 1 | 1.860 / 2.870 ms | 30 |
-| 4 | 2.230 / 3.152 ms | 30 |
-| 8 | 3.012 / 3.247 ms | 30 |
+| 0 (one animated living zombie) | .183 / .517 ms | 30 |
+| 1 | .529 / .684 ms | 30 |
+| 4 | .655 / 1.002 ms | 30 |
+| 8 | .924 / 1.490 ms | 30 |
 
-These are short process-monitor observations, including the process's physics work, not isolated per-body timings or mobile certification. The 120 Hz contact improvement costs more physics work; real-device CPU, thermal, battery and gameplay load remain untested. Do not promote these defaults to production yet.
+These are the final real-project process-monitor observations, covering collapse/settling about 0.4–2.8 s after the simultaneous hit; sleeping retained bodies are included. Monitor values can repeat between refreshes. An earlier staging run was slower (1.86 ms for one, 3.01 ms for eight), showing the variability of these short samples. These are not isolated per-body timings or mobile certification. The 120 Hz contact improvement costs more physics work; real-device CPU, thermal, battery and gameplay load remain untested. Do not promote these defaults to production yet.
 
 ## Re-run checks
 

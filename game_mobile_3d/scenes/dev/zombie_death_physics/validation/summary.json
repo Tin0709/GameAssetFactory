@@ -1,0 +1,63 @@
+{
+  "status": "Pending visual review",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "state_weapon_phase_trials": 33,
+  "physics_samples": "every fixed tick, release onward",
+  "maximum_transient_corner_penetration_m": 0.0390623658895493,
+  "maximum_anchor_error_m": 0.0279687978327274,
+  "protected_file_count": 21,
+  "protected_files_unchanged": true,
+  "native_review": {
+    "display_cap": 30,
+    "engine": "4.7.2-stable (official)",
+    "failures": [],
+    "measurements": [
+      {
+        "bodies": 0,
+        "display_fps_median": 30.0,
+        "joints": 0,
+        "monitor_samples": 72,
+        "physics_monitor_max_ms": 0.517,
+        "physics_monitor_mean_ms": 0.18325,
+        "physics_monitor_p95_ms": 0.517,
+        "ragdolls": 0
+      },
+      {
+        "bodies": 7,
+        "display_fps_median": 30.0,
+        "joints": 6,
+        "monitor_samples": 72,
+        "physics_monitor_max_ms": 0.684,
+        "physics_monitor_mean_ms": 0.529458333333333,
+        "physics_monitor_p95_ms": 0.684,
+        "ragdolls": 1
+      },
+      {
+        "bodies": 28,
+        "display_fps_median": 30.0,
+        "joints": 24,
+        "monitor_samples": 72,
+        "physics_monitor_max_ms": 1.002,
+        "physics_monitor_mean_ms": 0.655194444444445,
+        "physics_monitor_p95_ms": 1.002,
+        "ragdolls": 4
+      },
+      {
+        "bodies": 56,
+        "display_fps_median": 30.0,
+        "joints": 48,
+        "monitor_samples": 72,
+        "physics_monitor_max_ms": 1.49,
+        "physics_monitor_mean_ms": 0.923541666666667,
+        "physics_monitor_p95_ms": 1.49,
+        "ragdolls": 8
+      }
+    ],
+    "physics_hz": 120,
+    "renderer": "Apple M2 Pro (Apple8)"
+  },
+  "capture_size": [
+    1440,
+    810
+  ]
+}
