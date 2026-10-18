@@ -1,11 +1,15 @@
+# Rebuild from the preserved parent study, never from the already refined Action:
+# Blender -b ../rifle_ready_locomotion_sway_v002.blend --python authoring/build.py
 import bpy,sys,json,hashlib,time
 from pathlib import Path
 from mathutils import Vector
 R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').exists());O=Path(__file__).resolve().parent.parent
-S=Path('/Users/tin/Documents/ChatGPT/New project/experiments/rifle_run_shoulders_20261018');sys.path.insert(0,str(R/'blender/animation/showcase'));sys.path.insert(0,str(O/'authoring'));import gaf_animation_library as ui
+sys.path.insert(0,str(R/'blender/animation/showcase'));sys.path.insert(0,str(O/'authoring'));import gaf_animation_library as ui
 from shoulder_fit import apply,SETTINGS
 N='Rifle_Ready_Run_ActionsStyle_v002';s=bpy.context.scene;r=bpy.data.objects[ui.RIG];a=bpy.data.actions[N]
-before=json.loads((S/'before/fingerprint.json').read_text())['actions'];assert ui.action_signature(a)==before[N]
+before=json.loads((O/'previous_action_hashes.json').read_text());assert ui.action_signature(a)==before[N]
+base_entry=next(e for e in json.loads((O.parent/'entries.json').read_text()) if e['action']==N)
+assert hashlib.sha256((R/base_entry['source']).read_bytes()).hexdigest()==base_entry['source_sha256']
 changed={'UpperArm.R':['location'],'UpperArm.L':['location','rotation_quaternion'],'WeaponCarrier':['location']}
 old_curves={(c.data_path,c.array_index):[(tuple(k.co),tuple(k.handle_left),tuple(k.handle_right),k.interpolation,k.handle_left_type,k.handle_right_type) for k in c.keyframe_points] for c in ui.curves(a)}
 frames=sorted({float(k.co.x) for c in ui.curves(a) for k in c.keyframe_points});rest={b.name:b.matrix_local.copy() for b in r.data.bones};palm=Vector((0,r.data.bones['ForeArm.L'].length*.78,0));r.animation_data.action=a;r.animation_data.action_slot=a.slots[0];s['gaf_library_last_action']=N
@@ -35,7 +39,7 @@ for c in ui.curves(a):
 assert set(before)=={a.name for a in bpy.data.actions}
 for n,h in before.items():
  if n!=N:assert ui.action_signature(bpy.data.actions[n])==h,n
-entry=next(e for e in json.loads((S/'before/animation_manifest.json').read_text())['animations'] if e['action']==N);entry=dict(entry)
+entry=dict(base_entry)
 entry.update(source=(O/'run_shoulders.blend').relative_to(R).as_posix(),action_sha256=ui.action_signature(a),shoulder_attachment=SETTINGS,
  refinement_note='2026-10-18 same Pending Run v002: seat BOTH shoulders closer using10mm torso-ward/6mm up rigid holding offset.15deg axial roll of the whole straight left arm clears the square head, without moving its support palm. Chest-led sway, body/head/legs/cadence and right grip unchanged. Previous v002 source remains intact in parent study file.',
  previous_pending_source=entry['source'],previous_pending_action_sha256=before[N])
