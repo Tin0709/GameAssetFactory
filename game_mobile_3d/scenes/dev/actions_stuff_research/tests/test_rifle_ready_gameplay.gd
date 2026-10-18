@@ -31,8 +31,19 @@ func run() -> void:
  if not failures.is_empty():scene.free();quit(1);return
  check(v.rifle_clips.size()==3,"Exactly three approved Rifle Ready clips")
  check(v.rifle_clips.Idle.clip.resource_name=="Rifle_Ready_Idle_ActionsStyle_v004","Exact approved Idle")
- check(v.rifle_clips.Walk.clip.resource_name=="Rifle_Ready_Walk_ActionsStyle_v001","Exact approved Walk")
- check(v.rifle_clips.Run.clip.resource_name=="Rifle_Ready_Run_ActionsStyle_v001","Exact approved Run")
+ check(v.rifle_clips.Walk.clip.resource_name=="Rifle_Ready_Walk_ActionsStyle_v0012","Exact approved Walk")
+ check(v.rifle_clips.Run.clip.resource_name=="Rifle_Ready_Run_ActionsStyle_v002","Exact approved Run")
+ # An already-contacting authored moving pose must retain its shoulder root.
+ var moving_shoulder_error:=0.
+ for kind in ["Walk","Run"]:
+  for time in [.0,.071,.251,.501,1.37]:
+   var authored: Transform3D=v.rifle_clips[kind].pose(v.arm_left,time)
+   var palm: Vector3=authored*v.palm_arm_local
+   v.rifle_move_weight=1.
+   moving_shoulder_error=maxf(moving_shoulder_error,v.constrained_left_pose(authored,palm).origin.distance_to(authored.origin))
+ v.rifle_move_weight=0.
+ check(moving_shoulder_error<.00002,"Approved moving shoulders survive contact solve: "+str(moving_shoulder_error))
+ check(v.rifle_profile.clips.Run.action_sha256=="433d33c3b73c9f5aedd0420b2ab27123521270d22373c83fedae464717d9e76b","Latest Walking-matched-shoulder Run source pin")
  check(v.rifle_model.visible,"Actual Rifle Stylized V2 visible")
  scene.set_process(false);a.set_physics_process(false);v.set_process(false)
  var previous: Array[Quaternion]=[];var reached_run:=false;var saw_support:=0;var camera_span: Array[float]=[];var idle_scan_cancelled:=false
@@ -67,5 +78,5 @@ func run() -> void:
  check(saw_support>10,"Usable foot support during motion")
  check(camera_span.max()-camera_span.min()<.03,"Ordinary jump keeps comfortable camera height")
  var life: float=v.entity_lifetime;scene.reset_player();check(a.position.length()<.001 and v.entity_lifetime==life,"Reset preserves persistent locomotion clocks")
- var report:={"fps":fps,"failures":failures,"right_grip_matrix_error":grip_error,"left_support_error_m":support_error,"minimum_foot_y":minimum_floor,"maximum_leg_step_deg":maximum_leg_step,"support_samples":saw_support,"camera_jump_y_span":camera_span.max()-camera_span.min()}
+ var report:={"fps":fps,"moving_shoulder_error_m":moving_shoulder_error,"failures":failures,"right_grip_matrix_error":grip_error,"left_support_error_m":support_error,"minimum_foot_y":minimum_floor,"maximum_leg_step_deg":maximum_leg_step,"support_samples":saw_support,"camera_jump_y_span":camera_span.max()-camera_span.min()}
  var out:="user://rifle_ready_"+str(fps)+".json";FileAccess.open(out,FileAccess.WRITE).store_string(JSON.stringify(report,"\t"));print("RIFLE_READY ",JSON.stringify(report));scene.free();quit(0 if failures.is_empty() else 1)

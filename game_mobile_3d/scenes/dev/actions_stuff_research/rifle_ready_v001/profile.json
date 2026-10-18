@@ -17,19 +17,19 @@
 	"carrier_in_right_arm": [
 		[
 			-1.00000011920929,
-			0.000000149011611938477,
-			-0.0000000819563865661621,
-			-0.0000000896397978067398
+			0.00000014901161193,
+			-0.00000008195638656,
+			-0.0000000896397978
 		],
 		[
-			0.000000178813934326172,
+			0.00000017881393432,
 			1.0,
-			0.000000342726707458496,
+			0.00000034272670745,
 			0.539200127124786
 		],
 		[
-			-0.0000000521540641784668,
-			0.000000357627868652344,
+			-0.00000005215406417,
+			0.00000035762786865,
 			-1.0,
 			0.0163896139711142
 		],
@@ -54,35 +54,35 @@
 			"source_sha256": "b1990be707b1928c027d2b4172c13812b4fb217385969e4fedf1f5823a163d5b"
 		},
 		"Run": {
-			"action": "Rifle_Ready_Run_ActionsStyle_v001",
-			"action_sha256": "f0ce8d3a7bc14375af7e347cadd4481a587ed313c8e57dbd3a4dac793d924405",
+			"action": "Rifle_Ready_Run_ActionsStyle_v002",
+			"action_sha256": "433d33c3b73c9f5aedd0420b2ab27123521270d22373c83fedae464717d9e76b",
 			"duration": 90.0,
 			"loop": true,
 			"phase_origin": 0.962871843296135,
 			"phase_rate": 1.6,
 			"row_floats": 134.0,
 			"samples": 24193.0,
-			"source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_actionsstyle_v001/rifle_ready_locomotion_actionsstyle_v001.blend",
-			"source_sha256": "79176f5ad3a3695c5af3d62d6fd4c28b270c6d551548ffdfe8812fb64bca2385"
+			"source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/walk_matched_shoulders/run_walk_matched_shoulders.blend",
+			"source_sha256": "8a0d6e6a71811378582d9ce9b2d806320831ac1193a161f789283a2e814ac735"
 		},
 		"Walk": {
-			"action": "Rifle_Ready_Walk_ActionsStyle_v001",
-			"action_sha256": "8fa03dae5480184928e98c7bcaa7dbfe283b467a37ff882360fe68ddd6dc5ec9",
+			"action": "Rifle_Ready_Walk_ActionsStyle_v0012",
+			"action_sha256": "e5592898f9ddb8c4b1f010107c288b19cf6c64131bfef88631f6e7a127c71bb6",
 			"duration": 7.2,
 			"loop": true,
 			"phase_origin": 0.939743627575226,
 			"phase_rate": 1.25,
 			"row_floats": 134.0,
 			"samples": 1891.0,
-			"source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_actionsstyle_v001/rifle_ready_locomotion_actionsstyle_v001.blend",
-			"source_sha256": "79176f5ad3a3695c5af3d62d6fd4c28b270c6d551548ffdfe8812fb64bca2385"
+			"source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/rifle_ready_locomotion_sway_v002.blend",
+			"source_sha256": "f554501f3ad0a839bf7068bcbd09f26b80f2dc19813488bdb7bf214784b5693e"
 		}
 	},
 	"forearm_left_rest": [
 		[
 			1.0,
 			0.0,
-			-0.000000000000014210854715202,
+			-0.00000000000001421,
 			0.0
 		],
 		[
@@ -92,7 +92,7 @@
 			0.337499976158142
 		],
 		[
-			0.000000000000014210854715202,
+			0.00000000000001421,
 			0.0,
 			1.0,
 			0.0
@@ -123,21 +123,21 @@
 	"weapon_mount": [
 		[
 			1.0,
-			0.0000000223517400144146,
-			-0.0000000298023223876953,
-			0.0000000216532498598099
+			0.00000002235174001,
+			-0.00000002980232238,
+			0.00000002165324985
 		],
 		[
-			-0.0000000298023223876953,
-			-0.0000000362608076898141,
+			-0.00000002980232238,
+			-0.00000003626080768,
 			-1.0,
-			0.0000000300351530313492
+			0.00000003003515303
 		],
 		[
-			0.00000000745058059692383,
+			0.00000000745058059,
 			1.0,
-			-0.0000000511619688836618,
-			0.0000000538420863449574
+			-0.00000005116196888,
+			0.00000005384208634
 		],
 		[
 			0.0,

@@ -3,8 +3,12 @@ func _initialize() -> void:call_deferred("build")
 func build() -> void:
  var args:=OS.get_cmdline_user_args();var stage:=args[0]
  var profile: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(stage+"/profile.json"))
- var library:=AnimationLibrary.new()
+ var library: AnimationLibrary=load("res://scenes/dev/actions_stuff_research/rifle_ready_v001/approved_library.res").duplicate(true)
+ var original_profile: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://scenes/dev/actions_stuff_research/rifle_ready_v001/profile.json"))
+ assert(profile.clips.Idle.action_sha256==original_profile.clips.Idle.action_sha256,"This locomotion update must preserve the accepted Idle")
+ assert(profile.bones==original_profile.bones)
  for kind: String in profile.clips:
+  if kind=="Idle":continue # Preserve the accepted Idle resource byte-for-byte in memory.
   var info: Dictionary=profile.clips[kind];var file:=FileAccess.open(stage+"/"+info.raw_file,FileAccess.READ)
   var data:=file.get_buffer(file.get_length()).to_float32_array();assert(data.size()==int(info.samples)*int(info.row_floats))
   var clip:=Animation.new();clip.resource_name=info.action;clip.length=float(info.duration);clip.loop_mode=Animation.LOOP_LINEAR
@@ -21,10 +25,12 @@ func build() -> void:
   for i in int(info.samples):
    var start:=i*int(info.row_floats);var t:=float(info.duration) if i==int(info.samples)-1 else float(data[start]);var p: int=start+1+profile.bones.size()*10
    clip.track_insert_key(support,t,Vector3(data[p],data[p+1],data[p+2]))
-  library.add_animation(kind,clip)
- var dest:="res://scenes/dev/actions_stuff_research/rifle_ready_v001/"
+  library.remove_animation(kind);library.add_animation(kind,clip)
+ var dest:=args[1].trim_suffix("/")+"/" if args.size()>1 else "res://scenes/dev/actions_stuff_research/rifle_ready_v001/"
+ DirAccess.make_dir_recursive_absolute(dest)
  assert(ResourceSaver.save(library,dest+"approved_library.res",ResourceSaver.FLAG_COMPRESS)==OK)
- var portable:=profile.duplicate(true)
+ var portable:=original_profile.duplicate(true)
+ for kind in ["Walk","Run"]:portable.clips[kind]=profile.clips[kind].duplicate(true)
  for kind in portable.clips:portable.clips[kind].erase("raw_file")
  FileAccess.open(dest+"profile.json",FileAccess.WRITE).store_string(JSON.stringify(portable,"\t"))
  print("APPROVED_RIFLE_LIBRARY ",library.get_animation_list());quit()

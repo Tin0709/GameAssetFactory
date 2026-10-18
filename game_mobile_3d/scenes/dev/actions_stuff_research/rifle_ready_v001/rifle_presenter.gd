@@ -7,8 +7,9 @@ func setup(body: CharacterBody3D,source_visual: Node) -> void:
   weapon_meshes.append(instance);weapon_locals.append(source_visual.rifle_model.global_transform.affine_inverse()*instance.global_transform)
  super.setup(body,source_visual)
 func capture() -> void:
- super.capture();current["rifle_support"]=visual.rifle_support_anchor
+ super.capture();current["rifle_support"]=visual.rifle_support_anchor;current["rifle_move_weight"]=visual.rifle_move_weight
  if not previous.has("rifle_support"):previous["rifle_support"]=visual.rifle_support_anchor
+ if not previous.has("rifle_move_weight"):previous["rifle_move_weight"]=visual.rifle_move_weight
 func prepare(alpha: float) -> void:
  super.prepare(alpha)
  if display_world.is_empty() or visual==null:return
@@ -20,7 +21,7 @@ func prepare(alpha: float) -> void:
  display_world[visual.carrier_bone]=carrier;display_world[visual.socket_bone]=carrier
  var anchor:=Vector3(previous.rifle_support).lerp(current.rifle_support,render_alpha)
  var chest_world: Transform3D=display_world[visual.chest]
- var left: Transform3D=visual.constrained_left_pose(chest_world.affine_inverse()*Transform3D(display_world[visual.arm_left]),chest_world.affine_inverse()*(carrier*anchor))
+ var left: Transform3D=visual.constrained_left_pose(chest_world.affine_inverse()*Transform3D(display_world[visual.arm_left]),chest_world.affine_inverse()*(carrier*anchor),lerpf(previous.rifle_move_weight,current.rifle_move_weight,render_alpha))
  display_world[visual.arm_left]=chest_world*left
  display_world[visual.forearm_left]=Transform3D(display_world[visual.arm_left])*visual.forearm_left_rest
 func _upload() -> void:

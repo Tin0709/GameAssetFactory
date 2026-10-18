@@ -1,0 +1,12 @@
+{
+  "description": "Accepted Rifle Ready v001 gameplay set before user-approved sway / Walking-matched shoulders integration. Restore together only if requested. Research-only.",
+  "sha256": {
+    "approved_library.res": "860319fc20ed6a4777b49942c3508e70fff286f88ddb36060728fbbe2de3b24a",
+    "profile.json": "0b7f3594f30e29efd6f7c6c0f7de91f24522f7f53625856923096c90caa182b5",
+    "rifle_visual.gd": "3fe993186815b909796179e85b44dec675538a5912e75b2986a746f63d87354a",
+    "rifle_presenter.gd": "ccd83d3f524b0e36e613c1c8c4f01cd336c45d2fafe34afa06b695e4d53b0cdc",
+    "export_approved.py": "1bd8e96f843623bee0182b04c9525a01d4e9d616a4449ff8f1df4f2eac71051a",
+    "build_library.gd": "98bd2f22e765debe79697dfb0675311bda9a13faff5b73f72e7b767cbbbaed1f",
+    "README.md": "507065b3d00778e2662d5c741fdd2da24bd7008f74c95f584a9c5c00c1df5fb9"
+  }
+}

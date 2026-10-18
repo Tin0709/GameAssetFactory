@@ -118,9 +118,12 @@ func _support(side: int) -> bool:
 func _apply_weapon_carry() -> void:
  pass # The full approved arm/Carrier pose is already in the sole pose writer.
 
-func constrained_left_pose(arm_pose: Transform3D,target: Vector3) -> Transform3D:
+func constrained_left_pose(arm_pose: Transform3D,target: Vector3,move_weight: float=-1.) -> Transform3D:
  var current:=arm_pose.basis*palm_arm_local
- var desired:=target-left_socket_local
+ # Keep the approved moving shoulder placement; retain the accepted Idle solve.
+ if move_weight<0.:move_weight=rifle_move_weight
+ var shoulder:=left_socket_local.lerp(arm_pose.origin,clampf(move_weight,0.,1.))
+ var desired:=target-shoulder
  var swing:=Quaternion(current.normalized(),desired.normalized())
  var basis:=Basis(swing)*arm_pose.basis
  return Transform3D(basis,target-basis*palm_arm_local)
