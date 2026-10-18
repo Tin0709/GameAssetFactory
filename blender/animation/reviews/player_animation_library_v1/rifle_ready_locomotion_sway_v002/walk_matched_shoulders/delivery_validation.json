@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "same_pending_run": "Rifle_Ready_Run_ActionsStyle_v002",
+  "source": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/walk_matched_shoulders/run_walk_matched_shoulders.blend",
+  "action_sha256": "433d33c3b73c9f5aedd0420b2ab27123521270d22373c83fedae464717d9e76b",
+  "correct_new_source_verified_after_reopen": true,
+  "walk_reference_unchanged": true,
+  "all_other_actions_exact": 86,
+  "native_assets_unchanged": true,
+  "protected_old_research_and_godot_files_exact": 1997,
+  "review_movies": 5,
+  "decoded_frames": 720,
+  "geometry_poses": 5401,
+  "loop_error": 0,
+  "walking_shoulder_target_max_error_m": {
+    "L": 0.001892194073900818,
+    "R": 3.7814907850174666e-07
+  },
+  "native_playback": {
+    "wraps": 1,
+    "gait_cycles_observed": 2.7733333333333334
+  },
+  "lfs": [
+    {
+      "file": "blender/animation/showcase/Animation_Showcase.blend",
+      "bytes": 84903635,
+      "lfs": true,
+      "index_pointer_matches_file": true
+    },
+    {
+      "file": "blender/animation/reviews/player_animation_library_v1/rifle_ready_locomotion_sway_v002/walk_matched_shoulders/run_walk_matched_shoulders.blend",
+      "bytes": 84902362,
+      "lfs": true,
+      "index_pointer_matches_file": true
+    }
+  ],
+  "no_godot_integration": true
+}
