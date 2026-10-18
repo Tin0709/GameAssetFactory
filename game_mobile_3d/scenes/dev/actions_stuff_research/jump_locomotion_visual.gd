@@ -54,6 +54,9 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
 		# Only source gait phase is shared, never airborne/profile flags or Y history.
 		# In particular, retain source sprint exits' .05/.55 phase overrides.
 		for key in PHASE_KEYS:direction_controller.env[key]=jump_snapshot.vars[key]
+	elif not is_equal_approx(locomotion_playback_rate,1.):
+		# Seed takeoff from the retimed ground gait without speeding jump layers.
+		for key in PHASE_KEYS:jump_runtime.env[key]=direction_snapshot.vars[key]
 	if jump_active:
 		jump_sampler.set_snapshot(jump_snapshot)
 		jump_future_sampler.set_snapshot(jump_sampler.future_snapshot(jump_snapshot,.004))
