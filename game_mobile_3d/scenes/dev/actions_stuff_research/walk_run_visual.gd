@@ -13,7 +13,8 @@ const RUN_PERIOD:=.625
 const WALK_RECEIVE:=.22
 const RUN_RECEIVE:=.44
 const SOLE_POINTS: Array[Vector3]=[Vector3(-.1125,.675,-.1125),Vector3(-.1125,.675,.1125),Vector3(.1125,.675,-.1125),Vector3(.1125,.675,.1125)]
-var travel_speed_scale:=1. # Scene-local travel tuning; source cadence remains unchanged.
+var travel_speed_scale:=1. # Scene-local travel calibration.
+var locomotion_playback_rate:=1. # Gameplay-only retiming; source clips remain immutable.
 var active_walk_action:="Walk_ActionsStuff_Source_Test_v001"
 var active_run_action:="Run_ActionsStuff_Source_Test_v001"
 var gameplay_walk_version: String
@@ -128,6 +129,7 @@ func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> v
 	for i in count:
 		_virtual_query_position+=direction*query_speed*step
 		direction_snapshot=direction_controller.step({"position":_virtual_query_position,"movement_direction":direction,"head_y_rotation":wrapf(-rad_to_deg(look_yaw),-180.,180.),"body_y_rotation":-rad_to_deg(look_yaw),"yaw_speed":yaw_rate,"target_x_rotation":0.},step)
+		_retime_locomotion_phase(step)
 	entity_lifetime=direction_snapshot.life
 	gait_phase=fposmod(direction_snapshot.phase,1.);gait_frequency=direction_snapshot.cadence;gait_run_weight=direction_snapshot.run_weight
 	var body_yaw: float=-deg_to_rad(direction_snapshot.vars["v.nthjcy"])
@@ -140,6 +142,17 @@ func drive_locomotion(world_velocity: Vector3,requested: bool,delta: float) -> v
 	elif not move_requested:attention_time=fposmod(attention_time+delta,8.)
 	reference_phase=gait_phase;reference_sprint_weight=gait_run_weight
 	support_left=_support(0);support_right=_support(1)
+
+func _retime_locomotion_phase(step: float) -> void:
+	if is_equal_approx(locomotion_playback_rate,1.):return
+	# Retiming the common cursor preserves every baked pose and relative hand/
+	# rifle sway channel. Input filters, lifetime, Idle and jump keep real time.
+	var phase: float=direction_snapshot.phase+step*float(direction_snapshot.cadence)*(locomotion_playback_rate-1.)
+	var phase01:=fposmod(phase,1.)
+	direction_controller.env["v.eqhdel"]=phase;direction_controller.env["v.ifcvde"]=phase01
+	direction_snapshot.phase=phase;direction_snapshot.phase01=phase01
+	direction_snapshot.vars["v.eqhdel"]=phase;direction_snapshot.vars["v.ifcvde"]=phase01
+	direction_snapshot.cadence*=locomotion_playback_rate
 
 func _cache_direction_poses() -> void:
 	direction_sampler.set_snapshot(direction_snapshot)
