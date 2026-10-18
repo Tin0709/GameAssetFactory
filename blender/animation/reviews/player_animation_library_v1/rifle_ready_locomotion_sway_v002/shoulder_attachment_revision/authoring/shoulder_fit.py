@@ -3,11 +3,11 @@
 The complete holding assembly shifts toward the chest and slightly upward.
 The support arm rolls as one rigid block chain about its palm/shoulder axis;
 its palm path and the inherited living support motion stay unchanged relative
- to the rifle. This is an authored rig accommodation, not literal source data.
+to the rifle. This is an authored rig accommodation, not literal source data.
 """
 import math
 from mathutils import Matrix,Vector
-SETTINGS={'toward_torso_m':.030,'up_m':.010,'left_whole_arm_roll_deg':20.}
+SETTINGS={'toward_torso_m':.010,'up_m':.006,'left_whole_arm_roll_deg':15.}
 HOLD=['UpperArm.R','ForeArm.R','WeaponCarrier','UpperArm.L','ForeArm.L']
 def apply(source,palm):
  M={n:m.copy() for n,m in source.items()}

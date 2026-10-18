@@ -37,7 +37,7 @@ for n,h in before.items():
  if n!=N:assert ui.action_signature(bpy.data.actions[n])==h,n
 entry=next(e for e in json.loads((S/'before/animation_manifest.json').read_text())['animations'] if e['action']==N);entry=dict(entry)
 entry.update(source=(O/'run_shoulders.blend').relative_to(R).as_posix(),action_sha256=ui.action_signature(a),shoulder_attachment=SETTINGS,
- refinement_note='2026-10-18 same Pending Run v002: seat BOTH shoulders closer using30mm torso-ward/10mm up rigid holding offset.20deg axial roll of the whole straight left arm clears the square head, without moving its support palm. Chest-led sway, body/head/legs/cadence and right grip unchanged. Previous v002 source remains intact in parent study file.',
+ refinement_note='2026-10-18 same Pending Run v002: seat BOTH shoulders closer using10mm torso-ward/6mm up rigid holding offset.15deg axial roll of the whole straight left arm clears the square head, without moving its support palm. Chest-led sway, body/head/legs/cadence and right grip unchanged. Previous v002 source remains intact in parent study file.',
  previous_pending_source=entry['source'],previous_pending_action_sha256=before[N])
 entry.pop('source_sha256',None);ui.validate_action(a,entry,r)
 s.frame_start=1;s.frame_end=2700;s.render.fps=30;s.render.fps_base=1.;s.frame_set(1);s.camera=bpy.data.objects['Showcase_THREE_QUARTER'];ui.show_preview_prop(s,{'preview_prop':'rifle_stylized_v2'})
