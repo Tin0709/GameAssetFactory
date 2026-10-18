@@ -14,6 +14,8 @@ func tick(count: int) -> void:
 func run() -> void:
 	var lab = LAB.instantiate()
 	root.add_child(lab)
+	lab.corpse_lifetime = 35.0
+	lab.active_physics_duration = 35.0
 	await tick(2)
 	check(lab.actor.ragdoll.bodies.size() == 7, "Seven physical bodies")
 	for state in ["Idle", "Walk", "Attack"]:
@@ -73,7 +75,7 @@ func run() -> void:
 	check(lab.zombies.size() == 4, "Four actor stress cap")
 	for zombie in lab.zombies: check(zombie.dead, "Stress actor died")
 	lab.corpse_lifetime = 0.1
-	await tick(5)
+	await tick(12)
 	check(lab.zombies.is_empty(), "Corpse cleanup removes bodies safely")
 	lab.reset_zombie()
 	await tick(2)

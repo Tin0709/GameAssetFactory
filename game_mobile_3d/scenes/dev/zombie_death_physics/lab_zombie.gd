@@ -19,6 +19,12 @@ var visible_pose: Array[Transform3D] = []
 var visible_physics_samples := 0
 var maximum_skin_position_error := 0.0
 var maximum_skin_angle_error := 0.0
+var corpse_parked := false
+var first_contact_age := -1.0
+var stable_contact_time := 0.0
+var fade_started := -1.0
+var corpse_center := Vector3.ZERO
+var fade_materials: Array[BaseMaterial3D] = []
 
 func _ready() -> void:
 	spawn_position = position
@@ -41,12 +47,70 @@ func _ready() -> void:
 	set_state(state)
 	ragdoll.sample(1.0 / 60.0)
 
+func reset_for_reuse(at: Vector3) -> void:
+	# The visual is pooled, never a live native physics graph or stale solver state.
+	if is_instance_valid(ragdoll):
+		ragdoll.release()
+		ragdoll.free()
+	transform = Transform3D(Basis.IDENTITY,at)
+	spawn_position = at
+	model.transform = Transform3D.IDENTITY
+	dead = false
+	age = 0.0
+	elapsed = 0.0
+	death_result = false
+	corpse_parked = false
+	first_contact_age = -1.0
+	stable_contact_time = 0.0
+	fade_started = -1.0
+	corpse_center = at + Vector3(0,.8,0)
+	queued_death.clear()
+	model_offset_at_handoff = Vector3.ZERO
+	visible_pose.clear()
+	visible_physics_samples = 0
+	maximum_skin_position_error = 0.0
+	maximum_skin_angle_error = 0.0
+	for mesh in model.find_children("*","MeshInstance3D",true,false):
+		for i in mesh.mesh.get_surface_count(): mesh.set_surface_override_material(i,null)
+	fade_materials.clear()
+	skeleton.reset_bone_poses()
+	ragdoll = RAGDOLL.new()
+	add_child(ragdoll)
+	ragdoll.setup(skeleton)
+	set_physics_process(true)
+	process_mode = Node.PROCESS_MODE_PAUSABLE
+	visible = true
+	set_state(state)
+
+func fade_out(fraction: float) -> void:
+	if fade_materials.is_empty():
+		# GeometryInstance transparency is ignored by Mobile. Use temporary local
+		# alpha-hash materials for the brief optional fade; original materials survive.
+		for mesh in model.find_children("*","MeshInstance3D",true,false):
+			for i in mesh.mesh.get_surface_count():
+				var original: BaseMaterial3D = mesh.mesh.surface_get_material(i)
+				if not original: continue
+				var material: BaseMaterial3D = original.duplicate()
+				material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_HASH
+				mesh.set_surface_override_material(i,material)
+				fade_materials.append(material)
+	for material in fade_materials: material.albedo_color.a = 1.0-clampf(fraction,0,1)
+
+func retire() -> void:
+	player.pause()
+	ragdoll.release()
+	set_physics_process(false)
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+	queued_death.clear()
+
 func set_state(value: String) -> void:
 	if dead: return
 	state = value
 	elapsed = 0.0
 	model.position = Vector3.ZERO
 	player.play("Zombie_Walk" if state == "Walk" else "Zombie_Idle", 0.0)
+	player.seek(0.0,true) # Reset/reuse only; never rewind during death handoff.
 	player.advance(0.0)
 	# Clear the history when a clip/offset changes: no synthetic transition velocity.
 	ragdoll.sample_count = 0

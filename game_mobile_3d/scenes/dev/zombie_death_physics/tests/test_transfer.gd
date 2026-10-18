@@ -8,6 +8,8 @@ func check(ok: bool, message: String) -> void:
 func run() -> void:
 	var lab = load("res://scenes/dev/ZombieDeathPhysicsLab.tscn").instantiate()
 	root.add_child(lab)
+	lab.corpse_lifetime = 35.0
+	lab.active_physics_duration = 35.0
 	var actor = lab.actor
 	actor.set_physics_process(false)
 	actor.player.pause()
@@ -53,7 +55,7 @@ func run() -> void:
 		actor.ragdoll.begin(profile, Vector3.FORWARD, "Right shoulder", 1.5, 9.8)
 		var sum := Vector3.ZERO
 		for impulse in actor.ragdoll.impact_distribution.values(): sum += impulse
-		check(sum.distance_to(Vector3(0,10,-86)) < 0.0001, "Pellet total momentum conserved")
+		check(sum.distance_to(Vector3(0,profile.upward_impulse,-profile.linear_impulse)) < 0.001, "Pellet total momentum conserved")
 		distributions.append(actor.ragdoll.impact_distribution.duplicate())
 	check(distributions[0] != distributions[2], "Spread changes which physical parts receive impulse")
 	print("TRANSFER_TESTS ", JSON.stringify({"failures": failures, "shotgun_distributions": distributions}))

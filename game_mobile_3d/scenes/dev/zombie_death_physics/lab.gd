@@ -5,10 +5,16 @@ const ZOMBIE = preload("res://scenes/dev/zombie_death_physics/lab_zombie.gd")
 @export var rifle_profile: Resource = preload("res://scenes/dev/zombie_death_physics/presets/rifle.tres")
 @export var shotgun_profile: Resource = preload("res://scenes/dev/zombie_death_physics/presets/shotgun.tres")
 @export_range(1, 8, 1) var maximum_active_ragdolls := 4
-@export_range(5, 120, 1) var corpse_lifetime := 35.0
+@export_range(0.2, 35, 0.05) var corpse_lifetime := 1.2
+@export_range(0.1, 35, 0.05) var active_physics_duration := 1.2
+@export_range(0.0, 2, 0.05) var airborne_extension := 0.6
+@export_range(0.0, 0.4, 0.01) var landing_grace := 0.12
+@export_range(0.0, 0.15, 0.01) var fade_duration := 0.08
+@export var pool_corpses := true
+var corpse_pool: Array[Node3D] = []
 @export_range(1, 25, 0.1) var ragdoll_gravity := 9.8
 @export_enum("60 Hz:60", "120 Hz:120") var simulation_hz := 120
-@export_range(8, 32, 8) var solver_iterations := 16
+@export_range(8, 32, 8) var solver_iterations := 32
 var actor: Node3D
 var zombies: Array[Node3D] = []
 var animation_choice: OptionButton
@@ -52,6 +58,8 @@ func _ready() -> void:
 	_update_camera()
 
 func _exit_tree() -> void:
+	for zombie in corpse_pool: zombie.free()
+	corpse_pool.clear()
 	Engine.max_fps = saved_max_fps
 	Engine.physics_ticks_per_second = saved_physics_hz
 	if lab_space.is_valid():
@@ -128,16 +136,16 @@ func _build_ui() -> void:
 	box.add_theme_constant_override("separation", 7)
 	scroll.add_child(box)
 	_label(box, "ZOMBIE / DEATH PHYSICS", 21)
-	_label(box, "PHASE 1 · EXPERIMENTAL · VISUAL REVIEW", 11)
+	_label(box, "V002 · IMPACT + SHORT LIFETIME", 11)
 	var note := _label(box, "Original rig + original runtime clips\n7 bodies / 6 limited joints · rigid limbs", 13)
 	note.modulate = Color("acc4d7")
 	animation_choice = _choice(box, "Starting animation (resets zombie)", ["Idle", "Walk", "Attack"])
 	animation_choice.item_selected.connect(func(_id): reset_zombie())
 	weapon_choice = _choice(box, "Death profile", ["Pistol — Light", "Rifle — Medium", "Shotgun — Heavy / rotational"])
 	weapon_choice.item_selected.connect(_load_profile)
-	_number(box, "linear", "Linear impulse · N s", 0, 150, 0.5, 14)
+	_number(box, "linear", "Linear impulse · N s", 0, 900, 1, 180)
 	_number(box, "angular", "Extra torque · N m s", 0, 20, 0.1, 0.7)
-	_number(box, "up", "Upward impulse · N s", 0, 60, 0.5, 0)
+	_number(box, "up", "Upward impulse · N s", 0, 360, 1, 108)
 	_number(box, "distance", "Shot distance · m", 0.5, 20, 0.1, 1.5)
 	hit_choice = _choice(box, "Hit location", ["Chest", "Right shoulder", "Left shoulder", "Head", "Hip"])
 	hit_choice.select(1)
@@ -168,8 +176,27 @@ func _build_ui() -> void:
 	_number(box, "limits", "Angular limit multiplier", 0.2, 2, 0.05, 0.85)
 	_number(box, "linear_damp", "Linear damping · 1/s", 0, 5, 0.05, 0.25)
 	_number(box, "angular_damp", "Angular damping · 1/s", 0, 8, 0.05, 0.9)
-	var passive := _label(box, "Passive 6DOF joints; no stiffness motor.\nLimits rebase to the captured death pose.", 12)
+	_number(box, "resistance", "Joint resistance", 0, 2.5, 0.05, 1.0)
+	_number(box, "transport", "Whole-body force share", 0, 0.98, 0.01, 0.9)
+	var passive := _label(box, "Resistance calms limb flailing for 2 s.\nLower limits keep the body connected.", 12)
 	passive.modulate = Color("acc4d7")
+	_label(box, "Corpse cleanup (simulation seconds)", 17)
+	_number(box,"lifetime","Total death lifetime · s",.2,35,.05,corpse_lifetime).value_changed.connect(func(v): corpse_lifetime=v)
+	_number(box,"physics_time","Active physics target · s",.1,35,.05,active_physics_duration).value_changed.connect(func(v): active_physics_duration=v)
+	_number(box,"air_extension","Air / landing extension · s",0,2,.05,airborne_extension).value_changed.connect(func(v): airborne_extension=v)
+	_number(box,"landing_grace","Landing grace · s",0,.4,.01,landing_grace).value_changed.connect(func(v): landing_grace=v)
+	_number(box,"fade","Fade within lifetime · s",0,.15,.01,fade_duration).value_changed.connect(func(v): fade_duration=v)
+	var recycle := CheckButton.new()
+	recycle.text = "Pool visual models (physics rebuilt)"
+	recycle.button_pressed = pool_corpses
+	box.add_child(recycle)
+	recycle.toggled.connect(func(v):
+		pool_corpses=v
+		if not v:
+			for z in corpse_pool: z.queue_free()
+			corpse_pool.clear())
+	var lifetime_note := _label(box,"Physics target is soft while falling/moving.\nOnly a grounded, settled pose may be parked.\nExtension is bounded; no midair freeze.",12)
+	lifetime_note.modulate = Color("acc4d7")
 	_label(box, "Inspection camera", 17)
 	var views := HBoxContainer.new()
 	box.add_child(views)
@@ -193,7 +220,7 @@ func _build_ui() -> void:
 
 func _load_profile(index: int) -> void:
 	var p: Resource = profiles[index]
-	for pair in [["linear", "linear_impulse"], ["angular", "angular_impulse"], ["up", "upward_impulse"], ["limits", "limit_scale"], ["linear_damp", "linear_damping"], ["angular_damp", "angular_damping"]]:
+	for pair in [["linear", "linear_impulse"], ["angular", "angular_impulse"], ["up", "upward_impulse"], ["limits", "limit_scale"], ["linear_damp", "linear_damping"], ["angular_damp", "angular_damping"], ["resistance", "joint_resistance"], ["transport", "transport_fraction"]]:
 		controls[pair[0]].value = p.get(pair[1])
 
 func trial_profile() -> Resource:
@@ -204,26 +231,41 @@ func trial_profile() -> Resource:
 	p.limit_scale = controls.limits.value
 	p.linear_damping = controls.linear_damp.value
 	p.angular_damping = controls.angular_damp.value
+	p.joint_resistance = controls.resistance.value
+	p.transport_fraction = controls.transport.value
 	return p
 
 func _spawn(at: Vector3) -> Node3D:
-	var zombie := Node3D.new()
-	zombie.set_script(ZOMBIE)
+	var zombie: Node3D
+	if pool_corpses and not corpse_pool.is_empty():
+		zombie = corpse_pool.pop_back()
+		zombie.reset_for_reuse(at)
+	else:
+		zombie = Node3D.new()
+		zombie.set_script(ZOMBIE)
+		zombie.position = at
+		zombie.process_mode = Node.PROCESS_MODE_PAUSABLE
+		add_child(zombie)
 	zombie.name = "LabZombie_%d" % zombies.size()
-	zombie.position = at
-	zombie.process_mode = Node.PROCESS_MODE_PAUSABLE
-	add_child(zombie)
 	zombie.walk_speed = controls.walk.value
 	zombie.set_state(animation_choice.get_item_text(animation_choice.selected))
 	zombies.append(zombie)
 	return zombie
 
+func _retire(zombie: Node3D) -> void:
+	zombie.retire()
+	if pool_corpses and corpse_pool.size() < maximum_active_ragdolls:
+		corpse_pool.append(zombie)
+	else:
+		remove_child(zombie)
+		zombie.queue_free()
+
 func _clear() -> void:
 	for zombie in zombies:
 		if is_instance_valid(zombie):
-			remove_child(zombie)
-			zombie.queue_free()
+			_retire(zombie)
 	zombies.clear()
+	while corpse_pool.size()>maximum_active_ragdolls: corpse_pool.pop_back().queue_free()
 	actor = null
 	stress_queued = false
 	physics_samples.clear()
@@ -244,7 +286,7 @@ func direction() -> Vector3:
 func trigger_death() -> void:
 	var count := 0
 	for zombie in zombies:
-		if zombie.dead: count += 1
+		if zombie.dead and zombie.ragdoll.running: count += 1
 	for zombie in zombies:
 		if zombie.dead: continue
 		if count >= maximum_active_ragdolls: break
@@ -285,12 +327,12 @@ func _process(delta: float) -> void:
 		var has_corpse := false
 		for zombie in zombies:
 			if zombie.dead:
-				center += zombie.ragdoll.bodies.Chest.global_position
+				center += zombie.corpse_center if zombie.corpse_parked else zombie.ragdoll.bodies.Chest.global_position
 				has_corpse = true
 			else: center += zombie.global_position + Vector3(0,0.8,0)
 		center /= zombies.size()
-		center.y = 0.55 if has_corpse else 0.8
-		camera_target = camera_target.lerp(center, 1.0 - exp(-3.5 * delta))
+		center.y = maxf(0.55, center.y) if has_corpse else 0.8
+		camera_target = camera_target.lerp(center, 1.0 - exp(-(14.0 if has_corpse else 3.5) * delta))
 	_update_camera()
 	if get_tree().paused: return
 	if stress_queued and is_instance_valid(actor) and actor.elapsed >= 0.5:
@@ -298,14 +340,38 @@ func _process(delta: float) -> void:
 		trigger_death()
 	var remove_list: Array[Node3D] = []
 	for zombie in zombies:
-		if zombie.dead and (zombie.age > corpse_lifetime or zombie.ragdoll.bodies.Hips.global_position.y < -15):
+		if not zombie.dead: continue
+		if not zombie.corpse_parked:
+			zombie.corpse_center = zombie.ragdoll.bodies.Chest.global_position
+			var motion: Dictionary = zombie.ragdoll.contact_motion()
+			if motion.contacts > 0:
+				if zombie.first_contact_age < 0: zombie.first_contact_age = zombie.age
+			else: zombie.first_contact_age = -1.0
+			if motion.contacts >= 2 and motion.linear < .55 and motion.angular < 1.3:
+				zombie.stable_contact_time += delta
+			else: zombie.stable_contact_time = 0.0
+			if zombie.age >= active_physics_duration and zombie.stable_contact_time >= .1:
+				zombie.ragdoll.release(zombie.visible_pose)
+				zombie.corpse_parked = true
+		if zombie.corpse_center.y < -15:
 			remove_list.append(zombie)
+			continue
+		var fade := minf(fade_duration,corpse_lifetime)
+		var base_end := corpse_lifetime
+		var hard_end := base_end + airborne_extension
+		var landing_seen: bool = zombie.first_contact_age >= 0 and zombie.age-zombie.first_contact_age >= landing_grace
+		# Landing protection may extend the nominal deadline, never indefinitely.
+		if zombie.fade_started < 0 and zombie.age >= base_end-fade and (landing_seen or zombie.age >= hard_end-fade):
+			zombie.fade_started = zombie.age
+		if zombie.fade_started >= 0:
+			var progress: float = (zombie.age-zombie.fade_started)/maxf(.0001,fade)
+			if fade > 0: zombie.fade_out(progress)
+			if progress >= 1.0 or fade == 0: remove_list.append(zombie)
 	for zombie in remove_list:
 		zombies.erase(zombie)
 		if zombie == actor: actor = null
-		remove_child(zombie)
-		zombie.queue_free()
-		status.text = "Corpse lifetime/bounds cleanup. Press Reset to respawn."
+		_retire(zombie)
+		status.text = "Corpse cleaned: physics/joints removed. Press R to respawn."
 	if Time.get_ticks_msec() < monitor_warmup_until: return
 	monitor_elapsed += delta
 	if monitor_elapsed < 0.25: return
@@ -317,17 +383,23 @@ func _process(delta: float) -> void:
 	var alive := 0
 	var dead := 0
 	var sleeping := 0
+	var active := 0
+	var parked := 0
 	var anchors := 0.0
 	for zombie in zombies:
 		if not zombie.dead:
 			alive += 1
 			continue
 		dead += 1
+		if zombie.corpse_parked:
+			parked += 1
+			continue
+		active += 1
 		anchors = maxf(anchors, zombie.ragdoll.max_anchor_error())
 		for body in zombie.ragdoll.bodies.values():
 			var direct := PhysicsServer3D.body_get_direct_state(body.get_rid())
 			if direct and direct.sleeping: sleeping += 1
-	telemetry.text = "Alive %d · Corpses %d / %d\nBodies %d · Joints %d · Sleeping bodies %d\nPhysics monitor %.3f ms · peak %.3f ms\nJoint anchor error %.1f mm\nGodot %s · %d Hz\nDesktop observation ≠ mobile validation\nAuto cleanup after %.0f s (no midair freeze)" % [alive, dead, maximum_active_ragdolls, dead * 7, dead * 6, sleeping, ms, measured_peak, anchors * 1000, Engine.get_version_info().string, Engine.physics_ticks_per_second, corpse_lifetime]
+	telemetry.text = "Alive %d · Active %d / %d · Parked %d\nBodies %d · Joints %d · Sleeping bodies %d\nPooled visuals %d (zero physics)\nPhysics monitor %.3f ms · peak %.3f ms\nJoint anchor error %.1f mm\nGodot %s · %d Hz\nDesktop observation ≠ mobile validation\nLifetime %.2f s + up to %.2f s landing grace" % [alive, active, maximum_active_ragdolls, parked, active*7, active*6, sleeping, corpse_pool.size(), ms, measured_peak, anchors*1000, Engine.get_version_info().string, Engine.physics_ticks_per_second,corpse_lifetime,airborne_extension]
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

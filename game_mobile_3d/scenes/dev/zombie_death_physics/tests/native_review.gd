@@ -60,10 +60,10 @@ func run() -> void:
 		else:
 			lab.maximum_active_ragdolls = count
 			lab.stress_test()
-		await seconds(0.9)
+		await seconds(0.62)
 		var values: Array[float] = []
 		var fps: Array[float] = []
-		var until := Time.get_ticks_msec() + 2400
+		var until := Time.get_ticks_msec() + 700
 		while Time.get_ticks_msec() < until:
 			await process_frame
 			values.append(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0)
@@ -73,8 +73,13 @@ func run() -> void:
 		var mean := 0.0
 		for value in values: mean += value
 		mean /= values.size()
-		results.append({"ragdolls": count, "bodies": count * 7, "joints": count * 6, "monitor_samples": values.size(), "physics_monitor_mean_ms": mean, "physics_monitor_p95_ms": values[int(values.size()*.95)], "physics_monitor_max_ms": values.back(), "display_fps_median": fps[fps.size()/2]})
+		results.append({"ragdolls": count, "bodies": count * 7, "joints": count * 6, "window": "0.12–0.82 s after hit (active)" if count>0 else "living baseline", "monitor_samples": values.size(), "physics_monitor_mean_ms": mean, "physics_monitor_p95_ms": values[int(values.size()*.95)], "physics_monitor_max_ms": values.back(), "display_fps_median": fps[fps.size()/2]})
 		if count == 8: await capture("lab_stress8.png")
+		if count>0:
+			await seconds(1.4)
+			check(lab.zombies.is_empty(),"Native corpse wave cleaned by deadline")
+			for z in lab.corpse_pool: check(z.ragdoll.bodies.is_empty(),"Native pooled model contains zero bodies")
+			if count==8: await capture("lab_cleaned.png")
 	var info := {"engine": Engine.get_version_info().string, "physics_hz": Engine.physics_ticks_per_second, "display_cap": Engine.max_fps, "renderer": RenderingServer.get_video_adapter_name(), "measurements": results, "failures": failures}
 	FileAccess.open(output_directory.path_join("native_results.json"), FileAccess.WRITE).store_string(JSON.stringify(info,"  "))
 	print("NATIVE_REVIEW ", JSON.stringify(info))

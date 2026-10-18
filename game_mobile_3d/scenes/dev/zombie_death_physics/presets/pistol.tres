@@ -3,9 +3,10 @@
 [resource]
 script = ExtResource("1")
 display_name = "Pistol — Light"
-linear_impulse = 14.0
-angular_impulse = 0.7
-upward_impulse = 0.0
-limit_scale = 0.85
-linear_damping = 0.25
-angular_damping = 0.9
+linear_impulse = 180
+angular_impulse = 1.0
+upward_impulse = 108
+limit_scale = 0.9
+linear_damping = 0.08
+angular_damping = 0.5
+transport_fraction = 0.9

@@ -4,12 +4,12 @@ const PHYSICAL_PART = preload("res://scenes/dev/zombie_death_physics/physical_pa
 const PARTS := [
 	# name, Skeleton Y-up rest center, inset box, kg, bend°, twist°
 	["Hips", Vector3(0, 0.765, 0), Vector3(0.36, 0.18, 0.16), 8.0, 0.0, 0.0],
-	["Chest", Vector3(0, 1.0125, 0), Vector3(0.43, 0.655, 0.205), 22.0, 12.0, 10.0],
-	["Head", Vector3(0, 1.575, 0), Vector3(0.43, 0.43, 0.43), 8.0, 25.0, 25.0],
-	["Arm.L", Vector3(0.3375, 1.0125, 0), Vector3(0.205, 0.655, 0.205), 4.0, 70.0, 35.0],
-	["Arm.R", Vector3(-0.3375, 1.0125, 0), Vector3(0.205, 0.655, 0.205), 4.0, 70.0, 35.0],
-	["Leg.L", Vector3(0.1125, 0.3375, 0), Vector3(0.205, 0.655, 0.205), 7.0, 45.0, 25.0],
-	["Leg.R", Vector3(-0.1125, 0.3375, 0), Vector3(0.205, 0.655, 0.205), 7.0, 45.0, 25.0],
+	["Chest", Vector3(0, 1.0125, 0), Vector3(0.43, 0.655, 0.205), 22.0, 6.0, 4.0],
+	["Head", Vector3(0, 1.575, 0), Vector3(0.43, 0.43, 0.43), 8.0, 16.0, 10.0],
+	["Arm.L", Vector3(0.3375, 1.0125, 0), Vector3(0.205, 0.655, 0.205), 4.0, 40.0, 14.0],
+	["Arm.R", Vector3(-0.3375, 1.0125, 0), Vector3(0.205, 0.655, 0.205), 4.0, 40.0, 14.0],
+	["Leg.L", Vector3(0.1125, 0.3375, 0), Vector3(0.205, 0.655, 0.205), 7.0, 25.0, 10.0],
+	["Leg.R", Vector3(-0.1125, 0.3375, 0), Vector3(0.205, 0.655, 0.205), 7.0, 25.0, 10.0],
 ]
 const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "Chest", "Leg.L": "Hips", "Leg.R": "Hips"}
 @export var maximum_inherited_linear_speed := 3.0
@@ -28,8 +28,14 @@ var anchors: Dictionary = {}
 var total_applied_impulse := Vector3.ZERO
 var impact_distribution: Dictionary = {}
 var last_strength := 1.0
+var joint_rest_rotations: Dictionary = {}
+var resistance_gain := 0.0
+var resistance_age := 0.0
+# (Nm/rad, Nms/rad): soft restoring torque plus relative angular damping.
+const JOINT_RESPONSE := {"Chest": Vector2(18,5.4), "Head": Vector2(4,2.4), "Arm.L": Vector2(3,2.1), "Arm.R": Vector2(3,2.1), "Leg.L": Vector2(6,2.7), "Leg.R": Vector2(6,2.7)}
 
 func setup(target: Skeleton3D) -> void:
+	set_physics_process(false)
 	skeleton = target
 	# Reject unsupported rigs instead of quietly binding the wrong bones/scale.
 	assert(skeleton.global_basis.get_scale().is_equal_approx(Vector3.ONE), "Ragdoll requires unit-scale hierarchy")
@@ -56,10 +62,12 @@ func setup(target: Skeleton3D) -> void:
 		var collider := CollisionShape3D.new()
 		var shape := BoxShape3D.new()
 		shape.size = part[2]
+		shape.custom_solver_bias = 0.6 # Stronger contact recovery for the new fast launches.
 		collider.shape = shape
 		body.add_child(collider)
 		simulator.add_child(body)
 		PhysicsServer3D.body_set_enable_continuous_collision_detection(body.get_rid(), true)
+		PhysicsServer3D.body_set_max_contacts_reported(body.get_rid(), 4)
 		if part[0] == "Hips":
 			# Utility carrier supports the torso: use finite torso-like inertia, not a tiny hinge.
 			PhysicsServer3D.body_set_param(body.get_rid(), PhysicsServer3D.BODY_PARAM_INERTIA, Vector3(0.6, 0.4, 0.6))
@@ -118,8 +126,46 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 		var joint_world := body.global_transform * body.joint_offset
 		var parent: PhysicalBone3D = bodies[PARENTS[part[0]]]
 		anchors[part[0]] = parent.global_transform.affine_inverse() * joint_world
+		joint_rest_rotations[part[0]] = (parent.global_basis.inverse() * body.global_basis).get_rotation_quaternion()
+	resistance_gain = profile.joint_resistance
+	set_physics_process(resistance_gain > 0.0)
 	apply_impact(profile, direction, location, distance)
 	return true
+
+func _physics_process(delta: float) -> void:
+	if not running: return
+	resistance_age += delta
+	if resistance_age >= 2.0:
+		# Leave the final passive corpse free to sleep; no perpetual motor or pose writer.
+		set_physics_process(false)
+		return
+	var gain := resistance_gain * (1.0 - smoothstep(1.2,2.0,resistance_age))
+	for name in joint_rest_rotations:
+		var child: PhysicalBone3D = bodies[name]
+		var parent: PhysicalBone3D = bodies[PARENTS[name]]
+		var target: Quaternion = parent.global_basis.get_rotation_quaternion() * joint_rest_rotations[name]
+		var error := (target * child.global_basis.get_rotation_quaternion().inverse()).normalized()
+		if error.w < 0.0: error = -error
+		var imaginary := Vector3(error.x,error.y,error.z)
+		var angle := imaginary.normalized() * (2.0 * atan2(imaginary.length(),error.w))
+		var response: Vector2 = JOINT_RESPONSE[name]
+		# Implicit angular damping stays stable at 60 Hz / high resistance.
+		# J = dt(k*error - c*(w + (Ic^-1+Ip^-1)*J)).
+		var child_state := PhysicsServer3D.body_get_direct_state(child.get_rid())
+		var parent_state := PhysicsServer3D.body_get_direct_state(parent.get_rid())
+		if not child_state or not parent_state: continue
+		var ci: Basis = child_state.inverse_inertia_tensor
+		var pi: Basis = parent_state.inverse_inertia_tensor
+		var inverse_inertia := Basis(ci.x+pi.x,ci.y+pi.y,ci.z+pi.z)
+		var damping := response.y * gain
+		var scaled := inverse_inertia * (damping * delta)
+		var solve := Basis(Vector3.RIGHT+scaled.x,Vector3.UP+scaled.y,Vector3.BACK+scaled.z)
+		var relative: Vector3 = child.angular_velocity-parent.angular_velocity
+		var impulse: Vector3 = solve.inverse() * ((angle * response.x * gain-relative * damping) * delta)
+		impulse = impulse.limit_length(40.0 * delta)
+		# Equal/opposite internal torques resist flailing without braking whole-body travel.
+		PhysicsServer3D.body_apply_torque_impulse(child.get_rid(),impulse)
+		PhysicsServer3D.body_apply_torque_impulse(parent.get_rid(),-impulse)
 
 func apply_impact(profile: Resource, direction: Vector3, location: String, distance: float) -> void:
 	var dir := direction.normalized()
@@ -136,6 +182,18 @@ func apply_impact(profile: Resource, direction: Vector3, location: String, dista
 	last_strength = profile.strength_at(distance)
 	var total: Vector3 = (dir * profile.linear_impulse + Vector3.UP * profile.upward_impulse) * last_strength
 	total_applied_impulse = total
+	impact_distribution.clear()
+	# A common added velocity carries the 60kg assembly together. The remaining
+	# event impulse hits the selected region/pellet pattern and supplies asymmetry.
+	# Both shares add to ONE event J; no per-limb copy of the full weapon impulse.
+	var mass := 0.0
+	for body in bodies.values(): mass += body.mass
+	var transport: Vector3 = total * clampf(profile.transport_fraction, 0.0, 0.98)
+	for body in bodies.values():
+		var impulse: Vector3 = transport * body.mass / mass
+		body.apply_central_impulse(impulse)
+		impact_distribution[body.name] = impulse
+	total -= transport
 	if profile.aggregate_pellets:
 		# Five weighted pattern samples, one event, no projectile physics objects.
 		# Route to current box surfaces so spread can share load with a shoulder/head.
@@ -154,7 +212,7 @@ func apply_impact(profile: Resource, direction: Vector3, location: String, dista
 			impact_distribution[receiver.name] = impact_distribution.get(receiver.name, Vector3.ZERO) + impulse
 	else:
 		target.apply_impulse(total, hit - target.global_position)
-		impact_distribution[target.name] = total
+		impact_distribution[target.name] = impact_distribution.get(target.name, Vector3.ZERO) + total
 	var axis := Vector3.UP.cross(dir).normalized()
 	if axis.is_zero_approx(): axis = Vector3.RIGHT
 	# A bounded whole-pattern art control, not an extra impulse per pellet.
@@ -192,3 +250,36 @@ func minimum_corner_y() -> float:
 				for z in [-1, 1]:
 					result = minf(result, (body.global_transform * (half * Vector3(x,y,z))).y)
 	return result
+
+func contact_motion() -> Dictionary:
+	var contacts := 0
+	var peak_linear := 0.0
+	var peak_angular := 0.0
+	for body in bodies.values():
+		var direct := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if direct and direct.get_contact_count() > 0: contacts += 1
+		peak_linear = maxf(peak_linear,body.linear_velocity.length())
+		peak_angular = maxf(peak_angular,body.angular_velocity.length())
+	return {"contacts":contacts,"linear":peak_linear,"angular":peak_angular}
+
+func release(visible_world_pose: Array[Transform3D] = []) -> void:
+	# Called outside the physics integration callback. Free native joints/bodies,
+	# not just collisions/sleep flags. Optionally retain the final visible pose.
+	var pose: Array[Transform3D] = []
+	# Modifier poses are temporary: read the skeleton_updated cache, not the
+	# reverted animation pose returned during _process.
+	for world_pose in visible_world_pose: pose.append(skeleton.global_transform.affine_inverse()*world_pose)
+	set_physics_process(false)
+	running = false
+	if is_instance_valid(simulator):
+		simulator.physical_bones_stop_simulation()
+		simulator.active = false
+		simulator.free()
+	simulator = null
+	bodies.clear()
+	anchors.clear()
+	joint_rest_rotations.clear()
+	if not pose.is_empty():
+		# Native physical bones have stopped writing. Restore final global poses in
+		# parent-first order, including utility bones, without an AnimationPlayer RESET.
+		for i in pose.size(): skeleton.set_bone_global_pose(i,pose[i])

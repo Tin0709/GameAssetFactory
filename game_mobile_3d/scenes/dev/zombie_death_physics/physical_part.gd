@@ -1,7 +1,7 @@
 extends PhysicalBone3D
 ## Numerical guardrails, not pose tracking: physics still owns every corpse transform.
-@export var maximum_linear_speed := 10.0
-@export var maximum_angular_speed := 12.0
+@export var maximum_linear_speed := 24.0
+@export var maximum_angular_speed := 8.0
 var peak_linear_speed := 0.0
 var peak_angular_speed := 0.0
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:

@@ -3,14 +3,15 @@
 [resource]
 script = ExtResource("1")
 display_name = "Shotgun — Heavy / rotational"
-linear_impulse = 86.0
+linear_impulse = 600
 angular_impulse = 5.0
-upward_impulse = 10.0
-limit_scale = 1.4
-linear_damping = 0.12
-angular_damping = 0.45
+upward_impulse = 180
+limit_scale = 1.1
+linear_damping = 0.06
+angular_damping = 0.6
 aggregate_pellets = true
 pattern_radius = 0.11
 full_strength_distance = 1.5
 falloff_distance = 8.0
 far_strength = 0.2
+transport_fraction = 0.96
