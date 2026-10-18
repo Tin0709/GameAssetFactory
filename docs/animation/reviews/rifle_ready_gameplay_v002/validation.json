@@ -1,0 +1,131 @@
+{
+  "checks.json": [
+    {
+      "test": "parity",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "idle",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "rifle30",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "rifle60",
+      "exit_code": 0,
+      "passed": true
+    }
+  ],
+  "regressions.json": [
+    {
+      "test": "test_render_presentation",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "test_direction_continuity",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "test_jump_gameplay",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "test": "test_camera_comfort",
+      "exit_code": 0,
+      "passed": true
+    }
+  ],
+  "export/export_validation.json": {
+    "passed": true,
+    "approved_sources_unchanged": true,
+    "actions": [
+      "Rifle_Ready_Idle_ActionsStyle_v004",
+      "Rifle_Ready_Walk_ActionsStyle_v0012",
+      "Rifle_Ready_Run_ActionsStyle_v002"
+    ],
+    "maximum_carrier_to_right_arm_matrix_error": 1.4640390872955322e-06,
+    "total_native_samples": 28677,
+    "fixtures": 33
+  },
+  "export/runtime_export_validation.json": {
+    "failures": [],
+    "fixtures": 33,
+    "idle_solver_error": 1.68587391158326e-07,
+    "maximum_local_transform_error": 7.50810158933746e-06,
+    "maximum_support_target_error_m": 3.72529029846191e-09,
+    "maximum_weapon_root_error": 1.78801906258741e-06,
+    "moving_shoulder_transform_error": 6.93194351697457e-07,
+    "passed": true
+  },
+  "native_gameplay.json": {
+    "collision_landings": 1,
+    "fps": 30,
+    "frames": 240,
+    "physical_peak_height": 1.31090891361237,
+    "rifle_visible": true,
+    "same_scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "takeoffs": 1
+  },
+  "showcase_reopen.json": {
+    "passed": true,
+    "saved_snapshot_matches_manifest": true,
+    "actions_in_showcase": 87,
+    "approved": [
+      {
+        "action": "Rifle_Ready_Walk_ActionsStyle_v0012",
+        "status": "approved",
+        "source_and_action_unchanged": true
+      },
+      {
+        "action": "Rifle_Ready_Run_ActionsStyle_v002",
+        "status": "approved",
+        "source_and_action_unchanged": true
+      }
+    ]
+  },
+  "rifle30": {
+    "camera_jump_y_span": 0.0,
+    "failures": [],
+    "fps": 30,
+    "left_support_error_m": 5.75409148950712e-06,
+    "maximum_leg_step_deg": 23.6350636605071,
+    "minimum_foot_y": -5.96046447753906e-08,
+    "moving_shoulder_error_m": 3.00342506420748e-08,
+    "right_grip_matrix_error": 2.55694226325431e-06,
+    "support_samples": 214
+  },
+  "rifle60": {
+    "camera_jump_y_span": 0.0,
+    "failures": [],
+    "fps": 60,
+    "left_support_error_m": 3.93616346627823e-06,
+    "maximum_leg_step_deg": 24.1171401196739,
+    "minimum_foot_y": -5.96046447753906e-08,
+    "moving_shoulder_error_m": 3.00342506420748e-08,
+    "right_grip_matrix_error": 2.55694226325431e-06,
+    "support_samples": 436
+  },
+  "preservation": {
+    "checked_files": 6805,
+    "changed_only_authorized_runtime_files": [
+      "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_rifle_ready_gameplay.gd",
+      "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/approved_library.res",
+      "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/export_approved.py",
+      "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/README.md",
+      "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd",
+      "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/build_library.gd",
+      "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_presenter.gd",
+      "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/profile.json"
+    ],
+    "all_source_actions_and_weapon_assets_unchanged": true,
+    "worldmap_project_settings_scene_camera_controller_unchanged": true
+  }
+}
