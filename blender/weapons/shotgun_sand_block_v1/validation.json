@@ -2,11 +2,11 @@
   "passed": true,
   "meshes": 4,
   "materials": 1,
-  "triangles": 4812,
+  "triangles": 4768,
   "dimensions_m": [
     0.1022999994456768,
     1.0580000281333923,
-    0.23702305555343628
+    0.2402360960841179
   ],
   "roundtrip_error_m": 0.0,
   "texture_roundtrip_error": 0.0,
@@ -20,7 +20,7 @@
   "pump_body_height_m": 0.07699999585747719,
   "grip_origin_inside_handle": true,
   "marker_roundtrip_exact": true,
-  "pump_groove_depth_m": 0.0020000040531158447,
+  "pump_groove_depth_m": 0.001999989151954651,
   "inset_receiver_port": true,
   "shells": 4,
   "animations": 0
