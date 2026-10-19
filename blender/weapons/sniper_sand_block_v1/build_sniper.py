@@ -206,11 +206,7 @@ for side in [-1,1]:
 block('Handguard_Top_Sand_Bridge',375,77,150,5,.061,1)
 block('Handguard_Lower_Sand_Bridge',375,103,150,4,.061,2)
 sleeve('Handguard_Recessed_Barrel',[(298,.025,.026,.003),(462,.025,.026,.003)],79,6,(.016,.016))
-sleeve('Handguard_Front_Collar',[(449,.062,.060,.004),(458,.062,.060,.004),
-    (466,.047,.043,.004)],86,4,(.029,.029))
-# The collar's barrel opening must follow the upper barrel axis rather than its
-# geometric center. Rebuild that sleeve with offset bore using housing directly.
-bad=parts['Frame'].pop();bpy.data.objects.remove(bad,do_unlink=True)
+# The collar's bore follows the upper barrel axis, above its geometric center.
 housing('Handguard_Front_Collar',[(Y(449),.062,.060,.004),(Y(458),.062,.060,.004),
     (Y(466),.047,.043,.004)],Z(86),4,hole=(.029,.029,.001),through=True,hole_z=Z(79))
 
@@ -306,7 +302,7 @@ def vertical_oct(name,center,radius,height,tile=4,n=16):
     fs=[tuple(reversed(range(n))),tuple(range(n,2*n))]
     fs += [(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)]
     return part(name,vs,fs,tile)
-block('Scope_Turret_Saddle',203,33,27,20,.055,4,.0010)
+sleeve('Scope_Turret_Saddle',[(189.5,.055,.050,.004),(216.5,.055,.050,.004)],42,4,(.034,.030))
 vertical_oct('Scope_Top_Turret_Stem',P(203,24),.017,.016,6)
 vertical_oct('Scope_Top_Turret_Drum',P(203,16),.025,.024,4)
 vertical_oct('Scope_Turret_Warm_Cap',P(203,9),.025,.004,9)
