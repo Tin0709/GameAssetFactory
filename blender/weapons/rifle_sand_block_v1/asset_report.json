@@ -61,7 +61,7 @@
   ],
   "topology": {
     "Rifle_Sand_Block_Body": {
-      "triangles": 4976,
+      "triangles": 4464,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
@@ -71,5 +71,5 @@
       "loose_vertices": 0
     }
   },
-  "triangles": 5160
+  "triangles": 4648
 }

@@ -37,7 +37,7 @@ colors = [
     (173, 145, 95), (193, 164, 110), (151, 126, 83), (211, 184, 132),
     (53, 51, 51), (66, 63, 62), (43, 42, 43), (82, 76, 69),
     (29, 30, 32), (102, 91, 74), (127, 109, 79), (57, 52, 48),
-    (112, 48, 28), (153, 65, 33), (79, 34, 23), (22, 23, 25),
+    (145, 58, 31), (185, 85, 43), (79, 34, 23), (22, 23, 25),
 ]
 size = 256
 pixels = [0.0] * (size * size * 4)
@@ -97,6 +97,9 @@ def mesh(name, vertices, faces, tile=0, bevel=0, magazine=False):
         mod.affect = 'EDGES'
         bpy.ops.object.modifier_apply(modifier=mod.name)
     uv = data.uv_layers.new(name='SandBlockUV')
+    minimum = [min(v.co[i] for v in data.vertices) for i in range(3)]
+    spans = [max(v.co[i] for v in data.vertices)-minimum[i] for i in range(3)]
+    density = min(1.60, .84/max(spans))
     for poly in data.polygons:
         normal = poly.normal
         drop = max(range(3), key=lambda i: abs(normal[i]))
@@ -104,7 +107,7 @@ def mesh(name, vertices, faces, tile=0, bevel=0, magazine=False):
         for li in poly.loop_indices:
             co = data.vertices[data.loops[li].vertex_index].co
             # Broad pixels at a consistent world density; never sample tile edges.
-            u, v = [(co[a] * 1.60 + .46) % .84 + .08 for a in axes]
+            u, v = [.08+(co[a]-minimum[a])*density for a in axes]
             uv.data[li].uv = ((tile % 4 + u) / 4, (tile // 4 + v) / 4)
         poly.use_smooth = False
     group = ob.vertex_groups.new(name=name)
@@ -196,7 +199,7 @@ for side in [-1,1]:
     box('Vent_Panel_Top', (x,.388,.151), (.012,.292,.022), 1, .0006)
     box('Vent_Panel_Bottom', (x,.388,.104), (.012,.292,.022), 0, .0006)
     for i in range(8):
-        box('Vent_Bridge_%s_%02d' % (side,i), (x,.253+i*.038,.1275), (.012,.015,.050), 0, .0005)
+        box('Vent_Bridge_%s_%02d' % (side,i), (x,.253+i*.038,.1275), (.012,.015,.025), 0)
     box('Front_Handguard_Rim', (x,.533,.127), (.014,.016,.082), 1, .0008)
 box('Handguard_Rear_Band', (0,.246,.127), (.101,.021,.087), 1, .0014)
 box('Handguard_Front_Band', (0,.536,.123), (.098,.019,.087), 4, .0012)
@@ -219,11 +222,11 @@ for side in [-1,1]:
                           (-.076,-.069)], .003, 5, .0005, side*.030)
     profile('Grip_Tan_Backstrap', [(.020,.033), (.033,.041), (-.025,-.109),
                                  (-.038,-.115)], .004, 9, 0, side*.030)
-profile('Trigger_Guard', [(.017,.057), (.115,.057), (.121,.009),
-                         (.029,.009), (.020,.021), (.028,.027),
-                         (.103,.027), (.104,.045), (.017,.045)], .026, 9, .0007)
-profile('Trigger', [(.064,.059), (.074,.056), (.069,.033),
-                   (.059,.027), (.055,.033), (.061,.039)], .011, 8)
+profile('Trigger_Guard', [(.017,.038), (.115,.038), (.121,-.010),
+                         (.029,-.010), (.020,.002), (.028,.008),
+                         (.103,.008), (.104,.026), (.017,.026)], .026, 9, .0007)
+profile('Trigger', [(.064,.040), (.074,.037), (.069,.014),
+                   (.059,.008), (.055,.014), (.061,.020)], .011, 8)
 
 # Slightly forward-slanted straight magazine, three long stamped flutes.
 mag_outline = [(.112,.037), (.214,.037), (.241,-.137), (.133,-.152)]
@@ -357,7 +360,10 @@ world.node_tree.nodes['Background'].inputs[0].default_value = (.075,.080,.092,1)
 world.node_tree.nodes['Background'].inputs[1].default_value = .45
 scene.world = world
 floor_mat = bpy.data.materials.new('Graphite Floor')
-floor_mat.diffuse_color = (.035,.039,.047,1)
+floor_mat.use_nodes = True
+floor_bsdf = floor_mat.node_tree.nodes.get('Principled BSDF')
+floor_bsdf.inputs['Base Color'].default_value = (.025,.028,.034,1)
+floor_bsdf.inputs['Roughness'].default_value = .88
 bpy.ops.mesh.primitive_plane_add(size=200, location=(0,0,-.164))
 floor = bpy.context.object
 floor.name = 'Review_Ground'
