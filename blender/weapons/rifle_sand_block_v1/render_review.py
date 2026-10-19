@@ -1,9 +1,14 @@
 """Render the saved source with a ground height fitted to its final silhouette."""
 import bpy
+import argparse
+import sys
 from pathlib import Path
 from mathutils import Vector
 
 OUT = Path(__file__).resolve().parent
+parser = argparse.ArgumentParser()
+parser.add_argument('--only', choices=['three_quarter','side','top','front'])
+args = parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
 bpy.ops.wm.open_mainfile(filepath=str(OUT/'Rifle_Sand_Block_V1.blend'))
 s = bpy.context.scene
 c = bpy.data.collections['WEAPON_EXPORT']
@@ -17,9 +22,11 @@ focus = Vector((0,.263,.070))
 cam = s.camera
 for name, direction in [('three_quarter',(1.65,.85,.52)),('side',(2,0,.05)),
                         ('top',(.001,0,2)),('front',(0,2,.03))]:
+    if args.only and args.only != name:
+        continue
     cam.location = focus+Vector(direction)
     cam.rotation_euler = (focus-cam.location).to_track_quat('-Z','Y').to_euler()
-    cam.data.ortho_scale = 1.39 if name != 'front' else .66
+    cam.data.ortho_scale = 1.39 if name != 'front' else .95
     s.render.filepath = str(OUT/'review'/(name+'.png'))
     bpy.ops.render.render(write_still=True)
 print('REVIEW_RENDERED',flush=True)
