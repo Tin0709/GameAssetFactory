@@ -87,5 +87,8 @@
     "runtime_equivalence": "declared neutral reference profile; not a captured Bedrock runtime proof"
   },
   "source_item_adapter": "AWM source relative orientation examined against M4; native V2 weapon orientation/contact fit replaces per-weapon model/binding/scale, does not claim original AWM placement",
-  "research_only": true
+  "research_only": true,
+  "actions_stuff_archive_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "vanilla_controller": "controller.animation.player.root / third_person",
+  "actions_stuff_reference": "crossbow_aim_actionsstuff_source_v001/source_reference.json and unchanged previous Aim Action; remove static hold before composing Arsenal"
 }

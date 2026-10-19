@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "arsenal_archive_sha256": "7c605736c6aed41c64ca1d906870e16a75d14cbc56f332997973e6d42c49fa1c",
+  "actions_stuff_archive_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "fresh_source_expression_and_positions_verified": true,
+  "neutral_profile_composed_arm_rotation_deg": {
+    "R": [
+      -91.0,
+      -9,
+      0
+    ],
+    "L": [
+      -88,
+      40,
+      0
+    ]
+  },
+  "native_source_pose_matrix_parity_error": {
+    "UpperArm.R": 2.220446049250313e-16,
+    "UpperArm.L": 1.1102230246251565e-16
+  },
+  "one_sided_yaw_limits_verified": true,
+  "declared_vanilla_profile_not_runtime_capture": true,
+  "source_bob_replaced_not_doubled": true,
+  "source_body_arms_scale_unchanged": true
+}

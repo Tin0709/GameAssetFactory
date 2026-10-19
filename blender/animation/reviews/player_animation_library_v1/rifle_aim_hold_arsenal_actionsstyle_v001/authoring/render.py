@@ -14,7 +14,8 @@ elif view in ['reference','back']:
  c.location=Vector((-6,4,3.3) if view=='back' else (-3,-7,3.0));c.rotation_euler=(Vector((-.05,-.3,1.02))-c.location).to_track_quat('-Z','Y').to_euler();c.data.type='ORTHO';c.data.ortho_scale=2.40
 elif view=='front':
  c.location=Vector((0,-6,2.35));c.rotation_euler=(Vector((-.01,-.1,.98))-c.location).to_track_quat('-Z','Y').to_euler();c.data.type='ORTHO';c.data.ortho_scale=2.25
-else:c.data.ortho_scale*=1.3
+else:
+ c.location=Vector((-7,0,2.3));c.rotation_euler=(Vector((-.05,-.15,.98))-c.location).to_track_quat('-Z','Y').to_euler();c.data.type='ORTHO';c.data.ortho_scale=2.4
 s.camera=c;prefix='before_' if before else 'aim_'
 s.render.image_settings.media_type='IMAGE';s.render.image_settings.file_format='PNG';s.frame_set(85);s.render.filepath=str(S/(prefix+view+'.png'));bpy.ops.render.render(write_still=True)
 if not (before or still):

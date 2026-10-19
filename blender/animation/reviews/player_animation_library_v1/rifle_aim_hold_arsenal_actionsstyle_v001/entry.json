@@ -59,7 +59,7 @@
     "animation.oreville_ans.asxvzc"
   ],
   "source_controllers": [
-    "controller.animation.player.third_person",
+    "controller.animation.player.root",
     "controller.animation.oreville_ans.njvelc",
     "controller.animation.oreville_ans.knoyhk"
   ],
@@ -143,5 +143,6 @@
       ]
     }
   },
-  "source_derived_composite": true
+  "source_derived_composite": true,
+  "vanilla_controller_state": "third_person"
 }
