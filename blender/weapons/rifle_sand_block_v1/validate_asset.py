@@ -33,8 +33,14 @@ body = bpy.data.objects['Rifle_Sand_Block_Body']
 for i in range(7):
     y = .272+i*.038
     for side in [-1,1]:
-        hit, point, _, _ = body.ray_cast(Vector((side*.2,y,.1275)),Vector((-side,0,0)))
-        assert hit and abs(point.x) < .025, ('Blocked vent',i,side,list(point))
+        for z in [.116,.1275,.139]:
+            hit, point, _, _ = body.ray_cast(Vector((side*.2,y,z)),Vector((-side,0,0)))
+            assert hit and abs(point.x) < .025, ('Blocked vent',i,side,z,list(point))
+for i in range(14,23):
+    hit, point, _, _ = body.ray_cast(Vector((0,-.077+i*.0255,.30)),Vector((0,0,-1)))
+    assert hit and abs(point.z-.179) < 1e-5, ('Rail pocket obstructed',i,list(point))
+hit, point, _, _ = body.ray_cast(Vector((0,1,.123)),Vector((0,-1,0)))
+assert hit and point.y < .84, ('Muzzle recess capped by decorative rim',list(point))
 atlas = bpy.data.images['Sand_Block_Atlas_256']
 assert atlas.packed_file and tuple(atlas.size) == (256,256)
 points = [o.matrix_world@v.co for o in meshes for v in o.data.vertices]
@@ -54,7 +60,8 @@ assert bpy.data.objects.get('RightHandGrip') and bpy.data.objects.get('Muzzle')
 images = [im for im in bpy.data.images if im.type == 'IMAGE']
 assert len(images) == 1 and tuple(images[0].size) == (256,256)
 result = {'passed':True,'meshes':2,'triangles':source_tris,
-          'vent_opening_ray_checks':14,'dimensions_m':source_dims,
+          'vent_opening_ray_checks':42, 'rail_pocket_ray_checks':9,
+          'muzzle_recess_depth_m':.866-point.y,'dimensions_m':source_dims,
           'roundtrip_dimensions_max_error_m':max(abs(a-b) for a,b in zip(source_dims,export_dims)),
           'packed_texture':[256,256], 'animations':0}
 (OUT/'validation.json').write_text(json.dumps(result,indent=2))

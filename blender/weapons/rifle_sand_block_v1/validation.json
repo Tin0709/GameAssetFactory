@@ -1,8 +1,10 @@
 {
   "passed": true,
   "meshes": 2,
-  "triangles": 4648,
-  "vent_opening_ray_checks": 14,
+  "triangles": 5632,
+  "vent_opening_ray_checks": 42,
+  "rail_pocket_ray_checks": 9,
+  "muzzle_recess_depth_m": 0.041999999046325676,
   "dimensions_m": [
     0.11900000274181366,
     1.2049999833106995,
