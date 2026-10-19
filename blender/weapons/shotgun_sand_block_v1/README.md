@@ -15,3 +15,5 @@ Chưa tạo animation, gameplay hoặc optic gắn trên rail. Các chi tiết p
 Baseline, bản dựng đầu, backup thư viện và log kiểm tra: `.validation/shotgun_sand_block_v1_20261019/` tại gốc dự án. Không tự thêm hoặc commit Git.
 
 Lượt kiểm tra cận cuối sửa hai ô bên hông đầu nòng thành hốc sâu thật, thay miếng đen nổi. Kiểm tra raycast xác nhận hốc bên sâu khoảng 4 mm từ viền ngoài, không làm kín lòng nòng. Bản trước lượt này được giữ trong `muzzle_refinement/` của baseline. Nguồn và GLB khớp kích thước/texture; thư viện được mở lại và thử đủ 90 tổ hợp mẫu/chế độ/góc nhìn.
+
+Theo phản hồi tiếp theo ngày 2026-10-19, ống dưới và cả bốn vòng ôm được nâng 22 mm để sát nòng trên hơn; khớp nối giữa hai ống được thu gọn tương ứng. Raycast đo khoảng hở 1.5 mm tại vòng ôm và 6 mm ở đoạn ống trơn. Nòng trên, tay bơm, báng, thân, giá đạn, texture, kích thước tổng và các marker được giữ nguyên. Bản trước chỉnh khoảng cách và log được lưu trong `.validation/shotgun_sand_block_close_tubes_20261019/`.
