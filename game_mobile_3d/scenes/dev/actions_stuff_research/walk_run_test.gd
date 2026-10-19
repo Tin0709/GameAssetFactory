@@ -7,7 +7,7 @@ const RenderPresenter=preload("res://scenes/dev/actions_stuff_research/render_po
 const RIFLE_VISUAL=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd")
 const RiflePresenter=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_presenter.gd")
 @export var rifle_ready:=true
-@export_range(.1,3.,.05) var movement_speed_multiplier:=1.25
+@export_range(.1,3.,.05) var movement_speed_multiplier:=1.5
 @export_range(.1,3.,.05) var locomotion_animation_multiplier:=1.0
 var presentation: Node
 var player: CharacterBody3D
@@ -33,7 +33,7 @@ func _ready() -> void:
 	player.get_node("Visual").set_script(RIFLE_VISUAL if rifle_ready else SOURCE_VISUAL)
 	player.get_node("Visual").authored_locomotion=true;player.get_node("Visual").generic_weapon_carry=true;player.get_node("Visual").long_gun_carry_v2=true;player.get_node("Visual").weapon_equipped=false
 	# Planar travel and rifle gait playback have independent, reversible tuning.
-	player.review_pace=1.;player.walk_speed=1.8*movement_speed_multiplier;player.run_speed=5.031*movement_speed_multiplier;player.acceleration=32.*movement_speed_multiplier;player.deceleration=28.*movement_speed_multiplier
+	player.review_pace=1.;player.walk_speed=1.8*movement_speed_multiplier;player.run_speed=5.031*movement_speed_multiplier;player.acceleration=40.;player.deceleration=35.
 	player.get_node("Visual").travel_speed_scale=movement_speed_multiplier
 	player.get_node("Visual").locomotion_playback_rate=locomotion_animation_multiplier if rifle_ready else 1.
 	add_child(player)
@@ -75,8 +75,9 @@ func _process(delta: float) -> void:
 	if visual.idle_active and not visual.move_requested:state="RIFLE READY · IDLE" if rifle_ready else "IDLE · LOOK AROUND"
 	if visual.jump_active:
 		state="LANDING" if visual.jump_grounded else ("TAKEOFF / RISE" if player.velocity.y>0 else "AIRBORNE / FALL")
+	if rifle_ready and visual.rifle_aim_weight>.001:state+=" · AIM" if visual.rifle_aim_weight>.999 else " · READY ↔ AIM"
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
-	hud.text=("RIFLE READY · APPROVED BLENDER SET" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nRight-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
+	hud.text=("RIFLE READY / AIM · APPROVED BLENDER SET" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold Right Mouse Aim · Right-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
@@ -108,11 +109,17 @@ func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventMouseButton:
-		if event.button_index==MOUSE_BUTTON_RIGHT:orbiting=event.pressed
+		if event.button_index==MOUSE_BUTTON_RIGHT:
+			orbiting=event.pressed
+			if rifle_ready:player.visual.set_rifle_aim(event.pressed)
 		if event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_UP:camera_size=maxf(3.6,camera_size-.3)
 		if event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:camera_size=minf(8.,camera_size+.3)
 	if event is InputEventMouseMotion and orbiting:
 		azimuth-=event.relative.x*.006;elevation=clampf(elevation+event.relative.y*.004,.15,.75)
+func _notification(what: int) -> void:
+	if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
+		orbiting=false
+		if is_instance_valid(player) and rifle_ready:player.visual.set_rifle_aim(false)
 func reset_player() -> void:
 	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.reset_jump_motion();player.visual.reset_contacts()
 	if presentation!=null: presentation.reset_history()
