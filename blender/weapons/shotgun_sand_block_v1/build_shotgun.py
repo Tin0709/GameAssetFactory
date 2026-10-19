@@ -218,6 +218,8 @@ crown=housing('Muzzle_Crown',[(.605,.047,.044,.004),(.632,.047,.044,.004),
 for side in [-1,1]:
     bpy.ops.mesh.primitive_cube_add(size=1,location=(side*.0235,.615,.110))
     cutter=bpy.context.object;cutter.dimensions=(.008,.014,.011)
+    cutter.data.materials.append(mat)
+    for layer in list(cutter.data.uv_layers):cutter.data.uv_layers.remove(layer)
     bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
     for ob in [barrel,crown]:
         bpy.context.view_layer.objects.active=ob
