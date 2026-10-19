@@ -1,0 +1,75 @@
+{
+  "status": "Pending",
+  "source_reference": "reference.png",
+  "meshes": 2,
+  "materials": 1,
+  "atlas_size": [
+    256,
+    256
+  ],
+  "markers": {
+    "RightHandGrip": [
+      0,
+      0,
+      0
+    ],
+    "LeftHandGuide": [
+      0,
+      0.35,
+      0.077
+    ],
+    "Muzzle": [
+      0,
+      0.867,
+      0.123
+    ],
+    "AimReference": [
+      0,
+      0.22,
+      0.253
+    ],
+    "RecoilPivot": [
+      0,
+      0,
+      0
+    ],
+    "HolsterAttach": [
+      0,
+      0,
+      0
+    ],
+    "Grip_Point": [
+      0,
+      0,
+      0
+    ],
+    "Support_Hand_Point": [
+      0,
+      0.35,
+      0.077
+    ],
+    "Muzzle_Point": [
+      0,
+      0.867,
+      0.123
+    ]
+  },
+  "dimensions_m": [
+    0.11900000274181366,
+    1.2049999833106995,
+    0.4839203655719757
+  ],
+  "topology": {
+    "Rifle_Sand_Block_Body": {
+      "triangles": 4976,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    },
+    "Rifle_Sand_Block_Magazine": {
+      "triangles": 184,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    }
+  },
+  "triangles": 5160
+}
