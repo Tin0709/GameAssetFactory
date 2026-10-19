@@ -6,74 +6,79 @@
     256,
     256
   ],
-  "reference": "reference.png",
+  "reference": "reference_refined.png",
   "forward": "+Y",
   "markers": {
     "RightHandGrip": [
-      0,
-      0,
-      0
+      0.0,
+      0.0,
+      0.0
     ],
     "LeftHandGuide": [
-      0,
-      0.303,
-      0.035
+      0.0,
+      0.4620000123977661,
+      0.04600000008940697
     ],
     "Muzzle": [
-      0,
-      0.641,
-      0.108
+      0.0,
+      0.7739999890327454,
+      0.10200000554323196
     ],
     "AimReference": [
-      0,
-      0.613,
-      0.146
+      0.0,
+      0.7459999918937683,
+      0.14000000059604645
     ],
     "RecoilPivot": [
-      0,
-      0,
-      0
+      0.0,
+      0.0,
+      0.0
     ],
     "HolsterAttach": [
-      0,
-      0,
-      0
+      0.0,
+      0.0,
+      0.0
     ],
     "Grip_Point": [
-      0,
-      0,
-      0
+      0.0,
+      0.0,
+      0.0
     ],
     "Support_Hand_Point": [
-      0,
-      0.303,
-      0.035
+      0.0,
+      0.4620000123977661,
+      0.04600000008940697
     ],
     "Muzzle_Point": [
-      0,
-      0.641,
-      0.108
+      0.0,
+      0.7739999890327454,
+      0.10200000554323196
     ],
     "MagazineFeed": [
-      0,
-      0.103,
-      0.052
+      0.0,
+      0.23600000143051147,
+      0.04600000008940697
     ]
   },
+  "authoring_origin_m": [
+    0.0,
+    -0.13300000131130219,
+    0.006000000052154064
+  ],
   "dimensions_m": [
-    0.10500000044703484,
-    1.05799999833107,
-    0.2667788192629814
+    0.1022999994456768,
+    1.0580000281333923,
+    0.23702305555343628
   ],
   "shells": 4,
   "topology": {
     "Shotgun_Sand_Frame": {
-      "triangles": 3812,
+      "triangles": 4060,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
     "Shotgun_Sand_Pump": {
-      "triangles": 844,
+      "triangles": 304,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
@@ -83,10 +88,10 @@
       "loose_vertices": 0
     },
     "Shotgun_Sand_Shells": {
-      "triangles": 400,
+      "triangles": 336,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     }
   },
-  "triangles": 5168
+  "triangles": 4812
 }

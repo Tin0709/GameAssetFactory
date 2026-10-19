@@ -5,13 +5,14 @@ from mathutils import Vector
 OUT=Path(__file__).resolve().parent
 bpy.ops.wm.open_mainfile(filepath=str(OUT/'Shotgun_Sand_Block_V1.blend'))
 s=bpy.context.scene;cam=s.camera
+origin=Vector(bpy.data.objects['Shotgun_Sand_Block_V1'].get('authoring_origin',(0,0,0)))
 s.render.resolution_x,s.render.resolution_y=1300,950
 for name,focus,direction,scale in [
-    ('stock_grip',(0,-.260,.050),(.90,.28,.22),.47),
+    ('stock_grip',(0,-.265,.030),(.90,.28,.22),.47),
     ('receiver_shells',(.02,.010,.092),(.75,.16,.25),.39),
-    ('pump',(.015,.300,.068),(.7,.15,.18),.30),
-    ('muzzle',(0,.554,.073),(.65,.55,.18),.28)]:
-    focus=Vector(focus);cam.location=focus+Vector(direction)
+    ('pump',(.015,.329,.087),(.7,.15,.18),.31),
+    ('muzzle',(0,.569,.083),(.65,.55,.18),.28)]:
+    focus=Vector(focus)-origin;cam.location=focus+Vector(direction)
     cam.rotation_euler=(focus-cam.location).to_track_quat('-Z','Y').to_euler()
     cam.data.ortho_scale=scale
     s.render.filepath=str(OUT/'review'/('detail_'+name+'.png'))

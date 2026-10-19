@@ -403,7 +403,7 @@ for name,loc,power,size,color in [
     ('Shotgun Fill',(1.3,1.9,.8),160,1.6,(.76,.85,1)),
     ('Shotgun Rim',(-1.4,-.4,1.8),460,1.7,(1,.86,.69))]:
     data=bpy.data.lights.new(name,'AREA');data.energy=power;data.size=size;data.color=color
-    ob=bpy.data.objects.new(name,data);studio.objects.link(ob);ob.location=loc
+    ob=bpy.data.objects.new(name,data);studio.objects.link(ob);ob.location=Vector(loc)-grip_origin
     ob.rotation_euler=(focus-ob.location).to_track_quat('-Z','Y').to_euler()
 cam=bpy.data.objects.new('Shotgun_Review_Camera',bpy.data.cameras.new('Shotgun_Review_Camera'))
 studio.objects.link(cam);cam.data.type='ORTHO';cam.data.ortho_scale=1.23
