@@ -113,5 +113,5 @@
   },
   "contains_source_derived_base_pose": true,
   "review_scope": "Source-clock rifle aiming HOLD only; previous Ready\u2192Aim\u2192Hold\u2192Ready source/timeline preserved in previous_pending_source.",
-  "user_reference": "User top-view request2026-10-19: align barrel with unchanged right holding arm, same grip pivot; refit left support only. Body/head/right-arm and idle curves are exact copies of previous Pending."
+  "user_reference": "User stance reference2026-10-19: modest leg opening and small stagger for stable aiming, less wide than example. All non-leg curves, including approved arm/barrel alignment, head, torso and breathing clocks, are unchanged."
 }
