@@ -214,7 +214,7 @@ for ob in parts['Frame']:
             v.co.z=.055+(v.co.z-.055)*.80
     elif ob.name in ['Angular_Trigger_Guard','Stepped_Trigger']:
         for v in ob.data.vertices:
-            v.co.y=-.031+(v.co.y-.008)*.86
+            v.co.y=-.050+(v.co.y-.008)*.86
             v.co.z=.055+(v.co.z-.055)*.72
 
 # Compact detachable box matching the short block below the reference receiver.
@@ -265,45 +265,71 @@ for ob,tile in [(barrel,4),(crown,7)]:
 # remains visible between the collars and the underside of the upper barrel.
 lower_tube_z=.066
 housing('Lower_Tube',[(.143,.034,.034,.007),(.608,.034,.034,.007),
-        (.620,.032,.032,.006)],lower_tube_z,6,hole=(.018,.018,.012),group='Frame')
-for i,y in enumerate([.428,.458,.488,.518]):
-    housing('Tube_Collar_%02d'%i,[(y,.042,.043,.007),(y+.019,.042,.043,.007)],
+        (.620,.032,.032,.006)],lower_tube_z,6,hole=(.018,.018,.012),hole_chamfer=.005)
+for i,y in enumerate([.459,.484,.509,.534]):
+    housing('Tube_Collar_%02d'%i,[(y,.042,.043,.007),(y+.018,.042,.043,.007)],
             lower_tube_z,4 if i%2 else 5,group='Frame')
-box('Barrel_Tube_Bridge',(0,.410,.0875),(.044,.017,.015),6,.0008)
-housing('Foreend_Front_Collar',[(.399,.069,.078,.006),(.420,.066,.078,.006)],
-        .061,6,group='Frame')
+box('Barrel_Tube_Bridge',(0,.450,.0875),(.044,.017,.015),6,.0008)
+housing('Foreend_Front_Collar',[(.437,.065,.094,.006),(.456,.060,.094,.006)],
+        .083,6,hole=(.027,.029,.019),through=True,hole_chamfer=.007,hole_z=.108)
 
-# Raised tan ribs leave five real, visibly deeper side grooves in the pump.
-housing('Pump_Recessed_Core',[(.205,.056,.077,.005),(.216,.064,.080,.006),
-        (.394,.064,.080,.006),(.405,.058,.077,.005)],.063,2,group='Pump')
-box('Pump_Upper_Tan_Trim',(0,.303,.095),(.078,.197,.014),1,.0010,'Pump')
-profile('Pump_Lower_Continuous_Trim',[(.206,.036),(.404,.036),(.404,.025),
-        (.396,.019),(.216,.019),(.206,.026)],.072,2,.0006,'Pump')
+# A slimmer, higher, continuous faceted pump. Shallow rectangular grooves replace
+# the old raised fingers; the top/bottom chamfers remain one connected surface.
+pump_body=housing('Pump_Faceted_Body',[(.216,.057,.069,.005),(.226,.066,.077,.006),
+        (.430,.066,.077,.006),(.442,.058,.071,.005)],.079,0,group='Pump')
 for side in [-1,1]:
-    for i,y in enumerate([.225,.259,.293,.327,.361,.395]):
-        profile('Pump_Rib_%02d'%i,[(y-.011,.087),(y+.011,.087),(y+.011,.029),
-                (y+.006,.022),(y-.011,.028)],.007,0,.0006,'Pump',x=side*.0355)
+    for y in [.246,.288,.330,.372,.414]:
+        bpy.ops.mesh.primitive_cube_add(size=1,location=(side*.0345,y,.077))
+        cutter=bpy.context.object;cutter.dimensions=(.007,.018,.062)
+        cutter.data.materials.append(mat)
+        for layer in list(cutter.data.uv_layers):cutter.data.uv_layers.remove(layer)
+        bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+        bpy.context.view_layer.objects.active=pump_body
+        mod=pump_body.modifiers.new('Shallow grip groove','BOOLEAN')
+        mod.operation='DIFFERENCE';mod.solver='EXACT';mod.object=cutter
+        bpy.ops.object.modifier_apply(modifier=mod.name)
+        bpy.data.objects.remove(cutter,do_unlink=True)
+me=pump_body.data;me.update();uv=me.uv_layers.active
+lo=[min(v.co[i] for v in me.vertices) for i in range(3)]
+spans=[max(v.co[i] for v in me.vertices)-lo[i] for i in range(3)]
+density=min(8.0,.84/max(spans))
+for face in me.polygons:
+    drop=max(range(3),key=lambda i:abs(face.normal[i]))
+    axes=[i for i in range(3) if i!=drop]
+    groove=abs(abs(face.center.x)-.031)<.00005 and .045<face.center.z<.109
+    face_tile=2 if groove or face.normal.z<-.5 else (1 if face.center.z>.109 else 0)
+    for li in face.loop_indices:
+        co=me.vertices[me.loops[li].vertex_index].co
+        u,v=[.08+(co[a]-lo[a])*density for a in axes]
+        uv.data[li].uv=((face_tile%4+u)/4,(face_tile//4+v)/4)
+box('Pump_Rear_Tan_Step',(0,.226,.123),(.064,.023,.020),1,.0008,'Pump')
 
 # Dark upper fore-end and continuous Picatinny-style block rail.
-box('Foreend_Upper_Shroud',(0,.272,.128),(.060,.267,.028),4,.0010)
+box('Foreend_Upper_Shroud',(0,.29125,.128),(.060,.3055,.028),4,.0010)
 box('Receiver_Rail_Riser',(0,.012,.138),(.048,.268,.014),6,.0006)
-box('Top_Rail_Base',(0,.142,.145),(.052,.530,.008),6,.0005)
-for i in range(23):
-    y=-.116+i*.0231
-    box('Top_Rail_Tooth_%02d'%i,(0,y,.153),(.056,.012,.009),7 if i%5==0 else 4,.0005)
-box('Rear_Sight_Base',(0,-.071,.160),(.039,.024,.006),6,.0004)
+box('Top_Rail_Base',(0,.153,.145),(.045,.552,.008),6,.0005)
+for i in range(25):
+    y=-.116+i*.0222
+    box('Top_Rail_Tooth_%02d'%i,(0,y,.15225),(.048,.010,.0065),7 if i%5==0 else 4,.0004)
+box('Rear_Sight_Base',(0,-.061,.160),(.035,.022,.006),6,.0004)
 for x in [-.012,.012]:
-    box('Rear_Sight_Ear',(x,-.071,.166),(.011,.016,.014),4,.0004)
+    box('Rear_Sight_Ear',(x,-.061,.166),(.011,.016,.014),4,.0004)
 box('Front_Sight_Base',(0,.613,.133),(.027,.018,.005),6,.0004)
 box('Front_Sight_Post',(0,.613,.140),(.012,.011,.012),7,.0004)
 
-# One-sided four-shell saddle. Red shells remain a distinct rigid mesh.
-box('Shell_Saddle_Backplate',(.0365,.068,.082),(.009,.122,.074),6,.0009)
-box('Shell_Saddle_Bottom_Rail',(.045,.068,.054),(.014,.127,.005),8,.0004)
-for i,y in enumerate([.024,.052,.080,.108]):
-    box('Shell_Red_%02d'%i,(.048,y,.082),(.018,.020,.052),12,.0012,'Shells')
-    box('Shell_Brass_Cap_%02d'%i,(.048,y,.112),(.020,.022,.012),13,.0008,'Shells')
-    box('Shell_Cap_Primer_%02d'%i,(.048,y,.1181),(.006,.006,.0005),9,0,'Shells')
+# Octagonal shell ends and brighter yellow brass match the close-up reference.
+def upright_shell(name,center,dims,tile,chamfer):
+    x,y,z=center;w,d,h=dims
+    vs=[(x+xx,y+yy,z+zz) for zz in [-h/2,h/2] for xx,yy in octagon(w,d,chamfer)]
+    fs=[tuple(reversed(range(8))),tuple(range(8,16))]
+    fs += [(i,(i+1)%8,(i+1)%8+8,i+8) for i in range(8)]
+    return part(name,vs,fs,tile,group='Shells')
+box('Shell_Saddle_Backplate',(.0365,.075,.082),(.009,.122,.074),6,.0009)
+box('Shell_Saddle_Bottom_Rail',(.045,.075,.054),(.014,.127,.005),8,.0004)
+for i,y in enumerate([.031,.059,.087,.115]):
+    upright_shell('Shell_Red_%02d'%i,(.048,y,.082),(.018,.020,.052),12,.003)
+    upright_shell('Shell_Brass_Cap_%02d'%i,(.048,y,.112),(.021,.022,.012),13,.004)
+    upright_shell('Shell_Cap_Primer_%02d'%i,(.048,y,.1181),(.006,.006,.0006),9,.0015)
     box('Shell_Clamp_%02d'%i,(.060,y,.079),(.012,.024,.022),6,.0007)
 
 
@@ -315,21 +341,22 @@ def join(name,group,pivot):
     ob=bpy.context.object;ob.name=name
     pivot=Vector(pivot)
     for v in ob.data.vertices:v.co-=pivot
-    ob.parent=root;ob.location=pivot
+    ob.parent=root;ob.location=pivot-grip_origin
     return ob
 
-frame=join('Shotgun_Sand_Frame','Frame',(0,0,0))
-pump=join('Shotgun_Sand_Pump','Pump',(0,.303,.063))
+frame=join('Shotgun_Sand_Frame','Frame',grip_origin)
+pump=join('Shotgun_Sand_Pump','Pump',(0,.329,.079))
 mag=join('Shotgun_Sand_Magazine','Magazine',(0,.103,.052))
-shells=join('Shotgun_Sand_Shells','Shells',(.048,.068,.082))
+shells=join('Shotgun_Sand_Shells','Shells',(.048,.075,.082))
 pump['role']='Independent static fore-end; no animation authored'
 mag['role']='Compact detachable box from reference silhouette'
 shells['role']='Four decorative red/brass shell props in the side saddle'
-markers={'RightHandGrip':(0,0,0),'LeftHandGuide':(0,.303,.035),
+markers={'RightHandGrip':tuple(grip_origin),'LeftHandGuide':(0,.329,.052),
          'Muzzle':(0,.641,.108),'AimReference':(0,.613,.146),
-         'RecoilPivot':(0,0,0),'HolsterAttach':(0,0,0),'Grip_Point':(0,0,0),
-         'Support_Hand_Point':(0,.303,.035),'Muzzle_Point':(0,.641,.108),
+         'RecoilPivot':tuple(grip_origin),'HolsterAttach':tuple(grip_origin),'Grip_Point':tuple(grip_origin),
+         'Support_Hand_Point':(0,.329,.052),'Muzzle_Point':(0,.641,.108),
          'MagazineFeed':(0,.103,.052)}
+markers={name:tuple(Vector(pos)-grip_origin) for name,pos in markers.items()}
 for name,pos in markers.items():
     ob=bpy.data.objects.new(name,None);c.objects.link(ob);ob.parent=root;ob.location=pos
     ob.empty_display_type='ARROWS';ob.empty_display_size=.020;root[name]=list(pos)
@@ -342,7 +369,8 @@ bpy.ops.export_scene.gltf(filepath=str(OUT/'Shotgun_Sand_Block_V1.glb'),export_f
 meshes=[frame,pump,mag,shells]
 points=[ob.matrix_world@v.co for ob in meshes for v in ob.data.vertices]
 report={'status':'Pending','meshes':4,'materials':1,'atlas_size':[256,256],
-        'reference':'reference.png','forward':'+Y','markers':markers,
+        'reference':'reference_refined.png','forward':'+Y','markers':markers,
+        'authoring_origin_m':list(grip_origin),
         'dimensions_m':[max(p[i] for p in points)-min(p[i] for p in points) for i in range(3)],
         'shells':4,'topology':{}}
 for ob in meshes:
@@ -369,7 +397,7 @@ bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,min(p.z for p in points)
 floor=bpy.context.object
 for col in list(floor.users_collection):col.objects.unlink(floor)
 studio.objects.link(floor);floor.name='Shotgun_Review_Ground';floor.data.materials.append(fm)
-focus=Vector((.008,.105,.045))
+focus=Vector((.008,.105,.045))-grip_origin
 for name,loc,power,size,color in [
     ('Shotgun Key',(1.4,-.8,2.2),360,2.0,(1,.91,.79)),
     ('Shotgun Fill',(1.3,1.9,.8),160,1.6,(.76,.85,1)),
