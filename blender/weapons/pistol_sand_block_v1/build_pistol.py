@@ -43,7 +43,7 @@ for tile,rgb in graphite.items():
     for _ in range(110):
         x,y = rng.randrange(2,57),rng.randrange(2,57)
         w,h = rng.choice([3,4,6,8]),rng.choice([3,4,5,7])
-        shade = rng.choice([.78,.86,.93,1.07,1.15,1.24])
+        shade = rng.choice([.72,.84,.94,1.10,1.24,1.38])
         for yy in range(y,min(62,y+h)):
             for xx in range(x,min(62,x+w)):
                 shades[yy][xx] = shade
@@ -73,7 +73,7 @@ parts = {'Frame':[],'Slide':[],'Magazine':[]}
 scale = Vector((1,.98,.95))
 
 
-def part(name,vertices,faces,tile=0,bevel=0,group='Frame'):
+def part(name,vertices,faces,tile=0,bevel=0,group='Frame',face_tiles=None):
     me = bpy.data.meshes.new(name)
     me.from_pydata(vertices,[],faces)
     me.update()
@@ -97,12 +97,13 @@ def part(name,vertices,faces,tile=0,bevel=0,group='Frame'):
     spans = [max(v.co[i] for v in me.vertices)-lo[i] for i in range(3)]
     density = min(8.0,.84/max(spans))
     for face in me.polygons:
+        face_tile = face_tiles[face.index] if face_tiles else tile
         drop = max(range(3),key=lambda i:abs(face.normal[i]))
         axes = [i for i in range(3) if i != drop]
         for li in face.loop_indices:
             co = me.vertices[me.loops[li].vertex_index].co
             u,v = [.08+(co[a]-lo[a])*density for a in axes]
-            uv.data[li].uv = ((tile%4+u)/4,(tile//4+v)/4)
+            uv.data[li].uv = ((face_tile%4+u)/4,(face_tile//4+v)/4)
         face.use_smooth = False
     vg = ob.vertex_groups.new(name=name)
     vg.add(list(range(len(me.vertices))),1,'REPLACE')
@@ -199,15 +200,19 @@ for i in range(8):
            (i,i+8,j+8,j),(i+16,j+16,j+24,i+24)]
 part('Raked_Grip_Shell',vs,fs,0)
 for side in [-1,1]:
-    profile('Graphite_Grip_Panel',[(-.027,.042),(.018,.039),(-.0068,-.0521),(-.0647,-.0457)],
-            .0038,4,.0010,x=side*.0190)
-    profile('Grip_Front_Facet',[(.008,.039),(.018,.039),(-.0068,-.0521),(-.0168,-.0508)],
-            .0012,5,0,x=side*.0213)
-    profile('Grip_Rear_Edge',[(-.029,.040),(-.023,.040),(-.058,-.044),(-.066,-.044)],
-            .0012,6,0,x=side*.0213)
-    profile('Grip_Lower_Facet',[(-.0647,-.0412),(-.0055,-.0478),
-                                (-.0068,-.0521),(-.0647,-.0457)],
-            .0012,5,0,x=side*.0213)
+    # One solid panel with connected broad edge facets. Its lower edge seats on
+    # the floorplate instead of leaving a tan band or floating edge strips.
+    outer = [(-.027,.042),(.018,.039),(-.0068,-.0521),(-.0647,-.0457)]
+    inner = [(-.024,.038),(.010,.035),(-.0132,-.0478),(-.0570,-.0429)]
+    panel_vs = [(side*x,y,z) for x,loop in [(.0173,outer),(.0192,outer),(.0219,inner)]
+                for y,z in loop]
+    panel_fs = [tuple(reversed(range(4))),tuple(range(8,12))]
+    panel_tiles = [6,4]
+    for i in range(4):
+        j = (i+1)%4
+        panel_fs += [(i,j,j+4,i+4),(i+4,j+4,j+8,i+8)]
+        panel_tiles += [6,[5,5,5,6][i]]
+    part('Graphite_Grip_Panel',panel_vs,panel_fs,4,face_tiles=panel_tiles)
 for z in [.027,.003,-.021]:
     z1,z2 = z+.010,z-.010
     front1,front2 = .035+(z1-.050)*.365,.035+(z2-.050)*.365
