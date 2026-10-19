@@ -1,3 +1,5 @@
+**Current Pending v001: face clearance refinement (2026-10-19).** Open [the current review](face_clearance_refinement_20261019/README.md). All earlier source files/reviews remain unchanged; the existing Showcase selects this refined source.
+
 **Current Pending v001: user pose reference refinement (2026-10-18).** Open [the current refined review](reference_pose_refinement_20261018/README.md). The source/reviews below preserve the previous Pending pose unchanged; the existing Showcase selects the refined source.
 
 # Rifle Aim / Hold ActionsStyle v001 — Pending Blender review

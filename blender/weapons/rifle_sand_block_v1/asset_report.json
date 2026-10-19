@@ -1,8 +1,9 @@
 {
   "status": "Pending",
   "source_reference": "reference.png",
-  "meshes": 2,
-  "materials": 1,
+  "meshes": 3,
+  "materials": 2,
+  "optical_lenses": 2,
   "atlas_size": [
     256,
     256
@@ -61,7 +62,7 @@
   ],
   "topology": {
     "Rifle_Sand_Block_Body": {
-      "triangles": 5524,
+      "triangles": 5896,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
@@ -69,7 +70,12 @@
       "triangles": 208,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
+    },
+    "Rifle_Sand_Block_Lenses": {
+      "triangles": 96,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
     }
   },
-  "triangles": 5732
+  "triangles": 6200
 }

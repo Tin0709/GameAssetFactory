@@ -72,7 +72,22 @@ tex = mat.node_tree.nodes.new('ShaderNodeTexImage')
 tex.image = atlas
 tex.interpolation = 'Closest'
 mat.node_tree.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
-parts, magazines = [], []
+glass = bpy.data.materials.new('Scope_Optical_Glass')
+glass.use_nodes = True
+glass.diffuse_color = (.66,.84,.88,.56)
+glass_bsdf = glass.node_tree.nodes.get('Principled BSDF')
+glass_bsdf.inputs['Base Color'].default_value = (.84,.94,.97,1)
+glass_bsdf.inputs['Metallic'].default_value = 0
+glass_bsdf.inputs['Roughness'].default_value = .065
+glass_bsdf.inputs['Transmission Weight'].default_value = .96
+glass_bsdf.inputs['IOR'].default_value = 1.46
+glass_bsdf.inputs['Coat Weight'].default_value = .22
+glass_bsdf.inputs['Coat Roughness'].default_value = .045
+glass_bsdf.inputs['Alpha'].default_value = .56
+glass.surface_render_method = 'DITHERED'
+glass.use_raytrace_refraction = True
+glass.use_transparent_shadow = True
+parts, magazines, lens_parts = [], [], []
 
 
 def mesh(name, vertices, faces, tile=0, bevel=0, magazine=False):
@@ -165,6 +180,28 @@ def housing(name, rings, z, tile=4, hollow=None, through=False):
     if hollow and not through:
         for li in ob.data.polygons[-1].loop_indices:
             ob.data.uv_layers.active.data[li].uv = (.875,.875)
+    return ob
+
+
+def lens(name, y, w, h):
+    """A closed, shallow biconvex lens, independent from the metal shell."""
+    outline = section(w,h,.004)
+    vs = [(x,y,z+.253) for x,z in outline]
+    for sign in [-1,1]:
+        vs += [(x*.64,y+sign*.0007,z*.64+.253) for x,z in outline]
+        vs.append((0,y+sign*.0010,.253))
+    fs = []
+    for start,center in [(8,16),(17,25)]:
+        for i in range(8):
+            k = (i+1)%8
+            fs += [(i,k,start+k,start+i),(start+i,start+k,center)]
+    ob = mesh(name,vs,fs,12)
+    parts.remove(ob)
+    lens_parts.append(ob)
+    ob.data.materials.clear()
+    ob.data.materials.append(glass)
+    for face in ob.data.polygons:
+        face.use_smooth = True
     return ob
 
 
@@ -343,20 +380,27 @@ for yy in [-.022,.143]:
     box('Scope_Mount_Foot', (0,yy,.198), (.079,.033,.013), 6, .0006)
     box('Scope_Mount_Riser', (0,yy,.213), (.039,.026,.030), 4, .0006)
 box('Scope_Mount_Bridge', (0,.063,.214), (.048,.208,.014), 4, .0006)
-housing('Scope_Central_Tube', [(-.025,.054,.055,.009),(.170,.054,.055,.009)], .253, 5)
+housing('Scope_Central_Tube', [(-.025,.054,.055,.009),(.170,.054,.055,.009)],
+        .253,5,hollow=(.042,.042,.195),through=True)
 housing('Scope_Ocular', [(-.066,.064,.066,.008),(-.058,.077,.078,.010),
-                         (-.024,.077,.078,.010),(-.014,.060,.061,.007)], .253, 4)
-housing('Scope_Rear_Eyecup', [(-.073,.058,.060,.008),(-.060,.058,.060,.008)], .253, 6)
+                         (-.024,.077,.078,.010),(-.014,.060,.061,.007)],
+        .253,4,hollow=(.047,.047,.052),through=True)
+housing('Scope_Rear_Eyecup', [(-.073,.058,.060,.008),(-.060,.058,.060,.008)],
+        .253,6,hollow=(.047,.047,.013),through=True)
+housing('Scope_Rear_Lens_Seat', [(-.060,.052,.052,.006),(-.055,.052,.052,.006)],
+        .253,4,hollow=(.044,.044,.005),through=True)
 for i, yy in enumerate([.006,.045,.085,.125]):
-    housing('Scope_Band_%02d'%i, [(yy,.065,.065,.010),(yy+.019,.065,.065,.010)], .253, 4 if i%2 else 7)
+    housing('Scope_Band_%02d'%i, [(yy,.065,.065,.010),(yy+.019,.065,.065,.010)],
+            .253,4 if i%2 else 7,hollow=(.0545,.0555,.019),through=True)
 housing('Scope_Objective_Shoulder', [(.150,.060,.061,.009),(.161,.080,.078,.006),
-                                     (.199,.080,.078,.006)], .253, 5)
+                                     (.199,.080,.078,.006)],
+        .253,5,hollow=(.044,.044,.049),through=True)
 housing('Scope_Objective_Rim', [(.195,.085,.083,.004),(.229,.085,.083,.004)],
-        .253, 9, hollow=(.061,.061,.009))
-box('Scope_Amber_Glass', (0,.221,.253), (.058,.0015,.058), 12)
-box('Scope_Amber_Reflection', (-.016,.222,.254), (.009,.001,.050), 13)
-box('Scope_Amber_Inner_Reflection', (-.022,.2222,.251), (.004,.0008,.041), 13)
-box('Scope_Dark_Glass_Edge', (.025,.222,.253), (.007,.001,.057), 14)
+        .253,9,hollow=(.061,.061,.034),through=True)
+housing('Scope_Front_Lens_Seat', [(.216,.064,.064,.005),(.223,.064,.064,.005)],
+        .253,6,hollow=(.058,.058,.007),through=True)
+lens('Scope_Rear_Lens',-.058,.045,.045)
+lens('Scope_Front_Lens',.219,.059,.059)
 box('Scope_Turret_Stem', (0,.048,.293), (.026,.030,.021), 4)
 box('Scope_Turret_Cap', (0,.048,.309), (.042,.042,.015), 7, .0007)
 box('Scope_Turret_Top', (0,.048,.319), (.026,.027,.008), 5)
@@ -367,7 +411,7 @@ for side in [-1,1]:
 
 # Align the orthographic proportions to the supplied side view. The reference
 # has a shallow receiver and optic, a shorter raked grip, and a compact magazine.
-for ob in parts:
+for ob in parts+lens_parts:
     for v in ob.data.vertices:
         if ob.name.startswith('Scope_'):
             v.co.y = .078+(v.co.y-.078)*.90+.050
@@ -408,6 +452,9 @@ def join(objs, name, pivot=(0,0,0)):
 
 body = join(parts, 'Rifle_Sand_Block_Body')
 mag = join(magazines, 'Rifle_Sand_Block_Magazine', (0,.163,.030))
+optics = join(lens_parts,'Rifle_Sand_Block_Lenses')
+optics['lens_count'] = 2
+optics['role'] = 'Two transmitting biconvex lenses in a clear metal optic tunnel'
 mag['role'] = 'Separate magazine; feed-mouth pivot'
 markers = {'RightHandGrip':(0,0,0), 'LeftHandGuide':(0,.350,.087),
            'Muzzle':(0,.867,.123), 'AimReference':(0,.256,.233),
@@ -429,12 +476,12 @@ bpy.context.view_layer.objects.active = body
 bpy.ops.export_scene.gltf(filepath=str(OUT/'Rifle_Sand_Block_V1.glb'),
                           export_format='GLB', use_selection=True,
                           export_animations=False, export_cameras=False, export_lights=False)
-pts = [ob.matrix_world @ v.co for ob in [body,mag] for v in ob.data.vertices]
-report = {'status':'Pending', 'source_reference':'reference.png', 'meshes':2,
-          'materials':1, 'atlas_size':[256,256], 'markers':markers,
+pts = [ob.matrix_world @ v.co for ob in [body,mag,optics] for v in ob.data.vertices]
+report = {'status':'Pending', 'source_reference':'reference.png', 'meshes':3,
+          'materials':2, 'optical_lenses':2, 'atlas_size':[256,256], 'markers':markers,
           'dimensions_m':[max(v[i] for v in pts)-min(v[i] for v in pts) for i in range(3)],
           'topology':{}}
-for ob in [body,mag]:
+for ob in [body,mag,optics]:
     ob.data.calc_loop_triangles()
     bm = bmesh.new()
     bm.from_mesh(ob.data)
