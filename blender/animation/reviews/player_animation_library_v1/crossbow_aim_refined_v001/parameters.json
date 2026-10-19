@@ -1,0 +1,10 @@
+{
+  "head_lean_toward_rifle_deg": 7.0,
+  "head_seating_lift_m": 0.008,
+  "head_seating_lateral_m": 0.012,
+  "arms_downward_deg": 5.0,
+  "left_whole_arm_outward_deg": 2.0,
+  "head_pivot": "neck-base roll with8mm up/12mm lateral collar seating",
+  "left_pivot": "unchanged upper-arm shoulder root",
+  "all_other_bones_and_source_clocks": "unchanged"
+}

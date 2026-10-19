@@ -1,0 +1,71 @@
+{
+  "source_rig": "Showcase_Player_Rig",
+  "source_mesh": "Showcase_Player_Mesh",
+  "source_armature": "LB_Test_RestRig",
+  "slot_identifier": "OBRUN_Test_Rig",
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "rotation_modes": {
+    "Root": "XYZ",
+    "Hips": "XYZ",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "XYZ",
+    "Leg.R": "XYZ"
+  },
+  "preview_prop": "rifle_stylized_v2",
+  "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+  "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
+  "action": "Crossbow_Aim_ActionsStuff_Refined_Test_v001",
+  "source": "blender/animation/reviews/player_animation_library_v1/crossbow_aim_refined_v001/crossbow_aim_refined_v001.blend",
+  "source_sha256": "bb5b4822b9ec4cc118b0fddc154bcb80e0c1a05105efe43d4246bd22878fab71",
+  "action_sha256": "4b4d072c8b6b909155207505eae19fc1dbd4bc15b227544c61791a6c7eae883f",
+  "action_frame_range": [
+    1.0,
+    109.0
+  ],
+  "start": 1,
+  "end": 108,
+  "fps": 30,
+  "fps_base": 1.0,
+  "status": "pending",
+  "approval_note": "Preferred Crossbow source base, with user-requested stronger head lean toward rifle, both arms lowered slightly and left arm away slightly. Arsenal composite set aside. Pending review.",
+  "seamless_loop": true,
+  "research_only": true,
+  "production_eligible": false,
+  "source_derived_reconstruction": true,
+  "original_custom_animation": false,
+  "bake_hz": 240,
+  "source_duration_s": 3.6,
+  "endpoint_sample_frame": 109,
+  "source_animations": [
+    "animation.oreville_ans.rrvlnm",
+    "animation.oreville_ans.dubgwy",
+    "animation.oreville_ans.jawwtn",
+    "animation.oreville_ans.asxvzc"
+  ],
+  "source_controllers": [
+    "controller.animation.oreville_ans.njvelc",
+    "controller.animation.oreville_ans.knoyhk"
+  ],
+  "source_profile": "ordinary player0, already charged mainhand crossbow, no shield, grounded, neutral look; 0.6s charged entry warmup",
+  "visual_base": "Crossbow_Aim_ActionsStuff_Source_Test_v001",
+  "visual_base_action_sha256": "5d6949a66a5448c4acc6d54d02c839da1d3222bb034463e418cdc54658577930",
+  "rig_adaptations": {
+    "head_lean_toward_rifle_deg": 7.0,
+    "head_seating_lift_m": 0.008,
+    "head_seating_lateral_m": 0.012,
+    "arms_downward_deg": 5.0,
+    "left_whole_arm_outward_deg": 2.0,
+    "head_pivot": "neck-base roll with8mm up/12mm lateral collar seating",
+    "left_pivot": "unchanged upper-arm shoulder root",
+    "all_other_bones_and_source_clocks": "unchanged"
+  },
+  "literal_unmodified_source_pose": false
+}

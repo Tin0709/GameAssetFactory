@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "edited_transform_curves": 22,
+  "unchanged_curves_exact": 118,
+  "all_body_legs_forearm_scales_and_shoulder_roots_exact": true,
+  "source_actions_preserved": 21,
+  "local_translation_solve_error": 3.579381748874281e-07
+}
