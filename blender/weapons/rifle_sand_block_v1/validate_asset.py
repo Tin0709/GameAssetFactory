@@ -9,7 +9,7 @@ OUT = Path(__file__).resolve().parent
 bpy.ops.wm.open_mainfile(filepath=str(OUT/'Rifle_Sand_Block_V1.blend'))
 collection = bpy.data.collections['WEAPON_EXPORT']
 meshes = [o for o in collection.all_objects if o.type == 'MESH']
-assert len(meshes) == 2
+assert len(meshes) == 3
 assert not bpy.data.actions
 root = bpy.data.objects['Rifle_Sand_Block_V1']
 assert root.parent is None and root.location.length < 1e-7
@@ -57,14 +57,14 @@ for o in meshes:
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=str(OUT/'Rifle_Sand_Block_V1.glb'))
 meshes = [o for o in bpy.data.objects if o.type == 'MESH']
-assert len(meshes) == 2 and not bpy.data.actions
+assert len(meshes) == 3 and not bpy.data.actions
 points = [o.matrix_world@v.co for o in meshes for v in o.data.vertices]
 export_dims = [max(v[i] for v in points)-min(v[i] for v in points) for i in range(3)]
 assert max(abs(a-b) for a,b in zip(source_dims,export_dims)) < 1e-6
 assert bpy.data.objects.get('RightHandGrip') and bpy.data.objects.get('Muzzle')
 images = [im for im in bpy.data.images if im.type == 'IMAGE']
 assert len(images) == 1 and tuple(images[0].size) == (256,256)
-result = {'passed':True,'meshes':2,'triangles':source_tris,
+result = {'passed':True,'meshes':3,'materials':2,'triangles':source_tris,
           'vent_opening_ray_checks':42, 'rail_pocket_ray_checks':9,
           'muzzle_recess_depth_m':muzzle_depth, 'sight_aperture_ray_checks':2,
           'dimensions_m':source_dims,

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "clear_metal_bore_rays": 5,
+  "lens_surface_rays": 2,
+  "lens_count": 2,
+  "transmission": 0.9599999785423279,
+  "gltf_transmission_preserved": true,
+  "gltf_alpha_mode": "BLEND"
+}
