@@ -1,5 +1,7 @@
 # Permanent Weapon Showcase
 
+**2026-10-19 — Sand Block scope glass:** the same Pending V1 now has an open metal optic tunnel, recessed front/rear lens seats and two separate transmitting biconvex glass lenses. GLB retains glass transmission and alpha blending. The detail pass and all prior weapons remain preserved; dimensions/markers are unchanged. Reopen an existing viewer window to load the updated saved model.
+
 **2026-10-19 — Sand Block V1 detail review:** the same Pending entry now includes chamfered taller vents, recessed rail teeth, front/side sight apertures, warm optic/muzzle trim, stock/grip/magazine seams and finer pixel clusters after a second comparison with the user reference. Its dimensions and markers are unchanged; previous V1 is backed up under `.validation/rifle_sand_block_detail_20261019/`.
 
 **2026-10-19 — New reference rifle:** [Rifle — Sand Block V1](../rifle_sand_block_v1/README.md) is registered as Pending and selected on open. The active list now has four models. This distinct sand/graphite block rifle follows the user's supplied multi-view reference; previous sources and approval states are preserved. The three-model/default-shotgun descriptions below record the earlier library state.
