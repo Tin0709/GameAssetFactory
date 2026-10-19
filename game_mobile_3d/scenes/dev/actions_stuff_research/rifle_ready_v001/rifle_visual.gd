@@ -82,6 +82,17 @@ func _clip_time(kind: String,phase: float,ahead: float=0.) -> float:
  if kind=="Idle":return fposmod(rifle_idle_time+ahead,float(rifle_profile.clips.Idle.duration))
  var info: Dictionary=rifle_profile.clips[kind]
  return fposmod((phase-float(info.phase_origin))/float(info.phase_rate),float(info.duration))
+func _aim_pose(bone: int,time: float) -> Transform3D:
+ var pose: Transform3D=rifle_aim_clip.pose(bone,time)
+ if bone==arm_left or bone==arm_right:
+  # The two approved bakes use opposite longitudinal roll frames on the
+  # rectangular rigid arms. A half-turn preserves their occupied volume,
+  # shoulder/palm positions and whole-arm direction, while removing a spurious
+  # 180deg corkscrew from Ready -> Aim. Carrier is NOT rotated: its attachment
+  # is recomputed from this retargeted frame, preserving the exact rifle pose.
+  pose.basis=pose.basis*Basis(Vector3.UP,PI)
+ return pose
+
 func _sample_set(ahead: float=0.) -> Array:
  var phase:=float(direction_snapshot.get("phase",0.))+ahead*gait_frequency
  var ti:=_clip_time("Idle",phase,ahead);var tw:=_clip_time("Walk",phase);var tr:=_clip_time("Run",phase)
@@ -95,13 +106,13 @@ func _sample_set(ahead: float=0.) -> Array:
   rifle_contact_shoulder_weight=rifle_move_weight
  if rifle_aim_clip!=null and rifle_aim_weight>0.:
   var aim_time:=fposmod(rifle_aim_time+ahead,float(rifle_aim_profile.clips.Aim.duration))
-  for bone in _aim_bones:poses[bone]=Transform3D(poses[bone]).interpolate_with(rifle_aim_clip.pose(bone,aim_time),rifle_aim_weight)
+  for bone in _aim_bones:poses[bone]=Transform3D(poses[bone]).interpolate_with(_aim_pose(bone,aim_time),rifle_aim_weight)
   # At rest retain the approved torso breathing. Moving/airborne hips and all
   # leg/root channels stay under the existing gait and physical jump systems.
   var hips_weight:=rifle_aim_weight*(1.-rifle_move_weight) if jump_grounded else 0.
   poses[hips]=Transform3D(poses[hips]).interpolate_with(rifle_aim_clip.pose(hips,aim_time),hips_weight)
   if ahead==0.:
-   var attachment: Transform3D=rifle_aim_clip.pose(arm_right,aim_time).affine_inverse()*rifle_aim_clip.pose(carrier_bone,aim_time)
+   var attachment: Transform3D=_aim_pose(arm_right,aim_time).affine_inverse()*_aim_pose(carrier_bone,aim_time)
    rifle_carrier_attachment=carrier_in_right_arm.interpolate_with(attachment,rifle_aim_weight)
    rifle_support_anchor=rifle_support_anchor.lerp(rifle_aim_clip.support(aim_time),rifle_aim_weight)
    rifle_contact_shoulder_weight=maxf(rifle_move_weight,rifle_aim_weight)

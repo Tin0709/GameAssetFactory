@@ -39,8 +39,22 @@ func run() -> void:
  # Exact upper-body target at full Aim; lower body remains the active gait.
  var ready_poses: Array=v._sample_set();v.rifle_aim_weight=1.;var aiming_poses: Array=v._sample_set()
  for bone in [v.leg_left,v.leg_right,v.skeleton.find_bone("Root")]:check(difference(ready_poses[bone],aiming_poses[bone])<.00001,"Aim leaves gait/root channels unchanged")
- for bone_name in ["Chest","Neck","Head","Arm.L","Arm.R","ForeArm.L","ForeArm.R","WeaponCarrier"]:
+ for bone_name in ["Chest","Neck","Head","ForeArm.L","ForeArm.R","WeaponCarrier"]:
   var b: int=v.skeleton.find_bone(bone_name);check(difference(aiming_poses[b],v.rifle_aim_clip.pose(b,v.rifle_aim_time))<.00001,"Approved local pose retained: "+bone_name)
+ # Rectangular-arm frame adaptation preserves the complete occupied volume
+ # and both endpoints, with no longitudinal corkscrew during the lift.
+ var arm_corner_error:=0.;var max_ready_aim_angle:=0.
+ for bone in [v.arm_left,v.arm_right]:
+  var source: Transform3D=v.rifle_aim_clip.pose(bone,0.)
+  var target: Transform3D=aiming_poses[bone]
+  check(target.origin.distance_to(source.origin)<.000001 and target.basis.y.distance_to(source.basis.y)<.000001,"Arm shoulder/long axis unchanged")
+  for x in [-.1125,.1125]:
+   for y in [0.,.675]:
+    for z in [-.1125,.1125]:
+     arm_corner_error=maxf(arm_corner_error,(target*Vector3(x,y,z)).distance_to(source*Vector3(-x,y,-z)))
+  max_ready_aim_angle=maxf(max_ready_aim_angle,rad_to_deg(Transform3D(ready_poses[bone]).basis.get_rotation_quaternion().angle_to(target.basis.get_rotation_quaternion())))
+ check(arm_corner_error<.000002,"Approved rigid-arm volume preserved by frame retargeting")
+ check(max_ready_aim_angle<100.,"Ready -> Aim avoids the unintended180deg arm roll")
  v.rifle_aim_weight=0.;var reached_run:=false;var full_aim:=false;var released:=false;var saw_air:=false;var saw_land:=false;var camera_y: Array[float]=[];var previous: Array=[];var previous_weapon:=Transform3D.IDENTITY
  for i in int(12.*fps):
   var t:=i*dt;var moving:=t>2. and t<9.;var sprint:=t>4. and t<7.
@@ -71,9 +85,9 @@ func run() -> void:
  check(reached_run and saw_air and saw_land,"Aim coexists with Run, Jump and Landing")
  check(grip_error<.00005,"Stable right grip during physics/render transitions: "+str(grip_error))
  check(support_error<.00005,"Stable authored left support during physics/render transitions: "+str(support_error))
- check(max_arm_step<35.,"No sudden arm pose reset: "+str(max_arm_step))
+ check(max_arm_step<22.,"No sudden arm pose reset: "+str(max_arm_step))
  check(max_weapon_step<.20,"No weapon snap in chest frame: "+str(max_weapon_step))
  check(camera_y.max()-camera_y.min()<.03,"Comfortable jump camera remains stable")
  v.set_rifle_aim(true);scene._notification(NOTIFICATION_APPLICATION_FOCUS_OUT);check(not v.rifle_aim_requested,"Focus loss releases Aim")
- var report:={"fps":fps,"failures":failures,"grip_error":grip_error,"support_error_m":support_error,"max_arm_step_deg":max_arm_step,"max_weapon_step_m":max_weapon_step,"camera_y_span":camera_y.max()-camera_y.min()}
+ var report:={"fps":fps,"failures":failures,"arm_volume_error_m":arm_corner_error,"ready_aim_max_arm_rotation_deg":max_ready_aim_angle,"grip_error":grip_error,"support_error_m":support_error,"max_arm_step_deg":max_arm_step,"max_weapon_step_m":max_weapon_step,"camera_y_span":camera_y.max()-camera_y.min()}
  FileAccess.open("user://rifle_aim_"+str(fps)+".json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"));print("RIFLE_AIM ",JSON.stringify(report));scene.free();quit(0 if failures.is_empty() else 1)
