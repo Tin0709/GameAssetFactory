@@ -101,5 +101,5 @@
   },
   "contains_source_derived_base_pose": true,
   "review_scope": "Source-clock rifle aiming HOLD only; previous Ready\u2192Aim\u2192Hold\u2192Ready source/timeline preserved in previous_pending_source.",
-  "user_reference": "User-provided two rifle reference images2026-10-19: whole-upper-body focused aim: diagonal torso and head, touching crossed rigid hands, balanced face clearance; preserve immutable source study and its idle clocks/lower body."
+  "user_reference": "User top-view request2026-10-19: align barrel with unchanged right holding arm, same grip pivot; refit left support only. Body/head/right-arm and idle curves are exact copies of previous Pending."
 }

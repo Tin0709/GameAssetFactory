@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "other_actions_exact": 88,
+  "native_actions": 89,
+  "old_protected_files_exact": 6857,
+  "godot_files_exact": 2007,
+  "source_crossbow_exact": true,
+  "all_other_asset_fingerprints_exact": true,
+  "source_sha256": "d577290a44a73d2e968aa39d4ccfab19a773a69875136cf24db26afb157cac31",
+  "action_sha256": "bbee00739e0b47877532d388b7c28cf26f716c82fa267e82f892d43cf47d9fd5",
+  "new_lfs_version_storage_download_estimate_MiB": 94.63167476654053,
+  "largest_new_ordinary_file_bytes": 6070247,
+  "lfs_note": "Existing *.blend filter=lfs. Account quota unavailable locally; no tracking/history migration or manual commit/push."
+}
