@@ -132,7 +132,9 @@
       "source": "blender/weapons/sniper_sand_block_v1/Sniper_Sand_Block_V1.blend",
       "source_sha256": "b3333d8db481f3df17a51abc205ac4cc9c9c16d18d4ef86d414a183b4a6c3bf7",
       "status": "Pending",
-      "status_note": "New registration; awaiting explicit visual approval."
+      "status_note": "New registration; awaiting explicit visual approval.",
+      "collection": "WEAPON_sniper_sand_block_v1",
+      "root": "sniper_sand_block_v1__Sniper_Sand_Block_V1"
     }
   ],
   "preferred_rifle": "rifle_stylized_v2",
