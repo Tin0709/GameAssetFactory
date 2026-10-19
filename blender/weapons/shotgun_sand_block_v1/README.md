@@ -1,19 +1,17 @@
 # Shotgun — Sand Block V1
 
-Mẫu shotgun tactical dựng theo ảnh người dùng cung cấp ngày 2026-10-19. Nguồn riêng, đăng ký **Pending** trong cùng `../showcase/Weapon_Showcase.blend`; mẫu mới được chọn khi mở lại viewer. Giữ nguyên nguồn các khẩu trước. Pistol Sand Block V1 được ghi nhận Approved trong metadata theo lời người dùng “ok tốt rồi”, không thay đổi nguồn hoặc tích hợp gameplay.
+Mẫu hiện tại vẫn **Pending** trong cùng `../showcase/Weapon_Showcase.blend`. Lượt chỉnh mới nhất dùng `reference_refined.png`, ảnh nhiều góc người dùng gửi sau khi nhận xét tỷ lệ chưa giống; `reference.png` giữ ảnh ban đầu. Không thay nguồn hoặc trạng thái duyệt của các khẩu khác.
 
-Báng cát có khoảng rỗng và thanh giằng dạng bậc, đệm báng graphite, tay cầm nghiêng, vòng cò rỗng, thân graphite với cửa bên lõm, rail nhiều nấc và thước ngắm. Tay bơm màu cát có sáu gân và năm rãnh sâu thật, mép dưới liền khối. Nòng trên có hốc vuông sâu/viền vát; ống dưới có đầu lõm và bốn vòng ôm. Giá bên thân giữ bốn viên đạn đỏ với đầu brass vàng. Đây là tạo hình game prop theo thị giác từ ảnh, không phải bản đo hoặc mô phỏng cơ khí.
+Đã đối chiếu góc ngang ở cùng chiều dài, rồi dựng lại các phần lệch: báng có thanh trên dày hơn, đệm sau thấp/dày hơn và lỗ rỗng dạng bậc; cổ nối có các bậc thu gọn cùng nắp thân sau vát. Tay bơm đặt cao và tiến về trước, bề ngang giảm từ78 xuống66mm; thân liền có năm rãnh chìm khoảng2mm mỗi bên thay các gân nổi7mm trước đó. Thân tay bơm cao77mm, có mặt vát dưới rộng và gờ tan nhỏ ở đầu sau. Chiều dài được tăng nhẹ theo ảnh thay vì thu nhỏ đồng đều mọi chiều.
 
-- `Shotgun_Sand_Block_V1.blend` và `.glb`: bốn mesh cứng gồm thân, tay bơm, hộp tiếp đạn ngắn và nhóm bốn viên đạn; 5,168 tam giác, một material/atlas 256×256, texture nearest và được pack.
-- Dài khoảng 1.058 m, rộng 0.105 m tính cả giá đạn, cao 0.2668 m. Blender +Y về trước, +Z lên trên, origin ở RightHandGrip; 10 marker theo thư viện.
-- `shotgun_palette_source_256.png`: palette cát/graphite được sao từ pistol đã duyệt. Builder chỉ đổi ba swatch phụ cho đỏ/brass; mảng pixel đen giữ tương phản rõ theo phản hồi trước.
-- `reference.png`: ảnh người dùng. `review/`: góc 3/4, hai bên, trên, trước và cận báng/tay cầm, thân/giá đạn, tay bơm, đầu nòng.
-- `build_shotgun.py`: builder riêng. `render_details.py`: đọc nguồn đã lưu và render cận. `validate_asset.py`: mở lại nguồn và GLB; kiểm tra topology/UV/texture, marker, kích thước roundtrip, báng và vòng cò rỗng, hốc nòng, độ sâu rãnh tay bơm, cửa bên thân và đủ bốn viên đạn.
+Tay cầm lùi50mm, ngắn hơn20%, vòng cò được thu gọn và đưa theo tay cầm; đế đen và hộp tiếp đạn ngắn được chỉnh tỷ lệ. Rail mảnh/thấp hơn, nắp thân sau và nút bên được đặt lại. Bốn viên đạn có đầu/brass tám cạnh vàng hơn; miệng hai ống dùng biên dạng tám cạnh thay lỗ gần vuông. Khoảng cách hai ống đã chỉnh ở lượt trước vẫn giữ:1.5mm tại vòng ôm và6mm ở đoạn trơn; vòng ôm/cổ tay bơm chuyển theo tay bơm mới. Hốc bên đầu nòng vẫn sâu thật.
 
-Chưa tạo animation, gameplay hoặc optic gắn trên rail. Các chi tiết phụ tách rời ở mép phải ảnh được dùng để hiểu phong cách; cấu hình súng chính theo hình lớn. Character Ready/Holster trong viewer dùng pose snapshot hiện có, chưa tinh chỉnh khớp tay cho mẫu mới.
+- `Shotgun_Sand_Block_V1.blend` và `.glb`: bốn mesh cứng (thân, tay bơm, hộp tiếp đạn ngắn, bốn viên đạn),4,768 tam giác; một material/atlas256×256 được pack, texture nearest.
+- Dài1.058m, rộng khoảng0.1023m tính cả giá đạn, cao0.2402m. Đây là tạo hình theo thị giác từ ảnh, không phải bản đo cơ khí.
+- Blender+Y về trước/+Z lên trên; root/RightHandGrip ở0 và hiện nằm trong tay cầm thật. Hình được đặt lại quanh tay cầm sau khi dịch nó, `authoring_origin` lưu hệ tọa độ dựng để tái tạo. Mười marker theo thư viện; LeftHandGuide đi theo tay bơm mới, các vị trí được kiểm tra roundtripGLB.
+- `review/`:3/4,hai bên,trên,trước và cận báng/tay cầm,thân/giá đạn,tay bơm,đầu nòng. Studio ngoài `WEAPON_EXPORT` không được nhập vào thư viện.
+- `build_shotgun.py`: builder riêng. `render_details.py`: render từ nguồn đã lưu. `validate_asset.py`: mở lại nguồn/GLB, kiểm tra topology/UV/atlas, marker, kích thước và texture roundtrip, ba vị trí qua lỗ báng bậc, vòng cò, gốc tay cầm, hốc nòng/cửa bên, rãnh và kích thước tay bơm.
 
-Baseline, bản dựng đầu, backup thư viện và log kiểm tra: `.validation/shotgun_sand_block_v1_20261019/` tại gốc dự án. Không tự thêm hoặc commit Git.
+Nguồn trước lượt này và ảnh so ngang nằm tại `.validation/shotgun_sand_block_reference_refinement_20261019/`; `before_source/` giữ nguyên mẫu trước, `first_refinement/` giữ bước dựng trung gian. Các baseline trước (`shotgun_sand_block_v1_20261019/`, `shotgun_sand_block_close_tubes_20261019/`) vẫn giữ nguyên.
 
-Lượt kiểm tra cận cuối sửa hai ô bên hông đầu nòng thành hốc sâu thật, thay miếng đen nổi. Kiểm tra raycast xác nhận hốc bên sâu khoảng 4 mm từ viền ngoài, không làm kín lòng nòng. Bản trước lượt này được giữ trong `muzzle_refinement/` của baseline. Nguồn và GLB khớp kích thước/texture; thư viện được mở lại và thử đủ 90 tổ hợp mẫu/chế độ/góc nhìn.
-
-Theo phản hồi tiếp theo ngày 2026-10-19, ống dưới và cả bốn vòng ôm được nâng 22 mm để sát nòng trên hơn; khớp nối giữa hai ống được thu gọn tương ứng. Raycast đo khoảng hở 1.5 mm tại vòng ôm và 6 mm ở đoạn ống trơn. Nòng trên, tay bơm, báng, thân, giá đạn, texture, kích thước tổng và các marker được giữ nguyên. Bản trước chỉnh khoảng cách và log được lưu trong `.validation/shotgun_sand_block_close_tubes_20261019/`.
+Chưa tạo animation hoặc tích hợp gameplay/Godot. Character Ready/Holster dùng snapshot có sẵn, chưa tinh chỉnh hỗ trợ tay trái cho mẫu mới. Không tự thêm hoặc commit Git.

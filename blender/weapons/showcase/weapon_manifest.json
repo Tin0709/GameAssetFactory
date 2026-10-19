@@ -119,9 +119,9 @@
       "kind": "Shotgun",
       "label": "Shotgun \u2014 Sand Block V1",
       "source": "blender/weapons/shotgun_sand_block_v1/Shotgun_Sand_Block_V1.blend",
-      "source_sha256": "c064af86011485ac6865a3679d9c1f7da4bc654f063d13b170e4179f8ff76877",
+      "source_sha256": "7c5124e4db4eedd3b6c5d6b8be83c0f56e1d5705381879421000bac48e49d72d",
       "status": "Pending",
-      "status_note": "Pending visual review; user-requested closer barrel/tube spacing with the lower tube and its four collars raised 22 mm and the connecting bridge refitted.",
+      "status_note": "Pending visual review; user-requested multi-view reference refinement: compact recessed pump, stepped stock cavity and neck, shorter grip/guard, finer rail and brass shell details.",
       "collection": "WEAPON_shotgun_sand_block_v1",
       "root": "shotgun_sand_block_v1__Shotgun_Sand_Block_V1"
     }
