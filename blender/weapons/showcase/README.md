@@ -1,5 +1,7 @@
 # Permanent Weapon Showcase
 
+**2026-10-19 — Pistol Sand Block V1 detail review:** the same Pending pistol now has stronger flat graphite pixel clusters, a stepped rear slide roof, a lower barrel hood with a narrow warm crown, a straighter stepped trigger, and connected faceted grip panels seated on a wider magazine floorplate. Dimensions and markers are unchanged. [Source and eight inspection views](../pistol_sand_block_v1/README.md); previous pistol/library are backed up under `.validation/pistol_sand_block_detail_20261019/`. Reopen an existing viewer to load the saved refinement.
+
 **2026-10-19 — Pistol Sand Block V1:** [new user-reference pistol](../pistol_sand_block_v1/README.md), sand frame and graphite slide, is registered Pending and selected by default. The same library now contains five active models; previous weapon entries and sources are preserved.
 
 **2026-10-19 — Red-orange scope tint:** both V1 glass lenses now use the user's requested red-orange color. Transmission, reflectivity, hollow housing and all geometry are retained.
