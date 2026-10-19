@@ -1,3 +1,5 @@
+Archived prior Pending iteration: the user's09:50 side/back screenshot exposed excessive forward extension of the holding set. This pose is superseded by the next shoulder-seated refinement; it was not approved. The source and review renders remain for reversal/comparison.
+
 # Focused rifle Aim/Hold — same Pending Action
 
 Select `Rifle_Aim_Hold_ActionsStyle_v001` in the existing **Animation_Showcase.blend → N → Animation Library**. This is a refinement of that same Pending entry, not another Action or Showcase. Blender-only research; Godot remains unchanged.
