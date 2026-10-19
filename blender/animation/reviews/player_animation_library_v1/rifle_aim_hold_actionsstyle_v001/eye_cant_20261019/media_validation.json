@@ -1,0 +1,11 @@
+[
+  {
+    "decoded_frames" : 216,
+    "distinct_sampled_pixel_hashes" : 216,
+    "duration_s" : 7.2000000000000002,
+    "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/rifle_aim_eye_cant_20261019\/aim_reference_30fps_1x.mp4",
+    "fps" : 30,
+    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
+    "passed" : true
+  }
+]

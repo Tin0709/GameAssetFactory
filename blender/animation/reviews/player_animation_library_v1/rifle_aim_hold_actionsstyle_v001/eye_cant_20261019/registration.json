@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "refined_same_pending_action": "Rifle_Aim_Hold_ActionsStyle_v001",
+  "status": "pending",
+  "action_count_unchanged": 89,
+  "other_actions_exact": 88,
+  "old_pending_source_preserved": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/grounded_stance_20261019/rifle_aim_hold_actionsstyle_v001.blend",
+  "all_existing_rigs_meshes_materials_cameras_sequences_exact": true
+}
