@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "meshes": 3,
+  "materials": 1,
+  "triangles": 2420,
+  "dimensions_m": [
+    0.05400000140070915,
+    0.279193714261055,
+    0.1814056560397148
+  ],
+  "roundtrip_error_m": 0.0,
+  "guard_ray_checks": 4,
+  "muzzle_recess_ray_checks": 2,
+  "sight_notch_and_ears": true,
+  "lowered_top_chamber": true,
+  "open_grip_well": true,
+  "animations": 0
+}
