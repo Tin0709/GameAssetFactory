@@ -1,5 +1,5 @@
 extends "res://scenes/dev/actions_stuff_research/jump_locomotion_visual.gd"
-## Three approved Blender clips in the existing input/physics/contact pipeline.
+## Approved Ready clips plus the approved Aim in the existing pose/contact pipeline.
 ## Source studies remain read-only; generic weapon posing never overlays this set.
 const RifleSampler=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_sampler.gd")
 const RIFLE_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/approved_library.res")
