@@ -34,19 +34,19 @@ root['reference'] = 'reference.png — supplied by user 2026-10-19'
 
 # Sixteen padded 64px swatches, with sparse broad rectangular color clusters.
 colors = [
-    (173, 145, 95), (193, 164, 110), (151, 126, 83), (211, 184, 132),
+    (175, 151, 104), (196, 171, 120), (151, 131, 91), (213, 188, 140),
     (53, 51, 51), (66, 63, 62), (43, 42, 43), (82, 76, 69),
     (29, 30, 32), (102, 91, 74), (127, 109, 79), (57, 52, 48),
-    (145, 58, 31), (185, 85, 43), (79, 34, 23), (22, 23, 25),
+    (164, 74, 37), (199, 102, 50), (86, 38, 24), (22, 23, 25),
 ]
 size = 256
 pixels = [0.0] * (size * size * 4)
 rng = random.Random(20261019)
 for tile, rgb in enumerate(colors):
     values = [[1.0] * 64 for _ in range(64)]
-    for _ in range(95):
+    for _ in range(160):
         x, y = rng.randrange(2, 58), rng.randrange(2, 58)
-        w, h = rng.choice([4, 6, 8, 12]), rng.choice([3, 4, 6, 8])
+        w, h = rng.choice([2, 3, 4, 6]), rng.choice([2, 3, 4])
         shade = rng.choice([.935, .965, .985, 1.025, 1.045])
         for yy in range(y, min(62, y + h)):
             for xx in range(x, min(62, x + w)):
@@ -99,7 +99,7 @@ def mesh(name, vertices, faces, tile=0, bevel=0, magazine=False):
     uv = data.uv_layers.new(name='SandBlockUV')
     minimum = [min(v.co[i] for v in data.vertices) for i in range(3)]
     spans = [max(v.co[i] for v in data.vertices)-minimum[i] for i in range(3)]
-    density = min(1.60, .84/max(spans))
+    density = min(2.40, .84/max(spans))
     for poly in data.polygons:
         normal = poly.normal
         drop = max(range(3), key=lambda i: abs(normal[i]))
@@ -139,10 +139,10 @@ def section(w, h, chamfer):
             (-w/2, h/2-chamfer), (-w/2, -h/2+chamfer)]
 
 
-def housing(name, rings, z, tile=4, hollow=None):
+def housing(name, rings, z, tile=4, hollow=None, through=False):
     # rings: (Y position, width, height, corner chamfer)
     vs = [(x, y, z+zz) for y, w, h, c in rings for x, zz in section(w, h, c)]
-    fs = [tuple(reversed(range(8)))]
+    fs = [] if through else [tuple(reversed(range(8)))]
     for j in range(len(rings)-1):
         fs += [(j*8+i, j*8+(i+1) % 8, (j+1)*8+(i+1) % 8, (j+1)*8+i) for i in range(8)]
     end = (len(rings)-1)*8
@@ -150,14 +150,73 @@ def housing(name, rings, z, tile=4, hollow=None):
         w, h, depth = hollow
         start = len(vs)
         vs += [(x, rings[-1][0], z+zz) for x, zz in section(w, h, min(w, h)*.06)]
-        vs += [(x, rings[-1][0]-depth, z+zz) for x, zz in section(w, h, min(w, h)*.06)]
+        rear_y = rings[0][0] if through else rings[-1][0]-depth
+        vs += [(x, rear_y, z+zz) for x, zz in section(w, h, min(w, h)*.06)]
         for i in range(8):
             k = (i+1) % 8
             fs += [(end+i, end+k, start+k, start+i), (start+i, start+k, start+8+k, start+8+i)]
-        fs.append(tuple(start+8+i for i in range(8)))
+        if through:
+            fs += [(i,start+8+i,start+8+(i+1)%8,(i+1)%8) for i in range(8)]
+        else:
+            fs.append(tuple(start+8+i for i in range(8)))
     else:
         fs.append(tuple(end+i for i in range(8)))
-    return mesh(name, vs, fs, tile)
+    ob = mesh(name, vs, fs, tile)
+    if hollow and not through:
+        for li in ob.data.polygons[-1].loop_indices:
+            ob.data.uv_layers.active.data[li].uv = (.875,.875)
+    return ob
+
+
+def vent_panel(side):
+    """One welded frame with seven holes and continuous chamfered inner rims."""
+    ys = [.242]
+    for i in range(7):
+        ys += [.2605+i*.038,.2835+i*.038]
+    ys.append(.534)
+    zs = [.093,.110,.145,.163]
+    occupied = {(j,k) for j in range(len(ys)-1) for k in range(3)
+                if k != 1 or j % 2 == 0}
+    vertices, faces, lookup = [], [], {}
+    xs = [side*.043-.006,side*.043+.006]
+    def vertex(i,j,k):
+        key = (i,j,k)
+        if key not in lookup:
+            lookup[key] = len(vertices)
+            vertices.append((xs[i],ys[j],zs[k]))
+        return lookup[key]
+    for j,k in sorted(occupied):
+        for i in [0,1]:
+            faces.append(tuple(vertex(i,jj,kk) for jj,kk in
+                               [(j,k),(j+1,k),(j+1,k+1),(j,k+1)]))
+        if (j-1,k) not in occupied:
+            faces.append(tuple(vertex(i,j,kk) for i,kk in [(0,k),(1,k),(1,k+1),(0,k+1)]))
+        if (j+1,k) not in occupied:
+            faces.append(tuple(vertex(i,j+1,kk) for i,kk in [(0,k),(1,k),(1,k+1),(0,k+1)]))
+        if (j,k-1) not in occupied:
+            faces.append(tuple(vertex(i,jj,k) for i,jj in [(0,j),(1,j),(1,j+1),(0,j+1)]))
+        if (j,k+1) not in occupied:
+            faces.append(tuple(vertex(i,jj,k+1) for i,jj in [(0,j),(1,j),(1,j+1),(0,j+1)]))
+    return mesh('Vent_Panel_'+str(side),vertices,faces,0,.0008)
+
+
+def rail_tooth(index, y):
+    # Shallow square pocket visible in the reference's top/detail views.
+    w,l,h,depth = .060,.014,.013,.0025
+    z = .191
+    vs = [(x,y+yy,z+zz) for zz in [-h/2,h/2]
+          for x,yy in [(-w/2,-l/2),(w/2,-l/2),(w/2,l/2),(-w/2,l/2)]]
+    vs += [(x,y+yy,z+h/2-d) for d in [0,depth]
+           for x,yy in [(-.012,-.0035),(.012,-.0035),(.012,.0035),(-.012,.0035)]]
+    fs = [(3,2,1,0)]
+    for i in range(4):
+        k = (i+1)%4
+        fs += [(i,k,k+4,i+4),(i+4,k+4,k+8,i+8),(i+8,k+8,k+12,i+12)]
+    fs.append((12,13,14,15))
+    ob = mesh('Top_Rail_Tooth_%02d'%index,vs,fs,4)
+    for li in ob.data.polygons[-1].loop_indices:
+        ob.data.uv_layers.active.data[li].uv = (.125,.625)
+    return ob
 
 
 # Rear rubber pad, full upper stock and stair-stepped lower silhouette.
@@ -171,6 +230,9 @@ profile('Stock_Stepped_Heel', [(-.310,-.038), (-.263,-.038), (-.263,-.010),
 for side in [-1, 1]:
     box('Stock_Shadow_Inset', (side*.035, -.257, .099), (.004,.081,.020), 11)
     box('Stock_Cheek_Block', (side*.037, -.205, .123), (.007,.132,.038), 0)
+    for yy,zz,length in [(-.287,-.012,.044),(-.287,.031,.044),(-.278,.071,.061)]:
+        box('Stock_Block_Joint', (side*.034,yy,zz), (.002,length,.0025), 2)
+    box('Stock_Lower_Block_Face', (side*.0348,-.288,.012), (.0025,.037,.030), 1)
 box('Stock_Neck', (0,-.101,.131), (.062,.053,.059), 6, .001)
 box('Stock_Locking_Collar', (0,-.112,.139), (.090,.022,.074), 4, .001)
 
@@ -188,6 +250,8 @@ for side in [-1,1]:
     box('Receiver_Small_Lower_Tab', (side*.041,.034,.083), (.005,.043,.018), 1)
     for yy in [.025,.043]:
         box('Receiver_Pin', (side*.044,yy,.084), (.003,.006,.006), 9)
+    box('Receiver_Front_Lower_Block', (side*.041,.238,.075), (.012,.024,.020), 6, .0006)
+    box('Receiver_Upper_Seam', (side*.0424,.084,.098), (.0015,.272,.0025), 2)
 box('Charging_Handle', (0,-.068,.183), (.105,.022,.012), 4, .0008)
 
 # Fore-end: seven genuine openings on each side, with the dark core recessed.
@@ -196,10 +260,7 @@ box('Handguard_Top_Spine', (0,.388,.165), (.094,.292,.023), 1, .0013)
 box('Handguard_Bottom_Spine', (0,.388,.090), (.092,.292,.020), 2, .001)
 for side in [-1,1]:
     x = side*.043
-    box('Vent_Panel_Top', (x,.388,.151), (.012,.292,.022), 1, .0006)
-    box('Vent_Panel_Bottom', (x,.388,.104), (.012,.292,.022), 0, .0006)
-    for i in range(8):
-        box('Vent_Bridge_%s_%02d' % (side,i), (x,.253+i*.038,.1275), (.012,.015,.025), 0)
+    vent_panel(side)
     box('Front_Handguard_Rim', (x,.533,.127), (.014,.016,.082), 1, .0008)
 box('Handguard_Rear_Band', (0,.246,.127), (.101,.021,.087), 1, .0014)
 box('Handguard_Front_Band', (0,.536,.123), (.098,.019,.087), 4, .0012)
@@ -207,7 +268,7 @@ box('Handguard_Front_Band', (0,.536,.123), (.098,.019,.087), 4, .0012)
 # Continuous square rail teeth: a broad readable rhythm, including beneath scope.
 box('Upper_Rail_Base', (0,.228,.181), (.048,.632,.011), 6)
 for i in range(25):
-    box('Top_Rail_Tooth_%02d'%i, (0,-.077+i*.0255,.191), (.060,.014,.013), 4, .0005)
+    rail_tooth(i,-.077+i*.0255)
 box('Lower_Rail_Base', (0,.390,.078), (.057,.278,.012), 6)
 for i in range(11):
     box('Lower_Rail_Tooth_%02d'%i, (0,.264+i*.0255,.071), (.066,.014,.012), 6)
@@ -222,6 +283,10 @@ for side in [-1,1]:
                           (-.076,-.069)], .003, 5, .0005, side*.030)
     profile('Grip_Tan_Backstrap', [(.020,.033), (.033,.041), (-.025,-.109),
                                  (-.038,-.115)], .004, 9, 0, side*.030)
+    for yy,zz in [(-.035,-.080),(-.043,-.103)]:
+        profile('Grip_Lower_Step', [(yy-.014,zz+.004),(yy+.010,zz+.010),
+                                   (yy+.008,zz-.001),(yy-.018,zz-.009)],
+                .005,9,.0004,side*.031)
 profile('Trigger_Guard', [(.017,.038), (.115,.038), (.121,-.010),
                          (.029,-.010), (.020,.002), (.028,.008),
                          (.103,.008), (.104,.026), (.017,.026)], .026, 9, .0007)
@@ -242,6 +307,9 @@ for side in [-1,1]:
     profile('Magazine_Front_Edge', [(.201,.028),(.212,.028),
                                    (.237,-.132),(.225,-.134)],
             .003, 9, 0, side*.034, True)
+    profile('Magazine_Lower_Seam', [(.131,-.119),(.236,-.106),
+                                  (.237,-.109),(.132,-.122)],
+            .002,7,0,side*.034,True)
 
 # Octagonal barrel and a large chamfered rectangular muzzle, with a real recess.
 housing('Barrel', [(.535,.034,.034,.008),(.755,.034,.034,.008)], .123, 4)
@@ -254,7 +322,7 @@ housing('Muzzle_Main', [(.742,.062,.061,.009),(.755,.077,.074,.012),
                        (.851,.077,.074,.012),(.864,.068,.066,.007)],
         .123, 5, hollow=(.025,.034,.040))
 housing('Muzzle_Front_Lip', [(.847,.079,.076,.012),(.866,.071,.068,.008)],
-        .123, 7, hollow=(.025,.034,.006))
+        .123, 9, hollow=(.025,.034,.019), through=True)
 box('Muzzle_Top_Block', (0,.816,.163), (.026,.026,.006), 6)
 for side in [-1,1]:
     box('Muzzle_Side_Recess', (side*.0387,.838,.125), (.001,.016,.032), 8)
@@ -282,9 +350,10 @@ for i, yy in enumerate([.006,.045,.085,.125]):
 housing('Scope_Objective_Shoulder', [(.150,.060,.061,.009),(.161,.080,.078,.006),
                                      (.199,.080,.078,.006)], .253, 5)
 housing('Scope_Objective_Rim', [(.195,.085,.083,.004),(.229,.085,.083,.004)],
-        .253, 7, hollow=(.061,.061,.009))
+        .253, 9, hollow=(.061,.061,.009))
 box('Scope_Amber_Glass', (0,.221,.253), (.058,.0015,.058), 12)
 box('Scope_Amber_Reflection', (-.016,.222,.254), (.009,.001,.050), 13)
+box('Scope_Amber_Inner_Reflection', (-.022,.2222,.251), (.004,.0008,.041), 13)
 box('Scope_Dark_Glass_Edge', (.025,.222,.253), (.007,.001,.057), 14)
 box('Scope_Turret_Stem', (0,.048,.293), (.026,.030,.021), 4)
 box('Scope_Turret_Cap', (0,.048,.309), (.042,.042,.015), 7, .0007)
@@ -387,20 +456,20 @@ scene.world = world
 floor_mat = bpy.data.materials.new('Graphite Floor')
 floor_mat.use_nodes = True
 floor_bsdf = floor_mat.node_tree.nodes.get('Principled BSDF')
-floor_bsdf.inputs['Base Color'].default_value = (.025,.028,.034,1)
+floor_bsdf.inputs['Base Color'].default_value = (.006,.007,.009,1)
 floor_bsdf.inputs['Roughness'].default_value = .88
-bpy.ops.mesh.primitive_plane_add(size=200, location=(0,0,-.164))
+bpy.ops.mesh.primitive_plane_add(size=200, location=(0,0,min(p.z for p in pts)-.0007))
 floor = bpy.context.object
 floor.name = 'Review_Ground'
 for col in list(floor.users_collection):
     col.objects.unlink(floor)
 studio.objects.link(floor)
 floor.data.materials.append(floor_mat)
-focus = Vector((0,.263,.080))
+focus = Vector((0,.263,.070))
 for name, pos, power, width, color in [
-    ('Key', (1.0,.0,1.8), 95, 1.8, (1,.90,.76)),
-    ('Fill', (1.4,1.9,.7), 55, 1.4, (.76,.85,1)),
-    ('Rim', (-.8,-.1,1.2), 115, 1.5, (1,.85,.65)),
+    ('Key', (1.0,.0,1.8), 130, 1.8, (1,.90,.76)),
+    ('Fill', (1.4,1.9,.7), 68, 1.4, (.76,.85,1)),
+    ('Rim', (-.8,-.1,1.2), 150, 1.5, (1,.85,.65)),
 ]:
     data = bpy.data.lights.new(name,'AREA')
     data.energy, data.size, data.color = power, width, color
@@ -447,7 +516,7 @@ for name, direction in [('three_quarter',(1.65,.85,.52)), ('side',(2,0,.05)),
                         ('top',(.001,0,2)), ('front',(0,2,.03))]:
     cam.location = focus+Vector(direction)
     cam.rotation_euler = (focus-cam.location).to_track_quat('-Z','Y').to_euler()
-    cam.data.ortho_scale = 1.39 if name != 'front' else .66
+    cam.data.ortho_scale = 1.39 if name != 'front' else .95
     scene.render.filepath = str(review/(name+'.png'))
     bpy.ops.render.render(write_still=True)
 print('RIFLE_SAND_BLOCK_BUILT',json.dumps(report),flush=True)
