@@ -294,6 +294,31 @@ box('Scope_Side_Cap', (.059,.048,.255), (.009,.028,.027), 7, .0006)
 for side in [-1,1]:
     box('Scope_Mount_Pin', (side*.040,.134,.199), (.003,.007,.007), 8)
 
+# Align the orthographic proportions to the supplied side view. The reference
+# has a shallow receiver and optic, a shorter raked grip, and a compact magazine.
+for ob in parts:
+    for v in ob.data.vertices:
+        if ob.name.startswith('Scope_'):
+            v.co.y = .078+(v.co.y-.078)*.90+.050
+            v.co.z = .253+(v.co.z-.253)*.85-.020
+        elif ob.name.startswith('Grip_'):
+            v.co.z = .067+(v.co.z-.067)*.88
+        elif ob.name.startswith('Stock_'):
+            v.co.z = -.038+(v.co.z+.038)*.94
+        elif ob.name.startswith(('Upper_Receiver','Receiver_Top_Trim','Charging_Handle')):
+            v.co.z = .100+(v.co.z-.100)*.78
+        elif ob.name.startswith(('Handguard_','Vent_','Front_Handguard_','Lower_Rail_')):
+            v.co.z = .127+(v.co.z-.127)*.80
+        elif ob.name.startswith(('Top_Rail_','Upper_Rail_')):
+            v.co.z -= .016
+        elif ob.name.startswith('Sight_') and v.co.z > .170:
+            v.co.z = .170+(v.co.z-.170)*.75
+    ob.data.update()
+for ob in magazines:
+    for v in ob.data.vertices:
+        v.co.z = .037+(v.co.z-.037)*.82-.012
+    ob.data.update()
+
 
 def join(objs, name, pivot=(0,0,0)):
     bpy.ops.object.select_all(action='DESELECT')
@@ -313,10 +338,10 @@ def join(objs, name, pivot=(0,0,0)):
 body = join(parts, 'Rifle_Sand_Block_Body')
 mag = join(magazines, 'Rifle_Sand_Block_Magazine', (0,.163,.030))
 mag['role'] = 'Separate magazine; feed-mouth pivot'
-markers = {'RightHandGrip':(0,0,0), 'LeftHandGuide':(0,.350,.077),
-           'Muzzle':(0,.867,.123), 'AimReference':(0,.220,.253),
+markers = {'RightHandGrip':(0,0,0), 'LeftHandGuide':(0,.350,.087),
+           'Muzzle':(0,.867,.123), 'AimReference':(0,.256,.233),
            'RecoilPivot':(0,0,0), 'HolsterAttach':(0,0,0),
-           'Grip_Point':(0,0,0), 'Support_Hand_Point':(0,.350,.077),
+           'Grip_Point':(0,0,0), 'Support_Hand_Point':(0,.350,.087),
            'Muzzle_Point':(0,.867,.123)}
 for name, pos in markers.items():
     ob = bpy.data.objects.new(name, None)

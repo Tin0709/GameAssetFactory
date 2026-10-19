@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "meshes": 2,
+  "triangles": 4648,
+  "vent_opening_ray_checks": 14,
+  "dimensions_m": [
+    0.11900000274181366,
+    1.2049999833106995,
+    0.42979471385478973
+  ],
+  "roundtrip_dimensions_max_error_m": 0.0,
+  "packed_texture": [
+    256,
+    256
+  ],
+  "animations": 0
+}
