@@ -54,9 +54,10 @@ for side in [-1,1]:
 # The lowered top chamber is visibly below the slide's surrounding top planes.
 hit,point = cast(slide,(.017,.080*.98,.20),(0,0,-1))
 assert hit and point.z < .094,('Top chamber is filled',list(point))
-# Detachable magazine can expose an actual open grip well.
-top_center = Vector((0,.0035*.98,.05*.95))
-bottom_center = Vector((0,-.031*.98,-.046*.95))
+# Check the usable cavity below the frame/feed seat, rather than ray casting
+# through the solid receiver above the grip's opening.
+top_center = Vector((0,-.00225*.98,.034*.95))
+bottom_center = Vector((0,-.031*.98,-.0505*.95))
 ray = (top_center-bottom_center).normalized()
 hit,point = cast(frame,bottom_center-ray*.025,ray,distance=(top_center-bottom_center).length+.024)
 assert not hit,('Grip well is filled with frame geometry',list(point))

@@ -154,9 +154,8 @@ profile('Front_Dustcover',[(.112,.061),(.201,.061),(.201,.045),(.129,.045),(.112
         .042,0,.0007)
 for side in [-1,1]:
     box('Dustcover_Long_Recess',(side*.0214,.155,.055),(.0017,.083,.0034),2)
-    box('Dustcover_Lower_Step',(side*.019,.154,.046),(.004,.067,.003),1)
 for y in [.130,.166]:
-    box('Under_Rail_Lug',(0,y,.044),(.033,.016,.004),2,.0004)
+    box('Under_Rail_Lug',(0,y,.0465),(.033,.016,.004),2,.0004)
 box('Rear_Frame_Step',(0,-.036,.049),(.035,.024,.008),2,.0005)
 
 # Hollow, raked tan grip shell. Inner walls remain when magazine is removed.
@@ -164,7 +163,8 @@ sections = [(.050,.0035,.035,.063),(-.046,-.031,.035,.062)]
 vs = []
 for z,y,w,l in sections:
     for section in [octagon(w,l,.0018),octagon(.024,.040,.001)]:
-        vs += [(x,y+yy,z) for x,yy in section]
+        vs += [(x,y+yy,z if z > 0 else -.046-(y+yy+.066)*(.007/.064)-.0007)
+               for x,yy in section]
 fs = []
 for i in range(8):
     j = (i+1)%8
@@ -231,6 +231,10 @@ housing('Square_Muzzle_Trim',[(.209,.046,.039,.0025),(.217,.045,.038,.002)],
 box('Lower_Recoil_Plug',(0,.208,.066),(.027,.015,.018),6,.0008)
 for side in [-1,1]:
     box('Slide_Front_Side_Accent',(side*.0217,.201,.092),(.001,.009,.023),6,0,'Slide')
+    for yy,zz,length,height,tile in [(.164,.0897,.018,.008,6),
+                                   (.183,.099,.009,.006,6),
+                                   (.125,.104,.020,.006,5)]:
+        box('Slide_Pixel_Patch',(side*.02158,yy,zz),(.00012,length,height),tile,0,'Slide')
 
 # Open U rear sight and single square front post, both fixed to the slide.
 box('Rear_Sight_Base',(0,-.009,.115),(.033,.020,.004),7,.0004,'Slide')
