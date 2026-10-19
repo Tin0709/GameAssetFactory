@@ -108,9 +108,9 @@
       "kind": "Pistol",
       "label": "Pistol \u2014 Sand Block V1",
       "source": "blender/weapons/pistol_sand_block_v1/Pistol_Sand_Block_V1.blend",
-      "source_sha256": "443811deea701efc7fd607bc7c929f6b23d81ad80e13dfefe35cb43bd2ae8b47",
+      "source_sha256": "db8549c2362e6d1857cf5dd8bdf612d66e9ed24fc960fe55eeaa7ffb0b1c8a80",
       "status": "Pending",
-      "status_note": "Pending visual review; user-requested reference detail pass: flat graphite pixel clusters, stepped slide roof, inset barrel hood, straighter trigger and grip panels seated at the magazine floorplate.",
+      "status_note": "Pending visual review; user-requested larger and higher-contrast graphite pixel patches across the dark parts, preserving the completed geometry detail pass.",
       "collection": "WEAPON_pistol_sand_block_v1",
       "root": "pistol_sand_block_v1__Pistol_Sand_Block_V1"
     }
