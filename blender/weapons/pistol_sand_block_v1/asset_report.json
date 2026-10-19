@@ -67,12 +67,12 @@
   ],
   "topology": {
     "Pistol_Sand_Frame": {
-      "triangles": 1504,
+      "triangles": 1568,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
     "Pistol_Sand_Slide": {
-      "triangles": 828,
+      "triangles": 808,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
@@ -82,5 +82,5 @@
       "loose_vertices": 0
     }
   },
-  "triangles": 2420
+  "triangles": 2464
 }
