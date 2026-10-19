@@ -97,9 +97,9 @@
       "kind": "Rifle",
       "label": "Rifle \u2014 Sand Block V1",
       "source": "blender/weapons/rifle_sand_block_v1/Rifle_Sand_Block_V1.blend",
-      "source_sha256": "c86d9b7fb4ad56b8c4de30e4f680aa4972491bbef04add1842191cdae5a54834",
+      "source_sha256": "1c6e64e625421b2323b738e4edf76d4bc88763012d0aa2025ec11b14c41e89ce",
       "status": "Pending",
-      "status_note": "Pending visual review; user-requested reference detail pass 2026-10-19: vent chamfers, rail pockets, sight apertures, warm optic/muzzle rims, block joints and finer pixel clusters.",
+      "status_note": "Pending visual review; user-requested optic correction 2026-10-19: clear hollow metal tube, separate front/rear biconvex transmitting lenses and recessed lens seats; previous detail work retained.",
       "collection": "WEAPON_rifle_sand_block_v1",
       "root": "rifle_sand_block_v1__Rifle_Sand_Block_V1"
     }
