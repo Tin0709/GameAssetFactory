@@ -2,11 +2,11 @@
   "passed": true,
   "meshes": 4,
   "materials": 1,
-  "triangles": 5168,
+  "triangles": 4812,
   "dimensions_m": [
-    0.10500000044703484,
-    1.05799999833107,
-    0.2667788192629814
+    0.1022999994456768,
+    1.0580000281333923,
+    0.23702305555343628
   ],
   "roundtrip_error_m": 0.0,
   "texture_roundtrip_error": 0.0,
@@ -16,7 +16,11 @@
   "recessed_lower_cap": true,
   "barrel_to_collar_gap_m": 0.0015000030398368835,
   "barrel_to_lower_tube_gap_m": 0.006000004708766937,
-  "pump_groove_depth_m": 0.0070000141859054565,
+  "pump_width_m": 0.06599999964237213,
+  "pump_body_height_m": 0.07699999585747719,
+  "grip_origin_inside_handle": true,
+  "marker_roundtrip_exact": true,
+  "pump_groove_depth_m": 0.0020000040531158447,
   "inset_receiver_port": true,
   "shells": 4,
   "animations": 0

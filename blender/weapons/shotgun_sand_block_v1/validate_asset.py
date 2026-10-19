@@ -61,6 +61,7 @@ assert hit
 hit,groove=cast(pump,(.20,.246,.078),(-1,0,0))
 assert hit and .0015<rib.x-groove.x<.0035,('Pump grooves are absent or too deep',list(rib),list(groove))
 assert pump.dimensions.x<.070 and .223<pump.dimensions.y<.231,tuple(pump.dimensions)
+pump_width=pump.dimensions.x
 hit,pump_top=cast(pump,(0,.330,.20),(0,0,-1))
 assert hit
 hit,pump_bottom=cast(pump,(0,.330,0),(0,0,1))
@@ -106,7 +107,7 @@ result={'passed':True,'meshes':4,'materials':1,'triangles':tris,'dimensions_m':d
         'stock_and_guard_open':True,'deep_main_muzzle':True,'recessed_muzzle_side_windows':True,
         'recessed_lower_cap':True,
         'barrel_to_collar_gap_m':collar_gap,'barrel_to_lower_tube_gap_m':tube_gap,
-        'pump_width_m':pump.dimensions.x,'pump_body_height_m':pump_top.z-pump_bottom.z,
+        'pump_width_m':pump_width,'pump_body_height_m':pump_top.z-pump_bottom.z,
         'grip_origin_inside_handle':True,'marker_roundtrip_exact':True,
         'pump_groove_depth_m':rib.x-groove.x,'inset_receiver_port':True,'shells':4,'animations':0}
 (OUT/'validation.json').write_text(json.dumps(result,indent=2))
