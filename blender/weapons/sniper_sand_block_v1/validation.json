@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "meshes": 4,
+  "materials": 3,
+  "triangles": 8004,
+  "dimensions_m": [
+    0.1119999997317791,
+    1.1932000070810318,
+    0.29822567105293274
+  ],
+  "roundtrip_error_m": 0.0,
+  "texture_roundtrip_error": 0.0,
+  "stock_and_guard_open": true,
+  "deep_muzzle_bore": true,
+  "real_brake_slots": 4,
+  "handguard_vents": 10,
+  "clear_metal_optic_tunnel_rays": 5,
+  "red_orange_transmitting_lenses": 2,
+  "grip_origin_inside_handle": true,
+  "marker_roundtrip_exact": true,
+  "animations": 0
+}
