@@ -320,10 +320,11 @@ box('Top_Rail_Base',(0,.153,.145),(.045,.552,.008),6,.0005)
 for i in range(25):
     y=-.116+i*.0222
     box('Top_Rail_Tooth_%02d'%i,(0,y,.15225),(.048,.010,.0065),7 if i%5==0 else 4,.0004)
+box('Rear_Sight_Seat',(0,-.061,.156),(.034,.020,.003),6,.0003)
 box('Rear_Sight_Base',(0,-.061,.160),(.035,.022,.006),6,.0004)
 for x in [-.012,.012]:
     box('Rear_Sight_Ear',(x,-.061,.166),(.011,.016,.014),4,.0004)
-box('Front_Sight_Base',(0,.613,.133),(.027,.018,.005),6,.0004)
+box('Front_Sight_Base',(0,.613,.1322),(.027,.018,.005),6,.0004)
 box('Front_Sight_Post',(0,.613,.140),(.012,.011,.012),7,.0004)
 
 # Octagonal shell ends and brighter yellow brass match the close-up reference.

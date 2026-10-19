@@ -34,6 +34,9 @@ def cast(o,origin,direction,distance=1):
     return hit,o.matrix_world@point+authoring_origin
 
 for side in [-1,1]:
+    for y,z in [(-.0716,.156),(.613,.1302)]:
+        hit,point=cast(frame,(side*.12,y,z),(-side,0,0))
+        assert hit and .010<abs(point.x)<.020,('Sight mount has an air gap',y,z)
     for y,z in [(-.340,.025),(-.310,.040),(-.280,.058)]:
         hit,_=cast(frame,(side*.20,y,z),(-side,0,0))
         assert not hit,('Stepped stock opening is filled',side,y,z)
@@ -109,6 +112,7 @@ result={'passed':True,'meshes':4,'materials':1,'triangles':tris,'dimensions_m':d
         'barrel_to_collar_gap_m':collar_gap,'barrel_to_lower_tube_gap_m':tube_gap,
         'pump_width_m':pump_width,'pump_body_height_m':pump_top.z-pump_bottom.z,
         'grip_origin_inside_handle':True,'marker_roundtrip_exact':True,
+        'sight_seats_attached':True,
         'pump_groove_depth_m':rib.x-groove.x,'inset_receiver_port':True,'shells':4,'animations':0}
 (OUT/'validation.json').write_text(json.dumps(result,indent=2))
 print('SHOTGUN_ASSET_VALIDATED',json.dumps(result))
