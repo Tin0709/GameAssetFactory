@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "native_action_count": 89,
+  "other_actions_exact": 88,
+  "source_crossbow_action_exact": true,
+  "existing_protected_files_exact": 6772,
+  "existing_godot_files_exact": 2007,
+  "old_pending_sources_exact": true,
+  "same_pending_entry_refined": true,
+  "rigs_meshes_materials_cameras_and_sequences_exact": true,
+  "focused_entries": 21,
+  "archived_entries": 35,
+  "lfs_new_version_storage_download_estimate_MiB": 94.52332305908203,
+  "lfs_attributes": "existing *.blend filter=lfs diff=lfs merge=lfs; no new patterns or migration",
+  "quota_note": "Local Git cannot establish account storage/bandwidth quota. No manual commit/push/tracking/history changes; existing autosync remains untouched.",
+  "largest_new_ordinary_file_bytes": 1309588,
+  "source_sha256": "e434f02e8be10557d058ca5eef0ddfc4d355c5d173d0138edb03b14d9aad03dd",
+  "action_sha256": "9a81be3fde8b3472b88bfac093cbb03db48dfafcc71e4bb82ee0a5fc907f15b7"
+}

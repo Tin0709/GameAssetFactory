@@ -85,5 +85,6 @@
     "action_sha256": "f852e42039a05b45ece934e8a6063bb6bfe4886317cd4c7dc46c7b506a2c58b6"
   },
   "contains_source_derived_base_pose": true,
-  "review_scope": "Source-clock rifle aiming HOLD only; previous Ready\u2192Aim\u2192Hold\u2192Ready source/timeline preserved in previous_pending_source."
+  "review_scope": "Source-clock rifle aiming HOLD only; previous Ready\u2192Aim\u2192Hold\u2192Ready source/timeline preserved in previous_pending_source.",
+  "user_reference": "User-provided two rifle reference images2026-10-19: adapt immutable source charged-crossbow pose to level rifle, clear face, distinct trigger and fore-end contacts; preserve source core/head/legs/clocks."
 }
