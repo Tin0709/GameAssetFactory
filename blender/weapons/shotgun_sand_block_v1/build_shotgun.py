@@ -169,12 +169,12 @@ box('Stock_Front_Web',(0,-.260,.058),(.050,.039,.025),2,.0006)
 box('Stock_Lower_Socket',(0,-.238,.055),(.033,.016,.026),6,.0005)
 housing('Stock_Graphite_Pad',[(-.418,.059,.151,.003),(-.411,.064,.159,.003),
         (-.380,.064,.159,.003)],.040,6)
-profile('Stock_Neck_Core',[(-.247,.119),(-.210,.119),(-.210,.126),(-.184,.126),
-        (-.184,.134),(-.151,.134),(-.139,.128),(-.136,.081),
-        (-.183,.080),(-.196,.086),(-.247,.086)],.044,4,.0008)
-housing('Stock_Rear_Collar',[(-.246,.050,.039,.002),(-.226,.050,.039,.002)],.105,6)
-profile('Stock_Receiver_Adapter',[(-.169,.130),(-.153,.143),(-.134,.139),
-        (-.124,.121),(-.126,.062),(-.148,.064),(-.169,.078)],.057,4,.0008)
+profile('Stock_Neck_Core',[(-.247,.116),(-.211,.116),(-.211,.121),(-.184,.121),
+        (-.184,.126),(-.151,.126),(-.139,.121),(-.136,.086),
+        (-.196,.086),(-.247,.086)],.042,4,.0008)
+housing('Stock_Rear_Collar',[(-.246,.048,.035,.002),(-.226,.048,.035,.002)],.103,6)
+profile('Stock_Receiver_Adapter',[(-.184,.119),(-.164,.119),(-.164,.131),
+        (-.135,.134),(-.126,.121),(-.129,.080),(-.184,.080)],.052,4,.0008)
 
 # Receiver with genuinely inset side ports under its overhanging roof.
 profile('Receiver_Lower',[(-.135,.102),(-.125,.107),(.130,.107),(.139,.094),
@@ -199,7 +199,7 @@ grip_yz=[(-.094,.065),(-.036,.052),(-.074,-.078),(-.137,-.061)]
 profile('Grip_Sand_Core',grip_yz,.043,0,.0012)
 profile('Grip_Dark_Backstrap',[(-.094,.065),(-.086,.064),(-.129,-.060),(-.137,-.061)],
         .045,6,.0006)
-profile('Grip_Graphite_Heel',[(-.143,-.060),(-.072,-.078),(-.077,-.094),(-.148,-.076)],
+profile('Grip_Graphite_Heel',[(-.140,-.059),(-.064,-.077),(-.068,-.098),(-.145,-.080)],
         .050,6,.0009)
 yz_ring('Angular_Trigger_Guard',[(-.044,.055),(.064,.055),(.058,.008),
         (-.006,.008),(-.038,.024),(-.048,.036)],
@@ -277,6 +277,15 @@ housing('Foreend_Front_Collar',[(.437,.065,.094,.006),(.456,.060,.094,.006)],
 # the old raised fingers; the top/bottom chamfers remain one connected surface.
 pump_body=housing('Pump_Faceted_Body',[(.216,.057,.069,.005),(.226,.066,.077,.006),
         (.430,.066,.077,.006),(.442,.058,.071,.005)],.079,0,group='Pump')
+# Give the underside a broader bevel than the top, as in the pump close-up.
+for j,(w,h,ch) in enumerate([(.057,.069,.005),(.066,.077,.006),
+                           (.066,.077,.006),(.058,.071,.005)]):
+    lower_ch=.011 if j in [1,2] else .009
+    for i in [0,1]:
+        pump_body.data.vertices[j*8+i].co.x=(-1 if i==0 else 1)*(w/2-lower_ch)
+    for i in [2,7]:
+        pump_body.data.vertices[j*8+i].co.z=.079-h/2+lower_ch
+pump_body.data.update()
 for side in [-1,1]:
     for y in [.246,.288,.330,.372,.414]:
         bpy.ops.mesh.primitive_cube_add(size=1,location=(side*.0345,y,.077))

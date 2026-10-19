@@ -68,17 +68,17 @@
   "dimensions_m": [
     0.1022999994456768,
     1.0580000281333923,
-    0.23702305555343628
+    0.2402360960841179
   ],
   "shells": 4,
   "topology": {
     "Shotgun_Sand_Frame": {
-      "triangles": 4060,
+      "triangles": 4056,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
     "Shotgun_Sand_Pump": {
-      "triangles": 304,
+      "triangles": 264,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
@@ -93,5 +93,5 @@
       "loose_vertices": 0
     }
   },
-  "triangles": 4812
+  "triangles": 4768
 }
