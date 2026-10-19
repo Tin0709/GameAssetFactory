@@ -330,8 +330,10 @@ for side in [-1,1]:
 # Front sight tower with an open square aperture and small offset lug.
 box('Sight_Tower_Base', (0,.548,.166), (.059,.031,.063), 4, .0009)
 for side in [-1,1]:
-    box('Sight_Tower_Ear', (side*.021,.548,.221), (.014,.032,.057), 7, .0007)
+    for yy in [.536,.560]:
+        box('Sight_Tower_Ear', (side*.021,yy,.221), (.014,.009,.057), 7, .0007)
 box('Sight_Tower_Top', (0,.548,.245), (.054,.033,.012), 7, .0005)
+box('Sight_Top_Inset', (0,.548,.2512), (.013,.016,.0012), 8)
 box('Sight_Tower_Sill', (0,.548,.201), (.054,.032,.012), 5)
 box('Sight_Pin', (0,.548,.214), (.006,.012,.019), 6)
 box('Sight_Side_Lug', (.036,.549,.185), (.022,.017,.017), 7, .0005)
