@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "native_actions": 89,
+  "other_actions_exact": 88,
+  "literal_crossbow_source_action_exact": true,
+  "old_protected_files_exact": 6824,
+  "godot_files_exact": 2007,
+  "rig_mesh_material_camera_research_sequence_fingerprints_exact": true,
+  "same_pending_action_updated": "Rifle_Aim_Hold_ActionsStyle_v001",
+  "previous_pending_source_preserved": {
+    "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/focused_aim_pose_20261019/rifle_aim_hold_actionsstyle_v001.blend",
+    "source_sha256": "be9c930d842a4925d738ab430fc993e22fe9e76f78309da309da85ce15fb8494",
+    "action_sha256": "0e459603fe447293469b0fff7abb5ebdba905eeec41e02fdb1ca9f7d88515cd5"
+  },
+  "source_sha256": "0b10235b74d7fa5cf48cba2f92b1df046b12f2044dad4de4a5ab90fc18341029",
+  "action_sha256": "bad5c3c066c053be6a6a072160222cf08ae09aaf2db750791a7aa08209a69b3b",
+  "lfs_new_versions_estimated_storage_download_MiB": 94.62472534179688,
+  "largest_new_ordinary_file_bytes": 1046119,
+  "lfs": "Existing *.blend filter=lfs; no new patterns/history migration. Account quota unavailable locally. No manual commit/push/tracking changes."
+}

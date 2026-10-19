@@ -1,0 +1,66 @@
+{
+  "passed": true,
+  "saved_showcase_reopened": true,
+  "previous_manifest_entries_and_review_data_exact": true,
+  "action_count": 89,
+  "selections": [
+    {
+      "action": "Rifle_Aim_Hold_ActionsStyle_v001",
+      "status": "pending",
+      "range": [
+        1,
+        108
+      ],
+      "fps": 30
+    },
+    {
+      "action": "Crossbow_Aim_ActionsStuff_Source_Test_v001",
+      "status": "pending",
+      "range": [
+        1,
+        108
+      ],
+      "fps": 30
+    },
+    {
+      "action": "Rifle_Ready_Idle_ActionsStyle_v004",
+      "status": "approved",
+      "range": [
+        1,
+        324
+      ],
+      "fps": 30
+    },
+    {
+      "action": "Rifle_Ready_Walk_ActionsStyle_v0012",
+      "status": "approved",
+      "range": [
+        1,
+        216
+      ],
+      "fps": 30
+    },
+    {
+      "action": "Rifle_Ready_Run_ActionsStyle_v002",
+      "status": "approved",
+      "range": [
+        1,
+        2700
+      ],
+      "fps": 30
+    },
+    {
+      "action": "Rifle_Aim_Hold_ActionsStyle_v001",
+      "status": "pending",
+      "range": [
+        1,
+        108
+      ],
+      "fps": 30
+    }
+  ],
+  "focused_entries": 21,
+  "archived_entries": 35,
+  "full_loop_pose_error": 0.0,
+  "hold_loop_pose_error": 0.0
+}

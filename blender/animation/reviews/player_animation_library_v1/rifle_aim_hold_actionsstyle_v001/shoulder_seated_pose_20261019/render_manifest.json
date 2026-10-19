@@ -1,0 +1,34 @@
+{
+  "fps": 30,
+  "original_speed": true,
+  "frames": 216,
+  "duration_s": 7.2,
+  "source_period_s": 3.6,
+  "continuous_cycles": 2,
+  "closing_key_frame": 109,
+  "playable_cycle_frames": [
+    1,
+    108
+  ],
+  "views": [
+    "front",
+    "reference",
+    "side",
+    "back"
+  ],
+  "matched_comparison_frame": 85,
+  "comparison_camera": {
+    "location": [
+      -6,
+      -4,
+      4.6
+    ],
+    "target": [
+      -0.05,
+      -0.3,
+      1.02
+    ],
+    "orthographic_scale": 2.4
+  },
+  "camera_changes_presentation_only": true
+}

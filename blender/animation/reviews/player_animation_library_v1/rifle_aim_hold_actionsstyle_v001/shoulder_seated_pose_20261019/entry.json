@@ -90,5 +90,6 @@
     "action_sha256": "0e459603fe447293469b0fff7abb5ebdba905eeec41e02fdb1ca9f7d88515cd5"
   },
   "contains_source_derived_base_pose": true,
-  "review_scope": "Source-clock rifle aiming HOLD only; previous Ready\u2192Aim\u2192Hold\u2192Ready source/timeline preserved in previous_pending_source."
+  "review_scope": "Source-clock rifle aiming HOLD only; previous Ready\u2192Aim\u2192Hold\u2192Ready source/timeline preserved in previous_pending_source.",
+  "user_reference": "User-provided two rifle reference images2026-10-19: whole-upper-body focused aim: diagonal torso and head, touching crossed rigid hands, balanced face clearance; preserve immutable source study and its idle clocks/lower body."
 }

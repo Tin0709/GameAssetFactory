@@ -1,0 +1,110 @@
+{
+  "Rifle_Aim_Hold_ActionsStyle_v001": {
+    "Root": {
+      "translation": 0.0,
+      "angular": 0.0
+    },
+    "Hips": {
+      "translation": 0.001745578533293089,
+      "angular": 0.005312654835974093
+    },
+    "Spine": {
+      "translation": 0.0018232943305270097,
+      "angular": 0.005429988136251011
+    },
+    "Chest": {
+      "translation": 0.002660830109466091,
+      "angular": 0.005350344172875334
+    },
+    "Neck": {
+      "translation": 0.003950533732580194,
+      "angular": 0.005350290289372581
+    },
+    "Head": {
+      "translation": 0.0040635324936204795,
+      "angular": 0.005528839256638668
+    },
+    "UpperArm.L": {
+      "translation": 0.004587711830031827,
+      "angular": 0.005434988193039785
+    },
+    "ForeArm.L": {
+      "translation": 0.005708269562443905,
+      "angular": 0.005434988193039785
+    },
+    "UpperArm.R": {
+      "translation": 0.003632446947712093,
+      "angular": 0.005394298797901124
+    },
+    "ForeArm.R": {
+      "translation": 0.004758531430802781,
+      "angular": 0.005394507987957749
+    },
+    "WeaponCarrier": {
+      "translation": 0.0056585453886230114,
+      "angular": 0.0054256361970837904
+    },
+    "Leg.L": {
+      "translation": 0.0002253521183203052,
+      "angular": 0.000393204176343993
+    },
+    "Leg.R": {
+      "translation": 0.00024445612403242674,
+      "angular": 0.00034127953871213154
+    }
+  },
+  "Crossbow_Aim_ActionsStuff_Source_Test_v001": {
+    "Root": {
+      "translation": 0.0,
+      "angular": 0.0
+    },
+    "Hips": {
+      "translation": 0.001745578533293089,
+      "angular": 0.00534117773538504
+    },
+    "Spine": {
+      "translation": 0.0018282175989470357,
+      "angular": 0.00534117773538504
+    },
+    "Chest": {
+      "translation": 0.0026926326461753883,
+      "angular": 0.005347957407611794
+    },
+    "Neck": {
+      "translation": 0.003964185923088786,
+      "angular": 0.005347957407611794
+    },
+    "Head": {
+      "translation": 0.003923089724984037,
+      "angular": 0.0015433518487970815
+    },
+    "UpperArm.L": {
+      "translation": 0.0045798800107700295,
+      "angular": 0.005446404281213394
+    },
+    "ForeArm.L": {
+      "translation": 0.005393161063747244,
+      "angular": 0.0054418044535533075
+    },
+    "UpperArm.R": {
+      "translation": 0.0036343789975254604,
+      "angular": 0.00544493052576018
+    },
+    "ForeArm.R": {
+      "translation": 0.004532625539357247,
+      "angular": 0.00543956611254806
+    },
+    "WeaponCarrier": {
+      "translation": 0.005251636035142629,
+      "angular": 0.005404808281000347
+    },
+    "Leg.L": {
+      "translation": 0.000225759673654162,
+      "angular": 0.00039990507677555346
+    },
+    "Leg.R": {
+      "translation": 0.0002328772610239591,
+      "angular": 0.0003426158461070947
+    }
+  }
+}
