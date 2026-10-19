@@ -2,13 +2,15 @@ import bpy,sys,json,hashlib,math
 from pathlib import Path
 from mathutils import Matrix,Vector
 import argparse
-p=argparse.ArgumentParser();p.add_argument('--cache',required=True);opt=p.parse_args(sys.argv[sys.argv.index('--')+1:])
+p=argparse.ArgumentParser();p.add_argument('--cache',required=True);p.add_argument('--rebuild-pending',action='store_true');opt=p.parse_args(sys.argv[sys.argv.index('--')+1:])
 R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').is_file());S=Path(opt.cache).resolve();O=R/'blender/animation/reviews/player_animation_library_v1/crossbow_aim_actionsstuff_source_v001';O.mkdir(exist_ok=True)
 sys.path.insert(0,str(R/'blender/animation/showcase'));import gaf_animation_library as ui
 sys.path.insert(0,str(R/'blender/animation/reviews/player_animation_library_v1/actions_stuff_idle_v001'));from idle_retarget import JumpRetarget
 N='Crossbow_Aim_ActionsStuff_Source_Test_v001';rig=bpy.data.objects[ui.RIG];mesh=bpy.data.objects['Showcase_Player_Mesh'];s=bpy.context.scene
 assert N not in bpy.data.actions
 mf=json.loads((R/'blender/animation/showcase/animation_manifest.json').read_text());e0=next(e for e in mf['animations'] if e['action']=='Rifle_Ready_Idle_ActionsStyle_v004');a0=bpy.data.actions[e0['action']];assert ui.action_signature(a0)==e0['action_sha256']
+assert not any(e['action']==N and e['status']=='approved' for e in mf['animations']),'Approved source studies must remain unchanged'
+if (O/'crossbow_aim_actionsstuff_source_v001.blend').exists() and not opt.rebuild_pending:raise RuntimeError('Preserve existing source; use an explicit backed-up Pending rebuild')
 rig.animation_data.action=a0;rig.animation_data.action_slot=a0.slots[0];s.frame_set(1);bpy.context.view_layer.update();approved={b.name:b.matrix.copy() for b in rig.pose.bones}
 # The only weapon adapter: hold the original rifle grip position in the rigid
 # right-hand frame. Align rifle axis to source item frame; never solve either arm.
