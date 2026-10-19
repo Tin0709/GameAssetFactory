@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "new_pending_action": "Rifle_Aim_Hold_Arsenal_ActionsStyle_v001",
+  "native_actions": 90,
+  "all_previous_actions_exact": 89,
+  "previous_aim_exact": true,
+  "all_other_native_assets_exact": true
+}
