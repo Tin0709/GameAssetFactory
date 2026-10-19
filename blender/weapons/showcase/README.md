@@ -1,5 +1,7 @@
 # Permanent Weapon Showcase
 
+**2026-10-19 — Pistol Sand Block V1:** [new user-reference pistol](../pistol_sand_block_v1/README.md), sand frame and graphite slide, is registered Pending and selected by default. The same library now contains five active models; previous weapon entries and sources are preserved.
+
 **2026-10-19 — Red-orange scope tint:** both V1 glass lenses now use the user's requested red-orange color. Transmission, reflectivity, hollow housing and all geometry are retained.
 
 **2026-10-19 — Sand Block scope glass:** the same Pending V1 now has an open metal optic tunnel, recessed front/rear lens seats and two separate transmitting biconvex glass lenses. GLB retains glass transmission and alpha blending. The detail pass and all prior weapons remain preserved; dimensions/markers are unchanged. Reopen an existing viewer window to load the updated saved model.
