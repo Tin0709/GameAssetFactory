@@ -382,6 +382,9 @@ for name,direction,ortho in [('three_quarter',(.50,.24,.15),.355),('side',(.65,0
                               ('top',(.0001,0,.65),.355),('front',(0,.65,.008),.295)]:
     cam.location = focus+Vector(direction)
     cam.rotation_euler = (focus-cam.location).to_track_quat('-Z','Y').to_euler()
+    if name == 'top':
+        cam.location = focus+Vector((0,0,.65))
+        cam.rotation_euler = (0,0,math.pi/2)
     cam.data.ortho_scale = ortho
     s.render.filepath = str(review/(name+'.png'))
     bpy.ops.render.render(write_still=True)
