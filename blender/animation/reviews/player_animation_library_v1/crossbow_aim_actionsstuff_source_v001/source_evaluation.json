@@ -1,0 +1,335 @@
+{
+  "pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "layers": [
+    {
+      "alias": "xfltzh",
+      "controller": "rzkmtm",
+      "state": "default",
+      "clock": 5.200000000000025,
+      "controller_weight": 1.0,
+      "state_weight": 1.0,
+      "ancestry": [
+        "rzkmtm"
+      ],
+      "id": "animation.oreville_ans.boabcq",
+      "clip_weight": 1.0,
+      "applied_weight": 1.0
+    },
+    {
+      "alias": "cape",
+      "controller": "rzkmtm",
+      "state": "default",
+      "clock": 5.200000000000025,
+      "controller_weight": 1.0,
+      "state_weight": 1.0,
+      "ancestry": [
+        "rzkmtm"
+      ],
+      "id": "animation.oreville_ans.vuslkn",
+      "clip_weight": 1.0,
+      "applied_weight": 1.0
+    },
+    {
+      "alias": "oprmcp",
+      "controller": "veywgp",
+      "state": "onccai",
+      "clock": 0.0,
+      "controller_weight": 1.0,
+      "state_weight": 1.0,
+      "ancestry": [
+        "rzkmtm",
+        "veywgp"
+      ],
+      "id": "animation.oreville_ans.przmfq",
+      "clip_weight": 1.0,
+      "applied_weight": 1.0
+    },
+    {
+      "alias": "mshwsb",
+      "controller": "kcexxa",
+      "state": "ltqtzr",
+      "clock": 5.191666666666692,
+      "controller_weight": 1.0,
+      "state_weight": 1.0,
+      "ancestry": [
+        "rzkmtm",
+        "okjrob",
+        "kcexxa"
+      ],
+      "id": "animation.oreville_ans.rrvlnm",
+      "clip_weight": 1.0,
+      "applied_weight": 1.0
+    },
+    {
+      "alias": "tcucxa",
+      "controller": "kcexxa",
+      "state": "ltqtzr",
+      "clock": 5.191666666666692,
+      "controller_weight": 1.0,
+      "state_weight": 1.0,
+      "ancestry": [
+        "rzkmtm",
+        "okjrob",
+        "kcexxa"
+      ],
+      "id": "animation.oreville_ans.dubgwy",
+      "clip_weight": 1.0,
+      "applied_weight": 1.0
+    },
+    {
+      "alias": "look_at_target",
+      "controller": "hsfnbp",
+      "state": "default",
+      "clock": 5.200000000000025,
+      "controller_weight": 1.0,
+      "state_weight": 1.0,
+      "ancestry": [
+        "rzkmtm",
+        "hsfnbp"
+      ],
+      "id": "animation.oreville_ans.cndmcx",
+      "clip_weight": 1.0,
+      "applied_weight": 1.0
+    },
+    {
+      "alias": "mhyyzj",
+      "controller": "ybphcg",
+      "state": "gjhnog",
+      "clock": 1.9167,
+      "controller_weight": 1.0,
+      "state_weight": 1.0,
+      "ancestry": [
+        "rzkmtm",
+        "ybphcg"
+      ],
+      "id": "animation.oreville_ans.jawwtn",
+      "clip_weight": 1.0,
+      "applied_weight": 1.0
+    },
+    {
+      "alias": "hfnozn",
+      "controller": "ybphcg",
+      "state": "gjhnog",
+      "clock": 1.9167,
+      "controller_weight": 1.0,
+      "state_weight": 1.0,
+      "ancestry": [
+        "rzkmtm",
+        "ybphcg"
+      ],
+      "id": "animation.oreville_ans.asxvzc",
+      "clip_weight": 1.0,
+      "applied_weight": 1.0
+    },
+    {
+      "alias": "humanoid_base_pose",
+      "controller": "ybphcg",
+      "state": "gjhnog",
+      "clock": 4.1958333333334155,
+      "controller_weight": 1.0,
+      "state_weight": 1.0,
+      "ancestry": [
+        "rzkmtm",
+        "ybphcg"
+      ],
+      "id": "animation.oreville_ans.pcbwvo",
+      "clip_weight": 1.0,
+      "applied_weight": 1.0
+    }
+  ],
+  "controllers": {
+    "rzkmtm": "default",
+    "controller.player_movement.offset": "default",
+    "flkskc": "default",
+    "veywgp": "onccai",
+    "psowex": "default",
+    "agyfrv": "knxfvl",
+    "cwxfxl": "default",
+    "cmdvzm": "default",
+    "okjrob": "eryuvy",
+    "pyhwuc": "default",
+    "ngeixo": "default",
+    "muiqdc": "default",
+    "kcexxa": "ltqtzr",
+    "wjfipe": "default",
+    "ptaudk": "default",
+    "hsfnbp": "default",
+    "bjmscc": "wkbbnc",
+    "ybphcg": "gjhnog",
+    "rylnkt": "default",
+    "eudgiz": "default"
+  },
+  "first_channels": {
+    "root": {
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "waist": {
+      "rotation": [
+        1.515544456622213,
+        0.0,
+        0.49999999999972544
+      ],
+      "position": [
+        -0.3173413361165332,
+        -0.3000000000001647,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "body": {
+      "rotation": [
+        0.0,
+        12.0,
+        0.0
+      ],
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "head": {
+      "rotation": [
+        0.0,
+        0.0,
+        -1.7220508075691943
+      ],
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "rightarm": {
+      "rotation": [
+        -85.0,
+        -17.0,
+        0.0
+      ],
+      "position": [
+        -0.1,
+        0.9133974596215878,
+        0.5
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "leftarm": {
+      "rotation": [
+        -98.0,
+        45.0,
+        1.0
+      ],
+      "position": [
+        -0.8,
+        0.8133974596215878,
+        -2.25
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "rightleg": {
+      "rotation": [
+        0.0,
+        0.0,
+        -0.5073713465535326
+      ],
+      "position": [
+        -0.41734133611653323,
+        0.0,
+        0.5
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "leftleg": {
+      "rotation": [
+        0.0,
+        0.0,
+        -2.5073713465535326
+      ],
+      "position": [
+        -0.2173413361165332,
+        0.0,
+        -0.5
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "rightitem": {
+      "rotation": [
+        -2.0,
+        0.0,
+        2.5
+      ],
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "first_life": 14.99999999999991,
+  "last_life": 18.599999999999707,
+  "duration_s": 3.6,
+  "samples": 865,
+  "neutral_look": true,
+  "loop_error": 1.2445600106048005e-12,
+  "engine_conventions": [
+    "python_random_MT19937_seeded_integer_inclusive_source_PRNG_unknown",
+    "positive_only_unnormalized_controller_and_clip_weights_engine_unmeasured",
+    "uniform_catmull_duplicate_endpoints",
+    "one_ordered_transition_per_controller_per_step_then_new_state_clock_zero",
+    "linear_outgoing_source_duration_fades_outgoing_clocks_continue",
+    "recursive_source_animation_order_with_each_controller_stepped_once",
+    "this_is_accumulated_same_axis_channel",
+    "source_upstream_skeleton_only_face_and_final_geometry_capture_excluded",
+    "hold_on_last_frame_is_finished_at_duration_while_visually_held"
+  ],
+  "passed": true
+}

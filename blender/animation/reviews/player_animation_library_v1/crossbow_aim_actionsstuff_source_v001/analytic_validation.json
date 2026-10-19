@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "sample_count": 865,
+  "direct_raw_layer_analytic_max_error": 1.1102230246251565e-16,
+  "checked": [
+    "ordered accumulated this cancellation",
+    "charged endpoint key addition",
+    "degree-based life clocks",
+    "arm translation pulses",
+    "item pitch/roll/position",
+    "head source roll+0.01deg endpoint"
+  ],
+  "no_current_or_previous_custom_rifle_action_sampled_as_pose_truth": true
+}

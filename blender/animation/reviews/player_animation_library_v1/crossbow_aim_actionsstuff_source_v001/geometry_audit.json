@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "samples": 109,
+  "right_hand_attachment_position_error_m": 4.0094924113374084e-07,
+  "left_palm_to_approved_rifle_support_anchor_distance_m": [
+    0.24436521023186625,
+    0.24436581811612992
+  ],
+  "minimum_native_boot_corner_height_m": -0.004827043507248163,
+  "left_support_was_not_solved_or_reposed": true,
+  "foot_floor_correction_applied": false,
+  "description": "Source crossbow has a shorter item and different support spacing. Preserve literal arm pose; rifle left support is NOT claimed to match the approved rifle handguard. Native boot geometry keeps raw source transforms even if sole corners enter ground. Research fidelity study, not gameplay-ready fitting."
+}

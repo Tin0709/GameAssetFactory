@@ -1,0 +1,40 @@
+{
+  "archive_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "player_file": "entity/dtr.json",
+  "player_animation_file": "animations/f2da1071.json",
+  "controllers_file": "animation_controllers/616f2ff7.json",
+  "source_chain": [
+    "rzkmtm/xunqct",
+    "okjrob/iplurh",
+    "kcexxa/njvelc.ltqtzr: mshwsb/rrvlnm THEN tcucxa/dubgwy",
+    "ybphcg/knoyhk.gjhnog: mhyyzj/jawwtn THEN hfnozn/asxvzc THEN humanoid_base_pose/pcbwvo"
+  ],
+  "attachable_inspected": {
+    "file": "attachables/glm.json",
+    "third_person_animation": "animation.oreville_ans.ctxhqv",
+    "file_animation": "animations/464e7f72.json",
+    "controller": "controller.animation.oreville_ans.oxlgtq",
+    "scope": "Original crossbow geometry/item offsets are not applied to the longer Rifle V2. Static rifle attachment is an explicit adapter, never a claim of identical weapon geometry."
+  },
+  "sampling": {
+    "look_pitch": 0,
+    "relative_look_yaw": 0,
+    "main_hand_item_use_duration": 0,
+    "item_is_charged": 1,
+    "main_hand_item_max_duration": 25,
+    "first_life_time_s": 15,
+    "hz": 240,
+    "duration_s": 3.6,
+    "source_charge_endpoint_s": 1.9167
+  },
+  "unsupported_source_geometry": [
+    "zero-scaled auxiliary skin/shoulder/arrow helpers without native counterparts",
+    "crossbow attachable geometry/material/particle effects",
+    "cape/facial/first-person geometry"
+  ],
+  "dependency_sha256": {
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_idle_v001/idle_retarget.py": "b2be971125cd30b5c1a1ad9a662c0aafedc43d4de2b51944364a74a4ef002866",
+    "blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v003/authoring/crossbow_runtime.py": "a151c274a2e3ee16ed570a3af34c99376b37d13173edd2326d9e67a859712b00",
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_idle_v001/immutable_dependencies/jump_runtime.py": "d8af03b3d31b47b755f13191b617a8fb413d65a225ee1eb5c62751e70306f0c7"
+  }
+}
