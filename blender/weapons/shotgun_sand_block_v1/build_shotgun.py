@@ -32,7 +32,7 @@ pixels=list(atlas.pixels[:])
 rng=random.Random(2026101908)
 # Preserve the accepted sand and high-contrast graphite; use spare warm swatches
 # for red shell bodies, brass caps and red shadows within the same atlas.
-for tile,rgb in {12:(205,43,32),13:(222,180,78),14:(113,25,18)}.items():
+for tile,rgb in {12:(178,35,22),13:(208,158,49),14:(113,25,18)}.items():
     shades=[[1.0]*64 for _ in range(64)]
     for _ in range(85):
         x,y=rng.randrange(2,57),rng.randrange(2,57)
@@ -230,6 +230,8 @@ housing('Foreend_Front_Collar',[(.399,.069,.078,.006),(.420,.066,.078,.006)],
 housing('Pump_Recessed_Core',[(.205,.056,.077,.005),(.216,.064,.080,.006),
         (.394,.064,.080,.006),(.405,.058,.077,.005)],.063,2,group='Pump')
 box('Pump_Upper_Tan_Trim',(0,.303,.095),(.078,.197,.014),1,.0010,'Pump')
+profile('Pump_Lower_Continuous_Trim',[(.206,.036),(.404,.036),(.404,.025),
+        (.396,.019),(.216,.019),(.206,.026)],.072,2,.0006,'Pump')
 for side in [-1,1]:
     for i,y in enumerate([.225,.259,.293,.327,.361,.395]):
         profile('Pump_Rib_%02d'%i,[(y-.011,.087),(y+.011,.087),(y+.011,.029),
@@ -311,10 +313,10 @@ s['review_status']='Pending';s['asset_report']=json.dumps(report)
 # Presentation collection stays outside the export and central weapon import.
 studio=bpy.data.collections.new('SOURCE_REVIEW_STUDIO');s.collection.children.link(studio)
 world=bpy.data.worlds.new('Shotgun Graphite Studio');world.use_nodes=True
-world.node_tree.nodes['Background'].inputs[0].default_value=(.055,.063,.078,1)
-world.node_tree.nodes['Background'].inputs[1].default_value=.45;s.world=world
+world.node_tree.nodes['Background'].inputs[0].default_value=(.028,.033,.044,1)
+world.node_tree.nodes['Background'].inputs[1].default_value=.35;s.world=world
 fm=bpy.data.materials.new('Shotgun Review Floor');fm.use_nodes=True
-fm.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value=(.006,.007,.009,1)
+fm.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value=(.003,.004,.006,1)
 fm.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value=.88
 bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,min(p.z for p in points)-.002))
 floor=bpy.context.object
@@ -322,9 +324,9 @@ for col in list(floor.users_collection):col.objects.unlink(floor)
 studio.objects.link(floor);floor.name='Shotgun_Review_Ground';floor.data.materials.append(fm)
 focus=Vector((.008,.105,.045))
 for name,loc,power,size,color in [
-    ('Shotgun Key',(1.4,-.8,2.2),500,2.0,(1,.91,.79)),
-    ('Shotgun Fill',(1.3,1.9,.8),230,1.6,(.76,.85,1)),
-    ('Shotgun Rim',(-1.4,-.4,1.8),650,1.7,(1,.86,.69))]:
+    ('Shotgun Key',(1.4,-.8,2.2),360,2.0,(1,.91,.79)),
+    ('Shotgun Fill',(1.3,1.9,.8),160,1.6,(.76,.85,1)),
+    ('Shotgun Rim',(-1.4,-.4,1.8),460,1.7,(1,.86,.69))]:
     data=bpy.data.lights.new(name,'AREA');data.energy=power;data.size=size;data.color=color
     ob=bpy.data.objects.new(name,data);studio.objects.link(ob);ob.location=loc
     ob.rotation_euler=(focus-ob.location).to_track_quat('-Z','Y').to_euler()

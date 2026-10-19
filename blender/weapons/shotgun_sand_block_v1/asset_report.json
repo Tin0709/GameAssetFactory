@@ -73,7 +73,7 @@
       "loose_vertices": 0
     },
     "Shotgun_Sand_Pump": {
-      "triangles": 776,
+      "triangles": 844,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
@@ -88,5 +88,5 @@
       "loose_vertices": 0
     }
   },
-  "triangles": 5060
+  "triangles": 5128
 }
