@@ -31,9 +31,9 @@
 
 **Interfaces:** Produce grip-centered `Sniper_Sand_Block_V1` root and rigid frame/magazine/bolt/lens meshes in WEAPON_EXPORT.
 
-- [ ] Write and run saved-file validator; expect missing source initially.
-- [ ] Build side-view-scaled silhouette, stock cheek pad/opening, bolt, slotted handguard, long scope and slotted muzzle.
-- [ ] Run native/GLB topology, openings, optical materials, markers and texture checks.
+- [x] Write and run saved-file validator; expect missing source initially.
+- [x] Build side-view-scaled silhouette, stock cheek pad/opening, bolt, slotted handguard, long scope and slotted muzzle.
+- [x] Run native/GLB topology, openings, optical materials, markers and texture checks.
 
 ### Task 2: Inspect and refine visual details
 
@@ -41,8 +41,8 @@
 
 **Interfaces:** Read saved source only; output five full views and four close inspections.
 
-- [ ] Compare side proportions and all four detail regions against the reference; correct visible discrepancies.
-- [ ] Rerun validator after any source change.
+- [x] Compare side proportions and all four detail regions against the reference; correct visible discrepancies.
+- [x] Rerun validator after any source change.
 
 ### Task 3: Register and verify the existing library
 
@@ -50,7 +50,7 @@
 
 **Interfaces:** Existing `register_weapon.py --kind Rifle --id sniper_sand_block_v1`; default selection becomes new sniper.
 
-- [ ] Register the validated source under the existing update lock.
-- [ ] Run `test_library.py`; require 105 mode/view selections for seven entries.
-- [ ] Compare baseline source hashes and manifest records; previous assets and approvals remain exact.
-- [ ] Deliver the review image and viewer refresh instruction.
+- [x] Register the validated source under the existing update lock.
+- [x] Run `test_library.py`; require 105 mode/view selections for seven entries.
+- [x] Compare baseline source hashes and manifest records; previous assets and approvals remain exact.
+- [x] Deliver the review image and viewer refresh instruction.
