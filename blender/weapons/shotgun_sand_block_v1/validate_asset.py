@@ -34,7 +34,7 @@ def cast(o,origin,direction,distance=1):
     return hit,o.matrix_world@point+authoring_origin
 
 for side in [-1,1]:
-    for y,z in [(-.0716,.156),(.613,.1302)]:
+    for y,z in [(-.070,.156),(.613,.1302)]:
         hit,point=cast(frame,(side*.12,y,z),(-side,0,0))
         assert hit and .010<abs(point.x)<.020,('Sight mount has an air gap',y,z)
     for y,z in [(-.340,.025),(-.310,.040),(-.280,.058)]:

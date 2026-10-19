@@ -2,7 +2,7 @@
   "passed": true,
   "meshes": 4,
   "materials": 1,
-  "triangles": 4768,
+  "triangles": 4812,
   "dimensions_m": [
     0.1022999994456768,
     1.0580000281333923,
@@ -20,6 +20,7 @@
   "pump_body_height_m": 0.07699999585747719,
   "grip_origin_inside_handle": true,
   "marker_roundtrip_exact": true,
+  "sight_seats_attached": true,
   "pump_groove_depth_m": 0.001999989151954651,
   "inset_receiver_port": true,
   "shells": 4,
