@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "failures": [],
+  "sampled_poses": 433,
+  "metrics": {
+    "right_grip_error": 4.849499578700629e-07,
+    "left_palm_error": 5.662441253662109e-07,
+    "forearm_bend": 0.0,
+    "straight_cross": 3.6010283153040923e-07,
+    "unit_scale": 4.76837158203125e-07,
+    "foot_drift": 6.705522537231445e-08,
+    "foot_penetration": 0.0,
+    "eye_line_gap_hold": 0.099074760973314,
+    "shoulder_gap_hold": 0.004290321841835976,
+    "seam": 0.0,
+    "hold_seam": 0.0
+  },
+  "limits": {
+    "right_grip_error": 3e-05,
+    "left_palm_error": 3e-05,
+    "forearm_bend": 0.0001,
+    "straight_cross": 1e-05,
+    "unit_scale": 1e-05,
+    "foot_drift": 1e-05,
+    "foot_penetration": 1e-05,
+    "eye_line_gap_hold": 0.1,
+    "shoulder_gap_hold": 0.008,
+    "seam": 1e-05,
+    "hold_seam": 1e-05
+  },
+  "minimum_head_rifle_surface_gap_m": 0.03572472557425499,
+  "minimum_hold_head_rifle_gap_m": 0.03572472557425499,
+  "maximum_support_hand_surface_gap_hold_m": 0.004584367852658033,
+  "collisions_count": 0,
+  "collisions": [],
+  "adjacent_excess": [],
+  "existing_source_actions_preserved": 20
+}
