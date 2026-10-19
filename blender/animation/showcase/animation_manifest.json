@@ -2879,9 +2879,9 @@
       "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
       "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
       "action": "Rifle_Aim_Hold_ActionsStyle_v001",
-      "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/arm_axis_alignment_20261019/rifle_aim_hold_actionsstyle_v001.blend",
-      "source_sha256": "d577290a44a73d2e968aa39d4ccfab19a773a69875136cf24db26afb157cac31",
-      "action_sha256": "bbee00739e0b47877532d388b7c28cf26f716c82fa267e82f892d43cf47d9fd5",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/grounded_stance_20261019/rifle_aim_hold_actionsstyle_v001.blend",
+      "source_sha256": "38e4a151c3026f06a9f2749662c59698820942cce016927289f9218ad0d97efa",
+      "action_sha256": "976214db32550ef0c578da3a7696a4aa99e0764d6744a108e5dae7853e29e539",
       "action_frame_range": [
         1.0,
         109.0
@@ -2891,7 +2891,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Same Pending rifle Aim: barrel parallel to unchanged right arm; same grip/body/head/idle. Left support fitted to aligned rifle. User top-view request2026-10-19.",
+      "approval_note": "Same Pending rifle Aim: user-requested modest planted stance; only rigid leg location/rotation changes. All upper-body, grip, head and original idle clocks preserved.2026-10-19.",
       "seamless_loop": true,
       "research_only": true,
       "production_eligible": false,
@@ -2948,16 +2948,28 @@
           0.000587279444602961,
           -0.0005323170328958041,
           0.0001474219683038904
-        ]
+        ],
+        "aim_stance": {
+          "foot_center_spacing_m": 0.32,
+          "fore_aft_stagger_m": 0.1,
+          "outward_leg_tilt_deg": 3.0,
+          "leg_forward_back_tilt_deg": 2.5,
+          "toe_out_each_deg": 5.0,
+          "stance_blade_deg": 6.914611782648605,
+          "floor_m": 0.0,
+          "stance_center_x_m": -0.01,
+          "feet_policy": "constant world-space rigid leg matrices; lowest sole corners on floor; unchanged hips breathing above planted feet",
+          "upper_body": "all non-leg curves exact copies of preceding arm-axis aligned Pending"
+        }
       },
       "previous_pending_source": {
-        "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/shoulder_seated_pose_20261019/rifle_aim_hold_actionsstyle_v001.blend",
-        "source_sha256": "0b10235b74d7fa5cf48cba2f92b1df046b12f2044dad4de4a5ab90fc18341029",
-        "action_sha256": "bad5c3c066c053be6a6a072160222cf08ae09aaf2db750791a7aa08209a69b3b"
+        "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/arm_axis_alignment_20261019/rifle_aim_hold_actionsstyle_v001.blend",
+        "source_sha256": "d577290a44a73d2e968aa39d4ccfab19a773a69875136cf24db26afb157cac31",
+        "action_sha256": "bbee00739e0b47877532d388b7c28cf26f716c82fa267e82f892d43cf47d9fd5"
       },
       "contains_source_derived_base_pose": true,
       "review_scope": "Source-clock rifle aiming HOLD only; previous Ready\u2192Aim\u2192Hold\u2192Ready source/timeline preserved in previous_pending_source.",
-      "user_reference": "User top-view request2026-10-19: align barrel with unchanged right holding arm, same grip pivot; refit left support only. Body/head/right-arm and idle curves are exact copies of previous Pending."
+      "user_reference": "User stance reference2026-10-19: modest leg opening and small stagger for stable aiming, less wide than example. All non-leg curves, including approved arm/barrel alignment, head, torso and breathing clocks, are unchanged."
     },
     {
       "source_rig": "Showcase_Player_Rig",

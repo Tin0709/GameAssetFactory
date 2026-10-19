@@ -1,0 +1,12 @@
+{
+  "foot_center_spacing_m": 0.32,
+  "fore_aft_stagger_m": 0.1,
+  "outward_leg_tilt_deg": 3.0,
+  "leg_forward_back_tilt_deg": 2.5,
+  "toe_out_each_deg": 5.0,
+  "stance_blade_deg": 6.914611782648605,
+  "floor_m": 0.0,
+  "stance_center_x_m": -0.01,
+  "feet_policy": "constant world-space rigid leg matrices; lowest sole corners on floor; unchanged hips breathing above planted feet",
+  "upper_body": "all non-leg curves exact copies of preceding arm-axis aligned Pending"
+}

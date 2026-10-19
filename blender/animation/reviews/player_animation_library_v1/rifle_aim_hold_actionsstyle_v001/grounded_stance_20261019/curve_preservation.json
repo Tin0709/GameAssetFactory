@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "edited_curves": 12,
+  "untouched_curves_exact": 114,
+  "only_modified_bones": [
+    "Leg.L",
+    "Leg.R"
+  ],
+  "all_upper_body_hips_grip_head_clocks_scales_exact": true
+}

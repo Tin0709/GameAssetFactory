@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "failures": [],
+  "sampled_poses": 217,
+  "metrics": {
+    "unchanged_bone_matrix_error": 0.0,
+    "planted_leg_matrix_error": 1.1920928955078125e-07,
+    "foot_vertex_drift": 2.4119816303632207e-07,
+    "foot_floor_penetration": 2.384185791015625e-07,
+    "foot_floor_gap": 1.2014061212539673e-07,
+    "right_grip_error": 5.623090941939713e-07,
+    "left_palm_error": 7.348554137908192e-07,
+    "forearm_local_error": 7.048948447163639e-08,
+    "straight_arm_error": 3.5153202063920695e-07,
+    "unit_scale_error": 2.384185791015625e-07,
+    "barrel_arm_axis_cross_error": 1.9883167833468298e-07,
+    "shoulder_surface_gap": 0.0,
+    "support_surface_gap": 0.010100227780640125,
+    "loop_error": 0.0
+  },
+  "limits": {
+    "unchanged_bone_matrix_error": 1e-05,
+    "planted_leg_matrix_error": 1e-05,
+    "foot_vertex_drift": 1e-05,
+    "foot_floor_penetration": 1e-05,
+    "foot_floor_gap": 1e-05,
+    "right_grip_error": 3e-05,
+    "left_palm_error": 3e-05,
+    "forearm_local_error": 1e-05,
+    "straight_arm_error": 1e-05,
+    "unit_scale_error": 1e-05,
+    "barrel_arm_axis_cross_error": 1e-05,
+    "shoulder_surface_gap": 0.01,
+    "support_surface_gap": 0.015,
+    "loop_error": 1e-05
+  },
+  "loop_translation_velocity_difference_m_s": 0.005679184603493957,
+  "loop_velocity_limits": {
+    "translation_m_s": 0.006,
+    "angular_rad_s": 0.05
+  },
+  "loop_angular_velocity_difference_rad_s": 0.005528839256638668,
+  "minimum_head_rifle_surface_gap_m": 0.02942931465804577,
+  "crossing_hand_contact_sat_range_m": [
+    0.0007998645305633545,
+    0.0008002649992704391
+  ],
+  "head_chest_max_seating_m": 0.014787405729293823,
+  "head_chest_min_seating_m": 0.010109612718224525,
+  "shoulder_max_seating_m": 0.049310446716845036,
+  "hip_leg_signed_contact_range_m": [
+    0.0037746847374364734,
+    0.050148689304478467
+  ],
+  "collisions_count": 0,
+  "collisions": [],
+  "adjacent": [],
+  "existing_actions_preserved": 21,
+  "source_study_exact": true,
+  "notes": [
+    "User-requested modest aiming stance is an authored rifle adaptation, not a literal crossbow leg reconstruction.",
+    "0.32m sole-center spacing,0.10m stagger,3deg outward rigid-leg tilt and5deg toe-out each. All foot vertices stay stationary; lowest sole corners contact floor. Rigid block legs have no ankles or knees, so tilted soles contact along their low corners.",
+    "Only12 Leg.L/R location/Euler curves changed. All114 other curves and every non-leg evaluated matrix remain unchanged.",
+    "Existing source240Hz idle clocks, head/torso, straight arms, barrel/right-arm alignment and grips remain exact.",
+    "Loop finite chord velocity tolerance6mm/s bounds a0.2mm one-frame displacement at30FPS.",
+    "The two rigid hand blocks retain the reviewed contact; no new allowed collision pair."
+  ]
+}
