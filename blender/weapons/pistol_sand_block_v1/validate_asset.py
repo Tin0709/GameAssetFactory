@@ -63,6 +63,7 @@ hit,point = cast(frame,bottom_center-ray*.025,ray,distance=(top_center-bottom_ce
 assert not hit,('Grip well is filled with frame geometry',list(point))
 atlas = bpy.data.images['Pistol_Sand_Atlas_256']
 assert atlas.packed_file and tuple(atlas.size) == (256,256)
+source_pixels = list(atlas.pixels[:])
 points = [o.matrix_world@v.co for o in meshes for v in o.data.vertices]
 dims = [max(v[i] for v in points)-min(v[i] for v in points) for i in range(3)]
 assert .26 < dims[1] < .30 and .16 < dims[2] < .20,dims
@@ -82,8 +83,11 @@ assert bpy.data.objects.get('Muzzle') and bpy.data.objects.get('MagazineFeed')
 assert len([m for m in bpy.data.materials if m.use_nodes]) == 1
 images = [im for im in bpy.data.images if im.type == 'IMAGE']
 assert len(images) == 1 and tuple(images[0].size) == (256,256)
+texture_error = max(abs(a-b) for a,b in zip(source_pixels,images[0].pixels[:]))
+assert texture_error < 1e-6,('GLB texture differs from the saved source atlas',texture_error)
 result = {'passed':True,'meshes':3,'materials':1,'triangles':triangles,
-          'dimensions_m':dims,'roundtrip_error_m':error,'guard_ray_checks':4,
+          'dimensions_m':dims,'roundtrip_error_m':error,'texture_roundtrip_error':texture_error,
+          'guard_ray_checks':4,
           'muzzle_recess_ray_checks':2,'sight_notch_and_ears':True,
           'lowered_top_chamber':True,'open_grip_well':True,'animations':0}
 (OUT/'validation.json').write_text(json.dumps(result,indent=2))

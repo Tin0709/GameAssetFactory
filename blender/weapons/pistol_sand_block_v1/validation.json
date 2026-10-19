@@ -9,6 +9,7 @@
     0.1814056560397148
   ],
   "roundtrip_error_m": 0.0,
+  "texture_roundtrip_error": 0.0,
   "guard_ray_checks": 4,
   "muzzle_recess_ray_checks": 2,
   "sight_notch_and_ears": true,

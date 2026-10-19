@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "all_previous_native_actions_preserved": 88,
+  "native_action_count": 89,
+  "existing_protected_files_unchanged": 6748,
+  "godot_files_unchanged": 2007,
+  "previous_custom_aim_preserved": true,
+  "old_manifest_entries_and_statuses_unchanged": true,
+  "archived_entries": 35,
+  "focused_entries": 21,
+  "research_only": true,
+  "production_eligible": false,
+  "lfs_version_impact_bytes": 99138331,
+  "lfs_version_impact_MiB": 94.54568004608154,
+  "lfs_note": "Two full Blender versions, approximate storage/download if neither exists remotely; existing LFS patterns, no migration/history changes. Account quota unavailable from local Git. No manual commit/push/tracking command in this task.",
+  "largest_ordinary_new_file_bytes": 372571,
+  "blender_files": [
+    {
+      "path": "blender/animation/reviews/player_animation_library_v1/crossbow_aim_actionsstuff_source_v001/crossbow_aim_actionsstuff_source_v001.blend",
+      "bytes": 12097464,
+      "sha256": "3605993264b2dca39ed4880217bea020e50f097072bfe1f2f95bfb0d1397866d"
+    },
+    {
+      "path": "blender/animation/showcase/Animation_Showcase.blend",
+      "bytes": 87040867,
+      "sha256": "e0bbbe8d7c701303dab76e9254da3bbdeb8eba41c1b48575baea14678f2200bd"
+    }
+  ]
+}
