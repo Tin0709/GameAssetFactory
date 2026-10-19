@@ -1,0 +1,91 @@
+{
+  "arsenal_archive_sha256": "7c605736c6aed41c64ca1d906870e16a75d14cbc56f332997973e6d42c49fa1c",
+  "files": [
+    {
+      "path": "ArsenalRP/animations/arsenal/arsenal.g.animation.json",
+      "sha256": "3fc752be4dd71451a0988fa244376f922ca4b1bab65ab33489900c40f5eed71f",
+      "bytes": 1023
+    },
+    {
+      "path": "ArsenalRP/animations/arsenal/arsenal.awm.animation.json",
+      "sha256": "05c912f44a19393c2dd0d8f531967fb7ca67481b992c66eb3f2e82f123b9fdda",
+      "bytes": 12574
+    },
+    {
+      "path": "ArsenalRP/animations/arsenal/arsenal.rifle_m4a1.animation.json",
+      "sha256": "f60dbdaf5b9deec0b4029480c494c6af5f6a6f94b09cf36aa70b2b70775656df",
+      "bytes": 5352
+    },
+    {
+      "path": "ArsenalRP/models/entity/arsenal/arsenal.awm.json",
+      "sha256": "6e64c4e374788bbd68f704a241ca386420f722b74752dceed913d04ba171bf8c",
+      "bytes": 12390
+    },
+    {
+      "path": "ArsenalRP/models/entity/arsenal/arsenal.rifle_m4a1.json",
+      "sha256": "9cebbee08ed9657d363e6409ecce087c8b657f4938000e866aac3f9192be1538",
+      "bytes": 7685
+    },
+    {
+      "path": "ArsenalBP/scripts/arsenal/main.js",
+      "sha256": "c9903b049fc9c48cbc26d753b941eb4476968d125f20666ee3438562c7242335",
+      "bytes": 18412
+    },
+    {
+      "path": "ArsenalRP/animation_controllers/arsenal/controller_animations.json",
+      "sha256": "d4abe6603247c212ee5864154f53c0afb7f2c9ccd1bcb28e573d11f4803a2996",
+      "bytes": 2083
+    }
+  ],
+  "hold": {
+    "loop": true,
+    "bones": {
+      "leftArm": {
+        "rotation": [
+          "-88 + q.target_x_rotation",
+          "40 + (math.min(20, q.target_y_rotation))",
+          0
+        ],
+        "position": [
+          -1.2,
+          0,
+          -1.4
+        ]
+      },
+      "rightArm": {
+        "rotation": [
+          "-88 + q.target_x_rotation",
+          "-9 + (math.max(-40, q.target_y_rotation))",
+          0
+        ],
+        "position": [
+          0.1,
+          0,
+          0.8
+        ]
+      }
+    }
+  },
+  "vanilla": [
+    {
+      "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/v1.21.100.6/resource_pack/animation_controllers/player.animation_controllers.json",
+      "sha256": "0b1017345d39a4a27ef7ab4e629349e17438b2a5acddf8db83950aedb69d287c"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/v1.21.100.6/resource_pack/animations/player.animation.json",
+      "sha256": "12990707376e9d1abb1f8f003346981fad103a79ea74a772b5bd7ab70b429c93"
+    }
+  ],
+  "evaluation_profile": {
+    "mainhand_two_hands": true,
+    "is_holding_right": 1,
+    "is_holding_left": 0,
+    "target_pitch": 0,
+    "target_yaw": 0,
+    "layer_order": "move.arms R30, holding R(-30*.5-18)=-33, Arsenal R-88 => R-91; L0+0-88 => L-88",
+    "vanilla_bob": "replaced by existing A&S 0.9/1.8/3.6s study, not doubled",
+    "runtime_equivalence": "declared neutral reference profile; not a captured Bedrock runtime proof"
+  },
+  "source_item_adapter": "AWM source relative orientation examined against M4; native V2 weapon orientation/contact fit replaces per-weapon model/binding/scale, does not claim original AWM placement",
+  "research_only": true
+}

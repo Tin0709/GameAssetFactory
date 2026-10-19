@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "edited_curves": 28,
+  "untouched_curves_exact": 98,
+  "all_existing_actions_exact": 22,
+  "body_hips_legs_forearm_scales_exact": true,
+  "same_original_idle_clocks_s": [
+    0.9,
+    1.8,
+    3.6
+  ]
+}
