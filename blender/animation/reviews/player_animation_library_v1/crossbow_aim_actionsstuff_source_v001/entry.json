@@ -1,0 +1,58 @@
+{
+  "source_rig": "Showcase_Player_Rig",
+  "source_mesh": "Showcase_Player_Mesh",
+  "source_armature": "LB_Test_RestRig",
+  "slot_identifier": "OBRUN_Test_Rig",
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "rotation_modes": {
+    "Root": "XYZ",
+    "Hips": "XYZ",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "XYZ",
+    "Leg.R": "XYZ"
+  },
+  "preview_prop": "rifle_stylized_v2",
+  "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+  "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
+  "action": "Crossbow_Aim_ActionsStuff_Source_Test_v001",
+  "source": "blender/animation/reviews/player_animation_library_v1/crossbow_aim_actionsstuff_source_v001/crossbow_aim_actionsstuff_source_v001.blend",
+  "source_sha256": "851d68739fa67e6b9bd41be150fdd68702636998085812dcf7612a4bebf72df4",
+  "action_sha256": "b75e2d33174f031fab013f8057517ace74e24ead82266f37099bb976da411841",
+  "action_frame_range": [
+    1.0,
+    109.0
+  ],
+  "start": 1,
+  "end": 108,
+  "fps": 30,
+  "fps_base": 1.0,
+  "status": "pending",
+  "approval_note": "Literal source charged-crossbow aim pose requested2026-10-19. No custom rifle arm/pose fitting. Pending Blender review; research-only.",
+  "seamless_loop": true,
+  "research_only": true,
+  "production_eligible": false,
+  "source_derived_reconstruction": true,
+  "original_custom_animation": false,
+  "bake_hz": 240,
+  "source_duration_s": 3.6,
+  "endpoint_sample_frame": 109,
+  "source_animations": [
+    "animation.oreville_ans.rrvlnm",
+    "animation.oreville_ans.dubgwy",
+    "animation.oreville_ans.jawwtn",
+    "animation.oreville_ans.asxvzc"
+  ],
+  "source_controllers": [
+    "controller.animation.oreville_ans.njvelc",
+    "controller.animation.oreville_ans.knoyhk"
+  ],
+  "source_profile": "ordinary player0, already charged mainhand crossbow, no shield, grounded, neutral look; 0.6s charged entry warmup"
+}
