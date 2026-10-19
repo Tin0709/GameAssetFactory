@@ -40,10 +40,10 @@ rng = random.Random(2026101907)
 graphite = {4:(53,51,51),5:(66,63,62),6:(43,42,43),7:(82,76,69),8:(29,30,32)}
 for tile,rgb in graphite.items():
     shades = [[1.0]*64 for _ in range(64)]
-    for _ in range(110):
-        x,y = rng.randrange(2,57),rng.randrange(2,57)
-        w,h = rng.choice([3,4,6,8]),rng.choice([3,4,5,7])
-        shade = rng.choice([.72,.84,.94,1.10,1.24,1.38])
+    for _ in range(72):
+        x,y = rng.randrange(2,55),rng.randrange(2,55)
+        w,h = rng.choice([4,6,8,10]),rng.choice([3,5,7])
+        shade = rng.choice([.68,.80,.92,1.12,1.38,1.65,1.82])
         for yy in range(y,min(62,y+h)):
             for xx in range(x,min(62,x+w)):
                 shades[yy][xx] = shade
