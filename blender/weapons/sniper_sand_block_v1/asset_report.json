@@ -67,7 +67,7 @@
   },
   "topology": {
     "Sniper_Sand_Frame": {
-      "triangles": 7180,
+      "triangles": 7244,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
@@ -92,5 +92,5 @@
     1.1932000070810318,
     0.29822567105293274
   ],
-  "triangles": 7940
+  "triangles": 8004
 }

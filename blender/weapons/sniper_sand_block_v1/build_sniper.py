@@ -152,8 +152,9 @@ for side in [-1,1]:
 shape('Receiver_Lower_Sand',[(147,82),(270,82),(271,88),(301,88),(301,106),
     (272,107),(272,114),(178,113),(174,123),(146,121)],.061,0,.0009)
 block('Receiver_Top_Sand_Roof',214,73,126,9,.059,1)
-block('Receiver_Slot_Rear_Wall',163,79,31,18,.059,0)
-block('Receiver_Slot_Front_Wall',251,79,33,18,.059,0)
+block('Receiver_Slot_Rear_Wall',163,79,31,18,.061,0)
+block('Receiver_Slot_Front_Wall',251,79,33,18,.061,0)
+block('Receiver_Front_Upper_Bridge',286,80,30,21,.061,0)
 block('Receiver_Recessed_Dark_Bolt',205,79.3,59,9,.042,6,.0005)
 for side in [-1,1]:
     block('Receiver_Inset_Port_Sill',205,84,60,3,.005,2,.0003,x=side*.0279)
