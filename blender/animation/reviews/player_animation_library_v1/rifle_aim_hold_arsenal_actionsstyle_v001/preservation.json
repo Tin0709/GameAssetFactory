@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "new_pending_action": "Rifle_Aim_Hold_Arsenal_ActionsStyle_v001",
+  "all_previous_native_actions_exact": 89,
+  "native_actions": 90,
+  "previous_aim_source_and_action_exact": true,
+  "old_protected_files_exact": 6943,
+  "godot_files_exact": 2007,
+  "all_previous_native_assets_exact": true,
+  "source_sha256": "1e509f523b4a421ae24aa099c4ffc3e5a1ac4850f42a3cfbfff79e16fb0067d8",
+  "action_sha256": "8c7524f6b1eb2bcd2b9f4fb47aa95cd7ad471815c1e0bc4db64a2c0a0726dd15",
+  "estimated_new_lfs_version_storage_download_MiB": 96.1120834350586,
+  "largest_new_ordinary_file_bytes": 938843,
+  "lfs_note": "Existing *.blend LFS filter; no new tracking patterns, history migration or manual commit/push. Quota unavailable locally."
+}
