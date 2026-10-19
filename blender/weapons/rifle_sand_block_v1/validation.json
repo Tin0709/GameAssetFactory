@@ -1,7 +1,8 @@
 {
   "passed": true,
-  "meshes": 2,
-  "triangles": 5732,
+  "meshes": 3,
+  "materials": 2,
+  "triangles": 6200,
   "vent_opening_ray_checks": 42,
   "rail_pocket_ray_checks": 9,
   "muzzle_recess_depth_m": 0.041999999046325676,
