@@ -87,6 +87,10 @@ glass_bsdf.inputs['Alpha'].default_value = .56
 glass.surface_render_method = 'DITHERED'
 glass.use_raytrace_refraction = True
 glass.use_transparent_shadow = True
+front_glass = glass.copy()
+front_glass.name = 'Scope_Front_Amber_Glass'
+front_glass.diffuse_color = (.91,.69,.39,.56)
+front_glass.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value = (.98,.86,.62,1)
 parts, magazines, lens_parts = [], [], []
 
 
@@ -199,7 +203,7 @@ def lens(name, y, w, h):
     parts.remove(ob)
     lens_parts.append(ob)
     ob.data.materials.clear()
-    ob.data.materials.append(glass)
+    ob.data.materials.append(front_glass if name == 'Scope_Front_Lens' else glass)
     for face in ob.data.polygons:
         face.use_smooth = True
     return ob
@@ -478,7 +482,7 @@ bpy.ops.export_scene.gltf(filepath=str(OUT/'Rifle_Sand_Block_V1.glb'),
                           export_animations=False, export_cameras=False, export_lights=False)
 pts = [ob.matrix_world @ v.co for ob in [body,mag,optics] for v in ob.data.vertices]
 report = {'status':'Pending', 'source_reference':'reference.png', 'meshes':3,
-          'materials':2, 'optical_lenses':2, 'atlas_size':[256,256], 'markers':markers,
+          'materials':3, 'optical_lenses':2, 'atlas_size':[256,256], 'markers':markers,
           'dimensions_m':[max(v[i] for v in pts)-min(v[i] for v in pts) for i in range(3)],
           'topology':{}}
 for ob in [body,mag,optics]:

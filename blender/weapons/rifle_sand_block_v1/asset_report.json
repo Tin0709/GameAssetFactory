@@ -2,7 +2,7 @@
   "status": "Pending",
   "source_reference": "reference.png",
   "meshes": 3,
-  "materials": 2,
+  "materials": 3,
   "optical_lenses": 2,
   "atlas_size": [
     256,

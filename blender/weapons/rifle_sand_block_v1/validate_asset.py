@@ -19,7 +19,7 @@ assert bpy.data.objects['Rifle_Sand_Block_Magazine'].parent == root
 assert bpy.data.objects['Muzzle'].location.y > .86
 assert bpy.data.objects['RightHandGrip'].location.length < 1e-7
 for ob in meshes:
-    assert len(ob.data.materials) == 1
+    assert len(ob.data.materials) == (2 if ob.name == 'Rifle_Sand_Block_Lenses' else 1)
     assert ob.data.uv_layers.active
     bm = bmesh.new()
     bm.from_mesh(ob.data)
@@ -64,7 +64,7 @@ assert max(abs(a-b) for a,b in zip(source_dims,export_dims)) < 1e-6
 assert bpy.data.objects.get('RightHandGrip') and bpy.data.objects.get('Muzzle')
 images = [im for im in bpy.data.images if im.type == 'IMAGE']
 assert len(images) == 1 and tuple(images[0].size) == (256,256)
-result = {'passed':True,'meshes':3,'materials':2,'triangles':source_tris,
+result = {'passed':True,'meshes':3,'materials':3,'triangles':source_tris,
           'vent_opening_ray_checks':42, 'rail_pocket_ray_checks':9,
           'muzzle_recess_depth_m':muzzle_depth, 'sight_aperture_ray_checks':2,
           'dimensions_m':source_dims,
