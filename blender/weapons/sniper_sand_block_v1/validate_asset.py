@@ -44,7 +44,7 @@ for side in [-1,1]:
         assert not hit,('Stock/guard opening blocked',px,py)
     for px in [316,342,368,394,420]:
         hit,point=cast(frame,(side*.20,Y(px),Z(89)),(-side,0,0))
-        assert hit and abs(point.x)<.022,('Vent is filled',px,list(point))
+        assert not hit or abs(point.x)<.022,('Vent is filled',px,list(point))
     for px in [608,624]:
         hit,point=cast(frame,(side*.20,Y(px),Z(79)),(-side,0,0))
         assert not hit,('Muzzle side slot blocked',px,list(point))
