@@ -8,6 +8,7 @@ import bmesh
 import bpy
 import json
 import math
+import random
 import sys
 from pathlib import Path
 from mathutils import Vector
@@ -30,8 +31,34 @@ root['review_status'] = 'Pending'
 root['forward'] = '+Y'
 root['origin'] = 'RightHandGrip'
 root['reference'] = 'reference.png — user supplied 2026-10-19'
-atlas = bpy.data.images.load(str(OUT/'pistol_sand_atlas_256.png'),check_existing=False)
+# Keep the sand palette exact. Rebuild graphite clusters from an immutable seed
+# so repeated --rebuild runs cannot progressively increase texture contrast.
+atlas = bpy.data.images.load(str(OUT/'pistol_palette_source_256.png'),check_existing=False)
 atlas.name = 'Pistol_Sand_Atlas_256'
+pixels = list(atlas.pixels[:])
+rng = random.Random(2026101907)
+graphite = {4:(53,51,51),5:(66,63,62),6:(43,42,43),7:(82,76,69),8:(29,30,32)}
+for tile,rgb in graphite.items():
+    shades = [[1.0]*64 for _ in range(64)]
+    for _ in range(110):
+        x,y = rng.randrange(2,57),rng.randrange(2,57)
+        w,h = rng.choice([3,4,6,8]),rng.choice([3,4,5,7])
+        shade = rng.choice([.78,.86,.93,1.07,1.15,1.24])
+        for yy in range(y,min(62,y+h)):
+            for xx in range(x,min(62,x+w)):
+                shades[yy][xx] = shade
+    for y in range(64):
+        for x in range(64):
+            i = (((tile//4)*64+y)*256+(tile%4)*64+x)*4
+            # Match the original palette encoding; broad tonal blocks are color,
+            # never raised plates or bump/noise on the low-poly metal surface.
+            values = [min(1,c/255*shades[y][x]) for c in rgb]
+            pixels[i:i+4] = [v/12.92 if v <= .04045 else ((v+.055)/1.055)**2.4
+                             for v in values]+[1]
+atlas.pixels.foreach_set(pixels)
+atlas.filepath_raw = str(OUT/'pistol_sand_atlas_256.png')
+atlas.file_format = 'PNG'
+atlas.save()
 atlas.pack()
 mat = bpy.data.materials.new('Pistol_Sand_Graphite_Atlas')
 mat.use_nodes = True
@@ -172,12 +199,15 @@ for i in range(8):
            (i,i+8,j+8,j),(i+16,j+16,j+24,i+24)]
 part('Raked_Grip_Shell',vs,fs,0)
 for side in [-1,1]:
-    profile('Graphite_Grip_Panel',[(-.027,.042),(.018,.039),(-.006,-.043),(-.061,-.030)],
+    profile('Graphite_Grip_Panel',[(-.027,.042),(.018,.039),(-.0068,-.0521),(-.0647,-.0457)],
             .0038,4,.0010,x=side*.0190)
-    profile('Grip_Front_Facet',[(.008,.039),(.018,.039),(-.006,-.043),(-.016,-.041)],
+    profile('Grip_Front_Facet',[(.008,.039),(.018,.039),(-.0068,-.0521),(-.0168,-.0508)],
             .0012,5,0,x=side*.0213)
-    profile('Grip_Rear_Edge',[(-.029,.040),(-.023,.040),(-.055,-.031),(-.063,-.029)],
+    profile('Grip_Rear_Edge',[(-.029,.040),(-.023,.040),(-.058,-.044),(-.066,-.044)],
             .0012,6,0,x=side*.0213)
+    profile('Grip_Lower_Facet',[(-.0647,-.0412),(-.0055,-.0478),
+                                (-.0068,-.0521),(-.0647,-.0457)],
+            .0012,5,0,x=side*.0213)
 for z in [.027,.003,-.021]:
     z1,z2 = z+.010,z-.010
     front1,front2 = .035+(z1-.050)*.365,.035+(z2-.050)*.365
@@ -190,8 +220,8 @@ yz_ring('Trigger_Guard',[(.032,.051),(.113,.051),(.113,.010),
         [(.044,.043),(.101,.043),(.101,.021),(.050,.021),(.044,.025),(.041,.032)],
         .030,0,.0007)
 box('Guard_Front_Step',(0,.108,.026),(.033,.012,.024),1,.0004)
-profile('Trigger',[(.054,.051),(.069,.051),(.068,.035),(.075,.029),
-                   (.071,.022),(.059,.024),(.053,.034)],.017,6,.0005)
+profile('Trigger',[(.054,.051),(.069,.051),(.069,.037),(.072,.034),
+                   (.072,.022),(.059,.022),(.055,.029)],.017,6,.0005)
 for side in [-1,1]:
     box('Slide_Release',(side*.024,-.001,.065),(.006,.015,.012),4,.0005)
     box('Frame_Pin_Block',(side*.0237,.055,.058),(.0037,.013,.011),4,.0004)
@@ -203,7 +233,7 @@ for side in [-1,1]:
 profile('Magazine_Insert',[(-.015,.053),(.024,.053),(-.016,-.051),(-.055,-.047)],
         .022,6,.0005,'Magazine')
 profile('Magazine_Floorplate',[(-.066,-.046),(-.002,-.053),(-.004,-.061),(-.068,-.055)],
-        .039,8,.0005,'Magazine')
+        .044,8,.0005,'Magazine')
 
 # Chunky rear slide and true wraparound serrations, leaving narrow recessed gaps.
 housing('Slide_Rear',[(-.047,.040,.033,.003),(-.043,.043,.036,.0035),
@@ -213,13 +243,17 @@ for i in range(6):
     housing('Rear_Serration_%02d'%i,[(y,.046,.037,.0035),(y+.0047,.046,.037,.0035)],
             .096,5 if i%2 else 4)
 box('Rear_Slide_Backplate',(0,-.0475,.096),(.027,.002,.026),6,.0005,'Slide')
+profile('Rear_Slide_Roof_Step',[(.018,.1135),(.059,.1135),(.059,.115),
+                                (.052,.116),(.018,.116)],
+        .037,5,.0003,'Slide')
 
 # Open lowered top chamber in the reference; the barrel hood is visibly inset.
 box('Slide_Lower_Chamber_Web',(0,.080,.085),(.041,.054,.014),4,.0005,'Slide')
 box('Chamber_Far_Lip',(-.019,.080,.102),(.004,.050,.020),5,.0004,'Slide')
 box('Chamber_Near_Lip',(.019,.080,.091),(.004,.050,.005),6,0,'Slide')
-box('Barrel_Hood',(0,.080,.099),(.027,.052,.014),5,.0007)
-box('Barrel_Hood_Top',(0,.080,.106),(.027,.050,.002),9,.0003)
+box('Barrel_Hood',(0,.080,.097),(.027,.052,.014),5,.0007)
+box('Barrel_Hood_Top',(0,.080,.104),(.027,.050,.0015),7,.0003)
+box('Barrel_Hood_Crown_Strip',(-.0075,.080,.1048),(.008,.048,.0014),9,.0003)
 
 # Front slide, inset barrel and warm chamfered square muzzle. The cap is a sleeve.
 housing('Slide_Front',[(.103,.043,.036,.0035),(.206,.043,.036,.0035),
@@ -231,10 +265,6 @@ housing('Square_Muzzle_Trim',[(.209,.046,.039,.0025),(.217,.045,.038,.002)],
 box('Lower_Recoil_Plug',(0,.208,.066),(.027,.015,.018),6,.0008)
 for side in [-1,1]:
     box('Slide_Front_Side_Accent',(side*.0217,.201,.092),(.001,.009,.023),6,0,'Slide')
-    for yy,zz,length,height,tile in [(.164,.0897,.018,.008,6),
-                                   (.183,.099,.009,.006,6),
-                                   (.125,.104,.020,.006,5)]:
-        box('Slide_Pixel_Patch',(side*.02158,yy,zz),(.00012,length,height),tile,0,'Slide')
 
 # Open U rear sight and single square front post, both fixed to the slide.
 box('Rear_Sight_Base',(0,-.009,.115),(.033,.020,.004),7,.0004,'Slide')
