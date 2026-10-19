@@ -1,0 +1,86 @@
+{
+  "status": "Pending",
+  "meshes": 3,
+  "materials": 1,
+  "atlas_size": [
+    256,
+    256
+  ],
+  "reference": "reference.png",
+  "forward": "+Y",
+  "markers": {
+    "RightHandGrip": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "LeftHandGuide": [
+      0.0,
+      0.022540001198649406,
+      0.01899999938905239
+    ],
+    "Muzzle": [
+      0.0,
+      0.2136400043964386,
+      0.09120000153779984
+    ],
+    "AimReference": [
+      0.0,
+      0.18914000689983368,
+      0.11685000360012054
+    ],
+    "RecoilPivot": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "HolsterAttach": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Grip_Point": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Support_Hand_Point": [
+      0.0,
+      0.022540001198649406,
+      0.01899999938905239
+    ],
+    "Muzzle_Point": [
+      0.0,
+      0.2136400043964386,
+      0.09120000153779984
+    ],
+    "MagazineFeed": [
+      0.0,
+      0.003920000046491623,
+      0.04749999940395355
+    ]
+  },
+  "dimensions_m": [
+    0.05400000140070915,
+    0.279193714261055,
+    0.1814056560397148
+  ],
+  "topology": {
+    "Pistol_Sand_Frame": {
+      "triangles": 1528,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    },
+    "Pistol_Sand_Slide": {
+      "triangles": 756,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    },
+    "Pistol_Sand_Magazine": {
+      "triangles": 88,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    }
+  },
+  "triangles": 2372
+}
