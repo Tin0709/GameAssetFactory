@@ -74,9 +74,9 @@ tex.interpolation = 'Closest'
 mat.node_tree.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
 glass = bpy.data.materials.new('Scope_Optical_Glass')
 glass.use_nodes = True
-glass.diffuse_color = (.66,.84,.88,.56)
+glass.diffuse_color = (.85,.16,.025,.56)
 glass_bsdf = glass.node_tree.nodes.get('Principled BSDF')
-glass_bsdf.inputs['Base Color'].default_value = (.84,.94,.97,1)
+glass_bsdf.inputs['Base Color'].default_value = (.85,.16,.025,1)
 glass_bsdf.inputs['Metallic'].default_value = 0
 glass_bsdf.inputs['Roughness'].default_value = .065
 glass_bsdf.inputs['Transmission Weight'].default_value = .96
@@ -89,8 +89,8 @@ glass.use_raytrace_refraction = True
 glass.use_transparent_shadow = True
 front_glass = glass.copy()
 front_glass.name = 'Scope_Front_Amber_Glass'
-front_glass.diffuse_color = (.91,.69,.39,.56)
-front_glass.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value = (.98,.86,.62,1)
+front_glass.diffuse_color = (.85,.16,.025,.56)
+front_glass.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value = (.85,.16,.025,1)
 parts, magazines, lens_parts = [], [], []
 
 
