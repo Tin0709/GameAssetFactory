@@ -1,0 +1,22 @@
+{
+  "weapon_grip": [
+    -0.245,
+    -0.5,
+    1.29
+  ],
+  "weapon_yaw_deg": 15.0,
+  "head_yaw_deg": 0.0,
+  "right_grip_along_arm_m": 0.5392001271247864,
+  "right_grip_normal_m": 0.01638961397111416,
+  "left_palm_along_arm_m": 0.63,
+  "left_support_carrier_local": [
+    -0.13,
+    0.3,
+    -0.035
+  ],
+  "roll_R": 0.0,
+  "roll_L": 10.0,
+  "socket_drop_R_m": 0.2,
+  "socket_drop_L_m": 0.045,
+  "holding_drop_m": 0.024
+}

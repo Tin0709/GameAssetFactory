@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "failures": [],
+  "sampled_poses": 217,
+  "metrics": {
+    "source_core_matrix_error": 5.960464477539062e-07,
+    "requested_pose_error": 5.960464477539062e-07,
+    "right_grip_error": 4.933162140025749e-07,
+    "left_palm_error": 9.665172169741285e-07,
+    "forearm_local_error": 8.800999751201743e-08,
+    "straight_arm_error": 3.5248806255441166e-07,
+    "unit_scale_error": 3.5762786865234375e-07,
+    "shoulder_surface_gap": 0.0,
+    "support_surface_gap": 0.0028701864648610353,
+    "loop_error": 0.0
+  },
+  "limits": {
+    "source_core_matrix_error": 1e-05,
+    "requested_pose_error": 1e-05,
+    "right_grip_error": 3e-05,
+    "left_palm_error": 3e-05,
+    "forearm_local_error": 1e-05,
+    "straight_arm_error": 1e-05,
+    "unit_scale_error": 1e-05,
+    "shoulder_surface_gap": 0.01,
+    "support_surface_gap": 0.015,
+    "loop_error": 1e-05
+  },
+  "minimum_head_rifle_surface_gap_m": 0.03128747642040253,
+  "collisions_count": 0,
+  "collisions": [],
+  "adjacent": [],
+  "existing_actions_preserved": 21,
+  "source_study_exact": true,
+  "notes": [
+    "Native source leg/foot motion including4.83mm sole corner seating is unchanged.",
+    "Right/left contact points are adapted inside rigid hand blocks; there are no elbows, length changes, mesh edits or scale."
+  ]
+}

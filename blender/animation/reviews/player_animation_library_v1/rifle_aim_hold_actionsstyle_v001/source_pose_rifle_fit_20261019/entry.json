@@ -1,0 +1,89 @@
+{
+  "source_rig": "Showcase_Player_Rig",
+  "source_mesh": "Showcase_Player_Mesh",
+  "source_armature": "LB_Test_RestRig",
+  "slot_identifier": "OBRUN_Test_Rig",
+  "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "rotation_modes": {
+    "Root": "XYZ",
+    "Hips": "XYZ",
+    "Spine": "QUATERNION",
+    "Chest": "QUATERNION",
+    "Neck": "QUATERNION",
+    "Head": "QUATERNION",
+    "UpperArm.L": "QUATERNION",
+    "ForeArm.L": "QUATERNION",
+    "UpperArm.R": "QUATERNION",
+    "ForeArm.R": "QUATERNION",
+    "WeaponCarrier": "QUATERNION",
+    "Leg.L": "XYZ",
+    "Leg.R": "XYZ"
+  },
+  "preview_prop": "rifle_stylized_v2",
+  "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
+  "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
+  "action": "Rifle_Aim_Hold_ActionsStyle_v001",
+  "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/source_pose_rifle_fit_20261019/rifle_aim_hold_actionsstyle_v001.blend",
+  "source_sha256": "e434f02e8be10557d058ca5eef0ddfc4d355c5d173d0138edb03b14d9aad03dd",
+  "action_sha256": "9a81be3fde8b3472b88bfac093cbb03db48dfafcc71e4bb82ee0a5fc907f15b7",
+  "action_frame_range": [
+    1.0,
+    109.0
+  ],
+  "start": 1,
+  "end": 108,
+  "fps": 30,
+  "fps_base": 1.0,
+  "status": "pending",
+  "approval_note": "Same Pending rifle Aim refined from accepted literal crossbow pose and user rifle-reference images2026-10-19. Blender-only review.",
+  "seamless_loop": true,
+  "research_only": true,
+  "production_eligible": false,
+  "source_derived_reconstruction": true,
+  "original_custom_animation": false,
+  "bake_hz": 240,
+  "source_duration_s": 3.6,
+  "endpoint_sample_frame": 109,
+  "source_animations": [
+    "animation.oreville_ans.rrvlnm",
+    "animation.oreville_ans.dubgwy",
+    "animation.oreville_ans.jawwtn",
+    "animation.oreville_ans.asxvzc"
+  ],
+  "source_controllers": [
+    "controller.animation.oreville_ans.njvelc",
+    "controller.animation.oreville_ans.knoyhk"
+  ],
+  "source_profile": "ordinary player0, already charged mainhand crossbow, no shield, grounded, neutral look; 0.6s charged entry warmup",
+  "visual_base": "Crossbow_Aim_ActionsStuff_Source_Test_v001",
+  "visual_base_action_sha256": "5d6949a66a5448c4acc6d54d02c839da1d3222bb034463e418cdc54658577930",
+  "rig_adaptations": {
+    "weapon_grip": [
+      -0.245,
+      -0.5,
+      1.29
+    ],
+    "weapon_yaw_deg": 15.0,
+    "head_yaw_deg": 0.0,
+    "right_grip_along_arm_m": 0.5392001271247864,
+    "right_grip_normal_m": 0.01638961397111416,
+    "left_palm_along_arm_m": 0.63,
+    "left_support_carrier_local": [
+      -0.13,
+      0.3,
+      -0.035
+    ],
+    "roll_R": 0.0,
+    "roll_L": 10.0,
+    "socket_drop_R_m": 0.2,
+    "socket_drop_L_m": 0.045,
+    "holding_drop_m": 0.024
+  },
+  "previous_pending_source": {
+    "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/face_clearance_refinement_20261019/rifle_aim_hold_actionsstyle_v001.blend",
+    "source_sha256": "9dc8d03ba8e5bd154f76a53253e7b8a4cc5b0ea37a195f6c3ae07073c4575dc2",
+    "action_sha256": "f852e42039a05b45ece934e8a6063bb6bfe4886317cd4c7dc46c7b506a2c58b6"
+  },
+  "contains_source_derived_base_pose": true,
+  "review_scope": "Source-clock rifle aiming HOLD only; previous Ready\u2192Aim\u2192Hold\u2192Ready source/timeline preserved in previous_pending_source."
+}
