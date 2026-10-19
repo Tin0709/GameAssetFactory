@@ -1,7 +1,7 @@
 import bpy,json,sys,hashlib,math
 from pathlib import Path
 from mathutils import Matrix,Vector
-R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').is_file());S=Path(__file__).resolve().parent.parent;sys.path.insert(0,str(S));sys.path.insert(0,str(R/'blender/animation/showcase'));import gaf_animation_library as ui
+R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').is_file());S=Path(__file__).resolve().parent.parent;sys.path.insert(0,str(Path(__file__).resolve().parent));sys.path.insert(0,str(S));sys.path.insert(0,str(R/'blender/animation/showcase'));import gaf_animation_library as ui
 from motion import RifleFit
 N='Rifle_Aim_Hold_ActionsStyle_v001';BASE='Crossbow_Aim_ActionsStuff_Source_Test_v001';r=bpy.data.objects[ui.RIG];s=bpy.context.scene;a0=bpy.data.actions[BASE];mf=json.loads((R/'blender/animation/showcase/animation_manifest.json').read_text());be=next(e for e in mf['animations'] if e['action']==BASE);old=next(e for e in mf['animations'] if e['action']==N);assert old['status']=='pending';
 if (S/'rifle_aim_hold_actionsstyle_v001.blend').exists():raise RuntimeError('Preserve existing result. Rebuild in a backed-up working copy with an explicit output path.')
