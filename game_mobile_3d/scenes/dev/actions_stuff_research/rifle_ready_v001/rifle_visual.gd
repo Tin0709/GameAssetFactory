@@ -132,8 +132,13 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
   # Keep approved jump/landing chest/core motion, with the aimed head carried
   # relative to that chest rather than cancelling the physical jump response.
   for bone in _aim_head_bones:
-   direction_poses[bone]=Transform3D(direction_poses[bone]).interpolate_with(rifle_ground_poses[bone],rifle_aim_weight)
-   direction_future_poses[bone]=Transform3D(direction_future_poses[bone]).interpolate_with(rifle_ground_future[bone],rifle_aim_weight)
+   for pair in [[direction_poses,0.],[direction_future_poses,.004]]:
+    var source: Transform3D=pair[0][bone]
+    var target: Transform3D=rifle_aim_clip.pose(bone,fposmod(rifle_aim_time+float(pair[1]),float(rifle_aim_profile.clips.Aim.duration)))
+    var blended:=source.interpolate_with(target,rifle_aim_weight)
+    # The jump controller still owns compression/stretch; Aim owns head pose.
+    blended.basis=Basis(blended.basis.orthonormalized().get_rotation_quaternion()).scaled(source.basis.get_scale())
+    pair[0][bone]=blended
  else:position.y=0. # These approved clips already include native boot clearance.
  idle_active=not moving and not jump_active
  rifle_state="Run" if gait_run_weight>.98 and moving else ("Walk" if moving else "Idle")
