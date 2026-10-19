@@ -25,14 +25,16 @@ s.unit_settings.system='METRIC'
 c=bpy.data.collections.new('WEAPON_EXPORT');s.collection.children.link(c)
 root=bpy.data.objects.new('Shotgun_Sand_Block_V1',None);c.objects.link(root)
 root['review_status']='Pending';root['forward']='+Y';root['origin']='RightHandGrip'
-root['reference']='reference.png — user supplied 2026-10-19'
+root['reference']='reference_refined.png — latest user multi-view reference 2026-10-19'
+grip_origin=Vector((0,-.133,.006))
+root['authoring_origin']=list(grip_origin)
 atlas=bpy.data.images.load(str(OUT/'shotgun_palette_source_256.png'),check_existing=False)
 atlas.name='Shotgun_Sand_Atlas_256'
 pixels=list(atlas.pixels[:])
 rng=random.Random(2026101908)
 # Preserve the accepted sand and high-contrast graphite; use spare warm swatches
 # for red shell bodies, brass caps and red shadows within the same atlas.
-for tile,rgb in {12:(178,35,22),13:(208,158,49),14:(113,25,18)}.items():
+for tile,rgb in {12:(178,35,22),13:(221,196,69),14:(113,25,18)}.items():
     shades=[[1.0]*64 for _ in range(64)]
     for _ in range(85):
         x,y=rng.randrange(2,57),rng.randrange(2,57)
@@ -114,7 +116,7 @@ def octagon(w,h,ch):
             (w/2-ch,h/2),(-w/2+ch,h/2),(-w/2,h/2-ch),(-w/2,-h/2+ch)]
 
 
-def housing(name,rings,z,tile=4,hole=None,through=False,group='Slide'):
+def housing(name,rings,z,tile=4,hole=None,through=False,group='Frame',hole_chamfer=.0008,hole_z=None):
     # Cross sections along +Y; optional closed deep recess or open ring sleeve.
     vs = [(x,y,z+zz) for y,w,h,ch in rings for x,zz in octagon(w,h,ch)]
     fs = [] if through else [tuple(reversed(range(8)))]
@@ -125,7 +127,7 @@ def housing(name,rings,z,tile=4,hole=None,through=False,group='Slide'):
         w,h,depth = hole
         start = len(vs)
         for y in [rings[-1][0],rings[0][0] if through else rings[-1][0]-depth]:
-            vs += [(x,y,z+zz) for x,zz in octagon(w,h,.0008)]
+            vs += [(x,y,(z if hole_z is None else hole_z)+zz) for x,zz in octagon(w,h,hole_chamfer)]
         for i in range(8):
             k = (i+1)%8
             fs += [(last+i,last+k,start+k,start+i),(start+i,start+k,start+8+k,start+8+i)]
@@ -153,44 +155,50 @@ def yz_ring(name,outer,inner,width,tile=0,bevel=0):
                (i,2*n+i,2*n+j,j),(n+i,n+j,3*n+j,3*n+i)]
     return part(name,vs,fs,tile,bevel)
 
-# Open stepped stock: upper beam, rear post and a stair-shaped lower brace.
-profile('Stock_Sand_Upper_Beam',[(-.395,.134),(-.214,.124),(-.225,.092),(-.392,.100)],
-        .058,0,.0012)
-profile('Stock_Rear_Post',[(-.395,.104),(-.364,.102),(-.364,-.024),(-.395,-.024)],
+# The reference has a thick upper stock beam and stepped inner ledges, rather
+# than a large triangular opening. Its lower, thicker pad sets the silhouette.
+profile('Stock_Sand_Upper_Beam',[(-.381,.120),(-.214,.124),(-.244,.068),(-.381,.068)],
+        .058,0,.0011)
+profile('Stock_Rear_Post',[(-.381,.071),(-.352,.071),(-.352,-.030),(-.381,-.030)],
         .050,0,.0008)
-profile('Stock_Stepped_Brace',[(-.364,.026),(-.285,.084),(-.247,.084),
-        (-.247,.066),(-.271,.066),(-.271,.045),(-.295,.045),(-.295,.024),
-        (-.319,.024),(-.319,.003),(-.344,.003),(-.344,-.016),(-.364,-.016)],.050,2,.0006)
-box('Stock_Front_Web',(0,-.239,.094),(.052,.042,.023),2,.0006)
-housing('Stock_Graphite_Pad',[(-.418,.059,.168,.003),(-.412,.064,.175,.003),
-        (-.392,.064,.175,.003)],.0535,6,group='Frame')
-profile('Stock_Neck',[(-.232,.124),(-.155,.124),(-.155,.135),(-.115,.135),
-        (-.105,.102),(-.121,.069),(-.195,.080),(-.212,.092)],.052,4,.0012)
-box('Stock_Neck_Joint',(0,-.159,.106),(.056,.017,.059),6,.0007)
+profile('Stock_Stepped_Brace',[(-.352,.009),(-.327,.009),(-.327,.029),
+        (-.303,.029),(-.303,.048),(-.244,.048),(-.244,.027),(-.268,.027),
+        (-.268,.008),(-.292,.008),(-.292,-.011),(-.316,-.011),
+        (-.316,-.030),(-.352,-.030)],.050,2,.0006)
+box('Stock_Front_Web',(0,-.260,.058),(.050,.039,.025),2,.0006)
+box('Stock_Lower_Socket',(0,-.238,.055),(.033,.016,.026),6,.0005)
+housing('Stock_Graphite_Pad',[(-.418,.059,.151,.003),(-.411,.064,.159,.003),
+        (-.380,.064,.159,.003)],.040,6)
+profile('Stock_Neck_Core',[(-.247,.119),(-.210,.119),(-.210,.126),(-.184,.126),
+        (-.184,.134),(-.151,.134),(-.139,.128),(-.136,.081),
+        (-.183,.080),(-.196,.086),(-.247,.086)],.044,4,.0008)
+housing('Stock_Rear_Collar',[(-.246,.050,.039,.002),(-.226,.050,.039,.002)],.105,6)
+profile('Stock_Receiver_Adapter',[(-.169,.130),(-.153,.143),(-.134,.139),
+        (-.124,.121),(-.126,.062),(-.148,.064),(-.169,.078)],.057,4,.0008)
 
 # Receiver with genuinely inset side ports under its overhanging roof.
-profile('Receiver_Lower',[(-.135,.102),(-.125,.107),(.145,.107),(.158,.094),
-        (.158,.050),(-.113,.048),(-.135,.062)],.060,4,.0013)
-box('Receiver_Upper_Core',(0,.012,.114),(.050,.275,.023),6,.0007)
-box('Receiver_Roof',(0,.012,.128),(.060,.275,.008),5,.0008)
+profile('Receiver_Lower',[(-.135,.102),(-.125,.107),(.130,.107),(.139,.094),
+        (.139,.050),(-.113,.048),(-.135,.062)],.060,4,.0013)
+box('Receiver_Upper_Core',(0,.00675,.114),(.050,.2645,.023),6,.0007)
+box('Receiver_Roof',(0,.00675,.128),(.060,.2645,.008),5,.0008)
+profile('Receiver_Sloped_Rear_Cover',[(-.132,.059),(-.137,.100),(-.122,.139),
+        (-.052,.132),(-.035,.119),(-.041,.056)],.064,4,.0010)
 for side in [-1,1]:
     box('Receiver_Rear_Sidewall',(side*.0285,-.0935,.115),(.006,.077,.026),4,.0006)
-    box('Receiver_Front_Sidewall',(side*.0285,.1275,.115),(.006,.045,.026),4,.0006)
+    box('Receiver_Front_Sidewall',(side*.0285,.122,.115),(.006,.034,.026),4,.0006)
     box('Port_Lower_Lip',(side*.029,.023,.105),(.005,.158,.006),5,.0003)
     box('Inset_Port_Bolt',(side*.0258,.015,.1135),(.002,.115,.011),7,.0004)
-    box('Receiver_Control',(side*.032,-.095,.070),(.005,.017,.006),7,.0004)
-    box('Receiver_Control_Pin',(side*.0348,-.095,.070),(.001,.004,.004),8)
-    for y in [-.115,.141]:
+    box('Receiver_Control',(side*.033,-.083,.070),(.005,.017,.006),7,.0004)
+    box('Receiver_Control_Pin',(side*.0358,-.083,.070),(.001,.004,.004),8)
+    for y in [-.115,.126]:
         box('Receiver_Square_Pin',(side*.0305,y,.061),(.0025,.005,.005),7,.0003)
 
-# Tan raked grip, dark backstrap and broad black heel.
+# Solid tan grip with a narrow connected dark backstrap; shorten and move it
+# rearward to match the reference's relation to the receiver and trigger guard.
 grip_yz=[(-.094,.065),(-.036,.052),(-.074,-.078),(-.137,-.061)]
-profile('Grip_Dark_Shell',grip_yz,.043,4,.0010)
-for side in [-1,1]:
-    profile('Grip_Sand_Panel',[(-.089,.054),(-.044,.047),(-.080,-.069),(-.129,-.056)],
-            .002,0,.0007,x=side*.022)
-profile('Grip_Sand_Frontstrap',[(-.049,.050),(-.036,.052),(-.074,-.078),(-.084,-.075)],
-        .043,1,.0006)
+profile('Grip_Sand_Core',grip_yz,.043,0,.0012)
+profile('Grip_Dark_Backstrap',[(-.094,.065),(-.086,.064),(-.129,-.060),(-.137,-.061)],
+        .045,6,.0006)
 profile('Grip_Graphite_Heel',[(-.143,-.060),(-.072,-.078),(-.077,-.094),(-.148,-.076)],
         .050,6,.0009)
 yz_ring('Angular_Trigger_Guard',[(-.044,.055),(.064,.055),(.058,.008),
@@ -199,20 +207,29 @@ yz_ring('Angular_Trigger_Guard',[(-.044,.055),(.064,.055),(.058,.008),
         .029,6,.0008)
 profile('Stepped_Trigger',[(-.002,.050),(.009,.050),(.006,.032),(.014,.025),
         (.009,.020),(-.004,.024),(-.008,.035)],.013,8,.0005)
+for ob in parts['Frame']:
+    if ob.name.startswith('Grip_'):
+        for v in ob.data.vertices:
+            v.co.y-=.050
+            v.co.z=.055+(v.co.z-.055)*.80
+    elif ob.name in ['Angular_Trigger_Guard','Stepped_Trigger']:
+        for v in ob.data.vertices:
+            v.co.y=-.031+(v.co.y-.008)*.86
+            v.co.z=.055+(v.co.z-.055)*.72
 
 # Compact detachable box matching the short block below the reference receiver.
-profile('Magazine_Stub',[(.064,.057),(.144,.057),(.141,.024),(.065,.027)],
+profile('Magazine_Stub',[(.064,.057),(.136,.057),(.134,.035),(.065,.037)],
         .053,4,.0008,'Magazine')
-box('Magazine_Baseplate',(0,.103,.024),(.058,.083,.006),6,.0006,'Magazine')
+box('Magazine_Baseplate',(0,.101,.035),(.056,.078,.005),6,.0006,'Magazine')
 for side in [-1,1]:
-    box('Magazine_Side_Inset',(side*.0268,.103,.040),(.001,.058,.012),6,0,'Magazine')
+    box('Magazine_Side_Inset',(side*.0268,.101,.045),(.001,.055,.009),6,0,'Magazine')
 
 # Long upper barrel with an open warm graphite crown and a deep square bore.
 barrel=housing('Main_Barrel',[(.143,.047,.042,.005),(.173,.041,.038,.004),
         (.603,.041,.038,.004),(.628,.039,.037,.004)],.108,4,
-        hole=(.024,.025,.478),group='Frame')
+        hole=(.024,.025,.478),hole_chamfer=.0065)
 crown=housing('Muzzle_Crown',[(.605,.047,.044,.004),(.632,.047,.044,.004),
-        (.640,.044,.042,.003)],.108,7,hole=(.026,.027,.035),through=True,group='Frame')
+        (.640,.044,.042,.003)],.108,7,hole=(.026,.027,.035),through=True,hole_chamfer=.0065)
 # Recess both sleeves together so the underlying barrel cannot fill the crown's
 # side window. Keep the floor outside the bore and map it to the dark swatch.
 for side in [-1,1]:
