@@ -1,0 +1,40 @@
+{
+  "weapon_inward_cant_deg": 10.0,
+  "rigid_right_arm_inward_cant_deg": 10.0,
+  "grip_clearance_fit_m": [
+    -0.01,
+    0,
+    -0.005
+  ],
+  "support": [
+    -0.1506118793893177,
+    0.21379899101958263,
+    -0.03467563982649414
+  ],
+  "left_palm_m": 0.6347353700657523,
+  "left_refit_axial_deg": -1.8470900552752332,
+  "eye_marker_head_local_m": [
+    -0.140625,
+    0.28125,
+    0.225
+  ],
+  "sight_marker_carrier_local_m": [
+    0,
+    0,
+    0.25
+  ],
+  "note": "Small user-requested inward cant with explicit10mm lateral/5mm lower clearance fit; original barrel/right-arm parallelism and exact grip retained. Head/torso/stance remain unchanged.",
+  "stance": {
+    "foot_center_spacing_m": 0.32,
+    "fore_aft_stagger_m": 0.14,
+    "right_foot": "forward",
+    "left_foot": "back",
+    "outward_leg_tilt_deg": 3.0,
+    "leg_forward_back_tilt_deg": 4.5,
+    "toe_out_each_deg": 5.0,
+    "stance_blade_deg": 6.914611782648605,
+    "floor_m": 0.0,
+    "stance_center_x_m": -0.01,
+    "feet_policy": "fixed rigid world-space legs throughout loop; lowest sole corners seated on floor"
+  }
+}

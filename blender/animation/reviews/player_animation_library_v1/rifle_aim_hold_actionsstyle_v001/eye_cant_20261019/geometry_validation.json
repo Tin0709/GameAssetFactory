@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "failures": [],
+  "sampled_poses": 217,
+  "metrics": {
+    "unchanged_bone_matrix_error": 0.0,
+    "changed_hold_matrix_error": 4.76837158203125e-07,
+    "foot_vertex_drift": 2.476757791094879e-07,
+    "foot_floor_penetration": 2.8219074010849e-07,
+    "foot_floor_gap": 7.82310962677002e-08,
+    "right_grip_error": 4.995779578161303e-07,
+    "left_palm_error": 4.995779578161303e-07,
+    "forearm_local_error": 7.048948447163639e-08,
+    "straight_arm_error": 3.6814935172843637e-07,
+    "unit_scale_error": 2.384185791015625e-07,
+    "barrel_arm_axis_cross_error": 1.4212972337228307e-07,
+    "shoulder_surface_gap": 0.0,
+    "support_surface_gap": 0.007536397781223059,
+    "loop_error": 0.0
+  },
+  "limits": {
+    "unchanged_bone_matrix_error": 1e-05,
+    "changed_hold_matrix_error": 1e-05,
+    "foot_vertex_drift": 1e-05,
+    "foot_floor_penetration": 1e-05,
+    "foot_floor_gap": 1e-05,
+    "right_grip_error": 3e-05,
+    "left_palm_error": 3e-05,
+    "forearm_local_error": 1e-05,
+    "straight_arm_error": 1e-05,
+    "unit_scale_error": 1e-05,
+    "barrel_arm_axis_cross_error": 1e-05,
+    "shoulder_surface_gap": 0.01,
+    "support_surface_gap": 0.015,
+    "loop_error": 1e-05
+  },
+  "loop_translation_velocity_difference_m_s": 0.005636624787910934,
+  "loop_velocity_limits": {
+    "translation_m_s": 0.006,
+    "angular_rad_s": 0.05
+  },
+  "loop_angular_velocity_difference_rad_s": 0.005528839256638668,
+  "minimum_head_rifle_surface_gap_m": 0.00990921538323164,
+  "before_eye_sight_gap_range_m": [
+    0.15270842633650294,
+    0.15925038428977478
+  ],
+  "after_eye_sight_gap_range_m": [
+    0.12089211786754107,
+    0.12851984045153222
+  ],
+  "minimum_eye_line_improvement_m": 0.0306505767942441,
+  "crossing_hand_contact_sat_range_m": [
+    0.0008687004446983337,
+    0.000869162380695343
+  ],
+  "head_chest_max_seating_m": 0.014787405729293823,
+  "head_chest_min_seating_m": 0.010109612718224525,
+  "shoulder_max_seating_m": 0.046814754605293274,
+  "hip_leg_signed_contact_range_m": [
+    -0.0009631000575609505,
+    0.059510404244065285
+  ],
+  "right_foot_forward_projection_m": 0.1595117785036564,
+  "collisions_count": 0,
+  "collisions": [],
+  "adjacent": [],
+  "existing_actions_preserved": 21,
+  "source_study_exact": true,
+  "notes": [
+    "User-requested10deg inward arm/rifle cant toward character right eye. Original source timing remains unchanged.",
+    "Only33 arm/carrier location/quaternion and leg location/Euler curves changed. All93 remaining curves and evaluated head/torso/hips remain exact copies of preceding grounded stance.",
+    "Right grip and barrel/arm parallelism are retained. Left rigid support is refitted with submillimeter static shoulder displacement. No elbow, scale, mesh or rig changes.",
+    "The small fitted eye-ward cant intentionally reduces earlier face clearance; explicit8mm surface clearance minimum, no head/rifle intersection. The square head and full-length block arms still prevent perfect optical ADS.",
+    "Sight/eye markers are approximate rig diagnostics; source rifle has a carry handle rather than an added optic.",
+    "Right foot is forward and left foot back,0.14m stagger/0.32m lateral sole-center spacing in the stance frame. Feet stay planted; no wider stance, knee or ankle articulation."
+  ]
+}
