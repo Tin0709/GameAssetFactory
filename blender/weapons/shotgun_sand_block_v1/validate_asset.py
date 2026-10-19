@@ -39,6 +39,9 @@ for side in [-1,1]:
     assert not hit,'Trigger guard opening is filled'
 hit,point=cast(frame,(0,.76,.108),(0,-1,0))
 assert hit and point.y<.49,('Main muzzle is shallow/capped',list(point))
+for side in [-1,1]:
+    hit,point=cast(frame,(side*.12,.615,.110),(-side,0,0))
+    assert hit and abs(point.x)<.020,('Muzzle side window is raised/filled',list(point))
 hit,point=cast(frame,(0,.76,.044),(0,-1,0))
 assert hit and .59<point.y<.616,('Missing recessed lower tube end',list(point))
 hit,rib=cast(pump,(.20,.225,.059),(-1,0,0))
@@ -77,7 +80,8 @@ texture_error=max(abs(a-b) for a,b in zip(pixels,images[0].pixels[:]))
 assert texture_error<1e-6,texture_error
 result={'passed':True,'meshes':4,'materials':1,'triangles':tris,'dimensions_m':dims,
         'roundtrip_error_m':error,'texture_roundtrip_error':texture_error,
-        'stock_and_guard_open':True,'deep_main_muzzle':True,'recessed_lower_cap':True,
+        'stock_and_guard_open':True,'deep_main_muzzle':True,'recessed_muzzle_side_windows':True,
+        'recessed_lower_cap':True,
         'pump_groove_depth_m':rib.x-groove.x,'inset_receiver_port':True,'shells':4,'animations':0}
 (OUT/'validation.json').write_text(json.dumps(result,indent=2))
 print('SHOTGUN_ASSET_VALIDATED',json.dumps(result))

@@ -208,13 +208,38 @@ for side in [-1,1]:
     box('Magazine_Side_Inset',(side*.0268,.103,.040),(.001,.058,.012),6,0,'Magazine')
 
 # Long upper barrel with an open warm graphite crown and a deep square bore.
-housing('Main_Barrel',[(.143,.047,.042,.005),(.173,.041,.038,.004),
+barrel=housing('Main_Barrel',[(.143,.047,.042,.005),(.173,.041,.038,.004),
         (.603,.041,.038,.004),(.628,.039,.037,.004)],.108,4,
         hole=(.024,.025,.478),group='Frame')
-housing('Muzzle_Crown',[(.605,.047,.044,.004),(.632,.047,.044,.004),
+crown=housing('Muzzle_Crown',[(.605,.047,.044,.004),(.632,.047,.044,.004),
         (.640,.044,.042,.003)],.108,7,hole=(.026,.027,.035),through=True,group='Frame')
+# Recess both sleeves together so the underlying barrel cannot fill the crown's
+# side window. Keep the floor outside the bore and map it to the dark swatch.
 for side in [-1,1]:
-    box('Crown_Side_Recess',(side*.02365,.615,.110),(.0006,.014,.011),15)
+    bpy.ops.mesh.primitive_cube_add(size=1,location=(side*.0235,.615,.110))
+    cutter=bpy.context.object;cutter.dimensions=(.008,.014,.011)
+    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+    for ob in [barrel,crown]:
+        bpy.context.view_layer.objects.active=ob
+        mod=ob.modifiers.new('Recessed side window','BOOLEAN')
+        mod.operation='DIFFERENCE';mod.solver='EXACT';mod.object=cutter
+        bpy.ops.object.modifier_apply(modifier=mod.name)
+    bpy.data.objects.remove(cutter,do_unlink=True)
+for ob,tile in [(barrel,4),(crown,7)]:
+    me=ob.data;me.update();uv=me.uv_layers.active
+    lo=[min(v.co[i] for v in me.vertices) for i in range(3)]
+    spans=[max(v.co[i] for v in me.vertices)-lo[i] for i in range(3)]
+    density=min(8.0,.84/max(spans))
+    for face in me.polygons:
+        drop=max(range(3),key=lambda i:abs(face.normal[i]))
+        axes=[i for i in range(3) if i!=drop]
+        inset=(.607<face.center.y<.623 and .104<face.center.z<.116
+               and abs(abs(face.center.x)-.0195)<.00005)
+        face_tile=15 if inset else tile
+        for li in face.loop_indices:
+            co=me.vertices[me.loops[li].vertex_index].co
+            u,v=[.08+(co[a]-lo[a])*density for a in axes]
+            uv.data[li].uv=((face_tile%4+u)/4,(face_tile//4+v)/4)
 
 # Under-barrel tube and its four chunky octagonal forward collars.
 housing('Lower_Tube',[(.143,.034,.034,.007),(.608,.034,.034,.007),

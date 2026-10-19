@@ -68,7 +68,7 @@
   "shells": 4,
   "topology": {
     "Shotgun_Sand_Frame": {
-      "triangles": 3772,
+      "triangles": 3812,
       "nonmanifold_edges": 0,
       "loose_vertices": 0
     },
@@ -88,5 +88,5 @@
       "loose_vertices": 0
     }
   },
-  "triangles": 5128
+  "triangles": 5168
 }
