@@ -2,7 +2,7 @@
   "schema": 1,
   "title": "GameAssetFactory Weapon Library",
   "approval_policy": "New assets start Pending; explicit user approval only. Production is preserved separately.",
-  "default_selection": "shotgun_sand_block_v1",
+  "default_selection": "sniper_sand_block_v1",
   "weapons": [
     {
       "id": "rifle_stylized_v2",
@@ -124,6 +124,15 @@
       "status_note": "Pending visual review; user-requested multi-view reference refinement: compact recessed pump, stepped stock cavity and neck, shorter grip/guard, finer rail and brass shell details.",
       "collection": "WEAPON_shotgun_sand_block_v1",
       "root": "shotgun_sand_block_v1__Shotgun_Sand_Block_V1"
+    },
+    {
+      "id": "sniper_sand_block_v1",
+      "kind": "Rifle",
+      "label": "Sniper \u2014 Sand Block V1",
+      "source": "blender/weapons/sniper_sand_block_v1/Sniper_Sand_Block_V1.blend",
+      "source_sha256": "b3333d8db481f3df17a51abc205ac4cc9c9c16d18d4ef86d414a183b4a6c3bf7",
+      "status": "Pending",
+      "status_note": "New registration; awaiting explicit visual approval."
     }
   ],
   "preferred_rifle": "rifle_stylized_v2",

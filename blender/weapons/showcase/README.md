@@ -26,7 +26,9 @@ The launcher does not install an add-on, change preferences, enable global autom
 
 ## Registered models
 
-3 active entries: `Rifle_Stylized_V2` (Preferred), `Pistol_Stylized_V2` (Pending) and `Shotgun_Stylized_V2` (Pending). The shotgun opens selected. Per the user's 2026-10-12 request, the 16 older entries are removed from the selection list and stored under `archived_weapons` in `weapon_manifest.json`; their metadata, source files and exports remain preserved. Future new designs register in this same active list. Gameplay integration remains Pending.
+7 active entries: `Rifle_Stylized_V2` (Preferred), `Pistol_Stylized_V2` (Pending), `Shotgun_Stylized_V2` (Pending), `Rifle_Sand_Block_V1` (Pending), `Pistol_Sand_Block_V1` (Approved), `Shotgun_Sand_Block_V1` (Pending), and **Sniper — Sand Block V1** (Pending). The sniper opens selected. Per the user's 2026-10-12 request, the 16 older entries are removed from the selection list and stored under `archived_weapons` in `weapon_manifest.json`; their metadata, source files and exports remain preserved. Future new designs register in this same active list. Gameplay integration remains Pending.
+
+Latest sniper reference review, 2026-10-19: sand/graphite block model with long scope and red-orange transmitting lenses, raised cheek pad, angled bolt handle, five handguard vents per side, long barrel and a slotted open muzzle brake. [Source, export and review images](../sniper_sand_block_v1/README.md). Existing Rifle static fit previews are inherited; no gameplay or animation edit is included.
 
 List cleanup verification: all 35 recorded source/export files retain their hashes, all 19 original entry records retain their fields/statuses across active and archived records, and the saved showcase passes 45 selection/mode/view combinations. The previous showcase and manifest are backed up under `.validation/weapon_showcase_v2/list_cleanup_20261012_172503/`. See `list_cleanup_verification.json` and `library_verification.json`.
 
