@@ -244,12 +244,15 @@ for ob,tile in [(barrel,4),(crown,7)]:
             uv.data[li].uv=((face_tile%4+u)/4,(face_tile//4+v)/4)
 
 # Under-barrel tube and its four chunky octagonal forward collars.
+# Raised as one assembly after the user's spacing review; the narrow clearance
+# remains visible between the collars and the underside of the upper barrel.
+lower_tube_z=.066
 housing('Lower_Tube',[(.143,.034,.034,.007),(.608,.034,.034,.007),
-        (.620,.032,.032,.006)],.044,6,hole=(.018,.018,.012),group='Frame')
+        (.620,.032,.032,.006)],lower_tube_z,6,hole=(.018,.018,.012),group='Frame')
 for i,y in enumerate([.428,.458,.488,.518]):
     housing('Tube_Collar_%02d'%i,[(y,.042,.043,.007),(y+.019,.042,.043,.007)],
-            .044,4 if i%2 else 5,group='Frame')
-box('Barrel_Tube_Bridge',(0,.410,.077),(.044,.017,.031),6,.0008)
+            lower_tube_z,4 if i%2 else 5,group='Frame')
+box('Barrel_Tube_Bridge',(0,.410,.0875),(.044,.017,.015),6,.0008)
 housing('Foreend_Front_Collar',[(.399,.069,.078,.006),(.420,.066,.078,.006)],
         .061,6,group='Frame')
 
