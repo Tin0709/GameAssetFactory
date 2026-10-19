@@ -152,9 +152,11 @@ for side in [-1,1]:
 shape('Receiver_Lower_Sand',[(147,82),(270,82),(271,88),(301,88),(301,106),
     (272,107),(272,114),(178,113),(174,123),(146,121)],.061,0,.0009)
 block('Receiver_Top_Sand_Roof',214,73,126,9,.059,1)
-block('Receiver_Slot_Rear_Wall',163,79,31,18,.061,0)
-block('Receiver_Slot_Front_Wall',251,79,33,18,.061,0)
-block('Receiver_Front_Upper_Bridge',286,80,30,21,.061,0)
+# Half-millimetre side steps avoid coincident faces where these walls overlap
+# the roof and lower shell; a shared face plane creates black render seams.
+block('Receiver_Slot_Rear_Wall',163,79,31,18,.060,0)
+block('Receiver_Slot_Front_Wall',251,79,33,18,.060,0)
+block('Receiver_Front_Upper_Bridge',286,80,30,21,.060,0)
 block('Receiver_Recessed_Dark_Bolt',205,79.3,59,9,.042,6,.0005)
 for side in [-1,1]:
     block('Receiver_Inset_Port_Sill',205,84,60,3,.005,2,.0003,x=side*.0279)
@@ -403,6 +405,7 @@ if not args.no_render:
         cam.location=focus+Vector(direction)
         cam.rotation_euler=(focus-cam.location).to_track_quat('-Z','Y').to_euler()
         if name=='top':cam.rotation_euler=(0,0,math.pi/2)
+        floor.hide_render=name!='three_quarter'
         cam.data.ortho_scale=ortho;s.render.filepath=str(review/(name+'.png'));bpy.ops.render.render(write_still=True)
 print('SNIPER_SAND_BLOCK_BUILT',flush=True)
 
