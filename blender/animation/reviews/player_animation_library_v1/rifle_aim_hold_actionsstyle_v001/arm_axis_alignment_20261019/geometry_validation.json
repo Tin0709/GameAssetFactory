@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "failures": [],
+  "sampled_poses": 217,
+  "metrics": {
+    "source_core_matrix_error": 1.1920928955078125e-07,
+    "requested_pose_error": 7.152557373046875e-07,
+    "right_grip_error": 5.623090941939713e-07,
+    "left_palm_error": 7.348554137908192e-07,
+    "forearm_local_error": 7.048948447163639e-08,
+    "straight_arm_error": 3.5153202063920695e-07,
+    "unit_scale_error": 2.384185791015625e-07,
+    "barrel_arm_axis_cross_error": 1.9883167833468298e-07,
+    "shoulder_surface_gap": 0.0,
+    "support_surface_gap": 0.010100227780640125,
+    "loop_error": 0.0
+  },
+  "limits": {
+    "source_core_matrix_error": 1e-05,
+    "requested_pose_error": 1e-05,
+    "right_grip_error": 3e-05,
+    "left_palm_error": 3e-05,
+    "forearm_local_error": 1e-05,
+    "straight_arm_error": 1e-05,
+    "unit_scale_error": 1e-05,
+    "barrel_arm_axis_cross_error": 1e-05,
+    "shoulder_surface_gap": 0.01,
+    "support_surface_gap": 0.015,
+    "loop_error": 1e-05
+  },
+  "loop_translation_velocity_difference_m_s": 0.005679184603493957,
+  "loop_velocity_limits": {
+    "translation_m_s": 0.006,
+    "angular_rad_s": 0.05
+  },
+  "loop_angular_velocity_difference_rad_s": 0.005528839256638668,
+  "minimum_head_rifle_surface_gap_m": 0.02942931465804577,
+  "crossing_hand_contact_sat_range_m": [
+    0.0007998645305633545,
+    0.0008002649992704391
+  ],
+  "head_chest_max_seating_m": 0.014787405729293823,
+  "head_chest_min_seating_m": 0.010109612718224525,
+  "shoulder_max_seating_m": 0.049310446716845036,
+  "collisions_count": 0,
+  "collisions": [],
+  "adjacent": [],
+  "existing_actions_preserved": 21,
+  "source_study_exact": true,
+  "notes": [
+    "Native source leg/foot motion including4.83mm sole corner seating is unchanged.",
+    "240Hz linear source baking has finite one-sided chord velocities;6mm/s tolerance bounds a0.2mm one-frame displacement at30FPS. No source timing was retimed.",
+    "Only14 transform curves on WeaponCarrier/UpperArm.L changed.112 other curves, including right arm, head, torso and lower body, are exact copies of the preceding Pending pose.",
+    "Barrel axis is parallel to the unchanged right complete-arm longitudinal axis; right grip pivot and original idle timing are retained.",
+    "The two rigid hand blocks intentionally touch with at most1.5mm seating; this explicit user-requested contact is the only additional allowed pair.",
+    "There are no elbows, length changes, mesh edits or scale."
+  ]
+}

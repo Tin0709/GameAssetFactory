@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "edited_curves": 14,
+  "untouched_curves_exact": 112,
+  "only_modified_bones": [
+    "UpperArm.L",
+    "WeaponCarrier"
+  ],
+  "right_arm_head_torso_lower_body_all_curves_exact": true
+}

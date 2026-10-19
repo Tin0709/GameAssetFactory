@@ -1,0 +1,37 @@
+{
+  "grip": [
+    -0.33047323635617004,
+    -0.4453544827449642,
+    1.28
+  ],
+  "body_blade_deg": 6.914611782648605,
+  "body_lean_deg": 3.092183204904206,
+  "body_roll_deg": -2.1334985252938274,
+  "head_nod_deg": 10.965333624774374,
+  "head_roll_deg": -9.097395322583253,
+  "head_yaw_delta_deg": 1.2785032250573067,
+  "weapon_yaw_deg": 3.3652851770098966,
+  "drop_R": 0.01067203041176399,
+  "drop_L": 0.05,
+  "roll_R": 14.080766412442678,
+  "roll_L": -86.90034701111219,
+  "support": [
+    -0.1378370423349427,
+    0.21642879564265335,
+    -0.050308002677840635
+  ],
+  "left_palm_m": 0.6347353700657523,
+  "weapon_pitch_deg": -1.1141063142826741,
+  "head_idle_delta_weight": 0.3,
+  "head_seat_lift_m": 0.028,
+  "weapon_axis_alignment": "parallel to right complete-arm longitudinal axis",
+  "weapon_axis_roll_adapter_deg": 2.0,
+  "left_refit_roll_deg": 101.76273782432742,
+  "left_socket_drop_adapter_m": 0.0033167138810529678,
+  "left_hand_contact_seating_m": 0.0008,
+  "left_hand_fine_translation_m": [
+    0.000587279444602961,
+    -0.0005323170328958041,
+    0.0001474219683038904
+  ]
+}
