@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "failures": [],
+  "sampled_poses": 217,
+  "metrics": {
+    "unchanged_bone_matrix_error": 0.0,
+    "new_target_matrix_error": 4.76837158203125e-07,
+    "foot_vertex_drift": 2.476757791094879e-07,
+    "foot_floor_error": 2.8219074010849e-07,
+    "right_grip_error": 4.814712530792806e-07,
+    "forearm_local_error": 7.048948447163639e-08,
+    "unit_scale_error": 2.384185791015625e-07,
+    "shoulder_surface_gap": 0.0,
+    "support_surface_gap": 0.00030108660575933754,
+    "loop_error": 0.0
+  },
+  "limits": {
+    "unchanged_bone_matrix_error": 1e-05,
+    "new_target_matrix_error": 1e-05,
+    "foot_vertex_drift": 1e-05,
+    "foot_floor_error": 1e-05,
+    "right_grip_error": 2e-05,
+    "forearm_local_error": 1e-05,
+    "unit_scale_error": 1e-05,
+    "shoulder_surface_gap": 0.01,
+    "support_surface_gap": 0.012,
+    "loop_error": 1e-05
+  },
+  "minimum_head_rifle_surface_gap_m": 0.11505062878131866,
+  "support_surface_gap_range_m": [
+    0.0003002829907927662,
+    0.00030108660575933754
+  ],
+  "head_chest_signed_contact_range_m": [
+    0.001067285891622305,
+    0.004752008244395256
+  ],
+  "shoulder_max_seating_m": 0.054744429886341095,
+  "loop_translation_velocity_difference_m_s": 0.005078235142028025,
+  "loop_angular_velocity_difference_rad_s": 0.0054492459903744996,
+  "all_source_file_previous_actions_exact": 22,
+  "bounded_solid_hand_contact_max_component_obb_depth_m": {
+    "Rifle_V2_Body|ForeArm.L": 0.0074110329151153564,
+    "Rifle_V2_Magazine|ForeArm.R": 0.007011346518993378
+  },
+  "hand_seating_limit_m": 0.008,
+  "collision_pairs": {},
+  "collisions_count": 0,
+  "collisions": [],
+  "adjacent": []
+}
