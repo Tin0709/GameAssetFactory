@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "meshes": 4,
+  "materials": 1,
+  "triangles": 5060,
+  "dimensions_m": [
+    0.10500000044703484,
+    1.05799999833107,
+    0.2667788192629814
+  ],
+  "roundtrip_error_m": 0.0,
+  "texture_roundtrip_error": 0.0,
+  "stock_and_guard_open": true,
+  "deep_main_muzzle": true,
+  "recessed_lower_cap": true,
+  "pump_groove_depth_m": 0.0070000141859054565,
+  "inset_receiver_port": true,
+  "shells": 4,
+  "animations": 0
+}
