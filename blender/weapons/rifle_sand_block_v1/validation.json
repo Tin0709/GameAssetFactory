@@ -1,7 +1,7 @@
 {
   "passed": true,
   "meshes": 3,
-  "materials": 2,
+  "materials": 3,
   "triangles": 6200,
   "vent_opening_ray_checks": 42,
   "rail_pocket_ray_checks": 9,
