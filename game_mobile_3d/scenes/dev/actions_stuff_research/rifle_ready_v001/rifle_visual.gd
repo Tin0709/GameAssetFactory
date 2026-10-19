@@ -36,7 +36,7 @@ var rifle_carrier_attachment:=Transform3D.IDENTITY
 var rifle_contact_shoulder_weight:=0.0
 var _aim_bones: Array[int]=[]
 var _aim_head_bones: Array[int]=[]
-const AIM_BLEND_SECONDS:=.16
+const AIM_BLEND_SECONDS:=.24
 
 func _rows(rows: Array) -> Transform3D:
  return Transform3D(Basis(Vector3(rows[0][0],rows[1][0],rows[2][0]),Vector3(rows[0][1],rows[1][1],rows[2][1]),Vector3(rows[0][2],rows[1][2],rows[2][2])),Vector3(rows[0][3],rows[1][3],rows[2][3]))
