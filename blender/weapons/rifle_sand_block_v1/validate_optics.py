@@ -24,6 +24,8 @@ for material in lenses.data.materials:
     node = material.node_tree.nodes.get('Principled BSDF')
     assert node.inputs['Transmission Weight'].default_value > .9
     assert node.inputs['Roughness'].default_value < .15
+    r,g,b,_ = node.inputs['Base Color'].default_value
+    assert r > g*3 and g > b*3, ('Glass must retain the requested red-orange tint',material.name)
 for origin,direction in [((0,-.030,.233),(0,1,0)),((0,.300,.233),(0,-1,0))]:
     hit, point, _, _ = lenses.ray_cast(Vector(origin),Vector(direction))
     assert hit and -.01 < point.y < .27
@@ -37,8 +39,10 @@ assert len(glass_specs) == 2
 for material in glass_specs:
     assert material['extensions']['KHR_materials_transmission']['transmissionFactor'] > .9
     assert material['alphaMode'] == 'BLEND'
+    r,g,b,_ = material['pbrMetallicRoughness']['baseColorFactor']
+    assert r > g*3 and g > b*3, 'GLB lost the red-orange glass tint'
 result = {'passed':True,'clear_metal_bore_rays':5,'lens_surface_rays':2,
           'lens_count':2,'transmission':bsdf.inputs['Transmission Weight'].default_value,
-          'gltf_transmission_preserved':True,'gltf_alpha_mode':'BLEND'}
+          'gltf_transmission_preserved':True,'gltf_alpha_mode':'BLEND','lens_tint':'red-orange'}
 (OUT/'optics_validation.json').write_text(json.dumps(result,indent=2))
 print('OPTICS_VALIDATED',json.dumps(result))

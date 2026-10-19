@@ -5,5 +5,6 @@
   "lens_count": 2,
   "transmission": 0.9599999785423279,
   "gltf_transmission_preserved": true,
-  "gltf_alpha_mode": "BLEND"
+  "gltf_alpha_mode": "BLEND",
+  "lens_tint": "red-orange"
 }
