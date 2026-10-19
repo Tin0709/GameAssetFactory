@@ -6,7 +6,11 @@ N='Rifle_Aim_Hold_Arsenal_ActionsStyle_v001';r=bpy.data.objects[ui.RIG];m=bpy.da
 p=R/'blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v004/authoring/validate_upper_body_geometry.py';ns={'__file__':str(p),'__name__':'geometry_helpers'};exec(compile(p.read_text().rsplit('\nmain()',1)[0],str(p),'exec'),ns);ids,tri,bad=ns['setup'](r,m)
 # Explicit solid Minecraft hand contacts, bounded below by component geometry.
 ns['CONTACT'] |= {frozenset(('ForeArm.L','Rifle_V2_Body')),frozenset(('ForeArm.R','Rifle_V2_Magazine'))}
-P=json.loads((S/'parameters.json').read_text());T={n:Matrix(v) for n,v in json.loads((S/'static_pose.json').read_text()).items()};source=[{n:Matrix(v) for n,v in row.items()} for row in json.loads((S/'baseline_world_samples.json').read_text())];metrics={k:0. for k in ['unchanged_bone_matrix_error','new_target_matrix_error','foot_vertex_drift','foot_floor_error','right_grip_error','forearm_local_error','unit_scale_error','shoulder_surface_gap','support_surface_gap','loop_error']};collisions=[];adjacent=[];minhead=1e9;headseat=[1e9,-1e9];shoulderseat=0.;poses={};foot0={};gaprange=[1e9,-1e9]
+P=json.loads((S/'parameters.json').read_text());T={n:Matrix(v) for n,v in json.loads((S/'static_pose.json').read_text()).items()};baseline=bpy.data.actions['Rifle_Aim_Hold_ActionsStyle_v001'];r.animation_data.action=baseline;r.animation_data.action_slot=baseline.slots[0];s['gaf_library_last_action']=baseline.name;source=[]
+for j in range(217):
+ f=1+j*.5;s.frame_set(math.floor(f),subframe=f%1);bpy.context.view_layer.update();source.append({b.name:b.matrix.copy() for b in r.pose.bones})
+r.animation_data.action=a;r.animation_data.action_slot=a.slots[0];s['gaf_library_last_action']=N
+metrics={k:0. for k in ['unchanged_bone_matrix_error','new_target_matrix_error','foot_vertex_drift','foot_floor_error','right_grip_error','forearm_local_error','unit_scale_error','shoulder_surface_gap','support_surface_gap','loop_error']};collisions=[];adjacent=[];minhead=1e9;headseat=[1e9,-1e9];shoulderseat=0.;poses={};foot0={};gaprange=[1e9,-1e9]
 def frame(f):s.frame_set(math.floor(f),subframe=f%1);bpy.context.view_layer.update();return {b.name:b.matrix.copy() for b in r.pose.bones}
 for i in range(217):
  M=frame(1+i*.5);D=source[i]['UpperArm.R']@source[0]['UpperArm.R'].inverted();DH=source[i]['Head']@source[0]['Head'].inverted();pts,trees=ns['geometry'](r,m,ids,tri);pairs,sats=ns['collision'](r,pts,trees)
