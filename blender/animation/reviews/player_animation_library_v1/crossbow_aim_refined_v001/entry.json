@@ -34,8 +34,8 @@
   "end": 108,
   "fps": 30,
   "fps_base": 1.0,
-  "status": "pending",
-  "approval_note": "Preferred Crossbow source base, with user-requested stronger head lean toward rifle, both arms lowered slightly and left arm away slightly. Arsenal composite set aside. Pending review.",
+  "status": "approved",
+  "approval_note": "Officially artistically APPROVED by user2026-10-19 for the existing research/dev Godot Aim integration. Exact source Action preserved; research-only/nonproduction restrictions remain.",
   "seamless_loop": true,
   "research_only": true,
   "production_eligible": false,
@@ -67,5 +67,6 @@
     "left_pivot": "unchanged upper-arm shoulder root",
     "all_other_bones_and_source_clocks": "unchanged"
   },
-  "literal_unmodified_source_pose": false
+  "literal_unmodified_source_pose": false,
+  "approval_date": "2026-10-19"
 }
