@@ -115,5 +115,11 @@
     "idle_weapon_yaw_deg": 0.35,
     "idle_chest_yaw_deg": 0.18,
     "left_palm_forward_m": 0.065
-  }
+  },
+  "previous_pending_source": {
+    "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/reference_pose_refinement_20261018/rifle_aim_hold_actionsstyle_v001.blend",
+    "source_sha256": "1bab13402bba6d546caa50819ad4be847ccd12302f7b7a0a96826e3731c7d912",
+    "action_sha256": "dfa6b1c637a99029a9f7a2dc7b5dff023105e03728cc9bcf5ace86023817d093"
+  },
+  "user_reference": "User-provided rifle hold examples and feedback2026-10-19: lower, forward hold with clear cheek space; straight arms, connected shoulders, source holding rhythms preserved."
 }
