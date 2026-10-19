@@ -17,5 +17,5 @@
   "new_source_bytes": 12864518,
   "canonical_version_bytes": 86370497,
   "ordinary_files_over_25MiB": [],
-  "passed": false
+  "passed": true
 }
