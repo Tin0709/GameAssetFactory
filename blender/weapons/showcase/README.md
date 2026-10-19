@@ -1,5 +1,7 @@
 # Permanent Weapon Showcase
 
+**2026-10-19 — Tactical Sand Block shotgun:** [new reference shotgun](../shotgun_sand_block_v1/README.md) is registered Pending and selected by default in this same library. It has a stepped open sand stock, grooved sand pump, graphite receiver/dual tubes, a long block rail and four red/brass shells in a side saddle. Six active models; previous sources and archived records are preserved. The user's preceding “ok tốt rồi” records Pistol Sand Block V1 as visually Approved in metadata only; no gameplay integration or source edits.
+
 **2026-10-19 — Pistol Sand Block V1 detail review:** the same Pending pistol now has stronger flat graphite pixel clusters, a stepped rear slide roof, a lower barrel hood with a narrow warm crown, a straighter stepped trigger, and connected faceted grip panels seated on a wider magazine floorplate. Latest feedback increases the size and light/dark contrast of the graphite patches for clearer visibility. Dimensions and markers are unchanged. [Source and eight inspection views](../pistol_sand_block_v1/README.md); previous pistol/library are backed up under `.validation/pistol_sand_block_detail_20261019/` and `.validation/pistol_sand_block_dark_texture_20261019/`. Reopen an existing viewer to load the saved refinement.
 
 **2026-10-19 — Pistol Sand Block V1:** [new user-reference pistol](../pistol_sand_block_v1/README.md), sand frame and graphite slide, is registered Pending and selected by default. The same library now contains five active models; previous weapon entries and sources are preserved.
