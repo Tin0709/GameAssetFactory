@@ -119,9 +119,9 @@
       "kind": "Shotgun",
       "label": "Shotgun \u2014 Sand Block V1",
       "source": "blender/weapons/shotgun_sand_block_v1/Shotgun_Sand_Block_V1.blend",
-      "source_sha256": "124ca197cf2671f6ad4ff2c25f5c4de2ff79bb3c28fc96b0f890053d3851f373",
+      "source_sha256": "a20858db797a33cb04345de1d3a03706ab73016248038828ea465af94941ec49",
       "status": "Pending",
-      "status_note": "New user-reference tactical shotgun; awaiting explicit visual approval.",
+      "status_note": "New user-reference tactical shotgun, with final recessed muzzle side windows; awaiting explicit visual approval.",
       "collection": "WEAPON_shotgun_sand_block_v1",
       "root": "shotgun_sand_block_v1__Shotgun_Sand_Block_V1"
     }
