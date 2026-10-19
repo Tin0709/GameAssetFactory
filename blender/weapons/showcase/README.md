@@ -1,5 +1,7 @@
 # Permanent Weapon Showcase
 
+**2026-10-19 — Sand Block V1 detail review:** the same Pending entry now includes chamfered taller vents, recessed rail teeth, front/side sight apertures, warm optic/muzzle trim, stock/grip/magazine seams and finer pixel clusters after a second comparison with the user reference. Its dimensions and markers are unchanged; previous V1 is backed up under `.validation/rifle_sand_block_detail_20261019/`.
+
 **2026-10-19 — New reference rifle:** [Rifle — Sand Block V1](../rifle_sand_block_v1/README.md) is registered as Pending and selected on open. The active list now has four models. This distinct sand/graphite block rifle follows the user's supplied multi-view reference; previous sources and approval states are preserved. The three-model/default-shotgun descriptions below record the earlier library state.
 
 **Latest rifle selection — 2026-10-12:** Rifle Stylized V2 is the explicitly selected preferred model/reference. Its ready and10deg back previews now use uniform1.05 scale, preserving source proportions instead of legacy width compression. All other weapon geometry and mount behavior are preserved. The concurrent Pistol Stylized V2 registration/default selection remains intact. Actual Godot test uses the existing55deg Chest mount, not the10deg showcase alternative. [Candidate, rendered fit, validation and remaining overlap limits](../rifle_stylized_v2/godot_integration/README.md). Selection is not production-replacement approval.
