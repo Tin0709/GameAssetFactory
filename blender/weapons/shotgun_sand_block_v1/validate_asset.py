@@ -42,7 +42,17 @@ assert hit and point.y<.49,('Main muzzle is shallow/capped',list(point))
 for side in [-1,1]:
     hit,point=cast(frame,(side*.12,.615,.110),(-side,0,0))
     assert hit and abs(point.x)<.020,('Muzzle side window is raised/filled',list(point))
-hit,point=cast(frame,(0,.76,.044),(0,-1,0))
+hit,barrel_bottom=cast(frame,(0,.438,.08825),(0,0,1))
+assert hit
+hit,collar_top=cast(frame,(0,.438,.08825),(0,0,-1))
+collar_gap=barrel_bottom.z-collar_top.z
+assert hit and .001<collar_gap<.004,('Excess gap between barrel and tube collars',collar_gap)
+hit,barrel_bottom=cast(frame,(0,.580,.086),(0,0,1))
+assert hit
+hit,tube_top=cast(frame,(0,.580,.086),(0,0,-1))
+tube_gap=barrel_bottom.z-tube_top.z
+assert hit and .004<tube_gap<.008,('Excess gap between bare tubes',tube_gap)
+hit,point=cast(frame,(0,.76,.066),(0,-1,0))
 assert hit and .59<point.y<.616,('Missing recessed lower tube end',list(point))
 hit,rib=cast(pump,(.20,.225,.059),(-1,0,0))
 assert hit
@@ -82,6 +92,7 @@ result={'passed':True,'meshes':4,'materials':1,'triangles':tris,'dimensions_m':d
         'roundtrip_error_m':error,'texture_roundtrip_error':texture_error,
         'stock_and_guard_open':True,'deep_main_muzzle':True,'recessed_muzzle_side_windows':True,
         'recessed_lower_cap':True,
+        'barrel_to_collar_gap_m':collar_gap,'barrel_to_lower_tube_gap_m':tube_gap,
         'pump_groove_depth_m':rib.x-groove.x,'inset_receiver_port':True,'shells':4,'animations':0}
 (OUT/'validation.json').write_text(json.dumps(result,indent=2))
 print('SHOTGUN_ASSET_VALIDATED',json.dumps(result))
