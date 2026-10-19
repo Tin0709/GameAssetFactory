@@ -119,7 +119,7 @@
       "kind": "Shotgun",
       "label": "Shotgun \u2014 Sand Block V1",
       "source": "blender/weapons/shotgun_sand_block_v1/Shotgun_Sand_Block_V1.blend",
-      "source_sha256": "7c5124e4db4eedd3b6c5d6b8be83c0f56e1d5705381879421000bac48e49d72d",
+      "source_sha256": "10fcaccb5712e7155cabe3f8b7d9e75edd747268a74cfdd458a1c24846de8baa",
       "status": "Pending",
       "status_note": "Pending visual review; user-requested multi-view reference refinement: compact recessed pump, stepped stock cavity and neck, shorter grip/guard, finer rail and brass shell details.",
       "collection": "WEAPON_shotgun_sand_block_v1",
