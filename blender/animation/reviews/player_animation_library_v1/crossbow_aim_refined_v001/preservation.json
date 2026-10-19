@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "new_pending_action": "Crossbow_Aim_ActionsStuff_Refined_Test_v001",
+  "all_previous_native_actions_exact": 90,
+  "native_actions": 91,
+  "preferred_crossbow_source_preserved": true,
+  "arsenal_study_preserved_set_aside": true,
+  "old_protected_files_exact": 6974,
+  "godot_files_exact": 2007,
+  "all_previous_native_assets_exact": true,
+  "source_sha256": "bb5b4822b9ec4cc118b0fddc154bcb80e0c1a05105efe43d4246bd22878fab71",
+  "action_sha256": "4b4d072c8b6b909155207505eae19fc1dbd4bc15b227544c61791a6c7eae883f",
+  "estimated_new_lfs_version_storage_download_MiB": 95.97913265228271,
+  "largest_new_ordinary_file_bytes": 926989,
+  "lfs_note": "Existing *.blend LFS filter; no new tracking patterns, migration, manual commit or push. Quota unavailable locally."
+}

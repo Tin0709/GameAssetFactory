@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "new_pending_action": "Crossbow_Aim_ActionsStuff_Refined_Test_v001",
+  "native_actions": 91,
+  "all_previous_actions_exact": 90,
+  "literal_crossbow_source_exact": true,
+  "arsenal_study_preserved_and_set_aside": true,
+  "all_other_native_assets_exact": true
+}
