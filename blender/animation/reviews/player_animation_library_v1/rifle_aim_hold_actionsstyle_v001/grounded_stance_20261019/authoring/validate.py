@@ -1,7 +1,7 @@
 import bpy,json,sys,math
 from pathlib import Path
 from mathutils import Matrix,Vector
-R=next(p for p in Path(bpy.data.filepath).resolve().parents if (p/'AGENTS.md').is_file());S=Path('/Users/tin/Documents/ChatGPT/New project/experiments/rifle_aim_grounded_stance_20261019');sys.path.insert(0,str(S));sys.path.insert(0,str(R/'blender/animation/showcase'));import gaf_animation_library as ui
+R=next(p for p in Path(bpy.data.filepath).resolve().parents if (p/'AGENTS.md').is_file());S=Path(__file__).resolve().parent;sys.path.insert(0,str(S));sys.path.insert(0,str(R/'blender/animation/showcase'));import gaf_animation_library as ui
 
 r=bpy.data.objects[ui.RIG];m=bpy.data.objects['Showcase_Player_Mesh'];s=bpy.context.scene;N='Rifle_Aim_Hold_ActionsStyle_v001';BASE='Crossbow_Aim_ActionsStuff_Source_Test_v001';P=json.loads((S/'parameters.json').read_text());a=bpy.data.actions[N];src=bpy.data.actions[BASE]
 path=R/'blender/animation/reviews/player_animation_library_v1/rifle_ready_idle_actionsstyle_v004/authoring/validate_upper_body_geometry.py';ns={'__file__':str(path),'__name__':'geometry_helpers'};exec(compile(path.read_text().rsplit('\nmain()',1)[0],str(path),'exec'),ns);ids,tri,bad=ns['setup'](r,m)
