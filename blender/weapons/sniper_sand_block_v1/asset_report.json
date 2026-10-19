@@ -1,0 +1,96 @@
+{
+  "status": "Pending",
+  "meshes": 4,
+  "materials": 3,
+  "atlas_size": [
+    256,
+    256
+  ],
+  "forward": "+Y",
+  "reference": "reference.png",
+  "markers": {
+    "RightHandGrip": [
+      0,
+      0,
+      0
+    ],
+    "RecoilPivot": [
+      0,
+      0,
+      0
+    ],
+    "HolsterAttach": [
+      0,
+      0,
+      0
+    ],
+    "Grip_Point": [
+      0,
+      0,
+      0
+    ],
+    "LeftHandGuide": [
+      0,
+      0.4427,
+      0.0627
+    ],
+    "Support_Hand_Point": [
+      0,
+      0.4427,
+      0.0627
+    ],
+    "Muzzle": [
+      0,
+      0.9519,
+      0.1045
+    ],
+    "Muzzle_Point": [
+      0,
+      0.9519,
+      0.1045
+    ],
+    "AimReference": [
+      0,
+      0.3952,
+      0.1748
+    ],
+    "MagazineFeed": [
+      0,
+      0.1463,
+      0.0456
+    ],
+    "BoltHandle": [
+      0.057,
+      0.0627,
+      0.0665
+    ]
+  },
+  "topology": {
+    "Sniper_Sand_Frame": {
+      "triangles": 7180,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    },
+    "Sniper_Sand_Magazine": {
+      "triangles": 444,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    },
+    "Sniper_Sand_Bolt": {
+      "triangles": 220,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    },
+    "Sniper_Scope_Lenses": {
+      "triangles": 96,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    }
+  },
+  "dimensions_m": [
+    0.1119999997317791,
+    1.1932000070810318,
+    0.29822567105293274
+  ],
+  "triangles": 7940
+}
