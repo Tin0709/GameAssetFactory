@@ -2879,9 +2879,9 @@
       "preview_prop_source": "blender/weapons/rifle_stylized_v2/Rifle_Stylized_V2.blend",
       "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
       "action": "Rifle_Aim_Hold_ActionsStyle_v001",
-      "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/focused_aim_pose_20261019/rifle_aim_hold_actionsstyle_v001.blend",
-      "source_sha256": "be9c930d842a4925d738ab430fc993e22fe9e76f78309da309da85ce15fb8494",
-      "action_sha256": "0e459603fe447293469b0fff7abb5ebdba905eeec41e02fdb1ca9f7d88515cd5",
+      "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/shoulder_seated_pose_20261019/rifle_aim_hold_actionsstyle_v001.blend",
+      "source_sha256": "0b10235b74d7fa5cf48cba2f92b1df046b12f2044dad4de4a5ab90fc18341029",
+      "action_sha256": "bad5c3c066c053be6a6a072160222cf08ae09aaf2db750791a7aa08209a69b3b",
       "action_frame_range": [
         1.0,
         109.0
@@ -2891,7 +2891,7 @@
       "fps": 30,
       "fps_base": 1.0,
       "status": "pending",
-      "approval_note": "Same Pending rifle Aim: coordinated diagonal torso/head, crossing rigid hands and balanced face clearance. User photo refinement2026-10-19. Blender only.",
+      "approval_note": "Same Pending rifle Aim: compact shoulder-seated hold, connected angled head/torso and crossing hands; no forward arm-root drift. User photo refinement2026-10-19. Blender only.",
       "seamless_loop": true,
       "research_only": true,
       "production_eligible": false,
@@ -2915,34 +2915,35 @@
       "visual_base_action_sha256": "5d6949a66a5448c4acc6d54d02c839da1d3222bb034463e418cdc54658577930",
       "rig_adaptations": {
         "grip": [
-          -0.15682479285051776,
-          -0.7228145188835111,
-          1.27
+          -0.33047323635617004,
+          -0.4453544827449642,
+          1.28
         ],
-        "body_blade_deg": 36.63645100008683,
-        "body_lean_deg": 7.0,
-        "body_roll_deg": -1.4216232722426136,
-        "head_nod_deg": 8.0,
-        "head_roll_deg": 5.0,
-        "head_yaw_delta_deg": -4.0,
-        "weapon_yaw_deg": 7.375232451477122,
-        "drop_R": 0.24,
-        "drop_L": 0.038899042259163935,
-        "roll_R": -90.0,
-        "roll_L": -61.898234031691494,
+        "body_blade_deg": 6.914611782648605,
+        "body_lean_deg": 3.092183204904206,
+        "body_roll_deg": -2.1334985252938274,
+        "head_nod_deg": 10.965333624774374,
+        "head_roll_deg": -9.097395322583253,
+        "head_yaw_delta_deg": -19.46732411359283,
+        "weapon_yaw_deg": 24.111112515660032,
+        "drop_R": 0.01067203041176399,
+        "drop_L": 0.05,
+        "roll_R": 14.080766412442678,
+        "roll_L": -86.90034701111219,
         "support": [
-          -0.19007814661796762,
-          0.2022274118876667,
-          0.014752724735541536
+          -0.12100368683403524,
+          0.2614682016598083,
+          -0.024147746126577958
         ],
-        "left_palm_m": 0.5723737464368268,
-        "weapon_pitch_deg": 0.0,
-        "head_idle_delta_weight": 0.3
+        "left_palm_m": 0.6370496790202977,
+        "weapon_pitch_deg": 2.0,
+        "head_idle_delta_weight": 0.3,
+        "head_seat_lift_m": 0.028
       },
       "previous_pending_source": {
-        "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/source_pose_rifle_fit_20261019/rifle_aim_hold_actionsstyle_v001.blend",
-        "source_sha256": "e434f02e8be10557d058ca5eef0ddfc4d355c5d173d0138edb03b14d9aad03dd",
-        "action_sha256": "9a81be3fde8b3472b88bfac093cbb03db48dfafcc71e4bb82ee0a5fc907f15b7"
+        "source": "blender/animation/reviews/player_animation_library_v1/rifle_aim_hold_actionsstyle_v001/focused_aim_pose_20261019/rifle_aim_hold_actionsstyle_v001.blend",
+        "source_sha256": "be9c930d842a4925d738ab430fc993e22fe9e76f78309da309da85ce15fb8494",
+        "action_sha256": "0e459603fe447293469b0fff7abb5ebdba905eeec41e02fdb1ca9f7d88515cd5"
       },
       "contains_source_derived_base_pose": true,
       "review_scope": "Source-clock rifle aiming HOLD only; previous Ready\u2192Aim\u2192Hold\u2192Ready source/timeline preserved in previous_pending_source.",

@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "failures": [],
+  "sampled_poses": 217,
+  "metrics": {
+    "source_core_matrix_error": 1.1920928955078125e-07,
+    "requested_pose_error": 7.152557373046875e-07,
+    "right_grip_error": 5.280984981855556e-07,
+    "left_palm_error": 5.018506681635651e-07,
+    "forearm_local_error": 7.048948447163639e-08,
+    "straight_arm_error": 3.5113207818650746e-07,
+    "unit_scale_error": 2.384185791015625e-07,
+    "shoulder_surface_gap": 0.0,
+    "support_surface_gap": 0.010866872034966946,
+    "loop_error": 0.0
+  },
+  "limits": {
+    "source_core_matrix_error": 1e-05,
+    "requested_pose_error": 1e-05,
+    "right_grip_error": 3e-05,
+    "left_palm_error": 3e-05,
+    "forearm_local_error": 1e-05,
+    "straight_arm_error": 1e-05,
+    "unit_scale_error": 1e-05,
+    "shoulder_surface_gap": 0.01,
+    "support_surface_gap": 0.015,
+    "loop_error": 1e-05
+  },
+  "loop_translation_velocity_difference_m_s": 0.005708269562443905,
+  "loop_velocity_limits": {
+    "translation_m_s": 0.01,
+    "angular_rad_s": 0.05
+  },
+  "loop_angular_velocity_difference_rad_s": 0.005528839256638668,
+  "minimum_head_rifle_surface_gap_m": 0.061468180269002914,
+  "crossing_hand_contact_sat_range_m": [
+    0.0008004158735275269,
+    0.0008010249584913254
+  ],
+  "head_chest_max_seating_m": 0.014787405729293823,
+  "head_chest_min_seating_m": 0.010109612718224525,
+  "shoulder_max_seating_m": 0.05053673731163144,
+  "collisions_count": 0,
+  "collisions": [],
+  "adjacent": [],
+  "existing_actions_preserved": 21,
+  "source_study_exact": true,
+  "notes": [
+    "Native source leg/foot motion including4.83mm sole corner seating is unchanged.",
+    "240Hz linear source bake has finite one-sided chord velocities: rifle5.25mm/s in immutable crossbow,7.20mm/s after longer forward attachment.10mm/s limit bounds a0.333mm one-frame displacement at30FPS; no source timing was retimed to hide this.",
+    "Static diagonal body/head and fitted rifle/arm matrices are authored to user photo; immutable source clocks and lower body stay exact.",
+    "The two rigid hand blocks intentionally touch with at most1.5mm seating; this explicit user-requested contact is the only additional allowed pair.",
+    "There are no elbows, length changes, mesh edits or scale."
+  ]
+}
