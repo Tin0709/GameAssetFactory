@@ -4,6 +4,7 @@ extends "res://scenes/dev/actions_stuff_research/jump_locomotion_visual.gd"
 const RifleSampler=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_sampler.gd")
 const RIFLE_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/approved_library.res")
 const AIM_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/aim_approved_library.res")
+const RECOIL_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/recoil_approved_library.res")
 const RIFLE_ASSET=preload("res://assets/weapons/rifle_stylized_v2_test/Rifle_Stylized_V2.glb")
 var rifle_ready_active:=false
 var rifle_clips: Dictionary={}
@@ -39,6 +40,14 @@ var rifle_contact_shoulder_weight:=0.0
 var _aim_bones: Array[int]=[]
 var _aim_head_bones: Array[int]=[]
 const AIM_BLEND_SECONDS:=.24
+var rifle_recoil_clip: RefCounted
+var rifle_recoil_profile: Dictionary={}
+var rifle_recoil_time:=10.
+var _recoil_reference_inverse: Array[Transform3D]=[]
+var _recoil_saved: Array[Transform3D]=[]
+var _recoil_support_base:=Vector3.ZERO
+var _recoil_saved_support:=Vector3.ZERO
+var _recoil_applied:=false
 
 func _rows(rows: Array) -> Transform3D:
  return Transform3D(Basis(Vector3(rows[0][0],rows[1][0],rows[2][0]),Vector3(rows[0][1],rows[1][1],rows[2][1]),Vector3(rows[0][2],rows[1][2],rows[2][2])),Vector3(rows[0][3],rows[1][3],rows[2][3]))
@@ -55,6 +64,11 @@ func _ready() -> void:
  arm_left=skeleton.find_bone("Arm.L");arm_right=skeleton.find_bone("Arm.R");forearm_left=skeleton.find_bone("ForeArm.L");forearm_right=skeleton.find_bone("ForeArm.R");carrier_bone=skeleton.find_bone("WeaponCarrier")
  for bone_name in ["Spine","Chest","Neck","Head","Arm.L","Arm.R","ForeArm.L","ForeArm.R","WeaponCarrier"]:_aim_bones.append(skeleton.find_bone(bone_name))
  for bone_name in ["Neck","Head"]:_aim_head_bones.append(skeleton.find_bone(bone_name))
+ rifle_recoil_profile=JSON.parse_string(FileAccess.get_file_as_string("res://scenes/dev/actions_stuff_research/rifle_ready_v001/recoil_profile.json"))
+ rifle_recoil_clip=RifleSampler.new(RECOIL_LIBRARY.get_animation("Recoil"),skeleton)
+ for bone in skeleton.get_bone_count():_recoil_reference_inverse.append(rifle_recoil_clip.pose(bone,0.).affine_inverse())
+ _recoil_support_base=rifle_recoil_clip.support(0.)
+ for bone in _aim_bones:_recoil_saved.append(skeleton.get_bone_pose(bone))
  active_walk_action=rifle_profile.clips.Walk.action;active_run_action=rifle_profile.clips.Run.action
  _cache_direction_poses();position.y=0.
  for i in skeleton.get_bone_count():
@@ -131,6 +145,10 @@ func _cache_direction_poses() -> void:
  direction_poses=rifle_ground_poses.duplicate();direction_future_poses=rifle_ground_future.duplicate()
 
 func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictionary,delta: float) -> void:
+ # Remove the previous displayed impulse before the existing pose writer reads
+ # its state. Recoil never feeds the inertializer, gait, feet or the next shot.
+ _restore_rifle_recoil()
+ rifle_recoil_time=minf(rifle_recoil_time+delta,rifle_recoil_clip.clip.length)
  rifle_aim_weight=move_toward(rifle_aim_weight,1. if rifle_aim_requested else 0.,delta/AIM_BLEND_SECONDS)
  if rifle_aim_requested or rifle_aim_weight>0.:rifle_aim_time=fposmod(rifle_aim_time+delta,float(rifle_aim_profile.clips.Aim.duration))
  var moving:=requested or Vector2(world_velocity.x,world_velocity.z).length()>.025
@@ -161,7 +179,31 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  if jump_grounded:_update_direction_support(delta)
  support_left=_support(0);support_right=_support(1)
  _evaluate(delta)
+ _apply_rifle_recoil()
  if presentation!=null:presentation.capture()
+
+func play_rifle_recoil() -> void:
+ rifle_recoil_time=0.
+func _restore_rifle_recoil() -> void:
+ if not _recoil_applied:return
+ for i in _aim_bones.size():skeleton.set_bone_pose(_aim_bones[i],_recoil_saved[i])
+ rifle_support_anchor=_recoil_saved_support
+ _recoil_applied=false
+ _constrain_rifle_contacts()
+func cancel_rifle_recoil() -> void:
+ _restore_rifle_recoil();rifle_recoil_time=rifle_recoil_clip.clip.length
+func _apply_rifle_recoil() -> void:
+ if rifle_recoil_time>=rifle_recoil_clip.clip.length:return
+ # Evaluated source-local delta, including translation; not a generic kick.
+ # Pre-multiplication also preserves the accepted rectangular-arm roll frame.
+ _recoil_saved_support=rifle_support_anchor
+ for i in _aim_bones.size():
+  var bone: int=_aim_bones[i];var pose:=skeleton.get_bone_pose(bone);_recoil_saved[i]=pose
+  var impulse: Transform3D=rifle_recoil_clip.pose(bone,rifle_recoil_time)*_recoil_reference_inverse[bone]
+  skeleton.set_bone_pose(bone,impulse*pose)
+ rifle_support_anchor+=rifle_recoil_clip.support(rifle_recoil_time)-_recoil_support_base
+ _recoil_applied=true
+ _constrain_rifle_contacts()
 
 func _idle_foot_lateral_speed(bone: int) -> float:
  # Measure the authentic Idle foot motion, independent of the upper-body
@@ -221,4 +263,5 @@ func _evaluate(delta: float) -> void:
  var before:=pose_sequence;super._evaluate(delta)
  if pose_sequence!=before and not rifle_clips.is_empty():_constrain_rifle_contacts()
 func reset_contacts() -> void:
+ if rifle_recoil_clip!=null:cancel_rifle_recoil()
  super.reset_contacts();rifle_idle_time=0.;rifle_move_weight=0.;idle_active=true

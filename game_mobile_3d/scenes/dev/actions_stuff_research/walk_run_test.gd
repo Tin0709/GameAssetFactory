@@ -6,10 +6,12 @@ const SOURCE_ACTOR=preload("res://scenes/dev/actions_stuff_research/source_jump_
 const RenderPresenter=preload("res://scenes/dev/actions_stuff_research/render_pose_presenter.gd")
 const RIFLE_VISUAL=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd")
 const RiflePresenter=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_presenter.gd")
+const RifleFire=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/continuous_fire.gd")
 @export var rifle_ready:=true
 @export_range(.1,3.,.05) var movement_speed_multiplier:=1.5
 @export_range(.1,3.,.05) var locomotion_animation_multiplier:=1.0
 var presentation: Node
+var rifle_fire: Node3D
 var player: CharacterBody3D
 var camera: Camera3D
 var hud: Label
@@ -46,6 +48,8 @@ func _ready() -> void:
 	hud=Label.new();hud.add_theme_font_size_override("font_size",18);panel.add_child(hud)
 	presentation=RiflePresenter.new() if rifle_ready else RenderPresenter.new();presentation.name="RenderPosePresentation";add_child(presentation)
 	presentation.setup(player,player.visual);player.visual.presentation=presentation
+	if rifle_ready:
+		rifle_fire=RifleFire.new();rifle_fire.name="InfiniteRifleFire";add_child(rifle_fire);rifle_fire.setup(player)
 	_update_camera()
 func _build_environment() -> void:
 	var environment:=WorldEnvironment.new();var settings:=Environment.new();settings.background_mode=Environment.BG_COLOR;settings.background_color=Color(.17,.22,.26)
@@ -67,6 +71,7 @@ func _build_environment() -> void:
 func _process(delta: float) -> void:
 	if player==null:return
 	presentation.prepare(Engine.get_physics_interpolation_fraction())
+	if rifle_fire!=null:rifle_fire.present(presentation)
 	_update_camera(delta,presentation.display_actor)
 	var visual=player.visual
 	# Camera orbit is observational; locomotion owns the character's heading.
@@ -76,8 +81,9 @@ func _process(delta: float) -> void:
 	if visual.jump_active:
 		state="LANDING" if visual.jump_grounded else ("TAKEOFF / RISE" if player.velocity.y>0 else "AIRBORNE / FALL")
 	if rifle_ready and visual.rifle_aim_weight>.001:state+=" · AIM" if visual.rifle_aim_weight>.999 else " · READY ↔ AIM"
+	if rifle_fire!=null and rifle_fire.trigger_held:state+=" · FIRING"
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
-	hud.text=("RIFLE READY / AIM · APPROVED BLENDER SET" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold Right Mouse Aim · Right-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
+	hud.text=("RIFLE READY / AIM / FIRE · INFINITE AMMO ∞" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold Left Mouse Fire · Hold Right Mouse Aim\nRight-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
@@ -109,6 +115,7 @@ func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventMouseButton:
+		if event.button_index==MOUSE_BUTTON_LEFT and rifle_fire!=null:rifle_fire.set_trigger(event.pressed)
 		if event.button_index==MOUSE_BUTTON_RIGHT:
 			orbiting=event.pressed
 			if rifle_ready:player.visual.set_rifle_aim(event.pressed)
@@ -120,7 +127,9 @@ func _notification(what: int) -> void:
 	if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
 		orbiting=false
 		if is_instance_valid(player) and rifle_ready:player.visual.set_rifle_aim(false)
+		if rifle_fire!=null:rifle_fire.set_trigger(false)
 func reset_player() -> void:
+	if rifle_fire!=null:rifle_fire.reset_fire()
 	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.reset_jump_motion();player.visual.reset_contacts()
 	if presentation!=null: presentation.reset_history()
 	_camera_initialized=false;_update_camera()
