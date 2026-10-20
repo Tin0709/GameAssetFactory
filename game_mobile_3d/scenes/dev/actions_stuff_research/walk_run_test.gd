@@ -56,7 +56,7 @@ func _ready() -> void:
 	if rifle_ready:
 		rifle_fire=RifleFire.new();rifle_fire.name="InfiniteRifleFire";add_child(rifle_fire);rifle_fire.setup(player)
 		if zombie_combat_enabled:
-			zombie_combat=ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player)
+			zombie_combat=ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player,rifle_fire.audio)
 	_update_camera()
 func _build_environment() -> void:
 	var environment:=WorldEnvironment.new();var settings:=Environment.new();settings.background_mode=Environment.BG_COLOR;settings.background_color=Color(.17,.22,.26)

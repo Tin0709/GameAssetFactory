@@ -7,11 +7,13 @@ const SPAWNS := [Vector3(-1.6,0,-3.0),Vector3(1.5,0,-3.8),Vector3(3.1,0,1.6),Vec
 const MAX_RAGDOLLS := 4
 var zombies: Array[CharacterBody3D] = []
 var player: CharacterBody3D
+var audio: Node
 var kills := 0
 var last_corpse_lifetime := 0.0
 
-func setup(target: CharacterBody3D) -> void:
+func setup(target: CharacterBody3D,existing_audio: Node) -> void:
 	player = target
+	audio = existing_audio
 	reset_encounter()
 
 func reset_encounter() -> void:
@@ -26,6 +28,7 @@ func reset_encounter() -> void:
 		zombie.name = "ResearchZombie_%d" % (i+1)
 		zombie.position = SPAWNS[i]
 		zombie.target = player
+		zombie.combat_audio = audio
 		zombie.stop_distance = 1.45
 		zombie.detection_range = 12.0
 		zombie.persistent_chase = true

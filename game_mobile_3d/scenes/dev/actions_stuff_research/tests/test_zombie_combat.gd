@@ -18,9 +18,11 @@ func run() -> void:
 	scene.player.scripted_input = true
 	await ticks(15)
 	check(combat.zombies.size() == 4,"Small fixed group of four zombies")
-	for z in combat.zombies:
+	for i in combat.zombies.size():
+		var z = combat.zombies[i]
+		check(absf(z.position.y)<.02,"Living capsules remain grounded without dormant-body self collision")
 		z.target = null;z.move_speed = 0.0
-		z.position = Vector3(20,0,20)
+		z.position = Vector3(20+i*3,0,20);z.velocity=Vector3.ZERO
 	var z = combat.zombies[0]
 	var aim := InputEventKey.new();aim.keycode=KEY_E;aim.physical_keycode=KEY_E;aim.pressed=true
 	scene._unhandled_input(aim)
@@ -30,18 +32,21 @@ func run() -> void:
 	var direction := carrier.basis.y.normalized()
 	z.position = v.socket.muzzle_position()+direction*2.5
 	z.position.y = 0.0
+	z.velocity=Vector3.ZERO
 	await ticks(4)
 	var shots_before: int = scene.rifle_fire.shots_fired
 	for i in hz*3:
 		await ticks(1)
 		if z.is_dead: break
 	check(z.is_dead and z.current_hp == 0,"Real held-E rifle projectiles deal lethal damage")
+	if not z.is_dead:scene.free();quit(1);return
 	check(scene.rifle_fire.shots_fired-shots_before>=4,"Existing12damage/60HP requires multiple actual bullets")
 	aim.pressed=false;scene._input(aim)
 	check(z.ragdoll.running and z.ragdoll.bodies.size()==7,"Lethal shot starts existing seven-part Lab physics")
 	check(z.ragdoll.handoff_error<.0002,"Animated world pose retained at death handoff")
 	var impulse: Vector3 = z.ragdoll.total_applied_impulse
-	check(impulse.dot(direction)>300.0 and impulse.y>150.0,"Existing Rifle preset impulse follows actual projectile direction")
+	var expected_impulse:=direction*360.0+Vector3.UP*180.0
+	check(impulse.distance_to(expected_impulse)<6.0,"Existing Rifle preset impulse follows actual projectile direction")
 	check(not z.take_damage(999,Vector3.RIGHT),"Dead zombie rejects repeated damage/impulses")
 	check(z.death_triggers==1,"One lethal handoff only")
 	var bodies: Array = z.ragdoll.bodies.values()

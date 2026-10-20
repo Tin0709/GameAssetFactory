@@ -9,6 +9,7 @@ var corpse_age := 0.0
 var corpse_lifetime := 1.2
 var death_triggers := 0
 var pending_direction := Vector3.ZERO
+var combat_audio: Node
 
 func _ready() -> void:
 	super._ready()
@@ -24,6 +25,12 @@ func _ready() -> void:
 		body.collision_layer = 0
 		body.collision_mask = 0
 	ragdoll.sample(1.0 / Engine.physics_ticks_per_second)
+
+func take_damage(amount: int,direction: Vector3=Vector3.ZERO) -> bool:
+	var accepted := super.take_damage(amount,direction)
+	if accepted and is_instance_valid(combat_audio):
+		combat_audio.play_event(&"zombie_death" if is_dead else &"zombie_hit")
+	return accepted
 
 func _physics_process(delta: float) -> void:
 	if not is_dead:
