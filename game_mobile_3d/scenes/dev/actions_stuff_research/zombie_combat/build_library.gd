@@ -16,7 +16,7 @@ func build() -> void:
 			for type in [Animation.TYPE_POSITION_3D,Animation.TYPE_ROTATION_3D,Animation.TYPE_SCALE_3D]:
 				var track:=clip.add_track(type);clip.track_set_path(track,NodePath(":"+str(profile.bones[bone])));tracks.append(track)
 			for i in int(info.samples):
-				var row:=i*int(info.row_floats);var t:=float(info.duration) if i==int(info.samples)-1 else float(data[row]);var p:=row+1+bone*10
+				var row:=i*int(info.row_floats);var t:=float(info.duration) if i==int(info.samples)-1 else float(data[row]);var p: int=row+1+bone*10
 				clip.position_track_insert_key(tracks[0],t,Vector3(data[p],data[p+1],data[p+2]))
 				clip.rotation_track_insert_key(tracks[1],t,Quaternion(data[p+3],data[p+4],data[p+5],data[p+6]).normalized())
 				clip.scale_track_insert_key(tracks[2],t,Vector3(data[p+7],data[p+8],data[p+9]))

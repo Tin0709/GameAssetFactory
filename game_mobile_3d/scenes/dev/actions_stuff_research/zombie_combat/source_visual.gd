@@ -1,6 +1,6 @@
 extends "res://scripts/cuboid_animation.gd"
 ## Full evaluated Mobs research poses, no generic arm/leg procedural substitute.
-const source_library = preload("res://scenes/dev/actions_stuff_research/zombie_combat/source_library.res")
+var source_library: AnimationLibrary = preload("res://scenes/dev/actions_stuff_research/zombie_combat/source_library.res")
 const PROFILE = preload("res://scenes/dev/actions_stuff_research/zombie_combat/profile.json")
 const Sampler = preload("res://scenes/dev/actions_stuff_research/source_clip_sampler.gd")
 var skeleton: Skeleton3D

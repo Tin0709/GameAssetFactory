@@ -1,0 +1,50 @@
+{
+	"bones": [
+		"Root",
+		"Hips",
+		"Spine",
+		"Chest",
+		"Neck",
+		"Head",
+		"Arm.L",
+		"Arm.R",
+		"Leg.L",
+		"Leg.R"
+	],
+	"clips": {
+		"Attack": {
+			"action": "Zombie_Attack_Player_A&S_Reference_v001",
+			"action_sha256": "d7639853f6a7cd6e935b426d9d18b34d9fa3612695c267173b29e0aee2c244e7",
+			"duration": 0.75,
+			"loop": false,
+			"preview_floor_y": -0.0278187831044197,
+			"registered_status": "Reference Only",
+			"row_floats": 101.0,
+			"samples": 721.0
+		},
+		"Idle": {
+			"action": "Zombie_Idle_ActionsStuff_Source_Test_v001",
+			"action_sha256": "7524877b1d74863931d9ce4348a5a82c6115318d49d9d1464f06b89fb1f4cdab",
+			"duration": 3.6,
+			"loop": true,
+			"preview_floor_y": -0.0272883464694023,
+			"registered_status": "Pending",
+			"row_floats": 101.0,
+			"samples": 865.0
+		},
+		"Walk": {
+			"action": "Zombie_Walk_ActionsStuff_Source_Test_v001",
+			"action_sha256": "d1aa05c16fb06188c88dd30634c9bfdaa4afeea4d84c47576bb9531c20521301",
+			"duration": 18.0,
+			"loop": true,
+			"preview_floor_y": -0.0639943097829819,
+			"registered_status": "Pending",
+			"row_floats": 101.0,
+			"samples": 4321.0
+		}
+	},
+	"production_eligible": false,
+	"research_only": true,
+	"source": "blender/animation/showcase/Mobs_Animation_Library.blend",
+	"source_sha256": "ad7fdfd7f07debbcb08994fb44ec38822858c6ac97acaf4cdc0e678f8628cafd"
+}
