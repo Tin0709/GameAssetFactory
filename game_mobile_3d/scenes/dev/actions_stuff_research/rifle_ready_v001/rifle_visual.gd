@@ -311,7 +311,19 @@ func _idle_foot_lateral_speed(bone: int) -> float:
 
 func _update_direction_support(delta: float) -> void:
  if _rifle_driving:return
- if move_requested:super._update_direction_support(delta);return
+ if move_requested:
+  super._update_direction_support(delta)
+  for side in 2:
+   if not _source_support[side] or not foot_support[side]:continue
+   var bone:int=[leg_left,leg_right][side]
+   var raw_yaw:=_foot_yaw(_source_global_pose(bone).basis.orthonormalized().get_rotation_quaternion())
+   # The inherited 35deg anchor tolerance holds a foot sideways, then snaps
+   # it back during a diagonal start/reversal. Release before that wind-up;
+   # the same gait/contact rearm logic still owns its next landing.
+   if absf(wrapf(raw_yaw-_foot_yaw(foot_rotations[side]),-PI,PI))>deg_to_rad(12.):
+    _source_support[side]=false;_support_rearmed[side]=false
+    _release_phase[side]=direction_snapshot.phase;released[side]=true
+  return
  if stationary_turn!=null and stationary_turn.quick_turning:
   # Combat input outranks the long observational step sequence. Release old
   # anchors for the brief pivot, then replant through the existing floor solve.
