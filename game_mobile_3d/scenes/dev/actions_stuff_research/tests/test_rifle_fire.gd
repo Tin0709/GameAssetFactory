@@ -51,6 +51,7 @@ func run() -> void:
   a.velocity=direction*(a.run_speed if running else a.walk_speed) if moving else Vector3.ZERO;a.position+=a.velocity*dt
   var jt:=t-4.5;var air:=jt>0. and jt<.74;a.position.y=maxf(0.,6.66*jt-9.*jt*jt) if air else 0.
   v.drive_jump_motion(a.velocity,moving,{"grounded":not air,"body_position":a.position,"vertical_speed":6.66-18.*jt if air else 0.,"takeoff":absf(jt)<dt*.5,"sprinting":running},dt);gun.tick(dt)
+  control.player.position=a.position;control.player.velocity=a.velocity
   var cv=control.player.visual;cv.set_rifle_aim(t>.3 and t<6.5)
   cv.drive_jump_motion(a.velocity,moving,{"grounded":not air,"body_position":a.position,"vertical_speed":6.66-18.*jt if air else 0.,"takeoff":absf(jt)<dt*.5,"sprinting":running},dt)
   for bone_name in ["Root","Hips","Leg.L","Leg.R"]:

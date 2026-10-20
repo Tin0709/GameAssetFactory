@@ -112,6 +112,9 @@ func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	_camera_vertical_velocity=(_camera_vertical_velocity-CAMERA_VERTICAL_RESPONSE*spring*delta)*decay
 	camera.global_position=camera_anchor+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*8.
 	camera.look_at(camera_anchor,Vector3.UP);camera.size=camera_size
+func _input(event: InputEvent) -> void:
+	# A GUI may consume the release after a press began over the world.
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and not event.pressed and rifle_fire!=null:rifle_fire.set_trigger(false)
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventMouseButton:
