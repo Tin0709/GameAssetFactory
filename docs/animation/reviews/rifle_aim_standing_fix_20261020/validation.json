@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "research_only": true,
+  "tests": {
+    "red": {
+      "failures": [
+        "Stationary Aim must not add incompatible fore/aft foot rocking: 2.8071775502755",
+        "Stationary Aim has no abrupt contact-driven leg root jumps: 0.04347399994731"
+      ],
+      "fps": 30,
+      "max_fore_aft_leg_tilt_deg": 2.8071775502755,
+      "max_leg_root_step_m": 0.0434739999473095,
+      "minimum_floor": -5.96046447753906e-08,
+      "supported_sole_step_m": 7.0387287109952e-08
+    },
+    "standing30": {
+      "failures": [],
+      "fps": 30,
+      "max_fore_aft_leg_tilt_deg": 5.34292587858814e-06,
+      "max_leg_root_step_m": 0.014465051703155,
+      "minimum_floor": -5.96046447753906e-08,
+      "supported_sole_step_m": 1.1926748300084e-07
+    },
+    "standing60": {
+      "failures": [],
+      "fps": 60,
+      "max_fore_aft_leg_tilt_deg": 5.34292587858814e-06,
+      "max_leg_root_step_m": 0.01168801356107,
+      "minimum_floor": -5.96046447753906e-08,
+      "supported_sole_step_m": 6.66660469050839e-08
+    },
+    "aim30": {
+      "arm_volume_error_m": 1.63912773132324e-07,
+      "camera_y_span": 0.0,
+      "failures": [],
+      "fps": 30,
+      "grip_error": 4.13229281548411e-06,
+      "max_arm_step_deg": 12.4268769117725,
+      "max_weapon_step_m": 0.0731532648205757,
+      "ready_aim_max_arm_rotation_deg": 78.9240174822237,
+      "support_error_m": 3.93209984395071e-06
+    },
+    "aim60": {
+      "arm_volume_error_m": 1.63912773132324e-07,
+      "camera_y_span": 0.0,
+      "failures": [],
+      "fps": 60,
+      "grip_error": 4.46802596343332e-06,
+      "max_arm_step_deg": 6.238944943568,
+      "max_weapon_step_m": 0.0370458476245403,
+      "ready_aim_max_arm_rotation_deg": 78.9240174822237,
+      "support_error_m": 3.84484610549407e-06
+    },
+    "idle30": {
+      "failures": [],
+      "fps": 30,
+      "free_weight_shift_samples": 30,
+      "max_idle_joint_drag_m": 0.0107817454263568,
+      "minimum_floor": -5.96046447753906e-08,
+      "minimum_upper_leg_gap_m": 0.00129861384630203,
+      "supported_sole_step_m": 1.1926748300084e-07
+    },
+    "idle60": {
+      "failures": [],
+      "fps": 60,
+      "free_weight_shift_samples": 54,
+      "max_idle_joint_drag_m": 0.0160899199545383,
+      "minimum_floor": -5.96046447753906e-08,
+      "minimum_upper_leg_gap_m": 0.00092034786939621,
+      "supported_sole_step_m": 6.66660469050839e-08
+    }
+  },
+  "preservation": {
+    "passed": true,
+    "protected_files": 118,
+    "only_changed_protected_files": [
+      "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/README.md",
+      "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
+    ],
+    "four_approved_blender_sources_unchanged": true,
+    "showcase_libraries_profiles_actor_camera_scene_project_presenter_unchanged": true
+  },
+  "native_metal_capture_complete": true
+}
