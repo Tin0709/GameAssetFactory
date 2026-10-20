@@ -92,6 +92,7 @@ func run() -> void:
  var target:=AimTarget.new();scene.add_child(target);target.position=Vector3(0,0,-1.6)
  v.auto_aim_target=target;v.set_rifle_aim(true);scene.rifle_fire.set_trigger(true)
  for i in fps*2:tick(v,dt);scene.rifle_fire.tick(dt)
+ if diagnostic:print("CLOSE ",v.auto_aim_aligned," shots ",scene.rifle_fire.shots_fired," angle ",rad_to_deg(v._auto_aim_rotation.get_angle())," gaze ",rad_to_deg(v.stationary_turn.gaze))
  check(v.auto_aim_aligned and scene.rifle_fire.shots_fired>=5,"Close57deg target remains fireable inside the source head/body dead zone")
  scene.rifle_fire.set_trigger(false);v.auto_aim_target=null
  check(max_grip<.00005 and max_palm<.00005,"Rifle grip and left support remain stable throughout")
