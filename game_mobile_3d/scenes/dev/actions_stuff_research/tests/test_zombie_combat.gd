@@ -18,6 +18,7 @@ func run() -> void:
 	scene.player.scripted_input = true
 	await ticks(15)
 	check(combat.zombies.size() == 4,"Small fixed group of four zombies")
+	check(combat.zombies[0].visual.get("source_library")!=null,"Requested Mobs A&S Idle/Walk/Attack library is active")
 	for i in combat.zombies.size():
 		var z = combat.zombies[i]
 		check(absf(z.position.y)<.02,"Living capsules remain grounded without dormant-body self collision")
