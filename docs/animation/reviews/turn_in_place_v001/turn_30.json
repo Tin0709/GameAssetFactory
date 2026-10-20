@@ -1,0 +1,49 @@
+{
+	"cases": [
+		{
+			"angle": 25.0,
+			"body_angle_deg": 0.0,
+			"foot_lifts_m": [
+				0.0,
+				0.0113564729690552
+			],
+			"stepped": false
+		},
+		{
+			"angle": 90.0,
+			"body_angle_deg": 63.0253656606176,
+			"foot_lifts_m": [
+				0.0393360257148743,
+				0.0298146605491638
+			],
+			"stepped": true
+		},
+		{
+			"angle": -90.0,
+			"body_angle_deg": -63.0253520002392,
+			"foot_lifts_m": [
+				0.0328552722930908,
+				0.0440691709518433
+			],
+			"stepped": true
+		},
+		{
+			"angle": 180.0,
+			"body_angle_deg": -153.025357919812,
+			"foot_lifts_m": [
+				0.0520980954170227,
+				0.0658620595932007
+			],
+			"stepped": true
+		}
+	],
+	"contact_step_m": 0.0000000614390600617298,
+	"failures": [],
+	"fps": 30,
+	"left_palm_error_m": 0.000000381946733796212,
+	"maximum_sole_frame_motion_m": 0.154332235455513,
+	"minimum_sole_y_m": -0.0000000596046447753906,
+	"passed": true,
+	"planted_foot_yaw_step_rad": 0.000000741566066775334,
+	"right_grip_error_m": 0.000000152691470134414
+}

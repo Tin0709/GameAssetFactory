@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "protected_files": 7300,
+  "changed_existing_files": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/molang_vm.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd",
+    "blender/animation/reviews/player_animation_library_v1/actions_stuff_directional_v001/README.md"
+  ],
+  "missing": [],
+  "unchanged_files": 7296,
+  "approved_blender_sources_unchanged": true,
+  "animation_libraries_unchanged": true,
+  "worldmap_and_production_unchanged": true
+}
