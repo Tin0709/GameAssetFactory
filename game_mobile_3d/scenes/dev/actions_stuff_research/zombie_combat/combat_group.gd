@@ -19,13 +19,14 @@ var _space: RID
 func setup(target: CharacterBody3D,existing_audio: Node) -> void:
 	player = target
 	audio = existing_audio
-	# Reuse the Lab's32 solver iterations locally, retaining gameplay's60Hz clock.
+	# Same native Lab solver,48 iterations for contact at gameplay's60Hz clock
+	# (the Lab uses32 at120Hz). No player timing/project settings change.
 	# Reference count also supports regression fixtures sharing one World3D.
 	_space=get_world_3d().space
 	if not _spaces.has(_space):
 		_spaces[_space]={"users":0,"original":PhysicsServer3D.space_get_param(_space,PhysicsServer3D.SPACE_PARAM_SOLVER_ITERATIONS)}
 	_spaces[_space].users += 1
-	PhysicsServer3D.space_set_param(_space,PhysicsServer3D.SPACE_PARAM_SOLVER_ITERATIONS,32)
+	PhysicsServer3D.space_set_param(_space,PhysicsServer3D.SPACE_PARAM_SOLVER_ITERATIONS,48)
 	reset_encounter()
 
 func can_fight() -> bool:return active

@@ -66,7 +66,7 @@ func run() -> void:
 	check(saw_contact,"Native corpse reaches ground with core-body collision before cleanup")
 	for body in bodies: check(not is_instance_valid(body),"Cleanup frees every native physical body")
 	check(combat.last_corpse_lifetime>=1.1 and combat.last_corpse_lifetime<=1.3,"Corpse removal within1.1–1.3seconds")
-	check(min_y>-.10 and peak_anchor<.10,"Bounded ground penetration and joint separation at gameplay physics rate")
+	check(min_y>-.075 and peak_anchor<.05,"Bounded ground penetration and joint separation at gameplay physics rate")
 	# Simultaneous deaths, then reset mid-flight: no orphaned graphs or stale shots.
 	for other in combat.zombies:other.take_damage(999,Vector3.FORWARD)
 	await ticks(3)
@@ -78,7 +78,14 @@ func run() -> void:
 	check(combat.zombies.size()==4 and combat.active_ragdolls()==0,"R restores four living zombies without accumulating corpses")
 	check(scene.rifle_fire.active_projectiles()==0 and not scene.rifle_fire.trigger_held,"Reset clears pending shots")
 	check(absf(scene.player.walk_speed-2.70)<.001 and absf(scene.player.run_speed-7.55)<.01,"Approved movement speeds retained")
-	report={"passed":failures.is_empty(),"failures":failures,"physics_hz":hz,"impulse":str(impulse),"minimum_corner_y":min_y,"maximum_anchor_error_m":peak_anchor,"corpse_lifetime":combat.last_corpse_lifetime,"native_ground_contact":saw_contact,"maximum_ragdolls":4}
+	await ticks(hz*3)
+	var attack_count := 0
+	for other in combat.zombies:
+		check(other.visual.walk_clock>0.0,"Chasing uses requested source Walk")
+		attack_count += other.visual.attack_count
+	check(attack_count>=4,"Existing AI triggers requested source Attack at stand-off range")
+	check(not scene.player.is_dead,"Research attacks do not replace approved player health/death gameplay")
+	report={"passed":failures.is_empty(),"failures":failures,"physics_hz":hz,"impulse":str(impulse),"minimum_corner_y":min_y,"maximum_anchor_error_m":peak_anchor,"corpse_lifetime":combat.last_corpse_lifetime,"native_ground_contact":saw_contact,"maximum_ragdolls":4,"source_attack_triggers":attack_count}
 	print("ZOMBIE_COMBAT ",JSON.stringify(report))
 	var destination:=OS.get_environment("ZOMBIE_COMBAT_RESULTS")
 	if not destination.is_empty():FileAccess.open(destination,FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
