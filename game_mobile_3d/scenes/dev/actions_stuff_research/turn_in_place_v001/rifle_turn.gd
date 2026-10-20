@@ -48,10 +48,12 @@ func advance(current_yaw: float,target_yaw: float,moving: bool,grounded: bool,de
  body_yaw=current_yaw if interrupted else -deg_to_rad(float(snapshot.body_degrees))
  gaze=clampf(wrapf(look_yaw-body_yaw,-PI,PI),-PI*.5,PI*.5)
  weight=move_toward(weight,0. if interrupted else 1.,delta/.15)
- stepping=snapshot.state=="vywhcj"
+ stepping=snapshot.state=="vywhcj" and absf(float(snapshot.turn_degrees))>.01
  clock=float(runtime.env.get("v.hdseda",0.))
  lead_side=1 if float(snapshot.turn_degrees)>0. else 0
- active=weight>.0001 and (stepping or not snapshot.layers.is_empty() or absf(gaze)>.0001)
+ var weighted_layers:=false
+ for layer in snapshot.layers:weighted_layers=weighted_layers or float(layer.controller_weight)>.0001
+ active=weight>.0001 and (weighted_layers or absf(gaze)>.0001)
  was_moving=interrupted
  return body_yaw
 func _global(poses: Array,bone: int) -> Transform3D:

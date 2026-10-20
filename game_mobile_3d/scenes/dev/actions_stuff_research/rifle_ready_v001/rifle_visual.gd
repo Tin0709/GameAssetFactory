@@ -305,7 +305,7 @@ func _update_direction_support(delta: float) -> void:
    # Once the corrective foot keys settle, the approved Idle can still make
    # its low-clearance lateral weight shift. A residual head/body yaw must not
    # disable that existing contact release and drag an old anchor inward.
-   var idle_reposition:=stationary_turn.clock>.5 and _idle_foot_lateral_speed(bone)>.025
+   var idle_reposition: bool=(not stationary_turn.stepping or stationary_turn.clock>.5) and _idle_foot_lateral_speed(bone)>.025
    if free_leg or height>.035 or idle_reposition:_source_support[side]=false;released[side]=true
    elif height<.025:_source_support[side]=true;released[side]=false
   return

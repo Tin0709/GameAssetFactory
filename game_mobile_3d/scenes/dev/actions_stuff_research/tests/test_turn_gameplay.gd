@@ -36,6 +36,10 @@ func run() -> void:
  var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();scene.auto_aim_enabled=false;scene.zombie_combat_enabled=false;root.add_child(scene)
  var a=scene.player;var v=a.visual
  scene.set_process(false);a.set_physics_process(false);v.set_process(false);scene.rifle_fire.set_physics_process(false)
+ var raw=v.stationary_turn.sampler
+ check(absf(raw.sample_clip("rjfeeq",.0833).rightleg.position.y-.015)<.000001,"Exact source leading-foot lift key is retained")
+ check(absf(raw.sample_clip("rjfeeq",.1667).rightleg.rotation.y-.5)<.000001 and absf(raw.sample_clip("ejnecs",.1667).leftleg.rotation.y+.5)<.000001,"Mirrored source yaw keys are retained")
+ check(absf(raw.sample_clip("rjfeeq",.22915).leftleg.rotation.x-.083125)<.000001,"Source Catmull-Rom stays curved rather than linearized")
  var cases:=[]
  for angle in [25.,90.,-90.,180.]:
   current_case=angle
@@ -74,6 +78,10 @@ func run() -> void:
  var intent: float=v.stationary_turn.requested_yaw
  var mouse:=InputEventMouseMotion.new();mouse.relative=Vector2(20,0);scene.orbiting=true;scene._unhandled_input(mouse)
  check(v.stationary_turn.requested_yaw==intent,"Camera orbit does not request player turning")
+ v.rotation.y=PI;v.look_yaw=PI;v.reset_contacts()
+ for i in fps*12:
+  tick(v,dt)
+  check(not v.stationary_turn.active and not v.stationary_turn.stepping,"Source zero-angle idle timeout cannot create walking-in-place")
  check(max_grip<.00005 and max_palm<.00005,"Rifle grip and left support remain stable throughout")
  check(min_floor>-.004,"Feet never penetrate the research floor")
  check(max_contact_drift<.008,"Planted feet stay at their world contact")
