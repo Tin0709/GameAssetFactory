@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "approved_sources_unchanged": true,
+  "actions": [
+    "Rifle_Fire_Recoil_ActionsStyle_v001"
+  ],
+  "maximum_carrier_to_right_arm_variation": 5.420297384262085e-07,
+  "total_native_samples": 42,
+  "fixtures": 10
+}

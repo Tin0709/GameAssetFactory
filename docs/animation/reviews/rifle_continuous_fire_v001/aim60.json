@@ -1,0 +1,11 @@
+{
+  "arm_volume_error_m": 1.63912773132324e-07,
+  "camera_y_span": 0.0,
+  "failures": [],
+  "fps": 60,
+  "grip_error": 4.46802596343332e-06,
+  "max_arm_step_deg": 6.238944943568,
+  "max_weapon_step_m": 0.0370458476245403,
+  "ready_aim_max_arm_rotation_deg": 78.9240174822237,
+  "support_error_m": 3.84484610549407e-06
+}

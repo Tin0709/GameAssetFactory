@@ -1,4 +1,6 @@
-# Rifle Fire / Recoil ActionsStyle v001 — Pending
+**Approved2026-10-20:** User artistically approved the latest1.5x refinement; exact Action/source are immutable. Integrated as continuous infinite-ammo fire in the existing Godot research scene; see `docs/animation/reviews/rifle_continuous_fire_v001/README.md`. The previous Pending/Blender-only notes below are retained as authoring-stage history.
+
+# Rifle Fire / Recoil ActionsStyle v001 — APPROVED
 
 One new Blender-only Action: `Rifle_Fire_Recoil_ActionsStyle_v001`. The existing Rifle Ready ↔ Aim gameplay was explicitly accepted on 2026-10-20 and remains unchanged; its recovery hashes are in `docs/animation/baselines/rifle_ready_aim_gameplay_accepted_v003/`.
 
