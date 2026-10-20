@@ -82,5 +82,10 @@
       "ready_aim_max_arm_rotation_deg": 78.9240174822237,
       "support_error_m": 3.84484610549407e-06
     }
-  }
+  },
+  "allowed_changed_protected_files": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
+  ],
+  "four_approved_blender_sources_unchanged": true
 }
