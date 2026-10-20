@@ -3,6 +3,7 @@ extends Node3D
 ## production CombatDirector/player-death replacement.
 const ZOMBIE = preload("res://scenes/characters/CuboidZombie.tscn")
 const PHYSICS_ZOMBIE = preload("res://scenes/dev/actions_stuff_research/zombie_combat/physics_zombie.gd")
+const SOURCE_VISUAL = preload("res://scenes/dev/actions_stuff_research/zombie_combat/source_visual.gd")
 const SPAWNS := [Vector3(-1.6,0,-3.0),Vector3(1.5,0,-3.8),Vector3(3.1,0,1.6),Vector3(-3.2,0,1.5)]
 const MAX_RAGDOLLS := 4
 var zombies: Array[CharacterBody3D] = []
@@ -10,11 +11,26 @@ var player: CharacterBody3D
 var audio: Node
 var kills := 0
 var last_corpse_lifetime := 0.0
+var active := true
+var effects: Node3D
+static var _spaces: Dictionary = {}
+var _space: RID
 
 func setup(target: CharacterBody3D,existing_audio: Node) -> void:
 	player = target
 	audio = existing_audio
+	# Reuse the Lab's32 solver iterations locally, retaining gameplay's60Hz clock.
+	# Reference count also supports regression fixtures sharing one World3D.
+	_space=get_world_3d().space
+	if not _spaces.has(_space):
+		_spaces[_space]={"users":0,"original":PhysicsServer3D.space_get_param(_space,PhysicsServer3D.SPACE_PARAM_SOLVER_ITERATIONS)}
+	_spaces[_space].users += 1
+	PhysicsServer3D.space_set_param(_space,PhysicsServer3D.SPACE_PARAM_SOLVER_ITERATIONS,32)
 	reset_encounter()
+
+func can_fight() -> bool:return active
+func play_sound(event: StringName) -> void:
+	if is_instance_valid(audio):audio.play_event(event)
 
 func reset_encounter() -> void:
 	# All old native graphs are freed synchronously before a new group is admitted.
@@ -25,11 +41,17 @@ func reset_encounter() -> void:
 	for i in SPAWNS.size():
 		var zombie: CharacterBody3D = ZOMBIE.instantiate()
 		zombie.set_script(PHYSICS_ZOMBIE)
+		zombie.get_node("Visual").set_script(SOURCE_VISUAL)
 		zombie.name = "ResearchZombie_%d" % (i+1)
 		zombie.position = SPAWNS[i]
 		zombie.target = player
 		zombie.combat_audio = audio
-		zombie.stop_distance = 1.45
+		zombie.combat = self
+		zombie.stop_distance = 1.6
+		zombie.attack_range = 1.7
+		# Show the requested Attack clip using existing AI timing without introducing
+		# player-death/health gameplay into this approved locomotion research scene.
+		zombie.attack_damage = 0
 		zombie.detection_range = 12.0
 		zombie.persistent_chase = true
 		zombie.corpse_finished.connect(_corpse_finished)
@@ -52,3 +74,10 @@ func living_count() -> int:
 	for zombie in zombies:
 		if not zombie.is_dead:count += 1
 	return count
+
+func _exit_tree() -> void:
+	if not _spaces.has(_space):return
+	_spaces[_space].users -= 1
+	if _spaces[_space].users == 0:
+		PhysicsServer3D.space_set_param(_space,PhysicsServer3D.SPACE_PARAM_SOLVER_ITERATIONS,_spaces[_space].original)
+		_spaces.erase(_space)

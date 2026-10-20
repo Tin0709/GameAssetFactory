@@ -28,8 +28,8 @@ func _ready() -> void:
 
 func take_damage(amount: int,direction: Vector3=Vector3.ZERO) -> bool:
 	var accepted := super.take_damage(amount,direction)
-	if accepted and is_instance_valid(combat_audio):
-		combat_audio.play_event(&"zombie_death" if is_dead else &"zombie_hit")
+	if accepted and is_dead and is_instance_valid(combat_audio):
+		combat_audio.play_event(&"zombie_death")
 	return accepted
 
 func _physics_process(delta: float) -> void:
