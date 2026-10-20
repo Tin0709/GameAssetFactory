@@ -1,0 +1,86 @@
+{
+  "passed": true,
+  "protected_files": 117,
+  "allowed_runtime_changes": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
+  ],
+  "approved_showcase_manifest_runtime_libraries_unchanged": true,
+  "camera_actor_scene_project_and_weapon_presenter_unchanged": true,
+  "tests": {
+    "red": {
+      "failures": [
+        "Idle contact must not drag rigid leg roots inward: 0.11727382987738",
+        "Settled Idle upper legs must remain separated: -0.11061657965183",
+        "Authored low-clearance lateral weight shift releases its foot"
+      ],
+      "fps": 30,
+      "free_weight_shift_samples": 0,
+      "max_idle_joint_drag_m": 0.117273829877377,
+      "minimum_floor": -5.96046447753906e-08,
+      "minimum_upper_leg_gap_m": -0.110616579651833,
+      "supported_sole_step_m": 1.1926748300084e-07
+    },
+    "idle30": {
+      "failures": [],
+      "fps": 30,
+      "free_weight_shift_samples": 30,
+      "max_idle_joint_drag_m": 0.0107817454263568,
+      "minimum_floor": -5.96046447753906e-08,
+      "minimum_upper_leg_gap_m": 0.00129861384630203,
+      "supported_sole_step_m": 4.77767571283039e-07
+    },
+    "idle60": {
+      "failures": [],
+      "fps": 60,
+      "free_weight_shift_samples": 54,
+      "max_idle_joint_drag_m": 0.0160899199545383,
+      "minimum_floor": -5.96046447753906e-08,
+      "minimum_upper_leg_gap_m": 0.00092034786939621,
+      "supported_sole_step_m": 4.76837158203125e-07
+    },
+    "ready30": {
+      "camera_jump_y_span": 0.0,
+      "failures": [],
+      "fps": 30,
+      "left_support_error_m": 3.9181909414765e-06,
+      "maximum_leg_step_deg": 23.5931023933411,
+      "minimum_foot_y": -5.96046447753906e-08,
+      "moving_shoulder_error_m": 3.00342506420748e-08,
+      "right_grip_matrix_error": 3.92261063097976e-06,
+      "support_samples": 222
+    },
+    "ready60": {
+      "camera_jump_y_span": 0.0,
+      "failures": [],
+      "fps": 60,
+      "left_support_error_m": 3.92238280255697e-06,
+      "maximum_leg_step_deg": 13.8041743126218,
+      "minimum_foot_y": -5.96046447753906e-08,
+      "moving_shoulder_error_m": 3.00342506420748e-08,
+      "right_grip_matrix_error": 4.30192994826939e-06,
+      "support_samples": 441
+    },
+    "aim30": {
+      "arm_volume_error_m": 1.63912773132324e-07,
+      "camera_y_span": 0.0,
+      "failures": [],
+      "fps": 30,
+      "grip_error": 4.13229281548411e-06,
+      "max_arm_step_deg": 12.4268769117725,
+      "max_weapon_step_m": 0.0731532648205757,
+      "ready_aim_max_arm_rotation_deg": 78.9240174822237,
+      "support_error_m": 3.93209984395071e-06
+    },
+    "aim60": {
+      "arm_volume_error_m": 1.63912773132324e-07,
+      "camera_y_span": 0.0,
+      "failures": [],
+      "fps": 60,
+      "grip_error": 4.46802596343332e-06,
+      "max_arm_step_deg": 6.238944943568,
+      "max_weapon_step_m": 0.0370458401739597,
+      "ready_aim_max_arm_rotation_deg": 78.9240174822237,
+      "support_error_m": 3.84484610549407e-06
+    }
+  }
+}
