@@ -30,7 +30,7 @@ In the reproducible stationary-death test, torso rise drops0.425m→0.012m, firs
 
 ## Fast E turnaround
 
-The latest user request explicitly prioritizes fast combat response over the earlier long source-led stationary step sequence. While E requests Aim+Fire and auto-aim has a valid target, body facing uses31.416rad/s (180deg in0.10s), and the common rifle/head/shoulder aim frame acquires at40/s. Keep the exact approved Aim pose and0.24s raise, so no firing with hands lowered. Measured first shot for a target180deg behind is about0.27s. Movement stays responsive and the gait cursor never restarts.
+The latest user request explicitly prioritizes fast combat response over the earlier long source-led stationary step sequence. While E requests Aim+Fire and a valid auto-target needs more than45deg of standing correction, latch a rapid acquisition until aligned. Small tracking adjustments retain planted source-style observation instead of releasing both feet every tick. Rapid body facing uses31.416rad/s (180deg in0.10s), and the common rifle/head/shoulder aim frame acquires at40/s. Keep the exact approved Aim pose and0.24s raise, so no firing with hands lowered. Measured first shot for a target180deg behind is about0.27s. Movement stays responsive and the gait cursor never restarts.
 
 Release old foot anchors only during the brief stationary combat pivot and replant with the existing solver. Q/C observation and RMB aim-only keep the source turn controller/footwork; camera orbit still does not request player turning. This accelerated combat pivot is an explicitly requested Godot adapter, not an invented source animation.
 
