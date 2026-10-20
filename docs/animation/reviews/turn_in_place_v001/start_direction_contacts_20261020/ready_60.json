@@ -1,0 +1,11 @@
+{
+  "camera_jump_y_span": 0,
+  "failures": [],
+  "fps": 60,
+  "left_support_error_m": 0.00000392238280255697,
+  "maximum_leg_step_deg": 13.8041743126218,
+  "minimum_foot_y": -5.96046447753906e-8,
+  "moving_shoulder_error_m": 3.00342506420748e-8,
+  "right_grip_matrix_error": 0.00000430192994826939,
+  "support_samples": 441
+}

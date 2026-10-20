@@ -1,0 +1,9 @@
+{
+  "failures": [],
+  "fps": 30,
+  "free_weight_shift_samples": 30,
+  "max_idle_joint_drag_m": 0.0107817454263568,
+  "minimum_floor": -5.96046447753906e-8,
+  "minimum_upper_leg_gap_m": 0.00129861384630203,
+  "supported_sole_step_m": 1.1926748300084e-7
+}
