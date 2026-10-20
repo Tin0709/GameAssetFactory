@@ -1,3 +1,5 @@
+> Later user refinement2026-10-20: [close melee, heavier deaths and fast held-E combat facing](../zombie_contact_weight_quickturn_v001/README.md). The evidence below records the earlier implementation; current E combat priority/death tuning follows that newer record. Original source studies/ordinary observation turning remain preserved.
+
 # Actions & Stuff stationary turning — source audit and dev integration
 
 2026-10-20. Implemented in the **existing** `res://scenes/dev/ActionsStuffWalkRunTest.tscn`. Gameplay awaits user play feedback; no new Blender Action, candidate, scene or project. Existing approved Actions remain byte-identical.

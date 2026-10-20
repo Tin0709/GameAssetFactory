@@ -1,3 +1,5 @@
+> Later user refinement2026-10-20: [close melee, heavier deaths and fast held-E combat facing](../zombie_contact_weight_quickturn_v001/README.md). The evidence below records the earlier implementation; current E combat priority/death tuning follows that newer record. Original source studies/ordinary observation turning remain preserved.
+
 # Rifle zombie combat in the existing research scene
 
 Open `res://scenes/dev/ActionsStuffWalkRunTest.tscn` in the existing `game_mobile_3d` project and run F6. F5 still opens WorldMap. Hold **E** to raise Aim and fire continuously at6Hz; WASD turns/moves, Shift runs, Space jumps, RMB aims/orbits, wheel zooms. **R** resets player, projectiles and the four-zombie group. There are no automatic waves.
