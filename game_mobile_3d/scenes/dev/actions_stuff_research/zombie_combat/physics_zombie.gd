@@ -16,6 +16,7 @@ func _ready() -> void:
 	# One physics clock owns living pose sampling and death handoff. The existing
 	# manual AnimationPlayer/secondary motion is evaluated unchanged below.
 	visual.set_process(false)
+	visual._process(0.0)
 	ragdoll = Ragdoll.new()
 	add_child(ragdoll)
 	ragdoll.setup(visual.skeleton)

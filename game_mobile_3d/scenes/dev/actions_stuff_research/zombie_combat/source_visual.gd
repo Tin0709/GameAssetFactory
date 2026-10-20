@@ -22,6 +22,9 @@ func _ready() -> void:
 	idle = Sampler.new(source_library.get_animation("Idle"),skeleton)
 	walk = Sampler.new(source_library.get_animation("Walk"),skeleton)
 	attack = Sampler.new(source_library.get_animation("Attack"),skeleton)
+	# Keep the inherited actor's startup seek API valid; this paused legacy player
+	# never advances or drives the living/dead pose after the source sampler starts.
+	animation_player.play("Zombie_Idle")
 	animation_player.pause()
 	# PhysicsZombie evaluates this manually once after the living controller.
 	set_process(false)
