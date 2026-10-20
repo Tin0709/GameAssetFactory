@@ -25,5 +25,8 @@
   },
   "production_and_other_approved_assets_preserved": true,
   "research_export_guard_enabled": true,
-  "infinite_ammo_no_reload": true
+  "infinite_ammo_no_reload": true,
+  "interactive_scene_started": true,
+  "interactive_audio": "normal project audio; no Dummy/silent flags",
+  "interactive_scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn"
 }
