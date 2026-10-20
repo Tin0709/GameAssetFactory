@@ -1,4 +1,6 @@
 {
+  "amplitude_multiplier": 1.5,
+  "left_support_clearance_roll_deg": 0.6,
   "duration_s": 0.16666666666666666,
   "fps": 30,
   "bake_hz": 240,

@@ -23,3 +23,7 @@ The approved reference Action/source remain byte-exact: Action SHA `4b4d072c8b6b
 ## Rig and rifle limits
 
 The unchanged 13-bone rig uses rigid full arms with identity ForeArm helpers, no visible elbow bending, no scale pulse, and unchanged meshes/materials/proportions. Shoulder translation absorbs a small original recoil around the fixed grip. The support side follows the existing weapon-space contact rather than reproducing the crossbow’s different fore-end dimensions. The existing head lean, rifle attachment and planted lower-body pose are the approved reference. Inherited rigid-cube seating/floor penetration is explicitly retained; this shot does not certify the approved base as collision-free or production-licensed.
+
+### User-requested strength change, 2026-10-20
+
+Recoil envelopes are now multiplied by 1.5 without retiming. A maximum 0.9° full-left-arm axial clearance correction retains the existing support point and head-contact limits. This is a rig-fit adjustment, not a newly discovered source behaviour. The source pack observations and approved Aim base remain unchanged.

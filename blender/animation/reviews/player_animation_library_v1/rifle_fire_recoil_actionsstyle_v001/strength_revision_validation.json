@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "same_action": "Rifle_Fire_Recoil_ActionsStyle_v001",
+  "amplitude_multiplier": 1.5,
+  "unchanged_timing": true,
+  "unchanged_approved_aim_reference": true,
+  "peak_ratios": {
+    "muzzle_pitch_up_deg": 1.4999963827238043,
+    "weapon_back_m": 1.4979629254389855
+  },
+  "support_clearance_max_roll_deg": 0.9,
+  "support_anchor_remains_fixed_apart_from_original_scaled_secondary_motion": true,
+  "prior_pending_action_sha256": "e079c1be4ae3af70a0e400a7f1c958b7c40a85ee6b6bc4f10980f90cf1ed5ba6",
+  "prior_pending_source_sha256": "99d70756ab7b4c8e37a4f2155e6d398f17dfe284f9a3db863be87a52122c1fff",
+  "prior_complete_package_backup": "/Users/tin/Documents/ChatGPT/New project/experiments/rifle_fire_recoil_strength_15_20261020/before/package"
+}

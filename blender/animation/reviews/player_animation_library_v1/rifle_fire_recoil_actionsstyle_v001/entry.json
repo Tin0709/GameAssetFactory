@@ -24,8 +24,8 @@
   "preview_prop_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f",
   "action": "Rifle_Fire_Recoil_ActionsStyle_v001",
   "source": "blender/animation/reviews/player_animation_library_v1/rifle_fire_recoil_actionsstyle_v001/rifle_fire_recoil_actionsstyle_v001.blend",
-  "source_sha256": "99d70756ab7b4c8e37a4f2155e6d398f17dfe284f9a3db863be87a52122c1fff",
-  "action_sha256": "e079c1be4ae3af70a0e400a7f1c958b7c40a85ee6b6bc4f10980f90cf1ed5ba6",
+  "source_sha256": "4f4fe6530a9787737f6293a264f56b6416253261c0efc2b26882f11806a28cea",
+  "action_sha256": "a0d88c8b85796cc670b7495de7ad4b86b3a4d3bd380c811a46eaca5ce97bd277",
   "action_frame_range": [
     1.0,
     6.0
@@ -58,6 +58,8 @@
   "visual_base_source_sha256": "bb5b4822b9ec4cc118b0fddc154bcb80e0c1a05105efe43d4246bd22878fab71",
   "source_reference_only": true,
   "original_recoil_parameters": {
+    "amplitude_multiplier": 1.5,
+    "left_support_clearance_roll_deg": 0.6,
     "duration_s": 0.16666666666666666,
     "fps": 30,
     "bake_hz": 240,

@@ -36,7 +36,7 @@ for x,y in [(1,1.125),(5.875,6)]:
 for k in ['entry_pose_error','exit_pose_error','right_grip_relative_error','forearm_articulation_error','unit_scale_error','foot_vertex_drift_m','loop_pose_error','endpoint_velocity_m_s']:
  if metrics[k]>1e-5:fails.append(k)
 if metrics['left_support_anchor_drift_m']>.0015:fails.append('left_support_uncontrolled')
-if metrics['right_shoulder_offset_m']>.018 or metrics['left_shoulder_offset_m']>.018:fails.append('shoulder_seating')
+if metrics['right_shoulder_offset_m']>.027 or metrics['left_shoulder_offset_m']>.027:fails.append('shoulder_seating')
 if metrics['head_local_roll_change_rad']>.0001:fails.append('approved_head_lean_changed')
 if not 1.<metrics['muzzle_pitch_up_deg']<4.:fails.append('recoil_pitch')
 if not .001<metrics['weapon_back_m']<.025:fails.append('recoil_back')

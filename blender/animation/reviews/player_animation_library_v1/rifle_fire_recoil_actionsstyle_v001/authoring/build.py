@@ -7,7 +7,7 @@ S=Path(__file__).resolve().parent;O=S.parent;R=Path(opt.repo) if opt.repo else n
 E=json.loads((S/'baseline_entry.json').read_text());assert E['status']=='approved';source=R/E['source'];assert hashlib.sha256(source.read_bytes()).hexdigest()==E['source_sha256'];bpy.ops.wm.open_mainfile(filepath=str(source),load_ui=False)
 r=bpy.data.objects[ui.RIG];s=bpy.context.scene;base=bpy.data.actions[E['action']];assert ui.action_signature(base)==E['action_sha256'];N='Rifle_Fire_Recoil_ActionsStyle_v001';assert N not in bpy.data.actions
 old={a.name:ui.action_signature(a) for a in bpy.data.actions};r.animation_data.action=base;r.animation_data.action_slot=base.slots[0];s['gaf_library_last_action']=base.name;s.frame_set(85);bpy.context.view_layer.update();B={b.name:b.matrix.copy() for b in r.pose.bones}
-P={'duration_s':1/6,'fps':30,'bake_hz':240,'approved_aim_reference_frame':85,'first_motion_s':1/240,'primary_peak_after_motion_s':.025,'primary_recovery_end_s':.0958333333333,'countersettle_window_s':[.0583333333333,.1125],'countersettle_gain':.055,'arm_kick_deg':1.1,'right_shoulder_back_m':.006,'right_hand_drop_m':.0015,'spine_back_deg':.15,'chest_back_deg':.45,'body_delay_s':2/240,'head_counterpitch_deg':.22,'head_delay_s':3/240,'left_support_delay_s':2/240,'left_support_secondary_up_m':.0007,'left_support_secondary_foreaft_m':.0005,'repeat_demo_hz':6.,'origin':'All recoil envelopes, amplitudes and coordination authored originally; source crossbow used for principles only.'}
+P={'amplitude_multiplier':1.5,'left_support_clearance_roll_deg':.6,'duration_s':1/6,'fps':30,'bake_hz':240,'approved_aim_reference_frame':85,'first_motion_s':1/240,'primary_peak_after_motion_s':.025,'primary_recovery_end_s':.0958333333333,'countersettle_window_s':[.0583333333333,.1125],'countersettle_gain':.055,'arm_kick_deg':1.1,'right_shoulder_back_m':.006,'right_hand_drop_m':.0015,'spine_back_deg':.15,'chest_back_deg':.45,'body_delay_s':2/240,'head_counterpitch_deg':.22,'head_delay_s':3/240,'left_support_delay_s':2/240,'left_support_secondary_up_m':.0007,'left_support_secondary_foreaft_m':.0005,'repeat_demo_hz':6.,'origin':'All recoil envelopes, amplitudes and coordination authored originally; source crossbow used for principles only.'}
 C=B['UpperArm.R'].inverted()@B['WeaponCarrier'];FL=B['UpperArm.L'].inverted()@B['ForeArm.L'];FR=B['UpperArm.R'].inverted()@B['ForeArm.R'];palm=Vector((0,r.data.bones['ForeArm.L'].length*.78,0));palm_arm=FL@palm;palm_right=FR@palm;anchor=B['WeaponCarrier'].inverted()@(B['ForeArm.L']@palm)
 forward=B['WeaponCarrier'].to_3x3().col[1].normalized();up=Vector((0,0,1));axis=forward.cross(up).normalized()
 def smooth(u):u=max(0.,min(1.,u));return u*u*u*(10+u*(-15+6*u))
@@ -17,7 +17,7 @@ def env(t,delay=0):
  peak=P['primary_peak_after_motion_s'];end=P['primary_recovery_end_s'];value=smooth(t/peak) if t<peak else 1-smooth((t-peak)/(end-peak))
  a,b=P['countersettle_window_s']
  if a<t<b:value-=P['countersettle_gain']*math.sin(math.pi*(t-a)/(b-a))**2
- return value
+ return value*P['amplitude_multiplier']
 
 def turn(M,axis,angle):
  Q=Quaternion(axis,math.radians(angle)).to_matrix().to_4x4();q=Q@M;q.translation=M.translation;return q
@@ -30,7 +30,7 @@ def target(t):
  carry=dc@B['UpperArm.R'];pivot=carry@palm_right;Q=Quaternion(ax,math.radians(P['arm_kick_deg']*e)).to_matrix().to_4x4();M['UpperArm.R']=Q@carry;M['UpperArm.R'].translation=pivot+Q.to_3x3()@(carry.translation-pivot)-fwd*P['right_shoulder_back_m']*e-(dc.to_3x3()@up)*P['right_hand_drop_m']*e
  M['ForeArm.R']=M['UpperArm.R']@FR;M['WeaponCarrier']=M['UpperArm.R']@C
  desired=M['WeaponCarrier']@anchor+(dc.to_3x3()@up)*P['left_support_secondary_up_m']*(support-e)+fwd*P['left_support_secondary_foreaft_m']*(support-e)
- L=dc@B['UpperArm.L'];vec=L.to_3x3()@palm_arm;aim=desired-L.translation;rot=vec.normalized().rotation_difference(aim.normalized());basis=rot.to_matrix()@L.to_3x3();M['UpperArm.L']=basis.to_4x4();M['UpperArm.L'].translation=desired-basis@palm_arm;M['ForeArm.L']=M['UpperArm.L']@FL
+ L=dc@B['UpperArm.L'];vec=L.to_3x3()@palm_arm;aim=desired-L.translation;rot=vec.normalized().rotation_difference(aim.normalized());basis=rot.to_matrix()@L.to_3x3();basis=Quaternion((basis@palm_arm).normalized(),math.radians(P['left_support_clearance_roll_deg']*e)).to_matrix()@basis;M['UpperArm.L']=basis.to_4x4();M['UpperArm.L'].translation=desired-basis@palm_arm;M['ForeArm.L']=M['UpperArm.L']@FL
  return M
 
 times=[i/240 for i in range(41)];data={b.name:[] for b in r.pose.bones};maxscale=0.
