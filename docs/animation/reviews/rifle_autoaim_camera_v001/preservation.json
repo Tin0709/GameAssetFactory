@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "files_checked": 7337,
+  "changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_camera_comfort.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_zombie_combat.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/continuous_fire.gd"
+  ],
+  "missing": [],
+  "blender_and_approved_animation_resources_unchanged": true,
+  "worldmap_production_project_settings_original_death_physics_unchanged": true
+}

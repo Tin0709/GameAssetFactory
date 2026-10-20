@@ -8,11 +8,11 @@ Follow horizontal X/Z travel smoothly. Keep camera height independent of normal 
 
 Only `game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn`, via its existing `actions_stuff_research/walk_run_test.gd`, is changed. The anchor follows X/Z exponentially at12/s. A1.4m upward/1.1m downward airborne dead zone keeps the existing1.26–1.31m ordinary physics jump completely inside a fixed vertical frame. Outside that zone, an exact critically damped8/s spring adjusts elevation; quarter-second vertical velocity anticipation activates only outside the zone to follow long falls. Grounded height changes use the same spring. The camera's position and velocity remain continuous at takeoff/landing. Explicit R teleport rebases the camera immediately.
 
-Original orthographic size5.1,8m distance, azimuth.66/elevation.40, orbit/zoom and aim offset.95m are retained. Movement, gravity, jump height, controls and animation data are unchanged by the camera adapter.
+Latest explicit user request2026-10-20 widens orthographic size5.1→7.2 and distance8→10m for a more distant, readable Minecraft Dungeons2-inspired view. This is our framing choice, not a reconstruction of its camera internals. Azimuth.66/elevation.40, orbit/zoom and aim offset.95m are retained. Movement, gravity, jump height, controls and animation data are unchanged by the camera adapter.
 
 ## Verification and future integration
 
-`test_camera_comfort.gd` checks30/60Hz, horizontal tracking, zero normal-jump camera-height change, smooth large elevation changes/long-fall zone recovery, grounded settling and original framing. Native Metal rendering checks full character/feet visibility during the actual standing/moving jump. Flat-ground research cannot certify arbitrary production terrain or every mobile aspect ratio; test the same philosophy against actual level slopes/falls and target screens when main integration is authorized.
+`test_camera_comfort.gd` checks30/60Hz, horizontal tracking, zero normal-jump camera-height change, smooth large elevation changes/long-fall zone recovery, grounded settling and the current explicitly requested wider framing. Native Metal rendering checks full character/feet visibility during the actual standing/moving jump. Flat-ground research cannot certify arbitrary production terrain or every mobile aspect ratio; test the same philosophy against actual level slopes/falls and target screens when main integration is authorized.
 
 Apply this rule to future authorized main-game integrations. Do not change WorldMap or production camera until explicitly requested. No new scene or project is required.
 

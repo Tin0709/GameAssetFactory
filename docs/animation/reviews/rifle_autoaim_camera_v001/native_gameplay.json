@@ -1,0 +1,24 @@
+{
+	"automatic_targets_seen": [
+		"ResearchZombie_1",
+		"ResearchZombie_3",
+		"ResearchZombie_2",
+		"ResearchZombie_4"
+	],
+	"camera_distance": 10.0,
+	"camera_jump_y_span": 0.000604689121246338,
+	"camera_orthographic_size": 7.19999980926514,
+	"cleaned_corpses": 5,
+	"frames": 450,
+	"landings": 1,
+	"max_speed": 7.54651880264282,
+	"maximum_active_ragdolls": 2,
+	"minimum_frame_quantized_shot_interval": 0.166666666666666,
+	"passed": true,
+	"physics_hz": 60,
+	"pool_misses": 0,
+	"render_fps": 30,
+	"scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+	"shots": 44,
+	"takeoffs": 1
+}
