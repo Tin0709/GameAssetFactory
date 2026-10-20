@@ -219,6 +219,7 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  if _has_auto_aim():
   var toward: Vector3=auto_aim_target.global_position-global_position
   target_yaw=atan2(toward.x,toward.z)
+  if not bool(physics.grounded) and not moving:_advance_facing(target_yaw,delta)
  stationary_turn.axis=turn_axis
  rotation.y=stationary_turn.advance(rotation.y,target_yaw,moving,bool(physics.grounded),delta)
  look_yaw=rotation.y
