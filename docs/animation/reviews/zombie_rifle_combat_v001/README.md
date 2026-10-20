@@ -36,6 +36,7 @@ Both Blender Showcases, all Actions and prior sources remain exact. The existing
 - `source_parity.json`:24 Blender fixture poses, maximum translation deviation2.742µm from float32 timestamp quantization; quaternion dot error5.96e-8, scale error0. Loops and exact requested resource names verified.
 - Existing Rifle Fire30/60 regressions pass:159shots, no pool misses, unchanged lower-body poses and zero recovered recoil residue. Grips remain within1µm of accepted contacts.
 - Native original-speed30FPS Godot capture: real projectile deaths, source Walk/Attack, R reset, running fire, one physical jump/landing, cameraY span below1mm, no tracer pool misses. See `native_gameplay.json` and captured pixels. The movie readback/concurrent test monitor peak is retained as raw evidence and is **not** a performance benchmark.
+- `desktop_burst.json`: an isolated short desktop four-death burst (no movie capture) measured9.128ms synchronous handoff for all four; sampled physics-process monitor peaks stayed below5.4ms and zero corpses remained. Monitor values repeat between updates and do not establish per-body scaling, mobile performance or long-session thermals.
 - `preservation.json`:7,321 earlier Blender/Godot files checked; only the existing research coordinator changed. No missing files, both Showcases and production/project files exact. Accepted continuous-fire baseline is separately recorded.
 
 Actual Godot pixels:

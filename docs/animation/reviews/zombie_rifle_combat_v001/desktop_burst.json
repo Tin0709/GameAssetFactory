@@ -1,0 +1,22 @@
+{
+	"after_cleanup": {
+		"count": 60,
+		"mean_ms": 5.1112,
+		"p95_ms": 5.358,
+		"peak_ms": 5.358
+	},
+	"baseline_living4": {
+		"count": 55,
+		"mean_ms": 4.80381818181818,
+		"p95_ms": 4.803,
+		"peak_ms": 4.848
+	},
+	"note": "Short isolated desktop process-monitor samples, no movie readback, no phone-performance claim",
+	"remaining_corpses": 0,
+	"simultaneous4_ragdolls": {
+		"count": 54,
+		"mean_ms": 4.83611111111112,
+		"p95_ms": 4.848,
+		"peak_ms": 4.848
+	}
+}

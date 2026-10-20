@@ -1,0 +1,12 @@
+{
+	"camera_span_m": 0.0,
+	"failures": [],
+	"fps": 60,
+	"grip_error_m": 0.000000772932651216252,
+	"lower_body_error": 0.0,
+	"passed": true,
+	"pool_misses": 0,
+	"recovered_pose_error": 0.0,
+	"shots": 159,
+	"support_error_m": 0.000000357627868652344
+}
