@@ -4,7 +4,7 @@
   "ordinary_files_over_25MiB": [],
   "lfs_pattern": "existing *.blend",
   "new_source_MiB": 12.176252365112305,
-  "estimated_source_plus_showcase_version_MiB": 96.02407455444336,
+  "estimated_source_plus_showcase_version_MiB": 96.0228910446167,
   "quota": "not exposed; no new tracking patterns or migration",
-  "central_showcase_MiB": 83.84697532653809
+  "central_showcase_MiB": 83.8466386795044
 }

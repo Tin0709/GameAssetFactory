@@ -1,12 +1,10 @@
 {
   "passed": true,
-  "new_action": "Rifle_Fire_Recoil_ActionsStyle_v001",
-  "status": "pending",
-  "previous_actions_preserved": 91,
-  "total_actions": 92,
-  "all_existing_assets_and_research_sequences_preserved": true,
-  "previous_manifest_entries_preserved": true,
-  "active_frame": 2,
-  "focused_entries": 24,
-  "all_entries": 59
+  "same_pending_action": "Rifle_Fire_Recoil_ActionsStyle_v001",
+  "total_native_actions": 92,
+  "other_91_actions_exact": true,
+  "existing_assets_exact": true,
+  "times_and_reference_pose_unchanged": true,
+  "recoil_amplitude_multiplier": 1.5,
+  "old_pending_package_backup": "/Users/tin/Documents/ChatGPT/New project/experiments/rifle_fire_recoil_strength_15_20261020/before/package"
 }
