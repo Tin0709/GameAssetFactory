@@ -78,7 +78,7 @@ func run() -> void:
  var intent: float=v.stationary_turn.requested_yaw
  var mouse:=InputEventMouseMotion.new();mouse.relative=Vector2(20,0);scene.orbiting=true;scene._unhandled_input(mouse)
  check(v.stationary_turn.requested_yaw==intent,"Camera orbit does not request player turning")
- v.rotation.y=PI;v.look_yaw=PI;v.reset_contacts()
+ v.rotation.y=PI;v.look_yaw=PI;v.reset_contacts();previous_soles.clear();previous_yaws.clear();previous_ids.clear()
  for i in fps*12:
   tick(v,dt)
   check(not v.stationary_turn.active and not v.stationary_turn.stepping,"Source zero-angle idle timeout cannot create walking-in-place")
