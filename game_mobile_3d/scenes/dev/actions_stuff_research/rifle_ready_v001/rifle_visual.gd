@@ -186,7 +186,12 @@ func _prepare_auto_aim(delta: float) -> void:
    desired=Quaternion(source.normalized(),target.normalized()).normalized()
    if desired.w<0.0:desired=-desired
    var angle:=desired.get_angle()
-   if angle>deg_to_rad(60.0):desired=Quaternion.IDENTITY.slerp(desired,deg_to_rad(60.0)/angle)
+   # The source leaves up to60deg head/body yaw at rest. Reserve another15deg
+   # of the common hold's cone for muzzle parallax + pitch at melee distance;
+   # otherwise a57deg target can saturate a60deg 3D cone and never be fired at.
+   # Moving/airborne acquisition keeps its existing bound and facing behavior.
+   var cone:=75. if jump_grounded and not move_requested and stationary_turn!=null and absf(stationary_turn.gaze)<=deg_to_rad(60.) else 60.
+   if angle>deg_to_rad(cone):desired=Quaternion.IDENTITY.slerp(desired,deg_to_rad(cone)/angle)
  _auto_aim_rotation=_auto_aim_rotation.slerp(desired,1.0-exp(-20.0*delta)).normalized()
  if _auto_aim_rotation.get_angle()<.0001:_auto_aim_rotation=Quaternion.IDENTITY
 func _apply_auto_aim() -> void:
