@@ -28,6 +28,8 @@ const CAMERA_DISTANCE:=10.0
 var orbiting:=false
 var _fire_key_held:=false
 var _right_aim_held:=false
+var _turn_left_held:=false
+var _turn_right_held:=false
 # Comfort rule: track travel independently from airborne capsule height.
 # Normal 1.26m jumps fit inside this vertical zone without moving the camera.
 var camera_anchor:=Vector3.ZERO
@@ -89,7 +91,7 @@ func _process(delta: float) -> void:
 	if rifle_fire!=null:rifle_fire.present(presentation)
 	_update_camera(delta,presentation.display_actor)
 	var visual=player.visual
-	# Camera orbit is observational; locomotion owns the character's heading.
+	# Camera orbit is observational; Q/C and auto-aim own stationary look intent.
 	var state:="RUN" if visual.gait_run_weight>.98 else ("WALK ↔ RUN" if visual.gait_run_weight>.02 else "WALK")
 	if not visual.move_requested:state="SETTLING" if visual.settling else "IDLE"
 	if visual.idle_active and not visual.move_requested:state="RIFLE READY · IDLE" if rifle_ready else "IDLE · LOOK AROUND"
@@ -101,6 +103,7 @@ func _process(delta: float) -> void:
 	hud.text=("RIFLE READY / AIM / FIRE · INFINITE AMMO ∞" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold E Aim + Fire · Right Mouse Aim / Orbit\nWheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
 	if zombie_combat!=null:hud.text+="\nZombies %d · Corpses %d / 4 · Cleared %d · R Restart"%[zombie_combat.living_count(),zombie_combat.active_ragdolls(),zombie_combat.kills]
 	if rifle_auto_aim!=null:hud.text+="\nAuto-aim: "+(rifle_auto_aim.target.name if is_instance_valid(rifle_auto_aim.target) else "nearest zombie while aiming")
+	if rifle_ready:hud.text+="\nQ / C Turn in place · head leads, feet correct >60°"
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
@@ -133,6 +136,13 @@ func _input(event: InputEvent) -> void:
 	# A GUI may consume the key-up after the press began over the world.
 	if event is InputEventKey and (event.physical_keycode==KEY_E or event.keycode==KEY_E) and not event.pressed:
 		_fire_key_held=false;_sync_rifle_controls()
+	if event is InputEventKey and not event.pressed:_turn_key(event)
+func _turn_key(event: InputEventKey) -> void:
+	var code:=event.physical_keycode if event.physical_keycode!=0 else event.keycode
+	if code==KEY_Q:_turn_left_held=event.pressed
+	elif code==KEY_C:_turn_right_held=event.pressed
+	else:return
+	if rifle_ready and is_instance_valid(player):player.visual.turn_axis=float(_turn_left_held)-float(_turn_right_held)
 func _sync_rifle_controls() -> void:
 	if is_instance_valid(player) and rifle_ready:player.visual.set_rifle_aim(_fire_key_held or _right_aim_held)
 	if rifle_fire!=null:rifle_fire.set_trigger(_fire_key_held)
@@ -141,6 +151,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and (event.physical_keycode==KEY_E or event.keycode==KEY_E) and not event.echo:
 		_fire_key_held=event.pressed;_sync_rifle_controls()
+	if event is InputEventKey and not event.echo:_turn_key(event)
 	if event is InputEventMouseButton:
 		if event.button_index==MOUSE_BUTTON_RIGHT:
 			orbiting=event.pressed
@@ -152,11 +163,14 @@ func _unhandled_input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
 		orbiting=false;_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
+		_turn_left_held=false;_turn_right_held=false
+		if rifle_ready and is_instance_valid(player):player.visual.turn_axis=0.
 func reset_player() -> void:
 	if rifle_auto_aim!=null:rifle_auto_aim.reset_target()
 	if rifle_fire!=null:rifle_fire.reset_fire()
 	if zombie_combat!=null:zombie_combat.reset_encounter()
 	_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
+	_turn_left_held=false;_turn_right_held=false
 	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.reset_jump_motion();player.visual.reset_contacts()
 	if presentation!=null: presentation.reset_history()
 	_camera_initialized=false;_update_camera()
