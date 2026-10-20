@@ -301,8 +301,8 @@ func _update_direction_support(delta: float) -> void:
    var bone: int=[leg_left,leg_right][side]
    var pose:=_source_global_pose(bone);var height:=INF
    for point in SOLE_POINTS:height=minf(height,(pose*point).y)
-   var free:=stationary_turn.free_foot(side)
-   if free or height>.035:_source_support[side]=false;released[side]=true
+   var free_leg: bool=stationary_turn.free_foot(side)
+   if free_leg or height>.035:_source_support[side]=false;released[side]=true
    elif height<.025:_source_support[side]=true;released[side]=false
   return
  # Preserve the approved idle's occasional free-leg weight shift.
