@@ -54,6 +54,13 @@ func run() -> void:
 	await ticks(2) # Selection runs before the projectile's lethal hit in a tick.
 	check(aim.target==null,"Last living zombie outside rifle range is not auto-targeted")
 	check(scene.rifle_fire.pool_misses==0,"Auto-aim preserves bounded projectile pools")
+	key(scene,false);scene.reset_player();await ticks(3);key(scene,true)
+	# Real encounter: equally close melee zombies must not make target selection
+	# chatter between headings and starve continuous fire.
+	for i in 540:
+		await ticks(1)
+		if group.living_count()==0:break
+	check(group.living_count()==0,"Held E clears the actual approaching four-zombie encounter without aim chatter")
 	key(scene,false);scene.reset_player();await ticks(3)
 	check(aim.target==null,"Reset leaves no stale target")
 	for i in group.zombies.size():freeze(group.zombies[i],Vector3(3,0,-4) if i==0 else Vector3(25+i*3,0,20))
