@@ -7,7 +7,7 @@ func check(ok:bool,label:String):
  if not ok and not failures.has(label):failures.append(label);push_error(label)
 func advance(scene:Node,input:Vector2,dt:float):
  var a=scene.player;var v=a.visual
- var wanted:=input.limit_length()*a.walk_speed
+ var wanted:Vector2=input.limit_length()*a.walk_speed
  var planar:=Vector2(a.velocity.x,a.velocity.z).move_toward(wanted,(a.deceleration if input.is_zero_approx() else a.acceleration)*dt)
  a.velocity=Vector3(planar.x,0,planar.y);a.position+=a.velocity*dt
  v.drive_jump_motion(a.velocity,not input.is_zero_approx(),{"grounded":true,"body_position":a.position,"vertical_speed":0.,"takeoff":false,"sprinting":false},dt)
