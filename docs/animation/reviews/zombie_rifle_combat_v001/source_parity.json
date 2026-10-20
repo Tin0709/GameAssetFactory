@@ -1,0 +1,8 @@
+{
+	"failures": [],
+	"fixtures": 24,
+	"passed": true,
+	"position_error_m": 0.00000274181365966797,
+	"rotation_quaternion_dot_error": 0.0000000596046447753906,
+	"scale_error": 0.0
+}

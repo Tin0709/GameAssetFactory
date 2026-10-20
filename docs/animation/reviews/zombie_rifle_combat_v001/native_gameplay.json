@@ -1,0 +1,19 @@
+{
+	"actual_projectile_deaths_seen": 2,
+	"cleaned_corpses": 2,
+	"desktop_peak_physics_monitor_ms_not_mobile_benchmark": 455.473,
+	"frames": 360,
+	"jump_camera_y_span": 0.000651657581329346,
+	"landings": 1,
+	"last_corpse_lifetime": 1.2,
+	"max_active_bodies": 7,
+	"max_active_ragdolls": 1,
+	"max_player_speed": 7.54652404785156,
+	"passed": true,
+	"physics_hz": 60,
+	"projectile_pool_misses": 0,
+	"render_fps": 30,
+	"scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+	"source_attack_count_one_zombie": 4,
+	"takeoffs": 1
+}

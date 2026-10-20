@@ -1,0 +1,12 @@
+{
+	"corpse_lifetime": 1.2,
+	"failures": [],
+	"impulse": "(-16.28593, 130.9249, -356.2673)",
+	"maximum_anchor_error_m": 0.0118458373472095,
+	"maximum_ragdolls": 4,
+	"minimum_corner_y": -0.0515994727611542,
+	"native_ground_contact": true,
+	"passed": true,
+	"physics_hz": 60,
+	"source_attack_triggers": 9
+}

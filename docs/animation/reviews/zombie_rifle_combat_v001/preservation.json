@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "files_checked": 7321,
+  "changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd"
+  ],
+  "missing": [],
+  "both_blender_showcases_unchanged": true,
+  "production_worldmap_and_project_settings_unchanged": true
+}
