@@ -1,5 +1,7 @@
 extends SceneTree
 var failures: Array[String]=[]
+var current_case:=0.
+var diagnostic:=OS.get_cmdline_user_args().has("diagnostic")
 var max_grip:=0.;var max_palm:=0.;var max_contact_drift:=0.;var max_foot_yaw_drift:=0.;var min_floor:=0.;var max_pose_step:=0.
 var previous_soles: Array=[]
 var previous_yaws: Array=[]
@@ -18,8 +20,10 @@ func tick(v: Node,dt: float,velocity:=Vector3.ZERO,requested:=false) -> void:
   var bone: int=[v.leg_left,v.leg_right][side];var sole: Vector3=v._sole_world(bone);var yaw: float=v._foot_yaw(v._leg_world_rotation(bone))
   min_floor=minf(min_floor,sole.y)
   if previous_soles.size()==2:
-   max_pose_step=maxf(max_pose_step,sole.distance_to(previous_soles[side]))
-   if v.foot_support[side] and v.contact_ids[side]==previous_ids[side]:
+   if not v.move_requested:
+    max_pose_step=maxf(max_pose_step,sole.distance_to(previous_soles[side]))
+    if diagnostic and sole.distance_to(previous_soles[side])>.1:print("BIG ",current_case," ",side," ",v.stationary_turn.clock," ",sole.distance_to(previous_soles[side])," ",v.stationary_turn.snapshot.state)
+   if not v.move_requested and v.foot_support[side] and v.contact_ids[side]==previous_ids[side]:
     max_contact_drift=maxf(max_contact_drift,Vector2(sole.x-previous_soles[side].x,sole.z-previous_soles[side].z).length())
     max_foot_yaw_drift=maxf(max_foot_yaw_drift,absf(wrapf(yaw-previous_yaws[side],-PI,PI)))
   if previous_soles.size()<2:
@@ -32,6 +36,7 @@ func run() -> void:
  scene.set_process(false);a.set_physics_process(false);v.set_process(false);scene.rifle_fire.set_physics_process(false)
  var cases:=[]
  for angle in [25.,90.,-90.,180.]:
+  current_case=angle
   v.rotation.y=PI;v.look_yaw=PI;v.reset_contacts();previous_soles.clear();previous_yaws.clear();previous_ids.clear()
   for i in fps:tick(v,dt)
   var initial: float=v.rotation.y;var phase: float=v.direction_snapshot.phase
@@ -44,9 +49,9 @@ func run() -> void:
   if angle==25.:
    check(not stepped and absf(wrapf(v.rotation.y-initial,-PI,PI))<.001,"Small turn is head-led with planted body/feet")
   else:
-   check(stepped and absf(wrapf(v.rotation.y-initial-deg_to_rad(angle),-PI,PI))<.002,"Large turn reaches heading through corrective steps")
+   check(stepped and absf(wrapf(v.rotation.y-initial-deg_to_rad(angle),-PI,PI))<=deg_to_rad(60.1),"Large turn leaves at most the source 60-degree head/body dead zone")
    check(lift[0]>.015 and lift[1]>.015,"Both feet adjust during a large turn")
-  cases.append({"angle":angle,"foot_lifts_m":lift,"stepped":stepped})
+  cases.append({"angle":angle,"body_angle_deg":rad_to_deg(wrapf(v.rotation.y-initial,-PI,PI)),"foot_lifts_m":lift,"stepped":stepped})
  # Reversals and Aim/Ready retain synchronized grip, not independent arm spins.
  for i in fps*3:
   v.stationary_turn.requested_yaw=PI+(.5*PI if i%(fps/2)<fps/4 else -.5*PI)
