@@ -98,6 +98,15 @@ static func _math(function: String, a: Array) -> Variant:
 		"min_angle": return fposmod(x + 180.0, 360.0) - 180.0
 		"sign": return float(x > 0.0) - float(x < 0.0)
 		"hermite_blend": return x * x * (3.0 - 2.0 * x)
+		"ease_out_cubic": return x + (float(a[1])-x)*(1.0-pow(1.0-float(a[2]),3.0))
+		"ease_in_out_back":
+			# Standard Back easing adapter. Bedrock documents overshoot semantics,
+			# but does not publish its engine coefficient; this is declared in the audit.
+			var t: float = float(a[2])
+			var c := 1.70158*1.525
+			var u := 2.0*t if t < .5 else 2.0*t-2.0
+			var blend := u*u*((c+1.0)*u-c)*.5 if t < .5 else (u*u*((c+1.0)*u+c)+2.0)*.5
+			return x + (float(a[1])-x)*blend
 	push_error("Unsupported Molang Math function: " + function)
 	return 0.0
 
