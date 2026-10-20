@@ -85,6 +85,15 @@ func run() -> void:
 		attack_count += other.visual.attack_count
 	check(attack_count>=4,"Existing AI triggers requested source Attack at stand-off range")
 	check(not scene.player.is_dead,"Research attacks do not replace approved player health/death gameplay")
+	# Worst admitted burst: all four native graphs die at once and fully retire.
+	var burst_bodies: Array=[]
+	for other in combat.zombies:
+		other.take_damage(999,Vector3.FORWARD)
+		burst_bodies.append_array(other.ragdoll.bodies.values())
+	check(combat.active_ragdolls()==4 and burst_bodies.size()==28,"Fixed encounter bounds a simultaneous burst to28native bodies")
+	await ticks(hz+hz/3)
+	check(combat.zombies.is_empty() and combat.active_ragdolls()==0,"All four corpses cleaned after the short lifetime")
+	for body in burst_bodies:check(not is_instance_valid(body),"Burst cleanup releases every native body/joint")
 	report={"passed":failures.is_empty(),"failures":failures,"physics_hz":hz,"impulse":str(impulse),"minimum_corner_y":min_y,"maximum_anchor_error_m":peak_anchor,"corpse_lifetime":combat.last_corpse_lifetime,"native_ground_contact":saw_contact,"maximum_ragdolls":4,"source_attack_triggers":attack_count}
 	print("ZOMBIE_COMBAT ",JSON.stringify(report))
 	var destination:=OS.get_environment("ZOMBIE_COMBAT_RESULTS")
