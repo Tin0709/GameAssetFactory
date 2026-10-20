@@ -29,6 +29,11 @@ func run() -> void:
 	var barrel: Transform3D=v.skeleton.global_transform*v.skeleton.get_bone_global_pose(v.carrier_bone)
 	var toward: Vector3=(z0.global_position+Vector3(0,1.02,0)-v.socket.muzzle_position()).normalized()
 	check(barrel.basis.y.normalized().dot(toward)>.999,"Actual gun barrel visibly points at nearest target, not redirected invisible bullets")
+	z1.position=Vector3(-2.9,0,0);await ticks(2)
+	check(aim.target==z0,"Nearly equal distances retain a steady target instead of flickering")
+	z1.position=Vector3(-2.6,0,0);await ticks(2)
+	check(aim.target==z1,"A meaningfully closer living target is selected promptly")
+	z1.position=Vector3(0,0,-5);await ticks(2)
 	var camera_before: Vector3=scene.camera_anchor
 	z0.take_damage(999,Vector3.RIGHT);await ticks(2)
 	check(aim.target==z1,"A dead but visible ragdoll is immediately skipped")
