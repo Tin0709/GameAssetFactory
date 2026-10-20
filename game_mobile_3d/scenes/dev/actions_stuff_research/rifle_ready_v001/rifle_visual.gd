@@ -363,7 +363,7 @@ func _replant_clearance(side: int,destination: Vector3) -> float:
  # not the inherited compulsory 35mm step after every directional tap.
  if replant_from[side].y>.006:return 0.
  var distance:=Vector2(destination.x-replant_from[side].x,destination.z-replant_from[side].z).length()
- return smoothstep(.04,.16,distance)*.010
+ return smoothstep(.04,.16,distance)*.008
 func _apply_weapon_carry() -> void:
  pass # The full approved arm/Carrier pose is already in the sole pose writer.
 
