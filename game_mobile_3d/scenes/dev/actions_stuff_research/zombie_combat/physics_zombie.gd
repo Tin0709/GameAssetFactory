@@ -18,6 +18,11 @@ func _ready() -> void:
 	ragdoll = Ragdoll.new()
 	add_child(ragdoll)
 	ragdoll.setup(visual.skeleton)
+	# Lab actors have no living capsule. Here the dormant physical bones must not
+	# collide with their own CharacterBody (or with the player) before handoff.
+	for body in ragdoll.bodies.values():
+		body.collision_layer = 0
+		body.collision_mask = 0
 	ragdoll.sample(1.0 / Engine.physics_ticks_per_second)
 
 func _physics_process(delta: float) -> void:
@@ -61,6 +66,9 @@ func _begin_death(direction: Vector3) -> void:
 
 func _start_physics() -> void:
 	if ragdoll.running or ragdoll.sample_count < 2:return
+	for body in ragdoll.bodies.values():
+		body.collision_layer = 2
+		body.collision_mask = 1
 	# Same 360N·s directional +180N·s upward impulse, weighted once across60kg;
 	# seven rigid parts, six limited joints, inherited velocity, ground-only CCD.
 	ragdoll.begin(RIFLE,pending_direction,"Chest",0.0,9.8)
