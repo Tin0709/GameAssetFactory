@@ -13,10 +13,12 @@
   "paused_frame": 2,
   "rifle_visible": true,
   "observed_frames": [
+    1,
     2,
+    3,
     4,
     5,
-    1,
+    5,
     1,
     2,
     2,
