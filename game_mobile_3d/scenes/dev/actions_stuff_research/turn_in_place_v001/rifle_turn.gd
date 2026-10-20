@@ -21,7 +21,7 @@ var lead_side:=1
 var was_moving:=false
 var quick_turning:=false
 var _combat_pivot_active:=false
-const QUICK_TURN_RATE:=TAU/.20 #180deg in0.10s; E combat priority, not source timing.
+const QUICK_TURN_RATE:=PI/.30 #180deg in0.30s; readable E combat pivot, not source timing.
 func _init(skeleton: Skeleton3D,yaw: float) -> void:
  rig=skeleton;sampler=Sampler.new(rig);future_sampler=Sampler.new(rig)
  sampler.set_snapshot({"layers":[]});neutral=sampler.poses.duplicate()
