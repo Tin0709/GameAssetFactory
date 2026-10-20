@@ -1,0 +1,80 @@
+{
+	"contact_window_zombies": [
+		"ResearchZombie_1",
+		"ResearchZombie_4",
+		"ResearchZombie_3"
+	],
+	"corpse_samples": {
+		"ResearchZombie_1_0.1": {
+			"age": 0.116666666666667,
+			"chest": "(0.129958, 0.952641, 1.236982)"
+		},
+		"ResearchZombie_1_0.35": {
+			"age": 0.35,
+			"chest": "(0.190546, 0.672435, 1.91343)"
+		},
+		"ResearchZombie_1_0.55": {
+			"age": 0.55,
+			"chest": "(0.11924, 0.153312, 2.380799)"
+		},
+		"ResearchZombie_1_0.9": {
+			"age": 0.916666666666668,
+			"chest": "(0.092332, 0.155726, 2.513393)"
+		},
+		"ResearchZombie_2_0.1": {
+			"age": 0.116666666666667,
+			"chest": "(0.891954, 0.909132, 0.793611)"
+		},
+		"ResearchZombie_2_0.35": {
+			"age": 0.35,
+			"chest": "(1.396188, 0.76751, 0.977889)"
+		},
+		"ResearchZombie_2_0.55": {
+			"age": 0.55,
+			"chest": "(1.812635, 0.333152, 1.140726)"
+		},
+		"ResearchZombie_2_0.9": {
+			"age": 0.916666666666668,
+			"chest": "(1.774966, 0.193136, 1.448048)"
+		},
+		"ResearchZombie_3_0.1": {
+			"age": 0.116666666666667,
+			"chest": "(1.29248, 0.947467, 0.302387)"
+		},
+		"ResearchZombie_3_0.35": {
+			"age": 0.35,
+			"chest": "(1.772516, 0.731174, 0.327508)"
+		},
+		"ResearchZombie_3_0.55": {
+			"age": 0.55,
+			"chest": "(2.202812, 0.172599, 0.331585)"
+		},
+		"ResearchZombie_3_0.9": {
+			"age": 0.916666666666668,
+			"chest": "(2.338127, 0.153605, 0.359016)"
+		},
+		"ResearchZombie_4_0.1": {
+			"age": 0.116666666666667,
+			"chest": "(-0.147315, 0.958095, 1.255876)"
+		},
+		"ResearchZombie_4_0.35": {
+			"age": 0.35,
+			"chest": "(-0.006298, 0.302944, 2.023114)"
+		},
+		"ResearchZombie_4_0.55": {
+			"age": 0.55,
+			"chest": "(0.007421, 0.151083, 2.425189)"
+		},
+		"ResearchZombie_4_0.9": {
+			"age": 0.916666666666668,
+			"chest": "(0.015691, 0.154618, 2.480694)"
+		}
+	},
+	"kills": 4,
+	"maximum_corpses": 2,
+	"passed": true,
+	"point_blank_hits": 20,
+	"pool_misses": 0,
+	"shots": 36,
+	"source_attacks_seen": true
+}

@@ -1,0 +1,16 @@
+{
+	"corpse_lifetime": 1.2,
+	"failures": [
+		"Rifle death does not loft the torso like a lightweight balloon",
+		"Heavy core reaches the floor decisively within0.55seconds",
+		"Corpse throw stays short instead of sailing away"
+	],
+	"first_core_ground_contact_s": 0.866666666666668,
+	"impulse": "(0.0, 180.0, -360.0)",
+	"maximum_horizontal_torso_travel_m": 5.77746152877808,
+	"maximum_joint_error_m": 0.0240647066384554,
+	"minimum_corner_y_m": -0.0524342507123947,
+	"passed": false,
+	"peak_torso_rise_m": 0.424864530563354,
+	"physics_hz": 60
+}

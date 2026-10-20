@@ -1,0 +1,61 @@
+{
+	"closest_capsule_centers_m": 0.871533751487732,
+	"directions": [
+		{
+			"attack_count": 3,
+			"attack_start_distances_m": [
+				0.871533751487732,
+				0.871533751487732,
+				0.871533751487732
+			],
+			"contacting_strikes": 3,
+			"direction": "(0.0, 0.0, -1.0)"
+		},
+		{
+			"attack_count": 3,
+			"attack_start_distances_m": [
+				0.871533751487732,
+				0.871533751487732,
+				0.871533751487732
+			],
+			"contacting_strikes": 3,
+			"direction": "(0.0, 0.0, 1.0)"
+		},
+		{
+			"attack_count": 3,
+			"attack_start_distances_m": [
+				0.871533751487732,
+				0.871533751487732,
+				0.871533751487732
+			],
+			"contacting_strikes": 3,
+			"direction": "(-1.0, 0.0, 0.0)"
+		},
+		{
+			"attack_count": 3,
+			"attack_start_distances_m": [
+				0.871533751487732,
+				0.871533751487732,
+				0.871533751487732
+			],
+			"contacting_strikes": 3,
+			"direction": "(1.0, 0.0, 0.0)"
+		}
+	],
+	"failures": [],
+	"group_contacting_zombies": [
+		"ResearchZombie_1",
+		"ResearchZombie_4",
+		"ResearchZombie_3",
+		"ResearchZombie_2"
+	],
+	"group_strikers": [
+		"ResearchZombie_1",
+		"ResearchZombie_4",
+		"ResearchZombie_3",
+		"ResearchZombie_2"
+	],
+	"passed": true,
+	"physics_hz": 60,
+	"render_fps": 0
+}

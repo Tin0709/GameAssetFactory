@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "protected_files": 7315,
+  "unchanged_files": 7308,
+  "changed_existing_files": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/turn_in_place_v001/rifle_turn.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_zombie_combat.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/continuous_fire.gd"
+  ],
+  "missing": [],
+  "blender_and_approved_libraries_unchanged": true,
+  "canonical_lab_and_production_unchanged": true
+}

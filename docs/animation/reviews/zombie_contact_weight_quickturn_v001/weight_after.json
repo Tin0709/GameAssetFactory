@@ -1,0 +1,12 @@
+{
+	"corpse_lifetime": 1.2,
+	"failures": [],
+	"first_core_ground_contact_s": 0.45,
+	"impulse": "(0.0, 48.0, -240.0)",
+	"maximum_horizontal_torso_travel_m": 2.00939583778381,
+	"maximum_joint_error_m": 0.0172881074249744,
+	"minimum_corner_y_m": -0.0638810098171234,
+	"passed": true,
+	"peak_torso_rise_m": 0.0120261907577515,
+	"physics_hz": 60
+}

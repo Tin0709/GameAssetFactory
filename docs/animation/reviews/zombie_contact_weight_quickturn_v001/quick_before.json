@@ -1,0 +1,11 @@
+{
+	"body_ready_s": -1.0,
+	"failures": [
+		"Held E decisively turns toward a zombie180deg behind within0.15seconds",
+		"First shot waits for approved Aim raise, without a long turning delay"
+	],
+	"first_shot_s": -1.0,
+	"passed": false,
+	"physics_hz": 60,
+	"shots": 0
+}
