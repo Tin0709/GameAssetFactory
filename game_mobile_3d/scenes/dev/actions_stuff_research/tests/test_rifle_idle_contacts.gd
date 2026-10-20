@@ -13,6 +13,7 @@ func run() -> void:
  for i in int(26.*fps):
   var t:=i*dt;var moving:=t>12. and t<14.;var velocity:=Vector3(0,0,-a.walk_speed) if moving else Vector3.ZERO
   a.velocity=velocity;a.position+=velocity*dt
+  v.set_rifle_aim(t>20. and t<24.)
   v.drive_jump_motion(velocity,moving,{"grounded":true,"body_position":a.position,"vertical_speed":0.,"takeoff":false,"sprinting":false},dt)
   var settled: bool=not v.move_requested and not v.settling and v.rifle_move_weight<.001 and v.transition_age>.7
   var upper_edges: Array[float]=[INF,-INF]
@@ -24,7 +25,7 @@ func run() -> void:
    min_floor=minf(min_floor,sole.y)
    if settled:
     var correction:=actual.origin-raw.origin
-    max_idle_joint_drag=maxf(max_idle_joint_drag,Vector2(correction.x,correction.z).length())
+    if v.rifle_aim_weight<.001:max_idle_joint_drag=maxf(max_idle_joint_drag,Vector2(correction.x,correction.z).length())
     if not v.foot_support[side]:free_weight_shift+=1
     for x in [-.1125,.1125]:
      for y in [0.,.1]:
