@@ -11,7 +11,7 @@ func run() -> void:
  var fps:=60 if OS.get_cmdline_user_args().has("60") else 30
  var dt:=1./fps
  var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(scene)
- check(scene.get("rifle_fire")!=null,"LMB continuous fire exists in the SAME research scene")
+ check(scene.get("rifle_fire")!=null,"Continuous fire exists in the SAME research scene")
  if not failures.is_empty():scene.free();quit(1);return
  var control=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(control)
  var a=scene.player;var v=a.visual;var gun=scene.rifle_fire
@@ -20,20 +20,34 @@ func run() -> void:
  check(absf(a.walk_speed-2.70)<.001 and absf(a.run_speed-7.55)<.01,"Approved travel speeds retained")
  check(v.rifle_recoil_clip.clip.resource_name=="Rifle_Fire_Recoil_ActionsStyle_v001","Exact approved recoil selected")
  check(v.rifle_recoil_profile.clips.Recoil.action_sha256=="a0d88c8b85796cc670b7495de7ad4b86b3a4d3bd380c811a46eaca5ce97bd277","Latest1.5x source pin")
- var press:=InputEventMouseButton.new();press.button_index=MOUSE_BUTTON_LEFT;press.pressed=true;scene._unhandled_input(press)
- check(gun.trigger_held,"LMB press fires without requiring RMB")
+ var mouse:=InputEventMouseButton.new();mouse.button_index=MOUSE_BUTTON_LEFT;mouse.pressed=true;scene._unhandled_input(mouse)
+ check(not gun.trigger_held,"LMB no longer fires after switching to E");gun.set_trigger(false)
+ var press:=InputEventKey.new();press.keycode=KEY_E;press.physical_keycode=KEY_E;press.pressed=true;scene._unhandled_input(press)
+ check(gun.trigger_held and v.rifle_aim_requested,"Holding E requests both Aim and continuous fire")
+ gun.set_trigger(true)
+ for i in 3:gun.tick(dt)
+ check(gun.shots_fired==0,"Hands-down Ready cannot fire even with a held trigger")
+ v.set_rifle_aim(true);control.player.visual.set_rifle_aim(true)
+ for i in int(.4*fps):
+  var context:={"grounded":true,"body_position":a.position,"vertical_speed":0.,"takeoff":false,"sprinting":false}
+  var before_shot: int=gun.shots_fired
+  v.drive_jump_motion(Vector3.ZERO,false,context,dt);control.player.visual.drive_jump_motion(Vector3.ZERO,false,context,dt);gun.tick(dt)
+  if gun.shots_fired>before_shot:check(v.rifle_aim_weight>=.999,"Every first shot waits for the raised Aim pose")
+ check(gun.shots_fired>0,"Held E starts firing automatically once Aim is raised")
+ var before_hold: int=gun.shots_fired
  var children_before:=root.get_child_count(true);var pool_before: int=gun.get_child_count()
  for i in int(20.*fps):gun.tick(dt)
- check(gun.shots_fired==120,"Held fire remains uninterrupted across120shots, no reload or magazine limit: "+str(gun.shots_fired))
+ check(gun.shots_fired-before_hold==120,"Held fire remains uninterrupted across120shots, no reload or magazine limit: "+str(gun.shots_fired-before_hold))
  check(gun.pool_misses==0,"Continuous fire never exhausts its fixed pools")
  check(gun.get_child_count()==pool_before and root.get_child_count(true)==children_before,"No per-shot nodes accumulate")
  press.pressed=false;scene._unhandled_input(press);var stopped: int=gun.shots_fired
  for i in fps:gun.tick(dt)
- check(gun.shots_fired==stopped,"LMB release stops new shots")
+ check(gun.shots_fired==stopped and not v.rifle_aim_requested,"E release stops shots and lowers Aim")
  gun.set_trigger(true)
- check(scene.has_method("_input"),"Mouse release is caught before a HUD can consume it")
- if scene.has_method("_input"):scene._input(press);check(not gun.trigger_held,"LMB release over UI cannot leave firing stuck")
+ check(scene.has_method("_input"),"E release is caught before a HUD can consume it")
+ if scene.has_method("_input"):scene._input(press);check(not gun.trigger_held,"E release over UI cannot leave firing stuck")
  gun.set_trigger(false)
+ v.set_rifle_aim(true)
  # Rapid clicks must not bypass cooldown; a long stall must not emit a backlog.
  for i in 8:gun.set_trigger(true);gun.tick(.001);gun.set_trigger(false);gun.tick(.001)
  check(gun.shots_fired<=stopped+1,"Click spam obeys the same rate limit")
