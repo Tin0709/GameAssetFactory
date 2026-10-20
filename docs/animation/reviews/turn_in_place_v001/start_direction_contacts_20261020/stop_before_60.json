@@ -1,0 +1,112 @@
+{
+	"cases": [
+		{
+			"direction": "(-1.0, -1.0)",
+			"floor_min_m": -0.0000000596046447753906,
+			"peak_after_stop_m": [
+				0.0947502851486206,
+				0.0353086590766907
+			],
+			"stop_height_m": [
+				0.086111307144165,
+				0.000738561153411865
+			]
+		},
+		{
+			"direction": "(1.0, -1.0)",
+			"floor_min_m": -0.0000000596046447753906,
+			"peak_after_stop_m": [
+				0.0946434140205383,
+				0.0364922285079956
+			],
+			"stop_height_m": [
+				0.0859954953193665,
+				0.00324815511703491
+			]
+		},
+		{
+			"direction": "(0.0, -1.0)",
+			"floor_min_m": -0.0000000596046447753906,
+			"peak_after_stop_m": [
+				0.0947093963623047,
+				0.0364184975624084
+			],
+			"stop_height_m": [
+				0.0860670208930969,
+				0.00309175252914429
+			]
+		},
+		{
+			"direction": "(0.0, 1.0)",
+			"floor_min_m": -0.0000000596046447753906,
+			"peak_after_stop_m": [
+				0.0915862321853638,
+				0.0350697040557861
+			],
+			"stop_height_m": [
+				0.0826816558837891,
+				0.00023186206817627
+			]
+		},
+		{
+			"direction": "(-1.0, 0.0)",
+			"floor_min_m": 0.0,
+			"peak_after_stop_m": [
+				0.0947909355163574,
+				0.0350722074508667
+			],
+			"stop_height_m": [
+				0.0861554145812988,
+				0.000237226486206055
+			]
+		},
+		{
+			"direction": "(1.0, 0.0)",
+			"floor_min_m": 0.0,
+			"peak_after_stop_m": [
+				0.0946415662765503,
+				0.0353595018386841
+			],
+			"stop_height_m": [
+				0.0859934687614441,
+				0.000846326351165771
+			]
+		},
+		{
+			"direction": "(-1.0, 1.0)",
+			"floor_min_m": -0.0000000596046447753906,
+			"peak_after_stop_m": [
+				0.0875313878059387,
+				0.0349603891372681
+			],
+			"stop_height_m": [
+				0.0782864093780518,
+				0.0
+			]
+		},
+		{
+			"direction": "(1.0, 1.0)",
+			"floor_min_m": 0.0,
+			"peak_after_stop_m": [
+				0.0873595476150513,
+				0.0351372957229614
+			],
+			"stop_height_m": [
+				0.0781001448631287,
+				0.000375092029571533
+			]
+		}
+	],
+	"failures": [
+		"A grounded foot must not take an extra corrective step after a short tap: (-1.0, -1.0) side 1",
+		"A grounded foot must not take an extra corrective step after a short tap: (1.0, -1.0) side 1",
+		"A grounded foot must not take an extra corrective step after a short tap: (0.0, -1.0) side 1",
+		"A grounded foot must not take an extra corrective step after a short tap: (0.0, 1.0) side 1",
+		"A grounded foot must not take an extra corrective step after a short tap: (-1.0, 0.0) side 1",
+		"A grounded foot must not take an extra corrective step after a short tap: (1.0, 0.0) side 1",
+		"A grounded foot must not take an extra corrective step after a short tap: (-1.0, 1.0) side 1",
+		"A grounded foot must not take an extra corrective step after a short tap: (1.0, 1.0) side 1"
+	],
+	"fps": 60,
+	"passed": false
+}

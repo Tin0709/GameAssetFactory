@@ -1,0 +1,20 @@
+{
+  "micro_before": {
+    "native_render_fps": 30,
+    "physics_hz": 60,
+    "moving_planted_heading_lag_deg": 21.819625352948037,
+    "post_stop_peak_height_m": [
+      0.0355303883552551,
+      0.0103206634521484
+    ]
+  },
+  "final_micro": {
+    "native_render_fps": 30,
+    "physics_hz": 60,
+    "moving_planted_heading_lag_deg": 4.421130971645994,
+    "post_stop_peak_height_m": [
+      0.00120866298675537,
+      0.000460028648376465
+    ]
+  }
+}
