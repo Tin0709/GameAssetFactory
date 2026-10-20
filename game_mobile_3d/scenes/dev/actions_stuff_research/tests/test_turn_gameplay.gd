@@ -24,7 +24,9 @@ func tick(v: Node,dt: float,velocity:=Vector3.ZERO,requested:=false) -> void:
     max_pose_step=maxf(max_pose_step,sole.distance_to(previous_soles[side]))
     if diagnostic and sole.distance_to(previous_soles[side])>.1:print("BIG ",current_case," ",side," ",v.stationary_turn.clock," ",sole.distance_to(previous_soles[side])," ",v.stationary_turn.snapshot.state)
    if not v.move_requested and v.foot_support[side] and v.contact_ids[side]==previous_ids[side]:
-    max_contact_drift=maxf(max_contact_drift,Vector2(sole.x-previous_soles[side].x,sole.z-previous_soles[side].z).length())
+    var drift:=Vector2(sole.x-previous_soles[side].x,sole.z-previous_soles[side].z).length()
+    max_contact_drift=maxf(max_contact_drift,drift)
+    if diagnostic and drift>.008:print("DRIFT ",current_case," ",side," ",v.stationary_turn.clock," ",drift," budget ",v.maximum_correction," clamp ",v.correction_clamps," at ",sole," anchor ",v.foot_anchors[side])
     max_foot_yaw_drift=maxf(max_foot_yaw_drift,absf(wrapf(yaw-previous_yaws[side],-PI,PI)))
   if previous_soles.size()<2:
    previous_soles.append(sole);previous_yaws.append(yaw);previous_ids.append(v.contact_ids[side])
