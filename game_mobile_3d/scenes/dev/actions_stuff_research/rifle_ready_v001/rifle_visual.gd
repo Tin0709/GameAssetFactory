@@ -26,6 +26,8 @@ var forearm_right: int
 var carrier_bone: int
 var rifle_ground_poses: Array=[]
 var rifle_ground_future: Array=[]
+var _rifle_idle_poses: Array=[]
+var _rifle_idle_future: Array=[]
 var _rifle_driving:=false
 var rifle_aim_clip: RefCounted
 var rifle_aim_profile: Dictionary={}
@@ -97,9 +99,13 @@ func _sample_set(ahead: float=0.) -> Array:
  var phase:=float(direction_snapshot.get("phase",0.))+ahead*gait_frequency
  var ti:=_clip_time("Idle",phase,ahead);var tw:=_clip_time("Walk",phase);var tr:=_clip_time("Run",phase)
  var poses: Array=[]
+ var idle_poses: Array=[]
  for bone in skeleton.get_bone_count():
   var ip: Transform3D=rifle_clips.Idle.pose(bone,ti);var wp: Transform3D=rifle_clips.Walk.pose(bone,tw);var rp: Transform3D=rifle_clips.Run.pose(bone,tr)
+  idle_poses.append(ip)
   poses.append(ip.interpolate_with(wp.interpolate_with(rp,gait_run_weight),rifle_move_weight))
+ if ahead==0.:_rifle_idle_poses=idle_poses
+ else:_rifle_idle_future=idle_poses
  if ahead==0.:
   rifle_support_anchor=Vector3(rifle_clips.Idle.support(ti)).lerp(Vector3(rifle_clips.Walk.support(tw)).lerp(rifle_clips.Run.support(tr),gait_run_weight),rifle_move_weight)
   rifle_carrier_attachment=carrier_in_right_arm
@@ -158,6 +164,20 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  _evaluate(delta)
  if presentation!=null:presentation.capture()
 
+func _idle_foot_lateral_speed(bone: int) -> float:
+ # Use the actual Idle clip before Aim's hip overlay. Otherwise a Ready/Aim
+ # crossfade could release both planted feet merely because the body moved.
+ if _rifle_idle_poses.is_empty() or _rifle_idle_future.is_empty():return 0.
+ var pose: Transform3D=_rifle_idle_poses[bone]
+ var future: Transform3D=_rifle_idle_future[bone]
+ var parent:=skeleton.get_bone_parent(bone)
+ while parent>=0:
+  pose=Transform3D(_rifle_idle_poses[parent])*pose
+  future=Transform3D(_rifle_idle_future[parent])*future
+  parent=skeleton.get_bone_parent(parent)
+ var motion: Vector3=(future*Vector3(0,.675,0)-pose*Vector3(0,.675,0))/.004
+ return Vector2(motion.x,motion.z).length()
+
 func _update_direction_support(delta: float) -> void:
  if _rifle_driving:return
  if move_requested:super._update_direction_support(delta);return
@@ -166,7 +186,11 @@ func _update_direction_support(delta: float) -> void:
   var bone: int=[leg_left,leg_right][side];var pose:=_source_global_pose(bone);var height:=INF
   for point in SOLE_POINTS:height=minf(height,(pose*point).y)
   var rise:=height-_source_sole_previous[side];_source_sole_previous[side]=height
-  if height>.035:_source_support[side]=false;released[side]=true
+  # The approved Idle has a low-clearance lateral foot reposition. Height
+  # alone misses it and drags the leg root inward against an obsolete anchor.
+  # Follow that authored free foot; replant when its lateral motion settles.
+  var repositioning:=rifle_move_weight<.001 and not settling and not jump_active and _idle_foot_lateral_speed(bone)>.025
+  if height>.035 or repositioning:_source_support[side]=false;released[side]=true
   elif height<.02 and rise<.004:_source_support[side]=true;released[side]=false
 func _support(side: int) -> bool:
  if rifle_clips.is_empty():return super._support(side)
