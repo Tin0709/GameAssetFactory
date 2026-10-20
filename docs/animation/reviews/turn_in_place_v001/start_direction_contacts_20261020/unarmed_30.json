@@ -1,0 +1,11 @@
+{
+  "average_pose_and_controller_ms": 3.49177222222222,
+  "failures": [],
+  "final_phase": 27.3638032227429,
+  "fps": 30,
+  "max_world_leg_step_deg": 47.4227308225451,
+  "maximum_scale": 1.06902384757996,
+  "minimum_foot_y": -5.96046447753906e-8,
+  "side_and_back_used": true,
+  "support_samples": 15
+}
