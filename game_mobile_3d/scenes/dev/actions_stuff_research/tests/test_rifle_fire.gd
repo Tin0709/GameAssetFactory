@@ -35,7 +35,7 @@ func run() -> void:
  check(gun.shots_fired==before_stall+1,"A stalled frame emits at most one shot")
  scene.reset_player();check(not gun.trigger_held and gun.active_projectiles()==0,"Reset cancels firing and pooled projectiles")
  # Repeated recoil while using real Ready/Aim, gait, direction and jump layers.
- var grip_error:=0.;var support_error:=0.;var saw_air:=false;var saw_run:=false;var previous_camera:=scene.camera_anchor.y;var camera_span:=0.
+ var grip_error:=0.;var support_error:=0.;var saw_air:=false;var saw_run:=false;var previous_camera: float=scene.camera_anchor.y;var camera_span:=0.
  var palm:=Vector3(v.rifle_profile.palm_forearm_local[0],v.rifle_profile.palm_forearm_local[1],v.rifle_profile.palm_forearm_local[2])
  gun.set_trigger(true)
  for i in int(8.*fps):
