@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "angle": 25.0,
+      "fps": 30,
+      "max_body": 0.0,
+      "steps": 0
+    },
+    {
+      "angle": 90.0,
+      "fps": 30,
+      "max_body": 98.6735927466667,
+      "steps": 1
+    },
+    {
+      "angle": -90.0,
+      "fps": 30,
+      "max_body": 98.6735927466667,
+      "steps": 1
+    },
+    {
+      "angle": 180.0,
+      "fps": 30,
+      "max_body": 188.673592746667,
+      "steps": 2
+    },
+    {
+      "angle": 25.0,
+      "fps": 60,
+      "max_body": 0.0,
+      "steps": 0
+    },
+    {
+      "angle": 90.0,
+      "fps": 60,
+      "max_body": 98.9893936533333,
+      "steps": 1
+    },
+    {
+      "angle": -90.0,
+      "fps": 60,
+      "max_body": 98.9893936533333,
+      "steps": 1
+    },
+    {
+      "angle": 180.0,
+      "fps": 60,
+      "max_body": 188.989393653333,
+      "steps": 2
+    }
+  ],
+  "failures": [],
+  "passed": true
+}

@@ -1,0 +1,15 @@
+{
+  "failures": [],
+  "reports": [
+    {
+      "fps": 30,
+      "normal_jump_camera_y_range": 0.0,
+      "normal_jump_max_y_step": 0.0
+    },
+    {
+      "fps": 60,
+      "normal_jump_camera_y_range": 0.0,
+      "normal_jump_max_y_step": 0.0
+    }
+  ]
+}

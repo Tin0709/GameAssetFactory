@@ -48,7 +48,7 @@ A gradual90° look request can trigger its step as soon as the gap exceeds60°, 
 
 Existing continuous-fire30/60, automatic target/LOS/death/approaching encounter30/60 and camera30/60 regressions pass. Infinite6Hz fire,2.70/~7.55m/s, approved animation1× and jump/camera parameters remain. Native Metal Mobile captures at30/60FPS exercise manual turns, Aim, auto-target combat/recoil, Run and Jump/Landing with source footsteps. Numeric reports are saved alongside this README.
 
-The combined native move/jump/stop sequence has one8.64mm replant adjustment from the inherited140mm contact-safety cap; foot yaw stays within0.02° per planted sample. The isolated turn tests have no such slip. Do not remove that protective cap or claim perfect all-terrain contact. Flat research floor only; no phone performance certification. Native physics timing measures desktop auto-aim/player/fire work between priority−2 and+2, excluding the later zombie pass and rendering; it is not total mobile frame time.
+The combined native move/jump/stop sequence has one8.64mm replant adjustment from the inherited140mm contact-safety cap; foot yaw stays within0.02° per planted sample. The isolated turn tests have no such slip. Do not remove that protective cap or claim perfect all-terrain contact. Flat research floor only; no phone performance certification. Native timing measures desktop scene physics callbacks between priorities−2 and+2 (including the current zombie callbacks), excluding physics-server integration and rendering; it is not total mobile frame time.
 
 Run checks with Godot4.7.2, e.g.:
 
