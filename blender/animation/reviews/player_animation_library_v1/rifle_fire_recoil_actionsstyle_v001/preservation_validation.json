@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "protected_existing_files": 7007,
+  "existing_files_preserved": 7007,
   "godot_files": 2017,
-  "changed_or_missing": []
+  "changed": []
 }

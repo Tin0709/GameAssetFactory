@@ -1,32 +1,32 @@
 [
   {
     "decoded_frames": 180,
-    "distinct_sampled_pixel_hashes": 152,
+    "distinct_sampled_pixel_hashes": 153,
     "duration_s": 6,
     "file": "recoil_front_30fps_1x.mp4",
     "fps": 30,
     "max_timestamp_step_error_s": 7.7021722333370235e-16,
     "passed": true,
-    "sha256": "4b9bba28c9cf5bcf6207ee66092ca1f9ce8abc857be22df194be834f1e5f3f5f"
+    "sha256": "d9ffcc29a4d12557773e1c7427c42648a513121e4fd82de9090ad439f195e9d8"
   },
   {
     "decoded_frames": 180,
-    "distinct_sampled_pixel_hashes": 139,
+    "distinct_sampled_pixel_hashes": 140,
     "duration_s": 6,
     "file": "recoil_three_quarter_30fps_1x.mp4",
     "fps": 30,
     "max_timestamp_step_error_s": 7.7021722333370235e-16,
     "passed": true,
-    "sha256": "0055db23b3fde325e724a1a036d54a9b3cbb8f9d1010186ed57c94aeb3676db7"
+    "sha256": "aa4a2fcaf95a116a2464b39af4d48c2c8726c0be8143bc9a5d8814ef5f02bbbc"
   },
   {
     "decoded_frames": 180,
-    "distinct_sampled_pixel_hashes": 148,
+    "distinct_sampled_pixel_hashes": 151,
     "duration_s": 6,
     "file": "recoil_side_30fps_1x.mp4",
     "fps": 30,
     "max_timestamp_step_error_s": 7.7021722333370235e-16,
     "passed": true,
-    "sha256": "af5879eea1239ade69153a824d18fbbbdf18d7eb769bf12d59e0af6330722dd1"
+    "sha256": "72d830ee9ec070632488bda733ab3c91c975ea4fbecaebc959a10b184cd22d28"
   }
 ]
