@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "one_new_pending_action": "Rifle_Fire_Recoil_ActionsStyle_v001",
+  "old_manifest_entries_exact": true,
+  "source_sha256": "99d70756ab7b4c8e37a4f2155e6d398f17dfe284f9a3db863be87a52122c1fff",
+  "action_sha256": "e079c1be4ae3af70a0e400a7f1c958b7c40a85ee6b6bc4f10980f90cf1ed5ba6",
+  "native_reopened_played_2_loops": true,
+  "previous_91_native_actions_preserved": true,
+  "old_7007_files_preserved": true,
+  "godot_2017_files_preserved": true,
+  "review_videos_3_views_180_frames_30fps": true,
+  "no_additional_scene_project": true
+}

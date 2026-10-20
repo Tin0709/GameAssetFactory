@@ -26,7 +26,7 @@ This is a short shot on a frozen approved Aim sample, not a replacement for the 
 
 `validation.json` records 81 evaluated poses at 480 Hz, exact entry/exit and loop boundaries, 20 repeated NLA cycles without accumulation, rigid arms, grip/support, head clearance and unchanged foot vertices. The minimum head–rifle gap is 10.775 mm. Existing approved cube-to-cube contact/seating is retained, not advertised as a completely intersection-free production fit. The base’s sole corners remain 4.12 mm / 0.77 mm below its existing display floor; this task deliberately does not edit approved lower-body data.
 
-All 22 prior Actions embedded in the authoring source and every earlier central Showcase Action/asset are preserved. The source package, central registration/reopen and decoded media have separate verification reports. Existing gameplay, movement speeds, camera, grip and transitions are unchanged. No Godot Fire/Recoil integration is included.
+All 22 prior Actions embedded in the authoring source and every earlier central Showcase Action/asset are preserved. The saved central file was reopened in native Blender, the approved Aim was reselected independently, and the new Pending Action played two natural loops at 30 FPS with the actual rifle visible. See `registration.json`, `native_playback_validation.json`, `preservation_validation.json` and `media_validation.json`. Existing gameplay, movement speeds, camera, grip and transitions are unchanged. No Godot Fire/Recoil integration is included.
 
 ## Reproduce
 

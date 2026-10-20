@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "native_saved_file_reopened": true,
+  "approved_aim_reselected_and_preserved": true,
+  "fps": 30,
+  "range": [
+    1,
+    5
+  ],
+  "full_natural_wraps": 2,
+  "selected": "Rifle_Fire_Recoil_ActionsStyle_v001",
+  "status": "pending",
+  "paused_frame": 2,
+  "rifle_visible": true,
+  "observed_frames": [
+    2,
+    4,
+    5,
+    1,
+    1,
+    2,
+    2,
+    3,
+    4,
+    4,
+    5,
+    1
+  ]
+}
