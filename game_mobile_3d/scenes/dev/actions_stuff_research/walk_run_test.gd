@@ -64,8 +64,10 @@ func _build_environment() -> void:
 	settings.tonemap_mode=Environment.TONE_MAPPER_FILMIC;environment.environment=settings;add_child(environment)
 	var sun:=DirectionalLight3D.new();sun.rotation_degrees=Vector3(-55,-35,0);sun.light_color=Color(1.,.94,.85);sun.light_energy=1.3;sun.shadow_enabled=true;sun.directional_shadow_max_distance=35.;add_child(sun)
 	var floor_body:=StaticBody3D.new();floor_body.name="FlatGround";add_child(floor_body)
-	var shape:=BoxShape3D.new();shape.size=Vector3(200,.2,200)
-	var collision:=CollisionShape3D.new();collision.shape=shape;collision.position.y=-.1;floor_body.add_child(collision)
+	# Same surface atY0; use the Lab's thicker contact slab and recovery bias
+	# for its fast native corpse impulses. Player floor height/physics stay exact.
+	var shape:=BoxShape3D.new();shape.size=Vector3(200,.4,200);shape.custom_solver_bias=.6
+	var collision:=CollisionShape3D.new();collision.shape=shape;collision.position.y=-.2;floor_body.add_child(collision)
 	var ground:=MeshInstance3D.new();var mesh:=PlaneMesh.new();mesh.size=Vector2(200,200);ground.mesh=mesh
 	var material:=StandardMaterial3D.new();material.albedo_color=Color(.31,.38,.39);material.roughness=1.;ground.material_override=material;floor_body.add_child(ground)
 	# Quiet metre markers reveal travel and sliding without competing with the pose.
