@@ -47,6 +47,12 @@ func run() -> void:
  check(scene.has_method("_input"),"E release is caught before a HUD can consume it")
  if scene.has_method("_input"):scene._input(press);check(not gun.trigger_held,"E release over UI cannot leave firing stuck")
  gun.set_trigger(false)
+ var right:=InputEventMouseButton.new();right.button_index=MOUSE_BUTTON_RIGHT;right.pressed=true;scene._unhandled_input(right)
+ press.pressed=true;scene._unhandled_input(press);right.pressed=false;scene._unhandled_input(right)
+ check(v.rifle_aim_requested and gun.trigger_held,"RMB release cannot cancel held E Aim/fire")
+ right.pressed=true;scene._unhandled_input(right);press.pressed=false;scene._unhandled_input(press)
+ check(v.rifle_aim_requested and not gun.trigger_held,"E release stops firing while separately held RMB keeps Aim")
+ right.pressed=false;scene._unhandled_input(right)
  v.set_rifle_aim(true)
  # Rapid clicks must not bypass cooldown; a long stall must not emit a backlog.
  for i in 8:gun.set_trigger(true);gun.tick(.001);gun.set_trigger(false);gun.tick(.001)
