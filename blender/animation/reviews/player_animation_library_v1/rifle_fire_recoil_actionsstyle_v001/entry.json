@@ -34,8 +34,8 @@
   "end": 5,
   "fps": 30,
   "fps_base": 1.0,
-  "status": "pending",
-  "approval_note": "New original rifle recoil on the approved research Aim base; Pending artistic review. No Godot integration.",
+  "status": "approved",
+  "approval_note": "User explicitly artistically approved latest1.5x recoil; integrate continuous infinite-ammo fire in existing research scene. Approved source Action unchanged.",
   "seamless_loop": true,
   "research_only": true,
   "production_eligible": false,
@@ -86,5 +86,6 @@
     "repeat_demo_hz": 6.0,
     "origin": "All recoil envelopes, amplitudes and coordination authored originally; source crossbow used for principles only."
   },
-  "review_repeat_hz": 6.0
+  "review_repeat_hz": 6.0,
+  "approval_date": "2026-10-20"
 }
