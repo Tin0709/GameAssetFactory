@@ -4,7 +4,7 @@ extends Node3D
 const ZOMBIE = preload("res://scenes/characters/CuboidZombie.tscn")
 const PHYSICS_ZOMBIE = preload("res://scenes/dev/actions_stuff_research/zombie_combat/physics_zombie.gd")
 const SOURCE_VISUAL = preload("res://scenes/dev/actions_stuff_research/zombie_combat/source_visual.gd")
-const SPAWNS := [Vector3(-1.6,0,-3.0),Vector3(1.5,0,-3.8),Vector3(3.1,0,1.6),Vector3(-3.2,0,1.5)]
+const SPAWNS := [Vector3(.1,0,-3.4),Vector3(1.5,0,-3.8),Vector3(3.1,0,1.6),Vector3(-3.2,0,1.5)]
 const MAX_RAGDOLLS := 4
 var zombies: Array[CharacterBody3D] = []
 var player: CharacterBody3D
