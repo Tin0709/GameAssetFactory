@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "existing_files": 6987,
+  "intentional_changed_files": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd",
+    "blender/animation/reviews/player_animation_library_v1/rifle_fire_recoil_actionsstyle_v001/entry.json",
+    "blender/animation/reviews/player_animation_library_v1/rifle_fire_recoil_actionsstyle_v001/README.md"
+  ],
+  "unexpected_changed_files": [],
+  "production_scripts_assets_and_WorldMap_preserved": true
+}

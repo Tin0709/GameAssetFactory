@@ -1,0 +1,17 @@
+{
+	"actual_collision_landings": 1,
+	"actual_collision_takeoffs": 1,
+	"combined_input": "Hold E",
+	"fps": 30,
+	"frames": 300,
+	"hits": 49,
+	"jump_camera_y_span": 0.00105541944503784,
+	"max_projectiles": 5,
+	"max_speed": 7.54789304733276,
+	"minimum_aim_weight_when_firing": 1.0,
+	"node_count_constant": true,
+	"passed": true,
+	"pool_misses": 0,
+	"scene": "res://scenes/dev/ActionsStuffWalkRunTest.tscn",
+	"shots": 50
+}
