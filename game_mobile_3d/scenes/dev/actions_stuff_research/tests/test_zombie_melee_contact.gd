@@ -64,7 +64,7 @@ func run()->void:
  check(group_contacts.size()>=2,"Several zombies make actual hand contact in the four-zombie encounter")
  check(not scene.player.is_dead,"Research attack still preserves existing player health behavior")
  check(absf(scene.player.walk_speed-2.70)<.001 and absf(scene.player.run_speed-7.55)<.01,"Player movement speeds stay approved")
- var report:={"passed":failures.is_empty(),"failures":failures,"render_fps":Engine.max_fps,"physics_hz":Engine.physics_ticks_per_second,"directions":reports,"closest_capsule_centers_m":closest,"group_strikers":group_strikers.keys(),"group_contacting_zombies":group_contacts.keys()}
+ var report:={"passed":failures.is_empty(),"failures":failures,"render_fps":30 if OS.get_cmdline_user_args().has("30") else 60,"physics_hz":Engine.physics_ticks_per_second,"directions":reports,"closest_capsule_centers_m":closest,"group_strikers":group_strikers.keys(),"group_contacting_zombies":group_contacts.keys()}
  print("ZOMBIE_MELEE_CONTACT ",JSON.stringify(report))
  var path:=OS.get_environment("ZOMBIE_MELEE_RESULTS")
  if not path.is_empty():FileAccess.open(path,FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
