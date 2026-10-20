@@ -1,0 +1,127 @@
+{
+	"bones": [
+		"Root",
+		"Hips",
+		"Spine",
+		"Chest",
+		"Neck",
+		"Head",
+		"Arm.L",
+		"ForeArm.L",
+		"Arm.R",
+		"ForeArm.R",
+		"WeaponCarrier",
+		"Leg.L",
+		"Leg.R"
+	],
+	"carrier_in_right_arm_first_sample": [
+		[
+			0.999048173427582,
+			0.0435927771031856,
+			-0.00152224022895097,
+			-0.0000000540167093276978
+		],
+		[
+			-0.0436192862689495,
+			0.998439729213715,
+			-0.0348662436008453,
+			0.539200365543365
+		],
+		[
+			-0.0000000353902578353882,
+			0.0348994620144367,
+			0.999390721321106,
+			0.0163898598402739
+		],
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		]
+	],
+	"clips": {
+		"Recoil": {
+			"action": "Rifle_Fire_Recoil_ActionsStyle_v001",
+			"action_sha256": "a0d88c8b85796cc670b7495de7ad4b86b3a4d3bd380c811a46eaca5ce97bd277",
+			"duration": 0.166666666666667,
+			"loop": false,
+			"phase_origin": 0.0,
+			"phase_rate": 0.0,
+			"row_floats": 134.0,
+			"samples": 42.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/rifle_fire_recoil_actionsstyle_v001/rifle_fire_recoil_actionsstyle_v001.blend",
+			"source_sha256": "4f4fe6530a9787737f6293a264f56b6416253261c0efc2b26882f11806a28cea"
+		}
+	},
+	"forearm_left_rest": [
+		[
+			1.0,
+			0.0,
+			-0.000000000000014210854715202,
+			0.0
+		],
+		[
+			0.0,
+			0.999999940395355,
+			0.0,
+			0.337499976158142
+		],
+		[
+			0.000000000000014210854715202,
+			0.0,
+			1.0,
+			0.0
+		],
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		]
+	],
+	"note": "Runtime samples the evaluated recoil arm-relative attachment at every time; no static mount assumption.",
+	"palm_forearm_local": [
+		0.0,
+		0.263249933719635,
+		0.0
+	],
+	"production_eligible": false,
+	"research_only": true,
+	"rifle_asset": "res://assets/weapons/rifle_stylized_v2_test/Rifle_Stylized_V2.glb",
+	"schema": 1.0,
+	"shoulder_left_chest_local": [
+		0.337499976158142,
+		0.28124988079071,
+		0.0
+	],
+	"shoulder_outset_m": 0.004,
+	"source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+	"weapon_mount": [
+		[
+			1.0,
+			-0.0000000023283066585833,
+			-0.00000000279396772384644,
+			-0.0000000158324837684631
+		],
+		[
+			0.00000000279396772384644,
+			-0.0000000398696862191628,
+			-1.00000011920929,
+			0.0000000186264514923096
+		],
+		[
+			0.000000000931322574615478,
+			1.0,
+			-0.0000000640840696064515,
+			0.00000000651925802230835
+		],
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		]
+	],
+	"weapon_source_sha256": "0d8c2d0fb05e8be82d5c2a3485eb3cd1a40acdc70c1e656ed2f4322e17bad03f"
+}
