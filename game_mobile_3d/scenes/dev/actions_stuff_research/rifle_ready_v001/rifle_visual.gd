@@ -312,10 +312,6 @@ func _idle_foot_lateral_speed(bone: int) -> float:
 func _update_direction_support(delta: float) -> void:
  if _rifle_driving:return
  if move_requested:super._update_direction_support(delta);return
- # The approved rifle Idle already recovers the free foot. The inherited
- # Expressive stop adds two compulsory 35mm steps, even after a tiny tap;
- # interrupting those steps feeds a spurious kick into the next start.
- settling=false
  if stationary_turn!=null and stationary_turn.quick_turning:
   # Combat input outranks the long observational step sequence. Release old
   # anchors for the brief pivot, then replant through the existing floor solve.
@@ -349,6 +345,13 @@ func _update_direction_support(delta: float) -> void:
 func _support(side: int) -> bool:
  if rifle_clips.is_empty():return super._support(side)
  return jump_grounded and _source_support[side] and not released[side]
+func _replant_clearance(side: int,destination: Vector3) -> float:
+ # A free foot already has clearance: lower it directly instead of lifting
+ # it again. A grounded foot only needs a small lift for a real stance change,
+ # not the inherited compulsory 35mm step after every directional tap.
+ if replant_from[side].y>.006:return 0.
+ var distance:=Vector2(destination.x-replant_from[side].x,destination.z-replant_from[side].z).length()
+ return smoothstep(.04,.16,distance)*.010
 func _apply_weapon_carry() -> void:
  pass # The full approved arm/Carrier pose is already in the sole pose writer.
 

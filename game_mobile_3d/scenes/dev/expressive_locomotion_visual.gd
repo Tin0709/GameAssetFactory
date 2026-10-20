@@ -277,7 +277,7 @@ func _evaluate(delta: float) -> void:
 			var eased:=u*u*u*(10+u*(-15+6*u))
 			# Current uncorrected destination tends to the exact approved Idle pose.
 			target=replant_from[side].lerp(Vector3(sole.x,0,sole.z),eased)
-			target.y=lerpf(replant_from[side].y,0,eased)+sin(PI*u)*.035
+			target.y=lerpf(replant_from[side].y,0,eased)+sin(PI*u)*_replant_clearance(side,sole)
 			var global_q:=replant_q[side].slerp(_leg_world_rotation(bone),eased).normalized()
 			_set_world_leg_rotation(bone,global_q)
 			sole=_sole_world(bone)
@@ -320,6 +320,9 @@ func _evaluate(delta: float) -> void:
 			_final_vp[bone]=(p-_final_p[bone])/delta;_final_vq[bone]=_rotvec(q*_final_q[bone].inverse())/delta
 		_final_p[bone]=p;_final_q[bone]=q
 	if socket!=null:socket.on_skeleton_update();socket.sync_transport_sockets()
+
+func _replant_clearance(_side: int,_destination: Vector3) -> float:
+	return .035
 
 func _limit_contact_correction(correction: Vector3) -> Vector3:
 	return correction.limit_length(.14)
