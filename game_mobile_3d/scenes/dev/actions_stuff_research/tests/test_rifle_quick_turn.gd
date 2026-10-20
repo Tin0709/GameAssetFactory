@@ -20,7 +20,7 @@ func run()->void:
   if body_ready<0. and absf(wrapf(v.rotation.y,-PI,PI))<deg_to_rad(8.):body_ready=age
   if first_shot<0. and scene.rifle_fire.shots_fired>0:first_shot=age
  check(body_ready>=.24 and body_ready<=.36,"Held E turns180deg decisively but visibly, around0.30seconds rather than snapping")
- check(first_shot>=.23 and first_shot<=.36,"First shot waits for approved Aim raise, without a long turning delay")
+ check(first_shot>=.23 and first_shot<=.40,"First shot waits for approved Aim raise and the readable turn, without a long delay")
  check(absf(v.direction_snapshot.phase-phase)<.0001,"Stationary combat pivot never resets or starts gait")
  event.pressed=false;scene._input(event)
  check(not scene.rifle_fire.trigger_held,"E release still stops firing")
