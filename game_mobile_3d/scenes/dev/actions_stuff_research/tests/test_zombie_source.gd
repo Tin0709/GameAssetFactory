@@ -19,7 +19,9 @@ func run() -> void:
 			var expected:=Quaternion(p[3],p[4],p[5],p[6]).normalized()
 			rotation_error=maxf(rotation_error,1.0-absf(expected.dot(sampler.rotation(bone,f.time))))
 			scale_error=maxf(scale_error,sampler.scale(bone,f.time).distance_to(Vector3(p[7],p[8],p[9])))
-	check(position_error<.000002 and rotation_error<.000002 and scale_error<.000002,"All evaluated Blender PRS fixtures retained on original10bone rig")
+	# Float32 times near18s quantize by~1µs; high-slope source translations
+	# therefore interpolate a fewµm away from the original double-time fixture.
+	check(position_error<.000005 and rotation_error<.000002 and scale_error<.000002,"All evaluated Blender PRS fixtures retained on original10bone rig")
 	check(v.source_library.get_animation("Idle").resource_name=="Zombie_Idle_ActionsStuff_Source_Test_v001","Exact requested Idle")
 	check(v.source_library.get_animation("Walk").resource_name=="Zombie_Walk_ActionsStuff_Source_Test_v001","Exact requested Walk")
 	check(v.source_library.get_animation("Attack").resource_name=="Zombie_Attack_Player_A&S_Reference_v001","Exact requested Attack")
