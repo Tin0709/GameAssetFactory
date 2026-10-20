@@ -1,0 +1,79 @@
+extends SceneTree
+## Actual scene, actual swept rifle projectiles and native Lab death bodies.
+var failures: Array[String] = []
+var report := {}
+func _initialize() -> void: call_deferred("run")
+func check(ok: bool, message: String) -> void:
+	if not ok and not failures.has(message): failures.append(message);push_error(message)
+func ticks(count: int) -> void:
+	for i in count: await physics_frame
+	await process_frame
+func run() -> void:
+	var scene = load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate()
+	root.add_child(scene)
+	var combat = scene.get("zombie_combat")
+	check(combat != null,"Existing research scene contains zombie combat")
+	if combat == null: scene.free();quit(1);return
+	var hz := Engine.physics_ticks_per_second
+	scene.player.scripted_input = true
+	await ticks(15)
+	check(combat.zombies.size() == 4,"Small fixed group of four zombies")
+	for z in combat.zombies:
+		z.target = null;z.move_speed = 0.0
+		z.position = Vector3(20,0,20)
+	var z = combat.zombies[0]
+	var aim := InputEventKey.new();aim.keycode=KEY_E;aim.physical_keycode=KEY_E;aim.pressed=true
+	scene._unhandled_input(aim)
+	await ticks(25)
+	var v = scene.player.visual
+	var carrier: Transform3D = v.skeleton.global_transform * v.skeleton.get_bone_global_pose(v.carrier_bone)
+	var direction := carrier.basis.y.normalized()
+	z.position = v.socket.muzzle_position()+direction*2.5
+	z.position.y = 0.0
+	await ticks(4)
+	var shots_before: int = scene.rifle_fire.shots_fired
+	for i in hz*3:
+		await ticks(1)
+		if z.is_dead: break
+	check(z.is_dead and z.current_hp == 0,"Real held-E rifle projectiles deal lethal damage")
+	check(scene.rifle_fire.shots_fired-shots_before>=4,"Existing12damage/60HP requires multiple actual bullets")
+	aim.pressed=false;scene._input(aim)
+	check(z.ragdoll.running and z.ragdoll.bodies.size()==7,"Lethal shot starts existing seven-part Lab physics")
+	check(z.ragdoll.handoff_error<.0002,"Animated world pose retained at death handoff")
+	var impulse: Vector3 = z.ragdoll.total_applied_impulse
+	check(impulse.dot(direction)>300.0 and impulse.y>150.0,"Existing Rifle preset impulse follows actual projectile direction")
+	check(not z.take_damage(999,Vector3.RIGHT),"Dead zombie rejects repeated damage/impulses")
+	check(z.death_triggers==1,"One lethal handoff only")
+	var bodies: Array = z.ragdoll.bodies.values()
+	var chest: PhysicalBone3D = z.ragdoll.bodies.Chest
+	var start := chest.global_position
+	var saw_contact := false
+	var min_y := INF
+	var peak_anchor := 0.0
+	while is_instance_valid(z):
+		if z.is_dead and not z.ragdoll.bodies.is_empty():
+			min_y=minf(min_y,z.ragdoll.minimum_corner_y())
+			peak_anchor=maxf(peak_anchor,z.ragdoll.max_anchor_error())
+			saw_contact=saw_contact or z.ragdoll.contact_motion().core_contacts>0
+			for b in z.ragdoll.bodies.values():check(b.global_position.is_finite(),"Finite physical corpse transforms")
+		await ticks(1)
+	check(saw_contact,"Native corpse reaches ground with core-body collision before cleanup")
+	for body in bodies: check(not is_instance_valid(body),"Cleanup frees every native physical body")
+	check(combat.last_corpse_lifetime>=1.1 and combat.last_corpse_lifetime<=1.3,"Corpse removal within1.1–1.3seconds")
+	check(min_y>-.10 and peak_anchor<.10,"Bounded ground penetration and joint separation at gameplay physics rate")
+	# Simultaneous deaths, then reset mid-flight: no orphaned graphs or stale shots.
+	for other in combat.zombies:other.take_damage(999,Vector3.FORWARD)
+	await ticks(3)
+	check(combat.active_ragdolls()<=4,"At most four active ragdolls")
+	var old_bodies: Array=[]
+	for other in combat.zombies:old_bodies.append_array(other.ragdoll.bodies.values())
+	scene.reset_player();await ticks(3)
+	for body in old_bodies:check(not is_instance_valid(body),"Reset releases old corpse bodies/joints")
+	check(combat.zombies.size()==4 and combat.active_ragdolls()==0,"R restores four living zombies without accumulating corpses")
+	check(scene.rifle_fire.active_projectiles()==0 and not scene.rifle_fire.trigger_held,"Reset clears pending shots")
+	check(absf(scene.player.walk_speed-2.70)<.001 and absf(scene.player.run_speed-7.55)<.01,"Approved movement speeds retained")
+	report={"passed":failures.is_empty(),"failures":failures,"physics_hz":hz,"impulse":str(impulse),"minimum_corner_y":min_y,"maximum_anchor_error_m":peak_anchor,"corpse_lifetime":combat.last_corpse_lifetime,"native_ground_contact":saw_contact,"maximum_ragdolls":4}
+	print("ZOMBIE_COMBAT ",JSON.stringify(report))
+	var destination:=OS.get_environment("ZOMBIE_COMBAT_RESULTS")
+	if not destination.is_empty():FileAccess.open(destination,FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
+	scene.free();quit(0 if failures.is_empty() else 1)
