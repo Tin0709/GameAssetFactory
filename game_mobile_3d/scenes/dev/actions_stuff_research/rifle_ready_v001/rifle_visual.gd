@@ -48,6 +48,13 @@ var _recoil_saved: Array[Transform3D]=[]
 var _recoil_support_base:=Vector3.ZERO
 var _recoil_saved_support:=Vector3.ZERO
 var _recoil_applied:=false
+var auto_aim_target: Node3D
+var auto_aim_aligned:=true
+var _auto_aim_spine: int
+var _auto_aim_saved:=Transform3D.IDENTITY
+var _auto_aim_rotation:=Quaternion.IDENTITY
+var _auto_aim_applied:=false
+var _auto_aim_turning:=false
 
 func _rows(rows: Array) -> Transform3D:
  return Transform3D(Basis(Vector3(rows[0][0],rows[1][0],rows[2][0]),Vector3(rows[0][1],rows[1][1],rows[2][1]),Vector3(rows[0][2],rows[1][2],rows[2][2])),Vector3(rows[0][3],rows[1][3],rows[2][3]))
@@ -139,6 +146,53 @@ func _sample_set(ahead: float=0.) -> Array:
 
 func set_rifle_aim(held: bool) -> void:
  rifle_aim_requested=held
+func _has_auto_aim() -> bool:
+ return rifle_aim_requested and is_instance_valid(auto_aim_target) and not auto_aim_target.is_dead
+func _advance_facing(target_yaw: float,delta: float) -> void:
+ if _has_auto_aim():
+  var offset: Vector3=auto_aim_target.global_position-global_position
+  if Vector2(offset.x,offset.z).length_squared()>.0001:target_yaw=atan2(offset.x,offset.z)
+ super._advance_facing(target_yaw,delta)
+func _restore_auto_aim() -> void:
+ if not _auto_aim_applied:return
+ skeleton.set_bone_pose(_auto_aim_spine,_auto_aim_saved)
+ _auto_aim_applied=false
+func _apply_auto_aim(delta: float) -> void:
+ _auto_aim_spine=skeleton.find_bone("Spine")
+ var desired:=Quaternion.IDENTITY
+ if _has_auto_aim():
+  var parent: int=skeleton.get_bone_parent(_auto_aim_spine)
+  var parent_world:=skeleton.global_transform*skeleton.get_bone_global_pose(parent)
+  var inverse:=parent_world.affine_inverse()
+  var pose:=skeleton.get_bone_pose(_auto_aim_spine)
+  var muzzle: Vector3=inverse*socket.muzzle_position()
+  var carrier:=skeleton.global_transform*skeleton.get_bone_global_pose(carrier_bone)
+  var forward: Vector3=(inverse.basis*carrier.basis.y).normalized()
+  var target: Vector3=inverse*(auto_aim_target.global_position+Vector3(0,1.02,0))-pose.origin
+  var reach:=muzzle-pose.origin
+  var perpendicular:=reach-forward*reach.dot(forward)
+  # Rotate the intact hold about Spine so its actual muzzle ray intersects the
+  # target. Account for the weapon's offset/length, rather than aiming an
+  # invisible bullet independently of its barrel or moving either hand.
+  var along_squared:=target.length_squared()-perpendicular.length_squared()
+  if along_squared>0.0001:
+   var source:=perpendicular+forward*sqrt(along_squared)
+   desired=Quaternion(source.normalized(),target.normalized()).normalized()
+   if desired.w<0.0:desired=-desired
+   var angle:=desired.get_angle()
+   if angle>deg_to_rad(60.0):desired=Quaternion.IDENTITY.slerp(desired,deg_to_rad(60.0)/angle)
+ _auto_aim_rotation=_auto_aim_rotation.slerp(desired,1.0-exp(-20.0*delta)).normalized()
+ if _auto_aim_rotation.get_angle()<.0001:_auto_aim_rotation=Quaternion.IDENTITY
+ _auto_aim_saved=skeleton.get_bone_pose(_auto_aim_spine)
+ if _auto_aim_rotation!=Quaternion.IDENTITY:
+  skeleton.set_bone_pose(_auto_aim_spine,Transform3D(Basis(_auto_aim_rotation)*_auto_aim_saved.basis,_auto_aim_saved.origin))
+  _auto_aim_applied=true
+  _constrain_rifle_contacts()
+ auto_aim_aligned=true
+ if _has_auto_aim():
+  var to_target: Vector3=auto_aim_target.global_position+Vector3(0,1.02,0)-socket.muzzle_position()
+  var barrel:=skeleton.global_transform*skeleton.get_bone_global_pose(carrier_bone)
+  auto_aim_aligned=barrel.basis.y.normalized().dot(to_target.normalized())>.999
 func _cache_direction_poses() -> void:
  if rifle_clips.is_empty():super._cache_direction_poses();return
  rifle_ground_poses=_sample_set();rifle_ground_future=_sample_set(.004)
@@ -147,11 +201,15 @@ func _cache_direction_poses() -> void:
 func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictionary,delta: float) -> void:
  # Remove the previous displayed impulse before the existing pose writer reads
  # its state. Recoil never feeds the inertializer, gait, feet or the next shot.
+ _restore_auto_aim()
  _restore_rifle_recoil()
  rifle_recoil_time=minf(rifle_recoil_time+delta,rifle_recoil_clip.clip.length)
  rifle_aim_weight=move_toward(rifle_aim_weight,1. if rifle_aim_requested else 0.,delta/AIM_BLEND_SECONDS)
  if rifle_aim_requested or rifle_aim_weight>0.:rifle_aim_time=fposmod(rifle_aim_time+delta,float(rifle_aim_profile.clips.Aim.duration))
  var moving:=requested or Vector2(world_velocity.x,world_velocity.z).length()>.025
+ var previous_heading:=rotation.y
+ if _has_auto_aim() and not moving:
+  _advance_facing(rotation.y,delta);look_yaw=rotation.y
  rifle_move_weight=move_toward(rifle_move_weight,1. if moving else 0.,delta/.14)
  # Interrupt the scan immediately. Reset its cursor while fully hidden, never
  # while its pose is still visible during a very short movement tap.
@@ -176,10 +234,12 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  else:position.y=0. # These approved clips already include native boot clearance.
  idle_active=not moving and not jump_active
  rifle_state="Run" if gait_run_weight>.98 and moving else ("Walk" if moving else "Idle")
+ _auto_aim_turning=_has_auto_aim() and absf(wrapf(rotation.y-previous_heading,-PI,PI))>.0001
  if jump_grounded:_update_direction_support(delta)
  support_left=_support(0);support_right=_support(1)
  _evaluate(delta)
  _apply_rifle_recoil()
+ _apply_auto_aim(delta)
  if presentation!=null:presentation.capture()
 
 func play_rifle_recoil() -> void:
@@ -191,6 +251,7 @@ func _restore_rifle_recoil() -> void:
  _recoil_applied=false
  _constrain_rifle_contacts()
 func cancel_rifle_recoil() -> void:
+ _restore_auto_aim()
  _restore_rifle_recoil();rifle_recoil_time=rifle_recoil_clip.clip.length
 func _apply_rifle_recoil() -> void:
  if rifle_recoil_time>=rifle_recoil_clip.clip.length:return
@@ -222,6 +283,11 @@ func _idle_foot_lateral_speed(bone: int) -> float:
 func _update_direction_support(delta: float) -> void:
  if _rifle_driving:return
  if move_requested:super._update_direction_support(delta);return
+ if _auto_aim_turning:
+  # Do not pin idle feet to old world anchors while turning in place.
+  # The existing contact solver replants them once the turn settles.
+  for side in 2:_source_support[side]=false;released[side]=true
+  return
  # Preserve the approved idle's occasional free-leg weight shift.
  for side in 2:
   var bone: int=[leg_left,leg_right][side];var pose:=_source_global_pose(bone);var height:=INF
@@ -263,5 +329,6 @@ func _evaluate(delta: float) -> void:
  var before:=pose_sequence;super._evaluate(delta)
  if pose_sequence!=before and not rifle_clips.is_empty():_constrain_rifle_contacts()
 func reset_contacts() -> void:
+ _restore_auto_aim();auto_aim_target=null;auto_aim_aligned=true;_auto_aim_rotation=Quaternion.IDENTITY;_auto_aim_turning=false
  if rifle_recoil_clip!=null:cancel_rifle_recoil()
  super.reset_contacts();rifle_idle_time=0.;rifle_move_weight=0.;idle_active=true

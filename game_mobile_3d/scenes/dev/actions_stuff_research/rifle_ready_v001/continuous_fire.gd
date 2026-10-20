@@ -57,7 +57,7 @@ func tick(delta: float) -> void:
  cooldown=maxf(0.,cooldown-delta)
  # User rule: a held E requests Aim first. No shot while lowered, raising,
  # or returning to Ready; movement remains fully responsive during the lift.
- var aimed: bool=visual.rifle_ready_active and visual.rifle_aim_requested and visual.rifle_aim_weight>=.999
+ var aimed: bool=visual.rifle_ready_active and visual.rifle_aim_requested and visual.rifle_aim_weight>=.999 and visual.auto_aim_aligned
  if trigger_held and aimed and cooldown<=.000001:
   _fire(profile);cooldown=INTERVAL # Never catch up with a burst after a stall.
 func _fire(profile: Dictionary) -> void:
