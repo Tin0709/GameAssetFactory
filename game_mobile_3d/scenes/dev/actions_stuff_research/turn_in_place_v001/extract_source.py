@@ -6,6 +6,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[5]
 PARSER = ROOT / 'blender/animation/reviews/player_animation_library_v1/actions_stuff_directional_v001/molang.py'
 spec = importlib.util.spec_from_file_location('turn_molang', PARSER)
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+EXPECTED_SHA256 = '9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d'
 BONES = ['root','waist','body','head','rightarm','leftarm','rightleg','leftleg']
 def expression(value):
     return m._compile(value) if isinstance(value,str) else ['literal',value]
@@ -23,6 +24,7 @@ def channel(value):
 
 def main():
     a=argparse.ArgumentParser();a.add_argument('pack',type=pathlib.Path);args=a.parse_args()
+    assert hashlib.sha256(args.pack.read_bytes()).hexdigest() == EXPECTED_SHA256, 'Different source pack: audit it before regenerating'
     with zipfile.ZipFile(args.pack) as z:
         entity=json.loads(z.read('entity/dtr.json'))['minecraft:client_entity']['description']
         controllers=json.loads(z.read('animation_controllers/616f2ff7.json'))['animation_controllers']
@@ -58,6 +60,6 @@ def main():
              'controllers':{'agyfrv':{'initial_state':controller.get('initial_state','default'),'states':states}},'clips':clips}
     directory=pathlib.Path(__file__).parent
     for name,data in [('source_evidence.json',raw),('turn_program.json',program)]:
-        (directory/name).write_text(json.dumps(data,separators=(',',':'))+'\n')
+        (directory/name).write_text((json.dumps(data,indent=2) if name=='source_evidence.json' else json.dumps(data,separators=(',',':')))+'\n')
         print(name,(directory/name).stat().st_size,'bytes')
 if __name__=='__main__': main()

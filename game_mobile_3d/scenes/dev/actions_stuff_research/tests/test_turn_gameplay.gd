@@ -1,4 +1,6 @@
 extends SceneTree
+class AimTarget extends Node3D:
+ var is_dead:=false
 var failures: Array[String]=[]
 var current_case:=0.
 var measuring:=false
@@ -83,6 +85,15 @@ func run() -> void:
  var intent: float=v.stationary_turn.requested_yaw
  var mouse:=InputEventMouseMotion.new();mouse.relative=Vector2(20,0);scene.orbiting=true;scene._unhandled_input(mouse)
  check(v.stationary_turn.requested_yaw==intent,"Camera orbit does not request player turning")
+ # A close target can be inside the60deg yaw zone yet outside a60deg 3D
+ # weapon cone because of pitch/parallax. It must not starve continuous fire.
+ measuring=false
+ v.rotation.y=deg_to_rad(123.);v.look_yaw=v.rotation.y;v.reset_contacts()
+ var target:=AimTarget.new();scene.add_child(target);target.position=Vector3(0,0,-1.6)
+ v.auto_aim_target=target;v.set_rifle_aim(true);scene.rifle_fire.set_trigger(true)
+ for i in fps*2:tick(v,dt);scene.rifle_fire.tick(dt)
+ check(v.auto_aim_aligned and scene.rifle_fire.shots_fired>=5,"Close57deg target remains fireable inside the source head/body dead zone")
+ scene.rifle_fire.set_trigger(false);v.auto_aim_target=null
  check(max_grip<.00005 and max_palm<.00005,"Rifle grip and left support remain stable throughout")
  check(min_floor>-.004,"Feet never penetrate the research floor")
  check(max_contact_drift<.008,"Planted feet stay at their world contact")
