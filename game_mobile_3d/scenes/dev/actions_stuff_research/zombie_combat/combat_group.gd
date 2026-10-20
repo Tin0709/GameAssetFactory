@@ -19,14 +19,15 @@ var _space: RID
 func setup(target: CharacterBody3D,existing_audio: Node) -> void:
 	player = target
 	audio = existing_audio
-	# Same native Lab solver,48 iterations for contact at gameplay's60Hz clock
-	# (the Lab uses32 at120Hz). No player timing/project settings change.
+	# Same native Lab solver at gameplay's60Hz clock. The heavier18m/s² falls
+	# need96 local iterations to retain the existing ground/joint error bounds;
+	# the fixed encounter still admits at most28 physical parts. No timing change.
 	# Reference count also supports regression fixtures sharing one World3D.
 	_space=get_world_3d().space
 	if not _spaces.has(_space):
 		_spaces[_space]={"users":0,"original":PhysicsServer3D.space_get_param(_space,PhysicsServer3D.SPACE_PARAM_SOLVER_ITERATIONS)}
 	_spaces[_space].users += 1
-	PhysicsServer3D.space_set_param(_space,PhysicsServer3D.SPACE_PARAM_SOLVER_ITERATIONS,48)
+	PhysicsServer3D.space_set_param(_space,PhysicsServer3D.SPACE_PARAM_SOLVER_ITERATIONS,96)
 	reset_encounter()
 
 func can_fight() -> bool:return active
