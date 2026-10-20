@@ -49,8 +49,8 @@ func run() -> void:
 	check(z.ragdoll.running and z.ragdoll.bodies.size()==7,"Lethal shot starts existing seven-part Lab physics")
 	check(z.ragdoll.handoff_error<.0002,"Animated world pose retained at death handoff")
 	var impulse: Vector3 = z.ragdoll.total_applied_impulse
-	var directed_impulse:=impulse-Vector3.UP*180.0
-	check(absf(directed_impulse.length()-360.0)<.01 and directed_impulse.normalized().dot(direction)>.998,"Existing Rifle preset impulse follows actual projectile direction")
+	var directed_impulse:=impulse-Vector3.UP*48.0
+	check(absf(directed_impulse.length()-240.0)<.01 and directed_impulse.normalized().dot(direction)>.998,"Heavier combat Rifle impulse follows actual projectile direction")
 	check(not z.take_damage(999,Vector3.RIGHT),"Dead zombie rejects repeated damage/impulses")
 	check(z.death_triggers==1,"One lethal handoff only")
 	var bodies: Array = z.ragdoll.bodies.values()

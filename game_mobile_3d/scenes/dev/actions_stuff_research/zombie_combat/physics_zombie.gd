@@ -3,6 +3,9 @@ extends "res://scripts/cuboid_zombie.gd"
 ## with the existing Lab native skeletal adapter and unchanged Rifle preset.
 const Ragdoll = preload("res://scenes/dev/zombie_death_physics/ragdoll.gd")
 const RIFLE = preload("res://scenes/dev/zombie_death_physics/presets/rifle.tres")
+const COMBAT_IMPULSE := 240.0
+const COMBAT_LIFT := 48.0
+const COMBAT_GRAVITY := 18.0
 signal corpse_finished(zombie: CharacterBody3D, lifetime: float)
 var ragdoll: Node
 var corpse_age := 0.0
@@ -10,9 +13,16 @@ var corpse_lifetime := 1.2
 var death_triggers := 0
 var pending_direction := Vector3.ZERO
 var combat_audio: Node
+var combat_rifle: Resource
 
 func _ready() -> void:
 	super._ready()
+	# Heavier combat response, using the same native Lab graph/masses/joints.
+	# Duplicate once: the canonical Lab Rifle preset remains unchanged.
+	combat_rifle = RIFLE.duplicate()
+	combat_rifle.linear_impulse = COMBAT_IMPULSE
+	combat_rifle.upward_impulse = COMBAT_LIFT
+	combat_rifle.linear_damping = .20
 	# One physics clock owns living pose sampling and death handoff. The existing
 	# manual AnimationPlayer/secondary motion is evaluated unchanged below.
 	visual.set_process(false)
@@ -77,9 +87,9 @@ func _start_physics() -> void:
 	for body in ragdoll.bodies.values():
 		body.collision_layer = 2
 		body.collision_mask = 1
-	# Same 360N·s directional +180N·s upward impulse, weighted once across60kg;
-	# seven rigid parts, six limited joints, inherited velocity, ground-only CCD.
-	ragdoll.begin(RIFLE,pending_direction,"Chest",0.0,9.8)
+	# One240N·s directional/48N·s lift event across60kg, with18m/s² gravity:
+	# shorter throw and prompt fall, preserving seven parts/six loose joints/CCD.
+	ragdoll.begin(combat_rifle,pending_direction,"Chest",0.0,COMBAT_GRAVITY)
 
 func _exit_tree() -> void:
 	if is_instance_valid(ragdoll):ragdoll.release()
