@@ -302,7 +302,11 @@ func _update_direction_support(delta: float) -> void:
    var pose:=_source_global_pose(bone);var height:=INF
    for point in SOLE_POINTS:height=minf(height,(pose*point).y)
    var free_leg: bool=stationary_turn.free_foot(side)
-   if free_leg or height>.035:_source_support[side]=false;released[side]=true
+   # Once the corrective foot keys settle, the approved Idle can still make
+   # its low-clearance lateral weight shift. A residual head/body yaw must not
+   # disable that existing contact release and drag an old anchor inward.
+   var idle_reposition:=stationary_turn.clock>.5 and _idle_foot_lateral_speed(bone)>.025
+   if free_leg or height>.035 or idle_reposition:_source_support[side]=false;released[side]=true
    elif height<.025:_source_support[side]=true;released[side]=false
   return
  # Preserve the approved idle's occasional free-leg weight shift.
