@@ -113,10 +113,9 @@ func _sample_set(ahead: float=0.) -> Array:
  if rifle_aim_clip!=null and rifle_aim_weight>0.:
   var aim_time:=fposmod(rifle_aim_time+ahead,float(rifle_aim_profile.clips.Aim.duration))
   for bone in _aim_bones:poses[bone]=Transform3D(poses[bone]).interpolate_with(_aim_pose(bone,aim_time),rifle_aim_weight)
-  # At rest retain the approved torso breathing. Moving/airborne hips and all
-  # leg/root channels stay under the existing gait and physical jump systems.
-  var hips_weight:=rifle_aim_weight*(1.-rifle_move_weight) if jump_grounded else 0.
-  poses[hips]=Transform3D(poses[hips]).interpolate_with(rifle_aim_clip.pose(hips,aim_time),hips_weight)
+  # Aim owns the upper body only. Keep pelvis and legs on the SAME existing
+  # Idle/gait clock: mixing the Aim pelvis with compensating Idle legs makes
+  # the feet rock fore/aft and repeatedly reacquire incompatible contacts.
   if ahead==0.:
    var attachment: Transform3D=_aim_pose(arm_right,aim_time).affine_inverse()*_aim_pose(carrier_bone,aim_time)
    rifle_carrier_attachment=carrier_in_right_arm.interpolate_with(attachment,rifle_aim_weight)
@@ -165,8 +164,8 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  if presentation!=null:presentation.capture()
 
 func _idle_foot_lateral_speed(bone: int) -> float:
- # Use the actual Idle clip before Aim's hip overlay. Otherwise a Ready/Aim
- # crossfade could release both planted feet merely because the body moved.
+ # Measure the authentic Idle foot motion, independent of the upper-body
+ # weapon layer. Aim never replaces this pelvis/leg pair.
  if _rifle_idle_poses.is_empty() or _rifle_idle_future.is_empty():return 0.
  var pose: Transform3D=_rifle_idle_poses[bone]
  var future: Transform3D=_rifle_idle_future[bone]
