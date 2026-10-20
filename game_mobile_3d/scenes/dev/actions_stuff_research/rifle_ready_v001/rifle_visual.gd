@@ -7,7 +7,7 @@ const AIM_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v
 const RECOIL_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/recoil_approved_library.res")
 const RIFLE_ASSET=preload("res://assets/weapons/rifle_stylized_v2_test/Rifle_Stylized_V2.glb")
 const RifleTurn=preload("res://scenes/dev/actions_stuff_research/turn_in_place_v001/rifle_turn.gd")
-var stationary_turn: RefCounted
+var stationary_turn: RifleTurn
 var turn_axis:=0.
 var rifle_ready_active:=false
 var rifle_clips: Dictionary={}
