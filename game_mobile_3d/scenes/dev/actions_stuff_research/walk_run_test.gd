@@ -7,11 +7,14 @@ const RenderPresenter=preload("res://scenes/dev/actions_stuff_research/render_po
 const RIFLE_VISUAL=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd")
 const RiflePresenter=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_presenter.gd")
 const RifleFire=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/continuous_fire.gd")
+const ZombieCombat=preload("res://scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd")
 @export var rifle_ready:=true
+@export var zombie_combat_enabled:=true
 @export_range(.1,3.,.05) var movement_speed_multiplier:=1.5
 @export_range(.1,3.,.05) var locomotion_animation_multiplier:=1.0
 var presentation: Node
 var rifle_fire: Node3D
+var zombie_combat: Node3D
 var player: CharacterBody3D
 var camera: Camera3D
 var hud: Label
@@ -52,6 +55,8 @@ func _ready() -> void:
 	presentation.setup(player,player.visual);player.visual.presentation=presentation
 	if rifle_ready:
 		rifle_fire=RifleFire.new();rifle_fire.name="InfiniteRifleFire";add_child(rifle_fire);rifle_fire.setup(player)
+		if zombie_combat_enabled:
+			zombie_combat=ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player)
 	_update_camera()
 func _build_environment() -> void:
 	var environment:=WorldEnvironment.new();var settings:=Environment.new();settings.background_mode=Environment.BG_COLOR;settings.background_color=Color(.17,.22,.26)
@@ -86,6 +91,7 @@ func _process(delta: float) -> void:
 	if rifle_fire!=null and rifle_fire.trigger_held:state+=" · FIRING" if visual.rifle_aim_weight>=.999 else " · RAISING TO FIRE"
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
 	hud.text=("RIFLE READY / AIM / FIRE · INFINITE AMMO ∞" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold E Aim + Fire · Right Mouse Aim / Orbit\nWheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
+	if zombie_combat!=null:hud.text+="\nZombies %d · Corpses %d / 4 · Cleared %d · R Restart"%[zombie_combat.living_count(),zombie_combat.active_ragdolls(),zombie_combat.kills]
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
@@ -138,6 +144,7 @@ func _notification(what: int) -> void:
 		orbiting=false;_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
 func reset_player() -> void:
 	if rifle_fire!=null:rifle_fire.reset_fire()
+	if zombie_combat!=null:zombie_combat.reset_encounter()
 	_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
 	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.reset_jump_motion();player.visual.reset_contacts()
 	if presentation!=null: presentation.reset_history()
