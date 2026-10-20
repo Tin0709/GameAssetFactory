@@ -51,6 +51,7 @@ func run() -> void:
 		if is_instance_valid(aim.target):previous=aim.target
 		if group.living_count()==1:break
 	check(group.living_count()==1,"Held E auto-turns and kills all three in-range zombies with actual projectiles")
+	await ticks(2) # Selection runs before the projectile's lethal hit in a tick.
 	check(aim.target==null,"Last living zombie outside rifle range is not auto-targeted")
 	check(scene.rifle_fire.pool_misses==0,"Auto-aim preserves bounded projectile pools")
 	key(scene,false);scene.reset_player();await ticks(3)

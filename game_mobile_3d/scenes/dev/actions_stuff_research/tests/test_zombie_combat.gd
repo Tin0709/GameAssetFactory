@@ -10,6 +10,9 @@ func ticks(count: int) -> void:
 	await process_frame
 func run() -> void:
 	var scene = load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate()
+	# Preserve this original manual-barrel damage/handoff regression. Automatic
+	# target selection/turning/projectile kills have their own end-to-end suite.
+	scene.auto_aim_enabled=false
 	root.add_child(scene)
 	var combat = scene.get("zombie_combat")
 	check(combat != null,"Existing research scene contains zombie combat")
