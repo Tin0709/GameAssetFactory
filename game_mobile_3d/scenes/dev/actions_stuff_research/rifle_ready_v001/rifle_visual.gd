@@ -6,6 +6,9 @@ const RIFLE_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready
 const AIM_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/aim_approved_library.res")
 const RECOIL_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/recoil_approved_library.res")
 const RIFLE_ASSET=preload("res://assets/weapons/rifle_stylized_v2_test/Rifle_Stylized_V2.glb")
+const RifleTurn=preload("res://scenes/dev/actions_stuff_research/turn_in_place_v001/rifle_turn.gd")
+var stationary_turn: RefCounted
+var turn_axis:=0.
 var rifle_ready_active:=false
 var rifle_clips: Dictionary={}
 var rifle_profile: Dictionary={}
@@ -77,6 +80,7 @@ func _ready() -> void:
  _recoil_support_base=rifle_recoil_clip.support(0.)
  for bone in _aim_bones:_recoil_saved.append(skeleton.get_bone_pose(bone))
  active_walk_action=rifle_profile.clips.Walk.action;active_run_action=rifle_profile.clips.Run.action
+ stationary_turn=RifleTurn.new(skeleton,rotation.y)
  _cache_direction_poses();position.y=0.
  for i in skeleton.get_bone_count():
   var pose: Transform3D=direction_poses[i];var q:=pose.basis.orthonormalized().get_rotation_quaternion()
@@ -142,6 +146,7 @@ func _sample_set(ahead: float=0.) -> Array:
    rifle_carrier_attachment=carrier_in_right_arm.interpolate_with(attachment,rifle_aim_weight)
    rifle_support_anchor=rifle_support_anchor.lerp(rifle_aim_clip.support(aim_time),rifle_aim_weight)
    rifle_contact_shoulder_weight=maxf(rifle_move_weight,rifle_aim_weight)
+ if stationary_turn!=null:stationary_turn.apply(poses,ahead,rifle_aim_weight,_has_auto_aim())
  return poses
 
 func set_rifle_aim(held: bool) -> void:
@@ -210,9 +215,13 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  rifle_aim_weight=move_toward(rifle_aim_weight,1. if rifle_aim_requested else 0.,delta/AIM_BLEND_SECONDS)
  if rifle_aim_requested or rifle_aim_weight>0.:rifle_aim_time=fposmod(rifle_aim_time+delta,float(rifle_aim_profile.clips.Aim.duration))
  var moving:=requested or Vector2(world_velocity.x,world_velocity.z).length()>.025
- var previous_heading:=rotation.y
- if _has_auto_aim() and not moving:
-  _advance_facing(rotation.y,delta);look_yaw=rotation.y
+ var target_yaw:=NAN
+ if _has_auto_aim():
+  var toward: Vector3=auto_aim_target.global_position-global_position
+  target_yaw=atan2(toward.x,toward.z)
+ stationary_turn.axis=turn_axis
+ rotation.y=stationary_turn.advance(rotation.y,target_yaw,moving,bool(physics.grounded),delta)
+ look_yaw=rotation.y
  rifle_move_weight=move_toward(rifle_move_weight,1. if moving else 0.,delta/.14)
  # Interrupt the scan immediately. Reset its cursor while fully hidden, never
  # while its pose is still visible during a very short movement tap.
@@ -237,7 +246,6 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  else:position.y=0. # These approved clips already include native boot clearance.
  idle_active=not moving and not jump_active
  rifle_state="Run" if gait_run_weight>.98 and moving else ("Walk" if moving else "Idle")
- _auto_aim_turning=_has_auto_aim() and absf(wrapf(rotation.y-previous_heading,-PI,PI))>.0001
  if jump_grounded:_update_direction_support(delta)
  support_left=_support(0);support_right=_support(1)
  _evaluate(delta)
@@ -287,10 +295,15 @@ func _idle_foot_lateral_speed(bone: int) -> float:
 func _update_direction_support(delta: float) -> void:
  if _rifle_driving:return
  if move_requested:super._update_direction_support(delta);return
- if _auto_aim_turning:
-  # Do not pin idle feet to old world anchors while turning in place.
-  # The existing contact solver replants them once the turn settles.
-  for side in 2:_source_support[side]=false;released[side]=true
+ if stationary_turn!=null and stationary_turn.active:
+  settling=false
+  for side in 2:
+   var bone: int=[leg_left,leg_right][side]
+   var pose:=_source_global_pose(bone);var height:=INF
+   for point in SOLE_POINTS:height=minf(height,(pose*point).y)
+   var free:=stationary_turn.free_foot(side)
+   if free or height>.035:_source_support[side]=false;released[side]=true
+   elif height<.025:_source_support[side]=true;released[side]=false
   return
  # Preserve the approved idle's occasional free-leg weight shift.
  for side in 2:
@@ -336,3 +349,5 @@ func reset_contacts() -> void:
  _restore_auto_aim();auto_aim_target=null;auto_aim_aligned=true;_auto_aim_rotation=Quaternion.IDENTITY;_auto_aim_turning=false
  if rifle_recoil_clip!=null:cancel_rifle_recoil()
  super.reset_contacts();rifle_idle_time=0.;rifle_move_weight=0.;idle_active=true
+ turn_axis=0.
+ if stationary_turn!=null:stationary_turn.reset(rotation.y)
