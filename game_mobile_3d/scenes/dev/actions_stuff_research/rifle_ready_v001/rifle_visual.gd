@@ -157,7 +157,8 @@ func _restore_auto_aim() -> void:
  if not _auto_aim_applied:return
  skeleton.set_bone_pose(_auto_aim_spine,_auto_aim_saved)
  _auto_aim_applied=false
-func _apply_auto_aim(delta: float) -> void:
+func _prepare_auto_aim(delta: float) -> void:
+ # Compute from the clean Aim pose BEFORE recoil; never chase/cancel its kick.
  _auto_aim_spine=skeleton.find_bone("Spine")
  var desired:=Quaternion.IDENTITY
  if _has_auto_aim():
@@ -183,6 +184,8 @@ func _apply_auto_aim(delta: float) -> void:
    if angle>deg_to_rad(60.0):desired=Quaternion.IDENTITY.slerp(desired,deg_to_rad(60.0)/angle)
  _auto_aim_rotation=_auto_aim_rotation.slerp(desired,1.0-exp(-20.0*delta)).normalized()
  if _auto_aim_rotation.get_angle()<.0001:_auto_aim_rotation=Quaternion.IDENTITY
+func _apply_auto_aim() -> void:
+ # Carry the full approved recoil/hold together under that same aiming frame.
  _auto_aim_saved=skeleton.get_bone_pose(_auto_aim_spine)
  if _auto_aim_rotation!=Quaternion.IDENTITY:
   skeleton.set_bone_pose(_auto_aim_spine,Transform3D(Basis(_auto_aim_rotation)*_auto_aim_saved.basis,_auto_aim_saved.origin))
@@ -238,8 +241,9 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  if jump_grounded:_update_direction_support(delta)
  support_left=_support(0);support_right=_support(1)
  _evaluate(delta)
+ _prepare_auto_aim(delta)
  _apply_rifle_recoil()
- _apply_auto_aim(delta)
+ _apply_auto_aim()
  if presentation!=null:presentation.capture()
 
 func play_rifle_recoil() -> void:
