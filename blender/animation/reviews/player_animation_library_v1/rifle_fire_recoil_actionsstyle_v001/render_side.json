@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "view": "side",
+  "fps": 30,
+  "frames": 180,
+  "duration_s": 6.0,
+  "original_speed": true,
+  "same_action": "Rifle_Fire_Recoil_ActionsStyle_v001",
+  "single_shots_start_frames": [
+    31,
+    61
+  ],
+  "burst_start_frame": 91,
+  "burst_shots": 12,
+  "burst_hz": 6.0,
+  "no_extra_actions_created": true
+}

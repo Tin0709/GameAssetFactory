@@ -1,0 +1,107 @@
+{
+  "pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+  "file_sha256": {
+    "entity/dtr.json": "e6f3db842fb0dd2b2d770a390e166f0ae95f93659c759c597b5091d5c3a25dd2",
+    "animations/f2da1071.json": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+    "animation_controllers/616f2ff7.json": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f"
+  },
+  "entity_controller_aliases": {
+    "kcexxa": "controller.animation.oreville_ans.njvelc",
+    "ybphcg": "controller.animation.oreville_ans.knoyhk"
+  },
+  "release_alias": "dtfqyg",
+  "release_animation": "animation.oreville_ans.pomlkz",
+  "release_duration_s": 0.875,
+  "release_loop_mode": "hold_on_last_frame",
+  "release_channels": {
+    "waist": [
+      "rotation"
+    ],
+    "head": [
+      "rotation"
+    ],
+    "leftarm": [
+      "rotation",
+      "position"
+    ],
+    "rightarm": [
+      "rotation",
+      "position"
+    ],
+    "rightitem": [
+      "rotation",
+      "position"
+    ],
+    "hmhadkja89l_92f5d6": [
+      "scale"
+    ]
+  },
+  "release_interpolation": "No lerp_mode fields in the release clip; numeric rotation/position keys use default linear interpolation. The separate charge clip uses Catmull-Rom.",
+  "neutral_look_release_landmarks": {
+    "waist_pitch_deg": {
+      "0": 0,
+      "0.0417": -6,
+      "0.1667": -10,
+      "0.625": 1.1,
+      "0.875": 0
+    },
+    "head_pitch_deg": {
+      "0.0417": 8.1,
+      "0.25": -15.4,
+      "0.5833": 0
+    },
+    "right_arm_pitch_deg": {
+      "0": -55,
+      "0.1667": -76,
+      "0.6667": 0
+    }
+  },
+  "units": "Source rotations/Molang trig use degrees; position values are model units/pixels, not meters. Only principles were transferred; no direct source sample is used for the authored recoil.",
+  "charged_state": {
+    "animations": [
+      "mhyyzj",
+      {
+        "hfnozn": "1-v.jkpkmj"
+      },
+      {
+        "humanoid_base_pose": "q.get_animation_frame>3||q.item_is_charged"
+      }
+    ],
+    "transitions": [
+      {
+        "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))||(!q.any_animation_finished&&q.main_hand_item_use_duration==0)"
+      },
+      {
+        "ikvaib": "q.all_animations_finished&&!q.item_is_charged"
+      },
+      {
+        "btdwij": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+      }
+    ],
+    "blend_transition": 0.1
+  },
+  "release_state": {
+    "animations": [
+      "dtfqyg"
+    ],
+    "transitions": [
+      {
+        "default": "!(q.equipped_item_any_tag('slot.weapon.mainhand','oreville:is_crossbow')||q.is_item_name_any('slot.weapon.mainhand','minecraft:crossbow'))||q.all_animations_finished"
+      },
+      {
+        "gjhnog": "q.main_hand_item_use_duration!=0||q.item_is_charged"
+      },
+      {
+        "btdwij": "q.blocking&&(q.equipped_item_any_tag('slot.weapon.offhand','oreville:is_shield')||q.is_item_name_any('slot.weapon.offhand','minecraft:shield'))"
+      }
+    ],
+    "blend_transition": 0.15
+  },
+  "verified_limits": [
+    "This is crossbow charge/release, not an automatic rifle controller.",
+    "The release recovers to ordinary uncharged handling rather than maintaining rifle Aim.",
+    "No source automatic fire rate or repeated-rifle accumulation policy was identified in these player crossbow states.",
+    "A non-player helper bone toggles scale at0.125s; it is not character squash and is not mapped onto the unchanged rifle/rig."
+  ],
+  "original_rifle_adaptation": "Independent bounded impulse and recovery; frozen approved AimF85; exact same pose at each shot boundary;6Hz review only."
+}
