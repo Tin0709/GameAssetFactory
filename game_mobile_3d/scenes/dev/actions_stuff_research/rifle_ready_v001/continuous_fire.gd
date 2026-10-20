@@ -14,6 +14,7 @@ var visual: Node
 var trigger_held:=false
 var shots_fired:=0
 var hit_count:=0
+var point_blank_hits:=0
 var pool_misses:=0
 var cooldown:=0.
 var bullets: Array[Node3D]=[]
@@ -35,7 +36,15 @@ func setup(body: CharacterBody3D) -> void:
  impact_ages.resize(IMPACTS);impact_ages.fill(-1.)
  flash=_pooled(FLASH);audio=Audio.new();audio.name="ExistingCombatAudio";add_child(audio)
  query.collision_mask=5;query.exclude=[player.get_rid()]
+ query.hit_from_inside=true
+ visual.barrel_contact_query=barrel_contact
  muzzle_local=visual.rifle_model.to_local(visual.socket.muzzles[1].global_position)
+func barrel_contact() -> Dictionary:
+ # Reuse the actual weapon's short grip-to-muzzle segment and existing swept
+ # hit pipeline when a close enemy overlaps the gun. No extra combat system.
+ var carrier: Transform3D=visual.skeleton.global_transform*visual.skeleton.get_bone_global_pose(visual.carrier_bone)
+ query.from=carrier*Vector3(visual.socket.grips[1]);query.to=visual.socket.muzzle_position()
+ return get_world_3d().direct_space_state.intersect_ray(query)
 func _pooled(scene: PackedScene) -> Node3D:
  var node: Node3D=scene.instantiate()
  # Retain the exact existing meshes/materials; the manager owns lifetime.
@@ -66,8 +75,11 @@ func _fire(profile: Dictionary) -> void:
  var origin: Vector3=visual.socket.muzzle_position()
  var carrier: Transform3D=visual.skeleton.global_transform*visual.skeleton.get_bone_global_pose(visual.carrier_bone)
  var direction:=carrier.basis.y.normalized()
+ var contact:=barrel_contact()
  ages[slot]=0.;directions[slot]=direction
  var bullet:=bullets[slot];bullet.global_position=origin;bullet.look_at(origin+direction,Vector3.UP);bullet.reset_physics_interpolation();bullet.show()
+ if not contact.is_empty():
+  _resolve_hit(contact,direction);point_blank_hits+=1;ages[slot]=-1.;bullet.hide()
  shots_fired+=1;visual.play_rifle_recoil()
  flash_age=0.;flash_size=float(profile.flash_scale)*(.94+.06*(shots_fired%3));flash.scale=Vector3.ONE*flash_size
  flash.get_node("Visual").rotation.z=(shots_fired%4)*PI/8.;flash.global_position=origin;flash.look_at(origin+direction,Vector3.UP);flash.reset_physics_interpolation();flash.show()
@@ -81,11 +93,13 @@ func _move_projectiles(delta: float,profile: Dictionary) -> void:
   query.from=bullet.global_position;query.to=destination
   var hit:=get_world_3d().direct_space_state.intersect_ray(query)
   if not hit.is_empty():
-   var collider: Object=hit.collider
-   if collider.has_method("take_damage") and collider.is_in_group("zombies"):collider.take_damage(int(profile.damage),directions[i])
-   hit_count+=1;_impact(hit.position);audio.play_event(&"bullet_impact");ages[i]=-1.;bullet.hide()
+   _resolve_hit(hit,directions[i]);ages[i]=-1.;bullet.hide()
   elif ages[i]>=limit:ages[i]=-1.;bullet.hide()
   else:bullet.global_position=destination
+func _resolve_hit(hit: Dictionary,direction: Vector3) -> void:
+ var collider: Object=hit.collider
+ if collider.has_method("take_damage") and collider.is_in_group("zombies"):collider.take_damage(int(Profiles.PROFILES[1].damage),direction)
+ hit_count+=1;_impact(hit.position);audio.play_event(&"bullet_impact")
 func _impact(point: Vector3) -> void:
  var slot:=impact_ages.find(-1.)
  if slot<0:return # Cosmetic capacity never blocks damage or firing.

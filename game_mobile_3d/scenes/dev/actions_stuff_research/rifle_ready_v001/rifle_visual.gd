@@ -53,6 +53,7 @@ var _recoil_saved_support:=Vector3.ZERO
 var _recoil_applied:=false
 var auto_aim_target: Node3D
 var auto_aim_aligned:=true
+var barrel_contact_query: Callable
 var _auto_aim_spine: int
 var _auto_aim_saved:=Transform3D.IDENTITY
 var _auto_aim_rotation:=Quaternion.IDENTITY
@@ -206,6 +207,12 @@ func _apply_auto_aim() -> void:
   var to_target: Vector3=auto_aim_target.global_position+Vector3(0,1.02,0)-socket.muzzle_position()
   var barrel:=skeleton.global_transform*skeleton.get_bone_global_pose(carrier_bone)
   auto_aim_aligned=barrel.basis.y.normalized().dot(to_target.normalized())>.999
+  # An approaching zombie can intersect the barrel before its center is in
+  # front of the muzzle. Require real segment contact rather than waiting for
+  # an impossible forward ray or silently redirecting a bullet backwards.
+  if not auto_aim_aligned and to_target.dot(barrel.basis.y)<0. and barrel_contact_query.is_valid():
+   var contact: Dictionary=barrel_contact_query.call()
+   auto_aim_aligned=contact.get("collider")==auto_aim_target
 func _cache_direction_poses() -> void:
  if rifle_clips.is_empty():super._cache_direction_poses();return
  rifle_ground_poses=_sample_set();rifle_ground_future=_sample_set(.004)

@@ -1,5 +1,5 @@
 extends SceneTree
-## Test actual source hand boxes against the player's animated visible torso,
+## Test actual source hand boxes against the player's animated visible body,
 ## rather than just the larger collision capsule or a configured attack range.
 var failures:Array[String]=[]
 func _initialize()->void:call_deferred("run")
@@ -24,10 +24,14 @@ func intersects(a:Dictionary,b:Dictionary)->bool:
   if absf(offset.dot(axis))>ra+rb+.005:return false
  return true
 func touching(z:CharacterBody3D,player:CharacterBody3D)->bool:
- var torso:=box(player.visual.skeleton,"Chest",Vector3(0,1.0125,0),Vector3(.45,.675,.225))
+ # Contact with a visible arm is a real hit too, especially from the side.
+ # Approved player arms are straight, so each complete arm is one rigid box.
+ var parts: Array=[box(player.visual.skeleton,"Chest",Vector3(0,1.0125,0),Vector3(.45,.675,.225)),box(player.visual.skeleton,"Head",Vector3(0,1.575,0),Vector3(.45,.45,.45))]
+ for side in [-1.,1.]:parts.append(box(player.visual.skeleton,"Arm.L" if side>0 else "Arm.R",Vector3(.3375*side,1.0125,0),Vector3(.225,.675,.225)))
  for side in [-1.,1.]:
   var hand:=box(z.visual.skeleton,"Arm.L" if side>0 else "Arm.R",Vector3(.3375*side,.775,0),Vector3(.225,.20,.225))
-  if intersects(hand,torso):return true
+  for part:Dictionary in parts:
+   if intersects(hand,part):return true
  return false
 func freeze(z:CharacterBody3D,at:Vector3)->void:
  z.target=null;z.move_speed=0.;z.velocity=Vector3.ZERO;z.position=at
@@ -46,7 +50,7 @@ func run()->void:
    if z.visual.attack_count>previous_count:distances.append(distance);previous_count=z.visual.attack_count
    if z.visual.attack_time>=.12 and z.visual.attack_time<=.27 and touching(z,scene.player):contacts[z.visual.attack_count]=true
   check(previous_count>=2,"Zombie reaches the player and repeatedly attacks from each direction")
-  check(contacts.size()>=2,"Source hands physically meet the visible player torso on repeated strikes from "+str(direction))
+  check(contacts.size()>=2,"Source hands physically meet the visible player body on repeated strikes from "+str(direction))
   check(closest>=.57,"Living capsules prevent the zombie walking into the player's body")
   reports.append({"direction":str(direction),"attack_start_distances_m":distances,"attack_count":previous_count,"contacting_strikes":contacts.size()})
  # Real group: only zombies able to reach melee range should swing. Those
