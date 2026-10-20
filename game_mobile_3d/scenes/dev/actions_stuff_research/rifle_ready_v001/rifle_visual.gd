@@ -312,6 +312,10 @@ func _idle_foot_lateral_speed(bone: int) -> float:
 func _update_direction_support(delta: float) -> void:
  if _rifle_driving:return
  if move_requested:super._update_direction_support(delta);return
+ # The approved rifle Idle already recovers the free foot. The inherited
+ # Expressive stop adds two compulsory 35mm steps, even after a tiny tap;
+ # interrupting those steps feeds a spurious kick into the next start.
+ settling=false
  if stationary_turn!=null and stationary_turn.quick_turning:
   # Combat input outranks the long observational step sequence. Release old
   # anchors for the brief pivot, then replant through the existing floor solve.
