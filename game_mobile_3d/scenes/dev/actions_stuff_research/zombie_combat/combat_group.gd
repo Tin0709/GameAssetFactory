@@ -51,8 +51,8 @@ func reset_encounter() -> void:
 		# The source strike reaches about0.9m forward; the remaining distance is
 		# the player's visible torso/hand thickness. Starting at1.7m stopped the
 		# chase before either fist could touch. Keep the capsules/model unchanged.
-		zombie.stop_distance = 1.0
-		zombie.attack_range = 1.05
+		zombie.stop_distance = .85
+		zombie.attack_range = .90
 		# Show the requested Attack clip using existing AI timing without introducing
 		# player-death/health gameplay into this approved locomotion research scene.
 		zombie.attack_damage = 0
