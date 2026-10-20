@@ -57,5 +57,5 @@
 	],
 	"passed": true,
 	"physics_hz": 60,
-	"render_fps": 0
+	"render_fps": 60
 }
