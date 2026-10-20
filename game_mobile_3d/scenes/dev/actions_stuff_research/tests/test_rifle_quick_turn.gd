@@ -14,8 +14,9 @@ func run()->void:
  var v=scene.player.visual;var body_ready:=-1.;var first_shot:=-1.;var hz:=Engine.physics_ticks_per_second
  var event:=InputEventKey.new();event.keycode=KEY_E;event.physical_keycode=KEY_E;event.pressed=true;scene._unhandled_input(event)
  var phase:float=v.direction_snapshot.phase
+ var started:=Engine.get_physics_frames()
  for i in hz:
-  await ticks(1);var age:=float(i+1)/hz
+  await ticks(1);var age:=float(Engine.get_physics_frames()-started)/hz
   if body_ready<0. and absf(wrapf(v.rotation.y,-PI,PI))<deg_to_rad(8.):body_ready=age
   if first_shot<0. and scene.rifle_fire.shots_fired>0:first_shot=age
  check(body_ready>=0. and body_ready<=.15,"Held E decisively turns toward a zombie180deg behind within0.15seconds")
