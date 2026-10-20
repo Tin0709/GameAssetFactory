@@ -1,0 +1,9 @@
+{
+	"camera_y_span_m": 0.00162988901138306,
+	"failures": [],
+	"grip_error_m": 0.000000151962623817781,
+	"passed": true,
+	"scan_count": 852,
+	"shots": 70,
+	"support_error_m": 0.000000273548948825919
+}

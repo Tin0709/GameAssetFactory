@@ -1,0 +1,8 @@
+{
+	"body_ready_s": 0.3,
+	"failures": [],
+	"first_shot_s": 0.366666666666667,
+	"passed": true,
+	"physics_hz": 60,
+	"shots": 10
+}

@@ -1,5 +1,9 @@
 # Close melee, heavier zombie deaths and quick E combat turn
 
+## Latest follow-up: readable combat turning
+
+2026-10-20 user feedback supersedes the0.10s turnaround timing recorded below. One runtime constant now bounds E combat facing to600deg/s (`PI/0.30`):180deg in0.30s,90deg in0.15s, through both standing and moving paths. The existing >45deg stationary latch, small-angle source tracking and common upper-body aim response are unchanged. Measured full reversal is0.30s at30/60FPS; first shot0.367/0.35s respectively, after the approved raise and real muzzle alignment. Existing moving/run/jump auto-aim tests pass, with submicrometre grip errors and unchanged camera bounds. Native same-camera30FPS before/after clips show the pivot over additional frames; clips remain outside Git in `experiments/rifle_turn_natural_20261020`. The regression now rejects a snap faster than0.24s and an acquisition slower than0.36s; its first-shot upper bound becomes0.40s to allow the requested turn and display sampling. No new source animation, scene, or project; this is gameplay timing tuning awaiting user feedback. Original evidence below remains historical.
+
 2026-10-20. Three explicit user refinements, implemented in the **same** `res://scenes/dev/ActionsStuffWalkRunTest.tscn`. No new project, scene or animation Action. Gameplay awaits user feedback; approved artistic statuses are unchanged.
 
 ## Close attacks

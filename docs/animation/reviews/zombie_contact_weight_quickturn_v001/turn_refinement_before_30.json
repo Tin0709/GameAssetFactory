@@ -1,0 +1,10 @@
+{
+	"body_ready_s": 0.1,
+	"failures": [
+		"Held E turns180deg decisively but visibly, around0.30seconds rather than snapping"
+	],
+	"first_shot_s": 0.266666666666667,
+	"passed": false,
+	"physics_hz": 60,
+	"shots": 11
+}
