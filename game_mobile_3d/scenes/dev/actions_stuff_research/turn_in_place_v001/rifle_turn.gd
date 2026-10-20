@@ -19,16 +19,21 @@ var stepping:=false
 var clock:=0.
 var lead_side:=1
 var was_moving:=false
+var quick_turning:=false
+const QUICK_TURN_RATE:=TAU/.20 #180deg in0.10s; E combat priority, not source timing.
 func _init(skeleton: Skeleton3D,yaw: float) -> void:
  rig=skeleton;sampler=Sampler.new(rig);future_sampler=Sampler.new(rig)
  sampler.set_snapshot({"layers":[]});neutral=sampler.poses.duplicate()
  reset(yaw)
 func reset(yaw: float) -> void:
  runtime=Runtime.new();runtime.seed_heading(-rad_to_deg(yaw))
- look_yaw=yaw;requested_yaw=yaw;body_yaw=yaw;gaze=0.;weight=0.;axis=0.;active=false;stepping=false;was_moving=false
+ look_yaw=yaw;requested_yaw=yaw;body_yaw=yaw;gaze=0.;weight=0.;axis=0.;active=false;stepping=false;was_moving=false;quick_turning=false
  snapshot=runtime.step_turn(-rad_to_deg(yaw),false,1./60.)
-func advance(current_yaw: float,target_yaw: float,moving: bool,grounded: bool,delta: float) -> float:
- var interrupted:=moving or not grounded
+func advance(current_yaw: float,target_yaw: float,moving: bool,grounded: bool,delta: float,combat_priority: bool=false) -> float:
+ var urgent:=combat_priority and is_finite(target_yaw) and not moving and grounded
+ quick_turning=urgent and absf(wrapf(target_yaw-current_yaw,-PI,PI))>.001
+ if urgent:current_yaw+=clampf(wrapf(target_yaw-current_yaw,-PI,PI),-QUICK_TURN_RATE*delta,QUICK_TURN_RATE*delta)
+ var interrupted:=moving or not grounded or urgent
  if interrupted:
   look_yaw=current_yaw;requested_yaw=current_yaw
   runtime.seed_heading(-rad_to_deg(current_yaw))

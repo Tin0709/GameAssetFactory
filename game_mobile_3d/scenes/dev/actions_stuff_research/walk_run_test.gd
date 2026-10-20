@@ -145,6 +145,7 @@ func _turn_key(event: InputEventKey) -> void:
 	if rifle_ready and is_instance_valid(player):player.visual.turn_axis=float(_turn_left_held)-float(_turn_right_held)
 func _sync_rifle_controls() -> void:
 	if is_instance_valid(player) and rifle_ready:player.visual.set_rifle_aim(_fire_key_held or _right_aim_held)
+	if is_instance_valid(player) and rifle_ready:player.visual.combat_turn_requested=_fire_key_held
 	if rifle_fire!=null:rifle_fire.set_trigger(_fire_key_held)
 	if rifle_auto_aim!=null and not (_fire_key_held or _right_aim_held):rifle_auto_aim.reset_target()
 func _unhandled_input(event: InputEvent) -> void:

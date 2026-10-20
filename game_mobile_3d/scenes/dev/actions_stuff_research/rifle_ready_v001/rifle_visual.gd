@@ -9,6 +9,7 @@ const RIFLE_ASSET=preload("res://assets/weapons/rifle_stylized_v2_test/Rifle_Sty
 const RifleTurn=preload("res://scenes/dev/actions_stuff_research/turn_in_place_v001/rifle_turn.gd")
 var stationary_turn: RifleTurn
 var turn_axis:=0.
+var combat_turn_requested:=false
 var rifle_ready_active:=false
 var rifle_clips: Dictionary={}
 var rifle_profile: Dictionary={}
@@ -158,6 +159,9 @@ func _advance_facing(target_yaw: float,delta: float) -> void:
  if _has_auto_aim():
   var offset: Vector3=auto_aim_target.global_position-global_position
   if Vector2(offset.x,offset.z).length_squared()>.0001:target_yaw=atan2(offset.x,offset.z)
+  if combat_turn_requested:
+   rotation.y+=clampf(wrapf(target_yaw-rotation.y,-PI,PI),-RifleTurn.QUICK_TURN_RATE*delta,RifleTurn.QUICK_TURN_RATE*delta)
+   return
  super._advance_facing(target_yaw,delta)
 func _restore_auto_aim() -> void:
  if not _auto_aim_applied:return
@@ -193,7 +197,7 @@ func _prepare_auto_aim(delta: float) -> void:
    # Moving/airborne acquisition keeps its existing bound and facing behavior.
    var cone:=75. if jump_grounded and not move_requested and stationary_turn!=null and absf(stationary_turn.gaze)<=deg_to_rad(60.) else 60.
    if angle>deg_to_rad(cone):desired=Quaternion.IDENTITY.slerp(desired,deg_to_rad(cone)/angle)
- _auto_aim_rotation=_auto_aim_rotation.slerp(desired,1.0-exp(-20.0*delta)).normalized()
+ _auto_aim_rotation=_auto_aim_rotation.slerp(desired,1.0-exp(-(40.0 if combat_turn_requested else 20.0)*delta)).normalized()
  if _auto_aim_rotation.get_angle()<.0001:_auto_aim_rotation=Quaternion.IDENTITY
 func _apply_auto_aim() -> void:
  # Carry the full approved recoil/hold together under that same aiming frame.
@@ -233,7 +237,7 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
   target_yaw=atan2(toward.x,toward.z)
   if not bool(physics.grounded) and not moving:_advance_facing(target_yaw,delta)
  stationary_turn.axis=turn_axis
- rotation.y=stationary_turn.advance(rotation.y,target_yaw,moving,bool(physics.grounded),delta)
+ rotation.y=stationary_turn.advance(rotation.y,target_yaw,moving,bool(physics.grounded),delta,combat_turn_requested)
  look_yaw=rotation.y
  rifle_move_weight=move_toward(rifle_move_weight,1. if moving else 0.,delta/.14)
  # Interrupt the scan immediately. Reset its cursor while fully hidden, never
@@ -308,6 +312,11 @@ func _idle_foot_lateral_speed(bone: int) -> float:
 func _update_direction_support(delta: float) -> void:
  if _rifle_driving:return
  if move_requested:super._update_direction_support(delta);return
+ if stationary_turn!=null and stationary_turn.quick_turning:
+  # Combat input outranks the long observational step sequence. Release old
+  # anchors for the brief pivot, then replant through the existing floor solve.
+  for side in 2:_source_support[side]=false;released[side]=true
+  return
  if stationary_turn!=null and stationary_turn.active:
   settling=false
   for side in 2:
