@@ -19,6 +19,8 @@ var azimuth:=.66
 var elevation:=.40
 var camera_size:=5.1
 var orbiting:=false
+var _fire_key_held:=false
+var _right_aim_held:=false
 # Comfort rule: track travel independently from airborne capsule height.
 # Normal 1.26m jumps fit inside this vertical zone without moving the camera.
 var camera_anchor:=Vector3.ZERO
@@ -81,9 +83,9 @@ func _process(delta: float) -> void:
 	if visual.jump_active:
 		state="LANDING" if visual.jump_grounded else ("TAKEOFF / RISE" if player.velocity.y>0 else "AIRBORNE / FALL")
 	if rifle_ready and visual.rifle_aim_weight>.001:state+=" · AIM" if visual.rifle_aim_weight>.999 else " · READY ↔ AIM"
-	if rifle_fire!=null and rifle_fire.trigger_held:state+=" · FIRING"
+	if rifle_fire!=null and rifle_fire.trigger_held:state+=" · FIRING" if visual.rifle_aim_weight>=.999 else " · RAISING TO FIRE"
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
-	hud.text=("RIFLE READY / AIM / FIRE · INFINITE AMMO ∞" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold Left Mouse Fire · Hold Right Mouse Aim\nRight-drag Orbit · Wheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
+	hud.text=("RIFLE READY / AIM / FIRE · INFINITE AMMO ∞" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold E Aim + Fire · Right Mouse Aim / Orbit\nWheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
@@ -113,26 +115,30 @@ func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	camera.global_position=camera_anchor+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*8.
 	camera.look_at(camera_anchor,Vector3.UP);camera.size=camera_size
 func _input(event: InputEvent) -> void:
-	# A GUI may consume the release after a press began over the world.
-	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and not event.pressed and rifle_fire!=null:rifle_fire.set_trigger(false)
+	# A GUI may consume the key-up after the press began over the world.
+	if event is InputEventKey and (event.physical_keycode==KEY_E or event.keycode==KEY_E) and not event.pressed:
+		_fire_key_held=false;_sync_rifle_controls()
+func _sync_rifle_controls() -> void:
+	if is_instance_valid(player) and rifle_ready:player.visual.set_rifle_aim(_fire_key_held or _right_aim_held)
+	if rifle_fire!=null:rifle_fire.set_trigger(_fire_key_held)
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reset_test"):reset_player()
+	if event is InputEventKey and (event.physical_keycode==KEY_E or event.keycode==KEY_E) and not event.echo:
+		_fire_key_held=event.pressed;_sync_rifle_controls()
 	if event is InputEventMouseButton:
-		if event.button_index==MOUSE_BUTTON_LEFT and rifle_fire!=null:rifle_fire.set_trigger(event.pressed)
 		if event.button_index==MOUSE_BUTTON_RIGHT:
 			orbiting=event.pressed
-			if rifle_ready:player.visual.set_rifle_aim(event.pressed)
+			_right_aim_held=event.pressed;_sync_rifle_controls()
 		if event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_UP:camera_size=maxf(3.6,camera_size-.3)
 		if event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:camera_size=minf(8.,camera_size+.3)
 	if event is InputEventMouseMotion and orbiting:
 		azimuth-=event.relative.x*.006;elevation=clampf(elevation+event.relative.y*.004,.15,.75)
 func _notification(what: int) -> void:
 	if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
-		orbiting=false
-		if is_instance_valid(player) and rifle_ready:player.visual.set_rifle_aim(false)
-		if rifle_fire!=null:rifle_fire.set_trigger(false)
+		orbiting=false;_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
 func reset_player() -> void:
 	if rifle_fire!=null:rifle_fire.reset_fire()
+	_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
 	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.reset_jump_motion();player.visual.reset_contacts()
 	if presentation!=null: presentation.reset_history()
 	_camera_initialized=false;_update_camera()
