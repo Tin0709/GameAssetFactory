@@ -1,29 +1,32 @@
 [
   {
-    "decoded_frames" : 180,
-    "distinct_sampled_pixel_hashes" : 152,
-    "duration_s" : 6,
-    "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/rifle_fire_recoil_actionsstyle_v001\/package\/recoil_front_30fps_1x.mp4",
-    "fps" : 30,
-    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
-    "passed" : true
+    "decoded_frames": 180,
+    "distinct_sampled_pixel_hashes": 152,
+    "duration_s": 6,
+    "file": "recoil_front_30fps_1x.mp4",
+    "fps": 30,
+    "max_timestamp_step_error_s": 7.7021722333370235e-16,
+    "passed": true,
+    "sha256": "4b9bba28c9cf5bcf6207ee66092ca1f9ce8abc857be22df194be834f1e5f3f5f"
   },
   {
-    "decoded_frames" : 180,
-    "distinct_sampled_pixel_hashes" : 139,
-    "duration_s" : 6,
-    "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/rifle_fire_recoil_actionsstyle_v001\/package\/recoil_three_quarter_30fps_1x.mp4",
-    "fps" : 30,
-    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
-    "passed" : true
+    "decoded_frames": 180,
+    "distinct_sampled_pixel_hashes": 139,
+    "duration_s": 6,
+    "file": "recoil_three_quarter_30fps_1x.mp4",
+    "fps": 30,
+    "max_timestamp_step_error_s": 7.7021722333370235e-16,
+    "passed": true,
+    "sha256": "0055db23b3fde325e724a1a036d54a9b3cbb8f9d1010186ed57c94aeb3676db7"
   },
   {
-    "decoded_frames" : 180,
-    "distinct_sampled_pixel_hashes" : 148,
-    "duration_s" : 6,
-    "file" : "\/Users\/tin\/Documents\/ChatGPT\/New project\/experiments\/rifle_fire_recoil_actionsstyle_v001\/package\/recoil_side_30fps_1x.mp4",
-    "fps" : 30,
-    "max_timestamp_step_error_s" : 7.7021722333370235e-16,
-    "passed" : true
+    "decoded_frames": 180,
+    "distinct_sampled_pixel_hashes": 148,
+    "duration_s": 6,
+    "file": "recoil_side_30fps_1x.mp4",
+    "fps": 30,
+    "max_timestamp_step_error_s": 7.7021722333370235e-16,
+    "passed": true,
+    "sha256": "af5879eea1239ade69153a824d18fbbbdf18d7eb769bf12d59e0af6330722dd1"
   }
 ]

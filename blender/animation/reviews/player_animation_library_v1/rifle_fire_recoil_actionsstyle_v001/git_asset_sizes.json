@@ -1,0 +1,10 @@
+{
+  "path": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/animation/reviews/player_animation_library_v1/rifle_fire_recoil_actionsstyle_v001",
+  "source_sha256": "99d70756ab7b4c8e37a4f2155e6d398f17dfe284f9a3db863be87a52122c1fff",
+  "ordinary_files_over_25MiB": [],
+  "lfs_pattern": "existing *.blend",
+  "new_source_MiB": 12.177099227905273,
+  "estimated_source_plus_showcase_version_MiB": 96.02407455444336,
+  "quota": "not exposed; no new tracking patterns or migration",
+  "central_showcase_MiB": 83.84697532653809
+}
