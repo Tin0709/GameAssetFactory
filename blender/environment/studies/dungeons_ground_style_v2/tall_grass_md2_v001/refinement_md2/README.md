@@ -31,3 +31,7 @@ The Tall section now has six full-width **TALL GRASS · CẬN CẢNH** buttons: 
 - Two new unified-launcher tests were RED then GREEN; retained short/tall tests,10viewer tests and16launcher tests pass.
 
 All tall candidates remain Pending. This supersedes the previous all-green tall appearance and two-panel layout; earlier source builds/checks are historical. Do not rerun the guarded additive builders against the completed library.
+
+## Pale seed fan refinement — 2026-10-21
+
+User requests the pale central stalks to fan outward for a lusher canopy. Only upper-ring XY of the three existing seed cards per tuft changes; tips extend another18–25cm outward, with smooth increasing bend above fixed roots. The same source deltas update both clusters and their linked presentations. Heights, all root vertices, lower green leaf cards, topology, UVs, materials, textures and every other native asset remain exact. Six close-up routes frame the full updated tuft. Evidence: `.validation/tall_grass_seed_fan_v001/`; renders: `review/Fan_Soft_Meadow.png`, `review/Fan_Meadow_Cluster.png`. Same Pending candidates, no Godot changes.

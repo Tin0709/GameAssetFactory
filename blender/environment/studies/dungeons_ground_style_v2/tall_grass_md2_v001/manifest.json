@@ -508,5 +508,16 @@
       0.72,
       0.94
     ]
+  },
+  "seed_fan_refinement": {
+    "date": "2026-10-21",
+    "core_cards_per_tuft": 3,
+    "additional_tip_spread_m": [
+      0.1786,
+      0.2496
+    ],
+    "change": "Only upper-ring XY of the existing central pale seed cards; roots, all Z, lower green leaf cards, topology, UVs and materials exact. Same deltas applied to existing clusters.",
+    "status": "Pending",
+    "evidence": ".validation/tall_grass_seed_fan_v001"
   }
 }
