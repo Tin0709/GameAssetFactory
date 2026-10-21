@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "same_pending_hair_asset": true,
+  "existing_hair_cards_unchanged": 20,
+  "additional_planar_hair_cards": 39,
+  "total_hair_cards": 59,
+  "hair_triangles": 118,
+  "bandana_triangles": 44,
+  "total_head_asset_triangles": 162,
+  "bandana_translation_m": [
+    0,
+    0,
+    -0.02
+  ],
+  "bandana_shape_uv_and_pixels_unchanged": true,
+  "original_card_pixels_unchanged": true,
+  "new_materials": 0,
+  "new_bones": 0,
+  "new_actions": 0,
+  "godot_integration": false
+}
