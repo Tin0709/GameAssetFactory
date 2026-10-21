@@ -125,10 +125,15 @@ func advance_motion(delta:float,velocity:Vector3,head_position:Vector3,head_basi
  var local_velocity:=head_basis.inverse()*velocity
  var rhythm:=sin(phase*TAU)*move_weight;var bounce:=sin(phase*TAU*2.)*move_weight
  var hair_target:=Vector3(local_accel.z*.0018+local_accel.y*.0008+rhythm*.020,-angular_velocity.y*.012,-local_accel.x*.0017+bounce*.009)
- var tail_target:=Vector3(local_accel.z*.003+local_velocity.z*.009+local_accel.y*.0015+bounce*.045,-angular_velocity.y*.024,-local_accel.x*.003+rhythm*.028)
+ # Relative vertical wind is downward on ascent and upward during the fall.
+ # Falling air lifts the already angled loose ribbon away from the back of the
+ # head; takeoff acceleration pulls it down. The second hinge follows with lag.
+ var fall_wind:=maxf(0.,-local_velocity.y-.25)*.050
+ var rise_wind:=-maxf(0.,local_velocity.y)*.012
+ var tail_target:=Vector3(local_accel.z*.003+local_velocity.z*.009-local_accel.y*.003+fall_wind+rise_wind+bounce*.045,-angular_velocity.y*.024,-local_accel.x*.003-local_velocity.x*.008+rhythm*.028)
  hair_spring.advance(delta,hair_target*SECONDARY_STRENGTH,4.2,.64,Vector3(.10,.075,.08)*SECONDARY_STRENGTH)
- tail_spring.advance(delta,tail_target*SECONDARY_STRENGTH,3.1,.55,Vector3(.28,.18,.20)*SECONDARY_STRENGTH)
- tail_tip.advance(delta,tail_spring.value*.52,3.8,.58,Vector3(.14,.10,.10)*SECONDARY_STRENGTH)
+ tail_spring.advance(delta,tail_target*SECONDARY_STRENGTH,3.1,.55,Vector3(.40,.18,.20)*SECONDARY_STRENGTH)
+ tail_tip.advance(delta,tail_spring.value*.52,3.8,.58,Vector3(.22,.10,.10)*SECONDARY_STRENGTH)
  last_velocity=velocity;last_head_position=head_position;last_head_velocity=head_velocity;last_basis=head_basis
 func _process(delta:float):
  if presenter.display_world.is_empty():return

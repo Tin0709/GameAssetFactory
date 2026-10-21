@@ -28,7 +28,7 @@ func run():
   was_blink=blink
   check(appearance.hair_spring.value.is_finite() and appearance.tail_spring.value.is_finite(),"Bounded finite secondary simulation")
  check(max_hair>.01 and max_tail>.02,"Walk/run/turn inputs visibly excite both secondary springs")
- check(max_hair<.30 and max_tail<.65,"Controlled hair/tail angular limits")
+ check(max_hair<.30 and max_tail<.90,"Controlled hair/tail angular limits")
  check(appearance.hair_spring.value.length()<.001 and appearance.tail_spring.value.length()<.001,"Stop settles to rest with no accumulated drift")
  check(blink_count>=2,"Persistent irregular blink clock survives state switches")
  appearance.advance_face(1./fps,"Aim",0.,false)
@@ -37,10 +37,25 @@ func run():
  appearance.request_expression("Hurt_Heavy");appearance.request_expression("Fire_Recoil_Face")
  for i in maxi(1,roundi(.1*fps)):appearance.advance_face(1./fps,"Aim",0.,false)
  check(absf(appearance.channels.open_l-.12)<.01,"Higher priority authored Hurt owns face above Fire")
+ # Jump airflow must distinguish ascent/fall and raise the free tail tips.
+ appearance.initialized=false;appearance.tail_spring.reset();appearance.tail_tip.reset()
+ var h:=1.55
+ for i in fps:
+  h+=6./fps
+  appearance.advance_motion(1./fps,Vector3(0,6.,0),Vector3(0,h,0),Basis.IDENTITY,0.,0.)
+ var rise_pitch:float=appearance.tail_spring.value.x
+ for i in fps:
+  h-=6./fps
+  appearance.advance_motion(1./fps,Vector3(0,-6.,0),Vector3(0,h,0),Basis.IDENTITY,0.,0.)
+ var fall_pitch:float=appearance.tail_spring.value.x
+ check(rise_pitch<0. and fall_pitch>.4,"Ascent trails down; upward relative wind on descent lifts both tails")
+ check(appearance.tail_tip.value.x>.15,"Loose second tail hinge follows airborne lift")
+ for i in 3*fps:appearance.advance_motion(1./fps,Vector3.ZERO,Vector3(0,h,0),Basis.IDENTITY,0.,0.)
+ check(appearance.tail_spring.value.length()<.001,"Landing returns the wind-lifted tails to rest without drift")
  appearance.request_expression("Blink_Soft")
  for i in roundi(.6*fps):appearance.advance_face(1./fps,"Rifle Ready Idle",0.,false)
  check(appearance.channels.blink>.99,"Authored manual Blink_Soft remains callable")
  scene.reset_player()
  check(appearance.tail_spring.value.length()==0. and appearance.hair_spring.value.length()==0.,"Reset clears physics history")
- print("SOLDIER_SECONDARY ",JSON.stringify({"fps":fps,"passed":failures.is_empty(),"failures":failures,"max_hair_rad":max_hair,"max_tail_rad":max_tail,"blinks":blink_count}))
+ print("SOLDIER_SECONDARY ",JSON.stringify({"fps":fps,"passed":failures.is_empty(),"failures":failures,"max_hair_rad":max_hair,"max_tail_rad":max_tail,"blinks":blink_count,"ascent_pitch_rad":rise_pitch,"fall_lift_rad":fall_pitch}))
  scene.free();quit(0 if failures.is_empty() else 1)
