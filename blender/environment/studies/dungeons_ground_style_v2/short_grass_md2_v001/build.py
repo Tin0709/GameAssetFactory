@@ -74,7 +74,7 @@ for poly,co in zip(mesh.polygons,coords):
 cluster=bpy.data.objects.new('Short_Grass_MD2_Cluster_v001',mesh);masters.objects.link(cluster);cluster.location=(5.6,0,1);cluster.visible_shadow=False;cluster['review_status']='Pending';cluster['cards']=sum(objects[k%4]['cards'] for k in range(5));cluster.asset_mark();cluster.asset_data.description='Pending / five offset short tufts in one editable mesh, one shared material.';objects.append(cluster)
 # Latest user requirement: every individual bush spans at least one block in
 # both horizontal axes. Bake the wider footprint; retain authored short heights.
-for obj,(width,length) in zip(objects,[(1.03,1.01),(1.15,1.02),(1.10,1.12),(1.02,1.04),(1.35,1.30)]):
+for obj,(width,length) in zip(objects,[(1.14,1.11),(1.20,1.14),(1.10,1.12),(1.10,1.12),(1.40,1.35)]):
  bounds=[max(v.co[i] for v in obj.data.vertices)-min(v.co[i] for v in obj.data.vertices) for i in [0,1]]
  for v in obj.data.vertices:v.co.x*=width/bounds[0];v.co.y*=length/bounds[1]
  obj.data.update();obj['minimum_footprint_m']='1 x 1';obj['width_m']=width;obj['length_m']=length
