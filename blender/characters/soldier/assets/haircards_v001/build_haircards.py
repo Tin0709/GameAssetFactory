@@ -69,6 +69,7 @@ for s in bpy.data.scenes:
    if item:item.exclude=vl!=layer
 # Head review reuses exact existing objects in isolated linked collections.
 for e in registry['entries']:
+ if e['id'] in ['SOLDIER_HairCards_v001','SOLDIER_Bandana_2D_v001']:continue
  c=bpy.data.collections.get(e.get('collection',''))
  if c:
   item=lc(layer.layer_collection,c)

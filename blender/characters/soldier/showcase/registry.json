@@ -97,6 +97,34 @@
       ],
       "original_face_design": true,
       "research_body_previews": true
+    },
+    {
+      "id": "SOLDIER_HairCards_v001",
+      "label": "SOLDIER_HairCards_v001",
+      "status": "Pending",
+      "type": "hair",
+      "object": "SOLDIER_HairCards_v001",
+      "collection": "SOLDIER_HairCards_v001_PENDING",
+      "review_scene": "SOLDIER_ASSET_LIBRARY",
+      "view_layer": "Hair & Bandana",
+      "head_bone": "Head",
+      "head_rig": "Original_V6_Rig \u2014 slim arm sockets",
+      "thin_planar_cards": true,
+      "original_hair_preserved": "Survivor_Hair_3D \u2014 layered brown locks"
+    },
+    {
+      "id": "SOLDIER_Bandana_2D_v001",
+      "label": "SOLDIER_Bandana_2D_v001",
+      "status": "Pending",
+      "type": "headwear",
+      "object": "SOLDIER_Bandana_2D_v001",
+      "collection": "SOLDIER_Bandana_2D_v001_PENDING",
+      "review_scene": "SOLDIER_ASSET_LIBRARY",
+      "view_layer": "Hair & Bandana",
+      "head_bone": "Head",
+      "head_rig": "Original_V6_Rig \u2014 slim arm sockets",
+      "thin_planar_cards": true,
+      "original_hair_preserved": "Survivor_Hair_3D \u2014 layered brown locks"
     }
   ],
   "reserved_categories": [

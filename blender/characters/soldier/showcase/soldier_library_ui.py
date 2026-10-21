@@ -18,6 +18,8 @@ def review_scene(entry):
 
 def active_entry(context):
     entries=registry().get('entries',[])
+    if context.view_layer.name=='Hair & Bandana':
+        return next((e for e in entries if e['id']=='SOLDIER_HairCards_v001'),None)
     if context.view_layer.name=='Facial Expressions':
         return next((e for e in entries if e.get('type')=='facial'),None)
     return next((e for e in entries if review_scene(e)==context.scene.name and e.get('type')!='facial'),None)
@@ -51,6 +53,11 @@ class SOLDIER_OT_select_asset(bpy.types.Operator):
         entry=next((e for e in registry().get('entries',[]) if e['id']==self.asset_id),None)
         if entry is None or review_scene(entry) not in bpy.data.scenes:
             self.report({'ERROR'},'Asset review is unavailable');return {'CANCELLED'}
+        if entry.get('type') in ['hair','headwear']:
+            import haircards_ui
+            return bpy.ops.soldier_hair.compare(variant='BANDANA' if entry['type']=='headwear' else 'HAIR')
+        if entry.get('type')=='facial':
+            return bpy.ops.soldier_face.open()
         target=bpy.data.scenes[review_scene(entry)]
         context.window.scene=target
         context.window.view_layer=target.view_layers.get(entry.get('view_layer',''),target.view_layers[0])
@@ -85,7 +92,7 @@ class SOLDIER_PT_library(bpy.types.Panel):
     def draw(self,context):
         layout=self.layout;entries=registry()['entries'];current=active_entry(context)
         for title,equipment in [('CHARACTER',False),('EQUIPMENT',True)]:
-            group=[e for e in entries if e.get('type')!='facial' and (e.get('type')=='equipment')==equipment]
+            group=[e for e in entries if e.get('type') not in ['facial','hair','headwear'] and (e.get('type')=='equipment')==equipment]
             if not group:continue
             box=layout.box();box.label(text=title,icon='OUTLINER_COLLECTION')
             for entry in group:
@@ -93,8 +100,10 @@ class SOLDIER_PT_library(bpy.types.Panel):
                 op=row.operator('soldier_library.select_asset',text=label(entry),icon='OUTLINER_OB_MESH',depress=current['id']==entry['id'])
                 op.asset_id=entry['id']
                 row.label(text=entry.get('status','Pending'))
+        if current.get('type')!='hair' and hasattr(bpy.types,'HC_PT_hair'):layout.operator('soldier_hair.open',text='2D Hair & Bandana · Pending',icon='OUTLINER_OB_MESH')
         if current.get('type')=='facial':return
         if any(e.get('type')=='facial' for e in entries):layout.operator('soldier_face.open',text='Facial Expressions · 18 Pending',icon='HIDE_OFF')
+        if current.get('type') in ['hair','headwear']:return
         layout.separator()
         box=layout.box();box.label(text=label(current),icon='CHECKMARK' if current.get('status')=='Approved' else 'TIME')
         box.label(text='Status: '+current.get('status','Pending'))
@@ -142,6 +151,10 @@ def register():
     if str(facial) not in sys.path:sys.path.insert(0,str(facial))
     if (facial/'facial_ui.py').exists():
         import facial_ui;facial_ui.register()
+    hair=Path(__file__).resolve().parents[1]/'assets/haircards_v001'
+    if (hair/'haircards_ui.py').exists():
+        if str(hair) not in sys.path:sys.path.insert(0,str(hair))
+        import haircards_ui;haircards_ui.register()
     if loaded not in bpy.app.handlers.load_post:bpy.app.handlers.load_post.append(loaded)
     loaded(None)
 
@@ -149,6 +162,7 @@ def unregister():
     if bpy.app.timers.is_registered(focus_sidebar):bpy.app.timers.unregister(focus_sidebar)
     if loaded in bpy.app.handlers.load_post:bpy.app.handlers.load_post.remove(loaded)
     if 'facial_ui' in sys.modules:sys.modules['facial_ui'].unregister()
+    if 'haircards_ui' in sys.modules:sys.modules['haircards_ui'].unregister()
     for cls in reversed(CLASSES):bpy.utils.unregister_class(cls)
 
 if __name__=='__main__':register()
