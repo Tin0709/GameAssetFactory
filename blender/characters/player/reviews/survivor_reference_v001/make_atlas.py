@@ -48,16 +48,20 @@ def hair_paint(im,mask,seed):
    y=max(ys);c=im.getpixel((x,y));im.putpixel((x,y),tuple(max(0,v-12) for v in c))
  return im
 
-# FACE: eyes only, no nose, mouth, eyebrows, or sculpted facial parts.
+# FACE: latest user request adds short brown eyebrows; no nose or mouth.
 im,d=paint(32,32,SKIN)
 d.rectangle((0,13,1,30),fill=(218,143,111));d.rectangle((30,13,31,30),fill=(219,146,114))
 fringe=[26,22,16,15,12,11,15,12,8,10,14,15,15,18,24,26]
 hair_paint(im,lambda x,y:y<fringe[x//2],0)
 d=ImageDraw.Draw(im)
-for x in [4,20]:
- d.rectangle((x,16,x+7,23),fill=(249,241,222))
- d.rectangle((x+3,16,x+6,23),fill=(54,43,29))
- d.rectangle((x+3,16,x+5,17),fill=(28,27,23))
+for x in [4,19]:
+ # Slightly wider, less tall than the previous8x8 eye; closer paired spacing.
+ d.rectangle((x,18,x+8,24),fill=(249,241,222))
+ d.rectangle((x+3,18,x+6,24),fill=(54,43,29))
+ d.rectangle((x+3,18,x+5,19),fill=(28,27,23))
+ # Fine warm-brown brows, partly tucked beneath the unchanged fringe.
+ d.rectangle((x,15,x+7,16),fill=(69,35,21))
+ d.rectangle((x+1,15,x+6,15),fill=(81,42,25))
 d.rectangle((2,25,8,27),fill=(244,182,148));d.rectangle((24,25,29,27),fill=(244,182,148))
 store('head_front',im)
 for side in ['left','right']:
@@ -136,4 +140,4 @@ for i,color in enumerate(HAIR_3D):
  d.rectangle((0,7,7,7),fill=tuple(max(0,c-5) for c in color))
  store('hair3d_'+str(i),im)
 ATLAS.save(OUT/'survivor_atlas.png');(OUT/'atlas_regions.json').write_text(json.dumps(regions,indent=2))
-print('Painted skin-only atlas:',len(regions),'regions')
+print('Painted Soldier atlas:',len(regions),'regions')

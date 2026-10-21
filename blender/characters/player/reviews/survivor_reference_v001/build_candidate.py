@@ -1,5 +1,5 @@
 """Pending skin/clothing review. Append the ORIGINAL V6 body/rig read-only.
-Only requested external clothes are added; no base shape, neck, pose, Action or Godot changes.
+Original head/torso/legs retained; documented slim arms and requested external hair/clothing. No Action or Godot changes.
 """
 import bpy,math,json,sys,hashlib,struct
 from pathlib import Path
@@ -30,7 +30,7 @@ character=next(o for o in dst.objects if o.type=='MESH');rig=next(o for o in dst
 for obj in [character,rig]:asset.objects.link(obj);obj.animation_data_clear()
 for pb in rig.pose.bones:pb.matrix_basis=Matrix.Identity(4)
 for action in list(bpy.data.actions):bpy.data.actions.remove(action)
-character.name='Survivor_Reference_v001 — ORIGINAL BODY / NEW SKIN';rig.name='Original_V6_Rig — unchanged rest'
+character.name='Survivor_Reference_v001 — ORIGINAL BODY / NEW SKIN';rig.name='Original_V6_Rig — slim arm sockets'
 
 def geometry_signature(mesh):
  data=b''.join(struct.pack('<3f',*v.co) for v in mesh.vertices)
@@ -151,21 +151,21 @@ def ring(name,cx,cy,cz,inner_w,inner_d,thickness,height,bone,tile):
   faces.extend([(i,j,8+j,8+i),(4+j,4+i,12+i,12+j),(8+i,8+j,12+j,12+i),(j,i,4+i,4+j)])
  return cloth_mesh(name,verts,faces,bone,override=tile)
 
-# A6mm shirt layer/hem and short sleeves, retaining original shoulder/waist heights.
-cloth_box('Black shirt / thin external layer',(0,0,1.0125),(.462,.237,.675),'Chest','shirt3d_edge')
-ring('Shirt lower hem',0,0,.686,.462,.237,.0035,.022,'Chest','shirt3d_edge')
+# Stronger15mm shirt relief and thicker bands/panels for distant readability.
+cloth_box('Black shirt / readable external layer',(0,0,1.0125),(.480,.255,.675),'Chest','shirt3d_edge')
+ring('Shirt lower hem',0,0,.686,.480,.255,.006,.022,'Chest','shirt3d_edge')
 for side,sign in [('L',1),('R',-1)]:
  cx=sign*.309375
- cloth_box('Black short sleeve '+side,(cx,0,1.2375),(.18075,.237,.225),'Arm.'+side,'shirt3d_edge')
- ring('Sleeve hem '+side,cx,0,1.134,.18075,.237,.003,.018,'Arm.'+side,'shirt3d_edge')
- ring('White forearm wrap '+side,cx,0,1.0125,.16875,.225,.010,.084375,'Arm.'+side,'wrap3d')
- ring('Black wrist band '+side,cx,0,.82265625,.16875,.225,.0075,.0703125,'Arm.'+side,'band3d')
- # Broad stepped fabric panels,6–10mm relief; no added bag or redesigned limb.
+ cloth_box('Black short sleeve '+side,(cx,0,1.2375),(.19875,.255,.225),'Arm.'+side,'shirt3d_edge')
+ ring('Sleeve hem '+side,cx,0,1.134,.19875,.255,.006,.018,'Arm.'+side,'shirt3d_edge')
+ ring('White forearm wrap '+side,cx,0,1.0125,.16875,.225,.020,.084375,'Arm.'+side,'wrap3d')
+ ring('Black wrist band '+side,cx,0,.82265625,.16875,.225,.017,.0703125,'Arm.'+side,'band3d')
+ # Broad stepped fabric panels,20–28mm relief; no added bags or limb redesign.
  lx=sign*.1125
- cloth_box('Raised upper trouser panel '+side,(lx,-.1175,.579),(.205,.010,.145),'Leg.'+side,'pants3d_edge')
- cloth_box('Raised knee fabric panel '+side,(lx,-.118,.348),(.212,.011,.158),'Leg.'+side,'pants3d_edge')
- cloth_box('Outer trouser fabric panel '+side,(lx+sign*.116,0,.574),(.007,.199,.142),'Leg.'+side,'pants3d_edge')
- ring('Trouser lower hem '+side,lx,0,.147,.225,.225,.005,.034,'Leg.'+side,'pants3d_edge')
+ cloth_box('Raised upper trouser panel '+side,(lx,-.1245,.579),(.205,.024,.145),'Leg.'+side,'pants3d_edge')
+ cloth_box('Raised knee fabric panel '+side,(lx,-.1265,.348),(.212,.028,.158),'Leg.'+side,'pants3d_edge')
+ cloth_box('Outer trouser fabric panel '+side,(lx+sign*.1225,0,.574),(.020,.199,.142),'Leg.'+side,'pants3d_edge')
+ ring('Trouser lower hem '+side,lx,0,.147,.225,.225,.012,.034,'Leg.'+side,'pants3d_edge')
 bpy.ops.object.select_all(action='DESELECT')
 for obj in overlays:obj.select_set(True)
 bpy.context.view_layer.objects.active=overlays[0];bpy.ops.object.join();clothes=bpy.context.object
@@ -226,6 +226,12 @@ for i,j,k in sorted(occupied):
   which=lock_index(x,z,front_locks if y<0 else back_locks) if abs(direction[1]) else lock_index(y,z,side_locks)
   tone=(which*5+1)%6 if which>=0 else ((i-k//2)//2*7+j//2*3+k//2)%6
   tiles.append('hair3d_'+str(tone))
+# Latest user correction: preserve this approved-looking haircut, thin only its outer relief.
+def thinner_hair_co(co):
+ x,y,z=co
+ def thin(v):return math.copysign(.225+(abs(v)-.225)*.80,v) if abs(v)>.225 else v
+ return (thin(x),thin(y),1.80+(z-1.80)*.85 if z>1.80 else z)
+verts=[thinner_hair_co(co) for co in verts]
 mesh=bpy.data.meshes.new('Soldier / staggered voxel hair');mesh.from_pydata(verts,[],faces);mesh.update()
 hair=bpy.data.objects.new('Survivor_Hair_3D — layered brown locks',mesh);asset.objects.link(hair);mesh.materials.append(material)
 uvh=mesh.uv_layers.new(name='Survivor_Skin')
@@ -235,7 +241,7 @@ for poly,tile in zip(mesh.polygons,tiles):
  poly.use_smooth=False
 vg=hair.vertex_groups.new(name='Head');vg.add(list(range(len(mesh.vertices))),1.,'REPLACE')
 mod=hair.modifiers.new('Rigid Head follow','ARMATURE');mod.object=rig;hair.parent=rig
-hair['scope']='User-requested3D hair only; original head cube is unchanged';hair['hair_voxel_m']=CELL
+hair['scope']='User-requested3D hair only; original head cube is unchanged';hair['hair_voxel_m']=CELL;hair['outer_relief_multiplier']=.80
 mesh.calc_loop_triangles()
 
 # Nothing below changes any body vertex, face, normal, bone or skin weight.
@@ -249,8 +255,8 @@ asset.asset_mark();asset.asset_data.description='Pending skin and3D clothes on o
 asset['review_status']='Pending'
 reference=bpy.data.images.load(str(OUT/'primary_reference.png'));reference.name='PRIMARY — supplied six-view character';reference.pack();reference.use_fake_user=True
 ref=bpy.data.objects.new('PRIMARY REFERENCE — viewport only',None);refs.objects.link(ref);ref.empty_display_type='IMAGE';ref.data=reference;ref.empty_display_size=2.5;ref.location=(2,1,1);ref.hide_render=True;ref.hide_set(True)
-notes=bpy.data.texts.new('START HERE — SKIN ONLY')
-notes.write('PENDING / Survivor Reference v001\nOriginal V6 head/body/legs exact; older3x12x4 slim arms restored;48base vertices, no neck.\nNew skin plus user-requested3D clothing: white/black arm bands, black shirt and trouser relief.\nLarge eyes only; no nose/mouth. A separate3D brown hair layer surrounds the unchanged original head cube.\nNo new Action or Godot integration.\nCameras Front / Front_3Q / Left_Side / Back / Right_Side / Back_3Q.\nNumpad0: camera; F12: render. Images packed.\n')
+notes=bpy.data.texts.new('START HERE — SOLDIER SKIN')
+notes.write('PENDING / Survivor Reference v001\nOriginal V6 head/body/legs exact; older3x12x4 slim arms restored;48base vertices, no neck.\nNew skin plus stronger3D clothing relief: white/black arm bands, black shirt and trouser panels.\nLarge9x7pixel eyes and short brown eyebrows; no nose/mouth. A separate3D brown hair layer surrounds the unchanged original head cube.\nNo new Action or Godot integration.\nCameras Front / Front_3Q / Left_Side / Back / Right_Side / Back_3Q.\nNumpad0: camera; F12: render. Images packed.\n')
 
 def studio_mat(name,color):
  m=bpy.data.materials.new(name);m.diffuse_color=(*color,1);m.use_nodes=True
@@ -286,7 +292,7 @@ for im in list(bpy.data.images):
 scene['review_cameras']=json.dumps(list(views));scene['skin_only']=False;scene['original_body_unchanged']=False;scene['non_arm_original_geometry_exact']=True;scene['slim_arms']=True;scene['requested_clothing_relief']=True
 bpy.ops.wm.save_as_mainfile(filepath=str(FILE),compress=True)
 character.data.calc_loop_triangles()
-report={'candidate':FILE.name,'status':'Pending','skin_only':False,'original_body_unchanged':False,'non_arm_original_geometry_exact':True,'slim_arm_dimensions_wld_m':[.16875,.675,.225],'slim_arm_reference':'blender/characters/player/cuboid/create_slim_arm_study.py (3x12x4)','vertices':len(character.data.vertices),'triangles':len(character.data.loop_triangles),'quads':len(character.data.polygons),'materials':len(character.data.materials),'bones':len(rig.data.bones),'actions':len(bpy.data.actions),'body_source_sha256':source_hash,'original_geometry_sha256':original_geometry,'body_geometry_sha256':adapted_geometry,'geometry_exact':False,'non_arm_geometry_exact':True,'non_arm_rest_skeleton_exact':True,'arm_pivots_seated_to_body':True,'weights_exact':True,'no_neck_geometry':True,'no_nose_or_mouth':True,'added_3d_clothing_only':True,'clothing_vertices':len(clothes.data.vertices),'clothing_triangles':len(clothes.data.loop_triangles),'clothing_parts':['Black shirt and short sleeves','White forearm wraps','Black wrist bands','Trouser fabric panels and hems'],'volumetric_hair':True,'hair_vertices':len(hair.data.vertices),'hair_triangles':len(hair.data.loop_triangles),'hair_style':'Curated staggered3D locks, dark warm brown palette','rigid_bounds_m':body_bounds,'packed_images':[im.name for im in bpy.data.images if im.packed_file],'review_cameras':list(views),'gameplay_integrated':False}
+report={'candidate':FILE.name,'status':'Pending','skin_only':False,'original_body_unchanged':False,'non_arm_original_geometry_exact':True,'slim_arm_dimensions_wld_m':[.16875,.675,.225],'slim_arm_reference':'blender/characters/player/cuboid/create_slim_arm_study.py (3x12x4)','vertices':len(character.data.vertices),'triangles':len(character.data.loop_triangles),'quads':len(character.data.polygons),'materials':len(character.data.materials),'bones':len(rig.data.bones),'actions':len(bpy.data.actions),'body_source_sha256':source_hash,'original_geometry_sha256':original_geometry,'body_geometry_sha256':adapted_geometry,'geometry_exact':False,'non_arm_geometry_exact':True,'non_arm_rest_skeleton_exact':True,'arm_pivots_seated_to_body':True,'weights_exact':True,'no_neck_geometry':True,'no_nose_or_mouth':True,'requested_3d_clothing':True,'relief_m':{'shirt':.015,'white_wrap':.020,'black_band':.017,'trouser_panels':[.020,.024,.028],'trouser_hem':.012},'hair_outer_relief_multiplier':.80,'eyebrows':True,'eye_pixels_wh':[9,7],'clothing_vertices':len(clothes.data.vertices),'clothing_triangles':len(clothes.data.loop_triangles),'clothing_parts':['Black shirt and short sleeves','White forearm wraps','Black wrist bands','Trouser fabric panels and hems'],'volumetric_hair':True,'hair_vertices':len(hair.data.vertices),'hair_triangles':len(hair.data.loop_triangles),'hair_style':'Curated staggered3D locks, dark warm brown palette','rigid_bounds_m':body_bounds,'packed_images':[im.name for im in bpy.data.images if im.packed_file],'review_cameras':list(views),'gameplay_integrated':False}
 assert report['vertices']==48 and report['triangles']==72 and report['quads']==36 and report['actions']==0
 assert hashlib.sha256(SOURCE.read_bytes()).hexdigest()==source_hash
 (OUT/'model_validation.json').write_text(json.dumps(report,indent=2));print('MODEL_VALIDATION',json.dumps(report),flush=True)

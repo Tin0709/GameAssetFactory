@@ -26,7 +26,24 @@
   "weights_exact": true,
   "no_neck_geometry": true,
   "no_nose_or_mouth": true,
-  "added_3d_clothing_only": true,
+  "requested_3d_clothing": true,
+  "relief_m": {
+    "shirt": 0.015,
+    "white_wrap": 0.02,
+    "black_band": 0.017,
+    "trouser_panels": [
+      0.02,
+      0.024,
+      0.028
+    ],
+    "trouser_hem": 0.012
+  },
+  "hair_outer_relief_multiplier": 0.8,
+  "eyebrows": true,
+  "eye_pixels_wh": [
+    9,
+    7
+  ],
   "clothing_vertices": 216,
   "clothing_triangles": 396,
   "clothing_parts": [
