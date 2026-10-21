@@ -11,7 +11,7 @@ from mathutils import Vector
 
 D=Path(__file__).resolve().parent;P=D.parent;R=D.parents[4];E=R/'.validation/md2_grass_interaction_v001'
 sys.path[:0]=[str(D),str(P),str(P/'tall_grass_md2_v001'),str(P/'grass_wind_md2_v001')]
-from flower_preservation import snapshot, digest, rna_values, node_content
+from flower_preservation import snapshot, digest, rna_values, node_content, scalar_copy
 from check_field import check
 from field import CONTROLS
 import runtime
@@ -41,7 +41,8 @@ def wind_fingerprint():
         for attr in o.data.attributes:
             if attr.name.startswith('md2_wind_'):
                 attrs[attr.name]=[list(d.vector) if hasattr(d,'vector') else d.value for d in attr.data]
-        objects[name]={'modifier_values':mod.properties.inputs.to_dict(),'drivers':drivers,'attributes':attrs}
+        values={s.identifier:scalar_copy(mod.properties.inputs[s.identifier]['value']) for s in tree.interface.items_tree if s.item_type=='SOCKET' and s.in_out=='INPUT' and s.name!='Geometry'}
+        objects[name]={'modifier_values':values,'drivers':drivers,'attributes':attrs}
     return digest({'tree':node_content(tree),'interface':[rna_values(s) for s in tree.interface.items_tree],
                    'props':dict(tree.items()),'objects':objects,'controller':dict(bpy.data.objects[info['controller']].items())})
 
