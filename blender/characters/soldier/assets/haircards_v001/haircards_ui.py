@@ -32,10 +32,30 @@ def camera(context,direction):
  old={'ThreeQuarter':'Front_3Q','Side':'Left_Side','BackThreeQuarter':'Back_3Q','OtherSide':'Right_Side'}
  name='HC_'+direction if p.closeup or p.preview!='CHARACTER' else old.get(direction,direction)
  s.camera=bpy.data.objects[name]
+def preview_changed(self,context):
+ global GUARD
+ if GUARD:return
+ GUARD=True
+ if self.preview!='CHARACTER':self.style='CARDS';self.bandana=self.preview=='HAIR_BANDANA'
+ GUARD=False;apply(self,context)
+def bandana_changed(self,context):
+ global GUARD
+ if GUARD:return
+ GUARD=True
+ if self.preview!='CHARACTER':self.preview='HAIR_BANDANA' if self.bandana else 'HAIR_ONLY'
+ GUARD=False;apply(self,context)
+def style_changed(self,context):
+ global GUARD
+ if GUARD:return
+ GUARD=True
+ if self.style=='ORIGINAL':
+  self.bandana=False
+  if self.preview=='HAIR_BANDANA':self.preview='HAIR_ONLY'
+ GUARD=False;apply(self,context)
 class HC_Settings(bpy.types.PropertyGroup):
- style:EnumProperty(name='Hair',items=[('ORIGINAL','Original Hair','Preserved chunky voxel hairstyle'),('CARDS','2D Hair','Thin layered pixel cards')],default='CARDS',update=apply)
- bandana:BoolProperty(name='Show Bandana',default=True,update=apply)
- preview:EnumProperty(name='Preview',items=[('CHARACTER','On Soldier','The actual unchanged Soldier'),('HAIR_ONLY','Hair only','Isolated flat hair cards'),('HAIR_BANDANA','Hair + Bandana','Isolated layered head assets')],default='CHARACTER',update=apply)
+ style:EnumProperty(name='Hair',items=[('ORIGINAL','Original Hair','Preserved chunky voxel hairstyle'),('CARDS','2D Hair','Thin layered pixel cards')],default='CARDS',update=style_changed)
+ bandana:BoolProperty(name='Show Bandana',default=True,update=bandana_changed)
+ preview:EnumProperty(name='Preview',items=[('CHARACTER','On Soldier','The actual unchanged Soldier'),('HAIR_ONLY','Hair only','Isolated flat hair cards'),('HAIR_BANDANA','Hair + Bandana','Isolated layered head assets')],default='CHARACTER',update=preview_changed)
  closeup:BoolProperty(name='Close-up',default=True,update=apply)
 class HC_OT_open(bpy.types.Operator):
  bl_idname='soldier_hair.open';bl_label='2D Hair & Bandana'

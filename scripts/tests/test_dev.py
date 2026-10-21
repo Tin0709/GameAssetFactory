@@ -137,7 +137,7 @@ class PortableLauncherTests(unittest.TestCase):
         tool='/Applications/Blender.app/Contents/MacOS/Blender'
         source=dev.ROOT/dev.VIEWERS['soldier']
         loader=dev.ROOT/'scripts/load_showcase_ui.py'
-        listing=f'  31 {tool} --factory-startup {source}\n  32 {tool} --factory-startup {source} --python {loader}\n  34 {tool} --factory-startup {source} --python {loader} --python-expr print(\"SOLDIER_FACIAL_UI_V001\")\n  33 {tool} --factory-startup {source} --python {loader} --python-expr print(\"SOLDIER_FACIAL_UI_V001 SOLDIER_HAIRCARDS_UI_V001\")\n'
+        listing=f'  31 {tool} --factory-startup {source}\n  32 {tool} --factory-startup {source} --python {loader}\n  34 {tool} --factory-startup {source} --python {loader} --python-expr print(\"SOLDIER_FACIAL_UI_V001\")\n  35 {tool} --factory-startup {source} --python {loader} --python-expr print(\"SOLDIER_FACIAL_UI_V001 SOLDIER_HAIRCARDS_UI_V001\")\n  33 {tool} --factory-startup {source} --python {loader} --python-expr print(\"SOLDIER_FACIAL_UI_V001 SOLDIER_HAIRCARDS_UI_V001_R2\")\n'
         with patch.object(dev.subprocess,'check_output',return_value=listing):
             self.assertEqual(dev.existing_viewer_pid(tool,source,require_ui=True),33)
 
