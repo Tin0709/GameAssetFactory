@@ -1,7 +1,10 @@
 """Focused numerical contracts, independent of Blender drawing."""
 import json
 import time
+import sys
+from pathlib import Path
 import numpy as np
+sys.path.insert(0,str(Path(__file__).resolve().parent))
 from field import CONTROLS, FieldCache, grid, route, spring_step, target
 
 

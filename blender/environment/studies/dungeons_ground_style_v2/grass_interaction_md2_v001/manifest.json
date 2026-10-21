@@ -1,0 +1,24 @@
+{
+  "status": "Pending",
+  "field_clumps": 43,
+  "grass_triangles": 2566,
+  "new_grass_meshes": 0,
+  "new_node_groups": 1,
+  "new_scenes": 0,
+  "new_actions": 0,
+  "shared_grid": [
+    64,
+    48
+  ],
+  "default_controls": {
+    "Player Interaction On/Off": true,
+    "Interaction Radius": 0.9,
+    "Interaction Strength": 1.15,
+    "Bending Response": 18.0,
+    "Recovery Speed": 6.0,
+    "Walk/Run Preview Speed": 1.0
+  },
+  "proxy_height_m": 1.8,
+  "duration_s": 20.0,
+  "catalog_line": "69a8a118-95d4-5ca5-837f-292b3dc95390:Environment/Grass Interaction Pending:Grass Interaction Pending\n"
+}
