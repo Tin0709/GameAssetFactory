@@ -158,6 +158,13 @@ for sign in [-1,1]:
     for edge in [-1,1]:
         box('pouch side seam',(x+edge*.079,-.282,.196),(.008,.011,.171),'canvas_edge')
 
+# Flush squared rivet heads on the four front tabs; no loose high-poly fasteners.
+for sign in [-1,1]:
+    for z,cx,cy,w,h in [(.395,sign*.125,-.249,.039,.077),(.182,sign*.094,-.331,.040,.066)]:
+        for dx in [-1,1]:
+            for dz in [-1,1]:
+                box('front tab rivet',(cx+dx*(w/2-.005),cy,z+dz*(h/2-.006)),(.0028,.002,.0028),'steel_edge',True)
+
 # Side sleeves, compression webbing, and lower accessory pockets.
 for sign in [-1,1]:
     x=sign*.232
@@ -184,7 +191,8 @@ for sign in [-1,1]:
     box('back padding face '+str(sign),(x,.171,.372),(.053,.015,.525),'canvas_warm')
     box('upper back dark strap '+str(sign),(x,.184,.548),(.077,.017,.047),'leather')
     box('adjustment webbing '+str(sign),(x,.188,.226),(.040,.020,.236),'leather')
-    frame('back shoulder adjuster '+str(sign),x,.210,.344,.074,.074,.011)
+    box('buckle backing webbing '+str(sign),(x,.294,.344),(.050,.020,.067),'leather')
+    frame('back shoulder adjuster '+str(sign),x,.310,.344,.074,.074,.011)
     # Shoulder loop is unsupported equipment geometry, not attached to any rig.
     path=[(.119,.633),(.174,.602),(.228,.536),(.266,.432),(.278,.307),(.252,.205),(.201,.135),(.118,.104)]
     ribbon('outer shoulder loop '+str(sign),sign*.135,path,.058,.023,'webbing_brown')
@@ -196,12 +204,12 @@ frame('waist buckle',0,.232,.126,.084,.071,.012)
 
 # Squared carry handle and its short mount blocks.
 for sign in [-1,1]:
-    box('handle mount '+str(sign),(sign*.062,.057,.665),(.032,.046,.033),'leather')
-    box('handle upright '+str(sign),(sign*.062,.057,.690),(.021,.032,.040),'leather')
-box('top carry handle',(0,.057,.710),(.145,.035,.021),'leather')
+    box('handle mount '+str(sign),(sign*.062,.057,.660),(.032,.046,.020),'leather')
+    box('handle upright '+str(sign),(sign*.062,.057,.673),(.021,.032,.025),'leather')
+box('top carry handle',(0,.057,.684),(.145,.035,.018),'leather')
 
 # Reference side silhouette is relatively compact; retain real depth with broad straps.
-vertices=[(x*.94,y*.60,z) for x,y,z in vertices]
+vertices=[(x*.85,y*.60,z) for x,y,z in vertices]
 mesh=bpy.data.meshes.new('BPK_Standalone backpack mesh')
 mesh.from_pydata(vertices,[],faces);mesh.update()
 obj=bpy.data.objects.new('BPK_Backpack_v001',mesh);asset.objects.link(obj)
@@ -223,7 +231,7 @@ for poly,style in zip(mesh.polygons,styles):
     span=[max(hi[i]-lo[i],1e-5) for i in range(2)]
     rng=random.Random(part+str(poly.index//6))
     # Keep a consistent coarse pixel density rather than stretching a full tile per small box.
-    scale=[min(.98,max(.08,v/(.0048*rw))) for v in span]
+    scale=[min(.98,max(.08,v/(.0032*rw))) for v in span]
     offset=[rng.uniform(0,1-scale[i]) for i in range(2)]
     if is_plate:scale=[.98,.98];offset=[.01,.01]
     for li in poly.loop_indices:
