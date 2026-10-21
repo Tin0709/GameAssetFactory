@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "band_height_before_m": 0.04599999999999982,
+  "band_height_after_m": 0.06899999999999995,
+  "width_multiplier": 1.5000000000000049,
+  "hair_geometry_uv_and_texture_unchanged": true,
+  "tails_geometry_unchanged": true,
+  "cloth_tucked_under_existing_front_and_side_hair": true
+}
