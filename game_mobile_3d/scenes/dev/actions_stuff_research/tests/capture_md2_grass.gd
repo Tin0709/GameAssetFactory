@@ -64,14 +64,14 @@ func run():
 	for material in level.grass_field.materials:material.set_shader_parameter("interaction_strength",0.)
 	await process_frame;RenderingServer.force_draw(false)
 	viewport.get_texture().get_image().save_png(out+"/contact_off.png")
-	for material in level.grass_field.materials:material.set_shader_parameter("interaction_strength",1.25)
+	for material in level.grass_field.materials:material.set_shader_parameter("interaction_strength",1.50)
 	await process_frame;RenderingServer.force_draw(false)
 	viewport.get_texture().get_image().save_png(out+"/contact_on.png")
 	for material in level.grass_field.materials:
 		material.set_shader_parameter("interaction_strength",0.);material.set_shader_parameter("wind_strength",0.)
 	await process_frame;RenderingServer.force_draw(false)
 	viewport.get_texture().get_image().save_png(out+"/wind_off.png")
-	for material in level.grass_field.materials:material.set_shader_parameter("wind_strength",1.)
+	for material in level.grass_field.materials:material.set_shader_parameter("wind_strength",1.28)
 	await process_frame;RenderingServer.force_draw(false)
 	viewport.get_texture().get_image().save_png(out+"/wind_on.png")
 	paused=false

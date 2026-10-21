@@ -7,7 +7,7 @@ const STEP:=1./60.
 const RADIUS:=1.40
 const RESPONSE:=23.
 const RECOVERY:=7.8
-const DAMPING:=.17
+const DAMPING:=.14
 var x:=PackedFloat32Array()
 var z:=PackedFloat32Array()
 var vx:=PackedFloat32Array()
@@ -92,8 +92,8 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 			# restarts the oscillation, and repeated brushes remain velocity-bounded.
 			var contact:=falloff*ground_gain
 			var rise:=maxf(0.,contact-contact_weights[index]);contact_weights[index]=contact
-			var kick:=direction*rise*(6.5+2.0*minf(speed/7.55,1.))
-			var velocity_now:=(Vector2(vx[index],vz[index])+kick).limit_length(7.5)
+			var kick:=direction*rise*(8.0+2.4*minf(speed/7.55,1.))
+			var velocity_now:=(Vector2(vx[index],vz[index])+kick).limit_length(8.5)
 			vx[index]=velocity_now.x;vz[index]=velocity_now.y
 			# Closed-form underdamped spring: clear bend, soft reversals, fading energy.
 			var damping:=DAMPING*omega;var frequency:=omega*sqrt(1.-DAMPING*DAMPING)

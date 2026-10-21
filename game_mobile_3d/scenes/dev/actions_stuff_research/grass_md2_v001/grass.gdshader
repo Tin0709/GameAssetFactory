@@ -5,8 +5,8 @@ uniform sampler2D interaction_field : filter_linear, repeat_disable;
 uniform sampler2D interaction_previous : filter_linear, repeat_disable;
 uniform float interaction_alpha=1.0;
 uniform float wind_time=0.0;
-uniform float wind_strength=1.0;
-uniform float interaction_strength=1.25;
+uniform float wind_strength=1.28;
+uniform float interaction_strength=1.50;
 uniform float family_response=1.0;
 uniform float field_extent=34.0;
 varying float height_fraction;
@@ -34,8 +34,12 @@ void vertex(){
 		textureLod(interaction_field,uv,0.0).rg,interaction_alpha)
 		*interaction_strength*mix(0.90,1.18,step(0.9,family_response));
 	vec2 combined=wind+contact;
-	float angle=min(length(combined),1.32);
-	vec2 world_direction=combined/max(length(combined),0.00001);
+	float magnitude=length(combined);
+	// Soft bend limit: stronger strokes keep moving instead of hitting a flat
+	// hard-clamped plateau. Value and slope stay continuous at1.10rad.
+	float excess=max(magnitude-1.10,0.0);
+	float angle=min(magnitude,1.10)+0.35*excess/(0.35+excess);
+	vec2 world_direction=combined/max(magnitude,0.00001);
 	vec3 local_direction=normalize(transpose(mat3(MODEL_MATRIX))*vec3(world_direction.x,0.0,world_direction.y)+vec3(0.0,0.0000001,0.0));
 	// Exact circular centerline: fixed root, bounded arc shortening, no stretch.
 	float curve=angle*t;
