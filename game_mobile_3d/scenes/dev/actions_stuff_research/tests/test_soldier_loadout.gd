@@ -44,7 +44,7 @@ func run():
   muzzle_axis_error=maxf(muzzle_axis_error,forward.distance_to(carrier.basis.y.normalized()))
   if i%maxi(1,int(fps/6))==0:
    var left:Transform3D=v.skeleton.global_transform*v.skeleton.get_bone_global_pose(v.arm_left)
-   var tr:=left.affine_inverse()*v.rifle_model.global_transform;var gap:=100.
+   var tr:Transform3D=left.affine_inverse()*v.rifle_model.global_transform;var gap:=100.
    for point in gun_points:
     var local:Vector3=tr*point;gap=minf(gap,local.distance_to(local.clamp(palm_box.position,palm_box.end)))
     if gap==0.:break
