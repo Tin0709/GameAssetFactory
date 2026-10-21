@@ -87,6 +87,9 @@ for side in ['L','R']:
   d.rectangle((0,16,15,18),fill=(228,137,108));d.rectangle((2,16,5,18),fill=(240,155,123))
   d.rectangle((0,21,15,26),fill=(205,195,171));d.rectangle((0,21,15,21),fill=(178,163,137));d.rectangle((0,26,15,26),fill=(233,220,193));d.rectangle((2,23,10,23),fill=(216,206,180))
   d.rectangle((0,35,15,39),fill=(34,37,36));d.rectangle((0,35,15,35),fill=(45,46,43))
+  # User-requested restrained skin contact shadows BELOW each3D ring.
+  d.rectangle((0,27,15,27),fill=(211,148,115));d.rectangle((0,28,15,28),fill=(226,163,130))
+  d.rectangle((0,40,15,40),fill=(207,145,111));d.rectangle((0,41,15,41),fill=(224,160,127))
   d.rectangle((0,46,15,47),fill=(220,150,116))
   if face=='front':
    x=11 if side=='L' else 3
