@@ -45,7 +45,7 @@ bpy.context.window.view_layer=layer
 for view_layer in scene.view_layers:view_layer.use=view_layer==layer
 original_rig=bpy.data.objects[skin['rig']];rig=original_rig.copy();rig.data=original_rig.data.copy();rig.name='SF_Soldier_Rig';rig.data.name='SF_Original_Soldier_RestRig_Copy';rig.animation_data_clear();asset.objects.link(rig);rig.hide_viewport=False;rig.hide_render=False;rig.hide_set(False)
 for pb in rig.pose.bones:pb.matrix_basis=Matrix.Identity(4);pb.rotation_mode='QUATERNION'
-for source in bpy.data.collections[skin['collection']].all_objects:
+for source in list(bpy.data.collections[skin['collection']].all_objects):
  if source.type!='MESH':continue
  clone=source.copy();clone.name='SF_'+('Soldier_Body' if source.name==skin['body'] else 'Soldier_Hair' if source.name==skin['hair'] else 'Soldier_Clothing');clone.animation_data_clear();asset.objects.link(clone);clone.parent=rig;clone.matrix_world=source.matrix_world;clone.hide_render=False;clone.hide_viewport=False;clone.hide_set(False)
  for mod in clone.modifiers:
