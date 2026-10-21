@@ -5,8 +5,24 @@ from bpy.app.handlers import persistent
 D=Path(__file__).resolve().parent;sys.path.insert(0,str(D.parent/'short_grass_md2_v001'));import review_ui as short_ui
 LIB='dungeons_ground_style_v2.blend'
 def record():return json.loads(bpy.context.scene.get('md2_tall_review','{}'))
+def visible_names(key):
+ info=record();root=bpy.data.collections['MD2_Tall_Grass_v001_PENDING'];all_objects=list(root.all_objects)
+ if key=='Overview':return {o.name for o in all_objects}
+ visible={o.name for o in all_objects if o.type in {'CAMERA','LIGHT'} or o.name=='Tall_MD2_Studio_Floor'}
+ if key in ['Grouped','Gameplay','Opposite']:
+  visible.update(o.name for o in bpy.data.collections['03_Tall_MD2_Grouped'].objects)
+ elif key=='Compare':
+  visible.update(o.name for o in all_objects if o.name.startswith(('Tall_MD2_Compare','Tall_MD2_Label_SHORT','Tall_MD2_Label_TALL MD2','Tall_MD2_Label_CURRENT','Tall_MD2_Label_EXISTING')))
+ else:
+  variant='Soft Meadow' if key=='Side' else key
+  obj=next(bpy.data.objects[n] for n in info['masters'] if bpy.data.objects[n]['variant']==variant)
+  visible.add(obj.name);visible.update(o.name for o in all_objects if o.name=='Tall_MD2_Platform_'+obj.name or o.name.startswith('Tall_MD2_ClusterBase_'+obj.name))
+ return visible
 def select(context,key):
  info=record();assert info and Path(bpy.data.filepath).name==LIB
+ if key not in ['Short','Original']:
+  layer=context.scene.view_layers[info['layer']];context.window.view_layer=layer;visible=visible_names(key)
+  for obj in bpy.data.collections['MD2_Tall_Grass_v001_PENDING'].all_objects:obj.hide_set(obj.name not in visible,view_layer=layer)
  if key in ['Short','Original']:short_ui.select(context,'Overview' if key=='Short' else 'Original')
  else:
   context.window.view_layer=context.scene.view_layers[info['layer']]

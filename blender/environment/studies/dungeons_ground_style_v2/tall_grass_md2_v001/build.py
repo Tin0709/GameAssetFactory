@@ -27,7 +27,7 @@ texinfo=json.loads((D/'texture_manifest.json').read_text());mat=short_objects[0]
 for n in mat.node_tree.nodes:
  if n.type=='TEX_IMAGE':n.image=image
 mat['review_status']='Pending';mat['reference']='Actual tall_grass_top + tall_grass_bottom, Dungeons II Style0.7 JE; same short-grass green palette'
-specs=[('A','Soft Meadow',.78,9,.54,.085,.22,(1.10,1.08)),('B','Open Fan',.94,10,.56,.105,.27,(1.22,1.12)),('C','Low Sweep',.72,8,.60,.10,.25,(1.12,1.14)),('D','Uneven Crown',.87,9,.50,.08,.23,(1.10,1.08))]
+specs=[('A','Soft Meadow',.78,9,.54,.085,.22,(1.10,1.08)),('B','Open Fan',.94,10,.56,.105,.27,(1.22,1.12)),('C','Low Sweep',.72,8,.46,.10,.32,(1.12,1.14)),('D','Uneven Crown',.87,9,.50,.08,.23,(1.10,1.08))]
 objects=[]
 for idx,(suffix,label,height,count,width,radius,lean,footprint) in enumerate(specs):
  rng=random.Random(926+idx);verts=[];faces=[];uv=[];wind=[];ids=[]
