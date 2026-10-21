@@ -161,6 +161,15 @@ for key in routes:
         assert item.hide_get(view_layer=bpy.context.view_layer) == (item.name not in expected), (key,item.name,'viewport isolation')
 static_ui.select(bpy.context, 'All')
 for key, expected in info['original_timeline'].items(): assert getattr(scene, key) == expected, (key, getattr(scene,key), expected)
+# Preserve live static review edits across later wind visits, not just build state.
+scene.use_preview_range=False; scene.frame_start=17; scene.frame_end=400; scene.frame_set(123)
+changed={k:getattr(scene,k) for k in info['original_timeline']}
+ui.select(bpy.context,'Field'); static_ui.select(bpy.context,'All')
+for key,value in changed.items(): assert getattr(scene,key)==value,(key,'live timeline')
+original=info['original_timeline']
+scene.use_preview_range=False; scene.frame_start=original['frame_start']; scene.frame_end=original['frame_end']
+scene.frame_preview_start=original['frame_preview_start']; scene.frame_preview_end=original['frame_preview_end']
+scene.use_preview_range=original['use_preview_range']; scene.frame_set(original['frame_current'])
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
     bpy.context.window.view_layer = scene.view_layers[name]
     scene.update_tag(); scene.frame_set(78); bpy.context.view_layer.update()
