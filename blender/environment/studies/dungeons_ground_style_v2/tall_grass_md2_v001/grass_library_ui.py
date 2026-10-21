@@ -1,10 +1,36 @@
 """One shared Grass MD2 panel for the saved short and tall research assets."""
 import bpy,json,sys
 from pathlib import Path
+from mathutils import Vector
 from bpy.app.handlers import persistent
 D=Path(__file__).resolve().parent;sys.path.insert(0,str(D));import tall_review_ui as tall
 short=tall.short_ui;LIB='dungeons_ground_style_v2.blend'
 def record():return json.loads(bpy.context.scene.get('md2_grass_library','{}'))
+def tall_closeup(context,key):
+ # Review cameras are created/reused in memory; source meshes and saved cameras
+ # are never moved or rescaled. Fit the complete tuft, including its roots.
+ tall.select(context,key);context.view_layer.update()
+ info=tall.record();obj=next(bpy.data.objects[n] for n in info['masters'] if bpy.data.objects[n]['variant']==key)
+ normal=bpy.data.objects[info['cameras'][key]];name='MD2_Tall_Closeup_'+obj.name
+ camera=bpy.data.objects.get(name)
+ if camera is None:
+  data=normal.data.copy();data.name=name;camera=bpy.data.objects.new(name,data)
+  bpy.data.collections['04_Tall_MD2_Review_Studio'].objects.link(camera);camera['md2_tall_closeup']=True
+ rotation=normal.rotation_euler.to_matrix();right=rotation.col[0];up=rotation.col[1]
+ points=[obj.matrix_world@v.co for v in obj.data.vertices]
+ bounds=[(min(p.dot(axis) for p in points),max(p.dot(axis) for p in points)) for axis in [right,up]]
+ center=sum(points,Vector())/len(points)
+ center+=right*((sum(bounds[0])/2)-center.dot(right))
+ center+=up*((sum(bounds[1])/2)-center.dot(up))
+ render=context.scene.render;aspect=(render.resolution_x*render.pixel_aspect_x)/(render.resolution_y*render.pixel_aspect_y)
+ camera.rotation_euler=normal.rotation_euler.copy();camera.location=center+rotation.col[2]*3.
+ camera.data.type='ORTHO';camera.data.sensor_fit='HORIZONTAL'
+ camera.data.ortho_scale=max(bounds[0][1]-bounds[0][0],(bounds[1][1]-bounds[1][0])*aspect)*1.08
+ for area in context.screen.areas:
+  if area.type=='VIEW_3D':
+   area.spaces.active.camera=camera;area.spaces.active.region_3d.view_perspective='CAMERA';area.tag_redraw()
+ context.view_layer.update()
+ return camera
 def select(context,key):
  info=record();assert info and Path(bpy.data.filepath).name==LIB
  layer=context.scene.view_layers[info['layer']]
@@ -16,6 +42,7 @@ def select(context,key):
    if a.type=='VIEW_3D':
     v=a.spaces.active;v.use_local_camera=True;v.camera=bpy.data.objects[info['all_camera']];v.region_3d.view_perspective='CAMERA';v.region_3d.view_camera_zoom=0;v.show_region_ui=True;v.overlay.show_overlays=False;a.tag_redraw()
  elif key.startswith('S:'):short.select(context,key[2:])
+ elif key.startswith('TC:'):tall_closeup(context,key[3:])
  elif key.startswith('T:'):tall.select(context,key[2:])
  else:raise ValueError(key)
  context.scene['md2_grass_library_selected']=key
@@ -37,10 +64,9 @@ class MD2_PT_grass_library(bpy.types.Panel):
    r=b.row(align=True)
    for key,title in pair:button(r,'S:'+key,title,'MESH_DATA')
   button(b,'S:Cluster','Short · Dense Cluster')
-  b=l.box();b.label(text='TALL GRASS · MD2 meadow')
-  for pair in [[('Soft Meadow','A · Meadow'),('Open Fan','B · Open Fan')],[('Low Sweep','C · Low Sweep'),('Uneven Crown','D · Uneven')],[('Meadow Cluster','Cluster 1'),('Upright Cluster','Cluster 2')]]:
-   r=b.row(align=True)
-   for key,title in pair:button(r,'T:'+key,title,'MESH_DATA')
+  b=l.box();b.label(text='TALL GRASS · CẬN CẢNH',icon='VIEWZOOM')
+  for key,title in [('Soft Meadow','A · Soft Meadow'),('Open Fan','B · Open Fan'),('Low Sweep','C · Low Sweep'),('Uneven Crown','D · Uneven Crown'),('Meadow Cluster','Cluster 1 · Meadow'),('Upright Cluster','Cluster 2 · Upright')]:
+   button(b,'TC:'+key,title,'MESH_DATA')
   r=l.row(align=True);button(r,'T:Grouped','Mixed patch');button(r,'T:Gameplay','Gameplay')
   r=l.row(align=True);button(r,'T:Side','Side');button(r,'T:Opposite','Opposite')
   button(l,'S:Original','Existing environment studies','BACK')
