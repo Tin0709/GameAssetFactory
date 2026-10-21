@@ -9,7 +9,7 @@ loader['main']()
 assert hasattr(bpy.types,'SOLDIER_PT_library')
 library=bpy.data.scenes['SOLDIER_ASSET_LIBRARY']
 entries=json.loads(library['soldier_registry'])['entries']
-assert {e['id'] for e in entries}=={'SOLDIER_Skin_v001','SOLDIER_Backpack_v001'}
+assert {'SOLDIER_Skin_v001','SOLDIER_Backpack_v001','SOLDIER_Facial_System_v001'} <= {e['id'] for e in entries}
 def digest():
     return hashlib.sha256(json.dumps({o.name:{'matrix':[list(r) for r in o.matrix_local],'vertices':[list(v.co) for v in o.data.vertices]} for o in bpy.data.objects if o.type=='MESH'},sort_keys=True).encode()).hexdigest()
 before=digest()
@@ -20,7 +20,7 @@ for asset_id,scene_name,prefix in [('SOLDIER_Skin_v001','SOLDIER_ASSET_LIBRARY',
         assert bpy.ops.soldier_library.view(direction=direction)=={'FINISHED'}
         assert bpy.context.scene.camera.name==prefix+direction
 assert digest()==before,'Asset selection/view controls changed mesh data or object transforms'
-assert bpy.data.objects['BPK_Backpack_v001'].parent is None and not bpy.data.actions
+assert bpy.data.objects['BPK_Backpack_v001'].parent is None and all(a.get('soldier_facial',False) for a in bpy.data.actions)
 assert bpy.ops.soldier_library.view(direction='Front_3Q')=={'FINISHED'}
 loader['main']()  # Re-loading the public bootstrap must be harmless.
 print('SOLDIER_UI_TEST_PASS assets=2 switches=4 camera_switches=16 geometry_preserved=True')

@@ -9,6 +9,9 @@ ctrl=bpy.data.objects['SF_Face_Control'];face=bpy.data.objects['SF_Face_Mesh'];r
 assert len(face.data.polygons)<100 and len(face.data.materials)==1
 assert face.modifiers[0].object==rig and face.vertex_groups.get('Head')
 assert all(abs(v.groups[0].weight-1.)<1e-8 for v in face.data.vertices)
+assert all(n in bpy.data.objects for n in ['SF_Soldier_Body','SF_Soldier_Hair','SF_Soldier_Clothing'])
+for key in face.data.shape_keys.key_blocks:
+ for i in range(4):assert (key.data[i].co-face.data.shape_keys.key_blocks['Basis'].data[i].co).length<1e-8,('Face cover must stay rigid',key.name,i)
 assert len(rig.data.bones)==10 and bpy.data.objects['BPK_Backpack_v001'].parent is None
 assert len([a for a in bpy.data.actions if a.name.startswith('SOLDIER_Face_Preset_')])==18
 assert all(bpy.data.actions['SOLDIER_Face_Preset_'+n]['review_status']=='Pending' for n in model.PRESETS)
