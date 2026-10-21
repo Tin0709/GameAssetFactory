@@ -47,7 +47,8 @@ for screen in bpy.data.screens:
    area.spaces.active.shading.type='MATERIAL'
   if area.type=='DOPESHEET_EDITOR':
    area.type='FILE_BROWSER';area.ui_type='ASSETS'
-   if area.spaces.active.params:area.spaces.active.params.asset_library_reference='LOCAL'
+   params=getattr(area.spaces.active,'params',None)
+   if params:params.asset_library_reference='LOCAL'
 # All packed images remain portable; source candidate and approved sources are never saved.
 assert len(bpy.data.actions)==0 and len([o for o in asset.objects if o.type=='MESH'])==3
 bpy.ops.wm.save_as_mainfile(filepath=str(FILE),compress=True)

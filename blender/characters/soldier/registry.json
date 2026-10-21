@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "library": "SOLDIER_Asset_Library",
+  "status": "Pending",
+  "entries": [
+    {
+      "id": "SOLDIER_Skin_v001",
+      "label": "Soldier / Survivor reference skin",
+      "status": "Pending",
+      "collection": "SOLDIER_Skin_v001_PENDING",
+      "body": "Survivor_Reference_v001 \u2014 ORIGINAL BODY / NEW SKIN",
+      "rig": "Original_V6_Rig \u2014 slim arm sockets",
+      "hair": "Survivor_Hair_3D \u2014 layered brown locks",
+      "clothing": "Survivor_Clothing_3D \u2014 requested outer relief",
+      "source_candidate": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/characters/player/reviews/survivor_reference_v001/Survivor_Reference_v001.blend",
+      "source_body_sha256": "cc2344b6c5fe00ec6a0f50f18997977206644c0d6037ed0dd0f0a9e338342cdd",
+      "slim_arm_wld_m": [
+        0.16875,
+        0.675,
+        0.225
+      ],
+      "cameras": [
+        "Front",
+        "Front_3Q",
+        "Left_Side",
+        "Back",
+        "Right_Side",
+        "Back_3Q"
+      ]
+    }
+  ],
+  "reserved_categories": [
+    "SOLDIER/Hair",
+    "SOLDIER/Clothing",
+    "SOLDIER/Equipment",
+    "SOLDIER/Future Upgrades"
+  ],
+  "gameplay_integrated": false
+}
