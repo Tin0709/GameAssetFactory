@@ -1,3 +1,5 @@
+**Latest refinement — 2026-10-21:** [MD2 meadow and unified viewer](refinement_md2/README.md) adds pale seed tips, narrower stalks and green basal layers to the existing tall candidates. Short data remains exact. A single shared panel and combined row replace the previous two-panel review. Earlier tall appearance/checks below are historical.
+
 # Tall Grass MD2 v001 — Pending Blender review
 
 Four tall variants and two density arrangements are added to the SAME `dungeons_ground_style_v2.blend`. No Godot content, export, flowers, bushes or permanent separate library is included. Existing short grass was accepted as the baseline; subsequent explicit steering raises that set to approximately half a block. New tall candidates remain Pending.
