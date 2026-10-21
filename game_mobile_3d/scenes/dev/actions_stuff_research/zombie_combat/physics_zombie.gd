@@ -1,6 +1,6 @@
 extends "res://scripts/cuboid_zombie.gd"
-## Reuse living zombie AI/model/feedback; replace ONLY its old scripted death
-## with the existing Lab native skeletal adapter and unchanged Rifle preset.
+## Reuse living zombie AI/model and the existing Lab native death adapter.
+## Bounded live hit feedback is restricted to this research/dev wrapper.
 const Ragdoll = preload("res://scenes/dev/zombie_death_physics/ragdoll.gd")
 const RIFLE = preload("res://scenes/dev/zombie_death_physics/presets/rifle.tres")
 const COMBAT_IMPULSE := 240.0
