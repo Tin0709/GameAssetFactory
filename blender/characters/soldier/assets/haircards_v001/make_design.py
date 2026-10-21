@@ -9,7 +9,8 @@ CLOTH=[(155,40,34),(171,46,37),(134,32,29),(184,52,41)]
 def card(name,verts,w,h,polygon=None,kind='hair',seed=0):
  i=len(cards);x=4+(i%7)*72;y=4+(i//7)*72
  assert y+h+4<512
- palette=HAIR if kind=='hair' else CLOTH
+ # Keep historical unused card slots exact; the new red applies only to bandana.
+ palette=HAIR if kind=='hair' else CLOTH if kind=='bandana' else [(113,47,38),(125,53,42),(101,40,33),(133,58,46)]
  tile=Image.new('RGBA',(w,h),palette[seed%len(palette)]+(255,));draw=ImageDraw.Draw(tile)
  if kind=='hair':
   # Broad offset locks, no random speckles / subpixel grain.
@@ -21,11 +22,11 @@ def card(name,verts,w,h,polygon=None,kind='hair',seed=0):
      draw.line((xx+offset+1,yy,xx+offset+4,yy),fill=tuple(min(255,c+5) for c in shade)+(255,))
  else:
   draw.rectangle((0,0,w-1,0),fill=tuple(c+12 for c in palette[seed%4])+(255,))
-  if h>3:draw.rectangle((0,h-1,w-1,h-1),fill=CLOTH[2]+(255,))
+  if h>3:draw.rectangle((0,h-1,w-1,h-1),fill=palette[2]+(255,))
   if h>6:
-   for yy in range(5,h,7):draw.rectangle((1,yy,max(1,w-2),yy),fill=CLOTH[(seed+1)%4]+(255,))
+   for yy in range(5,h,7):draw.rectangle((1,yy,max(1,w-2),yy),fill=palette[(seed+1)%4]+(255,))
   elif w>8:
-   draw.line((2,h//2,w//2,h//2),fill=CLOTH[(seed+1)%4]+(255,))
+   draw.line((2,h//2,w//2,h//2),fill=palette[(seed+1)%4]+(255,))
  mask=Image.new('L',(w,h),0);md=ImageDraw.Draw(mask);md.polygon(polygon or [(0,0),(w-1,0),(w-1,h-1),(0,h-1)],fill=255)
  tile.putalpha(mask)
  # One-pixel shadow follows the cut silhouette; fully binary alpha stays crisp.
