@@ -41,6 +41,6 @@ for asset in ['SOLDIER_Backpack_v001','SOLDIER_Skin_v001']:
  assert bpy.context.view_layer.name!='Facial Expressions';assert sum(layer.use for layer in bpy.context.scene.view_layers)==1
 assert bpy.ops.soldier_face.open()=={'FINISHED'}
 ui.register();assert bpy.app.handlers.frame_change_post.count(ui.frame_changed)==1
-assert all(not d.driver.is_valid or d.driver.is_simple_expression for d in face.data.shape_keys.animation_data.drivers)
+assert all(d.driver.is_valid and d.driver.is_simple_expression for d in face.data.shape_keys.animation_data.drivers)
 report={'passed':True,'presets':18,'situations':len(model.SITUATIONS),'geometry_samples':samples,'maximum_face_width_m':max_width,'maximum_pupil_escape_m':max_pupil_escape,'no_action_accumulation':True,'same_library_scene':True,'native_simple_drivers':True}
 (D/'ui_validation.json').write_text(json.dumps(report,indent=2)+'\n');print('SOLDIER_FACE_UI_PASS',json.dumps(report),flush=True)

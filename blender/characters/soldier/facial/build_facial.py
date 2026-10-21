@@ -144,7 +144,7 @@ for side in ['L','R']:
  def lid(v,p):
   if p['kind']=='lid':v.z=cy+(.0018 if v.z>cy else -.0018)
   return v
- key=add_key('Lid_'+side,side,lid);driver(key,'min(1,max(0,b*i+a*u))**3',{'b':'blink','a':'auto_blink','u':'blink_auto','i':'intensity'})
+ key=add_key('Lid_'+side,side,lid);driver(key,'min(1,max(0,b*i+a*u))*min(1,max(0,b*i+a*u))*min(1,max(0,b*i+a*u))',{'b':'blink','a':'auto_blink','u':'blink_auto','i':'intensity'})
 face['parts_json']=json.dumps(parts)
 # Store presets and contextual clips in this one native file.
 for name,preset in model.PRESETS.items():fb.face_action('SOLDIER_Face_Preset_'+name,ctrl,'preset',name,preset['duration'])

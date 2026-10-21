@@ -6,3 +6,4 @@ a41806cf-eeea-51c5-ae49-fd8dca35da64:SOLDIER/Hair:Hair
 175e9c8d-e942-5ba9-aabf-5371a21e54bc:SOLDIER/Clothing:Clothing
 ee5433eb-89c3-542c-a670-b18fc5e0c248:SOLDIER/Equipment:Equipment
 6fed3f17-9d61-517f-868a-7c101bb6b20b:SOLDIER/Future Upgrades:Future Upgrades
+6b14730b-0010-488c-95e4-69de37481d73:SOLDIER/Facial Expressions:Facial Expressions
