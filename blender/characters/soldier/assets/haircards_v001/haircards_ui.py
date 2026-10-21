@@ -94,7 +94,8 @@ class HC_PT_hair(bpy.types.Panel):
    row=l.row(align=True)
    for label,direction in pair:row.operator('soldier_hair.view',text=label).direction=direction
   count=len(bpy.data.objects['SOLDIER_Bandana_2D_v001'].data.polygons)
-  l.separator();l.label(text=f'20 flat hair cards · {count} bandana cards',icon='INFO');l.label(text='Original hair preserved · Blender only')
+  hair_count=len(bpy.data.objects['SOLDIER_HairCards_v001'].data.polygons)
+  l.separator();l.label(text=f'{hair_count} flat hair cards · {count} bandana cards',icon='INFO');l.label(text='Original hair preserved · Blender only')
 @persistent
 def loaded(_):
  global GUARD

@@ -7,7 +7,13 @@ atlas=Image.new('RGBA',(512,512),(55,30,21,0));cards=[]
 HAIR=[(56,30,21),(63,34,24),(69,38,26),(49,27,20),(75,41,28)]
 CLOTH=[(155,40,34),(171,46,37),(134,32,29),(184,52,41)]
 def card(name,verts,w,h,polygon=None,kind='hair',seed=0):
- i=len(cards);x=4+(i%7)*72;y=4+(i//7)*72
+ i=len(cards)
+ # Preserve the original44 tile slots, including the red bandana UVs.
+ # Small new locks use the otherwise empty right side of each atlas cell.
+ if i<44:x=4+(i%7)*72;y=4+(i//7)*72
+ else:
+  j=i-44;x=42+(j%7)*72;y=4+(j//7)*72
+  assert w<=24 and h<=34
  assert y+h+4<512
  # Keep historical unused card slots exact; the new red applies only to bandana.
  palette=HAIR if kind=='hair' else CLOTH if kind=='bandana' else [(113,47,38),(125,53,42),(101,40,33),(133,58,46)]
@@ -93,5 +99,37 @@ def tail(label,sign):
   poly=None if j==0 else [(0,0),(3,0),(3,8),(2,8),(2,9),(0,9)]
   card('Bandana / Tail.'+label+' segment '+str(j+1),verts,4,10,poly,'bandana',j+(0 if sign>0 else 1))
 tail('L',-1);tail('R',1)
+# User refinement: the whole unchanged red accessory sits20mm lower.
+for part in cards:
+ if part['kind']=='bandana':
+  part['vertices']=[(x,y,z-.020) for x,y,z in part['vertices']]
+# Bushier silhouette: broad, zero-thickness stepped locks, not solid voxel cubes.
+# Each tuft is a planar parallelogram with an opaque pixel-cutout outline.
+def tuft(name,top,u,d,width,height,seed=0):
+ ul=math.sqrt(sum(a*a for a in u));dl=math.sqrt(sum(a*a for a in d))
+ u=tuple(a/ul for a in u);d=tuple(a/dl for a in d)
+ def pt(side,down):return tuple(top[k]+side*width*.5*u[k]+down*height*d[k] for k in range(3))
+ poly=[(0,0),(9,0),(9,10),(8,10),(8,12),(6,12),(6,13),(2,13),(2,12),(0,12)]
+ card('Hair / bushy '+name,[pt(-1,1),pt(1,1),pt(1,0),pt(-1,0)],10,14,poly,seed=seed)
+# Distinct crown-edge locks drape over the upper band edge, leaving red visible.
+for i,(x,z,w,h,roll) in enumerate([(-.219,1.835,.063,.098,-10),(-.135,1.845,.066,.111,9),(-.048,1.854,.072,.141,-8),(.086,1.836,.063,.109,12),(.197,1.838,.065,.095,-9)]):
+ a=math.radians(roll);tuft('front band lock '+str(i+1),(x,-.278,z),(math.cos(a),0,math.sin(a)),(math.sin(a),-.25,-math.cos(a)),w,h,1+i%2)
+# Temple tips frame the face without covering the large eyes.
+for sign,label in [(-1,'R'),(1,'L')]:
+ for j,(z,h) in enumerate([(1.654,.128),(1.525,.112)]):
+  tuft(label+' temple tip '+str(j+1),(sign*.247,-.265-j*.009,z),(1,0,0),(sign*.17,-.22,-1),.070,h,2-j)
+ # Three staggered rows, each anchored into the existing side sheets.
+ for row,(z,h,w) in enumerate([(1.822,.114,.087),(1.663,.155,.145),(1.505,.113,.123)]):
+  for col,y in enumerate([-.168,.012,.178]):
+   yy=y+(.014 if row==1 else 0)+(.009 if sign>0 else 0)
+   tuft(label+' side layer '+str(row+1)+'-'+str(col+1),(sign*(.268+row*.006),yy,z+(col%2)*.012),(0,1,0),(sign*(.30 if row!=1 else .24),(.09 if col%2 else -.10),-1),w,h,1+(row+col)%2)
+# Six small crown flicks rise from the cap; no floating crossing sheets.
+for i,(x,y,z,w,h,dy,dz) in enumerate([(-.170,-.130,1.837,.115,.102,-.90,.44),(.055,-.172,1.840,.124,.110,-.85,.53),(.170,.015,1.841,.104,.104,.90,.44),(-.075,.050,1.844,.132,.122,.90,.44),(-.175,.173,1.836,.101,.092,.92,.40),(.070,.195,1.838,.118,.095,.88,.47)]):
+ tuft('crown flick '+str(i+1),(x,y,z),(1,0,0),(0,dy,dz),w,h,1+i%2)
+# Rear layering connects the silhouette and keeps the knot/tails readable.
+for row,(z,h) in enumerate([(1.819,.123),(1.600,.155)]):
+ for col,x in enumerate([-.183,0,.180]):
+  tuft('rear layer '+str(row+1)+'-'+str(col+1),(x,.270+row*.005,z),(1,0,0),((col-1)*.08,.22,-1),.114 if row==0 else .152,h,1+(row+col)%2)
+
 atlas.save(D/'soldier_hair_bandana_atlas.png');(D/'cards.json').write_text(json.dumps({'atlas_size':512,'cards':cards,'binary_alpha':True,'construction':'Single-sided geometric planes rendered double-sided, no extrusion or solidify'},indent=2)+'\n')
 print('DESIGNED',sum(c['kind']=='hair' for c in cards),'hair cards',sum(c['kind']=='bandana' for c in cards),'bandana cards')
