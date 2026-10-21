@@ -12,6 +12,7 @@ def available():return main() is not None and bpy.data.objects.get('SF_Face_Cont
 
 def show_layer(context):
  scene=main();context.window.scene=scene;context.window.view_layer=scene.view_layers['Facial Expressions']
+ for view_layer in scene.view_layers:view_layer.use=view_layer.name=='Facial Expressions'
  return scene
 
 def apply_controls(self,context):

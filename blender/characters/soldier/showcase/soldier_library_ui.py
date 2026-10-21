@@ -54,6 +54,7 @@ class SOLDIER_OT_select_asset(bpy.types.Operator):
         target=bpy.data.scenes[review_scene(entry)]
         context.window.scene=target
         context.window.view_layer=target.view_layers.get(entry.get('view_layer',''),target.view_layers[0])
+        for layer in target.view_layers:layer.use=layer==context.window.view_layer
         for obj in context.view_layer.objects:
             if obj.select_get():obj.select_set(False)
         selected=bpy.data.objects.get(entry.get('object',entry.get('body','')))

@@ -42,6 +42,7 @@ for e in registry['entries']:
   lc=layer_collection(layer.layer_collection,bpy.data.collections[e['collection']])
   if lc:lc.exclude=True
 bpy.context.window.view_layer=layer
+for view_layer in scene.view_layers:view_layer.use=view_layer==layer
 original_rig=bpy.data.objects[skin['rig']];rig=original_rig.copy();rig.data=original_rig.data.copy();rig.name='SF_Soldier_Rig';rig.data.name='SF_Original_Soldier_RestRig_Copy';rig.animation_data_clear();asset.objects.link(rig);rig.hide_viewport=False;rig.hide_render=False;rig.hide_set(False)
 for pb in rig.pose.bones:pb.matrix_basis=Matrix.Identity(4);pb.rotation_mode='QUATERNION'
 for source in bpy.data.collections[skin['collection']].all_objects:
