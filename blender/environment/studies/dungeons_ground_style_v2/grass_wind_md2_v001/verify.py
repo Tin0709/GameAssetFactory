@@ -146,7 +146,7 @@ obj.location = location; obj.rotation_euler = rotation; reset()
 # Every individual and field/comparison route is available in the same scene.
 routes = ['Field', 'Close', 'Gameplay', 'Compare'] + list(info['individual_visible'])
 for key in routes:
-    ui.select(bpy.context, key)
+    assert bpy.ops.md2_wind.view(key=key) == {'FINISHED'}
     assert bpy.context.view_layer.name == info['layer']
     assert any(a.type == 'VIEW_3D' and a.spaces.active.camera.name == info['cameras'][key] for a in bpy.context.screen.areas)
     expected = {o.name for o in bpy.data.collections[info['studio_collection']].all_objects}
