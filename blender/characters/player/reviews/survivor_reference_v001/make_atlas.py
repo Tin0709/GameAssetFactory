@@ -1,19 +1,18 @@
-"""Original pixel painting: fixed clothing masks + sparse, seeded block clusters.
-Reads the supplied reference for provenance only; does not project/copy its pixels.
+"""Reference-inspired skin ONLY. Original six-cuboid geometry stays unchanged.
+Original pixel painting; no image projection, no generated raster substitute.
 """
 from pathlib import Path
-from PIL import Image, ImageDraw
+from PIL import Image,ImageDraw
 import json,random
 OUT=Path(__file__).resolve().parent
-ATLAS=Image.new('RGB',(512,512),(55,44,35));regions={};cx=2;cy=2;row=0
-
-def tile(name,w,h,base,variation=0,seed=0):
- rng=random.Random(seed);im=Image.new('RGB',(w,h),base);d=ImageDraw.Draw(im)
- if variation:
-  for i in range(w*h//10):
-   x=rng.randrange(w);y=rng.randrange(h);v=rng.choice([-variation,-variation//2,variation//2,variation])
-   col=tuple(max(0,min(255,c+v)) for c in base)
-   d.rectangle((x,y,x+rng.choice([1,2,3]),y+rng.choice([1,2,4])),fill=col)
+ATLAS=Image.new('RGB',(512,512),(57,44,33));regions={};cx=2;cy=2;row=0
+SKIN=(235,172,139)
+HAIR=[(59,30,18),(68,35,21),(77,40,24),(54,27,17),(83,43,26),(64,32,20)]
+def paint(w,h,color,seed=0,variation=0):
+ im=Image.new('RGB',(w,h),color);d=ImageDraw.Draw(im);rng=random.Random(seed)
+ for i in range(w*h//12 if variation else 0):
+  x=rng.randrange(w);y=rng.randrange(h);v=rng.choice([-variation,variation])
+  d.rectangle((x,y,x+rng.choice([1,2,3]),y+rng.choice([1,2,3])),fill=tuple(max(0,min(255,c+v)) for c in color))
  return im,d
 
 def store(name,im):
@@ -21,73 +20,99 @@ def store(name,im):
  w,h=im.size
  if cx+w+2>512:cx=2;cy+=row+4;row=0
  assert cy+h+2<512
- # Replicated gutter prevents adjacent tiles leaking at texture boundaries.
  ATLAS.paste(im.resize((w+2,h+2),Image.Resampling.NEAREST),(cx-1,cy-1));ATLAS.paste(im,(cx,cy))
  regions[name]=[cx,cy,w,h];cx+=w+4;row=max(row,h)
 
-skin=(235,169,134)
-for name,seed in [('skin',2),('skin_side',3),('hand',4),('neck',5)]:
- im,d=tile(name,16,32 if name=='skin' else 16,skin,5,seed)
- if name=='skin':
-  d.rectangle((0,2,15,5),fill=(226,139,111));d.rectangle((0,5,3,8),fill=(235,148,119))
- if name=='hand':
-  d.rectangle((0,12,15,15),fill=(214,140,106));d.rectangle((1,1,3,12),fill=(243,180,144))
-  d.rectangle((9,12,11,15),fill=(174,102,75));d.rectangle((9,12,10,13),fill=(245,176,138))
- store(name,im)
-im,d=tile('face',32,32,skin,3,7)
-d.rectangle((0,0,31,9),fill=(220,149,111));d.rectangle((0,12,2,28),fill=(215,135,102));d.rectangle((29,12,31,28),fill=(218,142,110))
-# Simple wide white eyes with dark warm pupils, no eyelashes or ornamental detail.
+def hair_paint(im,mask,seed):
+ """Broad offset pixel locks, dark undersides and restrained top highlights."""
+ d=ImageDraw.Draw(im);rng=random.Random(seed)
+ for y in range(0,32,2):
+  for x in range(0,32,2):
+   if not mask(x,y):continue
+   shade=HAIR[((x-y//2)//4*7+y//4*11+seed)%len(HAIR)]
+   for yy in range(y,min(32,y+2)):
+    for xx in range(x,min(32,x+2)):
+     if mask(xx,yy):im.putpixel((xx,yy),shade)
+ # Hand-placed, staggered locks, clipped to the haircut silhouette.
+ for x,y,w,h,tone in [(2,4,8,4,1),(10,2,7,5,2),(21,4,8,5,0),(0,10,7,5,2),(7,9,9,4,1),(17,8,8,5,2),(24,14,7,5,1),(5,15,7,5,0),(12,13,6,5,2),(2,20,5,5,0),(20,18,6,5,1)]:
+  color=HAIR[(tone+seed)%len(HAIR)]
+  for yy in range(y,min(32,y+h)):
+   for xx in range(x,min(32,x+w)):
+    if mask(xx,yy):
+     shade=tuple(max(0,c-10) for c in color) if yy==y+h-1 else tuple(c+4 for c in color) if yy==y else color
+     im.putpixel((xx,yy),shade)
+ # Pixel staircase shadow directly under the fringe, not an eyebrow.
+ for x in range(32):
+  ys=[y for y in range(32) if mask(x,y)]
+  if ys and max(ys)<31:
+   y=max(ys);c=im.getpixel((x,y));im.putpixel((x,y),tuple(max(0,v-12) for v in c))
+ return im
+
+# FACE: eyes only, no nose, mouth, eyebrows, or sculpted facial parts.
+im,d=paint(32,32,SKIN)
+d.rectangle((0,13,1,30),fill=(218,143,111));d.rectangle((30,13,31,30),fill=(219,146,114))
+fringe=[26,22,16,15,12,11,15,12,8,10,14,15,15,18,24,26]
+hair_paint(im,lambda x,y:y<fringe[x//2],0)
+d=ImageDraw.Draw(im)
 for x in [4,20]:
- d.rectangle((x,16,x+7,23),fill=(248,240,223));d.rectangle((x+3,16,x+6,23),fill=(55,43,30));d.rectangle((x+3,16,x+5,17),fill=(28,27,23))
-d.rectangle((3,25,9,27),fill=(247,183,148));d.rectangle((23,25,28,27),fill=(247,183,148))
-d.rectangle((4,30,27,31),fill=(226,151,114))
-store('face',im)
-for i,name in enumerate(['shirt_front','shirt_back','shirt_side','sleeve']):
- im,d=tile(name,32,40 if name!='sleeve' else 24,(44,45,44),4,20+i)
+ d.rectangle((x,16,x+7,23),fill=(249,241,222))
+ d.rectangle((x+3,16,x+6,23),fill=(54,43,29))
+ d.rectangle((x+3,16,x+5,17),fill=(28,27,23))
+d.rectangle((2,25,8,27),fill=(244,182,148));d.rectangle((24,25,29,27),fill=(244,182,148))
+store('head_front',im)
+for side in ['left','right']:
+ im,d=paint(32,32,SKIN)
+ def mask(x,y):
+  xx=x if side=='right' else 31-x
+  bottom=27 if xx<4 else 28 if xx<11 else 30 if xx<23 else 28
+  return y<bottom and not (xx<3 and 17<=y<=25)
+ hair_paint(im,mask,1 if side=='left' else 4);store('head_'+side,im)
+im,d=paint(32,32,SKIN);hair_paint(im,lambda x,y:y<(29 if x%9<4 else 30),3);store('head_back',im)
+im,d=paint(32,32,HAIR[0]);hair_paint(im,lambda x,y:True,2);store('head_top',im)
+im,d=paint(32,32,SKIN,0,2);store('head_bottom',im)
+
+for i,name in enumerate(['shirt_front','shirt_back','shirt_side','shirt_top','shirt_bottom']):
+ im,d=paint(32,48 if name in ['shirt_front','shirt_back','shirt_side'] else 16,(44,45,44),20+i,4)
  if name=='shirt_front':
-  d.rectangle((9,0,22,1),fill=(32,34,33));d.rectangle((11,2,20,2),fill=(39,40,38))
-  d.rectangle((1,4,2,35),fill=(48,49,48));d.rectangle((0,38,31,39),fill=(42,44,42))
- if name=='shirt_back':d.rectangle((8,0,23,1),fill=(43,44,42));d.rectangle((0,38,31,39),fill=(44,45,43))
- if name=='sleeve':d.rectangle((0,22,31,23),fill=(45,46,45))
+  d.rectangle((9,0,22,2),fill=(31,33,32));d.rectangle((11,0,20,1),fill=SKIN)
+ if name in ['shirt_front','shirt_back']:d.rectangle((0,46,31,47),fill=(37,39,37))
  store(name,im)
-for name,base in [('wrap',(205,195,169)),('band',(38,40,39))]:
- im,d=tile(name,24,8,base,4,31)
- if name=='wrap':
-  d.rectangle((0,0,23,0),fill=(178,160,131));d.rectangle((0,7,23,7),fill=(234,220,191));d.rectangle((4,3,15,3),fill=(219,207,177))
- store(name,im)
+
 for side in ['L','R']:
- for face in ['front','back','side']:
-  seed=40+len(regions);im,d=tile('pants',16,56,(53,56,54),7,seed)
-  rng=random.Random(seed)
-  # Authored coarse dust/camouflage islands: darker shins, worn upper thighs/knees.
-  masks=[(1,3,5,7),(3,7,8,10),(10,2,14,6),(8,8,12,11),(0,18,4,22),(5,19,9,24),(11,18,15,21),(9,30,13,34),(1,33,5,38),(4,36,9,40),(0,45,15,48),(3,49,9,50)]
-  if face=='back':masks=[(2,3,7,6),(9,6,13,10),(0,20,5,24),(6,24,11,27),(9,35,14,40),(0,46,15,48),(4,49,8,51)]
-  if face=='side':masks=[(3,6,8,9),(7,11,12,14),(2,19,7,23),(8,23,12,25),(0,33,4,36),(7,36,13,39),(0,46,15,49)]
+ for face in ['front','back','side','inside']:
+  im,d=paint(16,48,SKIN,31,3)
+  sleeve,sd=paint(16,16,(43,44,43),27,4);im.paste(sleeve,(0,0));d=ImageDraw.Draw(im)
+  d.rectangle((0,15,15,15),fill=(34,36,35))
+  # Warm skin directly below the sleeve, then the pale wrap and dark wrist band.
+  d.rectangle((0,16,15,18),fill=(228,137,108));d.rectangle((2,16,5,18),fill=(240,155,123))
+  d.rectangle((0,21,15,26),fill=(205,195,171));d.rectangle((0,21,15,21),fill=(178,163,137));d.rectangle((0,26,15,26),fill=(233,220,193));d.rectangle((2,23,10,23),fill=(216,206,180))
+  d.rectangle((0,35,15,39),fill=(34,37,36));d.rectangle((0,35,15,35),fill=(45,46,43))
+  d.rectangle((0,46,15,47),fill=(220,150,116))
+  if face=='front':
+   x=11 if side=='L' else 3
+   d.rectangle((x,44,x+1,47),fill=(179,111,81));d.rectangle((x,44,x,45),fill=(240,173,135))
+  store('arm_'+side+'_'+face,im)
+ im,d=paint(16,16,(44,45,44),26,3);store('arm_'+side+'_top',im)
+ im,d=paint(16,16,SKIN,21,3);store('arm_'+side+'_bottom',im)
+
+for side in ['L','R']:
+ for face in ['front','back','side','inside']:
+  im,d=paint(16,48,(48,51,49),51+len(regions),5)
+  masks=[(1,2,5,5),(4,6,8,8),(11,2,14,5),(9,8,12,10),(0,16,3,19),(6,17,9,20),(12,16,15,18),(10,26,13,29),(1,28,4,31),(5,31,8,33),(0,36,15,38)]
+  if face in ['side','inside']:masks=[(2,5,6,8),(8,9,12,11),(0,17,4,20),(9,20,12,22),(2,28,6,30),(10,30,14,32),(0,36,15,38)]
+  if face=='back':masks=[(2,3,7,5),(10,6,14,9),(0,17,4,20),(5,22,8,24),(10,29,14,32),(0,36,15,38)]
   for j,(x0,y0,x1,y1) in enumerate(masks):
    if side=='R':x0,x1=15-x1,15-x0
-   base=[(100,92,79),(120,102,84),(132,111,90)][j%3]
-   d.rectangle((x0,y0,x1,y1),fill=base)
-   # Broken wear islands: clipped corners and dark interruptions, not solid blobs.
-   d.rectangle((x0,y0,min(x1,x0+1),min(y1,y0+1)),fill=(57,59,56))
-   d.rectangle((max(x0,x1-1),max(y0,y1-1),x1,y1),fill=(65,65,59))
-   if j%2==0:d.rectangle((x0+2,y0+1,min(x1,x0+3),min(y1,y0+2)),fill=(73,73,65))
-   d.rectangle((max(0,x0+1),max(0,y0-1),min(15,x1-1),y0),fill=(99,94,80))
-   d.rectangle((x0,y1,min(x1,x0+1),min(55,y1+2)),fill=(111,94,77))
-  # Pocket edge/hem is painted; no bag or new accessory added.
-  d.rectangle((0,13,15,14),fill=(40,43,41));d.rectangle((0,29,15,30),fill=(42,45,43));d.rectangle((0,53,15,55),fill=(38,40,37))
-  store('pants_'+side+'_'+face,im)
-for i,name in enumerate(['boot','sole','boot_toe','boot_collar']):
- base=(66,55,46) if name!='sole' else (43,43,39)
- im,d=tile(name,24,12,base,7,70+i)
- if name in ['boot','boot_toe']:
-  d.rectangle((0,8,23,10),fill=(119,87,63));d.rectangle((3,5,7,8),fill=(132,100,72));d.rectangle((11,7,14,8),fill=(140,109,79));d.rectangle((19,3,22,6),fill=(90,73,55))
- if name=='sole':d.rectangle((0,1,23,2),fill=(65,62,51));d.rectangle((0,11,23,11),fill=(31,33,31))
- store(name,im)
-for i in range(12):
- base=[(58,29,17),(65,33,19),(71,36,21),(50,25,15),(78,40,23),(61,31,19)][i%6]
- im,d=tile('hair',8,8,base,3,90+i)
- # Broad lock highlights rather than salt-and-pepper texel noise.
- d.rectangle((0,0,7,0),fill=tuple(c+2 for c in base));d.rectangle((0,0,0,7),fill=tuple(c-2 for c in base))
- store('hair'+str(i),im)
+   color=[(108,96,79),(128,107,87),(139,117,94)][j%3]
+   d.rectangle((x0,y0,x1,y1),fill=color)
+   d.rectangle((x0,y0,min(x1,x0+1),min(y1,y0+1)),fill=(58,60,55))
+   if j%2==0:d.rectangle((min(x1,x0+2),min(y1,y0+1),min(x1,x0+3),min(y1,y0+2)),fill=(72,73,64))
+  d.rectangle((0,12,15,13),fill=(35,38,36));d.rectangle((0,25,15,25),fill=(36,39,37))
+  # Boots are painted onto the ORIGINAL leg block, no added sole/toe geometry.
+  d.rectangle((0,39,15,40),fill=(42,43,38));d.rectangle((0,41,15,44),fill=(73,58,44));d.rectangle((0,44,15,45),fill=(108,80,58));d.rectangle((0,46,15,47),fill=(37,39,35))
+  d.rectangle((3,42,6,43),fill=(122,91,64));d.rectangle((10,43,13,44),fill=(91,71,51))
+  store('leg_'+side+'_'+face,im)
+ im,d=paint(16,16,(48,51,48),50,4);store('leg_'+side+'_top',im)
+ im,d=paint(16,16,(35,37,33),52,3);store('leg_'+side+'_bottom',im)
 ATLAS.save(OUT/'survivor_atlas.png');(OUT/'atlas_regions.json').write_text(json.dumps(regions,indent=2))
-print('Atlas painted:',len(regions),'regions,512² RGB')
+print('Painted skin-only atlas:',len(regions),'regions')
