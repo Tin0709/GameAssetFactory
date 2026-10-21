@@ -1,7 +1,7 @@
 """Register the same Pending review candidate in the requested Soldier library."""
 import bpy,json,uuid,hashlib
 from pathlib import Path
-HERE=Path(__file__).resolve().parent;R=HERE.parents[2]
+HERE=Path(__file__).resolve().parent;R=HERE.parents[3]
 D=R/'blender/characters/player/reviews/survivor_reference_v001'
 FILE=HERE/'SOLDIER_Asset_Library.blend'
 # A rerun may update the current Pending library only; reviewed assets cannot be replaced.
