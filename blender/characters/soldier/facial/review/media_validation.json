@@ -1,0 +1,30 @@
+{
+  "front": {
+    "decoded_frames": 864,
+    "decoded_duration_s": 28.8,
+    "expected_fps": 30,
+    "file_bytes": 3084307,
+    "passed": true
+  },
+  "three_quarter": {
+    "decoded_frames": 864,
+    "decoded_duration_s": 28.8,
+    "expected_fps": 30,
+    "file_bytes": 2987976,
+    "passed": true
+  },
+  "gameplay": {
+    "decoded_frames": 864,
+    "decoded_duration_s": 28.8,
+    "expected_fps": 30,
+    "file_bytes": 1966513,
+    "passed": true
+  },
+  "combined": {
+    "decoded_frames": 864,
+    "decoded_duration_s": 28.8,
+    "expected_fps": 30,
+    "file_bytes": 5929239,
+    "passed": true
+  }
+}
