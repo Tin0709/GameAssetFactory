@@ -1,14 +1,14 @@
 {
   "asset_id": "SOLDIER_Backpack_v001",
   "status": "Pending",
-  "vertices": 1416,
-  "triangles": 2352,
+  "vertices": 3688,
+  "triangles": 5760,
   "mesh_objects": 1,
   "materials": 1,
-  "parts": 120,
+  "parts": 404,
   "dimensions_m": [
     0.5440000295639038,
-    0.3888000249862671,
+    0.39240002632141113,
     0.6669999957084656
   ],
   "standalone": true,
