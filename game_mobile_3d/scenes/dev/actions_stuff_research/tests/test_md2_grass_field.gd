@@ -30,7 +30,7 @@ func run():
 		for fps in [30,60]:
 			var state=state_script.new();state.advance(0.,Vector3(-3,0,0),Vector3.ZERO)
 			for f in range(1,2*fps+1):
-				var t:=float(f)/fps
+				var t:float=float(f)/float(fps)
 				state.advance(1./fps,Vector3(-3.+3.*minf(t,1.),0,0),Vector3(3 if t<=1. else 0,0,0))
 			var contact:Vector2=state.sample_at(Vector2(.35,.35))
 			check(contact.length()>.15,"Standing proximity retains a readable contact bend")
