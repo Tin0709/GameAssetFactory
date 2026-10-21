@@ -105,5 +105,28 @@
       "code": 0,
       "script_errors": false
     }
-  ]
+  ],
+  "latest_secondary30": {
+    "ascent_pitch_rad": -0.144004717469215,
+    "blinks": 2,
+    "failures": [],
+    "fall_lift_rad": 0.575022041797638,
+    "fps": 30,
+    "max_hair_rad": 0.0731487572193146,
+    "max_tail_rad": 0.23579216003418,
+    "passed": true
+  },
+  "latest_secondary60": {
+    "ascent_pitch_rad": -0.144004374742508,
+    "blinks": 2,
+    "failures": [],
+    "fall_lift_rad": 0.575020551681519,
+    "fps": 60,
+    "max_hair_rad": 0.0503991432487965,
+    "max_tail_rad": 0.235104084014893,
+    "passed": true
+  },
+  "visible_triangle_count": 662,
+  "blender_source_preserved": true,
+  "held_e_half_turn_seconds": 0.6
 }
