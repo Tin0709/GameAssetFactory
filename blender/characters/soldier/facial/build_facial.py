@@ -38,7 +38,7 @@ for s in bpy.data.scenes:
   lc=layer_collection(vl.layer_collection,asset)
   if lc:lc.exclude=vl!=layer
 for e in registry['entries']:
- if e.get('collection') in bpy.data.collections:
+ if e.get('type')!='facial' and e.get('collection') in bpy.data.collections:
   lc=layer_collection(layer.layer_collection,bpy.data.collections[e['collection']])
   if lc:lc.exclude=True
 bpy.context.window.view_layer=layer
