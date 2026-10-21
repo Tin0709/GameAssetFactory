@@ -46,13 +46,14 @@ class PortableLauncherTests(unittest.TestCase):
         self.assertIn(str(dev.ROOT / 'scripts/load_showcase_ui.py'), cmd)
         self.assertTrue(any(s.endswith('Animation_Showcase.blend') for s in cmd))
 
-    def test_all_five_viewers_use_existing_files(self):
+    def test_all_viewers_use_existing_files(self):
         expected = {
             'asset-style-v2': 'dungeons_ground_style_v2.blend',
             'player-library': 'player_animation_library_v1.blend',
             'animation': 'Animation_Showcase.blend',
             'weapon': 'Weapon_Showcase.blend',
             'mobs': 'Mobs_Animation_Library.blend',
+            'soldier': 'SOLDIER_Asset_Library.blend',
         }
         self.assertEqual(set(dev.VIEWERS), set(expected))
         for viewer, filename in expected.items():
@@ -63,7 +64,7 @@ class PortableLauncherTests(unittest.TestCase):
                 self.assertEqual(source.name, filename)
                 self.assertIn(str(source), cmd)
                 self.assertNotIn(str(dev.ROOT / 'scripts/start_blender_mcp.py'), cmd)
-                self.assertEqual('--python' in cmd, viewer != 'asset-style-v2')
+                self.assertEqual('--python' in cmd, viewer not in {'asset-style-v2', 'soldier'})
 
     def test_blender_launch_detaches_without_waiting(self):
         command = dev.blender_command(Path('/bin/blender'), 'weapon')

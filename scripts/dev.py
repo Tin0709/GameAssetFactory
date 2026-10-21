@@ -19,6 +19,7 @@ VIEWERS = {
     'animation': 'blender/animation/showcase/Animation_Showcase.blend',
     'weapon': 'blender/weapons/showcase/Weapon_Showcase.blend',
     'mobs': 'blender/animation/showcase/Mobs_Animation_Library.blend',
+    'soldier': 'blender/characters/soldier/showcase/SOLDIER_Asset_Library.blend',
 }
 SCENES = {
     'snappy': 'res://scenes/dev/SnappyLocomotionFastJumpTest.tscn',

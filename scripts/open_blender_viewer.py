@@ -11,6 +11,7 @@ VIEWERS = {
     'animation': 'animation',
     'weapon': 'weapon',
     'mobs': 'mobs',
+    'soldier': 'soldier',
 }
 
 

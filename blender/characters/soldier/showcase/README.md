@@ -11,3 +11,11 @@ Default three-quarter camera. Numpad0 camera view, F12 render; other cameras Fro
 Latest appearance: original head/torso/legs and no neck; older3×12×4 slim arms; large eyes and short brown eyebrows, no nose/mouth; layered dark-brown3D hair with slightly thinner relief; thicker shirt/wraps/bands/trouser panels and subtle skin contact shadows below the rings. One material,3,904triangles, zero Actions. Blender review only.
 
 For future additions, add separate Pending collections/assets under the appropriate category; preserve reviewed versions and existing asset IDs. Do not overwrite approved original player assets. Current source recipe and six render views remain in `../../player/reviews/survivor_reference_v001/`; this library is the main place to review and extend this skin.
+
+## Quick open from Terminal
+
+```sh
+python3 "$HOME/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py" soldier
+```
+
+Works from any working directory, uses the existing detached launcher and reuses an already-open library window. `--dry-run` prints the resolved path without launching.
