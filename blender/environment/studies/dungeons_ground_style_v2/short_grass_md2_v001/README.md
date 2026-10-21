@@ -1,3 +1,5 @@
+**2026-10-21 height refinement:** The user now requests approximately half a block of height for the short-grass set. All five visible crowns are now0.500m. Only positive mesh Z changed; widths, lengths, roots, topology, UVs and material are preserved. The original16–27cm pass and its renders/checks below are historical. Current height verification and comparison views are in [Tall Grass MD2](../tall_grass_md2_v001/README.md).
+
 # Short Grass MD2 v001 — Pending Blender review
 
 Added to the existing `dungeons_ground_style_v2.blend`, not a separate library. No Godot export or integration. Original grass, flowers, ground, materials, lighting and source camera remain unchanged.

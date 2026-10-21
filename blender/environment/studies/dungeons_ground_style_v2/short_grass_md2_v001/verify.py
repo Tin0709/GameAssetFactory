@@ -12,7 +12,7 @@ for item in manifest['assets']:
  obj=bpy.data.objects[item['name']];m=obj.data;material_ids.add(m.materials[0].as_pointer());assert len(m.materials)==1;assert obj.asset_data and obj['review_status']=='Pending'
  assert all(math.isfinite(float(x)) for v in m.vertices for x in v.co)
  assert all(p.area>1e-10 for p in m.polygons)
- assert max(v.co.z for v in m.vertices)<.29
+ assert max(v.co.z for v in m.vertices)<.65
  assert -.009<=min(v.co.z for v in m.vertices)<0.
  for p in m.polygons:
   first=m.vertices[p.vertices[0]].co

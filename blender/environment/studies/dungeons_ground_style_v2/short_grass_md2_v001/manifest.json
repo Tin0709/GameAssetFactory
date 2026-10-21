@@ -105,13 +105,14 @@
       "vertices": 48,
       "cards": 8,
       "z_min": -0.00800000037997961,
-      "height_above_surface": 0.1940000057220459,
+      "height_above_surface": 0.5,
       "xy_size": [
         1.14,
         1.11
       ],
       "materials": 1,
-      "minimum_one_block_footprint": true
+      "minimum_one_block_footprint": true,
+      "visible_height_above_surface": 0.5
     },
     {
       "name": "Short_Grass_MD2_v001_B",
@@ -119,13 +120,14 @@
       "vertices": 42,
       "cards": 7,
       "z_min": -0.00800000037997961,
-      "height_above_surface": 0.23399999737739563,
+      "height_above_surface": 0.5,
       "xy_size": [
         1.2,
         1.14
       ],
       "materials": 1,
-      "minimum_one_block_footprint": true
+      "minimum_one_block_footprint": true,
+      "visible_height_above_surface": 0.5
     },
     {
       "name": "Short_Grass_MD2_v001_C",
@@ -133,13 +135,14 @@
       "vertices": 54,
       "cards": 9,
       "z_min": -0.00800000037997961,
-      "height_above_surface": 0.164000004529953,
+      "height_above_surface": 0.6197294592857361,
       "xy_size": [
         1.1,
         1.12
       ],
       "materials": 1,
-      "minimum_one_block_footprint": true
+      "minimum_one_block_footprint": true,
+      "visible_height_above_surface": 0.5
     },
     {
       "name": "Short_Grass_MD2_v001_D",
@@ -147,13 +150,14 @@
       "vertices": 42,
       "cards": 7,
       "z_min": -0.00800000037997961,
-      "height_above_surface": 0.27399998903274536,
+      "height_above_surface": 0.5,
       "xy_size": [
         1.1,
         1.12
       ],
       "materials": 1,
-      "minimum_one_block_footprint": true
+      "minimum_one_block_footprint": true,
+      "visible_height_above_surface": 0.5
     },
     {
       "name": "Short_Grass_MD2_Cluster_v001",
@@ -161,13 +165,14 @@
       "vertices": 234,
       "cards": 39,
       "z_min": -0.008160000666975975,
-      "height_above_surface": 0.20823998749256134,
+      "height_above_surface": 0.4999999701976776,
       "xy_size": [
         1.4,
         1.35
       ],
       "materials": 1,
-      "minimum_one_block_footprint": true
+      "minimum_one_block_footprint": true,
+      "visible_height_above_surface": 0.4999999701976776
     }
   ],
   "mixed_patch_tufts": 6,
@@ -436,5 +441,7 @@
       }
     ]
   },
-  "user_footprint_requirement": "Every bush is at least 1 block wide AND 1 block long, including the visible alpha silhouette; 1 block = 1 m. Height remains short."
+  "user_footprint_requirement": "Every bush is at least 1 block wide AND 1 block long, including the visible alpha silhouette; 1 block = 1 m. Height remains short.",
+  "height_refinement": "2026-10-21: explicit user request raises each short bush to approximately half a block; positive Z only; XY, topology, UV and materials exact.",
+  "target_visible_height_m": 0.5
 }
