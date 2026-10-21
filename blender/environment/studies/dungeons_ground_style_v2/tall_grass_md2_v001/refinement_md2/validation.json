@@ -1,0 +1,176 @@
+{
+  "passed": true,
+  "file": ".validation/grass_md2_single_window_v001/dungeons_ground_style_v2.blend",
+  "sha256": "c81e0588f60d4be265b92fbdf203fc5ec447a3fe7be37f26f37ab504037ee758",
+  "preservation": "All pre-existing native content exact when authorized six tall candidate meshes are restored; short half-block geometry/materials untouched.",
+  "assets": [
+    {
+      "name": "Tall_Grass_MD2_v001_A",
+      "mesh": "Tall_MD2_A_Layered_Strips",
+      "triangles": 54,
+      "vertices": 72,
+      "cards": 9,
+      "mesh_xy_size": [
+        1.2641119360923767,
+        1.2152644991874695
+      ],
+      "root_xy_size": [
+        0.749324232339859,
+        0.6923392415046692
+      ],
+      "visible_xy_size": [
+        1.0999999642372131,
+        1.0800000429153442
+      ],
+      "visible_height": 0.7799999713897705,
+      "mesh_height": 0.7799999713897705,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_v001_B",
+      "mesh": "Tall_MD2_B_Layered_Strips",
+      "triangles": 60,
+      "vertices": 80,
+      "cards": 10,
+      "mesh_xy_size": [
+        1.349491536617279,
+        1.175520658493042
+      ],
+      "root_xy_size": [
+        0.7626301050186157,
+        0.6815552711486816
+      ],
+      "visible_xy_size": [
+        1.2200000286102295,
+        1.1200000643730164
+      ],
+      "visible_height": 0.940000057220459,
+      "mesh_height": 0.9399999976158142,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_v001_C",
+      "mesh": "Tall_MD2_C_Layered_Strips",
+      "triangles": 48,
+      "vertices": 64,
+      "cards": 8,
+      "mesh_xy_size": [
+        1.2401489615440369,
+        1.2529634833335876
+      ],
+      "root_xy_size": [
+        0.6111156046390533,
+        0.6345811784267426
+      ],
+      "visible_xy_size": [
+        1.1200000643730164,
+        1.1399999856948853
+      ],
+      "visible_height": 0.7200000286102295,
+      "mesh_height": 0.7978506088256836,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_v001_D",
+      "mesh": "Tall_MD2_D_Layered_Strips",
+      "triangles": 54,
+      "vertices": 72,
+      "cards": 9,
+      "mesh_xy_size": [
+        1.2754835486412048,
+        1.2680988907814026
+      ],
+      "root_xy_size": [
+        0.7231528162956238,
+        0.759321540594101
+      ],
+      "visible_xy_size": [
+        1.100000023841858,
+        1.0800000429153442
+      ],
+      "visible_height": 0.8700000047683716,
+      "mesh_height": 0.8700000047683716,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_Cluster_v001",
+      "mesh": "Tall_MD2_Cluster_001_Editable",
+      "triangles": 156,
+      "vertices": 208,
+      "cards": 26,
+      "mesh_xy_size": [
+        1.3481999635696411,
+        1.1226792335510254
+      ],
+      "root_xy_size": [
+        0.9648174047470093,
+        0.8218898773193359
+      ],
+      "visible_xy_size": [
+        1.2581376433372498,
+        1.0481495261192322
+      ],
+      "visible_height": 0.8700000047683716,
+      "mesh_height": 0.8700000047683716,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_Cluster_v002",
+      "mesh": "Tall_MD2_Cluster_002_Editable",
+      "triangles": 216,
+      "vertices": 288,
+      "cards": 36,
+      "mesh_xy_size": [
+        1.2303407192230225,
+        1.146620273590088
+      ],
+      "root_xy_size": [
+        0.9172274768352509,
+        0.827953428030014
+      ],
+      "visible_xy_size": [
+        1.1649049520492554,
+        1.0742592215538025
+      ],
+      "visible_height": 0.940000057220459,
+      "mesh_height": 0.9399999976158142,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    }
+  ],
+  "one_shared_panel": true,
+  "same_scene": true,
+  "same_short_review_layer": "Short Grass MD2",
+  "combined_tall_copies": 6,
+  "routes": [
+    "All",
+    "S:Overview",
+    "S:Low Cushion",
+    "S:Broad Fan",
+    "S:Soft Rosette",
+    "S:Uneven Tuft",
+    "S:Cluster",
+    "T:Overview",
+    "T:Compare",
+    "T:Soft Meadow",
+    "T:Open Fan",
+    "T:Low Sweep",
+    "T:Uneven Crown",
+    "T:Meadow Cluster",
+    "T:Upright Cluster",
+    "T:Grouped",
+    "T:Gameplay",
+    "T:Side",
+    "T:Opposite",
+    "S:Original",
+    "All"
+  ],
+  "max_quad_planarity_error_m": 5.960464477539063e-08,
+  "new_actions": 0,
+  "new_scenes": 0
+}
