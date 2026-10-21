@@ -35,9 +35,9 @@ void vertex(){
 	vec3 local_direction=normalize(transpose(mat3(MODEL_MATRIX))*vec3(world_direction.x,0.0,world_direction.y)+vec3(0.0,0.0000001,0.0));
 	// Exact circular centerline: fixed root, bounded arc shortening, no stretch.
 	float curve=angle*t;
-	float offset=blade_length*(1.0-cos(curve))/max(angle,0.00001);
+	float offset=angle>0.0001?blade_length*(1.0-cos(curve))/angle:0.5*blade_length*angle*t*t;
 	VERTEX.xz+=local_direction.xz*offset;
-	VERTEX.y+=blade_length*(sin(curve)/max(angle,0.00001)-t);
+	VERTEX.y+=angle>0.0001?blade_length*(sin(curve)/angle-t):-blade_length*angle*angle*t*t*t/6.0;
 	// Small coherent card-tip ripple, subordinate to broad whole-blade sway.
 	VERTEX.xz+=local_direction.xz*(blade_length*pow(t,4.0)*0.009*sin(wind_time*10.681415+COLOR.b*6.283185+phase))*wind_strength;
 	vec3 axis=normalize(vec3(local_direction.z,0.0000001,-local_direction.x));
