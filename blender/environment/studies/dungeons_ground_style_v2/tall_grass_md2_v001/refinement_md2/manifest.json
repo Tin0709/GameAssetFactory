@@ -1,0 +1,512 @@
+{
+  "status": "Pending",
+  "central_library": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/environment/studies/dungeons_ground_style_v2/dungeons_ground_style_v2.blend",
+  "layer": "Tall Grass MD2",
+  "source_reference": {
+    "source_pack": "Dungeons II Style 0.7 JE",
+    "source_files": {
+      "tall_grass_top.png": {
+        "path": "/Users/tin/Desktop/Game Dev/local_references/Dungeons II Style 0.7 JE/assets/minecraft/textures/block/tall_grass_top.png",
+        "sha256": "158c4290a44d178d643ac1d271945d44a169e60a787c041237b5cbe746468797"
+      },
+      "tall_grass_bottom.png": {
+        "path": "/Users/tin/Desktop/Game Dev/local_references/Dungeons II Style 0.7 JE/assets/minecraft/textures/block/tall_grass_bottom.png",
+        "sha256": "2b0869b8bc5b1cdc17ff6f50c1fe1a10ea3f01520c15e8c1d88c2fb29aa05352"
+      },
+      "grass_block_top.png": {
+        "path": "/Users/tin/Desktop/Game Dev/local_references/Dungeons II Style 0.7 JE/assets/minecraft/textures/block/grass_block_top.png",
+        "sha256": "f74e56e267853b1061f6f4cc59b3ab7d81dbf6690ae534a12f06bf77efbc6017"
+      }
+    },
+    "source_sprite_size": [
+      16,
+      16
+    ],
+    "joined_crop": [
+      2,
+      3,
+      15,
+      32
+    ],
+    "reference_grays": [
+      141,
+      146,
+      160,
+      175
+    ],
+    "terrain_root_srgb": [
+      84,
+      130,
+      52
+    ],
+    "palette_srgb": [
+      [
+        76,
+        122,
+        49
+      ],
+      [
+        82,
+        128,
+        51
+      ],
+      [
+        89,
+        136,
+        55
+      ],
+      [
+        97,
+        144,
+        60
+      ]
+    ],
+    "atlas_size": [
+      128,
+      128
+    ],
+    "regions_top_left": [
+      [
+        8,
+        3,
+        26,
+        58
+      ],
+      [
+        72,
+        3,
+        26,
+        58
+      ],
+      [
+        8,
+        67,
+        26,
+        58
+      ],
+      [
+        72,
+        67,
+        26,
+        58
+      ]
+    ],
+    "coverage": [
+      0.5543766578249337,
+      0.5543766578249337,
+      0.5384615384615384,
+      0.5278514588859416
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "construction": "Actual joined top/bottom13x29crop; mirror and selective tip trimming. Same short-grass greens and terrain root convergence; nearest2x only. Geometry is an authored adaptation, not official game data.",
+    "review_only": true
+  },
+  "assets": [
+    {
+      "name": "Tall_Grass_MD2_v001_A",
+      "mesh": "Tall_MD2_A_Layered_Strips",
+      "triangles": 54,
+      "vertices": 72,
+      "cards": 9,
+      "mesh_xy_size": [
+        1.2641119360923767,
+        1.2152644991874695
+      ],
+      "root_xy_size": [
+        0.749324232339859,
+        0.6923392415046692
+      ],
+      "visible_xy_size": [
+        1.0999999642372131,
+        1.0800000429153442
+      ],
+      "visible_height": 0.7799999713897705,
+      "mesh_height": 0.7799999713897705,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_v001_B",
+      "mesh": "Tall_MD2_B_Layered_Strips",
+      "triangles": 60,
+      "vertices": 80,
+      "cards": 10,
+      "mesh_xy_size": [
+        1.349491536617279,
+        1.175520658493042
+      ],
+      "root_xy_size": [
+        0.7626301050186157,
+        0.6815552711486816
+      ],
+      "visible_xy_size": [
+        1.2200000286102295,
+        1.1200000643730164
+      ],
+      "visible_height": 0.940000057220459,
+      "mesh_height": 0.9399999976158142,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_v001_C",
+      "mesh": "Tall_MD2_C_Layered_Strips",
+      "triangles": 48,
+      "vertices": 64,
+      "cards": 8,
+      "mesh_xy_size": [
+        1.2401489615440369,
+        1.2529634833335876
+      ],
+      "root_xy_size": [
+        0.6111156046390533,
+        0.6345811784267426
+      ],
+      "visible_xy_size": [
+        1.1200000643730164,
+        1.1399999856948853
+      ],
+      "visible_height": 0.7200000286102295,
+      "mesh_height": 0.7978506088256836,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_v001_D",
+      "mesh": "Tall_MD2_D_Layered_Strips",
+      "triangles": 54,
+      "vertices": 72,
+      "cards": 9,
+      "mesh_xy_size": [
+        1.2754835486412048,
+        1.2680988907814026
+      ],
+      "root_xy_size": [
+        0.7231528162956238,
+        0.759321540594101
+      ],
+      "visible_xy_size": [
+        1.100000023841858,
+        1.0800000429153442
+      ],
+      "visible_height": 0.8700000047683716,
+      "mesh_height": 0.8700000047683716,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_Cluster_v001",
+      "mesh": "Tall_MD2_Cluster_001_Editable",
+      "triangles": 156,
+      "vertices": 208,
+      "cards": 26,
+      "mesh_xy_size": [
+        1.3481999635696411,
+        1.1226792335510254
+      ],
+      "root_xy_size": [
+        0.9648174047470093,
+        0.8218898773193359
+      ],
+      "visible_xy_size": [
+        1.2581376433372498,
+        1.0481495261192322
+      ],
+      "visible_height": 0.8700000047683716,
+      "mesh_height": 0.8700000047683716,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    },
+    {
+      "name": "Tall_Grass_MD2_Cluster_v002",
+      "mesh": "Tall_MD2_Cluster_002_Editable",
+      "triangles": 216,
+      "vertices": 288,
+      "cards": 36,
+      "mesh_xy_size": [
+        1.2303407192230225,
+        1.146620273590088
+      ],
+      "root_xy_size": [
+        0.9172274768352509,
+        0.827953428030014
+      ],
+      "visible_xy_size": [
+        1.1649049520492554,
+        1.0742592215538025
+      ],
+      "visible_height": 0.940000057220459,
+      "mesh_height": 0.9399999976158142,
+      "root_z": -0.00800000037997961,
+      "materials": 1
+    }
+  ],
+  "new_materials_for_assets": 1,
+  "atlas_size": [
+    128,
+    128
+  ],
+  "mixed_field_tall_count": 4,
+  "mixed_field_short_count": 3,
+  "catalog_line": "7d63323f-d3f2-5a3d-8f2d-f90e2f276483:Environment/Tall Grass MD2 Pending:Tall Grass MD2 Pending\n",
+  "cameras": {
+    "Overview": "Tall_MD2_Camera_Overview",
+    "Compare": "Tall_MD2_Camera_Compare",
+    "Grouped": "Tall_MD2_Camera_Grouped",
+    "Gameplay": "Tall_MD2_Camera_Gameplay",
+    "Opposite": "Tall_MD2_Camera_Opposite",
+    "Side": "Tall_MD2_Camera_Side",
+    "Soft Meadow": "Tall_MD2_Camera_Soft Meadow",
+    "Open Fan": "Tall_MD2_Camera_Open Fan",
+    "Low Sweep": "Tall_MD2_Camera_Low Sweep",
+    "Uneven Crown": "Tall_MD2_Camera_Uneven Crown",
+    "Meadow Cluster": "Tall_MD2_Camera_Meadow Cluster",
+    "Upright Cluster": "Tall_MD2_Camera_Upright Cluster"
+  },
+  "new_scenes": 0,
+  "new_actions": 0,
+  "no_godot_integration": true,
+  "short_height_user_change": {
+    "target_visible_height_m": 0.5,
+    "assets": [
+      {
+        "name": "Short_Grass_MD2_v001_A",
+        "mesh": "MD2_A_Editable_Card_Strips",
+        "triangles": 32,
+        "vertices": 48,
+        "cards": 8,
+        "mesh_xy_size": [
+          1.1399999856948853,
+          1.1100000143051147
+        ],
+        "root_xy_size": [
+          0.8861187398433685,
+          0.8919669389724731
+        ],
+        "visible_xy_size": [
+          1.0360262989997864,
+          1.0309498310089111
+        ],
+        "visible_height": 0.5,
+        "mesh_height": 0.5,
+        "root_z": -0.00800000037997961,
+        "materials": 1
+      },
+      {
+        "name": "Short_Grass_MD2_v001_B",
+        "mesh": "MD2_B_Editable_Card_Strips",
+        "triangles": 28,
+        "vertices": 42,
+        "cards": 7,
+        "mesh_xy_size": [
+          1.2000000476837158,
+          1.1399999856948853
+        ],
+        "root_xy_size": [
+          0.9902001321315765,
+          0.8537151217460632
+        ],
+        "visible_xy_size": [
+          1.1247357726097107,
+          1.0231188237667084
+        ],
+        "visible_height": 0.5,
+        "mesh_height": 0.5,
+        "root_z": -0.00800000037997961,
+        "materials": 1
+      },
+      {
+        "name": "Short_Grass_MD2_v001_C",
+        "mesh": "MD2_C_Editable_Card_Strips",
+        "triangles": 36,
+        "vertices": 54,
+        "cards": 9,
+        "mesh_xy_size": [
+          1.100000023841858,
+          1.1200000047683716
+        ],
+        "root_xy_size": [
+          0.705233097076416,
+          0.6778910756111145
+        ],
+        "visible_xy_size": [
+          1.0380817353725433,
+          1.0197829604148865
+        ],
+        "visible_height": 0.5,
+        "mesh_height": 0.6197294592857361,
+        "root_z": -0.00800000037997961,
+        "materials": 1
+      },
+      {
+        "name": "Short_Grass_MD2_v001_D",
+        "mesh": "MD2_D_Editable_Card_Strips",
+        "triangles": 28,
+        "vertices": 42,
+        "cards": 7,
+        "mesh_xy_size": [
+          1.100000023841858,
+          1.1199999451637268
+        ],
+        "root_xy_size": [
+          0.9118945598602295,
+          0.8930195271968842
+        ],
+        "visible_xy_size": [
+          1.0287480354309082,
+          1.0296712815761566
+        ],
+        "visible_height": 0.5,
+        "mesh_height": 0.5,
+        "root_z": -0.00800000037997961,
+        "materials": 1
+      },
+      {
+        "name": "Short_Grass_MD2_Cluster_v001",
+        "mesh": "MD2_Cluster_Editable",
+        "triangles": 156,
+        "vertices": 234,
+        "cards": 39,
+        "mesh_xy_size": [
+          1.4000000357627869,
+          1.350000023841858
+        ],
+        "root_xy_size": [
+          1.1965263485908508,
+          1.1239550709724426
+        ],
+        "visible_xy_size": [
+          1.3496627807617188,
+          1.2752500772476196
+        ],
+        "visible_height": 0.4999999701976776,
+        "mesh_height": 0.4999999701976776,
+        "root_z": -0.008160000666975975,
+        "materials": 1
+      }
+    ]
+  },
+  "material": "Tall MD2 \u2014 green meadow pale seed tips",
+  "style_refinement": {
+    "reference_images": [
+      "docs/graphics/references/user-dungeons2-gameplay-2026-10-09.png",
+      "docs/graphics/references/user-dungeons2-2026-10-09.png"
+    ],
+    "observed_style": "dense green base, fewer upright stalks and small pale cream/gold seed tips; visual observation only",
+    "source_files": {
+      "tall_grass_top.png": "158c4290a44d178d643ac1d271945d44a169e60a787c041237b5cbe746468797",
+      "tall_grass_bottom.png": "2b0869b8bc5b1cdc17ff6f50c1fe1a10ea3f01520c15e8c1d88c2fb29aa05352",
+      "short_grass.png": "bbffa540577107a281bb14fce9fd30884bbe55acf4fbb6c5925800f8350941f8"
+    },
+    "regions_top_left": [
+      [
+        4,
+        3,
+        26,
+        58
+      ],
+      [
+        36,
+        3,
+        26,
+        58
+      ],
+      [
+        4,
+        67,
+        26,
+        58
+      ],
+      [
+        36,
+        67,
+        26,
+        58
+      ],
+      [
+        80,
+        8,
+        32,
+        20
+      ],
+      [
+        80,
+        40,
+        32,
+        20
+      ]
+    ],
+    "atlas_size": [
+      128,
+      128
+    ],
+    "green_palette": [
+      [
+        76,
+        122,
+        49
+      ],
+      [
+        82,
+        128,
+        51
+      ],
+      [
+        89,
+        136,
+        55
+      ],
+      [
+        97,
+        144,
+        60
+      ]
+    ],
+    "seed_palette": [
+      [
+        173,
+        172,
+        110
+      ],
+      [
+        190,
+        187,
+        122
+      ],
+      [
+        208,
+        201,
+        142
+      ],
+      [
+        219,
+        212,
+        156
+      ]
+    ],
+    "root_srgb": [
+      84,
+      130,
+      52
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "adaptation": "Actual pack masks; source tint retained at roots, authored pale tip tint based on supplied MD2 image. No claim of official meshes/materials."
+  },
+  "same_window_library": {
+    "layer": "Short Grass MD2",
+    "all_camera": "MD2_Combined_Camera",
+    "combined_collection": "05_MD2_TallGrass_In_Same_Review",
+    "revision": "MD2_GRASS_LIBRARY_V001",
+    "short_height_m": 0.5,
+    "tall_height_range_m": [
+      0.72,
+      0.94
+    ]
+  }
+}
