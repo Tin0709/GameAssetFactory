@@ -38,6 +38,7 @@ var rifle_strafe_weight:=0.
 var _rifle_strafe_context:=false
 var _rifle_strafe_bones:Array[int]=[]
 var _rifle_strafe_height:=0.
+var _rifle_strafe_floor_y:=0.
 var rifle_aim_clip: RefCounted
 var rifle_aim_profile: Dictionary={}
 var rifle_aim_requested:=false
@@ -271,6 +272,7 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  else:rifle_idle_time=fposmod(rifle_idle_time+delta,float(rifle_profile.clips.Idle.duration))
  _rifle_driving=true;super.drive_jump_motion(world_velocity,requested,physics,delta);_rifle_driving=false
  if jump_active:
+  _rifle_strafe_floor_y=0.
   # No newly invented Rifle Jump Action: retain approved jump/landing core/legs
   # and carry the approved rifle arm set relative to the existing animated Chest.
   for bone in [arm_left,arm_right,forearm_left,forearm_right,carrier_bone]:direction_poses[bone]=rifle_ground_poses[bone];direction_future_poses[bone]=rifle_ground_future[bone]
@@ -284,7 +286,11 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
     # The jump controller still owns compression/stretch; Aim owns head pose.
     blended.basis=Basis(blended.basis.orthonormalized().get_rotation_quaternion()).scaled(source.basis.get_scale())
     pair[0][bone]=blended
- else:position.y=_rifle_strafe_height*rifle_strafe_weight # Existing native source envelope; approved rifle clips already include their own clearance.
+ else:
+  # Smooth only this rig's geometric height envelope. Literal source waist/
+  # leg bounce remains in the PRS; the existing floor solver owns contact.
+  _rifle_strafe_floor_y=move_toward(_rifle_strafe_floor_y,_rifle_strafe_height*rifle_strafe_weight,delta*.75)
+  position.y=_rifle_strafe_floor_y
  idle_active=not moving and not jump_active
  rifle_state="Run" if gait_run_weight>.98 and moving else ("Walk" if moving else "Idle")
  if jump_grounded:_update_direction_support(delta)
@@ -418,6 +424,6 @@ func reset_contacts() -> void:
  _restore_auto_aim();auto_aim_target=null;auto_aim_aligned=true;_auto_aim_rotation=Quaternion.IDENTITY;_auto_aim_turning=false
  if rifle_recoil_clip!=null:cancel_rifle_recoil()
  super.reset_contacts();rifle_idle_time=0.;rifle_move_weight=0.;idle_active=true
- rifle_strafe_weight=0.;_rifle_strafe_context=false;_rifle_strafe_height=0.;direction_controller.seed_context(false)
+ rifle_strafe_weight=0.;_rifle_strafe_context=false;_rifle_strafe_height=0.;_rifle_strafe_floor_y=0.;direction_controller.seed_context(false)
  turn_axis=0.
  if stationary_turn!=null:stationary_turn.reset(rotation.y)
