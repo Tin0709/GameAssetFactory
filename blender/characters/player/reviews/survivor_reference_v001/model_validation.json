@@ -1,28 +1,100 @@
 {
   "candidate": "Survivor_Reference_v001.blend",
   "status": "Pending",
-  "vertices": 1837,
-  "triangles": 3620,
+  "skin_only": true,
+  "vertices": 48,
+  "triangles": 72,
+  "quads": 36,
   "materials": 1,
   "bones": 10,
   "actions": 0,
-  "unweighted_or_nonrigid_vertices": 0,
-  "bounds_min": [
-    -0.43128830194473267,
-    -0.2800000309944153,
-    0.0
-  ],
-  "bounds_max": [
-    0.43128830194473267,
-    0.2800000309944153,
-    1.8550000190734863
-  ],
-  "height_m": 1.8550000190734863,
+  "body_source_sha256": "cc2344b6c5fe00ec6a0f50f18997977206644c0d6037ed0dd0f0a9e338342cdd",
+  "body_geometry_sha256": "226bb42bb85045fdaddc9cc2cf8c31cbb671f3262af367b655ebc7611bdd051b",
+  "geometry_exact": true,
+  "rest_skeleton_exact": true,
+  "weights_exact": true,
+  "no_neck_geometry": true,
+  "no_nose_or_mouth": true,
+  "no_volumetric_additions": true,
+  "rigid_bounds_m": {
+    "Head": {
+      "min": [
+        -0.22499999403953552,
+        -0.22499999403953552,
+        1.350000023841858
+      ],
+      "max": [
+        0.22499999403953552,
+        0.22499999403953552,
+        1.7999999523162842
+      ]
+    },
+    "Chest": {
+      "min": [
+        -0.22499999403953552,
+        -0.11249999701976776,
+        0.675000011920929
+      ],
+      "max": [
+        0.22499999403953552,
+        0.11249999701976776,
+        1.350000023841858
+      ]
+    },
+    "Arm.L": {
+      "min": [
+        0.22499999403953552,
+        -0.11249999701976776,
+        0.675000011920929
+      ],
+      "max": [
+        0.44999998807907104,
+        0.11249999701976776,
+        1.350000023841858
+      ]
+    },
+    "Arm.R": {
+      "min": [
+        -0.44999998807907104,
+        -0.11249999701976776,
+        0.675000011920929
+      ],
+      "max": [
+        -0.22499999403953552,
+        0.11249999701976776,
+        1.350000023841858
+      ]
+    },
+    "Leg.L": {
+      "min": [
+        0.0,
+        -0.11249999701976776,
+        0.0
+      ],
+      "max": [
+        0.22499999403953552,
+        0.11249999701976776,
+        0.675000011920929
+      ]
+    },
+    "Leg.R": {
+      "min": [
+        -0.22499999403953552,
+        -0.11249999701976776,
+        0.0
+      ],
+      "max": [
+        0.0,
+        0.11249999701976776,
+        0.675000011920929
+      ]
+    }
+  },
   "packed_images": [
-    "PRIMARY \u2014 user character reference",
-    "Survivor \u2014 Original Pixel Atlas 512"
+    "PRIMARY \u2014 supplied six-view character",
+    "Survivor \u2014 original hand-painted skin"
   ],
-  "cameras": [
+  "review_cameras": [
     "Front",
     "Front_3Q",
     "Left_Side",
@@ -30,6 +102,5 @@
     "Right_Side",
     "Back_3Q"
   ],
-  "source_reference_sha256": "9bfe4bdd3f65bf80a456746e6c76d0c60bed29b9552a82ce00340963627ec0f6",
   "gameplay_integrated": false
 }
