@@ -8,7 +8,7 @@ Four tall variants and two density arrangements are added to the SAME `dungeons_
 python3 "$HOME/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py" asset
 ```
 
-The **Grass MD2** sidebar now has a **Tall Grass MD2 — Pending** panel above the retained short-grass controls. Choose the overview, A–D, two clusters, mixed planting, gameplay view, side/opposite views or comparison. Individual/field/comparison routes isolate only the relevant new display objects. **Short grass overview** selects the preserved short section; **Existing environment studies** selects the original environment layer. Local viewport cameras never replace the original scene camera. Old unsaved viewer windows stay untouched; the launcher recognizes the current tall-review bootstrap.
+The **Grass MD2** sidebar now has a **Tall Grass MD2 — Pending** panel alongside the retained short-grass controls. Choose the overview, A–D, two clusters, mixed planting, gameplay view, side/opposite views or comparison. Individual/field/comparison routes isolate only the relevant new display objects. **Short grass overview** selects the preserved short section; **Existing environment studies** selects the original environment layer. Local viewport cameras never replace the original scene camera. Old unsaved viewer windows stay untouched; the launcher recognizes the current tall-review bootstrap.
 
 The native review leaves **Compare** open: half-block short grass, Tall A, previous V3 tall grass and the existing1.35m golden grass on identical source blocks. Old studies are references, not assets replaced by the new candidates.
 
