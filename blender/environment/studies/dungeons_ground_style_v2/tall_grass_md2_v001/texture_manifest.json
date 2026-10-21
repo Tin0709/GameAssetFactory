@@ -1,0 +1,102 @@
+{
+  "source_pack": "Dungeons II Style 0.7 JE",
+  "source_files": {
+    "tall_grass_top.png": {
+      "path": "/Users/tin/Desktop/Game Dev/local_references/Dungeons II Style 0.7 JE/assets/minecraft/textures/block/tall_grass_top.png",
+      "sha256": "158c4290a44d178d643ac1d271945d44a169e60a787c041237b5cbe746468797"
+    },
+    "tall_grass_bottom.png": {
+      "path": "/Users/tin/Desktop/Game Dev/local_references/Dungeons II Style 0.7 JE/assets/minecraft/textures/block/tall_grass_bottom.png",
+      "sha256": "2b0869b8bc5b1cdc17ff6f50c1fe1a10ea3f01520c15e8c1d88c2fb29aa05352"
+    },
+    "grass_block_top.png": {
+      "path": "/Users/tin/Desktop/Game Dev/local_references/Dungeons II Style 0.7 JE/assets/minecraft/textures/block/grass_block_top.png",
+      "sha256": "f74e56e267853b1061f6f4cc59b3ab7d81dbf6690ae534a12f06bf77efbc6017"
+    }
+  },
+  "source_sprite_size": [
+    16,
+    16
+  ],
+  "joined_crop": [
+    2,
+    3,
+    15,
+    32
+  ],
+  "reference_grays": [
+    141,
+    146,
+    160,
+    175
+  ],
+  "terrain_root_srgb": [
+    84,
+    130,
+    52
+  ],
+  "palette_srgb": [
+    [
+      76,
+      122,
+      49
+    ],
+    [
+      82,
+      128,
+      51
+    ],
+    [
+      89,
+      136,
+      55
+    ],
+    [
+      97,
+      144,
+      60
+    ]
+  ],
+  "atlas_size": [
+    128,
+    128
+  ],
+  "regions_top_left": [
+    [
+      8,
+      3,
+      26,
+      58
+    ],
+    [
+      72,
+      3,
+      26,
+      58
+    ],
+    [
+      8,
+      67,
+      26,
+      58
+    ],
+    [
+      72,
+      67,
+      26,
+      58
+    ]
+  ],
+  "coverage": [
+    0.5543766578249337,
+    0.5543766578249337,
+    0.5384615384615384,
+    0.5278514588859416
+  ],
+  "alpha_values": [
+    0,
+    255
+  ],
+  "construction": "Actual joined top/bottom13x29crop; mirror and selective tip trimming. Same short-grass greens and terrain root convergence; nearest2x only. Geometry is an authored adaptation, not official game data.",
+  "review_only": true
+}
