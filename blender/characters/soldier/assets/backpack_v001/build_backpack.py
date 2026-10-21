@@ -70,6 +70,7 @@ review.unit_settings.system='METRIC'
 regions=json.loads((HERE/'atlas_regions.json').read_text())
 atlas=bpy.data.images.load(str(HERE/'backpack_atlas.png'))
 atlas.name='BPK_Hand-painted canvas leather steel';atlas.pack()
+ATLAS_SIZE=atlas.size[0]
 mat=bpy.data.materials.new('BPK_Canvas Leather Steel / one atlas');mat.use_nodes=True
 p=mat.node_tree.nodes.get('Principled BSDF');p.inputs['Roughness'].default_value=.86
 tex=mat.node_tree.nodes.new('ShaderNodeTexImage');tex.image=atlas;tex.interpolation='Closest'
@@ -233,14 +234,14 @@ for poly,style in zip(mesh.polygons,styles):
     span=[max(hi[i]-lo[i],1e-5) for i in range(2)]
     rng=random.Random(part+str(poly.index//6))
     # Keep a consistent coarse pixel density rather than stretching a full tile per small box.
-    scale=[min(.98,max(.08,v/(.0032*rw))) for v in span]
+    scale=[min(.98,max(.08,v/(.0020*rw))) for v in span]
     offset=[rng.uniform(0,1-scale[i]) for i in range(2)]
     if is_plate:scale=[.98,.98];offset=[.01,.01]
     for li in poly.loop_indices:
         co=mesh.vertices[mesh.loops[li].vertex_index].co
         a=(co[axes[0]]-lo[0])/span[0];b=(co[axes[1]]-lo[1])/span[1]
         u=offset[0]+a*scale[0];v=offset[1]+b*scale[1]
-        uv.data[li].uv=((rx+.02+u*(rw-.04))/512,(512-ry-rh+.02+v*(rh-.04))/512)
+        uv.data[li].uv=((rx+.02+u*(rw-.04))/ATLAS_SIZE,(ATLAS_SIZE-ry-rh+.02+v*(rh-.04))/ATLAS_SIZE)
         m=.62 if is_metal else 0.
         attr.data[li].color=(m,m,m,1.)
     poly.use_smooth=False
