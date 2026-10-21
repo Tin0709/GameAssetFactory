@@ -40,7 +40,7 @@ Two-sided binary cutout uses nearest filtering, rough diffuse plus restrained th
 - `visible_footprints.json`: opaque texel support; minimum horizontal span is approximately1.020m.
 - `native_viewport_validation.json`: eleven actual native selector/draw routes, active Grass MD2 sidebar, original scene camera preserved, final Overview left open.
 - `review/`: native UI captures, Overview, Grouped, Gameplay, individual A and opposing-light previews.
-- `.validation/short_grass_md2_v001/file_preservation.json`:8,793existing files checked; only the authorized central Blender library changed. Godot files and every other Blender file remain byte-identical.
+- `.validation/short_grass_md2_v001/file_preservation.json`:8,793existing files checked; only the authorized central Blender library and its study-index documentation changed. Godot files and every other `.blend` remain byte-identical.
 - Launcher:2focused stale-window/UI checks,6viewer bootstrap tests and16dev launcher tests passed.
 
 Read-only checks use Blender `--background --factory-startup --disable-autoexec --python` with `verify.py` or `verify_visible_footprints.py`. `render.py` renders saved data without saving camera/settings. `review_native.py` exercises controls and captures the actual window without saving.
