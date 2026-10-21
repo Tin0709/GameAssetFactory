@@ -1,7 +1,6 @@
 {
-  "pre_existing_gameplay_blender_files": 8595,
-  "unchanged": 8595,
+  "preexisting_files_checked": 8595,
   "changed": [],
   "missing": [],
-  "approved_source_appended_read_only": true
+  "approved_sources_and_gameplay_preserved": true
 }
