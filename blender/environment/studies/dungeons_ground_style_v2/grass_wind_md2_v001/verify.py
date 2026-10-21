@@ -77,6 +77,7 @@ reset()
 fps_results = {}; samples = {}
 for fps in [30, 60]:
     scene.render.fps = fps
+    scene.update_tag(); bpy.context.view_layer.update()
     start = time.perf_counter(); previous = None; maximum_step = 0.; poses = {}
     for frame in range(8 * fps, 10 * fps + 1):
         posed = sample(obj, frame / fps)
@@ -87,6 +88,7 @@ for fps in [30, 60]:
     fps_results[str(fps)] = {'max_step_m': maximum_step, 'check_elapsed_s': time.perf_counter()-start}
     samples[fps] = poses
 fps_error = max(error(samples[30][t], samples[60][t]) for t in samples[30])
+print('FPS_DIFFS',[(t,error(samples[30][t],samples[60][t])) for t in samples[30]],flush=True)
 assert fps_error < 2e-6, fps_error
 scene.render.fps = 24
 
