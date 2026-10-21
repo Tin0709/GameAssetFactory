@@ -31,10 +31,10 @@ result=subprocess.run([str(FFMPEG),'-hide_banner','-i',str(output),'-f','null','
 assert 'frame=  480' in result.stderr and '00:00:20.00' in result.stderr,result.stderr[-1500:]
 # One ordered strip for examining approach/contact/exit/recovery, no optical-flow claims.
 indices=[156,162,168,174,180,186,192,198]
-sheet=Image.new('RGB',(1600,1088),(19,23,23))
+sheet=Image.new('RGB',(1600,544),(19,23,23))
 for index,f in enumerate(indices):
     image=Image.open(dest/('%04d.png'%f));image.thumbnail((400,544))
-    sheet.paste(image,((index%4)*400,(index//4)*544))
+    sheet.paste(image,((index%4)*400,(index//4)*272))
 sheet.save(review/'Run_Contact_Recovery_Strip.jpg',quality=93)
 (E/'video.json').write_text(json.dumps({'frames':480,'fps':24,'duration_s':20.,'retiming':False,'native_fixed_camera':True,'output':str(output),'decoded_all_frames':True},indent=2)+'\n')
 print('INTERACTION_VIDEO_READY',str(output),flush=True)
