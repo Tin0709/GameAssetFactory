@@ -58,6 +58,9 @@ def evaluate_preset(name,t,auto_blink=True,intensity=1.):
   if 2.4<t<4.5:c['gaze_x']=.12*pulse(t-2.4,2.1,.24,.7)
  elif name=='Blink_Soft':
   c=NEUTRAL.copy();c['blink']=pulse(t-.5,.18,.075,.02)
+ elif name=='Fire_Recoil_Face':
+  c=blend(NEUTRAL,target('Focused_Aim'),pulse(t-.08,duration-.16,.16,duration-.56))
+  total,attack,hold,_=EVENTS[name];c=blend(c,target(name),pulse(t-.5,total,attack,hold))
  elif name in EVENTS:
   total,attack,hold,_=EVENTS[name];c=blend(NEUTRAL,target(name),pulse(t-.25,total,attack,hold))
  else:

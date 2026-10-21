@@ -107,12 +107,13 @@ def body_action(rig,weapon,kind,key,duration):
   if kind=='preset':
    c=model.evaluate_preset(key,t,False);head=poses['Head'];rot=Matrix.Rotation(math.radians(c['head_yaw']),4,'Z')@Matrix.Rotation(math.radians(c['head_pitch']),4,'X');m=rot@head;m.translation=head.translation;poses['Head']=m
   for bone in rig.pose.bones:
-   bone.matrix=poses[bone.name];bpy.context.view_layer.update()
-  for bone in rig.pose.bones:
-   q=bone.rotation_quaternion.copy()
+   parent=bone.parent
+   kw={"parent_matrix":poses[parent.name],"parent_matrix_local":parent.bone.matrix_local} if parent else {}
+   basis=bone.bone.convert_local_to_pose(poses[bone.name],bone.bone.matrix_local,invert=True,**kw)
+   loc,q,scale=basis.decompose()
    if bone.name in previous and q.dot(previous[bone.name])<0:q.negate()
    previous[bone.name]=q.copy()
-   for suffix,value in [('location',list(bone.location)),('rotation_quaternion',list(q)),('scale',list(bone.scale))]:channels.setdefault(f'pose.bones["{bone.name}"].{suffix}',[]).append(value)
+   for suffix,value in [('location',list(loc)),('rotation_quaternion',list(q)),('scale',list(scale))]:channels.setdefault(f'pose.bones["{bone.name}"].{suffix}',[]).append(value)
   wm=poses.get('Weapon') or Matrix.Identity(4);p,q,s=wm.decompose()
   if 'Weapon' in previous and q.dot(previous['Weapon'])<0:q.negate()
   previous['Weapon']=q.copy()
