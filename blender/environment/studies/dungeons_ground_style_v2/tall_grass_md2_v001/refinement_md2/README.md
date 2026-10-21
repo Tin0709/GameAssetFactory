@@ -16,6 +16,12 @@ The provided screenshot was a legacy process bootstrapped with only `MD2_SHORT_G
 
 For literal in-place refresh of that older window, `scripts/refresh_environment_viewer.py` is a trusted local helper: run it from that Blender Python Console. It saves a recoverable copy of the currently loaded state, reloads the SAME central file in the SAME process/window and installs the unified panel. No global auto-run/preferences change. The helper refuses any non-environment library. It is provided for that one-time legacy migration; no destructive process closure is used.
 
+## Tall close-up options — 2026-10-21
+
+The Tall section now has six full-width **TALL GRASS · CẬN CẢNH** buttons: A Soft Meadow, B Open Fan, C Low Sweep, D Uneven Crown, Cluster1Meadow and Cluster2Upright. Each isolates its existing asset and fits an orthographic review camera to the complete tuft, including roots. Compared with the ordinary views, magnification is approximately1.40–1.83×. Cameras are created/reused in memory only; the saved central Blender file, model geometry, materials and textures remain unchanged. Normal Tall overview, mixed, gameplay, side and opposite options remain available.
+
+`refresh_environment_viewer.py` now replaces cached viewer modules when rerun, so an already-open window can receive this UI-only update safely. The same live-state recovery backup and environment-file guard remain. In-Blender headless checks verify six actual selector routes, camera reuse, complete projected framing and six panel button bindings; two renders were visually checked. A double-refresh check covers module-cache replacement. Evidence is `.validation/tall_grass_closeups_v001/`; no new desktop viewer window was launched for this small UI change.
+
 ## Evidence
 
 - `validation.json`: current-source SHA, full pre-existing native content matches when only the six authorized tall candidate meshes are restored, unchanged short data, finite planar quads, one cutout material/atlas and21selector routes.
