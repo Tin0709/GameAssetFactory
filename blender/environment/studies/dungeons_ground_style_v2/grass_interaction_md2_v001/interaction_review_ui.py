@@ -1,5 +1,6 @@
 """Same-window Pending interaction review, keeping Wind's native code untouched."""
 import json
+import time
 from pathlib import Path
 import bpy
 import runtime
@@ -106,3 +107,10 @@ def start_preview():
     runtime.update(force=True)
     if not bpy.context.screen.is_animation_playing:bpy.ops.screen.animation_play()
     print('MD2_INTERACTION_NATIVE_READY',bpy.context.view_layer.name,bpy.context.screen.is_animation_playing,flush=True)
+    first=bpy.context.scene.frame_current;started=time.perf_counter()
+    def playback_checkpoint():
+        context=bpy.context
+        print('MD2_INTERACTION_NATIVE_PLAYBACK',json.dumps({'layer':context.view_layer.name,
+              'playing':context.screen.is_animation_playing,'start_frame':first,'current_frame':context.scene.frame_current,
+              'elapsed_s':round(time.perf_counter()-started,3),'panel_registered':hasattr(bpy.types,'MD2_PT_interaction')}),flush=True)
+    bpy.app.timers.register(playback_checkpoint,first_interval=2.)
