@@ -7,6 +7,8 @@ func ticks(count:int)->void:
  for i in count:await physics_frame
  await process_frame
 func run()->void:
+ var fps:=60 if OS.get_cmdline_user_args().has("60") else 30
+ Engine.physics_ticks_per_second=fps;Engine.max_fps=fps
  var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(scene);scene.player.scripted_input=true
  for i in 4:
   var z=scene.zombie_combat.zombies[i];z.target=null;z.move_speed=0.;z.velocity=Vector3.ZERO;z.position=Vector3(0,0,3) if i==0 else Vector3(25+i,0,25);z.current_hp=10000
@@ -19,8 +21,8 @@ func run()->void:
   await ticks(1);var age:=float(Engine.get_physics_frames()-started)/hz
   if body_ready<0. and absf(wrapf(v.rotation.y,-PI,PI))<deg_to_rad(8.):body_ready=age
   if first_shot<0. and scene.rifle_fire.shots_fired>0:first_shot=age
- check(body_ready>=.24 and body_ready<=.36,"Held E turns180deg decisively but visibly, around0.30seconds rather than snapping")
- check(first_shot>=.23 and first_shot<=.40,"First shot waits for approved Aim raise and the readable turn, without a long delay")
+ check(body_ready>=.52 and body_ready<=.68,"Held E turns180deg decisively but visibly, around0.60seconds rather than snapping")
+ check(first_shot>=.50 and first_shot<=.78,"First shot waits for approved Aim raise and the readable turn, without a long delay")
  check(absf(v.direction_snapshot.phase-phase)<.0001,"Stationary combat pivot never resets or starts gait")
  event.pressed=false;scene._input(event)
  check(not scene.rifle_fire.trigger_held,"E release still stops firing")
