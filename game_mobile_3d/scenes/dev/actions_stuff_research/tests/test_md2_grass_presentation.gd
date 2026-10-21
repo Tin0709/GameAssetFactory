@@ -27,6 +27,8 @@ func run():
    if field.has_method("present"):field.present(alpha)
    else:field._process(1./240.)
    var actual:=shown(field.materials[0],col,row)
+   if OS.get_cmdline_user_args().has("diagnose") and tick<2:
+    print("PRESENT_PROBE ", {"tick":tick,"alpha":alpha,"before":before,"after":after,"display":actual,"raw":field.interaction.pixels.decode_half((row*64+col)*8),"previous_raw":field.interaction.previous_pixels.decode_half((row*64+col)*8),"image":field.interaction.image.get_pixel(col,row),"previous_image":field.interaction.previous_image.get_pixel(col,row),"uniform":field.materials[0].get_shader_parameter("interaction_alpha")})
    worst=maxf(worst,actual.distance_to(before.lerp(after,alpha)))
    if k>0 and before.distance_to(after)>.002:
     if actual.distance_to(last)<.00001:held_subframes+=1
