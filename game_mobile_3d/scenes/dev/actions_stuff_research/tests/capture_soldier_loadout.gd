@@ -22,7 +22,7 @@ func run():
   if frame>=330 and frame<375:a.requested_direction=Vector2(0,-1);a.requested_run=true
   await physics_frame;await process_frame;await RenderingServer.frame_post_draw
   var now:=Time.get_ticks_usec();frame_times.append((now-last)/1000.);last=now
-  if frame>=70:scene.azimuth=v.rotation.y+PI+.70
+  if frame>=70:scene.azimuth=v.rotation.y-.70
   if frame in [35,60,100,155,205,255,292,360]:root.get_texture().get_image().save_png(out+"/native_"+str(frame)+".png")
  frame_times.sort()
  var report:={"fps_cap":fps,"frame_median_ms":frame_times[int(frame_times.size()*.5)],"frame_p95_ms":frame_times[int(frame_times.size()*.95)],"shots":scene.rifle_fire.shots_fired,"hits":scene.rifle_fire.hit_count,"pool_misses":scene.rifle_fire.pool_misses,"frames":390,"skin":str(v.meshes[0].name),"weapon":v.rifle_model.scene_file_path}

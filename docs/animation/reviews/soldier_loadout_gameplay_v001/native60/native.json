@@ -1,0 +1,11 @@
+{
+	"fps_cap": 60,
+	"frame_median_ms": 16.674,
+	"frame_p95_ms": 18.139,
+	"frames": 390,
+	"hits": 20,
+	"pool_misses": 0,
+	"shots": 20,
+	"skin": "SoldierSkinV001",
+	"weapon": "res://scenes/dev/actions_stuff_research/soldier_loadout_v001/Rifle_Sand_Block_V1.glb"
+}
