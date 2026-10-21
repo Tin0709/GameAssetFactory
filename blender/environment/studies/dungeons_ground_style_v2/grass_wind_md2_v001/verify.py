@@ -125,6 +125,16 @@ for key in routes:
     ui.select(bpy.context, key)
     assert bpy.context.view_layer.name == info['layer']
     assert any(a.type == 'VIEW_3D' and a.spaces.active.camera.name == info['cameras'][key] for a in bpy.context.screen.areas)
+    expected = {o.name for o in bpy.data.collections[info['studio_collection']].all_objects}
+    if key in ['Field', 'Close', 'Gameplay']:
+        expected.update(o.name for o in bpy.data.collections[info['field_collection']].all_objects)
+    elif key == 'Compare':
+        expected.update(o.name for o in bpy.data.collections[info['compare_collection']].all_objects)
+    else:
+        expected.update(info['individual_visible'][key])
+    for item in list(bpy.data.collections[info['root']].all_objects):
+        assert item.hide_render == (item.name not in expected), (key,item.name,'render isolation')
+        assert item.hide_get(view_layer=bpy.context.view_layer) == (item.name not in expected), (key,item.name,'viewport isolation')
 static_ui.select(bpy.context, 'All')
 for key, expected in info['original_timeline'].items(): assert getattr(scene, key) == expected, (key, getattr(scene,key), expected)
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:

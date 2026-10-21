@@ -34,7 +34,8 @@ def select(context, key):
         visible.update(o.name for o in bpy.data.collections[info['compare_collection']].all_objects)
     else:
         visible.update(info['individual_visible'][key])
-    for obj in bpy.data.collections[info['root']].all_objects:
+    # Visibility changes invalidate Blender's live all_objects iterator.
+    for obj in list(bpy.data.collections[info['root']].all_objects):
         obj.hide_set(obj.name not in visible, view_layer=layer)
         obj.hide_render = obj.name not in visible
     # Keep the same review illumination on the distant individual/compare rows.
