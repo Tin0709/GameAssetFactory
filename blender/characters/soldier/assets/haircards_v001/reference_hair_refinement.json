@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "same_pending_hair_asset": true,
+  "hair_style_reference": "User supplied screenshot and64x64skin; head/outer-layer silhouettes only",
+  "existing_brown_palette_exact": true,
+  "face_body_clothes_and_rig_changes": false,
+  "bandana_geometry_uv_and_pixels_exact": true,
+  "rear_knot_and_tails_scale_preserved": 1.5,
+  "lower_wrap_width_m": 0.1035,
+  "hair_cards": 43,
+  "hair_triangles": 86,
+  "bandana_triangles": 44,
+  "total_head_asset_triangles": 130,
+  "new_actions": 0,
+  "godot_integration": false
+}
