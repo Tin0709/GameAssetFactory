@@ -93,7 +93,8 @@ vg=face.vertex_groups.new(name='Head');vg.add(list(range(len(vertices))),1.,'REP
 face.shape_key_add(name='Basis');face['review_status']='Pending';face['no_mouth_or_nose']=True;face['original_geometry_unchanged']=True
 
 def add_key(name,side,fn):
- key=face.shape_key_add(name=name);key.slider_min=-1.;key.slider_max=1.5
+ key=face.shape_key_add(name=name,from_mix=False);key.slider_min=-1.;key.slider_max=1.5
+ for i,co in enumerate(vertices):key.data[i].co=co
  for part in parts:
   if part['side']!=side:continue
   for i in part['indices']:key.data[i].co=fn(Vector(vertices[i]),part)
