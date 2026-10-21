@@ -124,27 +124,29 @@ def make_group():
 
 def add_modifier(obj, controller, group, sockets, tall, phase):
     modifier = obj.modifiers.new(NAME, 'NODES'); modifier.node_group = group
-    # New native modifier sockets are not materialized as ID properties until
-    # explicitly assigned; initialize before adding serializable drivers.
+    # Blender 5.2 stores inputs in properties.inputs, not modifier ID properties.
+    # Driver paths must start on the owning Object (runtime-probed on 5.2.2).
+    inputs = modifier.properties.inputs
+    def path(name):
+        return 'modifiers["' + modifier.name + '"].properties.inputs["' + sockets[name] + '"]["value"]'
     for name, (value, *_rest) in CONTROLS.items():
-        modifier[sockets[name]] = value
-    modifier[sockets['World Origin']] = tuple(obj.location)
-    modifier[sockets['Local Heading']] = obj.rotation_euler.z
+        inputs[sockets[name]]['value'] = value
+    inputs[sockets['World Origin']]['value'] = tuple(obj.location)
+    inputs[sockets['Local Heading']]['value'] = obj.rotation_euler.z
     for name in CONTROLS:
-        key = sockets[name]
-        fc = modifier.driver_add('["' + key + '"]')
+        fc = obj.driver_add(path(name))
         variable = fc.driver.variables.new(); variable.name = 'value'; variable.type = 'SINGLE_PROP'
         variable.targets[0].id = controller; variable.targets[0].data_path = '["' + name + '"]'
         fc.driver.expression = 'value'
     for index, axis in enumerate(['X', 'Y', 'Z']):
-        fc = modifier.driver_add('["' + sockets['World Origin'] + '"]', index)
+        fc = obj.driver_add(path('World Origin'), index)
         variable = fc.driver.variables.new(); variable.name = 'value'; variable.type = 'TRANSFORMS'
         variable.targets[0].id = obj; variable.targets[0].transform_type = 'LOC_' + axis
         variable.targets[0].transform_space = 'WORLD_SPACE'; fc.driver.expression = 'value'
-    fc = modifier.driver_add('["' + sockets['Local Heading'] + '"]')
+    fc = obj.driver_add(path('Local Heading'))
     variable = fc.driver.variables.new(); variable.name = 'value'; variable.type = 'TRANSFORMS'
     variable.targets[0].id = obj; variable.targets[0].transform_type = 'ROT_Z'
     variable.targets[0].transform_space = 'WORLD_SPACE'; fc.driver.expression = 'value'
-    modifier[sockets['Tall']] = float(tall)
-    modifier[sockets['Clump Phase']] = phase
+    inputs[sockets['Tall']]['value'] = float(tall)
+    inputs[sockets['Clump Phase']]['value'] = phase
     return modifier
