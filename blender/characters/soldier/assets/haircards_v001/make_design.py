@@ -103,6 +103,12 @@ tail('L',-1);tail('R',1)
 for part in cards:
  if part['kind']=='bandana':
   part['vertices']=[(x,y,z-.020) for x,y,z in part['vertices']]
+# Enlarge only the rear tie/fold/tails around the existing attachment point.
+# The head wrap, hair, UVs and palette remain unchanged.
+rear_tie_anchor=(0.,.279,1.694-.020)
+for part in cards:
+ if part['kind']=='bandana' and 'wrap facet' not in part['name']:
+  part['vertices']=[tuple(rear_tie_anchor[k]+1.5*(v[k]-rear_tie_anchor[k]) for k in range(3)) for v in part['vertices']]
 # Bushier silhouette: broad, zero-thickness stepped locks, not solid voxel cubes.
 # Each tuft is a planar parallelogram with an opaque pixel-cutout outline.
 def tuft(name,top,u,d,width,height,seed=0):
