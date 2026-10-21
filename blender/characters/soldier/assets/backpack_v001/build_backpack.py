@@ -43,6 +43,8 @@ for c in list(bpy.data.collections):
     if c.name==ASSET_NAME or c.name.startswith('BPK_'): bpy.data.collections.remove(c)
 for group in [bpy.data.meshes,bpy.data.materials,bpy.data.images,bpy.data.cameras,bpy.data.lights,bpy.data.worlds]:
     for block in list(group):
+        if block.name.startswith('BPK_') and isinstance(block,bpy.types.Image) and block.use_fake_user and block.users==1:
+            block.use_fake_user=False
         if block.name.startswith('BPK_') and block.users==0: group.remove(block)
 registry['entries']=[e for e in registry['entries'] if e['id']!='SOLDIER_Backpack_v001']
 

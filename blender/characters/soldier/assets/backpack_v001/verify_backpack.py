@@ -3,7 +3,7 @@ import bpy,bmesh,json,hashlib
 from pathlib import Path
 HERE=Path(__file__).resolve().parent
 LIB=HERE.parents[1]/'showcase/SOLDIER_Asset_Library.blend'
-bpy.ops.wm.open_mainfile(filepath=str(LIB),load_ui=False)
+bpy.ops.wm.open_mainfile(filepath=str(LIB),load_ui=True)
 library=bpy.data.scenes['SOLDIER_ASSET_LIBRARY']
 registry=json.loads(library['soldier_registry'])
 entry=next(e for e in registry['entries'] if e['id']=='SOLDIER_Backpack_v001')
@@ -38,7 +38,21 @@ for screen in bpy.data.screens:
     for area in screen.areas:
         if area.ui_type=='ASSETS':assert area.spaces.active.asset_params,'Unsafe uninitialized Asset Browser'
 # Pack the actual four-view review without altering any character data.
+references=[im for im in bpy.data.images if im.name.startswith('BPK_PRIMARY')]
+for duplicate in references[1:]:
+    assert duplicate.users==1 and duplicate.use_fake_user
+    bpy.data.images.remove(duplicate)
+for previous in list(bpy.data.images):
+    if previous.name.startswith('BPK_REVIEW') and previous.users==1 and previous.use_fake_user:
+        bpy.data.images.remove(previous)
 im=bpy.data.images.load(str(HERE/'review_four_views.jpg'));im.name='BPK_REVIEW front three-quarter side back';im.pack();im.use_fake_user=True
+for window in bpy.context.window_manager.windows:window.scene=scene
+for screen in bpy.data.screens:
+    for area in screen.areas:
+        if area.type=='VIEW_3D':
+            area.spaces.active.region_3d.view_perspective='CAMERA'
+            area.spaces.active.overlay.show_overlays=False
+            area.spaces.active.shading.type='MATERIAL'
 bpy.context.preferences.filepaths.save_version=0
 bpy.ops.wm.save_as_mainfile(filepath=str(LIB),compress=True)
 result={'passed':True,'fresh_reopen':True,'standalone_equipment':True,'not_attached_or_worn':True,'skin_geometry_uv_weights_rig_unchanged':True,'closed_parts':True,'one_mesh_one_material':True,'packed_reference_atlas_review':True,'actions_added':0,'review_scene':scene.name,'registered_assets':len(registry['entries']),'native_asset_thumbnail':True,'safe_saved_layout':True}
