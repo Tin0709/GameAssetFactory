@@ -1,3 +1,7 @@
+# Current: Layered2D Hair + Bandana · Pending
+
+The same library now opens with **SOLDIER_HairCards_v001** and **SOLDIER_Bandana_2D_v001** on the actual unchanged Soldier, in the existing main scene / **Hair & Bandana** view layer. SOLDIER Library provides Original /2D Hair /2D+Bandana comparisons, independent accessory visibility, isolated previews and head/full-body views. Original chunky hair, face, rig, clothing/equipment and all facial Actions remain intact. Both new assets are Pending and Blender-only; Godot is unchanged. See [construction, controls and comparisons](../assets/haircards_v001/README.md). The same soldier quick-open command loads the new selector; earlier viewer windows are preserved.
+
 # Current: Facial Expressions · Pending
 
 The same library now opens in its existing main scene, **Facial Expressions** view layer. The **SOLDIER Library** sidebar includes18 original facial presets,10 situation previews, playback/loop/intensity/gaze/blink controls and close/gameplay review cameras. Skin and standalone Backpack remain selectable and unchanged. All facial work is Blender-only and Pending; existing Godot gameplay is untouched. Read [facial research, architecture and review](../facial/README.md). Use the same `open_blender_viewer.py soldier` command for the complete panel. The following earlier notes describe the preserved base assets and opening history.
