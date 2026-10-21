@@ -1,0 +1,3 @@
+# This is an Asset Catalog Definition file for Blender.
+VERSION 1
+7b66d253-ca9d-58f0-9caa-24af4ac53e31:Environment/Short Grass MD2 Pending:Short Grass MD2 Pending

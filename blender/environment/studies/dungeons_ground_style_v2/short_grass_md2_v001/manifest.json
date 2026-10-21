@@ -1,0 +1,434 @@
+{
+  "status": "Pending",
+  "source_reference": {
+    "source_pack": "Dungeons II Style 0.7 JE",
+    "source_file": "/Users/tin/Desktop/Game Dev/local_references/Dungeons II Style 0.7 JE/assets/minecraft/textures/block/short_grass.png",
+    "sha256": "bbffa540577107a281bb14fce9fd30884bbe55acf4fbb6c5925800f8350941f8",
+    "reference_grays": [
+      141,
+      146,
+      160,
+      175
+    ],
+    "terrain_root_srgb": [
+      84,
+      130,
+      52
+    ],
+    "palette_srgb": [
+      [
+        76,
+        122,
+        49
+      ],
+      [
+        82,
+        128,
+        51
+      ],
+      [
+        89,
+        136,
+        55
+      ],
+      [
+        97,
+        144,
+        60
+      ]
+    ],
+    "atlas_size": [
+      128,
+      64
+    ],
+    "regions_top_left": [
+      [
+        8,
+        8,
+        32,
+        20
+      ],
+      [
+        72,
+        8,
+        32,
+        20
+      ],
+      [
+        8,
+        40,
+        32,
+        20
+      ],
+      [
+        72,
+        40,
+        32,
+        20
+      ]
+    ],
+    "coverage": [
+      0.65625,
+      0.65625,
+      0.60625,
+      0.6125
+    ],
+    "alpha_values": [
+      0,
+      255
+    ],
+    "construction": "Cropped, mirrored and selectively shortened source silhouettes; terrain-matched tint. No blur or random pixel noise.",
+    "review_only": true
+  },
+  "central_library": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/environment/studies/dungeons_ground_style_v2/dungeons_ground_style_v2.blend",
+  "new_scene_count": 0,
+  "no_godot_integration": true,
+  "layer": "Short Grass MD2",
+  "cameras": {
+    "Overview": "MD2_Camera_Overview",
+    "Compare": "MD2_Camera_Compare",
+    "Low Cushion": "MD2_Camera_Low Cushion",
+    "Broad Fan": "MD2_Camera_Broad Fan",
+    "Soft Rosette": "MD2_Camera_Soft Rosette",
+    "Uneven Tuft": "MD2_Camera_Uneven Tuft",
+    "Cluster": "MD2_Camera_Cluster",
+    "Grouped": "MD2_Camera_Grouped",
+    "Gameplay": "MD2_Camera_Gameplay",
+    "Opposite": "MD2_Camera_Opposite"
+  },
+  "original_layer": "ViewLayer",
+  "original_camera": "CAM_V3_Showcase",
+  "assets": [
+    {
+      "name": "Short_Grass_MD2_v001_A",
+      "triangles": 32,
+      "vertices": 48,
+      "cards": 8,
+      "z_min": -0.00800000037997961,
+      "height_above_surface": 0.1940000057220459,
+      "xy_size": [
+        0.34283895790576935,
+        0.3263489454984665
+      ],
+      "materials": 1
+    },
+    {
+      "name": "Short_Grass_MD2_v001_B",
+      "triangles": 28,
+      "vertices": 42,
+      "cards": 7,
+      "z_min": -0.00800000037997961,
+      "height_above_surface": 0.23399999737739563,
+      "xy_size": [
+        0.3613790273666382,
+        0.3777761906385422
+      ],
+      "materials": 1
+    },
+    {
+      "name": "Short_Grass_MD2_v001_C",
+      "triangles": 36,
+      "vertices": 54,
+      "cards": 9,
+      "z_min": -0.00800000037997961,
+      "height_above_surface": 0.164000004529953,
+      "xy_size": [
+        0.476406991481781,
+        0.45838138461112976
+      ],
+      "materials": 1
+    },
+    {
+      "name": "Short_Grass_MD2_v001_D",
+      "triangles": 28,
+      "vertices": 42,
+      "cards": 7,
+      "z_min": -0.00800000037997961,
+      "height_above_surface": 0.27399998903274536,
+      "xy_size": [
+        0.2628343179821968,
+        0.2765515595674515
+      ],
+      "materials": 1
+    },
+    {
+      "name": "Short_Grass_MD2_Cluster_v001",
+      "triangles": 156,
+      "vertices": 234,
+      "cards": 39,
+      "z_min": -0.008160000666975975,
+      "height_above_surface": 0.20823998749256134,
+      "xy_size": [
+        0.7222153544425964,
+        0.6803969144821167
+      ],
+      "materials": 1
+    }
+  ],
+  "mixed_patch_tufts": 36,
+  "material": "MD2_ShortGrass \u2014 terrain-matched cutout",
+  "new_materials_for_assets": 1,
+  "atlas_size": [
+    128,
+    64
+  ],
+  "root_gap_m": 0,
+  "cards": {
+    "Short_Grass_MD2_v001_A": [
+      {
+        "height": 0.202,
+        "width": 0.26713804142002173,
+        "azimuth": -0.06979009726622162,
+        "root_radius": 0.01125,
+        "outward_bend": 0.025050549838216054,
+        "core": true
+      },
+      {
+        "height": 0.17644769966428184,
+        "width": 0.28635908249914055,
+        "azimuth": 2.511373621195389,
+        "root_radius": 0.01125,
+        "outward_bend": 0.01939355679996711,
+        "core": true
+      },
+      {
+        "height": 0.1840231535630995,
+        "width": 0.25797532672166346,
+        "azimuth": 4.700669769456753,
+        "root_radius": 0.01125,
+        "outward_bend": 0.01895141970243588,
+        "core": true
+      },
+      {
+        "height": 0.14224364174947182,
+        "width": 0.22067643680924337,
+        "azimuth": 7.19218569224167,
+        "root_radius": 0.075,
+        "outward_bend": 0.0826372404528427,
+        "core": false
+      },
+      {
+        "height": 0.10591868866903394,
+        "width": 0.1911047581205782,
+        "azimuth": 9.587886710252171,
+        "root_radius": 0.075,
+        "outward_bend": 0.07648842474199241,
+        "core": false
+      },
+      {
+        "height": 0.10194300841474016,
+        "width": 0.1840820142499344,
+        "azimuth": 11.980064071070991,
+        "root_radius": 0.075,
+        "outward_bend": 0.07040928011051885,
+        "core": false
+      },
+      {
+        "height": 0.11351934069779326,
+        "width": 0.18191080193885079,
+        "azimuth": 14.422653293897,
+        "root_radius": 0.075,
+        "outward_bend": 0.07825275452893463,
+        "core": false
+      },
+      {
+        "height": 0.10274523557800301,
+        "width": 0.19524940537863994,
+        "azimuth": 16.84785504292828,
+        "root_radius": 0.075,
+        "outward_bend": 0.07224512436505952,
+        "core": false
+      }
+    ],
+    "Short_Grass_MD2_v001_B": [
+      {
+        "height": 0.242,
+        "width": 0.2954037381517136,
+        "azimuth": 0.40877652192223113,
+        "root_radius": 0.012,
+        "outward_bend": 0.036795000536604325,
+        "core": true
+      },
+      {
+        "height": 0.22758130306463215,
+        "width": 0.3246573128802046,
+        "azimuth": 2.7350683563296947,
+        "root_radius": 0.012,
+        "outward_bend": 0.03717331057643177,
+        "core": true
+      },
+      {
+        "height": 0.2043530033746221,
+        "width": 0.3121278369486098,
+        "azimuth": 5.2123497859754595,
+        "root_radius": 0.012,
+        "outward_bend": 0.03673031060769746,
+        "core": true
+      },
+      {
+        "height": 0.16525185311603788,
+        "width": 0.2118365728434045,
+        "azimuth": 7.591865866981491,
+        "root_radius": 0.08,
+        "outward_bend": 0.09459526163839088,
+        "core": false
+      },
+      {
+        "height": 0.13784402720039013,
+        "width": 0.2304809767089051,
+        "azimuth": 9.973061294160033,
+        "root_radius": 0.08,
+        "outward_bend": 0.097320217383118,
+        "core": false
+      },
+      {
+        "height": 0.13503430029694277,
+        "width": 0.2589202569671157,
+        "azimuth": 12.48691986838635,
+        "root_radius": 0.08,
+        "outward_bend": 0.09212457743910235,
+        "core": false
+      },
+      {
+        "height": 0.1716328861452251,
+        "width": 0.23050391599432035,
+        "azimuth": 14.78252310708464,
+        "root_radius": 0.08,
+        "outward_bend": 0.09295658558868294,
+        "core": false
+      }
+    ],
+    "Short_Grass_MD2_v001_C": [
+      {
+        "height": 0.172,
+        "width": 0.27500306662582497,
+        "azimuth": 0.9100276943848632,
+        "root_radius": 0.01575,
+        "outward_bend": 0.03941663643435331,
+        "core": true
+      },
+      {
+        "height": 0.14927844269919738,
+        "width": 0.305434575257009,
+        "azimuth": 3.140905396412264,
+        "root_radius": 0.01575,
+        "outward_bend": 0.03185173985950264,
+        "core": true
+      },
+      {
+        "height": 0.15782862417747873,
+        "width": 0.27362265909000805,
+        "azimuth": 5.61301463431643,
+        "root_radius": 0.01575,
+        "outward_bend": 0.032144177174730414,
+        "core": true
+      },
+      {
+        "height": 0.12024598226898475,
+        "width": 0.20295014137537482,
+        "azimuth": 7.958227394049217,
+        "root_radius": 0.105,
+        "outward_bend": 0.12735880696948354,
+        "core": false
+      },
+      {
+        "height": 0.12359461483712693,
+        "width": 0.19337304027636718,
+        "azimuth": 10.496023524003649,
+        "root_radius": 0.105,
+        "outward_bend": 0.10011267842308634,
+        "core": false
+      },
+      {
+        "height": 0.10467124730908331,
+        "width": 0.18953908652952647,
+        "azimuth": 12.846321834474555,
+        "root_radius": 0.105,
+        "outward_bend": 0.12076369634880661,
+        "core": false
+      },
+      {
+        "height": 0.09723353617641431,
+        "width": 0.2259172040638417,
+        "azimuth": 15.243840485240687,
+        "root_radius": 0.105,
+        "outward_bend": 0.09801803615694919,
+        "core": false
+      },
+      {
+        "height": 0.09078880071986613,
+        "width": 0.19509094419586706,
+        "azimuth": 17.654324448672554,
+        "root_radius": 0.105,
+        "outward_bend": 0.11983636904064998,
+        "core": false
+      },
+      {
+        "height": 0.1139283409080146,
+        "width": 0.21893395444827454,
+        "azimuth": 20.157598150799103,
+        "root_radius": 0.105,
+        "outward_bend": 0.09824159701854127,
+        "core": false
+      }
+    ],
+    "Short_Grass_MD2_v001_D": [
+      {
+        "height": 0.282,
+        "width": 0.23296673682599883,
+        "azimuth": 1.242241928844877,
+        "root_radius": 0.00825,
+        "outward_bend": 0.018540877856260504,
+        "core": true
+      },
+      {
+        "height": 0.22570862477917442,
+        "width": 0.22422419404747945,
+        "azimuth": 3.5901127965649993,
+        "root_radius": 0.00825,
+        "outward_bend": 0.018122637477667982,
+        "core": true
+      },
+      {
+        "height": 0.23809440673807825,
+        "width": 0.2168638896929857,
+        "azimuth": 6.004959731734932,
+        "root_radius": 0.00825,
+        "outward_bend": 0.018447534370060383,
+        "core": true
+      },
+      {
+        "height": 0.20047245574887249,
+        "width": 0.1831624178798747,
+        "azimuth": 8.503388340933911,
+        "root_radius": 0.055,
+        "outward_bend": 0.06408446798726292,
+        "core": false
+      },
+      {
+        "height": 0.164333501128688,
+        "width": 0.15996562311351523,
+        "azimuth": 10.890759725474933,
+        "root_radius": 0.055,
+        "outward_bend": 0.06391919792376076,
+        "core": false
+      },
+      {
+        "height": 0.14821406503380688,
+        "width": 0.19580313896026583,
+        "azimuth": 13.207190387773855,
+        "root_radius": 0.055,
+        "outward_bend": 0.07223580850789608,
+        "core": false
+      },
+      {
+        "height": 0.15738764778661138,
+        "width": 0.17148812264268967,
+        "azimuth": 15.57543101306964,
+        "root_radius": 0.055,
+        "outward_bend": 0.06483189067859478,
+        "core": false
+      }
+    ]
+  }
+}
