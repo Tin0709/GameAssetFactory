@@ -21,6 +21,7 @@ static_ui.register(); info = ui.record(); controller = bpy.data.objects[info['co
 original_meshes = json.loads((E / 'source_grass_meshes.json').read_text())
 for name, expected in original_meshes.items():
     assert json.loads(json.dumps(mesh_content(bpy.data.objects[name].data))) == expected, name
+scene.frame_set(info['original_timeline']['frame_current'])
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
     bpy.context.window.view_layer = scene.view_layers[name]; bpy.context.view_layer.update()
 errors = compare(json.loads((E / 'before_native.json').read_text()))

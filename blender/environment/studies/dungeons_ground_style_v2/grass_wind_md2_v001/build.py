@@ -28,7 +28,10 @@ sources = [bpy.data.objects[n] for key in ['md2_review', 'md2_tall_review'] for 
 
 def collection(name, parent):
     c = bpy.data.collections.new(name); parent.children.link(c); return c
-root = collection(NAME + '_PENDING', bpy.data.collections['Vegetation_Grass_Pending'])
+# A top-level review collection permits complete per-layer isolation. Linking
+# beneath an old asset collection would also render objects directly in that
+# ancestor, which Blender cannot exclude while retaining this child.
+root = collection(NAME + '_PENDING', scene.collection)
 root['review_status'] = 'Pending'; root['research_only'] = True
 individual = collection('01_MD2_Wind_Individuals', root)
 field = collection('02_MD2_Wind_Mixed_Field', root)
