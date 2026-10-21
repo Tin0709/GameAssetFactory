@@ -50,7 +50,7 @@ def mesh_asset(name,kind,col,catalog):
  for loop in mesh.loops:uv.data[loop.index].uv=uvcoords[loop.vertex_index]
  obj.parent=rig;group=obj.vertex_groups.new(name='Head');group.add(list(range(len(vertices))),1.,'REPLACE');mod=obj.modifiers.new('Follow existing Head — rigid weights','ARMATURE');mod.object=rig
  obj.asset_mark();obj.asset_data.catalog_id=catalog;obj.asset_data.description='Pending | original Minecraft-style flat '+kind+' cards | existing Soldier Head attachment'
- col['review_status']='Pending';col.asset_mark();col.asset_data.catalog_id=catalog
+ col['review_status']='Pending'
  return obj
 hair=mesh_asset('SOLDIER_HairCards_v001','hair',haircol,'a41806cf-eeea-51c5-ae49-fd8dca35da64')
 band=mesh_asset('SOLDIER_Bandana_2D_v001','bandana',bandcol,'ee5433eb-89c3-542c-a670-b18fc5e0c248')
