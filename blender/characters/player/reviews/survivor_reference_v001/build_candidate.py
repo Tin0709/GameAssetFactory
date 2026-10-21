@@ -162,7 +162,8 @@ assert original_rest=={b.name:list(x for row in b.matrix_local for x in row) for
 character['review_status']='Pending';character['skin_only']=False;character['original_body_unchanged']=True;character['no_neck_geometry']=True
 character['body_geometry_sha256']=original_geometry;character['body_source']='blender/characters/player/cuboid/player_cuboid_v6.blend'
 character['primary_reference_sha256']=hashlib.sha256((OUT/'primary_reference.png').read_bytes()).hexdigest()
-character.asset_mark();character.asset_data.description='Pending skin-only reference review on the exact original V6 body; eyes only, no nose or mouth.'
+asset.asset_mark();asset.asset_data.description='Pending skin and requested3D clothes on the original V6 body; eyes only, no nose or mouth.'
+asset['review_status']='Pending'
 reference=bpy.data.images.load(str(OUT/'primary_reference.png'));reference.name='PRIMARY — supplied six-view character';reference.pack();reference.use_fake_user=True
 ref=bpy.data.objects.new('PRIMARY REFERENCE — viewport only',None);refs.objects.link(ref);ref.empty_display_type='IMAGE';ref.data=reference;ref.empty_display_size=2.5;ref.location=(2,1,1);ref.hide_render=True;ref.hide_set(True)
 notes=bpy.data.texts.new('START HERE — SKIN ONLY')
