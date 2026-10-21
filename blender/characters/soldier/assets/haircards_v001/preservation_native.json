@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "original_counts": {
+    "objects": 51,
+    "materials": 8,
+    "images": 8,
+    "actions": 34,
+    "scenes": 2
+  },
+  "changed_original_data": {
+    "objects": [],
+    "materials": [],
+    "images": [],
+    "actions": []
+  },
+  "existing_scenes_preserved": true,
+  "new_scene_count": 0
+}

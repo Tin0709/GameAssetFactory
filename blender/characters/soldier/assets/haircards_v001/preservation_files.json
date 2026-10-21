@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "original_files": 8723,
+  "changed": [
+    "blender/characters/soldier/showcase/registry.json",
+    "blender/characters/soldier/showcase/SOLDIER_Asset_Library.blend",
+    "blender/characters/soldier/showcase/soldier_library_ui.py"
+  ],
+  "unexpected_changes": [],
+  "missing": [],
+  "godot_files": 2101,
+  "changed_godot_files": []
+}
