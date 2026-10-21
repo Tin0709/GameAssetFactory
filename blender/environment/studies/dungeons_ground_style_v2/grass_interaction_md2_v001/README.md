@@ -14,7 +14,7 @@ The neutral1.8mproxy walks through short grass, runs through tall grass, crosses
 
 Implementation:43linked clumps /2,566grass triangles; original11Wind meshes/materials shared without edits. The exact original Wind modifier runs first. A second native Geometry Nodes group samples one64×48float image using immutable root positions and combines contact curvature with incoming wind. Roots and ring widths stay fixed. A120Hzcritical spring grid caches60Hzsamples deterministically; a single image upload/group tag per frame serves every clump. Disabled, zero-strength and fully recovered outputs match the first Wind modifier exactly.
 
-These motion settings are authored adaptations. Genuine MD2 footage confirms player passage, but does not establish a measurable player-caused bend/recovery response or Mojang's implementation. See [research and limitations](../../../../../../docs/environment/MD2_GRASS_INTERACTION_RESEARCH.md).
+These motion settings are authored adaptations. Genuine MD2 footage confirms player passage, but does not establish a measurable player-caused bend/recovery response or Mojang's implementation. See [research and limitations](../../../../../docs/environment/MD2_GRASS_INTERACTION_RESEARCH.md).
 
 The default desktop cache is29.5MB and rebuilds synchronously in about0.50s on this host when numeric controls change. It is a review tool, not a Mobile benchmark. Flat terrain, heading-only transforms and one proxy are the present scope. A future Godot architecture is documented; gameplay remains untouched.
 

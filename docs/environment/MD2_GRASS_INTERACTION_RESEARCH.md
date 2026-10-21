@@ -20,7 +20,7 @@ Plan:
 - [x] Add six controls and fixed gameplay/close/wind-only review routes through the existing launcher/sidebar.
 - [x] Verify Wind unchanged, exact off/zero equivalence, roots/widths, directional falloff, standing contact, run/walk response, recovery, scrubbing and30/60equivalent times.
 - [x] Render and inspect one clear original-speed preview covering short/walk, tall/run, dense passage, standing, exit and recovery.
-- [ ] Publish guarded native file, document actual evidence/limits, open the existing viewer and stop for visual approval.
+- [x] Publish guarded native file, document actual evidence/limits, open the existing viewer and stop for visual approval.
 
 Review risks: stale GN image evaluation; feedback/recursion in Blender handlers; proxy/grass timeline mismatch; preserving Wind controls and native group; root attachment under combined deformation; abrupt field-boundary/direction flips; state after reverse scrubs; static/Wind/interaction UI transitions; cache cost on control changes. All new work stays Pending.
 
@@ -108,3 +108,5 @@ Results in `.validation/md2_grass_interaction_v001/verification.json`:
 - Nine focused launcher/routing tests passed. Encoded clip decoded480frames,20.00s at24FPS.
 
 These establish internal correctness on this desktop. Artistic quality awaits review; phone performance, complex terrain, many interactors and Godot shader integration remain untested and out of scope. Every pre-existing protected Blender/gameplay file is audited by SHA256; the only intended pre-existing Blender text changes are the shared UI registration and additive native catalog entry. Source-derived research assets remain development-only.
+
+Published readback passed the same native suite. SHA256 audit:8,879pre-existing protected files,8,877exact; only the authorized shared grass UI and catalog changed. All Godot files, other Blender libraries and Wind v001 folder bytes are exact. The updated existing launcher opened native Blender PID6688 with the Interaction layer/sidebar, playback enabled, frame1→49 in2.008s (24FPS target). This is native API/log confirmation of playback, not a screenshot of that window or phone-performance evidence. The existing source Wind and unrelated Soldier windows were not operated on. Candidate status remains Pending.
