@@ -125,10 +125,14 @@ floor = bpy.data.meshes.new('MD2_Wind_Studio_Floor')
 floor.from_pydata([(-80,-80,-.026),(80,-80,-.026),(80,80,-.026),(-80,80,-.026)], [], [(0,1,2,3)])
 floor.materials.append(bpy.data.materials['REVIEW_Studio_Charcoal_Soft_V2'])
 o = bpy.data.objects.new(floor.name, floor); studio.objects.link(o)
-for name, pos, power, size, color in [('Key', (0,-4,10), 1200, 7., (1.,.96,.87)), ('Fill', (5,4,7), 650, 6., (.82,.91,1.))]:
+for name, pos, power, size, color in [('Key', (0,-4,10), 600, 7., (1.,.96,.87)), ('Fill', (5,4,7), 300, 6., (.82,.91,1.))]:
     d = bpy.data.lights.new('MD2_Wind_' + name, 'AREA'); d.energy = power; d.shape = 'DISK'; d.size = size; d.color = color
     o = bpy.data.objects.new(d.name, d); studio.objects.link(o); o.location = pos
     o.rotation_euler = (Vector((0,0,1)) - o.location).to_track_quat('-Z','Y').to_euler()
+# Uniform soft daylight keeps the far-away individual/comparison rows as
+# readable as the main field, without changing any original review lighting.
+sun = bpy.data.lights.new('MD2_Wind_Soft_Daylight', 'SUN'); sun.energy = .8; sun.angle = math.radians(25.)
+o = bpy.data.objects.new(sun.name, sun); studio.objects.link(o); o.rotation_euler = (math.radians(28), math.radians(-20), math.radians(-35))
 def camera(key, pos, target, scale):
     data = bpy.data.cameras.new('MD2_Wind_Camera_' + key); data.type = 'ORTHO'; data.ortho_scale = scale
     o = bpy.data.objects.new(data.name, data); studio.objects.link(o); o.location = pos
@@ -136,7 +140,7 @@ def camera(key, pos, target, scale):
 camera('Field', (9,-12,10), (0,0,1.), 10.6)
 camera('Close', (3,-4.6,3.3), (0,-.5,1.3), 4.6)
 camera('Gameplay', (10,-14,17), (0,0,1.), 11.5)
-camera('Compare', (18.,-3.,7.), (13.,5.,1.25), 6.7)
+camera('Compare', (18.,-4.,8.), (13.,4.8,1.1), 8.)
 for source, obj in zip(sources, masters):
     x = obj.location.x
     camera(source.name, (x+1.2,-2.4,2.6), (x,0,1.3), 2.8 if 'Cluster' in source.name else 2.3)

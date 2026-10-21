@@ -82,6 +82,7 @@ def loaded(_):
   if 'md2_wind_review' in bpy.context.scene:
    import wind_review_ui
    wind_review_ui.select(bpy.context,'Field')
+   if not bpy.app.timers.is_registered(wind_review_ui.start_preview):bpy.app.timers.register(wind_review_ui.start_preview,first_interval=.9)
   else:select(bpy.context,'All')
   if not bpy.app.timers.is_registered(short.focus_sidebar):bpy.app.timers.register(short.focus_sidebar,first_interval=.3)
 def register():

@@ -110,3 +110,7 @@ class MD2_PT_wind_individual(bpy.types.Panel):
 def register():
     for cls in [MD2_OT_wind_view, MD2_OT_wind_play, MD2_PT_wind, MD2_PT_wind_individual]:
         if not hasattr(bpy.types, cls.__name__): bpy.utils.register_class(cls)
+
+def start_preview():
+    if bpy.app.background or not record() or not bpy.context.scene.get('md2_wind_view_active'): return
+    if not bpy.context.screen.is_animation_playing: bpy.ops.screen.animation_play()
