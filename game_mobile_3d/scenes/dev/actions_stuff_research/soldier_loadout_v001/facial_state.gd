@@ -2,6 +2,7 @@ extends RefCounted
 ## Runtime port of the existing Soldier expression_model.py. Authored data is
 ## exported read-only from that module; preview-only head channels never drive bones.
 var data:Dictionary
+var targets:Dictionary={}
 var channels:Dictionary
 var base:Dictionary
 var ages:=PackedFloat64Array()
@@ -14,6 +15,8 @@ var context_name:=""
 var context_age:=100.
 func _init(model:Dictionary):
  data=model;channels=data.neutral.duplicate();base=channels.duplicate()
+ for key in data.presets:
+  var values:Dictionary=data.neutral.duplicate();values.merge(data.presets[key].target,true);targets[key]=values
  for key in data.events:event_names.append(key)
  event_names.sort_custom(func(a,b):return data.events[a][3]<data.events[b][3])
  ages.resize(event_names.size()*4);ages.fill(100.)
@@ -34,7 +37,7 @@ func request(key:String):
  elif data.presets.has(key):context_name=key;context_age=0.
 
 func target(key:String)->Dictionary:
- var result:Dictionary=data.neutral.duplicate();result.merge(data.presets[key].target,true);return result
+ return targets[key]
 static func smooth(t:float)->float:
  t=clampf(t,0.,1.);return t*t*(3.-2.*t)
 static func pulse(t:float,duration:float,attack:float,hold:float)->float:
@@ -47,7 +50,7 @@ func blend(a:Dictionary,b:Dictionary,w:float):
 func advance(delta:float,state:String,low_hp:float,dead:bool)->Dictionary:
  time+=delta;context_age+=delta
  var name:String={"Idle":"Neutral_Idle","Walk":"Move_Effort_Light","Run":"Run_Effort","Rifle Ready Idle":"Enemy_Nearby","Aim":"Focused_Aim"}.get(state,"Neutral_Idle")
- var desired:=target(name)
+ var desired:=target(name).duplicate()
  if state=="Rifle Ready Idle":
   desired.open_l=1.02;desired.open_r=1.02;desired.gaze_x=.15*pulse(fmod(time,7.2)-2.1,2.,.3,.5)
  elif state=="Idle":
@@ -73,7 +76,7 @@ func advance(delta:float,state:String,low_hp:float,dead:bool)->Dictionary:
   for j in range(i*4,i*4+4):
    ages[j]+=delta;w=maxf(w,pulse(ages[j],spec[0],spec[1],spec[2]))
   if dead and event_names[i]=="Death_Stunned":w=maxf(w,smooth(ages[i*4]/.09))
-  blend(channels,target(event_names[i]),w)
+  if w>0.:blend(channels,target(event_names[i]),w)
 
  for key in channels:
   var bounds:Array=data.limits[key];channels[key]=clampf(channels[key],bounds[0],bounds[1])

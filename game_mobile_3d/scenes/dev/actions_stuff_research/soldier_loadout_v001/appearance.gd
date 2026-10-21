@@ -122,10 +122,10 @@ func advance_motion(delta:float,velocity:Vector3,head_position:Vector3,head_basi
  var rotation_speed:Vector3=rotation_delta.get_axis()*wrapf(rotation_delta.get_angle(),-PI,PI)/delta
  angular_velocity=angular_velocity.lerp(rotation_speed.limit_length(12.),1.-exp(-14.*delta))
  var local_accel:=head_basis.inverse()*acceleration
- var speed:=Vector2(velocity.x,velocity.z).length()
+ var local_velocity:=head_basis.inverse()*velocity
  var rhythm:=sin(phase*TAU)*move_weight;var bounce:=sin(phase*TAU*2.)*move_weight
- var hair_target:=Vector3(local_accel.z*.0018+rhythm*.020,-angular_velocity.y*.012,-local_accel.x*.0017+bounce*.009)
- var tail_target:=Vector3(-local_accel.z*.003-speed*.009-bounce*.045,-angular_velocity.y*.024,local_accel.x*.003+rhythm*.028)
+ var hair_target:=Vector3(local_accel.z*.0018+local_accel.y*.0008+rhythm*.020,-angular_velocity.y*.012,-local_accel.x*.0017+bounce*.009)
+ var tail_target:=Vector3(local_accel.z*.003+local_velocity.z*.009+local_accel.y*.0015+bounce*.045,-angular_velocity.y*.024,-local_accel.x*.003+rhythm*.028)
  hair_spring.advance(delta,hair_target*SECONDARY_STRENGTH,4.2,.64,Vector3(.10,.075,.08)*SECONDARY_STRENGTH)
  tail_spring.advance(delta,tail_target*SECONDARY_STRENGTH,3.1,.55,Vector3(.28,.18,.20)*SECONDARY_STRENGTH)
  tail_tip.advance(delta,tail_spring.value*.52,3.8,.58,Vector3(.14,.10,.10)*SECONDARY_STRENGTH)
@@ -181,8 +181,11 @@ func _upload():
   if not part.fixed:
    var sign_side:=1. if "Tail.L" in part.name else -1.
    var angles:=tail_spring.value;angles.z+=sign_side*tail_spring.value.x*.12
+   # A simple rear-head stop: backward travel cannot fold cloth into the skull.
+   angles.x=maxf(angles.x,-.08)
    if "segment 2" in part.name:
-    transform=tail_matrices[i-1]*_pivoted(_vector(part.pivot),tail_tip.value)
+    var tip:=tail_tip.value;tip.x=maxf(tip.x,-.045)
+    transform=tail_matrices[i-1]*_pivoted(_vector(part.pivot),tip)
    else:transform=_pivoted(_vector(part.pivot),angles)
   tail_matrices[i]=transform
   RenderingServer.skeleton_bone_set_transform(band_ref.get_skeleton(),i,transform)
