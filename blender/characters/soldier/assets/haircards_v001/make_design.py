@@ -74,11 +74,12 @@ front('Hair / rear lock B',-.020,.252,1.395,1.817,.264,20,30,[(0,0),(16,0),(16,1
 # Two short flat crown tufts break the roof line without adding solid blocks.
 card('Hair / loose crown tuft A',[(-.210,-.06,1.836),(-.070,-.06,1.836),(-.070,.01,1.855),(-.210,.01,1.855)],10,5,[(0,1),(3,1),(3,0),(7,0),(7,1),(9,1),(9,4),(0,4)],seed=1)
 card('Hair / loose crown tuft B',[(.045,.10,1.844),(.160,.10,1.844),(.160,.165,1.859),(.045,.165,1.859)],8,5,[(0,1),(2,1),(2,0),(6,0),(6,1),(7,1),(7,4),(0,4)],seed=2)
-# Eight flat wrap facets follow the hair contour; zero solid thickness.
-points=[(-.242,-.272),(.242,-.272),(.273,-.241),(.273,.241),(.242,.273),(-.242,.273),(-.273,.241),(-.273,-.241)]
+# Wider flat cloth, tucked UNDER the unchanged central fringe and one side lock.
+# Short planar ramps keep the ribbon continuous as it weaves behind the hair.
+points=[(-.242,-.272),(-.125,-.272),(-.108,-.257),(.037,-.257),(.055,-.272),(.242,-.272),(.273,-.241),(.273,.010),(.255,.040),(.255,.120),(.273,.150),(.273,.241),(.242,.273),(-.242,.273),(-.273,.241),(-.273,-.241)]
 for i,(a,b) in enumerate(zip(points,points[1:]+points[:1])):
- z=1.719 if i in [0,1,7] else 1.712
- width=math.dist(a,b);card('Bandana / wrap facet '+str(i+1),[(a[0],a[1],z-.023),(b[0],b[1],z-.023),(b[0],b[1],z+.023),(a[0],a[1],z+.023)],max(3,round(width/.014)),4,kind='bandana',seed=i%2)
+ z=1.719 if (a[1]+b[1])/2<-.24 else 1.712
+ width=math.dist(a,b);card('Bandana / wrap facet '+str(i+1),[(a[0],a[1],z-.0345),(b[0],b[1],z-.0345),(b[0],b[1],z+.0345),(a[0],a[1],z+.0345)],max(3,round(width/.014)),5,kind='bandana',seed=i%2)
 # Flat crossed cloth at rear: no solid/block knot.
 card('Bandana / flat tie',[(-.040,.279,1.669),(.040,.279,1.669),(.040,.279,1.733),(-.040,.279,1.733)],6,5,[(1,0),(4,0),(4,1),(5,1),(5,3),(4,3),(4,4),(1,4),(1,3),(0,3),(0,1),(1,1)],'bandana',1)
 card('Bandana / tie fold',[(-.025,.282,1.675),(.027,.282,1.684),(.018,.282,1.731),(-.034,.282,1.722)],4,4,kind='bandana',seed=2)

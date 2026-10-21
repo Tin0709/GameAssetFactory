@@ -1,9 +1,9 @@
 {
   "passed": true,
   "hair_cards": 20,
-  "bandana_cards": 14,
+  "bandana_cards": 22,
   "hair_triangles": 40,
-  "bandana_triangles": 28,
+  "bandana_triangles": 44,
   "materials": 1,
   "atlas_size": 512,
   "new_scenes": 0,
