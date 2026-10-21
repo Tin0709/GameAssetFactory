@@ -22,7 +22,7 @@ func run() -> void:
 	for i in int(fps*7.5):
 		if i==int(fps*.3):scene._unhandled_input(event)
 		await process_frame
-		var dt:=get_process_time_delta();elapsed+=dt
+		var dt: float=scene.get_process_delta_time();elapsed+=dt
 		if i>fps:
 			frames.append(dt*1000.)
 			process_ms.append(Performance.get_monitor(Performance.TIME_PROCESS)*1000.)
