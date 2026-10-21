@@ -1,5 +1,9 @@
 # Blender plant studies V1
 
+## Tall Grass MD2 + half-block short refinement — 2026-10-21, Pending
+
+[Tall Grass MD2](tall_grass_md2_v001/README.md) adds four0.72–0.94m layered candidates and two clusters to this same viewer, using the actual pack tall top/bottom sprites and the current short-grass palette. Latest explicit user steering raises all five recent short bushes to0.500m visible height through positive Z only; original widths/UV/materials remain exact. The Grass MD2 tab retains short controls and adds isolated tall/comparison/grouped views. Native preservation/UI checks and protected-file audit cover the authorized height exception. No Godot, flower, bush, export or Action work.
+
 ## Short Grass MD2 v001 — 2026-10-21, PENDING REVIEW
 
 [Short grass MD2](short_grass_md2_v001/README.md) adds four low layered candidates and a dense cluster to this same library. Latest user requirement is at least1×1block in BOTH horizontal axes, including visible cutout support; heights stay16–27cm. Actual Dungeons II Style0.7JE sprite-derived atlas, one material,28–36triangles per bush. Grass MD2 sidebar offers individual/grouped/gameplay/current-grass comparisons and the original environment view. Native routes and original-data/file preservation checked. Blender review only; Godot and previous grass/flower/ground assets preserved.
