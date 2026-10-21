@@ -4,72 +4,50 @@ from PIL import Image, ImageDraw
 import random, json
 
 HERE = Path(__file__).resolve().parent
-atlas = Image.new('RGB', (1024, 1024), (56, 43, 28))
+atlas = Image.new('RGB', (512, 512), (56, 43, 28))
 regions = {}
 x0, y0, row_h = 2, 2, 0
 
-def add(name, color, seed, size=128, kind='canvas'):
+def add(name, color, seed, size=64, kind='canvas'):
     global x0, y0, row_h
-    if x0 + size + 2 > 1024:
+    if x0 + size + 2 > 512:
         x0, y0, row_h = 2, y0 + row_h + 4, 0
-    assert y0 + size + 2 < 1024
+    assert y0 + size + 2 < 512
     rng = random.Random(seed)
-    im = Image.new('RGB', (size, size), color)
+    # Latest direction: quiet broad pixel blocks, no per-pixel grain/speckles.
+    # Paint at32 logical pixels, then enlarge with NEAREST to keep crisp voxel edges.
+    logical=32
+    im = Image.new('RGB', (logical, logical), color)
     d = ImageDraw.Draw(im)
-    # The source sheet has mottled brown cloth with gray-brown dust and tiny
-    # cool speckles, rather than large camouflage-like squares. Paint these
-    # as original pixels at a finer density, using measured reference colors.
-    for _ in range(size*size//280):
-        x, y = rng.randrange(size), rng.randrange(size)
-        w, h = rng.randrange(4, 15), rng.randrange(3, 12)
-        delta = rng.choice([-10, -5, 3, 8])
-        tint = (-2,1,5) if rng.random()<.4 else (0,0,0)
-        c = tuple(max(0, min(255, color[i] + delta + tint[i])) for i in range(3))
-        d.rectangle((x, y, x+w, y+h), fill=c)
-    for _ in range(size*size//3):
-        x, y = rng.randrange(size), rng.randrange(size)
-        if kind == 'canvas':
-            delta = rng.choice([-17, -11, -6, -3, 2, 7, 12, 17])
-            tint = rng.choice([(0,0,0), (-4,0,5), (-7,-1,7), (6,2,-3)])
-            c = tuple(max(0, min(255, color[i]+delta+tint[i])) for i in range(3))
-        else:
-            delta = rng.choice([-8, -4, 4, 8])
-            c = tuple(max(0, min(255, v+delta)) for v in color)
-        d.rectangle((x, y, x+rng.choice([0,0,1]), y+rng.choice([0,1,1,2])), fill=c)
-    if kind=='canvas':
-        # Restrained warm fiber threads and small desaturated grit pixels.
-        for _ in range(size*size//38):
-            x,y=rng.randrange(size),rng.randrange(size)
-            c=rng.choice([(color[0]+20,color[1]+15,color[2]+8),
-                          (color[0]-10,color[1]-3,color[2]+4),
-                          (color[0]-17,color[1]-11,color[2]-4)])
-            d.rectangle((x,y,x+1,y+1),fill=c)
+    for x,y,w,h in [(2,3,5,4),(11,2,5,3),(21,4,6,4),(5,11,4,5),
+                    (15,10,5,4),(25,13,4,5),(1,23,5,4),(10,20,5,5),
+                    (20,23,6,4),(12,28,5,3),(27,26,4,3)]:
+        delta=rng.choice([-4,-2,2,4]) if kind=='canvas' else rng.choice([-2,0,2])
+        c=tuple(max(0,min(255,v+delta)) for v in color)
+        d.rectangle((x,y,x+w-1,y+h-1),fill=c)
+    if kind=='canvas_edge':
+        d.rectangle((0,0,31,2),fill=tuple(v+4 for v in color))
     if kind == 'webbing':
-        for y in range(2, size, 5):
-            d.line((0,y,size,y), fill=tuple(v+3 for v in color), width=1)
+        for y in [7,15,23]:
+            d.rectangle((0,y,31,y+1),fill=tuple(v+2 for v in color))
     if kind == 'plate':
-        # Worn gray steel: edge nicks, dark rivet rings and short scratches.
-        for _ in range(size*size//150):
-            x,y=rng.randrange(size),rng.randrange(size)
-            d.line((x,y,x+rng.randrange(1,5),y),fill=(146,144,135))
-        d.rectangle((0,0,size-1,1),fill=(145,144,135))
-        d.rectangle((0,2,1,size-2),fill=(130,130,122))
-        d.rectangle((size-2,2,size-1,size-1),fill=(78,77,71))
-        d.rectangle((0,size-2,size-1,size-1),fill=(80,78,71))
-        for x in [12,size-13]:
-            for y in [12,size-13]:
-                d.rectangle((x-2,y-2,x+2,y+2),fill=(76,74,67))
-                d.rectangle((x-1,y-1,x+1,y+1),fill=(123,121,111))
-                d.point((x-1,y-1),fill=(161,158,144))
+        # Readable flat gray plates with simple edge highlights and four square rivets.
+        d.rectangle((0,0,31,0),fill=(128,129,123))
+        d.rectangle((0,1,0,30),fill=(121,122,117))
+        d.rectangle((31,1,31,31),fill=(91,92,88))
+        d.rectangle((0,31,31,31),fill=(91,92,88))
+        for x in [3,28]:
+            for y in [3,28]:d.rectangle((x,y,x+1,y+1),fill=(86,87,82))
+    im=im.resize((size,size),Image.Resampling.NEAREST)
     atlas.paste(im.resize((size+2,size+2), Image.Resampling.NEAREST), (x0-1,y0-1))
     atlas.paste(im,(x0,y0))
     regions[name] = [x0,y0,size,size]
     x0 += size+4
     row_h = max(row_h,size)
 
-add('canvas', (82,61,40), 12, 256)
-add('canvas_warm', (91,66,40), 33, 256)
-add('canvas_flap', (93,67,40), 54, 256)
+add('canvas', (82,61,40), 12, 128)
+add('canvas_warm', (91,66,40), 33, 128)
+add('canvas_flap', (93,67,40), 54, 128)
 add('canvas_side', (76,57,38), 61)
 add('canvas_edge', (113,83,49), 73)
 add('canvas_shadow', (59,45,32), 84)
