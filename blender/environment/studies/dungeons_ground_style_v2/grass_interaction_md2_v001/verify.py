@@ -49,8 +49,11 @@ def wind_fingerprint():
 target=Path(sys.argv[sys.argv.index('--')+1]) if '--' in sys.argv else E/'dungeons_ground_style_v2.blend'
 bpy.ops.wm.open_mainfile(filepath=str(E/'before.blend'))
 baseline=stable_snapshot();wind_before=wind_fingerprint()
+baseline_rna={o.name:rna_values(o) for o in bpy.data.objects}
 bpy.ops.wm.open_mainfile(filepath=str(target));scene=bpy.context.scene
 actual=stable_snapshot();errors=[(g,n) for g,values in baseline.items() for n,val in values.items() if actual[g].get(n)!=val]
+if errors:
+    print('PRESERVATION_RNA_DIFFS',[(n,{k:[v,rna_values(bpy.data.objects[n]).get(k)] for k,v in baseline_rna[n].items() if v!=rna_values(bpy.data.objects[n]).get(k)}) for g,n in errors[:3] if g=='objects'],flush=True)
 assert not errors,errors
 assert wind_fingerprint()==wind_before,'Original Wind tree, controls, attributes, modifier values or drivers changed'
 assert len(bpy.data.scenes)==1 and not len(bpy.data.actions)
