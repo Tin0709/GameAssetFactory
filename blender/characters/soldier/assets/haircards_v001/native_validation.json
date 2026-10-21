@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "flat_hair_cards": 20,
+  "flat_bandana_cards": 14,
+  "binary_alpha": true,
+  "double_sided": true,
+  "head_pose_checks": 7,
+  "maximum_head_attachment_error_m": 1.228781230931777e-07,
+  "existing_actions": 34,
+  "new_bones": 0,
+  "original_and_new_hair_controls": true,
+  "bandana_hide_and_isolated_views": true,
+  "all_5_asset_routes": true,
+  "no_save_performed": true
+}

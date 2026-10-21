@@ -92,7 +92,7 @@ def blender_command(tool: Path, showcase: str) -> list[str]:
     if showcase in {'player-library', 'animation', 'weapon', 'mobs', 'soldier'}:
         command += ['--python', str(ROOT / 'scripts/load_showcase_ui.py')]
     if showcase=='soldier':
-        command += ['--python-expr', "print('SOLDIER_FACIAL_UI_V001')"]
+        command += ['--python-expr', "print('SOLDIER_FACIAL_UI_V001 SOLDIER_HAIRCARDS_UI_V001')"]
     return command
 
 
@@ -116,6 +116,8 @@ def existing_viewer_pid(tool: str, source: Path, *, require_ui: bool = False) ->
             continue  # Do not reuse a legacy Soldier window with no library panel.
         if require_ui and source.name=='SOLDIER_Asset_Library.blend' and 'SOLDIER_FACIAL_UI_V001' not in command:
             continue  # Leave older viewers untouched; their loaded UI lacks the facial system.
+        if require_ui and source.name=='SOLDIER_Asset_Library.blend' and 'SOLDIER_HAIRCARDS_UI_V001' not in command:
+            continue  # Preserve older open files; the new head selector needs its own bootstrap.
         prefix, found, suffix = command.partition(str(source))
         if found and prefix.endswith(' ') and (not suffix or suffix.startswith(' --')):
             return int(fields[0])
