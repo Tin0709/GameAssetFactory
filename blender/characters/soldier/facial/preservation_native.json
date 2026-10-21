@@ -1,0 +1,38 @@
+{
+  "passed": false,
+  "original_counts": {
+    "objects": 26,
+    "materials": 4,
+    "images": 6,
+    "actions": 0,
+    "scenes": 2
+  },
+  "changed_original_data": {
+    "objects": [
+      "Back",
+      "Back_3Q",
+      "BPK_Back",
+      "BPK_Back_3Q",
+      "BPK_Fill",
+      "BPK_Front",
+      "BPK_Front_3Q",
+      "BPK_Key",
+      "BPK_Left_Side",
+      "BPK_Right_Side",
+      "BPK_Rim",
+      "Front",
+      "Front_3Q",
+      "Left_Side",
+      "PRIMARY REFERENCE \u2014 viewport only",
+      "Right_Side",
+      "Studio Fill",
+      "Studio Key",
+      "Studio Rim"
+    ],
+    "materials": [],
+    "images": [],
+    "actions": []
+  },
+  "existing_scenes_preserved": true,
+  "new_scene_count": 0
+}
