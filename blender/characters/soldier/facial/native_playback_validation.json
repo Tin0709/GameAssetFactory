@@ -1,0 +1,11 @@
+{
+  "start_frame": 1,
+  "scene": "SOLDIER_ASSET_LIBRARY",
+  "view_layer": "Facial Expressions",
+  "presets": 18,
+  "target_fps": 30,
+  "end_frame": 118,
+  "advanced": true,
+  "elapsed_s": 4.04913304198999,
+  "passed": true
+}
