@@ -35,7 +35,10 @@
     "Black wrist bands",
     "Trouser fabric panels and hems"
   ],
-  "volumetric_hair": false,
+  "volumetric_hair": true,
+  "hair_vertices": 6872,
+  "hair_triangles": 3436,
+  "hair_style": "Curated staggered3D locks, dark warm brown palette",
   "rigid_bounds_m": {
     "Head": {
       "min": [

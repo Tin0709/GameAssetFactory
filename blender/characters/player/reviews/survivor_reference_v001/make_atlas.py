@@ -128,5 +128,12 @@ for name,color in [('wrap3d',(205,195,171)),('band3d',(34,37,36)),('shirt3d_edge
  if name=='wrap3d':
   d.rectangle((0,0,15,0),fill=(179,164,138));d.rectangle((0,7,15,7),fill=(231,218,189));d.rectangle((2,3,12,3),fill=(218,208,180))
  store(name,im)
+# Layered3D hair palette sampled by eye against the reference's dark warm browns.
+HAIR_3D=[(46,23,14),(55,27,16),(63,31,18),(39,19,13),(69,35,20),(50,25,15)]
+for i,color in enumerate(HAIR_3D):
+ im,d=paint(8,8,color,97+i,2)
+ d.rectangle((1,0,6,0),fill=tuple(c+3 for c in color))
+ d.rectangle((0,7,7,7),fill=tuple(max(0,c-5) for c in color))
+ store('hair3d_'+str(i),im)
 ATLAS.save(OUT/'survivor_atlas.png');(OUT/'atlas_regions.json').write_text(json.dumps(regions,indent=2))
 print('Painted skin-only atlas:',len(regions),'regions')
