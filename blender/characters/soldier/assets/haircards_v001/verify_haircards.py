@@ -31,6 +31,9 @@ for mode in ['ORIGINAL','HAIR','BANDANA']:
  assert not ui.find(layer.layer_collection,ui.COLS['body']).exclude
  for direction in ['Front','ThreeQuarter','Side','Back']:
   assert bpy.ops.soldier_hair.view(direction=direction)=={'FINISHED'};assert s.camera.name=='HC_'+direction
+p.preview='HAIR_ONLY';assert ui.find(layer.layer_collection,ui.COLS['band']).exclude,'Dropdown Hair only must hide bandana'
+p.bandana=False;p.preview='HAIR_BANDANA';assert not ui.find(layer.layer_collection,ui.COLS['band']).exclude,'Dropdown Hair + Bandana must show bandana'
+p.bandana=False;assert p.preview=='HAIR_ONLY','Independent hide must keep preview label coherent'
 bpy.ops.soldier_hair.isolate(bandana=False);assert ui.find(layer.layer_collection,ui.COLS['body']).exclude and ui.find(layer.layer_collection,ui.COLS['band']).exclude
 bpy.ops.soldier_hair.isolate(bandana=True);assert not ui.find(layer.layer_collection,ui.COLS['band']).exclude
 p.bandana=False;assert ui.find(layer.layer_collection,ui.COLS['band']).exclude
