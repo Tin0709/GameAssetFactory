@@ -15,6 +15,27 @@ from wind_nodes import CONTROLS
 import grass_library_ui as static_ui
 import wind_review_ui as ui
 
+def stable_native_snapshot():
+    # Hidden masters can retain identity world/local matrix caches until first
+    # evaluated. A temporary all-visible layer normalizes both native reads;
+    # no original layer visibility or authored data is edited or saved.
+    s = bpy.context.scene; previous = bpy.context.view_layer.name
+    temporary = s.view_layers.new('__MD2_Preservation_Evaluation')
+    def include(lc):
+        lc.exclude = False; lc.hide_viewport = False
+        for child in lc.children: include(child)
+    include(temporary.layer_collection)
+    bpy.context.window.view_layer = temporary
+    for obj in list(temporary.objects): obj.hide_set(False, view_layer=temporary)
+    s.update_tag(); s.frame_set(78); temporary.update()
+    result = snapshot()
+    bpy.context.window.view_layer = s.view_layers[previous]; s.view_layers.remove(temporary)
+    return result
+
+def native_errors(expected):
+    now = stable_native_snapshot()
+    return [(group,name) for group,values in expected.items() for name,value in values.items() if now[group].get(name) != value]
+
 target = Path(sys.argv[sys.argv.index('--') + 1]) if '--' in sys.argv else E / 'dungeons_ground_style_v2.blend'
 # Compare fresh native reads at identical time/dependency-graph state. The build
 # snapshot also proves immediate preservation, but its cached transforms can
@@ -24,7 +45,7 @@ bpy.context.scene.frame_set(78)
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
     bpy.context.window.view_layer = bpy.context.scene.view_layers[name]
     bpy.context.scene.update_tag(); bpy.context.scene.frame_set(78); bpy.context.view_layer.update()
-baseline = snapshot()
+baseline = stable_native_snapshot()
 baseline_rna = {o.name:rna_values(o) for o in bpy.data.objects}
 (E / 'before_reopened_native.json').write_text(json.dumps(baseline,indent=2)+'\n')
 bpy.ops.wm.open_mainfile(filepath=str(target)); scene = bpy.context.scene
@@ -36,7 +57,7 @@ scene.frame_set(info['original_timeline']['frame_current'])
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
     bpy.context.window.view_layer = scene.view_layers[name]
     scene.update_tag(); scene.frame_set(78); bpy.context.view_layer.update()
-errors = compare(baseline)
+errors = native_errors(baseline)
 assert not errors, errors
 
 def reset():
@@ -143,7 +164,7 @@ for key, expected in info['original_timeline'].items(): assert getattr(scene, ke
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
     bpy.context.window.view_layer = scene.view_layers[name]
     scene.update_tag(); scene.frame_set(78); bpy.context.view_layer.update()
-errors = compare(baseline)
+errors = native_errors(baseline)
 if errors:
     print('PRESERVATION_COMPONENTS',[(name,{k:[v,rna_values(bpy.data.objects[name]).get(k)] for k,v in baseline_rna[name].items() if v!=rna_values(bpy.data.objects[name]).get(k)}) for group,name in errors[:2] if group=='objects'],flush=True)
 assert not errors, errors
