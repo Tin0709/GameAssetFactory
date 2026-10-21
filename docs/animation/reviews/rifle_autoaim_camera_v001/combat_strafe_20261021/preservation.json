@@ -1,9 +1,16 @@
 {
   "passed": true,
   "baseline_files": 8572,
-  "unchanged_files": 8571,
+  "unchanged_files": 8570,
   "changed_files": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/README.md",
     "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
+  ],
+  "runtime_changes": [
+    "existing research rifle_visual.gd only"
+  ],
+  "documentation_changes": [
+    "existing research rifle README"
   ],
   "approved_blender_and_libraries_preserved": true
 }
