@@ -19,7 +19,7 @@ func run():
 	# the user is operating; it still instantiates the exact existing lab scene.
 	viewport=SubViewport.new();viewport.size=Vector2i(1280,720);viewport.own_world_3d=true
 	viewport.render_target_update_mode=SubViewport.UPDATE_ALWAYS;root.add_child(viewport)
-	level=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();viewport.add_child(level);current_scene=level
+	level=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();viewport.add_child(level);current_scene=viewport
 	level.player.scripted_input=true
 	for zombie in level.zombie_combat.zombies:
 		zombie.target=null;zombie.move_speed=0.
