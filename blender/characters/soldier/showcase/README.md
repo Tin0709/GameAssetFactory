@@ -19,3 +19,9 @@ python3 "$HOME/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py"
 ```
 
 Works from any working directory, uses the existing detached launcher and reuses an already-open library window. `--dry-run` prints the resolved path without launching.
+
+## Native opening fix —2026-10-21
+
+The original background-built Asset Browser had null `SpaceFile.asset_params`; GUI first draw crashed in `file_banners_update`. The builder now retains the initialized source candidate layout. Native asset registration/catalogs remain intact; open Asset Browser/Current File through Blender when needed. Do not change editor type to ASSETS in background mode and save without GUI initialization.
+
+The existing `soldier` command was launched successfully and the fixed file was opened in a native Blender window with the character visible. `opening_fix_validation.json` confirms identical meshes, rigid weights, rest rig, UVs, material assignments and packed images. The one-off layout probe fails on the original file and passes after the fix. Original failing file is backed up outside the repository. If macOS still offers recovery of the previous crashed windows, choose **Don't Reopen**, then use the normal soldier command.
