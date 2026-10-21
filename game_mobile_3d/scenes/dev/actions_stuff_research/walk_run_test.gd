@@ -14,6 +14,7 @@ const SoldierAppearance=preload("res://scenes/dev/actions_stuff_research/soldier
 const GrassField=preload("res://scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd")
 @export var grass_field_enabled:=false
 var grass_field:Node3D
+var grass_overview:=false
 var soldier_appearance:Node
 @export var soldier_loadout:=true
 @export var rifle_ready:=true
@@ -125,8 +126,10 @@ func _process(delta: float) -> void:
 	if zombie_combat!=null:hud.text+="\nZombies %d · Corpses %d / 4 · Cleared %d · R Restart"%[zombie_combat.living_count(),zombie_combat.active_ragdolls(),zombie_combat.kills]
 	if rifle_auto_aim!=null:hud.text+="\nAuto-aim: "+(rifle_auto_aim.target.name if is_instance_valid(rifle_auto_aim.target) else "nearest zombie while aiming")
 	if rifle_ready:hud.text+="\nQ / C Turn in place · head leads, feet correct >60°"
-	if grass_field!=null:hud.text+="\n30 × 30 BLOCKS · MIXED GRASS · STRONG WIND + PLAYER WAKE"
+	if grass_field!=null:hud.text+="\n30 × 30 BLOCKS · STRONG WIND + PLAYER WAKE · V Overview"
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
+	if grass_field!=null and grass_overview:
+		camera.global_position=Vector3(24,30,24);camera.look_at(Vector3(0,.5,0));camera.size=43.;return
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
 	# display sample upward on the landing frame.
@@ -171,6 +174,8 @@ func _sync_rifle_controls() -> void:
 	if rifle_fire!=null:rifle_fire.set_trigger(_fire_key_held)
 	if rifle_auto_aim!=null and not (_fire_key_held or _right_aim_held):rifle_auto_aim.reset_target()
 func _unhandled_input(event: InputEvent) -> void:
+	if grass_field!=null and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_V:
+		grass_overview=not grass_overview;_camera_initialized=false
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and (event.physical_keycode==KEY_E or event.keycode==KEY_E) and not event.echo:
 		_fire_key_held=event.pressed;_sync_rifle_controls()
