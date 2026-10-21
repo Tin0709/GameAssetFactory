@@ -25,12 +25,13 @@ def stable_snapshot():
         lc.exclude=False;lc.hide_viewport=False
         for c in lc.children:include(c)
     include(tmp.layer_collection);bpy.context.window.view_layer=tmp
-    for o in list(tmp.objects):
-        o.hide_set(False,view_layer=tmp)
-        # Newly excluded Wind roots load unevaluated identity matrix caches.
-        # Tag transform evaluation on BOTH reads; no authored property changes.
-        o.update_tag(refresh={'OBJECT'})
-    s.update_tag();s.frame_set(78);tmp.update();result=snapshot()
+    for o in list(tmp.objects):o.hide_set(False,view_layer=tmp)
+    s.update_tag();s.frame_set(78);tmp.update()
+    bpy.context.evaluated_depsgraph_get().update()
+    # First establish the new graph, THEN propagate all original matrix caches.
+    # Tagging before graph creation does not normalize newly excluded Wind roots.
+    for o in list(tmp.objects):o.update_tag(refresh={'OBJECT'})
+    s.frame_set(78);tmp.update();result=snapshot()
     bpy.context.window.view_layer=s.view_layers[old];s.view_layers.remove(tmp);return result
 
 def wind_fingerprint():
