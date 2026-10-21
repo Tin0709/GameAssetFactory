@@ -34,6 +34,8 @@ func run() -> void:
 	for direction in [Vector3.FORWARD,Vector3.BACK,Vector3.RIGHT,Vector3.LEFT]:
 		check(z.take_damage(1,direction),"Living zombie accepts nonlethal damage")
 		check(v.flash_remaining>0.,"Damage flashes immediately")
+		check(ref.flash_remaining==0.,"Damage flash remains per-instance")
+		check(v.flash_duration<=.075,"Brief damage flash separates continuous shots")
 		var directional_peak:=0.
 		for i in int(.6*fps):
 			v._process(dt);ref._process(dt)
@@ -54,12 +56,19 @@ func run() -> void:
 		check(v.flash_remaining<=0.,"Flash clears between 6Hz shots")
 	check(lower_error<.00002,"Live reaction preserves lower-body source pose")
 	check(recovery<deg_to_rad(.2),"Reaction recovers quickly without movement stun")
+	# Hit direction stays in world space even as the chasing zombie turns.
+	v.rotation.y=PI*.5;ref.rotation.y=PI*.5
+	z.take_damage(1,Vector3.RIGHT)
+	for i in 2:v._process(dt);ref._process(dt)
+	var base_up: Vector3=rs.global_basis*rs.get_bone_global_pose(chest).basis.y
+	var hit_up: Vector3=sk.global_basis*sk.get_bone_global_pose(chest).basis.y
+	check((hit_up-base_up).dot(Vector3.RIGHT)>.01,"Rotated zombie reacts along world-space shot direction")
+	for i in fps:v._process(dt);ref._process(dt)
 	var initial_nodes:=nodes(z)
 	var train_peak:=0.;var speed_peak:=0.
 	for i in fps*4:
 		if i%int(fps/6)==0:z.take_damage(1,Vector3.FORWARD)
 		v._process(dt)
-		var q: Quaternion=sk.get_bone_pose_rotation(chest)
 		# Explicit bounded state is also useful for mobile telemetry/stacking checks.
 		if v.get("hit_rotation")!=null:train_peak=maxf(train_peak,v.hit_rotation.length())
 		speed_peak=maxf(speed_peak,z.knockback.length())
@@ -79,7 +88,6 @@ func run() -> void:
 		if i%10==0:z.take_damage(1,Vector3.FORWARD)
 		await ticks(1)
 	check(z.position.distance_to(start)>.8 and v.walk_clock>0.,"Hit zombie keeps approaching without gait resets or stun lock")
-	var final_chest: Transform3D=sk.global_transform*sk.get_bone_global_pose(chest)
 	z.take_damage(999999,Vector3.FORWARD)
 	check(z.is_dead and z.death_triggers==1 and z.ragdoll.running,"Lethal damage starts existing native death exactly once")
 	check(z.ragdoll.handoff_error<.0002,"Native death retains final hit-reacted pose")
