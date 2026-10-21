@@ -11,6 +11,9 @@ const ZombieCombat=preload("res://scenes/dev/actions_stuff_research/zombie_comba
 const RifleAutoAim=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/auto_aim.gd")
 const SoldierLoadout=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/loadout.gd")
 const SoldierAppearance=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/appearance.gd")
+const GrassField=preload("res://scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd")
+@export var grass_field_enabled:=false
+var grass_field:Node3D
 var soldier_appearance:Node
 @export var soldier_loadout:=true
 @export var rifle_ready:=true
@@ -75,6 +78,8 @@ func _ready() -> void:
 				rifle_auto_aim=RifleAutoAim.new();rifle_auto_aim.name="NearestZombieAutoAim";add_child(rifle_auto_aim);rifle_auto_aim.setup(player,zombie_combat)
 	if soldier_loadout and rifle_ready:
 		soldier_appearance=SoldierAppearance.new();soldier_appearance.name="SoldierAppearance";add_child(soldier_appearance);soldier_appearance.setup(self)
+	if grass_field_enabled:
+		grass_field=GrassField.new();grass_field.name="MD2GrassField30x30";add_child(grass_field);grass_field.setup(player)
 	_update_camera()
 func _build_environment() -> void:
 	var environment:=WorldEnvironment.new();var settings:=Environment.new();settings.background_mode=Environment.BG_COLOR;settings.background_color=Color(.17,.22,.26)
@@ -84,8 +89,14 @@ func _build_environment() -> void:
 	var floor_body:=StaticBody3D.new();floor_body.name="FlatGround";add_child(floor_body)
 	# Same surface atY0; use the Lab's thicker contact slab and recovery bias
 	# for its fast native corpse impulses. Player floor height/physics stay exact.
-	var shape:=BoxShape3D.new();shape.size=Vector3(200,.4,200);shape.custom_solver_bias=.6
+	var shape:=BoxShape3D.new();shape.size=Vector3(30 if grass_field_enabled else 200,.4,30 if grass_field_enabled else 200);shape.custom_solver_bias=.6
 	var collision:=CollisionShape3D.new();collision.shape=shape;collision.position.y=-.2;floor_body.add_child(collision)
+	if grass_field_enabled:
+		# Bounded playable field; same Y0 and floor solver. Four static edge shapes.
+		for edge in [Vector3(-15.2,.7,0),Vector3(15.2,.7,0),Vector3(0,.7,-15.2),Vector3(0,.7,15.2)]:
+			var wall:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(.4,2.,30.8) if edge.x!=0 else Vector3(30.8,2.,.4)
+			wall.shape=box;wall.position=edge;floor_body.add_child(wall)
+		return
 	var ground:=MeshInstance3D.new();var mesh:=PlaneMesh.new();mesh.size=Vector2(200,200);ground.mesh=mesh
 	var material:=StandardMaterial3D.new();material.albedo_color=Color(.31,.38,.39);material.roughness=1.;ground.material_override=material;floor_body.add_child(ground)
 	# Quiet metre markers reveal travel and sliding without competing with the pose.
@@ -114,6 +125,7 @@ func _process(delta: float) -> void:
 	if zombie_combat!=null:hud.text+="\nZombies %d · Corpses %d / 4 · Cleared %d · R Restart"%[zombie_combat.living_count(),zombie_combat.active_ragdolls(),zombie_combat.kills]
 	if rifle_auto_aim!=null:hud.text+="\nAuto-aim: "+(rifle_auto_aim.target.name if is_instance_valid(rifle_auto_aim.target) else "nearest zombie while aiming")
 	if rifle_ready:hud.text+="\nQ / C Turn in place · head leads, feet correct >60°"
+	if grass_field!=null:hud.text+="\n30 × 30 BLOCKS · MIXED GRASS · STRONG WIND + PLAYER WAKE"
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
@@ -185,4 +197,5 @@ func reset_player() -> void:
 	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.reset_jump_motion();player.visual.reset_contacts()
 	if presentation!=null: presentation.reset_history()
 	if soldier_appearance!=null:soldier_appearance.reset()
+	if grass_field!=null:grass_field.reset()
 	_camera_initialized=false;_update_camera()

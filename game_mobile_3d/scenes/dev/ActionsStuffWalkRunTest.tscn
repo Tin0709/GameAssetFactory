@@ -4,3 +4,4 @@
 
 [node name="ActionsStuffWalkRunTest" type="Node3D"]
 script = ExtResource("test")
+grass_field_enabled = true
