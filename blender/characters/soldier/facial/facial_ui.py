@@ -5,7 +5,7 @@ from bpy.app.handlers import persistent
 import expression_model as model
 import face_blender as fb
 _GUARD=False
-SIT_ITEMS=[('EXPRESSION','Expression presets','Independent preset review')]+[(name,name,'Situation-driven face + existing body preview') for name in model.SITUATIONS]
+SIT_ITEMS=[('EXPRESSION','Expression presets','Independent preset review'),('REVIEW_REEL','Original-speed Review Reel','All expressions in context')]+[(name,name,'Situation-driven face + existing body preview') for name in model.SITUATIONS]
 
 def main():return bpy.data.scenes.get('SOLDIER_ASSET_LIBRARY')
 def available():return main() is not None and bpy.data.objects.get('SF_Face_Control') is not None
@@ -27,12 +27,12 @@ def select(context,kind,key,autoplay=False):
  _GUARD=True
  try:
   scene=show_layer(context);props=scene.soldier_facial;ctrl=bpy.data.objects['SF_Face_Control'];current={k:float(ctrl[k]) for k in model.NEUTRAL}
-  duration=model.PRESETS[key]['duration'] if kind=='preset' else model.SITUATIONS[key]
+  duration=model.PRESETS[key]['duration'] if kind=='preset' else model.SITUATIONS[key] if kind=='situation' else model.REEL_DURATION
   fb.assign(ctrl,fb.face_action('SF_Preview_Live_Face',ctrl,kind,key,duration,current))
   fb.body_action(bpy.data.objects['SF_Soldier_Rig'],bpy.data.objects['SF_Rifle_Sand_Block_V1'],kind,key,duration)
   scene.frame_start=1;scene.frame_end=round(duration*30)
   if kind=='preset':props.loop=model.PRESETS[key]['loop'];props.index=list(model.PRESETS).index(key);props.situation='EXPRESSION'
-  else:props.loop=key not in ['Jump','Landing','Hurt'];props.situation=key
+  else:props.loop=key not in ['Jump','Landing','Hurt','REVIEW_REEL'];props.situation=key
   scene['sf_selected_preset']=props.index;scene['sf_mode']=kind;scene['sf_situation']=key;scene['sf_loop']=props.loop
   scene.frame_set(1);scene.camera=bpy.data.objects.get(scene.get('sf_camera','SF_Front_Close'),bpy.data.objects['SF_Front_Close'])
   for area in context.window.screen.areas:
@@ -45,6 +45,7 @@ def selected(self,context):
 def situation_changed(self,context):
  if _GUARD or not available():return
  if self.situation=='EXPRESSION':select(context,'preset',list(model.PRESETS)[self.index],True)
+ elif self.situation=='REVIEW_REEL':select(context,'reel','REVIEW_REEL',True)
  else:select(context,'situation',self.situation,True)
 def loop_changed(self,context):
  if main():main()['sf_loop']=self.loop
@@ -132,7 +133,7 @@ def loaded(_):
   p.index=int(s.get('sf_selected_preset',0));p.loop=bool(s.get('sf_loop',True))
   ctrl=bpy.data.objects['SF_Face_Control']
   for k in ['intensity','look_x','look_y']:setattr(p,k,float(ctrl.get(k,1. if k=='intensity' else 0.)))
-  p.auto_blink=bool(ctrl.get('auto_blink',1.));p.situation=s.get('sf_situation','Idle') if s.get('sf_mode')=='situation' else 'EXPRESSION'
+  p.auto_blink=bool(ctrl.get('auto_blink',1.));p.situation=s.get('sf_situation','Idle') if s.get('sf_mode') in ['situation','reel'] else 'EXPRESSION'
  finally:_GUARD=False
 CLASSES=[SF_PresetItem,SF_Settings,SF_UL_presets,SF_OT_open,SF_OT_step,SF_OT_play,SF_OT_restart,SF_OT_neutral,SF_OT_camera,SF_PT_facial]
 def register():

@@ -84,7 +84,7 @@ for side,x in [('R',4),('L',19)]:
   quad(x+a,x+b,15,17,.00165,'brow',side,'brow',segment)
   h0=max(1,a);h1=min(7,b)
   if h1>h0:quad(x+h0,x+h1,15,16,.0018,'brow_light',side,'brow',segment)
- quad(x+.5,x+8.5,21.4965,21.5035,.00195,'lid',side,'lid')
+ quad(x+.5,x+8.5,21.49998,21.50002,.00195,'lid',side,'lid')
 mesh=bpy.data.meshes.new('SF_Voxel_Face_42Triangles');mesh.from_pydata(vertices,[],faces);mesh.update();face=bpy.data.objects.new('SF_Face_Mesh',mesh);asset.objects.link(face);face.parent=rig;mesh.materials.append(material)
 uv=mesh.uv_layers.new(name='SF_Face_Atlas')
 for poly,coords in zip(mesh.polygons,uvs):

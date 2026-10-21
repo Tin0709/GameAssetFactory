@@ -21,9 +21,9 @@ PRESETS={
  'Run_Effort':dict(duration=3.,loop=True,target=dict(open_l=.79,open_r=.80,brow_l=-.12,brow_r=-.12,tilt_l=.30,tilt_r=.30)),
  'Jump_Focus':dict(duration=2.,loop=False,target=dict(open_l=.80,open_r=.84,brow_l=-.10,brow_r=-.10,tilt_l=.30,tilt_r=.30)),
  'Land_Impact':dict(duration=1.8,loop=False,target=dict(open_l=.32,open_r=.39,brow_l=-.22,brow_r=-.22,tilt_l=.38,tilt_r=.38)),
- 'Hurt_Light':dict(duration=2.2,loop=False,target=dict(open_l=.35,open_r=.57,brow_l=.05,brow_r=.10,tilt_l=-.42,tilt_r=-.36)),
- 'Hurt_Heavy':dict(duration=2.6,loop=False,target=dict(open_l=.12,open_r=.20,brow_l=.20,brow_r=.26,tilt_l=-.80,tilt_r=-.72)),
- 'Low_HP_Tense':dict(duration=4.,loop=True,target=dict(open_l=.66,open_r=.73,brow_l=.02,brow_r=.08,tilt_l=-.55,tilt_r=-.45)),
+ 'Hurt_Light':dict(duration=2.2,loop=False,target=dict(open_l=.35,open_r=.57,brow_l=-.08,brow_r=.02,tilt_l=-.42,tilt_r=-.36)),
+ 'Hurt_Heavy':dict(duration=2.6,loop=False,target=dict(open_l=.12,open_r=.20,brow_l=-.20,brow_r=-.18,tilt_l=-.80,tilt_r=-.72)),
+ 'Low_HP_Tense':dict(duration=4.,loop=True,target=dict(open_l=.66,open_r=.73,brow_l=-.15,brow_r=-.10,tilt_l=-.55,tilt_r=-.45)),
  'Victory_Small':dict(duration=3.,loop=False,target=dict(open_l=.74,open_r=.81,brow_l=.23,brow_r=.30,tilt_l=-.08,tilt_r=-.06)),
  'Death_Stunned':dict(duration=3.,loop=False,target=dict(open_l=1.28,open_r=1.28,brow_l=.55,brow_r=.55,pupil_scale=.69)),
 }
@@ -95,3 +95,19 @@ def evaluate_situation(state,t,events=None,low_hp=0.,auto_blink=True,intensity=1
   c=blend(c,target(winner[2]),winner[1])
  if auto_blink and not active:c['blink_auto']=blink_at(t,state in ['Aim','Fire'])
  return finish(c,intensity)
+
+# A review edit, not another animation candidate. Seconds stay at original30FPS.
+REEL=[('situation','Idle',4.),('preset','Look_Left',2.),('preset','Look_Right',2.),('preset','Look_Down_Short',1.8),('preset','Alert',1.5),('situation','Walk',1.5),('situation','Run',1.5),('situation','Rifle Ready Idle',1.5),('situation','Aim',1.5),('situation','Fire',1.5),('situation','Jump',2.4),('situation','Hurt',2.7),('situation','Low Health',1.5),('preset','Victory_Small',1.5),('preset','Death_Stunned',1.5)]
+REEL_DURATION=sum(d for _,_,d in REEL)
+def reel_position(t):
+ start=0.;previous=None
+ for kind,key,duration in REEL:
+  if t<start+duration or (kind,key,duration)==REEL[-1]:return kind,key,clamp(t-start,0.,duration),previous
+  previous=(kind,key,duration);start+=duration
+def evaluate_reel(t):
+ kind,key,local,previous=reel_position(t)
+ fn=evaluate_preset if kind=='preset' else evaluate_situation;c=fn(key,local)
+ if previous and local<.14:
+  pk,pn,pd=previous;prior=(evaluate_preset if pk=='preset' else evaluate_situation)(pn,pd)
+  c=blend(prior,c,smooth(local/.14))
+ return c

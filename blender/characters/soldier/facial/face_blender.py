@@ -46,7 +46,7 @@ def action_channels(name,obj,channels,frames,description,asset=False):
 def face_action(name,ctrl,kind,key,duration,from_face=None):
  frames=list(range(1,round(duration*30)+2));channels={f'["{k}"]':[] for k in model.NEUTRAL}
  for frame in frames:
-  t=(frame-1)/30;c=model.evaluate_preset(key,t) if kind=='preset' else model.evaluate_situation(key,t)
+  t=(frame-1)/30;c=model.evaluate_preset(key,t) if kind=='preset' else model.evaluate_situation(key,t) if kind=='situation' else model.evaluate_reel(t)
   if from_face is not None and t<.14:c=model.blend(from_face,c,model.smooth(t/.14))
   for k,v in c.items():channels[f'["{k}"]'].append(v)
  a=action_channels(name,ctrl,channels,frames,'Original Soldier '+kind+': '+key,not name.endswith('Live_Face'))
@@ -72,7 +72,7 @@ def source_pose(mode,t):
 def mix_poses(a,b,w):
  return {k:(a[k].lerp(b[k],w) if a[k] is not None and b[k] is not None else (b[k] if w>.5 else a[k])) for k in a}
 
-def preview_pose(key,t,kind='situation'):
+def _base_preview_pose(key,t,kind='situation'):
  if kind=='preset':
   mapping={'Move_Effort_Light':'Walk','Run_Effort':'Run','Focused_Aim':'Aim','Fire_Recoil_Face':'FirePreset','Enemy_Nearby':'Rifle Ready Idle','Jump_Focus':'Jump','Land_Impact':'Landing'}
   mode=mapping.get(key,'Idle')
@@ -96,6 +96,17 @@ def preview_pose(key,t,kind='situation'):
   return source_pose('Fire',t-.35)
  return source_pose(mode,t)
 
+def preview_pose(key,t,kind='situation'):
+ if kind=='reel':
+  k,n,local,previous=model.reel_position(t);poses=preview_pose(n,local,k)
+  if previous and local<.14:
+   pk,pn,pd=previous;poses=mix_poses(preview_pose(pn,pd,pk),poses,model.smooth(local/.14))
+  return poses
+ poses=_base_preview_pose(key,t,kind)
+ if kind=='preset':
+  c=model.evaluate_preset(key,t,False);head=poses['Head'];rot=Matrix.Rotation(math.radians(c['head_yaw']),4,'Z')@Matrix.Rotation(math.radians(c['head_pitch']),4,'X');m=rot@head;m.translation=head.translation;poses['Head']=m
+ return poses
+
 def body_action(rig,weapon,kind,key,duration):
  scene=bpy.data.scenes['SOLDIER_ASSET_LIBRARY'];old_frame=scene.frame_current
  channels={};weapon_channels={'location':[],'rotation_quaternion':[],'scale':[]};frames=list(range(1,round(duration*30)+2));previous={}
@@ -104,8 +115,6 @@ def body_action(rig,weapon,kind,key,duration):
  for p in rig.pose.bones:p.rotation_mode='QUATERNION'
  for frame in frames:
   t=(frame-1)/30;poses=preview_pose(key,t,kind)
-  if kind=='preset':
-   c=model.evaluate_preset(key,t,False);head=poses['Head'];rot=Matrix.Rotation(math.radians(c['head_yaw']),4,'Z')@Matrix.Rotation(math.radians(c['head_pitch']),4,'X');m=rot@head;m.translation=head.translation;poses['Head']=m
   for bone in rig.pose.bones:
    parent=bone.parent
    kw={"parent_matrix":poses[parent.name],"parent_matrix_local":parent.bone.matrix_local} if parent else {}
@@ -115,6 +124,9 @@ def body_action(rig,weapon,kind,key,duration):
    previous[bone.name]=q.copy()
    for suffix,value in [('location',list(loc)),('rotation_quaternion',list(q)),('scale',list(scale))]:channels.setdefault(f'pose.bones["{bone.name}"].{suffix}',[]).append(value)
   wm=poses.get('Weapon') or Matrix.Identity(4);p,q,s=wm.decompose()
+  if kind=='reel':
+   _,reel_key,_,_=model.reel_position(t)
+   if reel_key not in ['Rifle Ready Idle','Aim','Fire','Focused_Aim','Fire_Recoil_Face','Enemy_Nearby']:s=Vector((0,0,0))
   if 'Weapon' in previous and q.dot(previous['Weapon'])<0:q.negate()
   previous['Weapon']=q.copy()
   for path,value in [('location',p),('rotation_quaternion',q),('scale',s)]:weapon_channels[path].append(list(value))
@@ -122,7 +134,7 @@ def body_action(rig,weapon,kind,key,duration):
  action['preview_only']=True;assign(rig,action)
  action=action_channels('SF_Preview_Live_Weapon',weapon,weapon_channels,frames,'Actual Sand Block rifle compatibility preview')
  action['preview_only']=True;weapon.rotation_mode='QUATERNION';assign(weapon,action)
- weapon.hide_render=not (key in ['Rifle Ready Idle','Aim','Fire','Focused_Aim','Fire_Recoil_Face','Enemy_Nearby'])
+ weapon.hide_render=not (kind=='reel' or key in ['Rifle Ready Idle','Aim','Fire','Focused_Aim','Fire_Recoil_Face','Enemy_Nearby'])
  weapon.hide_set(weapon.hide_render)
  for child in weapon.children_recursive:child.hide_render=weapon.hide_render
  scene.frame_set(old_frame)
