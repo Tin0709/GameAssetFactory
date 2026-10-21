@@ -4,7 +4,7 @@ from bpy.props import EnumProperty,BoolProperty,PointerProperty
 from bpy.app.handlers import persistent
 GUARD=False
 LAYER='Hair & Bandana'
-COLS={'hair':'SOLDIER_HairCards_v001_PENDING','band':'SOLDIER_Bandana_2D_v001_PENDING','old':'HC_Original_Hair — archived / unchanged','body':'HC_Character — unchanged body and clothing'}
+COLS={'hair':'SOLDIER_HairCards_v001_PENDING','band':'SOLDIER_Bandana_2D_v001_PENDING','old':'HC_Original_Hair — archived / unchanged','body':'HC_Character — Soldier body and clothing'}
 def scene():return bpy.data.scenes.get('SOLDIER_ASSET_LIBRARY')
 def ready():return scene() is not None and LAYER in scene().view_layers
 def find(root,name):

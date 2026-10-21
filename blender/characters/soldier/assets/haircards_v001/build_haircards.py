@@ -21,7 +21,7 @@ def collection(name,parent):
 assets=bpy.data.collections['SOLDIER_ASSETS']
 review=collection('HC_REVIEW — linked original Soldier',assets)
 refs=collection('HC_Rig — existing Head attachment',review);refs.objects.link(rig)
-character=collection('HC_Character — unchanged body and clothing',review)
+character=collection('HC_Character — Soldier body and clothing',review)
 for o in [body,clothes]:character.objects.link(o)
 archive=collection('HC_Original_Hair — archived / unchanged',review);archive.objects.link(oldhair)
 haircol=collection('SOLDIER_HairCards_v001_PENDING',bpy.data.collections['02_HAIR_VARIANTS'])
