@@ -2,6 +2,6 @@
 
 | Candidate | Scope | Status | Open |
 |---|---|---|---|
-| Survivor Reference v001 | Reference-inspired skin plus requested3D shirt/bands/trouser relief, exact original V6 base body, no neck | Pending | [Blender](survivor_reference_v001/Survivor_Reference_v001.blend) · [Four views](survivor_reference_v001/review_four_views.jpg) |
+| SOLDIER skin v001 | Original head/torso/legs, slim arms, layered3D hair, stronger3D clothes, large eyes and brows; no neck/nose/mouth | Pending | [SOLDIER library](../../soldier/showcase/SOLDIER_Asset_Library.blend) · [Four views](survivor_reference_v001/review_four_views.jpg) |
 
-Blender review only. Approved character sources, Actions and gameplay remain unchanged.
+Blender review only. Same source candidate in survivor_reference_v001. Approved player assets, Actions and gameplay remain unchanged.
