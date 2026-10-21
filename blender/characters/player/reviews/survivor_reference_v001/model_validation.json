@@ -1,7 +1,8 @@
 {
   "candidate": "Survivor_Reference_v001.blend",
   "status": "Pending",
-  "skin_only": true,
+  "skin_only": false,
+  "original_body_unchanged": true,
   "vertices": 48,
   "triangles": 72,
   "quads": 36,
@@ -15,7 +16,16 @@
   "weights_exact": true,
   "no_neck_geometry": true,
   "no_nose_or_mouth": true,
-  "no_volumetric_additions": true,
+  "added_3d_clothing_only": true,
+  "clothing_vertices": 216,
+  "clothing_triangles": 396,
+  "clothing_parts": [
+    "Black shirt and short sleeves",
+    "White forearm wraps",
+    "Black wrist bands",
+    "Trouser fabric panels and hems"
+  ],
+  "volumetric_hair": false,
   "rigid_bounds_m": {
     "Head": {
       "min": [

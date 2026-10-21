@@ -119,5 +119,11 @@ for side in ['L','R']:
   store('leg_'+side+'_'+face,im)
  im,d=paint(16,16,(48,51,48),50,4);store('leg_'+side+'_top',im)
  im,d=paint(16,16,(35,37,33),52,3);store('leg_'+side+'_bottom',im)
+# Explicitly requested3D clothing reuses this one atlas.
+for name,color in [('wrap3d',(205,195,171)),('band3d',(34,37,36)),('shirt3d_edge',(35,37,35)),('pants3d_edge',(37,40,36))]:
+ im,d=paint(16,8,color,88,3)
+ if name=='wrap3d':
+  d.rectangle((0,0,15,0),fill=(179,164,138));d.rectangle((0,7,15,7),fill=(231,218,189));d.rectangle((2,3,12,3),fill=(218,208,180))
+ store(name,im)
 ATLAS.save(OUT/'survivor_atlas.png');(OUT/'atlas_regions.json').write_text(json.dumps(regions,indent=2))
 print('Painted skin-only atlas:',len(regions),'regions')
