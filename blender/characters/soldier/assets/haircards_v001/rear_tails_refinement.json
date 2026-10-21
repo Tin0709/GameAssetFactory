@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "rear_tie_and_tails_scale": 1.5,
+  "fixed_attachment_m": [
+    0.0,
+    0.279,
+    1.674
+  ],
+  "changed_cards": [
+    "Bandana / flat tie",
+    "Bandana / tie fold",
+    "Bandana / Tail.L segment 1",
+    "Bandana / Tail.L segment 2",
+    "Bandana / Tail.R segment 1",
+    "Bandana / Tail.R segment 2"
+  ],
+  "hair_and_head_wrap_unchanged": true,
+  "uv_and_atlas_exact": true,
+  "no_added_thickness": true,
+  "status": "Pending"
+}
