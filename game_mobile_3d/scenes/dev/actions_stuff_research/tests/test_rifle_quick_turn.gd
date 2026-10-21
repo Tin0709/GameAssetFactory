@@ -13,20 +13,23 @@ func run()->void:
  for i in 4:
   var z=scene.zombie_combat.zombies[i];z.target=null;z.move_speed=0.;z.velocity=Vector3.ZERO;z.position=Vector3(0,0,3) if i==0 else Vector3(25+i,0,25);z.current_hp=10000
  await ticks(8)
- var v=scene.player.visual;var body_ready:=-1.;var first_shot:=-1.;var hz:=Engine.physics_ticks_per_second
+ var v=scene.player.visual;var body_ready:=-1.;var body_complete:=-1.;var first_shot:=-1.;var hz:=Engine.physics_ticks_per_second
  var event:=InputEventKey.new();event.keycode=KEY_E;event.physical_keycode=KEY_E;event.pressed=true;scene._unhandled_input(event)
  var phase:float=v.direction_snapshot.phase
  var started:=Engine.get_physics_frames()
  for i in hz:
   await ticks(1);var age:=float(Engine.get_physics_frames()-started)/hz
   if body_ready<0. and absf(wrapf(v.rotation.y,-PI,PI))<deg_to_rad(8.):body_ready=age
+  if body_complete<0. and absf(wrapf(v.rotation.y,-PI,PI))<deg_to_rad(.1):body_complete=age
+  if scene.rifle_fire.shots_fired>0:check(v.rifle_aim_weight>=.999 and v.auto_aim_aligned,"Shots require raised Aim and the actual aligned rifle")
   if first_shot<0. and scene.rifle_fire.shots_fired>0:first_shot=age
  check(body_ready>=.52 and body_ready<=.68,"Held E turns180deg decisively but visibly, around0.60seconds rather than snapping")
- check(first_shot>=.50 and first_shot<=.78,"First shot waits for approved Aim raise and the readable turn, without a long delay")
+ check(body_complete>=.58 and body_complete<=.66,"Full180deg combat body rotation takes0.60seconds")
+ check(first_shot>=.23 and first_shot<=.78,"Approved Aim raise/alignment gating remains responsive during the longer body turn")
  check(absf(v.direction_snapshot.phase-phase)<.0001,"Stationary combat pivot never resets or starts gait")
  event.pressed=false;scene._input(event)
  check(not scene.rifle_fire.trigger_held,"E release still stops firing")
- var report:={"passed":failures.is_empty(),"failures":failures,"physics_hz":hz,"body_ready_s":body_ready,"first_shot_s":first_shot,"shots":scene.rifle_fire.shots_fired}
+ var report:={"passed":failures.is_empty(),"failures":failures,"physics_hz":hz,"body_ready_s":body_ready,"body_complete_s":body_complete,"first_shot_s":first_shot,"shots":scene.rifle_fire.shots_fired}
  print("RIFLE_QUICK_TURN ",JSON.stringify(report))
  var dest:=OS.get_environment("RIFLE_QUICK_TURN_RESULTS")
  if not dest.is_empty():FileAccess.open(dest,FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
