@@ -11,7 +11,7 @@ func run():
  for s in [scene,baseline]:
   s.set_process(false);s.player.set_physics_process(false);s.player.visual.set_process(false);s.rifle_fire.set_physics_process(false);s.rifle_auto_aim.set_physics_process(false)
  check(v.meshes.size()==1 and v.meshes[0].name=="SoldierSkinV001","Single merged Soldier draw surface")
- var mesh:MeshInstance3D=v.meshes[0];check(mesh.mesh.get_surface_count()==1,"Single atlas material")
+ var mesh:MeshInstance3D=v.meshes[0];check(mesh.mesh.get_surface_count()==3,"Original face, worn skin and hard-cutout clothing surfaces")
  check(mesh.skin.get_bind_count()==10,"All ten original skin bindings retained")
  var source=load("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/Soldier_Skin_v001.glb").instantiate()
  var imported:MeshInstance3D=source.find_children("*","MeshInstance3D",true,false)[0]

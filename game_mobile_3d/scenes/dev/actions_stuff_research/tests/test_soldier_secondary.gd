@@ -13,7 +13,8 @@ func run():
  scene.rifle_fire.set_physics_process(false);scene.rifle_auto_aim.set_physics_process(false);appearance.set_process(false)
  check(appearance.hair.mesh.get_surface_count()==1 and appearance.band.mesh.get_surface_count()==1,"One cutout surface each for hair and bandana")
  check(appearance.face.get_blend_shape_count()==16,"Existing authored16facial shape keys exported")
- check(scene.player.visual.skeleton.get_bone_count()==19,"Approved animated skeleton unchanged")
+ var old_scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();old_scene.soldier_loadout=false;root.add_child(old_scene)
+ check(scene.player.visual.skeleton.get_bone_count()==old_scene.player.visual.skeleton.get_bone_count(),"Approved animated skeleton unchanged");old_scene.free()
  var max_hair:=0.;var max_tail:=0.;var blink_count:=0;var was_blink:=false
  for i in 12*fps:
   var t:=float(i)/fps;var moving:=t>1. and t<7.
