@@ -43,6 +43,7 @@ def error(a, b): return max((x-y).length for x,y in zip(a,b))
 def rest(obj): return [v.co.copy() for v in obj.data.vertices]
 
 ui.select(bpy.context, 'Field')
+assert {o.name for o in bpy.context.view_layer.objects} <= {o.name for o in bpy.data.collections[info['root']].all_objects}, 'Unrelated object leaked into wind review layer'
 masters = [bpy.data.objects[n] for n in info['masters']]
 root_error = 0.; width_error = 0.; largest = 0.
 for obj in masters:
