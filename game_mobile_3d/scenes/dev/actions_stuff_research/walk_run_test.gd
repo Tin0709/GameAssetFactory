@@ -10,6 +10,8 @@ const RifleFire=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v00
 const ZombieCombat=preload("res://scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd")
 const RifleAutoAim=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/auto_aim.gd")
 const SoldierLoadout=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/loadout.gd")
+const SoldierAppearance=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/appearance.gd")
+var soldier_appearance:Node
 @export var soldier_loadout:=true
 @export var rifle_ready:=true
 @export var zombie_combat_enabled:=true
@@ -71,6 +73,8 @@ func _ready() -> void:
 			zombie_combat=ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player,rifle_fire.audio)
 			if auto_aim_enabled:
 				rifle_auto_aim=RifleAutoAim.new();rifle_auto_aim.name="NearestZombieAutoAim";add_child(rifle_auto_aim);rifle_auto_aim.setup(player,zombie_combat)
+	if soldier_loadout and rifle_ready:
+		soldier_appearance=SoldierAppearance.new();soldier_appearance.name="SoldierAppearance";add_child(soldier_appearance);soldier_appearance.setup(self)
 	_update_camera()
 func _build_environment() -> void:
 	var environment:=WorldEnvironment.new();var settings:=Environment.new();settings.background_mode=Environment.BG_COLOR;settings.background_color=Color(.17,.22,.26)
@@ -180,4 +184,5 @@ func reset_player() -> void:
 	_turn_left_held=false;_turn_right_held=false
 	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.reset_jump_motion();player.visual.reset_contacts()
 	if presentation!=null: presentation.reset_history()
+	if soldier_appearance!=null:soldier_appearance.reset()
 	_camera_initialized=false;_update_camera()

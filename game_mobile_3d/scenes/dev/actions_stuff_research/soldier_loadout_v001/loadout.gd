@@ -21,5 +21,7 @@ static func install_skin(visual: Node) -> void:
  for surface in mesh.mesh.get_surface_count():
   var material: BaseMaterial3D=mesh.mesh.surface_get_material(surface).duplicate()
   material.texture_filter=BaseMaterial3D.TEXTURE_FILTER_NEAREST;material.roughness=1.
+  if material.resource_name.contains("WC_Ragged"):
+   material.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR;material.alpha_scissor_threshold=.5;material.cull_mode=BaseMaterial3D.CULL_DISABLED
   mesh.set_surface_override_material(surface,material)
  source.free()
