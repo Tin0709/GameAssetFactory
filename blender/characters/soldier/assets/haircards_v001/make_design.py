@@ -113,7 +113,7 @@ def tuft(name,top,u,d,width,height,seed=0):
  card('Hair / bushy '+name,[pt(-1,1),pt(1,1),pt(1,0),pt(-1,0)],10,14,poly,seed=seed)
 # Distinct crown-edge locks drape over the upper band edge, leaving red visible.
 for i,(x,z,w,h,roll) in enumerate([(-.219,1.835,.063,.098,-10),(-.135,1.845,.066,.111,9),(-.048,1.854,.072,.141,-8),(.086,1.836,.063,.109,12),(.197,1.838,.065,.095,-9)]):
- a=math.radians(roll);tuft('front band lock '+str(i+1),(x,-.246,z-.017),(math.cos(a),0,math.sin(a)),(math.sin(a),-.25,-math.cos(a)),w,h,1+i%2)
+ a=math.radians(roll);tuft('front band lock '+str(i+1),(x,-.246,z-.017),(math.cos(a),0,math.sin(a)),(math.sin(a),-.60,-math.cos(a)),w,h,1+i%2)
 # Temple tips frame the face without covering the large eyes.
 for sign,label in [(-1,'R'),(1,'L')]:
  for j,(z,h) in enumerate([(1.654,.128),(1.525,.112)]):
