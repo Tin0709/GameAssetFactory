@@ -1,11 +1,14 @@
 {
   "research_only": true,
-  "authorization": "User requested existing skin and Sand Block rifle in existing gameplay lab 2026-10-21",
+  "authorization": "Latest worn Soldier + secondary hair/tails + existing facial system in same gameplay lab, user2026-10-21",
   "source_sha256": {
-    "blender/characters/soldier/showcase/SOLDIER_Asset_Library.blend": "69840f7ea26917f698e6e992a8db06d79a5db239eaedd58f87066948c47d6cce",
+    "blender/characters/soldier/showcase/SOLDIER_Asset_Library.blend": "70988b24ac54076d0219904339e7d75627011b648555a190557c224ff26b8b8d",
     "blender/weapons/rifle_sand_block_v1/Rifle_Sand_Block_V1.glb": "d0fcfe5bbb677ed9bd26981c7bfa5ad52a7d25ec77154b1ac31f825b64d94fd7",
     "blender/weapons/rifle_sand_block_v1/Rifle_Sand_Block_V1.blend": "178928c19b0a9a2611ee56247d82002faa95513d1aada30e70a4bc4288438410"
   },
-  "skin_triangles": 3904,
-  "backpack_equipped": false
+  "body_triangles": 454,
+  "head_triangles": 208,
+  "backpack_equipped": false,
+  "source_actions_exported": false,
+  "source_blend_saved": false
 }
