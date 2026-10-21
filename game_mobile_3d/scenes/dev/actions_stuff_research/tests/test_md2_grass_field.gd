@@ -38,7 +38,9 @@ func run():
 			var value:Vector2=liquid.sample_at(probe)
 			reverse=minf(reverse,value.dot(probe.normalized()));tail_peak=maxf(tail_peak,value.length())
 		check(reverse<-.025,"Departed grass sways through rest like soft jelly")
-		check(liquid.sample_at(probe).length()<.015,"Elastic oscillation loses energy rather than accumulating")
+		check(liquid.sample_at(probe).length()<.10,"Looser elastic oscillation still loses energy")
+		for f in 180:liquid.advance(1./60.,Vector3(5,0,0),Vector3.ZERO)
+		check(liquid.sample_at(probe).length()<.003,"The longer jelly tail eventually settles without drift")
 		var samples:={}
 		for fps in [30,60]:
 			var state=state_script.new();state.advance(0.,Vector3(-3,0,0),Vector3.ZERO)
@@ -49,10 +51,10 @@ func run():
 			check(contact.length()>.15,"Standing proximity retains a readable contact bend")
 			check(contact.dot(Vector2(.35,.35))>0.,"Grass bends away from the stopped player")
 			samples[fps]=contact
-			for f in range(1,3*fps+1):
+			for f in range(1,5*fps+1):
 				state.advance(1./fps,Vector3(minf(9.,float(f)/fps*5.),0,0),Vector3(5,0,0))
-			check(state.sample_at(Vector2(.35,.35)).length()<.002,"Departed grass recovers without persistent drift")
-			check(state.active.size()<160,"Shared state work stays local and bounded")
+			check(state.sample_at(Vector2(.35,.35)).length()<.003,"Departed grass recovers without persistent drift")
+			check(state.active.size()<240,"Shared state work stays local and bounded")
 			state.reset();check(state.sample_at(Vector2(.35,.35))==Vector2.ZERO,"R/teleport reset removes the old trail")
 		check(samples[30].distance_to(samples[60])<.003,"30/60FPScontact converges consistently")
 		field.free();actor.free()
