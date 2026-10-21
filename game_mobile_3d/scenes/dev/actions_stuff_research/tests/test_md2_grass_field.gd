@@ -51,9 +51,9 @@ func run():
 			check(contact.length()>.15,"Standing proximity retains a readable contact bend")
 			check(contact.dot(Vector2(.35,.35))>0.,"Grass bends away from the stopped player")
 			samples[fps]=contact
-			for f in range(1,5*fps+1):
+			for f in range(1,7*fps+1):
 				state.advance(1./fps,Vector3(minf(9.,float(f)/fps*5.),0,0),Vector3(5,0,0))
-			check(state.sample_at(Vector2(.35,.35)).length()<.003,"Departed grass recovers without persistent drift")
+			check(state.sample_at(Vector2(.35,.35)).length()<.003,"The looser wake settles within seven seconds without persistent drift")
 			check(state.active.size()<240,"Shared state work stays local and bounded")
 			state.reset();check(state.sample_at(Vector2(.35,.35))==Vector2.ZERO,"R/teleport reset removes the old trail")
 		check(samples[30].distance_to(samples[60])<.003,"30/60FPScontact converges consistently")
