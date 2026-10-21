@@ -1,0 +1,17 @@
+{
+	"blinks": 1,
+	"fall_lift_rad": 0.748425185680389,
+	"fps_cap": 30,
+	"frame_median_ms": 16.02,
+	"frame_p95_ms": 27.273,
+	"frames": 270,
+	"hair_peak_rad": 0.173629149794579,
+	"jump_face_seen": true,
+	"landing_face_seen": true,
+	"pool_misses": 0,
+	"ready_face_recovered": true,
+	"secondary_strength": 2.0,
+	"shot_face_seen": true,
+	"shots": 10,
+	"tail_peak_rad": 0.748574256896973
+}

@@ -1,0 +1,109 @@
+{
+  "turn30": {
+    "body_complete_s": 0.6,
+    "body_ready_s": 0.6,
+    "failures": [],
+    "first_shot_s": 0.633333333333333,
+    "passed": true,
+    "physics_hz": 30,
+    "shots": 3
+  },
+  "turn60": {
+    "body_complete_s": 0.6,
+    "body_ready_s": 0.583333333333333,
+    "failures": [],
+    "first_shot_s": 0.35,
+    "passed": true,
+    "physics_hz": 60,
+    "shots": 4
+  },
+  "strafe60": {
+    "aim_aligned_samples": 1050,
+    "back_seen": true,
+    "contact_pairs": 282,
+    "contact_step_m": 4.76837158203125e-07,
+    "failures": [],
+    "fps": 60,
+    "height_step_m": 0.0125000104308128,
+    "left_support_error_m": 2.81154541426076e-07,
+    "maximum_leg_step_deg": 15.3506281784556,
+    "maximum_source_pose_error": 3.57627953917472e-07,
+    "minimum_floor_m": -5.96046447753906e-08,
+    "passed": true,
+    "recent_action_branch": true,
+    "right_grip_error_m": 1.95994175555825e-07,
+    "side_seen": true,
+    "source_samples": 656
+  },
+  "autoaim60": {
+    "camera_y_span_m": 0.00164121389389038,
+    "failures": [],
+    "grip_error_m": 1.71201307352931e-07,
+    "passed": true,
+    "scan_count": 672,
+    "shots": 53,
+    "support_error_m": 2.79967395044878e-07
+  },
+  "baseline_regressions": [
+    {
+      "test": "soldier_loadout",
+      "fps": 30,
+      "code": 0,
+      "script_errors": false
+    },
+    {
+      "test": "soldier_loadout",
+      "fps": 60,
+      "code": 0,
+      "script_errors": false
+    },
+    {
+      "test": "soldier_secondary",
+      "fps": 30,
+      "code": 0,
+      "script_errors": false
+    },
+    {
+      "test": "soldier_secondary",
+      "fps": 60,
+      "code": 0,
+      "script_errors": false
+    },
+    {
+      "test": "rifle_fire",
+      "fps": 30,
+      "code": 0,
+      "script_errors": false
+    },
+    {
+      "test": "rifle_fire",
+      "fps": 60,
+      "code": 0,
+      "script_errors": false
+    },
+    {
+      "test": "rifle_combat_strafe",
+      "fps": 30,
+      "code": 0,
+      "script_errors": false
+    },
+    {
+      "test": "rifle_combat_strafe",
+      "fps": 60,
+      "code": 0,
+      "script_errors": false
+    },
+    {
+      "test": "rifle_auto_aim",
+      "fps": 30,
+      "code": 0,
+      "script_errors": false
+    },
+    {
+      "test": "rifle_auto_aim",
+      "fps": 60,
+      "code": 0,
+      "script_errors": false
+    }
+  ]
+}
