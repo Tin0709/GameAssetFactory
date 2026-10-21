@@ -2,6 +2,7 @@ extends Node
 ## Dev-only appearance layered onto the approved render pose. Supplemental render
 ## palettes never modify the player's Skeleton3D, contacts, camera or rifle sockets.
 const DIR="res://scenes/dev/actions_stuff_research/soldier_loadout_v001/"
+const SECONDARY_STRENGTH:=2.0 # User refinement: twice the visible hair/tail response.
 const Spring=preload("res://scripts/secondary_spring.gd")
 const FaceState=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/facial_state.gd")
 var scene:Node
@@ -125,9 +126,9 @@ func advance_motion(delta:float,velocity:Vector3,head_position:Vector3,head_basi
  var rhythm:=sin(phase*TAU)*move_weight;var bounce:=sin(phase*TAU*2.)*move_weight
  var hair_target:=Vector3(local_accel.z*.0018+rhythm*.020,-angular_velocity.y*.012,-local_accel.x*.0017+bounce*.009)
  var tail_target:=Vector3(-local_accel.z*.003-speed*.009-bounce*.045,-angular_velocity.y*.024,local_accel.x*.003+rhythm*.028)
- hair_spring.advance(delta,hair_target,4.2,.64,Vector3(.10,.075,.08))
- tail_spring.advance(delta,tail_target,3.1,.55,Vector3(.28,.18,.20))
- tail_tip.advance(delta,tail_spring.value*.52,3.8,.58,Vector3(.14,.10,.10))
+ hair_spring.advance(delta,hair_target*SECONDARY_STRENGTH,4.2,.64,Vector3(.10,.075,.08)*SECONDARY_STRENGTH)
+ tail_spring.advance(delta,tail_target*SECONDARY_STRENGTH,3.1,.55,Vector3(.28,.18,.20)*SECONDARY_STRENGTH)
+ tail_tip.advance(delta,tail_spring.value*.52,3.8,.58,Vector3(.14,.10,.10)*SECONDARY_STRENGTH)
  last_velocity=velocity;last_head_position=head_position;last_head_velocity=head_velocity;last_basis=head_basis
 func _process(delta:float):
  if presenter.display_world.is_empty():return
