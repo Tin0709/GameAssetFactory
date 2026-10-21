@@ -51,6 +51,52 @@
         0.39240002632141113,
         0.6669999957084656
       ]
+    },
+    {
+      "id": "SOLDIER_Facial_System_v001",
+      "label": "Facial Expressions",
+      "status": "Pending",
+      "type": "facial",
+      "collection": "SOLDIER_Facial_Expressions_PENDING",
+      "review_scene": "SOLDIER_ASSET_LIBRARY",
+      "view_layer": "Facial Expressions",
+      "object": "SF_Face_Control",
+      "controller": "SF_Face_Control",
+      "face": "SF_Face_Mesh",
+      "presets": [
+        "Neutral_Idle",
+        "Blink_Soft",
+        "Look_Left",
+        "Look_Right",
+        "Look_Down_Short",
+        "Alert",
+        "Focused_Aim",
+        "Fire_Recoil_Face",
+        "Enemy_Nearby",
+        "Move_Effort_Light",
+        "Run_Effort",
+        "Jump_Focus",
+        "Land_Impact",
+        "Hurt_Light",
+        "Hurt_Heavy",
+        "Low_HP_Tense",
+        "Victory_Small",
+        "Death_Stunned"
+      ],
+      "situations": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Rifle Ready Idle",
+        "Aim",
+        "Fire",
+        "Jump",
+        "Landing",
+        "Hurt",
+        "Low Health"
+      ],
+      "original_face_design": true,
+      "research_body_previews": true
     }
   ],
   "reserved_categories": [
