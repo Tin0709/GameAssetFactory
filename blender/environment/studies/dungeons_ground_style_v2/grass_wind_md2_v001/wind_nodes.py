@@ -124,6 +124,12 @@ def make_group():
 
 def add_modifier(obj, controller, group, sockets, tall, phase):
     modifier = obj.modifiers.new(NAME, 'NODES'); modifier.node_group = group
+    # New native modifier sockets are not materialized as ID properties until
+    # explicitly assigned; initialize before adding serializable drivers.
+    for name, (value, *_rest) in CONTROLS.items():
+        modifier[sockets[name]] = value
+    modifier[sockets['World Origin']] = tuple(obj.location)
+    modifier[sockets['Local Heading']] = obj.rotation_euler.z
     for name in CONTROLS:
         key = sockets[name]
         fc = modifier.driver_add('["' + key + '"]')
