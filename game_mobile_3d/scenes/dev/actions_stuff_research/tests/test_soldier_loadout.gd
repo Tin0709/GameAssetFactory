@@ -23,7 +23,7 @@ func run():
  var max_pose_error:=0.;var muzzle_axis_error:=0.
  for i in 8*fps:
   var t:=float(i)/fps;var moving:=t>1. and t<6.;var running:=t>3. and t<4.5
-  var air:=t>4.5 and t<5.2;var velocity:=Vector3(sin(t*3.),0.,cos(t*3.))*(scene.player.run_speed if running else scene.player.walk_speed) if moving else Vector3.ZERO
+  var air:=t>4.5 and t<5.2;var velocity:Vector3=Vector3(sin(t*3.),0.,cos(t*3.))*(scene.player.run_speed if running else scene.player.walk_speed) if moving else Vector3.ZERO
   var context:={"grounded":not air,"body_position":Vector3(0,1. if air else 0.,0),"vertical_speed":0.,"takeoff":absf(t-4.5)<.5/fps,"sprinting":running}
   for visual in [v,cv]:
    visual.set_rifle_aim(t>.5 and t<7.);visual.turn_axis=1. if t>6. and t<6.4 else 0.;visual.drive_jump_motion(velocity,moving,context,1./fps)
