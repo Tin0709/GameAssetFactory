@@ -1,23 +1,23 @@
 {
   "candidate": "Survivor_Reference_v001.blend",
   "status": "Pending",
-  "vertices": 1866,
-  "triangles": 3668,
+  "vertices": 2025,
+  "triangles": 3996,
   "materials": 1,
   "bones": 10,
   "actions": 0,
   "unweighted_or_nonrigid_vertices": 0,
   "bounds_min": [
     -0.43128830194473267,
-    -0.24500000476837158,
+    -0.2800000309944153,
     0.0
   ],
   "bounds_max": [
     0.43128830194473267,
-    0.24500000476837158,
-    1.8900001049041748
+    0.2800000309944153,
+    1.8550000190734863
   ],
-  "height_m": 1.8900001049041748,
+  "height_m": 1.8550000190734863,
   "packed_images": [
     "PRIMARY \u2014 user character reference",
     "Survivor \u2014 Original Pixel Atlas 512"

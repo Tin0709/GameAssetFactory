@@ -41,10 +41,10 @@ for x in [5,21]:
  d.rectangle((x,17,x+5,22),fill=(247,238,215));d.rectangle((x+2,17,x+4,22),fill=(52,44,33));d.rectangle((x+2,17,x+3,18),fill=(27,28,24))
  d.rectangle((x-1,15,x+5,16),fill=(85,50,34))
 d.rectangle((3,25,9,27),fill=(247,183,148));d.rectangle((23,25,28,27),fill=(247,183,148))
-d.rectangle((14,25,17,26),fill=(221,145,109));d.rectangle((13,29,18,29),fill=(192,121,91));d.rectangle((4,30,27,31),fill=(226,151,114))
+d.rectangle((14,25,17,26),fill=(221,145,109));d.rectangle((14,29,17,29),fill=(217,145,111));d.rectangle((4,30,27,31),fill=(226,151,114))
 store('face',im)
 for i,name in enumerate(['shirt_front','shirt_back','shirt_side','sleeve']):
- im,d=tile(name,32,40 if name!='sleeve' else 24,(56,57,56),5,20+i)
+ im,d=tile(name,32,40 if name!='sleeve' else 24,(44,45,44),4,20+i)
  if name=='shirt_front':
   d.rectangle((9,0,22,1),fill=(32,34,33));d.rectangle((11,2,20,2),fill=(39,40,38))
   d.rectangle((1,4,2,35),fill=(48,49,48));d.rectangle((0,38,31,39),fill=(42,44,42))
@@ -66,10 +66,14 @@ for side in ['L','R']:
   if face=='side':masks=[(3,6,8,9),(7,11,12,14),(2,19,7,23),(8,23,12,25),(0,33,4,36),(7,36,13,39),(0,46,15,49)]
   for j,(x0,y0,x1,y1) in enumerate(masks):
    if side=='R':x0,x1=15-x1,15-x0
-   base=[(111,102,84),(131,112,90),(143,122,97)][j%3]
+   base=[(100,92,79),(120,102,84),(132,111,90)][j%3]
    d.rectangle((x0,y0,x1,y1),fill=base)
+   # Broken wear islands: clipped corners and dark interruptions, not solid blobs.
+   d.rectangle((x0,y0,min(x1,x0+1),min(y1,y0+1)),fill=(57,59,56))
+   d.rectangle((max(x0,x1-1),max(y0,y1-1),x1,y1),fill=(65,65,59))
+   if j%2==0:d.rectangle((x0+2,y0+1,min(x1,x0+3),min(y1,y0+2)),fill=(73,73,65))
    d.rectangle((max(0,x0+1),max(0,y0-1),min(15,x1-1),y0),fill=(99,94,80))
-   d.rectangle((x0,y1,min(x1,x0+1),min(55,y1+2)),fill=(119,104,86))
+   d.rectangle((x0,y1,min(x1,x0+1),min(55,y1+2)),fill=(111,94,77))
   # Pocket edge/hem is painted; no bag or new accessory added.
   d.rectangle((0,13,15,14),fill=(40,43,41));d.rectangle((0,29,15,30),fill=(42,45,43));d.rectangle((0,53,15,55),fill=(38,40,37))
   store('pants_'+side+'_'+face,im)
@@ -81,10 +85,10 @@ for i,name in enumerate(['boot','sole','boot_toe','boot_collar']):
  if name=='sole':d.rectangle((0,1,23,2),fill=(65,62,51));d.rectangle((0,11,23,11),fill=(31,33,31))
  store(name,im)
 for i in range(12):
- base=[(79,43,28),(86,47,30),(92,51,32),(70,37,26),(101,57,35),(83,46,32)][i%6]
+ base=[(58,29,17),(65,33,19),(71,36,21),(50,25,15),(78,40,23),(61,31,19)][i%6]
  im,d=tile('hair',8,8,base,3,90+i)
  # Broad lock highlights rather than salt-and-pepper texel noise.
- d.rectangle((0,0,7,0),fill=tuple(c+5 for c in base));d.rectangle((0,0,0,7),fill=tuple(c-6 for c in base))
+ d.rectangle((0,0,7,0),fill=tuple(c+2 for c in base));d.rectangle((0,0,0,7),fill=tuple(c-2 for c in base))
  store('hair'+str(i),im)
 ATLAS.save(OUT/'survivor_atlas.png');(OUT/'atlas_regions.json').write_text(json.dumps(regions,indent=2))
 print('Atlas painted:',len(regions),'regions,512² RGB')

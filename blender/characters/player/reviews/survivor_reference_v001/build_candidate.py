@@ -58,7 +58,7 @@ def box(name,center,size,tile,group,transform=None,crop=None):
 
 # Large cubic face; the head and all layered hair remain one rigid Head part.
 box('Head / simple voxel face',(0,0,1.555),(.438,.406,.390),['face','skin_side','skin_side','skin_side','skin_side','skin_side'],'Head')
-box('Small planar nose',(0,-.207,1.445),(.041,.015,.027),'skin_side','Head')
+box('Small planar nose',(0,-.204,1.445),(.041,.003,.025),'skin_side','Head')
 box('Neck / joined collar',(0,0,1.352),(.145,.175,.060),'neck','Neck')
 box('Charcoal short-sleeve shirt',(0,0,1.065),(.430,.255,.540),['shirt_front','shirt_back','shirt_side','shirt_side','shirt_side','shirt_side'],'Chest')
 
@@ -96,11 +96,11 @@ for i in range(-8,8):
   lock=(i//2*13+j//2*7)%5
   for k in range(15):
    z=BASE+(k+.5)*CELL
-   top=1.856+.018*((i//2*7+j//2*11)%3-1)
+   top=1.820+.018*((i//2*7+j//2*11)%3-1)+(.018 if abs(x)<.18 and abs(y)<.16 else 0.)
    # Cut corners/upper silhouette in broad steps, with a few controlled crown tufts.
-   hw=.270 if z<1.79 else .246
-   hd=.258 if z<1.80 else .239
-   if z<1.54:hw=.250;hd=.242
+   hw=.290 if z<1.765 else .260
+   hd=.290 if z<1.78 else .260
+   if z<1.54:hw=.269;hd=.263
    if z>top or abs(x)>hw or abs(y)>hd:continue
    if max(0,abs(x)-(hw-.070))+max(0,abs(y)-(hd-.070))>.085:continue
    if z<1.754 and abs(x)<.205 and abs(y)<.189:continue
@@ -108,16 +108,16 @@ for i in range(-8,8):
     bottom=fringe[i+8]
     if z<bottom:continue
     # Two staggered shingle depths keep the fringe visibly layered in side view.
-    outer=.244+(.024 if (i//2+k//3)%3==0 else 0)
+    outer=.244+(.029 if ((i-2*(k//3))//3+k//3)%3==0 else 0)
     if -y>outer:continue
    elif y>.17:
     bottom=1.401+.035*((i//3)%3==0)
     if z<bottom:continue
-    if y>.233 and (i//2+k//3)%3==1:continue
+    if y>.237 and ((i+k//2)//3+k//3)%3==1:continue
    else:
     bottom=1.431+.035*((j//2+(1 if i>0 else 0))%4==0)
     if z<bottom:continue
-    if abs(x)>.24 and (j//2+k//3)%3==2:continue
+    if abs(x)>.25 and ((j-2*(k//3))//3+k//3)%3==2:continue
    occupied.add((i,j,k))
 # Only exposed quads; no duplicate interior cube faces.
 verts=[];faces=[];tiles=[]
@@ -128,7 +128,7 @@ for i,j,k in sorted(occupied):
   n=len(verts)
   verts.extend([((i+a)*CELL,(j+b)*CELL,BASE+(k+c)*CELL) for a,b,c in corners]);faces.append(tuple(range(n,n+4)))
   # Shared color across adjacent cells forms locks larger than a single voxel.
-  shade=(i//2*7+j//2*13+k//3*3)%12
+  shade=((i-k//2)//2*7+(j+k//3)//2*11+k//2*5)%12
   tiles.append('hair'+str(shade))
 hair=make_mesh('Layered chunky brown hair',verts,faces,tiles,'Head')
 hair['cell_m']=CELL;hair['occupied_cells']=len(occupied);hair['exposed_quads']=len(faces)
