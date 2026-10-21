@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "native_viewport_draws": [
+    {
+      "view": "Front",
+      "camera": "Front",
+      "character_visible": true
+    },
+    {
+      "view": "ThreeQuarter",
+      "camera": "Front_3Q",
+      "character_visible": true
+    },
+    {
+      "view": "Side",
+      "camera": "Left_Side",
+      "character_visible": true
+    },
+    {
+      "view": "Back",
+      "camera": "Back",
+      "character_visible": true
+    },
+    {
+      "view": "ThreeQuarter",
+      "camera": "Front_3Q",
+      "character_visible": true
+    }
+  ],
+  "final_scene": "SOLDIER_ASSET_LIBRARY",
+  "final_layer": "Hair & Bandana",
+  "final_camera": "Front_3Q",
+  "full_body": true,
+  "status": "Pending",
+  "saved": false
+}
