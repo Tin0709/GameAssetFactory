@@ -26,6 +26,19 @@ func run():
 				if c.r<.00001:roots+=1
 			check(roots>0,"Every variant carries immutable zero-weight roots")
 		var state_script=load("res://scenes/dev/actions_stuff_research/grass_md2_v001/interaction_field.gd")
+		# A brush must leave a real elastic reversal, not only ease toward zero.
+		var liquid=state_script.new();liquid.advance(0.,Vector3.ZERO,Vector3.ZERO)
+		for f in 10:liquid.advance(1./60.,Vector3.ZERO,Vector3.ZERO)
+		var probe:=Vector2(.35,.35);var initial:Vector2=liquid.sample_at(probe)
+		check(initial.length()>.20,"A light contact produces a prompt visible bend")
+		for f in range(1,41):liquid.advance(1./60.,Vector3(float(f)*.125,0,0),Vector3(7.5,0,0))
+		var reverse:=0.;var tail_peak:=0.
+		for f in 100:
+			liquid.advance(1./60.,Vector3(5,0,0),Vector3.ZERO)
+			var value:Vector2=liquid.sample_at(probe)
+			reverse=minf(reverse,value.dot(probe.normalized()));tail_peak=maxf(tail_peak,value.length())
+		check(reverse<-.025,"Departed grass sways through rest like soft jelly")
+		check(liquid.sample_at(probe).length()<.015,"Elastic oscillation loses energy rather than accumulating")
 		var samples:={}
 		for fps in [30,60]:
 			var state=state_script.new();state.advance(0.,Vector3(-3,0,0),Vector3.ZERO)
