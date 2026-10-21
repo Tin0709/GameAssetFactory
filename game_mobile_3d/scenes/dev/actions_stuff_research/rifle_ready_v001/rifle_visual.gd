@@ -34,6 +34,10 @@ var rifle_ground_future: Array=[]
 var _rifle_idle_poses: Array=[]
 var _rifle_idle_future: Array=[]
 var _rifle_driving:=false
+var combat_strafe_weight:=0.
+var _combat_context:=false
+var _combat_bones:Array[int]=[]
+var _combat_height:=0.
 var rifle_aim_clip: RefCounted
 var rifle_aim_profile: Dictionary={}
 var rifle_aim_requested:=false
@@ -82,6 +86,7 @@ func _ready() -> void:
  _recoil_support_base=rifle_recoil_clip.support(0.)
  for bone in _aim_bones:_recoil_saved.append(skeleton.get_bone_pose(bone))
  active_walk_action=rifle_profile.clips.Walk.action;active_run_action=rifle_profile.clips.Run.action
+ for bone_name in ["Root","Hips","Leg.L","Leg.R"]:_combat_bones.append(skeleton.find_bone(bone_name))
  stationary_turn=RifleTurn.new(skeleton,rotation.y)
  _cache_direction_poses();position.y=0.
  for i in skeleton.get_bone_count():
@@ -149,6 +154,11 @@ func _sample_set(ahead: float=0.) -> Array:
    rifle_support_anchor=rifle_support_anchor.lerp(rifle_aim_clip.support(aim_time),rifle_aim_weight)
    rifle_contact_shoulder_weight=maxf(rifle_move_weight,rifle_aim_weight)
  if stationary_turn!=null:stationary_turn.apply(poses,ahead,rifle_aim_weight,_has_auto_aim())
+ if combat_strafe_weight>0.:
+  var directional:Array=direction_future_sampler.poses if ahead>0. else direction_sampler.poses
+  # Keep the source waist/leg parent compensation together. The approved
+  # rifle upper-body locals, grip and recoil remain on their existing path.
+  for bone in _combat_bones:poses[bone]=Transform3D(poses[bone]).interpolate_with(directional[bone],combat_strafe_weight)
  return poses
 
 func set_rifle_aim(held: bool) -> void:
@@ -219,6 +229,12 @@ func _apply_auto_aim() -> void:
    auto_aim_aligned=contact.get("collider")==auto_aim_target
 func _cache_direction_poses() -> void:
  if rifle_clips.is_empty():super._cache_direction_poses();return
+ if combat_strafe_weight>0.:
+  direction_sampler.set_snapshot(direction_snapshot)
+  var future:Dictionary=direction_snapshot.duplicate(true)
+  future.phase+=.004*float(future.cadence);future.life+=.004
+  direction_future_sampler.set_snapshot(future)
+  _combat_height=direction_sampler.height_offset(direction_snapshot)
  rifle_ground_poses=_sample_set();rifle_ground_future=_sample_set(.004)
  direction_poses=rifle_ground_poses.duplicate();direction_future_poses=rifle_ground_future.duplicate()
 
@@ -231,6 +247,14 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  rifle_aim_weight=move_toward(rifle_aim_weight,1. if rifle_aim_requested else 0.,delta/AIM_BLEND_SECONDS)
  if rifle_aim_requested or rifle_aim_weight>0.:rifle_aim_time=fposmod(rifle_aim_time+delta,float(rifle_aim_profile.clips.Aim.duration))
  var moving:=requested or Vector2(world_velocity.x,world_velocity.z).length()>.025
+ var combat:=combat_turn_requested and _has_auto_aim()
+ # Verified pre29 recent-action branch keeps forward/lateral weights relative
+ # to look. E is our rifle-combat equivalent; never reset its shared gait.
+ if combat:direction_controller.seed_context(true)
+ elif _combat_context:direction_controller.seed_context(false)
+ _combat_context=combat
+ var grounded_combat:=combat and moving and bool(physics.grounded) and not bool(physics.get("takeoff",false)) and not jump_active
+ combat_strafe_weight=move_toward(combat_strafe_weight,1. if grounded_combat else 0.,delta/.14)
  var target_yaw:=NAN
  if _has_auto_aim():
   var toward: Vector3=auto_aim_target.global_position-global_position
@@ -260,7 +284,7 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
     # The jump controller still owns compression/stretch; Aim owns head pose.
     blended.basis=Basis(blended.basis.orthonormalized().get_rotation_quaternion()).scaled(source.basis.get_scale())
     pair[0][bone]=blended
- else:position.y=0. # These approved clips already include native boot clearance.
+ else:position.y=_combat_height*combat_strafe_weight # Existing native source envelope; approved rifle clips already include their own clearance.
  idle_active=not moving and not jump_active
  rifle_state="Run" if gait_run_weight>.98 and moving else ("Walk" if moving else "Idle")
  if jump_grounded:_update_direction_support(delta)
@@ -394,5 +418,6 @@ func reset_contacts() -> void:
  _restore_auto_aim();auto_aim_target=null;auto_aim_aligned=true;_auto_aim_rotation=Quaternion.IDENTITY;_auto_aim_turning=false
  if rifle_recoil_clip!=null:cancel_rifle_recoil()
  super.reset_contacts();rifle_idle_time=0.;rifle_move_weight=0.;idle_active=true
+ combat_strafe_weight=0.;_combat_context=false;_combat_height=0.;direction_controller.seed_context(false)
  turn_axis=0.
  if stationary_turn!=null:stationary_turn.reset(rotation.y)
