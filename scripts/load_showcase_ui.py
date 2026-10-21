@@ -6,6 +6,7 @@ import bpy
 
 ROOT = Path(__file__).resolve().parents[1]
 SHOWCASES = {
+    'dungeons_ground_style_v2.blend': ('blender/environment/studies/dungeons_ground_style_v2/short_grass_md2_v001', 'review_ui', 'MD2_PT_short_grass'),
     'player_animation_library_v1.blend': ('blender/animation/reviews/player_animation_library_v1', 'review_controls', 'PLAYER_REVIEW_PT_library'),
     'Animation_Showcase.blend': ('blender/animation/showcase', 'gaf_animation_library', 'GAF_PT_animation_library'),
     'Weapon_Showcase.blend': ('blender/weapons/showcase', 'gaf_weapon_library', 'GAF_PT_weapon_library'),

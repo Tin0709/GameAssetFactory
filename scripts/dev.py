@@ -89,8 +89,10 @@ def blender_command(tool: Path, showcase: str) -> list[str]:
         if stream.read(80).startswith(b'version https://git-lfs.github.com/spec/'):
             raise ValueError(f'Not a restored Blender file: {source}. Run git lfs pull first.')
     command = [str(tool), '--factory-startup', '--disable-autoexec', str(source)]
-    if showcase in {'player-library', 'animation', 'weapon', 'mobs', 'soldier'}:
+    if showcase in {'asset-style-v2', 'player-library', 'animation', 'weapon', 'mobs', 'soldier'}:
         command += ['--python', str(ROOT / 'scripts/load_showcase_ui.py')]
+    if showcase=='asset-style-v2':
+        command += ['--python-expr', "print('MD2_SHORT_GRASS_V001')"]
     if showcase=='soldier':
         command += ['--python-expr', "print('SOLDIER_FACIAL_UI_V001 SOLDIER_HAIRCARDS_UI_V001_R2')"]
     return command
@@ -114,6 +116,8 @@ def existing_viewer_pid(tool: str, source: Path, *, require_ui: bool = False) ->
         command = fields[1]
         if require_ui and str(ROOT / 'scripts/load_showcase_ui.py') not in command:
             continue  # Do not reuse a legacy Soldier window with no library panel.
+        if require_ui and source.name=='dungeons_ground_style_v2.blend' and 'MD2_SHORT_GRASS_V001' not in command:
+            continue  # Preserve stale open studies; use the current review controls.
         if require_ui and source.name=='SOLDIER_Asset_Library.blend' and 'SOLDIER_FACIAL_UI_V001' not in command:
             continue  # Leave older viewers untouched; their loaded UI lacks the facial system.
         if require_ui and source.name=='SOLDIER_Asset_Library.blend' and 'SOLDIER_HAIRCARDS_UI_V001_R2' not in command:
@@ -159,7 +163,7 @@ def launch_blender(command: list[str], viewer: str, *, bridge: bool) -> int:
         if os.name != 'nt':
             import fcntl
             fcntl.flock(lock, fcntl.LOCK_EX)
-        pid = existing_viewer_pid(command[0], ROOT / VIEWERS[viewer], require_ui=viewer=='soldier')
+        pid = existing_viewer_pid(command[0], ROOT / VIEWERS[viewer], require_ui=viewer in {'soldier','asset-style-v2'})
         if bridge:
             check_mcp_port()
             addon = Path(os.environ.get('BLENDER_MCP_ADDON', str(Path.home() /

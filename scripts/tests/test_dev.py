@@ -64,7 +64,7 @@ class PortableLauncherTests(unittest.TestCase):
                 self.assertEqual(source.name, filename)
                 self.assertIn(str(source), cmd)
                 self.assertNotIn(str(dev.ROOT / 'scripts/start_blender_mcp.py'), cmd)
-                self.assertEqual('--python' in cmd, viewer != 'asset-style-v2')
+                self.assertIn('--python', cmd)
 
     def test_blender_launch_detaches_without_waiting(self):
         command = dev.blender_command(Path('/bin/blender'), 'weapon')

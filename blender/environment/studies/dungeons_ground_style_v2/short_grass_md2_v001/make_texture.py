@@ -30,7 +30,7 @@ for i,mask in enumerate([a,b,c,d]):
    tile.putpixel((x,y),(*color,255))
  # Keep16x10logical reference pixels:2× nearest-neighbour scale only.
  tile=tile.resize((32,20),Image.Resampling.NEAREST)
- x=8+i*32 if False else (8+(i%2)*64);y=8+(i//2)*32
+ x=8+(i%2)*64;y=8+(i//2)*32
  atlas.paste(tile,(x,y));regions.append([x,y,32,20]);cover.append(sum(p[3]>127 for p in tile.getdata())/(32*20))
  # Duplicate RGB into transparent gutter, keeping alpha0 (no coloured fringe).
  for yy in range(y-4,y+24):

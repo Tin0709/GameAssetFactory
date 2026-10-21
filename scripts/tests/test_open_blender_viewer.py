@@ -31,7 +31,7 @@ class PublicViewerCommandsTests(unittest.TestCase):
                     self.assertIn(str(ROOT / relative), command)
                     self.assertNotIn('--background', command)
                     self.assertNotIn(str(ROOT / 'scripts/start_blender_mcp.py'), command)
-                    self.assertEqual('--python' in command, viewer != 'asset')
+                    self.assertIn('--python', command)
 
     def test_unknown_viewer_fails_without_launching(self):
         result = subprocess.run([sys.executable, str(SCRIPT), 'invalid'], cwd='/tmp',
