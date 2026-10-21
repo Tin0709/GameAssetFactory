@@ -5,6 +5,7 @@
     "blender/characters/soldier/showcase/registry.json",
     "blender/characters/soldier/showcase/SOLDIER_Asset_Library.blend",
     "blender/characters/soldier/showcase/blender_assets.cats.txt",
+    "blender/characters/soldier/showcase/README.md",
     "blender/characters/soldier/showcase/test_library_ui.py",
     "blender/characters/soldier/showcase/soldier_library_ui.py"
   ],
