@@ -1,3 +1,7 @@
+# Current: Facial Expressions · Pending
+
+The same library now opens in its existing main scene, **Facial Expressions** view layer. The **SOLDIER Library** sidebar includes18 original facial presets,10 situation previews, playback/loop/intensity/gaze/blink controls and close/gameplay review cameras. Skin and standalone Backpack remain selectable and unchanged. All facial work is Blender-only and Pending; existing Godot gameplay is untouched. Read [facial research, architecture and review](../facial/README.md). Use the same `open_blender_viewer.py soldier` command for the complete panel. The following earlier notes describe the preserved base assets and opening history.
+
 # SOLDIER Asset Library
 
 Open **SOLDIER_Asset_Library.blend** here. The existing skin candidate is registered **Pending**, with an actual-render asset thumbnail and packed reference/four-view preview. No Godot integration.
