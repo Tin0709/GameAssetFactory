@@ -6,6 +6,7 @@ bpy.ops.wm.open_mainfile(filepath=str(D.parent/'showcase/SOLDIER_Asset_Library.b
 bpy.context.preferences.filepaths.save_version=0
 import soldier_library_ui;soldier_library_ui.register();import facial_ui as ui;import face_blender as fb;import expression_model as model
 scene=bpy.data.scenes['SOLDIER_ASSET_LIBRARY'];ui.show_layer(bpy.context)
+packed=bpy.data.texts.get('SOLDIER — body preview samples (research only)');packed.clear();packed.write((D/'body_preview_samples.json').read_text());fb._DATA=None
 face=bpy.data.objects['SF_Face_Mesh'];ctrl=bpy.data.objects['SF_Face_Control'];rig=bpy.data.objects['SF_Soldier_Rig'];weapon=bpy.data.objects['SF_Rifle_Sand_Block_V1']
 for curve in face.data.shape_keys.animation_data.drivers:
  if '**3' in curve.driver.expression:
