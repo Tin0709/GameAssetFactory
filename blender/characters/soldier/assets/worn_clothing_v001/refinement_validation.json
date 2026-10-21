@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "same_pending_soldier_library": true,
+  "hair_cards": 61,
+  "hair_palette_exact": true,
+  "all22_bandana_cards_geometry_uv_and_pixels_exact": true,
+  "ragged_cloth_tabs": 35,
+  "continuous_trouser_faces": 6,
+  "body_vertices_preserved": 48,
+  "clothing_triangles": 382,
+  "visible_soldier_triangles": 620,
+  "original_face_and_eye_material_preserved": true,
+  "actions_exact": 34,
+  "new_actions": 0,
+  "new_scenes": 0,
+  "godot_integration": false
+}
