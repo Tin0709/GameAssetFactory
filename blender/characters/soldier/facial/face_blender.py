@@ -44,10 +44,10 @@ def action_channels(name,obj,channels,frames,description,asset=False):
  return action
 
 def face_action(name,ctrl,kind,key,duration,from_face=None):
- frames=list(range(1,round(duration*30)+2));channels={f'["{k}"]':[] for k in model.NEUTRAL}
+ frames=list(range(-3 if from_face is not None else 1,round(duration*30)+2));channels={f'["{k}"]':[] for k in model.NEUTRAL}
  for frame in frames:
-  t=(frame-1)/30;c=model.evaluate_preset(key,t) if kind=='preset' else model.evaluate_situation(key,t) if kind=='situation' else model.evaluate_reel(t)
-  if from_face is not None and t<.14:c=model.blend(from_face,c,model.smooth(t/.14))
+  t=max(0.,(frame-1)/30);c=model.evaluate_preset(key,t) if kind=='preset' else model.evaluate_situation(key,t) if kind=='situation' else model.evaluate_reel(t)
+  if from_face is not None and frame<1:c=model.blend(from_face,c,model.smooth((frame+3)/4))
   for k,v in c.items():channels[f'["{k}"]'].append(v)
  a=action_channels(name,ctrl,channels,frames,'Original Soldier '+kind+': '+key,not name.endswith('Live_Face'))
  a['duration_s']=duration;a['preset']=key;a['kind']=kind;a['original_facial_animation']=True
@@ -81,19 +81,17 @@ def _base_preview_pose(key,t,kind='situation'):
   phase=t-.5
   if 0<=phase<1/6:return source_pose('Fire',phase)
   return source_pose('Fire',0.)
- if mode=='Aim':return mix_poses(source_pose('Rifle Ready Idle',t),source_pose('Aim',t),model.smooth(t/.30))
+ if mode=='Aim':return source_pose('Aim',t)
  if mode=='Jump':
   if t<.30:return source_pose('Idle',t)
-  if t<1.35:return source_pose('Jump',(t-.30)*1.1666667/1.05)
-  if t<2.15:return source_pose('Landing',(t-1.35)/.8)
-  return mix_poses(source_pose('Landing',1.),source_pose('Idle',t),model.smooth((t-2.15)/.25))
+  if t<1.50:return source_pose('Jump',t-.30)
+  if t<2.50:return source_pose('Landing',t-1.50)
+  return mix_poses(source_pose('Landing',1.),source_pose('Idle',t),model.smooth((t-2.50)/.30))
  if mode=='Landing':
   if t<.5:return source_pose('Idle',t)
   if t<1.5:return source_pose('Landing',t-.5)
   return mix_poses(source_pose('Landing',1.),source_pose('Idle',t),model.smooth((t-1.5)/.3))
- if mode=='Fire':
-  if t<.35:return source_pose('Fire',0.)
-  return source_pose('Fire',t-.35)
+ if mode=='Fire':return source_pose('Fire',t)
  return source_pose(mode,t)
 
 def preview_pose(key,t,kind='situation'):
@@ -107,14 +105,20 @@ def preview_pose(key,t,kind='situation'):
   c=model.evaluate_preset(key,t,False);head=poses['Head'];rot=Matrix.Rotation(math.radians(c['head_yaw']),4,'Z')@Matrix.Rotation(math.radians(c['head_pitch']),4,'X');m=rot@head;m.translation=head.translation;poses['Head']=m
  return poses
 
-def body_action(rig,weapon,kind,key,duration):
+def body_action(rig,weapon,kind,key,duration,entry=False):
  scene=bpy.data.scenes['SOLDIER_ASSET_LIBRARY'];old_frame=scene.frame_current
- channels={};weapon_channels={'location':[],'rotation_quaternion':[],'scale':[]};frames=list(range(1,round(duration*30)+2));previous={}
+ channels={};weapon_channels={'location':[],'rotation_quaternion':[],'scale':[]};frames=list(range(-3 if entry else 1,round(duration*30)+2));previous={}
+ captured={bone.name:bone.matrix.copy() for bone in rig.pose.bones};captured['Weapon']=weapon.matrix_world.copy()
  # No action/constraint writer competes while native basis channels are sampled.
  rig.animation_data_create();rig.animation_data.action=None
  for p in rig.pose.bones:p.rotation_mode='QUATERNION'
  for frame in frames:
-  t=(frame-1)/30;poses=preview_pose(key,t,kind)
+  t=max(0.,(frame-1)/30);poses=preview_pose(key,t,kind)
+  # One-time entry lives BEFORE the canonical loop, not in every repetition.
+  if entry and frame<1:poses=mix_poses(captured,poses,model.smooth((frame+3)/4))
+  # Short preset reviews have different lengths from the source idle/gait.
+  # Close only their preview seam; source pose sampling itself stays at1x.
+  if kind=='preset' and t>duration-.16:poses=mix_poses(poses,preview_pose(key,0.,kind),model.smooth((t-duration+.16)/.16))
   for bone in rig.pose.bones:
    parent=bone.parent
    kw={"parent_matrix":poses[parent.name],"parent_matrix_local":parent.bone.matrix_local} if parent else {}

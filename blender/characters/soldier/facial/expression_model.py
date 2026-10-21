@@ -38,7 +38,10 @@ def pulse(t,duration,attack=.12,hold=.25):
  if t<attack:return smooth(t/attack)
  if t<attack+hold:return 1.
  return 1.-smooth((t-attack-hold)/max(.001,duration-attack-hold))
-def blend(a,b,w):return {k:a[k]+(b.get(k,NEUTRAL[k])-a[k])*w for k in NEUTRAL}
+def blend(a,b,w):
+ if w<=0:return a.copy()
+ if w>=1:return {k:b.get(k,NEUTRAL[k]) for k in NEUTRAL}
+ return {k:a[k]+(b.get(k,NEUTRAL[k])-a[k])*w for k in NEUTRAL}
 def target(name):return {**NEUTRAL,**PRESETS[name]['target']}
 @lru_cache(maxsize=32)
 def blink_schedule(duration=60.,focus=False):
