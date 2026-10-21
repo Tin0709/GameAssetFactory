@@ -1,0 +1,24 @@
+extends RefCounted
+## Appearance-only research adapter. Existing rig, pose writer and sockets survive.
+const SKIN=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/Soldier_Skin_v001.glb")
+const RIFLE=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/Rifle_Sand_Block_V1.glb")
+static func install_skin(visual: Node) -> void:
+ var source:=SKIN.instantiate()
+ var imported: MeshInstance3D=source.find_children("*","MeshInstance3D",true,false)[0]
+ var mesh:=MeshInstance3D.new();mesh.name="SoldierSkinV001";mesh.mesh=imported.mesh
+ # Rebind the canonical mesh to the current approved full-arm runtime rig.
+ # Inverse runtime rests retain the authored slim-arm silhouette and all UVs.
+ var skin:=Skin.new();skin.set_bind_count(imported.skin.get_bind_count())
+ for i in skin.get_bind_count():
+  var name: StringName=imported.skin.get_bind_name(i)
+  var bone: int=visual.skeleton.find_bone(name)
+  assert(bone>=0,"Unmapped Soldier skin bone: "+str(name))
+  skin.set_bind_name(i,name);skin.set_bind_pose(i,visual.skeleton.get_bone_global_rest(bone).affine_inverse())
+ mesh.skin=skin;visual.skeleton.add_child(mesh);mesh.skeleton=NodePath("..")
+ for old: MeshInstance3D in visual.meshes:old.hide()
+ visual.meshes.clear();visual.meshes.append(mesh)
+ for surface in mesh.mesh.get_surface_count():
+  var material: BaseMaterial3D=mesh.mesh.surface_get_material(surface).duplicate()
+  material.texture_filter=BaseMaterial3D.TEXTURE_FILTER_NEAREST;material.roughness=1.
+  mesh.set_surface_override_material(surface,material)
+ source.free()

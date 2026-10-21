@@ -9,6 +9,8 @@ const RiflePresenter=preload("res://scenes/dev/actions_stuff_research/rifle_read
 const RifleFire=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/continuous_fire.gd")
 const ZombieCombat=preload("res://scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd")
 const RifleAutoAim=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/auto_aim.gd")
+const SoldierLoadout=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/loadout.gd")
+@export var soldier_loadout:=true
 @export var rifle_ready:=true
 @export var zombie_combat_enabled:=true
 @export var auto_aim_enabled:=true
@@ -50,7 +52,11 @@ func _ready() -> void:
 	player.get_node("Visual").travel_speed_scale=movement_speed_multiplier
 	player.get_node("Visual").locomotion_playback_rate=locomotion_animation_multiplier if rifle_ready else 1.
 	add_child(player)
-	if rifle_ready:player.visual.activate_rifle_ready()
+	if rifle_ready:
+		if soldier_loadout:
+			SoldierLoadout.install_skin(player.visual)
+			player.visual.activate_rifle_ready(SoldierLoadout.RIFLE)
+		else:player.visual.activate_rifle_ready()
 	camera=Camera3D.new();camera.name="GameplayCamera";camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=camera_size;camera.far=150.;add_child(camera);camera.make_current()
 	var layer:=CanvasLayer.new();add_child(layer)
 	var panel:=PanelContainer.new();panel.position=Vector2(20,20);layer.add_child(panel)

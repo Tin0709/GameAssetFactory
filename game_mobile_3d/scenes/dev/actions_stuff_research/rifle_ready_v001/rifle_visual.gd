@@ -99,9 +99,9 @@ func _ready() -> void:
   var b: int=[leg_left,leg_right][side];var sole:=_sole_world(b);last_sole[side]=sole;foot_anchors[side]=Vector3(sole.x,0.,sole.z);foot_rotations[side]=_leg_world_rotation(b);replant_from[side]=sole;replant_q[side]=foot_rotations[side]
  pose_dirty=false;transition_age=10.;_scale_dirty=false
 
-func activate_rifle_ready() -> void:
+func activate_rifle_ready(asset: PackedScene=RIFLE_ASSET) -> void:
  # Reuse the existing weapon socket, marker arrays and preferred model.
- var old: Node3D=socket.instances[1];old.hide();rifle_model=RIFLE_ASSET.instantiate();rifle_model.name="ApprovedRifleStylizedV2";socket.add_child(rifle_model);socket.instances[1]=rifle_model
+ var old: Node3D=socket.instances[1];old.hide();rifle_model=asset.instantiate();rifle_model.name="ResearchRifle";socket.add_child(rifle_model);socket.instances[1]=rifle_model
  socket.hand_transforms[1]=_rows(rifle_profile.weapon_mount)
  for instance: MeshInstance3D in rifle_model.find_children("*","MeshInstance3D",true,false):
   for surface in instance.mesh.get_surface_count():
