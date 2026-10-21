@@ -6,6 +6,8 @@ D=Path(__file__).resolve().parent;sys.path.insert(0,str(D));sys.path.insert(0,st
 bpy.ops.wm.open_mainfile(filepath=str(D.parents[1]/'showcase/SOLDIER_Asset_Library.blend'),load_ui=True)
 import soldier_library_ui;soldier_library_ui.register();import haircards_ui as ui
 s=ui.show(bpy.context);p=s.soldier_hair;hair=bpy.data.objects['SOLDIER_HairCards_v001'];band=bpy.data.objects['SOLDIER_Bandana_2D_v001'];rig=hair.parent
+p.closeup=False;bpy.ops.soldier_hair.view(direction='ThreeQuarter');assert s.camera.name=='Front_3Q'
+p.closeup=True
 assert len(bpy.data.scenes)==2 and len(bpy.data.actions)==34 and len(rig.data.bones)==10
 for obj in [hair,band]:
  assert obj.get('review_status')=='Pending' and obj.asset_data

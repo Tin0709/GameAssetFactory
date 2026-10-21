@@ -17,9 +17,13 @@ for poly in body.data.polygons:
     if bone=='Head':assert body.data.materials[poly.material_index]==original_body.materials[0]
 assert original_body.users>=2 and original_clothes.users>=2,'Archived originals and Facial review must remain'
 layout=json.loads((D/'cloth_cards.json').read_text());assert len(layout['cards'])==35
-assert len(clothes.data.polygons)==185 and len(clothes.data.vertices)==308
+assert len(clothes.data.polygons)==191 and len(clothes.data.vertices)==332
+assert clothes['wc_garment_faces']==6
 for v in clothes.data.vertices:assert len(v.groups)==1 and abs(v.groups[0].weight-1)<1e-7
-for poly,card in zip(list(clothes.data.polygons)[-35:],layout['cards']):
+def key(points):return tuple(sorted(tuple(round(float(a),6) for a in p) for p in points))
+faces={key([clothes.data.vertices[i].co for i in p.vertices]):p for p in clothes.data.polygons}
+for card in layout['cards']:
+    poly=faces[key(card['vertices'])]
     assert len(poly.vertices)==4
     points=[clothes.data.vertices[i].co for i in poly.vertices]
     n=(points[1]-points[0]).cross(points[2]-points[0]).normalized()
@@ -44,5 +48,5 @@ for angles in [(0,0,0,0,0),(8,-90,90,35,-35),(-10,40,-35,-30,30),(12,-65,-65,50,
         evaluated.to_mesh_clear()
 for name,matrix in saved.items():rig.pose.bones[name].matrix_basis=matrix
 bpy.context.view_layer.update();assert max_error<1e-5,max_error
-report={'passed':True,'original_body_vertices_uv_weights_exact':True,'original_head_material_retained':True,'original_shared_meshes_archived_and_facial_review_preserved':True,'flat_cloth_cards':35,'binary_cutout':True,'rigid_pose_samples':4,'maximum_attachment_error_m':max_error,'actions':34,'bones':10,'new_scenes':0,'no_save_performed':True}
+report={'passed':True,'original_body_vertices_uv_weights_exact':True,'original_head_material_retained':True,'original_shared_meshes_archived_and_facial_review_preserved':True,'flat_cloth_cards':35,'thin_trouser_garment_faces':6,'binary_cutout':True,'rigid_pose_samples':4,'maximum_attachment_error_m':max_error,'actions':34,'bones':10,'new_scenes':0,'no_save_performed':True}
 (D/'native_validation.json').write_text(json.dumps(report,indent=2)+'\n');print('WORN_CLOTHING_VERIFY_PASS',json.dumps(report),flush=True)
