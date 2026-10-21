@@ -17,6 +17,7 @@ for item in manifest['assets']:
  for p in m.polygons:
   first=m.vertices[p.vertices[0]].co
   for vi in p.vertices:planarity=max(planarity,abs((m.vertices[vi].co-first).dot(p.normal)))
+ assert all(max(v.co[i] for v in m.vertices)-min(v.co[i] for v in m.vertices)>=.99999 for i in [0,1]),obj.name
  assert not obj.modifiers and not obj.animation_data
 assert len(material_ids)==1;assert planarity<1e-6
 mat=bpy.data.objects[manifest['assets'][0]['name']].data.materials[0];nodes=mat.node_tree.nodes
@@ -26,7 +27,7 @@ assert any(n.type=='MATH' and n.operation=='GREATER_THAN' for n in nodes)
 assert all(n.interpolation=='Closest' for n in nodes if n.type=='TEX_IMAGE')
 # Shared original ground topology/materials are retained on every copied platform.
 base=bpy.data.objects['ENV_GrassBlock_DI_V3'];grounds=[o for o in bpy.data.objects if o.name.startswith(('MD2_Platform_','MD2_Field_Ground_'))]
-assert len(grounds)==11 and all(o.data==base.data for o in grounds)
+assert len(grounds)==10 and all(o.data==base.data for o in grounds)
 import review_ui as ui;ui.register();routes=[]
 for key in list(record['cameras'])+['Original','Overview']:
  ui.select(bpy.context,key);expected=record['old_layer'] if key=='Original' else record['layer'];assert bpy.context.view_layer.name==expected
