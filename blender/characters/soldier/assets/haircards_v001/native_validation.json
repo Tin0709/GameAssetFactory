@@ -1,11 +1,11 @@
 {
   "passed": true,
-  "flat_hair_cards": 20,
+  "flat_hair_cards": 59,
   "flat_bandana_cards": 22,
   "binary_alpha": true,
   "double_sided": true,
   "head_pose_checks": 7,
-  "maximum_head_attachment_error_m": 1.228781230931777e-07,
+  "maximum_head_attachment_error_m": 1.2377834115800373e-07,
   "existing_actions": 34,
   "new_bones": 0,
   "original_and_new_hair_controls": true,
