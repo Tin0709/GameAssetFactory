@@ -5,7 +5,7 @@ import json,math
 D=Path(__file__).resolve().parent
 atlas=Image.new('RGBA',(512,512),(55,30,21,0));cards=[]
 HAIR=[(56,30,21),(63,34,24),(69,38,26),(49,27,20),(75,41,28)]
-CLOTH=[(113,47,38),(125,53,42),(101,40,33),(133,58,46)]
+CLOTH=[(155,40,34),(171,46,37),(134,32,29),(184,52,41)]
 def card(name,verts,w,h,polygon=None,kind='hair',seed=0):
  i=len(cards);x=4+(i%7)*72;y=4+(i//7)*72
  assert y+h+4<512
