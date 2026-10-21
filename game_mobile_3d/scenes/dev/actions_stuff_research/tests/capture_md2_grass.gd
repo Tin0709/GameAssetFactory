@@ -18,6 +18,7 @@ func run():
 	# Offscreen native GPU target keeps capture independent of which editor window
 	# the user is operating; it still instantiates the exact existing lab scene.
 	viewport=SubViewport.new();viewport.size=Vector2i(1280,720);viewport.own_world_3d=true
+	if args.has("large"):viewport.size=Vector2i(3004,1805)
 	viewport.render_target_update_mode=SubViewport.UPDATE_ALWAYS;root.add_child(viewport)
 	level=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();viewport.add_child(level);current_scene=viewport
 	level.player.scripted_input=true
@@ -57,7 +58,7 @@ func run():
 	var report:={"fps_target":fps,"frames":duration*fps,"capture_readback_each_frame":capture,"median_frame_ms":times[times.size()/2],"p95_frame_ms":times[int(times.size()*.95)],
 		"field_update_median_usec":field_times[field_times.size()/2],"field_update_p95_usec":field_times[int(field_times.size()*.95)],"peak_active_cells":active_max,
 		"clumps":level.grass_field.instance_count,"batches":level.grass_field.batch_count,"walk_speed":level.player.walk_speed,"run_speed":level.player.run_speed,
-		"shots":level.rifle_fire.shots_fired,"pool_misses":level.rifle_fire.pool_misses,"renderer":RenderingServer.get_current_rendering_method(),"simulated_seconds":level.grass_field.clock-first_clock}
+		"shots":level.rifle_fire.shots_fired,"pool_misses":level.rifle_fire.pool_misses,"renderer":RenderingServer.get_current_rendering_method(),"simulated_seconds":level.grass_field.clock-first_clock,"viewport":str(viewport.size),"hud_scale":str(level.hud.get_parent().scale)}
 	# Freeze actor/camera/wind time. Only the requested shader contribution changes.
 	paused=true
 	for material in level.grass_field.materials:material.set_shader_parameter("interaction_strength",0.)

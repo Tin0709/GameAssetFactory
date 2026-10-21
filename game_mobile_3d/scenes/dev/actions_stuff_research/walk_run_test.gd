@@ -65,7 +65,7 @@ func _ready() -> void:
 		else:player.visual.activate_rifle_ready()
 	camera=Camera3D.new();camera.name="GameplayCamera";camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=camera_size;camera.far=150.;add_child(camera);camera.make_current()
 	var layer:=CanvasLayer.new();add_child(layer)
-	var panel:=PanelContainer.new();panel.position=Vector2(20,20);layer.add_child(panel)
+	var panel:=PanelContainer.new();panel.position=Vector2(20,20);panel.scale=Vector2(.25,.25);layer.add_child(panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.055,.88);style.content_margin_left=16;style.content_margin_right=16;style.content_margin_top=12;style.content_margin_bottom=12;style.set_corner_radius_all(6)
 	panel.add_theme_stylebox_override("panel",style)
 	hud=Label.new();hud.add_theme_font_size_override("font_size",18);panel.add_child(hud)
