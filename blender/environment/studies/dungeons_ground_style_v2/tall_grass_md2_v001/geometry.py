@@ -27,6 +27,7 @@ def check_short_height_and_preservation(scene,baseline,short_before,compare,mesh
  """
  saved={};max_error=0.
  for name,old in short_before.items():
+  old=json.loads(json.dumps(old))
   o=bpy.data.objects[name];m=o.data;now=json.loads(json.dumps(mesh_content(m)));saved[name]=[list(v.co) for v in m.vertices]
   assert {k:v for k,v in now.items() if k!='vertices'}=={k:v for k,v in old.items() if k!='vertices'},name
   assert len(now['vertices'])==len(old['vertices'])
