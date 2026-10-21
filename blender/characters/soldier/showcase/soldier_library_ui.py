@@ -101,7 +101,7 @@ class SOLDIER_PT_library(bpy.types.Panel):
 
 def focus_sidebar():
     global _sidebar_attempts
-    _sidebar_attempts+=1;ready=False
+    _sidebar_attempts+=1;ready=False;active=False
     for window in bpy.context.window_manager.windows:
         if not any(review_scene(e)==window.scene.name for e in registry().get('entries',[])):continue
         for area in window.screen.areas:
@@ -109,12 +109,15 @@ def focus_sidebar():
             area.spaces.active.show_region_ui=True;area.tag_redraw()
             for region in area.regions:
                 if region.type=='UI':
+                    ready=True
                     try:
-                        region.active_panel_category=CATEGORY
-                        ready=True
-                    except (TypeError,RuntimeError):pass  # Wait for the first panel draw.
+                        with bpy.context.temp_override(window=window,area=area,region=region):
+                            region.active_panel_category=CATEGORY
+                    except (AttributeError,TypeError,RuntimeError):
+                        pass  # Some native contexts expose this getter as read-only; the tab stays available.
+                    active=active or region.active_panel_category==CATEGORY
     if not ready and _sidebar_attempts<12:return .25
-    print('SOLDIER_LIBRARY_UI_READY',json.dumps({'assets':len(registry().get('entries',[])),'sidebar_active':ready,'scene':bpy.context.scene.name}),flush=True)
+    print('SOLDIER_LIBRARY_UI_READY',json.dumps({'assets':len(registry().get('entries',[])),'sidebar_available':ready,'sidebar_active':active,'scene':bpy.context.scene.name}),flush=True)
 
 @persistent
 def loaded(_):
