@@ -3,7 +3,7 @@ import bpy,sys,json,math,random,hashlib,uuid
 from pathlib import Path
 from mathutils import Vector,Matrix
 D=Path(__file__).resolve().parent;STUDY=D.parent;R=D.parents[4];E=R/'.validation/tall_grass_md2_v001';LIB=STUDY/'dungeons_ground_style_v2.blend'
-sys.path[:0]=[str(STUDY),str(D)];from flower_preservation import snapshot,compare,mesh_content;from geometry import visible_bounds,asset_record
+sys.path[:0]=[str(STUDY),str(D)];from flower_preservation import snapshot,compare,mesh_content;from geometry import visible_bounds,asset_record,check_short_height_and_preservation
 assert hashlib.sha256(LIB.read_bytes()).hexdigest()==(E/'before.sha256').read_text(),'Source changed since baseline; do not overwrite concurrent work'
 bpy.ops.wm.open_mainfile(filepath=str(LIB));scene=bpy.context.scene
 assert not bpy.data.collections.get('MD2_Tall_Grass_v001_PENDING'),'Never rebuild over completed candidates'
@@ -127,7 +127,7 @@ manifest={'status':'Pending','central_library':str(LIB),'layer':layer.name,'sour
 # Normalize old evaluated caches and check every old datum except authorized short Z.
 for name in ['Short Grass MD2','ViewLayer']:
  bpy.context.window.view_layer=scene.view_layers[name];bpy.context.view_layer.update()
-allowed_mesh={o.data.name for o in short_objects};errors=[p for p in compare(baseline) if not(p[0]=='meshes' and p[1] in allowed_mesh)];assert not errors,errors
+check_short_height_and_preservation(scene,baseline,short_before,compare,mesh_content,bpy)
 bpy.context.window.view_layer=layer
 for screen in bpy.data.screens:
  for area in screen.areas:

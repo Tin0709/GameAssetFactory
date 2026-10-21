@@ -10,7 +10,7 @@ class CurrentAssetViewer(unittest.TestCase):
   self.assertTrue(any('MD2_SHORT_GRASS_V001' in arg for arg in command))
  def test_legacy_open_asset_window_is_preserved_but_not_reused(self):
   source=dev.ROOT/dev.VIEWERS['asset-style-v2']
-  listing=f'101 /bin/blender --factory-startup --disable-autoexec {source}\n202 /bin/blender --factory-startup --disable-autoexec {source} --python {dev.ROOT}/scripts/load_showcase_ui.py --python-expr print(\"MD2_SHORT_GRASS_V001\")\n'
+  listing=f'101 /bin/blender --factory-startup --disable-autoexec {source}\n202 /bin/blender --factory-startup --disable-autoexec {source} --python {dev.ROOT}/scripts/load_showcase_ui.py --python-expr print(\"MD2_SHORT_GRASS_V001 MD2_TALL_GRASS_V001\")\n'
   with patch.object(dev.subprocess,'check_output',return_value=listing):
    self.assertEqual(dev.existing_viewer_pid('/bin/blender',source,require_ui=True),202)
 if __name__=='__main__':unittest.main()
