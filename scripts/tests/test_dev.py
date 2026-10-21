@@ -64,7 +64,7 @@ class PortableLauncherTests(unittest.TestCase):
                 self.assertEqual(source.name, filename)
                 self.assertIn(str(source), cmd)
                 self.assertNotIn(str(dev.ROOT / 'scripts/start_blender_mcp.py'), cmd)
-                self.assertEqual('--python' in cmd, viewer not in {'asset-style-v2', 'soldier'})
+                self.assertEqual('--python' in cmd, viewer != 'asset-style-v2')
 
     def test_blender_launch_detaches_without_waiting(self):
         command = dev.blender_command(Path('/bin/blender'), 'weapon')
@@ -130,6 +130,16 @@ class PortableLauncherTests(unittest.TestCase):
     def test_unknown_viewer_is_rejected(self):
         with self.assertRaises(ValueError):
             dev.blender_command(Path('/bin/blender'), 'unknown')
+
+    def test_soldier_reuses_only_a_window_with_the_library_ui_bootstrap(self):
+        import inspect
+        self.assertIn('require_ui',inspect.signature(dev.existing_viewer_pid).parameters)
+        tool='/Applications/Blender.app/Contents/MacOS/Blender'
+        source=dev.ROOT/dev.VIEWERS['soldier']
+        loader=dev.ROOT/'scripts/load_showcase_ui.py'
+        listing=f'  31 {tool} --factory-startup {source}\n  32 {tool} --factory-startup {source} --python {loader}\n'
+        with patch.object(dev.subprocess,'check_output',return_value=listing):
+            self.assertEqual(dev.existing_viewer_pid(tool,source,require_ui=True),32)
 
     def test_scene_path_rejects_external_or_traversal_paths(self):
         for scene in ['C:/outside/scene.tscn', '../scene.tscn', 'res://../scene.tscn']:
