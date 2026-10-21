@@ -1,0 +1,35 @@
+{
+  "candidate": "Survivor_Reference_v001.blend",
+  "status": "Pending",
+  "vertices": 1866,
+  "triangles": 3668,
+  "materials": 1,
+  "bones": 10,
+  "actions": 0,
+  "unweighted_or_nonrigid_vertices": 0,
+  "bounds_min": [
+    -0.43128830194473267,
+    -0.24500000476837158,
+    0.0
+  ],
+  "bounds_max": [
+    0.43128830194473267,
+    0.24500000476837158,
+    1.8900001049041748
+  ],
+  "height_m": 1.8900001049041748,
+  "packed_images": [
+    "PRIMARY \u2014 user character reference",
+    "Survivor \u2014 Original Pixel Atlas 512"
+  ],
+  "cameras": [
+    "Front",
+    "Front_3Q",
+    "Left_Side",
+    "Back",
+    "Right_Side",
+    "Back_3Q"
+  ],
+  "source_reference_sha256": "9bfe4bdd3f65bf80a456746e6c76d0c60bed29b9552a82ce00340963627ec0f6",
+  "gameplay_integrated": false
+}
