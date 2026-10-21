@@ -89,7 +89,7 @@ def blender_command(tool: Path, showcase: str) -> list[str]:
         if stream.read(80).startswith(b'version https://git-lfs.github.com/spec/'):
             raise ValueError(f'Not a restored Blender file: {source}. Run git lfs pull first.')
     command = [str(tool), '--factory-startup', '--disable-autoexec', str(source)]
-    if showcase in {'player-library', 'animation', 'weapon', 'mobs'}:
+    if showcase in {'player-library', 'animation', 'weapon', 'mobs', 'soldier'}:
         command += ['--python', str(ROOT / 'scripts/load_showcase_ui.py')]
     return command
 
@@ -100,7 +100,7 @@ def viewer_cache() -> Path:
     return base / 'GameAssetFactory/viewers' / hashlib.sha256(str(ROOT).encode()).hexdigest()[:12]
 
 
-def existing_viewer_pid(tool: str, source: Path) -> int | None:
+def existing_viewer_pid(tool: str, source: Path, *, require_ui: bool = False) -> int | None:
     """Recognize exact viewer paths, including sessions from the earlier launcher."""
     if os.name == 'nt':
         return None
@@ -110,6 +110,8 @@ def existing_viewer_pid(tool: str, source: Path) -> int | None:
         if len(fields) != 2 or not fields[1].startswith(tool + ' '):
             continue
         command = fields[1]
+        if require_ui and str(ROOT / 'scripts/load_showcase_ui.py') not in command:
+            continue  # Do not reuse a legacy Soldier window with no library panel.
         prefix, found, suffix = command.partition(str(source))
         if found and prefix.endswith(' ') and (not suffix or suffix.startswith(' --')):
             return int(fields[0])
@@ -151,7 +153,7 @@ def launch_blender(command: list[str], viewer: str, *, bridge: bool) -> int:
         if os.name != 'nt':
             import fcntl
             fcntl.flock(lock, fcntl.LOCK_EX)
-        pid = existing_viewer_pid(command[0], ROOT / VIEWERS[viewer])
+        pid = existing_viewer_pid(command[0], ROOT / VIEWERS[viewer], require_ui=viewer=='soldier')
         if bridge:
             check_mcp_port()
             addon = Path(os.environ.get('BLENDER_MCP_ADDON', str(Path.home() /

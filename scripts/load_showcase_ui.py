@@ -10,6 +10,7 @@ SHOWCASES = {
     'Animation_Showcase.blend': ('blender/animation/showcase', 'gaf_animation_library', 'GAF_PT_animation_library'),
     'Weapon_Showcase.blend': ('blender/weapons/showcase', 'gaf_weapon_library', 'GAF_PT_weapon_library'),
     'Mobs_Animation_Library.blend': ('blender/animation/showcase/mobs_library', 'gaf_mobs_animation_library', 'MOBS_PT_library'),
+    'SOLDIER_Asset_Library.blend': ('blender/characters/soldier/showcase', 'soldier_library_ui', 'SOLDIER_PT_library'),
 }
 
 
