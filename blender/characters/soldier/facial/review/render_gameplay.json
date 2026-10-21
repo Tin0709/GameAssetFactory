@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "actual_blender_render": true,
+  "view": "gameplay",
+  "fps": 30,
+  "frames": 864,
+  "duration_s": 28.8,
+  "original_speed": true,
+  "seconds_to_render": 199.6891348361969
+}
