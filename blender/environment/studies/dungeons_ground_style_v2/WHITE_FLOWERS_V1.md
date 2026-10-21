@@ -1,5 +1,9 @@
 # Blender plant studies V1
 
+## Short Grass MD2 v001 — 2026-10-21, PENDING REVIEW
+
+[Short grass MD2](short_grass_md2_v001/README.md) adds four low layered candidates and a dense cluster to this same library. Latest user requirement is at least1×1block in BOTH horizontal axes, including visible cutout support; heights stay16–27cm. Actual Dungeons II Style0.7JE sprite-derived atlas, one material,28–36triangles per bush. Grass MD2 sidebar offers individual/grouped/gameplay/current-grass comparisons and the original environment view. Native routes and original-data/file preservation checked. Blender review only; Godot and previous grass/flower/ground assets preserved.
+
 ## ShortGrass_Fluffy_v1 — 2026-10-14, PENDING REVIEW
 
 The existing `dungeons_ground_style_v2.blend` is now the explicitly requested central review location for future vegetation. [ShortGrass_Fluffy_v1](short_grass_fluffy_v1/README.md) adds four original pixel-art grass colors and a32-tuft demonstration patch in `Vegetation_Grass_Pending`, preserving all existing environment data. Six cards /24triangles per tuft, one shared original atlas/material, green anchored roots and pastel tips. The viewport matches Mobs Material Preview (`forest.exr`, intensity1); actual scene lighting/cameras remain unchanged. Native appendable library, fourGLBs, Godot material wrappers, low/elevated/opposing previews and validation reports are in that package. No main-map integration or prior grass replacement; stop for visual review.
