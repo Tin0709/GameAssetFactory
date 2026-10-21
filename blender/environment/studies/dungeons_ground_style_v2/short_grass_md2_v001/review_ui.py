@@ -32,7 +32,7 @@ class MD2_PT_short_grass(bpy.types.Panel):
    op=row.operator('md2_grass.view',text=key);op.key=key
   op=layout.operator('md2_grass.view',text='Existing environment studies',icon='BACK');op.key='Original'
   layout.label(text='A–D: 28–36 triangles each')
-  layout.label(text='Each bush: at least1x1block')
+  layout.label(text='Each bush: at least 1 x 1 block')
   layout.label(text='16–27 cm · one shared material')
   layout.label(text='Pending · no Godot integration',icon='INFO')
 def focus_sidebar():

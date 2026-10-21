@@ -22,8 +22,8 @@ nt=mat.node_tree;p=nt.nodes.get('Principled BSDF');p.inputs['Roughness'].default
 tex=nt.nodes.new('ShaderNodeTexImage');tex.image=image;tex.interpolation='Closest';tex.extension='EXTEND';uvnode=nt.nodes.new('ShaderNodeUVMap');uvnode.uv_map='UV_Atlas';nt.links.new(uvnode.outputs['UV'],tex.inputs['Vector'])
 clip=nt.nodes.new('ShaderNodeMath');clip.operation='GREATER_THAN';clip.inputs[1].default_value=.5;nt.links.new(tex.outputs['Color'],p.inputs['Base Color']);nt.links.new(tex.outputs['Alpha'],clip.inputs[0]);nt.links.new(clip.outputs[0],p.inputs['Alpha'])
 # Terrain-aligned soft leaf normals retain a modest side response, no emission.
-g=nt.nodes.new('ShaderNodeNewGeometry');f=nt.nodes.new('ShaderNodeMath');f.operation='MULTIPLY_ADD';f.inputs[1].default_value=-2.;f.inputs[2].default_value=1.;nt.links.new(g.outputs['Backfacing'],f.inputs[0])
-n=nt.nodes.new('ShaderNodeCombineXYZ');n.inputs['Z'].default_value=.86;mult=nt.nodes.new('ShaderNodeVectorMath');mult.operation='SCALE';mult.inputs[3].default_value=.14;nt.links.new(g.outputs['Normal'],mult.inputs[0]);add=nt.nodes.new('ShaderNodeVectorMath');add.operation='ADD';nt.links.new(n.outputs[0],add.inputs[0]);nt.links.new(mult.outputs[0],add.inputs[1]);flip=nt.nodes.new('ShaderNodeVectorMath');flip.operation='SCALE';nt.links.new(add.outputs[0],flip.inputs[0]);nt.links.new(f.outputs[0],flip.inputs[3]);nt.links.new(add.outputs[0],p.inputs['Normal'])
+g=nt.nodes.new('ShaderNodeNewGeometry')
+n=nt.nodes.new('ShaderNodeCombineXYZ');n.inputs['Z'].default_value=.86;mult=nt.nodes.new('ShaderNodeVectorMath');mult.operation='SCALE';mult.inputs[3].default_value=.14;nt.links.new(g.outputs['Normal'],mult.inputs[0]);add=nt.nodes.new('ShaderNodeVectorMath');add.operation='ADD';nt.links.new(n.outputs[0],add.inputs[0]);nt.links.new(mult.outputs[0],add.inputs[1]);nt.links.new(add.outputs[0],p.inputs['Normal'])
 # Reuse the current Fluffy study's proven thin-foliage transmission. Both
 # lobes are clipped, so reverse-light cards stay readable without emission.
 trans=nt.nodes.new('ShaderNodeBsdfTranslucent');trans.name='MD2_ThinLeaf_Transmission';nt.links.new(tex.outputs['Color'],trans.inputs['Color']);nt.links.new(add.outputs[0],trans.inputs['Normal'])
@@ -72,20 +72,28 @@ mesh=bpy.data.meshes.new('MD2_Cluster_Editable');mesh.from_pydata(verts,[],faces
 for poly,co in zip(mesh.polygons,coords):
  for li,p in zip(poly.loop_indices,co):u.data[li].uv=p
 cluster=bpy.data.objects.new('Short_Grass_MD2_Cluster_v001',mesh);masters.objects.link(cluster);cluster.location=(5.6,0,1);cluster.visible_shadow=False;cluster['review_status']='Pending';cluster['cards']=sum(objects[k%4]['cards'] for k in range(5));cluster.asset_mark();cluster.asset_data.description='Pending / five offset short tufts in one editable mesh, one shared material.';objects.append(cluster)
+# Latest user requirement: every individual bush spans at least one block in
+# both horizontal axes. Bake the wider footprint; retain authored short heights.
+for obj,(width,length) in zip(objects,[(1.03,1.01),(1.15,1.02),(1.10,1.12),(1.02,1.04),(1.35,1.30)]):
+ bounds=[max(v.co[i] for v in obj.data.vertices)-min(v.co[i] for v in obj.data.vertices) for i in [0,1]]
+ for v in obj.data.vertices:v.co.x*=width/bounds[0];v.co.y*=length/bounds[1]
+ obj.data.update();obj['minimum_footprint_m']='1 x 1';obj['width_m']=width;obj['length_m']=length
+ obj.asset_data.description+=' / at least 1 x 1 block footprint'
 # Linked existing ground/grass comparisons. Never edit their shared mesh/materials.
 base=bpy.data.objects['ENV_GrassBlock_DI_V3']
 def linked(src,name,loc,collection):
  obj=bpy.data.objects.new(name,src.data);collection.objects.link(obj);obj.location=loc;return obj
-for obj in objects:linked(base,'MD2_Platform_'+obj.name,(obj.location.x,0,0),review)
+for obj in objects[:4]:linked(base,'MD2_Platform_'+obj.name,(obj.location.x,0,0),review)
+for x in [-.5,.5]:
+ for y in [-.5,.5]:linked(base,'MD2_Cluster_Base_'+str(x)+'_'+str(y),(5.6+x,y,0),review)
 for x,name in [(7.1,'ENV_Grass_DI_V3'),(8.45,'ShortGrass_Fluffy_v1_SageGreen')]:
  linked(base,'MD2_Existing_Platform_'+str(x),(x,0,0),review);source=bpy.data.objects[name];copy=linked(source,'MD2_Comparison_'+name,(x,0,1),review);copy.visible_shadow=False
 # A3x2m mixed patch seen at gameplay distance and from the opposite light side.
 for x in range(3):
  for y in range(2):linked(base,'MD2_Field_Ground_%d_%d'%(x,y),(1.0+x,2.65+y,0),patch)
-rng=random.Random(2007);families=['A','C','B','A','C','A','D','C']
-for x in range(8):
- for y in range(8):
-  source=objects[['A','B','C','D'].index(families[(x*3+y)%8])];o=bpy.data.objects.new('MD2_Field_Tuft_%02d'%(x*8+y),source.data);patch.objects.link(o);o.location=(.72+x*.365+rng.uniform(-.045,.045),2.40+y*.222+rng.uniform(-.025,.025),1);o.rotation_euler.z=rng.uniform(0,math.tau);s=rng.uniform(.84,1.08);o.scale=(s,s,s);o.visible_shadow=False
+for x in range(3):
+ for y in range(2):
+  source=objects[(x+y*2)%4];o=bpy.data.objects.new('MD2_Field_Tuft_%02d'%(x*2+y),source.data);patch.objects.link(o);o.location=(1+x,2.65+y,1);o.rotation_euler.z=math.radians([0,11,-9,5,-12,8][x*2+y]);o.visible_shadow=False
   # Every geometric root is physically over the actual block footprint.
   bpy.context.view_layer.update();roots=[o.matrix_world@v.co for v in o.data.vertices if v.co.z<0.]
   bounds=[(min(p[i] for p in roots),max(p[i] for p in roots)) for i in [0,1]]
@@ -97,9 +105,9 @@ for x in range(8):
 labelmat=bpy.data.materials.new('MD2_Review_Type');labelmat.diffuse_color=(.68,.76,.64,1.)
 def label(body,loc,size=.14):
  d=bpy.data.curves.new('MD2_Label','FONT');d.body=body;d.size=size;d.align_x='CENTER';obj=bpy.data.objects.new('MD2_Label_'+body,d);studio.objects.link(obj);obj.location=loc;d.materials.append(labelmat)
-for obj in objects:label(obj.name.replace('Short_Grass_MD2_v001_','').replace('Short_Grass_MD2_Cluster_v001','CLUSTER'),(obj.location.x,-.70,.012),.15)
+for obj in objects:label(obj.name.replace('Short_Grass_MD2_v001_','').replace('Short_Grass_MD2_Cluster_v001','CLUSTER'),(obj.location.x,-1.18 if obj==cluster else -.70,.012),.15)
 for x,title in [(7.1,'CURRENT V3'),(8.45,'CURRENT FLUFFY')]:label(title,(x,-.70,.012),.11)
-label('SHORT GRASS MD2  /  PENDING',(4.1,-1.25,.012),.21)
+label('SHORT GRASS MD2  /  PENDING',(4.1,-1.80,.012),.21)
 label('MIXED GROUND COVER  /  3 x 2 m',(2.,4.45,.012),.17)
 # A new floor uses the unchanged studio material without altering the old floor.
 floor_mat=bpy.data.materials.get('REVIEW_Studio_Charcoal_Soft_V2') or bpy.data.materials.get('Studio_Charcoal')
@@ -150,9 +158,9 @@ text=cat.read_text() if cat.exists() else '# This is an Asset Catalog Definition
 line=catalog+':Environment/Short Grass MD2 Pending:Short Grass MD2 Pending\n'
 if line not in text:cat.write_text(text.rstrip()+'\n'+line)
 for obj in objects:obj.asset_data.catalog_id=catalog
-manifest={'status':'Pending','source_reference':texinfo,'central_library':str(LIB),'new_scene_count':0,'no_godot_integration':True,'layer':layer.name,'cameras':{k:o.name for k,o in cams.items()},'original_layer':original_layer.name,'original_camera':original_camera.name if original_camera else '', 'assets':[],'mixed_patch_tufts':64,'material':mat.name,'new_materials_for_assets':1,'atlas_size':[128,64],'root_gap_m':0,'cards':card_specs}
+manifest={'status':'Pending','source_reference':texinfo,'central_library':str(LIB),'new_scene_count':0,'no_godot_integration':True,'layer':layer.name,'cameras':{k:o.name for k,o in cams.items()},'original_layer':original_layer.name,'original_camera':original_camera.name if original_camera else '', 'assets':[],'mixed_patch_tufts':6,'material':mat.name,'new_materials_for_assets':1,'atlas_size':[128,64],'root_gap_m':0,'cards':card_specs,'user_footprint_requirement':'Every bush is at least 1 block wide AND 1 block long; 1 block = 1 m. Height remains short.'}
 for obj in objects:
- mesh=obj.data;manifest['assets'].append({'name':obj.name,'triangles':sum(len(p.vertices)-2 for p in mesh.polygons),'vertices':len(mesh.vertices),'cards':int(obj['cards']),'z_min':min(v.co.z for v in mesh.vertices),'height_above_surface':max(v.co.z for v in mesh.vertices),'xy_size':[max(v.co[i] for v in mesh.vertices)-min(v.co[i] for v in mesh.vertices) for i in [0,1]],'materials':len(mesh.materials)})
+ mesh=obj.data;manifest['assets'].append({'name':obj.name,'triangles':sum(len(p.vertices)-2 for p in mesh.polygons),'vertices':len(mesh.vertices),'cards':int(obj['cards']),'z_min':min(v.co.z for v in mesh.vertices),'height_above_surface':max(v.co.z for v in mesh.vertices),'xy_size':[max(v.co[i] for v in mesh.vertices)-min(v.co[i] for v in mesh.vertices) for i in [0,1]],'materials':len(mesh.materials),'minimum_one_block_footprint':True})
 (D/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 (EV/'after_fingerprints.json').write_text(json.dumps(snapshot()))
 bpy.ops.wm.save_as_mainfile(filepath=str(LIB),compress=True)
