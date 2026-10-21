@@ -10,7 +10,7 @@ func run():
  if appearance==null:scene.free();quit(1);return
  var fps:=60 if OS.get_cmdline_user_args().has("60") else 30
  scene.set_process(false);scene.player.set_physics_process(false);scene.player.visual.set_process(false)
- scene.rifle_fire.set_physics_process(false);scene.rifle_auto_aim.set_physics_process(false);appearance.set_process(false)
+ scene.rifle_fire.set_physics_process(false);scene.rifle_auto_aim.set_physics_process(false);appearance.set_process(false);appearance.set_physics_process(false)
  check(appearance.hair.mesh.get_surface_count()==1 and appearance.band.mesh.get_surface_count()==1,"One cutout surface each for hair and bandana")
  check(appearance.face.get_blend_shape_count()==16,"Existing authored16facial shape keys exported")
  var old_scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();old_scene.soldier_loadout=false;root.add_child(old_scene)
@@ -37,6 +37,9 @@ func run():
  appearance.request_expression("Hurt_Heavy");appearance.request_expression("Fire_Recoil_Face")
  for i in maxi(1,roundi(.1*fps)):appearance.advance_face(1./fps,"Aim",0.,false)
  check(absf(appearance.channels.open_l-.12)<.01,"Higher priority authored Hurt owns face above Fire")
+ appearance.request_expression("Blink_Soft")
+ for i in roundi(.6*fps):appearance.advance_face(1./fps,"Rifle Ready Idle",0.,false)
+ check(appearance.channels.blink>.99,"Authored manual Blink_Soft remains callable")
  scene.reset_player()
  check(appearance.tail_spring.value.length()==0. and appearance.hair_spring.value.length()==0.,"Reset clears physics history")
  print("SOLDIER_SECONDARY ",JSON.stringify({"fps":fps,"passed":failures.is_empty(),"failures":failures,"max_hair_rad":max_hair,"max_tail_rad":max_tail,"blinks":blink_count}))

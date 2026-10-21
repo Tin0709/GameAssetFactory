@@ -10,7 +10,6 @@ var time:=0.
 var blink_age:=1.
 var next_blink:=3.1
 var rng:=RandomNumberGenerator.new()
-var celebration_age:=10.
 var context_name:=""
 var context_age:=100.
 func _init(model:Dictionary):
@@ -20,7 +19,7 @@ func _init(model:Dictionary):
  ages.resize(event_names.size()*4);ages.fill(100.)
  rng.seed=1701
 func reset():
- time=0.;blink_age=1.;next_blink=3.1;ages.fill(100.);celebration_age=10.
+ time=0.;blink_age=1.;next_blink=3.1;ages.fill(100.)
  rng.seed=1701;base=data.neutral.duplicate();channels=base.duplicate();context_name="";context_age=100.
 func request(key:String):
  var index:=event_names.find(key)
@@ -46,7 +45,7 @@ static func pulse(t:float,duration:float,attack:float,hold:float)->float:
 func blend(a:Dictionary,b:Dictionary,w:float):
  for key in a:a[key]=lerpf(a[key],b[key],w)
 func advance(delta:float,state:String,low_hp:float,dead:bool)->Dictionary:
- time+=delta;celebration_age+=delta;context_age+=delta
+ time+=delta;context_age+=delta
  var name:String={"Idle":"Neutral_Idle","Walk":"Move_Effort_Light","Run":"Run_Effort","Rifle Ready Idle":"Enemy_Nearby","Aim":"Focused_Aim"}.get(state,"Neutral_Idle")
  var desired:=target(name)
  if state=="Rifle Ready Idle":
@@ -64,7 +63,8 @@ func advance(delta:float,state:String,low_hp:float,dead:bool)->Dictionary:
  if next_blink<=0.:
   blink_age=0.;next_blink=rng.randf_range(5.6,8.2) if state=="Aim" else rng.randf_range(2.65,4.8)
  channels.blink_auto=pulse(blink_age,.18,.075,.02)
- if context_name!="" and state!="Aim":
+ if context_name=="Blink_Soft":channels.blink=pulse(context_age-.5,.18,.075,.02)
+ elif context_name!="" and state!="Aim":
   var duration:float=data.presets[context_name].duration
   blend(channels,target(context_name),pulse(context_age-.12,maxf(.1,duration-.24),.16,maxf(.1,duration-.9)))
  # Sorted ascending priorities, max envelope per event, no additive stacking.
