@@ -10,12 +10,21 @@ from mathutils import Vector
 D = Path(__file__).resolve().parent; P = D.parent; R = D.parents[4]
 E = R / '.validation/md2_grass_wind_v001'
 sys.path[:0] = [str(D), str(P), str(P / 'tall_grass_md2_v001')]
-from flower_preservation import compare, mesh_content
+from flower_preservation import compare, mesh_content, snapshot
 from wind_nodes import CONTROLS
 import grass_library_ui as static_ui
 import wind_review_ui as ui
 
 target = Path(sys.argv[sys.argv.index('--') + 1]) if '--' in sys.argv else E / 'dungeons_ground_style_v2.blend'
+# Compare fresh native reads at identical time/dependency-graph state. The build
+# snapshot also proves immediate preservation, but its cached transforms can
+# differ from a frame_set/reopen even on the untouched BEFORE library itself.
+bpy.ops.wm.open_mainfile(filepath=str(E / 'before.blend'))
+bpy.context.scene.frame_set(78)
+for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
+    bpy.context.window.view_layer = bpy.context.scene.view_layers[name]; bpy.context.view_layer.update()
+baseline = snapshot()
+(E / 'before_reopened_native.json').write_text(json.dumps(baseline,indent=2)+'\n')
 bpy.ops.wm.open_mainfile(filepath=str(target)); scene = bpy.context.scene
 static_ui.register(); info = ui.record(); controller = bpy.data.objects[info['controller']]
 original_meshes = json.loads((E / 'source_grass_meshes.json').read_text())
@@ -24,7 +33,7 @@ for name, expected in original_meshes.items():
 scene.frame_set(info['original_timeline']['frame_current'])
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
     bpy.context.window.view_layer = scene.view_layers[name]; bpy.context.view_layer.update()
-errors = compare(json.loads((E / 'before_native.json').read_text()))
+errors = compare(baseline)
 assert not errors, errors
 
 def reset():
@@ -120,7 +129,7 @@ static_ui.select(bpy.context, 'All')
 for key, expected in info['original_timeline'].items(): assert getattr(scene, key) == expected, (key, getattr(scene,key), expected)
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
     bpy.context.window.view_layer = scene.view_layers[name]; bpy.context.view_layer.update()
-errors = compare(json.loads((E / 'before_native.json').read_text()))
+errors = compare(baseline)
 assert not errors, errors
 report = {'passed': True, 'original_assets_exact': True, 'native_preservation_errors': errors,
           'root_error_m':root_error,'ring_width_error_m':width_error,'max_default_displacement_sampled_m':largest,
