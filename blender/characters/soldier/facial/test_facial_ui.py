@@ -5,6 +5,17 @@ D=Path(__file__).resolve().parent;sys.path.insert(0,str(D));sys.path.insert(0,st
 bpy.ops.wm.open_mainfile(filepath=str(D.parent/'showcase/SOLDIER_Asset_Library.blend'),load_ui=True)
 import soldier_library_ui;soldier_library_ui.register();import facial_ui as ui;import expression_model as model
 scene=bpy.data.scenes['SOLDIER_ASSET_LIBRARY'];ctrl=bpy.data.objects['SF_Face_Control'];face=bpy.data.objects['SF_Face_Mesh'];rig=bpy.data.objects['SF_Soldier_Rig']
+ui.select(bpy.context,'preset','Hurt_Heavy');scene.frame_set(13)
+captured=float(ctrl['open_l']);assert captured<.2
+ui.select(bpy.context,'preset','Neutral_Idle')
+assert scene.frame_start<1 and scene.frame_current==scene.frame_start,'Entry must be outside repeating frames'
+assert abs(ctrl['open_l']-captured)<1e-5,'Selection must start from current face'
+scene.frame_set(1);assert scene.frame_start==1,'Entry is consumed once'
+neutral_start=float(ctrl['open_l']);scene.frame_set(scene.frame_end+1);neutral_end=float(ctrl['open_l'])
+scene.frame_set(1)
+assert abs(ctrl['open_l']-neutral_start)<1e-5 and abs(neutral_end-neutral_start)<1e-5,'Loop must not replay Hurt'
+ui.select(bpy.context,'situation','Aim');scene.frame_set(1);a=float(ctrl['open_l']);scene.frame_set(scene.frame_end+1);b=float(ctrl['open_l'])
+assert abs(a-.73)<1e-5 and abs(a-b)<1e-5,'Aim must not reopen eyes on each loop'
 assert len(scene.soldier_facial.presets)==18
 assert all(n in bpy.data.objects for n in ['SF_Soldier_Body','SF_Soldier_Hair','SF_Soldier_Clothing'])
 parts=json.loads(face['parts_json']);samples=0;max_width=0.;max_pupil_escape=0.
@@ -42,5 +53,5 @@ for asset in ['SOLDIER_Backpack_v001','SOLDIER_Skin_v001']:
 assert bpy.ops.soldier_face.open()=={'FINISHED'}
 ui.register();assert bpy.app.handlers.frame_change_post.count(ui.frame_changed)==1
 assert all(d.driver.is_valid and d.driver.is_simple_expression for d in face.data.shape_keys.animation_data.drivers)
-report={'passed':True,'presets':18,'situations':len(model.SITUATIONS),'geometry_samples':samples,'maximum_face_width_m':max_width,'maximum_pupil_escape_m':max_pupil_escape,'no_action_accumulation':True,'same_library_scene':True,'native_simple_drivers':True}
+report={'passed':True,'presets':18,'situations':len(model.SITUATIONS),'geometry_samples':samples,'maximum_face_width_m':max_width,'maximum_pupil_escape_m':max_pupil_escape,'no_action_accumulation':True,'same_library_scene':True,'native_simple_drivers':True,'one_time_entry_then_clean_loop':True}
 (D/'ui_validation.json').write_text(json.dumps(report,indent=2)+'\n');print('SOLDIER_FACE_UI_PASS',json.dumps(report),flush=True)
