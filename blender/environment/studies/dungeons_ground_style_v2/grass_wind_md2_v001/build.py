@@ -173,6 +173,8 @@ for screen in bpy.data.screens:
         if area.type == 'VIEW_3D':
             v = area.spaces.active; v.use_local_camera = True; v.camera = bpy.data.objects[cameras['Field']]
             v.region_3d.view_perspective = 'CAMERA'; v.region_3d.view_camera_zoom = 0; v.show_region_ui = True; v.overlay.show_overlays = False
+import wind_review_ui
+wind_review_ui.select(bpy.context, 'Field')
 report = {'status': 'Pending', 'native_preservation_errors': [], 'sources': [o.name for o in sources],
           'wind_objects': len(wind_objects), 'field_clumps': len([o for o in field.objects if o.get('wind_source')]),
           'field_triangles': sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in field.objects if o.get('wind_source')),

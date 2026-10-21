@@ -2,6 +2,7 @@
 import json
 import bpy
 from pathlib import Path
+from mathutils import Vector
 
 LIB = 'dungeons_ground_style_v2.blend'
 
@@ -36,6 +37,13 @@ def select(context, key):
     for obj in bpy.data.collections[info['root']].all_objects:
         obj.hide_set(obj.name not in visible, view_layer=layer)
         obj.hide_render = obj.name not in visible
+    # Keep the same review illumination on the distant individual/compare rows.
+    target = Vector((13.,4.8,1.)) if key == 'Compare' else Vector((0.,0.,1.))
+    if key in info['individual_visible']:
+        target.x = bpy.data.objects[info['individual_visible'][key][0]].location.x
+    for name, offset in [('MD2_Wind_Key',(0.,-4.,9.)), ('MD2_Wind_Fill',(5.,4.,6.))]:
+        light = bpy.data.objects[name]; light.location = target + Vector(offset)
+        light.rotation_euler = (target-light.location).to_track_quat('-Z','Y').to_euler()
     for area in context.screen.areas:
         if area.type == 'VIEW_3D':
             view = area.spaces.active; view.use_local_camera = True
