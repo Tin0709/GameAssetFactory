@@ -86,7 +86,7 @@ front_mask('Hair / reference stepped outer fringe',-.255,.255,1.420,1.826,-.254,
 side_mask('Hair / reference R outer layer',-.255,-.255,.255,1.35,1.826,[row[::-1] for row in HAT_R],2)
 side_mask('Hair / reference L outer layer',.255,-.255,.255,1.35,1.826,HAT_L,1)
 front_mask('Hair / reference rear outer layer',-.255,.255,1.35,1.826,.255,HAT_BACK,2)
-card('Hair / reference outer crown',[(-.255,-.255,1.827),(.255,-.255,1.827),(.255,.255,1.827),(-.255,.255,1.827)],32,32,seed=1)
+card('Hair / reference outer crown',[(-.255,-.255,1.827),(.255,-.255,1.827),(.255,.255,1.827),(-.255,.255,1.827)],32,32,[(1,1),(7,1),(7,0),(14,0),(14,1),(23,1),(23,0),(29,0),(29,2),(31,2),(31,10),(30,10),(30,18),(31,18),(31,27),(29,27),(29,31),(21,31),(21,30),(12,30),(12,31),(3,31),(3,29),(0,29),(0,22),(1,22),(1,13),(0,13),(0,4),(1,4)],seed=1)
 # Three recognisable uneven bang groups; centre lock stays between the eyes.
 front('Hair / reference left bang',-.240,-.081,1.565,1.815,-.265,12,20,[(0,0),(11,0),(11,14),(9,14),(9,18),(6,18),(6,19),(1,19),(1,17),(0,17)],1)
 front('Hair / reference long centre bang',-.029,.029,1.516,1.797,-.269,6,24,[(0,0),(5,0),(5,21),(4,21),(4,23),(1,23),(1,22),(0,22)],2)
@@ -151,6 +151,24 @@ for i,(x,y,dy) in enumerate([(-.174,.080,-1),(.180,-.074,1),(-.011,-.173,1),(.09
 for row,(z,h) in enumerate([(1.797,.106),(1.528,.112)]):
  for i,x in enumerate([-.174,.177]):
   tuft('rear edge '+str(row+1)+'-'+str(i+1),(x,.252,z),(1,0,0),((i-.5)*.15,.40,-1),.101,h,1+(row+i)%2)
+
+# Stronger fluff, retaining the latest reference haircut and fixed red bandana.
+for part in cards:
+ if part['kind']=='hair' and part['name'].startswith('Hair / fluffy'):
+  top=tuple((part['vertices'][2][k]+part['vertices'][3][k])*.5 for k in range(3))
+  part['vertices']=[tuple(top[k]+1.22*(v[k]-top[k]) for k in range(3)) for v in part['vertices']]
+ elif part['kind']=='hair' and 'reference crown flick' in part['name']:
+  base=min(v[2] for v in part['vertices'])
+  part['vertices']=[(x,y,base+1.8*(z-base)) for x,y,z in part['vertices']]
+for i,x in enumerate([-.219,.218]):
+ tuft('extra fringe '+str(i+1),(x,-.249,1.826),(1,0,.09 if i else -.09),(.08 if i else -.08,-.58,-1),.060,.119,1+i)
+for i,(x,y,dy) in enumerate([(-.177,-.102,-.81),(.077,-.160,-.83),(.183,.040,.82),(-.087,.135,.86),(.047,.206,.84)]):
+ tuft('extra crown '+str(i+1),(x,y,1.827),(math.cos(i*.25),math.sin(i*.25),0),(0,dy,.59),.098+.009*(i%2),.115+.010*(i%3),1+i%2)
+for sign,label in [(-1,'R'),(1,'L')]:
+ for i,(y,z,w,h) in enumerate([(-.196,1.772,.093,.103),(.178,1.806,.109,.115),(-.059,1.612,.113,.116),(.109,1.459,.094,.090)]):
+  tuft(label+' extra side '+str(i+1),(sign*.258,y,z),(0,1,0),(sign*.35,.12 if i%2 else -.11,-1),w,h,1+i%2)
+for i,(x,z,h) in enumerate([(-.207,1.781,.105),(.085,1.592,.110),(.209,1.504,.090)]):
+ tuft('extra rear '+str(i+1),(x,.254,z),(1,0,0),(.08 if i%2 else -.08,.42,-1),.103,h,1+i%2)
 
 atlas.save(D/'soldier_hair_bandana_atlas.png');(D/'cards.json').write_text(json.dumps({'atlas_size':512,'cards':cards,'binary_alpha':True,'construction':'Single-sided geometric planes rendered double-sided, no extrusion or solidify'},indent=2)+'\n')
 print('DESIGNED',sum(c['kind']=='hair' for c in cards),'hair cards',sum(c['kind']=='bandana' for c in cards),'bandana cards')
