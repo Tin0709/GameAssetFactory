@@ -1,0 +1,10 @@
+{
+  "pre_existing_files": 8588,
+  "unchanged": 8585,
+  "changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/source_visual.gd"
+  ],
+  "missing": []
+}
