@@ -34,3 +34,5 @@ Actual native Metal **Mobile renderer**,1280×720, AppleM2Pro, ordinary existing
 
 Open/run `res://scenes/dev/ActionsStuffWalkRunTest.tscn`.
 WASD move; Shift run; Space jump; **hold E to Aim + Auto-Aim + Fire**; RMB Aim/Orbit; Q/C turn; wheel zoom; **R resets the four zombies**. Infinite ammo,6Hz, approved movement speeds/player animations/Combat Strafe/grips/camera/jump unchanged. Research/dev only; production WorldMap/export behavior unchanged.
+
+Preservation audit:8,588pre-existing gameplay/Blender files checked;8,585exact. Only the dev zombie `source_visual.gd`, `physics_zombie.gd` and its README changed; none missing. New helper/tests and this evidence are scoped to dev/docs. See `preservation.json`. Existing scene launched for user review with normal audio (no Dummy driver or silent-review flag), startup free of script/runtime errors.

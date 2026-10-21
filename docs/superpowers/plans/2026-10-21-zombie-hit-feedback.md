@@ -30,6 +30,6 @@ Interfaces: existing `take_damage(int, Vector3)->bool`, `flash_hit(float)`, `hit
 - [x] Use65ms existing flash, existing impact/audio pools, four prewarmed number slots per zombie; bounded1.6m/s nonlethal knockback.
 - [x] Run GREEN at30/60 and existing death/fire/autoaim/Combat Strafe checks.
 - [x] Inspect native30/60 gameplay captures.
-- [ ] Record file preservation and open the same scene with ordinary audio for user review.
+- [x] Record file preservation and open the same scene with ordinary audio for user review.
 
 No manual commit or Git history/tracking changes: existing workspace auto-sync owns persistence.
