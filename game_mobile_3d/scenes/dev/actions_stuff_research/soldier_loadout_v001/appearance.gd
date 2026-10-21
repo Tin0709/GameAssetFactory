@@ -32,11 +32,13 @@ var tail_matrices:Array[Transform3D]=[]
 var last_shots:=0
 var last_hp:=100
 var last_kills:=0
-var _grounded:=true
+var gaze_offset:=0.
+var enemy_nearby:=false
 var _last_takeoff:=false
 var _last_landed:=false
 func setup(owner_scene:Node):
  scene=owner_scene;actor=scene.player;visual=actor.visual;presenter=scene.presentation
+ process_physics_priority=2
  data=JSON.parse_string(FileAccess.get_file_as_string(DIR+"appearance.json"))
  head_bone=visual.skeleton.find_bone("Head")
  var skin:Skin=visual.meshes[0].skin
@@ -92,7 +94,7 @@ func reset():
  initialized=false;hair_spring.reset();tail_spring.reset();tail_tip.reset();acceleration=Vector3.ZERO;angular_velocity=Vector3.ZERO
  face_state.reset();channels=face_state.channels;last_shots=scene.rifle_fire.shots_fired;last_hp=actor.current_hp
  last_kills=scene.zombie_combat.kills if scene.zombie_combat!=null else 0
- _last_takeoff=false;_last_landed=false
+ _last_takeoff=false;_last_landed=false;gaze_offset=0.;enemy_nearby=false
 func _health_changed(hp:int,maximum:int):
  if hp<last_hp:request_expression("Hurt_Heavy" if last_hp-hp>=maximum*.25 else "Hurt_Light")
  last_hp=hp
@@ -131,12 +133,6 @@ func _process(delta:float):
  if presenter.display_world.is_empty():return
  var head:Transform3D=presenter.display_world[head_bone]*head_bind
  advance_motion(delta,actor.velocity,head.origin+head.basis*Vector3(0,1.58,0),head.basis,visual.gait_phase,visual.rifle_move_weight)
- if scene.rifle_fire.shots_fired!=last_shots:request_expression("Fire_Recoil_Face");last_shots=scene.rifle_fire.shots_fired
- var q:Dictionary=actor.last_jump_query
- var takeoff:bool=q.get("takeoff",false);var landed:bool=q.get("landed",false)
- if takeoff and not _last_takeoff:request_expression("Jump_Focus")
- if landed and not _last_landed:request_expression("Land_Impact")
- _last_takeoff=takeoff;_last_landed=landed
  var state:="Rifle Ready Idle"
  if visual.move_requested:state="Run" if visual.gait_run_weight>.5 else "Walk"
  if visual.rifle_aim_weight>.15:state="Aim"
@@ -146,10 +142,27 @@ func _process(delta:float):
   last_kills=kills
  var low_hp:=clampf((.35-float(actor.current_hp)/maxi(1,actor.max_hp))/.35,0.,1.)
  advance_face(delta,state,low_hp,actor.is_dead)
- # Eyes follow intentional standing look gently; approved Head lean is untouched.
- if state=="Rifle Ready Idle" and absf(visual.turn_axis)>.01:
-  channels.gaze_x=lerpf(channels.gaze_x,visual.turn_axis*.65,1.-exp(-12.*delta))
-  _shape("GazeX_L",channels.gaze_x);_shape("GazeX_R",channels.gaze_x)
+ # Eyes follow intentional standing look; approved Head lean is untouched.
+ var wanted_gaze:float=visual.turn_axis*.65 if state=="Rifle Ready Idle" else 0.
+ gaze_offset=lerpf(gaze_offset,wanted_gaze,1.-exp(-12.*delta))
+ channels.gaze_x=clampf(channels.gaze_x+gaze_offset,-1.,1.)
+ _shape("GazeX_L",channels.gaze_x);_shape("GazeX_R",channels.gaze_x)
+func _physics_process(_delta:float):
+ # Events are observed after the actor and shot manager, so one-tick takeoff /
+ # landing pulses cannot be lost on30Hz render frames with60Hz gameplay physics.
+ if scene.rifle_fire.shots_fired!=last_shots:request_expression("Fire_Recoil_Face");last_shots=scene.rifle_fire.shots_fired
+ var q:Dictionary=actor.last_jump_query
+ var takeoff:bool=q.get("takeoff",false);var landed:bool=q.get("landed",false)
+ if takeoff and not _last_takeoff:request_expression("Jump_Focus")
+ if landed and not _last_landed:request_expression("Land_Impact")
+ _last_takeoff=takeoff;_last_landed=landed
+ if scene.zombie_combat!=null:
+  var close:=false
+  for zombie in scene.zombie_combat.zombies:
+   if is_instance_valid(zombie) and not zombie.is_dead and actor.global_position.distance_squared_to(zombie.global_position)<12.25:close=true;break
+  if close and not enemy_nearby and visual.rifle_aim_weight<.1:request_expression("Alert")
+  enemy_nearby=close
+
 func _pivoted(p:Vector3,angles:Vector3)->Transform3D:
  var basis:=Basis.from_euler(angles);return Transform3D(basis,p-basis*p)
 func _upload():
