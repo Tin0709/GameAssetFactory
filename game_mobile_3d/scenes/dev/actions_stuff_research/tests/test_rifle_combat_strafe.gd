@@ -61,6 +61,10 @@ func run():
  for i in fps*2:
   var direction:Vector3=[Vector3.LEFT,Vector3.RIGHT,Vector3.FORWARD,Vector3.BACK][int(i/maxi(1,int(.1*fps)))%4]
   tick(scene,direction*scene.player.walk_speed,dt,reference,false)
+ # Release must return to ordinary movement-facing locomotion, retaining phase.
+ event.pressed=false;scene._input(event);v.auto_aim_target=null
+ for i in fps*2:tick(scene,Vector3.RIGHT*scene.player.walk_speed,dt,reference,false)
+ check(absf(wrapf(v.rotation.y-PI*.5,-PI,PI))<.01,"E release restores existing movement-facing behavior")
  check(max_source_error<.00005,"Combat lower body uses literal directional source PRS, including waist compensation")
  check(side_seen and back_seen and recent_seen,"Held E activates the verified recent-action side/back source branch")
  check(reached_run and aligned_samples>fps*3,"Directional combat supports Run and real muzzle alignment")
@@ -69,10 +73,6 @@ func run():
  check(max_leg_step<65.,"Rapid combat reversals do not spin legs")
  check(contact_pairs>4 and contact_drift<.008,"Actual same-point support contacts remain stable during strafe")
  check(height_step<.03,"Directional body-height changes remain smooth")
- # Release must return to ordinary movement-facing locomotion, retaining phase.
- event.pressed=false;scene._input(event);v.auto_aim_target=null
- for i in fps*2:tick(scene,Vector3.RIGHT*scene.player.walk_speed,dt,reference,false)
- check(absf(wrapf(v.rotation.y-PI*.5,-PI,PI))<.01,"E release restores existing movement-facing behavior")
  var report:={"passed":failures.is_empty(),"fps":fps,"failures":failures,"source_samples":source_samples,"maximum_source_pose_error":max_source_error,"side_seen":side_seen,"back_seen":back_seen,"recent_action_branch":recent_seen,"right_grip_error_m":max_grip,"left_support_error_m":max_support,"minimum_floor_m":min_floor,"maximum_leg_step_deg":max_leg_step,"contact_step_m":contact_drift,"contact_pairs":contact_pairs,"height_step_m":height_step,"aim_aligned_samples":aligned_samples}
  print("RIFLE_COMBAT_STRAFE ",JSON.stringify(report))
  var dest:=OS.get_environment("RIFLE_STRAFE_RESULTS")
