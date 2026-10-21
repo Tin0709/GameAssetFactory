@@ -1,5 +1,5 @@
 """Fresh-open content preservation, authorized short-Z change, geometry and UI."""
-import bpy,json,sys,math
+import bpy,json,sys,math,hashlib
 from pathlib import Path
 D=Path(__file__).resolve().parent;R=D.parents[4];E=R/'.validation/tall_grass_md2_v001';sys.path[:0]=[str(D.parent),str(D)]
 from flower_preservation import compare,mesh_content
@@ -35,5 +35,5 @@ for key in list(info['cameras'])+['Short','Original','Overview']:
  expected=info['short_layer'] if key=='Short' else info['original_layer'] if key=='Original' else info['layer'];assert bpy.context.view_layer.name==expected
  assert scene.camera.name==structure['original_scene_camera'];routes.append(key)
 assert all(bpy.data.objects[n].data==bpy.data.objects['ENV_GrassBlock_DI_V3'].data for n in bpy.data.objects.keys() if n.startswith(('Tall_MD2_Platform_','Tall_MD2_ClusterBase_','Tall_MD2_FieldGround_','Tall_MD2_CompareBase_')))
-report={'passed':True,'source_path':str(path),'original_data_preserved_except_explicit_short_z':True,'original_object_count':structure['objects'],'original_actions':0,'short_z_formula_error_m':error,'short_grass_height_update':short_records,'tall_assets':records,'max_quad_planarity_error_m':planarity,'selector_routes':routes,'new_scenes':0,'new_actions':0,'asset_materials':1,'atlas_size':[128,128],'godot_integration':False,'mobile_claim':'geometry/material budget only; no phone benchmark'}
+report={'passed':True,'source_path':str(path),'source_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'manifest_sha256':hashlib.sha256((D/'manifest.json').read_bytes()).hexdigest(),'original_data_preserved_except_explicit_short_z':True,'original_object_count':structure['objects'],'original_actions':0,'short_z_formula_error_m':error,'short_grass_height_update':short_records,'tall_assets':records,'max_quad_planarity_error_m':planarity,'selector_routes':routes,'new_scenes':0,'new_actions':0,'asset_materials':1,'atlas_size':[128,128],'godot_integration':False,'mobile_claim':'geometry/material budget only; no phone benchmark'}
 (D/'validation.json').write_text(json.dumps(report,indent=2)+'\n');print('TALL_NATIVE_VALIDATION',json.dumps(report),flush=True)
