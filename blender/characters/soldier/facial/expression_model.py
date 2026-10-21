@@ -27,7 +27,7 @@ PRESETS={
  'Victory_Small':dict(duration=3.,loop=False,target=dict(open_l=.74,open_r=.81,brow_l=.23,brow_r=.30,tilt_l=-.08,tilt_r=-.06)),
  'Death_Stunned':dict(duration=3.,loop=False,target=dict(open_l=1.28,open_r=1.28,brow_l=.55,brow_r=.55,pupil_scale=.69)),
 }
-SITUATIONS={'Idle':8.,'Walk':4.,'Run':4.,'Rifle Ready Idle':7.2,'Aim':4.8,'Fire':3.6,'Jump':2.4,'Landing':2.2,'Hurt':3.6,'Low Health':4.}
+SITUATIONS={'Idle':9.,'Walk':4.,'Run':6.,'Rifle Ready Idle':7.2,'Aim':3.6,'Fire':22/6,'Jump':2.8,'Landing':2.2,'Hurt':3.6,'Low Health':9.}
 BASE={'Idle':'Neutral_Idle','Walk':'Move_Effort_Light','Run':'Run_Effort','Rifle Ready Idle':'Enemy_Nearby','Aim':'Focused_Aim','Fire':'Focused_Aim','Jump':'Neutral_Idle','Landing':'Neutral_Idle','Hurt':'Focused_Aim','Low Health':'Low_HP_Tense'}
 EVENTS={'Fire_Recoil_Face':(.1666666667,.025,.0167,20),'Jump_Focus':(.38,.055,.10,30),'Land_Impact':(.33,.035,.045,40),'Hurt_Light':(.46,.045,.09,60),'Hurt_Heavy':(.70,.065,.14,80),'Death_Stunned':(1.15,.09,.60,100)}
 
@@ -70,34 +70,40 @@ def evaluate_preset(name,t,auto_blink=True,intensity=1.):
  if auto_blink and name not in EVENTS and 0<t<duration:c['blink_auto']=blink_at(t,name=='Focused_Aim')
  return finish(c,intensity)
 def evaluate_situation(state,t,events=None,low_hp=0.,auto_blink=True,intensity=1.):
- name=BASE[state];c=blend(NEUTRAL,target(name),smooth(t/.16))
+ # Steady clips contain no entry ramp. The sidebar plays selection entry once,
+ # outside the repeating frame range; canonical loops never replay an old face.
+ name=BASE[state];c=target(name)
  if state=='Rifle Ready Idle':
   c['open_l']=c['open_r']=1.02;c['gaze_x']=.15*pulse(t-2.1,2.0,.3,.5)
  elif state=='Idle':
   c['gaze_x']=.13*pulse(t-2.2,2.,.25,.8)-.09*pulse(t-5.2,1.7,.25,.6)
-  c['open_l']=c['open_r']=1.-.008*(.5-.5*math.cos(t*math.pi/2))
+  c['open_l']=c['open_r']=1.-.008*(.5-.5*math.cos(t*math.pi*4/SITUATIONS[state]))
  elif state in ['Walk','Run']:
-  c['open_l']+=.012*math.sin(t*2*math.pi*(1.25 if state=='Walk' else 1.6));c['open_r']=c['open_l']
+  c['open_l']+=.012*math.sin(t*2*math.pi*(5 if state=='Walk' else 10)/SITUATIONS[state]);c['open_r']=c['open_l']
  c=blend(c,target('Low_HP_Tense'),clamp(low_hp,0.,1.)*.48)
+ if auto_blink:c['blink_auto']=blink_at(t,state in ['Aim','Fire'])
  # Gameplay event requests compose by priority, never sum or restart a spring.
  planned=list(events or [])
  if events is None:
-  if state=='Fire':planned=[{'type':'Fire_Recoil_Face','time':.35+i/6} for i in range(24)]
-  elif state=='Jump':planned=[{'type':'Jump_Focus','time':.30},{'type':'Land_Impact','time':1.35}]
+  if state=='Fire':planned=[{'type':'Fire_Recoil_Face','time':i/6} for i in range(22)]
+  elif state=='Jump':planned=[{'type':'Jump_Focus','time':.30},{'type':'Land_Impact','time':1.50}]
   elif state=='Landing':planned=[{'type':'Land_Impact','time':.5}]
   elif state=='Hurt':planned=[{'type':'Hurt_Light','time':.4},{'type':'Hurt_Heavy','time':1.6}]
  active=[]
  for e in planned:
   total,attack,hold,priority=EVENTS[e['type']];weight=pulse(t-e['time'],total,attack,hold)
   if weight>0:active.append((priority,weight,e['type']))
- if active:
-  priority=max(e[0] for e in active);winner=max((e for e in active if e[0]==priority),key=lambda e:e[1])
+ # Continuous priority composition: a high-priority event fades over the
+ # current lower-priority composite. Equal-priority duplicate requests use max,
+ # never addition. Full Hurt weight suppresses Fire exactly; recovery reveals
+ # the current underlying state rather than a captured, obsolete reaction.
+ for priority in sorted({e[0] for e in active}):
+  winner=max((e for e in active if e[0]==priority),key=lambda e:e[1])
   c=blend(c,target(winner[2]),winner[1])
- if auto_blink and not active:c['blink_auto']=blink_at(t,state in ['Aim','Fire'])
  return finish(c,intensity)
 
 # A review edit, not another animation candidate. Seconds stay at original30FPS.
-REEL=[('situation','Idle',4.),('preset','Look_Left',2.),('preset','Look_Right',2.),('preset','Look_Down_Short',1.8),('preset','Alert',1.5),('situation','Walk',1.5),('situation','Run',1.5),('situation','Rifle Ready Idle',1.5),('situation','Aim',1.5),('situation','Fire',1.5),('situation','Jump',2.4),('situation','Hurt',2.7),('situation','Low Health',1.5),('preset','Victory_Small',1.5),('preset','Death_Stunned',1.5)]
+REEL=[('situation','Idle',4.),('preset','Look_Left',2.),('preset','Look_Right',2.),('preset','Look_Down_Short',1.8),('preset','Alert',1.5),('situation','Walk',1.5),('situation','Run',1.5),('situation','Rifle Ready Idle',1.5),('situation','Aim',1.5),('situation','Fire',1.5),('situation','Jump',2.8),('situation','Hurt',2.7),('situation','Low Health',1.5),('preset','Victory_Small',1.5),('preset','Death_Stunned',1.5)]
 REEL_DURATION=sum(d for _,_,d in REEL)
 def reel_position(t):
  start=0.;previous=None
