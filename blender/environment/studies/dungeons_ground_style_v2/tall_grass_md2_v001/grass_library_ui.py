@@ -32,6 +32,10 @@ def tall_closeup(context,key):
  context.view_layer.update()
  return camera
 def select(context,key):
+ # Restore the pre-wind timeline when returning to any static review route.
+ if 'md2_wind_review' in context.scene:
+  import wind_review_ui
+  wind_review_ui.leave(context)
  info=record();assert info and Path(bpy.data.filepath).name==LIB
  layer=context.scene.view_layers[info['layer']]
  if key=='All' or key.startswith('S:'):
@@ -75,7 +79,10 @@ class MD2_PT_grass_library(bpy.types.Panel):
 @persistent
 def loaded(_):
  if not bpy.app.background and Path(bpy.data.filepath).name==LIB and record():
-  select(bpy.context,'All')
+  if 'md2_wind_review' in bpy.context.scene:
+   import wind_review_ui
+   wind_review_ui.select(bpy.context,'Field')
+  else:select(bpy.context,'All')
   if not bpy.app.timers.is_registered(short.focus_sidebar):bpy.app.timers.register(short.focus_sidebar,first_interval=.3)
 def register():
  tall.register()
@@ -86,4 +93,8 @@ def register():
   if cls:bpy.utils.unregister_class(cls)
  for cls in [MD2_OT_grass_library_view,MD2_PT_grass_library]:
   if not hasattr(bpy.types,cls.__name__):bpy.utils.register_class(cls)
+ wind_path=str(D.parent/'grass_wind_md2_v001')
+ if wind_path not in sys.path:sys.path.insert(0,wind_path)
+ import wind_review_ui
+ wind_review_ui.register()
  if loaded not in bpy.app.handlers.load_post:bpy.app.handlers.load_post.append(loaded)
