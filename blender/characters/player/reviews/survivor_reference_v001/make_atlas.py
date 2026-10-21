@@ -74,7 +74,7 @@ im,d=paint(32,32,SKIN,0,2);store('head_bottom',im)
 for i,name in enumerate(['shirt_front','shirt_back','shirt_side','shirt_top','shirt_bottom']):
  im,d=paint(32,48 if name in ['shirt_front','shirt_back','shirt_side'] else 16,(44,45,44),20+i,4)
  if name=='shirt_front':
-  d.rectangle((9,0,22,2),fill=(31,33,32));d.rectangle((11,0,20,1),fill=SKIN)
+  d.rectangle((9,0,22,2),fill=(31,33,32))
  if name in ['shirt_front','shirt_back']:d.rectangle((0,46,31,47),fill=(37,39,37))
  store(name,im)
 
@@ -108,9 +108,14 @@ for side in ['L','R']:
    d.rectangle((x0,y0,min(x1,x0+1),min(y1,y0+1)),fill=(58,60,55))
    if j%2==0:d.rectangle((min(x1,x0+2),min(y1,y0+1),min(x1,x0+3),min(y1,y0+2)),fill=(72,73,64))
   d.rectangle((0,12,15,13),fill=(35,38,36));d.rectangle((0,25,15,25),fill=(36,39,37))
+  # A painted inner seam separates the two original touching leg blocks.
+  if face=='front':
+   seam=0 if side=='L' else 15
+   d.rectangle((seam,0,seam,47),fill=(35,38,35))
   # Boots are painted onto the ORIGINAL leg block, no added sole/toe geometry.
   d.rectangle((0,39,15,40),fill=(42,43,38));d.rectangle((0,41,15,44),fill=(73,58,44));d.rectangle((0,44,15,45),fill=(108,80,58));d.rectangle((0,46,15,47),fill=(37,39,35))
   d.rectangle((3,42,6,43),fill=(122,91,64));d.rectangle((10,43,13,44),fill=(91,71,51))
+  if face=='front':d.rectangle((seam,39,seam,47),fill=(29,32,29))
   store('leg_'+side+'_'+face,im)
  im,d=paint(16,16,(48,51,48),50,4);store('leg_'+side+'_top',im)
  im,d=paint(16,16,(35,37,33),52,3);store('leg_'+side+'_bottom',im)

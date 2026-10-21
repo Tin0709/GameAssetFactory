@@ -16,6 +16,7 @@ if FILE.exists():
  assert previous.get('review_status')=='Pending','Reviewed assets require a new candidate.'
  bpy.data.scenes.remove(previous)
 bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.context.preferences.filepaths.save_version=0
 scene=bpy.context.scene;scene.name='Survivor Skin Review — PENDING'
 scene['review_status']='Pending';scene['candidate']='Survivor_Reference_v001'
 scene['scope']='SKIN ONLY; exact original six cuboids and rest skeleton; no Godot integration'
