@@ -96,8 +96,10 @@ func _physics_process(delta:float)->void:
 
 func _process(delta:float)->void:
 	clock+=delta;upload_accumulator+=delta
-	if upload_accumulator>=1./30.:
-		upload_accumulator=fmod(upload_accumulator,1./30.);interaction.upload()
+	if upload_accumulator>=1./60.:
+		# At most once per rendered frame:30Hzon30FPSphones,60Hzfor smooth
+		# desktop contact. One32KiBbulk upload, never per-blade updates.
+		upload_accumulator=fmod(upload_accumulator,1./60.);interaction.upload()
 	for material in materials:material.set_shader_parameter("wind_time",clock)
 
 func reset()->void:
