@@ -6,6 +6,8 @@ const RIFLE = preload("res://scenes/dev/zombie_death_physics/presets/rifle.tres"
 const COMBAT_IMPULSE := 240.0
 const COMBAT_LIFT := 48.0
 const COMBAT_GRAVITY := 18.0
+const HitFeedback = preload("res://scenes/dev/actions_stuff_research/zombie_combat/hit_feedback.gd")
+const HIT_KNOCKBACK_LIMIT := 1.6
 signal corpse_finished(zombie: CharacterBody3D, lifetime: float)
 var ragdoll: Node
 var corpse_age := 0.0
@@ -17,6 +19,12 @@ var combat_rifle: Resource
 
 func _ready() -> void:
 	super._ready()
+	# Dev-only bounded feedback. Shared production actors/UI remain unchanged.
+	damage_feedback.free()
+	damage_feedback = HitFeedback.new()
+	damage_feedback.name = "DamageFeedback"
+	add_child(damage_feedback)
+	knockback_speed = 1.35
 	# Heavier combat response, using the same native Lab graph/masses/joints.
 	# Duplicate once: the canonical Lab Rifle preset remains unchanged.
 	combat_rifle = RIFLE.duplicate()
@@ -39,6 +47,8 @@ func _ready() -> void:
 
 func take_damage(amount: int,direction: Vector3=Vector3.ZERO) -> bool:
 	var accepted := super.take_damage(amount,direction)
+	if accepted and not is_dead:
+		knockback = knockback.limit_length(HIT_KNOCKBACK_LIMIT)
 	if accepted and is_dead and is_instance_valid(combat_audio):
 		combat_audio.play_event(&"zombie_death")
 	return accepted

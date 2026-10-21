@@ -43,7 +43,7 @@ func run() -> void:
 			for name in ["Hips","Leg.L","Leg.R"]:
 				var bone: int=sk.find_bone(name)
 				lower_error=maxf(lower_error,sk.get_bone_pose_position(bone).distance_to(rs.get_bone_pose_position(bone)))
-				lower_error=maxf(lower_error,sk.get_bone_pose_rotation(bone).angle_to(rs.get_bone_pose_rotation(bone)))
+				lower_error=maxf(lower_error,1.-absf(sk.get_bone_pose_rotation(bone).dot(rs.get_bone_pose_rotation(bone))))
 			if i==1:
 				var base_up: Vector3=rs.global_basis*rs.get_bone_global_pose(chest).basis.y
 				var hit_up: Vector3=sk.global_basis*sk.get_bone_global_pose(chest).basis.y
