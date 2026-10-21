@@ -32,6 +32,7 @@
       "camera": "HC_ThreeQuarter"
     }
   ],
+  "dropdown_visibility_roundtrip": true,
   "final_scene": "SOLDIER_ASSET_LIBRARY",
   "final_view_layer": "Hair & Bandana",
   "final_camera": "HC_ThreeQuarter",

@@ -4,6 +4,7 @@
   "changed": [
     "blender/characters/soldier/showcase/registry.json",
     "blender/characters/soldier/showcase/SOLDIER_Asset_Library.blend",
+    "blender/characters/soldier/showcase/README.md",
     "blender/characters/soldier/showcase/soldier_library_ui.py"
   ],
   "unexpected_changes": [],
