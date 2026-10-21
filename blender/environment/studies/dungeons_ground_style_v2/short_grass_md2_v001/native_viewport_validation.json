@@ -1,0 +1,108 @@
+{
+  "passed": true,
+  "native_routes": [
+    {
+      "view": "Overview",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Overview",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Low Cushion",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Low Cushion",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Broad Fan",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Broad Fan",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Soft Rosette",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Soft Rosette",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Uneven Tuft",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Uneven Tuft",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Cluster",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Cluster",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Grouped",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Grouped",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Compare",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Compare",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Opposite",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Opposite",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Original",
+      "view_layer": "ViewLayer",
+      "local_camera": "CAM_V3_Showcase",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    },
+    {
+      "view": "Overview",
+      "view_layer": "Short Grass MD2",
+      "local_camera": "MD2_Camera_Overview",
+      "sidebar": [
+        "Grass MD2"
+      ],
+      "viewport_shading": "MATERIAL"
+    }
+  ],
+  "file": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/environment/studies/dungeons_ground_style_v2/dungeons_ground_style_v2.blend",
+  "final_view": "Overview",
+  "new_scene_count": 0,
+  "saved": false
+}
