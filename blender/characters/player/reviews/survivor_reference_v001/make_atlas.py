@@ -37,11 +37,10 @@ for name,seed in [('skin',2),('skin_side',3),('hand',4),('neck',5)]:
 im,d=tile('face',32,32,skin,3,7)
 d.rectangle((0,0,31,9),fill=(220,149,111));d.rectangle((0,12,2,28),fill=(215,135,102));d.rectangle((29,12,31,28),fill=(218,142,110))
 # Simple wide white eyes with dark warm pupils, no eyelashes or ornamental detail.
-for x in [5,21]:
- d.rectangle((x,17,x+5,22),fill=(247,238,215));d.rectangle((x+2,17,x+4,22),fill=(52,44,33));d.rectangle((x+2,17,x+3,18),fill=(27,28,24))
- d.rectangle((x-1,15,x+5,16),fill=(85,50,34))
+for x in [4,20]:
+ d.rectangle((x,16,x+7,23),fill=(248,240,223));d.rectangle((x+3,16,x+6,23),fill=(55,43,30));d.rectangle((x+3,16,x+5,17),fill=(28,27,23))
 d.rectangle((3,25,9,27),fill=(247,183,148));d.rectangle((23,25,28,27),fill=(247,183,148))
-d.rectangle((14,25,17,26),fill=(221,145,109));d.rectangle((14,29,17,29),fill=(217,145,111));d.rectangle((4,30,27,31),fill=(226,151,114))
+d.rectangle((4,30,27,31),fill=(226,151,114))
 store('face',im)
 for i,name in enumerate(['shirt_front','shirt_back','shirt_side','sleeve']):
  im,d=tile(name,32,40 if name!='sleeve' else 24,(44,45,44),4,20+i)

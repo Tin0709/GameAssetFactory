@@ -57,8 +57,7 @@ def box(name,center,size,tile,group,transform=None,crop=None):
  return make_mesh(name,vertices,FACE_INDICES,tiles,group,uvs)
 
 # Large cubic face; the head and all layered hair remain one rigid Head part.
-box('Head / simple voxel face',(0,0,1.555),(.438,.406,.390),['face','skin_side','skin_side','skin_side','skin_side','skin_side'],'Head')
-box('Small planar nose',(0,-.204,1.445),(.041,.003,.025),'skin_side','Head')
+box('Head / simple voxel face',(0,0,1.5475),(.438,.406,.375),['face','skin_side','skin_side','skin_side','skin_side','skin_side'],'Head')
 box('Neck / joined collar',(0,0,1.352),(.145,.175,.060),'neck','Neck')
 box('Charcoal short-sleeve shirt',(0,0,1.065),(.430,.255,.540),['shirt_front','shirt_back','shirt_side','shirt_side','shirt_side','shirt_side'],'Chest')
 
@@ -96,7 +95,7 @@ for i in range(-8,8):
   lock=(i//2*13+j//2*7)%5
   for k in range(15):
    z=BASE+(k+.5)*CELL
-   top=1.820+.018*((i//2*7+j//2*11)%3-1)+(.018 if abs(x)<.18 and abs(y)<.16 else 0.)
+   top=1.850-.115*(abs(x)/.29)**2-.090*(abs(y)/.28)**2+.012*((i//2*7+j//2*11)%3-1)
    # Cut corners/upper silhouette in broad steps, with a few controlled crown tufts.
    hw=.290 if z<1.765 else .260
    hd=.290 if z<1.78 else .260
