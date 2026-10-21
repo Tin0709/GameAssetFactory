@@ -32,5 +32,18 @@
     "Short Grass Response": 0.38,
     "Tall Grass Response": 1.0
   },
-  "catalog_line": "f0977acb-3c65-5e27-8976-5784f4629698:Environment/Grass Wind Pending:Grass Wind Pending\n"
+  "catalog_line": "f0977acb-3c65-5e27-8976-5784f4629698:Environment/Grass Wind Pending:Grass Wind Pending\n",
+  "verification": {
+    "passed": true,
+    "original_assets_exact": true,
+    "root_error_m": 0.0,
+    "ring_width_error_m": 6.664001874625056e-08,
+    "default_20s_loop_error_m": 6.143906154658885e-08,
+    "fps_30_60_error_m": 0.0,
+    "routes_checked": 15,
+    "no_cumulative_drift": true
+  },
+  "central_library": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/environment/studies/dungeons_ground_style_v2/dungeons_ground_style_v2.blend",
+  "published_sha256": "93300b54fd12b6cc8e3facb98167d87b0e30c2e685ee4c78236e093fb12d5bb3",
+  "research_document": "docs/environment/MD2_GRASS_WIND_RESEARCH.md"
 }
