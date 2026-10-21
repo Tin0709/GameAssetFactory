@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "model_rig_weights_uv_materials_images_unchanged": true,
+  "fixed_scope": "Remove uninitialized background Asset Browser layout only",
+  "native_gui_verified": true,
+  "launcher": "python3 \"$HOME/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py\" soldier",
+  "crash_signature": "file_banners_update(SpaceFile const&) / SIGSEGV, null asset_params",
+  "regression_probe_before": "FAIL: Layout ASSETS params and asset_params null",
+  "regression_probe_after": "PASS: initialized candidate layout preserved"
+}
