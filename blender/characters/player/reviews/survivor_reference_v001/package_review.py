@@ -8,8 +8,8 @@ views=['Front','Front_3Q','Left_Side','Back','Right_Side','Back_3Q']
 labels={'Front':'FRONT','Front_3Q':'FRONT 3/4','Left_Side':'SIDE','Back':'BACK','Right_Side':'OTHER SIDE','Back_3Q':'BACK 3/4'}
 for names,file in [(views[:4],'review_four_views.jpg'),(views,'review_six_views.jpg')]:
  canvas=Image.new('RGB',(480*len(names),704),(236,232,225));d=ImageDraw.Draw(canvas)
- d.text((24,13),'SURVIVOR / SKIN-ONLY REVIEW',font=TITLE,fill=(52,43,35))
- d.text((24,47),'Original body proportions | No neck | Large eyes, no nose or mouth | PENDING',font=SMALL,fill=(91,79,65))
+ d.text((24,13),'SURVIVOR / SKIN + CLOTHING REVIEW',font=TITLE,fill=(52,43,35))
+ d.text((24,47),'Original body | 3D shirt, bands and trouser detail | No neck / nose / mouth | PENDING',font=SMALL,fill=(91,79,65))
  for i,name in enumerate(names):
   im=Image.open(OUT/'renders'/f'{name}.png').convert('RGB').resize((480,600),Image.Resampling.LANCZOS)
   canvas.paste(im,(480*i,80));d.text((480*i+240,686),labels[name],font=SMALL,anchor='mm',fill=(52,43,35))

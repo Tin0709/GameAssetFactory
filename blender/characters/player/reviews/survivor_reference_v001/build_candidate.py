@@ -1,5 +1,5 @@
-"""Skin-only Pending review. Append the ORIGINAL V6 six-cuboid mesh/rig read-only.
-No new character geometry, proportions, neck, poses, Actions or Godot changes.
+"""Pending skin/clothing review. Append the ORIGINAL V6 body/rig read-only.
+Only requested external clothes are added; no base shape, neck, pose, Action or Godot changes.
 """
 import bpy,math,json,sys,hashlib,struct
 from pathlib import Path
