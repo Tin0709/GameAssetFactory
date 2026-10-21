@@ -22,7 +22,13 @@ func run():
  check(bind_error<.00001,"Source inverse binds preserve rigid limb pivots")
  check(v.rifle_model.scene_file_path.ends_with("Rifle_Sand_Block_V1.glb"),"Requested Sand Block rifle")
  check(v.skeleton.get_bone_count()==cv.skeleton.get_bone_count(),"Existing animated rig remains unchanged")
- var max_pose_error:=0.;var muzzle_axis_error:=0.
+ var max_pose_error:=0.;var muzzle_axis_error:=0.;var support_surface_gap:=0.
+ var gun_points:Array[Vector3]=[]
+ for part:MeshInstance3D in v.rifle_model.find_children("*","MeshInstance3D",true,false):
+  var tr:Transform3D=v.rifle_model.global_transform.affine_inverse()*part.global_transform
+  for sf in part.mesh.get_surface_count():
+   for point in part.mesh.surface_get_arrays(sf)[Mesh.ARRAY_VERTEX]:gun_points.append(tr*point)
+ var palm_box:=AABB(Vector3(-.084375,.50,-.1125),Vector3(.16875,.175,.225))
  for i in 8*fps:
   var t:=float(i)/fps;var moving:=t>1. and t<6.;var running:=t>3. and t<4.5
   var air:=t>4.5 and t<5.2;var velocity:Vector3=Vector3(sin(t*3.),0.,cos(t*3.))*(scene.player.run_speed if running else scene.player.walk_speed) if moving else Vector3.ZERO
@@ -36,9 +42,19 @@ func run():
   var carrier:Transform3D=v.skeleton.global_transform*v.skeleton.get_bone_global_pose(v.carrier_bone)
   var forward:Vector3=-v.rifle_model.global_basis.z.normalized()
   muzzle_axis_error=maxf(muzzle_axis_error,forward.distance_to(carrier.basis.y.normalized()))
+  if i%maxi(1,int(fps/6))==0:
+   var left:Transform3D=v.skeleton.global_transform*v.skeleton.get_bone_global_pose(v.arm_left)
+   var tr:=left.affine_inverse()*v.rifle_model.global_transform;var gap:=100.
+   for point in gun_points:
+    var local:Vector3=tr*point;gap=minf(gap,local.distance_to(local.clamp(palm_box.position,palm_box.end)))
+    if gap==0.:break
+   support_surface_gap=maxf(support_surface_gap,gap)
+  var grip:Vector3=(v.skeleton.global_transform*v.skeleton.get_bone_global_pose(v.arm_right)).affine_inverse()*v.rifle_model.global_position
+  check(palm_box.grow(.002).has_point(grip),"Right grip remains inside actual slim palm volume")
+ check(support_surface_gap<.025,"Actual rifle surface remains within25mm of support palm during motion: "+str(support_surface_gap))
  check(max_pose_error<.00001,"Appearance swap leaves all animation poses exact")
  check(muzzle_axis_error<.00001,"New barrel matches existing projectile/auto-aim axis")
  check(scene.presentation.mesh==mesh and scene.presentation.bind_bones.size()==10,"Render interpolation uses new skin and all bindings")
  check(not scene.player.find_child("*Backpack*",true,false),"Backpack remains standalone")
- var report:={"fps":fps,"passed":failures.is_empty(),"failures":failures,"bind_error":bind_error,"pose_difference_from_old_loadout":max_pose_error,"barrel_axis_error":muzzle_axis_error}
+ var report:={"fps":fps,"passed":failures.is_empty(),"failures":failures,"bind_error":bind_error,"pose_difference_from_old_loadout":max_pose_error,"barrel_axis_error":muzzle_axis_error,"maximum_support_surface_gap_m":support_surface_gap}
  print("SOLDIER_LOADOUT ",JSON.stringify(report));source.free();scene.free();baseline.free();quit(0 if failures.is_empty() else 1)
