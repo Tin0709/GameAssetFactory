@@ -44,4 +44,21 @@ class Expressions(unittest.TestCase):
     for k,(lo,hi) in m.LIMITS.items():self.assertTrue(lo-1e-6<=c[k]<=hi+1e-6,(state,k,c[k]))
   events=[{'type':'Fire_Recoil_Face','time':i/6} for i in range(120)]
   self.assertEqual(m.evaluate_situation('Aim',21.,events=events,auto_blink=False),m.evaluate_situation('Aim',21.,auto_blink=False))
+ def test_priority_onset_and_recovery_are_continuous(self):
+  for lower,start in [('Fire_Recoil_Face',1.),('Hurt_Light',1.)]:
+   events=[{'type':lower,'time':start},{'type':'Hurt_Heavy','time':1.04}]
+   for boundary in [1.04,1.74]:
+    a=m.evaluate_situation('Aim',boundary-1e-6,events=events)
+    b=m.evaluate_situation('Aim',boundary+1e-6,events=events)
+    self.assertLess(max(abs(a[k]-b[k]) for k in a),.0001)
+  events=[{'type':'Hurt_Light','time':1.325}]
+  a=m.evaluate_situation('Idle',1.325-1e-6,events=events)
+  b=m.evaluate_situation('Idle',1.325+1e-6,events=events)
+  self.assertLess(max(abs(a[k]-b[k]) for k in a),.0001)
+ def test_steady_situation_loop_seams(self):
+  for state,duration in m.SITUATIONS.items():
+   if state in ['Jump','Landing','Hurt']:continue
+   a=m.evaluate_situation(state,0.)
+   b=m.evaluate_situation(state,duration)
+   self.assertLess(max(abs(a[k]-b[k]) for k in a),.00001,state)
 if __name__=='__main__':unittest.main()
