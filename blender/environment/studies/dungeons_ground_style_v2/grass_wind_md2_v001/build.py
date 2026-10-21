@@ -94,7 +94,7 @@ catalog = str(uuid.uuid5(uuid.NAMESPACE_URL, 'GameAssetFactory/Environment/MD2Gr
 for i, source in enumerate(sources):
     x = 12. + i * 2.5
     o = grass(source, source.name + '__Wind_v001', (x, 0., 1.), individual)
-    o['variant'] = source['variant']; o.asset_mark(); o.asset_data.catalog_id = catalog
+    o['variant'] = source.get('variant', 'Dense Cluster'); o.asset_mark(); o.asset_data.catalog_id = catalog
     o.asset_data.description = 'Pending / original MD2-inspired wind / separate review copy of ' + source.name
     masters.append(o)
     platforms = [ground('MD2_Wind_Base_%d_%d' % (i, j), x + ox, oy, individual).name

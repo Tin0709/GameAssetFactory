@@ -103,7 +103,8 @@ class MD2_PT_wind_individual(bpy.types.Panel):
             names = json.loads(context.scene[key])['masters']
             for index, name in enumerate(names):
                 obj = bpy.data.objects[name]
-                text = chr(65+index) + ' · ' + obj['variant'] if index < 4 else obj['variant']
+                variant = obj.get('variant', 'Dense Cluster')
+                text = chr(65+index) + ' · ' + variant if index < 4 else variant
                 layout.operator('md2_wind.view', text=text, icon='MESH_DATA').key = name
 
 def register():

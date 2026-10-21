@@ -1,0 +1,36 @@
+{
+  "status": "Pending",
+  "native_preservation_errors": [],
+  "sources": [
+    "Short_Grass_MD2_v001_A",
+    "Short_Grass_MD2_v001_B",
+    "Short_Grass_MD2_v001_C",
+    "Short_Grass_MD2_v001_D",
+    "Short_Grass_MD2_Cluster_v001",
+    "Tall_Grass_MD2_v001_A",
+    "Tall_Grass_MD2_v001_B",
+    "Tall_Grass_MD2_v001_C",
+    "Tall_Grass_MD2_v001_D",
+    "Tall_Grass_MD2_Cluster_v001",
+    "Tall_Grass_MD2_Cluster_v002"
+  ],
+  "wind_objects": 60,
+  "field_clumps": 47,
+  "field_triangles": 1790,
+  "new_meshes": 11,
+  "new_node_groups": 1,
+  "new_scenes": 0,
+  "new_actions": 0,
+  "defaults": {
+    "Wind Enabled": true,
+    "Wind Direction": 0.6,
+    "Wind Strength": 0.85,
+    "Wind Speed": 1.0,
+    "Gust Strength": 0.7,
+    "Gust Frequency": 0.05,
+    "Per-Clump Variation": 0.65,
+    "Short Grass Response": 0.38,
+    "Tall Grass Response": 1.0
+  },
+  "catalog_line": "f0977acb-3c65-5e27-8976-5784f4629698:Environment/Grass Wind Pending:Grass Wind Pending\n"
+}
