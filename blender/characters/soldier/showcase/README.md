@@ -6,7 +6,7 @@ Open **SOLDIER_Asset_Library.blend** here. The existing skin candidate is regist
 - `02_HAIR_VARIANTS`, `03_CLOTHING_UPGRADES`, `04_EQUIPMENT`, `05_FUTURE_UPGRADES`: empty groups for future additions.
 - Native asset catalogs in `blender_assets.cats.txt`; Asset Browser can use **Current File**. `registry.json` mirrors the saved scene registry.
 
-Default three-quarter camera. Numpad0 camera view, F12 render; other cameras Front, Front_3Q, Left_Side, Back, Right_Side, Back_3Q. `START HERE — SOLDIER LIBRARY` is packed inside the file.
+Skin review remains in SOLDIER_ASSET_LIBRARY. Default three-quarter camera for each review. Numpad0 camera view, F12 render; other cameras Front, Front_3Q, Left_Side, Back, Right_Side, Back_3Q. `START HERE — SOLDIER LIBRARY` is packed inside the file.
 
 Latest appearance: original head/torso/legs and no neck; older3×12×4 slim arms; large eyes and short brown eyebrows, no nose/mouth; layered dark-brown3D hair with slightly thinner relief; thicker shirt/wraps/bands/trouser panels and subtle skin contact shadows below the rings. One material,3,904triangles, zero Actions. Blender review only.
 
@@ -25,3 +25,11 @@ Works from any working directory, uses the existing detached launcher and reuses
 The original background-built Asset Browser had null `SpaceFile.asset_params`; GUI first draw crashed in `file_banners_update`. The builder now retains the initialized source candidate layout. Native asset registration/catalogs remain intact; open Asset Browser/Current File through Blender when needed. Do not change editor type to ASSETS in background mode and save without GUI initialization.
 
 The existing `soldier` command was launched successfully and the fixed file was opened in a native Blender window with the character visible. `opening_fix_validation.json` confirms identical meshes, rigid weights, rest rig, UVs, material assignments and packed images. The one-off layout probe fails on the original file and passes after the fix. Original failing file is backed up outside the repository. If macOS still offers recovery of the previous crashed windows, choose **Don't Reopen**, then use the normal soldier command.
+
+## Standalone backpack —Pending
+
+The same library now contains `SOLDIER_Backpack_v001_PENDING` under `SOLDIER_ASSETS/04_EQUIPMENT`, catalog SOLDIER/Equipment. The file opens in **SOLDIER_BACKPACK_REVIEW**, showing only the backpack and its studio. Switch the scene selector to **SOLDIER_ASSET_LIBRARY** to review the character. The backpack is excluded from the character review and has no parent/rig/attachment.
+
+Reference-matched brown canvas, twin front and side pockets, real strap loops and open square adjusters; latest refinements add stepped voxel corners, segmented padding/piping and small block fabric details. One packed1024pixel atlas, one mesh/material; all original skin data remains unchanged. Review/render files and focused rebuild scripts are in `../assets/backpack_v001/`. The initial skin-only builder is guarded against deleting additional library assets.
+
+If the library is already open, choose File>Revert in that SOLDIER window to load its latest saved contents.
