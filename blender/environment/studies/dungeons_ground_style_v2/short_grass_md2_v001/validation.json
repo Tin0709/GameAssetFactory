@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "original_data_unchanged": true,
+  "baseline_counts": {
+    "objects": 366,
+    "meshes": 161,
+    "materials": 28,
+    "images": 25,
+    "cameras": 14,
+    "lights": 6,
+    "worlds": 1,
+    "scenes": 1
+  },
+  "variants": [
+    {
+      "name": "Short_Grass_MD2_v001_A",
+      "triangles": 32,
+      "vertices": 48,
+      "cards": 8,
+      "z_min": -0.00800000037997961,
+      "height_above_surface": 0.1940000057220459,
+      "xy_size": [
+        0.34283895790576935,
+        0.3263489454984665
+      ],
+      "materials": 1
+    },
+    {
+      "name": "Short_Grass_MD2_v001_B",
+      "triangles": 28,
+      "vertices": 42,
+      "cards": 7,
+      "z_min": -0.00800000037997961,
+      "height_above_surface": 0.23399999737739563,
+      "xy_size": [
+        0.3613790273666382,
+        0.3777761906385422
+      ],
+      "materials": 1
+    },
+    {
+      "name": "Short_Grass_MD2_v001_C",
+      "triangles": 36,
+      "vertices": 54,
+      "cards": 9,
+      "z_min": -0.00800000037997961,
+      "height_above_surface": 0.164000004529953,
+      "xy_size": [
+        0.476406991481781,
+        0.45838138461112976
+      ],
+      "materials": 1
+    },
+    {
+      "name": "Short_Grass_MD2_v001_D",
+      "triangles": 28,
+      "vertices": 42,
+      "cards": 7,
+      "z_min": -0.00800000037997961,
+      "height_above_surface": 0.27399998903274536,
+      "xy_size": [
+        0.2628343179821968,
+        0.2765515595674515
+      ],
+      "materials": 1
+    },
+    {
+      "name": "Short_Grass_MD2_Cluster_v001",
+      "triangles": 156,
+      "vertices": 234,
+      "cards": 39,
+      "z_min": -0.008160000666975975,
+      "height_above_surface": 0.20823998749256134,
+      "xy_size": [
+        0.7222153544425964,
+        0.6803969144821167
+      ],
+      "materials": 1
+    }
+  ],
+  "planarity_error_m": 1.955777406692505e-08,
+  "cutout": "binary threshold0.5 / nearest / two-sided / transmitted reverse light / no emission",
+  "selector_routes": [
+    "Overview",
+    "Compare",
+    "Low Cushion",
+    "Broad Fan",
+    "Soft Rosette",
+    "Uneven Tuft",
+    "Cluster",
+    "Grouped",
+    "Gameplay",
+    "Opposite",
+    "Original",
+    "Overview"
+  ],
+  "existing_ground_mesh_and_materials_exact": true,
+  "new_scenes": 0,
+  "new_animations": 0,
+  "godot_modified": false
+}

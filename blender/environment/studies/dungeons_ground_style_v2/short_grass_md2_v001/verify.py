@@ -4,6 +4,7 @@ from pathlib import Path
 D=Path(__file__).resolve().parent;R=D.parents[4];EV=R/'.validation/short_grass_md2_v001';sys.path.insert(0,str(D.parent));sys.path.insert(0,str(D))
 from flower_preservation import compare
 bpy.ops.wm.open_mainfile(filepath=str(D.parent/'dungeons_ground_style_v2.blend'))
+bpy.context.window.view_layer=bpy.context.scene.view_layers['ViewLayer']
 errors=compare(json.loads((EV/'before_fingerprints.json').read_text()));assert not errors,errors
 manifest=json.loads((D/'manifest.json').read_text());record=json.loads(bpy.context.scene['md2_review']);assert len(bpy.data.scenes)==1
 planarity=0.;root_error=0.;material_ids=set()
@@ -32,6 +33,8 @@ for key in list(record['cameras'])+['Original','Overview']:
  for area in bpy.context.screen.areas:
   if area.type=='VIEW_3D':assert area.spaces.active.camera.name==(record['original_camera'] if key=='Original' else record['cameras'][key])
  routes.append(key)
+ui.select(bpy.context,'Original')
 assert not compare(json.loads((EV/'before_fingerprints.json').read_text()))
+ui.select(bpy.context,'Overview')
 report={'passed':True,'original_data_unchanged':True,'baseline_counts':{k:len(v) for k,v in json.loads((EV/'before_fingerprints.json').read_text()).items()},'variants':manifest['assets'],'planarity_error_m':planarity,'cutout':'binary threshold0.5 / nearest / two-sided / transmitted reverse light / no emission','selector_routes':routes,'existing_ground_mesh_and_materials_exact':True,'new_scenes':0,'new_animations':0,'godot_modified':False}
 (D/'validation.json').write_text(json.dumps(report,indent=2)+'\n');print('MD2_GRASS_NATIVE_VALIDATION',json.dumps(report),flush=True)
