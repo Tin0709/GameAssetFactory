@@ -1,0 +1,108 @@
+{
+  "reference_images": [
+    "docs/graphics/references/user-dungeons2-gameplay-2026-10-09.png",
+    "docs/graphics/references/user-dungeons2-2026-10-09.png"
+  ],
+  "observed_style": "dense green base, fewer upright stalks and small pale cream/gold seed tips; visual observation only",
+  "source_files": {
+    "tall_grass_top.png": "158c4290a44d178d643ac1d271945d44a169e60a787c041237b5cbe746468797",
+    "tall_grass_bottom.png": "2b0869b8bc5b1cdc17ff6f50c1fe1a10ea3f01520c15e8c1d88c2fb29aa05352",
+    "short_grass.png": "bbffa540577107a281bb14fce9fd30884bbe55acf4fbb6c5925800f8350941f8"
+  },
+  "regions_top_left": [
+    [
+      4,
+      3,
+      26,
+      58
+    ],
+    [
+      36,
+      3,
+      26,
+      58
+    ],
+    [
+      4,
+      67,
+      26,
+      58
+    ],
+    [
+      36,
+      67,
+      26,
+      58
+    ],
+    [
+      80,
+      8,
+      32,
+      20
+    ],
+    [
+      80,
+      40,
+      32,
+      20
+    ]
+  ],
+  "atlas_size": [
+    128,
+    128
+  ],
+  "green_palette": [
+    [
+      76,
+      122,
+      49
+    ],
+    [
+      82,
+      128,
+      51
+    ],
+    [
+      89,
+      136,
+      55
+    ],
+    [
+      97,
+      144,
+      60
+    ]
+  ],
+  "seed_palette": [
+    [
+      173,
+      172,
+      110
+    ],
+    [
+      190,
+      187,
+      122
+    ],
+    [
+      208,
+      201,
+      142
+    ],
+    [
+      219,
+      212,
+      156
+    ]
+  ],
+  "root_srgb": [
+    84,
+    130,
+    52
+  ],
+  "alpha_values": [
+    0,
+    255
+  ],
+  "adaptation": "Actual pack masks; source tint retained at roots, authored pale tip tint based on supplied MD2 image. No claim of official meshes/materials."
+}
