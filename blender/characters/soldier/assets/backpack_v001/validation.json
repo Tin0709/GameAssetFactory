@@ -1,0 +1,27 @@
+{
+  "asset_id": "SOLDIER_Backpack_v001",
+  "status": "Pending",
+  "vertices": 1272,
+  "triangles": 2136,
+  "mesh_objects": 1,
+  "materials": 1,
+  "parts": 102,
+  "dimensions_m": [
+    0.6015999913215637,
+    0.37146762013435364,
+    0.6944999694824219
+  ],
+  "standalone": true,
+  "attached_to_character": false,
+  "actions_added": 0,
+  "skin_preserved": true,
+  "skin_fingerprints": {
+    "Survivor_Reference_v001 \u2014 ORIGINAL BODY / NEW SKIN": "d3b72c668c16fa9f3cc8b208f0574865d5b1b4cbc7632e9d3507199d027d1fa4",
+    "Original_V6_Rig \u2014 slim arm sockets": "06781384f9bf6f8e33934c6f3d38cb54ba9c8a2e0edfe2601ea46e9c5ee47822",
+    "Survivor_Clothing_3D \u2014 requested outer relief": "5e2ef43dc437ce24d25d84238eafc9a8350e389661c52d254091bade1f58c64f",
+    "Survivor_Hair_3D \u2014 layered brown locks": "c8055c08ea394e09778f7b408379484661cf9f58f1372ed64b459f031b165cc2"
+  },
+  "primary_reference_sha256": "7d5ff7cd1a568e41ce6ae61cb77f5aab39752855052f9b4532155f1565a07a26",
+  "library": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/characters/soldier/showcase/SOLDIER_Asset_Library.blend",
+  "review_scene": "SOLDIER_BACKPACK_REVIEW"
+}
