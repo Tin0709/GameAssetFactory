@@ -24,6 +24,12 @@ clip=nt.nodes.new('ShaderNodeMath');clip.operation='GREATER_THAN';clip.inputs[1]
 # Terrain-aligned soft leaf normals retain a modest side response, no emission.
 g=nt.nodes.new('ShaderNodeNewGeometry');f=nt.nodes.new('ShaderNodeMath');f.operation='MULTIPLY_ADD';f.inputs[1].default_value=-2.;f.inputs[2].default_value=1.;nt.links.new(g.outputs['Backfacing'],f.inputs[0])
 n=nt.nodes.new('ShaderNodeCombineXYZ');n.inputs['Z'].default_value=.86;mult=nt.nodes.new('ShaderNodeVectorMath');mult.operation='SCALE';mult.inputs[3].default_value=.14;nt.links.new(g.outputs['Normal'],mult.inputs[0]);add=nt.nodes.new('ShaderNodeVectorMath');add.operation='ADD';nt.links.new(n.outputs[0],add.inputs[0]);nt.links.new(mult.outputs[0],add.inputs[1]);flip=nt.nodes.new('ShaderNodeVectorMath');flip.operation='SCALE';nt.links.new(add.outputs[0],flip.inputs[0]);nt.links.new(f.outputs[0],flip.inputs[3]);nt.links.new(flip.outputs[0],p.inputs['Normal'])
+# Reuse the current Fluffy study's proven thin-foliage transmission. Both
+# lobes are clipped, so reverse-light cards stay readable without emission.
+trans=nt.nodes.new('ShaderNodeBsdfTranslucent');trans.name='MD2_ThinLeaf_Transmission';nt.links.new(tex.outputs['Color'],trans.inputs['Color']);nt.links.new(flip.outputs[0],trans.inputs['Normal'])
+shader_add=nt.nodes.new('ShaderNodeAddShader');nt.links.new(p.outputs[0],shader_add.inputs[0]);nt.links.new(trans.outputs[0],shader_add.inputs[1])
+transparent=nt.nodes.new('ShaderNodeBsdfTransparent');mix=nt.nodes.new('ShaderNodeMixShader');nt.links.new(clip.outputs[0],mix.inputs[0]);nt.links.new(transparent.outputs[0],mix.inputs[1]);nt.links.new(shader_add.outputs[0],mix.inputs[2]);nt.links.new(mix.outputs[0],nt.nodes.get('Material Output').inputs['Surface'])
+mat['thin_leaf_lighting']='Diffuse + thin-leaf transmission, both hard clipped; no emission. Existing Fluffy material technique adapted to new low foliage.'
 # Core shape families: differentiated architecture, not just colour variants.
 specs=[('A','Low Cushion',.202,8,.27,.075,.074),('B','Broad Fan',.242,7,.31,.080,.108),('C','Soft Rosette',.172,9,.29,.105,.115),('D','Uneven Tuft',.282,7,.235,.055,.065)]
 objects=[];card_specs={}

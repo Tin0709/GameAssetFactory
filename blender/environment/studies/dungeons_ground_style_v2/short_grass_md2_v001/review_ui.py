@@ -34,9 +34,22 @@ class MD2_PT_short_grass(bpy.types.Panel):
   layout.label(text='A–D: 28–36 triangles each')
   layout.label(text='16–27 cm · one shared material')
   layout.label(text='Pending · no Godot integration',icon='INFO')
+def focus_sidebar():
+ for window in bpy.context.window_manager.windows:
+  for area in window.screen.areas:
+   if area.type!='VIEW_3D':continue
+   area.spaces.active.show_region_ui=True
+   for region in area.regions:
+    if region.type=='UI':
+     try:
+      with bpy.context.temp_override(window=window,area=area,region=region):region.active_panel_category='Grass MD2'
+     except (AttributeError,TypeError,RuntimeError):pass
+   area.tag_redraw()
+ print('MD2_REVIEW_SIDEBAR_READY',flush=True)
 @persistent
 def loaded(_):
  if Path(bpy.data.filepath).name==LIB and 'md2_review' in bpy.context.scene and not bpy.app.background:select(bpy.context,'Overview')
+ if not bpy.app.background and not bpy.app.timers.is_registered(focus_sidebar):bpy.app.timers.register(focus_sidebar,first_interval=.3)
 def register():
  for cls in [MD2_OT_view,MD2_PT_short_grass]:
   if not hasattr(bpy.types,cls.__name__):bpy.utils.register_class(cls)
