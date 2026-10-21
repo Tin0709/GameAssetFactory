@@ -27,6 +27,7 @@ func run():
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(out+"/gameplay.png")
 	previous=Time.get_ticks_usec()
+	var first_clock:float=level.grass_field.clock
 	for f in 12*fps:
 		var t:=float(f)/float(fps);var actor=level.player
 		actor.requested_direction=Vector2.ZERO;actor.requested_run=false
@@ -45,5 +46,24 @@ func run():
 	var report:={"fps_target":fps,"frames":12*fps,"capture_readback_each_frame":capture,"median_frame_ms":times[times.size()/2],"p95_frame_ms":times[int(times.size()*.95)],
 		"field_update_median_usec":field_times[field_times.size()/2],"field_update_p95_usec":field_times[int(field_times.size()*.95)],"peak_active_cells":active_max,
 		"clumps":level.grass_field.instance_count,"batches":level.grass_field.batch_count,"walk_speed":level.player.walk_speed,"run_speed":level.player.run_speed,
-		"shots":level.rifle_fire.shots_fired,"pool_misses":level.rifle_fire.pool_misses,"renderer":RenderingServer.get_current_rendering_method()}
-	FileAccess.open(out+"/native.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"));print("NATIVE_MD2_GRASS ",JSON.stringify(report));level.free();quit()
+		"shots":level.rifle_fire.shots_fired,"pool_misses":level.rifle_fire.pool_misses,"renderer":RenderingServer.get_current_rendering_method(),"simulated_seconds":level.grass_field.clock-first_clock}
+	# Freeze actor/camera/wind time. Only the requested shader contribution changes.
+	paused=true
+	for material in level.grass_field.materials:material.set_shader_parameter("interaction_strength",0.)
+	await process_frame;await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(out+"/contact_off.png")
+	for material in level.grass_field.materials:material.set_shader_parameter("interaction_strength",1.)
+	await process_frame;await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(out+"/contact_on.png")
+	for material in level.grass_field.materials:
+		material.set_shader_parameter("interaction_strength",0.);material.set_shader_parameter("wind_strength",0.)
+	await process_frame;await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(out+"/wind_off.png")
+	for material in level.grass_field.materials:material.set_shader_parameter("wind_strength",1.)
+	await process_frame;await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(out+"/wind_on.png")
+	paused=false
+	FileAccess.open(out+"/native.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"));print("NATIVE_MD2_GRASS ",JSON.stringify(report))
+	level.free();level=null
+	for i in 4:await process_frame
+	quit()

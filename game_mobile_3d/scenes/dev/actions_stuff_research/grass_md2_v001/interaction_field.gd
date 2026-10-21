@@ -22,7 +22,6 @@ var initialized:=false
 var update_usec:=0
 
 func _init()->void:
-	for array in [x,z,vx,vz]:array.resize(SIZE*SIZE);array.fill(0.)
 	# Packed arrays have value semantics; allocate each member explicitly.
 	x.resize(SIZE*SIZE);z.resize(SIZE*SIZE);vx.resize(SIZE*SIZE);vz.resize(SIZE*SIZE)
 	marked.resize(SIZE*SIZE);marked.fill(0)
@@ -35,7 +34,7 @@ func reset()->void:
 	accumulator=0.;initialized=false
 	upload()
 
-func _stamp(point:Vector3,velocity:Vector3)->void:
+func _stamp(point:Vector3)->void:
 	if point.y>1.25:return
 	var a:=Vector2(point.x,point.z)
 	var minimum:=Vector2i(floori((a.x-RADIUS+EXTENT*.5)/CELL),floori((a.y-RADIUS+EXTENT*.5)/CELL))
@@ -58,7 +57,7 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 	var speed:=planar.length();var forward:=planar/maxf(speed,.00001)
 	for step in steps:
 		var at:=previous.lerp(point,float(step+1)/float(steps))
-		_stamp(at,velocity)
+		_stamp(at)
 		var ground_gain:=1.-smoothstep(.25,1.25,maxf(0.,at.y))
 		var amplitude:=minf(1.20,.48+.115*speed)*ground_gain
 		var movement_gain:=.90*speed/(speed+.4)
