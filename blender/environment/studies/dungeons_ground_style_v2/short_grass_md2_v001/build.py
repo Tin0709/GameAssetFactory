@@ -82,10 +82,17 @@ for x,name in [(7.1,'ENV_Grass_DI_V3'),(8.45,'ShortGrass_Fluffy_v1_SageGreen')]:
 # A3x2m mixed patch seen at gameplay distance and from the opposite light side.
 for x in range(3):
  for y in range(2):linked(base,'MD2_Field_Ground_%d_%d'%(x,y),(1.0+x,2.65+y,0),patch)
-rng=random.Random(2007)
-for x in range(6):
- for y in range(6):
-  source=objects[(x*3+y)%4];o=linked(source,'MD2_Field_Tuft_%02d'%(x*6+y),(.72+x*.51+rng.uniform(-.065,.065),2.43+y*.29+rng.uniform(-.035,.035),1),patch);o.rotation_euler.z=rng.uniform(0,math.tau);s=rng.uniform(.82,1.13);o.scale=(s,s,s);o.visible_shadow=False
+rng=random.Random(2007);families=['A','C','B','A','C','A','D','C']
+for x in range(8):
+ for y in range(8):
+  source=objects[['A','B','C','D'].index(families[(x*3+y)%8])];o=bpy.data.objects.new('MD2_Field_Tuft_%02d'%(x*8+y),source.data);patch.objects.link(o);o.location=(.72+x*.365+rng.uniform(-.045,.045),2.40+y*.222+rng.uniform(-.025,.025),1);o.rotation_euler.z=rng.uniform(0,math.tau);s=rng.uniform(.84,1.08);o.scale=(s,s,s);o.visible_shadow=False
+  # Every geometric root is physically over the actual block footprint.
+  bpy.context.view_layer.update();roots=[o.matrix_world@v.co for v in o.data.vertices if v.co.z<0.]
+  bounds=[(min(p[i] for p in roots),max(p[i] for p in roots)) for i in [0,1]]
+  for axis,(lo,hi) in enumerate([(.51,3.49),(2.16,4.14)]):
+   a,b=bounds[axis]
+   if a<lo:o.location[axis]+=lo-a
+   elif b>hi:o.location[axis]-=b-hi
 # All presentation additions stay in this one new review collection/view layer.
 labelmat=bpy.data.materials.new('MD2_Review_Type');labelmat.diffuse_color=(.68,.76,.64,1.)
 def label(body,loc,size=.14):
@@ -143,7 +150,7 @@ text=cat.read_text() if cat.exists() else '# This is an Asset Catalog Definition
 line=catalog+':Environment/Short Grass MD2 Pending:Short Grass MD2 Pending\n'
 if line not in text:cat.write_text(text.rstrip()+'\n'+line)
 for obj in objects:obj.asset_data.catalog_id=catalog
-manifest={'status':'Pending','source_reference':texinfo,'central_library':str(LIB),'new_scene_count':0,'no_godot_integration':True,'layer':layer.name,'cameras':{k:o.name for k,o in cams.items()},'original_layer':original_layer.name,'original_camera':original_camera.name if original_camera else '', 'assets':[],'mixed_patch_tufts':36,'material':mat.name,'new_materials_for_assets':1,'atlas_size':[128,64],'root_gap_m':0,'cards':card_specs}
+manifest={'status':'Pending','source_reference':texinfo,'central_library':str(LIB),'new_scene_count':0,'no_godot_integration':True,'layer':layer.name,'cameras':{k:o.name for k,o in cams.items()},'original_layer':original_layer.name,'original_camera':original_camera.name if original_camera else '', 'assets':[],'mixed_patch_tufts':64,'material':mat.name,'new_materials_for_assets':1,'atlas_size':[128,64],'root_gap_m':0,'cards':card_specs}
 for obj in objects:
  mesh=obj.data;manifest['assets'].append({'name':obj.name,'triangles':sum(len(p.vertices)-2 for p in mesh.polygons),'vertices':len(mesh.vertices),'cards':int(obj['cards']),'z_min':min(v.co.z for v in mesh.vertices),'height_above_surface':max(v.co.z for v in mesh.vertices),'xy_size':[max(v.co[i] for v in mesh.vertices)-min(v.co[i] for v in mesh.vertices) for i in [0,1]],'materials':len(mesh.materials)})
 (D/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
