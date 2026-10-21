@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "original_body_vertices_uv_weights_exact": true,
+  "original_head_material_retained": true,
+  "original_shared_meshes_archived_and_facial_review_preserved": true,
+  "flat_cloth_cards": 35,
+  "thin_trouser_garment_faces": 6,
+  "binary_cutout": true,
+  "rigid_pose_samples": 4,
+  "maximum_attachment_error_m": 1.5840151626966372e-07,
+  "actions": 34,
+  "bones": 10,
+  "new_scenes": 0,
+  "no_save_performed": true
+}
