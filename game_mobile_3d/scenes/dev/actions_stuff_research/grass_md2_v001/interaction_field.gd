@@ -34,7 +34,7 @@ func _init()->void:
 	contact_weights.resize(SIZE*SIZE)
 	marked.resize(SIZE*SIZE);marked.fill(0)
 	pixels.resize(SIZE*SIZE*8);pixels.fill(0)
-	previous_pixels=pixels
+	previous_pixels=pixels.duplicate()
 	image=Image.create_from_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,pixels)
 	texture=ImageTexture.create_from_image(image)
 	previous_image=Image.create_from_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,previous_pixels)
@@ -42,7 +42,7 @@ func _init()->void:
 
 func reset()->void:
 	x.fill(0.);z.fill(0.);vx.fill(0.);vz.fill(0.);contact_weights.fill(0.);marked.fill(0);pixels.fill(0);active.clear()
-	previous_pixels=pixels;revision+=1
+	previous_pixels=pixels.duplicate();revision+=1
 	accumulator=0.;initialized=false
 	upload()
 
@@ -70,9 +70,9 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 	var planar:=Vector2(velocity.x,velocity.z)
 	var speed:=planar.length();var forward:=planar/maxf(speed,.00001)
 	for step in steps:
-		# Copy-on-write snapshot of the final two FIXED ticks, even at30FPS.
+		# Independent snapshot of the final two FIXED ticks, even at30FPS.
 		# The renderer follows the same delayed interpolation as the actor.
-		previous_pixels=pixels
+		previous_pixels=pixels.duplicate()
 		var at:=previous.lerp(point,float(step+1)/float(steps))
 		_stamp(at)
 		var ground_gain:=1.-smoothstep(.25,1.25,maxf(0.,at.y))
