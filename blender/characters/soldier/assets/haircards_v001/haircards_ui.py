@@ -73,7 +73,7 @@ class HC_PT_hair(bpy.types.Panel):
   for pair in [[('Front','Front'),('3/4','ThreeQuarter'),('Side','Side')],[('Back','Back'),('Back 3/4','BackThreeQuarter'),('Other side','OtherSide')]]:
    row=l.row(align=True)
    for label,direction in pair:row.operator('soldier_hair.view',text=label).direction=direction
-  l.separator();l.label(text='18 flat hair cards · 14 bandana cards',icon='INFO');l.label(text='Original hair preserved · Blender only')
+  l.separator();l.label(text='20 flat hair cards · 14 bandana cards',icon='INFO');l.label(text='Original hair preserved · Blender only')
 @persistent
 def loaded(_):
  global GUARD

@@ -71,6 +71,9 @@ for sign,label in [(1,'L'),(-1,'R')]:
  side('Hair / '+label+' lower flat flick',sign*.268,-.135,.127,1.414,1.644,19,16,[(0,0),(18,0),(18,9),(16,9),(16,12),(13,12),(13,15),(8,15),(8,13),(3,13),(3,10),(0,10)],3)
 front('Hair / rear lock A',-.249,.041,1.39,1.822,.252,21,31,[(0,2),(4,2),(4,0),(17,0),(17,2),(20,2),(20,24),(17,24),(17,27),(13,27),(13,30),(6,30),(6,28),(2,28),(2,25),(0,25)],1)
 front('Hair / rear lock B',-.020,.252,1.395,1.817,.264,20,30,[(0,0),(16,0),(16,1),(19,1),(19,24),(17,24),(17,27),(14,27),(14,29),(8,29),(8,27),(4,27),(4,25),(0,25)],2)
+# Two short flat crown tufts break the roof line without adding solid blocks.
+card('Hair / loose crown tuft A',[(-.210,-.06,1.830),(-.070,-.06,1.830),(-.070,-.04,1.870),(-.210,-.04,1.870)],10,3,[(0,1),(3,1),(3,0),(7,0),(7,1),(9,1),(9,2),(0,2)],seed=1)
+card('Hair / loose crown tuft B',[(.045,.10,1.834),(.160,.10,1.834),(.160,.12,1.863),(.045,.12,1.863)],8,3,[(0,1),(2,1),(2,0),(6,0),(6,1),(7,1),(7,2),(0,2)],seed=2)
 # Eight flat wrap facets follow the hair contour; zero solid thickness.
 points=[(-.242,-.272),(.242,-.272),(.273,-.241),(.273,.241),(.242,.273),(-.242,.273),(-.273,.241),(-.273,-.241)]
 for i,(a,b) in enumerate(zip(points,points[1:]+points[:1])):
@@ -82,9 +85,9 @@ card('Bandana / tie fold',[(-.025,.282,1.675),(.027,.282,1.684),(.018,.282,1.731
 def tail(label,sign):
  pts=[(sign*.014,.281,1.694),(sign*.063,.302,1.560),(sign*.108,.322,1.431 if sign>0 else 1.450)]
  for j,(a,b) in enumerate(zip(pts,pts[1:])):
-  dx=b[0]-a[0];dz=b[2]-a[2];length=math.hypot(dx,dz);rx=-dz/length*.027;rz=dx/length*.027
+  dx=b[0]-a[0];dz=b[2]-a[2];length=math.hypot(dx,dz);rx=-dz/length*.023;rz=dx/length*.023;ry=sign*.014
   # All four vertices of each segment are exactly coplanar.
-  verts=[(b[0]-rx,b[1],b[2]-rz),(b[0]+rx,b[1],b[2]+rz),(a[0]+rx,a[1],a[2]+rz),(a[0]-rx,a[1],a[2]-rz)]
+  verts=[(b[0]-rx,b[1]-ry,b[2]-rz),(b[0]+rx,b[1]+ry,b[2]+rz),(a[0]+rx,a[1]+ry,a[2]+rz),(a[0]-rx,a[1]-ry,a[2]-rz)]
   poly=None if j==0 else [(0,0),(3,0),(3,8),(2,8),(2,9),(0,9)]
   card('Bandana / Tail.'+label+' segment '+str(j+1),verts,4,10,poly,'bandana',j+(0 if sign>0 else 1))
 tail('L',-1);tail('R',1)
