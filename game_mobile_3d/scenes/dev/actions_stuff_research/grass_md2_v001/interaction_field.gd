@@ -15,9 +15,14 @@ var vz:=PackedFloat32Array()
 var marked:=PackedByteArray()
 var contact_weights:=PackedFloat32Array()
 var pixels:=PackedByteArray()
+var previous_pixels:=PackedByteArray()
 var active:=PackedInt32Array()
 var image:Image
 var texture:ImageTexture
+var previous_image:Image
+var previous_texture:ImageTexture
+var revision:=0
+var uploaded_revision:=-1
 var accumulator:=0.
 var previous:=Vector3.ZERO
 var initialized:=false
@@ -29,11 +34,15 @@ func _init()->void:
 	contact_weights.resize(SIZE*SIZE)
 	marked.resize(SIZE*SIZE);marked.fill(0)
 	pixels.resize(SIZE*SIZE*8);pixels.fill(0)
+	previous_pixels=pixels
 	image=Image.create_from_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,pixels)
 	texture=ImageTexture.create_from_image(image)
+	previous_image=Image.create_from_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,previous_pixels)
+	previous_texture=ImageTexture.create_from_image(previous_image)
 
 func reset()->void:
 	x.fill(0.);z.fill(0.);vx.fill(0.);vz.fill(0.);contact_weights.fill(0.);marked.fill(0);pixels.fill(0);active.clear()
+	previous_pixels=pixels;revision+=1
 	accumulator=0.;initialized=false
 	upload()
 
@@ -61,6 +70,9 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 	var planar:=Vector2(velocity.x,velocity.z)
 	var speed:=planar.length();var forward:=planar/maxf(speed,.00001)
 	for step in steps:
+		# Copy-on-write snapshot of the final two FIXED ticks, even at30FPS.
+		# The renderer follows the same delayed interpolation as the actor.
+		previous_pixels=pixels
 		var at:=previous.lerp(point,float(step+1)/float(steps))
 		_stamp(at)
 		var ground_gain:=1.-smoothstep(.25,1.25,maxf(0.,at.y))
@@ -96,10 +108,14 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 				active[i]=active[active.size()-1];active.resize(active.size()-1)
 			pixels.encode_half(index*8,x[index]);pixels.encode_half(index*8+2,z[index])
 			i-=1
+	revision+=steps
 	previous=point;update_usec=Time.get_ticks_usec()-start
 
 func upload()->void:
+	if uploaded_revision==revision:return
+	previous_image.set_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,previous_pixels);previous_texture.update(previous_image)
 	image.set_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,pixels);texture.update(image)
+	uploaded_revision=revision
 
 func sample_at(point:Vector2)->Vector2:
 	var cell:=(point+Vector2.ONE*EXTENT*.5)/CELL-Vector2.ONE*.5

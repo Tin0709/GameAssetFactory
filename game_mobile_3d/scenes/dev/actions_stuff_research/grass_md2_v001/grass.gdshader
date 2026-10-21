@@ -2,6 +2,8 @@ shader_type spatial;
 render_mode cull_disabled, diffuse_lambert, specular_disabled;
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
+uniform sampler2D interaction_previous : filter_linear, repeat_disable;
+uniform float interaction_alpha=1.0;
 uniform float wind_time=0.0;
 uniform float wind_strength=1.0;
 uniform float interaction_strength=1.25;
@@ -28,7 +30,9 @@ void vertex(){
 	vec2 wind=(direction*main_sway*(0.78+0.22*gust)
 		+crosswind*0.15*sin(wind_time*4.084070-spatial*0.36))*wind_strength*family_response;
 	vec2 uv=(root.xz+field_extent*0.5)/field_extent;
-	vec2 contact=textureLod(interaction_field,uv,0.0).rg*interaction_strength*mix(0.90,1.18,step(0.9,family_response));
+	vec2 contact=mix(textureLod(interaction_previous,uv,0.0).rg,
+		textureLod(interaction_field,uv,0.0).rg,interaction_alpha)
+		*interaction_strength*mix(0.90,1.18,step(0.9,family_response));
 	vec2 combined=wind+contact;
 	float angle=min(length(combined),1.32);
 	vec2 world_direction=combined/max(length(combined),0.00001);

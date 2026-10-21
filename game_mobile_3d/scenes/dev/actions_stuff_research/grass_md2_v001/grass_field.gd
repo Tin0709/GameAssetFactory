@@ -13,7 +13,6 @@ var short_count:=0
 var tall_count:=0
 var batch_count:=0
 var clock:=0.
-var upload_accumulator:=0.
 var enabled:=true
 var _atlases:Dictionary={}
 
@@ -83,7 +82,9 @@ func _mesh(entry:Dictionary,grass:bool)->ArrayMesh:
 				if m.get_shader_parameter("atlas")==_atlas(surface.atlas):found=m;break
 			if found==null:
 				found=ShaderMaterial.new();found.shader=GRASS_SHADER;found.set_shader_parameter("atlas",_atlas(surface.atlas))
-				found.set_shader_parameter("interaction_field",interaction.texture);found.set_shader_parameter("family_response",.72 if entry.family=="short" else 1.)
+				found.set_shader_parameter("interaction_field",interaction.texture)
+				found.set_shader_parameter("interaction_previous",interaction.previous_texture)
+				found.set_shader_parameter("family_response",.72 if entry.family=="short" else 1.)
 				materials.append(found)
 			material=found
 		else:
@@ -95,12 +96,15 @@ func _physics_process(delta:float)->void:
 	if is_instance_valid(player) and enabled:interaction.advance(delta,player.global_position,player.velocity)
 
 func _process(delta:float)->void:
-	clock+=delta;upload_accumulator+=delta
-	if upload_accumulator>=1./60.:
-		# At most once per rendered frame:30Hzon30FPSphones,60Hzfor smooth
-		# desktop contact. One32KiBbulk upload, never per-blade updates.
-		upload_accumulator=fmod(upload_accumulator,1./60.);interaction.upload()
+	clock+=delta
+	present(Engine.get_physics_interpolation_fraction())
 	for material in materials:material.set_shader_parameter("wind_time",clock)
+
+func present(alpha:float)->void:
+	# Publish only changed physics histories, never on an independent timer.
+	# The GPU blends them EVERY render frame without per-blade CPU work.
+	interaction.upload()
+	for material in materials:material.set_shader_parameter("interaction_alpha",clampf(alpha,0.,1.))
 
 func reset()->void:
 	interaction.reset()

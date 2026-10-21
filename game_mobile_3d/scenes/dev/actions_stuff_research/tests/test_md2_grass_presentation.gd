@@ -1,5 +1,5 @@
 extends SceneTree
-## Real field texture/uniform presentation at sub-physics render times.
+## Native renderer required: reads real uploaded field textures at sub-tick times.
 var failures:Array[String]=[]
 func _initialize():call_deferred("run")
 func shown(material:ShaderMaterial,col:int,row:int)->Vector2:
