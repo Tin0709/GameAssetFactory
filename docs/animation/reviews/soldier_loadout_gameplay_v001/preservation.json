@@ -1,0 +1,12 @@
+{
+  "checked": 433,
+  "changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
+  ],
+  "missing": [],
+  "allowed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
+  ]
+}

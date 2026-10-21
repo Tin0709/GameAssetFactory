@@ -1,0 +1,120 @@
+{
+  "test_rifle_fire_30": {
+    "camera_span_m": 0.0,
+    "failures": [],
+    "fps": 30,
+    "grip_error_m": 5.44477359198936e-07,
+    "lower_body_error": 0.0,
+    "passed": true,
+    "pool_misses": 0,
+    "recovered_pose_error": 0.0,
+    "shots": 159,
+    "support_error_m": 2.66976257989882e-07
+  },
+  "test_rifle_aim_gameplay_60": {
+    "arm_volume_error_m": 1.63912773132324e-07,
+    "camera_y_span": 0.0,
+    "failures": [],
+    "fps": 60,
+    "grip_error": 4.46802596343332e-06,
+    "max_arm_step_deg": 6.238944943568,
+    "max_weapon_step_m": 0.0370458476245403,
+    "ready_aim_max_arm_rotation_deg": 78.9240174822237,
+    "support_error_m": 3.84484610549407e-06
+  },
+  "test_soldier_loadout_60": {
+    "barrel_axis_error": 1.3838838697211e-07,
+    "bind_error": 0.0,
+    "failures": [],
+    "fps": 60,
+    "maximum_support_surface_gap_m": 0.00553352665156126,
+    "passed": true,
+    "pose_difference_from_old_loadout": 0.0
+  },
+  "test_rifle_combat_strafe_60": {
+    "aim_aligned_samples": 1061,
+    "back_seen": true,
+    "contact_pairs": 296,
+    "contact_step_m": 2.45756240246919e-07,
+    "failures": [],
+    "fps": 60,
+    "height_step_m": 0.0125000104308128,
+    "left_support_error_m": 3.03925247635561e-07,
+    "maximum_leg_step_deg": 15.3930129173501,
+    "maximum_source_pose_error": 3.03925247635561e-07,
+    "minimum_floor_m": -5.96046447753906e-08,
+    "passed": true,
+    "recent_action_branch": true,
+    "right_grip_error_m": 1.95994175555825e-07,
+    "side_seen": true,
+    "source_samples": 656
+  },
+  "test_rifle_auto_aim_60": {
+    "camera_y_span_m": 0.0016295313835144,
+    "failures": [],
+    "grip_error_m": 1.74413614217883e-07,
+    "passed": true,
+    "scan_count": 652,
+    "shots": 53,
+    "support_error_m": 2.7028258386963e-07
+  },
+  "test_rifle_fire_60": {
+    "camera_span_m": 0.0,
+    "failures": [],
+    "fps": 60,
+    "grip_error_m": 7.72932651216252e-07,
+    "lower_body_error": 0.0,
+    "passed": true,
+    "pool_misses": 0,
+    "recovered_pose_error": 0.0,
+    "shots": 159,
+    "support_error_m": 3.57627868652344e-07
+  },
+  "test_rifle_combat_strafe_30": {
+    "aim_aligned_samples": 534,
+    "back_seen": true,
+    "contact_pairs": 101,
+    "contact_step_m": 1.19209289550781e-07,
+    "failures": [],
+    "fps": 30,
+    "height_step_m": 0.0250000059604645,
+    "left_support_error_m": 2.73142802598159e-07,
+    "maximum_leg_step_deg": 29.1742719453065,
+    "maximum_source_pose_error": 3.01380367773163e-07,
+    "minimum_floor_m": -5.96046447753906e-08,
+    "passed": true,
+    "recent_action_branch": true,
+    "right_grip_error_m": 1.81280455535671e-07,
+    "side_seen": true,
+    "source_samples": 320
+  },
+  "test_rifle_auto_aim_30": {
+    "camera_y_span_m": 0.00162976980209351,
+    "failures": [],
+    "grip_error_m": 1.74413614217883e-07,
+    "passed": true,
+    "scan_count": 652,
+    "shots": 53,
+    "support_error_m": 2.7028258386963e-07
+  },
+  "test_rifle_aim_gameplay_30": {
+    "arm_volume_error_m": 1.63912773132324e-07,
+    "camera_y_span": 0.0,
+    "failures": [],
+    "fps": 30,
+    "grip_error": 4.13229281548411e-06,
+    "max_arm_step_deg": 12.4268769117725,
+    "max_weapon_step_m": 0.0731532648205757,
+    "ready_aim_max_arm_rotation_deg": 78.9240174822237,
+    "support_error_m": 3.93209984395071e-06
+  },
+  "test_soldier_loadout_30": {
+    "barrel_axis_error": 1.36571401299079e-07,
+    "bind_error": 0.0,
+    "failures": [],
+    "fps": 30,
+    "maximum_support_surface_gap_m": 0.00552210723981261,
+    "passed": true,
+    "pose_difference_from_old_loadout": 0.0
+  }
+}
