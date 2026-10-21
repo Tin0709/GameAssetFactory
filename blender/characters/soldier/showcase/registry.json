@@ -26,7 +26,15 @@
         "Back",
         "Right_Side",
         "Back_3Q"
-      ]
+      ],
+      "clothing_refinement": {
+        "status": "Pending",
+        "type": "worn_clothing",
+        "flat_cards": 35,
+        "same_existing_clothing_object": true,
+        "source_meshes_archived": true,
+        "guide": "assets/worn_clothing_v001"
+      }
     },
     {
       "id": "SOLDIER_Backpack_v001",

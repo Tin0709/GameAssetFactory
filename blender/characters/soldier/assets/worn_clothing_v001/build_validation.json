@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "same_pending_skin": true,
+  "body_vertices": 48,
+  "clothing_vertices": 308,
+  "clothing_faces": 185,
+  "clothing_triangles": 370,
+  "flat_cloth_tabs": 35,
+  "removed_finished_hem_faces": 48,
+  "retained_wrist_rings": true,
+  "source_meshes_archived": [
+    "Player_Cuboid_V6_Seamless_Mesh",
+    "Black shirt / readable external layer"
+  ],
+  "existing_actions": 34,
+  "existing_bones": 10,
+  "new_scenes": 0
+}
