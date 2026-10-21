@@ -20,6 +20,7 @@ def leave(context):
     scene.frame_start = original['frame_start']; scene.frame_end = original['frame_end']
     scene.frame_preview_start = original['frame_preview_start']; scene.frame_preview_end = original['frame_preview_end']
     scene.use_preview_range = original['use_preview_range']
+    if 'sync_mode' in original: scene.sync_mode = original['sync_mode']
     scene.frame_set(original['frame_current'])
     scene['md2_wind_view_active'] = False
 
@@ -52,13 +53,14 @@ def select(context, key):
             view.region_3d.view_perspective = 'CAMERA'; view.region_3d.view_camera_zoom = 0.
             view.overlay.show_overlays = False; view.show_region_ui = True; area.tag_redraw()
     if not scene.get('md2_wind_view_active'):
-        scene['md2_wind_return_timeline'] = json.dumps({k: getattr(scene,k) for k in info['original_timeline']})
+        scene['md2_wind_return_timeline'] = json.dumps({k: getattr(scene,k) for k in set(info['original_timeline']) | {'sync_mode'}})
         scene.use_preview_range = False
         scene.frame_start = 1
         scene.frame_end = max(scene.frame_end, round(info['duration_s'] * scene.render.fps / scene.render.fps_base))
         scene.frame_preview_start = 1
         scene.frame_preview_end = round(info['duration_s'] * scene.render.fps / scene.render.fps_base)
         scene.use_preview_range = True; scene.frame_set(1)
+    scene.sync_mode = 'FRAME_DROP'
     scene['md2_wind_view_active'] = True; scene['md2_wind_selected'] = key
     context.view_layer.update()
 

@@ -22,7 +22,7 @@ old_layers = [l.name for l in scene.view_layers]
 for name in old_layers:
     bpy.context.window.view_layer = scene.view_layers[name]; bpy.context.view_layer.update()
 baseline = snapshot(); (E / 'before_native.json').write_text(json.dumps(baseline, indent=2) + '\n')
-timeline = {k: getattr(scene, k) for k in ['frame_current', 'frame_start', 'frame_end', 'use_preview_range', 'frame_preview_start', 'frame_preview_end']}
+timeline = {k: getattr(scene, k) for k in ['frame_current', 'frame_start', 'frame_end', 'use_preview_range', 'frame_preview_start', 'frame_preview_end', 'sync_mode']}
 sources = [bpy.data.objects[n] for key in ['md2_review', 'md2_tall_review'] for n in json.loads(scene[key])['masters']]
 (E / 'source_grass_meshes.json').write_text(json.dumps({o.name: mesh_content(o.data) for o in sources}) + '\n')
 
