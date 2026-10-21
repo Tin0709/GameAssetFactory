@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "change": "Stronger cloth red on bandana wrap, tie and tails",
+  "changed_atlas_pixels": 2564,
+  "palette_before": [
+    [
+      113,
+      47,
+      38
+    ],
+    [
+      125,
+      53,
+      42
+    ],
+    [
+      101,
+      40,
+      33
+    ],
+    [
+      133,
+      58,
+      46
+    ]
+  ],
+  "palette_after": [
+    [
+      155,
+      40,
+      34
+    ],
+    [
+      171,
+      46,
+      37
+    ],
+    [
+      134,
+      32,
+      29
+    ],
+    [
+      184,
+      52,
+      41
+    ]
+  ],
+  "geometry_uv_and_hair_pixels_unchanged": true,
+  "binary_alpha_unchanged": true,
+  "wrap_width_m": 0.1035,
+  "status": "Pending"
+}
