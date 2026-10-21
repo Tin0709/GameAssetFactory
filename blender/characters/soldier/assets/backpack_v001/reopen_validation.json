@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "standalone_equipment": true,
+  "not_attached_or_worn": true,
+  "skin_geometry_uv_weights_rig_unchanged": true,
+  "closed_parts": true,
+  "one_mesh_one_material": true,
+  "packed_reference_atlas_review": true,
+  "actions_added": 0,
+  "review_scene": "SOLDIER_BACKPACK_REVIEW",
+  "registered_assets": 2,
+  "native_asset_thumbnail": true,
+  "safe_saved_layout": true
+}
