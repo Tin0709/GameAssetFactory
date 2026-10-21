@@ -1,0 +1,29 @@
+{
+  "before": {
+    "unique_colors": 44,
+    "adjacent_rgb_difference": 9.8384,
+    "mean_rgb": [
+      92.12,
+      67.25,
+      41.63
+    ]
+  },
+  "after": {
+    "unique_colors": 4,
+    "adjacent_rgb_difference": 0.0679,
+    "mean_rgb": [
+      93.44,
+      67.44,
+      40.44
+    ]
+  },
+  "old_triangles": 5760,
+  "new_triangles": 3744,
+  "old_parts": 404,
+  "new_parts": 236,
+  "texture_size": [
+    512,
+    512
+  ],
+  "nearest_filter_preserved": true
+}
