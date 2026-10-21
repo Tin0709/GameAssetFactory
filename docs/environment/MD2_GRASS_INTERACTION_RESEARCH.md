@@ -1,6 +1,6 @@
 # MD2 Grass Interaction v001 — research and Blender review
 
-Status: Pending; one new interaction candidate in the existing environment library. Wind v001 remains Pending and is preserved unchanged. No Godot gameplay/WorldMap integration in this task.
+Status: Pending. The original Blender study below preserves Wind v001 unchanged. A later explicit user request authorizes a30×30Godot field in the existing research lab; see the final section. Production WorldMap remains unchanged.
 
 ## Design contract and implementation plan
 
@@ -110,3 +110,17 @@ Results in `.validation/md2_grass_interaction_v001/verification.json`:
 These establish internal correctness on this desktop. Artistic quality awaits review; phone performance, complex terrain, many interactors and Godot shader integration remain untested and out of scope. Every pre-existing protected Blender/gameplay file is audited by SHA256; the only intended pre-existing Blender text changes are the shared UI registration and additive native catalog entry. Source-derived research assets remain development-only.
 
 Published readback passed the same native suite. SHA256 audit:8,879pre-existing protected files,8,877exact; only the authorized shared grass UI and catalog changed. All Godot files, other Blender libraries and Wind v001 folder bytes are exact. The updated existing launcher opened native Blender PID6688 with the Interaction layer/sidebar, playback enabled, frame1→49 in2.008s (24FPS target). This is native API/log confirmation of playback, not a screenshot of that window or phone-performance evidence. The existing source Wind and unrelated Soldier windows were not operated on. Candidate status remains Pending.
+
+## Authorized follow-up —30×30Godot field and jelly contact
+
+The user subsequently requested Godot integration:30×30blocks, full random tall/short coverage, stronger/faster wind and stronger player contact. Further steering requests an immediate, strong, liquid/jelly-like wobble which slows and fades, then still stronger/looser movement. These are artistic instructions, not independently verified MD2 internals.
+
+Implemented in the SAME `res://scenes/dev/ActionsStuffWalkRunTest.tscn`:900linked textured blocks and1,317clumps (718short/599tall), with every cell planted. Four regions×eight source variants use32MultiMeshes, two grass materials and static buffers. V gives a whole-field overview; the normal camera, original actor/rifle/zombie systems,2.70/~7.55m/smovement and6Hzinfinite fire remain. No extra scene/project or WorldMap change. Read-only Blender extraction preserves the current meshes/UVs/packed atlases. All runtime assets stay in the release-excluded dev root.
+
+The original shader uses broad~0.85Hzmain wind plus1.35/0.65Hzsecondary motion. A shared64×64worldXZfield combines contact with wind before bounded circular bending. Roots have zero weight; the combined angle is limited to1.32rad and culling bounds include its displacement. No per-clump scripts/physics or per-frame instance transform changes.
+
+Latest contact profile uses positive contact-rise kicks (about1.5×the first elastic pass),1.25×contact shader gain, damping ratio0.17and7.8–23/snatural frequency. Standing contact does not continually restart oscillation. Incoming velocity+kicks are capped at7.5rad/s BEFORE integration; restoring velocity is not claimed to have that strict bound. Under-damped reversals fade over a longer tail. R/teleports clear all state; jump height attenuates contact. Sparse active cells update at60Hz, one32KiBRGBA16Ftexture uploads at30Hz, shared by every clump. Wind continues through contact/recovery. Earlier Blender Wind/Interaction candidates remain unchanged.
+
+The old critical solver failed the new elastic-reversal contract; the replacement passed. Latest29field checks include population/root data, prompt bend, reversal, longer-tail decay, reset and30/60consistency. Existing Fire30/60, Combat Strafe and camera-comfort regressions pass. Frozen-time native GPU image pairs isolate Wind and contact. Six-second fixed-step gameplay recording retains180frames/6.00simulated seconds at30FPS; readback-heavy recording timings are not performance claims. Native desktop Mobile checks do not establish phone performance.
+
+Evidence: `.validation/md2_grass_gameplay30_v001/`. Source conservation covers8,914pre-existing Blender/game files; only the authorized lab scene/controller change. All .blendfiles, approved actor/weapon/zombie code, project main scene and WorldMap remain exact. [Runtime usage and details](../../game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/README.md). Visual review remains Pending.
