@@ -17,8 +17,12 @@ def leave(context):
         bpy.ops.screen.animation_cancel(restore_frame=False)
     original = json.loads(scene.get('md2_wind_return_timeline', json.dumps(info['original_timeline'])))
     scene.use_preview_range = False
-    scene.frame_start = original['frame_start']; scene.frame_end = original['frame_end']
+    # A disabled static preview range can lie outside the playback bounds.
+    # Restore its values before tightening those bounds to avoid RNA clamping.
+    scene.frame_start = min(original['frame_start'], original['frame_preview_start'])
+    scene.frame_end = max(original['frame_end'], original['frame_preview_end'])
     scene.frame_preview_start = original['frame_preview_start']; scene.frame_preview_end = original['frame_preview_end']
+    scene.frame_start = original['frame_start']; scene.frame_end = original['frame_end']
     scene.use_preview_range = original['use_preview_range']
     if 'sync_mode' in original: scene.sync_mode = original['sync_mode']
     scene.frame_set(original['frame_current'])
