@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "fresh_reopen": true,
+  "original_geometry_exact": true,
+  "rigid_weights_exact": true,
+  "head_touches_torso": true,
+  "mesh_vertices": 48,
+  "mesh_quads": 36,
+  "actions": 0,
+  "packed_review": true,
+  "candidate_only_saved": "/Users/tin/Desktop/Game Dev/GameAssetFactory/blender/characters/player/reviews/survivor_reference_v001/Survivor_Reference_v001.blend"
+}
