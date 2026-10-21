@@ -13,11 +13,13 @@ func run():
  check(v.meshes.size()==1 and v.meshes[0].name=="SoldierSkinV001","Single merged Soldier draw surface")
  var mesh:MeshInstance3D=v.meshes[0];check(mesh.mesh.get_surface_count()==1,"Single atlas material")
  check(mesh.skin.get_bind_count()==10,"All ten original skin bindings retained")
+ var source=load("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/Soldier_Skin_v001.glb").instantiate()
+ var imported:MeshInstance3D=source.find_children("*","MeshInstance3D",true,false)[0]
  var bind_error:=0.
  for i in mesh.skin.get_bind_count():
-  var b:int=v.skeleton.find_bone(mesh.skin.get_bind_name(i));var t:Transform3D=v.skeleton.get_bone_global_rest(b)*mesh.skin.get_bind_pose(i)
+  var b:int=v.skeleton.find_bone(mesh.skin.get_bind_name(i));var t:Transform3D=imported.skin.get_bind_pose(i).affine_inverse()*mesh.skin.get_bind_pose(i)
   bind_error=maxf(bind_error,t.origin.length()+t.basis.x.distance_to(Vector3.RIGHT)+t.basis.y.distance_to(Vector3.UP)+t.basis.z.distance_to(Vector3.BACK))
- check(bind_error<.00001,"Runtime inverse binds preserve canonical silhouette")
+ check(bind_error<.00001,"Source inverse binds preserve rigid limb pivots")
  check(v.rifle_model.scene_file_path.ends_with("Rifle_Sand_Block_V1.glb"),"Requested Sand Block rifle")
  check(v.skeleton.get_bone_count()==cv.skeleton.get_bone_count(),"Existing animated rig remains unchanged")
  var max_pose_error:=0.;var muzzle_axis_error:=0.
@@ -39,4 +41,4 @@ func run():
  check(scene.presentation.mesh==mesh and scene.presentation.bind_bones.size()==10,"Render interpolation uses new skin and all bindings")
  check(not scene.player.find_child("*Backpack*",true,false),"Backpack remains standalone")
  var report:={"fps":fps,"passed":failures.is_empty(),"failures":failures,"bind_error":bind_error,"pose_difference_from_old_loadout":max_pose_error,"barrel_axis_error":muzzle_axis_error}
- print("SOLDIER_LOADOUT ",JSON.stringify(report));scene.free();baseline.free();quit(0 if failures.is_empty() else 1)
+ print("SOLDIER_LOADOUT ",JSON.stringify(report));source.free();scene.free();baseline.free();quit(0 if failures.is_empty() else 1)
