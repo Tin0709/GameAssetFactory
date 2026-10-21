@@ -28,7 +28,7 @@ PRESETS={
  'Death_Stunned':dict(duration=3.,loop=False,target=dict(open_l=1.28,open_r=1.28,brow_l=.55,brow_r=.55,pupil_scale=.69)),
 }
 SITUATIONS={'Idle':8.,'Walk':4.,'Run':4.,'Rifle Ready Idle':7.2,'Aim':4.8,'Fire':3.6,'Jump':2.4,'Landing':2.2,'Hurt':3.6,'Low Health':4.}
-BASE={'Idle':'Neutral_Idle','Walk':'Move_Effort_Light','Run':'Run_Effort','Rifle Ready Idle':'Enemy_Nearby','Aim':'Focused_Aim','Fire':'Focused_Aim','Jump':'Neutral_Idle','Landing':'Neutral_Idle','Hurt':'Enemy_Nearby','Low Health':'Low_HP_Tense'}
+BASE={'Idle':'Neutral_Idle','Walk':'Move_Effort_Light','Run':'Run_Effort','Rifle Ready Idle':'Enemy_Nearby','Aim':'Focused_Aim','Fire':'Focused_Aim','Jump':'Neutral_Idle','Landing':'Neutral_Idle','Hurt':'Focused_Aim','Low Health':'Low_HP_Tense'}
 EVENTS={'Fire_Recoil_Face':(.1666666667,.025,.0167,20),'Jump_Focus':(.38,.055,.10,30),'Land_Impact':(.33,.035,.045,40),'Hurt_Light':(.46,.045,.09,60),'Hurt_Heavy':(.70,.065,.14,80),'Death_Stunned':(1.15,.09,.60,100)}
 
 def clamp(x,a,b):return min(b,max(a,x))

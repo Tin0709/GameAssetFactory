@@ -11,6 +11,21 @@ for curve in face.data.shape_keys.animation_data.drivers:
  if '**3' in curve.driver.expression:
   term='min(1,max(0,b*i+a*u))';curve.driver.expression='*'.join([term]*3)
 assert all(d.driver.is_simple_expression for d in face.data.shape_keys.animation_data.drivers)
+asset=bpy.data.collections['SOLDIER_Facial_Expressions_PENDING']
+
+head_frame=bpy.data.objects.get('SF_Head_Frame')
+if head_frame is None:
+ head_frame=bpy.data.objects.new('SF_Head_Frame',None);asset.objects.link(head_frame)
+ c=head_frame.constraints.new('COPY_TRANSFORMS');c.name='Follow Head only / preview camera';c.target=rig;c.subtarget='Head'
+ target=bpy.data.objects.new('SF_Face_Target',None);asset.objects.link(target);target.parent=head_frame;target.location=(0,.225,0)
+else:target=bpy.data.objects['SF_Face_Target']
+for camera_name in ['SF_Front_Close','SF_ThreeQuarter_Close','SF_Side_Close']:
+ cam=bpy.data.objects[camera_name]
+ if not cam.constraints:
+  c=cam.constraints.new('TRACK_TO');c.target=target;c.track_axis='TRACK_NEGATIVE_Z';c.up_axis='UP_Y'
+
+for name,preset in model.PRESETS.items():fb.face_action('SOLDIER_Face_Preset_'+name,ctrl,'preset',name,preset['duration'])
+for name,duration in model.SITUATIONS.items():fb.face_action('SOLDIER_Face_Situation_'+name.replace(' ','_'),ctrl,'situation',name,duration)
 reel=fb.face_action('SOLDIER_Facial_Review_Reel',ctrl,'reel','REVIEW_REEL',model.REEL_DURATION)
 fb.body_action(rig,weapon,'reel','REVIEW_REEL',model.REEL_DURATION)
 for obj,name in [(rig,'SF_Review_Reel_Body'),(weapon,'SF_Review_Reel_Weapon')]:

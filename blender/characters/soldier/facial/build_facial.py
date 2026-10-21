@@ -159,6 +159,18 @@ camera('SF_Front_Close',(0,-5,1.63),(0,0,1.60),.69)
 camera('SF_ThreeQuarter_Close',(-2.7,-5,2.4),(0,-.03,1.59),.80)
 camera('SF_Side_Close',(-5,-.4,1.85),(0,0,1.59),.78)
 camera('SF_Gameplay_Distance',(-6,-8,6),(0,-.05,.96),12.8)
+
+head_frame=bpy.data.objects.get('SF_Head_Frame')
+if head_frame is None:
+ head_frame=bpy.data.objects.new('SF_Head_Frame',None);asset.objects.link(head_frame)
+ c=head_frame.constraints.new('COPY_TRANSFORMS');c.name='Follow Head only / preview camera';c.target=rig;c.subtarget='Head'
+ target=bpy.data.objects.new('SF_Face_Target',None);asset.objects.link(target);target.parent=head_frame;target.location=(0,.225,0)
+else:target=bpy.data.objects['SF_Face_Target']
+for camera_name in ['SF_Front_Close','SF_ThreeQuarter_Close','SF_Side_Close']:
+ cam=bpy.data.objects[camera_name]
+ if not cam.constraints:
+  c=cam.constraints.new('TRACK_TO');c.target=target;c.track_axis='TRACK_NEGATIVE_Z';c.up_axis='UP_Y'
+
 registry['entries']=[e for e in registry['entries'] if e['id']!='SOLDIER_Facial_System_v001']
 registry['entries'].append({'id':'SOLDIER_Facial_System_v001','label':'Facial Expressions','status':'Pending','type':'facial','collection':asset.name,'review_scene':scene.name,'view_layer':layer.name,'object':ctrl.name,'controller':ctrl.name,'face':face.name,'presets':list(model.PRESETS),'situations':list(model.SITUATIONS),'original_face_design':True,'research_body_previews':True})
 scene['soldier_registry']=json.dumps(registry);scene['sf_selected_preset']=0;scene['sf_mode']='preset';scene['sf_situation']='Idle';scene['sf_loop']=True

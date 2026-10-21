@@ -76,7 +76,7 @@ def _base_preview_pose(key,t,kind='situation'):
  if kind=='preset':
   mapping={'Move_Effort_Light':'Walk','Run_Effort':'Run','Focused_Aim':'Aim','Fire_Recoil_Face':'FirePreset','Enemy_Nearby':'Rifle Ready Idle','Jump_Focus':'Jump','Land_Impact':'Landing'}
   mode=mapping.get(key,'Idle')
- else:mode={'Hurt':'Rifle Ready Idle','Low Health':'Idle'}.get(key,key)
+ else:mode={'Hurt':'Aim','Low Health':'Idle'}.get(key,key)
  if mode=='FirePreset':
   phase=t-.5
   if 0<=phase<1/6:return source_pose('Fire',phase)
@@ -126,7 +126,7 @@ def body_action(rig,weapon,kind,key,duration):
   wm=poses.get('Weapon') or Matrix.Identity(4);p,q,s=wm.decompose()
   if kind=='reel':
    _,reel_key,_,_=model.reel_position(t)
-   if reel_key not in ['Rifle Ready Idle','Aim','Fire','Focused_Aim','Fire_Recoil_Face','Enemy_Nearby']:s=Vector((0,0,0))
+   if reel_key not in ['Rifle Ready Idle','Aim','Fire','Focused_Aim','Fire_Recoil_Face','Enemy_Nearby','Hurt']:s=Vector((0,0,0))
   if 'Weapon' in previous and q.dot(previous['Weapon'])<0:q.negate()
   previous['Weapon']=q.copy()
   for path,value in [('location',p),('rotation_quaternion',q),('scale',s)]:weapon_channels[path].append(list(value))
@@ -134,7 +134,7 @@ def body_action(rig,weapon,kind,key,duration):
  action['preview_only']=True;assign(rig,action)
  action=action_channels('SF_Preview_Live_Weapon',weapon,weapon_channels,frames,'Actual Sand Block rifle compatibility preview')
  action['preview_only']=True;weapon.rotation_mode='QUATERNION';assign(weapon,action)
- weapon.hide_render=not (kind=='reel' or key in ['Rifle Ready Idle','Aim','Fire','Focused_Aim','Fire_Recoil_Face','Enemy_Nearby'])
+ weapon.hide_render=not (kind=='reel' or key in ['Rifle Ready Idle','Aim','Fire','Focused_Aim','Fire_Recoil_Face','Enemy_Nearby','Hurt'])
  weapon.hide_set(weapon.hide_render)
  for child in weapon.children_recursive:child.hide_render=weapon.hide_render
  scene.frame_set(old_frame)
