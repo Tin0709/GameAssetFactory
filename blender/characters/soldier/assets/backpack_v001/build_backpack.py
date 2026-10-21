@@ -200,6 +200,8 @@ for sign in [-1,1]:
     box('handle upright '+str(sign),(sign*.062,.057,.690),(.021,.032,.040),'leather')
 box('top carry handle',(0,.057,.710),(.145,.035,.021),'leather')
 
+# Reference side silhouette is relatively compact; retain real depth with broad straps.
+vertices=[(x*.94,y*.60,z) for x,y,z in vertices]
 mesh=bpy.data.meshes.new('BPK_Standalone backpack mesh')
 mesh.from_pydata(vertices,[],faces);mesh.update()
 obj=bpy.data.objects.new('BPK_Backpack_v001',mesh);asset.objects.link(obj)
@@ -280,6 +282,7 @@ for screen in bpy.data.screens:
 reference=bpy.data.images.load(str(HERE/'primary_reference.png'))
 reference.name='BPK_PRIMARY backpack reference';reference.pack();reference.use_fake_user=True
 mesh.calc_loop_triangles()
+bpy.context.view_layer.update()
 entry={'id':'SOLDIER_Backpack_v001','label':'Survival Backpack / supplied reference','status':'Pending','type':'equipment','collection':asset.name,'object':obj.name,'review_scene':review.name,'standalone':True,'attached_to_character':False,'cameras':['BPK_'+v for v in views],'dimensions_m':[float(v) for v in obj.dimensions]}
 registry['entries'].append(entry);library['soldier_registry']=json.dumps(registry)
 library['active_equipment_review']=review.name
