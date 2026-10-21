@@ -1,0 +1,17 @@
+{
+	"directional_chest_peaks_deg": [
+		3.54863268068635,
+		3.54863268068635,
+		3.54863268068635,
+		3.54863268068635
+	],
+	"failures": [],
+	"fixed_actor_nodes": 30,
+	"knockback_peak_mps": 1.60000026226044,
+	"lower_body_error": 0.000000178813934326172,
+	"passed": true,
+	"physics_hz": 60,
+	"recovery_at_400ms_deg": 0.0,
+	"render_fps": 30,
+	"sustained_burst_peak_deg": 6.77350628386446
+}

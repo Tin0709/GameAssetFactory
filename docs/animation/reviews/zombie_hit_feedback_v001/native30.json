@@ -1,0 +1,17 @@
+{
+	"engine_process_p95_ms": 34.835,
+	"fixed_feedback_children": 20,
+	"kills": 4,
+	"max_corpses": 2,
+	"max_live_reaction_deg": 4.73151707110431,
+	"native_renderer": "mobile",
+	"nonlethal_seen": true,
+	"passed": true,
+	"physics_hz": 60,
+	"physics_p95_ms": 5.231,
+	"pool_misses": 0,
+	"shots": 41,
+	"target_fps": 30,
+	"wall_frame_median_ms": 33.347,
+	"wall_frame_p95_ms": 34.27
+}

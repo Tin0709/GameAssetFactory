@@ -1,0 +1,56 @@
+[
+  {
+    "name": "hit30",
+    "returncode": 0,
+    "passed": true,
+    "seconds": 4.2,
+    "summary": [
+      "ZOMBIE_HIT_FEEDBACK {\"directional_chest_peaks_deg\":[3.54863268068635,3.54863268068635,3.54863268068635,3.54863268068635],\"failures\":[],\"fixed_actor_nodes\":30,\"knockback_peak_mps\":1.60000002384186,\"lower_body_error\":0.000000178813934326172,\"passed\":true,\"physics_hz\":60,\"recovery_at_400ms_deg\":0.0,\"render_fps\":30,\"sustained_burst_peak_deg\":6.77350628386446}"
+    ]
+  },
+  {
+    "name": "combat",
+    "returncode": 0,
+    "passed": true,
+    "seconds": 7.8,
+    "summary": [
+      "ZOMBIE_COMBAT {\"corpse_lifetime\":1.2,\"failures\":[],\"impulse\":\"(-10.82494, 16.11466, -237.6261)\",\"maximum_anchor_error_m\":0.0384464487433434,\"maximum_ragdolls\":4,\"minimum_corner_y\":-0.0747184008359909,\"native_ground_contact\":true,\"passed\":true,\"physics_hz\":60,\"source_attack_triggers\":8}"
+    ]
+  },
+  {
+    "name": "autoaim",
+    "returncode": 0,
+    "passed": true,
+    "seconds": 12.8,
+    "summary": [
+      "RIFLE_AUTO_AIM {\"camera_y_span_m\":0.00164270401000977,\"failures\":[],\"grip_error_m\":0.000000151962623817781,\"passed\":true,\"scan_count\":652,\"shots\":53,\"support_error_m\":0.000000239464014839541}"
+    ]
+  },
+  {
+    "name": "fire",
+    "returncode": 0,
+    "passed": true,
+    "seconds": 3.7,
+    "summary": [
+      "RIFLE_FIRE {\"camera_span_m\":0.0,\"failures\":[],\"fps\":30,\"grip_error_m\":0.000000544477359198936,\"lower_body_error\":0.0,\"passed\":true,\"pool_misses\":0,\"recovered_pose_error\":0.0,\"shots\":159,\"support_error_m\":0.000000266976257989882}"
+    ]
+  },
+  {
+    "name": "strafe30",
+    "returncode": 0,
+    "passed": true,
+    "seconds": 6.7,
+    "summary": [
+      "RIFLE_COMBAT_STRAFE {\"aim_aligned_samples\":534,\"back_seen\":true,\"contact_pairs\":101,\"contact_step_m\":0.000000119209289550781,\"failures\":[],\"fps\":30,\"height_step_m\":0.0250000059604645,\"left_support_error_m\":0.00000027516759359969,\"maximum_leg_step_deg\":29.1742719453065,\"maximum_source_pose_error\":0.000000301380367773163,\"minimum_floor_m\":-0.0000000596046447753906,\"passed\":true,\"recent_action_branch\":true,\"right_grip_error_m\":0.000000191408886962563,\"side_seen\":true,\"source_samples\":320}"
+    ]
+  },
+  {
+    "name": "strafe60",
+    "returncode": 0,
+    "passed": true,
+    "seconds": 10.3,
+    "summary": [
+      "RIFLE_COMBAT_STRAFE {\"aim_aligned_samples\":1061,\"back_seen\":true,\"contact_pairs\":296,\"contact_step_m\":0.000000245756240246919,\"failures\":[],\"fps\":60,\"height_step_m\":0.0125000104308128,\"left_support_error_m\":0.000000303925247635561,\"maximum_leg_step_deg\":15.3930129173501,\"maximum_source_pose_error\":0.000000303925247635561,\"minimum_floor_m\":-0.0000000596046447753906,\"passed\":true,\"recent_action_branch\":true,\"right_grip_error_m\":0.000000195994175555825,\"side_seen\":true,\"source_samples\":656}"
+    ]
+  }
+]
