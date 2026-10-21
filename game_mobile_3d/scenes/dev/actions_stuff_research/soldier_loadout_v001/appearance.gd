@@ -101,7 +101,7 @@ func request_expression(key:String):face_state.request(key)
 func advance_face(delta:float,state:String,low_hp:float,dead:bool):
  channels=face_state.advance(delta,state,low_hp,dead)
  for side in ["L","R"]:
-  var small:=side.to_lower();var opened:float=channels["open_"+small]
+  var small:String=side.to_lower();var opened:float=channels["open_"+small]
   var blink:=clampf(channels.blink+channels.blink_auto,0.,1.);var effective:=opened*(1.-blink)
   _shape("Close_"+side,1.-effective);_shape("GazeX_"+side,channels.gaze_x)
   _shape("GazeUp_"+side,maxf(0.,channels.gaze_y)*effective);_shape("GazeDown_"+side,maxf(0.,-channels.gaze_y)*effective)
