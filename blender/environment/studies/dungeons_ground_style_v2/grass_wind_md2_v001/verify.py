@@ -10,7 +10,7 @@ from mathutils import Vector
 D = Path(__file__).resolve().parent; P = D.parent; R = D.parents[4]
 E = R / '.validation/md2_grass_wind_v001'
 sys.path[:0] = [str(D), str(P), str(P / 'tall_grass_md2_v001')]
-from flower_preservation import compare, mesh_content, snapshot
+from flower_preservation import compare, mesh_content, snapshot, rna_values
 from wind_nodes import CONTROLS
 import grass_library_ui as static_ui
 import wind_review_ui as ui
@@ -22,8 +22,10 @@ target = Path(sys.argv[sys.argv.index('--') + 1]) if '--' in sys.argv else E / '
 bpy.ops.wm.open_mainfile(filepath=str(E / 'before.blend'))
 bpy.context.scene.frame_set(78)
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
-    bpy.context.window.view_layer = bpy.context.scene.view_layers[name]; bpy.context.view_layer.update()
+    bpy.context.window.view_layer = bpy.context.scene.view_layers[name]
+    bpy.context.scene.update_tag(); bpy.context.scene.frame_set(78); bpy.context.view_layer.update()
 baseline = snapshot()
+baseline_rna = {o.name:rna_values(o) for o in bpy.data.objects}
 (E / 'before_reopened_native.json').write_text(json.dumps(baseline,indent=2)+'\n')
 bpy.ops.wm.open_mainfile(filepath=str(target)); scene = bpy.context.scene
 static_ui.register(); info = ui.record(); controller = bpy.data.objects[info['controller']]
@@ -32,7 +34,8 @@ for name, expected in original_meshes.items():
     assert json.loads(json.dumps(mesh_content(bpy.data.objects[name].data))) == expected, name
 scene.frame_set(info['original_timeline']['frame_current'])
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
-    bpy.context.window.view_layer = scene.view_layers[name]; bpy.context.view_layer.update()
+    bpy.context.window.view_layer = scene.view_layers[name]
+    scene.update_tag(); scene.frame_set(78); bpy.context.view_layer.update()
 errors = compare(baseline)
 assert not errors, errors
 
@@ -138,8 +141,11 @@ for key in routes:
 static_ui.select(bpy.context, 'All')
 for key, expected in info['original_timeline'].items(): assert getattr(scene, key) == expected, (key, getattr(scene,key), expected)
 for name in ['ViewLayer', 'Short Grass MD2', 'Tall Grass MD2']:
-    bpy.context.window.view_layer = scene.view_layers[name]; bpy.context.view_layer.update()
+    bpy.context.window.view_layer = scene.view_layers[name]
+    scene.update_tag(); scene.frame_set(78); bpy.context.view_layer.update()
 errors = compare(baseline)
+if errors:
+    print('PRESERVATION_COMPONENTS',[(name,{k:[v,rna_values(bpy.data.objects[name]).get(k)] for k,v in baseline_rna[name].items() if v!=rna_values(bpy.data.objects[name]).get(k)}) for group,name in errors[:2] if group=='objects'],flush=True)
 assert not errors, errors
 report = {'passed': True, 'original_assets_exact': True, 'native_preservation_errors': errors,
           'root_error_m':root_error,'ring_width_error_m':width_error,'max_default_displacement_sampled_m':largest,

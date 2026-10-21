@@ -15,7 +15,7 @@ def leave(context):
     info = record()
     if context.screen.is_animation_playing:
         bpy.ops.screen.animation_cancel(restore_frame=False)
-    original = info['original_timeline']
+    original = json.loads(scene.get('md2_wind_return_timeline', json.dumps(info['original_timeline'])))
     scene.use_preview_range = False
     scene.frame_start = original['frame_start']; scene.frame_end = original['frame_end']
     scene.frame_preview_start = original['frame_preview_start']; scene.frame_preview_end = original['frame_preview_end']
@@ -52,7 +52,9 @@ def select(context, key):
             view.region_3d.view_perspective = 'CAMERA'; view.region_3d.view_camera_zoom = 0.
             view.overlay.show_overlays = False; view.show_region_ui = True; area.tag_redraw()
     if not scene.get('md2_wind_view_active'):
+        scene['md2_wind_return_timeline'] = json.dumps({k: getattr(scene,k) for k in info['original_timeline']})
         scene.use_preview_range = False
+        scene.frame_start = 1
         scene.frame_end = max(scene.frame_end, round(info['duration_s'] * scene.render.fps / scene.render.fps_base))
         scene.frame_preview_start = 1
         scene.frame_preview_end = round(info['duration_s'] * scene.render.fps / scene.render.fps_base)
