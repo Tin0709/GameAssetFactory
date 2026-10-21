@@ -44,10 +44,11 @@ def action_channels(name,obj,channels,frames,description,asset=False):
  return action
 
 def face_action(name,ctrl,kind,key,duration,from_face=None):
- frames=list(range(-3 if from_face is not None else 1,round(duration*30)+2));channels={f'["{k}"]':[] for k in model.NEUTRAL}
+ start=5 if from_face is not None else 1
+ frames=list(range(1,round(duration*30)+start+1));channels={f'["{k}"]':[] for k in model.NEUTRAL}
  for frame in frames:
-  t=max(0.,(frame-1)/30);c=model.evaluate_preset(key,t) if kind=='preset' else model.evaluate_situation(key,t) if kind=='situation' else model.evaluate_reel(t)
-  if from_face is not None and frame<1:c=model.blend(from_face,c,model.smooth((frame+3)/4))
+  t=max(0.,(frame-start)/30);c=model.evaluate_preset(key,t) if kind=='preset' else model.evaluate_situation(key,t) if kind=='situation' else model.evaluate_reel(t)
+  if from_face is not None and frame<start:c=model.blend(from_face,c,model.smooth((frame-1)/4))
   for k,v in c.items():channels[f'["{k}"]'].append(v)
  a=action_channels(name,ctrl,channels,frames,'Original Soldier '+kind+': '+key,not name.endswith('Live_Face'))
  a['duration_s']=duration;a['preset']=key;a['kind']=kind;a['original_facial_animation']=True
@@ -107,15 +108,16 @@ def preview_pose(key,t,kind='situation'):
 
 def body_action(rig,weapon,kind,key,duration,entry=False):
  scene=bpy.data.scenes['SOLDIER_ASSET_LIBRARY'];old_frame=scene.frame_current
- channels={};weapon_channels={'location':[],'rotation_quaternion':[],'scale':[]};frames=list(range(-3 if entry else 1,round(duration*30)+2));previous={}
+ start=5 if entry else 1
+ channels={};weapon_channels={'location':[],'rotation_quaternion':[],'scale':[]};frames=list(range(1,round(duration*30)+start+1));previous={}
  captured={bone.name:bone.matrix.copy() for bone in rig.pose.bones};captured['Weapon']=weapon.matrix_world.copy()
  # No action/constraint writer competes while native basis channels are sampled.
  rig.animation_data_create();rig.animation_data.action=None
  for p in rig.pose.bones:p.rotation_mode='QUATERNION'
  for frame in frames:
-  t=max(0.,(frame-1)/30);poses=preview_pose(key,t,kind)
+  t=max(0.,(frame-start)/30);poses=preview_pose(key,t,kind)
   # One-time entry lives BEFORE the canonical loop, not in every repetition.
-  if entry and frame<1:poses=mix_poses(captured,poses,model.smooth((frame+3)/4))
+  if entry and frame<start:poses=mix_poses(captured,poses,model.smooth((frame-1)/4))
   # Short preset reviews have different lengths from the source idle/gait.
   # Close only their preview seam; source pose sampling itself stays at1x.
   if kind=='preset' and t>duration-.16:poses=mix_poses(poses,preview_pose(key,0.,kind),model.smooth((t-duration+.16)/.16))

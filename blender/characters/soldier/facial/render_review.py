@@ -12,10 +12,10 @@ if args.view=='stills':
  scene.render.resolution_x=scene.render.resolution_y=512;scene.render.image_settings.media_type='IMAGE';scene.render.image_settings.file_format='PNG'
  times={'Neutral_Idle':.7,'Blink_Soft':.575,'Look_Left':.65,'Look_Right':.65,'Look_Down_Short':.5,'Alert':.6,'Focused_Aim':.65,'Fire_Recoil_Face':.5333,'Enemy_Nearby':1.,'Move_Effort_Light':.75,'Run_Effort':.75,'Jump_Focus':.45,'Land_Impact':.30,'Hurt_Light':.32,'Hurt_Heavy':.38,'Low_HP_Tense':1.,'Victory_Small':.8,'Death_Stunned':.5}
  for name,t in times.items():
-  ui.select(bpy.context,'preset',name);scene.soldier_facial.auto_blink=False;scene.frame_set(round(t*30)+1);scene.camera=bpy.data.objects['SF_Front_Close'];scene.render.filepath=str(out/(name+'.png'));bpy.ops.render.render(write_still=True)
+  ui.select(bpy.context,'preset',name);scene.soldier_facial.auto_blink=False;scene.frame_set(round(t*30)+5);scene.camera=bpy.data.objects['SF_Front_Close'];scene.render.filepath=str(out/(name+'.png'));bpy.ops.render.render(write_still=True)
  for name in ['Neutral_Idle','Alert','Focused_Aim','Hurt_Heavy']:
-  ui.select(bpy.context,'preset',name);scene.soldier_facial.auto_blink=False;scene.frame_set(round(times[name]*30)+1);scene.camera=bpy.data.objects['SF_ThreeQuarter_Close'];scene.render.filepath=str(out/(name+'_3Q.png'));bpy.ops.render.render(write_still=True)
- ui.select(bpy.context,'situation','Aim');scene.frame_set(31);scene.camera=bpy.data.objects['SF_Side_Close'];scene.render.filepath=str(out/'Aim_side.png');bpy.ops.render.render(write_still=True)
+  ui.select(bpy.context,'preset',name);scene.soldier_facial.auto_blink=False;scene.frame_set(round(times[name]*30)+5);scene.camera=bpy.data.objects['SF_ThreeQuarter_Close'];scene.render.filepath=str(out/(name+'_3Q.png'));bpy.ops.render.render(write_still=True)
+ ui.select(bpy.context,'situation','Aim');scene.frame_set(35);scene.camera=bpy.data.objects['SF_Side_Close'];scene.render.filepath=str(out/'Aim_side.png');bpy.ops.render.render(write_still=True)
 else:
  fb.assign(ctrl,bpy.data.actions['SOLDIER_Facial_Review_Reel']);fb.assign(rig,bpy.data.actions['SF_Review_Reel_Body']);fb.assign(weapon,bpy.data.actions['SF_Review_Reel_Weapon']);ctrl['auto_blink']=1.;ctrl['intensity']=1.;ctrl['look_x']=ctrl['look_y']=0.
  weapon.hide_render=False;weapon.hide_set(False)

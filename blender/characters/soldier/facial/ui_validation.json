@@ -7,5 +7,6 @@
   "maximum_pupil_escape_m": 2.384185791015625e-07,
   "no_action_accumulation": true,
   "same_library_scene": true,
-  "native_simple_drivers": true
+  "native_simple_drivers": true,
+  "one_time_entry_then_clean_loop": true
 }

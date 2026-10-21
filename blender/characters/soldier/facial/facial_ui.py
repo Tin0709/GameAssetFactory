@@ -30,11 +30,11 @@ def select(context,kind,key,autoplay=False):
   duration=model.PRESETS[key]['duration'] if kind=='preset' else model.SITUATIONS[key] if kind=='situation' else model.REEL_DURATION
   fb.assign(ctrl,fb.face_action('SF_Preview_Live_Face',ctrl,kind,key,duration,current))
   fb.body_action(bpy.data.objects['SF_Soldier_Rig'],bpy.data.objects['SF_Rifle_Sand_Block_V1'],kind,key,duration,entry=True)
-  scene.frame_start=-3;scene.frame_end=round(duration*30);scene['sf_entry_pending']=True
+  scene.frame_start=1;scene.frame_end=round(duration*30)+4;scene['sf_loop_start']=5;scene['sf_entry_pending']=True
   if kind=='preset':props.loop=model.PRESETS[key]['loop'];props.index=list(model.PRESETS).index(key);props.situation='EXPRESSION'
   else:props.loop=key not in ['Jump','Landing','Hurt','REVIEW_REEL'];props.situation=key
   scene['sf_selected_preset']=props.index;scene['sf_mode']=kind;scene['sf_situation']=key;scene['sf_loop']=props.loop
-  scene.frame_set(-3);scene.camera=bpy.data.objects.get(scene.get('sf_camera','SF_Front_Close'),bpy.data.objects['SF_Front_Close'])
+  scene.frame_set(1);scene.camera=bpy.data.objects.get(scene.get('sf_camera','SF_Front_Close'),bpy.data.objects['SF_Front_Close'])
   for area in context.window.screen.areas:
    if area.type=='VIEW_3D':area.spaces.active.region_3d.view_perspective='CAMERA';area.spaces.active.show_region_ui=True;area.tag_redraw()
   if autoplay and not bpy.app.background and not context.screen.is_animation_playing:bpy.ops.screen.animation_play()
@@ -83,7 +83,7 @@ class SF_OT_play(bpy.types.Operator):
 class SF_OT_restart(bpy.types.Operator):
  bl_idname='soldier_face.restart';bl_label='Restart'
  def execute(self,context):
-  scene=show_layer(context);scene['sf_entry_pending']=False;scene.frame_start=1;scene.frame_set(1);return {'FINISHED'}
+  scene=show_layer(context);scene['sf_entry_pending']=False;scene.frame_start=int(scene.get('sf_loop_start',1));scene.frame_set(scene.frame_start);return {'FINISHED'}
 class SF_OT_neutral(bpy.types.Operator):
  bl_idname='soldier_face.neutral';bl_label='Reset to Neutral'
  def execute(self,context):
@@ -120,8 +120,8 @@ class SF_PT_facial(bpy.types.Panel):
 @persistent
 def frame_changed(scene,depsgraph=None):
  if _GUARD or not available() or scene!=main():return
- if scene.get('sf_entry_pending',False) and scene.frame_current>=1:
-  scene.frame_start=1;scene['sf_entry_pending']=False
+ if scene.get('sf_entry_pending',False) and scene.frame_current>=int(scene.get('sf_loop_start',1)):
+  scene.frame_start=int(scene['sf_loop_start']);scene['sf_entry_pending']=False
  if scene.get('sf_loop',True) or bpy.app.background:return
  for window in bpy.context.window_manager.windows:
   if window.scene==scene and window.view_layer.name=='Facial Expressions' and window.screen.is_animation_playing and scene.frame_current>=scene.frame_end:

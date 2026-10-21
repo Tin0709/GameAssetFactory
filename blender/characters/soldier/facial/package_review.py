@@ -42,7 +42,7 @@ for action in bpy.data.actions:
  if action.get('soldier_facial') and action.asset_data:action.asset_data.catalog_id=identifier
 bpy.data.collections['SOLDIER_Facial_Expressions_PENDING'].asset_data.catalog_id=identifier
 ui.select(bpy.context,'preset','Neutral_Idle');scene.soldier_facial.auto_blink=True;scene.soldier_facial.intensity=1.;scene.soldier_facial.look_x=scene.soldier_facial.look_y=0.
-scene.camera=bpy.data.objects['SF_Front_Close'];scene['sf_camera']='SF_Front_Close';scene.frame_set(1);scene.render.fps=30;scene.render.fps_base=1.
+scene.camera=bpy.data.objects['SF_Front_Close'];scene['sf_camera']='SF_Front_Close';scene.frame_set(5);scene.render.fps=30;scene.render.fps_base=1.
 for area in bpy.context.screen.areas:
  if area.type=='VIEW_3D':area.spaces.active.show_region_ui=True;area.spaces.active.overlay.show_overlays=False;area.spaces.active.region_3d.view_perspective='CAMERA';area.spaces.active.use_local_camera=False
 rig.hide_set(True)

@@ -5,16 +5,16 @@ D=Path(__file__).resolve().parent;sys.path.insert(0,str(D));sys.path.insert(0,st
 bpy.ops.wm.open_mainfile(filepath=str(D.parent/'showcase/SOLDIER_Asset_Library.blend'),load_ui=True)
 import soldier_library_ui;soldier_library_ui.register();import facial_ui as ui;import expression_model as model
 scene=bpy.data.scenes['SOLDIER_ASSET_LIBRARY'];ctrl=bpy.data.objects['SF_Face_Control'];face=bpy.data.objects['SF_Face_Mesh'];rig=bpy.data.objects['SF_Soldier_Rig']
-ui.select(bpy.context,'preset','Hurt_Heavy');scene.frame_set(13)
+ui.select(bpy.context,'preset','Hurt_Heavy');scene.frame_set(17)
 captured=float(ctrl['open_l']);assert captured<.2
 ui.select(bpy.context,'preset','Neutral_Idle')
-assert scene.frame_start<1 and scene.frame_current==scene.frame_start,'Entry must be outside repeating frames'
+assert scene.frame_start<scene['sf_loop_start'] and scene.frame_current==scene.frame_start,'Entry must be outside repeating frames'
 assert abs(ctrl['open_l']-captured)<1e-5,'Selection must start from current face'
-scene.frame_set(1);assert scene.frame_start==1,'Entry is consumed once'
+scene.frame_set(5);assert scene.frame_start==5,'Entry is consumed once'
 neutral_start=float(ctrl['open_l']);scene.frame_set(scene.frame_end+1);neutral_end=float(ctrl['open_l'])
-scene.frame_set(1)
+scene.frame_set(5)
 assert abs(ctrl['open_l']-neutral_start)<1e-5 and abs(neutral_end-neutral_start)<1e-5,'Loop must not replay Hurt'
-ui.select(bpy.context,'situation','Aim');scene.frame_set(1);a=float(ctrl['open_l']);scene.frame_set(scene.frame_end+1);b=float(ctrl['open_l'])
+ui.select(bpy.context,'situation','Aim');scene.frame_set(5);a=float(ctrl['open_l']);scene.frame_set(scene.frame_end+1);b=float(ctrl['open_l'])
 assert abs(a-.73)<1e-5 and abs(a-b)<1e-5,'Aim must not reopen eyes on each loop'
 assert len(scene.soldier_facial.presets)==18
 assert all(n in bpy.data.objects for n in ['SF_Soldier_Body','SF_Soldier_Hair','SF_Soldier_Clothing'])
@@ -23,7 +23,7 @@ for name,p in model.PRESETS.items():
  ui.select(bpy.context,'preset',name)
  assert sum(layer.use for layer in scene.view_layers)==1 and scene.view_layers['Facial Expressions'].use
  for t in [0,.3,.4,.6,p['duration']/2,p['duration']-.04]:
-  scene.frame_set(round(t*30)+1)
+  scene.frame_set(round(t*30)+5)
   for intensity,gx,gy in [(1.,0.,0.),(1.,1.,1.),(1.,-1.,-1.),(0.,0.,0.)]:
    props=scene.soldier_facial;props.intensity=intensity;props.look_x=gx;props.look_y=gy;props.auto_blink=True
    bpy.context.view_layer.update();evaluated=face.evaluated_get(bpy.context.evaluated_depsgraph_get());mesh=evaluated.to_mesh()
