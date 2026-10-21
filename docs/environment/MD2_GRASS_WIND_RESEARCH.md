@@ -14,11 +14,11 @@ Execution checklist:
 
 - [x] Fan the pale central seed cards outward and verify preserved roots, Z, leaf cards, UVs and materials.
 - [x] Inspect the accessible actual TikTok sequence before choosing motion; investigate official gameplay and primary technique references.
-- [ ] Add separate wind-capable copies, shared native nodes and mixed field in the same scene/library.
-- [ ] Add controls, individual short/tall views, close/gameplay field and static comparison routes.
-- [ ] Check roots, zero strength, finite bounds, heading coherence, non-accumulation and 30/60 time sampling against evaluated native geometry.
-- [ ] Render and inspect a 20-second original-speed preview and contact sheets; reopen source and verify original assets/other files.
-- [ ] Open the existing environment viewer ready for visual review; keep Pending and stop before player interaction/Godot.
+- [x] Add separate wind-capable copies, shared native nodes and mixed field in the same scene/library.
+- [x] Add controls, individual short/tall views, close/gameplay field and static comparison routes.
+- [x] Check roots, zero strength, finite bounds, heading coherence, non-accumulation and 30/60 time sampling against evaluated native geometry.
+- [x] Render and inspect a 20-second original-speed preview and contact sheets; reopen source and verify original assets/other files.
+- [x] Open the existing environment viewer ready for visual review; keep Pending and stop before player interaction/Godot.
 
 Review focus: root attachment under gusts; short grass not shaking like a carpet; secondary motion not tearing cards apart; direction/strength controls working after reopen; world field remaining coherent for rotated clumps; source assets unchanged; restoring original static routes/timeline.
 
@@ -111,3 +111,6 @@ Evidence is under `.validation/md2_grass_wind_v001/`; native fresh-read checks c
 Essential checks cover exact roots, unchanged ring widths, finite positions, zero strength/disabled rest, frozen time, deterministic scrubbing, the default20s seam, 30/60FPS equal-time shape parity, world headings0/90/180/−90°, exact15route render/viewport isolation, static timeline restoration and protected-file hashes. Original-speed rendered clips and native viewer review are the visual evidence; numeric checks are not artistic approval or a mobile benchmark.
 
 Final preview paths and measured check results are recorded in the adjacent wind manifest/README after verification. No new permanent library, project, scene, Blender Action, Godot integration or player interaction is part of this work.
+
+
+Final review results: native roots0m error, ring widths<0.1µm residual, default20sseam<0.1µm,30/60equal-time shape difference0;15route isolation and live static-timeline roundtrips pass.47field clumps/1,790grass triangles. Protected-file audit covers8,861pre-existing files; authorized UI/catalog changes only outside the central library, all Godot files/other Blender libraries exact. Two480-frame24fps1×videos are available: [field](../../blender/environment/studies/dungeons_ground_style_v2/grass_wind_md2_v001/review/MD2_Grass_Wind_Field_20s_1x.mp4), [close-up](../../blender/environment/studies/dungeons_ground_style_v2/grass_wind_md2_v001/review/MD2_Grass_Wind_Close_20s_1x.mp4). Native viewer launched with the current wind bootstrap; macOS CUA app binding selects the separate Soldier process, so no claim of a captured native wind-window screenshot is made. Rendered evidence and native API/operator checks are separate from visual approval.

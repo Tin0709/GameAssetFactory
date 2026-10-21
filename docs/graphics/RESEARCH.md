@@ -390,3 +390,8 @@ Theo yêu cầu quay lại Blender ngày 2026-10-09, đã thêm ba slab **1 × 1
 ## Hoa xanh dương, đỏ và vàng — Blender review
 
 Theo yêu cầu tiếp theo, [nguồn hoa hiện tại](../../blender/environment/studies/dungeons_ground_style_v2/WHITE_FLOWERS_V1.md#blue-red-and-yellow-flower-variants--2026-10-09) có thêm ba biến thể màu trên hình học hoa trắng đã mở rộng 1.5× và hướng cánh lên 12°. Mỗi bụi gồm 5 bông, giữ diện tích trồng **1 × 1 m**; chỉ đổi màu đầu hoa theo bảng màu lấy từ ảnh người dùng. Dựng, render, export study và lưu bằng Blender MCP live trong cùng file/cửa sổ; bốn màu được đặt cạnh nhau. Kích thước, UV và màu thân/lá được đối chiếu với hoa trắng, dữ liệu cũ được kiểm tra không đổi, và đã xem render thật. Các bản sao wind chỉ kế thừa study Blender hiện có; không sửa animation cũ hay chứng minh chuyển động runtime. Ba biến thể mới chờ review mỹ thuật, chưa đưa vào Godot.
+
+
+## MD2 grass wind — Blender review,2026-10-21
+
+[Focused research and implementation](../environment/MD2_GRASS_WIND_RESEARCH.md): actual TikTok/official trailer/uploader samples, observed-versus-unknown motion, separate native wind copies in the existing library,20s1×field/close previews and Godot Mobile proposal. Original source assets/gameplay remain exact. Pending visual approval; no player interaction or Godot integration.
