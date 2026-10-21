@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "authorized_changes": {
+    "objects": [
+      "SOLDIER_HairCards_v001",
+      "Survivor_Clothing_3D \u2014 requested outer relief",
+      "Survivor_Reference_v001 \u2014 ORIGINAL BODY / NEW SKIN"
+    ],
+    "materials": [],
+    "images": [
+      "HC_Hair_Bandana \u2014 original pixel atlas"
+    ],
+    "actions": []
+  },
+  "unexpected_changes": {
+    "objects": [],
+    "materials": [],
+    "images": [],
+    "actions": []
+  },
+  "all_existing_actions_exact": true,
+  "protected_materials_exact": true,
+  "protected_images_except_hair_atlas_exact": true,
+  "same_two_scenes": true,
+  "pre_wear_original_counts": {
+    "objects": 59,
+    "materials": 9,
+    "images": 9,
+    "actions": 34
+  },
+  "head_face_body_geometry_and_bone_weights": "Checked separately by verify_wear.py"
+}
