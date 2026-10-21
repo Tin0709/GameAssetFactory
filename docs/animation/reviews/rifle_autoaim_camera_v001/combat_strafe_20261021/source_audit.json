@@ -1,0 +1,658 @@
+{
+  "files": {
+    "entity/dtr.json": "e6f3db842fb0dd2b2d770a390e166f0ae95f93659c759c597b5091d5c3a25dd2",
+    "animations/f2da1071.json": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+    "animation_controllers/616f2ff7.json": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f"
+  },
+  "chain": {
+    "rzkmtm": {
+      "name": "controller.animation.oreville_ans.xunqct",
+      "controller": {
+        "states": {
+          "default": {
+            "animations": [
+              {
+                "xfltzh": "!q.is_gliding&&!q.is_in_ui&&!v.mbqkjf"
+              },
+              "cape",
+              "controller.player_movement.offset",
+              "flkskc",
+              {
+                "veywgp": "!q.any(v.tnlxsa,3,13)?!q.is_gliding-v.jkpkmj"
+              },
+              {
+                "dprsws": "v.tnlxsa==3?!q.is_gliding-v.jkpkmj"
+              },
+              {
+                "zpbnrr": "v.tnlxsa==13?!q.is_gliding-v.jkpkmj"
+              },
+              "psowex",
+              {
+                "agyfrv": "!q.is_in_ui&&!v.is_paperdoll"
+              },
+              "cwxfxl",
+              {
+                "cmdvzm": "!q.is_gliding"
+              },
+              {
+                "okjrob": "!q.is_gliding"
+              },
+              {
+                "ptaudk": "!v.gtgvhp"
+              },
+              {
+                "hsfnbp": "!q.is_emoting"
+              },
+              {
+                "pyioph": "v.jkpkmj>0"
+              },
+              {
+                "bjmscc": "!q.is_in_ui"
+              },
+              {
+                "ybphcg": "!v.gtgvhp"
+              },
+              {
+                "rylnkt": "v.zagini?1-Math.clamp((q.life_time-v.zagini)/0.25,0,1):1"
+              },
+              {
+                "eudgiz": "v.tnlxsa!=4"
+              },
+              {
+                "bwdayn": "v.tnlxsa==4"
+              }
+            ],
+            "transitions": [
+              {
+                "bnyqbz": "!q.is_alive"
+              },
+              {
+                "sykxyi": "q.is_sleeping"
+              },
+              {
+                "zqihwb": "q.is_riding"
+              }
+            ]
+          },
+          "bnyqbz": {
+            "transitions": [
+              {
+                "default": "q.is_alive"
+              }
+            ]
+          },
+          "sykxyi": {
+            "animations": [
+              "sleeping"
+            ],
+            "transitions": [
+              {
+                "default": "!q.is_sleeping"
+              }
+            ]
+          },
+          "zqihwb": {
+            "animations": [
+              "fjtwtc",
+              {
+                "ptaudk": "!q.is_riding_any_entity_of_type('minecraft:boat','minecraft:chest_boat')"
+              },
+              "ybphcg",
+              {
+                "ceotii": "!q.is_riding_any_entity_of_type('minecraft:cushion')"
+              }
+            ],
+            "transitions": [
+              {
+                "default": "!q.is_riding"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "veywgp": {
+      "name": "controller.animation.oreville_ans.lhbuwm",
+      "controller": {
+        "initial_state": "onccai",
+        "states": {
+          "run": {
+            "animations": [
+              {
+                "move": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "move_right": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "move_left": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "pgnnhd": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "hxfxxu": "v.esnrkj"
+              },
+              {
+                "kiggsk": "Math.max(Math.abs(v.cknrcn),Math.abs(v.mrmeib))*(v.jycjqy=='slime')"
+              },
+              {
+                "yonenf": "Math.max(v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+              },
+              {
+                "gcquxx": "Math.max(-v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+              },
+              "oprmcp"
+            ],
+            "transitions": [
+              {
+                "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+              },
+              {
+                "zhbjho": "v.hkmncu>0.05"
+              },
+              {
+                "rdvwhr": "v.rvwafl&&q.state_time>0.2"
+              },
+              {
+                "xdchdk": "v.undfyr&&v.lzwweo>6.75&&q.is_pack_setting_selected('oreville_ans:fyumxp','eysaic')"
+              },
+              {
+                "onccai": "v.esnrkj<0.6&&q.state_time>0.2"
+              }
+            ],
+            "blend_transition": 0.22
+          },
+          "xdchdk": {
+            "animations": [
+              {
+                "ksoign": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "ijczfy": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "movjvc": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "nlkzpp": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "hxfxxu": "v.esnrkj"
+              },
+              "inxmkt"
+            ],
+            "transitions": [
+              {
+                "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+              },
+              {
+                "zhbjho": "v.hkmncu>0.05"
+              },
+              {
+                "rdvwhr": "v.rvwafl&&q.state_time>0.2"
+              },
+              {
+                "run": "!v.undfyr&&v.lzwweo<4.5||!q.is_pack_setting_selected('oreville_ans:fyumxp','eysaic')"
+              },
+              {
+                "onccai": "v.esnrkj<0.6&&q.state_time>0.2"
+              }
+            ],
+            "blend_transition": 0.22
+          },
+          "onccai": {
+            "animations": [
+              {
+                "walk": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "vwyhwm": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "pvgbyg": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "kzuqni": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "bqirai": "Math.max(Math.abs(v.cknrcn),Math.abs(v.mrmeib))*(v.jycjqy=='slime')"
+              },
+              {
+                "iuktbd": "Math.max(v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+              },
+              {
+                "kgpeib": "Math.max(-v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+              },
+              "oprmcp"
+            ],
+            "transitions": [
+              {
+                "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+              },
+              {
+                "zhbjho": "v.hkmncu>0.05"
+              },
+              {
+                "icxyyv": "v.rvwafl&&q.state_time>0.2"
+              },
+              {
+                "run": "v.esnrkj>0.7&&q.state_time>0.2"
+              }
+            ],
+            "blend_transition": 0.22
+          },
+          "rdvwhr": {
+            "on_entry": [
+              "v.vgieqh=1;"
+            ],
+            "animations": [
+              {
+                "usmlvw": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "move_right": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "move_left": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "bkydlx": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "kiggsk": "Math.max(Math.abs(v.cknrcn),Math.abs(v.mrmeib))*(v.jycjqy=='slime')"
+              },
+              {
+                "yonenf": "Math.max(v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+              },
+              {
+                "gcquxx": "Math.max(-v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+              }
+            ],
+            "transitions": [
+              {
+                "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+              },
+              {
+                "zhbjho": "v.hkmncu>0.05"
+              },
+              {
+                "run": "v.esnrkj>0.7&&!v.rvwafl&&q.state_time>0.1"
+              },
+              {
+                "icxyyv": "v.esnrkj<0.6&&q.state_time>0.1"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "icxyyv": {
+            "on_entry": [
+              "v.vgieqh=1;"
+            ],
+            "animations": [
+              {
+                "icxyyv": "q.is_in_ui?1:v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "vwyhwm": "q.is_in_ui?0:v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "pvgbyg": "q.is_in_ui?0:-v.mrmeib-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "kzhobv": "q.is_in_ui?-1:-v.cknrcn-Math.abs(v.mrmeib)*0.25"
+              },
+              {
+                "bqirai": "Math.max(Math.abs(v.cknrcn),Math.abs(v.mrmeib))*(v.jycjqy=='slime')"
+              },
+              {
+                "iuktbd": "Math.max(v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+              },
+              {
+                "kgpeib": "Math.max(-v.cknrcn,Math.abs(v.mrmeib))*(v.tnlxsa==4)"
+              }
+            ],
+            "transitions": [
+              {
+                "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+              },
+              {
+                "zhbjho": "v.hkmncu>0.05"
+              },
+              {
+                "rdvwhr": "v.esnrkj>0.7&&q.state_time>0.1"
+              },
+              {
+                "onccai": "v.esnrkj<0.6&&!v.rvwafl&&q.state_time>0.1"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "knxfvl": {
+            "transitions": [
+              {
+                "zhbjho": "!q.is_on_ground&&!v.hirjne&&!v.hhsumy&&!(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))&&!v.gddzeg&&!v.gtgvhp&&!v.yyjpfg"
+              },
+              {
+                "rdvwhr": "!v.hirjne&&!v.hhsumy&&!(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))&&!v.gddzeg&&!v.gtgvhp&&!v.yyjpfg&&v.rvwafl"
+              },
+              {
+                "run": "!v.hirjne&&!v.hhsumy&&!(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))&&!v.gddzeg&&!v.gtgvhp&&!v.yyjpfg"
+              }
+            ],
+            "blend_transition": 0.2
+          },
+          "zhbjho": {
+            "on_entry": [
+              "!q.is_in_ui&&!v.is_paperdoll?{v.xgnfpn=0;};"
+            ],
+            "animations": [
+              {
+                "pkdlkc": "Math.clamp(v.cknrcn,0,1)"
+              },
+              {
+                "hnhukj": "Math.clamp(v.mrmeib,0,1)"
+              },
+              {
+                "txkksi": "Math.clamp(-v.mrmeib,0,1)"
+              },
+              {
+                "xvsgam": "Math.clamp(-v.cknrcn,0,1)"
+              },
+              {
+                "fly": "v.xgnfpn-v.axerqj"
+              },
+              {
+                "qbfoza": "v.xgnfpn-v.axerqj"
+              }
+            ],
+            "transitions": [
+              {
+                "zhbjho": "!q.is_in_ui&&!v.is_paperdoll&&q.state_time>0.4?{v.xgnfpn=v.xgnfpn+((!q.is_in_water&&q.vertical_speed>=0)-v.xgnfpn)*(0.6*q.delta_time);v.cthrgf=v.xgnfpn>=0.5&&q.state_time>=1.15&&!v.rvwafl;};return 0;"
+              },
+              {
+                "knxfvl": "v.hirjne||v.hhsumy||(v.fxllpr&&q.is_pack_setting_selected('oreville_ans:fyumxp','flpxjs'))||v.gddzeg||v.gtgvhp||v.yyjpfg"
+              },
+              {
+                "rdvwhr": "v.esnrkj>0.7&&q.is_on_ground&&v.rvwafl"
+              },
+              {
+                "run": "v.esnrkj>0.7&&q.is_on_ground"
+              },
+              {
+                "icxyyv": "q.is_on_ground&&v.rvwafl"
+              },
+              {
+                "onccai": "q.is_on_ground"
+              }
+            ],
+            "blend_transition": 0.16,
+            "on_exit": [
+              "!q.is_in_ui&&!v.is_paperdoll?{v.cthrgf=0;};"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "pre_animation": {
+    "27": "!q.is_in_ui&&!v.is_paperdoll?{t.x=q.position(0);t.y=q.position(1);t.z=q.position(2);v.iaxjoy=v.toclgf;v.eeydlb=v.zwgbad;v.iynnie=v.qkrfdi;t.t=q.life_time;t.jnl=q.vertical_speed;t.jnl!=v.sjlbms?{v.bsddha=(t.jnl-v.sjlbms)/(t.t-v.bueybx);v.sjlbms=t.jnl;v.bueybx=t.t;};t.x!=v.toclgf||t.y!=v.zwgbad||t.z!=v.qkrfdi?{t.nng=t.t-v.abjhra;v.abjhra=t.t;t.xhy=t.x-v.toclgf;t.gdq=t.y-v.zwgbad;t.asp=t.z-v.qkrfdi;v.qlczor>t.nng?{v.obhshf=Math.sqrt(t.xhy*t.xhy+t.gdq*t.gdq+t.asp*t.asp)/t.nng;v.lzwweo=Math.sqrt(t.xhy*t.xhy+t.asp*t.asp)/t.nng;v.xiemzw=t.xhy/t.nng;v.xjryuc=t.gdq/t.nng;v.rupatf=t.asp/t.nng;}:{v.esnrkj=0;v.obhshf=0;v.lzwweo=0;v.xiemzw=0;v.xjryuc=0;v.rupatf=0;};v.toclgf=t.x;v.zwgbad=t.y;v.qkrfdi=t.z;v.txvzcq=0;}:{v.txvzcq=v.txvzcq+q.delta_time;v.txvzcq>0.03?{v.obhshf=v.obhshf*(1-6*q.delta_time);v.lzwweo=v.lzwweo*(1-6*q.delta_time);};};v.esnrkj=v.esnrkj+(Math.clamp(v.lzwweo/4.3,0,1)-v.esnrkj)*((v.rvwafl?18:13)*q.delta_time);v.hkmncu=!q.is_on_ground?v.hkmncu+q.delta_time;t.nng=t.t-v.jcvgdh;t.nng>1/10&&(t.x!=v.sgeovf||t.y!=v.kggwrp||t.z!=v.lzmpor)?{v.jcvgdh=t.t;t.xhy=t.x-v.sgeovf;t.gdq=t.y-v.kggwrp;t.asp=t.z-v.lzmpor;v.vvtgzf=Math.sqrt(t.xhy*t.xhy+t.asp*t.asp)/t.nng;v.sgeovf=t.x;v.kggwrp=t.y;v.lzmpor=t.z;};};",
+    "29": "t.pqo=v.wtlyok?1:!v.is_first_person;!q.is_in_ui&&!v.is_paperdoll&&t.pqo?{v.axerqj=v.axerqj+(Math.clamp(q.vertical_speed*-0.05,0,1)-v.axerqj)*(3*q.delta_time);v.gadjrq?{v.eqhdel=v.gadjrq;}:{v.njrdop=v.esnrkj+(Math.abs(v.mrmeib)*0.25*Math.min(1,v.esnrkj*3));v.njrdop=Math.abs(v.njrdop);v.eqhdel=v.eqhdel+(q.delta_time*Math.pow(v.njrdop,0.5)*1.6);};v.gadjrq=0;v.ifcvde=Math.mod(v.eqhdel,1);v.jkpkmj=Math.clamp(v.jkpkmj+(q.is_swimming||q.is_crawling?q.delta_time*2:q.delta_time*-3),0,1);q.has_cape?{v.zknmnw=v.pvdnsw;v.pvdnsw=v.nthjcy;v.dhybwd=v.pvdnsw-v.zknmnw;v.kbshhs=Math.lerp(v.kbshhs,-Math.clamp(Math.min(v.cknrcn*v.obhshf,10)-(q.is_on_ground?0:v.xjryuc),0,25)*7,1-Math.exp(-8*q.delta_time));v.ealvck=Math.lerp(v.ealvck,Math.clamp((v.dhybwd*6)-(v.mrmeib*6*v.lzwweo),-45,45),1-Math.exp(-8*q.delta_time));};!v.is_first_person?{v.hgztwc=q.head_y_rotation(0);v.jjzail=v.hgztwc-v.jrptkt;v.qfzzuw=v.jjzail+(v.jjzail<-180?360:v.jjzail>180?-360:0);v.vyjyhz=v.vyjyhz+v.qfzzuw;v.jrptkt=v.hgztwc;v.ccwxuc=v.vyjyhz-v.nthjcy;v.tnswmo=Math.min_angle(v.ccwxuc);Math.abs(v.tnswmo)>90?{v.wyuvst=Math.lerp(v.wyuvst,Math.clamp(v.tnswmo,-90,90),0.05);}:{v.wyuvst=v.tnswmo;};v.bdjsdw=v.bdjsdw+((v.sfdeke>0?Math.clamp(q.yaw_speed,-48,48))-v.bdjsdw)*(5*q.delta_time);};v.txtwqb=v.attack_time==0?v.txtwqb+q.delta_time;v.nwocdu=v.txtwqb<10||v.sfdeke<-0.3||q.blocking||q.main_hand_item_use_duration||q.item_is_charged||q.is_swimming||v.cthrgf||v.gddzeg;v.tjbdov=v.esnrkj>0.1||v.cthrgf||v.gddzeg;v.hoiyga=q.is_riding_any_entity_of_type('minecraft:cushion');v.hoiyga?{v.nthjcy=q.ride_body_y_rotation;}:v.tjbdov?{v.ufojdf=v.ufojdf+(v.vyjyhz-v.ufojdf)*(12*q.delta_time);v.nthjcy=v.ufojdf+v.upxhvv*90;v.nwocdu&&v.hirjne==0?{v.upxhvv=v.upxhvv*(1-6*q.delta_time);v.mrmeib=v.mrmeib+(v.nqexps-v.mrmeib)*(8*q.delta_time);v.cknrcn=v.cknrcn+(v.sfdeke-v.cknrcn)*(8*q.delta_time);}:{v.upxhvv=v.upxhvv+((v.lzwweo>0.1?v.nqexps*Math.abs(v.nqexps):0)-v.upxhvv)*(6*q.delta_time);v.cknrcn=v.cknrcn+((v.sfdeke>-0.3?1:-1)-v.cknrcn)*(8*q.delta_time);v.mrmeib=v.mrmeib*(1-6*q.delta_time);};}:{v.txvzcq>0.1&&!v.rvwafl?{v.sfdeke=0;v.nqexps=0;v.cknrcn=v.cknrcn*(1-6*q.delta_time);v.mrmeib=v.mrmeib*(1-6*q.delta_time);};};v.is_holding_right?{v.vbcdda=Math.lerp(v.vbcdda,!v.fxllpr&&!v.hhsumy&&v.undfyr==0,0.2);}:{v.vbcdda=v.vbcdda*(1-9*q.delta_time);};v.is_holding_left?{v.wfyvyl=Math.lerp(v.wfyvyl,!v.hhsumy,0.2);}:{v.wfyvyl=v.wfyvyl*(1-9*q.delta_time);};};",
+    "30": "t.pqo=v.wtlyok?1:!v.is_first_person;!q.is_in_ui&&!v.is_paperdoll&&t.pqo?{v.esnrkj>0.01?{q.is_local_player?{t.xhy=q.movement_direction(0);t.asp=q.movement_direction(2);t.nrq=Math.sqrt(t.xhy*t.xhy+t.asp*t.asp);v.iajodc=t.xhy/t.nrq;v.qpjczw=t.asp/t.nrq;}:{t.x=q.position(0);t.z=q.position(2);t.x!=v.iaxjoy||t.z!=v.iynnie?{t.xhy=t.x-v.iaxjoy;t.asp=t.z-v.iynnie;t.nrq=Math.sqrt(t.xhy*t.xhy+t.asp*t.asp);v.iajodc=t.xhy/t.nrq;v.qpjczw=t.asp/t.nrq;};};}:{v.iajodc=0;v.qpjczw=0;};t.mzd=Math.sin(-q.head_y_rotation(0));t.vzp=Math.cos(q.head_y_rotation(0));v.sfdeke=v.iajodc*t.mzd+v.qpjczw*t.vzp;v.nqexps=-(v.iajodc*t.vzp+v.qpjczw*-t.mzd);};"
+  },
+  "clips": {
+    "walk": {
+      "name": "animation.oreville_ans.tldiyl",
+      "anim_time_update": "v.eqhdel",
+      "blend_weight": "Math.clamp(v.esnrkj*3,0,1)",
+      "animation_length": 1,
+      "loop": true,
+      "bones": [
+        "waist",
+        "body",
+        "head",
+        "rightarm",
+        "leftarm",
+        "leftleg",
+        "rightleg",
+        "cape",
+        "egjh9waist",
+        "egjh9body",
+        "egjh9rightarm",
+        "egjh9leftarm",
+        "egjh9head",
+        "egjh9leftleg",
+        "egjh9rightleg"
+      ],
+      "sha256": "0abb699c7c554ddb936548a5d2d25d3b09e759daad7dca8b2d6207dfde64f7c4"
+    },
+    "kzuqni": {
+      "name": "animation.oreville_ans.eaqhvv",
+      "anim_time_update": "v.eqhdel",
+      "blend_weight": "Math.clamp(v.esnrkj*3,0,1)",
+      "animation_length": 1,
+      "loop": true,
+      "bones": [
+        "waist",
+        "body",
+        "head",
+        "rightarm",
+        "leftarm",
+        "leftleg",
+        "rightleg",
+        "egjh9waist",
+        "egjh9body",
+        "egjh9rightarm",
+        "egjh9leftarm",
+        "egjh9head",
+        "egjh9leftleg",
+        "egjh9rightleg"
+      ],
+      "sha256": "8bab901a95a938994982d42b8290c5e2c3e1d8b233f631f88b8b365148b1006c"
+    },
+    "vwyhwm": {
+      "name": "animation.oreville_ans.fpushb",
+      "anim_time_update": "v.eqhdel",
+      "blend_weight": "Math.clamp(v.esnrkj*3,0,1)",
+      "animation_length": 1,
+      "loop": true,
+      "bones": [
+        "waist",
+        "body",
+        "head",
+        "rightarm",
+        "leftarm",
+        "leftleg",
+        "rightleg",
+        "cape",
+        "egjh9waist",
+        "egjh9body",
+        "egjh9rightarm",
+        "egjh9leftarm",
+        "egjh9head",
+        "egjh9leftleg",
+        "egjh9rightleg"
+      ],
+      "sha256": "baf025fe98f4b2d0608aa2888d425a501d746af87cdd1ad1ce3414c643f043af"
+    },
+    "pvgbyg": {
+      "name": "animation.oreville_ans.dfajpq",
+      "anim_time_update": "v.eqhdel",
+      "blend_weight": "Math.clamp(v.esnrkj*3,0,1)",
+      "animation_length": 1,
+      "loop": true,
+      "bones": [
+        "waist",
+        "body",
+        "head",
+        "rightarm",
+        "leftarm",
+        "leftleg",
+        "rightleg",
+        "cape",
+        "egjh9waist",
+        "egjh9body",
+        "egjh9rightarm",
+        "egjh9leftarm",
+        "egjh9head",
+        "egjh9leftleg",
+        "egjh9rightleg"
+      ],
+      "sha256": "b46c45fa7167c64838c34532027e8cc0c6e5c71648859cb33c49dd64de9efe85"
+    },
+    "move": {
+      "name": "animation.oreville_ans.fngydr",
+      "anim_time_update": "v.eqhdel",
+      "blend_weight": "v.esnrkj",
+      "animation_length": 1,
+      "loop": true,
+      "bones": [
+        "head",
+        "rightarm",
+        "leftarm",
+        "body",
+        "waist",
+        "rightleg",
+        "leftleg",
+        "cape",
+        "egjh9head",
+        "egjh9rightarm",
+        "egjh9leftarm",
+        "egjh9body",
+        "egjh9waist",
+        "egjh9rightleg",
+        "egjh9leftleg"
+      ],
+      "sha256": "770ddcb505b457227bd6b49c1266f78aa058ff0b42bee50823127117f3e5a8b7"
+    },
+    "pgnnhd": {
+      "name": "animation.oreville_ans.fcsrsv",
+      "anim_time_update": "v.eqhdel",
+      "blend_weight": "v.esnrkj",
+      "animation_length": 1,
+      "loop": true,
+      "bones": [
+        "waist",
+        "rightleg",
+        "leftleg",
+        "body",
+        "head",
+        "leftarm",
+        "rightarm",
+        "egjh9waist",
+        "egjh9body",
+        "egjh9leftarm",
+        "egjh9rightarm",
+        "egjh9rightleg",
+        "egjh9leftleg",
+        "egjh9head"
+      ],
+      "sha256": "afbab4fa89a1404013d72f8261a70f577f25f3d8bca9e013270ec3f68cb4c6f1"
+    },
+    "move_right": {
+      "name": "animation.oreville_ans.pmgjno",
+      "anim_time_update": "v.eqhdel",
+      "blend_weight": "v.esnrkj",
+      "animation_length": 1,
+      "loop": true,
+      "bones": [
+        "waist",
+        "rightleg",
+        "leftleg",
+        "body",
+        "head",
+        "leftarm",
+        "rightarm",
+        "cape",
+        "egjh9waist",
+        "egjh9body",
+        "egjh9leftarm",
+        "egjh9rightarm",
+        "egjh9rightleg",
+        "egjh9leftleg",
+        "egjh9head"
+      ],
+      "sha256": "dab8f38d201de04cdf0c3ea7a383287ce01da7f76c736d6123ee14e8959ba051"
+    },
+    "move_left": {
+      "name": "animation.oreville_ans.qzziyu",
+      "anim_time_update": "v.eqhdel",
+      "blend_weight": "v.esnrkj",
+      "animation_length": 1,
+      "loop": true,
+      "bones": [
+        "waist",
+        "rightleg",
+        "leftleg",
+        "body",
+        "head",
+        "leftarm",
+        "rightarm",
+        "cape",
+        "egjh9waist",
+        "egjh9body",
+        "egjh9leftarm",
+        "egjh9rightarm",
+        "egjh9rightleg",
+        "egjh9leftleg",
+        "egjh9head"
+      ],
+      "sha256": "66c136c9fdb7470003efe8696592793fb3c02bad75963df9204f952533a00932"
+    },
+    "xfltzh": {
+      "name": "animation.oreville_ans.boabcq",
+      "anim_time_update": null,
+      "blend_weight": null,
+      "animation_length": null,
+      "loop": true,
+      "bones": [
+        "root",
+        "waist",
+        "cape",
+        "head",
+        "egjh9root",
+        "egjh9waist",
+        "egjh9head"
+      ],
+      "sha256": "84a5f79da3b7c5f22e9e3d40989da867a2e42e1ee1e964aa4e93a67756c241a0"
+    },
+    "hxfxxu": {
+      "name": "animation.oreville_ans.ktgnrt",
+      "anim_time_update": null,
+      "blend_weight": null,
+      "animation_length": null,
+      "loop": true,
+      "bones": [
+        "root",
+        "waist",
+        "head",
+        "egjh9root",
+        "egjh9waist",
+        "egjh9head"
+      ],
+      "sha256": "9b29ea3795aa82eac1e6c73cb6c7f8ffbe6ae626a0b6820fe6449d92646319a9"
+    },
+    "bob": {
+      "name": "animation.oreville_ans.tdrcwc",
+      "anim_time_update": null,
+      "blend_weight": null,
+      "animation_length": null,
+      "loop": "hold_on_last_frame",
+      "bones": [
+        "waist",
+        "head",
+        "leftarm",
+        "rightarm",
+        "rightleg",
+        "leftleg",
+        "egjh9waist",
+        "egjh9leftarm",
+        "egjh9rightarm",
+        "egjh9head",
+        "egjh9rightleg",
+        "egjh9leftleg"
+      ],
+      "sha256": "a71a17b07bcaba955efb88d27e63d379c7aef30e760025fba4d4b60807ad027c"
+    }
+  }
+}

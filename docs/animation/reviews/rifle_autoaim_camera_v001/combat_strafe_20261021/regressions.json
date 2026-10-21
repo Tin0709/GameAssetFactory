@@ -1,0 +1,101 @@
+[
+  {
+    "name": "test_direction_controller",
+    "fps": 60,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "DIRECTION_CONTROLLER_TEST {\"comparisons\":130664,\"dense_source_max_absolute_error\":0.000000000000028421709430404,\"failures\":[],\"max_absolute_error\":0.00000000149011611383365,\"steps\":1350,\"traces\":10}"
+    ]
+  },
+  {
+    "name": "test_direction_sampler",
+    "fps": 60,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "DIRECTION_SAMPLER_TEST {\"failures\":[],\"max_basis\":0.0000003698370960592,\"max_channel\":0.00000764428114052862,\"max_height\":0.00000000273938045858291,\"max_position\":0.000000388614921575936,\"run_parity\":0.0000000842936955791629,\"samples\":275}"
+    ]
+  },
+  {
+    "name": "test_rifle_quick_turn",
+    "fps": 30,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "RIFLE_QUICK_TURN {\"body_ready_s\":0.3,\"failures\":[],\"first_shot_s\":0.366666666666667,\"passed\":true,\"physics_hz\":60,\"shots\":10}"
+    ]
+  },
+  {
+    "name": "test_rifle_quick_turn",
+    "fps": 60,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "RIFLE_QUICK_TURN {\"body_ready_s\":0.3,\"failures\":[],\"first_shot_s\":0.35,\"passed\":true,\"physics_hz\":60,\"shots\":4}"
+    ]
+  },
+  {
+    "name": "test_rifle_auto_aim",
+    "fps": 30,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "RIFLE_AUTO_AIM {\"camera_y_span_m\":0.00162988901138306,\"failures\":[],\"grip_error_m\":0.000000171201307352931,\"passed\":true,\"scan_count\":852,\"shots\":69,\"support_error_m\":0.000000244397227788795}"
+    ]
+  },
+  {
+    "name": "test_rifle_auto_aim",
+    "fps": 60,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "RIFLE_AUTO_AIM {\"camera_y_span_m\":0.00162959098815918,\"failures\":[],\"grip_error_m\":0.000000160490415623826,\"passed\":true,\"scan_count\":671,\"shots\":53,\"support_error_m\":0.000000178813934326172}"
+    ]
+  },
+  {
+    "name": "test_rifle_fire",
+    "fps": 60,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "RIFLE_FIRE {\"camera_span_m\":0.0,\"failures\":[],\"fps\":60,\"grip_error_m\":0.000000772932651216252,\"lower_body_error\":0.0,\"passed\":true,\"pool_misses\":0,\"recovered_pose_error\":0.0,\"shots\":159,\"support_error_m\":0.000000357627868652344}"
+    ]
+  },
+  {
+    "name": "test_rifle_ready_gameplay",
+    "fps": 30,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "RIFLE_READY {\"camera_jump_y_span\":0.0,\"failures\":[],\"fps\":30,\"left_support_error_m\":0.0000039181909414765,\"maximum_leg_step_deg\":23.5931023933411,\"minimum_foot_y\":-0.0000000596046447753906,\"moving_shoulder_error_m\":0.0000000300342506420748,\"right_grip_matrix_error\":0.00000392261063097976,\"support_samples\":222}"
+    ]
+  },
+  {
+    "name": "test_turn_gameplay",
+    "fps": 30,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "TURN_GAMEPLAY {\"cases\":[{\"angle\":25.0,\"body_angle_deg\":0.0,\"foot_lifts_m\":[0.0,0.0113564729690552],\"stepped\":false},{\"angle\":90.0,\"body_angle_deg\":63.0253656606176,\"foot_lifts_m\":[0.0393360257148743,0.0298146605491638],\"stepped\":true},{\"angle\":-90.0,\"body_angle_deg\":-63.0253520002392,\"foot_lifts_m\":[0.0328552722930908,0.0440691709518433],\"stepped\":true},{\"angle\":180.0,\"body_angle_deg\":-153.025357919812,\"foot_lifts_m\":[0.0520980954170227,0.0658620595932007],\"stepped\":true}],\"contact_step_m\":0.0000000614390600617298,\"failures\":[],\"fps\":30,\"left_palm_error_m\":0.000000381946733796212,\"maximum_sole_frame_motion_m\":0.154332235455513,\"minimum_sole_y_m\":-0.0000000596046447753906,\"passed\":true,\"planted_foot_yaw_step_rad\":0.000000741566066775334,\"right_grip_error_m\":0.000000152691470134414}"
+    ]
+  },
+  {
+    "name": "test_rifle_stop_replant",
+    "fps": 30,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "RIFLE_STOP_REPLANT {\"cases\":[{\"direction\":\"(-1.0, -1.0)\",\"floor_min_m\":0.0,\"peak_after_stop_m\":[0.0753264427185059,0.00836771726608276],\"stop_height_m\":[0.0753264427185059,0.000798940658569336]},{\"direction\":\"(1.0, -1.0)\",\"floor_min_m\":0.0,\"peak_after_stop_m\":[0.0753264427185059,0.00835913419723511],\"stop_height_m\":[0.0753264427185059,0.000780701637268066]},{\"direction\":\"(0.0, -1.0)\",\"floor_min_m\":0.0,\"peak_after_stop_m\":[0.0753264427185059,0.0102522969245911],\"stop_height_m\":[0.0753264427185059,0.00400280952453613]},{\"direction\":\"(0.0, 1.0)\",\"floor_min_m\":0.0,\"peak_after_stop_m\":[0.0717951655387878,0.00818848609924316],\"stop_height_m\":[0.0717951655387878,0.00041884183883667]},{\"direction\":\"(-1.0, 0.0)\",\"floor_min_m\":0.0,\"peak_after_stop_m\":[0.0753264427185059,0.00812792778015137],\"stop_height_m\":[0.0753264427185059,0.000290453433990479]},{\"direction\":\"(1.0, 0.0)\",\"floor_min_m\":0.0,\"peak_after_stop_m\":[0.0753264427185059,0.00847285985946655],\"stop_height_m\":[0.0753264427185059,0.00102180242538452]},{\"direction\":\"(-1.0, 1.0)\",\"floor_min_m\":0.0,\"peak_after_stop_m\":[0.0676706433296204,0.00799095630645752],\"stop_height_m\":[0.0676706433296204,0.0]},{\"direction\":\"(1.0, 1.0)\",\"floor_min_m\":0.0,\"peak_after_stop_m\":[0.0676706433296204,0.00818568468093872],\"stop_height_m\":[0.0676706433296204,0.000412940979003906]}],\"failures\":[],\"fps\":30,\"maximum_moving_foot_heading_lag_deg\":8.62537597514278,\"passed\":true}"
+    ]
+  },
+  {
+    "name": "test_zombie_combat",
+    "fps": 60,
+    "exit_code": 0,
+    "passed": true,
+    "reports": [
+      "ZOMBIE_COMBAT {\"corpse_lifetime\":1.2,\"failures\":[],\"impulse\":\"(-10.82494, 16.11466, -237.6261)\",\"maximum_anchor_error_m\":0.0180858951061964,\"maximum_ragdolls\":4,\"minimum_corner_y\":-0.0380977094173431,\"native_ground_contact\":true,\"passed\":true,\"physics_hz\":60,\"source_attack_triggers\":8}"
+    ]
+  }
+]

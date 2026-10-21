@@ -1,0 +1,18 @@
+{
+	"aim_aligned_samples": 1076,
+	"back_seen": true,
+	"contact_step_m": 0.182616457343102,
+	"failures": [
+		"Combat lower body uses literal directional source PRS, including waist compensation"
+	],
+	"fps": 60,
+	"left_support_error_m": 0.000000295121992621716,
+	"maximum_leg_step_deg": 22.2755196288579,
+	"maximum_source_pose_error": 1.6421320438385,
+	"minimum_floor_m": -0.0000000596046447753906,
+	"passed": false,
+	"recent_action_branch": true,
+	"right_grip_error_m": 0.000000191408886962563,
+	"side_seen": true,
+	"source_samples": 656
+}

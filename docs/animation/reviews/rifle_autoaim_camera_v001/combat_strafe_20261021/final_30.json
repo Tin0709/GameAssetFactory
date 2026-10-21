@@ -1,0 +1,18 @@
+{
+	"aim_aligned_samples": 534,
+	"back_seen": true,
+	"contact_pairs": 101,
+	"contact_step_m": 0.000000119209289550781,
+	"failures": [],
+	"fps": 30,
+	"height_step_m": 0.0250000059604645,
+	"left_support_error_m": 0.00000027516759359969,
+	"maximum_leg_step_deg": 29.1742719453065,
+	"maximum_source_pose_error": 0.000000301380367773163,
+	"minimum_floor_m": -0.0000000596046447753906,
+	"passed": true,
+	"recent_action_branch": true,
+	"right_grip_error_m": 0.000000191408886962563,
+	"side_seen": true,
+	"source_samples": 320
+}

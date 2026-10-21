@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "baseline_files": 8572,
+  "unchanged_files": 8571,
+  "changed_files": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
+  ],
+  "approved_blender_and_libraries_preserved": true
+}
