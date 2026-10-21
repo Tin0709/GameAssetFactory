@@ -6,12 +6,14 @@ const CELL:=EXTENT/SIZE
 const STEP:=1./60.
 const RADIUS:=1.40
 const RESPONSE:=23.
-const RECOVERY:=6.5
+const RECOVERY:=9.5
+const DAMPING:=.26
 var x:=PackedFloat32Array()
 var z:=PackedFloat32Array()
 var vx:=PackedFloat32Array()
 var vz:=PackedFloat32Array()
 var marked:=PackedByteArray()
+var contact_weights:=PackedFloat32Array()
 var pixels:=PackedByteArray()
 var active:=PackedInt32Array()
 var image:Image
@@ -24,13 +26,14 @@ var update_usec:=0
 func _init()->void:
 	# Packed arrays have value semantics; allocate each member explicitly.
 	x.resize(SIZE*SIZE);z.resize(SIZE*SIZE);vx.resize(SIZE*SIZE);vz.resize(SIZE*SIZE)
+	contact_weights.resize(SIZE*SIZE)
 	marked.resize(SIZE*SIZE);marked.fill(0)
 	pixels.resize(SIZE*SIZE*8);pixels.fill(0)
 	image=Image.create_from_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,pixels)
 	texture=ImageTexture.create_from_image(image)
 
 func reset()->void:
-	x.fill(0.);z.fill(0.);vx.fill(0.);vz.fill(0.);marked.fill(0);pixels.fill(0);active.clear()
+	x.fill(0.);z.fill(0.);vx.fill(0.);vz.fill(0.);contact_weights.fill(0.);marked.fill(0);pixels.fill(0);active.clear()
 	accumulator=0.;initialized=false
 	upload()
 
@@ -46,6 +49,8 @@ func _stamp(point:Vector3)->void:
 
 func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 	var start:=Time.get_ticks_usec()
+	# Existing editor play sessions can hot-reload this new state member.
+	if contact_weights.size()!=SIZE*SIZE:contact_weights.resize(SIZE*SIZE);contact_weights.fill(0.)
 	if not initialized:previous=point;initialized=true
 	if point.distance_squared_to(previous)>16.:reset();previous=point;initialized=true
 	var duration:=clampf(delta,0.,.1333333)
@@ -59,7 +64,7 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 		var at:=previous.lerp(point,float(step+1)/float(steps))
 		_stamp(at)
 		var ground_gain:=1.-smoothstep(.25,1.25,maxf(0.,at.y))
-		var amplitude:=minf(1.20,.48+.115*speed)*ground_gain
+		var amplitude:=minf(.90,.42+.075*speed)*ground_gain
 		var movement_gain:=.90*speed/(speed+.4)
 		var i:=active.size()-1
 		while i>=0:
@@ -71,13 +76,23 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 			direction=direction/maxf(direction.length(),.12)
 			var desired:=direction*(amplitude*falloff)
 			var omega:=lerpf(RECOVERY,RESPONSE,falloff*ground_gain)
-			var decay:=exp(-omega*STEP)
+			# Only newly increasing contact supplies a kick. Resting contact never
+			# restarts the oscillation, and repeated brushes remain velocity-bounded.
+			var contact:=falloff*ground_gain
+			var rise:=maxf(0.,contact-contact_weights[index]);contact_weights[index]=contact
+			var kick:=direction*rise*(4.4+1.5*minf(speed/7.55,1.))
+			var velocity_now:=(Vector2(vx[index],vz[index])+kick).limit_length(5.5)
+			vx[index]=velocity_now.x;vz[index]=velocity_now.y
+			# Closed-form underdamped spring: clear bend, soft reversals, fading energy.
+			var damping:=DAMPING*omega;var frequency:=omega*sqrt(1.-DAMPING*DAMPING)
+			var decay:=exp(-damping*STEP);var cosine:=cos(frequency*STEP);var sine:=sin(frequency*STEP)
 			var ex:=x[index]-desired.x;var ez:=z[index]-desired.y
-			var tx:=(vx[index]+omega*ex)*STEP;var tz:=(vz[index]+omega*ez)*STEP
-			x[index]=desired.x+(ex+tx)*decay;z[index]=desired.y+(ez+tz)*decay
-			vx[index]=(vx[index]-omega*tx)*decay;vz[index]=(vz[index]-omega*tz)*decay
+			var tx:=(vx[index]+damping*ex)/frequency;var tz:=(vz[index]+damping*ez)/frequency
+			x[index]=desired.x+(ex*cosine+tx*sine)*decay;z[index]=desired.y+(ez*cosine+tz*sine)*decay
+			vx[index]=(vx[index]*cosine-(damping*vx[index]+omega*omega*ex)/frequency*sine)*decay
+			vz[index]=(vz[index]*cosine-(damping*vz[index]+omega*omega*ez)/frequency*sine)*decay
 			if falloff==0. and absf(x[index])+absf(z[index])+absf(vx[index])+absf(vz[index])<.00002:
-				x[index]=0.;z[index]=0.;vx[index]=0.;vz[index]=0.;marked[index]=0
+				x[index]=0.;z[index]=0.;vx[index]=0.;vz[index]=0.;contact_weights[index]=0.;marked[index]=0
 				active[i]=active[active.size()-1];active.resize(active.size()-1)
 			pixels.encode_half(index*8,x[index]);pixels.encode_half(index*8+2,z[index])
 			i-=1
