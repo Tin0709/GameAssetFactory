@@ -135,7 +135,10 @@ box('bottom front canvas hem',(0,-.180,.065),(.348,.023,.024),'canvas_warm')
 for sign in [-1,1]:
     x=sign*.200
     box('vertical rounded edge '+str(sign),(x,-.137,.346),(.022,.064,.527),'canvas_side')
-    box('front perimeter stitch '+str(sign),(sign*.184,-.187,.345),(.010,.010,.516),'canvas_edge')
+    # Individual broad voxel stitch/piping blocks, rather than a long smooth rail.
+    for i in range(18):
+        z=.099+i*.028
+        box('voxel perimeter stitch '+str(sign),(sign*.184,-.190-(i%3==0)*.003,z),(.018,.016,.026),'canvas_edge' if i%4==0 else 'canvas_side')
 
 # Broad top flap and its paired dark webbing / silver closure tabs.
 stepped('large top flap',0,.386,.351,.251,-.190,-.218,.022,'canvas_flap')
@@ -154,7 +157,8 @@ for sign in [-1,1]:
     stepped('front pouch body '+str(sign),x,.090,.170,.220,-.190,-.285,.012,'canvas_warm')
     box('pouch lower piping '+str(sign),(x,-.289,.100),(.145,.014,.014),'canvas_edge')
     stepped('front pouch flap '+str(sign),x,.182,.177,.132,-.267,-.305,.012,'canvas_flap')
-    box('pouch flap folded hem '+str(sign),(x,-.309,.187),(.156,.013,.018),'canvas_edge')
+    for i in range(5):
+        box('pouch voxel folded hem '+str(sign),(x+(i-2)*.031,-.313,.187),(.030,.020,.021),'canvas_edge' if i%2==0 else 'canvas_warm')
     box('pouch long closure '+str(sign),(x,-.297,.167),(.034,.018,.154),'webbing_brown')
     box('pouch closure plate '+str(sign),(x,-.322,.182),(.040,.014,.066),'buckle_plate',True,True)
     box('pouch closure tail '+str(sign),(x,-.304,.122),(.029,.016,.032),'leather')
@@ -176,7 +180,7 @@ for sign in [-1,1]:
     box('upper compression band '+str(sign),(sign*.256,-.004,.475),(.032,.170,.044),'leather')
     box('side upper steel guide '+str(sign),(sign*.278,-.001,.531),(.012,.037,.107),'steel',True)
     box('side lower guide tail '+str(sign),(sign*.266,-.001,.464),(.012,.023,.044),'steel_edge',True)
-    box('lower side pocket shadow '+str(sign),(sign*.237,.001,.183),(.081,.155,.254),'canvas_shadow')
+    box('lower side pocket shadow '+str(sign),(sign*.237,.011,.183),(.081,.155,.254),'canvas_shadow')
     box('lower side pocket '+str(sign),(sign*.255,-.004,.184),(.072,.145,.237),'canvas_warm')
     box('side pocket flap '+str(sign),(sign*.269,-.004,.270),(.065,.155,.086),'canvas_flap')
     box('side pocket flap edge '+str(sign),(sign*.299,-.004,.236),(.013,.145,.016),'canvas_edge')
@@ -210,6 +214,63 @@ for sign in [-1,1]:
     box('handle mount '+str(sign),(sign*.062,.057,.660),(.032,.046,.020),'leather')
     box('handle upright '+str(sign),(sign*.062,.057,.673),(.021,.032,.025),'leather')
 box('top carry handle',(0,.057,.684),(.145,.035,.018),'leather')
+
+# Reference-specific voxel sculpt: chunky stepped cloth corners, folded pocket
+# lips, small raised fabric blocks and segmented straps. These are canvas/belt
+# construction details, not new accessories or fine geometric noise.
+for sign in [-1,1]:
+    for i in range(21):
+        z=.092+i*.025
+        inset=max(0,z-.596)*.9
+        x=sign*(.207-inset)
+        box('stepped shell corner block',(x,-.143-(i%3==0)*.005,z),(.029,.072,.024),['canvas_side','canvas','canvas_warm'][i%3])
+    # Small broad square blocks along both shoulders of the canvas shell.
+    for i in range(4):
+        box('voxel upper shoulder',(sign*(.183-i*.012),-.037,.612+i*.012),(.038,.159-i*.010,.025),'canvas_side' if i%2 else 'canvas_warm')
+    # Raised fabric quads on the outside of each lower side pocket.
+    for i in range(6):
+        z=.083+i*.034
+        for j in range(3):
+            y=-.048+j*.047
+            box('side pouch voxel edging',(sign*(.292+(i+j)%2*.003),y,z),(.012,.044,.031),'canvas_warm' if (i+j)%3 else 'canvas_side')
+    # Segmented padding is visible from the rear and along the shoulder loop.
+    for i in range(13):
+        box('back padding voxel segment',(sign*.122,.184,.128+i*.038),(.058,.021,.035),'canvas_warm' if i%3 else 'webbing_brown')
+    path=[(.119,.633),(.174,.602),(.228,.536),(.266,.432),(.278,.307),(.252,.205),(.201,.135),(.118,.104)]
+    for segment in range(len(path)-1):
+        a=Vector(path[segment]);b=Vector(path[segment+1]);n=max(1,round((b-a).length/.028))
+        for i in range(n):
+            t0=(i+.045)/n;t1=(i+.955)/n
+            ribbon('voxel shoulder pad '+str(sign),sign*.135,[a.lerp(b,t0),a.lerp(b,t1)],.064,.038,'canvas_side' if segment<4 else 'leather')
+    for dx in [-1,1]:
+        for dz in [-1,1]:
+            box('back buckle square corner',(sign*.122+dx*.029,.320,.344+dz*.029),(.012,.004,.012),'steel_edge',True)
+
+# A coarse, staggered canvas crown, with hard voxel ledges around its perimeter.
+for i in range(7):
+    x=(i-3)*.046
+    for j in range(2):
+        y=-.069+j*.089
+        box('top canvas voxel fold',(x,y,.658+((i+j)%3)*.004),(.044,.086,.018),'canvas_flap' if (i+j)%3 else 'canvas_warm')
+for i in range(12):
+    x=(i-5.5)*.027
+    box('top flap voxel edge',(x,-.224,.624+((i%4)==0)*.004),(.026,.027,.029),'canvas_flap' if i%3 else 'canvas_edge')
+for i in range(11):
+    box('bottom canvas voxel edge',((i-5)*.031,-.176,.058+(i%3==0)*.004),(.030,.038,.030),'canvas_side' if i%3 else 'canvas_warm')
+
+# Sparse shallow square fabric breaks leave the broad face readable, as in the
+# supplied sheet. Their relief is 4–9mm after the depth calibration below.
+for x,z,w,h in [(-.137,.554,.036,.042),(-.112,.600,.041,.024),(-.149,.479,.024,.043),
+                 (.140,.582,.033,.033),(.148,.505,.026,.039),(.113,.447,.045,.025),
+                 (-.080,.425,.037,.023),(-.018,.603,.045,.025),(.052,.601,.028,.032)]:
+    box('raised voxel fabric patch',(x,-.224,z),(w,.018,h),'canvas_warm')
+for sign in [-1,1]:
+    x=sign*.094
+    for i in range(5):
+        box('pocket top voxel fold',(x+(i-2)*.033,-.293,.302+((i%3)==0)*.004),(.031,.037,.022),'canvas_flap' if i%2 else 'canvas_warm')
+    for edge in [-1,1]:
+        for i in range(5):
+            box('pocket side voxel seam',(x+edge*.078,-.290,.114+i*.033),(.013,.021,.030),'canvas_side' if i%2 else 'canvas_edge')
 
 # Reference side silhouette is relatively compact; retain real depth with broad straps.
 vertices=[(x*.85,y*.60,z) for x,y,z in vertices]
