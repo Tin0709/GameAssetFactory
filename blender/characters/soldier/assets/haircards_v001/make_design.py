@@ -12,7 +12,7 @@ def card(name,verts,w,h,polygon=None,kind='hair',seed=0):
  # Small new locks use the otherwise empty right side of each atlas cell.
  if i<44:x=4+(i%7)*72;y=4+(i//7)*72
  else:
-  j=i-44;x=42+(j%7)*72;y=4+(j//7)*72
+  j=i-44;x=44+(j%7)*72;y=4+(j//7)*72
   assert w<=24 and h<=34
  assert y+h+4<512
  # Keep historical unused card slots exact; the new red applies only to bandana.
@@ -113,23 +113,23 @@ def tuft(name,top,u,d,width,height,seed=0):
  card('Hair / bushy '+name,[pt(-1,1),pt(1,1),pt(1,0),pt(-1,0)],10,14,poly,seed=seed)
 # Distinct crown-edge locks drape over the upper band edge, leaving red visible.
 for i,(x,z,w,h,roll) in enumerate([(-.219,1.835,.063,.098,-10),(-.135,1.845,.066,.111,9),(-.048,1.854,.072,.141,-8),(.086,1.836,.063,.109,12),(.197,1.838,.065,.095,-9)]):
- a=math.radians(roll);tuft('front band lock '+str(i+1),(x,-.278,z),(math.cos(a),0,math.sin(a)),(math.sin(a),-.25,-math.cos(a)),w,h,1+i%2)
+ a=math.radians(roll);tuft('front band lock '+str(i+1),(x,-.246,z-.017),(math.cos(a),0,math.sin(a)),(math.sin(a),-.25,-math.cos(a)),w,h,1+i%2)
 # Temple tips frame the face without covering the large eyes.
 for sign,label in [(-1,'R'),(1,'L')]:
  for j,(z,h) in enumerate([(1.654,.128),(1.525,.112)]):
-  tuft(label+' temple tip '+str(j+1),(sign*.247,-.265-j*.009,z),(1,0,0),(sign*.17,-.22,-1),.070,h,2-j)
+  tuft(label+' temple tip '+str(j+1),(sign*.247,-.244-j*.002,z),(1,0,0),(sign*.17,-.22,-1),.070,h,2-j)
  # Three staggered rows, each anchored into the existing side sheets.
  for row,(z,h,w) in enumerate([(1.822,.114,.087),(1.663,.155,.145),(1.505,.113,.123)]):
   for col,y in enumerate([-.168,.012,.178]):
    yy=y+(.014 if row==1 else 0)+(.009 if sign>0 else 0)
-   tuft(label+' side layer '+str(row+1)+'-'+str(col+1),(sign*(.268+row*.006),yy,z+(col%2)*.012),(0,1,0),(sign*(.30 if row!=1 else .24),(.09 if col%2 else -.10),-1),w,h,1+(row+col)%2)
+   tuft(label+' side layer '+str(row+1)+'-'+str(col+1),(sign*(.252+row*.006),yy,z+(col%2)*.012),(0,1,0),(sign*(.43 if row!=1 else .36),(.09 if col%2 else -.10),-1),w,h,1+(row+col)%2)
 # Six small crown flicks rise from the cap; no floating crossing sheets.
 for i,(x,y,z,w,h,dy,dz) in enumerate([(-.170,-.130,1.837,.115,.102,-.90,.44),(.055,-.172,1.840,.124,.110,-.85,.53),(.170,.015,1.841,.104,.104,.90,.44),(-.075,.050,1.844,.132,.122,.90,.44),(-.175,.173,1.836,.101,.092,.92,.40),(.070,.195,1.838,.118,.095,.88,.47)]):
- tuft('crown flick '+str(i+1),(x,y,z),(1,0,0),(0,dy,dz),w,h,1+i%2)
+ tuft('crown flick '+str(i+1),(x,y,1.819),(math.cos(i*.31),math.sin(i*.31),0),(0,dy,dz),w,h*1.16,1+i%2)
 # Rear layering connects the silhouette and keeps the knot/tails readable.
 for row,(z,h) in enumerate([(1.819,.123),(1.600,.155)]):
  for col,x in enumerate([-.183,0,.180]):
-  tuft('rear layer '+str(row+1)+'-'+str(col+1),(x,.270+row*.005,z),(1,0,0),((col-1)*.08,.22,-1),.114 if row==0 else .152,h,1+(row+col)%2)
+  tuft('rear layer '+str(row+1)+'-'+str(col+1),(x,.246+row*.006,z),(1,0,0),((col-1)*.08,.38,-1),.114 if row==0 else .152,h,1+(row+col)%2)
 
 atlas.save(D/'soldier_hair_bandana_atlas.png');(D/'cards.json').write_text(json.dumps({'atlas_size':512,'cards':cards,'binary_alpha':True,'construction':'Single-sided geometric planes rendered double-sided, no extrusion or solidify'},indent=2)+'\n')
 print('DESIGNED',sum(c['kind']=='hair' for c in cards),'hair cards',sum(c['kind']=='bandana' for c in cards),'bandana cards')
