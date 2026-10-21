@@ -1,0 +1,12 @@
+{
+  "preexisting_files_checked": 8914,
+  "changed_authorized_lab_files": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd"
+  ],
+  "missing": [],
+  "unexpected_changes": [],
+  "all_blender_files_exact": true,
+  "worldmap_and_project_exact": true,
+  "approved_actor_weapon_zombie_code_exact": true
+}

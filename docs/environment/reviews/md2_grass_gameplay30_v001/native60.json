@@ -1,0 +1,20 @@
+{
+	"batches": 32,
+	"capture_readback_each_frame": false,
+	"clumps": 1317,
+	"field_update_median_usec": 105,
+	"field_update_p95_usec": 194,
+	"fps_target": 60,
+	"frames": 360,
+	"hud_scale": "(0.25, 0.25)",
+	"median_frame_ms": 16.676,
+	"p95_frame_ms": 17.669,
+	"peak_active_cells": 117,
+	"pool_misses": 0,
+	"renderer": "mobile",
+	"run_speed": 7.5465,
+	"shots": 0,
+	"simulated_seconds": 6.42402233333331,
+	"viewport": "(3004, 1805)",
+	"walk_speed": 2.7
+}
