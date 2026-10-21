@@ -6,8 +6,10 @@ D=R/'blender/characters/player/reviews/survivor_reference_v001'
 FILE=HERE/'SOLDIER_Asset_Library.blend'
 # A rerun may update the current Pending library only; reviewed assets cannot be replaced.
 if FILE.exists():
- with bpy.data.libraries.load(str(FILE),link=False) as (src,dst):dst.scenes=[src.scenes[0]]
+ with bpy.data.libraries.load(str(FILE),link=False) as (src,dst):dst.scenes=['SOLDIER_ASSET_LIBRARY']
  assert dst.scenes[0].get('review_status')=='Pending'
+ previous_registry=json.loads(dst.scenes[0]['soldier_registry'])
+ assert all(e['id']=='SOLDIER_Skin_v001' for e in previous_registry['entries']), 'Library contains additional assets. Use their focused asset builders; never rebuild the library from the skin alone.'
 bpy.ops.wm.open_mainfile(filepath=str(D/'Survivor_Reference_v001.blend'),load_ui=True)
 bpy.context.preferences.filepaths.save_version=0
 scene=bpy.context.scene;scene.name='SOLDIER_ASSET_LIBRARY'
