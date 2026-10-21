@@ -1,0 +1,29 @@
+{
+  "blender_version": "5.2.2 LTS",
+  "numpy_version": "2.3.4",
+  "factory_scene_only": true,
+  "loaded_or_saved_library": false,
+  "image_float": true,
+  "image_space": "Non-Color",
+  "sample_interpolation": "Linear",
+  "initial_signed_sample": [
+    -0.125,
+    0.5,
+    0.0
+  ],
+  "image_update_only_sample": [
+    -0.125,
+    0.5,
+    0.0
+  ],
+  "image_update_and_object_tag_sample": [
+    0.0625,
+    -0.1875,
+    0.0
+  ],
+  "image_update_and_frame_change_sample": [
+    0.0625,
+    -0.1875,
+    0.0
+  ]
+}
