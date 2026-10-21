@@ -20,7 +20,7 @@ for entry in manifest['assets']:
  assert all(math.isfinite(float(x)) for v in m.vertices for x in v.co);assert all(p.area>1e-10 for p in m.polygons)
  mat=m.materials[0];mat_ids.add(mat.as_pointer());im=next(n.image for n in mat.node_tree.nodes if n.type=='TEX_IMAGE');r=asset_record(o,im);records.append(r)
  assert .70<=r['visible_height']<=.96 and r['materials']==1 and -.009<=r['root_z']<0
- if '_v001_' in o.name:assert min(r['visible_xy_size'])>=1. and max(r['root_xy_size'])<1.05
+ if '_v001_' in o.name:assert min(r['visible_xy_size'])>=1. and max(r['root_xy_size'])<1.05,(o.name,r)
  for p in m.polygons:
   co=m.vertices[p.vertices[0]].co
   for vi in p.vertices:planarity=max(planarity,abs((m.vertices[vi].co-co).dot(p.normal)))

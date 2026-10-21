@@ -22,7 +22,7 @@ def select(context,key):
  info=record();assert info and Path(bpy.data.filepath).name==LIB
  if key not in ['Short','Original']:
   layer=context.scene.view_layers[info['layer']];context.window.view_layer=layer;visible=visible_names(key)
-  for obj in bpy.data.collections['MD2_Tall_Grass_v001_PENDING'].all_objects:obj.hide_set(obj.name not in visible,view_layer=layer)
+  for obj in list(bpy.data.collections['MD2_Tall_Grass_v001_PENDING'].all_objects):obj.hide_set(obj.name not in visible,view_layer=layer)
  if key in ['Short','Original']:short_ui.select(context,'Overview' if key=='Short' else 'Original')
  else:
   context.window.view_layer=context.scene.view_layers[info['layer']]
