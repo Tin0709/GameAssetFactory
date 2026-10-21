@@ -33,3 +33,17 @@ The same library now contains `SOLDIER_Backpack_v001_PENDING` under `SOLDIER_ASS
 Reference-matched brown canvas, twin front and side pockets, real strap loops and open square adjusters; latest refinements add stepped voxel corners, segmented padding/piping and small block fabric details. One packed1024pixel atlas, one mesh/material; all original skin data remains unchanged. Review/render files and focused rebuild scripts are in `../assets/backpack_v001/`. The initial skin-only builder is guarded against deleting additional library assets.
 
 If the library is already open, choose File>Revert in that SOLDIER window to load its latest saved contents.
+
+## SOLDIER Library sidebar
+
+Open with the existing Terminal command below so the repository-local sidebar is explicitly registered:
+
+```sh
+python3 "$HOME/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py" soldier
+```
+
+Press **N** in the3Dviewport if needed and choose **SOLDIER Library**. The panel groups **Soldier Skin v001** under CHARACTER and **Backpack v001** under EQUIPMENT, shows Pending status and provides Front/3/4/Side/Back view buttons. Asset selection switches existing review scenes and cameras without changing the model or attaching equipment. Reverting the file in this viewer rehydrates the same panel through its persistent load handler.
+
+An older Soldier window opened without the UI bootstrap is left intact; the updated command opens a viewer with the panel. Subsequent launches reuse a viewer that already has the bootstrap. Raw double-click opening does not run external Python; use the command for this sidebar, as with the other project viewers.
+
+Latest backpack refinement: broad low-contrast pixel blocks, no granular speckles, fewer repeated relief details,512atlas and3,744triangles. The existing skin and all approved gameplay remain unchanged.

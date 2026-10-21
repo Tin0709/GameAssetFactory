@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "public_launcher_bootstraps_sidebar": true,
+  "asset_switches_checked": 4,
+  "camera_switches_checked": 16,
+  "mesh_transforms_and_geometry_preserved": true,
+  "legacy_window_without_panel_not_reused": true,
+  "launcher_tests_passed": 18,
+  "native_panel_class_registered": true,
+  "panel": "SOLDIER Library",
+  "assets": [
+    "Soldier Skin v001",
+    "Backpack v001"
+  ],
+  "auto_run_settings_changed": false
+}
