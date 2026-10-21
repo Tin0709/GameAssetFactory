@@ -88,19 +88,23 @@ def make_group():
     seconds = node('GeometryNodeInputSceneTime').outputs['Seconds']
     time = mul(seconds, g['Wind Speed'])
     p = mul(g['Clump Phase'], g['Per-Clump Variation'])
-    noise = node('ShaderNodeTexNoise', 'Slow advected world field'); noise.noise_dimensions = '3D'
+    noise = node('ShaderNodeTexNoise', 'Periodic coherent world field'); noise.noise_dimensions = '4D'
     noise.inputs['Scale'].default_value = 1.; noise.inputs['Detail'].default_value = 0.
-    put(noise.inputs['Vector'], vecop('ADD', vecop('SCALE', root_world, .23), vecop('SCALE', direction, mul(time, -.18))))
+    # Circular traversal in noise space closes the default 20-second review.
+    # The gust front below still propagates monotonically in the wind direction.
+    noise_phase = mul(time, math.tau * .05)
+    put(noise.inputs['Vector'], vecop('ADD', vecop('SCALE', root_world, .23), vecop('SCALE', direction, mul(cos(noise_phase), .72))))
+    put(noise.inputs['W'], mul(sin(noise_phase), .72))
     centered_noise = sub(noise.outputs['Fac'], .5)
-    ambient = add(.13, add(mul(sin(add(sub(mul(time, math.tau * .17), mul(along, .62)), mul(p, .25))), .038),
-                            add(mul(sin(add(mul(time, math.tau * .31), mul(along, .39))), .025),
+    ambient = add(.13, add(mul(sin(add(sub(mul(time, math.tau * .15), mul(along, .62)), mul(p, .25))), .038),
+                            add(mul(sin(add(mul(time, math.tau * .30), mul(along, .39))), .025),
                                 mul(mul(centered_noise, .065), g['Per-Clump Variation']))))
     gust_phase = mul(sub(sub(mul(time, g['Gust Frequency']), mul(along, .055)), .25), math.tau)
     gust = power(mathop('MAXIMUM', sin(gust_phase), 0.), 4.)
     response = add(g['Short Grass Response'], mul(g['Tall'], sub(g['Tall Grass Response'], g['Short Grass Response'])))
     gain = mul(mul(g['Wind Strength'], response), g['Wind Enabled'])
     bend = mathop('MINIMUM', mul(add(ambient, mul(mul(gust, g['Gust Strength']), .72)), gain), .9)
-    side = mul(add(mul(sin(add(mul(time, math.tau * .23), mul(along, .45))), .04), mul(centered_noise, .035)), gain)
+    side = mul(add(mul(sin(add(mul(time, math.tau * .25), mul(along, .45))), .04), mul(centered_noise, .035)), gain)
     flutter_phase = add(add(mul(time, math.tau * 1.1), phase), add(mul(along, .71), p))
     flutter = mul(mul(mul(add(sin(flutter_phase), mul(sin(add(mul(time, math.tau * 1.7), mul(phase, .7))), .35)), .018),
                           mul(g['Per-Clump Variation'], add(.45, mul(gust, .55)))), gain)
