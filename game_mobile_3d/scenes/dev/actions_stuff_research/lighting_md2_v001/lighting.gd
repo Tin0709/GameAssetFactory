@@ -1,6 +1,9 @@
 extends Node
 ## Lab-local owner. Uses only Mobile features and restores its borrowed resources.
 const Palette=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/palette.gd")
+const Metrics=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/metrics.gd")
+const PreviewUI=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/preview_ui.gd")
+const ReviewProps=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/review_props.gd")
 const TIERS:=[
 	{"name":"Low","scale":.75,"atlas":1024,"filter":1,"distance":24.,"splits":0,"glow":false},
 	{"name":"Medium","scale":.85,"atlas":2048,"filter":2,"distance":32.,"splits":1,"glow":true},
@@ -61,6 +64,10 @@ func setup(scene:Node3D,foliage:Node=null)->void:
 	sun.light_angular_distance=0.;sun.shadow_bias=.10;sun.shadow_normal_bias=.8
 	sun.shadow_blur=1.25;sun.directional_shadow_fade_start=.85;sun.directional_shadow_blend_splits=false;sun.directional_shadow_split_1=.35
 	set_quality(quality);_apply()
+	metrics=Metrics.new();metrics.setup(viewport)
+	ui=PreviewUI.new();ui.name="LightingPreviewControls";add_child(ui);ui.setup(self)
+	# Demonstration props belong to this opt-in lab module and leave with it.
+	var props:=ReviewProps.new();add_child(props)
 
 func set_time(hour:float,snap:bool=false)->void:
 	target_hour=fposmod(hour,24.) if is_finite(hour) else 12.
@@ -136,5 +143,7 @@ func _restore()->void:
 
 func release()->void:
 	if released:return
-	_restore();released=true
+	_restore()
+	if metrics!=null:metrics.release()
+	released=true
 func _exit_tree()->void:release()
