@@ -1,0 +1,129 @@
+{
+	"fixed_fps": false,
+	"grass": 14831,
+	"map_blocks": 100,
+	"note": "Normal render loop. No forced draws/readbacks in measured windows. Stress HP only keeps100alive; normalHP phase separately exercises lethal corpses. DesktopM2Pro only.",
+	"physics_hz": 60,
+	"render_cap": 120,
+	"renderer": "mobile/Metal",
+	"rows": [
+		{
+			"alive": 100,
+			"average_fps": 119.263516227313,
+			"fps_windows": [
+				117.802187358934,
+				119.937033057645
+			],
+			"frame_p95_ms": 15.68,
+			"hits": 17,
+			"mean_LOS_rays": 1.91364902506964,
+			"minimum_alive": 100,
+			"phase": "stand_fire100",
+			"physics_p95_ms": 10.141,
+			"pool_misses": 0,
+			"ragdolls": 0,
+			"seconds": 3.010141,
+			"shots": 17,
+			"strafe_fraction": 0.0,
+			"travel_m": 0.0
+		},
+		{
+			"alive": 100,
+			"average_fps": 118.214173446499,
+			"fps_windows": [
+				115.116823728356,
+				118.434181683956,
+				120.376482382112,
+				119.489778645185,
+				116.002264522839
+			],
+			"frame_p95_ms": 16.205,
+			"hits": 23,
+			"mean_LOS_rays": 1.57746478873239,
+			"minimum_alive": 100,
+			"phase": "walk_fire100",
+			"physics_p95_ms": 12.973,
+			"pool_misses": 0,
+			"ragdolls": 0,
+			"seconds": 6.006048,
+			"shots": 23,
+			"strafe_fraction": 0.976056338028169,
+			"travel_m": 12.9418534757569
+		},
+		{
+			"alive": 100,
+			"average_fps": 104.576704556572,
+			"fps_windows": [
+				105.553403549582,
+				118.919848022433,
+				112.6018231618,
+				111.883957523701,
+				98.4837481919777,
+				86.7497624239461,
+				102.1282333997,
+				109.616888973039,
+				99.5478948577106,
+				109.767530171237,
+				101.797969575255
+			],
+			"frame_p95_ms": 17.375,
+			"hits": 61,
+			"mean_LOS_rays": 1.30573248407643,
+			"minimum_alive": 100,
+			"phase": "run_fire100",
+			"physics_p95_ms": 15.175,
+			"pool_misses": 0,
+			"ragdolls": 0,
+			"seconds": 12.010323,
+			"shots": 61,
+			"strafe_fraction": 1.0,
+			"travel_m": 72.4258369505405
+		},
+		{
+			"alive": 100,
+			"average_fps": 119.851483622121,
+			"fps_windows": [
+				119.774349085805,
+				119.933077342843
+			],
+			"frame_p95_ms": 16.264,
+			"hits": 0,
+			"mean_LOS_rays": 1.0,
+			"minimum_alive": 100,
+			"phase": "release100",
+			"physics_p95_ms": 13.258,
+			"pool_misses": 0,
+			"ragdolls": 0,
+			"seconds": 2.010822,
+			"shots": 0,
+			"strafe_fraction": 0.004149377593361,
+			"travel_m": 0.388192958664149
+		},
+		{
+			"alive": 96,
+			"average_fps": 105.361395209844,
+			"fps_windows": [
+				103.666025582801,
+				102.343873427457,
+				109.711330709486,
+				103.869436118799,
+				107.169117829468,
+				105.524763802047,
+				104.2934121328
+			],
+			"frame_p95_ms": 17.189,
+			"hits": 42,
+			"mean_LOS_rays": 1.20047449584816,
+			"minimum_alive": 96,
+			"phase": "run_fire_normal_hp",
+			"physics_p95_ms": 14.073,
+			"pool_misses": 0,
+			"ragdolls": 0,
+			"seconds": 8.001033,
+			"shots": 42,
+			"strafe_fraction": 0.979833926453143,
+			"travel_m": 47.9690966783091
+		}
+	],
+	"viewport": "3004x1805"
+}

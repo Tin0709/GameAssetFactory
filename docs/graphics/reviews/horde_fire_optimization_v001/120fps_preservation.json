@@ -1,0 +1,51 @@
+{
+  "anchor": ".validation/expanded_grass_additive_v001/protected_before.json (pre-existing8982-file anchor; previous authorized changes retained)",
+  "examined": 8982,
+  "current_authorized_existing": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/molang_vm.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_direction_controller.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_jump_runtime.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_direction_sampler.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/auto_aim.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/source_visual.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_jump_gameplay.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_horde_efficiency.gd"
+  ],
+  "changed": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_direction_controller.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/molang_vm.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_direction_sampler.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/source_jump_runtime.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/controls.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_md2_grass_presentation.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_zombie_hit_feedback.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_jump_gameplay.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_performance_lab.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_combat_feel.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/source_visual.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/interaction_field.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass.gdshader",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/auto_aim.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
+  ],
+  "missing": [],
+  "unexpected": [],
+  "blender_changed": [],
+  "worldmap_changed": [],
+  "new_dev_files": [
+    "molang_program.gd",
+    "tests/test_molang_program.gd",
+    "tests/test_horde_auto_aim.gd"
+  ],
+  "scene_terrain_grass_physics_only_prior_changes": true
+}

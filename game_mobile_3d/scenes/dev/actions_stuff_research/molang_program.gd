@@ -1,6 +1,6 @@
 extends RefCounted
 ## Dev-only compiler of the audited JSON AST subset into Godot bytecode.
-## No source evaluation/rewrite or clock changes. Lazy branches and ordered
+## Source datasets stay read-only and clocks stay exact. Lazy branches and ordered
 ## side effects become explicit statements; each root keeps its return scope.
 const KERNEL_PATH="res://scenes/dev/actions_stuff_research/molang_vm.gd"
 const TAGS=["program","unary","binary","call","assign","return","conditional","vector"]
