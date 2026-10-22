@@ -15,10 +15,17 @@ var batch_count:=0
 var clock:=0.
 var enabled:=true
 var _atlases:Dictionary={}
+var _ground_top:Texture2D
 
 func setup(actor:CharacterBody3D)->void:
 	player=actor
 	var data:Dictionary=JSON.parse_string(FileAccess.get_file_as_string(ASSETS+"grass_data.json"))
+	# Reuse the actual upward terrain surface, without duplicating its texture.
+	for surface:Dictionary in data.ground.surfaces:
+		if not surface.normals.is_empty() and float(surface.normals[0][1])>0.99:
+			_ground_top=_atlas(surface.atlas)
+			break
+	assert(_ground_top!=null,"Grass root blending requires the terrain's top atlas")
 	for entry:Dictionary in data.meshes:meshes.append(_mesh(entry,true))
 	var ground_mesh:=_mesh(data.ground,false)
 	var ground:=MultiMesh.new();ground.transform_format=MultiMesh.TRANSFORM_3D;ground.mesh=ground_mesh;ground.instance_count=900
@@ -82,6 +89,7 @@ func _mesh(entry:Dictionary,grass:bool)->ArrayMesh:
 				if m.get_shader_parameter("atlas")==_atlas(surface.atlas):found=m;break
 			if found==null:
 				found=ShaderMaterial.new();found.shader=GRASS_SHADER;found.set_shader_parameter("atlas",_atlas(surface.atlas))
+				found.set_shader_parameter("ground_atlas",_ground_top)
 				found.set_shader_parameter("interaction_field",interaction.texture)
 				found.set_shader_parameter("interaction_previous",interaction.previous_texture)
 				found.set_shader_parameter("family_response",.72 if entry.family=="short" else 1.)

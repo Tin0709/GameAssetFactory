@@ -1,6 +1,7 @@
 shader_type spatial;
 render_mode cull_disabled, diffuse_lambert, specular_disabled, shadows_disabled;
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
+uniform sampler2D ground_atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
 uniform sampler2D interaction_previous : filter_linear, repeat_disable;
 uniform float interaction_alpha=1.0;
@@ -12,6 +13,7 @@ uniform float family_response=1.0;
 uniform float field_extent=34.0;
 varying float height_fraction;
 varying vec3 planted_root;
+varying vec3 ground_albedo;
 
 void vertex(){
 	// Export contract: UV2=immutable local root XZ, COLOR=(t,length,phase,1).
@@ -20,6 +22,9 @@ void vertex(){
 	height_fraction=t;
 	vec3 root=(MODEL_MATRIX*vec4(UV2.x,0.0,UV2.y,1.0)).xyz;
 	planted_root=root;
+	// Unit ground blocks repeat UV=(world XZ modulo 1). Sample at the fixed
+	// root once per vertex; the root tint must not swim with the bending tips.
+	ground_albedo=textureLod(ground_atlas,fract(root.xz),0.0).rgb;
 	vec2 direction=normalize(vec2(0.825,0.565));
 	vec2 crosswind=vec2(-direction.y,direction.x);
 	float spatial=dot(root.xz,direction);
@@ -58,10 +63,13 @@ void fragment(){
 	ALPHA=texel.a;ALPHA_SCISSOR_THRESHOLD=0.5;
 	float variation=0.97+0.06*sin(planted_root.x*0.19+planted_root.z*0.27);
 	ALBEDO=texel.rgb*variation*mix(0.96,1.03,height_fraction);
-	// Original Mobile material adaptation only. Wind/root geometry is untouched.
-	ALBEDO*=mix(1.0,mix(0.82,1.0,smoothstep(0.0,0.55,height_fraction)),lighting_grade);
+	// Match the actual terrain at the base, then retain the authored leaf/seed
+	// colors above it. No dark root band or extra per-fragment texture sample.
+	float root_blend=1.0-smoothstep(0.02,0.62,height_fraction);
+	ALBEDO=mix(ALBEDO,ground_albedo,root_blend);
 	vec3 face=FRONT_FACING?NORMAL:-NORMAL;
 	vec3 up=(VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz;
-	NORMAL=normalize(mix(face,up,mix(0.56,0.54,lighting_grade)));
+	vec3 leaf_normal=normalize(mix(face,up,mix(0.56,0.54,lighting_grade)));
+	NORMAL=normalize(mix(leaf_normal,up,root_blend));
 	ROUGHNESS=1.0;SPECULAR=0.0;
 }
