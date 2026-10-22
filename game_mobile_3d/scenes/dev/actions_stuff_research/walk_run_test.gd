@@ -209,10 +209,11 @@ func _notification(what: int) -> void:
 func reset_player() -> void:
 	if rifle_auto_aim!=null:rifle_auto_aim.reset_target()
 	if rifle_fire!=null:rifle_fire.reset_fire()
-	if zombie_combat!=null:zombie_combat.reset_encounter()
 	_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
 	_turn_left_held=false;_turn_right_held=false
 	player.global_position=Vector3.ZERO;player.velocity=Vector3.ZERO;player.current_speed=0.;player.reset_jump_motion();player.visual.reset_contacts()
+	# Adjustable batches derive their positions from the player's reset location.
+	if zombie_combat!=null:zombie_combat.reset_encounter()
 	if presentation!=null: presentation.reset_history()
 	if soldier_appearance!=null:soldier_appearance.reset()
 	if grass_field!=null:grass_field.reset()
