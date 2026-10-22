@@ -28,6 +28,7 @@ func set_item_holding(right: float, left: float) -> void:
 
 func _init(rig: Skeleton3D) -> void:
 	data = JSON.parse_string(FileAccess.get_file_as_string(DATA_PATH))
+	_cache_literal_vectors()
 	height_field = JSON.parse_string(FileAccess.get_file_as_string(HEIGHT_PATH))
 	var profile: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(BASE_PATH))
 	parents = profile.parents
@@ -60,7 +61,23 @@ func _neutral() -> Dictionary:
 		out[bone] = {"rotation":Vector3.ZERO,"position":Vector3.ZERO,"scale":Vector3.ONE}
 	return out
 
-func _vector(values: Array, env: Dictionary, accumulated: Vector3) -> Vector3:
+func _cache_literal_vectors()->void:
+	# Most authored key vectors are numeric constants. Materialize their exact
+	# float32 Vector3 once, retaining dynamic ASTs and all original key times.
+	for clip:Dictionary in data.clips.values():
+		for bone:Dictionary in clip.bones.values():
+			for keys:Array in bone.values():
+				for key:Array in keys:
+					for side:int in [1,2]:
+						var values:Array=key[side]
+						if values[0][0]=="literal" and values[1][0]=="literal" and values[2][0]=="literal":
+							key[side]=Vector3(float(values[0][1]),float(values[1][1]),float(values[2][1]))
+
+func _vector(values: Variant, env: Dictionary, accumulated: Vector3) -> Vector3:
+	if values is Vector3:
+		# Preserve the evaluator's final `this` value even for constant channels.
+		env["this"]=accumulated.z
+		return values
 	var out := Vector3.ZERO
 	for axis in 3:
 		# Holding evaluates `this` from the accumulated same-axis channel.
