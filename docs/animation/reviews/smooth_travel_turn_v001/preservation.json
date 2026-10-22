@@ -1,0 +1,11 @@
+{
+  "baseline_files": 9049,
+  "changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
+  ],
+  "missing": [],
+  "unexpected_changes": [],
+  "blender_unchanged": true,
+  "worldmap_unchanged": true
+}
