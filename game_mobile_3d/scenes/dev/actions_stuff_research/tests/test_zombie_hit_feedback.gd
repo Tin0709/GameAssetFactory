@@ -17,6 +17,8 @@ func run() -> void:
 	if "30" in OS.get_cmdline_user_args():fps=30
 	Engine.max_fps=fps
 	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate()
+	# Explicit legacy damage/death fixture; saved performance lab remains100m.
+	scene.performance_test_enabled=false;scene.grass_field_blocks=30;scene.grass_vegetation_enabled=false
 	root.add_child(scene);scene.player.scripted_input=true
 	await ticks(6)
 	var z=scene.zombie_combat.zombies[0]

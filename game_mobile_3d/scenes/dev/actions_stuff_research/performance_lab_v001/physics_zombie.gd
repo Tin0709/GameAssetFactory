@@ -39,7 +39,12 @@ func _advance_living_ai(delta:float)->void:
 	var elapsed:=_pending_ai_delta;_pending_ai_delta=0.
 	ai_steps+=1
 	super._advance_living_ai(elapsed)
-	_ai_blocked=is_on_floor() and chasing and not holding_distance and pending_attack<0. and knockback.length_squared()<.0001 and attack_visual_remaining<=0. and Vector2(get_real_velocity().x,get_real_velocity().z).length_squared()<.01
+	# move_and_slide may zero velocity at a wall. Use the retained chase intent,
+	# not its post-collision velocity, to recognize a blocked approach.
+	_ai_blocked=(is_on_floor() and chasing and not holding_distance
+		and pending_attack<0. and attack_visual_remaining<=0.
+		and knockback.length_squared()<.0001
+		and Vector2(get_real_velocity().x,get_real_velocity().z).length_squared()<.01)
 
 func take_damage(amount:int,direction:Vector3=Vector3.ZERO)->bool:
 	# A new impact must never wait for the crowd retry phase.

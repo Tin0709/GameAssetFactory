@@ -58,18 +58,11 @@ func _advance_living_ai(delta:float)->void:
 	# original encounter always uses its unchanged native living controller.
 	super._physics_process(delta)
 
-static var diagnostic_ai_usec:=0
-static var diagnostic_visual_usec:=0
-static var diagnostic_sample_usec:=0
 func _physics_process(delta: float) -> void:
 	if not is_dead:
-		var started:=Time.get_ticks_usec()
 		_advance_living_ai(delta)
-		diagnostic_ai_usec+=Time.get_ticks_usec()-started;started=Time.get_ticks_usec()
 		visual._process(delta)
-		diagnostic_visual_usec+=Time.get_ticks_usec()-started;started=Time.get_ticks_usec()
 		ragdoll.sample(delta)
-		diagnostic_sample_usec+=Time.get_ticks_usec()-started
 		return
 	if not ragdoll.running:
 		# Immediate debug damage may precede two warmed pose samples.

@@ -61,11 +61,7 @@ func _pooled(scene: PackedScene) -> Node3D:
  node.set_script(null);node.visible=false;add_child(node);return node
 func set_trigger(held: bool) -> void:
  trigger_held=held
-var diagnostic_usec:=0
-func _physics_process(delta: float) -> void:
- var started:=Time.get_ticks_usec()
- tick(delta)
- diagnostic_usec+=Time.get_ticks_usec()-started
+func _physics_process(delta: float) -> void:tick(delta)
 func tick(delta: float) -> void:
  var profile: Dictionary=Profiles.PROFILES[1]
  _move_projectiles(delta,profile)
