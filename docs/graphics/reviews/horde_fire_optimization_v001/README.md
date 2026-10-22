@@ -1,3 +1,25 @@
+## Latest follow-up: moving while firing, 110–120 FPS target (2026-10-22)
+
+The existing full100×100 lab retains10,000 blocks/14,831grass and100zombies. No density, resolution, source animation, weapon cadence, movement/camera or native death settings were reduced. The110–120FPS target is **not yet sustained** in the heaviest running/fire phase.
+
+The expensive player source AST evaluation now compiles complete audited AST roots into Godot bytecode once per dataset. Degree math, ordered writes, lazy branches, Callables, scoped returns and source clocks remain. Pure constant key vectors are cached; zero-contribution gaits/clip weights are skipped and source key intervals use binary lookup. Rifle combat requests only the four directional output poses it already consumes (Root/Hips/legs), including their required ancestor compensation. The original full sampler remains the reference. Zombies submit complete local PRS in one native skeleton write. Auto-aim sorts reusable distance rows, casts nearest-first and retains the original equal-distance tie/hysteresis/LOS policy.
+
+Native Mobile/Metal on this M2Pro;3004×1805SubViewport,60Hzphysics,120render cap,vsync off. Ordinary render loop, no fixedFPS/force-draw/readback inside windows. Same actual100spawned actors chase; heldE is reasserted like physical held input during unattended testing. Stress HP alone keeps100alive, with movement/shots/hits explicitly required. A separate normalHP phase exercises lethal damage. Baseline code was actually restored from this task's clean backups, measured, then current code restored. Other lab play instances were closed for isolated runs.
+
+| Phase | Before FPS | After FPS | After frame p95 ms | After shots / hits |
+|---|---:|---:|---:|---:|
+| stand_fire100 | 120.0 | 120.3 | 15.61 | 17 / 17 |
+| walk_fire100 | 79.0 | 118.6 | 15.98 | 28 / 28 |
+| run_fire100 | 60.0 | 106.4 | 17.11 | 65 / 64 |
+| release100 | 112.1 | 119.3 | 15.96 | 0 / 1 |
+| run_fire_normal_hp | 59.6 | 106.1 | 17.20 | 37 / 37 |
+
+Run/fire retains100alive for12seconds, continuous strafe and over72m of actual travel; individual1s windows still fall below110. Thus this is a substantial improvement, not a claim of stable110–120 or mobile-device certification. Raw samples: [before](120fps_before.json), [after](120fps_after.json), [same benchmark](120fps_benchmark.gd). A screenshot readback occurs only after all timing windows.
+
+Correctness:130,664controller comparisons/1,350steps,275direction poses and2,160jump snapshots/326clip samples match their frozen source oracles with the same pre-change errors.70compiler value/environment parity cases pass, including return/short-circuit scopes and strong program ownership.120real-physics target comparisons match the original scan, reducing LOS casts462→132 with reused storage. Expanded zombie source PRS comparison covers60clock/state/blend combinations (46checks), worst3.21e−7.30/60FPS Fire(159shots,zero pool misses), Combat Strafe, Jump Gameplay,465performance checks,12crowd checks,23combat checks and hit feedback pass. Jump test's two obsolete5.1camera/1.25movement assertions were updated to the already-approved14.5/1.2values; no gameplay tuning was changed to satisfy tests. Review corrected the single skeleton write to local-axis scale composition.
+
+Discarded: per-track constant cache increased overhead; disabling dormant corpse colliders did not show a reliable benefit. Neither is shipped. All temporary per-function timing counters/wrappers were removed. Some intermediate timing runs overlapped a separately opened editor-play instance and are excluded from the final comparison. Same original scene/project, original physics resources/solver/corpse lifetime, source JSON/libraries, Blender files and WorldMap remain.
+
 # 100-zombie continuous-fire optimization — existing gameplay lab
 
 The user reported a large frame-rate drop while shooting100zombies, recovering after release. Same saved100×100field,14,831clumps, player controls/camera/speed,6Hzfire and native death resources. No new scene or project. Native profiling separated idle, aim without firing, continuous shots and release.

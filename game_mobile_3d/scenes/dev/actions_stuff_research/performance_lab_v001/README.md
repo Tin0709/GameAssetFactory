@@ -1,3 +1,9 @@
+## Latest moving/fire follow-up —2026-10-22
+
+Compiled the existing audited player source AST roots once, cached constant vectors, skipped zero-weight work and sampled only the four directional poses already consumed by rifle strafe. Full source sampler remains the oracle. Zombies upload identical local PRS once per bone; nearest-first pooled LOS preserves auto-aim selection/tie/hysteresis behavior. No source animations, weapon/movement/camera tuning, grass density or native physics changes.
+
+Actual M2Pro Mobile/Metal3004×1805,100all-alive/full14,831grass: walking+E79→118.6FPS; running+E60→106.4FPS. The110–120target is still not sustained in heavy running/fire or lethal-physics cases. Fresh30/60checks, source oracles and matching real shots/hits/travel evidence pass. Full limits, raw before/after samples and reproduction are in `docs/graphics/reviews/horde_fire_optimization_v001/README.md` at repository root. Earlier figures below are historical.
+
 ## Latest100-zombie fire optimization —2026-10-22
 
 Fully blocked grounded chasers retry native movement at30Hz, carrying elapsed AI timer delta and per-actor retry phases. Damage immediately cancels the wait. Freely moving/attacking actors retain the normal physics updates. All source animation/hit-layer evaluation and native handoff samples continue at60Hz. This is an opt-in property of this performance actor, not a production AI change. Collision masks, native max-slides/solver, movement speed and corpse parameters remain exact. Existing source evaluator now skips only zero-weight clips, preserving every resulting PRS pose and blend.
