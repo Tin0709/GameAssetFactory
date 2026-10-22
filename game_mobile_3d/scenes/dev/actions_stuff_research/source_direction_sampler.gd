@@ -16,6 +16,13 @@ var names: Array[String] = []
 var poses: Array[Transform3D] = []
 var channels: Dictionary = {}
 var unit := 0.0
+var lower_body_only:=false
+var sampled_bones:Array=BONES
+func set_lower_body_only()->void:
+	# Rifle combat consumes only these channels/ancestor transforms. Upper-body
+	# direction poses are discarded by the approved Aim/grip/recoil layers.
+	lower_body_only=true
+	sampled_bones=["root","waist","rightleg","leftleg"]
 # Preserve the immutable study's standard-item profile by default. Gameplay
 # explicitly selects the unarmed profile; both samples use the same flags.
 var holding_right := 1.0
@@ -58,7 +65,7 @@ func _environment(snapshot: Dictionary, clock: float) -> Dictionary:
 
 func _neutral() -> Dictionary:
 	var out: Dictionary = {}
-	for bone in BONES:
+	for bone in sampled_bones:
 		out[bone] = {"rotation":Vector3.ZERO,"position":Vector3.ZERO,"scale":Vector3.ONE}
 	return out
 
@@ -109,7 +116,7 @@ func _add_clip(out: Dictionary, alias: String, environment: Dictionary, clock: f
 	var weight := maxf(0.0,controller_weight)*maxf(0.0,float(VM.execute(clip.blend_weight,env)))
 	if weight == 0.0:
 		return
-	for bone in BONES:
+	for bone in sampled_bones:
 		for key in clip.bones[bone]:
 			var identity: Vector3 = Vector3.ONE if key == "scale" else Vector3.ZERO
 			out[bone][key] += weight*(_channel(clip.bones[bone][key],clock,env,out[bone][key])-identity)
@@ -150,7 +157,7 @@ func _diagnostic_set_snapshot(snapshot: Dictionary) -> void:
 		var walk := _directional("walk",env,clock)
 		var running := _directional("run",env,clock)
 		channels = _neutral()
-		for bone in BONES:
+		for bone in sampled_bones:
 			for key in CHANNELS:
 				channels[bone][key] = Vector3(walk[bone][key]).lerp(running[bone][key],run_weight)
 	_add_clip(channels,"xfltzh",env,clock)
@@ -164,6 +171,16 @@ func _diagnostic_set_snapshot(snapshot: Dictionary) -> void:
 	var desired: Dictionary = base.duplicate()
 	var source_root := _source_transform("root",Vector3.ZERO)
 	var waist := source_root*_source_transform("waist",base.Hips.origin)
+	if lower_body_only:
+		desired.Root=source_root*Transform3D(base.Root)
+		desired.Hips=waist*Transform3D(base.Hips)
+		for side in ["L","R"]:
+			var name:String="Leg."+side
+			desired[name]=source_root*_source_transform("leftleg" if side=="L" else "rightleg",base[name].origin)*Transform3D(base[name])
+		for name in ["Root","Hips","Leg.L","Leg.R"]:
+			var i:=names.find(name)
+			poses[i]=Transform3D(desired[parents[name]]).affine_inverse()*Transform3D(desired[name]) if parents[name]!="" else desired[name]
+		return
 	var body := waist*_source_transform("body",base.Head.origin)
 	desired.Root = source_root*Transform3D(base.Root)
 	for name in ["Hips","Spine"]:
