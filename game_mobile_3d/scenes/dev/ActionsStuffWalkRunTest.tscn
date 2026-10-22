@@ -5,3 +5,4 @@
 [node name="ActionsStuffWalkRunTest" type="Node3D"]
 script = ExtResource("test")
 grass_field_enabled = true
+md2_lighting_enabled = true

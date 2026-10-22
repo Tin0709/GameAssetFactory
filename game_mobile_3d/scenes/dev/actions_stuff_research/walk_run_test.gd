@@ -12,6 +12,9 @@ const RifleAutoAim=preload("res://scenes/dev/actions_stuff_research/rifle_ready_
 const SoldierLoadout=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/loadout.gd")
 const SoldierAppearance=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/appearance.gd")
 const GrassField=preload("res://scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd")
+const MD2Lighting=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/lighting.gd")
+@export var md2_lighting_enabled:=false
+var md2_lighting:Node
 @export var grass_field_enabled:=false
 var grass_field:Node3D
 var grass_overview:=false
@@ -81,6 +84,8 @@ func _ready() -> void:
 		soldier_appearance=SoldierAppearance.new();soldier_appearance.name="SoldierAppearance";add_child(soldier_appearance);soldier_appearance.setup(self)
 	if grass_field_enabled:
 		grass_field=GrassField.new();grass_field.name="MD2GrassField30x30";add_child(grass_field);grass_field.setup(player)
+	if md2_lighting_enabled:
+		md2_lighting=MD2Lighting.new();md2_lighting.name="GAF_MD2_Lighting_v001";add_child(md2_lighting);md2_lighting.setup(self)
 	_update_camera()
 func _build_environment() -> void:
 	var environment:=WorldEnvironment.new();var settings:=Environment.new();settings.background_mode=Environment.BG_COLOR;settings.background_color=Color(.17,.22,.26)

@@ -4,6 +4,7 @@ uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
 uniform sampler2D interaction_previous : filter_linear, repeat_disable;
 uniform float interaction_alpha=1.0;
+uniform float lighting_grade=0.0;
 uniform float wind_time=0.0;
 uniform float wind_strength=1.28;
 uniform float interaction_strength=1.50;
@@ -57,8 +58,10 @@ void fragment(){
 	ALPHA=texel.a;ALPHA_SCISSOR_THRESHOLD=0.5;
 	float variation=0.97+0.06*sin(planted_root.x*0.19+planted_root.z*0.27);
 	ALBEDO=texel.rgb*variation*mix(0.96,1.03,height_fraction);
+	// Original Mobile material adaptation only. Wind/root geometry is untouched.
+	ALBEDO*=mix(1.0,mix(0.82,1.0,smoothstep(0.0,0.55,height_fraction)),lighting_grade);
 	vec3 face=FRONT_FACING?NORMAL:-NORMAL;
 	vec3 up=(VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz;
-	NORMAL=normalize(mix(face,up,0.56));
+	NORMAL=normalize(mix(face,up,mix(0.56,0.54,lighting_grade)));
 	ROUGHNESS=1.0;SPECULAR=0.0;
 }
