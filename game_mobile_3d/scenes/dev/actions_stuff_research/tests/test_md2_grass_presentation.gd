@@ -14,8 +14,9 @@ func shown(material:ShaderMaterial,col:int,row:int)->Vector2:
 func run():
  var actor:=CharacterBody3D.new();root.add_child(actor)
  var field=load("res://scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd").new()
- root.add_child(field);field.setup(actor);field.set_process(false);field.set_physics_process(false)
- var col:=32;var row:=32;var probe:=Vector2(.265625,.265625)
+ root.add_child(field);field.setup(actor,100 if OS.get_cmdline_user_args().has("100") else 30);field.set_process(false);field.set_physics_process(false)
+ var size:int=field.interaction.size
+ var col:int=size/2;var row:int=size/2;var probe:Vector2=Vector2.ONE*field.interaction.cell*.5
  var worst:=0.;var moving_subframes:=0;var held_subframes:=0
  for tick in 20:
   var before:Vector2=field.interaction.sample_at(probe)
@@ -28,7 +29,7 @@ func run():
    else:field._process(1./240.)
    var actual:=shown(field.materials[0],col,row)
    if OS.get_cmdline_user_args().has("diagnose") and tick<2:
-    print("PRESENT_PROBE ", {"tick":tick,"alpha":alpha,"before":before,"after":after,"display":actual,"raw":field.interaction.pixels.decode_half((row*64+col)*8),"previous_raw":field.interaction.previous_pixels.decode_half((row*64+col)*8),"image":field.interaction.image.get_pixel(col,row),"previous_image":field.interaction.previous_image.get_pixel(col,row),"uniform":field.materials[0].get_shader_parameter("interaction_alpha")})
+    print("PRESENT_PROBE ", {"tick":tick,"alpha":alpha,"before":before,"after":after,"display":actual,"raw":field.interaction.pixels.decode_half((row*size+col)*8),"previous_raw":field.interaction.previous_pixels.decode_half((row*size+col)*8),"image":field.interaction.image.get_pixel(col,row),"previous_image":field.interaction.previous_image.get_pixel(col,row),"uniform":field.materials[0].get_shader_parameter("interaction_alpha")})
    worst=maxf(worst,actual.distance_to(before.lerp(after,alpha)))
    if k>0 and before.distance_to(after)>.002:
     if actual.distance_to(last)<.00001:held_subframes+=1
@@ -40,5 +41,5 @@ func run():
  if field.has_method("present"):field.present(.5)
  else:field._process(1./60.)
  if shown(field.materials[0],col,row).length()>.00001:failures.append("Reset must clear BOTH render histories")
- print("MD2_GRASS_PRESENTATION ",JSON.stringify({"worst_error_rad":worst,"moving_subframes":moving_subframes,"held_subframes":held_subframes,"failures":failures}))
+ print("MD2_GRASS_PRESENTATION ",JSON.stringify({"field_size":size,"worst_error_rad":worst,"moving_subframes":moving_subframes,"held_subframes":held_subframes,"failures":failures}))
  field.free();actor.free();quit(0 if failures.is_empty() else 1)
