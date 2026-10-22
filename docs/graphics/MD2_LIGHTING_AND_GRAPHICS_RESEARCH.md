@@ -139,7 +139,7 @@ RealAndroid/iOSvalidation is **pending**. Sustained heat, bandwidth, alpha overd
 
 Existing RifleFire30/60, CombatStrafe, camera-comfort and29grass contracts are run internally; actual native profiling exercises new lighting with live combat. Exact file/SHAaudit covers all pre-existing Blender/game files. Approved .blendActions, Soldier/weapon meshes, character/rifle/zombie scripts, projectdefaults and WorldMap remain untouched. Only the authorized lab script, scene opt-in and grass fragment shader change among pre-existing game files; the grass `vertex()` body is byte-identical. New runtime material remains inside the existing release-excluded research root.
 
-Native stills freeze world/pose/camera/wind phase; both A/Bstates use the same props. The short movie uses30FPSfixed simulation,300actual rendered frames/10.00simulated seconds, no retiming of actor/grass motion. Time-of-day preset seeking is intentionally accelerated preview, not a realtime10secondphysical day. Screenshot/movie timings are excluded from performance claims.
+Native stills freeze world/pose/camera/wind phase; Original restores its original1.0render scale, while the new Medium preview uses.85. This compares the complete default look and quality setup, not a claim of identical render budget; both A/Bstates use the same props. The short movie uses30FPSfixed simulation,300actual rendered frames/10.00simulated seconds, no retiming of actor/grass motion. Time-of-day preset seeking is intentionally accelerated preview, not a realtime10secondphysical day. Screenshot/movie timings are excluded from performance claims.
 
 ## 12. Known limits and next work
 

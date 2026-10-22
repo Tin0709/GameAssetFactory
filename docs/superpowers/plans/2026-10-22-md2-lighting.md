@@ -42,11 +42,11 @@
 
 ### Task4: Native verification and delivery
 **Files:** same existingtests directory native capture/profiling script; review output `docs/graphics/reviews/md2_lighting_v001/`; required researchreport.
-- [ ] Capture Original+fivephases, same gameplaycamera/pose/scene/windphase and nativeMobileoutput; inspect montage and adjust only lighting if needed.
-- [ ] Short original-speed smooth daytransition clip. No retiming or promotionalcamera replacement.
-- [ ] Warm nativeLow/Med/Highbenchmarks with wind,playerpassage,actualEcombat; rendererCPU/GPU,framepace,visible/shadowstats. Controlled same-pose shadow/glow A/B estimates if meaningful.
-- [ ] Run essentialexistingFire/Strafe/camera/grass checks, SHAaudit allprotectedfiles and standalone fresh review.
-- [ ] One focused fresh final code review; fix materialissues, report limits. Open the EXISTING lab with normal audio; stop for visualreview.
+- [x] Capture Original+fivephases, same gameplaycamera/pose/scene/windphase and nativeMobileoutput; inspect montage and adjust only lighting if needed.
+- [x] Short original-speed smooth daytransition clip. No retiming or promotionalcamera replacement.
+- [x] Warm nativeLow/Med/Highbenchmarks with wind,playerpassage,actualEcombat; rendererCPU/GPU,framepace,visible/shadowstats. Controlled same-pose shadow/glow A/B estimates if meaningful.
+- [x] Run essentialexistingFire/Strafe/camera/grass checks, SHAaudit allprotectedfiles and standalone fresh review.
+- [x] One focused fresh final code review; fix materialissues, report limits. Open the EXISTING lab with normal audio; stop for visualreview.
 
 ## Execution decisions
 - User explicitly requests BOTH research and implementation, no research-only stop. Perform this concrete authorized design in-place rather than insert redundant approval gates. Current asset-heavy workingtree is intentional; no copied project/worktree.
@@ -60,3 +60,7 @@
 - Native fivephase stills inspected, night/duskfillraised for readability. Finalstillrefreshpendingafter depthprecisionrestoration/UIheadercorrection.
 - Clip first manualfixedFPSrun hit native skinallocation startup errors, not gameplaybonechanges. Capturehelper now warms native storage before reconnecting approved presenter callbacks. Cleanrecapturepending; do not publish erroneousfirstlog.
 - Scope decisions: no decorativebeams/extraaccentlights in clearing; no nativeGI/reflectionwork for matteassets; nophoneFPSclaims; noWorldMaporprojectdefaults.
+
+- Task4 complete checks:20lighting/29grass, Fire30/60,Strafe,camera allclean; native finalstills/capture clean;300frame10sMP4decodedentirely. Finalstills usecorrect16bitrestoration; latestUIheaderandreadableNight/Duskfillincluded.
+- PreservationGREEN:8,939pre-existingfiles, exactly3authorizedchanges,0missing/unexpected, allBlender/project/WorldMap/approvedgameplayexact; grassvertexSHA47dc06ab122d3b579c80cf19a149715a97419e0590318c7157a12ab5af16df57.
+- Final whole-feature reviewcomplete; bothImportantissuesverifiedRED→GREEN, noCritical/deferredminors. Capture startupfixedonlyinhelper; approvedpresenters unchanged.
