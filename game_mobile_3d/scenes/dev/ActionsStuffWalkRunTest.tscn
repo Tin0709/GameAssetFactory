@@ -5,7 +5,8 @@
 [node name="ActionsStuffWalkRunTest" type="Node3D"]
 script = ExtResource("test")
 grass_field_enabled = true
-grass_vegetation_enabled = false
+grass_vegetation_enabled = true
+grass_field_blocks = 100
 md2_lighting_enabled = true
 performance_test_enabled = true
 movement_speed_multiplier = 1.2

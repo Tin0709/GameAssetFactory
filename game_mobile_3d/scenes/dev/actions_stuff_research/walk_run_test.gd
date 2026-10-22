@@ -21,6 +21,7 @@ var performance_controls:CanvasLayer
 var md2_lighting:Node
 @export var grass_field_enabled:=false
 @export var grass_vegetation_enabled:=true
+@export_range(10,200,1) var grass_field_blocks:=30
 var grass_field:Node3D
 var grass_overview:=false
 var soldier_appearance:Node
@@ -71,7 +72,7 @@ func _ready() -> void:
 			SoldierLoadout.install_skin(player.visual)
 			player.visual.activate_rifle_ready(SoldierLoadout.RIFLE)
 		else:player.visual.activate_rifle_ready()
-	camera=Camera3D.new();camera.name="GameplayCamera";camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=camera_size;camera.far=150.;add_child(camera);camera.make_current()
+	camera=Camera3D.new();camera.name="GameplayCamera";camera.projection=Camera3D.PROJECTION_ORTHOGONAL;camera.size=camera_size;camera.far=maxf(150.,grass_field_blocks*4.) if grass_field_enabled else 150.;add_child(camera);camera.make_current()
 	var layer:=CanvasLayer.new();add_child(layer)
 	var panel:=PanelContainer.new();panel.position=Vector2(20,20);panel.scale=Vector2(.25,.25);layer.add_child(panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.055,.88);style.content_margin_left=16;style.content_margin_right=16;style.content_margin_top=12;style.content_margin_bottom=12;style.set_corner_radius_all(6)
@@ -97,7 +98,7 @@ func _ready() -> void:
 	if soldier_loadout and rifle_ready:
 		soldier_appearance=SoldierAppearance.new();soldier_appearance.name="SoldierAppearance";add_child(soldier_appearance);soldier_appearance.setup(self)
 	if grass_field_enabled:
-		grass_field=GrassField.new();grass_field.name="MD2GrassField30x30";add_child(grass_field);grass_field.setup(player)
+		grass_field=GrassField.new();grass_field.name="MD2GrassField%dx%d"%[grass_field_blocks,grass_field_blocks];add_child(grass_field);grass_field.setup(player,grass_field_blocks)
 		if not grass_vegetation_enabled:
 			# Keep terrain, meshes, shader and contact histories for later restoration.
 			for child in grass_field.get_children():
@@ -117,14 +118,15 @@ func _build_environment() -> void:
 	var floor_body:=StaticBody3D.new();floor_body.name="FlatGround";add_child(floor_body)
 	# Same surface atY0; use the Lab's thicker contact slab and recovery bias
 	# for its fast native corpse impulses. Player floor height/physics stay exact.
-	var shape:=BoxShape3D.new();shape.size=Vector3(30 if grass_field_enabled else 200,.4,30 if grass_field_enabled else 200);shape.custom_solver_bias=.6
+	var shape:=BoxShape3D.new();shape.size=Vector3(grass_field_blocks if grass_field_enabled else 200,.4,grass_field_blocks if grass_field_enabled else 200);shape.custom_solver_bias=.6
 	var collision:=CollisionShape3D.new();collision.shape=shape;collision.position.y=-.2;floor_body.add_child(collision)
 	if grass_field_enabled:
 		# Bounded playable field; same Y0 and floor solver. Four static edge shapes.
 		# Separate invisible walls so dev bullets may fly beyond the arena edge.
 		var boundary:=StaticBody3D.new();boundary.name="FieldBoundary";add_child(boundary)
-		for edge in [Vector3(-15.2,.7,0),Vector3(15.2,.7,0),Vector3(0,.7,-15.2),Vector3(0,.7,15.2)]:
-			var wall:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(.4,2.,30.8) if edge.x!=0 else Vector3(30.8,2.,.4)
+		var edge_distance:=grass_field_blocks*.5+.2
+		for edge in [Vector3(-edge_distance,.7,0),Vector3(edge_distance,.7,0),Vector3(0,.7,-edge_distance),Vector3(0,.7,edge_distance)]:
+			var wall:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(.4,2.,grass_field_blocks+.8) if edge.x!=0 else Vector3(grass_field_blocks+.8,2.,.4)
 			wall.shape=box;wall.position=edge;boundary.add_child(wall)
 		return
 	var ground:=MeshInstance3D.new();var mesh:=PlaneMesh.new();mesh.size=Vector2(200,200);ground.mesh=mesh
@@ -153,14 +155,15 @@ func _process(delta: float) -> void:
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
 	hud.text=("RIFLE READY / AIM / FIRE · INFINITE AMMO ∞" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold E Aim + Fire · Right Mouse Aim / Orbit\nWheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
 	if zombie_combat!=null:
-		var capacity:int=zombie_combat.spawn_count if performance_test_enabled else ZombieCombat.MAX_RAGDOLLS
+		var capacity:int=zombie_combat.zombies.size() if performance_test_enabled else ZombieCombat.MAX_RAGDOLLS
 		hud.text+="\nZombies %d · Corpses %d / %d · Cleared %d · R Restart"%[zombie_combat.living_count(),zombie_combat.active_ragdolls(),capacity,zombie_combat.kills]
 	if rifle_auto_aim!=null:hud.text+="\nAuto-aim: "+(rifle_auto_aim.target.name if is_instance_valid(rifle_auto_aim.target) else "nearest zombie while aiming")
 	if rifle_ready:hud.text+="\nQ / C Turn in place · head leads, feet correct >60°"
-	if grass_field!=null:hud.text+="\n30 × 30 BLOCKS · "+("STRONG WIND + PLAYER WAKE" if grass_vegetation_enabled else "GRASS PAUSED")+" · V Overview"
+	if grass_field!=null:hud.text+="\n%d × %d BLOCKS · "%[grass_field_blocks,grass_field_blocks]+("STRONG WIND + PLAYER WAKE" if grass_vegetation_enabled else "GRASS PAUSED")+" · V Overview"
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	if grass_field!=null and grass_overview:
-		camera.global_position=Vector3(24,30,24);camera.look_at(Vector3(0,.5,0));camera.size=43.;return
+		var overview_scale:=float(grass_field_blocks)/30.
+		camera.global_position=Vector3(24,30,24)*overview_scale;camera.look_at(Vector3(0,.5,0));camera.size=43.*overview_scale;return
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
 	# display sample upward on the landing frame.

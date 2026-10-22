@@ -4,7 +4,10 @@ const Field=preload("res://scenes/dev/actions_stuff_research/grass_md2_v001/inte
 const GRASS_SHADER=preload("res://scenes/dev/actions_stuff_research/grass_md2_v001/grass.gdshader")
 const ASSETS:="res://scenes/dev/actions_stuff_research/grass_md2_v001/assets/"
 var player:CharacterBody3D
-var interaction=Field.new()
+var interaction:Field
+var side_length:=30
+var regions_per_axis:=2
+var terrain:MultiMeshInstance3D
 var cells:=PackedInt32Array()
 var meshes:Array[ArrayMesh]=[]
 var materials:Array[ShaderMaterial]=[]
@@ -17,8 +20,11 @@ var enabled:=true
 var _atlases:Dictionary={}
 var _ground_top:Texture2D
 
-func setup(actor:CharacterBody3D)->void:
+func setup(actor:CharacterBody3D,blocks:int=30)->void:
 	player=actor
+	side_length=clampi(blocks,1,200)
+	regions_per_axis=ceili(float(side_length)/15.)
+	interaction=Field.new(float(side_length)+4.)
 	var data:Dictionary=JSON.parse_string(FileAccess.get_file_as_string(ASSETS+"grass_data.json"))
 	# Reuse the actual upward terrain surface, without duplicating its texture.
 	for surface:Dictionary in data.ground.surfaces:
@@ -28,23 +34,24 @@ func setup(actor:CharacterBody3D)->void:
 	assert(_ground_top!=null,"Grass root blending requires the terrain's top atlas")
 	for entry:Dictionary in data.meshes:meshes.append(_mesh(entry,true))
 	var ground_mesh:=_mesh(data.ground,false)
-	var ground:=MultiMesh.new();ground.transform_format=MultiMesh.TRANSFORM_3D;ground.mesh=ground_mesh;ground.instance_count=900
-	for x in 30:
-		for z in 30:ground.set_instance_transform(x*30+z,Transform3D(Basis.IDENTITY,Vector3(x-14.5,-1.,z-14.5)))
-	var terrain:=MultiMeshInstance3D.new();terrain.name="ThirtyByThirtyBlocks";terrain.multimesh=ground;add_child(terrain)
-	# Four15x15regions, eight exact variants each. Static buffers never rebuilt per frame.
+	var ground:=MultiMesh.new();ground.transform_format=MultiMesh.TRANSFORM_3D;ground.mesh=ground_mesh;ground.instance_count=side_length*side_length
+	var offset:=float(side_length-1)*.5
+	for x in side_length:
+		for z in side_length:ground.set_instance_transform(x*side_length+z,Transform3D(Basis.IDENTITY,Vector3(x-offset,-1.,z-offset)))
+	terrain=MultiMeshInstance3D.new();terrain.name="ThirtyByThirtyBlocks" if side_length==30 else "TerrainBlocks";terrain.multimesh=ground;add_child(terrain)
+	# Same15x15regional batches: distant foliage can be frustum-culled as the map grows.
 	var buckets:Array[Array]=[]
-	for i in 32:buckets.append([])
+	for i in regions_per_axis*regions_per_axis*8:buckets.append([])
 	var rng:=RandomNumberGenerator.new();rng.seed=2301021
-	for x in 30:
-		for z in 30:
-			cells.append(x*30+z)
+	for x in side_length:
+		for z in side_length:
+			cells.append(x*side_length+z)
 			var count:=2 if rng.randf()<.48 else 1
 			for j in count:
 				var tall:=rng.randf()<.46
 				var variant:=rng.randi_range(0,3)+(4 if tall else 0)
-				var region:=int(x/15)*2+int(z/15)
-				var position:=Vector3(x-14.5+rng.randf_range(-.20,.20),0,z-14.5+rng.randf_range(-.20,.20))
+				var region:=int(x/15)*regions_per_axis+int(z/15)
+				var position:=Vector3(x-offset+rng.randf_range(-.20,.20),0,z-offset+rng.randf_range(-.20,.20))
 				var basis:=Basis(Vector3.UP,rng.randf_range(-PI,PI)).scaled(Vector3.ONE*rng.randf_range(1.,1.07))
 				buckets[region*8+variant].append([Transform3D(basis,position),Color(rng.randf(),0,0,1)])
 				instance_count+=1
@@ -62,7 +69,7 @@ func setup(actor:CharacterBody3D)->void:
 		mm.custom_aabb=bounds.grow(.8)
 		var batch:=MultiMeshInstance3D.new();batch.name="GrassRegion_%d_Variant_%d"%[i/8,i%8];batch.multimesh=mm
 		batch.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;add_child(batch);batch_count+=1
-	print("MD2_GRASS_FIELD_READY ",JSON.stringify({"blocks":900,"clumps":instance_count,"short":short_count,"tall":tall_count,"batches":batch_count}))
+	print("MD2_GRASS_FIELD_READY ",JSON.stringify({"blocks":side_length*side_length,"clumps":instance_count,"short":short_count,"tall":tall_count,"batches":batch_count,"interaction_size":interaction.size,"interaction_extent":interaction.extent}))
 
 func _atlas(name:String)->Texture2D:
 	if not _atlases.has(name):_atlases[name]=load(ASSETS+name)
@@ -92,6 +99,7 @@ func _mesh(entry:Dictionary,grass:bool)->ArrayMesh:
 				found.set_shader_parameter("ground_atlas",_ground_top)
 				found.set_shader_parameter("interaction_field",interaction.texture)
 				found.set_shader_parameter("interaction_previous",interaction.previous_texture)
+				found.set_shader_parameter("field_extent",interaction.extent)
 				found.set_shader_parameter("family_response",.72 if entry.family=="short" else 1.)
 				materials.append(found)
 			material=found

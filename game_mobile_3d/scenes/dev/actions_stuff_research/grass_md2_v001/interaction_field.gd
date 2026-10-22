@@ -8,6 +8,9 @@ const RADIUS:=1.40
 const RESPONSE:=23.
 const RECOVERY:=7.8
 const DAMPING:=.14
+var size:=SIZE
+var extent:=EXTENT
+var cell:=CELL
 var x:=PackedFloat32Array()
 var z:=PackedFloat32Array()
 var vx:=PackedFloat32Array()
@@ -28,16 +31,19 @@ var previous:=Vector3.ZERO
 var initialized:=false
 var update_usec:=0
 
-func _init()->void:
+func _init(covered_extent:float=EXTENT)->void:
+	extent=maxf(EXTENT,covered_extent)
+	size=maxi(SIZE,roundi(extent/CELL))
+	cell=extent/float(size)
 	# Packed arrays have value semantics; allocate each member explicitly.
-	x.resize(SIZE*SIZE);z.resize(SIZE*SIZE);vx.resize(SIZE*SIZE);vz.resize(SIZE*SIZE)
-	contact_weights.resize(SIZE*SIZE)
-	marked.resize(SIZE*SIZE);marked.fill(0)
-	pixels.resize(SIZE*SIZE*8);pixels.fill(0)
+	x.resize(size*size);z.resize(size*size);vx.resize(size*size);vz.resize(size*size)
+	contact_weights.resize(size*size)
+	marked.resize(size*size);marked.fill(0)
+	pixels.resize(size*size*8);pixels.fill(0)
 	previous_pixels=pixels.duplicate()
-	image=Image.create_from_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,pixels)
+	image=Image.create_from_data(size,size,false,Image.FORMAT_RGBAH,pixels)
 	texture=ImageTexture.create_from_image(image)
-	previous_image=Image.create_from_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,previous_pixels)
+	previous_image=Image.create_from_data(size,size,false,Image.FORMAT_RGBAH,previous_pixels)
 	previous_texture=ImageTexture.create_from_image(previous_image)
 
 func reset()->void:
@@ -49,17 +55,17 @@ func reset()->void:
 func _stamp(point:Vector3)->void:
 	if point.y>1.25:return
 	var a:=Vector2(point.x,point.z)
-	var minimum:=Vector2i(floori((a.x-RADIUS+EXTENT*.5)/CELL),floori((a.y-RADIUS+EXTENT*.5)/CELL))
-	var maximum:=Vector2i(floori((a.x+RADIUS+EXTENT*.5)/CELL),floori((a.y+RADIUS+EXTENT*.5)/CELL))
-	for row in range(maxi(0,minimum.y),mini(SIZE-1,maximum.y)+1):
-		for col in range(maxi(0,minimum.x),mini(SIZE-1,maximum.x)+1):
-			var index:=row*SIZE+col
+	var minimum:=Vector2i(floori((a.x-RADIUS+extent*.5)/cell),floori((a.y-RADIUS+extent*.5)/cell))
+	var maximum:=Vector2i(floori((a.x+RADIUS+extent*.5)/cell),floori((a.y+RADIUS+extent*.5)/cell))
+	for row in range(maxi(0,minimum.y),mini(size-1,maximum.y)+1):
+		for col in range(maxi(0,minimum.x),mini(size-1,maximum.x)+1):
+			var index:=row*size+col
 			if marked[index]==0:marked[index]=1;active.append(index)
 
 func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 	var start:=Time.get_ticks_usec()
 	# Existing editor play sessions can hot-reload this new state member.
-	if contact_weights.size()!=SIZE*SIZE:contact_weights.resize(SIZE*SIZE);contact_weights.fill(0.)
+	if contact_weights.size()!=size*size:contact_weights.resize(size*size);contact_weights.fill(0.)
 	if not initialized:previous=point;initialized=true
 	if point.distance_squared_to(previous)>16.:reset();previous=point;initialized=true
 	var duration:=clampf(delta,0.,.1333333)
@@ -80,8 +86,8 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 		var movement_gain:=.90*speed/(speed+.4)
 		var i:=active.size()-1
 		while i>=0:
-			var index:=active[i];var row:=index/SIZE;var col:=index%SIZE
-			var root_point:=Vector2((col+.5)*CELL-EXTENT*.5,(row+.5)*CELL-EXTENT*.5)
+			var index:=active[i];var row:=index/size;var col:=index%size
+			var root_point:=Vector2((col+.5)*cell-extent*.5,(row+.5)*cell-extent*.5)
 			var away:=root_point-Vector2(at.x,at.z);var distance:=away.length()
 			var q:=clampf(1.-distance/RADIUS,0.,1.);var falloff:=q*q*(3.-2.*q)
 			var direction:=away/maxf(distance,.00001)*.70+forward*movement_gain
@@ -113,16 +119,16 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 
 func upload()->void:
 	if uploaded_revision==revision:return
-	previous_image.set_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,previous_pixels);previous_texture.update(previous_image)
-	image.set_data(SIZE,SIZE,false,Image.FORMAT_RGBAH,pixels);texture.update(image)
+	previous_image.set_data(size,size,false,Image.FORMAT_RGBAH,previous_pixels);previous_texture.update(previous_image)
+	image.set_data(size,size,false,Image.FORMAT_RGBAH,pixels);texture.update(image)
 	uploaded_revision=revision
 
 func sample_at(point:Vector2)->Vector2:
-	var cell:=(point+Vector2.ONE*EXTENT*.5)/CELL-Vector2.ONE*.5
-	var a:=Vector2i(floori(cell.x),floori(cell.y));var f:=cell-Vector2(a)
+	var coordinate:=(point+Vector2.ONE*extent*.5)/cell-Vector2.ONE*.5
+	var a:=Vector2i(floori(coordinate.x),floori(coordinate.y));var f:=coordinate-Vector2(a)
 	var result:=Vector2.ZERO
 	for dy in 2:
 		for dx in 2:
-			var col:=clampi(a.x+dx,0,SIZE-1);var row:=clampi(a.y+dy,0,SIZE-1);var i:=row*SIZE+col
+			var col:=clampi(a.x+dx,0,size-1);var row:=clampi(a.y+dy,0,size-1);var i:=row*size+col
 			result+=Vector2(x[i],z[i])*(f.x if dx==1 else 1.-f.x)*(f.y if dy==1 else 1.-f.y)
 	return result

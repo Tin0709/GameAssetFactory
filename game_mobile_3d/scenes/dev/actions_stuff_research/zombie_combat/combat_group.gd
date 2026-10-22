@@ -15,6 +15,7 @@ var active := true
 var effects: Node3D
 static var _spaces: Dictionary = {}
 var _space: RID
+var _spawn_serial:=0
 
 func setup(target: CharacterBody3D,existing_audio: Node) -> void:
 	player = target
@@ -43,12 +44,16 @@ func reset_encounter() -> void:
 		if is_instance_valid(zombie):zombie.free()
 	zombies.clear()
 	kills = 0
-	var positions:=_spawn_positions()
+	_spawn_serial=0
+	_spawn_zombies(_spawn_positions())
+
+func _spawn_zombies(positions:Array[Vector3])->void:
 	for i in positions.size():
 		var zombie: CharacterBody3D = ZOMBIE.instantiate()
 		zombie.set_script(_zombie_script())
 		zombie.get_node("Visual").set_script(SOURCE_VISUAL)
-		zombie.name = "ResearchZombie_%d" % (i+1)
+		_spawn_serial+=1
+		zombie.name = "ResearchZombie_%d" % _spawn_serial
 		zombie.position = positions[i]
 		zombie.target = player
 		zombie.combat_audio = audio
