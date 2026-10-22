@@ -111,13 +111,27 @@ func _process(delta: float) -> void:
 	var wt:=fposmod(walk_clock+phase_offset*18.0,18.0)
 	var at:=clampf(attack_time,0.0,.75)
 	for bone in skeleton.get_bone_count():
-		var p: Vector3=idle.position(bone,it).lerp(walk.position(bone,wt),walk_weight)
-		var q: Quaternion=idle.rotation(bone,it).slerp(walk.rotation(bone,wt),walk_weight)
-		var s: Vector3=idle.scale(bone,it).lerp(walk.scale(bone,wt),walk_weight)
-		if attack_weight>0.0:
-			p=p.lerp(attack.position(bone,at),attack_weight)
-			q=q.slerp(attack.rotation(bone,at),attack_weight)
-			s=s.lerp(attack.scale(bone,at),attack_weight)
+		# The same source PRS result: never evaluate a zero-weight clip. Crowds
+		# spend most time fully Idle/Walk/Attack, so two-thirds of attack sampling
+		# and half of steady gait sampling previously produced discarded values.
+		var p:Vector3
+		var q:Quaternion
+		var s:Vector3
+		if attack_weight>=1.0:
+			p=attack.position(bone,at);q=attack.rotation(bone,at);s=attack.scale(bone,at)
+		else:
+			if walk_weight<=0.0:
+				p=idle.position(bone,it);q=idle.rotation(bone,it);s=idle.scale(bone,it)
+			elif walk_weight>=1.0:
+				p=walk.position(bone,wt);q=walk.rotation(bone,wt);s=walk.scale(bone,wt)
+			else:
+				p=idle.position(bone,it).lerp(walk.position(bone,wt),walk_weight)
+				q=idle.rotation(bone,it).slerp(walk.rotation(bone,wt),walk_weight)
+				s=idle.scale(bone,it).lerp(walk.scale(bone,wt),walk_weight)
+			if attack_weight>0.0:
+				p=p.lerp(attack.position(bone,at),attack_weight)
+				q=q.slerp(attack.rotation(bone,at),attack_weight)
+				s=s.lerp(attack.scale(bone,at),attack_weight)
 		skeleton.set_bone_pose_position(bone,p)
 		skeleton.set_bone_pose_rotation(bone,q)
 		skeleton.set_bone_pose_scale(bone,s)
