@@ -1,0 +1,58 @@
+{
+  "scope": "Existing8982file snapshot before the previous100m expansion; its13authorized changes are listed separately. New behavior files are compared to current-task backups as well.",
+  "examined_existing_files": 8982,
+  "previous_expansion_changes": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass.gdshader",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/interaction_field.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/controls.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_combat_feel.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_md2_grass_presentation.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_performance_lab.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd"
+  ],
+  "new_authorized_changes": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_zombie_hit_feedback.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/source_visual.gd"
+  ],
+  "changed": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/controls.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_md2_grass_presentation.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_zombie_hit_feedback.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_performance_lab.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_combat_feel.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/source_visual.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/interaction_field.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass.gdshader"
+  ],
+  "unexpected": [],
+  "missing": [],
+  "blender_changed": [],
+  "worldmap_changed": [],
+  "original_fire_and_autoaim_restored": {
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/auto_aim.gd": true,
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/continuous_fire.gd": true
+  },
+  "final_authored_sha256": {
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_zombie_hit_feedback.gd": "306f179688d5a16ce48491f20d922f3269da4b490d0c1c7ddd7903445ce9b76a",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/physics_zombie.gd": "db2d41267d0cb53e8bbbd829e68575439fe457b9c136207618cc6148d06ec1af",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/source_visual.gd": "8a09e2682ff133678a0ded3bf8afc7287bcfcf59e3b2e201ae497fdf3938fed3",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd": "05170e804f6795768487bc923bac2ac291e13b1637996d9b1c0c424618b73b13"
+  }
+}
