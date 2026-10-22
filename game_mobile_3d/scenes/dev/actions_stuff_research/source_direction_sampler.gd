@@ -143,12 +143,7 @@ func _source_transform(bone: String, pivot: Vector3) -> Transform3D:
 	var basis := Basis(Vector3.FORWARD,deg_to_rad(r.z))*Basis(Vector3.UP,deg_to_rad(-r.y))*Basis(Vector3.RIGHT,deg_to_rad(r.x))*Basis.from_scale(s)
 	return Transform3D(basis,Vector3(p.x,p.y,-p.z)*unit+pivot-basis*pivot)
 
-var diagnostic_channels_usec:=0
 func set_snapshot(snapshot: Dictionary) -> void:
-	var started:=Time.get_ticks_usec()
-	_diagnostic_set_snapshot(snapshot)
-	diagnostic_channels_usec+=Time.get_ticks_usec()-started
-func _diagnostic_set_snapshot(snapshot: Dictionary) -> void:
 	var run_weight := float(snapshot.get("run_weight",0.0))
 	assert(is_finite(run_weight) and run_weight >= 0.0 and run_weight <= 1.0,"Source run_weight must be in [0,1]")
 	# Preserve source's endpoint seam: phase1 wraps to0 with no closure repair.
