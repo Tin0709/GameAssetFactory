@@ -8,6 +8,7 @@ const TIERS:=[
 ]
 const SUN_PROPERTIES:=["rotation","light_color","light_energy","shadow_enabled","shadow_opacity","shadow_blur","shadow_bias","shadow_normal_bias","directional_shadow_mode","directional_shadow_max_distance","directional_shadow_fade_start","directional_shadow_blend_splits","directional_shadow_split_1","light_angular_distance"]
 var lab:Node3D
+var grass_field:Node
 var world:WorldEnvironment
 var sun:DirectionalLight3D
 var viewport:Viewport
@@ -31,8 +32,8 @@ var ui:CanvasLayer
 var metrics:RefCounted
 var _dirty:=true
 
-func setup(scene:Node3D)->void:
-	lab=scene;viewport=lab.get_viewport()
+func setup(scene:Node3D,foliage:Node=null)->void:
+	lab=scene;grass_field=foliage;viewport=lab.get_viewport()
 	for child in lab.get_children():
 		if child is WorldEnvironment:world=child
 		elif child is DirectionalLight3D:sun=child
@@ -120,12 +121,12 @@ func _apply()->void:
 	_foliage_grade(1.);_dirty=false
 
 func _foliage_grade(value:float)->void:
-	if lab!=null and lab.grass_field!=null:
-		for material:ShaderMaterial in lab.grass_field.materials:material.set_shader_parameter("lighting_grade",value)
+	if is_instance_valid(grass_field):
+		for material:ShaderMaterial in grass_field.materials:material.set_shader_parameter("lighting_grade",value)
 
 func _restore()->void:
-	if not is_instance_valid(world):return
-	world.environment=original_environment
+	if original_view.is_empty():return
+	if is_instance_valid(world):world.environment=original_environment
 	if is_instance_valid(sun):
 		for property:String in SUN_PROPERTIES:sun.set(property,original_sun[property])
 	if is_instance_valid(viewport):viewport.scaling_3d_mode=original_view.mode;viewport.scaling_3d_scale=original_view.scale
