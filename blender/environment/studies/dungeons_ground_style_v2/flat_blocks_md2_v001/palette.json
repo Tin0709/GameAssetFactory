@@ -1,0 +1,85 @@
+{
+  "status": "Pending",
+  "source_zip": "/Users/tin/Desktop/Game Dev/local_references/Dungeons II Style 0.7 JE.zip",
+  "source_zip_sha256": "d6a74b912c5ac041a02fe3236c74e2333673b3377eda9ff9a0f791fa115f0931",
+  "blocks": {
+    "Grass": {
+      "srgb": [
+        84,
+        130,
+        52
+      ],
+      "hex": "#548234",
+      "method": "Archive grass top is grayscale and includes no biome color map; use dominant green of the existing library grass_top_0.png as the explicit project tint adaptation",
+      "source_texture": "assets/minecraft/textures/block/grass_block_top.png",
+      "source_texture_sha256": "f74e56e267853b1061f6f4cc59b3ab7d81dbf6690ae534a12f06bf77efbc6017",
+      "source_dominant_rgb": [
+        148,
+        148,
+        148
+      ],
+      "size_m": [
+        1,
+        1,
+        1
+      ],
+      "origin": "Bottom center",
+      "faces": 6,
+      "triangles": 12,
+      "material_count": 1,
+      "texture_nodes": 0
+    },
+    "Dirt": {
+      "srgb": [
+        134,
+        92,
+        60
+      ],
+      "hex": "#865C3C",
+      "method": "Most frequent RGB in the exact resource-pack texture",
+      "source_texture": "assets/minecraft/textures/block/dirt.png",
+      "source_texture_sha256": "667cb56474ef89c4923a044a8901201b02032d18b3cc45ef785a7094660fe136",
+      "source_dominant_rgb": [
+        134,
+        92,
+        60
+      ],
+      "size_m": [
+        1,
+        1,
+        1
+      ],
+      "origin": "Bottom center",
+      "faces": 6,
+      "triangles": 12,
+      "material_count": 1,
+      "texture_nodes": 0
+    },
+    "Stone": {
+      "srgb": [
+        136,
+        133,
+        132
+      ],
+      "hex": "#888584",
+      "method": "Most frequent RGB in the exact resource-pack texture",
+      "source_texture": "assets/minecraft/textures/block/stone.png",
+      "source_texture_sha256": "5f5aa24b8bc36b6b20b21f9f012b6663a2af98d6b4d42be68b98235b4bfead65",
+      "source_dominant_rgb": [
+        136,
+        133,
+        132
+      ],
+      "size_m": [
+        1,
+        1,
+        1
+      ],
+      "origin": "Bottom center",
+      "faces": 6,
+      "triangles": 12,
+      "material_count": 1,
+      "texture_nodes": 0
+    }
+  }
+}
