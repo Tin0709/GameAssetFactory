@@ -5,9 +5,9 @@ const Metrics=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001
 const PreviewUI=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/preview_ui.gd")
 const ReviewProps=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/review_props.gd")
 const TIERS:=[
-	{"name":"Low","scale":.75,"atlas":1024,"filter":1,"distance":24.,"splits":0,"glow":false},
-	{"name":"Medium","scale":.85,"atlas":2048,"filter":2,"distance":32.,"splits":1,"glow":true},
-	{"name":"High","scale":1.,"atlas":2048,"filter":3,"distance":38.,"splits":1,"glow":true}
+	{"name":"Low","scale":.75,"atlas":1024,"bits16":true,"filter":1,"distance":24.,"splits":0,"glow":false},
+	{"name":"Medium","scale":.85,"atlas":2048,"bits16":true,"filter":2,"distance":32.,"splits":1,"glow":true},
+	{"name":"High","scale":1.,"atlas":2048,"bits16":false,"filter":3,"distance":38.,"splits":1,"glow":true}
 ]
 const SUN_PROPERTIES:=["rotation","light_color","light_energy","shadow_enabled","shadow_opacity","shadow_blur","shadow_bias","shadow_normal_bias","directional_shadow_mode","directional_shadow_max_distance","directional_shadow_fade_start","directional_shadow_blend_splits","directional_shadow_split_1","light_angular_distance"]
 var lab:Node3D
@@ -44,6 +44,7 @@ func setup(scene:Node3D,foliage:Node=null)->void:
 	original_environment=world.environment
 	for property:String in SUN_PROPERTIES:original_sun[property]=sun.get(property)
 	original_view={"scale":viewport.scaling_3d_scale,"mode":viewport.scaling_3d_mode,
+		"bits16":bool(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/16_bits")),
 		"atlas":int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/size")),
 		"filter":int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality"))}
 	environment=Environment.new();environment.background_mode=Environment.BG_SKY
@@ -80,7 +81,7 @@ func set_quality(index:int)->void:
 	if viewport==null or original:return
 	var tier:Dictionary=TIERS[quality]
 	viewport.scaling_3d_mode=Viewport.SCALING_3D_MODE_BILINEAR;viewport.scaling_3d_scale=tier.scale
-	RenderingServer.directional_shadow_atlas_set_size(tier.atlas,false)
+	RenderingServer.directional_shadow_atlas_set_size(tier.atlas,tier.bits16)
 	RenderingServer.directional_soft_shadow_filter_set_quality(tier.filter)
 	sun.directional_shadow_max_distance=tier.distance;sun.directional_shadow_mode=tier.splits
 	sun.shadow_enabled=true
@@ -137,7 +138,7 @@ func _restore()->void:
 	if is_instance_valid(sun):
 		for property:String in SUN_PROPERTIES:sun.set(property,original_sun[property])
 	if is_instance_valid(viewport):viewport.scaling_3d_mode=original_view.mode;viewport.scaling_3d_scale=original_view.scale
-	RenderingServer.directional_shadow_atlas_set_size(original_view.atlas,false)
+	RenderingServer.directional_shadow_atlas_set_size(original_view.atlas,original_view.bits16)
 	RenderingServer.directional_soft_shadow_filter_set_quality(original_view.filter)
 	_foliage_grade(0.)
 
