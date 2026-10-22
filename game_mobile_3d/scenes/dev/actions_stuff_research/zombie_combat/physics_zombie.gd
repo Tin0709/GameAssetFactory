@@ -53,13 +53,18 @@ func take_damage(amount: int,direction: Vector3=Vector3.ZERO) -> bool:
 		combat_audio.play_event(&"zombie_death")
 	return accepted
 
+func _advance_living_ai(delta:float)->void:
+	# Performance research may bound redundant blocked-motion retries. The
+	# original encounter always uses its unchanged native living controller.
+	super._physics_process(delta)
+
 static var diagnostic_ai_usec:=0
 static var diagnostic_visual_usec:=0
 static var diagnostic_sample_usec:=0
 func _physics_process(delta: float) -> void:
 	if not is_dead:
 		var started:=Time.get_ticks_usec()
-		super._physics_process(delta)
+		_advance_living_ai(delta)
 		diagnostic_ai_usec+=Time.get_ticks_usec()-started;started=Time.get_ticks_usec()
 		visual._process(delta)
 		diagnostic_visual_usec+=Time.get_ticks_usec()-started;started=Time.get_ticks_usec()
