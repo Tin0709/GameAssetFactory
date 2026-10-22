@@ -27,7 +27,7 @@ func run():
    var current:float=wrapf(v.rotation.y-yaw,-PI,PI)/dt
    acceleration=maxf(acceleration,absf(current-speed)/dt)
    maximum_speed=maxf(maximum_speed,absf(current));speed=current;yaw=v.rotation.y
-  check(acceleration<.65*14./dt,"Travel turn eases angular speed even on a 180-degree reversal: "+str(scenario))
+  check(acceleration<=180.1,"Travel turn eases angular speed even on a 180-degree reversal: "+str(scenario))
   check(absf(wrapf(v.rotation.y-atan2(target.x,target.y),-PI,PI))<.01,"Smooth travel turn still arrives promptly and accurately")
   var maximum_leg_step:=0.;var previous:Array=[];var floor_min:=0.
   for i in fps*3:

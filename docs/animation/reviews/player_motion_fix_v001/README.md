@@ -1,3 +1,5 @@
+**Later travel-turn refinement:** The constant14rad/s update described below is superseded by [smooth repeated turning](../smooth_travel_turn_v001/README.md). All other fixes remain.
+
 # Player locomotion and secondary motion fix —2026-10-22
 
 Current existing `res://scenes/dev/ActionsStuffWalkRunTest.tscn` only. New defaults temporarily restore original1× travel: Walk1.80m/s, Run5.031m/s. The existing multiplier remains available; no production player, Blender Action, geometry, rig or source data is changed.
