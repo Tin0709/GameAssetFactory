@@ -1,3 +1,11 @@
+## Latest ground replacement —2026-10-22
+
+User now authorizes the new soft-textured grass block in the SAME30×30lab. `atlas_02.png`, `atlas_03.png`, `atlas_04.png` are exact16×16crops of the current Blender packed atlas: dirt bottom, green top, stepped grass-over-dirt sides. Source block `MD2_Flat_Grass_Block_v001` is geometrically equivalent to the existing unit cube; preserve all900placements, original full-tileUV orientation,3surfaces/12tri per block, one shared terrain MultiMesh. Ground material specular0 matches its Blender source. `grass_data.json.ground_source` records the current source hashes separately from the older grass-family source hash. The actual top sampler remains `atlas_03.png`, so preserved vegetation roots will follow the new terrain if enabled again.
+
+Current vegetation remains paused/hidden; all1,317clumps/32batches, family atlases00/01, vertex/rest data, wind/contact/shadow shader and saved source assets are exact. No new scene/project, no productionWorldMap or approved player asset changes. Floor/collision geometry, camera, controls, current1×movement,20zombies and0–50/KillAll settings remain.
+
+Read-only Blender source/geometry/packed-atlas checks and29existing field contracts pass. Native Mobile checks confirm900unit cubes,3surfaces/12tri,16px nearest maps, floorY0,20zombies and32hidden vegetation batches; default gameplay and border images are captured. Renderer AABB grows the unit cube to1.00001m inY; raw vertices retain exact0..1m. Capture readback is not a performance benchmark. Backups/source proof/native logs/images: `.validation/soft_grass_ground_v001/`. Earlier original-ground claims below are historical.
+
 # MD2 mixed grass field — gameplay review, Pending
 
 Authorized follow-up in the EXISTING `res://scenes/dev/ActionsStuffWalkRunTest.tscn`. No new scene/project, production WorldMap change or Blender Action edits. `grass_field_enabled=true` on that scene enables the field; the shared lab script's default false preserves its older construction path.

@@ -1,3 +1,5 @@
+**Later authorized gameplay trial:** Only the grass block is now used as the900-block terrain in the existing ActionsStuffWalkRunTest. Blender data is unchanged; dirt/stone standalone blocks remain in this review library. See `game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/README.md` from the repository root. Earlier no-integration notes below describe the Blender refinement stage.
+
 # MD2 blocks — subtle texture refinement, Pending
 
 Latest user correction supersedes the first all-six-faces single-color trial: the grass block has a green top and the actual pack's stepped green cap over brown dirt sides, with a dirt bottom. Grass, dirt and stone now have very subtle broad pixel patches. Update the SAME three Pending objects in the SAME `dungeons_ground_style_v2.blend`; no new candidate, scene, project or Godot integration.
