@@ -1,33 +1,66 @@
 {
   "status": "Pending",
+  "revision": "soft_texture_r2",
   "source_zip": "/Users/tin/Desktop/Game Dev/local_references/Dungeons II Style 0.7 JE.zip",
   "source_zip_sha256": "d6a74b912c5ac041a02fe3236c74e2333673b3377eda9ff9a0f791fa115f0931",
+  "source_sha256": {
+    "grass_block_top": "f74e56e267853b1061f6f4cc59b3ab7d81dbf6690ae534a12f06bf77efbc6017",
+    "grass_block_side": "14b2077f3cfcaa2d9ad2a86b0ac47d617e579fcb62a097aa2c08a1d46aa166f1",
+    "grass_block_side_overlay": "679b14f21e8a44daa41bd91526af27af2670acf41c78371b55829242988bf7dc",
+    "dirt": "667cb56474ef89c4923a044a8901201b02032d18b3cc45ef785a7094660fe136",
+    "stone": "5f5aa24b8bc36b6b20b21f9f012b6663a2af98d6b4d42be68b98235b4bfead65"
+  },
+  "contrast_strength": 0.25,
+  "logical_tile_pixels": 16,
+  "padding_pixels": 2,
+  "atlas_size": [
+    80,
+    20
+  ],
+  "atlas_rects": {
+    "GrassTop": [
+      0.025,
+      0.1,
+      0.225,
+      0.9
+    ],
+    "GrassSide": [
+      0.275,
+      0.1,
+      0.475,
+      0.9
+    ],
+    "Dirt": [
+      0.525,
+      0.1,
+      0.725,
+      0.9
+    ],
+    "Stone": [
+      0.775,
+      0.1,
+      0.975,
+      0.9
+    ]
+  },
+  "grass_edge": "Exact original grass_block_side_overlay alpha silhouette, cap depth3\u20136/16block",
   "blocks": {
     "Grass": {
       "srgb": [
-        84,
-        130,
-        52
+        74,
+        109,
+        41
       ],
-      "hex": "#548234",
-      "method": "Archive grass top is grayscale and includes no biome color map; use dominant green of the existing library grass_top_0.png as the explicit project tint adaptation",
-      "source_texture": "assets/minecraft/textures/block/grass_block_top.png",
-      "source_texture_sha256": "f74e56e267853b1061f6f4cc59b3ab7d81dbf6690ae534a12f06bf77efbc6017",
-      "source_dominant_rgb": [
-        148,
-        148,
-        148
-      ],
+      "hex": "#4A6D29",
+      "method": "Most frequent RGB in actual pack grass_block_side pixels masked by grass_block_side_overlay",
+      "material_count": 1,
+      "texture_nodes": 1,
       "size_m": [
         1,
         1,
         1
       ],
-      "origin": "Bottom center",
-      "faces": 6,
-      "triangles": 12,
-      "material_count": 1,
-      "texture_nodes": 0
+      "triangles": 12
     },
     "Dirt": {
       "srgb": [
@@ -36,24 +69,15 @@
         60
       ],
       "hex": "#865C3C",
-      "method": "Most frequent RGB in the exact resource-pack texture",
-      "source_texture": "assets/minecraft/textures/block/dirt.png",
-      "source_texture_sha256": "667cb56474ef89c4923a044a8901201b02032d18b3cc45ef785a7094660fe136",
-      "source_dominant_rgb": [
-        134,
-        92,
-        60
-      ],
+      "method": "Most frequent RGB in actual pack dirt.png",
+      "material_count": 1,
+      "texture_nodes": 1,
       "size_m": [
         1,
         1,
         1
       ],
-      "origin": "Bottom center",
-      "faces": 6,
-      "triangles": 12,
-      "material_count": 1,
-      "texture_nodes": 0
+      "triangles": 12
     },
     "Stone": {
       "srgb": [
@@ -62,24 +86,15 @@
         132
       ],
       "hex": "#888584",
-      "method": "Most frequent RGB in the exact resource-pack texture",
-      "source_texture": "assets/minecraft/textures/block/stone.png",
-      "source_texture_sha256": "5f5aa24b8bc36b6b20b21f9f012b6663a2af98d6b4d42be68b98235b4bfead65",
-      "source_dominant_rgb": [
-        136,
-        133,
-        132
-      ],
+      "method": "Most frequent RGB in actual pack stone.png",
+      "material_count": 1,
+      "texture_nodes": 1,
       "size_m": [
         1,
         1,
         1
       ],
-      "origin": "Bottom center",
-      "faces": 6,
-      "triangles": 12,
-      "material_count": 1,
-      "texture_nodes": 0
+      "triangles": 12
     }
   }
 }
