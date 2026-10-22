@@ -132,9 +132,8 @@ func _process(delta: float) -> void:
 				p=p.lerp(attack.position(bone,at),attack_weight)
 				q=q.slerp(attack.rotation(bone,at),attack_weight)
 				s=s.lerp(attack.scale(bone,at),attack_weight)
-		skeleton.set_bone_pose_position(bone,p)
-		skeleton.set_bone_pose_rotation(bone,q)
-		skeleton.set_bone_pose_scale(bone,s)
+		# Upload the same complete PRS once instead of three native setters.
+		skeleton.set_bone_pose(bone,Transform3D(Basis(q).scaled(s),p))
 	# Reproduce the library's fixed preview-floor clearance above the real floor;
 	# presentation offsets are not added to the capsule or corpse trajectory.
 	var clips: Dictionary=PROFILE.data.clips

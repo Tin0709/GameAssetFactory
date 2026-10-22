@@ -12,7 +12,7 @@ var holding_left := 0.0
 
 func _init(initial_life: float = 12.0) -> void:
 	super(initial_life)
-	_program = JSON.parse_string(FileAccess.get_file_as_string(JUMP_PROGRAM_PATH))
+	_program = VM.prepare(JSON.parse_string(FileAccess.get_file_as_string(JUMP_PROGRAM_PATH)))
 	env.clear()
 	for variable in _program.variable_names: env[variable.to_lower()] = 0.0
 	env.merge({"v.tnlxsa":2.0,"v.wtlyok":1.0,"v.qlczor":initial_life,"v.abjhra":initial_life,"v.jcvgdh":initial_life,"v.bueybx":initial_life},true)
