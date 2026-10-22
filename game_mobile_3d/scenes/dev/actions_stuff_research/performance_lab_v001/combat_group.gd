@@ -1,10 +1,9 @@
 extends "res://scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd"
 ## Same encounter, with one replaceable simultaneous batch for the dev benchmark.
-const BoundedZombie=preload("res://scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd")
+const StressZombie=preload("res://scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd")
 var spawn_count:=20
-var _death_order:Array[CharacterBody3D]=[]
 
-func _zombie_script()->Script:return BoundedZombie
+func _zombie_script()->Script:return StressZombie
 
 func _spawn_positions()->Array[Vector3]:
 	var points:Array[Vector3]=[]
@@ -24,7 +23,6 @@ func _spawn_positions()->Array[Vector3]:
 	return points
 
 func reset_encounter()->void:
-	_death_order.clear()
 	super.reset_encounter()
 	# The benchmark exercises the existing chase even when spawned beyond its
 	# ordinary detection radius; AI speed, melee and source animation are intact.
@@ -36,23 +34,10 @@ func spawn_batch(count:int)->void:
 	print("PERFORMANCE_ZOMBIE_BATCH ",spawn_count)
 
 func kill_all()->void:
-	# Death callbacks may retire old corpses from the registry during this loop.
+	# Apply every lethal hit in this call, with no queue, corpse culling or budget
+	# substitution. Every actor keeps its existing native death for the stress test.
 	for zombie:CharacterBody3D in zombies.duplicate():
 		if not is_instance_valid(zombie) or zombie.is_dead:continue
 		var direction:=zombie.global_position-player.global_position;direction.y=0.
 		zombie.take_damage(zombie.current_hp,direction.normalized())
 
-func reserve_ragdoll(zombie:CharacterBody3D)->void:
-	# Keep the existing four-corpse budget even for a same-frame Kill All.
-	# Recycle the oldest corpse, not a living actor or the native death system.
-	while _death_order.size()>=MAX_RAGDOLLS:
-		var oldest:CharacterBody3D=_death_order.pop_front()
-		if not is_instance_valid(oldest):continue
-		last_corpse_lifetime=oldest.corpse_age;kills+=1
-		zombies.erase(oldest)
-		oldest.free()
-	_death_order.append(zombie)
-
-func _corpse_finished(zombie:CharacterBody3D,lifetime:float)->void:
-	_death_order.erase(zombie)
-	super._corpse_finished(zombie,lifetime)

@@ -64,7 +64,7 @@ func _process(delta:float)->void:
 	if _timer>=.25:_timer=0.;_refresh()
 
 func _refresh()->void:
-	status.text="Alive %d · Ragdolls %d / 4"%[encounter.living_count(),encounter.active_ragdolls()]
+	status.text="Alive %d · Ragdolls %d / %d"%[encounter.living_count(),encounter.active_ragdolls(),encounter.spawn_count]
 	var fps:=Engine.get_frames_per_second()
 	var frame:="%.1fms"%(1000./fps) if fps>0 else "N/A"
 	stats.text="%d FPS · Frame %s\nProcess %.2fms · Physics %.2fms"%[fps,frame,Performance.get_monitor(Performance.TIME_PROCESS)*1000.,Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)*1000.]

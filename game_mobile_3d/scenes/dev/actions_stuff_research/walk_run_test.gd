@@ -134,7 +134,9 @@ func _process(delta: float) -> void:
 	if rifle_fire!=null and rifle_fire.trigger_held:state+=" · FIRING" if visual.rifle_aim_weight>=.999 else " · RAISING TO FIRE"
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
 	hud.text=("RIFLE READY / AIM / FIRE · INFINITE AMMO ∞" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold E Aim + Fire · Right Mouse Aim / Orbit\nWheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
-	if zombie_combat!=null:hud.text+="\nZombies %d · Corpses %d / 4 · Cleared %d · R Restart"%[zombie_combat.living_count(),zombie_combat.active_ragdolls(),zombie_combat.kills]
+	if zombie_combat!=null:
+		var capacity:int=zombie_combat.spawn_count if performance_test_enabled else ZombieCombat.MAX_RAGDOLLS
+		hud.text+="\nZombies %d · Corpses %d / %d · Cleared %d · R Restart"%[zombie_combat.living_count(),zombie_combat.active_ragdolls(),capacity,zombie_combat.kills]
 	if rifle_auto_aim!=null:hud.text+="\nAuto-aim: "+(rifle_auto_aim.target.name if is_instance_valid(rifle_auto_aim.target) else "nearest zombie while aiming")
 	if rifle_ready:hud.text+="\nQ / C Turn in place · head leads, feet correct >60°"
 	if grass_field!=null:hud.text+="\n30 × 30 BLOCKS · STRONG WIND + PLAYER WAKE · V Overview"
