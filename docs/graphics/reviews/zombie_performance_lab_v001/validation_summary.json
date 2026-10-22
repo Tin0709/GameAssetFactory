@@ -1,0 +1,65 @@
+{
+  "functional_30": "134 checks, 0 failures",
+  "functional_60": "134 checks, 0 failures",
+  "four_actor_combat_regression": "passed",
+  "auto_aim_regression": "passed",
+  "lighting_regression": "20 checks, 0 failures",
+  "native_sampling": {
+    "camera": "same fixed V overview for 0/20/50 samples",
+    "cleanup_complete": true,
+    "desktop_only": true,
+    "gpu_note": "Metal GPU timing unavailable. Native sampling helper includes manual draw; captures are outside sample windows. Not a phone benchmark.",
+    "held_E_lethal_targets": 0,
+    "held_E_shots": 14,
+    "kill_all_immediate_alive": 0,
+    "peak_ragdolls": 4,
+    "render_fps_cap": 60,
+    "renderer": "mobile",
+    "review_props_removed": true,
+    "samples": [
+      {
+        "alive": 0,
+        "draws_median": 40.0,
+        "engine_physics_p95_ms": 5.214,
+        "engine_process_p95_ms": 5.273,
+        "samples": 120,
+        "spawn_count": 0,
+        "spawn_setup_ms": 3.008,
+        "wall_frame_median_ms": 16.669,
+        "wall_frame_p95_ms": 17.595
+      },
+      {
+        "alive": 20,
+        "draws_median": 60.0,
+        "engine_physics_p95_ms": 6.733,
+        "engine_process_p95_ms": 2.22,
+        "samples": 120,
+        "spawn_count": 20,
+        "spawn_setup_ms": 6.11,
+        "wall_frame_median_ms": 16.636,
+        "wall_frame_p95_ms": 17.891
+      },
+      {
+        "alive": 50,
+        "draws_median": 90.0,
+        "engine_physics_p95_ms": 9.693,
+        "engine_process_p95_ms": 2.209,
+        "samples": 120,
+        "spawn_count": 50,
+        "spawn_setup_ms": 17.564,
+        "wall_frame_median_ms": 16.63,
+        "wall_frame_p95_ms": 18.161
+      }
+    ],
+    "viewport": "1280x720"
+  },
+  "extended_native_fire": {
+    "active_ragdolls": 1,
+    "lethal_targets": 1,
+    "pool_misses": 0,
+    "render_frames": 133,
+    "shots": 11
+  },
+  "short_fire_note": "The initial 3-second post-benchmark sample spread 14 shots across the crowded targets, with no lethal hit; that overly strict short-duration kill expectation returned exit 1. The separate fresh 20-target native firing check verified a lethal hit in 133 frames with 11 shots and no pool misses. No combat timing or aim change was made.",
+  "review": "Read-only final review found one P3 reset-position ordering edge. Reproduced failing, moved encounter reset after player teleport, then all 134 checks passed at fixed30/60. No other findings."
+}

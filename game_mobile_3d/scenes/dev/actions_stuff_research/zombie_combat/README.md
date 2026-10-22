@@ -1,3 +1,5 @@
+**2026-10-22 — Current scene performance mode:** The existing lab now opts into an adjustable 0–50 batch, default20, and removes lighting review props. See `../performance_lab_v001/README.md`. The original four-actor encounter below remains the opt-out fixture; source visuals, AI and death physics remain unchanged. Both modes cap performance-mode active corpses at4 via the new admission subclass.
+
 # Source zombie combat — development only
 
 This component is loaded only by the existing `ActionsStuffWalkRunTest` research scene. Read `docs/animation/reviews/zombie_rifle_combat_v001/README.md` at the repository root for source mappings, source-vs-gameplay adapters, controls, lifecycle, rebuild and validation.

@@ -1,0 +1,49 @@
+{
+	"camera": "same fixed V overview for 0/20/50 samples",
+	"cleanup_complete": true,
+	"desktop_only": true,
+	"gpu_note": "Metal GPU timing unavailable. Native sampling helper includes manual draw; captures are outside sample windows. Not a phone benchmark.",
+	"held_E_lethal_targets": 0,
+	"held_E_shots": 14,
+	"kill_all_immediate_alive": 0,
+	"peak_ragdolls": 4,
+	"render_fps_cap": 60,
+	"renderer": "mobile",
+	"review_props_removed": true,
+	"samples": [
+		{
+			"alive": 0,
+			"draws_median": 40.0,
+			"engine_physics_p95_ms": 5.214,
+			"engine_process_p95_ms": 5.273,
+			"samples": 120,
+			"spawn_count": 0,
+			"spawn_setup_ms": 3.008,
+			"wall_frame_median_ms": 16.669,
+			"wall_frame_p95_ms": 17.595
+		},
+		{
+			"alive": 20,
+			"draws_median": 60.0,
+			"engine_physics_p95_ms": 6.733,
+			"engine_process_p95_ms": 2.22,
+			"samples": 120,
+			"spawn_count": 20,
+			"spawn_setup_ms": 6.11,
+			"wall_frame_median_ms": 16.636,
+			"wall_frame_p95_ms": 17.891
+		},
+		{
+			"alive": 50,
+			"draws_median": 90.0,
+			"engine_physics_p95_ms": 9.693,
+			"engine_process_p95_ms": 2.209,
+			"samples": 120,
+			"spawn_count": 50,
+			"spawn_setup_ms": 17.564,
+			"wall_frame_median_ms": 16.63,
+			"wall_frame_p95_ms": 18.161
+		}
+	],
+	"viewport": "1280x720"
+}
