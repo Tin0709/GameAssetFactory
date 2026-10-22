@@ -89,6 +89,10 @@ func run():
  var valid:=true
  for z in group.zombies:valid=valid and absf(z.position.x)<=14.001 and absf(z.position.z)<=14.001 and z.position.distance_to(lab.player.position)>=2.
  check(valid,"Maximum batch stays valid when the player is near a map corner")
+ group.spawn_batch(20);lab.reset_player()
+ nearest=INF
+ for z in group.zombies:nearest=minf(nearest,z.position.distance_to(lab.player.position))
+ check(nearest>=2.,"R from a map corner builds around the reset position with player clearance")
  lab.free();await process_frame
  var legacy=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();legacy.performance_test_enabled=false;root.add_child(legacy)
  check(legacy.zombie_combat.living_count()==4 and legacy.performance_controls==null and legacy.find_child("ExistingAssetLightingEvaluation",true,false)!=null,"Opt-out retains the original four-zombie lighting review fixture")
