@@ -96,7 +96,7 @@ func _mesh(entry:Dictionary,grass:bool)->ArrayMesh:
 				materials.append(found)
 			material=found
 		else:
-			var mat:=StandardMaterial3D.new();mat.albedo_texture=_atlas(surface.atlas);mat.texture_filter=BaseMaterial3D.TEXTURE_FILTER_NEAREST;mat.roughness=1.;material=mat
+			var mat:=StandardMaterial3D.new();mat.albedo_texture=_atlas(surface.atlas);mat.texture_filter=BaseMaterial3D.TEXTURE_FILTER_NEAREST;mat.roughness=1.;mat.metallic_specular=0.;material=mat
 		mesh.surface_set_material(mesh.get_surface_count()-1,material)
 	return mesh
 
