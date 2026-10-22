@@ -164,6 +164,8 @@ func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	camera.look_at(camera_anchor,Vector3.UP);camera.size=camera_size
 func _input(event: InputEvent) -> void:
 	# A GUI may consume the key-up after the press began over the world.
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_RIGHT and not event.pressed:
+		orbiting=false;_right_aim_held=false;_sync_rifle_controls()
 	if event is InputEventKey and (event.physical_keycode==KEY_E or event.keycode==KEY_E) and not event.pressed:
 		_fire_key_held=false;_sync_rifle_controls()
 	if event is InputEventKey and not event.pressed:_turn_key(event)

@@ -71,12 +71,14 @@ func setup(scene:Node3D,foliage:Node=null)->void:
 	var props:=ReviewProps.new();add_child(props)
 
 func set_time(hour:float,snap:bool=false)->void:
+	if released:return
 	target_hour=fposmod(hour,24.) if is_finite(hour) else 12.
 	if snap:current_hour=target_hour
 	_dirty=true
 	if snap and environment!=null:_apply()
 
 func set_quality(index:int)->void:
+	if released:return
 	quality=clampi(index,0,TIERS.size()-1)
 	if viewport==null or original:return
 	var tier:Dictionary=TIERS[quality]
@@ -89,6 +91,7 @@ func set_quality(index:int)->void:
 	_dirty=true
 
 func set_original(value:bool)->void:
+	if released:return
 	original=value
 	if original:_restore()
 	else:
@@ -99,8 +102,10 @@ func set_original(value:bool)->void:
 	_foliage_grade(0. if original else 1.)
 
 func set_fog(value:bool)->void:
+	if released:return
 	fog_requested=value;_dirty=true
 func set_glow(value:bool)->void:
+	if released:return
 	glow_requested=value;_dirty=true
 
 func advance(delta:float)->void:
@@ -146,5 +151,7 @@ func release()->void:
 	if released:return
 	_restore()
 	if metrics!=null:metrics.release()
+	if is_instance_valid(ui):ui.visible=false;ui.process_mode=Node.PROCESS_MODE_DISABLED
+	set_process(false)
 	released=true
 func _exit_tree()->void:release()
