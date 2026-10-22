@@ -1,0 +1,22 @@
+{
+  "examined_existing_files": 8982,
+  "changed": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/controls.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_md2_grass_presentation.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_performance_lab.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_combat_feel.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/interaction_field.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass.gdshader"
+  ],
+  "missing": [],
+  "unexpected": [],
+  "blender_changed": [],
+  "worldmap_changed": []
+}
