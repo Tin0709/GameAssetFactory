@@ -3,11 +3,17 @@ extends RefCounted
 ## Degree math, ordered assignments and lazy branches match that source subset.
 ## Environment keys are flattened v.*, t.*, q.*; q.* calls require Callable.
 static func execute(node: Array, env: Dictionary) -> Variant:
+	# Literal channels and direct reads have no side effects or nested return.
+	# Avoid allocating a return frame for these very common authored channels.
+	if node[0]=="literal":return node[1]
+	if node[0]=="variable":return env.get(_name(node[1]),0.0)
 	return _execute(node, env, {"returned": false, "value": 0.0})
 
 static func _name(value: String) -> String:
-	for pair in [["variable.", "v."], ["query.", "q."], ["temp.", "t."]]:
-		if value.begins_with(pair[0]): return pair[1] + value.substr(pair[0].length())
+	# Same case-sensitive aliases; no temporary array-of-pairs per AST read.
+	if value.begins_with("variable."):return "v."+value.substr(9)
+	if value.begins_with("query."):return "q."+value.substr(6)
+	if value.begins_with("temp."):return "t."+value.substr(5)
 	return value
 
 static func _execute(node: Array, env: Dictionary, frame: Dictionary) -> Variant:
