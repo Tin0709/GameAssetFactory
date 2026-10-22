@@ -128,6 +128,8 @@ static func _equal(a: Variant, b: Variant) -> bool:
 # Compile only side-effect-free arithmetic channel trees. Ordered assignments,
 # lazy branches, query Callables and return statements keep the literal VM path.
 static func compile_channel(node:Array)->Array:
+	if node[0] in ["literal","variable"]:return node
+	if node[0]=="program" and node[1].size()==1 and node[1][0][0] in ["literal","variable"]:return node[1][0]
 	var variables:Array[String]=[]
 	var source:=_channel_source(node,variables)
 	if source.is_empty():return node
