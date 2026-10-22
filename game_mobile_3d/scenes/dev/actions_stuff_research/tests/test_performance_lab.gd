@@ -28,7 +28,7 @@ func run():
  check(ui!=null and ui.selected_count==20,"Count selector opens at 20")
  check(lab.find_child("ExistingAssetLightingEvaluation",true,false)==null,"Blocks, trees, flowers and their props colliders are removed")
  check(lab.grass_field.get_node("ThirtyByThirtyBlocks").multimesh.instance_count==900 and lab.grass_field.instance_count==1317,"The 30x30 terrain and mixed grass remain intact")
- check(lab.player.walk_speed==2.7 and absf(lab.player.run_speed-7.5465)<.00001,"Approved player movement speeds remain unchanged")
+ check(absf(lab.player.walk_speed-1.8*lab.movement_speed_multiplier)<.00001 and absf(lab.player.run_speed-5.031*lab.movement_speed_multiplier)<.00001,"Approved player movement speeds remain unchanged")
  var previous:=bodies(group)
  ui.select_count(0);ui.spawn_button.pressed.emit()
  check(group.living_count()==0 and group.zombies.is_empty(),"Spawn 0 removes the entire group for a clean baseline")

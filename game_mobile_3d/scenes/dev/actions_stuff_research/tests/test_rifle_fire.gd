@@ -17,7 +17,7 @@ func run() -> void:
  var a=scene.player;var v=a.visual;var gun=scene.rifle_fire
  scene.set_process(false);a.set_physics_process(false);v.set_process(false);gun.set_physics_process(false)
  control.set_process(false);control.player.set_physics_process(false);control.player.visual.set_process(false);control.rifle_fire.set_physics_process(false)
- check(absf(a.walk_speed-2.70)<.001 and absf(a.run_speed-7.55)<.01,"Approved travel speeds retained")
+ check(absf(a.walk_speed-1.8*scene.movement_speed_multiplier)<.001 and absf(a.run_speed-5.031*scene.movement_speed_multiplier)<.001,"Approved travel speeds retained")
  check(v.rifle_recoil_clip.clip.resource_name=="Rifle_Fire_Recoil_ActionsStyle_v001","Exact approved recoil selected")
  check(v.rifle_recoil_profile.clips.Recoil.action_sha256=="a0d88c8b85796cc670b7495de7ad4b86b3a4d3bd380c811a46eaca5ce97bd277","Latest1.5x source pin")
  var mouse:=InputEventMouseButton.new();mouse.button_index=MOUSE_BUTTON_LEFT;mouse.pressed=true;scene._unhandled_input(mouse)

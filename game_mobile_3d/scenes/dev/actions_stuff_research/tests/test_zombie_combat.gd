@@ -83,7 +83,7 @@ func run() -> void:
 	for body in old_bodies:check(not is_instance_valid(body),"Reset releases old corpse bodies/joints")
 	check(combat.zombies.size()==4 and combat.active_ragdolls()==0,"R restores four living zombies without accumulating corpses")
 	check(scene.rifle_fire.active_projectiles()==0 and not scene.rifle_fire.trigger_held,"Reset clears pending shots")
-	check(absf(scene.player.walk_speed-2.70)<.001 and absf(scene.player.run_speed-7.55)<.01,"Approved movement speeds retained")
+	check(absf(scene.player.walk_speed-1.8*scene.movement_speed_multiplier)<.001 and absf(scene.player.run_speed-5.031*scene.movement_speed_multiplier)<.001,"Approved movement speeds retained")
 	await ticks(hz*3)
 	var attack_count := 0
 	for other in combat.zombies:

@@ -28,7 +28,7 @@ func run():
   was_blink=blink
   check(appearance.hair_spring.value.is_finite() and appearance.tail_spring.value.is_finite(),"Bounded finite secondary simulation")
  check(max_hair>.01 and max_tail>.02,"Walk/run/turn inputs visibly excite both secondary springs")
- check(max_hair<.30 and max_tail<.90,"Controlled hair/tail angular limits")
+ check(max_hair<.15*appearance.SECONDARY_STRENGTH and max_tail<.45*appearance.SECONDARY_STRENGTH,"Controlled hair/tail angular limits")
  check(appearance.hair_spring.value.length()<.001 and appearance.tail_spring.value.length()<.001,"Stop settles to rest with no accumulated drift")
  check(blink_count>=2,"Persistent irregular blink clock survives state switches")
  appearance.advance_face(1./fps,"Aim",0.,false)

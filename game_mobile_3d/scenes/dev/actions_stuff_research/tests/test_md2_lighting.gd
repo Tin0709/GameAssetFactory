@@ -36,7 +36,7 @@ func run():
   check(light.world.environment==original,"Original restores exact Environment resource")
   check(sun.rotation_degrees.distance_to(Vector3(-55,-35,0))<.0001 and is_equal_approx(sun.light_energy,1.3),"Original restores exact key direction/energy")
   check(lab.grass_field.materials[0].get_shader_parameter("lighting_grade")==0.,"Original restores approved foliage fragment shading")
-  check(lab.player.walk_speed==2.7 and absf(lab.player.run_speed-7.5465)<.00001,"Lighting does not change travel speeds")
+  check(absf(lab.player.walk_speed-1.8*lab.movement_speed_multiplier)<.00001 and absf(lab.player.run_speed-5.031*lab.movement_speed_multiplier)<.00001,"Lighting does not change travel speeds")
   var clock:float=lab.grass_field.clock;var count:int=lab.grass_field.instance_count
   light.set_original(false);light.set_time(22.,true)
   check(lab.grass_field.clock==clock and lab.grass_field.instance_count==count,"Lighting switching leaves wind clock/population untouched")

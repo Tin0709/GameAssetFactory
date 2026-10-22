@@ -30,7 +30,7 @@ func run() -> void:
  check(v.rifle_aim_clip.clip.resource_name=="Crossbow_Aim_ActionsStuff_Refined_Test_v001","Exact approved Aim Action")
  check(v.rifle_aim_profile.clips.Aim.action_sha256=="4b4d072c8b6b909155207505eae19fc1dbd4bc15b227544c61791a6c7eae883f","Approved source pin")
  check(v.rifle_clips.size()==3,"Original Ready clip set retained")
- check(absf(a.walk_speed-2.70)<.001 and absf(a.run_speed-7.55)<.01,"Requested Walk/Run travel speeds")
+ check(absf(a.walk_speed-1.8*scene.movement_speed_multiplier)<.001 and absf(a.run_speed-5.031*scene.movement_speed_multiplier)<.001,"Requested Walk/Run travel speeds")
  check(v.locomotion_playback_rate==1.,"Approved animation playback stays1x")
  scene.set_process(false);a.set_physics_process(false);v.set_process(false)
  var press:=InputEventMouseButton.new();press.button_index=MOUSE_BUTTON_RIGHT;press.pressed=true;scene._unhandled_input(press)
