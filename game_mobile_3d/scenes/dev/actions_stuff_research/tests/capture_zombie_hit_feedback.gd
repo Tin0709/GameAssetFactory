@@ -12,6 +12,7 @@ func run() -> void:
 	var stage:=OS.get_environment("ZOMBIE_HIT_STAGE")
 	var fps:=60 if args.has("60") else 30
 	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate()
+	scene.performance_test_enabled=false # Original four-zombie regression fixture.
 	root.add_child(scene);current_scene=scene;scene.player.scripted_input=true
 	Engine.max_fps=fps
 	var event:=InputEventKey.new();event.physical_keycode=KEY_E;event.pressed=true

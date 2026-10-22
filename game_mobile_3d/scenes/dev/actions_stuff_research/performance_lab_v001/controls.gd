@@ -15,6 +15,7 @@ var _timer:=0.
 func setup(scene:Node3D)->void:
 	lab=scene;encounter=lab.zombie_combat;layer=31
 	panel=PanelContainer.new();add_child(panel)
+	panel.grow_vertical=Control.GROW_DIRECTION_BEGIN
 	panel.anchor_top=1.;panel.anchor_bottom=1.;panel.offset_left=12.;panel.offset_right=294.;panel.offset_top=-230.;panel.offset_bottom=-12.
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.04,.055,.91);style.set_corner_radius_all(5)
 	style.content_margin_left=10.;style.content_margin_right=10.;style.content_margin_top=8.;style.content_margin_bottom=8.;panel.add_theme_stylebox_override("panel",style)
@@ -65,4 +66,5 @@ func _process(delta:float)->void:
 func _refresh()->void:
 	status.text="Alive %d · Ragdolls %d / 4"%[encounter.living_count(),encounter.active_ragdolls()]
 	var fps:=Engine.get_frames_per_second()
-	stats.text="%d FPS · Frame %.1fms\nProcess %.2fms · Physics %.2fms"%[fps,1000./maxi(fps,1),Performance.get_monitor(Performance.TIME_PROCESS)*1000.,Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)*1000.]
+	var frame:="%.1fms"%(1000./fps) if fps>0 else "N/A"
+	stats.text="%d FPS · Frame %s\nProcess %.2fms · Physics %.2fms"%[fps,frame,Performance.get_monitor(Performance.TIME_PROCESS)*1000.,Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)*1000.]

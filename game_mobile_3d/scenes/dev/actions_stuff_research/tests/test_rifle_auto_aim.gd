@@ -15,7 +15,7 @@ func mouse(scene: Node,pressed: bool) -> void:
 func freeze(z: CharacterBody3D,at: Vector3) -> void:
 	z.target=null;z.move_speed=0.0;z.knockback_speed=0.0;z.position=at;z.velocity=Vector3.ZERO
 func run() -> void:
-	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(scene)
+	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();scene.performance_test_enabled=false;root.add_child(scene)
 	var aim=scene.get("rifle_auto_aim")
 	check(aim!=null,"Nearest-zombie auto-aim exists in the SAME scene")
 	if aim==null:scene.free();quit(1);return
