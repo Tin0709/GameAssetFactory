@@ -16,6 +16,14 @@ func run():
  Engine.max_fps=60
  viewport=SubViewport.new();viewport.size=Vector2i(1280,720);viewport.own_world_3d=true;viewport.render_target_update_mode=SubViewport.UPDATE_ALWAYS;root.add_child(viewport)
  lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();viewport.add_child(lab);current_scene=viewport
+ # Fixed-fps manual draws can reach frame_pre_draw before the native skin
+ # allocation queued by Skeleton3D has been consumed. Warm renderer storage
+ # before enabling the approved display-only palette callbacks; no rig edits.
+ var uploads:Array[Callable]=[Callable(lab.presentation,"_upload"),Callable(lab.soldier_appearance,"_upload")]
+ for callback:Callable in uploads:
+  if RenderingServer.frame_pre_draw.is_connected(callback):RenderingServer.frame_pre_draw.disconnect(callback)
+ await draw_frames(3)
+ for callback:Callable in uploads:RenderingServer.frame_pre_draw.connect(callback)
  lab.player.scripted_input=true
  for zombie in lab.zombie_combat.zombies:zombie.target=null;zombie.move_speed=0.
  lab._right_aim_held=true;lab._sync_rifle_controls()
