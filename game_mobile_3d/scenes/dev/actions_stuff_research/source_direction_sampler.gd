@@ -99,14 +99,17 @@ func _channel(keys: Array, clock: float, env: Dictionary, accumulated: Vector3) 
 		return _vector(keys[0][1],env,accumulated)
 	if clock >= float(keys[-1][0]):
 		return _vector(keys[-1][2],env,accumulated)
-	for i in keys.size()-1:
-		var a: float = keys[i][0]
-		var b: float = keys[i+1][0]
-		if a <= clock and clock < b:
-			# Post at the left key, pre at the right key; exact authored times
-			# belong to the following interval, as in SourceChannels._channel.
-			return _vector(keys[i][2],env,accumulated).lerp(_vector(keys[i+1][1],env,accumulated),(clock-a)/(b-a))
-	return accumulated
+	# Exact key boundaries retain the original left-post/right-pre rule.
+	# Long authored curves use logarithmic lookup instead of a per-pose scan.
+	var left:=0
+	var right:=keys.size()-1
+	while left+1<right:
+		var middle:=(left+right)/2
+		if clock<float(keys[middle][0]):right=middle
+		else:left=middle
+	var a:float=keys[left][0]
+	var b:float=keys[right][0]
+	return _vector(keys[left][2],env,accumulated).lerp(_vector(keys[right][1],env,accumulated),(clock-a)/(b-a))
 
 func _add_clip(out: Dictionary, alias: String, environment: Dictionary, clock: float, controller_weight: float = 1.0) -> void:
 	if controller_weight <= 0.0:return
