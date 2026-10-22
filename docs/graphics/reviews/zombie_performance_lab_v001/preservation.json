@@ -1,0 +1,19 @@
+{
+  "checked_existing_files": 9038,
+  "changed": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_zombie_combat.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/capture_zombie_hit_feedback.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_rifle_auto_aim.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/lighting_md2_v001/lighting.gd"
+  ],
+  "missing": [],
+  "only_authorized_files_changed": true,
+  "all_blender_and_production_files_exact": true,
+  "grass_shader_and_motion_exact": true,
+  "zombie_source_visual_physics_and_ai_exact": true,
+  "native_logs_no_engine_errors": true
+}

@@ -1,4 +1,4 @@
-**2026-10-22 — Current scene performance mode:** The existing lab now opts into an adjustable 0–50 batch, default20, and removes lighting review props. See `../performance_lab_v001/README.md`. The original four-actor encounter below remains the opt-out fixture; source visuals, AI and death physics remain unchanged. Both modes cap performance-mode active corpses at4 via the new admission subclass.
+**2026-10-22 — Current scene performance mode:** The existing lab now opts into an adjustable 0–50 batch, default20, and removes lighting review props. See `../performance_lab_v001/README.md`. The original four-actor encounter below remains the opt-out fixture; source visuals, AI and death physics remain unchanged. The performance subclass enforces four active ragdolls even with 50 actors; the original four-actor fixture remains unchanged.
 
 # Source zombie combat — development only
 
