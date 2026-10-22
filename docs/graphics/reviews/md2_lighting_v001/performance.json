@@ -1,0 +1,456 @@
+{
+	"frame_cap": 60,
+	"frozen_probes": [
+		{
+			"samples": 75,
+			"statistics": {
+				"draws": {
+					"max": 56.0,
+					"median": 56.0,
+					"p95": 56.0
+				},
+				"fps": {
+					"max": 60.0,
+					"median": 60.0,
+					"p95": 60.0
+				},
+				"frame_ms": {
+					"max": 18.653,
+					"median": 16.677,
+					"p95": 17.782
+				},
+				"gpu_ms": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"objects": {
+					"max": 56.0,
+					"median": 56.0,
+					"p95": 56.0
+				},
+				"physics_ms": {
+					"max": 10.548,
+					"median": 8.137,
+					"p95": 10.548
+				},
+				"primitives": {
+					"max": 76932.0,
+					"median": 76932.0,
+					"p95": 76932.0
+				},
+				"process_ms": {
+					"max": 3.546,
+					"median": 3.546,
+					"p95": 3.546
+				},
+				"render_cpu_ms": {
+					"max": 1.0809999704361,
+					"median": 0.683000028133392,
+					"p95": 0.967999994754791
+				},
+				"setup_cpu_ms": {
+					"max": 0.103,
+					"median": 0.059,
+					"p95": 0.091
+				},
+				"shadow_draws": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"shadow_primitives": {
+					"max": 22258.0,
+					"median": 22258.0,
+					"p95": 22258.0
+				}
+			},
+			"variant": "full"
+		},
+		{
+			"samples": 75,
+			"statistics": {
+				"draws": {
+					"max": 56.0,
+					"median": 56.0,
+					"p95": 56.0
+				},
+				"fps": {
+					"max": 60.0,
+					"median": 60.0,
+					"p95": 60.0
+				},
+				"frame_ms": {
+					"max": 18.561,
+					"median": 16.636,
+					"p95": 17.778
+				},
+				"gpu_ms": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"objects": {
+					"max": 56.0,
+					"median": 56.0,
+					"p95": 56.0
+				},
+				"physics_ms": {
+					"max": 8.137,
+					"median": 0.093,
+					"p95": 8.137
+				},
+				"primitives": {
+					"max": 76932.0,
+					"median": 76932.0,
+					"p95": 76932.0
+				},
+				"process_ms": {
+					"max": 4.63,
+					"median": 4.63,
+					"p95": 4.63
+				},
+				"render_cpu_ms": {
+					"max": 0.968999981880188,
+					"median": 0.52700001001358,
+					"p95": 0.875999987125397
+				},
+				"setup_cpu_ms": {
+					"max": 0.101,
+					"median": 0.05,
+					"p95": 0.094
+				},
+				"shadow_draws": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"shadow_primitives": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				}
+			},
+			"variant": "shadows_off"
+		},
+		{
+			"samples": 75,
+			"statistics": {
+				"draws": {
+					"max": 56.0,
+					"median": 56.0,
+					"p95": 56.0
+				},
+				"fps": {
+					"max": 60.0,
+					"median": 60.0,
+					"p95": 60.0
+				},
+				"frame_ms": {
+					"max": 18.629,
+					"median": 16.775,
+					"p95": 17.611
+				},
+				"gpu_ms": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"objects": {
+					"max": 56.0,
+					"median": 56.0,
+					"p95": 56.0
+				},
+				"physics_ms": {
+					"max": 0.075,
+					"median": 0.075,
+					"p95": 0.075
+				},
+				"primitives": {
+					"max": 76932.0,
+					"median": 76932.0,
+					"p95": 76932.0
+				},
+				"process_ms": {
+					"max": 4.408,
+					"median": 4.408,
+					"p95": 4.408
+				},
+				"render_cpu_ms": {
+					"max": 0.964999973773956,
+					"median": 0.694000005722046,
+					"p95": 0.925999999046326
+				},
+				"setup_cpu_ms": {
+					"max": 0.102,
+					"median": 0.062,
+					"p95": 0.088
+				},
+				"shadow_draws": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"shadow_primitives": {
+					"max": 22258.0,
+					"median": 22258.0,
+					"p95": 22258.0
+				}
+			},
+			"variant": "glow_off"
+		}
+	],
+	"godot": "4.7.2-stable (official)",
+	"gpu_time_available": false,
+	"notes": "Render CPU excludes scripts. Process/physics are engine monitors. Frame pace includes60FPSlimit. No readbacks in samples. ZeroGPU or shadowcounter is N/A on this backend; per-passGPUcost unavailable. Controlled probes are whole-frame comparisons, not isolatedGPUtimings.",
+	"os": "macOS",
+	"phone_tested": false,
+	"renderer": "mobile",
+	"shadow_counters_available": false,
+	"tiers": [
+		{
+			"final_shots": 28,
+			"peak_active_grass_cells": 102,
+			"peak_corpses": 2,
+			"peak_travel_speed": 7.54650926589966,
+			"pool_misses": 0,
+			"quality": {
+				"atlas": 1024,
+				"bits16": true,
+				"distance": 24.0,
+				"filter": 1,
+				"glow": false,
+				"name": "Low",
+				"scale": 0.75,
+				"splits": 0
+			},
+			"samples": 300,
+			"statistics": {
+				"draws": {
+					"max": 63.0,
+					"median": 57.0,
+					"p95": 61.0
+				},
+				"fps": {
+					"max": 60.0,
+					"median": 60.0,
+					"p95": 60.0
+				},
+				"frame_ms": {
+					"max": 72.065,
+					"median": 16.69,
+					"p95": 17.594
+				},
+				"gpu_ms": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"objects": {
+					"max": 63.0,
+					"median": 57.0,
+					"p95": 61.0
+				},
+				"physics_ms": {
+					"max": 571.807,
+					"median": 9.721,
+					"p95": 571.807
+				},
+				"primitives": {
+					"max": 80580.0,
+					"median": 77040.0,
+					"p95": 80546.0
+				},
+				"process_ms": {
+					"max": 53.361,
+					"median": 2.579,
+					"p95": 53.361
+				},
+				"render_cpu_ms": {
+					"max": 0.171000003814697,
+					"median": 0.0750000029802322,
+					"p95": 0.0920000001788139
+				},
+				"setup_cpu_ms": {
+					"max": 0.073,
+					"median": 0.01,
+					"p95": 0.049
+				},
+				"shadow_draws": {
+					"max": 20.0,
+					"median": 19.0,
+					"p95": 20.0
+				},
+				"shadow_primitives": {
+					"max": 22330.0,
+					"median": 21986.0,
+					"p95": 22330.0
+				}
+			},
+			"warmup_shots": 4
+		},
+		{
+			"final_shots": 54,
+			"peak_active_grass_cells": 102,
+			"peak_corpses": 2,
+			"peak_travel_speed": 7.54651403427124,
+			"pool_misses": 0,
+			"quality": {
+				"atlas": 2048,
+				"bits16": true,
+				"distance": 32.0,
+				"filter": 2,
+				"glow": true,
+				"name": "Medium",
+				"scale": 0.85,
+				"splits": 1
+			},
+			"samples": 300,
+			"statistics": {
+				"draws": {
+					"max": 63.0,
+					"median": 57.0,
+					"p95": 62.0
+				},
+				"fps": {
+					"max": 61.0,
+					"median": 60.0,
+					"p95": 61.0
+				},
+				"frame_ms": {
+					"max": 64.279,
+					"median": 16.678,
+					"p95": 17.571
+				},
+				"gpu_ms": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"objects": {
+					"max": 63.0,
+					"median": 57.0,
+					"p95": 62.0
+				},
+				"physics_ms": {
+					"max": 14.899,
+					"median": 8.28,
+					"p95": 14.899
+				},
+				"primitives": {
+					"max": 80580.0,
+					"median": 76924.0,
+					"p95": 80546.0
+				},
+				"process_ms": {
+					"max": 55.69,
+					"median": 2.923,
+					"p95": 55.69
+				},
+				"render_cpu_ms": {
+					"max": 0.194999992847443,
+					"median": 0.0829999968409538,
+					"p95": 0.0970000028610229
+				},
+				"setup_cpu_ms": {
+					"max": 0.185,
+					"median": 0.01,
+					"p95": 0.045
+				},
+				"shadow_draws": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"shadow_primitives": {
+					"max": 22330.0,
+					"median": 21986.0,
+					"p95": 22330.0
+				}
+			},
+			"warmup_shots": 32
+		},
+		{
+			"final_shots": 79,
+			"peak_active_grass_cells": 106,
+			"peak_corpses": 2,
+			"peak_travel_speed": 7.5465145111084,
+			"pool_misses": 0,
+			"quality": {
+				"atlas": 2048,
+				"bits16": false,
+				"distance": 38.0,
+				"filter": 3,
+				"glow": true,
+				"name": "High",
+				"scale": 1.0,
+				"splits": 1
+			},
+			"samples": 300,
+			"statistics": {
+				"draws": {
+					"max": 63.0,
+					"median": 57.0,
+					"p95": 62.0
+				},
+				"fps": {
+					"max": 60.0,
+					"median": 60.0,
+					"p95": 60.0
+				},
+				"frame_ms": {
+					"max": 63.954,
+					"median": 16.682,
+					"p95": 17.477
+				},
+				"gpu_ms": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"objects": {
+					"max": 63.0,
+					"median": 57.0,
+					"p95": 62.0
+				},
+				"physics_ms": {
+					"max": 13.226,
+					"median": 8.147,
+					"p95": 13.226
+				},
+				"primitives": {
+					"max": 80572.0,
+					"median": 76924.0,
+					"p95": 80476.0
+				},
+				"process_ms": {
+					"max": 53.504,
+					"median": 3.266,
+					"p95": 53.504
+				},
+				"render_cpu_ms": {
+					"max": 0.236000001430511,
+					"median": 0.0839999988675117,
+					"p95": 0.0979999974370003
+				},
+				"setup_cpu_ms": {
+					"max": 0.073,
+					"median": 0.01,
+					"p95": 0.047
+				},
+				"shadow_draws": {
+					"max": 0.0,
+					"median": 0.0,
+					"p95": 0.0
+				},
+				"shadow_primitives": {
+					"max": 22330.0,
+					"median": 21986.0,
+					"p95": 22330.0
+				}
+			},
+			"warmup_shots": 58
+		}
+	],
+	"viewport": "1280x720"
+}

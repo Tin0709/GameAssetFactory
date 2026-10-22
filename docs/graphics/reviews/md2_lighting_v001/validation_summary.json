@@ -1,0 +1,34 @@
+{
+  "green.log": {
+    "errors": 0,
+    "tail": "MD2_LIGHTING_CHECKS {\"checks\":20,\"failures\":[]}"
+  },
+  "fire.log": {
+    "errors": 0,
+    "tail": "RIFLE_FIRE {\"camera_span_m\":0.0,\"failures\":[],\"fps\":30,\"grip_error_m\":0.000000544477359198936,\"lower_body_error\":0.0,\"passed\":true,\"pool_misses\":0,\"recovered_pose_error\":0.0,\"shots\":159,\"support_error_m\":0.000000266976257989882}"
+  },
+  "fire60.log": {
+    "errors": 0,
+    "tail": "RIFLE_FIRE {\"camera_span_m\":0.0,\"failures\":[],\"fps\":60,\"grip_error_m\":0.000000772932651216252,\"lower_body_error\":0.0,\"passed\":true,\"pool_misses\":0,\"recovered_pose_error\":0.0,\"shots\":159,\"support_error_m\":0.000000357627868652344}"
+  },
+  "strafe.log": {
+    "errors": 0,
+    "tail": "RIFLE_COMBAT_STRAFE {\"aim_aligned_samples\":529,\"back_seen\":true,\"contact_pairs\":97,\"contact_step_m\":0.000000119209289550781,\"failures\":[],\"fps\":30,\"height_step_m\":0.0250000059604645,\"left_support_error_m\":0.000000279967395044878,\"maximum_leg_step_deg\":28.0030140309598,\"maximum_source_pose_error\":0.000000266976257989882,\"minimum_floor_m\":-0.0000000596046447753906,\"passed\":true,\"recent_action_branch\":true,\"right_grip_error_m\":0.000000181280455535671,\"side_seen\":true,\"source_samples\":320}"
+  },
+  "camera.log": {
+    "errors": 0,
+    "tail": "CAMERA_COMFORT {\"failures\":[],\"reports\":[{\"fps\":30,\"normal_jump_camera_y_range\":0.0,\"normal_jump_max_y_step\":0.0},{\"fps\":60,\"normal_jump_camera_y_range\":0.0,\"normal_jump_max_y_step\":0.0}]}"
+  },
+  "grass.log": {
+    "errors": 0,
+    "tail": "MD2_GRASS_CHECKS {\"checks\":29,\"failures\":[]}"
+  },
+  "clip.log": {
+    "errors": 0,
+    "tail": "MD2_LIGHTING_CLIP {\"accelerated_preview_hours\":[7.0,12.0,16.5,18.5,22.0],\"fps\":30,\"frames\":300,\"simulated_seconds\":9.99999999999997}"
+  },
+  "stills.log": {
+    "errors": 0,
+    "tail": "MD2_LIGHTING_NATIVE_STILLS /Users/tin/Desktop/Game Dev/GameAssetFactory/.validation/md2_lighting_v001/stills"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "checked": 8939,
+  "changed": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass.gdshader"
+  ],
+  "missing": [],
+  "unexpected_changes": [],
+  "all_blender_exact": true,
+  "project_worldmap_approved_actor_weapon_zombie_exact": true,
+  "grass_vertex_body_exact": true,
+  "grass_vertex_sha": "47dc06ab122d3b579c80cf19a149715a97419e0590318c7157a12ab5af16df57"
+}
