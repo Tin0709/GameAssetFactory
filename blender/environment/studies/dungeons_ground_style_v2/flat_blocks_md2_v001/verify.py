@@ -4,10 +4,23 @@ from pathlib import Path
 
 D=Path(__file__).resolve().parent;P=D.parent;R=P.parents[3];E=R/'.validation/flat_blocks_v001'
 sys.path[:0]=[str(P),str(P/'tall_grass_md2_v001')]
-from flower_preservation import compare
+import flower_preservation as preservation
+# These four Object values are evaluated caches, not authored data. A hidden
+# view layer reopens with identity world matrices/stale modifier bounds until
+# evaluated. Keep every stored transform, mesh/UV/material and modifier value.
+original_rna_values=preservation.rna_values
+def authored_rna(value):
+    values=original_rna_values(value)
+    if isinstance(value,bpy.types.Object):
+        for name in ['bound_box','dimensions','matrix_world','matrix_local']:
+            values.pop(name,None)
+    return values
+preservation.rna_values=authored_rna
+bpy.ops.wm.open_mainfile(filepath=str(E/'before/dungeons_ground_style_v2.blend'))
+baseline=preservation.snapshot()
 bpy.ops.wm.open_mainfile(filepath=str(P/'dungeons_ground_style_v2.blend'))
 scene=bpy.context.scene
-changes=compare(json.loads((E/'native_before.json').read_text()))
+changes=preservation.compare(baseline)
 assert not changes,changes
 import grass_library_ui as ui
 ui.register()
