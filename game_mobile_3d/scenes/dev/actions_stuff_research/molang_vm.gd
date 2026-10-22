@@ -5,10 +5,7 @@ extends RefCounted
 static func execute(node: Array, env: Dictionary) -> Variant:
 	# Literal channels and direct reads have no side effects or nested return.
 	# Avoid allocating a return frame for these very common authored channels.
-	if node[0]=="native_expression":
-		var inputs:Array=[]
-		for key in node[2]:inputs.append(env.get(key,0.0))
-		return node[1].execute(inputs,null,true,true)
+	if node[0]=="native_expression":return _native(node,env)
 	if node[0]=="literal":return node[1]
 	if node[0]=="variable":return env.get(_name(node[1]),0.0)
 	return _execute(node, env, {"returned": false, "value": 0.0})
@@ -23,6 +20,7 @@ static func _name(value: String) -> String:
 static func _execute(node: Array, env: Dictionary, frame: Dictionary) -> Variant:
 	if frame.returned: return frame.value
 	match node[0]:
+		"native_expression":return _native(node,env)
 		"literal": return node[1]
 		"variable": return env.get(_name(node[1]), 0.0)
 		"assign":
@@ -170,3 +168,21 @@ static func _channel_source(node:Array,variables:Array[String])->String:
 				"math.atan":return "rad_to_deg(atan("+value+"))"
 				"math.abs":return "abs("+value+")"
 	return ""
+
+static func _native(node:Array,env:Dictionary)->Variant:
+	var inputs:Array=[]
+	for key in node[2]:inputs.append(env.get(key,0.0))
+	return node[1].execute(inputs,null,true,true)
+
+static func prepare(value:Variant)->Variant:
+	# Only JSON AST roots are rewritten, once at construction. Pure subtrees
+	# inside ordered/lazy programs can use native arithmetic without reordering.
+	if value is Dictionary:
+		for key in value:value[key]=prepare(value[key])
+	elif value is Array and not value.is_empty():
+		if value[0] is String and value[0] in ["literal","variable"]:return value
+		if value[0] is String and value[0] in ["program","unary","binary","call","assign","return","conditional"]:
+			var compiled:=compile_channel(value)
+			if compiled[0]=="native_expression" or compiled[0] in ["literal","variable"]:return compiled
+		for i in value.size():value[i]=prepare(value[i])
+	return value
