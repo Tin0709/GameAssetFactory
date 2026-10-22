@@ -12,6 +12,11 @@ func run():
   var lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(lab)
   var light=lab.md2_lighting
   check(light!=null,"Existing scene opts into lighting without another gameplay scene")
+  var down:=InputEventMouseButton.new();down.button_index=MOUSE_BUTTON_RIGHT;down.pressed=true
+  var up:=InputEventMouseButton.new();up.button_index=MOUSE_BUTTON_RIGHT;up.pressed=false
+  lab._unhandled_input(down);lab._input(up)
+  check(not lab.orbiting and not lab._right_aim_held,"Mouse release over GUI cannot leave aim/orbit stuck")
+  lab._unhandled_input(up)
   var sun:DirectionalLight3D=light.sun;var original:Environment=light.original_environment
   var palette=light.palette
   var midnight:Dictionary=palette.sample(0.);var wrapped:Dictionary=palette.sample(24.)
@@ -38,6 +43,9 @@ func run():
   check(not light.environment.volumetric_fog_enabled and not light.environment.ssao_enabled and not light.environment.ssr_enabled,"Mobile preview does not request unsupported effects")
   light.release()
   check(light.world.environment==original,"Removing lighting leaves exact recoverable baseline")
+  light.set_quality(0);light.set_original(false);light.set_time(7.,true)
+  check(light.world.environment==original and is_equal_approx(lab.get_viewport().scaling_3d_scale,light.original_view.scale) and is_equal_approx(sun.light_energy,1.3),"Released controls cannot mutate the restored lighting or viewport")
+  check(not light.ui.visible,"Release retires the preview controls")
   lab.free()
   var second=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(second)
   var owner=second.md2_lighting;owner.set_quality(0)
