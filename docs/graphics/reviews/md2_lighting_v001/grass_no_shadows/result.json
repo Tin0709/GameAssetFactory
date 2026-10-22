@@ -1,0 +1,23 @@
+{
+	"gpu_note": "MetalGPUtimingunavailable; do not claim FPSgain from capped samples.",
+	"grass_batches": 32,
+	"grass_receiving_disabled": true,
+	"grass_shadow_casters": 0,
+	"samples": [
+		{
+			"frame_median_ms": 16.685,
+			"frame_p95_ms": 19.074,
+			"gpu_median_ms": null,
+			"receives_shadows": true,
+			"render_cpu_median_ms": 0.746999979019165
+		},
+		{
+			"frame_median_ms": 16.649,
+			"frame_p95_ms": 17.649,
+			"gpu_median_ms": null,
+			"receives_shadows": false,
+			"render_cpu_median_ms": 0.652999997138977
+		}
+	],
+	"sun_shadows_retained": true
+}

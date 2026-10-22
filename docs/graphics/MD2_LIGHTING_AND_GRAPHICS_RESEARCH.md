@@ -151,3 +151,9 @@ Native stills freeze world/pose/camera/wind phase; Original restores its origina
 - Future priorities: representative fixed level/canopy openings; on-deviceGPUcapture and thermal runs; compare scale/MSAA/shadowtiers; static terrain AO/lightmapprobe plan without touching bendUV2; localized emissive practicals only where authored; optional bounded shafts with measured benefit.
 
 Stop at this integrated **visual review**. Do not promote native libraries/Actions or productionWorldMap based on this desktop result.
+
+## Follow-up — grass shadows disabled,2026-10-22
+
+Latest user requests no shadows on either tall or short grass. All32grassMultiMeshbatches already had shadowcastingOFF. The shared grass shader now also uses native `shadows_disabled`, removing shadow reception for both families. Directional/ambient diffuse, rootgrade, texture colors and all vertexwind/contact logic remain unchanged; one render-mode token is the only code change. Character/zombie/tree/terrain shadow settings stay intact. Original A/Bnow compares lighting while retaining this latest grass shadow policy; the earlier fivephase media above predates this optimization.
+
+[Current native image](reviews/md2_lighting_v001/grass_no_shadows/after.png) · [Before](reviews/md2_lighting_v001/grass_no_shadows/before.png) · [Native check](reviews/md2_lighting_v001/grass_no_shadows/result.json). ActualMobilecompile/render passed,32grassbatches/0casters, unchangedvertexbody. Paired60sampledesktopchecks stayed near60FPScap; renderCPUmedian.747→.653ms, but this is not GPUtime and is insufficient to claim a large FPSgain. MetalGPUtiming remains unavailable. No shadowcasterpass reduction is attributed to this change because grasscasting was already disabled.
