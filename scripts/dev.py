@@ -92,7 +92,7 @@ def blender_command(tool: Path, showcase: str) -> list[str]:
     if showcase in {'asset-style-v2', 'player-library', 'animation', 'weapon', 'mobs', 'soldier'}:
         command += ['--python', str(ROOT / 'scripts/load_showcase_ui.py')]
     if showcase=='asset-style-v2':
-        command += ['--python-expr', "print('MD2_SHORT_GRASS_V001 MD2_TALL_GRASS_V001 MD2_GRASS_LIBRARY_V001 MD2_GRASS_WIND_V001 MD2_GRASS_INTERACTION_V001 MD2_FLAT_BLOCKS_V001')"]
+        command += ['--python-expr', "print('MD2_SHORT_GRASS_V001 MD2_TALL_GRASS_V001 MD2_GRASS_LIBRARY_V001 MD2_GRASS_WIND_V001 MD2_GRASS_INTERACTION_V001 MD2_FLAT_BLOCKS_V001 MD2_SOFT_BLOCKS_R2')"]
     if showcase=='soldier':
         command += ['--python-expr', "print('SOLDIER_FACIAL_UI_V001 SOLDIER_HAIRCARDS_UI_V001_R2')"]
     return command
@@ -128,6 +128,8 @@ def existing_viewer_pid(tool: str, source: Path, *, require_ui: bool = False) ->
             continue  # Preserve loaded Wind-only windows; current review also needs the shared contact field.
         if require_ui and source.name=='dungeons_ground_style_v2.blend' and 'MD2_FLAT_BLOCKS_V001' not in command:
             continue  # Keep older unsaved grass windows; only the current file has the flat-block entries.
+        if require_ui and source.name=='dungeons_ground_style_v2.blend' and 'MD2_SOFT_BLOCKS_R2' not in command:
+            continue  # Retain older flat-only windows; the saved Pending blocks now use a grass cap and soft texture.
         if require_ui and source.name=='SOLDIER_Asset_Library.blend' and 'SOLDIER_FACIAL_UI_V001' not in command:
             continue  # Leave older viewers untouched; their loaded UI lacks the facial system.
         if require_ui and source.name=='SOLDIER_Asset_Library.blend' and 'SOLDIER_HAIRCARDS_UI_V001_R2' not in command:
