@@ -68,6 +68,7 @@ func _refresh()->void:
 	var shadow:="%d"%m.shadow_draws if m.shadow_draws>0 or not lighting.sun.shadow_enabled else "N/A"
 	stats.text="%d FPS · Render CPU %.2fms · GPU %s\nDraws %d · Shadow %s · %d objects"%[m.fps,m.render_cpu_ms,gpu,m.draws,shadow,m.objects]
 	var minutes:=int(round(lighting.current_hour*60.))%1440
+	header.text="Lighting · %02d:%02d · %s · L"%[minutes/60,minutes%60,"Original" if lighting.original else lighting.TIERS[lighting.quality].name]
 	time_label.text="%02d:%02d · %s"%[minutes/60,minutes%60,"Original" if lighting.original else "GAF MD2 v001"]
 	time_slider.set_value_no_signal(lighting.current_hour)
 	play.text="Ⅱ Pause" if lighting.automatic else "▶ Auto"

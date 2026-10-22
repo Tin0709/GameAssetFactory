@@ -21,6 +21,18 @@ func run():
  lab._right_aim_held=true;lab._sync_rifle_controls()
  await draw_frames(45)
  var lighting=lab.md2_lighting
+ if args.has("clip"):
+  lighting.ui.body.visible=false;lighting.ui.panel.reset_size();lighting.set_time(7.,true)
+  var first_clock:float=lab.grass_field.clock
+  var hours:=[7.,12.,16.5,18.5,22.]
+  for f in 300:
+   if f%60==0:lighting.set_time(hours[f/60])
+   await draw_frames(1)
+   viewport.get_texture().get_image().save_png(out+("/frame_%04d.png"%f))
+  print("MD2_LIGHTING_CLIP ",JSON.stringify({"frames":300,"fps":30,"simulated_seconds":lab.grass_field.clock-first_clock,"accelerated_preview_hours":hours}))
+  lab.free();viewport.free()
+  for i in 4:await process_frame
+  quit();return
  paused=true
  lighting.ui.visible=false;lab.hud.get_parent().visible=false
  lighting.set_original(true);await save("00_original")
