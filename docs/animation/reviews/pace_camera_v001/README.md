@@ -1,4 +1,4 @@
-#1.2×pace and wider camera —2026-10-22
+# 1.2× pace and wider camera —2026-10-22
 
 User authorizes20%faster travel and animation, plus a wider MD2-like view using the supplied gameplay screenshot. SAME `ActionsStuffWalkRunTest.tscn`; no new scene/project or approved Action change.
 
