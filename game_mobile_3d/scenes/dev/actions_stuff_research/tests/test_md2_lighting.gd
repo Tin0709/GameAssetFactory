@@ -39,4 +39,10 @@ func run():
   light.release()
   check(light.world.environment==original,"Removing lighting leaves exact recoverable baseline")
   lab.free()
+  var second=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(second)
+  var owner=second.md2_lighting;owner.set_quality(0)
+  var old_scale:float=owner.original_view.scale
+  owner.world.free();owner.release()
+  check(is_equal_approx(second.get_viewport().scaling_3d_scale,old_scale),"Removal restores viewport even if borrowed environment was removed first")
+  second.free()
  print("MD2_LIGHTING_CHECKS ",JSON.stringify({"checks":checks,"failures":failures}));quit(0 if failures.is_empty() else 1)
