@@ -39,7 +39,7 @@ var camera: Camera3D
 var hud: Label
 var azimuth:=.66
 var elevation:=.40
-var camera_size:=7.2
+@export_range(3.6,24.,.1) var camera_size:=7.2
 const CAMERA_DISTANCE:=10.0
 var orbiting:=false
 var _fire_key_held:=false
@@ -186,7 +186,10 @@ func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	var decay:=exp(-CAMERA_VERTICAL_RESPONSE*delta)
 	camera_anchor.y=height+(offset+spring*delta)*decay
 	_camera_vertical_velocity=(_camera_vertical_velocity-CAMERA_VERTICAL_RESPONSE*spring*delta)*decay
-	camera.global_position=camera_anchor+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*CAMERA_DISTANCE
+	# Orthographic framing needs distance as well: a wider view must still start
+	# above the ground rather than clip its foreground at the camera near plane.
+	var view_distance:=CAMERA_DISTANCE*maxf(1.,camera_size/7.2)
+	camera.global_position=camera_anchor+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*view_distance
 	camera.look_at(camera_anchor,Vector3.UP);camera.size=camera_size
 func _input(event: InputEvent) -> void:
 	# A GUI may consume the key-up after the press began over the world.
@@ -218,7 +221,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			orbiting=event.pressed
 			_right_aim_held=event.pressed;_sync_rifle_controls()
 		if event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_UP:camera_size=maxf(3.6,camera_size-.3)
-		if event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:camera_size=minf(8.,camera_size+.3)
+		if event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:camera_size=minf(24.,camera_size+.3)
 	if event is InputEventMouseMotion and orbiting:
 		azimuth-=event.relative.x*.006;elevation=clampf(elevation+event.relative.y*.004,.15,.75)
 func _notification(what: int) -> void:

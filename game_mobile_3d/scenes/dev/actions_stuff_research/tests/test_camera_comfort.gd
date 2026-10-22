@@ -22,7 +22,7 @@ func run() -> void:
 			max_step=maxf(max_step,absf(scene.camera.global_position.y-previous.y));previous=scene.camera.global_position
 		check(max_y<.001,"Normal jump keeps vertical frame stable at "+str(fps))
 		check(scene.camera_anchor.x>3.2 and scene.camera_anchor.x<3.6,"Horizontal follow remains smooth and responsive")
-		check(is_equal_approx(scene.camera.global_position.distance_to(scene.camera_anchor),10.),"Requested wider camera distance preserved")
+		check(absf(scene.camera.global_position.distance_to(scene.camera_anchor)-20.138889)<.0001,"Requested wider camera distance preserved")
 		# Simulated new platform/long fall, without adding any scene or physics content.
 		for height in [6.,-9.]:
 			var prior: float=scene.camera_anchor.y
@@ -34,7 +34,7 @@ func run() -> void:
 			scene.player.visual.jump_grounded=true
 			for i in fps*4: scene._update_camera(dt)
 			check(absf(scene.camera_anchor.y-(height+.95))<.001,"Grounded elevation settles smoothly")
-		check(scene.azimuth==.66 and scene.elevation==.40 and scene.camera_size==7.2,"Original angle and requested wider framing preserved")
+		check(scene.azimuth==.66 and scene.elevation==.40 and scene.camera_size==14.5,"Original angle and requested wider framing preserved")
 		reports.append({"fps":fps,"normal_jump_camera_y_range":max_y,"normal_jump_max_y_step":max_step})
 	print("CAMERA_COMFORT ",JSON.stringify({"failures":failures,"reports":reports}))
 	scene.free();quit(0 if failures.is_empty() else 1)

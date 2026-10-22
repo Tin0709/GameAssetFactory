@@ -19,7 +19,7 @@ func run():
  lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();lab.zombie_combat_enabled=false;lab.auto_aim_enabled=false;root.add_child(lab)
  lab.set_process(false);lab.player.set_physics_process(false);lab.player.visual.set_process(false);lab.rifle_fire.set_physics_process(false);lab.soldier_appearance.set_process(false);lab.soldier_appearance.set_physics_process(false)
  var a=lab.player;var v=a.visual
- check(absf(a.walk_speed-1.8)<.0001 and absf(a.run_speed-5.031)<.0001,"Saved scene uses original 1x movement speeds")
+ check(absf(a.walk_speed-2.16)<.0001 and absf(a.run_speed-6.0372)<.0001,"Saved scene uses requested 1.2x movement speeds")
  for i in fps:tick(Vector2.ZERO,false,dt)
  for i in fps:tick(Vector2(0,-1),false,dt)
  for i in fps:tick(Vector2(0,-1),true,dt)
