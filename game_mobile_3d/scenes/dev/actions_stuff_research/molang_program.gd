@@ -11,7 +11,7 @@ static func prepare(value:Variant)->Variant:
  _gather(value,roots)
  if roots.is_empty():return value
  var state:={"lines":PackedStringArray(),"next":0}
- state.lines.append("extends RefCounted\nconst VM=preload("+JSON.stringify(KERNEL_PATH)+")")
+ state.lines.append("extends RefCounted\nconst VM=preload("+JSON.stringify(KERNEL_PATH)+")\nfunc missing_call(name:String)->float:\n push_error(\"Unsupported Molang call or missing Callable: \"+name)\n return 0.0")
  for i in roots.size():
   state.lines.append("func e"+str(i)+"(env:Dictionary)->Variant:")
   var result:=_emit(roots[i],state,1)
@@ -100,7 +100,8 @@ static func _emit(n:Array,s:Dictionary,indent:int)->String:
    for child in n[2]:args.append(_emit(child,s,indent))
    var arguments:String="["+",".join(args)+"]"
    if function.begins_with("math."):return _store(s,indent,"VM._math("+JSON.stringify(function.substr(5))+","+arguments+")")
+   if not function.begins_with("q."):return _store(s,indent,"missing_call("+JSON.stringify(function)+")")
    var callback:=_store(s,indent,"env.get("+JSON.stringify(function)+")")
-   return _store(s,indent,callback+".callv("+arguments+") if "+callback+" is Callable else 0.0")
+   return _store(s,indent,callback+".callv("+arguments+") if "+callback+" is Callable else missing_call("+JSON.stringify(function)+")")
  _line(s,indent,"push_error(\"Unsupported compiled Molang node\")")
  return "0.0"
