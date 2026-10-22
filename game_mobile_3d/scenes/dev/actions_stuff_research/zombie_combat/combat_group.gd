@@ -4,7 +4,7 @@ extends Node3D
 const ZOMBIE = preload("res://scenes/characters/CuboidZombie.tscn")
 const PHYSICS_ZOMBIE = preload("res://scenes/dev/actions_stuff_research/zombie_combat/physics_zombie.gd")
 const SOURCE_VISUAL = preload("res://scenes/dev/actions_stuff_research/zombie_combat/source_visual.gd")
-const SPAWNS := [Vector3(.1,0,-3.4),Vector3(1.5,0,-3.8),Vector3(3.1,0,1.6),Vector3(-3.2,0,1.5)]
+const SPAWNS: Array[Vector3] = [Vector3(.1,0,-3.4),Vector3(1.5,0,-3.8),Vector3(3.1,0,1.6),Vector3(-3.2,0,1.5)]
 const MAX_RAGDOLLS := 4
 var zombies: Array[CharacterBody3D] = []
 var player: CharacterBody3D
@@ -34,18 +34,22 @@ func can_fight() -> bool:return active
 func play_sound(event: StringName) -> void:
 	if is_instance_valid(audio):audio.play_event(event)
 
+func _spawn_positions() -> Array[Vector3]:return SPAWNS
+func _zombie_script() -> Script:return PHYSICS_ZOMBIE
+
 func reset_encounter() -> void:
 	# All old native graphs are freed synchronously before a new group is admitted.
 	for zombie in zombies:
 		if is_instance_valid(zombie):zombie.free()
 	zombies.clear()
 	kills = 0
-	for i in SPAWNS.size():
+	var positions:=_spawn_positions()
+	for i in positions.size():
 		var zombie: CharacterBody3D = ZOMBIE.instantiate()
-		zombie.set_script(PHYSICS_ZOMBIE)
+		zombie.set_script(_zombie_script())
 		zombie.get_node("Visual").set_script(SOURCE_VISUAL)
 		zombie.name = "ResearchZombie_%d" % (i+1)
-		zombie.position = SPAWNS[i]
+		zombie.position = positions[i]
 		zombie.target = player
 		zombie.combat_audio = audio
 		zombie.combat = self

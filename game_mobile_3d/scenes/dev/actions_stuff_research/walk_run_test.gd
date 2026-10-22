@@ -13,6 +13,10 @@ const SoldierLoadout=preload("res://scenes/dev/actions_stuff_research/soldier_lo
 const SoldierAppearance=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/appearance.gd")
 const GrassField=preload("res://scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd")
 const MD2Lighting=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/lighting.gd")
+const PerformanceCombat=preload("res://scenes/dev/actions_stuff_research/performance_lab_v001/combat_group.gd")
+const PerformanceControls=preload("res://scenes/dev/actions_stuff_research/performance_lab_v001/controls.gd")
+@export var performance_test_enabled:=false
+var performance_controls:CanvasLayer
 @export var md2_lighting_enabled:=false
 var md2_lighting:Node
 @export var grass_field_enabled:=false
@@ -77,7 +81,7 @@ func _ready() -> void:
 	if rifle_ready:
 		rifle_fire=RifleFire.new();rifle_fire.name="InfiniteRifleFire";add_child(rifle_fire);rifle_fire.setup(player)
 		if zombie_combat_enabled:
-			zombie_combat=ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player,rifle_fire.audio)
+			zombie_combat=PerformanceCombat.new() if performance_test_enabled else ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player,rifle_fire.audio)
 			if auto_aim_enabled:
 				rifle_auto_aim=RifleAutoAim.new();rifle_auto_aim.name="NearestZombieAutoAim";add_child(rifle_auto_aim);rifle_auto_aim.setup(player,zombie_combat)
 	if soldier_loadout and rifle_ready:
@@ -85,7 +89,9 @@ func _ready() -> void:
 	if grass_field_enabled:
 		grass_field=GrassField.new();grass_field.name="MD2GrassField30x30";add_child(grass_field);grass_field.setup(player)
 	if md2_lighting_enabled:
-		md2_lighting=MD2Lighting.new();md2_lighting.name="GAF_MD2_Lighting_v001";add_child(md2_lighting);md2_lighting.setup(self,grass_field)
+		md2_lighting=MD2Lighting.new();md2_lighting.name="GAF_MD2_Lighting_v001";add_child(md2_lighting);md2_lighting.setup(self,grass_field,not performance_test_enabled)
+	if performance_test_enabled and zombie_combat!=null:
+		performance_controls=PerformanceControls.new();performance_controls.name="PerformanceTestControls";add_child(performance_controls);performance_controls.setup(self)
 	_update_camera()
 func _build_environment() -> void:
 	var environment:=WorldEnvironment.new();var settings:=Environment.new();settings.background_mode=Environment.BG_COLOR;settings.background_color=Color(.17,.22,.26)

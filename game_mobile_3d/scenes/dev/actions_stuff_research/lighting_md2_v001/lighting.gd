@@ -35,7 +35,7 @@ var ui:CanvasLayer
 var metrics:RefCounted
 var _dirty:=true
 
-func setup(scene:Node3D,foliage:Node=null)->void:
+func setup(scene:Node3D,foliage:Node=null,include_review_props:bool=true)->void:
 	lab=scene;grass_field=foliage;viewport=lab.get_viewport()
 	for child in lab.get_children():
 		if child is WorldEnvironment:world=child
@@ -68,7 +68,8 @@ func setup(scene:Node3D,foliage:Node=null)->void:
 	metrics=Metrics.new();metrics.setup(viewport)
 	ui=PreviewUI.new();ui.name="LightingPreviewControls";add_child(ui);ui.setup(self)
 	# Demonstration props belong to this opt-in lab module and leave with it.
-	var props:=ReviewProps.new();add_child(props)
+	if include_review_props:
+		var props:=ReviewProps.new();add_child(props)
 	print("GAF_MD2_LIGHTING_READY ",JSON.stringify({"hour":current_hour,"quality":TIERS[quality].name,"renderer":RenderingServer.get_current_rendering_method(),"automatic":automatic}))
 
 func set_time(hour:float,snap:bool=false)->void:

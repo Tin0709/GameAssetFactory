@@ -10,6 +10,9 @@ func ticks(count: int) -> void:
 	await process_frame
 func run() -> void:
 	var scene = load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate()
+	# Keep this original four-actor damage/handoff fixture independent of the
+	# scene's opt-in adjustable performance batch.
+	scene.performance_test_enabled=false
 	# Preserve this original manual-barrel damage/handoff regression. Automatic
 	# target selection/turning/projectile kills have their own end-to-end suite.
 	scene.auto_aim_enabled=false
