@@ -62,7 +62,7 @@ func _ready() -> void:
 	player.get_node("Visual").set_script(RIFLE_VISUAL if rifle_ready else SOURCE_VISUAL)
 	player.get_node("Visual").authored_locomotion=true;player.get_node("Visual").generic_weapon_carry=true;player.get_node("Visual").long_gun_carry_v2=true;player.get_node("Visual").weapon_equipped=false
 	# Planar travel and rifle gait playback have independent, reversible tuning.
-	player.review_pace=1.;player.walk_speed=1.8*movement_speed_multiplier;player.run_speed=5.031*movement_speed_multiplier;player.acceleration=40.;player.deceleration=35.
+	player.review_pace=1.;player.walk_speed=1.8*movement_speed_multiplier;player.run_speed=5.031*movement_speed_multiplier;player.acceleration=40.*movement_speed_multiplier;player.deceleration=35.*movement_speed_multiplier
 	player.get_node("Visual").travel_speed_scale=movement_speed_multiplier
 	player.get_node("Visual").locomotion_playback_rate=locomotion_animation_multiplier if rifle_ready else 1.
 	add_child(player)
