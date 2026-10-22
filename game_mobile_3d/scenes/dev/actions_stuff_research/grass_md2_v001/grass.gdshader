@@ -1,10 +1,11 @@
 shader_type spatial;
-render_mode cull_disabled, diffuse_lambert, specular_disabled, shadows_disabled;
+render_mode cull_disabled, diffuse_burley, specular_disabled, shadows_disabled;
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D ground_atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
 uniform sampler2D interaction_previous : filter_linear, repeat_disable;
 uniform float interaction_alpha=1.0;
+// Retained for the lighting controller; both A/B modes keep terrain-matched foliage.
 uniform float lighting_grade=0.0;
 uniform float wind_time=0.0;
 uniform float wind_strength=1.28;
@@ -67,9 +68,8 @@ void fragment(){
 	// colors above it. No dark root band or extra per-fragment texture sample.
 	float root_blend=1.0-smoothstep(0.02,0.62,height_fraction);
 	ALBEDO=mix(ALBEDO,ground_albedo,root_blend);
-	vec3 face=FRONT_FACING?NORMAL:-NORMAL;
-	vec3 up=(VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz;
-	vec3 leaf_normal=normalize(mix(face,up,mix(0.56,0.54,lighting_grade)));
-	NORMAL=normalize(mix(leaf_normal,up,root_blend));
+	// Use the same upward lighting normal and diffuse model as the terrain.
+	// Leaf yaw/bending must not turn the meadow black under low-angle sunlight.
+	NORMAL=normalize((VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz);
 	ROUGHNESS=1.0;SPECULAR=0.0;
 }
