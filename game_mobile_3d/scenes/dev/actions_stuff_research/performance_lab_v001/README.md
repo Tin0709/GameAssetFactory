@@ -25,6 +25,14 @@ The saved lab hides grass via `grass_vegetation_enabled=false`; set true before 
 
 Fresh21 combat-feel and136 performance checks pass fixed30/60FPS. Both rifle30/60 regressions and legacy combat pass. Native held-E combat and all50 simultaneous deaths were recorded at original speed; all350 parts are freed after cleanup. These captures are not performance benchmarks.
 
+## Latest refinement — brief slide, corpses pass through zombies
+
+The user requests a little slide rather than near-instant adhesion. Current planar damping is18/s (previous80/s), with friction1.0 retained. Actual floor contact still begins the damping, leaving the airborne launch unchanged. In the real-scene test, COM travels0.14–0.21m during the first0.1s after contact and settles quickly.
+
+Original corpse parts advertised layer2, which living zombie mask7 includes. Although the corpse mask1 ignored living actors, the reverse collision still blocked/pushed them. The performance subclass now sets running corpse parts to layer0/mask1 after the original native handoff. This keeps ground collision and makes interaction with living zombies, player and other corpses absent in both directions. Original shared death source/production files remain exact.
+
+23 actual-scene checks pass fixed30/60FPS, including native corpse contact recording with a living zombie directly in the launch path and an actual living CharacterBody sweep across the airborne chest. Both tests reproduced unwanted collisions before the fix and now pass. Existing136 performance checks also pass at both frame rates, retaining all50 simultaneous corpses/350 parts and2.5s cleanup. Bullet tuning and approved animation/control behavior are unchanged. Current evidence: `docs/graphics/reviews/zombie_slide_pass_v001/`.
+
 ## Historical verification before combat-feel tuning
 
 135 actual-scene checks passed at fixed30/60 FPS: exact counts including 0/1/13/20/50, bounds/clamping/separation, repeated Spawn, corner R reset, button signals, immediate/double Kill All, all-50/350-part simultaneous death and retention, 1.2s cleanup and native resource teardown. Existing four-actor damage/handoff and auto-aim regressions pass, as do 20 lighting checks. Fresh native held-E gameplay kills a performance actor with the existing rifle (11 shots, 133 frames, no pool misses). Read-only final review found one minor reset-order edge, reproduced and corrected before these final checks.
