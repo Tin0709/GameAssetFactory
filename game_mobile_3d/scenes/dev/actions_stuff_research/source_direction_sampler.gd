@@ -88,7 +88,9 @@ func _vector(values: Variant, env: Dictionary, accumulated: Vector3) -> Vector3:
 		# Preserve the evaluator's final `this` value even for constant channels.
 		env["this"]=accumulated.z
 		return values
-	if values[0] is String and values[0]=="compiled_program":return values[1].call(env,accumulated)
+	if values[0] is String:
+		if values[0]=="compiled_program":return values[1].call(env,accumulated)
+		if values[0]=="vector":values=values[1] # Literal fallback if compilation is unavailable.
 	var out := Vector3.ZERO
 	for axis in 3:
 		# Holding evaluates `this` from the accumulated same-axis channel.
