@@ -20,23 +20,24 @@ func run():
  var idle:=CountedSampler.new(visual.idle);var walk:=CountedSampler.new(visual.walk);var attack:=CountedSampler.new(visual.attack)
  visual.idle=idle;visual.walk=walk;visual.attack=attack
  var worst:=0.;var sample_counts:Dictionary={}
- for state in [{"name":"Idle","walk":0.,"attack":0.},{"name":"Walk","walk":1.,"attack":0.},{"name":"Attack","walk":.65,"attack":1.},{"name":"Blend","walk":.37,"attack":.29}]:
-  visual.life=1.723;visual.walk_clock=7.123;visual.attack_time=.27;visual.walk_weight=state.walk;visual.attack_weight=state.attack
-  idle.calls=0;walk.calls=0;attack.calls=0
-  visual._process(0.)
-  sample_counts[state.name]=idle.calls+walk.calls+attack.calls
-  if state.name!="Blend":check(sample_counts[state.name]<=visual.skeleton.get_bone_count()*3,"Full "+state.name+" samples only its contributing source clip")
-  var it:float=fposmod(visual.life+visual.phase_offset*3.6,3.6)
-  var wt:float=fposmod(visual.walk_clock+visual.phase_offset*18.,18.)
-  for bone in visual.skeleton.get_bone_count():
-   var p:Vector3=idle.source.position(bone,it).lerp(walk.source.position(bone,wt),visual.walk_weight)
-   var q:Quaternion=idle.source.rotation(bone,it).slerp(walk.source.rotation(bone,wt),visual.walk_weight)
-   var s:Vector3=idle.source.scale(bone,it).lerp(walk.source.scale(bone,wt),visual.walk_weight)
-   p=p.lerp(attack.source.position(bone,visual.attack_time),visual.attack_weight)
-   q=q.slerp(attack.source.rotation(bone,visual.attack_time),visual.attack_weight)
-   s=s.lerp(attack.source.scale(bone,visual.attack_time),visual.attack_weight)
-   worst=maxf(worst,p.distance_to(visual.skeleton.get_bone_pose_position(bone)))
-   worst=maxf(worst,s.distance_to(visual.skeleton.get_bone_pose_scale(bone)))
-   worst=maxf(worst,1.-absf(q.dot(visual.skeleton.get_bone_pose_rotation(bone))))
+ for t in [0.,.016667,.033333,.1,.2,.3,.4,.5,.6,.7,.8,.9,.966667,.983333,1.]:
+  for state in [{"name":"Idle","walk":0.,"attack":0.},{"name":"Walk","walk":1.,"attack":0.},{"name":"Attack","walk":.65,"attack":1.},{"name":"Blend","walk":.37,"attack":.29}]:
+   visual.life=1.723+t*3.6;visual.walk_clock=7.123+t*18.;visual.attack_time=t*.75;visual.walk_weight=state.walk;visual.attack_weight=state.attack
+   idle.calls=0;walk.calls=0;attack.calls=0
+   visual._process(0.)
+   sample_counts[state.name]=idle.calls+walk.calls+attack.calls
+   if state.name!="Blend":check(sample_counts[state.name]<=visual.skeleton.get_bone_count()*3,"Full "+state.name+" samples only its contributing source clip")
+   var it:float=fposmod(visual.life+visual.phase_offset*3.6,3.6)
+   var wt:float=fposmod(visual.walk_clock+visual.phase_offset*18.,18.)
+   for bone in visual.skeleton.get_bone_count():
+    var p:Vector3=idle.source.position(bone,it).lerp(walk.source.position(bone,wt),visual.walk_weight)
+    var q:Quaternion=idle.source.rotation(bone,it).slerp(walk.source.rotation(bone,wt),visual.walk_weight)
+    var s:Vector3=idle.source.scale(bone,it).lerp(walk.source.scale(bone,wt),visual.walk_weight)
+    p=p.lerp(attack.source.position(bone,visual.attack_time),visual.attack_weight)
+    q=q.slerp(attack.source.rotation(bone,visual.attack_time),visual.attack_weight)
+    s=s.lerp(attack.source.scale(bone,visual.attack_time),visual.attack_weight)
+    worst=maxf(worst,p.distance_to(visual.skeleton.get_bone_pose_position(bone)))
+    worst=maxf(worst,s.distance_to(visual.skeleton.get_bone_pose_scale(bone)))
+    worst=maxf(worst,1.-absf(q.dot(visual.skeleton.get_bone_pose_rotation(bone))))
  check(worst<.00001,"Optimized Idle/Walk/Attack/blends retain original source PRS poses")
  lab.free();print("HORDE_EFFICIENCY ",JSON.stringify({"checks":checks,"failures":failures,"worst_pose_error":worst,"source_calls":sample_counts}));quit(0 if failures.is_empty() else 1)
