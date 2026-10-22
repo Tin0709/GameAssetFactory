@@ -1,43 +1,80 @@
 extends "res://scenes/dev/actions_stuff_research/zombie_combat/combat_group.gd"
-## Same encounter, with one replaceable simultaneous batch for the dev benchmark.
+## Same native encounter. UI additions preserve every existing actor and corpse.
 const StressZombie=preload("res://scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd")
+const SPAWN_SPACING:=.75
 var spawn_count:=20
+var last_added:=0
 
 func _zombie_script()->Script:return StressZombie
 
+func _cell(point:Vector3)->Vector2i:
+ return Vector2i(floori(point.x/SPAWN_SPACING),floori(point.z/SPAWN_SPACING))
+
+func _occupy(occupied:Dictionary,point:Vector3)->void:
+ var key:=_cell(point)
+ if not occupied.has(key):occupied[key]=[]
+ occupied[key].append(Vector2(point.x,point.z))
+
+func _blocked(occupied:Dictionary,point:Vector3)->bool:
+ var key:=_cell(point);var at:=Vector2(point.x,point.z)
+ for x in range(-1,2):
+  for z in range(-1,2):
+   var neighbor:=key+Vector2i(x,z)
+   if not occupied.has(neighbor):continue
+   for other:Vector2 in occupied[neighbor]:
+    if at.distance_squared_to(other)<SPAWN_SPACING*SPAWN_SPACING:return true
+ return false
+
 func _spawn_positions()->Array[Vector3]:
-	var points:Array[Vector3]=[]
-	if spawn_count==0:return points
-	var center:=Vector3(clampf(player.global_position.x,-4.,4.),0.,clampf(player.global_position.z,-4.,4.))
-	var radius:=maxf(6.5,float(spawn_count)*.20)
-	var slots:Array[Vector3]=[]
-	# Fixed 64-slot ring: >=0.63m spacing, within the 30m floor, and never on
-	# the player. Resampling the valid slots spreads every requested count evenly.
-	for i in 64:
-		var angle:=TAU*float(i)/64.+.31
-		var point:=center+Vector3(sin(angle),0.,cos(angle))*radius
-		var offset:=point-player.global_position;offset.y=0.
-		if offset.length_squared()>=4.:slots.append(point)
-	assert(slots.size()>=spawn_count)
-	for i in spawn_count:points.append(slots[i*slots.size()/spawn_count])
-	return points
+ var points:Array[Vector3]=[]
+ if spawn_count==0:return points
+ var side:float=float(get_parent().get("grass_field_blocks"))
+ var limit:=maxf(2.,side*.5-1.)
+ var center:=Vector3(player.global_position.x,0.,player.global_position.z)
+ var occupied:Dictionary={}
+ # One sparse occupancy grid per button press, never per frame. Check living
+ # capsules; native corpses already pass through actors under the approved policy.
+ for zombie in zombies:
+  if is_instance_valid(zombie) and not zombie.is_dead:_occupy(occupied,zombie.global_position)
+ var radius:=minf(maxf(6.5,float(spawn_count)*.20),maxf(2.5,side*.25))
+ var phase:=.31+float(_spawn_serial)*.37
+ while radius<=side*1.42 and points.size()<spawn_count:
+  var candidates:=ceili(TAU*radius/.45)
+  for i in candidates:
+   # Golden-angle order distributes each added batch around the player rather
+   # than filling one short arc first. Occupancy enforces actual clearance.
+   var angle:=phase+float(i)*2.399963229728653
+   var point:=center+Vector3(sin(angle),0.,cos(angle))*radius
+   if absf(point.x)>limit or absf(point.z)>limit:continue
+   if point.distance_squared_to(center)<4. or _blocked(occupied,point):continue
+   points.append(point);_occupy(occupied,point)
+   if points.size()==spawn_count:break
+  radius+=1.
+ return points
 
 func reset_encounter()->void:
-	super.reset_encounter()
-	# The benchmark exercises the existing chase even when spawned beyond its
-	# ordinary detection radius; AI speed, melee and source animation are intact.
-	for zombie in zombies:zombie.chasing=true
+ super.reset_encounter()
+ for zombie in zombies:zombie.chasing=true
+ last_added=zombies.size()
 
 func spawn_batch(count:int)->void:
-	spawn_count=clampi(count,0,50)
-	reset_encounter()
-	print("PERFORMANCE_ZOMBIE_BATCH ",spawn_count)
+ # Explicit replacement retained for R/reset fixtures. The Spawn button uses
+ # add_batch; it never calls this destructive-to-runtime reset path.
+ spawn_count=clampi(count,0,50)
+ reset_encounter()
+
+func add_batch(count:int)->int:
+ spawn_count=clampi(count,0,50)
+ var first:=zombies.size()
+ _spawn_zombies(_spawn_positions())
+ for i in range(first,zombies.size()):zombies[i].chasing=true
+ last_added=zombies.size()-first
+ print("PERFORMANCE_ZOMBIES_ADDED ",JSON.stringify({"requested":spawn_count,"added":last_added,"alive":living_count()}))
+ return last_added
 
 func kill_all()->void:
-	# Apply every lethal hit in this call, with no queue, corpse culling or budget
-	# substitution. Every actor keeps its existing native death for the stress test.
-	for zombie:CharacterBody3D in zombies.duplicate():
-		if not is_instance_valid(zombie) or zombie.is_dead:continue
-		var direction:=zombie.global_position-player.global_position;direction.y=0.
-		zombie.take_damage(zombie.current_hp,direction.normalized())
-
+ # Every actor receives its native lethal hit now; no admission/corpse cap.
+ for zombie:CharacterBody3D in zombies.duplicate():
+  if not is_instance_valid(zombie) or zombie.is_dead:continue
+  var direction:=zombie.global_position-player.global_position;direction.y=0.
+  zombie.take_damage(zombie.current_hp,direction.normalized())

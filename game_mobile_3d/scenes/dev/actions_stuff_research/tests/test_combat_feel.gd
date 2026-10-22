@@ -15,10 +15,10 @@ func finish(lab:Node)->void:
  print("COMBAT_FEEL_CHECKS ",JSON.stringify({"checks":checks,"failures":failures,"metrics":metrics}))
  quit(0 if failures.is_empty() else 1)
 func run():
- var lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(lab)
+ var lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();lab.grass_field_blocks=30;lab.grass_vegetation_enabled=false;root.add_child(lab)
  lab.player.scripted_input=true
  var fire=lab.rifle_fire
- check(lab.get("grass_vegetation_enabled")==false,"Vegetation is temporarily disabled in the saved lab")
+ check(lab.get("grass_vegetation_enabled")==false,"Combat fixture explicitly pauses vegetation while preserving the enabled100m gameplay field")
  var hidden:=true
  for child in lab.grass_field.get_children():
   if child.name.begins_with("GrassRegion_"):hidden=hidden and not child.visible

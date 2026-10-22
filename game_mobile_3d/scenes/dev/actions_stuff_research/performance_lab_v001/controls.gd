@@ -21,7 +21,7 @@ func setup(scene:Node3D)->void:
 	style.content_margin_left=10.;style.content_margin_right=10.;style.content_margin_top=8.;style.content_margin_bottom=8.;panel.add_theme_stylebox_override("panel",style)
 	var theme:=Theme.new();theme.default_font_size=13;panel.theme=theme
 	var stack:=VBoxContainer.new();stack.add_theme_constant_override("separation",5);panel.add_child(stack)
-	var title:=Label.new();title.text="PERFORMANCE TEST · 30 × 30";stack.add_child(title)
+	var title:=Label.new();title.text="PERFORMANCE TEST · %d × %d"%[lab.grass_field_blocks,lab.grass_field_blocks];stack.add_child(title)
 	status=Label.new();stack.add_child(status)
 	count_label=Label.new();stack.add_child(count_label)
 	count_slider=HSlider.new();count_slider.min_value=0.;count_slider.max_value=50.;count_slider.step=1.;count_slider.focus_mode=Control.FOCUS_NONE;count_slider.custom_minimum_size.y=20.;stack.add_child(count_slider)
@@ -30,10 +30,10 @@ func setup(scene:Node3D)->void:
 	for count:int in [0,10,20,50]:
 		var button:=_button(str(count),select_count.bind(count));button.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(button)
 	row=HBoxContainer.new();stack.add_child(row)
-	spawn_button=_button("Spawn 20",spawn_selected);spawn_button.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(spawn_button)
+	spawn_button=_button("Spawn +20",spawn_selected);spawn_button.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(spawn_button)
 	kill_button=_button("Kill All",kill_all);kill_button.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(kill_button)
 	stats=Label.new();stats.add_theme_font_size_override("font_size",11);stack.add_child(stats)
-	var note:=Label.new();note.text="Spawn replaces group · R resets it\nV overview · no automatic respawn";note.add_theme_font_size_override("font_size",11);stack.add_child(note)
+	var note:=Label.new();note.text="Spawn adds zombies · R resets group\nV overview · no automatic respawn";note.add_theme_font_size_override("font_size",11);stack.add_child(note)
 	select_count(encounter.spawn_count);_refresh()
 
 func _button(text:String,callback:Callable)->Button:
@@ -42,16 +42,15 @@ func _button(text:String,callback:Callable)->Button:
 func select_count(value:float)->void:
 	selected_count=clampi(int(value),0,50)
 	count_slider.set_value_no_signal(selected_count)
-	count_label.text="Zombie count: %d / 50"%selected_count
-	spawn_button.text="Spawn %d"%selected_count
+	count_label.text="Add per click: %d / 50"%selected_count
+	spawn_button.text="Spawn +%d"%selected_count
 
 func _clear_target_and_shots()->void:
 	if lab.rifle_auto_aim!=null:lab.rifle_auto_aim.reset_target()
 	if lab.rifle_fire!=null:lab.rifle_fire.reset_fire()
 
 func spawn_selected()->void:
-	_clear_target_and_shots()
-	encounter.spawn_batch(selected_count)
+	encounter.add_batch(selected_count)
 	lab._sync_rifle_controls();_refresh()
 
 func kill_all()->void:
@@ -64,7 +63,7 @@ func _process(delta:float)->void:
 	if _timer>=.25:_timer=0.;_refresh()
 
 func _refresh()->void:
-	status.text="Alive %d · Ragdolls %d / %d"%[encounter.living_count(),encounter.active_ragdolls(),encounter.spawn_count]
+	status.text="Alive %d · Ragdolls %d"%[encounter.living_count(),encounter.active_ragdolls()]
 	var fps:=Engine.get_frames_per_second()
 	var frame:="%.1fms"%(1000./fps) if fps>0 else "N/A"
 	stats.text="%d FPS · Frame %s\nProcess %.2fms · Physics %.2fms"%[fps,frame,Performance.get_monitor(Performance.TIME_PROCESS)*1000.,Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)*1000.]
