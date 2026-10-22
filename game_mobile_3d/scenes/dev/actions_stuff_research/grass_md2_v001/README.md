@@ -1,3 +1,13 @@
+## Current100×100 gameplay test —2026-10-22
+
+The existing lab now sets `grass_field_blocks=100`, `grass_vegetation_enabled=true`:10,000 unit blocks atY0,14,831 randomized existing clumps (8,053short/6,778tall),8variants and392regional15×15MultiMeshes. Every terrain cell is planted. Same terrain atlas/UV/soft-texture materials; same two shared grass-family materials and no per-clump scripts. Default `setup(actor)` remains30m for legacy fixtures; `setup(actor,100)` drives this saved lab.
+
+The shared contact field covers104m at196×196 (~0.5306m cells versus original0.53125m); CPU stamp/solve/sample and both GPU texture histories use the same dimensions. Sparse active-cell spring work remains local. Two RGBA16F histories total614,656bytes; only changed fixed-tick histories upload and renders interpolate each frame. No per-frame grass-instance transform updates. Floor/boundaries and whole-field Voverview expand; normal camera/lighting retain their approved settings.
+
+Latest contact-only request: shader `interaction_strength`1.50→2.25, exactly1.5× input contact response before the retained continuous soft bend limit. Wind1.28, .14 spring damping, timing, root locking, height/length preservation, lighting and shadow reception/casting remain. Strong peaks still respect the same safe arc bound, so visible tip displacement is not uniformly1.5× at saturation.
+
+Native196² texture check:76moving subframes, zero held frames, maximum interpolation error0.000299rad. Full field and far-edge motion captured; actual scene checks pass at30/60. Evidence and desktop-only timing limits: `docs/graphics/reviews/expanded_grass_additive_v001/README.md`. Earlier30m/paused descriptions below are historical.
+
 **Later pace/camera tuning:** Existing lab now uses1.2×movement/playback (Walk2.16/Run6.0372) and14.5orthographic framing. Ground/vegetation settings below remain. See `docs/animation/reviews/pace_camera_v001/README.md` from repository root.
 
 ## Latest ground replacement —2026-10-22

@@ -1,0 +1,46 @@
+{
+	"contact_gain": 2.25,
+	"desktop_only": true,
+	"failures": [],
+	"fps_cap": 60,
+	"grass_batches": 392,
+	"grass_clumps": 14831,
+	"grass_shadow_casters": 0,
+	"note": "Normal-render samples exclude captures/readbacks. Native Metal GPU duration unavailable; no phone claim. Clip uses fixed30FPS original-speed physics; samples use requested launch rate.",
+	"peak_simultaneous_ragdolls": 60,
+	"renderer": "mobile",
+	"samples": [
+		{
+			"draw_calls_median": 202.0,
+			"frame_median_ms": 16.68,
+			"frame_p95_ms": 17.57,
+			"frames": 120,
+			"grass_active_solver_p95_ms": 0.06,
+			"label": "normal_gameplay20",
+			"living": 20,
+			"ragdolls": 0
+		},
+		{
+			"draw_calls_median": 242.0,
+			"frame_median_ms": 16.681,
+			"frame_p95_ms": 17.549,
+			"frames": 120,
+			"grass_active_solver_p95_ms": 0.054,
+			"label": "normal_gameplay60",
+			"living": 60,
+			"ragdolls": 0
+		},
+		{
+			"draw_calls_median": 582.0,
+			"frame_median_ms": 16.614,
+			"frame_p95_ms": 17.415,
+			"frames": 120,
+			"grass_active_solver_p95_ms": 0.055,
+			"label": "overview100_60zombies",
+			"living": 60,
+			"ragdolls": 0
+		}
+	],
+	"viewport": "1280x720",
+	"wind_gain": 1.28
+}

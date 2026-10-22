@@ -1,0 +1,53 @@
+{
+	"cleanup_complete": true,
+	"desktop_only": true,
+	"fixed_fps_override": false,
+	"fps_cap": 60,
+	"note": "Apple M2 Pro native Mobile/Metal, normal render loop; no per-frame captures, readbacks or forced draws in sample windows. Capped/vsynced desktop timings, GPU timing unavailable; not phone performance.",
+	"peak_ragdolls": 60,
+	"physics_hz": 60,
+	"renderer": "mobile",
+	"samples": [
+		{
+			"draw_calls_median": 202.0,
+			"frame_median_ms": 16.693,
+			"frame_p95_ms": 17.732,
+			"frames": 120,
+			"grass_active_solver_p95_ms": 0.076,
+			"label": "normal_gameplay20",
+			"living": 20,
+			"ragdolls": 0
+		},
+		{
+			"draw_calls_median": 242.0,
+			"frame_median_ms": 16.704,
+			"frame_p95_ms": 17.108,
+			"frames": 120,
+			"grass_active_solver_p95_ms": 0.061,
+			"label": "normal_gameplay60",
+			"living": 60,
+			"ragdolls": 0
+		},
+		{
+			"draw_calls_median": 582.0,
+			"frame_median_ms": 16.679,
+			"frame_p95_ms": 17.147,
+			"frames": 120,
+			"grass_active_solver_p95_ms": 0.06,
+			"label": "overview100_60zombies",
+			"living": 60,
+			"ragdolls": 0
+		},
+		{
+			"draw_calls_median": 582.0,
+			"frame_median_ms": 16.653,
+			"frame_p95_ms": 17.361,
+			"frames": 120,
+			"grass_active_solver_p95_ms": 0.064,
+			"label": "all60_death_first2seconds",
+			"living": 0,
+			"ragdolls": 60
+		}
+	],
+	"viewport": "1280x720"
+}
