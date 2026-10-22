@@ -1,0 +1,11 @@
+{
+  "protected_files": 9049,
+  "changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/grounded_part.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_combat_feel.gd"
+  ],
+  "missing": [],
+  "unexpected_changes": []
+}
