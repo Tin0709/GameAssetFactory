@@ -53,14 +53,9 @@ func take_damage(amount: int,direction: Vector3=Vector3.ZERO) -> bool:
 		combat_audio.play_event(&"zombie_death")
 	return accepted
 
-func _advance_living_ai(delta:float)->void:
-	# Performance research may bound redundant blocked-motion retries. The
-	# original encounter always uses its unchanged native living controller.
-	super._physics_process(delta)
-
 func _physics_process(delta: float) -> void:
 	if not is_dead:
-		_advance_living_ai(delta)
+		super._physics_process(delta)
 		visual._process(delta)
 		ragdoll.sample(delta)
 		return
