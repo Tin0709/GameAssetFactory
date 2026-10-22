@@ -69,6 +69,7 @@ var _gameplay_run_weight:=0.
 var _ground_travel:=0.
 var _micro_stop:=false
 var _distance_phase:=NAN
+var _travel_yaw_velocity:=0.
 
 func _retime_locomotion_phase(step:float)->void:
  if rifle_clips.is_empty():super._retime_locomotion_phase(step);return
@@ -196,6 +197,7 @@ func _has_auto_aim() -> bool:
  return rifle_aim_requested and is_instance_valid(auto_aim_target) and not auto_aim_target.is_dead
 func _advance_facing(target_yaw: float,delta: float) -> void:
  if _has_auto_aim():
+  _travel_yaw_velocity=0.
   var offset: Vector3=auto_aim_target.global_position-global_position
   if Vector2(offset.x,offset.z).length_squared()>.0001:target_yaw=atan2(offset.x,offset.z)
   if combat_turn_requested:
@@ -203,9 +205,15 @@ func _advance_facing(target_yaw: float,delta: float) -> void:
    return
  if _has_auto_aim():super._advance_facing(target_yaw,delta)
  else:
-  # Travel turns follow the changing velocity promptly. Stationary Q/C and
-  # the approved 0.6s E pivot keep their separate existing controller.
-  rotation.y+=clampf(wrapf(target_yaw-rotation.y,-PI,PI),-14.*delta,14.*delta)
+  # Exact critically damped angular response: carry turn velocity through
+  # changing input instead of hard starting/stopping a constant-rate pivot.
+  # Stationary Q/C and the approved 0.6s E pivot keep their existing path.
+  var offset:=wrapf(rotation.y-target_yaw,-PI,PI)
+  var spring:=_travel_yaw_velocity+20.*offset
+  var decay:=exp(-20.*delta)
+  var next_offset:float=(offset+spring*delta)*decay
+  _travel_yaw_velocity=clampf((_travel_yaw_velocity-20.*spring*delta)*decay,-14.,14.)
+  rotation.y+=clampf(next_offset-offset,-14.*delta,14.*delta)
 func _restore_auto_aim() -> void:
  if not _auto_aim_applied:return
  skeleton.set_bone_pose(_auto_aim_spine,_auto_aim_saved)
@@ -280,6 +288,7 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  rifle_aim_weight=move_toward(rifle_aim_weight,1. if rifle_aim_requested else 0.,delta/AIM_BLEND_SECONDS)
  if rifle_aim_requested or rifle_aim_weight>0.:rifle_aim_time=fposmod(rifle_aim_time+delta,float(rifle_aim_profile.clips.Aim.duration))
  var moving:=requested or Vector2(world_velocity.x,world_velocity.z).length()>.025
+ if not moving:_travel_yaw_velocity=0.
  if moving:
   if not move_requested:_ground_travel=0.
   _ground_travel+=Vector2(world_velocity.x,world_velocity.z).length()*delta
@@ -472,7 +481,7 @@ func _evaluate(delta: float) -> void:
  var before:=pose_sequence;super._evaluate(delta)
  if pose_sequence!=before and not rifle_clips.is_empty():_constrain_rifle_contacts()
 func reset_contacts() -> void:
- _gameplay_run_weight=0.;_ground_travel=0.;_micro_stop=false;_distance_phase=NAN
+ _gameplay_run_weight=0.;_ground_travel=0.;_micro_stop=false;_distance_phase=NAN;_travel_yaw_velocity=0.
  _restore_auto_aim();auto_aim_target=null;auto_aim_aligned=true;_auto_aim_rotation=Quaternion.IDENTITY;_auto_aim_turning=false
  if rifle_recoil_clip!=null:cancel_rifle_recoil()
  super.reset_contacts();rifle_idle_time=0.;rifle_move_weight=0.;idle_active=true
