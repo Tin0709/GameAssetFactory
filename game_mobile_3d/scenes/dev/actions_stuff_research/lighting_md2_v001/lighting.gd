@@ -48,7 +48,7 @@ func setup(scene:Node3D)->void:
 	sky_material.sky_curve=.18;sky_material.ground_curve=.25
 	sky_material.sun_angle_max=15.;sky_material.sun_curve=.12
 	environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_sky_contribution=0.;environment.reflected_light_source=Environment.REFLECTED_SOURCE_DISABLED
+	environment.ambient_light_sky_contribution=0.;environment.reflected_light_source=Environment.REFLECTION_SOURCE_DISABLED
 	environment.tonemap_mode=Environment.TONE_MAPPER_FILMIC;environment.tonemap_white=1.8
 	environment.adjustment_enabled=true;environment.adjustment_contrast=1.04
 	environment.fog_mode=Environment.FOG_MODE_DEPTH;environment.fog_depth_begin=10.;environment.fog_depth_curve=1.5
