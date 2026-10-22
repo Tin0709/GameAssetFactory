@@ -65,7 +65,8 @@ func _process(delta:float)->void:
 func _refresh()->void:
 	var m:Dictionary=lighting.metrics.sample()
 	var gpu:="%.2fms"%m.gpu_ms if m.gpu_ms>0. else "N/A"
-	stats.text="%d FPS · Render CPU %.2fms · GPU %s\nDraws %d + %d shadow · %d objects"%[m.fps,m.render_cpu_ms,gpu,m.draws,m.shadow_draws,m.objects]
+	var shadow:="%d"%m.shadow_draws if m.shadow_draws>0 or not lighting.sun.shadow_enabled else "N/A"
+	stats.text="%d FPS · Render CPU %.2fms · GPU %s\nDraws %d · Shadow %s · %d objects"%[m.fps,m.render_cpu_ms,gpu,m.draws,shadow,m.objects]
 	var minutes:=int(round(lighting.current_hour*60.))%1440
 	time_label.text="%02d:%02d · %s"%[minutes/60,minutes%60,"Original" if lighting.original else "GAF MD2 v001"]
 	time_slider.set_value_no_signal(lighting.current_hour)
