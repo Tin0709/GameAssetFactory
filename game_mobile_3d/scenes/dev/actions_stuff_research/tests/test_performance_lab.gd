@@ -60,7 +60,7 @@ func run():
  for i in 12:state.advance(1./60.,Vector3(45,0,-45),Vector3.ZERO)
  check(state.sample_at(Vector2(45.35,-44.65)).length()>.15,"Grass responds to player contact beyond old30m map")
  field.reset();check(state.sample_at(Vector2(45.35,-44.65))==Vector2.ZERO,"Reset clears distant contact histories")
- var original:=group.zombies.duplicate();var old_parts:=bodies(group)
+ var original:Array=group.zombies.duplicate();var old_parts:=bodies(group)
  lab._fire_key_held=true;lab._sync_rifle_controls()
  lab.rifle_auto_aim.target=original[0];lab.player.visual.auto_aim_target=original[0]
  ui.select_count(20);ui.spawn_button.pressed.emit();ui.spawn_button.pressed.emit()
