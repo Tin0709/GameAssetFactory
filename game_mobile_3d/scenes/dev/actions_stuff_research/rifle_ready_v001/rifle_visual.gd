@@ -162,10 +162,10 @@ func _aim_pose(bone: int,time: float) -> Transform3D:
 
 var diagnostic_rifle_usec:=0
 func _sample_set(ahead: float=0.) -> Array:
-	var started:=Time.get_ticks_usec()
-	var result=_diagnostic__sample_set(ahead)
-	diagnostic_rifle_usec+=Time.get_ticks_usec()-started
-	return result
+ var started:=Time.get_ticks_usec()
+ var result=_diagnostic__sample_set(ahead)
+ diagnostic_rifle_usec+=Time.get_ticks_usec()-started
+ return result
 func _diagnostic__sample_set(ahead: float=0.) -> Array:
  var phase:=float(direction_snapshot.get("phase",0.))+ahead*gait_frequency
  var ti:=_clip_time("Idle",phase,ahead);var tw:=_clip_time("Walk",phase);var tr:=_clip_time("Run",phase)
