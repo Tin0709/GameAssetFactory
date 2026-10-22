@@ -1,0 +1,9 @@
+{
+	"clumps": 1317,
+	"grass_batches": 32,
+	"grass_receiving_disabled": true,
+	"grass_shadow_casters": 0,
+	"ground_resource": "res://scenes/dev/actions_stuff_research/grass_md2_v001/assets/atlas_03.png",
+	"ground_sampler_shared": true,
+	"materials": 2
+}

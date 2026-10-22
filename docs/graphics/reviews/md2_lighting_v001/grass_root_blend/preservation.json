@@ -1,0 +1,20 @@
+{
+  "files_checked": 9038,
+  "changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass.gdshader"
+  ],
+  "missing": [],
+  "only_authorized_files_changed": true,
+  "deformation_code_exact_excluding_added_color_sample": true,
+  "grass_checks": 29,
+  "native_result": {
+    "clumps": 1317,
+    "grass_batches": 32,
+    "grass_receiving_disabled": true,
+    "grass_shadow_casters": 0,
+    "ground_resource": "res://scenes/dev/actions_stuff_research/grass_md2_v001/assets/atlas_03.png",
+    "ground_sampler_shared": true,
+    "materials": 2
+  }
+}
