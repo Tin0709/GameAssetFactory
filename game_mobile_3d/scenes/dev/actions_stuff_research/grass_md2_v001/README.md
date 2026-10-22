@@ -1,3 +1,5 @@
+**Later pace/camera tuning:** Existing lab now uses1.2×movement/playback (Walk2.16/Run6.0372) and14.5orthographic framing. Ground/vegetation settings below remain. See `docs/animation/reviews/pace_camera_v001/README.md` from repository root.
+
 ## Latest ground replacement —2026-10-22
 
 User now authorizes the new soft-textured grass block in the SAME30×30lab. `atlas_02.png`, `atlas_03.png`, `atlas_04.png` are exact16×16crops of the current Blender packed atlas: dirt bottom, green top, stepped grass-over-dirt sides. Source block `MD2_Flat_Grass_Block_v001` is geometrically equivalent to the existing unit cube; preserve all900placements, original full-tileUV orientation,3surfaces/12tri per block, one shared terrain MultiMesh. Ground material specular0 matches its Blender source. `grass_data.json.ground_source` records the current source hashes separately from the older grass-family source hash. The actual top sampler remains `atlas_03.png`, so preserved vegetation roots will follow the new terrain if enabled again.
