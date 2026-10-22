@@ -100,6 +100,7 @@ func _channel(keys: Array, clock: float, env: Dictionary, accumulated: Vector3) 
 	return accumulated
 
 func _add_clip(out: Dictionary, alias: String, environment: Dictionary, clock: float, controller_weight: float = 1.0) -> void:
+	if controller_weight <= 0.0:return
 	var clip: Dictionary = data.clips[alias]
 	var env: Dictionary = environment.duplicate()
 	env["q.anim_time"] = clock
@@ -137,12 +138,19 @@ func _diagnostic_set_snapshot(snapshot: Dictionary) -> void:
 	# Preserve source's endpoint seam: phase1 wraps to0 with no closure repair.
 	var clock := fposmod(float(snapshot.get("phase",0.0)),1.0)
 	var env := _environment(snapshot,clock)
-	var walk := _directional("walk",env,clock)
-	var running := _directional("run",env,clock)
-	channels = _neutral()
-	for bone in BONES:
-		for key in CHANNELS:
-			channels[bone][key] = Vector3(walk[bone][key]).lerp(running[bone][key],run_weight)
+	# Endpoints contribute exactly one gait. Do not evaluate a discarded gait;
+	# intermediate weights still use the complete original channel blend.
+	if run_weight <= 0.0:
+		channels = _directional("walk",env,clock)
+	elif run_weight >= 1.0:
+		channels = _directional("run",env,clock)
+	else:
+		var walk := _directional("walk",env,clock)
+		var running := _directional("run",env,clock)
+		channels = _neutral()
+		for bone in BONES:
+			for key in CHANNELS:
+				channels[bone][key] = Vector3(walk[bone][key]).lerp(running[bone][key],run_weight)
 	_add_clip(channels,"xfltzh",env,clock)
 	_add_clip(channels,"hxfxxu",env,clock,run_weight*float(env.get("v.esnrkj",0.0)))
 	_add_clip(channels,"xahrzd",env,2.0,run_weight)
