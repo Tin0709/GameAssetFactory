@@ -82,7 +82,10 @@ class MD2_PT_grass_library(bpy.types.Panel):
 @persistent
 def loaded(_):
  if not bpy.app.background and Path(bpy.data.filepath).name==LIB and record():
-  if 'md2_interaction_review' in bpy.context.scene:
+  if 'md2_flat_blocks_review' in bpy.context.scene:
+   import flat_block_review_ui
+   flat_block_review_ui.select(bpy.context,'All')
+  elif 'md2_interaction_review' in bpy.context.scene:
    import interaction_review_ui
    interaction_review_ui.select(bpy.context)
    if not bpy.app.timers.is_registered(interaction_review_ui.start_preview):bpy.app.timers.register(interaction_review_ui.start_preview,first_interval=.9)
@@ -109,4 +112,8 @@ def register():
  if interaction_path not in sys.path:sys.path.insert(0,interaction_path)
  import interaction_review_ui
  interaction_review_ui.register()
+ flat_path=str(D.parent/'flat_blocks_md2_v001')
+ if flat_path not in sys.path:sys.path.insert(0,flat_path)
+ import flat_block_review_ui
+ flat_block_review_ui.register()
  if loaded not in bpy.app.handlers.load_post:bpy.app.handlers.load_post.append(loaded)
