@@ -53,11 +53,18 @@ func take_damage(amount: int,direction: Vector3=Vector3.ZERO) -> bool:
 		combat_audio.play_event(&"zombie_death")
 	return accepted
 
+static var diagnostic_ai_usec:=0
+static var diagnostic_visual_usec:=0
+static var diagnostic_sample_usec:=0
 func _physics_process(delta: float) -> void:
 	if not is_dead:
+		var started:=Time.get_ticks_usec()
 		super._physics_process(delta)
+		diagnostic_ai_usec+=Time.get_ticks_usec()-started;started=Time.get_ticks_usec()
 		visual._process(delta)
+		diagnostic_visual_usec+=Time.get_ticks_usec()-started;started=Time.get_ticks_usec()
 		ragdoll.sample(delta)
+		diagnostic_sample_usec+=Time.get_ticks_usec()-started
 		return
 	if not ragdoll.running:
 		# Immediate debug damage may precede two warmed pose samples.
