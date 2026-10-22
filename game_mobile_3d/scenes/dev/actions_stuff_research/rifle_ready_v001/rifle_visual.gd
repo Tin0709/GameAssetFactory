@@ -209,10 +209,10 @@ func _advance_facing(target_yaw: float,delta: float) -> void:
   # changing input instead of hard starting/stopping a constant-rate pivot.
   # Stationary Q/C and the approved 0.6s E pivot keep their existing path.
   var offset:=wrapf(rotation.y-target_yaw,-PI,PI)
-  var spring:=_travel_yaw_velocity+20.*offset
-  var decay:=exp(-20.*delta)
+  var spring:=_travel_yaw_velocity+26.*offset
+  var decay:=exp(-26.*delta)
   var next_offset:float=(offset+spring*delta)*decay
-  _travel_yaw_velocity=clampf((_travel_yaw_velocity-20.*spring*delta)*decay,-14.,14.)
+  _travel_yaw_velocity=clampf((_travel_yaw_velocity-26.*spring*delta)*decay,-14.,14.)
   rotation.y+=clampf(next_offset-offset,-14.*delta,14.*delta)
 func _restore_auto_aim() -> void:
  if not _auto_aim_applied:return
