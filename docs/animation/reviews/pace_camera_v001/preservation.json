@@ -1,0 +1,15 @@
+{
+  "baseline_files": 8982,
+  "changed": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_camera_comfort.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_player_motion.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/README.md"
+  ],
+  "missing": [],
+  "unexpected": [],
+  "all_blends_unchanged": true,
+  "worldmap_unchanged": true
+}
