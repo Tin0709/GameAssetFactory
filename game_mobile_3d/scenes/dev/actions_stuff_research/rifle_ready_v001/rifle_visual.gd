@@ -120,7 +120,6 @@ func _ready() -> void:
  for bone in _aim_bones:_recoil_saved.append(skeleton.get_bone_pose(bone))
  active_walk_action=rifle_profile.clips.Walk.action;active_run_action=rifle_profile.clips.Run.action
  for bone_name in ["Root","Hips","Leg.L","Leg.R"]:_rifle_strafe_bones.append(skeleton.find_bone(bone_name))
- direction_sampler.set_lower_body_only();direction_future_sampler.set_lower_body_only()
  stationary_turn=RifleTurn.new(skeleton,rotation.y)
  _cache_direction_poses();position.y=0.
  for i in skeleton.get_bone_count():

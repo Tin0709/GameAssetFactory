@@ -19,7 +19,7 @@ var _blend_to := 0.0
 var _program: Dictionary
 
 func _init(initial_life: float = 12.0) -> void:
-	_program = VM.prepare(JSON.parse_string(FileAccess.get_file_as_string(PROGRAM_PATH)))
+	_program = JSON.parse_string(FileAccess.get_file_as_string(PROGRAM_PATH))
 	for variable in _program.variable_names: env[variable] = 0.0
 	life = initial_life
 	env.merge({"v.tnlxsa": 2.0, "v.wtlyok": 1.0, "v.qlczor": initial_life, "v.abjhra": initial_life, "v.jcvgdh": initial_life, "v.bueybx": initial_life, "v.txtwqb": maxf(initial_life, 12.0)}, true)

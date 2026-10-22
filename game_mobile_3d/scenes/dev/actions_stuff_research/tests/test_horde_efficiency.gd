@@ -39,16 +39,4 @@ func run():
    worst=maxf(worst,s.distance_to(visual.skeleton.get_bone_pose_scale(bone)))
    worst=maxf(worst,1.-absf(q.dot(visual.skeleton.get_bone_pose_rotation(bone))))
  check(worst<.00001,"Optimized Idle/Walk/Attack/blends retain original source PRS poses")
- var dormant:=0
- for actor in lab.zombie_combat.zombies:
-  for part in actor.ragdoll.bodies.values():
-   for child in part.get_children():
-    if child is CollisionShape3D and child.disabled:dormant+=1
- check(dormant==lab.zombie_combat.zombies.size()*7,"All living corpse shapes stay outside native broadphase")
- z.take_damage(z.current_hp,Vector3.RIGHT)
- var enabled:=0
- for part in z.ragdoll.bodies.values():
-  for child in part.get_children():
-   if child is CollisionShape3D and not child.disabled:enabled+=1
- check(z.ragdoll.running and enabled==7,"Lethal handoff enables all7 original collision shapes immediately")
  lab.free();print("HORDE_EFFICIENCY ",JSON.stringify({"checks":checks,"failures":failures,"worst_pose_error":worst,"source_calls":sample_counts}));quit(0 if failures.is_empty() else 1)

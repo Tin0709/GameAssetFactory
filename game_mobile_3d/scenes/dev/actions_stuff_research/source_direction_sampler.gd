@@ -16,13 +16,6 @@ var names: Array[String] = []
 var poses: Array[Transform3D] = []
 var channels: Dictionary = {}
 var unit := 0.0
-var lower_body_only:=false
-var sampled_bones:Array=BONES
-func set_lower_body_only()->void:
-	# Rifle combat consumes only these channels/ancestor transforms. Upper-body
-	# direction poses are discarded by the approved Aim/grip/recoil layers.
-	lower_body_only=true
-	sampled_bones=["root","waist","rightleg","leftleg"]
 # Preserve the immutable study's standard-item profile by default. Gameplay
 # explicitly selects the unarmed profile; both samples use the same flags.
 var holding_right := 1.0
@@ -35,8 +28,6 @@ func set_item_holding(right: float, left: float) -> void:
 
 func _init(rig: Skeleton3D) -> void:
 	data = JSON.parse_string(FileAccess.get_file_as_string(DATA_PATH))
-	_cache_literal_vectors()
-	VM.prepare(data)
 	height_field = JSON.parse_string(FileAccess.get_file_as_string(HEIGHT_PATH))
 	var profile: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(BASE_PATH))
 	parents = profile.parents
@@ -65,32 +56,11 @@ func _environment(snapshot: Dictionary, clock: float) -> Dictionary:
 
 func _neutral() -> Dictionary:
 	var out: Dictionary = {}
-	for bone in sampled_bones:
+	for bone in BONES:
 		out[bone] = {"rotation":Vector3.ZERO,"position":Vector3.ZERO,"scale":Vector3.ONE}
 	return out
 
-func _cache_literal_vectors()->void:
-	# Most authored key vectors are numeric constants. Materialize their exact
-	# float32 Vector3 once, retaining dynamic ASTs and all original key times.
-	for clip:Dictionary in data.clips.values():
-		for bone:Dictionary in clip.bones.values():
-			for keys:Array in bone.values():
-				for key:Array in keys:
-					for side:int in [1,2]:
-						var values:Array=key[side]
-						if values[0][0]=="literal" and values[1][0]=="literal" and values[2][0]=="literal":
-							key[side]=Vector3(float(values[0][1]),float(values[1][1]),float(values[2][1]))
-						else:key[side]=["vector",values]
-
-
-func _vector(values: Variant, env: Dictionary, accumulated: Vector3) -> Vector3:
-	if values is Vector3:
-		# Preserve the evaluator's final `this` value even for constant channels.
-		env["this"]=accumulated.z
-		return values
-	if values[0] is String:
-		if values[0]=="compiled_program":return values[1].call(env,accumulated)
-		if values[0]=="vector":values=values[1] # Literal fallback if compilation is unavailable.
+func _vector(values: Array, env: Dictionary, accumulated: Vector3) -> Vector3:
 	var out := Vector3.ZERO
 	for axis in 3:
 		# Holding evaluates `this` from the accumulated same-axis channel.
@@ -103,27 +73,23 @@ func _channel(keys: Array, clock: float, env: Dictionary, accumulated: Vector3) 
 		return _vector(keys[0][1],env,accumulated)
 	if clock >= float(keys[-1][0]):
 		return _vector(keys[-1][2],env,accumulated)
-	# Exact key boundaries retain the original left-post/right-pre rule.
-	# Long authored curves use logarithmic lookup instead of a per-pose scan.
-	var left:=0
-	var right:=keys.size()-1
-	while left+1<right:
-		var middle:=(left+right)/2
-		if clock<float(keys[middle][0]):right=middle
-		else:left=middle
-	var a:float=keys[left][0]
-	var b:float=keys[right][0]
-	return _vector(keys[left][2],env,accumulated).lerp(_vector(keys[right][1],env,accumulated),(clock-a)/(b-a))
+	for i in keys.size()-1:
+		var a: float = keys[i][0]
+		var b: float = keys[i+1][0]
+		if a <= clock and clock < b:
+			# Post at the left key, pre at the right key; exact authored times
+			# belong to the following interval, as in SourceChannels._channel.
+			return _vector(keys[i][2],env,accumulated).lerp(_vector(keys[i+1][1],env,accumulated),(clock-a)/(b-a))
+	return accumulated
 
 func _add_clip(out: Dictionary, alias: String, environment: Dictionary, clock: float, controller_weight: float = 1.0) -> void:
-	if controller_weight <= 0.0:return
 	var clip: Dictionary = data.clips[alias]
 	var env: Dictionary = environment.duplicate()
 	env["q.anim_time"] = clock
 	var weight := maxf(0.0,controller_weight)*maxf(0.0,float(VM.execute(clip.blend_weight,env)))
 	if weight == 0.0:
 		return
-	for bone in sampled_bones:
+	for bone in BONES:
 		for key in clip.bones[bone]:
 			var identity: Vector3 = Vector3.ONE if key == "scale" else Vector3.ZERO
 			out[bone][key] += weight*(_channel(clip.bones[bone][key],clock,env,out[bone][key])-identity)
@@ -149,19 +115,12 @@ func set_snapshot(snapshot: Dictionary) -> void:
 	# Preserve source's endpoint seam: phase1 wraps to0 with no closure repair.
 	var clock := fposmod(float(snapshot.get("phase",0.0)),1.0)
 	var env := _environment(snapshot,clock)
-	# Endpoints contribute exactly one gait. Do not evaluate a discarded gait;
-	# intermediate weights still use the complete original channel blend.
-	if run_weight <= 0.0:
-		channels = _directional("walk",env,clock)
-	elif run_weight >= 1.0:
-		channels = _directional("run",env,clock)
-	else:
-		var walk := _directional("walk",env,clock)
-		var running := _directional("run",env,clock)
-		channels = _neutral()
-		for bone in sampled_bones:
-			for key in CHANNELS:
-				channels[bone][key] = Vector3(walk[bone][key]).lerp(running[bone][key],run_weight)
+	var walk := _directional("walk",env,clock)
+	var running := _directional("run",env,clock)
+	channels = _neutral()
+	for bone in BONES:
+		for key in CHANNELS:
+			channels[bone][key] = Vector3(walk[bone][key]).lerp(running[bone][key],run_weight)
 	_add_clip(channels,"xfltzh",env,clock)
 	_add_clip(channels,"hxfxxu",env,clock,run_weight*float(env.get("v.esnrkj",0.0)))
 	_add_clip(channels,"xahrzd",env,2.0,run_weight)
@@ -173,16 +132,6 @@ func set_snapshot(snapshot: Dictionary) -> void:
 	var desired: Dictionary = base.duplicate()
 	var source_root := _source_transform("root",Vector3.ZERO)
 	var waist := source_root*_source_transform("waist",base.Hips.origin)
-	if lower_body_only:
-		desired.Root=source_root*Transform3D(base.Root)
-		desired.Hips=waist*Transform3D(base.Hips)
-		for side in ["L","R"]:
-			var name:String="Leg."+side
-			desired[name]=source_root*_source_transform("leftleg" if side=="L" else "rightleg",base[name].origin)*Transform3D(base[name])
-		for name in ["Root","Hips","Leg.L","Leg.R"]:
-			var i:=names.find(name)
-			poses[i]=Transform3D(desired[parents[name]]).affine_inverse()*Transform3D(desired[name]) if parents[name]!="" else desired[name]
-		return
 	var body := waist*_source_transform("body",base.Head.origin)
 	desired.Root = source_root*Transform3D(base.Root)
 	for name in ["Hips","Spine"]:
