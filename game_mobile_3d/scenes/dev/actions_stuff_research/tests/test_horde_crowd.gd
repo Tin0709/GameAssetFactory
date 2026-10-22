@@ -19,6 +19,7 @@ func run():
  var shape:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(6,2,.2);shape.shape=box;wall.add_child(shape);lab.add_child(wall)
  jam.position=Vector3(0,0,-3.5);free.position=Vector3(8,0,-6)
  await ticks(90)
+ print("JAM_STATE ",{"position":jam.position,"velocity":jam.velocity,"real_velocity":jam.get_real_velocity(),"floor":jam.is_on_floor(),"holding":jam.holding_distance,"pending_attack":jam.pending_attack,"knockback":jam.knockback,"chasing":jam.chasing,"blocked":jam._ai_blocked})
  check(jam._ai_blocked and jam.is_on_floor(),"Actual native wall contact detects a blocked grounded chaser")
  free.position=Vector3(8,0,-6);free.velocity=Vector3.ZERO
  var ai:int=jam.ai_steps;var samples:int=jam.ragdoll.sample_count;var poses:int=jam.visual.source_frames;var free_ai:int=free.ai_steps
