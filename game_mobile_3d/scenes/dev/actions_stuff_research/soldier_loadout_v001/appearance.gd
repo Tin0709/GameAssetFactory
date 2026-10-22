@@ -2,7 +2,7 @@ extends Node
 ## Dev-only appearance layered onto the approved render pose. Supplemental render
 ## palettes never modify the player's Skeleton3D, contacts, camera or rifle sockets.
 const DIR="res://scenes/dev/actions_stuff_research/soldier_loadout_v001/"
-const SECONDARY_STRENGTH:=2.0 # User refinement: twice the visible hair/tail response.
+const SECONDARY_STRENGTH:=4.0 # Latest user: double the previous 2x response.
 const Spring=preload("res://scripts/secondary_spring.gd")
 const FaceState=preload("res://scenes/dev/actions_stuff_research/soldier_loadout_v001/facial_state.gd")
 var scene:Node
@@ -20,6 +20,8 @@ var head_bind:Transform3D
 var hair_spring:=Spring.new()
 var tail_spring:=Spring.new()
 var tail_tip:=Spring.new()
+var crown_spring:=Spring.new()
+var motion_clock:=0.
 var face_state:RefCounted
 var channels:Dictionary
 var initialized:=false
@@ -92,7 +94,7 @@ func _head_mesh(label:String,d:Dictionary,material:Material)->Array:
  mesh.skin=skin;mesh.skeleton=mesh.get_path_to(rig);mesh.material_override=material
  return [mesh,rig.register_skin(skin)]
 func reset():
- initialized=false;hair_spring.reset();tail_spring.reset();tail_tip.reset();acceleration=Vector3.ZERO;angular_velocity=Vector3.ZERO
+ initialized=false;hair_spring.reset();tail_spring.reset();tail_tip.reset();crown_spring.reset();motion_clock=0.;acceleration=Vector3.ZERO;angular_velocity=Vector3.ZERO
  face_state.reset();channels=face_state.channels;last_shots=scene.rifle_fire.shots_fired;last_hp=actor.current_hp
  last_kills=scene.zombie_combat.kills if scene.zombie_combat!=null else 0
  _last_takeoff=false;_last_landed=false;gaze_offset=0.;enemy_nearby=false
@@ -123,6 +125,7 @@ func advance_motion(delta:float,velocity:Vector3,head_position:Vector3,head_basi
  angular_velocity=angular_velocity.lerp(rotation_speed.limit_length(12.),1.-exp(-14.*delta))
  var local_accel:=head_basis.inverse()*acceleration
  var local_velocity:=head_basis.inverse()*velocity
+ motion_clock+=delta
  var rhythm:=sin(phase*TAU)*move_weight;var bounce:=sin(phase*TAU*2.)*move_weight
  var hair_target:=Vector3(local_accel.z*.0018+local_accel.y*.0008+rhythm*.020,-angular_velocity.y*.012,-local_accel.x*.0017+bounce*.009)
  # Relative vertical wind is downward on ascent and upward during the fall.
@@ -134,6 +137,11 @@ func advance_motion(delta:float,velocity:Vector3,head_position:Vector3,head_basi
  hair_spring.advance(delta,hair_target*SECONDARY_STRENGTH,4.2,.64,Vector3(.10,.075,.08)*SECONDARY_STRENGTH)
  tail_spring.advance(delta,tail_target*SECONDARY_STRENGTH,3.1,.55,Vector3(.40,.18,.20)*SECONDARY_STRENGTH)
  tail_tip.advance(delta,tail_spring.value*.52,3.8,.58,Vector3(.22,.10,.10)*SECONDARY_STRENGTH)
+ # Free crown/roof cards catch running airflow and the alternating footfall.
+ # Fixed cap, head, face, band wrap and knot remain on the approved head pose.
+ var airflow:=clampf(Vector2(velocity.x,velocity.z).length()/5.031,0.,1.)*move_weight
+ var crown_target:=Vector3(bounce*.045+airflow*(.025+sin(motion_clock*17.)*.014),sin(motion_clock*13.)*.016*airflow,rhythm*.025)
+ crown_spring.advance(delta,crown_target*SECONDARY_STRENGTH,4.8,.62,Vector3(.25,.12,.16))
  last_velocity=velocity;last_head_position=head_position;last_head_velocity=head_velocity;last_basis=head_basis
 func _process(delta:float):
  if presenter.display_world.is_empty():return
@@ -180,6 +188,7 @@ func _upload():
   if not part.fixed:
    var factor:=.45 if "bang" in part.name else .75+float(i%4)*.08
    angles=hair_spring.value*factor
+   if "crown" in part.name or "roof" in part.name:angles+=crown_spring.value*(.8+float(i%3)*.15)
   RenderingServer.skeleton_bone_set_transform(hair_ref.get_skeleton(),i,_pivoted(_vector(part.pivot),angles))
  for i in data.band.parts.size():
   var part:Dictionary=data.band.parts[i];var transform:=Transform3D.IDENTITY

@@ -65,6 +65,28 @@ var _auto_aim_saved:=Transform3D.IDENTITY
 var _auto_aim_rotation:=Quaternion.IDENTITY
 var _auto_aim_applied:=false
 var _auto_aim_turning:=false
+var _gameplay_run_weight:=0.
+var _ground_travel:=0.
+var _micro_stop:=false
+
+func _retime_locomotion_phase(step:float)->void:
+ if rifle_clips.is_empty():super._retime_locomotion_phase(step);return
+ # Gameplay speed owns classification. The literal research controller's
+ # 0.61035 Walk query never crosses its 0.6 Run exit hysteresis.
+ var speed:=movement_speed/maxf(travel_speed_scale,.001)
+ _gameplay_run_weight=move_toward(_gameplay_run_weight,smoothstep(WALK_SPEED+.05,RUN_SPEED-.05,speed),step/.14)
+ direction_snapshot.run_weight=_gameplay_run_weight
+ if jump_active or not jump_grounded:
+  super._retime_locomotion_phase(step);return
+ # Keep the common cursor continuous, but advance it by actual travel rather
+ # than the source speed filter's residual motion after the capsule stops.
+ var previous_phase:float=direction_snapshot.phase-step*float(direction_snapshot.cadence)
+ var stride:=lerpf(WALK_SPEED/1.25,RUN_SPEED/1.6,_gameplay_run_weight)
+ var cadence:=speed/stride*locomotion_playback_rate
+ var phase:=previous_phase+step*cadence
+ direction_snapshot.phase=phase;direction_snapshot.phase01=fposmod(phase,1.);direction_snapshot.cadence=cadence
+ for pair in [["v.eqhdel",phase],["v.ifcvde",fposmod(phase,1.)]]:
+  direction_snapshot.vars[pair[0]]=pair[1];direction_controller.env[pair[0]]=pair[1]
 
 func _rows(rows: Array) -> Transform3D:
  return Transform3D(Basis(Vector3(rows[0][0],rows[1][0],rows[2][0]),Vector3(rows[0][1],rows[1][1],rows[2][1]),Vector3(rows[0][2],rows[1][2],rows[2][2])),Vector3(rows[0][3],rows[1][3],rows[2][3]))
@@ -173,7 +195,11 @@ func _advance_facing(target_yaw: float,delta: float) -> void:
   if combat_turn_requested:
    rotation.y+=clampf(wrapf(target_yaw-rotation.y,-PI,PI),-RifleTurn.QUICK_TURN_RATE*delta,RifleTurn.QUICK_TURN_RATE*delta)
    return
- super._advance_facing(target_yaw,delta)
+ if _has_auto_aim():super._advance_facing(target_yaw,delta)
+ else:
+  # Travel turns follow the changing velocity promptly. Stationary Q/C and
+  # the approved 0.6s E pivot keep their separate existing controller.
+  rotation.y+=clampf(wrapf(target_yaw-rotation.y,-PI,PI),-14.*delta,14.*delta)
 func _restore_auto_aim() -> void:
  if not _auto_aim_applied:return
  skeleton.set_bone_pose(_auto_aim_spine,_auto_aim_saved)
@@ -248,6 +274,12 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
  rifle_aim_weight=move_toward(rifle_aim_weight,1. if rifle_aim_requested else 0.,delta/AIM_BLEND_SECONDS)
  if rifle_aim_requested or rifle_aim_weight>0.:rifle_aim_time=fposmod(rifle_aim_time+delta,float(rifle_aim_profile.clips.Aim.duration))
  var moving:=requested or Vector2(world_velocity.x,world_velocity.z).length()>.025
+ if moving:
+  if not move_requested:_ground_travel=0.
+  _ground_travel+=Vector2(world_velocity.x,world_velocity.z).length()*delta
+  _micro_stop=false
+ elif move_requested:
+  _micro_stop=_ground_travel<.18 and bool(physics.grounded) and not jump_active
  var combat:=combat_turn_requested and _has_auto_aim()
  # Verified pre29 recent-action branch keeps forward/lateral weights relative
  # to look. E is our rifle-combat equivalent; never reset its shared gait.
@@ -271,6 +303,16 @@ func drive_jump_motion(world_velocity: Vector3,requested: bool,physics: Dictiona
   if rifle_move_weight>=.9999:rifle_idle_time=0.
  else:rifle_idle_time=fposmod(rifle_idle_time+delta,float(rifle_profile.clips.Idle.duration))
  _rifle_driving=true;super.drive_jump_motion(world_velocity,requested,physics,delta);_rifle_driving=false
+ if jump_grounded and not jump_active:
+  for key in PHASE_KEYS:jump_runtime.env[key]=direction_snapshot.vars[key]
+ if _micro_stop and not moving and settling:
+  # A tap does not warrant the inherited alternating 0.44s replant sequence.
+  # Retain its current ground contacts while the moving pose fades out.
+  settling=false
+  for side in 2:
+   foot_anchors[side]=Vector3(last_sole[side].x,0.,last_sole[side].z)
+   foot_rotations[side]=_leg_world_rotation([leg_left,leg_right][side])
+   foot_support[side]=true;support_aim[side]=Quaternion.IDENTITY
  if jump_active:
   _rifle_strafe_floor_y=0.
   # No newly invented Rifle Jump Action: retain approved jump/landing core/legs
@@ -374,6 +416,9 @@ func _update_direction_support(delta: float) -> void:
    elif height<.025:_source_support[side]=true;released[side]=false
   return
  # Preserve the approved idle's occasional free-leg weight shift.
+ if _micro_stop and rifle_move_weight>.001:
+  for side in 2:_source_support[side]=true;released[side]=false
+  return
  for side in 2:
   var bone: int=[leg_left,leg_right][side];var pose:=_source_global_pose(bone);var height:=INF
   for point in SOLE_POINTS:height=minf(height,(pose*point).y)
@@ -421,6 +466,7 @@ func _evaluate(delta: float) -> void:
  var before:=pose_sequence;super._evaluate(delta)
  if pose_sequence!=before and not rifle_clips.is_empty():_constrain_rifle_contacts()
 func reset_contacts() -> void:
+ _gameplay_run_weight=0.;_ground_travel=0.;_micro_stop=false
  _restore_auto_aim();auto_aim_target=null;auto_aim_aligned=true;_auto_aim_rotation=Quaternion.IDENTITY;_auto_aim_turning=false
  if rifle_recoil_clip!=null:cancel_rifle_recoil()
  super.reset_contacts();rifle_idle_time=0.;rifle_move_weight=0.;idle_active=true
