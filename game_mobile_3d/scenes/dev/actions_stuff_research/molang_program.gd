@@ -28,7 +28,7 @@ static func prepare(value:Variant)->Variant:
   _cache[code]=weakref(program)
  for i in roots.size():
   var node:Array=roots[i]
-  node.clear();node.append("compiled_program");node.append(Callable(program,"e"+str(i)))
+  node.clear();node.append("compiled_program");node.append(Callable(program,"e"+str(i)));node.append(program)
  return value
 
 static func _gather(value:Variant,roots:Array)->void:
