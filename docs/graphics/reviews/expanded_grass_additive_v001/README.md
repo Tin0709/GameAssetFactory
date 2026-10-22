@@ -2,10 +2,10 @@
 
 User-authorized same-scene update, ready for gameplay review. No new scene/project; productionWorldMap and all Blender/source assets remain unchanged.
 
--10,000 terrain blocks, full surface planted with14,831clumps:8,053short/6,778tall,8existing meshes,392regional MultiMeshes/twofamilymaterials.
--104m shared contact coverage,196² histories, ~0.53m cells, sparse local spring work. Roots/wind/source textures/material lighting preserved.
--Latest steering: contact gain1.50→2.25,1.5× stronger before the unchanged continuous bend bound; .14damping and1.28wind unchanged.
--Spawn+N adds0–50per click. Existing actors/corpses/targets/shots/statistics remain;0is a no-op. R is the explicit full reset to last applied count. Existing native deaths remain uncapped and clean up after2.5s.
+- 10,000 terrain blocks, full surface planted with14,831clumps:8,053short/6,778tall,8existing meshes,392regional MultiMeshes/twofamilymaterials.
+- 104m shared contact coverage,196² histories, ~0.53m cells, sparse local spring work. Roots/wind/source textures/material lighting preserved.
+- Latest steering: contact gain1.50→2.25,1.5× stronger before the unchanged continuous bend bound; .14damping and1.28wind unchanged.
+- Spawn+N adds0–50per click. Existing actors/corpses/targets/shots/statistics remain;0is a no-op. R is the explicit full reset to last applied count. Existing native deaths remain uncapped and clean up after2.5s.
 
 `performance_30.log` and `performance_60.log`:465checks each, failures[]. Real UI20→40→60,100accumulated near a corner, .75m spawn clearance,60deaths/420parts, appending13during death without retiring bodies, normal cleanup and reset. `grass_contracts.log`:29pass; `combat_60.log`:23pass; `fire_30.log`:159shots/no pool misses, approved grip/recoil/aim preserved. `presentation100.log`:196² histories,76moving subframes/0held, max0.000299rad error.
 
