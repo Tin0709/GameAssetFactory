@@ -1,3 +1,5 @@
+**Latest 2026-10-22 performance-mode correction:** All 0–50 spawned actors now run their native death simultaneously on Kill All. No four-corpse retirement is applied in this stress test; all 50 may contribute 350 active physical parts for the original1.2s lifetime. The original four-actor opt-out fixture and all source physics remain unchanged. This supersedes the earlier performance cap note immediately below.
+
 **2026-10-22 — Current scene performance mode:** The existing lab now opts into an adjustable 0–50 batch, default20, and removes lighting review props. See `../performance_lab_v001/README.md`. The original four-actor encounter below remains the opt-out fixture; source visuals, AI and death physics remain unchanged. The performance subclass enforces four active ragdolls even with 50 actors; the original four-actor fixture remains unchanged.
 
 # Source zombie combat — development only

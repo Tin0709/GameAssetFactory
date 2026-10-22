@@ -1,0 +1,31 @@
+{
+	"after_cleanup_actors": 0,
+	"after_cleanup_ragdolls": 0,
+	"all_native_parts_freed": true,
+	"animated_chests": 50,
+	"clip_fps": 30,
+	"clip_frames": 45,
+	"initial_ragdolls": 50,
+	"native_parts": 350,
+	"note": "Actual existing scene, fixed30FPS simulation and native pixels. Readbacks are excluded from any performance claim.",
+	"renderer": "mobile",
+	"retention_samples": [
+		{
+			"actors": 50,
+			"frame": 2,
+			"ragdolls": 50
+		},
+		{
+			"actors": 50,
+			"frame": 14,
+			"ragdolls": 50
+		},
+		{
+			"actors": 50,
+			"frame": 26,
+			"ragdolls": 50
+		}
+	],
+	"simulated_seconds": 1.5,
+	"single_death_event_each": true
+}
