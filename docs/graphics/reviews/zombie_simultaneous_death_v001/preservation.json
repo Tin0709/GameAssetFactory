@@ -1,0 +1,48 @@
+{
+  "files_checked": 9047,
+  "changed": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/combat_group.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/controls.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_performance_lab.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/zombie_combat/README.md"
+  ],
+  "missing": [],
+  "only_authorized_files_changed": true,
+  "base_native_physics_visual_AI_and_production_unchanged": true,
+  "all_approved_blender_files_unchanged": true,
+  "scene_and_grass_unchanged": true,
+  "native_confirmation": {
+    "after_cleanup_actors": 0,
+    "after_cleanup_ragdolls": 0,
+    "all_native_parts_freed": true,
+    "animated_chests": 50,
+    "clip_fps": 30,
+    "clip_frames": 45,
+    "initial_ragdolls": 50,
+    "native_parts": 350,
+    "note": "Actual existing scene, fixed30FPS simulation and native pixels. Readbacks are excluded from any performance claim.",
+    "renderer": "mobile",
+    "retention_samples": [
+      {
+        "actors": 50,
+        "frame": 2,
+        "ragdolls": 50
+      },
+      {
+        "actors": 50,
+        "frame": 14,
+        "ragdolls": 50
+      },
+      {
+        "actors": 50,
+        "frame": 26,
+        "ragdolls": 50
+      }
+    ],
+    "simulated_seconds": 1.5,
+    "single_death_event_each": true
+  }
+}
