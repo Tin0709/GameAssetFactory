@@ -1,0 +1,22 @@
+{
+  "protected_files": 9049,
+  "changed": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_soldier_secondary.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_zombie_melee_contact.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_zombie_combat.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_md2_lighting.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_rifle_fire.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_performance_lab.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_rifle_aim_gameplay.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/soldier_loadout_v001/appearance.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/soldier_loadout_v001/README.md"
+  ],
+  "missing": [],
+  "unexpected_changes": [],
+  "blender_changes": [],
+  "production_changes": [],
+  "new_test": "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_player_motion.gd"
+}
