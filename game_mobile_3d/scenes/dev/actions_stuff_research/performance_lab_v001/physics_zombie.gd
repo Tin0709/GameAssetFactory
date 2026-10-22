@@ -15,3 +15,13 @@ func _ready()->void:
 		part.corpse=self
 		part.core_part=name in ["Hips","Chest","Head"]
 		part.friction=1.
+
+func _start_physics()->void:
+	super._start_physics()
+	if not ragdoll.running:return
+	for part:PhysicalBone3D in ragdoll.bodies.values():
+		# A living zombie's mask includes layer2 (player), the original corpse
+		# layer. Stop advertising the corpse on that layer as well as ignoring
+		# live actors in our own mask. Native ground collision remains via mask1.
+		part.collision_layer=0
+		part.collision_mask=1

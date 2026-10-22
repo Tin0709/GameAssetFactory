@@ -14,9 +14,9 @@ func _integrate_forces(state:PhysicsDirectBodyState3D)->void:
 				corpse.ground_contact_age=corpse.corpse_age
 				break
 	if corpse.ground_arrested:
-		# Coherent planar arrest stops joints dragging the other parts like ice.
+		# Brief, restrained slide before settling; no long glide like ice.
 		# Vertical fall, angular motion, constraints and CCD remain native physics.
 		var velocity:=state.linear_velocity
-		var retain:=exp(-80.*state.step)
+		var retain:=exp(-18.*state.step)
 		velocity.x*=retain;velocity.z*=retain
 		state.linear_velocity=velocity
