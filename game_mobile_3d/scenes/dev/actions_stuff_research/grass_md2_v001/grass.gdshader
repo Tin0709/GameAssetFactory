@@ -9,7 +9,8 @@ uniform float interaction_alpha=1.0;
 uniform float lighting_grade=0.0;
 uniform float wind_time=0.0;
 uniform float wind_strength=1.28;
-uniform float interaction_strength=1.50;
+// Latest gameplay request:1.5x player contact, same wind/spring timing.
+uniform float interaction_strength=2.25;
 uniform float family_response=1.0;
 uniform float field_extent=34.0;
 varying float height_fraction;
