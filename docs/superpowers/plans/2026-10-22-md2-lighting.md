@@ -46,7 +46,7 @@
 - [x] Short original-speed smooth daytransition clip. No retiming or promotionalcamera replacement.
 - [x] Warm nativeLow/Med/Highbenchmarks with wind,playerpassage,actualEcombat; rendererCPU/GPU,framepace,visible/shadowstats. Controlled same-pose shadow/glow A/B estimates if meaningful.
 - [x] Run essentialexistingFire/Strafe/camera/grass checks, SHAaudit allprotectedfiles and standalone fresh review.
-- [x] One focused fresh final code review; fix materialissues, report limits. Open the EXISTING lab with normal audio; stop for visualreview.
+- [x] One focused fresh final code review; fix materialissues, report limits. [x] Opened the EXISTING lab with normal audio; stop for visualreview.
 
 ## Execution decisions
 - User explicitly requests BOTH research and implementation, no research-only stop. Perform this concrete authorized design in-place rather than insert redundant approval gates. Current asset-heavy workingtree is intentional; no copied project/worktree.
