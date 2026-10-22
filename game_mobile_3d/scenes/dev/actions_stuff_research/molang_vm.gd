@@ -5,6 +5,10 @@ extends RefCounted
 static func execute(node: Array, env: Dictionary) -> Variant:
 	# Literal channels and direct reads have no side effects or nested return.
 	# Avoid allocating a return frame for these very common authored channels.
+	if node[0]=="native_expression":
+		var inputs:Array=[]
+		for key in node[2]:inputs.append(env.get(key,0.0))
+		return node[1].execute(inputs,null,true,true)
 	if node[0]=="literal":return node[1]
 	if node[0]=="variable":return env.get(_name(node[1]),0.0)
 	return _execute(node, env, {"returned": false, "value": 0.0})
@@ -120,3 +124,47 @@ static func _equal(a: Variant, b: Variant) -> bool:
 	# Python permits unlike scalar types in equality (numeric vs string is false).
 	if (a is String) != (b is String): return false
 	return a == b
+
+# Compile only side-effect-free arithmetic channel trees. Ordered assignments,
+# lazy branches, query Callables and return statements keep the literal VM path.
+static func compile_channel(node:Array)->Array:
+	var variables:Array[String]=[]
+	var source:=_channel_source(node,variables)
+	if source.is_empty():return node
+	var expression:=Expression.new()
+	var inputs:=PackedStringArray()
+	for i in variables.size():inputs.append("x"+str(i))
+	if expression.parse(source,inputs)!=OK:return node
+	return ["native_expression",expression,variables]
+
+static func _channel_source(node:Array,variables:Array[String])->String:
+	match node[0]:
+		"literal":
+			return JSON.stringify(node[1],"",true,true) if node[1] is float else ""
+		"variable":
+			var key:=_name(node[1])
+			if not variables.has(key):variables.append(key)
+			return "x"+str(variables.find(key))
+		"program":
+			return _channel_source(node[1][0],variables) if node[1].size()==1 else ""
+		"unary":
+			if node[1] not in ["-","+"]:return ""
+			var value:=_channel_source(node[2],variables)
+			return "("+node[1]+value+")" if not value.is_empty() else ""
+		"binary":
+			if node[1] not in ["+","-","*","/"]:return ""
+			# Keep zero-division protection and dynamic divisors in the original VM.
+			if node[1]=="/" and (node[3][0]!="literal" or not node[3][1]):return ""
+			var a:=_channel_source(node[2],variables)
+			var b:=_channel_source(node[3],variables)
+			return "("+a+node[1]+b+")" if not a.is_empty() and not b.is_empty() else ""
+		"call":
+			if node[1] not in ["math.sin","math.cos","math.atan","math.abs"] or node[2].size()!=1:return ""
+			var value:=_channel_source(node[2][0],variables)
+			if value.is_empty():return ""
+			match node[1]:
+				"math.sin":return "sin(deg_to_rad("+value+"))"
+				"math.cos":return "cos(deg_to_rad("+value+"))"
+				"math.atan":return "rad_to_deg(atan("+value+"))"
+				"math.abs":return "abs("+value+")"
+	return ""

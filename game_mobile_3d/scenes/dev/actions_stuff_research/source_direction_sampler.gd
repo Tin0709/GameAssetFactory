@@ -72,6 +72,8 @@ func _cache_literal_vectors()->void:
 						var values:Array=key[side]
 						if values[0][0]=="literal" and values[1][0]=="literal" and values[2][0]=="literal":
 							key[side]=Vector3(float(values[0][1]),float(values[1][1]),float(values[2][1]))
+						else:
+							for axis in 3:values[axis]=VM.compile_channel(values[axis])
 
 func _vector(values: Variant, env: Dictionary, accumulated: Vector3) -> Vector3:
 	if values is Vector3:
