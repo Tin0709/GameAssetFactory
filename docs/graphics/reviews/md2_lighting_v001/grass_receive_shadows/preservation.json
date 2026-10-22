@@ -1,0 +1,22 @@
+{
+  "protected_files_checked": 9038,
+  "baseline": "grass_daylight_match_v001/protected_before.json",
+  "changed_from_baseline": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/grass_md2_v001/grass.gdshader"
+  ],
+  "documentation_note": "README changed during the preceding daylight-material task and receives this policy update. Only the grass shader runtime source differs.",
+  "missing": [],
+  "current_change_only_removes_shadow_reception_disable_token": true,
+  "vertex_and_fragment_bodies_byte_identical": true,
+  "native_result": {
+    "clumps": 1317,
+    "grass_batches": 32,
+    "grass_receiving_disabled": false,
+    "grass_shadow_casters": 0,
+    "ground_resource": "res://scenes/dev/actions_stuff_research/grass_md2_v001/assets/atlas_03.png",
+    "ground_sampler_shared": true,
+    "materials": 2,
+    "terrain_diffuse_mode": 0
+  }
+}
