@@ -1,0 +1,19 @@
+{
+  "protected_files": 9047,
+  "changed": [
+    "game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/walk_run_test.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/README.md",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/physics_zombie.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_performance_lab.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/rifle_ready_v001/continuous_fire.gd"
+  ],
+  "missing": [],
+  "unexpected_changes": [],
+  "blender_changes": [],
+  "production_changes": [],
+  "new_runtime_files": [
+    "game_mobile_3d/scenes/dev/actions_stuff_research/performance_lab_v001/grounded_part.gd",
+    "game_mobile_3d/scenes/dev/actions_stuff_research/tests/test_combat_feel.gd"
+  ]
+}
