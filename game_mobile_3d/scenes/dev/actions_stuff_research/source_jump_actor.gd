@@ -6,6 +6,8 @@ var last_jump_query: Dictionary = {}
 var _scripted_jump_held := false
 var _floor_initialized := false
 
+var diagnostic_motion_usec:=0
+var diagnostic_pose_usec:=0
 func _physics_process(delta: float) -> void:
 	var stick := requested_direction if scripted_input else Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var sprint := requested_run if scripted_input else Input.is_action_pressed("sprint")
@@ -28,7 +30,9 @@ func _physics_process(delta: float) -> void:
 	velocity = Vector3(planar.x, vertical, planar.y)
 	# move_and_slide clears downward velocity on collision; retain it for impact.
 	var incoming_vertical := velocity.y
+	var motion_start:=Time.get_ticks_usec()
 	move_and_slide()
+	diagnostic_motion_usec+=Time.get_ticks_usec()-motion_start
 	# Fast horizontal travel can retain a floor flag on the takeoff tick.
 	# Upward velocity means the capsule is departing, not supported by that floor.
 	var grounded := is_on_floor() and velocity.y <= 0.
@@ -47,10 +51,13 @@ func _physics_process(delta: float) -> void:
 		"sprinting": fast_sprinting,
 		"body_position": global_position,
 	}
+	var pose_start:=Time.get_ticks_usec()
 	if visual.has_method("drive_jump_motion"):
 		visual.drive_jump_motion(actual_velocity, not stick.is_zero_approx(), last_jump_query, delta)
 	else:
 		visual.drive_locomotion(actual_velocity, not stick.is_zero_approx(), delta)
+
+	diagnostic_pose_usec+=Time.get_ticks_usec()-pose_start
 
 func reset_jump_motion() -> void:
 	requested_jump = false

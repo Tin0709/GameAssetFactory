@@ -122,7 +122,13 @@ func _step_controller(alias: String, dt: float) -> Array:
 func _controller_snapshot(c: Dictionary) -> Dictionary:
 	return {"state":c.state,"state_time":c.time,"clocks":c.clocks.duplicate(),"outgoing":null if c.old == null else c.old.state,"fade_elapsed":c.fade,"fade_duration":c.duration}
 
+var diagnostic_jump_usec:=0
 func step(query: Dictionary, dt: float) -> Dictionary:
+	var started:=Time.get_ticks_usec()
+	var result=_diagnostic_step(query,dt)
+	diagnostic_jump_usec+=Time.get_ticks_usec()-started
+	return result
+func _diagnostic_step(query: Dictionary, dt: float) -> Dictionary:
 	if not is_finite(dt) or dt <= 0.0 or dt > 1.0/6.0:
 		push_error("dt must be finite in (0,1/6]")
 		return {}
