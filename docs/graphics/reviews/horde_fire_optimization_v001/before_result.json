@@ -1,0 +1,63 @@
+{
+	"fixed_fps": false,
+	"grass": 14831,
+	"note": "Final code without diagnostic counters, real damage/lethal native corpses, native Mobile/Metal on M2Pro. Normal loop, no readbacks in sample windows. Desktop only; GPU timing unavailable.",
+	"physics_hz": 60,
+	"render_cap": 120,
+	"renderer": "mobile",
+	"results": [
+		{
+			"alive": 100,
+			"average_fps": 107.903992298539,
+			"frame_p95_ms": 17.331,
+			"frames": 217,
+			"hits": 0,
+			"phase": "idle100",
+			"physics_p95_ms": 13.734,
+			"pool_misses": 0,
+			"ragdolls": 0,
+			"seconds": 2.011047,
+			"shots": 0
+		},
+		{
+			"alive": 93,
+			"average_fps": 98.6663733851701,
+			"frame_p95_ms": 17.689,
+			"frames": 593,
+			"hits": 35,
+			"phase": "fire100_normal_hp",
+			"physics_p95_ms": 14.833,
+			"pool_misses": 0,
+			"ragdolls": 3,
+			"seconds": 6.010153,
+			"shots": 35
+		},
+		{
+			"alive": 91,
+			"average_fps": 54.9478133143047,
+			"frame_p95_ms": 44.165,
+			"frames": 220,
+			"hits": 13,
+			"phase": "run_fire_normal_hp",
+			"physics_p95_ms": 17.985,
+			"pool_misses": 0,
+			"ragdolls": 2,
+			"seconds": 4.003799,
+			"shots": 13
+		},
+		{
+			"alive": 91,
+			"average_fps": 119.544237594172,
+			"frame_p95_ms": 17.265,
+			"frames": 240,
+			"hits": 0,
+			"phase": "release",
+			"physics_p95_ms": 17.985,
+			"pool_misses": 0,
+			"ragdolls": 0,
+			"seconds": 2.007625,
+			"shots": 0
+		}
+	],
+	"viewport": "3004x1805"
+}

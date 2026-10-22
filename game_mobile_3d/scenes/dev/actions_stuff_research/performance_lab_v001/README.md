@@ -1,3 +1,9 @@
+## Latest100-zombie fire optimization —2026-10-22
+
+Fully blocked grounded chasers retry native movement at30Hz, carrying elapsed AI timer delta and per-actor retry phases. Damage immediately cancels the wait. Freely moving/attacking actors retain the normal physics updates. All source animation/hit-layer evaluation and native handoff samples continue at60Hz. This is an opt-in property of this performance actor, not a production AI change. Collision masks, native max-slides/solver, movement speed and corpse parameters remain exact. Existing source evaluator now skips only zero-weight clips, preserving every resulting PRS pose and blend.
+
+Actual100normal-HP Mobile/Metal3004×1805 desktop comparison: standing heldE98.7→120FPS; running+heldE54.9→69.3FPS, moving framep9544.17→20.07ms.100all-alive at capped60also passes;150moving and200remain over budget. These short Mac measurements are not phone guarantees or an unlimited crowd claim. Genuine red→green source/blocked-AI tests, actual465scene checks30/60,Fire60,Hit30/60 and23combat checks pass. All source assets and native deaths remain. Full methodology/limits: `docs/graphics/reviews/horde_fire_optimization_v001/README.md` from repository root.
+
 # Adjustable zombie performance lab — existing scene only
 
 Current `res://scenes/dev/ActionsStuffWalkRunTest.tscn` opts into `performance_test_enabled=true`. It now contains100×100 unit ground blocks and14,831 enabled randomized short/tall grass clumps, with the approved player/rifle, lighting controls and movement. The optional lighting review blocks/trees/flowers and their colliders are omitted. WorldMap, project defaults, approved Blender files, existing grass assets and native AI/animation/death behavior are preserved. Latest contact gain is1.5×; wind and spring timing remain unchanged.
