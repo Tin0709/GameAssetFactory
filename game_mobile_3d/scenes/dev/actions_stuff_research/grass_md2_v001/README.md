@@ -17,3 +17,11 @@ Checks:29field contracts after genuine failing→passing elasticity test, curren
 All new assets/scripts stay under the existing release-excluded research root. Keep the gameplay result Pending until user review; source .blendfiles, approved animations, movement speeds2.70/~7.55m/s,6Hzinfinite rifle fire, zombie combat/death and main WorldMap are preserved.
 
 Latest2026-10-22user policy: all tall/short grass has castingOFFand receivingdisabled (`shadows_disabled` in sharedshader). Other caster settings remain. Wind/contactvertexcode unchanged. Original A/Bretains this latest grasspolicy. NativeMobilecompile/render and32batch/0castercheck pass; measured FPSgain is not established by cappeddesktopCPUtimings. See lightingresearchfollow-up.
+
+## 2026-10-22 — Green terrain-to-root blend
+
+The latest user feedback replaces the former dark root grade. Both grass families now sample the existing ground-top atlas (`atlas_03.png`) at immutable world-space root XZ, using the verified unit-block UV mapping. The lookup runs in the vertex shader; its color is passed to fragments. A smooth blend over normalized blade height 0.02–0.62 makes the base match that terrain color and upward lighting normal, then returns to the authored leaf colors and shading. Cream seed tips remain intact. There is no emissive lift or exposure change, so the material still follows the time-of-day lighting. Grass casting and reception remain disabled.
+
+Wind/contact deformation, normals rotated by bending, root data, source geometry/atlases, population and all gameplay code remain unchanged. Only color sampling was added to the vertex stage; the deformation statements are exact. Two family materials reuse the same already-loaded ground texture. Original A/B keeps this new root blend, as it keeps the latest no-shadow policy.
+
+Native Mobile frozen-pose comparisons at 14:48 and 18:30, a close-up, the shared sampler/32-batch audit and preservation evidence are in `docs/graphics/reviews/md2_lighting_v001/grass_root_blend/`. All 29 existing grass checks pass. No phone performance or FPS gain is asserted for this shading correction.
