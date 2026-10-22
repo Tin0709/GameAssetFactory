@@ -84,9 +84,10 @@ func _retime_locomotion_phase(step:float)->void:
  var stride:=lerpf(WALK_SPEED/1.25,RUN_SPEED/1.6,_gameplay_run_weight)
  var cadence:=speed/stride*locomotion_playback_rate
  var phase:=previous_phase+step*cadence
- direction_snapshot.phase=phase;direction_snapshot.phase01=fposmod(phase,1.);direction_snapshot.cadence=cadence
- for pair in [["v.eqhdel",phase],["v.ifcvde",fposmod(phase,1.)]]:
-  direction_snapshot.vars[pair[0]]=pair[1];direction_controller.env[pair[0]]=pair[1]
+ var phase01:=fposmod(phase,1.)
+ direction_snapshot.phase=phase;direction_snapshot.phase01=phase01;direction_snapshot.cadence=cadence
+ direction_snapshot.vars["v.eqhdel"]=phase;direction_snapshot.vars["v.ifcvde"]=phase01
+ direction_controller.env["v.eqhdel"]=phase;direction_controller.env["v.ifcvde"]=phase01
 
 func _rows(rows: Array) -> Transform3D:
  return Transform3D(Basis(Vector3(rows[0][0],rows[1][0],rows[2][0]),Vector3(rows[0][1],rows[1][1],rows[2][1]),Vector3(rows[0][2],rows[1][2],rows[2][2])),Vector3(rows[0][3],rows[1][3],rows[2][3]))
