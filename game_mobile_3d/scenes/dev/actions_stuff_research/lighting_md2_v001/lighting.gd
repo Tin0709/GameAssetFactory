@@ -69,6 +69,7 @@ func setup(scene:Node3D,foliage:Node=null)->void:
 	ui=PreviewUI.new();ui.name="LightingPreviewControls";add_child(ui);ui.setup(self)
 	# Demonstration props belong to this opt-in lab module and leave with it.
 	var props:=ReviewProps.new();add_child(props)
+	print("GAF_MD2_LIGHTING_READY ",JSON.stringify({"hour":current_hour,"quality":TIERS[quality].name,"renderer":RenderingServer.get_current_rendering_method(),"automatic":automatic}))
 
 func set_time(hour:float,snap:bool=false)->void:
 	if released:return
