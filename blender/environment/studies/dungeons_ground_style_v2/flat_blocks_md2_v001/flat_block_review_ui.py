@@ -1,4 +1,4 @@
-"""Flat blocks in the same Grass MD2 environment-library sidebar."""
+"""Soft-textured blocks in the same Grass MD2 environment-library sidebar."""
 import bpy, json
 
 def record(context):
@@ -39,7 +39,7 @@ class MD2_OT_flat_block_view(bpy.types.Operator):
         return {'FINISHED'}
 
 class MD2_PT_flat_blocks(bpy.types.Panel):
-    bl_label = 'Flat Blocks MD2 — Pending'
+    bl_label = 'Blocks MD2 — Soft Texture'
     bl_idname = 'MD2_PT_flat_blocks'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -59,7 +59,8 @@ class MD2_PT_flat_blocks(bpy.types.Panel):
         info = record(context)
         if key in info['objects']:
             layout.label(text=bpy.data.objects[info['objects'][key]]['flat_color_hex'])
-        layout.label(text='1 × 1 × 1 block · one solid color')
+        layout.label(text='Grass cap over dirt · subtle pixels')
+        layout.label(text='1 × 1 × 1 block · matte')
         layout.label(text='Pending · Blender review only', icon='INFO')
 
 def register():
