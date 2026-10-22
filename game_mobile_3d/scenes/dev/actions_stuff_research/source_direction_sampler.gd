@@ -80,6 +80,7 @@ func _cache_literal_vectors()->void:
 						var values:Array=key[side]
 						if values[0][0]=="literal" and values[1][0]=="literal" and values[2][0]=="literal":
 							key[side]=Vector3(float(values[0][1]),float(values[1][1]),float(values[2][1]))
+						else:key[side]=["vector",values]
 
 
 func _vector(values: Variant, env: Dictionary, accumulated: Vector3) -> Vector3:
@@ -87,6 +88,7 @@ func _vector(values: Variant, env: Dictionary, accumulated: Vector3) -> Vector3:
 		# Preserve the evaluator's final `this` value even for constant channels.
 		env["this"]=accumulated.z
 		return values
+	if values[0] is String and values[0]=="compiled_program":return values[1].call(env,accumulated)
 	var out := Vector3.ZERO
 	for axis in 3:
 		# Holding evaluates `this` from the accumulated same-axis channel.

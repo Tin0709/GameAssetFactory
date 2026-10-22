@@ -3,7 +3,7 @@ extends RefCounted
 ## No source evaluation/rewrite or clock changes. Lazy branches and ordered
 ## side effects become explicit statements; each root keeps its return scope.
 const KERNEL_PATH="res://scenes/dev/actions_stuff_research/molang_vm.gd"
-const TAGS=["program","unary","binary","call","assign","return","conditional"]
+const TAGS=["program","unary","binary","call","assign","return","conditional","vector"]
 static var _cache:Dictionary={}
 
 static func prepare(value:Variant)->Variant:
@@ -13,7 +13,7 @@ static func prepare(value:Variant)->Variant:
  var state:={"lines":PackedStringArray(),"next":0}
  state.lines.append("extends RefCounted\nconst VM=preload("+JSON.stringify(KERNEL_PATH)+")\nfunc missing_call(name:String)->float:\n push_error(\"Unsupported Molang call or missing Callable: \"+name)\n return 0.0")
  for i in roots.size():
-  state.lines.append("func e"+str(i)+"(env:Dictionary)->Variant:")
+  state.lines.append("func e"+str(i)+"(env:Dictionary,accumulated:Vector3=Vector3.ZERO)->Variant:")
   var result:=_emit(roots[i],state,1)
   _line(state,1,"return "+result)
  var code:String="\n".join(state.lines)
@@ -37,8 +37,19 @@ static func _gather(value:Variant,roots:Array)->void:
  elif value is Array and not value.is_empty():
   if value[0] is String:
    if value[0] in ["literal","variable","compiled_program"]:return
-   if value[0] in TAGS:roots.append(value);return
+   if value[0] in TAGS:
+    # A bare non-program AST can expose the literal VM's RHS return coercion.
+    # Keep that unusual scope on the literal path; authored roots use programs.
+    if value[0]!="program" and _has_return(value):return
+    roots.append(value);return
   for item in value:_gather(item,roots)
+
+static func _has_return(value:Variant)->bool:
+ if not value is Array:return false
+ if not value.is_empty() and value[0] is String and value[0]=="return":return true
+ for item in value:
+  if _has_return(item):return true
+ return false
 
 static func _name(value:String)->String:
  if value.begins_with("variable."):return "v."+value.substr(9)
@@ -52,6 +63,12 @@ static func _store(s:Dictionary,indent:int,expression:String)->String:
  return name
 static func _emit(n:Array,s:Dictionary,indent:int)->String:
  match n[0]:
+  "vector":
+   var axes:=PackedStringArray()
+   for axis in 3:
+    _line(s,indent,"env[\"this\"]=accumulated["+str(axis)+"]")
+    axes.append(_emit(n[1][axis],s,indent))
+   return _store(s,indent,"Vector3("+",".join(axes)+")")
   "literal":return _store(s,indent,JSON.stringify(n[1],"",true,true))
   "variable":return _store(s,indent,"env.get("+JSON.stringify(_name(n[1]))+",0.0)")
   "assign":
@@ -99,7 +116,17 @@ static func _emit(n:Array,s:Dictionary,indent:int)->String:
    var function:=_name(n[1]);var args:=PackedStringArray()
    for child in n[2]:args.append(_emit(child,s,indent))
    var arguments:String="["+",".join(args)+"]"
-   if function.begins_with("math."):return _store(s,indent,"VM._math("+JSON.stringify(function.substr(5))+","+arguments+")")
+   if function.begins_with("math."):
+    # These hot operations are the same degree/float adapters as VM._math.
+    var x:String="float("+args[0]+")" if not args.is_empty() else "0.0"
+    match function:
+     "math.sin":return _store(s,indent,"sin(deg_to_rad("+x+"))")
+     "math.cos":return _store(s,indent,"cos(deg_to_rad("+x+"))")
+     "math.atan":return _store(s,indent,"rad_to_deg(atan("+x+"))")
+     "math.abs":return _store(s,indent,"absf("+x+")")
+     "math.clamp":return _store(s,indent,"minf(float("+args[2]+"),maxf(float("+args[1]+"),"+x+"))")
+     "math.lerp":return _store(s,indent,x+"+(float("+args[1]+")-"+x+")*float("+args[2]+")")
+    return _store(s,indent,"VM._math("+JSON.stringify(function.substr(5))+","+arguments+")")
    if not function.begins_with("q."):return _store(s,indent,"missing_call("+JSON.stringify(function)+")")
    var callback:=_store(s,indent,"env.get("+JSON.stringify(function)+")")
    return _store(s,indent,callback+".callv("+arguments+") if "+callback+" is Callable else missing_call("+JSON.stringify(function)+")")
