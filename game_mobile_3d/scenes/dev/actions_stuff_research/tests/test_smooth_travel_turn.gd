@@ -17,17 +17,18 @@ func run():
  lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();lab.zombie_combat_enabled=false;lab.auto_aim_enabled=false;root.add_child(lab)
  lab.set_process(false);lab.player.set_physics_process(false);lab.player.visual.set_process(false);lab.rifle_fire.set_physics_process(false);lab.soldier_appearance.set_process(false);lab.soldier_appearance.set_physics_process(false)
  var v=lab.player.visual
- for sprint in [false,true]:
+ for scenario in [[false,Vector2(-1,0)],[true,Vector2(-1,0)],[false,Vector2(0,1)],[true,Vector2(0,1)]]:
+  var sprint:bool=scenario[0];var target:Vector2=scenario[1]
   lab.reset_player()
   for i in fps:tick(Vector2(0,-1),sprint,dt)
   var yaw:float=v.rotation.y;var speed:=0.;var acceleration:=0.;var maximum_speed:=0.
   for i in fps:
-   tick(Vector2(-1,0),sprint,dt)
+   tick(target,sprint,dt)
    var current:float=wrapf(v.rotation.y-yaw,-PI,PI)/dt
    acceleration=maxf(acceleration,absf(current-speed)/dt)
    maximum_speed=maxf(maximum_speed,absf(current));speed=current;yaw=v.rotation.y
-  check(acceleration<.65*14./dt,"90-degree turn eases angular speed instead of hard starting/stopping: "+str(sprint))
-  check(absf(wrapf(v.rotation.y+PI*.5,-PI,PI))<.01,"Smooth travel turn still arrives promptly and accurately")
+  check(acceleration<.65*14./dt,"Travel turn eases angular speed even on a 180-degree reversal: "+str(scenario))
+  check(absf(wrapf(v.rotation.y-atan2(target.x,target.y),-PI,PI))<.01,"Smooth travel turn still arrives promptly and accurately")
   var maximum_leg_step:=0.;var previous:Array=[];var floor_min:=0.
   for i in fps*3:
    var direction:Vector2=[Vector2(0,-1),Vector2(-1,0),Vector2(0,1),Vector2(1,0),Vector2(1,-1).normalized(),Vector2(-1,1).normalized()][int(i/maxi(1,roundi(.15*fps)))%6]
@@ -39,5 +40,5 @@ func run():
     else:previous[side]=q
     floor_min=minf(floor_min,v._sole_world(bone).y)
   check(maximum_leg_step<65. and floor_min>-.004,"Rapid alternating directions keep continuous grounded leg poses")
-  rows.append({"run":sprint,"maximum_angular_acceleration_rad_s2":acceleration,"peak_turn_speed_rad_s":maximum_speed,"maximum_leg_step_deg":maximum_leg_step,"minimum_foot_y":floor_min})
+  rows.append({"run":sprint,"target":str(target),"maximum_angular_acceleration_rad_s2":acceleration,"peak_turn_speed_rad_s":maximum_speed,"maximum_leg_step_deg":maximum_leg_step,"minimum_foot_y":floor_min})
  print("SMOOTH_TRAVEL_TURN ",JSON.stringify({"fps":fps,"passed":failures.is_empty(),"failures":failures,"rows":rows}));lab.free();quit(0 if failures.is_empty() else 1)

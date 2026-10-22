@@ -205,15 +205,16 @@ func _advance_facing(target_yaw: float,delta: float) -> void:
    return
  if _has_auto_aim():super._advance_facing(target_yaw,delta)
  else:
-  # Exact critically damped angular response: carry turn velocity through
-  # changing input instead of hard starting/stopping a constant-rate pivot.
+  # Carry a damped turn velocity through changing input. Bound acceleration
+  # too: a 180-degree reversal must not jump straight to the speed limit.
   # Stationary Q/C and the approved 0.6s E pivot keep their existing path.
   var offset:=wrapf(rotation.y-target_yaw,-PI,PI)
   var spring:=_travel_yaw_velocity+26.*offset
   var decay:=exp(-26.*delta)
-  var next_offset:float=(offset+spring*delta)*decay
-  _travel_yaw_velocity=clampf((_travel_yaw_velocity-26.*spring*delta)*decay,-14.,14.)
-  rotation.y+=clampf(next_offset-offset,-14.*delta,14.*delta)
+  var previous_velocity:=_travel_yaw_velocity
+  var desired_velocity:=clampf((_travel_yaw_velocity-26.*spring*delta)*decay,-14.,14.)
+  _travel_yaw_velocity=move_toward(previous_velocity,desired_velocity,180.*delta)
+  rotation.y+=(previous_velocity+_travel_yaw_velocity)*.5*delta
 func _restore_auto_aim() -> void:
  if not _auto_aim_applied:return
  skeleton.set_bone_pose(_auto_aim_spine,_auto_aim_saved)
