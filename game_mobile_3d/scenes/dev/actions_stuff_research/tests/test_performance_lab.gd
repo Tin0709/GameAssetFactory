@@ -62,7 +62,9 @@ func run():
  check(group.kills==kills and group.active_ragdolls()==50,"Repeated Kill All cannot trigger duplicate deaths")
  await ticks(45)
  check(group.zombies.size()==50 and group.active_ragdolls()==50,"No corpse is removed early to hide the simultaneous physics load")
- await ticks(40)
+ await ticks(45)
+ check(group.zombies.size()==50 and group.active_ragdolls()==50,"All corpses remain visible beyond the former 1.2-second lifetime")
+ await ticks(70)
  check(group.zombies.is_empty() and group.active_ragdolls()==0 and group.kills==50,"All 50 kills settle and retire once after the short corpse lifetime")
  released(previous,"Bulk cleanup frees every physical bone")
  # Also exercise same-frame kill before pose sampling is warmed.

@@ -20,6 +20,7 @@ var performance_controls:CanvasLayer
 @export var md2_lighting_enabled:=false
 var md2_lighting:Node
 @export var grass_field_enabled:=false
+@export var grass_vegetation_enabled:=true
 var grass_field:Node3D
 var grass_overview:=false
 var soldier_appearance:Node
@@ -80,6 +81,13 @@ func _ready() -> void:
 	presentation.setup(player,player.visual);player.visual.presentation=presentation
 	if rifle_ready:
 		rifle_fire=RifleFire.new();rifle_fire.name="InfiniteRifleFire";add_child(rifle_fire);rifle_fire.setup(player)
+		if performance_test_enabled:
+			# Current combat-feel experiment only; shared weapon profiles stay exact.
+			rifle_fire.level_trajectory=true
+			rifle_fire.projectile_speed_multiplier=1.5
+			rifle_fire.projectile_range_multiplier=3.
+			var boundary:=get_node_or_null("FieldBoundary") as StaticBody3D
+			if boundary!=null:rifle_fire.query.exclude.append(boundary.get_rid())
 		if zombie_combat_enabled:
 			zombie_combat=PerformanceCombat.new() if performance_test_enabled else ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player,rifle_fire.audio)
 			if auto_aim_enabled:
@@ -88,6 +96,12 @@ func _ready() -> void:
 		soldier_appearance=SoldierAppearance.new();soldier_appearance.name="SoldierAppearance";add_child(soldier_appearance);soldier_appearance.setup(self)
 	if grass_field_enabled:
 		grass_field=GrassField.new();grass_field.name="MD2GrassField30x30";add_child(grass_field);grass_field.setup(player)
+		if not grass_vegetation_enabled:
+			# Keep terrain, meshes, shader and contact histories for later restoration.
+			for child in grass_field.get_children():
+				if child.name.begins_with("GrassRegion_"):child.hide()
+			grass_field.enabled=false
+			grass_field.set_process(false);grass_field.set_physics_process(false)
 	if md2_lighting_enabled:
 		md2_lighting=MD2Lighting.new();md2_lighting.name="GAF_MD2_Lighting_v001";add_child(md2_lighting);md2_lighting.setup(self,grass_field,not performance_test_enabled)
 	if performance_test_enabled and zombie_combat!=null:
@@ -105,9 +119,11 @@ func _build_environment() -> void:
 	var collision:=CollisionShape3D.new();collision.shape=shape;collision.position.y=-.2;floor_body.add_child(collision)
 	if grass_field_enabled:
 		# Bounded playable field; same Y0 and floor solver. Four static edge shapes.
+		# Separate invisible walls so dev bullets may fly beyond the arena edge.
+		var boundary:=StaticBody3D.new();boundary.name="FieldBoundary";add_child(boundary)
 		for edge in [Vector3(-15.2,.7,0),Vector3(15.2,.7,0),Vector3(0,.7,-15.2),Vector3(0,.7,15.2)]:
 			var wall:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(.4,2.,30.8) if edge.x!=0 else Vector3(30.8,2.,.4)
-			wall.shape=box;wall.position=edge;floor_body.add_child(wall)
+			wall.shape=box;wall.position=edge;boundary.add_child(wall)
 		return
 	var ground:=MeshInstance3D.new();var mesh:=PlaneMesh.new();mesh.size=Vector2(200,200);ground.mesh=mesh
 	var material:=StandardMaterial3D.new();material.albedo_color=Color(.31,.38,.39);material.roughness=1.;ground.material_override=material;floor_body.add_child(ground)
@@ -139,7 +155,7 @@ func _process(delta: float) -> void:
 		hud.text+="\nZombies %d · Corpses %d / %d · Cleared %d · R Restart"%[zombie_combat.living_count(),zombie_combat.active_ragdolls(),capacity,zombie_combat.kills]
 	if rifle_auto_aim!=null:hud.text+="\nAuto-aim: "+(rifle_auto_aim.target.name if is_instance_valid(rifle_auto_aim.target) else "nearest zombie while aiming")
 	if rifle_ready:hud.text+="\nQ / C Turn in place · head leads, feet correct >60°"
-	if grass_field!=null:hud.text+="\n30 × 30 BLOCKS · STRONG WIND + PLAYER WAKE · V Overview"
+	if grass_field!=null:hud.text+="\n30 × 30 BLOCKS · "+("STRONG WIND + PLAYER WAKE" if grass_vegetation_enabled else "GRASS PAUSED")+" · V Overview"
 func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	if grass_field!=null and grass_overview:
 		camera.global_position=Vector3(24,30,24);camera.look_at(Vector3(0,.5,0));camera.size=43.;return

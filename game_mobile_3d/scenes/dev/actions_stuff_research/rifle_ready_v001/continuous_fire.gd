@@ -28,6 +28,16 @@ var flash_size:=1.
 var audio: Node
 var query:=PhysicsRayQueryParameters3D.new()
 var muzzle_local:=Vector3.ZERO
+# Opt-in dev tuning. Defaults preserve the original four-zombie research fixture.
+var level_trajectory:=false
+var projectile_speed_multiplier:=1.
+var projectile_range_multiplier:=1.
+func _flight_direction(forward:Vector3)->Vector3:
+ if not level_trajectory:return forward.normalized()
+ var planar:=Vector3(forward.x,0.,forward.z)
+ if planar.length_squared()<.000001:
+  planar=visual.global_basis.z;planar.y=0.
+ return planar.normalized()
 func setup(body: CharacterBody3D) -> void:
  player=body;visual=player.visual;process_physics_priority=1
  for i in BULLETS:bullets.append(_pooled(PROJECTILE))
@@ -74,7 +84,7 @@ func _fire(profile: Dictionary) -> void:
  if slot<0:pool_misses+=1;return
  var origin: Vector3=visual.socket.muzzle_position()
  var carrier: Transform3D=visual.skeleton.global_transform*visual.skeleton.get_bone_global_pose(visual.carrier_bone)
- var direction:=carrier.basis.y.normalized()
+ var direction:=_flight_direction(carrier.basis.y)
  var contact:=barrel_contact()
  ages[slot]=0.;directions[slot]=direction
  var bullet:=bullets[slot];bullet.global_position=origin;bullet.look_at(origin+direction,Vector3.UP);bullet.reset_physics_interpolation();bullet.show()
@@ -85,7 +95,8 @@ func _fire(profile: Dictionary) -> void:
  flash.get_node("Visual").rotation.z=(shots_fired%4)*PI/8.;flash.global_position=origin;flash.look_at(origin+direction,Vector3.UP);flash.reset_physics_interpolation();flash.show()
  audio.play_event(&"pistol_shot")
 func _move_projectiles(delta: float,profile: Dictionary) -> void:
- var speed:=float(profile.speed);var limit:=float(profile.range)/speed
+ var speed:=float(profile.speed)*projectile_speed_multiplier
+ var limit:=float(profile.range)*projectile_range_multiplier/speed
  for i in BULLETS:
   if ages[i]<0.:continue
   var step:=minf(delta,maxf(0.,limit-ages[i]));ages[i]+=delta
@@ -108,7 +119,7 @@ func present(presentation: Node) -> void:
  if not flash.visible or presentation.display_world.is_empty():return
  var carrier: Transform3D=presentation.display_world[visual.carrier_bone]
  flash.global_position=carrier*visual.socket.hand_transforms[1]*muzzle_local
- flash.look_at(flash.global_position+carrier.basis.y.normalized(),Vector3.UP)
+ flash.look_at(flash.global_position+_flight_direction(carrier.basis.y),Vector3.UP)
 func active_projectiles() -> int:
  var count:=0
  for age in ages:
