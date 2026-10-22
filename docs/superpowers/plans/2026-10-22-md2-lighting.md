@@ -25,20 +25,20 @@
 - [x] Inspect actual680-entryZIP, licenses and referenced include pipelines.
 - [x] Inspect genuine official MD2screenshots/trailer frames and official GodotMobiledocs.
 - [x] Inspect current lab/project/assets; save protected SHA baseline and original3files under.validation.
-- [ ] Consolidate source evidence into required report alongside implementation results.
+- [x] Consolidate source evidence into required report alongside implementation results.
 
 ### Task2: Original reusable controller
 **Files:** Create `game_mobile_3d/scenes/dev/actions_stuff_research/lighting_md2_v001/{palette.gd,lighting.gd}`; modify existing lab opt-in setup and exact scene flag. Add shading toggle in existing grass fragment only.
 **Interface:** `Lighting.setup(lab)`, `set_time(hour,snap=false)`, `set_quality(index)`, `set_original(enabled)`, `advance(delta)`, `release()`; `Palette.sample(hour,into={})` wraps any finite hour and returns shared field dictionary.
-- [ ] Write `tests/test_md2_lighting.gd`: resource+sceneintegration, wrappedsampleequality, noon/nightdistinct/readable,30/60transitionparity, original/quality/release restoration, grassgeometryclockpreservation.
-- [ ] Run missing-controller RED, implement palette/controller with owned state and no per-frame scene/object creation, run GREEN.
-- [ ] Qualitytiers: Low.75/1024/VeryLow/orthogonal24m/glowoff; Medium.85/2048/Low/two-split32m/subtleglow; High1.0/2048/Medium/two-split38m/subtleglow. Bilinear3Dscale, no project saves.
+- [x] Write `tests/test_md2_lighting.gd`: resource+sceneintegration, wrappedsampleequality, noon/nightdistinct/readable,30/60transitionparity, original/quality/release restoration, grassgeometryclockpreservation.
+- [x] Run missing-controller RED, implement palette/controller with owned state and no per-frame scene/object creation, run GREEN.
+- [x] Qualitytiers: Low.75/1024/VeryLow/orthogonal24m/glowoff; Medium.85/2048/Low/two-split32m/subtleglow; High1.0/2048/Medium/two-split38m/subtleglow. Bilinear3Dscale, no project saves.
 
 ### Task3: Preview and asset evaluation
 **Files:** Create samefolder `preview_ui.gd`, `review_props.gd`, `metrics.gd`; no new scene. UI compact top-right and collapsible.
-- [ ] Five preset buttons7,12,16.5,18.5,22;24hslider; pausedinitialauto; ratecontrol; Original; qualityselect; independentfog/glow toggles;2–4Hzmetrics; Loptionalnonconflictingcollapse.
-- [ ] Reuse existing GLBs for small stone/dirt/flower/tree arrangement with bounded selected shadows and stable ground contact, away from main spawn contacts. No altered source assets.
-- [ ] Check UI and controls through actual lab. Preserve old25%HUD.
+- [x] Five preset buttons7,12,16.5,18.5,22;24hslider; pausedinitialauto; ratecontrol; Original; qualityselect; independentfog/glow toggles;2–4Hzmetrics; Loptionalnonconflictingcollapse.
+- [x] Reuse existing GLBs for small stone/dirt/flower/tree arrangement with bounded selected shadows and stable ground contact, away from main spawn contacts. No altered source assets.
+- [x] Check UI and controls through actual lab. Preserve old25%HUD.
 
 ### Task4: Native verification and delivery
 **Files:** same existingtests directory native capture/profiling script; review output `docs/graphics/reviews/md2_lighting_v001/`; required researchreport.
@@ -51,3 +51,12 @@
 ## Execution decisions
 - User explicitly requests BOTH research and implementation, no research-only stop. Perform this concrete authorized design in-place rather than insert redundant approval gates. Current asset-heavy workingtree is intentional; no copied project/worktree.
 - Current architecture has explicit state-sampling and opt-in hooks. Preserve all other approved source files; no broadened combat/controller redesign.
+
+## Verification ledger
+- Task1 complete: actualZIP+licenses/GLSLincludeaudit,4.7Mobiledocs and officialMD2pixelresearch; protected baseline8,939files.
+- Task2/3 complete:20lighting contracts GREEN after genuine missingmoduleRED and lifecycle/inputreviewsRED. Optional fragment shading only; all grass vertex logic retained.
+- Final review: twoImportantfindings (releasedcontrols couldmutate; RMBupoverGUIcouldstick); bothreproducedRED thenfixedGREEN, noCritical/minordeferred.
+- Native benchmark done:300samples/tier, activecombat/grass,0poolmisses, peak2ragdolls; rawperformanceJSON. GPUN/AonMetal, two-splitdrawcounterN/A, shadowprimitivesavailable. IntentionalRresetspike~64msreported.
+- Native fivephase stills inspected, night/duskfillraised for readability. Finalstillrefreshpendingafter depthprecisionrestoration/UIheadercorrection.
+- Clip first manualfixedFPSrun hit native skinallocation startup errors, not gameplaybonechanges. Capturehelper now warms native storage before reconnecting approved presenter callbacks. Cleanrecapturepending; do not publish erroneousfirstlog.
+- Scope decisions: no decorativebeams/extraaccentlights in clearing; no nativeGI/reflectionwork for matteassets; nophoneFPSclaims; noWorldMaporprojectdefaults.
