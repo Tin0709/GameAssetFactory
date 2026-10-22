@@ -68,6 +68,7 @@ var _auto_aim_turning:=false
 var _gameplay_run_weight:=0.
 var _ground_travel:=0.
 var _micro_stop:=false
+var _distance_phase:=NAN
 
 func _retime_locomotion_phase(step:float)->void:
  if rifle_clips.is_empty():super._retime_locomotion_phase(step);return
@@ -81,9 +82,13 @@ func _retime_locomotion_phase(step:float)->void:
  # Keep the common cursor continuous, but advance it by actual travel rather
  # than the source speed filter's residual motion after the capsule stops.
  var previous_phase:float=direction_snapshot.phase-step*float(direction_snapshot.cadence)
+ # Cancel round-off from subtracting the source advance, without masking
+ # intentional source jump phase overrides on takeoff/landing.
+ if is_finite(_distance_phase) and absf(previous_phase-_distance_phase)<.0000001:previous_phase=_distance_phase
  var stride:=lerpf(WALK_SPEED/1.25,RUN_SPEED/1.6,_gameplay_run_weight)
  var cadence:=speed/stride*locomotion_playback_rate
  var phase:=previous_phase+step*cadence
+ _distance_phase=phase
  var phase01:=fposmod(phase,1.)
  direction_snapshot.phase=phase;direction_snapshot.phase01=phase01;direction_snapshot.cadence=cadence
  direction_snapshot.vars["v.eqhdel"]=phase;direction_snapshot.vars["v.ifcvde"]=phase01
@@ -467,7 +472,7 @@ func _evaluate(delta: float) -> void:
  var before:=pose_sequence;super._evaluate(delta)
  if pose_sequence!=before and not rifle_clips.is_empty():_constrain_rifle_contacts()
 func reset_contacts() -> void:
- _gameplay_run_weight=0.;_ground_travel=0.;_micro_stop=false
+ _gameplay_run_weight=0.;_ground_travel=0.;_micro_stop=false;_distance_phase=NAN
  _restore_auto_aim();auto_aim_target=null;auto_aim_aligned=true;_auto_aim_rotation=Quaternion.IDENTITY;_auto_aim_turning=false
  if rifle_recoil_clip!=null:cancel_rifle_recoil()
  super.reset_contacts();rifle_idle_time=0.;rifle_move_weight=0.;idle_active=true
