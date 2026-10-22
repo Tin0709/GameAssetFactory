@@ -87,7 +87,9 @@ func _ready() -> void:
 			rifle_fire.projectile_speed_multiplier=1.5
 			rifle_fire.projectile_range_multiplier=3.
 			var boundary:=get_node_or_null("FieldBoundary") as StaticBody3D
-			if boundary!=null:rifle_fire.query.exclude.append(boundary.get_rid())
+			if boundary!=null:
+				var excluded:Array[RID]=rifle_fire.query.exclude
+				excluded.append(boundary.get_rid());rifle_fire.query.exclude=excluded
 		if zombie_combat_enabled:
 			zombie_combat=PerformanceCombat.new() if performance_test_enabled else ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player,rifle_fire.audio)
 			if auto_aim_enabled:
