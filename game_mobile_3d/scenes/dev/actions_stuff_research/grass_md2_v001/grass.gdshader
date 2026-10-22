@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode cull_disabled, diffuse_burley, specular_disabled, shadows_disabled;
+render_mode cull_disabled, diffuse_burley, specular_disabled;
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D ground_atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
