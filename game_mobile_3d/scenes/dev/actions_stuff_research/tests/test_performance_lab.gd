@@ -52,23 +52,25 @@ func run():
  previous=bodies(group)
  ui.kill_button.pressed.emit()
  check(group.living_count()==0,"Kill All kills all 50 immediately")
- check(group.active_ragdolls()==4 and group.zombies.size()==4,"Kill All keeps at most four native ragdolls")
+ check(group.active_ragdolls()==50 and group.zombies.size()==50,"Kill All starts all 50 native ragdolls together")
  var active_parts:=0
  for part in previous:
   if is_instance_valid(part):active_parts+=1
- check(active_parts==28,"Bulk death promptly releases excess native bodies, retaining 28")
+ check(active_parts==350,"All 350 physical parts remain available for the simultaneous death stress test")
  var kills:int=group.kills
  ui.kill_button.pressed.emit()
- check(group.kills==kills and group.active_ragdolls()==4,"Repeated Kill All cannot trigger duplicate deaths")
- await ticks(80)
+ check(group.kills==kills and group.active_ragdolls()==50,"Repeated Kill All cannot trigger duplicate deaths")
+ await ticks(45)
+ check(group.zombies.size()==50 and group.active_ragdolls()==50,"No corpse is removed early to hide the simultaneous physics load")
+ await ticks(40)
  check(group.zombies.is_empty() and group.active_ragdolls()==0 and group.kills==50,"All 50 kills settle and retire once after the short corpse lifetime")
  released(previous,"Bulk cleanup frees every physical bone")
  # Also exercise same-frame kill before pose sampling is warmed.
  ui.select_count(50);ui.spawn_button.pressed.emit();previous=bodies(group)
  ui.kill_button.pressed.emit()
- check(group.living_count()==0 and group.zombies.size()==4,"Immediate spawn then Kill All is bounded before pose warmup")
+ check(group.living_count()==0 and group.zombies.size()==50,"Immediate spawn then Kill All keeps every corpse before pose warmup")
  await ticks(3)
- check(group.active_ragdolls()==4,"Pending corpse handoff starts cleanly on the existing physics clock")
+ check(group.active_ragdolls()==50,"All pending corpse handoffs start together on the existing physics clock")
  ui.select_count(13);ui.spawn_button.pressed.emit()
  released(previous,"Spawn during death retires old running and dormant native resources")
  check(group.living_count()==13,"Slider supports arbitrary integer batches")
