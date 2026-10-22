@@ -73,19 +73,33 @@ func run():
  var hp:int=zombie.current_hp
  fire._fire(profile);fire._move_projectiles(.2,profile)
  check(zombie.current_hp<hp,"Swept collision at the faster speed still damages a real zombie")
- fire.reset_fire();lab.zombie_combat.spawn_batch(1);zombie=lab.zombie_combat.zombies[0]
+ fire.reset_fire();lab.zombie_combat.spawn_batch(2);zombie=lab.zombie_combat.zombies[0]
+ var spectator=lab.zombie_combat.zombies[1]
+ spectator.position=Vector3(0,0,3.7);spectator.set_physics_process(false)
  zombie.position=Vector3(0,0,5)
  await ticks(3)
  zombie.take_damage(zombie.current_hp,Vector3.FORWARD)
  check(zombie.death_triggers==1 and zombie.ragdoll.total_applied_impulse.is_equal_approx(Vector3(0,96,-480)),"One lethal hit starts one doubled native impact")
  var parts:Array=zombie.ragdoll.bodies.values().duplicate()
  var first_contact:=Vector3.ZERO;var later_contact:=Vector3.ZERO;var contact_time:=-1.;var air_speed:=0.
+ var touched_living:=false;var tested_living_sweep:=false;var living_sweep_blocked:=false
  for i in 120:
   await ticks(1)
   if not is_instance_valid(zombie):break
   var center:=Vector3.ZERO;var velocity:=Vector3.ZERO;var mass:=0.
   for part in zombie.ragdoll.bodies.values():
    center+=part.global_position*part.mass;velocity+=part.linear_velocity*part.mass;mass+=part.mass
+   var state:=PhysicsServer3D.body_get_direct_state(part.get_rid())
+   for j in state.get_contact_count():
+    touched_living=touched_living or state.get_contact_collider_id(j)==spectator.get_instance_id()
+  if not tested_living_sweep and zombie.corpse_age>=.10:
+   tested_living_sweep=true
+   var chest:PhysicalBone3D=zombie.ragdoll.bodies.Chest
+   var from:Transform3D=spectator.global_transform
+   from.origin=Vector3(chest.global_position.x-.8,.01,chest.global_position.z)
+   var collision:=KinematicCollision3D.new()
+   if spectator.test_move(from,Vector3(1.6,0,0),collision):
+    for j in collision.get_collision_count():living_sweep_blocked=living_sweep_blocked or collision.get_collider(j) is PhysicalBone3D
   center/=mass;velocity/=mass;center.y=0.;velocity.y=0.
   if not zombie.ground_arrested:air_speed=maxf(air_speed,velocity.length())
   elif contact_time<0.:
@@ -95,10 +109,14 @@ func run():
  check(is_instance_valid(zombie) and zombie.corpse_age>=1.49,"Corpse survives beyond the former cleanup time")
  check(zombie.ground_arrested and contact_time>.08 and contact_time<1.2,"Only actual core landing engages ground arrest, after the airborne throw")
  var drift:float=first_contact.distance_to(later_contact)
- check(air_speed>5. and drift<.25,"Strong airborne throw arrests its planar drift within 0.1s of ground impact")
+ check(air_speed>5. and drift>.09 and drift<.4,"Strong throw has a short readable slide after landing, without an icy glide")
+ check(not touched_living,"Flying native corpse passes through an actual living zombie without contact")
+ check(tested_living_sweep and not living_sweep_blocked,"Living zombie movement cannot collide with or push a flying corpse")
  metrics["peak_airborne_com_speed_mps"]=air_speed
  metrics["first_core_contact_s"]=contact_time
  metrics["ground_drift_first_0_1s_m"]=drift
+ metrics["corpse_contact_with_living"]=touched_living
+ metrics["living_sweep_blocked_by_corpse"]=living_sweep_blocked
  zombie.take_damage(999,Vector3.BACK)
  check(zombie.death_triggers==1,"Repeated lethal damage cannot accumulate launch impulses")
  await ticks(75)
