@@ -14,9 +14,9 @@ func setup(body: CharacterBody3D,group: Node3D) -> void:
 var diagnostic_usec:=0
 var diagnostic_rays:=0
 func _physics_process(delta:float)->void:
- var started:=Time.get_ticks_usec()
- _diagnostic_scan(delta)
- diagnostic_usec+=Time.get_ticks_usec()-started
+	var started:=Time.get_ticks_usec()
+	_diagnostic_scan(delta)
+	diagnostic_usec+=Time.get_ticks_usec()-started
 func _diagnostic_scan(_delta: float) -> void:
 	if not is_instance_valid(player):return
 	var visual=player.visual
