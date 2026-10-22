@@ -7,6 +7,9 @@ const AIM_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v
 const RECOIL_LIBRARY=preload("res://scenes/dev/actions_stuff_research/rifle_ready_v001/recoil_approved_library.res")
 const RIFLE_ASSET=preload("res://assets/weapons/rifle_stylized_v2_test/Rifle_Stylized_V2.glb")
 const RifleTurn=preload("res://scenes/dev/actions_stuff_research/turn_in_place_v001/rifle_turn.gd")
+const TRAVEL_TURN_RESPONSE:=28.
+const TRAVEL_TURN_MAX_RATE:=14.
+const TRAVEL_TURN_ACCELERATION:=180.
 var stationary_turn: RifleTurn
 var turn_axis:=0.
 var combat_turn_requested:=false
@@ -209,11 +212,11 @@ func _advance_facing(target_yaw: float,delta: float) -> void:
   # too: a 180-degree reversal must not jump straight to the speed limit.
   # Stationary Q/C and the approved 0.6s E pivot keep their existing path.
   var offset:=wrapf(rotation.y-target_yaw,-PI,PI)
-  var spring:=_travel_yaw_velocity+26.*offset
-  var decay:=exp(-26.*delta)
+  var spring:=_travel_yaw_velocity+TRAVEL_TURN_RESPONSE*offset
+  var decay:=exp(-TRAVEL_TURN_RESPONSE*delta)
   var previous_velocity:=_travel_yaw_velocity
-  var desired_velocity:=clampf((_travel_yaw_velocity-26.*spring*delta)*decay,-14.,14.)
-  _travel_yaw_velocity=move_toward(previous_velocity,desired_velocity,180.*delta)
+  var desired_velocity:=clampf((_travel_yaw_velocity-TRAVEL_TURN_RESPONSE*spring*delta)*decay,-TRAVEL_TURN_MAX_RATE,TRAVEL_TURN_MAX_RATE)
+  _travel_yaw_velocity=move_toward(previous_velocity,desired_velocity,TRAVEL_TURN_ACCELERATION*delta)
   rotation.y+=(previous_velocity+_travel_yaw_velocity)*.5*delta
 func _restore_auto_aim() -> void:
  if not _auto_aim_applied:return
