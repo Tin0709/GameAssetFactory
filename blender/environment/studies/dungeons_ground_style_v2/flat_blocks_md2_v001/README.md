@@ -1,29 +1,27 @@
-# Flat Blocks MD2 v001 — Pending Blender review
+# MD2 blocks — subtle texture refinement, Pending
 
-Three additive1×1×1m blocks, bottom-center origins, six planar faces/12triangles each, one matte solid material on all six faces. No texture nodes, UV pattern, bevel, noise, displaced detail, animation or Godot export. Saved in the existing `dungeons_ground_style_v2.blend`, original scene and new isolated `Flat Blocks MD2` review layer. All prior candidates, native data and grass/wind/interaction routes remain.
+Latest user correction supersedes the first all-six-faces single-color trial: the grass block has a green top and the actual pack's stepped green cap over brown dirt sides, with a dirt bottom. Grass, dirt and stone now have very subtle broad pixel patches. Update the SAME three Pending objects in the SAME `dungeons_ground_style_v2.blend`; no new candidate, scene, project or Godot integration.
 
-## Color provenance
+## Source and appearance
 
-| Block | Solid sRGB | Evidence |
+Actual local `Dungeons II Style0.7JE.zip` members supply16×16pixel patterns. Retain25%of their original color deviations around the dominant color, with no added procedural noise, bump, roughness variation, bevel or geometry relief. The exact side-overlay alpha boundary makes a3–6/16block grass cap. The top uses the original grayscale pattern tinted green. One packed80×20sRGB atlas shares four16px tiles with2px edge padding and nearest filtering; one material per cube, same1m geometry/origin/12triangles.
+
+| Surface | Base sRGB | Provenance |
 |---|---|---|
-| Grass | `#548234` | Exact archive grass top is grayscale, dominantRGB148/148/148, and the archive provides no biome colormap. Use the dominant green of the current library `v3_textures/grass_top_0.png` as an explicitly authored project tint adaptation. This green is not claimed to be embedded in the pack. |
-| Dirt | `#865C3C` | Most frequentRGB134/92/60 in actual archive `assets/minecraft/textures/block/dirt.png`. |
-| Stone | `#888584` | Most frequentRGB136/133/132 in actual archive `assets/minecraft/textures/block/stone.png`. |
+| Grass | `#4A6D29` | DominantRGB74/109/41 of actual `grass_block_side.png` green pixels, selected by `grass_block_side_overlay.png` alpha. The archive top is grayscale, but its side already contains green; this corrects the first trial's project-green substitution. |
+| Dirt | `#865C3C` | DominantRGB134/92/60 in actual `dirt.png`. |
+| Stone | `#888584` | DominantRGB136/133/132 in actual `stone.png`. |
 
-Exact local ZIP/member hashes and color method: `palette.json`. Correct sRGB→linear conversion feeds the Blender Base Color; normal lighting still shades cube faces. The actual-model render is `preview.png`.
+Source/atlas palette and hashes are in `palette.json`; actual-model render is `preview.png`. `soft_texture.py` derives pixels; `refine_soft.py` is a guarded one-time refinement and must not be rerun over a completed refinement. Initial `build.py` remains historical and guarded.
 
-## Open and select
+## Open
 
 ```sh
 python3 "$HOME/Desktop/Game Dev/GameAssetFactory/scripts/open_blender_viewer.py" asset
 ```
 
-In the existing **Grass MD2** tab, **Flat Blocks MD2 — Pending** offers **ALL 3 BLOCKS**, **Grass**, **Dirt**, **Stone**, and **Opposite view**. Existing short/tall/Wind/Interaction controls remain below. Native assets use catalog **Environment/Flat Blocks MD2 Pending**.
+Existing **Grass MD2 → Blocks MD2 — Soft Texture** has **ALL 3 BLOCKS**, **Grass**, **Dirt**, **Stone**, and **Opposite view**. Stable object/layer/catalog identifiers retain the first trial's Flat names for compatibility. Existing short/tall/Wind/Interaction controls remain. Current launcher recognizes `MD2_SOFT_BLOCKS_R2`, preserving older unsaved viewers rather than displaying their stale flat-only loaded data. Recovery-first same-window refresh remains available through `scripts/refresh_environment_viewer.py`.
 
-The launcher recognizes the new flat-block bootstrap, preserving older unsaved viewers rather than reusing their stale loaded data. Same-window refresh remains available through `scripts/refresh_environment_viewer.py`, which first writes a recovery copy. No auto-run preferences change.
+## Checks
 
-## Essential checks
-
-Saved/reopened; correct1m dimensions, outward normals, rigid flat faces, one material/no texture nodes, exact palette and native asset marks. All new routes plus existing short/tall/close/Wind/Interaction routes pass. Original objects/transforms, meshes/UVs/materials/images/lights/cameras/worlds/render settings match the pre-edit library. Reopen preservation compares stored data; four derived Object caches (bounds, dimensions, local/world matrix) are excluded because hidden layers initialize them lazily. Stored transforms and matrix basis are still compared. The new blocks' dimensions are independently asserted after evaluation.
-
-Evidence/backups: `.validation/flat_blocks_v001/` from repo root. Other pre-existing Blender/game files remain byte-identical except the shared sidebar module and additive asset catalog. No production WorldMap or gameplay changes. Await user color/design review; no prior asset is replaced or approval promoted. Do not rerun the guarded build over the completed library.
+Saved/reopened; three1m cubes, same vertices/faces/transforms, outward flat normals, UVs place grass on top/cap and dirt below, one packed nearest texture node/material per block, native asset marks. Five block views and existing grass/Wind/Interaction routes pass. Native source-data comparison permits only the authorized three objects/meshes/materials; every other existing authored data block matches the pre-refinement file. Four derived hidden-layer Object caches are excluded as in the first trial; raw transforms/matrix basis remain compared. Fixed-camera native Blender render inspected. Backups/evidence: `.validation/soft_textured_blocks_v001/`. No production WorldMap, character, gameplay or approved Action changes. Pending user visual review.
