@@ -1,0 +1,17 @@
+# Weight and body mechanics
+
+Weight links receiving, body response and recovery; a waist curve does not measure force. **S**=source verified; **O**=observed pixels; **A**=project adaptation; **P**=original proposal; **U**=unknown. Effects/recommendations below are **P**.
+
+| Principle | Verified basis | Intended effect and artistic purpose | Rig adaptation; use / avoid |
+|---|---|---|---|
+| **11. Support and leg recovery** | **S:** footstep flags gate projected particle helpers; they do not measure each sole's support. [P04](SOURCE_EVIDENCE.md#p04) | Support carries the body while the free leg recovers. | **P:** define contact on the target's actual rigid sole after composition. Use reachable rolling/replanting contacts; avoid treating dust, a marker or whole-player grounded as proof that both feet are planted. |
+| **12. Motivate compression** | **S:** forward Run's waist wave has unequal lower/upper branches; it is not a symmetric bob. [P03](SOURCE_EVIDENCE.md#p03) | Brief loading and a less abrupt recovery communicate controlled “nhúng nhúng.” | **P:** lower connected body mass within leg reach, keeping scale one. Use small event-related compression; avoid disconnected torso drops, piston legs or a permanent timer-driven bounce after stopping. |
+| **13. Hip/torso weight transfer** | **S:** torso yaw, waist roll and head motion have different amplitudes/phases. [P03](SOURCE_EVIDENCE.md#p03), [P07](SOURCE_EVIDENCE.md#p07) | Opposition keeps the gesture lively while maintaining a readable facing. | **P:** distribute intent across available torso controls on the audited 13- or 10-bone rig. Use restrained angular opposition; avoid duplicating the same rotation on every parent and child. |
+| **14. Contact/impact, then recovery** | **S:** local moving/stationary Landing differ; moving Landing leaves arms/legs to concurrent layers. [P05](SOURCE_EVIDENCE.md#p05), [P06](SOURCE_EVIDENCE.md#p06) | Receiving softness reads without losing the active stride or upper-body task. | **P:** author a connected load and diminishing recovery around target contact. Use separate moving/stationary intent; avoid locking all limbs into a full-body landing while travel continues. |
+| **15. Let physics own travel** | **S:** source controllers consume height/velocity/grounded queries; the inspected fall probe predicts conditions rather than commanding a jump trajectory. [P04](SOURCE_EVIDENCE.md#p04), [P05](SOURCE_EVIDENCE.md#p05) | Impact and takeoff stay responsive to the real world. | **P:** keep reusable pose motion separate from capsule/world travel. Use actual collision for runtime landing; avoid adding preview elevation twice or delaying input until anticipation ends. |
+
+**A:** existing project sole anchors, height envelopes, reach releases and floor corrections are target-rig adaptations. They cannot be attributed to the pack. **U:** exact source per-foot loads, duty factors and general terrain behavior remain unverified.
+
+Measure final world-space sole center **and corners**, contact duration, drift and release reason. Separate rolling from slip. Preserve rigid geometry/weights and unit scale in new originals; source reconstructions retain their disclosed scale.
+
+Use [approved recovery/landing controls](APPROVED_REFERENCES.md) and [support guidance](../ANIMATION_EXPANSION_GUIDE.md#3-general-principles-for-this-visual-style). Flat-floor results do not certify terrain or phone performance.

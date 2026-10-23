@@ -1,0 +1,19 @@
+# Motion style bible
+
+Create original expressive blocky motion: decisive changes of pose, controlled weight, readable intent and responsive interruption. “Snappy” describes a contrast in spacing; “bouncy” describes motivated receiving and recovery. Neither means raising every amplitude.
+
+Labels: **S** source verified; **O** observed pixels; **A** project adaptation; **P** original proposal; **U** unknown. An S mechanism can inspire a P artistic choice without proving why viewers like it. Sources below identify evidence, not permission to reproduce a source performance.
+
+These twenty principles span this page and [Timing](TIMING_AND_SPACING.md), [Weight](WEIGHT_AND_BODY_MECHANICS.md), and [Patterns](SNAPPY_BOUNCY_PATTERNS.md). Every effect/purpose below is **P**, unless marked otherwise.
+
+| Principle | Verified basis | Intended effect and artistic purpose | Rig adaptation; use / avoid |
+|---|---|---|---|
+| **1. Key poses and silhouettes** | **S:** gait gives legs, torso and head distinct channels and phases. [P03](SOURCE_EVIDENCE.md#p03) | Separate the active limb from the trunk so direction and effort read at gameplay distance. | **P:** articulate existing shoulder/hip pivots; inspect front, side and gameplay views. Use clear passing/open contrasts; avoid solving occlusion by detaching limbs. |
+| **2. Preserve block identity** | **S:** source Run/Jump contain animated scale; exact reproduction and rigid interpretation differ. [P03](SOURCE_EVIDENCE.md#p03), [P06](SOURCE_EVIDENCE.md#p06) | Stable proportions make attitude and timing carry expression. | **A:** new originals retain full straight arms/legs and unit scale unless explicitly authorized. Use limb rotation and connected translation; avoid adding knees, elbows, shear or stretch. Label existing scaled source reconstructions separately. |
+| **3. Purposeful asymmetry** | **S:** sprint Jump has two phase-selected branches; they are not exact mirrors. [P05](SOURCE_EVIDENCE.md#p05) | A clear leading side gives the gesture intent and prevents mechanical duplication. | **P:** vary lead-side orientation while preserving support and attachment. Use asymmetry to explain action; avoid arbitrary left/right noise. |
+| **4. Head/body independence** | **S:** entity-relative head rotation and separate body-heading response exist. [P07](SOURCE_EVIDENCE.md#p07) | Keep gaze understandable while the mass turns beneath it. | **P:** map head basis once on the audited rig. Use bounded orientation separation; avoid double parent compensation or inventing independent eye animation from head evidence. |
+| **5. Contextual direction** | **S:** direction smoothing, yaw offset and active/relaxed context alter locomotion; no dedicated turn clip is established here. [P02](SOURCE_EVIDENCE.md#p02), [P07](SOURCE_EVIDENCE.md#p07) | Feet, torso and attention agree on the current intention. | **P:** define travel-facing versus attention-facing per behavior. Use reachable pivots/replants; avoid spinning indefinitely around an incompatible planted foot. |
+
+The historical **13-bone helper** and current **10-bone Soldier** are separate rigs. Audit the actual target hierarchy/rest basis before mapping channels; redistribute torso intent across available controls without adding bones. Preserve current geometry, pivots, rigid weights, materials and approved Actions. See [approved controls](APPROVED_REFERENCES.md) and the [existing expansion guide](../ANIMATION_EXPANSION_GUIDE.md#5-rigging-and-blender-implementation-considerations).
+
+Review original-speed gameplay plus diagnostic views. Compare one variable group with preserved [approved references](APPROVED_REFERENCES.md); inspect contact after the final composed pose. Source parity, appealing motion and production/device readiness are separate findings. Existing approvals do not automatically approve a new candidate.

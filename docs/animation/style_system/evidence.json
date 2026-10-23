@@ -1,0 +1,441 @@
+{
+  "schema_version": 1,
+  "pack": {
+    "path": "/Users/tin/Desktop/Game Dev/local_references/Actions Stuff 1.12 (resources).mcpack",
+    "sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+    "size": 33884235,
+    "manifest_version": "1.1.60"
+  },
+  "evidence": [
+    {
+      "id": "P01a",
+      "group": "P01",
+      "topic": "locomotion",
+      "member": "entity/dtr.json",
+      "pointer": "/minecraft:client_entity/description/scripts/animate",
+      "sha256": "e6f3db842fb0dd2b2d770a390e166f0ae95f93659c759c597b5091d5c3a25dd2",
+      "summary": "Player animate roots are alias-driven and context gated; resolve them against player aliases before tracing controllers."
+    },
+    {
+      "id": "P01b",
+      "group": "P01",
+      "topic": "timing",
+      "member": "entity/dtr.json",
+      "pointer": "/minecraft:client_entity/description/scripts/pre_animation/29",
+      "sha256": "e6f3db842fb0dd2b2d770a390e166f0ae95f93659c759c597b5091d5c3a25dd2",
+      "summary": "Persistent gait phase advances from filtered speed and lateral magnitude; jump overrides reseed it, while lifetime-driven layers retain a separate clock."
+    },
+    {
+      "id": "P02a",
+      "group": "P02",
+      "topic": "locomotion",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.lhbuwm/states/onccai",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Walk uses directional layer weights, enters Run above normalized speed .7 after .2 seconds, and has a .22-second outgoing blend."
+    },
+    {
+      "id": "P02b",
+      "group": "P02",
+      "topic": "turn",
+      "member": "entity/dtr.json",
+      "pointer": "/minecraft:client_entity/description/scripts/pre_animation/30",
+      "sha256": "e6f3db842fb0dd2b2d770a390e166f0ae95f93659c759c597b5091d5c3a25dd2",
+      "summary": "Local movement direction or remote position deltas are projected into head-relative forward/lateral components after the preceding timing program."
+    },
+    {
+      "id": "P03a",
+      "group": "P03",
+      "topic": "weight",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.fngydr/bones/waist/position/1",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "Forward Run waist height has unequal piecewise branches: local minimum -3.1 and maximum .8 source units."
+    },
+    {
+      "id": "P03b",
+      "group": "P03",
+      "topic": "locomotion",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.fpushb/bones/leftleg/position",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "The lateral Walk left-leg local-position endpoints differ by .078 source units; plain keys do not establish ideal loop continuity."
+    },
+    {
+      "id": "P04a",
+      "group": "P04",
+      "topic": "support",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.jvdljb/bones/ja89l7gglkl6h/position",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "Foot-effect helper X/Z are computed from leg TRS and a 12-unit length; Y is forced to 2.1 or 0 by context rather than per-foot floor contact."
+    },
+    {
+      "id": "P04b",
+      "group": "P04",
+      "topic": "support",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.ylzimv/states/default",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "A footstep flag is consumed/reset behind whole-player grounded and speed/context gates; this is an effect trigger, not a measured sole constraint."
+    },
+    {
+      "id": "P04c",
+      "group": "P04",
+      "topic": "support",
+      "member": "models/entity/464e86f4.json",
+      "pointer": "/minecraft:geometry/302/bones/2",
+      "sha256": "c86676d601ef97c9cf7fe711de33542cf5322cf5abab1b17f9501938a26e40e5",
+      "summary": "The right-foot effect helper carries locator hgqiud under independent parent 6d6e6flk; it is not a leg-child contact constraint."
+    },
+    {
+      "id": "P05a",
+      "group": "P05",
+      "topic": "jump",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.lfjeov",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Jump controller chooses sprint branches by gait phase, allows contextual interruptions, and writes .05/.55 gait phase overrides on branch exit."
+    },
+    {
+      "id": "P05b",
+      "group": "P05",
+      "topic": "jump",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.tjytvl/states/zhbjho",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Local Landing dispatches from actual grounded queries to moving or stationary recovery after airborne entry; optional heavy/roll variants are context gated."
+    },
+    {
+      "id": "P06a",
+      "group": "P06",
+      "topic": "jump",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.mykcsi/bones/rightleg/scale",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "Ordinary Jump includes explicit Catmull-Rom scale keys and a plain identity endpoint; source leg stretch reaches 1.25 and is not a unit-scale target-rig rule."
+    },
+    {
+      "id": "P06b",
+      "group": "P06",
+      "topic": "timing",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.yemteq/states/dvwvti/blend_transition",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "This .4-second outgoing blend is an authored weight table rather than the scalar durations used for ordinary ground gait changes."
+    },
+    {
+      "id": "P07a",
+      "group": "P07",
+      "topic": "turn",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.cndmcx/bones/head",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "Head look declares entity-relative rotation; zero numeric input is not sufficient evidence that parent-basis compensation is inactive."
+    },
+    {
+      "id": "P07b",
+      "group": "P07",
+      "topic": "turn",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.boabcq/bones/root",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "Root orientation derives from source heading/body variables; this is procedural compensation, not evidence of a dedicated player turn clip."
+    },
+    {
+      "id": "P07c",
+      "group": "P07",
+      "topic": "weapon",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.dpjhxl/bones/rightarm/rotation",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "Generic holding attenuates the previously accumulated arm pitch through this; it is not merely an added static shoulder pose."
+    },
+    {
+      "id": "C01a",
+      "group": "C01",
+      "topic": "combat",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.xunqct/states/default/animations",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Third-person default orders separate locomotion, item, attack and use layers; first-person controllers require their own reachability conditions."
+    },
+    {
+      "id": "C01b",
+      "group": "C01",
+      "topic": "combat",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.camimd/states/zefcct",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Sword combo state selects source attack layers, a .115-second outgoing blend, and a follow-up gate at state time at least .3 seconds."
+    },
+    {
+      "id": "C02a",
+      "group": "C02",
+      "topic": "combat",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.camimd/states/dxdudb.a",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Grounded axe attack uses its own repeat state and .375-second follow-up gate; airborne/offhand/riding variants are distinct."
+    },
+    {
+      "id": "C02b",
+      "group": "C02",
+      "topic": "combat",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.ufbmwj/anim_time_update",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "The grounded axe source clock speeds to 1.2 times while attack progress is active; source length is not an invariant real-time duration."
+    },
+    {
+      "id": "C03a",
+      "group": "C03",
+      "topic": "combat",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.camimd/states/azdvph",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Mace falling attack layers depend on airborne context and filtered fall response; this does not establish a custom hammer or radial-damage rule."
+    },
+    {
+      "id": "C03b",
+      "group": "C03",
+      "topic": "combat",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.camimd/states/qbiqbl",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Post-fall mace recovery applies its selected animation with weight 2; isolated raw clip channels are not the complete actor pose."
+    },
+    {
+      "id": "C04a",
+      "group": "C04",
+      "topic": "weapon",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.cqkhdi/states/default",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Spear jab entry reads early attack progress or cooldown ratio; this resource controller does not define hitbox activation or damage."
+    },
+    {
+      "id": "C04b",
+      "group": "C04",
+      "topic": "weapon",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.epthqa/anim_time_update",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "Spear jab clock uses movement/progress-dependent rates, so its two-second source length is not a fixed gameplay cooldown."
+    },
+    {
+      "id": "C05a",
+      "group": "C05",
+      "topic": "hurt",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.ismckx/states/nmagsu",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Player Hurt selects third-person skeletal hurt separately from first-person arms and allows retriggering after .49 seconds."
+    },
+    {
+      "id": "C05b",
+      "group": "C05",
+      "topic": "death",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.kpybsh/bones/root",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "Player death root compensation is authored procedural animation driven by death timing; it is not ragdoll simulation."
+    },
+    {
+      "id": "C06a",
+      "group": "C06",
+      "topic": "weapon",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.knoyhk/states/gjhnog",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Crossbow charging/use selects its own clips and release conditions, separate from generic holding and bow behavior."
+    },
+    {
+      "id": "C06b",
+      "group": "C06",
+      "topic": "weapon",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.knoyhk/states/dmyegi",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Bow draw/use layers and release dispatch are distinct from crossbow charge progression."
+    },
+    {
+      "id": "C06c",
+      "group": "C06",
+      "topic": "weapon",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.knoyhk/states/shield",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Third-person shield dispatch separates main/offhand blocking context; the resource poses do not establish a timed parry mechanic."
+    },
+    {
+      "id": "C07a",
+      "group": "C07",
+      "topic": "hurt",
+      "member": "render_controllers/hbh.json",
+      "pointer": "/render_controllers/controller.render.oreville_ans.bkmptz/is_hurt_color/r",
+      "sha256": "0396ecf3b6a42fbc1c79f359de2e7bc6073180435041c47f68bcd372b9976ce9",
+      "summary": "Mapped zombie hurt-color path sets a transient flag; color feedback alone is not a skeletal Hurt Action."
+    },
+    {
+      "id": "C07b",
+      "group": "C07",
+      "topic": "hurt",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.nwwoke",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "The traced armor Hurt response routes transient flags into sound-only states; this does not establish zombie skeletal Hurt or death physics."
+    },
+    {
+      "id": "C08a",
+      "group": "C08",
+      "topic": "hurt",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.xjrxen",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Breeze Hurt controller explicitly reacts to health changes and plays its entity-specific hurt alias; mob findings cannot be generalized across rigs."
+    },
+    {
+      "id": "C08b",
+      "group": "C08",
+      "topic": "death",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.vqzwtx/states/exhwcf",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Vindicator has an explicit entity-specific death animation path, unlike an inference from a generic hurt-color flash."
+    },
+    {
+      "id": "C09a",
+      "group": "C09",
+      "topic": "combat",
+      "member": "animations/f2da1071.json",
+      "pointer": "/animations/animation.oreville_ans.adutle/timeline/0.25",
+      "sha256": "cec40c0992cff0868cb78418ed8f9a6a40943adf883d2293360ff92bace49b24",
+      "summary": "A timed spear presentation marker selects swing-sound feedback; it does not define collision or a damage frame."
+    },
+    {
+      "id": "C09b",
+      "group": "C09",
+      "topic": "combat",
+      "member": "animation_controllers/616f2ff7.json",
+      "pointer": "/animation_controllers/controller.animation.oreville_ans.ybkmlx/states/default",
+      "sha256": "610041159dd4098734954115599b44778576fc4304a81f781e0e0a2646ce1f3f",
+      "summary": "Spear hit-sound feedback reads engine-reported kinetic-hit age in 0..5 ticks; this is evidence after a hit, not damage authority or an unverified spin/dash/parry rule."
+    }
+  ],
+  "routes": {
+    "overview": [
+      "docs/animation/style_system/README.md",
+      "docs/animation/style_system/MOTION_STYLE_BIBLE.md",
+      "docs/animation/style_system/APPROVED_REFERENCES.md"
+    ],
+    "locomotion": [
+      "docs/animation/style_system/MOTION_STYLE_BIBLE.md",
+      "docs/animation/style_system/TIMING_AND_SPACING.md",
+      "docs/animation/style_system/WEIGHT_AND_BODY_MECHANICS.md",
+      "docs/animation/style_system/TRANSITION_RULES.md"
+    ],
+    "walk": [
+      "docs/animation/style_system/TIMING_AND_SPACING.md",
+      "docs/animation/style_system/WEIGHT_AND_BODY_MECHANICS.md",
+      "docs/animation/style_system/SNAPPY_BOUNCY_PATTERNS.md"
+    ],
+    "run": [
+      "docs/animation/style_system/TIMING_AND_SPACING.md",
+      "docs/animation/style_system/WEIGHT_AND_BODY_MECHANICS.md",
+      "docs/animation/style_system/SNAPPY_BOUNCY_PATTERNS.md"
+    ],
+    "timing": [
+      "docs/animation/style_system/TIMING_AND_SPACING.md",
+      "docs/animation/style_system/SNAPPY_BOUNCY_PATTERNS.md",
+      "docs/animation/style_system/SOURCE_EVIDENCE.md"
+    ],
+    "spacing": [
+      "docs/animation/style_system/TIMING_AND_SPACING.md",
+      "docs/animation/style_system/SNAPPY_BOUNCY_PATTERNS.md"
+    ],
+    "weight": [
+      "docs/animation/style_system/WEIGHT_AND_BODY_MECHANICS.md",
+      "docs/animation/style_system/SNAPPY_BOUNCY_PATTERNS.md",
+      "docs/animation/style_system/APPROVED_REFERENCES.md"
+    ],
+    "support": [
+      "docs/animation/style_system/WEIGHT_AND_BODY_MECHANICS.md",
+      "docs/animation/style_system/RIG_CONSTRAINTS.md",
+      "docs/animation/style_system/GODOT_INTEGRATION.md"
+    ],
+    "turn": [
+      "docs/animation/style_system/MOTION_STYLE_BIBLE.md",
+      "docs/animation/style_system/TRANSITION_RULES.md",
+      "docs/animation/style_system/GODOT_INTEGRATION.md",
+      "docs/animation/style_system/GAPS_AND_DEMOS.md"
+    ],
+    "jump": [
+      "docs/animation/style_system/WEIGHT_AND_BODY_MECHANICS.md",
+      "docs/animation/style_system/TRANSITION_RULES.md",
+      "docs/animation/style_system/GODOT_INTEGRATION.md",
+      "docs/animation/style_system/SOURCE_EVIDENCE.md"
+    ],
+    "weapon": [
+      "docs/animation/style_system/WEAPON_HANDLING.md",
+      "docs/animation/style_system/COMBAT_ANIMATION_DESIGN.md",
+      "docs/animation/style_system/RIG_CONSTRAINTS.md",
+      "docs/animation/style_system/TRANSITION_RULES.md"
+    ],
+    "equipment": [
+      "docs/animation/style_system/WEAPON_HANDLING.md",
+      "docs/animation/style_system/RIG_CONSTRAINTS.md",
+      "docs/animation/style_system/TRANSITION_RULES.md"
+    ],
+    "combat": [
+      "docs/animation/style_system/COMBAT_ANIMATION_DESIGN.md",
+      "docs/animation/style_system/WEAPON_HANDLING.md",
+      "docs/animation/style_system/TRANSITION_RULES.md",
+      "docs/animation/style_system/GAPS_AND_DEMOS.md"
+    ],
+    "hurt": [
+      "docs/animation/style_system/COMBAT_ANIMATION_DESIGN.md",
+      "docs/animation/style_system/TRANSITION_RULES.md",
+      "docs/animation/style_system/SOURCE_EVIDENCE.md",
+      "docs/animation/style_system/GAPS_AND_DEMOS.md"
+    ],
+    "death": [
+      "docs/animation/style_system/COMBAT_ANIMATION_DESIGN.md",
+      "docs/animation/style_system/GODOT_INTEGRATION.md",
+      "docs/animation/style_system/SOURCE_EVIDENCE.md",
+      "docs/animation/style_system/GAPS_AND_DEMOS.md"
+    ],
+    "transitions": [
+      "docs/animation/style_system/TRANSITION_RULES.md",
+      "docs/animation/style_system/TIMING_AND_SPACING.md",
+      "docs/animation/style_system/GODOT_INTEGRATION.md"
+    ],
+    "rig": [
+      "docs/animation/style_system/RIG_CONSTRAINTS.md",
+      "docs/animation/style_system/MOTION_STYLE_BIBLE.md",
+      "docs/animation/style_system/APPROVED_REFERENCES.md"
+    ],
+    "godot": [
+      "docs/animation/style_system/GODOT_INTEGRATION.md",
+      "docs/animation/style_system/TRANSITION_RULES.md",
+      "docs/animation/style_system/AUTHORING_WORKFLOW.md"
+    ],
+    "approval": [
+      "docs/animation/style_system/APPROVED_REFERENCES.md",
+      "docs/animation/style_system/AUTHORING_WORKFLOW.md"
+    ],
+    "authoring": [
+      "docs/animation/style_system/AUTHORING_WORKFLOW.md",
+      "docs/animation/style_system/MOTION_STYLE_BIBLE.md",
+      "docs/animation/style_system/APPROVED_REFERENCES.md"
+    ],
+    "gaps": [
+      "docs/animation/style_system/GAPS_AND_DEMOS.md",
+      "docs/animation/style_system/SOURCE_EVIDENCE.md"
+    ],
+    "evidence": [
+      "docs/animation/style_system/SOURCE_EVIDENCE.md",
+      "docs/animation/style_system/README.md"
+    ]
+  }
+}
