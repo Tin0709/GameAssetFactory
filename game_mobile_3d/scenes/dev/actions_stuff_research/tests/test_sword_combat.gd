@@ -50,4 +50,4 @@ func run()->void:
 	scene._fire_key_held=false;scene._sync_rifle_controls()
 	scene.reset_player();check(driver.hits==0 and driver.stamina==100. and driver.effects.active_count()==0,"Reset clears combat and pooled effects");await ticks(3)
 	var result:={"failures":failures,"physics_hz":Engine.physics_ticks_per_second,"sword_hits":count,"pool_children":original_nodes}
-	print("SWORD_COMBAT_CHECKS ",JSON.stringify(result));scene.free();await ticks(2);quit(0 if failures.is_empty() else 1)
+	print("SWORD_COMBAT_CHECKS ",JSON.stringify(result));scene.queue_free();await ticks(3);quit(0 if failures.is_empty() else 1)
