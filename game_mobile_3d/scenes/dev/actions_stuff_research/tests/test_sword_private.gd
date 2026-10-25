@@ -50,5 +50,15 @@ func run()->void:
 	c.guard(true);await ticks(5);c.set_equipped(false)
 	await ticks(hz);check(absf(wrapf(v.rotation.y-PI*.5,-PI,PI))<.1,"Rifle faces movement after private Guard switch-back")
 	s.player.requested_direction=Vector2.ZERO
+	c.set_equipped(true);c.reset_combat();s.player.position=Vector3.ZERO;s.player.velocity=Vector3.ZERO;v.rotation.y=0.
+	var wall:=StaticBody3D.new();wall.collision_layer=1;wall.position=Vector3(0,1.5,.65)
+	var collision:=CollisionShape3D.new();var shape:=BoxShape3D.new();shape.size=Vector3(3,3,.15);collision.shape=shape;wall.add_child(collision);s.add_child(wall)
+	z.position=Vector3(0,0,1.05);z.current_hp=1000
+	await ticks(3);c.state.start_attack(0);await ticks(ceili(hz*1.5))
+	check(c.hits==0 and z.current_hp==1000,"Actual source blade cannot damage through terrain")
+	c.reset_combat();z.position=Vector3(40,0,40);s.player.position=Vector3.ZERO;s.player.velocity=Vector3.ZERO;s.player.requested_direction=Vector2.DOWN
+	await ticks(2);c.roll();await ticks(hz)
+	check(s.player.position.z<.4,"Directional source Roll capsule stops at terrain")
+	s.player.requested_direction=Vector2.ZERO
 	print("SWORD_PRIVATE ",JSON.stringify({"physics_hz":hz,"failures":failures,"attack_hits":accepted,"grip_error_m":max_grip,"source_clips":v.private_fiery_profile.clips.keys()}))
 	s.queue_free();await ticks(3);quit(0 if failures.is_empty() else 1)
