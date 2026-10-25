@@ -13,6 +13,17 @@ var sword_base_local:=Vector3.ZERO
 var sword_tip_local:=Vector3.ZERO
 var sword_upper:Array[int]=[]
 var sword_lower:Array[int]=[]
+var _sword_turn_lock:=false
+var _roll_gait_cursor:=NAN
+func _retime_locomotion_phase(step:float)->void:
+	if sword_equipped and melee!=null and melee.state.state==&"roll" and is_finite(_roll_gait_cursor):
+		var phase:float=_roll_gait_cursor;var phase01:=fposmod(phase,1.)
+		direction_snapshot.phase=phase;direction_snapshot.phase01=phase01;direction_snapshot.cadence=0.;direction_snapshot.run_weight=_gameplay_run_weight
+		direction_snapshot.vars["v.eqhdel"]=phase;direction_snapshot.vars["v.ifcvde"]=phase01
+		direction_controller.env["v.eqhdel"]=phase;direction_controller.env["v.ifcvde"]=phase01
+		_distance_phase=phase
+		return
+	super._retime_locomotion_phase(step)
 func _ready()->void:
 	super._ready()
 	sword_profile=JSON.parse_string(FileAccess.get_file_as_string("res://scenes/dev/actions_stuff_research/sword_combat_v001/profile.json"))
@@ -55,15 +66,25 @@ func _sample_set(ahead:float=0.)->Array:
 	poses[carrier_bone]=Transform3D(poses[arm_right])*sword_attachment
 	return poses
 func _advance_facing(target_yaw:float,delta:float)->void:
-	if sword_equipped and melee!=null and melee.state.state in [&"attack",&"guard",&"parry",&"roll"]:
-		rotation.y+=clampf(wrapf(melee.facing-rotation.y,-PI,PI),-16.*delta,16.*delta);return
+	if _sword_turn_lock:return # Combat heading already advanced once this tick.
 	super._advance_facing(target_yaw,delta)
 func drive_jump_motion(world_velocity:Vector3,requested:bool,physics:Dictionary,delta:float)->void:
 	if not sword_equipped:super.drive_jump_motion(world_velocity,requested,physics,delta);return
 	rifle_aim_requested=false;rifle_aim_weight=0.;combat_turn_requested=false;auto_aim_target=null
-	if melee!=null and melee.state.state in [&"attack",&"guard",&"parry",&"roll"]:
+	_sword_turn_lock=melee!=null and melee.state.state in [&"attack",&"guard",&"parry",&"roll"]
+	if _sword_turn_lock:
 		rotation.y+=clampf(wrapf(melee.facing-rotation.y,-PI,PI),-16.*delta,16.*delta)
-		stationary_turn.reset(rotation.y)
+		# Reuse the already-compiled runtime. reset() constructs/parses/prepares
+		# an entire source controller and must never run in a per-tick hot path.
+		stationary_turn.runtime.seed_heading(-rad_to_deg(rotation.y))
+		stationary_turn.look_yaw=rotation.y;stationary_turn.requested_yaw=rotation.y;stationary_turn.body_yaw=rotation.y
+		stationary_turn.gaze=0.;stationary_turn.weight=0.;stationary_turn.axis=0.;stationary_turn.active=false;stationary_turn.stepping=false
+	if melee!=null and melee.state.state==&"roll":
+		if not is_finite(_roll_gait_cursor):_roll_gait_cursor=float(direction_snapshot.phase)
+		# Physical contact has been established; Roll supersedes the old landing
+		# pose, without resetting either the shared gait or physical jump state.
+		jump_active=false
+	else:_roll_gait_cursor=NAN
 	var moving:=requested
 	# Physics travel during a lunge/roll is not a walking gait request.
 	if melee!=null and melee.state.state==&"roll":moving=false;settling=false

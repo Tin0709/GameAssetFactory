@@ -23,7 +23,7 @@ func run()->void:
 	var original_nodes:int=driver.effects.get_child_count()
 	driver.state.request_attack();await ticks(Engine.physics_ticks_per_second)
 	check(driver.hits==0 and driver.freeze_remaining==0.,"Whiff deals no damage and no hit-stop")
-	var z=zombies[0];z.position=Vector3(0,0,1.15);z.current_hp=1000
+	var z=zombies[0];z.position=scene.player.global_position+Vector3(0,0,1.05);z.current_hp=1000
 	driver.state.cancel();driver._seen_serial=-1;driver.state.request_attack()
 	await ticks(Engine.physics_ticks_per_second)
 	check(driver.hits==1 and z.current_hp==983,"Actual swept blade accepts exactly one hit per swing")

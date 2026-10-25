@@ -26,7 +26,7 @@ func parry_stagger()->void:
 	if is_dead:return
 	stagger_remaining=maxf(stagger_remaining,.7);poise=36.;poise_delay=1.2
 	pending_attack=-1.;attack_visual_remaining=0.;attack_cooldown=maxf(attack_cooldown,.8)
-	visual.hit_impulse((global_position-target.global_position).normalized())
+	visual.hit_impulse((global_position-target.global_position).normalized() if is_instance_valid(target) else -global_basis.z)
 func _physics_process(delta:float)->void:
 	if not is_dead and melee_freeze>0.:
 		melee_freeze=maxf(0.,melee_freeze-delta);return
