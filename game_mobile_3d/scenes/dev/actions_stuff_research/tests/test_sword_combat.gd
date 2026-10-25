@@ -8,7 +8,7 @@ func ticks(n:int)->void:
 	await process_frame
 func run()->void:
 	var scene=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate()
-	scene.grass_field_enabled=false;scene.md2_lighting_enabled=false
+	scene.grass_field_enabled=false;scene.md2_lighting_enabled=false;scene.sword_private_reference_enabled=false
 	root.add_child(scene);await ticks(6)
 	var driver=scene.get("sword_combat")
 	check(driver!=null,"Existing lab contains playable Sword controller")
@@ -48,6 +48,6 @@ func run()->void:
 	check(scene.player.visual.rifle_model.visible and not scene.player.visual.sword_model.visible,"Rifle is restored")
 	scene._fire_key_held=true;scene._sync_rifle_controls();check(scene.rifle_fire.trigger_held,"Approved E-fire available after switch")
 	scene._fire_key_held=false;scene._sync_rifle_controls()
-	scene.reset_player();check(driver.hits==0 and driver.stamina==100. and driver.effects.active_count()==0,"Reset clears combat and pooled effects")
+	scene.reset_player();check(driver.hits==0 and driver.stamina==100. and driver.effects.active_count()==0,"Reset clears combat and pooled effects");await ticks(3)
 	var result:={"failures":failures,"physics_hz":Engine.physics_ticks_per_second,"sword_hits":count,"pool_children":original_nodes}
 	print("SWORD_COMBAT_CHECKS ",JSON.stringify(result));scene.free();await ticks(2);quit(0 if failures.is_empty() else 1)

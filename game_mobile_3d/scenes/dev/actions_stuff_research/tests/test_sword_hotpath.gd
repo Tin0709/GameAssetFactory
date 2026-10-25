@@ -4,7 +4,7 @@ func _initialize()->void:call_deferred("run")
 func check(value:bool,label:String)->void:
 	if not value and not failures.has(label):failures.append(label);push_error(label)
 func run()->void:
-	var s=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();s.grass_field_enabled=false;s.md2_lighting_enabled=false;root.add_child(s);s.player.scripted_input=true
+	var s=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();s.grass_field_enabled=false;s.md2_lighting_enabled=false;s.sword_private_reference_enabled=false;root.add_child(s);s.player.scripted_input=true
 	for z in s.zombie_combat.zombies:z.target=null;z.move_speed=0.
 	for i in 8:await physics_frame
 	var c=s.sword_combat;c.set_equipped(true)

@@ -44,6 +44,10 @@ var sword_button:Button
 func setup(scene:Node3D,tuning:Resource)->void:
 	lab=scene;player=scene.player;visual=player.visual;encounter=scene.zombie_combat;config=tuning.duplicate()
 	state.buffer_seconds=config.buffer_seconds;state.parry_window=config.parry_window
+	if visual.using_private_fiery:
+		state.durations=PackedFloat32Array([1.2917,1.2917,1.2917]);state.roll_duration=.6667
+		state.chain_open=PackedFloat32Array([.88,.88,1.05]);state.chain_time=PackedFloat32Array([1.03,1.03,1.2917])
+		state.active_start=PackedFloat32Array([.35,.35,.35]);state.active_end=PackedFloat32Array([.48,.48,.48])
 	player.melee_controller=self;visual.melee=self
 	effects=Effects.new();effects.name="OriginalSwordEffects";add_child(effects);effects.quality=config.effects_quality;effects.intensity=config.effects_intensity;effects.setup()
 	_rays.collision_mask=1;_rays.exclude=[player.get_rid()]
@@ -208,7 +212,7 @@ func present(delta:float)->void:
 		var sword:Transform3D=lab.presentation.display_sword
 		effects.set_trail(sword*visual.sword_base_local,sword*visual.sword_tip_local,state.state==&"attack" and state.time>=state.active_start[state.attack_index]-.06 and state.time<=state.active_end[state.attack_index]+.08,state.attack_index==2)
 	else:effects.set_trail(Vector3.ZERO,Vector3.ZERO,false)
-	status.text=("SWORD · %s · Combo %d/3 · HP %d · Stamina %d · Hits %d · Parries %d"%[state.state.to_upper(),state.attack_index+1,vitality,roundi(stamina),hits,parries]) if equipped else "RIFLE · Infinite ammo · Hold E to aim/fire · Tab equips Sword"
+	status.text=(("FIERY PRIVATE · " if visual.using_private_fiery else "SWORD · ")+"%s · Combo %d/3 · HP %d · Stamina %d · Hits %d · Parries %d"%[state.state.to_upper(),state.attack_index+1,vitality,roundi(stamina),hits,parries]) if equipped else "RIFLE · Infinite ammo · Hold E to aim/fire · Tab equips Sword"
 	if knockout>0.:status.text="PRACTICE KNOCKDOWN · recovering…"
 func camera_offset()->Vector2:return Vector2(sin(camera_clock*113.),cos(camera_clock*89.))*camera_kick
 func reset_combat()->void:

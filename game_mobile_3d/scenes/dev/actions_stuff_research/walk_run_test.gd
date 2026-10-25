@@ -21,6 +21,7 @@ const SwordPresenter=preload("res://scenes/dev/actions_stuff_research/sword_comb
 const SwordController=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/controller.gd")
 const SwordGroup=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/combat_group.gd")
 @export var sword_combat_enabled:=false
+@export var sword_private_reference_enabled:=false
 @export var sword_config:Resource=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/settings.tres")
 var sword_combat:Node3D
 @export var performance_test_enabled:=false
@@ -69,6 +70,7 @@ func _ready() -> void:
 	player=PLAYER.instantiate();player.name="ResearchPlayer"
 	player.set_script(SwordActor if sword_combat_enabled and rifle_ready else SOURCE_ACTOR)
 	player.get_node("Visual").set_script((SwordVisual if sword_combat_enabled else RIFLE_VISUAL) if rifle_ready else SOURCE_VISUAL)
+	if sword_combat_enabled and rifle_ready:player.get_node("Visual").private_fiery_requested=sword_private_reference_enabled
 	player.get_node("Visual").authored_locomotion=true;player.get_node("Visual").generic_weapon_carry=true;player.get_node("Visual").long_gun_carry_v2=true;player.get_node("Visual").weapon_equipped=false
 	# Planar travel and rifle gait playback have independent, reversible tuning.
 	player.review_pace=1.;player.walk_speed=1.8*movement_speed_multiplier;player.run_speed=5.031*movement_speed_multiplier;player.acceleration=40.*movement_speed_multiplier;player.deceleration=35.*movement_speed_multiplier
