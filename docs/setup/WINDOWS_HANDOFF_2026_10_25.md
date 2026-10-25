@@ -73,7 +73,7 @@ py -3 scripts/open_blender_viewer.py weapon
 py -3 scripts/open_blender_viewer.py mobs
 ```
 
-Có thể bấm `Open_Combat_Lab.cmd` ở gốc repo sau khi Godot/Python đã được tìm thấy. Trong editor, mở `ActionsStuffWalkRunTest.tscn` rồi **F6**; F5 vẫn là WorldMap. Sword/Rifle ở dưới màn hình hoặc Tab đổi vũ khí; E/chuột trái chém, chuột phải guard/parry, F Roll, WASD/Shift/Space di chuyển. Khởi chạy user playtest dùng audio bình thường.
+Có thể chạy `.\Open_Combat_Lab.cmd` trong terminal đã đặt biến môi trường ở trên. Bấm đúp file này từ Explorer chỉ khi tool được tìm thấy trên PATH/vị trí tự nhận diện hoặc biến môi trường cấp user. Trong editor, mở `ActionsStuffWalkRunTest.tscn` rồi **F6**; F5 vẫn là WorldMap. Sword/Rifle ở dưới màn hình hoặc Tab đổi vũ khí; E/chuột trái chém, chuột phải guard/parry, F Roll, WASD/Shift/Space di chuyển. Khởi chạy user playtest dùng audio bình thường.
 
 Windows launcher giữ Mobile renderer với D3D12. Nếu GPU/driver không chạy được D3D12, thử override **cho process đó**:
 
