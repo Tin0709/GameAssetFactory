@@ -1,5 +1,6 @@
 """Register the existing viewer panels without auto-run, preferences or file saves."""
 import importlib
+import importlib.util
 from pathlib import Path
 import sys
 import bpy
@@ -26,6 +27,23 @@ def main():
             importlib.import_module(module_name)
     else:
         module = importlib.import_module(module_name)
+        # An older installed GAF addon can already occupy this module name.
+        # Use this viewer's repository UI, keeping saved selection/playback state.
+        expected = ROOT / folder / (module_name + '.py')
+        cached_path = getattr(module, '__file__', None)
+        if module_name == 'gaf_animation_library' and isinstance(cached_path, str) and Path(cached_path).resolve() != expected.resolve():
+            saved = [(scene, {name: getattr(scene, name) for name in ['gaf_active_index', 'gaf_loop', 'gaf_show_archived']})
+                     for scene in bpy.data.scenes if scene.get('gaf_animation_showcase')]
+            if hasattr(bpy.types, panel):
+                module.unregister()
+            spec = importlib.util.spec_from_file_location(module_name, expected)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
+            module.register()
+            for scene, values in saved:
+                for name, value in values.items():
+                    setattr(scene, name, value)
         if not hasattr(bpy.types, panel):
             module.register()
         # Hydrate only the registry already saved in this viewer. Refresh/import
