@@ -37,7 +37,7 @@ class ViewerUIContractTests(unittest.TestCase):
                 patch('importlib.import_module', return_value=old), \
                 patch('importlib.util.spec_from_file_location', return_value=spec), \
                 patch('importlib.util.module_from_spec', return_value=fresh):
-            runpy.run_path(str(BOOTSTRAP), run_name='__main__')
+            exec(compile(BOOTSTRAP.read_text(), str(BOOTSTRAP), 'exec'), {'__name__':'__main__','__file__':str(BOOTSTRAP)})
         old.unregister.assert_called_once()
         spec.loader.exec_module.assert_called_once_with(fresh)
         fresh.register.assert_called_once(); fresh.loaded.assert_called_once_with(None)
