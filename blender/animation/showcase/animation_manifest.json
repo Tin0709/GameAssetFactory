@@ -3670,7 +3670,7 @@
     }
   ],
   "library_focus": {
-    "label": "Actions & Stuff",
+    "label": "Actions & Stuff + Original Combat",
     "entries": [
       {
         "kind": "action",
@@ -3767,6 +3767,10 @@
       {
         "kind": "action",
         "id": "Rifle_Fire_Recoil_ActionsStyle_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Sword_Combo_Original_v001"
       }
     ]
   }
