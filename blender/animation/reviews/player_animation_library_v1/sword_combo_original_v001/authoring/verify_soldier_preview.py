@@ -5,7 +5,7 @@ R=Path(__file__).resolve().parents[6];OUT=Path(__file__).resolve().parent.parent
 sys.path.insert(0,str(R/'blender/characters/soldier/showcase'));sys.path.insert(0,str(R/'blender/animation/showcase'))
 import soldier_library_ui as ui
 import gaf_animation_library as animation
-baseline=json.loads((R/'.validation/sword_combo_original_v001_20261025/soldier_native_baseline.json').read_text())
+baseline=json.loads((R/'.validation/sword_combo_original_v001_20261025/soldier_live_baseline.json').read_text())
 for name,h in baseline['meshes'].items():
  m=bpy.data.meshes[name];value=hashlib.sha256(repr(([tuple(v.co) for v in m.vertices],[(tuple(p.vertices),p.material_index) for p in m.polygons],[[tuple(d.uv) for d in l.data] for l in m.uv_layers])).encode()).hexdigest();assert value==h,('original mesh changed',name)
 for name,h in baseline['actions'].items():
