@@ -19,7 +19,7 @@ atlas.name='Sword_Sand_Atlas_256';pixels=list(atlas.pixels[:]);rng=random.Random
 # Warm gold and restrained graphite pixels follow the sword reference. The
 # long blade needs quieter variation than the earlier pistol's high contrast.
 colors={0:(181,158,110),1:(207,181,130),2:(147,126,83),3:(226,199,147),
-        4:(49,49,55),5:(56,55,61),6:(41,41,47),7:(82,78,74),
+        4:(58,57,61),5:(65,63,68),6:(48,47,52),7:(82,78,74),
         12:(183,176,166),13:(212,203,187),14:(152,148,141),15:(34,34,36)}
 for tile,rgb in colors.items():
     shades=[[1.0]*64 for _ in range(64)]
@@ -32,9 +32,7 @@ for tile,rgb in colors.items():
         for x in range(64):
             i=(((tile//4)*64+y)*256+(tile%4)*64+x)*4
             values=[min(1,v/255*shades[y][x]) for v in rgb]
-            # File-image pixels save as encoded values in this native pipeline;
-            # graphite uses direct sRGB values so it stays readable on metal.
-            pixels[i:i+4]=(values if 4<=tile<8 else [v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4 for v in values])+[1]
+            pixels[i:i+4]=[v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4 for v in values]+[1]
 atlas.pixels.foreach_set(pixels);atlas.filepath_raw=str(OUT/'sword_sand_atlas_256.png')
 atlas.file_format='PNG';atlas.save();atlas.pack()
 mat=bpy.data.materials.new('Sword_Hilt_Gold_Graphite');mat.use_nodes=True
@@ -276,7 +274,7 @@ world=bpy.data.worlds.new('Sword Graphite Studio');world.use_nodes=True
 world.node_tree.nodes['Background'].inputs[0].default_value=(.028,.033,.044,1)
 world.node_tree.nodes['Background'].inputs[1].default_value=.35;s.world=world
 fm=bpy.data.materials.new('Sword Review Floor');fm.use_nodes=True
-fm.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value=(.003,.004,.006,1)
+fm.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value=(.0004,.0005,.0007,1)
 fm.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value=.88
 bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,min(p.z for p in points)-.002))
 floor=bpy.context.object
@@ -287,7 +285,7 @@ for name,loc,power,size,color in [
     ('Sword Key',(1.4,-.8,2.2),340,2.0,(1,.91,.79)),
     ('Sword Fill',(1.3,1.9,.8),150,1.6,(.76,.85,1)),
     ('Sword Rim',(-1.4,-.4,1.8),430,1.7,(1,.86,.69)),
-    ('Sword Lower Fill',(.8,.4,-.10),45,1.5,(.88,.91,1))]:
+    ('Sword Lower Fill',(.8,.4,-.10),30,1.0,(.88,.91,1))]:
     data=bpy.data.lights.new(name,'AREA');data.energy=power;data.size=size;data.color=color
     ob=bpy.data.objects.new(name,data);studio.objects.link(ob);ob.location=loc
     ob.rotation_euler=(focus-ob.location).to_track_quat('-Z','Y').to_euler()
