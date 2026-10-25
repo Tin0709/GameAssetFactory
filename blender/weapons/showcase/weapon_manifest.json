@@ -146,7 +146,9 @@
       "status_note": "New registration; awaiting explicit visual approval.",
       "preview_modes": [
         "STANDALONE"
-      ]
+      ],
+      "collection": "WEAPON_sword_sand_block_v1",
+      "root": "sword_sand_block_v1__Sword_Sand_Block_V1"
     }
   ],
   "preferred_rifle": "rifle_stylized_v2",
