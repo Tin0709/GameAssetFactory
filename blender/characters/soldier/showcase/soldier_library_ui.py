@@ -31,7 +31,7 @@ def label(entry):
 
 def show_camera(context,entry,direction):
     target=bpy.data.scenes[review_scene(entry)]
-    prefix='BPK_' if entry['id']=='SOLDIER_Backpack_v001' else ''
+    prefix=entry.get('camera_prefix','BPK_' if entry['id']=='SOLDIER_Backpack_v001' else '')
     camera=bpy.data.objects.get(prefix+direction)
     if camera is None:raise ValueError('Review camera is unavailable')
     target.camera=camera
@@ -58,6 +58,7 @@ class SOLDIER_OT_select_asset(bpy.types.Operator):
             return bpy.ops.soldier_hair.compare(variant='BANDANA' if entry['type']=='headwear' else 'HAIR')
         if entry.get('type')=='facial':
             return bpy.ops.soldier_face.open()
+        if context.screen.is_animation_playing:bpy.ops.screen.animation_cancel(restore_frame=False)
         target=bpy.data.scenes[review_scene(entry)]
         context.window.scene=target
         context.window.view_layer=target.view_layers.get(entry.get('view_layer',''),target.view_layers[0])
@@ -67,6 +68,8 @@ class SOLDIER_OT_select_asset(bpy.types.Operator):
         selected=bpy.data.objects.get(entry.get('object',entry.get('body','')))
         if selected is not None:
             selected.select_set(True);context.view_layer.objects.active=selected
+        if entry.get('type')=='animation':
+            target.frame_start,target.frame_end=entry['frames'];target.render.fps=entry['fps'];target.frame_set(entry['frames'][0])
         show_camera(context,entry,'Front_3Q')
         return {'FINISHED'}
 
@@ -80,6 +83,19 @@ class SOLDIER_OT_view(bpy.types.Operator):
         show_camera(context,entry,self.direction)
         return {'FINISHED'}
 
+class SOLDIER_OT_animation_control(bpy.types.Operator):
+    bl_idname='soldier_library.animation_control'
+    bl_label='Sword Combo Playback'
+    mode:EnumProperty(items=[('PLAY','Play / Pause',''),('RESTART','Restart',''),('HIT1','Hit 1',''),('HIT2','Hit 2',''),('HIT3','Hit 3','')])
+    def execute(self,context):
+        entry=active_entry(context)
+        if entry is None or entry.get('type')!='animation':return {'CANCELLED'}
+        if self.mode=='PLAY':bpy.ops.screen.animation_play();return {'FINISHED'}
+        if context.screen.is_animation_playing:bpy.ops.screen.animation_cancel(restore_frame=False)
+        frame=entry['frames'][0] if self.mode=='RESTART' else entry['contacts'][int(self.mode[-1])-1]
+        context.scene.frame_set(frame)
+        return {'FINISHED'}
+
 class SOLDIER_PT_library(bpy.types.Panel):
     bl_label='SOLDIER — Asset Library'
     bl_idname='SOLDIER_PT_library'
@@ -91,8 +107,8 @@ class SOLDIER_PT_library(bpy.types.Panel):
         return bool(registry().get('entries')) and active_entry(context) is not None
     def draw(self,context):
         layout=self.layout;entries=registry()['entries'];current=active_entry(context)
-        for title,equipment in [('CHARACTER',False),('EQUIPMENT',True)]:
-            group=[e for e in entries if e.get('type') not in ['facial','hair','headwear'] and (e.get('type')=='equipment')==equipment]
+        for title,kind in [('CHARACTER','character'),('EQUIPMENT','equipment'),('ANIMATIONS','animation')]:
+            group=[e for e in entries if e.get('type','character')==kind]
             if not group:continue
             box=layout.box();box.label(text=title,icon='OUTLINER_COLLECTION')
             for entry in group:
@@ -108,6 +124,14 @@ class SOLDIER_PT_library(bpy.types.Panel):
         box=layout.box();box.label(text=label(current),icon='CHECKMARK' if current.get('status')=='Approved' else 'TIME')
         box.label(text='Status: '+current.get('status','Pending'))
         if current.get('type')=='equipment':box.label(text='Standalone — not attached',icon='INFO')
+        if current.get('type')=='animation':
+            box.label(text='3 hits · Original choreography · 30 FPS')
+            row=box.row(align=True)
+            row.operator('soldier_library.animation_control',text='Play / Pause',icon='PLAY').mode='PLAY'
+            row.operator('soldier_library.animation_control',text='Restart',icon='REW').mode='RESTART'
+            row=box.row(align=True)
+            for i in range(1,4):row.operator('soldier_library.animation_control',text='Hit '+str(i)).mode='HIT'+str(i)
+            box.prop(context.scene,'frame_current',text='Frame')
         layout.label(text='REVIEW VIEWS')
         for choices in [[('Front','Front'),('3/4','Front_3Q'),('Side','Left_Side')],[('Back','Back'),('Back 3/4','Back_3Q'),('Other side','Right_Side')]]:
             row=layout.row(align=True)
@@ -143,7 +167,7 @@ def loaded(_):
     if not bpy.app.background and not bpy.app.timers.is_registered(focus_sidebar):
         bpy.app.timers.register(focus_sidebar,first_interval=.25)
 
-CLASSES=[SOLDIER_OT_select_asset,SOLDIER_OT_view,SOLDIER_PT_library]
+CLASSES=[SOLDIER_OT_select_asset,SOLDIER_OT_view,SOLDIER_OT_animation_control,SOLDIER_PT_library]
 def register():
     if hasattr(bpy.types,'SOLDIER_PT_library'):return
     for cls in CLASSES:bpy.utils.register_class(cls)
