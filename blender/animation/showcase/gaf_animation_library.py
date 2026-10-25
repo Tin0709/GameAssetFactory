@@ -8,7 +8,12 @@ from bpy.props import StringProperty,IntProperty,BoolProperty,CollectionProperty
 
 SCENE_TAG='gaf_animation_showcase';RIG='Showcase_Player_Rig';BASELINE='GAF_Neutral_Pose.json'
 REVIEW_TAG='gaf_review_sequence_id';REVIEW_ENTRY='gaf_review_entry_json'
-PREVIEW_PROPS={'rifle_stylized_v2':('GAF_Rifle_V2_Preview','GAF_Rifle_V2_Attachment','WeaponCarrier')}
+PREVIEW_PROPS={
+    'rifle_stylized_v2':('GAF_Rifle_V2_Preview','GAF_Rifle_V2_Attachment','WeaponCarrier'),
+    'sword_sand_block_v1':('GAF_Sword_Sand_Block_V1_Preview','GAF_Sword_Sand_Block_V1_Attachment','WeaponCarrier'),
+}
+PREVIEW_PROP_ROOTS={'rifle_stylized_v2':'Rifle_Stylized_V2','sword_sand_block_v1':'Sword_Sand_Block_V1'}
+PREVIEW_PROP_LABELS={'rifle_stylized_v2':'Rifle Stylized V2 attached','sword_sand_block_v1':'Sword Sand Block V1 attached'}
 _switching=False
 
 def curves(action):
@@ -364,7 +369,7 @@ def refresh(scene,import_missing=True):
                         dst.collections=['WEAPON_EXPORT']
                     c=dst.collections[0];c.name=collection;new_props.append(c)
                     scene.collection.children.link(c)
-                    o=next(x for x in c.all_objects if x.name=='Rifle_Stylized_V2');o.name=name
+                    o=next(x for x in c.all_objects if x.name==PREVIEW_PROP_ROOTS[key]);o.name=name
                     if any(x.type=='ARMATURE' for x in c.all_objects):raise ValueError('Preview prop must not contain a rig')
                     o.parent=rig;o.parent_type='BONE';o.parent_bone=bone
                     o.matrix_parent_inverse=Matrix.Translation((0,-rig.data.bones[bone].length,0));o.matrix_basis=Matrix.Identity(4)
@@ -504,7 +509,7 @@ class GAF_PT_animation_library(bpy.types.Panel):
             item=s.gaf_clips[s.gaf_active_index];e=json.loads(item.entry_json)
             box=layout.box();box.label(text=item.action);box.label(text=f"F{e['start']}–{e['end']}  |  {e['fps']/e['fps_base']:g} FPS  |  {item.status.upper()}")
             box.label(text='Seamless cycle' if e.get('seamless_loop') else 'One-shot; replay resets to start',icon='INFO')
-            if e.get('preview_prop'):box.label(text='Rifle Stylized V2 attached',icon='OUTLINER_OB_MESH')
+            if e.get('preview_prop'):box.label(text=PREVIEW_PROP_LABELS[e['preview_prop']],icon='OUTLINER_OB_MESH')
         row=layout.row(align=True);row.operator('gaf.play_pause',text='Pause' if context.screen.is_animation_playing else 'Play',icon='PAUSE' if context.screen.is_animation_playing else 'PLAY');row.operator('gaf.restart',text='Restart',icon='REW')
         if s.gaf_clips and json.loads(s.gaf_clips[s.gaf_active_index].entry_json).get('research_only'):
             layout.label(text='SOURCE RESEARCH ONLY — DO NOT SHIP',icon='INFO')
