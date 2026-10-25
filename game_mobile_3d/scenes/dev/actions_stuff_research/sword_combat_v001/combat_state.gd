@@ -15,6 +15,8 @@ var parry_ready_at:=0.
 var parry_armed:=false
 var roll_ready_at:=0.
 var hurt_duration:=.4
+var roll_duration:=.72
+var chain_time:=PackedFloat32Array([.60,.50,.90])
 var durations:=PackedFloat32Array([.60,.50,.90])
 var active_start:=PackedFloat32Array([.265,.165,.265])
 var active_end:=PackedFloat32Array([.36,.28,.39])
@@ -25,7 +27,7 @@ func start_attack(index:int)->void:
 	attack_index=index;buffered_until=-1.;enter(&"attack")
 func request_attack()->bool:
 	if state==&"ready" or state==&"guard":
-		guard_held=false;start_attack(0);return true
+		start_attack(0);return true
 	if state==&"attack":buffered_until=clock+buffer_seconds;return true
 	return false
 func request_guard(held:bool)->void:
@@ -57,9 +59,9 @@ func tick(delta:float,rate:float,paused:bool=false)->void:
 	clock+=delta;previous_time=time
 	if paused:return
 	time+=delta*(rate if state==&"attack" else 1.)
-	if state==&"attack" and time+.000001>=durations[attack_index]:
-		if attack_index<2 and has_buffer():start_attack(attack_index+1)
-		else:enter(&"guard" if guard_held else &"ready")
-	elif state==&"roll" and time>=.72:enter(&"guard" if guard_held else &"ready")
+	if state==&"attack":
+		if attack_index<2 and has_buffer() and time+.000001>=chain_time[attack_index]:start_attack(attack_index+1)
+		elif time+.000001>=durations[attack_index]:enter(&"guard" if guard_held else &"ready")
+	elif state==&"roll" and time>=roll_duration:enter(&"guard" if guard_held else &"ready")
 	elif state==&"parry" and time>=.32:enter(&"guard" if guard_held else &"ready")
 	elif state==&"hurt" and time>=hurt_duration:enter(&"guard" if guard_held else &"ready")

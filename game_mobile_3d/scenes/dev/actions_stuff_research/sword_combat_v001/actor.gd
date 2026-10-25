@@ -21,6 +21,7 @@ func _physics_process(delta:float)->void:
 	_scripted_jump_held=requested_jump if scripted_input else false
 	var was_grounded:=is_on_floor() and velocity.y<=0.
 	var takeoff:=was_grounded and jump_pressed
+	if takeoff and melee_controller.state.state==&"attack":melee_controller.state.cancel()
 	var vertical:float=-.2 if was_grounded else velocity.y-gravity*step
 	if takeoff:vertical=sqrt(2.*gravity*research_jump_height)
 	velocity=Vector3(planar.x,vertical,planar.y)

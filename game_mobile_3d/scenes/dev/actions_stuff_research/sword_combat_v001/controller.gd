@@ -29,6 +29,7 @@ var roll_direction:=Vector3.FORWARD
 var _seen_serial:=-1
 var _hit_ids:Dictionary={}
 var _swing_hit:=false
+var _last_state:StringName=&"ready"
 var _feedback_given:=false
 var _last_base:=Vector3.ZERO
 var _last_tip:=Vector3.ZERO
@@ -110,8 +111,9 @@ func before_motion(delta:float)->float:
 		if state.state==&"ready" or (state.state==&"attack" and state.time>=state.chain_open[state.attack_index]-.05):state.request_attack()
 	state.tick(delta,config.attack_speed,paused)
 	if state.serial!=_seen_serial:
-		if _seen_serial>=0 and _swing_hit==false and swings>0 and not _hit_ids.is_empty():whiffs+=1
+		if _seen_serial>=0 and not _swing_hit and _last_state==&"attack":whiffs+=1
 		_seen_serial=state.serial;visual.pose_dirty=true;visual.transition_age=0.;_blade_initialized=false
+		_last_state=state.state
 		if state.state==&"attack":
 			_pick_facing();_hit_ids.clear();_swing_hit=false;_feedback_given=false;swings+=1;effects.swing(state.attack_index)
 		elif state.state==&"guard":_pick_facing()
@@ -131,7 +133,11 @@ func motion_velocity(desired:Vector2)->Vector2:
 		var drive:=sin(PI*clampf((state.time-.10)/.30,0.,1.))*(1.2 if state.attack_index<2 else 1.65)
 		return desired*.35+Vector2(sin(facing),cos(facing))*drive
 	return desired
-func locks_jump()->bool:return equipped and state.state in [&"attack",&"roll",&"hurt",&"parry"]
+func locks_jump()->bool:
+	if not equipped:return false
+	if knockout>0.:return true
+	if state.state==&"attack":return state.time<state.chain_open[state.attack_index]
+	return state.state in [&"roll",&"hurt",&"parry"]
 static func segment_distance_squared(a:Vector3,b:Vector3,c:Vector3,d:Vector3)->float:
 	var u:=b-a;var v:=d-c;var w:=a-c
 	var aa:=u.dot(u);var bb:=u.dot(v);var cc:=v.dot(v);var dd:=u.dot(w);var ee:=v.dot(w)
