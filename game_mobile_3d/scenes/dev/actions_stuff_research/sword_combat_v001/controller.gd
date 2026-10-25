@@ -119,7 +119,7 @@ func motion_velocity(desired:Vector2)->Vector2:
 	if not equipped:return desired
 	if knockout>0. or state.state==&"hurt":return Vector2.ZERO
 	if state.state==&"roll":
-		var envelope:=smoothstep(.72,.38,state.time) if state.time>.38 else 1.
+		var envelope:=1.-smoothstep(.38,.72,state.time) if state.time>.38 else 1.
 		return Vector2(roll_direction.x,roll_direction.z)*config.roll_speed*envelope
 	if state.state==&"guard" or state.state==&"parry":return desired*.42
 	if state.state==&"attack":
@@ -165,7 +165,7 @@ func _sweep(a:Vector3,b:Vector3,c:Vector3,d:Vector3)->void:
 		_rays.from=player.global_position+Vector3(0,1.0,0);_rays.to=z.global_position+Vector3(0,1.0,0)
 		if not player.get_world_3d().direct_space_state.intersect_ray(_rays).is_empty():continue
 		var direction:=z.global_position-player.global_position;direction.y=0.;direction=direction.normalized()
-		var breaking:=z.get("poise")!=null and z.poise<=config.poise_damage[state.attack_index]
+		var breaking:bool=z.get("poise")!=null and z.poise<=config.poise_damage[state.attack_index]
 		var accepted:bool=z.apply_melee_hit(config.damage[state.attack_index],direction,config.poise_damage[state.attack_index],2.8 if state.attack_index==2 else 1.8,config.hit_stop) if z.has_method("apply_melee_hit") else z.take_damage(config.damage[state.attack_index],direction)
 		if not accepted:continue
 		_hit_ids[z.get_instance_id()]=true;hits+=1;_swing_hit=true
