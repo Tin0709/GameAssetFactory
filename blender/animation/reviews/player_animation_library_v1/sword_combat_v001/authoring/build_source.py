@@ -81,6 +81,16 @@ def custom(kind,t,duration):
   bpy.context.view_layer.update()
   deps=bpy.context.evaluated_depsgraph_get();ev=mesh.evaluated_get(deps);geo=ev.to_mesh();lowest=min(v.co.z for v in geo.vertices);ev.to_mesh_clear()
   root.location.y+=.0006-lowest;bpy.context.view_layer.update()
+  # A one-handed sword is carried above the rotating body. Counter-rotate the
+  # existing full rigid arm, keeping the blade along world X throughout tuck.
+  # This is authored shoulder motion, never a detached prop or helper bend.
+  right=rig.pose.bones['UpperArm.R'];current=right.matrix.to_quaternion()
+  safe,_=arm_frame(Vector((0,-.40,.9165)),Vector((-1,0,0)))
+  q=current.slerp(safe.to_quaternion(),tuck)
+  rm=q.to_matrix().to_4x4();rm.translation=right.head;right.matrix=rm
+  bpy.context.view_layer.update();fixed_grip()
+  ev=mesh.evaluated_get(bpy.context.evaluated_depsgraph_get());geo=ev.to_mesh();lowest=min(v.co.z for v in geo.vertices);ev.to_mesh_clear()
+  root.location.y+=.0006-lowest;bpy.context.view_layer.update()
  fixed_grip()
  return snapshot()
 CLIPS={'Ready':(.8,True,None),'Attack1':(.6,False,(1,19)),'Attack2':(.5,False,(19,34)),'Attack3':(.9,False,(34,61)),'Guard':(.8,True,None),'Parry':(.32,False,None),'Roll':(.72,False,None),'Hurt':(.4,False,None)}
