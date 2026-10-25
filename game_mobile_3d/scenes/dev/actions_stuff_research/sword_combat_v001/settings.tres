@@ -1,0 +1,4 @@
+[gd_resource type="Resource" script_class="" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scenes/dev/actions_stuff_research/sword_combat_v001/config.gd" id="config"]
+[resource]
+script = ExtResource("config")

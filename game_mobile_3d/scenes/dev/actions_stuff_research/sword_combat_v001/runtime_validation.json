@@ -1,0 +1,18 @@
+{
+	"checks": 6227,
+	"failures": 0,
+	"fps_checks": [
+		30,
+		60
+	],
+	"maximum_carrier_fixed_grip_error": 0.00000107639618818212,
+	"maximum_local_prs_matrix_error": 0.000000350414978811386,
+	"maximum_sword_tip_world_error_m": 0.000000574806392705796,
+	"native_fixtures": 40,
+	"passed": true,
+	"roll_rotation_distance_rad": {
+		"30": 6.28297652502079,
+		"60": 6.28292511601467
+	},
+	"sampler": "existing source_clip_sampler.gd -> animation_pose_sampler.gd"
+}
