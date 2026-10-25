@@ -20,7 +20,7 @@ func run()->void:
 	driver.set_equipped(true);await ticks(8)
 	check(scene.player.visual.sword_model.visible and not scene.player.visual.rifle_model.visible,"New Blender Sword equips and Rifle hides")
 	check(scene.player.visual.sword_profile.sword_asset.contains("Sword_Sand_Block_V1"),"Uses requested new sword asset")
-	var original_nodes:=driver.effects.get_child_count()
+	var original_nodes:int=driver.effects.get_child_count()
 	driver.state.request_attack();await ticks(Engine.physics_ticks_per_second)
 	check(driver.hits==0 and driver.freeze_remaining==0.,"Whiff deals no damage and no hit-stop")
 	var z=zombies[0];z.position=Vector3(0,0,1.15);z.current_hp=1000
