@@ -1,0 +1,61 @@
+{
+  "status": "Pending",
+  "meshes": 2,
+  "materials": 2,
+  "atlas_size": [
+    256,
+    256
+  ],
+  "forward": "+Y",
+  "reference": "reference.png",
+  "markers": {
+    "RightHandGrip": [
+      0,
+      0,
+      0
+    ],
+    "Grip_Point": [
+      0,
+      0,
+      0
+    ],
+    "HolsterAttach": [
+      0,
+      0,
+      0
+    ],
+    "BladeBase": [
+      0,
+      0.1596,
+      0.0
+    ],
+    "BladeTip": [
+      0,
+      0.9629199999999999,
+      0.0
+    ],
+    "GuardCenter": [
+      0,
+      0.1235,
+      0.0
+    ]
+  },
+  "topology": {
+    "Sword_Hilt": {
+      "triangles": 1392,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    },
+    "Sword_Blade": {
+      "triangles": 1332,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0
+    }
+  },
+  "dimensions_m": [
+    0.08940000087022781,
+    1.1073200106620789,
+    0.25706999003887177
+  ],
+  "triangles": 2724
+}
