@@ -1,9 +1,11 @@
 """Append8 Pending originals; guarded backup, refresh existing Showcase, preserve signatures."""
-import bpy,sys,json,hashlib,shutil
+import bpy,sys,json,hashlib,shutil,importlib.util
 from pathlib import Path
 from datetime import datetime,timezone
 R=next(p for p in Path(__file__).resolve().parents if (p/'AGENTS.md').exists());OUT=Path(__file__).resolve().parent.parent
-sys.path.insert(0,str(R/'blender/animation/showcase'));import gaf_animation_library as ui
+cached=sys.modules.get('gaf_animation_library')
+if cached and hasattr(cached,'unregister') and hasattr(bpy.types.Scene,'gaf_clips'):cached.unregister()
+spec=importlib.util.spec_from_file_location('gaf_animation_library',R/'blender/animation/showcase/gaf_animation_library.py');ui=importlib.util.module_from_spec(spec);sys.modules[spec.name]=ui;spec.loader.exec_module(ui);ui.register()
 P=R/'blender/animation/showcase/animation_manifest.json';V=P.parent/'Animation_Showcase.blend';D=json.loads((OUT/'design.json').read_text())
 assert json.loads((OUT/'geometry_validation.json').read_text())['passed']
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
