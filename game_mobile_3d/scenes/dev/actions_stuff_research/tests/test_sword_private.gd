@@ -22,7 +22,8 @@ func run()->void:
 	check(v.using_private_fiery,"Requested actual Fiery source library loaded outside res://")
 	if not v.using_private_fiery:s.free();quit(1);return
 	for key in ["Attack1","Attack2","Attack3","Roll","Ready","Guard"]:
-		check(v.sword_clips[key].clip.resource_path.begins_with("/Users/") and v._dynamic_clips.has(key),"External source clip and item channel: "+key)
+		var source_path:String=v.sword_clips[key].clip.resource_path
+		check(source_path.is_absolute_path() and not source_path.begins_with(ProjectSettings.globalize_path("res://")) and v._dynamic_clips.has(key),"External source clip and item channel: "+key)
 	c.set_equipped(true)
 	var z=s.zombie_combat.zombies[0]
 	var accepted:Array[int]=[]

@@ -102,6 +102,6 @@ func run() -> void:
 	check(max_basis < .000004,"JumpRetarget inherited root/leg scale and head basis " + str(max_basis))
 	var report := {"failures":failures,"samples":samples,"states":seen_states.keys(),"phase_overrides":seen_overrides.keys(),"clip_samples":fixtures.clips.size(),"max_variable":max_variable,"max_clock":max_clock,"max_channel":max_channel,"max_position":max_position,"max_basis":max_basis}
 	print("JUMP_SOURCE_TEST ",JSON.stringify(report))
-	FileAccess.open("/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_jump_gameplay_v001/source_parity.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
+	FileAccess.open("user://jump_source_parity.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	actor.queue_free()
 	quit(0 if failures.is_empty() else 1)

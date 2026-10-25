@@ -22,6 +22,7 @@ VIEWERS = {
     'soldier': 'blender/characters/soldier/showcase/SOLDIER_Asset_Library.blend',
 }
 SCENES = {
+    'combat': 'res://scenes/dev/ActionsStuffWalkRunTest.tscn',
     'snappy': 'res://scenes/dev/SnappyLocomotionFastJumpTest.tscn',
     'expressive': 'res://scenes/dev/ExpressiveLocomotionTest.tscn',
     'grassland': 'res://scenes/Grassland.tscn',
@@ -59,10 +60,20 @@ def find_tool(name: str, explicit: str | None = None) -> Path:
     raise FileNotFoundError(f'Set {name.upper()}_BIN to the executable, or put {name} on PATH.')
 
 
-def godot_command(tool: Path, scene: str | None, editor: bool, headless: bool) -> list[str]:
+def godot_command(tool: Path, scene: str | None, editor: bool, headless: bool,
+                  *, weapon: str | None = None, driver: str | None = None) -> list[str]:
+    if weapon is not None and weapon not in {'rifle','sword'}:
+        raise ValueError('Weapon must be rifle or sword.')
+    if weapon is not None and editor:
+        raise ValueError('--weapon selects a running combat lab, not editor startup.')
+    if driver is not None and driver not in {'d3d12','vulkan','metal'}:
+        raise ValueError('Unsupported GPU driver override.')
+    if weapon is not None and scene is None:
+        scene='combat'
     command = [str(tool), '--path', str(ROOT / 'game_mobile_3d'), '--rendering-method', 'mobile']
-    if platform.system() == 'Windows' and not headless:
-        command += ['--rendering-driver', 'd3d12']
+    selected_driver=driver or ('d3d12' if platform.system() == 'Windows' else None)
+    if selected_driver and not headless:
+        command += ['--rendering-driver', selected_driver]
     if headless:
         command.append('--headless')
     if editor:
@@ -73,7 +84,11 @@ def godot_command(tool: Path, scene: str | None, editor: bool, headless: bool) -
             raise ValueError('Scene must be a known alias or repository res:// path.')
         if not (ROOT / 'game_mobile_3d' / resource[6:]).is_file():
             raise FileNotFoundError(resource)
+        if weapon is not None and resource != SCENES['combat']:
+            raise ValueError('--weapon is only supported by the combat lab.')
         command.append(resource)
+    if weapon=='sword':
+        command += ['--','--sword']
     return command
 
 
@@ -204,6 +219,8 @@ def main(argv=None) -> int:
     game = sub.add_parser('godot')
     game.add_argument('--godot-bin'); game.add_argument('--scene', choices=None)
     game.add_argument('--editor', action='store_true'); game.add_argument('--headless', action='store_true')
+    game.add_argument('--weapon',choices=['rifle','sword'],help='Start the existing combat lab with this weapon')
+    game.add_argument('--driver',choices=['d3d12','vulkan','metal'],help='Process-only GPU override; project settings stay unchanged')
     game.add_argument('--dry-run', action='store_true')
     for mode in ['blender', 'bridge']:
         item = sub.add_parser(mode)
@@ -221,7 +238,7 @@ def main(argv=None) -> int:
                 except FileNotFoundError as error: result[name] = str(error)
             print(json.dumps(result, indent=2)); return 0
         if args.mode == 'godot':
-            command = godot_command(find_tool('godot', args.godot_bin), args.scene, args.editor, args.headless)
+            command = godot_command(find_tool('godot', args.godot_bin), args.scene, args.editor, args.headless,weapon=args.weapon,driver=args.driver)
         else:
             viewer = args.viewer or args.showcase or 'animation'
             command = blender_command(find_tool('blender', args.blender_bin), viewer)

@@ -132,6 +132,6 @@ func run() -> void:
 	check(max_native < .000004,"Inactive overlay native baseline parity " + str(max_native))
 	var report := {"failures":failures,"samples":samples,"poses":poses,"rendered30":rendered30,"rendered60":rendered60,"clip_samples":fixtures.clips.size(),"states":seen.keys(),"max_clock":max_clock,"max_channel":max_channel,"max_native":max_native,"max_active_native":max_active_native}
 	print("IDLE_SOURCE_TEST ",JSON.stringify(report))
-	FileAccess.open("/Users/tin/Documents/ChatGPT/New project/experiments/actions_stuff_idle_gameplay_v001/source_parity.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
+	FileAccess.open("user://idle_source_parity.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	actor.queue_free()
 	quit(0 if failures.is_empty() else 1)
