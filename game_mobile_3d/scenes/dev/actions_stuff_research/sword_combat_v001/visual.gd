@@ -1,5 +1,5 @@
 extends "res://scenes/dev/actions_stuff_research/rifle_ready_v001/rifle_visual.gd"
-## Original Sword poses enter the existing target/contact/inertialization writer.
+## Sword candidates or external private-source poses enter the existing sole writer.
 const SWORD_LIBRARY=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/original_library.res")
 const PoseSampler=preload("res://scenes/dev/actions_stuff_research/source_clip_sampler.gd")
 var sword_equipped:=false
