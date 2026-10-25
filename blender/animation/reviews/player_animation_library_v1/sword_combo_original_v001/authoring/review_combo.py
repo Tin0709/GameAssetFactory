@@ -112,6 +112,7 @@ def poses():
 
 def videos():
     folder=OUT/'review';folder.mkdir(exist_ok=True)
+    scene.render.image_settings.media_type='VIDEO'
     scene.render.image_settings.file_format='FFMPEG'
     scene.render.ffmpeg.format='MPEG4';scene.render.ffmpeg.codec='H264'
     scene.render.ffmpeg.constant_rate_factor='HIGH';scene.render.ffmpeg.ffmpeg_preset='GOOD'

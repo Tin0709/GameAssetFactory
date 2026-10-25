@@ -33,11 +33,13 @@ class ViewerUIContractTests(unittest.TestCase):
         fresh = Mock(); fresh.__file__ = str(BOOTSTRAP.parents[1] / 'blender/animation/showcase/gaf_animation_library.py')
         fresh.register.side_effect = lambda: setattr(types, 'GAF_PT_animation_library', object())
         spec = SimpleNamespace(loader=Mock())
-        with patch.dict(sys.modules, {'bpy': bpy}), patch.object(sys, 'path', list(sys.path)), \
-                patch('importlib.import_module', return_value=old), \
-                patch('importlib.util.spec_from_file_location', return_value=spec), \
-                patch('importlib.util.module_from_spec', return_value=fresh):
-            exec(compile(BOOTSTRAP.read_text(), str(BOOTSTRAP), 'exec'), {'__name__':'__main__','__file__':str(BOOTSTRAP)})
+        with patch.dict(sys.modules, {'bpy': bpy}), patch.object(sys, 'path', list(sys.path)):
+            namespace = runpy.run_path(str(BOOTSTRAP), run_name='_startup_test_')
+            util = SimpleNamespace(spec_from_file_location=Mock(return_value=spec),
+                                   module_from_spec=Mock(return_value=fresh))
+            with patch.object(namespace['importlib'], 'util', util), \
+                    patch.object(namespace['importlib'], 'import_module', return_value=old):
+                namespace['main']()
         old.unregister.assert_called_once()
         spec.loader.exec_module.assert_called_once_with(fresh)
         fresh.register.assert_called_once(); fresh.loaded.assert_called_once_with(None)
