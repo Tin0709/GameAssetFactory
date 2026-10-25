@@ -13,6 +13,7 @@
       "duration": 0.8,
       "checks": {
         "rigid_arms": true,
+        "rigid_legs": true,
         "unit_scales": true,
         "identity_helpers": true,
         "fixed_grip": true,
@@ -22,6 +23,7 @@
         "loop_seam": true
       },
       "max_arm_rigidity_error_m": 2.5636927089222153e-07,
+      "max_leg_rigidity_error_m": 1.666000468656264e-08,
       "max_scale_error": 0.0,
       "max_helper_identity_matrix_error": 0.0,
       "max_grip_matrix_error": 4.172325134277344e-07,
@@ -42,6 +44,7 @@
       "duration": 0.6,
       "checks": {
         "rigid_arms": true,
+        "rigid_legs": true,
         "unit_scales": true,
         "identity_helpers": true,
         "fixed_grip": true,
@@ -51,6 +54,7 @@
         "loop_seam": true
       },
       "max_arm_rigidity_error_m": 3.579381748874281e-07,
+      "max_leg_rigidity_error_m": 6.828569911354542e-08,
       "max_scale_error": 0.0,
       "max_helper_identity_matrix_error": 0.0,
       "max_grip_matrix_error": 9.520445019006729e-07,
@@ -71,6 +75,7 @@
       "duration": 0.5,
       "checks": {
         "rigid_arms": true,
+        "rigid_legs": true,
         "unit_scales": true,
         "identity_helpers": true,
         "fixed_grip": true,
@@ -80,6 +85,7 @@
         "loop_seam": true
       },
       "max_arm_rigidity_error_m": 3.7814907850174666e-07,
+      "max_leg_rigidity_error_m": 6.828569911354542e-08,
       "max_scale_error": 0.0,
       "max_helper_identity_matrix_error": 0.0,
       "max_grip_matrix_error": 1.9787345081567764e-05,
@@ -100,6 +106,7 @@
       "duration": 0.9,
       "checks": {
         "rigid_arms": true,
+        "rigid_legs": true,
         "unit_scales": true,
         "identity_helpers": true,
         "fixed_grip": true,
@@ -109,6 +116,7 @@
         "loop_seam": true
       },
       "max_arm_rigidity_error_m": 3.68709654559452e-07,
+      "max_leg_rigidity_error_m": 6.828569911354542e-08,
       "max_scale_error": 0.0,
       "max_helper_identity_matrix_error": 0.0,
       "max_grip_matrix_error": 4.470348358154297e-06,
@@ -129,6 +137,7 @@
       "duration": 0.8,
       "checks": {
         "rigid_arms": true,
+        "rigid_legs": true,
         "unit_scales": true,
         "identity_helpers": true,
         "fixed_grip": true,
@@ -138,6 +147,7 @@
         "loop_seam": true
       },
       "max_arm_rigidity_error_m": 3.7814907850174666e-07,
+      "max_leg_rigidity_error_m": 1.666000468656264e-08,
       "max_scale_error": 0.0,
       "max_helper_identity_matrix_error": 0.0,
       "max_grip_matrix_error": 4.172325134277344e-07,
@@ -158,6 +168,7 @@
       "duration": 0.32,
       "checks": {
         "rigid_arms": true,
+        "rigid_legs": true,
         "unit_scales": true,
         "identity_helpers": true,
         "fixed_grip": true,
@@ -167,6 +178,7 @@
         "loop_seam": true
       },
       "max_arm_rigidity_error_m": 3.6378370570342845e-07,
+      "max_leg_rigidity_error_m": 1.666000468656264e-08,
       "max_scale_error": 0.0,
       "max_helper_identity_matrix_error": 0.0,
       "max_grip_matrix_error": 4.76837158203125e-07,
@@ -187,6 +199,7 @@
       "duration": 0.72,
       "checks": {
         "rigid_arms": true,
+        "rigid_legs": true,
         "unit_scales": true,
         "identity_helpers": true,
         "fixed_grip": true,
@@ -199,6 +212,7 @@
         "blade_floor_clearance": true
       },
       "max_arm_rigidity_error_m": 4.887944301026084e-07,
+      "max_leg_rigidity_error_m": 2.3934808975769594e-07,
       "max_scale_error": 0.0,
       "max_helper_identity_matrix_error": 0.0,
       "max_grip_matrix_error": 7.152557373046875e-07,
@@ -219,6 +233,7 @@
       "duration": 0.4,
       "checks": {
         "rigid_arms": true,
+        "rigid_legs": true,
         "unit_scales": true,
         "identity_helpers": true,
         "fixed_grip": true,
@@ -228,6 +243,7 @@
         "loop_seam": true
       },
       "max_arm_rigidity_error_m": 3.591767189858541e-07,
+      "max_leg_rigidity_error_m": 1.666000468656264e-08,
       "max_scale_error": 0.0,
       "max_helper_identity_matrix_error": 0.0,
       "max_grip_matrix_error": 4.172325134277344e-07,

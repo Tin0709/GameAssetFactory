@@ -13,18 +13,22 @@ def bind(e):
 def validate():
  groups={g.index:g.name for g in mesh.vertex_groups}
  ids={side:[v.index for v in mesh.data.vertices if any(groups[g.group] in {'UpperArm.'+side,'ForeArm.'+side} and g.weight>.999 for g in v.groups)] for side in ['L','R']}
+ legids={side:[v.index for v in mesh.data.vertices if any(groups[g.group]=='Leg.'+side and g.weight>.999 for g in v.groups)] for side in ['L','R']}
  headids=[v.index for v in mesh.data.vertices if any(groups[g.group]=='Head' and g.weight>.999 for g in v.groups)]
  hlo=Vector(tuple(min(mesh.data.vertices[i].co[a] for i in headids) for a in range(3)));hhi=Vector(tuple(max(mesh.data.vertices[i].co[a] for i in headids) for a in range(3)))
  blade=bpy.data.objects['Sword_Blade'];reports={};C=None
  for kind,e in D['clips'].items():
   a=bind(e);assert ui.action_signature(a)==e['action_sha256'];ui.validate_action(a,e,rig)
-  maxrig=0.;maxscale=0.;maxhelper=0.;maxgrip=0.;maxsocket=0.;minfloor=99.;minblade=99.;maxstep=0.;prev={};headhits=[];rootx=[];n=0
+  maxrig=0.;maxlegrig=0.;maxscale=0.;maxhelper=0.;maxgrip=0.;maxsocket=0.;minfloor=99.;minblade=99.;maxstep=0.;prev={};headhits=[];rootx=[];n=0
   times=sorted({round(min(j/hz,e['duration']),10) for hz in [30,60,240] for j in range(math.ceil(e['duration']*hz)+1)})
   for t in times:
    frame(t);deps=bpy.context.evaluated_depsgraph_get();ev=mesh.evaluated_get(deps);geo=ev.to_mesh()
    for side,vids in ids.items():
     b=rig.pose.bones['UpperArm.'+side];m=b.matrix@b.bone.matrix_local.inverted()
     for i in vids:maxrig=max(maxrig,(geo.vertices[i].co-m@mesh.data.vertices[i].co).length)
+   for side,vids in legids.items():
+    b=rig.pose.bones['Leg.'+side];m=b.matrix@b.bone.matrix_local.inverted()
+    for i in vids:maxlegrig=max(maxlegrig,(geo.vertices[i].co-m@mesh.data.vertices[i].co).length)
    minfloor=min(minfloor,min(v.co.z for v in geo.vertices))
    for b in rig.pose.bones:
     maxscale=max(maxscale,max(abs(v-1) for v in b.scale));q=b.matrix.to_quaternion()
@@ -44,9 +48,9 @@ def validate():
      headhits.append(t);break
    rootx.append(float(rig.pose.bones['Root'].rotation_euler.x));ev.to_mesh_clear();n+=1
   frame(0);first={b.name:b.matrix.copy() for b in rig.pose.bones};frame(e['duration']);endpoint=max(abs(b.matrix[i][j]-first[b.name][i][j]) for b in rig.pose.bones for i in range(4) for j in range(4))
-  checks={'rigid_arms':maxrig<2e-5,'unit_scales':maxscale<1e-6,'identity_helpers':maxhelper<1e-6,'fixed_grip':maxgrip<2e-5,'connected_legs':maxsocket<.075,'no_body_floor_penetration':minfloor>-.0015,'blade_clears_head':not headhits,'loop_seam':not e['loop'] or endpoint<2e-5}
+  checks={'rigid_arms':maxrig<2e-5,'rigid_legs':maxlegrig<2e-5,'unit_scales':maxscale<1e-6,'identity_helpers':maxhelper<1e-6,'fixed_grip':maxgrip<2e-5,'connected_legs':maxsocket<.075,'no_body_floor_penetration':minfloor>-.0015,'blade_clears_head':not headhits,'loop_seam':not e['loop'] or endpoint<2e-5}
   if kind=='Roll':checks['unwrapped_complete_roll']=rootx[0]==0 and abs(rootx[-1]-2*math.pi)<1e-5 and all(b>=a-1e-5 for a,b in zip(rootx,rootx[1:]));checks['ground_support']=minfloor>=-.0015;checks['blade_floor_clearance']=minblade>=-.0015
-  reports[kind]={'passed':all(checks.values()),'samples':n,'duration':e['duration'],'checks':checks,'max_arm_rigidity_error_m':maxrig,'max_scale_error':maxscale,'max_helper_identity_matrix_error':maxhelper,'max_grip_matrix_error':maxgrip,'max_leg_socket_distance_m':maxsocket,'minimum_body_floor_z_m':minfloor,'minimum_blade_z_m':minblade,'blade_head_intersections':headhits[:20],'endpoint_matrix_difference':endpoint,'max_pose_orientation_step_rad':maxstep,'root_x_range_rad':[min(rootx),max(rootx)]}
+  reports[kind]={'passed':all(checks.values()),'samples':n,'duration':e['duration'],'checks':checks,'max_arm_rigidity_error_m':maxrig,'max_leg_rigidity_error_m':maxlegrig,'max_scale_error':maxscale,'max_helper_identity_matrix_error':maxhelper,'max_grip_matrix_error':maxgrip,'max_leg_socket_distance_m':maxsocket,'minimum_body_floor_z_m':minfloor,'minimum_blade_z_m':minblade,'blade_head_intersections':headhits[:20],'endpoint_matrix_difference':endpoint,'max_pose_orientation_step_rad':maxstep,'root_x_range_rad':[min(rootx),max(rootx)]}
   print('SWORD_NATIVE_CHECK',kind,json.dumps(reports[kind]),flush=True)
  report={'passed':all(v['passed'] for v in reports.values()),'fps_checks':[30,60,240],'rig_signature':ui.rest_signature(rig.data),'clips':reports,'source_combo_unchanged':hashlib.sha256((R/D['original_combo_source']).read_bytes()).hexdigest()==D['original_combo_source_sha256']}
  (OUT/'geometry_validation.json').write_text(json.dumps(report,indent=2)+'\n');assert report['passed'],'Inspect geometry_validation.json'
