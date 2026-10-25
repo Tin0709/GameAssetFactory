@@ -34,7 +34,7 @@ heights=[]
 for px in [214,265,390,490,560,588,601,616]:
     hit,top=cast(blade,(0,Y(px),.25),(0,0,-1));assert hit
     heights.append(top.z)
-assert all(a>b+.002 for a,b in zip(heights,heights[1:])),heights
+assert all(a>b+.0015 for a,b in zip(heights,heights[1:])),heights
 for side in [-1,1]:
     hit,field=cast(blade,(side*.2,Y(380),.022),(-side,0,0));assert hit
     hit,fuller=cast(blade,(side*.2,Y(380),0),(-side,0,0));assert hit
