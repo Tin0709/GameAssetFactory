@@ -40,6 +40,26 @@ class PortableLauncherTests(unittest.TestCase):
         self.assertIn('d3d12', cmd)
         self.assertIn(str(dev.ROOT / 'game_mobile_3d'), cmd)
 
+    def test_combat_alias_and_sword_start_use_existing_scene(self):
+        cmd=dev.godot_command(Path('/bin/godot'),'combat',False,False,weapon='sword')
+        self.assertIn('res://scenes/dev/ActionsStuffWalkRunTest.tscn',cmd)
+        self.assertEqual(cmd[-2:],['--','--sword'])
+
+    def test_explicit_windows_vulkan_override_retains_mobile_renderer(self):
+        with patch.object(dev.platform,'system',return_value='Windows'):
+            cmd=dev.godot_command(Path('C:/Tools/Godot.exe'),'combat',False,False,driver='vulkan')
+        self.assertIn('vulkan',cmd);self.assertNotIn('d3d12',cmd)
+        self.assertIn('mobile',cmd)
+
+    def test_weapon_start_option_cannot_be_silently_ignored_by_editor(self):
+        with self.assertRaises(ValueError):dev.godot_command(Path('/bin/godot'),'combat',True,False,weapon='sword')
+
+    def test_combat_cli_preserves_spaced_executable_and_scene_arguments(self):
+        with patch.object(dev,'find_tool',return_value=Path('/Tool Folder/Godot')),patch.object(dev.subprocess,'call',return_value=0) as launch:
+            self.assertEqual(dev.main(['godot','--scene','combat','--weapon','sword']),0)
+        self.assertEqual(launch.call_args.args[0][0],'/Tool Folder/Godot')
+        self.assertEqual(launch.call_args.args[0][-2:],['--','--sword'])
+
     def test_showcase_explicitly_loads_repository_ui(self):
         cmd = dev.blender_command(Path('/bin/blender'), 'animation')
         self.assertIn('--disable-autoexec', cmd)
