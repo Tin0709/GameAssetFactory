@@ -2,7 +2,7 @@
 
 > Execute in the established checkout on `codex/sword-combat-v001`. Use the subagent-driven-development workflow for independent animation and VFX units, with the parent owning integration and final validation. No commits or publication are required.
 
-**Goal:** A complete playable original Sword vertical slice alongside the approved Rifle in the existing ActionsStuffWalkRunTest scene.
+**Goal:** A complete playable Sword vertical slice alongside the approved Rifle in the existing ActionsStuffWalkRunTest scene. Latest user steering selects actual Fiery private reference motions for this lab, while the independently authored original candidates remain preserved.
 
 **Architecture:** One scene-owned combat state machine determines damage and defensive events. The existing pose/contact pipeline remains authoritative for locomotion; a derived Sword visual composes original upper-body clips, grounded attack steps and an original roll, then captures the existing interpolated presenter. Fixed pools render weapon-following arcs, sparks, dust and contact bursts; only confirmed hits trigger hit-stop, shake, stagger and impact audio.
 
@@ -13,7 +13,7 @@
 ## Constraints and design decisions
 
 - Preserve WorldMap, project main scene, source packs, every approved Action, Rifle clips/cadence/recoil, camera controls, jump physics, movement speeds and native zombie corpse behavior. Backups and baseline hashes under `.validation/sword_combat_v001/`.
-- Never import Fiery tracks into gameplay. Private Fiery JSON/script analysis remains outside repository. Existing independently authored Sword_Combo_Original_v001 supplies the original connected poses; new split actions and defense/roll actions are independently named Pending. Actual source combo is 1→2→1→3; requested gameplay is deliberately original 1→2→3.
+- Initial implementation used independently authored Sword_Combo_Original_v001 and eight separately named Pending candidates. The user's subsequent screenshot explicitly requests actual Fiery Attack1/2/3 and Roll instead. The private lab now reads six retargeted source clips from a sibling private research directory outside the repository/Git; it copies no Fiery tracks into res://. Existing release exclusion remains enabled. Original candidates and approved Actions remain preserved. Source behavior combo is 1→2→1→3; the requested lab chain remains an explicit1→2→3 gameplay adapter.
 - Same checkout/project requested; create a feature branch, no extra worktree/project/scene. Approved source files are read-only. New dev Sword assets remain behind the existing research release exclusion.
 - Tab switches weapon; E or left mouse attacks in Sword, right mouse holds guard with a short parry window on entry, F dodges along WASD (or facing); Space jump, Shift run, Q/C turn, wheel zoom, R reset remain. Rifle E/right mouse keep current semantics; middle mouse provides Sword camera orbit.
 - One buffered attack (0.22s), three distinct active windows, one hit per enemy per attack, capped nearest-first target budget and world-geometry LOS. Whiffs get swing/trail only. No global Engine.time_scale changes.
