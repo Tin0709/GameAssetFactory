@@ -1,0 +1,42 @@
+{
+  "action": "Sword_Combo_Original_v001",
+  "status": "pending",
+  "samples": 481,
+  "fps_checks": [
+    30,
+    60
+  ],
+  "groups": {
+    "Head": 8,
+    "Chest": 8,
+    "UpperArm.L": 8,
+    "UpperArm.R": 8,
+    "Leg.L": 8,
+    "Leg.R": 8,
+    "ForeArm.L": 8,
+    "ForeArm.R": 8
+  },
+  "minimum_sole_z_m": 0.0005767848342657089,
+  "max_sole_height_error_m": 0.00023085528345295758,
+  "max_straight_arm_rigidity_error_m": 3.819467311494439e-07,
+  "max_palm_grip_translation_error_m": 0.0019454531823498795,
+  "max_palm_grip_rotation_error_rad": 6.283185005187988,
+  "max_leg_socket_distance_m": 0.0853125565867315,
+  "head_intersection_samples": [],
+  "max_scale_error": 2.384185791015625e-07,
+  "maximum_sword_orientation_delta_per_240fps_sample_rad": 0.31856268644332886,
+  "endpoint_matrix_error": 0.0,
+  "rig_rest_signature": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+  "checks": {
+    "ground_contact": true,
+    "rigid_straight_arms": true,
+    "fixed_grip": false,
+    "unit_scale": true,
+    "blade_clears_head": true,
+    "connected_leg_sockets": false,
+    "quiet_compatible_guard_endpoints": true,
+    "no_rig_constraints": true,
+    "no_object_root_motion": true
+  },
+  "passed": false
+}
