@@ -166,7 +166,7 @@ def foot_design(frame):
     left_x=channel(frame,[(1,.16),(29,.16),(36,.18),(51,.18),(58,.16),(61,.16)])
     return {
         'L':(Vector((left_x,left_y,0)),step(frame,4,9,.028)+step(frame,29,36,.024)+step(frame,51,58,.028),8),
-        'R':(Vector((-.16,right_y,0)),step(frame,16,23,.038)+step(frame,44,51,.032),-8),
+        'R':(Vector((-.16,right_y,0)),step(frame,16,23,.026)+step(frame,44,51,.032),-8),
     }
 
 
