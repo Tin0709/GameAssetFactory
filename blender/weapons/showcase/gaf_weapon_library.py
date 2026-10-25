@@ -6,13 +6,20 @@ from mathutils import Vector,Matrix
 _busy=False
 def entries(scene):return json.loads(scene['weapon_manifest_snapshot'])['weapons']
 def root_of(entry):return bpy.data.objects[entry['root']]
+def preview_modes(entry):return entry.get('preview_modes',['STANDALONE','READY','HOLSTER'])
 def bounds(objects):
  pts=[o.matrix_world@Vector(c) for o in objects if o.type=='MESH' for c in o.bound_box]
  lo=Vector([min(v[i] for v in pts) for i in range(3)]);hi=Vector([max(v[i] for v in pts) for i in range(3)])
  return (lo+hi)/2,hi-lo
 def activate(scene):
+ global _busy
  if _busy or not scene.gaf_weapons:return
  entry=entries(scene)[scene.gaf_weapon_index];mode=scene.gaf_fit_mode
+ if mode not in preview_modes(entry):
+  _busy=True
+  try:scene.gaf_fit_mode='STANDALONE'
+  finally:_busy=False
+  mode='STANDALONE'
  for c in bpy.data.collections:
   if c.get('weapon_entry'):c.hide_viewport=c.hide_render=(c.name!=entry['collection'])
   if c.get('fit_kind'):c.hide_viewport=c.hide_render=(c.get('fit_kind')!=entry['kind'] or c.get('fit_mode')!=mode)
@@ -89,7 +96,8 @@ class GAF_PT_weapon_library(bpy.types.Panel):
   l.template_list('GAF_UL_weapons','',s,'gaf_weapons',s,'gaf_weapon_index',rows=min(10,max(3,len(s.gaf_weapons))))
   if not s.gaf_weapons:return
   e=entries(s)[s.gaf_weapon_index];b=l.box();b.label(text=e['label']);b.label(text=e['status']+' | '+e['kind']);b.label(text=e['source'].split('/')[-1])
-  l.prop(s,'gaf_fit_mode',text='Preview')
+  if len(preview_modes(e))>1:l.prop(s,'gaf_fit_mode',text='Preview')
+  else:l.label(text='Standalone model',icon='OBJECT_DATA')
   for labels in [[('Left','LEFT'),('Right','RIGHT'),('3/4','THREE_QUARTER')],[('Front','FRONT'),('Back','BACK')]]:
    row=l.row(align=True)
    for label,d in labels:row.operator('gaf.weapon_view',text=label).direction=d

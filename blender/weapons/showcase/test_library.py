@@ -37,7 +37,7 @@ for kind in ['Rifle','Pistol','Shotgun']:
 checks=0
 for i,item in enumerate(s.gaf_weapons):
  s.gaf_weapon_index=i
- for mode in ['STANDALONE','READY','HOLSTER']:
+ for mode in lib.preview_modes(lib.entries(s)[i]):
   s.gaf_fit_mode=mode
   lib.activate(s)
   visible=[c.name for c in bpy.data.collections if c.get('weapon_entry') and not c.hide_render]
