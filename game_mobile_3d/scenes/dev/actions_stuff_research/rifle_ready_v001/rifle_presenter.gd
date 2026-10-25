@@ -16,6 +16,7 @@ func capture() -> void:
 func prepare(alpha: float) -> void:
  super.prepare(alpha)
  if display_world.is_empty() or visual==null:return
+ if visual.get("sword_equipped")==true:return
  # Physics endpoints already contain the final constrained pose, including
  # inherited jump scale/shear. Re-solving them would change an authoritative
  # endpoint. Only intermediate render poses need contact reconciliation.
