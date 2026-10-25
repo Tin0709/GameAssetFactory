@@ -255,10 +255,14 @@ func _emit(point: Vector3, velocity: Vector3, size: Vector3, lifetime: float, gr
 	_velocities[slot] = velocity
 	_sizes[slot] = size
 	_gravity[slot] = gravity
-	_orientations[slot] = orientation
+	var particle_basis := orientation
+	if orientation == Basis.IDENTITY and velocity.length_squared() > 0.001:
+		var travel := velocity.normalized()
+		particle_basis = Basis.looking_at(travel, Vector3.UP if absf(travel.y) < 0.95 else Vector3.RIGHT)
+	_orientations[slot] = particle_basis
 	_colors[slot] = color
 	_multimesh.set_instance_color(slot, color)
-	_multimesh.set_instance_transform(slot, Transform3D(orientation.scaled(size), point))
+	_multimesh.set_instance_transform(slot, Transform3D(particle_basis.scaled(size), point))
 	_alive += 1
 	_emitted_this_frame += 1
 
@@ -270,7 +274,7 @@ func _ring(point: Vector3, normal: Vector3, radius: float, speed: float, lifetim
 	for index in number:
 		var angle := TAU * float(index) / float(number)
 		var radial := tangent * cos(angle) + bitangent * sin(angle)
-		var along := axis.cross(radial).normalized()
+		var along := radial.cross(axis).normalized()
 		# Separate crisp box segments; ring expands through velocity, then shrinks.
 		var orientation := Basis(radial, axis, along)
 		_emit(point + radial * radius, radial * speed, Vector3(0.025, 0.025, 0.10), lifetime, 0.0, color, orientation)
@@ -304,6 +308,7 @@ func _write_trail() -> void:
 	for index in oldest + 1:
 		bounds = bounds.expand(_trail_base[index]).expand(_trail_tip[index])
 	_ribbon.custom_aabb = bounds.grow(0.1)
+	_trail_material.set_shader_parameter("history_span", maxf(1.0 / float(TRAIL_SAMPLES - 1), float(oldest) / float(TRAIL_SAMPLES - 1)))
 	_trail_material.set_shader_parameter("opacity", minf(intensity, 1.4) * _trail_fade)
 	_trail_material.set_shader_parameter("finisher", 1.0 if _trail_finisher else 0.0)
 
