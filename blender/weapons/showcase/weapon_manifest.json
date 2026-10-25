@@ -2,7 +2,7 @@
   "schema": 1,
   "title": "GameAssetFactory Weapon Library",
   "approval_policy": "New assets start Pending; explicit user approval only. Production is preserved separately.",
-  "default_selection": "sniper_sand_block_v1",
+  "default_selection": "sword_sand_block_v1",
   "weapons": [
     {
       "id": "rifle_stylized_v2",
@@ -135,6 +135,18 @@
       "status_note": "New registration; awaiting explicit visual approval.",
       "collection": "WEAPON_sniper_sand_block_v1",
       "root": "sniper_sand_block_v1__Sniper_Sand_Block_V1"
+    },
+    {
+      "id": "sword_sand_block_v1",
+      "kind": "Sword",
+      "label": "Sword \u2014 Sand Block V1",
+      "source": "blender/weapons/sword_sand_block_v1/Sword_Sand_Block_V1.blend",
+      "source_sha256": "2347d72fb158bc85ae1c8910ec38882e41af6b90e87bb22f3e067cbd12baa225",
+      "status": "Pending",
+      "status_note": "New registration; awaiting explicit visual approval.",
+      "preview_modes": [
+        "STANDALONE"
+      ]
     }
   ],
   "preferred_rifle": "rifle_stylized_v2",
