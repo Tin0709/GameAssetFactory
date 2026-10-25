@@ -4,7 +4,7 @@
   "original_custom_animation": true,
   "source_derived_reconstruction": false,
   "source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
-  "source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f",
+  "source_sha256": "a5ca98c355275d90df98f88fd9c589f745428c4ba8291affeb3761b5b94e6397",
   "source_rig": "SCC_Player_Rig",
   "source_mesh": "SCC_Player_Mesh",
   "source_armature": "LB_Test_RestRig.004",
@@ -213,7 +213,7 @@
       "duration": 0.72,
       "loop": false,
       "source_frames": null,
-      "action_sha256": "fee113a1f8b5bff89d539b3c5228d118c8a26e542eeb26e6df65a7b46dcc3de2",
+      "action_sha256": "515a17fd25d3c67b928b49cc783c7f0ad6f805c5a3c63276ad93f46ba085e300",
       "action_frame_range": [
         1.0,
         22.600000381469727
