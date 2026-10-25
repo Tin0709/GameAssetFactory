@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "meshes": 2,
+  "materials": 2,
+  "triangles": 2724,
+  "dimensions_m": [
+    0.08940000087022781,
+    1.1073200106620789,
+    0.25706999003887177
+  ],
+  "roundtrip_error_m": 0.0,
+  "texture_roundtrip_error": 0.0,
+  "stepped_blade_profile": true,
+  "symmetric_shallow_fuller": true,
+  "grip_wraps": 5,
+  "pommel_recess": true,
+  "marker_roundtrip_exact": true,
+  "actions": 0
+}
