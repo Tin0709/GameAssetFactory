@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "saved_manifest_snapshot_matches_disk": true,
+  "reopened_pending_actions": [
+    "Sword_Ready_Original_v001",
+    "Sword_Attack1_Original_v001",
+    "Sword_Attack2_Original_v001",
+    "Sword_Attack3_Original_v001",
+    "Sword_Guard_Original_v001",
+    "Sword_Parry_Original_v001",
+    "Sword_Roll_Original_v001",
+    "Sword_Hurt_Original_v001"
+  ],
+  "canonical_original_signature_preserved": true,
+  "rig_signature_preserved": true,
+  "selected_action": "Sword_Ready_Original_v001",
+  "saved_central_action_count": 101
+}
