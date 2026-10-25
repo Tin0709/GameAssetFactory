@@ -21,4 +21,6 @@ func run()->void:
 	check(absf(float(s.player.visual.direction_snapshot.phase)-phase)<.00001,"Dodge travel must preserve locomotion phase")
 	c.rifle_button.pressed.emit();check(not c.equipped and c.rifle_button.button_pressed and not c.sword_button.button_pressed,"Rifle UI selects Rifle")
 	c.sword_button.pressed.emit();check(c.equipped and c.sword_button.button_pressed and not c.rifle_button.button_pressed,"Sword UI selects Sword")
+	c.state.start_attack(0);c.state.time=.50;check(not c.locks_jump(),"Recovery permits jump interruption")
+	c.knockout=.9;c.state.cancel();check(c.locks_jump(),"Knockout cannot jump after Hurt pose ends")
 	print("SWORD_HOTPATH ",JSON.stringify({"failures":failures}));s.free();quit(0 if failures.is_empty() else 1)

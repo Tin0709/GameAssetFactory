@@ -20,6 +20,7 @@ func _initialize()->void:
 		s.cancel();check(not s.overlaps_active() and not s.has_buffer(),"Cancellation clears damage window and input")
 		s.request_guard(true);check(s.can_parry(),"Guard entry opens timed parry")
 		s.tick(.25,1.);check(not s.can_parry() and s.state==&"guard","Held guard outlasts parry window")
+		s.request_attack();s.tick(1.,1.);check(s.state==&"guard" and s.guard_held,"Held guard resumes after attack recovery")
 		s.request_guard(false);check(s.request_roll(),"Ready can roll")
 		s.tick(.12,1.);check(s.invulnerable(),"Roll invulnerability is timed")
 		s.tick(.45,1.);check(not s.invulnerable(),"Roll recovery is vulnerable")
