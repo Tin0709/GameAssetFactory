@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "selectors": {
+    "SOLDIER_Skin_v001": true,
+    "SOLDIER_Backpack_v001": true,
+    "SOLDIER_Facial_System_v001": true,
+    "SOLDIER_HairCards_v001": true,
+    "SOLDIER_Bandana_2D_v001": true,
+    "SOLDIER_Sword_Combo_v001": true
+  },
+  "views": 6,
+  "contact_frame_controls": [
+    10,
+    25,
+    43
+  ],
+  "fps_checked": [
+    30,
+    60
+  ],
+  "lowest_body_sole_m": 0.0005999095737934113,
+  "canonical_action_hash_matches": true,
+  "old_meshes_uvs_material_indices_preserved": 14,
+  "old_action_curves_preserved": 34,
+  "old_rig_rest_transforms_preserved": true,
+  "godot_integrated": false
+}

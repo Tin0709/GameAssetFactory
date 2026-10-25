@@ -53,12 +53,12 @@ class SOLDIER_OT_select_asset(bpy.types.Operator):
         entry=next((e for e in registry().get('entries',[]) if e['id']==self.asset_id),None)
         if entry is None or review_scene(entry) not in bpy.data.scenes:
             self.report({'ERROR'},'Asset review is unavailable');return {'CANCELLED'}
+        if context.screen.is_animation_playing:bpy.ops.screen.animation_cancel(restore_frame=False)
         if entry.get('type') in ['hair','headwear']:
             import haircards_ui
             return bpy.ops.soldier_hair.compare(variant='BANDANA' if entry['type']=='headwear' else 'HAIR')
         if entry.get('type')=='facial':
             return bpy.ops.soldier_face.open()
-        if context.screen.is_animation_playing:bpy.ops.screen.animation_cancel(restore_frame=False)
         target=bpy.data.scenes[review_scene(entry)]
         context.window.scene=target
         context.window.view_layer=target.view_layers.get(entry.get('view_layer',''),target.view_layers[0])
@@ -91,7 +91,6 @@ class SOLDIER_OT_animation_control(bpy.types.Operator):
         entry=active_entry(context)
         if entry is None or entry.get('type')!='animation':return {'CANCELLED'}
         if self.mode=='PLAY':bpy.ops.screen.animation_play();return {'FINISHED'}
-        if context.screen.is_animation_playing:bpy.ops.screen.animation_cancel(restore_frame=False)
         frame=entry['frames'][0] if self.mode=='RESTART' else entry['contacts'][int(self.mode[-1])-1]
         context.scene.frame_set(frame)
         return {'FINISHED'}
@@ -116,9 +115,9 @@ class SOLDIER_PT_library(bpy.types.Panel):
                 op=row.operator('soldier_library.select_asset',text=label(entry),icon='OUTLINER_OB_MESH',depress=current['id']==entry['id'])
                 op.asset_id=entry['id']
                 row.label(text=entry.get('status','Pending'))
-        if current.get('type')!='hair' and hasattr(bpy.types,'HC_PT_hair'):layout.operator('soldier_hair.open',text='2D Hair & Bandana · Pending',icon='OUTLINER_OB_MESH')
+        if current.get('type')!='hair' and hasattr(bpy.types,'HC_PT_hair'):layout.operator('soldier_library.select_asset',text='2D Hair & Bandana · Pending',icon='OUTLINER_OB_MESH').asset_id='SOLDIER_Bandana_2D_v001'
         if current.get('type')=='facial':return
-        if any(e.get('type')=='facial' for e in entries):layout.operator('soldier_face.open',text='Facial Expressions · 18 Pending',icon='HIDE_OFF')
+        if any(e.get('type')=='facial' for e in entries):layout.operator('soldier_library.select_asset',text='Facial Expressions · 18 Pending',icon='HIDE_OFF').asset_id='SOLDIER_Facial_System_v001'
         if current.get('type') in ['hair','headwear']:return
         layout.separator()
         box=layout.box();box.label(text=label(current),icon='CHECKMARK' if current.get('status')=='Approved' else 'TIME')
