@@ -65,7 +65,7 @@
 			"row_floats": 131.0,
 			"samples": 145.0,
 			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
-			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+			"source_sha256": "d231df97c6be057ba719c70e70f45a71fce17cccfc1ef6ca5a51ed0e8cbe155e"
 		},
 		"Attack2": {
 			"action": "Sword_Attack2_Original_v001",
@@ -81,7 +81,7 @@
 			"row_floats": 131.0,
 			"samples": 121.0,
 			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
-			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+			"source_sha256": "d231df97c6be057ba719c70e70f45a71fce17cccfc1ef6ca5a51ed0e8cbe155e"
 		},
 		"Attack3": {
 			"action": "Sword_Attack3_Original_v001",
@@ -97,7 +97,7 @@
 			"row_floats": 131.0,
 			"samples": 217.0,
 			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
-			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+			"source_sha256": "d231df97c6be057ba719c70e70f45a71fce17cccfc1ef6ca5a51ed0e8cbe155e"
 		},
 		"Guard": {
 			"action": "Sword_Guard_Original_v001",
@@ -110,7 +110,7 @@
 			"row_floats": 131.0,
 			"samples": 193.0,
 			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
-			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+			"source_sha256": "d231df97c6be057ba719c70e70f45a71fce17cccfc1ef6ca5a51ed0e8cbe155e"
 		},
 		"Hurt": {
 			"action": "Sword_Hurt_Original_v001",
@@ -123,7 +123,7 @@
 			"row_floats": 131.0,
 			"samples": 97.0,
 			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
-			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+			"source_sha256": "d231df97c6be057ba719c70e70f45a71fce17cccfc1ef6ca5a51ed0e8cbe155e"
 		},
 		"Parry": {
 			"action": "Sword_Parry_Original_v001",
@@ -136,7 +136,7 @@
 			"row_floats": 131.0,
 			"samples": 78.0,
 			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
-			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+			"source_sha256": "d231df97c6be057ba719c70e70f45a71fce17cccfc1ef6ca5a51ed0e8cbe155e"
 		},
 		"Ready": {
 			"action": "Sword_Ready_Original_v001",
@@ -149,11 +149,11 @@
 			"row_floats": 131.0,
 			"samples": 193.0,
 			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
-			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+			"source_sha256": "d231df97c6be057ba719c70e70f45a71fce17cccfc1ef6ca5a51ed0e8cbe155e"
 		},
 		"Roll": {
 			"action": "Sword_Roll_Original_v001",
-			"action_sha256": "fee113a1f8b5bff89d539b3c5228d118c8a26e542eeb26e6df65a7b46dcc3de2",
+			"action_sha256": "c48bfbee6812b28648a39496fecb3730f4add5155a22c3afae15749deef561d1",
 			"contact_time": -1.0,
 			"duration": 0.72,
 			"entry_exit": "Ready→full forward turn→Ready, unwrapped0→2π, original local ground compensation; physics owns travel/collision.",
@@ -162,7 +162,7 @@
 			"row_floats": 131.0,
 			"samples": 174.0,
 			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
-			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+			"source_sha256": "d231df97c6be057ba719c70e70f45a71fce17cccfc1ef6ca5a51ed0e8cbe155e"
 		}
 	},
 	"original_combo_action_sha256": "749fb852130af82e5e46ae2913c57159d30779cfe6a10d1c64ca5718977732b2",
