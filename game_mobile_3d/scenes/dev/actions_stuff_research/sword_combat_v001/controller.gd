@@ -47,7 +47,9 @@ func setup(scene:Node3D,tuning:Resource)->void:
 	if visual.using_private_fiery:
 		state.durations=PackedFloat32Array([1.2917,1.2917,1.2917]);state.roll_duration=.6667
 		state.chain_open=PackedFloat32Array([.88,.88,1.05]);state.chain_time=PackedFloat32Array([1.03,1.03,1.2917])
-		state.active_start=PackedFloat32Array([.35,.35,.35]);state.active_end=PackedFloat32Array([.48,.48,.48])
+		# Gameplay sweep windows follow each retargeted blade arc. Attack2 passes
+		# forward earlier; a shared .35 start misses its actual forward crossing.
+		state.active_start=PackedFloat32Array([.35,.28,.35]);state.active_end=PackedFloat32Array([.48,.48,.48])
 	player.melee_controller=self;visual.melee=self
 	effects=Effects.new();effects.name="OriginalSwordEffects";add_child(effects);effects.quality=config.effects_quality;effects.intensity=config.effects_intensity;effects.setup()
 	_rays.collision_mask=1;_rays.exclude=[player.get_rid()]
@@ -130,7 +132,8 @@ func motion_velocity(desired:Vector2)->Vector2:
 	if not equipped:return desired
 	if knockout>0. or state.state==&"hurt":return Vector2.ZERO
 	if state.state==&"roll":
-		var envelope:=1.-smoothstep(.38,.72,state.time) if state.time>.38 else 1.
+		var brake:float=state.roll_duration*(.38/.72)
+		var envelope:=1.-smoothstep(brake,state.roll_duration,state.time) if state.time>brake else 1.
 		return Vector2(roll_direction.x,roll_direction.z)*config.roll_speed*envelope
 	if state.state==&"guard" or state.state==&"parry":return desired*.42
 	if state.state==&"attack":
