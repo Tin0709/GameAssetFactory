@@ -10,6 +10,8 @@ Labels: **S** verified source; **O** observed pixels; **A** project adapter; **P
 
 **O → P:** the inspected Dungeons II footage emphasizes readable directional silhouettes and concentrated effect bursts at gameplay distance. Use these as artistic references; cuts, obscuration and small actor pixels do not establish exact contact timing or engine mechanics. See [video provenance and limits](SOURCE_EVIDENCE.md#visual-references-and-limits).
 
+For the researched public footage and a detailed **original** three-hit sword brief, use [MD2 Phase2](MD2_COMBAT_ANIMATION_RESEARCH.md), its [frame analyses](MD2_COMBAT_FRAME_ANALYSES.md) and the [melee framework](ORIGINAL_MELEE_COMBO_FRAMEWORK.md). Unverified weapon identity and censored timing remain explicit; this is not an MD2 asset reconstruction.
+
 ## Action families
 
 All new choreography, timings and gameplay contracts remain **P** until implemented and reviewed.

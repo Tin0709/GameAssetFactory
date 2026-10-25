@@ -1,6 +1,6 @@
 # GameAssetFactory animation knowledge system
 
-Verified 2026-10-23. Purpose: design **original** expressive voxel animation using audited motion principles, the actual selected rig/weapon and the established Blender → review → Godot workflow. This milestone adds knowledge and read-only discovery; it creates no Action or gameplay change.
+Base source audit: 2026-10-23; public combat extension: 2026-10-25. Purpose: design **original** expressive voxel animation using audited motion principles, the actual selected rig/weapon and the established Blender → review → Godot workflow. This milestone adds knowledge and read-only discovery; it creates no Action or gameplay change.
 
 ## Start small
 
@@ -11,6 +11,7 @@ Read the [Director Skill](../../../.agents/skills/gaf-animation-director/SKILL.m
 | Locomotion, starts/stops, jumping | [Timing](TIMING_AND_SPACING.md), [Weight](WEIGHT_AND_BODY_MECHANICS.md), [Transitions](TRANSITION_RULES.md) |
 | Bounce, arcs, expressive follow-through | [Patterns](SNAPPY_BOUNCY_PATTERNS.md) plus the relevant principle in Timing/Weight |
 | Rifle, ranged or weapon-ready motion | [Weapon Handling](WEAPON_HANDLING.md), [Approved References](APPROVED_REFERENCES.md) |
+| MD2 public combat footage / original sword combo | [Phase2 research](MD2_COMBAT_ANIMATION_RESEARCH.md), [frame evidence](MD2_COMBAT_FRAME_ANALYSES.md), [original framework](ORIGINAL_MELEE_COMBO_FRAMEWORK.md) |
 | Melee, combo, skill, reaction, enemy | [Combat Design](COMBAT_ANIMATION_DESIGN.md), Weapon Handling and the named [source evidence](SOURCE_EVIDENCE.md) |
 | Blender creation/review | [Authoring Workflow](AUTHORING_WORKFLOW.md), exact live manifest/source/slot |
 | Authorized gameplay integration | [Godot Integration](GODOT_INTEGRATION.md), Transitions, actual current scripts |

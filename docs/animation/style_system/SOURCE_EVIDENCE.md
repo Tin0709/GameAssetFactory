@@ -106,3 +106,8 @@ Older A&S walk/run/jump videos under [style references](../references/style_rese
 ## Earlier records and project adaptations
 
 Use [player deep research](../ACTIONS_AND_STUFF_PLAYER_DEEP_RESEARCH.md), [local audit](../research/actions_and_stuff_deep_2026_10_14/LOCAL_AUDIT.md), [current Workflow](../ANIMATION_WORKFLOW.md), [Rig](RIG_CONSTRAINTS.md), [Godot](GODOT_INTEGRATION.md) and [Approved References](APPROVED_REFERENCES.md). Older claims are scoped to their dated inspection; direct routes above expand their combat/Hurt coverage. Do not overwrite approved source curves or repair library status drift during research. Remaining uncertainties are listed in [Gaps](GAPS_AND_DEMOS.md).
+
+
+## 2026-10-25 public combat extension
+
+[MD2 Phase2](MD2_COMBAT_ANIMATION_RESEARCH.md) adds public paused-browser observations and decoded cached gameplay with frame-zero/PTS conventions, images and uncertainty. See [frame analyses](MD2_COMBAT_FRAME_ANALYSES.md) for the distinction between visible feedback and internal damage timing. Existing A&S source pins remain unchanged; unofficial MD2 archive encryption/authenticity limitations remain intact.

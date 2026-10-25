@@ -436,6 +436,21 @@
     "evidence": [
       "docs/animation/style_system/SOURCE_EVIDENCE.md",
       "docs/animation/style_system/README.md"
+    ],
+    "md2": [
+      "docs/animation/style_system/MD2_COMBAT_ANIMATION_RESEARCH.md",
+      "docs/animation/style_system/MD2_COMBAT_FRAME_ANALYSES.md",
+      "docs/animation/style_system/ORIGINAL_MELEE_COMBO_FRAMEWORK.md"
+    ],
+    "melee": [
+      "docs/animation/style_system/ORIGINAL_MELEE_COMBO_FRAMEWORK.md",
+      "docs/animation/style_system/WEAPON_HANDLING.md",
+      "docs/animation/style_system/RIG_CONSTRAINTS.md"
+    ],
+    "combo": [
+      "docs/animation/style_system/ORIGINAL_MELEE_COMBO_FRAMEWORK.md",
+      "docs/animation/style_system/TRANSITION_RULES.md",
+      "docs/animation/style_system/MD2_COMBAT_FRAME_ANALYSES.md"
     ]
   }
 }
