@@ -89,10 +89,12 @@ func _sample_set(ahead:float=0.)->Array:
 	poses[carrier_bone]=Transform3D(poses[arm_right])*attachment
 	return poses
 func _advance_facing(target_yaw:float,delta:float)->void:
-	if _sword_turn_lock:return # Combat heading already advanced once this tick.
+	if sword_equipped and _sword_turn_lock:return # Combat heading already advanced once this tick.
 	super._advance_facing(target_yaw,delta)
 func drive_jump_motion(world_velocity:Vector3,requested:bool,physics:Dictionary,delta:float)->void:
-	if not sword_equipped:super.drive_jump_motion(world_velocity,requested,physics,delta);return
+	if not sword_equipped:
+		_sword_turn_lock=false;_roll_gait_cursor=NAN
+		super.drive_jump_motion(world_velocity,requested,physics,delta);return
 	rifle_aim_requested=false;rifle_aim_weight=0.;combat_turn_requested=false;auto_aim_target=null
 	_sword_turn_lock=melee!=null and melee.state.state in [&"attack",&"guard",&"parry",&"roll"]
 	if _sword_turn_lock:
