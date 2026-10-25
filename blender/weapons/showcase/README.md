@@ -26,7 +26,9 @@ The launcher does not install an add-on, change preferences, enable global autom
 
 ## Registered models
 
-7 active entries: `Rifle_Stylized_V2` (Preferred), `Pistol_Stylized_V2` (Pending), `Shotgun_Stylized_V2` (Pending), `Rifle_Sand_Block_V1` (Pending), `Pistol_Sand_Block_V1` (Approved), `Shotgun_Sand_Block_V1` (Pending), and **Sniper — Sand Block V1** (Pending). The sniper opens selected. Per the user's 2026-10-12 request, the 16 older entries are removed from the selection list and stored under `archived_weapons` in `weapon_manifest.json`; their metadata, source files and exports remain preserved. Future new designs register in this same active list. Gameplay integration remains Pending.
+Latest addition,2026-10-25: [Sword — Sand Block V1](../sword_sand_block_v1/README.md), matching the supplied gold/graphite/silver stepped sword. It supports Standalone review only; selecting it safely leaves an existing firearm Ready/Holster preview. Seven firearm entries retain their modes and approval metadata.
+
+8 active entries: `Rifle_Stylized_V2` (Preferred), `Pistol_Stylized_V2` (Pending), `Shotgun_Stylized_V2` (Pending), `Rifle_Sand_Block_V1` (Pending), `Pistol_Sand_Block_V1` (Approved), `Shotgun_Sand_Block_V1` (Pending), **Sniper — Sand Block V1** (Pending), and **Sword — Sand Block V1** (Pending). The sword opens selected. Per the user's 2026-10-12 request, the 16 older entries are removed from the selection list and stored under `archived_weapons` in `weapon_manifest.json`; their metadata, source files and exports remain preserved. Future new designs register in this same active list. Gameplay integration remains Pending.
 
 Latest sniper reference review, 2026-10-19: sand/graphite block model with long scope and red-orange transmitting lenses, raised cheek pad, angled bolt handle, five handguard vents per side, long barrel and a slotted open muzzle brake. [Source, export and review images](../sniper_sand_block_v1/README.md). Existing Rifle static fit previews are inherited; no gameplay or animation edit is included.
 
