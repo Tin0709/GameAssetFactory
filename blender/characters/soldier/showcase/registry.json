@@ -133,6 +133,32 @@
       "head_rig": "Original_V6_Rig \u2014 slim arm sockets",
       "thin_planar_cards": true,
       "original_hair_preserved": "Survivor_Hair_3D \u2014 layered brown locks"
+    },
+    {
+      "id": "SOLDIER_Sword_Combo_v001",
+      "label": "Sword Combo v001",
+      "type": "animation",
+      "status": "Pending",
+      "review_scene": "SOLDIER_SWORD_COMBO_REVIEW",
+      "view_layer": "ViewLayer",
+      "object": "SW_Soldier_Review_Rig",
+      "camera_prefix": "SW_",
+      "action": "Sword_Combo_Original_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/sword_combo_original_v001/sword_combo_original_v001.blend",
+      "source_sha256": "51599e6fe7b1ad53e00f5582530d14ead862d021a5925a303c43adbc4c110a4e",
+      "frames": [
+        1,
+        61
+      ],
+      "fps": 30,
+      "contacts": [
+        10,
+        25,
+        43
+      ],
+      "appearance_adapter": "Copied current skin / original rigid part weights; arm rest pivots rebound to existing Showcase rig",
+      "godot_integrated": false,
+      "original_motion": true
     }
   ],
   "reserved_categories": [
