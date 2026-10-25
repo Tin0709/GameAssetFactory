@@ -31,6 +31,7 @@ var _voice_cursor := 0
 var _audio_clock := 1.0
 var _last_contact_sound := -1.0
 var _last_swing_sound := -1.0
+var _last_defense_sound := -1.0
 var _alive := 0
 var _cursor := 0
 var _emitted_this_frame := 0
@@ -176,8 +177,8 @@ func defense(point: Vector3, parry: bool) -> void:
 		_ring(point, Vector3.UP, 0.12, 2.0, 0.21, WHITE, 14)
 		for index in _scaled_count(6):
 			_emit(point, Vector3(_rng.randf_range(-2, 2), _rng.randf_range(0.7, 2.3), _rng.randf_range(-1, 1)), Vector3(0.045, 0.045, 0.11), 0.19, 4.0, WHITE)
-	if _audio_clock - _last_contact_sound >= 0.045:
-		_last_contact_sound = _audio_clock
+	if _audio_clock - _last_defense_sound >= 0.045:
+		_last_defense_sound = _audio_clock
 		_play(PARRY_AUDIO if parry else GUARD_AUDIO, -13.0 if parry else -17.0, 1.0)
 
 func dust(point: Vector3, strength: float = 1.0) -> void:
@@ -204,6 +205,7 @@ func reset() -> void:
 		voice.stop()
 	_last_contact_sound = -1.0
 	_last_swing_sound = -1.0
+	_last_defense_sound = -1.0
 
 func active_count() -> int:
 	return _alive

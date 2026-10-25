@@ -32,7 +32,12 @@ func run() -> void:
 		check(effects.get_child_count() == nodes, "Setup is idempotent")
 		check(effects.active_count() == 0, "Fresh pool starts empty")
 		effects.swing(1)
+		check(float(effects.get("_last_swing_sound")) >= 0.0 and float(effects.get("_last_contact_sound")) < 0.0, "Whiff schedules swing audio without contact audio")
 		check(effects.active_count() == 0, "Whiff swing never emits a contact impact")
+		effects.impact(Vector3.UP, Vector3.FORWARD)
+		effects.defense(Vector3.UP, true)
+		check(effects.get("_last_defense_sound") != null and float(effects.get("_last_defense_sound")) >= 0.0, "A parry keeps its distinct defense audio when a hit sounds in the same frame")
+		effects.reset()
 		for hit in 100:
 			effects.impact(Vector3(float(hit) * .02, 1.0, 0.0), Vector3.FORWARD, hit % 3 == 0, hit % 7 == 0)
 			effects.defense(Vector3(0, 1, 0), hit % 2 == 0)
@@ -48,15 +53,24 @@ func run() -> void:
 		effects.reset()
 		check(effects.active_count() == 0, "Reset immediately releases every particle")
 		check(effects.get_child_count() == nodes and effects.fixed_capacity() == capacity, "Reset retains fixed scene/pool allocation")
+		effects.position = Vector3(80, 5, -40)
+		effects.set_trail(Vector3(1, 1, 1), Vector3(1, 2, 1), true)
+		effects.set_trail(Vector3(1, 1, 1), Vector3(1.2, 2, 1), true)
+		var ribbon = effects.get_node("SwordBladeRibbon")
+		check(ribbon.global_transform == Transform3D.IDENTITY and ribbon.custom_aabb.position.x < 2.0, "Weapon trail endpoints remain in world coordinates even under a moved owner")
+		effects.reset()
 		for frame in 12:
 			effects.set_trail(Vector3(0, 1, 0), Vector3(float(frame) * .08, 2, 0), true, true)
 			effects._process(1.0 / 60.0)
 		effects.set_trail(Vector3.ZERO, Vector3.ZERO, false)
 		for frame in 120:
 			effects._process(1.0 / 60.0)
-		check(effects.active_count() == 0, "All effects naturally expire after reset/reuse")
+		check(effects.active_count() == 0 and not ribbon.visible, "All effects and trail naturally expire after reset/reuse")
 		effects.impact(Vector3.UP, Vector3.ZERO)
 		check(effects.active_count() > 0, "Pool reuses slots after reset and accepts zero hit direction")
+		for frame in 90:
+			effects._process(1.0 / 60.0)
+		check(effects.active_count() == 0, "Confirmed-hit particles expire without further events")
 		effects.intensity = 0.0
 		effects.reset()
 		effects.impact(Vector3.UP, Vector3.FORWARD, true, true)
