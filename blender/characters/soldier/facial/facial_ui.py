@@ -104,7 +104,7 @@ class SF_PT_facial(bpy.types.Panel):
  def poll(cls,context):return available()
  def draw(self,context):
   layout=self.layout
-  if context.scene!=main() or context.view_layer.name!='Facial Expressions':layout.operator('soldier_face.open',icon='HIDE_OFF');return
+  if context.scene!=main() or context.view_layer.name!='Facial Expressions':layout.operator('soldier_library.select_asset',text='Facial Expressions',icon='HIDE_OFF').asset_id='SOLDIER_Facial_System_v001';return
   p=main().soldier_facial;layout.label(text='18 original presets · actual Soldier',icon='OUTLINER_OB_ARMATURE')
   layout.template_list('SF_UL_presets','',p,'presets',p,'index',rows=18,maxrows=18)
   row=layout.row(align=True);row.operator('soldier_face.step',text='Previous',icon='TRIA_LEFT').direction=-1;row.operator('soldier_face.step',text='Next',icon='TRIA_RIGHT').direction=1
