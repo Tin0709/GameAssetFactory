@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "pending_actions": [
+    "Sword_Ready_Original_v001",
+    "Sword_Attack1_Original_v001",
+    "Sword_Attack2_Original_v001",
+    "Sword_Attack3_Original_v001",
+    "Sword_Guard_Original_v001",
+    "Sword_Parry_Original_v001",
+    "Sword_Roll_Original_v001",
+    "Sword_Hurt_Original_v001"
+  ],
+  "imported_actions": 8,
+  "prior_action_signatures_preserved": 93,
+  "prior_manifest_entries_preserved": 58,
+  "fresh_full_manifest_validation": true,
+  "exact_repo_addon": "blender/animation/showcase/gaf_animation_library.py",
+  "original_combo_source_unchanged": true,
+  "backup": ".validation/sword_combat_v001/animation_registration/20261025T104006416316Z",
+  "manifest_before_sha256": "821cbf1d79ef1771a88e0103e7b3fdea407cfcb36b20a0f29a795056b2bf6961",
+  "viewer_before_sha256": "704f9ed1dcc8de7dd5f7f44cc7328a58a6d8c6945136e693993a7c0c05096ee7",
+  "manifest_after_sha256": "fd5a4db8ed843de57937cb6f3f300b739d2455d8963abbcdb136e069280b1bec",
+  "viewer_after_sha256": "2a9c8e05c7e94567e2978972a0b7696e861dc6d94694a1bc2c84c1d769661b74"
+}
