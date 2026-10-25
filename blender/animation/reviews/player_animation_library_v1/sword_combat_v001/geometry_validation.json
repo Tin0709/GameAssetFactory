@@ -1,5 +1,5 @@
 {
-  "passed": false,
+  "passed": true,
   "fps_checks": [
     30,
     60,
@@ -182,7 +182,7 @@
       ]
     },
     "Roll": {
-      "passed": false,
+      "passed": true,
       "samples": 174,
       "duration": 0.72,
       "checks": {
@@ -192,26 +192,22 @@
         "fixed_grip": true,
         "connected_legs": true,
         "no_body_floor_penetration": true,
-        "blade_clears_head": false,
+        "blade_clears_head": true,
         "loop_seam": true,
         "unwrapped_complete_roll": true,
         "ground_support": true,
-        "blade_floor_clearance": false
+        "blade_floor_clearance": true
       },
-      "max_arm_rigidity_error_m": 3.793216365980463e-07,
+      "max_arm_rigidity_error_m": 4.887944301026084e-07,
       "max_scale_error": 0.0,
       "max_helper_identity_matrix_error": 0.0,
-      "max_grip_matrix_error": 5.960464477539062e-07,
+      "max_grip_matrix_error": 7.152557373046875e-07,
       "max_leg_socket_distance_m": 0.037223694449179105,
       "minimum_body_floor_z_m": 0.0005996227264404297,
-      "minimum_blade_z_m": -0.6188393831253052,
-      "blade_head_intersections": [
-        0.0541666667,
-        0.6125,
-        0.6166666667
-      ],
+      "minimum_blade_z_m": 0.7737534642219543,
+      "blade_head_intersections": [],
       "endpoint_matrix_difference": 4.209578037261963e-07,
-      "max_pose_orientation_step_rad": 2.535059992467062,
+      "max_pose_orientation_step_rad": 0.15731260180473328,
       "root_x_range_rad": [
         0.0,
         6.2831854820251465
