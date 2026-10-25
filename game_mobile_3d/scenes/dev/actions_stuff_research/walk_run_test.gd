@@ -15,6 +15,14 @@ const GrassField=preload("res://scenes/dev/actions_stuff_research/grass_md2_v001
 const MD2Lighting=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/lighting.gd")
 const PerformanceCombat=preload("res://scenes/dev/actions_stuff_research/performance_lab_v001/combat_group.gd")
 const PerformanceControls=preload("res://scenes/dev/actions_stuff_research/performance_lab_v001/controls.gd")
+const SwordActor=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/actor.gd")
+const SwordVisual=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/visual.gd")
+const SwordPresenter=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/presenter.gd")
+const SwordController=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/controller.gd")
+const SwordGroup=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/combat_group.gd")
+@export var sword_combat_enabled:=false
+@export var sword_config:Resource=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/settings.tres")
+var sword_combat:Node3D
 @export var performance_test_enabled:=false
 var performance_controls:CanvasLayer
 @export var md2_lighting_enabled:=false
@@ -59,8 +67,8 @@ const CAMERA_AIR_DOWN_ZONE:=1.1
 func _ready() -> void:
 	_build_environment()
 	player=PLAYER.instantiate();player.name="ResearchPlayer"
-	player.set_script(SOURCE_ACTOR)
-	player.get_node("Visual").set_script(RIFLE_VISUAL if rifle_ready else SOURCE_VISUAL)
+	player.set_script(SwordActor if sword_combat_enabled and rifle_ready else SOURCE_ACTOR)
+	player.get_node("Visual").set_script((SwordVisual if sword_combat_enabled else RIFLE_VISUAL) if rifle_ready else SOURCE_VISUAL)
 	player.get_node("Visual").authored_locomotion=true;player.get_node("Visual").generic_weapon_carry=true;player.get_node("Visual").long_gun_carry_v2=true;player.get_node("Visual").weapon_equipped=false
 	# Planar travel and rifle gait playback have independent, reversible tuning.
 	player.review_pace=1.;player.walk_speed=1.8*movement_speed_multiplier;player.run_speed=5.031*movement_speed_multiplier;player.acceleration=40.*movement_speed_multiplier;player.deceleration=35.*movement_speed_multiplier
@@ -78,7 +86,7 @@ func _ready() -> void:
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.055,.88);style.content_margin_left=16;style.content_margin_right=16;style.content_margin_top=12;style.content_margin_bottom=12;style.set_corner_radius_all(6)
 	panel.add_theme_stylebox_override("panel",style)
 	hud=Label.new();hud.add_theme_font_size_override("font_size",18);panel.add_child(hud)
-	presentation=RiflePresenter.new() if rifle_ready else RenderPresenter.new();presentation.name="RenderPosePresentation";add_child(presentation)
+	presentation=(SwordPresenter.new() if sword_combat_enabled else RiflePresenter.new()) if rifle_ready else RenderPresenter.new();presentation.name="RenderPosePresentation";add_child(presentation)
 	presentation.setup(player,player.visual);player.visual.presentation=presentation
 	if rifle_ready:
 		rifle_fire=RifleFire.new();rifle_fire.name="InfiniteRifleFire";add_child(rifle_fire);rifle_fire.setup(player)
@@ -92,7 +100,7 @@ func _ready() -> void:
 				var excluded:Array[RID]=rifle_fire.query.exclude
 				excluded.append(boundary.get_rid());rifle_fire.query.exclude=excluded
 		if zombie_combat_enabled:
-			zombie_combat=PerformanceCombat.new() if performance_test_enabled else ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player,rifle_fire.audio)
+			zombie_combat=(SwordGroup.new() if sword_combat_enabled else PerformanceCombat.new()) if performance_test_enabled else ZombieCombat.new();zombie_combat.name="ResearchZombieCombat";add_child(zombie_combat);zombie_combat.setup(player,rifle_fire.audio)
 			if auto_aim_enabled:
 				rifle_auto_aim=RifleAutoAim.new();rifle_auto_aim.name="NearestZombieAutoAim";add_child(rifle_auto_aim);rifle_auto_aim.setup(player,zombie_combat)
 	if soldier_loadout and rifle_ready:
@@ -109,6 +117,9 @@ func _ready() -> void:
 		md2_lighting=MD2Lighting.new();md2_lighting.name="GAF_MD2_Lighting_v001";add_child(md2_lighting);md2_lighting.setup(self,grass_field,not performance_test_enabled)
 	if performance_test_enabled and zombie_combat!=null:
 		performance_controls=PerformanceControls.new();performance_controls.name="PerformanceTestControls";add_child(performance_controls);performance_controls.setup(self)
+	if sword_combat_enabled and rifle_ready and zombie_combat!=null:
+		sword_combat=SwordController.new();sword_combat.name="OriginalSwordCombat";add_child(sword_combat);sword_combat.setup(self,sword_config)
+		if "--sword" in OS.get_cmdline_user_args():sword_combat.set_equipped(true)
 	_update_camera()
 func _build_environment() -> void:
 	var environment:=WorldEnvironment.new();var settings:=Environment.new();settings.background_mode=Environment.BG_COLOR;settings.background_color=Color(.17,.22,.26)
@@ -143,6 +154,9 @@ func _process(delta: float) -> void:
 	presentation.prepare(Engine.get_physics_interpolation_fraction())
 	if rifle_fire!=null:rifle_fire.present(presentation)
 	_update_camera(delta,presentation.display_actor)
+	if sword_combat!=null:
+		sword_combat.present(delta)
+		var feedback:Vector2=sword_combat.camera_offset();camera.global_position+=camera.global_basis.x*feedback.x+camera.global_basis.y*feedback.y
 	var visual=player.visual
 	# Camera orbit is observational; Q/C and auto-aim own stationary look intent.
 	var state:="RUN" if visual.gait_run_weight>.98 else ("WALK ↔ RUN" if visual.gait_run_weight>.02 else "WALK")
@@ -153,7 +167,8 @@ func _process(delta: float) -> void:
 	if rifle_ready and visual.rifle_aim_weight>.001:state+=" · AIM" if visual.rifle_aim_weight>.999 else " · READY ↔ AIM"
 	if rifle_fire!=null and rifle_fire.trigger_held:state+=" · FIRING" if visual.rifle_aim_weight>=.999 else " · RAISING TO FIRE"
 	var variables: Dictionary=visual.direction_snapshot.get("vars",{})
-	hud.text=("RIFLE READY / AIM / FIRE · INFINITE AMMO ∞" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH")+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold E Aim + Fire · Right Mouse Aim / Orbit\nWheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
+	hud.text=("SWORD · ORIGINAL COMBAT" if sword_combat!=null and sword_combat.equipped else ("RIFLE READY / AIM / FIRE · INFINITE AMMO ∞" if rifle_ready else "ACTIONS & STUFF · LOCOMOTION RESEARCH"))+"\n%s   |   %.2f m/s   |   %.2f cycles/s\nPhase %.2f · F %.2f / Side %.2f\nWASD Walk · Shift Run · Space Jump · R Reset\nHold E Aim + Fire · Right Mouse Aim / Orbit\nWheel Zoom"%[state,player.current_speed,visual.gait_frequency,visual.gait_phase,variables.get("v.cknrcn",0.),variables.get("v.mrmeib",0.)]
+	if sword_combat!=null and sword_combat.equipped:hud.text=hud.text.replace("Hold E Aim + Fire · Right Mouse Aim / Orbit","E / LMB Sword · RMB Guard/Parry · F Roll · Tab Rifle · Middle Orbit")
 	if zombie_combat!=null:
 		var capacity:int=zombie_combat.zombies.size() if performance_test_enabled else ZombieCombat.MAX_RAGDOLLS
 		hud.text+="\nZombies %d · Corpses %d / %d · Cleared %d · R Restart"%[zombie_combat.living_count(),zombie_combat.active_ragdolls(),capacity,zombie_combat.kills]
@@ -195,6 +210,12 @@ func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	camera.global_position=camera_anchor+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*view_distance
 	camera.look_at(camera_anchor,Vector3.UP);camera.size=camera_size
 func _input(event: InputEvent) -> void:
+	if sword_combat!=null and sword_combat.equipped:
+		if event is InputEventKey and not event.pressed and event.physical_keycode==KEY_E:sword_combat.attack(false)
+		if event is InputEventMouseButton and not event.pressed:
+			if event.button_index==MOUSE_BUTTON_LEFT:sword_combat.attack(false)
+			if event.button_index==MOUSE_BUTTON_RIGHT:sword_combat.guard(false)
+			if event.button_index==MOUSE_BUTTON_MIDDLE:orbiting=false
 	# A GUI may consume the key-up after the press began over the world.
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_RIGHT and not event.pressed:
 		orbiting=false;_right_aim_held=false;_sync_rifle_controls()
@@ -208,11 +229,26 @@ func _turn_key(event: InputEventKey) -> void:
 	else:return
 	if rifle_ready and is_instance_valid(player):player.visual.turn_axis=float(_turn_left_held)-float(_turn_right_held)
 func _sync_rifle_controls() -> void:
+	if sword_combat!=null and sword_combat.equipped:
+		player.visual.set_rifle_aim(false);player.visual.combat_turn_requested=false;rifle_fire.set_trigger(false)
+		if rifle_auto_aim!=null:rifle_auto_aim.reset_target()
+		return
 	if is_instance_valid(player) and rifle_ready:player.visual.set_rifle_aim(_fire_key_held or _right_aim_held)
 	if is_instance_valid(player) and rifle_ready:player.visual.combat_turn_requested=_fire_key_held
 	if rifle_fire!=null:rifle_fire.set_trigger(_fire_key_held)
 	if rifle_auto_aim!=null and not (_fire_key_held or _right_aim_held):rifle_auto_aim.reset_target()
 func _unhandled_input(event: InputEvent) -> void:
+	if sword_combat!=null:
+		if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_TAB:
+			sword_combat.set_equipped(not sword_combat.equipped);get_viewport().set_input_as_handled();return
+		if sword_combat.equipped:
+			if event is InputEventKey and not event.echo:
+				if event.physical_keycode==KEY_E:sword_combat.attack(event.pressed);return
+				if event.physical_keycode==KEY_F and event.pressed:sword_combat.roll();return
+			if event is InputEventMouseButton:
+				if event.button_index==MOUSE_BUTTON_LEFT:sword_combat.attack(event.pressed);return
+				if event.button_index==MOUSE_BUTTON_RIGHT:sword_combat.guard(event.pressed);return
+				if event.button_index==MOUSE_BUTTON_MIDDLE:orbiting=event.pressed;return
 	if grass_field!=null and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_V:
 		grass_overview=not grass_overview;_camera_initialized=false
 	if event.is_action_pressed("reset_test"):reset_player()
@@ -229,10 +265,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		azimuth-=event.relative.x*.006;elevation=clampf(elevation+event.relative.y*.004,.15,.75)
 func _notification(what: int) -> void:
 	if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
+		if sword_combat!=null:sword_combat.attack(false);sword_combat.guard(false)
 		orbiting=false;_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
 		_turn_left_held=false;_turn_right_held=false
 		if rifle_ready and is_instance_valid(player):player.visual.turn_axis=0.
 func reset_player() -> void:
+	if sword_combat!=null:sword_combat.reset_combat()
 	if rifle_auto_aim!=null:rifle_auto_aim.reset_target()
 	if rifle_fire!=null:rifle_fire.reset_fire()
 	_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
