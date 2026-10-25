@@ -1,0 +1,60 @@
+{
+  "action": "Sword_Combo_Original_v001",
+  "status": "pending",
+  "source": "blender/animation/reviews/player_animation_library_v1/sword_combo_original_v001/sword_combo_original_v001.blend",
+  "rig": "SC_Player_Rig",
+  "mesh": "SC_Player_Mesh",
+  "slot": "OBSC_Player_Rig",
+  "frames": [
+    1,
+    61
+  ],
+  "fps": 30,
+  "elapsed_endpoint_seconds": 2.0,
+  "nonloop": true,
+  "planned_contact_frames": [
+    10,
+    25,
+    43
+  ],
+  "planned_contact_seconds": [
+    0.3,
+    0.8,
+    1.4
+  ],
+  "hit_descriptions": [
+    "right-to-left descending slash",
+    "left-to-right returning sweep",
+    "longer load / descending finisher"
+  ],
+  "sword_asset": "blender/weapons/sword_sand_block_v1/Sword_Sand_Block_V1.blend",
+  "grip_distance_from_shoulder_m": 0.622,
+  "world_travel_owner": "future controller; not authored in this Action",
+  "original_motion": true,
+  "game_tracks_imported": false,
+  "godot_modified": false,
+  "provenance": {
+    "S": "A&S controller/layer/time principles only; no source curves copied",
+    "O": "Genuine MD2 cached gameplay frame sheets G01\u2013G03, same-body sweep/follow-through and discrete hit feedback",
+    "P": "All bone transforms, timing, footwork, arcs and receiving/recovery",
+    "U": "Real MD2 skeleton, tracks, authored keys, hit windows and blend settings unavailable"
+  },
+  "md2_publication_facts": {
+    "damage": [
+      14,
+      16,
+      22
+    ],
+    "knockback_strength_raw": [
+      500,
+      500,
+      800
+    ],
+    "attack_speed_multiplier": [
+      1,
+      1,
+      1.4
+    ],
+    "qualification": "Previously cross-checked public data publications, not an independently authenticated local game asset. Not used as pose angles, times, physical masses or clip play rates."
+  }
+}
