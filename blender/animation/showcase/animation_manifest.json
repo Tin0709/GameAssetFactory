@@ -3367,6 +3367,58 @@
       },
       "review_repeat_hz": 6.0,
       "approval_date": "2026-10-20"
+    },
+    {
+      "action": "Sword_Combo_Original_v001",
+      "source": "blender/animation/reviews/player_animation_library_v1/sword_combo_original_v001/sword_combo_original_v001.blend",
+      "source_sha256": "51599e6fe7b1ad53e00f5582530d14ead862d021a5925a303c43adbc4c110a4e",
+      "source_rig": "SC_Player_Rig",
+      "source_mesh": "SC_Player_Mesh",
+      "source_armature": "LB_Test_RestRig.004",
+      "slot_identifier": "OBSC_Player_Rig",
+      "action_sha256": "749fb852130af82e5e46ae2913c57159d30779cfe6a10d1c64ca5718977732b2",
+      "action_frame_range": [
+        1.0,
+        61.0
+      ],
+      "start": 1,
+      "end": 61,
+      "fps": 30,
+      "fps_base": 1.0,
+      "status": "pending",
+      "approval_note": "Awaiting explicit human review; registering/importing does not approve animation.",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "preview_prop": "sword_sand_block_v1",
+      "preview_prop_source": "blender/weapons/sword_sand_block_v1/Sword_Sand_Block_V1.blend",
+      "preview_prop_source_sha256": "2347d72fb158bc85ae1c8910ec38882e41af6b90e87bb22f3e067cbd12baa225",
+      "research_only": true,
+      "production_eligible": false,
+      "original_custom_animation": true,
+      "source_derived_reconstruction": false,
+      "bake_hz": 240,
+      "planned_contact_frames": [
+        10,
+        25,
+        43
+      ],
+      "duration_s": 2.0,
+      "timing_provenance": "P original proposed timing; not extracted MD2 animation parameters",
+      "review_note": "Original three-hit choreography; same Action previewed on current skin in SOLDIER_Asset_Library. Blender only."
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
