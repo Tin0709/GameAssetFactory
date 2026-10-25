@@ -57,3 +57,8 @@ An older Soldier window opened without the UI bootstrap is left intact; the upda
 Latest backpack refinement: broad low-contrast pixel blocks, no granular speckles, fewer repeated relief details,512atlas and3,744triangles. The existing skin and all approved gameplay remain unchanged.
 
 Latest Pending review — bushier reference haircut and ragged survival clothing: open the same Soldier library, Hair & Bandana view. Default now shows the whole character.61 flat hair cards keep the current brown palette; the full red wrap/knot/tails remain exact. The existing skin/clothing receives broad low-noise dirt, real cutout tears and35 flat frayed cloth tabs. Original head material, body geometry, wrist rings, source shared meshes/Face review and all34Actions are preserved. Authoring and checks: `../assets/worn_clothing_v001/`; five full-body views and shirt/trouser closeups in its `review/`. No Godot change or artistic-status promotion.
+
+
+## Sword Combo v001 — Pending (2026-10-25)
+
+Use **SOLDIER Library → ANIMATIONS → Sword Combo v001**. The existing library now previews the original three-hit Action on copies of the current worn Soldier skin, hair and red bandana. Play/Pause, Restart, Hit 1/2/3 and six review angles are provided. The same independently registered Action remains in Animation Showcase; original Soldier assets and all Godot gameplay are preserved. See `../../../animation/reviews/player_animation_library_v1/sword_combo_original_v001/README.md` for provenance, original timing and validation.
