@@ -21,7 +21,7 @@
   "max_straight_arm_rigidity_error_m": 3.8886035533845093e-07,
   "max_palm_grip_translation_error_m": 2.092834445418912e-05,
   "max_palm_grip_rotation_error_rad": 3.0199159795074593e-07,
-  "max_leg_socket_distance_m": 0.08025448756304503,
+  "max_leg_socket_distance_m": 0.07881980149386102,
   "head_intersection_samples": [],
   "max_scale_error": 2.384185791015625e-07,
   "maximum_sword_orientation_delta_per_240fps_sample_rad": 0.13680818676948547,
