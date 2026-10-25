@@ -38,6 +38,8 @@ var _rows:Array[Array]=[]
 var _candidates:Array[Array]=[]
 var panel:PanelContainer
 var status:Label
+var rifle_button:Button
+var sword_button:Button
 func setup(scene:Node3D,tuning:Resource)->void:
 	lab=scene;player=scene.player;visual=player.visual;encounter=scene.zombie_combat;config=tuning.duplicate()
 	state.buffer_seconds=config.buffer_seconds;state.parry_window=config.parry_window
@@ -50,14 +52,17 @@ func _build_controls()->void:
 	panel=PanelContainer.new();panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM);panel.position=Vector2(-290,-116);panel.size=Vector2(580,100);canvas.add_child(panel)
 	var box:=VBoxContainer.new();panel.add_child(box);status=Label.new();status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.add_theme_font_size_override("font_size",15);box.add_child(status)
 	var row:=HBoxContainer.new();row.alignment=BoxContainer.ALIGNMENT_CENTER;box.add_child(row)
-	for label in ["Tab · Rifle / Sword","E / Click · Attack","RMB · Guard","F · Roll"]:
+	rifle_button=Button.new();rifle_button.text="Rifle";rifle_button.toggle_mode=true;rifle_button.focus_mode=Control.FOCUS_NONE;rifle_button.custom_minimum_size.x=90;row.add_child(rifle_button)
+	sword_button=Button.new();sword_button.text="Sword";sword_button.toggle_mode=true;sword_button.focus_mode=Control.FOCUS_NONE;sword_button.custom_minimum_size.x=90;row.add_child(sword_button)
+	rifle_button.button_pressed=true;rifle_button.pressed.connect(func():set_equipped(false));sword_button.pressed.connect(func():set_equipped(true))
+	for label in ["E / Click · Attack","RMB · Guard","F · Roll"]:
 		var button:=Button.new();button.text=label;button.focus_mode=Control.FOCUS_NONE;row.add_child(button)
 		match label:
-			"Tab · Rifle / Sword":button.pressed.connect(func():set_equipped(not equipped))
 			"E / Click · Attack":button.button_down.connect(func():attack(true));button.button_up.connect(func():attack(false))
 			"RMB · Guard":button.button_down.connect(func():guard(true));button.button_up.connect(func():guard(false))
 			"F · Roll":button.pressed.connect(roll)
 func set_equipped(value:bool)->void:
+	rifle_button.set_pressed_no_signal(not value);sword_button.set_pressed_no_signal(value)
 	if equipped==value:return
 	equipped=value;held_attack=false;freeze_remaining=0.;state.cancel();_hit_ids.clear();_blade_initialized=false
 	visual.cancel_rifle_recoil();visual.set_rifle_aim(false);visual.auto_aim_target=null;visual.combat_turn_requested=false
