@@ -69,7 +69,7 @@ def custom(kind,t,duration):
   ar0=rig.pose.bones['UpperArm.R'].matrix.to_quaternion();al0=rig.pose.bones['UpperArm.L'].matrix.to_quaternion()
   ar,_=arm_frame(Vector((-.26,-.40,-.88)),Vector((-1,0,0)))
   al,_=arm_frame(Vector((.32,-.70,-.64)),Vector((0,-1,0)))
-  qr=ar0.slerp(ar.to_quaternion(),tuck);ql=al0.slerp(al.to_quaternion(),tuck)
+  qr=ar0.slerp((ar@rig.data.bones['UpperArm.R'].matrix_local.to_3x3()).to_quaternion(),tuck);ql=al0.slerp((al@rig.data.bones['UpperArm.L'].matrix_local.to_3x3()).to_quaternion(),tuck)
   for name,q in [('UpperArm.R',qr),('UpperArm.L',ql)]:
    b=rig.pose.bones[name];m=q.to_matrix().to_4x4();m.translation=b.head;b.matrix=m;bpy.context.view_layer.update()
   fixed_grip()
@@ -86,7 +86,7 @@ def custom(kind,t,duration):
   # This is authored shoulder motion, never a detached prop or helper bend.
   right=rig.pose.bones['UpperArm.R'];current=right.matrix.to_quaternion()
   safe,_=arm_frame(Vector((0,-.40,.9165)),Vector((-1,0,0)))
-  q=current.slerp(safe.to_quaternion(),tuck)
+  q=current.slerp((safe@right.bone.matrix_local.to_3x3()).to_quaternion(),tuck)
   rm=q.to_matrix().to_4x4();rm.translation=right.head;right.matrix=rm
   bpy.context.view_layer.update();fixed_grip()
   ev=mesh.evaluated_get(bpy.context.evaluated_depsgraph_get());geo=ev.to_mesh();lowest=min(v.co.z for v in geo.vertices);ev.to_mesh_clear()
