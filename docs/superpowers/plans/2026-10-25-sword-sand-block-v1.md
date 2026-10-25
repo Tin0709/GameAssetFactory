@@ -31,10 +31,10 @@
 
 **Interfaces:** WEAPON_EXPORT with grip-centered Sword_Sand_Block_V1 root, Sword_Blade and Sword_Hilt children.
 
-- [ ] Run the saved-file validator before build; confirm missing source.
-- [ ] Build the reference silhouette, faceted silver edges, shallow fuller, gold guard, five grip wraps and recessed pommel.
-- [ ] Render side, opposite, top, front, hero and four details; compare with the reference and refine.
-- [ ] Verify saved topology/GLB roundtrip/markers/atlas and source dimensions.
+- [x] Run the saved-file validator before build; confirm missing source.
+- [x] Build the reference silhouette, faceted silver edges, shallow fuller, gold guard, five grip wraps and recessed pommel.
+- [x] Render side, opposite, top, front, hero and four details; compare with the reference and refine.
+- [x] Verify saved topology/GLB roundtrip/markers/atlas and source dimensions.
 
 ### Task 2: Add standalone Sword support
 
@@ -42,15 +42,15 @@
 
 **Interfaces:** Per-entry preview_modes, defaulting to the existing three firearm modes. Sword registrations receive only STANDALONE; unsupported mode requests normalize safely.
 
-- [ ] Run the real saved-library sword selection test before registration; confirm missing Sword.
-- [ ] Add Sword registration and standalone mode handling; preserve existing firearm behavior.
-- [ ] Register the finalized source under the existing update lock.
-- [ ] Run saved-library mode/view coverage and Sword/firearm mode-transition checks.
+- [x] Run the real saved-library sword selection test before registration; confirm missing Sword.
+- [x] Add Sword registration and standalone mode handling; preserve existing firearm behavior.
+- [x] Register the finalized source under the existing update lock.
+- [x] Run saved-library mode/view coverage and Sword/firearm mode-transition checks.
 
 ### Task 3: Deliver and preserve
 
 **Files:** Same showcase manifest/blend/README/reports; evidence under `.validation/sword_sand_block_v1_20261025/`.
 
-- [ ] Audit all prior source/file hashes, active/archive records and preferred rifle.
-- [ ] Confirm nine final render files, new Pending entry and new default selection.
-- [ ] Open the saved model in Blender or activate the existing viewer; report reload needs accurately.
+- [x] Audit all prior source/file hashes, active/archive records and preferred rifle.
+- [x] Confirm nine final render files, new Pending entry and new default selection.
+- [x] Open the saved model in Blender or activate the existing viewer; report reload needs accurately.
