@@ -1,0 +1,29 @@
+[
+  {
+    "file": "Sword_Combo_Front_30fps.mp4",
+    "frames": 61,
+    "size": [
+      640,
+      640
+    ],
+    "fps": 30.0
+  },
+  {
+    "file": "Sword_Combo_Front_3Q_30fps.mp4",
+    "frames": 61,
+    "size": [
+      640,
+      640
+    ],
+    "fps": 30.0
+  },
+  {
+    "file": "Sword_Combo_Left_Side_30fps.mp4",
+    "frames": 61,
+    "size": [
+      640,
+      640
+    ],
+    "fps": 30.0
+  }
+]
