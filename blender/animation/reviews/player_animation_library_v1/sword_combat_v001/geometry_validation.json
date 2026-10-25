@@ -1,0 +1,246 @@
+{
+  "passed": true,
+  "fps_checks": [
+    30,
+    60,
+    240
+  ],
+  "rig_signature": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+  "clips": {
+    "Ready": {
+      "passed": true,
+      "samples": 193,
+      "duration": 0.8,
+      "checks": {
+        "rigid_arms": true,
+        "unit_scales": true,
+        "identity_helpers": true,
+        "fixed_grip": true,
+        "connected_legs": true,
+        "no_body_floor_penetration": true,
+        "blade_clears_head": true,
+        "loop_seam": true
+      },
+      "max_arm_rigidity_error_m": 2.5636927089222153e-07,
+      "max_scale_error": 0.0,
+      "max_helper_identity_matrix_error": 0.0,
+      "max_grip_matrix_error": 4.172325134277344e-07,
+      "max_leg_socket_distance_m": 0.037223667217582336,
+      "minimum_body_floor_z_m": 0.000600028783082962,
+      "minimum_blade_z_m": 0.7975216507911682,
+      "blade_head_intersections": [],
+      "endpoint_matrix_difference": 0.0,
+      "max_pose_orientation_step_rad": 0.0,
+      "root_x_range_rad": [
+        0.0,
+        0.0
+      ]
+    },
+    "Attack1": {
+      "passed": true,
+      "samples": 145,
+      "duration": 0.6,
+      "checks": {
+        "rigid_arms": true,
+        "unit_scales": true,
+        "identity_helpers": true,
+        "fixed_grip": true,
+        "connected_legs": true,
+        "no_body_floor_penetration": true,
+        "blade_clears_head": true,
+        "loop_seam": true
+      },
+      "max_arm_rigidity_error_m": 3.579381748874281e-07,
+      "max_scale_error": 0.0,
+      "max_helper_identity_matrix_error": 0.0,
+      "max_grip_matrix_error": 9.520445019006729e-07,
+      "max_leg_socket_distance_m": 0.06640706123179109,
+      "minimum_body_floor_z_m": 0.0005998946726322174,
+      "minimum_blade_z_m": 0.8009084463119507,
+      "blade_head_intersections": [],
+      "endpoint_matrix_difference": 0.9370384141802788,
+      "max_pose_orientation_step_rad": 6.165928363800049,
+      "root_x_range_rad": [
+        0.0,
+        0.0
+      ]
+    },
+    "Attack2": {
+      "passed": true,
+      "samples": 121,
+      "duration": 0.5,
+      "checks": {
+        "rigid_arms": true,
+        "unit_scales": true,
+        "identity_helpers": true,
+        "fixed_grip": true,
+        "connected_legs": true,
+        "no_body_floor_penetration": true,
+        "blade_clears_head": true,
+        "loop_seam": true
+      },
+      "max_arm_rigidity_error_m": 3.7814907850174666e-07,
+      "max_scale_error": 0.0,
+      "max_helper_identity_matrix_error": 0.0,
+      "max_grip_matrix_error": 1.9787345081567764e-05,
+      "max_leg_socket_distance_m": 0.06665780424995862,
+      "minimum_body_floor_z_m": 0.0005998257547616959,
+      "minimum_blade_z_m": 1.0706590414047241,
+      "blade_head_intersections": [],
+      "endpoint_matrix_difference": 1.2391063868999481,
+      "max_pose_orientation_step_rad": 6.182762145996094,
+      "root_x_range_rad": [
+        0.0,
+        0.0
+      ]
+    },
+    "Attack3": {
+      "passed": true,
+      "samples": 217,
+      "duration": 0.9,
+      "checks": {
+        "rigid_arms": true,
+        "unit_scales": true,
+        "identity_helpers": true,
+        "fixed_grip": true,
+        "connected_legs": true,
+        "no_body_floor_penetration": true,
+        "blade_clears_head": true,
+        "loop_seam": true
+      },
+      "max_arm_rigidity_error_m": 3.68709654559452e-07,
+      "max_scale_error": 0.0,
+      "max_helper_identity_matrix_error": 0.0,
+      "max_grip_matrix_error": 4.470348358154297e-06,
+      "max_leg_socket_distance_m": 0.07362493237196595,
+      "minimum_body_floor_z_m": 0.0005998667329549789,
+      "minimum_blade_z_m": 0.38480255007743835,
+      "blade_head_intersections": [],
+      "endpoint_matrix_difference": 1.0168896615505219,
+      "max_pose_orientation_step_rad": 6.266612529754639,
+      "root_x_range_rad": [
+        0.0,
+        0.0
+      ]
+    },
+    "Guard": {
+      "passed": true,
+      "samples": 193,
+      "duration": 0.8,
+      "checks": {
+        "rigid_arms": true,
+        "unit_scales": true,
+        "identity_helpers": true,
+        "fixed_grip": true,
+        "connected_legs": true,
+        "no_body_floor_penetration": true,
+        "blade_clears_head": true,
+        "loop_seam": true
+      },
+      "max_arm_rigidity_error_m": 3.7814907850174666e-07,
+      "max_scale_error": 0.0,
+      "max_helper_identity_matrix_error": 0.0,
+      "max_grip_matrix_error": 4.172325134277344e-07,
+      "max_leg_socket_distance_m": 0.037223667217582336,
+      "minimum_body_floor_z_m": 0.000600028783082962,
+      "minimum_blade_z_m": 0.9761857986450195,
+      "blade_head_intersections": [],
+      "endpoint_matrix_difference": 0.0,
+      "max_pose_orientation_step_rad": 0.0,
+      "root_x_range_rad": [
+        0.0,
+        0.0
+      ]
+    },
+    "Parry": {
+      "passed": true,
+      "samples": 78,
+      "duration": 0.32,
+      "checks": {
+        "rigid_arms": true,
+        "unit_scales": true,
+        "identity_helpers": true,
+        "fixed_grip": true,
+        "connected_legs": true,
+        "no_body_floor_penetration": true,
+        "blade_clears_head": true,
+        "loop_seam": true
+      },
+      "max_arm_rigidity_error_m": 3.6378370570342845e-07,
+      "max_scale_error": 0.0,
+      "max_helper_identity_matrix_error": 0.0,
+      "max_grip_matrix_error": 4.76837158203125e-07,
+      "max_leg_socket_distance_m": 0.037223667217582336,
+      "minimum_body_floor_z_m": 0.000600028783082962,
+      "minimum_blade_z_m": 0.9763309955596924,
+      "blade_head_intersections": [],
+      "endpoint_matrix_difference": 0.0,
+      "max_pose_orientation_step_rad": 6.277926445007324,
+      "root_x_range_rad": [
+        0.0,
+        0.0
+      ]
+    },
+    "Roll": {
+      "passed": true,
+      "samples": 174,
+      "duration": 0.72,
+      "checks": {
+        "rigid_arms": true,
+        "unit_scales": true,
+        "identity_helpers": true,
+        "fixed_grip": true,
+        "connected_legs": true,
+        "no_body_floor_penetration": true,
+        "blade_clears_head": true,
+        "loop_seam": true,
+        "unwrapped_complete_roll": true,
+        "ground_support": true
+      },
+      "max_arm_rigidity_error_m": 2.7161428531346e-07,
+      "max_scale_error": 0.0,
+      "max_helper_identity_matrix_error": 0.0,
+      "max_grip_matrix_error": 5.364418029785156e-07,
+      "max_leg_socket_distance_m": 0.037223694449179105,
+      "minimum_body_floor_z_m": 0.0005996227264404297,
+      "minimum_blade_z_m": -0.43284937739372253,
+      "blade_head_intersections": [],
+      "endpoint_matrix_difference": 4.172325134277344e-07,
+      "max_pose_orientation_step_rad": 6.251904487609863,
+      "root_x_range_rad": [
+        0.0,
+        6.2831854820251465
+      ]
+    },
+    "Hurt": {
+      "passed": true,
+      "samples": 97,
+      "duration": 0.4,
+      "checks": {
+        "rigid_arms": true,
+        "unit_scales": true,
+        "identity_helpers": true,
+        "fixed_grip": true,
+        "connected_legs": true,
+        "no_body_floor_penetration": true,
+        "blade_clears_head": true,
+        "loop_seam": true
+      },
+      "max_arm_rigidity_error_m": 3.591767189858541e-07,
+      "max_scale_error": 0.0,
+      "max_helper_identity_matrix_error": 0.0,
+      "max_grip_matrix_error": 4.172325134277344e-07,
+      "max_leg_socket_distance_m": 0.037223667217582336,
+      "minimum_body_floor_z_m": 0.000600028783082962,
+      "minimum_blade_z_m": 0.7724826335906982,
+      "blade_head_intersections": [],
+      "endpoint_matrix_difference": 0.0,
+      "max_pose_orientation_step_rad": 0.03291501849889755,
+      "root_x_range_rad": [
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "source_combo_unchanged": true
+}

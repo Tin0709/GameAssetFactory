@@ -1,0 +1,224 @@
+{
+	"blade_base_local": [
+		0.0,
+		0.0,
+		-0.1596
+	],
+	"blade_tip_local": [
+		0.0,
+		0.0,
+		-0.96292
+	],
+	"bones": [
+		"Root",
+		"Hips",
+		"Spine",
+		"Chest",
+		"Neck",
+		"Head",
+		"Arm.L",
+		"ForeArm.L",
+		"Arm.R",
+		"ForeArm.R",
+		"WeaponCarrier",
+		"Leg.L",
+		"Leg.R"
+	],
+	"carrier_in_right_arm": [
+		[
+			-1.00000011920929,
+			0.0000000228174030780792,
+			-0.0000000207219272851944,
+			0.0000000811414793133736
+		],
+		[
+			0.0000000121071934700012,
+			0.000000042840838432312,
+			1.00000023841858,
+			0.621999740600586
+		],
+		[
+			-0.0000000623986124992371,
+			1.00000011920929,
+			-0.0000000204890966415405,
+			0.0000000670552253723145
+		],
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		]
+	],
+	"clips": {
+		"Attack1": {
+			"action": "Sword_Attack1_Original_v001",
+			"action_sha256": "1b5cc038df69905c1bf075edaf270cbf3ded74cbcaab09cd0d73d0978fc622de",
+			"contact_time": 0.3,
+			"duration": 0.6,
+			"entry_exit": "Original F1 Ready→F19 flowing open left finish; outgoing nonzero velocity for Attack2 or runtime recovery blend.",
+			"loop": false,
+			"original_source_frames": [
+				1.0,
+				19.0
+			],
+			"row_floats": 131.0,
+			"samples": 145.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
+			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+		},
+		"Attack2": {
+			"action": "Sword_Attack2_Original_v001",
+			"action_sha256": "38bc1196c98b7ed252b04461b73584b7f17ca3ece5a05e8d8c70088b0b0b2ed7",
+			"contact_time": 0.2,
+			"duration": 0.5,
+			"entry_exit": "Original F19 open left→F34 right raised load; outgoing nonzero velocity for Attack3 or runtime recovery blend.",
+			"loop": false,
+			"original_source_frames": [
+				19.0,
+				34.0
+			],
+			"row_floats": 131.0,
+			"samples": 121.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
+			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+		},
+		"Attack3": {
+			"action": "Sword_Attack3_Original_v001",
+			"action_sha256": "5cc789661f1ab8074f6144e44f0d38a2af178775cd7b927b00975db79cb238c4",
+			"contact_time": 0.3,
+			"duration": 0.9,
+			"entry_exit": "Original F34 right raised→F61 settled Ready; zero exit velocity.",
+			"loop": false,
+			"original_source_frames": [
+				34.0,
+				61.0
+			],
+			"row_floats": 131.0,
+			"samples": 217.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
+			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+		},
+		"Guard": {
+			"action": "Sword_Guard_Original_v001",
+			"action_sha256": "3c8d5db7693d443bb23bae291a65591c89ba41374881590988301da608e17c96",
+			"contact_time": -1.0,
+			"duration": 0.8,
+			"entry_exit": "Held settled front diagonal guard; loop endpoints zero velocity; locomotion support retained.",
+			"loop": true,
+			"original_source_frames": null,
+			"row_floats": 131.0,
+			"samples": 193.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
+			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+		},
+		"Hurt": {
+			"action": "Sword_Hurt_Original_v001",
+			"action_sha256": "ccc8ae861de976dc6c45b26f598356f408c6170559d1b7ea2fb04d5e4eecaf97",
+			"contact_time": -1.0,
+			"duration": 0.4,
+			"entry_exit": "Ready→asymmetric recoil→Ready; zero endpoints, controller owns interrupt and knockback.",
+			"loop": false,
+			"original_source_frames": null,
+			"row_floats": 131.0,
+			"samples": 97.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
+			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+		},
+		"Parry": {
+			"action": "Sword_Parry_Original_v001",
+			"action_sha256": "5df275daf736b67775025652aedbe6bef22d6e703f46a450ee2b2972c67d3fc3",
+			"contact_time": -1.0,
+			"duration": 0.32,
+			"entry_exit": "Guard→quick original receive→Guard; zero entry/exit velocity, controller owns successful contact.",
+			"loop": false,
+			"original_source_frames": null,
+			"row_floats": 131.0,
+			"samples": 78.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
+			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+		},
+		"Ready": {
+			"action": "Sword_Ready_Original_v001",
+			"action_sha256": "38a129bf2f243f9399ebf23f9a34756841f1bfe694335d774aa81a4f31759132",
+			"contact_time": -1.0,
+			"duration": 0.8,
+			"entry_exit": "Looped settled stance; zero endpoint velocities, upper body owner while locomotion owns support.",
+			"loop": true,
+			"original_source_frames": null,
+			"row_floats": 131.0,
+			"samples": 193.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
+			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+		},
+		"Roll": {
+			"action": "Sword_Roll_Original_v001",
+			"action_sha256": "fee113a1f8b5bff89d539b3c5228d118c8a26e542eeb26e6df65a7b46dcc3de2",
+			"contact_time": -1.0,
+			"duration": 0.72,
+			"entry_exit": "Ready→full forward turn→Ready, unwrapped0→2π, original local ground compensation; physics owns travel/collision.",
+			"loop": false,
+			"original_source_frames": null,
+			"row_floats": 131.0,
+			"samples": 174.0,
+			"source": "blender/animation/reviews/player_animation_library_v1/sword_combat_v001/sword_combat_v001.blend",
+			"source_sha256": "eb19b0318bff8f5df604a0cc9ab02650dd5448bc2fa060e3fb3ad6f38e84c89f"
+		}
+	},
+	"original_combo_action_sha256": "749fb852130af82e5e46ae2913c57159d30779cfe6a10d1c64ca5718977732b2",
+	"original_combo_source": "blender/animation/reviews/player_animation_library_v1/sword_combo_original_v001/sword_combo_original_v001.blend",
+	"original_combo_source_sha256": "51599e6fe7b1ad53e00f5582530d14ead862d021a5925a303c43adbc4c110a4e",
+	"original_custom_animation": true,
+	"production_eligible": false,
+	"provenance": {
+		"P": "Independent original Ready/Guard/Parry/Roll/Hurt; Attack1/2/3 continuous slices of the project original choreography. Original timing and pose authorship.",
+		"S": "Exact existing 13bone rest rig, new Sword Sand Block GLB/markers. No raw source game tracks used.",
+		"U": "Artistic approval pending; no copied commercial game behavior claimed."
+	},
+	"research_only": true,
+	"rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+	"roll_root_translation": "Original local pelvis pivot and support compensation only. Do not add it to CharacterBody3D travel.",
+	"schema": 1.0,
+	"source_derived_reconstruction": false,
+	"status": "pending",
+	"sword_asset": "res://scenes/dev/actions_stuff_research/sword_combat_v001/assets/Sword_Sand_Block_V1.glb",
+	"sword_base_local": [
+		0.0,
+		0.0,
+		-0.1596
+	],
+	"sword_tip_local": [
+		0.0,
+		0.0,
+		-0.96292
+	],
+	"weapon_glb_sha256": "08dbec1dd0375b188d4f1f80d3a6f4c66ed4458b68b1ec1011ba513552d8ef83",
+	"weapon_mount": [
+		[
+			1.0,
+			0.0,
+			0.0,
+			0.0
+		],
+		[
+			0.0,
+			-0.0000000437113882867379,
+			-1.0,
+			0.0
+		],
+		[
+			0.0,
+			1.0,
+			-0.0000000437113882867379,
+			0.0
+		],
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		]
+	],
+	"weapon_source_sha256": "2347d72fb158bc85ae1c8910ec38882e41af6b90e87bb22f3e067cbd12baa225",
+	"world_travel_owner": "physics"
+}
