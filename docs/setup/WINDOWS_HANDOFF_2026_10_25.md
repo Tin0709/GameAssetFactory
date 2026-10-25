@@ -92,10 +92,10 @@ Không đổi project sang Compatibility chỉ để bỏ lỗi vì hình ảnh/
 - Mở repo trong Codex trên Windows; các connector/MCP và executable config là theo máy, cần cấu hình lại nếu dùng. Gameplay và các viewer không đòi MCP.
 - Giữ **Actions & Stuff Research Export Guard** bật. Private source study không phải asset thương mại; chưa phát hành hoặc chuyển dữ liệu riêng vào public repo.
 
-Nếu cần Blender MCP, dùng lại addon đáng tin cậy đã cài trên Windows và đặt `BLENDER_MCP_ADDON` tới đúng file entry của addon đó; host/port phải khớp client. Ví dụ cấu hình theo máy, không commit:
+Nếu cần Blender MCP, dùng lại addon đáng tin cậy đã cài trên Windows và đặt `BLENDER_MCP_ADDON` tới đúng **thư mục chứa `mcp_to_blender_server.py`**, không phải file `__init__.py`; host/port phải khớp client. Ví dụ cấu hình theo máy, không commit:
 
 ```powershell
-$env:BLENDER_MCP_ADDON = 'C:\duong-dan-addon-da-cai\__init__.py'
+$env:BLENDER_MCP_ADDON = 'C:\duong-dan-addon-da-cai\mcp_bridge'
 $env:BLENDER_MCP_HOST = '127.0.0.1'
 $env:BLENDER_MCP_PORT = '9876'
 py -3 scripts/dev.py bridge --viewer animation
