@@ -68,5 +68,10 @@ venv/
 # Generated validation data
 .validation/
 
+# Private machine-transfer data must never enter the public repository.
+/private_research/
+/GAF_Private_Transfer/
+/PRIVATE_Windows_Research.zip
+
 # Transient single-writer guard for weapon-library updates
 blender/weapons/showcase/.weapon_library.lock
