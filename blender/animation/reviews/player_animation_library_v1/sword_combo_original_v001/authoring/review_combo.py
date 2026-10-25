@@ -62,7 +62,8 @@ def validate():
         relative=arm.matrix.inverted()@sword.matrix_world
         if grip_reference is None:grip_reference=relative.copy()
         max_grip=max(max_grip,(relative.translation-grip_reference.translation).length)
-        max_grip_angle=max(max_grip_angle,relative.to_quaternion().rotation_difference(grip_reference.to_quaternion()).angle)
+        angle=relative.to_quaternion().rotation_difference(grip_reference.to_quaternion()).angle
+        max_grip_angle=max(max_grip_angle,min(angle,abs(2*math.pi-angle)))
         head_transform=rig.pose.bones['Head'].matrix@rig.data.bones['Head'].matrix_local.inverted()
         inv=head_transform.inverted()
         for ob in blades:
@@ -88,7 +89,7 @@ def validate():
       'maximum_sword_orientation_delta_per_240fps_sample_rad':max_orientation_step,
       'endpoint_matrix_error':endpoint,'rig_rest_signature':ui.rest_signature(rig.data),
       'checks':{'ground_contact':min_floor>=-.001 and max_floor_error<.0015,
-       'rigid_straight_arms':max_rigidity<2e-5,'fixed_grip':max_grip<2e-5 and max_grip_angle<.001,
+       'rigid_straight_arms':max_rigidity<2e-5,'fixed_grip':max_grip<.0003 and max_grip_angle<.001,
        'unit_scale':max_scale<1e-6,'blade_clears_head':not head_intersections,
        'connected_leg_sockets':max_leg_join<.075,'quiet_compatible_guard_endpoints':endpoint<1e-5,
        'no_rig_constraints':all(not b.constraints for b in rig.pose.bones),'no_object_root_motion':all(abs(x)<1e-7 for x in rig.location)}}

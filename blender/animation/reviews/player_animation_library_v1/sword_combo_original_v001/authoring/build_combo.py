@@ -5,7 +5,7 @@ No imported MD2/A&S motion tracks. Coordinates: this measured viewer faces -Y.
 """
 import bpy, json, math, sys
 from pathlib import Path
-from mathutils import Vector, Matrix, Euler
+from mathutils import Vector, Matrix, Euler, Quaternion
 
 OUT=Path(__file__).resolve().parent.parent
 ROOT=OUT.parents[4]
@@ -41,7 +41,7 @@ RIGHT=[
  (1,(.20,.46,-.87),(-.16,.66,.73)),
  (3,(.20,.46,-.87),(-.16,.66,.73)),
  (6.5,(.84,.32,.04),(.08,.42,.90)),
- (8,(.68,.62,-.12),(-.20,.56,.80)),
+ (7.5,(.84,.32,.04),(.08,.42,.90)),
  (10,(-.10,.92,-.38),(-.76,.55,-.36)),
  (13,(-.23,.92,-.26),(-.94,.20,-.20)),
  (17,(-.19,.94,-.20),(-.86,.08,.51)),
@@ -78,6 +78,52 @@ def arm_frame(direction,blade):
     front=(blade-down*blade.dot(down)).normalized()
     side=front.cross(down).normalized()
     return Matrix((side,-front,-down)).transposed(),front
+
+
+def quat_log(q):
+    q=q.normalized()
+    if q.w<0:q.negate()
+    v=Vector((q.x,q.y,q.z));n=v.length
+    return v*(math.atan2(n,q.w)/n) if n>1e-10 else Vector((0,0,0))
+
+
+def quat_exp(v):
+    n=v.length
+    return Quaternion((math.cos(n),*(v*(math.sin(n)/n)))) if n>1e-10 else Quaternion((1,0,0,0))
+
+
+_right_quats=None
+
+
+def right_rotation(frame):
+    """Time-aware spherical Bezier, avoiding near-parallel vector projections."""
+    global _right_quats
+    if _right_quats is None:
+        qs=[]
+        for f,direction,blade in RIGHT:
+            q=arm_frame(world_vector(direction),world_vector(blade))[0].to_quaternion()
+            if qs and qs[-1][1].dot(q)<0:q.negate()
+            qs.append((f,q))
+        velocities=[]
+        for i,(f,q) in enumerate(qs):
+            if i==0 or i==len(qs)-1:v=Vector((0,0,0))
+            else:
+                hp=f-qs[i-1][0];hn=qs[i+1][0]-f
+                before=-quat_log(q.inverted()@qs[i-1][1])/hp
+                after=quat_log(q.inverted()@qs[i+1][1])/hn
+                v=(hn*before+hp*after)/(hp+hn)
+                if before.length<1e-6 or after.length<1e-6:v=Vector((0,0,0))
+                if v.length>.25:v*=.25/v.length
+            velocities.append(v)
+        _right_quats=(qs,velocities)
+    qs,velocities=_right_quats
+    if frame<=qs[0][0]:return qs[0][1].to_matrix()
+    if frame>=qs[-1][0]:return qs[-1][1].to_matrix()
+    i=next(i for i in range(len(qs)-1) if frame<qs[i+1][0])
+    f,q=qs[i];g,r=qs[i+1];h=g-f;t=(frame-f)/h
+    a=q@quat_exp(velocities[i]*h/3);b=r@quat_exp(-velocities[i+1]*h/3)
+    qa=q.slerp(a,t);qb=a.slerp(b,t);qc=b.slerp(r,t)
+    return qa.slerp(qb,t).slerp(qb.slerp(qc,t),t).to_matrix()
 
 
 def rotation(pitch=0,yaw=0,roll=0):
@@ -148,9 +194,8 @@ def pose(rig,neutral,frame):
     head_yaw=channel(frame,[(1,0),(7,-5),(11,5),(20,7),(26,-6),(36,-4),(44,5),(53,0),(61,0)])
     set_orientation(rig.pose.bones['Head'],rotation(lean*.2,head_yaw,roll*.15))
     # A single rigid rotation drives the full right arm and its sword grip.
-    right_dir=world_vector(vec_channel(frame,RIGHT)).normalized()
-    right_blade=world_vector(vec_channel(frame,RIGHT,2)).normalized()
-    arm_rot,blade=arm_frame(right_dir,right_blade)
+    arm_rot=right_rotation(frame)
+    right_dir=arm_rot@Vector((0,0,-1));blade=arm_rot@Vector((0,-1,0))
     right=rig.pose.bones['UpperArm.R'];set_orientation(right,arm_rot)
     for side in ['L','R']:rig.pose.bones['ForeArm.'+side].matrix_basis=Matrix.Identity(4)
     left_dir=world_vector(vec_channel(frame,LEFT)).normalized()
@@ -214,8 +259,8 @@ def main():
     action=bpy.data.actions.new(ACTION);action.use_fake_user=True
     rig.animation_data_create();rig.animation_data.action=action
     prev={}
-    for j in range((END-START)*4+1):
-        f=START+j/4;pose(rig,neutral,f)
+    for j in range((END-START)*8+1):
+        f=START+j/8;pose(rig,neutral,f)
         for b in rig.pose.bones:
             prop='rotation_quaternion' if b.rotation_mode=='QUATERNION' else 'rotation_euler'
             if prop=='rotation_quaternion':
