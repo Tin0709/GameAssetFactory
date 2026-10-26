@@ -50,8 +50,8 @@ func run()->void:
 		for bone:int in face_relative:
 			check((rig.get_bone_global_pose(head).affine_inverse()*rig.get_bone_global_pose(bone)).is_equal_approx(face_relative[bone]),"Face region retains original head-relative transform after head stabilization: "+str(rig.get_bone_name(bone)))
 		for bone in rig.get_bone_count():
-			if bone not in [spine,head]:allowed=allowed and rig.get_bone_pose(bone).is_equal_approx(raw[bone])
-		check(allowed,"Stability changes only spine/head local poses; arms/weapon/root/hip/legs stay original")
+			if bone not in [spine,head] and bone not in helper.face_roots:allowed=allowed and rig.get_bone_pose(bone).is_equal_approx(raw[bone])
+		check(allowed,"Only spine/head plus its sibling facial roots follow stability; arms/weapon/root/hip/legs stay original")
 		check(rig.get_bone_global_pose(rig.find_bone("J_L_Leg")).is_equal_approx(legs[0]) and rig.get_bone_global_pose(rig.find_bone("J_R_Leg")).is_equal_approx(legs[1]),"All lower-body global trajectories remain identical")
 		check(rig.get_bone_global_pose(head).origin.distance_to(rig.get_bone_global_pose(neck)*raw[head].origin)<.00001,"Head rotation stabilization keeps the original neck attachment position")
 		var stable:Transform3D=rig.get_bone_global_pose(head)
