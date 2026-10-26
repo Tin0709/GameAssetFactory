@@ -198,7 +198,7 @@ func _physics_process(delta:float)->void:
 	var desired:=stick.limit_length()*speed
 	var ground_anchor:bool=using_original_source and combo.active() and was_grounded and not jump_pressed
 	if ground_anchor:desired=Vector2.ZERO
-	elif combo.active() and was_grounded:desired*=.22 # Authored fallback unchanged.
+	elif not using_original_source and combo.active() and was_grounded:desired*=.22 # Authored fallback unchanged.
 	var planar:=Vector2.ZERO if ground_anchor else Vector2(velocity.x,velocity.z).move_toward(desired,(deceleration if stick.is_zero_approx() else acceleration)*delta)
 	# Public GA_HeavyJumpAttack GravityMultiplier2; native base jump remains unknown.
 	var gravity_factor:=2. if _heavy_slam_active else 1.
@@ -377,7 +377,7 @@ func movement_measurements()->Dictionary:
 	var report:Dictionary=movement_meter.snapshot()
 	if using_original_source:report.merge({"jump_apex_time_adapter":SOURCE_JUMP_APEX_SECONDS,"moving_landing_release_adapter":SOURCE_MOVING_LAND_SECONDS,"heavy_slam_gravity_multiplier":2.,"effective_gravity":gravity*(2. if _heavy_slam_active else 1.),"jump_phase":_jump_stage})
 	report.merge({"clip":active_clip,"play_rate":_playback_speed,"world_velocity":[velocity.x,velocity.y,velocity.z],"walk_speed":walk_speed,"run_speed":run_speed,"walk_stride_reference":walk_stride_speed,"run_stride_reference":run_stride_speed,"source_table_speed":700 if using_original_source else null,"unit_conversion":"100UU per Godot metre; local effective MD2 runtime unverified" if using_original_source else "authored fallback","acceleration_setting":acceleration,"deceleration_setting":deceleration,"turn_rate_adapter":12.,"attack_travel_adapter":.22,"coyote_time":coyote_time,"jump_height_adapter":jump_height,"gravity_adapter":gravity,"native_runtime_parameters_recovered":false})
-	if using_original_source:report.merge({"attack_travel_adapter":0.,"body_stability_enabled":body_stability_enabled,"retained_body_oscillation_adapter":BodyStability.RETAINED_OSCILLATION,"body_stability_strength":body_stability.strength})
+	if using_original_source:report.merge({"attack_travel_adapter":0.,"body_stability_enabled":body_stability_enabled,"retained_body_oscillation_adapter":BodyStability.RETAINED_OSCILLATION,"body_stability_strength":body_stability.strength},true)
 	return report
 func save_movement_measurements()->String:
 	var folder:=private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements") if using_private_skin else "user://sabre_movement_measurements"
