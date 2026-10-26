@@ -127,7 +127,7 @@ cả yêu cầu bật tự commit đang chờ đọc trạng thái.
 
 ## Push
 
-**Push** chỉ chạy khi bạn bấm nút và xác nhận trong app. App gửi các commit đã
+**Push** chạy ngay khi bạn bấm nút, không mở hộp thoại xác nhận. App gửi các commit đã
 có lên đúng upstream hiện tại, dùng đích remote đã cấu hình sẵn. Thay đổi chưa
 commit không được gửi. Không tự pull, merge, đổi nhánh hoặc force-push.
 

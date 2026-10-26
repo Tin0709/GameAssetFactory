@@ -449,8 +449,6 @@ class CheckpointApp:
         snapshot = self.snapshots[index]
         if not snapshot or self.busy:
             return
-        if not messagebox.askyesno('Push lên GitHub', f'Push các commit đã có của {self.configs[index].name} lên {snapshot.upstream or "upstream chưa cấu hình"}?\nThay đổi chưa commit không được gửi. Không force-push.\n{redact(self.configs[index].expected_remote)}', parent=self.root):
-            return
         identity = snapshot.identity
         def job():
             message = self.repositories[index].push(expected_identity=identity)
