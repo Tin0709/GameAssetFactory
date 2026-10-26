@@ -82,13 +82,19 @@ class KnowledgeCliTests(unittest.TestCase):
         self.save()
         self.assertIn('missing.md', self.cli('check', ok=False)['error'])
 
-    def test_check_rejects_routes_outside_root_including_symlinks(self):
+    def test_check_rejects_routes_outside_root(self):
         outside = Path(tempfile.gettempdir()) / 'gaf-animation-route-outside'
         for route in ['../gaf-animation-route-outside', str(outside)]:
             self.data['routes']['walk'] = [route]
             self.save()
             self.assertIn('inside', self.cli('check', ok=False)['error'])
-        (self.root / 'escape').symlink_to(Path(tempfile.gettempdir()))
+    def test_check_rejects_symlink_routes_outside_root(self):
+        try:
+            (self.root / 'escape').symlink_to(Path(tempfile.gettempdir()))
+        except OSError as error:
+            if getattr(error, 'winerror', None) == 1314:
+                self.skipTest('Windows needs Developer Mode or symlink privilege for this fixture')
+            raise
         self.data['routes']['walk'] = ['escape']
         self.save()
         self.assertIn('inside', self.cli('check', ok=False)['error'])

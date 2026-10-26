@@ -9,8 +9,9 @@ class CurrentAssetViewer(unittest.TestCase):
   self.assertIn(str(dev.ROOT/'scripts/load_showcase_ui.py'),command)
   self.assertTrue(any('MD2_SHORT_GRASS_V001' in arg for arg in command))
  def test_legacy_open_asset_window_is_preserved_but_not_reused(self):
+  loader=dev.ROOT/'scripts/load_showcase_ui.py'
   source=dev.ROOT/dev.VIEWERS['asset-style-v2']
-  listing=f'101 /bin/blender --factory-startup --disable-autoexec {source}\n202 /bin/blender --factory-startup --disable-autoexec {source} --python {dev.ROOT}/scripts/load_showcase_ui.py --python-expr print(\"MD2_SHORT_GRASS_V001 MD2_TALL_GRASS_V001 MD2_GRASS_LIBRARY_V001 MD2_GRASS_WIND_V001 MD2_GRASS_INTERACTION_V001 MD2_FLAT_BLOCKS_V001 MD2_SOFT_BLOCKS_R2\")\n'
-  with patch.object(dev.subprocess,'check_output',return_value=listing):
+  listing=f'101 /bin/blender --factory-startup --disable-autoexec {source}\n202 /bin/blender --factory-startup --disable-autoexec {source} --python {loader} --python-expr print(\"MD2_SHORT_GRASS_V001 MD2_TALL_GRASS_V001 MD2_GRASS_LIBRARY_V001 MD2_GRASS_WIND_V001 MD2_GRASS_INTERACTION_V001 MD2_FLAT_BLOCKS_V001 MD2_SOFT_BLOCKS_R2\")\n'
+  with patch.object(dev.os,'name','posix'), patch.object(dev.subprocess,'check_output',return_value=listing):
    self.assertEqual(dev.existing_viewer_pid('/bin/blender',source,require_ui=True),202)
 if __name__=='__main__':unittest.main()

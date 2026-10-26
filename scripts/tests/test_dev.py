@@ -57,7 +57,7 @@ class PortableLauncherTests(unittest.TestCase):
     def test_combat_cli_preserves_spaced_executable_and_scene_arguments(self):
         with patch.object(dev,'find_tool',return_value=Path('/Tool Folder/Godot')),patch.object(dev.subprocess,'call',return_value=0) as launch:
             self.assertEqual(dev.main(['godot','--scene','combat','--weapon','sword']),0)
-        self.assertEqual(launch.call_args.args[0][0],'/Tool Folder/Godot')
+        self.assertEqual(launch.call_args.args[0][0],str(Path('/Tool Folder/Godot')))
         self.assertEqual(launch.call_args.args[0][-2:],['--','--sword'])
 
     def test_showcase_explicitly_loads_repository_ui(self):
@@ -144,8 +144,14 @@ class PortableLauncherTests(unittest.TestCase):
         tool = '/Applications/Blender.app/Contents/MacOS/Blender'
         source = dev.ROOT / dev.VIEWERS['animation']
         processes = f'  41 {tool} --factory-startup {source}.other --python helper.py\n  42 {tool} --factory-startup {source} --python helper.py\n'
-        with patch.object(dev.subprocess, 'check_output', return_value=processes):
+        with patch.object(dev.os, 'name', 'posix'), patch.object(dev.subprocess, 'check_output', return_value=processes):
             self.assertEqual(dev.existing_viewer_pid(tool, source), 42)
+
+    def test_windows_viewer_detection_does_not_invoke_posix_ps(self):
+        source = dev.ROOT / dev.VIEWERS['animation']
+        with patch.object(dev.os, 'name', 'nt'), patch.object(dev.subprocess, 'check_output') as listing:
+            self.assertIsNone(dev.existing_viewer_pid('blender.exe', source))
+        listing.assert_not_called()
 
     def test_unknown_viewer_is_rejected(self):
         with self.assertRaises(ValueError):
@@ -158,7 +164,7 @@ class PortableLauncherTests(unittest.TestCase):
         source=dev.ROOT/dev.VIEWERS['soldier']
         loader=dev.ROOT/'scripts/load_showcase_ui.py'
         listing=f'  31 {tool} --factory-startup {source}\n  32 {tool} --factory-startup {source} --python {loader}\n  34 {tool} --factory-startup {source} --python {loader} --python-expr print(\"SOLDIER_FACIAL_UI_V001\")\n  35 {tool} --factory-startup {source} --python {loader} --python-expr print(\"SOLDIER_FACIAL_UI_V001 SOLDIER_HAIRCARDS_UI_V001\")\n  33 {tool} --factory-startup {source} --python {loader} --python-expr print(\"SOLDIER_FACIAL_UI_V001 SOLDIER_HAIRCARDS_UI_V001_R2\")\n'
-        with patch.object(dev.subprocess,'check_output',return_value=listing):
+        with patch.object(dev.os, 'name', 'posix'), patch.object(dev.subprocess,'check_output',return_value=listing):
             self.assertEqual(dev.existing_viewer_pid(tool,source,require_ui=True),33)
 
     def test_scene_path_rejects_external_or_traversal_paths(self):

@@ -176,7 +176,11 @@ class GitToolTests(unittest.TestCase):
         first = self.run_tool(INSTALLER)
         self.assertEqual(first.returncode, 0, first.stderr)
         hook = self.repo / ".git/hooks/pre-commit"
-        self.assertTrue(hook.stat().st_mode & 0o111)
+        # NTFS does not expose POSIX execute bits for an extensionless hook.
+        # Git for Windows recognizes this hook by its name and shebang instead.
+        if os.name != 'nt':
+            self.assertTrue(hook.stat().st_mode & 0o111)
+        self.assertTrue(hook.read_bytes().startswith(b'#!/bin/sh\n'))
         before = hook.read_bytes()
         self.assertEqual(self.run_tool(INSTALLER).returncode, 0)
         self.assertEqual(hook.read_bytes(), before)

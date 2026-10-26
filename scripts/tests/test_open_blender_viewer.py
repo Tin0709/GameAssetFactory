@@ -34,8 +34,9 @@ class PublicViewerCommandsTests(unittest.TestCase):
                     self.assertIn('--python', command)
 
     def test_unknown_viewer_fails_without_launching(self):
-        result = subprocess.run([sys.executable, str(SCRIPT), 'invalid'], cwd='/tmp',
-                                capture_output=True, text=True, timeout=5)
+        with tempfile.TemporaryDirectory(prefix='unrelated working directory ') as cwd:
+            result = subprocess.run([sys.executable, str(SCRIPT), 'invalid'], cwd=cwd,
+                                    capture_output=True, text=True, timeout=5)
         self.assertEqual(result.returncode, 2)
         self.assertIn('invalid choice', result.stderr)
 
