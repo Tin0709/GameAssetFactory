@@ -10,6 +10,7 @@ import time
 import tkinter as tk
 import unittest
 import uuid
+import weakref
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -260,9 +261,12 @@ class DesktopTests(unittest.TestCase):
         capture.assert_called_once_with(window=self.root.winfo_id())
         self.assertIsNotNone(self.app.dialog.backdrop_photo)
         self.assertIsNotNone(self.app.dialog.card.backdrop)
+        snapshot_ref = weakref.ref(self.app.dialog._blurred_source)
         self.app.dialog.close()
+        gc.collect()
         self.assertIsNone(self.app.dialog.backdrop_photo)
         self.assertIsNone(self.app.dialog._blurred_source)
+        self.assertIsNone(snapshot_ref(), 'Destroyed modal must release its full snapshot')
         self.root.withdraw()
 
     def test_notification_inside_modal_stays_in_its_grab_and_cleans_up(self):

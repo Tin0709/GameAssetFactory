@@ -30,6 +30,8 @@ nội dung. Bấm **Chi tiết Git** để mở/thu gọn đường dẫn, nhán
 thẻ MD2 mở phần cảnh báo PRIVATE/Release ngay từ đầu.
 
 **Xem thay đổi** và xác nhận **Commit ngay** mở thành bảng bên trong cửa sổ app.
+Nền sau bảng được blur từ ảnh riêng của cửa sổ app trên Windows, không phủ đen.
+Ảnh chỉ giữ trong RAM lúc bảng mở, không chụp desktop và không lưu thành file.
 Escape hoặc nút đóng/Hủy quay lại; Hủy không commit. Lỗi và thông báo copy/lưu/
 push dùng cùng giao diện trong app, không mở hộp thoại Windows. Lỗi được giữ
 đến khi đóng hoặc thay bằng thông báo mới; thông báo thường tự ẩn sau 4,5 giây.
@@ -42,6 +44,11 @@ Pillow đã có trên máy hiện tại. Nếu thiếu Pillow ở máy khác, ap
 vẽ Tk dự phòng. Có thể cài `py -3 -m pip install Pillow` để có viền mịn như bản
 Windows hiện tại. Mỗi widget giữ một ảnh nền hiện tại, không chạy hiệu ứng nhấp
 nháy hoặc bộ hẹn giờ animation giao diện.
+
+Ô số giây dùng nút **− / +** và vẫn cho gõ trực tiếp; phím lên/xuống thay đổi
+giá trị, Enter hoặc **Áp dụng** lưu khoảng quét. Giá trị hợp lệ vẫn từ10–3600s.
+**Tự commit** là công tắc trượt bo tròn, xanh khi bật, xám khi tắt. Thay kiểu
+điều khiển không thay các chốt kiểm tra file staged/lock/nhánh của bộ xử lý Git.
 
 ## Blender MCP và đèn trạng thái
 
@@ -205,6 +212,13 @@ Cấu hình khoảng quét và nhật ký xoay vòng lưu ngoài Git:
 remote đã fetch gần nhất; app không âm thầm fetch sau mỗi 10 giây.
 
 ## Kiểm thử dành cho phát triển
+
+UI refresh2026-10-26: helper suite131 bài đạt (4 optional skip có sẵn); sau sửa
+vòng đời ảnh blur,22 bài UI chạy lại đạt. Đã xem cửa sổ thật ở1400×940 và960×660,
+thẻ mở/thu gọn, bảng thay đổi/xác nhận, thông báo lỗi, công tắc và ô −/+.
+Ảnh blur được kiểm tra chỉ lấy HWND của app và giải phóng khi đóng; commit/push
+kiểm thử chỉ chạy trên repo tạm. Bản review hiện tại giữ nguyên bộ xử lý Git,
+Blender MCP và chức năng mở/copy đường dẫn; không tự Push.
 
 ```powershell
 py -3 -m unittest discover -s scripts/tests -p "test_checkpoint_manager*.py" -v

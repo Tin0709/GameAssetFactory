@@ -44,3 +44,8 @@ palette. Apply those final preferences rather than the original navy/indigo.
 Header/repo controls wrap at narrow widths. Pillow (already available) provides
 3x supersampled corners with one cached surface per widget; Tk is the fallback.
 The modal owns any toast shown during its grab and cancels it on dismissal.
+Later requested refinements replace native spinbox/checkbox chrome with an
+editable rounded −/+ input and rounded toggle. Modal backdrop is a Gaussian-
+blurred, in-memory capture of this Tk client HWND only, rather than black;
+release on close and scale with the viewport. Never capture the desktop or
+persist a background screenshot. HWND capture and controls get regressions.

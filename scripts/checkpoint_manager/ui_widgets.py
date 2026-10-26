@@ -409,7 +409,7 @@ class InAppDialog:
                 # windows. Kept in memory and discarded when the panel closes.
                 snapshot = ImageGrab.grab(window=self.root.winfo_id())
                 self._blurred_source = snapshot.filter(ImageFilter.GaussianBlur(10))
-            except (OSError, ValueError, tk.TclError):
+            except (OSError, ValueError, TypeError, tk.TclError):
                 pass
         self.kind = kind
         self.frame = tk.Frame(self.root, background=PAGE)
@@ -504,8 +504,16 @@ class InAppDialog:
                 self.frame.grab_release()
             except tk.TclError:
                 pass
+            self.card.backdrop = None
+            self.card._rounded_photo = None
+            self.card._rounded_key = None
+            self.frame._blurred_backdrop = None
+            self.background_label.configure(image='')
             self.frame.destroy()
             self.frame = None
+            self.card = None
+            self.background_label = None
+            self.text_widget = None
             self.backdrop_photo = None
             self._blurred_source = None
             previous = getattr(self, 'previous_focus', None)
