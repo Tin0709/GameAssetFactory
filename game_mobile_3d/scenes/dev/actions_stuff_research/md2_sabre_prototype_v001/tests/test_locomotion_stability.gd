@@ -43,7 +43,12 @@ func run()->void:
 		var raw:Array[Transform3D]=[];var legs:Array[Transform3D]=[]
 		for bone in rig.get_bone_count():raw.append(rig.get_bone_pose(bone))
 		for name:String in ["J_L_Leg","J_R_Leg"]:legs.append(rig.get_bone_global_pose(rig.find_bone(name)))
+		var head_before:Transform3D=rig.get_bone_global_pose(head);var face_relative:Dictionary={}
+		for name:String in ["J_L_EyeIris","J_R_EyeIris","J_L_EyePupil","J_R_EyePupil","J_L_Eyebrow","J_R_Eyebrow","J_Mouth"]:
+			var bone:=rig.find_bone(name);face_relative[bone]=head_before.affine_inverse()*rig.get_bone_global_pose(bone)
 		helper.apply("Run",.1,true);var allowed:=true
+		for bone:int in face_relative:
+			check((rig.get_bone_global_pose(head).affine_inverse()*rig.get_bone_global_pose(bone)).is_equal_approx(face_relative[bone]),"Face region retains original head-relative transform after head stabilization: "+str(rig.get_bone_name(bone)))
 		for bone in rig.get_bone_count():
 			if bone not in [spine,head]:allowed=allowed and rig.get_bone_pose(bone).is_equal_approx(raw[bone])
 		check(allowed,"Stability changes only spine/head local poses; arms/weapon/root/hip/legs stay original")

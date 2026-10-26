@@ -62,6 +62,13 @@
 
 ## Verified outcome
 
+## Task8 — User reports intermittent missing face while moving
+
+- [ ] Reproduce with native front-facing Run frames, inspect rig/material structure. Confirm eyes/mouth roots are siblings of J_Head under J_Neck, so the recently added head correction must carry them too. Temporary6mm face-material experiment is diagnostic only; no source geometry/material changes are authorized by that experiment.
+- [ ] Red/green head-relative transform tests: move the five sibling facial roots by the same rigid head correction, preserve pupil descendants once, blink/scales/shape controls and neck attachment. Restore all corrected local poses; bypass raw review/combat/air as before.
+- [ ] Native pixel visibility sweep with original material/no grow across motion, preserving legitimate source blinking. Check render-fraction/transition behavior; no texture repaint, mesh write or new source extraction.
+- [ ] Regress interleaved combat/jump/stability; original hashes; independent review; fresh same-lab launch. Clearly distinguish source hierarchy evidence from reconstructed runtime correction.
+
 ## Task7 — User requests MD2-like strike / move / strike rhythm
 
 - [ ] Preserve each complete source strike and grounded planting, but interleave a real locomotion window between buffered/held attacks when movement input is present. Retain1→2→3 order; stationary hold remains the existing continuous combo. User requests this observed behavior; native interval values remain unavailable.
