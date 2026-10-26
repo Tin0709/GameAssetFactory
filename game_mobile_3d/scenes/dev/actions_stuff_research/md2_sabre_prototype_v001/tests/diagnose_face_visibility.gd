@@ -19,7 +19,7 @@ func ticks(n:int)->void:
 	await process_frame
 func run()->void:
 	Engine.physics_ticks_per_second=60;lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();lab.grass_field_blocks=30;root.add_child(lab);current_scene=lab;a=lab.player;mode=lab.sabre_mode
-	lab.set_process(false);mode.canvas.hide();lab.md2_lighting.canvas.hide()
+	lab.set_process(false);mode.canvas.hide();lab.md2_lighting.ui.hide()
 	folder=a.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/face_visibility");DirAccess.make_dir_recursive_absolute(folder)
 	var rig:Skeleton3D=a.skeleton;var mesh:MeshInstance3D=a.face;var arrays:=mesh.mesh.surface_get_arrays(0);var vertices:PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
 	var bones:PackedInt32Array=arrays[Mesh.ARRAY_BONES];var weights:PackedFloat32Array=arrays[Mesh.ARRAY_WEIGHTS];var stride:int=weights.size()/vertices.size()
