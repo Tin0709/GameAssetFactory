@@ -64,10 +64,12 @@
 
 ## Task5 — User follow-up: ordinary jump still floats
 
-- [ ] Reproduce ordinary jump at30/60Hz and separate capsule flight from source takeoff/landing clips. Check remaining accessible evidence without repeating failed injection/extraction.
-- [ ] Write failing real-collision tests for a declared faster jump adapter: preserve1.2-unit height, target.25s ascent/.50s ordinary flight; fixed source pose playback1x. Source native gravity/launch remain unknown.
-- [ ] Change source-profile gravity only to2h/t²=38.4; keep grounded speed, camera, source assets and fallback unchanged. Transition takeoff by physical apex/ceiling rather than a.4s clip timer; allow moving landing to release after.05s, stationary original landing remains complete.
-- [ ] Validate normal jump, hold/no air repeat, ledge/coyote, ceiling, moving landing, heavy slam2factor, raw review and native same-scene display. Preserve previous measurements; report exact adapter scope.
-- [ ] Run affected and full Sabre checks, source hashes and independent final review. Launch a fresh playable instance only after validation.
+- [x] Reproduce ordinary jump at30/60Hz and separate capsule flight from source takeoff/landing clips. Check remaining accessible evidence without repeating failed injection/extraction.
+- [x] Write failing real-collision tests for a declared faster jump adapter: preserve1.2-unit height, target.25s ascent/.50s ordinary flight; fixed source pose playback1x. Source native gravity/launch remain unknown.
+- [x] Change source-profile gravity only to2h/t²=38.4; keep grounded speed, camera, source assets and fallback unchanged. Transition takeoff by physical apex/ceiling rather than a.4s clip timer; allow moving landing to release after.05s, stationary original landing remains complete.
+- [x] Validate normal jump, hold/no air repeat, ledge/coyote, ceiling, moving landing, heavy slam2factor, raw review and native same-scene display. Preserve previous measurements; report exact adapter scope.
+- [x] Run affected and full Sabre checks, source hashes and independent final review. Launch a fresh playable instance only after validation.
 
 2026-10-26: 857 checks across16 suites passed, plus same-scene native Mobile/D3D12 movement8frames, combat/camera8frames and virtual144Hz/60physics display continuity. Independent review P2 event-clock issue fixed and re-reviewed with no remaining P1/P2. Original GLB/showcase hashes unchanged; project/scene/environment files unchanged from task base. Both approved UE4SS starts failed before Lua and were rolled back. Native solo camera, ordinary jump and effective movement formulas remain unresolved; this completes the scoped playable fixes and audit, not a claim of exact engine equivalence.
+
+Task5 verified: 897 checks/17 suites passed; native full100x100/14831grass ordinaryjump before.816667s ->after.516667s with unchanged1.200827-unit apex. Source takeoff and review stay1x, moving landing releases after.05s adapter. Independent review caught aerial sync regression: fixed with disclosed1.6 physics-cadence adapter for AirAttack pose/events/VFX/audio, original pitch1 and raw review1. Native actual contact at source.266667/rate1.6 is within[.19,.38]effect window. Re-review found no remaining P1/P2. Source GLB/showcase hashes unchanged. Native MD2 ordinary jump and aerial rate remain unknown; no video calibration or new tools.

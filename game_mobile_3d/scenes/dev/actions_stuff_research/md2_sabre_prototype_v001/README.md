@@ -107,6 +107,8 @@ with movement input it releases after a declared.05s contact interval into the
 existing gait/blend. This prevents a.3s static landing pose sliding across the
 ground while the capsule already travels7u/s. Source clips, raw review1x,
 ordinary movement speed and fallback jump remain unchanged.
+At the unchanged7u/s travel speed, shorter flight also shortens horizontal jump
+range; native MD2 jump distance and air-control parameters remain unverified.
 No claim of matching the original game engine's interpolation is made.
 
 ## Direct movement evidence and measurement
