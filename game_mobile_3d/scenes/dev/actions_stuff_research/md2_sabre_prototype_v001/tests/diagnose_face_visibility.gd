@@ -29,8 +29,13 @@ func run()->void:
 		if not regions.has(key):regions[key]=[]
 		regions[key].append({"point":vertices[i],"bone":bone,"bind":mesh.skin.get_bind_pose(bind)})
 	var original:BaseMaterial3D=mesh.mesh.surface_get_material(0);var outcomes:Array[Dictionary]=[]
+	for prop:Dictionary in original.get_property_list():
+		if "grow" in prop.name:print("GROW_PROPERTY ",prop.name," ",original.get(prop.name))
 	for offset:float in [0.,.006]:
-		var material:BaseMaterial3D=original.duplicate();material.grow_enabled=offset>0.;material.grow_amount=offset;mesh.material_override=material
+		var material:BaseMaterial3D=original.duplicate()
+		for prop:Dictionary in material.get_property_list():
+			if prop.name=="grow" and prop.type==TYPE_BOOL:material.set(prop.name,offset>0.)
+		material.grow_amount=offset;mesh.material_override=material
 		mode.reset();a.scripted_input=true;a.requested_direction=Vector2.DOWN;a.requested_run=true;await ticks(35)
 		for frame in 16:
 			await ticks(2);await RenderingServer.frame_post_draw
