@@ -85,7 +85,7 @@ lab's1.2 multiplier. Slow Walk2 is a study adapter. Its **stride references rema
 Walk2.0/Run5.6**, derived from the earlier stance fit, not native speed settings.
 Cadence follows actual post-collision travel divided by these references: Run7
 produces1.25× gameplay sampling, not an arbitrary aesthetic multiplier or a
-recovered MD2 play-rate formula. Raw review and jump clips remain1×. Gameplay
+recovered MD2 play-rate formula. Raw review and ordinary jump clips remain1×. Gameplay
 Sabre attacks use their public per-variant rates1.2/1.2/1; recoveries stay1×
 because their native montage-rate relationship is not established.
 Blocked travel produces zero gait advance. Run's asymmetric stance paths still
@@ -146,6 +146,15 @@ first nonascending physics tick is.267/.250s normally and.167/.167s for the
 aerial attack at30/60Hz. The twofold gravity factor is public-table data; the
 base trajectory and ability handoff remain reconstructed. These are prototype
 measurements, not recovered MD2 flight times.
+The faster gravity would otherwise land before the established aerial slash
+and sound. AirAttack therefore uses a declared physics-cadence adapter
+sqrt(38.4/15)=1.6x, applied identically to pose, combo clock, VFX window and audio
+landmark (original audio pitch remains1). Its source time at real contact is
+.266667s, inside the existing[.19,.38] blade-motion window; the reconstructed
+audio landmark is.158875 wall seconds, within8ms of the tested.166667 contact.
+This rate is NOT recovered MD2 data. Raw AirAttack review remains1x; grounded
+Sabre rates remain the verified1.2/1.2/1. This avoids moving only the effect while
+leaving the sword pose behind the physical landing.
 Native blending/root-motion/attack movement remain unresolved.
 
 A second, pinned public extraction snapshot corroborates the player row:
