@@ -8,11 +8,12 @@ var folder:=""
 var regions:Dictionary={}
 func _initialize()->void:
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS,true);DisplayServer.window_set_position(Vector2i(-16000,-16000));call_deferred("run")
-func _process(delta:float)->void:
-	if lab==null:return
+func _process(delta:float)->bool:
+	if lab==null:return false
 	mode.present(delta)
 	var center:Vector3=mode.display_position()+Vector3(0,1.72,0)
 	lab.camera.position=center+Vector3(.15,.25,4.);lab.camera.look_at(center);lab.camera.size=1.15
+	return false
 func ticks(n:int)->void:
 	for i in n:await physics_frame
 	await process_frame
