@@ -61,6 +61,8 @@ func run()->void:
 		check(absf(a.velocity.y-(falling-2.*a.gravity/hz))<.0001,"Review/cancel does not interrupt physical slam before floor at%dHz"%hz)
 		await ticks(hz*2)
 		check(a._grounded and not a._heavy_slam_active,"Real floor clears heavy gravity even during review at%dHz"%hz)
+		a.review("AirAttack");a.set_physics_process(false);a._animate(.2)
+		check(absf(a.animation_player.current_animation_position-.2)<.00001 and a._playback_speed==1.,"Raw aerial strike review is1x despite gameplay physics synchronization")
 	# Rate-aware event clock must be invariant under wall-time partition.
 	var C=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combo_state.gd");var b=C.new();b.setup(a.clips)
 	if b.get("attack_play_rates")!=null:

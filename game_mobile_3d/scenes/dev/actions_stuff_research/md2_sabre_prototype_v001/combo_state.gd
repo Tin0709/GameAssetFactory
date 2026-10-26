@@ -10,6 +10,7 @@ var held:=false
 var buffer_until:=-1.
 var buffer_seconds:=.22
 var attack_play_rates:Array=[1.,1.,1.] # Source profile sets verified table rates.
+var air_attack_play_rate:=1. # Optional physics-cadence adapter; not native data.
 var serial:=0
 var _impact_sent:=false
 var _events:Array[Dictionary]=[]
@@ -22,6 +23,7 @@ func clip()->String:
 	return "CombatReady"
 func active()->bool:return phase!=&"ready"
 func playback_rate()->float:
+	if phase==&"air_attack":return maxf(.001,air_attack_play_rate)
 	return maxf(.001,float(attack_play_rates[index])) if phase==&"attack" else 1.
 func remaining()->float:
 	return maxf(0.,float(clips[clip()].duration)-time) if active() else INF

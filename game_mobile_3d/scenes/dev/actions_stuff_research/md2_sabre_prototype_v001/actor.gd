@@ -131,6 +131,9 @@ func _ready()->void:
 		# Slow Walk and stride references remain disclosed study adapters.
 		walk_speed=2.;run_speed=700./100.;coyote_time=.155
 		gravity=2.*jump_height/(SOURCE_JUMP_APEX_SECONDS*SOURCE_JUMP_APEX_SECONDS)
+		# Preserve the prior aerial strike/flight relationship as the jump is sped
+		# up: time scales with sqrt(g). This1.6x is an adapter, not an MD2 rate.
+		combo.air_attack_play_rate=sqrt(gravity/15.)
 		# Public DT_MeleePropertyDefinition#44 Sabre variants, not a global speedup.
 		combo.attack_play_rates=[1.2,1.2,1.]
 		cadence_label="Table700 ×1 /100 =7 units/s · runtime unverified\nGait follows travel/stride · review1x"

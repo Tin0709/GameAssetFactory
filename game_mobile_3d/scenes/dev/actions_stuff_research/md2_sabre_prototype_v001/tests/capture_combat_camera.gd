@@ -5,6 +5,8 @@ var actor:CharacterBody3D
 var folder:=""
 var frames:Array[Dictionary]=[]
 var failures:Array[String]=[]
+var air_contacts:Array[Dictionary]=[]
+var previous_grounded:=true
 func _initialize()->void:
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS,true)
 	DisplayServer.window_set_position(Vector2i(-16000,-16000));call_deferred("run")
@@ -18,6 +20,9 @@ func capture(label:String)->void:
 func run()->void:
 	Engine.physics_ticks_per_second=60
 	lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(lab);current_scene=lab;actor=lab.player
+	actor.physics_pose_ready.connect(func():
+		if actor._grounded and not previous_grounded and actor.combo.phase==&"air_attack":air_contacts.append({"source_time":actor.combo.time,"rate":actor.combo.playback_rate(),"clock":actor.simulation_clock})
+		previous_grounded=actor._grounded)
 	folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/combat_camera");DirAccess.make_dir_recursive_absolute(folder)
 	await ticks(30);await capture("01_launch_camera")
 	actor.scripted_input=true;actor.attack(true);await ticks(7);await capture("02_attack1_rate1_2")
@@ -38,6 +43,7 @@ func run()->void:
 	if absf(lab.azimuth-.66)>.0001 or absf(lab.elevation-.4)>.0001 or absf(lab.camera_size-14.5)>.0001:failures.append("Native camera restore")
 	var path:String=lab.sabre_mode.save_measurements();var saved:Dictionary=JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not saved.has("camera"):failures.append("Saved camera measurement provenance")
-	var report:={"failures":failures,"frames":frames,"renderer":RenderingServer.get_current_rendering_method(),"grass_blocks":lab.grass_field_blocks,"original_bones":actor.skeleton.get_bone_count(),"original_clips":actor.source_clip_count,"audio_sources":lab.sabre_mode.reference_audio.available_count,"native_md2_camera_verified":false,"source_base_jump_physics_verified":false}
+	if air_contacts.is_empty() or float(air_contacts[0].source_time)<float(actor.clips.AirAttack.vfx_window[0]) or float(air_contacts[0].source_time)>float(actor.clips.AirAttack.vfx_window[1]):failures.append("Physical aerial contact outside blade-motion window")
+	var report:={"failures":failures,"frames":frames,"aerial_physical_contacts":air_contacts,"renderer":RenderingServer.get_current_rendering_method(),"grass_blocks":lab.grass_field_blocks,"original_bones":actor.skeleton.get_bone_count(),"original_clips":actor.source_clip_count,"audio_sources":lab.sabre_mode.reference_audio.available_count,"native_md2_camera_verified":false,"source_base_jump_physics_verified":false}
 	FileAccess.open(folder.path_join("native-combat-camera.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"));print("SABRE_NATIVE_COMBAT_CAMERA ",JSON.stringify({"failures":failures,"frames":frames.size(),"renderer":report.renderer}))
 	lab.free();await process_frame;quit(0 if failures.is_empty() else 1)

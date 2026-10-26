@@ -54,7 +54,7 @@ func setup(scene:Node3D)->void:
 		var research_root:String=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir()
 		reference_audio.setup(research_root);actor.attack_accepted_timed.connect(reference_audio.trigger_attack)
 		reference_audio.timeline_provider=func()->float:return actor.simulation_clock
-		if actor.using_original_source:reference_audio.clip_play_rates={"Attack1":1.2,"Attack2":1.2,"Attack3":1.}
+		if actor.using_original_source:reference_audio.clip_play_rates={"Attack1":1.2,"Attack2":1.2,"Attack3":1.,"AirAttack":actor.combo.air_attack_play_rate}
 		reference_audio.is_event_valid=func(serial:int)->bool:return actor.combo.serial==serial and actor.combo.active() and actor.review_clip.is_empty()
 	lab.camera=Camera3D.new();lab.camera.name="GameplayCamera";lab.camera.projection=Camera3D.PROJECTION_ORTHOGONAL
 	lab.camera.size=lab.camera_size;lab.camera.far=maxf(150.,lab.grass_field_blocks*4.) if lab.grass_field_enabled else 150.;lab.add_child(lab.camera);lab.camera.make_current()
