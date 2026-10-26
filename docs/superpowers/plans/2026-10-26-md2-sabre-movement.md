@@ -62,6 +62,14 @@
 
 ## Verified outcome
 
+## Task6 — User-approved jump preserved; grounded combat and torso stability
+
+- [ ] Diagnose actual W/screen heading, body/head pose ranges and held-combo travel. Observed W lateral screen velocity~0/actor heading error0; source spine roll range5.3deg, pitch range6.1deg, head pitch range4.3deg. Held attack still adds3.346u/2s despite zero exported root translation.
+- [ ] Red/green real physics tests: anchored source full-body ground combos (no arbitrary22% input translation), no momentum drift, release into movement from unqueued recovery; preserve air steering, jump and fallback. Do not invent native root-motion lunges or blend locomotion legs over authored attack feet.
+- [ ] Red/green grounded locomotion stability helper: cache source Walk/Run cycle-mean spine/head orientations in memory, retain25% oscillation. Restore raw poses before every new evaluation; head global orientation compensates reduced spine motion once. Preserve all leg poses, local arms/weapon tracks, scale, source timing and raw review. Source runtime graph remains unknown.
+- [ ] Enable helper only for normal grounded gait with bounded enter/idle fade; bypass attacks/jumps/review. Optional existing-panel A/B toggle, no camera or scene changes. Validate W relative to multiple camera yaws rather than rotate the camera to hide pose sway.
+- [ ] Native same-scene held/spam attacks, release, W and lateral gait; raw/helper A/B metrics and private images. Full regressions incl accepted jump, source hashes, final independent review and fresh playable restart. Document source versus adapters.
+
 ## Task5 — User follow-up: ordinary jump still floats
 
 - [x] Reproduce ordinary jump at30/60Hz and separate capsule flight from source takeoff/landing clips. Check remaining accessible evidence without repeating failed injection/extraction.
