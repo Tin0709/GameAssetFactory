@@ -46,6 +46,11 @@ func run()->void:
 	# Exact nonuniform original finisher basis must survive at both endpoints.
 	a.review("Attack3");a.animation_player.seek(.35,true);a._refresh_markers();p.capture();p.prepare(1.)
 	check(error(p.display_world[a._weapon_attachment.bone_idx],rig.global_transform*rig.get_bone_global_pose(a._weapon_attachment.bone_idx))<.00002,"Finisher's full original weapon basis is retained")
+	p.capture();p.prepare(.5)
+	var stationary_error:=0.
+	for bone in rig.get_bone_count():stationary_error=maxf(stationary_error,error(p.display_world[bone],rig.global_transform*rig.get_bone_global_pose(bone)))
+	check(stationary_error<.00002,"Fractional reconstruction independently matches evaluated stationary32-bone nonuniform pose")
+	mode.reset();check(p.current.clock==mode.effects.clock,"Mode reset rebases display history after resetting VFX clock")
 	a.reset_actor();p.prepare(.5);check(p.display_actor.distance_to(a.global_position)<.00001,"Reset rebases history, avoiding a teleport streak")
 	check(worst_endpoint<.00002 and worst_rigid<.00003,"Exact render endpoint matrices for skin and original rigid Sabre")
 	print("SABRE_PRESENTATION ",JSON.stringify({"checks":checks,"failures":failures,"fractional_samples":samples,"endpoint_error":worst_endpoint,"rigid_error":worst_rigid}));lab.free();quit(0 if failures.is_empty() else 1)

@@ -1,5 +1,15 @@
 # Checkpoint Manager icon
 
+## Current supplied logo (v2)
+
+User supplied `C:/Users/ADMIN/Downloads/Geometric Network Cube Icon.png` on
+2026-10-26. The v2 PNG preserves its image pixels; the 48px header PNG and
+multi-size ICO are packaging conversions with Pillow. No new image generation
+or creative edit was performed. The v2 assets serve the header/window/taskbar
+and existing Desktop shortcut. Original v1 assets below remain preserved.
+
+## Original icon (v1)
+
 Original asset generated with the built-in `image_gen.imagegen` tool on
 2026-10-26, with `transparent_background=true`. No CLI/API fallback was used.
 

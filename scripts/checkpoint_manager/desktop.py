@@ -9,34 +9,12 @@ import queue
 import threading
 import time
 import tkinter as tk
-from tkinter import messagebox, scrolledtext, ttk
+from .ui_widgets import InAppDialog, Notifications
+from .layout import build_layout
 
 from .core import AutoSchedule, FilesChanging, GitRepository, RepoBlocked, RepoConfig, redact
 from .blender_bridge import BlenderBridge, BridgeMonitor
 from .blender_views import BlenderViewLauncher, VIEW_LABELS
-
-
-class StatusLight(ttk.Frame):
-    COLORS = {'idle': '#64748b', 'working': '#fbbf24', 'ok': '#34d399', 'error': '#fb7185'}
-
-    def __init__(self, parent, panel=False):
-        background = '#182337' if panel else '#0b1120'
-        super().__init__(parent, style='Panel.TFrame' if panel else 'TFrame')
-        self.canvas = tk.Canvas(self, width=13, height=13, background=background, highlightthickness=0, borderwidth=0)
-        self.canvas.pack(side='left', padx=(0, 5))
-        self.dot = self.canvas.create_oval(3, 3, 11, 11, fill=self.COLORS['idle'], outline='')
-        self.label = ttk.Label(self, style='Panel.TLabel' if panel else 'Muted.TLabel')
-        self.label.pack(side='left')
-        self.state = 'idle'
-        self.text = ''
-
-    def set(self, state, text=''):
-        if state != self.state:
-            self.canvas.itemconfigure(self.dot, fill=self.COLORS[state])
-            self.state = state
-        if text != self.text:
-            self.label.configure(text=text)
-            self.text = text
 
 
 class SingleInstance:
@@ -119,6 +97,16 @@ class CheckpointApp:
         self.uncommitted_vars = [tk.StringVar(root, 'Chưa commit: —') for _ in configs]
         self.remote_extra_vars = [tk.StringVar(root, 'GitHub có thêm: —') for _ in configs]
         self.pending_push_labels = []
+        self.uncommitted_labels = []
+        self.repo_sections = []
+        self.branch_vars = [tk.StringVar(root, '—') for _ in configs]
+        self.head_detail_vars = [tk.StringVar(root, '—') for _ in configs]
+        self.upstream_detail_vars = [tk.StringVar(root, '—') for _ in configs]
+        self.checkpoint_detail_vars = [tk.StringVar(root, '—') for _ in configs]
+        self.counts_detail_vars = [tk.StringVar(root, 'Đang đọc…') for _ in configs]
+        self.notifications = Notifications(root)
+        self.dialog = InAppDialog(root)
+        self.last_issue_messages = [''] * len(configs)
         self.interval_var = tk.StringVar(root, str(interval))
         self.mode_var = tk.StringVar(root, 'ĐÃ TẠM DỪNG • Kiểm tra thay đổi trước khi bật tự commit')
         self.countdown_var = tk.StringVar(root, f'Chu kỳ quét: {interval}s • Chỉ commit khi bạn bật Tự commit')
@@ -145,118 +133,7 @@ class CheckpointApp:
         self.after_ids['heartbeat'] = root.after(1000, self._heartbeat)
 
     def _build(self):
-        root = self.root
-        root.title('Git Checkpoint Manager — GameAssetFactory & MD2')
-        root.geometry('1120x940')
-        root.minsize(980, 860)
-        root.configure(background='#0b1120')
-        style = ttk.Style(root)
-        style.theme_use('clam')
-        style.configure('.', font=('Segoe UI', 10))
-        style.configure('TFrame', background='#0b1120')
-        style.configure('Panel.TFrame', background='#182337')
-        style.configure('TLabel', background='#0b1120', foreground='#e2e8f0')
-        style.configure('Panel.TLabel', background='#182337', foreground='#cbd5e1')
-        style.configure('Title.TLabel', font=('Segoe UI', 21, 'bold'), foreground='#f8fafc')
-        style.configure('Repo.TLabel', background='#182337', foreground='#f8fafc', font=('Segoe UI', 13, 'bold'))
-        style.configure('Metric.TLabel', background='#182337', foreground='#e2e8f0', font=('Segoe UI', 11, 'bold'))
-        style.configure('Muted.TLabel', foreground='#94a3b8')
-        style.configure('Status.TLabel', foreground='#34d399', font=('Segoe UI', 10, 'bold'))
-        style.configure('TButton', padding=(12, 7), background='#2a3b55', foreground='#f8fafc', borderwidth=0)
-        style.map('TButton', background=[('active', '#3b5273'), ('disabled', '#1e293b')], foreground=[('disabled', '#64748b')])
-        style.configure('Accent.TButton', background='#087f71')
-        style.map('Accent.TButton', background=[('active', '#0d9c89')])
-        style.configure('TCheckbutton', background='#182337', foreground='#e2e8f0', padding=4)
-        style.map('TCheckbutton', background=[('active', '#182337')])
-        page = ttk.Frame(root, padding=24)
-        page.pack(fill='both', expand=True)
-        heading = ttk.Frame(page)
-        heading.pack(fill='x')
-        assets = Path(__file__).with_name('assets')
-        try:
-            self.header_icon = tk.PhotoImage(file=str(assets / 'checkpoint-manager-32.png'))
-            ttk.Label(heading, image=self.header_icon).pack(side='left', padx=(0, 12))
-            if os.name == 'nt':
-                root.iconbitmap(str(assets / 'checkpoint-manager.ico'))
-            else:
-                root.iconphoto(True, self.header_icon)
-        except tk.TclError:
-            self.header_icon = None
-        ttk.Label(heading, text='Git Checkpoint Manager', style='Title.TLabel').pack(side='left')
-        ttk.Label(page, text='Checkpoint cục bộ • Push thủ công • Hai repository riêng biệt', style='Muted.TLabel').pack(anchor='w', pady=(4, 16))
-        toolbar = ttk.Frame(page)
-        toolbar.pack(fill='x', pady=(0, 10))
-        ttk.Label(toolbar, text='Quét mỗi').pack(side='left')
-        ttk.Spinbox(toolbar, from_=10, to=3600, width=6, textvariable=self.interval_var).pack(side='left', padx=8)
-        ttk.Label(toolbar, text='giây').pack(side='left')
-        ttk.Button(toolbar, text='Áp dụng', command=self.apply_interval).pack(side='left', padx=8)
-        ttk.Button(toolbar, text='Bật tự commit cả hai', style='Accent.TButton', command=self.resume_all).pack(side='right')
-        ttk.Button(toolbar, text='Tạm dừng tất cả', command=self.pause_all).pack(side='right', padx=8)
-        mode_row = ttk.Frame(page)
-        mode_row.pack(fill='x', pady=(0, 3))
-        self.activity_light = StatusLight(mode_row)
-        self.activity_light.pack(side='left', padx=(0, 5))
-        ttk.Label(mode_row, textvariable=self.mode_var, style='Status.TLabel').pack(side='left')
-        ttk.Label(page, textvariable=self.countdown_var, style='Muted.TLabel').pack(anchor='w', pady=(0, 10))
-        bridge_panel = ttk.Frame(page, padding=(15, 11), style='Panel.TFrame')
-        bridge_panel.pack(fill='x', pady=(0, 12))
-        bridge_title = ttk.Frame(bridge_panel, style='Panel.TFrame')
-        bridge_title.pack(fill='x')
-        ttk.Label(bridge_title, text='Blender MCP', style='Repo.TLabel').pack(side='left')
-        self.blender_light = StatusLight(bridge_title, panel=True)
-        self.blender_light.pack(side='left', padx=16)
-        self.blender_light.set('idle', 'Đang kiểm tra…')
-        ttk.Button(bridge_title, text='Kiểm tra ngay', command=self.refresh_blender).pack(side='right')
-        ttk.Button(bridge_title, text='Chạy Blender MCP', style='Accent.TButton', command=self.start_blender).pack(side='right', padx=8)
-        ttk.Label(bridge_panel, textvariable=self.bridge_detail, style='Panel.TLabel', wraplength=1010).pack(anchor='w', pady=(7, 0))
-        shortcuts = ttk.Frame(bridge_panel, style='Panel.TFrame')
-        shortcuts.pack(fill='x', pady=(7, 0))
-        for key, label in VIEW_LABELS.items():
-            group = ttk.Frame(shortcuts, style='Panel.TFrame')
-            group.pack(side='left', padx=(0, 14))
-            button = ttk.Button(group, text='Mở ' + label, command=lambda view=key: self.open_blender_view(view))
-            button.pack(side='left', padx=(0, 4))
-            self.view_buttons[key] = button
-            copy_button = ttk.Button(group, text='Copy path', command=lambda view=key: self.copy_blender_view_path(view))
-            copy_button.pack(side='left')
-            self.view_copy_buttons[key] = copy_button
-        ttk.Label(shortcuts, text='MCP kiểm tra mỗi 3 giây', style='Panel.TLabel').pack(side='right')
-        for index, config in enumerate(self.configs):
-            panel = ttk.Frame(page, style='Panel.TFrame', padding=15)
-            panel.pack(fill='x', pady=(0, 12))
-            title = ttk.Frame(panel, style='Panel.TFrame')
-            title.pack(fill='x')
-            ttk.Label(title, text=config.name, style='Repo.TLabel').pack(side='left')
-            light = StatusLight(title, panel=True)
-            light.pack(side='left', padx=16)
-            light.set('idle', 'Tạm dừng')
-            self.repo_lights.append(light)
-            ttk.Checkbutton(title, text='Tự commit', variable=self.auto_vars[index], command=lambda i=index: self.toggle_auto(i)).pack(side='right')
-            ttk.Label(panel, text=str(config.path), style='Panel.TLabel').pack(anchor='w', pady=(4, 8))
-            metrics = ttk.Frame(panel, style='Panel.TFrame')
-            metrics.pack(fill='x', pady=(0, 7))
-            ttk.Label(metrics, textvariable=self.uncommitted_vars[index], style='Metric.TLabel').pack(side='left', padx=(0, 25))
-            pending = ttk.Label(metrics, textvariable=self.pending_push_vars[index], style='Metric.TLabel')
-            pending.pack(side='left', padx=(0, 25))
-            self.pending_push_labels.append(pending)
-            ttk.Label(metrics, textvariable=self.remote_extra_vars[index], style='Panel.TLabel').pack(side='left')
-            ttk.Label(panel, textvariable=self.repo_text[index], style='Panel.TLabel', justify='left', wraplength=1010).pack(anchor='w')
-            buttons = ttk.Frame(panel, style='Panel.TFrame')
-            buttons.pack(fill='x', pady=(10, 0))
-            for label, callback in [
-                ('Làm mới', self.refresh), ('Xem thay đổi', lambda i=index: self.show_changes(i)),
-                ('Commit ngay', lambda i=index: self.commit_now(i)), ('Push', lambda i=index: self.push_now(i)),
-            ]:
-                button = ttk.Button(buttons, text=label, command=callback)
-                button.pack(side='left', padx=(0, 8))
-                self.action_buttons.append(button)
-            if config.require_private:
-                ttk.Label(panel, text='MD2: Push kiểm tra repo PRIVATE. Dữ liệu gốc trong Release snapshot không được cập nhật bởi Git commit/push.', style='Panel.TLabel', foreground='#fbbf24', wraplength=1010).pack(anchor='w', pady=(10, 0))
-        ttk.Label(page, text='NHẬT KÝ', style='Muted.TLabel').pack(anchor='w', pady=(0, 6))
-        self.log_widget = scrolledtext.ScrolledText(page, height=8, background='#101a2c', foreground='#cbd5e1', insertbackground='white', font=('Consolas', 9), relief='flat', wrap='word')
-        self.log_widget.pack(fill='both', expand=True)
-        self.log_widget.configure(state='disabled')
-        ttk.Label(page, text='Đóng app = dừng hẹn giờ. Bỏ qua file đang ghi; không có thay đổi hợp lệ thì không tạo commit.', style='Muted.TLabel').pack(side='bottom', anchor='w', pady=(10, 0), before=self.log_widget)
+        build_layout(self)
 
     def log(self, message):
         message = redact(message)
@@ -339,15 +216,10 @@ class CheckpointApp:
                     self.repo_issues[index] = True
                 self.pause_all()
                 self.log('LỖI: ' + value)
+                self.notifications.show('Cần kiểm tra', value, kind='error')
             elif kind == 'details':
                 title, text = value
-                window = tk.Toplevel(self.root)
-                window.title(title)
-                window.geometry('980x620')
-                text_widget = scrolledtext.ScrolledText(window, wrap='none', font=('Consolas', 10))
-                text_widget.pack(fill='both', expand=True)
-                text_widget.insert('1.0', text)
-                text_widget.configure(state='disabled')
+                self.dialog.show_details(title, text)
             else:
                 for index, snapshot, message, disable, committed in value:
                     if disable:
@@ -355,6 +227,10 @@ class CheckpointApp:
                         self.auto_vars[index].set(False)
                         self.auto_permits[index].clear()
                         self.repo_text[index].set('Cần kiểm tra: ' + message[:400])
+                        if message != self.last_issue_messages[index]:
+                            self.repo_sections[index].set_expanded(True)
+                            self.notifications.show(self.configs[index].name, message, kind='error')
+                            self.last_issue_messages[index] = message
                     if snapshot:
                         self.repo_issues[index] = snapshot.staged
                         self.snapshots[index] = snapshot
@@ -366,13 +242,19 @@ class CheckpointApp:
                         self.uncommitted_vars[index].set(f'Chưa commit: {len(snapshot.changes)} file')
                         self.pending_push_vars[index].set(f'Chưa push: {counts[0]} commit' if known else 'Chưa push: chưa xác định')
                         self.remote_extra_vars[index].set(f'GitHub có thêm: {counts[1]} commit' if known else 'GitHub: chưa có dữ liệu so sánh')
-                        self.pending_push_labels[index].configure(foreground='#fbbf24' if known and int(counts[0]) else '#34d399' if known else '#94a3b8')
-                        self.repo_text[index].set(
-                            f'Nhánh: {snapshot.branch or "DETACHED"}   •   HEAD: {snapshot.head[:8]}   •   Upstream: {snapshot.upstream or "chưa có"}\n'
-                            f'Hợp lệ: {len(snapshot.eligible)} file   |   Bỏ qua: {excluded}   |   Đã stage: {"có" if snapshot.staged else "không"}   •   Checkpoint trong app: {self.last_checkpoint[index]}'
-                        )
+                        self.pending_push_labels[index].set_kind('warn' if known and int(counts[0]) else 'success' if known else 'neutral')
+                        self.uncommitted_labels[index].set_kind('warn' if snapshot.changes else 'success')
+                        self.branch_vars[index].set(snapshot.branch or 'DETACHED')
+                        self.head_detail_vars[index].set(snapshot.head[:8])
+                        self.upstream_detail_vars[index].set(snapshot.upstream or 'chưa có')
+                        self.checkpoint_detail_vars[index].set(self.last_checkpoint[index])
+                        self.counts_detail_vars[index].set(f'Hợp lệ: {len(snapshot.eligible)} file   |   Bỏ qua: {excluded}   |   Đã stage: {"có" if snapshot.staged else "không"}')
+                        self.repo_text[index].set('File đã stage được giữ nguyên; tạm dừng tự commit để bạn kiểm tra.' if snapshot.staged else '')
+                        self.last_issue_messages[index] = ''
                     if message:
                         self.log(f'{self.configs[index].name}: {message}')
+                        if not disable and kind in {'manual_commit', 'push_result'}:
+                            self.notifications.show(self.configs[index].name, message)
             self._update_mode()
             if kind == 'result' and self.auto_start_pending and not self.closing:
                 self.auto_start_pending = False
@@ -388,19 +270,25 @@ class CheckpointApp:
             if not 10 <= seconds <= 3600:
                 raise ValueError
         except ValueError:
-            messagebox.showerror('Khoảng quét', 'Chọn số giây từ 10 đến 3600.', parent=self.root)
+            self.notifications.show('Khoảng quét không hợp lệ', 'Chọn số giây từ 10 đến 3600.', kind='error')
+            return
+        path = self.state_dir / 'settings.json'
+        temporary = path.with_suffix('.tmp')
+        try:
+            temporary.write_text(json.dumps({'interval_seconds': seconds}), encoding='utf-8')
+            temporary.replace(path)
+        except OSError as error:
+            self.notifications.show('Không lưu được khoảng quét', redact(str(error)), kind='error')
             return
         self.schedule.interval = seconds
         self.schedule.consume(self.clock())
-        path = self.state_dir / 'settings.json'
-        temporary = path.with_suffix('.tmp')
-        temporary.write_text(json.dumps({'interval_seconds': seconds}), encoding='utf-8')
-        temporary.replace(path)
         self.log(f'Đã đặt khoảng quét: {seconds} giây. Không có thời gian chờ 60 giây.')
+        self.notifications.show('Đã cập nhật', f'Quét mỗi {seconds} giây khi app đang mở.')
 
     def _update_mode(self):
         count = sum(variable.get() for variable in self.auto_vars)
         self.mode_var.set(f'TỰ COMMIT ĐANG BẬT: {count}/{len(self.configs)} REPO • Push vẫn thủ công' if count else 'ĐÃ TẠM DỪNG • Chỉ quét, không tự commit')
+        self.mode_badge.set_kind('success' if count else 'neutral')
         if not self.busy:
             self.activity_light.set('error' if any(self.repo_issues) else 'ok' if count else 'idle')
             for index, variable in enumerate(self.auto_vars):
@@ -453,24 +341,31 @@ class CheckpointApp:
 
     def commit_now(self, index):
         snapshot = self.snapshots[index]
-        if not snapshot or self.busy:
+        if not snapshot or self.busy or self.closed or self.closing or self.dialog.active:
             return
-        if messagebox.askyesno('Commit ngay', f'{self.configs[index].name}: commit các thay đổi hợp lệ trên nhánh {snapshot.branch}?\nFile staged sẵn sẽ không bị lấy vào commit tự động.', parent=self.root):
+        identity = snapshot.identity
+        def confirm():
+            if self.busy:
+                self.notifications.show('Đang xử lý Git', 'Đợi thao tác hiện tại hoàn tất rồi bấm Commit ngay.')
+                return False
             flags = [False] * len(self.configs)
             flags[index] = True
             anchors = self._anchors()
-            self._submit(lambda: self._cycle([index], flags, anchors), indices=[index], label='Đang commit')
+            anchors[index] = identity
+            return self._submit(lambda: self._cycle([index], flags, anchors), kind='manual_commit', indices=[index], label='Đang commit')
+        self.dialog.show_confirm('Commit ngay · ' + self.configs[index].name,
+            f'Commit các thay đổi hợp lệ trên nhánh {snapshot.branch}?\n\nFile staged sẵn được giữ nguyên. Thao tác này chỉ tạo commit cục bộ.', confirm)
 
     def push_now(self, index):
         snapshot = self.snapshots[index]
-        if not snapshot or self.busy:
+        if not snapshot or self.busy or self.dialog.active:
             return
         identity = snapshot.identity
         def job():
             message = self.repositories[index].push(expected_identity=identity)
             return [(index, self.repositories[index].scan(), message, False, False)]
         self.log(f'{self.configs[index].name}: đang Push theo yêu cầu của bạn…')
-        self._submit(job, indices=[index], label='Đang Push')
+        self._submit(job, kind='push_result', indices=[index], label='Đang Push')
 
     def start_blender(self):
         if not self.closed and not self.closing:
@@ -486,6 +381,7 @@ class CheckpointApp:
             self.log(f'Đã mở {label} (PID {pid}).')
         except (OSError, ValueError) as error:
             self.log(f'Không mở được {label}: {error}')
+            self.notifications.show('Không mở được ' + label, redact(str(error)), kind='error')
 
     def copy_blender_view_path(self, key):
         if self.closed or self.closing:
@@ -497,8 +393,10 @@ class CheckpointApp:
             self.root.clipboard_append(str(path))
             self.root.update_idletasks()
             self.log(f'Đã copy path {label}.')
+            self.notifications.show('Đã copy đường dẫn', str(path))
         except (OSError, ValueError, tk.TclError) as error:
             self.log(f'Không copy được path {label}: {error}')
+            self.notifications.show('Không copy được đường dẫn', redact(str(error)), kind='error')
 
     def refresh_blender(self):
         if not self.closed and not self.closing:
@@ -531,6 +429,8 @@ class CheckpointApp:
 
     def _destroy(self):
         self.closed = True
+        self.dialog.close()
+        self.notifications.close()
         for timer in self.after_ids.values():
             try:
                 self.root.after_cancel(timer)
@@ -550,8 +450,19 @@ def main(auto_commit=False):
     state_dir = Path(os.environ.get('LOCALAPPDATA', str(Path.home() / '.local' / 'state'))) / 'GAFGitCheckpointManager'
     try:
         instance = SingleInstance(state_dir / 'manager.lock', identity='Local\\Tin0709.GAFGitCheckpointManager')
-    except RuntimeError as error:
-        messagebox.showinfo('Git Checkpoint Manager', str(error), parent=root)
+    except RuntimeError:
+        # Reuse the existing application instead of opening a native dialog.
+        if os.name == 'nt':
+            import ctypes
+            user32 = ctypes.windll.user32
+            user32.FindWindowW.restype = ctypes.c_void_p
+            user32.FindWindowW.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p]
+            user32.ShowWindow.argtypes = [ctypes.c_void_p, ctypes.c_int]
+            user32.SetForegroundWindow.argtypes = [ctypes.c_void_p]
+            window = user32.FindWindowW(None, 'Git Checkpoint Manager — GameAssetFactory & MD2')
+            if window:
+                user32.ShowWindow(window, 9)
+                user32.SetForegroundWindow(window)
         root.destroy()
         return
     repository = Path(__file__).resolve().parents[2]

@@ -17,9 +17,24 @@ App dùng Python/Tkinter đã có sẵn. Không tạo web server, repo mới, ta
 Windows hoặc dịch vụ tự khởi động. Đóng app sẽ dừng hẹn giờ Git. Mỗi lần mở app, tự commit
 được tắt để bạn có thể kiểm tra trước; chỉ cho phép một cửa sổ app hoạt động.
 
-Icon riêng được áp dụng cho shortcut, cửa sổ và taskbar. File PNG gốc và ICO
-nhiều kích cỡ nằm trong `scripts/checkpoint_manager/assets/`; PNG được tạo bằng
-built-in imagegen, ICO chỉ là chuyển định dạng/kích thước từ cùng ảnh gốc.
+Logo hiện tại dùng ảnh `Geometric Network Cube Icon.png` do bạn cung cấp.
+Các file `checkpoint-manager-v2*` trong `scripts/checkpoint_manager/assets/`
+được dùng cho header, cửa sổ, taskbar và shortcut; icon cũ vẫn được giữ lại.
+
+## Giao diện thu gọn và thông báo trong app
+
+Bố cục navy/tím dùng các thẻ bo góc dựa theo mẫu ZIP bạn gửi. Chữ được tăng
+khoảng 20%; hàng nút Git tự xuống dòng khi cửa sổ hẹp. Cuộn trang để xem toàn bộ
+nội dung. Bấm **Chi tiết Git** để mở/thu gọn đường dẫn, nhánh, HEAD và số liệu;
+thẻ MD2 mở phần cảnh báo PRIVATE/Release ngay từ đầu.
+
+**Xem thay đổi** và xác nhận **Commit ngay** mở thành bảng bên trong cửa sổ app.
+Escape hoặc nút đóng/Hủy quay lại; Hủy không commit. Lỗi và thông báo copy/lưu/
+push dùng cùng giao diện trong app, không mở hộp thoại Windows. Lỗi được giữ
+đến khi đóng hoặc thay bằng thông báo mới; thông báo thường tự ẩn sau 4,5 giây.
+Output dài vẫn có trong nhật ký/bảng thay đổi, có thanh cuộn. Tự commit không
+hiện thông báo nổi mỗi lần để tránh làm phiền. **Push vẫn chạy ngay, không hỏi
+xác nhận.** Mở app lần hai đưa cửa sổ hiện tại lên trước.
 
 ## Blender MCP và đèn trạng thái
 

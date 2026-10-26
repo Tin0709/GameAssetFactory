@@ -189,13 +189,71 @@ class DesktopTests(unittest.TestCase):
         self.app.repositories[0] = GitRepository(RepoConfig(config.name, config.path, str(remote)))
         self.app.refresh()
         self.wait_idle()
-        with patch('checkpoint_manager.desktop.messagebox.askyesno', side_effect=AssertionError('Push must not open a confirmation dialog')):
+        with patch('tkinter.messagebox.askyesno', side_effect=AssertionError('Push must not open a confirmation dialog')):
             self.app.push_now(0)
             self.wait_idle()
         actual = subprocess.check_output(['git', '--git-dir', str(remote), 'rev-parse', 'refs/heads/test'], text=True).strip()
         expected = subprocess.check_output(['git', '-C', str(config.path), 'rev-parse', 'HEAD'], text=True).strip()
         self.assertEqual(actual, expected)
         self.assertEqual(self.app.pending_push_vars[0].get(), 'Chưa push: 0 commit')
+
+    def test_repository_details_can_expand_and_collapse(self):
+        section = self.app.repo_sections[0]
+        self.assertFalse(section.expanded)
+        section.toggle()
+        self.root.update_idletasks()
+        self.assertTrue(section.expanded)
+        self.assertEqual(section.content.winfo_manager(), 'pack')
+        section.toggle()
+        self.root.update_idletasks()
+        self.assertFalse(section.expanded)
+        self.assertEqual(section.content.winfo_manager(), '')
+
+    def test_rounded_cards_allocate_height_before_their_body_is_mapped(self):
+        self.root.deiconify()
+        self.root.update_idletasks()
+        section = self.app.repo_sections[0]
+        card = section.frame.master.master
+        self.assertGreater(card.winfo_height(), 70)
+        self.assertTrue(section.frame.winfo_ismapped())
+        self.root.withdraw()
+
+    def test_interval_error_is_displayed_inside_app(self):
+        self.app.interval_var.set('not-a-number')
+        with patch('tkinter.messagebox.showerror', side_effect=AssertionError('No OS dialog')):
+            self.app.apply_interval()
+        self.assertEqual(self.app.schedule.interval, 10)
+        self.assertEqual(self.app.notifications.kind, 'error')
+        self.assertIn('10', self.app.notifications.message)
+
+    def test_changes_view_opens_inside_app_without_another_window(self):
+        (self.configs[0].path / 'work.txt').write_text('new content')
+        with patch('tkinter.Toplevel', side_effect=AssertionError('No secondary window')):
+            self.app.show_changes(0)
+            self.wait_idle()
+        self.assertTrue(self.app.dialog.active)
+        self.assertEqual(self.app.dialog.kind, 'details')
+        self.assertIn('work.txt', self.app.dialog.text_widget.get('1.0', 'end'))
+        self.app.dialog.close()
+        self.assertFalse(self.app.dialog.active)
+
+    def test_commit_now_confirmation_and_cancel_stay_inside_app(self):
+        (self.configs[0].path / 'work.txt').write_text('new commit content')
+        self.app.refresh()
+        self.wait_idle()
+        with patch('tkinter.messagebox.askyesno', side_effect=AssertionError('No OS dialog')):
+            self.app.commit_now(0)
+            self.assertTrue(self.app.dialog.active)
+            self.assertEqual(self.app.dialog.kind, 'confirm')
+            self.assertEqual(self.count(0), 1)
+            self.app.dialog.cancel_button.invoke()
+            self.assertFalse(self.app.dialog.active)
+            self.assertEqual(self.count(0), 1)
+            self.app.commit_now(0)
+            self.app.dialog.confirm_button.invoke()
+            self.wait_idle()
+        self.assertEqual(self.count(0), 2)
+        self.assertFalse(self.app.dialog.active)
 
     def test_pause_while_busy_skips_the_next_repository(self):
         self.app.resume_all()

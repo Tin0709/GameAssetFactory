@@ -4,6 +4,8 @@ extends CharacterBody3D
 ## The expression controller writes only the two face morph scalars.
 signal attack_accepted(index:int,clip:String,serial:int)
 signal impact_ready(index:int,base:Vector3,tip:Vector3,serial:int)
+signal physics_pose_ready
+signal presentation_reset
 const Model=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/Sabre_Character_Authored.glb")
 const Combo=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combo_state.gd")
 const DirectionAdapter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/locomotion_direction.gd")
@@ -208,6 +210,7 @@ func _physics_process(delta:float)->void:
 		_animate(step);left-=step
 	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and not combo.active()) if direction_adapter!=null else []
 	movement_meter.sample(delta,global_position,desired.length(),_move_requested,_gait_cycles_this_tick,soles)
+	physics_pose_ready.emit()
 
 func _animate(delta:float)->void:
 	if direction_adapter!=null:direction_adapter.restore()
@@ -290,6 +293,7 @@ func review(key:String)->void:
 	if not clips.has(key):return
 	if direction_adapter!=null:direction_adapter.deactivate()
 	combo.cancel();release_inputs();review_clip=key;_review_time=0.;active_clip="";_play(key);animation_player.seek(0.,true)
+	presentation_reset.emit()
 func resume_gameplay()->void:
 	if review_clip.is_empty():return
 	animation_player.get_animation(clips[review_clip].action).loop_mode=Animation.LOOP_LINEAR if clips[review_clip].loop else Animation.LOOP_NONE
@@ -325,6 +329,7 @@ func reset_actor()->void:
 	visual.rotation.y=0.;expression_clock=0.;simulation_clock=0.;focus_value=0.;blink_value=0.;_forced_blink=0.
 	_play("Idle",0.);_apply_face(0.);reset_physics_interpolation()
 	reset_movement_measurements()
+	presentation_reset.emit()
 func reset_movement_measurements()->void:
 	movement_meter.reset(global_position,_move_requested)
 func movement_measurements()->Dictionary:

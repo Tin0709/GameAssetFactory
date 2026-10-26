@@ -6,6 +6,7 @@ const Effects=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototy
 const GrassField=preload("res://scenes/dev/actions_stuff_research/grass_md2_v001/grass_field.gd")
 const Lighting=preload("res://scenes/dev/actions_stuff_research/lighting_md2_v001/lighting.gd")
 const ReferenceAudio=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
+const RenderPresenter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/render_presenter.gd")
 const SELECTION_META:="md2_sabre_prototype_selected"
 const LAB_SCENE:="res://scenes/dev/ActionsStuffWalkRunTest.tscn"
 var lab:Node3D
@@ -21,6 +22,8 @@ var actions:OptionButton
 var expression:OptionButton
 var movement_panel:PanelContainer
 var movement_label:Label
+var render_presenter:Node
+var native_pixels:=true
 var _right_held:=false
 var _left_held:=false
 var _e_held:=false
@@ -61,6 +64,9 @@ func setup(scene:Node3D)->void:
 	if actor.using_private_skin:
 		for mesh:MeshInstance3D in actor.model.find_children("*","MeshInstance3D",true,false):mesh.layers=2
 		refresh_reflections()
+	if actor.using_original_source:
+		render_presenter=RenderPresenter.new();render_presenter.name="SourceRenderPresentation";add_child(render_presenter);render_presenter.setup(actor)
+	apply_visual_clarity()
 	_build_ui();lab._update_camera()
 	print("MD2_SABRE_READY ",JSON.stringify({"clips":actor.clips.size(),"bones":actor.skeleton.get_bone_count(),"markers":[str(actor.marker_grip.get_path()),str(actor.marker_base.get_path()),str(actor.marker_tip.get_path())],"appearance":actor.appearance_label,"motion":"original source tracks with declared semantic aliases" if actor.using_original_source else "reconstructed authored curves"}))
 func _build_ui()->void:
@@ -116,7 +122,7 @@ func _build_ui()->void:
 	_build_movement_panel()
 func _build_movement_panel()->void:
 	movement_panel=PanelContainer.new();movement_panel.name="MovementMeasurements";canvas.add_child(movement_panel)
-	movement_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);movement_panel.offset_left=-420;movement_panel.offset_right=-18;movement_panel.offset_top=-215;movement_panel.offset_bottom=-18
+	movement_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);movement_panel.offset_left=-420;movement_panel.offset_right=-18;movement_panel.offset_top=-250;movement_panel.offset_bottom=-18
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.035,.045,.9);style.set_content_margin_all(9);style.set_corner_radius_all(5);movement_panel.add_theme_stylebox_override("panel",style)
 	var box:=VBoxContainer.new();movement_panel.add_child(box)
 	var heading:=Label.new();heading.text="MOVEMENT METER · actual physics travel";heading.add_theme_font_size_override("font_size",12);box.add_child(heading)
@@ -126,6 +132,18 @@ func _build_movement_panel()->void:
 	var save:=_button("Save JSON",row);save.tooltip_text="Save aggregate measurements in private Research; no animation/mesh export.";save.pressed.connect(func():
 		var path:String=actor.save_movement_measurements();save.text="Saved" if not path.is_empty() else "Save failed";save.tooltip_text=path;print("SABRE_MOVEMENT_SAVED ",path))
 	var hide:=_button("Hide · F3",row);hide.pressed.connect(func():movement_panel.hide())
+	if actor.using_original_source:
+		row=HBoxContainer.new();box.add_child(row)
+		var pixels:=CheckButton.new();pixels.text="Native pixels100%";pixels.button_pressed=true;pixels.focus_mode=Control.FOCUS_NONE;row.add_child(pixels);pixels.toggled.connect(set_native_pixels)
+		var smooth:=CheckButton.new();smooth.text="Smooth display";smooth.button_pressed=true;smooth.focus_mode=Control.FOCUS_NONE;row.add_child(smooth);smooth.toggled.connect(func(value:bool):render_presenter.enabled=value)
+func set_native_pixels(value:bool)->void:
+	native_pixels=value;apply_visual_clarity()
+func apply_visual_clarity()->void:
+	if not actor.using_original_source:return
+	var scale:=1.
+	if not native_pixels and lab.md2_lighting!=null:
+		scale=float(lab.md2_lighting.original_view.scale) if lab.md2_lighting.original else float(Lighting.TIERS[lab.md2_lighting.quality].scale)
+	if not is_equal_approx(lab.get_viewport().scaling_3d_scale,scale):lab.get_viewport().scaling_3d_scale=scale
 func _button(label:String,parent:Node)->Button:
 	var button:=Button.new();button.text=label;button.focus_mode=Control.FOCUS_NONE;parent.add_child(button);return button
 func action_caption(key:String)->String:
@@ -150,7 +168,11 @@ func _physics_process(_delta:float)->void:
 		var hit:Variant=Plane(Vector3.UP,0.).intersects_ray(lab.camera.project_ray_origin(mouse),lab.camera.project_ray_normal(mouse))
 		if hit!=null:actor.aim_point=hit;actor.has_aim_point=true
 func present(delta:float)->void:
-	effects.present();lab._update_camera(delta,display_position())
+	apply_visual_clarity()
+	if render_presenter!=null:render_presenter.prepare(Engine.get_physics_interpolation_fraction())
+	if render_presenter!=null:effects.present(render_presenter.display_clock,render_presenter.display_marker(actor.marker_base).origin,render_presenter.display_marker(actor.marker_tip).origin)
+	else:effects.present()
+	lab._update_camera(delta,display_position())
 	var label:String="Original MD2 player + Sabre (private)" if actor.using_original_source else actor.appearance_label
 	status.text="%s\n%s · %.2f units/s\nCombo %d / 3 · accepted %d · ready gates %d"%[label,("REVIEW: "+action_caption(actor.review_clip) if not actor.review_clip.is_empty() else action_caption(actor.active_clip)),actor.current_speed,actor.combo.index+1,actor.accepted_count,actor.impact_count]
 	if movement_panel.visible:
@@ -160,7 +182,7 @@ func present(delta:float)->void:
 		var response:String="—" if m.response_95<0. else "%d ms"%roundi(m.response_95*1000.)
 		movement_label.text="Speed %.2f / target %.2f u/s · peak %.2f\nPath %.2f · net %.2f units · %.1f s\nGait %.2f cycles/s · %.3fx · total %.2f\nStart95 %s · stop %.3fu / %.3fs\nSole candidates L %s / R %s u/s\nSole motion includes rolling; native rates unverified"%[m.speed,m.target_speed,m.peak_speed,m.distance,m.net_distance,m.elapsed,m.cycle_hz,m.play_rate,m.gait_cycles,response,m.stop_distance,m.stop_seconds,left,right]
 func display_position()->Vector3:
-	return actor.global_position
+	return render_presenter.display_actor if render_presenter!=null else actor.global_position
 func input(event:InputEvent)->void:
 	# Release anywhere, including over GUI; only unhandled presses can attack.
 	if event is InputEventMouseButton and not event.pressed:
@@ -196,6 +218,7 @@ func release_inputs()->void:
 	for action:StringName in [&"move_left",&"move_right",&"move_forward",&"move_backward",&"sprint",&"jump"]:Input.action_release(action)
 func reset()->void:
 	release_inputs();actor.reset_actor();effects.reset()
+	if render_presenter!=null:render_presenter.reset_history()
 	if reference_audio!=null:reference_audio.reset()
 	if lab.grass_field!=null:lab.grass_field.reset()
 	lab._camera_initialized=false;lab._update_camera()
