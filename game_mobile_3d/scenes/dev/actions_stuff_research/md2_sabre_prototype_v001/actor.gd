@@ -13,6 +13,9 @@ const DirectionAdapter=preload("res://scenes/dev/actions_stuff_research/md2_sabr
 const MovementMeter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/movement_meter.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
+# Ordinary jump study timing; native MD2 launch/gravity have NOT been recovered.
+const SOURCE_JUMP_APEX_SECONDS:=.25
+const SOURCE_MOVING_LAND_SECONDS:=.05
 var combo=Combo.new()
 var clips:Dictionary={}
 var visual:Node3D
@@ -127,7 +130,7 @@ func _ready()->void:
 		# Standard100UU/m conversion; local effective runtime values unverified.
 		# Slow Walk and stride references remain disclosed study adapters.
 		walk_speed=2.;run_speed=700./100.;coyote_time=.155
-		gravity=15. # Existing ballistic approximation; NOT inferred native physics.
+		gravity=2.*jump_height/(SOURCE_JUMP_APEX_SECONDS*SOURCE_JUMP_APEX_SECONDS)
 		# Public DT_MeleePropertyDefinition#44 Sabre variants, not a global speedup.
 		combo.attack_play_rates=[1.2,1.2,1.]
 		cadence_label="Table700 ×1 /100 =7 units/s · runtime unverified\nGait follows travel/stride · review1x"
