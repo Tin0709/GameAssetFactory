@@ -11,7 +11,7 @@ func run()->void:
 	var a=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();root.add_child(a)
 	check(a.using_original_source,"Calibration uses original source profile")
 	check(absf(a.walk_speed-2.)<.00001 and absf(a.run_speed-7.)<.00001,"Public table baseline is separate from unchanged source stride references")
-	check(absf(a.gravity-15.)<.00001,"Previous approximate jump physics remains explicit")
+	check(absf(a.gravity-38.4)<.00001,"Responsive jump gravity is a declared adapter, not native MD2 data")
 	if not failures.is_empty():a.free();floor.free();quit(1);return
 	var reports:Array[Dictionary]=[]
 	for hz in [30,60]:
@@ -23,8 +23,8 @@ func run()->void:
 			if a.is_on_floor():flight=a.simulation_clock-start;break
 			await tick()
 		check(absf(peak-1.2)<.012,"Estimated1.2-unit apex retained at "+str(hz))
-		check(absf(apex-.4)<=1./hz+.001,"Physical apex follows source Takeoff end at "+str(hz))
-		check(absf(flight-.8)<=2./hz+.001,"Physical flight matches timing adapter at "+str(hz))
+		check(absf(apex-.25)<=1./hz+.001,"Physical apex follows explicit250ms adapter independently of source Takeoff duration at "+str(hz))
+		check(absf(flight-.5)<=2./hz+.001,"Physical flight matches faster500ms adapter at "+str(hz))
 		var ground_drift:=0.
 		for i in 15:await tick();ground_drift=maxf(ground_drift,absf(a.global_position.y))
 		check(ground_drift<.001 and a.is_on_floor(),"Ground contact remains stable after landing at "+str(hz))

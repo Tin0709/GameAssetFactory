@@ -46,16 +46,16 @@ func run()->void:
 		a.reset_actor();await ticks(4);a.requested_jump=true;await tick();a.requested_jump=false;guard=0
 		while a.velocity.y>0. and guard<hz*2:await tick();guard+=1
 		var start_velocity:float=a.velocity.y;var slam_start:float=a.simulation_clock;a.attack(true);a.attack(false);await tick()
-		check(a.combo.clip()=="AirAttack" and absf(a.velocity.y-(start_velocity-30./hz))<.0001,"Aerial attack uses recovered gravity factor2 at%dHz"%hz)
+		check(a.combo.clip()=="AirAttack" and absf(a.velocity.y-(start_velocity-2.*a.gravity/hz))<.0001,"Aerial attack uses recovered gravity factor2 at%dHz"%hz)
 		while not a._grounded and guard<hz*3:await tick();guard+=1
 		var slam_fall:float=a.simulation_clock-slam_start
 		check(slam_fall<normal_fall*.85,"Slam reaches real floor decisively sooner at%dHz"%hz)
-		check(a.gravity==15.,"Ordinary jump gravity is not replaced by aerial attack factor")
+		check(absf(a.gravity-38.4)<.0001,"Ordinary jump gravity adapter is not replaced by aerial attack factor")
 		timings.append({"hz":hz,"normal_apex":apex,"normal_apex_to_floor":normal_fall,"slam_apex_to_floor":slam_fall})
-		a.reset_actor();a.global_position.y=40.;await ticks(3);a.attack(true);a.attack(false);await ticks(hz)
+		a.reset_actor();a.global_position.y=100.;await ticks(3);a.attack(true);a.attack(false);await ticks(hz)
 		check(not a._grounded and not a.combo.active() and a._heavy_slam_active,"Heavy gravity persists after air clip ends above a high ledge at%dHz"%hz)
 		a.review("Idle");var falling:float=a.velocity.y;await tick()
-		check(absf(a.velocity.y-(falling-30./hz))<.0001,"Review/cancel does not interrupt physical slam before floor at%dHz"%hz)
+		check(absf(a.velocity.y-(falling-2.*a.gravity/hz))<.0001,"Review/cancel does not interrupt physical slam before floor at%dHz"%hz)
 		await ticks(hz*2)
 		check(a._grounded and not a._heavy_slam_active,"Real floor clears heavy gravity even during review at%dHz"%hz)
 	# Rate-aware event clock must be invariant under wall-time partition.
