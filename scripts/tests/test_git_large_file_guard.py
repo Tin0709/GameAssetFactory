@@ -60,6 +60,47 @@ class GitToolTests(unittest.TestCase):
         result = self.run_tool()
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    @unittest.skipUnless(os.name == 'nt', 'Windows console allocation regression')
+    def test_guard_git_child_has_no_console_when_called_from_pythonw(self):
+        compiler = Path(os.environ.get('WINDIR', r'C:\Windows')) / 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
+        if not compiler.is_file():
+            self.skipTest('Framework C# compiler unavailable for the temporary console probe')
+        source = self.repo / 'ConsoleProbe.cs'
+        executable = self.repo / 'console-probe.exe'
+        source.write_text('''using System;
+using System.Runtime.InteropServices;
+class ConsoleProbe {
+    [DllImport("kernel32.dll")] static extern IntPtr GetConsoleWindow();
+    static void Main() { Console.Write(GetConsoleWindow() == IntPtr.Zero ? "no-console" : "has-console"); }
+}''')
+        built = subprocess.run([str(compiler), '/nologo', '/target:exe', '/out:' + str(executable), str(source)],
+                               capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
+        self.assertEqual(built.returncode, 0, built.stdout.decode(errors='replace'))
+        output = self.repo / 'probe-result.txt'
+        driver = self.repo / 'gui-driver.py'
+        driver.write_text(f'''import importlib.util, pathlib, subprocess
+spec = importlib.util.spec_from_file_location('guard_probe', {str(GUARD)!r})
+guard = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(guard)
+real_run = subprocess.run
+def console_probe(args, **kwargs):
+    # Keep even the RED reproduction visually hidden. A console handle still
+    # exists without CREATE_NO_WINDOW, so this tests actual OS allocation.
+    startup = subprocess.STARTUPINFO()
+    startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    startup.wShowWindow = subprocess.SW_HIDE
+    kwargs.setdefault('startupinfo', startup)
+    return real_run([{str(executable)!r}, *args[1:]], **kwargs)
+guard.subprocess.run = console_probe
+pathlib.Path({str(output)!r}).write_bytes(guard.git(pathlib.Path({str(self.repo)!r}), 'status'))
+''', encoding='utf-8')
+        pythonw = Path(os.sys.executable).with_name('pythonw.exe')
+        self.assertTrue(pythonw.is_file())
+        run = subprocess.run([str(pythonw), str(driver)], capture_output=True,
+                             creationflags=subprocess.CREATE_NO_WINDOW, timeout=15)
+        self.assertEqual(run.returncode, 0, run.stderr.decode(errors='replace'))
+        self.assertEqual(output.read_bytes(), b'no-console')
+
     def test_warn_threshold_is_strict_and_reads_staged_blob(self):
         self.stage("exact.bin", size=25 * MIB)
         self.stage("staged big with spaces.bin", size=25 * MIB + 1)

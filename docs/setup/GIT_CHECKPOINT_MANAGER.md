@@ -49,6 +49,11 @@ Các nút Git giữ nguyên màu khi quét, không đổi xám/bật lại theo 
 đèn cạnh mỗi repo cho biết tạm dừng, đang xử lý, tự commit bật hoặc cần kiểm tra.
 Nút bấm trong lúc thao tác Git đang chạy không xếp chồng lệnh mới.
 
+Lệnh Git, tiến trình kiểm tra file lớn và uvx do app gọi được chạy không tạo
+console trên Windows. Bộ kiểm tra file lớn cũng áp dụng chế độ này cho các Git
+con do chính nó gọi, để tránh terminal lóe lên trong mỗi lượt commit. Lỗi và
+tiến độ vẫn được hiển thị trong nhật ký của app.
+
 ## Thông số từng thư mục
 
 - **Chưa commit: N file** — số đường dẫn thay đổi được Git báo ở máy, gồm cả

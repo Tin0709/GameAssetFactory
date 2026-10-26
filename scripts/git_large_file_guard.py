@@ -16,7 +16,8 @@ LFS_POINTER = re.compile(
 
 def git(repo, *args, data=None):
     result = subprocess.run(["git", *args], cwd=repo, input=data,
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
     if result.returncode:
         raise RuntimeError(result.stderr.decode(errors="replace").strip())
     return result.stdout
