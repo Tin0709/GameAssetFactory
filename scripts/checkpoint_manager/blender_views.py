@@ -1,0 +1,43 @@
+"""Open the two existing research views with their matching UI bootstrap."""
+import os
+from pathlib import Path
+import subprocess
+
+
+VIEW_LABELS = {'animation': 'Animation MD2', 'sabre': 'Valorie + Sabre'}
+
+
+class BlenderViewLauncher:
+    def __init__(self, state_dir, research_root=None, blender_exe=None):
+        self.state_dir = Path(state_dir)
+        self.research_root = Path(research_root) if research_root else Path.home() / 'Desktop' / 'MD2 Research'
+        self.blender_exe = Path(blender_exe) if blender_exe else Path('C:/Program Files/Blender Foundation/Blender 5.2/blender.exe')
+        self.views = {
+            'animation': (self.research_root / 'blender/MD2_Animation_Library_BrowserFixed.blend',
+                          self.research_root / 'scripts/md2_blender_library.py'),
+            'sabre': (self.research_root / 'blender/prototype_sabre/MD2_Valorie_Sabre_Source_Showcase.blend',
+                      self.research_root / 'blender/prototype_sabre/source_preview_ui.py'),
+        }
+
+    def _view(self, key):
+        if key not in self.views:
+            raise ValueError('Lối tắt Blender không hợp lệ.')
+        return self.views[key]
+
+    def blend_path(self, key):
+        return self._view(key)[0]
+
+    def open(self, key):
+        blend, script = self._view(key)
+        for path in (self.blender_exe, blend, script):
+            if not path.is_file():
+                raise FileNotFoundError('Không tìm thấy: ' + str(path))
+        self.state_dir.mkdir(parents=True, exist_ok=True)
+        # Match the existing .cmd launchers, directly: no intermediate cmd.exe
+        # console, no --background, and no saves or modifications to the blend.
+        with (self.state_dir / f'blender-{key}-launch.log').open('ab') as output:
+            process = subprocess.Popen([str(self.blender_exe), str(blend), '--python', str(script)],
+                                       cwd=blend.parent, stdin=subprocess.DEVNULL,
+                                       stdout=output, stderr=subprocess.STDOUT,
+                                       creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        return process.pid

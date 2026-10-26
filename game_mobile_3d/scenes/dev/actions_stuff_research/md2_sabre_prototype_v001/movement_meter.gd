@@ -8,6 +8,8 @@ var speed:=0.
 var peak_speed:=0.
 var vertical_speed:=0.
 var acceleration:=0.
+var acceleration_valid:=false
+var _has_velocity_sample:=false
 var target_speed:=0.
 var cycle_hz:=0.
 var response_95:=-1.
@@ -29,13 +31,15 @@ var _sole_samples:Array[int]=[0,0]
 func reset(position:Vector3,moving:bool=false)->void:
 	elapsed=0.;distance=0.;gait_cycles=0.;speed=0.;peak_speed=0.;vertical_speed=0.;acceleration=0.;target_speed=0.;cycle_hz=0.
 	response_95=-1.;stop_distance=0.;stop_seconds=0.;_start=position;_previous=position
+	acceleration_valid=false;_has_velocity_sample=false
 	_intent=moving;_responding=false;_response_time=0.;_stopping=false
 	sole_speed=[-1.,-1.];sole_height=[0.,0.];_sole_previous=[Vector3.ZERO,Vector3.ZERO];_sole_contact=[false,false];_sole_squared=[0.,0.];_sole_samples=[0,0]
 
 func sample(delta:float,position:Vector3,requested_speed:float,moving:bool,advanced_cycles:float,soles:Array=[])->void:
 	if delta<=0.:return
 	var step:=position-_previous;var travelled:=Vector2(step.x,step.z).length()
-	var previous_speed:=speed;speed=travelled/delta;vertical_speed=step.y/delta;acceleration=(speed-previous_speed)/delta
+	var previous_speed:=speed;speed=travelled/delta;vertical_speed=step.y/delta
+	acceleration_valid=_has_velocity_sample;acceleration=(speed-previous_speed)/delta if acceleration_valid else 0.;_has_velocity_sample=true
 	elapsed+=delta;distance+=travelled;peak_speed=maxf(peak_speed,speed);target_speed=requested_speed
 	gait_cycles+=advanced_cycles;cycle_hz=advanced_cycles/delta
 	if moving and not _intent:_responding=true;_response_time=0.;response_95=-1.;_stopping=false
@@ -62,4 +66,4 @@ func snapshot()->Dictionary:
 	var net:=_previous-_start;var rms:Array[float]=[-1.,-1.]
 	for side in 2:
 		if _sole_samples[side]>0:rms[side]=sqrt(_sole_squared[side]/_sole_samples[side])
-	return {"elapsed":elapsed,"distance":distance,"net_distance":Vector2(net.x,net.z).length(),"speed":speed,"peak_speed":peak_speed,"vertical_speed":vertical_speed,"acceleration":acceleration,"target_speed":target_speed,"gait_cycles":gait_cycles,"cycle_hz":cycle_hz,"response_95":response_95,"stop_distance":stop_distance,"stop_seconds":stop_seconds,"sole_speed":sole_speed.duplicate(),"sole_height":sole_height.duplicate(),"sole_candidate_rms_speed":rms,"sole_candidate_samples":_sole_samples.duplicate(),"sole_note":"Rest-bottom centroids during low-foot candidates; rolling and stance inference are not resolved. Not a proof of foot slip or foot locking."}
+	return {"elapsed":elapsed,"distance":distance,"net_distance":Vector2(net.x,net.z).length(),"speed":speed,"peak_speed":peak_speed,"vertical_speed":vertical_speed,"acceleration":acceleration if acceleration_valid else null,"acceleration_sample_valid":acceleration_valid,"target_speed":target_speed,"gait_cycles":gait_cycles,"cycle_hz":cycle_hz,"response_95":response_95,"stop_distance":stop_distance,"stop_seconds":stop_seconds,"sole_speed":sole_speed.duplicate(),"sole_height":sole_height.duplicate(),"sole_candidate_rms_speed":rms,"sole_candidate_samples":_sole_samples.duplicate(),"sole_note":"Rest-bottom centroids during low-foot candidates; rolling and stance inference are not resolved. Not a proof of foot slip or foot locking."}

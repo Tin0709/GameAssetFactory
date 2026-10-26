@@ -42,6 +42,19 @@ bạn mở Blender với add-on MCP như trước. Đóng app sẽ dừng theo d
 MCP đã được yêu cầu khởi động tiếp tục chạy để các client khác còn dùng được.
 Không có đăng ký Startup/Task Scheduler cho tính năng này.
 
+Hai nút mở nhanh trong cùng khu vực Blender:
+
+- **Mở Animation MD2:** mở `MD2_Animation_Library_BrowserFixed.blend` và nạp
+  `scripts/md2_blender_library.py`.
+- **Mở Valorie + Sabre:** mở `MD2_Valorie_Sabre_Source_Showcase.blend` và nạp
+  `source_preview_ui.py`.
+
+Các nút dùng đúng file/script của hai launcher `.cmd` có sẵn nhưng gọi trực tiếp
+Blender, nên không mở thêm terminal. Không tự lưu hoặc sửa file `.blend`. Mỗi
+lần bấm mở một cửa sổ Blender; thiếu file sẽ được báo trong nhật ký của app.
+Nút **Copy path** cạnh mỗi nút mở sẽ copy đường dẫn đầy đủ của file `.blend`
+tương ứng vào clipboard, không mở Blender và không hiện hộp thoại.
+
 Nhật ký tiến trình MCP: `%LOCALAPPDATA%\GAFGitCheckpointManager\blender-mcp.stdout.log`
 và `blender-mcp.stderr.log`. Nhật ký được tạo khi app thực sự chạy một server mới.
 

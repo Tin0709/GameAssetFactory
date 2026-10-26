@@ -19,6 +19,8 @@ var panel:PanelContainer
 var status:Label
 var actions:OptionButton
 var expression:OptionButton
+var movement_panel:PanelContainer
+var movement_label:Label
 var _right_held:=false
 var _left_held:=false
 var _e_held:=false
@@ -77,7 +79,7 @@ func _build_ui()->void:
 	if actor.using_original_source:
 		var count:=Label.new();count.text="22 semantic states · %d original clips · %d aliases"%[actor.source_clip_count,actor.source_alias_count];box.add_child(count)
 		var calibration:=Label.new();calibration.text=actor.cadence_label;calibration.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;calibration.custom_minimum_size.x=318;calibration.add_theme_font_size_override("font_size",11);box.add_child(calibration)
-	var hints:=Label.new();hints.text=("WASD normal7 · Shift slow Walk · Space jump" if actor.using_original_source else "WASD walk · Shift run · Space jump")+"\nLMB / E: three-hit combo (hold or tap)\nRMB: combat strafe + mouse ground aim\nQ / C: turn · Middle drag: orbit · Wheel: zoom\nR reset · V grass overview";box.add_child(hints)
+	var hints:=Label.new();hints.text=("WASD normal7 · Shift slow Walk · Space jump" if actor.using_original_source else "WASD walk · Shift run · Space jump")+"\nLMB / E: three-hit combo (hold or tap)\nRMB: combat strafe + mouse ground aim\nQ / C: turn · Middle drag: orbit · Wheel: zoom\nR reset · V overview · F3 meter · F4 zero";box.add_child(hints)
 	actions=OptionButton.new();actions.name="AuthoredActionSelector";actions.focus_mode=Control.FOCUS_NONE
 	for key:String in actor.clips:
 		actions.add_item(action_caption(key));actions.set_item_metadata(actions.item_count-1,key)
@@ -111,6 +113,19 @@ func _build_ui()->void:
 	note.add_theme_font_size_override("font_size",11);box.add_child(note)
 	var back:=_button("Return to original Rifle / Sword lab",box);back.name="ReturnOriginalLabButton";back.pressed.connect(func():
 		release_inputs();get_tree().set_meta(SELECTION_META,false);get_tree().change_scene_to_file(LAB_SCENE))
+	_build_movement_panel()
+func _build_movement_panel()->void:
+	movement_panel=PanelContainer.new();movement_panel.name="MovementMeasurements";canvas.add_child(movement_panel)
+	movement_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);movement_panel.offset_left=-420;movement_panel.offset_right=-18;movement_panel.offset_top=-215;movement_panel.offset_bottom=-18
+	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.035,.045,.9);style.set_content_margin_all(9);style.set_corner_radius_all(5);movement_panel.add_theme_stylebox_override("panel",style)
+	var box:=VBoxContainer.new();movement_panel.add_child(box)
+	var heading:=Label.new();heading.text="MOVEMENT METER · actual physics travel";heading.add_theme_font_size_override("font_size",12);box.add_child(heading)
+	movement_label=Label.new();movement_label.add_theme_font_size_override("font_size",12);box.add_child(movement_label)
+	var row:=HBoxContainer.new();box.add_child(row)
+	var zero:=_button("Reset meter · F4",row);zero.pressed.connect(actor.reset_movement_measurements)
+	var save:=_button("Save JSON",row);save.tooltip_text="Save aggregate measurements in private Research; no animation/mesh export.";save.pressed.connect(func():
+		var path:String=actor.save_movement_measurements();save.text="Saved" if not path.is_empty() else "Save failed";save.tooltip_text=path;print("SABRE_MOVEMENT_SAVED ",path))
+	var hide:=_button("Hide · F3",row);hide.pressed.connect(func():movement_panel.hide())
 func _button(label:String,parent:Node)->Button:
 	var button:=Button.new();button.text=label;button.focus_mode=Control.FOCUS_NONE;parent.add_child(button);return button
 func action_caption(key:String)->String:
@@ -138,6 +153,12 @@ func present(delta:float)->void:
 	effects.present();lab._update_camera(delta,display_position())
 	var label:String="Original MD2 player + Sabre (private)" if actor.using_original_source else actor.appearance_label
 	status.text="%s\n%s · %.2f units/s\nCombo %d / 3 · accepted %d · ready gates %d"%[label,("REVIEW: "+action_caption(actor.review_clip) if not actor.review_clip.is_empty() else action_caption(actor.active_clip)),actor.current_speed,actor.combo.index+1,actor.accepted_count,actor.impact_count]
+	if movement_panel.visible:
+		var m:Dictionary=actor.movement_measurements()
+		var left:String="—" if m.sole_speed[0]<0. else "%.2f"%m.sole_speed[0]
+		var right:String="—" if m.sole_speed[1]<0. else "%.2f"%m.sole_speed[1]
+		var response:String="—" if m.response_95<0. else "%d ms"%roundi(m.response_95*1000.)
+		movement_label.text="Speed %.2f / target %.2f u/s · peak %.2f\nPath %.2f · net %.2f units · %.1f s\nGait %.2f cycles/s · %.3fx · total %.2f\nStart95 %s · stop %.3fu / %.3fs\nSole candidates L %s / R %s u/s\nSole motion includes rolling; native rates unverified"%[m.speed,m.target_speed,m.peak_speed,m.distance,m.net_distance,m.elapsed,m.cycle_hz,m.play_rate,m.gait_cycles,response,m.stop_distance,m.stop_seconds,left,right]
 func display_position()->Vector3:
 	return actor.global_position
 func input(event:InputEvent)->void:
@@ -159,6 +180,8 @@ func unhandled_input(event:InputEvent)->void:
 		if code==KEY_Q:_q_held=event.pressed
 		elif code==KEY_C:_c_held=event.pressed
 		elif code==KEY_V and event.pressed:lab.grass_overview=not lab.grass_overview;lab._camera_initialized=false
+		elif code==KEY_F3 and event.pressed:movement_panel.visible=not movement_panel.visible
+		elif code==KEY_F4 and event.pressed:actor.reset_movement_measurements()
 	if event is InputEventMouseButton:
 		if event.button_index==MOUSE_BUTTON_LEFT:_left_held=event.pressed;actor.attack(_left_held or _e_held);get_viewport().set_input_as_handled()
 		elif event.button_index==MOUSE_BUTTON_RIGHT:_right_held=event.pressed;actor.combat_requested=_right_held

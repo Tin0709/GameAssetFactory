@@ -7,6 +7,7 @@ signal impact_ready(index:int,base:Vector3,tip:Vector3,serial:int)
 const Model=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/Sabre_Character_Authored.glb")
 const Combo=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combo_state.gd")
 const DirectionAdapter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/locomotion_direction.gd")
+const MovementMeter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/movement_meter.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 var combo=Combo.new()
@@ -80,6 +81,8 @@ var _grounded:=false
 var _floor_initialized:=false
 var _previous_combat:=false
 var _playback_speed:=1.
+var movement_meter=MovementMeter.new()
+var _gait_cycles_this_tick:=0.
 
 func _ready()->void:
 	collision_layer=2;collision_mask=1;add_to_group("player")
@@ -135,6 +138,7 @@ func _ready()->void:
 	assert(_focus_index>=0 and _blink_index>=0,"Imported face morph names preserved")
 	visual.rotation.y=0. # Authored +Z front initially faces the existing lab camera.
 	_play("Idle",0.);_apply_face(0.)
+	movement_meter.reset(global_position)
 
 func private_model_path()->String:
 	if not private_model_path_override.is_empty():return private_model_path_override
@@ -196,11 +200,14 @@ func _physics_process(delta:float)->void:
 	if combat_requested!=_previous_combat:
 		_transition="" if using_original_source else ("ReadyEnter" if combat_requested else "ReadyExit");_transition_time=0.;_previous_combat=combat_requested
 	var left:=delta
+	_gait_cycles_this_tick=0.
 	while left>.00000001:
 		var step:=minf(left,1./120.)
 		if combo.active():step=minf(step,combo.remaining())
 		if step<.00000001:combo.advance(.00000001);continue
 		_animate(step);left-=step
+	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and not combo.active()) if direction_adapter!=null else []
+	movement_meter.sample(delta,global_position,desired.length(),_move_requested,_gait_cycles_this_tick,soles)
 
 func _animate(delta:float)->void:
 	if direction_adapter!=null:direction_adapter.restore()
@@ -212,6 +219,7 @@ func _animate(delta:float)->void:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
 		_playback_speed=maxf(0.,current_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
 	animation_player.advance(delta*_playback_speed)
+	if review_clip.is_empty() and selected in GAITS:_gait_cycles_this_tick+=delta*_playback_speed/float(clips[selected].duration)
 	if not review_clip.is_empty():
 		_review_time+=delta
 		var duration:float=clips[review_clip].duration
@@ -316,3 +324,19 @@ func reset_actor()->void:
 	_time_since_grounded=INF
 	visual.rotation.y=0.;expression_clock=0.;simulation_clock=0.;focus_value=0.;blink_value=0.;_forced_blink=0.
 	_play("Idle",0.);_apply_face(0.);reset_physics_interpolation()
+	reset_movement_measurements()
+func reset_movement_measurements()->void:
+	movement_meter.reset(global_position,_move_requested)
+func movement_measurements()->Dictionary:
+	var report:Dictionary=movement_meter.snapshot()
+	report.merge({"clip":active_clip,"play_rate":_playback_speed,"world_velocity":[velocity.x,velocity.y,velocity.z],"walk_speed":walk_speed,"run_speed":run_speed,"walk_stride_reference":walk_stride_speed,"run_stride_reference":run_stride_speed,"source_table_speed":700 if using_original_source else null,"unit_conversion":"100UU per Godot metre; local effective MD2 runtime unverified" if using_original_source else "authored fallback","acceleration_setting":acceleration,"deceleration_setting":deceleration,"turn_rate_adapter":12.,"attack_travel_adapter":.22,"coyote_time":coyote_time,"jump_height_adapter":jump_height,"gravity_adapter":gravity,"native_runtime_parameters_recovered":false})
+	return report
+func save_movement_measurements()->String:
+	var folder:=private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements") if using_private_skin else "user://sabre_movement_measurements"
+	if DirAccess.make_dir_recursive_absolute(folder)!=OK:return ""
+	var stamp:=Time.get_datetime_string_from_system().replace(":","-")+"-"+str(Time.get_ticks_usec())
+	var path:=folder.path_join("movement-"+stamp+".json")
+	if FileAccess.file_exists(path):return ""
+	var file:=FileAccess.open(path,FileAccess.WRITE)
+	if file==null:return ""
+	file.store_string(JSON.stringify(movement_measurements(),"\t"));file.close();return path

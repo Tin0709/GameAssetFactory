@@ -37,7 +37,7 @@ func run()->void:
 		await ticks(hz)
 		check(a.global_position.x>start.x+1.5 and a.current_speed>1.8,"Actual movement Input actions move capsule at "+str(hz))
 		Input.action_press("sprint");await ticks(hz)
-		check(a.current_speed>5.,"Actual Shift action sprints at "+str(hz))
+		check(absf(a.current_speed-2.)<.01 if a.using_original_source else a.current_speed>5.,"Actual Shift uses source slow Walk / authored sprint at "+str(hz))
 		Input.action_release("move_right");Input.action_release("sprint")
 		Input.action_press("jump");await ticks(1);Input.action_release("jump")
 		var peak:float=a.global_position.y
@@ -70,11 +70,11 @@ func run()->void:
 		check(accepted==[0,1,2] and emitted==[0,1,2],"Actual E events produce exactly three accepted attacks and ready gates at "+str(hz))
 		a.attack_accepted.disconnect(on_start);a.impact_ready.disconnect(on_gate)
 		var mouse:=InputEventMouseButton.new();mouse.button_index=MOUSE_BUTTON_RIGHT;mouse.pressed=true;mode.unhandled_input(mouse)
-		Input.action_press("move_right");await ticks(8);Input.action_release("move_right")
-		check(a.active_clip in ["CombatWalk","CombatStrafeLeft","CombatStrafeRight"],"RMB + movement selects authored combat locomotion")
+		Input.action_press("move_right");await ticks(12);Input.action_release("move_right")
+		check(a.active_clip=="CombatRun" if a.using_original_source else a.active_clip in ["CombatWalk","CombatStrafeLeft","CombatStrafeRight"],"RMB + movement selects the selected profile's combat locomotion")
 		if a.using_original_source:
 			Input.action_press("move_right");Input.action_press("sprint");await ticks(8)
-			check(a.active_clip=="CombatRun" and a.clips[a.active_clip].source_name=="Player_Master_Run" and absf(float(a._playback_speed)-1.)<.0001,"RMB + Shift + lateral Input uses original Run at1x")
+			check(a.active_clip in ["CombatWalk","CombatStrafeLeft","CombatStrafeRight"] and a.clips[a.active_clip].source_name=="Player_Master_Walk" and absf(float(a._playback_speed)-1.)<.0001,"RMB + Shift + lateral Input uses slow source Walk at stride-calibrated1x")
 			Input.action_release("move_right");Input.action_release("sprint")
 		mouse.pressed=false;mode.input(mouse);await ticks(3)
 		check(not a.combat_requested,"RMB release over GUI clears combat facing")
@@ -83,6 +83,12 @@ func run()->void:
 		fx.sample(1./120.,true,Vector3.ZERO,Vector3(sin(i*.2),1,cos(i*.2)),i)
 	check(fx.get_child_count()==node_count and fx.samples.size()<=fx.MAX_SAMPLES and fx.particles.size()==fx.PARTICLE_CAPACITY,"VFX budget remains bounded under saturation")
 	mode.reset();check(fx.samples.is_empty(),"Reset clears ribbon histories")
+	check(mode.movement_panel!=null and mode.movement_label.text.contains("Speed"),"Existing lab exposes actual movement measurements")
+	var meter_event:=InputEventKey.new();meter_event.physical_keycode=KEY_F3;meter_event.pressed=true
+	mode.unhandled_input(meter_event);check(not mode.movement_panel.visible,"F3 hides measurement overlay")
+	mode.unhandled_input(meter_event);check(mode.movement_panel.visible,"F3 restores measurement overlay")
+	var meter_position:Vector3=a.global_position;meter_event.physical_keycode=KEY_F4;mode.unhandled_input(meter_event)
+	check(a.movement_measurements().distance==0. and a.global_position==meter_position,"F4 resets measurements without resetting gameplay")
 	var report:={"checks":checks,"failures":failures,"clips":a.clips.keys(),"renderer":RenderingServer.get_current_rendering_method()}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://.validation/md2_sabre_prototype_v001"))
 	FileAccess.open("res://.validation/md2_sabre_prototype_v001/runtime.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))

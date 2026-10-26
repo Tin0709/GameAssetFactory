@@ -10,8 +10,8 @@ func run()->void:
 	var floor:=StaticBody3D.new();var collision:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(100,.4,100);collision.shape=box;collision.position.y=-.2;floor.add_child(collision);root.add_child(floor)
 	var a=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();root.add_child(a)
 	check(a.using_original_source,"Calibration uses original source profile")
-	check(absf(a.walk_speed-2.)<.00001 and absf(a.run_speed-5.6)<.00001,"Kinematic world speeds avoid lab1.2 multiplier")
-	check(absf(a.gravity-15.)<.00001,"Estimated jump physics aligns .4-second takeoff apex")
+	check(absf(a.walk_speed-2.)<.00001 and absf(a.run_speed-7.)<.00001,"Public table baseline is separate from unchanged source stride references")
+	check(absf(a.gravity-15.)<.00001,"Previous approximate jump physics remains explicit")
 	if not failures.is_empty():a.free();floor.free();quit(1);return
 	var reports:Array[Dictionary]=[]
 	for hz in [30,60]:
@@ -28,7 +28,7 @@ func run()->void:
 		var ground_drift:=0.
 		for i in 15:await tick();ground_drift=maxf(ground_drift,absf(a.global_position.y))
 		check(ground_drift<.001 and a.is_on_floor(),"Ground contact remains stable after landing at "+str(hz))
-		Input.action_press("move_forward");Input.action_press("sprint")
+		Input.action_press("move_forward")
 		for i in 12:await tick()
 		var cruise_rate:float=a._playback_speed;var cruise_speed:float=a.current_speed
 		Input.action_release("move_forward");Input.action_release("sprint")
@@ -65,6 +65,6 @@ func run()->void:
 		check(worst<.00001,"Repeated CombatWalk/Strafe classification retains stride phase at "+str(hz))
 	a.review("Walk");a._animate(float(a.clips.Walk.duration)*.75)
 	check(absf(a.animation_player.current_animation_position/float(a.clips.Walk.duration)-.75)<.00001,"Review remains original1x")
-	var report:={"checks":checks,"failures":failures,"physics":reports,"profile":"kinematic calibration; native configuration not recovered"}
+	var report:={"checks":checks,"failures":failures,"physics":reports,"profile":"public table700 baseline; distance/stride cadence adapter; native runtime/jump config unverified"}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://.validation/md2_sabre_prototype_v001"));FileAccess.open("res://.validation/md2_sabre_prototype_v001/motion-calibration.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("SABRE_MOTION_CALIBRATION ",JSON.stringify(report));a.free();floor.free();quit(0 if failures.is_empty() else 1)

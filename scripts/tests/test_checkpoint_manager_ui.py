@@ -234,6 +234,32 @@ class DesktopTests(unittest.TestCase):
             release.set()
             self.wait_idle()
 
+    def test_blender_view_buttons_open_the_two_requested_views(self):
+        def open_view(key):
+            return {'animation': 1111, 'sabre': 2222}[key]
+        with patch.object(self.app.view_launcher, 'open', side_effect=open_view):
+            self.app.view_buttons['animation'].invoke()
+            self.app.view_buttons['sabre'].invoke()
+        log = self.app.log_widget.get('1.0', 'end')
+        self.assertIn('Animation MD2 (PID 1111)', log)
+        self.assertIn('Valorie + Sabre (PID 2222)', log)
+
+    def test_copy_path_buttons_copy_each_blend_path_without_opening_blender(self):
+        clipboard = {'text': ''}
+        expected = {
+            'animation': Path.home() / 'Desktop/MD2 Research/blender/MD2_Animation_Library_BrowserFixed.blend',
+            'sabre': Path.home() / 'Desktop/MD2 Research/blender/prototype_sabre/MD2_Valorie_Sabre_Source_Showcase.blend',
+        }
+        def append(text):
+            clipboard['text'] += text
+        # Do not overwrite the user's actual Windows clipboard during tests.
+        with patch.object(self.root, 'clipboard_clear', side_effect=lambda: clipboard.update(text='')):
+            with patch.object(self.root, 'clipboard_append', side_effect=append):
+                with patch.object(self.app.view_launcher, 'open', side_effect=AssertionError('Copy must not launch Blender')):
+                    for key, path in expected.items():
+                        self.app.view_copy_buttons[key].invoke()
+                        self.assertEqual(clipboard['text'], str(path))
+
     def test_close_while_busy_cannot_be_resumed(self):
         self.app.resume_all()
         for config in self.configs:

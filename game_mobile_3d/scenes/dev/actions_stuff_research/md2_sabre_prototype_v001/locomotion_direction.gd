@@ -7,6 +7,7 @@ var current_yaw:=0.
 var current_world_yaw:=0.
 var _saved:Dictionary={}
 var _points:Array[Array]=[[],[]]
+var _sole_points:Array[Array]=[[],[]]
 
 func setup(skeleton:Skeleton3D,model:Node)->void:
 	rig=skeleton;legs=[rig.find_bone("J_L_Leg"),rig.find_bone("J_R_Leg")]
@@ -39,6 +40,26 @@ func setup(skeleton:Skeleton3D,model:Node)->void:
 						seen[side][key]=true
 						_points[side].append({"bone":bone,"bind":mesh.skin.get_bind_pose(bind),"point":p})
 	assert(point_count()>8,"Rigid source leg vertices required for height preservation")
+	for side in 2:
+		var bottom:=INF
+		for entry:Dictionary in _points[side]:
+			var rest_point:Vector3=rig.get_bone_global_rest(entry.bone)*Transform3D(entry.bind)*Vector3(entry.point)
+			bottom=minf(bottom,rest_point.y)
+		for entry:Dictionary in _points[side]:
+			var rest_point:Vector3=rig.get_bone_global_rest(entry.bone)*Transform3D(entry.bind)*Vector3(entry.point)
+			if rest_point.y<=bottom+.0001:_sole_points[side].append(entry)
+
+func observe_soles(root_height:float,grounded:bool)->Array:
+	var result:Array=[]
+	for side in 2:
+		var center:=Vector3.ZERO;var height:=INF
+		for entry:Dictionary in _sole_points[side]:
+			var point:Vector3=rig.global_transform*(rig.get_bone_global_pose(entry.bone)*Transform3D(entry.bind)*Vector3(entry.point))
+			center+=point;height=minf(height,point.y-root_height)
+		var count:int=_sole_points[side].size()
+		if count>0:center/=float(count)
+		result.append({"center":center,"height":height,"candidate":grounded and count>0 and height<=.06})
+	return result
 
 func point_count()->int:return _points[0].size()+_points[1].size()
 func restore()->void:

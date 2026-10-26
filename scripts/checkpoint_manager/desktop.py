@@ -13,6 +13,7 @@ from tkinter import messagebox, scrolledtext, ttk
 
 from .core import AutoSchedule, FilesChanging, GitRepository, RepoBlocked, RepoConfig, redact
 from .blender_bridge import BlenderBridge, BridgeMonitor
+from .blender_views import BlenderViewLauncher, VIEW_LABELS
 
 
 class StatusLight(ttk.Frame):
@@ -130,6 +131,10 @@ class CheckpointApp:
         self.repo_issues = [False] * len(configs)
         self.busy_indices = ()
         self.bridge_detail = tk.StringVar(root, 'Đang kiểm tra server và Blender…')
+        research = next((config.path for config in configs if config.name == 'MD2 Research'), None)
+        self.view_launcher = BlenderViewLauncher(self.state_dir, research)
+        self.view_buttons = {}
+        self.view_copy_buttons = {}
         self._build()
         self.bridge_monitor = BridgeMonitor(bridge or BlenderBridge(self.state_dir))
         root.protocol('WM_DELETE_WINDOW', self.close)
@@ -204,7 +209,18 @@ class CheckpointApp:
         ttk.Button(bridge_title, text='Kiểm tra ngay', command=self.refresh_blender).pack(side='right')
         ttk.Button(bridge_title, text='Chạy Blender MCP', style='Accent.TButton', command=self.start_blender).pack(side='right', padx=8)
         ttk.Label(bridge_panel, textvariable=self.bridge_detail, style='Panel.TLabel', wraplength=1010).pack(anchor='w', pady=(7, 0))
-        ttk.Label(bridge_panel, text='Kiểm tra nền mỗi 3 giây • Server MCP tiếp tục chạy khi đóng app.', style='Panel.TLabel').pack(anchor='w', pady=(3, 0))
+        shortcuts = ttk.Frame(bridge_panel, style='Panel.TFrame')
+        shortcuts.pack(fill='x', pady=(7, 0))
+        for key, label in VIEW_LABELS.items():
+            group = ttk.Frame(shortcuts, style='Panel.TFrame')
+            group.pack(side='left', padx=(0, 14))
+            button = ttk.Button(group, text='Mở ' + label, command=lambda view=key: self.open_blender_view(view))
+            button.pack(side='left', padx=(0, 4))
+            self.view_buttons[key] = button
+            copy_button = ttk.Button(group, text='Copy path', command=lambda view=key: self.copy_blender_view_path(view))
+            copy_button.pack(side='left')
+            self.view_copy_buttons[key] = copy_button
+        ttk.Label(shortcuts, text='MCP kiểm tra mỗi 3 giây', style='Panel.TLabel').pack(side='right')
         for index, config in enumerate(self.configs):
             panel = ttk.Frame(page, style='Panel.TFrame', padding=15)
             panel.pack(fill='x', pady=(0, 12))
@@ -460,6 +476,29 @@ class CheckpointApp:
         if not self.closed and not self.closing:
             self.blender_light.set('working', 'Đang xử lý yêu cầu…')
             self.bridge_monitor.request_start()
+
+    def open_blender_view(self, key):
+        if self.closed or self.closing:
+            return
+        label = VIEW_LABELS.get(key, 'Blender')
+        try:
+            pid = self.view_launcher.open(key)
+            self.log(f'Đã mở {label} (PID {pid}).')
+        except (OSError, ValueError) as error:
+            self.log(f'Không mở được {label}: {error}')
+
+    def copy_blender_view_path(self, key):
+        if self.closed or self.closing:
+            return
+        label = VIEW_LABELS.get(key, 'Blender')
+        try:
+            path = self.view_launcher.blend_path(key)
+            self.root.clipboard_clear()
+            self.root.clipboard_append(str(path))
+            self.root.update_idletasks()
+            self.log(f'Đã copy path {label}.')
+        except (OSError, ValueError, tk.TclError) as error:
+            self.log(f'Không copy được path {label}: {error}')
 
     def refresh_blender(self):
         if not self.closed and not self.closing:
