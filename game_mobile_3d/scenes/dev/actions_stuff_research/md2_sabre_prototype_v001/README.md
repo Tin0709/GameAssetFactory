@@ -87,6 +87,18 @@ Leg/root/hip poses and local arm/weapon tracks remain intact; arms and Sabre
 inherit the steadier torso. Neck attachment position and source scale/shear
 are preserved. Air/combat/raw review bypass it. These weights are an explicit
 gameplay reconstruction, not recovered MD2 animation-graph values.
+The source hierarchy makes J_Head and five facial roots siblings under J_Neck.
+The head correction must carry EyeIrisL/R, EyebrowL/R and Mouth rigidly; pupil
+children inherit once. Moving only J_Head caused the reported intermittent
+missing eyes/mouth by rotating head geometry over the facial planes. All seven
+regions now retain their exact original head-relative expression transforms.
+Fractional rendering also interpolates these roots relative to the displayed
+head, then rebuilds pupil descendants, rather than cutting a straight chord
+between independent neck-local positions. Natural source blinks remain active.
+Native front-facing Run/Walk: the reproduced prior bug lost eyes in14/32 and
+22/32frames; all64corrected frames keep them visible with the original material,
+no mesh/texture edits or depth-offset workaround. Gait-to-combat fractional tests
+bound head-relative error below2.4e-7 while exact endpoints remain unchanged.
 Native same-scene A/B measurements: spine roll range5.335→1.333degrees, spine
 pitch6.067→1.512degrees, head pitch4.310→1.077degrees. The mean source pose is
 retained, rather than tilting the entire character or suppressing gait cadence.
@@ -207,8 +219,20 @@ It measures OUR implementation; it does not infer MD2 parameters from video.
 Source attacks retain the complete full-body pose and anchor grounded input
 travel immediately, including pre-attack momentum. Previously the22% input
 adapter slid3.346u/2s despite zero root translation in the exported combat clips;
-the new native held-combo trace adds0u. Held/buffered combos retain their feet;
-an unheld, unqueued recovery yields to movement. Original animated steps inside
+the new native trace adds0u during full-body attack phases. When movement and
+held/buffered combat continue together, each completed strike opens a real
+locomotion step before the next ordered strike:1→move→2→move→3→move→1.
+The step targets.45u actual collision displacement, with a.30s guard if blocked;
+these interval values are reconstruction parameters, not recovered MD2 values.
+The next strike starts before the following physics move, after travel stops.
+Stopping direction resumes the next planted strike; releasing held attack in
+the step cancels automatic continuation, while a deliberate buffered tap is
+retained once. Focus/jump/air entry clear the reserved ground link; a fresh
+airborne attack press remains valid. Stationary held combos stay continuous.
+Gait phase follows the actual step distance across attacks. Its entry crossfade
+is bounded to the first20% of step travel, so most of the interval visibly uses
+the running/walking legs, with no attack-clock changes. An unheld, unqueued
+recovery also yields to movement. Original animated steps inside
 the attack remain; no claim of perfect IK or native runtime lunges is made.
 Authored fallback retains its earlier22% travel. Jumping bypasses the source
 ground anchor, including a simultaneous Run+attack+jump, without lowering its
