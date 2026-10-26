@@ -74,7 +74,17 @@ AnimationPlayer supplies the raw source pose. An optional grounded locomotion
 direction adapter then redirects only the two legs; raw review, attacks and jumps
 bypass it. Its world-yaw smoothing preserves the travel plane during body turns,
 and a small leg-local height correction preserves each original evaluated sole
-minimum. Hips, spine, arms and the weapon remain unchanged. The face controller
+minimum. This direction helper leaves hips and the upper body alone. A separate
+reversible **Stable body/head** adapter now retains25% of the original spine/head
+orientation oscillation around each source Walk/Run cycle mean. It caches96
+samples per clip in memory, restores source locals before each evaluation and
+fades over100ms at gait entry/idle. Head orientation is solved in skeleton space
+so reducing spine sway does not double the original compensating head nod.
+Leg/root/hip poses and local arm/weapon tracks remain intact; arms and Sabre
+inherit the steadier torso. Neck attachment position and source scale/shear
+are preserved. Air/combat/raw review bypass it. These weights are an explicit
+gameplay reconstruction, not recovered MD2 animation-graph values.
+The face controller
 owns only its two optional morph scalars. Original source weapon scale/shear is retained,
 including the compressed blade during the finisher. Source clip durations are preserved; the 220ms input buffer,
 40ms clip blend, movement rates, collider behavior and VFX windows are authored
@@ -137,7 +147,7 @@ Attack2.4/1.2=.333333s, Attack3.666667/1=.666667s. The220ms input buffer remains
 wall time, and source VFX gates map through each clip's rate. The exact montage
 sections and effective runtime attack-speed composition are still unverified.
 
-Acceleration48, braking42, turn cap12rad/s, attack travel.22, ballistic jump and
+Acceleration48, braking42, turn cap12rad/s, grounded attack input anchor, ballistic jump and
 camera remain disclosed lab adapters. The public player's heavy-jump-attack
 GravityMultiplier2 is applied only after an airborne source attack, until actual
 floor contact, including if its pose clip finishes during a long fall. It is not
@@ -188,8 +198,15 @@ tests/capture_movement.gd renders this same lab on native Mobile/D3D12 and write
 private images/measurements, including two cadence rules at the same7-unit speed.
 It measures OUR implementation; it does not infer MD2 parameters from video.
 
-Attacks retain the authored full-body pose and reduce grounded travel to 22%.
-There is no lower-body movement blend or perfect foot lock during moving attacks.
+Source attacks retain the complete full-body pose and anchor grounded input
+travel immediately, including pre-attack momentum. Previously the22% input
+adapter slid3.346u/2s despite zero root translation in the exported combat clips;
+the new native held-combo trace adds0u. Held/buffered combos retain their feet;
+an unheld, unqueued recovery yields to movement. Original animated steps inside
+the attack remain; no claim of perfect IK or native runtime lunges is made.
+Authored fallback retains its earlier22% travel. Jumping bypasses the source
+ground anchor, including a simultaneous Run+attack+jump, without lowering its
+launch travel speed.
 Jumping cancels a grounded combo; an attack requested in the air selects AirAttack.
 Each accepted attack emits one `impact_ready` signal at its authored fast-motion
 gate for future targets. There are no targets, damage, fake impact flashes or
