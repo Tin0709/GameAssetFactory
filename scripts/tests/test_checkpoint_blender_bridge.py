@@ -29,23 +29,31 @@ class BridgeTests(unittest.TestCase):
         self.tool_calls = 0
         self.codes = []
         self.slow_stream = False
+        self.fragment_utf8 = False
         owner = self
         class HTTPHandler(BaseHTTPRequestHandler):
             def do_POST(self):
                 request = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
                 if request['method'] == 'initialize':
                     value = {'serverInfo': {'name': owner.server_name, 'version': '1.0.3'}, 'protocolVersion': '2024-11-05', 'capabilities': {}}
+                    if owner.fragment_utf8:
+                        value['instructions'] = 'Kiểm tra 🌱'
                 else:
                     owner.tool_calls += 1
                     owner.codes.append(request['params']['arguments']['code'])
                     value = {'content': [{'type': 'text', 'text': json.dumps({'status': 'ok' if owner.tool_ok else 'error', 'result': {'gaf_manager_probe': owner.tool_ok}})}]}
-                payload = json.dumps({'jsonrpc': '2.0', 'id': request['id'], 'result': value}).encode()
+                payload = json.dumps({'jsonrpc': '2.0', 'id': request['id'], 'result': value}, ensure_ascii=False).encode()
                 self.send_response(200)
-                self.send_header('Content-Type', 'text/event-stream' if owner.slow_stream else 'application/json')
-                if not owner.slow_stream:
+                self.send_header('Content-Type', 'text/event-stream' if owner.slow_stream or owner.fragment_utf8 else 'application/json')
+                if not owner.slow_stream and not owner.fragment_utf8:
                     self.send_header('Content-Length', str(len(payload)))
                 self.end_headers()
-                if owner.slow_stream:
+                if owner.fragment_utf8:
+                    event = b'data: ' + payload + b'\n\n'
+                    split = event.index('🌱'.encode()) + 1
+                    self.wfile.write(event[:split]);self.wfile.flush();time.sleep(.03)
+                    self.wfile.write(event[split:])
+                elif owner.slow_stream:
                     try:
                         for byte in b'data: ' + payload + b'\n\n':
                             self.wfile.write(bytes([byte]));self.wfile.flush();time.sleep(.02)
@@ -144,6 +152,10 @@ class BridgeTests(unittest.TestCase):
         with self.assertRaises(BridgeError):
             bridge._initialize()
         self.assertLess(time.monotonic() - started, .35)
+
+    def test_sse_packet_split_inside_utf8_does_not_drop_connection(self):
+        self.fragment_utf8 = True
+        self.bridge._initialize()
 
 
 if __name__ == '__main__':
