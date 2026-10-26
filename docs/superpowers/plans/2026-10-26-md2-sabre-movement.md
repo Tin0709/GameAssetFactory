@@ -62,6 +62,14 @@
 
 ## Verified outcome
 
+## Task7 — User requests MD2-like strike / move / strike rhythm
+
+- [ ] Preserve each complete source strike and grounded planting, but interleave a real locomotion window between buffered/held attacks when movement input is present. Retain1→2→3 order; stationary hold remains the existing continuous combo. User requests this observed behavior; native interval values remain unavailable.
+- [ ] Red/green real30/60Hz default-profile tests for alternation, zero input travel during full-body attacks, gait while moving, next attack only after the moving physics frame, held/tapped requests, stop-direction, release/focus/jump/reset, and blocked movement timeout.
+- [ ] Add optional Combo step phase, full-body active=false there, with latched explicit buffered intent and a distinct finish_step boundary. Source actor tracks actual collision displacement: target.45u, guard.30s (declared adapter), resumes pending strike before the next physics move and carries the gait phase into the step. No root teleport or attack playback changes.
+- [ ] Update previous strict-anchor fixture to isolate movement-break-off planting; default behavior validated in the new integration suite. Update native same-scene capture to distinguish allowed step travel from forbidden attack travel. Validate accepted jump/body stability/raw source/audio contracts.
+- [ ] Full regression, native demonstration, original hashes, independent review; reopen current lab. No new project/scene/assets/tools; runtime interval and original state graph remain reconstructed.
+
 ## Task6 — User-approved jump preserved; grounded combat and torso stability
 
 - [x] Diagnose actual W/screen heading, body/head pose ranges and held-combo travel. Observed W lateral screen velocity~0/actor heading error0; source spine roll range5.3deg, pitch range6.1deg, head pitch range4.3deg. Held attack still adds3.346u/2s despite zero exported root translation.
