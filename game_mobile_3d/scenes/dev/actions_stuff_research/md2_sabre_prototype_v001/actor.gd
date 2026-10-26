@@ -17,6 +17,8 @@ const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","
 # Ordinary jump study timing; native MD2 launch/gravity have NOT been recovered.
 const SOURCE_JUMP_APEX_SECONDS:=.25
 const SOURCE_MOVING_LAND_SECONDS:=.05
+const COMBAT_STEP_DISTANCE:=.45 # Reconstructed interval; no native value recovered.
+const COMBAT_STEP_TIMEOUT:=.30
 var combo=Combo.new()
 var clips:Dictionary={}
 var visual:Node3D
@@ -93,6 +95,11 @@ var _previous_combat:=false
 var _playback_speed:=1.
 var movement_meter=MovementMeter.new()
 var _gait_cycles_this_tick:=0.
+var _gait_resume_phase:=0.
+var _step_seen:=-1
+var _step_distance:=0.
+var _step_elapsed:=0.
+var _step_ready:=false
 
 func _ready()->void:
 	collision_layer=2;collision_mask=1;add_to_group("player")
@@ -139,6 +146,7 @@ func _ready()->void:
 		combo.air_attack_play_rate=sqrt(gravity/15.)
 		# Public DT_MeleePropertyDefinition#44 Sabre variants, not a global speedup.
 		combo.attack_play_rates=[1.2,1.2,1.]
+		combo.movement_breaks_enabled=true
 		cadence_label="Table700 ×1 /100 =7 units/s · runtime unverified\nGait follows travel/stride · review1x"
 		direction_adapter=DirectionAdapter.new();direction_adapter.setup(skeleton,model)
 	combo.setup(clips)
@@ -189,6 +197,14 @@ func _physics_process(delta:float)->void:
 	if _move_requested:_last_run_gait=_run_requested
 	if _move_requested or jump_pressed:resume_gameplay()
 	var was_grounded:=is_on_floor() and velocity.y<=0.
+	combo.movement_requested=using_original_source and was_grounded and _move_requested
+	if combo.phase==&"step":
+		if jump_pressed or not was_grounded:combo.cancel()
+		else:
+			if _step_seen!=combo.step_serial:
+				_step_seen=combo.step_serial;_step_distance=0.;_step_elapsed=0.;_step_ready=false
+			# Finish BEFORE movement: a strike cannot start on a moving physics frame.
+			if _step_ready or not _move_requested:combo.finish_step()
 	# Source attacks are full-body/in-place. An unqueued recovery can yield to
 	# movement; a held/buffered combo keeps its authored feet, without fake travel.
 	if using_original_source and was_grounded and _move_requested and combo.phase==&"recovery" and not combo.held and combo.buffer_until<combo.clock-.0000001:combo.cancel()
@@ -207,7 +223,12 @@ func _physics_process(delta:float)->void:
 		combo.cancel();velocity.y=sqrt(2.*gravity*jump_height)-(gravity*delta*.5 if using_original_source else 0.);_jump_stage="JumpTakeoff";_jump_time=0.
 		_heavy_slam_active=false
 		_time_since_grounded=INF # Consume the coyote opportunity; no second air jump.
+	var taking_step:bool=combo.phase==&"step"
+	var before_move:=global_position
 	move_and_slide();_grounded=is_on_floor() and velocity.y<=0.
+	if taking_step:
+		_step_distance+=Vector2(global_position.x-before_move.x,global_position.z-before_move.z).length();_step_elapsed+=delta
+		_step_ready=_step_distance>=COMBAT_STEP_DISTANCE or _step_elapsed>=COMBAT_STEP_TIMEOUT-.0000001
 	if _grounded:_heavy_slam_active=false
 	# Source pose duration does not define physical flight. The apex (including
 	# an interrupted ascent at a ceiling) owns the transition into the air loop.
@@ -251,7 +272,9 @@ func _animate(delta:float)->void:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
 		_playback_speed=maxf(0.,current_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
 	animation_player.advance(delta*_playback_speed)
-	if review_clip.is_empty() and selected in GAITS:_gait_cycles_this_tick+=delta*_playback_speed/float(clips[selected].duration)
+	if review_clip.is_empty() and selected in GAITS:
+		_gait_cycles_this_tick+=delta*_playback_speed/float(clips[selected].duration)
+		_gait_resume_phase=fposmod(animation_player.current_animation_position/float(clips[selected].duration),1.)
 	if not review_clip.is_empty():
 		_review_time+=delta
 		var duration:float=clips[review_clip].duration
@@ -319,9 +342,10 @@ func _play(key:String,blend:float=.04)->void:
 		if not review_clip.is_empty() and review_loop and not animation_player.is_playing():animation_player.play(clips[key].action,0.)
 		return
 	var preserve_phase:bool=using_original_source and review_clip.is_empty() and active_clip in GAITS and key in GAITS
-	var phase:=fposmod(animation_player.current_animation_position/float(clips[active_clip].duration),1.) if preserve_phase else 0.
-	active_clip=key;animation_player.play(clips[key].action,.08 if preserve_phase else blend);animation_player.advance(0.)
-	if preserve_phase:animation_player.seek(phase*float(clips[key].duration),true)
+	var resume_step:bool=using_original_source and review_clip.is_empty() and combo.phase==&"step" and key in GAITS
+	var phase:=fposmod(animation_player.current_animation_position/float(clips[active_clip].duration),1.) if preserve_phase else (_gait_resume_phase if resume_step else 0.)
+	active_clip=key;animation_player.play(clips[key].action,.08 if preserve_phase or resume_step else blend);animation_player.advance(0.)
+	if preserve_phase or resume_step:animation_player.seek(phase*float(clips[key].duration),true)
 func attack(value:bool)->void:
 	if value:resume_gameplay()
 	combo.attack(value,not _grounded)
@@ -366,6 +390,7 @@ func reset_actor()->void:
 	review_clip="";active_clip="";_jump_stage="";_jump_time=0.;_heavy_slam_active=false;_transition="";_transition_time=0.;_grounded=false;_floor_initialized=false;_previous_combat=false
 	accepted_count=0;impact_count=0
 	_last_run_gait=false
+	_gait_resume_phase=0.;_step_seen=-1;_step_distance=0.;_step_elapsed=0.;_step_ready=false
 	_time_since_grounded=INF
 	visual.rotation.y=0.;expression_clock=0.;simulation_clock=0.;focus_value=0.;blink_value=0.;_forced_blink=0.
 	_play("Idle",0.);_apply_face(0.);reset_physics_interpolation()

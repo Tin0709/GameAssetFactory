@@ -11,6 +11,11 @@ var buffer_until:=-1.
 var buffer_seconds:=.22
 var attack_play_rates:Array=[1.,1.,1.] # Source profile sets verified table rates.
 var air_attack_play_rate:=1. # Optional physics-cadence adapter; not native data.
+var movement_breaks_enabled:=false
+var movement_requested:=false
+var step_serial:=0
+var step_next_index:=0
+var step_buffered:=false
 var serial:=0
 var _impact_sent:=false
 var _events:Array[Dictionary]=[]
@@ -21,7 +26,7 @@ func clip()->String:
 	if phase==&"recovery":return "Recovery%d"%(index+1)
 	if phase==&"air_attack":return "AirAttack"
 	return "CombatReady"
-func active()->bool:return phase!=&"ready"
+func active()->bool:return phase not in [&"ready",&"step"]
 func playback_rate()->float:
 	if phase==&"air_attack":return maxf(.001,air_attack_play_rate)
 	return maxf(.001,float(attack_play_rates[index])) if phase==&"attack" else 1.
@@ -32,21 +37,29 @@ func attack(value:bool,airborne:bool=false)->void:
 	held=value
 	if edge:request_attack(airborne)
 func request_attack(airborne:bool=false)->void:
-	if not active():_start_attack(0,airborne)
+	if phase==&"step":step_buffered=true
+	elif not active():_start_attack(0,airborne)
 	else:buffer_until=clock+buffer_seconds
 func _start_attack(which:int,airborne:bool=false)->void:
 	phase=&"air_attack" if airborne else &"attack";index=which;time=0.;serial+=1
-	buffer_until=-1.;_impact_sent=false
+	buffer_until=-1.;step_buffered=false;_impact_sent=false
 	_events.append({"kind":"accepted","index":index,"serial":serial,"clip":clip(),"at":clock})
 func _finish()->void:
 	var queued:=held or buffer_until>=clock-.0000001
 	if phase==&"air_attack":phase=&"ready";time=0.;buffer_until=-1.;return
 	if phase==&"attack":
-		if index<2 and queued:_start_attack(index+1)
+		if movement_breaks_enabled and movement_requested and queued:
+			phase=&"step";time=0.;step_serial+=1;step_next_index=(index+1)%3
+			step_buffered=buffer_until>=clock-.0000001;buffer_until=-1.
+		elif index<2 and queued:_start_attack(index+1)
 		else:phase=&"recovery";time=0.
 	elif phase==&"recovery":
 		if queued:_start_attack(index+1 if index<2 else 0)
 		else:phase=&"ready";time=0.;buffer_until=-1.
+func finish_step()->void:
+	if phase!=&"step":return
+	if held or step_buffered:_start_attack(step_next_index)
+	else:phase=&"ready";time=0.;buffer_until=-1.
 func advance(delta:float)->void:
 	var left:=maxf(delta,0.)
 	while left>.00000001:
@@ -62,6 +75,8 @@ func advance(delta:float)->void:
 		if remaining()<=.00000001:_finish()
 func drain_events()->Array[Dictionary]:
 	var result:=_events;_events=[];return result
-func release_inputs()->void:held=false;buffer_until=-1.
+func release_inputs()->void:
+	held=false;buffer_until=-1.
+	if phase==&"step":cancel()
 func cancel()->void:
-	phase=&"ready";index=0;time=0.;held=false;buffer_until=-1.;_impact_sent=false;_events.clear()
+	phase=&"ready";index=0;time=0.;held=false;buffer_until=-1.;step_buffered=false;_impact_sent=false;_events.clear()
