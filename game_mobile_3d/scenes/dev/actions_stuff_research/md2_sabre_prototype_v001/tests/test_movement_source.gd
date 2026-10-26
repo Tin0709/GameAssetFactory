@@ -37,7 +37,8 @@ func run()->void:
 		if a.has_method("set_movement_camera_basis"):
 			a.set_movement_camera_basis(Basis(Vector3.UP,PI/2.));Input.action_press("move_forward");await ticks(hz/2)
 			check(a.velocity.x< -6.99 and absf(a.velocity.z)<.01,"W follows camera forward, including orbit, at "+str(hz))
-			release();a.set_movement_camera_basis(Basis.IDENTITY);a.reset_actor();await ticks(4)
+			release();a.set_movement_camera_basis(Basis.IDENTITY)
+		a.reset_actor();await ticks(4)
 		# Actual collision must stop both travel and distance-driven gait.
 		var wall:=StaticBody3D.new();var wc:=CollisionShape3D.new();var wb:=BoxShape3D.new();wb.size=Vector3(20,5,1);wc.shape=wb;wall.position=Vector3(0,2,-3);wall.add_child(wc);root.add_child(wall)
 		Input.action_press("move_forward");await ticks(hz)
