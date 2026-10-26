@@ -35,7 +35,7 @@ func run()->void:
 		# The accepted jump trajectory and air steering are separate from ground planting.
 		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;await ticks(hz/2);a.attack(true);a.requested_jump=true;await tick()
 		print("GROUND_JUMP_LAUNCH ",JSON.stringify({"hz":hz,"speed":a.current_speed,"velocity":str(a.velocity),"combo":str(a.combo.phase),"grounded":a._grounded,"jump":a._jump_stage,"clock":a.simulation_clock}))
-		check(absf(a.current_speed-7.)<.01,"Simultaneous attack and jump retains full running launch speed at%dHz"%hz)
+		check(absf(Vector2(a.velocity.x,a.velocity.z).length()-7.)<.0001 and a.current_speed>=6.99,"Simultaneous attack and jump retains full commanded running speed without anchor reduction at%dHz"%hz)
 		a.requested_jump=false;await ticks(6)
 		check(a.velocity.y>0. and a.current_speed>1. and not a.combo.active(),"Jump cancels ground anchor and retains air movement at%dHz"%hz)
 		trials.append({"hz":hz,"two_second_held_attack_path":path,"maximum_ground_attack_speed":peak})
