@@ -45,6 +45,20 @@ class PortableLauncherTests(unittest.TestCase):
         self.assertIn('res://scenes/dev/ActionsStuffWalkRunTest.tscn',cmd)
         self.assertEqual(cmd[-2:],['--','--sword'])
 
+    def test_sabre_uses_existing_lab_and_explicit_prototype_mode(self):
+        cmd=dev.godot_command(Path('/Tool Folder/Godot'),None,False,False,weapon='sabre')
+        self.assertIn('res://scenes/dev/ActionsStuffWalkRunTest.tscn',cmd)
+        self.assertEqual(cmd[-2:],['--','--md2-sabre'])
+        self.assertEqual(cmd[0],str(Path('/Tool Folder/Godot')))
+
+    def test_sabre_cannot_silently_start_in_an_unrelated_scene(self):
+        with self.assertRaises(ValueError):
+            dev.godot_command(Path('/bin/godot'),'grassland',False,False,weapon='sabre')
+
+    def test_rifle_explicitly_selects_legacy_lab_when_f6_defaults_to_sabre(self):
+        cmd=dev.godot_command(Path('/bin/godot'),'combat',False,False,weapon='rifle')
+        self.assertEqual(cmd[-2:],['--','--legacy-combat'])
+
     def test_explicit_windows_vulkan_override_retains_mobile_renderer(self):
         with patch.object(dev.platform,'system',return_value='Windows'):
             cmd=dev.godot_command(Path('C:/Tools/Godot.exe'),'combat',False,False,driver='vulkan')

@@ -62,8 +62,8 @@ def find_tool(name: str, explicit: str | None = None) -> Path:
 
 def godot_command(tool: Path, scene: str | None, editor: bool, headless: bool,
                   *, weapon: str | None = None, driver: str | None = None) -> list[str]:
-    if weapon is not None and weapon not in {'rifle','sword'}:
-        raise ValueError('Weapon must be rifle or sword.')
+    if weapon is not None and weapon not in {'rifle','sword','sabre'}:
+        raise ValueError('Weapon must be rifle, sword or sabre.')
     if weapon is not None and editor:
         raise ValueError('--weapon selects a running combat lab, not editor startup.')
     if driver is not None and driver not in {'d3d12','vulkan','metal'}:
@@ -89,6 +89,10 @@ def godot_command(tool: Path, scene: str | None, editor: bool, headless: bool,
         command.append(resource)
     if weapon=='sword':
         command += ['--','--sword']
+    elif weapon=='sabre':
+        command += ['--','--md2-sabre']
+    elif weapon=='rifle':
+        command += ['--','--legacy-combat']
     return command
 
 
@@ -219,7 +223,7 @@ def main(argv=None) -> int:
     game = sub.add_parser('godot')
     game.add_argument('--godot-bin'); game.add_argument('--scene', choices=None)
     game.add_argument('--editor', action='store_true'); game.add_argument('--headless', action='store_true')
-    game.add_argument('--weapon',choices=['rifle','sword'],help='Start the existing combat lab with this weapon')
+    game.add_argument('--weapon',choices=['rifle','sword','sabre'],help='Start the existing combat lab with this weapon/prototype')
     game.add_argument('--driver',choices=['d3d12','vulkan','metal'],help='Process-only GPU override; project settings stay unchanged')
     game.add_argument('--dry-run', action='store_true')
     for mode in ['blender', 'bridge']:
