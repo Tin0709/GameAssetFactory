@@ -43,8 +43,8 @@ func run()->void:
 	var cadence_trials:Array[Dictionary]=[]
 	for reference:float in [7.,5.6]:
 		mode.reset();actor.run_stride_speed=reference;await ticks(4);Input.action_press("move_forward");await ticks(30);actor.reset_movement_measurements();await ticks(260)
-		var trial:Dictionary=actor.movement_measurements();trial["trial"]="target-normalized1x counterfactual" if reference==7. else "distance/stride adapter";cadence_trials.append(trial)
-		Input.action_release("move_forward");await ticks(20)
+		var trial:Dictionary=actor.movement_measurements();trial["trial"]="target-normalized1x counterfactual" if reference==7. else "distance/stride adapter"
+		Input.action_release("move_forward");await ticks(20);trial["release_stop"]=actor.movement_measurements();cadence_trials.append(trial)
 	actor.run_stride_speed=5.6;mode.reset()
 	var report:={"failures":failures,"renderer":RenderingServer.get_current_rendering_method(),"display":DisplayServer.get_name(),"scene":"res://scenes/dev/ActionsStuffWalkRunTest.tscn","camera_preserved":{"size":lab.camera_size,"azimuth":lab.azimuth,"elevation":lab.elevation},"grass_blocks":lab.grass_field_blocks,"original_clips":actor.source_clip_count,"bones":actor.skeleton.get_bone_count(),"frames":frames,"cadence_trials":cadence_trials,"export":saved,"native_md2_runtime_values_verified":false}
 	FileAccess.open(folder.path_join("native-validation.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"));print("SABRE_NATIVE_MOVEMENT ",JSON.stringify({"failures":failures,"renderer":report.renderer,"frames":frames.size(),"export":saved}))

@@ -56,6 +56,11 @@ func sample(delta:float,position:Vector3,requested_speed:float,moving:bool,advan
 		if side>=soles.size():_sole_contact[side]=false;continue
 		var item:Dictionary=soles[side];var center:Vector3=item.center;var candidate:bool=item.candidate
 		sole_height[side]=float(item.height)
+		if speed>.1 and advanced_cycles>0. and _has_velocity_sample:
+			var relative_motion:Vector3=center-_sole_previous[side]-step
+			# A low foot travelling forward relative to the body is still in swing.
+			# Height alone would misreport its fast return as stance sliding.
+			candidate=candidate and Vector2(relative_motion.x,relative_motion.z).dot(Vector2(step.x,step.z))<=0.
 		if candidate and _sole_contact[side]:
 			var motion:=center-_sole_previous[side];var ground_speed:=Vector2(motion.x,motion.z).length()/delta
 			sole_speed[side]=ground_speed;_sole_squared[side]+=ground_speed*ground_speed;_sole_samples[side]+=1
@@ -66,4 +71,4 @@ func snapshot()->Dictionary:
 	var net:=_previous-_start;var rms:Array[float]=[-1.,-1.]
 	for side in 2:
 		if _sole_samples[side]>0:rms[side]=sqrt(_sole_squared[side]/_sole_samples[side])
-	return {"elapsed":elapsed,"distance":distance,"net_distance":Vector2(net.x,net.z).length(),"speed":speed,"peak_speed":peak_speed,"vertical_speed":vertical_speed,"acceleration":acceleration if acceleration_valid else null,"acceleration_sample_valid":acceleration_valid,"target_speed":target_speed,"gait_cycles":gait_cycles,"cycle_hz":cycle_hz,"response_95":response_95,"stop_distance":stop_distance,"stop_seconds":stop_seconds,"sole_speed":sole_speed.duplicate(),"sole_height":sole_height.duplicate(),"sole_candidate_rms_speed":rms,"sole_candidate_samples":_sole_samples.duplicate(),"sole_note":"Rest-bottom centroids during low-foot candidates; rolling and stance inference are not resolved. Not a proof of foot slip or foot locking."}
+	return {"elapsed":elapsed,"distance":distance,"net_distance":Vector2(net.x,net.z).length(),"speed":speed,"peak_speed":peak_speed,"vertical_speed":vertical_speed,"acceleration":acceleration if acceleration_valid else null,"acceleration_sample_valid":acceleration_valid,"target_speed":target_speed,"gait_cycles":gait_cycles,"cycle_hz":cycle_hz,"response_95":response_95,"stop_distance":stop_distance,"stop_seconds":stop_seconds,"sole_speed":sole_speed.duplicate(),"sole_height":sole_height.duplicate(),"sole_candidate_rms_speed":rms,"sole_candidate_samples":_sole_samples.duplicate(),"sole_note":"Rest-bottom centroids during low/backward foot candidates; rolling and stance inference are not resolved. Not a proof of foot slip or foot locking."}

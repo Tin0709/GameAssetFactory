@@ -40,4 +40,8 @@ func _initialize()->void:
 	check(meter.snapshot().sole_speed[0]==0. and meter.snapshot().sole_speed[1]<0.,"Candidate sole drift distinguishes stationary support from an airborne foot")
 	soles[0].center+=Vector3(.05,0,0);meter.sample(.1,Vector3.ZERO,0.,false,0.,soles)
 	check(absf(meter.snapshot().sole_speed[0]-.5)<.00001,"World-space sole movement is measured, not declared foot locking")
+	meter.reset(Vector3.ZERO)
+	soles[0].center=Vector3.ZERO;meter.sample(.1,Vector3.ZERO,7.,true,.2,soles)
+	soles[0].center=Vector3(1.4,0,0);meter.sample(.1,Vector3(.7,0,0),7.,true,.2,soles)
+	check(meter.snapshot().sole_speed[0]<0. and meter.snapshot().sole_candidate_samples[0]==0,"Low forward-swinging foot is excluded from backward stance candidates")
 	print("SABRE_MOVEMENT_METER ",JSON.stringify({"checks":checks,"failures":failures}));quit(0 if failures.is_empty() else 1)
