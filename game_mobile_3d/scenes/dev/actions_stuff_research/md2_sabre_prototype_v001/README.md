@@ -93,9 +93,20 @@ prevent a claim of perfect bilateral foot locking. Gaits persist through braking
 locomotion switches retain normalized cycle phase with an80ms blend.
 Public-table JumpCoyoteTime.155 permits one jump after a recent ledge departure;
 takeoff consumes it, so it cannot grant a second airborne jump. Estimated jump
-height remains1.2 units, gravity15 and launch6. These previously chosen ballistic
-values remain approximations: a Takeoff pose's.4s length does not establish the
-native physical apex/flight duration. Actual floor collision owns landing.
+height remains1.2 units. Following the user's slow-jump feedback, the source
+profile uses a declared.25s apex-time adapter: gravity=2h/t²=38.4, launch9.6.
+The earlier15/6 adapter took about.817s per jump; the new native60Hz capsule
+trace takes.517s with the same1.200827-unit measured apex. At30/60/120Hz,
+flight is.533/.517/.508s, including discrete floor-contact detection.
+These are lab approximations, not recovered MD2 gravity/launch constants.
+
+Source takeoff stays1x but transitions to the original airborne loop at the
+physical apex or ceiling collision, rather than waiting for its full.4s clip.
+Actual floor contact starts landing. Stationary landing retains its full.3s;
+with movement input it releases after a declared.05s contact interval into the
+existing gait/blend. This prevents a.3s static landing pose sliding across the
+ground while the capsule already travels7u/s. Source clips, raw review1x,
+ordinary movement speed and fallback jump remain unchanged.
 No claim of matching the original game engine's interpolation is made.
 
 ## Direct movement evidence and measurement
@@ -130,9 +141,11 @@ GravityMultiplier2 is applied only after an airborne source attack, until actual
 floor contact, including if its pose clip finishes during a long fall. It is not
 applied to ordinary jumping. Activation height-limit semantics, launch-velocity
 handoff, source montage physics and landing notify alignment remain unresolved.
-With the retained1.2-unit/15-gravity jump adapter, actual apex-to-floor travel is
-.400s normally and .267/.283s for the aerial attack at30/60Hz. These are measured
-prototype results, not recovered MD2 flight times.
+With the new1.2-unit/38.4-gravity adapter, apex-to-floor travel measured from the
+first nonascending physics tick is.267/.250s normally and.167/.167s for the
+aerial attack at30/60Hz. The twofold gravity factor is public-table data; the
+base trajectory and ability handoff remain reconstructed. These are prototype
+measurements, not recovered MD2 flight times.
 Native blending/root-motion/attack movement remain unresolved.
 
 A second, pinned public extraction snapshot corroborates the player row:
@@ -226,6 +239,13 @@ with Godot `--headless --path <existing-project>
 --script res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/tests/<name>`.
 The latter verifies neutral morphs, the original alpha atlas, embedded textures,
 and zero new project filenames caused by the private runtime load.
+
+`test_jump_responsiveness.gd` checks actual collisions at30/60/120Hz, unchanged
+height, held-jump/no repeat, apex/falling pose, ceiling collision, stationary
+landing, moving landing release and raw source playback. `capture_jump.gd`
+records every physical pose via the existing signal so image-capture waits
+cannot miss the apex. Its before/after parameter trials use the SAME existing
+lab, camera and grass; private frames/trace stay in Research/movement_measurements/jump.
 
 `tests/capture_native.gd` uses a no-focus offscreen native viewport and actual
 Input actions. Use Mobile/D3D12 on this machine. Numeric reports go to
