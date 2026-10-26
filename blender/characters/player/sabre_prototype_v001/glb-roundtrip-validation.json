@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "pose_joint_comparisons": 250,
+  "maximum_world_joint_position_error": 4.844596447649258e-07,
+  "maximum_sabre_world_bounds_error": 8.940696716308594e-07,
+  "maximum_clip_duration_error": 0.0,
+  "animations": 22,
+  "scope": "Authored Blender -> GLB -> independent Blender reimport. No MD2 fidelity implied."
+}
