@@ -61,6 +61,72 @@ class CheckpointTests(unittest.TestCase):
         before = self.head()
         self.assertEqual(self.manager.checkpoint().head, before)
 
+    def test_docs_commit_has_title_counts_lines_and_file_list(self):
+        (self.repo / 'docs').mkdir()
+        (self.repo / 'docs' / 'one.md').write_text('first\nsecond\n')
+        (self.repo / 'docs' / 'two.md').write_text('third\n')
+        self.manager.checkpoint()
+        self.assertEqual(self.git('log', '-1', '--format=%s'), 'docs: change 2 docs files')
+        body = self.git('log', '-1', '--format=%b')
+        self.assertIn('Added: 2.', body)
+        self.assertIn('Text lines: +3 / -0; binary files: 0.', body)
+        self.assertIn('- Add: "docs/one.md"', body)
+        self.assertIn('- Add: "docs/two.md"', body)
+        self.assertIn('Repository: Test', body)
+
+    def test_description_reports_modified_deleted_and_binary_paths(self):
+        (self.repo / 'remove.txt').write_text('remove me\n')
+        self.git('add', 'remove.txt')
+        self.git('commit', '-qm', 'second baseline')
+        (self.repo / 'remove.txt').unlink()
+        (self.repo / 'keep.txt').write_text('replaced\nextra\n')
+        (self.repo / 'asset.bin').write_bytes(b'\x00\x01\x02')
+        self.manager.checkpoint()
+        body = self.git('log', '-1', '--format=%b')
+        self.assertIn('Added: 1. Modified: 1. Deleted: 1.', body)
+        self.assertIn('Text lines: +2 / -2; binary files: 1.', body)
+        self.assertIn('- Delete: "remove.txt"', body)
+        self.assertIn('- Modify: "keep.txt"', body)
+        self.assertIn('- Add: "asset.bin"', body)
+
+    def test_lfs_pointer_lines_are_not_reported_as_asset_text(self):
+        self.git('config', 'filter.lfs.clean', 'cat')
+        self.git('config', 'filter.lfs.smudge', 'cat')
+        self.git('config', 'filter.lfs.process', '')
+        self.git('config', 'filter.lfs.required', 'false')
+        (self.repo / '.gitattributes').write_text('*.blend filter=lfs diff=lfs merge=lfs -text\n')
+        self.git('add', '.gitattributes')
+        self.git('commit', '-qm', 'track fixture pointers')
+        pointer = 'version https://git-lfs.github.com/spec/v1\noid sha256:' + 'a' * 64 + '\nsize 200000000\n'
+        (self.repo / 'study.blend').write_text(pointer, newline='\n')
+        self.manager.checkpoint()
+        self.assertEqual(self.git('log', '-1', '--format=%s'), 'assets: change 1 asset file')
+        body = self.git('log', '-1', '--format=%b')
+        self.assertIn('Text lines: +0 / -0; binary files: 1.', body)
+
+    def test_message_quotes_paths_and_keeps_unicode(self):
+        name = 'notes [one] tiếng Việt.md'
+        (self.repo / name).write_text('note\n', encoding='utf-8')
+        self.manager.checkpoint()
+        body = self.git('log', '-1', '--format=%b')
+        self.assertIn('- Add: "notes [one] tiếng Việt.md"', body)
+
+    def test_deleting_lfs_asset_and_tracking_rule_keeps_binary_stats(self):
+        self.git('config', 'filter.lfs.clean', 'cat')
+        self.git('config', 'filter.lfs.smudge', 'cat')
+        self.git('config', 'filter.lfs.process', '')
+        self.git('config', 'filter.lfs.required', 'false')
+        (self.repo / '.gitattributes').write_text('*.blend filter=lfs diff=lfs merge=lfs -text\n')
+        pointer = 'version https://git-lfs.github.com/spec/v1\noid sha256:' + 'b' * 64 + '\nsize 99999\n'
+        (self.repo / 'study.blend').write_text(pointer, newline='\n')
+        self.manager.checkpoint()
+        (self.repo / 'study.blend').unlink()
+        (self.repo / '.gitattributes').unlink()
+        self.manager.checkpoint()
+        body = self.git('log', '-1', '--format=%b')
+        self.assertIn('Deleted: 2.', body)
+        self.assertIn('Text lines: +0 / -1; binary files: 1.', body)
+
     def test_staged_work_is_preserved_and_not_committed(self):
         (self.repo / 'keep.txt').write_text('staged\n')
         self.git('add', 'keep.txt')

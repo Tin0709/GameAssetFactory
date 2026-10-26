@@ -83,6 +83,43 @@ lượt quét tiếp theo. File lớn hoặc hook chậm có thể khiến một
 Commit là checkpoint công việc đang làm, không phải xác nhận hoàn thành hay
 phê duyệt asset/animation.
 
+### Mô tả commit trên GitHub
+
+Commit mới có tiêu đề theo loại file và phần mô tả chi tiết từ diff đã stage:
+
+```text
+docs: change 2 docs files
+
+Modified: 2.
+Text lines: +16 / -6; binary files: 0.
+
+- Modify: "docs/setup/WINDOWS_HANDOFF_2026_10_25.md"
+- Modify: "docs/superpowers/plans/2026-10-25-windows-handoff.md"
+
+Repository: GameAssetFactory
+Branch: codex/sword-combat-v001
+Checkpoint: 2026-10-26T12:00:00+07:00
+```
+
+Đây là ví dụ định dạng; số liệu và đường dẫn của từng commit được tính thật.
+App phân loại docs/test/assets/game/code hoặc nhóm thay đổi hỗn hợp; không đoán
+mục đích sửa lỗi/tính năng. LFS được tính vào file asset, không cộng dòng pointer
+vào thay đổi text. File đổi vị trí được mô tả thành đường dẫn xóa và đường dẫn
+thêm. Tên file được đặt trong dấu ngoặc kép và escape ký tự đặc biệt.
+
+Phần mô tả xuất hiện dưới tiêu đề khi mở chi tiết commit trên GitHub sau Push.
+Commit cũ giữ nguyên. Nội dung được truyền qua stdin UTF-8 để danh sách file dài
+không vượt giới hạn dòng lệnh Windows.
+
+Khi muốn chủ động mở app và bật tự commit sau lượt đọc trạng thái đầu tiên:
+
+```powershell
+py -3 scripts/git_checkpoint_manager.py --auto-commit
+```
+
+Flag này không tự Push. Shortcut bình thường vẫn mở tạm dừng. Nút Tạm dừng hủy
+cả yêu cầu bật tự commit đang chờ đọc trạng thái.
+
 ## Push
 
 **Push** chỉ chạy khi bạn bấm nút và xác nhận trong app. App gửi các commit đã

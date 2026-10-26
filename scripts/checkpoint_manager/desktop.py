@@ -95,7 +95,7 @@ class SingleInstance:
 
 
 class CheckpointApp:
-    def __init__(self, root, configs, state_dir, clock=time.monotonic, bridge=None):
+    def __init__(self, root, configs, state_dir, clock=time.monotonic, bridge=None, start_auto=False):
         self.root, self.configs, self.clock = root, tuple(configs), clock
         self.state_dir = Path(state_dir)
         self.state_dir.mkdir(parents=True, exist_ok=True)
@@ -122,6 +122,7 @@ class CheckpointApp:
         self.mode_var = tk.StringVar(root, 'ĐÃ TẠM DỪNG • Kiểm tra thay đổi trước khi bật tự commit')
         self.countdown_var = tk.StringVar(root, f'Chu kỳ quét: {interval}s • Chỉ commit khi bạn bật Tự commit')
         self.busy, self.closed, self.closing = False, False, False
+        self.auto_start_pending = start_auto
         self.events = queue.Queue()
         self.after_ids = {}
         self.action_buttons = []
@@ -357,6 +358,9 @@ class CheckpointApp:
                     if message:
                         self.log(f'{self.configs[index].name}: {message}')
             self._update_mode()
+            if kind == 'result' and self.auto_start_pending and not self.closing:
+                self.auto_start_pending = False
+                self.resume_all()
             if self.closing:
                 self._destroy()
                 return
@@ -415,9 +419,11 @@ class CheckpointApp:
                 self.auto_permits[index].set()
         self.schedule.consume(self.clock())
         self._update_mode()
-        self.log(f'Đã bật tự commit cho repo đã đọc được trạng thái. Quét mỗi {self.schedule.interval} giây.')
+        enabled = [config.name for config, variable in zip(self.configs, self.auto_vars) if variable.get()]
+        self.log(f'Đã bật tự commit cho {len(enabled)}/{len(self.configs)} repo ({", ".join(enabled) or "chưa có"}). Quét mỗi {self.schedule.interval} giây.')
 
     def pause_all(self):
+        self.auto_start_pending = False
         for index, variable in enumerate(self.auto_vars):
             variable.set(False)
             self.auto_permits[index].clear()
@@ -498,7 +504,7 @@ class CheckpointApp:
         self.root.destroy()
 
 
-def main():
+def main(auto_commit=False):
     if os.name == 'nt':
         import ctypes
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Tin0709.GAFGitCheckpointManager')
@@ -518,7 +524,7 @@ def main():
         RepoConfig('MD2 Research', desktop / 'MD2 Research', 'https://github.com/Tin0709/MD2-Research.git', require_private=True),
     ]
     try:
-        CheckpointApp(root, configs, state_dir)
+        CheckpointApp(root, configs, state_dir, start_auto=auto_commit)
         root.deiconify()
         root.mainloop()
     finally:

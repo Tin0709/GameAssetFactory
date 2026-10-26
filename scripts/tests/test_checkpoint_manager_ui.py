@@ -37,16 +37,19 @@ class DesktopTests(unittest.TestCase):
             for args in [('add', 'work.txt'), ('commit', '-qm', 'initial')]:
                 subprocess.run(['git', '-C', str(path), *args], check=True, capture_output=True)
             self.configs.append(RepoConfig(name, path, ''))
+        self.now = 0.0
+        self.open_app()
+        self.addCleanup(self.cleanup_root)
+        self.wait_idle()
+
+    def open_app(self, start_auto=False):
         try:
             self.root = tk.Tk()
         except tk.TclError as error:
             self.skipTest(str(error))
         self.root.withdraw()
-        self.now = 0.0
         bridge = BlenderBridge(self.base / 'state', BridgeConfig(http_port=0, addon_port=0, timeout=.03))
-        self.app = CheckpointApp(self.root, self.configs, self.base / 'state', clock=lambda: self.now, bridge=bridge)
-        self.addCleanup(self.cleanup_root)
-        self.wait_idle()
+        self.app = CheckpointApp(self.root, self.configs, self.base / 'state', clock=lambda: self.now, bridge=bridge, start_auto=start_auto)
 
     def cleanup_root(self):
         if not self.app.closed:
@@ -99,6 +102,33 @@ class DesktopTests(unittest.TestCase):
         self.app.tick()
         self.wait_idle()
         self.assertEqual(self.count(0), 2)
+
+    def test_explicit_auto_launch_waits_for_scan_then_uses_ten_second_timer(self):
+        self.cleanup_root()
+        self.open_app(start_auto=True)
+        self.assertTrue(all(not value.get() for value in self.app.auto_vars))
+        self.wait_idle()
+        self.assertTrue(all(value.get() for value in self.app.auto_vars))
+        (self.configs[0].path / 'work.txt').write_text('new automatic checkpoint')
+        self.assertEqual(self.count(0), 1)
+        self.now = 10
+        self.app.tick()
+        self.wait_idle()
+        self.assertEqual(self.count(0), 2)
+
+    def test_pause_before_scan_cancels_explicit_auto_launch(self):
+        self.cleanup_root()
+        self.open_app(start_auto=True)
+        self.app.pause_all()
+        self.wait_idle()
+        self.assertTrue(all(not value.get() for value in self.app.auto_vars))
+        self.assertEqual(self.count(1), 1)
+        self.app.pause_all()
+        (self.configs[0].path / 'work.txt').write_text('after pause')
+        self.now = 20
+        self.app.tick()
+        self.wait_idle()
+        self.assertEqual(self.count(0), 1)
 
     def test_closing_stops_future_work(self):
         self.app.resume_all()

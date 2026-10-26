@@ -10,6 +10,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from .commit_message import staged_message
 
 
 class RepoError(RuntimeError):
@@ -241,7 +242,9 @@ class GitRepository:
         if validation.returncode:
             raise RepoBlocked(redact(validation.stderr.decode(errors='replace')) or 'Kiểm tra staged/LFS thất bại.')
         stamp = datetime.now().astimezone().isoformat(timespec='seconds')
-        self._run('commit', '-m', f'checkpoint: {self.config.name} {stamp} ({len(actual)} paths)', timeout=600)
+        message = staged_message(self._run, self.config.name, before.branch, stamp)
+        self._run('-c', 'i18n.commitEncoding=UTF-8', 'commit', '--file=-',
+                  data=message.encode('utf-8', errors='backslashreplace'), timeout=600)
         return self.scan()
 
     def _push_target(self, snapshot):
