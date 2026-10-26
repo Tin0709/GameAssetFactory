@@ -23,6 +23,11 @@ func run()->void:
 		check(a.accepted_count>=3 and a.impact_count>=3,"Anchoring preserves complete combo/events at%dHz"%hz)
 		a.attack(false);a.requested_direction=Vector2(0,-1);await ticks(hz)
 		check(a.active_clip=="Run" and absf(a.current_speed-7.)<.01,"Release resumes normal movement after the active strike at%dHz"%hz)
+		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;await ticks(hz/2)
+		var tapped_start:Vector3=a.position
+		for i in hz*2:a.attack(i%int(hz/6)==0);await tick()
+		check(Vector2(a.position.x-tapped_start.x,a.position.z-tapped_start.z).length()<.005 and a.accepted_count>=3,"Repeated six-taps-per-second combat keeps buffered feet planted at%dHz"%hz)
+		a.attack(false)
 		# Recovery can yield to movement without truncating a still-active strike.
 		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;a.combo.phase=&"recovery";a.combo.index=0;a.combo.time=.01
 		await tick();check(not a.combo.active() and a.active_clip=="Run","Unqueued recovery yields to intentional movement at%dHz"%hz)
