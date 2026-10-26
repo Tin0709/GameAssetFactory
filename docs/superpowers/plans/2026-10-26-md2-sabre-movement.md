@@ -37,6 +37,16 @@
 
 ## Verification
 
+## Task3 — User-reported motion softness, double image and stepping
+
+- [ ] Diagnose actual viewport scaling/AA and the source-specific presentation route. Preserve physical speed and original pose clocks.
+- [ ] Test full-resolution source display separately from lighting/shadow tiers; expose a reversible toggle, keep original A/B/tier semantics.
+- [ ] Test render-fraction interpolation for original32-bone skin, rigid Sabre and camera together; rendering must not write authoritative skeleton/capsule/markers/events. Exact endpoints including weapon scale and reset/teleport history.
+- [ ] Keep ribbon/particles on the same display time, preserving physical VFX sampling/events/pool limits.
+- [ ] Validate30/60Hz fractional render samples and native Mobile/D3D12 pixels. No TAA/motion blur/sharpening added. Standard one-physics-tick display delay is disclosed.
+
+## Final verification
+
 - [ ] Meaningful Godot checks30/60Hz, existing Sabre suites, physics contact/phase/combo/audio regressions; all automated runs use Dummy audio.
 - [ ] Native Mobile/D3D12 run of this same scene, inspect the overlay and controls. Runtime frames verify this lab, never estimate original MD2 values from pixels.
 - [ ] Rehash original source GLB/showcase; audit diff for only controller/debug/tests/docs changes. No manual stage/commit while checkpoint manager is active.
