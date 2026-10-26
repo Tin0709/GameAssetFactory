@@ -29,3 +29,24 @@ three-node checkpoint branch and subtle amber accent; no text or existing logos.
 Root cause of flicker: `_submit` and `show_changes` disable every action button,
 and `_poll` re-enables them after every passive scan. Keep the existing busy
 guards, remove those visual state mutations and show working/idle/error lights.
+
+User refinement: add prominent per-folder counts for files not committed,
+commits not pushed, and commits known upstream but not local. Keep the cached
+upstream qualification visible, not raw Ahead/Behind jargon. Test two local
+commits becoming zero after a temporary local push.
+
+During review another real app window was opened and its automatic checkpoints
+advanced the real branches. Preserve these commits; do not reset or rewrite
+them. Close the app gracefully for upgrading, then reopen paused. Add a Windows
+named application mutex independent of state-folder environment overrides to
+prevent simultaneous managers using different runtime data directories.
+
+Completed verification: full helper suite 106 tests green, four existing optional
+skips; nine bridge tests and nine UI tests cover the new protocol, timeout,
+UTF-8, steady-button, named-mutex and pending-counter behavior. Fresh independent
+review found no remaining material issues. Native preview sampled 452 button
+states across a full 10-second scan with zero disabled samples; real read-only
+HTTP-to-Blender health succeeded. Generated multi-resolution icon and desktop
+shortcut inspected. The active manager's three GameAssetFactory checkpoints and
+one MD2 checkpoint were preserved, with no reset/rewrite/forced push. Evidence:
+`.validation/checkpoint_manager_mcp_20261026/`.

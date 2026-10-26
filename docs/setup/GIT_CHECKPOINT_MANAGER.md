@@ -49,6 +49,23 @@ Các nút Git giữ nguyên màu khi quét, không đổi xám/bật lại theo 
 đèn cạnh mỗi repo cho biết tạm dừng, đang xử lý, tự commit bật hoặc cần kiểm tra.
 Nút bấm trong lúc thao tác Git đang chạy không xếp chồng lệnh mới.
 
+## Thông số từng thư mục
+
+- **Chưa commit: N file** — số đường dẫn thay đổi được Git báo ở máy, gồm cả
+  file chưa được theo dõi. Dòng Hợp lệ/Bỏ qua cho biết phần app sẽ lấy vào commit.
+- **Chưa push: N commit** — số commit của nhánh tại máy chưa có trong bản ghi
+  upstream được máy biết. Màu vàng nếu còn commit; xanh nếu bằng 0.
+- **GitHub có thêm: N commit** — số commit trong bản ghi upstream mà nhánh tại
+  máy chưa có; app không tự merge/pull chúng.
+
+Các số so sánh commit dựa trên lần đồng bộ GitHub gần nhất, không phải truy vấn
+GitHub trực tiếp sau mỗi 10 giây. Không có upstream hoặc dữ liệu so sánh thì app
+hiển thị chưa xác định, thay vì đoán là 0. Sau Push thành công, app đọc lại trạng
+thái để cập nhật số commit chưa push.
+
+Trên Windows, khóa ứng dụng dùng thêm named mutex để không mở hai manager cùng
+lúc ngay cả khi chúng nhận các đường dẫn LOCALAPPDATA khác nhau từ runtime.
+
 ## Tự commit mỗi 10 giây
 
 1. Đợi app đọc xong trạng thái hai thư mục.
@@ -124,3 +141,11 @@ suite 94 kiểm thử đạt với bốn optional skip có sẵn. Knowledge suit
 đạt với một skip do quyền tạo symlink trên Windows. Đã xem giao diện thật, mở app
 tạm dừng, xác minh PRIVATE bằng API chỉ đọc và đối chiếu HEAD/index hai repo thật
 không đổi. Chưa Push lên GitHub bằng app hoặc kiểm chứng độc lập LFS từ xa.
+
+Bản bổ sung icon/MCP/thông số: helper suite 106 kiểm thử đạt, bốn optional skip;
+đã kiểm tra SSE chậm, timeout toàn yêu cầu, gói UTF-8 bị chia nhỏ, nút giữ nguyên
+màu và bộ đếm hai commit trở về 0 sau Push vào remote tạm. Kết nối Blender thật
+đã phản hồi lệnh chỉ đọc qua HTTP MCP. Trong quá trình nâng cấp, cửa sổ manager
+khác được mở và tạo checkpoint tự động; những commit đó được giữ nguyên, không
+reset/rewrite. Phiên bản hiện tại khóa cả ứng dụng Windows để tránh hai cửa sổ
+manager dùng các thư mục trạng thái runtime khác nhau cùng ghi Git.

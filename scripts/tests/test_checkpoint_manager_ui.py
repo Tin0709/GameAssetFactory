@@ -1,6 +1,7 @@
 """Run the desktop controller against two disposable repositories."""
 from pathlib import Path
 import gc
+import os
 import subprocess
 import sys
 import tempfile
@@ -8,6 +9,7 @@ import threading
 import time
 import tkinter as tk
 import unittest
+import uuid
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -77,7 +79,7 @@ class DesktopTests(unittest.TestCase):
         self.wait_idle()
         self.assertEqual(self.count(0), 1)
         self.assertTrue(all(not var.get() for var in self.app.auto_vars))
-        self.assertIn('1', self.app.repo_text[0].get())
+        self.assertEqual(self.app.uncommitted_vars[0].get(), 'Chưa commit: 1 file')
 
     def test_enabled_timer_commits_on_next_ten_second_tick(self):
         self.app.resume_all()
@@ -114,6 +116,36 @@ class DesktopTests(unittest.TestCase):
         first.close()
         second = SingleInstance(path)
         second.close()
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows named application mutex')
+    def test_same_app_identity_blocks_different_state_directories(self):
+        identity = 'Local\\CheckpointManagerTest_' + uuid.uuid4().hex
+        first = SingleInstance(self.base / 'state-a' / 'lock', identity=identity)
+        self.addCleanup(first.close)
+        with self.assertRaises(RuntimeError):
+            SingleInstance(self.base / 'state-b' / 'lock', identity=identity)
+        first.close()
+        second = SingleInstance(self.base / 'state-b' / 'lock', identity=identity)
+        second.close()
+
+    def test_pending_push_counts_two_local_commits_then_zero_after_push(self):
+        config = self.configs[0]
+        remote = self.base / 'counter-remote.git'
+        subprocess.run(['git', 'init', '-q', '--bare', str(remote)], check=True, capture_output=True)
+        for args in [('remote', 'add', 'origin', str(remote)), ('push', '-qu', 'origin', 'test')]:
+            subprocess.run(['git', '-C', str(config.path), *args], check=True, capture_output=True)
+        for value in ['first local commit', 'second local commit']:
+            (config.path / 'work.txt').write_text(value)
+            for args in [('add', 'work.txt'), ('commit', '-qm', value)]:
+                subprocess.run(['git', '-C', str(config.path), *args], check=True, capture_output=True)
+        self.app.refresh()
+        self.wait_idle()
+        self.assertEqual(self.app.pending_push_vars[0].get(), 'Chưa push: 2 commit')
+        self.assertEqual(self.app.uncommitted_vars[0].get(), 'Chưa commit: 0 file')
+        subprocess.run(['git', '-C', str(config.path), 'push', '-q'], check=True, capture_output=True)
+        self.app.refresh()
+        self.wait_idle()
+        self.assertEqual(self.app.pending_push_vars[0].get(), 'Chưa push: 0 commit')
 
     def test_pause_while_busy_skips_the_next_repository(self):
         self.app.resume_all()

@@ -40,7 +40,34 @@ class StatusLight(ttk.Frame):
 
 class SingleInstance:
     """An OS-released file lock, never a stale PID-file-only guard."""
-    def __init__(self, path):
+    def __init__(self, path, identity=None):
+        self._mutex = None
+        self._kernel = None
+        self.file = None
+        if os.name == 'nt' and identity:
+            import ctypes
+            from ctypes import wintypes
+            self._kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+            self._kernel.CreateMutexW.argtypes = [ctypes.c_void_p, wintypes.BOOL, wintypes.LPCWSTR]
+            self._kernel.CreateMutexW.restype = wintypes.HANDLE
+            self._kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+            self._kernel.ReleaseMutex.argtypes = [wintypes.HANDLE]
+            ctypes.set_last_error(0)
+            handle = self._kernel.CreateMutexW(None, True, identity)
+            error = ctypes.get_last_error()
+            if not handle:
+                raise RuntimeError('Không thể tạo khóa ứng dụng Windows.')
+            if error == 183:
+                self._kernel.CloseHandle(handle)
+                raise RuntimeError('Git Checkpoint Manager đang mở. Hãy dùng cửa sổ hiện tại.')
+            self._mutex = handle
+        try:
+            self._lock_file(path)
+        except Exception:
+            self.close()
+            raise
+
+    def _lock_file(self, path):
         path.parent.mkdir(parents=True, exist_ok=True)
         self.file = path.open('a+b')
         if path.stat().st_size == 0:
@@ -59,8 +86,12 @@ class SingleInstance:
             raise RuntimeError('Git Checkpoint Manager đang mở. Hãy dùng cửa sổ hiện tại.') from None
 
     def close(self):
-        if not self.file.closed:
+        if self.file is not None and not self.file.closed:
             self.file.close()
+        if self._mutex is not None:
+            self._kernel.ReleaseMutex(self._mutex)
+            self._kernel.CloseHandle(self._mutex)
+            self._mutex = None
 
 
 class CheckpointApp:
@@ -83,6 +114,10 @@ class CheckpointApp:
         self.auto_vars = [tk.BooleanVar(root, False) for _ in configs]
         self.auto_permits = [threading.Event() for _ in configs]
         self.repo_text = [tk.StringVar(root, 'Đang đọc trạng thái…') for _ in configs]
+        self.pending_push_vars = [tk.StringVar(root, 'Chưa push: —') for _ in configs]
+        self.uncommitted_vars = [tk.StringVar(root, 'Chưa commit: —') for _ in configs]
+        self.remote_extra_vars = [tk.StringVar(root, 'GitHub có thêm: —') for _ in configs]
+        self.pending_push_labels = []
         self.interval_var = tk.StringVar(root, str(interval))
         self.mode_var = tk.StringVar(root, 'ĐÃ TẠM DỪNG • Kiểm tra thay đổi trước khi bật tự commit')
         self.countdown_var = tk.StringVar(root, f'Chu kỳ quét: {interval}s • Chỉ commit khi bạn bật Tự commit')
@@ -118,6 +153,7 @@ class CheckpointApp:
         style.configure('Panel.TLabel', background='#182337', foreground='#cbd5e1')
         style.configure('Title.TLabel', font=('Segoe UI', 21, 'bold'), foreground='#f8fafc')
         style.configure('Repo.TLabel', background='#182337', foreground='#f8fafc', font=('Segoe UI', 13, 'bold'))
+        style.configure('Metric.TLabel', background='#182337', foreground='#e2e8f0', font=('Segoe UI', 11, 'bold'))
         style.configure('Muted.TLabel', foreground='#94a3b8')
         style.configure('Status.TLabel', foreground='#34d399', font=('Segoe UI', 10, 'bold'))
         style.configure('TButton', padding=(12, 7), background='#2a3b55', foreground='#f8fafc', borderwidth=0)
@@ -180,6 +216,13 @@ class CheckpointApp:
             self.repo_lights.append(light)
             ttk.Checkbutton(title, text='Tự commit', variable=self.auto_vars[index], command=lambda i=index: self.toggle_auto(i)).pack(side='right')
             ttk.Label(panel, text=str(config.path), style='Panel.TLabel').pack(anchor='w', pady=(4, 8))
+            metrics = ttk.Frame(panel, style='Panel.TFrame')
+            metrics.pack(fill='x', pady=(0, 7))
+            ttk.Label(metrics, textvariable=self.uncommitted_vars[index], style='Metric.TLabel').pack(side='left', padx=(0, 25))
+            pending = ttk.Label(metrics, textvariable=self.pending_push_vars[index], style='Metric.TLabel')
+            pending.pack(side='left', padx=(0, 25))
+            self.pending_push_labels.append(pending)
+            ttk.Label(metrics, textvariable=self.remote_extra_vars[index], style='Panel.TLabel').pack(side='left')
             ttk.Label(panel, textvariable=self.repo_text[index], style='Panel.TLabel', justify='left', wraplength=1010).pack(anchor='w')
             buttons = ttk.Frame(panel, style='Panel.TFrame')
             buttons.pack(fill='x', pady=(10, 0))
@@ -252,7 +295,7 @@ class CheckpointApp:
         if self.closed or self.closing:
             return
         remaining = max(0, self.schedule.last + self.schedule.interval - self.clock())
-        self.countdown_var.set(('Đang thực hiện thao tác Git…' if self.busy else f'Lượt quét tiếp theo: {remaining:.0f}s') + ' • ahead/behind dùng dữ liệu remote đã fetch gần nhất')
+        self.countdown_var.set(('Đang thực hiện thao tác Git…' if self.busy else f'Lượt quét tiếp theo: {remaining:.0f}s') + ' • Số commit dựa trên lần đồng bộ GitHub gần nhất')
         if self.schedule.due(self.clock()) and not self.busy:
             flags = [variable.get() for variable in self.auto_vars]
             anchors = self._anchors()
@@ -302,12 +345,14 @@ class CheckpointApp:
                             self.last_checkpoint[index] = datetime.now().strftime('%H:%M:%S')
                         excluded = len(snapshot.changes) - len(snapshot.eligible)
                         counts = snapshot.ahead_behind.split()
-                        ahead = counts[0] if len(counts) == 2 else '?'
-                        behind = counts[1] if len(counts) == 2 else '?'
+                        known = len(counts) == 2 and all(value.isdecimal() for value in counts)
+                        self.uncommitted_vars[index].set(f'Chưa commit: {len(snapshot.changes)} file')
+                        self.pending_push_vars[index].set(f'Chưa push: {counts[0]} commit' if known else 'Chưa push: chưa xác định')
+                        self.remote_extra_vars[index].set(f'GitHub có thêm: {counts[1]} commit' if known else 'GitHub: chưa có dữ liệu so sánh')
+                        self.pending_push_labels[index].configure(foreground='#fbbf24' if known and int(counts[0]) else '#34d399' if known else '#94a3b8')
                         self.repo_text[index].set(
                             f'Nhánh: {snapshot.branch or "DETACHED"}   •   HEAD: {snapshot.head[:8]}   •   Upstream: {snapshot.upstream or "chưa có"}\n'
-                            f'Thay đổi: {len(snapshot.changes)}   |   Hợp lệ: {len(snapshot.eligible)}   |   Bỏ qua: {excluded}   |   Staged: {"có" if snapshot.staged else "không"}\n'
-                            f'Ahead: {ahead}   /   Behind: {behind} (cached)   •   Checkpoint trong app: {self.last_checkpoint[index]}'
+                            f'Hợp lệ: {len(snapshot.eligible)} file   |   Bỏ qua: {excluded}   |   Đã stage: {"có" if snapshot.staged else "không"}   •   Checkpoint trong app: {self.last_checkpoint[index]}'
                         )
                     if message:
                         self.log(f'{self.configs[index].name}: {message}')
@@ -461,7 +506,7 @@ def main():
     root.withdraw()
     state_dir = Path(os.environ.get('LOCALAPPDATA', str(Path.home() / '.local' / 'state'))) / 'GAFGitCheckpointManager'
     try:
-        instance = SingleInstance(state_dir / 'manager.lock')
+        instance = SingleInstance(state_dir / 'manager.lock', identity='Local\\Tin0709.GAFGitCheckpointManager')
     except RuntimeError as error:
         messagebox.showinfo('Git Checkpoint Manager', str(error), parent=root)
         root.destroy()
