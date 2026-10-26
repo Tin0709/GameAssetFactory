@@ -11,6 +11,7 @@ const Model=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype
 const Combo=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combo_state.gd")
 const DirectionAdapter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/locomotion_direction.gd")
 const MovementMeter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/movement_meter.gd")
+const BodyStability=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/locomotion_stability.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 # Ordinary jump study timing; native MD2 launch/gravity have NOT been recovered.
@@ -38,6 +39,8 @@ var _weapon_attachment:BoneAttachment3D
 var effects:Node3D
 var direction_adapter:RefCounted
 var locomotion_direction_enabled:=true
+var body_stability_enabled:=true
+var body_stability:RefCounted
 var cadence_label:=""
 var current_speed:=0.
 var walk_speed:=2.16
@@ -144,6 +147,8 @@ func _ready()->void:
 		var animation:=animation_player.get_animation(clips[key].action)
 		assert(animation!=null,"Missing authored action "+key)
 		animation.loop_mode=Animation.LOOP_LINEAR if clips[key].loop else Animation.LOOP_NONE
+	if using_original_source:
+		body_stability=BodyStability.new();body_stability.setup(skeleton,animation_player,clips)
 	for index in face.mesh.get_blend_shape_count():
 		if face.mesh.get_blend_shape_name(index)=="Focused":_focus_index=index
 		elif face.mesh.get_blend_shape_name(index)=="Blink":_blink_index=index
@@ -235,6 +240,7 @@ func _physics_process(delta:float)->void:
 	physics_pose_ready.emit()
 
 func _animate(delta:float)->void:
+	if body_stability!=null:body_stability.restore()
 	if direction_adapter!=null:direction_adapter.restore()
 	simulation_clock+=delta;expression_clock+=delta
 	var selected:=_select_clip()
@@ -260,6 +266,9 @@ func _animate(delta:float)->void:
 				if moving_release or _jump_time>=float(clips.JumpLanding.duration):_jump_stage="";_jump_time=0.
 		_transition_time+=delta
 		if not _transition.is_empty() and _transition_time>=float(clips[_transition].duration):_transition=""
+	if body_stability!=null:
+		if body_stability_enabled and review_clip.is_empty() and _grounded and not combo.active() and (selected in GAITS or selected in ["Idle","CombatReady"]):body_stability.apply(selected,delta,selected in GAITS)
+		else:body_stability.deactivate()
 	if direction_adapter!=null:
 		var settling:bool=selected in ["Idle","CombatReady"] and absf(direction_adapter.current_yaw)>.0001
 		if locomotion_direction_enabled and review_clip.is_empty() and _grounded and not combo.active() and (selected in GAITS or settling):
@@ -318,6 +327,7 @@ func attack(value:bool)->void:
 	combo.attack(value,not _grounded)
 func review(key:String)->void:
 	if not clips.has(key):return
+	if body_stability!=null:body_stability.deactivate()
 	if direction_adapter!=null:direction_adapter.deactivate()
 	combo.cancel();release_inputs();review_clip=key;_review_time=0.;active_clip="";_play(key);animation_player.seek(0.,true)
 	presentation_reset.emit()
@@ -329,6 +339,9 @@ func force_blink()->void:_forced_blink=.16
 func set_locomotion_direction_adapter(value:bool)->void:
 	locomotion_direction_enabled=value
 	if not value and direction_adapter!=null:direction_adapter.deactivate()
+func set_body_stability(value:bool)->void:
+	body_stability_enabled=value
+	if not value and body_stability!=null:body_stability.deactivate()
 func set_movement_camera_basis(camera_basis:Basis)->void:
 	# The installed MD2 WASD reference mod also uses camera-relative input.
 	# These vectors are horizontal and orthonormal: diagonals retain unit length.
@@ -347,6 +360,7 @@ func _apply_face(delta:float)->void:
 func release_inputs()->void:
 	combo.release_inputs();combat_requested=false;has_aim_point=false;turn_axis=0.;requested_direction=Vector2.ZERO;requested_run=false;requested_jump=false;_jump_held=false
 func reset_actor()->void:
+	if body_stability!=null:body_stability.deactivate()
 	if direction_adapter!=null:direction_adapter.deactivate()
 	release_inputs();combo.cancel();global_position=Vector3.ZERO;velocity=Vector3.ZERO;current_speed=0.
 	review_clip="";active_clip="";_jump_stage="";_jump_time=0.;_heavy_slam_active=false;_transition="";_transition_time=0.;_grounded=false;_floor_initialized=false;_previous_combat=false

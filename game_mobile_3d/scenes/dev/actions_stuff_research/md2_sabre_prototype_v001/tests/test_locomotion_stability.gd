@@ -32,7 +32,7 @@ func run()->void:
 			check((max_head-min_head).y<1.6,"Head stabilization compensates spine change rather than doubling nod at%dHz"%hz)
 			trials.append({"hz":hz,"camera_yaw":yaw,"body_angle_range":str(max_body-min_body),"head_angle_range":str(max_head-min_head),"screen_lateral_velocity":screen_drift,"actor_heading_error":heading_error})
 	# Raw source review must bypass corrections, with no modified resource keys.
-	a.set_physics_process(false);a.review("Run");a._animate(.15);var reference:Array[Transform3D]=[]
+	a.set_physics_process(false);a.review("Run");a.animation_player.play(a.clips.Run.action,0.);a.animation_player.advance(0.);a._animate(.15);var reference:Array[Transform3D]=[]
 	for bone in rig.get_bone_count():reference.append(rig.get_bone_pose(bone))
 	a.animation_player.seek(.15,true);var unchanged:=true
 	for bone in rig.get_bone_count():unchanged=unchanged and rig.get_bone_pose(bone).is_equal_approx(reference[bone])
