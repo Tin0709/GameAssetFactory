@@ -20,8 +20,8 @@ Use MD2_RESEARCH_ROOT to select a restored research workspace elsewhere.
 
 Godot: run the root "Open Sabre Prototype.cmd", or in the existing Godot project
 open scenes/dev/ActionsStuffWalkRunTest.tscn and press F6 for direct Sabre entry.
-The root "Open Sabre Editor.cmd" opens the correct C:\Dev\GameAssetFactory
-project; the Desktop\Dev copy is an older separate checkout. The prototype's
+The root "Open Sabre Editor.cmd" opens this current Desktop\Dev\GameAssetFactory
+project. The user selected Desktop\Dev as the canonical workspace. The prototype's
 "Return to original Rifle / Sword lab" button retains the old experiment.
 No additional Godot project is created.
 

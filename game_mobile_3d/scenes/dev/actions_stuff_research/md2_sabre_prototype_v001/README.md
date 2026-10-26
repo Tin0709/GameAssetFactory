@@ -1,8 +1,10 @@
 # Player + Sabre prototype
 
 F6 in the existing `ActionsStuffWalkRunTest.tscn` now opens this prototype
-directly. Use `C:\Dev\GameAssetFactory\Open Sabre Editor.cmd` to select the
-correct project and scene; the older Desktop\Dev checkout is separate.
+directly. Use `game_mobile_3d/Open Sabre Editor.cmd` in the canonical
+`C:\Users\ADMIN\Desktop\Dev\GameAssetFactory` checkout to select this scene.
+The user chose Desktop\Dev as the main development location; prior C:\Dev work
+has been consolidated here and its earlier versions preserved outside Git.
 Launching the same scene with `--md2-sabre` also works.
 **Return to original Rifle / Sword lab** overrides even the command-line opt-in.
 Only the saved scene's Sabre entry flag changes. WorldMap, original actors,

@@ -3,14 +3,15 @@ PLAYER + ORIGINAL SABRE: PRIVATE FIDELITY PROTOTYPE
 
 Start the existing lab
 ----------------------
-Run C:\Dev\GameAssetFactory\Open Sabre Prototype.cmd.
+Run C:\Users\ADMIN\Desktop\Dev\GameAssetFactory\Open Sabre Prototype.cmd.
 Alternatively, open game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn in
-the existing Godot project at C:\Dev\GameAssetFactory, then press F6.
+the existing Godot project at C:\Users\ADMIN\Desktop\Dev\GameAssetFactory, then press F6.
 F6 now enters the Valorie/Sabre prototype directly. "Return to original Rifle /
 Sword lab" retains the old experiment; its entry button can switch back.
 Open Sabre Editor.cmd at the project root opens this exact project and scene.
-The older C:\Users\ADMIN\Desktop\Dev\GameAssetFactory copy is a separate
-checkout and does not contain this prototype; it is preserved as it was.
+This Desktop checkout is now the user's canonical project. The earlier C:\Dev
+work was consolidated here with verified backups; its location references in
+historical reports describe the earlier build, not the current development root.
 The project's WorldMap/main scene is preserved; this is an opt-in lab mode.
 
 WASD: walk. Shift: run. Space: jump. LMB or E: three-hit combo, hold or tap.
