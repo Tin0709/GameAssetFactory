@@ -6,47 +6,71 @@ from tkinter import ttk
 
 from .blender_views import VIEW_LABELS
 from .ui_widgets import (PAGE, CARD, TEXT, MUTED, Badge, Button, Disclosure,
-                         RoundedCard, ScrollablePage, StatusLight, font_size)
+                         RoundedCard, ScrollablePage, StatusLight, font_size, NumberInput, Toggle)
+
+
+def _dark_titlebar(root):
+    if os.name != 'nt':
+        return
+    def mapped(event):
+        if event.widget != root:
+            return
+        import ctypes
+        try:
+            user32 = ctypes.windll.user32
+            user32.GetAncestor.argtypes = [ctypes.c_void_p, ctypes.c_uint]
+            user32.GetAncestor.restype = ctypes.c_void_p
+            handle = user32.GetAncestor(root.winfo_id(), 2)
+            attribute = ctypes.windll.dwmapi.DwmSetWindowAttribute
+            attribute.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_void_p, ctypes.c_uint]
+            # Unsupported attributes on older Windows simply return HRESULT.
+            for key, value in [(20, 1), (35, 0x202020), (36, 0xEDEDED)]:
+                data = ctypes.c_uint(value)
+                attribute(handle, key, ctypes.byref(data), ctypes.sizeof(data))
+        except (AttributeError, OSError, tk.TclError):
+            pass
+    root.bind('<Map>', mapped, add='+')
 
 
 def build_layout(app):
     root = app.root
     root.title('Git Checkpoint Manager — GameAssetFactory & MD2')
-    root.geometry(f'{min(1280, root.winfo_screenwidth() - 80)}x{min(940, root.winfo_screenheight() - 100)}')
+    root.geometry(f'{min(1400, root.winfo_screenwidth() - 80)}x{min(980, root.winfo_screenheight() - 100)}')
     root.minsize(960, 660)
     root.configure(background=PAGE)
+    _dark_titlebar(root)
     style = ttk.Style(root)
     style.theme_use('clam')
     style.configure('.', font=('Segoe UI', font_size(9)))
     style.configure('TFrame', background=PAGE)
     style.configure('Page.TFrame', background=PAGE)
     style.configure('Card.TFrame', background=CARD)
-    style.configure('Line.TFrame', background='#1b2335')
+    style.configure('Line.TFrame', background='#333333')
     for name, options in {
         'Card': {}, 'Muted': {'foreground': MUTED, 'font': ('Segoe UI', font_size(8))},
-        'CardTitle': {'font': ('Segoe UI', font_size(11), 'bold'), 'foreground': '#f8fafc'},
-        'Title': {'font': ('Segoe UI', font_size(17), 'bold'), 'foreground': '#f8fafc'},
+        'CardTitle': {'font': ('Segoe UI', font_size(11), 'bold'), 'foreground': '#f4f4f4'},
+        'Title': {'font': ('Segoe UI', font_size(17), 'bold'), 'foreground': '#f4f4f4'},
         'DialogTitle': {'font': ('Segoe UI', font_size(14), 'bold')},
-        'Mono': {'foreground': '#a5b4fc', 'font': ('Consolas', font_size(8))},
-        'MonoMuted': {'foreground': '#71829e', 'font': ('Consolas', font_size(8))},
+        'Mono': {'foreground': '#9dbbe2', 'font': ('Consolas', font_size(8))},
+        'MonoMuted': {'foreground': '#979797', 'font': ('Consolas', font_size(8))},
     }.items():
         style.configure(name + '.TLabel', **{'background': CARD, 'foreground': TEXT, **options})
     style.configure('TCheckbutton', background=CARD, foreground=TEXT, padding=2, font=('Segoe UI', font_size(8)))
-    style.map('TCheckbutton', background=[('active', CARD)], indicatorbackground=[('selected', '#4f46e5'), ('!selected', PAGE)], indicatorforeground=[('selected', '#ffffff')])
-    style.configure('TSpinbox', fieldbackground=PAGE, foreground=TEXT, arrowcolor=MUTED, bordercolor='#273249', padding=3)
-    style.configure('Dark.Vertical.TScrollbar', background='#26324b', troughcolor=PAGE, arrowcolor=MUTED,
+    style.map('TCheckbutton', background=[('active', CARD)], indicatorbackground=[('selected', '#245a9a'), ('!selected', PAGE)], indicatorforeground=[('selected', '#ffffff')])
+    style.configure('TSpinbox', fieldbackground=PAGE, foreground=TEXT, arrowcolor=MUTED, bordercolor='#454545', padding=3)
+    style.configure('Dark.Vertical.TScrollbar', background='#444444', troughcolor=PAGE, arrowcolor=MUTED,
                     bordercolor=PAGE, lightcolor=PAGE, darkcolor=PAGE, borderwidth=0, width=10)
-    style.map('Dark.Vertical.TScrollbar', background=[('active', '#334155'), ('!active', '#26324b')])
-    style.configure('Dark.Horizontal.TScrollbar', background='#26324b', troughcolor=PAGE, arrowcolor=MUTED,
+    style.map('Dark.Vertical.TScrollbar', background=[('active', '#555555'), ('!active', '#444444')])
+    style.configure('Dark.Horizontal.TScrollbar', background='#444444', troughcolor=PAGE, arrowcolor=MUTED,
                     bordercolor=PAGE, lightcolor=PAGE, darkcolor=PAGE, borderwidth=0, width=10)
-    style.map('Dark.Horizontal.TScrollbar', background=[('active', '#334155'), ('!active', '#26324b')])
+    style.map('Dark.Horizontal.TScrollbar', background=[('active', '#555555'), ('!active', '#444444')])
     app.page = ScrollablePage(root)
     app.page.pack(fill='both', expand=True)
     app.page.blocked = lambda: app.dialog.active
     page = app.page.content
 
     def card():
-        frame = RoundedCard(page, padding=17)
+        frame = RoundedCard(page, padding=20)
         frame.pack(fill='x', pady=(0, 13))
         return frame.body
 
@@ -74,26 +98,32 @@ def build_layout(app):
 
     header = card()
     title = row(header)
+    brand = ttk.Frame(title, style='Card.TFrame')
+    brand.pack(side='left', fill='x', expand=True)
+    actions = ttk.Frame(title, style='Card.TFrame')
+    actions.pack(side='right', padx=(10, 0))
     assets = Path(__file__).with_name('assets')
     try:
-        app.header_icon = tk.PhotoImage(file=str(assets / 'checkpoint-manager-v2-48.png'))
-        ttk.Label(title, image=app.header_icon, style='Card.TLabel').pack(side='left', padx=(0, 12))
+        app.header_icon = tk.PhotoImage(file=str(assets / 'checkpoint-manager-v2-64.png'))
+        ttk.Label(brand, image=app.header_icon, style='Card.TLabel').pack(side='left', padx=(0, 14))
         if os.name == 'nt':
             root.iconbitmap(str(assets / 'checkpoint-manager-v2.ico'))
         else:
             root.iconphoto(True, app.header_icon)
     except tk.TclError:
         app.header_icon = None
-    heading = ttk.Frame(title, style='Card.TFrame')
+    heading = ttk.Frame(brand, style='Card.TFrame')
     heading.pack(side='left')
     ttk.Label(heading, text='Git Checkpoint Manager', style='Title.TLabel').pack(anchor='w')
     ttk.Label(heading, text='Checkpoint cục bộ · Push thủ công · Hai repository riêng biệt', style='Muted.TLabel').pack(anchor='w', pady=(3, 0))
-    Button(title, '✓  Bật tự commit cả hai', app.resume_all, kind='success').pack(side='right')
-    Button(title, '●  Tạm dừng tất cả', app.pause_all).pack(side='right', padx=8)
+    Button(actions, '✓  Bật tự commit cả hai', app.resume_all, kind='success').pack(side='right')
+    Button(actions, '●  Tạm dừng tất cả', app.pause_all).pack(side='right', padx=8)
+    responsive_pair(title, brand, actions)
     ttk.Frame(header, height=1, style='Line.TFrame').pack(fill='x', pady=(15, 12))
     toolbar = row(header)
     ttk.Label(toolbar, text='Quét mỗi', style='Muted.TLabel').pack(side='left')
-    ttk.Spinbox(toolbar, from_=10, to=3600, width=5, textvariable=app.interval_var).pack(side='left', padx=8)
+    app.interval_input = NumberInput(toolbar, app.interval_var, app.apply_interval)
+    app.interval_input.pack(side='left', padx=10)
     ttk.Label(toolbar, text='giây', style='Muted.TLabel').pack(side='left')
     Button(toolbar, 'Áp dụng', app.apply_interval, kind='subtle', small=True).pack(side='left', padx=8)
     mode = row(header, pady=(12, 0))
@@ -146,7 +176,9 @@ def build_layout(app):
         ttk.Label(metrics, textvariable=app.remote_extra_vars[index], style='MonoMuted.TLabel').pack(side='left')
         controls = ttk.Frame(summary, style='Card.TFrame')
         controls.pack(side='right', padx=(10, 0))
-        ttk.Checkbutton(controls, text='Tự commit', variable=app.auto_vars[index], command=lambda i=index: app.toggle_auto(i)).pack(side='left', padx=(0, 8))
+        toggle = Toggle(controls, app.auto_vars[index], lambda i=index: app.toggle_auto(i))
+        toggle.pack(side='left', padx=(0, 12))
+        app.auto_toggles.append(toggle)
         for label, command, kind in [
             ('Làm mới', app.refresh, 'ghost'), ('Xem thay đổi', lambda i=index: app.show_changes(i), 'ghost'),
             ('Commit ngay', lambda i=index: app.commit_now(i), 'primary'), ('Push', lambda i=index: app.push_now(i), 'ghost'),
@@ -159,11 +191,11 @@ def build_layout(app):
         app.repo_sections.append(section)
         details = section.content
         if config.require_private:
-            warning = tk.Frame(details, background='#251f15', highlightbackground='#574124', highlightthickness=1, padx=10, pady=9)
+            warning = tk.Frame(details, background='#302a1e', highlightbackground='#52462f', highlightthickness=1, padx=10, pady=9)
             warning.pack(fill='x', pady=(0, 10))
             tk.Label(warning, text='⚠  MD2: Push kiểm tra repo PRIVATE. Dữ liệu gốc trong Release snapshot không được cập nhật bởi Git commit/push.',
-                     background='#251f15', foreground='#fbbf24', font=('Segoe UI', font_size(8)), anchor='w', wraplength=930, justify='left').pack(fill='x')
-        path = tk.Label(details, text='▱  ' + str(config.path), background=PAGE, foreground='#9bb4dc', anchor='w', padx=10, pady=8, font=('Consolas', font_size(8)))
+                     background='#302a1e', foreground='#e9c46b', font=('Segoe UI', font_size(8)), anchor='w', wraplength=930, justify='left').pack(fill='x')
+        path = tk.Label(details, text='▱  ' + str(config.path), background=PAGE, foreground='#b3c3d8', anchor='w', padx=10, pady=8, font=('Consolas', font_size(8)))
         path.pack(fill='x', pady=(0, 9))
         grid = ttk.Frame(details, style='Card.TFrame')
         grid.pack(fill='x')
@@ -185,10 +217,10 @@ def build_layout(app):
     ttk.Label(title, text='●  NHẬT KÝ', style='Mono.TLabel').pack(side='left')
     ttk.Label(title, text='Trạng thái thời gian thực', style='MonoMuted.TLabel').pack(side='right')
     area = row(log, pady=(10, 0))
-    app.log_widget = tk.Text(area, height=6, background=PAGE, foreground='#b6c5e3', insertbackground=TEXT,
+    app.log_widget = tk.Text(area, height=6, background=PAGE, foreground='#d0d0d0', insertbackground=TEXT,
                              font=('Consolas', font_size(8)), relief='flat', borderwidth=0, wrap='word', padx=10, pady=8)
     scroll = ttk.Scrollbar(area, command=app.log_widget.yview, style='Dark.Vertical.TScrollbar')
     scroll.pack(side='right', fill='y')
     app.log_widget.pack(side='left', fill='both', expand=True)
     app.log_widget.configure(yscrollcommand=scroll.set, state='disabled')
-    ttk.Label(page, text='Đóng app = dừng hẹn giờ. Bỏ qua file đang ghi; không có thay đổi hợp lệ thì không tạo commit.', background=PAGE, foreground='#64748b', font=('Segoe UI', font_size(8))).pack(anchor='center', pady=(1, 8))
+    ttk.Label(page, text='Đóng app = dừng hẹn giờ. Bỏ qua file đang ghi; không có thay đổi hợp lệ thì không tạo commit.', background=PAGE, foreground='#929292', font=('Segoe UI', font_size(8))).pack(anchor='center', pady=(1, 8))

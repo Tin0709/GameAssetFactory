@@ -9,6 +9,7 @@ var clock:=0.
 var held:=false
 var buffer_until:=-1.
 var buffer_seconds:=.22
+var attack_play_rates:Array=[1.,1.,1.] # Source profile sets verified table rates.
 var serial:=0
 var _impact_sent:=false
 var _events:Array[Dictionary]=[]
@@ -20,6 +21,8 @@ func clip()->String:
 	if phase==&"air_attack":return "AirAttack"
 	return "CombatReady"
 func active()->bool:return phase!=&"ready"
+func playback_rate()->float:
+	return maxf(.001,float(attack_play_rates[index])) if phase==&"attack" else 1.
 func remaining()->float:
 	return maxf(0.,float(clips[clip()].duration)-time) if active() else INF
 func attack(value:bool,airborne:bool=false)->void:
@@ -46,13 +49,14 @@ func advance(delta:float)->void:
 	var left:=maxf(delta,0.)
 	while left>.00000001:
 		if not active():clock+=left;return
-		var segment:=minf(left,remaining())
+		var rate:=playback_rate()
+		var segment:=minf(left,remaining()/rate)
 		var previous:=time
-		time+=segment;clock+=segment;left-=segment
+		time+=segment*rate;clock+=segment;left-=segment
 		if phase in [&"attack",&"air_attack"] and not _impact_sent:
 			var gate:float=clips[clip()].vfx_window[0]
 			if previous<=gate and time>=gate:
-				_impact_sent=true;_events.append({"kind":"impact","index":index,"serial":serial,"clip":clip(),"at":clock-(time-gate)})
+				_impact_sent=true;_events.append({"kind":"impact","index":index,"serial":serial,"clip":clip(),"at":clock-(time-gate)/rate})
 		if remaining()<=.00000001:_finish()
 func drain_events()->Array[Dictionary]:
 	var result:=_events;_events=[];return result

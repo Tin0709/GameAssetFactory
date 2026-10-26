@@ -3,7 +3,7 @@
 ## Current supplied logo (v2)
 
 User supplied `C:/Users/ADMIN/Downloads/Geometric Network Cube Icon.png` on
-2026-10-26. The v2 PNG preserves its image pixels; the 48px header PNG and
+2026-10-26. The v2 PNG preserves its image pixels; the 48px/64px header PNGs and
 multi-size ICO are packaging conversions with Pillow. No new image generation
 or creative edit was performed. The v2 assets serve the header/window/taskbar
 and existing Desktop shortcut. Original v1 assets below remain preserved.

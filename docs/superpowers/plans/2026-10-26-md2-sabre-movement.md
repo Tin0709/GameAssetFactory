@@ -23,31 +23,43 @@
 
 ## Task1 — Physical pace, input and gait
 
-- [ ] Add real-actor tests proving ordinary human input reaches7, Shift2, diagonal same speed, actual distance, camera-relative directions, gait advances by travel/stride and raw review stays1x; watch pre-fix assertions fail.
-- [ ] Implement the minimal source-profile changes in actor.gd and mode.gd. Keep explicit scripted walk/run and independent attack/jump clocks.
-- [ ] Test coyote acceptance/rejection and one jump per press. Preserve original jump trajectory until actual native values can be read.
-- [ ] Update prior fixtures only where their documented superseded speed/control assumptions change; keep their underlying regression coverage.
+- [x] Add real-actor tests proving ordinary human input reaches7, Shift2, diagonal same speed, actual distance, camera-relative directions, gait advances by travel/stride and raw review stays1x; watch pre-fix assertions fail.
+- [x] Implement the minimal source-profile changes in actor.gd and mode.gd. Keep explicit scripted walk/run and independent attack/jump clocks.
+- [x] Test coyote acceptance/rejection and one jump per press. Preserve original jump trajectory until actual native values can be read.
+- [x] Update prior fixtures only where their documented superseded speed/control assumptions change; keep their underlying regression coverage.
 
 ## Task2 — Inspectable movement measurements
 
-- [ ] Test actual path/net distance, wall blocking, response95 and stop distance; do not integrate requested velocity as travelled distance.
-- [ ] Add bounded movement_meter.gd and native-sole snapshots; reset without moving the actor.
-- [ ] Add toggle/reset/save controls to existing CanvasLayer, compact bottom-right overlay. No new scene, resource/project settings or environment edits.
-- [ ] Save aggregate measurement results under private Research, not proprietary poses or resources in project/Git.
+- [x] Test actual path/net distance, wall blocking, response95 and stop distance; do not integrate requested velocity as travelled distance.
+- [x] Add bounded movement_meter.gd and native-sole snapshots; reset without moving the actor.
+- [x] Add toggle/reset/save controls to existing CanvasLayer, compact bottom-right overlay. No new scene, resource/project settings or environment edits.
+- [x] Save aggregate measurement results under private Research, not proprietary poses or resources in project/Git.
 
 ## Verification
 
 ## Task3 — User-reported motion softness, double image and stepping
 
-- [ ] Diagnose actual viewport scaling/AA and the source-specific presentation route. Preserve physical speed and original pose clocks.
-- [ ] Test full-resolution source display separately from lighting/shadow tiers; expose a reversible toggle, keep original A/B/tier semantics.
-- [ ] Test render-fraction interpolation for original32-bone skin, rigid Sabre and camera together; rendering must not write authoritative skeleton/capsule/markers/events. Exact endpoints including weapon scale and reset/teleport history.
-- [ ] Keep ribbon/particles on the same display time, preserving physical VFX sampling/events/pool limits.
-- [ ] Validate30/60Hz fractional render samples and native Mobile/D3D12 pixels. No TAA/motion blur/sharpening added. Standard one-physics-tick display delay is disclosed.
+- [x] Diagnose actual viewport scaling/AA and the source-specific presentation route. Preserve physical speed and original pose clocks.
+- [x] Test full-resolution source display separately from lighting/shadow tiers; expose a reversible toggle, keep original A/B/tier semantics.
+- [x] Test render-fraction interpolation for original32-bone skin, rigid Sabre and camera together; rendering must not write authoritative skeleton/capsule/markers/events. Exact endpoints including weapon scale and reset/teleport history.
+- [x] Keep ribbon/particles on the same display time, preserving physical VFX sampling/events/pool limits.
+- [x] Validate30/60Hz fractional render samples and native Mobile/D3D12 pixels. No TAA/motion blur/sharpening added. Standard one-physics-tick display delay is disclosed.
 
 ## Final verification
 
-- [ ] Meaningful Godot checks30/60Hz, existing Sabre suites, physics contact/phase/combo/audio regressions; all automated runs use Dummy audio.
-- [ ] Native Mobile/D3D12 run of this same scene, inspect the overlay and controls. Runtime frames verify this lab, never estimate original MD2 values from pixels.
-- [ ] Rehash original source GLB/showcase; audit diff for only controller/debug/tests/docs changes. No manual stage/commit while checkpoint manager is active.
-- [ ] Final independent review if available, fix substantive findings, rerun affected checks. Document remaining runtime/foot-contact/attack-root-motion uncertainties in existing module README.
+## Task4 — Subsequent user combat and camera steering
+
+- [x] Verify source Sabre AttackSpeedMultiplier1.2/1.2/1.0 in gameplay, preserving raw review1x and wall-time input buffering. Recoveries stay1x because their rate relationship is not established.
+- [x] Align private sample envelope targets and VFX windows with the configured motion rate, retaining source audio pitch.
+- [x] Apply the public HeavyJumpAttack GravityMultiplier2 only to source aerial attacks until physical landing. Ordinary jump remains the disclosed ballistic adapter. Test actual apex-to-floor travel at30/60Hz.
+- [x] Audit camera projection, direction, framing, damping and jump behavior; expose inspectable current values and a reproducible baseline reset. Do not substitute co-op4000 arm length for unverified solo configuration or calibrate native constants from video.
+- [x] Native same-scene combat/camera validation, source preservation hashes, final regression and independent review.
+
+- [x] Meaningful Godot checks30/60Hz, existing Sabre suites, physics contact/phase/combo/audio regressions; all automated runs use Dummy audio.
+- [x] Native Mobile/D3D12 run of this same scene, inspect the overlay and controls. Runtime frames verify this lab, never estimate original MD2 values from pixels.
+- [x] Rehash original source GLB/showcase; audit diff for only controller/debug/tests/docs changes. No manual stage/commit while checkpoint manager is active.
+- [x] Final independent review if available, fix substantive findings, rerun affected checks. Document remaining runtime/foot-contact/attack-root-motion uncertainties in existing module README.
+
+## Verified outcome
+
+2026-10-26: 857 checks across16 suites passed, plus same-scene native Mobile/D3D12 movement8frames, combat/camera8frames and virtual144Hz/60physics display continuity. Independent review P2 event-clock issue fixed and re-reviewed with no remaining P1/P2. Original GLB/showcase hashes unchanged; project/scene/environment files unchanged from task base. Both approved UE4SS starts failed before Lua and were rolled back. Native solo camera, ordinary jump and effective movement formulas remain unresolved; this completes the scoped playable fixes and audit, not a claim of exact engine equivalence.

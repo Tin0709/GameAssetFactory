@@ -5,8 +5,10 @@ const VOICE_CAPACITY:=4
 const MAX_PENDING:=8
 var voices:Array[AudioStreamPlayer]=[]
 var groups:Dictionary={}
+var clip_play_rates:Dictionary={}
 var pending:Array[Dictionary]=[]
 var is_event_valid:Callable
+var timeline_provider:Callable
 var available_count:=0
 var rejected_count:=0
 var event_count:=0
@@ -51,25 +53,31 @@ func setup(research_root:String)->void:
 			stream.loop=false;entries.append({"stream":stream,"source":entry.source,"delay":float(entry.get("trigger_delay_seconds",0.)),"peak":float(entry.get("sample_envelope_peak_seconds",0.)),"target":float(entry.get("motion_landmark_seconds",0.))});available_count+=1
 		groups[key]=entries
 
-func trigger_attack(_index:int,clip:String,serial:int)->void:
+func trigger_attack(_index:int,clip:String,serial:int,event_time:float=-1.)->void:
 	if not enabled or serial<=last_serial:return
 	if not groups.has(clip) or groups[clip].is_empty():return
 	last_serial=serial;last_sources.clear();event_count+=1
-	_schedule_group(clip,serial)
-	if clip=="Attack3":_schedule_group("Attack3Whoosh",serial)
+	var rate:=maxf(.001,float(clip_play_rates.get(clip,1.)))
+	var at:=event_time if event_time>=0. else clock
+	_schedule_group(clip,serial,rate,at)
+	if clip=="Attack3":_schedule_group("Attack3Whoosh",serial,rate,at)
 
-func _schedule_group(key:String,serial:int)->void:
+func _schedule_group(key:String,serial:int,rate:float,accepted_at:float)->void:
 	var entries:Array=groups.get(key,[])
 	if entries.is_empty():return
 	var index:int=int(_choices.get(key,0))%entries.size();_choices[key]=index+1
 	var entry:Dictionary=entries[index]
 	if pending.size()>=MAX_PENDING:pending.pop_front()
-	pending.append({"at":clock+float(entry.delay),"entry":entry,"serial":serial});last_sources.append(entry.source)
+	# Move the envelope peak, not the source sample pitch. Targets are source
+	# motion landmarks, not recovered native Wwise notifies.
+	var delay:=maxf(0.,float(entry.target)/rate-float(entry.peak))
+	pending.append({"at":accepted_at+delay,"entry":entry,"serial":serial});last_sources.append(entry.source)
 
 func _physics_process(delta:float)->void:advance(delta)
 
 func advance(delta:float)->void:
-	clock+=maxf(0.,delta)
+	# Source mode shares the actor timeline, including after mute/reset/review.
+	clock=maxf(0.,float(timeline_provider.call())) if timeline_provider.is_valid() else clock+maxf(0.,delta)
 	var future:Array[Dictionary]=[]
 	for event:Dictionary in pending:
 		if not enabled or (is_event_valid.is_valid() and not is_event_valid.call(int(event.serial))):continue

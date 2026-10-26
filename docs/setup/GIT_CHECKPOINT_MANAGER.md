@@ -23,8 +23,9 @@ Các file `checkpoint-manager-v2*` trong `scripts/checkpoint_manager/assets/`
 
 ## Giao diện thu gọn và thông báo trong app
 
-Bố cục navy/tím dùng các thẻ bo góc dựa theo mẫu ZIP bạn gửi. Chữ được tăng
-khoảng 20%; hàng nút Git tự xuống dòng khi cửa sổ hẹp. Cuộn trang để xem toàn bộ
+Bố cục dùng các thẻ bo góc dựa theo mẫu ZIP bạn gửi, với màu đen than/xám,
+chữ trắng dịu và nút chính xanh lam theo ảnh Codex bạn chọn sau đó. Chữ được tăng
+khoảng 44% sau hai lần tăng 20%; hàng nút Git tự xuống dòng khi cửa sổ hẹp. Cuộn trang để xem toàn bộ
 nội dung. Bấm **Chi tiết Git** để mở/thu gọn đường dẫn, nhánh, HEAD và số liệu;
 thẻ MD2 mở phần cảnh báo PRIVATE/Release ngay từ đầu.
 
@@ -35,6 +36,12 @@ push dùng cùng giao diện trong app, không mở hộp thoại Windows. Lỗi
 Output dài vẫn có trong nhật ký/bảng thay đổi, có thanh cuộn. Tự commit không
 hiện thông báo nổi mỗi lần để tránh làm phiền. **Push vẫn chạy ngay, không hỏi
 xác nhận.** Mở app lần hai đưa cửa sổ hiện tại lên trước.
+
+Viền bo góc được vẽ lấy mẫu lớn rồi thu nhỏ bằng Pillow để làm mịn cạnh;
+Pillow đã có trên máy hiện tại. Nếu thiếu Pillow ở máy khác, app vẫn dùng cách
+vẽ Tk dự phòng. Có thể cài `py -3 -m pip install Pillow` để có viền mịn như bản
+Windows hiện tại. Mỗi widget giữ một ảnh nền hiện tại, không chạy hiệu ứng nhấp
+nháy hoặc bộ hẹn giờ animation giao diện.
 
 ## Blender MCP và đèn trạng thái
 

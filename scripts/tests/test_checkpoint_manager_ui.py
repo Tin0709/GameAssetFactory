@@ -226,6 +226,16 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.app.notifications.kind, 'error')
         self.assertIn('10', self.app.notifications.message)
 
+    def test_notification_inside_modal_stays_in_its_grab_and_cleans_up(self):
+        self.app.dialog.show_details('Changes', 'Details')
+        self.app.notifications.show('Đang xử lý', 'Đợi thao tác Git hiện tại.')
+        self.root.update_idletasks()
+        self.assertIs(self.app.notifications.card.master, self.app.dialog.frame)
+        self.assertIsNotNone(self.app.notifications.timer)
+        self.app.dialog.close()
+        self.assertIsNone(self.app.notifications.card)
+        self.assertIsNone(self.app.notifications.timer)
+
     def test_changes_view_opens_inside_app_without_another_window(self):
         (self.configs[0].path / 'work.txt').write_text('new content')
         with patch('tkinter.Toplevel', side_effect=AssertionError('No secondary window')):

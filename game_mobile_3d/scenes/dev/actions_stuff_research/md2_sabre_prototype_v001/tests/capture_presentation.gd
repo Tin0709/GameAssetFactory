@@ -1,5 +1,6 @@
 extends SceneTree
 ## Our native display continuity probe, not an MD2 video measurement.
+## Invoke with --fixed-fps 144; the normal lab cap is120, not this virtual clock.
 var lab:Node3D
 var a:CharacterBody3D
 var mode:Node

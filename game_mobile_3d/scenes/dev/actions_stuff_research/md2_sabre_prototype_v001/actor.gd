@@ -3,6 +3,7 @@ extends CharacterBody3D
 ## adapter then redirects only the two legs. Review bypasses that adapter.
 ## The expression controller writes only the two face morph scalars.
 signal attack_accepted(index:int,clip:String,serial:int)
+signal attack_accepted_timed(index:int,clip:String,serial:int,simulation_time:float)
 signal impact_ready(index:int,base:Vector3,tip:Vector3,serial:int)
 signal physics_pose_ready
 signal presentation_reset
@@ -73,6 +74,7 @@ var _forced_blink:=0.
 var _jump_held:=false
 var _jump_stage:=""
 var _jump_time:=0.
+var _heavy_slam_active:=false
 var _transition:=""
 var _transition_time:=0.
 var _review_time:=0.
@@ -126,6 +128,8 @@ func _ready()->void:
 		# Slow Walk and stride references remain disclosed study adapters.
 		walk_speed=2.;run_speed=700./100.;coyote_time=.155
 		gravity=15. # Existing ballistic approximation; NOT inferred native physics.
+		# Public DT_MeleePropertyDefinition#44 Sabre variants, not a global speedup.
+		combo.attack_play_rates=[1.2,1.2,1.]
 		cadence_label="Table700 ×1 /100 =7 units/s · runtime unverified\nGait follows travel/stride · review1x"
 		direction_adapter=DirectionAdapter.new();direction_adapter.setup(skeleton,model)
 	combo.setup(clips)
@@ -174,6 +178,7 @@ func _physics_process(delta:float)->void:
 	if _move_requested:_last_run_gait=_run_requested
 	if _move_requested or jump_pressed:resume_gameplay()
 	var was_grounded:=is_on_floor() and velocity.y<=0.
+	if using_original_source and not was_grounded and combo.phase==&"air_attack":_heavy_slam_active=true
 	_time_since_grounded=0. if was_grounded else _time_since_grounded+delta
 	var speed:=run_speed if _run_requested else walk_speed
 	var desired:=stick.limit_length()*speed
@@ -181,11 +186,15 @@ func _physics_process(delta:float)->void:
 	# over their legs; this adapter can still exhibit some moving-attack foot slip.
 	if combo.active() and was_grounded:desired*=.22
 	var planar:=Vector2(velocity.x,velocity.z).move_toward(desired,(deceleration if stick.is_zero_approx() else acceleration)*delta)
-	velocity=Vector3(planar.x,-.2 if was_grounded else velocity.y-gravity*delta,planar.y)
+	# Public GA_HeavyJumpAttack GravityMultiplier2; native base jump remains unknown.
+	var gravity_factor:=2. if _heavy_slam_active else 1.
+	velocity=Vector3(planar.x,-.2 if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
 	if jump_pressed and (was_grounded or (using_original_source and _time_since_grounded<=coyote_time)):
 		combo.cancel();velocity.y=sqrt(2.*gravity*jump_height)-(gravity*delta*.5 if using_original_source else 0.);_jump_stage="JumpTakeoff";_jump_time=0.
+		_heavy_slam_active=false
 		_time_since_grounded=INF # Consume the coyote opportunity; no second air jump.
 	move_and_slide();_grounded=is_on_floor() and velocity.y<=0.
+	if _grounded:_heavy_slam_active=false
 	if _grounded and not was_grounded and _floor_initialized and _jump_stage!="JumpLanding":_jump_stage="JumpLanding";_jump_time=0.
 	elif not _grounded and _jump_stage.is_empty():_jump_stage="JumpAirborne";_jump_time=0.
 	_floor_initialized=_floor_initialized or _grounded
@@ -205,7 +214,7 @@ func _physics_process(delta:float)->void:
 	_gait_cycles_this_tick=0.
 	while left>.00000001:
 		var step:=minf(left,1./120.)
-		if combo.active():step=minf(step,combo.remaining())
+		if combo.active():step=minf(step,combo.remaining()/combo.playback_rate())
 		if step<.00000001:combo.advance(.00000001);continue
 		_animate(step);left-=step
 	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and not combo.active()) if direction_adapter!=null else []
@@ -218,6 +227,7 @@ func _animate(delta:float)->void:
 	var selected:=_select_clip()
 	_play(selected)
 	_playback_speed=1.
+	if review_clip.is_empty() and combo.active():_playback_speed=combo.playback_rate()
 	if review_clip.is_empty() and selected in GAITS:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
 		_playback_speed=maxf(0.,current_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
@@ -243,7 +253,9 @@ func _animate(delta:float)->void:
 	_refresh_markers()
 	_apply_face(delta)
 	for event:Dictionary in combo.drain_events():
-		if event.kind=="accepted":accepted_count+=1;attack_accepted.emit(event.index,event.clip,event.serial)
+		if event.kind=="accepted":
+			accepted_count+=1;attack_accepted.emit(event.index,event.clip,event.serial)
+			attack_accepted_timed.emit(event.index,event.clip,event.serial,simulation_clock-(combo.clock-float(event.at)))
 		elif event.kind=="impact":impact_count+=1;impact_ready.emit(event.index,marker_base.global_position,marker_tip.global_position,event.serial)
 	if effects!=null:
 		var active:=false
@@ -322,7 +334,7 @@ func release_inputs()->void:
 func reset_actor()->void:
 	if direction_adapter!=null:direction_adapter.deactivate()
 	release_inputs();combo.cancel();global_position=Vector3.ZERO;velocity=Vector3.ZERO;current_speed=0.
-	review_clip="";active_clip="";_jump_stage="";_jump_time=0.;_transition="";_transition_time=0.;_grounded=false;_floor_initialized=false;_previous_combat=false
+	review_clip="";active_clip="";_jump_stage="";_jump_time=0.;_heavy_slam_active=false;_transition="";_transition_time=0.;_grounded=false;_floor_initialized=false;_previous_combat=false
 	accepted_count=0;impact_count=0
 	_last_run_gait=false
 	_time_since_grounded=INF

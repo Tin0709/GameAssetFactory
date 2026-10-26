@@ -70,6 +70,25 @@ func run()->void:
 	a.is_event_valid=func(_serial:int)->bool:return false
 	a.trigger_attack(0,"Attack1",106);var played:int=a.played_count;a.advance(1.)
 	check(a.played_count==played and a.pending.is_empty(),"Interrupted attacks cannot emit delayed swing sounds")
+	a.is_event_valid=Callable();a.reset()
+	if a.get("clip_play_rates")!=null:
+		a.clip_play_rates={"Attack1":1.2,"Attack2":1.2,"Attack3":1.}
+		a.trigger_attack(0,"Attack1",107)
+		var scheduled:Dictionary=a.pending[0];var entry:Dictionary=scheduled.entry
+		check(absf(float(scheduled.at)+float(entry.peak)-float(entry.target)/1.2)<.000001,"Configured faster source pose keeps audio envelope peak aligned")
+		check(a.voices[0].pitch_scale==1.,"Faster source pose does not pitch-shift original Sabre samples")
+	else:check(false,"Audio exposes independent per-clip motion-rate alignment")
+	var accepts_time:=false
+	for method:Dictionary in a.get_method_list():
+		if method.name=="trigger_attack":accepts_time=method.args.size()==4
+	check(accepts_time,"Audio accepts exact sub-tick source event timestamp")
+	if accepts_time:
+		a.reset();a.clock=.3333333333;a.trigger_attack(1,"Attack2",108,.3611111111)
+		var timed:Dictionary=a.pending[0]
+		check(absf(float(timed.at)-(.3611111111+maxf(0.,float(timed.entry.target)/1.2-float(timed.entry.peak))))<.000001,"Chained sound uses accepted event time rather than physics tick start")
+		a.timeline_provider=func()->float:return 20.3333333333
+		a.enabled=false;a.enabled=true;a.trigger_attack(0,"Attack1",109,20.3);var before_unmute:int=a.played_count;a.advance(1./30.)
+		check(a.played_count==before_unmute+1 and a.pending.is_empty(),"Mute/reset cannot desynchronize source audio from an actor already20seconds into gameplay")
 	var report:={"checks":checks,"failures":failures,"available_sources":a.available_count,"voice_capacity":a.voices.size(),"native_mixer_recovered":false}
 	var dir:="res://.validation/md2_sabre_prototype_v001"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))

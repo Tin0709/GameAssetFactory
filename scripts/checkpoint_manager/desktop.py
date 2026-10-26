@@ -91,6 +91,7 @@ class CheckpointApp:
         self.snapshots = [None] * len(configs)
         self.last_checkpoint = ['—'] * len(configs)
         self.auto_vars = [tk.BooleanVar(root, False) for _ in configs]
+        self.auto_toggles = []
         self.auto_permits = [threading.Event() for _ in configs]
         self.repo_text = [tk.StringVar(root, 'Đang đọc trạng thái…') for _ in configs]
         self.pending_push_vars = [tk.StringVar(root, 'Chưa push: —') for _ in configs]
@@ -104,8 +105,10 @@ class CheckpointApp:
         self.upstream_detail_vars = [tk.StringVar(root, '—') for _ in configs]
         self.checkpoint_detail_vars = [tk.StringVar(root, '—') for _ in configs]
         self.counts_detail_vars = [tk.StringVar(root, 'Đang đọc…') for _ in configs]
-        self.notifications = Notifications(root)
         self.dialog = InAppDialog(root)
+        self.notifications = Notifications(root, host=lambda: self.dialog.frame if self.dialog.active else root)
+        self.dialog.on_open = self.notifications.close
+        self.dialog.on_close = self.notifications.close
         self.last_issue_messages = [''] * len(configs)
         self.interval_var = tk.StringVar(root, str(interval))
         self.mode_var = tk.StringVar(root, 'ĐÃ TẠM DỪNG • Kiểm tra thay đổi trước khi bật tự commit')
@@ -152,7 +155,7 @@ class CheckpointApp:
             return False
         self.busy = True
         self.busy_indices = tuple(range(len(self.configs))) if indices is None else tuple(indices)
-        self.activity_light.set('working')
+        self.activity_light.set('working', 'Đang xử lý')
         for index in self.busy_indices:
             self.repo_lights[index].set('working', label)
         def run():
@@ -290,7 +293,8 @@ class CheckpointApp:
         self.mode_var.set(f'TỰ COMMIT ĐANG BẬT: {count}/{len(self.configs)} REPO • Push vẫn thủ công' if count else 'ĐÃ TẠM DỪNG • Chỉ quét, không tự commit')
         self.mode_badge.set_kind('success' if count else 'neutral')
         if not self.busy:
-            self.activity_light.set('error' if any(self.repo_issues) else 'ok' if count else 'idle')
+            self.activity_light.set('error' if any(self.repo_issues) else 'ok' if count else 'idle',
+                                    'Cần kiểm tra' if any(self.repo_issues) else 'Đang bật' if count else 'Tạm dừng')
             for index, variable in enumerate(self.auto_vars):
                 if self.repo_issues[index]:
                     self.repo_lights[index].set('error', 'Cần kiểm tra')

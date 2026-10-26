@@ -35,3 +35,12 @@ design; implement inline without another preference/approval round.
 5. Fresh read-only review for lifecycle, modal interaction, scrolling and Git
    behavior. Reopen the actual app with the previously authorized auto-commit
    mode. Preserve any pre-existing staged work; never auto-push for this task.
+
+## Follow-up direction during implementation
+
+User requested two successive 20% font increases (about44% over initial design),
+a refined spacing pass, smoother corners, then a Codex-like charcoal/gray/blue
+palette. Apply those final preferences rather than the original navy/indigo.
+Header/repo controls wrap at narrow widths. Pillow (already available) provides
+3x supersampled corners with one cached surface per widget; Tk is the fallback.
+The modal owns any toast shown during its grab and cancels it on dismissal.

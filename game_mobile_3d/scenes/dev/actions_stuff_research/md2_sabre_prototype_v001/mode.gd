@@ -22,6 +22,8 @@ var actions:OptionButton
 var expression:OptionButton
 var movement_panel:PanelContainer
 var movement_label:Label
+var camera_label:Label
+var _launch_camera:Dictionary={}
 var render_presenter:Node
 var native_pixels:=true
 var _right_held:=false
@@ -39,6 +41,7 @@ static func install_entry_button(scene:Node3D)->void:
 		scene.get_tree().change_scene_to_file(LAB_SCENE))
 func setup(scene:Node3D)->void:
 	lab=scene;process_physics_priority=-10
+	_launch_camera={"azimuth":lab.azimuth,"elevation":lab.elevation,"size":lab.camera_size}
 	lab._build_environment()
 	actor=Actor.new();actor.name="SabrePrototypePlayer"
 	actor.prefer_private_skin=bool(get_tree().get_meta("md2_sabre_private_skin_selected",true))
@@ -49,7 +52,9 @@ func setup(scene:Node3D)->void:
 	if actor.using_private_skin:
 		reference_audio=ReferenceAudio.new();reference_audio.name="PrivateReferenceAudio";add_child(reference_audio)
 		var research_root:String=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir()
-		reference_audio.setup(research_root);actor.attack_accepted.connect(reference_audio.trigger_attack)
+		reference_audio.setup(research_root);actor.attack_accepted_timed.connect(reference_audio.trigger_attack)
+		reference_audio.timeline_provider=func()->float:return actor.simulation_clock
+		if actor.using_original_source:reference_audio.clip_play_rates={"Attack1":1.2,"Attack2":1.2,"Attack3":1.}
 		reference_audio.is_event_valid=func(serial:int)->bool:return actor.combo.serial==serial and actor.combo.active() and actor.review_clip.is_empty()
 	lab.camera=Camera3D.new();lab.camera.name="GameplayCamera";lab.camera.projection=Camera3D.PROJECTION_ORTHOGONAL
 	lab.camera.size=lab.camera_size;lab.camera.far=maxf(150.,lab.grass_field_blocks*4.) if lab.grass_field_enabled else 150.;lab.add_child(lab.camera);lab.camera.make_current()
@@ -85,7 +90,7 @@ func _build_ui()->void:
 	if actor.using_original_source:
 		var count:=Label.new();count.text="22 semantic states · %d original clips · %d aliases"%[actor.source_clip_count,actor.source_alias_count];box.add_child(count)
 		var calibration:=Label.new();calibration.text=actor.cadence_label;calibration.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;calibration.custom_minimum_size.x=318;calibration.add_theme_font_size_override("font_size",11);box.add_child(calibration)
-	var hints:=Label.new();hints.text=("WASD normal7 · Shift slow Walk · Space jump" if actor.using_original_source else "WASD walk · Shift run · Space jump")+"\nLMB / E: three-hit combo (hold or tap)\nRMB: combat strafe + mouse ground aim\nQ / C: turn · Middle drag: orbit · Wheel: zoom\nR reset · V overview · F3 meter · F4 zero";box.add_child(hints)
+	var hints:=Label.new();hints.text=("WASD normal7 · Shift slow Walk · Space jump" if actor.using_original_source else "WASD walk · Shift run · Space jump")+"\nLMB / E: combo · in air: downward attack\nRMB: combat strafe + mouse ground aim\nQ / C: turn · Middle drag: orbit · Wheel: zoom\nR reset · V overview · F3 meter · F4 zero · F8 camera";box.add_child(hints)
 	actions=OptionButton.new();actions.name="AuthoredActionSelector";actions.focus_mode=Control.FOCUS_NONE
 	for key:String in actor.clips:
 		actions.add_item(action_caption(key));actions.set_item_metadata(actions.item_count-1,key)
@@ -122,16 +127,18 @@ func _build_ui()->void:
 	_build_movement_panel()
 func _build_movement_panel()->void:
 	movement_panel=PanelContainer.new();movement_panel.name="MovementMeasurements";canvas.add_child(movement_panel)
-	movement_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);movement_panel.offset_left=-420;movement_panel.offset_right=-18;movement_panel.offset_top=-250;movement_panel.offset_bottom=-18
+	movement_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);movement_panel.offset_left=-420;movement_panel.offset_right=-18;movement_panel.offset_top=-350;movement_panel.offset_bottom=-18
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.035,.045,.9);style.set_content_margin_all(9);style.set_corner_radius_all(5);movement_panel.add_theme_stylebox_override("panel",style)
 	var box:=VBoxContainer.new();movement_panel.add_child(box)
 	var heading:=Label.new();heading.text="MOVEMENT METER · actual physics travel";heading.add_theme_font_size_override("font_size",12);box.add_child(heading)
 	movement_label=Label.new();movement_label.add_theme_font_size_override("font_size",12);box.add_child(movement_label)
+	camera_label=Label.new();camera_label.add_theme_font_size_override("font_size",12);box.add_child(camera_label)
 	var row:=HBoxContainer.new();box.add_child(row)
 	var zero:=_button("Reset meter · F4",row);zero.pressed.connect(actor.reset_movement_measurements)
 	var save:=_button("Save JSON",row);save.tooltip_text="Save aggregate measurements in private Research; no animation/mesh export.";save.pressed.connect(func():
-		var path:String=actor.save_movement_measurements();save.text="Saved" if not path.is_empty() else "Save failed";save.tooltip_text=path;print("SABRE_MOVEMENT_SAVED ",path))
+		var path:=save_measurements();save.text="Saved" if not path.is_empty() else "Save failed";save.tooltip_text=path;print("SABRE_MOVEMENT_SAVED ",path))
 	var hide:=_button("Hide · F3",row);hide.pressed.connect(func():movement_panel.hide())
+	row=HBoxContainer.new();box.add_child(row);var camera_reset:=_button("Reset launch camera · F8",row);camera_reset.pressed.connect(reset_camera)
 	if actor.using_original_source:
 		row=HBoxContainer.new();box.add_child(row)
 		var pixels:=CheckButton.new();pixels.text="Native pixels100%";pixels.button_pressed=true;pixels.focus_mode=Control.FOCUS_NONE;row.add_child(pixels);pixels.toggled.connect(set_native_pixels)
@@ -181,6 +188,19 @@ func present(delta:float)->void:
 		var right:String="—" if m.sole_speed[1]<0. else "%.2f"%m.sole_speed[1]
 		var response:String="—" if m.response_95<0. else "%d ms"%roundi(m.response_95*1000.)
 		movement_label.text="Speed %.2f / target %.2f u/s · peak %.2f\nPath %.2f · net %.2f units · %.1f s\nGait %.2f cycles/s · %.3fx · total %.2f\nStart95 %s · stop %.3fu / %.3fs\nSole candidates L %s / R %s u/s\nSole motion includes rolling; native rates unverified"%[m.speed,m.target_speed,m.peak_speed,m.distance,m.net_distance,m.elapsed,m.cycle_hz,m.play_rate,m.gait_cycles,response,m.stop_distance,m.stop_seconds,left,right]
+		var c:=camera_measurements()
+		camera_label.text="Camera adapter · %s %.2f\nYaw %.2f° · elevation %.2f° · arm %.2fu\nNative MD2 solo camera values unresolved"%[c.projection,c.orthographic_span,c.azimuth_deg,c.elevation_deg,c.arm_distance]
+func camera_measurements()->Dictionary:
+	var outward:Vector3=lab.camera.global_basis.z
+	var target:Vector3=Vector3(0,.5,0) if lab.grass_overview else lab.camera_anchor
+	return {"projection":"orthographic" if lab.camera.projection==Camera3D.PROJECTION_ORTHOGONAL else "perspective","orthographic_span":lab.camera.size,"azimuth_deg":rad_to_deg(atan2(outward.x,outward.z)),"elevation_deg":rad_to_deg(asin(clampf(outward.y,-1.,1.))),"arm_distance":lab.camera.global_position.distance_to(target),"viewport_pixels":[int(lab.get_viewport().get_visible_rect().size.x),int(lab.get_viewport().get_visible_rect().size.y)],"horizontal_response_adapter":lab.CAMERA_HORIZONTAL_RESPONSE,"vertical_response_adapter":lab.CAMERA_VERTICAL_RESPONSE,"air_up_zone_adapter":lab.CAMERA_AIR_UP_ZONE,"air_down_zone_adapter":lab.CAMERA_AIR_DOWN_ZONE,"overview":lab.grass_overview,"native_md2_solo_verified":false}
+func reset_camera()->void:
+	lab.azimuth=float(_launch_camera.azimuth);lab.elevation=float(_launch_camera.elevation);lab.camera_size=float(_launch_camera.size);lab.grass_overview=false;lab.orbiting=false;lab._camera_initialized=false;lab._update_camera(1./60.,display_position())
+func save_measurements()->String:
+	var path:String=actor.save_movement_measurements()
+	if path.is_empty():return ""
+	var report:Dictionary=JSON.parse_string(FileAccess.get_file_as_string(path));report["camera"]=camera_measurements()
+	FileAccess.open(path,FileAccess.WRITE).store_string(JSON.stringify(report,"\t"));return path
 func display_position()->Vector3:
 	return render_presenter.display_actor if render_presenter!=null else actor.global_position
 func input(event:InputEvent)->void:
@@ -204,6 +224,7 @@ func unhandled_input(event:InputEvent)->void:
 		elif code==KEY_V and event.pressed:lab.grass_overview=not lab.grass_overview;lab._camera_initialized=false
 		elif code==KEY_F3 and event.pressed:movement_panel.visible=not movement_panel.visible
 		elif code==KEY_F4 and event.pressed:actor.reset_movement_measurements()
+		elif code==KEY_F8 and event.pressed:reset_camera()
 	if event is InputEventMouseButton:
 		if event.button_index==MOUSE_BUTTON_LEFT:_left_held=event.pressed;actor.attack(_left_held or _e_held);get_viewport().set_input_as_handled()
 		elif event.button_index==MOUSE_BUTTON_RIGHT:_right_held=event.pressed;actor.combat_requested=_right_held

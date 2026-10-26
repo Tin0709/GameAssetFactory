@@ -14,10 +14,12 @@ old command-line experiment; its **Player + Sabre prototype** button returns her
 In the original-source profile, WASD uses normal **7 units/s** travel; Shift
 selects the existing **2 units/s** slow study Walk. The authored fallback retains
 WASD Walk / Shift Run. Space jumps; LMB/E holds or buffers a three-hit combo.
-RMB keeps combat facing toward the mouse's ground intersection and enables the
-authored combat movement clips. Q/C turns; middle drag orbits; wheel zooms;
+RMB keeps combat facing toward the mouse's ground intersection and selects
+combat locomotion (declared Idle/Walk/Run aliases in the source profile).
+Q/C turns; middle drag orbits; wheel zooms;
 R resets; V shows the existing grass overview. F3 toggles the movement meter;
-F4 resets only its measurements. **Save JSON** writes aggregates to private
+F4 resets only its measurements. F8 restores the launch camera after orbit,
+zoom or overview. **Save JSON** writes aggregates and camera settings to private
 Research. GUI presses are consumed before
 world attacks; releases and focus loss clear held commands.
 
@@ -31,8 +33,9 @@ therefore selects CombatStrafeLeft; Q rotates the face toward that same left sid
 
 The action selector exposes all 22 clips. Selecting a clip enters review, with an
 optional repeating loop. Movement, jump or attack resumes gameplay immediately.
-Face Auto follows combat, Neutral/Focused override it, and Blink tests the same
-independent morph controller used by the simulation's periodic blink.
+Source facial bone channels remain active. Focused/Blink add optional authored
+morph overlays; Source/Neutral disables those overlays. In the authored fallback,
+Auto follows combat and supplies periodic blinking.
 
 ## Appearance and file boundary
 
@@ -82,7 +85,9 @@ lab's1.2 multiplier. Slow Walk2 is a study adapter. Its **stride references rema
 Walk2.0/Run5.6**, derived from the earlier stance fit, not native speed settings.
 Cadence follows actual post-collision travel divided by these references: Run7
 produces1.25× gameplay sampling, not an arbitrary aesthetic multiplier or a
-recovered MD2 play-rate formula. Raw review, attacks and jump clocks remain1×.
+recovered MD2 play-rate formula. Raw review and jump clips remain1×. Gameplay
+Sabre attacks use their public per-variant rates1.2/1.2/1; recoveries stay1×
+because their native montage-rate relationship is not established.
 Blocked travel produces zero gait advance. Run's asymmetric stance paths still
 prevent a claim of perfect bilateral foot locking. Gaits persist through braking before Idle, and
 locomotion switches retain normalized cycle phase with an80ms blend.
@@ -113,12 +118,21 @@ effective active-player values are not recovered locally. Base1 is the chosen
 bare prototype profile; no unsupported boost curve is invented. Sabre's table
 contains per-variant AttackSpeedMultiplier1.2/1.2/1 and montage references, but
 no attacker travel/root-motion settings. Its knockback control-disable fields
-belong to hit-target knockback, not an attacker lock. This movement correction
-preserves the previously verified attack timeline.
+belong to hit-target knockback, not an attacker lock. Gameplay now applies those
+three attack rates without rewriting source keys: Attack1.433333/1.2=.361111s,
+Attack2.4/1.2=.333333s, Attack3.666667/1=.666667s. The220ms input buffer remains
+wall time, and source VFX gates map through each clip's rate. The exact montage
+sections and effective runtime attack-speed composition are still unverified.
 
 Acceleration48, braking42, turn cap12rad/s, attack travel.22, ballistic jump and
 camera remain disclosed lab adapters. The public player's heavy-jump-attack
-GravityMultiplier2 is a separate ability, not applied to ordinary jumping.
+GravityMultiplier2 is applied only after an airborne source attack, until actual
+floor contact, including if its pose clip finishes during a long fall. It is not
+applied to ordinary jumping. Activation height-limit semantics, launch-velocity
+handoff, source montage physics and landing notify alignment remain unresolved.
+With the retained1.2-unit/15-gravity jump adapter, actual apex-to-floor travel is
+.400s normally and .267/.283s for the aerial attack at30/60Hz. These are measured
+prototype results, not recovered MD2 flight times.
 Native blending/root-motion/attack movement remain unresolved.
 
 A second, pinned public extraction snapshot corroborates the player row:
@@ -130,9 +144,9 @@ do not establish this solo player's view or projection, so the existing camera
 is preserved. TypeAttributeModifiers is empty in these two rows; that is not
 proof that equipment, effects or other runtime modifiers are absent.
 
-An approved UE4SS3.0.1-1183 experimental read-only attempt crashed during stock
-startup before Lua initialized. The single added dwmapi.dll was moved back to
-Research, existing Native Loader winmm.dll hash stayed unchanged, and zero
+Approved UE4SS3.0.1-1183 crashed before Lua initialized, both with the existing
+Native Loader and in a controlled isolated attempt. Its added dwmapi.dll was
+removed, existing Native Loader winmm.dll restored with the same hash, and zero
 runtime values were obtained. No console unlock or protection bypass was used.
 
 The meter computes planar path/net distance and speed from actual position
@@ -159,6 +173,41 @@ whiff hitstop in this mode. Ribbon points follow exported SabreBladeBase/Tip nod
 the ribbon holds at most 28 samples and particles use a fixed pool of 48. Original
 Sabre OGG samples are decoded from Research into a bounded four-voice prototype
 mix; sample triggering/layering does not reconstruct the original Wwise graph.
+Scheduling retains exact accepted-event times even when a faster combo section
+starts inside a physics tick. Audio shares the actor's timeline across mute,
+reset and review, without changing original sample pitch. Envelope landmarks are
+our reconstruction; two variants would need a negative start delay at1.2×, so
+the start clamps to the accepted event and leaves up to14ms peak mismatch.
+Physics-tick dispatch and device latency also remain; no sample-accurate native
+event/mixer match is claimed.
+
+## Motion clarity and camera audit
+
+Source mode uses100% render resolution by default instead of Medium's85%
+bilinear upscale. **Native pixels100%** is reversible and follows the selected
+lighting tier/Original A/B scale when off; grass, lights and shadows stay intact.
+TAA, screen-space AA and motion blur were not enabled in the measured viewport.
+
+The source32-joint skin, rigid Sabre, ribbon, particles and camera now share a
+render-fraction presentation timeline. It uploads interpolated poses only to
+RenderingServer, leaving physical skeleton/capsule/markers/event clocks intact.
+**Smooth display** disables it for comparison. Standard interpolation adds up
+to one physics tick of display delay; it does not add a temporal image trail.
+Bounded histories retain just-expired VFX through that display delay. Exact
+endpoints preserve original weapon scale. Native virtual144Hz/60physics samples
+show0 held display frames versus84 held physical samples in144 observations.
+This is a continuity probe, not a performance benchmark or phone result. Run
+`capture_presentation.gd` with `--fixed-fps 144`; assuming144 while running the
+ordinary120 cap gives invalid
+speed normalization. The failed ordinary-cap diagnostic is retained in Research.
+
+The camera meter reports the actual camera basis, including V overview, plus
+projection, span, arm distance, viewport and disclosed damping adapters. At
+launch it remains orthographic14.5, azimuth37.815°, elevation22.918°, arm20.139u,
+horizontal response12/vertical8. Ordinary jump anchorY span is<.0004u at30/60Hz.
+F8 restores that recorded launch framing; it does not claim a recovered MD2 view.
+The solo projection/FOV/rotation/zoom and speed-sensitive controller formula
+remain unknown. Co-op arm4000 is insufficient evidence to replace these values.
 
 Source metallic maps are retained. An optional actor-only ReflectionProbe captures
 the local world/sky: receive mask2, capture mask1, ambient override disabled.
@@ -168,7 +217,9 @@ It leaves the lab Environment and grass unchanged. The probe recenters in coarse
 
 ## Verification
 
-Run `tests/test_state.gd`, `tests/test_runtime.gd`, `tests/test_mode_switch.gd`,
+Run all `tests/test_*.gd`, including source-combat timing, camera audit,
+presentation and effect-history checks; the earlier core suites are
+`tests/test_state.gd`, `tests/test_runtime.gd`, `tests/test_mode_switch.gd`,
 `tests/test_review.gd`, `tests/test_facing.gd`, `tests/test_source_profile.gd`,
 `tests/test_motion_calibration.gd`, `tests/test_locomotion_direction.gd`, and `tests/test_private_loading.gd`
 with Godot `--headless --path <existing-project>
