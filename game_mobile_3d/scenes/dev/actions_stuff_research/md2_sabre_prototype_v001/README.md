@@ -95,7 +95,7 @@ regions now retain their exact original head-relative expression transforms.
 Fractional rendering also interpolates these roots relative to the displayed
 head, then rebuilds pupil descendants, rather than cutting a straight chord
 between independent neck-local positions. Natural source blinks remain active.
-Native front-facing Run/Walk: the reproduced prior bug lost eyes in14/32 and
+Native front-facing Run/Walk: the reproduced prior bug lost eyes in15/32 and
 22/32frames; all64corrected frames keep them visible with the original material,
 no mesh/texture edits or depth-offset workaround. Gait-to-combat fractional tests
 bound head-relative error below2.4e-7 while exact endpoints remain unchanged.
