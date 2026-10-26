@@ -20,6 +20,7 @@ func run()->void:
 			a.requested_direction=[Vector2(0,-1),Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT][int(i/(hz/2))%4]
 			await tick();path+=Vector2(a.position.x-previous.x,a.position.z-previous.z).length();previous=a.position;peak=maxf(peak,a.current_speed)
 		check(path<.005 and peak<.005,"Held ground combo cannot skate from movement input or pre-attack momentum at%dHz"%hz)
+		check(a.movement_measurements().attack_travel_adapter==0.,"Source measurements report anchored input travel rather than superseded22percent adapter")
 		check(a.accepted_count>=3 and a.impact_count>=3,"Anchoring preserves complete combo/events at%dHz"%hz)
 		a.attack(false);a.requested_direction=Vector2(0,-1);await ticks(hz)
 		check(a.active_clip=="Run" and absf(a.current_speed-7.)<.01,"Release resumes normal movement after the active strike at%dHz"%hz)
@@ -32,7 +33,9 @@ func run()->void:
 		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;a.combo.phase=&"recovery";a.combo.index=0;a.combo.time=.01
 		await tick();check(not a.combo.active() and a.active_clip=="Run","Unqueued recovery yields to intentional movement at%dHz"%hz)
 		# The accepted jump trajectory and air steering are separate from ground planting.
-		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;a.attack(true);a.requested_jump=true;await tick();a.requested_jump=false;await ticks(6)
+		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;await ticks(hz/2);a.attack(true);a.requested_jump=true;await tick()
+		check(absf(a.current_speed-7.)<.01,"Simultaneous attack and jump retains full running launch speed at%dHz"%hz)
+		a.requested_jump=false;await ticks(6)
 		check(a.velocity.y>0. and a.current_speed>1. and not a.combo.active(),"Jump cancels ground anchor and retains air movement at%dHz"%hz)
 		trials.append({"hz":hz,"two_second_held_attack_path":path,"maximum_ground_attack_speed":peak})
 	var out:={"checks":checks,"failures":failures,"trials":trials,"native_root_motion_recovered":false}
