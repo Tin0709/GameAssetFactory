@@ -62,4 +62,12 @@
 
 ## Verified outcome
 
+## Task5 — User follow-up: ordinary jump still floats
+
+- [ ] Reproduce ordinary jump at30/60Hz and separate capsule flight from source takeoff/landing clips. Check remaining accessible evidence without repeating failed injection/extraction.
+- [ ] Write failing real-collision tests for a declared faster jump adapter: preserve1.2-unit height, target.25s ascent/.50s ordinary flight; fixed source pose playback1x. Source native gravity/launch remain unknown.
+- [ ] Change source-profile gravity only to2h/t²=38.4; keep grounded speed, camera, source assets and fallback unchanged. Transition takeoff by physical apex/ceiling rather than a.4s clip timer; allow moving landing to release after.05s, stationary original landing remains complete.
+- [ ] Validate normal jump, hold/no air repeat, ledge/coyote, ceiling, moving landing, heavy slam2factor, raw review and native same-scene display. Preserve previous measurements; report exact adapter scope.
+- [ ] Run affected and full Sabre checks, source hashes and independent final review. Launch a fresh playable instance only after validation.
+
 2026-10-26: 857 checks across16 suites passed, plus same-scene native Mobile/D3D12 movement8frames, combat/camera8frames and virtual144Hz/60physics display continuity. Independent review P2 event-clock issue fixed and re-reviewed with no remaining P1/P2. Original GLB/showcase hashes unchanged; project/scene/environment files unchanged from task base. Both approved UE4SS starts failed before Lua and were rolled back. Native solo camera, ordinary jump and effective movement formulas remain unresolved; this completes the scoped playable fixes and audit, not a claim of exact engine equivalence.
