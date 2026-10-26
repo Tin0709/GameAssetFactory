@@ -27,6 +27,9 @@ Source-profile movement follows the camera's horizontal right/forward axes,
 including after orbiting; diagonals keep unit length. This follows the installed
 MD2 WASD reference mod's documented input convention; vanilla click movement is
 a distinct input scheme. Explicit scripted Walk/Run remains world-aligned.
+Measured human W at camera azimuth.66 and1.30 has effectively zero screen-X
+drift and zero actor-heading error. The reported sideways lean comes from pose
+sway in this configuration, so camera/input axes are not rotated to hide it.
 Clip side names are anatomical: this
 asset faces local +Z, and its left arm/leg are on local +X. Positive local-X travel
 therefore selects CombatStrafeLeft; Q rotates the face toward that same left side.
@@ -84,6 +87,9 @@ Leg/root/hip poses and local arm/weapon tracks remain intact; arms and Sabre
 inherit the steadier torso. Neck attachment position and source scale/shear
 are preserved. Air/combat/raw review bypass it. These weights are an explicit
 gameplay reconstruction, not recovered MD2 animation-graph values.
+Native same-scene A/B measurements: spine roll range5.335→1.333degrees, spine
+pitch6.067→1.512degrees, head pitch4.310→1.077degrees. The mean source pose is
+retained, rather than tilting the entire character or suppressing gait cadence.
 The face controller
 owns only its two optional morph scalars. Original source weapon scale/shear is retained,
 including the compressed blade during the finisher. Source clip durations are preserved; the 220ms input buffer,
