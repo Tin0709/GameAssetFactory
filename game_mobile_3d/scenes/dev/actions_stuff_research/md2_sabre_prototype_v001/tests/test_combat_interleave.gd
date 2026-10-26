@@ -6,6 +6,8 @@ var record:=false
 var previous:=Vector3.ZERO
 var trace:Array[Dictionary]=[]
 var starts:Array[int]=[]
+var probe_ledge:=false
+var fresh_air_received:=false
 func check(value:bool,label:String)->void:
 	checks+=1
 	if not value:failures.append(label);push_error(label)
@@ -14,6 +16,8 @@ func tick()->void:await physics_frame;await process_frame
 func ticks(n:int)->void:
 	for i in n:await tick()
 func observe()->void:
+	if probe_ledge and not a._grounded and a.combo.phase==&"step":
+		probe_ledge=false;a.attack(false);a.attack(true);a.attack(false);fresh_air_received=a.combo.phase==&"air_attack"
 	if not record:return
 	var travel:=Vector2(a.position.x-previous.x,a.position.z-previous.z).length();previous=a.position
 	trace.append({"phase":str(a.combo.phase),"clip":a.active_clip,"travel":travel,"speed":a.current_speed,"index":a.combo.index})
@@ -72,6 +76,22 @@ func run()->void:
 			await tick()
 			if a.combo.phase!=&"step":break
 		check(a.position.distance_to(walk_start)>=.44 and a.combo.phase==&"attack" and a.combo.index==1,"Slow Walk gets a real short step before its next strike at%dHz"%hz)
+		# Mid-step the legs must already be locomotion, not a long frozen strike crossfade.
+		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;a.attack(true);await wait_step(hz)
+		while a.combo.phase==&"step" and a._step_distance<.20:await tick()
+		a.set_physics_process(false);a.direction_adapter.restore();a.body_stability.restore()
+		var leg:int=a.skeleton.find_bone("J_L_Leg");var visible_leg:Transform3D=a.skeleton.get_bone_pose(leg);var cursor:float=a.animation_player.current_animation_position
+		a.animation_player.play(a.clips.Run.action,0.);a.animation_player.seek(cursor,true)
+		check(visible_leg.basis.is_equal_approx(a.skeleton.get_bone_pose(leg).basis),"Locomotion has taken over the legs by the middle of the real step at%dHz"%hz)
+		a.reset_actor();a.set_physics_process(true);await ticks(4)
+		# Walk off the actual platform edge, then submit a fresh airborne press
+		# before the following physics tick cancels the old ground reservation.
+		a.position.z=-49.9;await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;probe_ledge=true;fresh_air_received=false;a.attack(true)
+		for i in hz*2:
+			await tick()
+			if not probe_ledge:break
+		check(not probe_ledge and fresh_air_received,"Fresh aerial input survives walking off a step window at%dHz"%hz)
+		probe_ledge=false
 	var out:={"checks":checks,"failures":failures,"trials":trials,"native_md2_interleave_interval_recovered":false}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://.validation/md2_sabre_movement"));FileAccess.open("res://.validation/md2_sabre_movement/combat-interleave.json",FileAccess.WRITE).store_string(JSON.stringify(out,"\t"))
 	print("SABRE_COMBAT_INTERLEAVE ",JSON.stringify(out));a.free();floor.free();quit(0 if failures.is_empty() else 1)
