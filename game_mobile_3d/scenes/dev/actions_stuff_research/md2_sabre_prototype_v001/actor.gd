@@ -198,6 +198,10 @@ func _physics_process(delta:float)->void:
 		_time_since_grounded=INF # Consume the coyote opportunity; no second air jump.
 	move_and_slide();_grounded=is_on_floor() and velocity.y<=0.
 	if _grounded:_heavy_slam_active=false
+	# Source pose duration does not define physical flight. The apex (including
+	# an interrupted ascent at a ceiling) owns the transition into the air loop.
+	if using_original_source and not _grounded and _jump_stage=="JumpTakeoff" and velocity.y<=0.:
+		_jump_stage="JumpAirborne";_jump_time=0.
 	if _grounded and not was_grounded and _floor_initialized and _jump_stage!="JumpLanding":_jump_stage="JumpLanding";_jump_time=0.
 	elif not _grounded and _jump_stage.is_empty():_jump_stage="JumpAirborne";_jump_time=0.
 	_floor_initialized=_floor_initialized or _grounded
@@ -244,8 +248,10 @@ func _animate(delta:float)->void:
 		combo.advance(delta)
 		if not _jump_stage.is_empty():
 			_jump_time+=delta
-			if _jump_stage=="JumpTakeoff" and _jump_time>=float(clips.JumpTakeoff.duration):_jump_stage="JumpAirborne";_jump_time-=float(clips.JumpTakeoff.duration)
-			elif _jump_stage=="JumpLanding" and _jump_time>=float(clips.JumpLanding.duration):_jump_stage="";_jump_time=0.
+			if not using_original_source and _jump_stage=="JumpTakeoff" and _jump_time>=float(clips.JumpTakeoff.duration):_jump_stage="JumpAirborne";_jump_time-=float(clips.JumpTakeoff.duration)
+			elif _jump_stage=="JumpLanding":
+				var moving_release:bool=using_original_source and _grounded and _move_requested and _jump_time>=SOURCE_MOVING_LAND_SECONDS
+				if moving_release or _jump_time>=float(clips.JumpLanding.duration):_jump_stage="";_jump_time=0.
 		_transition_time+=delta
 		if not _transition.is_empty() and _transition_time>=float(clips[_transition].duration):_transition=""
 	if direction_adapter!=null:
