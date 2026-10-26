@@ -41,7 +41,7 @@ func run()->void:
 		a.reset_actor();await ticks(4)
 		# Actual collision must stop both travel and distance-driven gait.
 		var wall:=StaticBody3D.new();var wc:=CollisionShape3D.new();var wb:=BoxShape3D.new();wb.size=Vector3(20,5,1);wc.shape=wb;wall.position=Vector3(0,2,-3);wall.add_child(wc);root.add_child(wall)
-		Input.action_press("move_forward");await ticks(hz)
+		Input.action_press("move_forward");await ticks(hz*2)
 		var blocked_start:Vector3=a.global_position;await ticks(8)
 		check(a.global_position.distance_to(blocked_start)<.001 and a.current_speed<.001 and a._playback_speed<.001,"Blocked capsule does not walk in place at "+str(hz))
 		release();wall.free();a.reset_actor();await ticks(4)

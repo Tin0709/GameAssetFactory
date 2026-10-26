@@ -39,6 +39,13 @@ var acceleration:=48.
 var deceleration:=42.
 var gravity:=18.
 var jump_height:=1.2
+var coyote_time:=0.
+var _time_since_grounded:=INF
+var _movement_right:=Vector2.RIGHT
+var _movement_back:=Vector2.DOWN
+# Measured source stride references are independent of gameplay target speed.
+var walk_stride_speed:=2.
+var run_stride_speed:=5.6
 var scripted_input:=false
 var requested_direction:=Vector2.ZERO
 var requested_run:=false
@@ -109,10 +116,12 @@ func _ready()->void:
 			unique_sources[entry.source_name]=true
 			if entry.get("source_alias_adapter",false):source_alias_count+=1
 		source_clip_count=unique_sources.size()
-		# Kinematic sole-trajectory fit at scale1/clip1x, not recovered game config.
-		walk_speed=2.;run_speed=5.6
-		gravity=2.*jump_height/pow(float(clips.JumpTakeoff.duration),2.)
-		cadence_label="Kinematic calibration · native config not recovered"
+		# Public DT_PlayerDefinition#0: MovementSpeed700, multiplier1, coyote.155.
+		# Standard100UU/m conversion; local effective runtime values unverified.
+		# Slow Walk and stride references remain disclosed study adapters.
+		walk_speed=2.;run_speed=700./100.;coyote_time=.155
+		gravity=15. # Existing ballistic approximation; NOT inferred native physics.
+		cadence_label="Table700 ×1 /100 =7 units/s · runtime unverified\nGait follows travel/stride · review1x"
 		direction_adapter=DirectionAdapter.new();direction_adapter.setup(skeleton,model)
 	combo.setup(clips)
 	animation_player.callback_mode_process=AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
@@ -149,13 +158,17 @@ static func load_private_model(path:String)->Node3D:
 
 func _physics_process(delta:float)->void:
 	var stick:=requested_direction if scripted_input else Input.get_vector("move_left","move_right","move_forward","move_backward")
+	if not scripted_input:stick=_movement_right*stick.x+_movement_back*stick.y
 	var sprint:=requested_run if scripted_input else Input.is_action_pressed("sprint")
 	var jump_down:=requested_jump if scripted_input else Input.is_action_pressed("jump")
 	var jump_pressed:=jump_down and not _jump_held;_jump_held=jump_down
-	_move_requested=not stick.is_zero_approx();_run_requested=sprint and _move_requested
+	# Human source controls use ordinary full-speed movement, with Shift as a
+	# slow study modifier. Explicit scripted Walk/Run and authored controls stay stable.
+	_move_requested=not stick.is_zero_approx();_run_requested=(sprint if scripted_input or not using_original_source else not sprint) and _move_requested
 	if _move_requested:_last_run_gait=_run_requested
 	if _move_requested or jump_pressed:resume_gameplay()
 	var was_grounded:=is_on_floor() and velocity.y<=0.
+	_time_since_grounded=0. if was_grounded else _time_since_grounded+delta
 	var speed:=run_speed if _run_requested else walk_speed
 	var desired:=stick.limit_length()*speed
 	# Preserve authored full-body attacks. Travel is reduced rather than blending
@@ -163,8 +176,9 @@ func _physics_process(delta:float)->void:
 	if combo.active() and was_grounded:desired*=.22
 	var planar:=Vector2(velocity.x,velocity.z).move_toward(desired,(deceleration if stick.is_zero_approx() else acceleration)*delta)
 	velocity=Vector3(planar.x,-.2 if was_grounded else velocity.y-gravity*delta,planar.y)
-	if jump_pressed and was_grounded:
+	if jump_pressed and (was_grounded or (using_original_source and _time_since_grounded<=coyote_time)):
 		combo.cancel();velocity.y=sqrt(2.*gravity*jump_height)-(gravity*delta*.5 if using_original_source else 0.);_jump_stage="JumpTakeoff";_jump_time=0.
+		_time_since_grounded=INF # Consume the coyote opportunity; no second air jump.
 	move_and_slide();_grounded=is_on_floor() and velocity.y<=0.
 	if _grounded and not was_grounded and _floor_initialized and _jump_stage!="JumpLanding":_jump_stage="JumpLanding";_jump_time=0.
 	elif not _grounded and _jump_stage.is_empty():_jump_stage="JumpAirborne";_jump_time=0.
@@ -195,8 +209,8 @@ func _animate(delta:float)->void:
 	_play(selected)
 	_playback_speed=1.
 	if review_clip.is_empty() and selected in GAITS:
-		var nominal:float=(run_speed if selected in ["Run","CombatRun"] else walk_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
-		_playback_speed=clampf(current_speed/nominal,0. if using_original_source else .25,1.25)
+		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
+		_playback_speed=maxf(0.,current_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
 	animation_player.advance(delta*_playback_speed)
 	if not review_clip.is_empty():
 		_review_time+=delta
@@ -276,6 +290,13 @@ func force_blink()->void:_forced_blink=.16
 func set_locomotion_direction_adapter(value:bool)->void:
 	locomotion_direction_enabled=value
 	if not value and direction_adapter!=null:direction_adapter.deactivate()
+func set_movement_camera_basis(camera_basis:Basis)->void:
+	# The installed MD2 WASD reference mod also uses camera-relative input.
+	# These vectors are horizontal and orthonormal: diagonals retain unit length.
+	var right:=Vector2(camera_basis.x.x,camera_basis.x.z)
+	var back:=Vector2(camera_basis.z.x,camera_basis.z.z)
+	if right.length_squared()>.0001 and back.length_squared()>.0001:
+		_movement_right=right.normalized();_movement_back=back.normalized()
 func _apply_face(delta:float)->void:
 	var target:=1. if expression_mode==2 or (expression_mode==0 and not using_original_source and (combo.active() or combat_requested)) else 0.
 	focus_value=lerpf(focus_value,target,1.-exp(-14.*delta)) if delta>0. else target
@@ -292,5 +313,6 @@ func reset_actor()->void:
 	review_clip="";active_clip="";_jump_stage="";_jump_time=0.;_transition="";_transition_time=0.;_grounded=false;_floor_initialized=false;_previous_combat=false
 	accepted_count=0;impact_count=0
 	_last_run_gait=false
+	_time_since_grounded=INF
 	visual.rotation.y=0.;expression_clock=0.;simulation_clock=0.;focus_value=0.;blink_value=0.;_forced_blink=0.
 	_play("Idle",0.);_apply_face(0.);reset_physics_interpolation()

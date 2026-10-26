@@ -77,7 +77,7 @@ func _build_ui()->void:
 	if actor.using_original_source:
 		var count:=Label.new();count.text="22 semantic states · %d original clips · %d aliases"%[actor.source_clip_count,actor.source_alias_count];box.add_child(count)
 		var calibration:=Label.new();calibration.text=actor.cadence_label;calibration.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;calibration.custom_minimum_size.x=318;calibration.add_theme_font_size_override("font_size",11);box.add_child(calibration)
-	var hints:=Label.new();hints.text="WASD walk · Shift run · Space jump\nLMB / E: three-hit combo (hold or tap)\nRMB: combat strafe + mouse ground aim\nQ / C: turn · Middle drag: orbit · Wheel: zoom\nR reset · V grass overview";box.add_child(hints)
+	var hints:=Label.new();hints.text=("WASD normal7 · Shift slow Walk · Space jump" if actor.using_original_source else "WASD walk · Shift run · Space jump")+"\nLMB / E: three-hit combo (hold or tap)\nRMB: combat strafe + mouse ground aim\nQ / C: turn · Middle drag: orbit · Wheel: zoom\nR reset · V grass overview";box.add_child(hints)
 	actions=OptionButton.new();actions.name="AuthoredActionSelector";actions.focus_mode=Control.FOCUS_NONE
 	for key:String in actor.clips:
 		actions.add_item(action_caption(key));actions.set_item_metadata(actions.item_count-1,key)
@@ -125,6 +125,7 @@ func refresh_reflections()->void:
 	lab.add_child(reflection_probe);reflection_probe.global_position=actor.global_position+Vector3.UP
 func _physics_process(_delta:float)->void:
 	if actor==null:return
+	if actor.using_original_source:actor.set_movement_camera_basis(lab.camera.global_basis)
 	if reflection_probe!=null and Vector2(actor.global_position.x-reflection_probe.global_position.x,actor.global_position.z-reflection_probe.global_position.z).length()>12.:refresh_reflections()
 	actor.turn_axis=float(_q_held)-float(_c_held)
 	actor.combat_requested=_right_held or _q_held or _c_held
