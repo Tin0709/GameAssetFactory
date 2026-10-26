@@ -11,6 +11,7 @@ func ticks(n:int)->void:
 func run()->void:
 	var floor:=StaticBody3D.new();var c:=CollisionShape3D.new();var b:=BoxShape3D.new();b.size=Vector3(100,.4,100);c.shape=b;c.position.y=-.2;floor.add_child(c);root.add_child(floor)
 	var a=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();a.scripted_input=true;root.add_child(a)
+	a.combo.movement_breaks_enabled=false # Isolate full-body planting; default interleave is tested separately.
 	var trials:Array[Dictionary]=[]
 	for hz in [30,60]:
 		Engine.physics_ticks_per_second=hz;a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;await ticks(hz/2)

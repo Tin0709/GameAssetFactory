@@ -30,6 +30,7 @@ func run()->void:
 	var trials:Array[Dictionary]=[]
 	for hz in [30,60]:
 		Engine.physics_ticks_per_second=hz;a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;await ticks(hz/2)
+		var initial_phase:float=a._gait_resume_phase
 		trace.clear();starts.clear();previous=a.position;record=true;a.attack(true);await ticks(hz*4);record=false
 		var attack_travel:=0.;var step_travel:=0.;var step_frames:=0;var valid_gait:=true
 		for frame:Dictionary in trace:
@@ -40,6 +41,8 @@ func run()->void:
 		check(step_frames>0 and step_travel>.5,"Holding movement and combat creates real movement between strikes at%dHz"%hz)
 		check(attack_travel<.005 and valid_gait,"Travel belongs to locomotion windows; full-body attacks stay planted at%dHz"%hz)
 		check(starts.size()>=6 and starts.slice(0,6)==[0,1,2,0,1,2],"Movement windows retain complete1/2/3 combo order at%dHz"%hz)
+		var expected_phase:=fposmod(initial_phase+step_travel/(5.6*float(a.clips.Run.duration)),1.)
+		check(absf(wrapf(a._gait_resume_phase-expected_phase,-.5,.5))<.003,"Interleaved gait phase advances by actual travel instead of restarting a foot at%dHz"%hz)
 		trials.append({"hz":hz,"step_frames":step_frames,"step_travel":step_travel,"attack_travel":attack_travel,"accepted":starts.duplicate()})
 		# Release attack during the window: continue moving, no surprise next swing.
 		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;starts.clear();a.attack(true)
@@ -59,6 +62,16 @@ func run()->void:
 		a.requested_direction=Vector2(0,-1);a.requested_run=true;starts.clear();a.attack(true);await ticks(hz*3)
 		check(starts.size()>=3 and starts.slice(0,3)==[0,1,2],"Blocked movement has a bounded escape and continues held attacks at%dHz"%hz)
 		wall.free()
+		# Actual repeated taps use the same alternation, not a held-input-only shortcut.
+		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;starts.clear();var tap_start:Vector3=a.position
+		for i in hz*2:a.attack(i%int(hz/6)==0);await tick()
+		check(starts.size()>=3 and starts.slice(0,3)==[0,1,2] and a.position.distance_to(tap_start)>.5,"Rapid taps also move between complete ordered strikes at%dHz"%hz)
+		# Slow movement still gets actual distance; the wall guard is not the regular step timer.
+		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=false;a.attack(true);await wait_step(hz);var walk_start:Vector3=a.position
+		for i in hz:
+			await tick()
+			if a.combo.phase!=&"step":break
+		check(a.position.distance_to(walk_start)>=.44 and a.combo.phase==&"attack" and a.combo.index==1,"Slow Walk gets a real short step before its next strike at%dHz"%hz)
 	var out:={"checks":checks,"failures":failures,"trials":trials,"native_md2_interleave_interval_recovered":false}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://.validation/md2_sabre_movement"));FileAccess.open("res://.validation/md2_sabre_movement/combat-interleave.json",FileAccess.WRITE).store_string(JSON.stringify(out,"\t"))
 	print("SABRE_COMBAT_INTERLEAVE ",JSON.stringify(out));a.free();floor.free();quit(0 if failures.is_empty() else 1)
