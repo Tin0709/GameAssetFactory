@@ -93,9 +93,9 @@ class BlenderBridge:
                 if sse:
                     # A valid SSE result need not wait for the server to close
                     # its event stream. Parse only complete events.
-                    events = body.decode('utf-8').replace('\r\n', '\n').split('\n\n')[:-1]
+                    events = body.replace(b'\r\n', b'\n').split(b'\n\n')[:-1]
                     for event in events:
-                        data = '\n'.join(line[5:].lstrip() for line in event.splitlines() if line.startswith('data:'))
+                        data = b'\n'.join(line[5:].lstrip() for line in event.splitlines() if line.startswith(b'data:'))
                         if data:
                             value = json.loads(data)
                             if isinstance(value, dict) and value.get('id') == 'gaf-health':
