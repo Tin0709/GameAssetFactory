@@ -13,7 +13,7 @@ import uuid
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from checkpoint_manager.core import RepoConfig
+from checkpoint_manager.core import GitRepository, RepoConfig
 from checkpoint_manager.blender_bridge import BlenderBridge, BridgeConfig
 try:
     from checkpoint_manager.desktop import CheckpointApp, SingleInstance
@@ -175,6 +175,26 @@ class DesktopTests(unittest.TestCase):
         subprocess.run(['git', '-C', str(config.path), 'push', '-q'], check=True, capture_output=True)
         self.app.refresh()
         self.wait_idle()
+        self.assertEqual(self.app.pending_push_vars[0].get(), 'Chưa push: 0 commit')
+
+    def test_push_click_pushes_immediately_without_confirmation(self):
+        config = self.configs[0]
+        remote = self.base / 'one-click-remote.git'
+        subprocess.run(['git', 'init', '-q', '--bare', str(remote)], check=True, capture_output=True)
+        for args in [('remote', 'add', 'origin', str(remote)), ('push', '-qu', 'origin', 'test')]:
+            subprocess.run(['git', '-C', str(config.path), *args], check=True, capture_output=True)
+        (config.path / 'work.txt').write_text('ready to push')
+        for args in [('add', 'work.txt'), ('commit', '-qm', 'local checkpoint')]:
+            subprocess.run(['git', '-C', str(config.path), *args], check=True, capture_output=True)
+        self.app.repositories[0] = GitRepository(RepoConfig(config.name, config.path, str(remote)))
+        self.app.refresh()
+        self.wait_idle()
+        with patch('checkpoint_manager.desktop.messagebox.askyesno', side_effect=AssertionError('Push must not open a confirmation dialog')):
+            self.app.push_now(0)
+            self.wait_idle()
+        actual = subprocess.check_output(['git', '--git-dir', str(remote), 'rev-parse', 'refs/heads/test'], text=True).strip()
+        expected = subprocess.check_output(['git', '-C', str(config.path), 'rev-parse', 'HEAD'], text=True).strip()
+        self.assertEqual(actual, expected)
         self.assertEqual(self.app.pending_push_vars[0].get(), 'Chưa push: 0 commit')
 
     def test_pause_while_busy_skips_the_next_repository(self):
