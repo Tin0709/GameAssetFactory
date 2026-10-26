@@ -34,6 +34,7 @@ func run()->void:
 		await tick();check(not a.combo.active() and a.active_clip=="Run","Unqueued recovery yields to intentional movement at%dHz"%hz)
 		# The accepted jump trajectory and air steering are separate from ground planting.
 		a.reset_actor();await ticks(4);a.requested_direction=Vector2(0,-1);a.requested_run=true;await ticks(hz/2);a.attack(true);a.requested_jump=true;await tick()
+		print("GROUND_JUMP_LAUNCH ",JSON.stringify({"hz":hz,"speed":a.current_speed,"velocity":str(a.velocity),"combo":str(a.combo.phase),"grounded":a._grounded,"jump":a._jump_stage,"clock":a.simulation_clock}))
 		check(absf(a.current_speed-7.)<.01,"Simultaneous attack and jump retains full running launch speed at%dHz"%hz)
 		a.requested_jump=false;await ticks(6)
 		check(a.velocity.y>0. and a.current_speed>1. and not a.combo.active(),"Jump cancels ground anchor and retains air movement at%dHz"%hz)
