@@ -344,7 +344,13 @@ func _play(key:String,blend:float=.04)->void:
 	var preserve_phase:bool=using_original_source and review_clip.is_empty() and active_clip in GAITS and key in GAITS
 	var resume_step:bool=using_original_source and review_clip.is_empty() and combo.phase==&"step" and key in GAITS
 	var phase:=fposmod(animation_player.current_animation_position/float(clips[active_clip].duration),1.) if preserve_phase else (_gait_resume_phase if resume_step else 0.)
-	active_clip=key;animation_player.play(clips[key].action,.08 if preserve_phase or resume_step else blend);animation_player.advance(0.)
+	var transition_blend:=.08 if preserve_phase else blend
+	if resume_step and not preserve_phase:
+		# Gait advances by distance; an80ms source-clock blend would consume most
+		# of this short step. Give locomotion the legs within its first20% travel.
+		var stride_ref:=run_stride_speed if key in ["Run","CombatRun"] else walk_stride_speed
+		transition_blend=minf(blend,COMBAT_STEP_DISTANCE/stride_ref*.2)
+	active_clip=key;animation_player.play(clips[key].action,transition_blend);animation_player.advance(0.)
 	if preserve_phase or resume_step:animation_player.seek(phase*float(clips[key].duration),true)
 func attack(value:bool)->void:
 	if value:resume_gameplay()

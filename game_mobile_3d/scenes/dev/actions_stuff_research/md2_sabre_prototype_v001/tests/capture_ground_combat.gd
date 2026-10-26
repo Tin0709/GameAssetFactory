@@ -42,9 +42,10 @@ func run()->void:
 		if frame.phase=="step":step_travel+=float(frame.travel)
 		else:drift+=float(frame.travel)
 	if drift>.005 or step_travel<=.1:failures.append("Native strike/move travel ownership")
+	var held_net:=Vector2(a.position.x-start.x,a.position.z-start.z).length()
 	press.pressed=false;lab.sabre_mode.input(press);await ticks(65);await shot("04_release_resumes_run")
 	if a.active_clip!="Run" or absf(a.current_speed-7.)>.01:failures.append("Native movement release")
 	Input.action_release("move_forward");await ticks(20)
-	var report:={"failures":failures,"frames":frames,"trials":trials,"held_attack_travel":drift,"movement_break_travel":step_travel,"held_input_net_travel":Vector2(a.position.x-start.x,a.position.z-start.z).length(),"attack_trace":attack_trace,"renderer":RenderingServer.get_current_rendering_method(),"grass_blocks":lab.grass_field_blocks,"bones":a.skeleton.get_bone_count(),"clips":a.source_clip_count,"camera":lab.sabre_mode.camera_measurements(),"native_md2_graph_verified":false}
+	var report:={"failures":failures,"frames":frames,"trials":trials,"held_attack_travel":drift,"movement_break_travel":step_travel,"held_input_net_travel":held_net,"attack_trace":attack_trace,"renderer":RenderingServer.get_current_rendering_method(),"grass_blocks":lab.grass_field_blocks,"bones":a.skeleton.get_bone_count(),"clips":a.source_clip_count,"camera":lab.sabre_mode.camera_measurements(),"native_md2_graph_verified":false}
 	FileAccess.open(folder.path_join("native-ground-combat.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"));print("SABRE_NATIVE_GROUND ",JSON.stringify({"failures":failures,"held_attack_travel":drift,"frames":frames.size()}))
 	lab.free();await process_frame;quit(0 if failures.is_empty() else 1)

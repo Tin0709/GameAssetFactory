@@ -37,7 +37,8 @@ func attack(value:bool,airborne:bool=false)->void:
 	held=value
 	if edge:request_attack(airborne)
 func request_attack(airborne:bool=false)->void:
-	if phase==&"step":step_buffered=true
+	if phase==&"step" and airborne:_start_attack(0,true)
+	elif phase==&"step":step_buffered=true
 	elif not active():_start_attack(0,airborne)
 	else:buffer_until=clock+buffer_seconds
 func _start_attack(which:int,airborne:bool=false)->void:
