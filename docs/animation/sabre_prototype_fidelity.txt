@@ -1,0 +1,182 @@
+PLAYER + ORIGINAL SABRE: PRIVATE FIDELITY PROTOTYPE
+26 October 2026
+
+Start the existing lab
+----------------------
+Run C:\Dev\GameAssetFactory\Open Sabre Prototype.cmd.
+Alternatively, open game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn in
+the existing Godot project at C:\Dev\GameAssetFactory, then press F6.
+F6 now enters the Valorie/Sabre prototype directly. "Return to original Rifle /
+Sword lab" retains the old experiment; its entry button can switch back.
+Open Sabre Editor.cmd at the project root opens this exact project and scene.
+The older C:\Users\ADMIN\Desktop\Dev\GameAssetFactory copy is a separate
+checkout and does not contain this prototype; it is preserved as it was.
+The project's WorldMap/main scene is preserved; this is an opt-in lab mode.
+
+WASD: walk. Shift: run. Space: jump. LMB or E: three-hit combo, hold or tap.
+RMB: combat-facing movement and aim at the mouse's ground position.
+Q/C: turn. Middle drag: orbit. Wheel: zoom. R: reset. V: grass overview.
+The panel selects individual clips, review looping, facial overlays and trails.
+
+Open Blender
+------------
+blender/characters/player/sabre_prototype_v001/Open Sabre Showcase.cmd prefers
+the separate original-source showcase in MD2 Research. The earlier private skin
+reconstruction and the independently authored fallback remain available.
+Research root defaults to C:\Users\ADMIN\Desktop\MD2 Research. Set
+MD2_RESEARCH_ROOT when restoring this workspace on another machine.
+
+What is recovered directly
+--------------------------
+The preferred private MD2_Valorie_Sabre_Source.glb preserves the recovered
+32-joint player skeleton, rest transforms, hierarchy, inverse bind matrices,
+weights and original animation channel data. Character: 608 vertex entries,
+770 triangles. Sabre: 970 vertex entries, 816 triangles, original UVs/normals
+and 32px base/MRES maps. Valorie uses the original 64px base/MRES maps.
+Original image bytes and mesh attributes/topology are independently compared
+to their extracted inputs, including triangle winding.
+
+There are 22 selectable semantic states, backed by 13 distinct original clips:
+Idle, Walk, Run, JumpTakeoff, JumpAirborne, JumpLanding, Attack1/2/3,
+Recovery1/2/3 and AirAttack. The GLB preserves selected source timestamps,
+interpolation and all translation/rotation/scale channels. The 22 aliases
+contain 2,112 channels in total; that is not 22 unique recovered animations.
+
+The saved Blender study retains 22 direct-import actions and 22 derived SLERP
+precision preview copies. The selected GLB remains authoritative for original
+keys and clocks. At five phases for every semantic state, the preview's maximum
+joint-world matrix component error was 8.60e-7; grip error was 6.67e-8 source
+units. These are sampled validation results, not a claim about Unreal runtime
+blending. Saved/reopened rig, selector, timing and expression checks pass16/16.
+
+Original facial-joint tracks remain in these animations. Neutral facial
+geometry and pixels are original. The optional Focused/Blink morph overlays
+are newly authored controls, not recovered native expression logic.
+
+Fifteen original Sabre Vorbis samples are decoded transiently from Research:
+three variants each for Attack1, Attack2, Attack3 swing, Attack3 whoosh and
+Sabre heavy-jump swing. Source hashes, Ogg CRCs and durations are verified.
+
+What is reconstructed or inferred
+--------------------------------
+No native Sabre-to-animation-family row value has been recovered. This study
+selects the actual 1H_Medium SwordCombo family; it is an experimental mapping.
+The original static sword is attached to J_R_Weapon with an identity item-local
+mount. Native equipment/socket offsets have not been recovered.
+
+Nine semantic states reuse original Idle/Walk/Run: StrafeLeft/Right,
+CombatReady, ReadyEnter/Exit, CombatWalk/Run and CombatStrafeLeft/Right.
+They are labelled adapters, not bespoke recovered ready/strafe/transition clips.
+Input buffering, movement speed, gravity, collider, state transitions and blend
+durations are prototype logic. Directional movement adaptation and cadence
+calibration are described below; they do not recover missing original clips.
+Attacks retain full-body clips with reduced travel; there is no recovered
+native lower-body blend, gameplay damage system, enemy or hitstop simulation.
+
+Blade trails and finite particle bursts follow actual weapon markers. Their
+lifetimes, colours, VFX gates and impact-ready signals are authored. A fast
+blade-motion landmark does not establish native contact/notify timing.
+The exported components do not recover Unreal's complete particle systems.
+
+The original MRES maps are projected to glTF/Godot metal, roughness and masked
+emission. Skin alpha is cutout, separate from the MRES scattering channel.
+Original parent shader graphs, scattering scale, material gains, native
+reflection, campfire exposure and post-processing are not fully recovered.
+The study uses nearest filtering and clamped texture edges as a renderer
+projection. The exported source samplers omit wrapS/T (glTF defaults to repeat);
+that does not prove the original Unreal sampler. An edge audit found no triangle
+centroid colour changes; filtering/wrapping are not certified native settings.
+Any mode-local reflection support is a labelled renderer adapter; it does not
+modify source material pixels or the existing grass/lighting resources.
+The lab's global reflected-light source remains disabled. An optional local
+probe supplies sky/environment reflections to the private actor only; use its
+Refresh button after changing the lab time of day. This preserves the original
+metallic map instead of darkening or painting over its pixels.
+
+Audio sample bytes are original. Attack acceptance schedules a round-robin
+variant; its existing decoded amplitude-envelope peak is aligned with the
+measured blade-speed landmark. Attack3 schedules swing and whoosh separately.
+This fixes the earlier roughly .32s-early finisher whoosh. Alignment uses the
+existing 96-bin decode journal (about 5-15ms bin resolution), not a native notify.
+The bounded queue drops canceled attacks; mute/reset clears delayed events and
+live voices. Variant selection, layering, fixed pitch and -14dB gain are authored.
+The native Wwise graph, mixing, offsets and attenuation are not reproduced.
+The available heavy-jump sound's assignment to the selected medium air attack
+is unproven. Whiffs do not play fictitious enemy impacts.
+
+Movement calibration and remaining physics limits
+------------------------------------------------
+The source-scale-1 walking/running sole-vertex trajectories support a kinematic
+calibration, not a recovered native movement-config value. Contact-velocity
+least-squares estimates are 2.00625 source units/s for Walk and 5.63224 for Run.
+The source profile targets effective 2.0/5.6 at full-speed clip rate 1.0; the old
+lab's 1.2 speed multiplier must not be applied again to this calibration.
+Walk contact estimates agree bilaterally around 2.02. Run is asymmetric
+(left 4.464, right 6.495); one speed alone cannot remove every stance slip.
+These observations do not establish native units in metres or gameplay buffs.
+An explicit gameplay-only leg-direction adapter reorients the two source leg
+trajectories toward actual travel while leaving hips, spine, arms and weapon
+poses unchanged. It preserves each leg's original minimum sole height, including
+diagonals; it does not perform native foot locking or erase source contact error.
+It restores the source pose before each sample and is bypassed for raw review,
+attacks and jumps. The UI exposes a switch for direct comparison.
+Locomotion aliases retain normalized stride phase, including Walk/Run changes
+with an .08s blend. Grounded braking keeps the gait until stationary; it does not
+switch to idle while still sliding. Lateral sprint uses the Run clip and its
+direction adapter, rather than playing a Walk alias at running speed.
+
+JumpTakeoff lasts .4s, AirborneLoop .833333s and Landing .3s in the recovered
+clips. Root/hip translation in those pose clips cannot establish native height,
+distance, gravity or complete airtime. The physical prototype aligns its apex
+with the .4s takeoff endpoint and retains an explicitly estimated 1.2-unit height
+(ballistic gravity 15, launch velocity 6, nominal airtime .8s). The airborne clip
+continues until a real floor contact; then Landing runs. The game's declared
+JumpHeight/JumpDistance/JumpCurve/TimeToJumpApex fields do not supply their values.
+An in-game measured jump trajectory is still required for exact runtime parity.
+The read-only 480-samples-per-cycle audit and threshold sensitivity are retained
+in Research/reports/prototype_sabre/source_foot_contact_audit.txt and .json.
+
+Storage and portability
+-----------------------
+All MD2 mesh/skin/rig/motion/weapon/audio data and source-bearing preview renders
+stay in MD2 Research. Godot loads the external GLB with embedded images directly
+into memory; no editor import, ResourceSaver or extracted image copy is used.
+GameAssetFactory contains implementation code and an independently generated
+fallback mesh/atlas/eleven-bone animation set. Its source builders read only
+their own authored geometry/motion definitions. The previous reconstructed
+study is retained for comparison, not silently overwritten.
+The user clarified that Research Git must also stop tracking assets from now
+on. A local index-only exclusion removed 507 art/media/array entries and added
+ignore patterns; all local files and previous private backup history remain.
+Scripts, documentation and technical metadata remain trackable. No history
+rewrite, remote push or asset-file deletion was used for this change.
+
+This is an internal fidelity study. Android export and phone performance have
+not been validated. Desktop playback uses the installed Godot Mobile renderer
+through D3D12 on this Windows machine. Mobile optimization is deferred as the
+user requested; original data remains available for later controlled changes.
+Native shutdown currently reports seven leaked Texture RIDs after the local
+reflection/runtime-texture study; gameplay tests have no script failures. This
+cleanup warning remains recorded for investigation before production/mobile use.
+
+Inspect the evidence
+--------------------
+Research/reports/prototype_sabre/source_bundle_manifest.json
+Research/reports/prototype_sabre/source_bundle_validation.json
+Research/reports/prototype_sabre/private_media_manifest.json
+Research/reports/prototype_sabre/godot_native/
+game_mobile_3d/.validation/md2_sabre_prototype_v001/
+.validation/md2_sabre_prototype_v001/preservation-baseline.json
+
+Final checks: 247 runtime checks across ten suites pass; 16 saved/reopened
+Blender checks pass; the original Python baseline passed71 tests (4 skipped),
+and the F6 launcher correction passes the updated24-test launcher subset.
+The final integrity validator passes19 checks. Native source_v003 captures21
+states and748 frames at60fps with non-silent48kHz stereo sample feedback;
+the earlier source_v002 and eleven-bone studies are preserved separately.
+
+Grass/lighting resources, the production main scene and project settings are
+checked against the preservation baseline. The saved lab scene adds only the
+md2_sabre_prototype_enabled=true entry flag so F6 opens the current prototype.
+The existing walk_run_test.gd receives the intended mode-selection hooks;
+new actor, effects and UI code lives in md2_sabre_prototype_v001.
