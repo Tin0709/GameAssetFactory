@@ -1,0 +1,347 @@
+{
+  "scope": "Internal fidelity prototype; fresh geometry/UV/atlas, source-informed sparse authored curves.",
+  "rig_bones": [
+    "Root",
+    "Hips",
+    "Body",
+    "Head",
+    "Arm.L",
+    "Hand.L",
+    "Arm.R",
+    "Hand.R",
+    "Weapon",
+    "Leg.L",
+    "Leg.R"
+  ],
+  "axis": "BlenderZup,forward-Y; glTFYup,forward+Z",
+  "metrics": {
+    "authored_from_scratch": true,
+    "height_m": 2.003,
+    "head_cube_m": 0.508,
+    "torso_xyz_m": [
+      0.5,
+      0.25,
+      0.75
+    ],
+    "rigid_arm_xyz_m": [
+      0.187,
+      0.25,
+      0.75
+    ],
+    "rigid_leg_xyz_m": [
+      0.25,
+      0.25,
+      0.75
+    ],
+    "sabre_unmounted_xyz_m": [
+      0.53,
+      0.063,
+      1.768
+    ],
+    "sabre_local_z_m": [
+      -1.458,
+      0.31
+    ],
+    "atlas_size": 128,
+    "bones": 11,
+    "triangles": 924,
+    "shape_keys": [
+      "Focused",
+      "Blink"
+    ]
+  },
+  "clips": {
+    "Idle": {
+      "duration": 2.6666666666666665,
+      "loop": true,
+      "category": "locomotion",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_Master_Idle",
+      "action": "Sabre_Idle",
+      "frames": [
+        1,
+        321
+      ]
+    },
+    "Walk": {
+      "duration": 0.8666666666666667,
+      "loop": true,
+      "category": "locomotion",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_Master_Walk",
+      "action": "Sabre_Walk",
+      "frames": [
+        1,
+        105
+      ]
+    },
+    "Run": {
+      "duration": 0.43333333333333335,
+      "loop": true,
+      "category": "locomotion",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_Master_Run",
+      "action": "Sabre_Run",
+      "frames": [
+        1,
+        53
+      ]
+    },
+    "StrafeLeft": {
+      "duration": 0.8666666666666667,
+      "loop": true,
+      "category": "locomotion",
+      "evidence": "authored adapter",
+      "source_name": null,
+      "action": "Sabre_StrafeLeft",
+      "frames": [
+        1,
+        105
+      ]
+    },
+    "StrafeRight": {
+      "duration": 0.8666666666666667,
+      "loop": true,
+      "category": "locomotion",
+      "evidence": "authored adapter",
+      "source_name": null,
+      "action": "Sabre_StrafeRight",
+      "frames": [
+        1,
+        105
+      ]
+    },
+    "JumpTakeoff": {
+      "duration": 0.4,
+      "loop": false,
+      "category": "jump",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_Jump",
+      "action": "Sabre_JumpTakeoff",
+      "frames": [
+        1,
+        49
+      ]
+    },
+    "JumpAirborne": {
+      "duration": 0.8333333333333334,
+      "loop": true,
+      "category": "jump",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_Jump_Loop",
+      "action": "Sabre_JumpAirborne",
+      "frames": [
+        1,
+        101
+      ]
+    },
+    "JumpLanding": {
+      "duration": 0.3,
+      "loop": false,
+      "category": "jump",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_Jump_Land",
+      "action": "Sabre_JumpLanding",
+      "frames": [
+        1,
+        37
+      ]
+    },
+    "CombatReady": {
+      "duration": 2.6666666666666665,
+      "loop": true,
+      "category": "ready",
+      "evidence": "authored adapter",
+      "source_name": null,
+      "action": "Sabre_CombatReady",
+      "frames": [
+        1,
+        321
+      ]
+    },
+    "ReadyEnter": {
+      "duration": 0.2,
+      "loop": false,
+      "category": "transition",
+      "evidence": "authored adapter",
+      "source_name": null,
+      "action": "Sabre_ReadyEnter",
+      "frames": [
+        1,
+        25
+      ]
+    },
+    "ReadyExit": {
+      "duration": 0.2,
+      "loop": false,
+      "category": "transition",
+      "evidence": "authored adapter",
+      "source_name": null,
+      "action": "Sabre_ReadyExit",
+      "frames": [
+        1,
+        25
+      ]
+    },
+    "CombatWalk": {
+      "duration": 0.8666666666666667,
+      "loop": true,
+      "category": "combat movement",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_Master_Walk",
+      "action": "Sabre_CombatWalk",
+      "frames": [
+        1,
+        105
+      ]
+    },
+    "CombatRun": {
+      "duration": 0.43333333333333335,
+      "loop": true,
+      "category": "combat movement",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_Master_Run",
+      "action": "Sabre_CombatRun",
+      "frames": [
+        1,
+        53
+      ]
+    },
+    "CombatStrafeLeft": {
+      "duration": 0.8666666666666667,
+      "loop": true,
+      "category": "combat movement",
+      "evidence": "authored adapter",
+      "source_name": null,
+      "action": "Sabre_CombatStrafeLeft",
+      "frames": [
+        1,
+        105
+      ]
+    },
+    "CombatStrafeRight": {
+      "duration": 0.8666666666666667,
+      "loop": true,
+      "category": "combat movement",
+      "evidence": "authored adapter",
+      "source_name": null,
+      "action": "Sabre_CombatStrafeRight",
+      "frames": [
+        1,
+        105
+      ]
+    },
+    "Attack1": {
+      "duration": 0.43333333333333335,
+      "loop": false,
+      "category": "attack",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_SwordCombo_Attack1",
+      "vfx_window": [
+        0.055,
+        0.185
+      ],
+      "vfx_evidence": "authored window around measured fast motion; not native hit/notify",
+      "action": "Sabre_Attack1",
+      "frames": [
+        1,
+        53
+      ]
+    },
+    "Attack2": {
+      "duration": 0.4,
+      "loop": false,
+      "category": "attack",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_SwordCombo_Attack2",
+      "vfx_window": [
+        0.125,
+        0.285
+      ],
+      "vfx_evidence": "authored window around measured fast motion; not native hit/notify",
+      "action": "Sabre_Attack2",
+      "frames": [
+        1,
+        49
+      ]
+    },
+    "Attack3": {
+      "duration": 0.6666666666666666,
+      "loop": false,
+      "category": "finisher",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_SwordCombo_Attack3",
+      "vfx_window": [
+        0.275,
+        0.44
+      ],
+      "vfx_evidence": "authored window around measured fast motion; not native hit/notify",
+      "action": "Sabre_Attack3",
+      "frames": [
+        1,
+        81
+      ]
+    },
+    "Recovery1": {
+      "duration": 0.36666666666666664,
+      "loop": false,
+      "category": "recovery",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_SwordCombo_Attack1Recovery",
+      "action": "Sabre_Recovery1",
+      "frames": [
+        1,
+        45
+      ]
+    },
+    "Recovery2": {
+      "duration": 0.3333333333333333,
+      "loop": false,
+      "category": "recovery",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_SwordCombo_Attack2Recovery",
+      "action": "Sabre_Recovery2",
+      "frames": [
+        1,
+        41
+      ]
+    },
+    "Recovery3": {
+      "duration": 0.6666666666666666,
+      "loop": false,
+      "category": "recovery",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_SwordCombo_Attack3Recovery",
+      "action": "Sabre_Recovery3",
+      "frames": [
+        1,
+        81
+      ]
+    },
+    "AirAttack": {
+      "duration": 0.8666666666666667,
+      "loop": false,
+      "category": "optional alternate",
+      "evidence": "source duration; authored sparse pose reconstruction",
+      "source_name": "Player_1H_Medium_JumpAttack",
+      "vfx_window": [
+        0.19,
+        0.38
+      ],
+      "vfx_evidence": "authored window around measured fast motion; not native hit/notify",
+      "action": "Sabre_AirAttack",
+      "frames": [
+        1,
+        105
+      ]
+    }
+  },
+  "glb": "Sabre_Character_Authored.glb",
+  "body_sha256": "d314f292bfe726bd8d63e5e3f2bd0066b4a1759d09bda78aa8ab543876b6f147",
+  "approximation": "No source TRS, UV, texture or rig copied. Source weapon shear omitted; new rigid full-size mount.",
+  "authored_input_sha256": {
+    "geometry.py": "c76d9ba773c24512bd4f88c9c4ab766c8340229bd1da98ac4ea958741885d8eb",
+    "motion.py": "2893d0c8cb649501408ef3a47fb7ba2e6f1538e015ce8949fcebf500d2f28564",
+    "build.py": "cebbd998680ae085601b8fcd1e706cb89404d2fccad00eb5f60419b9efbcfd1a"
+  }
+}

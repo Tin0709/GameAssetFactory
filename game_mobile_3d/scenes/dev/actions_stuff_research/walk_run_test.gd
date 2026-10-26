@@ -20,6 +20,9 @@ const SwordVisual=preload("res://scenes/dev/actions_stuff_research/sword_combat_
 const SwordPresenter=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/presenter.gd")
 const SwordController=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/controller.gd")
 const SwordGroup=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/combat_group.gd")
+const SabreMode=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/mode.gd")
+@export var md2_sabre_prototype_enabled:=false
+var sabre_mode:Node
 @export var sword_combat_enabled:=false
 @export var sword_private_reference_enabled:=false
 @export var sword_config:Resource=preload("res://scenes/dev/actions_stuff_research/sword_combat_v001/settings.tres")
@@ -66,6 +69,11 @@ const CAMERA_VERTICAL_RESPONSE:=8.0
 const CAMERA_AIR_UP_ZONE:=1.4
 const CAMERA_AIR_DOWN_ZONE:=1.1
 func _ready() -> void:
+	var use_sabre:bool=md2_sabre_prototype_enabled or "--md2-sabre" in OS.get_cmdline_user_args()
+	if "--sword" in OS.get_cmdline_user_args() or "--legacy-combat" in OS.get_cmdline_user_args():use_sabre=false
+	if get_tree().has_meta(SabreMode.SELECTION_META):use_sabre=bool(get_tree().get_meta(SabreMode.SELECTION_META))
+	if use_sabre:
+		sabre_mode=SabreMode.new();sabre_mode.name="MD2SabrePrototypeMode";add_child(sabre_mode);sabre_mode.setup(self);return
 	_build_environment()
 	player=PLAYER.instantiate();player.name="ResearchPlayer"
 	player.set_script(SwordActor if sword_combat_enabled and rifle_ready else SOURCE_ACTOR)
@@ -123,6 +131,7 @@ func _ready() -> void:
 		sword_combat=SwordController.new();sword_combat.name="OriginalSwordCombat";add_child(sword_combat);sword_combat.setup(self,sword_config)
 		if "--sword" in OS.get_cmdline_user_args():sword_combat.set_equipped(true)
 	_update_camera()
+	SabreMode.install_entry_button(self)
 func _build_environment() -> void:
 	var environment:=WorldEnvironment.new();var settings:=Environment.new();settings.background_mode=Environment.BG_COLOR;settings.background_color=Color(.17,.22,.26)
 	settings.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR;settings.ambient_light_color=Color(.78,.86,1.);settings.ambient_light_energy=.65
@@ -153,6 +162,7 @@ func _build_environment() -> void:
 	var ink:=StandardMaterial3D.new();ink.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;ink.albedo_color=Color(.36,.43,.44);grid.material_override=ink;add_child(grid)
 func _process(delta: float) -> void:
 	if player==null:return
+	if sabre_mode!=null:sabre_mode.present(delta);return
 	presentation.prepare(Engine.get_physics_interpolation_fraction())
 	if rifle_fire!=null:rifle_fire.present(presentation)
 	_update_camera(delta,presentation.display_actor)
@@ -184,14 +194,15 @@ func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	var target: Vector3=(player.global_position if display_position==null else display_position)+Vector3(0,.95,0)
 	# Actual ground contact owns floor elevation; do not follow the last airborne
 	# display sample upward on the landing frame.
-	if player.visual.jump_grounded: target.y=player.global_position.y+.95
+	var camera_grounded:bool=player.is_on_floor() if sabre_mode!=null else player.visual.jump_grounded
+	if camera_grounded: target.y=player.global_position.y+.95
 	if not _camera_initialized:
 		camera_anchor=target;_camera_initialized=true;_camera_vertical_velocity=0.
 	var horizontal:=1.-exp(-CAMERA_HORIZONTAL_RESPONSE*delta)
 	camera_anchor.x=lerpf(camera_anchor.x,target.x,horizontal)
 	camera_anchor.z=lerpf(camera_anchor.z,target.z,horizontal)
 	var height:=target.y
-	if not player.visual.jump_grounded:
+	if not camera_grounded:
 		# Keep the current anchor until the character leaves the visibility zone.
 		# Long falls/high elevation changes then follow with the same damping.
 		height=clampf(camera_anchor.y,target.y-CAMERA_AIR_UP_ZONE,target.y+CAMERA_AIR_DOWN_ZONE)
@@ -212,6 +223,7 @@ func _update_camera(delta: float=1./60.,display_position: Variant=null) -> void:
 	camera.global_position=camera_anchor+Vector3(sin(azimuth)*cos(elevation),sin(elevation),cos(azimuth)*cos(elevation))*view_distance
 	camera.look_at(camera_anchor,Vector3.UP);camera.size=camera_size
 func _input(event: InputEvent) -> void:
+	if sabre_mode!=null:sabre_mode.input(event);return
 	if sword_combat!=null and sword_combat.equipped:
 		if event is InputEventKey and not event.pressed and event.physical_keycode==KEY_E:sword_combat.attack(false)
 		if event is InputEventMouseButton and not event.pressed:
@@ -240,6 +252,7 @@ func _sync_rifle_controls() -> void:
 	if rifle_fire!=null:rifle_fire.set_trigger(_fire_key_held)
 	if rifle_auto_aim!=null and not (_fire_key_held or _right_aim_held):rifle_auto_aim.reset_target()
 func _unhandled_input(event: InputEvent) -> void:
+	if sabre_mode!=null:sabre_mode.unhandled_input(event);return
 	if sword_combat!=null:
 		if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_TAB:
 			sword_combat.set_equipped(not sword_combat.equipped);get_viewport().set_input_as_handled();return
@@ -267,11 +280,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		azimuth-=event.relative.x*.006;elevation=clampf(elevation+event.relative.y*.004,.15,.75)
 func _notification(what: int) -> void:
 	if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
+		if sabre_mode!=null:sabre_mode.release_inputs();return
 		if sword_combat!=null:sword_combat.attack(false);sword_combat.guard(false)
 		orbiting=false;_fire_key_held=false;_right_aim_held=false;_sync_rifle_controls()
 		_turn_left_held=false;_turn_right_held=false
 		if rifle_ready and is_instance_valid(player):player.visual.turn_axis=0.
 func reset_player() -> void:
+	if sabre_mode!=null:sabre_mode.reset();return
 	if sword_combat!=null:sword_combat.reset_combat()
 	if rifle_auto_aim!=null:rifle_auto_aim.reset_target()
 	if rifle_fire!=null:rifle_fire.reset_fire()
