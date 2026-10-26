@@ -108,7 +108,9 @@ func _build_ui()->void:
 	var vfx:=CheckButton.new();vfx.text="Blade trails";vfx.button_pressed=true;vfx.focus_mode=Control.FOCUS_NONE;row.add_child(vfx);vfx.toggled.connect(func(value:bool):effects.enabled=value)
 	var reset_button:=_button("Reset",row);reset_button.pressed.connect(reset)
 	if actor.using_original_source:
-		var direction:=CheckButton.new();direction.text="Locomotion direction adapter";direction.button_pressed=actor.locomotion_direction_enabled;direction.focus_mode=Control.FOCUS_NONE;box.add_child(direction);direction.toggled.connect(actor.set_locomotion_direction_adapter)
+		row=HBoxContainer.new();box.add_child(row)
+		var direction:=CheckButton.new();direction.text="Leg direction";direction.button_pressed=actor.locomotion_direction_enabled;direction.focus_mode=Control.FOCUS_NONE;row.add_child(direction);direction.toggled.connect(actor.set_locomotion_direction_adapter)
+		var stability:=CheckButton.new();stability.text="Stable body/head";stability.button_pressed=actor.body_stability_enabled;stability.focus_mode=Control.FOCUS_NONE;stability.tooltip_text="Gameplay adapter retains25% source spine/head oscillation. Raw review bypasses it; native MD2 blend weights are unknown.";row.add_child(stability);stability.toggled.connect(actor.set_body_stability)
 	if reference_audio!=null:
 		var audio:=CheckButton.new();audio.text="Original Sabre samples";audio.tooltip_text="Prototype sample mix and trigger timing; original Wwise graph not recovered.";audio.button_pressed=true;audio.disabled=reference_audio.available_count==0;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio);audio.toggled.connect(func(value:bool):reference_audio.enabled=value)
 	if actor.using_private_skin:
@@ -120,7 +122,7 @@ func _build_ui()->void:
 			elif reflection_probe!=null:reflection_probe.free();reflection_probe=null)
 		var refresh:=_button("Refresh",row);refresh.tooltip_text="Refresh the actor-only sky capture after lighting changes.";refresh.pressed.connect(refresh_reflections)
 	var note:=Label.new();note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;note.custom_minimum_size.x=318
-	note.text="Original source tracks; ready/strafe states reuse Idle/Walk/Run. Sabre mount/family, input, VFX and audio mix are adapters. Source weapon scale retained; no whiff hitstop." if actor.using_original_source else "New curves informed by measured motion. Sabre assignment/input/VFX timing inferred. Attack travel reduced; no lower-body blend or hitstop."
+	note.text="Original tracks; ready/strafe reuse Idle/Walk/Run. Ground attacks planted; stable body/head is a gameplay adapter. Sabre mount, VFX/audio timing inferred; raw review1x." if actor.using_original_source else "New curves informed by measured motion. Sabre assignment/input/VFX timing inferred. Attack travel reduced; no lower-body blend or hitstop."
 	note.add_theme_font_size_override("font_size",11);box.add_child(note)
 	var back:=_button("Return to original Rifle / Sword lab",box);back.name="ReturnOriginalLabButton";back.pressed.connect(func():
 		release_inputs();get_tree().set_meta(SELECTION_META,false);get_tree().change_scene_to_file(LAB_SCENE))

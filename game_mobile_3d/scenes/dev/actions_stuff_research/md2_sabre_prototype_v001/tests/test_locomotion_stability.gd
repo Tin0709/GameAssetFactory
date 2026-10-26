@@ -37,6 +37,25 @@ func run()->void:
 	a.animation_player.seek(.15,true);var unchanged:=true
 	for bone in rig.get_bone_count():unchanged=unchanged and rig.get_bone_pose(bone).is_equal_approx(reference[bone])
 	check(unchanged,"Raw Run review matches direct original sampling for all32bones")
+	if a.get("body_stability")!=null:
+		var helper=a.body_stability;var spine:=rig.find_bone("J_Spine");var head:=rig.find_bone("J_Head");var neck:=rig.get_bone_parent(head)
+		a.review_clip="";helper.deactivate();a.animation_player.play(a.clips.Run.action,0.);a.animation_player.seek(.12,true);rig.force_update_all_bone_transforms()
+		var raw:Array[Transform3D]=[];var legs:Array[Transform3D]=[]
+		for bone in rig.get_bone_count():raw.append(rig.get_bone_pose(bone))
+		for name:String in ["J_L_Leg","J_R_Leg"]:legs.append(rig.get_bone_global_pose(rig.find_bone(name)))
+		helper.apply("Run",.1,true);var allowed:=true
+		for bone in rig.get_bone_count():
+			if bone not in [spine,head]:allowed=allowed and rig.get_bone_pose(bone).is_equal_approx(raw[bone])
+		check(allowed,"Stability changes only spine/head local poses; arms/weapon/root/hip/legs stay original")
+		check(rig.get_bone_global_pose(rig.find_bone("J_L_Leg")).is_equal_approx(legs[0]) and rig.get_bone_global_pose(rig.find_bone("J_R_Leg")).is_equal_approx(legs[1]),"All lower-body global trajectories remain identical")
+		check(rig.get_bone_global_pose(head).origin.distance_to(rig.get_bone_global_pose(neck)*raw[head].origin)<.00001,"Head rotation stabilization keeps the original neck attachment position")
+		var stable:Transform3D=rig.get_bone_global_pose(head)
+		for i in 20:
+			helper.restore();a.animation_player.seek(.12,true);rig.force_update_all_bone_transforms();helper.apply("Run",1./60.,true)
+		check(rig.get_bone_global_pose(head).is_equal_approx(stable),"Repeated source evaluation has no accumulated stabilization drift")
+		helper.deactivate();var restored:=true
+		for bone in rig.get_bone_count():restored=restored and rig.get_bone_pose(bone).is_equal_approx(raw[bone])
+		check(restored,"Disabling stability restores every original local pose")
 	var out:={"checks":checks,"failures":failures,"trials":trials,"native_md2_blend_weights_verified":false}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://.validation/md2_sabre_movement"));FileAccess.open("res://.validation/md2_sabre_movement/locomotion-stability.json",FileAccess.WRITE).store_string(JSON.stringify(out,"\t"))
 	print("SABRE_LOCOMOTION_STABILITY ",JSON.stringify(out));lab.free();quit(0 if failures.is_empty() else 1)
