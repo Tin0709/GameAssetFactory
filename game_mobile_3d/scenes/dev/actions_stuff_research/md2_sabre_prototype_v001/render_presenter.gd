@@ -7,6 +7,8 @@ var rig:Skeleton3D
 var meshes:Array[MeshInstance3D]=[]
 var bindings:Array[Dictionary]=[]
 var parents:Array[int]=[]
+var head_bone:=-1
+var face_branches:Array[Array]=[]
 var previous:Dictionary={}
 var current:Dictionary={}
 var display_world:Array=[]
@@ -21,6 +23,9 @@ var last_uploaded_actor:=Vector3.ZERO
 func setup(body:CharacterBody3D)->void:
 	actor=body;rig=actor.skeleton;actor._refresh_markers()
 	for bone in rig.get_bone_count():parents.append(rig.get_bone_parent(bone))
+	if actor.using_original_source and actor.body_stability!=null:
+		head_bone=rig.find_bone("J_Head")
+		for face:int in actor.body_stability.face_roots:face_branches.append(_branch(face))
 	for mesh:MeshInstance3D in actor.model.find_children("*","MeshInstance3D",true,false):
 		meshes.append(mesh)
 		var record:={"skin":null,"bones":[],"bone":-1,"offset":Transform3D.IDENTITY}
@@ -59,6 +64,24 @@ func _global_pose(bone:int,locals:Array,globals:Array)->Transform3D:
 	var result:Transform3D=locals[bone]
 	if parents[bone]>=0:result=_global_pose(parents[bone],locals,globals)*result
 	globals[bone]=result;return result
+func _branch(root:int)->Array[int]:
+	var result:Array[int]=[root]
+	for bone in parents.size():
+		if parents[bone]==root:result.append_array(_branch(bone))
+	return result
+
+func _prepare_face_groups(alpha:float,locals:Array)->void:
+	if head_bone<0:return
+	for branch:Array in face_branches:
+		var root:int=branch[0]
+		var before:Transform3D=Transform3D(previous.world[head_bone]).affine_inverse()*Transform3D(previous.world[root])
+		var after:Transform3D=Transform3D(current.world[head_bone]).affine_inverse()*Transform3D(current.world[root])
+		# Sibling facial roots must follow the displayed head's arc, rather than
+		# the straight chord between their independent neck-local positions.
+		display_world[root]=Transform3D(display_world[head_bone])*before.interpolate_with(after,alpha)
+		for index in range(1,branch.size()):
+			var bone:int=branch[index]
+			display_world[bone]=Transform3D(display_world[parents[bone]])*Transform3D(locals[bone])
 
 func prepare(alpha:float)->void:
 	if current.is_empty():return
@@ -73,6 +96,7 @@ func prepare(alpha:float)->void:
 	var rig_transform:=Transform3D(previous.rig).interpolate_with(current.rig,render_alpha)
 	display_world.clear()
 	for bone in rig.get_bone_count():display_world.append(rig_transform*_global_pose(bone,locals,globals))
+	_prepare_face_groups(render_alpha,locals)
 	display_meshes.clear()
 	for index in meshes.size():
 		var record:Dictionary=bindings[index]
