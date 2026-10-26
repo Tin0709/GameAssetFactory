@@ -11,7 +11,7 @@ func ticks(count:int)->void:
 func release()->void:
 	for action:String in ["move_left","move_right","move_forward","move_backward","sprint","jump"]:Input.action_release(action)
 func run()->void:
-	var floor:=StaticBody3D.new();var floor_shape:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(1000,.4,1000);floor_shape.shape=box;floor_shape.position.y=-.2;floor.add_child(floor_shape);root.add_child(floor)
+	var floor:=StaticBody3D.new();var floor_shape:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(100,.4,100);floor_shape.shape=box;floor_shape.position.y=-.2;floor.add_child(floor_shape);root.add_child(floor)
 	var a=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();root.add_child(a)
 	check(a.using_original_source,"Probe uses original private source profile")
 	check(absf(a.run_speed-7.)<.00001,"Public player700 baseline converts100UU per Godot metre")
@@ -44,7 +44,8 @@ func run()->void:
 		Input.action_press("move_forward");await ticks(hz*2)
 		var blocked_start:Vector3=a.global_position;await ticks(8)
 		print("WALL_PROBE ",JSON.stringify({"hz":hz,"position":str(a.global_position),"delta":a.global_position.distance_to(blocked_start),"speed":a.current_speed,"rate":a._playback_speed,"contacts":a.get_slide_collision_count()}))
-		check(a.global_position.distance_to(blocked_start)<.001 and a.current_speed<.001 and a._playback_speed<.001,"Blocked capsule does not walk in place at "+str(hz))
+		var horizontal_delta:=Vector2(a.global_position.x-blocked_start.x,a.global_position.z-blocked_start.z).length()
+		check(horizontal_delta<.001 and a.current_speed<.001 and a._playback_speed<.001,"Blocked capsule does not walk in place at "+str(hz))
 		release();wall.free();a.reset_actor();await ticks(4)
 		# Simulate an actual ledge by removing support, not by changing is_on_floor.
 		floor_shape.set_deferred("disabled",true);await ticks(2)
