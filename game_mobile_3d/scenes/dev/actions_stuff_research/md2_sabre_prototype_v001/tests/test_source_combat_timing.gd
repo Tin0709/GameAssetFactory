@@ -17,7 +17,7 @@ func run()->void:
 	if a.has_signal("attack_accepted_timed"):a.attack_accepted_timed.connect(func(_index:int,_clip:String,_serial:int,at:float):accepted_times.append(at))
 	var timings:Array[Dictionary]=[]
 	for hz in [30,60]:
-		Engine.physics_ticks_per_second=hz;a.reset_actor();await ticks(4);a.set_physics_process(false)
+		Engine.physics_ticks_per_second=hz;a.reset_actor();a.set_physics_process(true);await ticks(4);a.set_physics_process(false)
 		accepted_times.clear();a.attack(true)
 		for i in ceili(.76*hz):a._physics_process(1./hz)
 		check(accepted_times.size()>=3 and absf(accepted_times[1]-accepted_times[0]-float(a.clips.Attack1.duration)/1.2)<.00001,"Accepted source chain retains fractional wall-time boundary at%dHz"%hz)

@@ -13,6 +13,7 @@ func run()->void:
 	lab.md2_sabre_prototype_enabled=true;lab.grass_field_blocks=30;root.add_child(lab)
 	await physics_frame;await process_frame
 	var a=lab.player;var mode=lab.sabre_mode
+	if a.using_original_source:check(absf(float(mode.reference_audio.clip_play_rates.AirAttack)-a.combo.air_attack_play_rate)<.000001,"Aerial source pose and audio share one physics-cadence adapter")
 	check(mode!=null and a.animation_player!=null,"Same lab opts into independent AnimationPlayer actor")
 	check(lab.zombie_combat==null and lab.rifle_fire==null and lab.sword_combat==null,"New mode has no legacy combat coupling")
 	check(a.skeleton.get_bone_count()==(32 if a.using_original_source else 11),"Selected source/authored rig imported")

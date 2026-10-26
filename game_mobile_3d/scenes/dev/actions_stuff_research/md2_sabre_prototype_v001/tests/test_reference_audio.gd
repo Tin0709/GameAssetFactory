@@ -89,6 +89,9 @@ func run()->void:
 		a.timeline_provider=func()->float:return 20.3333333333
 		a.enabled=false;a.enabled=true;a.trigger_attack(0,"Attack1",109,20.3);var before_unmute:int=a.played_count;a.advance(1./30.)
 		check(a.played_count==before_unmute+1 and a.pending.is_empty(),"Mute/reset cannot desynchronize source audio from an actor already20seconds into gameplay")
+		a.timeline_provider=Callable();a.reset();a.clip_play_rates["AirAttack"]=1.6;a.trigger_attack(0,"AirAttack",110)
+		var aerial:Dictionary=a.pending[0]
+		check(absf(float(aerial.at)+float(aerial.entry.peak)-float(aerial.entry.target)/1.6)<.000001,"Aerial envelope uses the same faster physics-cadence adapter as blade motion")
 	var report:={"checks":checks,"failures":failures,"available_sources":a.available_count,"voice_capacity":a.voices.size(),"native_mixer_recovered":false}
 	var dir:="res://.validation/md2_sabre_prototype_v001"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
