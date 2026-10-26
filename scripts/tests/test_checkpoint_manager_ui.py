@@ -226,6 +226,45 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.app.notifications.kind, 'error')
         self.assertIn('10', self.app.notifications.message)
 
+    def test_rounded_interval_controls_and_switch_preserve_behavior(self):
+        field = self.app.interval_input
+        field.minus.invoke()
+        self.assertEqual(self.app.interval_var.get(), '10')
+        self.app.interval_var.set('3599')
+        field.plus.invoke()
+        field.plus.invoke()
+        self.assertEqual(self.app.interval_var.get(), '3600')
+        self.app.interval_var.set('invalid')
+        field.plus.invoke()
+        self.assertEqual(self.app.interval_var.get(), '10')
+        self.assertEqual(self.app.schedule.interval, 10)
+        self.app.auto_toggles[0].invoke()
+        self.assertTrue(self.app.auto_vars[0].get())
+        self.assertTrue(self.app.auto_permits[0].is_set())
+        self.app.auto_toggles[0].invoke()
+        self.assertFalse(self.app.auto_vars[0].get())
+        self.assertFalse(self.app.auto_permits[0].is_set())
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Window-only blur uses Windows capture')
+    def test_modal_blurs_only_its_own_client_and_releases_snapshot(self):
+        from checkpoint_manager import ui_widgets
+        if ui_widgets.Image is None:
+            self.skipTest('Pillow unavailable')
+        self.root.deiconify()
+        self.root.update()
+        size = (self.root.winfo_width(), self.root.winfo_height())
+        source = ui_widgets.Image.new('RGB', size, '#222222')
+        with patch.object(ui_widgets.ImageGrab, 'grab', return_value=source) as capture:
+            self.app.dialog.show_details('Changes', 'Details')
+            self.root.update_idletasks()
+        capture.assert_called_once_with(window=self.root.winfo_id())
+        self.assertIsNotNone(self.app.dialog.backdrop_photo)
+        self.assertIsNotNone(self.app.dialog.card.backdrop)
+        self.app.dialog.close()
+        self.assertIsNone(self.app.dialog.backdrop_photo)
+        self.assertIsNone(self.app.dialog._blurred_source)
+        self.root.withdraw()
+
     def test_notification_inside_modal_stays_in_its_grab_and_cleans_up(self):
         self.app.dialog.show_details('Changes', 'Details')
         self.app.notifications.show('Đang xử lý', 'Đợi thao tác Git hiện tại.')

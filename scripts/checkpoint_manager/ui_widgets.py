@@ -397,12 +397,13 @@ class InAppDialog:
         return self.frame is not None
 
     def _open(self, title, kind):
+        previous_backdrop = self._blurred_source if self.active else None
         self.close()
         self.on_open()
         self.previous_focus = self.root.focus_get()
         self.root.update_idletasks()
-        self._blurred_source = None
-        if Image is not None and sys.platform == 'win32' and self.root.winfo_ismapped():
+        self._blurred_source = previous_backdrop
+        if previous_backdrop is None and Image is not None and sys.platform == 'win32' and self.root.winfo_ismapped():
             try:
                 # Capture this Tk client HWND only, never the desktop/other
                 # windows. Kept in memory and discarded when the panel closes.
