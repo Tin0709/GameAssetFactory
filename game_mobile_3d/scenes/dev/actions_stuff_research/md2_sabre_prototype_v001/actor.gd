@@ -184,14 +184,17 @@ func _physics_process(delta:float)->void:
 	if _move_requested:_last_run_gait=_run_requested
 	if _move_requested or jump_pressed:resume_gameplay()
 	var was_grounded:=is_on_floor() and velocity.y<=0.
+	# Source attacks are full-body/in-place. An unqueued recovery can yield to
+	# movement; a held/buffered combo keeps its authored feet, without fake travel.
+	if using_original_source and was_grounded and _move_requested and combo.phase==&"recovery" and not combo.held and combo.buffer_until<combo.clock-.0000001:combo.cancel()
 	if using_original_source and not was_grounded and combo.phase==&"air_attack":_heavy_slam_active=true
 	_time_since_grounded=0. if was_grounded else _time_since_grounded+delta
 	var speed:=run_speed if _run_requested else walk_speed
 	var desired:=stick.limit_length()*speed
-	# Preserve authored full-body attacks. Travel is reduced rather than blending
-	# over their legs; this adapter can still exhibit some moving-attack foot slip.
-	if combo.active() and was_grounded:desired*=.22
-	var planar:=Vector2(velocity.x,velocity.z).move_toward(desired,(deceleration if stick.is_zero_approx() else acceleration)*delta)
+	var ground_anchor:bool=using_original_source and combo.active() and was_grounded and not jump_pressed
+	if ground_anchor:desired=Vector2.ZERO
+	elif combo.active() and was_grounded:desired*=.22 # Authored fallback unchanged.
+	var planar:=Vector2.ZERO if ground_anchor else Vector2(velocity.x,velocity.z).move_toward(desired,(deceleration if stick.is_zero_approx() else acceleration)*delta)
 	# Public GA_HeavyJumpAttack GravityMultiplier2; native base jump remains unknown.
 	var gravity_factor:=2. if _heavy_slam_active else 1.
 	velocity=Vector3(planar.x,-.2 if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
