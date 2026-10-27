@@ -69,7 +69,9 @@ func sample(key:String,phase:float)->Array[Transform3D]:
 			Animation.TYPE_ROTATION_3D:q[channel.bone]=animation.rotation_track_interpolate(channel.index,time)
 			Animation.TYPE_SCALE_3D:s[channel.bone]=animation.scale_track_interpolate(channel.index,time)
 	var result:Array[Transform3D]=[]
-	for bone in defaults.size():result.append(Transform3D(Basis(q[bone]).scaled(s[bone]),p[bone]))
+	# glTF/Skeleton local TRS is R*S (columns), not world-axis S*R. Blink
+	# planes carry nonuniform scale and expose this distinction immediately.
+	for bone in defaults.size():result.append(Transform3D(Basis(q[bone])*Basis.from_scale(s[bone]),p[bone]))
 	return result
 
 func worlds(local:Array[Transform3D])->Array[Transform3D]:
