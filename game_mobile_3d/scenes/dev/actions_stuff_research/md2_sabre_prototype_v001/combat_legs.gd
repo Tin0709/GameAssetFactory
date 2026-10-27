@@ -8,8 +8,10 @@ var blend_seconds:=.05
 var _raw:Dictionary={}
 func setup(skeleton:Skeleton3D,config:Dictionary)->bool:
 	rig=skeleton
+	if not config.get("leg_branches") is Array or config.leg_branches.size()!=2 or config.leg_branches[0]==config.leg_branches[1]:return false
 	var roots:Array=[]
 	for name:Variant in config.get("leg_branches",[]):
+		if name not in ["J_L_Leg","J_R_Leg"]:return false
 		var bone:=rig.find_bone(String(name))
 		if bone<0:return false
 		roots.append(bone)

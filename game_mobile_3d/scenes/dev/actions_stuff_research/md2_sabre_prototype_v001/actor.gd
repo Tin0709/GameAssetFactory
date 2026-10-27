@@ -246,9 +246,9 @@ func _load_private_combat_clips(config:Variant)->void:
 	# Stage ALL resources and validate their relationship before changing any
 	# approved action. An optional malformed/stale sidecar must fail closed.
 	if not config is Dictionary or config.get("schema")!="md2-private-sabre-combat/1" or not config.get("additional_clips") is Array or config.additional_clips.size()>8:return
-	if not config.get("leg_branches") is Array or config.leg_branches.is_empty():return
+	if not config.get("leg_branches") is Array or config.leg_branches.size()!=2 or config.leg_branches[0]==config.leg_branches[1]:return
 	for name:Variant in config.leg_branches:
-		if not name is String or skeleton.find_bone(name)<0:return
+		if not name is String or name not in ["J_L_Leg","J_R_Leg"] or skeleton.find_bone(name)<0:return
 	var seconds:Variant=config.get("blend_seconds")
 	if not (seconds is float or seconds is int) or not is_finite(float(seconds)) or float(seconds)<=0.:return
 	var staged:Dictionary={};var candidate:Dictionary=clips.duplicate(true)
@@ -278,7 +278,7 @@ func _load_private_combat_clips(config:Variant)->void:
 		var valid:=player!=null and rig!=null and rig.get_bone_count()==skeleton.get_bone_count()
 		if valid:
 			for bone in rig.get_bone_count():
-				if rig.get_bone_name(bone)!=skeleton.get_bone_name(bone) or not rig.get_bone_rest(bone).is_equal_approx(skeleton.get_bone_rest(bone)):valid=false;break
+				if rig.get_bone_name(bone)!=skeleton.get_bone_name(bone) or rig.get_bone_parent(bone)!=skeleton.get_bone_parent(bone) or not rig.get_bone_rest(bone).is_equal_approx(skeleton.get_bone_rest(bone)):valid=false;break
 		if valid:
 			var names:=player.get_animation_list();var selected:Animation;var count:=0
 			for key:String in names:
@@ -387,10 +387,9 @@ func _physics_process(delta:float)->void:
 		_transition="" if using_original_source else ("ReadyEnter" if combat_requested else "ReadyExit");_transition_time=0.;_previous_combat=combat_requested
 	var left:=delta
 	_gait_cycles_this_tick=0.
-	while left>.00000001:
+	while left>0.:
 		var step:=minf(left,1./120.)
-		if combo.active():step=minf(step,combo.boundary_seconds())
-		if step<.00000001:combo.advance(.00000001);continue
+		if combo.active():step=minf(step,maxf(.00000001,combo.boundary_seconds()))
 		_animate(step);left-=step
 	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and (not combo.active() or (combo.native_enabled and combo.movement_allowed()))) if direction_adapter!=null else []
 	movement_meter.sample(delta,global_position,desired.length(),_move_requested,_gait_cycles_this_tick,soles)

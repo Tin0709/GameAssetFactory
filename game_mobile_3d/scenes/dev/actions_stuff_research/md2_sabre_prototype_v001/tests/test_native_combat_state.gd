@@ -47,4 +47,11 @@ func run()->void:
 		check(s.index==1 and s.time==0.,"Press after opened gate begins next strike without waiting for full recovery")
 		s.cancel();s.request_attack();s.advance(.01);s.request_attack();s.advance(.33)
 		check(s.index==0,"Expired220ms adapter tap cannot become a ghost combo")
+		for name:String in ["resume","chain","attack_duration"]:
+			s.cancel();s._start_attack(0);s.held=name=="chain"
+			var w:Dictionary=config.windows[0];s.advance((float(w[name])-1.1e-8)/float(w.rate));var before:float=s.clock
+			var sum:=0.
+			for segment:Dictionary in s.movement_plan(5e-8):sum+=segment.duration
+			s.advance(1e-8)
+			check(s.clock>before and absf(sum-5e-8)<1e-13,"Sub-epsilon wall boundary progresses and forecast accounts all time: "+name)
 	print("SABRE_NATIVE_COMBAT_STATE ",JSON.stringify({"checks":checks,"failures":failures}));actor.free();quit(0 if failures.is_empty() else 1)

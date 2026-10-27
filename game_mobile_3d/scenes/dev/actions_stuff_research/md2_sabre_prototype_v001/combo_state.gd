@@ -60,10 +60,9 @@ func movement_plan(delta:float)->Array[Dictionary]:
 	var copy=get_script().new();copy.clips=clips;copy.native_windows=native_windows;copy.native_enabled=native_enabled
 	for key in ["phase","index","time","clock","held","buffer_until","buffer_seconds","attack_play_rates","air_attack_play_rate","movement_breaks_enabled","movement_requested","step_serial","step_next_index","step_buffered","serial","_impact_sent"]:copy.set(key,get(key))
 	var result:Array[Dictionary]=[];var left:=maxf(0.,delta)
-	while left>.00000001:
+	while left>0.:
 		copy._resolve_native()
-		var dt:=minf(left,copy.boundary_seconds())
-		if dt<.00000001:copy.advance(.00000001);left-=.00000001;continue
+		var dt:=minf(left,maxf(.00000001,copy.boundary_seconds()))
 		result.append({"duration":dt,"move":copy.movement_allowed(),"phase":copy.phase,"index":copy.index,"time":copy.time,"serial":copy.serial})
 		copy.advance(dt);left-=dt
 	return result
@@ -119,11 +118,13 @@ func finish_step()->void:
 	else:phase=&"ready";time=0.;buffer_until=-1.
 func advance(delta:float)->void:
 	_resolve_native()
+	if active() and remaining()<=.00000001:_finish();_resolve_native()
 	var left:=maxf(delta,0.)
-	while left>.00000001:
+	while left>0.:
 		if not active():clock+=left;return
 		var rate:=playback_rate()
 		var segment:=minf(left,boundary_seconds())
+		if segment<=0.:_finish();_resolve_native();continue
 		var previous:=time
 		time+=segment*rate;clock+=segment;left-=segment
 		if phase in [&"attack",&"air_attack"] and not _impact_sent:
