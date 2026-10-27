@@ -522,7 +522,7 @@ func _animate(delta:float)->void:
 	_apply_face(delta)
 	for event:Dictionary in combo.drain_events():
 		if event.kind=="accepted":
-			_record_order(&"attack_accepted",{"accepted_index":event.index,"accepted_serial":event.serial,"source_simulation_time":simulation_clock-(combo.clock-float(event.at))})
+			_record_order(&"attack_notice",{"accepted_index":event.index,"accepted_serial":event.serial,"source_simulation_time":simulation_clock-(combo.clock-float(event.at)),"clock_scope":"Signal delivery; source_simulation_time is the reconstructed acceptance clock."})
 			accepted_count+=1;attack_accepted.emit(event.index,event.clip,event.serial)
 			attack_accepted_timed.emit(event.index,event.clip,event.serial,simulation_clock-(combo.clock-float(event.at)))
 		elif event.kind=="impact":impact_count+=1;impact_ready.emit(event.index,marker_base.global_position,marker_tip.global_position,event.serial)
