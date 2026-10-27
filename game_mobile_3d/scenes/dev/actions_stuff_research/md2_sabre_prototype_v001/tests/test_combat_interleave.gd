@@ -83,7 +83,8 @@ func run()->void:
 		a.set_physics_process(false);a.direction_adapter.restore();a.body_stability.restore()
 		var leg:int=a.skeleton.find_bone("J_L_Leg");var visible_leg:Transform3D=a.skeleton.get_bone_pose(leg);var cursor:float=a.animation_player.current_animation_position
 		a.animation_player.play(a.clips.Run.action,0.);a.animation_player.seek(cursor,true)
-		check(visible_leg.basis.is_equal_approx(a.skeleton.get_bone_pose(leg).basis),"Locomotion has taken over the legs by the middle of the real step at%dHz"%hz)
+		var gait_leg:Transform3D=a.source_gait.compose(cursor/float(a.clips.Run.duration),a.current_speed)[leg] if a.source_gait!=null else a.skeleton.get_bone_pose(leg)
+		check(visible_leg.basis.is_equal_approx(gait_leg.basis),"Current phase-composed locomotion owns legs by the middle of the real step at%dHz"%hz)
 		a.reset_actor();a.set_physics_process(true);await ticks(4)
 		# Walk off the actual platform edge, then submit a fresh airborne press
 		# before the following physics tick cancels the old ground reservation.
