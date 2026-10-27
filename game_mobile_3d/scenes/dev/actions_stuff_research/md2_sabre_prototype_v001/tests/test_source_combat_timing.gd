@@ -10,7 +10,7 @@ func ticks(count:int)->void:
 	for i in count:await tick()
 func run()->void:
 	var floor:=StaticBody3D.new();var col:=CollisionShape3D.new();var shape:=BoxShape3D.new();shape.size=Vector3(100,.4,100);col.shape=shape;col.position.y=-.2;floor.add_child(col);root.add_child(floor)
-	var a=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();a.scripted_input=true;root.add_child(a)
+	var a=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();a.scripted_input=true;root.add_child(a);a.set_native_combat_enabled(false) # Legacy policy regression; native behavior has dedicated suites.
 	check(a.using_original_source,"Combat test loads original private source profile")
 	var accepted_times:Array[float]=[]
 	check(a.has_signal("attack_accepted_timed"),"Actor preserves accepted sub-tick timestamp for synchronized audio")

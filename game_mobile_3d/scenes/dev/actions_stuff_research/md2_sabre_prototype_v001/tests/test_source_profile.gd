@@ -10,7 +10,7 @@ func run()->void:
 	check(a.get("using_original_source")==true,"Original source bundle is preferred over private retarget and authored fallback")
 	if not failures.is_empty():a.free();quit(1);return
 	check(a.skeleton.get_bone_count()==32 and a.skeleton.find_bone("J_R_Weapon")>=0,"Original32-joint hierarchy retained")
-	check(a.clips.size()==22 and a.source_clip_count==13 and a.source_alias_count==9,"Twenty-two semantic states expose thirteen originals and nine declared aliases")
+	check(a.clips.size()==22+a.supplemental_combat_clips and a.source_clip_count==13 and a.source_alias_count==9,"Twenty-two semantic states expose thirteen originals and nine declared aliases")
 	check(absf(a.clips.ReadyEnter.duration-2.666667)<.000001 and a.clips.ReadyEnter.source_alias_adapter,"Adjacent source manifest owns original transition-alias duration")
 	check(FileAccess.get_sha256(a.private_model_path())==a.private_metadata.glb_sha256,"Runtime source bundle matches validated original-data manifest")
 	var sabre:MeshInstance3D

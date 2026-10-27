@@ -503,7 +503,7 @@ func _play(key:String,blend:float=.04)->void:
 		return
 	var preserve_phase:bool=using_original_source and review_clip.is_empty() and active_clip in GAITS and key in GAITS
 	var resume_step:bool=using_original_source and review_clip.is_empty() and combo.phase==&"step" and key in GAITS
-	var resume_combat:bool=combo.native_enabled and review_clip.is_empty() and active_clip not in GAITS and key in GAITS
+	var resume_combat:bool=combo.native_enabled and review_clip.is_empty() and not active_clip.is_empty() and clips[active_clip].category in ["attack","recovery","finisher"] and active_clip!="AirAttack" and key in GAITS
 	var phase:=fposmod(animation_player.current_animation_position/float(clips[active_clip].duration),1.) if preserve_phase else (_gait_resume_phase if resume_step or resume_combat else 0.)
 	var transition_blend:=.08 if preserve_phase else blend
 	if resume_step and not preserve_phase:

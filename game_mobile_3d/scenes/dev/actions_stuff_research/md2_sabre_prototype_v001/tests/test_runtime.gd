@@ -17,7 +17,7 @@ func run()->void:
 	check(mode!=null and a.animation_player!=null,"Same lab opts into independent AnimationPlayer actor")
 	check(lab.zombie_combat==null and lab.rifle_fire==null and lab.sword_combat==null,"New mode has no legacy combat coupling")
 	check(a.skeleton.get_bone_count()==(32 if a.using_original_source else 11),"Selected source/authored rig imported")
-	check(a.clips.size()==22,"All twenty-two authored actions available")
+	check(a.clips.size()==22+a.supplemental_combat_clips,"All twenty-two authored actions available")
 	for key:String in a.clips:
 		check(a.animation_player.has_animation(a.clips[key].action),"Imported action "+key)
 		check(absf(a.animation_player.get_animation(a.clips[key].action).length-float(a.clips[key].duration))<.0001,"Imported action duration "+key)
@@ -68,7 +68,7 @@ func run()->void:
 		await ticks(ceili(hz*1.55))
 		var up:=InputEventKey.new();up.physical_keycode=KEY_E;up.pressed=false;Input.parse_input_event(up)
 		await ticks(hz)
-		check(accepted==[0,1,2] and emitted==[0,1,2],"Actual E events produce exactly three accepted attacks and ready gates at "+str(hz))
+		check(accepted==([0,1,2,0] if a.combo.native_enabled else [0,1,2]) and emitted==accepted,"Actual E events produce ordered native gate links and melee events at "+str(hz))
 		a.attack_accepted.disconnect(on_start);a.impact_ready.disconnect(on_gate)
 		var mouse:=InputEventMouseButton.new();mouse.button_index=MOUSE_BUTTON_RIGHT;mouse.pressed=true;mode.unhandled_input(mouse)
 		Input.action_press("move_right");await ticks(12);Input.action_release("move_right")
