@@ -92,6 +92,9 @@ func run()->void:
 		a.timeline_provider=Callable();a.reset();a.clip_play_rates["AirAttack"]=1.6;a.trigger_attack(0,"AirAttack",110)
 		var aerial:Dictionary=a.pending[0]
 		check(absf(float(aerial.at)+float(aerial.entry.peak)-float(aerial.entry.target)/1.6)<.000001,"Aerial envelope uses the same faster physics-cadence adapter as blade motion")
+		a.reset();a.clip_aliases["NativeFinisher"]="Attack3";var count_before:int=a.event_count
+		a.trigger_attack(2,"NativeFinisher",111)
+		check(a.event_count==count_before+1 and a.pending.size()==2,"Actual montage finisher retains bounded prototype swing/whoosh mix through explicit alias")
 	var report:={"checks":checks,"failures":failures,"available_sources":a.available_count,"voice_capacity":a.voices.size(),"native_mixer_recovered":false}
 	var dir:="res://.validation/md2_sabre_prototype_v001"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
