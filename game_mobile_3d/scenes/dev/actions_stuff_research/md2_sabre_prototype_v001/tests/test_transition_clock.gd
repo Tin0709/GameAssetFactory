@@ -35,6 +35,6 @@ func run()->void:
 	a.review_loop=false;a.review("Run");a._animate(.123)
 	check(absf(a.animation_player.current_animation_position-.123)<.000001,"Raw Run review clock remains1x")
 	var report:={"checks":checks,"failures":failures,"trials":trials,"interruption_error":interrupt_error}
-	var folder:=a.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/contract_audit")
+	var folder:String=a.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/contract_audit")
 	DirAccess.make_dir_recursive_absolute(folder);FileAccess.open(folder.path_join("transition-clock.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("SABRE_TRANSITION_CLOCK ",JSON.stringify(report));a.free();oracle.free();quit(0 if failures.is_empty() else 1)
