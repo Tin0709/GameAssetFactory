@@ -1,6 +1,30 @@
 # Player + Sabre prototype
 
-### Current — evaluated locomotion handoffs, 2026-10-27
+### Current — continuous combat composite boundaries, 2026-10-27
+
+The optional private handoff profile now supplies montage entry wall time.
+Playback rate no longer scales that entry. Consecutive attack/recovery segments
+retain the same handoff clock instead of starting another whole-body crossfade;
+the incoming segment still resets omitted constant tracks safely. A longer entry
+that crosses a segment boundary also continues without truncation. Fallback and
+raw1x review remain available. The entry snapshot and exit handling are still
+explicit adapters; this does not recreate the native montage stack or foot IK.
+
+All32-bone recovery-source comparisons and moving leg-layer checks pass at
+30/60/120Hz.35suites/1391checks pass. Same full-grass Mobile/D3D12 lab has17frames
+and606recorded states, including direction changes, held combos, unqueued
+recovery, jumping and stopping. Recorded native-input replay retains the same
+15ordered accepts; no recovery delay, queue rule or cancellation window changed.
+Movement, gait, approved sources, graphics and scene remain unchanged.
+
+Detailed configuration, before/after pose/contact-point measurements and native
+instance evidence live privately under Research
+`reports/prototype_sabre/runtime_locomotion/compiled_logic/behavior/`; the existing
+compiled-logic inspector has a Runtime behavior tab. Its source pose error is
+not a native contact/IK or general gameplay fidelity score. Native notify bodies,
+device-specific cancel rules and the real leg-mask interpolation remain open.
+
+### Previous milestone — evaluated locomotion handoffs, 2026-10-27
 
 Same scene, assets and private sidecar. The independent generic sampler now
 accepts an optional blend-input floor; the ground-state selector requires real
