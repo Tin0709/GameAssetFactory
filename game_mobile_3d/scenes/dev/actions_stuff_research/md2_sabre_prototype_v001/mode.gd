@@ -91,7 +91,7 @@ func _build_ui()->void:
 		release_inputs();get_tree().set_meta("md2_sabre_private_skin_selected",index==0);get_tree().set_meta(SELECTION_META,true);get_tree().change_scene_to_file(LAB_SCENE))
 	status=Label.new();status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;status.custom_minimum_size=Vector2(318,50);box.add_child(status);lab.hud=status
 	if actor.using_original_source:
-		var count:=Label.new();count.text="22 semantic states · %d original clips · %d aliases"%[actor.source_clip_count,actor.source_alias_count];box.add_child(count)
+		var count:=Label.new();count.text="%d states · %d source clips · %d aliases"%[actor.clips.size(),actor.source_clip_count+actor.supplemental_combat_clips,actor.source_alias_count];box.add_child(count)
 		var calibration:=Label.new();calibration.text=actor.cadence_label;calibration.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;calibration.custom_minimum_size.x=318;calibration.add_theme_font_size_override("font_size",11);box.add_child(calibration)
 	var hints:=Label.new();hints.text=("WASD normal7 · Shift slow Walk · Space jump" if actor.using_original_source else "WASD walk · Shift run · Space jump")+"\nLMB / E: combo · in air: downward attack\nRMB: combat strafe + mouse ground aim\nQ / C: turn · Middle drag: orbit · Wheel: zoom\nR reset · V overview · F3 meter · F4 zero · F8 camera";box.add_child(hints)
 	actions=OptionButton.new();actions.name="AuthoredActionSelector";actions.focus_mode=Control.FOCUS_NONE
@@ -126,6 +126,7 @@ func _build_ui()->void:
 		var refresh:=_button("Refresh",row);refresh.tooltip_text="Refresh the actor-only sky capture after lighting changes.";refresh.pressed.connect(refresh_reflections)
 	var note:=Label.new();note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;note.custom_minimum_size.x=318
 	note.text="Original tracks; ready/strafe reuse Idle/Walk/Run. Ground attacks planted; stable body/head is a gameplay adapter. Sabre mount, VFX/audio timing inferred; raw review1x." if actor.using_original_source else "New curves informed by measured motion. Sabre assignment/input/VFX timing inferred. Attack travel reduced; no lower-body blend or hitstop."
+	if actor.combo.native_enabled:note.text="Source clips + Sabre montage gates. Windup locks; ResumeMovement releases legs. Buffer, mask blending and sample mix remain reconstructed. Raw review1x preserves every key."
 	note.add_theme_font_size_override("font_size",11);box.add_child(note)
 	var back:=_button("Return to original Rifle / Sword lab",box);back.name="ReturnOriginalLabButton";back.pressed.connect(func():
 		release_inputs();get_tree().set_meta(SELECTION_META,false);get_tree().change_scene_to_file(LAB_SCENE))

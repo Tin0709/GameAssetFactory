@@ -15,6 +15,7 @@ func run()->void:
 	assert(actor.using_original_source)
 	folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/contract_audit")
 	if "--source-gait" in OS.get_cmdline_user_args():folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/source-gait-contract")
+	if "--combat-runtime" in OS.get_cmdline_user_args():folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/combat/pose")
 	if "--baseline" in OS.get_cmdline_user_args():
 		actor.source_transition.clear();actor.source_transition=null;folder=folder.path_join("baseline")
 	DirAccess.make_dir_recursive_absolute(folder)
@@ -34,6 +35,7 @@ func run()->void:
 			actor.animation_player.seek(time,true);actor._refresh_markers()
 			raw.append({"clip":key,"source_name":actor.clips[key].source_name,"time":time,"matrices":pose()})
 	FileAccess.open(folder.path_join("godot-raw-poses.json"),FileAccess.WRITE).store_string(JSON.stringify({"bones":names,"parents":parents,"rests":rests,"tracks":track_contract,"samples":raw}))
+	if "--raw-only" in OS.get_cmdline_user_args():print("LOCOMOTION_RAW_SAMPLES ",raw.size());actor.free();quit();return
 	var floor:=StaticBody3D.new();var collision:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(100,.4,100);collision.shape=box;collision.position.y=-.2;floor.add_child(collision);root.add_child(floor)
 	var trials:Array=[]
 	for hz in [30,60,120]:
