@@ -21,9 +21,10 @@ var _impact_sent:=false
 var _events:Array[Dictionary]=[]
 var native_enabled:=false
 var native_windows:Array=[]
+var native_input_policy:="legacy_buffer"
 
 func configure_native(config:Variant)->bool:
-	native_enabled=false;native_windows=[]
+	native_enabled=false;native_windows=[];native_input_policy="legacy_buffer"
 	if not config is Dictionary or config.get("schema")!="md2-private-sabre-combat/1" or not config.get("windows") is Array or config.windows.size()!=3:return false
 	for i in 3:
 		var w:Variant=config.windows[i]
@@ -37,6 +38,10 @@ func configure_native(config:Variant)->bool:
 		var attack_key:String=w.get("attack_key","Attack%d"%(i+1));var recovery_key:String=w.get("recovery_key","Recovery%d"%(i+1))
 		if not clips.has(attack_key) or not clips.has(recovery_key):return false
 		if clips[attack_key].get("source_name")!=w.get("attack_source") or clips[recovery_key].get("source_name")!=w.get("recovery_source"):return false
+	var input:Variant=config.get("input")
+	if input!=null:
+		if not input is Dictionary or input.get("ground_policy")!="live_hold":return false
+		native_input_policy="live_hold"
 	native_windows=config.windows.duplicate(true);native_enabled=true;return true
 
 func movement_allowed()->bool:
@@ -51,7 +56,7 @@ func boundary_seconds()->float:
 		if _queued() and time<float(w.chain)-.00000001:boundary=minf(boundary,float(w.chain)-time)
 	return boundary/playback_rate()
 
-func _queued()->bool:return held or buffer_until>=clock-.0000001
+func _queued()->bool:return held or (native_input_policy!="live_hold" and buffer_until>=clock-.0000001)
 
 func _resolve_native()->void:
 	if native_enabled and phase in [&"attack",&"recovery"] and _queued():
@@ -59,7 +64,7 @@ func _resolve_native()->void:
 
 func movement_plan(delta:float)->Array[Dictionary]:
 	# Forecast with the SAME state machine. No real clock/input/event mutation.
-	var copy=get_script().new();copy.clips=clips;copy.native_windows=native_windows;copy.native_enabled=native_enabled
+	var copy=get_script().new();copy.clips=clips;copy.native_windows=native_windows;copy.native_enabled=native_enabled;copy.native_input_policy=native_input_policy
 	for key in ["phase","index","time","clock","held","buffer_until","buffer_seconds","attack_play_rates","air_attack_play_rate","movement_breaks_enabled","movement_requested","step_serial","step_next_index","step_buffered","serial","_impact_sent"]:copy.set(key,get(key))
 	var result:Array[Dictionary]=[];var left:=maxf(0.,delta)
 	while left>0.:
@@ -89,6 +94,11 @@ func attack(value:bool,airborne:bool=false)->void:
 	held=value
 	if edge:request_attack(airborne)
 func request_attack(airborne:bool=false)->void:
+	if native_enabled and native_input_policy=="live_hold" and phase in [&"attack",&"recovery"]:
+		# Captured grounded presses are not stored across an active ability.
+		# Held input is sampled at RecoveryStart; a fresh later edge is immediate.
+		if phase==&"recovery" or time>=float(native_windows[index].chain)-.00000001:_start_attack((index+1)%3)
+		return
 	if phase==&"step" and airborne:_start_attack(0,true)
 	elif phase==&"step":step_buffered=true
 	elif not active():_start_attack(0,airborne)
@@ -98,7 +108,7 @@ func _start_attack(which:int,airborne:bool=false)->void:
 	buffer_until=-1.;step_buffered=false;_impact_sent=false
 	_events.append({"kind":"accepted","index":index,"serial":serial,"clip":clip(),"at":clock})
 func _finish()->void:
-	var queued:=held or buffer_until>=clock-.0000001
+	var queued:=_queued() if native_enabled else held or buffer_until>=clock-.0000001
 	if phase==&"air_attack":phase=&"ready";time=0.;buffer_until=-1.;return
 	if native_enabled:
 		if queued:_start_attack((index+1)%3)
