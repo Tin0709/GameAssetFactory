@@ -47,7 +47,7 @@ func run()->void:
 		check(absf(wrapf(a._gait_resume_phase-float(measured.phase),-.5,.5))<.0003,"Native restart and shared leg phase follow open travel at "+str(hz))
 		a.attack(false);a.requested_direction=Vector2.UP
 		for i in hz*2:await tick()
-		check(a.active_clip=="Run" and absf(a.current_speed-7.)<.001,"Recovery immediately yields naturally to full-speed gait at "+str(hz))
+		check(a.active_clip=="Run" and absf(a.current_speed-7.)<.001,"Recovery immediately yields naturally to full-speed gait at "+str(hz)+" actual="+str({"clip":a.active_clip,"speed":a.current_speed,"position":a.position,"combo":a.combo.phase,"clock":a.simulation_clock}))
 		check(absf(wrapf(a.visual.rotation.y-PI,-PI,PI))<.001,"Combat turning and free locomotion share native yaw response at "+str(hz))
 		trials.append({"hz":hz,"expected_m":measured.expected,"actual_m":measured.path,"locked_m":measured.locked_path,"open_seconds":measured.open_time})
 	for hz in [30,60,120]:
