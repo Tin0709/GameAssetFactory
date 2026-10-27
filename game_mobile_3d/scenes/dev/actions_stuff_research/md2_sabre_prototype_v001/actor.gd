@@ -15,6 +15,7 @@ const MovementMeter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_p
 const BodyStability=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/locomotion_stability.gd")
 const SourceTransition=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_transition.gd")
 const SourceGait=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
+const CombatLegs=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combat_legs.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 # User-accepted jump study; native launch/scale recovered, full trajectory pending.
@@ -49,6 +50,12 @@ var body_stability_enabled:=true
 var body_stability:RefCounted
 var source_transition:RefCounted
 var source_gait:RefCounted
+var combat_legs:RefCounted
+var _combat_plan_active:=false
+var _combat_open_seconds:=0.
+var _animation_motion_speed:=0.
+var _combat_path:=0.
+var _combat_locked_seconds:=0.
 var native_gait_enabled:=true
 var cadence_label:=""
 var current_speed:=0.
@@ -184,6 +191,9 @@ func _ready()->void:
 		source_transition=SourceTransition.new();source_transition.setup(skeleton)
 		var gait:=SourceGait.new()
 		if gait.setup(skeleton,animation_player,clips,runtime_locomotion_profile.get("gait_blend")):source_gait=gait;cadence_label="Live player700 /100 =7 units/s · ground settings recovered\nSource phase blend %.3f Hz · evidence in private profile"%(1./float(gait.state(run_speed).period))
+		if combo.native_enabled and source_gait!=null:
+			var legs:=CombatLegs.new()
+			if legs.setup(skeleton,runtime_locomotion_profile.combat):combat_legs=legs
 		body_stability=BodyStability.new();body_stability.setup(skeleton,animation_player,clips)
 	for index in face.mesh.get_blend_shape_count():
 		if face.mesh.get_blend_shape_name(index)=="Focused":_focus_index=index
@@ -286,17 +296,26 @@ func _physics_process(delta:float)->void:
 			if _step_ready or not _move_requested:combo.finish_step()
 	# Source attacks are full-body/in-place. An unqueued recovery can yield to
 	# movement; a held/buffered combo keeps its authored feet, without fake travel.
-	if using_original_source and was_grounded and _move_requested and combo.phase==&"recovery" and not combo.held and combo.buffer_until<combo.clock-.0000001:combo.cancel()
+	if using_original_source and not combo.native_enabled and was_grounded and _move_requested and combo.phase==&"recovery" and not combo.held and combo.buffer_until<combo.clock-.0000001:combo.cancel()
 	if using_original_source and not was_grounded and combo.phase==&"air_attack":_heavy_slam_active=true
 	_time_since_grounded=0. if was_grounded else _time_since_grounded+delta
 	var speed:=run_speed if _run_requested else walk_speed
 	var desired:=stick.limit_length()*speed
-	var ground_anchor:bool=using_original_source and combo.active() and was_grounded and not jump_pressed
+	combo.advance(0.) # Resolve a late command already beyond RecoveryStart.
+	_combat_plan_active=combo.native_enabled and combo.active() and was_grounded and not jump_pressed and review_clip.is_empty()
+	_combat_open_seconds=0.
+	if _combat_plan_active:
+		for segment:Dictionary in combo.movement_plan(delta):
+			if segment.move:_combat_open_seconds+=float(segment.duration)
+	var ground_anchor:bool=using_original_source and not combo.native_enabled and combo.active() and was_grounded and not jump_pressed
 	if ground_anchor:desired=Vector2.ZERO
 	elif not using_original_source and combo.active() and was_grounded:desired*=.22 # Authored fallback unchanged.
 	var response_acceleration:=air_acceleration if using_original_source and not was_grounded else acceleration
 	var response_deceleration:=air_deceleration if using_original_source and not was_grounded else deceleration
 	var planar:=Vector2.ZERO if ground_anchor else Vector2(velocity.x,velocity.z).move_toward(desired,(response_deceleration if stick.is_zero_approx() else response_acceleration)*delta)
+	# One collision solve per physics tick; integrate only permitted subintervals.
+	# Animation below uses full open-interval speed, not this frame-average speed.
+	if _combat_plan_active:planar=desired*(_combat_open_seconds/delta)
 	# Public GA_HeavyJumpAttack GravityMultiplier2; native base jump remains unknown.
 	var gravity_factor:=2. if _heavy_slam_active else 1.
 	velocity=Vector3(planar.x,-.2 if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
@@ -319,8 +338,13 @@ func _physics_process(delta:float)->void:
 	elif not _grounded and _jump_stage.is_empty():_jump_stage="JumpAirborne";_jump_time=0.
 	_floor_initialized=_floor_initialized or _grounded
 	current_speed=Vector2(get_real_velocity().x,get_real_velocity().z).length()
+	_animation_motion_speed=current_speed
+	if _combat_plan_active:
+		var distance:=Vector2(global_position.x-before_move.x,global_position.z-before_move.z).length()
+		_animation_motion_speed=minf(desired.length(),distance/_combat_open_seconds) if _combat_open_seconds>.00000001 else 0.
+		_combat_path+=distance;_combat_locked_seconds+=delta-_combat_open_seconds
 	var facing:=visual.rotation.y
-	if not combo.active():
+	if not combo.active() or (combo.native_enabled and _grounded):
 		if combat_requested:
 			if has_aim_point:
 				var look:=aim_point-global_position
@@ -335,10 +359,10 @@ func _physics_process(delta:float)->void:
 	_gait_cycles_this_tick=0.
 	while left>.00000001:
 		var step:=minf(left,1./120.)
-		if combo.active():step=minf(step,combo.remaining()/combo.playback_rate())
+		if combo.active():step=minf(step,combo.boundary_seconds())
 		if step<.00000001:combo.advance(.00000001);continue
 		_animate(step);left-=step
-	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and not combo.active()) if direction_adapter!=null else []
+	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and (not combo.active() or (combo.native_enabled and combo.movement_allowed()))) if direction_adapter!=null else []
 	movement_meter.sample(delta,global_position,desired.length(),_move_requested,_gait_cycles_this_tick,soles)
 	physics_pose_ready.emit()
 
@@ -348,18 +372,35 @@ func _animate(delta:float)->void:
 	simulation_clock+=delta;expression_clock+=delta
 	var selected:=_select_clip()
 	_play(selected)
+	var motion_speed:float=_animation_motion_speed if _combat_plan_active else current_speed
+	var layered_combat:bool=combat_legs!=null and combo.native_enabled and review_clip.is_empty() and _grounded and combo.phase in [&"attack",&"recovery"]
+	var moving_legs:bool=layered_combat and combo.movement_allowed() and motion_speed>.001 and _move_requested
 	_playback_speed=1.
 	if review_clip.is_empty() and combo.active():_playback_speed=combo.playback_rate()
 	if review_clip.is_empty() and selected in GAITS:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
-		_playback_speed=maxf(0.,current_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
+		_playback_speed=maxf(0.,motion_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
 	var composed_gait:bool=source_gait!=null and native_gait_enabled and review_clip.is_empty() and selected in GAITS and _grounded
-	var gait_state:Dictionary=source_gait.state(current_speed) if composed_gait else {}
-	if composed_gait:_playback_speed=float(clips[selected].duration)/float(gait_state.period) if current_speed>.001 else 0.
+	var gait_state:Dictionary=source_gait.state(motion_speed) if composed_gait else {}
+	if composed_gait:_playback_speed=float(clips[selected].duration)/float(gait_state.period) if motion_speed>.001 else 0.
 	if source_transition!=null:source_transition.restore()
+	# Transition's raw snapshot includes the previous layer; restore its base AFTER
+	# transition restoration so omitted constant source tracks cannot accumulate it.
+	if combat_legs!=null:combat_legs.restore()
 	var source_before:=animation_player.current_animation_position
 	animation_player.advance(delta*_playback_speed)
-	if composed_gait:source_gait.apply(animation_player.current_animation_position/float(clips[selected].duration),current_speed)
+	if composed_gait:source_gait.apply(animation_player.current_animation_position/float(clips[selected].duration),motion_speed)
+	if layered_combat:
+		var leg_state:Dictionary=source_gait.state(motion_speed)
+		var before_phase:=_gait_resume_phase
+		var advance_phase:=delta/float(leg_state.period) if moving_legs else 0.
+		_gait_resume_phase=fposmod(before_phase+advance_phase,1.)
+		combat_legs.apply(source_gait.compose(_gait_resume_phase,motion_speed),moving_legs,delta)
+		_gait_cycles_this_tick+=advance_phase
+		if moving_legs:
+			var event_clip:String=leg_state.right if float(leg_state.weight)>.5 else leg_state.left
+			_dispatch_locomotion_events(event_clip,before_phase*float(clips[event_clip].duration),advance_phase*float(clips[event_clip].duration),delta)
+	elif combat_legs!=null:combat_legs.weight=0.
 	if source_transition!=null:source_transition.apply(delta)
 	if review_clip.is_empty() and selected in GAITS:
 		var event_clip:String=(gait_state.right if float(gait_state.weight)>.5 else gait_state.left) if composed_gait else selected
@@ -386,7 +427,7 @@ func _animate(delta:float)->void:
 		else:body_stability.deactivate()
 	if direction_adapter!=null:
 		var settling:bool=selected in ["Idle","CombatReady"] and absf(direction_adapter.current_yaw)>.0001
-		if locomotion_direction_enabled and review_clip.is_empty() and _grounded and not combo.active() and (selected in GAITS or settling):
+		if locomotion_direction_enabled and review_clip.is_empty() and _grounded and ((not combo.active() and (selected in GAITS or settling)) or moving_legs):
 			direction_adapter.apply(velocity,delta)
 		else:direction_adapter.deactivate()
 	_refresh_markers()
@@ -459,7 +500,8 @@ func _play(key:String,blend:float=.04)->void:
 		return
 	var preserve_phase:bool=using_original_source and review_clip.is_empty() and active_clip in GAITS and key in GAITS
 	var resume_step:bool=using_original_source and review_clip.is_empty() and combo.phase==&"step" and key in GAITS
-	var phase:=fposmod(animation_player.current_animation_position/float(clips[active_clip].duration),1.) if preserve_phase else (_gait_resume_phase if resume_step else 0.)
+	var resume_combat:bool=combo.native_enabled and review_clip.is_empty() and active_clip not in GAITS and key in GAITS
+	var phase:=fposmod(animation_player.current_animation_position/float(clips[active_clip].duration),1.) if preserve_phase else (_gait_resume_phase if resume_step or resume_combat else 0.)
 	var transition_blend:=.08 if preserve_phase else blend
 	if resume_step and not preserve_phase:
 		# Gait advances by distance; an80ms source-clock blend would consume most
@@ -476,9 +518,10 @@ func _play(key:String,blend:float=.04)->void:
 	# glTF import drops channels that remain equal to the bone rest. A new clip
 	# must begin from those defaults, rather than retaining a prior clip's pupil
 	# or weapon helper pose. Snapshot the outgoing handoff BEFORE this reset.
+	if combat_legs!=null:combat_legs.discard_raw()
 	if using_original_source:skeleton.reset_bone_poses()
 	active_clip=key;animation_player.play(clips[key].action,0. if source_transition!=null else transition_blend);animation_player.advance(0.)
-	if preserve_phase or resume_step:animation_player.seek(phase*float(clips[key].duration),true)
+	if preserve_phase or resume_step or resume_combat:animation_player.seek(phase*float(clips[key].duration),true)
 	if source_transition!=null:source_transition.apply(0.)
 func attack(value:bool)->void:
 	if value:resume_gameplay()
@@ -487,6 +530,7 @@ func review(key:String)->void:
 	if not clips.has(key):return
 	if body_stability!=null:body_stability.deactivate()
 	if direction_adapter!=null:direction_adapter.deactivate()
+	if combat_legs!=null:combat_legs.clear()
 	combo.cancel();release_inputs();review_clip=key;_review_time=0.;active_clip="";_play(key);animation_player.seek(0.,true)
 	presentation_reset.emit()
 func resume_gameplay()->void:
@@ -501,6 +545,10 @@ func set_body_stability(value:bool)->void:
 	body_stability_enabled=value
 	if not value and body_stability!=null:body_stability.deactivate()
 func set_native_gait_enabled(value:bool)->void:native_gait_enabled=value
+func set_native_combat_enabled(value:bool)->void:
+	combo.cancel()
+	combo.native_enabled=value and not combo.native_windows.is_empty()
+	if combat_legs!=null:combat_legs.clear()
 func set_movement_camera_basis(camera_basis:Basis)->void:
 	# The installed MD2 WASD reference mod also uses camera-relative input.
 	# These vectors are horizontal and orthonormal: diagonals retain unit length.
@@ -522,6 +570,8 @@ func reset_actor()->void:
 	if body_stability!=null:body_stability.deactivate()
 	if direction_adapter!=null:direction_adapter.deactivate()
 	if source_transition!=null:source_transition.clear()
+	if combat_legs!=null:combat_legs.clear()
+	_combat_plan_active=false;_combat_open_seconds=0.;_animation_motion_speed=0.;_combat_path=0.;_combat_locked_seconds=0.
 	release_inputs();combo.cancel();global_position=Vector3.ZERO;velocity=Vector3.ZERO;current_speed=0.
 	review_clip="";active_clip="";_jump_stage="";_jump_time=0.;_heavy_slam_active=false;_transition="";_transition_time=0.;_grounded=false;_floor_initialized=false;_previous_combat=false
 	accepted_count=0;impact_count=0
@@ -554,6 +604,7 @@ func movement_measurements()->Dictionary:
 		var phase_verified:bool=(observed is float or observed is int) and is_finite(float(observed)) and float(observed)>0. and bool(report.get("native_ground_motion_trace_verified",false))
 		report.merge({"native_gait_enabled":native_gait_enabled,"native_gait_state":source_gait.state(current_speed),"native_normal_phase_hz_observed":observed,"native_normal_gait_phase_verified":phase_verified,"native_source_pose_blend_exact":false,"gait_composition_scope":"Recovered source samples/input, observed normal phase; local/face blending reconstruction" if phase_verified else "Configured source-phase blend; observational metadata absent"})
 	if source_transition!=null:report.merge({"transition_wall_seconds":source_transition.duration,"transition_elapsed_seconds":source_transition.elapsed,"transition_clock":"wall time, independent of source cadence"})
+	if combo.native_enabled:report.merge({"native_combat_enabled":true,"combat_phase":str(combo.phase),"combat_strike":combo.index+1,"combat_source_seconds":combo.time,"combat_move_allowed":combo.movement_allowed(),"combat_open_seconds_this_tick":_combat_open_seconds,"combat_path_metres":_combat_path,"combat_locked_seconds":_combat_locked_seconds,"combat_leg_weight":combat_legs.weight if combat_legs!=null else 0.,"combat_leg_phase":_gait_resume_phase,"combat_open_speed":_animation_motion_speed,"combat_buffer_seconds_adapter":combo.buffer_seconds,"attack_travel_adapter":null,"native_combat_pose_mask_exact":false},true)
 	var actual:=get_real_velocity();var travelling:=Vector2(actual.x,actual.z).length()>.01
 	var travel_heading:=atan2(actual.x,actual.z)
 	var body_forward:=visual.global_basis*Vector3(0,0,1);var body_heading:=atan2(body_forward.x,body_forward.z)
