@@ -190,6 +190,10 @@ func present(delta:float)->void:
 		var right:String="—" if m.sole_speed[1]<0. else "%.2f"%m.sole_speed[1]
 		var response:String="—" if m.response_95<0. else "%d ms"%roundi(m.response_95*1000.)
 		movement_label.text="Speed %.2f / target %.2f u/s · peak %.2f\nPath %.2f · net %.2f units · %.1f s\nGait %.2f cycles/s · %.3fx · total %.2f\nStart95 %s · stop %.3fu / %.3fs\nSole candidates L %s / R %s u/s\nSole motion includes rolling; native rates unverified"%[m.speed,m.target_speed,m.peak_speed,m.distance,m.net_distance,m.elapsed,m.cycle_hz,m.play_rate,m.gait_cycles,response,m.stop_distance,m.stop_seconds,left,right]
+		if actor.using_original_source:
+			var body_angle:String="—" if m.body_travel_angle_deg==null else "%.1f°"%float(m.body_travel_angle_deg)
+			var leg_angle:String="—" if m.legs_travel_angle_deg==null else "%.1f°"%float(m.legs_travel_angle_deg)
+			movement_label.text+="\nPhase %.3f · handoff %.0f / %.0f ms\nTravel Δ body %s · legs %s"%[m.source_phase,minf(float(m.transition_elapsed_seconds),float(m.transition_wall_seconds))*1000.,float(m.transition_wall_seconds)*1000.,body_angle,leg_angle]
 		var c:=camera_measurements()
 		camera_label.text="Camera adapter · %s %.2f\nYaw %.2f° · elevation %.2f° · arm %.2fu\nNative MD2 solo camera values unresolved"%[c.projection,c.orthographic_span,c.azimuth_deg,c.elevation_deg,c.arm_distance]
 func camera_measurements()->Dictionary:

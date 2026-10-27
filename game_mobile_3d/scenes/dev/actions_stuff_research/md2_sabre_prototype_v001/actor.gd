@@ -428,6 +428,10 @@ func movement_measurements()->Dictionary:
 	report.merge({"clip":active_clip,"play_rate":_playback_speed,"world_velocity":[velocity.x,velocity.y,velocity.z],"walk_speed":walk_speed,"run_speed":run_speed,"walk_stride_reference":walk_stride_speed,"run_stride_reference":run_stride_speed,"source_table_speed":700 if using_original_source else null,"unit_conversion":"100UU per Godot metre; local effective MD2 runtime unverified" if using_original_source else "authored fallback","acceleration_setting":acceleration,"deceleration_setting":deceleration,"turn_rate_adapter":12.,"attack_travel_adapter":.22,"coyote_time":coyote_time,"jump_height_adapter":jump_height,"gravity_adapter":gravity,"native_runtime_parameters_recovered":false})
 	if using_original_source:report.merge({"attack_travel_adapter":0.,"body_stability_enabled":body_stability_enabled,"retained_body_oscillation_adapter":BodyStability.RETAINED_OSCILLATION,"body_stability_strength":body_stability.strength},true)
 	if source_transition!=null:report.merge({"transition_wall_seconds":source_transition.duration,"transition_elapsed_seconds":source_transition.elapsed,"transition_clock":"wall time, independent of source cadence"})
+	var actual:=get_real_velocity();var travelling:=Vector2(actual.x,actual.z).length()>.01
+	var travel_heading:=atan2(actual.x,actual.z)
+	var body_forward:=visual.global_basis*Vector3(0,0,1);var body_heading:=atan2(body_forward.x,body_forward.z)
+	report.merge({"source_phase":animation_player.current_animation_position/float(clips[active_clip].duration) if not active_clip.is_empty() else 0.,"body_travel_angle_deg":absf(rad_to_deg(wrapf(body_heading-travel_heading,-PI,PI))) if travelling else null,"legs_travel_angle_deg":absf(rad_to_deg(wrapf(direction_adapter.current_world_yaw-travel_heading,-PI,PI))) if travelling and direction_adapter!=null else null})
 	return report
 func save_movement_measurements()->String:
 	var folder:=private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements") if using_private_skin else "user://sabre_movement_measurements"
