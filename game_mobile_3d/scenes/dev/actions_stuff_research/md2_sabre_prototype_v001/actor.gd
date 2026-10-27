@@ -15,7 +15,7 @@ const BodyStability=preload("res://scenes/dev/actions_stuff_research/md2_sabre_p
 const SourceTransition=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_transition.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
-# Ordinary jump study timing; native MD2 launch/gravity have NOT been recovered.
+# User-accepted jump study; native launch/scale recovered, full trajectory pending.
 const SOURCE_JUMP_APEX_SECONDS:=.25
 const SOURCE_MOVING_LAND_SECONDS:=.05
 const COMBAT_STEP_DISTANCE:=.45 # Reconstructed interval; no native value recovered.
@@ -51,6 +51,10 @@ var walk_speed:=2.16
 var run_speed:=6.0372
 var acceleration:=48.
 var deceleration:=42.
+var air_acceleration:=48.
+var air_deceleration:=42.
+var ground_turn_rate:=12.
+var runtime_locomotion_profile:Dictionary={}
 var gravity:=18.
 var jump_height:=1.2
 var coyote_time:=0.
@@ -138,8 +142,8 @@ func _ready()->void:
 			unique_sources[entry.source_name]=true
 			if entry.get("source_alias_adapter",false):source_alias_count+=1
 		source_clip_count=unique_sources.size()
-		# Public DT_PlayerDefinition#0: MovementSpeed700, multiplier1, coyote.155.
-		# Standard100UU/m conversion; local effective runtime values unverified.
+		# Table baseline; an external, owner-verified live profile can refine the
+		# ground response without placing recovered configuration in the project.
 		# Slow Walk and stride references remain disclosed study adapters.
 		walk_speed=2.;run_speed=700./100.;coyote_time=.155
 		gravity=2.*jump_height/(SOURCE_JUMP_APEX_SECONDS*SOURCE_JUMP_APEX_SECONDS)
@@ -149,7 +153,16 @@ func _ready()->void:
 		# Public DT_MeleePropertyDefinition#44 Sabre variants, not a global speedup.
 		combo.attack_play_rates=[1.2,1.2,1.]
 		combo.movement_breaks_enabled=true
-		cadence_label="Table700 ×1 /100 =7 units/s · runtime unverified\nGait follows travel/stride · review1x"
+		air_acceleration=acceleration;air_deceleration=deceleration
+		runtime_locomotion_profile=read_runtime_locomotion_profile(private_model_path().get_base_dir().path_join("MD2_Locomotion_Runtime.json"))
+		if not runtime_locomotion_profile.is_empty():
+			var ground:Dictionary=runtime_locomotion_profile.ground
+			var units:float=runtime_locomotion_profile.units.centimetres_per_godot_unit
+			run_speed=float(ground.speed_cm_s)/units
+			acceleration=float(ground.acceleration_cm_s2)/units
+			deceleration=float(ground.braking_deceleration_cm_s2)/units
+			ground_turn_rate=deg_to_rad(float(ground.yaw_deg_s))
+		cadence_label=("Live player700 /100 =7 units/s · ground response recovered" if not runtime_locomotion_profile.is_empty() else "Table700 /100 =7 units/s · live profile absent")+"\nGait travel/stride adapter · native evaluator rate unresolved"
 		direction_adapter=DirectionAdapter.new();direction_adapter.setup(skeleton,model)
 	combo.setup(clips)
 	animation_player.callback_mode_process=AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
@@ -175,6 +188,22 @@ func private_model_path()->String:
 	var source:=research_root.path_join("blender/prototype_sabre/MD2_Valorie_Sabre_Source.glb")
 	if FileAccess.file_exists(source) and FileAccess.file_exists(source.get_basename()+".json"):return source
 	return research_root.path_join("blender/prototype_sabre/MD2_Valorie_Sabre_Private.glb")
+static func read_runtime_locomotion_profile(path:String)->Dictionary:
+	# This optional selected-value sidecar stays alongside the private source.
+	# All-or-nothing validation prevents a partial/stale profile changing motion.
+	if not path.is_absolute_path() or not FileAccess.file_exists(path):return {}
+	var project_root:=ProjectSettings.globalize_path("res://").replace("\\","/").simplify_path().trim_suffix("/").to_lower()+"/"
+	if path.replace("\\","/").simplify_path().to_lower().begins_with(project_root):return {}
+	var decoded:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not decoded is Dictionary:return {}
+	var data:Dictionary=decoded
+	if data.get("schema","")!="md2-private-locomotion-runtime/1" or not data.get("ground") is Dictionary or not data.get("units") is Dictionary:return {}
+	var unit:Variant=data.units.get("centimetres_per_godot_unit")
+	if not (unit is float or unit is int) or not is_finite(float(unit)) or float(unit)!=100.:return {}
+	for key:String in ["speed_cm_s","acceleration_cm_s2","braking_deceleration_cm_s2","yaw_deg_s"]:
+		var value:Variant=data.ground.get(key)
+		if not (value is float or value is int) or not is_finite(float(value)) or float(value)<=0.:return {}
+	return data
 static func load_private_model(path:String)->Node3D:
 	# Parse directly into transient in-memory resources. No ResourceSaver,
 	# editor importer, texture extraction, or project cache is used for this file.
@@ -218,7 +247,9 @@ func _physics_process(delta:float)->void:
 	var ground_anchor:bool=using_original_source and combo.active() and was_grounded and not jump_pressed
 	if ground_anchor:desired=Vector2.ZERO
 	elif not using_original_source and combo.active() and was_grounded:desired*=.22 # Authored fallback unchanged.
-	var planar:=Vector2.ZERO if ground_anchor else Vector2(velocity.x,velocity.z).move_toward(desired,(deceleration if stick.is_zero_approx() else acceleration)*delta)
+	var response_acceleration:=acceleration if was_grounded else air_acceleration
+	var response_deceleration:=deceleration if was_grounded else air_deceleration
+	var planar:=Vector2.ZERO if ground_anchor else Vector2(velocity.x,velocity.z).move_toward(desired,(response_deceleration if stick.is_zero_approx() else response_acceleration)*delta)
 	# Public GA_HeavyJumpAttack GravityMultiplier2; native base jump remains unknown.
 	var gravity_factor:=2. if _heavy_slam_active else 1.
 	velocity=Vector3(planar.x,-.2 if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
@@ -249,7 +280,8 @@ func _physics_process(delta:float)->void:
 				if Vector2(look.x,look.z).length()>.1:facing=atan2(look.x,look.z)
 			else:facing+=turn_axis*2.8*delta
 		elif _move_requested:facing=atan2(stick.x,stick.y)
-		visual.rotation.y+=clampf(wrapf(facing-visual.rotation.y,-PI,PI),-12.*delta,12.*delta)
+		var turn_rate:=ground_turn_rate if _grounded else 12.
+		visual.rotation.y+=clampf(wrapf(facing-visual.rotation.y,-PI,PI),-turn_rate*delta,turn_rate*delta)
 	if combat_requested!=_previous_combat:
 		_transition="" if using_original_source else ("ReadyEnter" if combat_requested else "ReadyExit");_transition_time=0.;_previous_combat=combat_requested
 	var left:=delta
@@ -431,6 +463,8 @@ func movement_measurements()->Dictionary:
 	if using_original_source:report.merge({"jump_apex_time_adapter":SOURCE_JUMP_APEX_SECONDS,"moving_landing_release_adapter":SOURCE_MOVING_LAND_SECONDS,"heavy_slam_gravity_multiplier":2.,"effective_gravity":gravity*(2. if _heavy_slam_active else 1.),"jump_phase":_jump_stage})
 	report.merge({"clip":active_clip,"play_rate":_playback_speed,"world_velocity":[velocity.x,velocity.y,velocity.z],"walk_speed":walk_speed,"run_speed":run_speed,"walk_stride_reference":walk_stride_speed,"run_stride_reference":run_stride_speed,"source_table_speed":700 if using_original_source else null,"unit_conversion":"100UU per Godot metre; local effective MD2 runtime unverified" if using_original_source else "authored fallback","acceleration_setting":acceleration,"deceleration_setting":deceleration,"turn_rate_adapter":12.,"attack_travel_adapter":.22,"coyote_time":coyote_time,"jump_height_adapter":jump_height,"gravity_adapter":gravity,"native_runtime_parameters_recovered":false})
 	if using_original_source:report.merge({"attack_travel_adapter":0.,"body_stability_enabled":body_stability_enabled,"retained_body_oscillation_adapter":BodyStability.RETAINED_OSCILLATION,"body_stability_strength":body_stability.strength},true)
+	if not runtime_locomotion_profile.is_empty():
+		report.merge({"native_runtime_parameters_recovered":true,"unit_conversion":"Live owned player native cm /100 per Godot metre","ground_response_source":"Live reflected component configuration; moving MD2 trace pending","turn_rate_adapter":null,"ground_yaw_rate_deg_s":rad_to_deg(ground_turn_rate),"air_acceleration_adapter":air_acceleration,"air_deceleration_adapter":air_deceleration,"native_animation_evaluator_rate_verified":false,"native_ground_motion_trace_verified":false},true)
 	if source_transition!=null:report.merge({"transition_wall_seconds":source_transition.duration,"transition_elapsed_seconds":source_transition.elapsed,"transition_clock":"wall time, independent of source cadence"})
 	var actual:=get_real_velocity();var travelling:=Vector2(actual.x,actual.z).length()>.01
 	var travel_heading:=atan2(actual.x,actual.z)

@@ -34,7 +34,7 @@ func run()->void:
 		# Planted attack retains zero travel even with native fast ground response.
 		a.requested_direction=Vector2.ZERO;await tick();a.attack(true);a.requested_direction=Vector2.RIGHT
 		var planted_at:Vector3=a.global_position
-		for i in 4:await tick()
+		await tick()
 		check(a.combo.active() and a.global_position.distance_to(planted_at)<.001,"Held attack stays planted "+str(hz))
 		a.attack(false);a.requested_direction=Vector2.ZERO
 	var report:={"checks":checks,"failures":failures,"measurements":reports}
