@@ -16,4 +16,12 @@
 
 Remaining: human-controlled MD2 motion sample; stock versus installed WASD input policy; current2HMedium versus Sabre-specific layer; air/world-gravity and combat effect overrides; native support/contact/IK and audio/surface routing. No claim of complete native movement equivalence. No further tool installation or loader change was needed.
 
+## Human-trace continuation
+
+Human trials now recover actual1HMedium/Sabre owners,700cm/s normal ground response and10clean gait segments at median1.88832normalized cycles/s. The equipped1H layer uses the existing Master Idle/Walk/Run sources; input1 yields a derived2/9Walk+7/9Run blend and weighted period.52963s, independently matching native cadence. The previous pure Run1.25x clocks2.8846cycles/s and is incorrect for this observed state.
+
+- [ ] Add a small source-only gait composer using existing imported tracks, shared phase and recovered private sample settings. Leave raw review, source files, airborne timing, fallback and the three prior pose fixes intact. Use the existing final pose pipeline; no scene/engine/project replacement.
+- [ ] Prove failing cadence first, exact all-bone anchor sampling, phase/notify/transition semantics and private-profile fallback. Validate complete regressions and actual full-grass viewport, then review changes.
+- [ ] Consolidate live combat montage/ResumeMovement/slot and jump evidence. Do not substitute unresolved composite/slot behavior with an unverified full combat rewrite.
+
 Review focus: class defaults versus live instances, derived versus inherited properties, large-world double vectors versus floats, bitfield booleans, asynchronous sampling uncertainty, active modifiers and UI/menu/pause ownership. No values inferred from arbitrary byte patterns.
