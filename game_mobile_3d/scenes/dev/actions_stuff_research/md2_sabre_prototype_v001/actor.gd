@@ -512,7 +512,10 @@ func movement_measurements()->Dictionary:
 		report.merge({"source_locomotion_event_count":source_locomotion_event_count,"last_source_locomotion_event":last_source_locomotion_event.duplicate(),"source_notify_scope":"Stored source times on selected clip; graph weights/surface and native event behavior unresolved"})
 		report.native_ground_motion_trace_verified=bool(runtime_locomotion_profile.get("ground_motion_trace_verified",false))
 		if report.native_ground_motion_trace_verified:report.ground_response_source="Owned human-controlled MD2 ground velocity trace and reflected configuration; asynchronous reads"
-	if source_gait!=null:report.merge({"native_gait_enabled":native_gait_enabled,"native_gait_state":source_gait.state(current_speed),"native_normal_phase_hz_observed":runtime_locomotion_profile.gait_blend.get("normal_phase_hz_observed"),"gait_composition_scope":"Recovered source samples/input, observed normal phase; local/face blending reconstruction"})
+	if source_gait!=null:
+		var observed:Variant=runtime_locomotion_profile.gait_blend.get("normal_phase_hz_observed")
+		var phase_verified:bool=(observed is float or observed is int) and is_finite(float(observed)) and float(observed)>0. and bool(report.get("native_ground_motion_trace_verified",false))
+		report.merge({"native_gait_enabled":native_gait_enabled,"native_gait_state":source_gait.state(current_speed),"native_normal_phase_hz_observed":observed,"native_normal_gait_phase_verified":phase_verified,"native_source_pose_blend_exact":false,"gait_composition_scope":"Recovered source samples/input, observed normal phase; local/face blending reconstruction" if phase_verified else "Configured source-phase blend; observational metadata absent"})
 	if source_transition!=null:report.merge({"transition_wall_seconds":source_transition.duration,"transition_elapsed_seconds":source_transition.elapsed,"transition_clock":"wall time, independent of source cadence"})
 	var actual:=get_real_velocity();var travelling:=Vector2(actual.x,actual.z).length()>.01
 	var travel_heading:=atan2(actual.x,actual.z)
