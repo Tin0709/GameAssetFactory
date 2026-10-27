@@ -28,6 +28,8 @@ func run()->void:
 		for strike in 3:
 			a.reset_actor();a._grounded=true;a._animate(.1);a.combo._start_attack(strike);a._animate(0.)
 			check(absf(a.source_transition.duration-float(config.blend_in_seconds))<.000001,"Montage entry uses independent wall time at strike%d/%dHz"%[strike+1,hz])
+			a._animate(float(config.blend_in_seconds)*.25)
+			check(absf(a.source_transition.incoming_weight-.25)<.000001,"Montage entry weight advances linearly in wall time independently of strike rate")
 			var w:Dictionary=a.combo.native_windows[strike]
 			# Follow the real unqueued attack through its exact segment boundary.
 			while a.combo.phase==&"attack":a._animate(minf(1./hz,a.combo.boundary_seconds()))
@@ -37,11 +39,22 @@ func run()->void:
 			oracle.animation_player.seek(a.animation_player.current_animation_position,true)
 			var worst:=0.;var points:Dictionary={}
 			for bone in a.skeleton.get_bone_count():worst=maxf(worst,error(a.skeleton.get_bone_pose(bone),oracle.skeleton.get_bone_pose(bone)))
-			for name:String in ["J_Hips","J_L_Foot","J_R_Foot","J_R_Weapon"]:
+			for name:String in ["J_Hip","J_L_Foot","J_R_Foot","J_R_Weapon"]:
 				var bone:int=a.skeleton.find_bone(name)
+				check(bone>=0,"Measured contact/grip/pelvis point exists: "+name)
 				if bone>=0:points[name]=a.skeleton.get_bone_global_pose(bone).origin.distance_to(oracle.skeleton.get_bone_global_pose(bone).origin)
 			check(worst<.00002,"Continuous composite seam preserves all32 incoming source bones at strike%d/%dHz"%[strike+1,hz])
 			trials.append({"hz":hz,"strike":strike+1,"source_seconds":a.animation_player.current_animation_position,"max_local_pose_error":worst,"point_error_metres":points,"handoff_duration":a.source_transition.duration})
+			# Moving continuation keeps the leg gait layer while the upper body
+			# follows the uninterrupted recovery source. No extra whole-body blend.
+			a.reset_actor();a._grounded=true;a.current_speed=7.;a._move_requested=true;a._run_requested=true;a.combo._start_attack(strike)
+			while a.combo.phase==&"attack":a._animate(minf(1./hz,a.combo.boundary_seconds()))
+			a._animate(1./hz);oracle.review(a.combo.clip());oracle.animation_player.seek(a.animation_player.current_animation_position,true)
+			var gait:Array=a.source_gait.compose(a._gait_resume_phase,7.);var moving_error:=0.
+			for bone in a.skeleton.get_bone_count():
+				var expected:Transform3D=gait[bone] if bone in a.combat_legs.bones else oracle.skeleton.get_bone_pose(bone)
+				moving_error=maxf(moving_error,error(a.skeleton.get_bone_pose(bone),expected))
+			check(moving_error<.00002 and a.combat_legs.weight==1.,"Moving composite seam preserves source upper body and common-phase leg layer")
 	# Opt-out must retain the previous fallback, with exact raw-review timing.
 	if a.get("combat_handoffs")!=null:
 		a.combat_handoffs={};a.reset_actor();a._grounded=true;a._animate(.1);a.combo._start_attack(0);a._animate(0.)
