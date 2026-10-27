@@ -39,6 +39,7 @@ func run()->void:
 	Input.action_release("move_forward");await ticks(25);await shot("10_landed_idle");recording=false
 	if actor.accepted_count<3:failures.append("Held combo did not execute")
 	if not actor.is_on_floor() or actor.current_speed>.01:failures.append("End contact/stop")
+	if lab.sabre_mode.movement_panel.get_global_rect().end.y>root.get_visible_rect().end.y:failures.append("Movement diagnostics extend below viewport")
 	var report:={"renderer":RenderingServer.get_current_rendering_method(),"grass_blocks":lab.grass_field_blocks,"bones":actor.skeleton.get_bone_count(),"source_clips":actor.source_clip_count,"frames":frames,"trace":trace,"failures":failures,"camera":lab.sabre_mode.camera_measurements(),"scope":"Our existing lab; controlled inputs, no calibration of MD2 from video. Offline fixed60fps is not performance evidence."}
 	FileAccess.open(folder.path_join("native-contract-validation.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("SABRE_NATIVE_CONTRACT ",JSON.stringify({"failures":failures,"frames":frames.size(),"samples":trace.size(),"renderer":report.renderer}))

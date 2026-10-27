@@ -130,6 +130,7 @@ func _build_ui()->void:
 func _build_movement_panel()->void:
 	movement_panel=PanelContainer.new();movement_panel.name="MovementMeasurements";canvas.add_child(movement_panel)
 	movement_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);movement_panel.offset_left=-420;movement_panel.offset_right=-18;movement_panel.offset_top=-350;movement_panel.offset_bottom=-18
+	movement_panel.grow_vertical=Control.GROW_DIRECTION_BEGIN
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.035,.045,.9);style.set_content_margin_all(9);style.set_corner_radius_all(5);movement_panel.add_theme_stylebox_override("panel",style)
 	var box:=VBoxContainer.new();movement_panel.add_child(box)
 	var heading:=Label.new();heading.text="MOVEMENT METER · actual physics travel";heading.add_theme_font_size_override("font_size",12);box.add_child(heading)
