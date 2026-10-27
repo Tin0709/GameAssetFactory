@@ -15,8 +15,11 @@ func run()->void:
 	check(s.index==1 and s.time==0.,"Fresh press after RecoveryStart immediately accepts the next variant")
 	for index in 3:
 		s.cancel();s._start_attack(index);s.attack(true)
-		var gate:float=s.native_windows[index].chain/s.native_windows[index].rate
-		s.advance(gate)
+		var raw_gate:float=s.native_windows[index].chain/s.native_windows[index].rate
+		var gate:float=ceilf(raw_gate*s.native_event_hz-.0000001)/s.native_event_hz
+		s.advance(gate-.0001)
+		check(s.index==index,"Held input waits for the discrete delivery tick "+str(index))
+		s.advance(.0001)
 		check(s.index==(index+1)%3 and s.time<.00001,"Holding through native ability gate chains in order "+str(index))
 	for hz in [30,60,120]:
 		s.cancel();s.request_attack()

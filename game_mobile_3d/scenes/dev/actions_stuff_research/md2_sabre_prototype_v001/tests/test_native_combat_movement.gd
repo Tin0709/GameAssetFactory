@@ -15,29 +15,41 @@ func run()->void:
 	for hz in [30,60,120]:
 		Engine.physics_ticks_per_second=hz;a.reset_actor();await tick();await tick();a.requested_direction=Vector2(0,-1);a.requested_run=true
 		for i in hz/2:await tick()
-		var expected:=0.;var path:=0.;var locked_path:=0.;var open_time:=0.;var previous:Vector3=a.position;var expected_phase:=0.;var previously_open:=false
 		var period:float=a.source_gait.state(7.).period
 		a.attack(true)
-		for i in hz*4:
+		var oracle=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combo_state.gd").new()
+		oracle.setup(a.clips);oracle.configure_native(a.runtime_locomotion_profile.combat);oracle.attack(true)
+		var measured:={"expected":0.,"path":0.,"locked_path":0.,"open_time":0.,"phase":0.,"previously_open":false,"position":a.position,"clock":a.simulation_clock}
+		# A process_frame waiter can span multiple physics ticks under CPU load.
+		# Monitor each actual actor tick instead of assuming one tick per waiter.
+		var monitor:=func()->void:
+			var dt:float=a.simulation_clock-float(measured.clock)
 			var open:=0.
-			for segment:Dictionary in a.combo.movement_plan(1./hz):
+			for segment:Dictionary in oracle.movement_plan(dt):
 				if segment.move:
-					if not previously_open:expected_phase=0.
-					expected_phase=fposmod(expected_phase+float(segment.duration)/period,1.);open+=segment.duration
-				previously_open=segment.move
-			expected+=open*7.;open_time+=open
+					if not measured.previously_open:measured.phase=0.
+					measured.phase=fposmod(float(measured.phase)+float(segment.duration)/period,1.);open+=segment.duration
+				measured.previously_open=segment.move
+			oracle.advance(dt)
+			var from:Vector3=measured.position
+			var distance:=Vector2(a.position.x-from.x,a.position.z-from.z).length()
+			measured.expected+=open*7.;measured.open_time+=open;measured.path+=distance
+			if open<.00000001:measured.locked_path+=distance
+			measured.position=a.position;measured.clock=a.simulation_clock
+		a.physics_pose_ready.connect(monitor)
+		for i in hz*4:
 			a.requested_direction=[Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT][int(i/(hz/2))%4]
-			await tick();var distance:=Vector2(a.position.x-previous.x,a.position.z-previous.z).length();path+=distance;previous=a.position
-			if open==0.:locked_path+=distance
-		check(absf(path-expected)<.003,"Collision-resolved distance follows7m/s permission integral at "+str(hz))
-		check(locked_path<.0001,"Windups remain planted without momentum at "+str(hz))
+			await tick()
+		a.physics_pose_ready.disconnect(monitor)
+		check(absf(float(measured.path)-float(measured.expected))<.003,"Collision-resolved distance follows7m/s permission integral at "+str(hz))
+		check(float(measured.locked_path)<.0001,"Windups remain planted without momentum at "+str(hz))
 		check(a.accepted_count>=7 and a.combo.phase!=&"step","Held combo repeats ordered native links without arbitrary step at "+str(hz))
-		check(absf(wrapf(a._gait_resume_phase-expected_phase,-.5,.5))<.0003,"Native restart and shared leg phase follow open travel at "+str(hz))
+		check(absf(wrapf(a._gait_resume_phase-float(measured.phase),-.5,.5))<.0003,"Native restart and shared leg phase follow open travel at "+str(hz))
 		a.attack(false);a.requested_direction=Vector2.UP
 		for i in hz*2:await tick()
 		check(a.active_clip=="Run" and absf(a.current_speed-7.)<.001,"Recovery immediately yields naturally to full-speed gait at "+str(hz))
 		check(absf(wrapf(a.visual.rotation.y-PI,-PI,PI))<.001,"Combat turning and free locomotion share native yaw response at "+str(hz))
-		trials.append({"hz":hz,"expected_m":expected,"actual_m":path,"locked_m":locked_path,"open_seconds":open_time})
+		trials.append({"hz":hz,"expected_m":measured.expected,"actual_m":measured.path,"locked_m":measured.locked_path,"open_seconds":measured.open_time})
 	for hz in [30,60,120]:
 		Engine.physics_ticks_per_second=hz;a.reset_actor();await tick();await tick()
 		var wall:=StaticBody3D.new();var wc:=CollisionShape3D.new();var wb:=BoxShape3D.new();wb.size=Vector3(10,5,.4);wc.shape=wb;wall.position=Vector3(0,2,-.8);wall.add_child(wc);root.add_child(wall)

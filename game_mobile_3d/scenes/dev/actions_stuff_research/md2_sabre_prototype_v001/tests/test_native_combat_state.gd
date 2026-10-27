@@ -15,6 +15,7 @@ func run()->void:
 		for index in 3:
 			s.cancel();s._start_attack(index);s.held=true
 			var w:Dictionary=config.windows[index];var rate:float=w.rate;var unlock:float=w.resume/rate;var chain:float=w.chain/rate
+			chain=ceilf(chain*s.native_event_hz-.0000001)/s.native_event_hz
 			var plan:Array=s.movement_plan(chain)
 			var open:=0.
 			for segment:Dictionary in plan:
@@ -38,10 +39,13 @@ func run()->void:
 				if segment.move:expected_time+=float(segment.duration)
 			oracle.advance(4.)
 			check(absf(travel_time-expected_time)<.00001 and s.index==oracle.index and absf(s.time-oracle.time)<.00001,"Permission integral and overshoot independent of physics rate "+str(hz))
-		# Release does not enqueue surprise attacks; late queue executes at the
-		# native gate or immediately if that gate has already passed.
+		# A released early press is not retained by the current observed policy.
 		s.cancel();s.attack(true);s.attack(false);s.advance(.18);s.request_attack();s.advance(.16)
-		check(s.index==1 and s.phase==&"attack","One bounded tap queues the next strike")
+		check(s.index==0 and s.phase==&"attack" and s.buffer_until<0.,"Early released press does not invent a pending ground combo")
+		var legacy_config:Dictionary=config.duplicate(true);legacy_config.erase("input")
+		var legacy=Combo.new();legacy.setup(actor.clips);legacy.configure_native(legacy_config)
+		legacy.request_attack();legacy.advance(.18);legacy.request_attack();legacy.advance(.17)
+		check(legacy.index==1,"Explicit legacy profile keeps its bounded queue for independent A/B comparisons")
 		s.release_inputs();s.advance(2.);check(s.phase==&"ready" and not s.held,"Focus/release clears future links")
 		s.cancel();s.request_attack();s.advance(.36);s.request_attack();s.advance(0.)
 		check(s.index==1 and s.time==0.,"Press after opened gate begins next strike without waiting for full recovery")
