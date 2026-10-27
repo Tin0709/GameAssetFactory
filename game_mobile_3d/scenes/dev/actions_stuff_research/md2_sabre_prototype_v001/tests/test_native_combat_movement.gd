@@ -28,7 +28,7 @@ func run()->void:
 		check(absf(path-expected)<.003,"Collision-resolved distance follows7m/s permission integral at "+str(hz))
 		check(locked_path<.0001,"Windups remain planted without momentum at "+str(hz))
 		check(a.accepted_count>=7 and a.combo.phase!=&"step","Held combo repeats ordered native links without arbitrary step at "+str(hz))
-		var period:float=a.source_gait.state(7.).period;var expected_phase:=fposmod(gait_before+open_time/period,1.)
+		var period:float=a.source_gait.state(7.).period;var expected_phase:=fposmod(gait_before+path/7./period,1.)
 		check(absf(wrapf(a._gait_resume_phase-expected_phase,-.5,.5))<.0001,"Legs preserve shared phase and advance only during real open travel at "+str(hz))
 		a.attack(false);a.requested_direction=Vector2.UP
 		for i in hz*2:await tick()
