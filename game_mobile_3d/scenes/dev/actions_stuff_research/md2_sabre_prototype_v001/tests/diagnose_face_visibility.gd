@@ -26,6 +26,8 @@ func run()->void:
 	folder=a.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/face_visibility");DirAccess.make_dir_recursive_absolute(folder)
 	if "--contract-audit" in OS.get_cmdline_user_args():
 		folder=a.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/contract_audit/native_faces");DirAccess.make_dir_recursive_absolute(folder)
+	if "--source-gait" in OS.get_cmdline_user_args():
+		folder=a.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/native-gait/faces");DirAccess.make_dir_recursive_absolute(folder)
 	var rig:Skeleton3D=a.skeleton;var mesh:MeshInstance3D=a.face;var arrays:=mesh.mesh.surface_get_arrays(0);var vertices:PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
 	var bones:PackedInt32Array=arrays[Mesh.ARRAY_BONES];var weights:PackedFloat32Array=arrays[Mesh.ARRAY_WEIGHTS];var stride:int=weights.size()/vertices.size()
 	for i in vertices.size():

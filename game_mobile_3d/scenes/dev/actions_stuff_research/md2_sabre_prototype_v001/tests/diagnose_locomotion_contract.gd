@@ -14,6 +14,7 @@ func run()->void:
 	actor=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();root.add_child(actor);actor.set_physics_process(false)
 	assert(actor.using_original_source)
 	folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/contract_audit")
+	if "--source-gait" in OS.get_cmdline_user_args():folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/source-gait-contract")
 	if "--baseline" in OS.get_cmdline_user_args():
 		actor.source_transition.clear();actor.source_transition=null;folder=folder.path_join("baseline")
 	DirAccess.make_dir_recursive_absolute(folder)
