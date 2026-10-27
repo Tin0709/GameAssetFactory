@@ -14,7 +14,7 @@
 - [x] Reproduce concrete ground-response mismatches with failing tests, implement optional private-profile mapping and source-clock event hooks; label remaining adapters.
 - [x] Validate30/60/120physics,27suites/1123checks,32bone/264time parity, unchanged source hashes and same native full-grass lab12frames/513states. Update existing findings. Independent code review issue fixed with failing/passing regression.
 
-Remaining: human-controlled MD2 motion sample; stock versus installed WASD input policy; current2HMedium versus Sabre-specific layer; air/world-gravity and combat effect overrides; native support/contact/IK and audio/surface routing. No claim of complete native movement equivalence. No further tool installation or loader change was needed.
+Remaining after the initial pass (human-trace limitations superseded below): human-controlled motion, stock/WASD policy,2H/Sabre layer, air/combat overrides and native support/contact/IK/audio routing. No complete native movement-equivalence claim or additional tool installation.
 
 ## Human-trace continuation
 
