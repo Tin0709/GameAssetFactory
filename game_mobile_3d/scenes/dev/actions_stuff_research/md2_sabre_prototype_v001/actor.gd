@@ -197,7 +197,9 @@ static func read_runtime_locomotion_profile(path:String)->Dictionary:
 	if not path.is_absolute_path() or not FileAccess.file_exists(path):return {}
 	var project_root:=ProjectSettings.globalize_path("res://").replace("\\","/").simplify_path().trim_suffix("/").to_lower()+"/"
 	if path.replace("\\","/").simplify_path().to_lower().begins_with(project_root):return {}
-	var decoded:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
+	var decoder:=JSON.new()
+	if decoder.parse(FileAccess.get_file_as_string(path))!=OK:return {}
+	var decoded:Variant=decoder.data
 	if not decoded is Dictionary:return {}
 	var data:Dictionary=decoded
 	if data.get("schema","")!="md2-private-locomotion-runtime/1" or not data.get("ground") is Dictionary or not data.get("units") is Dictionary:return {}
@@ -362,7 +364,8 @@ func _dispatch_locomotion_events(selected:String,before:float,advanced:float,wal
 	var record:Variant=sources.get(String(clips[selected].source_name),{})
 	if not record is Dictionary or not record.get("events") is Array:return
 	var duration:float=clips[selected].duration
-	if absf(float(record.get("duration",0.))-duration)>.001:return
+	var stored_duration:Variant=record.get("duration")
+	if not (stored_duration is float or stored_duration is int) or not is_finite(float(stored_duration)) or absf(float(stored_duration)-duration)>.001:return
 	var end:=before+advanced
 	for cycle in range(floori(before/duration),mini(floori(end/duration)+1,129)):
 		for entry:Variant in record.events:

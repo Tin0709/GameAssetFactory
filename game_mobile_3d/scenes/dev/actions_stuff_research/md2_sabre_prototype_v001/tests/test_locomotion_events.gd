@@ -24,4 +24,11 @@ func run()->void:
 		a.review("Run");a._animate(duration*2.)
 		check(events.size()==count*2,"Raw review does not trigger gameplay event hooks")
 		a.reset_actor();check(a.movement_measurements().get("source_locomotion_event_count",-1)==0,"Reset clears event diagnostics")
+		var source:String=a.clips.Run.source_name
+		var native_record:Dictionary=a.runtime_locomotion_profile.locomotion_events[source].duplicate(true)
+		for invalid:Variant in [{},[],null,NAN,INF,"bad",-1.]:
+			a.runtime_locomotion_profile.locomotion_events[source]=native_record.duplicate(true)
+			a.runtime_locomotion_profile.locomotion_events[source].duration=invalid
+			a._dispatch_locomotion_events("Run",0.,duration,duration)
+			check(a.source_locomotion_event_count==0,"Malformed optional notify duration ignored: "+str(invalid))
 	print("SABRE_LOCOMOTION_EVENTS ",JSON.stringify({"checks":checks,"failures":failures}));a.free();quit(0 if failures.is_empty() else 1)
