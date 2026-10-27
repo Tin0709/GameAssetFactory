@@ -57,6 +57,13 @@ func run()->void:
 			check(moving_error<.00002 and a.combat_legs.weight==1.,"Moving composite seam preserves source upper body and common-phase leg layer")
 	# Opt-out must retain the previous fallback, with exact raw-review timing.
 	if a.get("combat_handoffs")!=null:
+		# Synthetic slow entry checks that a composite boundary preserves an
+		# already-running montage blend rather than starting OR truncating it.
+		a.combat_handoffs=config.duplicate(true);a.combat_handoffs.blend_in_seconds=.75
+		a.reset_actor();a._grounded=true;a.combo._start_attack(1)
+		while a.combo.phase==&"attack":a._animate(minf(1./120.,a.combo.boundary_seconds()))
+		a._animate(1./120.)
+		check(absf(a.source_transition.duration-.75)<.000001 and a.source_transition.incoming_weight<1.,"Composite boundary retains an unfinished supported montage entry")
 		a.combat_handoffs={};a.reset_actor();a._grounded=true;a._animate(.1);a.combo._start_attack(0);a._animate(0.)
 		check(a.source_transition.duration>0.,"Absent optional settings retain legacy montage entry")
 	a.review_loop=false;a.review("Attack1");a._animate(.123)
