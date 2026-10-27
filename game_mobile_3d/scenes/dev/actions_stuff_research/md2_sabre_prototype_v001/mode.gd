@@ -55,6 +55,9 @@ func setup(scene:Node3D)->void:
 		reference_audio.setup(research_root);actor.attack_accepted_timed.connect(reference_audio.trigger_attack)
 		reference_audio.timeline_provider=func()->float:return actor.simulation_clock
 		if actor.using_original_source:reference_audio.clip_play_rates={"Attack1":1.2,"Attack2":1.2,"Attack3":1.,"AirAttack":actor.combo.air_attack_play_rate}
+		for key:String in actor.clips:
+			var alias:String=actor.clips[key].get("audio_alias","")
+			if not alias.is_empty():reference_audio.clip_aliases[key]=alias
 		reference_audio.is_event_valid=func(serial:int)->bool:return actor.combo.serial==serial and actor.combo.active() and actor.review_clip.is_empty()
 	lab.camera=Camera3D.new();lab.camera.name="GameplayCamera";lab.camera.projection=Camera3D.PROJECTION_ORTHOGONAL
 	lab.camera.size=lab.camera_size;lab.camera.far=maxf(150.,lab.grass_field_blocks*4.) if lab.grass_field_enabled else 150.;lab.add_child(lab.camera);lab.camera.make_current()
@@ -191,11 +194,12 @@ func present(delta:float)->void:
 		var right:String="—" if m.sole_speed[1]<0. else "%.2f"%m.sole_speed[1]
 		var response:String="—" if m.response_95<0. else "%d ms"%roundi(m.response_95*1000.)
 		movement_label.text="Speed %.2f / target %.2f u/s · peak %.2f\nPath %.2f · net %.2f units · %.1f s\nGait %.2f cycles/s · %.3fx · total %.2f\nStart95 %s · stop %.3fu / %.3fs\nSole candidates L %s / R %s u/s"%[m.speed,m.target_speed,m.peak_speed,m.distance,m.net_distance,m.elapsed,m.cycle_hz,m.play_rate,m.gait_cycles,response,m.stop_distance,m.stop_seconds,left,right]
-		movement_label.tooltip_text="Sole motion includes rolling, not proven native contacts or foot slip. Native graph/rates remain unresolved. Bounded source reconstruction; Save JSON retains all measurements."
+		movement_label.tooltip_text="Sole motion includes rolling, not proven contact or foot slip. Normal gait cadence and combat notify gates are source-backed; mask/contact and input buffer remain reconstructed. Save JSON retains all measurements."
 		if actor.using_original_source:
 			var body_angle:String="—" if m.body_travel_angle_deg==null else "%.1f°"%float(m.body_travel_angle_deg)
 			var leg_angle:String="—" if m.legs_travel_angle_deg==null else "%.1f°"%float(m.legs_travel_angle_deg)
 			movement_label.text+="\nPhase %.3f · handoff %.0f / %.0f ms\nTravel Δ body %s · legs %s"%[m.source_phase,minf(float(m.transition_elapsed_seconds),float(m.transition_wall_seconds))*1000.,float(m.transition_wall_seconds)*1000.,body_angle,leg_angle]
+			if m.get("native_combat_enabled",false):movement_label.text+="\nStrike%d %s · move %s · legs %.2f"%[m.combat_strike,m.combat_phase,"open" if m.combat_move_allowed else "locked",m.combat_leg_weight]
 		else:movement_label.text+="\nSole motion includes rolling; native rates unverified"
 		var c:=camera_measurements()
 		camera_label.text="Camera adapter · %s %.2f\nYaw %.2f° · elevation %.2f° · arm %.2fu\nNative MD2 solo camera values unresolved"%[c.projection,c.orthographic_span,c.azimuth_deg,c.elevation_deg,c.arm_distance]

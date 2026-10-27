@@ -444,6 +444,7 @@ func _animate(delta:float)->void:
 		var active:=false
 		if combo.phase in [&"attack",&"air_attack"] and review_clip.is_empty():
 			var window:Array=clips[combo.clip()].vfx_window
+			if combo.native_enabled and combo.phase==&"attack":window=combo.native_windows[combo.index].get("trail_window",window)
 			active=combo.time>=float(window[0]) and combo.time<=float(window[1])
 		effects.sample(delta,active,marker_base.global_position,marker_tip.global_position,combo.serial)
 

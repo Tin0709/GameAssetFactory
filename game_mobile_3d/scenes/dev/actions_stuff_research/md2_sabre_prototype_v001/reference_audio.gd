@@ -6,6 +6,7 @@ const MAX_PENDING:=8
 var voices:Array[AudioStreamPlayer]=[]
 var groups:Dictionary={}
 var clip_play_rates:Dictionary={}
+var clip_aliases:Dictionary={} # Explicit prototype sample mapping for new source clips.
 var pending:Array[Dictionary]=[]
 var is_event_valid:Callable
 var timeline_provider:Callable
@@ -55,6 +56,7 @@ func setup(research_root:String)->void:
 
 func trigger_attack(_index:int,clip:String,serial:int,event_time:float=-1.)->void:
 	if not enabled or serial<=last_serial:return
+	clip=String(clip_aliases.get(clip,clip))
 	if not groups.has(clip) or groups[clip].is_empty():return
 	last_serial=serial;last_sources.clear();event_count+=1
 	var rate:=maxf(.001,float(clip_play_rates.get(clip,1.)))
