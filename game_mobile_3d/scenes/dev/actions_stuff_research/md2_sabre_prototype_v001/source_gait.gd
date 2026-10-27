@@ -4,6 +4,7 @@ extends RefCounted
 var rig:Skeleton3D
 var samples:Array[Dictionary]=[]
 var base_speed:=1.
+var input_floor:=0.
 var animations:Dictionary={}
 var durations:Dictionary={}
 var channels:Dictionary={}
@@ -31,6 +32,9 @@ func setup(skeleton:Skeleton3D,player:AnimationPlayer,clips:Dictionary,config:Va
 		if not validated.is_empty() and float(value.input)<=float(validated[-1].input):return false
 		validated.append(value)
 	if validated.size()!=3 or validated[0].semantic!="Idle" or validated[1].semantic!="Walk" or validated[2].semantic!="Run":return false
+	var minimum:Variant=config.get("input_floor",validated[0].input)
+	if not (minimum is float or minimum is int) or not is_finite(float(minimum)) or float(minimum)<float(validated[0].input) or float(minimum)>float(validated[-1].input):return false
+	input_floor=float(minimum)
 	rig=skeleton;samples=validated;base_speed=float(native_speed)/100.
 	var saved:Array[Transform3D]=[]
 	for bone in rig.get_bone_count():saved.append(rig.get_bone_pose(bone))
@@ -54,7 +58,7 @@ func setup(skeleton:Skeleton3D,player:AnimationPlayer,clips:Dictionary,config:Va
 	return true
 
 func state(speed:float)->Dictionary:
-	var input:=clampf(maxf(speed,0.)/base_speed,float(samples[0].input),float(samples[-1].input));var left:=0
+	var input:=clampf(maxf(speed,0.)/base_speed,input_floor,float(samples[-1].input));var left:=0
 	while left<samples.size()-2 and input>float(samples[left+1].input):left+=1
 	var a:Dictionary=samples[left];var b:Dictionary=samples[left+1]
 	var weight:=clampf((input-float(a.input))/(float(b.input)-float(a.input)),0.,1.)

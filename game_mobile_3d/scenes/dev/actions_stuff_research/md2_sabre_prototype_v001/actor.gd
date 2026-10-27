@@ -50,6 +50,8 @@ var body_stability_enabled:=true
 var body_stability:RefCounted
 var source_transition:RefCounted
 var source_gait:RefCounted
+var ground_graph:Dictionary={}
+var _outgoing_locomotion_state:Dictionary={}
 var combat_legs:RefCounted
 var _combat_plan_active:=false
 var _combat_open_seconds:=0.
@@ -192,6 +194,7 @@ func _ready()->void:
 		source_transition=SourceTransition.new();source_transition.setup(skeleton)
 		var gait:=SourceGait.new()
 		if gait.setup(skeleton,animation_player,clips,runtime_locomotion_profile.get("gait_blend")):source_gait=gait;cadence_label="Live player700 /100 =7 units/s · ground settings recovered\nSource phase blend %.3f Hz · evidence in private profile"%(1./float(gait.state(run_speed).period))
+		if source_gait!=null:ground_graph=read_ground_graph(runtime_locomotion_profile.get("ground_graph"))
 		if combo.native_enabled and source_gait!=null:
 			var legs:=CombatLegs.new()
 			if legs.setup(skeleton,runtime_locomotion_profile.combat):combat_legs=legs
@@ -241,6 +244,28 @@ static func load_private_model(path:String)->Node3D:
 	var error:=document.append_from_file(path,state)
 	if error!=OK:push_warning("External private appearance could not load: "+str(error));return null
 	return document.generate_scene(state,120.)
+
+static func read_ground_graph(value:Variant)->Dictionary:
+	if not value is Dictionary or value.get("schema")!="private-ground-graph/1" or value.get("curve") not in ["linear","smoothstep"]:return {}
+	for key:String in ["idle_to_move_seconds","move_to_idle_seconds"]:
+		var seconds:Variant=value.get(key)
+		if not (seconds is float or seconds is int) or not is_finite(float(seconds)) or float(seconds)<=0. or float(seconds)>1.:return {}
+	return value.duplicate(true)
+
+func _ground_graph_enabled()->bool:
+	return source_gait!=null and native_gait_enabled and not ground_graph.is_empty()
+
+func _outgoing_locomotion_sampler(key:String,phase:float)->Callable:
+	var cursor:={"clip":key,"phase":phase}
+	_outgoing_locomotion_state=cursor
+	return func(delta:float)->Array[Transform3D]:
+		if key in GAITS:
+			var speed:float=_animation_motion_speed if _combat_plan_active else current_speed
+			var state:Dictionary=source_gait.state(speed)
+			cursor.phase=fposmod(float(cursor.phase)+delta/float(state.period),1.)
+			return source_gait.compose(float(cursor.phase),speed)
+		cursor.phase=fposmod(float(cursor.phase)+delta/float(clips.Idle.duration),1.)
+		return source_gait.sample("Idle",float(cursor.phase))
 
 func _load_private_combat_clips(config:Variant)->void:
 	# Stage ALL resources and validate their relationship before changing any
@@ -512,7 +537,10 @@ func _select_clip()->String:
 	if not review_clip.is_empty():return review_clip
 	if combo.active():return combo.clip()
 	if not _jump_stage.is_empty():return _jump_stage
-	if _move_requested:
+	# Input intent alone cannot hold a running pose against a blocked capsule.
+	# These are local physics equivalents; native boolean thresholds remain unknown.
+	var eligible:=_move_requested and (not (_ground_graph_enabled() and _grounded) or current_speed>.001)
+	if eligible:
 		if combat_requested:
 			if using_original_source and _run_requested:return "CombatRun"
 			var local:=visual.global_basis.inverse()*velocity
@@ -520,7 +548,7 @@ func _select_clip()->String:
 			if absf(local.x)>absf(local.z)*.75:return "CombatStrafeLeft" if local.x>0. else "CombatStrafeRight"
 			return "CombatRun" if _run_requested else "CombatWalk"
 		return "Run" if _run_requested else "Walk"
-	if using_original_source and _grounded and current_speed>.1 and active_clip in GAITS:
+	if using_original_source and not _ground_graph_enabled() and _grounded and current_speed>.1 and active_clip in GAITS:
 		return ("CombatRun" if _last_run_gait else "CombatWalk") if combat_requested else ("Run" if _last_run_gait else "Walk")
 	if not _transition.is_empty():return _transition
 	return "CombatReady" if combat_requested else "Idle"
@@ -545,7 +573,14 @@ func _play(key:String,blend:float=.04)->void:
 			# Retain established aerial/combat handoff durations while removing
 			# cadence scaling from locomotion transitions. Source clocks unchanged.
 			var rate:float=combo.playback_rate() if combo.active() else 1.
-			source_transition.begin(transition_blend/rate)
+			var idle_to_move:bool=active_clip in ["Idle","CombatReady"] and key in GAITS
+			var move_to_idle:bool=active_clip in GAITS and key in ["Idle","CombatReady"]
+			if _ground_graph_enabled() and _grounded and (idle_to_move or move_to_idle):
+				var seconds:float=ground_graph.idle_to_move_seconds if idle_to_move else ground_graph.move_to_idle_seconds
+				var outgoing_phase:float=animation_player.current_animation_position/float(clips[active_clip].duration)
+				source_transition.begin_evaluated(seconds,_outgoing_locomotion_sampler(active_clip,outgoing_phase),StringName(ground_graph.curve))
+			else:
+				_outgoing_locomotion_state.clear();source_transition.begin(transition_blend/rate)
 		else:source_transition.clear()
 	# glTF import drops channels that remain equal to the bone rest. A new clip
 	# must begin from those defaults, rather than retaining a prior clip's pupil
@@ -636,6 +671,7 @@ func movement_measurements()->Dictionary:
 		var phase_verified:bool=(observed is float or observed is int) and is_finite(float(observed)) and float(observed)>0. and bool(report.get("native_ground_motion_trace_verified",false))
 		report.merge({"native_gait_enabled":native_gait_enabled,"native_gait_state":source_gait.state(current_speed),"native_normal_phase_hz_observed":observed,"native_normal_gait_phase_verified":phase_verified,"native_source_pose_blend_exact":false,"gait_composition_scope":"Recovered source samples/input, observed normal phase; local/face blending reconstruction" if phase_verified else "Configured source-phase blend; observational metadata absent"})
 	if source_transition!=null:report.merge({"transition_wall_seconds":source_transition.duration,"transition_elapsed_seconds":source_transition.elapsed,"transition_clock":"wall time, independent of source cadence"})
+	if _ground_graph_enabled():report.merge({"ground_graph_enabled":true,"transition_outgoing_evaluated":source_transition.evaluated_outgoing(),"transition_outgoing_state":_outgoing_locomotion_state.duplicate(),"ground_motion_eligible":_move_requested and current_speed>.001,"motion_boolean_scope":"Local intent/displacement equivalents; native thresholds and wall predicate remain unresolved"})
 	if combo.native_enabled:report.merge({"native_combat_enabled":true,"combat_phase":str(combo.phase),"combat_strike":combo.index+1,"combat_source_seconds":combo.time,"combat_move_allowed":combo.movement_allowed(),"combat_open_seconds_this_tick":_combat_open_seconds,"combat_path_metres":_combat_path,"combat_locked_seconds":_combat_locked_seconds,"combat_leg_weight":combat_legs.weight if combat_legs!=null else 0.,"combat_leg_phase":_gait_resume_phase,"combat_open_speed":_animation_motion_speed,"combat_buffer_seconds_adapter":combo.buffer_seconds,"attack_travel_adapter":null,"native_combat_pose_mask_exact":false},true)
 	var actual:=get_real_velocity();var travelling:=Vector2(actual.x,actual.z).length()>.01
 	var travel_heading:=atan2(actual.x,actual.z)
