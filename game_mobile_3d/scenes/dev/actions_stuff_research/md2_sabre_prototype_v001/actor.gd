@@ -412,7 +412,11 @@ func reset_actor()->void:
 	_last_run_gait=false
 	_gait_resume_phase=0.;_step_seen=-1;_step_distance=0.;_step_elapsed=0.;_step_ready=false
 	_time_since_grounded=INF
-	visual.rotation.y=0.;expression_clock=0.;simulation_clock=0.;focus_value=0.;blink_value=0.;_forced_blink=0.
+	visual.rotation.y=0.
+	# Rebase the direction adapter AFTER resetting the visual's world heading.
+	# Otherwise its first new step starts from the previous life's heading.
+	if direction_adapter!=null:direction_adapter.deactivate()
+	expression_clock=0.;simulation_clock=0.;focus_value=0.;blink_value=0.;_forced_blink=0.
 	_play("Idle",0.);_apply_face(0.);reset_physics_interpolation()
 	reset_movement_measurements()
 	presentation_reset.emit()
