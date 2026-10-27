@@ -25,6 +25,9 @@ func clear()->void:
 func restore()->void:
 	for bone in _raw.size():rig.set_bone_pose(bone,_raw[bone])
 	_raw.clear()
+func discard_raw()->void:
+	# A new segment shares this transition clock but has its own rest channels.
+	_raw.clear()
 func begin(seconds:float)->void:
 	_outgoing_evaluator=Callable();_shape=&"linear"
 	_from.clear()

@@ -597,7 +597,7 @@ func _play(key:String,blend:float=.04)->void:
 			var idle_to_move:bool=active_clip in ["Idle","CombatReady"] and key in GAITS
 			var move_to_idle:bool=active_clip in GAITS and key in ["Idle","CombatReady"]
 			if _continuous_combat_segment(active_clip,key):
-				_outgoing_locomotion_state.clear();source_transition.clear()
+				_outgoing_locomotion_state.clear();source_transition.discard_raw()
 			elif _combat_entry(key):
 				_outgoing_locomotion_state.clear();source_transition.begin(float(combat_handoffs.blend_in_seconds))
 			elif _ground_graph_enabled() and _grounded and (idle_to_move or move_to_idle):
