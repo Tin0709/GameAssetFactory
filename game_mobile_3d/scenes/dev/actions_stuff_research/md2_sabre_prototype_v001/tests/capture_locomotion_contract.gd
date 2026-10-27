@@ -12,7 +12,7 @@ func _initialize()->void:
 func sample()->void:
 	if not recording:return
 	var m:Dictionary=actor.movement_measurements()
-	trace.append({"clock":actor.simulation_clock,"position":[actor.position.x,actor.position.y,actor.position.z],"speed":actor.current_speed,"clip":actor.active_clip,"clip_time":actor.animation_player.current_animation_position,"rate":actor._playback_speed,"combo":str(actor.combo.phase),"sole_height":m.sole_height,"sole_speed":m.sole_speed,"transition_elapsed":m.get("transition_elapsed_seconds"),"transition_duration":m.get("transition_wall_seconds")})
+	trace.append({"clock":actor.simulation_clock,"position":[actor.position.x,actor.position.y,actor.position.z],"speed":actor.current_speed,"clip":actor.active_clip,"clip_time":actor.animation_player.current_animation_position,"rate":actor._playback_speed,"combo":str(actor.combo.phase),"sole_height":m.sole_height,"sole_speed":m.sole_speed,"transition_elapsed":m.get("transition_elapsed_seconds"),"transition_duration":m.get("transition_wall_seconds"),"gait_state":m.get("native_gait_state"),"gait_cycles":m.gait_cycles})
 func ticks(count:int)->void:
 	for i in count:await physics_frame
 	await process_frame
@@ -23,6 +23,7 @@ func run()->void:
 	lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(lab);current_scene=lab;actor=lab.player
 	folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/contract_audit/native")
 	if "--runtime-ground" in OS.get_cmdline_user_args():folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/native")
+	if "--source-gait" in OS.get_cmdline_user_args():folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/native-gait")
 	DirAccess.make_dir_recursive_absolute(folder)
 	actor.physics_pose_ready.connect(sample);await ticks(15);recording=true
 	await shot("01_idle")
@@ -33,7 +34,7 @@ func run()->void:
 	for i in 3:
 		Input.action_press("move_forward");await ticks(3);Input.action_release("move_forward");await ticks(12)
 	await shot("07_short_taps")
-	if "--runtime-ground" in OS.get_cmdline_user_args():
+	if "--runtime-ground" in OS.get_cmdline_user_args() or "--source-gait" in OS.get_cmdline_user_args():
 		var right:=InputEventMouseButton.new();right.button_index=MOUSE_BUTTON_RIGHT;right.pressed=true;lab.sabre_mode.unhandled_input(right)
 		Input.action_press("move_right");await ticks(24);await shot("11_combat_strafe")
 		Input.action_release("move_right");right.pressed=false;lab.sabre_mode.input(right);await ticks(12)
