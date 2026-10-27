@@ -171,6 +171,7 @@ func _ready()->void:
 		cadence_label=("Live player700 /100 =7 units/s · ground settings recovered" if not runtime_locomotion_profile.is_empty() else "Table700 /100 =7 units/s · live profile absent")+"\nGait travel/stride adapter · native evaluator rate unresolved"
 		direction_adapter=DirectionAdapter.new();direction_adapter.setup(skeleton,model)
 	combo.setup(clips)
+	if using_original_source:combo.configure_native(runtime_locomotion_profile.get("combat"))
 	animation_player.callback_mode_process=AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	for key:String in clips:
 		var animation:=animation_player.get_animation(clips[key].action)

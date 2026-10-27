@@ -19,6 +19,53 @@ var step_buffered:=false
 var serial:=0
 var _impact_sent:=false
 var _events:Array[Dictionary]=[]
+var native_enabled:=false
+var native_windows:Array=[]
+
+func configure_native(config:Variant)->bool:
+	native_enabled=false;native_windows=[]
+	if not config is Dictionary or config.get("schema")!="md2-private-sabre-combat/1" or not config.get("windows") is Array or config.windows.size()!=3:return false
+	for i in 3:
+		var w:Variant=config.windows[i]
+		if not w is Dictionary:return false
+		for key in ["rate","resume","chain","attack_duration","recovery_duration","melee"]:
+			var value:Variant=w.get(key)
+			if not (value is float or value is int) or not is_finite(float(value)) or float(value)<=0.:return false
+		if w.resume>=w.chain or w.chain>w.attack_duration or w.melee>w.attack_duration:return false
+		if not clips.has("Attack%d"%(i+1)) or not clips.has("Recovery%d"%(i+1)):return false
+		if clips["Attack%d"%(i+1)].get("source_name")!=w.get("attack_source") or clips["Recovery%d"%(i+1)].get("source_name")!=w.get("recovery_source"):return false
+	native_windows=config.windows.duplicate(true);native_enabled=true;return true
+
+func movement_allowed()->bool:
+	return not active() or (native_enabled and (phase==&"recovery" or (phase==&"attack" and time>=float(native_windows[index].resume)-.00000001)))
+
+func boundary_seconds()->float:
+	if not active():return INF
+	var boundary:=remaining()
+	if native_enabled and phase==&"attack":
+		var w:Dictionary=native_windows[index]
+		if time<float(w.resume)-.00000001:boundary=minf(boundary,float(w.resume)-time)
+		if _queued() and time<float(w.chain)-.00000001:boundary=minf(boundary,float(w.chain)-time)
+	return boundary/playback_rate()
+
+func _queued()->bool:return held or buffer_until>=clock-.0000001
+
+func _resolve_native()->void:
+	if native_enabled and phase in [&"attack",&"recovery"] and _queued():
+		if phase==&"recovery" or time>=float(native_windows[index].chain)-.00000001:_start_attack((index+1)%3)
+
+func movement_plan(delta:float)->Array[Dictionary]:
+	# Forecast with the SAME state machine. No real clock/input/event mutation.
+	var copy=get_script().new();copy.clips=clips;copy.native_windows=native_windows;copy.native_enabled=native_enabled
+	for key in ["phase","index","time","clock","held","buffer_until","buffer_seconds","attack_play_rates","air_attack_play_rate","movement_breaks_enabled","movement_requested","step_serial","step_next_index","step_buffered","serial","_impact_sent"]:copy.set(key,get(key))
+	var result:Array[Dictionary]=[];var left:=maxf(0.,delta)
+	while left>.00000001:
+		copy._resolve_native()
+		var dt:=minf(left,copy.boundary_seconds())
+		if dt<.00000001:copy.advance(.00000001);left-=.00000001;continue
+		result.append({"duration":dt,"move":copy.movement_allowed(),"phase":copy.phase,"index":copy.index,"time":copy.time,"serial":copy.serial})
+		copy.advance(dt);left-=dt
+	return result
 
 func setup(entries:Dictionary)->void:clips=entries
 func clip()->String:
@@ -29,8 +76,10 @@ func clip()->String:
 func active()->bool:return phase not in [&"ready",&"step"]
 func playback_rate()->float:
 	if phase==&"air_attack":return maxf(.001,air_attack_play_rate)
+	if native_enabled and phase in [&"attack",&"recovery"]:return float(native_windows[index].rate)
 	return maxf(.001,float(attack_play_rates[index])) if phase==&"attack" else 1.
 func remaining()->float:
+	if native_enabled and phase in [&"attack",&"recovery"]:return maxf(0.,float(native_windows[index]["attack_duration" if phase==&"attack" else "recovery_duration"])-time)
 	return maxf(0.,float(clips[clip()].duration)-time) if active() else INF
 func attack(value:bool,airborne:bool=false)->void:
 	var edge:=value and not held
@@ -48,6 +97,11 @@ func _start_attack(which:int,airborne:bool=false)->void:
 func _finish()->void:
 	var queued:=held or buffer_until>=clock-.0000001
 	if phase==&"air_attack":phase=&"ready";time=0.;buffer_until=-1.;return
+	if native_enabled:
+		if queued:_start_attack((index+1)%3)
+		elif phase==&"attack":phase=&"recovery";time=0.
+		else:phase=&"ready";time=0.;buffer_until=-1.
+		return
 	if phase==&"attack":
 		if movement_breaks_enabled and movement_requested and queued:
 			phase=&"step";time=0.;step_serial+=1;step_next_index=(index+1)%3
@@ -62,18 +116,21 @@ func finish_step()->void:
 	if held or step_buffered:_start_attack(step_next_index)
 	else:phase=&"ready";time=0.;buffer_until=-1.
 func advance(delta:float)->void:
+	_resolve_native()
 	var left:=maxf(delta,0.)
 	while left>.00000001:
 		if not active():clock+=left;return
 		var rate:=playback_rate()
-		var segment:=minf(left,remaining()/rate)
+		var segment:=minf(left,boundary_seconds())
 		var previous:=time
 		time+=segment*rate;clock+=segment;left-=segment
 		if phase in [&"attack",&"air_attack"] and not _impact_sent:
 			var gate:float=clips[clip()].vfx_window[0]
+			if native_enabled and phase==&"attack":gate=float(native_windows[index].melee)
 			if previous<=gate and time>=gate:
 				_impact_sent=true;_events.append({"kind":"impact","index":index,"serial":serial,"clip":clip(),"at":clock-(time-gate)/rate})
 		if remaining()<=.00000001:_finish()
+		_resolve_native()
 func drain_events()->Array[Dictionary]:
 	var result:=_events;_events=[];return result
 func release_inputs()->void:
