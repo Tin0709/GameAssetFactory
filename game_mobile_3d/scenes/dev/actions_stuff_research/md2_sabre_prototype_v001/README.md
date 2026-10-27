@@ -1,6 +1,37 @@
 # Player + Sabre prototype
 
-### Current — continuous combat composite boundaries, 2026-10-27
+### Current — full playable movement validation, 2026-10-27
+
+Same scene, original sources and graphics. Three bounded fixes:
+
+- External opt-in lets a fresh airborne attack replace an ongoing ground action
+  before its ground combo gate. It does not invent a universal cancel window.
+- Source-mode grounded motion uses built-in floor snapping without a forced
+  downward velocity. This removes measured flat-floor capsule oscillation while
+  preserving jump/fall and the authored fallback.
+- Optional external queued-delivery settings distinguish the stored movement
+  notify key from the movement consumer boundary. Original pose clocks, keys,
+  gait and chain timing remain unchanged. This is a runtime-supported pipeline
+  reconstruction, not recovered native callback source code.
+
+The same full-grass Mobile/D3D12 lab passes47gameplay checks across30/60/120Hz,
+recording2220physical states and7rendered views. Recorded physical keys also
+drive the entire actor: all six rate/input-order trials preserve15ordered
+strikes. At60Hz, mean trajectory residual falls from.413m to.029m under the
+completed-clock ordering; the alternate intra-tick input alignment yields.119m.
+Release near a combo gate still produces larger30/120Hz residuals. Do not turn
+the best cohort into a universal fidelity claim or hardware-latency result.
+
+Save JSON includes the stored and consumed movement gates separately. Detailed
+source/holdout evidence, baseline, regressions, measured paths and current
+limitations remain private in Research
+`reports/prototype_sabre/runtime_locomotion/compiled_logic/playable_validation/`.
+Native callback bodies, exact final foot/contact/IK and broader cancel/device
+rules remain open. Ordinary-jump behavior stays accepted; the native montage
+may persist through jump differently. No new scene, source asset or render
+setting was created or replaced.
+
+### Previous milestone — continuous combat composite boundaries, 2026-10-27
 
 The optional private handoff profile now supplies montage entry wall time.
 Playback rate no longer scales that entry. Consecutive attack/recovery segments
