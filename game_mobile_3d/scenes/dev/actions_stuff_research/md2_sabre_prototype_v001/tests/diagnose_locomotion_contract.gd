@@ -17,10 +17,14 @@ func run()->void:
 	if "--baseline" in OS.get_cmdline_user_args():
 		actor.source_transition.clear();actor.source_transition=null;folder=folder.path_join("baseline")
 	DirAccess.make_dir_recursive_absolute(folder)
-	var names:Array=[]
-	for bone in actor.skeleton.get_bone_count():names.append(actor.skeleton.get_bone_name(bone))
+	var names:Array=[];var parents:Array=[];var rests:Array=[];var track_contract:Dictionary={}
+	for bone in actor.skeleton.get_bone_count():
+		names.append(actor.skeleton.get_bone_name(bone));parents.append(actor.skeleton.get_bone_parent(bone));rests.append(matrix(actor.skeleton.get_bone_rest(bone)))
 	var raw:Array=[]
 	for key:String in actor.clips:
+		var animation:Animation=actor.animation_player.get_animation(actor.clips[key].action);var tracks:Array=[]
+		for index in animation.get_track_count():tracks.append({"path":str(animation.track_get_path(index)),"type":animation.track_get_type(index),"keys":animation.track_get_key_count(index)})
+		track_contract[key]=tracks
 		actor.reset_actor();actor.review_loop=false;actor.review(key)
 		actor.animation_player.play(actor.clips[key].action,0.);actor.animation_player.advance(0.)
 		var length:float=actor.animation_player.get_animation(actor.clips[key].action).length
@@ -28,7 +32,7 @@ func run()->void:
 			var time:float=length*fraction
 			actor.animation_player.seek(time,true);actor._refresh_markers()
 			raw.append({"clip":key,"source_name":actor.clips[key].source_name,"time":time,"matrices":pose()})
-	FileAccess.open(folder.path_join("godot-raw-poses.json"),FileAccess.WRITE).store_string(JSON.stringify({"bones":names,"samples":raw}))
+	FileAccess.open(folder.path_join("godot-raw-poses.json"),FileAccess.WRITE).store_string(JSON.stringify({"bones":names,"parents":parents,"rests":rests,"tracks":track_contract,"samples":raw}))
 	var floor:=StaticBody3D.new();var collision:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(100,.4,100);collision.shape=box;collision.position.y=-.2;floor.add_child(collision);root.add_child(floor)
 	var trials:Array=[]
 	for hz in [30,60,120]:
