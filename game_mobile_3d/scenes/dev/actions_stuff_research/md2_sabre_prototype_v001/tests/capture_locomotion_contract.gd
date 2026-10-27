@@ -40,7 +40,8 @@ func run()->void:
 	if actor.accepted_count<3:failures.append("Held combo did not execute")
 	if not actor.is_on_floor() or actor.current_speed>.01:failures.append("End contact/stop")
 	if lab.sabre_mode.movement_panel.get_global_rect().end.y>root.get_visible_rect().end.y:failures.append("Movement diagnostics extend below viewport")
-	var report:={"renderer":RenderingServer.get_current_rendering_method(),"grass_blocks":lab.grass_field_blocks,"bones":actor.skeleton.get_bone_count(),"source_clips":actor.source_clip_count,"frames":frames,"trace":trace,"failures":failures,"camera":lab.sabre_mode.camera_measurements(),"scope":"Our existing lab; controlled inputs, no calibration of MD2 from video. Offline fixed60fps is not performance evidence."}
+	var report_panel:=lab.sabre_mode.movement_panel.get_global_rect()
+	var report:={"renderer":RenderingServer.get_current_rendering_method(),"grass_blocks":lab.grass_field_blocks,"bones":actor.skeleton.get_bone_count(),"source_clips":actor.source_clip_count,"frames":frames,"trace":trace,"failures":failures,"camera":lab.sabre_mode.camera_measurements(),"meter_rect":[report_panel.position.x,report_panel.position.y,report_panel.size.x,report_panel.size.y],"scope":"Our existing lab; controlled inputs, no calibration of MD2 from video. Offline fixed60fps is not performance evidence."}
 	FileAccess.open(folder.path_join("native-contract-validation.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("SABRE_NATIVE_CONTRACT ",JSON.stringify({"failures":failures,"frames":frames.size(),"samples":trace.size(),"renderer":report.renderer}))
 	lab.free();await process_frame;quit(0 if failures.is_empty() else 1)
