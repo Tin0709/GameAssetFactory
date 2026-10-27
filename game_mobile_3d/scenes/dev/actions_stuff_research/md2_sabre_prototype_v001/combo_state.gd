@@ -85,7 +85,6 @@ func boundary_seconds()->float:
 	if not active():return INF
 	var boundary:=remaining()
 	if native_enabled and phase==&"attack":
-		var w:Dictionary=native_windows[index]
 		var resume:=movement_source_gate()
 		if time<resume-.00000001:boundary=minf(boundary,resume-time)
 		var chain:=chain_source_gate()

@@ -15,13 +15,16 @@ func run()->void:
 		for index in 3:
 			s.cancel();s._start_attack(index);s.held=true
 			var w:Dictionary=config.windows[index];var rate:float=w.rate;var unlock:float=w.resume/rate;var chain:float=w.chain/rate
+			if config.has("movement_delivery"):
+				var delivery:Dictionary=config.movement_delivery
+				unlock=(ceilf(unlock*float(delivery.evaluation_hz)-.0000001)+float(delivery.consumer_ticks))/float(delivery.evaluation_hz)
 			chain=ceilf(chain*s.native_event_hz-.0000001)/s.native_event_hz
 			var plan:Array=s.movement_plan(chain)
 			var open:=0.
 			for segment:Dictionary in plan:
 				if segment.move:open+=float(segment.duration)
 			check(absf(open-(chain-unlock))<.000001,"Per-strike open time comes from notify gates "+str(index))
-			s.advance(unlock-.0001);check(not s.movement_allowed(),"Windup blocks travel "+str(index));s.advance(.0001);check(s.movement_allowed(),"ResumeMovement opens travel "+str(index))
+			s.advance(unlock-.0001);check(not s.movement_allowed(),"Windup blocks travel "+str(index));s.advance(.0001);check(s.movement_allowed(),"Consumed ResumeMovement opens travel "+str(index))
 			s.advance(chain-unlock);check(s.index==(index+1)%3 and s.phase==&"attack" and absf(s.time)<.00001,"RecoveryStart chains directly without fixed-distance step "+str(index))
 			check(not s.movement_allowed(),"Next strike owns a new windup lock "+str(index))
 		for hz in [30,60,120]:
