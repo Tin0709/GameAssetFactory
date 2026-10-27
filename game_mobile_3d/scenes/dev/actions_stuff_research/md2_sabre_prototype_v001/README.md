@@ -1,5 +1,36 @@
 # Player + Sabre prototype
 
+### Current — input/event ordering audit, 2026-10-27
+
+Gameplay policy is unchanged in this milestone. An extra universal chain tick
+improved one replay cadence but worsened60Hz; input-pass-only commitment lost
+one30Hz attack. Neither candidate was adopted. Earlier physics-only key replay
+cannot by itself distinguish a controller defect from input sampling alignment.
+
+The existing scene now has a bounded developer trace in private source mode.
+Use F3 to show the movement meter, then **Save JSON**. It stores the latest512
+events: input receipt, resolved command, simulation step, movement permission
+and attack notice. Wall time denotes engine receipt/notice delivery; the source
+acceptance clock is recorded separately. It is not device/native MD2 input time.
+The trace holds scalar snapshots only and does not alter combat state or clocks.
+
+Actual SceneTree key dispatch at nine render/physics combinations30/60/120Hz
+keeps all15ordered attacks and72consistent LMB receipts per trial.36explicit
+release/gate-order cases pass;39regression suites/1596checks pass. Native
+Mobile/D3D12 playback retains the full grass lab, source character and Sabre;
+Save JSON was read back at all three physics rates. These checks establish
+dispatch consistency, not exact native timing or reduced trajectory error.
+
+Private evidence and the45-case frame inspector are in Research
+`reports/prototype_sabre/runtime_locomotion/compiled_logic/input_ordering/`
+and the existing compiled-logic inspector's **Input ordering** tab. Old OS
+polls bound key edges but lack native processed-action timestamps. Reflected
+tick groups do not reveal within-group prerequisites. No active mesh post-process
+instance in one source snapshot does not prove absence of native foot IK.
+No guessed cancel window, global input setting, animation timing or IK change
+was added. Source profile, Blender/GLB, scene and project settings hashes match
+the baseline;7m/s and1.888Hz remain intact.
+
 ### Current — full playable movement validation, 2026-10-27
 
 Same scene, original sources and graphics. Three bounded fixes:
