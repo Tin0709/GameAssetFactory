@@ -1,6 +1,6 @@
 extends RefCounted
-## Authored input adapter. Clip durations come from the new GLB manifest;
-## the 220ms buffer and VFX gates are prototype choices, not native notifies.
+## Optional private source-event policy, with authored fallback. The220ms
+## input buffer remains an adapter; native timing is validated against clips.
 var clips:Dictionary={}
 var phase:StringName=&"ready"
 var index:=0
