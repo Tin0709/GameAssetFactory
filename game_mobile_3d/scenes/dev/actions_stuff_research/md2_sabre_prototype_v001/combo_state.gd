@@ -22,9 +22,10 @@ var _events:Array[Dictionary]=[]
 var native_enabled:=false
 var native_windows:Array=[]
 var native_input_policy:="legacy_buffer"
+var native_event_hz:=0.
 
 func configure_native(config:Variant)->bool:
-	native_enabled=false;native_windows=[];native_input_policy="legacy_buffer"
+	native_enabled=false;native_windows=[];native_input_policy="legacy_buffer";native_event_hz=0.
 	if not config is Dictionary or config.get("schema")!="md2-private-sabre-combat/1" or not config.get("windows") is Array or config.windows.size()!=3:return false
 	for i in 3:
 		var w:Variant=config.windows[i]
@@ -41,11 +42,21 @@ func configure_native(config:Variant)->bool:
 	var input:Variant=config.get("input")
 	if input!=null:
 		if not input is Dictionary or input.get("ground_policy")!="live_hold":return false
+		var hz:Variant=input.get("event_evaluation_hz")
+		if not (hz is float or hz is int) or not is_finite(float(hz)) or float(hz)<=0. or float(hz)>1000.:return false
 		native_input_policy="live_hold"
+		native_event_hz=float(hz)
 	native_windows=config.windows.duplicate(true);native_enabled=true;return true
 
 func movement_allowed()->bool:
 	return not active() or (native_enabled and (phase==&"recovery" or (phase==&"attack" and time>=float(native_windows[index].resume)-.00000001)))
+
+func chain_source_gate()->float:
+	var source:float=native_windows[index].chain
+	if native_event_hz<=0.:return source
+	# Notify delivery is discrete; retain the original pose/source clock.
+	var rate:float=native_windows[index].rate
+	return ceilf(source/rate*native_event_hz-.0000001)/native_event_hz*rate
 
 func boundary_seconds()->float:
 	if not active():return INF
@@ -53,18 +64,19 @@ func boundary_seconds()->float:
 	if native_enabled and phase==&"attack":
 		var w:Dictionary=native_windows[index]
 		if time<float(w.resume)-.00000001:boundary=minf(boundary,float(w.resume)-time)
-		if _queued() and time<float(w.chain)-.00000001:boundary=minf(boundary,float(w.chain)-time)
+		var chain:=chain_source_gate()
+		if _queued() and time<chain-.00000001:boundary=minf(boundary,chain-time)
 	return boundary/playback_rate()
 
 func _queued()->bool:return held or (native_input_policy!="live_hold" and buffer_until>=clock-.0000001)
 
 func _resolve_native()->void:
 	if native_enabled and phase in [&"attack",&"recovery"] and _queued():
-		if phase==&"recovery" or time>=float(native_windows[index].chain)-.00000001:_start_attack((index+1)%3)
+		if phase==&"recovery" or time>=chain_source_gate()-.00000001:_start_attack((index+1)%3)
 
 func movement_plan(delta:float)->Array[Dictionary]:
 	# Forecast with the SAME state machine. No real clock/input/event mutation.
-	var copy=get_script().new();copy.clips=clips;copy.native_windows=native_windows;copy.native_enabled=native_enabled;copy.native_input_policy=native_input_policy
+	var copy=get_script().new();copy.clips=clips;copy.native_windows=native_windows;copy.native_enabled=native_enabled;copy.native_input_policy=native_input_policy;copy.native_event_hz=native_event_hz
 	for key in ["phase","index","time","clock","held","buffer_until","buffer_seconds","attack_play_rates","air_attack_play_rate","movement_breaks_enabled","movement_requested","step_serial","step_next_index","step_buffered","serial","_impact_sent"]:copy.set(key,get(key))
 	var result:Array[Dictionary]=[];var left:=maxf(0.,delta)
 	while left>0.:
@@ -97,7 +109,7 @@ func request_attack(airborne:bool=false)->void:
 	if native_enabled and native_input_policy=="live_hold" and phase in [&"attack",&"recovery"]:
 		# Captured grounded presses are not stored across an active ability.
 		# Held input is sampled at RecoveryStart; a fresh later edge is immediate.
-		if phase==&"recovery" or time>=float(native_windows[index].chain)-.00000001:_start_attack((index+1)%3)
+		if phase==&"recovery" or time>=chain_source_gate()-.00000001:_start_attack((index+1)%3)
 		return
 	if phase==&"step" and airborne:_start_attack(0,true)
 	elif phase==&"step":step_buffered=true
