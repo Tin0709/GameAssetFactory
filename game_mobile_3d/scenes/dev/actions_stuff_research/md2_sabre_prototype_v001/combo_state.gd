@@ -24,9 +24,12 @@ var native_windows:Array=[]
 var native_input_policy:="legacy_buffer"
 var native_event_hz:=0.
 var native_air_interrupt:=false
+var movement_evaluation_hz:=0.
+var movement_consumer_ticks:=0.
 
 func configure_native(config:Variant)->bool:
 	native_enabled=false;native_windows=[];native_input_policy="legacy_buffer";native_event_hz=0.;native_air_interrupt=false
+	movement_evaluation_hz=0.;movement_consumer_ticks=0.
 	if not config is Dictionary or config.get("schema")!="md2-private-sabre-combat/1" or not config.get("windows") is Array or config.windows.size()!=3:return false
 	for i in 3:
 		var w:Variant=config.windows[i]
@@ -49,10 +52,27 @@ func configure_native(config:Variant)->bool:
 		native_input_policy="live_hold"
 		native_event_hz=float(hz)
 		native_air_interrupt=bool(input.get("airborne_press_interrupts_ground",false))
+	if config.has("movement_delivery"):
+		var delivery:Variant=config.movement_delivery
+		if not delivery is Dictionary or delivery.get("schema")!="private-queued-movement/1":return false
+		var hz:Variant=delivery.get("evaluation_hz");var ticks:Variant=delivery.get("consumer_ticks")
+		if not (hz is float or hz is int) or not is_finite(float(hz)) or float(hz)<=0. or float(hz)>1000.:return false
+		if not (ticks is float or ticks is int) or not is_finite(float(ticks)) or float(ticks)<0. or float(ticks)>4. or float(ticks)!=floorf(float(ticks)):return false
+		for w:Dictionary in config.windows:
+			var gate:float=(ceilf(float(w.resume)/float(w.rate)*float(hz)-.0000001)+float(ticks))/float(hz)*float(w.rate)
+			if gate>=float(w.chain) or gate>=float(w.attack_duration):return false
+		movement_evaluation_hz=float(hz);movement_consumer_ticks=float(ticks)
 	native_windows=config.windows.duplicate(true);native_enabled=true;return true
 
+func movement_source_gate()->float:
+	var w:Dictionary=native_windows[index]
+	if movement_evaluation_hz<=0.:return float(w.resume)
+	# Keep stored keys intact. Only the independently configured movement
+	# consumer observes the queued evaluation boundary; pose clocks stay raw.
+	return (ceilf(float(w.resume)/float(w.rate)*movement_evaluation_hz-.0000001)+movement_consumer_ticks)/movement_evaluation_hz*float(w.rate)
+
 func movement_allowed()->bool:
-	return not active() or (native_enabled and (phase==&"recovery" or (phase==&"attack" and time>=float(native_windows[index].resume)-.00000001)))
+	return not active() or (native_enabled and (phase==&"recovery" or (phase==&"attack" and time>=movement_source_gate()-.00000001)))
 
 func chain_source_gate()->float:
 	var source:float=native_windows[index].chain
@@ -66,7 +86,8 @@ func boundary_seconds()->float:
 	var boundary:=remaining()
 	if native_enabled and phase==&"attack":
 		var w:Dictionary=native_windows[index]
-		if time<float(w.resume)-.00000001:boundary=minf(boundary,float(w.resume)-time)
+		var resume:=movement_source_gate()
+		if time<resume-.00000001:boundary=minf(boundary,resume-time)
 		var chain:=chain_source_gate()
 		if _queued() and time<chain-.00000001:boundary=minf(boundary,chain-time)
 	return boundary/playback_rate()
@@ -80,6 +101,7 @@ func _resolve_native()->void:
 func movement_plan(delta:float)->Array[Dictionary]:
 	# Forecast with the SAME state machine. No real clock/input/event mutation.
 	var copy=get_script().new();copy.clips=clips;copy.native_windows=native_windows;copy.native_enabled=native_enabled;copy.native_input_policy=native_input_policy;copy.native_event_hz=native_event_hz;copy.native_air_interrupt=native_air_interrupt
+	copy.movement_evaluation_hz=movement_evaluation_hz;copy.movement_consumer_ticks=movement_consumer_ticks
 	for key in ["phase","index","time","clock","held","buffer_until","buffer_seconds","attack_play_rates","air_attack_play_rate","movement_breaks_enabled","movement_requested","step_serial","step_next_index","step_buffered","serial","_impact_sent"]:copy.set(key,get(key))
 	var result:Array[Dictionary]=[];var left:=maxf(0.,delta)
 	while left>0.:

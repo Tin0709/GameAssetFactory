@@ -9,11 +9,11 @@ func run()->void:
 	var a=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();root.add_child(a);a.set_physics_process(false)
 	var s=a.combo;var config:Dictionary=a.runtime_locomotion_profile.combat;var delivery:Dictionary=config.movement_delivery
 	for index in 3:
-		s.cancel();s._start_attack(index);var w:Dictionary=config.windows[index]
+		s.cancel();s._start_attack(index);var w:Dictionary=config.windows[index];var started:float=s.clock
 		var gate:float=(ceilf(float(w.resume)/float(w.rate)*float(delivery.evaluation_hz)-.0000001)+float(delivery.consumer_ticks))/float(delivery.evaluation_hz)
 		s.advance(float(w.resume)/float(w.rate)+.00001)
 		check(not s.movement_allowed(),"Raw notify key does not anticipate its queued movement consumption")
-		s.advance(gate-s.clock+.000001)
+		s.advance(gate-(s.clock-started)+.000001)
 		check(s.movement_allowed(),"Movement opens at the observed evaluated/consumed gate")
 		s.cancel();s._start_attack(index);s.held=true
 		var chain:float=ceilf(float(w.chain)/float(w.rate)*s.native_event_hz-.0000001)/s.native_event_hz
