@@ -29,6 +29,10 @@ func run()->void:
 				for bone in a.skeleton.get_bone_count():
 					var expected:Transform3D=oracle.skeleton.get_bone_pose(bone);var actual:Transform3D=poses[bone]
 					worst=maxf(worst,maxf(expected.origin.distance_to(actual.origin),maxf(expected.basis.x.distance_to(actual.basis.x),maxf(expected.basis.y.distance_to(actual.basis.y),expected.basis.z.distance_to(actual.basis.z)))))
+				if worst>=.00002:
+					for bone in a.skeleton.get_bone_count():
+						var e:Transform3D=oracle.skeleton.get_bone_pose(bone);var v:Transform3D=poses[bone]
+						if e.origin.distance_to(v.origin)>.00002 or e.basis.x.distance_to(v.basis.x)>.00002 or e.basis.y.distance_to(v.basis.y)>.00002 or e.basis.z.distance_to(v.basis.z)>.00002:print("SAMPLER_DIAGNOSTIC ",key," ",phase," ",a.skeleton.get_bone_name(bone)," error=",worst," expected=",e," sampled=",v)
 				check(worst<.00002,"All-bone source sampling parity "+key+" phase "+str(phase))
 		for hz in [30,60,120]:
 			a.reset_actor();a._grounded=true;a._move_requested=true;a._run_requested=true;a.current_speed=7.;a._gait_cycles_this_tick=0.
