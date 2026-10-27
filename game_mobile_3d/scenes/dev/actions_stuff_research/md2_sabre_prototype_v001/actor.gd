@@ -16,6 +16,7 @@ const BodyStability=preload("res://scenes/dev/actions_stuff_research/md2_sabre_p
 const SourceTransition=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_transition.gd")
 const SourceGait=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
 const CombatLegs=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combat_legs.gd")
+const InputOrderTrace=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/input_order_trace.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 # User-accepted jump study; native launch/scale recovered, full trajectory pending.
@@ -54,6 +55,7 @@ var ground_graph:Dictionary={}
 var combat_handoffs:Dictionary={}
 var _outgoing_locomotion_state:Dictionary={}
 var combat_legs:RefCounted
+var input_order_trace=InputOrderTrace.new()
 var _combat_plan_active:=false
 var _combat_open_seconds:=0.
 var _animation_motion_speed:=0.
@@ -208,6 +210,7 @@ func _ready()->void:
 	visual.rotation.y=0. # Authored +Z front initially faces the existing lab camera.
 	_play("Idle",0.);_apply_face(0.)
 	movement_meter.reset(global_position)
+	input_order_trace.enabled=using_original_source
 
 func private_model_path()->String:
 	if not private_model_path_override.is_empty():return private_model_path_override
@@ -351,6 +354,7 @@ func _load_private_combat_clips(config:Variant)->void:
 	supplemental_combat_clips=staged.size()
 
 func _physics_process(delta:float)->void:
+	_record_order(&"physics_begin",{"delta":delta})
 	var stick:=requested_direction if scripted_input else Input.get_vector("move_left","move_right","move_forward","move_backward")
 	if not scripted_input:stick=_movement_right*stick.x+_movement_back*stick.y
 	var sprint:=requested_run if scripted_input else Input.is_action_pressed("sprint")
@@ -378,6 +382,7 @@ func _physics_process(delta:float)->void:
 	var speed:=run_speed if _run_requested else walk_speed
 	var desired:=stick.limit_length()*speed
 	combo.advance(0.) # Resolve a late command already beyond RecoveryStart.
+	_record_order(&"input_resolution",{"stick":[stick.x,stick.y],"jump_pressed":jump_pressed})
 	_combat_plan_active=combo.native_enabled and combo.active() and was_grounded and not jump_pressed and review_clip.is_empty()
 	_combat_open_seconds=0.
 	if _combat_plan_active:
@@ -442,9 +447,11 @@ func _physics_process(delta:float)->void:
 		_animate(step);left-=step
 	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and (not combo.active() or (combo.native_enabled and combo.movement_allowed()))) if direction_adapter!=null else []
 	movement_meter.sample(delta,global_position,desired.length(),_move_requested,_gait_cycles_this_tick,soles)
+	_record_order(&"physics_end",{"open_seconds":_combat_open_seconds,"position":[global_position.x,global_position.y,global_position.z]})
 	physics_pose_ready.emit()
 
 func _animate(delta:float)->void:
+	var permission_before:bool=combo.movement_allowed()
 	if body_stability!=null:body_stability.restore()
 	if direction_adapter!=null:direction_adapter.restore()
 	simulation_clock+=delta;expression_clock+=delta
@@ -494,6 +501,7 @@ func _animate(delta:float)->void:
 		_review_time=fposmod(_review_time,duration) if review_loop else minf(_review_time,duration)
 	else:
 		combo.advance(delta)
+		if input_order_trace.enabled and permission_before!=combo.movement_allowed():_record_order(&"movement_permission_change",{"before":permission_before,"after":combo.movement_allowed()})
 		if not _jump_stage.is_empty():
 			_jump_time+=delta
 			if not using_original_source and _jump_stage=="JumpTakeoff" and _jump_time>=float(clips.JumpTakeoff.duration):_jump_stage="JumpAirborne";_jump_time-=float(clips.JumpTakeoff.duration)
@@ -514,6 +522,7 @@ func _animate(delta:float)->void:
 	_apply_face(delta)
 	for event:Dictionary in combo.drain_events():
 		if event.kind=="accepted":
+			_record_order(&"attack_accepted",{"accepted_index":event.index,"accepted_serial":event.serial,"source_simulation_time":simulation_clock-(combo.clock-float(event.at))})
 			accepted_count+=1;attack_accepted.emit(event.index,event.clip,event.serial)
 			attack_accepted_timed.emit(event.index,event.clip,event.serial,simulation_clock-(combo.clock-float(event.at)))
 		elif event.kind=="impact":impact_count+=1;impact_ready.emit(event.index,marker_base.global_position,marker_tip.global_position,event.serial)
@@ -621,6 +630,14 @@ func _play(key:String,blend:float=.04)->void:
 func attack(value:bool)->void:
 	if value:resume_gameplay()
 	combo.attack(value,not _grounded)
+	_record_order(&"attack_command",{"requested_level":value,"airborne":not _grounded})
+func note_input_source(action:StringName,pressed:bool,stage:StringName)->void:
+	_record_order(&"input_receipt",{"action":str(action),"pressed":pressed,"dispatch_stage":str(stage)})
+func _record_order(kind:StringName,extra:Dictionary={})->void:
+	if not input_order_trace.enabled:return
+	var state:={"simulation_seconds":simulation_clock,"combo_clock":combo.clock,"phase":str(combo.phase),"source_time":combo.time,"strike":combo.index,"serial":combo.serial,"held":combo.held,"move_allowed":combo.movement_allowed(),"velocity":[velocity.x,velocity.y,velocity.z]}
+	state.merge(extra);input_order_trace.add(kind,state)
+func input_order_snapshot()->Dictionary:return input_order_trace.snapshot()
 func review(key:String)->void:
 	if not clips.has(key):return
 	if body_stability!=null:body_stability.deactivate()
@@ -661,7 +678,9 @@ func _apply_face(delta:float)->void:
 	face.set_blend_shape_value(_focus_index,focus_value);face.set_blend_shape_value(_blink_index,blink_value)
 func release_inputs()->void:
 	combo.release_inputs();combat_requested=false;has_aim_point=false;turn_axis=0.;requested_direction=Vector2.ZERO;requested_run=false;requested_jump=false;_jump_held=false
+	_record_order(&"release_commands")
 func reset_actor()->void:
+	input_order_trace.clear()
 	if body_stability!=null:body_stability.deactivate()
 	if direction_adapter!=null:direction_adapter.deactivate()
 	if source_transition!=null:source_transition.clear()
@@ -717,4 +736,5 @@ func save_movement_measurements()->String:
 	if FileAccess.file_exists(path):return ""
 	var file:=FileAccess.open(path,FileAccess.WRITE)
 	if file==null:return ""
-	file.store_string(JSON.stringify(movement_measurements(),"\t"));file.close();return path
+	var report:=movement_measurements();report["input_order_trace"]=input_order_snapshot()
+	file.store_string(JSON.stringify(report,"\t"));file.close();return path

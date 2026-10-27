@@ -220,11 +220,13 @@ func display_position()->Vector3:
 func input(event:InputEvent)->void:
 	# Release anywhere, including over GUI; only unhandled presses can attack.
 	if event is InputEventMouseButton and not event.pressed:
+		if event.button_index==MOUSE_BUTTON_LEFT:actor.note_input_source(&"LMB",false,&"_input")
 		if event.button_index==MOUSE_BUTTON_LEFT:_left_held=false;actor.attack(_e_held)
 		elif event.button_index==MOUSE_BUTTON_RIGHT:_right_held=false;actor.combat_requested=false
 		elif event.button_index==MOUSE_BUTTON_MIDDLE:lab.orbiting=false
 	if event is InputEventKey and not event.pressed:
 		var code:int=event.physical_keycode if event.physical_keycode!=0 else event.keycode
+		if code==KEY_E:actor.note_input_source(&"E",false,&"_input")
 		if code==KEY_E:_e_held=false;actor.attack(_left_held)
 		elif code==KEY_Q:_q_held=false
 		elif code==KEY_C:_c_held=false
@@ -232,6 +234,7 @@ func unhandled_input(event:InputEvent)->void:
 	if event.is_action_pressed("reset_test"):reset();return
 	if event is InputEventKey and not event.echo:
 		var code:int=event.physical_keycode if event.physical_keycode!=0 else event.keycode
+		if code==KEY_E:actor.note_input_source(&"E",event.pressed,&"_unhandled_input")
 		if code==KEY_E:_e_held=event.pressed;actor.attack(_e_held or _left_held);get_viewport().set_input_as_handled();return
 		if code==KEY_Q:_q_held=event.pressed
 		elif code==KEY_C:_c_held=event.pressed
@@ -240,6 +243,7 @@ func unhandled_input(event:InputEvent)->void:
 		elif code==KEY_F4 and event.pressed:actor.reset_movement_measurements()
 		elif code==KEY_F8 and event.pressed:reset_camera()
 	if event is InputEventMouseButton:
+		if event.button_index==MOUSE_BUTTON_LEFT:actor.note_input_source(&"LMB",event.pressed,&"_unhandled_input")
 		if event.button_index==MOUSE_BUTTON_LEFT:_left_held=event.pressed;actor.attack(_left_held or _e_held);get_viewport().set_input_as_handled()
 		elif event.button_index==MOUSE_BUTTON_RIGHT:_right_held=event.pressed;actor.combat_requested=_right_held
 		elif event.button_index==MOUSE_BUTTON_MIDDLE:lab.orbiting=event.pressed
