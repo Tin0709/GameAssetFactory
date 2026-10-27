@@ -46,7 +46,8 @@ func run()->void:
 		var blocked_start:Vector3=a.global_position;await ticks(8)
 		print("WALL_PROBE ",JSON.stringify({"hz":hz,"position":str(a.global_position),"delta":a.global_position.distance_to(blocked_start),"speed":a.current_speed,"rate":a._playback_speed,"contacts":a.get_slide_collision_count()}))
 		var horizontal_delta:=Vector2(a.global_position.x-blocked_start.x,a.global_position.z-blocked_start.z).length()
-		check(horizontal_delta<.001 and a.current_speed<.001 and a._playback_speed<.001,"Blocked capsule does not walk in place at "+str(hz))
+		var stopped_gait:bool=a.active_clip=="Idle" if a._ground_graph_enabled() else a._playback_speed<.001
+		check(horizontal_delta<.001 and a.current_speed<.001 and stopped_gait,"Blocked capsule selects stationary idle instead of a running pose at "+str(hz))
 		release();wall.free();a.reset_actor();await ticks(4)
 		# Simulate an actual ledge by removing support, not by changing is_on_floor.
 		floor_shape.set_deferred("disabled",true);await ticks(2)

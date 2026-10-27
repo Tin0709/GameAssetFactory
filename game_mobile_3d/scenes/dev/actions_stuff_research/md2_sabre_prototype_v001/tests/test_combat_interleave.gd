@@ -30,6 +30,7 @@ func run()->void:
 	var floor:=StaticBody3D.new();var c:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(100,.4,100);c.shape=box;c.position.y=-.2;floor.add_child(c);root.add_child(floor)
 	a=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();a.scripted_input=true;root.add_child(a)
 	a.set_native_combat_enabled(false) # Legacy policy regression; native behavior has dedicated suites.
+	a.ground_graph.clear() # Keep the legacy step-handoff policy isolated as well.
 	a.physics_pose_ready.connect(observe)
 	a.attack_accepted.connect(func(index:int,_clip:String,_serial:int):starts.append(index))
 	check(a.combo.get("movement_breaks_enabled")==true,"Default source mode supports strike/move/strike rather than locking the entire held combo")
