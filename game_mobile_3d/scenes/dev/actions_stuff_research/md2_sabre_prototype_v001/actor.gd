@@ -266,7 +266,6 @@ func _physics_process(delta:float)->void:
 func _animate(delta:float)->void:
 	if body_stability!=null:body_stability.restore()
 	if direction_adapter!=null:direction_adapter.restore()
-	if source_transition!=null:source_transition.restore()
 	simulation_clock+=delta;expression_clock+=delta
 	var selected:=_select_clip()
 	_play(selected)

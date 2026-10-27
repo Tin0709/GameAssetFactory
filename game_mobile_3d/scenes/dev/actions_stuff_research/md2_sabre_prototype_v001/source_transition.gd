@@ -21,9 +21,8 @@ func restore()->void:
 	for bone in _raw.size():rig.set_bone_pose(bone,_raw[bone])
 	_raw.clear()
 func begin(seconds:float)->void:
-	_from=_last.duplicate()
-	if _from.is_empty():
-		for bone in rig.get_bone_count():_from.append(rig.get_bone_pose(bone))
+	_from.clear()
+	for bone in rig.get_bone_count():_from.append(rig.get_bone_pose(bone))
 	duration=maxf(seconds,0.);elapsed=0.
 func _worlds(local:Array[Transform3D])->Array[Transform3D]:
 	var world:Array[Transform3D]=[]
