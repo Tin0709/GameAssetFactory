@@ -22,6 +22,6 @@ Human trials now recover actual1HMedium/Sabre owners,700cm/s normal ground respo
 
 - [x] Add source-only gait composer using existing imported tracks/shared phase/private settings. Raw review, files, air/fallback/three fixes preserved; no new scene/project.
 - [x] Cadence red→green;35gait checks and28suites/1158checks pass. All32bone source anchors, phase/notify/handoff, malformed optional metadata, independent264time parity, unchanged hashes, full-grass12frame/513state native study and64/64corrected face frames verified. Reviewer issues repaired and reverified.
-- [x] Consolidate native Sabre UpperBody montage/composite references/early ResumeMovement/leg filters and jump data; Recovery2 timestamp varies across snapshots. Whole-body plant/.45u step remain explicitly reconstructed pending full combat/input/queue handoff mapping. No guessed combat rewrite.
+- [x] Consolidate native Sabre UpperBody montage/composite references/early ResumeMovement/leg filters and jump data. CORRECTION: main RecoveryStart keys are stable across snapshots; prior variation confused cached EndLink. The later2026-10-27-sabre-combat-locomotion plan supersedes the historical whole-body plant/.45u policy; original queue latency remains unresolved.
 
 Review focus: class defaults versus live instances, derived versus inherited properties, large-world double vectors versus floats, bitfield booleans, asynchronous sampling uncertainty, active modifiers and UI/menu/pause ownership. No values inferred from arbitrary byte patterns.
