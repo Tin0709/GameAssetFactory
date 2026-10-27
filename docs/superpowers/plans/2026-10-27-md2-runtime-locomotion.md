@@ -20,8 +20,8 @@ Remaining: human-controlled MD2 motion sample; stock versus installed WASD input
 
 Human trials now recover actual1HMedium/Sabre owners,700cm/s normal ground response and10clean gait segments at median1.88832normalized cycles/s. The equipped1H layer uses the existing Master Idle/Walk/Run sources; input1 yields a derived2/9Walk+7/9Run blend and weighted period.52963s, independently matching native cadence. The previous pure Run1.25x clocks2.8846cycles/s and is incorrect for this observed state.
 
-- [ ] Add a small source-only gait composer using existing imported tracks, shared phase and recovered private sample settings. Leave raw review, source files, airborne timing, fallback and the three prior pose fixes intact. Use the existing final pose pipeline; no scene/engine/project replacement.
-- [ ] Prove failing cadence first, exact all-bone anchor sampling, phase/notify/transition semantics and private-profile fallback. Validate complete regressions and actual full-grass viewport, then review changes.
-- [ ] Consolidate live combat montage/ResumeMovement/slot and jump evidence. Do not substitute unresolved composite/slot behavior with an unverified full combat rewrite.
+- [x] Add source-only gait composer using existing imported tracks/shared phase/private settings. Raw review, files, air/fallback/three fixes preserved; no new scene/project.
+- [x] Cadence red→green;35gait checks and28suites/1158checks pass. All32bone source anchors, phase/notify/handoff, malformed optional metadata, independent264time parity, unchanged hashes, full-grass12frame/513state native study and64/64corrected face frames verified. Reviewer issues repaired and reverified.
+- [x] Consolidate native Sabre UpperBody montage/composite references/early ResumeMovement/leg filters and jump data; Recovery2 timestamp varies across snapshots. Whole-body plant/.45u step remain explicitly reconstructed pending full combat/input/queue handoff mapping. No guessed combat rewrite.
 
 Review focus: class defaults versus live instances, derived versus inherited properties, large-world double vectors versus floats, bitfield booleans, asynchronous sampling uncertainty, active modifiers and UI/menu/pause ownership. No values inferred from arbitrary byte patterns.

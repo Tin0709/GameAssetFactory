@@ -65,7 +65,9 @@ channels remain active in Source mode. Focused/Blink are optional new morph over
 Neutral disables those overlays. The public Sabre table identifies
 ABP_1HMediumAnimLayers and AM_Player_SabreCombo, supporting the selected family.
 Exact montage sections/sequence assignments and identity attachment to J_R_Weapon
-remain unverified adapters, rather than recovered equip data.
+were initially unverified. Native Sabre montage sections/composite assignments
+are now recovered privately; identity attachment to J_R_Weapon and full runtime
+section/cancel execution remain adapters.
 The prototype uses a one-unit-per-metre convention, including its 2.003-unit
 model, 2.0-unit capsule and existing1m terrain blocks. The700→7 conversion uses
 standard Unreal100UU/m and cm/s velocity. The new owned live player snapshot
@@ -125,9 +127,15 @@ and samples animation/markers in steps no longer than 1/120s within physics tick
 The original source profile now uses table-derived normal Run7, without the
 lab's1.2 multiplier. Slow Walk2 is a study adapter. Its **stride references remain
 Walk2.0/Run5.6**, derived from the earlier stance fit, not native speed settings.
-Cadence follows actual post-collision travel divided by these references: Run7
-produces1.25× gameplay sampling, not an arbitrary aesthetic multiplier or a
-recovered MD2 play-rate formula. Raw review and ordinary jump clips remain1×. Gameplay
+These references now serve the retained legacy A/B adapter only. When the private
+observed `gait_blend` profile is present, grounded gameplay samples Idle/Walk/Run
+on a shared normalized phase with recovered sample coordinates and weighted period.
+At7u/s the normal composed cycle is.52963s:1.88811Hz, matching the native human
+trial1.88832Hz. The derived blend is2/9Walk+7/9Run; the canonical Run cursor advances
+at.81818× while Walk is sampled at that same normalized phase. This is one blended
+cycle, not an aesthetic slow-down of Run or a change to its resource keys.
+The former pure-Run1.25× rule incorrectly generated2.8846cycles/s in this state.
+Raw review and ordinary jump clips remain1×. Gameplay
 Sabre attacks use their public per-variant rates1.2/1.2/1; recoveries stay1×
 because their native montage-rate relationship is not established.
 Blocked travel produces zero gait advance. Run's asymmetric stance paths still
@@ -303,6 +311,52 @@ It leaves the lab Environment and grass unchanged. The probe recenters in coarse
 
 ## Verification
 
+### Human Sabre runtime trace and gait repair — 2026-10-27
+
+Two successful user-controlled60s trials recover23,939samples, including11,956
+with actual `ABP_1HMediumAnimLayers_C`. A35s standing attempt is preserved and
+excluded from moving evidence. The long ground segments measure median699.55cm/s
+from actual root path, agreeing with native velocity/cap700. Mesh/root scale1,
+native imported height200.34cm and global animation rate1 additionally confirm
+the scale convention. Device-input latency and sub-frame read ordering are not
+measured; worst asynchronous read width is6.59ms.
+
+Ten clean Sabre segments show normalized BlendSpace input1 and phase1.88832Hz.
+The actual1H layer uses the existing generic Master Idle/Walk/Run assets. Their
+sample coordinates/rates predict1.88811Hz, independently supporting the common
+phase model. `source_gait.gd` samples the existing imported tracks without saving
+new assets, then feeds the established wall-time transition/stability/direction
+pipeline. It preserves local R*S (including nonuniform blink planes), omitted
+rest channels and head-relative facial roots. Local-pose interpolation is a
+reconstruction; native per-sample weights were not directly read. Transient
+graph fields labelled BlendWeight exceeded1 and are deliberately not used.
+
+28suites/1158checks pass. New35gait checks cover source sampling on all32bones,
+native phase30/60/120Hz, alias/step phase, low/blocked-speed handoffs, dominant
+source notify timing, optional metadata safety and raw1x review. The older
+clock-only regression fixture explicitly disables composition to isolate its
+original bug; composed handoffs have their own regression. Raw264time parity
+remains0.00001067max Godot/source matrix-element error with unchanged source
+hashes. Same full-grass viewport12frames/513states passes; macro face probe
+keeps both eyes in64/64corrected Walk/Run frames. Independent review has no
+remaining Critical/Important findings. No phone performance claim is implied.
+
+New working captures/trace are under Research `runtime_locomotion/native-gait/`,
+and the raw comparison under `runtime_locomotion/source-gait-contract/`.
+`capture_locomotion_contract.gd -- --source-gait` and
+`diagnose_locomotion_contract.gd -- --source-gait` preserve older outputs.
+
+Combat remains a distinct unresolved architecture gap. The recovered Sabre
+montage uses UpperBody and native main-graph leg branch filters. ResumeMovement
+keys occur before attack end; observed blocked/moving intervals agree with those
+keys and the table rates. One RecoveryStart timestamp changes between runtime
+snapshots, so it cannot be treated as an immutable source constant. The current
+whole-body planted policy plus.45u step is still a reconstruction and was not
+silently replaced by a guessed montage/queue solver. Jump trials additionally
+show about.5206s ordinary flight,-6000cm/s² vertical slope, moving air speed800,
+and a repeated unexplained70cm launch root advance. The accepted Godot jump
+remains unchanged pending isolation of that offset and the slam/landing handoff.
+
 ### Native configuration continuation — 2026-10-27
 
 An external Python reader now obtains owner-verified reflected configuration
@@ -329,12 +383,12 @@ folder, preserving the prior capture. The8.83s movie is continuity evidence,
 not desktop/phone performance evidence. Independent code review has no remaining
 Critical/Important findings.
 
-Important limit: synthetic gameplay inputs are not received by the MD2 session;
-all original-game samples so far contain standing state. The sampler is ready
-for a human-controlled60s-or-shorter session. Final normalized-speed inputs,
-actual blend weights/evaluator rates, combat overrides and foot-contact state
-remain open; matching the inspected component cannot establish complete MD2
-gameplay equivalence.
+The initial synthetic-input probes contained standing state only; the later
+human trials above supersede that limitation for ordinary ground movement.
+Exact per-bone native poses, contact/IK and full combat/input policy remain open;
+configuration and normal phase agreement do not establish complete gameplay
+equivalence. Reflected cached bone arrays were empty and no post-process
+blueprint was found in the inspected player mesh setup.
 
 ### Locomotion cause audit — 2026-10-27
 
@@ -359,11 +413,13 @@ full100×100grass lab. Private source arrays, traces, frames and the silent
 offline AVI are under Research `movement_measurements/contract_audit/`, ignored
 by Git. Its `findings.txt` explains source vs implementation vs architecture.
 
-Remaining limitations are substantive:7u/s now matches inspected baseline
-configuration, while Run1.25x is still a stride adapter, not the recovered final
-play-rate graph. Loaded generic and Claymore BlendSpaces have idle/walk/run
+Remaining limitations are substantive:7u/s now matches inspected configuration
+and measured native path. The former Run1.25x stride adapter has been replaced
+in normal source gameplay by the observed shared-phase blend. Loaded generic
+and Claymore BlendSpaces have idle/walk/run
 samples at0/.3/1.2 with sample/asset RateScale1 and no axis/weight smoothing.
-These settings alone do not establish the graph's final input or output cadence.
+Those settings alone were insufficient; the later human trace now establishes
+normal Sabre input/output cadence. It does not establish all modifier/state behavior.
 The source contains
 `LocomotionWalkRatio`/`RelativeMoveSpeed`/`LocomotionWalkVariedPlayRate` interfaces;
 their formulas and native final graph values remain missing. The formerly
