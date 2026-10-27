@@ -12,6 +12,7 @@ const Combo=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype
 const DirectionAdapter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/locomotion_direction.gd")
 const MovementMeter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/movement_meter.gd")
 const BodyStability=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/locomotion_stability.gd")
+const SourceTransition=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_transition.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 # Ordinary jump study timing; native MD2 launch/gravity have NOT been recovered.
@@ -43,6 +44,7 @@ var direction_adapter:RefCounted
 var locomotion_direction_enabled:=true
 var body_stability_enabled:=true
 var body_stability:RefCounted
+var source_transition:RefCounted
 var cadence_label:=""
 var current_speed:=0.
 var walk_speed:=2.16
@@ -156,6 +158,7 @@ func _ready()->void:
 		assert(animation!=null,"Missing authored action "+key)
 		animation.loop_mode=Animation.LOOP_LINEAR if clips[key].loop else Animation.LOOP_NONE
 	if using_original_source:
+		source_transition=SourceTransition.new();source_transition.setup(skeleton)
 		body_stability=BodyStability.new();body_stability.setup(skeleton,animation_player,clips)
 	for index in face.mesh.get_blend_shape_count():
 		if face.mesh.get_blend_shape_name(index)=="Focused":_focus_index=index
@@ -263,6 +266,7 @@ func _physics_process(delta:float)->void:
 func _animate(delta:float)->void:
 	if body_stability!=null:body_stability.restore()
 	if direction_adapter!=null:direction_adapter.restore()
+	if source_transition!=null:source_transition.restore()
 	simulation_clock+=delta;expression_clock+=delta
 	var selected:=_select_clip()
 	_play(selected)
@@ -271,7 +275,9 @@ func _animate(delta:float)->void:
 	if review_clip.is_empty() and selected in GAITS:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
 		_playback_speed=maxf(0.,current_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
+	if source_transition!=null:source_transition.restore()
 	animation_player.advance(delta*_playback_speed)
+	if source_transition!=null:source_transition.apply(delta)
 	if review_clip.is_empty() and selected in GAITS:
 		_gait_cycles_this_tick+=delta*_playback_speed/float(clips[selected].duration)
 		_gait_resume_phase=fposmod(animation_player.current_animation_position/float(clips[selected].duration),1.)
@@ -350,8 +356,16 @@ func _play(key:String,blend:float=.04)->void:
 		# of this short step. Give locomotion the legs within its first20% travel.
 		var stride_ref:=run_stride_speed if key in ["Run","CombatRun"] else walk_stride_speed
 		transition_blend=minf(blend,COMBAT_STEP_DISTANCE/stride_ref*.2)
-	active_clip=key;animation_player.play(clips[key].action,transition_blend);animation_player.advance(0.)
+	if source_transition!=null:
+		if review_clip.is_empty():
+			# Retain established aerial/combat handoff durations while removing
+			# cadence scaling from locomotion transitions. Source clocks unchanged.
+			var rate:float=combo.playback_rate() if combo.active() else 1.
+			source_transition.begin(transition_blend/rate)
+		else:source_transition.clear()
+	active_clip=key;animation_player.play(clips[key].action,0. if source_transition!=null else transition_blend);animation_player.advance(0.)
 	if preserve_phase or resume_step:animation_player.seek(phase*float(clips[key].duration),true)
+	if source_transition!=null:source_transition.apply(0.)
 func attack(value:bool)->void:
 	if value:resume_gameplay()
 	combo.attack(value,not _grounded)
@@ -392,6 +406,7 @@ func release_inputs()->void:
 func reset_actor()->void:
 	if body_stability!=null:body_stability.deactivate()
 	if direction_adapter!=null:direction_adapter.deactivate()
+	if source_transition!=null:source_transition.clear()
 	release_inputs();combo.cancel();global_position=Vector3.ZERO;velocity=Vector3.ZERO;current_speed=0.
 	review_clip="";active_clip="";_jump_stage="";_jump_time=0.;_heavy_slam_active=false;_transition="";_transition_time=0.;_grounded=false;_floor_initialized=false;_previous_combat=false
 	accepted_count=0;impact_count=0
@@ -409,6 +424,7 @@ func movement_measurements()->Dictionary:
 	if using_original_source:report.merge({"jump_apex_time_adapter":SOURCE_JUMP_APEX_SECONDS,"moving_landing_release_adapter":SOURCE_MOVING_LAND_SECONDS,"heavy_slam_gravity_multiplier":2.,"effective_gravity":gravity*(2. if _heavy_slam_active else 1.),"jump_phase":_jump_stage})
 	report.merge({"clip":active_clip,"play_rate":_playback_speed,"world_velocity":[velocity.x,velocity.y,velocity.z],"walk_speed":walk_speed,"run_speed":run_speed,"walk_stride_reference":walk_stride_speed,"run_stride_reference":run_stride_speed,"source_table_speed":700 if using_original_source else null,"unit_conversion":"100UU per Godot metre; local effective MD2 runtime unverified" if using_original_source else "authored fallback","acceleration_setting":acceleration,"deceleration_setting":deceleration,"turn_rate_adapter":12.,"attack_travel_adapter":.22,"coyote_time":coyote_time,"jump_height_adapter":jump_height,"gravity_adapter":gravity,"native_runtime_parameters_recovered":false})
 	if using_original_source:report.merge({"attack_travel_adapter":0.,"body_stability_enabled":body_stability_enabled,"retained_body_oscillation_adapter":BodyStability.RETAINED_OSCILLATION,"body_stability_strength":body_stability.strength},true)
+	if source_transition!=null:report.merge({"transition_wall_seconds":source_transition.duration,"transition_elapsed_seconds":source_transition.elapsed,"transition_clock":"wall time, independent of source cadence"})
 	return report
 func save_movement_measurements()->String:
 	var folder:=private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements") if using_private_skin else "user://sabre_movement_measurements"
