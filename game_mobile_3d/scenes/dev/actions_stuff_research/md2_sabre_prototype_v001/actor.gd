@@ -362,6 +362,10 @@ func _play(key:String,blend:float=.04)->void:
 			var rate:float=combo.playback_rate() if combo.active() else 1.
 			source_transition.begin(transition_blend/rate)
 		else:source_transition.clear()
+	# glTF import drops channels that remain equal to the bone rest. A new clip
+	# must begin from those defaults, rather than retaining a prior clip's pupil
+	# or weapon helper pose. Snapshot the outgoing handoff BEFORE this reset.
+	if using_original_source:skeleton.reset_bone_poses()
 	active_clip=key;animation_player.play(clips[key].action,0. if source_transition!=null else transition_blend);animation_player.advance(0.)
 	if preserve_phase or resume_step:animation_player.seek(phase*float(clips[key].duration),true)
 	if source_transition!=null:source_transition.apply(0.)
