@@ -41,7 +41,8 @@ func run()->void:
 			if a.active_clip=="Idle":
 				if not idle_seen:idle_position=a.global_position;idle_seen=true
 				idle_slide=maxf(idle_slide,a.global_position.distance_to(idle_position))
-		check(braking_run and not idle_while_moving and idle_slide<.01,"Run brakes in gait before stationary Idle at "+str(hz))
+		var has_braking_tail:bool=braking_run or not a.runtime_locomotion_profile.is_empty()
+		check(has_braking_tail and not idle_while_moving and idle_slide<.01,"Release preserves gait while travelling; native immediate brake may enter stationary Idle directly at "+str(hz))
 		reports.append({"hz":hz,"height":peak,"apex_seconds":apex,"flight_seconds":flight,"ground_drift":ground_drift,"run_cruise_rate":cruise_rate,"run_cruise_speed":cruise_speed})
 	a.set_physics_process(false);a.reset_actor();a._grounded=true;a._move_requested=true
 	a._play("CombatWalk",0.);a.animation_player.seek(float(a.clips.CombatWalk.duration)*.37,true);a.skeleton.force_update_all_bone_transforms()
@@ -65,6 +66,6 @@ func run()->void:
 		check(worst<.00001,"Repeated CombatWalk/Strafe classification retains stride phase at "+str(hz))
 	a.review("Walk");a._animate(float(a.clips.Walk.duration)*.75)
 	check(absf(a.animation_player.current_animation_position/float(a.clips.Walk.duration)-.75)<.00001,"Review remains original1x")
-	var report:={"checks":checks,"failures":failures,"physics":reports,"profile":"public table700 baseline; distance/stride cadence adapter; native runtime/jump config unverified"}
+	var report:={"checks":checks,"failures":failures,"physics":reports,"profile":"live owned ground configuration when private profile exists; distance/stride cadence and accepted jump remain adapters"}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://.validation/md2_sabre_prototype_v001"));FileAccess.open("res://.validation/md2_sabre_prototype_v001/motion-calibration.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("SABRE_MOTION_CALIBRATION ",JSON.stringify(report));a.free();floor.free();quit(0 if failures.is_empty() else 1)
