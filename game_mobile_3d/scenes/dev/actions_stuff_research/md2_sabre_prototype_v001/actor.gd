@@ -51,6 +51,7 @@ var body_stability:RefCounted
 var source_transition:RefCounted
 var source_gait:RefCounted
 var ground_graph:Dictionary={}
+var combat_handoffs:Dictionary={}
 var _outgoing_locomotion_state:Dictionary={}
 var combat_legs:RefCounted
 var _combat_plan_active:=false
@@ -185,6 +186,7 @@ func _ready()->void:
 	if using_original_source:
 		_load_private_combat_clips(runtime_locomotion_profile.get("combat"))
 		combo.configure_native(runtime_locomotion_profile.get("combat"))
+		if combo.native_enabled:combat_handoffs=read_combat_handoffs(runtime_locomotion_profile.combat.get("handoffs"))
 	animation_player.callback_mode_process=AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	for key:String in clips:
 		var animation:=animation_player.get_animation(clips[key].action)
@@ -251,6 +253,25 @@ static func read_ground_graph(value:Variant)->Dictionary:
 		var seconds:Variant=value.get(key)
 		if not (seconds is float or seconds is int) or not is_finite(float(seconds)) or float(seconds)<=0. or float(seconds)>1.:return {}
 	return value.duplicate(true)
+
+static func read_combat_handoffs(value:Variant)->Dictionary:
+	if not value is Dictionary or value.get("schema")!="private-combat-handoffs/1" or value.get("curve")!="linear" or value.get("composite_seam")!="continuous":return {}
+	var seconds:Variant=value.get("blend_in_seconds")
+	if not (seconds is float or seconds is int) or not is_finite(float(seconds)) or float(seconds)<=0. or float(seconds)>1.:return {}
+	return value.duplicate(true)
+
+func _continuous_combat_segment(from:String,to:String)->bool:
+	if not combo.native_enabled or combat_handoffs.is_empty():return false
+	for i in combo.native_windows.size():
+		var window:Dictionary=combo.native_windows[i]
+		if from==window.get("attack_key","Attack%d"%(i+1)) and to==window.get("recovery_key","Recovery%d"%(i+1)):return true
+	return false
+
+func _combat_entry(key:String)->bool:
+	if not combo.native_enabled or combat_handoffs.is_empty():return false
+	for i in combo.native_windows.size():
+		if key==combo.native_windows[i].get("attack_key","Attack%d"%(i+1)):return true
+	return false
 
 func _ground_graph_enabled()->bool:
 	return source_gait!=null and native_gait_enabled and not ground_graph.is_empty()
@@ -570,12 +591,16 @@ func _play(key:String,blend:float=.04)->void:
 		transition_blend=minf(blend,COMBAT_STEP_DISTANCE/stride_ref*.2)
 	if source_transition!=null:
 		if review_clip.is_empty():
-			# Retain established aerial/combat handoff durations while removing
-			# cadence scaling from locomotion transitions. Source clocks unchanged.
+			# Optional external configuration controls montage entry wall time.
+			# A composite's consecutive segments do not start a new montage/blend.
 			var rate:float=combo.playback_rate() if combo.active() else 1.
 			var idle_to_move:bool=active_clip in ["Idle","CombatReady"] and key in GAITS
 			var move_to_idle:bool=active_clip in GAITS and key in ["Idle","CombatReady"]
-			if _ground_graph_enabled() and _grounded and (idle_to_move or move_to_idle):
+			if _continuous_combat_segment(active_clip,key):
+				_outgoing_locomotion_state.clear();source_transition.clear()
+			elif _combat_entry(key):
+				_outgoing_locomotion_state.clear();source_transition.begin(float(combat_handoffs.blend_in_seconds))
+			elif _ground_graph_enabled() and _grounded and (idle_to_move or move_to_idle):
 				var seconds:float=ground_graph.idle_to_move_seconds if idle_to_move else ground_graph.move_to_idle_seconds
 				var outgoing_phase:float=animation_player.current_animation_position/float(clips[active_clip].duration)
 				source_transition.begin_evaluated(seconds,_outgoing_locomotion_sampler(active_clip,outgoing_phase),StringName(ground_graph.curve))
