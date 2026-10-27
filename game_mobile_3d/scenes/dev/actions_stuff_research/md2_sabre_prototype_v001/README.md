@@ -1,5 +1,44 @@
 # Player + Sabre prototype
 
+### Current — Sabre event-based combat movement, 2026-10-27
+
+The existing scene now uses the private runtime profile's ResumeMovement and
+RecoveryStart boundaries. Windup blocks travel; open intervals integrate the
+requested ground velocity with collision, while only the two verified leg
+branches receive the common Walk/Run phase blend. Normal7m/s/1.888Hz, source keys,
+accepted jump, face/weapon fidelity and all graphics remain intact. The fixed
+distance step remains only in legacy fallback/A/B regression tests.
+
+The live Sabre montage references Axe3 and its recovery. These two existing
+private exports load transiently with hash/hierarchy checks, alongside the
+unchanged13-clip bundle:24semantic entries/15unique source clips/9aliases.
+All14 observed combat resumptions restart the gait near the beginning; the new
+leg phase resets on resume while keeping Walk/Run synchronized. Body turning
+continues during strikes under the recovered yaw limit. Unqueued recovery uses
+composite hold/trim; buffered/held links use the earliest stored gate.
+
+31suites/1260checks pass, including30/60/120Hz actual travel, windup planting,
+turning, chained/released/late commands, collision/focus/jump, raw pose and
+malformed-profile/epsilon regressions. Raw32bone/288time parity against original
+GLB accessors has maximum matrix error0.00001067; original GLB/Blender hashes
+unchanged. Same full-grass native Mobile/D3D12 capture:15frames/513states,8.83s.
+Offline capture is continuity evidence, not a performance benchmark.
+
+Limits: original input-device timestamps and queue/cancel internals were not
+captured. The second-strike moving interval remains about37ms longer in the
+native cohort than our earliest-gate policy; no guessed delay is added.220ms
+buffer, exact mask/contact interpolation, ribbon lifetime and audio sample mix
+remain labelled adapters. Source slash-onset and melee-event keys are distinct
+from actual damage authority. New current-owner inspection finds standing melee
+speed multiplier1 and native buffer/player-melee abilities, but no queue duration.
+
+F3 shows strike/permission/leg weight; Save JSON includes event clock, open time,
+path and gait phase. Reproduce the private capture with
+`capture_locomotion_contract.gd -- --combat-runtime`; raw parity uses
+`diagnose_locomotion_contract.gd -- --combat-runtime --raw-only` and Research's
+`scripts/audit_sabre_combat_sources.py`. Detailed comparison/current findings,
+profile and movie remain Research-only under `runtime_locomotion/combat/`.
+
 F6 in the existing `ActionsStuffWalkRunTest.tscn` now opens this prototype
 directly. Use `game_mobile_3d/Open Sabre Editor.cmd` in the canonical
 `C:\Users\ADMIN\Desktop\Dev\GameAssetFactory` checkout to select this scene.
@@ -349,10 +388,11 @@ and the raw comparison under `runtime_locomotion/source-gait-contract/`.
 Combat remains a distinct unresolved architecture gap. The recovered Sabre
 montage uses UpperBody and native main-graph leg branch filters. ResumeMovement
 keys occur before attack end; observed blocked/moving intervals agree with those
-keys and the table rates. One RecoveryStart timestamp changes between runtime
-snapshots, so it cannot be treated as an immutable source constant. The current
-whole-body planted policy plus.45u step is still a reconstruction and was not
-silently replaced by a guessed montage/queue solver. Jump trials additionally
+keys and the table rates. CORRECTION: main RecoveryStart LinkValue keys agree
+across both snapshots; the earlier variation claim confused cached EndLink
+values. The whole-body plant/.45u policy described at this historical milestone
+is superseded in normal source mode by the current combat implementation above.
+Jump trials additionally
 show about.5206s ordinary flight,-6000cm/s² vertical slope, moving air speed800,
 and a repeated unexplained70cm launch root advance. The accepted Godot jump
 remains unchanged pending isolation of that offset and the slam/landing handoff.
