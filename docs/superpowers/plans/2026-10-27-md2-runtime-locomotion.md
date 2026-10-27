@@ -8,10 +8,12 @@
 
 **Spec:** Latest user request; speed700, Run1.25, acceleration48/deceleration42 need runtime verification. Preserve previous3fidelity fixes, original assets, accepted jump and graphics. No new scene/project/engine. Private data remains Research-only and excluded from current Git tracking before capture.
 
-- [ ] Validate a new read-only evidence route against public loader source and known reflected types.
-- [ ] Recover active player/component/attribute/animation owners and defaults; capture controlled start/stop/turn/jump/combat samples where accessible.
-- [ ] Independently compare units, speeds, velocity response, animation rates/ratios and contact/notify evidence.
-- [ ] Reproduce concrete controller mismatches with failing tests, implement justified repairs and label unknowns.
-- [ ] Validate30/60/120physics behaviors, all Sabre regressions, raw pose parity and native existing-lab gameplay. Update the existing findings with new evidence and limits.
+- [x] Validate a new read-only evidence route against public loader source and known reflected types.
+- [x] Recover active player/component/attribute/animation owners and defaults; capture standing state and bounded input attempts. Actual moving original-game trace remains unavailable because injected gameplay inputs are not received; optional human input requested.
+- [x] Independently compare units, speeds, velocity response, animation asset settings and contact/notify evidence. Final native graph normalization/weights/rates remain unresolved.
+- [x] Reproduce concrete ground-response mismatches with failing tests, implement optional private-profile mapping and source-clock event hooks; label remaining adapters.
+- [x] Validate30/60/120physics,27suites/1123checks,32bone/264time parity, unchanged source hashes and same native full-grass lab12frames/513states. Update existing findings. Independent code review issue fixed with failing/passing regression.
+
+Remaining: human-controlled MD2 motion sample; stock versus installed WASD input policy; current2HMedium versus Sabre-specific layer; air/world-gravity and combat effect overrides; native support/contact/IK and audio/surface routing. No claim of complete native movement equivalence. No further tool installation or loader change was needed.
 
 Review focus: class defaults versus live instances, derived versus inherited properties, large-world double vectors versus floats, bitfield booleans, asynchronous sampling uncertainty, active modifiers and UI/menu/pause ownership. No values inferred from arbitrary byte patterns.

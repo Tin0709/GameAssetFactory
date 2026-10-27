@@ -68,8 +68,22 @@ Exact montage sections/sequence assignments and identity attachment to J_R_Weapo
 remain unverified adapters, rather than recovered equip data.
 The prototype uses a one-unit-per-metre convention, including its 2.003-unit
 model, 2.0-unit capsule and existing1m terrain blocks. The700→7 conversion uses
-standard Unreal100UU/m and cm/s velocity; actual installed MD2 instance scaling
-and attribute-to-movement conversion remain unverified.
+standard Unreal100UU/m and cm/s velocity. The new owned live player snapshot
+confirms attribute700/multiplier1, component MaxWalkSpeed700, animation baseline700
+and root scale1 in the observed normal state. A moving original-game distance
+trace and modified-speed callback order remain unverified.
+
+The optional `MD2_Locomotion_Runtime.json` sidecar stays beside the private GLB,
+outside the project/Git/builds. It applies owner-verified ground settings only:
+speed700cm/s, acceleration1,000,000cm/s², braking9,999,999cm/s² and yaw1,800deg/s.
+The live component matches the loaded derived hero Blueprint's default component;
+the generic native and base-player defaults differ. Ordinary flat-ground response
+therefore reaches the target within one30/60/120Hz tick. This maps configuration,
+not the complete native CalcVelocity implementation. Air control/accepted jump,
+combat interval policy and source cadence remain the established adapters.
+The session includes the installed WASD mod; no stock unmodded motion trace is
+claimed. Missing or malformed sidecars retain the previous controller settings;
+authored fallback ignores the private profile entirely.
 
 ## Motion and feedback limits
 
@@ -105,7 +119,7 @@ retained, rather than tilting the entire character or suppressing gait cadence.
 The face controller
 owns only its two optional morph scalars. Original source weapon scale/shear is retained,
 including the compressed blade during the finisher. Source clip durations are preserved; the 220ms input buffer,
-40ms clip blend, movement rates, collider behavior and VFX windows are authored
+40ms clip blend, slow-walk rate, collider behavior and VFX windows are authored
 adapters. The controller advances an event clock with exact clip-end overshoot
 and samples animation/markers in steps no longer than 1/120s within physics ticks.
 The original source profile now uses table-derived normal Run7, without the
@@ -117,7 +131,8 @@ recovered MD2 play-rate formula. Raw review and ordinary jump clips remain1×. G
 Sabre attacks use their public per-variant rates1.2/1.2/1; recoveries stay1×
 because their native montage-rate relationship is not established.
 Blocked travel produces zero gait advance. Run's asymmetric stance paths still
-prevent a claim of perfect bilateral foot locking. Gaits persist through braking before Idle, and
+prevent a claim of perfect bilateral foot locking. Gaits persist while travelling;
+the recovered ground braking configuration can enter stationary Idle immediately, and
 locomotion switches retain normalized cycle phase with an80ms blend.
 Public-table JumpCoyoteTime.155 permits one jump after a recent ledge departure;
 takeoff consumes it, so it cannot grant a second airborne jump. Estimated jump
@@ -288,6 +303,39 @@ It leaves the lab Environment and grass unchanged. The probe recenters in coarse
 
 ## Verification
 
+### Native configuration continuation — 2026-10-27
+
+An external Python reader now obtains owner-verified reflected configuration
+using QUERY/VM_READ only, without injection, target calls, file changes or new
+software. It also recovers the referenced movement-multiplier RichCurve,
+loaded Walk/Run BlendSpaces and original source notify keys. Detailed private
+data lives in Research `reports/prototype_sabre/runtime_locomotion/`; the existing
+`movement_measurements/contract_audit/findings.txt` is updated with the findings.
+
+The old48/42ground acceleration/braking gave150ms95% response and0.525u release
+drift at60Hz. The inspected configuration now gives first-tick7u/s,16.7ms response
+and0post-release travel in the controlled flat-ground test.30/120Hz also pass.
+Ground yaw follows the inspected limit; all three prior pose fixes remain intact.
+The selected source clock now emits `source_locomotion_event` at stored notify
+times, including loop crossings, with raw-review suppression and reset diagnostics.
+It is an inspectable synchronization hook, not recovered audio/surface/graph logic.
+
+27suites/1123checks pass, including malformed optional-profile cases. Raw parity
+remains32bones/264times, max Godot/source matrix-element error0.00001067 and
+unchanged source hashes. Same full grass/lighting lab:12native frames/513physics
+states, starting/stopping/turning/strafe/jump/held combat, no gameplay failures.
+Run `capture_locomotion_contract.gd -- --runtime-ground` for the new private output
+folder, preserving the prior capture. The8.83s movie is continuity evidence,
+not desktop/phone performance evidence. Independent code review has no remaining
+Critical/Important findings.
+
+Important limit: synthetic gameplay inputs are not received by the MD2 session;
+all original-game samples so far contain standing state. The sampler is ready
+for a human-controlled60s-or-shorter session. Final normalized-speed inputs,
+actual blend weights/evaluator rates, combat overrides and foot-contact state
+remain open; matching the inspected component cannot establish complete MD2
+gameplay equivalence.
+
 ### Locomotion cause audit — 2026-10-27
 
 Matched-time comparison of the saved Blender precision Actions, original GLBs
@@ -299,8 +347,8 @@ now owns a short wall-time pose handoff before the existing body/direction
 adapters. Raw review bypasses it. Its facial roots remain head-relative.
 The outgoing pose is snapshotted, not another recovered motion clip.
 
-Source clocks, speeds, accepted jump, attack rates and physical movement were
-preserved. Maximum Godot/source matrix-element error decreased from.040674 to
+That earlier pose-only pass preserved source clocks, speeds, accepted jump,
+attack rates and physical movement. Maximum Godot/source matrix-element error decreased from.040674 to
 .00001067; the earlier exceptions were a left weapon helper and right pupil.
 This is sampled transform accuracy, not a native MD2 gameplay fidelity score.
 
@@ -311,12 +359,17 @@ full100×100grass lab. Private source arrays, traces, frames and the silent
 offline AVI are under Research `movement_measurements/contract_audit/`, ignored
 by Git. Its `findings.txt` explains source vs implementation vs architecture.
 
-Remaining limitations are substantive:7u/s is a public700/100 baseline, Run1.25x
-is a stride adapter, not the recovered play-rate graph. The source contains
+Remaining limitations are substantive:7u/s now matches inspected baseline
+configuration, while Run1.25x is still a stride adapter, not the recovered final
+play-rate graph. Loaded generic and Claymore BlendSpaces have idle/walk/run
+samples at0/.3/1.2 with sample/asset RateScale1 and no axis/weight smoothing.
+These settings alone do not establish the graph's final input or output cadence.
+The source contains
 `LocomotionWalkRatio`/`RelativeMoveSpeed`/`LocomotionWalkVariedPlayRate` interfaces;
-their formulas and native friction/turning/blend values remain missing. Player
-data additionally references an unavailable movement-multiplier adjustment
-curve; RunSpeedModifier is SetByCaller. Native notify-driven displacement cannot
+their formulas and native final graph values remain missing. The formerly
+unavailable movement-multiplier adjustment curve is now recovered privately;
+its higher range is nonlinear. RunSpeedModifier is SetByCaller. Native
+notify-driven attack displacement cannot
 be inferred from in-place root tracks. Current input-selected gait, leg yaw
 adaptation,25%body oscillation and combat step interval remain reconstructions.
 Godot supports blend spaces, state machines, filters and root-motion extraction;
