@@ -55,4 +55,7 @@ func run()->void:
 		check(events.size()==expected.size(),"Normal blend uses dominant Run notifications once per common cycle")
 		for i in mini(events.size(),expected.size()):
 			check(events[i].clip=="Run" and absf(events[i].at-float(expected[i].time)/float(a.clips.Run.duration)*period)<.00001,"Native-phase event time follows shared cycle "+str(i))
+		a.runtime_locomotion_profile.gait_blend.erase("normal_phase_hz_observed")
+		var minimal_report:Variant=a.movement_measurements()
+		check(minimal_report is Dictionary and minimal_report.has("speed") and minimal_report.get("native_normal_phase_hz_observed")==null,"Missing optional observational metadata does not break live diagnostics")
 	print("SABRE_SOURCE_GAIT ",JSON.stringify({"checks":checks,"failures":failures}));a.free();oracle.free();quit(0 if failures.is_empty() else 1)

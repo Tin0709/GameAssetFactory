@@ -179,7 +179,7 @@ func _ready()->void:
 	if using_original_source:
 		source_transition=SourceTransition.new();source_transition.setup(skeleton)
 		var gait:=SourceGait.new()
-		if gait.setup(skeleton,animation_player,clips,runtime_locomotion_profile.get("gait_blend")):source_gait=gait;cadence_label="Live player700 /100 =7 units/s · ground settings recovered\nObserved native gait1.888Hz · source phase blend"
+		if gait.setup(skeleton,animation_player,clips,runtime_locomotion_profile.get("gait_blend")):source_gait=gait;cadence_label="Live player700 /100 =7 units/s · ground settings recovered\nSource phase blend %.3f Hz · evidence in private profile"%(1./float(gait.state(run_speed).period))
 		body_stability=BodyStability.new();body_stability.setup(skeleton,animation_player,clips)
 	for index in face.mesh.get_blend_shape_count():
 		if face.mesh.get_blend_shape_name(index)=="Focused":_focus_index=index
@@ -511,7 +511,8 @@ func movement_measurements()->Dictionary:
 		report.merge({"native_runtime_parameters_recovered":true,"unit_conversion":"Live owned player native cm /100 per Godot metre","ground_response_source":"Live reflected component configuration; moving MD2 trace pending","turn_rate_adapter":null,"ground_yaw_rate_deg_s":rad_to_deg(ground_turn_rate),"air_acceleration_adapter":air_acceleration,"air_deceleration_adapter":air_deceleration,"native_animation_evaluator_rate_verified":false,"native_ground_motion_trace_verified":false},true)
 		report.merge({"source_locomotion_event_count":source_locomotion_event_count,"last_source_locomotion_event":last_source_locomotion_event.duplicate(),"source_notify_scope":"Stored source times on selected clip; graph weights/surface and native event behavior unresolved"})
 		report.native_ground_motion_trace_verified=bool(runtime_locomotion_profile.get("ground_motion_trace_verified",false))
-	if source_gait!=null:report.merge({"native_gait_enabled":native_gait_enabled,"native_gait_state":source_gait.state(current_speed),"native_normal_phase_hz_observed":runtime_locomotion_profile.gait_blend.normal_phase_hz_observed,"gait_composition_scope":"Recovered source samples/input, observed normal phase; local/face blending reconstruction"})
+		if report.native_ground_motion_trace_verified:report.ground_response_source="Owned human-controlled MD2 ground velocity trace and reflected configuration; asynchronous reads"
+	if source_gait!=null:report.merge({"native_gait_enabled":native_gait_enabled,"native_gait_state":source_gait.state(current_speed),"native_normal_phase_hz_observed":runtime_locomotion_profile.gait_blend.get("normal_phase_hz_observed"),"gait_composition_scope":"Recovered source samples/input, observed normal phase; local/face blending reconstruction"})
 	if source_transition!=null:report.merge({"transition_wall_seconds":source_transition.duration,"transition_elapsed_seconds":source_transition.elapsed,"transition_clock":"wall time, independent of source cadence"})
 	var actual:=get_real_velocity();var travelling:=Vector2(actual.x,actual.z).length()>.01
 	var travel_heading:=atan2(actual.x,actual.z)
