@@ -394,7 +394,10 @@ func _physics_process(delta:float)->void:
 	if _combat_plan_active:planar=desired*(_combat_open_seconds/delta)
 	# Public GA_HeavyJumpAttack GravityMultiplier2; native base jump remains unknown.
 	var gravity_factor:=2. if _heavy_slam_active else 1.
-	velocity=Vector3(planar.x,-.2 if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
+	# Built-in floor snapping already retains grounded contact. Driving the
+	# source capsule down every tick caused penetration/recovery body jitter.
+	var ground_vertical:=0. if using_original_source else -.2
+	velocity=Vector3(planar.x,ground_vertical if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
 	if jump_pressed and (was_grounded or (using_original_source and _time_since_grounded<=coyote_time)):
 		combo.cancel();velocity.y=sqrt(2.*gravity*jump_height)-(gravity*delta*.5 if using_original_source else 0.);_jump_stage="JumpTakeoff";_jump_time=0.
 		_heavy_slam_active=false
