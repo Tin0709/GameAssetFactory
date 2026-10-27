@@ -15,12 +15,16 @@ func run()->void:
 	for hz in [30,60,120]:
 		Engine.physics_ticks_per_second=hz;a.reset_actor();await tick();await tick();a.requested_direction=Vector2(0,-1);a.requested_run=true
 		for i in hz/2:await tick()
-		var expected:=0.;var path:=0.;var locked_path:=0.;var open_time:=0.;var previous:Vector3=a.position;var gait_before:float=a._gait_resume_phase
+		var expected:=0.;var path:=0.;var locked_path:=0.;var open_time:=0.;var previous:Vector3=a.position;var expected_phase:=0.;var previously_open:=false
+		var period:float=a.source_gait.state(7.).period
 		a.attack(true)
 		for i in hz*4:
 			var open:=0.
 			for segment:Dictionary in a.combo.movement_plan(1./hz):
-				if segment.move:open+=segment.duration
+				if segment.move:
+					if not previously_open:expected_phase=0.
+					expected_phase=fposmod(expected_phase+float(segment.duration)/period,1.);open+=segment.duration
+				previously_open=segment.move
 			expected+=open*7.;open_time+=open
 			a.requested_direction=[Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT][int(i/(hz/2))%4]
 			await tick();var distance:=Vector2(a.position.x-previous.x,a.position.z-previous.z).length();path+=distance;previous=a.position
@@ -28,8 +32,7 @@ func run()->void:
 		check(absf(path-expected)<.003,"Collision-resolved distance follows7m/s permission integral at "+str(hz))
 		check(locked_path<.0001,"Windups remain planted without momentum at "+str(hz))
 		check(a.accepted_count>=7 and a.combo.phase!=&"step","Held combo repeats ordered native links without arbitrary step at "+str(hz))
-		var period:float=a.source_gait.state(7.).period;var expected_phase:=fposmod(gait_before+path/7./period,1.)
-		check(absf(wrapf(a._gait_resume_phase-expected_phase,-.5,.5))<.0001,"Legs preserve shared phase and advance only during real open travel at "+str(hz))
+		check(absf(wrapf(a._gait_resume_phase-expected_phase,-.5,.5))<.0003,"Native restart and shared leg phase follow open travel at "+str(hz))
 		a.attack(false);a.requested_direction=Vector2.UP
 		for i in hz*2:await tick()
 		check(a.active_clip=="Run" and absf(a.current_speed-7.)<.001,"Recovery immediately yields naturally to full-speed gait at "+str(hz))

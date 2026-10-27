@@ -56,6 +56,7 @@ var _combat_open_seconds:=0.
 var _animation_motion_speed:=0.
 var _combat_path:=0.
 var _combat_locked_seconds:=0.
+var _combat_was_moving:=false
 var native_gait_enabled:=true
 var cadence_label:=""
 var current_speed:=0.
@@ -392,6 +393,7 @@ func _animate(delta:float)->void:
 	if composed_gait:source_gait.apply(animation_player.current_animation_position/float(clips[selected].duration),motion_speed)
 	if layered_combat:
 		var leg_state:Dictionary=source_gait.state(motion_speed)
+		if moving_legs and not _combat_was_moving and bool(runtime_locomotion_profile.combat.get("leg_restart_on_resume",false)):_gait_resume_phase=0.
 		var before_phase:=_gait_resume_phase
 		var advance_phase:=delta/float(leg_state.period) if moving_legs else 0.
 		_gait_resume_phase=fposmod(before_phase+advance_phase,1.)
@@ -401,6 +403,7 @@ func _animate(delta:float)->void:
 			var event_clip:String=leg_state.right if float(leg_state.weight)>.5 else leg_state.left
 			_dispatch_locomotion_events(event_clip,before_phase*float(clips[event_clip].duration),advance_phase*float(clips[event_clip].duration),delta)
 	elif combat_legs!=null:combat_legs.weight=0.
+	_combat_was_moving=moving_legs
 	if source_transition!=null:source_transition.apply(delta)
 	if review_clip.is_empty() and selected in GAITS:
 		var event_clip:String=(gait_state.right if float(gait_state.weight)>.5 else gait_state.left) if composed_gait else selected
@@ -571,7 +574,7 @@ func reset_actor()->void:
 	if direction_adapter!=null:direction_adapter.deactivate()
 	if source_transition!=null:source_transition.clear()
 	if combat_legs!=null:combat_legs.clear()
-	_combat_plan_active=false;_combat_open_seconds=0.;_animation_motion_speed=0.;_combat_path=0.;_combat_locked_seconds=0.
+	_combat_plan_active=false;_combat_open_seconds=0.;_animation_motion_speed=0.;_combat_path=0.;_combat_locked_seconds=0.;_combat_was_moving=false
 	release_inputs();combo.cancel();global_position=Vector3.ZERO;velocity=Vector3.ZERO;current_speed=0.
 	review_clip="";active_clip="";_jump_stage="";_jump_time=0.;_heavy_slam_active=false;_transition="";_transition_time=0.;_grounded=false;_floor_initialized=false;_previous_combat=false
 	accepted_count=0;impact_count=0
