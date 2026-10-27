@@ -1,6 +1,35 @@
 # Player + Sabre prototype
 
-### Current — Sabre event-based combat movement, 2026-10-27
+### Current — evaluated locomotion handoffs, 2026-10-27
+
+Same scene, assets and private sidecar. The independent generic sampler now
+accepts an optional blend-input floor; the ground-state selector requires real
+planar movement as well as intent, so a blocked capsule settles to Idle. An
+optional external graph supplies transition duration/easing. Outgoing locomotion
+keeps evaluating during the handoff rather than freezing a captured pose; a
+reversed unfinished blend retains the current composite as a disclosed adapter.
+Raw reviews, fallback and explicitly isolated legacy comparisons remain available.
+
+Validated against an existing native transition capture (23 evaluator samples):
+maximum normalized cursor error0.13068→0.000000717 and weight error0.88787→0.00000735.
+This verifies cursor/weight behavior in that sequence, not native per-bone blending
+or a universal contact/IK solver. Existing native-input replay retains15 ordered
+accepts with mean8.84ms/max15.05ms source-clock residual. Adding an unexplained
+recovery delay worsens this replay, so no fixed delay was added to the controller.
+
+34suites/1294checks pass, including preserved7m/s/1.888Hz, raw review, jump,
+face/weapon, collision/turn/combat and malformed-profile cases. Three failures
+already existed at the task baseline: obsolete queue/continuous-gate fixtures and
+a waiter-count assumption at120Hz. Those fixtures now test explicit policy and
+each actual actor tick. Same native full-grass D3D12 lab:16frames/513states, no
+contract failures. Native task completion, exact variable thresholds, input-device
+differences, cancellation and contact logic remain unresolved.
+
+Game-derived configuration, bytecode, captures and detailed evidence stay outside
+this repository in the private Research workspace. No original source animation,
+model, weapon, texture, environment, camera or project-render setting was changed.
+
+### Previous milestone — Sabre event-based combat movement, 2026-10-27
 
 The existing scene now uses the private runtime profile's ResumeMovement and
 RecoveryStart boundaries. Windup blocks travel; open intervals integrate the

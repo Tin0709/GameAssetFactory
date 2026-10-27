@@ -39,16 +39,16 @@ helper. Separate configured animation input, state eligibility, source cadence
 and transition time. Retain existing combat event integration until stronger
 evidence distinguishes its remaining native behavior. No engine/rig/scene rewrite.
 
-- [ ] Trace existing captured variables against compiled operations and bindings;
+- [x] Trace existing captured variables against compiled operations and bindings;
   record timing/order ambiguities and independently check blend shape/cursor motion.
-- [ ] Add failing tests for bounded low-speed blend input, blocked movement,
+- [x] Add failing tests for bounded low-speed blend input, blocked movement,
   wall-clock transition easing and an outgoing pose that keeps evaluating.
   Implement generic optional-profile behavior in source_gait/source_transition
   and actor only; raw reviews and fallback retain their current contracts.
-- [ ] Repair the three pre-existing failing fixtures only where they assert the
+- [x] Repair the three pre-existing failing fixtures only where they assert the
   superseded queue or continuous-gate policy; preserve explicit legacy tests and
   validate against the captured input replay, not just matching implementation.
-- [ ] Run applicable regressions and controlled start/stop/wall/turn/combat/jump
+- [x] Run applicable regressions and controlled start/stop/wall/turn/combat/jump
   measurements at30/60/120Hz. Check private source hashes and same-lab presentation;
   record before/after residuals and remaining native limits in existing findings.
 
@@ -56,3 +56,13 @@ Review focus: interrupted blends must retain the current pose; malformed optiona
 profiles must fail safely; moving along a wall must not count as fully blocked;
 raw source review must bypass gameplay blending; actual physics displacement and
 animation phase must remain separate from the combat permission fraction.
+
+Ruling: native compiled bodies remain inaccessible under current read-only
+limits. Apply only the recovered animation-input/state/transition contract plus
+independently confirmed evaluator behavior; do not invent a recovery delay or
+promote observed variable identities to recovered C++ algorithms.
+
+Result:34suites/1294checks, native same-lab16frames/513states, reviewed source
+preservation and focused red/green checks pass. Cursor/weight comparisons and
+the rejected delay ablation remain in the private evidence folder. Independent
+read-only review found no actionable issue in the implementation diff.
