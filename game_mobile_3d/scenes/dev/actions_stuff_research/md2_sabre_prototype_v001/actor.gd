@@ -14,6 +14,7 @@ const DirectionAdapter=preload("res://scenes/dev/actions_stuff_research/md2_sabr
 const MovementMeter=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/movement_meter.gd")
 const BodyStability=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/locomotion_stability.gd")
 const SourceTransition=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_transition.gd")
+const SourceGait=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 # User-accepted jump study; native launch/scale recovered, full trajectory pending.
@@ -46,6 +47,8 @@ var locomotion_direction_enabled:=true
 var body_stability_enabled:=true
 var body_stability:RefCounted
 var source_transition:RefCounted
+var source_gait:RefCounted
+var native_gait_enabled:=true
 var cadence_label:=""
 var current_speed:=0.
 var walk_speed:=2.16
@@ -175,6 +178,8 @@ func _ready()->void:
 		animation.loop_mode=Animation.LOOP_LINEAR if clips[key].loop else Animation.LOOP_NONE
 	if using_original_source:
 		source_transition=SourceTransition.new();source_transition.setup(skeleton)
+		var gait:=SourceGait.new()
+		if gait.setup(skeleton,animation_player,clips,runtime_locomotion_profile.get("gait_blend")):source_gait=gait;cadence_label="Live player700 /100 =7 units/s · ground settings recovered\nObserved native gait1.888Hz · source phase blend"
 		body_stability=BodyStability.new();body_stability.setup(skeleton,animation_player,clips)
 	for index in face.mesh.get_blend_shape_count():
 		if face.mesh.get_blend_shape_name(index)=="Focused":_focus_index=index
@@ -311,12 +316,18 @@ func _animate(delta:float)->void:
 	if review_clip.is_empty() and selected in GAITS:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
 		_playback_speed=maxf(0.,current_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
+	var composed_gait:bool=source_gait!=null and native_gait_enabled and review_clip.is_empty() and selected in GAITS and _grounded
+	var gait_state:Dictionary=source_gait.state(current_speed) if composed_gait else {}
+	if composed_gait:_playback_speed=float(clips[selected].duration)/float(gait_state.period) if current_speed>.001 else 0.
 	if source_transition!=null:source_transition.restore()
 	var source_before:=animation_player.current_animation_position
 	animation_player.advance(delta*_playback_speed)
+	if composed_gait:source_gait.apply(animation_player.current_animation_position/float(clips[selected].duration),current_speed)
 	if source_transition!=null:source_transition.apply(delta)
 	if review_clip.is_empty() and selected in GAITS:
-		_dispatch_locomotion_events(selected,source_before,delta*_playback_speed,delta)
+		var event_clip:String=(gait_state.right if float(gait_state.weight)>.5 else gait_state.left) if composed_gait else selected
+		var event_ratio:float=float(clips[event_clip].duration)/float(clips[selected].duration)
+		_dispatch_locomotion_events(event_clip,source_before*event_ratio,delta*_playback_speed*event_ratio,delta)
 		_gait_cycles_this_tick+=delta*_playback_speed/float(clips[selected].duration)
 		_gait_resume_phase=fposmod(animation_player.current_animation_position/float(clips[selected].duration),1.)
 	if not review_clip.is_empty():
@@ -452,6 +463,7 @@ func set_locomotion_direction_adapter(value:bool)->void:
 func set_body_stability(value:bool)->void:
 	body_stability_enabled=value
 	if not value and body_stability!=null:body_stability.deactivate()
+func set_native_gait_enabled(value:bool)->void:native_gait_enabled=value
 func set_movement_camera_basis(camera_basis:Basis)->void:
 	# The installed MD2 WASD reference mod also uses camera-relative input.
 	# These vectors are horizontal and orthonormal: diagonals retain unit length.
@@ -498,6 +510,8 @@ func movement_measurements()->Dictionary:
 	if not runtime_locomotion_profile.is_empty():
 		report.merge({"native_runtime_parameters_recovered":true,"unit_conversion":"Live owned player native cm /100 per Godot metre","ground_response_source":"Live reflected component configuration; moving MD2 trace pending","turn_rate_adapter":null,"ground_yaw_rate_deg_s":rad_to_deg(ground_turn_rate),"air_acceleration_adapter":air_acceleration,"air_deceleration_adapter":air_deceleration,"native_animation_evaluator_rate_verified":false,"native_ground_motion_trace_verified":false},true)
 		report.merge({"source_locomotion_event_count":source_locomotion_event_count,"last_source_locomotion_event":last_source_locomotion_event.duplicate(),"source_notify_scope":"Stored source times on selected clip; graph weights/surface and native event behavior unresolved"})
+		report.native_ground_motion_trace_verified=bool(runtime_locomotion_profile.get("ground_motion_trace_verified",false))
+	if source_gait!=null:report.merge({"native_gait_enabled":native_gait_enabled,"native_gait_state":source_gait.state(current_speed),"native_normal_phase_hz_observed":runtime_locomotion_profile.gait_blend.normal_phase_hz_observed,"gait_composition_scope":"Recovered source samples/input, observed normal phase; local/face blending reconstruction"})
 	if source_transition!=null:report.merge({"transition_wall_seconds":source_transition.duration,"transition_elapsed_seconds":source_transition.elapsed,"transition_clock":"wall time, independent of source cadence"})
 	var actual:=get_real_velocity();var travelling:=Vector2(actual.x,actual.z).length()>.01
 	var travel_heading:=atan2(actual.x,actual.z)
