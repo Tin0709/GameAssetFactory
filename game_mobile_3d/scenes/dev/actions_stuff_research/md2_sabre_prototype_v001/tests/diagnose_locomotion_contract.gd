@@ -31,11 +31,15 @@ func run()->void:
 	var trials:Array=[]
 	for hz in [30,60,120]:
 		Engine.physics_ticks_per_second=hz
+		# CharacterBody3D uses SceneTree's physics delta internally. Let the tree
+		# observe the new rate before controlled manual callbacks.
+		await physics_frame;await process_frame
 		for trial:String in ["start_stop","reverse","walk_run","tap","wall"]:
 			actor.reset_actor();actor.scripted_input=true
 			var wall:StaticBody3D
 			if trial=="wall":
 				wall=StaticBody3D.new();var c:=CollisionShape3D.new();var s:=BoxShape3D.new();s.size=Vector3(10,4,.4);c.shape=s;wall.add_child(c);wall.position=Vector3(0,2,1.);root.add_child(wall)
+			await physics_frame;await process_frame
 			for i in 3:actor._physics_process(1./hz)
 			var samples:Array=[]
 			for i in hz*2:
