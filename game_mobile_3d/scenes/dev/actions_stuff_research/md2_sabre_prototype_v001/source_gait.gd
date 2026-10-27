@@ -5,6 +5,7 @@ var rig:Skeleton3D
 var samples:Array[Dictionary]=[]
 var base_speed:=1.
 var animations:Dictionary={}
+var durations:Dictionary={}
 var channels:Dictionary={}
 var defaults:Array[Transform3D]=[]
 var positions:Array[Vector3]=[]
@@ -43,7 +44,7 @@ func setup(skeleton:Skeleton3D,player:AnimationPlayer,clips:Dictionary,config:Va
 	for record:Dictionary in samples:
 		var key:String=record.semantic;var animation:Animation=player.get_animation(clips[key].action);var tracks:Array=[]
 		if animation==null:return false
-		animations[key]=animation
+		animations[key]=animation;durations[key]=float(clips[key].duration)
 		for index in animation.get_track_count():
 			var path:=animation.track_get_path(index)
 			if path.get_subname_count()==0:continue
@@ -60,7 +61,7 @@ func state(speed:float)->Dictionary:
 	return {"left":a.semantic,"right":b.semantic,"weight":weight,"input":input,"period":lerpf(float(a.duration)/float(a.rate),float(b.duration)/float(b.rate),weight)}
 
 func sample(key:String,phase:float)->Array[Transform3D]:
-	var animation:Animation=animations[key];var time:=fposmod(phase,1.)*animation.length
+	var animation:Animation=animations[key];var time:=fposmod(phase,1.)*float(durations[key])
 	var p:=positions.duplicate();var q:=rotations.duplicate();var s:=scales.duplicate()
 	for channel:Dictionary in channels[key]:
 		match channel.kind:
