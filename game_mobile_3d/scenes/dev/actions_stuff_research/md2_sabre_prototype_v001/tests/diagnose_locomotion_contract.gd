@@ -40,7 +40,8 @@ func run()->void:
 			if trial=="wall":
 				wall=StaticBody3D.new();var c:=CollisionShape3D.new();var s:=BoxShape3D.new();s.size=Vector3(10,4,.4);c.shape=s;wall.add_child(c);wall.position=Vector3(0,2,1.);root.add_child(wall)
 			await physics_frame;await process_frame
-			for i in 3:actor._physics_process(1./hz)
+			actor.set_physics_process(true)
+			for i in 3:await physics_frame;await process_frame
 			var samples:Array=[]
 			for i in hz*2:
 				var time:float=float(i)/hz
@@ -49,12 +50,13 @@ func run()->void:
 				if trial=="reverse":actor.requested_direction=Vector2(0,1 if time<1. else -1)
 				elif trial=="walk_run":actor.requested_direction=Vector2(0,1);actor.requested_run=time>=.6 and time<1.4
 				elif trial=="tap":actor.requested_direction=Vector2(0,1) if time<.05 else Vector2.ZERO
-				actor._physics_process(1./hz)
+				await physics_frame;await process_frame
 				var soles:Array=actor.direction_adapter.observe_soles(actor.global_position.y,actor.is_on_floor())
 				var feet:Array=[]
 				for foot:Dictionary in soles:feet.append({"xyz":[foot.center.x,foot.center.y,foot.center.z],"height":foot.height,"candidate":foot.candidate})
 				samples.append({"t":(i+1.)/hz,"input":[actor.requested_direction.x,actor.requested_direction.y],"position":[actor.position.x,actor.position.y,actor.position.z],"velocity":[actor.get_real_velocity().x,actor.get_real_velocity().y,actor.get_real_velocity().z],"clip":actor.active_clip,"clip_time":actor.animation_player.current_animation_position,"rate":actor._playback_speed,"heading":actor.visual.rotation.y,"leg_yaw":actor.direction_adapter.current_yaw,"feet":feet})
 			trials.append({"hz":hz,"trial":trial,"samples":samples})
+			actor.set_physics_process(false)
 			if wall!=null:wall.free()
 	FileAccess.open(folder.path_join("godot-movement-traces.json"),FileAccess.WRITE).store_string(JSON.stringify({"trials":trials}))
 	print("LOCOMOTION_CONTRACT_AUDIT ",JSON.stringify({"raw_samples":raw.size(),"trials":trials.size(),"folder":folder}))
