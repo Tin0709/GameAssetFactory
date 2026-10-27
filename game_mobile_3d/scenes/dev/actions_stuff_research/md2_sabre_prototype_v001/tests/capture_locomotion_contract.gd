@@ -12,7 +12,7 @@ func _initialize()->void:
 func sample()->void:
 	if not recording:return
 	var m:Dictionary=actor.movement_measurements()
-	trace.append({"clock":actor.simulation_clock,"position":[actor.position.x,actor.position.y,actor.position.z],"speed":actor.current_speed,"clip":actor.active_clip,"clip_time":actor.animation_player.current_animation_position,"rate":actor._playback_speed,"combo":str(actor.combo.phase),"sole_height":m.sole_height,"sole_speed":m.sole_speed,"transition_elapsed":m.get("transition_elapsed_seconds"),"transition_duration":m.get("transition_wall_seconds"),"gait_state":m.get("native_gait_state"),"gait_cycles":m.gait_cycles})
+	trace.append({"clock":actor.simulation_clock,"position":[actor.position.x,actor.position.y,actor.position.z],"speed":actor.current_speed,"clip":actor.active_clip,"clip_time":actor.animation_player.current_animation_position,"rate":actor._playback_speed,"combo":str(actor.combo.phase),"sole_height":m.sole_height,"sole_speed":m.sole_speed,"transition_elapsed":m.get("transition_elapsed_seconds"),"transition_duration":m.get("transition_wall_seconds"),"gait_state":m.get("native_gait_state"),"gait_cycles":m.gait_cycles,"move_allowed":m.get("combat_move_allowed"),"leg_phase":m.get("combat_leg_phase"),"leg_weight":m.get("combat_leg_weight"),"strike":actor.combo.index,"serial":actor.combo.serial,"yaw":actor.visual.rotation.y})
 func ticks(count:int)->void:
 	for i in count:await physics_frame
 	await process_frame
@@ -24,6 +24,7 @@ func run()->void:
 	folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/contract_audit/native")
 	if "--runtime-ground" in OS.get_cmdline_user_args():folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/native")
 	if "--source-gait" in OS.get_cmdline_user_args():folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/native-gait")
+	if "--combat-runtime" in OS.get_cmdline_user_args():folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/combat/native")
 	DirAccess.make_dir_recursive_absolute(folder)
 	actor.physics_pose_ready.connect(sample);await ticks(15);recording=true
 	await shot("01_idle")
@@ -34,14 +35,21 @@ func run()->void:
 	for i in 3:
 		Input.action_press("move_forward");await ticks(3);Input.action_release("move_forward");await ticks(12)
 	await shot("07_short_taps")
-	if "--runtime-ground" in OS.get_cmdline_user_args() or "--source-gait" in OS.get_cmdline_user_args():
+	if "--runtime-ground" in OS.get_cmdline_user_args() or "--source-gait" in OS.get_cmdline_user_args() or "--combat-runtime" in OS.get_cmdline_user_args():
 		var right:=InputEventMouseButton.new();right.button_index=MOUSE_BUTTON_RIGHT;right.pressed=true;lab.sabre_mode.unhandled_input(right)
 		Input.action_press("move_right");await ticks(24);await shot("11_combat_strafe")
 		Input.action_release("move_right");right.pressed=false;lab.sabre_mode.input(right);await ticks(12)
 		Input.action_press("move_left");await ticks(8);await shot("12_direction_change");Input.action_release("move_left");await ticks(12)
 	Input.action_press("move_forward");await ticks(25)
 	var key:=InputEventKey.new();key.physical_keycode=KEY_E;key.pressed=true;lab.sabre_mode.unhandled_input(key)
-	await ticks(15);await shot("08_planted_attack");await ticks(100);key.pressed=false;lab.sabre_mode.input(key);await ticks(40)
+	await ticks(15);await shot("08_attack_resume")
+	if "--combat-runtime" in OS.get_cmdline_user_args():
+		await ticks(12);await shot("13_strike2_resume")
+		Input.action_release("move_forward");Input.action_press("move_right");await ticks(25);await shot("14_native_finisher")
+		Input.action_release("move_right");Input.action_press("move_backward");await ticks(40);await shot("15_combo_reverse")
+		Input.action_release("move_backward");Input.action_press("move_forward");await ticks(23)
+	else:await ticks(100)
+	key.pressed=false;lab.sabre_mode.input(key);await ticks(40)
 	Input.action_press("jump");await ticks(1);Input.action_release("jump");await ticks(13);await shot("09_jump_unchanged");await ticks(35)
 	Input.action_release("move_forward");await ticks(25);await shot("10_landed_idle");recording=false
 	if actor.accepted_count<3:failures.append("Held combo did not execute")

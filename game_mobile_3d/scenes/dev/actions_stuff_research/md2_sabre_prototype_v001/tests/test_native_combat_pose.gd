@@ -39,4 +39,13 @@ func run()->void:
 	config=a.runtime_locomotion_profile.combat.duplicate(true);config.additional_clips[0].semantic="Attack1"
 	a._load_private_combat_clips(config)
 	check(a.clips.Attack1.action==original_action and a.clips.size()==original_count,"Rejected optional profile cannot overwrite an approved semantic/action")
+	config=a.runtime_locomotion_profile.combat.duplicate(true);config.windows[0].attack_key=[]
+	check(not a.combo.configure_native(config),"Malformed semantic type fails closed without script error")
+	var legs=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combat_legs.gd").new()
+	check(not legs.setup(a.skeleton,{"leg_branches":["J_Head","J_R_Leg"]}),"Rejected branch cannot replace upper-body or face source channels")
+	a.animation_player.remove_animation_library("private_combat");a.clips.erase("NativeFinisher");a.clips.erase("NativeFinisherRecovery");a.supplemental_combat_clips=0
+	config=a.runtime_locomotion_profile.combat.duplicate(true);config.additional_clips[1].erase("duration");a._load_private_combat_clips(config)
+	check(a.clips.size()==22 and not a.animation_player.has_animation_library("private_combat"),"Invalid second supplemental clip cannot partially import the first")
+	config=a.runtime_locomotion_profile.combat.duplicate(true);config.leg_branches=["J_Head","J_R_Leg"];a._load_private_combat_clips(config)
+	check(a.clips.size()==22 and not a.animation_player.has_animation_library("private_combat"),"Invalid mask cannot mutate library at readiness")
 	print("SABRE_NATIVE_COMBAT_POSE ",JSON.stringify({"checks":checks,"failures":failures}));a.free();oracle.free();quit(0 if failures.is_empty() else 1)

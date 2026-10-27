@@ -32,6 +32,8 @@ func configure_native(config:Variant)->bool:
 			var value:Variant=w.get(key)
 			if not (value is float or value is int) or not is_finite(float(value)) or float(value)<=0.:return false
 		if w.resume>=w.chain or w.chain>w.attack_duration or w.melee>w.attack_duration:return false
+		for key:String in ["attack_key","recovery_key"]:
+			if w.has(key) and (not w[key] is String or String(w[key]).is_empty()):return false
 		var attack_key:String=w.get("attack_key","Attack%d"%(i+1));var recovery_key:String=w.get("recovery_key","Recovery%d"%(i+1))
 		if not clips.has(attack_key) or not clips.has(recovery_key):return false
 		if clips[attack_key].get("source_name")!=w.get("attack_source") or clips[recovery_key].get("source_name")!=w.get("recovery_source"):return false
