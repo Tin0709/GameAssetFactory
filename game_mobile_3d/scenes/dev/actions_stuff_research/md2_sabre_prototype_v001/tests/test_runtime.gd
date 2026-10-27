@@ -75,7 +75,8 @@ func run()->void:
 		check(a.active_clip=="CombatRun" if a.using_original_source else a.active_clip in ["CombatWalk","CombatStrafeLeft","CombatStrafeRight"],"RMB + movement selects the selected profile's combat locomotion")
 		if a.using_original_source:
 			Input.action_press("move_right");Input.action_press("sprint");await ticks(8)
-			check(a.active_clip in ["CombatWalk","CombatStrafeLeft","CombatStrafeRight"] and a.clips[a.active_clip].source_name=="Player_Master_Walk" and absf(float(a._playback_speed)-1.)<.0001,"RMB + Shift + lateral Input uses slow source Walk at stride-calibrated1x")
+			var expected_rate:float=float(a.clips.Walk.duration)/float(a.source_gait.state(a.current_speed).period) if a.source_gait!=null else 1.
+			check(a.active_clip in ["CombatWalk","CombatStrafeLeft","CombatStrafeRight"] and a.clips[a.active_clip].source_name=="Player_Master_Walk" and absf(float(a._playback_speed)-expected_rate)<.0001,"RMB + Shift + lateral Input retains slow Walk semantic with current gait clock")
 			Input.action_release("move_right");Input.action_release("sprint")
 		mouse.pressed=false;mode.input(mouse);await ticks(3)
 		check(not a.combat_requested,"RMB release over GUI clears combat facing")
