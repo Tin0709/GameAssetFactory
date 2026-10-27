@@ -35,4 +35,8 @@ func run()->void:
 	check(not a.combo.configure_native(config) and not a.combo.native_enabled,"Malformed nonfinite event profile cannot enable movement policy")
 	config=a.runtime_locomotion_profile.combat.duplicate(true);config.windows[2].attack_source="wrong"
 	check(not a.combo.configure_native(config),"Native timing cannot silently bind a different finisher")
+	var original_action:String=a.clips.Attack1.action;var original_count:int=a.clips.size()
+	config=a.runtime_locomotion_profile.combat.duplicate(true);config.additional_clips[0].semantic="Attack1"
+	a._load_private_combat_clips(config)
+	check(a.clips.Attack1.action==original_action and a.clips.size()==original_count,"Rejected optional profile cannot overwrite an approved semantic/action")
 	print("SABRE_NATIVE_COMBAT_POSE ",JSON.stringify({"checks":checks,"failures":failures}));a.free();oracle.free();quit(0 if failures.is_empty() else 1)
