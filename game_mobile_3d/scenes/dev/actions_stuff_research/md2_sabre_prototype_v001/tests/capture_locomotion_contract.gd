@@ -22,6 +22,7 @@ func run()->void:
 	Engine.physics_ticks_per_second=60
 	lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate();root.add_child(lab);current_scene=lab;actor=lab.player
 	folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements/contract_audit/native")
+	if "--runtime-ground" in OS.get_cmdline_user_args():folder=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/runtime_locomotion/native")
 	DirAccess.make_dir_recursive_absolute(folder)
 	actor.physics_pose_ready.connect(sample);await ticks(15);recording=true
 	await shot("01_idle")
@@ -32,6 +33,11 @@ func run()->void:
 	for i in 3:
 		Input.action_press("move_forward");await ticks(3);Input.action_release("move_forward");await ticks(12)
 	await shot("07_short_taps")
+	if "--runtime-ground" in OS.get_cmdline_user_args():
+		var right:=InputEventMouseButton.new();right.button_index=MOUSE_BUTTON_RIGHT;right.pressed=true;lab.sabre_mode.unhandled_input(right)
+		Input.action_press("move_right");await ticks(24);await shot("11_combat_strafe")
+		Input.action_release("move_right");right.pressed=false;lab.sabre_mode.input(right);await ticks(12)
+		Input.action_press("move_left");await ticks(8);await shot("12_direction_change");Input.action_release("move_left");await ticks(12)
 	Input.action_press("move_forward");await ticks(25)
 	var key:=InputEventKey.new();key.physical_keycode=KEY_E;key.pressed=true;lab.sabre_mode.unhandled_input(key)
 	await ticks(15);await shot("08_planted_attack");await ticks(100);key.pressed=false;lab.sabre_mode.input(key);await ticks(40)
@@ -41,7 +47,7 @@ func run()->void:
 	if not actor.is_on_floor() or actor.current_speed>.01:failures.append("End contact/stop")
 	if lab.sabre_mode.movement_panel.get_global_rect().end.y>root.get_visible_rect().end.y:failures.append("Movement diagnostics extend below viewport")
 	var report_panel:Rect2=lab.sabre_mode.movement_panel.get_global_rect()
-	var report:={"renderer":RenderingServer.get_current_rendering_method(),"grass_blocks":lab.grass_field_blocks,"bones":actor.skeleton.get_bone_count(),"source_clips":actor.source_clip_count,"frames":frames,"trace":trace,"failures":failures,"camera":lab.sabre_mode.camera_measurements(),"meter_rect":[report_panel.position.x,report_panel.position.y,report_panel.size.x,report_panel.size.y],"scope":"Our existing lab; controlled inputs, no calibration of MD2 from video. Offline fixed60fps is not performance evidence."}
+	var report:={"renderer":RenderingServer.get_current_rendering_method(),"grass_blocks":lab.grass_field_blocks,"bones":actor.skeleton.get_bone_count(),"source_clips":actor.source_clip_count,"frames":frames,"trace":trace,"failures":failures,"camera":lab.sabre_mode.camera_measurements(),"movement":actor.movement_measurements(),"meter_rect":[report_panel.position.x,report_panel.position.y,report_panel.size.x,report_panel.size.y],"scope":"Our existing lab; controlled inputs, no calibration of MD2 from video. Offline fixed60fps is not performance evidence."}
 	FileAccess.open(folder.path_join("native-contract-validation.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"\t"))
 	print("SABRE_NATIVE_CONTRACT ",JSON.stringify({"failures":failures,"frames":frames.size(),"samples":trace.size(),"renderer":report.renderer}))
 	lab.free();await process_frame;quit(0 if failures.is_empty() else 1)
