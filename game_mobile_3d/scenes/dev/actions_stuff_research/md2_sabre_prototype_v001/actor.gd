@@ -5,6 +5,7 @@ extends CharacterBody3D
 signal attack_accepted(index:int,clip:String,serial:int)
 signal attack_accepted_timed(index:int,clip:String,serial:int,simulation_time:float)
 signal impact_ready(index:int,base:Vector3,tip:Vector3,serial:int)
+signal source_locomotion_event(notify:String,clip:String,source_seconds:float,simulation_seconds:float)
 signal physics_pose_ready
 signal presentation_reset
 const Model=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/Sabre_Character_Authored.glb")
@@ -55,6 +56,8 @@ var air_acceleration:=48.
 var air_deceleration:=42.
 var ground_turn_rate:=12.
 var runtime_locomotion_profile:Dictionary={}
+var source_locomotion_event_count:=0
+var last_source_locomotion_event:Dictionary={}
 var gravity:=18.
 var jump_height:=1.2
 var coyote_time:=0.
@@ -247,8 +250,8 @@ func _physics_process(delta:float)->void:
 	var ground_anchor:bool=using_original_source and combo.active() and was_grounded and not jump_pressed
 	if ground_anchor:desired=Vector2.ZERO
 	elif not using_original_source and combo.active() and was_grounded:desired*=.22 # Authored fallback unchanged.
-	var response_acceleration:=acceleration if was_grounded else air_acceleration
-	var response_deceleration:=deceleration if was_grounded else air_deceleration
+	var response_acceleration:=air_acceleration if using_original_source and not was_grounded else acceleration
+	var response_deceleration:=air_deceleration if using_original_source and not was_grounded else deceleration
 	var planar:=Vector2.ZERO if ground_anchor else Vector2(velocity.x,velocity.z).move_toward(desired,(response_deceleration if stick.is_zero_approx() else response_acceleration)*delta)
 	# Public GA_HeavyJumpAttack GravityMultiplier2; native base jump remains unknown.
 	var gravity_factor:=2. if _heavy_slam_active else 1.
@@ -307,9 +310,11 @@ func _animate(delta:float)->void:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
 		_playback_speed=maxf(0.,current_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
 	if source_transition!=null:source_transition.restore()
+	var source_before:=animation_player.current_animation_position
 	animation_player.advance(delta*_playback_speed)
 	if source_transition!=null:source_transition.apply(delta)
 	if review_clip.is_empty() and selected in GAITS:
+		_dispatch_locomotion_events(selected,source_before,delta*_playback_speed,delta)
 		_gait_cycles_this_tick+=delta*_playback_speed/float(clips[selected].duration)
 		_gait_resume_phase=fposmod(animation_player.current_animation_position/float(clips[selected].duration),1.)
 	if not review_clip.is_empty():
@@ -347,6 +352,29 @@ func _animate(delta:float)->void:
 			var window:Array=clips[combo.clip()].vfx_window
 			active=combo.time>=float(window[0]) and combo.time<=float(window[1])
 		effects.sample(delta,active,marker_base.global_position,marker_tip.global_position,combo.serial)
+
+func _dispatch_locomotion_events(selected:String,before:float,advanced:float,wall_delta:float)->void:
+	# Exact stored notify keys on our selected source clock. This hook does not
+	# reproduce UE graph weights, surface selection or the native audio system.
+	if advanced<=0. or runtime_locomotion_profile.is_empty():return
+	var sources:Variant=runtime_locomotion_profile.get("locomotion_events",{})
+	if not sources is Dictionary:return
+	var record:Variant=sources.get(String(clips[selected].source_name),{})
+	if not record is Dictionary or not record.get("events") is Array:return
+	var duration:float=clips[selected].duration
+	if absf(float(record.get("duration",0.))-duration)>.001:return
+	var end:=before+advanced
+	for cycle in range(floori(before/duration),mini(floori(end/duration)+1,129)):
+		for entry:Variant in record.events:
+			if not entry is Dictionary or not entry.get("time") is float or not entry.get("name") is String:continue
+			var source_time:float=entry.time
+			if not is_finite(source_time) or source_time<0. or source_time>=duration:continue
+			var crossed:=cycle*duration+source_time
+			if crossed<=before+.0000001 or crossed>end+.0000001:continue
+			var at:=simulation_clock-wall_delta+(crossed-before)/advanced*wall_delta
+			source_locomotion_event_count+=1
+			last_source_locomotion_event={"name":entry.name,"clip":selected,"source_seconds":source_time,"simulation_seconds":at}
+			source_locomotion_event.emit(entry.name,selected,source_time,at)
 
 func _refresh_markers()->void:
 	skeleton.force_update_all_bone_transforms()
@@ -445,6 +473,7 @@ func reset_actor()->void:
 	release_inputs();combo.cancel();global_position=Vector3.ZERO;velocity=Vector3.ZERO;current_speed=0.
 	review_clip="";active_clip="";_jump_stage="";_jump_time=0.;_heavy_slam_active=false;_transition="";_transition_time=0.;_grounded=false;_floor_initialized=false;_previous_combat=false
 	accepted_count=0;impact_count=0
+	source_locomotion_event_count=0;last_source_locomotion_event={}
 	_last_run_gait=false
 	_gait_resume_phase=0.;_step_seen=-1;_step_distance=0.;_step_elapsed=0.;_step_ready=false
 	_time_since_grounded=INF
@@ -465,6 +494,7 @@ func movement_measurements()->Dictionary:
 	if using_original_source:report.merge({"attack_travel_adapter":0.,"body_stability_enabled":body_stability_enabled,"retained_body_oscillation_adapter":BodyStability.RETAINED_OSCILLATION,"body_stability_strength":body_stability.strength},true)
 	if not runtime_locomotion_profile.is_empty():
 		report.merge({"native_runtime_parameters_recovered":true,"unit_conversion":"Live owned player native cm /100 per Godot metre","ground_response_source":"Live reflected component configuration; moving MD2 trace pending","turn_rate_adapter":null,"ground_yaw_rate_deg_s":rad_to_deg(ground_turn_rate),"air_acceleration_adapter":air_acceleration,"air_deceleration_adapter":air_deceleration,"native_animation_evaluator_rate_verified":false,"native_ground_motion_trace_verified":false},true)
+		report.merge({"source_locomotion_event_count":source_locomotion_event_count,"last_source_locomotion_event":last_source_locomotion_event.duplicate(),"source_notify_scope":"Stored source times on selected clip; graph weights/surface and native event behavior unresolved"})
 	if source_transition!=null:report.merge({"transition_wall_seconds":source_transition.duration,"transition_elapsed_seconds":source_transition.elapsed,"transition_clock":"wall time, independent of source cadence"})
 	var actual:=get_real_velocity();var travelling:=Vector2(actual.x,actual.z).length()>.01
 	var travel_heading:=atan2(actual.x,actual.z)
