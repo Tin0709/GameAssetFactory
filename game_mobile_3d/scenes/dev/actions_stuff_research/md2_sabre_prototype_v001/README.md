@@ -288,6 +288,40 @@ It leaves the lab Environment and grass unchanged. The probe recenters in coarse
 
 ## Verification
 
+### Locomotion cause audit — 2026-10-27
+
+Matched-time comparison of the saved Blender precision Actions, original GLBs
+and Godot now covers32bones at264times across22semantic states/13unique clips.
+Three demonstrated controller defects were repaired: cadence-scaled crossfades
+could stall at low/zero speed; optimized-away rest-constant channels inherited
+old clip values; reset retained the old leg world heading. `source_transition.gd`
+now owns a short wall-time pose handoff before the existing body/direction
+adapters. Raw review bypasses it. Its facial roots remain head-relative.
+The outgoing pose is snapshotted, not another recovered motion clip.
+
+Source clocks, speeds, accepted jump, attack rates and physical movement were
+preserved. Maximum Godot/source matrix-element error decreased from.040674 to
+.00001067; the earlier exceptions were a left weapon helper and right pupil.
+This is sampled transform accuracy, not a native MD2 gameplay fidelity score.
+
+F3 additionally reports source phase, handoff time and body/leg-to-travel angles.
+Run `diagnose_locomotion_contract.gd` at fixed120fps for real30/60/120physics
+callbacks. Run `capture_locomotion_contract.gd` in Mobile/D3D12 for the SAME
+full100×100grass lab. Private source arrays, traces, frames and the silent
+offline AVI are under Research `movement_measurements/contract_audit/`, ignored
+by Git. Its `findings.txt` explains source vs implementation vs architecture.
+
+Remaining limitations are substantive:7u/s is a public700/100 baseline, Run1.25x
+is a stride adapter, not the recovered play-rate graph. The source contains
+`LocomotionWalkRatio`/`RelativeMoveSpeed`/`LocomotionWalkVariedPlayRate` interfaces;
+their formulas and native friction/turning/blend values remain missing. Player
+data additionally references an unavailable movement-multiplier adjustment
+curve; RunSpeedModifier is SetByCaller. Native notify-driven displacement cannot
+be inferred from in-place root tracks. Current input-selected gait, leg yaw
+adaptation,25%body oscillation and combat step interval remain reconstructions.
+Godot supports blend spaces, state machines, filters and root-motion extraction;
+the present evidence does not justify changing engines.
+
 Run all `tests/test_*.gd`, including source-combat timing, camera audit,
 presentation and effect-history checks; the earlier core suites are
 `tests/test_state.gd`, `tests/test_runtime.gd`, `tests/test_mode_switch.gd`,
