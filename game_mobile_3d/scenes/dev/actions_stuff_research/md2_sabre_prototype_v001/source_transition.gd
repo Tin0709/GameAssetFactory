@@ -5,6 +5,7 @@ extends RefCounted
 var rig:Skeleton3D
 var elapsed:=0.
 var duration:=0.
+var incoming_weight:=1.
 var _from:Array[Transform3D]=[]
 var _last:Array[Transform3D]=[]
 var _raw:Array[Transform3D]=[]
@@ -20,6 +21,7 @@ func setup(skeleton:Skeleton3D)->void:
 func clear()->void:
 	_from.clear();_last.clear();_raw.clear();elapsed=0.;duration=0.
 	_outgoing_evaluator=Callable();_shape=&"linear"
+	incoming_weight=1.
 func restore()->void:
 	for bone in _raw.size():rig.set_bone_pose(bone,_raw[bone])
 	_raw.clear()
@@ -28,6 +30,7 @@ func begin(seconds:float)->void:
 	_from.clear()
 	for bone in rig.get_bone_count():_from.append(rig.get_bone_pose(bone))
 	duration=maxf(seconds,0.);elapsed=0.
+	incoming_weight=0. if duration>0. else 1.
 func begin_evaluated(seconds:float,evaluator:Callable,shape:StringName=&"linear")->void:
 	# A reversing handoff starts from the shown composite. Continuing a single
 	# old source in that case would discard the other contributor and pop.
@@ -46,6 +49,7 @@ func apply(delta:float)->void:
 	elapsed+=maxf(delta,0.)
 	var alpha:=1. if duration<=0. else clampf(elapsed/duration,0.,1.)
 	if _shape==&"smoothstep":alpha=alpha*alpha*(3.-2.*alpha)
+	incoming_weight=alpha
 	if _from.size()!=_raw.size() or alpha>=1.:
 		_last=_raw.duplicate();_from.clear();_outgoing_evaluator=Callable();return
 	if alpha>0. and _outgoing_evaluator.is_valid():
