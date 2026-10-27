@@ -37,5 +37,21 @@ func run()->void:
 		await tick()
 		check(a.combo.active() and a.global_position.distance_to(planted_at)<.001,"Held attack stays planted "+str(hz))
 		a.attack(false);a.requested_direction=Vector2.ZERO
+		# Vertical contact must not inject a frame-rate-dependent body bounce.
+		a.reset_actor()
+		for i in 4:await tick()
+		var heights:Array[float]=[];var ground_states:Array[bool]=[]
+		var monitor:=func()->void:heights.append(a.position.y);ground_states.append(a._grounded)
+		a.physics_pose_ready.connect(monitor);a.requested_direction=Vector2.RIGHT;a.requested_run=true
+		for i in hz:await tick()
+		a.physics_pose_ready.disconnect(monitor)
+		check(float(heights.max())-float(heights.min())<.0001,"Flat-ground running does not add capsule vertical jitter at"+str(hz))
+		check(ground_states.all(func(on_ground:bool)->bool:return on_ground),"Zero artificial ground drive retains contact at"+str(hz))
+		# Native floor snapping must not pin the actor in space beyond an edge.
+		a.reset_actor();a.position.x=49.7
+		for i in 4:await tick()
+		a.requested_direction=Vector2.RIGHT;a.requested_run=true
+		for i in ceili(hz*.3):await tick()
+		check(not a._grounded and a.velocity.y<0.,"Walking beyond support still enters gravity/fall at"+str(hz))
 	var report:={"checks":checks,"failures":failures,"measurements":reports}
 	print("SABRE_NATIVE_GROUND ",JSON.stringify(report));a.free();floor.free();quit(0 if failures.is_empty() else 1)
