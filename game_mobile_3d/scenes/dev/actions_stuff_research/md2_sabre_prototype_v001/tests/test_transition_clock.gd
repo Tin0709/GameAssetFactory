@@ -12,6 +12,9 @@ func run()->void:
 	var script=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd")
 	var a=script.new();var oracle=script.new();root.add_child(a);root.add_child(oracle)
 	a.set_physics_process(false);oracle.set_physics_process(false)
+	# Isolate the prior wall-clock handoff regression from gait composition;
+	# test_source_gait additionally checks composed handoffs at these speeds.
+	a.set_native_gait_enabled(false)
 	a.set_body_stability(false);a.set_locomotion_direction_adapter(false)
 	var trials:Array=[]
 	for hz in [30,60,120]:

@@ -45,7 +45,8 @@ func run()->void:
 		check(step_frames>0 and step_travel>.5,"Holding movement and combat creates real movement between strikes at%dHz"%hz)
 		check(attack_travel<.005 and valid_gait,"Travel belongs to locomotion windows; full-body attacks stay planted at%dHz"%hz)
 		check(starts.size()>=6 and starts.slice(0,6)==[0,1,2,0,1,2],"Movement windows retain complete1/2/3 combo order at%dHz"%hz)
-		var expected_phase:=fposmod(initial_phase+step_travel/(5.6*float(a.clips.Run.duration)),1.)
+		var cycle_distance:float=7.*float(a.source_gait.state(7.).period) if a.source_gait!=null else 5.6*float(a.clips.Run.duration)
+		var expected_phase:=fposmod(initial_phase+step_travel/cycle_distance,1.)
 		check(absf(wrapf(a._gait_resume_phase-expected_phase,-.5,.5))<.003,"Interleaved gait phase advances by actual travel instead of restarting a foot at%dHz"%hz)
 		trials.append({"hz":hz,"step_frames":step_frames,"step_travel":step_travel,"attack_travel":attack_travel,"accepted":starts.duplicate()})
 		# Release attack during the window: continue moving, no surprise next swing.

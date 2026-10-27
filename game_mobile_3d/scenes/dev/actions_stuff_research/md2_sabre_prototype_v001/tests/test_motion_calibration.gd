@@ -44,7 +44,7 @@ func run()->void:
 		var has_braking_tail:bool=braking_run or not a.runtime_locomotion_profile.is_empty()
 		check(has_braking_tail and not idle_while_moving and idle_slide<.01,"Release preserves gait while travelling; native immediate brake may enter stationary Idle directly at "+str(hz))
 		reports.append({"hz":hz,"height":peak,"apex_seconds":apex,"flight_seconds":flight,"ground_drift":ground_drift,"run_cruise_rate":cruise_rate,"run_cruise_speed":cruise_speed})
-	a.set_physics_process(false);a.reset_actor();a._grounded=true;a._move_requested=true
+	a.set_physics_process(false);a.set_native_gait_enabled(false);a.reset_actor();a._grounded=true;a._move_requested=true
 	a._play("CombatWalk",0.);a.animation_player.seek(float(a.clips.CombatWalk.duration)*.37,true);a.skeleton.force_update_all_bone_transforms()
 	var leg:int=a.skeleton.find_bone("J_L_Leg")
 	var before:Transform3D=a.skeleton.get_bone_global_pose(leg)

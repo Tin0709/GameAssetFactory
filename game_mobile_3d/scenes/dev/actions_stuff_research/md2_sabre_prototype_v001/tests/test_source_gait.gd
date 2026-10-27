@@ -1,6 +1,7 @@
 extends SceneTree
 var failures:Array[String]=[]
 var checks:=0
+var events:Array=[]
 func check(ok:bool,label:String)->void:
 	checks+=1
 	if not ok:failures.append(label);push_error(label)
@@ -39,4 +40,19 @@ func run()->void:
 			for i in hz:a._animate(1./hz)
 			check(absf(a._gait_cycles_this_tick-1./period)<.00001,"Cadence remains native across physics rates "+str(hz))
 			a.review("Run");a._animate(.123);check(absf(a.animation_player.current_animation_position-.123)<.00001,"Raw1x source review bypasses composer "+str(hz))
+		for speed:float in [0.,.02,.2,2.,7.]:
+			a.reset_actor();a._grounded=true;a._move_requested=true;a._run_requested=false;a.current_speed=speed
+			for i in 18:a._animate(1./120.)
+			var reference:Array=helper.compose(a.animation_player.current_animation_position/float(a.clips.Walk.duration),speed)
+			var worst:=0.
+			for bone in a.skeleton.get_bone_count():
+				var e:Transform3D=reference[bone];var v:Transform3D=a.skeleton.get_bone_pose(bone)
+				worst=maxf(worst,maxf(e.origin.distance_to(v.origin),maxf(e.basis.x.distance_to(v.basis.x),maxf(e.basis.y.distance_to(v.basis.y),e.basis.z.distance_to(v.basis.z)))))
+			check(worst<.00002,"Composed handoff completes on wall time even at low/blocked speed "+str(speed))
+		a.source_locomotion_event.connect(func(notify:String,clip:String,source_seconds:float,simulation_seconds:float):events.append({"name":notify,"clip":clip,"source":source_seconds,"at":simulation_seconds}))
+		a.reset_actor();a._grounded=true;a._move_requested=true;a._run_requested=true;a.current_speed=7.;a._animate(period)
+		var expected:Array=a.runtime_locomotion_profile.locomotion_events[a.clips.Run.source_name].events
+		check(events.size()==expected.size(),"Normal blend uses dominant Run notifications once per common cycle")
+		for i in mini(events.size(),expected.size()):
+			check(events[i].clip=="Run" and absf(events[i].at-float(expected[i].time)/float(a.clips.Run.duration)*period)<.00001,"Native-phase event time follows shared cycle "+str(i))
 	print("SABRE_SOURCE_GAIT ",JSON.stringify({"checks":checks,"failures":failures}));a.free();oracle.free();quit(0 if failures.is_empty() else 1)

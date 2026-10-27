@@ -25,7 +25,8 @@ func run()->void:
 		await ticks(hz)
 		var travel:float=start.distance_to(a.global_position);var elapsed:float=a.simulation_clock-clock
 		check(absf(travel-7.*elapsed)<.025,"Measured capsule distance follows7 baseline at "+str(hz))
-		check(absf(a._playback_speed-a.current_speed/5.6)<.00001,"Gait rate follows actual travel/stride, not target-speed normalization at "+str(hz))
+		var expected_rate:float=float(a.clips.Run.duration)/float(a.source_gait.state(a.current_speed).period) if a.source_gait!=null else a.current_speed/5.6
+		check(absf(a._playback_speed-expected_rate)<.00001,"Gait rate follows recovered normalized blend period when present at "+str(hz))
 		var rate:float=a._playback_speed
 		Input.action_press("move_right");await ticks(hz/2)
 		check(absf(a.current_speed-7.)<.01,"Diagonal input has no sqrt2 speed bonus at "+str(hz))

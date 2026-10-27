@@ -8,6 +8,7 @@ func check(ok:bool,label:String)->void:
 func _initialize()->void:call_deferred("run")
 func run()->void:
 	var a=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd").new();root.add_child(a);a.set_physics_process(false)
+	a.set_native_gait_enabled(false) # Isolate dispatch/loop semantics on the retained stride adapter.
 	check(a.has_signal("source_locomotion_event"),"Actor exposes original phase-timed locomotion event hook")
 	if a.has_signal("source_locomotion_event"):
 		a.source_locomotion_event.connect(func(notify:String,clip:String,source_seconds:float,simulation_seconds:float):events.append({"name":notify,"clip":clip,"source":source_seconds,"at":simulation_seconds}))
