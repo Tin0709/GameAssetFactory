@@ -32,8 +32,9 @@ func configure_native(config:Variant)->bool:
 			var value:Variant=w.get(key)
 			if not (value is float or value is int) or not is_finite(float(value)) or float(value)<=0.:return false
 		if w.resume>=w.chain or w.chain>w.attack_duration or w.melee>w.attack_duration:return false
-		if not clips.has("Attack%d"%(i+1)) or not clips.has("Recovery%d"%(i+1)):return false
-		if clips["Attack%d"%(i+1)].get("source_name")!=w.get("attack_source") or clips["Recovery%d"%(i+1)].get("source_name")!=w.get("recovery_source"):return false
+		var attack_key:String=w.get("attack_key","Attack%d"%(i+1));var recovery_key:String=w.get("recovery_key","Recovery%d"%(i+1))
+		if not clips.has(attack_key) or not clips.has(recovery_key):return false
+		if clips[attack_key].get("source_name")!=w.get("attack_source") or clips[recovery_key].get("source_name")!=w.get("recovery_source"):return false
 	native_windows=config.windows.duplicate(true);native_enabled=true;return true
 
 func movement_allowed()->bool:
@@ -69,6 +70,7 @@ func movement_plan(delta:float)->Array[Dictionary]:
 
 func setup(entries:Dictionary)->void:clips=entries
 func clip()->String:
+	if native_enabled and phase in [&"attack",&"recovery"]:return native_windows[index].get("attack_key" if phase==&"attack" else "recovery_key",("Attack%d" if phase==&"attack" else "Recovery%d")%(index+1))
 	if phase==&"attack":return "Attack%d"%(index+1)
 	if phase==&"recovery":return "Recovery%d"%(index+1)
 	if phase==&"air_attack":return "AirAttack"

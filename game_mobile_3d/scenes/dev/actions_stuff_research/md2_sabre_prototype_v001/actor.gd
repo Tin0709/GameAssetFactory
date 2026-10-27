@@ -32,6 +32,7 @@ var using_original_source:=false
 var private_metadata:Dictionary={}
 var source_clip_count:=0
 var source_alias_count:=0
+var supplemental_combat_clips:=0
 var appearance_label:="Authored fallback"
 var private_model_path_override:=""
 var animation_player:AnimationPlayer
@@ -171,7 +172,9 @@ func _ready()->void:
 		cadence_label=("Live player700 /100 =7 units/s · ground settings recovered" if not runtime_locomotion_profile.is_empty() else "Table700 /100 =7 units/s · live profile absent")+"\nGait travel/stride adapter · native evaluator rate unresolved"
 		direction_adapter=DirectionAdapter.new();direction_adapter.setup(skeleton,model)
 	combo.setup(clips)
-	if using_original_source:combo.configure_native(runtime_locomotion_profile.get("combat"))
+	if using_original_source:
+		_load_private_combat_clips(runtime_locomotion_profile.get("combat"))
+		combo.configure_native(runtime_locomotion_profile.get("combat"))
 	animation_player.callback_mode_process=AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	for key:String in clips:
 		var animation:=animation_player.get_animation(clips[key].action)
@@ -227,6 +230,39 @@ static func load_private_model(path:String)->Node3D:
 	var error:=document.append_from_file(path,state)
 	if error!=OK:push_warning("External private appearance could not load: "+str(error));return null
 	return document.generate_scene(state,120.)
+
+func _load_private_combat_clips(config:Variant)->void:
+	if not config is Dictionary or not config.get("additional_clips") is Array:return
+	for value:Variant in config.additional_clips:
+		if not value is Dictionary or not value.get("path") is String or not value.get("semantic") is String or not value.get("sha256") is String:continue
+		var path:String=value.path
+		if FileAccess.get_sha256(path)!=value.sha256:continue
+		var imported:=load_private_model(path)
+		if imported==null:continue
+		var player:AnimationPlayer;var rig:Skeleton3D
+		for node:Node in imported.find_children("*","",true,false):
+			if node is AnimationPlayer:player=node
+			elif node is Skeleton3D:rig=node
+		var valid:=player!=null and rig!=null and rig.get_bone_count()==skeleton.get_bone_count()
+		if valid:
+			for bone in rig.get_bone_count():
+				if rig.get_bone_name(bone)!=skeleton.get_bone_name(bone) or not rig.get_bone_rest(bone).is_equal_approx(skeleton.get_bone_rest(bone)):valid=false;break
+		if valid:
+			var names:=player.get_animation_list();var selected:Animation
+			for key:String in names:
+				if key!="RESET":selected=player.get_animation(key)
+			if selected!=null and absf(selected.length-float(value.duration))<.001:
+				var copied:Animation=selected.duplicate(true);var target:=animation_player.get_node(animation_player.root_node).get_path_to(skeleton)
+				for track in copied.get_track_count():
+					var old_path:=copied.track_get_path(track)
+					if old_path.get_subname_count()!=1 or skeleton.find_bone(old_path.get_subname(0))<0:valid=false;break
+					copied.track_set_path(track,NodePath(str(target)+":"+str(old_path.get_subname(0))))
+				if valid:
+					if not animation_player.has_animation_library("private_combat"):animation_player.add_animation_library("private_combat",AnimationLibrary.new())
+					animation_player.get_animation_library("private_combat").add_animation(value.semantic,copied)
+					var entry:Dictionary=value.duplicate(true);entry.action="private_combat/"+value.semantic;entry.source_file=path;entry.source_alias_adapter=false
+					clips[value.semantic]=entry;supplemental_combat_clips+=1
+		imported.free()
 
 func _physics_process(delta:float)->void:
 	var stick:=requested_direction if scripted_input else Input.get_vector("move_left","move_right","move_forward","move_backward")
