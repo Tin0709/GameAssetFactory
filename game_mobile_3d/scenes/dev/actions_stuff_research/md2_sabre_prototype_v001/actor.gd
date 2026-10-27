@@ -165,7 +165,7 @@ func _ready()->void:
 			acceleration=float(ground.acceleration_cm_s2)/units
 			deceleration=float(ground.braking_deceleration_cm_s2)/units
 			ground_turn_rate=deg_to_rad(float(ground.yaw_deg_s))
-		cadence_label=("Live player700 /100 =7 units/s · ground response recovered" if not runtime_locomotion_profile.is_empty() else "Table700 /100 =7 units/s · live profile absent")+"\nGait travel/stride adapter · native evaluator rate unresolved"
+		cadence_label=("Live player700 /100 =7 units/s · ground settings recovered" if not runtime_locomotion_profile.is_empty() else "Table700 /100 =7 units/s · live profile absent")+"\nGait travel/stride adapter · native evaluator rate unresolved"
 		direction_adapter=DirectionAdapter.new();direction_adapter.setup(skeleton,model)
 	combo.setup(clips)
 	animation_player.callback_mode_process=AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
