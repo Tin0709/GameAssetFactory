@@ -11,6 +11,7 @@ func run()->void:
 	s.cancel();s.request_attack();s.advance(.13);s.attack(true);s.advance(.10);s.attack(false);s.advance(.11)
 	check(s.index==0 and s.phase==&"attack","Native early released tap cannot queue across RecoveryStart (captured counterexample)")
 	check(s.buffer_until<0.,"Source ground attacks do not invent a220ms pending command")
+	s.advance(.01) # Pass the discrete notify-delivery tick, not only its raw key.
 	s.attack(true);s.advance(0.)
 	check(s.index==1 and s.time==0.,"Fresh press after RecoveryStart immediately accepts the next variant")
 	for index in 3:
