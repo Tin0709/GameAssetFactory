@@ -243,13 +243,34 @@ static func load_private_model(path:String)->Node3D:
 	return document.generate_scene(state,120.)
 
 func _load_private_combat_clips(config:Variant)->void:
-	if not config is Dictionary or not config.get("additional_clips") is Array:return
+	# Stage ALL resources and validate their relationship before changing any
+	# approved action. An optional malformed/stale sidecar must fail closed.
+	if not config is Dictionary or config.get("schema")!="md2-private-sabre-combat/1" or not config.get("additional_clips") is Array or config.additional_clips.size()>8:return
+	if not config.get("leg_branches") is Array or config.leg_branches.is_empty():return
+	for name:Variant in config.leg_branches:
+		if not name is String or skeleton.find_bone(name)<0:return
+	var seconds:Variant=config.get("blend_seconds")
+	if not (seconds is float or seconds is int) or not is_finite(float(seconds)) or float(seconds)<=0.:return
+	var staged:Dictionary={};var candidate:Dictionary=clips.duplicate(true)
+	var research:=private_model_path().get_base_dir().get_base_dir().get_base_dir().replace("\\","/").simplify_path().trim_suffix("/").to_lower()+"/"
 	for value:Variant in config.additional_clips:
-		if not value is Dictionary or not value.get("path") is String or not value.get("semantic") is String or not value.get("sha256") is String:continue
+		if not value is Dictionary:return
+		for key:String in ["path","semantic","sha256","source_name"]:
+			if not value.get(key) is String or String(value[key]).is_empty():return
+		if clips.has(value.semantic) or staged.has(value.semantic) or not String(value.semantic).begins_with("Native"):return
+		var duration:Variant=value.get("duration")
+		if not (duration is float or duration is int) or not is_finite(float(duration)) or float(duration)<=0. or float(duration)>60.:return
+		if not value.get("loop") is bool or value.loop or value.get("category") not in ["attack","recovery"]:return
+		if not value.get("vfx_window") is Array or value.vfx_window.size()!=2:return
+		for point:Variant in value.vfx_window:
+			if not (point is float or point is int) or not is_finite(float(point)) or float(point)<0.:return
+		if float(value.vfx_window[1])<float(value.vfx_window[0]):return
+		if value.category=="attack" and float(value.vfx_window[1])>float(duration):return
 		var path:String=value.path
-		if FileAccess.get_sha256(path)!=value.sha256:continue
+		if not path.is_absolute_path() or not path.replace("\\","/").simplify_path().to_lower().begins_with(research) or not path.ends_with(".glb"):return
+		if FileAccess.get_sha256(path)!=value.sha256:return
 		var imported:=load_private_model(path)
-		if imported==null:continue
+		if imported==null:return
 		var player:AnimationPlayer;var rig:Skeleton3D
 		for node:Node in imported.find_children("*","",true,false):
 			if node is AnimationPlayer:player=node
@@ -259,21 +280,29 @@ func _load_private_combat_clips(config:Variant)->void:
 			for bone in rig.get_bone_count():
 				if rig.get_bone_name(bone)!=skeleton.get_bone_name(bone) or not rig.get_bone_rest(bone).is_equal_approx(skeleton.get_bone_rest(bone)):valid=false;break
 		if valid:
-			var names:=player.get_animation_list();var selected:Animation
+			var names:=player.get_animation_list();var selected:Animation;var count:=0
 			for key:String in names:
-				if key!="RESET":selected=player.get_animation(key)
-			if selected!=null and absf(selected.length-float(value.duration))<.001:
+				if key!="RESET":selected=player.get_animation(key);count+=1
+			valid=count==1 and selected!=null and absf(selected.length-float(duration))<.001
+			if valid:
 				var copied:Animation=selected.duplicate(true);var target:=animation_player.get_node(animation_player.root_node).get_path_to(skeleton)
 				for track in copied.get_track_count():
 					var old_path:=copied.track_get_path(track)
 					if old_path.get_subname_count()!=1 or skeleton.find_bone(old_path.get_subname(0))<0:valid=false;break
 					copied.track_set_path(track,NodePath(str(target)+":"+str(old_path.get_subname(0))))
 				if valid:
-					if not animation_player.has_animation_library("private_combat"):animation_player.add_animation_library("private_combat",AnimationLibrary.new())
-					animation_player.get_animation_library("private_combat").add_animation(value.semantic,copied)
 					var entry:Dictionary=value.duplicate(true);entry.action="private_combat/"+value.semantic;entry.source_file=path;entry.source_alias_adapter=false
-					clips[value.semantic]=entry;supplemental_combat_clips+=1
+					candidate[value.semantic]=entry;staged[value.semantic]=copied
 		imported.free()
+		if not valid:return
+	var validator=Combo.new();validator.setup(candidate)
+	if not validator.configure_native(config):return
+	var library:=AnimationLibrary.new()
+	for key:String in staged:library.add_animation(key,staged[key])
+	if animation_player.has_animation_library("private_combat"):return
+	animation_player.add_animation_library("private_combat",library)
+	for key:String in staged:clips[key]=candidate[key]
+	supplemental_combat_clips=staged.size()
 
 func _physics_process(delta:float)->void:
 	var stick:=requested_direction if scripted_input else Input.get_vector("move_left","move_right","move_forward","move_backward")
