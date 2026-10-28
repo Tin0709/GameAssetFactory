@@ -29,7 +29,11 @@ func setup(actor,path:String)->bool:
 	var research:String=actor.private_model_path().get_base_dir().get_base_dir().get_base_dir().replace("\\","/").simplify_path().to_lower().trim_suffix("/")+"/"
 	var source:String=data.source_path;var source_normalized:=source.replace("\\","/").simplify_path().to_lower()
 	if not source.is_absolute_path() or not source_normalized.begins_with(research) or source_normalized.begins_with(project) or not source_normalized.ends_with(".glb"):return false
-	if not FileAccess.file_exists(source) or FileAccess.get_sha256(source)!=data.source_sha256:return false
+	if not FileAccess.file_exists(source):return false
+	var source_file:=FileAccess.open(source,FileAccess.READ)
+	if source_file==null or source_file.get_length()>32000000:return false
+	source_file.close()
+	if FileAccess.get_sha256(source)!=data.source_sha256:return false
 	var imported:Node3D=actor.load_private_model(source)
 	if imported==null:return false
 	var player:AnimationPlayer;var rig:Skeleton3D
