@@ -3987,6 +3987,147 @@
       "original_stance_fraction": 0.16,
       "phase_origin": 0.25,
       "playback_sync": "FRAME_DROP"
+    },
+    {
+      "action": "Walk_ASInspired_Original_v001_PENDING",
+      "source": "blender/animation/reviews/player_animation_library_v1/as_primary_locomotion_original_v001/as_primary_locomotion_authoring.blend",
+      "source_sha256": "0f8f18cf748a8ddfcbb43c559fe4c0fded1b48eaa214e2840fe75eab2555620e",
+      "source_rig": "ASPrimary_Original_Authoring_Rig",
+      "source_mesh": "ASPrimary_Original_Authoring_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBASPrimary_Original_Authoring_Rig",
+      "action_sha256": "88b615d6a145d6fb38e8500cd8ed377d9bd79a93651763356eb55fef62507ebf",
+      "action_frame_range": [
+        1.0,
+        151.0
+      ],
+      "start": 1,
+      "end": 150,
+      "fps": 60,
+      "fps_base": 1.0,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "status": "pending",
+      "approval_note": "Original A&S-inspired motion, awaiting human artistic review. Godot untouched.",
+      "seamless_loop": true,
+      "original_custom_animation": true,
+      "source_keyframes_copied": false,
+      "production_eligible": false,
+      "preview_only": false,
+      "provenance": "Independently authored phase/support/spacing curves; reference principles only. No source keys or rig imported into new authoring.",
+      "gait_hz": 1.2,
+      "nominal_speed_m_s": 1.8,
+      "cycle_stride_m": 1.5,
+      "original_stance_fraction": 0.5,
+      "phase_origin": 0.18,
+      "playback_sync": "FRAME_DROP"
+    },
+    {
+      "action": "Run_ASInspired_Original_v001_PENDING",
+      "source": "blender/animation/reviews/player_animation_library_v1/as_primary_locomotion_original_v001/as_primary_locomotion_authoring.blend",
+      "source_sha256": "0f8f18cf748a8ddfcbb43c559fe4c0fded1b48eaa214e2840fe75eab2555620e",
+      "source_rig": "ASPrimary_Original_Authoring_Rig",
+      "source_mesh": "ASPrimary_Original_Authoring_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBASPrimary_Original_Authoring_Rig",
+      "action_sha256": "b88537d69d60b569be2222e232c0118285c18b8f91d1ec7dc9775c19860aa812",
+      "action_frame_range": [
+        1.0,
+        151.0
+      ],
+      "start": 1,
+      "end": 150,
+      "fps": 60,
+      "fps_base": 1.0,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "status": "pending",
+      "approval_note": "Original A&S-inspired motion, awaiting human artistic review. Godot untouched.",
+      "seamless_loop": true,
+      "original_custom_animation": true,
+      "source_keyframes_copied": false,
+      "production_eligible": false,
+      "preview_only": false,
+      "provenance": "Independently authored phase/support/spacing curves; reference principles only. No source keys or rig imported into new authoring.",
+      "gait_hz": 1.6,
+      "nominal_speed_m_s": 4.3,
+      "cycle_stride_m": 2.6874999999999996,
+      "original_stance_fraction": 0.28,
+      "phase_origin": 0.18,
+      "playback_sync": "FRAME_DROP"
+    },
+    {
+      "action": "PREVIEW_ONLY_WalkRun_PhaseTransition_Original_v001_PENDING",
+      "source": "blender/animation/reviews/player_animation_library_v1/as_primary_locomotion_original_v001/as_primary_locomotion_authoring.blend",
+      "source_sha256": "0f8f18cf748a8ddfcbb43c559fe4c0fded1b48eaa214e2840fe75eab2555620e",
+      "source_rig": "ASPrimary_Original_Authoring_Rig",
+      "source_mesh": "ASPrimary_Original_Authoring_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBASPrimary_Original_Authoring_Rig",
+      "action_sha256": "09cce9f698b14a860b9d9793150195ea105a5fb0bcf40978f1dec7a3a5c03641",
+      "action_frame_range": [
+        1.0,
+        271.0
+      ],
+      "start": 1,
+      "end": 270,
+      "fps": 60,
+      "fps_base": 1.0,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "status": "pending",
+      "approval_note": "Original A&S-inspired motion, awaiting human artistic review. Godot untouched.",
+      "seamless_loop": false,
+      "original_custom_animation": true,
+      "source_keyframes_copied": false,
+      "production_eligible": false,
+      "preview_only": true,
+      "provenance": "Independently authored phase/support/spacing curves; reference principles only. No source keys or rig imported into new authoring.",
+      "gait_hz": null,
+      "nominal_speed_m_s": null,
+      "cycle_stride_m": null,
+      "original_stance_fraction": null,
+      "phase_origin": 0.18,
+      "playback_sync": "FRAME_DROP"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
@@ -4299,11 +4440,144 @@
         }
       ],
       "playback_sync": "FRAME_DROP"
+    },
+    {
+      "id": "as_primary_walkrun_comparison_v001",
+      "label": "Original Walk / Run \u2014 A&S-inspired, Pending",
+      "status": "pending",
+      "scene": "ASPrimary_WalkRun_Comparison_PENDING",
+      "rig": "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Rig",
+      "mesh": "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Mesh",
+      "world_root": "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Carrier",
+      "pose_action": "Run_ASInspired_Original_v001_PENDING",
+      "pose_slot_identifier": "OBASPrimary_Original_Authoring_Rig",
+      "pose_action_sha256": "b88537d69d60b569be2222e232c0118285c18b8f91d1ec7dc9775c19860aa812",
+      "presentation_action": "PREVIEW_ONLY_ASPrimary_Comparison_Static",
+      "presentation_slot_identifier": "OBASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Carrier",
+      "presentation_action_sha256": "4fbbc4719c17c5a56ddd28c1d246e07f65ed4bbdc8369ab7a310407598565b84",
+      "start": 1,
+      "end": 150,
+      "fps": 60,
+      "fps_base": 1.0,
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "original_authored_comparison": true,
+      "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "cameras": {
+        "FRONT": "ASPrimary_WalkRun_Comparison_PENDING_FRONT",
+        "THREE_QUARTER": "ASPrimary_WalkRun_Comparison_PENDING_THREE_QUARTER",
+        "SIDE": "ASPrimary_WalkRun_Comparison_PENDING_SIDE"
+      },
+      "return_scene": "ANIMATION_SHOWCASE",
+      "hud_root": "ASPrimary_WalkRun_Comparison_PENDING_HUD",
+      "playback_sync": "FRAME_DROP",
+      "comparison_actors": [
+        {
+          "rig": "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_0_Rig",
+          "mesh": "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_0_Mesh",
+          "action": "Walk_ASInspired_Original_v001_PENDING"
+        },
+        {
+          "rig": "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Rig",
+          "mesh": "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Mesh",
+          "action": "Run_ASInspired_Original_v001_PENDING"
+        }
+      ]
+    },
+    {
+      "id": "as_primary_walkrun_transition_v001",
+      "label": "Original Walk\u2192Run\u2192Walk \u2014 traveled contact review",
+      "status": "pending",
+      "scene": "ASPrimary_WalkRun_Transition_PENDING",
+      "rig": "ASPrimary_ASPrimary_WalkRun_Transition_PENDING_0_Rig",
+      "mesh": "ASPrimary_ASPrimary_WalkRun_Transition_PENDING_0_Mesh",
+      "world_root": "ASPrimary_ASPrimary_WalkRun_Transition_PENDING_0_Carrier",
+      "pose_action": "PREVIEW_ONLY_WalkRun_PhaseTransition_Original_v001_PENDING",
+      "pose_slot_identifier": "OBASPrimary_Original_Authoring_Rig",
+      "pose_action_sha256": "09cce9f698b14a860b9d9793150195ea105a5fb0bcf40978f1dec7a3a5c03641",
+      "presentation_action": "PREVIEW_ONLY_ASPrimary_Transition_Travel",
+      "presentation_slot_identifier": "OBASPrimary_ASPrimary_WalkRun_Transition_PENDING_0_Carrier",
+      "presentation_action_sha256": "bb0aa4aaa18e791531c628cba32cefd0d36f86faa4ef1b6f9be6d82e7d8c721e",
+      "start": 1,
+      "end": 270,
+      "fps": 60,
+      "fps_base": 1.0,
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "original_authored_comparison": true,
+      "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "cameras": {
+        "FRONT": "ASPrimary_WalkRun_Transition_PENDING_FRONT",
+        "THREE_QUARTER": "ASPrimary_WalkRun_Transition_PENDING_THREE_QUARTER",
+        "SIDE": "ASPrimary_WalkRun_Transition_PENDING_SIDE"
+      },
+      "return_scene": "ANIMATION_SHOWCASE",
+      "hud_root": "ASPrimary_WalkRun_Transition_PENDING_HUD",
+      "playback_sync": "FRAME_DROP",
+      "comparison_actors": [
+        {
+          "rig": "ASPrimary_ASPrimary_WalkRun_Transition_PENDING_0_Rig",
+          "mesh": "ASPrimary_ASPrimary_WalkRun_Transition_PENDING_0_Mesh",
+          "action": "PREVIEW_ONLY_WalkRun_PhaseTransition_Original_v001_PENDING"
+        }
+      ]
     }
   ],
   "library_focus": {
     "label": "Actions & Stuff + Original Combat",
     "entries": [
+      {
+        "kind": "review_sequence",
+        "id": "as_primary_walkrun_comparison_v001"
+      },
+      {
+        "kind": "review_sequence",
+        "id": "as_primary_walkrun_transition_v001"
+      },
+      {
+        "kind": "action",
+        "id": "Walk_ASInspired_Original_v001_PENDING"
+      },
+      {
+        "kind": "action",
+        "id": "Run_ASInspired_Original_v001_PENDING"
+      },
+      {
+        "kind": "action",
+        "id": "PREVIEW_ONLY_WalkRun_PhaseTransition_Original_v001_PENDING"
+      },
       {
         "kind": "review_sequence",
         "id": "hybrid_run_comparison_v001"
