@@ -17,6 +17,15 @@ def hermite(a,b,va,vb,t,length):
 def mix(a,b,w):return a+(b-a)*w
 def blend_style(w):
  return {k:mix(STYLES[0][k],STYLES[1][k],w) for k in STYLES[0] if k!='kind'}|{'kind':'Transition'}
+def calibrated_run(speed):
+ """Original authoring helper, not a runtime change or new Action.
+
+ Keep cadence and feasible contact sweep; adjust stance duty for travel.
+ Existing keyed clips remain calibrated to their own nominal speed.
+ """
+ assert 3.5<=speed<=7.,'Only the stated original Run authoring envelope is checked'
+ s=STYLES[1].copy();s['speed']=speed;s['duty']=STYLES[1]['duty']*STYLES[1]['speed']/speed
+ return s
 def weight(t):
  # Original transition test: walk, accelerate, run, decelerate, walk.
  if t<.85:return 0.
@@ -64,11 +73,11 @@ def hip_height(p,s):
  weights=[math.exp(-.5*(i/3.3)**2)for i in range(-8,9)]
  return sum(raw_height((p+i*.00225)%1,s)*w for i,w in zip(range(-8,9),weights))/sum(weights)
 def verify():
- for s in STYLES:
+ for s in STYLES+[calibrated_run(v)for v in (3.5,4.3,7.)]:
   for i in range(1,400):
    q=-s['duty']/2+s['duty']*i/400
    theta,plant,c=leg(q%1,s)
    assert plant and abs(L*math.sin(theta)+c*math.cos(theta)-(s['speed']/s['hz']*q+c))<1e-10
   assert abs(END/FPS*s['hz']-round(END/FPS*s['hz']))<1e-12
- return {'styles':2,'analytic_contact_checks':798,'fps':FPS,'comparison_seconds':END/FPS}
+ return {'keyed_styles':2,'analytic_contact_checks':1995,'checked_additional_authoring_speeds_m_s':[3.5,4.3,7.],'fps':FPS,'comparison_seconds':END/FPS}
 if __name__=='__main__':print(verify())
