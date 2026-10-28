@@ -1,0 +1,37 @@
+[
+  {
+    "elapsed_s": 2.517261699977098,
+    "frame": 31,
+    "playing": true,
+    "scene": "Hybrid_Jump_Context_v001_PENDING",
+    "sync_mode": "FRAME_DROP"
+  },
+  {
+    "elapsed_s": 3.2177202999882866,
+    "frame": 73,
+    "playing": true,
+    "scene": "Hybrid_Jump_Context_v001_PENDING",
+    "sync_mode": "FRAME_DROP"
+  },
+  {
+    "elapsed_s": 3.9178397999785375,
+    "frame": 115,
+    "playing": true,
+    "scene": "Hybrid_Jump_Context_v001_PENDING",
+    "sync_mode": "FRAME_DROP"
+  },
+  {
+    "elapsed_s": 4.618184699997073,
+    "frame": 37,
+    "playing": true,
+    "scene": "Hybrid_Jump_Context_v001_PENDING",
+    "sync_mode": "FRAME_DROP"
+  },
+  {
+    "elapsed_s": 5.3182652999821585,
+    "frame": 80,
+    "playing": true,
+    "scene": "Hybrid_Jump_Context_v001_PENDING",
+    "sync_mode": "FRAME_DROP"
+  }
+]
