@@ -172,11 +172,11 @@ func set_contact_course(value:bool)->void:
 		var material:=StandardMaterial3D.new();material.albedo_color=Color(.28,.32,.35);material.roughness=1.
 		for x in 4:
 			for z in 4:
-				var height:=.42+float((x+z)%3)*.04
+				var height:=.72+float((x+z)%3)*.04
 				var body:=StaticBody3D.new();_contact_course.add_child(body);body.position=Vector3((x-1.5)*1.5,height-.1,(z-1.5)*1.5)
 				var shape:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(1.5,.2,1.5);shape.shape=box;body.add_child(shape)
 				var mesh:=MeshInstance3D.new();var cube:=BoxMesh.new();cube.size=box.size;mesh.mesh=cube;mesh.material_override=material;body.add_child(mesh)
-		actor.global_position=_contact_course.global_position+Vector3(-.75,.62,-.75)
+		actor.global_position=_contact_course.global_position+Vector3(-.75,.92,-.75)
 	else:
 		actor.global_position=_course_return;_contact_course.queue_free();_contact_course=null
 	actor.reset_physics_interpolation();actor.presentation_reset.emit()
@@ -289,7 +289,7 @@ func release_inputs()->void:
 	for action:StringName in [&"move_left",&"move_right",&"move_forward",&"move_backward",&"sprint",&"jump"]:Input.action_release(action)
 func reset()->void:
 	release_inputs();actor.reset_actor();effects.reset()
-	if is_instance_valid(_contact_course):actor.global_position=_contact_course.global_position+Vector3(-.75,.62,-.75)
+	if is_instance_valid(_contact_course):actor.global_position=_contact_course.global_position+Vector3(-.75,.92,-.75)
 	if render_presenter!=null:render_presenter.reset_history()
 	if reference_audio!=null:reference_audio.reset()
 	if lab.grass_field!=null:lab.grass_field.reset()

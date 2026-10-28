@@ -71,8 +71,11 @@ func apply(delta:float,grounded:bool,raw_review:bool,allow_plant:bool,serial:int
 	# Air and raw review are exact bypasses. Never carry an old anchor into flight.
 	if not grounded or raw_review:
 		clear();last={"enabled":enabled,"contacts":[false,false],"pelvis_m":0.,"airborne_bypass":not grounded};return
-	if actor.global_position.distance_to(_last_root)>.8 or serial!=_last_serial:
+	if actor.global_position.distance_to(_last_root)>.8:
 		states=[{"planted":false},{"planted":false}];_previous_contacts=[false,false]
+	elif serial!=_last_serial:
+		for s:Dictionary in states:s.planted=false
+		_previous_contacts=[false,false]
 	_last_root=actor.global_position;_last_serial=serial
 	var raw:Array=[];var grounds:Array=[];var targets:Array=[]
 	var body_goal:=0.;var minimum:=-INF;var maximum:=INF
@@ -112,7 +115,11 @@ func apply(delta:float,grounded:bool,raw_review:bool,allow_plant:bool,serial:int
 		var old:Vector3=s.get("correction",Vector3.ZERO)
 		# A valid plant is a world-space constraint, not a filtered pursuit of
 		# its anchor. Filter only the release back to the authored trajectory.
-		var horizontal:=Vector2(correction.x,correction.z) if s.planted else Vector2(old.x,old.z).lerp(Vector2.ZERO,1.-exp(-35.*delta))
+		var horizontal:=Vector2(correction.x,correction.z)
+		if not s.planted:
+			# Recenter during lift, not while the sole is still near the floor:
+			# returning an offset during stance creates artificial ground travel.
+			horizontal=Vector2(old.x,old.z) if valid and not rising and allow_plant else Vector2(old.x,old.z).lerp(Vector2.ZERO,1.-exp(-35.*delta))
 		correction.x=horizontal.x;correction.z=horizontal.y
 		# Ground support must follow the FINAL horizontal footprint. At a step
 		# edge its raw animation footprint may already be on a different slab.
