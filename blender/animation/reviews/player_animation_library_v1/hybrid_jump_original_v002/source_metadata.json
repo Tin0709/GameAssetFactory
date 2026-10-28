@@ -1,0 +1,34 @@
+{
+  "source": "blender/animation/reviews/player_animation_library_v1/hybrid_jump_original_v002/hybrid_jump_authoring.blend",
+  "source_sha256": "6e4c447635b9742704c41bf72f4bb53f0f27882a52ed841d69b170c461b3d048",
+  "actions": [
+    "Jump_Landing_MD2_AS_SoftBounce_Original_v002_PENDING",
+    "PREVIEW_ONLY_Jump_MD2_AS_SoftBounce_Context_Original_v002_PENDING"
+  ],
+  "specs": [
+    {
+      "action": "Jump_Landing_MD2_AS_SoftBounce_Original_v002_PENDING",
+      "duration": 0.75,
+      "phase": "landing",
+      "loop": false,
+      "floor": 0,
+      "start": 1,
+      "end": 46
+    },
+    {
+      "action": "PREVIEW_ONLY_Jump_MD2_AS_SoftBounce_Context_Original_v002_PENDING",
+      "duration": 2.4,
+      "phase": "context",
+      "loop": false,
+      "floor": -0.04,
+      "preview_only": true,
+      "start": 1,
+      "end": 144
+    }
+  ],
+  "rig": "HybridJump_Soft_V002_Authoring_Rig",
+  "mesh": "HybridJump_Soft_V002_Authoring_Mesh",
+  "armature": "LB_Test_RestRig",
+  "fps": 60,
+  "fps_base": 1
+}
