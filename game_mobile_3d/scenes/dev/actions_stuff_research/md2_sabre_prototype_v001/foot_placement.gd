@@ -3,7 +3,7 @@ extends RefCounted
 ## new joints, capsule displacement, source keys or animation clock writes.
 const LEG_HORIZONTAL_LIMIT:=.065
 const LEG_VERTICAL_LIMIT:=.065
-const REACH:=.105
+const REACH:=LEG_HORIZONTAL_LIMIT
 const PELVIS_LIMIT:=.085
 const CONTACT_ENTER:=.045
 const CONTACT_EXIT:=.085
@@ -108,7 +108,9 @@ func apply(delta:float,grounded:bool,raw_review:bool,allow_plant:bool,serial:int
 			correction.y=clampf(float(grounds[side].lift)-pelvis+.001,-LEG_VERTICAL_LIMIT,LEG_VERTICAL_LIMIT)
 		else:correction.y=clampf(-pelvis,-LEG_VERTICAL_LIMIT,LEG_VERTICAL_LIMIT)
 		var old:Vector3=s.get("correction",Vector3.ZERO)
-		var horizontal:=Vector2(old.x,old.z).lerp(Vector2(correction.x,correction.z),1.-exp(-35.*delta))
+		# A valid plant is a world-space constraint, not a filtered pursuit of
+		# its anchor. Filter only the release back to the authored trajectory.
+		var horizontal:=Vector2(correction.x,correction.z) if s.planted else Vector2(old.x,old.z).lerp(Vector2.ZERO,1.-exp(-35.*delta))
 		correction.x=horizontal.x;correction.z=horizontal.y
 		s.correction=correction;targets.append(correction if enabled else Vector3.ZERO)
 	for side in 2:
