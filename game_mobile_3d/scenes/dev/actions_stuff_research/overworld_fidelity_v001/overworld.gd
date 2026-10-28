@@ -47,7 +47,7 @@ func _process(delta:float)->void:
 	if _status_clock>.5 and meadow_status!=null:
 		_status_clock=0.
 		var s:Dictionary=meadow.snapshot()
-		meadow_status.text="%d plants/blocks · %d batches · %d species\n%.1f m/s · %d FPS · steps %d / rustles %d"%[s.instances,s.batches,s.species,player.current_speed,Engine.get_frames_per_second(),environment_audio.event_count.grass+environment_audio.event_count.dirt,environment_audio.event_count.rustle]
+		meadow_status.text="%d plants/blocks · %d batches · %d species\n%.1f m/s · %d FPS · steps %d / rustles %d"%[s.instances,s.batches,s.species,player.current_speed,Engine.get_frames_per_second(),environment_audio.event_count.grass+environment_audio.event_count.dirt+environment_audio.event_count.stone,environment_audio.event_count.rustle]
 		if environment_audio.rejected_count>0:meadow_status.text+="\nWARNING: %d audio files unavailable"%environment_audio.rejected_count
 
 func _unhandled_input(event:InputEvent)->void:
@@ -71,6 +71,8 @@ func _build_meadow_ui()->void:
 	_toggle(box,"Player vegetation interaction",true,func(on:bool):meadow.interactions_enabled=on)
 	_toggle(box,"Ambient audio",true,func(on:bool):environment_audio.ambient_enabled=on)
 	_toggle(box,"Footsteps + contact rustle",true,func(on:bool):environment_audio.footsteps_enabled=on;environment_audio.rustle_enabled=on;environment_audio.reset_contacts())
+	_trim(box,"Ambience trim",func(db:float):environment_audio.ambience_gain_db=db)
+	_trim(box,"Footstep / rustle trim",func(db:float):environment_audio.effects_gain_db=db)
 	var controls:=Button.new();controls.text="Player / animation controls";controls.focus_mode=Control.FOCUS_NONE;box.add_child(controls)
 	controls.pressed.connect(func():sabre_mode.panel.visible=not sabre_mode.panel.visible;sabre_mode.panel.position=Vector2(18,290))
 	meadow_status=Label.new();meadow_status.add_theme_font_size_override("font_size",11);box.add_child(meadow_status)
@@ -78,6 +80,13 @@ func _build_meadow_ui()->void:
 
 func _toggle(box:Node,label:String,value:bool,callback:Callable)->void:
 	var button:=CheckButton.new();button.text=label;button.button_pressed=value;button.focus_mode=Control.FOCUS_NONE;box.add_child(button);button.toggled.connect(callback)
+
+func _trim(box:Node,title:String,callback:Callable)->void:
+	var row:=HBoxContainer.new();box.add_child(row)
+	var label:=Label.new();label.text=title;label.add_theme_font_size_override("font_size",11);label.custom_minimum_size.x=145;row.add_child(label)
+	var slider:=HSlider.new();slider.min_value=-18.;slider.max_value=6.;slider.step=1.;slider.value=0.;slider.custom_minimum_size.x=105;slider.focus_mode=Control.FOCUS_NONE;row.add_child(slider)
+	var value:=Label.new();value.text="0 dB";value.add_theme_font_size_override("font_size",11);row.add_child(value)
+	slider.value_changed.connect(func(db:float):value.text="%+.0f dB"%db;callback.call(db))
 
 func _error_ui()->void:
 	var label:=Label.new();label.text="Private Overworld unavailable\n"+error_text+"\nRun Open Overworld Meadow.cmd from MD2 Research.";label.position=Vector2(30,30);add_child(label);push_error(error_text)

@@ -22,7 +22,7 @@ var step_voices:Array[AudioStreamPlayer3D]=[]
 var rustle_voices:Array[AudioStreamPlayer3D]=[]
 var nature_voices:Array[AudioStreamPlayer3D]=[]
 var clock:=0.
-var event_count:={"grass":0,"dirt":0,"rustle":0,"nature":0,"birds":0,"landing":0}
+var event_count:={"grass":0,"dirt":0,"stone":0,"rustle":0,"nature":0,"birds":0,"landing":0}
 var last_sources:Dictionary={}
 var events:Array[Dictionary]=[]
 var loaded_count:=0
@@ -126,11 +126,11 @@ func _on_pose()->void:
 		if (rising_contact or land) and clock-_last_step>.12:
 			_last_step=clock
 			var position:Vector3=soles[side].center
-			var key:="dirt" if meadow.is_path(position) else "grass"
+			var key:String=meadow.surface_at(position)
 			if footsteps_enabled:
 				_play(key,step_voices[_step_index%4],position,float(config.get("landing_db",-9.)) if land else float(config.get("footsteps_db",-14.)),1.);_step_index+=1
 				if land:event_count.landing+=1
-			if rustle_enabled and meadow.interactions_enabled and meadow.foliage_density(position)>.6:
+			if rustle_enabled and meadow.interactions_enabled and key!="stone"and meadow.has_foliage(position):
 				_play("rustle",rustle_voices[_rustle_index%4],position+Vector3.UP*.3,float(config.get("rustle_db",-22.))-(3. if actor.current_speed<4. else 0.),1.);_rustle_index+=1
 	_was_grounded=grounded
 

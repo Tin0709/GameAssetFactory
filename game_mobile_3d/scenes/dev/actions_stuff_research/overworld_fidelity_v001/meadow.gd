@@ -17,6 +17,7 @@ var flowers:Array[Vector2]=[]
 var _batches:Dictionary={}
 var _rng:=RandomNumberGenerator.new()
 var _wind_intensities:Array[float]=[]
+var _plant_cells:Dictionary={}
 
 static func path_center(z:float)->float:return 1.9*sin(z*.24)+.55*sin(z*.57)
 static func is_path(point:Vector3)->bool:return absf(point.x-path_center(point.z))<.85
@@ -56,6 +57,10 @@ func _place(asset:String,position:Vector3,yaw:float=0.,scale_factor:float=1.)->v
 	var t:=Transform3D(Basis(Vector3.UP,yaw).scaled(Vector3.ONE*scale_factor),position)
 	_batches[key].transforms.append(t);_batches[key].phases.append(_rng.randf()*TAU)
 	instance_count+=1;species_counts[asset]=int(species_counts.get(asset,0))+1
+	if asset.begins_with("MD2 | SM_")and not asset.contains("Boulder"):
+		var plant_cell:=Vector2i(floori(position.x),floori(position.z))
+		if not _plant_cells.has(plant_cell):_plant_cells[plant_cell]=[]
+		_plant_cells[plant_cell].append(Vector2(position.x,position.z))
 
 func _build_ground()->void:
 	for z in range(-16,16):
@@ -112,7 +117,7 @@ func _build_rocks()->void:
 		if is_path(point):continue
 		var yaw:=_rng.randf()*TAU
 		_place("MD2 | SM_SF_Boulder_01",point,yaw)
-		var body:=StaticBody3D.new();body.name="RockCollision";add_child(body)
+		var body:=StaticBody3D.new();body.name="RockCollision";body.set_meta("overworld_surface","stone");add_child(body)
 		var shape:=CollisionShape3D.new();shape.shape=bundle.meshes["MD2 | SM_SF_Boulder_01"].create_trimesh_shape();body.add_child(shape);body.position=point;body.rotation.y=yaw
 	# Large source rock remains beyond the playable boundary, without hiding player.
 	_place("MD2 | SM_PA1_Blocker_Boulder_A",Vector3(-14,-.15,-13),.7)
@@ -142,5 +147,17 @@ func present(alpha:float)->void:
 		material.set_shader_parameter("interaction_alpha",clampf(alpha,0.,1.));material.set_shader_parameter("interaction_strength",1. if interactions_enabled else 0.)
 
 func reset()->void:interaction.reset()
+func has_foliage(point:Vector3)->bool:
+	var cell:=Vector2i(floori(point.x),floori(point.z));var p:=Vector2(point.x,point.z)
+	for dz in range(-1,2):
+		for dx in range(-1,2):
+			for root:Vector2 in _plant_cells.get(cell+Vector2i(dx,dz),[]):
+				if root.distance_squared_to(p)<.55*.55:return true
+	return false
+func surface_at(point:Vector3)->String:
+	var ray:=PhysicsRayQueryParameters3D.create(point+Vector3.UP*.2,point-Vector3.UP*.3,1)
+	var hit:=get_world_3d().direct_space_state.intersect_ray(ray)
+	if not hit.is_empty()and hit.collider.has_meta("overworld_surface"):return hit.collider.get_meta("overworld_surface")
+	return "dirt"if is_path(point)else"grass"
 func snapshot()->Dictionary:
 	return {"instances":instance_count,"batches":batch_count,"species":species_counts.size(),"flower_colors":flower_colors,"wind":wind_enabled,"interaction":interactions_enabled,"active_spring_cells":interaction.active.size(),"spring_update_us":interaction.update_usec}
