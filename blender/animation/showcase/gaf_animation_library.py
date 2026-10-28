@@ -40,7 +40,9 @@ def manifest_path():return location()/'animation_manifest.json'
 
 def load_manifest():
     data=json.loads(manifest_path().read_text(encoding='utf-8'))
-    if data.get('schema')!=1 or not isinstance(data.get('animations'),list):raise ValueError('Unsupported animation manifest')
+    if data.get('schema') not in {1,2} or not isinstance(data.get('animations'),list):raise ValueError('Unsupported animation manifest')
+    if data.get('schema')!=2 and any(e.get('external_linked_research') is True for e in data['animations']):
+        raise ValueError('External research links require manifest schema 2; older viewers must not append private source keys')
     names=[e['action'] for e in data['animations']]
     if not names or len(names)!=len(set(names)):raise ValueError('Animation names must be nonempty and unique')
     for e in data['animations']:

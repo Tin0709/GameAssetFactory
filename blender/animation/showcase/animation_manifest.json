@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "title": "GameAssetFactory Animation Library",
   "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
   "actor_rig": "Showcase_Player_Rig",
@@ -5350,5 +5350,6 @@
         "id": "Sword_Hurt_Original_v001"
       }
     ]
-  }
+  },
+  "external_research_protocol": "read_only_library_links/v1"
 }
