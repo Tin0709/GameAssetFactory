@@ -167,6 +167,9 @@ func apply(delta:float,grounded:bool,raw_review:bool,allow_plant:bool,serial:int
 
 func snapshot()->Dictionary:
 	var result:=_metrics.duplicate(true);result.merge(last)
+	var corrections:Array=[]
+	for v:Vector3 in last.get("correction_m",[]):corrections.append([v.x,v.y,v.z])
+	result["correction_m"]=corrections
 	result["slip_rms_m_s"]=sqrt(float(_metrics.slip_sum_sq)/maxi(1,_metrics.contact_samples))
 	result["near_ground_travel_rms_m_s"]=sqrt(float(_metrics.near_ground_sum_sq)/maxi(1,_metrics.near_ground_samples))
 	result["penetration_mean_m"]=float(_metrics.penetration_sum_m)/maxi(1,_metrics.samples)

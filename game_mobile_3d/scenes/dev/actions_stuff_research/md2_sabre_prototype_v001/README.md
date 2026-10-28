@@ -1,5 +1,42 @@
 # Player + Sabre prototype
 
+### Current — original rigid foot-ground contact, 2026-10-28
+
+The existing private lab now defaults to a bounded original contact overlay.
+F3 opens the meter: **Rigid foot contact** switches A/B, **Uneven contact
+course / return** builds/removes a small original slab fixture in this same
+scene and moves the player onto/off it. R resets on the selected surface.
+Use the mouse wheel to inspect more closely. The meter scrolls; **Save JSON**
+includes contact candidates, planted-center sliding, near-ground sole travel,
+penetration, body-correction acceleration, releases, ray counts and offsets.
+Reset the meter after changing A/B for a fresh measurement.
+
+The source rig has no added knees or ankles. Existing sole vertices drive
+corner probes; world anchors release on lift, reach, incompatible turning,
+unsupported ground, air and action boundaries. Whole-leg translations are
+bounded to65mm per axis budget (horizontal radius65mm); whole-body settling
+is bounded to-40/+85mm. Bone rotations/scales and source keys are untouched.
+Settling is smoothed, with the minimum immediate upward projection needed to
+avoid reachable penetration. Both pelvis and legs query the final anchored
+footprint. Air and raw Action review bypass all correction exactly. The layer
+restores before source evaluation and runs once after the final physics pose,
+before presentation capture. Shared reusable ray parameters; at most24corner
+queries per grounded physics tick, not per120Hz animation substep.
+
+This is NOT recovered native MD2 IK. Native contact masks, the complete active
+1H graph and final native bone correction remain unknown. Flat/stepped contact
+does not establish exact tangent alignment on slopes: authored sole orientation
+is preserved. Tall steps, steep slopes and unreachable plants release rather
+than stretch the character. Planted-center stability does not mean every
+near-ground authored swing/rocking/strike is motionless; both metrics remain
+visible to avoid that claim. Desktop validation is not a phone benchmark.
+
+Private evidence/results: Research `reports/prototype_sabre/foot_ground/`.
+Same scene,7m/s,1.888Hz, source files and graphics are preserved. Original
+Blender/GLB/profile and combo/gait/scene/project hashes match the baseline.
+40suites/1877checks pass; same-lab A/B covers4138states at30/60/120Hz, plus
+native Mobile/D3D12 rendered checks. User feel/artistic review remains open.
+
 ### Current — native callback evidence boundary, 2026-10-28
 
 No controller or timing change. Audit of the retained native capture finds two
