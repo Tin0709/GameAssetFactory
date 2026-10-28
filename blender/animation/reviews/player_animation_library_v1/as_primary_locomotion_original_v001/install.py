@@ -12,7 +12,8 @@ CENTRAL=LIB/'Animation_Showcase.blend';MANIFEST=LIB/'animation_manifest.json'
 for path,digest in base['files'].items():assert sha(Path(path))==digest,'Concurrent central change'
 data=json.loads(MANIFEST.read_text(encoding='utf8'));old_actions=set(bpy.data.actions.keys())
 assert set(base['actions'])==old_actions
-for name,digest in base['actions'].items():assert ui.action_signature(bpy.data.actions[name])==digest,name
+# The opened baseline bytes are pinned above. Compare every old curve once
+# after all mutations below; avoid hashing the same large data three times.
 native=bpy.data.objects[ui.RIG];native_mesh=bpy.data.objects['Showcase_Player_Mesh'];modes={b.name:b.rotation_mode for b in native.pose.bones}
 with bpy.data.libraries.load(str(H/'as_primary_locomotion_authoring.blend'),link=False)as(src,dst):dst.actions=meta['actions']
 entries=[]
