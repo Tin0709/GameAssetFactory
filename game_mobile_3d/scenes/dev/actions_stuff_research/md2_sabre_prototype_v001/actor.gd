@@ -478,9 +478,9 @@ func _physics_process(delta:float)->void:
 	# an interrupted ascent at a ceiling) owns the transition into the air loop.
 	if using_original_source and not _grounded and _jump_stage=="JumpTakeoff" and velocity.y<=0.:
 		_jump_stage="JumpAirborne";_jump_time=0.
-	if _grounded and not was_grounded and _floor_initialized and _jump_stage!="JumpLanding":
-		_jump_stage="JumpLanding";_jump_time=0.
+	if _grounded and not was_grounded and _floor_initialized:
 		if novelty_jump!=null:novelty_jump.contact(simulation_clock+delta)
+		if _jump_stage!="JumpLanding":_jump_stage="JumpLanding";_jump_time=0.
 	elif not _grounded and _jump_stage.is_empty():_jump_stage="JumpAirborne";_jump_time=0.
 	_floor_initialized=_floor_initialized or _grounded
 	current_speed=Vector2(get_real_velocity().x,get_real_velocity().z).length()
