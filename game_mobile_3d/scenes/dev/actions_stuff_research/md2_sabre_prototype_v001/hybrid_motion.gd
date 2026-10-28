@@ -62,7 +62,8 @@ func setup(skeleton:Skeleton3D,path:String,target_path:String)->bool:
 				for number:Variant in matrix:
 					if not (number is float or number is int) or not is_finite(float(number)):return false
 				var transform:=Transform3D(Basis(Vector3(matrix[0],matrix[1],matrix[2]),Vector3(matrix[3],matrix[4],matrix[5]),Vector3(matrix[6],matrix[7],matrix[8])),Vector3(matrix[9],matrix[10],matrix[11]))
-				if transform.basis.determinant()<.05:return false
+				var determinant:=transform.basis.determinant()
+				if not transform.is_finite() or not is_finite(determinant) or determinant<.05:return false
 				values.append(transform)
 			frames.append(values)
 		staged[key]={"frames":frames,"duration":duration,"loop":bool(row.get("loop",false))}
@@ -82,7 +83,7 @@ func setup(skeleton:Skeleton3D,path:String,target_path:String)->bool:
 		for field in ["patch","lo","hi"]:
 			if not item.get(field) is Array or item[field].size()!=3:return false
 			for component:Variant in item[field]:
-				if not(component is float or component is int) or not is_finite(float(component)):return false
+				if not(component is float or component is int) or not is_finite(float(component)) or absf(float(component))>1000.:return false
 		var arm:=rig.find_bone(item.bone);var body:=rig.find_bone(item.body)
 		if arm<0 or body<0:return false
 		if data.bone_groups[item.body]!="Chest" or data.bone_groups[item.bone]!=("UpperArm.L" if float(item.side)>0. else "UpperArm.R"):return false

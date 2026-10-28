@@ -57,6 +57,22 @@ func run()->void:
 		a.requested_direction=Vector2.ZERO;await ticks(hz)
 		check(a.current_speed<.001 and a.combo.phase==&"ready","Stops and recovers at "+str(hz))
 		measurements.append({"hz":hz,"run_distance_one_second":meter.distance,"run_cycles_one_second":meter.gait_cycles,"attachment_error_m":a.hybrid_motion.maximum_attachment_gap,"peak_height_m":peak,"foot_ground":a.foot_placement.snapshot()})
+		a.reset_actor();await ticks(3);a.requested_jump=true;await ticks(1);a.requested_jump=false
+		await ticks(ceili(.60*hz))
+		a.requested_direction=Vector2.RIGHT;a.requested_run=true;await ticks(ceili(.15*hz))
+		check(a._jump_stage=="JumpLanding" and a.hybrid_motion.landing_move_weight>.99 and a.hybrid_motion.last_kind=="LandingMoving","Movement starts immediately during stationary landing at "+str(hz))
+		a.requested_direction=Vector2.ZERO;await ticks(ceili(.15*hz))
+		check(a.hybrid_motion.landing_move_weight<.001 and a.hybrid_motion.last_kind=="LandingStationary","Stopping during landing releases moving legs smoothly at "+str(hz))
+		await ticks(hz)
+		# A completed previous landing must not leak its contact clock into a
+		# second jump whose landing is temporarily covered by the air attack.
+		a.requested_jump=true;await ticks(1);a.requested_jump=false;await ticks(ceili(.20*hz));a.attack(true);await ticks(1);a.attack(false)
+		var checked_contact_clock:=false
+		for i in hz*2:
+			await ticks(1)
+			if a._jump_stage=="JumpLanding":
+				check(absf(a.hybrid_motion.landing_elapsed-a._jump_time)<=1./float(hz)+.00001,"Collision contact clock advances while airborne combat owns pose at "+str(hz));checked_contact_clock=true;break
+		check(checked_contact_clock,"Repeated jump / air attack reaches contact at "+str(hz));await ticks(hz*2)
 	var report:={"checks":checks,"failures":failures,"measurements":measurements}
 	var research:=OS.get_environment("MD2_RESEARCH_ROOT")
 	if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
