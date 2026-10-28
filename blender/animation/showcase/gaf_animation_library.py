@@ -342,19 +342,24 @@ def refresh(scene,import_missing=True):
         for e in data['animations']:
             source=(root()/e['source']).resolve()
             if not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest()!=e['source_sha256']:raise ValueError('Source missing or changed: '+e['source'])
+            linked_research=e.get('external_linked_research') is True
+            if linked_research and (e.get('research_only') is not True or e.get('production_eligible') is not False or source.is_relative_to(root()) or source.suffix.lower()!='.blend'):
+                raise ValueError('External research must stay private outside this project and remain production-ineligible')
             action=bpy.data.actions.get(e['action'])
             if action is None:
                 if not import_missing:raise ValueError('Action missing from saved showcase: '+e['action'])
                 imported_armature=None
                 try:
-                    with bpy.data.libraries.load(str(source),link=False) as (src,dst):
+                    with bpy.data.libraries.load(str(source),link=linked_research) as (src,dst):
                         if e['action'] not in src.actions or e['source_armature'] not in src.armatures:raise ValueError('Named Action or source armature missing')
                         dst.actions=[e['action']];dst.armatures=[e['source_armature']]
                     action=dst.actions[0];new_actions.append(action);imported_armature=dst.armatures[0]
                     if rest_signature(imported_armature)!=data['rig_sha256']:raise ValueError('Incompatible source rig: '+e['action'])
-                    action.use_fake_user=True
+                    if not linked_research:action.use_fake_user=True
                 finally:
                     if imported_armature:bpy.data.armatures.remove(imported_armature)
+            if linked_research and (action.library is None or Path(bpy.path.abspath(action.library.filepath)).resolve()!=source):
+                raise ValueError('Private research Action must remain linked; do not make a local copy')
             validate_action(action,e,rig)
             key=e.get('preview_prop')
             if key is not None:
