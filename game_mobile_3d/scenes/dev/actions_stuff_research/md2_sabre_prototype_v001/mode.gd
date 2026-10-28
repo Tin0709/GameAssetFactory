@@ -138,7 +138,8 @@ func _build_movement_panel()->void:
 	movement_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);movement_panel.offset_left=-420;movement_panel.offset_right=-18;movement_panel.offset_top=-350;movement_panel.offset_bottom=-18
 	movement_panel.grow_vertical=Control.GROW_DIRECTION_BEGIN
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.035,.045,.9);style.set_content_margin_all(9);style.set_corner_radius_all(5);movement_panel.add_theme_stylebox_override("panel",style)
-	var box:=VBoxContainer.new();movement_panel.add_child(box)
+	var scroll:=ScrollContainer.new();scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;movement_panel.add_child(scroll)
+	var box:=VBoxContainer.new();box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(box)
 	if actor.foot_placement!=null:
 		var feet:=CheckButton.new();feet.name="FootPlacementToggle";feet.text="Rigid foot contact · original adapter";feet.button_pressed=actor.foot_placement.enabled;feet.focus_mode=Control.FOCUS_NONE;box.add_child(feet)
 		feet.tooltip_text="Bounded sole anchors and whole-body settling; not recovered MD2 IK. Raw animation review bypasses it. Reset meter after switching for an A/B measurement."
@@ -226,6 +227,7 @@ func present(delta:float)->void:
 		if m.has("foot_ground"):
 			var feet:Dictionary=m.foot_ground
 			movement_label.text+="\nFoot contact %s · slide RMS %.2f m/s\nPenetration %.1f mm · pelvis %+.1f mm\nCorrection accel RMS %.2f m/s²"%["ON" if actor.foot_placement.enabled else "OFF",feet.slip_rms_m_s,float(feet.get("penetration_m",0.))*1000.,float(feet.get("pelvis_m",0.))*1000.,feet.body_correction_accel_rms_m_s2]
+			movement_label.text+="\nNear-ground sole travel %.2f m/s"%float(feet.near_ground_travel_rms_m_s)
 		if actor.using_original_source:
 			var body_angle:String="—" if m.body_travel_angle_deg==null else "%.1f°"%float(m.body_travel_angle_deg)
 			var leg_angle:String="—" if m.legs_travel_angle_deg==null else "%.1f°"%float(m.legs_travel_angle_deg)
@@ -287,6 +289,7 @@ func release_inputs()->void:
 	for action:StringName in [&"move_left",&"move_right",&"move_forward",&"move_backward",&"sprint",&"jump"]:Input.action_release(action)
 func reset()->void:
 	release_inputs();actor.reset_actor();effects.reset()
+	if is_instance_valid(_contact_course):actor.global_position=_contact_course.global_position+Vector3(-.75,.62,-.75)
 	if render_presenter!=null:render_presenter.reset_history()
 	if reference_audio!=null:reference_audio.reset()
 	if lab.grass_field!=null:lab.grass_field.reset()
