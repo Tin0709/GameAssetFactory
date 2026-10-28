@@ -11,8 +11,8 @@
         0.23999870680823202
       ],
       "rolling_contact_samples": 322,
-      "rolling_contact_speed_rms_m_s": 0.042296757896315866,
-      "rolling_contact_speed_max_m_s": 0.0594542967762313,
+      "rolling_contact_speed_rms_m_s": 0.04229675840564944,
+      "rolling_contact_speed_max_m_s": 0.05945429646272914,
       "max_floor_penetration_mm": 0,
       "max_scale_error": 0.0,
       "leg_pivot_offset_z_m": [
@@ -34,8 +34,8 @@
         0.3999977824260583
       ],
       "rolling_contact_samples": 322,
-      "rolling_contact_speed_rms_m_s": 0.042297006615719064,
-      "rolling_contact_speed_max_m_s": 0.05934267185210126,
+      "rolling_contact_speed_rms_m_s": 0.0422970071406908,
+      "rolling_contact_speed_max_m_s": 0.05934267209520839,
       "max_floor_penetration_mm": 0,
       "max_scale_error": 0.0,
       "leg_pivot_offset_z_m": [
@@ -57,8 +57,8 @@
         0.5999939122149505
       ],
       "rolling_contact_samples": 322,
-      "rolling_contact_speed_rms_m_s": 0.04229352458808341,
-      "rolling_contact_speed_max_m_s": 0.05934352845587055,
+      "rolling_contact_speed_rms_m_s": 0.042293525111240855,
+      "rolling_contact_speed_max_m_s": 0.05934353023080197,
       "max_floor_penetration_mm": 0,
       "max_scale_error": 0.0,
       "leg_pivot_offset_z_m": [
