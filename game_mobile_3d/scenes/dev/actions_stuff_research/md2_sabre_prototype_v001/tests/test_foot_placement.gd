@@ -46,6 +46,11 @@ func run():
  for bone in rig.get_bone_count():check(rig.get_bone_pose(bone).is_equal_approx(raw[bone]),"Off preserves exact source %d"%bone)
  helper.set_enabled(true);helper.apply(1./60.,true,false,true,0);helper.restore();a.position.x=.3;helper.apply(1./60.,true,false,true,0)
  check(not helper.states[0].planted and not helper.states[1].planted,"Excess travel releases unreachable anchors")
+ helper.clear();a.position=Vector3.ZERO;helper.apply(1./60.,true,false,true,0)
+ var pinned:Vector3=helper._samples(0).center
+ helper.restore();a.position.x+=.02;helper.apply(1./120.,true,false,true,0)
+ var displaced:Vector3=helper._samples(0).center-pinned
+ check(Vector2(displaced.x,displaced.z).length()<.001,"A planted sole holds its world anchor within the rigid correction budget")
  helper.clear();a.position=Vector3.ZERO;helper.apply(1./60.,true,false,true,0);helper.restore();a.visual.rotation.y=PI/2.;helper.apply(1./60.,true,false,true,0)
  check(not helper.states[0].planted and not helper.states[1].planted,"Turning releases incompatible anchors")
  helper.restore();a.visual.rotation.y=0.;helper.clear();helper.apply(1./60.,true,false,false,1)
