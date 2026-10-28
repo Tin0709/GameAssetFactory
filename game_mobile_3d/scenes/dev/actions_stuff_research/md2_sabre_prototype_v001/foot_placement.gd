@@ -77,21 +77,11 @@ func apply(delta:float,grounded:bool,raw_review:bool,allow_plant:bool,serial:int
 		for s:Dictionary in states:s.planted=false
 		_previous_contacts=[false,false]
 	_last_root=actor.global_position;_last_serial=serial
-	var raw:Array=[];var grounds:Array=[];var targets:Array=[]
+	var raw:Array=[];var grounds:Array=[];var targets:Array=[];var supports:Array=[]
 	var body_goal:=0.;var minimum:=-INF;var maximum:=INF
 	for side in 2:
 		raw.append(_samples(side));grounds.append(_ground(raw[side]))
-		if grounds[side].valid and float(grounds[side].lift)>-CONTACT_ENTER:
-			minimum=maxf(minimum,float(grounds[side].lift)-LEG_VERTICAL_LIMIT)
-			maximum=minf(maximum,float(grounds[side].lift)+LEG_VERTICAL_LIMIT)
-	# Prefer zero body motion whenever the rigid-leg budget can reach. This
-	# avoids injecting a second gait bob into already-authored hip animation.
-	if minimum<=maximum:body_goal=clampf(0.,minimum,maximum)
-	else:body_goal=minimum
-	body_goal=clampf(body_goal,-.04,PELVIS_LIMIT)
 	var previous_pelvis:=pelvis
-	pelvis=lerpf(pelvis,body_goal,1.-exp(-12.*delta)) if enabled else 0.
-	actor.visual.position=base_visual+Vector3.UP*pelvis
 	var contacts:Array=[];var near:Array=[];var raw_centers:Array=[]
 	for side in 2:
 		var s:Dictionary=states[side];var center:Vector3=raw[side].center;raw_centers.append(center)
@@ -128,10 +118,25 @@ func apply(delta:float,grounded:bool,raw_review:bool,allow_plant:bool,serial:int
 			var shifted:Array[Vector3]=[]
 			for p:Vector3 in raw[side].points:shifted.append(p+Vector3(correction.x,0.,correction.z))
 			support=_ground({"points":shifted})
-		if support.valid and (s.planted or float(support.lift)>0.):
+		supports.append(support);targets.append(correction)
+		if support.valid and (s.planted or float(support.lift)>-CONTACT_ENTER):
+			minimum=maxf(minimum,float(support.lift)-LEG_VERTICAL_LIMIT)
+			maximum=minf(maximum,float(support.lift)+LEG_VERTICAL_LIMIT)
+	# Both pelvis and legs use the final footprint. Prefer zero extra body bob;
+	# smooth the desired settling, then project upwards only as needed to avoid
+	# penetration within the available rigid-leg and pelvis budgets.
+	if minimum<=maximum:body_goal=clampf(0.,minimum,maximum)
+	else:body_goal=minimum
+	body_goal=clampf(body_goal,-.04,PELVIS_LIMIT)
+	pelvis=lerpf(pelvis,body_goal,1.-exp(-12.*delta)) if enabled else 0.
+	if enabled:pelvis=maxf(pelvis,clampf(minimum,-.04,PELVIS_LIMIT))
+	actor.visual.position=base_visual+Vector3.UP*pelvis
+	for side in 2:
+		var correction:Vector3=targets[side];var support:Dictionary=supports[side]
+		if support.valid and (states[side].planted or float(support.lift)>0.):
 			correction.y=clampf(float(support.lift)-pelvis+.001,-LEG_VERTICAL_LIMIT,LEG_VERTICAL_LIMIT)
 		else:correction.y=clampf(-pelvis,-LEG_VERTICAL_LIMIT,LEG_VERTICAL_LIMIT)
-		s.correction=correction;targets.append(correction if enabled else Vector3.ZERO)
+		states[side].correction=correction;targets[side]=correction if enabled else Vector3.ZERO
 	for side in 2:
 		var bone:int=geometry.legs[side];var pose:=rig.get_bone_pose(bone);_saved[bone]=pose
 		var parent:=rig.get_bone_parent(bone)
