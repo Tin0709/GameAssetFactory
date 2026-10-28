@@ -61,8 +61,9 @@ func read(path:String)->Dictionary:
 			var arrays:Array=[];arrays.resize(Mesh.ARRAY_MAX)
 			arrays[Mesh.ARRAY_VERTEX]=_v3(surface.positions);arrays[Mesh.ARRAY_NORMAL]=_v3(surface.normals)
 			arrays[Mesh.ARRAY_TEX_UV]=_v2(surface.uv);arrays[Mesh.ARRAY_TEX_UV2]=_v2(surface.roots)
-			arrays[Mesh.ARRAY_CUSTOM0]=PackedFloat32Array(surface.motion).to_byte_array()
+			arrays[Mesh.ARRAY_CUSTOM0]=PackedFloat32Array(surface.motion)
 			mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays,[],{},Mesh.ARRAY_CUSTOM_RGBA_FLOAT<<Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT)
+			if mesh.get_surface_count()==0:return _fail("Cannot build mesh surface: "+entry.name)
 			mesh.surface_set_material(mesh.get_surface_count()-1,_material_map[surface.material])
 		meshes[entry.name]=mesh
 	return data
