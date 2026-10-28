@@ -1,0 +1,54 @@
+{
+  "source": "blender/animation/reviews/player_animation_library_v1/hybrid_jump_original_v001/hybrid_jump_authoring.blend",
+  "source_sha256": "590f1e6569faf4d0d14ada7ba3beb593637fe5c4f6e8b51902ee3e3904e0495a",
+  "actions": [
+    "Jump_Takeoff_MD2_AS_Original_v001_PENDING",
+    "Jump_Airborne_MD2_AS_Original_v001_PENDING",
+    "Jump_Landing_MD2_AS_Original_v001_PENDING",
+    "PREVIEW_ONLY_Jump_MD2_AS_Context_Original_v001_PENDING"
+  ],
+  "specs": [
+    {
+      "action": "Jump_Takeoff_MD2_AS_Original_v001_PENDING",
+      "duration": 0.4,
+      "phase": "takeoff",
+      "loop": false,
+      "floor": -0.04,
+      "start": 1,
+      "end": 24
+    },
+    {
+      "action": "Jump_Airborne_MD2_AS_Original_v001_PENDING",
+      "duration": 0.8,
+      "phase": "airborne",
+      "loop": true,
+      "floor": -0.04,
+      "start": 1,
+      "end": 48
+    },
+    {
+      "action": "Jump_Landing_MD2_AS_Original_v001_PENDING",
+      "duration": 0.3,
+      "phase": "landing",
+      "loop": false,
+      "floor": 0,
+      "start": 1,
+      "end": 18
+    },
+    {
+      "action": "PREVIEW_ONLY_Jump_MD2_AS_Context_Original_v001_PENDING",
+      "duration": 2.0,
+      "phase": "context",
+      "loop": false,
+      "floor": -0.04,
+      "preview_only": true,
+      "start": 1,
+      "end": 120
+    }
+  ],
+  "rig": "HybridJump_Original_Authoring_Rig",
+  "mesh": "HybridJump_Original_Authoring_Mesh",
+  "armature": "LB_Test_RestRig",
+  "fps": 60,
+  "fps_base": 1
+}
