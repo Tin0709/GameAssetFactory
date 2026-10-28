@@ -1,0 +1,18 @@
+{
+  "old_actions_fingerprinted_and_preserved": 105,
+  "old_registry_entries_preserved": 69,
+  "old_reviews_preserved": 3,
+  "new_pending_pose_actions": 3,
+  "new_review_entries": 2,
+  "unchanged_godot_files": 736,
+  "central_actions_reopened": 110,
+  "gui_playing_samples": 4,
+  "gui_frames": [
+    2,
+    105,
+    58,
+    10
+  ],
+  "source_sha256": "8f0d04dad17934d0a78c40dc12c6e1641f4f4015067d901456552db1bbfc8808",
+  "current_showcase_sha256": "6f561794d34e1406438d1401dbff816e1ec38e9e837d031479953b1bd4ccd315"
+}
