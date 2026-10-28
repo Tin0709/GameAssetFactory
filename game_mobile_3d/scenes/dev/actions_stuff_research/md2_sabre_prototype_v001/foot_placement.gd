@@ -89,7 +89,7 @@ func apply(delta:float,grounded:bool,raw_review:bool,allow_plant:bool,serial:int
 		var s:Dictionary=states[side];var center:Vector3=raw[side].center;raw_centers.append(center)
 		var rising:=_previous_raw.size()==2 and (center.y-Vector3(_previous_raw[side]).y)/delta>.85
 		var valid:bool=grounds[side].valid and float(grounds[side].lift)>-CONTACT_EXIT
-		var forward:=actor.visual.global_basis.z.normalized()
+		var forward:Vector3=actor.visual.global_basis.z.normalized()
 		var reach:=0.
 		if s.planted:reach=Vector2(center.x-Vector3(s.anchor).x,center.z-Vector3(s.anchor).z).length()
 		var turning:bool=s.planted and forward.dot(s.get("heading",forward))<cos(deg_to_rad(15.))
