@@ -3895,7 +3895,8 @@
       "gait_hz": 1.888,
       "nominal_speed_m_s": 7,
       "original_stance_fraction": 0.16,
-      "phase_origin": 0.25
+      "phase_origin": 0.25,
+      "playback_sync": "FRAME_DROP"
     },
     {
       "action": "Run_Hybrid_V2_Balanced_Bounce_Original_v001",
@@ -3939,7 +3940,8 @@
       "gait_hz": 1.888,
       "nominal_speed_m_s": 7,
       "original_stance_fraction": 0.16,
-      "phase_origin": 0.25
+      "phase_origin": 0.25,
+      "playback_sync": "FRAME_DROP"
     },
     {
       "action": "Run_Hybrid_V3_Expressive_Bounce_Original_v001",
@@ -3983,7 +3985,8 @@
       "gait_hz": 1.888,
       "nominal_speed_m_s": 7,
       "original_stance_fraction": 0.16,
-      "phase_origin": 0.25
+      "phase_origin": 0.25,
+      "playback_sync": "FRAME_DROP"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
@@ -4294,7 +4297,8 @@
           "mesh": "Hybrid_Run_Comparison_Mesh_3",
           "action": "Run_Hybrid_V3_Expressive_Bounce_Original_v001"
         }
-      ]
+      ],
+      "playback_sync": "FRAME_DROP"
     }
   ],
   "library_focus": {
