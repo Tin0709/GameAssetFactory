@@ -9,7 +9,7 @@ import gaf_animation_library as ui
 m.verify()
 CENTRAL=ROOT/'blender/animation/showcase/Animation_Showcase.blend'
 SOURCE=HERE/'hybrid_run_authoring.blend'
-assert not SOURCE.exists(),'Do not overwrite an authored revision'
+assert not SOURCE.exists() or '--refine-draft' in sys.argv,'Do not overwrite an authored revision'
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 with bpy.data.libraries.load(str(CENTRAL),link=False) as (src,dst):dst.objects=['Showcase_Player_Rig','Showcase_Player_Mesh']
 rig,mesh=dst.objects
@@ -67,8 +67,8 @@ for variant in m.VARIANTS:
     slot=action.slots.new(id_type='OBJECT',name=rig.name)
     layer=action.layers.new('Original authored pose');strip=layer.strips.new(type='KEYFRAME');bag=strip.channelbags.new(slot)
     values={}
-    for j in range(1025):
-        frame=1+j/8;p=((frame-1)/m.FRAMES+m.ORIGIN)%1
+    for j in range(2049):
+        frame=1+j/16;p=((frame-1)/m.FRAMES+m.ORIGIN)%1
         pose(p,variant)
         for bone in rig.pose.bones:
             rotation='rotation_euler' if bone.rotation_mode!='QUATERNION' else 'rotation_quaternion'
