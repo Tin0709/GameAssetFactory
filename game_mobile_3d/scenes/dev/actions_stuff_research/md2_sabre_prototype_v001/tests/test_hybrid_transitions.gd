@@ -9,7 +9,7 @@ func _initialize()->void:call_deferred("run")
 func run()->void:
 	var Facing=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/smooth_facing.gd")
 	for hz in [30,60,120]:
-		var helper=Facing.new();var dt:=1./hz;var angle:=0.;var deltas:Array=[]
+		var helper=Facing.new();var dt:float=1./hz;var angle:=0.;var deltas:Array=[]
 		for i in hz:
 			var next:float=helper.step(angle,PI*.5,dt,100.);deltas.append(next-angle)
 			check(next>=angle-.000001 and next<=PI*.5+.000001,"Facing approaches90deg without overshoot "+str(hz));angle=next
@@ -32,15 +32,15 @@ func run()->void:
 	rows.append({"moving_landing_torso_phase_difference_rad":spread})
 	for hz in [30,60,120]:
 		a.reset_actor();a._grounded=false;a._move_requested=false;a.current_speed=0.;a.hybrid_motion.keep_shoulders_attached()
-		var previous:Dictionary={};var biggest_contact_step:=0.;var dt:=1./hz
+		var previous:Dictionary={};var biggest_contact_step:=0.;var dt:float=1./hz
 		for i in ceili(.8*hz):
-			var t:=i*dt;var key:String="JumpTakeoff" if t<.25 else ("JumpAirborne" if t<.5 else "JumpLanding")
+			var t:float=i*dt;var key:String="JumpTakeoff" if t<.25 else ("JumpAirborne" if t<.5 else "JumpLanding")
 			a._jump_stage=key;a._jump_time=t if key=="JumpTakeoff" else (t-.25 if key=="JumpAirborne" else t-.5);a._grounded=t>=.5;a.velocity.y=9.6-38.4*t if t<.5 else 0.
 			a.animation_player.play(a.clips[key].action,0.);a.animation_player.seek(a._jump_time,true)
 			a.hybrid_motion.apply(a,key,dt);a.hybrid_motion.keep_shoulders_attached()
-			var chest:=a.skeleton.find_bone("J_Shoulders");var inv:=a.skeleton.get_bone_global_pose(chest).affine_inverse()
+			var chest:int=a.skeleton.find_bone("J_Shoulders");var inv:Transform3D=a.skeleton.get_bone_global_pose(chest).affine_inverse()
 			for side in ["L","R"]:
-				var bone:=a.skeleton.find_bone("J_"+side+"_Arm");var q:Quaternion=(inv*a.skeleton.get_bone_global_pose(bone)).basis.get_rotation_quaternion()
+				var bone:int=a.skeleton.find_bone("J_"+side+"_Arm");var q:Quaternion=(inv*a.skeleton.get_bone_global_pose(bone)).basis.get_rotation_quaternion()
 				if t>=.5 and t<=.7 and previous.has(side):biggest_contact_step=maxf(biggest_contact_step,Quaternion(previous[side]).angle_to(q))
 				previous[side]=q
 		check(biggest_contact_step<.65,"Stationary arm contact has no instantaneous close/reopen snap "+str(hz))
