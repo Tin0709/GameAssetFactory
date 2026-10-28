@@ -1,0 +1,55 @@
+{
+  "source_sha256": "7cbc9f691330ff7eb4561838ada89d4c397b212fdfc30fc76beac7a135697550",
+  "source": "blender/animation/reviews/player_animation_library_v1/as_primary_locomotion_original_v001/as_primary_locomotion_authoring.blend",
+  "actions": [
+    "Walk_ASInspired_Original_v001_PENDING",
+    "Run_ASInspired_Original_v001_PENDING",
+    "PREVIEW_ONLY_WalkRun_PhaseTransition_Original_v001_PENDING"
+  ],
+  "specs": [
+    {
+      "action": "Walk_ASInspired_Original_v001_PENDING",
+      "start": 1,
+      "end": 150,
+      "loop": true,
+      "style": {
+        "kind": "Walk",
+        "hz": 1.2,
+        "speed": 1.8,
+        "duty": 0.44,
+        "arm": 34.0,
+        "torso": 8.0,
+        "head": 1.8,
+        "lift": 0.025
+      }
+    },
+    {
+      "action": "Run_ASInspired_Original_v001_PENDING",
+      "start": 1,
+      "end": 150,
+      "loop": true,
+      "style": {
+        "kind": "Run",
+        "hz": 1.6,
+        "speed": 4.3,
+        "duty": 0.28,
+        "arm": 53.0,
+        "torso": 17.0,
+        "head": 2.5,
+        "lift": 0.095
+      }
+    },
+    {
+      "action": "PREVIEW_ONLY_WalkRun_PhaseTransition_Original_v001_PENDING",
+      "start": 1,
+      "end": 270,
+      "loop": false,
+      "preview_only": true
+    }
+  ],
+  "rig": "ASPrimary_Original_Authoring_Rig",
+  "mesh": "ASPrimary_Original_Authoring_Mesh",
+  "armature": "LB_Test_RestRig",
+  "fps": 60,
+  "fps_base": 1
+}

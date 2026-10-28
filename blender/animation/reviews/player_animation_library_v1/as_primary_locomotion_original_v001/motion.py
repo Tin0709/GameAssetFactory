@@ -46,15 +46,13 @@ def hip_height(p,s):
  q=(p+.25)% .5-.25
  half=s['duty']/2
  if abs(q)<=half:
-  z=0.
-  for i in range(-4,5):z+=support_z(leg((q+i*.0008)%1,s)[0],s) if False else 0
   vals=[support_z(leg((q+i*.0008)%1,s)[0])for i in range(-4,5)]
   return sum(vals)/len(vals)-.004
  # Body floats only in the intentional exchange; unequal lift on alternate
  # steps gives a subtle leading-side accent without changing contact timing.
  a=half;b=.5-half; x=(q-half)%( .5)
  x=max(0.,min(1.,x/(b-a)))
- edge=support_z(leg(half,s)[0])-.004
+ edge=sum(support_z(leg((half+i*.0008)%1,s)[0])for i in range(-4,5))/9-.004
  amplitude=s['lift']*(1 if (p%1)<.5 else .91)
  # Unequal time to apex / compression, smooth positional and speed endpoints.
  peak=.39
