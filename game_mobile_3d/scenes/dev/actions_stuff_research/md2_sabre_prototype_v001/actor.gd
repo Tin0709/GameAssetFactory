@@ -20,6 +20,7 @@ const InputOrderTrace=preload("res://scenes/dev/actions_stuff_research/md2_sabre
 const FootPlacement=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/foot_placement.gd")
 const HybridMotion=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/hybrid_motion.gd")
 const JumpProfile=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/jump_profile.gd")
+const NoveltyJump=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/novelty_jump.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 # User-accepted jump study; native launch/scale recovered, full trajectory pending.
@@ -66,6 +67,7 @@ var jump_runtime_profile:Dictionary={}
 var measured_jump_requested:=true
 var measured_jump_active:=false
 var _legacy_jump_settings:Dictionary={}
+var novelty_jump:RefCounted
 var _combat_plan_active:=false
 var _combat_open_seconds:=0.
 var _animation_motion_speed:=0.
@@ -236,6 +238,11 @@ func _ready()->void:
 		if not jump_runtime_profile.is_empty():
 			_legacy_jump_settings={"gravity":gravity,"height":jump_height};_apply_jump_settings(true)
 			if hybrid_motion!=null:hybrid_motion.compact_landing_seconds=float(jump_runtime_profile.compact_landing_seconds)
+	if using_original_source and hybrid_motion!=null and OS.get_environment("MD2_NOVELTY_JUMP")!="0":
+		var research_root:=OS.get_environment("MD2_RESEARCH_ROOT")
+		if research_root.is_empty():research_root="C:/Users/ADMIN/Desktop/MD2 Research"
+		var novelty:=NoveltyJump.new()
+		if novelty.setup(self,research_root.path_join("reports/prototype_sabre/jump_flip_20261028/jump_flip.private.json")):novelty_jump=novelty
 
 func set_measured_jump(value:bool)->void:
 	measured_jump_requested=value;_apply_jump_settings()
@@ -454,6 +461,7 @@ func _physics_process(delta:float)->void:
 	velocity=Vector3(planar.x,ground_vertical if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
 	if accepted_jump:
 		combo.cancel();velocity.y=sqrt(2.*gravity*jump_height)-(gravity*delta*.5 if using_original_source else 0.);_jump_stage="JumpTakeoff";_jump_time=0.
+		if novelty_jump!=null:novelty_jump.launch(simulation_clock)
 		_heavy_slam_active=false
 		_time_since_grounded=INF # Consume the coyote opportunity; no second air jump.
 	if measured_air_step:velocity.y=measured_end_velocity+gravity*gravity_factor*delta*.5
@@ -470,7 +478,9 @@ func _physics_process(delta:float)->void:
 	# an interrupted ascent at a ceiling) owns the transition into the air loop.
 	if using_original_source and not _grounded and _jump_stage=="JumpTakeoff" and velocity.y<=0.:
 		_jump_stage="JumpAirborne";_jump_time=0.
-	if _grounded and not was_grounded and _floor_initialized and _jump_stage!="JumpLanding":_jump_stage="JumpLanding";_jump_time=0.
+	if _grounded and not was_grounded and _floor_initialized and _jump_stage!="JumpLanding":
+		_jump_stage="JumpLanding";_jump_time=0.
+		if novelty_jump!=null:novelty_jump.contact(simulation_clock+delta)
 	elif not _grounded and _jump_stage.is_empty():_jump_stage="JumpAirborne";_jump_time=0.
 	_floor_initialized=_floor_initialized or _grounded
 	current_speed=Vector2(get_real_velocity().x,get_real_velocity().z).length()
@@ -522,6 +532,7 @@ func _animate(delta:float)->void:
 	var moving_legs:bool=layered_combat and combo.movement_allowed() and motion_speed>.001 and _move_requested
 	_playback_speed=1.
 	if review_clip.is_empty() and combo.active():_playback_speed=combo.playback_rate()
+	if selected=="JumpFlip" and review_clip.is_empty():_playback_speed=float(clips.JumpFlip.duration)/(2.*sqrt(2.*jump_height/gravity))
 	if review_clip.is_empty() and selected in GAITS:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
 		_playback_speed=maxf(0.,motion_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
@@ -635,6 +646,7 @@ func _refresh_markers()->void:
 func _select_clip()->String:
 	if not review_clip.is_empty():return review_clip
 	if combo.active():return combo.clip()
+	if novelty_jump!=null and novelty_jump.flip and _jump_stage in ["JumpTakeoff","JumpAirborne"]:return "JumpFlip"
 	if not _jump_stage.is_empty():return _jump_stage
 	# Input intent alone cannot hold a running pose against a blocked capsule.
 	# These are local physics equivalents; native boolean thresholds remain unknown.
@@ -675,7 +687,7 @@ func _play(key:String,blend:float=.04)->void:
 			var idle_to_move:bool=active_clip in ["Idle","CombatReady"] and key in GAITS
 			var move_to_idle:bool=active_clip in GAITS and key in ["Idle","CombatReady"]
 			var continuous_hybrid_jump:bool=hybrid_motion!=null and active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding"] and key in ["JumpTakeoff","JumpAirborne","JumpLanding"] and not(key=="JumpLanding" and _move_requested)
-			var hybrid_jump_boundary:bool=hybrid_motion!=null and (active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding"] or key in ["JumpTakeoff","JumpAirborne","JumpLanding"])
+			var hybrid_jump_boundary:bool=hybrid_motion!=null and (active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding","JumpFlip"] or key in ["JumpTakeoff","JumpAirborne","JumpLanding","JumpFlip"])
 			if _continuous_combat_segment(active_clip,key) or continuous_hybrid_jump:
 				_outgoing_locomotion_state.clear();source_transition.discard_raw()
 			elif _combat_entry(key):
@@ -700,6 +712,7 @@ func _play(key:String,blend:float=.04)->void:
 func attack(value:bool)->void:
 	if value:resume_gameplay()
 	combo.attack(value,not _grounded)
+	if novelty_jump!=null and combo.active():novelty_jump.cancel()
 	_record_order(&"attack_command",{"requested_level":value,"airborne":not _grounded})
 func note_input_source(action:StringName,pressed:bool,stage:StringName)->void:
 	_record_order(&"input_receipt",{"action":str(action),"pressed":pressed,"dispatch_stage":str(stage)})
@@ -710,6 +723,7 @@ func _record_order(kind:StringName,extra:Dictionary={})->void:
 func input_order_snapshot()->Dictionary:return input_order_trace.snapshot()
 func review(key:String)->void:
 	if not clips.has(key):return
+	if novelty_jump!=null:novelty_jump.cancel()
 	if foot_placement!=null:foot_placement.clear()
 	if body_stability!=null:body_stability.deactivate()
 	if direction_adapter!=null:direction_adapter.deactivate()
@@ -751,6 +765,7 @@ func release_inputs()->void:
 	combo.release_inputs();combat_requested=false;has_aim_point=false;turn_axis=0.;requested_direction=Vector2.ZERO;requested_run=false;requested_jump=false;_jump_held=false
 	_record_order(&"release_commands")
 func reset_actor()->void:
+	if novelty_jump!=null:novelty_jump.reset()
 	if hybrid_motion!=null:hybrid_motion.reset()
 	if foot_placement!=null:foot_placement.clear()
 	input_order_trace.clear()
