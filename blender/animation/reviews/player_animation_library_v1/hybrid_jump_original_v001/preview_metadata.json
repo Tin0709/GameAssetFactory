@@ -1,0 +1,10 @@
+{
+  "actual_blender_frames": 60,
+  "encoded_frames": 26,
+  "identical_holds_merged_by_codec": true,
+  "duration_ms": 2000,
+  "average_sample_fps": 30,
+  "interpolated_frames": false,
+  "source": "Saved original authoring Action plus separate preview elevation, same stage as central",
+  "bytes": 1202171
+}
