@@ -1,0 +1,27 @@
+{
+  "v001": {
+    "landing_s": 0.3,
+    "hip_minimum_mm": -45.0,
+    "first_hip_minimum_s": 0.055,
+    "torso_maximum_s": 0.060000000000000005,
+    "head_maximum_s": 0.075,
+    "head_pitch_max_deg": 4.5,
+    "head_lag_after_torso_maximum_ms": 14.999999999999993,
+    "hip_speed_max_m_s": 1.5340773854781788,
+    "hip_acceleration_max_m_s2": 85.88569653084598,
+    "hip_velocity_at_210ms_m_s": 0.05140715453209529
+  },
+  "v002": {
+    "landing_s": 0.75,
+    "hip_minimum_mm": -62.0,
+    "first_hip_minimum_s": 0.115,
+    "torso_maximum_s": 0.10500000000000001,
+    "head_maximum_s": 0.20500000000000002,
+    "head_pitch_max_deg": 8.5,
+    "head_lag_after_torso_maximum_ms": 100.0,
+    "hip_speed_max_m_s": 0.8086948368538418,
+    "hip_acceleration_max_m_s2": 28.07962521574752,
+    "hip_velocity_at_210ms_m_s": 0.20134408467882556
+  },
+  "scope": "Analytical original response curves, not recovered native physics. Actual saved rig measurements are separate. Same presentation arc and original takeoff/airborne in A-B."
+}

@@ -32,7 +32,7 @@ def build(native,native_mesh,action,m):
  for name,pos,energy in [('Key',(1,-5,8),1400),('Fill',(-5,1,5),900)]:
   data=bpy.data.lights.new('Hybrid_Jump_V002_'+name,'AREA');data.energy=energy;data.size=6;o=link(bpy.data.objects.new(data.name,data));o.location=pos;o.rotation_euler=(Vector((0,0,1))-o.location).to_track_quat('-Z','Y').to_euler()
  hud=link(bpy.data.objects.new('Hybrid_Jump_V002_HUD',None));hud.parent=scene.camera
- for i,(body,y,size)in enumerate([('JUMP LANDING  |  BODY / HEAD A-B',2.05,.13),('SAME FLIGHT  /  SAME CONTACT  /  RIGID LIMBS',1.83,.09),('PENDING  |  ORIGINAL KEYS  |  PREVIEW ARC',-2.06,.09)]):
+ for i,(body,y,size)in enumerate([('JUMP LANDING  |  BODY / HEAD A-B',1.88,.13),('SAME FLIGHT  /  SAME CONTACT  /  RIGID LIMBS',1.66,.09),('PENDING  |  ORIGINAL KEYS  |  PREVIEW ARC',-1.93,.09)]):
   data=bpy.data.curves.new('Hybrid_Jump_V002_Label_'+str(i),'FONT');data.body=body;data.align_x='CENTER';data.size=size;data.materials.append(ink);obj=link(bpy.data.objects.new(data.name,data));obj.parent=hud;obj.location=(0,y,-4);obj.visible_shadow=False
  a=bpy.data.actions.new('PREVIEW_ONLY_Hybrid_Jump_V002_Elevation');a.use_fake_user=True;slot=a.slots.new(id_type='OBJECT',name=carrier.name);bag=a.layers.new('Presentation elevation only').strips.new(type='KEYFRAME').channelbags.new(slot)
  times=sorted(set([i/(m.FPS*8)for i in range(round(m.DURATION*m.FPS*8)+1)]+m.landmarks('context')))
@@ -65,6 +65,6 @@ def build(native,native_mesh,action,m):
   c.update()
  root1.animation_data_create();root1.animation_data.action=a1;root1.animation_data.action_slot=slot1
  for i,label in enumerate(['V001  PREVIOUS','V002  SOFT BODY + HEAD']):
-  data=bpy.data.curves.new('Hybrid_Jump_V002_Actor_Header_'+str(i),'FONT');data.body=label;data.align_x='CENTER';data.size=.1;data.materials.append(ink);obj=link(bpy.data.objects.new(data.name,data));obj.parent=hud;obj.location=((i-.5)*2.7,1.6,-4);obj.visible_shadow=False
+  data=bpy.data.curves.new('Hybrid_Jump_V002_Actor_Header_'+str(i),'FONT');data.body=label;data.align_x='CENTER';data.size=.1;data.materials.append(ink);obj=link(bpy.data.objects.new(data.name,data));obj.parent=hud;obj.location=((i-.5)*2.7,1.4,-4);obj.visible_shadow=False
  scene.frame_set(1)
  return scene,carrier,rig,mesh,a,cameras,hud
