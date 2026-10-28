@@ -50,18 +50,18 @@ def record(values,f):
 specs=[dict(action='Jump_Takeoff_MD2_AS_Original_v001_PENDING',duration=m.TAKEOFF,phase='takeoff',loop=False,floor=-.04),dict(action='Jump_Airborne_MD2_AS_Original_v001_PENDING',duration=m.AIR_LOOP,phase='airborne',loop=True,floor=-.04),dict(action='Jump_Landing_MD2_AS_Original_v001_PENDING',duration=m.LANDING,phase='landing',loop=False,floor=0),dict(action='PREVIEW_ONLY_Jump_MD2_AS_Context_Original_v001_PENDING',duration=m.DURATION,phase='context',loop=False,floor=-.04,preview_only=True)]
 actions=[]
 for spec in specs:
- values={};n=round(spec['duration']*m.FPS*8)
- for j in range(n+1):
-  t=j/(m.FPS*8);phase=spec['phase']
+ values={};n=round(spec['duration']*m.FPS*8);phase=spec['phase']
+ times=sorted(set([j/(m.FPS*8)for j in range(n+1)]+m.landmarks(phase)))
+ for t in times:
   if phase=='context':d,ground,_=m.context(t)
   else:d=getattr(m,phase)(t);ground=phase=='landing'
-  pose(d,ground);record(values,1+j/8)
+  pose(d,ground);record(values,1+t*m.FPS)
  a=bpy.data.actions.new(spec['action']);a.use_fake_user=True;slot=a.slots.new(id_type='OBJECT',name=rig.name);bag=a.layers.new('Independent original jump pose').strips.new(type='KEYFRAME').channelbags.new(slot)
  for(path,index),coords in values.items():
   c=bag.fcurves.new(path,index=index);c.keyframe_points.add(len(coords)//2);c.keyframe_points.foreach_set('co',coords)
   for k in c.keyframe_points:k.interpolation='LINEAR'
   c.update()
- a['original_authored']=True;a['source_keyframes_copied']=False;a['status']='pending';spec['start']=1;spec['end']=round(spec['duration']*m.FPS);actions.append(a)
+ a['original_authored']=True;a['source_keyframes_copied']=False;a['status']='pending';spec['start']=1;spec['end']=round(spec['duration']*m.FPS)+(1 if phase in ['takeoff','landing']else 0);actions.append(a)
  print('AUTHORED',a.name,flush=True)
 rig.animation_data_create();rig.animation_data.action=actions[-1];rig.animation_data.action_slot=actions[-1].slots[0]
 scene=bpy.context.scene;scene.name='HYBRID_JUMP_ORIGINAL_AUTHORING';scene.render.fps=60;scene.render.fps_base=1;scene.frame_start=1;scene.frame_end=120;scene.frame_set(1)

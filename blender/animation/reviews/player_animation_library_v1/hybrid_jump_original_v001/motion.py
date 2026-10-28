@@ -13,6 +13,13 @@ APEX_TIME=.25
 HEIGHT=1.2
 START=.4
 DURATION=2.
+TAKEOFF_LANDMARKS=[0,.035,.045,.05,.06,.10,.12,.14,.16,.19,.20,.21,.22,.23,.24,.27,.4]
+LANDING_LANDMARKS=[0,.055,.06,.065,.075,.08,.13,.14,.15,.16,.18,.195,.21,.23,.3]
+def landmarks(phase):
+ if phase=='takeoff':return TAKEOFF_LANDMARKS
+ if phase=='landing':return LANDING_LANDMARKS
+ if phase=='airborne':return [0,AIR_LOOP]
+ return [0,DURATION,START+APEX_TIME,START+FLIGHT]+[START+t for t in TAKEOFF_LANDMARKS]+[START+FLIGHT+t for t in LANDING_LANDMARKS]
 def ease(x):
  x=max(0.,min(1.,x));return x*x*x*(x*(x*6-15)+10)
 def curve(t,knots):
