@@ -489,7 +489,7 @@ class GAF_PT_animation_library(bpy.types.Panel):
         if s.get(REVIEW_TAG):
             try:e=json.loads(s[REVIEW_ENTRY])
             except (KeyError,ValueError):layout.label(text='Review registration is missing',icon='ERROR');return
-            box=layout.box();box.label(text=e.get('label',e['id']));box.label(text=e['status'].upper()+' — SOURCE RESEARCH ONLY',icon='CHECKMARK' if e['status']=='approved' else 'TIME')
+            box=layout.box();box.label(text=e.get('label',e['id']));box.label(text=e['status'].upper()+(' — ORIGINAL MOTION COMPARISON' if e.get('original_authored_comparison') else ' — SOURCE RESEARCH ONLY'),icon='CHECKMARK' if e['status']=='approved' else 'TIME')
             box.label(text=f"F{e['start']}–{e['end']}  |  {e['fps']/e['fps_base']:g} FPS")
             box.label(text='Continuous take; replay resets clocks')
             row=layout.row(align=True);row.operator('gaf.play_pause',text='Pause' if context.screen.is_animation_playing else 'Play',icon='PAUSE' if context.screen.is_animation_playing else 'PLAY');row.operator('gaf.restart',icon='REW')
