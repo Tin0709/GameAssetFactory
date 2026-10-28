@@ -161,6 +161,9 @@ func _build_movement_panel()->void:
 func set_native_pixels(value:bool)->void:
 	native_pixels=value;apply_visual_clarity()
 func set_contact_course(value:bool)->void:
+	if movement_panel!=null:
+		var toggle:=movement_panel.find_child("FootContactCourseToggle",true,false) as CheckButton
+		if toggle!=null:toggle.set_pressed_no_signal(value)
 	if value and is_instance_valid(_contact_course):return
 	if not value and not is_instance_valid(_contact_course):return
 	release_inputs();actor.combo.cancel();actor.velocity=Vector3.ZERO
