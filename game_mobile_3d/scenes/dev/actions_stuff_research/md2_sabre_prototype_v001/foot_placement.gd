@@ -109,16 +109,21 @@ func apply(delta:float,grounded:bool,raw_review:bool,allow_plant:bool,serial:int
 		if s.planted:
 			var error:Vector3=Vector3(s.anchor)-center;error.y=0.
 			correction=error.limit_length(LEG_HORIZONTAL_LIMIT)
-		# Also prevent near-ground strike/swing penetration without pinning its
-		# authored horizontal trajectory. Swing height above the floor is retained.
-		if grounds[side].valid and (s.planted or float(grounds[side].lift)>0.):
-			correction.y=clampf(float(grounds[side].lift)-pelvis+.001,-LEG_VERTICAL_LIMIT,LEG_VERTICAL_LIMIT)
-		else:correction.y=clampf(-pelvis,-LEG_VERTICAL_LIMIT,LEG_VERTICAL_LIMIT)
 		var old:Vector3=s.get("correction",Vector3.ZERO)
 		# A valid plant is a world-space constraint, not a filtered pursuit of
 		# its anchor. Filter only the release back to the authored trajectory.
 		var horizontal:=Vector2(correction.x,correction.z) if s.planted else Vector2(old.x,old.z).lerp(Vector2.ZERO,1.-exp(-35.*delta))
 		correction.x=horizontal.x;correction.z=horizontal.y
+		# Ground support must follow the FINAL horizontal footprint. At a step
+		# edge its raw animation footprint may already be on a different slab.
+		var support:Dictionary=grounds[side]
+		if enabled and horizontal.length_squared()>.00000001:
+			var shifted:Array[Vector3]=[]
+			for p:Vector3 in raw[side].points:shifted.append(p+Vector3(correction.x,0.,correction.z))
+			support=_ground({"points":shifted})
+		if support.valid and (s.planted or float(support.lift)>0.):
+			correction.y=clampf(float(support.lift)-pelvis+.001,-LEG_VERTICAL_LIMIT,LEG_VERTICAL_LIMIT)
+		else:correction.y=clampf(-pelvis,-LEG_VERTICAL_LIMIT,LEG_VERTICAL_LIMIT)
 		s.correction=correction;targets.append(correction if enabled else Vector3.ZERO)
 	for side in 2:
 		var bone:int=geometry.legs[side];var pose:=rig.get_bone_pose(bone);_saved[bone]=pose
