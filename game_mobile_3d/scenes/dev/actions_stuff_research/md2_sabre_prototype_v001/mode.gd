@@ -137,6 +137,10 @@ func _build_movement_panel()->void:
 	movement_panel.grow_vertical=Control.GROW_DIRECTION_BEGIN
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.035,.045,.9);style.set_content_margin_all(9);style.set_corner_radius_all(5);movement_panel.add_theme_stylebox_override("panel",style)
 	var box:=VBoxContainer.new();movement_panel.add_child(box)
+	if actor.foot_placement!=null:
+		var feet:=CheckButton.new();feet.name="FootPlacementToggle";feet.text="Rigid foot contact · original adapter";feet.button_pressed=actor.foot_placement.enabled;feet.focus_mode=Control.FOCUS_NONE;box.add_child(feet)
+		feet.tooltip_text="Bounded sole anchors and whole-body settling; not recovered MD2 IK. Raw animation review bypasses it. Reset meter after switching for an A/B measurement."
+		feet.toggled.connect(func(value:bool):actor.foot_placement.set_enabled(value);actor.presentation_reset.emit())
 	var heading:=Label.new();heading.text="MOVEMENT METER · actual physics travel";heading.add_theme_font_size_override("font_size",12);box.add_child(heading)
 	movement_label=Label.new();movement_label.add_theme_font_size_override("font_size",12);box.add_child(movement_label)
 	camera_label=Label.new();camera_label.add_theme_font_size_override("font_size",12);box.add_child(camera_label)
@@ -196,6 +200,9 @@ func present(delta:float)->void:
 		var response:String="—" if m.response_95<0. else "%d ms"%roundi(m.response_95*1000.)
 		movement_label.text="Speed %.2f / target %.2f u/s · peak %.2f\nPath %.2f · net %.2f units · %.1f s\nGait %.2f cycles/s · %.3fx · total %.2f\nStart95 %s · stop %.3fu / %.3fs\nSole candidates L %s / R %s u/s"%[m.speed,m.target_speed,m.peak_speed,m.distance,m.net_distance,m.elapsed,m.cycle_hz,m.play_rate,m.gait_cycles,response,m.stop_distance,m.stop_seconds,left,right]
 		movement_label.tooltip_text="Sole motion includes rolling, not proven contact or foot slip. Normal gait cadence and combat notify gates are source-backed; mask/contact and input buffer remain reconstructed. Save JSON retains all measurements."
+		if m.has("foot_ground"):
+			var feet:Dictionary=m.foot_ground
+			movement_label.text+="\nFoot contact %s · slide RMS %.2f m/s\nPenetration %.1f mm · pelvis %+.1f mm\nCorrection accel RMS %.2f m/s²"%["ON" if actor.foot_placement.enabled else "OFF",feet.slip_rms_m_s,float(feet.get("penetration_m",0.))*1000.,float(feet.get("pelvis_m",0.))*1000.,feet.body_correction_accel_rms_m_s2]
 		if actor.using_original_source:
 			var body_angle:String="—" if m.body_travel_angle_deg==null else "%.1f°"%float(m.body_travel_angle_deg)
 			var leg_angle:String="—" if m.legs_travel_angle_deg==null else "%.1f°"%float(m.legs_travel_angle_deg)

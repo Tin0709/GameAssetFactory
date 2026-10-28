@@ -17,6 +17,7 @@ const SourceTransition=preload("res://scenes/dev/actions_stuff_research/md2_sabr
 const SourceGait=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
 const CombatLegs=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combat_legs.gd")
 const InputOrderTrace=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/input_order_trace.gd")
+const FootPlacement=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/foot_placement.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 # User-accepted jump study; native launch/scale recovered, full trajectory pending.
@@ -56,6 +57,7 @@ var combat_handoffs:Dictionary={}
 var _outgoing_locomotion_state:Dictionary={}
 var combat_legs:RefCounted
 var input_order_trace=InputOrderTrace.new()
+var foot_placement:RefCounted
 var _combat_plan_active:=false
 var _combat_open_seconds:=0.
 var _animation_motion_speed:=0.
@@ -211,6 +213,8 @@ func _ready()->void:
 	_play("Idle",0.);_apply_face(0.)
 	movement_meter.reset(global_position)
 	input_order_trace.enabled=using_original_source
+	if using_original_source and direction_adapter!=null:
+		foot_placement=FootPlacement.new();foot_placement.setup(self,direction_adapter)
 
 func private_model_path()->String:
 	if not private_model_path_override.is_empty():return private_model_path_override
@@ -354,6 +358,7 @@ func _load_private_combat_clips(config:Variant)->void:
 	supplemental_combat_clips=staged.size()
 
 func _physics_process(delta:float)->void:
+	if foot_placement!=null:foot_placement.restore()
 	_record_order(&"physics_begin",{"delta":delta})
 	var stick:=requested_direction if scripted_input else Input.get_vector("move_left","move_right","move_forward","move_backward")
 	if not scripted_input:stick=_movement_right*stick.x+_movement_back*stick.y
@@ -445,12 +450,16 @@ func _physics_process(delta:float)->void:
 		var step:=minf(left,1./120.)
 		if combo.active():step=minf(step,maxf(.00000001,combo.boundary_seconds()))
 		_animate(step);left-=step
+	if foot_placement!=null:
+		foot_placement.apply(delta,_grounded,not review_clip.is_empty(),not combo.active() or combo.movement_allowed(),combo.serial)
+		_refresh_markers()
 	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and (not combo.active() or (combo.native_enabled and combo.movement_allowed()))) if direction_adapter!=null else []
 	movement_meter.sample(delta,global_position,desired.length(),_move_requested,_gait_cycles_this_tick,soles)
 	_record_order(&"physics_end",{"open_seconds":_combat_open_seconds,"position":[global_position.x,global_position.y,global_position.z]})
 	physics_pose_ready.emit()
 
 func _animate(delta:float)->void:
+	if foot_placement!=null:foot_placement.restore()
 	var permission_before:bool=combo.movement_allowed()
 	if body_stability!=null:body_stability.restore()
 	if direction_adapter!=null:direction_adapter.restore()
@@ -640,6 +649,7 @@ func _record_order(kind:StringName,extra:Dictionary={})->void:
 func input_order_snapshot()->Dictionary:return input_order_trace.snapshot()
 func review(key:String)->void:
 	if not clips.has(key):return
+	if foot_placement!=null:foot_placement.clear()
 	if body_stability!=null:body_stability.deactivate()
 	if direction_adapter!=null:direction_adapter.deactivate()
 	if combat_legs!=null:combat_legs.clear()
@@ -680,6 +690,7 @@ func release_inputs()->void:
 	combo.release_inputs();combat_requested=false;has_aim_point=false;turn_axis=0.;requested_direction=Vector2.ZERO;requested_run=false;requested_jump=false;_jump_held=false
 	_record_order(&"release_commands")
 func reset_actor()->void:
+	if foot_placement!=null:foot_placement.clear()
 	input_order_trace.clear()
 	if body_stability!=null:body_stability.deactivate()
 	if direction_adapter!=null:direction_adapter.deactivate()
@@ -703,8 +714,10 @@ func reset_actor()->void:
 	presentation_reset.emit()
 func reset_movement_measurements()->void:
 	movement_meter.reset(global_position,_move_requested)
+	if foot_placement!=null:foot_placement.reset_metrics()
 func movement_measurements()->Dictionary:
 	var report:Dictionary=movement_meter.snapshot()
+	if foot_placement!=null:report["foot_ground"]=foot_placement.snapshot()
 	if using_original_source:report.merge({"jump_apex_time_adapter":SOURCE_JUMP_APEX_SECONDS,"moving_landing_release_adapter":SOURCE_MOVING_LAND_SECONDS,"heavy_slam_gravity_multiplier":2.,"effective_gravity":gravity*(2. if _heavy_slam_active else 1.),"jump_phase":_jump_stage})
 	report.merge({"clip":active_clip,"play_rate":_playback_speed,"world_velocity":[velocity.x,velocity.y,velocity.z],"walk_speed":walk_speed,"run_speed":run_speed,"walk_stride_reference":walk_stride_speed,"run_stride_reference":run_stride_speed,"source_table_speed":700 if using_original_source else null,"unit_conversion":"100UU per Godot metre; local effective MD2 runtime unverified" if using_original_source else "authored fallback","acceleration_setting":acceleration,"deceleration_setting":deceleration,"turn_rate_adapter":12.,"attack_travel_adapter":.22,"coyote_time":coyote_time,"jump_height_adapter":jump_height,"gravity_adapter":gravity,"native_runtime_parameters_recovered":false})
 	if using_original_source:report.merge({"attack_travel_adapter":0.,"body_stability_enabled":body_stability_enabled,"retained_body_oscillation_adapter":BodyStability.RETAINED_OSCILLATION,"body_stability_strength":body_stability.strength},true)
