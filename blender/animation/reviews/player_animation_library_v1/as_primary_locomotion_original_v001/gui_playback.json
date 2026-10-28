@@ -1,0 +1,70 @@
+[
+  {
+    "elapsed": 2.528838400001405,
+    "frame": 2,
+    "playing": true,
+    "scene": "ASPrimary_WalkRun_Comparison_PENDING",
+    "sync": "FRAME_DROP",
+    "actors": [
+      [
+        "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_0_Rig",
+        "Walk_ASInspired_Original_v001_PENDING"
+      ],
+      [
+        "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Rig",
+        "Run_ASInspired_Original_v001_PENDING"
+      ]
+    ]
+  },
+  {
+    "elapsed": 4.245055500010494,
+    "frame": 105,
+    "playing": true,
+    "scene": "ASPrimary_WalkRun_Comparison_PENDING",
+    "sync": "FRAME_DROP",
+    "actors": [
+      [
+        "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_0_Rig",
+        "Walk_ASInspired_Original_v001_PENDING"
+      ],
+      [
+        "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Rig",
+        "Run_ASInspired_Original_v001_PENDING"
+      ]
+    ]
+  },
+  {
+    "elapsed": 5.961002500000177,
+    "frame": 58,
+    "playing": true,
+    "scene": "ASPrimary_WalkRun_Comparison_PENDING",
+    "sync": "FRAME_DROP",
+    "actors": [
+      [
+        "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_0_Rig",
+        "Walk_ASInspired_Original_v001_PENDING"
+      ],
+      [
+        "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Rig",
+        "Run_ASInspired_Original_v001_PENDING"
+      ]
+    ]
+  },
+  {
+    "elapsed": 7.676478400011547,
+    "frame": 10,
+    "playing": true,
+    "scene": "ASPrimary_WalkRun_Comparison_PENDING",
+    "sync": "FRAME_DROP",
+    "actors": [
+      [
+        "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_0_Rig",
+        "Walk_ASInspired_Original_v001_PENDING"
+      ],
+      [
+        "ASPrimary_ASPrimary_WalkRun_Comparison_PENDING_1_Rig",
+        "Run_ASInspired_Original_v001_PENDING"
+      ]
+    ]
+  }
+]
