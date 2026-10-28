@@ -1,0 +1,135 @@
+{
+  "old_actions_preserved": 101,
+  "old_registrations_preserved": 66,
+  "new_pending_character_actions": 3,
+  "static_presentation_actions_added": 1,
+  "total_actions": 105,
+  "gait_hz": 1.888,
+  "godot_files_byte_identical": 508,
+  "reopen": {
+    "old_entries_preserved": 66,
+    "old_review_entries_preserved": 2,
+    "total_actions": 105,
+    "new_pending": [
+      {
+        "action": "Run_Hybrid_V1_Subtle_Bounce_Original_v001",
+        "pose_cycle_error": 0.0,
+        "selected_slot": "OBHybridRun_Authoring_Rig"
+      },
+      {
+        "action": "Run_Hybrid_V2_Balanced_Bounce_Original_v001",
+        "pose_cycle_error": 0.0,
+        "selected_slot": "OBHybridRun_Authoring_Rig"
+      },
+      {
+        "action": "Run_Hybrid_V3_Expressive_Bounce_Original_v001",
+        "pose_cycle_error": 0.0,
+        "selected_slot": "OBHybridRun_Authoring_Rig"
+      }
+    ],
+    "comparison_cameras": 3,
+    "synchronized_actors": 3,
+    "gait_hz": 1.888,
+    "frame_bounds": [
+      1,
+      128
+    ],
+    "fps_base": 0.9931144118309021,
+    "sync_mode": "FRAME_DROP"
+  },
+  "measurements": {
+    "scope": "Actually evaluated source study; rolling-edge stance schedule is original, not recovered native MD2 contacts. Virtual travel7m/s, in-place rig root. No terrain IK.",
+    "metrics": [
+      {
+        "action": "Run_Hybrid_V1_Subtle_Bounce_Original_v001",
+        "hip_bounce_mm": 24.99997615814209,
+        "torso_yaw_peak_to_peak_deg": 7.999996522934481,
+        "head_world_relative_rest_peak_abs_deg": [
+          0.5999716073784421,
+          0.2699964707561049,
+          0.23999870680823202
+        ],
+        "rolling_contact_samples": 322,
+        "rolling_contact_speed_rms_m_s": 0.018879852642714447,
+        "rolling_contact_speed_max_m_s": 0.019991432202879383,
+        "max_floor_penetration_mm": 0,
+        "max_scale_error": 0.0,
+        "leg_pivot_offset_z_m": [
+          0.0,
+          0.12971556186676025
+        ],
+        "gait_hz": 1.888,
+        "stance_fraction_original": 0.16,
+        "phase_origin": 0.25,
+        "root_world_travel_m": 0
+      },
+      {
+        "action": "Run_Hybrid_V2_Balanced_Bounce_Original_v001",
+        "hip_bounce_mm": 44.999897480010986,
+        "torso_yaw_peak_to_peak_deg": 13.9999949823524,
+        "head_world_relative_rest_peak_abs_deg": [
+          0.9999519674860317,
+          0.44999452702671366,
+          0.3999977824260583
+        ],
+        "rolling_contact_samples": 322,
+        "rolling_contact_speed_rms_m_s": 0.018876179347662597,
+        "rolling_contact_speed_max_m_s": 0.019891798118539125,
+        "max_floor_penetration_mm": 0,
+        "max_scale_error": 0.0,
+        "leg_pivot_offset_z_m": [
+          0.0,
+          0.13478147983551025
+        ],
+        "gait_hz": 1.888,
+        "stance_fraction_original": 0.16,
+        "phase_origin": 0.25,
+        "root_world_travel_m": 0
+      },
+      {
+        "action": "Run_Hybrid_V3_Expressive_Bounce_Original_v001",
+        "hip_bounce_mm": 64.99987840652466,
+        "torso_yaw_peak_to_peak_deg": 19.99999088044938,
+        "head_world_relative_rest_peak_abs_deg": [
+          1.4999241626084923,
+          0.6749918972617763,
+          0.5999939122149505
+        ],
+        "rolling_contact_samples": 322,
+        "rolling_contact_speed_rms_m_s": 0.01887626263107842,
+        "rolling_contact_speed_max_m_s": 0.019891798118539125,
+        "max_floor_penetration_mm": 0,
+        "max_scale_error": 0.0,
+        "leg_pivot_offset_z_m": [
+          0.0,
+          0.1400139331817627
+        ],
+        "gait_hz": 1.888,
+        "stance_fraction_original": 0.16,
+        "phase_origin": 0.25,
+        "root_world_travel_m": 0
+      }
+    ]
+  },
+  "seams": [
+    {
+      "action": "Run_Hybrid_V1_Subtle_Bounce_Original_v001",
+      "four_cycle_pose_seam_error": 0.0,
+      "bone_origin_velocity_seam_difference_m_s": 0.028930424067143377,
+      "opposite_leg_half_phase_matrix_error": 4.996003610813204e-16
+    },
+    {
+      "action": "Run_Hybrid_V2_Balanced_Bounce_Original_v001",
+      "four_cycle_pose_seam_error": 0.0,
+      "bone_origin_velocity_seam_difference_m_s": 0.037848142479944946,
+      "opposite_leg_half_phase_matrix_error": 2.220446049250313e-16
+    },
+    {
+      "action": "Run_Hybrid_V3_Expressive_Bounce_Original_v001",
+      "four_cycle_pose_seam_error": 0.0,
+      "bone_origin_velocity_seam_difference_m_s": 0.04719363748339866,
+      "opposite_leg_half_phase_matrix_error": 1.2212453270876722e-15
+    }
+  ],
+  "review_scope": "Measured original Blender prototype; native MD2 contact masks are not recovered. Human artistic selection pending. Independent reviewer unavailable (two model-capacity failures); no external-review claim."
+}
