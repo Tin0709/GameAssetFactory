@@ -60,6 +60,17 @@ func run()->void:
 		check(a.active_clip=="AirAttack" and not a.novelty_jump.flip,"Sabre air attack takes pose ownership from flip "+str(hz))
 		await ticks(hz*2)
 		check(a.is_on_floor() and a.skeleton.get_bone_global_pose(a.skeleton.find_bone("J_Head")).is_finite(),"Interrupted flip returns to intact grounded pose "+str(hz))
+	# A short drop can physically land again before the old receiving state ends.
+	# Chain bookkeeping follows collision contact, not animation-stage replacement.
+	a.reset_actor();await ticks(3);a._jump_stage="JumpLanding";a._jump_time=.02
+	a.global_position.y=.2;a.velocity.y=.1;a.novelty_jump.variant=1;a.novelty_jump.last_contact=a.simulation_clock-.4
+	await tick()
+	for i in 60:
+		if a._grounded:break
+		await tick()
+	check(a._grounded and a._jump_stage=="JumpLanding","Short drop returns during previous receiving state")
+	a.requested_jump=true;await tick();a.requested_jump=false
+	check(a.novelty_jump.flip,"Every real floor contact refreshes chain clock even during existing landing")
 	finish(lab)
 func finish(lab)->void:
 	var report:={"checks":checks,"failures":failures,"cases":rows};print("NOVELTY_JUMP ",JSON.stringify(report))
