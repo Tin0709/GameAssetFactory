@@ -17,6 +17,7 @@ var owns_pose:=false
 var flight_elapsed:=0.
 var landing_elapsed:=0.
 var landing_duration:=1.
+var compact_landing_seconds:=0.
 var landing_moving:=false
 var landing_move_weight:=0.
 var landing_samples:=0
@@ -162,6 +163,19 @@ func _locals(deforms:Array[Transform3D])->Array[Transform3D]:
 func outgoing_pose(delta:float,cursor:Dictionary,speed:float)->Array[Transform3D]:
 	cursor.phase=fposmod(float(cursor.phase)+delta/period(speed,float(cursor.weight)),1.)
 	return _locals(_ground_deforms(float(cursor.phase),float(cursor.weight)))
+func landing_source_age(age:float,source_duration:float)->float:
+	if compact_landing_seconds<=0.:return age
+	# Original presentation clock: retain the soft first contact, then complete
+	# one authored compression/rebound in the short receiving interval.
+	# Monotone Hermite interpolation keeps speed continuous at the two joins.
+	var x:=[0.,.08,.18,.30];var y:=[0.,.10,.45 if source_duration>.8 else .35,source_duration]
+	var t:=clampf(age*.30/compact_landing_seconds,0.,.30)
+	var slopes:Array[float]=[]
+	for i in 3:slopes.append((y[i+1]-y[i])/(x[i+1]-x[i]))
+	var tangent:=[slopes[0],2.*slopes[0]*slopes[1]/(slopes[0]+slopes[1]),2.*slopes[1]*slopes[2]/(slopes[1]+slopes[2]),slopes[2]]
+	var segment:=0 if t<.08 else (1 if t<.18 else 2)
+	var width:float=x[segment+1]-x[segment];var u:float=(t-x[segment])/width
+	return (2.*u*u*u-3.*u*u+1.)*y[segment]+(u*u*u-2.*u*u+u)*width*tangent[segment]+(-2.*u*u*u+3.*u*u)*y[segment+1]+(u*u*u-u*u)*width*tangent[segment+1]
 func apply(actor,key:String,delta:float)->void:
 	phase_advanced=0.;phase_hz=0.;owns_pose=false
 	if not actor.review_clip.is_empty():_last_stage="";return
@@ -174,6 +188,7 @@ func apply(actor,key:String,delta:float)->void:
 		if _last_stage!="JumpLanding":landing_move_weight=1. if moving else 0.;landing_duration=.75 if moving else 1.
 		landing_elapsed=maxf(float(actor._jump_time),0.);landing_moving=moving
 		if not moving:landing_duration=1.
+		if compact_landing_seconds>0.:landing_duration=compact_landing_seconds
 		landing_move_weight=move_toward(landing_move_weight,1. if moving else 0.,delta/.10)
 	elif stage in ["JumpTakeoff","JumpAirborne"]:
 		if _last_stage not in ["JumpTakeoff","JumpAirborne"]:flight_elapsed=0. if stage=="JumpTakeoff" else .35
@@ -189,8 +204,8 @@ func apply(actor,key:String,delta:float)->void:
 		if stage=="JumpLanding":
 			var motion_weight:=landing_move_weight*landing_move_weight*(3.-2.*landing_move_weight)
 			landing_samples+=1;last_kind="LandingMoving" if landing_moving else "LandingStationary"
-			deforms=_sample("JumpStationary",.92+landing_elapsed)
-			var moving_source:=_sample("JumpMoving",.92+landing_elapsed)
+			deforms=_sample("JumpStationary",.92+landing_source_age(landing_elapsed,1.))
+			var moving_source:=_sample("JumpMoving",.92+landing_source_age(landing_elapsed,.75))
 			var moving_contact:=_sample("JumpMoving",.92)
 			if motion_weight>0.:
 				var ground:=_ground_deforms(phase,run_weight)
@@ -228,6 +243,8 @@ func apply(actor,key:String,delta:float)->void:
 			var native:=_native_worlds(actor,"JumpLanding",minf(landing_elapsed,float(actor.clips.JumpLanding.duration)))
 			var idle:=_native_worlds(actor,"Idle",fposmod(float(actor.expression_clock),float(actor.clips.Idle.duration)))
 			var settle:=clampf((landing_elapsed-.30)/.35,0.,1.);settle=settle*settle*(3.-2.*settle)
+			if compact_landing_seconds>0.:
+				settle=clampf((landing_elapsed/compact_landing_seconds-.6)/.4,0.,1.);settle=settle*settle*(3.-2.*settle)
 			var receive:=clampf(landing_elapsed/.18,0.,1.);receive=receive*receive*(3.-2.*receive)*landing_move_weight
 			for bone in _arm_bones:
 				var native_relative:Transform3D=native[_body_bone].affine_inverse()*native[bone]
