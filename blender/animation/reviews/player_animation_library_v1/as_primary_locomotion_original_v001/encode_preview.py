@@ -5,9 +5,13 @@ from PIL import Image
 H=Path(__file__).resolve().parent;R=H.parents[4]
 folder=R/'.validation/animation_showcase/as_primary_locomotion_original_v001/preview_frames'
 paths=sorted(folder.glob('*.png'));assert len(paths)==75
+palette_sheet=Image.new('RGB',(960,600*5))
+for j,i in enumerate((0,15,30,45,60)):
+ with Image.open(paths[i])as im:palette_sheet.paste(im.convert('RGB'),(0,600*j))
+palette=palette_sheet.quantize(colors=128)
 frames=[]
 for p in paths:
- with Image.open(p)as im:frames.append(im.convert('RGB').quantize(colors=192))
+ with Image.open(p)as im:frames.append(im.convert('RGB').quantize(palette=palette,dither=Image.Dither.NONE))
 duration=[30,30,40]*25
 out=H/'Walk_Run_Original_Pending.gif'
 frames[0].save(out,save_all=True,append_images=frames[1:],duration=duration,loop=0,optimize=False,disposal=2)
