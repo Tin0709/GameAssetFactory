@@ -9,6 +9,7 @@ var meadow:Node3D
 var meadow_status:Label
 var error_text:=""
 var _status_clock:=0.
+var hud_visible:=true
 
 func _build_environment()->void:
 	# Same inherited floor/contact solver, bounded to24m. Skip its old grass/grid.
@@ -52,7 +53,13 @@ func _process(delta:float)->void:
 
 func _unhandled_input(event:InputEvent)->void:
 	if not error_text.is_empty():return
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_H:
+		set_hud_visible(not hud_visible);get_viewport().set_input_as_handled();return
 	super._unhandled_input(event)
+
+func set_hud_visible(value:bool)->void:
+	hud_visible=value;get_node("OverworldControls").visible=value;sabre_mode.canvas.visible=value
+	if md2_lighting!=null:md2_lighting.ui.visible=value
 
 func _update_camera(delta:float=0.,render_position:Variant=null)->void:
 	var original_blocks:int=grass_field_blocks
@@ -66,7 +73,7 @@ func _build_meadow_ui()->void:
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.035,.87);style.set_corner_radius_all(6);style.content_margin_left=12;style.content_margin_right=12;style.content_margin_top=10;style.content_margin_bottom=10;panel.add_theme_stylebox_override("panel",style)
 	var box:=VBoxContainer.new();box.add_theme_constant_override("separation",4);panel.add_child(box)
 	var title:=Label.new();title.text="OVERWORLD · PRIVATE FIDELITY STUDY";title.add_theme_font_size_override("font_size",15);box.add_child(title)
-	var hint:=Label.new();hint.text="WASD run · Shift walk · Space jump\nLMB / E Sabre · R reset · V overview";hint.add_theme_font_size_override("font_size",12);box.add_child(hint)
+	var hint:=Label.new();hint.text="WASD run · Shift walk · Space jump\nLMB / E Sabre · R reset · V overview · H hide UI";hint.add_theme_font_size_override("font_size",12);box.add_child(hint)
 	_toggle(box,"Wind",true,func(on:bool):meadow.wind_enabled=on)
 	_toggle(box,"Player vegetation interaction",true,func(on:bool):meadow.interactions_enabled=on)
 	_toggle(box,"Ambient audio",true,func(on:bool):environment_audio.ambient_enabled=on)
