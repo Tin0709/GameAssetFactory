@@ -1,0 +1,39 @@
+{
+  "prior_registry_entries_preserved": 69,
+  "prior_review_entries_preserved": 3,
+  "total_actions": 110,
+  "new_pending_actions": [
+    {
+      "action": "Walk_ASInspired_Original_v001_PENDING",
+      "slot": "OBASPrimary_Original_Authoring_Rig",
+      "range": [
+        1,
+        150
+      ],
+      "pending": true
+    },
+    {
+      "action": "Run_ASInspired_Original_v001_PENDING",
+      "slot": "OBASPrimary_Original_Authoring_Rig",
+      "range": [
+        1,
+        150
+      ],
+      "pending": true
+    },
+    {
+      "action": "PREVIEW_ONLY_WalkRun_PhaseTransition_Original_v001_PENDING",
+      "slot": "OBASPrimary_Original_Authoring_Rig",
+      "range": [
+        1,
+        270
+      ],
+      "pending": true
+    }
+  ],
+  "review_cameras_checked": 6,
+  "unchanged_godot_files": 736,
+  "godot_changes": [],
+  "idle_approved_preserved": true,
+  "native_rest_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f"
+}
