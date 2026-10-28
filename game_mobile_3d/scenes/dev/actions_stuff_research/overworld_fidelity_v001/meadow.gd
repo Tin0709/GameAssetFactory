@@ -71,10 +71,11 @@ func _build_ground()->void:
 
 func _build_plants()->void:
 	var short_names:=["SM_GrassShort_01","SM_GrassShort_02"]
-	var medium_names:=["SM_GrassMedium_01","SM_GrassMedium_02","SM_GrassMedium_03","SM_CA1_ShortGrass"]
+	var medium_names:=["SM_GrassMedium_01","SM_GrassMedium_02","SM_GrassMedium_03"]
 	for z in range(-16,16):
 		for x in range(-16,16):
 			for n in 3:
+				if n==2 and _rng.randf()>.3:continue
 				var p:=Vector3(x+_rng.randf(),0.,z+_rng.randf())
 				var density:=foliage_density(p)
 				var patch:=.73+.27*sin(p.x*.51+sin(p.z*.38))*cos(p.z*.42)
@@ -82,7 +83,9 @@ func _build_plants()->void:
 				var names:Array=short_names if n<2 else medium_names
 				_place("MD2 | "+String(names[_rng.randi()%names.size()]),p,_rng.randf()*TAU)
 	# Clusters use independent centers/radii, irregular boundaries and source scale.
-	var color_names:={"pink":["SM_CA1_TulipPink","SM_TulipPink_A"],"yellow":["SM_Dandelion_A","SM_Dandelion_B"],"white":["SM_Daisy_A","SM_AzureBluetFlower_A","SM_OxeyeDaisy_A","SM_Dandelion_C"],"purple":["SM_TPT_Purpleflower_S","SM_TPT_Purpleflower_M","SM_TPT_Purpleflower_L","SM_CornflowerBlue_A"]}
+	# Keep source dimensions1x. Smaller native species dominate the walkable meadow;
+	# the tall library specimens are not a generic uniformly scaled flower population.
+	var color_names:={"pink":["SM_CA1_TulipPink","SM_CA1_TulipPink","SM_CA1_TulipPink","SM_CA1_TulipPink","SM_TulipPink_A"],"yellow":["SM_Dandelion_A","SM_Dandelion_A","SM_Dandelion_A","SM_Dandelion_B"],"white":["SM_Daisy_A","SM_AzureBluetFlower_A","SM_Daisy_A","SM_AzureBluetFlower_A","SM_OxeyeDaisy_A","SM_Dandelion_C"],"purple":["SM_TPT_Purpleflower_S","SM_TPT_Purpleflower_S","SM_TPT_Purpleflower_S","SM_TPT_Purpleflower_M","SM_TPT_Purpleflower_L","SM_CornflowerBlue_A"]}
 	var colors:Array=color_names.keys()
 	for cluster in 32:
 		var center:=Vector2(_rng.randf_range(-14.8,14.8),_rng.randf_range(-14.8,14.8))
@@ -97,10 +100,10 @@ func _build_plants()->void:
 			if flowers.any(func(other:Vector2):return other.distance_squared_to(p2)<.14):continue
 			flowers.append(p2);flower_colors[color]=int(flower_colors.get(color,0))+1
 			_place("MD2 | "+String(names[n%names.size()]),p,_rng.randf()*TAU)
-	var tall_names:=["SM_GrassTall_01","SM_GrassTall_02","SM_CA1_MedGrass","SM_CA1_MedGrass2","SM_CA1_TallGrass","SM_FA1_TallGrass_Cover"]
-	for i in 175:
+	var tall_names:=["SM_GrassTall_01","SM_GrassTall_02"]
+	for i in 40:
 		var p:=Vector3(_rng.randf_range(-15,15),0,_rng.randf_range(-15,15))
-		if foliage_density(p)<.95 or absf(p.x)<3.5:continue
+		if foliage_density(p)<.95 or absf(p.x)<8.:continue
 		_place("MD2 | "+String(tall_names[i%tall_names.size()]),p,_rng.randf()*TAU)
 
 func _build_rocks()->void:

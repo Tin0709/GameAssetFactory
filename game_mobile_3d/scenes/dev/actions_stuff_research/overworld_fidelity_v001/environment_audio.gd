@@ -13,13 +13,16 @@ var rustle_enabled:=true
 var actor:CharacterBody3D
 var meadow:Node3D
 var reader:RefCounted
+var config:Dictionary={}
+var ambience_gain_db:=0.
+var effects_gain_db:=0.
 var groups:Dictionary={}
 var beds:Array[Dictionary]=[]
 var step_voices:Array[AudioStreamPlayer3D]=[]
 var rustle_voices:Array[AudioStreamPlayer3D]=[]
 var nature_voices:Array[AudioStreamPlayer3D]=[]
 var clock:=0.
-var event_count:={"grass":0,"dirt":0,"rustle":0,"nature":0,"landing":0}
+var event_count:={"grass":0,"dirt":0,"rustle":0,"nature":0,"birds":0,"landing":0}
 var last_sources:Dictionary={}
 var events:Array[Dictionary]=[]
 var loaded_count:=0
@@ -30,12 +33,13 @@ var _contacts:Array[bool]=[false,false]
 var _was_grounded:=true
 var _last_step:=-10.
 var _next_nature:=4.
+var _next_bird:=2.5
 var _step_index:=0
 var _rustle_index:=0
 var _nature_index:=0
 
 func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted)->void:
-	actor=body;meadow=field;reader=bundle;_random.seed=281027
+	actor=body;meadow=field;reader=bundle;config=reader.data.get("audio_config",{});_random.seed=281027
 	for key:String in reader.data.audio:
 		var rows:Array=[]
 		for row:Dictionary in reader.data.audio[key]:
@@ -43,9 +47,10 @@ func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted)->void:
 			if stream==null:rejected_count+=1;continue
 			stream.loop=false;rows.append({"stream":stream,"name":row.name,"seconds":row.seconds});loaded_count+=1
 		groups[key]=rows
-	_make_bed("wind",-19.);_make_bed("leaves",-25.)
-	for i in 4:step_voices.append(_voice("Footstep",8.));rustle_voices.append(_voice("Vegetation",7.))
-	for i in 3:nature_voices.append(_voice("MeadowInsect",20.))
+	_make_bed("wind",float(config.get("wind_db",-19.)))
+	for i in 4:step_voices.append(_voice("Footstep",float(config.get("footstep_radius_m",8.))));rustle_voices.append(_voice("Vegetation",float(config.get("environment_radius_m",7.))))
+	for i in 3:
+		var voice:=_voice("MeadowNature",float(config.get("environment_radius_m",20.)));voice.unit_size=float(config.get("nature_unit_size_m_adapter",2.));nature_voices.append(voice)
 	var listener:=AudioListener3D.new();listener.name="GroundLevelAudioListener";actor.add_child(listener);listener.position.y=1.55;listener.make_current()
 	actor.physics_pose_ready.connect(_on_pose)
 	actor.presentation_reset.connect(reset_contacts)
@@ -66,17 +71,21 @@ func _process(delta:float)->void:
 	if not ambient_enabled:return
 	for bed:Dictionary in beds:_advance_bed(bed,delta)
 	if clock>=_next_nature:
-		_next_nature=clock+_random.randf_range(9.,18.)
+		_next_nature=clock+_random.randf_range(12.,21.)
 		var at:Vector3=actor.global_position+Vector3(_random.randf_range(-10.,10.),.2,_random.randf_range(-10.,10.))
-		_play("nature",nature_voices[_nature_index%3],at,-23.,1.);_nature_index+=1
+		_play("nature",nature_voices[_nature_index%3],at,float(config.get("insects_db",-23.)),1.);_nature_index+=1
+	if clock>=_next_bird:
+		_next_bird=clock+_random.randf_range(5.,12.)
+		var at:Vector3=actor.global_position+Vector3(_random.randf_range(-8.,8.),_random.randf_range(1.5,3.5),_random.randf_range(-8.,8.))
+		_play("birds",nature_voices[_nature_index%3],at,float(config.get("birds_db",-18.)),1.);_nature_index+=1
 
 func _advance_bed(bed:Dictionary,delta:float)->void:
 	var voices:Array=bed.voices
 	if not bed.started:
 		bed.started=true;bed.slot=0;bed.elapsed=0.;bed.fading=false;voices[0].play()
 	bed.elapsed+=delta
-	var sway:float=sin(clock*.23)*1.1+sin(clock*.071)*.6
-	var gain:float=float(bed.db)+sway
+	# The recording already contains dynamic wind; do not add unverified gain wobble.
+	var gain:float=float(bed.db)+ambience_gain_db
 	var a:int=bed.slot;var b:int=1-a
 	if not bed.fading and float(bed.elapsed)>=float(bed.length)-float(bed.fade):
 		bed.fading=true;bed.fade_elapsed=0.;voices[b].play()
@@ -97,7 +106,7 @@ func _pick(key:String)->Dictionary:
 func _play(key:String,voice:AudioStreamPlayer3D,point:Vector3,db:float,pitch:float)->void:
 	var row:=_pick(key)
 	if row.is_empty():return
-	voice.stop();voice.stream=row.stream;voice.global_position=point;voice.volume_db=db;voice.pitch_scale=pitch;voice.play()
+	voice.stop();voice.stream=row.stream;voice.global_position=point;voice.volume_db=db+(ambience_gain_db if key in ["nature","birds"]else effects_gain_db);voice.pitch_scale=pitch;voice.play()
 	event_count[key]=int(event_count.get(key,0))+1;last_sources[key]=row.name
 	events.append({"time":clock,"key":key,"name":row.name,"at":[point.x,point.y,point.z]})
 	if events.size()>256:events.pop_front()
@@ -119,10 +128,10 @@ func _on_pose()->void:
 			var position:Vector3=soles[side].center
 			var key:="dirt" if meadow.is_path(position) else "grass"
 			if footsteps_enabled:
-				_play(key,step_voices[_step_index%4],position,-9. if land else -14.,_random.randf_range(.97,1.03));_step_index+=1
+				_play(key,step_voices[_step_index%4],position,float(config.get("landing_db",-9.)) if land else float(config.get("footsteps_db",-14.)),1.);_step_index+=1
 				if land:event_count.landing+=1
 			if rustle_enabled and meadow.interactions_enabled and meadow.foliage_density(position)>.6:
-				_play("rustle",rustle_voices[_rustle_index%4],position+Vector3.UP*.3,-25. if actor.current_speed<4. else -22.,_random.randf_range(.96,1.04));_rustle_index+=1
+				_play("rustle",rustle_voices[_rustle_index%4],position+Vector3.UP*.3,float(config.get("rustle_db",-22.))-(3. if actor.current_speed<4. else 0.),1.);_rustle_index+=1
 	_was_grounded=grounded
 
 func reset_contacts()->void:
