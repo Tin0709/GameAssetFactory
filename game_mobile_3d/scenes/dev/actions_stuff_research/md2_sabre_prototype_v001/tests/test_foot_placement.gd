@@ -56,6 +56,7 @@ func run():
  for n in 120:
   helper.restore();helper.apply(1./120.,true,false,true,0)
  helper.restore();a.position.x=0.;helper.apply(1./120.,true,false,true,0)
+ print("EDGE_DEBUG ",helper._samples(1),helper.states[1],helper.snapshot().penetration_m)
  check(helper.snapshot().penetration_m<.003,"Ground clearance is solved at the anchored footprint across a terrain edge")
 
  helper.clear();a.position=Vector3.ZERO;helper.apply(1./60.,true,false,true,0);helper.restore();a.visual.rotation.y=PI/2.;helper.apply(1./60.,true,false,true,0)
