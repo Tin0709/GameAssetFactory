@@ -44,6 +44,11 @@ func run()->void:
 	for i in 120:await tick()
 	check(not a.measured_jump_active and absf(a.gravity-38.4)<.001,"A/B applies legacy physics only on ground")
 	a.set_measured_jump(true);check(a.measured_jump_active and absf(a.gravity-60.)<.001,"Measured physics can be restored without reloading the scene")
+	# Edge fall -> airborne attack -> accepted coyote jump must clear the slam
+	# before integrating the fresh ordinary jump, not one physics tick later.
+	a.reset_actor();await tick();await tick();a.global_position.y=.2;a.velocity.y=-1.;a._time_since_grounded=.02
+	await tick();a._heavy_slam_active=true;a._time_since_grounded=.03;a.requested_jump=true;await tick();a.requested_jump=false
+	check(absf(a.velocity.y-(14.4-60./120.))<.001 and not a._heavy_slam_active,"Accepted coyote jump integrates normal gravity immediately after slam cancellation")
 	var report:={"checks":checks,"failures":failures,"cases":cases}
 	var output:=OS.get_environment("JUMP_TIMING_OUTPUT")
 	if output.is_empty():output="C:/Users/ADMIN/Desktop/MD2 Research/reports/prototype_sabre/jump_fidelity_20261028/godot_timing.json"
