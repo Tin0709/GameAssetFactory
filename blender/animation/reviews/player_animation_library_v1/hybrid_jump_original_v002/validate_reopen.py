@@ -14,6 +14,9 @@ for e in data['animations'][76:]:
 for name in ['Jump_Landing_MD2_AS_Original_v001_PENDING','Walk_ASInspired_Original_v001_PENDING','Run_ASInspired_Original_v001_PENDING','Idle_ActionsStuff_Source_Test_v001']:
  ui.select_registered_action(bpy.context,name);assert rig.animation_data.action.name==name
 e=data['review_sequences'][-1];ui.validate_review_sequence(e);ui.open_review_sequence(bpy.context,e['id']);s=bpy.context.scene;s.gaf_loop=True
+for label,t in [('COMPRESSION',m.START+m.FLIGHT+.115),('HEAD FOLLOW',m.START+m.FLIGHT+.205)]:
+ marker=s.timeline_markers.get(label)or s.timeline_markers.new(label)
+ marker.frame=int(1+t*60+.5)
 for d in ['FRONT','SIDE','THREE_QUARTER']:ui.view(s,d);assert s.camera.name==e['cameras'][d]
 roots=[bpy.data.objects[e['world_root']],bpy.data.objects['Hybrid_Jump_V002_AB_V1_Root']]
 for t in [0,m.START,m.START+.4,m.START+m.FLIGHT,m.START+m.FLIGHT+.1,m.DURATION]:
@@ -24,5 +27,5 @@ for actor in e['comparison_actors']:assert bpy.data.objects[actor['rig']].animat
 changed=[p for p,digest in base['godot'].items()if hashlib.sha256((R/p).read_bytes()).hexdigest()!=digest];assert not changed
 assert ui.rest_signature(rig.data)==data['rig_sha256']and s.sync_mode=='FRAME_DROP';s.frame_set(1)
 bpy.ops.wm.save_as_mainfile(filepath=str(LIB/'Animation_Showcase.blend'))
-(H/'reopen_validation.json').write_text(json.dumps({'old_registry_entries_preserved':76,'old_reviews_preserved':6,'total_actions':len(bpy.data.actions),'new_pending':checks,'same_arc_actors':2,'unchanged_godot_files':len(base['godot']),'cameras_checked':3,'godot_changes':changed},indent=2),encoding='utf8')
+(H/'reopen_validation.json').write_text(json.dumps({'old_registry_entries_preserved':76,'old_reviews_preserved':6,'total_actions':len(bpy.data.actions),'new_pending':checks,'same_arc_actors':2,'unchanged_godot_files':len(base['godot']),'cameras_checked':3,'godot_changes':changed,'timeline_markers':{key:s.timeline_markers[key].frame for key in ['COMPRESSION','HEAD FOLLOW']}},indent=2),encoding='utf8')
 print('SOFT_JUMP_REOPEN_VALIDATED',len(checks),len(base['godot']),flush=True)

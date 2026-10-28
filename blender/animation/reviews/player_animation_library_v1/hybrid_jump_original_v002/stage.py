@@ -42,7 +42,7 @@ def build(native,native_mesh,action,m):
   c.update()
  carrier.animation_data_create();carrier.animation_data.action=a;carrier.animation_data.action_slot=slot
  scene.frame_start=1;scene.frame_end=144;scene.render.fps=60;scene.render.fps_base=1;scene.render.engine='CYCLES';scene.cycles.samples=12;scene.render.resolution_x=1120;scene.render.resolution_y=760;scene.render.resolution_percentage=100;scene.view_settings.view_transform='Standard'
- for name,t in [('TAKEOFF',m.START),('APEX - PREVIEW ARC',m.START+m.APEX_TIME),('CONTACT',m.START+m.FLIGHT),('COMPRESSION',m.START+m.FLIGHT+.055),('SETTLED',m.START+m.FLIGHT+m.LANDING)]:scene.timeline_markers.new(name,frame=round(1+t*60))
+ for name,t in [('TAKEOFF',m.START),('APEX - PREVIEW ARC',m.START+m.APEX_TIME),('CONTACT',m.START+m.FLIGHT),('COMPRESSION',m.START+m.FLIGHT+.115),('HEAD FOLLOW',m.START+m.FLIGHT+.205),('SETTLED',m.START+m.FLIGHT+m.LANDING)]:scene.timeline_markers.new(name,frame=int(1+t*60+.5))
  scene.frame_set(1)
  # Two actors use precisely the same presentation arc. The v001 source Action
  # is only bound to its own comparison rig, never edited or rewritten.
