@@ -86,6 +86,8 @@ func setup(skeleton:Skeleton3D,path:String,target_path:String)->bool:
 		var arm:=rig.find_bone(item.bone);var body:=rig.find_bone(item.body)
 		if arm<0 or body<0:return false
 		if data.bone_groups[item.body]!="Chest" or data.bone_groups[item.bone]!=("UpperArm.L" if float(item.side)>0. else "UpperArm.R"):return false
+		var arm_parent:=rig.get_bone_parent(arm)
+		if arm_parent<0 or data.bone_groups[String(rig.get_bone_name(arm_parent))]==data.bone_groups[item.bone]:return false
 		for axis in 3:
 			if float(item.hi[axis])-float(item.lo[axis])<.01:return false
 		_attachment.append({"arm":arm,"body":body,"side":float(item.side),"patch":Vector3(item.patch[0],item.patch[1],item.patch[2]),"lo":Vector3(item.lo[0],item.lo[1],item.lo[2]),"hi":Vector3(item.hi[0],item.hi[1],item.hi[2])})
@@ -152,6 +154,16 @@ func apply(actor,key:String,delta:float)->void:
 	var stage:String=actor._jump_stage
 	var speed:float=actor.current_speed
 	var moving:bool=actor._move_requested and speed>.001
+	# Contact/flight clocks belong to physical state, even while MD2 combat
+	# temporarily owns the visible pose. Never resume a stale previous landing.
+	if stage=="JumpLanding":
+		if _last_stage!="JumpLanding":landing_move_weight=1. if moving else 0.;landing_duration=.75 if moving else 1.
+		landing_elapsed=maxf(float(actor._jump_time),0.);landing_moving=moving
+		if not moving:landing_duration=1.
+		landing_move_weight=move_toward(landing_move_weight,1. if moving else 0.,delta/.10)
+	elif stage in ["JumpTakeoff","JumpAirborne"]:
+		if _last_stage not in ["JumpTakeoff","JumpAirborne"]:flight_elapsed=0. if stage=="JumpTakeoff" else .35
+		else:flight_elapsed+=delta
 	if actor._grounded and moving and not actor.combo.active():
 		run_weight=move_toward(run_weight,1. if actor._run_requested else 0.,delta/.22)
 		phase_advanced=delta/period(speed,run_weight);phase=fposmod(phase+phase_advanced,1.)
@@ -161,11 +173,6 @@ func apply(actor,key:String,delta:float)->void:
 		deforms=_ground_deforms(phase,run_weight);last_kind="Run" if actor._run_requested else "Walk"
 	elif not actor.combo.active() and key in ["JumpTakeoff","JumpAirborne","JumpLanding"]:
 		if stage=="JumpLanding":
-			if _last_stage!="JumpLanding":landing_elapsed=0.;landing_move_weight=1. if moving else 0.;landing_duration=.75 if moving else 1.
-			else:landing_elapsed+=delta
-			landing_moving=moving
-			if not moving:landing_duration=1.
-			landing_move_weight=move_toward(landing_move_weight,1. if moving else 0.,delta/.10)
 			var motion_weight:=landing_move_weight*landing_move_weight*(3.-2.*landing_move_weight)
 			landing_samples+=1;last_kind="LandingMoving" if landing_moving else "LandingStationary"
 			deforms=_sample("JumpStationary",.92+landing_elapsed)
@@ -180,8 +187,6 @@ func apply(actor,key:String,delta:float)->void:
 				for group in ["Leg.L","Leg.R"]:
 					var index:=group_names.find(group);deforms[index]=deforms[index].interpolate_with(root_delta*ground[index],motion_weight)
 		else:
-			if _last_stage not in ["JumpTakeoff","JumpAirborne"]:flight_elapsed=0. if stage=="JumpTakeoff" else .35
-			else:flight_elapsed+=delta
 			# Fit the source preview flight to the accepted physical apex interval.
 			# Actual collision still ends flight; no presentation arc moves the body.
 			var physical_flight:float=2.*sqrt(2.*actor.jump_height/actor.gravity)
