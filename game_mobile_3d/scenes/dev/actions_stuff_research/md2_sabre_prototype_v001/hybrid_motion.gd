@@ -18,6 +18,7 @@ var flight_elapsed:=0.
 var landing_elapsed:=0.
 var landing_duration:=1.
 var landing_moving:=false
+var landing_move_weight:=0.
 var landing_samples:=0
 var _last_stage:=""
 var _attachment:Array=[]
@@ -42,12 +43,16 @@ func setup(skeleton:Skeleton3D,path:String,target_path:String)->bool:
 	if not data is Dictionary or data.get("schema")!="private-hybrid-deformations/1" or data.get("research_only")!=true or data.get("production_eligible")!=false:return false
 	if data.get("target_source_sha256")!=FileAccess.get_sha256(target_path):return false
 	if not data.get("groups") is Array or data.groups.size()!=10 or not data.get("bone_groups") is Dictionary or not data.get("clips") is Dictionary:return false
+	for name in ["Root","Hips","Spine","Chest","Neck","Head","UpperArm.L","UpperArm.R","Leg.L","Leg.R"]:
+		if data.groups.count(name)!=1:return false
 	var staged:Dictionary={}
 	for key in ["Walk","Run","JumpStationary","JumpMoving"]:
 		var row:Variant=data.clips.get(key)
 		if not row is Dictionary or not row.get("samples") is Array:return false
 		var duration:float=float(row.get("duration",0.));var samples:Array=row.samples
 		if not is_finite(duration) or duration<=0. or duration>10. or samples.size()<2 or samples.size()>5000:return false
+		var expected_duration:float=.8 if key=="Walk" else (.625 if key=="Run" else 2.6)
+		if absf(duration-expected_duration)>.000001 or row.get("loop")!=(key in ["Walk","Run"]):return false
 		var frames:Array=[]
 		for frame:Variant in samples:
 			if not frame is Array or frame.size()!=10:return false
@@ -70,18 +75,29 @@ func setup(skeleton:Skeleton3D,path:String,target_path:String)->bool:
 		ids.append(group)
 	rig=skeleton;streams=staged;group_for_bone=ids;group_names=data.groups;source_path=path
 	for i in rig.get_bone_count():rest.append(rig.get_bone_global_rest(i));parents.append(rig.get_bone_parent(i))
-	for item:Dictionary in data.get("attachments",[]):
+	if not data.get("attachments") is Array or data.attachments.size()!=2:return false
+	for item:Variant in data.attachments:
+		if not item is Dictionary or not item.get("bone") is String or not item.get("body") is String:return false
+		if not(item.get("side") is float or item.get("side") is int) or absf(float(item.side))!=1.:return false
+		for field in ["patch","lo","hi"]:
+			if not item.get(field) is Array or item[field].size()!=3:return false
+			for component:Variant in item[field]:
+				if not(component is float or component is int) or not is_finite(float(component)):return false
 		var arm:=rig.find_bone(item.bone);var body:=rig.find_bone(item.body)
 		if arm<0 or body<0:return false
+		if data.bone_groups[item.body]!="Chest" or data.bone_groups[item.bone]!=("UpperArm.L" if float(item.side)>0. else "UpperArm.R"):return false
+		for axis in 3:
+			if float(item.hi[axis])-float(item.lo[axis])<.01:return false
 		_attachment.append({"arm":arm,"body":body,"side":float(item.side),"patch":Vector3(item.patch[0],item.patch[1],item.patch[2]),"lo":Vector3(item.lo[0],item.lo[1],item.lo[2]),"hi":Vector3(item.hi[0],item.hi[1],item.hi[2])})
 	if _attachment.size()!=2:return false
+	if _attachment[0].arm==_attachment[1].arm or _attachment[0].side==_attachment[1].side or _attachment[0].body!=_attachment[1].body:return false
 	_body_bone=_attachment[0].body
 	for i in rig.get_bone_count():
 		_native_rest.append(rig.get_bone_rest(i))
 		if group_names[group_for_bone[i]] in ["UpperArm.L","UpperArm.R"]:_arm_bones.append(i)
 	return true
 func reset()->void:
-	phase=0.;phase_advanced=0.;run_weight=0.;last_kind="";owns_pose=false;flight_elapsed=0.;landing_elapsed=0.;landing_samples=0;_last_stage="";maximum_attachment_gap=0.;_arm_key="";_arm_elapsed=1.;_arm_from.clear();_last_arm_relative.clear()
+	phase=0.;phase_advanced=0.;run_weight=0.;last_kind="";owns_pose=false;flight_elapsed=0.;landing_elapsed=0.;landing_samples=0;landing_move_weight=0.;_last_stage="";maximum_attachment_gap=0.;_arm_key="";_arm_elapsed=1.;_arm_from.clear();_last_arm_relative.clear()
 func _native_worlds(actor,key:String)->Array[Transform3D]:
 	if not _native_tracks.has(key):
 		var animation:Animation=actor.animation_player.get_animation(actor.clips[key].action);var tracks:Array=[]
@@ -145,18 +161,24 @@ func apply(actor,key:String,delta:float)->void:
 		deforms=_ground_deforms(phase,run_weight);last_kind="Run" if actor._run_requested else "Walk"
 	elif not actor.combo.active() and key in ["JumpTakeoff","JumpAirborne","JumpLanding"]:
 		if stage=="JumpLanding":
-			if _last_stage!="JumpLanding":landing_elapsed=0.;landing_moving=moving;landing_duration=.75 if landing_moving else 1.
+			if _last_stage!="JumpLanding":landing_elapsed=0.;landing_move_weight=1. if moving else 0.;landing_duration=.75 if moving else 1.
 			else:landing_elapsed+=delta
+			landing_moving=moving
+			if not moving:landing_duration=1.
+			landing_move_weight=move_toward(landing_move_weight,1. if moving else 0.,delta/.10)
+			var motion_weight:=landing_move_weight*landing_move_weight*(3.-2.*landing_move_weight)
 			landing_samples+=1;last_kind="LandingMoving" if landing_moving else "LandingStationary"
-			deforms=_sample("JumpMoving" if landing_moving else "JumpStationary",.92+landing_elapsed)
-			if landing_moving:
+			deforms=_sample("JumpStationary",.92+landing_elapsed)
+			var moving_source:=_sample("JumpMoving",.92+landing_elapsed)
+			for i in deforms.size():deforms[i]=deforms[i].interpolate_with(moving_source[i],motion_weight)
+			if motion_weight>0.:
 				var ground:=_ground_deforms(phase,run_weight)
 				var chest:=group_names.find("Chest");var root_group:=group_names.find("Root")
 				var body_delta:=deforms[chest]*ground[chest].affine_inverse();var root_delta:=deforms[root_group]*ground[root_group].affine_inverse()
 				for group in ["UpperArm.L","UpperArm.R"]:
-					var index:=group_names.find(group);deforms[index]=body_delta*ground[index]
+					var index:=group_names.find(group);deforms[index]=deforms[index].interpolate_with(body_delta*ground[index],motion_weight)
 				for group in ["Leg.L","Leg.R"]:
-					var index:=group_names.find(group);deforms[index]=root_delta*ground[index]
+					var index:=group_names.find(group);deforms[index]=deforms[index].interpolate_with(root_delta*ground[index],motion_weight)
 		else:
 			if _last_stage not in ["JumpTakeoff","JumpAirborne"]:flight_elapsed=0. if stage=="JumpTakeoff" else .35
 			else:flight_elapsed+=delta
