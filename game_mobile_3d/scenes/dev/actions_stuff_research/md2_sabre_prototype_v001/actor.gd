@@ -18,6 +18,7 @@ const SourceGait=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prot
 const CombatLegs=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combat_legs.gd")
 const InputOrderTrace=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/input_order_trace.gd")
 const FootPlacement=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/foot_placement.gd")
+const HybridMotion=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/hybrid_motion.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 # User-accepted jump study; native launch/scale recovered, full trajectory pending.
@@ -58,6 +59,8 @@ var _outgoing_locomotion_state:Dictionary={}
 var combat_legs:RefCounted
 var input_order_trace=InputOrderTrace.new()
 var foot_placement:RefCounted
+var hybrid_motion:RefCounted
+var hybrid_motion_enabled:=true
 var _combat_plan_active:=false
 var _combat_open_seconds:=0.
 var _animation_motion_speed:=0.
@@ -215,6 +218,12 @@ func _ready()->void:
 	input_order_trace.enabled=using_original_source
 	if using_original_source and direction_adapter!=null:
 		foot_placement=FootPlacement.new();foot_placement.setup(self,direction_adapter)
+	if using_original_source and hybrid_motion_enabled and OS.get_environment("MD2_HYBRID_MOTION")!="0":
+		var research_root:=OS.get_environment("MD2_RESEARCH_ROOT")
+		if research_root.is_empty():research_root="C:/Users/ADMIN/Desktop/MD2 Research"
+		var hybrid:=HybridMotion.new()
+		if hybrid.setup(skeleton,research_root.path_join("blender/hybrid_godot_v001/hybrid_motion.json"),private_model_path()):
+			hybrid_motion=hybrid;cadence_label="A&S Walk / Run · v004 attached landing\nDistance-synchronized source gait · MD2 combat / physics"
 
 func private_model_path()->String:
 	if not private_model_path_override.is_empty():return private_model_path_override
@@ -285,6 +294,10 @@ func _ground_graph_enabled()->bool:
 
 func _outgoing_locomotion_sampler(key:String,phase:float)->Callable:
 	var cursor:={"clip":key,"phase":phase}
+	if hybrid_motion!=null and hybrid_motion.is_gait(key):
+		cursor={"clip":key,"phase":hybrid_motion.phase,"weight":hybrid_motion.run_weight}
+		_outgoing_locomotion_state=cursor
+		return func(delta:float)->Array[Transform3D]:return hybrid_motion.outgoing_pose(delta,cursor,current_speed)
 	_outgoing_locomotion_state=cursor
 	return func(delta:float)->Array[Transform3D]:
 		if key in GAITS:
@@ -498,12 +511,19 @@ func _animate(delta:float)->void:
 	elif combat_legs!=null:combat_legs.weight=0.
 	_combat_was_moving=moving_legs
 	if source_transition!=null:source_transition.apply(delta)
+	if hybrid_motion!=null:
+		hybrid_motion.apply(self,selected,delta)
+		# Feed the existing handoff from the newly selected base pose rather than
+		# replacing its blended output; only one final source-transition writer.
+		if hybrid_motion.owns_pose and source_transition!=null:source_transition.apply(0.)
 	if review_clip.is_empty() and selected in GAITS:
 		var event_clip:String=(gait_state.right if float(gait_state.weight)>.5 else gait_state.left) if composed_gait else selected
 		var event_ratio:float=float(clips[event_clip].duration)/float(clips[selected].duration)
 		_dispatch_locomotion_events(event_clip,source_before*event_ratio,delta*_playback_speed*event_ratio,delta)
 		_gait_cycles_this_tick+=delta*_playback_speed/float(clips[selected].duration)
 		_gait_resume_phase=fposmod(animation_player.current_animation_position/float(clips[selected].duration),1.)
+		if hybrid_motion!=null and hybrid_motion.owns_pose:
+			_gait_cycles_this_tick=hybrid_motion.phase_advanced;_gait_resume_phase=hybrid_motion.phase
 	if not review_clip.is_empty():
 		_review_time+=delta
 		var duration:float=clips[review_clip].duration
@@ -515,18 +535,20 @@ func _animate(delta:float)->void:
 			_jump_time+=delta
 			if not using_original_source and _jump_stage=="JumpTakeoff" and _jump_time>=float(clips.JumpTakeoff.duration):_jump_stage="JumpAirborne";_jump_time-=float(clips.JumpTakeoff.duration)
 			elif _jump_stage=="JumpLanding":
-				var moving_release:bool=using_original_source and _grounded and _move_requested and _jump_time>=SOURCE_MOVING_LAND_SECONDS
-				if moving_release or _jump_time>=float(clips.JumpLanding.duration):_jump_stage="";_jump_time=0.
+				var moving_release:bool=using_original_source and hybrid_motion==null and _grounded and _move_requested and _jump_time>=SOURCE_MOVING_LAND_SECONDS
+				var landing_seconds:float=hybrid_motion.landing_duration if hybrid_motion!=null else float(clips.JumpLanding.duration)
+				if moving_release or _jump_time>=landing_seconds:_jump_stage="";_jump_time=0.
 		_transition_time+=delta
 		if not _transition.is_empty() and _transition_time>=float(clips[_transition].duration):_transition=""
 	if body_stability!=null:
-		if body_stability_enabled and review_clip.is_empty() and _grounded and not combo.active() and (selected in GAITS or selected in ["Idle","CombatReady"]):body_stability.apply(selected,delta,selected in GAITS)
+		if body_stability_enabled and review_clip.is_empty() and _grounded and not combo.active() and (hybrid_motion==null or not hybrid_motion.owns_pose) and (selected in GAITS or selected in ["Idle","CombatReady"]):body_stability.apply(selected,delta,selected in GAITS)
 		else:body_stability.deactivate()
 	if direction_adapter!=null:
 		var settling:bool=selected in ["Idle","CombatReady"] and absf(direction_adapter.current_yaw)>.0001
 		if locomotion_direction_enabled and review_clip.is_empty() and _grounded and ((not combo.active() and (selected in GAITS or settling)) or moving_legs):
 			direction_adapter.apply(velocity,delta)
 		else:direction_adapter.deactivate()
+	if hybrid_motion!=null:hybrid_motion.keep_shoulders_attached()
 	_refresh_markers()
 	_apply_face(delta)
 	for event:Dictionary in combo.drain_events():
@@ -690,6 +712,7 @@ func release_inputs()->void:
 	combo.release_inputs();combat_requested=false;has_aim_point=false;turn_axis=0.;requested_direction=Vector2.ZERO;requested_run=false;requested_jump=false;_jump_held=false
 	_record_order(&"release_commands")
 func reset_actor()->void:
+	if hybrid_motion!=null:hybrid_motion.reset()
 	if foot_placement!=null:foot_placement.clear()
 	input_order_trace.clear()
 	if body_stability!=null:body_stability.deactivate()
