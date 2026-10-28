@@ -21,6 +21,7 @@ uniform float field_extent=34.0;
 uniform float lighting_grade=1.0;
 varying float height_fraction;
 varying vec3 root_color;
+varying vec3 wrapped_normal_world;
 void vertex(){
 	// Full float custom attribute: normalized height, blade height, phase, response.
 	float u=CUSTOM0.x;
@@ -45,12 +46,16 @@ void vertex(){
 	vec3 world_offset=vec3(heading.x*planar,vertical,heading.y*planar);
 	VERTEX+=(inverse(MODEL_MATRIX)*vec4(world_offset,0.0)).xyz;
 	if(tinted_grass)NORMAL=normalize(NORMAL*0.35+vec3(0.0,0.65,0.0));
+	wrapped_normal_world=normalize(MODEL_NORMAL_MATRIX*NORMAL);
 	root_color=textureLod(ground_atlas,mix(ground_uv.xy,ground_uv.zw,fract(vec2(root.x,-root.z))),0.0).rgb;
 }
 void fragment(){
 	vec4 texel=texture(atlas,UV);
 	vec3 color=texel.rgb;
 	if(tinted_grass){
+		// Preserve the authored upward grass normals on both sides, as in the
+		// existing lab. Automatic backface flipping otherwise makes dark stripes.
+		NORMAL=normalize(mat3(VIEW_MATRIX)*wrapped_normal_world);
 		color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);
 		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
 	}
