@@ -1,0 +1,27 @@
+{
+  "old_registry_entries_preserved": 76,
+  "old_reviews_preserved": 6,
+  "total_actions": 119,
+  "new_pending": [
+    {
+      "action": "Jump_Landing_MD2_AS_SoftBounce_Original_v002_PENDING",
+      "slot": "OBHybridJump_Soft_V002_Authoring_Rig",
+      "range": [
+        1,
+        46
+      ]
+    },
+    {
+      "action": "PREVIEW_ONLY_Jump_MD2_AS_SoftBounce_Context_Original_v002_PENDING",
+      "slot": "OBHybridJump_Soft_V002_Authoring_Rig",
+      "range": [
+        1,
+        144
+      ]
+    }
+  ],
+  "same_arc_actors": 2,
+  "unchanged_godot_files": 736,
+  "cameras_checked": 3,
+  "godot_changes": []
+}
