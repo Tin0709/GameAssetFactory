@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/dev/ActionsStuffWalkRunTest.tscn" id="base"]
+[ext_resource type="Script" path="res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/overworld.gd" id="map"]
+
+[node name="MD2OverworldFidelityTest" instance=ExtResource("base")]
+script = ExtResource("map")
