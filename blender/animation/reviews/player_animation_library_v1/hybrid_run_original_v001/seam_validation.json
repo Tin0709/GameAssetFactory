@@ -1,0 +1,20 @@
+[
+  {
+    "action": "Run_Hybrid_V1_Subtle_Bounce_Original_v001",
+    "four_cycle_pose_seam_error": 0.0,
+    "bone_origin_velocity_seam_difference_m_s": 0.028930424067143377,
+    "opposite_leg_half_phase_matrix_error": 4.996003610813204e-16
+  },
+  {
+    "action": "Run_Hybrid_V2_Balanced_Bounce_Original_v001",
+    "four_cycle_pose_seam_error": 0.0,
+    "bone_origin_velocity_seam_difference_m_s": 0.037848142479944946,
+    "opposite_leg_half_phase_matrix_error": 2.220446049250313e-16
+  },
+  {
+    "action": "Run_Hybrid_V3_Expressive_Bounce_Original_v001",
+    "four_cycle_pose_seam_error": 0.0,
+    "bone_origin_velocity_seam_difference_m_s": 0.04719363748339866,
+    "opposite_leg_half_phase_matrix_error": 1.2212453270876722e-15
+  }
+]
