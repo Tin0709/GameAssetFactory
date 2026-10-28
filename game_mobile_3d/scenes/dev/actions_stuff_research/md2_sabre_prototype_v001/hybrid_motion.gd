@@ -29,6 +29,7 @@ var _body_bone:=-1
 var _last_arm_relative:Dictionary={}
 var _arm_from:Dictionary={}
 var _arm_elapsed:=1.
+var _arm_blend_duration:=.08
 var _arm_key:=""
 var _native_tracks:Dictionary={}
 var _native_rest:Array[Transform3D]=[]
@@ -225,9 +226,12 @@ func apply(actor,key:String,delta:float)->void:
 			# Keep the MD2 receiving arm arc instead of closing to the A&S layer's
 			# zero-arm first frame and reopening later. Body/head retain v004.
 			var native:=_native_worlds(actor,"JumpLanding",minf(landing_elapsed,float(actor.clips.JumpLanding.duration)))
+			var idle:=_native_worlds(actor,"Idle",fposmod(float(actor.expression_clock),float(actor.clips.Idle.duration)))
+			var settle:=clampf((landing_elapsed-.30)/.35,0.,1.);settle=settle*settle*(3.-2.*settle)
 			var receive:=clampf(landing_elapsed/.18,0.,1.);receive=receive*receive*(3.-2.*receive)*landing_move_weight
 			for bone in _arm_bones:
 				var native_relative:Transform3D=native[_body_bone].affine_inverse()*native[bone]
+				native_relative=native_relative.interpolate_with(idle[_body_bone].affine_inverse()*idle[bone],settle)
 				var gait_relative:Transform3D=worlds[_body_bone].affine_inverse()*worlds[bone]
 				worlds[bone]=worlds[_body_bone]*native_relative.interpolate_with(gait_relative,receive)
 			if previous_stage!="JumpLanding":_leg_from=_last_leg_relative.duplicate();_leg_elapsed=0.
@@ -235,11 +239,11 @@ func apply(actor,key:String,delta:float)->void:
 			var leg_weight:=clampf(_leg_elapsed/.08,0.,1.);leg_weight=leg_weight*leg_weight*(3.-2.*leg_weight)
 			for bone in _leg_bones:
 				if _leg_from.has(bone) and leg_weight<1.:worlds[bone]=worlds[_hip_bone]*Transform3D(_leg_from[bone]).interpolate_with(worlds[_hip_bone].affine_inverse()*worlds[bone],leg_weight)
-		if _arm_key not in ["JumpTakeoff","JumpAirborne","JumpLanding"]:
-			_arm_key=key;_arm_elapsed=0.;_arm_from=_last_arm_relative.duplicate()
+		if _arm_key not in ["JumpTakeoff","JumpAirborne","JumpLanding"] or (key=="JumpLanding" and previous_stage!="JumpLanding"):
+			_arm_key=key;_arm_elapsed=0.;_arm_from=_last_arm_relative.duplicate();_arm_blend_duration=.12 if key=="JumpLanding" else .08
 		else:_arm_key=key
 		_arm_elapsed+=delta
-		var weight:=clampf(_arm_elapsed/.08,0.,1.);weight=weight*weight*(3.-2.*weight)
+		var weight:=clampf(_arm_elapsed/_arm_blend_duration,0.,1.);weight=weight*weight*(3.-2.*weight)
 		var inverse:=worlds[_body_bone].affine_inverse()
 		for bone in _arm_bones:
 			if _arm_from.has(bone) and weight<1.:worlds[bone]=worlds[_body_bone]*Transform3D(_arm_from[bone]).interpolate_with(inverse*worlds[bone],weight)
