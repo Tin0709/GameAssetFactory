@@ -1,0 +1,22 @@
+{
+  "old_actions_preserved": 115,
+  "old_registry_entries_preserved": 76,
+  "old_reviews_preserved": 6,
+  "central_actions_reopened": 119,
+  "new_pending_original_actions": 2,
+  "same_arc_comparison_actors": 2,
+  "unchanged_godot_files": 736,
+  "gui_playing_frames": [
+    7,
+    49,
+    91,
+    134,
+    32
+  ],
+  "review_markers": {
+    "COMPRESSION": 63,
+    "HEAD FOLLOW": 69
+  },
+  "source_sha256": "6e4c447635b9742704c41bf72f4bb53f0f27882a52ed841d69b170c461b3d048",
+  "central_sha256": "3c17e04ab5c7d4e81d27c9818b5748fabff93d340e048f378c4976e9f65f3270"
+}
