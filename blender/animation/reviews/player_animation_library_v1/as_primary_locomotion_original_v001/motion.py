@@ -7,8 +7,8 @@ import math
 FPS=60
 END=150
 ORIGIN=.18
-STYLES=[dict(kind='Walk',hz=1.2,speed=1.8,duty=.50,arm=34.,torso=8.,head=1.8,lift=0.),
-        dict(kind='Run',hz=1.6,speed=4.3,duty=.28,arm=53.,torso=17.,head=2.5,lift=.095)]
+STYLES=[dict(kind='Walk',hz=1.2,speed=1.8,duty=.50,arm=34.,torso=8.,head=1.8,lift=0.,clearance=.025),
+        dict(kind='Run',hz=1.6,speed=4.3,duty=.28,arm=53.,torso=17.,head=2.5,lift=.095,clearance=.04)]
 L=.675; D=.1125
 def smooth(t):return t*t*(3-2*t)
 def ease(t):return t*t*t*(t*(t*6-15)+10)

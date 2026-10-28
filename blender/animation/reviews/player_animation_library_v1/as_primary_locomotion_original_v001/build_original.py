@@ -51,7 +51,7 @@ def pose(p,s,contacts=None):
    minimum=min((rot.to_3x3()@v).z for v in points[name])
    support=-minimum+.0003
    swing=((phase-s['duty']/2)%1)/(1-s['duty'])
-   clearance=(.025 if s['kind']=='Walk'else .04)*math.sin(math.pi*swing)**2
+   clearance=s['clearance']*math.sin(math.pi*swing)**2
    # A swing is never clamped onto the floor. Lift the rigid whole leg at
    # its hidden hip junction; no scale, bending, or false planted scrape.
    pivot.z=support if plant else max(world['Hips'].translation.z,support+clearance)

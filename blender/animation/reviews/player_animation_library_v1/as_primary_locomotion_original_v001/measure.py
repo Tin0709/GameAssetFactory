@@ -18,7 +18,7 @@ for spec in meta['specs']:
  style=spec.get('style');transition=bool(spec.get('preview_only'))
  rows=json.loads((H/'transition_trace.json').read_text(encoding='utf8'))if transition else None
  count=len(rows)if transition else 1601
- hips=[];heads=[];torso=[];roots=[];penetration=[];contact=[];allground=[];offsets=[];scales=[];forearms=[];origins=[]
+ hips=[];heads=[];torso=[];roots=[];penetration=[];contact=[];allground=[];offsets=[];scales=[];forearms=[];origins=[];swing_floor=0;swing_count=0
  for j in range(count):
   if transition:row=rows[j];f=row['frame'];t=row['time'];travel=row['travel_m'];phase=row['phase'];s=m.blend_style(row['run_weight'])
   else:
@@ -36,6 +36,9 @@ for spec in meta['specs']:
    offsets.append(rig.pose.bones[name].matrix.translation.z-hip.z)
    if transition:plant=row['contacts'][name]['plant'];corner=row['contacts'][name]['corner']
    else:_,plant,corner=m.leg(phase if name.endswith('L')else(phase+.5)%1,s)
+   if not plant:
+    swing_count+=1
+    if minz<.00036:swing_floor+=1
    if plant:
     edge=[mat@v for v in verts if abs(v.z)<1e-5 and abs(v.y-corner)<1e-5]
     assert len(edge)==2
@@ -43,8 +46,8 @@ for spec in meta['specs']:
     contact.append({'bone':name,'corner':corner,'t':t,'pos':list(pt)})
    # Retain actual lowest geometry during every near-ground sample separately.
    if minz<.02:
-    v=min(actual,key=lambda v:v.z).copy();v.y-=travel
-    allground.append({'bone':name,'t':t,'pos':list(v),'plant':plant})
+    chosen=min(range(len(actual)),key=lambda i:actual[i].z);v=actual[chosen].copy();v.y-=travel
+    allground.append({'bone':name,'t':t,'pos':list(v),'plant':plant,'corner_index':chosen,'z':minz})
  speeds=[]
  for name in feet:
   values=[r for r in contact if r['bone']==name]
@@ -68,7 +71,14 @@ for spec in meta['specs']:
    if last:maxstep=max(maxstep,max((cur[n]-last[n]).length for n in cur))
    last=cur
   rate_checks.append({'review_hz':hz,'max_bone_origin_step_m':maxstep})
- result={'action':action.name,'original_authored':True,'pending':True,'gait_hz':style['hz']if style else 'continuous 1.2 to 1.6','nominal_speed_m_s':style['speed']if style else [1.8,4.3],'cycle_stride_m':style['speed']/style['hz']if style else None,'hip_peak_to_peak_mm':(max(hips)-min(hips))*1000,'hip_height_m':[min(hips),max(hips)],'chest_yaw_peak_to_peak_deg':max(torso)-min(torso),'head_global_rotation_peak_abs_deg':[max(abs(v[k])for v in heads)for k in range(3)],'rolling_contact_velocity_m_s':stats(speeds),'rolling_contact_velocity_samples':len(speeds),'max_penetration_mm':max(penetration)*1000,'leg_hip_origin_vertical_difference_mm':[min(offsets)*1000,max(offsets)*1000],'max_scale_error':max(scales),'forearm_basis_error':max(forearms),'root_travel_m':max(roots),'pose_cycle_error':seam,'finite_bake_velocity_seam_m_s':velocity_seam,'playback_rate_measurements':rate_checks,'contact_schedule':'original intent, not source mask','near_ground_sample_count':len(allground)}
+ near_speeds=[];near_unplanted=[]
+ for name in feet:
+  near=[v for v in allground if v['bone']==name]
+  for a,b in zip(near,near[1:]):
+   if 0<b['t']-a['t']<.003 and a['corner_index']==b['corner_index']:
+    velocity=(Vector(b['pos'])-Vector(a['pos'])).length/(b['t']-a['t']);near_speeds.append(velocity)
+    if not a['plant']and not b['plant']and max(a['z'],b['z'])<.00036:near_unplanted.append(velocity)
+ result={'action':action.name,'original_authored':True,'pending':True,'gait_hz':style['hz']if style else 'continuous 1.2 to 1.6','nominal_speed_m_s':style['speed']if style else [1.8,4.3],'cycle_stride_m':style['speed']/style['hz']if style else None,'hip_peak_to_peak_mm':(max(hips)-min(hips))*1000,'hip_height_m':[min(hips),max(hips)],'chest_yaw_peak_to_peak_deg':max(torso)-min(torso),'head_global_rotation_peak_abs_deg':[max(abs(v[k])for v in heads)for k in range(3)],'rolling_contact_velocity_m_s':stats(speeds),'rolling_contact_velocity_samples':len(speeds),'max_penetration_mm':max(penetration)*1000,'leg_hip_origin_vertical_difference_mm':[min(offsets)*1000,max(offsets)*1000],'max_scale_error':max(scales),'forearm_basis_error':max(forearms),'root_travel_m':max(roots),'pose_cycle_error':seam,'finite_bake_velocity_seam_m_s':velocity_seam,'playback_rate_measurements':rate_checks,'contact_schedule':'original intent, not source mask','near_ground_sample_count':len(allground),'all_near_ground_same_corner_velocity_m_s':stats(near_speeds),'nonplant_floor_sample_fraction':swing_floor/(2*count),'nonplant_floor_velocity_m_s':stats(near_unplanted)}
  results.append(result);print(json.dumps(result),flush=True)
  assert max(penetration)<.001 and max(scales)<1e-6 and max(forearms)<1e-5
  assert result['rolling_contact_velocity_m_s']['max']<.065,result

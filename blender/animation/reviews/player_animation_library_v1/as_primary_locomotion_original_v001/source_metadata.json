@@ -1,5 +1,5 @@
 {
-  "source_sha256": "8be13a28b458dffdf92e5c2d3020cd1cc184b28c1bc42874dda2c357cc01141a",
+  "source_sha256": "0f8f18cf748a8ddfcbb43c559fe4c0fded1b48eaa214e2840fe75eab2555620e",
   "source": "blender/animation/reviews/player_animation_library_v1/as_primary_locomotion_original_v001/as_primary_locomotion_authoring.blend",
   "actions": [
     "Walk_ASInspired_Original_v001_PENDING",
@@ -20,7 +20,8 @@
         "arm": 34.0,
         "torso": 8.0,
         "head": 1.8,
-        "lift": 0.0
+        "lift": 0.0,
+        "clearance": 0.025
       }
     },
     {
@@ -36,7 +37,8 @@
         "arm": 53.0,
         "torso": 17.0,
         "head": 2.5,
-        "lift": 0.095
+        "lift": 0.095,
+        "clearance": 0.04
       }
     },
     {
