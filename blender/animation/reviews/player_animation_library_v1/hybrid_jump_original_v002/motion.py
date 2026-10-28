@@ -8,7 +8,7 @@ from pathlib import Path
 _spec=importlib.util.spec_from_file_location('gaf_own_jump_v001',Path(__file__).parent.parent/'hybrid_jump_original_v001/motion.py')
 old=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(old)
 FPS=60;TAKEOFF=old.TAKEOFF;AIR_LOOP=old.AIR_LOOP;FLIGHT=old.FLIGHT;APEX_TIME=old.APEX_TIME;HEIGHT=old.HEIGHT;START=old.START
-LANDING=.72;DURATION=2.4
+LANDING=.75;DURATION=2.4
 descriptor=old.descriptor;takeoff=old.takeoff;airborne=old.airborne;elevation=old.elevation;ease=old.ease;mix=old.mix
 def curve(t,knots):
  """C1 shape-preserving Hermite; non-extremal knots keep through-velocity."""
@@ -41,12 +41,12 @@ def context(t):
  return descriptor(),True,'settled'
 def landmarks(phase):
  times=sorted({x for values in CHANNELS.values()for x,_ in values})
- if phase=='landing':return times
+ if phase=='landing':return sorted(set(times+[LANDING]))
  return sorted(set([0,DURATION,START+APEX_TIME,START+FLIGHT]+[START+t for t in old.TAKEOFF_LANDMARKS]+[START+FLIGHT+t for t in times]))
 def verify():
  assert max(abs(landing(LANDING)[k]-descriptor()[k])for k in descriptor())<1e-12
  # Through-velocity is a regression guard against the old all-knots-stop rule.
- dt=1e-5
+ dt=1e-6
  v=(landing(.21+dt)['hip']-landing(.21-dt)['hip'])/(2*dt)
  assert v>.15,v
  for key,knots in CHANNELS.items():
