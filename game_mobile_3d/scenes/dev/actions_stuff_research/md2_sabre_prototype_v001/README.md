@@ -1,5 +1,28 @@
 # Player + Sabre prototype
 
+### Current — native callback evidence boundary, 2026-10-28
+
+No controller or timing change. Audit of the retained native capture finds two
+input/ability-end interval overlaps among14ends, including the problematic
+finisher release. Three end-to-next-active intervals also overlap; the samples
+cannot establish a universal extra consumer tick. The existing replay dispatches
+between physics ticks but still quantizes to render cadence: maximum delay from
+the source upper poll is33.21/16.54/8.28ms at30/60/120renderHz. This is a replay
+measurement limit, not native input latency.1,238complete retained Godot physics
+frames preserve begin→command resolution→end order and account for simulation
+time; that does not recover native callback execution order.
+
+All six stored movement/recovery notifies have zero trigger offsets, independently
+of any engine queue delay. The64declared base-graph nodes contain no explicit IK
+node, but nine linked-layer nodes and unavailable native final-pose behavior
+prevent a claim that foot IK is absent. No foot solver or source-key edit was
+added. The existing private inspector's Input ordering tab now links individual
+cases to conservative native transition brackets and shows callback/IK coverage.
+Detailed evidence: private `compiled_logic/input_ordering/callback-evidence.json`.
+Further timing changes require processed native action timestamps and callback/
+movement-consumer ordering, not another fitted delay. All preserved sources,
+7m/s,1.888Hz, scene and graphics remain unchanged.
+
 ### Current — input/event ordering audit, 2026-10-27
 
 Gameplay policy is unchanged in this milestone. An extra universal chain tick
