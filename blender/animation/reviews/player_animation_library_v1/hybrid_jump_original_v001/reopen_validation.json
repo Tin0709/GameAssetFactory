@@ -1,0 +1,65 @@
+{
+  "old_registry_entries_preserved": 72,
+  "old_reviews_preserved": 5,
+  "total_actions": 115,
+  "new_pending_actions": [
+    {
+      "action": "Jump_Takeoff_MD2_AS_Original_v001_PENDING",
+      "slot": "OBHybridJump_Original_Authoring_Rig",
+      "range": [
+        1,
+        25
+      ]
+    },
+    {
+      "action": "Jump_Airborne_MD2_AS_Original_v001_PENDING",
+      "slot": "OBHybridJump_Original_Authoring_Rig",
+      "range": [
+        1,
+        48
+      ]
+    },
+    {
+      "action": "Jump_Landing_MD2_AS_Original_v001_PENDING",
+      "slot": "OBHybridJump_Original_Authoring_Rig",
+      "range": [
+        1,
+        19
+      ]
+    },
+    {
+      "action": "PREVIEW_ONLY_Jump_MD2_AS_Context_Original_v001_PENDING",
+      "slot": "OBHybridJump_Original_Authoring_Rig",
+      "range": [
+        1,
+        120
+      ]
+    }
+  ],
+  "unchanged_godot_files": 736,
+  "godot_changes": [],
+  "cameras_checked": 3,
+  "actual_presentation_samples": [
+    {
+      "time_s": 0,
+      "height_m": 0.0
+    },
+    {
+      "time_s": 0.4,
+      "height_m": 0.0
+    },
+    {
+      "time_s": 0.65,
+      "height_m": 1.2000000476837158
+    },
+    {
+      "time_s": 0.92,
+      "height_m": 0.0
+    },
+    {
+      "time_s": 2.0,
+      "height_m": 0.0
+    }
+  ],
+  "sync_mode": "FRAME_DROP"
+}
