@@ -107,9 +107,10 @@ func _build_rocks()->void:
 	for i in 9:
 		var angle:=float(i)/9.*TAU+.2;var point:=Vector3(cos(angle)*11.,-.08,sin(angle)*11.)
 		if is_path(point):continue
-		_place("MD2 | SM_SF_Boulder_01",point,_rng.randf()*TAU)
+		var yaw:=_rng.randf()*TAU
+		_place("MD2 | SM_SF_Boulder_01",point,yaw)
 		var body:=StaticBody3D.new();body.name="RockCollision";add_child(body)
-		var shape:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(1.35,1.1,1.35);shape.shape=box;body.add_child(shape);body.position=point+Vector3.UP*.55
+		var shape:=CollisionShape3D.new();shape.shape=bundle.meshes["MD2 | SM_SF_Boulder_01"].create_trimesh_shape();body.add_child(shape);body.position=point;body.rotation.y=yaw
 	# Large source rock remains beyond the playable boundary, without hiding player.
 	_place("MD2 | SM_PA1_Blocker_Boulder_A",Vector3(-14,-.15,-13),.7)
 

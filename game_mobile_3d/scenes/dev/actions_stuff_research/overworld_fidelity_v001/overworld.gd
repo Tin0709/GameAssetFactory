@@ -15,6 +15,9 @@ func _build_environment()->void:
 	var original_blocks:int=grass_field_blocks;var original_enabled:bool=grass_field_enabled
 	grass_field_blocks=24;grass_field_enabled=true
 	super._build_environment()
+	# Preserve the floor solver while keeping fast jumps on boundary rocks inside.
+	for shape:CollisionShape3D in get_node("FieldBoundary").get_children():
+		shape.shape.size.y=8.;shape.position.y=3.
 	grass_field_blocks=original_blocks;grass_field_enabled=original_enabled
 
 func _ready()->void:
@@ -29,6 +32,10 @@ func _ready()->void:
 	if md2_lighting!=null:md2_lighting.grass_field=meadow
 	environment_audio=EnvAudio.new();environment_audio.name="PrivateOverworldAudio";add_child(environment_audio);environment_audio.setup(player,meadow,private_bundle)
 	sabre_mode.panel.hide();sabre_mode.movement_panel.hide();sabre_mode.refresh_reflections()
+	var appearance:OptionButton=sabre_mode.panel.find_child("AppearanceSelector",true,false)
+	for connection:Dictionary in appearance.item_selected.get_connections():appearance.item_selected.disconnect(connection.callable)
+	appearance.item_selected.connect(func(index:int):
+		sabre_mode.release_inputs();get_tree().set_meta("md2_sabre_private_skin_selected",index==0);get_tree().change_scene_to_file(scene_file_path))
 	_build_meadow_ui()
 	get_window().title="GameAssetFactory — Private Overworld Meadow / Sabre"
 	print("OVERWORLD_PLAYABLE_READY")
@@ -41,6 +48,7 @@ func _process(delta:float)->void:
 		_status_clock=0.
 		var s:Dictionary=meadow.snapshot()
 		meadow_status.text="%d plants/blocks · %d batches · %d species\n%.1f m/s · %d FPS · steps %d / rustles %d"%[s.instances,s.batches,s.species,player.current_speed,Engine.get_frames_per_second(),environment_audio.event_count.grass+environment_audio.event_count.dirt,environment_audio.event_count.rustle]
+		if environment_audio.rejected_count>0:meadow_status.text+="\nWARNING: %d audio files unavailable"%environment_audio.rejected_count
 
 func _unhandled_input(event:InputEvent)->void:
 	if not error_text.is_empty():return
