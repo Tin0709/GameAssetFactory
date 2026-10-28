@@ -1,8 +1,10 @@
-import bpy,sys,json,hashlib,math
+import bpy,sys,json,hashlib,math,runpy
 from pathlib import Path
 from mathutils import Matrix,Vector
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[4];LIB=ROOT/'blender/animation/showcase'
-sys.path.insert(0,str(HERE));sys.path.insert(0,str(LIB));import motion as m;import gaf_animation_library as ui
+sys.path.insert(0,str(HERE));sys.path.insert(0,str(LIB));import motion as m
+runpy.run_path(str(ROOT/'scripts/load_showcase_ui.py'),run_name='__main__')
+import gaf_animation_library as ui
 BASE=ROOT/'.validation/animation_showcase/hybrid_run_original_v001'
 baseline=json.loads((BASE/'baseline.json').read_text());meta=json.loads((HERE/'source_metadata.json').read_text())
 CENTRAL=LIB/'Animation_Showcase.blend';MANIFEST=LIB/'animation_manifest.json'
@@ -11,6 +13,8 @@ assert sha(CENTRAL)==baseline[str(CENTRAL)] and sha(MANIFEST)==baseline[str(MANI
 data=json.loads(MANIFEST.read_text());assert not any(x['action']in meta['actions']for x in data['animations'])
 native=bpy.data.objects[ui.RIG];native_mesh=bpy.data.objects['Showcase_Player_Mesh']
 old_probe=json.loads((HERE/'rig_probe.json').read_text());old_actions=set(bpy.data.actions.keys())
+old_probe['old_actions']={a.name:ui.action_signature(a)for a in bpy.data.actions}
+print('BASELINE_CURRENT_UI_READY',len(old_actions),flush=True)
 assert set(old_probe['old_actions'])==old_actions
 with bpy.data.libraries.load(str(HERE/'hybrid_run_authoring.blend'),link=False) as (src,dst):dst.actions=meta['actions']
 entries=[]
@@ -66,7 +70,7 @@ focus=data.get('library_focus',{});prior=focus.get('entries',[])
 focus['entries']=[{'kind':'review_sequence','id':review['id']}]+[{'kind':'action','id':e['action']}for e in entries]+prior;data['library_focus']=focus
 assert sha(CENTRAL)==baseline[str(CENTRAL)] and sha(MANIFEST)==baseline[str(MANIFEST)]
 MANIFEST.write_text(json.dumps(data,indent=2))
-ui.register();home=bpy.data.scenes['ANIMATION_SHOWCASE'];ui.refresh(home,import_missing=False)
+home=bpy.data.scenes['ANIMATION_SHOWCASE'];ui.refresh(home,import_missing=False)
 for name,signature in old_probe['old_actions'].items():assert ui.action_signature(bpy.data.actions[name])==signature,name
 assert ui.rest_signature(native.data)==data['rig_sha256']
 ui.open_review_sequence(bpy.context,review['id']);scene.gaf_loop=True
