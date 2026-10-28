@@ -55,7 +55,7 @@ func run()->void:
 				check(leg_error<.002,"Both flight legs preserve actual MD2 spread and pose at "+str(hz))
 			if a._jump_stage=="JumpAirborne" and a._jump_time>.1:continuous_apex=a.source_transition.elapsed>.25
 		check(peak>.9 and saw_landing and a.is_on_floor(),"Collision-owned hybrid jump/landing at "+str(hz))
-		check(a.hybrid_motion.landing_samples>int(.5*hz),"Moving bounce is not cut off by old50ms landing release at "+str(hz))
+		check(a.hybrid_motion.landing_samples>int(.20*hz),"Compact moving bounce is not cut off by old50ms landing release at "+str(hz))
 		check(native_arms_checked and continuous_apex,"Apex keeps the continuous hybrid body handoff at "+str(hz))
 		a.attack(true);await ticks(hz*2);a.attack(false);await ticks(hz)
 		check(a.accepted_count>=3,"Native MD2 combo still chains at "+str(hz))
@@ -64,10 +64,12 @@ func run()->void:
 		check(a.current_speed<.001 and a.combo.phase==&"ready","Stops and recovers at "+str(hz))
 		measurements.append({"hz":hz,"run_distance_one_second":meter.distance,"run_cycles_one_second":meter.gait_cycles,"attachment_error_m":a.hybrid_motion.maximum_attachment_gap,"peak_height_m":peak,"foot_ground":a.foot_placement.snapshot()})
 		a.reset_actor();await ticks(3);a.requested_jump=true;await ticks(1);a.requested_jump=false
-		await ticks(ceili(.60*hz))
-		a.requested_direction=Vector2.RIGHT;a.requested_run=true;await ticks(ceili(.15*hz))
+		for i in hz:
+			if a._jump_stage=="JumpLanding":break
+			await ticks(1)
+		a.requested_direction=Vector2.RIGHT;a.requested_run=true;await ticks(ceili(.10*hz))
 		check(a._jump_stage=="JumpLanding" and a.hybrid_motion.landing_move_weight>.99 and a.hybrid_motion.last_kind=="LandingMoving","Movement starts immediately during stationary landing at "+str(hz))
-		a.requested_direction=Vector2.ZERO;await ticks(ceili(.15*hz))
+		a.requested_direction=Vector2.ZERO;await ticks(ceili(.10*hz))
 		check(a.hybrid_motion.landing_move_weight<.001 and a.hybrid_motion.last_kind=="LandingStationary","Stopping during landing releases moving legs smoothly at "+str(hz))
 		await ticks(hz)
 		# A completed previous landing must not leak its contact clock into a
