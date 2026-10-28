@@ -1,4 +1,23 @@
-### Current jump timing — measured physics / compact receiving, 2026-10-28
+### Current chained jump — optional private original clip, 2026-10-28
+
+Release and press Space promptly after contact to chain two ordinary jumps
+then a somersault. F3 **Chained jump · original flip** enables/disables this
+at the next launch. Ordinary movement, jump physics and compact landing remain
+unchanged; attacking in the air yields to existing Sabre combat.
+
+Generic `novelty_jump.gd` loads an optional source/target-hash-pinned external
+profile from private Research `reports/prototype_sabre/jump_flip_20261028/`.
+Only transient animation resources are imported; no keys/assets are saved in
+the project. `MD2_NOVELTY_JUMP=0` opts out. Raw action selection includes
+**JumpFlip** at original speed; gameplay fits the source clock to physical
+flight. No new Blender Action was authored or approved.
+
+Third-slot clip selection and reset setting are source-backed. Ground-relative
+reset, count wrap, attack-chain cancellation and flight fitting are disclosed
+lab adapters; the native counter/timer callbacks remain unrecovered. Evidence,
+exact pre-change backups, tests and native rendered views remain private.
+
+### Jump timing — measured physics / compact receiving, 2026-10-28
 
 The same lab now reads optional hash-pinned private jump settings from Research
 `reports/prototype_sabre/jump_fidelity_20261028/jump_runtime.private.json`.
