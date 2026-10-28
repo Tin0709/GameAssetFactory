@@ -41,12 +41,18 @@ func run()->void:
 			await ticks(1);peak=maxf(peak,a.global_position.y)
 			if a._jump_stage=="JumpLanding":saw_landing=true
 			if a._jump_stage=="JumpTakeoff" and a._jump_time>.15 and not native_arms_checked:
-				var native:Array=a.hybrid_motion._native_worlds(a,"JumpTakeoff");var chest:int=a.skeleton.find_bone("J_Shoulders");var worst:=0.
+				var native:Array=a.hybrid_motion._native_worlds(a,"JumpTakeoff",a.hybrid_motion.native_limb_sample_seconds);var chest:int=a.skeleton.find_bone("J_Shoulders");var worst:=0.
 				for bone_name in ["J_L_Arm","J_R_Arm"]:
 					var bone:int=a.skeleton.find_bone(bone_name)
 					var truth:Transform3D=native[chest].affine_inverse()*native[bone];var visible:Transform3D=a.skeleton.get_bone_global_pose(chest).affine_inverse()*a.skeleton.get_bone_global_pose(bone)
 					worst=maxf(worst,truth.basis.get_rotation_quaternion().angle_to(visible.basis.get_rotation_quaternion()))
 				check(worst<.002,"Both flight arms follow actual MD2 source orientation at "+str(hz));native_arms_checked=true
+				var hip:int=a.skeleton.find_bone("J_Hip");var leg_error:=0.
+				for bone_name in ["J_L_Leg","J_R_Leg"]:
+					var bone:int=a.skeleton.find_bone(bone_name)
+					var truth:Transform3D=native[hip].affine_inverse()*native[bone];var visible:Transform3D=a.skeleton.get_bone_global_pose(hip).affine_inverse()*a.skeleton.get_bone_global_pose(bone)
+					leg_error=maxf(leg_error,maxf(truth.origin.distance_to(visible.origin),truth.basis.get_rotation_quaternion().angle_to(visible.basis.get_rotation_quaternion())))
+				check(leg_error<.002,"Both flight legs preserve actual MD2 spread and pose at "+str(hz))
 			if a._jump_stage=="JumpAirborne" and a._jump_time>.1:continuous_apex=a.source_transition.elapsed>.25
 		check(peak>.9 and saw_landing and a.is_on_floor(),"Collision-owned hybrid jump/landing at "+str(hz))
 		check(a.hybrid_motion.landing_samples>int(.5*hz),"Moving bounce is not cut off by old50ms landing release at "+str(hz))

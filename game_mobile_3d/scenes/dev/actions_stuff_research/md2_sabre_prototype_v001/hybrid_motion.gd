@@ -107,6 +107,7 @@ func setup(skeleton:Skeleton3D,path:String,target_path:String)->bool:
 		if group_names[group_for_bone[i]] in ["UpperArm.L","UpperArm.R"]:_arm_bones.append(i)
 		if group_names[group_for_bone[i]] in ["Leg.L","Leg.R"]:_leg_bones.append(i)
 		if group_names[group_for_bone[i]]=="Hips":_hip_bone=i
+	if _hip_bone<0 or _leg_bones.size()<2:return false
 	return true
 func reset()->void:
 	phase=0.;phase_advanced=0.;run_weight=0.;last_kind="";owns_pose=false;flight_elapsed=0.;landing_elapsed=0.;landing_samples=0;landing_move_weight=0.;_last_stage="";maximum_attachment_gap=0.;_arm_key="";_arm_elapsed=1.;_arm_from.clear();_last_arm_relative.clear()
@@ -264,4 +265,4 @@ func keep_shoulders_attached()->void:
 		var inverse:=rig.get_bone_global_pose(_hip_bone).affine_inverse()
 		for bone in _leg_bones:_last_leg_relative[bone]=inverse*rig.get_bone_global_pose(bone)
 func diagnostics()->Dictionary:
-	return {"source":source_path,"last_kind":last_kind,"phase":phase,"phase_hz":phase_hz,"run_weight":run_weight,"phase_advance":phase_advanced,"landing_elapsed":landing_elapsed,"landing_duration":landing_duration,"maximum_attachment_error_m":maximum_attachment_gap,"scope":"Private source-derived retarget; physics/collision and MD2 combat preserved. Run independent lifetime ambient omitted from periodic core."}
+	return {"source":source_path,"last_kind":last_kind,"phase":phase,"phase_hz":phase_hz,"run_weight":run_weight,"phase_advance":phase_advanced,"landing_elapsed":landing_elapsed,"landing_duration":landing_duration,"native_limb_sample_seconds":native_limb_sample_seconds,"visual_turn_velocity":facing.angular_velocity,"maximum_attachment_error_m":maximum_attachment_gap,"scope":"Private source-derived retarget; physics/collision and MD2 combat preserved. MD2 flight limbs fit physical apex with receiving handoff. Moving landing adds to live full gait. Run independent lifetime ambient omitted."}
