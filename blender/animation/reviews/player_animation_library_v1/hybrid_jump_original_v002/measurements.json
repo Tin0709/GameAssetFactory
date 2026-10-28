@@ -1,0 +1,72 @@
+{
+  "scope": "Actually evaluated saved original Actions and actual rigid sole geometry. Source-authored references not sampled. Preview arc is original adapter, not native physics.",
+  "metrics": [
+    {
+      "action": "Jump_Landing_MD2_AS_SoftBounce_Original_v002_PENDING",
+      "phase": "landing",
+      "duration_s": 0.75,
+      "hip_range_mm": 61.999380588531494,
+      "head_global_pitch_max_deg": 8.499930511686271,
+      "scale_error": 0.0,
+      "forearm_identity_error": 4.37442224665574e-08,
+      "root_travel_m": 0.0,
+      "minimum_in_place_sole_z_m": 0.0003000497817993164,
+      "ground_penetration_mm": 0.0,
+      "air_penetration_in_context_mm": 0,
+      "grounded_sole_velocity_max_m_s": 0.0,
+      "loop_pose_error": null,
+      "review_rates": [
+        {
+          "hz": 30,
+          "maximum_hip_origin_step_mm": 25.74294854871228,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 60,
+          "maximum_hip_origin_step_mm": 13.381064112178136,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 120,
+          "maximum_hip_origin_step_mm": 6.70468802875402,
+          "context_penetration_mm": 0
+        }
+      ]
+    },
+    {
+      "action": "PREVIEW_ONLY_Jump_MD2_AS_SoftBounce_Context_Original_v002_PENDING",
+      "phase": "context",
+      "duration_s": 2.4,
+      "hip_range_mm": 67.9979920387268,
+      "head_global_pitch_max_deg": 8.499432761650507,
+      "scale_error": 0.0,
+      "forearm_identity_error": 5.98374754190445e-08,
+      "root_travel_m": 0.0,
+      "minimum_in_place_sole_z_m": 0.0003000497817993164,
+      "ground_penetration_mm": 0.0,
+      "air_penetration_in_context_mm": 0.0,
+      "grounded_sole_velocity_max_m_s": 0.0,
+      "loop_pose_error": 0.0,
+      "review_rates": [
+        {
+          "hz": 30,
+          "maximum_hip_origin_step_mm": 25.924145994419703,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 60,
+          "maximum_hip_origin_step_mm": 13.358414054910002,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 120,
+          "maximum_hip_origin_step_mm": 7.197677964509958,
+          "context_penetration_mm": 0
+        }
+      ]
+    }
+  ],
+  "phase_boundaries": {
+    "landing_to_context_hold_pose_error": 0.0
+  }
+}
