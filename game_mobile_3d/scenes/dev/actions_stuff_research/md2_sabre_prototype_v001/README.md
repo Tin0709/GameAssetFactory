@@ -1,4 +1,24 @@
-### Current — A&S movement / v004 receiving / MD2 combat, 2026-10-28
+### Current jump timing — measured physics / compact receiving, 2026-10-28
+
+The same lab now reads optional hash-pinned private jump settings from Research
+`reports/prototype_sabre/jump_fidelity_20261028/jump_runtime.private.json`.
+This profile holds source-backed launch/normal-air settings and the measured
+vertical acceleration. An original trapezoidal integration adapter separates
+true end velocity from collision-step average velocity. Accepted coyote jumps
+cancel a previous slam before the new gravity step.
+
+User-selected compact receiving fits the existing private stationary/moving
+body/head bounce into a short contact-relative clock with continuous speed;
+original Blender keys and native combat remain unchanged. The F3 **Measured
+jump physics · A/B** switch changes physics on the ground only. Compact
+receiving remains enabled for both A/B choices. Baseline diagnostics must set
+both `MD2_HYBRID_MOTION=0` and `MD2_MEASURED_JUMP=0`.
+
+This is partial native fidelity: the captured launch root advance is still
+unexplained and deliberately unapplied. Private evidence, before/after timings,
+real-time rendered checks and preservation pins are in the report folder above.
+
+### A&S movement / v004 receiving / MD2 combat, 2026-10-28
 
 User authorizes private hybrid gameplay now. Restart the same lab/launcher;
 window title identifies **Hybrid A&S / Jump v004 / MD2 Sabre**. WASD runs,
