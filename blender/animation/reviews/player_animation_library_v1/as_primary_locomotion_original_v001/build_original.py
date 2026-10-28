@@ -41,7 +41,7 @@ def pose(p,s,contacts=None):
    side=1 if name.endswith('L')else -1
    # Original periodic spacing: fast exchanges and brief held extremes.
    shaped=math.tanh(1.35*math.sin(wave+.21))/math.tanh(1.35)
-   pitch=side*math.radians(s['arm'])*(shaped+.055*math.sin(2*wave-.35))
+   pitch=-side*math.radians(s['arm'])*(shaped+.055*math.sin(2*wave-.35))
    rot=rotate(pitch,-side*math.radians(3.5),side*math.radians(2.2)*math.sin(wave+.5))
   elif name in points:
    phase=p if name.endswith('L')else(p+.5)%1
