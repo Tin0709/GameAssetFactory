@@ -1,0 +1,21 @@
+{
+  "old_action_fingerprints_preserved": 110,
+  "old_registrations_preserved": 72,
+  "old_review_entries_preserved": 5,
+  "total_central_actions_reopened": 115,
+  "new_pending_phase_actions": 3,
+  "new_pending_context_pose_action": 1,
+  "unchanged_godot_files": 736,
+  "gui_playing_frames": [
+    31,
+    73,
+    115,
+    37,
+    80
+  ],
+  "actual_source_samples_per_action": 2001,
+  "context_ground_penetration_mm": 0.0,
+  "context_ground_sole_velocity_max_m_s": 0.0,
+  "source_sha256": "9538f730b0c2e51a35b18db3faa4d75ada5e6c73b68e899f58d54a1121806190",
+  "central_sha256": "e961a9bdbc0c69c9b16500b8f9582b2dbb7b40751fd8a9fcf803726c7f694a4a"
+}
