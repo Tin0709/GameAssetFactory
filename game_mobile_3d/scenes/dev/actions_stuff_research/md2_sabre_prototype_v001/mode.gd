@@ -141,6 +141,10 @@ func _build_movement_panel()->void:
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.035,.045,.9);style.set_content_margin_all(9);style.set_corner_radius_all(5);movement_panel.add_theme_stylebox_override("panel",style)
 	var scroll:=ScrollContainer.new();scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;movement_panel.add_child(scroll)
 	var box:=VBoxContainer.new();box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(box)
+	if actor.novelty_jump!=null:
+		var flips:=CheckButton.new();flips.name="NoveltyJumpToggle";flips.text="Chained jump · original flip";flips.button_pressed=actor.novelty_jump.requested_enabled;flips.focus_mode=Control.FOCUS_NONE;box.add_child(flips)
+		flips.tooltip_text="Release and press Space promptly after each landing: ordinary, ordinary, flip. Disabling takes effect at next launch. Native third-slot clip/reset value; reconstructed chain clock."
+		flips.toggled.connect(actor.novelty_jump.set_enabled)
 	if not actor.jump_runtime_profile.is_empty():
 		var jump:=CheckButton.new();jump.name="MeasuredJumpToggle";jump.text="Measured jump physics · A/B";jump.button_pressed=actor.measured_jump_requested;jump.focus_mode=Control.FOCUS_NONE;box.add_child(jump)
 		jump.tooltip_text="Switch launch/gravity/air speed on the ground, never mid-flight. Compact one-bounce landing remains the selected art direction. Native unexplained root advance is not applied."
@@ -232,6 +236,8 @@ func present(delta:float)->void:
 		var response:String="—" if m.response_95<0. else "%d ms"%roundi(m.response_95*1000.)
 		movement_label.text="Speed %.2f / target %.2f u/s · peak %.2f\nPath %.2f · net %.2f units · %.1f s\nGait %.2f cycles/s · %.3fx · total %.2f\nStart95 %s · stop %.3fu / %.3fs\nSole candidates L %s / R %s u/s"%[m.speed,m.target_speed,m.peak_speed,m.distance,m.net_distance,m.elapsed,m.cycle_hz,m.play_rate,m.gait_cycles,response,m.stop_distance,m.stop_seconds,left,right]
 		movement_label.tooltip_text="Sole motion includes rolling, not proven contact or foot slip. Normal gait cadence and combat notify gates are source-backed; mask/contact and input buffer remain reconstructed. Save JSON retains all measurements."
+		if actor.novelty_jump!=null:
+			movement_label.text+="\nJump variant %d / %d · %s"%[actor.novelty_jump.variant+1,int(actor.novelty_jump.config.variants),"original flip" if actor.novelty_jump.flip else "ordinary"]
 		if m.has("jump_physics"):
 			var j:Dictionary=m.jump_physics
 			movement_label.text+="\nJump %s · launch %.2f / gravity %.2f\nNominal apex %.3fs · flight %.3fs\nLanding %.2fs · one bounce"%["measured" if j.measured_active else "legacy",j.launch_m_s,j.gravity_m_s2,j.nominal_apex_s,j.nominal_air_s,actor.hybrid_motion.compact_landing_seconds if actor.hybrid_motion!=null else .3]

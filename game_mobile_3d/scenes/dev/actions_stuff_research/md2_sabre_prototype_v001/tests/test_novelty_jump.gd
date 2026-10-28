@@ -16,7 +16,7 @@ func run()->void:
 		Engine.physics_ticks_per_second=hz;a.reset_actor();await ticks(3)
 		for index in 4:
 			var start:float=a.simulation_clock;a.requested_jump=true;await tick();a.requested_jump=false
-			var expected_flip:=index==2;var serial:int=a.novelty_jump.serial;var minimum_up:=1.;var peak:=0.;var selected:bool=a.active_clip=="JumpFlip"
+			var expected_flip:=index==2;var serial:int=a.novelty_jump.serial;var minimum_up:=1.;var peak:=0.;var selected:bool=a.active_clip=="JumpFlip";var pose_error:=0.
 			check(selected==expected_flip,"Two ordinary jumps then original flip, sequence "+str(index)+" at "+str(hz))
 			for i in hz:
 				# Bone localY is not anatomical up in this recovered rig. Measure
@@ -26,14 +26,21 @@ func run()->void:
 				var deformation:Basis=a.skeleton.get_bone_global_pose(hip).basis*a.skeleton.get_bone_global_rest(hip).basis.inverse()
 				var body_up:Vector3=a.skeleton.global_basis*deformation*(a.skeleton.global_basis.inverse()*Vector3.UP)
 				minimum_up=minf(minimum_up,body_up.normalized().dot(Vector3.UP))
+				if expected_flip and a.active_clip=="JumpFlip" and a.source_transition.incoming_weight>=.9999:
+					var original:Array=a.hybrid_motion._native_worlds(a,"JumpFlip",a.animation_player.current_animation_position)
+					for name in ["J_Spine","J_Shoulders","J_Head","J_L_Leg","J_R_Leg","J_R_Weapon"]:
+						var bone:int=a.skeleton.find_bone(name);var shown:Transform3D=a.skeleton.get_bone_global_pose(bone)
+						pose_error=maxf(pose_error,maxf(shown.origin.distance_to(original[bone].origin),shown.basis.get_rotation_quaternion().angle_to(original[bone].basis.get_rotation_quaternion())))
 				peak=maxf(peak,a.global_position.y)
 				if a._grounded:break
 				await tick()
 			check(a._grounded and a.simulation_clock-start<.55,"Flip never adds flight height/delay "+str(hz)+" "+str(index))
 			check(absf(peak-1.728)<.015,"All variants retain same ballistic rise "+str(hz)+" "+str(index))
-			if expected_flip:check(minimum_up<-.5,"Full-body source really rotates upside-down, not just a renamed ordinary jump "+str(hz))
+			if expected_flip:
+				check(minimum_up<-.5,"Full-body source really rotates upside-down, not just a renamed ordinary jump "+str(hz))
+				check(pose_error<.002,"Torso/head/limbs/weapon match original source sampling after entry handoff "+str(hz))
 			check(a.novelty_jump.serial==serial,"No duplicate launch on landing or held jump "+str(hz))
-			rows.append({"hz":hz,"index":index,"flip":selected,"minimum_torso_up":minimum_up,"peak":peak,"air_s":a.simulation_clock-start})
+			rows.append({"hz":hz,"index":index,"flip":selected,"minimum_torso_up":minimum_up,"peak":peak,"air_s":a.simulation_clock-start,"source_pose_error":pose_error})
 			await tick()
 		await ticks(ceili(.25*hz));a.requested_jump=true;await tick();a.requested_jump=false
 		check(a.novelty_jump.variant==0 and a.active_clip!="JumpFlip","Ground pause resets chain "+str(hz))

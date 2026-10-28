@@ -794,6 +794,7 @@ func reset_movement_measurements()->void:
 	if foot_placement!=null:foot_placement.reset_metrics()
 func movement_measurements()->Dictionary:
 	var report:Dictionary=movement_meter.snapshot()
+	if novelty_jump!=null:report["jump_variation"]=novelty_jump.diagnostics()
 	if hybrid_motion!=null:report["hybrid_motion"]=hybrid_motion.diagnostics()
 	if not jump_runtime_profile.is_empty():report["jump_physics"]={"measured_active":measured_jump_active,"requested":measured_jump_requested,"launch_m_s":sqrt(2.*gravity*jump_height),"gravity_m_s2":gravity,"nominal_apex_s":sqrt(2.*jump_height/gravity),"nominal_air_s":2.*sqrt(2.*jump_height/gravity),"native_observed_air_s":jump_runtime_profile.get("native_observed_air_seconds"),"unexplained_root_advance_applied":false,"scope":"Verified launch setting and measured acceleration; no claim of complete native trajectory. A/B applies on ground, never mid-flight."}
 	if foot_placement!=null:report["foot_ground"]=foot_placement.snapshot()
