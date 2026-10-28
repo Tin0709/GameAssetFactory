@@ -4520,12 +4520,12 @@
     {
       "action": "Jump_AS_Stationary_ShouldersAttached_v004_RESEARCH",
       "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_landing_shoulders_v004\\AS_Landing_ShouldersAttached_v004.blend",
-      "source_sha256": "a57fc15a6651695b369944320630e3c47e9bc37548b43313d4bc42ae81e51cba",
+      "source_sha256": "a46f58736ace747efd94188e725a907a2cf2496e6fbdb12285a065ac34f86fe6",
       "source_rig": "ASLanding_Attached_Authoring_Rig",
       "source_mesh": "ASLanding_Attached_Authoring_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBASLanding_SourceMatch_Authoring_Rig",
-      "action_sha256": "461684d8cbaf20cc1295c5f11b3109fae193e302b6d789b9a5c77aa5c99a442c",
+      "action_sha256": "ff1ebd3af2fab2eaec4db297aa53013c32598c6bb897ee3c23bbb2735dcda631",
       "action_frame_range": [
         1.0,
         157.0
@@ -4581,12 +4581,12 @@
     {
       "action": "Jump_AS_Moving_ShouldersAttached_v004_RESEARCH",
       "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_landing_shoulders_v004\\AS_Landing_ShouldersAttached_v004.blend",
-      "source_sha256": "a57fc15a6651695b369944320630e3c47e9bc37548b43313d4bc42ae81e51cba",
+      "source_sha256": "a46f58736ace747efd94188e725a907a2cf2496e6fbdb12285a065ac34f86fe6",
       "source_rig": "ASLanding_Attached_Authoring_Rig",
       "source_mesh": "ASLanding_Attached_Authoring_Mesh",
       "source_armature": "LB_Test_RestRig",
       "slot_identifier": "OBASLanding_SourceMatch_Authoring_Rig",
-      "action_sha256": "99ed56d6f4901ef3074dfe4840d281b46f789871af086736c1dc0d88918a6c65",
+      "action_sha256": "f7df03fa926bc3acf714fdf046fae93312034c634faaf2407e75d98b9966c732",
       "action_frame_range": [
         1.0,
         157.0
@@ -5265,7 +5265,7 @@
       "world_root": "ASLandingV4_Stationary_Root",
       "pose_action": "Jump_AS_Stationary_ShouldersAttached_v004_RESEARCH",
       "pose_slot_identifier": "OBASLanding_SourceMatch_Authoring_Rig",
-      "pose_action_sha256": "461684d8cbaf20cc1295c5f11b3109fae193e302b6d789b9a5c77aa5c99a442c",
+      "pose_action_sha256": "ff1ebd3af2fab2eaec4db297aa53013c32598c6bb897ee3c23bbb2735dcda631",
       "presentation_action": "PREVIEW_ONLY_ASLandingV4_Stationary_Elevation",
       "presentation_slot_identifier": "OBASLandingV4_Stationary_Root",
       "presentation_action_sha256": "0130d12205ef4b0b10aa5a114cc619d9b7189dd40ff971e0a9f767322b7b1a02",
