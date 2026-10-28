@@ -1,3 +1,25 @@
+### Current — A&S movement / v004 receiving / MD2 combat, 2026-10-28
+
+User authorizes private hybrid gameplay now. Restart the same lab/launcher;
+window title identifies **Hybrid A&S / Jump v004 / MD2 Sabre**. WASD runs,
+Shift walks, Space jumps, LMB/E retains native MD2 Sabre combat. Appearance,
+camera and environment are preserved. The raw action reviewer stays MD2;
+**Resume gameplay** restores the hybrid.
+
+Generic `hybrid_motion.gd` reads an external, ignored research stream. A&S
+gait follows distance calibration, v004 supplies receiving body/head motion,
+native32bone jump sources supply flight limbs. Moving landing adds onto the
+live full gait immediately. `smooth_facing.gd` eases neutral travel-facing;
+native combat/aim and physical movement remain unchanged. Contact clocks
+remain physical even while an airborne strike owns the pose. This is a
+declared visual reconstruction, not newly recovered engine behavior.
+
+No source-derived keys were embedded here or promoted to production. Set
+`MD2_HYBRID_MOTION=0` for unchanged MD2-baseline diagnostics. Missing/invalid
+private data falls back to that path. Source provenance, retarget and timing
+limits, checks and captures are in private Research
+`blender/hybrid_godot_v001/README.md`. Phone optimization is not measured.
+
 # Player + Sabre prototype
 
 ### Current — original rigid foot-ground contact, 2026-10-28
