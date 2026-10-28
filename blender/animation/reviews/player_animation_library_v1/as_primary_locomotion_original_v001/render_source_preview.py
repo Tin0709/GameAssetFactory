@@ -18,7 +18,7 @@ for i,spec in enumerate(meta['specs'][:2]):
 for i,label in enumerate(['WALK  1.20 Hz / 1.50 m stride','RUN  1.60 Hz / 2.69 m stride']):text(s,'ASPrimary_Source_Column_'+str(i),label,hud,((i-.5)*2.7,1.65,-4),.13)
 bpy.context.window.scene=s
 s.render.engine='BLENDER_WORKBENCH';s.render.resolution_x=960;s.render.resolution_y=600
-sh=s.display.shading;sh.light='STUDIO';sh.color_type='TEXTURE';sh.show_shadows=True;sh.show_cavity=True;sh.cavity_type='BOTH';sh.show_specular_highlight=False;sh.background_type='WORLD'
+sh=s.display.shading;sh.light='STUDIO';sh.color_type='TEXTURE';sh.show_shadows=False;sh.show_cavity=True;sh.cavity_type='BOTH';sh.show_specular_highlight=False;sh.background_type='WORLD'
 s.display.render_aa='8';s.render.image_settings.file_format='PNG'
 out=R/'.validation/animation_showcase/as_primary_locomotion_original_v001/preview_frames';out.mkdir(exist_ok=True)
 for i in range(75):

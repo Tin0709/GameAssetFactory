@@ -45,7 +45,7 @@ def actor(scene,entry,number,location=(0,0,0)):
  return carrier,rig,mesh
 def text(scene,name,body,parent,location,size):
  curve=bpy.data.curves.new(name,'FONT');curve.body=body;curve.size=size;curve.align_x='CENTER';curve.materials.append(ink)
- obj=link(scene,bpy.data.objects.new(name,curve));obj.parent=parent;obj.location=location;return obj
+ obj=link(scene,bpy.data.objects.new(name,curve));obj.parent=parent;obj.location=location;obj.visible_shadow=False;return obj
 def stage(name,title,subtitle,end,travel=False):
  scene=bpy.data.scenes.new(name);scene.frame_start=1;scene.frame_end=end;scene.render.fps=60;scene.render.fps_base=1
  world=bpy.data.worlds.new(name+'_World');world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.12,.15,.20,1);world.node_tree.nodes['Background'].inputs[1].default_value=.55;scene.world=world
