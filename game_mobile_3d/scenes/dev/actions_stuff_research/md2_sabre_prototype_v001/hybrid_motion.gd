@@ -23,6 +23,14 @@ var _last_stage:=""
 var _attachment:Array=[]
 var maximum_attachment_gap:=0.
 var source_path:=""
+var _arm_bones:Array[int]=[]
+var _body_bone:=-1
+var _last_arm_relative:Dictionary={}
+var _arm_from:Dictionary={}
+var _arm_elapsed:=1.
+var _arm_key:=""
+var _native_tracks:Dictionary={}
+var _native_rest:Array[Transform3D]=[]
 func setup(skeleton:Skeleton3D,path:String,target_path:String)->bool:
 	if not path.is_absolute_path() or not FileAccess.file_exists(path):return false
 	var file:=FileAccess.open(path,FileAccess.READ)
@@ -66,9 +74,35 @@ func setup(skeleton:Skeleton3D,path:String,target_path:String)->bool:
 		var arm:=rig.find_bone(item.bone);var body:=rig.find_bone(item.body)
 		if arm<0 or body<0:return false
 		_attachment.append({"arm":arm,"body":body,"side":float(item.side),"patch":Vector3(item.patch[0],item.patch[1],item.patch[2]),"lo":Vector3(item.lo[0],item.lo[1],item.lo[2]),"hi":Vector3(item.hi[0],item.hi[1],item.hi[2])})
+	if _attachment.size()!=2:return false
+	_body_bone=_attachment[0].body
+	for i in rig.get_bone_count():
+		_native_rest.append(rig.get_bone_rest(i))
+		if group_names[group_for_bone[i]] in ["UpperArm.L","UpperArm.R"]:_arm_bones.append(i)
 	return true
 func reset()->void:
-	phase=0.;phase_advanced=0.;run_weight=0.;last_kind="";owns_pose=false;flight_elapsed=0.;landing_elapsed=0.;landing_samples=0;_last_stage="";maximum_attachment_gap=0.
+	phase=0.;phase_advanced=0.;run_weight=0.;last_kind="";owns_pose=false;flight_elapsed=0.;landing_elapsed=0.;landing_samples=0;_last_stage="";maximum_attachment_gap=0.;_arm_key="";_arm_elapsed=1.;_arm_from.clear();_last_arm_relative.clear()
+func _native_worlds(actor,key:String)->Array[Transform3D]:
+	if not _native_tracks.has(key):
+		var animation:Animation=actor.animation_player.get_animation(actor.clips[key].action);var tracks:Array=[]
+		for index in animation.get_track_count():
+			var path:=animation.track_get_path(index)
+			if path.get_subname_count()==0:continue
+			var bone:=rig.find_bone(path.get_subname(0));var kind:=animation.track_get_type(index)
+			if bone>=0 and kind in [Animation.TYPE_POSITION_3D,Animation.TYPE_ROTATION_3D,Animation.TYPE_SCALE_3D]:tracks.append({"bone":bone,"kind":kind,"index":index})
+		_native_tracks[key]={"animation":animation,"tracks":tracks}
+	var row:Dictionary=_native_tracks[key];var animation:Animation=row.animation;var seconds:float=actor.animation_player.current_animation_position
+	var local:Array[Transform3D]=_native_rest.duplicate();var p:Array[Vector3]=[];var q:Array[Quaternion]=[];var s:Array[Vector3]=[]
+	for value in local:p.append(value.origin);q.append(value.basis.get_rotation_quaternion());s.append(value.basis.get_scale())
+	for channel:Dictionary in row.tracks:
+		match channel.kind:
+			Animation.TYPE_POSITION_3D:p[channel.bone]=animation.position_track_interpolate(channel.index,seconds)
+			Animation.TYPE_ROTATION_3D:q[channel.bone]=animation.rotation_track_interpolate(channel.index,seconds)
+			Animation.TYPE_SCALE_3D:s[channel.bone]=animation.scale_track_interpolate(channel.index,seconds)
+	var world:Array[Transform3D]=[]
+	for i in local.size():
+		var value:=Transform3D(Basis(q[i])*Basis.from_scale(s[i]),p[i]);world.append(world[parents[i]]*value if parents[i]>=0 else value)
+	return world
 func is_gait(key:String)->bool:return key in GAITS
 func period(speed:float,weight:float)->float:
 	# Distance calibration:2m/s Walk /5.59m/s Run at their source cadences.
@@ -126,15 +160,32 @@ func apply(actor,key:String,delta:float)->void:
 		else:
 			if _last_stage not in ["JumpTakeoff","JumpAirborne"]:flight_elapsed=0. if stage=="JumpTakeoff" else .35
 			else:flight_elapsed+=delta
-			deforms=_sample("JumpMoving" if moving else "JumpStationary",clampf(.4+flight_elapsed,.4,.92));last_kind="Flight"
+			# Fit the source preview flight to the accepted physical apex interval.
+			# Actual collision still ends flight; no presentation arc moves the body.
+			var physical_flight:float=2.*sqrt(2.*actor.jump_height/actor.gravity)
+			deforms=_sample("JumpMoving" if moving else "JumpStationary",clampf(.4+flight_elapsed*.52/physical_flight,.4,.92));last_kind="Flight"
 	_last_stage=stage
 	if deforms.is_empty():return
 	var local:=_locals(deforms)
+	if key in ["JumpTakeoff","JumpAirborne","JumpLanding"]:
+		var worlds:Array[Transform3D]=[]
+		for i in local.size():worlds.append(worlds[parents[i]]*local[i] if parents[i]>=0 else local[i])
+		if key in ["JumpTakeoff","JumpAirborne"]:
+			var native:=_native_worlds(actor,key);var body_delta:=worlds[_body_bone]*native[_body_bone].affine_inverse()
+			for bone in _arm_bones:worlds[bone]=body_delta*native[bone]
+		if _arm_key!=key:
+			_arm_key=key;_arm_elapsed=0.;_arm_from=_last_arm_relative.duplicate()
+		_arm_elapsed+=delta
+		var weight:=clampf(_arm_elapsed/.08,0.,1.);weight=weight*weight*(3.-2.*weight)
+		var inverse:=worlds[_body_bone].affine_inverse()
+		for bone in _arm_bones:
+			if _arm_from.has(bone) and weight<1.:worlds[bone]=worlds[_body_bone]*Transform3D(_arm_from[bone]).interpolate_with(inverse*worlds[bone],weight)
+		for i in local.size():local[i]=worlds[parents[i]].affine_inverse()*worlds[i] if parents[i]>=0 else worlds[i]
+	else:_arm_key="";_arm_from.clear()
 	for i in local.size():rig.set_bone_pose(i,local[i])
 	rig.force_update_all_bone_transforms();owns_pose=true
 func keep_shoulders_attached()->void:
-	if not owns_pose:return
-	for item:Dictionary in _attachment:
+	for item:Dictionary in _attachment if owns_pose else []:
 		var arm:int=item.arm;var body:int=item.body;var body_skin:=rig.get_bone_global_pose(body)*rest[body].affine_inverse()
 		var arm_world:=rig.get_bone_global_pose(arm);var patch:Vector3=arm_world*rest[arm].affine_inverse()*Vector3(item.patch)
 		var local:=body_skin.affine_inverse()*patch;var lo:Vector3=item.lo;var hi:Vector3=item.hi
@@ -144,5 +195,8 @@ func keep_shoulders_attached()->void:
 		rig.set_bone_pose(arm,parent.affine_inverse()*arm_world);rig.force_update_all_bone_transforms()
 		var actual:Vector3=body_skin.affine_inverse()*(rig.get_bone_global_pose(arm)*rest[arm].affine_inverse()*Vector3(item.patch))
 		maximum_attachment_gap=maxf(maximum_attachment_gap,actual.distance_to(target))
+	if _body_bone>=0:
+		var inverse:=rig.get_bone_global_pose(_body_bone).affine_inverse()
+		for bone in _arm_bones:_last_arm_relative[bone]=inverse*rig.get_bone_global_pose(bone)
 func diagnostics()->Dictionary:
 	return {"source":source_path,"last_kind":last_kind,"phase":phase,"phase_hz":phase_hz,"run_weight":run_weight,"phase_advance":phase_advanced,"landing_elapsed":landing_elapsed,"landing_duration":landing_duration,"maximum_attachment_error_m":maximum_attachment_gap,"scope":"Private source-derived retarget; physics/collision and MD2 combat preserved. Run independent lifetime ambient omitted from periodic core."}

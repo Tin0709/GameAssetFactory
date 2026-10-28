@@ -636,10 +636,14 @@ func _play(key:String,blend:float=.04)->void:
 			var rate:float=combo.playback_rate() if combo.active() else 1.
 			var idle_to_move:bool=active_clip in ["Idle","CombatReady"] and key in GAITS
 			var move_to_idle:bool=active_clip in GAITS and key in ["Idle","CombatReady"]
-			if _continuous_combat_segment(active_clip,key):
+			var continuous_hybrid_jump:bool=hybrid_motion!=null and active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding"] and key in ["JumpTakeoff","JumpAirborne","JumpLanding"]
+			var hybrid_jump_boundary:bool=hybrid_motion!=null and (active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding"] or key in ["JumpTakeoff","JumpAirborne","JumpLanding"])
+			if _continuous_combat_segment(active_clip,key) or continuous_hybrid_jump:
 				_outgoing_locomotion_state.clear();source_transition.discard_raw()
 			elif _combat_entry(key):
 				_outgoing_locomotion_state.clear();source_transition.begin(float(combat_handoffs.blend_in_seconds))
+			elif hybrid_jump_boundary:
+				_outgoing_locomotion_state.clear();source_transition.begin_evaluated(.10,Callable(),&"smoothstep")
 			elif _ground_graph_enabled() and _grounded and (idle_to_move or move_to_idle):
 				var seconds:float=ground_graph.idle_to_move_seconds if idle_to_move else ground_graph.move_to_idle_seconds
 				var outgoing_phase:float=animation_player.current_animation_position/float(clips[active_clip].duration)
