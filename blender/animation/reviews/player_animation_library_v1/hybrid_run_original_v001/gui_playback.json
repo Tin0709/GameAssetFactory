@@ -1,0 +1,65 @@
+[
+  {
+    "elapsed": 2.53422609998961,
+    "frame": 25,
+    "playing": true,
+    "scene": "Hybrid_Run_Comparison_v001_PENDING",
+    "sync": "FRAME_DROP",
+    "actors": [
+      [
+        "Hybrid_Run_Comparison_Rig_1",
+        "Run_Hybrid_V1_Subtle_Bounce_Original_v001"
+      ],
+      [
+        "Hybrid_Run_Comparison_Rig_2",
+        "Run_Hybrid_V2_Balanced_Bounce_Original_v001"
+      ],
+      [
+        "Hybrid_Run_Comparison_Rig_3",
+        "Run_Hybrid_V3_Expressive_Bounce_Original_v001"
+      ]
+    ]
+  },
+  {
+    "elapsed": 5.043416300002718,
+    "frame": 48,
+    "playing": true,
+    "scene": "Hybrid_Run_Comparison_v001_PENDING",
+    "sync": "FRAME_DROP",
+    "actors": [
+      [
+        "Hybrid_Run_Comparison_Rig_1",
+        "Run_Hybrid_V1_Subtle_Bounce_Original_v001"
+      ],
+      [
+        "Hybrid_Run_Comparison_Rig_2",
+        "Run_Hybrid_V2_Balanced_Bounce_Original_v001"
+      ],
+      [
+        "Hybrid_Run_Comparison_Rig_3",
+        "Run_Hybrid_V3_Expressive_Bounce_Original_v001"
+      ]
+    ]
+  },
+  {
+    "elapsed": 7.546417500008829,
+    "frame": 71,
+    "playing": true,
+    "scene": "Hybrid_Run_Comparison_v001_PENDING",
+    "sync": "FRAME_DROP",
+    "actors": [
+      [
+        "Hybrid_Run_Comparison_Rig_1",
+        "Run_Hybrid_V1_Subtle_Bounce_Original_v001"
+      ],
+      [
+        "Hybrid_Run_Comparison_Rig_2",
+        "Run_Hybrid_V2_Balanced_Bounce_Original_v001"
+      ],
+      [
+        "Hybrid_Run_Comparison_Rig_3",
+        "Run_Hybrid_V3_Expressive_Bounce_Original_v001"
+      ]
+    ]
+  }
+]
