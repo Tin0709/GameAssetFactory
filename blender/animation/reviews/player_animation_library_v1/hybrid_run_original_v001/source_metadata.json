@@ -1,0 +1,13 @@
+{
+  "source_sha256": "e5ec010a57769ab99fec9509262c77f15afbd233daceb97ccd115be2285e6ebb",
+  "actions": [
+    "Run_Hybrid_V1_Subtle_Bounce_Original_v001",
+    "Run_Hybrid_V2_Balanced_Bounce_Original_v001",
+    "Run_Hybrid_V3_Expressive_Bounce_Original_v001"
+  ],
+  "rig": "HybridRun_Authoring_Rig",
+  "mesh": "HybridRun_Authoring_Mesh",
+  "armature": "LB_Test_RestRig",
+  "fps": 60,
+  "fps_base": 0.9931144067796611
+}
