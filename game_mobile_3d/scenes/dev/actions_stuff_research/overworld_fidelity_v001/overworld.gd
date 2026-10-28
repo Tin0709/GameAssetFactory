@@ -28,7 +28,7 @@ func _ready()->void:
 	camera.far=maxf(150.,grass_field_blocks*4.)
 	if md2_lighting!=null:md2_lighting.grass_field=meadow
 	environment_audio=EnvAudio.new();environment_audio.name="PrivateOverworldAudio";add_child(environment_audio);environment_audio.setup(player,meadow,private_bundle)
-	sabre_mode.panel.hide();sabre_mode.refresh_reflections()
+	sabre_mode.panel.hide();sabre_mode.movement_panel.hide();sabre_mode.refresh_reflections()
 	_build_meadow_ui()
 	get_window().title="GameAssetFactory — Private Overworld Meadow / Sabre"
 	print("OVERWORLD_PLAYABLE_READY")
@@ -45,6 +45,12 @@ func _process(delta:float)->void:
 func _unhandled_input(event:InputEvent)->void:
 	if not error_text.is_empty():return
 	super._unhandled_input(event)
+
+func _update_camera(delta:float=0.,render_position:Variant=null)->void:
+	var original_blocks:int=grass_field_blocks
+	if grass_overview:grass_field_blocks=32
+	super._update_camera(delta,render_position)
+	grass_field_blocks=original_blocks
 
 func _build_meadow_ui()->void:
 	var layer:=CanvasLayer.new();layer.name="OverworldControls";add_child(layer)
