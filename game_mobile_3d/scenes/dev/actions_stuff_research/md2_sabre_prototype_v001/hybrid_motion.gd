@@ -23,7 +23,10 @@ var _attachment:Array=[]
 var maximum_attachment_gap:=0.
 var source_path:=""
 func setup(skeleton:Skeleton3D,path:String,target_path:String)->bool:
-	if not path.is_absolute_path() or not FileAccess.file_exists(path) or FileAccess.get_size(path)>32000000:return false
+	if not path.is_absolute_path() or not FileAccess.file_exists(path):return false
+	var file:=FileAccess.open(path,FileAccess.READ)
+	if file==null or file.get_length()>32000000:return false
+	file.close()
 	var project:=ProjectSettings.globalize_path("res://").replace("\\","/").simplify_path().to_lower().trim_suffix("/")+"/"
 	if path.replace("\\","/").simplify_path().to_lower().begins_with(project):return false
 	var data:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -92,7 +95,7 @@ func _locals(deforms:Array[Transform3D])->Array[Transform3D]:
 func outgoing_pose(delta:float,cursor:Dictionary,speed:float)->Array[Transform3D]:
 	cursor.phase=fposmod(float(cursor.phase)+delta/period(speed,float(cursor.weight)),1.)
 	return _locals(_ground_deforms(float(cursor.phase),float(cursor.weight)))
-func apply(actor:CharacterBody3D,key:String,delta:float)->void:
+func apply(actor,key:String,delta:float)->void:
 	phase_advanced=0.;owns_pose=false
 	if not actor.review_clip.is_empty():_last_stage="";return
 	var stage:String=actor._jump_stage
