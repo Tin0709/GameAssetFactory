@@ -19,6 +19,7 @@ const CombatLegs=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prot
 const InputOrderTrace=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/input_order_trace.gd")
 const FootPlacement=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/foot_placement.gd")
 const HybridMotion=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/hybrid_motion.gd")
+const JumpProfile=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/jump_profile.gd")
 const MANIFEST:="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/manifest.json"
 const GAITS:=["Walk","Run","StrafeLeft","StrafeRight","CombatWalk","CombatRun","CombatStrafeLeft","CombatStrafeRight"]
 # User-accepted jump study; native launch/scale recovered, full trajectory pending.
@@ -61,6 +62,10 @@ var input_order_trace=InputOrderTrace.new()
 var foot_placement:RefCounted
 var hybrid_motion:RefCounted
 var hybrid_motion_enabled:=true
+var jump_runtime_profile:Dictionary={}
+var measured_jump_requested:=true
+var measured_jump_active:=false
+var _legacy_jump_settings:Dictionary={}
 var _combat_plan_active:=false
 var _combat_open_seconds:=0.
 var _animation_motion_speed:=0.
@@ -224,6 +229,23 @@ func _ready()->void:
 		var hybrid:=HybridMotion.new()
 		if hybrid.setup(skeleton,research_root.path_join("blender/hybrid_godot_v001/hybrid_motion.json"),private_model_path()):
 			hybrid_motion=hybrid;cadence_label="A&S Walk / Run · v004 attached landing\nDistance-synchronized source gait · MD2 combat / physics"
+	if using_original_source and OS.get_environment("MD2_MEASURED_JUMP")!="0":
+		var research_root:=OS.get_environment("MD2_RESEARCH_ROOT")
+		if research_root.is_empty():research_root="C:/Users/ADMIN/Desktop/MD2 Research"
+		jump_runtime_profile=JumpProfile.read(research_root.path_join("reports/prototype_sabre/jump_fidelity_20261028/jump_runtime.private.json"),private_model_path())
+		if not jump_runtime_profile.is_empty():
+			_legacy_jump_settings={"gravity":gravity,"height":jump_height};_apply_jump_settings(true)
+			if hybrid_motion!=null:hybrid_motion.compact_landing_seconds=float(jump_runtime_profile.compact_landing_seconds)
+
+func set_measured_jump(value:bool)->void:
+	measured_jump_requested=value;_apply_jump_settings()
+func _apply_jump_settings(force:bool=false)->void:
+	if jump_runtime_profile.is_empty() or (not force and (not is_on_floor() or combo.active())):return
+	if measured_jump_requested:
+		gravity=float(jump_runtime_profile.vertical_acceleration_m_s2)
+		jump_height=pow(float(jump_runtime_profile.launch_speed_m_s),2)/(2.*gravity)
+	else:gravity=float(_legacy_jump_settings.gravity);jump_height=float(_legacy_jump_settings.height)
+	measured_jump_active=measured_jump_requested
 
 func private_model_path()->String:
 	if not private_model_path_override.is_empty():return private_model_path_override
@@ -371,6 +393,7 @@ func _load_private_combat_clips(config:Variant)->void:
 	supplemental_combat_clips=staged.size()
 
 func _physics_process(delta:float)->void:
+	_apply_jump_settings()
 	if foot_placement!=null:foot_placement.restore()
 	_record_order(&"physics_begin",{"delta":delta})
 	var stick:=requested_direction if scripted_input else Input.get_vector("move_left","move_right","move_forward","move_backward")
@@ -398,6 +421,7 @@ func _physics_process(delta:float)->void:
 	if using_original_source and not was_grounded and combo.phase==&"air_attack":_heavy_slam_active=true
 	_time_since_grounded=0. if was_grounded else _time_since_grounded+delta
 	var speed:=run_speed if _run_requested else walk_speed
+	if measured_jump_active and _run_requested and (not was_grounded or jump_pressed):speed=float(jump_runtime_profile.normal_air_speed_m_s)
 	var desired:=stick.limit_length()*speed
 	combo.advance(0.) # Resolve a late command already beyond RecoveryStart.
 	_record_order(&"input_resolution",{"stick":[stick.x,stick.y],"jump_pressed":jump_pressed})
@@ -420,14 +444,22 @@ func _physics_process(delta:float)->void:
 	# Built-in floor snapping already retains grounded contact. Driving the
 	# source capsule down every tick caused penetration/recovery body jitter.
 	var ground_vertical:=0. if using_original_source else -.2
+	var measured_end_velocity:=0.
+	var measured_air_step:=measured_jump_active and (not was_grounded or jump_pressed)
+	if measured_air_step:
+		var start_velocity:float=sqrt(2.*gravity*jump_height) if jump_pressed and (was_grounded or _time_since_grounded<=coyote_time) else velocity.y
+		measured_end_velocity=start_velocity-gravity*gravity_factor*delta
 	velocity=Vector3(planar.x,ground_vertical if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
 	if jump_pressed and (was_grounded or (using_original_source and _time_since_grounded<=coyote_time)):
 		combo.cancel();velocity.y=sqrt(2.*gravity*jump_height)-(gravity*delta*.5 if using_original_source else 0.);_jump_stage="JumpTakeoff";_jump_time=0.
 		_heavy_slam_active=false
 		_time_since_grounded=INF # Consume the coyote opportunity; no second air jump.
+	if measured_air_step:velocity.y=measured_end_velocity+gravity*gravity_factor*delta*.5
 	var taking_step:bool=combo.phase==&"step"
 	var before_move:=global_position
-	move_and_slide();_grounded=is_on_floor() and velocity.y<=0.
+	move_and_slide()
+	if measured_air_step and not is_on_floor() and not is_on_ceiling():velocity.y=measured_end_velocity
+	_grounded=is_on_floor() and velocity.y<=0.
 	if taking_step:
 		_step_distance+=Vector2(global_position.x-before_move.x,global_position.z-before_move.z).length();_step_elapsed+=delta
 		_step_ready=_step_distance>=COMBAT_STEP_DISTANCE or _step_elapsed>=COMBAT_STEP_TIMEOUT-.0000001
@@ -746,6 +778,7 @@ func reset_movement_measurements()->void:
 func movement_measurements()->Dictionary:
 	var report:Dictionary=movement_meter.snapshot()
 	if hybrid_motion!=null:report["hybrid_motion"]=hybrid_motion.diagnostics()
+	if not jump_runtime_profile.is_empty():report["jump_physics"]={"measured_active":measured_jump_active,"requested":measured_jump_requested,"launch_m_s":sqrt(2.*gravity*jump_height),"gravity_m_s2":gravity,"nominal_apex_s":sqrt(2.*jump_height/gravity),"nominal_air_s":2.*sqrt(2.*jump_height/gravity),"native_observed_air_s":jump_runtime_profile.get("native_observed_air_seconds"),"unexplained_root_advance_applied":false,"scope":"Verified launch setting and measured acceleration; no claim of complete native trajectory. A/B applies on ground, never mid-flight."}
 	if foot_placement!=null:report["foot_ground"]=foot_placement.snapshot()
 	if using_original_source:report.merge({"jump_apex_time_adapter":SOURCE_JUMP_APEX_SECONDS,"moving_landing_release_adapter":SOURCE_MOVING_LAND_SECONDS,"heavy_slam_gravity_multiplier":2.,"effective_gravity":gravity*(2. if _heavy_slam_active else 1.),"jump_phase":_jump_stage})
 	report.merge({"clip":active_clip,"play_rate":_playback_speed,"world_velocity":[velocity.x,velocity.y,velocity.z],"walk_speed":walk_speed,"run_speed":run_speed,"walk_stride_reference":walk_stride_speed,"run_stride_reference":run_stride_speed,"source_table_speed":700 if using_original_source else null,"unit_conversion":"100UU per Godot metre; local effective MD2 runtime unverified" if using_original_source else "authored fallback","acceleration_setting":acceleration,"deceleration_setting":deceleration,"turn_rate_adapter":12.,"attack_travel_adapter":.22,"coyote_time":coyote_time,"jump_height_adapter":jump_height,"gravity_adapter":gravity,"native_runtime_parameters_recovered":false})
