@@ -1,0 +1,263 @@
+{
+  "studies": [
+    {
+      "action": "Jump_Landing_MD2_AS_Original_v001_PENDING",
+      "registered": {
+        "action": "Jump_Landing_MD2_AS_Original_v001_PENDING",
+        "source": "blender/animation/reviews/player_animation_library_v1/hybrid_jump_original_v001/hybrid_jump_authoring.blend",
+        "source_sha256": "9538f730b0c2e51a35b18db3faa4d75ada5e6c73b68e899f58d54a1121806190",
+        "source_rig": "HybridJump_Original_Authoring_Rig",
+        "source_mesh": "HybridJump_Original_Authoring_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBHybridJump_Original_Authoring_Rig",
+        "action_sha256": "0db1a126678299a30af25d6e573e6c01f5dd9aa844619cdd0c15a36290f43c2d",
+        "action_frame_range": [
+          1.0,
+          19.0
+        ],
+        "start": 1,
+        "end": 19,
+        "fps": 60,
+        "fps_base": 1.0,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "status": "pending",
+        "approval_note": "Original MD2-foundation/A&S-inspired Jump. Awaiting human artistic review; no Godot integration.",
+        "seamless_loop": false,
+        "original_custom_animation": true,
+        "source_keyframes_copied": false,
+        "production_eligible": false,
+        "preview_only": false,
+        "preview_floor_z_m": 0,
+        "provenance": "Independent original pose curves; verified source timing/artistic principles only. No reference keys or native physics code copied.",
+        "phase": "landing",
+        "phase_duration_s": 0.3,
+        "playback_sync": "FRAME_DROP"
+      },
+      "actual_range": [
+        1.0,
+        19.0
+      ],
+      "curves": 126,
+      "key_count": 19656,
+      "animated_scale_paths": [
+        "pose.bones[\"ForeArm.L\"].scale",
+        "pose.bones[\"Root\"].scale",
+        "pose.bones[\"Chest\"].scale",
+        "pose.bones[\"Hips\"].scale",
+        "pose.bones[\"Leg.R\"].scale",
+        "pose.bones[\"ForeArm.R\"].scale",
+        "pose.bones[\"Leg.L\"].scale",
+        "pose.bones[\"Head\"].scale",
+        "pose.bones[\"Neck\"].scale",
+        "pose.bones[\"UpperArm.R\"].scale",
+        "pose.bones[\"WeaponCarrier\"].scale",
+        "pose.bones[\"Spine\"].scale",
+        "pose.bones[\"UpperArm.L\"].scale"
+      ],
+      "sha": "0db1a126678299a30af25d6e573e6c01f5dd9aa844619cdd0c15a36290f43c2d"
+    },
+    {
+      "action": "PREVIEW_ONLY_Jump_MD2_AS_Context_Original_v001_PENDING",
+      "registered": {
+        "action": "PREVIEW_ONLY_Jump_MD2_AS_Context_Original_v001_PENDING",
+        "source": "blender/animation/reviews/player_animation_library_v1/hybrid_jump_original_v001/hybrid_jump_authoring.blend",
+        "source_sha256": "9538f730b0c2e51a35b18db3faa4d75ada5e6c73b68e899f58d54a1121806190",
+        "source_rig": "HybridJump_Original_Authoring_Rig",
+        "source_mesh": "HybridJump_Original_Authoring_Mesh",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBHybridJump_Original_Authoring_Rig",
+        "action_sha256": "ebc34f204e0b05821f48861adcfb461c67e24d7f4598a1783544bc4ff0b02139",
+        "action_frame_range": [
+          1.0,
+          121.0
+        ],
+        "start": 1,
+        "end": 120,
+        "fps": 60,
+        "fps_base": 1.0,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "status": "pending",
+        "approval_note": "Original MD2-foundation/A&S-inspired Jump. Awaiting human artistic review; no Godot integration.",
+        "seamless_loop": false,
+        "original_custom_animation": true,
+        "source_keyframes_copied": false,
+        "production_eligible": false,
+        "preview_only": true,
+        "preview_floor_z_m": -0.04,
+        "provenance": "Independent original pose curves; verified source timing/artistic principles only. No reference keys or native physics code copied.",
+        "phase": "context",
+        "phase_duration_s": 2.0,
+        "playback_sync": "FRAME_DROP"
+      },
+      "actual_range": [
+        1.0,
+        121.0
+      ],
+      "curves": 126,
+      "key_count": 123858,
+      "animated_scale_paths": [
+        "pose.bones[\"ForeArm.L\"].scale",
+        "pose.bones[\"Root\"].scale",
+        "pose.bones[\"Chest\"].scale",
+        "pose.bones[\"Hips\"].scale",
+        "pose.bones[\"Leg.R\"].scale",
+        "pose.bones[\"ForeArm.R\"].scale",
+        "pose.bones[\"Leg.L\"].scale",
+        "pose.bones[\"Head\"].scale",
+        "pose.bones[\"Neck\"].scale",
+        "pose.bones[\"UpperArm.R\"].scale",
+        "pose.bones[\"WeaponCarrier\"].scale",
+        "pose.bones[\"Spine\"].scale",
+        "pose.bones[\"UpperArm.L\"].scale"
+      ],
+      "sha": "ebc34f204e0b05821f48861adcfb461c67e24d7f4598a1783544bc4ff0b02139"
+    },
+    {
+      "action": "Landing_Stationary_ActionsStuff_Source_Test_v001",
+      "registered": {
+        "action": "Landing_Stationary_ActionsStuff_Source_Test_v001",
+        "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_jump_v001/jump_actions_stuff_review.blend",
+        "source_rig": "ASJ_Literal_Player_Rig_v001",
+        "source_mesh": "ASJ_Literal_Player_Mesh_v001",
+        "source_armature": "LB_Test_RestRig.002",
+        "slot_identifier": "OBASJ_Literal_Player_Rig_v001",
+        "action_sha256": "2c6abffd2144deed3c0354df95ac666fbc458a8e7a195c0bb3c44cb3021febfb",
+        "action_frame_range": [
+          1.0,
+          31.0
+        ],
+        "start": 1,
+        "end": 30,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Literal source phase reconstruction; pending explicit human review; research only, no production promotion.",
+        "seamless_loop": false,
+        "research_only": true,
+        "production_eligible": false,
+        "source_animation": "animation.oreville_ans.xvdslp",
+        "source_alias": "ydsari",
+        "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+        "research_scale_profile": "actions_stuff_jump_v001",
+        "research_scale_channels": {
+          "Root": {
+            "axes": [
+              0,
+              1,
+              2
+            ],
+            "min": 0.85,
+            "max": 1.15
+          }
+        },
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "preview_floor_z_m": -0.011503514751791954,
+        "source_duration_s": 1.0,
+        "endpoint_sample_frame": 31.0,
+        "bake_hz": 240,
+        "authored_key_times_s": [
+          0.0,
+          0.125,
+          0.1667,
+          0.2917,
+          0.3333,
+          0.375,
+          0.4583,
+          0.5,
+          0.5417,
+          0.625,
+          0.7083,
+          0.7917,
+          0.8333,
+          0.875,
+          0.9583,
+          1.0
+        ],
+        "profile": "isolated literal phase; no controller/blend/holding layers",
+        "head_convention": "literal phase parent-relative head; no entity-relative layer",
+        "source_sha256": "dc187cf1a2ea480c719931956ebea2877cd1120531f42b250383022501881b2a"
+      },
+      "actual_range": [
+        1.0,
+        31.0
+      ],
+      "curves": 126,
+      "key_count": 30366,
+      "animated_scale_paths": [
+        "pose.bones[\"ForeArm.L\"].scale",
+        "pose.bones[\"Root\"].scale",
+        "pose.bones[\"Chest\"].scale",
+        "pose.bones[\"Hips\"].scale",
+        "pose.bones[\"Leg.R\"].scale",
+        "pose.bones[\"ForeArm.R\"].scale",
+        "pose.bones[\"Leg.L\"].scale",
+        "pose.bones[\"Head\"].scale",
+        "pose.bones[\"Neck\"].scale",
+        "pose.bones[\"UpperArm.R\"].scale",
+        "pose.bones[\"WeaponCarrier\"].scale",
+        "pose.bones[\"Spine\"].scale",
+        "pose.bones[\"UpperArm.L\"].scale"
+      ],
+      "sha": "2c6abffd2144deed3c0354df95ac666fbc458a8e7a195c0bb3c44cb3021febfb"
+    }
+  ],
+  "action_count": 115,
+  "rig_bones": [
+    "Root",
+    "Hips",
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "UpperArm.L",
+    "ForeArm.L",
+    "UpperArm.R",
+    "ForeArm.R",
+    "WeaponCarrier",
+    "Leg.L",
+    "Leg.R"
+  ],
+  "rest_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f"
+}
