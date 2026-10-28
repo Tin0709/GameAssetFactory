@@ -68,6 +68,10 @@ func _make_bed(key:String,db:float)->void:
 
 func _process(delta:float)->void:
 	clock+=delta
+	for voice:AudioStreamPlayer3D in nature_voices:
+		if voice.playing:voice.volume_db=float(voice.get_meta("mix_base_db",-80.))+ambience_gain_db
+	for voice:AudioStreamPlayer3D in step_voices+rustle_voices:
+		if voice.playing:voice.volume_db=float(voice.get_meta("mix_base_db",-80.))+effects_gain_db
 	if not ambient_enabled:return
 	for bed:Dictionary in beds:_advance_bed(bed,delta)
 	if clock>=_next_nature:
@@ -106,7 +110,7 @@ func _pick(key:String)->Dictionary:
 func _play(key:String,voice:AudioStreamPlayer3D,point:Vector3,db:float,pitch:float)->void:
 	var row:=_pick(key)
 	if row.is_empty():return
-	voice.stop();voice.stream=row.stream;voice.global_position=point;voice.volume_db=db+(ambience_gain_db if key in ["nature","birds"]else effects_gain_db);voice.pitch_scale=pitch;voice.play()
+	voice.stop();voice.stream=row.stream;voice.global_position=point;voice.set_meta("mix_base_db",db);voice.volume_db=db+(ambience_gain_db if key in ["nature","birds"]else effects_gain_db);voice.pitch_scale=pitch;voice.play()
 	event_count[key]=int(event_count.get(key,0))+1;last_sources[key]=row.name
 	events.append({"time":clock,"key":key,"name":row.name,"at":[point.x,point.y,point.z]})
 	if events.size()>256:events.pop_front()

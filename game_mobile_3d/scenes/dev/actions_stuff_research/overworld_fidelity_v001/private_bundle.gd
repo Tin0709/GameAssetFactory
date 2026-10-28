@@ -28,6 +28,8 @@ func read(path:String)->Dictionary:
 	var parsed:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not parsed is Dictionary or parsed.get("schema","")!="private_overworld_v1" or not parsed.get("private_only",false):return _fail("Invalid private bundle schema.")
 	data=parsed
+	var blend:String=data.get("source_blend","")
+	if not permitted(blend) or not FileAccess.file_exists(blend) or FileAccess.get_sha256(blend)!=String(data.get("source_blend_sha256","")):return _fail("Approved Blender source changed; refresh the private bundle before review.")
 	if data.get("assets",[]).is_empty() or data.get("assets",[]).size()>100:return _fail("Invalid asset count.")
 	for entry:Dictionary in data.get("media",{}).values():
 		var file:String=entry.get("path","")
