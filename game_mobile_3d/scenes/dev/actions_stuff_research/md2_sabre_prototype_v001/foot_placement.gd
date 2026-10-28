@@ -24,12 +24,15 @@ var _last_root:=Vector3.ZERO
 var _last_pelvis_speed:=0.
 var _metrics:Dictionary={}
 var last:Dictionary={}
+var _query:=PhysicsRayQueryParameters3D.new()
 
 func setup(body:CharacterBody3D,sole_geometry:RefCounted)->void:
 	actor=body;geometry=sole_geometry;rig=actor.skeleton;base_visual=actor.visual.position
+	_query.exclude=[actor.get_rid()]
 	clear();reset_metrics()
 
 func restore()->void:
+	if _saved.is_empty() and actor.visual.position==base_visual:return
 	for bone:int in _saved:rig.set_bone_pose(bone,_saved[bone])
 	_saved.clear()
 	actor.visual.position=base_visual
@@ -60,8 +63,8 @@ func _ground(sample:Dictionary)->Dictionary:
 	var lift:=-INF;var hits:=0
 	var space:=actor.get_world_3d().direct_space_state
 	for p:Vector3 in sample.points:
-		var q:=PhysicsRayQueryParameters3D.create(Vector3(p.x,maxf(p.y+.25,actor.global_position.y+.3),p.z),Vector3(p.x,actor.global_position.y-.3,p.z),actor.collision_mask,[actor.get_rid()])
-		var hit:=space.intersect_ray(q);_metrics.ray_queries+=1
+		_query.from=Vector3(p.x,maxf(p.y+.25,actor.global_position.y+.3),p.z);_query.to=Vector3(p.x,actor.global_position.y-.3,p.z);_query.collision_mask=actor.collision_mask
+		var hit:=space.intersect_ray(_query);_metrics.ray_queries+=1
 		if hit.is_empty() or Vector3(hit.normal).y<.65 or float(hit.position.y)>actor.global_position.y+.15:continue
 		lift=maxf(lift,float(hit.position.y)-p.y);hits+=1
 	return {"valid":hits>=3,"lift":lift if hits>0 else 0.,"hits":hits}
