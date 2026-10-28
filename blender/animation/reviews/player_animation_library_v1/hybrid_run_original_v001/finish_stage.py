@@ -23,6 +23,4 @@ bpy.context.window.scene=s
 bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/animation/showcase/Animation_Showcase.blend'))
 for frame in [9,17]:
  s.frame_set(frame);s.render.filepath=str(HERE/('comparison_%03d.png'%frame));bpy.ops.render.render(write_still=True,scene=s.name)
-s.render.engine='CYCLES';s.cycles.samples=4;s.render.resolution_percentage=65
-s.render.image_settings.file_format='FFMPEG';s.render.ffmpeg.format='MPEG4';s.render.ffmpeg.codec='H264';s.render.ffmpeg.constant_rate_factor='MEDIUM';s.render.filepath=str(HERE/'hybrid_run_comparison.mp4')
-bpy.ops.render.render(animation=True,scene=s.name)
+print('COMPARISON_STAGE_RENDERED',flush=True)
