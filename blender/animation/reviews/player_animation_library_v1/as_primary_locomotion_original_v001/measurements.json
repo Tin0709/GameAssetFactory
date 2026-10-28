@@ -30,22 +30,22 @@
         28.830289840698242
       ],
       "max_scale_error": 0.0,
-      "forearm_basis_error": 7.456400652472439e-08,
+      "forearm_basis_error": 7.45494759257781e-08,
       "root_travel_m": 0.0,
       "pose_cycle_error": 0.0,
-      "finite_bake_velocity_seam_m_s": 0.024098121763103702,
+      "finite_bake_velocity_seam_m_s": 0.022939508859632928,
       "playback_rate_measurements": [
         {
           "review_hz": 30,
-          "max_bone_origin_step_m": 0.09006957139895803
+          "max_bone_origin_step_m": 0.07193381924030513
         },
         {
           "review_hz": 60,
-          "max_bone_origin_step_m": 0.04592311253052388
+          "max_bone_origin_step_m": 0.036327473971647053
         },
         {
           "review_hz": 120,
-          "max_bone_origin_step_m": 0.022974989474178305
+          "max_bone_origin_step_m": 0.01828251825570607
         }
       ],
       "contact_schedule": "original intent, not source mask",
@@ -86,22 +86,22 @@
         58.361053466796875
       ],
       "max_scale_error": 0.0,
-      "forearm_basis_error": 7.453492401054973e-08,
+      "forearm_basis_error": 6.985646905377507e-08,
       "root_travel_m": 0.0,
       "pose_cycle_error": 0.0,
       "finite_bake_velocity_seam_m_s": 0.07247702549495583,
       "playback_rate_measurements": [
         {
           "review_hz": 30,
-          "max_bone_origin_step_m": 0.19427850378128683
+          "max_bone_origin_step_m": 0.14208960236122498
         },
         {
           "review_hz": 60,
-          "max_bone_origin_step_m": 0.09914788185599353
+          "max_bone_origin_step_m": 0.07299222243158622
         },
         {
           "review_hz": 120,
-          "max_bone_origin_step_m": 0.04996439420560174
+          "max_bone_origin_step_m": 0.036771943468747174
         }
       ],
       "contact_schedule": "original intent, not source mask",
@@ -145,22 +145,22 @@
         58.361053466796875
       ],
       "max_scale_error": 0.0,
-      "forearm_basis_error": 7.462222129106522e-08,
+      "forearm_basis_error": 7.45494759257781e-08,
       "root_travel_m": 0.0,
       "pose_cycle_error": null,
       "finite_bake_velocity_seam_m_s": null,
       "playback_rate_measurements": [
         {
           "review_hz": 30,
-          "max_bone_origin_step_m": 0.19427850378128683
+          "max_bone_origin_step_m": 0.14208960236122498
         },
         {
           "review_hz": 60,
-          "max_bone_origin_step_m": 0.09914788185599353
+          "max_bone_origin_step_m": 0.07299222243158622
         },
         {
           "review_hz": 120,
-          "max_bone_origin_step_m": 0.04996439420560174
+          "max_bone_origin_step_m": 0.036771943468747174
         }
       ],
       "contact_schedule": "original intent, not source mask",
