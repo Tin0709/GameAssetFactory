@@ -27,7 +27,7 @@
       "max_penetration_mm": 0.0,
       "leg_hip_origin_vertical_difference_mm": [
         0.0,
-        5.57100772857666
+        28.830289840698242
       ],
       "max_scale_error": 0.0,
       "forearm_basis_error": 7.456400652472439e-08,
@@ -49,7 +49,13 @@
         }
       ],
       "contact_schedule": "original intent, not source mask",
-      "near_ground_sample_count": 2029
+      "near_ground_sample_count": 1829,
+      "all_near_ground_same_corner_velocity_m_s": {
+        "rms": 2.1713673364079185,
+        "max": 10.257895149562513
+      },
+      "nonplant_floor_sample_fraction": 0.0,
+      "nonplant_floor_velocity_m_s": null
     },
     {
       "action": "Run_ASInspired_Original_v001_PENDING",
@@ -77,7 +83,7 @@
       "max_penetration_mm": 0.0,
       "leg_hip_origin_vertical_difference_mm": [
         0.0,
-        26.996493339538574
+        58.361053466796875
       ],
       "max_scale_error": 0.0,
       "forearm_basis_error": 7.453492401054973e-08,
@@ -99,7 +105,13 @@
         }
       ],
       "contact_schedule": "original intent, not source mask",
-      "near_ground_sample_count": 1331
+      "near_ground_sample_count": 1003,
+      "all_near_ground_same_corner_velocity_m_s": {
+        "rms": 0.6502930975357762,
+        "max": 3.2580145629134165
+      },
+      "nonplant_floor_sample_fraction": 0.0003123048094940662,
+      "nonplant_floor_velocity_m_s": null
     },
     {
       "action": "PREVIEW_ONLY_WalkRun_PhaseTransition_Original_v001_PENDING",
@@ -130,7 +142,7 @@
       "max_penetration_mm": 0.0,
       "leg_hip_origin_vertical_difference_mm": [
         -20.58243751525879,
-        27.00364589691162
+        58.361053466796875
       ],
       "max_scale_error": 0.0,
       "forearm_basis_error": 7.462222129106522e-08,
@@ -152,7 +164,16 @@
         }
       ],
       "contact_schedule": "original intent, not source mask",
-      "near_ground_sample_count": 2309
+      "near_ground_sample_count": 1974,
+      "all_near_ground_same_corner_velocity_m_s": {
+        "rms": 1.6779166407873316,
+        "max": 10.643228742655639
+      },
+      "nonplant_floor_sample_fraction": 0.0037019898195279964,
+      "nonplant_floor_velocity_m_s": {
+        "rms": 0.02524362300659502,
+        "max": 0.037805300572136546
+      }
     }
   ]
 }
