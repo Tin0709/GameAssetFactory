@@ -761,7 +761,12 @@ func movement_measurements()->Dictionary:
 	var travel_heading:=atan2(actual.x,actual.z)
 	var body_forward:=visual.global_basis*Vector3(0,0,1);var body_heading:=atan2(body_forward.x,body_forward.z)
 	report.merge({"source_phase":animation_player.current_animation_position/float(clips[active_clip].duration) if not active_clip.is_empty() else 0.,"body_travel_angle_deg":absf(rad_to_deg(wrapf(body_heading-travel_heading,-PI,PI))) if travelling else null,"legs_travel_angle_deg":absf(rad_to_deg(wrapf(direction_adapter.current_world_yaw-travel_heading,-PI,PI))) if travelling and direction_adapter!=null else null})
+	if hybrid_motion!=null and hybrid_motion.owns_pose:
+		report.source_phase=hybrid_motion.phase;report.native_gait_enabled=false
+		report.gait_composition_scope="Private A&S retarget with distance-derived cadence; native MD2 gait retained for combat"
+		if selected_hybrid_gait():report.play_rate=hybrid_motion.phase_hz*lerpf(.8,.625,hybrid_motion.run_weight)
 	return report
+func selected_hybrid_gait()->bool:return hybrid_motion!=null and hybrid_motion.owns_pose and hybrid_motion.is_gait(active_clip)
 func save_movement_measurements()->String:
 	var folder:=private_model_path().get_base_dir().get_base_dir().get_base_dir().path_join("reports/prototype_sabre/movement_measurements") if using_private_skin else "user://sabre_movement_measurements"
 	if DirAccess.make_dir_recursive_absolute(folder)!=OK:return ""

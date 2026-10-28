@@ -85,7 +85,7 @@ func _build_ui()->void:
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.035,.045,.90);style.set_corner_radius_all(5);style.content_margin_left=12;style.content_margin_right=12;style.content_margin_top=10;style.content_margin_bottom=10;panel.add_theme_stylebox_override("panel",style)
 	var theme:=Theme.new();theme.default_font_size=13;panel.theme=theme
 	var box:=VBoxContainer.new();box.add_theme_constant_override("separation",6);panel.add_child(box)
-	var title:=Label.new();title.text="PLAYER + SABRE · "+("original source lab" if actor.using_original_source else "authored prototype");box.add_child(title)
+	var title:=Label.new();title.text="PLAYER + SABRE · "+("A&S / v004 / MD2" if actor.hybrid_motion!=null else ("original source lab" if actor.using_original_source else "authored prototype"));box.add_child(title)
 	var appearance:=OptionButton.new();appearance.name="AppearanceSelector";appearance.focus_mode=Control.FOCUS_NONE
 	appearance.add_item("Original MD2 player + Sabre (private)");appearance.add_item("Own authored fallback")
 	appearance.select(0 if actor.prefer_private_skin else 1);box.add_child(appearance)
@@ -101,7 +101,7 @@ func _build_ui()->void:
 		actions.add_item(action_caption(key));actions.set_item_metadata(actions.item_count-1,key)
 	box.add_child(actions);actions.item_selected.connect(func(index:int):actor.review(String(actions.get_item_metadata(index))))
 	var row:=HBoxContainer.new();box.add_child(row)
-	var play:=_button("Review selected",row);play.pressed.connect(func():actor.review(String(actions.get_item_metadata(actions.selected))))
+	var play:=_button("Review raw MD2" if actor.hybrid_motion!=null else "Review selected",row);play.pressed.connect(func():actor.review(String(actions.get_item_metadata(actions.selected))))
 	var resume:=_button("Resume gameplay",row);resume.pressed.connect(actor.resume_gameplay)
 	var loop:=CheckButton.new();loop.text="Loop review";loop.button_pressed=true;loop.focus_mode=Control.FOCUS_NONE;box.add_child(loop);loop.toggled.connect(func(value:bool):actor.review_loop=value)
 	row=HBoxContainer.new();box.add_child(row)

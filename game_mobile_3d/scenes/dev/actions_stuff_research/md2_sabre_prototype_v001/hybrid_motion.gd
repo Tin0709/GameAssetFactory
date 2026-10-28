@@ -10,6 +10,7 @@ var parents:Array[int]=[]
 var group_names:Array=[]
 var phase:=0.
 var phase_advanced:=0.
+var phase_hz:=0.
 var run_weight:=0.
 var last_kind:=""
 var owns_pose:=false
@@ -96,7 +97,7 @@ func outgoing_pose(delta:float,cursor:Dictionary,speed:float)->Array[Transform3D
 	cursor.phase=fposmod(float(cursor.phase)+delta/period(speed,float(cursor.weight)),1.)
 	return _locals(_ground_deforms(float(cursor.phase),float(cursor.weight)))
 func apply(actor,key:String,delta:float)->void:
-	phase_advanced=0.;owns_pose=false
+	phase_advanced=0.;phase_hz=0.;owns_pose=false
 	if not actor.review_clip.is_empty():_last_stage="";return
 	var stage:String=actor._jump_stage
 	var speed:float=actor.current_speed
@@ -104,6 +105,7 @@ func apply(actor,key:String,delta:float)->void:
 	if actor._grounded and moving and not actor.combo.active():
 		run_weight=move_toward(run_weight,1. if actor._run_requested else 0.,delta/.22)
 		phase_advanced=delta/period(speed,run_weight);phase=fposmod(phase+phase_advanced,1.)
+		phase_hz=1./period(speed,run_weight)
 	var deforms:Array[Transform3D]=[]
 	if not actor.combo.active() and is_gait(key):
 		deforms=_ground_deforms(phase,run_weight);last_kind="Run" if actor._run_requested else "Walk"
@@ -143,4 +145,4 @@ func keep_shoulders_attached()->void:
 		var actual:Vector3=body_skin.affine_inverse()*(rig.get_bone_global_pose(arm)*rest[arm].affine_inverse()*Vector3(item.patch))
 		maximum_attachment_gap=maxf(maximum_attachment_gap,actual.distance_to(target))
 func diagnostics()->Dictionary:
-	return {"source":source_path,"last_kind":last_kind,"phase":phase,"run_weight":run_weight,"phase_advance":phase_advanced,"landing_elapsed":landing_elapsed,"landing_duration":landing_duration,"maximum_attachment_error_m":maximum_attachment_gap,"scope":"Private source-derived retarget; physics/collision and MD2 combat preserved. Run independent lifetime ambient omitted from periodic core."}
+	return {"source":source_path,"last_kind":last_kind,"phase":phase,"phase_hz":phase_hz,"run_weight":run_weight,"phase_advance":phase_advanced,"landing_elapsed":landing_elapsed,"landing_duration":landing_duration,"maximum_attachment_error_m":maximum_attachment_gap,"scope":"Private source-derived retarget; physics/collision and MD2 combat preserved. Run independent lifetime ambient omitted from periodic core."}
