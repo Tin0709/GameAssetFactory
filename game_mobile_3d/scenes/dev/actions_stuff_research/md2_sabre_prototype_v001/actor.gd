@@ -516,10 +516,11 @@ func _animate(delta:float)->void:
 		var event_clip:String=(gait_state.right if float(gait_state.weight)>.5 else gait_state.left) if composed_gait else selected
 		var event_ratio:float=float(clips[event_clip].duration)/float(clips[selected].duration)
 		_dispatch_locomotion_events(event_clip,source_before*event_ratio,delta*_playback_speed*event_ratio,delta)
-		_gait_cycles_this_tick+=delta*_playback_speed/float(clips[selected].duration)
 		_gait_resume_phase=fposmod(animation_player.current_animation_position/float(clips[selected].duration),1.)
 		if hybrid_motion!=null and hybrid_motion.owns_pose:
-			_gait_cycles_this_tick=hybrid_motion.phase_advanced;_gait_resume_phase=hybrid_motion.phase
+			_gait_cycles_this_tick+=hybrid_motion.phase_advanced;_gait_resume_phase=hybrid_motion.phase
+		else:_gait_cycles_this_tick+=delta*_playback_speed/float(clips[selected].duration)
+	elif hybrid_motion!=null and hybrid_motion.owns_pose:_gait_cycles_this_tick+=hybrid_motion.phase_advanced
 	if not review_clip.is_empty():
 		_review_time+=delta
 		var duration:float=clips[review_clip].duration
