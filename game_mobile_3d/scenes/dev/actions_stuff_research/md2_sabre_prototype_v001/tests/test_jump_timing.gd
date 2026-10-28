@@ -19,10 +19,12 @@ func run()->void:
 			for i in 4:await tick()
 			var begin:float=a.simulation_clock;var peak:=0.;var apex:=-1.;var contact:=-1.;var finished:=-1.;var landing_begin:=-1.
 			a.requested_jump=true;await tick();a.requested_jump=false
-			var first_velocity:float=a.velocity.y;var peak_air_speed:=0.
+			var first_velocity:float=a.velocity.y;var peak_air_speed:=0.;var peak_commanded_air_speed:=0.
 			for i in hz*3:
 				var elapsed:float=a.simulation_clock-begin;peak=maxf(peak,a.global_position.y)
-				if not a._grounded:peak_air_speed=maxf(peak_air_speed,a.current_speed)
+				if not a._grounded:
+					peak_air_speed=maxf(peak_air_speed,a.current_speed)
+					peak_commanded_air_speed=maxf(peak_commanded_air_speed,Vector2(a.velocity.x,a.velocity.z).length())
 				if apex<0. and a.velocity.y<=0.:apex=elapsed
 				if contact<0. and a._grounded:contact=elapsed;landing_begin=elapsed
 				if contact>=0. and a._jump_stage.is_empty():finished=elapsed;break
@@ -33,8 +35,10 @@ func run()->void:
 			check(absf(first_velocity-(14.4-60./hz))<.001,"End-of-tick velocity is integrated once "+str(hz)+" "+str(moving))
 			check(absf(finished-landing_begin-.3)<=1./hz+.00001,"Compact receiving state completes one bounce in300ms "+str(hz)+" "+str(moving))
 			check(absf(a.combo.air_attack_play_rate-1.6)<.00001,"Approved Sabre air attack rate remains unchanged "+str(hz)+" "+str(moving))
-			if moving:check(absf(peak_air_speed-8.)<.001,"Native normal-air horizontal target8m/s "+str(hz))
-			cases.append({"hz":hz,"moving":moving,"launch_speed_setting":sqrt(2.*a.gravity*a.jump_height),"first_tick_vertical_speed":first_velocity,"gravity":a.gravity,"apex_s":apex,"air_s":contact,"peak_m":peak,"landing_visual_s":finished-landing_begin,"complete_visual_state_s":finished,"peak_air_horizontal_speed":peak_air_speed,"native_sabre_air_rate_preserved":a.combo.air_attack_play_rate})
+			if moving:
+				check(absf(peak_commanded_air_speed-8.)<.001,"Native normal-air horizontal target8m/s "+str(hz))
+				check(absf(peak_air_speed-8.)<=2.*a.safe_margin*hz+.001,"Collision recovery remains within two safe margins per tick "+str(hz))
+			cases.append({"hz":hz,"moving":moving,"launch_speed_setting":sqrt(2.*a.gravity*a.jump_height),"first_tick_vertical_speed":first_velocity,"gravity":a.gravity,"apex_s":apex,"air_s":contact,"peak_m":peak,"landing_visual_s":finished-landing_begin,"complete_visual_state_s":finished,"peak_air_horizontal_speed":peak_air_speed,"peak_commanded_air_speed":peak_commanded_air_speed,"native_sabre_air_rate_preserved":a.combo.air_attack_play_rate})
 	a.reset_actor();await tick();await tick();a.requested_jump=true;await tick();a.requested_jump=false
 	a.set_measured_jump(false);check(a.measured_jump_active,"A/B must not change gravity mid-flight")
 	for i in 120:await tick()
