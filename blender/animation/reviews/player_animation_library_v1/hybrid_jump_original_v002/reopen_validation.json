@@ -23,5 +23,9 @@
   "same_arc_actors": 2,
   "unchanged_godot_files": 736,
   "cameras_checked": 3,
-  "godot_changes": []
+  "godot_changes": [],
+  "timeline_markers": {
+    "COMPRESSION": 63,
+    "HEAD FOLLOW": 69
+  }
 }
