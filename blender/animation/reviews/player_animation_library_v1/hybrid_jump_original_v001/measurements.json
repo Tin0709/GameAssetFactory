@@ -1,0 +1,137 @@
+{
+  "scope": "Actually evaluated saved original Actions and actual rigid sole geometry. Source-authored references not sampled. Preview arc is original adapter, not native physics.",
+  "metrics": [
+    {
+      "action": "Jump_Takeoff_MD2_AS_Original_v001_PENDING",
+      "phase": "takeoff",
+      "duration_s": 0.4,
+      "hip_range_mm": 23.99998903274536,
+      "head_global_pitch_max_deg": 3.9999986883540637,
+      "scale_error": 0.0,
+      "forearm_identity_error": 5.960465898624534e-08,
+      "root_travel_m": 0.0,
+      "minimum_in_place_sole_z_m": -0.026638703420758247,
+      "ground_penetration_mm": null,
+      "air_penetration_in_context_mm": 0,
+      "grounded_sole_velocity_max_m_s": 0,
+      "loop_pose_error": null,
+      "review_rates": [
+        {
+          "hz": 30,
+          "maximum_hip_origin_step_mm": 17.98194638448432,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 60,
+          "maximum_hip_origin_step_mm": 9.784281314634653,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 120,
+          "maximum_hip_origin_step_mm": 7.197677964509958,
+          "context_penetration_mm": 0
+        }
+      ]
+    },
+    {
+      "action": "Jump_Airborne_MD2_AS_Original_v001_PENDING",
+      "phase": "airborne",
+      "duration_s": 0.8,
+      "hip_range_mm": 0.0,
+      "head_global_pitch_max_deg": 1.6999975855927965,
+      "scale_error": 0.0,
+      "forearm_identity_error": 4.458447122601683e-08,
+      "root_travel_m": 0.0,
+      "minimum_in_place_sole_z_m": -0.008534543216228485,
+      "ground_penetration_mm": null,
+      "air_penetration_in_context_mm": 0,
+      "grounded_sole_velocity_max_m_s": 0,
+      "loop_pose_error": 0.0,
+      "review_rates": [
+        {
+          "hz": 30,
+          "maximum_hip_origin_step_mm": 0,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 60,
+          "maximum_hip_origin_step_mm": 0,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 120,
+          "maximum_hip_origin_step_mm": 0,
+          "context_penetration_mm": 0
+        }
+      ]
+    },
+    {
+      "action": "Jump_Landing_MD2_AS_Original_v001_PENDING",
+      "phase": "landing",
+      "duration_s": 0.3,
+      "hip_range_mm": 44.99995708465576,
+      "head_global_pitch_max_deg": 4.4999971370161465,
+      "scale_error": 0.0,
+      "forearm_identity_error": 4.4651333297451856e-08,
+      "root_travel_m": 0.0,
+      "minimum_in_place_sole_z_m": 0.0003000497817993164,
+      "ground_penetration_mm": 0.0,
+      "air_penetration_in_context_mm": 0,
+      "grounded_sole_velocity_max_m_s": 0.0,
+      "loop_pose_error": null,
+      "review_rates": [
+        {
+          "hz": 30,
+          "maximum_hip_origin_step_mm": 31.184077579823803,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 60,
+          "maximum_hip_origin_step_mm": 23.66405748651879,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 120,
+          "maximum_hip_origin_step_mm": 12.498199949818943,
+          "context_penetration_mm": 0
+        }
+      ]
+    },
+    {
+      "action": "PREVIEW_ONLY_Jump_MD2_AS_Context_Original_v001_PENDING",
+      "phase": "context",
+      "duration_s": 2.0,
+      "hip_range_mm": 50.999999046325684,
+      "head_global_pitch_max_deg": 4.4999971370161465,
+      "scale_error": 0.0,
+      "forearm_identity_error": 6.053598156086082e-08,
+      "root_travel_m": 0.0,
+      "minimum_in_place_sole_z_m": 0.0003000497817993164,
+      "ground_penetration_mm": 0.0,
+      "air_penetration_in_context_mm": 0.0,
+      "grounded_sole_velocity_max_m_s": 0.0,
+      "loop_pose_error": 0.0,
+      "review_rates": [
+        {
+          "hz": 30,
+          "maximum_hip_origin_step_mm": 39.46298402880457,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 60,
+          "maximum_hip_origin_step_mm": 22.00818037937423,
+          "context_penetration_mm": 0
+        },
+        {
+          "hz": 120,
+          "maximum_hip_origin_step_mm": 12.498199949818943,
+          "context_penetration_mm": 0
+        }
+      ]
+    }
+  ],
+  "phase_boundaries": {
+    "takeoff_to_airborne_pose_error": 0.0,
+    "landing_to_context_hold_pose_error": 0.0
+  }
+}
