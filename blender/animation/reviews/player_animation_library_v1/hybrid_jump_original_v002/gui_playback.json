@@ -1,0 +1,37 @@
+[
+  {
+    "elapsed_s": 2.516876500012586,
+    "frame": 7,
+    "playing": true,
+    "scene": "Jump_Soft_Bounce_AB_v002_PENDING",
+    "sync_mode": "FRAME_DROP"
+  },
+  {
+    "elapsed_s": 3.218189400009578,
+    "frame": 49,
+    "playing": true,
+    "scene": "Jump_Soft_Bounce_AB_v002_PENDING",
+    "sync_mode": "FRAME_DROP"
+  },
+  {
+    "elapsed_s": 3.9184395000047516,
+    "frame": 91,
+    "playing": true,
+    "scene": "Jump_Soft_Bounce_AB_v002_PENDING",
+    "sync_mode": "FRAME_DROP"
+  },
+  {
+    "elapsed_s": 4.626703699992504,
+    "frame": 134,
+    "playing": true,
+    "scene": "Jump_Soft_Bounce_AB_v002_PENDING",
+    "sync_mode": "FRAME_DROP"
+  },
+  {
+    "elapsed_s": 5.327005900006043,
+    "frame": 32,
+    "playing": true,
+    "scene": "Jump_Soft_Bounce_AB_v002_PENDING",
+    "sync_mode": "FRAME_DROP"
+  }
+]
