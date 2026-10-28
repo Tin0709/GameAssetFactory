@@ -420,6 +420,8 @@ func _physics_process(delta:float)->void:
 	if using_original_source and not combo.native_enabled and was_grounded and _move_requested and combo.phase==&"recovery" and not combo.held and combo.buffer_until<combo.clock-.0000001:combo.cancel()
 	if using_original_source and not was_grounded and combo.phase==&"air_attack":_heavy_slam_active=true
 	_time_since_grounded=0. if was_grounded else _time_since_grounded+delta
+	var accepted_jump:bool=jump_pressed and (was_grounded or (using_original_source and _time_since_grounded<=coyote_time))
+	if accepted_jump:_heavy_slam_active=false
 	var speed:=run_speed if _run_requested else walk_speed
 	if measured_jump_active and _run_requested and (not was_grounded or jump_pressed):speed=float(jump_runtime_profile.normal_air_speed_m_s)
 	var desired:=stick.limit_length()*speed
@@ -439,7 +441,7 @@ func _physics_process(delta:float)->void:
 	# One collision solve per physics tick; integrate only permitted subintervals.
 	# Animation below uses full open-interval speed, not this frame-average speed.
 	if _combat_plan_active:planar=desired*(_combat_open_seconds/delta)
-	# Public GA_HeavyJumpAttack GravityMultiplier2; native base jump remains unknown.
+	# Public GA_HeavyJumpAttack GravityMultiplier2; accepted jumps cancel slam first.
 	var gravity_factor:=2. if _heavy_slam_active else 1.
 	# Built-in floor snapping already retains grounded contact. Driving the
 	# source capsule down every tick caused penetration/recovery body jitter.
@@ -447,10 +449,10 @@ func _physics_process(delta:float)->void:
 	var measured_end_velocity:=0.
 	var measured_air_step:=measured_jump_active and (not was_grounded or jump_pressed)
 	if measured_air_step:
-		var start_velocity:float=sqrt(2.*gravity*jump_height) if jump_pressed and (was_grounded or _time_since_grounded<=coyote_time) else velocity.y
+		var start_velocity:float=sqrt(2.*gravity*jump_height) if accepted_jump else velocity.y
 		measured_end_velocity=start_velocity-gravity*gravity_factor*delta
 	velocity=Vector3(planar.x,ground_vertical if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
-	if jump_pressed and (was_grounded or (using_original_source and _time_since_grounded<=coyote_time)):
+	if accepted_jump:
 		combo.cancel();velocity.y=sqrt(2.*gravity*jump_height)-(gravity*delta*.5 if using_original_source else 0.);_jump_stage="JumpTakeoff";_jump_time=0.
 		_heavy_slam_active=false
 		_time_since_grounded=INF # Consume the coyote opportunity; no second air jump.
