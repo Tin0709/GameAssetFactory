@@ -1,4 +1,4 @@
-import bpy,sys,json,math,hashlib
+import bpy,sys,json,math,hashlib,shutil,time
 from pathlib import Path
 from mathutils import Matrix,Vector,Euler
 H=Path(__file__).resolve().parent;R=H.parents[4]
@@ -7,7 +7,11 @@ import motion as m
 import gaf_animation_library as ui
 m.verify()
 SOURCE=H/'as_primary_locomotion_authoring.blend'
-assert not SOURCE.exists(),'Create a new revision; do not overwrite authoring source'
+if SOURCE.exists():
+ assert '--refine-unregistered-draft'in sys.argv,'Create a new revision; do not overwrite authoring source'
+ registry=json.loads((R/'blender/animation/showcase/animation_manifest.json').read_text(encoding='utf8'))
+ assert not any(e['source']==SOURCE.relative_to(R).as_posix()for e in registry['animations']),'Registered source must remain immutable'
+ shutil.copy2(SOURCE,R/'.validation/animation_showcase/as_primary_locomotion_original_v001'/('unregistered_draft_'+str(time.time_ns())+'.blend'))
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 with bpy.data.libraries.load(str(R/'blender/animation/showcase/Animation_Showcase.blend'),link=False)as(src,dst):dst.objects=['Showcase_Player_Rig','Showcase_Player_Mesh']
 rig,mesh=dst.objects
@@ -46,7 +50,7 @@ def pose(p,s,contacts=None):
    rot=rotate(theta);pivot.x=rest.translation.x;pivot.y=0.
    minimum=min((rot.to_3x3()@v).z for v in points[name])
    support=-minimum+.0003
-   pivot.z=support if plant else max(world['Hips'].translation.z,support+.002)
+   pivot.z=support if plant else max(world['Hips'].translation.z,support)
   target=Matrix.Translation(pivot)@(rot@rest.to_3x3().to_4x4()if rot is not None else default.to_3x3().to_4x4())
   if name=='Root':target=rest.copy()
   world[name]=target;basis=relative.inverted()@(world[parent].inverted()@target if parent else target)

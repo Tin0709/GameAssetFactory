@@ -7,7 +7,7 @@ import math
 FPS=60
 END=150
 ORIGIN=.25
-STYLES=[dict(kind='Walk',hz=1.2,speed=1.8,duty=.44,arm=34.,torso=8.,head=1.8,lift=.025),
+STYLES=[dict(kind='Walk',hz=1.2,speed=1.8,duty=.50,arm=34.,torso=8.,head=1.8,lift=0.),
         dict(kind='Run',hz=1.6,speed=4.3,duty=.28,arm=53.,torso=17.,head=2.5,lift=.095)]
 L=.675; D=.1125
 def smooth(t):return t*t*(3-2*t)
@@ -46,7 +46,7 @@ def hip_height(p,s):
  q=(p+.25)% .5-.25
  half=s['duty']/2
  if abs(q)<=half:
-  vals=[support_z(leg((q+i*.0008)%1,s)[0])for i in range(-4,5)]
+  vals=[support_z(leg((((q+i*.0008+.25)%.5)-.25)%1,s)[0])for i in range(-4,5)]
   return sum(vals)/len(vals)-.004
  # Body floats only in the intentional exchange; unequal lift on alternate
  # steps gives a subtle leading-side accent without changing contact timing.

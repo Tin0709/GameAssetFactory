@@ -1,5 +1,5 @@
 {
-  "source_sha256": "7cbc9f691330ff7eb4561838ada89d4c397b212fdfc30fc76beac7a135697550",
+  "source_sha256": "7caafce2f54e323fb421e0379579a734fa076d330f1511a0d46b438d968884da",
   "source": "blender/animation/reviews/player_animation_library_v1/as_primary_locomotion_original_v001/as_primary_locomotion_authoring.blend",
   "actions": [
     "Walk_ASInspired_Original_v001_PENDING",
@@ -16,11 +16,11 @@
         "kind": "Walk",
         "hz": 1.2,
         "speed": 1.8,
-        "duty": 0.44,
+        "duty": 0.5,
         "arm": 34.0,
         "torso": 8.0,
         "head": 1.8,
-        "lift": 0.025
+        "lift": 0.0
       }
     },
     {
