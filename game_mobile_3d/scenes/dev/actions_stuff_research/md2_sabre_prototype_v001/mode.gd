@@ -77,6 +77,7 @@ func setup(scene:Node3D)->void:
 	if actor.using_original_source:
 		render_presenter=RenderPresenter.new();render_presenter.name="SourceRenderPresentation";add_child(render_presenter);render_presenter.setup(actor)
 	apply_visual_clarity()
+	if actor.hybrid_motion!=null:DisplayServer.window_set_title("GameAssetFactory — Hybrid A&S / Jump v004 / MD2 Sabre")
 	_build_ui();lab._update_camera()
 	print("MD2_SABRE_READY ",JSON.stringify({"clips":actor.clips.size(),"bones":actor.skeleton.get_bone_count(),"markers":[str(actor.marker_grip.get_path()),str(actor.marker_base.get_path()),str(actor.marker_tip.get_path())],"appearance":actor.appearance_label,"motion":"original source tracks with declared semantic aliases" if actor.using_original_source else "reconstructed authored curves"}))
 func _build_ui()->void:
