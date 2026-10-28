@@ -62,6 +62,18 @@ func run():
  check(not helper.states[0].planted and not helper.states[1].planted,"Turning releases incompatible anchors")
  helper.restore();a.visual.rotation.y=0.;helper.clear();helper.apply(1./60.,true,false,false,1)
  check(not helper.states[0].planted and not helper.states[1].planted,"Locked strike keeps horizontal authored foot motion")
- a.free();floor.free();step.free();finish()
+ helper.clear();a.position=Vector3(.08,0,0);a.animation_player.seek(.2,true);rig.force_update_all_bone_transforms()
+ step.free()
+ var toe:Vector3=helper._samples(1).points[0]
+ for point:Vector3 in helper._samples(1).points:
+  if point.x>toe.x:toe=point
+ var island=floor_box(Vector3(toe.x,.02,toe.z),Vector3(.012,.2,.012));await physics_frame;await process_frame
+ for n in 120:
+  helper.restore();helper.apply(1./120.,true,false,true,0)
+ helper.restore();a.position.x=.04
+ for n in 30:
+  helper.restore();helper.apply(1./120.,true,false,true,0)
+ check(helper.snapshot().penetration_m<.003,"Pelvis support follows an anchored higher surface with remaining combined reach")
+ a.free();floor.free();island.free();finish()
 func finish():
  print("SABRE_FOOT_PLACEMENT ",JSON.stringify({"checks":checks,"failures":failures}));quit(0 if failures.is_empty() else 1)
