@@ -33,7 +33,10 @@ def pose(d,ground):
   elif name.startswith('UpperArm.'):
    side=1 if name.endswith('L')else -1
    pivot=hip+body.to_3x3()@(rest[name].translation-hip_rest)
-   rot=rotate(d['al']if side==1 else d['ar'],-side*d['splay'],side*d['yaw']*.18)
+   pitch=d['al']if side==1 else d['ar'];angle=math.radians(pitch)
+   # Fan raised arms away from the face. Fixed world-Y splay would reverse
+   # direction above horizontal and pull the hands inward across the eyes.
+   rot=rotate(pitch,-side*3*max(0.,math.cos(angle)),side*(-d['splay']*math.sin(angle)+d['yaw']*.18))
   elif name.startswith('Leg.'):
    side=1 if name.endswith('L')else -1
    pivot=hip+(rest[name].translation-hip_rest);rot=rotate(d['ll']if side==1 else d['lr'])
