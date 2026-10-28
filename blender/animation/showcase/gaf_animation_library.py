@@ -4,7 +4,8 @@ import bpy,json,hashlib,re,math
 from mathutils import Matrix
 from pathlib import Path
 from bpy.app.handlers import persistent
-from bpy.props import StringProperty,IntProperty,BoolProperty,CollectionProperty
+from bpy.props import StringProperty,IntProperty,BoolProperty,CollectionProperty,EnumProperty
+from gaf_animation_browser import FILTER_ITEMS,visible_entries
 
 SCENE_TAG='gaf_animation_showcase';RIG='Showcase_Player_Rig';BASELINE='GAF_Neutral_Pose.json'
 REVIEW_TAG='gaf_review_sequence_id';REVIEW_ENTRY='gaf_review_entry_json'
@@ -470,20 +471,36 @@ class GAF_OT_return_library(bpy.types.Operator):
         try:return_library(context);return {'FINISHED'}
         except Exception as error:context.scene.gaf_error=str(error);self.report({'ERROR'},str(error));return {'CANCELLED'}
 
+class GAF_OT_browse_group(bpy.types.Operator):
+    bl_idname='gaf.browse_group';bl_label='Browse Animation Group'
+    group_id:StringProperty(default='AS_WALKRUN')
+    def execute(self,context):
+        home=library_home(context.scene)
+        if home is None:return {'CANCELLED'}
+        home.gaf_library_group=self.group_id;home.gaf_library_search=''
+        return {'FINISHED'}
+
 def draw_focus_selector(layout,scene):
     home=library_home(scene)
     data=json.loads(home['gaf_manifest_snapshot']) if home else {}
-    focus=data.get('library_focus')
-    if not focus:return False
-    box=layout.box();box.label(text=focus.get('label','Current Focus'),icon='ANIM')
+    if home is None:return False
+    all_entries=ordered_library_entries(data,True)
+    box=layout.box()
+    row=box.row();row.scale_y=1.15
+    row.operator('gaf.browse_group',text='A&S - Walking / Running',icon='BOOKMARKS',depress=home.gaf_library_group=='AS_WALKRUN' and not home.gaf_library_search).group_id='AS_WALKRUN'
+    box.prop(home,'gaf_library_group',text='Group')
+    box.prop(home,'gaf_library_search',text='',icon='VIEWZOOM',placeholder='Search all animations...')
+    entries=visible_entries(all_entries,home.gaf_library_group,home.gaf_library_search)
+    box.label(text=f'{len(entries)} shown / {len(all_entries)} entries',icon='FILTER')
+    if not entries:box.label(text='No matching animations',icon='INFO')
     active=bpy.data.objects[RIG].animation_data.action
-    for e in library_entries(scene,False):
+    for e in entries:
         row=box.row(align=True)
+        row.scale_y=1.15
         if e['kind']=='action':
             row.operator('gaf.select_action',text=e['label'],icon='CHECKMARK' if e['status']=='approved' else 'TIME',depress=bool(scene==home and active and active.name==e['id'])).action_name=e['id']
         else:
             row.operator('gaf.open_review_sequence',text=e['label'],icon='SCENE_DATA',depress=scene.get(REVIEW_TAG)==e['id']).sequence_id=e['id']
-            box.label(text=e['status'].upper()+' — RESEARCH SEQUENCE',icon='CHECKMARK' if e['status']=='approved' else 'TIME')
     return True
 
 class GAF_PT_animation_library(bpy.types.Panel):
@@ -507,10 +524,7 @@ class GAF_PT_animation_library(bpy.types.Panel):
             if s.gaf_error:
                 for line in [s.gaf_error[i:i+42] for i in range(0,len(s.gaf_error),42)]:layout.label(text=line,icon='ERROR')
             return
-        if focused:
-            count=len(library_entries(s,True))-len(library_entries(s,False))
-            layout.prop(s,'gaf_show_archived',text=f'Show Archived ({count})')
-        if not focused or s.gaf_show_archived:
+        if not focused:
             layout.template_list('GAF_UL_animations','',s,'gaf_clips',s,'gaf_active_index',rows=5)
         if s.gaf_clips:
             item=s.gaf_clips[s.gaf_active_index];e=json.loads(item.entry_json)
@@ -526,7 +540,7 @@ class GAF_PT_animation_library(bpy.types.Panel):
         for text,direction in [('Front','FRONT'),('3/4','THREE_QUARTER'),('Side','SIDE')]:row.operator('gaf.view',text=text).direction=direction
         layout.separator();layout.operator('gaf.refresh_library',icon='FILE_REFRESH')
         primary={e['id'] for e in library_entries(s,False) if e['kind']=='review_sequence'} if focused else set()
-        sequences=[e for e in review_entries(s) if not focused or (s.gaf_show_archived and e['id'] not in primary)]
+        sequences=[e for e in review_entries(s) if not focused]
         if sequences:
             box=layout.box();box.label(text='Research Sequences',icon='SCENE_DATA')
             for e in sequences:box.operator('gaf.open_review_sequence',text=e.get('label',e['id']),icon='SCENE_DATA').sequence_id=e['id']
@@ -563,7 +577,7 @@ def loaded(_):
         try:validate_review_sequence(json.loads(s[REVIEW_ENTRY]));s.gaf_error=''
         except Exception as error:s.gaf_error=str(error)
 
-CLASSES=[GAF_Clip,GAF_UL_animations,GAF_OT_refresh,GAF_OT_play,GAF_OT_restart,GAF_OT_view,GAF_OT_open_review_sequence,GAF_OT_select_action,GAF_OT_return_library,GAF_PT_animation_library]
+CLASSES=[GAF_Clip,GAF_UL_animations,GAF_OT_refresh,GAF_OT_play,GAF_OT_restart,GAF_OT_view,GAF_OT_open_review_sequence,GAF_OT_select_action,GAF_OT_return_library,GAF_OT_browse_group,GAF_PT_animation_library]
 def register():
     for cls in CLASSES:bpy.utils.register_class(cls)
     bpy.types.Scene.gaf_clips=CollectionProperty(type=GAF_Clip)
@@ -571,10 +585,12 @@ def register():
     bpy.types.Scene.gaf_loop=BoolProperty(default=True)
     bpy.types.Scene.gaf_show_archived=BoolProperty(default=False,update=archive_visibility_changed,description='Show every registered animation without removing or changing archived data')
     bpy.types.Scene.gaf_error=StringProperty()
+    bpy.types.Scene.gaf_library_group=EnumProperty(items=FILTER_ITEMS,default='AS_WALKRUN',description='Browse a compact group without removing any animation')
+    bpy.types.Scene.gaf_library_search=StringProperty(default='',description='Search names across every group; clear to return to the chosen group')
     bpy.app.handlers.load_post.append(loaded);bpy.app.handlers.frame_change_post.append(stop_one_shot)
 
 def unregister():
     for handlers,fn in [(bpy.app.handlers.load_post,loaded),(bpy.app.handlers.frame_change_post,stop_one_shot)]:
         if fn in handlers:handlers.remove(fn)
-    for name in ['gaf_clips','gaf_active_index','gaf_loop','gaf_show_archived','gaf_error']:delattr(bpy.types.Scene,name)
+    for name in ['gaf_clips','gaf_active_index','gaf_loop','gaf_show_archived','gaf_error','gaf_library_group','gaf_library_search']:delattr(bpy.types.Scene,name)
     for cls in reversed(CLASSES):bpy.utils.unregister_class(cls)
