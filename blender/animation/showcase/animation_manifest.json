@@ -4308,6 +4308,96 @@
       "phase": "context",
       "phase_duration_s": 2.0,
       "playback_sync": "FRAME_DROP"
+    },
+    {
+      "action": "Jump_Landing_MD2_AS_SoftBounce_Original_v002_PENDING",
+      "source": "blender/animation/reviews/player_animation_library_v1/hybrid_jump_original_v002/hybrid_jump_authoring.blend",
+      "source_sha256": "6e4c447635b9742704c41bf72f4bb53f0f27882a52ed841d69b170c461b3d048",
+      "source_rig": "HybridJump_Soft_V002_Authoring_Rig",
+      "source_mesh": "HybridJump_Soft_V002_Authoring_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBHybridJump_Soft_V002_Authoring_Rig",
+      "action_sha256": "fc56ba63f86639b328b7bec757d5fcf054329f0db301a556e60de96d8b6f6e72",
+      "action_frame_range": [
+        1.0,
+        46.0
+      ],
+      "start": 1,
+      "end": 46,
+      "fps": 60,
+      "fps_base": 1.0,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "status": "pending",
+      "approval_note": "Original MD2-foundation/A&S-inspired Jump. Awaiting human artistic review; no Godot integration.",
+      "seamless_loop": false,
+      "original_custom_animation": true,
+      "source_keyframes_copied": false,
+      "production_eligible": false,
+      "preview_only": false,
+      "preview_floor_z_m": 0,
+      "provenance": "Independent original pose curves; verified source timing/artistic principles only. No reference keys or native physics code copied.",
+      "phase": "landing",
+      "phase_duration_s": 0.75,
+      "playback_sync": "FRAME_DROP"
+    },
+    {
+      "action": "PREVIEW_ONLY_Jump_MD2_AS_SoftBounce_Context_Original_v002_PENDING",
+      "source": "blender/animation/reviews/player_animation_library_v1/hybrid_jump_original_v002/hybrid_jump_authoring.blend",
+      "source_sha256": "6e4c447635b9742704c41bf72f4bb53f0f27882a52ed841d69b170c461b3d048",
+      "source_rig": "HybridJump_Soft_V002_Authoring_Rig",
+      "source_mesh": "HybridJump_Soft_V002_Authoring_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBHybridJump_Soft_V002_Authoring_Rig",
+      "action_sha256": "8c0a60518378511b99eb0a6ab7c40f40c15b5409d70902c60cb0b0ba95e1c2ab",
+      "action_frame_range": [
+        1.0,
+        145.0
+      ],
+      "start": 1,
+      "end": 144,
+      "fps": 60,
+      "fps_base": 1.0,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "status": "pending",
+      "approval_note": "Original MD2-foundation/A&S-inspired Jump. Awaiting human artistic review; no Godot integration.",
+      "seamless_loop": false,
+      "original_custom_animation": true,
+      "source_keyframes_copied": false,
+      "production_eligible": false,
+      "preview_only": true,
+      "preview_floor_z_m": -0.04,
+      "provenance": "Independent original pose curves; verified source timing/artistic principles only. No reference keys or native physics code copied.",
+      "phase": "context",
+      "phase_duration_s": 2.4,
+      "playback_sync": "FRAME_DROP"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
@@ -4785,11 +4875,86 @@
       "contact_time_s": 0.92,
       "preview_apex_m": 1.2,
       "preview_flight_s": 0.52
+    },
+    {
+      "id": "hybrid_jump_original_v002",
+      "label": "Jump v002 \u2014 Soft body / head (v001 A-B)",
+      "status": "pending",
+      "scene": "Jump_Soft_Bounce_AB_v002_PENDING",
+      "rig": "Hybrid_Jump_V002_Review_Rig",
+      "mesh": "Hybrid_Jump_V002_Review_Mesh",
+      "world_root": "Hybrid_Jump_V002_Presentation_Root",
+      "pose_action": "PREVIEW_ONLY_Jump_MD2_AS_SoftBounce_Context_Original_v002_PENDING",
+      "pose_slot_identifier": "OBHybridJump_Soft_V002_Authoring_Rig",
+      "pose_action_sha256": "8c0a60518378511b99eb0a6ab7c40f40c15b5409d70902c60cb0b0ba95e1c2ab",
+      "presentation_action": "PREVIEW_ONLY_Hybrid_Jump_V002_Elevation",
+      "presentation_slot_identifier": "OBHybrid_Jump_V002_Presentation_Root",
+      "presentation_action_sha256": "62bc82e174726f5cd49dd36294bc985ac43e21a0724eb795f4f8c0a50f3f43f5",
+      "start": 1,
+      "end": 144,
+      "fps": 60,
+      "fps_base": 1.0,
+      "seamless_loop": false,
+      "research_only": true,
+      "production_eligible": false,
+      "original_authored_comparison": true,
+      "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "cameras": {
+        "FRONT": "Hybrid_Jump_V002_FRONT",
+        "THREE_QUARTER": "Hybrid_Jump_V002_THREE_QUARTER",
+        "SIDE": "Hybrid_Jump_V002_SIDE"
+      },
+      "return_scene": "ANIMATION_SHOWCASE",
+      "hud_root": "Hybrid_Jump_V002_HUD",
+      "playback_sync": "FRAME_DROP",
+      "comparison_actors": [
+        {
+          "rig": "Hybrid_Jump_V002_AB_V1_Rig",
+          "action": "PREVIEW_ONLY_Jump_MD2_AS_Context_Original_v001_PENDING"
+        },
+        {
+          "rig": "Hybrid_Jump_V002_Review_Rig",
+          "action": "PREVIEW_ONLY_Jump_MD2_AS_SoftBounce_Context_Original_v002_PENDING"
+        }
+      ],
+      "same_trajectory_as_v001": true,
+      "preview_arc_original_adapter": true,
+      "takeoff_time_s": 0.4,
+      "contact_time_s": 0.92,
+      "preview_apex_m": 1.2,
+      "preview_flight_s": 0.52
     }
   ],
   "library_focus": {
     "label": "Actions & Stuff + Original Combat",
     "entries": [
+      {
+        "kind": "review_sequence",
+        "id": "hybrid_jump_original_v002"
+      },
+      {
+        "kind": "action",
+        "id": "Jump_Landing_MD2_AS_SoftBounce_Original_v002_PENDING"
+      },
+      {
+        "kind": "action",
+        "id": "PREVIEW_ONLY_Jump_MD2_AS_SoftBounce_Context_Original_v002_PENDING"
+      },
       {
         "kind": "review_sequence",
         "id": "hybrid_jump_original_v001"
