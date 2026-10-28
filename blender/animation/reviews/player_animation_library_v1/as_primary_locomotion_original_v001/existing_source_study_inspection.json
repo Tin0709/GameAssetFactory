@@ -1,0 +1,201 @@
+{
+  "studies": [
+    {
+      "action": "Walk_ActionsStuff_Source_Test_v001",
+      "registered": {
+        "action": "Walk_ActionsStuff_Source_Test_v001",
+        "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_walk_v001/walk_actions_stuff_review.blend",
+        "source_sha256": "ce855abcfd20bc4716201c2cd5f056d3c483c42e5fd8af854afdd04c263de9a5",
+        "source_rig": "ASW_Player_Rig_v001",
+        "source_mesh": "ASW_Player_Mesh_v001",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBASW_Player_Rig_v001",
+        "action_sha256": "4a64c34c3c4e607ea2a26054194e57c005352ca91c2aaa8922ded270ff4c96e0",
+        "action_frame_range": [
+          1.0,
+          25.0
+        ],
+        "start": 1,
+        "end": 24,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Pending human review: walking source clip from the supplied Actions & Stuff resource pack, retargeted to the unchanged native rigid rig. No gameplay integration.",
+        "seamless_loop": true,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "closing_key": 25,
+        "period_s": 0.8,
+        "in_place": true,
+        "preview_floor_z_m": -0.038,
+        "review_video": "blender/animation/reviews/player_animation_library_v1/actions_stuff_walk_v001/walking_1x.mp4"
+      },
+      "actual_range": [
+        1.0,
+        25.0
+      ],
+      "curves": 126,
+      "key_count": 48510,
+      "animated_scale_paths": [
+        "pose.bones[\"Spine\"].scale",
+        "pose.bones[\"WeaponCarrier\"].scale",
+        "pose.bones[\"Leg.L\"].scale",
+        "pose.bones[\"Chest\"].scale",
+        "pose.bones[\"UpperArm.R\"].scale",
+        "pose.bones[\"Root\"].scale",
+        "pose.bones[\"Neck\"].scale",
+        "pose.bones[\"Hips\"].scale",
+        "pose.bones[\"Leg.R\"].scale",
+        "pose.bones[\"UpperArm.L\"].scale",
+        "pose.bones[\"ForeArm.L\"].scale",
+        "pose.bones[\"Head\"].scale",
+        "pose.bones[\"ForeArm.R\"].scale"
+      ],
+      "sha": "4a64c34c3c4e607ea2a26054194e57c005352ca91c2aaa8922ded270ff4c96e0"
+    },
+    {
+      "action": "Run_ActionsStuff_Source_Test_v001",
+      "registered": {
+        "action": "Run_ActionsStuff_Source_Test_v001",
+        "source": "blender/animation/reviews/player_animation_library_v1/actions_stuff_run_v001/run_actions_stuff_review.blend",
+        "source_sha256": "7dfdd7c2a5cca1f35fb56cfacfd63ee91cc7e1dc72391de650d4666f75b51bfb",
+        "source_rig": "ASR_Player_Rig_v001",
+        "source_mesh": "ASR_Player_Mesh_v001",
+        "source_armature": "LB_Test_RestRig",
+        "slot_identifier": "OBASR_Player_Rig_v001",
+        "action_sha256": "efb34e9de589d3bfd9497ebb9eb24bf433b7876e7a49010ca949cc1bfbb2c93c",
+        "action_frame_range": [
+          1.0,
+          181.0
+        ],
+        "start": 1,
+        "end": 180,
+        "fps": 30,
+        "fps_base": 1.0,
+        "status": "pending",
+        "approval_note": "Source-derived research only. Pending visual review; never eligible for commercial production.",
+        "seamless_loop": false,
+        "rotation_modes": {
+          "Root": "XYZ",
+          "Hips": "XYZ",
+          "Spine": "QUATERNION",
+          "Chest": "QUATERNION",
+          "Neck": "QUATERNION",
+          "Head": "QUATERNION",
+          "UpperArm.L": "QUATERNION",
+          "ForeArm.L": "QUATERNION",
+          "UpperArm.R": "QUATERNION",
+          "ForeArm.R": "QUATERNION",
+          "WeaponCarrier": "QUATERNION",
+          "Leg.L": "XYZ",
+          "Leg.R": "XYZ"
+        },
+        "research_only": true,
+        "production_eligible": false,
+        "source_animation": "animation.oreville_ans.fngydr",
+        "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+        "research_scale_channels": {
+          "Leg.L": {
+            "axis": 1,
+            "min": 1.0,
+            "max": 1.070002
+          },
+          "Leg.R": {
+            "axis": 1,
+            "min": 1.0,
+            "max": 1.070002
+          }
+        },
+        "preview_floor_z_m": -0.03367406874895096,
+        "duration_s": 6.0,
+        "core_period_s": 0.625,
+        "endpoint_sample": 181,
+        "profile": {
+          "speed_normalized": 1.0,
+          "forward_weight": 1.0,
+          "lateral_weight": 0.0,
+          "grounded": true,
+          "sprinting": true,
+          "sprint_state_time_s": 2.0,
+          "life_time_origin_s": 0.0,
+          "phase_origin": 0.0,
+          "phase_rate_cycles_s": 1.6,
+          "duration_s": 6.0,
+          "body_type": 0,
+          "head_look": [
+            0,
+            0
+          ],
+          "turn_bank": 0,
+          "terrain_offset": 0,
+          "held_items": "generic main-hand item; unmirrored screen-left hand assumed right",
+          "right_holding_flag": 1.0,
+          "left_holding_flag": 0.0,
+          "undfyr": 0,
+          "ground_speed_blocks_s": 5.59,
+          "nonpositive_directional_weights": "assumed inactive; runtime negative-weight semantics not established",
+          "core_loop_s": 0.625,
+          "full_composite_short_loop": false
+        },
+        "rotation_convention": "Explicit Rz(rz) Ry(-ry) Rx(-rx), C-conjugated; Three.js ZYX / Blender XYZ",
+        "head_convention": "Entity-relative head rotation with parent-translated pivot; native parent rotation compensated",
+        "in_place": true,
+        "research_notes": "blender/animation/reviews/player_animation_library_v1/actions_stuff_run_v001/RECONSTRUCTION_NOTES.md",
+        "review_sequence": "blender/animation/reviews/player_animation_library_v1/actions_stuff_run_v001/reference_source_approved_front_1x.mp4",
+        "research_clock_note": "Six-second continuous take; no fabricated short composite loop. Replay resets declared clocks."
+      },
+      "actual_range": [
+        1.0,
+        181.0
+      ],
+      "curves": 126,
+      "key_count": 377496,
+      "animated_scale_paths": [
+        "pose.bones[\"Spine\"].scale",
+        "pose.bones[\"WeaponCarrier\"].scale",
+        "pose.bones[\"Leg.L\"].scale",
+        "pose.bones[\"Chest\"].scale",
+        "pose.bones[\"UpperArm.R\"].scale",
+        "pose.bones[\"Root\"].scale",
+        "pose.bones[\"Neck\"].scale",
+        "pose.bones[\"Hips\"].scale",
+        "pose.bones[\"Leg.R\"].scale",
+        "pose.bones[\"UpperArm.L\"].scale",
+        "pose.bones[\"ForeArm.L\"].scale",
+        "pose.bones[\"Head\"].scale",
+        "pose.bones[\"ForeArm.R\"].scale"
+      ],
+      "sha": "efb34e9de589d3bfd9497ebb9eb24bf433b7876e7a49010ca949cc1bfbb2c93c"
+    }
+  ],
+  "action_count": 105,
+  "rig_bones": [
+    "Root",
+    "Hips",
+    "Spine",
+    "Chest",
+    "Neck",
+    "Head",
+    "UpperArm.L",
+    "ForeArm.L",
+    "UpperArm.R",
+    "ForeArm.R",
+    "WeaponCarrier",
+    "Leg.L",
+    "Leg.R"
+  ],
+  "rest_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f"
+}
