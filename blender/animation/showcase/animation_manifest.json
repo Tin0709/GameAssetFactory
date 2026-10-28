@@ -4398,6 +4398,124 @@
       "phase": "context",
       "phase_duration_s": 2.4,
       "playback_sync": "FRAME_DROP"
+    },
+    {
+      "action": "Jump_AS_Stationary_SourceMatched_v003_RESEARCH",
+      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_landing_source_match_v003\\AS_Landing_SourceMatched_v003.blend",
+      "source_sha256": "d9482955f0d780d383ac432ac83b0e93360ba1e202d7738d6382e6a10073af19",
+      "source_rig": "ASLanding_SourceMatch_Authoring_Rig",
+      "source_mesh": "ASLanding_SourceMatch_Authoring_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBASLanding_SourceMatch_Authoring_Rig",
+      "action_sha256": "28f7c35487f759e170b8b23ea625962ded4ae21b0a689a011d84f57715c7d84d",
+      "action_frame_range": [
+        1.0,
+        157.0
+      ],
+      "start": 1,
+      "end": 156,
+      "fps": 60,
+      "fps_base": 1.0,
+      "status": "pending",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "research_only": true,
+      "production_eligible": false,
+      "source_keyframes_copied": true,
+      "original_custom_animation": false,
+      "external_linked_research": true,
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "source_animation": "animation.oreville_ans.xvdslp",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "research_scale_channels": {
+        "Root": {
+          "axes": [
+            0,
+            1,
+            2
+          ],
+          "min": 0.85,
+          "max": 1.15
+        }
+      },
+      "preview_floor_z_m": -0.011503514751791954,
+      "reference_action": "Landing_Stationary_ActionsStuff_Source_Test_v001",
+      "reference_action_sha256": "2c6abffd2144deed3c0354df95ac666fbc458a8e7a195c0bb3c44cb3021febfb",
+      "approval_note": "User-requested exact source-derived body/head/legs research. Read-only private external link. No production/Godot integration.",
+      "playback_sync": "FRAME_DROP"
+    },
+    {
+      "action": "Jump_AS_Moving_SourceMatched_v003_RESEARCH",
+      "source": "C:\\Users\\ADMIN\\Desktop\\MD2 Research\\blender\\as_landing_source_match_v003\\AS_Landing_SourceMatched_v003.blend",
+      "source_sha256": "d9482955f0d780d383ac432ac83b0e93360ba1e202d7738d6382e6a10073af19",
+      "source_rig": "ASLanding_SourceMatch_Authoring_Rig",
+      "source_mesh": "ASLanding_SourceMatch_Authoring_Mesh",
+      "source_armature": "LB_Test_RestRig",
+      "slot_identifier": "OBASLanding_SourceMatch_Authoring_Rig",
+      "action_sha256": "579aabe9fe7fc41ea039b8ee208dc1889209de94f34bc6b135b0acd4d7119993",
+      "action_frame_range": [
+        1.0,
+        157.0
+      ],
+      "start": 1,
+      "end": 156,
+      "fps": 60,
+      "fps_base": 1.0,
+      "status": "pending",
+      "seamless_loop": false,
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "research_only": true,
+      "production_eligible": false,
+      "source_keyframes_copied": true,
+      "original_custom_animation": false,
+      "external_linked_research": true,
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "source_animation": "animation.oreville_ans.jmjgft",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "research_scale_channels": {
+        "Root": {
+          "axes": [
+            0,
+            1,
+            2
+          ],
+          "min": 0.85,
+          "max": 1.15
+        }
+      },
+      "preview_floor_z_m": -0.0005,
+      "reference_action": "Landing_Moving_ActionsStuff_Source_Test_v001",
+      "reference_action_sha256": "9819f14c63bfb1e63525b1445d74ded1b42589e53749e2fa648f29edd1c6b274",
+      "approval_note": "User-requested exact source-derived body/head/legs research. Read-only private external link. No production/Godot integration.",
+      "playback_sync": "FRAME_DROP"
     }
   ],
   "approval_policy": "New registrations default to pending; only explicit human review establishes approval.",
@@ -4938,11 +5056,99 @@
       "contact_time_s": 0.92,
       "preview_apex_m": 1.2,
       "preview_flight_s": 0.52
+    },
+    {
+      "id": "as_landing_source_match_v003",
+      "label": "Jump v003 \u2014 A&S Stationary / Moving source matched",
+      "status": "pending",
+      "scene": "AS_Landing_SourceMatched_v003_RESEARCH",
+      "rig": "ASLandingV3_Stationary_Rig",
+      "mesh": "ASLandingV3_Stationary_Mesh",
+      "world_root": "ASLandingV3_Stationary_Root",
+      "pose_action": "Jump_AS_Stationary_SourceMatched_v003_RESEARCH",
+      "pose_slot_identifier": "OBASLanding_SourceMatch_Authoring_Rig",
+      "pose_action_sha256": "28f7c35487f759e170b8b23ea625962ded4ae21b0a689a011d84f57715c7d84d",
+      "presentation_action": "PREVIEW_ONLY_ASLandingV3_Stationary_Elevation",
+      "presentation_slot_identifier": "OBASLandingV3_Stationary_Root",
+      "presentation_action_sha256": "c1a49435234eb8f1265de183c5dac8550bf97c877114b94d6b5b7081449c6c1d",
+      "start": 1,
+      "end": 156,
+      "fps": 60,
+      "fps_base": 1.0,
+      "research_only": true,
+      "production_eligible": false,
+      "seamless_loop": false,
+      "rig_sha256": "cb913716b708b9f975b350f4a80a57d8244f1903ced498a6b3ce0fc5f8391b2f",
+      "rotation_modes": {
+        "Root": "XYZ",
+        "Hips": "XYZ",
+        "Spine": "QUATERNION",
+        "Chest": "QUATERNION",
+        "Neck": "QUATERNION",
+        "Head": "QUATERNION",
+        "UpperArm.L": "QUATERNION",
+        "ForeArm.L": "QUATERNION",
+        "UpperArm.R": "QUATERNION",
+        "ForeArm.R": "QUATERNION",
+        "WeaponCarrier": "QUATERNION",
+        "Leg.L": "XYZ",
+        "Leg.R": "XYZ"
+      },
+      "cameras": {
+        "FRONT": "ASLandingV3_FRONT",
+        "THREE_QUARTER": "ASLandingV3_THREE_QUARTER",
+        "SIDE": "ASLandingV3_SIDE"
+      },
+      "hud_root": "ASLandingV3_HUD",
+      "return_scene": "ANIMATION_SHOWCASE",
+      "playback_sync": "FRAME_DROP",
+      "source_pack_sha256": "9d23264d8fde67a4611f73ecbe044ae1c5cbb4759994a5bef670f7b3fb779e5d",
+      "research_scale_profile": "actions_stuff_jump_v001",
+      "research_scale_channels": {
+        "Root": {
+          "axes": [
+            0,
+            1,
+            2
+          ],
+          "min": 0.85,
+          "max": 1.15
+        }
+      },
+      "source_scale_animations": [
+        "animation.oreville_ans.xvdslp",
+        "animation.oreville_ans.jmjgft"
+      ],
+      "comparison_actors": [
+        {
+          "rig": "ASLandingV3_Stationary_Rig",
+          "action": "Jump_AS_Stationary_SourceMatched_v003_RESEARCH",
+          "kind": "Stationary"
+        },
+        {
+          "rig": "ASLandingV3_Moving_Rig",
+          "action": "Jump_AS_Moving_SourceMatched_v003_RESEARCH",
+          "kind": "Moving"
+        }
+      ],
+      "source_matched_external_research": true
     }
   ],
   "library_focus": {
     "label": "Actions & Stuff + Original Combat",
     "entries": [
+      {
+        "kind": "review_sequence",
+        "id": "as_landing_source_match_v003"
+      },
+      {
+        "kind": "action",
+        "id": "Jump_AS_Stationary_SourceMatched_v003_RESEARCH"
+      },
+      {
+        "kind": "action",
+        "id": "Jump_AS_Moving_SourceMatched_v003_RESEARCH"
+      },
       {
         "kind": "review_sequence",
         "id": "hybrid_jump_original_v002"
