@@ -1,0 +1,31 @@
+{
+  "old_entries_preserved": 66,
+  "old_review_entries_preserved": 2,
+  "total_actions": 105,
+  "new_pending": [
+    {
+      "action": "Run_Hybrid_V1_Subtle_Bounce_Original_v001",
+      "pose_cycle_error": 0.0,
+      "selected_slot": "OBHybridRun_Authoring_Rig"
+    },
+    {
+      "action": "Run_Hybrid_V2_Balanced_Bounce_Original_v001",
+      "pose_cycle_error": 0.0,
+      "selected_slot": "OBHybridRun_Authoring_Rig"
+    },
+    {
+      "action": "Run_Hybrid_V3_Expressive_Bounce_Original_v001",
+      "pose_cycle_error": 0.0,
+      "selected_slot": "OBHybridRun_Authoring_Rig"
+    }
+  ],
+  "comparison_cameras": 3,
+  "synchronized_actors": 3,
+  "gait_hz": 1.888,
+  "frame_bounds": [
+    1,
+    128
+  ],
+  "fps_base": 0.9931144118309021,
+  "sync_mode": "FRAME_DROP"
+}
