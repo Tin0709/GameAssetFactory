@@ -31,6 +31,8 @@ var _left_held:=false
 var _e_held:=false
 var _q_held:=false
 var _c_held:=false
+var _contact_course:Node3D
+var _course_return:=Vector3.ZERO
 
 static func install_entry_button(scene:Node3D)->void:
 	var layer:=CanvasLayer.new();layer.name="SabrePrototypeEntry";scene.add_child(layer)
@@ -141,6 +143,7 @@ func _build_movement_panel()->void:
 		var feet:=CheckButton.new();feet.name="FootPlacementToggle";feet.text="Rigid foot contact · original adapter";feet.button_pressed=actor.foot_placement.enabled;feet.focus_mode=Control.FOCUS_NONE;box.add_child(feet)
 		feet.tooltip_text="Bounded sole anchors and whole-body settling; not recovered MD2 IK. Raw animation review bypasses it. Reset meter after switching for an A/B measurement."
 		feet.toggled.connect(func(value:bool):actor.foot_placement.set_enabled(value);actor.presentation_reset.emit())
+		var course:=CheckButton.new();course.name="FootContactCourseToggle";course.text="Uneven contact course / return";course.focus_mode=Control.FOCUS_NONE;box.add_child(course);course.toggled.connect(set_contact_course)
 	var heading:=Label.new();heading.text="MOVEMENT METER · actual physics travel";heading.add_theme_font_size_override("font_size",12);box.add_child(heading)
 	movement_label=Label.new();movement_label.add_theme_font_size_override("font_size",12);box.add_child(movement_label)
 	camera_label=Label.new();camera_label.add_theme_font_size_override("font_size",12);box.add_child(camera_label)
@@ -156,6 +159,26 @@ func _build_movement_panel()->void:
 		var smooth:=CheckButton.new();smooth.text="Smooth display";smooth.button_pressed=true;smooth.focus_mode=Control.FOCUS_NONE;row.add_child(smooth);smooth.toggled.connect(func(value:bool):render_presenter.enabled=value)
 func set_native_pixels(value:bool)->void:
 	native_pixels=value;apply_visual_clarity()
+func set_contact_course(value:bool)->void:
+	if value and is_instance_valid(_contact_course):return
+	if not value and not is_instance_valid(_contact_course):return
+	release_inputs();actor.combo.cancel();actor.velocity=Vector3.ZERO
+	if actor.foot_placement!=null:actor.foot_placement.clear()
+	if value:
+		_course_return=actor.global_position
+		_contact_course=Node3D.new();_contact_course.name="OriginalFootContactCourse";lab.add_child(_contact_course)
+		_contact_course.global_position=Vector3(actor.global_position.x,0.,actor.global_position.z)
+		var material:=StandardMaterial3D.new();material.albedo_color=Color(.28,.32,.35);material.roughness=1.
+		for x in 4:
+			for z in 4:
+				var height:=.42+float((x+z)%3)*.04
+				var body:=StaticBody3D.new();_contact_course.add_child(body);body.position=Vector3((x-1.5)*1.5,height-.1,(z-1.5)*1.5)
+				var shape:=CollisionShape3D.new();var box:=BoxShape3D.new();box.size=Vector3(1.5,.2,1.5);shape.shape=box;body.add_child(shape)
+				var mesh:=MeshInstance3D.new();var cube:=BoxMesh.new();cube.size=box.size;mesh.mesh=cube;mesh.material_override=material;body.add_child(mesh)
+		actor.global_position=_contact_course.global_position+Vector3(-.75,.62,-.75)
+	else:
+		actor.global_position=_course_return;_contact_course.queue_free();_contact_course=null
+	actor.reset_physics_interpolation();actor.presentation_reset.emit()
 func apply_visual_clarity()->void:
 	if not actor.using_original_source:return
 	var scale:=1.
