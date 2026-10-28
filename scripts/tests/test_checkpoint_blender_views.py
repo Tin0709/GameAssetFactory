@@ -19,6 +19,7 @@ class BlenderViewTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.research = self.root / 'MD2 Research'
+        self.project = self.root / 'GameAssetFactory'
         self.blender = self.root / 'Program Files' / 'Blender' / 'blender.exe'
         self.blender.parent.mkdir(parents=True)
         self.blender.write_bytes(b'fixture')
@@ -28,7 +29,11 @@ class BlenderViewTests(unittest.TestCase):
             path = self.research / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b'fixture')
-        self.launcher = BlenderViewLauncher(self.root / 'state', self.research, self.blender)
+        for name in ['blender/animation/showcase/Animation_Showcase.blend', 'scripts/load_showcase_ui.py']:
+            path = self.project / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b'fixture')
+        self.launcher = BlenderViewLauncher(self.root / 'state', self.research, self.blender, project_root=self.project)
 
     def test_each_view_opens_its_existing_blend_with_matching_ui_script(self):
         expected = {
@@ -49,6 +54,13 @@ class BlenderViewTests(unittest.TestCase):
                 self.assertNotIn('--background', args)
                 self.assertFalse(kwargs.get('shell', False))
                 self.assertEqual(Path(kwargs['cwd']), (self.research / files[0]).parent)
+        with patch('subprocess.Popen') as launch:
+            launch.return_value.pid = 5678
+            self.assertEqual(self.launcher.open('showcase'), 5678)
+        self.assertEqual(launch.call_args.args[0], [str(self.blender), '--factory-startup', '--disable-autoexec',
+            str(self.project / 'blender/animation/showcase/Animation_Showcase.blend'), '--python',
+            str(self.project / 'scripts/load_showcase_ui.py')])
+        self.assertEqual(self.launcher.blend_path('showcase'), self.project / 'blender/animation/showcase/Animation_Showcase.blend')
 
     def test_missing_ui_script_is_reported_before_launch(self):
         (self.research / 'blender/prototype_sabre/source_preview_ui.py').unlink()

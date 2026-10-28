@@ -71,12 +71,16 @@ bạn mở Blender với add-on MCP như trước. Đóng app sẽ dừng theo d
 MCP đã được yêu cầu khởi động tiếp tục chạy để các client khác còn dùng được.
 Không có đăng ký Startup/Task Scheduler cho tính năng này.
 
-Hai nút mở nhanh trong cùng khu vực Blender:
+Ba nút mở nhanh trong cùng khu vực Blender (tự xuống hàng khi cửa sổ hẹp):
 
 - **Mở Animation MD2:** mở `MD2_Animation_Library_BrowserFixed.blend` và nạp
   `scripts/md2_blender_library.py`.
 - **Mở Valorie + Sabre:** mở `MD2_Valorie_Sabre_Source_Showcase.blend` và nạp
   `source_preview_ui.py`.
+- **Mở Animation Showcase:** mở `blender/animation/showcase/Animation_Showcase.blend`
+  trong GameAssetFactory và nạp `scripts/load_showcase_ui.py` để hiện bảng
+  **Animation Library**. Dùng cùng tùy chọn khởi động với launcher animation
+  hiện có của dự án. Nút **Copy path** cạnh nó copy đường dẫn file Showcase.
 
 Các nút dùng đúng file/script của hai launcher `.cmd` có sẵn nhưng gọi trực tiếp
 Blender, nên không mở thêm terminal. Không tự lưu hoặc sửa file `.blend`. Mỗi

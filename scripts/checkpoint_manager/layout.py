@@ -144,16 +144,30 @@ def build_layout(app):
     ttk.Label(bridge, textvariable=app.bridge_detail, style='Muted.TLabel', wraplength=980).pack(anchor='w', pady=(9, 12))
     ttk.Frame(bridge, height=1, style='Line.TFrame').pack(fill='x', pady=(0, 12))
     shortcuts = row(bridge)
+    shortcut_groups = []
     for key, label in VIEW_LABELS.items():
         group = ttk.Frame(shortcuts, style='Card.TFrame')
-        group.pack(side='left', padx=(0, 12))
+        shortcut_groups.append(group)
         button = Button(group, 'Mở ' + label, lambda view=key: app.open_blender_view(view), small=True)
         button.pack(side='left', padx=(0, 3))
         app.view_buttons[key] = button
         copy = Button(group, 'Copy path', lambda view=key: app.copy_blender_view_path(view), kind='ghost', small=True)
         copy.pack(side='left')
         app.view_copy_buttons[key] = copy
-    ttk.Label(shortcuts, text='MCP kiểm tra mỗi 3 giây', style='MonoMuted.TLabel').pack(side='right')
+    def arrange_shortcuts(event):
+        used, line, column = 0, 0, 0
+        for group in shortcut_groups:
+            width = group.winfo_reqwidth() + 12
+            if used and used + width > event.width:
+                used, line, column = 0, line + 1, 0
+            group.grid(row=line, column=column, sticky='w', padx=(0, 12), pady=(0 if line == 0 else 8, 0))
+            used += width
+            column += 1
+    shortcuts.bind('<Configure>', arrange_shortcuts)
+    # Initial grid mapping gives every group its natural width before resize.
+    for column, group in enumerate(shortcut_groups):
+        group.grid(row=0, column=column, sticky='w', padx=(0, 12))
+    ttk.Label(bridge, text='MCP kiểm tra mỗi 3 giây', style='MonoMuted.TLabel').pack(anchor='e', pady=(8, 0))
 
     for index, config in enumerate(app.configs):
         panel = card()

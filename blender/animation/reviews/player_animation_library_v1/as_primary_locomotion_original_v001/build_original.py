@@ -81,20 +81,36 @@ for style in m.STYLES:
 # One original preview-only transition take. Integrate the shared clock and
 # travel continuously. Anchored rolling edges are resolved in traveled space;
 # this is original offline contact construction, not a recovered runtime IK.
-values={};trace=[];p=m.ORIGIN;travel=0.;last_speed=m.STYLES[0]['speed'];last_hz=m.STYLES[0]['hz'];anchors={};lastkeys={}
+values={};trace=[];p=m.ORIGIN;travel=0.;last_speed=m.STYLES[0]['speed'];last_hz=m.STYLES[0]['hz'];anchors={};lastkeys={};corners={};released={};lasttheta={};lastnom={};lastdelta={}
 dt=1/(m.FPS*8);duration=4.5
 for j in range(int(duration/dt)+1):
  t=j*dt;w=m.weight(t);s=m.blend_style(w)
  if j:p+=(last_hz+s['hz'])*.5*dt;travel+=(last_speed+s['speed'])*.5*dt
  last_hz=s['hz'];last_speed=s['speed'];correct={};contact_info={}
  for name in points:
-  ph=p if name.endswith('L')else p+.5;theta,plant,corner=m.leg(ph%1,s)
-  key=(math.floor(ph+.5),corner)if plant else None
+  ph=p if name.endswith('L')else p+.5;theta,plant,corner=m.leg(ph%1,s);nominal=theta
+  key=math.floor(ph+.5)if plant else None
   if plant:
-   if lastkeys.get(name)!=key:anchors[name]=-travel+m.L*math.sin(theta)+corner*math.cos(theta)
+   if lastkeys.get(name)!=key:
+    anchors[name]=-travel+m.L*math.sin(theta)+corner*math.cos(theta);corners[name]=corner
+   corner=corners[name]
    target=anchors[name]+travel
    theta=math.asin(target/math.hypot(m.L,m.D))-math.atan2(corner,m.L)
-   correct[name]=theta
+   # Change material edge when the actual rigid sole is flat, rather than
+   # changing at a nominal phase while the speed is accelerating.
+   if corner>0 and theta>0:
+    anchors[name]-=2*m.D;corner=-m.D;corners[name]=corner
+    theta=math.asin((anchors[name]+travel)/math.hypot(m.L,m.D))-math.atan2(corner,m.L)
+  else:
+   if lastkeys.get(name)is not None:
+    d=lasttheta[name]-lastnom[name];v=(d-lastdelta.get(name,d))/dt
+    released[name]=(t,d,v)
+   if name in released:
+    when,d,v=released[name];age=t-when
+    if age<.12:theta+=m.hermite(d,0.,v,0.,age/.12,.12)
+  correct[name]=theta
+  lastdelta[name]=lasttheta.get(name,theta)-lastnom.get(name,nominal)
+  lasttheta[name]=theta;lastnom[name]=nominal
   lastkeys[name]=key;contact_info[name]={'plant':plant,'corner':corner,'anchor':anchors.get(name)}
  pose(p%1,s,correct);record(values,1+j/8)
  trace.append({'frame':1+j/8,'time':t,'phase':p%1,'run_weight':w,'travel_m':travel,'speed':s['speed'],'contacts':contact_info})

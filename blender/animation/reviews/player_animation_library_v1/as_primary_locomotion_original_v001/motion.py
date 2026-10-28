@@ -6,7 +6,7 @@ caller. Contact windows and all curve knots here are original design choices.
 import math
 FPS=60
 END=150
-ORIGIN=.25
+ORIGIN=.18
 STYLES=[dict(kind='Walk',hz=1.2,speed=1.8,duty=.50,arm=34.,torso=8.,head=1.8,lift=0.),
         dict(kind='Run',hz=1.6,speed=4.3,duty=.28,arm=53.,torso=17.,head=2.5,lift=.095)]
 L=.675; D=.1125
@@ -40,24 +40,29 @@ def leg(phase,s):
   if a<=x<=b:return hermite(y,z,dy,dz,(x-a)/(b-a),b-a),False,0.
  raise AssertionError(x)
 def support_z(theta):return L*math.cos(theta)+D*abs(math.sin(theta))+.0003
-def hip_height(p,s):
+def raw_height(p,s):
  # One mass trajectory per step. Within contact, smooth a small spatial
  # neighborhood of the geometric rolling support to avoid the box-edge cusp.
  q=(p+.25)% .5-.25
  half=s['duty']/2
  if abs(q)<=half:
-  vals=[support_z(leg((((q+i*.0008+.25)%.5)-.25)%1,s)[0])for i in range(-4,5)]
-  return sum(vals)/len(vals)-.004
+  return support_z(leg(q%1,s)[0])-.004
  # Body floats only in the intentional exchange; unequal lift on alternate
  # steps gives a subtle leading-side accent without changing contact timing.
  a=half;b=.5-half; x=(q-half)%( .5)
  x=max(0.,min(1.,x/(b-a)))
- edge=sum(support_z(leg((half+i*.0008)%1,s)[0])for i in range(-4,5))/9-.004
+ edge=support_z(leg(half,s)[0])-.004
  amplitude=s['lift']*(1 if (p%1)<.5 else .91)
  # Unequal time to apex / compression, smooth positional and speed endpoints.
  peak=.39
  wave=ease(x/peak) if x<peak else 1-ease((x-peak)/(1-peak))
  return edge+amplitude*wave
+def hip_height(p,s):
+ # Smooth only the mass trajectory, not the rigid sole constraints. A compact
+ # original Gaussian window rounds box-edge/landing cusps; the tiny residual
+ # is absorbed at the hidden hip junction, never by scaling the leg.
+ weights=[math.exp(-.5*(i/3.3)**2)for i in range(-8,9)]
+ return sum(raw_height((p+i*.00225)%1,s)*w for i,w in zip(range(-8,9),weights))/sum(weights)
 def verify():
  for s in STYLES:
   for i in range(1,400):
