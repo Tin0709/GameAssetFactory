@@ -10,6 +10,9 @@ m.verify()
 CENTRAL=ROOT/'blender/animation/showcase/Animation_Showcase.blend'
 SOURCE=HERE/'hybrid_run_authoring.blend'
 assert not SOURCE.exists() or '--refine-draft' in sys.argv,'Do not overwrite an authored revision'
+if SOURCE.exists():
+    registry=json.loads((ROOT/'blender/animation/showcase/animation_manifest.json').read_text())
+    assert not any(e.get('status')=='approved' and e.get('source')==SOURCE.relative_to(ROOT).as_posix() for e in registry['animations']),'Approved source is immutable; create a separately named revision'
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 with bpy.data.libraries.load(str(CENTRAL),link=False) as (src,dst):dst.objects=['Showcase_Player_Rig','Showcase_Player_Mesh']
 rig,mesh=dst.objects
