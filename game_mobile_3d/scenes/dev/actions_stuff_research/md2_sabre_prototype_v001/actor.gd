@@ -454,7 +454,11 @@ func _physics_process(delta:float)->void:
 			else:facing+=turn_axis*2.8*delta
 		elif _move_requested:facing=atan2(stick.x,stick.y)
 		var turn_rate:=ground_turn_rate if _grounded else 12.
-		visual.rotation.y+=clampf(wrapf(facing-visual.rotation.y,-PI,PI),-turn_rate*delta,turn_rate*delta)
+		if hybrid_motion!=null and _grounded and not combo.active() and not combat_requested:
+			visual.rotation.y=hybrid_motion.facing.step(visual.rotation.y,facing,delta,turn_rate,_move_requested)
+		else:
+			visual.rotation.y+=clampf(wrapf(facing-visual.rotation.y,-PI,PI),-turn_rate*delta,turn_rate*delta)
+			if hybrid_motion!=null:hybrid_motion.facing.reset(visual.rotation.y)
 	if combat_requested!=_previous_combat:
 		_transition="" if using_original_source else ("ReadyEnter" if combat_requested else "ReadyExit");_transition_time=0.;_previous_combat=combat_requested
 	var left:=delta
@@ -636,7 +640,7 @@ func _play(key:String,blend:float=.04)->void:
 			var rate:float=combo.playback_rate() if combo.active() else 1.
 			var idle_to_move:bool=active_clip in ["Idle","CombatReady"] and key in GAITS
 			var move_to_idle:bool=active_clip in GAITS and key in ["Idle","CombatReady"]
-			var continuous_hybrid_jump:bool=hybrid_motion!=null and active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding"] and key in ["JumpTakeoff","JumpAirborne","JumpLanding"]
+			var continuous_hybrid_jump:bool=hybrid_motion!=null and active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding"] and key in ["JumpTakeoff","JumpAirborne","JumpLanding"] and not(key=="JumpLanding" and _move_requested)
 			var hybrid_jump_boundary:bool=hybrid_motion!=null and (active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding"] or key in ["JumpTakeoff","JumpAirborne","JumpLanding"])
 			if _continuous_combat_segment(active_clip,key) or continuous_hybrid_jump:
 				_outgoing_locomotion_state.clear();source_transition.discard_raw()
