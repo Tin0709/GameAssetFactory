@@ -51,6 +51,13 @@ func run():
  helper.restore();a.position.x+=.02;helper.apply(1./120.,true,false,true,0)
  var displaced:Vector3=helper._samples(0).center-pinned
  check(Vector2(displaced.x,displaced.z).length()<.001,"A planted sole holds its world anchor within the rigid correction budget")
+ # The footprint can straddle a terrain edge after horizontal anchoring.
+ helper.clear();a.position=Vector3.ZERO;a.animation_player.seek(.2,true);rig.force_update_all_bone_transforms()
+ for n in 120:
+  helper.restore();helper.apply(1./120.,true,false,true,0)
+ helper.restore();a.position.x=-.04;helper.apply(1./120.,true,false,true,0)
+ check(helper.snapshot().penetration_m<.003,"Ground clearance is solved at the anchored footprint across a terrain edge")
+
  helper.clear();a.position=Vector3.ZERO;helper.apply(1./60.,true,false,true,0);helper.restore();a.visual.rotation.y=PI/2.;helper.apply(1./60.,true,false,true,0)
  check(not helper.states[0].planted and not helper.states[1].planted,"Turning releases incompatible anchors")
  helper.restore();a.visual.rotation.y=0.;helper.clear();helper.apply(1./60.,true,false,false,1)
