@@ -32,7 +32,7 @@ def main():
         expected = ROOT / folder / (module_name + '.py')
         cached_path = getattr(module, '__file__', None)
         if module_name == 'gaf_animation_library' and isinstance(cached_path, str) and Path(cached_path).resolve() != expected.resolve():
-            saved = [(scene, {name: getattr(scene, name) for name in ['gaf_active_index', 'gaf_loop', 'gaf_show_archived']})
+            saved = [(scene, {name: getattr(scene, name, default) for name, default in [('gaf_active_index', 0), ('gaf_loop', True), ('gaf_show_archived', False)]})
                      for scene in bpy.data.scenes if scene.get('gaf_animation_showcase')]
             if hasattr(bpy.types, panel):
                 module.unregister()
