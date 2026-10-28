@@ -510,12 +510,8 @@ func _animate(delta:float)->void:
 			_dispatch_locomotion_events(event_clip,before_phase*float(clips[event_clip].duration),advance_phase*float(clips[event_clip].duration),delta)
 	elif combat_legs!=null:combat_legs.weight=0.
 	_combat_was_moving=moving_legs
+	if hybrid_motion!=null:hybrid_motion.apply(self,selected,delta)
 	if source_transition!=null:source_transition.apply(delta)
-	if hybrid_motion!=null:
-		hybrid_motion.apply(self,selected,delta)
-		# Feed the existing handoff from the newly selected base pose rather than
-		# replacing its blended output; only one final source-transition writer.
-		if hybrid_motion.owns_pose and source_transition!=null:source_transition.apply(0.)
 	if review_clip.is_empty() and selected in GAITS:
 		var event_clip:String=(gait_state.right if float(gait_state.weight)>.5 else gait_state.left) if composed_gait else selected
 		var event_ratio:float=float(clips[event_clip].duration)/float(clips[selected].duration)
@@ -740,6 +736,7 @@ func reset_movement_measurements()->void:
 	if foot_placement!=null:foot_placement.reset_metrics()
 func movement_measurements()->Dictionary:
 	var report:Dictionary=movement_meter.snapshot()
+	if hybrid_motion!=null:report["hybrid_motion"]=hybrid_motion.diagnostics()
 	if foot_placement!=null:report["foot_ground"]=foot_placement.snapshot()
 	if using_original_source:report.merge({"jump_apex_time_adapter":SOURCE_JUMP_APEX_SECONDS,"moving_landing_release_adapter":SOURCE_MOVING_LAND_SECONDS,"heavy_slam_gravity_multiplier":2.,"effective_gravity":gravity*(2. if _heavy_slam_active else 1.),"jump_phase":_jump_stage})
 	report.merge({"clip":active_clip,"play_rate":_playback_speed,"world_velocity":[velocity.x,velocity.y,velocity.z],"walk_speed":walk_speed,"run_speed":run_speed,"walk_stride_reference":walk_stride_speed,"run_stride_reference":run_stride_speed,"source_table_speed":700 if using_original_source else null,"unit_conversion":"100UU per Godot metre; local effective MD2 runtime unverified" if using_original_source else "authored fallback","acceleration_setting":acceleration,"deceleration_setting":deceleration,"turn_rate_adapter":12.,"attack_travel_adapter":.22,"coyote_time":coyote_time,"jump_height_adapter":jump_height,"gravity_adapter":gravity,"native_runtime_parameters_recovered":false})

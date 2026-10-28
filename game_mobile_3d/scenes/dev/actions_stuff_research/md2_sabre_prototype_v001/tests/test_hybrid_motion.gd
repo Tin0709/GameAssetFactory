@@ -7,7 +7,7 @@ func check(value:bool,label:String)->void:
 func _initialize()->void:call_deferred("run")
 func run()->void:
 	var lab=load("res://scenes/dev/ActionsStuffWalkRunTest.tscn").instantiate()
-	lab.md2_sabre_prototype_enabled=true;lab.grass_field_blocks=10;root.add_child(lab)
+	lab.md2_sabre_prototype_enabled=true;lab.grass_field_blocks=80;root.add_child(lab)
 	await physics_frame;await process_frame
 	var a=lab.player
 	check(a.get("hybrid_motion")!=null,"Selected private hybrid motion is installed on existing Valorie actor")
