@@ -126,7 +126,11 @@ func _flush()->void:
 	for key:String in _batches:
 		var row:Dictionary=_batches[key];var mm:=MultiMesh.new();mm.transform_format=MultiMesh.TRANSFORM_3D;mm.use_custom_data=true;mm.mesh=bundle.meshes[row.asset];mm.instance_count=row.transforms.size()
 		for i in mm.instance_count:mm.set_instance_transform(i,row.transforms[i]);mm.set_instance_custom_data(i,Color(row.phases[i],0,0,1))
-		var instance:=MultiMeshInstance3D.new();instance.name="MeadowBatch_"+str(batch_count);instance.multimesh=mm;instance.extra_cull_margin=1.8;instance.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;add_child(instance);batch_count+=1
+		var instance:=MultiMeshInstance3D.new();instance.name="MeadowBatch_"+str(batch_count);instance.multimesh=mm;instance.extra_cull_margin=1.8;instance.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF
+		# Preserve the approved lab's foliage shadow policy; native per-type flags
+		# remain unverified. Dense alpha cards must not acquire new black self-shadows.
+		if String(row.asset).begins_with("MD2 | SM_")and not String(row.asset).contains("Boulder"):instance.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(instance);batch_count+=1
 	_batches.clear()
 
 func _physics_process(delta:float)->void:
