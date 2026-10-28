@@ -114,7 +114,7 @@ for action,variant in zip(actions,m.VARIANTS):
         rows=[v for v in contacts if v['bone']==name]
         for a,b in zip(rows,rows[1:]):
             if b['time']-a['time']<.001 and a['corner']==b['corner']:
-                speeds.append((Vector(b['point'])-Vector(a['point'])).length()/(b['time']-a['time']))
+                speeds.append((Vector(b['point'])-Vector(a['point'])).length/(b['time']-a['time']))
     result={'action':action.name,'hip_bounce_mm':(max(hips)-min(hips))*1000,'torso_yaw_peak_to_peak_deg':max(angles)-min(angles),'head_world_relative_rest_peak_abs_deg':[max(abs(h[i])for h in heads)for i in range(3)],'rolling_contact_samples':len(speeds),'rolling_contact_speed_rms_m_s':math.sqrt(sum(v*v for v in speeds)/len(speeds)),'rolling_contact_speed_max_m_s':max(speeds),'max_floor_penetration_mm':max(penetrations)*1000,'max_scale_error':max(scales),'leg_pivot_offset_z_m':[min(extensions),max(extensions)],'gait_hz':m.HZ,'stance_fraction_original':m.DUTY,'phase_origin':m.ORIGIN,'root_world_travel_m':0}
     assert max(penetrations)<.001 and max(speeds)<.05 and max(scales)<1e-6,result
     assert abs(result['hip_bounce_mm']-variant[1]*1000)<.1,result
