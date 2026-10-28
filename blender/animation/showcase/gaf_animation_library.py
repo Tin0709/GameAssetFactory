@@ -292,7 +292,7 @@ def open_review_sequence(context,sequence_id):
         obj.animation_data_create();obj.animation_data.action=action;obj.animation_data.action_slot=action.slots[0]
     scene[REVIEW_ENTRY]=json.dumps(entry)
     scene.frame_start=entry['start'];scene.frame_end=entry['end'];scene.render.fps=entry['fps'];scene.render.fps_base=entry['fps_base']
-    scene.use_preview_range=False;scene.sync_mode='NONE';scene.gaf_loop=False;scene.gaf_error='';scene.frame_set(entry['start'])
+    scene.use_preview_range=False;scene.sync_mode='FRAME_DROP' if entry.get('playback_sync')=='FRAME_DROP' else 'NONE';scene.gaf_loop=False;scene.gaf_error='';scene.frame_set(entry['start'])
     for obj in context.window.view_layer.objects:obj.select_set(False)
     context.window.view_layer.objects.active=rig;rig.select_set(True)
     view(scene,'THREE_QUARTER')
@@ -317,7 +317,7 @@ def activate(scene,index):
         for key,value in neutral[bone.name].items():setattr(bone,key,value)
     rig.animation_data.action=a;rig.animation_data.action_slot=a.slots[0]
     scene.frame_start=e['start'];scene.frame_end=e['end'];scene.render.fps=e['fps'];scene.render.fps_base=e['fps_base']
-    scene.use_preview_range=False;scene.sync_mode='NONE';scene.frame_set(e['start'])
+    scene.use_preview_range=False;scene.sync_mode='FRAME_DROP' if e.get('playback_sync')=='FRAME_DROP' else 'NONE';scene.frame_set(e['start'])
     show_preview_prop(scene,e)
     floor=bpy.data.objects.get('Showcase_FixedFloor')
     if floor:floor.location.z=e.get('preview_floor_z_m',0.0)
