@@ -5,6 +5,7 @@ uniform sampler2D mre_map : filter_nearest, repeat_disable;
 uniform bool has_mre=false;
 uniform float cutoff=0.3333;
 
+uniform vec3 gaf_sky_delta = vec3(0.0);
 uniform sampler2D gaf_indirect_field : filter_linear, repeat_disable;
 uniform vec2 gaf_field_origin=vec2(-17.0);
 uniform float gaf_field_extent=34.0;
@@ -23,5 +24,5 @@ void fragment(){
 	ALBEDO=texel.rgb;ROUGHNESS=1.0;SPECULAR=0.0;
 	if(has_mre){vec3 packed=texture(mre_map,UV).rgb;METALLIC=packed.r;ROUGHNESS=packed.g;EMISSION=texel.rgb*packed.b;}
  SPECULAR=gaf_specular;
- EMISSION+=ALBEDO*gaf_diffuse_fill*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+ EMISSION+=ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
 }

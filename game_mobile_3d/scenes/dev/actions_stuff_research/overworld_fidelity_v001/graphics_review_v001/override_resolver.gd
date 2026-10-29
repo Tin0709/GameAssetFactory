@@ -16,7 +16,7 @@ static func resolve(base:Dictionary,overrides:Array)->Dictionary:
 			var entries:Array=groups[priority];var total:=0.;var blended:Variant=null
 			for row:Dictionary in entries:
 				if not row.get("fields",{}).has(key):continue
-				var w:=clampf(float(row.weight),0.,1.);var v:Variant=row.fields[key]
+				var w:=clampf(float(row.weight),0.,1.);var v:Variant=_working(key,row.fields[key])
 				if v is float or v is int or v is Vector3 or v is Color:
 					blended=v*w if blended==null else blended+v*w
 				else:blended=v
@@ -28,19 +28,28 @@ static func resolve(base:Dictionary,overrides:Array)->Dictionary:
 			elif allocation>.5:value=blended
 			remaining*=1.-coverage
 		if base[key] is float or base[key] is int or base[key] is Vector3 or base[key] is Color:
-			result[key]=base[key] if value==null else value+base[key]*remaining
+			result[key]=base[key] if value==null else _display(key,value+_working(key,base[key])*remaining)
 		elif value!=null:result[key]=value
 	return result
 static func advance(state:Dictionary,target:Dictionary,velocity:Dictionary,delta_s:float,settle_s:float)->Dictionary:
 	var out:=state.duplicate(true);var speed:=velocity.duplicate(true)
 	var dt:=maxf(0.,delta_s);var rate:=4.7438645/maxf(.001,settle_s);var decay:=exp(-rate*dt)
 	for key:Variant in target:
-		var goal:Variant=target[key]
-		if not state.has(key):out[key]=goal;continue
+		var goal:Variant=_working(key,target[key])
+		if not state.has(key):out[key]=target[key];continue
 		if goal is float or goal is Vector3 or goal is Color:
-			var offset:Variant=state[key]-goal
+			var offset:Variant=_working(key,state[key])-goal
 			var v:Variant=speed.get(key,offset*0.)
 			var term:Variant=v+rate*offset
-			out[key]=goal+(offset+term*dt)*decay;speed[key]=(v-rate*term*dt)*decay
+			out[key]=_display(key,goal+(offset+term*dt)*decay);speed[key]=(v-rate*term*dt)*decay
 		else:out[key]=goal
 	return {"state":out,"velocity":speed}
+
+static func _working(key:Variant,value:Variant)->Variant:
+	if String(key).ends_with("_srgb")and value is Vector3:
+		var c:=Color(value.x,value.y,value.z).srgb_to_linear();return Vector3(c.r,c.g,c.b)
+	return value
+static func _display(key:Variant,value:Variant)->Variant:
+	if String(key).ends_with("_srgb")and value is Vector3:
+		var c:=Color(value.x,value.y,value.z).linear_to_srgb();return Vector3(c.r,c.g,c.b)
+	return value

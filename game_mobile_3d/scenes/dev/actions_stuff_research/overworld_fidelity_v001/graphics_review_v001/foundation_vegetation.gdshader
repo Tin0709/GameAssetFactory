@@ -23,6 +23,7 @@ varying float height_fraction;
 varying vec3 root_color;
 varying vec3 wrapped_normal_world;
 
+uniform vec3 gaf_sky_delta = vec3(0.0);
 uniform sampler2D gaf_indirect_field : filter_linear, repeat_disable;
 uniform vec2 gaf_field_origin=vec2(-17.0);
 uniform float gaf_field_extent=34.0;
@@ -76,5 +77,5 @@ void fragment(){
 	// Inferred wrapped backlighting; no claim of matching native two-sided shader.
 	BACKLIGHT=color*0.18;
  SPECULAR=gaf_specular;
- EMISSION+=ALBEDO*gaf_diffuse_fill*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+ EMISSION+=ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
 }
