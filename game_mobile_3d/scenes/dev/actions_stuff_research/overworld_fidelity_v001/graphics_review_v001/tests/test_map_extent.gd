@@ -6,6 +6,9 @@ func _initialize()->void:call_deferred("run")
 func run()->void:
 	var lab=load("res://scenes/dev/MD2OverworldFidelityTest.tscn").instantiate();root.add_child(lab)
 	check(lab.get_node("FlatGround").get_child(0).shape.size.x==100.,"Physical floor spans100m")
+	lab.grass_overview=true;lab._update_camera()
+	for corner:Vector3 in [Vector3(-50,0,-50),Vector3(-50,0,50),Vector3(50,0,-50),Vector3(50,0,50)]:
+		check(lab.camera.to_local(corner).z> -lab.camera.far,"Overview far plane covers corner")
 	check(lab.meadow.interaction.extent>=104.,"Grass interaction covers expanded field")
 	check(lab.meadow.instance_count>15000,"Outer map contains real ground and vegetation")
 	check(lab.get_node("FieldBoundary").get_child(0).position.x< -50.,"Boundary outside100m playable field")

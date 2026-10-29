@@ -16,6 +16,8 @@ func run()->void:
 			elif v is Vector3:check(v.is_finite(),"Finite phase vectors")
 	check(Track.sample(o.profile,0.)==Track.sample(o.profile,1.),"Cycle wraps exactly")
 	o.seek_cycle(.65,true);check(lab.md2_lighting.sun.light_energy<day*.3,"Night key light dims")
+	o.set_local_overrides([]);o._process(1.)
+	check(lab.md2_lighting.sun.light_energy<day*.3,"Paused Night persists after override removal")
 	o.set_candidate(false);check(lab.md2_lighting.environment.ambient_light_energy==o.environment_baseline.ambient_light_energy,"A/B restores ambient")
 	o.set_candidate(true);o.seek_cycle(.15,true)
 	check(is_equal_approx(lab.md2_lighting.sun.light_energy,day),"Day key restored")

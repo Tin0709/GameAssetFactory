@@ -31,7 +31,7 @@ func _ready()->void:
 	super._ready()
 	if player==null:error_text="Existing Sabre player failed to load.";_error_ui();return
 	meadow=Meadow.new();meadow.name="PrivateOverworldMeadow";add_child(meadow);meadow.setup(player,private_bundle);grass_field=meadow
-	camera.far=maxf(150.,grass_field_blocks*4.)
+	camera.far=maxf(400.,Meadow.MAP_EXTENT*4.)
 	if md2_lighting!=null:md2_lighting.grass_field=meadow
 	environment_audio=EnvAudio.new();environment_audio.name="PrivateOverworldAudio";add_child(environment_audio);environment_audio.setup(player,meadow,private_bundle)
 	sabre_mode.panel.hide();sabre_mode.movement_panel.hide();sabre_mode.refresh_reflections()

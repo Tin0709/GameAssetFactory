@@ -150,7 +150,7 @@ func set_local_overrides(entries:Array)->bool:
 			elif key=="sun_color_srgb":
 				if not row.fields[key]is Vector3 or not row.fields[key].is_finite():return false
 			else:return false
-	local_overrides=entries.duplicate(true);target_state=Resolver.resolve(profile.phase_fields(phase),local_overrides);return true
+	local_overrides=entries.duplicate(true);target_state=Resolver.resolve(PhaseTrack.sample(profile,cycle_position),local_overrides);return true
 func set_comparison_camera(value:bool)->void:
 	comparison_camera=value;apply_camera();_refresh_label()
 func apply_camera()->void:
