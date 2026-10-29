@@ -121,7 +121,8 @@ func _build_field()->void:
 				var distance:=point.distance_to(nearest)
 				if distance>1.4:continue
 				visibility=minf(visibility,lerpf(.30,1.,smoothstep(0.,1.4,distance)))
-			image.set_pixel(x,y,occluded.lerp(open,visibility))
+			var shade_gain:float=float(data.get("occlusion_exposure_ratio",1.))
+			image.set_pixel(x,y,(occluded*shade_gain).lerp(open,visibility))
 	field_texture=ImageTexture.create_from_image(image)
 func per_frame()->void:
 	if available and enabled and stage>=3:lab.md2_lighting.sun.light_energy=data.sun_energy

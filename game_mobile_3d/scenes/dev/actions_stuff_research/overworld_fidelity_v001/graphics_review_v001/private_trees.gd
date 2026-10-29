@@ -22,8 +22,13 @@ func setup(lab:Node,rows:Array)->void:
 			var instance:MeshInstance3D=child;var bounds:AABB=instance.global_transform*instance.mesh.get_aabb();canopy_bounds.append(bounds)
 			for surface in instance.mesh.get_surface_count():
 				var original:BaseMaterial3D=instance.get_active_material(surface)
-				if original==null or original.albedo_texture==null:continue
-				var material:=ShaderMaterial.new();material.shader=Solid;material.set_shader_parameter("atlas",original.albedo_texture)
+				var atlas:Texture2D=original.albedo_texture if original!=null else null
+				if row.has("texture_path"):
+					var image_path:String=row.texture_path
+					if not lab.private_bundle.permitted(image_path)or FileAccess.get_sha256(image_path)!=row.texture_sha256:errors.append("Tree atlas changed");continue
+					atlas=ImageTexture.create_from_image(Image.load_from_file(image_path))
+				if atlas==null:errors.append("Missing tree atlas");continue
+				var material:=ShaderMaterial.new();material.shader=Solid;material.set_shader_parameter("atlas",atlas);material.set_shader_parameter("review_alpha_mask",true)
 				material.set_shader_parameter("gaf_field_origin",Vector2(-52,-52));material.set_shader_parameter("gaf_field_extent",104.);material.set_shader_parameter("gaf_fill_up_ratio",1.)
 				instance.set_surface_override_material(surface,material);materials.append(material)
 		# Original lightweight trunk collision; source collision metadata not exported.

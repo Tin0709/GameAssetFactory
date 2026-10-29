@@ -1,5 +1,6 @@
 shader_type spatial;
 render_mode diffuse_burley, ambient_light_disabled;
+uniform bool review_alpha_mask=false;
 uniform bool review_path=false;
 uniform vec4 review_source_rects[3];
 uniform vec4 review_target_rect=vec4(0.0);
@@ -34,6 +35,7 @@ void fragment(){
 	 }
 	}
 	vec4 texel=texture(atlas,lookup_uv);
+	if(review_alpha_mask && texel.a<cutoff){discard;}
 	ALBEDO=texel.rgb;ROUGHNESS=1.0;SPECULAR=0.0;
 	if(has_mre){vec3 packed=texture(mre_map,lookup_uv).rgb;METALLIC=packed.r;ROUGHNESS=packed.g;EMISSION=texel.rgb*packed.b*review_emissive_gain;}
  SPECULAR=gaf_specular;
