@@ -128,6 +128,7 @@ func _apply_sun()->void:
 	lab.md2_lighting.environment.ambient_light_energy=environment_baseline.ambient_light_energy*float(resolved.get("ambient_gain",1.))
 	var fog:Color=environment_baseline.fog_light_color
 	lab.md2_lighting.environment.fog_light_color=(fog.srgb_to_linear()*gain).linear_to_srgb()
+	if strict_match!=null:strict_match.per_frame()
 func _restore_atmosphere()->void:
 	for key:String in environment_baseline:lab.md2_lighting.environment.set(key,environment_baseline[key])
 	for key:String in sky_baseline:lab.md2_lighting.sky_material.set(key,sky_baseline[key])
