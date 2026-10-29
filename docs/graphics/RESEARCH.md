@@ -431,3 +431,7 @@ Theo yêu cầu tiếp theo, [nguồn hoa hiện tại](../../blender/environmen
 ## MD2 grass wind — Blender review,2026-10-21
 
 [Focused research and implementation](../environment/MD2_GRASS_WIND_RESEARCH.md): actual TikTok/official trailer/uploader samples, observed-versus-unknown motion, separate native wind copies in the existing library,20s1×field/close previews and Godot Mobile proposal. Original source assets/gameplay remain exact. Pending visual approval; no player interaction or Godot integration.
+
+## 2026-10-29 — Private source meadow comparison (Pending)
+
+Existing MD2OverworldFidelityTest now has an editor-only strict color/camera/lighting review and user-authorized4source Oak variants/96source grass patches. Native LUT/texture/noise stay outside Git in Desktop/MD2 Research/godot_lab/overworld_strict_day_v001. Use Open Source Meadow.cmd, comparison.html and MISMATCH.md there. Shadow range32→72m and fog start10→40m address verified camera-distance mismatches; colored fill and spatial exposure substitutes remain approximations. Native grass multiplication/power/noise arithmetic informs the original shader implementation. Night presets do not provide a Night GPU match. Existing gameplay, audio and Blender assets remain unchanged; no production/phone or aesthetic approval.
