@@ -69,7 +69,7 @@ func set_enabled(value:bool)->void:
 func _build_grass_patches(lab:Node,rows:Array)->void:
 	var rng:=RandomNumberGenerator.new();rng.seed=291026
 	var batches:Dictionary={}
-	var assets:=["MD2 | SM_GrassTall_01","MD2 | SM_GrassMedium_02","MD2 | SM_GrassMedium_03"]
+	var assets:=["MD2 | SM_GrassMedium_01","MD2 | SM_GrassMedium_02","MD2 | SM_GrassShort_02"]
 	for row:Dictionary in rows:
 		var p:Array=row.position;var center:=Vector3(p[0],p[1],p[2])
 		for i in 24:
