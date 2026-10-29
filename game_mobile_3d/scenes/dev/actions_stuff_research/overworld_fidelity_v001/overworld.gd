@@ -3,6 +3,8 @@ extends "res://scenes/dev/actions_stuff_research/walk_run_test.gd"
 const Bundle=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/private_bundle.gd")
 const Meadow=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/meadow.gd")
 const EnvAudio=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/environment_audio.gd")
+const DayFoundation=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/graphics_owner.gd")
+var graphics_foundation:Node
 var private_bundle=Bundle.new()
 var environment_audio:Node3D
 var meadow:Node3D
@@ -38,6 +40,7 @@ func _ready()->void:
 	appearance.item_selected.connect(func(index:int):
 		sabre_mode.release_inputs();get_tree().set_meta("md2_sabre_private_skin_selected",index==0);get_tree().change_scene_to_file(scene_file_path))
 	_build_meadow_ui()
+	graphics_foundation=DayFoundation.new();graphics_foundation.name="OverworldDayFoundation";add_child(graphics_foundation);graphics_foundation.setup(self)
 	get_window().title="GameAssetFactory — Private Overworld Meadow / Sabre"
 	print("OVERWORLD_PLAYABLE_READY")
 
@@ -55,17 +58,21 @@ func _unhandled_input(event:InputEvent)->void:
 	if not error_text.is_empty():return
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_H:
 		set_hud_visible(not hud_visible);get_viewport().set_input_as_handled();return
+	if graphics_foundation!=null and graphics_foundation.input(event):get_viewport().set_input_as_handled();return
 	super._unhandled_input(event)
 
 func set_hud_visible(value:bool)->void:
 	hud_visible=value;get_node("OverworldControls").visible=value;sabre_mode.canvas.visible=value
 	if md2_lighting!=null:md2_lighting.ui.visible=value
+	if graphics_foundation!=null and graphics_foundation.available:
+		md2_lighting.ui.hide();graphics_foundation.ui.visible=value
 
 func _update_camera(delta:float=0.,render_position:Variant=null)->void:
 	var original_blocks:int=grass_field_blocks
 	if grass_overview:grass_field_blocks=32
 	super._update_camera(delta,render_position)
 	grass_field_blocks=original_blocks
+	if graphics_foundation!=null:graphics_foundation.apply_camera()
 
 func _build_meadow_ui()->void:
 	var layer:=CanvasLayer.new();layer.name="OverworldControls";add_child(layer)
