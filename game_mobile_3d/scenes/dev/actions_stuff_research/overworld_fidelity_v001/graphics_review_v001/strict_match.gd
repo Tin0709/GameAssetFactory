@@ -1,11 +1,11 @@
 extends Node
 ## One private static Day comparison. No source asset or calibration is embedded.
-const Effect=preload("strict_color_effect.gd")
 var controller_owner:Node
 var lab:Node3D
 var data:Dictionary={}
 var saved:Dictionary={}
-var effect:CompositorEffect
+var correction:ImageTexture3D
+var effect_error:=""
 var enabled:=true
 var available:=false
 var stage:=0
@@ -21,25 +21,26 @@ func setup(controller:Node)->void:
 	if not stage_arg.is_empty():stage=int(stage_arg)
 	controller_owner.seek_cycle(.15,true)
 	var env:Environment=lab.md2_lighting.environment
-	for key:String in ["tonemap_mode","tonemap_exposure","tonemap_white","adjustment_enabled","glow_enabled","fog_enabled"]:saved[key]=env.get(key)
+	for key:String in ["tonemap_mode","tonemap_exposure","tonemap_white","adjustment_enabled","glow_enabled","fog_enabled","adjustment_color_correction","adjustment_brightness","adjustment_contrast","adjustment_saturation"]:saved[key]=env.get(key)
 	saved.compositor=lab.camera.compositor;saved.aa=lab.get_viewport().screen_space_aa;saved.msaa=lab.get_viewport().msaa_3d
-	var lut_path:String=data.get("lut_path","")
-	if not lab.private_bundle.permitted(lut_path)or FileAccess.get_sha256(lut_path)!=data.get("lut_sha256",""):return
+	var lut_path:String=data.get("correction_path","")
+	if not lab.private_bundle.permitted(lut_path)or FileAccess.get_sha256(lut_path)!=data.get("correction_sha256",""):return
 	var bytes:=FileAccess.get_file_as_bytes(lut_path)
-	if bytes.size()!=32*32*32*16:return
+	var n:int=data.correction_size
+	if bytes.size()!=n*n*n*16:return
 	var slices:Array[Image]=[]
-	for z in 32:slices.append(Image.create_from_data(32,32,false,Image.FORMAT_RGBAF,bytes.slice(z*32*32*16,(z+1)*32*32*16)))
+	for z in n:slices.append(Image.create_from_data(n,n,false,Image.FORMAT_RGBAF,bytes.slice(z*n*n*16,(z+1)*n*n*16)))
 	var texture:=ImageTexture3D.new()
-	if texture.create(Image.FORMAT_RGBAF,32,32,32,false,slices)!=OK:return
-	effect=Effect.new();effect.lut=texture
-	effect.settings=PackedFloat32Array([0.,0.,data.exposure_adapter,0.,data.log_black,data.log_scale,data.log_bias,data.output_gain,data.vignette,0.,0.,0.])
+	if texture.create(Image.FORMAT_RGBAF,n,n,n,false,slices)!=OK:return
+	correction=texture
 	available=true;apply()
 func apply()->void:
 	if not available:return
 	var env:Environment=lab.md2_lighting.environment
 	if enabled and stage>=5:
-		env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=false;env.glow_enabled=false
-		var compositor:=Compositor.new();compositor.compositor_effects=[effect];lab.camera.compositor=compositor
+		env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=true;env.glow_enabled=false
+		env.adjustment_brightness=1.;env.adjustment_contrast=1.;env.adjustment_saturation=1.;env.adjustment_color_correction=correction
+		lab.camera.compositor=saved.compositor
 		lab.get_viewport().screen_space_aa=Viewport.SCREEN_SPACE_AA_FXAA;lab.get_viewport().msaa_3d=Viewport.MSAA_DISABLED
 	else:
 		for key:String in saved:
