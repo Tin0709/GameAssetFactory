@@ -6,6 +6,7 @@ var controller_owner:Node
 var lab:Node3D
 var data:Dictionary={}
 var saved:Dictionary={}
+var player_light:OmniLight3D
 var vignette_layer:CanvasLayer
 var noise_texture:ImageTexture
 var field_texture:ImageTexture
@@ -46,13 +47,15 @@ func setup(controller:Node)->void:
 	trees=Trees.new();trees.name="PrivateSourceTrees";lab.add_child(trees);trees.setup(lab,data.get("trees",[]),float(data.get("tree_hue_angle",0.)))
 	_build_field()
 	trees.set_field(field_texture)
+	player_light=OmniLight3D.new();player_light.name="NightPlayerLightPresetAdapter";player_light.omni_range=5.;player_light.light_color=Color.WHITE;player_light.shadow_enabled=false;lab.player.add_child(player_light);player_light.position=Vector3(0,1.5,0)
 	_build_vignette()
 	available=true;apply()
 func apply()->void:
 	if not available:return
 	var env:Environment=lab.md2_lighting.environment
 	if vignette_layer!=null:vignette_layer.visible=enabled and stage>=5
-	if trees!=null:trees.visible=enabled and stage>=6
+	if player_light!=null:player_light.visible=enabled and stage>=6
+	if trees!=null:trees.set_enabled(enabled and stage>=6)
 	for row:Dictionary in controller_owner.pairs:
 		row.candidate.set_shader_parameter("review_irradiance_scale",1.)
 		row.candidate.set_shader_parameter("gaf_indirect_field",field_texture if enabled and stage>=3 else controller_owner.field.texture)
@@ -129,6 +132,9 @@ func per_frame()->void:
 	if available and enabled and stage>=3:
 		lab.md2_lighting.sun.light_energy=float(controller_owner.resolved.get("review_sun_energy",data.sun_energy))
 		var scale:float=float(controller_owner.resolved.get("review_irradiance_scale",1.))
+		if player_light!=null:
+			var night:=clampf((1.-scale)/.7,0.,1.)
+			player_light.light_energy=float(data.sun_energy)*7./22.*night
 		for row:Dictionary in controller_owner.pairs:row.candidate.set_shader_parameter("review_irradiance_scale",scale)
 		if trees!=null:trees.set_phase_scale(scale);trees.set_sky_delta(controller_owner.resolved.sky_fill_linear-controller_owner.field_sky)
 func lock_camera()->void:
