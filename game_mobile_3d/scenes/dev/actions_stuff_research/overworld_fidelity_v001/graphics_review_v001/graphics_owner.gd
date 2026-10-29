@@ -89,11 +89,13 @@ func setup(scene:Node3D)->void:
 	strict_match=StrictMatch.new();add_child(strict_match);strict_match.setup(self)
 	if strict_match.available:
 		cycle_check.show();cycle_slider.show();ui.find_child("CyclePhaseButtons",true,false).show()
-		state_label.text="STRICT OVERWORLD DAY · LOCKED CAMERA"
+		state_label.text="MD2 SOURCE MEADOW · LOCKED CAMERA"
+		lab.get_window().title="GameAssetFactory — MD2 Source Meadow / Day & Night"
 func _process(_delta:float)->void:
 	if not available or released:return
 	if cycle_auto:
 		cycle_position=fposmod(cycle_position+_delta/cycle_seconds,1.)
+		_update_phase_caption()
 		target_state=Resolver.resolve(PhaseTrack.sample(profile,cycle_position),local_overrides)
 		_refresh_label()
 		if cycle_slider!=null:cycle_slider.set_value_no_signal(cycle_position)
@@ -136,11 +138,14 @@ func set_cycle_enabled(value:bool)->void:
 	cycle_auto=value
 	if cycle_check!=null:cycle_check.set_pressed_no_signal(value)
 func seek_cycle(position:float,snap:bool=false)->void:
-	cycle_position=fposmod(position,1.);set_cycle_enabled(false)
+	cycle_position=fposmod(position,1.);set_cycle_enabled(false);_update_phase_caption()
 	target_state=Resolver.resolve(PhaseTrack.sample(profile,cycle_position),local_overrides)
 	if snap:resolved=target_state.duplicate(true);state_velocity.clear()
 	if candidate:_apply_sun()
 	_refresh_label()
+func _update_phase_caption()->void:
+	for i in 4:
+		if cycle_position>=PhaseTrack.STARTS[i]:phase=PhaseTrack.NAMES[i]
 func set_phase(value:StringName)->bool:
 	if not available or released or (value!=&"day" and not profile.phases.has(value)):return false
 	set_cycle_enabled(false)

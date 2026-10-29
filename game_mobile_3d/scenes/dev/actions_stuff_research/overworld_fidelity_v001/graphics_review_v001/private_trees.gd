@@ -17,6 +17,9 @@ func setup(lab:Node,rows:Array,hue:float=0.)->void:
 	for row:Dictionary in rows:
 		var path:String=row.path
 		if not lab.private_bundle.permitted(path)or FileAccess.get_sha256(path)!=row.sha256:errors.append("Missing/changed tree "+path.get_file());continue
+		if row.has("texture_path"):
+			var atlas_path:String=row.texture_path
+			if not lab.private_bundle.permitted(atlas_path)or FileAccess.get_sha256(atlas_path)!=row.texture_sha256:errors.append("Missing/changed tree atlas");continue
 		if not cache.has(path):
 			var document:=GLTFDocument.new();var state:=GLTFState.new()
 			var status:=document.append_from_file(path,state)

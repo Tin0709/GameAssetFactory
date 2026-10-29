@@ -36,9 +36,10 @@ func setup(controller:Node)->void:
 	var n:int=data.correction_size
 	if bytes.size()!=n*n*n*16:return
 	var slices:Array[Image]=[]
-	for z in n:slices.append(Image.create_from_data(n,n,false,Image.FORMAT_RGBAF,bytes.slice(z*n*n*16,(z+1)*n*n*16)))
+	for z in n:
+		var image:=Image.create_from_data(n,n,false,Image.FORMAT_RGBAF,bytes.slice(z*n*n*16,(z+1)*n*n*16));image.convert(Image.FORMAT_RGBAH);slices.append(image)
 	var texture:=ImageTexture3D.new()
-	if texture.create(Image.FORMAT_RGBAF,n,n,n,false,slices)!=OK:return
+	if texture.create(Image.FORMAT_RGBAH,n,n,n,false,slices)!=OK:return
 	correction=texture
 	var noise_path:String=data.grass_noise_path
 	if not lab.private_bundle.permitted(noise_path)or FileAccess.get_sha256(noise_path)!=data.grass_noise_sha256:return
