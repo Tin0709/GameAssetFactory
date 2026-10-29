@@ -7,6 +7,8 @@ var shader:=RID()
 var pipeline:=RID()
 var sampler:=RID()
 var error:=""
+var working:=RID()
+var working_size:=Vector2i.ZERO
 const CODE:="""
 #version 450
 layout(local_size_x=8,local_size_y=8,local_size_z=1) in;
@@ -41,12 +43,22 @@ func _render_callback(kind:int,data:RenderData)->void:
 	if size.x==0 or size.y==0:return
 	var constants:=settings.duplicate();constants[0]=size.x;constants[1]=size.y
 	for view in buffers.get_view_count():
-		var image:=RDUniform.new();image.uniform_type=RenderingDevice.UNIFORM_TYPE_IMAGE;image.binding=0;image.add_id(buffers.get_color_layer(view))
+		var source_rid:=buffers.get_color_layer(view)
+		if working_size!=size:
+			if working.is_valid():rd.free_rid(working)
+			var format:=rd.texture_get_format(source_rid);format.usage_bits=RenderingDevice.TEXTURE_USAGE_STORAGE_BIT|RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT|RenderingDevice.TEXTURE_USAGE_CAN_COPY_TO_BIT
+			format.array_layers=1;format.texture_type=RenderingDevice.TEXTURE_TYPE_2D
+			print("STRICT_HDR_FORMAT ",format.format)
+			working=rd.texture_create(format,RDTextureView.new());working_size=size
+		rd.texture_copy(source_rid,working,Vector3i.ZERO,Vector3i.ZERO,Vector3i(size.x,size.y,1),0,0,view,0)
+		var image:=RDUniform.new();image.uniform_type=RenderingDevice.UNIFORM_TYPE_IMAGE;image.binding=0;image.add_id(working)
 		var lookup:=RDUniform.new();lookup.uniform_type=RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE;lookup.binding=1;lookup.add_id(sampler);lookup.add_id(RenderingServer.texture_get_rd_texture(lut.get_rid()))
 		var uniforms:=UniformSetCacheRD.get_cache(shader,0,[image,lookup])
 		var commands:=rd.compute_list_begin();rd.compute_list_bind_compute_pipeline(commands,pipeline);rd.compute_list_bind_uniform_set(commands,uniforms,0)
 		rd.compute_list_set_push_constant(commands,constants.to_byte_array(),48);rd.compute_list_dispatch(commands,ceili(size.x/8.),ceili(size.y/8.),1);rd.compute_list_end()
+		rd.texture_copy(working,source_rid,Vector3i.ZERO,Vector3i.ZERO,Vector3i(size.x,size.y,1),0,0,0,view)
 func _notification(what:int)->void:
 	if what==NOTIFICATION_PREDELETE and rd!=null:
+		if working.is_valid():rd.free_rid(working)
 		if shader.is_valid():rd.free_rid(shader)
 		if sampler.is_valid():rd.free_rid(sampler)
