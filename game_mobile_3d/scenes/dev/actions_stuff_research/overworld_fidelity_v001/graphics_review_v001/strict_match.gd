@@ -44,6 +44,10 @@ func apply()->void:
 	for row:Dictionary in controller_owner.pairs:
 		row.candidate.set_shader_parameter("gaf_indirect_field",field_texture if enabled and stage>=3 else controller_owner.field.texture)
 		row.candidate.set_shader_parameter("gaf_fill_up_ratio",1. if enabled and stage>=3 else .35)
+		if row.plant:
+			row.candidate.set_shader_parameter("review_grass_material",enabled and stage>=6 and row.original.get_meta("source_material","")=="MI_Grass_Plains")
+			row.candidate.set_shader_parameter("review_tip_height",float(data.get("grass_tip_height",.8)))
+			row.candidate.set_shader_parameter("review_tip_falloff",float(data.get("grass_tip_falloff",.52)))
 		if not row.plant:
 			row.candidate.set_shader_parameter("review_path",enabled and stage>=2 and row.original.get_meta("source_material","")=="MI_MasterTerrain_Opaque_Overworld")
 			var rects:Array[Vector4]=[]

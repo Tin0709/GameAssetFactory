@@ -8,6 +8,9 @@ uniform sampler2D ground_atlas : source_color, filter_nearest, repeat_disable;
 uniform vec4 ground_uv=vec4(0.0);
 uniform bool has_mre=false;
 uniform bool tinted_grass=false;
+uniform bool review_grass_material=false;
+uniform float review_tip_height=0.0;
+uniform float review_tip_falloff=1.0;
 uniform vec3 base_tint=vec3(0.0);
 uniform vec3 tip_tint=vec3(0.0);
 uniform float cutoff=0.3333;
@@ -68,7 +71,10 @@ void fragment(){
 		// Preserve the authored upward grass normals on both sides, as in the
 		// existing lab. Automatic backface flipping otherwise makes dark stripes.
 		NORMAL=normalize(mat3(VIEW_MATRIX)*wrapped_normal_world);
-		color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);
+		if(review_grass_material){
+		 float tip=1.-clamp(pow(max(UV.y+review_tip_height,0.),review_tip_falloff),0.,1.);
+		 color=mix(base_tint,tip_tint,tip)*texel.r;
+		}else{color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);}
 		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
 	}
 	ALBEDO=color;ALPHA=texel.a;ALPHA_SCISSOR_THRESHOLD=cutoff;
