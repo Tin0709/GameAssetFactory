@@ -1,5 +1,7 @@
 extends Node
 ## Single opt-in owner for the existing private meadow. Original code only.
+const StrictMatch=preload("strict_match.gd")
+var strict_match:Node
 const PhaseTrack=preload("phase_track.gd")
 const Profile=preload("profile.gd")
 const Resolver=preload("override_resolver.gd")
@@ -84,6 +86,10 @@ func setup(scene:Node3D)->void:
 	available=true
 	lab.md2_lighting.set_process(false);lab.md2_lighting.ui.hide()
 	_build_ui();set_candidate(true)
+	strict_match=StrictMatch.new();add_child(strict_match);strict_match.setup(self)
+	if strict_match.available:
+		cycle_check.hide();cycle_slider.hide()
+		state_label.text="STRICT OVERWORLD DAY · LOCKED CAMERA"
 func _process(_delta:float)->void:
 	if not available or released:return
 	if cycle_auto:
@@ -108,6 +114,7 @@ func set_candidate(value:bool)->void:
 	else:
 		sun.light_color=baseline.sun_color;sun.light_energy=baseline.sun_energy;sun.rotation=baseline.sun_rotation
 		_restore_atmosphere()
+	if strict_match!=null and strict_match.available:strict_match.enabled=candidate;strict_match.apply()
 	apply_camera();_refresh_label()
 func _apply_sun()->void:
 	var sun:DirectionalLight3D=lab.md2_lighting.sun
@@ -165,6 +172,7 @@ func apply_camera()->void:
 		c.look_at(lab.camera_anchor,Vector3.UP)
 	else:
 		c.projection=baseline.camera_projection;c.keep_aspect=baseline.camera_aspect;c.fov=baseline.camera_fov;c.near=baseline.camera_near
+	if strict_match!=null:strict_match.lock_camera()
 func material_identity()->Dictionary:
 	var result:={}
 	for row:Dictionary in surfaces:result[str(row.mesh.get_instance_id())+"/"+str(row.surface)]=row.mesh.surface_get_material(row.surface).get_instance_id()
@@ -202,6 +210,7 @@ func _refresh_label()->void:
 func release()->void:
 	if released:return
 	if available:
+		if strict_match!=null:strict_match.release()
 		set_candidate(false);comparison_camera=false;apply_camera()
 		lab.md2_lighting.set_process(baseline.process);lab.md2_lighting.ui.visible=baseline.ui_visible
 		if ui!=null:ui.hide()
