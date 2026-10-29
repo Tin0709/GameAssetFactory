@@ -88,7 +88,7 @@ func setup(scene:Node3D)->void:
 	_build_ui();set_candidate(true)
 	strict_match=StrictMatch.new();add_child(strict_match);strict_match.setup(self)
 	if strict_match.available:
-		cycle_check.hide();cycle_slider.hide();ui.find_child("CyclePhaseButtons",true,false).hide()
+		cycle_check.show();cycle_slider.show();ui.find_child("CyclePhaseButtons",true,false).show()
 		state_label.text="STRICT OVERWORLD DAY · LOCKED CAMERA"
 func _process(_delta:float)->void:
 	if not available or released:return
@@ -217,7 +217,7 @@ func _build_ui()->void:
 	var hint:=Label.new();hint.text="F9 A/B · F10 original · H hide controls";hint.add_theme_font_size_override("font_size",11);box.add_child(hint)
 func _refresh_label()->void:
 	if state_label!=null and strict_match!=null and strict_match.available and candidate:
-		state_label.text=("UPDATED MD2 DAY"if strict_match.stage>0 else"PREVIOUS GODOT M1")+" · locked camera\nF9 previous / updated · source LUT + calibrated fill"
+		state_label.text=("UPDATED MD2 · "+String(phase).to_upper()if strict_match.stage>0 else"PREVIOUS GODOT M1")+" · locked camera\nF9 previous / updated · source LUT + calibrated fill"
 		return
 	if state_label!=null:state_label.text=("FOUNDATION"if candidate else"BASELINE")+(" · perspective45°"if candidate or comparison_camera else" · original camera")+"\n100 × 100 m · cycle %.0f%% · Pending review"%[cycle_position*100.]
 func release()->void:

@@ -5,7 +5,7 @@ var materials:Array[ShaderMaterial]=[]
 var canopy_bounds:Array[AABB]=[]
 var loaded:=0
 var errors:Array[String]=[]
-func setup(lab:Node,rows:Array)->void:
+func setup(lab:Node,rows:Array,hue:float=0.)->void:
 	if not OS.has_feature("editor"):return
 	var cache:Dictionary={}
 	for row:Dictionary in rows:
@@ -28,7 +28,7 @@ func setup(lab:Node,rows:Array)->void:
 					if not lab.private_bundle.permitted(image_path)or FileAccess.get_sha256(image_path)!=row.texture_sha256:errors.append("Tree atlas changed");continue
 					atlas=ImageTexture.create_from_image(Image.load_from_file(image_path))
 				if atlas==null:errors.append("Missing tree atlas");continue
-				var material:=ShaderMaterial.new();material.shader=Solid;material.set_shader_parameter("atlas",atlas);material.set_shader_parameter("review_alpha_mask",true)
+				var material:=ShaderMaterial.new();material.shader=Solid;material.set_shader_parameter("atlas",atlas);material.set_shader_parameter("review_alpha_mask",true);material.set_shader_parameter("review_leaf_hue",hue)
 				material.set_shader_parameter("gaf_field_origin",Vector2(-52,-52));material.set_shader_parameter("gaf_field_extent",104.);material.set_shader_parameter("gaf_fill_up_ratio",1.)
 				instance.set_surface_override_material(surface,material);materials.append(material)
 		# Original lightweight trunk collision; source collision metadata not exported.
@@ -38,5 +38,7 @@ func setup(lab:Node,rows:Array)->void:
 	for source:Node in cache.values():source.free()
 func set_field(texture:Texture2D)->void:
 	for material:ShaderMaterial in materials:material.set_shader_parameter("gaf_indirect_field",texture)
+func set_phase_scale(scale:float)->void:
+	for material:ShaderMaterial in materials:material.set_shader_parameter("review_irradiance_scale",scale)
 func set_sky_delta(delta:Vector3)->void:
 	for material:ShaderMaterial in materials:material.set_shader_parameter("gaf_sky_delta",delta)

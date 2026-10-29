@@ -43,7 +43,7 @@ func setup(controller:Node)->void:
 	if not lab.private_bundle.permitted(noise_path)or FileAccess.get_sha256(noise_path)!=data.grass_noise_sha256:return
 	noise_texture=ImageTexture.create_from_image(Image.load_from_file(noise_path))
 	for key:String in ["directional_shadow_max_distance","shadow_bias","shadow_normal_bias","shadow_blur","directional_shadow_mode","directional_shadow_split_1"]:sun_saved[key]=lab.md2_lighting.sun.get(key)
-	trees=Trees.new();trees.name="PrivateSourceTrees";lab.add_child(trees);trees.setup(lab,data.get("trees",[]))
+	trees=Trees.new();trees.name="PrivateSourceTrees";lab.add_child(trees);trees.setup(lab,data.get("trees",[]),float(data.get("tree_hue_angle",0.)))
 	_build_field()
 	trees.set_field(field_texture)
 	_build_vignette()
@@ -54,6 +54,7 @@ func apply()->void:
 	if vignette_layer!=null:vignette_layer.visible=enabled and stage>=5
 	if trees!=null:trees.visible=enabled and stage>=6
 	for row:Dictionary in controller_owner.pairs:
+		row.candidate.set_shader_parameter("review_irradiance_scale",1.)
 		row.candidate.set_shader_parameter("gaf_indirect_field",field_texture if enabled and stage>=3 else controller_owner.field.texture)
 		row.candidate.set_shader_parameter("gaf_fill_up_ratio",1. if enabled and stage>=3 else .35)
 		if row.plant:
@@ -125,7 +126,11 @@ func _build_field()->void:
 			image.set_pixel(x,y,(occluded*shade_gain).lerp(open,visibility))
 	field_texture=ImageTexture.create_from_image(image)
 func per_frame()->void:
-	if available and enabled and stage>=3:lab.md2_lighting.sun.light_energy=data.sun_energy
+	if available and enabled and stage>=3:
+		lab.md2_lighting.sun.light_energy=float(controller_owner.resolved.get("review_sun_energy",data.sun_energy))
+		var scale:float=float(controller_owner.resolved.get("review_irradiance_scale",1.))
+		for row:Dictionary in controller_owner.pairs:row.candidate.set_shader_parameter("review_irradiance_scale",scale)
+		if trees!=null:trees.set_phase_scale(scale);trees.set_sky_delta(controller_owner.resolved.sky_fill_linear-controller_owner.field_sky)
 func lock_camera()->void:
 	if not available or (not enabled and not controller_owner.comparison_camera):return
 	var a:Array=data.camera_anchor;var anchor:=Vector3(a[0],a[1],a[2])
