@@ -50,6 +50,7 @@ func setup(scene:Node3D)->void:
 				mat.shader=Vegetation if plant else Solid
 				mat.set_shader_parameter("gaf_indirect_field",field.texture)
 				mat.set_shader_parameter("gaf_field_origin",Field.ORIGIN);mat.set_shader_parameter("gaf_field_extent",Field.EXTENT)
+				mat.set_shader_parameter("gaf_fill_up_ratio",float(resolved.get("fill_up_ratio",.35)))
 				var specular:=0.
 				var family:String=old.get_meta("source_material","")
 				if family=="MI_MasterTerrain_Opaque_Overworld":specular=.5
