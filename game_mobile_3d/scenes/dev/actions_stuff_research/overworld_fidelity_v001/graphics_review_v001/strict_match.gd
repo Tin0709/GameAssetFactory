@@ -4,6 +4,7 @@ var controller_owner:Node
 var lab:Node3D
 var data:Dictionary={}
 var saved:Dictionary={}
+var noise_texture:ImageTexture
 var field_texture:ImageTexture
 var sun_saved:Dictionary={}
 var correction:ImageTexture3D
@@ -35,6 +36,9 @@ func setup(controller:Node)->void:
 	var texture:=ImageTexture3D.new()
 	if texture.create(Image.FORMAT_RGBAF,n,n,n,false,slices)!=OK:return
 	correction=texture
+	var noise_path:String=data.grass_noise_path
+	if not lab.private_bundle.permitted(noise_path)or FileAccess.get_sha256(noise_path)!=data.grass_noise_sha256:return
+	noise_texture=ImageTexture.create_from_image(Image.load_from_file(noise_path))
 	for key:String in ["light_energy","directional_shadow_max_distance","shadow_bias","shadow_normal_bias","shadow_blur","directional_shadow_mode","directional_shadow_split_1"]:sun_saved[key]=lab.md2_lighting.sun.get(key)
 	_build_field()
 	available=true;apply()
@@ -46,6 +50,9 @@ func apply()->void:
 		row.candidate.set_shader_parameter("gaf_fill_up_ratio",1. if enabled and stage>=3 else .35)
 		if row.plant:
 			row.candidate.set_shader_parameter("review_grass_material",enabled and stage>=6 and row.original.get_meta("source_material","")=="MI_Grass_Plains")
+			row.candidate.set_shader_parameter("review_grass_noise",noise_texture)
+			var tint:Array=data.grass_world_color;row.candidate.set_shader_parameter("review_world_color",Vector3(tint[0],tint[1],tint[2]))
+			var origin:Array=data.grass_world_origin_cm;row.candidate.set_shader_parameter("review_world_origin_cm",Vector2(origin[0],origin[1]));row.candidate.set_shader_parameter("review_time",data.grass_captured_time)
 			row.candidate.set_shader_parameter("review_tip_height",float(data.get("grass_tip_height",.8)))
 			row.candidate.set_shader_parameter("review_tip_falloff",float(data.get("grass_tip_falloff",.52)))
 		if not row.plant:

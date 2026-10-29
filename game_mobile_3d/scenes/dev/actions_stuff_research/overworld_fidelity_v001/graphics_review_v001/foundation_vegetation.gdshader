@@ -11,6 +11,11 @@ uniform bool tinted_grass=false;
 uniform bool review_grass_material=false;
 uniform float review_tip_height=0.0;
 uniform float review_tip_falloff=1.0;
+uniform sampler2D review_grass_noise : filter_linear, repeat_enable;
+uniform vec3 review_world_color=vec3(0.0);
+uniform vec2 review_world_origin_cm=vec2(0.0);
+uniform float review_time=0.0;
+varying vec2 review_world_cm;
 uniform vec3 base_tint=vec3(0.0);
 uniform vec3 tip_tint=vec3(0.0);
 uniform float cutoff=0.3333;
@@ -37,6 +42,7 @@ varying float gaf_upward;
 
 void vertex(){
 	// Full float custom attribute: normalized height, blade height, phase, response.
+	review_world_cm=(MODEL_MATRIX*vec4(VERTEX,1.0)).xz*vec2(100.,-100.)+review_world_origin_cm;
 	float u=CUSTOM0.x;
 	float h=CUSTOM0.y;
 	height_fraction=u;
@@ -74,6 +80,12 @@ void fragment(){
 		if(review_grass_material){
 		 float tip=1.-clamp(pow(max(UV.y+review_tip_height,0.),review_tip_falloff),0.,1.);
 		 color=mix(base_tint,tip_tint,tip)*texel.r;
+		 vec2 coarse=review_world_cm*.00004+vec2(fract(review_time*.1),fract(-review_time*.1));
+		 vec2 fine=review_world_cm*.004+vec2(fract(-review_time*.2),fract(review_time*.1));
+		 float a=clamp((texture(review_grass_noise,fine).g-.1)/.9,0.,1.);
+		 float b=clamp((texture(review_grass_noise,coarse).r+.2+.2*a*a*(3.-2.*a))*0.7142857143,0.,1.);
+		 float coverage=.75*b*b*(3.-2.*b)*(1.-clamp(pow(max(UV.y+.2,0.),.6),0.,1.));
+		 color=mix(color,review_world_color,coverage);
 		}else{color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);}
 		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
 	}
