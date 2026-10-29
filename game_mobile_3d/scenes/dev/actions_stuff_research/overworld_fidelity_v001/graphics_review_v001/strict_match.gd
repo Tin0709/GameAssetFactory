@@ -24,7 +24,7 @@ func setup(controller:Node)->void:
 	if not stage_arg.is_empty():stage=int(stage_arg)
 	controller_owner.seek_cycle(.15,true)
 	var env:Environment=lab.md2_lighting.environment
-	for key:String in ["tonemap_mode","tonemap_exposure","tonemap_white","adjustment_enabled","glow_enabled","fog_enabled","adjustment_color_correction","adjustment_brightness","adjustment_contrast","adjustment_saturation"]:saved[key]=env.get(key)
+	for key:String in ["tonemap_mode","tonemap_exposure","tonemap_white","adjustment_enabled","glow_enabled","fog_enabled","adjustment_color_correction","adjustment_brightness","adjustment_contrast","adjustment_saturation","glow_intensity","glow_hdr_threshold","glow_bloom","glow_blend_mode","glow_strength"]:saved[key]=env.get(key)
 	saved.compositor=lab.camera.compositor;saved.aa=lab.get_viewport().screen_space_aa;saved.msaa=lab.get_viewport().msaa_3d
 	var lut_path:String=data.get("correction_path","")
 	if not lab.private_bundle.permitted(lut_path)or FileAccess.get_sha256(lut_path)!=data.get("correction_sha256",""):return
@@ -68,7 +68,8 @@ func apply()->void:
 		sun.directional_shadow_max_distance=data.shadow_distance_m;sun.shadow_bias=data.shadow_bias;sun.shadow_normal_bias=data.shadow_normal_bias;sun.shadow_blur=data.shadow_blur
 		sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS;sun.directional_shadow_split_1=.45
 	if enabled and stage>=5:
-		env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=true;env.glow_enabled=false
+		env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=true;env.glow_enabled=true
+		env.glow_intensity=float(data.glow_intensity);env.glow_hdr_threshold=float(data.glow_threshold);env.glow_bloom=0.;env.glow_blend_mode=Environment.GLOW_BLEND_MODE_ADDITIVE;env.glow_strength=1.
 		env.adjustment_brightness=1.;env.adjustment_contrast=1.;env.adjustment_saturation=1.;env.adjustment_color_correction=correction
 		lab.camera.compositor=saved.compositor
 		lab.get_viewport().screen_space_aa=Viewport.SCREEN_SPACE_AA_FXAA;lab.get_viewport().msaa_3d=Viewport.MSAA_DISABLED
