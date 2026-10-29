@@ -24,7 +24,7 @@ func setup(controller:Node)->void:
 	if not stage_arg.is_empty():stage=int(stage_arg)
 	controller_owner.seek_cycle(.15,true)
 	var env:Environment=lab.md2_lighting.environment
-	for key:String in ["tonemap_mode","tonemap_exposure","tonemap_white","adjustment_enabled","glow_enabled","fog_enabled","adjustment_color_correction","adjustment_brightness","adjustment_contrast","adjustment_saturation","glow_intensity","glow_hdr_threshold","glow_bloom","glow_blend_mode","glow_strength"]:saved[key]=env.get(key)
+	for key:String in ["tonemap_mode","tonemap_exposure","tonemap_white","adjustment_enabled","glow_enabled","fog_enabled","adjustment_color_correction","adjustment_brightness","adjustment_contrast","adjustment_saturation","glow_intensity","glow_hdr_threshold","glow_bloom","glow_blend_mode","glow_strength","fog_depth_begin","fog_depth_end","fog_height_density"]:saved[key]=env.get(key)
 	saved.compositor=lab.camera.compositor;saved.aa=lab.get_viewport().screen_space_aa;saved.msaa=lab.get_viewport().msaa_3d
 	var lut_path:String=data.get("correction_path","")
 	if not lab.private_bundle.permitted(lut_path)or FileAccess.get_sha256(lut_path)!=data.get("correction_sha256",""):return
@@ -62,8 +62,12 @@ func apply()->void:
 			row.candidate.set_shader_parameter("review_source_rects",rects)
 			var v:Array=data.path_target_rect;row.candidate.set_shader_parameter("review_target_rect",Vector4(v[0],v[1],v[2],v[3]))
 			row.candidate.set_shader_parameter("review_emissive_gain",30. if enabled and stage>=2 and row.original.get_meta("source_material","")=="MI_MasterTerrain_Opaque_Overworld"else 1.)
+	for key:String in saved:
+		if key not in ["compositor","aa","msaa"]:env.set(key,saved[key])
 	var sun:DirectionalLight3D=lab.md2_lighting.sun
 	for key:String in sun_saved:sun.set(key,sun_saved[key])
+	if enabled and stage>=3:
+		env.fog_depth_begin=40.;env.fog_depth_end=140.;env.fog_height_density=0.
 	if enabled and stage>=4:
 		sun.directional_shadow_max_distance=data.shadow_distance_m;sun.shadow_bias=data.shadow_bias;sun.shadow_normal_bias=data.shadow_normal_bias;sun.shadow_blur=data.shadow_blur
 		sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS;sun.directional_shadow_split_1=.45
@@ -74,8 +78,6 @@ func apply()->void:
 		lab.camera.compositor=saved.compositor
 		lab.get_viewport().screen_space_aa=Viewport.SCREEN_SPACE_AA_FXAA;lab.get_viewport().msaa_3d=Viewport.MSAA_DISABLED
 	else:
-		for key:String in saved:
-			if key not in ["compositor","aa","msaa"]:env.set(key,saved[key])
 		lab.camera.compositor=saved.compositor;lab.get_viewport().screen_space_aa=saved.aa;lab.get_viewport().msaa_3d=saved.msaa
 func _top_rect(asset:String)->Vector4:
 	var lo:=Vector2.ONE;var hi:=Vector2.ZERO
