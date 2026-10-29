@@ -4,6 +4,7 @@ var controller_owner:Node
 var lab:Node3D
 var data:Dictionary={}
 var saved:Dictionary={}
+var vignette_layer:CanvasLayer
 var noise_texture:ImageTexture
 var field_texture:ImageTexture
 var sun_saved:Dictionary={}
@@ -39,12 +40,14 @@ func setup(controller:Node)->void:
 	var noise_path:String=data.grass_noise_path
 	if not lab.private_bundle.permitted(noise_path)or FileAccess.get_sha256(noise_path)!=data.grass_noise_sha256:return
 	noise_texture=ImageTexture.create_from_image(Image.load_from_file(noise_path))
-	for key:String in ["light_energy","directional_shadow_max_distance","shadow_bias","shadow_normal_bias","shadow_blur","directional_shadow_mode","directional_shadow_split_1"]:sun_saved[key]=lab.md2_lighting.sun.get(key)
+	for key:String in ["directional_shadow_max_distance","shadow_bias","shadow_normal_bias","shadow_blur","directional_shadow_mode","directional_shadow_split_1"]:sun_saved[key]=lab.md2_lighting.sun.get(key)
 	_build_field()
+	_build_vignette()
 	available=true;apply()
 func apply()->void:
 	if not available:return
 	var env:Environment=lab.md2_lighting.environment
+	if vignette_layer!=null:vignette_layer.visible=enabled and stage>=5
 	for row:Dictionary in controller_owner.pairs:
 		row.candidate.set_shader_parameter("gaf_indirect_field",field_texture if enabled and stage>=3 else controller_owner.field.texture)
 		row.candidate.set_shader_parameter("gaf_fill_up_ratio",1. if enabled and stage>=3 else .35)
@@ -79,6 +82,11 @@ func apply()->void:
 		lab.get_viewport().screen_space_aa=Viewport.SCREEN_SPACE_AA_FXAA;lab.get_viewport().msaa_3d=Viewport.MSAA_DISABLED
 	else:
 		lab.camera.compositor=saved.compositor;lab.get_viewport().screen_space_aa=saved.aa;lab.get_viewport().msaa_3d=saved.msaa
+func _build_vignette()->void:
+	vignette_layer=CanvasLayer.new();vignette_layer.name="StrictDayPresentation";vignette_layer.layer=-5;add_child(vignette_layer)
+	var rectangle:=ColorRect.new();rectangle.mouse_filter=Control.MOUSE_FILTER_IGNORE;rectangle.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);vignette_layer.add_child(rectangle)
+	var shader:=Shader.new();shader.code="shader_type canvas_item;render_mode blend_mul;uniform float strength=0.;void fragment(){vec2 p=(UV*2.-1.)*strength;float v=1./pow(1.+dot(p,p),2.);COLOR=vec4(vec3(v),1.);}"
+	var material:=ShaderMaterial.new();material.shader=shader;material.set_shader_parameter("strength",float(data.vignette));rectangle.material=material
 func _top_rect(asset:String)->Vector4:
 	var lo:=Vector2.ONE;var hi:=Vector2.ZERO
 	for entry:Dictionary in lab.private_bundle.data.assets:
@@ -91,7 +99,8 @@ func _top_rect(asset:String)->Vector4:
 func _build_field()->void:
 	var image:=Image.create(196,196,false,Image.FORMAT_RGBAH)
 	var a:Array=data.incoming_open_linear;var b:Array=data.incoming_occluded_linear
-	var open:=Color(a[0],a[1],a[2]);var occluded:=Color(b[0],b[1],b[2])
+	var gain:Array=data.get("incoming_adapter_rgb",[1.,1.,1.])
+	var open:=Color(a[0]*gain[0],a[1]*gain[1],a[2]*gain[2]);var occluded:=Color(b[0]*gain[0],b[1]*gain[1],b[2]*gain[2])
 	var bounds:Array[AABB]=[]
 	for child:Node in lab.meadow.get_children():
 		if child is StaticBody3D:
