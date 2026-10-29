@@ -1,6 +1,6 @@
 extends RefCounted
 ## Independent masked appearance resolver, not a recovered native implementation.
-static func resolve(base:Dictionary,overrides:Array[Dictionary])->Dictionary:
+static func resolve(base:Dictionary,overrides:Array)->Dictionary:
 	var result:=base.duplicate(true)
 	var groups:Dictionary={}
 	for row:Dictionary in overrides:
