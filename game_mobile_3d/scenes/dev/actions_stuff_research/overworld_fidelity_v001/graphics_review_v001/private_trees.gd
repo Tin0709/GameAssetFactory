@@ -5,10 +5,14 @@ var materials:Array[ShaderMaterial]=[]
 var canopy_bounds:Array[AABB]=[]
 var loaded:=0
 var grass_roots:=0
+var patches_enabled:=true
+var patch_roots:Array[Vector2]=[]
+var meadow:Node3D
 var trunk_bodies:Array[StaticBody3D]=[]
 var errors:Array[String]=[]
 func setup(lab:Node,rows:Array,hue:float=0.)->void:
 	if not OS.has_feature("editor"):return
+	meadow=lab.meadow
 	var cache:Dictionary={}
 	for row:Dictionary in rows:
 		var path:String=row.path
@@ -48,6 +52,16 @@ func set_sky_delta(delta:Vector3)->void:
 
 func set_enabled(value:bool)->void:
 	visible=value
+	if patches_enabled!=value:
+		for point:Vector2 in patch_roots:
+			var cell:=Vector2i(floori(point.x),floori(point.y))
+			if value:
+				if not meadow._plant_cells.has(cell):meadow._plant_cells[cell]=[]
+				meadow._plant_cells[cell].append(point)
+			elif meadow._plant_cells.has(cell):
+				meadow._plant_cells[cell].erase(point)
+				if meadow._plant_cells[cell].is_empty():meadow._plant_cells.erase(cell)
+		patches_enabled=value
 	for body:StaticBody3D in trunk_bodies:body.collision_layer=1 if value else 0
 func _build_grass_patches(lab:Node,rows:Array)->void:
 	var rng:=RandomNumberGenerator.new();rng.seed=291026
@@ -65,7 +79,7 @@ func _build_grass_patches(lab:Node,rows:Array)->void:
 			batches[name].append(Transform3D(Basis(Vector3.UP,rng.randf()*TAU),point));grass_roots+=1
 			var cell:=Vector2i(floori(point.x),floori(point.z))
 			if not lab.meadow._plant_cells.has(cell):lab.meadow._plant_cells[cell]=[]
-			lab.meadow._plant_cells[cell].append(Vector2(point.x,point.z))
+			lab.meadow._plant_cells[cell].append(Vector2(point.x,point.z));patch_roots.append(Vector2(point.x,point.z))
 	for name:String in batches:
 		var transforms:Array=batches[name];var mm:=MultiMesh.new();mm.transform_format=MultiMesh.TRANSFORM_3D;mm.use_custom_data=true;mm.mesh=lab.private_bundle.meshes[name];mm.instance_count=transforms.size()
 		for i in transforms.size():mm.set_instance_transform(i,transforms[i]);mm.set_instance_custom_data(i,Color(rng.randf()*TAU,0,0,1))
