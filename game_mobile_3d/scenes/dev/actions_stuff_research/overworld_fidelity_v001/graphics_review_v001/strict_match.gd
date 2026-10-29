@@ -1,5 +1,7 @@
 extends Node
 ## One private static Day comparison. No source asset or calibration is embedded.
+const Trees=preload("private_trees.gd")
+var trees:Node3D
 var controller_owner:Node
 var lab:Node3D
 var data:Dictionary={}
@@ -41,13 +43,16 @@ func setup(controller:Node)->void:
 	if not lab.private_bundle.permitted(noise_path)or FileAccess.get_sha256(noise_path)!=data.grass_noise_sha256:return
 	noise_texture=ImageTexture.create_from_image(Image.load_from_file(noise_path))
 	for key:String in ["directional_shadow_max_distance","shadow_bias","shadow_normal_bias","shadow_blur","directional_shadow_mode","directional_shadow_split_1"]:sun_saved[key]=lab.md2_lighting.sun.get(key)
+	trees=Trees.new();trees.name="PrivateSourceTrees";lab.add_child(trees);trees.setup(lab,data.get("trees",[]))
 	_build_field()
+	trees.set_field(field_texture)
 	_build_vignette()
 	available=true;apply()
 func apply()->void:
 	if not available:return
 	var env:Environment=lab.md2_lighting.environment
 	if vignette_layer!=null:vignette_layer.visible=enabled and stage>=5
+	if trees!=null:trees.visible=enabled and stage>=6
 	for row:Dictionary in controller_owner.pairs:
 		row.candidate.set_shader_parameter("gaf_indirect_field",field_texture if enabled and stage>=3 else controller_owner.field.texture)
 		row.candidate.set_shader_parameter("gaf_fill_up_ratio",1. if enabled and stage>=3 else .35)
@@ -106,6 +111,7 @@ func _build_field()->void:
 		if child is StaticBody3D:
 			var mesh:Mesh=lab.private_bundle.meshes["MD2 | SM_SF_Boulder_01"]
 			bounds.append(child.transform*mesh.get_aabb())
+	if trees!=null:bounds.append_array(trees.canopy_bounds)
 	# Original bounded visibility approximation from existing static geometry.
 	for y in 196:
 		for x in 196:
