@@ -7,7 +7,8 @@ var wind_enabled:=true
 var interactions_enabled:=true
 var player:CharacterBody3D
 var bundle:RefCounted
-var interaction=Spring.new()
+const MAP_EXTENT:=100.
+var interaction=Spring.new(MAP_EXTENT+4.)
 var clock:=0.
 var instance_count:=0
 var batch_count:=0
@@ -35,7 +36,7 @@ func setup(actor:CharacterBody3D,reader:RefCounted)->void:
 		material.set_shader_parameter("interaction_field",interaction.texture);material.set_shader_parameter("interaction_previous",interaction.previous_texture)
 		material.set_shader_parameter("ground_atlas",reader.textures[ground.texture]);material.set_shader_parameter("ground_uv",top_uv)
 		material.set_shader_parameter("field_extent",interaction.extent)
-	_build_ground();_build_plants();_build_rocks();_flush()
+	_build_ground();_build_plants();_build_rocks();_extend_map();_flush()
 	print("OVERWORLD_FIELD_READY ",JSON.stringify(snapshot()))
 
 func _grass_top_uv()->Vector4:
@@ -62,23 +63,27 @@ func _place(asset:String,position:Vector3,yaw:float=0.,scale_factor:float=1.)->v
 		if not _plant_cells.has(plant_cell):_plant_cells[plant_cell]=[]
 		_plant_cells[plant_cell].append(Vector2(position.x,position.z))
 
-func _build_ground()->void:
-	for z in range(-16,16):
-		for x in range(-16,16):
+func _build_ground(outer:bool=false)->void:
+	var half:=50 if outer else 16
+	for z in range(-half,half):
+		for x in range(-half,half):
+			if outer and x>=-16 and x<16 and z>=-16 and z<16:continue
 			var pos:=Vector3(x+.5,0,z+.5)
 			var path:=is_path(pos)
 			var asset:="MD2 RECON | Dirt block "+str(_rng.randi_range(1,3)) if path else "MD2 RECON | Grass block "+str(1 if _rng.randf()<.82 else 2)
 			_place(asset,Vector3(x,-1,z))
 	# Source-textured stone/dirt perimeter reads as a small voxel terrain chunk.
-	for i in range(-16,16):
-		for side in [Vector3(i,-2,-16),Vector3(i,-2,15),Vector3(-16,-2,i),Vector3(15,-2,i)]:
+	for i in range(-half,half):
+		for side in [Vector3(i,-2,-half),Vector3(i,-2,half-1),Vector3(-half,-2,i),Vector3(half-1,-2,i)]:
 			_place("MD2 RECON | Stone block "+str(_rng.randi_range(1,3)),side)
 
-func _build_plants()->void:
+func _build_plants(outer:bool=false)->void:
+	var half:=50 if outer else 16
 	var short_names:=["SM_GrassShort_01","SM_GrassShort_02"]
 	var medium_names:=["SM_GrassMedium_01","SM_GrassMedium_02","SM_GrassMedium_03"]
-	for z in range(-16,16):
-		for x in range(-16,16):
+	for z in range(-half,half):
+		for x in range(-half,half):
+			if outer and x>=-16 and x<16 and z>=-16 and z<16:continue
 			for n in 3:
 				if n==2 and _rng.randf()>.3:continue
 				var p:=Vector3(x+_rng.randf(),0.,z+_rng.randf())
@@ -92,23 +97,24 @@ func _build_plants()->void:
 	# the tall library specimens are not a generic uniformly scaled flower population.
 	var color_names:={"pink":["SM_CA1_TulipPink","SM_CA1_TulipPink","SM_CA1_TulipPink","SM_CA1_TulipPink","SM_TulipPink_A"],"yellow":["SM_Dandelion_A","SM_Dandelion_A","SM_Dandelion_A","SM_Dandelion_B"],"white":["SM_Daisy_A","SM_AzureBluetFlower_A","SM_Daisy_A","SM_AzureBluetFlower_A","SM_OxeyeDaisy_A","SM_Dandelion_C"],"purple":["SM_TPT_Purpleflower_S","SM_TPT_Purpleflower_S","SM_TPT_Purpleflower_S","SM_TPT_Purpleflower_M","SM_TPT_Purpleflower_L","SM_CornflowerBlue_A"]}
 	var colors:Array=color_names.keys()
-	for cluster in 32:
-		var center:=Vector2(_rng.randf_range(-14.8,14.8),_rng.randf_range(-14.8,14.8))
+	for cluster in (288 if outer else 32):
+		var center:=Vector2(_rng.randf_range(-half+1.2,half-1.2),_rng.randf_range(-half+1.2,half-1.2))
 		if absf(center.x-path_center(center.y))<2.:center.x+=3.8 if center.x>=0 else -3.8
-		center=center.clamp(Vector2(-14,-14),Vector2(14,14))
+		center=center.clamp(Vector2(-half+2,-half+2),Vector2(half-2,half-2))
+		if outer and absf(center.x)<18. and absf(center.y)<18.:continue
 		var color:String=colors[cluster%4];var names:Array=color_names[color]
 		var radius:=_rng.randf_range(.65,1.65)
 		for n in _rng.randi_range(7,16):
 			var p2:=center+Vector2.from_angle(_rng.randf()*TAU)*sqrt(_rng.randf())*radius
 			var p:=Vector3(p2.x,0.,p2.y)
-			if foliage_density(p)<.7:continue
+			if foliage_density(p)<.7 or (outer and absf(p.x)<16. and absf(p.z)<16.):continue
 			if flowers.any(func(other:Vector2):return other.distance_squared_to(p2)<.14):continue
 			flowers.append(p2);flower_colors[color]=int(flower_colors.get(color,0))+1
 			_place("MD2 | "+String(names[n%names.size()]),p,_rng.randf()*TAU)
 	var tall_names:=["SM_GrassTall_01","SM_GrassTall_02"]
-	for i in 40:
-		var p:=Vector3(_rng.randf_range(-15,15),0,_rng.randf_range(-15,15))
-		if foliage_density(p)<.95 or absf(p.x)<8.:continue
+	for i in (360 if outer else 40):
+		var p:=Vector3(_rng.randf_range(-half+1,half-1),0,_rng.randf_range(-half+1,half-1))
+		if foliage_density(p)<.95 or absf(p.x)<8. or (outer and absf(p.x)<16. and absf(p.z)<16.):continue
 		_place("MD2 | "+String(tall_names[i%tall_names.size()]),p,_rng.randf()*TAU)
 
 func _build_rocks()->void:
@@ -121,6 +127,18 @@ func _build_rocks()->void:
 		var shape:=CollisionShape3D.new();shape.shape=bundle.meshes["MD2 | SM_SF_Boulder_01"].create_trimesh_shape();body.add_child(shape);body.position=point;body.rotation.y=yaw
 	# Large source rock remains beyond the playable boundary, without hiding player.
 	_place("MD2 | SM_PA1_Blocker_Boulder_A",Vector3(-14,-.15,-13),.7)
+
+func _extend_map()->void:
+	# Separate random stream preserves every original central placement.
+	_rng.seed=281126
+	_build_ground(true);_build_plants(true)
+	for i in 52:
+		var point:=Vector3(_rng.randf_range(-48,48),-.08,_rng.randf_range(-48,48))
+		if (absf(point.x)<18. and absf(point.z)<18.)or is_path(point):continue
+		var yaw:=_rng.randf()*TAU
+		_place("MD2 | SM_SF_Boulder_01",point,yaw)
+		var body:=StaticBody3D.new();body.name="OuterRockCollision";body.set_meta("overworld_surface","stone");add_child(body)
+		var shape:=CollisionShape3D.new();shape.shape=bundle.meshes["MD2 | SM_SF_Boulder_01"].create_trimesh_shape();body.add_child(shape);body.position=point;body.rotation.y=yaw
 
 func _flush()->void:
 	for key:String in _batches:
@@ -164,4 +182,4 @@ func surface_at(point:Vector3)->String:
 	if not hit.is_empty()and hit.collider.has_meta("overworld_surface"):return hit.collider.get_meta("overworld_surface")
 	return "dirt"if is_path(point)else"grass"
 func snapshot()->Dictionary:
-	return {"instances":instance_count,"batches":batch_count,"species":species_counts.size(),"flower_colors":flower_colors,"wind":wind_enabled,"interaction":interactions_enabled,"active_spring_cells":interaction.active.size(),"spring_update_us":interaction.update_usec}
+	return {"extent_m":MAP_EXTENT,"interaction_extent_m":interaction.extent,"instances":instance_count,"batches":batch_count,"species":species_counts.size(),"flower_colors":flower_colors,"wind":wind_enabled,"interaction":interactions_enabled,"active_spring_cells":interaction.active.size(),"spring_update_us":interaction.update_usec}

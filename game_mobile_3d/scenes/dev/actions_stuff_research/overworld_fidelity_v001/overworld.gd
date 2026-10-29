@@ -14,9 +14,9 @@ var _status_clock:=0.
 var hud_visible:=true
 
 func _build_environment()->void:
-	# Same inherited floor/contact solver, bounded to24m. Skip its old grass/grid.
+	# Same inherited floor/contact solver, bounded to100m. Skip its old grass/grid.
 	var original_blocks:int=grass_field_blocks;var original_enabled:bool=grass_field_enabled
-	grass_field_blocks=24;grass_field_enabled=true
+	grass_field_blocks=100;grass_field_enabled=true
 	super._build_environment()
 	# Preserve the floor solver while keeping fast jumps on boundary rocks inside.
 	for shape:CollisionShape3D in get_node("FieldBoundary").get_children():
@@ -69,7 +69,7 @@ func set_hud_visible(value:bool)->void:
 
 func _update_camera(delta:float=0.,render_position:Variant=null)->void:
 	var original_blocks:int=grass_field_blocks
-	if grass_overview:grass_field_blocks=32
+	if grass_overview:grass_field_blocks=100
 	super._update_camera(delta,render_position)
 	grass_field_blocks=original_blocks
 	if graphics_foundation!=null:graphics_foundation.apply_camera()

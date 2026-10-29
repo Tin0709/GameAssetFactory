@@ -1,9 +1,9 @@
 extends RefCounted
 ## Original bounded diffuse irradiance approximation for an instanced flat map.
 ## No shadow/AO stamps; no native GI operators, textures or LUTs are embedded.
-const SIZE:=64
-const EXTENT:=34.
-const ORIGIN:=Vector2(-17,-17)
+const SIZE:=196
+const EXTENT:=104.
+const ORIGIN:=Vector2(-52,-52)
 var image:Image
 var texture:ImageTexture
 func build(bundle:RefCounted,fields:Dictionary)->void:
