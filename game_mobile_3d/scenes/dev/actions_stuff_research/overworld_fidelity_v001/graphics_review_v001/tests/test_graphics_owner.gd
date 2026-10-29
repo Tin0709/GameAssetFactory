@@ -24,6 +24,17 @@ func run()->void:
 		if n is MultiMeshInstance3D:transforms[n.name]=n.multimesh.buffer.duplicate()
 	var baseline_sun:Vector3=lab.md2_lighting.sun.rotation_degrees
 	var shader_before:Dictionary=owner.material_identity()
+	check(owner.has_method("set_local_overrides")and owner.has_method("set_phase"),"Foundation exposes validated phase/local-light interfaces")
+	if owner.has_method("set_local_overrides"):
+		check(not owner.set_phase(&"unrecovered_night"),"No invented biome/phase calibration")
+		check(owner.set_phase(&"day"),"Known Day phase selectable")
+		var original_energy:float=owner.resolved.sun_energy
+		check(owner.set_local_overrides([{"priority":1,"weight":1.,"fields":{"sun_energy":original_energy+1.}}]),"Original local light override accepted")
+		check(owner.resolved.sun_energy==original_energy,"Override does not pop on assignment")
+		owner._process(.5)
+		check(owner.resolved.sun_energy>original_energy+.9 and owner.resolved.sun_energy<original_energy+1.,"Local light transition is bounded and smooth")
+		check(not owner.set_local_overrides([{"weight":1.,"fields":{"shadow_bias":9.}}]),"Deferred shadow override rejected")
+		owner.set_local_overrides([]);owner._process(4.)
 	owner.set_candidate(true);lab._update_camera()
 	check(lab.camera.projection==Camera3D.PROJECTION_PERSPECTIVE,"Candidate perspective")
 	check(lab.camera.keep_aspect==Camera3D.KEEP_WIDTH and is_equal_approx(lab.camera.fov,45.),"Horizontal45 degree FOV convention")
