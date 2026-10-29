@@ -1,5 +1,6 @@
 extends Node
 ## Single opt-in owner for the existing private meadow. Original code only.
+const PhaseTrack=preload("phase_track.gd")
 const Profile=preload("profile.gd")
 const Resolver=preload("override_resolver.gd")
 const Field=preload("indirect_field.gd")
@@ -24,6 +25,14 @@ var pairs:Array[Dictionary]=[]
 var baseline:Dictionary={}
 var ui:CanvasLayer
 var state_label:Label
+var cycle_auto:=true
+var cycle_position:=.15
+var cycle_seconds:=300.
+var cycle_slider:HSlider
+var cycle_check:CheckButton
+var field_sky:=Vector3.ZERO
+var environment_baseline:Dictionary={}
+var sky_baseline:Dictionary={}
 func setup(scene:Node3D)->void:
 	lab=scene;process_priority=100
 	if OS.get_environment("GAF_DAY_DISABLE")=="1":return
@@ -37,12 +46,22 @@ func setup(scene:Node3D)->void:
 	for key:String in profile.fields:
 		var value:Variant=profile.fields[key]
 		if value is Array and value.size()==3:profile.fields[key]=Vector3(value[0],value[1],value[2])
+	for name:String in data.get("phases",{}):
+		var values:Dictionary=data.phases[name].duplicate(true)
+		for key:String in values:
+			if values[key]is Array and values[key].size()==3:values[key]=Vector3(values[key][0],values[key][1],values[key][2])
+		profile.phases[StringName(name)]=values
+	cycle_seconds=maxf(30.,float(data.get("cycle",{}).get("preview_seconds",300.)))
 	if not profile.validate().is_empty():error="Invalid profile values";return
 	resolved=Resolver.resolve(profile.phase_fields(phase),local_overrides)
 	target_state=resolved.duplicate(true)
 	baseline={"sun_color":lab.md2_lighting.sun.light_color,"sun_energy":lab.md2_lighting.sun.light_energy,"sun_rotation":lab.md2_lighting.sun.rotation,
 		"process":lab.md2_lighting.is_processing(),"ui_visible":lab.md2_lighting.ui.visible,"camera_projection":lab.camera.projection,"camera_aspect":lab.camera.keep_aspect,
 		"camera_fov":lab.camera.fov,"camera_near":lab.camera.near,"azimuth":lab.azimuth,"elevation":lab.elevation,"camera_size":lab.camera_size}
+	var env:Environment=lab.md2_lighting.environment
+	for key:String in ["ambient_light_energy","ambient_light_color","fog_light_color"]:environment_baseline[key]=env.get(key)
+	for key:String in ["sky_top_color","sky_horizon_color","ground_bottom_color","ground_horizon_color"]:sky_baseline[key]=lab.md2_lighting.sky_material.get(key)
+	field_sky=resolved.sky_fill_linear
 	field.build(lab.private_bundle,resolved)
 	var made:Dictionary={}
 	for mesh:ArrayMesh in lab.private_bundle.meshes.values():
@@ -67,6 +86,11 @@ func setup(scene:Node3D)->void:
 	_build_ui();set_candidate(true)
 func _process(_delta:float)->void:
 	if not available or released:return
+	if cycle_auto:
+		cycle_position=fposmod(cycle_position+_delta/cycle_seconds,1.)
+		target_state=Resolver.resolve(PhaseTrack.sample(profile,cycle_position),local_overrides)
+		_refresh_label()
+		if cycle_slider!=null:cycle_slider.set_value_no_signal(cycle_position)
 	var next:Dictionary=Resolver.advance(resolved,target_state,state_velocity,_delta,.5)
 	resolved=next.state;state_velocity=next.velocity
 	if candidate:
@@ -83,13 +107,37 @@ func set_candidate(value:bool)->void:
 		_apply_sun()
 	else:
 		sun.light_color=baseline.sun_color;sun.light_energy=baseline.sun_energy;sun.rotation=baseline.sun_rotation
+		_restore_atmosphere()
 	apply_camera();_refresh_label()
 func _apply_sun()->void:
 	var sun:DirectionalLight3D=lab.md2_lighting.sun
 	var c:Vector3=resolved.sun_color_srgb;sun.light_color=Color(c.x,c.y,c.z);sun.light_energy=resolved.sun_energy
 	sun.rotation_degrees=Vector3(resolved.sun_pitch_deg,resolved.sun_yaw_deg,0.)
+	var sky_delta:Vector3=resolved.sky_fill_linear-field_sky
+	for row:Dictionary in pairs:row.candidate.set_shader_parameter("gaf_sky_delta",sky_delta)
+	var gain:float=resolved.get("environment_gain",1.)
+	for key:String in sky_baseline:
+		var c0:Color=sky_baseline[key];lab.md2_lighting.sky_material.set(key,(c0.srgb_to_linear()*gain).linear_to_srgb())
+	lab.md2_lighting.environment.ambient_light_energy=environment_baseline.ambient_light_energy*float(resolved.get("ambient_gain",1.))
+	var fog:Color=environment_baseline.fog_light_color
+	lab.md2_lighting.environment.fog_light_color=(fog.srgb_to_linear()*gain).linear_to_srgb()
+func _restore_atmosphere()->void:
+	for key:String in environment_baseline:lab.md2_lighting.environment.set(key,environment_baseline[key])
+	for key:String in sky_baseline:lab.md2_lighting.sky_material.set(key,sky_baseline[key])
+func set_cycle_enabled(value:bool)->void:
+	cycle_auto=value
+	if cycle_check!=null:cycle_check.set_pressed_no_signal(value)
+func seek_cycle(position:float,snap:bool=false)->void:
+	cycle_position=fposmod(position,1.);set_cycle_enabled(false)
+	target_state=Resolver.resolve(PhaseTrack.sample(profile,cycle_position),local_overrides)
+	if snap:resolved=target_state.duplicate(true);state_velocity.clear()
+	if candidate:_apply_sun()
+	_refresh_label()
 func set_phase(value:StringName)->bool:
 	if not available or released or (value!=&"day" and not profile.phases.has(value)):return false
+	set_cycle_enabled(false)
+	var phase_index:=PhaseTrack.NAMES.find(value)
+	if phase_index>=0:cycle_position=PhaseTrack.STARTS[phase_index]
 	phase=value;target_state=Resolver.resolve(profile.phase_fields(phase),local_overrides);_refresh_label();return true
 func set_local_overrides(entries:Array)->bool:
 	# M1 supports local key-light intent only; other visual systems are deferred.
@@ -123,7 +171,7 @@ func material_identity()->Dictionary:
 	return result
 func snapshot()->Dictionary:
 	return {"available":available,"candidate":candidate,"matched_camera":candidate or comparison_camera,"profile":profile.profile_id,"phase":phase,"local_overrides":local_overrides.size(),
-		"device_tiers":profile.device_tiers.keys(),"phone_benchmarked":false,"indirect_kind":"Original64x64 spatial diffuse-color gather; not native Lumen","surface_count":surfaces.size(),"error":error}
+		"device_tiers":profile.device_tiers.keys(),"phone_benchmarked":false,"indirect_kind":"Original196x196 spatial diffuse-color gather; not native Lumen","cycle_auto":cycle_auto,"cycle_position":cycle_position,"cycle_preview_seconds":cycle_seconds,"cycle_native_timing":false,"surface_count":surfaces.size(),"error":error}
 func input(event:InputEvent)->bool:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode==KEY_F9:set_comparison_camera(true);set_candidate(not candidate);return true
@@ -131,11 +179,17 @@ func input(event:InputEvent)->bool:
 	return false
 func _build_ui()->void:
 	ui=CanvasLayer.new();ui.name="DayFoundationReview";add_child(ui)
-	var panel:=PanelContainer.new();panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT);panel.position=Vector2(-360,-155);panel.custom_minimum_size=Vector2(345,140);ui.add_child(panel)
+	var panel:=PanelContainer.new();panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT);panel.position=Vector2(-380,-265);panel.custom_minimum_size=Vector2(365,250);ui.add_child(panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.045,.9);style.content_margin_left=12;style.content_margin_right=12;style.content_margin_top=10;style.content_margin_bottom=10;style.set_corner_radius_all(6);panel.add_theme_stylebox_override("panel",style)
 	var box:=VBoxContainer.new();panel.add_child(box)
 	var title:=Label.new();title.text="OVERWORLD DAY · FOUNDATION REVIEW";title.add_theme_font_size_override("font_size",13);box.add_child(title)
 	state_label=Label.new();state_label.add_theme_font_size_override("font_size",11);box.add_child(state_label)
+	var phase_row:=HBoxContainer.new();box.add_child(phase_row)
+	for name:StringName in PhaseTrack.NAMES:
+		var b:=Button.new();b.text=String(name).capitalize();b.focus_mode=Control.FOCUS_NONE;phase_row.add_child(b)
+		b.pressed.connect(func():set_phase(name))
+	cycle_check=CheckButton.new();cycle_check.text="Auto day/night · 5 min preview";cycle_check.button_pressed=cycle_auto;cycle_check.focus_mode=Control.FOCUS_NONE;cycle_check.toggled.connect(set_cycle_enabled);box.add_child(cycle_check)
+	cycle_slider=HSlider.new();cycle_slider.min_value=0.;cycle_slider.max_value=.99999;cycle_slider.step=.0001;cycle_slider.value=cycle_position;cycle_slider.value_changed.connect(func(v:float):seek_cycle(v));box.add_child(cycle_slider)
 	var row:=HBoxContainer.new();box.add_child(row)
 	for text:String in ["Day foundation","Baseline · same camera","Original"]:
 		var button:=Button.new();button.text=text;button.focus_mode=Control.FOCUS_NONE;button.add_theme_font_size_override("font_size",11);row.add_child(button)
@@ -144,7 +198,7 @@ func _build_ui()->void:
 		else:button.pressed.connect(func():set_comparison_camera(true);set_candidate(false))
 	var hint:=Label.new();hint.text="F9 A/B · F10 original · H hide controls";hint.add_theme_font_size_override("font_size",11);box.add_child(hint)
 func _refresh_label()->void:
-	if state_label!=null:state_label.text=("DAY FOUNDATION"if candidate else"BASELINE")+(" · perspective45°"if candidate or comparison_camera else" · original camera")+"\nMaterials + spatial fill · graphics candidate, pending review"
+	if state_label!=null:state_label.text=("FOUNDATION"if candidate else"BASELINE")+(" · perspective45°"if candidate or comparison_camera else" · original camera")+"\n100 × 100 m · cycle %.0f%% · Pending review"%[cycle_position*100.]
 func release()->void:
 	if released:return
 	if available:

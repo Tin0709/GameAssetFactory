@@ -16,6 +16,7 @@ func run()->void:
 	var owner:Node=lab.get("graphics_foundation")
 	check(owner!=null,"Existing Overworld needs reversible foundation owner")
 	if owner==null:lab.free();finish();return
+	owner.set_cycle_enabled(false);owner.seek_cycle(.15,true)
 	owner.set_candidate(false);owner.set_comparison_camera(false);lab._update_camera()
 	var env_before:=protected_environment(lab.md2_lighting.world.environment)
 	var before_count:int=lab.meadow.instance_count;var before_bone_count:int=lab.player.skeleton.get_bone_count()
