@@ -9,6 +9,7 @@ uniform vec4 ground_uv=vec4(0.0);
 uniform bool has_mre=false;
 uniform bool tinted_grass=false;
 uniform bool review_grass_material=false;
+uniform vec3 review_backlight_rgb=vec3(0.18);
 uniform float review_tip_height=0.0;
 uniform float review_tip_falloff=1.0;
 uniform sampler2D review_grass_noise : filter_linear, repeat_enable;
@@ -94,7 +95,7 @@ void fragment(){
 	ROUGHNESS=1.0;SPECULAR=0.0;
 	if(has_mre){vec3 packed=texture(mre_map,UV).rgb;METALLIC=packed.r;ROUGHNESS=packed.g;}
 	// Inferred wrapped backlighting; no claim of matching native two-sided shader.
-	BACKLIGHT=color*0.18;
+	BACKLIGHT=color*(review_grass_material ? review_backlight_rgb : vec3(0.18));
  SPECULAR=gaf_specular;
  EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
 }

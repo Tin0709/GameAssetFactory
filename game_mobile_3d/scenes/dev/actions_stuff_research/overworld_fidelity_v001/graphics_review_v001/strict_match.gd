@@ -45,7 +45,8 @@ func setup(controller:Node)->void:
 	if not lab.private_bundle.permitted(noise_path)or FileAccess.get_sha256(noise_path)!=data.grass_noise_sha256:return
 	noise_texture=ImageTexture.create_from_image(Image.load_from_file(noise_path))
 	for key:String in ["directional_shadow_max_distance","shadow_bias","shadow_normal_bias","shadow_blur","directional_shadow_mode","directional_shadow_split_1"]:sun_saved[key]=lab.md2_lighting.sun.get(key)
-	trees=Trees.new();trees.name="PrivateSourceTrees";lab.add_child(trees);trees.setup(lab,data.get("trees",[]),float(data.get("tree_hue_angle",0.)))
+	trees=Trees.new();trees.name="PrivateSourceTrees";lab.add_child(trees);var backlight:Array=data.tree_backlight_rgb
+	trees.setup(lab,data.get("trees",[]),float(data.get("tree_hue_angle",0.)),Vector3(backlight[0],backlight[1],backlight[2]))
 	_build_field()
 	trees.set_field(field_texture)
 	player_light=OmniLight3D.new();player_light.name="NightPlayerLightPresetAdapter";player_light.omni_range=5.;player_light.light_color=Color.WHITE;player_light.shadow_enabled=false;lab.player.add_child(player_light);player_light.position=Vector3(0,1.5,0)
@@ -63,6 +64,7 @@ func apply()->void:
 		row.candidate.set_shader_parameter("gaf_fill_up_ratio",1. if enabled and stage>=3 else .35)
 		if row.plant:
 			row.candidate.set_shader_parameter("review_grass_material",enabled and stage>=6 and row.original.get_meta("source_material","")=="MI_Grass_Plains")
+			var scattering:Array=data.grass_backlight_rgb;row.candidate.set_shader_parameter("review_backlight_rgb",Vector3(scattering[0],scattering[1],scattering[2]))
 			row.candidate.set_shader_parameter("review_grass_noise",noise_texture)
 			var tint:Array=data.grass_world_color;row.candidate.set_shader_parameter("review_world_color",Vector3(tint[0],tint[1],tint[2]))
 			var origin:Array=data.grass_world_origin_cm;row.candidate.set_shader_parameter("review_world_origin_cm",Vector2(origin[0],origin[1]));row.candidate.set_shader_parameter("review_time",data.grass_captured_time)
