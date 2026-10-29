@@ -88,7 +88,7 @@ func setup(scene:Node3D)->void:
 	_build_ui();set_candidate(true)
 	strict_match=StrictMatch.new();add_child(strict_match);strict_match.setup(self)
 	if strict_match.available:
-		cycle_check.hide();cycle_slider.hide()
+		cycle_check.hide();cycle_slider.hide();ui.find_child("CyclePhaseButtons",true,false).hide()
 		state_label.text="STRICT OVERWORLD DAY · LOCKED CAMERA"
 func _process(_delta:float)->void:
 	if not available or released:return
@@ -183,7 +183,11 @@ func snapshot()->Dictionary:
 		"device_tiers":profile.device_tiers.keys(),"phone_benchmarked":false,"indirect_kind":"Original196x196 spatial diffuse-color gather; not native Lumen","cycle_auto":cycle_auto,"cycle_position":cycle_position,"cycle_preview_seconds":cycle_seconds,"cycle_native_timing":false,"surface_count":surfaces.size(),"error":error}
 func input(event:InputEvent)->bool:
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.physical_keycode==KEY_F9:set_comparison_camera(true);set_candidate(not candidate);return true
+		if event.physical_keycode==KEY_F9:
+			if strict_match!=null and strict_match.available:
+				strict_match.stage=0 if strict_match.stage>0 else int(strict_match.data.stage);set_candidate(true)
+			else:set_comparison_camera(true);set_candidate(not candidate)
+			return true
 		if event.physical_keycode==KEY_F10:set_candidate(false);set_comparison_camera(false);lab._update_camera();return true
 	return false
 func _build_ui()->void:
@@ -193,7 +197,7 @@ func _build_ui()->void:
 	var box:=VBoxContainer.new();panel.add_child(box)
 	var title:=Label.new();title.text="OVERWORLD DAY · FOUNDATION REVIEW";title.add_theme_font_size_override("font_size",13);box.add_child(title)
 	state_label=Label.new();state_label.add_theme_font_size_override("font_size",11);box.add_child(state_label)
-	var phase_row:=HBoxContainer.new();box.add_child(phase_row)
+	var phase_row:=HBoxContainer.new();phase_row.name="CyclePhaseButtons";box.add_child(phase_row)
 	for name:StringName in PhaseTrack.NAMES:
 		var b:=Button.new();b.text=String(name).capitalize();b.focus_mode=Control.FOCUS_NONE;phase_row.add_child(b)
 		b.pressed.connect(func():set_phase(name))
@@ -202,11 +206,19 @@ func _build_ui()->void:
 	var row:=HBoxContainer.new();box.add_child(row)
 	for text:String in ["Day foundation","Baseline · same camera","Original"]:
 		var button:=Button.new();button.text=text;button.focus_mode=Control.FOCUS_NONE;button.add_theme_font_size_override("font_size",11);row.add_child(button)
-		if text=="Day foundation":button.pressed.connect(func():set_comparison_camera(true);set_candidate(true))
+		if text=="Day foundation":button.pressed.connect(func():
+			if strict_match!=null and strict_match.available:strict_match.stage=int(strict_match.data.stage)
+			set_comparison_camera(true);set_candidate(true))
 		elif text=="Original":button.pressed.connect(func():set_candidate(false);set_comparison_camera(false);lab._update_camera())
-		else:button.pressed.connect(func():set_comparison_camera(true);set_candidate(false))
+		else:button.pressed.connect(func():
+			set_comparison_camera(true)
+			if strict_match!=null and strict_match.available:strict_match.stage=0;set_candidate(true)
+			else:set_candidate(false))
 	var hint:=Label.new();hint.text="F9 A/B · F10 original · H hide controls";hint.add_theme_font_size_override("font_size",11);box.add_child(hint)
 func _refresh_label()->void:
+	if state_label!=null and strict_match!=null and strict_match.available and candidate:
+		state_label.text=("UPDATED MD2 DAY"if strict_match.stage>0 else"PREVIOUS GODOT M1")+" · locked camera\nF9 previous / updated · source LUT + calibrated fill"
+		return
 	if state_label!=null:state_label.text=("FOUNDATION"if candidate else"BASELINE")+(" · perspective45°"if candidate or comparison_camera else" · original camera")+"\n100 × 100 m · cycle %.0f%% · Pending review"%[cycle_position*100.]
 func release()->void:
 	if released:return
