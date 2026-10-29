@@ -24,6 +24,7 @@ var ui:CanvasLayer
 var state_label:Label
 func setup(scene:Node3D)->void:
 	lab=scene;process_priority=100
+	if OS.get_environment("GAF_DAY_DISABLE")=="1":return
 	var path:=OS.get_environment("MD2_DAY_PROFILE")
 	if path.is_empty():path=OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research/godot_lab/overworld_day_foundation_v001/day_profile.private.json")
 	# Private reference calibration never loads in an exported build.

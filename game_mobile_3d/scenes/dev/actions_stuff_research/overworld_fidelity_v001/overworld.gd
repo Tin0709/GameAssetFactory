@@ -41,7 +41,7 @@ func _ready()->void:
 		sabre_mode.release_inputs();get_tree().set_meta("md2_sabre_private_skin_selected",index==0);get_tree().change_scene_to_file(scene_file_path))
 	_build_meadow_ui()
 	graphics_foundation=DayFoundation.new();graphics_foundation.name="OverworldDayFoundation";add_child(graphics_foundation);graphics_foundation.setup(self)
-	get_window().title="GameAssetFactory — Private Overworld Meadow / Sabre"
+	get_window().title="GameAssetFactory — Overworld Day Foundation / Sabre"
 	print("OVERWORLD_PLAYABLE_READY")
 
 func _process(delta:float)->void:
