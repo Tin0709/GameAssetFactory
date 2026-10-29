@@ -23,6 +23,8 @@ func run()->void:
 	check(r.fill==Vector3.ONE,"Masked fields inherit lower priority")
 	overrides.reverse();check(Solver.resolve(p.fields,overrides)==r,"Override resolution order independent")
 	check(Solver.resolve(p.fields,[{"priority":9,"weight":0.,"fields":{"energy":99.}}]).energy==1.,"Zero override no-op")
+	var color_test:Dictionary=Solver.resolve({"sun_color_srgb":Vector3.ZERO},[{"weight":.5,"fields":{"sun_color_srgb":Vector3.ONE}}])
+	check(absf(color_test.sun_color_srgb.x-.73535698)<.00001,"sRGB display colors blend through linear light")
 	var reference:=0.
 	for hz in [30,60,120]:
 		var state:={"energy":0.};var velocity:={}
