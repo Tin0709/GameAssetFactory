@@ -10,6 +10,8 @@ var lab:Node3D
 var profile=Profile.new()
 var field=Field.new()
 var resolved:Dictionary={}
+var target_state:Dictionary={}
+var state_velocity:Dictionary={}
 var phase:StringName=&"day"
 var local_overrides:Array=[]
 var candidate:=false
@@ -37,6 +39,7 @@ func setup(scene:Node3D)->void:
 		if value is Array and value.size()==3:profile.fields[key]=Vector3(value[0],value[1],value[2])
 	if not profile.validate().is_empty():error="Invalid profile values";return
 	resolved=Resolver.resolve(profile.phase_fields(phase),local_overrides)
+	target_state=resolved.duplicate(true)
 	baseline={"sun_color":lab.md2_lighting.sun.light_color,"sun_energy":lab.md2_lighting.sun.light_energy,"sun_rotation":lab.md2_lighting.sun.rotation,
 		"process":lab.md2_lighting.is_processing(),"ui_visible":lab.md2_lighting.ui.visible,"camera_projection":lab.camera.projection,"camera_aspect":lab.camera.keep_aspect,
 		"camera_fov":lab.camera.fov,"camera_near":lab.camera.near,"azimuth":lab.azimuth,"elevation":lab.elevation,"camera_size":lab.camera_size}
@@ -64,7 +67,10 @@ func setup(scene:Node3D)->void:
 	_build_ui();set_candidate(true)
 func _process(_delta:float)->void:
 	if not available or released:return
+	var next:Dictionary=Resolver.advance(resolved,target_state,state_velocity,_delta,.5)
+	resolved=next.state;state_velocity=next.velocity
 	if candidate:
+		_apply_sun()
 		for row:Dictionary in pairs:
 			if row.plant:
 				for key:String in MOTION:row.candidate.set_shader_parameter(key,row.original.get_shader_parameter(key))
@@ -74,11 +80,29 @@ func set_candidate(value:bool)->void:
 	for row:Dictionary in surfaces:row.mesh.surface_set_material(row.surface,row.candidate if candidate else row.original)
 	var sun:DirectionalLight3D=lab.md2_lighting.sun
 	if candidate:
-		var c:Vector3=resolved.sun_color_srgb;sun.light_color=Color(c.x,c.y,c.z);sun.light_energy=resolved.sun_energy
-		sun.rotation_degrees=Vector3(resolved.sun_pitch_deg,resolved.sun_yaw_deg,0.)
+		_apply_sun()
 	else:
 		sun.light_color=baseline.sun_color;sun.light_energy=baseline.sun_energy;sun.rotation=baseline.sun_rotation
 	apply_camera();_refresh_label()
+func _apply_sun()->void:
+	var sun:DirectionalLight3D=lab.md2_lighting.sun
+	var c:Vector3=resolved.sun_color_srgb;sun.light_color=Color(c.x,c.y,c.z);sun.light_energy=resolved.sun_energy
+	sun.rotation_degrees=Vector3(resolved.sun_pitch_deg,resolved.sun_yaw_deg,0.)
+func set_phase(value:StringName)->bool:
+	if not available or released or (value!=&"day" and not profile.phases.has(value)):return false
+	phase=value;target_state=Resolver.resolve(profile.phase_fields(phase),local_overrides);_refresh_label();return true
+func set_local_overrides(entries:Array)->bool:
+	# M1 supports local key-light intent only; other visual systems are deferred.
+	for row:Variant in entries:
+		if not row is Dictionary or not row.get("fields",null)is Dictionary:return false
+		if not is_finite(float(row.get("weight",0.))):return false
+		for key:Variant in row.fields:
+			if key=="sun_energy":
+				if not (row.fields[key]is float or row.fields[key]is int)or not is_finite(float(row.fields[key]))or row.fields[key]<0.:return false
+			elif key=="sun_color_srgb":
+				if not row.fields[key]is Vector3 or not row.fields[key].is_finite():return false
+			else:return false
+	local_overrides=entries.duplicate(true);target_state=Resolver.resolve(profile.phase_fields(phase),local_overrides);return true
 func set_comparison_camera(value:bool)->void:
 	comparison_camera=value;apply_camera();_refresh_label()
 func apply_camera()->void:
