@@ -1,5 +1,9 @@
 // Independently authored field-consumer math. Z-up basis, meter lengths.
 // No spawning, particle lifetime, force history, or field generation is implied.
+// Include foliage_wind_math.gdshaderinc first. Encoded channels/threshold are
+// in [0,1], pin_width is positive, and all inputs must be finite.
+// Large-clock transcendental accuracy is backend-dependent; this helper is
+// deliberately not connected to the lab's differently encoded spring field.
 float foliage_saturated_ratio(float numerator, float denominator) {
  return denominator == 0.0 ? (numerator > 0.0 ? 1.0 : 0.0) : clamp(numerator / denominator, 0.0, 1.0);
 }
