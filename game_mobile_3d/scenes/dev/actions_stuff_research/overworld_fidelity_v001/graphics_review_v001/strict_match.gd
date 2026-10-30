@@ -2,6 +2,7 @@ extends Node
 ## One private static Day comparison. No source asset or calibration is embedded.
 const Trees=preload("private_trees.gd")
 const GradeDomain=preload("grade_domain.gd")
+const WindBounds=preload("wind_bounds.gd")
 var trees:Node3D
 var controller_owner:Node
 var lab:Node3D
@@ -17,6 +18,8 @@ var effect_error:=""
 var enabled:=true
 var available:=false
 var stage:=0
+var wind_bounds:Array[Dictionary]=[]
+var wind_bounds_active:=false
 func setup(controller:Node)->void:
 	controller_owner=controller;lab=controller_owner.lab
 	if OS.get_environment("GAF_STRICT_DAY_DISABLE")=="1"or not OS.has_feature("editor"):return
@@ -132,6 +135,7 @@ func apply()->void:
 			row.candidate.set_shader_parameter("review_source_rects",rects)
 			var v:Array=data.path_target_rect;row.candidate.set_shader_parameter("review_target_rect",Vector4(v[0],v[1],v[2],v[3]))
 			row.candidate.set_shader_parameter("review_emissive_gain",30. if enabled and stage>=2 and row.original.get_meta("source_material","")=="MI_MasterTerrain_Opaque_Overworld"else 1.)
+	_set_wind_bounds(enabled and stage>=6 and data.has("background_wind")and bool(data.background_wind.get("enabled",false)))
 	for key:String in saved:
 		if key not in ["compositor","aa","msaa","hdr_2d"]:env.set(key,saved[key])
 	var sun:DirectionalLight3D=lab.md2_lighting.sun
@@ -160,6 +164,20 @@ func _build_vignette()->void:
 	var rectangle:=ColorRect.new();rectangle.mouse_filter=Control.MOUSE_FILTER_IGNORE;rectangle.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);vignette_layer.add_child(rectangle)
 	var shader:=Shader.new();shader.code="shader_type canvas_item;render_mode blend_mul;uniform float strength=0.;void fragment(){vec2 p=(UV*2.-1.)*strength;float v=1./pow(1.+dot(p,p),2.);COLOR=vec4(vec3(v),1.);}"
 	var material:=ShaderMaterial.new();material.shader=shader;material.set_shader_parameter("strength",float(data.vignette));rectangle.material=material
+func _set_wind_bounds(active:bool)->void:
+	if active==wind_bounds_active:return
+	if active and wind_bounds.is_empty():
+		for child:Node in lab.find_children("*","MultiMeshInstance3D",true,false):
+			var node:MultiMeshInstance3D=child
+			if node.multimesh==null or node.multimesh.mesh==null:continue
+			var compatible:=false
+			for i in node.multimesh.mesh.get_surface_count():
+				var material:Material=node.multimesh.mesh.surface_get_material(i)
+				if material!=null and material.get_meta("source_material","")=="MI_Grass_Plains":compatible=true
+			if compatible:wind_bounds.append({"node":node,"before":node.extra_cull_margin,"extra":WindBounds.rotation_margin(node.multimesh,node.global_basis,float(data.background_wind.gain))})
+	for row:Dictionary in wind_bounds:
+		if is_instance_valid(row.node):row.node.extra_cull_margin=row.before+(row.extra if active else 0.)
+	wind_bounds_active=active
 func _top_rect(asset:String)->Vector4:
 	var lo:=Vector2.ONE;var hi:=Vector2.ZERO
 	for entry:Dictionary in lab.private_bundle.data.assets:
