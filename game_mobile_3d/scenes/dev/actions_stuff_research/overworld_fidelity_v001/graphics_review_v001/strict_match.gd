@@ -114,7 +114,7 @@ func apply()->void:
 	if enabled and stage>=5:
 		# Explicit private high-precision review only. The existing target stays
 		# the default; FP16 bandwidth needs real mobile-device validation.
-		lab.get_viewport().use_hdr_2d=bool(data.get("correction_hdr_2d",saved.hdr_2d))
+		lab.get_viewport().use_hdr_2d=bool(data.get("correction_hdr_2d",false))
 		env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=true;env.glow_enabled=true
 		env.glow_intensity=float(data.glow_intensity);env.glow_hdr_threshold=float(data.glow_threshold);env.glow_bloom=float(data.get("glow_bloom",0.));env.glow_blend_mode=Environment.GLOW_BLEND_MODE_ADDITIVE;env.glow_strength=1.
 		env.adjustment_brightness=GradeDomain.ui_brightness(float(data.get("correction_input_domain_linear",1.)))
