@@ -30,16 +30,19 @@ func setup(controller:Node)->void:
 	if not value is Dictionary or value.get("schema","")!="private_strict_day_v1":return
 	data=value;stage=int(data.stage)
 	if not GradeDomain.supported(float(data.get("correction_input_domain_linear",1.))):effect_error="Unsupported LUT input domain";return
+	if bool(data.get("correction_hdr_2d",false))!=bool(data.get("correction_output_linear",false)):
+		effect_error="LUT output encoding must match the HDR2D target";return
 	var stage_arg:=OS.get_environment("MD2_STRICT_STAGE")
 	if not stage_arg.is_empty():stage=int(stage_arg)
 	controller_owner.seek_cycle(.15,true)
 	var env:Environment=lab.md2_lighting.environment
 	for key:String in ["tonemap_mode","tonemap_exposure","tonemap_white","adjustment_enabled","glow_enabled","fog_enabled","adjustment_color_correction","adjustment_brightness","adjustment_contrast","adjustment_saturation","glow_intensity","glow_hdr_threshold","glow_bloom","glow_blend_mode","glow_strength","fog_depth_begin","fog_depth_end","fog_height_density"]:saved[key]=env.get(key)
-	saved.compositor=lab.camera.compositor;saved.aa=lab.get_viewport().screen_space_aa;saved.msaa=lab.get_viewport().msaa_3d
+	saved.compositor=lab.camera.compositor;saved.aa=lab.get_viewport().screen_space_aa;saved.msaa=lab.get_viewport().msaa_3d;saved.hdr_2d=lab.get_viewport().use_hdr_2d
 	var lut_path:String=data.get("correction_path","")
 	if not lab.private_bundle.permitted(lut_path)or FileAccess.get_sha256(lut_path)!=data.get("correction_sha256",""):return
 	var bytes:=FileAccess.get_file_as_bytes(lut_path)
 	var n:int=data.correction_size
+	if bool(data.get("correction_texel_centered",false)) and GradeDomain.sampling_contrast(n)<0.:effect_error="Invalid LUT lattice size";return
 	if bytes.size()!=n*n*n*16:return
 	var slices:Array[Image]=[]
 	for z in n:
@@ -100,7 +103,7 @@ func apply()->void:
 			var v:Array=data.path_target_rect;row.candidate.set_shader_parameter("review_target_rect",Vector4(v[0],v[1],v[2],v[3]))
 			row.candidate.set_shader_parameter("review_emissive_gain",30. if enabled and stage>=2 and row.original.get_meta("source_material","")=="MI_MasterTerrain_Opaque_Overworld"else 1.)
 	for key:String in saved:
-		if key not in ["compositor","aa","msaa"]:env.set(key,saved[key])
+		if key not in ["compositor","aa","msaa","hdr_2d"]:env.set(key,saved[key])
 	var sun:DirectionalLight3D=lab.md2_lighting.sun
 	for key:String in sun_saved:sun.set(key,sun_saved[key])
 	if enabled and stage>=3:
@@ -109,13 +112,18 @@ func apply()->void:
 		sun.directional_shadow_max_distance=data.shadow_distance_m;sun.shadow_bias=data.shadow_bias;sun.shadow_normal_bias=data.shadow_normal_bias;sun.shadow_blur=data.shadow_blur
 		sun.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS;sun.directional_shadow_split_1=.45
 	if enabled and stage>=5:
+		# Explicit private high-precision review only. The existing target stays
+		# the default; FP16 bandwidth needs real mobile-device validation.
+		lab.get_viewport().use_hdr_2d=bool(data.get("correction_hdr_2d",saved.hdr_2d))
 		env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=true;env.glow_enabled=true
 		env.glow_intensity=float(data.glow_intensity);env.glow_hdr_threshold=float(data.glow_threshold);env.glow_bloom=float(data.get("glow_bloom",0.));env.glow_blend_mode=Environment.GLOW_BLEND_MODE_ADDITIVE;env.glow_strength=1.
 		env.adjustment_brightness=GradeDomain.ui_brightness(float(data.get("correction_input_domain_linear",1.)))
-		env.adjustment_contrast=1.;env.adjustment_saturation=1.;env.adjustment_color_correction=correction
+		env.adjustment_contrast=GradeDomain.sampling_contrast(int(data.correction_size)) if bool(data.get("correction_texel_centered",false))else 1.
+		env.adjustment_saturation=1.;env.adjustment_color_correction=correction
 		lab.camera.compositor=saved.compositor
 		lab.get_viewport().screen_space_aa=Viewport.SCREEN_SPACE_AA_FXAA;lab.get_viewport().msaa_3d=Viewport.MSAA_DISABLED
 	else:
+		lab.get_viewport().use_hdr_2d=saved.hdr_2d
 		lab.camera.compositor=saved.compositor;lab.get_viewport().screen_space_aa=saved.aa;lab.get_viewport().msaa_3d=saved.msaa
 func _build_vignette()->void:
 	vignette_layer=CanvasLayer.new();vignette_layer.name="StrictDayPresentation";vignette_layer.layer=-5;add_child(vignette_layer)
