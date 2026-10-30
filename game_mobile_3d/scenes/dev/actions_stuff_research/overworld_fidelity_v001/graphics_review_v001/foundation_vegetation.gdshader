@@ -1,5 +1,6 @@
 shader_type spatial;
 render_mode cull_disabled, diffuse_burley, ambient_light_disabled;
+#include "vegetation_material_math.gdshaderinc"
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D mre_map : filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
@@ -12,7 +13,10 @@ uniform bool review_grass_material=false;
 uniform vec3 review_backlight_rgb=vec3(0.18);
 uniform float review_tip_height=0.0;
 uniform float review_tip_falloff=1.0;
-uniform sampler2D review_grass_noise : filter_linear, repeat_enable;
+uniform sampler2D review_grass_noise : filter_nearest, repeat_enable;
+uniform float review_gust_height=0.0;
+uniform float review_gust_falloff=1.0;
+uniform float review_scatter_strength=1.0;
 uniform vec3 review_world_color=vec3(0.0);
 uniform vec2 review_world_origin_cm=vec2(0.0);
 uniform float review_time=0.0;
@@ -75,19 +79,17 @@ void vertex(){
 void fragment(){
 	vec4 texel=texture(atlas,UV);
 	vec3 color=texel.rgb;
+	vec3 scatter_color=color;
 	if(tinted_grass){
 		// Preserve the authored upward grass normals on both sides, as in the
 		// existing lab. Automatic backface flipping otherwise makes dark stripes.
 		NORMAL=normalize(mat3(VIEW_MATRIX)*wrapped_normal_world);
 		if(review_grass_material){
-		 float tip=1.-clamp(pow(max(UV.y+review_tip_height,0.),review_tip_falloff),0.,1.);
-		 color=mix(base_tint,tip_tint,tip)*texel.r;
+		 vec3 blade=vegetation_blade_color(base_tint,tip_tint,UV.y,review_tip_height,review_tip_falloff,texel.r);
+		 scatter_color=vegetation_scattering(blade,review_scatter_strength);
 		 vec2 coarse=review_world_cm*.00004+vec2(fract(review_time*.1),fract(-review_time*.1));
 		 vec2 fine=review_world_cm*.004+vec2(fract(-review_time*.2),fract(review_time*.1));
-		 float a=clamp((texture(review_grass_noise,fine).g-.1)/.9,0.,1.);
-		 float b=clamp((texture(review_grass_noise,coarse).r+.2+.2*a*a*(3.-2.*a))*0.7142857143,0.,1.);
-		 float coverage=.75*b*b*(3.-2.*b)*(1.-clamp(pow(max(UV.y+.2,0.),.6),0.,1.));
-		 color=mix(color,review_world_color,coverage);
+		 color=vegetation_gust_color(blade,review_world_color,UV.y,review_gust_height,review_gust_falloff,texture(review_grass_noise,coarse).r,texture(review_grass_noise,fine).g);
 		}else{color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);}
 		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
 	}
@@ -95,7 +97,7 @@ void fragment(){
 	ROUGHNESS=1.0;SPECULAR=0.0;
 	if(has_mre){vec3 packed=texture(mre_map,UV).rgb;METALLIC=packed.r;ROUGHNESS=packed.g;}
 	// Inferred wrapped backlighting; no claim of matching native two-sided shader.
-	BACKLIGHT=color*(review_grass_material ? review_backlight_rgb : vec3(0.18));
+	BACKLIGHT=review_grass_material ? scatter_color*review_backlight_rgb : color*vec3(0.18);
  SPECULAR=gaf_specular;
  EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
 }

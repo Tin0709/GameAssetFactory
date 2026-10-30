@@ -64,7 +64,14 @@ func apply()->void:
 		row.candidate.set_shader_parameter("gaf_fill_up_ratio",1. if enabled and stage>=3 else .35)
 		if row.plant:
 			row.candidate.set_shader_parameter("review_grass_material",enabled and stage>=6 and row.original.get_meta("source_material","")=="MI_Grass_Plains")
-			var scattering:Array=data.grass_backlight_rgb;row.candidate.set_shader_parameter("review_backlight_rgb",Vector3(scattering[0],scattering[1],scattering[2]))
+			# Native material scattering is a pre-gust output. Keep its strength
+			# separate from the existing approximate Godot lighting-response gain.
+			var scatter_strength:float=float(data.get("grass_scatter_strength",1.))
+			var scattering:Array=data.grass_backlight_rgb
+			row.candidate.set_shader_parameter("review_backlight_rgb",Vector3(scattering[0],scattering[1],scattering[2])/maxf(scatter_strength,.000001))
+			row.candidate.set_shader_parameter("review_scatter_strength",scatter_strength)
+			row.candidate.set_shader_parameter("review_gust_height",float(data.get("grass_gust_height",0.)))
+			row.candidate.set_shader_parameter("review_gust_falloff",float(data.get("grass_gust_falloff",1.)))
 			row.candidate.set_shader_parameter("review_grass_noise",noise_texture)
 			var tint:Array=data.grass_world_color;row.candidate.set_shader_parameter("review_world_color",Vector3(tint[0],tint[1],tint[2]))
 			var origin:Array=data.grass_world_origin_cm;row.candidate.set_shader_parameter("review_world_origin_cm",Vector2(origin[0],origin[1]));row.candidate.set_shader_parameter("review_time",data.grass_captured_time)
