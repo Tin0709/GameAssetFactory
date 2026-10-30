@@ -226,5 +226,8 @@ func lock_camera()->void:
 	var a:Array=data.camera_anchor;var anchor:=Vector3(a[0],a[1],a[2])
 	lab.camera.projection=Camera3D.PROJECTION_PERSPECTIVE;lab.camera.keep_aspect=Camera3D.KEEP_WIDTH;lab.camera.fov=45.
 	lab.camera.global_position=anchor+Vector3(.5,sqrt(.5),.5)*float(data.camera_distance_m);lab.camera.look_at(anchor,Vector3.UP)
+func set_background_wind_enabled(value:bool)->void:
+	if not available or not data.has("background_wind"):return
+	data.background_wind.enabled=value;apply()
 func release()->void:
 	enabled=false;apply()

@@ -91,6 +91,11 @@ func setup(scene:Node3D)->void:
 		cycle_check.show();cycle_slider.show();ui.find_child("CyclePhaseButtons",true,false).show()
 		state_label.text="MD2 SOURCE MEADOW · LOCKED CAMERA"
 		lab.get_window().title="GameAssetFactory — MD2 Source Meadow / Day & Night"
+		if strict_match.data.has("background_wind"):
+			var toggle:=CheckButton.new();toggle.name="NativeBackgroundWindToggle";toggle.text="Recovered background wind · experimental";toggle.focus_mode=Control.FOCUS_NONE
+			toggle.tooltip_text="Captured background wind math; one shader-time unit per second in this preview. Existing contact bend is retained."
+			toggle.button_pressed=bool(strict_match.data.background_wind.get("enabled",false));toggle.toggled.connect(strict_match.set_background_wind_enabled)
+			var panel:PanelContainer=ui.get_child(0);var box:VBoxContainer=panel.get_child(0);box.add_child(toggle);panel.position.y-=35.
 func _process(_delta:float)->void:
 	if not available or released:return
 	if cycle_auto:
