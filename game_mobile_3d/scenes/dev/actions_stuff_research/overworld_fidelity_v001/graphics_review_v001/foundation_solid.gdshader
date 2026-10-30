@@ -1,5 +1,6 @@
 shader_type spatial;
 render_mode diffuse_burley, ambient_light_disabled;
+#include "height_fill.gdshaderinc"
 uniform bool review_alpha_mask=false;
 uniform float review_leaf_hue=0.0;
 uniform vec3 review_backlight_rgb=vec3(0.0);
@@ -19,12 +20,15 @@ uniform vec2 gaf_field_origin=vec2(-17.0);
 uniform float gaf_field_extent=34.0;
 uniform float gaf_specular=0.0;
 uniform float gaf_fill_up_ratio=0.35;
+uniform bool gaf_height_aware_fill=false;
+uniform vec3 gaf_open_fill=vec3(0.0);
+uniform float gaf_fill_height_fade=0.5;
 varying vec3 gaf_diffuse_fill;
 varying float gaf_upward;
 
 void vertex(){
  vec3 p=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
- gaf_diffuse_fill=textureLod(gaf_indirect_field,(p.xz-gaf_field_origin)/gaf_field_extent,0.0).rgb;
+ gaf_diffuse_fill=gaf_resolve_fill(textureLod(gaf_indirect_field,(p.xz-gaf_field_origin)/gaf_field_extent,0.0),p.y,gaf_open_fill,gaf_fill_height_fade,gaf_height_aware_fill);
  gaf_upward=clamp((MODEL_NORMAL_MATRIX*NORMAL).y,0.0,1.0);
 }
 void fragment(){

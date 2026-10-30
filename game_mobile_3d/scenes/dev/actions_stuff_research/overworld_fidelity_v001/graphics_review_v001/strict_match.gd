@@ -58,10 +58,19 @@ func apply()->void:
 	if vignette_layer!=null:vignette_layer.visible=enabled and stage>=5
 	if player_light!=null:player_light.visible=enabled and stage>=6
 	if trees!=null:trees.set_enabled(enabled and stage>=6)
+	# Opt-in original adapter: the previous ground-only field remains selectable.
+	var use_height:bool=enabled and stage>=3 and bool(data.get("height_aware_fill",false)) and OS.get_environment("GAF_HEIGHT_FILL_DISABLE")!="1"
+	var open_values:Array=data.incoming_open_linear;var gain_values:Array=data.get("incoming_adapter_rgb",[1.,1.,1.])
+	var open_fill:=Vector3(open_values[0]*gain_values[0],open_values[1]*gain_values[1],open_values[2]*gain_values[2])
+	var height_fade:float=float(data.get("fill_height_fade_m",.5))
+	if trees!=null:trees.set_height_fill(use_height,open_fill,height_fade)
 	for row:Dictionary in controller_owner.pairs:
 		row.candidate.set_shader_parameter("review_irradiance_scale",1.)
 		row.candidate.set_shader_parameter("gaf_indirect_field",field_texture if enabled and stage>=3 else controller_owner.field.texture)
 		row.candidate.set_shader_parameter("gaf_fill_up_ratio",1. if enabled and stage>=3 else .35)
+		row.candidate.set_shader_parameter("gaf_height_aware_fill",use_height)
+		row.candidate.set_shader_parameter("gaf_open_fill",open_fill)
+		row.candidate.set_shader_parameter("gaf_fill_height_fade",height_fade)
 		if row.plant:
 			row.candidate.set_shader_parameter("review_grass_material",enabled and stage>=6 and row.original.get_meta("source_material","")=="MI_Grass_Plains")
 			# Native material scattering is a pre-gust output. Keep its strength
@@ -129,14 +138,16 @@ func _build_field()->void:
 	# Original bounded visibility approximation from existing static geometry.
 	for y in 196:
 		for x in 196:
-			var point:=Vector2(x+.5,y+.5)*104./196.-Vector2(52,52);var visibility:=1.
+			var point:=Vector2(x+.5,y+.5)*104./196.-Vector2(52,52);var visibility:=1.;var roof:=-1.
 			for box:AABB in bounds:
 				var nearest:=point.clamp(Vector2(box.position.x,box.position.z),Vector2(box.end.x,box.end.z))
 				var distance:=point.distance_to(nearest)
 				if distance>1.4:continue
+				roof=maxf(roof,box.end.y)
 				visibility=minf(visibility,lerpf(.30,1.,smoothstep(0.,1.4,distance)))
 			var shade_gain:float=float(data.get("occlusion_exposure_ratio",1.))
-			image.set_pixel(x,y,(occluded*shade_gain).lerp(open,visibility))
+			var value:Color=(occluded*shade_gain).lerp(open,visibility);value.a=roof
+			image.set_pixel(x,y,value)
 	field_texture=ImageTexture.create_from_image(image)
 func per_frame()->void:
 	if available and enabled and stage>=3:

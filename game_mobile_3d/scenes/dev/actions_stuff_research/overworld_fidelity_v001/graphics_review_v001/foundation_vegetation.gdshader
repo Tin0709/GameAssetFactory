@@ -1,6 +1,7 @@
 shader_type spatial;
 render_mode cull_disabled, diffuse_burley, ambient_light_disabled;
 #include "vegetation_material_math.gdshaderinc"
+#include "height_fill.gdshaderinc"
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D mre_map : filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
@@ -43,6 +44,9 @@ uniform vec2 gaf_field_origin=vec2(-17.0);
 uniform float gaf_field_extent=34.0;
 uniform float gaf_specular=0.0;
 uniform float gaf_fill_up_ratio=0.35;
+uniform bool gaf_height_aware_fill=false;
+uniform vec3 gaf_open_fill=vec3(0.0);
+uniform float gaf_fill_height_fade=0.5;
 varying vec3 gaf_diffuse_fill;
 varying float gaf_upward;
 
@@ -73,7 +77,8 @@ void vertex(){
 	if(tinted_grass)NORMAL=normalize(NORMAL*0.35+vec3(0.0,0.65,0.0));
 	wrapped_normal_world=normalize(MODEL_NORMAL_MATRIX*NORMAL);
 	root_color=textureLod(ground_atlas,mix(ground_uv.xy,ground_uv.zw,fract(vec2(root.x,-root.z))),0.0).rgb;
- gaf_diffuse_fill=textureLod(gaf_indirect_field,(root.xz-gaf_field_origin)/gaf_field_extent,0.0).rgb;
+ float surface_height=(MODEL_MATRIX*vec4(VERTEX,1.0)).y;
+ gaf_diffuse_fill=gaf_resolve_fill(textureLod(gaf_indirect_field,(root.xz-gaf_field_origin)/gaf_field_extent,0.0),surface_height,gaf_open_fill,gaf_fill_height_fade,gaf_height_aware_fill);
  gaf_upward=clamp((MODEL_NORMAL_MATRIX*NORMAL).y,0.0,1.0);
 }
 void fragment(){

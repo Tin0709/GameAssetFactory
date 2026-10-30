@@ -48,6 +48,11 @@ func setup(lab:Node,rows:Array,hue:float=0.,backlight:Vector3=Vector3.ZERO)->voi
 	_build_grass_patches(lab,rows)
 func set_field(texture:Texture2D)->void:
 	for material:ShaderMaterial in materials:material.set_shader_parameter("gaf_indirect_field",texture)
+func set_height_fill(enabled:bool,open_fill:Vector3,fade_height:float)->void:
+	for material:ShaderMaterial in materials:
+		material.set_shader_parameter("gaf_height_aware_fill",enabled)
+		material.set_shader_parameter("gaf_open_fill",open_fill)
+		material.set_shader_parameter("gaf_fill_height_fade",fade_height)
 func set_phase_scale(scale:float)->void:
 	for material:ShaderMaterial in materials:material.set_shader_parameter("review_irradiance_scale",scale)
 func set_sky_delta(delta:Vector3)->void:
