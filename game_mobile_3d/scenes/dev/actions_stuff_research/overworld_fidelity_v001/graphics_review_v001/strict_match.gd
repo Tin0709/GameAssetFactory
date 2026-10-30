@@ -39,6 +39,15 @@ func setup(controller:Node)->void:
 		for channel:Variant in color:
 			if not (channel is float or channel is int)or not is_finite(float(channel))or float(channel)<0.:
 				effect_error="Invalid private grass color channel";return
+	if data.has("background_wind"):
+		var wind:Variant=data.background_wind
+		if not wind is Dictionary or not wind.get("axis",null)is Array or wind.axis.size()!=2:effect_error="Invalid private wind axis";return
+		for key:String in ["gain","pin_m","ramp_m","max_m","time_bias","speed","spatial"]:
+			if not wind.has(key)or not (wind[key]is float or wind[key]is int)or not is_finite(float(wind[key])):effect_error="Invalid private wind parameter";return
+		if float(wind.ramp_m)<=0. or float(wind.gain)<0. or float(wind.max_m)<0.:effect_error="Invalid private wind range";return
+		for channel:Variant in wind.axis:
+			if not (channel is float or channel is int)or not is_finite(float(channel)):effect_error="Invalid private wind axis channel";return
+		if Vector2(wind.axis[0]+.01,wind.axis[1]+.01).length_squared()<.00000001:effect_error="Degenerate private wind axis";return
 	var stage_arg:=OS.get_environment("MD2_STRICT_STAGE")
 	if not stage_arg.is_empty():stage=int(stage_arg)
 	controller_owner.seek_cycle(.15,true)
@@ -90,6 +99,12 @@ func apply()->void:
 		if row.plant:
 			var use_reference:bool=enabled and stage>=6 and row.original.get_meta("source_material","")=="MI_Grass_Plains"
 			row.candidate.set_shader_parameter("review_grass_material",use_reference)
+			var use_wind:bool=use_reference and data.has("background_wind")and bool(data.background_wind.get("enabled",false))
+			row.candidate.set_shader_parameter("review_source_wind",use_wind)
+			if use_wind:
+				var wind:Dictionary=data.background_wind;var axis:Array=wind.axis
+				row.candidate.set_shader_parameter("review_wind_axis",Vector2(axis[0],axis[1]))
+				for names:Array in [["gain","gain"],["pin_m","pin_m"],["ramp_m","ramp_m"],["max_m","max_m"],["time_bias","time_bias"],["speed","speed"],["spatial","spatial"]]:row.candidate.set_shader_parameter("review_wind_"+names[0],float(wind[names[1]]))
 			# Reference-frame appearance only; preserve the source mesh/material
 			# provenance and restore its palette outside this private review stage.
 			for names:Array in [["base_tint","grass_base_linear"],["tip_tint","grass_tip_linear"]]:
