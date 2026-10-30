@@ -60,15 +60,15 @@ func check()->void:
 	print("CONTACT_SYNTHETIC ",JSON.stringify({"cases":rows.size(),"max_error_m":worst,"errors":errors.size(),"native":rows[0]}));quit(0 if errors.is_empty()else 1)
 
 func make_cases()->Dictionary:
- var rows:Array=[]
- var seed_case:={"relative":[0.,0.,1.],"main":[0.,0.,0.],"encoded":[.5,0.],"time":0.,"frequency":1.,"threshold":1.,"strong_gain":1.,"angle_scale":.25,"pin":.1,"ramp":.01,"expected":[0.,0.,0.]}
- for threshold in [0.,.3,1.]:
-  for red in [0.,.5,1.]:
-   for clock in [0.,.125,3.7]:
-    var row:Dictionary=seed_case.duplicate(true);row.threshold=threshold;row.encoded=[red,0.];row.time=clock;row.label="zero-field/"+str(rows.size());rows.append(row)
- for height in [-.2,0.,.05,.1]:
-  var row:Dictionary=seed_case.duplicate(true);row.relative=[.2,.3,height];row.encoded=[.2,.8];row.time=.23;row.label="pin/"+str(height);rows.append(row)
- var axial:Dictionary=seed_case.duplicate(true);axial.threshold=0.;axial.encoded=[.5,1.];axial.expected=[0.,-1.,-1.];axial.label="unit-axis quarter turn";rows.append(axial)
- var diagonal:Dictionary=axial.duplicate(true);diagonal.encoded=[1.,1.];diagonal.strong_gain=1./sqrt(2.);diagonal.expected=[1.,-1.,-1.];diagonal.label="unnormalized-axis quarter turn";rows.append(diagonal)
- var endpoint:Dictionary=seed_case.duplicate(true);endpoint.encoded=[1.,1.];endpoint.time=0.;endpoint.label="zero over zero saturation boundary";rows.append(endpoint)
- return {"cases":rows}
+	var rows:Array=[]
+	var seed_case:={"relative":[0.,0.,1.],"main":[0.,0.,0.],"encoded":[.5,0.],"time":0.,"frequency":1.,"threshold":1.,"strong_gain":1.,"angle_scale":.25,"pin":.1,"ramp":.01,"expected":[0.,0.,0.]}
+	for threshold in [0.,.3,1.]:
+		for red in [0.,.5,1.]:
+			for clock in [0.,.125,3.7]:
+				var row:Dictionary=seed_case.duplicate(true);row.threshold=threshold;row.encoded=[red,0.];row.time=clock;row.label="zero-field/"+str(rows.size());rows.append(row)
+	for height in [-.2,0.,.05,.1]:
+		var row:Dictionary=seed_case.duplicate(true);row.relative=[.2,.3,height];row.encoded=[.2,.8];row.time=.23;row.label="pin/"+str(height);rows.append(row)
+	var axial:Dictionary=seed_case.duplicate(true);axial.threshold=0.;axial.encoded=[.5,1.];axial.expected=[0.,-1.,-1.];axial.label="unit-axis quarter turn";rows.append(axial)
+	var diagonal:Dictionary=axial.duplicate(true);diagonal.encoded=[1.,1.];diagonal.strong_gain=1./sqrt(2.);diagonal.expected=[1.,-1.,-1.];diagonal.label="unnormalized-axis quarter turn";rows.append(diagonal)
+	var endpoint:Dictionary=seed_case.duplicate(true);endpoint.encoded=[1.,1.];endpoint.time=0.;endpoint.label="zero over zero saturation boundary";rows.append(endpoint)
+	return {"cases":rows}
