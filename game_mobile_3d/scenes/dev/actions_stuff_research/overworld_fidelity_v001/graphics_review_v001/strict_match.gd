@@ -1,6 +1,7 @@
 extends Node
 ## One private static Day comparison. No source asset or calibration is embedded.
 const Trees=preload("private_trees.gd")
+const GradeDomain=preload("grade_domain.gd")
 var trees:Node3D
 var controller_owner:Node
 var lab:Node3D
@@ -20,10 +21,15 @@ func setup(controller:Node)->void:
 	controller_owner=controller;lab=controller_owner.lab
 	if OS.get_environment("GAF_STRICT_DAY_DISABLE")=="1"or not OS.has_feature("editor"):return
 	var path:=OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research/godot_lab/overworld_strict_day_v001/profile.private.json")
+	var profile_override:=OS.get_environment("MD2_STRICT_DAY_PROFILE")
+	if not profile_override.is_empty():
+		if not lab.private_bundle.permitted(profile_override):effect_error="Private profile must remain inside Research";return
+		path=profile_override
 	if not FileAccess.file_exists(path):return
 	var value:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not value is Dictionary or value.get("schema","")!="private_strict_day_v1":return
 	data=value;stage=int(data.stage)
+	if not GradeDomain.supported(float(data.get("correction_input_domain_linear",1.))):effect_error="Unsupported LUT input domain";return
 	var stage_arg:=OS.get_environment("MD2_STRICT_STAGE")
 	if not stage_arg.is_empty():stage=int(stage_arg)
 	controller_owner.seek_cycle(.15,true)
@@ -105,7 +111,8 @@ func apply()->void:
 	if enabled and stage>=5:
 		env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=true;env.glow_enabled=true
 		env.glow_intensity=float(data.glow_intensity);env.glow_hdr_threshold=float(data.glow_threshold);env.glow_bloom=float(data.get("glow_bloom",0.));env.glow_blend_mode=Environment.GLOW_BLEND_MODE_ADDITIVE;env.glow_strength=1.
-		env.adjustment_brightness=1.;env.adjustment_contrast=1.;env.adjustment_saturation=1.;env.adjustment_color_correction=correction
+		env.adjustment_brightness=GradeDomain.ui_brightness(float(data.get("correction_input_domain_linear",1.)))
+		env.adjustment_contrast=1.;env.adjustment_saturation=1.;env.adjustment_color_correction=correction
 		lab.camera.compositor=saved.compositor
 		lab.get_viewport().screen_space_aa=Viewport.SCREEN_SPACE_AA_FXAA;lab.get_viewport().msaa_3d=Viewport.MSAA_DISABLED
 	else:
