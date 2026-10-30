@@ -1,13 +1,11 @@
 extends SceneTree
 const HELPER="res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/foliage_contact_math.gdshaderinc"
-var base:String
 var fixture:Dictionary
 var viewport:SubViewport
 var frames:=0
 var label:="current"
 func vec(a:Array)->Vector3:return Vector3(a[0],a[1],a[2])
 func _initialize()->void:
-	base=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/native_field_consumer_v001/"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--label="):label=arg.trim_prefix("--label=")
 	call_deferred("begin")
@@ -55,9 +53,9 @@ func check()->void:
 		worst=maxf(worst,error)
 		if not is_finite(error)or error>.00002:errors.append({"case":i,"label":q.label,"error_m":error})
 		rows.append({"label":q.label,"actual":actual,"error_m":error})
-	var out:={"cases":rows.size(),"max_error_m":worst,"native_case":rows[0],"errors":errors,"rows":rows,"scope":"GPU contact helper + independent background model vs captured-DXIL CPU oracle; sampled inputs, no native nonzero-field trace","readback":"float32 bits packed through RGBA8 UNORM, blend disabled"}
+	var out:={"cases":rows.size(),"max_error_m":worst,"first_case":rows[0],"errors":errors,"rows":rows,"scope":"Original synthetic invariants; no private reference inputs","readback":"float32 bits packed through RGBA8 UNORM, blend disabled"}
 	
-	print("CONTACT_SYNTHETIC ",JSON.stringify({"cases":rows.size(),"max_error_m":worst,"errors":errors.size(),"native":rows[0]}));quit(0 if errors.is_empty()else 1)
+	print("CONTACT_SYNTHETIC ",JSON.stringify({"cases":rows.size(),"max_error_m":worst,"errors":errors.size(),"first":rows[0]}));quit(0 if errors.is_empty()else 1)
 
 func make_cases()->Dictionary:
 	var rows:Array=[]
