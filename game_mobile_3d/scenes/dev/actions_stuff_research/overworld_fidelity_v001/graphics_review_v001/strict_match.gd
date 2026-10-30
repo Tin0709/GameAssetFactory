@@ -32,6 +32,13 @@ func setup(controller:Node)->void:
 	if not GradeDomain.supported(float(data.get("correction_input_domain_linear",1.))):effect_error="Unsupported LUT input domain";return
 	if bool(data.get("correction_hdr_2d",false))!=bool(data.get("correction_output_linear",false)):
 		effect_error="LUT output encoding must match the HDR2D target";return
+	for key:String in ["grass_base_linear","grass_tip_linear"]:
+		if not data.has(key):continue
+		var color:Variant=data[key]
+		if not color is Array or color.size()!=3:effect_error="Invalid private grass color";return
+		for channel:Variant in color:
+			if not (channel is float or channel is int)or not is_finite(float(channel))or float(channel)<0.:
+				effect_error="Invalid private grass color channel";return
 	var stage_arg:=OS.get_environment("MD2_STRICT_STAGE")
 	if not stage_arg.is_empty():stage=int(stage_arg)
 	controller_owner.seek_cycle(.15,true)
@@ -81,7 +88,15 @@ func apply()->void:
 		row.candidate.set_shader_parameter("gaf_open_fill",open_fill)
 		row.candidate.set_shader_parameter("gaf_fill_height_fade",height_fade)
 		if row.plant:
-			row.candidate.set_shader_parameter("review_grass_material",enabled and stage>=6 and row.original.get_meta("source_material","")=="MI_Grass_Plains")
+			var use_reference:bool=enabled and stage>=6 and row.original.get_meta("source_material","")=="MI_Grass_Plains"
+			row.candidate.set_shader_parameter("review_grass_material",use_reference)
+			# Reference-frame appearance only; preserve the source mesh/material
+			# provenance and restore its palette outside this private review stage.
+			for names:Array in [["base_tint","grass_base_linear"],["tip_tint","grass_tip_linear"]]:
+				var tint:Variant=row.original.get_shader_parameter(names[0])
+				if use_reference and data.has(names[1]):
+					var rgb:Array=data[names[1]];tint=Vector3(rgb[0],rgb[1],rgb[2])
+				row.candidate.set_shader_parameter(names[0],tint)
 			# Native material scattering is a pre-gust output. Keep its strength
 			# separate from the existing approximate Godot lighting-response gain.
 			var scatter_strength:float=float(data.get("grass_scatter_strength",1.))
