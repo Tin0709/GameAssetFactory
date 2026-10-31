@@ -1,6 +1,7 @@
 extends Button
 ## Small, local-only bug-report helper. Explicit fields avoid exporting private paths.
 var context_provider:Callable
+var _reset:=Timer.new()
 
 func _init()->void:
 	name="CopyLabDiagnostics"
@@ -8,6 +9,8 @@ func _init()->void:
 	tooltip_text="Copy runtime and meadow settings for a bug report"
 	focus_mode=Control.FOCUS_NONE
 	pressed.connect(_copy_report)
+	_reset.one_shot=true;_reset.wait_time=2.;add_child(_reset)
+	_reset.timeout.connect(func():text="Copy lab info")
 
 func _copy_report()->void:
 	var state:Dictionary=context_provider.call() if context_provider.is_valid() else {}
@@ -26,4 +29,4 @@ func _copy_report()->void:
 		text="Clipboard unavailable";return
 	DisplayServer.clipboard_set("\n".join(lines))
 	text="Copied!"
-	get_tree().create_timer(2.).timeout.connect(func():text="Copy lab info")
+	_reset.start()
