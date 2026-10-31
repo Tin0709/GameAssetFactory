@@ -89,6 +89,9 @@ func _build_meadow_ui()->void:
 	_trim(box,"Footstep / rustle trim",func(db:float):environment_audio.effects_gain_db=db)
 	var controls:=Button.new();controls.text="Player / animation controls";controls.focus_mode=Control.FOCUS_NONE;box.add_child(controls)
 	controls.pressed.connect(func():sabre_mode.panel.visible=not sabre_mode.panel.visible;sabre_mode.panel.position=Vector2(18,290))
+	var diagnostics=load("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/copy_diagnostics.gd").new()
+	diagnostics.context_provider=func()->Dictionary:return {"Scene":scene_file_path,"Wind":meadow.wind_enabled,"Vegetation interaction":meadow.interactions_enabled,"Ambient audio":environment_audio.ambient_enabled,"Footsteps":environment_audio.footsteps_enabled,"Speed (m/s)":snappedf(player.current_speed,.01)}
+	box.add_child(diagnostics)
 	meadow_status=Label.new();meadow_status.add_theme_font_size_override("font_size",11);box.add_child(meadow_status)
 	var evidence:=Label.new();evidence.text="Original source assets/audio · recreated wind/mix";evidence.add_theme_font_size_override("font_size",10);evidence.modulate=Color(.72,.82,.71);box.add_child(evidence)
 
