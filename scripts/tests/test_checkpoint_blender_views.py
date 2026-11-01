@@ -33,7 +33,29 @@ class BlenderViewTests(unittest.TestCase):
             path = self.project / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b'fixture')
+        self.actions = self.root / 'ACT-Research'
+        for name in ['blender/Actions_Stuff_Animation_Library.blend', 'scripts/bootstrap.py']:
+            path = self.actions / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b'fixture')
         self.launcher = BlenderViewLauncher(self.root / 'state', self.research, self.blender, project_root=self.project)
+
+    def test_actions_stuff_opens_external_library_with_required_bootstrap(self):
+        blend = self.actions / 'blender/Actions_Stuff_Animation_Library.blend'
+        with patch('subprocess.Popen') as launch:
+            launch.return_value.pid = 9876
+            self.assertEqual(self.launcher.open('actions_stuff'), 9876)
+        self.assertEqual(launch.call_args.args[0], [str(self.blender), '--factory-startup', '--disable-autoexec',
+            str(blend), '--python', str(self.actions / 'scripts/bootstrap.py')])
+        self.assertEqual(self.launcher.blend_path('actions_stuff'), blend)
+        self.assertFalse(launch.call_args.kwargs.get('shell', False))
+
+    def test_missing_actions_stuff_bootstrap_does_not_launch(self):
+        (self.actions / 'scripts/bootstrap.py').unlink()
+        with patch('subprocess.Popen') as launch:
+            with self.assertRaises(FileNotFoundError):
+                self.launcher.open('actions_stuff')
+            launch.assert_not_called()
 
     def test_each_view_opens_its_existing_blend_with_matching_ui_script(self):
         expected = {
