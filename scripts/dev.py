@@ -23,6 +23,7 @@ VIEWERS = {
 }
 SCENES = {
     'combat': 'res://scenes/dev/ActionsStuffWalkRunTest.tscn',
+    'overworld': 'res://scenes/dev/MD2OverworldFidelityTest.tscn',
     'snappy': 'res://scenes/dev/SnappyLocomotionFastJumpTest.tscn',
     'expressive': 'res://scenes/dev/ExpressiveLocomotionTest.tscn',
     'grassland': 'res://scenes/Grassland.tscn',

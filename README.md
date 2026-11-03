@@ -21,10 +21,10 @@ Open `game_mobile_3d/project.godot` in Godot, then choose the scene for the test
 | Test | Scene to open before pressing F6 | Direct launcher |
 | --- | --- | --- |
 | Player locomotion and Sabre combat | [ActionsStuffWalkRunTest.tscn](game_mobile_3d/scenes/dev/ActionsStuffWalkRunTest.tscn) | Double-click `Open Sabre Prototype.cmd` in this repository; it selects Sabre mode. |
-| Private MD2 Overworld meadow | [MD2OverworldFidelityTest.tscn](game_mobile_3d/scenes/dev/MD2OverworldFidelityTest.tscn) | Use `Open Overworld Meadow.cmd` in the private Research folder below. |
+| Private MD2 Overworld meadow | [MD2OverworldFidelityTest.tscn](game_mobile_3d/scenes/dev/MD2OverworldFidelityTest.tscn) | Double-click `Open Overworld Meadow.cmd` in this repository. |
 
 **F6 runs the selected scene. F5 runs the project's main scene, `WorldMap.tscn`, rather than the selected lab.** Use `Open Sabre Editor.cmd` to open the combat scene in the editor.
 
-The Overworld launcher is stored separately at `%USERPROFILE%\Desktop\MD2 Research\godot_lab\overworld_fidelity_v001\Open Overworld Meadow.cmd`. Its reference bundle, models, textures and audio remain private and outside this repository. A Git clone alone does not restore them; keep the Research workspace separately and do not copy its proprietary files into `res://` or distributable builds.
+The Overworld launcher uses the private bundle at `%USERPROFILE%\Desktop\MD2 Research\godot_lab\overworld_fidelity_v001\bundle.private.json`. Set `MD2_OVERWORLD_BUNDLE` to use a different bundle location; an existing override is preserved. Models, textures and audio remain private and outside this repository. A Git clone alone does not restore them; keep the Research workspace separately and do not copy its proprietary files into `res://` or distributable builds.
 
-To check the selected scene and executable without starting Godot, run `py -3 scripts/dev.py godot --scene res://scenes/dev/MD2OverworldFidelityTest.tscn --dry-run` from this repository.
+Use `py -3 scripts/dev.py godot --scene overworld` to play, or add `--editor` to open the scene in Godot. To check the selected scene and executable without starting Godot, add `--dry-run`; the Windows launcher also accepts `--dry-run` and `--editor`.
