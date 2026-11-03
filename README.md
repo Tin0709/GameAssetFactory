@@ -28,3 +28,7 @@ Open `game_mobile_3d/project.godot` in Godot, then choose the scene for the test
 The Overworld launcher uses the private bundle at `%USERPROFILE%\Desktop\MD2 Research\godot_lab\overworld_fidelity_v001\bundle.private.json`. Set `MD2_OVERWORLD_BUNDLE` to use a different bundle location; an existing override is preserved. Models, textures and audio remain private and outside this repository. A Git clone alone does not restore them; keep the Research workspace separately and do not copy its proprietary files into `res://` or distributable builds.
 
 Use `py -3 scripts/dev.py godot --scene overworld` to play, or add `--editor` to open the scene in Godot. To check the selected scene and executable without starting Godot, add `--dry-run`; the Windows launcher also accepts `--dry-run` and `--editor`.
+
+Run `py -3 scripts/dev.py scenes` to list scene aliases and check that their scene files exist, even before installing Godot. This checks scene files only; it does not validate imported assets or private research bundles. Use `py -3 scripts/dev.py godot --help` for launch options.
+
+`py -3 scripts/dev.py doctor` also reports whether `project.godot` and the configured private Overworld bundle file exist. The bundle report preserves `MD2_OVERWORLD_BUNDLE` overrides and shows whether the path is absolute; it does not read asset contents or validate the bundle schema.

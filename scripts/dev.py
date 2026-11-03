@@ -221,8 +221,9 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='mode', required=True)
     sub.add_parser('doctor', help='Read-only tool and project discovery')
+    sub.add_parser('scenes', help='List scene aliases and scene-file availability; no Godot required')
     game = sub.add_parser('godot')
-    game.add_argument('--godot-bin'); game.add_argument('--scene', choices=None)
+    game.add_argument('--godot-bin'); game.add_argument('--scene', help='Scene alias (' + ', '.join(SCENES) + ') or a repository res:// path')
     game.add_argument('--editor', action='store_true'); game.add_argument('--headless', action='store_true')
     game.add_argument('--weapon',choices=['rifle','sword','sabre'],help='Start the existing combat lab with this weapon/prototype')
     game.add_argument('--driver',choices=['d3d12','vulkan','metal'],help='Process-only GPU override; project settings stay unchanged')
@@ -236,11 +237,29 @@ def main(argv=None) -> int:
         item.add_argument('--dry-run', action='store_true')
     args = parser.parse_args(argv)
     try:
+        if args.mode == 'scenes':
+            print(json.dumps({alias: {'scene': resource,
+                                     'scene_file_exists': (ROOT / 'game_mobile_3d' / resource[6:]).is_file()}
+                              for alias, resource in SCENES.items()}, indent=2))
+            return 0
         if args.mode == 'doctor':
             result = {'python': sys.version.split()[0], 'platform': platform.system(), 'root': str(ROOT)}
             for name in ['blender', 'godot']:
                 try: result[name] = str(find_tool(name))
                 except FileNotFoundError as error: result[name] = str(error)
+            project = ROOT / 'game_mobile_3d' / 'project.godot'
+            result['godot_project'] = {'path': str(project), 'file_exists': project.is_file()}
+            override = os.environ.get('MD2_OVERWORLD_BUNDLE')
+            profile = os.environ.get('USERPROFILE')
+            bundle = Path(override) if override else (
+                Path(profile) / 'Desktop/MD2 Research/godot_lab/overworld_fidelity_v001/bundle.private.json'
+                if profile else None)
+            result['overworld_bundle'] = {
+                'path': str(bundle) if bundle is not None else None,
+                'source': 'MD2_OVERWORLD_BUNDLE' if override else 'USERPROFILE' if profile else 'not_configured',
+                'absolute_path': bundle.is_absolute() if bundle is not None else False,
+                'file_exists': bundle.is_file() if bundle is not None else False,
+            }
             print(json.dumps(result, indent=2)); return 0
         if args.mode == 'godot':
             command = godot_command(find_tool('godot', args.godot_bin), args.scene, args.editor, args.headless,weapon=args.weapon,driver=args.driver)
