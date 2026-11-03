@@ -225,7 +225,9 @@ def launch_blender(command: list[str], viewer: str, *, bridge: bool) -> int:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='mode', required=True)
-    sub.add_parser('doctor', help='Read-only tool and project discovery')
+    doctor = sub.add_parser('doctor', help='Read-only tool and project discovery')
+    doctor.add_argument('--strict', action='store_true',
+                        help='Return 1 if Blender, Godot, or project.godot is missing; private references are optional')
     sub.add_parser('scenes', help='List scene aliases and scene-file availability; no Godot required')
     game = sub.add_parser('godot')
     game.add_argument('--godot-bin'); game.add_argument('--scene', help='Scene alias (' + ', '.join(SCENES) + ') or a repository res:// path')
@@ -249,9 +251,12 @@ def main(argv=None) -> int:
             return 0
         if args.mode == 'doctor':
             result = {'python': sys.version.split()[0], 'platform': platform.system(), 'root': str(ROOT)}
+            available = {}
             for name in ['blender', 'godot']:
-                try: result[name] = str(find_tool(name))
-                except FileNotFoundError as error: result[name] = str(error)
+                try:
+                    result[name] = str(find_tool(name)); available[name] = True
+                except FileNotFoundError as error:
+                    result[name] = str(error); available[name] = False
             project = ROOT / 'game_mobile_3d' / 'project.godot'
             result['godot_project'] = {'path': str(project), 'file_exists': project.is_file()}
             override = os.environ.get('MD2_OVERWORLD_BUNDLE')
@@ -265,7 +270,9 @@ def main(argv=None) -> int:
                 'absolute_path': bundle.is_absolute() if bundle is not None else False,
                 'file_exists': bundle.is_file() if bundle is not None else False,
             }
-            print(json.dumps(result, indent=2)); return 0
+            result['required_checks_passed'] = all(available.values()) and project.is_file()
+            print(json.dumps(result, indent=2))
+            return 1 if args.strict and not result['required_checks_passed'] else 0
         if args.mode == 'godot':
             command = godot_command(find_tool('godot', args.godot_bin), args.scene, args.editor, args.headless,weapon=args.weapon,driver=args.driver)
         else:

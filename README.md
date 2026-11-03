@@ -33,3 +33,5 @@ Use `py -3 scripts/dev.py godot --scene overworld` to play, or add `--editor` to
 Run `py -3 scripts/dev.py scenes` to list scene aliases and check that their scene files exist, even before installing Godot. This checks scene files only; it does not validate imported assets or private research bundles. Use `py -3 scripts/dev.py godot --help` for launch options.
 
 `py -3 scripts/dev.py doctor` also reports whether `project.godot` and the configured private Overworld bundle file exist. The bundle report preserves `MD2_OVERWORLD_BUNDLE` overrides and shows whether the path is absolute; it does not read asset contents or validate the bundle schema.
+
+Add `--strict` when automating setup checks: `py -3 scripts/dev.py doctor --strict` returns a nonzero exit code if Blender, Godot, or `project.godot` is missing. Private MD2 bundles are optional for this check. This verifies file discovery only, not tool versions, graphics-driver compatibility or gameplay.
