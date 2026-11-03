@@ -1,6 +1,12 @@
 @echo off
 setlocal
 if not defined MD2_OVERWORLD_BUNDLE set "MD2_OVERWORLD_BUNDLE=%USERPROFILE%\Desktop\MD2 Research\godot_lab\overworld_fidelity_v001\bundle.private.json"
+if exist "%MD2_OVERWORLD_BUNDLE%\" (
+  echo Private Overworld bundle must be a JSON file, not a folder:
+  echo "%MD2_OVERWORLD_BUNDLE%"
+  pause
+  exit /b 1
+)
 if not exist "%MD2_OVERWORLD_BUNDLE%" (
   echo Private Overworld bundle not found:
   echo "%MD2_OVERWORLD_BUNDLE%"

@@ -71,7 +71,11 @@ def godot_command(tool: Path, scene: str | None, editor: bool, headless: bool,
         raise ValueError('Unsupported GPU driver override.')
     if weapon is not None and scene is None:
         scene='combat'
-    command = [str(tool), '--path', str(ROOT / 'game_mobile_3d'), '--rendering-method', 'mobile']
+    project = ROOT / 'game_mobile_3d'
+    if not (project / 'project.godot').is_file():
+        raise FileNotFoundError(f'Godot project file not found: {project / "project.godot"}. '
+                                'Restore the existing project before launching.')
+    command = [str(tool), '--path', str(project), '--rendering-method', 'mobile']
     selected_driver=driver or ('d3d12' if platform.system() == 'Windows' else None)
     if selected_driver and not headless:
         command += ['--rendering-driver', selected_driver]
@@ -79,10 +83,11 @@ def godot_command(tool: Path, scene: str | None, editor: bool, headless: bool,
         command.append('--headless')
     if editor:
         command.append('--editor')
-    if scene:
+    if scene is not None:
         resource = SCENES.get(scene, scene)
         if not resource.startswith('res://') or '..' in Path(resource[6:]).parts or '\\' in resource:
-            raise ValueError('Scene must be a known alias or repository res:// path.')
+            raise ValueError('Scene must be a known alias or repository res:// path. '
+                             'Run scripts/dev.py scenes to list available aliases.')
         if not (ROOT / 'game_mobile_3d' / resource[6:]).is_file():
             raise FileNotFoundError(resource)
         if weapon is not None and resource != SCENES['combat']:

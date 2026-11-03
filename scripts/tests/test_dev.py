@@ -1,5 +1,6 @@
 """Portable launcher contracts; run with standard-library unittest."""
 import importlib.util
+import io
 from pathlib import Path
 import tempfile
 import socket
@@ -13,6 +14,26 @@ spec.loader.exec_module(dev)
 
 
 class PortableLauncherTests(unittest.TestCase):
+    def test_missing_project_does_not_launch_or_create_another_project(self):
+        with tempfile.TemporaryDirectory() as temp, \
+                patch.object(dev, 'ROOT', Path(temp)), \
+                patch.object(dev, 'find_tool', return_value=Path('/bin/godot')), \
+                patch.object(dev.subprocess, 'call', return_value=0) as launch, \
+                patch.object(dev.sys, 'stderr', io.StringIO()), \
+                self.assertRaises(SystemExit) as error:
+            dev.main(['godot'])
+        self.assertEqual(error.exception.code, 2)
+        launch.assert_not_called()
+
+    def test_blank_explicit_scene_does_not_launch_the_main_map(self):
+        with patch.object(dev, 'find_tool', return_value=Path('/bin/godot')), \
+                patch.object(dev.subprocess, 'call', return_value=0) as launch, \
+                patch.object(dev.sys, 'stderr', io.StringIO()), \
+                self.assertRaises(SystemExit) as error:
+            dev.main(['godot', '--scene', ''])
+        self.assertEqual(error.exception.code, 2)
+        launch.assert_not_called()
+
     def test_explicit_executable_with_spaces_is_one_argument(self):
         with tempfile.TemporaryDirectory(prefix='GAF tool space ') as temp:
             tool = Path(temp) / 'Godot binary'; tool.touch()

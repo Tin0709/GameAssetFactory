@@ -1,5 +1,10 @@
 # Tiếp tục GameAssetFactory trên Windows — 25/10/2026
 
+> **Bản lưu lịch sử ngày 25/10.** Quy trình hiện tại dùng Desktop\Dev và nhánh
+> `main` theo chỉ dẫn ngày 01/11 trong `AGENTS.md`. Xem [hướng dẫn Desktop hiện tại](DESKTOP_DEV.md)
+> và [README](../../README.md) trước khi mở lab hoặc chuyển máy. Các lệnh nhánh
+> và đường dẫn C:\Dev bên dưới được giữ làm tài liệu lịch sử.
+
 Trạng thái hiện tại: nhánh **`codex/sword-combat-v001`**, remote `git@github.com:Tin0709/GameAssetFactory.git`. Lab đang dùng Sword/Rifle, SOLDIER, Fiery private reference, map100×100 và cỏ. F5/WorldMap và các asset đã duyệt được giữ nguyên. Đây là hướng dẫn chuyển máy, không phải thay đổi approval hay cấp phép phát hành research.
 
 ## 1. Trên Mac: kiểm tra rồi push nhánh hiện tại

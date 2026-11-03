@@ -2,6 +2,7 @@
 
 Blender sources, original game assets, animation research and the Godot mobile project.
 
+- [Current Windows Desktop workspace](docs/setup/DESKTOP_DEV.md)
 - [Windows handoff — Sword/Rifle lab snapshot, 25/10/2026](docs/setup/WINDOWS_HANDOFF_2026_10_25.md)
 - [MacBook / Windows setup](docs/setup/MACBOOK_SETUP.md)
 - [Cleanup results and validation](docs/setup/CLEANUP_RESULT_2026_10_14.md)
