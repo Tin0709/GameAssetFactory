@@ -1,6 +1,6 @@
 extends Node
 ## Original, reversible integration in the existing lab. Reference data external.
-const Effect=preload("../bloom_v001/bloom_exposure_effect.gd")
+const Effect=preload("../presentation_v001/presentation_effect.gd")
 const Directional=preload("../directional_fill_v001/controller.gd")
 const Leaf=preload("../leaf_material_v001/controller.gd")
 const GrassNormal=preload("../grass_normal_v001/controller.gd")
@@ -36,6 +36,10 @@ var _directional_toggle:CheckBox
 var _want_directional:=false
 var _bloom_toggle:CheckBox
 var _want_bloom:=false
+var _want_presentation:=false
+var _presentation_environment:Dictionary={}
+var _presentation_vignette:=false
+var _presentation_toggle:CheckBox
 var _status:Label
 var _quality:OptionButton
 var _buttons:Array[Button]=[]
@@ -99,7 +103,7 @@ func select_mode(value:int)->bool:
 	if value==0:deactivate(true);return true
 	quality=1;_quality.select(1)
 	if _saved.is_empty()and not _begin():_refresh();return false
-	mode=value;_directional.apply(value==2 and _want_directional);_leaf.apply(value==2 and _want_leaf);_grass_normal.apply(value==2 and _want_normal);effect.set_neutral(value==3);effect.enabled=value in [2,3]
+	mode=value;_directional.apply(value==2 and _want_directional);_leaf.apply(value==2 and _want_leaf);_grass_normal.apply(value==2 and _want_normal);effect.set_neutral(value==3);effect.enabled=value in [2,3];_apply_presentation(value==2 and _want_presentation)
 	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
 	_bind_field((_covered_field if _want_covered else _field)if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
 func set_bloom_enabled(value:bool)->bool:
@@ -126,6 +130,33 @@ func set_directional_enabled(value:bool)->bool:
 	if path.is_empty():path=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/day_light_components_v001/directional_profile_v001/profile.private.json"
 	if not _directional.configure_external(path):error=_directional.error;_refresh();return false
 	_want_directional=true;_directional.apply(true);error="";_refresh();return true
+func _apply_presentation(active:bool)->void:
+	if effect!=null:effect.set_presentation_enabled(active)
+	var env:Environment=lab.md2_lighting.environment
+	var layer:CanvasLayer=owner_graphics.strict_match.vignette_layer
+	if active:
+		if _presentation_environment.is_empty():
+			for key:String in["tonemap_mode","tonemap_exposure","adjustment_enabled","glow_enabled"]:_presentation_environment[key]=env.get(key)
+			_presentation_vignette=layer!=null and layer.visible
+		env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=false;env.glow_enabled=false
+		if layer!=null:layer.visible=false
+	elif not _presentation_environment.is_empty():
+		for key:String in _presentation_environment:env.set(key,_presentation_environment[key])
+		if layer!=null:layer.visible=_presentation_vignette
+		_presentation_environment.clear()
+func set_presentation_enabled(value:bool)->bool:
+	if not value:_want_presentation=false;_apply_presentation(false);_refresh();return true
+	if mode!=2 and not select_mode(2):return false
+	if not effect.presentation_configured():
+		var path:=OS.get_environment("GAF_PRESENTATION_PROFILE")
+		if path.is_empty():path=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/presentation_closure_v001/live_profile_v001/profile.private.json"
+		if not lab.private_bundle.permitted(path)or not FileAccess.file_exists(path):error="Private presentation profile unavailable";_refresh();return false
+		var data:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
+		if not data is Dictionary:error="Invalid presentation profile";_refresh();return false
+		for key:String in["lut","parameters"]:
+			if not data.get(key,null)is Dictionary or not lab.private_bundle.permitted(str(data[key].get("path",""))):error="Presentation reference data must stay private";_refresh();return false
+		if not effect.configure_presentation_external(path):error="Presentation parameter/unit validation failed";_refresh();return false
+	_want_presentation=true;_apply_presentation(true);error="";_refresh();return true
 func set_covered_fill_enabled(value:bool)->bool:
 	if not value:
 		_want_covered=false
@@ -155,6 +186,7 @@ func set_normal_override_enabled(value:bool)->bool:
 func before_environment_change()->void:
 	if not _changing and not _saved.is_empty():deactivate(false)
 func deactivate(restore_owner:bool)->void:
+	_want_presentation=false;_apply_presentation(false)
 	_want_normal=false;_grass_normal.release()
 	_want_leaf=false;_leaf.release()
 	if owner_graphics!=null and owner_graphics.strict_match!=null:owner_graphics.strict_match.clear_source_companion()
@@ -186,7 +218,7 @@ func _process(delta:float)->void:
 		if not s.error.is_empty():error=s.error;deactivate(true)
 	_refresh()
 func snapshot()->Dictionary:
-	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"directional_fill":_directional.snapshot(),"leaf_material":_leaf.snapshot(),"grass_normal":_grass_normal.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
+	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"presentation":{"requested":_want_presentation,"active":mode==2 and _want_presentation,"environment_saved":not _presentation_environment.is_empty()},"directional_fill":_directional.snapshot(),"leaf_material":_leaf.snapshot(),"grass_normal":_grass_normal.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
 func _build_ui()->void:
 	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,255);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.045,.94);style.content_margin_left=10;style.content_margin_right=10;style.content_margin_top=8;style.content_margin_bottom=8;style.set_corner_radius_all(6);_panel.add_theme_stylebox_override("panel",style)
@@ -200,6 +232,7 @@ func _build_ui()->void:
 	_covered_toggle=CheckBox.new();_covered_toggle.text="Covered fill - preserve source endpoints";_covered_toggle.add_theme_font_size_override("font_size",11);_covered_toggle.focus_mode=Control.FOCUS_NONE;_covered_toggle.toggled.connect(set_covered_fill_enabled);_covered_toggle.tooltip_text="Two source-lit endpoints, unchanged original AABB/reach/height geometry; not native AO.";box.add_child(_covered_toggle)
 	_leaf_toggle=CheckBox.new();_leaf_toggle.text="Leaf channels - captured Oak Var2";_leaf_toggle.add_theme_font_size_override("font_size",11);_leaf_toggle.focus_mode=Control.FOCUS_NONE;_leaf_toggle.toggled.connect(set_leaf_material_enabled);_leaf_toggle.tooltip_text="Restores verified vertex-weighted material inputs for one matching mesh; native two-sided lighting remains approximate.";box.add_child(_leaf_toggle)
 	_normal_toggle=CheckBox.new();_normal_toggle.text="World-up normals - captured grass";_normal_toggle.add_theme_font_size_override("font_size",11);_normal_toggle.focus_mode=Control.FOCUS_NONE;_normal_toggle.toggled.connect(set_normal_override_enabled);_normal_toggle.tooltip_text="Captured Day grass normal response only; tree and terrain normals remain unchanged.";box.add_child(_normal_toggle)
+	_presentation_toggle=CheckBox.new();_presentation_toggle.text="Direct log-LUT + pre-grade vignette";_presentation_toggle.add_theme_font_size_override("font_size",11);_presentation_toggle.focus_mode=Control.FOCUS_NONE;_presentation_toggle.toggled.connect(set_presentation_enabled);_presentation_toggle.tooltip_text="Direct private typed LUT, aspect-normalized vignette before grading. Preserves old scene exposure calibration; native noise and final image are not bit-exact.";box.add_child(_presentation_toggle)
 	_status=Label.new();_status.add_theme_font_size_override("font_size",10);box.add_child(_status)
 func _refresh()->void:
 	if _status==null:return
@@ -208,6 +241,7 @@ func _refresh()->void:
 	_covered_toggle.set_pressed_no_signal(_want_covered)
 	_leaf_toggle.set_pressed_no_signal(_want_leaf)
 	_normal_toggle.set_pressed_no_signal(_want_normal)
+	_presentation_toggle.set_pressed_no_signal(_want_presentation)
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"

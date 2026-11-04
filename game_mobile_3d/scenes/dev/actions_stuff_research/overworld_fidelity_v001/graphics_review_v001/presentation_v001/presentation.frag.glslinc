@@ -1,0 +1,48 @@
+#version 450
+// Original configurable final presentation. All reference values remain external.
+layout(set=0,binding=0)uniform sampler2D source_color;
+layout(set=0,binding=1)uniform sampler3D exposure_grid;
+layout(set=0,binding=2)uniform sampler2D blurred_log;
+layout(std430,set=0,binding=3)readonly buffer Exposure{vec4 p[];};
+layout(set=0,binding=4)uniform sampler2D filtered_bloom;
+layout(set=0,binding=5)uniform sampler3D color_lut;
+layout(std430,set=0,binding=6)readonly buffer Presentation{vec4 q[];};
+layout(push_constant,std430)uniform Control{vec4 value;}control;
+layout(location=0)out vec4 output_color;
+vec3 display_to_linear(vec3 c){
+ return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),greaterThan(c,vec3(.04045)));
+}
+void main(){
+ ivec2 pixel=ivec2(gl_FragCoord.xy);
+ vec2 dimensions=vec2(textureSize(source_color,0));vec2 uv=gl_FragCoord.xy/dimensions;
+ vec4 color=texelFetch(source_color,pixel,0);
+ float luminance=max(dot(color.rgb*p[2].w,p[3].xyz),p[2].z);
+ float physical_log=log2(luminance);
+ float depth=(physical_log*p[1].z+p[1].w)*p[2].x+p[2].y;
+ vec2 grid=textureLod(exposure_grid,vec3(uv,depth),0.).rg;
+ float blur=textureLod(blurred_log,uv,0.).r;
+ float local=grid.y<p[1].y?blur:grid.x/grid.y;
+ float base=local+(blur-local)*p[1].x+log2(p[0].x);
+ float delta=base-log2(p[0].y);
+ float contrast=delta>0.?p[0].z:p[0].w;
+ float gain=exp2((contrast-1.)*delta);
+ vec3 composite=color.rgb*gain;
+ if(control.value.x>0.){
+  vec2 half_texel=.5/vec2(textureSize(filtered_bloom,0));
+  composite+=textureLod(filtered_bloom,clamp(uv,half_texel,1.-half_texel),0.).rgb*control.value.y;
+ }
+ float aspect=dimensions.y/dimensions.x;
+ float k=q[2].z/sqrt(1.+aspect*aspect);
+ vec2 edge=(uv*2.-1.)*vec2(k,k*aspect)*q[1].x;
+ float reciprocal=1./(1.+dot(edge,edge));
+ vec3 positive_input=(composite*q[2].w)*(reciprocal*reciprocal)+q[0].x;
+ vec3 mapped=clamp(log2(positive_input)*q[0].y+q[0].z,0.,1.);
+ float size=float(textureSize(color_lut,0).x);
+ vec3 encoded=textureLod(color_lut,mapped*((size-1.)/size)+.5/size,0.).rgb*q[0].w;
+ vec2 shifted=uv+q[1].zw;
+ float x=2.*fract(sin(shifted.y*q[2].x+shifted.x)*q[2].y)-1.;
+ float s=sign(x);encoded+=(s-sqrt(clamp(1.-abs(x),0.,1.))*s)*q[1].y;
+ // Reproduce the finite presentation range; the engine receives linear color.
+ encoded=clamp(encoded,0.,1.);
+ output_color=vec4(display_to_linear(encoded),color.a);
+}
