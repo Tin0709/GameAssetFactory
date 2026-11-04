@@ -35,3 +35,7 @@ Run `py -3 scripts/dev.py scenes` to list scene aliases and check that their sce
 `py -3 scripts/dev.py doctor` also reports whether `project.godot` and the configured private Overworld bundle file exist. The bundle report preserves `MD2_OVERWORLD_BUNDLE` overrides and shows whether the path is absolute; it does not read asset contents or validate the bundle schema.
 
 Add `--strict` when automating setup checks: `py -3 scripts/dev.py doctor --strict` returns a nonzero exit code if Blender, Godot, or `project.godot` is missing. Private MD2 bundles are optional for this check. This verifies file discovery only, not tool versions, graphics-driver compatibility or gameplay.
+
+Run `py -3 scripts/dev.py viewers` to locate the registered Blender libraries without opening Blender. The JSON catalog reports `ready`, `missing`, `lfs_pointer`, or `unreadable`; `ready` means the file is readable and is not an LFS pointer, not that Blender has validated its contents. Restore pointers with `git lfs pull`, then use `py -3 scripts/dev.py blender --viewer animation` (or another listed alias) to open a library.
+
+Godot launches with `--headless` select the Dummy audio driver for that process so automated checks stay quiet. Interactive play and editor launches keep normal audio; project and system sound settings are unchanged.

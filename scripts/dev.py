@@ -80,7 +80,7 @@ def godot_command(tool: Path, scene: str | None, editor: bool, headless: bool,
     if selected_driver and not headless:
         command += ['--rendering-driver', selected_driver]
     if headless:
-        command.append('--headless')
+        command += ['--headless', '--audio-driver', 'Dummy']
     if editor:
         command.append('--editor')
     if scene is not None:
