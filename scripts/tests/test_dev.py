@@ -14,6 +14,21 @@ spec.loader.exec_module(dev)
 
 
 class PortableLauncherTests(unittest.TestCase):
+    def test_headless_launch_uses_dummy_audio_only_for_that_process(self):
+        command = dev.godot_command(Path('/bin/godot'), 'combat', False, True)
+        self.assertIn('--headless', command)
+        audio_index = command.index('--audio-driver') if '--audio-driver' in command else -1
+        self.assertGreaterEqual(audio_index, 0, 'Automated headless checks must be quiet')
+        self.assertEqual(command[audio_index + 1], 'Dummy')
+        self.assertNotIn('--rendering-driver', command)
+
+    def test_interactive_play_and_editor_keep_normal_audio(self):
+        for editor in [False, True]:
+            with self.subTest(editor=editor):
+                command = dev.godot_command(Path('/bin/godot'), 'overworld', editor, False)
+                self.assertNotIn('--audio-driver', command)
+                self.assertNotIn('Dummy', command)
+
     def test_missing_project_does_not_launch_or_create_another_project(self):
         with tempfile.TemporaryDirectory() as temp, \
                 patch.object(dev, 'ROOT', Path(temp)), \
