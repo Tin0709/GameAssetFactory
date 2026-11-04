@@ -1,0 +1,15 @@
+#version 450
+// Original weighted-sampling model. All weights supplied externally.
+layout(set=0,binding=0)uniform sampler2D primary;
+layout(set=0,binding=2)uniform sampler2D coarser;
+layout(std430,set=0,binding=1)readonly buffer Parameters{vec4 p[];};
+layout(location=0)noperspective in vec2 base_uv;
+layout(location=1)noperspective in vec4 pair_uv[16];
+layout(location=0)out vec4 color;
+vec4 weighted(int i){vec2 q=(i%2==0)?pair_uv[i/2].xy:pair_uv[i/2].zw;return textureLod(primary,q,0.)*p[1+32+i];}
+void main(){
+ vec4 total=weighted(1)+weighted(0);
+ for(int i=2;i<32;i++)total+=weighted(i);
+ total+=textureLod(coarser,base_uv,0.);
+ color=total;
+}

@@ -1,0 +1,18 @@
+{
+  "schema": "original_bloom_shader_manifest_v1",
+  "files": {
+    "filter_12.frag.glslinc": "2aa8cd507f02c49c8a7ea48f5775338673cee4f31f4fa13a8d840af3527751cb",
+    "filter_12.vert.glslinc": "5a76b86854b36600e2b12650390ac75c4e4347dad4ef1ab3dd43240b05934ee7",
+    "filter_12_add.frag.glslinc": "988c3d1982aec89190ee860bdb9fea41c084091fadcfce7bf0451f3534dbbcde",
+    "filter_27.frag.glslinc": "0328ba61a2c1acddbb7c00d358cfb1a56bdfdc922301194141410f6899ea821f",
+    "filter_27.vert.glslinc": "b76f7a44baf91fbd982bb59341f9450a0ec6e2ab0a1b2a5822617ec724b12063",
+    "filter_27_add.frag.glslinc": "1f03005ff1520c5fafd14c84f035cad83817d2ba16114c1386d380c3f1228852",
+    "filter_32.frag.glslinc": "dedd72e4301062f00d281375ae051a12b8492b6d2e4b7334ef634e1f53b2330c",
+    "filter_32.vert.glslinc": "a358f47e52dcde6ee65d3174e558908cb2663b3dd1b295af45ab981a019af0f8",
+    "filter_32_add.frag.glslinc": "1bc86c451a1e93f0544f0d3e6401578c6cdd6e3c89a1d5e70fdddf48947cca80",
+    "filter_8.frag.glslinc": "5cd7eb023b511f8d355527dea21f038ccd580bc9e8704fe24b9f8a40cbb31ad8",
+    "filter_8.vert.glslinc": "6bf053a6bab45675fd80c6fea536f7279905f635cf59812463e5f26d58fcdaf5",
+    "filter_8_add.frag.glslinc": "a6e39766957c6394cf7b6f65c97d1b46cb9f090b099b09dc40198994e1038333",
+    "setup.frag.glslinc": "5e83164c36fbf10c0ae0c222611dc8d86c0c73016290504f3ddd1fbbba181830"
+  }
+}

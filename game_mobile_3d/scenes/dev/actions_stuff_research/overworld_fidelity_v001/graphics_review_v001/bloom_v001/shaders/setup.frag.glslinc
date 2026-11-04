@@ -1,0 +1,33 @@
+#version 450
+// Original active-Day reconstruction; native inputs are external/private.
+layout(set=0,binding=0)uniform sampler2D scene_color;
+layout(set=0,binding=1)uniform sampler3D exposure_grid;
+layout(set=0,binding=2)uniform sampler2D blurred_log;
+layout(std430,set=0,binding=3)readonly buffer Parameters{vec4 p[];};
+layout(push_constant,std430)uniform Control{vec4 value;}control;
+layout(location=0)out vec4 output_color;
+void main(){
+ vec2 scene_uv=gl_FragCoord.xy*p[3].zw+p[4].xy;
+ vec2 viewport_uv=floor(gl_FragCoord.xy)*p[3].xy;
+ vec3 pre_exposed=textureLod(scene_color,scene_uv,0.).rgb;
+ vec3 physical=pre_exposed*p[0].z;
+ float physical_log=log2(max(dot(physical,p[5].rgb),p[2].w));
+ float z=(physical_log*p[4].z+p[4].w)*(31./32.)+1./64.;
+ vec2 grid=textureLod(exposure_grid,vec3(viewport_uv*p[2].yz,z),0.).rg;
+ float blurred=textureLod(blurred_log,viewport_uv,0.).r;
+ float mean_log=blurred;
+ if(grid.y>=.001)mean_log=grid.x/grid.y;
+ precise float exposure_log=log2(p[0].x);
+ precise float pixel_log=exposure_log+physical_log;
+ precise float detail_base=exposure_log+mean_log+(blurred-mean_log)*p[1].w;
+ float pivot=log2(.18*p[0].y*p[2].x);
+ precise float base_delta=detail_base-pivot;
+ float contrast=base_delta>0.?p[1].x:p[1].y;
+ // Captured neutral knees collapse to zero correction; preserve residual/detail
+ // grouping rather than silently replacing the entire expression by gain1.
+ precise float detail=pixel_log-detail_base;
+ precise float exponent=(pivot-pixel_log)+detail*p[1].z;
+ exponent=exponent+base_delta*contrast;
+ float gain=control.value.x>0.?1.:exp2(exponent);
+ output_color=vec4((physical*gain)*p[0].w,0.);
+}

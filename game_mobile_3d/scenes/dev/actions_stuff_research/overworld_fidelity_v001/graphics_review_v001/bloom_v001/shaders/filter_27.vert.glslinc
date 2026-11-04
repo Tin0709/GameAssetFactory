@@ -1,0 +1,11 @@
+#version 450
+// Original separable-filter coordinates, external per-tap offsets only.
+layout(std430,set=0,binding=1)readonly buffer Parameters{vec4 p[];};
+layout(location=0)noperspective out vec2 base_uv;
+layout(location=1)noperspective out vec4 pair_uv[14];
+void main(){
+ vec2 corners[3]=vec2[3](vec2(0.,0.),vec2(2.,0.),vec2(0.,2.));
+ vec2 uv=corners[gl_VertexIndex];gl_Position=vec4(uv*2.-1.,0.,1.);
+ base_uv=uv*p[0].xy+p[0].zw;
+ for(int j=0;j<14;j++){int i=j*2;pair_uv[j].xy=base_uv+p[1+i].xy;pair_uv[j].zw=i+1<27?base_uv+p[2+i].xy:vec2(0.);}
+}
