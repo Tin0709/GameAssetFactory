@@ -1,6 +1,7 @@
 extends Node
 ## Original, reversible integration in the existing lab. Reference data external.
 const Effect=preload("../bloom_v001/bloom_exposure_effect.gd")
+const Directional=preload("../directional_fill_v001/controller.gd")
 const Policy=preload("availability.gd")
 const GradeDomain=preload("../grade_domain.gd")
 var owner_graphics:Node
@@ -17,13 +18,16 @@ var _elapsed:=0.
 var _hdr:ImageTexture3D
 var _field:ImageTexture
 var _panel:PanelContainer
+var _directional=Directional.new()
+var _directional_toggle:CheckBox
+var _want_directional:=false
 var _bloom_toggle:CheckBox
 var _want_bloom:=false
 var _status:Label
 var _quality:OptionButton
 var _buttons:Array[Button]=[]
 func setup(graphics:Node)->void:
-	owner_graphics=graphics;lab=graphics.lab;_build_ui();_refresh()
+	owner_graphics=graphics;lab=graphics.lab;_directional.setup(graphics,lab);_build_ui();_refresh()
 func _paths()->Dictionary:
 	var root:=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/"
 	var parameters:=OS.get_environment("GAF_LOCAL_EXPOSURE_PROFILE")
@@ -82,7 +86,7 @@ func select_mode(value:int)->bool:
 	if value==0:deactivate(true);return true
 	quality=1;_quality.select(1)
 	if _saved.is_empty()and not _begin():_refresh();return false
-	mode=value;effect.set_neutral(value==3);effect.enabled=value in [2,3]
+	mode=value;_directional.apply(value==2 and _want_directional);effect.set_neutral(value==3);effect.enabled=value in [2,3]
 	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
 	_bind_field(_field if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
 func set_bloom_enabled(value:bool)->bool:
@@ -102,9 +106,17 @@ func set_bloom_enabled(value:bool)->bool:
 			if not row is Dictionary or not lab.private_bundle.permitted(str(row.get("path",""))):error="Bloom parameters must stay private";_refresh();return false
 		if not effect.configure_bloom_external(path):error="Bloom parameter/unit validation failed";_refresh();return false
 	_want_bloom=true;effect.set_bloom_enabled(true);error="";_refresh();return true
+func set_directional_enabled(value:bool)->bool:
+	if not value:_want_directional=false;_directional.apply(false);_refresh();return true
+	if mode!=2 and not select_mode(2):return false
+	var path:=OS.get_environment("GAF_DIRECTIONAL_FILL_PROFILE")
+	if path.is_empty():path=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/day_light_components_v001/directional_profile_v001/profile.private.json"
+	if not _directional.configure_external(path):error=_directional.error;_refresh();return false
+	_want_directional=true;_directional.apply(true);error="";_refresh();return true
 func before_environment_change()->void:
 	if not _changing and not _saved.is_empty():deactivate(false)
 func deactivate(restore_owner:bool)->void:
+	_want_directional=false;_directional.apply(false)
 	if _saved.is_empty():_want_bloom=false;mode=0;_refresh();return
 	_changing=true
 	if effect!=null:effect.enabled=false
@@ -131,9 +143,9 @@ func _process(delta:float)->void:
 		if not s.error.is_empty():error=s.error;deactivate(true)
 	_refresh()
 func snapshot()->Dictionary:
-	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"restorable_session":not _saved.is_empty()}
+	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"directional_fill":_directional.snapshot(),"restorable_session":not _saved.is_empty()}
 func _build_ui()->void:
-	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,155);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
+	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,180);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.045,.94);style.content_margin_left=10;style.content_margin_right=10;style.content_margin_top=8;style.content_margin_bottom=8;style.set_corner_radius_all(6);_panel.add_theme_stylebox_override("panel",style)
 	var box:=VBoxContainer.new();_panel.add_child(box);var title:=Label.new();title.text="LOCAL EXPOSURE - DAY REFERENCE";title.add_theme_font_size_override("font_size",12);box.add_child(title)
 	_quality=OptionButton.new();_quality.add_theme_font_size_override("font_size",12);_quality.add_item("Auto / low device: original");_quality.add_item("Reference: experimental");_quality.focus_mode=Control.FOCUS_NONE;_quality.item_selected.connect(func(index:int):quality=index;if index==0:deactivate(true));box.add_child(_quality)
@@ -141,10 +153,12 @@ func _build_ui()->void:
 	for index in 4:
 		var b:=Button.new();b.text=["Original","HDR baseline","LE on","Neutral"][index];b.toggle_mode=true;b.focus_mode=Control.FOCUS_NONE;b.add_theme_font_size_override("font_size",11);b.pressed.connect(func():select_mode(index));row.add_child(b);_buttons.append(b)
 	_bloom_toggle=CheckBox.new();_bloom_toggle.text="Source bloom - experimental Day";_bloom_toggle.add_theme_font_size_override("font_size",11);_bloom_toggle.focus_mode=Control.FOCUS_NONE;_bloom_toggle.toggled.connect(set_bloom_enabled);box.add_child(_bloom_toggle)
+	_directional_toggle=CheckBox.new();_directional_toggle.text="Directional fill - single-probe reference";_directional_toggle.add_theme_font_size_override("font_size",11);_directional_toggle.focus_mode=Control.FOCUS_NONE;_directional_toggle.toggled.connect(set_directional_enabled);_directional_toggle.tooltip_text="Normal-dependent SH calibration; spatial field and foliage back GI remain approximate.";box.add_child(_directional_toggle)
 	_status=Label.new();_status.add_theme_font_size_override("font_size",10);box.add_child(_status)
 func _refresh()->void:
 	if _status==null:return
 	_bloom_toggle.set_pressed_no_signal(_want_bloom)
+	_directional_toggle.set_pressed_no_signal(_want_directional)
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"

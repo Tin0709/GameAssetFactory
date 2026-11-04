@@ -2,6 +2,7 @@ shader_type spatial;
 render_mode cull_disabled, diffuse_burley, ambient_light_disabled;
 #include "vegetation_material_math.gdshaderinc"
 #include "height_fill.gdshaderinc"
+#include "directional_fill_v001/directional_fill.gdshaderinc"
 #include "foliage_wind_math.gdshaderinc"
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D mre_map : filter_nearest, repeat_disable;
@@ -133,4 +134,9 @@ void fragment(){
 	BACKLIGHT=review_grass_material ? scatter_color*review_backlight_rgb : color*vec3(0.18);
  SPECULAR=gaf_specular;
  EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+ if(gaf_directional_fill_enabled){
+  vec3 normal_y=normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.)).xyz);
+  vec3 directional_term=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+  EMISSION+=directional_term*(gaf_directional_factor(normal_y)-vec3(1.));
+ }
 }

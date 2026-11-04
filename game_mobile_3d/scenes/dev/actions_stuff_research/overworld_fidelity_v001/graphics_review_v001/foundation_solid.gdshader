@@ -1,6 +1,7 @@
 shader_type spatial;
 render_mode diffuse_burley, ambient_light_disabled;
 #include "height_fill.gdshaderinc"
+#include "directional_fill_v001/directional_fill.gdshaderinc"
 uniform bool review_alpha_mask=false;
 uniform float review_leaf_hue=0.0;
 uniform vec3 review_backlight_rgb=vec3(0.0);
@@ -53,4 +54,9 @@ void fragment(){
 	if(has_mre){vec3 packed=texture(mre_map,lookup_uv).rgb;METALLIC=packed.r;ROUGHNESS=packed.g;EMISSION=texel.rgb*packed.b*review_emissive_gain;}
  SPECULAR=gaf_specular;
  EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+ if(gaf_directional_fill_enabled){
+  vec3 normal_y=normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.)).xyz);
+  vec3 directional_term=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+  EMISSION+=directional_term*(gaf_directional_factor(normal_y)-vec3(1.));
+ }
 }
