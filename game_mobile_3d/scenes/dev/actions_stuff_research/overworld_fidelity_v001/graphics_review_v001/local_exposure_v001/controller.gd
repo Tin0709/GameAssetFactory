@@ -2,6 +2,7 @@ extends Node
 ## Original, reversible integration in the existing lab. Reference data external.
 const Effect=preload("../bloom_v001/bloom_exposure_effect.gd")
 const Directional=preload("../directional_fill_v001/controller.gd")
+const Leaf=preload("../leaf_material_v001/controller.gd")
 const Policy=preload("availability.gd")
 const GradeDomain=preload("../grade_domain.gd")
 var owner_graphics:Node
@@ -24,6 +25,9 @@ var _covered_build_us:=0
 var _field:ImageTexture
 var _panel:PanelContainer
 var _directional=Directional.new()
+var _leaf=Leaf.new()
+var _leaf_toggle:CheckBox
+var _want_leaf:=false
 var _directional_toggle:CheckBox
 var _want_directional:=false
 var _bloom_toggle:CheckBox
@@ -32,7 +36,7 @@ var _status:Label
 var _quality:OptionButton
 var _buttons:Array[Button]=[]
 func setup(graphics:Node)->void:
-	owner_graphics=graphics;lab=graphics.lab;_directional.setup(graphics,lab);_build_ui();_refresh()
+	owner_graphics=graphics;lab=graphics.lab;_directional.setup(graphics,lab);_leaf.setup(graphics,lab);_build_ui();_refresh()
 func _paths()->Dictionary:
 	var root:=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/"
 	var parameters:=OS.get_environment("GAF_LOCAL_EXPOSURE_PROFILE")
@@ -91,7 +95,7 @@ func select_mode(value:int)->bool:
 	if value==0:deactivate(true);return true
 	quality=1;_quality.select(1)
 	if _saved.is_empty()and not _begin():_refresh();return false
-	mode=value;_directional.apply(value==2 and _want_directional);effect.set_neutral(value==3);effect.enabled=value in [2,3]
+	mode=value;_directional.apply(value==2 and _want_directional);_leaf.apply(value==2 and _want_leaf);effect.set_neutral(value==3);effect.enabled=value in [2,3]
 	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
 	_bind_field((_covered_field if _want_covered else _field)if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
 func set_bloom_enabled(value:bool)->bool:
@@ -130,9 +134,17 @@ func set_covered_fill_enabled(value:bool)->bool:
 		_covered_build_us=Time.get_ticks_usec()-started;_covered_builds+=1
 		if _covered_field==null:error="Covered-field allocation failed";_refresh();return false
 	_want_covered=true;_bind_field(_covered_field);error="";_refresh();return true
+func set_leaf_material_enabled(value:bool)->bool:
+	if not value:_want_leaf=false;_leaf.apply(false);_refresh();return true
+	if mode!=2 and not select_mode(2):return false
+	var path:=OS.get_environment("GAF_LEAF_MATERIAL_PROFILE")
+	if path.is_empty():path=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/leaf_vertex_material_v001/profile.private.json"
+	if not _leaf.configure_external(path):error=_leaf.error;_refresh();return false
+	_want_leaf=true;_leaf.apply(true);error="";_refresh();return true
 func before_environment_change()->void:
 	if not _changing and not _saved.is_empty():deactivate(false)
 func deactivate(restore_owner:bool)->void:
+	_want_leaf=false;_leaf.release()
 	if owner_graphics!=null and owner_graphics.strict_match!=null:owner_graphics.strict_match.clear_source_companion()
 	_want_covered=false
 	_want_directional=false;_directional.apply(false)
@@ -162,9 +174,9 @@ func _process(delta:float)->void:
 		if not s.error.is_empty():error=s.error;deactivate(true)
 	_refresh()
 func snapshot()->Dictionary:
-	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"directional_fill":_directional.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
+	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"directional_fill":_directional.snapshot(),"leaf_material":_leaf.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
 func _build_ui()->void:
-	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,205);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
+	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,230);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.045,.94);style.content_margin_left=10;style.content_margin_right=10;style.content_margin_top=8;style.content_margin_bottom=8;style.set_corner_radius_all(6);_panel.add_theme_stylebox_override("panel",style)
 	var box:=VBoxContainer.new();_panel.add_child(box);var title:=Label.new();title.text="LOCAL EXPOSURE - DAY REFERENCE";title.add_theme_font_size_override("font_size",12);box.add_child(title)
 	_quality=OptionButton.new();_quality.add_theme_font_size_override("font_size",12);_quality.add_item("Auto / low device: original");_quality.add_item("Reference: experimental");_quality.focus_mode=Control.FOCUS_NONE;_quality.item_selected.connect(func(index:int):quality=index;if index==0:deactivate(true));box.add_child(_quality)
@@ -174,12 +186,14 @@ func _build_ui()->void:
 	_bloom_toggle=CheckBox.new();_bloom_toggle.text="Source bloom - experimental Day";_bloom_toggle.add_theme_font_size_override("font_size",11);_bloom_toggle.focus_mode=Control.FOCUS_NONE;_bloom_toggle.toggled.connect(set_bloom_enabled);box.add_child(_bloom_toggle)
 	_directional_toggle=CheckBox.new();_directional_toggle.text="Directional fill - single-probe reference";_directional_toggle.add_theme_font_size_override("font_size",11);_directional_toggle.focus_mode=Control.FOCUS_NONE;_directional_toggle.toggled.connect(set_directional_enabled);_directional_toggle.tooltip_text="Normal-dependent SH calibration; spatial field and foliage back GI remain approximate.";box.add_child(_directional_toggle)
 	_covered_toggle=CheckBox.new();_covered_toggle.text="Covered fill - preserve source endpoints";_covered_toggle.add_theme_font_size_override("font_size",11);_covered_toggle.focus_mode=Control.FOCUS_NONE;_covered_toggle.toggled.connect(set_covered_fill_enabled);_covered_toggle.tooltip_text="Two source-lit endpoints, unchanged original AABB/reach/height geometry; not native AO.";box.add_child(_covered_toggle)
+	_leaf_toggle=CheckBox.new();_leaf_toggle.text="Leaf channels - captured Oak Var2";_leaf_toggle.add_theme_font_size_override("font_size",11);_leaf_toggle.focus_mode=Control.FOCUS_NONE;_leaf_toggle.toggled.connect(set_leaf_material_enabled);_leaf_toggle.tooltip_text="Restores verified vertex-weighted material inputs for one matching mesh; native two-sided lighting remains approximate.";box.add_child(_leaf_toggle)
 	_status=Label.new();_status.add_theme_font_size_override("font_size",10);box.add_child(_status)
 func _refresh()->void:
 	if _status==null:return
 	_bloom_toggle.set_pressed_no_signal(_want_bloom)
 	_directional_toggle.set_pressed_no_signal(_want_directional)
 	_covered_toggle.set_pressed_no_signal(_want_covered)
+	_leaf_toggle.set_pressed_no_signal(_want_leaf)
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"

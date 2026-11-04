@@ -26,6 +26,7 @@ func setup(lab:Node,rows:Array,hue:float=0.,backlight:Vector3=Vector3.ZERO)->voi
 			if status!=OK:errors.append("Tree GLTF error "+str(status));continue
 			var source:Node=document.generate_scene(state);cache[path]=source
 		var tree:Node3D=cache[path].duplicate();tree.name="PrivateMD2Tree_"+str(loaded);add_child(tree)
+		tree.set_meta("private_source_sha256",str(row.sha256))
 		var p:Array=row.position;tree.position=Vector3(p[0],p[1],p[2]);tree.rotation.y=float(row.yaw)
 		for child:Node in tree.find_children("*","MeshInstance3D",true,false):
 			var instance:MeshInstance3D=child;var bounds:AABB=instance.global_transform*instance.mesh.get_aabb();canopy_bounds.append(bounds)
