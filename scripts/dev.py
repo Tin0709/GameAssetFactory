@@ -123,6 +123,24 @@ def blender_command(tool: Path, showcase: str) -> list[str]:
     return command
 
 
+def viewer_catalog() -> dict:
+    """Discover registered files, not their validity as Blender documents."""
+    result = {}
+    for alias, relative in VIEWERS.items():
+        source = ROOT / relative
+        try:
+            if not source.is_file():
+                status = 'missing'
+            else:
+                with source.open('rb') as stream:
+                    status = ('lfs_pointer' if stream.read(80).startswith(
+                        b'version https://git-lfs.github.com/spec/') else 'ready')
+        except OSError:
+            status = 'unreadable'
+        result[alias] = {'path': str(source), 'status': status}
+    return result
+
+
 def viewer_cache() -> Path:
     base = (Path.home() / 'Library/Caches' if platform.system() == 'Darwin'
             else Path(os.environ.get('XDG_CACHE_HOME', str(Path.home() / '.cache'))))
@@ -229,6 +247,7 @@ def main(argv=None) -> int:
     doctor.add_argument('--strict', action='store_true',
                         help='Return 1 if Blender, Godot, or project.godot is missing; private references are optional')
     sub.add_parser('scenes', help='List scene aliases and scene-file availability; no Godot required')
+    sub.add_parser('viewers', help='List Blender viewer files and LFS restoration status; no Blender required')
     game = sub.add_parser('godot')
     game.add_argument('--godot-bin'); game.add_argument('--scene', help='Scene alias (' + ', '.join(SCENES) + ') or a repository res:// path')
     game.add_argument('--editor', action='store_true'); game.add_argument('--headless', action='store_true')
@@ -244,6 +263,9 @@ def main(argv=None) -> int:
         item.add_argument('--dry-run', action='store_true')
     args = parser.parse_args(argv)
     try:
+        if args.mode == 'viewers':
+            print(json.dumps(viewer_catalog(), indent=2))
+            return 0
         if args.mode == 'scenes':
             print(json.dumps({alias: {'scene': resource,
                                      'scene_file_exists': (ROOT / 'game_mobile_3d' / resource[6:]).is_file()}
