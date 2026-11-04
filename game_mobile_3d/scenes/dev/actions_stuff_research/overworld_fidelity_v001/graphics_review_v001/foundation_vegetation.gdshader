@@ -4,6 +4,9 @@ render_mode cull_disabled, diffuse_burley, ambient_light_disabled;
 #include "height_fill.gdshaderinc"
 #include "directional_fill_v001/directional_fill.gdshaderinc"
 #include "foliage_wind_math.gdshaderinc"
+#include "grass_normal_v001/world_normal.gdshaderinc"
+uniform bool gaf_grass_normal_enabled=false;
+uniform float gaf_grass_normal_up_weight=0.0;
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D mre_map : filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
@@ -102,7 +105,7 @@ void vertex(){
 		world_offset+=vec3(offset_z_up.x,offset_z_up.z,-offset_z_up.y);
 	}
 	VERTEX+=(inverse(MODEL_MATRIX)*vec4(world_offset,0.0)).xyz;
-	if(tinted_grass)NORMAL=normalize(NORMAL*0.35+vec3(0.0,0.65,0.0));
+	if(tinted_grass && !gaf_grass_normal_enabled)NORMAL=normalize(NORMAL*0.35+vec3(0.0,0.65,0.0));
 	wrapped_normal_world=normalize(MODEL_NORMAL_MATRIX*NORMAL);
 	root_color=textureLod(ground_atlas,mix(ground_uv.xy,ground_uv.zw,fract(vec2(root.x,-root.z))),0.0).rgb;
  float surface_height=(MODEL_MATRIX*vec4(VERTEX,1.0)).y;
@@ -113,10 +116,13 @@ void fragment(){
 	vec4 texel=texture(atlas,UV);
 	vec3 color=texel.rgb;
 	vec3 scatter_color=color;
+	float fill_upward=gaf_upward;
 	if(tinted_grass){
 		// Preserve the authored upward grass normals on both sides, as in the
 		// existing lab. Automatic backface flipping otherwise makes dark stripes.
-		NORMAL=normalize(mat3(VIEW_MATRIX)*wrapped_normal_world);
+		vec3 world_normal=wrapped_normal_world;
+		if(gaf_grass_normal_enabled){world_normal=gaf_foliage_world_normal(world_normal,gaf_grass_normal_up_weight);fill_upward=clamp(world_normal.y,0.,1.);}
+		NORMAL=normalize(mat3(VIEW_MATRIX)*world_normal);
 		if(review_grass_material){
 		 vec3 blade=vegetation_blade_color(base_tint,tip_tint,UV.y,review_tip_height,review_tip_falloff,texel.r);
 		 scatter_color=vegetation_scattering(blade,review_scatter_strength);
@@ -133,10 +139,10 @@ void fragment(){
 	// Inferred wrapped backlighting; no claim of matching native two-sided shader.
 	BACKLIGHT=review_grass_material ? scatter_color*review_backlight_rgb : color*vec3(0.18);
  SPECULAR=gaf_specular;
- EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+ EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,fill_upward)*(1.0-METALLIC);
  if(gaf_directional_fill_enabled){
   vec3 normal_y=normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.)).xyz);
-  vec3 directional_term=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+  vec3 directional_term=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,fill_upward)*(1.0-METALLIC);
   EMISSION+=directional_term*(gaf_directional_factor(normal_y)-vec3(1.));
  }
 }
