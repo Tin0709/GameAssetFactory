@@ -26,8 +26,8 @@
 
 ## Task 3 — Correct missing-bundle recovery guidance
 
-- [ ] Update the existing Overworld error text to name the actual GameAssetFactory launcher folder and external bundle override. This is a text-only correction; no new test mirroring the string.
-- [ ] Parse the existing Godot script, check the documented launcher exists, inspect the diff, and retain gameplay/graphics behavior.
+- [x] Update the existing Overworld error text to name the actual GameAssetFactory launcher folder and external bundle override. This is a text-only correction; no new test mirroring the string.
+- [x] Parse the existing Godot script, check the documented launcher exists, inspect the diff, and retain gameplay/graphics behavior.
 
 ## Execution ledger
 
@@ -37,3 +37,5 @@
 - Existing user checkpoint manager automatically committed the incremental files while work continued. Preserve those commits; no history rewriting. Full scripts suite running before final synchronization.
 - Full Python suite completed: 140 tests, 136 passed / 4 skipped, 106.170 seconds. Installed Godot accepted `--headless --audio-driver Dummy --version`. Independent bounded review found no actionable issues; its 30 launcher/catalog tests passed.
 - Ruling: add one text-only recovery correction found during inspection. The error screen points at Research, but `Research/Open Overworld Meadow.cmd` does not exist and the repository-root launcher does. No state/loading behavior change is needed.
+- Task 3: installed Godot 4.7.2 `--headless --audio-driver Dummy --check-only --script .../overworld.gd` exited 0 without parse errors. Root launcher existence and `git diff --check` passed. No visual/gameplay or private asset changes.
+- Final review: original tooling/code/docs only, main workflow already authorized; synchronize normal push, retain all automatic checkpoint commits. Usage still 3% used / 97% remaining; requested near-zero stop threshold has not been reached.
