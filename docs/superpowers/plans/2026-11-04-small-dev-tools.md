@@ -22,7 +22,12 @@
 
 - [x] Add failing tests for Dummy audio on headless launches only.
 - [x] Add the process-only audio override; keep interactive commands unchanged.
-- [ ] Run focused tests and CLI smokes, inspect diff, then commit/push only these original tooling changes under repository policy.
+- [x] Run focused tests and CLI smokes, inspect diff, then commit/push only these original tooling changes under repository policy.
+
+## Task 3 — Correct missing-bundle recovery guidance
+
+- [ ] Update the existing Overworld error text to name the actual GameAssetFactory launcher folder and external bundle override. This is a text-only correction; no new test mirroring the string.
+- [ ] Parse the existing Godot script, check the documented launcher exists, inspect the diff, and retain gameplay/graphics behavior.
 
 ## Execution ledger
 
@@ -30,3 +35,5 @@
 - Task 1 RED: the two catalog CLI tests rejected the missing `viewers` command. GREEN: catalog plus existing launcher suite, 28 tests passed. Local discovery found six readable non-pointer files; contents were not opened in Blender.
 - Task 2 RED: headless command lacked `--audio-driver`. GREEN: 31 focused launcher/catalog/Windows-wrapper tests passed. Both headless and normal dry runs inspected; only headless includes Dummy.
 - Existing user checkpoint manager automatically committed the incremental files while work continued. Preserve those commits; no history rewriting. Full scripts suite running before final synchronization.
+- Full Python suite completed: 140 tests, 136 passed / 4 skipped, 106.170 seconds. Installed Godot accepted `--headless --audio-driver Dummy --version`. Independent bounded review found no actionable issues; its 30 launcher/catalog tests passed.
+- Ruling: add one text-only recovery correction found during inspection. The error screen points at Research, but `Research/Open Overworld Meadow.cmd` does not exist and the repository-root launcher does. No state/loading behavior change is needed.

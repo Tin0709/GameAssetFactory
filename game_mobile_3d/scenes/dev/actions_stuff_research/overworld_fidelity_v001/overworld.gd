@@ -106,4 +106,4 @@ func _trim(box:Node,title:String,callback:Callable)->void:
 	slider.value_changed.connect(func(db:float):value.text="%+.0f dB"%db;callback.call(db))
 
 func _error_ui()->void:
-	var label:=Label.new();label.text="Private Overworld unavailable\n"+error_text+"\nRun Open Overworld Meadow.cmd from MD2 Research.";label.position=Vector2(30,30);add_child(label);push_error(error_text)
+	var label:=Label.new();label.text="Private Overworld unavailable\n"+error_text+"\nRun Open Overworld Meadow.cmd from the GameAssetFactory folder.\nRestore MD2 Research or set MD2_OVERWORLD_BUNDLE to its bundle.private.json.";label.position=Vector2(30,30);add_child(label);push_error(error_text)
