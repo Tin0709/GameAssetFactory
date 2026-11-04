@@ -1,0 +1,40 @@
+#version 450
+layout(local_size_x=8,local_size_y=8)in;layout(set=0,binding=0)uniform sampler2D source_color;layout(rg32f,set=0,binding=1)uniform writeonly image3D output_grid;layout(std430,set=0,binding=2)readonly buffer Parameters{vec4 p[];};shared uint histogram[2048];
+
+void contribute(float normalized,uint lane){
+ float address=clamp(normalized,0.,1.)*31.;uint a=uint(address),b=min(a+1u,31u);float f=fract(address);
+ float w0=1.-f,w1=f;
+ uint word0=(uint(w0*512.)<<16u)|(uint((normalized*512.)*w0)&65535u);
+ uint word1=(uint(w1*512.)<<16u)|(uint((normalized*512.)*w1)&65535u);
+ atomicAdd(histogram[a*64u+lane],word0);atomicAdd(histogram[b*64u+lane],word1);
+}
+void main(){
+ uint lx=gl_LocalInvocationID.x,ly=gl_LocalInvocationID.y,lane=lx*8u+ly;
+ for(uint b=0u;b<32u;b++)histogram[b*64u+lane]=0u;
+ barrier();
+ ivec2 minimum=ivec2(p[2].xy),maximum=ivec2(p[2].zw);
+ ivec2 origin=minimum+ivec2(gl_WorkGroupID.xy)*64+ivec2(gl_LocalInvocationID.xy)*2;
+ for(int oy=0;oy<64;oy+=16){
+  for(int ox=0;ox<64;ox+=16){
+   ivec2 pixel=origin+ivec2(ox,oy);
+   if(pixel.x<maximum.x-1 && pixel.y<maximum.y-1){
+    for(int y=0;y<2;y++)for(int x=0;x<2;x++){
+     vec3 color=texelFetch(source_color,pixel+ivec2(x,y),0).rgb*p[0].x;
+     float physical=max(dot(color,p[1].xyz),p[0].w);
+     float normalized=log2(physical)*p[0].y+p[0].z;
+     contribute(normalized,lane);
+    }
+   }
+  }
+ }
+ barrier();
+ uint bin=gl_LocalInvocationIndex;
+ if(bin<32u){
+  float sum_log=0.,sum_weight=0.;
+  for(uint y=0u;y<8u;y++)for(uint x=0u;x<8u;x++){
+   uint word=histogram[bin*64u+x*8u+y];float weight=float(word>>16u)/512.;float moment=float(word&65535u)/512.;
+   sum_log+=(moment-weight*p[0].z)/p[0].y;sum_weight+=weight;
+  }
+  imageStore(output_grid,ivec3(gl_WorkGroupID.xy,bin),vec4(sum_log,sum_weight,0.,0.));
+ }
+}

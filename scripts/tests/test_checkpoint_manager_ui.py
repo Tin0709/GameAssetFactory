@@ -117,6 +117,18 @@ class DesktopTests(unittest.TestCase):
         self.wait_idle()
         self.assertEqual(self.count(0), 2)
 
+    def test_named_auto_launch_only_enables_requested_repository(self):
+        self.cleanup_root()
+        self.open_app(start_auto=('Two',))
+        self.wait_idle()
+        self.assertEqual([v.get() for v in self.app.auto_vars], [False, True])
+        for config in self.configs:
+            (config.path / 'work.txt').write_text('selected startup checkpoint')
+        self.now = 10
+        self.app.tick()
+        self.wait_idle()
+        self.assertEqual([self.count(0), self.count(1)], [1, 2])
+
     def test_pause_before_scan_cancels_explicit_auto_launch(self):
         self.cleanup_root()
         self.open_app(start_auto=True)

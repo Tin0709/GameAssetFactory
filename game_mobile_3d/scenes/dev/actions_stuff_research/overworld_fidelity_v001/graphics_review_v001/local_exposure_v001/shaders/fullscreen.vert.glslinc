@@ -1,0 +1,2 @@
+#version 450
+void main(){vec2 v[3]=vec2[3](vec2(0.,0.),vec2(2.,0.),vec2(0.,2.));gl_Position=vec4(v[gl_VertexIndex]*2.-1.,0.,1.);}

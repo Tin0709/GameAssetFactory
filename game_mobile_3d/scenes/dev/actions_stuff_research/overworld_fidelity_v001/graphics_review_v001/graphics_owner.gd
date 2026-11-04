@@ -1,7 +1,9 @@
 extends Node
 ## Single opt-in owner for the existing private meadow. Original code only.
 const StrictMatch=preload("strict_match.gd")
+const LocalExposure=preload("local_exposure_v001/controller.gd")
 var strict_match:Node
+var local_exposure:Node
 const PhaseTrack=preload("phase_track.gd")
 const Profile=preload("profile.gd")
 const Resolver=preload("override_resolver.gd")
@@ -96,6 +98,7 @@ func setup(scene:Node3D)->void:
 			toggle.tooltip_text="Captured background wind math; simulation-second clock verified across10 PIX frames. Pause/time dilation unverified. Existing contact bend is retained."
 			toggle.button_pressed=bool(strict_match.data.background_wind.get("enabled",false));toggle.toggled.connect(strict_match.set_background_wind_enabled)
 			var panel:PanelContainer=ui.get_child(0);var box:VBoxContainer=panel.get_child(0);box.add_child(toggle);panel.position.y-=35.
+	local_exposure=LocalExposure.new();local_exposure.name="LocalExposure";add_child(local_exposure);local_exposure.setup(self)
 func _process(_delta:float)->void:
 	if not available or released:return
 	if cycle_auto:
@@ -113,6 +116,7 @@ func _process(_delta:float)->void:
 				for key:String in MOTION:row.candidate.set_shader_parameter(key,row.original.get_shader_parameter(key))
 func set_candidate(value:bool)->void:
 	if released or not available:return
+	_before_graphics_change()
 	candidate=value
 	for row:Dictionary in surfaces:row.mesh.surface_set_material(row.surface,row.candidate if candidate else row.original)
 	var sun:DirectionalLight3D=lab.md2_lighting.sun
@@ -140,9 +144,11 @@ func _restore_atmosphere()->void:
 	for key:String in environment_baseline:lab.md2_lighting.environment.set(key,environment_baseline[key])
 	for key:String in sky_baseline:lab.md2_lighting.sky_material.set(key,sky_baseline[key])
 func set_cycle_enabled(value:bool)->void:
+	_before_graphics_change()
 	cycle_auto=value
 	if cycle_check!=null:cycle_check.set_pressed_no_signal(value)
 func seek_cycle(position:float,snap:bool=false)->void:
+	_before_graphics_change()
 	cycle_position=fposmod(position,1.);set_cycle_enabled(false);_update_phase_caption()
 	target_state=Resolver.resolve(PhaseTrack.sample(profile,cycle_position),local_overrides)
 	if snap:resolved=target_state.duplicate(true);state_velocity.clear()
@@ -153,6 +159,7 @@ func _update_phase_caption()->void:
 		if cycle_position>=PhaseTrack.STARTS[i]:phase=PhaseTrack.NAMES[i]
 func set_phase(value:StringName)->bool:
 	if not available or released or (value!=&"day" and not profile.phases.has(value)):return false
+	_before_graphics_change()
 	set_cycle_enabled(false)
 	var phase_index:=PhaseTrack.NAMES.find(value)
 	if phase_index>=0:cycle_position=PhaseTrack.STARTS[phase_index]
@@ -168,6 +175,7 @@ func set_local_overrides(entries:Array)->bool:
 			elif key=="sun_color_srgb":
 				if not row.fields[key]is Vector3 or not row.fields[key].is_finite():return false
 			else:return false
+	_before_graphics_change()
 	local_overrides=entries.duplicate(true);target_state=Resolver.resolve(PhaseTrack.sample(profile,cycle_position),local_overrides);return true
 func set_comparison_camera(value:bool)->void:
 	comparison_camera=value;apply_camera();_refresh_label()
@@ -192,6 +200,7 @@ func snapshot()->Dictionary:
 	return {"available":available,"candidate":candidate,"matched_camera":candidate or comparison_camera,"profile":profile.profile_id,"phase":phase,"local_overrides":local_overrides.size(),
 		"device_tiers":profile.device_tiers.keys(),"phone_benchmarked":false,"indirect_kind":"Original196x196 spatial diffuse-color gather; not native Lumen","cycle_auto":cycle_auto,"cycle_position":cycle_position,"cycle_preview_seconds":cycle_seconds,"cycle_native_timing":false,"surface_count":surfaces.size(),"error":error}
 func input(event:InputEvent)->bool:
+	if local_exposure!=null and local_exposure.input(event):return true
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode==KEY_F9:
 			if strict_match!=null and strict_match.available:
@@ -232,6 +241,7 @@ func _refresh_label()->void:
 	if state_label!=null:state_label.text=("FOUNDATION"if candidate else"BASELINE")+(" · perspective45°"if candidate or comparison_camera else" · original camera")+"\n100 × 100 m · cycle %.0f%% · Pending review"%[cycle_position*100.]
 func release()->void:
 	if released:return
+	if local_exposure!=null:local_exposure.release()
 	if available:
 		if strict_match!=null:strict_match.release()
 		set_candidate(false);comparison_camera=false;apply_camera()
@@ -239,3 +249,5 @@ func release()->void:
 		if ui!=null:ui.hide()
 	released=true;set_process(false)
 func _exit_tree()->void:release()
+func _before_graphics_change()->void:
+	if local_exposure!=null:local_exposure.before_environment_change()

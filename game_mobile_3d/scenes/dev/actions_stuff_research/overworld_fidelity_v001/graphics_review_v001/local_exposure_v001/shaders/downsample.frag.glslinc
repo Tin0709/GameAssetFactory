@@ -1,0 +1,13 @@
+#version 450
+layout(set=0,binding=0)uniform sampler2D source_color;layout(std430,set=0,binding=1)readonly buffer Parameters{vec4 p[];};layout(location=0)out vec4 output_color;
+
+void main(){
+ vec2 uv=gl_FragCoord.xy*p[0].xy;
+ vec2 low=clamp(uv-p[0].zw,p[1].xy,p[1].zw),high=clamp(uv+p[0].zw,p[1].xy,p[1].zw);
+ vec4 a=textureLod(source_color,low,0.);
+ vec4 b=textureLod(source_color,vec2(high.x,low.y),0.);
+ vec4 c=textureLod(source_color,vec2(low.x,high.y),0.);
+ vec4 d=textureLod(source_color,high,0.);
+ vec4 mean=((b+a)+c+d)*.25;
+ output_color=vec4(max(mean.rgb,vec3(0.)),mean.a);
+}

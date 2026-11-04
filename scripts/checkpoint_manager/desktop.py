@@ -260,8 +260,12 @@ class CheckpointApp:
                             self.notifications.show(self.configs[index].name, message)
             self._update_mode()
             if kind == 'result' and self.auto_start_pending and not self.closing:
+                requested = self.auto_start_pending
                 self.auto_start_pending = False
-                self.resume_all()
+                if requested is True:
+                    self.resume_all()
+                else:
+                    self.resume_repositories(requested)
             if self.closing:
                 self._destroy()
                 return
@@ -319,12 +323,18 @@ class CheckpointApp:
         self._update_mode()
 
     def resume_all(self):
+        self.resume_repositories(config.name for config in self.configs)
+
+    def resume_repositories(self, names):
         if self.closed or self.closing:
             return
+        names = set(names)
         for index, variable in enumerate(self.auto_vars):
-            variable.set(self.snapshots[index] is not None)
+            variable.set(self.configs[index].name in names and self.snapshots[index] is not None)
             if variable.get():
                 self.auto_permits[index].set()
+            else:
+                self.auto_permits[index].clear()
         self.schedule.consume(self.clock())
         self._update_mode()
         enabled = [config.name for config, variable in zip(self.configs, self.auto_vars) if variable.get()]
@@ -445,7 +455,15 @@ class CheckpointApp:
         self.root.destroy()
 
 
-def main(auto_commit=False):
+def default_configs(repository, desktop):
+    return [
+        RepoConfig('GameAssetFactory', repository, 'https://github.com/Tin0709/GameAssetFactory.git'),
+        RepoConfig('MD2 Research', desktop / 'MD2 Research', 'https://github.com/Tin0709/MD2-Research.git', require_private=True),
+        RepoConfig('TaCZ Research', repository.parent / 'TaCZ-Research', 'https://github.com/Tin0709/TaCZ-Research.git', require_private=True),
+    ]
+
+
+def main(auto_commit=False, auto_repos=()):
     if os.name == 'nt':
         import ctypes
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Tin0709.GAFGitCheckpointManager')
@@ -471,12 +489,14 @@ def main(auto_commit=False):
         return
     repository = Path(__file__).resolve().parents[2]
     desktop = Path.home() / 'Desktop'
-    configs = [
-        RepoConfig('GameAssetFactory', repository, 'https://github.com/Tin0709/GameAssetFactory.git'),
-        RepoConfig('MD2 Research', desktop / 'MD2 Research', 'https://github.com/Tin0709/MD2-Research.git', require_private=True),
-    ]
+    configs = default_configs(repository, desktop)
+    unknown = set(auto_repos) - {config.name for config in configs}
+    if unknown:
+        instance.close()
+        root.destroy()
+        raise ValueError('Unknown auto-commit repositories: ' + ', '.join(sorted(unknown)))
     try:
-        CheckpointApp(root, configs, state_dir, start_auto=auto_commit)
+        CheckpointApp(root, configs, state_dir, start_auto=True if auto_commit else tuple(auto_repos))
         root.deiconify()
         root.mainloop()
     finally:

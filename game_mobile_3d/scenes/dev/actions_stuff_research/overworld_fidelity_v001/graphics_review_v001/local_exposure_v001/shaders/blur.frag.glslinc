@@ -1,0 +1,8 @@
+#version 450
+layout(set=0,binding=0)uniform sampler2D source_log;layout(std430,set=0,binding=1)readonly buffer Parameters{vec4 p[];};layout(location=0)in vec2 coordinates[17];layout(location=0)out float output_log;
+
+void main(){
+ float sum=textureLod(source_log,coordinates[0],0.).r*p[1].z;
+ for(int i=1;i<17;i++)sum+=textureLod(source_log,coordinates[i],0.).r*p[i+1].z;
+ output_log=sum;
+}

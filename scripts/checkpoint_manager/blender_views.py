@@ -5,7 +5,7 @@ import subprocess
 
 
 VIEW_LABELS = {'animation': 'Animation MD2', 'sabre': 'Valorie + Sabre', 'showcase': 'Animation Showcase',
-               'actions_stuff': 'Actions & Stuff'}
+               'actions_stuff': 'Actions & Stuff', 'tacz': 'TaCZ · Gun Animations'}
 
 
 class BlenderViewLauncher:
@@ -23,6 +23,8 @@ class BlenderViewLauncher:
                          self.project_root / 'scripts/load_showcase_ui.py'),
             'actions_stuff': (self.project_root.parent / 'ACT-Research/blender/Actions_Stuff_Animation_Library.blend',
                               self.project_root.parent / 'ACT-Research/scripts/bootstrap.py'),
+            'tacz': (self.project_root.parent / 'TaCZ-Research/blender/TaCZ_Animation_Library.blend',
+                     self.project_root.parent / 'TaCZ-Research/scripts/bootstrap.py'),
         }
 
     def _view(self, key):
@@ -43,7 +45,7 @@ class BlenderViewLauncher:
         # console, no --background, and no saves or modifications to the blend.
         with (self.state_dir / f'blender-{key}-launch.log').open('ab') as output:
             args = [str(self.blender_exe)]
-            if key in ('showcase', 'actions_stuff'):
+            if key in ('showcase', 'actions_stuff', 'tacz'):
                 # Match each library's explicit launcher without global autoexec.
                 args += ['--factory-startup', '--disable-autoexec']
             args += [str(blend), '--python', str(script)]

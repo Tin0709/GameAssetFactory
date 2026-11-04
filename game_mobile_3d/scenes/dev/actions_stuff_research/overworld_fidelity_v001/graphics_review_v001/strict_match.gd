@@ -81,6 +81,7 @@ func setup(controller:Node)->void:
 	_build_vignette()
 	available=true;apply()
 func apply()->void:
+	if controller_owner!=null and controller_owner.has_method("_before_graphics_change"):controller_owner._before_graphics_change()
 	if not available:return
 	var env:Environment=lab.md2_lighting.environment
 	if vignette_layer!=null:vignette_layer.visible=enabled and stage>=5

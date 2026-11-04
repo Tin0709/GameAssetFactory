@@ -1,0 +1,133 @@
+extends Node
+## Original, reversible integration in the existing lab. Reference data external.
+const Effect=preload("local_exposure_effect.gd")
+const Policy=preload("availability.gd")
+const GradeDomain=preload("../grade_domain.gd")
+var owner_graphics:Node
+var lab:Node3D
+var mode:=0 # Original / common HDR baseline / local exposure / neutral graph
+var error:=""
+var quality:=0 # Auto is baseline; Reference is explicit, desktop-verified only.
+var effect:CompositorEffect
+var _compositor:Compositor
+var _saved:Dictionary={}
+var _changing:=false
+var _released:=false
+var _elapsed:=0.
+var _hdr:ImageTexture3D
+var _field:ImageTexture
+var _panel:PanelContainer
+var _status:Label
+var _quality:OptionButton
+var _buttons:Array[Button]=[]
+func setup(graphics:Node)->void:
+	owner_graphics=graphics;lab=graphics.lab;_build_ui();_refresh()
+func _paths()->Dictionary:
+	var root:=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/"
+	var parameters:=OS.get_environment("GAF_LOCAL_EXPOSURE_PROFILE")
+	var hdr:=OS.get_environment("GAF_LOCAL_EXPOSURE_HDR_PROFILE")
+	return {"parameters":root+"local_exposure_contract_v001/live_parameters_units_v002/parameters.private.json"if parameters.is_empty()else parameters,"hdr":root+"hdr_grade_v001/profile.high_precision.private.json"if hdr.is_empty()else hdr}
+func _available(paths:Dictionary)->bool:
+	for path:String in paths.values():
+		if not lab.private_bundle.permitted(path)or not FileAccess.file_exists(path):return false
+	return owner_graphics.strict_match!=null and owner_graphics.strict_match.available
+func _load_hdr(profile:Dictionary)->bool:
+	if not bool(profile.get("correction_hdr_2d",false))or not bool(profile.get("correction_output_linear",false))or not bool(profile.get("correction_texel_centered",false))or float(profile.get("correction_input_domain_linear",0.))!=2.:error="Reference requires the verified HDR2D/domain2 grading contract";return false
+	var path:String=profile.get("correction_path","");var n:int=profile.get("correction_size",0)
+	if n!=64 or not lab.private_bundle.permitted(path)or FileAccess.get_sha256(path)!=profile.get("correction_sha256",""):error="Private HDR grading data unavailable or changed";return false
+	var bytes:=FileAccess.get_file_as_bytes(path)
+	if bytes.size()!=n*n*n*16:error="Invalid HDR grading payload";return false
+	var slices:Array[Image]=[]
+	for z in n:
+		var im:=Image.create_from_data(n,n,false,Image.FORMAT_RGBAF,bytes.slice(z*n*n*16,(z+1)*n*n*16));im.convert(Image.FORMAT_RGBAH);slices.append(im)
+	_hdr=ImageTexture3D.new()
+	if _hdr.create(Image.FORMAT_RGBAH,n,n,n,false,slices)!=OK:error="HDR grading texture unsupported";return false
+	return true
+func _bind_field(texture:ImageTexture)->void:
+	var strict=owner_graphics.strict_match;strict.field_texture=texture;strict.trees.set_field(texture)
+	for row:Dictionary in owner_graphics.pairs:row.candidate.set_shader_parameter("gaf_indirect_field",texture)
+func _begin()->bool:
+	var paths:=_paths();var support:Dictionary=Policy.evaluate({"editor":OS.has_feature("editor"),"renderer":RenderingServer.get_current_rendering_method(),"metadata_available":_available(paths),"reference_requested":quality==1})
+	if not support.allowed:error=support.reason;return false
+	var profile:Variant=JSON.parse_string(FileAccess.get_file_as_string(paths.hdr));var meta:Variant=JSON.parse_string(FileAccess.get_file_as_string(paths.parameters))
+	if not profile is Dictionary or not meta is Dictionary or not meta.get("paths",null)is Dictionary:error="Invalid external exposure configuration";return false
+	for value:Variant in meta.paths.values():
+		var rows:Array=value if value is Array else[value]
+		for row:Variant in rows:
+			if not row is Dictionary or not lab.private_bundle.permitted(str(row.get("path",""))):error="Captured buffers must remain private and outside the project";return false
+	var unit:Dictionary=meta.get("unit_contract",{});var gain:float=float(unit.get("existing_grade_exposed_gain",unit.get("grade_gain",0.)))
+	if gain<=0. or gain!=float(profile.get("exposure_adapter",-1.)):error="Metering/grade units do not match";return false
+	if not _load_hdr(profile):return false
+	effect=Effect.new()
+	if not effect.configure_external(paths.parameters):error=effect.snapshot().error;effect=null;return false
+	effect.enabled=false
+	var strict=owner_graphics.strict_match
+	_saved={"cycle":owner_graphics.cycle_position,"auto":owner_graphics.cycle_auto,"candidate":owner_graphics.candidate,"stage":strict.stage,"comparison_camera":owner_graphics.comparison_camera}
+	_changing=true;owner_graphics.seek_cycle(.15,true);strict.stage=int(strict.data.stage);owner_graphics.set_candidate(true);owner_graphics.set_comparison_camera(true);lab._update_camera();_changing=false
+	_saved.field=strict.field_texture;_saved.ratio=float(strict.data.get("occlusion_exposure_ratio",1.));_saved.compositor=lab.camera.compositor;_saved.hdr=lab.get_viewport().use_hdr_2d;_saved.environment={}
+	var env:Environment=lab.md2_lighting.environment
+	for key:String in ["tonemap_mode","tonemap_exposure","adjustment_enabled","adjustment_brightness","adjustment_contrast","adjustment_saturation","adjustment_color_correction"]:_saved.environment[key]=env.get(key)
+	strict.data.occlusion_exposure_ratio=1.;strict._build_field();_field=strict.field_texture;strict.data.occlusion_exposure_ratio=_saved.ratio;_bind_field(_saved.field)
+	lab.get_viewport().use_hdr_2d=true;env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=true;env.adjustment_brightness=GradeDomain.ui_brightness(2.);env.adjustment_contrast=GradeDomain.sampling_contrast(64);env.adjustment_saturation=1.;env.adjustment_color_correction=_hdr
+	_compositor=Compositor.new();var active:Array[CompositorEffect]=[]
+	if _saved.compositor!=null:
+		for e:CompositorEffect in _saved.compositor.compositor_effects:active.append(e)
+	active.append(effect);_compositor.compositor_effects=active;lab.camera.compositor=_compositor
+	return true
+func select_mode(value:int)->bool:
+	if _released or value not in [0,1,2,3]:return false
+	error=""
+	if value==0:deactivate(true);return true
+	quality=1;_quality.select(1)
+	if _saved.is_empty()and not _begin():_refresh();return false
+	mode=value;effect.set_neutral(value==3);effect.enabled=value in [2,3]
+	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
+	_bind_field(_field if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
+func before_environment_change()->void:
+	if not _changing and not _saved.is_empty():deactivate(false)
+func deactivate(restore_owner:bool)->void:
+	if _saved.is_empty():mode=0;_refresh();return
+	_changing=true
+	if effect!=null:effect.enabled=false
+	lab.camera.compositor=_saved.compositor
+	if effect!=null:RenderingServer.call_on_render_thread(effect.release_on_render_thread)
+	var strict=owner_graphics.strict_match;strict.data.occlusion_exposure_ratio=_saved.ratio;_bind_field(_saved.field)
+	var env:Environment=lab.md2_lighting.environment
+	for key:String in _saved.environment:env.set(key,_saved.environment[key])
+	lab.get_viewport().use_hdr_2d=_saved.hdr
+	if restore_owner:
+		strict.stage=int(_saved.stage);owner_graphics.seek_cycle(float(_saved.cycle),true);owner_graphics.set_candidate(bool(_saved.candidate));owner_graphics.set_comparison_camera(bool(_saved.comparison_camera));owner_graphics.set_cycle_enabled(bool(_saved.auto));lab._update_camera()
+	_saved.clear();_field=null;_hdr=null;effect=null;_compositor=null;mode=0;_changing=false;_refresh()
+func input(event:InputEvent)->bool:
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_F7:
+		select_mode(1 if mode==2 else 2);return true
+	return false
+func _process(delta:float)->void:
+	if _released:return
+	_elapsed+=delta
+	if _elapsed<.25:return
+	_elapsed=0.
+	if effect!=null:
+		var s:Dictionary=effect.snapshot()
+		if not s.error.is_empty():error=s.error;deactivate(true)
+	_refresh()
+func snapshot()->Dictionary:
+	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"restorable_session":not _saved.is_empty()}
+func _build_ui()->void:
+	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,125);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
+	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.045,.94);style.content_margin_left=10;style.content_margin_right=10;style.content_margin_top=8;style.content_margin_bottom=8;style.set_corner_radius_all(6);_panel.add_theme_stylebox_override("panel",style)
+	var box:=VBoxContainer.new();_panel.add_child(box);var title:=Label.new();title.text="LOCAL EXPOSURE - DAY REFERENCE";title.add_theme_font_size_override("font_size",12);box.add_child(title)
+	_quality=OptionButton.new();_quality.add_theme_font_size_override("font_size",12);_quality.add_item("Auto / low device: original");_quality.add_item("Reference: experimental");_quality.focus_mode=Control.FOCUS_NONE;_quality.item_selected.connect(func(index:int):quality=index;if index==0:deactivate(true));box.add_child(_quality)
+	var row:=HBoxContainer.new();box.add_child(row)
+	for index in 4:
+		var b:=Button.new();b.text=["Original","HDR baseline","LE on","Neutral"][index];b.toggle_mode=true;b.focus_mode=Control.FOCUS_NONE;b.add_theme_font_size_override("font_size",11);b.pressed.connect(func():select_mode(index));row.add_child(b);_buttons.append(b)
+	_status=Label.new();_status.add_theme_font_size_override("font_size",10);box.add_child(_status)
+func _refresh()->void:
+	if _status==null:return
+	for i in _buttons.size():_buttons[i].button_pressed=i==mode
+	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
+	_status.tooltip_text="Reference uses fixed1024x576work, preserved1.35grade calibration and source-backedDaycontrast. Original restores prior graphics/cycle. Auto retains baseline; phone performance unverified."
+func release()->void:
+	if _released:return
+	deactivate(false);_released=true;set_process(false)
+func _exit_tree()->void:release()

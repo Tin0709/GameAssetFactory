@@ -1,0 +1,12 @@
+{
+  "schema": "gaf_original_local_exposure_kernels_v1",
+  "files": {
+    "blur.frag.glslinc": "88e78a539dc62980ace5eddfec015bb4010f2da3e3956f38b672ce37f57e045d",
+    "blur.vert.glslinc": "c0025cc4f3ebb6d448fa64978823821ae74d57f1b929797f613ae0f6c996b414",
+    "downsample.frag.glslinc": "7f97ff73f3d883d4fe55fc9fc3207e49166d71d9ce2aba4724cc3069298ef356",
+    "fullscreen.vert.glslinc": "0af747a9f7b01e64f5b498a223f9ca936d2b64879899350fcc018c9d9ea70920",
+    "grid.comp.glslinc": "8a21c62f68335a6315e459e5098ab76eb2010b9ef300af972bbc00bc9b62844d",
+    "log.comp.glslinc": "51c8369df477229eddaa5f5a8fc6c0cfc172e7bb7a3f2805b1aafb008dcb705e"
+  },
+  "provenance": "Independently authored mathematical kernels; no native DXIL, game shader source, textures or reference buffers included."
+}
