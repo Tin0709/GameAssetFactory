@@ -198,7 +198,7 @@ func material_identity()->Dictionary:
 	return result
 func snapshot()->Dictionary:
 	return {"available":available,"candidate":candidate,"matched_camera":candidate or comparison_camera,"profile":profile.profile_id,"phase":phase,"local_overrides":local_overrides.size(),
-		"device_tiers":profile.device_tiers.keys(),"phone_benchmarked":false,"indirect_kind":"Original196x196 spatial diffuse-color gather; not native Lumen","cycle_auto":cycle_auto,"cycle_position":cycle_position,"cycle_preview_seconds":cycle_seconds,"cycle_native_timing":false,"surface_count":surfaces.size(),"error":error}
+		"device_tiers":profile.device_tiers.keys(),"phone_benchmarked":false,"indirect_kind":"Original196x196 spatial diffuse-color gather; not native Lumen","cycle_auto":cycle_auto,"cycle_position":cycle_position,"cycle_preview_seconds":cycle_seconds,"cycle_native_timing":false,"surface_count":surfaces.size(),"error":error,"local_exposure":{}if local_exposure==null else local_exposure.snapshot()}
 func input(event:InputEvent)->bool:
 	if local_exposure!=null and local_exposure.input(event):return true
 	if event is InputEventKey and event.pressed and not event.echo:
