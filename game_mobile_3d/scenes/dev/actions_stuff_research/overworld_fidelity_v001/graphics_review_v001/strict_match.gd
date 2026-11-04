@@ -1,6 +1,7 @@
 extends Node
 ## One private static Day comparison. No source asset or calibration is embedded.
 const Trees=preload("private_trees.gd")
+const FieldEndpoints=preload("field_endpoints.gd")
 const GradeDomain=preload("grade_domain.gd")
 const WindBounds=preload("wind_bounds.gd")
 var trees:Node3D
@@ -12,6 +13,8 @@ var player_light:OmniLight3D
 var vignette_layer:CanvasLayer
 var noise_texture:ImageTexture
 var field_texture:ImageTexture
+var _source_companion:ImageTexture
+var _source_companion_base:ImageTexture
 var sun_saved:Dictionary={}
 var correction:ImageTexture3D
 var effect_error:=""
@@ -188,8 +191,10 @@ func _top_rect(asset:String)->Vector4:
 				if float(surface.normals[i*3+1])>.99:
 					var uv:=Vector2(surface.uv[i*2],surface.uv[i*2+1]);lo=lo.min(uv);hi=hi.max(uv)
 	return Vector4(lo.x,lo.y,hi.x,hi.y)
-func _build_field()->void:
+func _build_field(source_endpoints:bool=false,cache_companion:bool=false)->void:
+	clear_source_companion()
 	var image:=Image.create(196,196,false,Image.FORMAT_RGBAH)
+	var companion:Image=Image.create(196,196,false,Image.FORMAT_RGBAH)if cache_companion else null
 	var a:Array=data.incoming_open_linear;var b:Array=data.incoming_occluded_linear
 	var gain:Array=data.get("incoming_adapter_rgb",[1.,1.,1.])
 	var open:=Color(a[0]*gain[0],a[1]*gain[1],a[2]*gain[2]);var occluded:=Color(b[0]*gain[0],b[1]*gain[1],b[2]*gain[2])
@@ -202,17 +207,30 @@ func _build_field()->void:
 	# Original bounded visibility approximation from existing static geometry.
 	for y in 196:
 		for x in 196:
-			var point:=Vector2(x+.5,y+.5)*104./196.-Vector2(52,52);var visibility:=1.;var roof:=-1.
+			var point:=Vector2(x+.5,y+.5)*104./196.-Vector2(52,52);var visibility:=1.;var source_visibility:=1.;var roof:=-1.
 			for box:AABB in bounds:
 				var nearest:=point.clamp(Vector2(box.position.x,box.position.z),Vector2(box.end.x,box.end.z))
 				var distance:=point.distance_to(nearest)
 				if distance>1.4:continue
 				roof=maxf(roof,box.end.y)
-				visibility=minf(visibility,lerpf(.30,1.,smoothstep(0.,1.4,distance)))
+				# The source occluded endpoint already contains shaded light.
+				# Keep the legacy floor selectable; do not lift it a second time.
+				if cache_companion:
+					var edge:float=FieldEndpoints.source_weight(distance,1.4);source_visibility=minf(source_visibility,edge)
+					visibility=minf(visibility,edge if source_endpoints else lerpf(.30,1.,edge))
+				elif source_endpoints:visibility=minf(visibility,FieldEndpoints.source_weight(distance,1.4))
+				else:visibility=minf(visibility,lerpf(.30,1.,smoothstep(0.,1.4,distance)))
 			var shade_gain:float=float(data.get("occlusion_exposure_ratio",1.))
 			var value:Color=(occluded*shade_gain).lerp(open,visibility);value.a=roof
 			image.set_pixel(x,y,value)
+			if companion!=null:
+				var calibrated:Color=(occluded*shade_gain).lerp(open,source_visibility);calibrated.a=roof;companion.set_pixel(x,y,calibrated)
 	field_texture=ImageTexture.create_from_image(image)
+	if companion!=null:_source_companion=ImageTexture.create_from_image(companion);_source_companion_base=field_texture
+func source_companion_for(reference:ImageTexture)->ImageTexture:
+	return _source_companion if reference==_source_companion_base else null
+func clear_source_companion()->void:
+	_source_companion=null;_source_companion_base=null
 func per_frame()->void:
 	if available and enabled and stage>=3:
 		lab.md2_lighting.sun.light_energy=float(controller_owner.resolved.get("review_sun_energy",data.sun_energy))

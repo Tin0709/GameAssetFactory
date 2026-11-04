@@ -16,6 +16,11 @@ var _changing:=false
 var _released:=false
 var _elapsed:=0.
 var _hdr:ImageTexture3D
+var _covered_field:ImageTexture
+var _want_covered:=false
+var _covered_toggle:CheckBox
+var _covered_builds:=0
+var _covered_build_us:=0
 var _field:ImageTexture
 var _panel:PanelContainer
 var _directional=Directional.new()
@@ -73,7 +78,7 @@ func _begin()->bool:
 	_saved.field=strict.field_texture;_saved.ratio=float(strict.data.get("occlusion_exposure_ratio",1.));_saved.compositor=lab.camera.compositor;_saved.hdr=lab.get_viewport().use_hdr_2d;_saved.environment={}
 	var env:Environment=lab.md2_lighting.environment
 	for key:String in ["tonemap_mode","tonemap_exposure","adjustment_enabled","adjustment_brightness","adjustment_contrast","adjustment_saturation","adjustment_color_correction"]:_saved.environment[key]=env.get(key)
-	strict.data.occlusion_exposure_ratio=1.;strict._build_field();_field=strict.field_texture;strict.data.occlusion_exposure_ratio=_saved.ratio;_bind_field(_saved.field)
+	var field_started:=Time.get_ticks_usec();strict.data.occlusion_exposure_ratio=1.;strict._build_field(false,true);_field=strict.field_texture;_covered_field=strict.source_companion_for(_field);_covered_build_us=Time.get_ticks_usec()-field_started;_covered_builds+=1;strict.data.occlusion_exposure_ratio=_saved.ratio;_bind_field(_saved.field)
 	lab.get_viewport().use_hdr_2d=true;env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=true;env.adjustment_brightness=GradeDomain.ui_brightness(2.);env.adjustment_contrast=GradeDomain.sampling_contrast(64);env.adjustment_saturation=1.;env.adjustment_color_correction=_hdr
 	_compositor=Compositor.new();var active:Array[CompositorEffect]=[]
 	if _saved.compositor!=null:
@@ -88,7 +93,7 @@ func select_mode(value:int)->bool:
 	if _saved.is_empty()and not _begin():_refresh();return false
 	mode=value;_directional.apply(value==2 and _want_directional);effect.set_neutral(value==3);effect.enabled=value in [2,3]
 	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
-	_bind_field(_field if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
+	_bind_field((_covered_field if _want_covered else _field)if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
 func set_bloom_enabled(value:bool)->bool:
 	if not value:
 		_want_bloom=false
@@ -113,11 +118,25 @@ func set_directional_enabled(value:bool)->bool:
 	if path.is_empty():path=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/day_light_components_v001/directional_profile_v001/profile.private.json"
 	if not _directional.configure_external(path):error=_directional.error;_refresh();return false
 	_want_directional=true;_directional.apply(true);error="";_refresh();return true
+func set_covered_fill_enabled(value:bool)->bool:
+	if not value:
+		_want_covered=false
+		if mode==2:_bind_field(_field)
+		_refresh();return true
+	if mode!=2 and not select_mode(2):return false
+	if _covered_field==null:
+		var strict=owner_graphics.strict_match;var previous:ImageTexture=strict.field_texture;var ratio:float=float(strict.data.get("occlusion_exposure_ratio",1.));var started:=Time.get_ticks_usec()
+		strict.data.occlusion_exposure_ratio=1.;strict._build_field(true);_covered_field=strict.field_texture;strict.data.occlusion_exposure_ratio=ratio;_bind_field(previous)
+		_covered_build_us=Time.get_ticks_usec()-started;_covered_builds+=1
+		if _covered_field==null:error="Covered-field allocation failed";_refresh();return false
+	_want_covered=true;_bind_field(_covered_field);error="";_refresh();return true
 func before_environment_change()->void:
 	if not _changing and not _saved.is_empty():deactivate(false)
 func deactivate(restore_owner:bool)->void:
+	if owner_graphics!=null and owner_graphics.strict_match!=null:owner_graphics.strict_match.clear_source_companion()
+	_want_covered=false
 	_want_directional=false;_directional.apply(false)
-	if _saved.is_empty():_want_bloom=false;mode=0;_refresh();return
+	if _saved.is_empty():_covered_field=null;_want_bloom=false;mode=0;_refresh();return
 	_changing=true
 	if effect!=null:effect.enabled=false
 	lab.camera.compositor=_saved.compositor
@@ -128,7 +147,7 @@ func deactivate(restore_owner:bool)->void:
 	lab.get_viewport().use_hdr_2d=_saved.hdr
 	if restore_owner:
 		strict.stage=int(_saved.stage);owner_graphics.seek_cycle(float(_saved.cycle),true);owner_graphics.set_candidate(bool(_saved.candidate));owner_graphics.set_comparison_camera(bool(_saved.comparison_camera));owner_graphics.set_cycle_enabled(bool(_saved.auto));lab._update_camera()
-	_want_bloom=false;_saved.clear();_field=null;_hdr=null;effect=null;_compositor=null;mode=0;_changing=false;_refresh()
+	_want_bloom=false;_saved.clear();_covered_field=null;_field=null;_hdr=null;effect=null;_compositor=null;mode=0;_changing=false;_refresh()
 func input(event:InputEvent)->bool:
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_F7:
 		select_mode(1 if mode==2 else 2);return true
@@ -143,9 +162,9 @@ func _process(delta:float)->void:
 		if not s.error.is_empty():error=s.error;deactivate(true)
 	_refresh()
 func snapshot()->Dictionary:
-	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"directional_fill":_directional.snapshot(),"restorable_session":not _saved.is_empty()}
+	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"directional_fill":_directional.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
 func _build_ui()->void:
-	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,180);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
+	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,205);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.045,.94);style.content_margin_left=10;style.content_margin_right=10;style.content_margin_top=8;style.content_margin_bottom=8;style.set_corner_radius_all(6);_panel.add_theme_stylebox_override("panel",style)
 	var box:=VBoxContainer.new();_panel.add_child(box);var title:=Label.new();title.text="LOCAL EXPOSURE - DAY REFERENCE";title.add_theme_font_size_override("font_size",12);box.add_child(title)
 	_quality=OptionButton.new();_quality.add_theme_font_size_override("font_size",12);_quality.add_item("Auto / low device: original");_quality.add_item("Reference: experimental");_quality.focus_mode=Control.FOCUS_NONE;_quality.item_selected.connect(func(index:int):quality=index;if index==0:deactivate(true));box.add_child(_quality)
@@ -154,11 +173,13 @@ func _build_ui()->void:
 		var b:=Button.new();b.text=["Original","HDR baseline","LE on","Neutral"][index];b.toggle_mode=true;b.focus_mode=Control.FOCUS_NONE;b.add_theme_font_size_override("font_size",11);b.pressed.connect(func():select_mode(index));row.add_child(b);_buttons.append(b)
 	_bloom_toggle=CheckBox.new();_bloom_toggle.text="Source bloom - experimental Day";_bloom_toggle.add_theme_font_size_override("font_size",11);_bloom_toggle.focus_mode=Control.FOCUS_NONE;_bloom_toggle.toggled.connect(set_bloom_enabled);box.add_child(_bloom_toggle)
 	_directional_toggle=CheckBox.new();_directional_toggle.text="Directional fill - single-probe reference";_directional_toggle.add_theme_font_size_override("font_size",11);_directional_toggle.focus_mode=Control.FOCUS_NONE;_directional_toggle.toggled.connect(set_directional_enabled);_directional_toggle.tooltip_text="Normal-dependent SH calibration; spatial field and foliage back GI remain approximate.";box.add_child(_directional_toggle)
+	_covered_toggle=CheckBox.new();_covered_toggle.text="Covered fill - preserve source endpoints";_covered_toggle.add_theme_font_size_override("font_size",11);_covered_toggle.focus_mode=Control.FOCUS_NONE;_covered_toggle.toggled.connect(set_covered_fill_enabled);_covered_toggle.tooltip_text="Two source-lit endpoints, unchanged original AABB/reach/height geometry; not native AO.";box.add_child(_covered_toggle)
 	_status=Label.new();_status.add_theme_font_size_override("font_size",10);box.add_child(_status)
 func _refresh()->void:
 	if _status==null:return
 	_bloom_toggle.set_pressed_no_signal(_want_bloom)
 	_directional_toggle.set_pressed_no_signal(_want_directional)
+	_covered_toggle.set_pressed_no_signal(_want_covered)
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"
