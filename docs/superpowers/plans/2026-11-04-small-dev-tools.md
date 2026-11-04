@@ -14,16 +14,19 @@
 
 ## Task 1 — Blender viewer discovery
 
-- [ ] Add failing CLI tests for a `viewers` JSON catalog: every existing alias, source path, `ready` / `missing` / `lfs_pointer` / `unreadable` discovery status; no tool lookup or launch.
-- [ ] Implement bounded file-header inspection, preserving compressed-file support. File discovery is not validation that Blender can open the file.
-- [ ] Run launcher regressions and document the command in the root README.
+- [x] Add failing CLI tests for a `viewers` JSON catalog: every existing alias, source path, `ready` / `missing` / `lfs_pointer` / `unreadable` discovery status; no tool lookup or launch.
+- [x] Implement bounded file-header inspection, preserving compressed-file support. File discovery is not validation that Blender can open the file.
+- [x] Run launcher regressions and document the command in the root README.
 
 ## Task 2 — Quiet automated launches
 
-- [ ] Add failing tests for Dummy audio on headless launches only.
-- [ ] Add the process-only audio override; keep interactive commands unchanged.
+- [x] Add failing tests for Dummy audio on headless launches only.
+- [x] Add the process-only audio override; keep interactive commands unchanged.
 - [ ] Run focused tests and CLI smokes, inspect diff, then commit/push only these original tooling changes under repository policy.
 
 ## Execution ledger
 
 - Initial state: main at 9e5608f4, clean checkout; usage 3% used / 97% remaining. No engine process will be started by catalog tests.
+- Task 1 RED: the two catalog CLI tests rejected the missing `viewers` command. GREEN: catalog plus existing launcher suite, 28 tests passed. Local discovery found six readable non-pointer files; contents were not opened in Blender.
+- Task 2 RED: headless command lacked `--audio-driver`. GREEN: 31 focused launcher/catalog/Windows-wrapper tests passed. Both headless and normal dry runs inspected; only headless includes Dummy.
+- Existing user checkpoint manager automatically committed the incremental files while work continued. Preserve those commits; no history rewriting. Full scripts suite running before final synchronization.
