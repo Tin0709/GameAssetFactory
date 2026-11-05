@@ -15,17 +15,17 @@ static func build(rocks: Array[Node], trunks: Array[StaticBody3D]) -> ImageTextu
 		for child: Node in body.get_children():
 			if child is CollisionShape3D and not child.disabled and child.shape is ConcavePolygonShape3D:
 				var base := _rock_footprint(child.shape.get_faces(), child.global_transform)
-				_stamp(field, base, 0.95, 1.0)
+				_stamp(field, base, 0.95)
 	for body: StaticBody3D in trunks:
 		for child: Node in body.get_children():
 			if not child is CollisionShape3D or child.disabled or not child.shape is CylinderShape3D:
 				continue
 			var base := PackedVector2Array()
 			for i in 12:
-				var point := Vector2.from_angle(TAU * i / 12.) * child.shape.radius
+				var point: Vector2 = Vector2.from_angle(TAU * i / 12.) * child.shape.radius
 				var world: Vector3 = child.global_transform * Vector3(point.x, -0.5 * child.shape.height, point.y)
 				base.append(Vector2(world.x, world.z))
-			_stamp(field, base, 0.85, 1.0)
+			_stamp(field, base, 0.85)
 	return ImageTexture.create_from_image(field)
 
 static func _rock_footprint(faces: PackedVector3Array, transform: Transform3D) -> PackedVector2Array:
@@ -48,7 +48,7 @@ static func _rock_footprint(faces: PackedVector3Array, transform: Transform3D) -
 		hull.remove_at(hull.size() - 1)
 	return hull
 
-static func _stamp(field: Image, footprint: PackedVector2Array, reach: float, strength: float) -> void:
+static func _stamp(field: Image, footprint: PackedVector2Array, reach: float) -> void:
 	if footprint.size() < 3:
 		return
 	var bounds := Rect2(footprint[0], Vector2.ZERO)
@@ -66,6 +66,6 @@ static func _stamp(field: Image, footprint: PackedVector2Array, reach: float, st
 				for i in footprint.size():
 					var nearest := Geometry2D.get_closest_point_to_segment(world, footprint[i], footprint[(i + 1) % footprint.size()])
 					distance = minf(distance, world.distance_to(nearest))
-			var occlusion := strength * (1.0 - smoothstep(0.0, reach, distance))
+			var occlusion := 1.0 - smoothstep(0.0, reach, distance)
 			if occlusion > field.get_pixel(x, y).r:
 				field.set_pixel(x, y, Color(occlusion, 0., 0.))
