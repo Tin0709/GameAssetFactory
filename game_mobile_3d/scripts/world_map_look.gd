@@ -45,6 +45,8 @@ var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
 var _pockets_requested:=false
 var _atmosphere_requested := false
+var _atmosphere_environment: Environment
+var _atmosphere_previous: Dictionary = {}
 var _exposure_requested := false
 var _exposure_effect: CompositorEffect
 var _exposure_compositor: Compositor
@@ -400,16 +402,28 @@ func set_atmosphere_review(enabled: bool) -> void:
 	refresh_atmosphere()
 
 func refresh_atmosphere() -> void:
-	if stage != 2: return
 	var environment: Environment = level.get_node("WorldEnvironment").environment
 	var active_review := atmosphere_review_active()
+	if not active_review or environment != _atmosphere_environment:
+		_restore_atmosphere()
+	if not active_review: return
+	if _atmosphere_environment == null:
+		_atmosphere_environment = environment
+		_atmosphere_previous["background_color"] = environment.background_color
+		for property: String in ATMOSPHERE_FOG:
+			_atmosphere_previous[property] = environment.get(property)
 	for property: String in ATMOSPHERE_FOG:
-		environment.set(property, ATMOSPHERE_FOG[property] if active_review else PRESET.environment.get(property))
-	environment.background_color = PRESET.environment.background_color
-	if active_review:
-		# Mobile's fog-only sky draw and no-fog clear use different color encodings.
-		# Keep the reviewed backdrop visually stable when H isolates the haze.
-		environment.background_color = ATMOSPHERE_BACKDROP if environment.fog_enabled else ATMOSPHERE_BACKDROP.srgb_to_linear()
+		environment.set(property, ATMOSPHERE_FOG[property])
+	# Mobile's fog-only sky draw and no-fog clear use different color encodings.
+	# Keep the reviewed backdrop visually stable when H isolates the haze.
+	environment.background_color = ATMOSPHERE_BACKDROP if environment.fog_enabled else ATMOSPHERE_BACKDROP.srgb_to_linear()
+
+func _restore_atmosphere() -> void:
+	if _atmosphere_environment == null: return
+	for property: String in _atmosphere_previous:
+		_atmosphere_environment.set(property, _atmosphere_previous[property])
+	_atmosphere_previous.clear()
+	_atmosphere_environment = null
 
 func local_exposure_available() -> bool:
 	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
@@ -530,6 +544,7 @@ func freeze_motion(time: float=0.0) -> void:
 		material.set_shader_parameter("player_position",level.player.position)
 
 func _exit_tree() -> void:
+	_restore_atmosphere()
 	_release_local_exposure()
 	RenderingServer.directional_shadow_atlas_set_size(saved_shadow_size,saved_shadow_16bit)
 	RenderingServer.directional_soft_shadow_filter_set_quality(saved_shadow_quality as RenderingServer.ShadowQuality)
