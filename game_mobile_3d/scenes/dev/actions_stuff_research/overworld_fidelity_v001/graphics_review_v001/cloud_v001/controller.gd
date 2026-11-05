@@ -14,7 +14,7 @@ static func supported() -> bool:
 	return OS.has_feature("editor") and OS.get_environment("GAF_CLOUD_REVIEW") == "1" and RenderingServer.get_current_rendering_method() == "mobile"
 
 static func review_shader(original: Shader) -> Shader:
-	if not supported():
+	if not renderer_supported():
 		return original
 	return VEGETATION if original.resource_path.ends_with("foundation_vegetation.gdshader") else SOLID
 

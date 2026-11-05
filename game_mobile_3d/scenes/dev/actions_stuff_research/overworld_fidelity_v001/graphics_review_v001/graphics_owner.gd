@@ -23,6 +23,8 @@ var local_overrides:Array=[]
 var candidate:=false
 var comparison_camera:=false
 var released:=false
+var day_composition_requested:=false
+var day_composition_toggle:CheckButton
 var available:=false
 var error:=""
 var surfaces:Array[Dictionary]=[]
@@ -116,6 +118,15 @@ func setup(scene:Node3D)->void:
 		contact_toggle.toggled.connect(strict_match.set_ground_contact_enabled)
 		graphics_panel.get_child(0).add_child(contact_toggle)
 		graphics_panel.position.y-=35.
+		if CloudReview.renderer_supported():
+			day_composition_toggle=CheckButton.new()
+			day_composition_toggle.name="DayCompositionToggle"
+			day_composition_toggle.text="Day lighting - warm sun and cloud"
+			day_composition_toggle.tooltip_text="F8 toggles the art-directed noon look. Pick Day and turn off Auto to preview."
+			day_composition_toggle.focus_mode=Control.FOCUS_NONE
+			day_composition_toggle.toggled.connect(set_day_composition)
+			graphics_panel.get_child(0).add_child(day_composition_toggle)
+			graphics_panel.position.y-=35.
 	local_exposure=LocalExposure.new();local_exposure.name="LocalExposure";add_child(local_exposure);local_exposure.setup(self)
 func _process(_delta:float)->void:
 	if not available or released:return
@@ -220,6 +231,9 @@ func snapshot()->Dictionary:
 func input(event:InputEvent)->bool:
 	if local_exposure!=null and local_exposure.input(event):return true
 	if event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode==KEY_F8 and day_composition_toggle!=null:
+			set_day_composition(not day_composition_requested)
+			return true
 		if event.physical_keycode==KEY_F9:
 			if strict_match!=null and strict_match.available:
 				strict_match.stage=0 if strict_match.stage>0 else int(strict_match.data.stage);set_candidate(true)
