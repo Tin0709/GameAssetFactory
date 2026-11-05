@@ -99,6 +99,15 @@ func setup(scene:Node3D)->void:
 			toggle.tooltip_text="Captured background wind math; simulation-second clock verified across10 PIX frames. Pause/time dilation unverified. Existing contact bend is retained."
 			toggle.button_pressed=bool(strict_match.data.background_wind.get("enabled",false));toggle.toggled.connect(strict_match.set_background_wind_enabled)
 			var panel:PanelContainer=ui.get_child(0);var box:VBoxContainer=panel.get_child(0);box.add_child(toggle);panel.position.y-=35.
+		var path_toggle:=CheckButton.new()
+		path_toggle.name="TerrainPathBlendToggle"
+		path_toggle.text="Grass / dirt path edges"
+		path_toggle.tooltip_text="Experimental world-space blend on terrain tops. Uses the existing atlas and terrain layout."
+		path_toggle.focus_mode=Control.FOCUS_NONE
+		path_toggle.toggled.connect(strict_match.set_path_blend_enabled)
+		var graphics_panel:PanelContainer=ui.get_child(0)
+		graphics_panel.get_child(0).add_child(path_toggle)
+		graphics_panel.position.y-=35.
 	local_exposure=LocalExposure.new();local_exposure.name="LocalExposure";add_child(local_exposure);local_exposure.setup(self)
 func _process(_delta:float)->void:
 	if not available or released:return

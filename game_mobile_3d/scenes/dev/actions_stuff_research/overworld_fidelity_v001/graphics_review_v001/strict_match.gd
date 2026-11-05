@@ -20,6 +20,8 @@ var sun_saved:Dictionary={}
 var correction:ImageTexture3D
 var effect_error:=""
 var enabled:=true
+var path_blend_requested:=false
+var path_grass_rects:Array[Vector4]=[]
 var available:=false
 var stage:=0
 var wind_bounds:Array[Dictionary]=[]
@@ -88,6 +90,7 @@ func setup(controller:Node)->void:
 	profile_digest.start(HashingContext.HASH_SHA256)
 	profile_digest.update(profile_bytes)
 	profile_sha256=profile_digest.finish().hex_encode()
+	path_grass_rects=[_top_rect("MD2 RECON | Grass block 1"),_top_rect("MD2 RECON | Grass block 2")]
 	available=true;apply()
 func apply()->void:
 	if controller_owner!=null and controller_owner.has_method("_before_graphics_change"):controller_owner._before_graphics_change()
@@ -145,6 +148,7 @@ func apply()->void:
 			row.candidate.set_shader_parameter("review_source_rects",rects)
 			var v:Array=data.path_target_rect;row.candidate.set_shader_parameter("review_target_rect",Vector4(v[0],v[1],v[2],v[3]))
 			row.candidate.set_shader_parameter("review_emissive_gain",30. if enabled and stage>=2 and row.original.get_meta("source_material","")=="MI_MasterTerrain_Opaque_Overworld"else 1.)
+	_apply_path_blend()
 	_set_wind_bounds(enabled and stage>=6 and data.has("background_wind")and bool(data.background_wind.get("enabled",false)))
 	for key:String in saved:
 		if key not in ["compositor","aa","msaa","hdr_2d"]:env.set(key,saved[key])
@@ -169,6 +173,25 @@ func apply()->void:
 	else:
 		lab.get_viewport().use_hdr_2d=saved.hdr_2d
 		lab.camera.compositor=saved.compositor;lab.get_viewport().screen_space_aa=saved.aa;lab.get_viewport().msaa_3d=saved.msaa
+func path_blend_active()->bool:
+	if not (available and enabled and stage>=2 and path_blend_requested):
+		return false
+	for rect:Vector4 in path_grass_rects:
+		if rect.z<=rect.x or rect.w<=rect.y:return false
+	return path_grass_rects.size()==2
+
+func set_path_blend_enabled(value:bool)->void:
+	path_blend_requested=value
+	_apply_path_blend()
+
+func _apply_path_blend()->void:
+	var active:=path_blend_active()
+	for row:Dictionary in controller_owner.pairs:
+		if row.plant or row.original.get_meta("source_material","")!="MI_MasterTerrain_Opaque_Overworld":
+			continue
+		row.candidate.set_shader_parameter("review_path_blend",active)
+		if active:
+			row.candidate.set_shader_parameter("review_grass_rects",path_grass_rects)
 func _build_vignette()->void:
 	vignette_layer=CanvasLayer.new();vignette_layer.name="StrictDayPresentation";vignette_layer.layer=-5;add_child(vignette_layer)
 	var rectangle:=ColorRect.new();rectangle.mouse_filter=Control.MOUSE_FILTER_IGNORE;rectangle.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);vignette_layer.add_child(rectangle)
