@@ -1,4 +1,3 @@
-shader_type spatial;
 render_mode cull_disabled, diffuse_burley, ambient_light_disabled;
 #include "vegetation_material_math.gdshaderinc"
 #include "height_fill.gdshaderinc"
@@ -116,14 +115,6 @@ void vertex(){
  gaf_upward=clamp((MODEL_NORMAL_MATRIX*NORMAL).y,0.0,1.0);
 }
 void fragment(){
-#ifdef GAF_CLOUD_PROJECTOR
-	// Ambient is disabled here. Mobile applies this AO to direct diffuse and
-	// specular, while the existing indirect term is supplied through EMISSION.
-	if(gaf_cloud_strength>0.0){
-		AO=gaf_cloud_at((INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xyz);
-		AO_LIGHT_AFFECT=1.0;
-	}
-#endif
 	vec4 texel=texture(atlas,UV);
 	vec3 color=texel.rgb;
 	vec3 scatter_color=color;
@@ -156,4 +147,12 @@ void fragment(){
   vec3 directional_term=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,fill_upward)*(1.0-METALLIC);
   EMISSION+=directional_term*(gaf_directional_factor(normal_y)-vec3(1.));
  }
+#ifdef GAF_CLOUD_PROJECTOR
+	// Ambient is disabled here. Mobile applies this AO to direct diffuse and
+	// specular, while the existing indirect term is supplied through EMISSION.
+	if(gaf_cloud_strength>0.0){
+		AO=gaf_cloud_at((INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xyz);
+		AO_LIGHT_AFFECT=1.0;
+	}
+#endif
 }
