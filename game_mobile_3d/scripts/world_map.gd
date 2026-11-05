@@ -64,7 +64,7 @@ func _ready() -> void:
 	add_child(look);look.setup(self)
 	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu · F4 nắng qua mây · F3 bóng mây chỉ chặn nắng · F2 bóng tiếp xúc dưới tán"
 	if RenderingServer.get_rendering_device()!=null:$HUD/Help.text+="\nF1 bóng nắng mềm"
-	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ"
+	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ · Shift+H chiều sâu không khí"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -185,6 +185,7 @@ func set_review_view(mode: String) -> void:
 		camera.rotation_degrees=Vector3(-90,0,0)
 		# Zero-length cutaway corridor restores native materials for overview.
 		geometry.update_cutaway(Vector3.ZERO,Vector3.ZERO)
+	if look != null:look.refresh_atmosphere()
 
 func update_status() -> void:
 	$HUD/Defeated.visible=player.is_dead
@@ -196,7 +197,14 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not map_ready:return
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.physical_keycode==KEY_H:$WorldEnvironment.environment.fog_enabled=not $WorldEnvironment.environment.fog_enabled
+		if event.physical_keycode == KEY_H:
+			if event.shift_pressed and look.atmosphere_review_available():
+				if look.stage == 2 and view_mode == "gameplay":
+					look.set_atmosphere_review(not look.atmosphere_review_active())
+			else:
+				$WorldEnvironment.environment.fog_enabled = not $WorldEnvironment.environment.fog_enabled
+				if look.atmosphere_review_active():look.refresh_atmosphere()
+			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_V:set_review_view("overview" if view_mode=="gameplay" else "gameplay")
 		if event.physical_keycode==KEY_B:set_reference_look(look.stage==0)
 		if event.physical_keycode==KEY_F7 and look.stage==2 and look.local_exposure_available():

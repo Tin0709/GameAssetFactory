@@ -7,6 +7,15 @@ const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
 const MOTION=preload("res://scripts/grassland_motion.gd")
 const REVIEW_SHADOW_BLUR := 1.08
 const REVIEW_SHADOW_NORMAL_BIAS := 0.76
+const ATMOSPHERE_FOG := {
+	"fog_depth_begin": 25.8,
+	"fog_depth_end": 43.0,
+	"fog_depth_curve": 1.45,
+	"fog_density": 0.26,
+	"fog_light_color": Color(0.64, 0.72, 0.73),
+	"fog_light_energy": 0.84,
+}
+const ATMOSPHERE_BACKDROP := Color(0.57, 0.68, 0.69)
 const BASE_CLOUD_SHAPE:=Vector4(13.,.50,.73,.20)
 const POCKET_CLOUD_SHAPE:=Vector4(1.35,.40,.65,.49)
 var level: Node3D
@@ -35,6 +44,7 @@ var cloud_texture: ImageTexture
 var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
 var _pockets_requested:=false
+var _atmosphere_requested := false
 var _exposure_requested := false
 var _exposure_effect: CompositorEffect
 var _exposure_compositor: Compositor
@@ -378,6 +388,29 @@ func publish_clouds(time: float) -> void:
 		var linear: Color=item[4].srgb_to_linear()
 		item[3].albedo_color=Color(linear.r*shade,linear.g*shade,linear.b*shade,linear.a).linear_to_srgb()
 
+func atmosphere_review_available() -> bool:
+	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
+
+func atmosphere_review_active() -> bool:
+	return stage == 2 and _atmosphere_requested and level.view_mode == "gameplay"
+
+func set_atmosphere_review(enabled: bool) -> void:
+	if enabled == _atmosphere_requested or (enabled and not atmosphere_review_available()): return
+	_atmosphere_requested = enabled
+	refresh_atmosphere()
+
+func refresh_atmosphere() -> void:
+	if stage != 2: return
+	var environment: Environment = level.get_node("WorldEnvironment").environment
+	var active_review := atmosphere_review_active()
+	for property: String in ATMOSPHERE_FOG:
+		environment.set(property, ATMOSPHERE_FOG[property] if active_review else PRESET.environment.get(property))
+	environment.background_color = PRESET.environment.background_color
+	if active_review:
+		# Mobile's fog-only sky draw and no-fog clear use different color encodings.
+		# Keep the reviewed backdrop visually stable when H isolates the haze.
+		environment.background_color = ATMOSPHERE_BACKDROP if environment.fog_enabled else ATMOSPHERE_BACKDROP.srgb_to_linear()
+
 func local_exposure_available() -> bool:
 	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
 
@@ -462,6 +495,7 @@ func set_stage(value: int) -> void:
 	for item: Array in plant_meshes:item[0].mesh=item[1] if stage==0 else item[2]
 	var environment: Environment=(PRESET.environment if stage==2 else baseline_environment).duplicate()
 	level.get_node("WorldEnvironment").environment=environment
+	refresh_atmosphere()
 	var sun: DirectionalLight3D=level.get_node("Sun")
 	for property: String in baseline_sun:sun.set(property,baseline_sun[property])
 	RenderingServer.directional_shadow_atlas_set_size(saved_shadow_size,saved_shadow_16bit)
