@@ -197,7 +197,7 @@ func _apply_path_blend()->void:
 		if active:
 			row.candidate.set_shader_parameter("review_grass_rects",path_grass_rects)
 func ground_contact_active()->bool:
-	return available and enabled and stage>=3 and ground_contact_requested and ground_contact_texture!=null
+	return available and enabled and stage>=6 and ground_contact_requested and ground_contact_texture!=null
 
 func set_ground_contact_enabled(value:bool)->void:
 	ground_contact_requested=value
