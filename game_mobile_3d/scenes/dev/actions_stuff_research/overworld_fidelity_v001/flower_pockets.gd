@@ -1,7 +1,7 @@
 extends RefCounted
 ## Original art-directed placement using the existing flower inventory.
 
-static func compose(roots:Array[Vector2],colors:PackedInt32Array,obstacles:Array[Rect2],path_center:Callable)->Array[Vector2]:
+static func compose(roots:Array[Vector2],colors:PackedInt32Array,obstacles:Array[Rect2],path_center:Callable,batch_size:float,map_half:float)->Array[Vector2]:
 	var occupied:Dictionary={}
 	for p:Vector2 in roots:
 		var cell:=Vector2i(p.floor())
@@ -14,36 +14,38 @@ static func compose(roots:Array[Vector2],colors:PackedInt32Array,obstacles:Array
 	noise.frequency=.105
 	noise.fractal_octaves=2
 	for i in roots.size():
-		var p:=roots[i]
-		var path_x:float=path_center.call(p.y)
-		var side:=signf(p.x-path_x)
-		var near:=1.-smoothstep(5.,10.,absf(p.x-path_x))
-		var e:=1.3
-		var gradient:=Vector2(noise.get_noise_2dv(p+Vector2(e,0))-noise.get_noise_2dv(p-Vector2(e,0)),
-				noise.get_noise_2dv(p+Vector2(0,e))-noise.get_noise_2dv(p-Vector2(0,e)))
+		var root:=roots[i]
+		var path_x:float=path_center.call(root.y)
+		var side:=signf(root.x-path_x)
+		var near_path:=1.-smoothstep(5.,10.,absf(root.x-path_x))
+		var sample_offset:=1.3
+		var gradient:=Vector2(noise.get_noise_2dv(root+Vector2(sample_offset,0))-noise.get_noise_2dv(root-Vector2(sample_offset,0)),
+				noise.get_noise_2dv(root+Vector2(0,sample_offset))-noise.get_noise_2dv(root-Vector2(0,sample_offset)))
 		var shift:=gradient*3.
 		var tint_phase:=float(colors[i])*.63
-		var around_bend:=sin(p.y*.31+side*1.55+tint_phase)
-		shift.x+=near*side*around_bend*.68
-		shift.y+=near*(sin(p.y*.33+side*1.8-tint_phase))*1.75
-		var bank_pocket:=smoothstep(-.1,.72,sin(p.y*.29+side*1.65))
-		var side_distance:=absf(p.x-path_x)
+		var around_bend:=sin(root.y*.31+side*1.55+tint_phase)
+		shift.x+=near_path*side*around_bend*.68
+		shift.y+=near_path*(sin(root.y*.33+side*1.8-tint_phase))*1.75
+		var bank_pocket:=smoothstep(-.1,.72,sin(root.y*.29+side*1.65))
+		var side_distance:=absf(root.x-path_x)
 		var toward_bank:=clampf(2.8-side_distance,-1.9,0.)
-		shift.x+=side*toward_bank*near*bank_pocket
-		shift.y+=near*bank_pocket*sin(p.y*.42+side)*.7
+		shift.x+=side*toward_bank*near_path*bank_pocket
+		shift.y+=near_path*bank_pocket*sin(root.y*.42+side)*.7
 		shift=shift.limit_length(2.7)
-		var first_cell:=Vector2i(p.floor())
-		occupied[first_cell].erase(p)
-		var next:=p
-		var grid:=((p+Vector2.ONE*16.)/16.).floor()*16.-Vector2.ONE*16.
+		var first_cell:=Vector2i(root.floor())
+		occupied[first_cell].erase(root)
+		var next:=root
+		var cell_origin:=(root/batch_size).floor()*batch_size
+		var min_bound:=(cell_origin+Vector2.ONE*.03).max(Vector2.ONE*(-map_half+1.))
+		var max_bound:=(cell_origin+Vector2.ONE*(batch_size-.03)).min(Vector2.ONE*(map_half-1.))
 		for attempt:int in 6:
-			var q:=p+shift*pow(.68,float(attempt))
-			if q.x<maxf(grid.x+.03,-49.) or q.x>minf(grid.x+15.97,49.) or q.y<maxf(grid.y+.03,-49.) or q.y>minf(grid.y+15.97,49.):continue
-			var distance:float=(q.x-float(path_center.call(q.y)))*side
+			var candidate:=root+shift*pow(.68,float(attempt))
+			if candidate!=candidate.clamp(min_bound,max_bound):continue
+			var distance:float=(candidate.x-float(path_center.call(candidate.y)))*side
 			if distance<1.83:continue
-			if _blocked(q,blockers):continue
-			if not _has_spacing(q,occupied):continue
-			next=q
+			if _blocked(candidate,blockers):continue
+			if not _has_spacing(candidate,occupied):continue
+			next=candidate
 			break
 		var final_cell:=Vector2i(next.floor())
 		if not occupied.has(final_cell):occupied[final_cell]=[]

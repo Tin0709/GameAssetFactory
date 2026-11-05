@@ -9,6 +9,7 @@ var interactions_enabled:=true
 var player:CharacterBody3D
 var bundle:RefCounted
 const MAP_EXTENT:=100.
+const BATCH_SIZE:=16.
 var interaction=Spring.new(MAP_EXTENT+4.)
 var clock:=0.
 var instance_count:=0
@@ -58,7 +59,7 @@ func _grass_top_uv()->Vector4:
 
 func _place(asset:String,position:Vector3,yaw:float=0.,scale_factor:float=1.,flower_index:int=-1)->void:
 	if not bundle.meshes.has(asset):push_error("Missing meadow species "+asset);return
-	var cell:=Vector2i(floori((position.x+16.)/16.),floori((position.z+16.)/16.))
+	var cell:=Vector2i((Vector2(position.x,position.z)/BATCH_SIZE).floor())+Vector2i.ONE
 	var key:=asset+"/"+str(cell)
 	if not _batches.has(key):_batches[key]={"asset":asset,"transforms":[],"phases":[]}
 	var t:=Transform3D(Basis(Vector3.UP,yaw).scaled(Vector3.ONE*scale_factor),position)
@@ -221,7 +222,7 @@ func _compose_flower_pockets(trunks:Array[StaticBody3D])->void:
 			var point:=world*local
 			bounds=bounds.expand(Vector2(point.x,point.z))
 		obstacles.append(bounds.grow(.18))
-	var positions:=FlowerPockets.compose(roots,palette,obstacles,path_center)
+	var positions:=FlowerPockets.compose(roots,palette,obstacles,path_center,BATCH_SIZE,MAP_EXTENT*.5)
 	for i in flower_order.size():_flower_composed[flower_order[i]]=positions[i]
 
 func _physics_process(delta:float)->void:
