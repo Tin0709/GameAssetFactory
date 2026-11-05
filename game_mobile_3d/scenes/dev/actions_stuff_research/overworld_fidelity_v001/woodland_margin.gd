@@ -15,7 +15,11 @@ func _build_border(roots:Array[Vector3])->void:
 	var field:=FastNoiseLite.new()
 	field.seed=360121
 	field.frequency=.17
-	for area:Rect2i in [Rect2i(-74,-74,126,24),Rect2i(-74,-50,24,102)]:
+	var banks:Array[Rect2i]=[]
+	for x in range(-74,52,28):banks.append(Rect2i(x,-74,mini(28,52-x),24))
+	for z in range(-50,52,26):banks.append(Rect2i(-74,z,24,mini(26,52-z)))
+	for area:Rect2i in banks:
+		var center:=Vector3(area.position.x+area.size.x*.5,0.,area.position.y+area.size.y*.5)
 		var tool:=SurfaceTool.new()
 		tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 		tool.set_material(material)
@@ -35,13 +39,16 @@ func _build_border(roots:Array[Vector3])->void:
 						var grain:=field.get_noise_2d(point.x,point.y)
 						var base:=Color("#648b44").lerp(Color("#4c6338"),smoothstep(0.,14.,depth))
 						base=base.lerp(Color("#92995d"),clampf(.15+grain*.31,0.,.39))
-						vertices[point]=position
+						vertices[point]=position-center
 						colors[point]=base.darkened(.27*shade).srgb_to_linear()
 					tool.set_color(colors[point])
 					tool.set_normal(Vector3.UP)
 					tool.add_vertex(vertices[point])
 		var bank:=MeshInstance3D.new()
 		bank.mesh=tool.commit()
+		bank.position=center
+		# Cap only distant bank tiles that would otherwise survive conservative frustum culling.
+		bank.visibility_range_end=74.
 		bank.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(bank)
 
