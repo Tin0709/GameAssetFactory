@@ -1,7 +1,9 @@
 shader_type spatial;
 render_mode diffuse_burley, ambient_light_disabled;
 #include "height_fill.gdshaderinc"
+#ifdef GAF_CLOUD_PROJECTOR
 #include "cloud_v001/cloud_projector.gdshaderinc"
+#endif
 #include "directional_fill_v001/directional_fill.gdshaderinc"
 #include "leaf_material_v001/leaf_material.gdshaderinc"
 uniform bool gaf_leaf_material_enabled=false;
@@ -40,12 +42,14 @@ void vertex(){
  gaf_upward=clamp((MODEL_NORMAL_MATRIX*NORMAL).y,0.0,1.0);
 }
 void fragment(){
+#ifdef GAF_CLOUD_PROJECTOR
 	// Ambient is disabled here. Mobile applies this AO to direct diffuse and
 	// specular, while the existing indirect term is supplied through EMISSION.
 	if(gaf_cloud_strength>0.0){
 		AO=gaf_cloud_at((INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xyz);
 		AO_LIGHT_AFFECT=1.0;
 	}
+#endif
 	vec2 lookup_uv=UV;
 	if(review_path && gaf_upward>.99){
 	 for(int i=0;i<3;i++){

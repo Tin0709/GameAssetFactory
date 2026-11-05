@@ -2,11 +2,12 @@ extends RefCounted
 ## Day-only attenuation for the two environment shaders with engine ambient disabled.
 
 const SIZE := 256
-const PARAMETERS := ["gaf_cloud_pattern", "gaf_cloud_phase", "gaf_cloud_strength"]
+const SOLID = preload("foundation_solid.gdshader")
+const VEGETATION = preload("foundation_vegetation.gdshader")
 
 var active := false
 var materials: Array[ShaderMaterial] = []
-var _saved: Array[Array] = []
+var _saved_shaders: Array[Shader] = []
 var _pattern: ImageTexture
 var _phase := Vector4.ZERO
 
@@ -36,10 +37,12 @@ func apply(graphics: Node, enabled: bool) -> void:
 		return
 	if not enabled:
 		for i in materials.size():
-			for j in PARAMETERS.size():
-				materials[i].set_shader_parameter(PARAMETERS[j], _saved[i][j])
+			materials[i].set_shader_parameter("gaf_cloud_pattern", null)
+			materials[i].set_shader_parameter("gaf_cloud_phase", null)
+			materials[i].set_shader_parameter("gaf_cloud_strength", null)
+			materials[i].shader = _saved_shaders[i]
 		materials.clear()
-		_saved.clear()
+		_saved_shaders.clear()
 		active = false
 		return
 	for row: Dictionary in graphics.pairs:
@@ -53,10 +56,8 @@ func apply(graphics: Node, enabled: bool) -> void:
 	if _pattern == null:
 		_pattern = _make_pattern()
 	for material: ShaderMaterial in materials:
-		var old_values := []
-		for parameter: String in PARAMETERS:
-			old_values.append(material.get_shader_parameter(parameter))
-		_saved.append(old_values)
+		_saved_shaders.append(material.shader)
+		material.shader = VEGETATION if material.shader.resource_path.ends_with("foundation_vegetation.gdshader") else SOLID
 		material.set_shader_parameter("gaf_cloud_pattern", _pattern)
 		material.set_shader_parameter("gaf_cloud_phase", _phase)
 		material.set_shader_parameter("gaf_cloud_strength", 1.0)
