@@ -1,7 +1,16 @@
 extends Node3D
 ## Original render-only scenery outside the meadow's two visible background edges.
 const GROUND=preload("woodland_ground.gdshader")
+const BANK_VIEW_DISTANCE:=74.
 const GROUND_TRIANGLES:=[Vector2i(0,0),Vector2i(2,0),Vector2i(2,2),Vector2i(0,0),Vector2i(2,2),Vector2i(0,2)]
+
+var _banks:Array[MeshInstance3D]=[]
+var _overview:=false
+
+func set_overview(value:bool)->void:
+	if value==_overview:return
+	_overview=value
+	for bank in _banks:bank.visibility_range_end=0. if value else BANK_VIEW_DISTANCE
 
 func build(path_center:Callable)->void:
 	var roots:=_build_forest()
@@ -16,8 +25,8 @@ func _build_border(roots:Array[Vector3])->void:
 	field.seed=360121
 	field.frequency=.17
 	var banks:Array[Rect2i]=[]
-	for x in range(-74,52,28):banks.append(Rect2i(x,-74,mini(28,52-x),24))
-	for z in range(-50,52,26):banks.append(Rect2i(-74,z,24,mini(26,52-z)))
+	for x in range(-74,52,42):banks.append(Rect2i(x,-74,mini(42,52-x),24))
+	for z in range(-50,52,34):banks.append(Rect2i(-74,z,24,mini(34,52-z)))
 	for area:Rect2i in banks:
 		var center:=Vector3(area.position.x+area.size.x*.5,0.,area.position.y+area.size.y*.5)
 		var tool:=SurfaceTool.new()
@@ -48,9 +57,10 @@ func _build_border(roots:Array[Vector3])->void:
 		bank.mesh=tool.commit()
 		bank.position=center
 		# Cap only distant bank tiles that would otherwise survive conservative frustum culling.
-		bank.visibility_range_end=74.
+		bank.visibility_range_end=BANK_VIEW_DISTANCE
 		bank.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(bank)
+		_banks.append(bank)
 
 func _border_height(at:Vector2)->float:
 	var depth:=maxf(-at.x-50.,-at.y-50.)

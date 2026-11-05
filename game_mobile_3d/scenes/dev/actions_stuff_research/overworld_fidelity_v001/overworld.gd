@@ -75,6 +75,7 @@ func _update_camera(delta:float=0.,render_position:Variant=null)->void:
 	super._update_camera(delta,render_position)
 	grass_field_blocks=original_blocks
 	if graphics_foundation!=null:graphics_foundation.apply_camera()
+	if woodland_margin!=null:woodland_margin.set_overview(grass_overview and camera.projection==Camera3D.PROJECTION_ORTHOGONAL)
 
 func _build_meadow_ui()->void:
 	var layer:=CanvasLayer.new();layer.name="OverworldControls";add_child(layer)
