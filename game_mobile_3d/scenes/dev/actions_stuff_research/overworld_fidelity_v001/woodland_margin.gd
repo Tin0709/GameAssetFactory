@@ -82,14 +82,15 @@ func _build_forest()->Array[Vector3]:
 			var v:=rng.randf_range(.88,1.)
 			pixel.set_pixel(x,y,Color(v,v,v))
 	leaves.albedo_texture=ImageTexture.create_from_image(pixel)
-	var tree_meshes:Array[Mesh]=[]
-	for kind in 3:tree_meshes.append(_make_tree(kind,leaves))
+	var crown_templates:Array[Array]=[]
+	for kind in 3:crown_templates.append(_make_tree(kind))
 	for side in 2:
 		for segment in 4:
-			var crowns:=SurfaceTool.new()
-			crowns.begin(Mesh.PRIMITIVE_TRIANGLES)
-			crowns.set_material(leaves)
-			var has_crowns:=false
+			var vertices:=PackedVector3Array()
+			var normals:=PackedVector3Array()
+			var colors:=PackedColorArray()
+			var uvs:=PackedVector2Array()
+			var indices:=PackedInt32Array()
 			var along:float=-37.5+25.*segment
 			var shifts:Array[Vector2]=[Vector2(-8.,3.2),Vector2(-3.2,6.9),Vector2(.85,2.4),Vector2(5.,8.8),Vector2(9.,3.9)]
 			for i in shifts.size():
@@ -103,19 +104,35 @@ func _build_forest()->Array[Vector3]:
 				roots.append(p)
 				var tree_scale:=rng.randf_range(.89,1.29) if i==1 or i==3 else rng.randf_range(.68,.98)
 				var rotation:=Basis(Vector3.UP,rng.randf_range(-.65,.65))
-				crowns.append_from(tree_meshes[variation],0,Transform3D(rotation.scaled(Vector3(tree_scale*.91,tree_scale,tree_scale*.91)),p))
-				has_crowns=true
-			if has_crowns:
+				var transform:=Transform3D(rotation.scaled(Vector3(tree_scale*.91,tree_scale,tree_scale*.91)),p)
+				# Keep the templates on the CPU so merging never reads meshes back from the renderer.
+				var source:=crown_templates[variation]
+				var vertex_offset:=vertices.size()
+				for v:Vector3 in source[Mesh.ARRAY_VERTEX]:vertices.append(transform*v)
+				for normal:Vector3 in source[Mesh.ARRAY_NORMAL]:normals.append(rotation*normal)
+				colors.append_array(source[Mesh.ARRAY_COLOR])
+				uvs.append_array(source[Mesh.ARRAY_TEX_UV])
+				for index:int in source[Mesh.ARRAY_INDEX]:indices.append(vertex_offset+index)
+			if not vertices.is_empty():
+				var arrays:Array=[]
+				arrays.resize(Mesh.ARRAY_MAX)
+				arrays[Mesh.ARRAY_VERTEX]=vertices
+				arrays[Mesh.ARRAY_NORMAL]=normals
+				arrays[Mesh.ARRAY_COLOR]=colors
+				arrays[Mesh.ARRAY_TEX_UV]=uvs
+				arrays[Mesh.ARRAY_INDEX]=indices
+				var mesh:=ArrayMesh.new()
+				mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
+				mesh.surface_set_material(0,leaves)
 				var group:=MeshInstance3D.new()
-				group.mesh=crowns.commit()
+				group.mesh=mesh
 				group.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 				add_child(group)
 	return roots
 
-func _make_tree(kind:int,material:Material)->ArrayMesh:
+func _make_tree(kind:int)->Array:
 	var tool:=SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
-	tool.set_material(material)
 	var bark:=Color("#796451")
 	var leaf:=Color("#729348") if kind==0 else (Color("#648640") if kind==1 else Color("#587b43"))
 	_append_box(tool,Vector3(0,.52,0),Vector3(.64,1.04,.64),bark.darkened(.30))
@@ -141,7 +158,7 @@ func _make_tree(kind:int,material:Material)->ArrayMesh:
 		var size:=Vector3(.43+cos(i*.64)*.15,.49+sin(i*1.34)*.15,.46)
 		_append_box(tool,p.snapped(Vector3.ONE*.14),size,leaf.lightened(.02*cos(i*1.)))
 	tool.index()
-	return tool.commit()
+	return tool.commit_to_arrays()
 
 func _append_box(tool:SurfaceTool,center:Vector3,size:Vector3,color:Color)->void:
 	for normal:Vector3 in [Vector3.UP,Vector3.DOWN,Vector3.RIGHT,Vector3.LEFT,Vector3.FORWARD,Vector3.BACK]:
