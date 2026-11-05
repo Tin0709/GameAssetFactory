@@ -398,9 +398,13 @@ func _apply_local_exposure() -> void:
 	_previous_compositor = _exposure_camera.compositor
 	_exposure_effect = LOCAL_EXPOSURE.new()
 	_exposure_compositor = Compositor.new()
+	var source := _previous_compositor
+	if source == null:
+		var environment: WorldEnvironment = level.get_node("WorldEnvironment")
+		source = environment.compositor
 	var effects: Array[CompositorEffect] = []
-	if _previous_compositor != null:
-		effects.assign(_previous_compositor.compositor_effects)
+	if source != null:
+		effects.assign(source.compositor_effects)
 	effects.append(_exposure_effect)
 	_exposure_compositor.compositor_effects = effects
 	_exposure_camera.compositor = _exposure_compositor
@@ -419,6 +423,9 @@ func _release_local_exposure() -> void:
 
 func _process(_delta: float) -> void:
 	if _exposure_effect == null: return
+	if not is_instance_valid(_exposure_camera) or _exposure_camera.compositor != _exposure_compositor:
+		set_local_exposure(false)
+		return
 	var error: String = _exposure_effect.failure()
 	if not error.is_empty():
 		push_warning("WorldMap local exposure disabled: " + error)
