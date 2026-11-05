@@ -1,6 +1,7 @@
 extends Node
 ## WorldMap-only look. Source textures, GLBs, shared environments and actors stay intact.
 const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
+const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
 const MOTION=preload("res://scripts/grassland_motion.gd")
 const BASE_CLOUD_SHAPE:=Vector4(13.,.50,.73,.20)
 const POCKET_CLOUD_SHAPE:=Vector4(1.35,.40,.65,.49)
@@ -30,6 +31,10 @@ var cloud_texture: ImageTexture
 var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
 var _pockets_requested:=false
+var _direct_clouds_requested:=false
+var _direct_variants: Dictionary[Shader,Shader]={}
+var _review_shaders: Dictionary[ShaderMaterial,Shader]={}
+var _direct_actor_materials: Array[ShaderMaterial]=[]
 var _pockets_image: Image
 var _pockets_texture: ImageTexture
 var _cloud_shape:=BASE_CLOUD_SHAPE
@@ -106,6 +111,7 @@ func make_material(native: BaseMaterial3D,kind: String) -> ShaderMaterial:
 	material.set_shader_parameter("albedo_tint",native.albedo_color)
 	material.set_shader_parameter("cloud_field",cloud_texture)
 	material.set_shader_parameter("clouds_enabled",true)
+	_review_shaders[material]=material.shader
 	materials[key]=material
 	return material
 
@@ -181,13 +187,85 @@ func daylight_pockets_active() -> bool:
 	return stage==2 and _pockets_requested
 
 func set_daylight_pockets(value: bool) -> void:
-	if value==_pockets_requested:return
+	if value==_pockets_requested and not _direct_clouds_requested:return
 	_pockets_requested=value
+	_direct_clouds_requested=false
+	_refresh_cloud_look()
+
+func direct_clouds_active() -> bool:
+	return stage==2 and _direct_clouds_requested
+
+func set_direct_clouds(value: bool) -> void:
+	if value==_direct_clouds_requested:return
+	# Godot does not call light() with forced vertex shading.
+	if value and ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading"):
+		return
+	_direct_clouds_requested=value
+	_pockets_requested=false
+	_refresh_cloud_look()
+
+func _refresh_cloud_look() -> void:
+	level.geometry.reset_cutaway_materials()
+	_apply_direct_clouds()
 	_apply_daylight_pockets()
+	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)
 
+func _direct_variant(original: Shader) -> Shader:
+	if not _direct_variants.has(original):
+		var shader:=Shader.new()
+		shader.code=original.code.replace("shader_type spatial;", "shader_type spatial;\n#define GAF_WORLD_DIRECT_CLOUD")
+		_direct_variants[original]=shader
+	return _direct_variants[original]
+
+func _apply_direct_clouds() -> void:
+	var direct:=direct_clouds_active()
+	level.geometry.cutaway_shader=_direct_variant(PRESET.cutaway_shader) if direct else PRESET.cutaway_shader
+	for material: ShaderMaterial in _review_shaders:
+		var native: Shader=_review_shaders[material]
+		var target:=_direct_variant(native) if direct else native
+		if target==material.shader:continue
+		var params: Dictionary={}
+		for row: Dictionary in native.get_shader_uniform_list():
+			params[row.name]=material.get_shader_parameter(row.name)
+		material.shader=target
+		for parameter: String in params:
+			if params[parameter]!=null:material.set_shader_parameter(parameter,params[parameter])
+	if direct and _direct_actor_materials.is_empty():
+		for item: Array in actor_materials:_direct_actor_materials.append(_make_direct_actor(item[0],item[3],item[4]))
+	for index in actor_materials.size():
+		var item: Array=actor_materials[index]
+		var adapter: ShaderMaterial=_direct_actor_materials[index] if direct else null
+		item[0].set_surface_override_material(item[1],item[2] if stage==0 else (adapter if adapter!=null else item[3]))
+
+func _make_direct_actor(node: MeshInstance3D, source: BaseMaterial3D, tint: Color) -> ShaderMaterial:
+	# Restrict the adapter to the current opaque, textured actor and equipment contract.
+	if node.material_override!=null or source.next_pass!=null or source.albedo_texture==null:
+		return null
+	if (source.cull_mode!=BaseMaterial3D.CULL_DISABLED or source.texture_filter!=BaseMaterial3D.TEXTURE_FILTER_NEAREST
+		or source.texture_repeat or source.transparency!=BaseMaterial3D.TRANSPARENCY_DISABLED
+		or source.shading_mode!=BaseMaterial3D.SHADING_MODE_PER_PIXEL
+		or source.diffuse_mode!=BaseMaterial3D.DIFFUSE_BURLEY or source.specular_mode!=BaseMaterial3D.SPECULAR_SCHLICK_GGX
+		or source.depth_draw_mode!=BaseMaterial3D.DEPTH_DRAW_OPAQUE_ONLY
+		or source.uv1_scale!=Vector3.ONE or source.uv1_offset!=Vector3.ZERO
+		or source.vertex_color_use_as_albedo or source.roughness_texture!=null or source.metallic_texture!=null
+		or source.disable_ambient_light or source.disable_receive_shadows or source.disable_fog):
+		return null
+	for feature in BaseMaterial3D.FEATURE_MAX:
+		if source.get_feature(feature):return null
+	var material:=ShaderMaterial.new()
+	material.shader=DIRECT_ACTOR_SHADER
+	material.render_priority=source.render_priority
+	material.set_shader_parameter("atlas",source.albedo_texture)
+	material.set_shader_parameter("albedo_tint",tint)
+	material.set_shader_parameter("native_roughness",source.roughness)
+	material.set_shader_parameter("native_metallic",source.metallic)
+	material.set_shader_parameter("native_specular",source.metallic_specular)
+	material.set_shader_parameter("clouds_enabled",true)
+	return material
+
 func _apply_daylight_pockets() -> void:
-	var pockets:=daylight_pockets_active()
+	var pockets:=daylight_pockets_active() or direct_clouds_active()
 	if pockets and _pockets_texture==null:
 		var noise:=FastNoiseLite.new()
 		noise.seed=97345
@@ -200,6 +278,11 @@ func _apply_daylight_pockets() -> void:
 	for material: ShaderMaterial in materials.values():
 		material.set_shader_parameter("cloud_field",texture)
 		material.set_shader_parameter("cloud_shape",_cloud_shape)
+	if direct_clouds_active():
+		for material: ShaderMaterial in _direct_actor_materials:
+			if material!=null:
+				material.set_shader_parameter("cloud_field",texture)
+				material.set_shader_parameter("cloud_shape",_cloud_shape)
 	level.geometry.update_cloud_style(texture,_cloud_shape)
 	if stage==2:
 		var sun: DirectionalLight3D=level.get_node("Sun")
@@ -227,6 +310,10 @@ func publish_clouds(time: float) -> void:
 	cloud_clock=time
 	for material: ShaderMaterial in materials.values():material.set_shader_parameter("cloud_time",time)
 	level.geometry.update_cloud_time(time)
+	if direct_clouds_active():
+		for material: ShaderMaterial in _direct_actor_materials:
+			if material!=null:material.set_shader_parameter("cloud_time",time)
+		return
 	var shade:=cloud_shade(level.player.position,time) if stage>0 else 1.0
 	for item: Array in actor_materials:
 		var linear: Color=item[4].srgb_to_linear()
@@ -237,7 +324,6 @@ func set_stage(value: int) -> void:
 	if level.geometry.has_method("reset_cutaway_materials"):level.geometry.reset_cutaway_materials()
 	for item: Array in terrain_materials:item[0].surface_set_material(item[1],item[2] if stage==0 else item[3])
 	for item: Array in plant_meshes:item[0].mesh=item[1] if stage==0 else item[2]
-	for item: Array in actor_materials:item[0].set_surface_override_material(item[1],item[2] if stage==0 else item[3])
 	var environment: Environment=(PRESET.environment if stage==2 else baseline_environment).duplicate()
 	level.get_node("WorldEnvironment").environment=environment
 	var sun: DirectionalLight3D=level.get_node("Sun")
@@ -248,6 +334,7 @@ func set_stage(value: int) -> void:
 		for property: String in PRESET.sun_settings:sun.set(property,PRESET.sun_settings[property])
 		RenderingServer.directional_shadow_atlas_set_size(PRESET.shadow_atlas_size,PRESET.shadow_16bit)
 		RenderingServer.directional_soft_shadow_filter_set_quality(PRESET.shadow_quality as RenderingServer.ShadowQuality)
+	_apply_direct_clouds()
 	_apply_daylight_pockets()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)

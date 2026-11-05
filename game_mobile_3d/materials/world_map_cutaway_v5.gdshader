@@ -24,11 +24,21 @@ void vertex() {
 	surface_normal=MODEL_NORMAL_MATRIX*NORMAL;
 }
 
+#ifdef GAF_WORLD_DIRECT_CLOUD
+#define GAF_WORLD_BURLEY
+#include "res://materials/world_map_direct_cloud.gdshaderinc"
+#endif
+
 void fragment() {
 	vec4 color = albedo_tint;
 	if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);
 	if (use_vertex_color) color *= COLOR;
-	ALBEDO = shade_world_surface(color.rgb,cutaway_world,surface_top)*world_cloud_shade(cutaway_world);
+	ALBEDO = shade_world_surface(color.rgb,cutaway_world,surface_top);
+#ifdef GAF_WORLD_DIRECT_CLOUD
+	cloud_transmission=world_cloud_shade(cutaway_world);
+#else
+	ALBEDO*=world_cloud_shade(cutaway_world);
+#endif
 	ALBEDO*=terrain_contact_shade(cutaway_world,surface_normal);
 	// Chunk bounds include low ground beside high walls. Fade only above the
 	// player's lower body; otherwise transparent floor exposes buried faces and

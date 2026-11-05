@@ -34,6 +34,10 @@ void vertex() {
 		NORMAL=rotate_plant(NORMAL,local_bend.xz);
 	}
 }
+#ifdef GAF_WORLD_DIRECT_CLOUD
+#include "res://materials/world_map_direct_cloud.gdshaderinc"
+#endif
+
 void fragment() {
 	vec3 source=plant_kind==0 ? texture(atlas,UV).rgb : COLOR.rgb*albedo_tint.rgb;
 	if (plant_kind==0) {
@@ -69,7 +73,11 @@ void fragment() {
 		}
 	}
 	vec3 face=FRONT_FACING ? NORMAL : -NORMAL;
+	#ifdef GAF_WORLD_DIRECT_CLOUD
+	cloud_transmission=world_cloud_shade(plant_root);
+#else
 	ALBEDO*=world_cloud_shade(plant_root);
+#endif
 	// Contact darkening is confined to attached roots, never the flower heads.
 	if (!((plant_kind==0 || plant_kind==2) && ground_blending)) ALBEDO*=mix(0.70,1.0,smoothstep(0.0,0.40,tip));
 	vec3 up=(VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz;

@@ -19,11 +19,21 @@ void vertex() {
 	surface_top=(MODEL_NORMAL_MATRIX*NORMAL).y;
 	surface_normal=MODEL_NORMAL_MATRIX*NORMAL;
 }
+#ifdef GAF_WORLD_DIRECT_CLOUD
+#define GAF_WORLD_BURLEY
+#include "res://materials/world_map_direct_cloud.gdshaderinc"
+#endif
+
 void fragment() {
 	vec4 color = albedo_tint;
 	if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);
 	if (use_vertex_color) color *= COLOR;
-	ALBEDO = shade_world_surface(color.rgb,surface_world,surface_top)*world_cloud_shade(surface_world);
+	ALBEDO = shade_world_surface(color.rgb,surface_world,surface_top);
+#ifdef GAF_WORLD_DIRECT_CLOUD
+	cloud_transmission=world_cloud_shade(surface_world);
+#else
+	ALBEDO*=world_cloud_shade(surface_world);
+#endif
 	ALBEDO*=terrain_contact_shade(surface_world,surface_normal);
 	ROUGHNESS = native_roughness;
 	METALLIC = native_metallic;

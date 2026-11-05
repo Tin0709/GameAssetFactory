@@ -15,9 +15,18 @@ void vertex() {
 	vec2 offset=(world_breeze(world)*0.048+world_passage(root)*0.55)*weight;
 	VERTEX+=inverse(mat3(MODEL_MATRIX))*vec3(offset.x,0.0,offset.y);
 }
+#ifdef GAF_WORLD_DIRECT_CLOUD
+#include "res://materials/world_map_direct_cloud.gdshaderinc"
+#endif
+
 void fragment() {
 	vec4 source=texture(atlas,UV)*albedo_tint;
-	ALBEDO=source.rgb*world_cloud_shade(leaf_world);
+	ALBEDO=source.rgb;
+#ifdef GAF_WORLD_DIRECT_CLOUD
+	cloud_transmission=world_cloud_shade(leaf_world);
+#else
+	ALBEDO*=world_cloud_shade(leaf_world);
+#endif
 	ALPHA=source.a;
 	ALPHA_SCISSOR_THRESHOLD=0.5;
 	vec3 face=FRONT_FACING ? NORMAL : -NORMAL;

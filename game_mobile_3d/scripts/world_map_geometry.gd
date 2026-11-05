@@ -513,6 +513,7 @@ func _build_multimeshes(chunk: Vector2i, origin: Vector3, kind: String, placemen
 
 
 var _current_cloud_time:=0.0
+var cutaway_shader: Shader = LOOK_PRESET.cutaway_shader
 
 
 func update_cutaway(player_position: Vector3, camera_position: Vector3, enabled: bool = true) -> void:
@@ -542,7 +543,7 @@ func update_cutaway(player_position: Vector3, camera_position: Vector3, enabled:
 
 func _make_cutaway_material(native: Material) -> ShaderMaterial:
 	var material := ShaderMaterial.new()
-	material.shader = LOOK_PRESET.cutaway_shader
+	material.shader = cutaway_shader
 	material.set_shader_parameter("cutaway_enabled", true)
 	if native is BaseMaterial3D:
 		material.set_shader_parameter("use_albedo_texture", native.albedo_texture != null)
