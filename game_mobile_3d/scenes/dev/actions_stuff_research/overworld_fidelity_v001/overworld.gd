@@ -82,21 +82,31 @@ func _build_meadow_ui()->void:
 	var title:=Label.new();title.text="OVERWORLD · PRIVATE FIDELITY STUDY";title.add_theme_font_size_override("font_size",15);box.add_child(title)
 	var hint:=Label.new();hint.text="WASD run · Shift walk · Space jump\nLMB / E Sabre · R reset · V overview · H hide UI";hint.add_theme_font_size_override("font_size",12);box.add_child(hint)
 	_toggle(box,"Wind",true,func(on:bool):meadow.wind_enabled=on)
+	var pockets:=_toggle(box,"Flower pockets",false,_set_flower_pockets)
+	pockets.name="FlowerPocketsToggle"
+	pockets.tooltip_text="Arrange the same flowers into grouped color patches along the meadow paths."
 	_toggle(box,"Player vegetation interaction",true,func(on:bool):meadow.interactions_enabled=on)
 	_toggle(box,"Ambient audio",true,func(on:bool):environment_audio.ambient_enabled=on)
 	_toggle(box,"Footsteps + contact rustle",true,func(on:bool):environment_audio.footsteps_enabled=on;environment_audio.rustle_enabled=on;environment_audio.reset_contacts())
 	_trim(box,"Ambience trim",func(db:float):environment_audio.ambience_gain_db=db)
 	_trim(box,"Footstep / rustle trim",func(db:float):environment_audio.effects_gain_db=db)
 	var controls:=Button.new();controls.text="Player / animation controls";controls.focus_mode=Control.FOCUS_NONE;box.add_child(controls)
-	controls.pressed.connect(func():sabre_mode.panel.visible=not sabre_mode.panel.visible;sabre_mode.panel.position=Vector2(18,290))
+	controls.pressed.connect(func():sabre_mode.panel.visible=not sabre_mode.panel.visible;sabre_mode.panel.position=Vector2(18,panel.position.y+panel.size.y+8.))
 	var diagnostics=load("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/copy_diagnostics.gd").new()
 	diagnostics.context_provider=func()->Dictionary:return {"Scene":scene_file_path,"Wind":meadow.wind_enabled,"Vegetation interaction":meadow.interactions_enabled,"Ambient audio":environment_audio.ambient_enabled,"Footsteps":environment_audio.footsteps_enabled,"Speed (m/s)":snappedf(player.current_speed,.01)}
 	box.add_child(diagnostics)
 	meadow_status=Label.new();meadow_status.add_theme_font_size_override("font_size",11);box.add_child(meadow_status)
 	var evidence:=Label.new();evidence.text="Original source assets/audio · recreated wind/mix";evidence.add_theme_font_size_override("font_size",10);evidence.modulate=Color(.72,.82,.71);box.add_child(evidence)
 
-func _toggle(box:Node,label:String,value:bool,callback:Callable)->void:
+func _set_flower_pockets(value:bool)->void:
+	var trunks:Array[StaticBody3D]=[]
+	if graphics_foundation!=null and graphics_foundation.strict_match!=null and graphics_foundation.strict_match.trees!=null:
+		trunks=graphics_foundation.strict_match.trees.trunk_bodies
+	meadow.set_flower_pockets(value,trunks)
+
+func _toggle(box:Node,label:String,value:bool,callback:Callable)->CheckButton:
 	var button:=CheckButton.new();button.text=label;button.button_pressed=value;button.focus_mode=Control.FOCUS_NONE;box.add_child(button);button.toggled.connect(callback)
+	return button
 
 func _trim(box:Node,title:String,callback:Callable)->void:
 	var row:=HBoxContainer.new();box.add_child(row)

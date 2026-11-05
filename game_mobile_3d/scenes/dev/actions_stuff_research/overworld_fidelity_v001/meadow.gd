@@ -1,6 +1,7 @@
 extends Node3D
 ## Original meadow layout with transient external reference meshes and textures.
 const Spring=preload("res://scenes/dev/actions_stuff_research/grass_md2_v001/interaction_field.gd")
+const FlowerPockets=preload("flower_pockets.gd")
 var materials:Array[ShaderMaterial]=[]
 var enabled:=true
 var wind_enabled:=true
@@ -15,6 +16,11 @@ var batch_count:=0
 var species_counts:Dictionary={}
 var flower_colors:Dictionary={}
 var flowers:Array[Vector2]=[]
+var flower_pockets_enabled:=false
+var _flower_batches:Array[Dictionary]=[]
+var _flower_palette:=PackedInt32Array()
+var _flower_original:Array[Vector2]=[]
+var _flower_composed:Array[Vector2]=[]
 var _batches:Dictionary={}
 var _rng:=RandomNumberGenerator.new()
 var _wind_intensities:Array[float]=[]
@@ -50,18 +56,30 @@ func _grass_top_uv()->Vector4:
 				var uv:=Vector2(s.uv[i*2],s.uv[i*2+1]);lo=lo.min(uv);hi=hi.max(uv)
 	return Vector4(lo.x,lo.y,hi.x,hi.y)
 
-func _place(asset:String,position:Vector3,yaw:float=0.,scale_factor:float=1.)->void:
+func _place(asset:String,position:Vector3,yaw:float=0.,scale_factor:float=1.,flower_index:int=-1)->void:
 	if not bundle.meshes.has(asset):push_error("Missing meadow species "+asset);return
 	var cell:=Vector2i(floori((position.x+16.)/16.),floori((position.z+16.)/16.))
 	var key:=asset+"/"+str(cell)
 	if not _batches.has(key):_batches[key]={"asset":asset,"transforms":[],"phases":[]}
 	var t:=Transform3D(Basis(Vector3.UP,yaw).scaled(Vector3.ONE*scale_factor),position)
 	_batches[key].transforms.append(t);_batches[key].phases.append(_rng.randf()*TAU)
+	if flower_index>=0:
+		if not _batches[key].has("flowers"):_batches[key].flowers=PackedInt32Array()
+		_batches[key].flowers.append(flower_index)
 	instance_count+=1;species_counts[asset]=int(species_counts.get(asset,0))+1
 	if asset.begins_with("MD2 | SM_")and not asset.contains("Boulder"):
-		var plant_cell:=Vector2i(floori(position.x),floori(position.z))
-		if not _plant_cells.has(plant_cell):_plant_cells[plant_cell]=[]
-		_plant_cells[plant_cell].append(Vector2(position.x,position.z))
+		_add_plant_root(Vector2(position.x,position.z))
+
+func _add_plant_root(point:Vector2)->void:
+	var cell:=Vector2i(point.floor())
+	if not _plant_cells.has(cell):_plant_cells[cell]=[]
+	_plant_cells[cell].append(point)
+
+func _remove_plant_root(point:Vector2)->void:
+	var cell:=Vector2i(point.floor())
+	var roots:Array=_plant_cells[cell]
+	roots.erase(point)
+	if roots.is_empty():_plant_cells.erase(cell)
 
 func _build_ground(outer:bool=false)->void:
 	var half:=50 if outer else 16
@@ -110,7 +128,8 @@ func _build_plants(outer:bool=false)->void:
 			if foliage_density(p)<.7 or (outer and absf(p.x)<16. and absf(p.z)<16.):continue
 			if flowers.any(func(other:Vector2):return other.distance_squared_to(p2)<.14):continue
 			flowers.append(p2);flower_colors[color]=int(flower_colors.get(color,0))+1
-			_place("MD2 | "+String(names[n%names.size()]),p,_rng.randf()*TAU)
+			_flower_palette.append(cluster%colors.size())
+			_place("MD2 | "+String(names[n%names.size()]),p,_rng.randf()*TAU,1.,flowers.size()-1)
 	var tall_names:=["SM_GrassTall_01","SM_GrassTall_02"]
 	for i in (360 if outer else 40):
 		var p:=Vector3(_rng.randf_range(-half+1,half-1),0,_rng.randf_range(-half+1,half-1))
@@ -149,7 +168,61 @@ func _flush()->void:
 		# remain unverified. Dense alpha cards must not acquire new black self-shadows.
 		if String(row.asset).begins_with("MD2 | SM_")and not String(row.asset).contains("Boulder"):instance.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(instance);batch_count+=1
+		if row.has("flowers"):_flower_batches.append({"mesh":mm,"indices":row.flowers})
 	_batches.clear()
+
+func set_flower_pockets(value:bool,trunks:Array[StaticBody3D])->void:
+	if value==flower_pockets_enabled:return
+	if value and _flower_composed.is_empty():_compose_flower_pockets(trunks)
+	var target:=_flower_composed if value else _flower_original
+	for row:Dictionary in _flower_batches:
+		var mm:MultiMesh=row.mesh
+		var indices:PackedInt32Array=row.indices
+		for i in indices.size():
+			var index:=indices[i]
+			var previous:=flowers[index]
+			var point:=target[index]
+			if previous==point:continue
+			var transform:=mm.get_instance_transform(i)
+			transform.origin.x=point.x
+			transform.origin.z=point.y
+			mm.set_instance_transform(i,transform)
+			_remove_plant_root(previous)
+			_add_plant_root(point)
+			flowers[index]=point
+	flower_pockets_enabled=value
+
+func _compose_flower_pockets(trunks:Array[StaticBody3D])->void:
+	_flower_original=flowers.duplicate()
+	_flower_composed=flowers.duplicate()
+	var roots:Array[Vector2]=[]
+	var palette:=PackedInt32Array()
+	var flower_order:=PackedInt32Array()
+	for row:Dictionary in _flower_batches:
+		for index:int in row.indices:
+			roots.append(flowers[index])
+			palette.append(_flower_palette[index])
+			flower_order.append(index)
+	var obstacles:Array[Rect2]=[]
+	for trunk:StaticBody3D in trunks:
+		var point:=trunk.global_position
+		obstacles.append(Rect2(Vector2(point.x,point.z)-Vector2.ONE*.53,Vector2.ONE*1.06))
+	for child:Node in get_children():
+		if child is not StaticBody3D or child.get_meta("overworld_surface","")!="stone":continue
+		var shape:CollisionShape3D=child.get_child(0)
+		var hull:=shape.shape as ConcavePolygonShape3D
+		if hull==null:continue
+		var points:=hull.get_faces()
+		if points.is_empty():continue
+		var world:=shape.global_transform
+		var first:=world*points[0]
+		var bounds:=Rect2(Vector2(first.x,first.z),Vector2.ZERO)
+		for local:Vector3 in points:
+			var point:=world*local
+			bounds=bounds.expand(Vector2(point.x,point.z))
+		obstacles.append(bounds.grow(.18))
+	var positions:=FlowerPockets.compose(roots,palette,obstacles,path_center)
+	for i in flower_order.size():_flower_composed[flower_order[i]]=positions[i]
 
 func _physics_process(delta:float)->void:
 	if is_instance_valid(player) and enabled:
