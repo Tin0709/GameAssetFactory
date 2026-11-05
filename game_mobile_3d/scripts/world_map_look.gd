@@ -3,6 +3,7 @@ extends Node
 const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
+const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
 const MOTION=preload("res://scripts/grassland_motion.gd")
 const REVIEW_SHADOW_BLUR := 1.08
 const REVIEW_SHADOW_NORMAL_BIAS := 0.76
@@ -34,6 +35,11 @@ var cloud_texture: ImageTexture
 var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
 var _pockets_requested:=false
+var _exposure_requested := false
+var _exposure_effect: CompositorEffect
+var _exposure_compositor: Compositor
+var _previous_compositor: Compositor
+var _exposure_camera: Camera3D
 var _shadow_review_requested := false
 var _canopy_requested := false
 var _canopy_leaves: Array[Vector4] = []
@@ -372,6 +378,52 @@ func publish_clouds(time: float) -> void:
 		var linear: Color=item[4].srgb_to_linear()
 		item[3].albedo_color=Color(linear.r*shade,linear.g*shade,linear.b*shade,linear.a).linear_to_srgb()
 
+func local_exposure_available() -> bool:
+	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
+
+func local_exposure_active() -> bool:
+	return _exposure_effect != null
+
+func set_local_exposure(enabled: bool) -> void:
+	if enabled and not local_exposure_available(): return
+	_exposure_requested = enabled
+	_apply_local_exposure()
+
+func _apply_local_exposure() -> void:
+	if stage != 2 or not _exposure_requested:
+		_release_local_exposure()
+		return
+	if _exposure_effect != null: return
+	_exposure_camera = level.get_node("Camera3D")
+	_previous_compositor = _exposure_camera.compositor
+	_exposure_effect = LOCAL_EXPOSURE.new()
+	_exposure_compositor = Compositor.new()
+	var effects: Array[CompositorEffect] = []
+	if _previous_compositor != null:
+		effects.assign(_previous_compositor.compositor_effects)
+	effects.append(_exposure_effect)
+	_exposure_compositor.compositor_effects = effects
+	_exposure_camera.compositor = _exposure_compositor
+
+func _release_local_exposure() -> void:
+	if _exposure_effect == null: return
+	var effect := _exposure_effect
+	_exposure_effect = null
+	effect.enabled = false
+	if is_instance_valid(_exposure_camera) and _exposure_camera.compositor == _exposure_compositor:
+		_exposure_camera.compositor = _previous_compositor
+	_exposure_compositor = null
+	_previous_compositor = null
+	_exposure_camera = null
+	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
+
+func _process(_delta: float) -> void:
+	if _exposure_effect == null: return
+	var error: String = _exposure_effect.failure()
+	if not error.is_empty():
+		push_warning("WorldMap local exposure disabled: " + error)
+		set_local_exposure(false)
+
 func directional_shadow_review_active() -> bool:
 	return stage == 2 and _shadow_review_requested
 
@@ -412,6 +464,7 @@ func set_stage(value: int) -> void:
 		_apply_directional_shadow_review(sun)
 	_apply_review_shaders()
 	_apply_daylight_pockets()
+	_apply_local_exposure()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)
 
@@ -436,5 +489,6 @@ func freeze_motion(time: float=0.0) -> void:
 		material.set_shader_parameter("player_position",level.player.position)
 
 func _exit_tree() -> void:
+	_release_local_exposure()
 	RenderingServer.directional_shadow_atlas_set_size(saved_shadow_size,saved_shadow_16bit)
 	RenderingServer.directional_soft_shadow_filter_set_quality(saved_shadow_quality as RenderingServer.ShadowQuality)
