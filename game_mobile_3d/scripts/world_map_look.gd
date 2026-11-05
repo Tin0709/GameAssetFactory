@@ -189,8 +189,12 @@ func daylight_pockets_active() -> bool:
 func set_daylight_pockets(value: bool) -> void:
 	if value==_pockets_requested and not _direct_clouds_requested:return
 	_pockets_requested=value
-	_direct_clouds_requested=false
-	_refresh_cloud_look()
+	if _direct_clouds_requested:
+		_direct_clouds_requested=false
+		_refresh_cloud_look()
+	else:
+		_apply_daylight_pockets()
+		publish_clouds(cloud_clock)
 
 func direct_clouds_active() -> bool:
 	return stage==2 and _direct_clouds_requested
