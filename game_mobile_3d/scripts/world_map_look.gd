@@ -2,6 +2,8 @@ extends Node
 ## WorldMap-only look. Source textures, GLBs, shared environments and actors stay intact.
 const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const MOTION=preload("res://scripts/grassland_motion.gd")
+const BASE_CLOUD_SHAPE:=Vector4(13.,.50,.73,.20)
+const POCKET_CLOUD_SHAPE:=Vector4(1.35,.40,.65,.49)
 var level: Node3D
 var motion=MOTION.new()
 var wind_materials: Array[ShaderMaterial]=[]
@@ -27,6 +29,10 @@ var cloud_image: Image
 var cloud_texture: ImageTexture
 var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
+var _pockets_requested:=false
+var _pockets_image: Image
+var _pockets_texture: ImageTexture
+var _cloud_shape:=BASE_CLOUD_SHAPE
 
 func setup(map: Node3D) -> void:
 	level=map
@@ -171,15 +177,45 @@ func build_cloud_field() -> void:
 		for x in 64:cloud_image.set_pixel(x,y,Color(rng.randf(),0,0,1))
 	cloud_texture=ImageTexture.create_from_image(cloud_image)
 
+func daylight_pockets_active() -> bool:
+	return stage==2 and _pockets_requested
+
+func set_daylight_pockets(value: bool) -> void:
+	if value==_pockets_requested:return
+	_pockets_requested=value
+	_apply_daylight_pockets()
+	publish_clouds(cloud_clock)
+
+func _apply_daylight_pockets() -> void:
+	var pockets:=daylight_pockets_active()
+	if pockets and _pockets_texture==null:
+		var noise:=FastNoiseLite.new()
+		noise.seed=97345
+		noise.frequency=.085
+		noise.fractal_octaves=2
+		_pockets_image=noise.get_seamless_image(64,64)
+		_pockets_texture=ImageTexture.create_from_image(_pockets_image)
+	var texture:=_pockets_texture if pockets else cloud_texture
+	_cloud_shape=POCKET_CLOUD_SHAPE if pockets else BASE_CLOUD_SHAPE
+	for material: ShaderMaterial in materials.values():
+		material.set_shader_parameter("cloud_field",texture)
+		material.set_shader_parameter("cloud_shape",_cloud_shape)
+	level.geometry.update_cloud_style(texture,_cloud_shape)
+	if stage==2:
+		var sun: DirectionalLight3D=level.get_node("Sun")
+		sun.light_color=Color(1.,.963,.865) if pockets else PRESET.sun_settings.light_color
+		sun.light_energy=1.72 if pockets else PRESET.sun_settings.light_energy
+
 func cloud_sample(point: Vector2) -> float:
+	var image:=_pockets_image if daylight_pockets_active() else cloud_image
 	var cell:=Vector2i(floori(point.x),floori(point.y))
 	var f:=Vector2(fposmod(point.x,1.0),fposmod(point.y,1.0))
-	return lerpf(lerpf(cloud_image.get_pixel(posmod(cell.x,64),posmod(cell.y,64)).r,cloud_image.get_pixel(posmod(cell.x+1,64),posmod(cell.y,64)).r,f.x),lerpf(cloud_image.get_pixel(posmod(cell.x,64),posmod(cell.y+1,64)).r,cloud_image.get_pixel(posmod(cell.x+1,64),posmod(cell.y+1,64)).r,f.x),f.y)
+	return lerpf(lerpf(image.get_pixel(posmod(cell.x,64),posmod(cell.y,64)).r,image.get_pixel(posmod(cell.x+1,64),posmod(cell.y,64)).r,f.x),lerpf(image.get_pixel(posmod(cell.x,64),posmod(cell.y+1,64)).r,image.get_pixel(posmod(cell.x+1,64),posmod(cell.y+1,64)).r,f.x),f.y)
 
 func cloud_shade(position: Vector3,time: float) -> float:
-	var p: Vector2=(Vector2(position.x,position.z)+Vector2(time*.48,time*.19))/13.0
+	var p: Vector2=(Vector2(position.x,position.z)+Vector2(time*.48,time*.19))/_cloud_shape.x
 	var density: float=(cloud_sample(p)+cloud_sample(p*2.07+Vector2(17,9))*.32)/1.32
-	return 1.0-smoothstep(.50,.73,density)*.20
+	return 1.0-smoothstep(_cloud_shape.y,_cloud_shape.z,density)*_cloud_shape.w
 
 func publish_clouds(time: float) -> void:
 	cloud_clock=time
@@ -206,6 +242,7 @@ func set_stage(value: int) -> void:
 		for property: String in PRESET.sun_settings:sun.set(property,PRESET.sun_settings[property])
 		RenderingServer.directional_shadow_atlas_set_size(PRESET.shadow_atlas_size,PRESET.shadow_16bit)
 		RenderingServer.directional_soft_shadow_filter_set_quality(PRESET.shadow_quality as RenderingServer.ShadowQuality)
+	_apply_daylight_pockets()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)
 

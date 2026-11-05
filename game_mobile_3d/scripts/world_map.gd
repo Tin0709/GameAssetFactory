@@ -62,7 +62,7 @@ func _ready() -> void:
 	look=load("res://scripts/world_map_look.gd").new()
 	look.name="ReferenceLook"
 	add_child(look);look.setup(self)
-	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu"
+	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu · F4 nắng qua mây"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -197,3 +197,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.physical_keycode==KEY_H:$WorldEnvironment.environment.fog_enabled=not $WorldEnvironment.environment.fog_enabled
 		if event.physical_keycode==KEY_V:set_review_view("overview" if view_mode=="gameplay" else "gameplay")
 		if event.physical_keycode==KEY_B:set_reference_look(look.stage==0)
+		if event.physical_keycode==KEY_F4 and look.stage==2:
+			look.set_daylight_pockets(not look.daylight_pockets_active())
+			get_viewport().set_input_as_handled()
