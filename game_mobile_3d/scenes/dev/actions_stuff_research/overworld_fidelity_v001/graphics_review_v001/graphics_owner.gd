@@ -108,6 +108,14 @@ func setup(scene:Node3D)->void:
 		var graphics_panel:PanelContainer=ui.get_child(0)
 		graphics_panel.get_child(0).add_child(path_toggle)
 		graphics_panel.position.y-=35.
+		var contact_toggle:=CheckButton.new()
+		contact_toggle.name="GroundContactToggle"
+		contact_toggle.text="Ground contact - trees / rocks"
+		contact_toggle.tooltip_text="Experimental soft indirect contact shadow around existing trunks and rock bases."
+		contact_toggle.focus_mode=Control.FOCUS_NONE
+		contact_toggle.toggled.connect(strict_match.set_ground_contact_enabled)
+		graphics_panel.get_child(0).add_child(contact_toggle)
+		graphics_panel.position.y-=35.
 	local_exposure=LocalExposure.new();local_exposure.name="LocalExposure";add_child(local_exposure);local_exposure.setup(self)
 func _process(_delta:float)->void:
 	if not available or released:return

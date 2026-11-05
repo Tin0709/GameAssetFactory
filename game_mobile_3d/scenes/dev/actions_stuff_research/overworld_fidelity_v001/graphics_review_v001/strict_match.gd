@@ -1,6 +1,7 @@
 extends Node
 ## One private static Day comparison. No source asset or calibration is embedded.
 const Trees=preload("private_trees.gd")
+const GroundContact=preload("ground_contact_field.gd")
 const FieldEndpoints=preload("field_endpoints.gd")
 const GradeDomain=preload("grade_domain.gd")
 const WindBounds=preload("wind_bounds.gd")
@@ -21,6 +22,8 @@ var correction:ImageTexture3D
 var effect_error:=""
 var enabled:=true
 var path_blend_requested:=false
+var ground_contact_requested:=false
+var ground_contact_texture:ImageTexture
 var path_grass_rects:Array[Vector4]=[]
 var available:=false
 var stage:=0
@@ -149,6 +152,7 @@ func apply()->void:
 			var v:Array=data.path_target_rect;row.candidate.set_shader_parameter("review_target_rect",Vector4(v[0],v[1],v[2],v[3]))
 			row.candidate.set_shader_parameter("review_emissive_gain",30. if enabled and stage>=2 and row.original.get_meta("source_material","")=="MI_MasterTerrain_Opaque_Overworld"else 1.)
 	_apply_path_blend()
+	_apply_ground_contact()
 	_set_wind_bounds(enabled and stage>=6 and data.has("background_wind")and bool(data.background_wind.get("enabled",false)))
 	for key:String in saved:
 		if key not in ["compositor","aa","msaa","hdr_2d"]:env.set(key,saved[key])
@@ -192,6 +196,21 @@ func _apply_path_blend()->void:
 		row.candidate.set_shader_parameter("review_path_blend",active)
 		if active:
 			row.candidate.set_shader_parameter("review_grass_rects",path_grass_rects)
+func ground_contact_active()->bool:
+	return available and enabled and stage>=3 and ground_contact_requested and ground_contact_texture!=null
+
+func set_ground_contact_enabled(value:bool)->void:
+	ground_contact_requested=value
+	if value and ground_contact_texture==null:
+		ground_contact_texture=GroundContact.build(lab.meadow.get_children(),trees.trunk_bodies)
+	_apply_ground_contact()
+
+func _apply_ground_contact()->void:
+	var active:=ground_contact_active()
+	for row:Dictionary in controller_owner.pairs:
+		row.candidate.set_shader_parameter("gaf_ground_contact_enabled",active)
+		if active:
+			row.candidate.set_shader_parameter("gaf_ground_contact_field",ground_contact_texture)
 func _build_vignette()->void:
 	vignette_layer=CanvasLayer.new();vignette_layer.name="StrictDayPresentation";vignette_layer.layer=-5;add_child(vignette_layer)
 	var rectangle:=ColorRect.new();rectangle.mouse_filter=Control.MOUSE_FILTER_IGNORE;rectangle.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);vignette_layer.add_child(rectangle)

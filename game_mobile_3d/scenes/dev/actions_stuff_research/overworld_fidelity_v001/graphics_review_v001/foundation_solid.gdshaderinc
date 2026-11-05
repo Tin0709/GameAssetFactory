@@ -1,5 +1,6 @@
 render_mode diffuse_burley, ambient_light_disabled;
 #include "height_fill.gdshaderinc"
+#include "ground_contact.gdshaderinc"
 #ifdef GAF_CLOUD_PROJECTOR
 #include "cloud_v001/cloud_projector.gdshaderinc"
 #endif
@@ -130,10 +131,14 @@ void fragment(){
 		EMISSION=(other_layer.z>0.?surface_color:texel.rgb)*packed.b*review_emissive_gain;
 	}
  SPECULAR=gaf_specular;
- EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+ float ground_contact=1.0;
+ if(gaf_ground_contact_enabled){
+  ground_contact=gaf_ground_contact_factor((INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xyz);
+ }
+ EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC)*ground_contact;
  if(gaf_directional_fill_enabled){
   vec3 normal_y=normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.)).xyz);
-  vec3 directional_term=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
+  vec3 directional_term=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC)*ground_contact;
   EMISSION+=directional_term*(gaf_directional_factor(normal_y)-vec3(1.));
  }
 #ifdef GAF_CLOUD_PROJECTOR
