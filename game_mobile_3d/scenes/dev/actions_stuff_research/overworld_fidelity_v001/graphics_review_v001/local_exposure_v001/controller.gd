@@ -232,12 +232,12 @@ func set_day_sun_enabled(value:bool)->bool:
 	if _released:
 		return false
 	if value:
+		if mode!=2:
+			return false
 		var measured:=_read_day_sun(_day_sun_path())
 		if measured.is_empty():
 			error="Validated Day sun profile unavailable"
 			_refresh()
-			return false
-		if mode!=2 and not select_mode(2):
 			return false
 		if measured.grade_gain!=_active_grade_gain:
 			error="Day sun and exposure use different units"
@@ -342,6 +342,7 @@ func _refresh()->void:
 	_presentation_toggle.set_pressed_no_signal(_want_presentation)
 	_cloud_toggle.set_pressed_no_signal(_want_cloud)
 	_day_sun_toggle.set_pressed_no_signal(not _day_sun.is_empty())
+	_day_sun_toggle.disabled=mode!=2
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"
