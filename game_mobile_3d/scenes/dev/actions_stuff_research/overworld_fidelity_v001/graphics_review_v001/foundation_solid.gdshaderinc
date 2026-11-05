@@ -56,6 +56,10 @@ bool gaf_inside_tile(vec2 uv,vec4 rect){
  return all(greaterThanEqual(uv,rect.xy-vec2(.00001)))&&all(lessThanEqual(uv,rect.zw+vec2(.00001)));
 }
 
+float gaf_path_noise(vec2 cell){
+ return fract(52.9829189*fract(dot(cell,vec2(.06711056,.00583715))));
+}
+
 vec3 gaf_meadow_path_color(vec3 previous,vec2 uv,vec2 world_xz){
  vec2 tile_uv=vec2(0.);
  vec4 grass_rect=review_grass_rects[0];
@@ -69,6 +73,7 @@ vec3 gaf_meadow_path_color(vec3 previous,vec2 uv,vec2 world_xz){
    break;
   }
  }
+ bool from_grass=matched;
  if(!matched){
   for(int i=0;i<3;i++){
    vec4 rect=review_source_rects[i];
@@ -82,12 +87,17 @@ vec3 gaf_meadow_path_color(vec3 previous,vec2 uv,vec2 world_xz){
  if(!matched){return previous;}
  // Follow the existing meadow path in world space across 1 m block seams.
  float center=1.9*sin(world_xz.y*.24)+.55*sin(world_xz.y*.57);
- vec2 cell=floor(world_xz*8.);
- float noise=fract(52.9829189*fract(dot(cell,vec2(.06711056,.00583715))));
- float distance_to_path=abs(world_xz.x-center)+.22*(noise-.5);
- float grass_weight=smoothstep(.61,1.09,distance_to_path);
- vec3 dirt=texture(atlas,mix(review_target_rect.xy,review_target_rect.zw,tile_uv)).rgb;
- vec3 grass=texture(atlas,mix(grass_rect.xy,grass_rect.zw,tile_uv)).rgb;
+ float clumps=gaf_path_noise(floor(world_xz*4.))-.5;
+ float pixels=gaf_path_noise(floor(world_xz*16.))-.5;
+ float distance_to_path=abs(world_xz.x-center)+.32*clumps+.15*pixels;
+ float grass_weight=smoothstep(.69,1.01,distance_to_path);
+ if((from_grass && grass_weight==1.) || (!from_grass && grass_weight==0.)){
+  return previous;
+ }
+ if(grass_weight==0.){return texture(atlas,mix(review_target_rect.xy,review_target_rect.zw,tile_uv)).rgb;}
+ if(grass_weight==1.){return texture(atlas,mix(grass_rect.xy,grass_rect.zw,tile_uv)).rgb;}
+ vec3 dirt=from_grass?texture(atlas,mix(review_target_rect.xy,review_target_rect.zw,tile_uv)).rgb:previous;
+ vec3 grass=from_grass?previous:texture(atlas,mix(grass_rect.xy,grass_rect.zw,tile_uv)).rgb;
  return mix(dirt,grass,grass_weight);
 }
 void fragment(){
