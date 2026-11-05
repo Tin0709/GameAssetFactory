@@ -4,7 +4,7 @@ const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const MOTION=preload("res://scripts/grassland_motion.gd")
-const REVIEW_SHADOW_BLUR := 1.62
+const REVIEW_SHADOW_BLUR := 1.08
 const REVIEW_SHADOW_NORMAL_BIAS := 0.76
 const BASE_CLOUD_SHAPE:=Vector4(13.,.50,.73,.20)
 const POCKET_CLOUD_SHAPE:=Vector4(1.35,.40,.65,.49)
@@ -393,6 +393,8 @@ func _apply_directional_shadow_review(sun: DirectionalLight3D) -> void:
 		if device != null and device.texture_is_format_supported_for_usage(RenderingDevice.DATA_FORMAT_D16_UNORM, usage):
 			use_16bit = true
 	RenderingServer.directional_shadow_atlas_set_size(PRESET.shadow_atlas_size, use_16bit)
+	var quality := RenderingServer.SHADOW_QUALITY_SOFT_HIGH if review else PRESET.shadow_quality
+	RenderingServer.directional_soft_shadow_filter_set_quality(quality as RenderingServer.ShadowQuality)
 
 func set_stage(value: int) -> void:
 	stage=clampi(value,0,2)
@@ -408,7 +410,6 @@ func set_stage(value: int) -> void:
 	if stage==2:
 		for property: String in PRESET.sun_settings:sun.set(property,PRESET.sun_settings[property])
 		_apply_directional_shadow_review(sun)
-		RenderingServer.directional_soft_shadow_filter_set_quality(PRESET.shadow_quality as RenderingServer.ShadowQuality)
 	_apply_review_shaders()
 	_apply_daylight_pockets()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
