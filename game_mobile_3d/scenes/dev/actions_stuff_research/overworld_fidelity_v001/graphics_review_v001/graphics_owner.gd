@@ -155,7 +155,21 @@ func set_candidate(value:bool)->void:
 		sun.light_color=baseline.sun_color;sun.light_energy=baseline.sun_energy;sun.rotation=baseline.sun_rotation
 		_restore_atmosphere()
 	if strict_match!=null and strict_match.available:strict_match.enabled=candidate;strict_match.apply()
+	if local_exposure!=null:local_exposure.sync_cloud()
 	apply_camera();_refresh_label()
+
+func set_day_composition(value:bool)->void:
+	day_composition_requested=value
+	if day_composition_toggle!=null:day_composition_toggle.set_pressed_no_signal(value)
+	if candidate:_apply_sun()
+
+func day_composition_active()->bool:
+	if not day_composition_requested or not candidate or released or cycle_auto:
+		return false
+	if strict_match==null or not strict_match.available or strict_match.stage<6:
+		return false
+	return is_equal_approx(cycle_position,PhaseTrack.STARTS[1]) and local_exposure!=null and local_exposure.mode==0 and CloudReview.renderer_supported()
+
 func _apply_sun()->void:
 	var sun:DirectionalLight3D=lab.md2_lighting.sun
 	var c:Vector3=resolved.sun_color_srgb;sun.light_color=Color(c.x,c.y,c.z);sun.light_energy=resolved.sun_energy
@@ -169,12 +183,19 @@ func _apply_sun()->void:
 	var fog:Color=environment_baseline.fog_light_color
 	lab.md2_lighting.environment.fog_light_color=(fog.srgb_to_linear()*gain).linear_to_srgb()
 	if strict_match!=null:strict_match.per_frame()
+	if day_composition_active():
+		sun.light_energy=.72
+		sun.light_color=Color(1.,.92,.82)
+	if local_exposure!=null:local_exposure.sync_cloud()
+
 func _restore_atmosphere()->void:
 	for key:String in environment_baseline:lab.md2_lighting.environment.set(key,environment_baseline[key])
 	for key:String in sky_baseline:lab.md2_lighting.sky_material.set(key,sky_baseline[key])
 func set_cycle_enabled(value:bool)->void:
 	_before_graphics_change()
+	var had_composition:=day_composition_active()
 	cycle_auto=value
+	if candidate and had_composition!=day_composition_active():_apply_sun()
 	if cycle_check!=null:cycle_check.set_pressed_no_signal(value)
 func seek_cycle(position:float,snap:bool=false)->void:
 	_before_graphics_change()

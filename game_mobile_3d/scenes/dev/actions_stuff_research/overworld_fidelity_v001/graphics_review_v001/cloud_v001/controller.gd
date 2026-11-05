@@ -10,8 +10,11 @@ var materials: Array[ShaderMaterial] = []
 var _pattern: ImageTexture
 var _phase := Vector4.ZERO
 
+static func renderer_supported() -> bool:
+	return OS.has_feature("editor") and RenderingServer.get_current_rendering_method() == "mobile"
+
 static func supported() -> bool:
-	return OS.has_feature("editor") and OS.get_environment("GAF_CLOUD_REVIEW") == "1" and RenderingServer.get_current_rendering_method() == "mobile"
+	return renderer_supported() and OS.get_environment("GAF_CLOUD_REVIEW") == "1"
 
 static func review_shader(original: Shader) -> Shader:
 	if not renderer_supported():
