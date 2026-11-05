@@ -243,7 +243,7 @@ func _set_actor_cloud_enabled(value:bool)->void:
 	_sync_actor_cloud()
 
 func _sync_actor_cloud()->void:
-	var enabled:bool=_want_actor_cloud and _cloud.active and owner_graphics.day_composition_active()
+	var enabled:bool=_want_actor_cloud and _cloud.active and owner_graphics.day_composition_active() and ActorCloud.supports_pixel_lighting()
 	if enabled and is_instance_valid(lab.player) and lab.player.using_private_skin:
 		_actor_cloud.apply(lab.player.model,_cloud._pattern,_cloud._phase,true)
 	elif _actor_cloud.model!=null:
@@ -431,7 +431,7 @@ func _build_ui()->void:
 	_actor_cloud_toggle.tooltip_text="Use the playable Day cloud field on the private actor and Sabre."
 	_actor_cloud_toggle.add_theme_font_size_override("font_size",11)
 	_actor_cloud_toggle.focus_mode=Control.FOCUS_NONE
-	_actor_cloud_toggle.visible=Cloud.renderer_supported()
+	_actor_cloud_toggle.visible=Cloud.renderer_supported() and ActorCloud.supports_pixel_lighting()
 	_actor_cloud_toggle.toggled.connect(_set_actor_cloud_enabled)
 	row.add_child(_actor_cloud_toggle)
 	_bloom_toggle=CheckBox.new();_bloom_toggle.text="Source bloom - experimental Day";_bloom_toggle.add_theme_font_size_override("font_size",11);_bloom_toggle.focus_mode=Control.FOCUS_NONE;_bloom_toggle.toggled.connect(set_bloom_enabled);box.add_child(_bloom_toggle)

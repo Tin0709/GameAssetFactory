@@ -7,6 +7,9 @@ var materials: Array[ShaderMaterial] = []
 var model: Node3D
 var active := false
 
+static func supports_pixel_lighting() -> bool:
+	return not bool(ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading"))
+
 func apply(actor_model: Node3D, texture: Texture2D, phase: Vector4, enabled: bool) -> void:
 	if not enabled or actor_model == null or texture == null:
 		release()
@@ -50,6 +53,8 @@ func _supported(node: MeshInstance3D, material: StandardMaterial3D) -> bool:
 		and material.alpha_antialiasing_mode == BaseMaterial3D.ALPHA_ANTIALIASING_OFF
 		and material.uv1_scale == Vector3.ONE and material.uv1_offset == Vector3.ZERO
 		and not material.uv1_triplanar and not material.normal_enabled and not material.ao_enabled
+		and not material.rim_enabled and not material.clearcoat_enabled and not material.anisotropy_enabled
+		and not material.heightmap_enabled and not material.backlight_enabled and not material.detail_enabled
 		and not material.vertex_color_use_as_albedo and not material.disable_ambient_light
 		and not material.disable_receive_shadows and not material.disable_fog
 		and material.albedo_texture != null and material.roughness_texture != null
@@ -70,7 +75,11 @@ func _adapt(source: StandardMaterial3D, texture: Texture2D) -> ShaderMaterial:
 	out.set_shader_parameter("actor_emission", source.emission_texture)
 	out.set_shader_parameter("actor_tint", source.albedo_color)
 	out.set_shader_parameter("actor_emission_tint", source.emission)
-	out.set_shader_parameter("actor_emission_gain", source.emission_energy_multiplier)
+	var emission_gain := source.emission_energy_multiplier
+	if ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/use_physical_light_units"):
+		emission_gain *= source.emission_intensity
+	out.set_shader_parameter("actor_emission_gain", emission_gain)
+	out.set_shader_parameter("actor_burley", not ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"))
 	out.set_shader_parameter("actor_metallic", source.metallic)
 	out.set_shader_parameter("actor_roughness", source.roughness)
 	out.set_shader_parameter("actor_specular", source.metallic_specular)
