@@ -126,6 +126,14 @@ func setup(scene:Node3D)->void:
 		contact_toggle.toggled.connect(strict_match.set_ground_contact_enabled)
 		graphics_panel.get_child(0).add_child(contact_toggle)
 		graphics_panel.position.y-=35.
+		var rock_bounce_toggle:=CheckButton.new()
+		rock_bounce_toggle.name="RockBounceToggle"
+		rock_bounce_toggle.text="Rock bounce light"
+		rock_bounce_toggle.tooltip_text="Lift rock side faces using the existing indirect light and ground contact."
+		rock_bounce_toggle.focus_mode=Control.FOCUS_NONE
+		rock_bounce_toggle.toggled.connect(strict_match.set_rock_bounce_enabled)
+		graphics_panel.get_child(0).add_child(rock_bounce_toggle)
+		graphics_panel.position.y-=35.
 		if CloudReview.renderer_supported():
 			day_composition_toggle=CheckButton.new()
 			day_composition_toggle.name="DayCompositionToggle"

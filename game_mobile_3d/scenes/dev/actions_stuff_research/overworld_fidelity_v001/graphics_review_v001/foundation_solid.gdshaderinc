@@ -13,6 +13,7 @@ uniform sampler2D gaf_leaf_wind_pattern : filter_nearest, repeat_enable;
 uniform vec2 gaf_leaf_wind = vec2(0.0);
 varying vec2 gaf_leaf_weights;
 uniform bool review_alpha_mask=false;
+uniform bool gaf_rock_bounce=false;
 uniform float review_leaf_hue=0.0;
 uniform vec3 review_backlight_rgb=vec3(0.0);
 uniform bool review_path=false;
@@ -135,11 +136,16 @@ void fragment(){
  if(gaf_ground_contact_enabled){
   ground_contact=gaf_ground_contact_factor((INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xyz);
  }
- EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC)*ground_contact;
+ vec3 diffuse_fill=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC)*ground_contact;
+ EMISSION+=diffuse_fill;
+ if(gaf_rock_bounce){
+  // Lift the vertical faces with existing scene irradiance and contact weighting.
+  float vertical_face=clamp(1.0-abs(dot(normalize(NORMAL),VIEW_MATRIX[1].xyz)),0.0,1.0);
+  EMISSION+=diffuse_fill*vec3(0.96,1.02,1.08)*vertical_face;
+ }
  if(gaf_directional_fill_enabled){
   vec3 normal_y=normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.)).xyz);
-  vec3 directional_term=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC)*ground_contact;
-  EMISSION+=directional_term*(gaf_directional_factor(normal_y)-vec3(1.));
+  EMISSION+=diffuse_fill*(gaf_directional_factor(normal_y)-vec3(1.));
  }
 #ifdef GAF_CLOUD_PROJECTOR
 	// Ambient is disabled here. Mobile applies this AO to direct diffuse and

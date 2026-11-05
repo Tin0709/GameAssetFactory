@@ -24,6 +24,7 @@ var enabled:=true
 var path_blend_requested:=false
 var grass_ground_color_requested:=false
 var ground_contact_requested:=false
+var rock_bounce_requested:=false
 var ground_contact_texture:ImageTexture
 var path_grass_rects:Array[Vector4]=[]
 var available:=false
@@ -155,6 +156,7 @@ func apply()->void:
 	_apply_path_blend()
 	_apply_grass_ground_color()
 	_apply_ground_contact()
+	_apply_rock_bounce()
 	_set_wind_bounds(enabled and stage>=6 and data.has("background_wind")and bool(data.background_wind.get("enabled",false)))
 	for key:String in saved:
 		if key not in ["compositor","aa","msaa","hdr_2d"]:env.set(key,saved[key])
@@ -210,6 +212,19 @@ func _apply_grass_ground_color()->void:
 	for row:Dictionary in controller_owner.pairs:
 		if row.plant and row.candidate.get_shader_parameter("tinted_grass"):
 			row.candidate.set_shader_parameter("gaf_grass_ground_color",active)
+
+func rock_bounce_active()->bool:
+	return available and enabled and stage>=6 and rock_bounce_requested
+
+func set_rock_bounce_enabled(value:bool)->void:
+	rock_bounce_requested=value
+	_apply_rock_bounce()
+
+func _apply_rock_bounce()->void:
+	var active:=rock_bounce_active()
+	for row:Dictionary in controller_owner.pairs:
+		if not row.plant and row.original.get_meta("source_material","") in ["Mi_ForestAtlas","Mi_PlainsA1A2Boulder"]:
+			row.candidate.set_shader_parameter("gaf_rock_bounce",active)
 
 func ground_contact_active()->bool:
 	return _wants_ground_contact() and ground_contact_texture!=null
