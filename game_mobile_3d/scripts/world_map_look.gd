@@ -33,6 +33,7 @@ var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
 var _pockets_requested:=false
 var _canopy_requested := false
+var _canopy_leaves: Array[Vector4] = []
 var _canopy_profile: Dictionary = {}
 var _direct_clouds_requested:=false
 var _direct_variants: Dictionary[Shader,Shader]={}
@@ -124,8 +125,12 @@ func build_path_map() -> void:
 	path_map_size=Vector2(bounds.max[0]-bounds.min[0]+1,bounds.max[2]-bounds.min[2]+1)
 	path_map_image=Image.create(int(path_map_size.x),int(path_map_size.y),false,Image.FORMAT_RGBAF)
 	var tops: Dictionary={}
+	var offset: Array = level.runtime.offset
 	for cell: Array in level.runtime.cells:
 		var entry: Dictionary=level.runtime.palette[cell[3]]
+		if entry.category=="leaf":
+			_canopy_leaves.append(Vector4(cell[0] + offset[0], cell[2] + offset[2],
+				cell[1] + entry.base_y_offset + offset[1], entry.height))
 		if entry.category!="terrain":continue
 		var key:=Vector2i(cell[0],cell[2])
 		var height: float=cell[1]+entry.base_y_offset+entry.height+level.runtime.offset[1]
@@ -190,15 +195,8 @@ func set_canopy_contact(enabled: bool) -> void:
 func _apply_canopy_contact() -> void:
 	var enabled := canopy_contact_active()
 	if enabled and _canopy_profile.is_empty():
-		var leaves: Array[Vector4] = []
-		var offset: Array = level.runtime.offset
-		for cell: Array in level.runtime.cells:
-			var entry: Dictionary = level.runtime.palette[cell[3]]
-			if entry.category == "leaf":
-				leaves.append(Vector4(cell[0] + offset[0], cell[2] + offset[2],
-					cell[1] + entry.base_y_offset + offset[1], entry.height))
-		var base_y: float = level.runtime.source_bounds.min[1] + offset[1]
-		var field := CANOPY.bake(leaves, path_map_image, Vector2i(path_map_origin), base_y)
+		var base_y: float = level.runtime.source_bounds.min[1] + level.runtime.offset[1]
+		var field := CANOPY.bake(_canopy_leaves, path_map_image, Vector2i(path_map_origin), base_y)
 		_canopy_profile = {"canopy_field": ImageTexture.create_from_image(field.image),
 			"canopy_origin": field.origin, "canopy_extent": field.extent, "canopy_base_y": base_y}
 	if _canopy_profile.is_empty(): return

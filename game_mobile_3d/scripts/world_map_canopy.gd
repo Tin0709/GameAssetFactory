@@ -19,9 +19,9 @@ static func bake(leaves: Array[Vector4], terrain: Image, map_min: Vector2i, base
 	var size := bounds.size * TEXELS_PER_METRE
 	if size.x == 0 or size.y == 0:
 		return {"image": Image.create(1, 1, false, Image.FORMAT_RGBA8), "origin": Vector2(map_min), "extent": Vector2.ONE}
-	var field := PackedFloat32Array()
+	var data := PackedByteArray()
+	data.resize(size.x * size.y * 4)
 	var terrain_offset := origin - map_min
-	field.resize(size.x * size.y)
 	var metres := 1.0 / TEXELS_PER_METRE
 	for leaf in leaves:
 		# Author cells describe full and half-leaf blocks. Adjacent blocks may
@@ -42,24 +42,14 @@ static func bake(leaves: Array[Vector4], terrain: Image, map_min: Vector2i, base
 				var spread := lerpf(0.80, REACH, clampf(clearance * 0.65, 0.0, 1.0))
 				var sky_weight := 1.0 - smoothstep(0.0, MAX_CLEARANCE, clearance)
 				var density := lerpf(0.56, 0.96, leaf.w)
-				var coverage := (1.0 - smoothstep(-0.26, spread, distance)) * density * sky_weight
-				var index := z * size.x + x
-				field[index] = maxf(field[index], coverage)
-	var data := PackedByteArray()
-	data.resize(field.size() * 4)
-	for z in size.y:
-		for x in size.x:
-			var index := z * size.x + x
-			var coverage := roundi(field[index] * 255.0)
-			if coverage == 0: continue
-			var receiver := Vector2i(x * metres, z * metres) + terrain_offset
-			var top := terrain.get_pixelv(receiver).g
-			# Encoding the weighted height preserves the receiver through
-			# bilinear filtering at the edge of the footprint.
-			var height := clampi(roundi((top - base_y) * HEIGHT_CODES_PER_METRE * (coverage / 255.0)), 0, 65535)
-			var pixel := index * 4
-			data[pixel] = coverage
-			data[pixel + 1] = height >> 8
-			data[pixel + 2] = height & 255
+				var coverage := roundi((1.0 - smoothstep(-0.26, spread, distance)) * density * sky_weight * 255.0)
+				var pixel := (z * size.x + x) * 4
+				if coverage <= data[pixel]: continue
+				# Encode weighted height so bilinear filtering preserves the
+				# receiver at the edge of the footprint.
+				var height := clampi(roundi((surface.g - base_y) * HEIGHT_CODES_PER_METRE * (coverage / 255.0)), 0, 65535)
+				data[pixel] = coverage
+				data[pixel + 1] = height >> 8
+				data[pixel + 2] = height & 255
 	var image := Image.create_from_data(size.x, size.y, false, Image.FORMAT_RGBA8, data)
 	return {"image": image, "origin": Vector2(origin), "extent": Vector2(bounds.size)}
