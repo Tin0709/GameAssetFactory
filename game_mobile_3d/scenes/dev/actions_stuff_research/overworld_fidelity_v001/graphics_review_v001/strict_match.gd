@@ -33,7 +33,8 @@ func setup(controller:Node)->void:
 		if not lab.private_bundle.permitted(profile_override):effect_error="Private profile must remain inside Research";return
 		path=profile_override
 	if not FileAccess.file_exists(path):return
-	var value:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
+	var profile_bytes:=FileAccess.get_file_as_bytes(path)
+	var value:Variant=JSON.parse_string(profile_bytes.get_string_from_utf8())
 	if not value is Dictionary or value.get("schema","")!="private_strict_day_v1":return
 	data=value;stage=int(data.stage)
 	if not GradeDomain.supported(float(data.get("correction_input_domain_linear",1.))):effect_error="Unsupported LUT input domain";return
@@ -83,7 +84,10 @@ func setup(controller:Node)->void:
 	trees.set_field(field_texture)
 	player_light=OmniLight3D.new();player_light.name="NightPlayerLightPresetAdapter";player_light.omni_range=5.;player_light.light_color=Color.WHITE;player_light.shadow_enabled=false;lab.player.add_child(player_light);player_light.position=Vector3(0,1.5,0)
 	_build_vignette()
-	profile_sha256=FileAccess.get_sha256(path)
+	var profile_digest:=HashingContext.new()
+	profile_digest.start(HashingContext.HASH_SHA256)
+	profile_digest.update(profile_bytes)
+	profile_sha256=profile_digest.finish().hex_encode()
 	available=true;apply()
 func apply()->void:
 	if controller_owner!=null and controller_owner.has_method("_before_graphics_change"):controller_owner._before_graphics_change()

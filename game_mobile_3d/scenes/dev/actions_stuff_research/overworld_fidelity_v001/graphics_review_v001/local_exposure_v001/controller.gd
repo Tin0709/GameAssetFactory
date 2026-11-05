@@ -283,10 +283,12 @@ func _load_canopy_weights()->Image:
 	var payload:Variant=manifest.get("map_path")
 	if not payload is String or not lab.private_bundle.permitted(payload) or not FileAccess.file_exists(payload):
 		return null
-	if FileAccess.get_sha256(payload)!=manifest.get("map_sha256"):
-		return null
 	var bytes:=FileAccess.get_file_as_bytes(payload)
 	if bytes.size()!=196*196*4:return null
+	var digest:=HashingContext.new()
+	digest.start(HashingContext.HASH_SHA256)
+	digest.update(bytes)
+	if digest.finish().hex_encode()!=manifest.get("map_sha256"):return null
 	for i in range(0,bytes.size(),4):
 		var visibility:=bytes.decode_half(i)
 		var roof:=bytes.decode_half(i+2)
