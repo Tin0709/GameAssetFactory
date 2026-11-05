@@ -8,6 +8,8 @@ render_mode diffuse_burley, ambient_light_disabled;
 uniform bool gaf_leaf_material_enabled=false;
 uniform sampler2D gaf_leaf_vertex_colors : filter_nearest, repeat_disable;
 uniform float gaf_leaf_scatter_strength=0.0;
+uniform sampler2D gaf_leaf_wind_pattern : filter_nearest, repeat_enable;
+uniform vec2 gaf_leaf_wind = vec2(0.0);
 varying vec2 gaf_leaf_weights;
 uniform bool review_alpha_mask=false;
 uniform float review_leaf_hue=0.0;
@@ -37,6 +39,14 @@ varying float gaf_upward;
 void vertex(){
  gaf_leaf_weights=gaf_leaf_material_enabled ? texelFetch(gaf_leaf_vertex_colors,ivec2(VERTEX_ID,0),0).rg : vec2(0.);
  vec3 p=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
+ if(gaf_leaf_material_enabled && gaf_leaf_wind.y > 0.0 && gaf_leaf_weights.g > 0.0){
+  vec3 relative = p - MAIN_CAM_INV_VIEW_MATRIX[3].xyz;
+  if(abs(relative.y) >= 0.2){
+   vec3 offset = gaf_leaf_wind_offset(gaf_leaf_wind_pattern, relative, gaf_leaf_wind.x, gaf_leaf_wind.y * gaf_leaf_weights.g);
+   VERTEX += transpose(MODEL_NORMAL_MATRIX) * offset;
+   p += offset;
+  }
+ }
  gaf_diffuse_fill=gaf_resolve_fill(textureLod(gaf_indirect_field,(p.xz-gaf_field_origin)/gaf_field_extent,0.0),p.y,gaf_open_fill,gaf_fill_height_fade,gaf_height_aware_fill);
  gaf_upward=clamp((MODEL_NORMAL_MATRIX*NORMAL).y,0.0,1.0);
 }

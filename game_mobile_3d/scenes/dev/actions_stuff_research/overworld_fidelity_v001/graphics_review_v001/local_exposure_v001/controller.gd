@@ -43,6 +43,8 @@ var _want_canopy:=false
 var _canopy_fields:Array[ImageTexture]=[null,null]
 var _leaf_toggle:CheckBox
 var _want_leaf:=false
+var _leaf_wind_toggle: CheckBox
+var _want_leaf_wind := false
 var _directional_toggle:CheckBox
 var _want_directional:=false
 var _bloom_toggle:CheckBox
@@ -116,6 +118,7 @@ func select_mode(value:int)->bool:
 	quality=1;_quality.select(1)
 	if _saved.is_empty()and not _begin():_refresh();return false
 	mode=value;_directional.apply(value==2 and _want_directional);_leaf.apply(value==2 and _want_leaf);_grass_normal.apply(value==2 and _want_normal);effect.set_neutral(value==3);effect.enabled=value in [2,3];_apply_presentation(value==2 and _want_presentation)
+	_leaf.apply_wind(value == 2 and _want_leaf_wind and owner_graphics.strict_match.stage >= 6)
 	_cloud.apply(owner_graphics,value==2 and _want_cloud)
 	if not _day_sun.is_empty():owner_graphics._apply_sun()
 	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
@@ -184,12 +187,28 @@ func set_covered_fill_enabled(value:bool)->bool:
 		if _covered_field==null:error="Covered-field allocation failed";_refresh();return false
 	_want_covered=true;_bind_field(_comparison_field());error="";_refresh();return true
 func set_leaf_material_enabled(value:bool)->bool:
-	if not value:_want_leaf=false;_leaf.apply(false);_refresh();return true
+	if not value:_want_leaf_wind=false;_want_leaf=false;_leaf.apply(false);_refresh();return true
 	if mode!=2 and not select_mode(2):return false
 	var path:=OS.get_environment("GAF_LEAF_MATERIAL_PROFILE")
 	if path.is_empty():path=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/leaf_vertex_material_v001/profile.private.json"
 	if not _leaf.configure_external(path):error=_leaf.error;_refresh();return false
 	_want_leaf=true;_leaf.apply(true);error="";_refresh();return true
+func set_leaf_wind_enabled(value: bool) -> bool:
+	if value:
+		if mode != 2 or not _want_leaf or owner_graphics.strict_match.stage < 6:
+			error = "Oak wind needs Day reference and the matched leaf material"
+			_refresh()
+			return false
+		if not _leaf.configure_wind(OS.get_environment("GAF_OAK_WIND_PROFILE")):
+			error = _leaf.error
+			_refresh()
+			return false
+	_want_leaf_wind = value
+	_leaf.apply_wind(value)
+	error = ""
+	_refresh()
+	return true
+
 func set_normal_override_enabled(value:bool)->bool:
 	if not value:_want_normal=false;_grass_normal.apply(false);_refresh();return true
 	if mode!=2 and not select_mode(2):return false
@@ -334,6 +353,7 @@ func deactivate(restore_owner:bool)->void:
 	_cloud.apply(owner_graphics,false)
 	_want_presentation=false;_apply_presentation(false)
 	_want_normal=false;_grass_normal.release()
+	_want_leaf_wind = false
 	_want_leaf=false;_leaf.release()
 	if owner_graphics!=null and owner_graphics.strict_match!=null:owner_graphics.strict_match.clear_source_companion()
 	_want_covered=false
@@ -357,6 +377,7 @@ func input(event:InputEvent)->bool:
 func _process(delta:float)->void:
 	if _released:return
 	_cloud.advance(delta)
+	_leaf.update_wind(lab.meadow.clock, lab.meadow.wind_enabled)
 	_elapsed+=delta
 	if _elapsed<.25:return
 	_elapsed=0.
@@ -378,6 +399,14 @@ func _build_ui()->void:
 	_directional_toggle=CheckBox.new();_directional_toggle.text="Directional fill - single-probe reference";_directional_toggle.add_theme_font_size_override("font_size",11);_directional_toggle.focus_mode=Control.FOCUS_NONE;_directional_toggle.toggled.connect(set_directional_enabled);_directional_toggle.tooltip_text="Normal-dependent SH calibration; spatial field and foliage back GI remain approximate.";box.add_child(_directional_toggle)
 	_covered_toggle=CheckBox.new();_covered_toggle.text="Covered fill - preserve source endpoints";_covered_toggle.add_theme_font_size_override("font_size",11);_covered_toggle.focus_mode=Control.FOCUS_NONE;_covered_toggle.toggled.connect(set_covered_fill_enabled);_covered_toggle.tooltip_text="Two source-lit endpoints, unchanged original AABB/reach/height geometry; not native AO.";box.add_child(_covered_toggle)
 	_leaf_toggle=CheckBox.new();_leaf_toggle.text="Leaf channels - captured Oak Var2";_leaf_toggle.add_theme_font_size_override("font_size",11);_leaf_toggle.focus_mode=Control.FOCUS_NONE;_leaf_toggle.toggled.connect(set_leaf_material_enabled);_leaf_toggle.tooltip_text="Restores verified vertex-weighted material inputs for one matching mesh; native two-sided lighting remains approximate.";box.add_child(_leaf_toggle)
+	_leaf_wind_toggle = CheckBox.new()
+	_leaf_wind_toggle.text = "Oak wind - captured Var2"
+	_leaf_wind_toggle.tooltip_text = "Uses the measured Oak deformation with the lab camera and wind clock."
+	_leaf_wind_toggle.add_theme_font_size_override("font_size", 11)
+	_leaf_wind_toggle.focus_mode = Control.FOCUS_NONE
+	_leaf_wind_toggle.visible = not OS.get_environment("GAF_OAK_WIND_PROFILE").is_empty()
+	_leaf_wind_toggle.toggled.connect(set_leaf_wind_enabled)
+	box.add_child(_leaf_wind_toggle)
 	_normal_toggle=CheckBox.new();_normal_toggle.text="World-up normals - captured grass";_normal_toggle.add_theme_font_size_override("font_size",11);_normal_toggle.focus_mode=Control.FOCUS_NONE;_normal_toggle.toggled.connect(set_normal_override_enabled);_normal_toggle.tooltip_text="Captured Day grass normal response only; tree and terrain normals remain unchanged.";box.add_child(_normal_toggle)
 	_presentation_toggle=CheckBox.new();_presentation_toggle.text="Direct log-LUT + pre-grade vignette";_presentation_toggle.add_theme_font_size_override("font_size",11);_presentation_toggle.focus_mode=Control.FOCUS_NONE;_presentation_toggle.toggled.connect(set_presentation_enabled);_presentation_toggle.tooltip_text="Direct private typed LUT, aspect-normalized vignette before grading. Preserves old scene exposure calibration; native noise and final image are not bit-exact.";box.add_child(_presentation_toggle)
 	_cloud_toggle=CheckBox.new()
@@ -411,6 +440,8 @@ func _refresh()->void:
 	_directional_toggle.set_pressed_no_signal(_want_directional)
 	_covered_toggle.set_pressed_no_signal(_want_covered)
 	_leaf_toggle.set_pressed_no_signal(_want_leaf)
+	_leaf_wind_toggle.set_pressed_no_signal(_want_leaf_wind)
+	_leaf_wind_toggle.disabled = mode != 2 or not _want_leaf or owner_graphics.strict_match.stage < 6
 	_normal_toggle.set_pressed_no_signal(_want_normal)
 	_presentation_toggle.set_pressed_no_signal(_want_presentation)
 	_cloud_toggle.set_pressed_no_signal(_want_cloud)
