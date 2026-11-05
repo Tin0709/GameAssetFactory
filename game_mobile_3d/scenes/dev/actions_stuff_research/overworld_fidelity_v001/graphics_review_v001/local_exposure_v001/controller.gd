@@ -115,6 +115,9 @@ func _begin()->bool:
 	active.append(effect);_compositor.compositor_effects=active;lab.camera.compositor=_compositor
 	_active_grade_gain=gain
 	return true
+func measurement_camera_locked()->bool:
+	return not _saved.is_empty()
+
 func select_mode(value:int)->bool:
 	if _released or value not in [0,1,2,3]:return false
 	error=""
@@ -396,9 +399,12 @@ func deactivate(restore_owner:bool)->void:
 	for key:String in _saved.environment:env.set(key,_saved.environment[key])
 	lab.get_viewport().use_hdr_2d=_saved.hdr
 	if restore_owner:
-		strict.stage=int(_saved.stage);owner_graphics.seek_cycle(float(_saved.cycle),true);owner_graphics.set_candidate(bool(_saved.candidate));owner_graphics.set_comparison_camera(bool(_saved.comparison_camera));owner_graphics.set_cycle_enabled(bool(_saved.auto));lab._update_camera()
+		strict.stage=int(_saved.stage);owner_graphics.seek_cycle(float(_saved.cycle),true);owner_graphics.set_candidate(bool(_saved.candidate));owner_graphics.set_comparison_camera(bool(_saved.comparison_camera));owner_graphics.set_cycle_enabled(bool(_saved.auto))
 	_want_bloom=false;_saved.clear();_covered_field=null;_field=null;_hdr=null;effect=null;_compositor=null;mode=0;_changing=false;_refresh()
-	if restore_owner and owner_graphics.day_composition_active():owner_graphics._apply_sun()
+	if restore_owner:
+		lab._update_camera()
+		owner_graphics._refresh_label()
+		if owner_graphics.day_composition_active():owner_graphics._apply_sun()
 func input(event:InputEvent)->bool:
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_F7:
 		select_mode(1 if mode==2 else 2);return true

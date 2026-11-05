@@ -46,7 +46,7 @@ func _build_border(roots:Array[Vector3])->void:
 							var offset:=Vector2(tree.x-position.x+.55,tree.z-position.z+1.3)
 							shade=maxf(shade,1.-smoothstep(.6,15.,offset.length_squared()))
 						var grain:=field.get_noise_2d(point.x,point.y)
-						var base:=Color("#648b44").lerp(Color("#4c6338"),smoothstep(0.,14.,depth))
+						var base:=Color("#59803f").lerp(Color("#4c6338"),smoothstep(0.,14.,depth))
 						base=base.lerp(Color("#92995d"),clampf(.15+grain*.31,0.,.39))
 						vertices[point]=position-center
 						colors[point]=base.darkened(.27*shade).srgb_to_linear()
@@ -86,7 +86,10 @@ func _build_forest()->Array[Vector3]:
 	for kind in 3:tree_meshes.append(_make_tree(kind,leaves))
 	for side in 2:
 		for segment in 4:
-			var variants:Array[Array]=[[],[],[]]
+			var crowns:=SurfaceTool.new()
+			crowns.begin(Mesh.PRIMITIVE_TRIANGLES)
+			crowns.set_material(leaves)
+			var has_crowns:=false
 			var along:float=-37.5+25.*segment
 			var shifts:Array[Vector2]=[Vector2(-8.,3.2),Vector2(-3.2,6.9),Vector2(.85,2.4),Vector2(5.,8.8),Vector2(9.,3.9)]
 			for i in shifts.size():
@@ -100,19 +103,14 @@ func _build_forest()->Array[Vector3]:
 				roots.append(p)
 				var tree_scale:=rng.randf_range(.89,1.29) if i==1 or i==3 else rng.randf_range(.68,.98)
 				var rotation:=Basis(Vector3.UP,rng.randf_range(-.65,.65))
-				variants[variation].append(Transform3D(rotation.scaled(Vector3(tree_scale*.91,tree_scale,tree_scale*.91)),p))
-			for kind in variants.size():
-				var transforms:Array=variants[kind]
-				if transforms.is_empty():continue
-				var node:=MultiMeshInstance3D.new()
-				var batch:=MultiMesh.new()
-				batch.transform_format=MultiMesh.TRANSFORM_3D
-				batch.mesh=tree_meshes[kind]
-				batch.instance_count=transforms.size()
-				for i in transforms.size():batch.set_instance_transform(i,transforms[i])
-				node.multimesh=batch
-				node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-				add_child(node)
+				crowns.append_from(tree_meshes[variation],0,Transform3D(rotation.scaled(Vector3(tree_scale*.91,tree_scale,tree_scale*.91)),p))
+				has_crowns=true
+			if has_crowns:
+				crowns.index()
+				var group:=MeshInstance3D.new()
+				group.mesh=crowns.commit()
+				group.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				add_child(group)
 	return roots
 
 func _make_tree(kind:int,material:Material)->ArrayMesh:
@@ -182,7 +180,7 @@ func _build_verge(path_center:Callable)->void:
 			var transforms:Array[Transform3D]=[]
 			for i in 82:
 				var along:float=-49.+segment*24.6+rng.randf_range(0.,24.6)
-				var depth:=rng.randf_range(.55,8.)
+				var depth:=lerpf(.55,8.,pow(rng.randf(),1.75))
 				var d:=-(50.+depth)
 				var p:=Vector2(d,along) if side==0 else Vector2(along,d)
 				if side==1 and absf(along-float(path_center.call(d)))<1.15:continue

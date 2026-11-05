@@ -254,6 +254,9 @@ func set_follow_player_camera(value:bool)->void:
 	apply_camera()
 	_refresh_label()
 
+func player_camera_following()->bool:
+	return follow_player_camera and (local_exposure==null or not local_exposure.measurement_camera_locked())
+
 func apply_camera()->void:
 	if not available or released:return
 	var c:Camera3D=lab.camera
@@ -266,7 +269,7 @@ func apply_camera()->void:
 		c.look_at(lab.camera_anchor,Vector3.UP)
 	else:
 		c.projection=baseline.camera_projection;c.keep_aspect=baseline.camera_aspect;c.fov=baseline.camera_fov;c.near=baseline.camera_near
-	if strict_match!=null and not follow_player_camera:strict_match.lock_camera()
+	if strict_match!=null and not player_camera_following():strict_match.lock_camera()
 func material_identity()->Dictionary:
 	var result:={}
 	for row:Dictionary in surfaces:result[str(row.mesh.get_instance_id())+"/"+str(row.surface)]=row.mesh.surface_get_material(row.surface).get_instance_id()
@@ -311,7 +314,7 @@ func _build_ui()->void:
 	var hint:=Label.new();hint.text="F9 A/B · F10 original · H hide controls";hint.add_theme_font_size_override("font_size",11);box.add_child(hint)
 func _refresh_label()->void:
 	if state_label!=null and strict_match!=null and strict_match.available and candidate:
-		state_label.text=("UPDATED MD2 · "+String(phase).to_upper()if strict_match.stage>0 else"PREVIOUS GODOT M1") + (" · following player" if follow_player_camera else " · locked camera")+"\nF9 previous / updated · source LUT + calibrated fill"
+		state_label.text=("UPDATED MD2 · "+String(phase).to_upper()if strict_match.stage>0 else"PREVIOUS GODOT M1") + (" · following player" if player_camera_following() else " · locked camera")+"\nF9 previous / updated · source LUT + calibrated fill"
 		return
 	if state_label!=null:state_label.text=("FOUNDATION"if candidate else"BASELINE")+(" · perspective45°"if candidate or comparison_camera else" · original camera")+"\n100 × 100 m · cycle %.0f%% · Pending review"%[cycle_position*100.]
 func release()->void:
