@@ -4,6 +4,8 @@ const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const MOTION=preload("res://scripts/grassland_motion.gd")
+const REVIEW_SHADOW_BLUR := 1.62
+const REVIEW_SHADOW_NORMAL_BIAS := 0.76
 const BASE_CLOUD_SHAPE:=Vector4(13.,.50,.73,.20)
 const POCKET_CLOUD_SHAPE:=Vector4(1.35,.40,.65,.49)
 var level: Node3D
@@ -32,6 +34,7 @@ var cloud_texture: ImageTexture
 var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
 var _pockets_requested:=false
+var _shadow_review_requested := false
 var _canopy_requested := false
 var _canopy_leaves: Array[Vector4] = []
 var _canopy_profile: Dictionary = {}
@@ -369,6 +372,27 @@ func publish_clouds(time: float) -> void:
 		var linear: Color=item[4].srgb_to_linear()
 		item[3].albedo_color=Color(linear.r*shade,linear.g*shade,linear.b*shade,linear.a).linear_to_srgb()
 
+func directional_shadow_review_active() -> bool:
+	return stage == 2 and _shadow_review_requested
+
+func set_directional_shadow_review(enabled: bool) -> void:
+	if enabled == _shadow_review_requested: return
+	_shadow_review_requested = enabled
+	if stage == 2:
+		_apply_directional_shadow_review(level.get_node("Sun"))
+
+func _apply_directional_shadow_review(sun: DirectionalLight3D) -> void:
+	var review := directional_shadow_review_active()
+	sun.shadow_blur = REVIEW_SHADOW_BLUR if review else PRESET.sun_settings.shadow_blur
+	sun.shadow_normal_bias = REVIEW_SHADOW_NORMAL_BIAS if review else PRESET.sun_settings.shadow_normal_bias
+	var use_16bit: bool = PRESET.shadow_16bit
+	if review:
+		var device := RenderingServer.get_rendering_device()
+		var usage := RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT | RenderingDevice.TEXTURE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
+		if device != null and device.texture_is_format_supported_for_usage(RenderingDevice.DATA_FORMAT_D16_UNORM, usage):
+			use_16bit = true
+	RenderingServer.directional_shadow_atlas_set_size(PRESET.shadow_atlas_size, use_16bit)
+
 func set_stage(value: int) -> void:
 	stage=clampi(value,0,2)
 	if level.geometry.has_method("reset_cutaway_materials"):level.geometry.reset_cutaway_materials()
@@ -382,7 +406,7 @@ func set_stage(value: int) -> void:
 	RenderingServer.directional_soft_shadow_filter_set_quality(saved_shadow_quality as RenderingServer.ShadowQuality)
 	if stage==2:
 		for property: String in PRESET.sun_settings:sun.set(property,PRESET.sun_settings[property])
-		RenderingServer.directional_shadow_atlas_set_size(PRESET.shadow_atlas_size,PRESET.shadow_16bit)
+		_apply_directional_shadow_review(sun)
 		RenderingServer.directional_soft_shadow_filter_set_quality(PRESET.shadow_quality as RenderingServer.ShadowQuality)
 	_apply_review_shaders()
 	_apply_daylight_pockets()
