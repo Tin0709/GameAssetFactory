@@ -2,7 +2,9 @@ shader_type spatial;
 render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_surface_v5.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
+#ifdef GAF_WORLD_CANOPY
 #include "res://materials/world_map_canopy.gdshaderinc"
+#endif
 varying vec3 surface_world;
 varying float surface_top;
 varying vec3 surface_normal;
@@ -26,8 +28,10 @@ void vertex() {
 #endif
 
 void fragment() {
+#ifdef GAF_WORLD_CANOPY
 	AO = surface_top > 0.9 ? canopy_ao(surface_world) : 1.0;
 	AO_LIGHT_AFFECT = CANOPY_DIRECT_AFFECT;
+#endif
 	vec4 color = albedo_tint;
 	if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);
 	if (use_vertex_color) color *= COLOR;

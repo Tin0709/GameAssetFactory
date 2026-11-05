@@ -36,7 +36,7 @@ var _canopy_requested := false
 var _canopy_leaves: Array[Vector4] = []
 var _canopy_profile: Dictionary = {}
 var _direct_clouds_requested:=false
-var _direct_variants: Dictionary[Shader,Shader]={}
+var _shader_variants: Dictionary[Shader,Dictionary]={}
 var _review_shaders: Dictionary[ShaderMaterial,Shader]={}
 var _direct_actor_materials: Array[ShaderMaterial]=[]
 var _pockets_image: Image
@@ -190,23 +190,22 @@ func canopy_contact_active() -> bool:
 func set_canopy_contact(enabled: bool) -> void:
 	if enabled == _canopy_requested: return
 	_canopy_requested = enabled
-	_apply_canopy_contact()
+	if stage != 2: return
+	level.geometry.reset_cutaway_materials()
+	_apply_review_shaders()
+	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 
 func _apply_canopy_contact() -> void:
-	var enabled := canopy_contact_active()
-	if enabled and _canopy_profile.is_empty():
+	if not canopy_contact_active(): return
+	if _canopy_profile.is_empty():
 		var base_y: float = level.runtime.source_bounds.min[1] + level.runtime.offset[1]
 		var field := CANOPY.bake(_canopy_leaves, path_map_image, Vector2i(path_map_origin), base_y)
 		_canopy_profile = {"canopy_field": ImageTexture.create_from_image(field.image),
 			"canopy_origin": field.origin, "canopy_extent": field.extent, "canopy_base_y": base_y}
-	if _canopy_profile.is_empty(): return
-	var parameters := _canopy_profile.duplicate()
-	parameters["canopy_enabled"] = enabled
 	for material: ShaderMaterial in _review_shaders:
 		if _review_shaders[material] == PRESET.leaves_shader: continue
-		for parameter: String in parameters:
-			material.set_shader_parameter(parameter, parameters[parameter])
-	level.geometry.update_canopy_contact(parameters)
+		for parameter: String in _canopy_profile:
+			material.set_shader_parameter(parameter, _canopy_profile[parameter])
 
 func build_cloud_field() -> void:
 	cloud_image=Image.create(64,64,false,Image.FORMAT_RF)
@@ -242,34 +241,43 @@ func set_direct_clouds(value: bool) -> void:
 
 func _refresh_cloud_look() -> void:
 	level.geometry.reset_cutaway_materials()
-	_apply_direct_clouds()
+	_apply_review_shaders()
 	_apply_daylight_pockets()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)
 
-func _direct_variant(original: Shader) -> Shader:
-	if not _direct_variants.has(original):
-		var shader:=Shader.new()
-		var defines:="shader_type spatial;\n#define GAF_WORLD_DIRECT_CLOUD"
-		if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
-			defines+="\n#define GAF_WORLD_FORCE_LAMBERT"
-		shader.code=original.code.replace("shader_type spatial;",defines)
-		_direct_variants[original]=shader
-	return _direct_variants[original]
+func _review_variant(original: Shader, direct: bool, canopy: bool) -> Shader:
+	if not (direct or canopy): return original
+	var key := Vector2i(int(direct), int(canopy))
+	var variants: Dictionary = _shader_variants.get_or_add(original, {})
+	if not variants.has(key):
+		var shader := Shader.new()
+		var defines := "shader_type spatial;"
+		if canopy:
+			defines += "\n#define GAF_WORLD_CANOPY"
+		if direct:
+			defines += "\n#define GAF_WORLD_DIRECT_CLOUD"
+			if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
+				defines += "\n#define GAF_WORLD_FORCE_LAMBERT"
+		shader.code = original.code.replace("shader_type spatial;", defines)
+		variants[key] = shader
+	return variants[key]
 
-func _apply_direct_clouds() -> void:
-	var direct:=direct_clouds_active()
-	level.geometry.cutaway_shader=_direct_variant(PRESET.cutaway_shader) if direct else PRESET.cutaway_shader
+func _apply_review_shaders() -> void:
+	var direct := direct_clouds_active()
+	var canopy := canopy_contact_active()
+	level.geometry.cutaway_shader = _review_variant(PRESET.cutaway_shader, direct, canopy)
 	for material: ShaderMaterial in _review_shaders:
-		var native: Shader=_review_shaders[material]
-		var target:=_direct_variant(native) if direct else native
-		if target==material.shader:continue
-		var params: Dictionary={}
+		var native: Shader = _review_shaders[material]
+		var target := _review_variant(native, direct, canopy and native != PRESET.leaves_shader)
+		if target == material.shader: continue
+		var params: Dictionary = {}
 		for row: Dictionary in native.get_shader_uniform_list():
-			params[row.name]=material.get_shader_parameter(row.name)
-		material.shader=target
+			params[row.name] = material.get_shader_parameter(row.name)
+		material.shader = target
 		for parameter: String in params:
-			if params[parameter]!=null:material.set_shader_parameter(parameter,params[parameter])
+			if params[parameter] != null: material.set_shader_parameter(parameter, params[parameter])
+	_apply_canopy_contact()
 	if direct and _direct_actor_materials.is_empty():
 		for item: Array in actor_materials:_direct_actor_materials.append(_make_direct_actor(item[0],item[3],item[4]))
 	for index in actor_materials.size():
@@ -296,7 +304,7 @@ func _make_direct_actor(node: MeshInstance3D, source: BaseMaterial3D, tint: Colo
 	for feature in BaseMaterial3D.FEATURE_MAX:
 		if source.get_feature(feature):return null
 	var material:=ShaderMaterial.new()
-	material.shader=_direct_variant(DIRECT_ACTOR_SHADER)
+	material.shader=_review_variant(DIRECT_ACTOR_SHADER, true, false)
 	material.render_priority=source.render_priority
 	material.set_shader_parameter("atlas",source.albedo_texture)
 	material.set_shader_parameter("albedo_tint",tint)
@@ -376,8 +384,7 @@ func set_stage(value: int) -> void:
 		for property: String in PRESET.sun_settings:sun.set(property,PRESET.sun_settings[property])
 		RenderingServer.directional_shadow_atlas_set_size(PRESET.shadow_atlas_size,PRESET.shadow_16bit)
 		RenderingServer.directional_soft_shadow_filter_set_quality(PRESET.shadow_quality as RenderingServer.ShadowQuality)
-	_apply_canopy_contact()
-	_apply_direct_clouds()
+	_apply_review_shaders()
 	_apply_daylight_pockets()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)
