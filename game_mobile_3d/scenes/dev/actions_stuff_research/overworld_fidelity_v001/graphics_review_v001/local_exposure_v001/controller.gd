@@ -232,7 +232,7 @@ func set_day_sun_enabled(value:bool)->bool:
 	if _released:
 		return false
 	if value:
-		if mode!=2:
+		if mode!=2 or owner_graphics.strict_match.stage<3:
 			return false
 		var measured:=_read_day_sun(_day_sun_path())
 		if measured.is_empty():
@@ -342,7 +342,7 @@ func _refresh()->void:
 	_presentation_toggle.set_pressed_no_signal(_want_presentation)
 	_cloud_toggle.set_pressed_no_signal(_want_cloud)
 	_day_sun_toggle.set_pressed_no_signal(not _day_sun.is_empty())
-	_day_sun_toggle.disabled=mode!=2
+	_day_sun_toggle.disabled=mode!=2 or owner_graphics.strict_match.stage<3
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"
