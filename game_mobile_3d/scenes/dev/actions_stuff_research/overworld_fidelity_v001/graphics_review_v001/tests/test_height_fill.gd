@@ -1,6 +1,6 @@
 extends SceneTree
 ## Synthetic geometry invariants for the original flat-map irradiance adapter.
-const SOURCE="res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/foundation_solid.gdshader"
+const SOURCE="res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/foundation_solid.gdshaderinc"
 var viewport:SubViewport
 var cases:Array[Dictionary]=[]
 var frame:=0
@@ -9,9 +9,7 @@ func begin()->void:
 	var source:=FileAccess.get_file_as_string(SOURCE)
 	var expression:String=source.split("gaf_diffuse_fill=")[1].split(";")[0]
 	expression=expression.replace("textureLod(gaf_indirect_field,(p.xz-gaf_field_origin)/gaf_field_extent,0.0)","probe_field").replace("p.y","probe_height")
-	var helpers:=""
-	for line:String in source.split("\n"):
-		if line.begins_with("#include"):helpers+=FileAccess.get_file_as_string(SOURCE.get_base_dir().path_join(line.split('"')[1]))+"\n"
+	var helpers:=FileAccess.get_file_as_string(SOURCE.get_base_dir().path_join("height_fill.gdshaderinc"))
 	var shader:=Shader.new();shader.code="""
 shader_type canvas_item;render_mode unshaded,blend_disabled;
 uniform vec4 probe_field;

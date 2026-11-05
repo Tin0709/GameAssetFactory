@@ -1,6 +1,6 @@
 extends SceneTree
 ## Original synthetic inputs only. No private assets or reference palette required.
-const SHADER_PATH="res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/foundation_vegetation.gdshader"
+const SHADER_PATH="res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/foundation_vegetation.gdshaderinc"
 var viewport:SubViewport
 var frame:=0
 var cases:Array[Dictionary]=[]

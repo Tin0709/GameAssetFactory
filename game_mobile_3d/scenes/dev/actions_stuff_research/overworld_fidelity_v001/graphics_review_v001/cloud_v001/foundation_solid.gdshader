@@ -1,2 +1,2 @@
 #define GAF_CLOUD_PROJECTOR
-#include "../foundation_solid.gdshader"
+#include "../foundation_solid.gdshaderinc"
