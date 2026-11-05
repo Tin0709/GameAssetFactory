@@ -306,7 +306,7 @@ func _comparison_field()->ImageTexture:
 	return _covered_field if _want_covered else _field
 
 func set_canopy_enabled(value:bool)->bool:
-	if _released or mode!=2 or owner_graphics.strict_match.stage<3:return false
+	if _released or mode!=2 or owner_graphics.strict_match.stage<6:return false
 	if value and _canopy_weights==null:
 		_canopy_weights=_load_canopy_weights()
 		if _canopy_weights==null:
@@ -417,7 +417,7 @@ func _refresh()->void:
 	_day_sun_toggle.set_pressed_no_signal(not _day_sun.is_empty())
 	_day_sun_toggle.disabled=mode!=2 or owner_graphics.strict_match.stage<3
 	_canopy_toggle.set_pressed_no_signal(_want_canopy)
-	_canopy_toggle.disabled=_day_sun_toggle.disabled
+	_canopy_toggle.disabled=mode!=2 or owner_graphics.strict_match.stage<6
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"
