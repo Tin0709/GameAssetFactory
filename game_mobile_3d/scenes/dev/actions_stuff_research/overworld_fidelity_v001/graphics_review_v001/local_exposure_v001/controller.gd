@@ -4,6 +4,7 @@ const Effect=preload("../presentation_v001/presentation_effect.gd")
 const Directional=preload("../directional_fill_v001/controller.gd")
 const Leaf=preload("../leaf_material_v001/controller.gd")
 const GrassNormal=preload("../grass_normal_v001/controller.gd")
+const Cloud=preload("../cloud_v001/controller.gd")
 const Policy=preload("availability.gd")
 const GradeDomain=preload("../grade_domain.gd")
 var owner_graphics:Node
@@ -30,6 +31,9 @@ var _leaf=Leaf.new()
 var _grass_normal=GrassNormal.new()
 var _normal_toggle:CheckBox
 var _want_normal:=false
+var _cloud=Cloud.new()
+var _cloud_toggle:CheckBox
+var _want_cloud:=false
 var _leaf_toggle:CheckBox
 var _want_leaf:=false
 var _directional_toggle:CheckBox
@@ -104,6 +108,7 @@ func select_mode(value:int)->bool:
 	quality=1;_quality.select(1)
 	if _saved.is_empty()and not _begin():_refresh();return false
 	mode=value;_directional.apply(value==2 and _want_directional);_leaf.apply(value==2 and _want_leaf);_grass_normal.apply(value==2 and _want_normal);effect.set_neutral(value==3);effect.enabled=value in [2,3];_apply_presentation(value==2 and _want_presentation)
+	_cloud.apply(owner_graphics,value==2 and _want_cloud)
 	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
 	_bind_field((_covered_field if _want_covered else _field)if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
 func set_bloom_enabled(value:bool)->bool:
@@ -183,9 +188,20 @@ func set_normal_override_enabled(value:bool)->bool:
 	if path.is_empty():path=OS.get_environment("USERPROFILE")+"/Desktop/MD2 Research/godot_lab/grass_normal_response_v001/profile.private.json"
 	if not _grass_normal.configure_external(path):error=_grass_normal.error;_refresh();return false
 	_want_normal=true;_grass_normal.apply(true);error="";_refresh();return true
+func set_cloud_enabled(value:bool)->bool:
+	if value:
+		if RenderingServer.get_current_rendering_method()!="mobile" or (mode!=2 and not select_mode(2)):
+			_refresh()
+			return false
+	_cloud.apply(owner_graphics,value)
+	_want_cloud=_cloud.active
+	_refresh()
+	return _want_cloud==value
 func before_environment_change()->void:
 	if not _changing and not _saved.is_empty():deactivate(false)
 func deactivate(restore_owner:bool)->void:
+	_want_cloud=false
+	_cloud.apply(owner_graphics,false)
 	_want_presentation=false;_apply_presentation(false)
 	_want_normal=false;_grass_normal.release()
 	_want_leaf=false;_leaf.release()
@@ -210,6 +226,7 @@ func input(event:InputEvent)->bool:
 	return false
 func _process(delta:float)->void:
 	if _released:return
+	_cloud.advance(delta)
 	_elapsed+=delta
 	if _elapsed<.25:return
 	_elapsed=0.
@@ -218,7 +235,7 @@ func _process(delta:float)->void:
 		if not s.error.is_empty():error=s.error;deactivate(true)
 	_refresh()
 func snapshot()->Dictionary:
-	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"presentation":{"requested":_want_presentation,"active":mode==2 and _want_presentation,"environment_saved":not _presentation_environment.is_empty()},"directional_fill":_directional.snapshot(),"leaf_material":_leaf.snapshot(),"grass_normal":_grass_normal.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
+	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"cloud_projection":{"requested":_want_cloud,"active":_cloud.active},"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"presentation":{"requested":_want_presentation,"active":mode==2 and _want_presentation,"environment_saved":not _presentation_environment.is_empty()},"directional_fill":_directional.snapshot(),"leaf_material":_leaf.snapshot(),"grass_normal":_grass_normal.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
 func _build_ui()->void:
 	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,255);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.045,.94);style.content_margin_left=10;style.content_margin_right=10;style.content_margin_top=8;style.content_margin_bottom=8;style.set_corner_radius_all(6);_panel.add_theme_stylebox_override("panel",style)
@@ -233,6 +250,14 @@ func _build_ui()->void:
 	_leaf_toggle=CheckBox.new();_leaf_toggle.text="Leaf channels - captured Oak Var2";_leaf_toggle.add_theme_font_size_override("font_size",11);_leaf_toggle.focus_mode=Control.FOCUS_NONE;_leaf_toggle.toggled.connect(set_leaf_material_enabled);_leaf_toggle.tooltip_text="Restores verified vertex-weighted material inputs for one matching mesh; native two-sided lighting remains approximate.";box.add_child(_leaf_toggle)
 	_normal_toggle=CheckBox.new();_normal_toggle.text="World-up normals - captured grass";_normal_toggle.add_theme_font_size_override("font_size",11);_normal_toggle.focus_mode=Control.FOCUS_NONE;_normal_toggle.toggled.connect(set_normal_override_enabled);_normal_toggle.tooltip_text="Captured Day grass normal response only; tree and terrain normals remain unchanged.";box.add_child(_normal_toggle)
 	_presentation_toggle=CheckBox.new();_presentation_toggle.text="Direct log-LUT + pre-grade vignette";_presentation_toggle.add_theme_font_size_override("font_size",11);_presentation_toggle.focus_mode=Control.FOCUS_NONE;_presentation_toggle.toggled.connect(set_presentation_enabled);_presentation_toggle.tooltip_text="Direct private typed LUT, aspect-normalized vignette before grading. Preserves old scene exposure calibration; native noise and final image are not bit-exact.";box.add_child(_presentation_toggle)
+	_cloud_toggle=CheckBox.new()
+	_cloud_toggle.text="Moving cloud shadows - Day"
+	_cloud_toggle.tooltip_text="Original cloud pattern on the meadow and foliage. Uses the Day scene's direct light only."
+	_cloud_toggle.add_theme_font_size_override("font_size",11)
+	_cloud_toggle.focus_mode=Control.FOCUS_NONE
+	_cloud_toggle.disabled=RenderingServer.get_current_rendering_method()!="mobile"
+	_cloud_toggle.toggled.connect(set_cloud_enabled)
+	box.add_child(_cloud_toggle)
 	_status=Label.new();_status.add_theme_font_size_override("font_size",10);box.add_child(_status)
 func _refresh()->void:
 	if _status==null:return
@@ -242,6 +267,7 @@ func _refresh()->void:
 	_leaf_toggle.set_pressed_no_signal(_want_leaf)
 	_normal_toggle.set_pressed_no_signal(_want_normal)
 	_presentation_toggle.set_pressed_no_signal(_want_presentation)
+	_cloud_toggle.set_pressed_no_signal(_want_cloud)
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"
