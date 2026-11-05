@@ -126,7 +126,6 @@ func setup(scene:Node3D)->void:
 			day_composition_toggle.focus_mode=Control.FOCUS_NONE
 			day_composition_toggle.toggled.connect(set_day_composition)
 			graphics_panel.get_child(0).add_child(day_composition_toggle)
-			graphics_panel.position.y-=35.
 	local_exposure=LocalExposure.new();local_exposure.name="LocalExposure";add_child(local_exposure);local_exposure.setup(self)
 func _process(_delta:float)->void:
 	if not available or released:return
