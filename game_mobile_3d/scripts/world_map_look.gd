@@ -52,9 +52,9 @@ func setup(map: Node3D) -> void:
 	baseline_environment=level.get_node("WorldEnvironment").environment.duplicate()
 	build_path_map()
 	build_cloud_field()
-	saved_shadow_size=int(ProjectSettings.get_setting("rendering/lights_and_shadows/directional_shadow/size",1024))
-	saved_shadow_16bit=bool(ProjectSettings.get_setting("rendering/lights_and_shadows/directional_shadow/16_bits",true))
-	saved_shadow_quality=int(ProjectSettings.get_setting("rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality",1))
+	saved_shadow_size=int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/size"))
+	saved_shadow_16bit=bool(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/16_bits"))
+	saved_shadow_quality=int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality"))
 	for property: String in PRESET.sun_settings:
 		baseline_sun[property]=level.get_node("Sun").get(property)
 	for chunk: MeshInstance3D in level.geometry.terrain_chunks:
@@ -377,6 +377,7 @@ func directional_shadow_review_active() -> bool:
 
 func set_directional_shadow_review(enabled: bool) -> void:
 	if enabled == _shadow_review_requested: return
+	if enabled and RenderingServer.get_rendering_device() == null: return
 	_shadow_review_requested = enabled
 	if stage == 2:
 		_apply_directional_shadow_review(level.get_node("Sun"))
