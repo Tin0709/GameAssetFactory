@@ -18,6 +18,7 @@ uniform sampler2D ground_atlas : source_color, filter_nearest, repeat_disable;
 uniform vec4 ground_uv=vec4(0.0);
 uniform bool has_mre=false;
 uniform bool tinted_grass=false;
+uniform bool gaf_grass_ground_color=false;
 uniform bool review_grass_material=false;
 uniform vec3 review_backlight_rgb=vec3(0.18);
 uniform float review_tip_height=0.0;
@@ -134,7 +135,14 @@ void fragment(){
 		 vec2 fine=review_world_cm*.004+vec2(fract(-material_time*.2),fract(material_time*.1));
 		 color=vegetation_gust_color(blade,review_world_color,UV.y,review_gust_height,review_gust_falloff,texture(review_grass_noise,coarse).r,texture(review_grass_noise,fine).g);
 		}else{color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);}
-		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
+		float blade_color_weight=smoothstep(0.0,0.18,height_fraction);
+		if(gaf_grass_ground_color){
+			// Carry the sampled ground palette further up the blade, leaving sunlit tips legible.
+			float ground_affinity=mix(0.53,0.14,smoothstep(0.22,0.87,height_fraction));
+			blade_color_weight*=1.0-ground_affinity;
+			scatter_color=mix(scatter_color,root_color,ground_affinity);
+		}
+		color=mix(root_color,color,blade_color_weight);
 	}
 	ALBEDO=color;ALPHA=texel.a;ALPHA_SCISSOR_THRESHOLD=cutoff;
 	ROUGHNESS=1.0;SPECULAR=0.0;

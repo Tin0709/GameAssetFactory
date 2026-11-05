@@ -110,6 +110,14 @@ func setup(scene:Node3D)->void:
 		var graphics_panel:PanelContainer=ui.get_child(0)
 		graphics_panel.get_child(0).add_child(path_toggle)
 		graphics_panel.position.y-=35.
+		var grass_color_toggle:=CheckButton.new()
+		grass_color_toggle.name="GrassGroundColorToggle"
+		grass_color_toggle.text="Grass / ground color"
+		grass_color_toggle.tooltip_text="Carries ground color up grass blades in Day foundation. Toggle off for the source palette."
+		grass_color_toggle.focus_mode=Control.FOCUS_NONE
+		grass_color_toggle.toggled.connect(strict_match.set_grass_ground_color_enabled)
+		graphics_panel.get_child(0).add_child(grass_color_toggle)
+		graphics_panel.position.y-=35.
 		var contact_toggle:=CheckButton.new()
 		contact_toggle.name="GroundContactToggle"
 		contact_toggle.text="Ground contact - trees / rocks"

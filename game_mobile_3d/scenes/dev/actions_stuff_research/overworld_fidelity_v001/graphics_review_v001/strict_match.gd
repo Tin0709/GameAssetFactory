@@ -22,6 +22,7 @@ var correction:ImageTexture3D
 var effect_error:=""
 var enabled:=true
 var path_blend_requested:=false
+var grass_ground_color_requested:=false
 var ground_contact_requested:=false
 var ground_contact_texture:ImageTexture
 var path_grass_rects:Array[Vector4]=[]
@@ -152,6 +153,7 @@ func apply()->void:
 			var v:Array=data.path_target_rect;row.candidate.set_shader_parameter("review_target_rect",Vector4(v[0],v[1],v[2],v[3]))
 			row.candidate.set_shader_parameter("review_emissive_gain",30. if enabled and stage>=2 and row.original.get_meta("source_material","")=="MI_MasterTerrain_Opaque_Overworld"else 1.)
 	_apply_path_blend()
+	_apply_grass_ground_color()
 	_apply_ground_contact()
 	_set_wind_bounds(enabled and stage>=6 and data.has("background_wind")and bool(data.background_wind.get("enabled",false)))
 	for key:String in saved:
@@ -196,6 +198,19 @@ func _apply_path_blend()->void:
 		row.candidate.set_shader_parameter("review_path_blend",active)
 		if active:
 			row.candidate.set_shader_parameter("review_grass_rects",path_grass_rects)
+func grass_ground_color_active()->bool:
+	return available and enabled and stage>=6 and grass_ground_color_requested
+
+func set_grass_ground_color_enabled(value:bool)->void:
+	grass_ground_color_requested=value
+	_apply_grass_ground_color()
+
+func _apply_grass_ground_color()->void:
+	var active:=grass_ground_color_active()
+	for row:Dictionary in controller_owner.pairs:
+		if row.plant and row.candidate.get_shader_parameter("tinted_grass"):
+			row.candidate.set_shader_parameter("gaf_grass_ground_color",active)
+
 func ground_contact_active()->bool:
 	return _wants_ground_contact() and ground_contact_texture!=null
 
