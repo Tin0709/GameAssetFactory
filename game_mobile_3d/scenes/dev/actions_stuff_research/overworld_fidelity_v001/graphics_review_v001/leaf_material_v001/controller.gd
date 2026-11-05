@@ -15,6 +15,8 @@ var _wind_gain := 0.0
 var _wind_offset := 0.0
 var _wind_active := false
 var _wind_saved: Array[Dictionary] = []
+var _meshes: Array[MeshInstance3D] = []
+var _wind_margins: Array[Dictionary] = []
 func setup(owner:Node,scene:Node)->void:graphics=owner;lab=scene
 func _fail(message:String)->bool:error=message;return false
 func _sha(bytes:PackedByteArray)->String:
@@ -38,6 +40,7 @@ func configure_external(path:String)->bool:
  var bytes:=FileAccess.get_file_as_bytes(p.colors_path)
  if bytes.size()!=count*4:return _fail("Invalid leaf color payload")
  var found:Array[ShaderMaterial]=[]
+ var meshes: Array[MeshInstance3D] = []
  for tree:Node in graphics.strict_match.trees.get_children():
   if tree.get_meta("private_source_sha256","")!=p.asset_sha256:continue
   for child:Node in tree.find_children("*","MeshInstance3D",true,false):
@@ -49,8 +52,9 @@ func configure_external(path:String)->bool:
     var material:Material=instance.get_active_material(surface)
     if not material is ShaderMaterial:return _fail("Leaf reference material unavailable")
     if not found.has(material):found.append(material)
+    if not meshes.has(instance):meshes.append(instance)
  if found.is_empty():return _fail("Matching private leaf mesh unavailable")
- _texture=ImageTexture.create_from_image(Image.create_from_data(count,1,false,Image.FORMAT_RGBA8,bytes));_materials=found;_strength=strength;_asset_hash=p.asset_sha256;configured=true;error="";return true
+ _texture=ImageTexture.create_from_image(Image.create_from_data(count,1,false,Image.FORMAT_RGBA8,bytes));_materials=found;_meshes=meshes;_strength=strength;_asset_hash=p.asset_sha256;configured=true;error="";return true
 func apply(value:bool)->void:
  if value==active:return
  if not value:
@@ -102,6 +106,10 @@ func apply_wind(value: bool) -> void:
    row.material.set_shader_parameter("gaf_leaf_wind_pattern", row.texture)
    row.material.set_shader_parameter("gaf_leaf_wind", row.parameters)
   _wind_saved.clear()
+  for row: Dictionary in _wind_margins:
+   if is_instance_valid(row.mesh):
+    row.mesh.extra_cull_margin = row.margin
+  _wind_margins.clear()
   _wind_active = false
   return
  if not active or _wind_texture == null:
@@ -110,6 +118,14 @@ func apply_wind(value: bool) -> void:
   _wind_saved.append({"material": material, "texture": material.get_shader_parameter("gaf_leaf_wind_pattern"),
                      "parameters": material.get_shader_parameter("gaf_leaf_wind")})
   material.set_shader_parameter("gaf_leaf_wind_pattern", _wind_texture)
+ # Bound all possible RGB samples in local space for camera and shadow culling.
+ var world_extent := _wind_gain * Vector3(0.675, 0.15, 0.675)
+ for mesh: MeshInstance3D in _meshes:
+  var inverse_rows := mesh.global_basis.inverse().transposed()
+  var margin := maxf(inverse_rows.x.abs().dot(world_extent),
+                    maxf(inverse_rows.y.abs().dot(world_extent), inverse_rows.z.abs().dot(world_extent)))
+  _wind_margins.append({"mesh": mesh, "margin": mesh.extra_cull_margin})
+  mesh.extra_cull_margin += margin
  _wind_active = true
  update_wind(lab.meadow.clock, lab.meadow.wind_enabled)
 
@@ -121,5 +137,5 @@ func update_wind(clock: float, enabled: bool) -> void:
   material.set_shader_parameter("gaf_leaf_wind", parameters)
 
 func release()->void:
- apply(false);_materials.clear();_texture=null;_wind_texture=null;configured=false
+ apply(false);_materials.clear();_meshes.clear();_texture=null;_wind_texture=null;configured=false
 func snapshot()->Dictionary:return {"active":active,"configured":configured,"materials":_materials.size(),"error":error,"native_lighting":false,"mesh_rebuilt":false,"wind_active":_wind_active,"texture_payload_bytes":0 if _texture==null else _texture.get_width()*4}

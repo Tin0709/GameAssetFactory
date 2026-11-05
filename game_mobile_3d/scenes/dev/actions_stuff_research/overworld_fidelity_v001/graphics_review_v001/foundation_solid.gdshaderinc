@@ -43,7 +43,7 @@ void vertex(){
   vec3 relative = p - MAIN_CAM_INV_VIEW_MATRIX[3].xyz;
   if(abs(relative.y) >= 0.2){
    vec3 offset = gaf_leaf_wind_offset(gaf_leaf_wind_pattern, relative, gaf_leaf_wind.x, gaf_leaf_wind.y * gaf_leaf_weights.g);
-   VERTEX += transpose(MODEL_NORMAL_MATRIX) * offset;
+   VERTEX += inverse(mat3(MODEL_MATRIX)) * offset;
    p += offset;
   }
  }
