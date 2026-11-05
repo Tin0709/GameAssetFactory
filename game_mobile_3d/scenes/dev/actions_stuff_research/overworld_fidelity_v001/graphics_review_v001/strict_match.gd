@@ -234,6 +234,7 @@ func clear_source_companion()->void:
 func per_frame()->void:
 	if available and enabled and stage>=3:
 		lab.md2_lighting.sun.light_energy=float(controller_owner.resolved.get("review_sun_energy",data.sun_energy))
+		if controller_owner.local_exposure!=null:controller_owner.local_exposure.apply_day_sun(lab.md2_lighting.sun)
 		var scale:float=float(controller_owner.resolved.get("review_irradiance_scale",1.))
 		if player_light!=null:
 			var night:=clampf((1.-scale)/.7,0.,1.)

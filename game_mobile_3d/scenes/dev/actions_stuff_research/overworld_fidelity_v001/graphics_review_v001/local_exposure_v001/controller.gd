@@ -34,6 +34,9 @@ var _want_normal:=false
 var _cloud=Cloud.new()
 var _cloud_toggle:CheckBox
 var _want_cloud:=false
+var _day_sun_toggle:CheckBox
+var _day_sun:Dictionary={}
+var _active_grade_gain:=0.0
 var _leaf_toggle:CheckBox
 var _want_leaf:=false
 var _directional_toggle:CheckBox
@@ -100,6 +103,7 @@ func _begin()->bool:
 	if _saved.compositor!=null:
 		for e:CompositorEffect in _saved.compositor.compositor_effects:active.append(e)
 	active.append(effect);_compositor.compositor_effects=active;lab.camera.compositor=_compositor
+	_active_grade_gain=gain
 	return true
 func select_mode(value:int)->bool:
 	if _released or value not in [0,1,2,3]:return false
@@ -109,6 +113,7 @@ func select_mode(value:int)->bool:
 	if _saved.is_empty()and not _begin():_refresh();return false
 	mode=value;_directional.apply(value==2 and _want_directional);_leaf.apply(value==2 and _want_leaf);_grass_normal.apply(value==2 and _want_normal);effect.set_neutral(value==3);effect.enabled=value in [2,3];_apply_presentation(value==2 and _want_presentation)
 	_cloud.apply(owner_graphics,value==2 and _want_cloud)
+	if not _day_sun.is_empty():owner_graphics._apply_sun()
 	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
 	_bind_field((_covered_field if _want_covered else _field)if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
 func set_bloom_enabled(value:bool)->bool:
@@ -197,9 +202,69 @@ func set_cloud_enabled(value:bool)->bool:
 	_want_cloud=_cloud.active
 	_refresh()
 	return _want_cloud==value
+func _day_sun_path()->String:
+	var path:=OS.get_environment("GAF_DAY_SUN_PROFILE")
+	if not OS.has_feature("editor") or RenderingServer.get_current_rendering_method()!="mobile" or path.is_empty():
+		return ""
+	return path if lab.private_bundle.permitted(path) and FileAccess.file_exists(path) else ""
+
+func _read_day_sun(path:String)->Dictionary:
+	if path.is_empty():
+		return {}
+	var data:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not data is Dictionary or data.get("schema","")!="original_day_sun_transfer_v1":
+		return {}
+	var energy:Variant=data.get("energy")
+	var gain:Variant=data.get("grade_gain")
+	var rgb:Variant=data.get("color_srgb")
+	if typeof(energy) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(energy)) or energy<=0.0 or energy>4.0:
+		return {}
+	if typeof(gain) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(gain)) or gain<=0.0:
+		return {}
+	if not rgb is Array or rgb.size()!=3:
+		return {}
+	for channel:Variant in rgb:
+		if typeof(channel) not in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(channel)) or channel<0.0 or channel>1.0:
+			return {}
+	return {"energy":float(energy),"grade_gain":float(gain),"color":Color(rgb[0],rgb[1],rgb[2])}
+
+func set_day_sun_enabled(value:bool)->bool:
+	if _released:
+		return false
+	if value:
+		var measured:=_read_day_sun(_day_sun_path())
+		if measured.is_empty():
+			error="Validated Day sun profile unavailable"
+			_refresh()
+			return false
+		if mode!=2 and not select_mode(2):
+			return false
+		if measured.grade_gain!=_active_grade_gain:
+			error="Day sun and exposure use different units"
+			_refresh()
+			return false
+		_day_sun=measured
+	else:
+		_day_sun.clear()
+	if owner_graphics.candidate:
+		owner_graphics._apply_sun()
+	error=""
+	_refresh()
+	return true
+
+func apply_day_sun(sun:DirectionalLight3D)->void:
+	if mode==2 and not _day_sun.is_empty():
+		sun.light_energy=_day_sun.energy
+		sun.light_color=_day_sun.color
+
 func before_environment_change()->void:
 	if not _changing and not _saved.is_empty():deactivate(false)
 func deactivate(restore_owner:bool)->void:
+	var had_day_sun:=not _day_sun.is_empty()
+	_day_sun.clear()
+	_active_grade_gain=0.0
+	if had_day_sun and owner_graphics.candidate:
+		owner_graphics._apply_sun()
 	_want_cloud=false
 	_cloud.apply(owner_graphics,false)
 	_want_presentation=false;_apply_presentation(false)
@@ -235,7 +300,7 @@ func _process(delta:float)->void:
 		if not s.error.is_empty():error=s.error;deactivate(true)
 	_refresh()
 func snapshot()->Dictionary:
-	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"cloud_projection":{"requested":_want_cloud,"active":_cloud.active},"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"presentation":{"requested":_want_presentation,"active":mode==2 and _want_presentation,"environment_saved":not _presentation_environment.is_empty()},"directional_fill":_directional.snapshot(),"leaf_material":_leaf.snapshot(),"grass_normal":_grass_normal.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
+	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"cloud_projection":{"requested":_want_cloud,"active":_cloud.active},"day_sun":{"requested":not _day_sun.is_empty(),"active":mode==2 and not _day_sun.is_empty()},"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"presentation":{"requested":_want_presentation,"active":mode==2 and _want_presentation,"environment_saved":not _presentation_environment.is_empty()},"directional_fill":_directional.snapshot(),"leaf_material":_leaf.snapshot(),"grass_normal":_grass_normal.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
 func _build_ui()->void:
 	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,255);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.045,.94);style.content_margin_left=10;style.content_margin_right=10;style.content_margin_top=8;style.content_margin_bottom=8;style.set_corner_radius_all(6);_panel.add_theme_stylebox_override("panel",style)
@@ -258,6 +323,14 @@ func _build_ui()->void:
 	_cloud_toggle.visible=Cloud.supported()
 	_cloud_toggle.toggled.connect(set_cloud_enabled)
 	box.add_child(_cloud_toggle)
+	_day_sun_toggle=CheckBox.new()
+	_day_sun_toggle.text="Calibrated Day sun"
+	_day_sun_toggle.tooltip_text="Unattenuated direct light with matched exposure units. Cloud attenuation is a separate switch."
+	_day_sun_toggle.add_theme_font_size_override("font_size",11)
+	_day_sun_toggle.focus_mode=Control.FOCUS_NONE
+	_day_sun_toggle.visible=not _day_sun_path().is_empty()
+	_day_sun_toggle.toggled.connect(set_day_sun_enabled)
+	box.add_child(_day_sun_toggle)
 	_status=Label.new();_status.add_theme_font_size_override("font_size",10);box.add_child(_status)
 func _refresh()->void:
 	if _status==null:return
@@ -268,6 +341,7 @@ func _refresh()->void:
 	_normal_toggle.set_pressed_no_signal(_want_normal)
 	_presentation_toggle.set_pressed_no_signal(_want_presentation)
 	_cloud_toggle.set_pressed_no_signal(_want_cloud)
+	_day_sun_toggle.set_pressed_no_signal(not _day_sun.is_empty())
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"
