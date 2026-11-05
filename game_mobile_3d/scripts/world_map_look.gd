@@ -214,7 +214,10 @@ func _refresh_cloud_look() -> void:
 func _direct_variant(original: Shader) -> Shader:
 	if not _direct_variants.has(original):
 		var shader:=Shader.new()
-		shader.code=original.code.replace("shader_type spatial;", "shader_type spatial;\n#define GAF_WORLD_DIRECT_CLOUD")
+		var defines:="shader_type spatial;\n#define GAF_WORLD_DIRECT_CLOUD"
+		if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
+			defines+="\n#define GAF_WORLD_FORCE_LAMBERT"
+		shader.code=original.code.replace("shader_type spatial;",defines)
 		_direct_variants[original]=shader
 	return _direct_variants[original]
 
@@ -236,7 +239,10 @@ func _apply_direct_clouds() -> void:
 	for index in actor_materials.size():
 		var item: Array=actor_materials[index]
 		var adapter: ShaderMaterial=_direct_actor_materials[index] if direct else null
-		item[0].set_surface_override_material(item[1],item[2] if stage==0 else (adapter if adapter!=null else item[3]))
+		if stage==0 or (direct and adapter==null):
+			item[0].set_surface_override_material(item[1],item[2])
+		else:
+			item[0].set_surface_override_material(item[1],adapter if direct else item[3])
 
 func _make_direct_actor(node: MeshInstance3D, source: BaseMaterial3D, tint: Color) -> ShaderMaterial:
 	# Restrict the adapter to the current opaque, textured actor and equipment contract.
@@ -254,7 +260,7 @@ func _make_direct_actor(node: MeshInstance3D, source: BaseMaterial3D, tint: Colo
 	for feature in BaseMaterial3D.FEATURE_MAX:
 		if source.get_feature(feature):return null
 	var material:=ShaderMaterial.new()
-	material.shader=DIRECT_ACTOR_SHADER
+	material.shader=_direct_variant(DIRECT_ACTOR_SHADER)
 	material.render_priority=source.render_priority
 	material.set_shader_parameter("atlas",source.albedo_texture)
 	material.set_shader_parameter("albedo_tint",tint)

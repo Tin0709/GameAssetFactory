@@ -18,10 +18,14 @@ void light() {
 		float nv = clamp(dot(NORMAL, VIEW), 0.0, 1.0);
 		vec3 half_vector = normalize(LIGHT + VIEW);
 		float lh = clamp(dot(LIGHT, half_vector), 0.0, 1.0);
-		float grazing = 2.0 * ROUGHNESS * lh * lh - 0.5;
 		if (METALLIC < 1.0) {
+#ifndef GAF_WORLD_FORCE_LAMBERT
+			float grazing = 2.0 * ROUGHNESS * lh * lh - 0.5;
 			DIFFUSE_LIGHT += incident * (1.0 + grazing * world_cloud_fresnel(nv))
 				* (1.0 + grazing * world_cloud_fresnel(nl));
+#else
+			DIFFUSE_LIGHT += incident;
+#endif
 		}
 		// Isotropic GGX for the current opaque actor and matte terrain.
 		if (ROUGHNESS > 0.0) {
