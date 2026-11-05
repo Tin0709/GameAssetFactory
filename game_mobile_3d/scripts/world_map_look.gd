@@ -2,6 +2,7 @@ extends Node
 ## WorldMap-only look. Source textures, GLBs, shared environments and actors stay intact.
 const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
+const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const MOTION=preload("res://scripts/grassland_motion.gd")
 const BASE_CLOUD_SHAPE:=Vector4(13.,.50,.73,.20)
 const POCKET_CLOUD_SHAPE:=Vector4(1.35,.40,.65,.49)
@@ -31,6 +32,8 @@ var cloud_texture: ImageTexture
 var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
 var _pockets_requested:=false
+var _canopy_requested := false
+var _canopy_profile: Dictionary = {}
 var _direct_clouds_requested:=false
 var _direct_variants: Dictionary[Shader,Shader]={}
 var _review_shaders: Dictionary[ShaderMaterial,Shader]={}
@@ -175,6 +178,37 @@ func configure_path_materials() -> void:
 		material.set_shader_parameter("path_map_size",path_map_size)
 		material.set_shader_parameter("path_grass_atlas",grass)
 		material.set_shader_parameter("path_dirt_atlas",dirt)
+
+func canopy_contact_active() -> bool:
+	return stage == 2 and _canopy_requested
+
+func set_canopy_contact(enabled: bool) -> void:
+	if enabled == _canopy_requested: return
+	_canopy_requested = enabled
+	_apply_canopy_contact()
+
+func _apply_canopy_contact() -> void:
+	var enabled := canopy_contact_active()
+	if enabled and _canopy_profile.is_empty():
+		var leaves: Array[Vector4] = []
+		var offset: Array = level.runtime.offset
+		for cell: Array in level.runtime.cells:
+			var entry: Dictionary = level.runtime.palette[cell[3]]
+			if entry.category == "leaf":
+				leaves.append(Vector4(cell[0] + offset[0], cell[2] + offset[2],
+					cell[1] + entry.base_y_offset + offset[1], entry.height))
+		var base_y: float = level.runtime.source_bounds.min[1] + offset[1]
+		var field := CANOPY.bake(leaves, path_map_image, Vector2i(path_map_origin), base_y)
+		_canopy_profile = {"canopy_field": ImageTexture.create_from_image(field.image),
+			"canopy_origin": field.origin, "canopy_extent": field.extent, "canopy_base_y": base_y}
+	if _canopy_profile.is_empty(): return
+	var parameters := _canopy_profile.duplicate()
+	parameters["canopy_enabled"] = enabled
+	for material: ShaderMaterial in _review_shaders:
+		if _review_shaders[material] == PRESET.leaves_shader: continue
+		for parameter: String in parameters:
+			material.set_shader_parameter(parameter, parameters[parameter])
+	level.geometry.update_canopy_contact(parameters)
 
 func build_cloud_field() -> void:
 	cloud_image=Image.create(64,64,false,Image.FORMAT_RF)
@@ -344,6 +378,7 @@ func set_stage(value: int) -> void:
 		for property: String in PRESET.sun_settings:sun.set(property,PRESET.sun_settings[property])
 		RenderingServer.directional_shadow_atlas_set_size(PRESET.shadow_atlas_size,PRESET.shadow_16bit)
 		RenderingServer.directional_soft_shadow_filter_set_quality(PRESET.shadow_quality as RenderingServer.ShadowQuality)
+	_apply_canopy_contact()
 	_apply_direct_clouds()
 	_apply_daylight_pockets()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")

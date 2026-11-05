@@ -2,6 +2,7 @@ shader_type spatial;
 render_mode cull_disabled, diffuse_lambert, specular_disabled;
 #include "res://materials/world_map_wind.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
+#include "res://materials/world_map_canopy.gdshaderinc"
 #include "res://materials/world_map_surface_v5.gdshaderinc"
 uniform bool ground_blending = false;
 uniform int plant_kind = 0; // short blades / flower / golden tall stems
@@ -39,6 +40,8 @@ void vertex() {
 #endif
 
 void fragment() {
+	AO = mix(1.0, canopy_ao(plant_root), 1.0 - clamp(tip, 0.0, 1.0) * 0.30);
+	AO_LIGHT_AFFECT = CANOPY_DIRECT_AFFECT;
 	vec3 source=plant_kind==0 ? texture(atlas,UV).rgb : COLOR.rgb*albedo_tint.rgb;
 	if (plant_kind==0) {
 		float field=0.5+0.5*sin(plant_root.x*0.23+sin(plant_root.z*0.18))*sin(plant_root.z*0.27);

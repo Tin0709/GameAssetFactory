@@ -3,6 +3,7 @@ render_mode diffuse_burley, depth_draw_always, cull_disabled;
 #include "res://materials/gameplay_cliff_cutaway.gdshaderinc"
 #include "res://materials/world_map_surface_v5.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
+#include "res://materials/world_map_canopy.gdshaderinc"
 varying float surface_top;
 varying vec3 surface_normal;
 
@@ -30,6 +31,8 @@ void vertex() {
 #endif
 
 void fragment() {
+	AO = surface_top > 0.9 ? canopy_ao(cutaway_world) : 1.0;
+	AO_LIGHT_AFFECT = CANOPY_DIRECT_AFFECT;
 	vec4 color = albedo_tint;
 	if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);
 	if (use_vertex_color) color *= COLOR;
