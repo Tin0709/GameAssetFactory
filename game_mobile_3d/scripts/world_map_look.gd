@@ -210,7 +210,13 @@ func cloud_sample(point: Vector2) -> float:
 	var image:=_pockets_image if daylight_pockets_active() else cloud_image
 	var cell:=Vector2i(floori(point.x),floori(point.y))
 	var f:=Vector2(fposmod(point.x,1.0),fposmod(point.y,1.0))
-	return lerpf(lerpf(image.get_pixel(posmod(cell.x,64),posmod(cell.y,64)).r,image.get_pixel(posmod(cell.x+1,64),posmod(cell.y,64)).r,f.x),lerpf(image.get_pixel(posmod(cell.x,64),posmod(cell.y+1,64)).r,image.get_pixel(posmod(cell.x+1,64),posmod(cell.y+1,64)).r,f.x),f.y)
+	var x0:=posmod(cell.x,64)
+	var x1:=posmod(cell.x+1,64)
+	var y0:=posmod(cell.y,64)
+	var y1:=posmod(cell.y+1,64)
+	var top:=lerpf(image.get_pixel(x0,y0).r,image.get_pixel(x1,y0).r,f.x)
+	var bottom:=lerpf(image.get_pixel(x0,y1).r,image.get_pixel(x1,y1).r,f.x)
+	return lerpf(top,bottom,f.y)
 
 func cloud_shade(position: Vector3,time: float) -> float:
 	var p: Vector2=(Vector2(position.x,position.z)+Vector2(time*.48,time*.19))/_cloud_shape.x

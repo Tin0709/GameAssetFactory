@@ -512,6 +512,9 @@ func _build_multimeshes(chunk: Vector2i, origin: Vector3, kind: String, placemen
 		part_index += 1
 
 
+var _current_cloud_time:=0.0
+
+
 func update_cutaway(player_position: Vector3, camera_position: Vector3, enabled: bool = true) -> void:
 	# Coincident endpoints are the overview/controller contract for restoring imports.
 	enabled = enabled and player_position.distance_squared_to(camera_position) > EPSILON
@@ -529,6 +532,8 @@ func update_cutaway(player_position: Vector3, camera_position: Vector3, enabled:
 			visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if active else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 			item.caster.visible = active
 			item.active = active
+			if active:
+				for material: ShaderMaterial in item.materials:material.set_shader_parameter("cloud_time",_current_cloud_time)
 		if active:
 			for material: ShaderMaterial in item.materials:
 				material.set_shader_parameter("cutaway_start", start)
@@ -562,6 +567,7 @@ func update_cloud_style(texture: Texture2D, shape: Vector4) -> void:
 			material.set_shader_parameter("cloud_shape",shape)
 
 func update_cloud_time(time: float) -> void:
+	_current_cloud_time=time
 	for item: Dictionary in _cutaway_chunks:
 		if item.active:
 			for material: ShaderMaterial in item.materials:material.set_shader_parameter("cloud_time",time)
