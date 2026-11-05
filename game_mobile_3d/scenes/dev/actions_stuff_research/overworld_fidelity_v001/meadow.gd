@@ -22,6 +22,7 @@ var _flower_batches:Array[Dictionary]=[]
 var _flower_palette:=PackedInt32Array()
 var _flower_original:Array[Vector2]=[]
 var _flower_composed:Array[Vector2]=[]
+var _decorative_rock_footprint:=Rect2()
 var _batches:Dictionary={}
 var _rng:=RandomNumberGenerator.new()
 var _wind_intensities:Array[float]=[]
@@ -59,7 +60,7 @@ func _grass_top_uv()->Vector4:
 
 func _place(asset:String,position:Vector3,yaw:float=0.,scale_factor:float=1.,flower_index:int=-1)->void:
 	if not bundle.meshes.has(asset):push_error("Missing meadow species "+asset);return
-	var cell:=Vector2i((Vector2(position.x,position.z)/BATCH_SIZE).floor())+Vector2i.ONE
+	var cell:=Vector2i(floori((position.x+BATCH_SIZE)/BATCH_SIZE),floori((position.z+BATCH_SIZE)/BATCH_SIZE))
 	var key:=asset+"/"+str(cell)
 	if not _batches.has(key):_batches[key]={"asset":asset,"transforms":[],"phases":[]}
 	var t:=Transform3D(Basis(Vector3.UP,yaw).scaled(Vector3.ONE*scale_factor),position)
@@ -145,8 +146,15 @@ func _build_rocks()->void:
 		_place("MD2 | SM_SF_Boulder_01",point,yaw)
 		var body:=StaticBody3D.new();body.name="RockCollision";body.set_meta("overworld_surface","stone");add_child(body)
 		var shape:=CollisionShape3D.new();shape.shape=bundle.meshes["MD2 | SM_SF_Boulder_01"].create_trimesh_shape();body.add_child(shape);body.position=point;body.rotation.y=yaw
-	# Large source rock remains beyond the playable boundary, without hiding player.
-	_place("MD2 | SM_PA1_Blocker_Boulder_A",Vector3(-14,-.15,-13),.7)
+	# Decorative blocker has no collision body, but flowers still avoid its footprint.
+	var asset:="MD2 | SM_PA1_Blocker_Boulder_A"
+	var position:=Vector3(-14,-.15,-13)
+	var yaw:=.7
+	_place(asset,position,yaw)
+	var mesh:Mesh=bundle.meshes.get(asset)
+	if mesh!=null:
+		var bounds:=Transform3D(Basis(Vector3.UP,yaw),position)*mesh.get_aabb()
+		_decorative_rock_footprint=Rect2(Vector2(bounds.position.x,bounds.position.z),Vector2(bounds.size.x,bounds.size.z)).grow(.18)
 
 func _extend_map()->void:
 	# Separate random stream preserves every original central placement.
@@ -205,6 +213,7 @@ func _compose_flower_pockets(trunks:Array[StaticBody3D])->void:
 			palette.append(_flower_palette[index])
 			flower_order.append(index)
 	var obstacles:Array[Rect2]=[]
+	if _decorative_rock_footprint.has_area():obstacles.append(_decorative_rock_footprint)
 	for trunk:StaticBody3D in trunks:
 		var point:=trunk.global_position
 		obstacles.append(Rect2(Vector2(point.x,point.z)-Vector2.ONE*.53,Vector2.ONE*1.06))
