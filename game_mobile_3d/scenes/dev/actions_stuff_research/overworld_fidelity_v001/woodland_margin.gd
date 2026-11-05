@@ -106,7 +106,6 @@ func _build_forest()->Array[Vector3]:
 				crowns.append_from(tree_meshes[variation],0,Transform3D(rotation.scaled(Vector3(tree_scale*.91,tree_scale,tree_scale*.91)),p))
 				has_crowns=true
 			if has_crowns:
-				crowns.index()
 				var group:=MeshInstance3D.new()
 				group.mesh=crowns.commit()
 				group.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -141,6 +140,7 @@ func _make_tree(kind:int,material:Material)->ArrayMesh:
 		var p:=Vector3(cos(heading)*(1.22+sin(i*.8)*.17),3.55+sin(i*2.21)*.61,sin(heading)*1.27)
 		var size:=Vector3(.43+cos(i*.64)*.15,.49+sin(i*1.34)*.15,.46)
 		_append_box(tool,p.snapped(Vector3.ONE*.14),size,leaf.lightened(.02*cos(i*1.)))
+	tool.index()
 	return tool.commit()
 
 func _append_box(tool:SurfaceTool,center:Vector3,size:Vector3,color:Color)->void:
@@ -180,7 +180,7 @@ func _build_verge(path_center:Callable)->void:
 			var transforms:Array[Transform3D]=[]
 			for i in 82:
 				var along:float=-49.+segment*24.6+rng.randf_range(0.,24.6)
-				var depth:=lerpf(.55,8.,pow(rng.randf(),1.75))
+				var depth:=lerpf(.67,8.,pow(rng.randf(),1.75))
 				var d:=-(50.+depth)
 				var p:=Vector2(d,along) if side==0 else Vector2(along,d)
 				if side==1 and absf(along-float(path_center.call(d)))<1.15:continue
