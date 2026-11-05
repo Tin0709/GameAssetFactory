@@ -37,6 +37,10 @@ var _want_cloud:=false
 var _day_sun_toggle:CheckBox
 var _day_sun:Dictionary={}
 var _active_grade_gain:=0.0
+var _canopy_toggle:CheckBox
+var _canopy_weights:Image
+var _want_canopy:=false
+var _canopy_fields:Array[ImageTexture]=[null,null]
 var _leaf_toggle:CheckBox
 var _want_leaf:=false
 var _directional_toggle:CheckBox
@@ -115,7 +119,7 @@ func select_mode(value:int)->bool:
 	_cloud.apply(owner_graphics,value==2 and _want_cloud)
 	if not _day_sun.is_empty():owner_graphics._apply_sun()
 	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
-	_bind_field((_covered_field if _want_covered else _field)if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
+	_bind_field(_comparison_field() if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
 func set_bloom_enabled(value:bool)->bool:
 	if not value:
 		_want_bloom=false
@@ -170,7 +174,7 @@ func set_presentation_enabled(value:bool)->bool:
 func set_covered_fill_enabled(value:bool)->bool:
 	if not value:
 		_want_covered=false
-		if mode==2:_bind_field(_field)
+		if mode==2:_bind_field(_comparison_field())
 		_refresh();return true
 	if mode!=2 and not select_mode(2):return false
 	if _covered_field==null:
@@ -178,7 +182,7 @@ func set_covered_fill_enabled(value:bool)->bool:
 		strict.data.occlusion_exposure_ratio=1.;strict._build_field(true);_covered_field=strict.field_texture;strict.data.occlusion_exposure_ratio=ratio;_bind_field(previous)
 		_covered_build_us=Time.get_ticks_usec()-started;_covered_builds+=1
 		if _covered_field==null:error="Covered-field allocation failed";_refresh();return false
-	_want_covered=true;_bind_field(_covered_field);error="";_refresh();return true
+	_want_covered=true;_bind_field(_comparison_field());error="";_refresh();return true
 func set_leaf_material_enabled(value:bool)->bool:
 	if not value:_want_leaf=false;_leaf.apply(false);_refresh();return true
 	if mode!=2 and not select_mode(2):return false
@@ -257,9 +261,68 @@ func apply_day_sun(sun:DirectionalLight3D)->void:
 		sun.light_energy=_day_sun.energy
 		sun.light_color=_day_sun.color
 
+func _canopy_profile_path()->String:
+	var path:=OS.get_environment("GAF_CANOPY_FIELD_PROFILE")
+	if not OS.has_feature("editor") or RenderingServer.get_current_rendering_method()!="mobile" or path.is_empty():
+		return ""
+	return path if lab.private_bundle.permitted(path) and FileAccess.file_exists(path) else ""
+
+func _load_canopy_weights()->Image:
+	var path:=_canopy_profile_path()
+	if path.is_empty():return null
+	var manifest:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not manifest is Dictionary or manifest.get("schema","")!="original_canopy_visibility_v1":
+		return null
+	var strict=owner_graphics.strict_match
+	if manifest.get("size")!=196 or manifest.get("span_m")!=104.0 or manifest.get("origin_m")!=[-52.0,-52.0]:
+		return null
+	if manifest.get("strict_profile_sha256")!=strict.profile_sha256 or not manifest.get("rows") is Array:
+		return null
+	if strict.trees.loaded!=manifest.rows.size() or not strict.trees.errors.is_empty():
+		return null
+	var payload:Variant=manifest.get("map_path")
+	if not payload is String or not lab.private_bundle.permitted(payload) or not FileAccess.file_exists(payload):
+		return null
+	if FileAccess.get_sha256(payload)!=manifest.get("map_sha256"):
+		return null
+	var bytes:=FileAccess.get_file_as_bytes(payload)
+	if bytes.size()!=196*196*4:return null
+	for i in range(0,bytes.size(),4):
+		var visibility:=bytes.decode_half(i)
+		var roof:=bytes.decode_half(i+2)
+		if not is_finite(visibility) or not is_finite(roof) or visibility<0.0 or visibility>1.0 or roof< -1.0 or roof>32.0:
+			return null
+		if roof<0.0 and visibility!=1.0:return null
+	return Image.create_from_data(196,196,false,Image.FORMAT_RGH,bytes)
+
+func _comparison_field()->ImageTexture:
+	if _want_canopy:
+		var key:=int(_want_covered)
+		if _canopy_fields[key]==null:
+			_canopy_fields[key]=owner_graphics.strict_match._build_field(_want_covered,false,_canopy_weights)
+		return _canopy_fields[key]
+	return _covered_field if _want_covered else _field
+
+func set_canopy_enabled(value:bool)->bool:
+	if _released or mode!=2 or owner_graphics.strict_match.stage<3:return false
+	if value and _canopy_weights==null:
+		_canopy_weights=_load_canopy_weights()
+		if _canopy_weights==null:
+			error="Private canopy field missing or incompatible"
+			_refresh()
+			return false
+	_want_canopy=value
+	_bind_field(_comparison_field())
+	error=""
+	_refresh()
+	return true
+
 func before_environment_change()->void:
 	if not _changing and not _saved.is_empty():deactivate(false)
 func deactivate(restore_owner:bool)->void:
+	_want_canopy=false
+	_canopy_weights=null
+	_canopy_fields=[null,null]
 	var had_day_sun:=not _day_sun.is_empty()
 	_day_sun.clear()
 	_active_grade_gain=0.0
@@ -300,7 +363,7 @@ func _process(delta:float)->void:
 		if not s.error.is_empty():error=s.error;deactivate(true)
 	_refresh()
 func snapshot()->Dictionary:
-	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"cloud_projection":{"requested":_want_cloud,"active":_cloud.active},"day_sun":{"requested":not _day_sun.is_empty(),"active":mode==2 and not _day_sun.is_empty()},"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"presentation":{"requested":_want_presentation,"active":mode==2 and _want_presentation,"environment_saved":not _presentation_environment.is_empty()},"directional_fill":_directional.snapshot(),"leaf_material":_leaf.snapshot(),"grass_normal":_grass_normal.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
+	return {"mode":mode,"quality":quality,"error":error,"effect":{}if effect==null else effect.snapshot(),"captured_day_parameters":true,"cloud_projection":{"requested":_want_cloud,"active":_cloud.active},"canopy":{"requested":_want_canopy,"active":mode==2 and _want_canopy},"day_sun":{"requested":not _day_sun.is_empty(),"active":mode==2 and not _day_sun.is_empty()},"work_size":[1024,576],"phone_benchmarked":false,"bloom_requested":_want_bloom,"presentation":{"requested":_want_presentation,"active":mode==2 and _want_presentation,"environment_saved":not _presentation_environment.is_empty()},"directional_fill":_directional.snapshot(),"leaf_material":_leaf.snapshot(),"grass_normal":_grass_normal.snapshot(),"covered_field":{"requested":_want_covered,"active":mode==2 and _want_covered,"cached":_covered_field!=null,"builds":_covered_builds,"last_build_us":_covered_build_us,"preparation":"Reference entry, shared geometry pass"},"restorable_session":not _saved.is_empty()}
 func _build_ui()->void:
 	_panel=PanelContainer.new();_panel.name="LocalExposureReview";_panel.position=Vector2(-380,-535);_panel.custom_minimum_size=Vector2(365,255);_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT);owner_graphics.ui.add_child(_panel)
 	var style:=StyleBoxFlat.new();style.bg_color=Color(.025,.045,.045,.94);style.content_margin_left=10;style.content_margin_right=10;style.content_margin_top=8;style.content_margin_bottom=8;style.set_corner_radius_all(6);_panel.add_theme_stylebox_override("panel",style)
@@ -331,6 +394,14 @@ func _build_ui()->void:
 	_day_sun_toggle.visible=not _day_sun_path().is_empty()
 	_day_sun_toggle.toggled.connect(set_day_sun_enabled)
 	box.add_child(_day_sun_toggle)
+	_canopy_toggle=CheckBox.new()
+	_canopy_toggle.text="Canopy sky contact - Day"
+	_canopy_toggle.tooltip_text="Voxel canopy sky visibility in the existing Day field. Direct lighting and boulder treatment stay independent."
+	_canopy_toggle.add_theme_font_size_override("font_size",11)
+	_canopy_toggle.focus_mode=Control.FOCUS_NONE
+	_canopy_toggle.visible=not _canopy_profile_path().is_empty()
+	_canopy_toggle.toggled.connect(set_canopy_enabled)
+	box.add_child(_canopy_toggle)
 	_status=Label.new();_status.add_theme_font_size_override("font_size",10);box.add_child(_status)
 func _refresh()->void:
 	if _status==null:return
@@ -343,6 +414,8 @@ func _refresh()->void:
 	_cloud_toggle.set_pressed_no_signal(_want_cloud)
 	_day_sun_toggle.set_pressed_no_signal(not _day_sun.is_empty())
 	_day_sun_toggle.disabled=mode!=2 or owner_graphics.strict_match.stage<3
+	_canopy_toggle.set_pressed_no_signal(_want_canopy)
+	_canopy_toggle.disabled=_day_sun_toggle.disabled
 	for i in _buttons.size():_buttons[i].button_pressed=i==mode
 	_status.text=error if not error.is_empty()else["Off - F7 enters Day A/B - H hides controls","HDR baseline - F7 enables LE","LE on - F7 compares HDR baseline","Full graph, neutral contrast - baseline image"][mode]
 	if _want_bloom and mode==2 and error.is_empty():_status.text="LE + source bloom - toggle checkbox for A/B"

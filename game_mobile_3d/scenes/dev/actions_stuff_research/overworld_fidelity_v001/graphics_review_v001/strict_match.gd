@@ -8,6 +8,7 @@ var trees:Node3D
 var controller_owner:Node
 var lab:Node3D
 var data:Dictionary={}
+var profile_sha256:=""
 var saved:Dictionary={}
 var player_light:OmniLight3D
 var vignette_layer:CanvasLayer
@@ -82,6 +83,7 @@ func setup(controller:Node)->void:
 	trees.set_field(field_texture)
 	player_light=OmniLight3D.new();player_light.name="NightPlayerLightPresetAdapter";player_light.omni_range=5.;player_light.light_color=Color.WHITE;player_light.shadow_enabled=false;lab.player.add_child(player_light);player_light.position=Vector3(0,1.5,0)
 	_build_vignette()
+	profile_sha256=FileAccess.get_sha256(path)
 	available=true;apply()
 func apply()->void:
 	if controller_owner!=null and controller_owner.has_method("_before_graphics_change"):controller_owner._before_graphics_change()
@@ -191,8 +193,8 @@ func _top_rect(asset:String)->Vector4:
 				if float(surface.normals[i*3+1])>.99:
 					var uv:=Vector2(surface.uv[i*2],surface.uv[i*2+1]);lo=lo.min(uv);hi=hi.max(uv)
 	return Vector4(lo.x,lo.y,hi.x,hi.y)
-func _build_field(source_endpoints:bool=false,cache_companion:bool=false)->void:
-	clear_source_companion()
+func _build_field(source_endpoints:bool=false,cache_companion:bool=false,canopy:Image=null)->ImageTexture:
+	if canopy==null:clear_source_companion()
 	var image:=Image.create(196,196,false,Image.FORMAT_RGBAH)
 	var companion:Image=Image.create(196,196,false,Image.FORMAT_RGBAH)if cache_companion else null
 	var a:Array=data.incoming_open_linear;var b:Array=data.incoming_occluded_linear
@@ -203,11 +205,14 @@ func _build_field(source_endpoints:bool=false,cache_companion:bool=false)->void:
 		if child is StaticBody3D:
 			var mesh:Mesh=lab.private_bundle.meshes["MD2 | SM_SF_Boulder_01"]
 			bounds.append(child.transform*mesh.get_aabb())
-	if trees!=null:bounds.append_array(trees.canopy_bounds)
+	if canopy==null and trees!=null:bounds.append_array(trees.canopy_bounds)
 	# Original bounded visibility approximation from existing static geometry.
 	for y in 196:
 		for x in 196:
-			var point:=Vector2(x+.5,y+.5)*104./196.-Vector2(52,52);var visibility:=1.;var source_visibility:=1.;var roof:=-1.
+			var point:=Vector2(x+.5,y+.5)*104./196.-Vector2(52,52)
+			var sky:=Color(1.0,-1.0,0.0)
+			if canopy!=null:sky=canopy.get_pixel(x,y)
+			var visibility:=sky.r;var source_visibility:=sky.r;var roof:=sky.g
 			for box:AABB in bounds:
 				var nearest:=point.clamp(Vector2(box.position.x,box.position.z),Vector2(box.end.x,box.end.z))
 				var distance:=point.distance_to(nearest)
@@ -225,8 +230,11 @@ func _build_field(source_endpoints:bool=false,cache_companion:bool=false)->void:
 			image.set_pixel(x,y,value)
 			if companion!=null:
 				var calibrated:Color=(occluded*shade_gain).lerp(open,source_visibility);calibrated.a=roof;companion.set_pixel(x,y,calibrated)
-	field_texture=ImageTexture.create_from_image(image)
+	var baked:=ImageTexture.create_from_image(image)
+	if canopy!=null:return baked
+	field_texture=baked
 	if companion!=null:_source_companion=ImageTexture.create_from_image(companion);_source_companion_base=field_texture
+	return baked
 func source_companion_for(reference:ImageTexture)->ImageTexture:
 	return _source_companion if reference==_source_companion_base else null
 func clear_source_companion()->void:
