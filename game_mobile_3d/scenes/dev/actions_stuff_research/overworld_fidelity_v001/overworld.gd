@@ -4,7 +4,9 @@ const Bundle=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity
 const Meadow=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/meadow.gd")
 const EnvAudio=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/environment_audio.gd")
 const DayFoundation=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/graphics_owner.gd")
+const Woodland=preload("woodland_margin.gd")
 var graphics_foundation:Node
+var woodland_margin:Node3D
 var private_bundle=Bundle.new()
 var environment_audio:Node3D
 var meadow:Node3D
@@ -85,6 +87,12 @@ func _build_meadow_ui()->void:
 	var pockets:=_toggle(box,"Flower pockets",false,_set_flower_pockets)
 	pockets.name="FlowerPocketsToggle"
 	pockets.tooltip_text="Arrange the same flowers into grouped color patches along the meadow paths."
+	var woodland:=_toggle(box,"Woodland margin",false,_set_woodland_margin)
+	woodland.name="WoodlandMarginToggle"
+	woodland.tooltip_text="Show original scenery beyond the north and west edges of the meadow."
+	var follow:=_toggle(box,"Follow player camera",false,_set_follow_camera)
+	follow.name="FollowCameraToggle"
+	follow.tooltip_text="Explore with the current camera. Turn off for the locked graphics comparison."
 	_toggle(box,"Player vegetation interaction",true,func(on:bool):meadow.interactions_enabled=on)
 	_toggle(box,"Ambient audio",true,func(on:bool):environment_audio.ambient_enabled=on)
 	_toggle(box,"Footsteps + contact rustle",true,func(on:bool):environment_audio.footsteps_enabled=on;environment_audio.rustle_enabled=on;environment_audio.reset_contacts())
@@ -97,6 +105,17 @@ func _build_meadow_ui()->void:
 	box.add_child(diagnostics)
 	meadow_status=Label.new();meadow_status.add_theme_font_size_override("font_size",11);box.add_child(meadow_status)
 	var evidence:=Label.new();evidence.text="Original source assets/audio · recreated wind/mix";evidence.add_theme_font_size_override("font_size",10);evidence.modulate=Color(.72,.82,.71);box.add_child(evidence)
+
+func _set_woodland_margin(value:bool)->void:
+	if value and woodland_margin==null:
+		woodland_margin=Woodland.new()
+		woodland_margin.name="WoodlandMargin"
+		add_child(woodland_margin)
+		woodland_margin.build(meadow.path_center)
+	if woodland_margin!=null:woodland_margin.visible=value
+
+func _set_follow_camera(value:bool)->void:
+	if graphics_foundation!=null:graphics_foundation.set_follow_player_camera(value)
 
 func _set_flower_pockets(value:bool)->void:
 	var trunks:Array[StaticBody3D]=[]
