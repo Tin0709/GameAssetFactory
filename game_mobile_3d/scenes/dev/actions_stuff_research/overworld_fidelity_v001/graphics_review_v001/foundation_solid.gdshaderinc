@@ -60,7 +60,7 @@ float gaf_path_noise(vec2 cell){
  return fract(52.9829189*fract(dot(cell,vec2(.06711056,.00583715))));
 }
 
-vec3 gaf_meadow_path_color(vec3 previous,vec2 uv,vec2 world_xz){
+vec3 gaf_meadow_path_layer(vec2 uv,vec2 world_xz){
  vec2 tile_uv=vec2(0.);
  vec4 grass_rect=review_grass_rects[0];
  bool matched=false;
@@ -84,21 +84,15 @@ vec3 gaf_meadow_path_color(vec3 previous,vec2 uv,vec2 world_xz){
    }
   }
  }
- if(!matched){return previous;}
+ if(!matched){return vec3(0.);}
  // Follow the existing meadow path in world space across 1 m block seams.
  float center=1.9*sin(world_xz.y*.24)+.55*sin(world_xz.y*.57);
  float clumps=gaf_path_noise(floor(world_xz*4.))-.5;
  float pixels=gaf_path_noise(floor(world_xz*16.))-.5;
  float distance_to_path=abs(world_xz.x-center)+.32*clumps+.15*pixels;
  float grass_weight=smoothstep(.69,1.01,distance_to_path);
- if((from_grass && grass_weight==1.) || (!from_grass && grass_weight==0.)){
-  return previous;
- }
- if(grass_weight==0.){return texture(atlas,mix(review_target_rect.xy,review_target_rect.zw,tile_uv)).rgb;}
- if(grass_weight==1.){return texture(atlas,mix(grass_rect.xy,grass_rect.zw,tile_uv)).rgb;}
- vec3 dirt=from_grass?texture(atlas,mix(review_target_rect.xy,review_target_rect.zw,tile_uv)).rgb:previous;
- vec3 grass=from_grass?previous:texture(atlas,mix(grass_rect.xy,grass_rect.zw,tile_uv)).rgb;
- return mix(dirt,grass,grass_weight);
+ vec4 other_rect=from_grass?review_target_rect:grass_rect;
+ return vec3(mix(other_rect.xy,other_rect.zw,tile_uv),from_grass?1.-grass_weight:grass_weight);
 }
 void fragment(){
 	vec2 lookup_uv=UV;
@@ -112,9 +106,13 @@ void fragment(){
 	}
 	vec4 texel=texture(atlas,lookup_uv);
 	if(review_alpha_mask && texel.a<cutoff){discard;}
-	vec3 surface_color=texel.rgb;
+	vec3 other_layer=vec3(0.);
 	if(review_path_blend && gaf_upward>.99){
-		surface_color=gaf_meadow_path_color(surface_color,UV,(INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xz);
+		other_layer=gaf_meadow_path_layer(UV,(INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xz);
+	}
+	vec3 surface_color=texel.rgb;
+	if(other_layer.z>0.){
+		surface_color=mix(surface_color,texture(atlas,other_layer.xy).rgb,other_layer.z);
 	}
 	if(gaf_leaf_material_enabled){surface_color=gaf_leaf_color(texel.rgb,review_leaf_hue,gaf_leaf_weights.r);}
 	else if(review_leaf_hue!=0. && texel.g>texel.r*1.1 && texel.g>texel.b*1.1){
@@ -124,7 +122,13 @@ void fragment(){
 	ALBEDO=max(surface_color,vec3(0.0));
 	if(gaf_leaf_material_enabled){BACKLIGHT=gaf_leaf_transmission(ALBEDO,gaf_leaf_weights.g,gaf_leaf_scatter_strength);}
 	else if(texel.g>texel.r*1.1 && texel.g>texel.b*1.1){BACKLIGHT=ALBEDO*review_backlight_rgb;}ROUGHNESS=1.0;SPECULAR=0.0;
-	if(has_mre){vec3 packed=texture(mre_map,lookup_uv).rgb;METALLIC=packed.r;ROUGHNESS=packed.g;EMISSION=texel.rgb*packed.b*review_emissive_gain;}
+	if(has_mre){
+		vec3 packed=texture(mre_map,lookup_uv).rgb;
+		if(other_layer.z>0.){packed=mix(packed,texture(mre_map,other_layer.xy).rgb,other_layer.z);}
+		METALLIC=packed.r;
+		ROUGHNESS=packed.g;
+		EMISSION=(other_layer.z>0.?surface_color:texel.rgb)*packed.b*review_emissive_gain;
+	}
  SPECULAR=gaf_specular;
  EMISSION+=review_irradiance_scale*ALBEDO*max(vec3(0.0),gaf_diffuse_fill+gaf_sky_delta)*mix(1.0,gaf_fill_up_ratio,gaf_upward)*(1.0-METALLIC);
  if(gaf_directional_fill_enabled){
