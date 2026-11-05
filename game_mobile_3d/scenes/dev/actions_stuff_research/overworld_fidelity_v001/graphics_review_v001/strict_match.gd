@@ -197,15 +197,18 @@ func _apply_path_blend()->void:
 		if active:
 			row.candidate.set_shader_parameter("review_grass_rects",path_grass_rects)
 func ground_contact_active()->bool:
-	return available and enabled and stage>=6 and ground_contact_requested and ground_contact_texture!=null
+	return _wants_ground_contact() and ground_contact_texture!=null
+
+func _wants_ground_contact()->bool:
+	return available and enabled and stage>=6 and ground_contact_requested
 
 func set_ground_contact_enabled(value:bool)->void:
 	ground_contact_requested=value
-	if value and ground_contact_texture==null:
-		ground_contact_texture=GroundContact.build(lab.meadow.get_children(),trees.trunk_bodies)
 	_apply_ground_contact()
 
 func _apply_ground_contact()->void:
+	if _wants_ground_contact() and ground_contact_texture==null:
+		ground_contact_texture=GroundContact.build(lab.meadow.get_children(),trees.trunk_bodies)
 	var active:=ground_contact_active()
 	for row:Dictionary in controller_owner.pairs:
 		row.candidate.set_shader_parameter("gaf_ground_contact_enabled",active)
