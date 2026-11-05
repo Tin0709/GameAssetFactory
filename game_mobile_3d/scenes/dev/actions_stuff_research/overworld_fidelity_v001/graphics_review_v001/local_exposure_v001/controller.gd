@@ -4,6 +4,7 @@ const Effect=preload("../presentation_v001/presentation_effect.gd")
 const Directional=preload("../directional_fill_v001/controller.gd")
 const Leaf=preload("../leaf_material_v001/controller.gd")
 const GrassNormal=preload("../grass_normal_v001/controller.gd")
+const ActorCloud=preload("../cloud_v001/actor_controller.gd")
 const Cloud=preload("../cloud_v001/controller.gd")
 const Policy=preload("availability.gd")
 const GradeDomain=preload("../grade_domain.gd")
@@ -34,6 +35,9 @@ var _want_normal:=false
 var _cloud=Cloud.new()
 var _cloud_toggle:CheckBox
 var _want_cloud:=false
+var _actor_cloud:=ActorCloud.new()
+var _actor_cloud_toggle:CheckBox
+var _want_actor_cloud:=false
 var _day_sun_toggle:CheckBox
 var _day_sun:Dictionary={}
 var _active_grade_gain:=0.0
@@ -232,6 +236,18 @@ func set_cloud_enabled(value:bool)->bool:
 func sync_cloud()->void:
 	if not _released:
 		_cloud.apply(owner_graphics,(mode==2 and _want_cloud) or owner_graphics.day_composition_active())
+		_sync_actor_cloud()
+
+func _set_actor_cloud_enabled(value:bool)->void:
+	_want_actor_cloud=value
+	_sync_actor_cloud()
+
+func _sync_actor_cloud()->void:
+	var enabled:bool=_want_actor_cloud and _cloud.active and owner_graphics.day_composition_active()
+	if enabled and is_instance_valid(lab.player) and lab.player.using_private_skin:
+		_actor_cloud.apply(lab.player.model,_cloud._pattern,_cloud._phase,true)
+	elif _actor_cloud.model!=null:
+		_actor_cloud.release()
 
 func _day_sun_path()->String:
 	var path:=OS.get_environment("GAF_DAY_SUN_PROFILE")
@@ -359,6 +375,7 @@ func deactivate(restore_owner:bool)->void:
 		owner_graphics._apply_sun()
 	_want_cloud=false
 	_cloud.apply(owner_graphics,false)
+	_actor_cloud.release()
 	_want_presentation=false;_apply_presentation(false)
 	_want_normal=false;_grass_normal.release()
 	_want_leaf_wind = false
@@ -389,6 +406,7 @@ func input(event:InputEvent)->bool:
 func _process(delta:float)->void:
 	if _released:return
 	_cloud.advance(delta)
+	if _actor_cloud.active:_actor_cloud.update_phase(_cloud._phase)
 	_leaf.update_wind(lab.meadow.clock, lab.meadow.wind_enabled)
 	_elapsed+=delta
 	if _elapsed<.25:return
@@ -407,6 +425,15 @@ func _build_ui()->void:
 	var row:=HBoxContainer.new();box.add_child(row)
 	for index in 4:
 		var b:=Button.new();b.text=["Original","HDR baseline","LE on","Neutral"][index];b.toggle_mode=true;b.focus_mode=Control.FOCUS_NONE;b.add_theme_font_size_override("font_size",11);b.pressed.connect(func():select_mode(index));row.add_child(b);_buttons.append(b)
+	_actor_cloud_toggle=CheckBox.new()
+	_actor_cloud_toggle.name="ActorCloudToggle"
+	_actor_cloud_toggle.text="Actor shade"
+	_actor_cloud_toggle.tooltip_text="Use the playable Day cloud field on the private actor and Sabre."
+	_actor_cloud_toggle.add_theme_font_size_override("font_size",11)
+	_actor_cloud_toggle.focus_mode=Control.FOCUS_NONE
+	_actor_cloud_toggle.visible=Cloud.renderer_supported()
+	_actor_cloud_toggle.toggled.connect(_set_actor_cloud_enabled)
+	row.add_child(_actor_cloud_toggle)
 	_bloom_toggle=CheckBox.new();_bloom_toggle.text="Source bloom - experimental Day";_bloom_toggle.add_theme_font_size_override("font_size",11);_bloom_toggle.focus_mode=Control.FOCUS_NONE;_bloom_toggle.toggled.connect(set_bloom_enabled);box.add_child(_bloom_toggle)
 	_directional_toggle=CheckBox.new();_directional_toggle.text="Directional fill - single-probe reference";_directional_toggle.add_theme_font_size_override("font_size",11);_directional_toggle.focus_mode=Control.FOCUS_NONE;_directional_toggle.toggled.connect(set_directional_enabled);_directional_toggle.tooltip_text="Normal-dependent SH calibration; spatial field and foliage back GI remain approximate.";box.add_child(_directional_toggle)
 	_covered_toggle=CheckBox.new();_covered_toggle.text="Covered fill - preserve source endpoints";_covered_toggle.add_theme_font_size_override("font_size",11);_covered_toggle.focus_mode=Control.FOCUS_NONE;_covered_toggle.toggled.connect(set_covered_fill_enabled);_covered_toggle.tooltip_text="Two source-lit endpoints, unchanged original AABB/reach/height geometry; not native AO.";box.add_child(_covered_toggle)

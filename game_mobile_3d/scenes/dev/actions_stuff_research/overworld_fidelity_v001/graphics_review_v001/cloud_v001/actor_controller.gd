@@ -13,6 +13,7 @@ func apply(actor_model: Node3D, texture: Texture2D, phase: Vector4, enabled: boo
 	if model != actor_model:
 		release()
 		model = actor_model
+		var adapters: Dictionary = {}
 		for node: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
 			if node.mesh == null:
 				continue
@@ -21,13 +22,18 @@ func apply(actor_model: Node3D, texture: Texture2D, phase: Vector4, enabled: boo
 				if not _supported(node, material):
 					bindings.clear()
 					return
-				var adapter := _adapt(material, texture)
+				if not adapters.has(material):
+					adapters[material] = _adapt(material, texture)
+				var adapter: ShaderMaterial = adapters[material]
+				if adapter == null:
+					bindings.clear()
+					return
 				bindings.append({"node": node, "surface": surface,
 					"original": node.get_surface_override_material(surface), "adapter": adapter})
 		for row: Dictionary in bindings:
 			row.node.set_surface_override_material(row.surface, row.adapter)
 		active = not bindings.is_empty()
-	update_phase(phase)
+		update_phase(phase)
 
 func _supported(node: MeshInstance3D, material: StandardMaterial3D) -> bool:
 	if node.material_override != null or material == null or material.next_pass != null:
@@ -38,6 +44,8 @@ func _supported(node: MeshInstance3D, material: StandardMaterial3D) -> bool:
 		and material.texture_filter == BaseMaterial3D.TEXTURE_FILTER_NEAREST and not material.texture_repeat
 		and material.shading_mode == BaseMaterial3D.SHADING_MODE_PER_PIXEL
 		and material.diffuse_mode == BaseMaterial3D.DIFFUSE_BURLEY and material.specular_mode == BaseMaterial3D.SPECULAR_SCHLICK_GGX
+		and material.depth_draw_mode == BaseMaterial3D.DEPTH_DRAW_OPAQUE_ONLY
+		and material.alpha_antialiasing_mode == BaseMaterial3D.ALPHA_ANTIALIASING_OFF
 		and material.uv1_scale == Vector3.ONE and material.uv1_offset == Vector3.ZERO
 		and not material.uv1_triplanar and not material.normal_enabled and not material.ao_enabled
 		and not material.vertex_color_use_as_albedo and not material.disable_ambient_light
@@ -52,6 +60,8 @@ func _supported(node: MeshInstance3D, material: StandardMaterial3D) -> bool:
 func _adapt(source: StandardMaterial3D, texture: Texture2D) -> ShaderMaterial:
 	var out := ShaderMaterial.new()
 	out.shader = OPAQUE if source.transparency == BaseMaterial3D.TRANSPARENCY_DISABLED else CUTOUT
+	if out.shader.get_shader_uniform_list().is_empty():
+		return null
 	out.render_priority = source.render_priority
 	out.set_shader_parameter("actor_albedo", source.albedo_texture)
 	out.set_shader_parameter("actor_surface", source.roughness_texture)
@@ -68,8 +78,11 @@ func _adapt(source: StandardMaterial3D, texture: Texture2D) -> ShaderMaterial:
 	return out
 
 func update_phase(phase: Vector4) -> void:
+	var updated: Array[ShaderMaterial] = []
 	for row: Dictionary in bindings:
-		row.adapter.set_shader_parameter("gaf_cloud_phase", phase)
+		if not updated.has(row.adapter):
+			row.adapter.set_shader_parameter("gaf_cloud_phase", phase)
+			updated.append(row.adapter)
 
 func release() -> void:
 	for row: Dictionary in bindings:
