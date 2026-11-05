@@ -233,6 +233,7 @@ func _release(rd: RenderingDevice) -> void:
 		rd.free_rid(rid)
 	_resources.clear()
 	_passes.clear()
+	_report("bytes", 0)
 	_color = RID()
 	_scene_uniform = RID()
 	_scene_framebuffer = RID()
