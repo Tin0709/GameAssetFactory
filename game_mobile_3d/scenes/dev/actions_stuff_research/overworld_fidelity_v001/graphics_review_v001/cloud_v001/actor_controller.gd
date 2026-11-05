@@ -3,6 +3,7 @@ extends RefCounted
 const OPAQUE := preload("actor_opaque.gdshader")
 const CUTOUT := preload("actor_cutout.gdshader")
 var bindings: Array[Dictionary] = []
+var materials: Array[ShaderMaterial] = []
 var model: Node3D
 var active := false
 
@@ -32,6 +33,7 @@ func apply(actor_model: Node3D, texture: Texture2D, phase: Vector4, enabled: boo
 					"original": node.get_surface_override_material(surface), "adapter": adapter})
 		for row: Dictionary in bindings:
 			row.node.set_surface_override_material(row.surface, row.adapter)
+		materials.assign(adapters.values())
 		active = not bindings.is_empty()
 		update_phase(phase)
 
@@ -78,16 +80,13 @@ func _adapt(source: StandardMaterial3D, texture: Texture2D) -> ShaderMaterial:
 	return out
 
 func update_phase(phase: Vector4) -> void:
-	var updated: Array[ShaderMaterial] = []
-	for row: Dictionary in bindings:
-		if not updated.has(row.adapter):
-			row.adapter.set_shader_parameter("gaf_cloud_phase", phase)
-			updated.append(row.adapter)
-
+	for material: ShaderMaterial in materials:
+		material.set_shader_parameter("gaf_cloud_phase", phase)
 func release() -> void:
 	for row: Dictionary in bindings:
 		if is_instance_valid(row.node) and row.node.get_surface_override_material(row.surface) == row.adapter:
 			row.node.set_surface_override_material(row.surface, row.original)
 	bindings.clear()
+	materials.clear()
 	model = null
 	active = false
