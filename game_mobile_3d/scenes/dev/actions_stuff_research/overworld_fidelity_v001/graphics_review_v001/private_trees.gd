@@ -1,6 +1,7 @@
 extends Node3D
 ## Editor-only transient source instances. No imported assets or source arrays in res://.
 const Solid=preload("foundation_solid.gdshader")
+const CloudReview=preload("cloud_v001/controller.gd")
 var materials:Array[ShaderMaterial]=[]
 var canopy_bounds:Array[AABB]=[]
 var loaded:=0
@@ -38,7 +39,7 @@ func setup(lab:Node,rows:Array,hue:float=0.,backlight:Vector3=Vector3.ZERO)->voi
 					if not lab.private_bundle.permitted(image_path)or FileAccess.get_sha256(image_path)!=row.texture_sha256:errors.append("Tree atlas changed");continue
 					atlas=ImageTexture.create_from_image(Image.load_from_file(image_path))
 				if atlas==null:errors.append("Missing tree atlas");continue
-				var material:=ShaderMaterial.new();material.shader=Solid;material.set_shader_parameter("atlas",atlas);material.set_shader_parameter("review_alpha_mask",true);material.set_shader_parameter("review_leaf_hue",hue);material.set_shader_parameter("review_backlight_rgb",backlight)
+				var material:=ShaderMaterial.new();material.shader=CloudReview.review_shader(Solid);material.set_shader_parameter("atlas",atlas);material.set_shader_parameter("review_alpha_mask",true);material.set_shader_parameter("review_leaf_hue",hue);material.set_shader_parameter("review_backlight_rgb",backlight)
 				material.set_shader_parameter("gaf_field_origin",Vector2(-52,-52));material.set_shader_parameter("gaf_field_extent",104.);material.set_shader_parameter("gaf_fill_up_ratio",1.)
 				instance.set_surface_override_material(surface,material);materials.append(material)
 		# Original lightweight trunk collision; source collision metadata not exported.

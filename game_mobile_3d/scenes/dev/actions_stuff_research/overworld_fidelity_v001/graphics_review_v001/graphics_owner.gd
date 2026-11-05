@@ -10,6 +10,7 @@ const Resolver=preload("override_resolver.gd")
 const Field=preload("indirect_field.gd")
 const Solid=preload("foundation_solid.gdshader")
 const Vegetation=preload("foundation_vegetation.gdshader")
+const CloudReview=preload("cloud_v001/controller.gd")
 const MOTION:=["wind_time","wind_intensity","wind_direction","frequency","interaction_field","interaction_previous","interaction_alpha","interaction_strength","field_extent","ground_atlas","ground_uv","lighting_grade"]
 var lab:Node3D
 var profile=Profile.new()
@@ -74,7 +75,7 @@ func setup(scene:Node3D)->void:
 			if not made.has(old.get_instance_id()):
 				var mat:ShaderMaterial=old.duplicate(false)
 				var plant:bool=old.shader.resource_path.ends_with("vegetation.gdshader")
-				mat.shader=Vegetation if plant else Solid
+				mat.shader=CloudReview.review_shader(Vegetation if plant else Solid)
 				mat.set_shader_parameter("gaf_indirect_field",field.texture)
 				mat.set_shader_parameter("gaf_field_origin",Field.ORIGIN);mat.set_shader_parameter("gaf_field_extent",Field.EXTENT)
 				mat.set_shader_parameter("gaf_fill_up_ratio",float(resolved.get("fill_up_ratio",.35)))

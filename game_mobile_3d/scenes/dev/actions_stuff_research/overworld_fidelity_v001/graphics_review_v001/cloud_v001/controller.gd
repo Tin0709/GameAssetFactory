@@ -7,9 +7,16 @@ const VEGETATION = preload("foundation_vegetation.gdshader")
 
 var active := false
 var materials: Array[ShaderMaterial] = []
-var _saved_shaders: Array[Shader] = []
 var _pattern: ImageTexture
 var _phase := Vector4.ZERO
+
+static func supported() -> bool:
+	return OS.has_feature("editor") and OS.get_environment("GAF_CLOUD_REVIEW") == "1" and RenderingServer.get_current_rendering_method() == "mobile"
+
+static func review_shader(original: Shader) -> Shader:
+	if not supported():
+		return original
+	return VEGETATION if original.resource_path.ends_with("foundation_vegetation.gdshader") else SOLID
 
 func _noise(seed_value: int, frequency: float) -> PackedByteArray:
 	var noise := FastNoiseLite.new()
@@ -36,13 +43,10 @@ func apply(graphics: Node, enabled: bool) -> void:
 	if active == enabled:
 		return
 	if not enabled:
-		for i in materials.size():
-			materials[i].set_shader_parameter("gaf_cloud_pattern", null)
-			materials[i].set_shader_parameter("gaf_cloud_phase", null)
-			materials[i].set_shader_parameter("gaf_cloud_strength", null)
-			materials[i].shader = _saved_shaders[i]
+		for material: ShaderMaterial in materials:
+			material.set_shader_parameter("gaf_cloud_strength", 0.0)
+			material.set_shader_parameter("gaf_cloud_pattern", null)
 		materials.clear()
-		_saved_shaders.clear()
 		active = false
 		return
 	for row: Dictionary in graphics.pairs:
@@ -56,8 +60,6 @@ func apply(graphics: Node, enabled: bool) -> void:
 	if _pattern == null:
 		_pattern = _make_pattern()
 	for material: ShaderMaterial in materials:
-		_saved_shaders.append(material.shader)
-		material.shader = VEGETATION if material.shader.resource_path.ends_with("foundation_vegetation.gdshader") else SOLID
 		material.set_shader_parameter("gaf_cloud_pattern", _pattern)
 		material.set_shader_parameter("gaf_cloud_phase", _phase)
 		material.set_shader_parameter("gaf_cloud_strength", 1.0)

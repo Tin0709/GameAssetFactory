@@ -190,7 +190,7 @@ func set_normal_override_enabled(value:bool)->bool:
 	_want_normal=true;_grass_normal.apply(true);error="";_refresh();return true
 func set_cloud_enabled(value:bool)->bool:
 	if value:
-		if RenderingServer.get_current_rendering_method()!="mobile" or (mode!=2 and not select_mode(2)):
+		if not Cloud.supported() or (mode!=2 and not select_mode(2)):
 			_refresh()
 			return false
 	_cloud.apply(owner_graphics,value)
@@ -255,7 +255,7 @@ func _build_ui()->void:
 	_cloud_toggle.tooltip_text="Original cloud pattern on the meadow and foliage. Uses the Day scene's direct light only."
 	_cloud_toggle.add_theme_font_size_override("font_size",11)
 	_cloud_toggle.focus_mode=Control.FOCUS_NONE
-	_cloud_toggle.disabled=RenderingServer.get_current_rendering_method()!="mobile"
+	_cloud_toggle.visible=Cloud.supported()
 	_cloud_toggle.toggled.connect(set_cloud_enabled)
 	box.add_child(_cloud_toggle)
 	_status=Label.new();_status.add_theme_font_size_override("font_size",10);box.add_child(_status)
