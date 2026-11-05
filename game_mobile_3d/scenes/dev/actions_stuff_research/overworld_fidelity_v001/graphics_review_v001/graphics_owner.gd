@@ -163,7 +163,7 @@ func set_day_composition(value:bool)->void:
 	if candidate:_apply_sun()
 
 func day_composition_active()->bool:
-	if not day_composition_requested or not candidate or released or cycle_auto:
+	if not day_composition_requested or not candidate or released or cycle_auto or not local_overrides.is_empty():
 		return false
 	if strict_match==null or not strict_match.available or strict_match.stage<6:
 		return false
@@ -225,7 +225,11 @@ func set_local_overrides(entries:Array)->bool:
 				if not row.fields[key]is Vector3 or not row.fields[key].is_finite():return false
 			else:return false
 	_before_graphics_change()
-	local_overrides=entries.duplicate(true);target_state=Resolver.resolve(PhaseTrack.sample(profile,cycle_position),local_overrides);return true
+	var had_composition:=day_composition_active()
+	local_overrides=entries.duplicate(true)
+	target_state=Resolver.resolve(PhaseTrack.sample(profile,cycle_position),local_overrides)
+	if candidate and had_composition!=day_composition_active():_apply_sun()
+	return true
 func set_comparison_camera(value:bool)->void:
 	comparison_camera=value;apply_camera();_refresh_label()
 func apply_camera()->void:
