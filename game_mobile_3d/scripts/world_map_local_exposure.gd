@@ -64,7 +64,10 @@ void main() {
 	float toe = smoothstep(0.002, 0.012, y);
 	float gain_stops = clamp(stops * settings.x, -settings.z, settings.w);
 	gain_stops *= (gain_stops > 0.0) ? toe : 1.0;
-	result = vec4(color.rgb * exp2(gain_stops), color.a);
+	// Preserve RGB ratios when a saturated component is near the packed target limit.
+	float peak = max(max(color.r, color.g), color.b);
+	float gain = min(exp2(gain_stops), 1.0 / max(peak, 0.002));
+	result = vec4(color.rgb * gain, color.a);
 }
 """
 
