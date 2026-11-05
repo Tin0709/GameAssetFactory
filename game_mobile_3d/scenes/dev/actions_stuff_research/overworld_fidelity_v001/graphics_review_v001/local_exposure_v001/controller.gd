@@ -114,15 +114,15 @@ func _begin()->bool:
 func select_mode(value:int)->bool:
 	if _released or value not in [0,1,2,3]:return false
 	error=""
-	if value==0:
-		deactivate(true)
-		if owner_graphics.candidate:owner_graphics._apply_sun()
-		return true
+	if value==0:deactivate(true);return true
 	quality=1;_quality.select(1)
 	if _saved.is_empty()and not _begin():_refresh();return false
 	mode=value;_directional.apply(value==2 and _want_directional);_leaf.apply(value==2 and _want_leaf);_grass_normal.apply(value==2 and _want_normal);effect.set_neutral(value==3);effect.enabled=value in [2,3];_apply_presentation(value==2 and _want_presentation)
 	_leaf.apply_wind(value == 2 and _want_leaf_wind and owner_graphics.strict_match.stage >= 6)
-	if owner_graphics.candidate:owner_graphics._apply_sun()
+	if not _day_sun.is_empty() or owner_graphics.day_composition_requested:
+		owner_graphics._apply_sun()
+	else:
+		sync_cloud()
 	owner_graphics.strict_match.data.occlusion_exposure_ratio=1. if value==2 else float(_saved.ratio)
 	_bind_field(_comparison_field() if value==2 else _saved.field);lab.camera.compositor=_compositor;_refresh();return true
 func set_bloom_enabled(value:bool)->bool:
@@ -366,7 +366,10 @@ func deactivate(restore_owner:bool)->void:
 	if owner_graphics!=null and owner_graphics.strict_match!=null:owner_graphics.strict_match.clear_source_companion()
 	_want_covered=false
 	_want_directional=false;_directional.apply(false)
-	if _saved.is_empty():_covered_field=null;_want_bloom=false;mode=0;_refresh();return
+	if _saved.is_empty():
+		_covered_field=null;_want_bloom=false;mode=0;_refresh()
+		if restore_owner and owner_graphics.day_composition_active():owner_graphics._apply_sun()
+		return
 	_changing=true
 	if effect!=null:effect.enabled=false
 	lab.camera.compositor=_saved.compositor
@@ -378,7 +381,7 @@ func deactivate(restore_owner:bool)->void:
 	if restore_owner:
 		strict.stage=int(_saved.stage);owner_graphics.seek_cycle(float(_saved.cycle),true);owner_graphics.set_candidate(bool(_saved.candidate));owner_graphics.set_comparison_camera(bool(_saved.comparison_camera));owner_graphics.set_cycle_enabled(bool(_saved.auto));lab._update_camera()
 	_want_bloom=false;_saved.clear();_covered_field=null;_field=null;_hdr=null;effect=null;_compositor=null;mode=0;_changing=false;_refresh()
-	if restore_owner and owner_graphics.candidate:owner_graphics._apply_sun()
+	if restore_owner and owner_graphics.day_composition_active():owner_graphics._apply_sun()
 func input(event:InputEvent)->bool:
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_F7:
 		select_mode(1 if mode==2 else 2);return true

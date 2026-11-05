@@ -122,7 +122,7 @@ func setup(scene:Node3D)->void:
 			day_composition_toggle=CheckButton.new()
 			day_composition_toggle.name="DayCompositionToggle"
 			day_composition_toggle.text="Day lighting - warm sun and cloud"
-			day_composition_toggle.tooltip_text="F8 toggles the art-directed noon look. Pick Day and turn off Auto to preview."
+			day_composition_toggle.tooltip_text="Art-directed noon lighting. Pick Day and turn off Auto to preview."
 			day_composition_toggle.focus_mode=Control.FOCUS_NONE
 			day_composition_toggle.toggled.connect(set_day_composition)
 			graphics_panel.get_child(0).add_child(day_composition_toggle)
@@ -251,9 +251,6 @@ func snapshot()->Dictionary:
 func input(event:InputEvent)->bool:
 	if local_exposure!=null and local_exposure.input(event):return true
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.physical_keycode==KEY_F8 and day_composition_toggle!=null:
-			set_day_composition(not day_composition_requested)
-			return true
 		if event.physical_keycode==KEY_F9:
 			if strict_match!=null and strict_match.available:
 				strict_match.stage=0 if strict_match.stage>0 else int(strict_match.data.stage);set_candidate(true)
