@@ -39,7 +39,6 @@ float gaf_actor_fresnel(float cosine) {
 // Godot combines these direct lobes with its own ambient, fog and emission.
 void light() {
 	float normal_light = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
-	if (normal_light <= 0.0) { return; }
 	float normal_view = clamp(dot(NORMAL, VIEW), 0.0001, 1.0);
 	vec3 halfway = normalize(LIGHT + VIEW);
 	float light_half = clamp(dot(LIGHT, halfway), 0.0, 1.0);
