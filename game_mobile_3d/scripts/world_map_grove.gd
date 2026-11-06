@@ -10,14 +10,14 @@ const PLACEMENTS := [
 	Vector4(-25.0, 3.7, 0.91, 2.0),
 	Vector4(-17.8, 11.5, 0.82, 0.1),
 	Vector4(-4.6, -3.5, 0.89, 0.7),
-	Vector4(4.3, -9.4, 0.90, 2.1),
+	Vector4(4.45, -8.45, 0.90, 2.1),
 ]
 const REVIEW_POSITION := Vector2(-27.5, 8.0)
 # Small authored pockets on the two meadow approaches. The schematic and its
 # vegetation batches remain separately inspectable.
 const UNDERSTORY := {
 	Vector2i(0, -4): {
-		"short_grass": [Vector2(-5.75,-3.18), Vector2(-4.16,-4.47), Vector2(-3.64,-2.36), Vector2(-2.72,-4.52), Vector2(1.82,-5.42), Vector2(2.43,-4.65), Vector2(3.29,-5.51), Vector2(4.37,-4.77), Vector2(4.65,-8.71)],
+		"short_grass": [Vector2(-5.75,-3.18), Vector2(-4.16,-4.47), Vector2(-3.64,-2.36), Vector2(-2.72,-4.52), Vector2(1.82,-5.42), Vector2(2.43,-4.65), Vector2(3.29,-5.51), Vector2(4.37,-4.77), Vector2(5.30,-8.63)],
 		"tall_grass": [Vector2(-5.47,-4.36), Vector2(-3.36,-3.57), Vector2(-2.47,-6.41), Vector2(2.37,-5.63), Vector2(5.28,-4.27)],
 		"flower_white": [Vector2(-3.41,-4.62), Vector2(-2.38,-3.58), Vector2(-1.76,-4.33), Vector2(2.68,-6.33)],
 		"flower_blue": [Vector2(2.64,-3.28), Vector2(3.27,-3.61), Vector2(3.74,-4.32), Vector2(4.75,-5.64)],
