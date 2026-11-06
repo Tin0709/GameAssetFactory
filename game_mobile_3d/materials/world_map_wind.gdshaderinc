@@ -22,6 +22,9 @@ vec2 world_passage(vec3 root) {
 		float attack = smoothstep(0.0,motion_end[i].w,motion_start[i].z);
 		float recover = 1.0-smoothstep(0.10,0.8,motion_end[i].z);
 		float weight = falloff*attack*recover;
+		// Normalize the horizontal overlap before attenuating each contribution.
+		// Otherwise multiple segments could cancel the height falloff.
+		weights += weight;
 		if (segment_passage_height) {
 			// A past contact stays on its original path when the player changes floors.
 			float path_height = mix(motion_heights[i].x, motion_heights[i].y, along);
@@ -30,7 +33,6 @@ vec2 world_passage(vec3 root) {
 		vec2 direction = away/max(length(away),0.05) + segment/max(sqrt(len2),0.0001)*0.45;
 		direction /= sqrt(dot(direction,direction)+0.0225);
 		total += direction * weight * motion_start[i].w;
-		weights += weight;
 	}
 	return total/max(1.0,weights)*elevation*interaction_strength;
 }
