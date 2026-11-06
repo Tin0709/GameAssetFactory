@@ -37,8 +37,12 @@ void vertex() {
 		NORMAL=rotate_plant(NORMAL,local_bend.xz);
 	}
 }
+#ifdef GAF_WORLD_FOLIAGE_LIGHT
+#include "res://materials/world_map_foliage_light.gdshaderinc"
+#else
 #ifdef GAF_WORLD_DIRECT_CLOUD
 #include "res://materials/world_map_direct_cloud.gdshaderinc"
+#endif
 #endif
 
 void fragment() {
@@ -92,6 +96,11 @@ void fragment() {
 	if (plant_kind==0 && ground_blending) soft=mix(1.0,0.65,smoothstep(0.0,0.75,tip));
 	bool tall_green=plant_kind==2 && !(source.r>source.g*0.86 && source.r>source.b*1.45);
 	if (tall_green && ground_blending) soft=mix(1.0,0.60,smoothstep(0.0,0.75,tip));
+#ifdef GAF_WORLD_FOLIAGE_LIGHT
+	foliage_face = normalize(NORMAL);
+	// Keep the existing ground join and the golden seed head lighting.
+	foliage_weight = (plant_kind == 0 || tall_green) ? smoothstep(0.26, 0.85, tip) : 0.0;
+#endif
 	NORMAL=normalize(mix(face,up,soft));
 	ROUGHNESS=1.0;
 	SPECULAR=0.0;

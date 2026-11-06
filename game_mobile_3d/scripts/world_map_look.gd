@@ -44,6 +44,7 @@ var cloud_texture: ImageTexture
 var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
 var _pockets_requested:=false
+var _foliage_light_requested := false
 var _atmosphere_requested := false
 var _atmosphere_environment: Environment
 var _atmosphere_previous: Dictionary = {}
@@ -267,15 +268,28 @@ func _refresh_cloud_look() -> void:
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)
 
-func _review_variant(original: Shader, direct: bool, canopy: bool) -> Shader:
-	if not (direct or canopy): return original
-	var key := Vector2i(int(direct), int(canopy))
+func foliage_light_available() -> bool:
+	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null and not ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading")
+
+func foliage_light_active() -> bool:
+	return stage == 2 and _foliage_light_requested
+
+func set_foliage_light(enabled: bool) -> void:
+	if enabled == _foliage_light_requested or (enabled and not foliage_light_available()): return
+	_foliage_light_requested = enabled
+	if stage == 2: _apply_review_shaders()
+
+func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool = false) -> Shader:
+	if not (direct or canopy or foliage): return original
+	var key := Vector3i(int(direct), int(canopy), int(foliage))
 	var variants: Dictionary = _shader_variants.get_or_add(original, {})
 	if not variants.has(key):
 		var shader := Shader.new()
 		var defines := "shader_type spatial;"
 		if canopy:
 			defines += "\n#define GAF_WORLD_CANOPY"
+		if foliage:
+			defines += "\n#define GAF_WORLD_FOLIAGE_LIGHT"
 		if direct:
 			defines += "\n#define GAF_WORLD_DIRECT_CLOUD"
 			if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
@@ -287,10 +301,14 @@ func _review_variant(original: Shader, direct: bool, canopy: bool) -> Shader:
 func _apply_review_shaders() -> void:
 	var direct := direct_clouds_active()
 	var canopy := canopy_contact_active()
+	var foliage := foliage_light_active()
 	level.geometry.cutaway_shader = _review_variant(PRESET.cutaway_shader, direct, canopy)
 	for material: ShaderMaterial in _review_shaders:
 		var native: Shader = _review_shaders[material]
-		var target := _review_variant(native, direct, canopy and native != PRESET.leaves_shader)
+		var plant_kind: int = int(material.get_shader_parameter("plant_kind")) if native == PRESET.plants_shader else -1
+		var leaves := native == PRESET.leaves_shader
+		var transmit := foliage and (leaves or plant_kind in [0, 2])
+		var target := _review_variant(native, direct, canopy and not leaves, transmit)
 		if target == material.shader: continue
 		var params: Dictionary = {}
 		for row: Dictionary in native.get_shader_uniform_list():
@@ -298,6 +316,9 @@ func _apply_review_shaders() -> void:
 		material.shader = target
 		for parameter: String in params:
 			if params[parameter] != null: material.set_shader_parameter(parameter, params[parameter])
+		if transmit:
+			var strength := 0.2652 if leaves else (0.1248 if plant_kind == 0 else 0.1794)
+			material.set_shader_parameter("foliage_transmission", strength)
 	_apply_canopy_contact()
 	if direct and _direct_actor_materials.is_empty():
 		for item: Array in actor_materials:_direct_actor_materials.append(_make_direct_actor(item[0],item[3],item[4]))

@@ -15,8 +15,12 @@ void vertex() {
 	vec2 offset=(world_breeze(world)*0.048+world_passage(root)*0.55)*weight;
 	VERTEX+=inverse(mat3(MODEL_MATRIX))*vec3(offset.x,0.0,offset.y);
 }
+#ifdef GAF_WORLD_FOLIAGE_LIGHT
+#include "res://materials/world_map_foliage_light.gdshaderinc"
+#else
 #ifdef GAF_WORLD_DIRECT_CLOUD
 #include "res://materials/world_map_direct_cloud.gdshaderinc"
+#endif
 #endif
 
 void fragment() {
@@ -29,6 +33,10 @@ void fragment() {
 #endif
 	ALPHA=source.a;
 	ALPHA_SCISSOR_THRESHOLD=0.5;
+#ifdef GAF_WORLD_FOLIAGE_LIGHT
+	foliage_face = normalize(NORMAL);
+	foliage_weight = 1.0;
+#endif
 	vec3 face=FRONT_FACING ? NORMAL : -NORMAL;
 	vec3 up=(VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz;
 	NORMAL=normalize(mix(face,up,0.16));
