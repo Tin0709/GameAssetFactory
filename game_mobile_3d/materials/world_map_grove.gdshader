@@ -3,15 +3,22 @@ shader_type spatial;
 uniform bool reveal_player = false;
 uniform vec3 player_view;
 uniform float native_specular = 0.24;
+uniform bool crown_detail = false;
+varying vec3 crown_local;
 
 #ifdef GAF_WORLD_DIRECT_CLOUD
 #include "res://materials/world_map_clouds.gdshaderinc"
 varying vec2 grove_world_xz;
+#endif
 
 void vertex() {
+	// Evaluate inside each face so its exact block boundary stays deterministic.
+	crown_local = VERTEX - NORMAL * 0.004;
+#ifdef GAF_WORLD_DIRECT_CLOUD
 	grove_world_xz = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;
-}
 #endif
+}
+
 #if defined(GAF_WORLD_DIRECT_CLOUD) || defined(GAF_WORLD_FOLIAGE_LIGHT)
 #define GAF_WORLD_BURLEY
 #ifdef GAF_WORLD_FOLIAGE_LIGHT
@@ -20,7 +27,29 @@ void vertex() {
 #include "res://materials/world_map_direct_cloud.gdshaderinc"
 #endif
 
+float crown_hash(vec3 cell) {
+	vec3 bits = fract(cell * vec3(0.1031, 0.11369, 0.13787));
+	bits += dot(bits, bits.yzx + 19.19);
+	return fract((bits.x + bits.y) * bits.z);
+}
+
+vec3 crown_color(vec3 color) {
+	vec3 small_cell = floor(crown_local * vec3(8.0, 9.0, 8.0));
+	vec3 cluster_cell = floor((crown_local + vec3(0.12, -0.06, 0.08)) * vec3(2.7, 3.8, 3.1));
+	// Fade the small cells first when an overview or smaller render target
+	// projects them below a pixel. Neutral input yields the original color.
+	vec3 width = fwidth(crown_local);
+	float footprint = max(width.x, max(width.y, width.z));
+	float broad = mix(crown_hash(cluster_cell), 0.5, smoothstep(0.12, 0.32, footprint));
+	float fine = mix(crown_hash(small_cell + vec3(7.0, 11.0, 3.0)), 0.5, smoothstep(0.04, 0.11, footprint));
+	float cluster = mix(broad, fine, 0.34);
+	float tips = smoothstep(0.55, 0.78, cluster);
+	float shade = 1.0 - smoothstep(0.25, 0.47, cluster);
+	return color * (1.0 + 0.36 * tips - 0.22 * shade) + tips * vec3(0.020, 0.024, 0.004);
+}
+
 void fragment() {
+	vec3 albedo = crown_detail ? crown_color(COLOR.rgb) : COLOR.rgb;
 	if (reveal_player) {
 		// WorldMap uses an orthographic camera. Keep the opening centred on
 		// the player even while the camera holds its elevation during a jump.
@@ -33,7 +62,7 @@ void fragment() {
 			if (opacity <= threshold) discard;
 		}
 	}
-	ALBEDO = COLOR.rgb;
+	ALBEDO = albedo;
 	ROUGHNESS = 0.95;
 	SPECULAR = native_specular;
 #ifdef GAF_WORLD_DIRECT_CLOUD

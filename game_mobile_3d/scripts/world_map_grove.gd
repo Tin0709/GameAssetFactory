@@ -168,6 +168,9 @@ func set_lighting(bark: Shader, leaves: Shader, field: Texture2D, shape: Vector4
 	_apply_lighting(_appearance, bark, field, shape, time)
 	_apply_lighting(_canopy_appearance, leaves, field, shape, time)
 
+func set_crown_detail(enabled: bool) -> void:
+	_canopy_appearance.set_shader_parameter("crown_detail", enabled)
+
 func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D, shape: Vector4, time: float) -> void:
 	if material.shader != shader:
 		var parameters := ["reveal_player", "player_view", "native_specular"]

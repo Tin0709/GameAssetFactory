@@ -60,6 +60,7 @@ var actor_materials: Array[Array]=[]
 var cloud_clock:=0.0
 var _pockets_requested:=false
 var _foliage_light_requested := false
+var _crown_detail_requested := false
 var _atmosphere_requested := false
 var _day_composition_previous: Dictionary = {}
 var _atmosphere_environment: Environment
@@ -477,6 +478,11 @@ func refresh_grove_lighting() -> void:
 	var bark := _review_variant(native, direct, false)
 	var leaves := _review_variant(native, direct, false, foliage_light_active())
 	level.grove.set_lighting(bark, leaves, _pockets_texture if direct else null, _cloud_shape, cloud_clock)
+	level.grove.set_crown_detail(stage == 2 and _crown_detail_requested)
+
+func toggle_crown_detail() -> void:
+	_crown_detail_requested = not _crown_detail_requested
+	refresh_grove_lighting()
 
 func cloud_sample(point: Vector2) -> float:
 	var image:=_pockets_image if daylight_pockets_active() else cloud_image
