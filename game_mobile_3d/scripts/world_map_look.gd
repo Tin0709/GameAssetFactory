@@ -242,7 +242,7 @@ func _apply_canopy_contact() -> void:
 		var texture: ImageTexture = _canopy_profile.get("canopy_field")
 		if texture == null:
 			texture = ImageTexture.create_from_image(field.image)
-		elif texture.get_size() == field.image.get_size():
+		elif Vector2i(texture.get_size()) == field.image.get_size():
 			texture.update(field.image)
 		else:
 			texture.set_image(field.image)
