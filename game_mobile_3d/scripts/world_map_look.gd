@@ -545,7 +545,7 @@ func set_day_palette(enabled: bool) -> void:
 
 func _refresh_day_palette() -> void:
 	var environment: Environment
-	if _palette_requested and stage == 2 and day_palette_available():
+	if _palette_requested and stage == 2 and not level.get_viewport().use_hdr_2d:
 		environment = level.get_node("WorldEnvironment").environment
 	if environment == _palette_environment: return
 	_restore_day_palette()
@@ -606,7 +606,7 @@ func _release_local_exposure() -> void:
 	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
 
 func _process(_delta: float) -> void:
-	if _palette_requested and stage == 2 and day_palette_active() == level.get_viewport().use_hdr_2d:
+	if _palette_requested and stage == 2:
 		_refresh_day_palette()
 	if _exposure_effect == null: return
 	if not is_instance_valid(_exposure_camera) or _exposure_camera.compositor != _exposure_compositor:
