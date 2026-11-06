@@ -28,6 +28,7 @@ var level: Node3D
 var motion=MOTION.new()
 var wind_materials: Array[ShaderMaterial]=[]
 var travelling_breeze := true
+var segment_passage_height := true
 var terrain_materials: Array[Array]=[]
 var plant_meshes: Array[Array]=[]
 var materials: Dictionary={}
@@ -138,6 +139,7 @@ func make_material(native: BaseMaterial3D,kind: String) -> ShaderMaterial:
 		wind_materials.append(material)
 	if kind != "terrain":
 		material.set_shader_parameter("travelling_breeze", travelling_breeze)
+		material.set_shader_parameter("segment_passage_height", segment_passage_height)
 	material.set_shader_parameter("atlas",native.albedo_texture)
 	if kind=="terrain" and native.albedo_texture!=null:
 		var texture_key:=native.albedo_texture.get_instance_id()
@@ -681,10 +683,16 @@ func set_travelling_breeze(enabled: bool) -> void:
 	for material: ShaderMaterial in wind_materials:
 		material.set_shader_parameter("travelling_breeze", enabled)
 
+func set_segment_passage_height(enabled: bool) -> void:
+	segment_passage_height = enabled
+	for material: ShaderMaterial in wind_materials:
+		material.set_shader_parameter("segment_passage_height", enabled)
+
 func _publish_wind(position: Vector3) -> void:
 	var phase := fposmod(motion.clock, 28.0) * TAU / 28.0
 	for material: ShaderMaterial in wind_materials:
 		motion.publish(material)
+		material.set_shader_parameter("motion_heights", motion.heights)
 		material.set_shader_parameter("breeze_phase", phase)
 		material.set_shader_parameter("player_position",position)
 

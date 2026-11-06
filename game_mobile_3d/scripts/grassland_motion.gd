@@ -8,7 +8,9 @@ var active_count := 0
 var samples: Array[Dictionary] = []
 var starts := PackedVector4Array()
 var ends := PackedVector4Array()
+var heights := PackedVector2Array()
 var previous := Vector2.ZERO
+var previous_height := 0.0
 var initialized := false
 
 func advance(delta: float, position: Vector3, velocity: Vector3, walk_speed: float, run_speed: float) -> void:
@@ -17,6 +19,7 @@ func advance(delta: float, position: Vector3, velocity: Vector3, walk_speed: flo
 	var speed := Vector2(velocity.x, velocity.z).length()
 	if not initialized:
 		previous = point
+		previous_height = position.y
 		initialized = true
 	# Expire before inserting, so recycled slots have already faded to zero.
 	while not samples.is_empty() and clock - float(samples[0].last) >= RECOVERY_SECONDS:
@@ -33,24 +36,33 @@ func advance(delta: float, position: Vector3, velocity: Vector3, walk_speed: flo
 			# Preserve old path/recovery at turns. At saturation, wait for an expired
 			# slot instead of abruptly deleting a still-visible disturbance.
 			if samples.size() < HISTORY_SIZE:
-				samples.append({"start": previous, "end": point, "born": clock - delta, "last": clock, "strength": strength, "attack": attack})
+				samples.append({
+					"start": previous, "end": point, "born": clock - delta, "last": clock,
+					"strength": strength, "attack": attack,
+					"heights": Vector2(previous_height, position.y),
+				})
 		else:
 			var sample: Dictionary = samples.back()
 			sample.end = point
 			sample.last = clock
+			sample.heights = Vector2(sample.heights.x, position.y)
 			# Preserve passage strength while decelerating; fade by age on stopping.
 			sample.strength = maxf(float(sample.strength), strength)
 			sample.attack = minf(float(sample.attack), attack)
 	previous = point
+	previous_height = position.y
 	starts.resize(HISTORY_SIZE)
 	ends.resize(HISTORY_SIZE)
+	heights.resize(HISTORY_SIZE)
 	starts.fill(Vector4.ZERO)
 	ends.fill(Vector4(0, 0, RECOVERY_SECONDS, 0.14))
+	heights.fill(Vector2.ZERO)
 	active_count = samples.size()
 	for i in range(active_count):
 		var sample: Dictionary = samples[i]
 		starts[i] = Vector4(sample.start.x, sample.start.y, clock - float(sample.born), sample.strength)
 		ends[i] = Vector4(sample.end.x, sample.end.y, clock - float(sample.last), sample.attack)
+		heights[i] = sample.heights
 
 func publish(material: ShaderMaterial) -> void:
 	# One shared clock and two tiny arrays; never update per-instance uniforms.

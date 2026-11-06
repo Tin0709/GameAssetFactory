@@ -6,11 +6,12 @@ uniform float interaction_strength = 1.0;
 uniform vec3 player_position = vec3(0.0);
 uniform vec4 motion_start[8];
 uniform vec4 motion_end[8];
+uniform bool segment_passage_height = false;
+uniform vec2 motion_heights[8];
 vec2 world_passage(vec3 root) {
 	vec2 total = vec2(0.0);
 	float weights = 0.0;
-	// Avoid affecting plants on another terrace above or below the player.
-	float elevation = 1.0 - smoothstep(0.5, 1.6, abs(root.y - player_position.y));
+	float elevation = segment_passage_height ? 1.0 : 1.0 - smoothstep(0.5, 1.6, abs(root.y - player_position.y));
 	for (int i=0; i<8; i++) {
 		if (motion_start[i].w <= 0.0 || motion_end[i].z >= 0.8) continue;
 		vec2 segment = motion_end[i].xy - motion_start[i].xy;
@@ -21,6 +22,11 @@ vec2 world_passage(vec3 root) {
 		float attack = smoothstep(0.0,motion_end[i].w,motion_start[i].z);
 		float recover = 1.0-smoothstep(0.10,0.8,motion_end[i].z);
 		float weight = falloff*attack*recover;
+		if (segment_passage_height) {
+			// A past contact stays on its original path when the player changes floors.
+			float path_height = mix(motion_heights[i].x, motion_heights[i].y, along);
+			weight *= 1.0 - smoothstep(0.5, 1.6, abs(root.y - path_height));
+		}
 		vec2 direction = away/max(length(away),0.05) + segment/max(sqrt(len2),0.0001)*0.45;
 		direction /= sqrt(dot(direction,direction)+0.0225);
 		total += direction * weight * motion_start[i].w;

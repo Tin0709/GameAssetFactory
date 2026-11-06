@@ -78,7 +78,7 @@ func _ready() -> void:
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
 	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu ban ngày"
-	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió"
+	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -259,7 +259,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			review_grove(event.shift_pressed)
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_N and look.stage != 0:
-			look.set_travelling_breeze(not look.travelling_breeze)
+			if event.shift_pressed:
+				look.set_segment_passage_height(not look.segment_passage_height)
+			else:
+				look.set_travelling_breeze(not look.travelling_breeze)
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_H:
 			if event.shift_pressed and look.atmosphere_review_available():
