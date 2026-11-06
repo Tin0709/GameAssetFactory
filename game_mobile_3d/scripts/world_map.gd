@@ -77,7 +77,7 @@ func _ready() -> void:
 	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ · Shift+H chiều sâu không khí"
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
-	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu ban ngày"
+	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu · Shift+P màu cân bằng"
 	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
@@ -284,7 +284,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			look.toggle_day_composition()
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_P and look.stage == 2 and look.day_palette_available():
-			look.set_day_palette(not look.day_palette_active())
+			look.set_day_palette(not look.day_palette_active(event.shift_pressed), event.shift_pressed)
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_Y and look.stage == 2 and look.foliage_light_available():
 			look.set_foliage_light(not look.foliage_light_active())

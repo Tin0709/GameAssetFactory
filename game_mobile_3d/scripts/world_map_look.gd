@@ -10,6 +10,13 @@ const DAY_PALETTE := {
 	"adjustment_enabled": true,
 	"adjustment_color_correction": preload("res://assets/graphics/meadow_daylight_v5/day_palette.res"),
 }
+const BALANCED_DAY_PALETTE := {
+	"ambient_light_color": Color(0.55, 0.71, 0.83),
+	"ambient_light_energy": 0.36,
+	"adjustment_enabled": true,
+	"adjustment_color_correction": preload("res://assets/graphics/meadow_daylight_v5/day_balanced.res"),
+}
+enum DayPalette { NONE, ORIGINAL, BALANCED }
 const MOTION=preload("res://scripts/grassland_motion.gd")
 const REVIEW_SHADOW_BLUR := 1.08
 const REVIEW_SHADOW_NORMAL_BIAS := 0.76
@@ -58,7 +65,8 @@ var _day_composition_previous: Dictionary = {}
 var _atmosphere_environment: Environment
 var _atmosphere_previous: Dictionary = {}
 var _exposure_requested := false
-var _palette_requested := false
+var _palette_requested := DayPalette.NONE
+var _palette_applied := DayPalette.NONE
 var _palette_environment: Environment
 var _palette_previous: Dictionary = {}
 var _exposure_effect: CompositorEffect
@@ -540,25 +548,29 @@ func _restore_atmosphere() -> void:
 func day_palette_available() -> bool:
 	return atmosphere_review_available() and not level.get_viewport().use_hdr_2d
 
-func day_palette_active() -> bool:
-	return _palette_environment != null
+func day_palette_active(balanced: bool = false) -> bool:
+	return _palette_applied == (DayPalette.BALANCED if balanced else DayPalette.ORIGINAL)
 
-func set_day_palette(enabled: bool) -> void:
+func set_day_palette(enabled: bool, balanced: bool = false) -> void:
 	if enabled and not day_palette_available(): return
-	_palette_requested = enabled
+	_palette_requested = DayPalette.NONE
+	if enabled:
+		_palette_requested = DayPalette.BALANCED if balanced else DayPalette.ORIGINAL
 	_refresh_day_palette()
 
 func _refresh_day_palette() -> void:
 	var environment: Environment
-	if _palette_requested and stage == 2 and not level.get_viewport().use_hdr_2d:
+	if _palette_requested != DayPalette.NONE and stage == 2 and day_palette_available():
 		environment = level.get_node("WorldEnvironment").environment
-	if environment == _palette_environment: return
+	if environment == _palette_environment and _palette_applied == _palette_requested: return
 	_restore_day_palette()
 	if environment == null: return
 	_palette_environment = environment
-	for property: String in DAY_PALETTE:
+	_palette_applied = _palette_requested
+	var palette := BALANCED_DAY_PALETTE if _palette_applied == DayPalette.BALANCED else DAY_PALETTE
+	for property: String in palette:
 		_palette_previous[property] = environment.get(property)
-		environment.set(property, DAY_PALETTE[property])
+		environment.set(property, palette[property])
 
 func _restore_day_palette() -> void:
 	if _palette_environment == null: return
@@ -566,6 +578,7 @@ func _restore_day_palette() -> void:
 		_palette_environment.set(property, _palette_previous[property])
 	_palette_previous.clear()
 	_palette_environment = null
+	_palette_applied = DayPalette.NONE
 
 func local_exposure_available() -> bool:
 	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
@@ -611,7 +624,7 @@ func _release_local_exposure() -> void:
 	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
 
 func _process(_delta: float) -> void:
-	if _palette_requested and stage == 2:
+	if _palette_requested != DayPalette.NONE and stage == 2:
 		_refresh_day_palette()
 	if _exposure_effect == null: return
 	if not is_instance_valid(_exposure_camera) or _exposure_camera.compositor != _exposure_compositor:
