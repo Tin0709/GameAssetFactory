@@ -46,6 +46,7 @@ var cloud_clock:=0.0
 var _pockets_requested:=false
 var _foliage_light_requested := false
 var _atmosphere_requested := false
+var _day_composition_previous: Dictionary = {}
 var _atmosphere_environment: Environment
 var _atmosphere_previous: Dictionary = {}
 var _exposure_requested := false
@@ -260,6 +261,45 @@ func set_direct_clouds(value: bool) -> void:
 	_direct_clouds_requested=value
 	_pockets_requested=false
 	_refresh_cloud_look()
+
+func day_composition_active() -> bool:
+	return stage == 2 and not _day_composition_previous.is_empty()
+
+func toggle_day_composition() -> void:
+	if stage != 2 or not atmosphere_review_available(): return
+	var entering := not day_composition_active()
+	if entering:
+		_day_composition_previous = {
+			"soft_shadows": _shadow_review_requested,
+			"direct_clouds": _direct_clouds_requested,
+			"albedo_clouds": _pockets_requested,
+			"foliage": _foliage_light_requested,
+			"atmosphere": _atmosphere_requested,
+		}
+		_shadow_review_requested = true
+		_atmosphere_requested = true
+		if foliage_light_available():
+			_direct_clouds_requested = true
+			_pockets_requested = false
+			_foliage_light_requested = true
+	else:
+		_shadow_review_requested = _day_composition_previous.soft_shadows
+		_direct_clouds_requested = _day_composition_previous.direct_clouds
+		_pockets_requested = _day_composition_previous.albedo_clouds
+		_foliage_light_requested = _day_composition_previous.foliage
+		_atmosphere_requested = _day_composition_previous.atmosphere
+		_day_composition_previous.clear()
+	_apply_path_verge(1.0 if entering else 0.0)
+	_refresh_cloud_look()
+	_apply_directional_shadow_review(level.get_node("Sun"))
+	refresh_atmosphere()
+
+func _apply_path_verge(strength: float) -> void:
+	for item: Array in terrain_materials:
+		item[3].set_shader_parameter("path_verge", strength)
+	for material: ShaderMaterial in wind_materials:
+		if _review_shaders.get(material) == PRESET.plants_shader and material.get_shader_parameter("plant_kind") in [0, 2]:
+			material.set_shader_parameter("path_verge", strength)
 
 func _refresh_cloud_look() -> void:
 	level.geometry.reset_cutaway_materials()

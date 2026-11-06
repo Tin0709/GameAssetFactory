@@ -5,6 +5,7 @@ uniform sampler2D path_surface_map : filter_nearest, repeat_disable;
 uniform sampler2D path_grass_atlas : source_color, filter_linear_mipmap, repeat_enable;
 uniform sampler2D path_dirt_atlas : source_color, filter_linear_mipmap, repeat_enable;
 uniform bool path_blending = false;
+uniform float path_verge = 0.0;
 uniform vec2 path_map_origin = vec2(0.0);
 uniform vec2 path_map_size = vec2(1.0);
 uniform float grass_variation_strength = 0.16;
@@ -169,5 +170,13 @@ vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	grass=vary_grass_surface(grass,world);
 	vec3 soil=grade_surface_kind(texture(path_dirt_atlas,world.xz).rgb,2,texture_contrast);
 	grass=plant_soil_speckles(grass,soil,world,field);
+	if (path_verge > 0.0) {
+		// Let grass reclaim the road shoulders in coherent world-space patches.
+		// Preserve the solid dirt away from the border and reuse both atlases.
+		float edge = signed_distance + (noise - 0.62) * 0.86;
+		float feather = smoothstep(-0.14, 0.15, edge);
+		float worn_soil = 1.0 - 0.26 * (1.0 - smoothstep(0.0, 0.52, abs(signed_distance)));
+		dirt = mix(dirt, feather * worn_soil, path_verge);
+	}
 	return mix(grass,soil,dirt);
 }
