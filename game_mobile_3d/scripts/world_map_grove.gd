@@ -39,7 +39,7 @@ const UNDERSTORY := {
 	Vector2i(6, -1): {
 		"short_grass": [Vector2(2.52, -2.35), Vector2(4.37, -3.42), Vector2(7.31, 0.34), Vector2(6.48, 1.72)],
 		"tall_grass": [Vector2(3.34, -2.4), Vector2(8.37, -1.44)],
-		"flower_white": [Vector2(3.38, -3.42), Vector2(7.27, -1.92)],
+		"flower_white": [Vector2(1.43, -3.38), Vector2(7.27, -1.92)],
 		"flower_blue": [Vector2(4.63, -1.66), Vector2(5.34, -1.27), Vector2(6.28, -1.42)],
 		"flower_yellow": [Vector2(7.37, -0.44)],
 		"flower_red": [Vector2(4.38, 0.48)],
