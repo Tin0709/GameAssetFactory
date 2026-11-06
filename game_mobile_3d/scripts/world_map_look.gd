@@ -58,6 +58,9 @@ var _shadow_review_requested := false
 var _canopy_requested := false
 var _canopy_leaves: Array[Vector4] = []
 var _canopy_profile: Dictionary = {}
+var _canopy_shrubs: Dictionary = {}
+var _canopy_grove: Dictionary = {}
+var _canopy_has_oaks := false
 var _direct_clouds_requested:=false
 var _shader_variants: Dictionary[Shader,Dictionary]={}
 var _review_shaders: Dictionary[ShaderMaterial,Shader]={}
@@ -218,13 +221,34 @@ func set_canopy_contact(enabled: bool) -> void:
 	_apply_review_shaders()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 
+func refresh_canopy_contact() -> void:
+	if not canopy_contact_active(): return
+	level.geometry.reset_cutaway_materials()
+	_apply_canopy_contact()
+	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
+
 func _apply_canopy_contact() -> void:
 	if not canopy_contact_active(): return
-	if _canopy_profile.is_empty():
+	var with_oaks: bool = level.grove != null and level.grove.visible
+	if _canopy_profile.is_empty() or with_oaks != _canopy_has_oaks:
 		var base_y: float = level.runtime.source_bounds.min[1] + level.runtime.offset[1]
-		var field := CANOPY.bake(_canopy_leaves, path_map_image, Vector2i(path_map_origin), base_y)
-		_canopy_profile = {"canopy_field": ImageTexture.create_from_image(field.image),
-			"canopy_origin": field.origin, "canopy_extent": field.extent, "canopy_base_y": base_y}
+		if _canopy_shrubs.is_empty():
+			_canopy_shrubs = CANOPY.bake(_canopy_leaves, path_map_image, Vector2i(path_map_origin), base_y)
+		if with_oaks and _canopy_grove.is_empty():
+			var oaks: Array[Transform3D] = []
+			for tree: Node3D in level.grove.get_children(): oaks.append(tree.global_transform)
+			_canopy_grove = CANOPY.stamp_oaks(_canopy_shrubs, path_map_image, Vector2i(path_map_origin), base_y, oaks)
+		var field := _canopy_grove if with_oaks else _canopy_shrubs
+		var texture: ImageTexture = _canopy_profile.get("canopy_field")
+		if texture == null:
+			texture = ImageTexture.create_from_image(field.image)
+		elif texture.get_size() == field.image.get_size():
+			texture.update(field.image)
+		else:
+			texture.set_image(field.image)
+		_canopy_profile = {"canopy_field": texture, "canopy_origin": field.origin,
+			"canopy_extent": field.extent, "canopy_base_y": base_y}
+		_canopy_has_oaks = with_oaks
 	for material: ShaderMaterial in _review_shaders:
 		if _review_shaders[material] == PRESET.leaves_shader: continue
 		for parameter: String in _canopy_profile:

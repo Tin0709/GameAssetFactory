@@ -29,8 +29,9 @@ void vertex() {
 
 void fragment() {
 #ifdef GAF_WORLD_CANOPY
-	AO = surface_top > 0.9 ? canopy_ao(surface_world) : 1.0;
-	AO_LIGHT_AFFECT = CANOPY_DIRECT_AFFECT;
+	vec2 contact = surface_top > 0.9 ? canopy_ao(surface_world) : vec2(1.0, CANOPY_DIRECT_AFFECT);
+	AO = contact.x;
+	AO_LIGHT_AFFECT = contact.y;
 #endif
 	vec4 color = albedo_tint;
 	if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);

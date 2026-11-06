@@ -47,8 +47,9 @@ void vertex() {
 
 void fragment() {
 #ifdef GAF_WORLD_CANOPY
-	AO = mix(1.0, canopy_ao(plant_root), 1.0 - clamp(tip, 0.0, 1.0) * 0.30);
-	AO_LIGHT_AFFECT = CANOPY_DIRECT_AFFECT;
+	vec2 contact = canopy_ao(plant_root);
+	AO = mix(1.0, contact.x, 1.0 - clamp(tip, 0.0, 1.0) * 0.30);
+	AO_LIGHT_AFFECT = contact.y;
 #endif
 	vec3 source=plant_kind==0 ? texture(atlas,UV).rgb : COLOR.rgb*albedo_tint.rgb;
 	if (plant_kind==0) {

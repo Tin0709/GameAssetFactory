@@ -4,6 +4,10 @@ const TEXELS_PER_METRE := 4
 const HEIGHT_CODES_PER_METRE := 64.0
 const MAX_CLEARANCE := 3.5
 const REACH := 1.15
+const OAK_ATLAS := "res://assets/graphics/meadow_daylight_v5/oak_contact.res"
+const OAK_STAMP_SIZE := 64
+const OAK_STAMP_EXTENT := 4.25
+const OAK_OCCLUSION_GAIN := 0.68
 
 static func bake(leaves: Array[Vector4], terrain: Image, map_min: Vector2i, base_y: float) -> Dictionary:
 	var rect := Rect2i(map_min, terrain.get_size())
@@ -53,3 +57,57 @@ static func bake(leaves: Array[Vector4], terrain: Image, map_min: Vector2i, base
 				data[pixel + 2] = height & 255
 	var image := Image.create_from_data(size.x, size.y, false, Image.FORMAT_RGBA8, data)
 	return {"image": image, "origin": Vector2(origin), "extent": Vector2(bounds.size)}
+
+
+static func stamp_oaks(field: Dictionary, terrain: Image, map_min: Vector2i, base_y: float, oaks: Array[Transform3D], gain: float = OAK_OCCLUSION_GAIN) -> Dictionary:
+	if oaks.is_empty(): return field
+	var atlas := load(OAK_ATLAS) as Image
+	if atlas == null: return field
+	var field_origin := Vector2i(field.origin)
+	var bounds := Rect2i(field_origin, Vector2i(field.extent))
+	var footprint_bounds: Array[Rect2i] = []
+	for oak: Transform3D in oaks:
+		var centre := Vector2(oak.origin.x, oak.origin.z)
+		var reach := Vector2.ONE * (OAK_STAMP_EXTENT * oak.basis.x.length())
+		var low := Vector2i((centre - reach).floor())
+		var high := Vector2i((centre + reach).ceil())
+		var footprint := Rect2i(low, high - low)
+		footprint_bounds.append(footprint)
+		bounds = bounds.merge(footprint)
+	bounds = bounds.intersection(Rect2i(map_min, terrain.get_size()))
+	var size := bounds.size * TEXELS_PER_METRE
+	var image := Image.create(size.x, size.y, false, Image.FORMAT_RGBA8)
+	var previous: Image = field.image
+	image.blit_rect(previous, Rect2i(Vector2i.ZERO, previous.get_size()), (field_origin - bounds.position) * TEXELS_PER_METRE)
+	for index in oaks.size():
+		var inverse := oaks[index].affine_inverse()
+		var covered := footprint_bounds[index].intersection(bounds)
+		var first := (covered.position - bounds.position) * TEXELS_PER_METRE
+		var last := (covered.end - bounds.position) * TEXELS_PER_METRE
+		for z in range(first.y, last.y):
+			for x in range(first.x, last.x):
+				var point := Vector2(bounds.position) + (Vector2(x, z) + Vector2(0.5, 0.5)) / TEXELS_PER_METRE
+				var receiver := terrain.get_pixelv(Vector2i(point.floor()) - map_min)
+				if receiver.a < 0.5: continue
+				var local := inverse * Vector3(point.x, receiver.g, point.y)
+				var height_weight := 1.0 - smoothstep(0.10, 0.60, absf(local.y))
+				if height_weight <= 0.0: continue
+				var uv := Vector2(local.x, local.z) / (2.0 * OAK_STAMP_EXTENT) + Vector2(0.5, 0.5)
+				var coverage := roundi(_sample_oak(atlas, index % 2, uv) * height_weight * gain * 255.0)
+				if coverage <= roundi(image.get_pixel(x, z).r * 255.0): continue
+				var height := clampi(roundi((receiver.g - base_y) * HEIGHT_CODES_PER_METRE * (coverage / 255.0)), 0, 65535)
+				# Alpha tags the ambient-only oak share. Existing shrub texels keep alpha zero.
+				image.set_pixel(x, z, Color8(coverage, height >> 8, height & 255, coverage))
+	return {"image": image, "origin": Vector2(bounds.position), "extent": Vector2(bounds.size)}
+
+
+static func _sample_oak(atlas: Image, tile: int, uv: Vector2) -> float:
+	if uv.x <= 0.0 or uv.x >= 1.0 or uv.y <= 0.0 or uv.y >= 1.0: return 0.0
+	var pixel := uv * OAK_STAMP_SIZE - Vector2(0.5, 0.5)
+	var low := Vector2i(pixel.floor()).clamp(Vector2i.ZERO, Vector2i.ONE * (OAK_STAMP_SIZE - 1))
+	var high := Vector2i(pixel.ceil()).clamp(Vector2i.ZERO, Vector2i.ONE * (OAK_STAMP_SIZE - 1))
+	var weight := pixel.posmod(1.0)
+	var tile_x := tile * OAK_STAMP_SIZE
+	var a := lerpf(atlas.get_pixel(tile_x + low.x, low.y).r, atlas.get_pixel(tile_x + high.x, low.y).r, weight.x)
+	var b := lerpf(atlas.get_pixel(tile_x + low.x, high.y).r, atlas.get_pixel(tile_x + high.x, high.y).r, weight.x)
+	return lerpf(a, b, weight.y)

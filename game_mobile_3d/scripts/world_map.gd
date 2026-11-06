@@ -216,6 +216,7 @@ func set_grove_visible(enabled: bool, at: Vector3) -> bool:
 	if enabled:
 		grove.update_focus($Camera3D, player.global_position, view_mode == "gameplay")
 		if look != null: look.refresh_grove_lighting()
+	if look != null: look.refresh_canopy_contact()
 	return true
 
 func review_grove(visit: bool) -> void:
