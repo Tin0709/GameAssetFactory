@@ -183,9 +183,11 @@ func _process(delta: float) -> void:
 	if (player.is_on_floor() or player.smooth_step_active) and (not jumping or landed):
 		_camera_ground_y=lerpf(_camera_ground_y,player.global_position.y,1.0-exp(-delta/.16))
 	if view_mode=="gameplay":
-		$Camera3D.position=Vector3(player.global_position.x,_camera_ground_y,player.global_position.z)+CAMERA_OFFSET
-		geometry.update_cutaway(player.global_position,$Camera3D.global_position)
-		if grove != null and grove.visible:grove.update_focus($Camera3D,player.global_position,true)
+		var camera: Camera3D = $Camera3D
+		_update_camera_near(camera)
+		camera.position=Vector3(player.global_position.x,_camera_ground_y,player.global_position.z)+CAMERA_OFFSET
+		geometry.update_cutaway(player.global_position,camera.global_position)
+		if grove != null and grove.visible:grove.update_focus(camera,player.global_position,true)
 
 func set_review_view(mode: String) -> void:
 	view_mode=mode
@@ -206,7 +208,8 @@ func set_review_view(mode: String) -> void:
 
 func _update_camera_near(camera: Camera3D) -> void:
 	var extend := _extended_camera_depth and view_mode == "gameplay" and camera.projection == Camera3D.PROJECTION_ORTHOGONAL
-	camera.near = GAMEPLAY_CAMERA_NEAR if extend else _original_camera_near
+	var near_plane := GAMEPLAY_CAMERA_NEAR if extend else _original_camera_near
+	if camera.near != near_plane: camera.near = near_plane
 
 func build_grove() -> bool:
 	var candidate := GROVE_REVIEW.new()
