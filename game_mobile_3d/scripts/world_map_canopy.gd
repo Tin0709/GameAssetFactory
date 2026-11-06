@@ -4,7 +4,7 @@ const TEXELS_PER_METRE := 4
 const HEIGHT_CODES_PER_METRE := 64.0
 const MAX_CLEARANCE := 3.5
 const REACH := 1.15
-const OAK_ATLAS := "res://assets/graphics/meadow_daylight_v5/oak_contact.res"
+const OAK_ATLAS := preload("res://assets/graphics/meadow_daylight_v5/oak_contact.res")
 const OAK_STAMP_SIZE := 64
 const OAK_STAMP_EXTENT := 4.25
 const OAK_OCCLUSION_GAIN := 0.68
@@ -61,8 +61,6 @@ static func bake(leaves: Array[Vector4], terrain: Image, map_min: Vector2i, base
 
 static func stamp_oaks(field: Dictionary, terrain: Image, map_min: Vector2i, base_y: float, oaks: Array[Transform3D], gain: float = OAK_OCCLUSION_GAIN) -> Dictionary:
 	if oaks.is_empty(): return field
-	var atlas := load(OAK_ATLAS) as Image
-	if atlas == null: return field
 	var field_origin := Vector2i(field.origin)
 	var bounds := Rect2i(field_origin, Vector2i(field.extent))
 	var footprint_bounds: Array[Rect2i] = []
@@ -93,7 +91,7 @@ static func stamp_oaks(field: Dictionary, terrain: Image, map_min: Vector2i, bas
 				var height_weight := 1.0 - smoothstep(0.10, 0.60, absf(local.y))
 				if height_weight <= 0.0: continue
 				var uv := Vector2(local.x, local.z) / (2.0 * OAK_STAMP_EXTENT) + Vector2(0.5, 0.5)
-				var coverage := roundi(_sample_oak(atlas, index % 2, uv) * height_weight * gain * 255.0)
+				var coverage := roundi(_sample_oak(OAK_ATLAS, index % 2, uv) * height_weight * gain * 255.0)
 				var previous_sample := image.get_pixel(x, z)
 				if coverage <= roundi(previous_sample.r * 255.0): continue
 				var height := clampi(roundi((receiver.g - base_y) * HEIGHT_CODES_PER_METRE * (coverage / 255.0)), 0, 65535)
