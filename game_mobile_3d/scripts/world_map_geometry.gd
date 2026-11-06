@@ -12,6 +12,7 @@ var terrain_face_area := 0.0
 var placement_counts: Dictionary = {}
 var terrain_chunks: Array[MeshInstance3D] = []
 var vegetation_batches: Array[MultiMeshInstance3D] = []
+var accent_batches: Array[MultiMeshInstance3D] = []
 var leaf_collision_count := 0
 var build_errors: Array[String] = []
 
@@ -108,6 +109,7 @@ func _clear_geometry() -> void:
 	_cutaway_chunks.clear()
 	terrain_chunks.clear()
 	vegetation_batches.clear()
+	accent_batches.clear()
 	placement_counts.clear()
 	build_errors.clear()
 	terrain_triangles = 0
@@ -399,7 +401,7 @@ func _build_chunk(chunk: Vector2i, chunk_cells: Array) -> void:
 				plants[group].roots.append(_leaf_cluster_roots[cell])
 	_finish_terrain(chunk, origin, builders)
 	for group: Dictionary in plants.values():
-		_build_multimeshes(chunk, origin, group.kind, group.placements, group.mask, group.roots)
+		_build_multimeshes(chunk, origin, group.kind, group.placements, group.mask, group.roots, vegetation_batches)
 
 
 func _emit_cell(builders: Dictionary, kind: String, cell: Vector3i, entry: Dictionary, placement: Vector3) -> void:
@@ -486,7 +488,17 @@ func _finish_terrain(chunk: Vector2i, origin: Vector3, builders: Dictionary) -> 
 	_cutaway_chunks.append({"visual": visual, "caster": caster, "active": false, "materials": []})
 
 
-func _build_multimeshes(chunk: Vector2i, origin: Vector3, kind: String, placements: Array, contact_mask: int = -1, wind_roots: Array = []) -> void:
+func build_accent_planting(anchor: Vector2i, planting: Dictionary) -> void:
+	var origin := Vector3(anchor.x, 0.0, anchor.y)
+	for kind: String in planting:
+		var positions: Array = []
+		for point: Vector3 in planting[kind]:
+			positions.append(point - origin)
+		if not positions.is_empty():
+			_build_multimeshes(anchor, origin, kind, positions, -1, [], accent_batches)
+
+
+func _build_multimeshes(chunk: Vector2i, origin: Vector3, kind: String, placements: Array, contact_mask: int, wind_roots: Array, batches: Array[MultiMeshInstance3D]) -> void:
 	var part_index := 0
 	var parts: Array = _parts[kind] if contact_mask < 0 else _leaf_parts_for_contacts(kind, contact_mask)
 	for part: Dictionary in parts:
@@ -508,7 +520,7 @@ func _build_multimeshes(chunk: Vector2i, origin: Vector3, kind: String, placemen
 		if contact_mask >= 0:
 			visual.set_meta("leaf_contact_mask", contact_mask)
 		add_child(visual)
-		vegetation_batches.append(visual)
+		batches.append(visual)
 		part_index += 1
 
 

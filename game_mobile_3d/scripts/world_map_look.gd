@@ -82,7 +82,7 @@ func setup(map: Node3D) -> void:
 			var native: Material=chunk.mesh.surface_get_material(index)
 			terrain_materials.append([chunk.mesh,index,native,make_material(native,"terrain")])
 	var copies: Dictionary={}
-	for batch: MultiMeshInstance3D in level.geometry.vegetation_batches:
+	for batch: MultiMeshInstance3D in level.geometry.vegetation_batches + level.geometry.accent_batches:
 		var native: Mesh=batch.multimesh.mesh
 		var kind: String=batch.get_meta("kind")
 		var key: String=str(native.get_instance_id())+":"+kind

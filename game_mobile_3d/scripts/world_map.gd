@@ -61,15 +61,19 @@ func _ready() -> void:
 	map_ready=true
 	reset_player()
 	set_review_view("gameplay")
+	if build_grove():
+		grove.build_understory(self)
+		set_grove_visible(true, player.global_position)
 	look=load("res://scripts/world_map_look.gd").new()
 	look.name="ReferenceLook"
 	add_child(look);look.setup(self)
+	if look.atmosphere_review_available(): look.toggle_day_composition()
 	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu · F4 nắng qua mây · F3 bóng mây chỉ chặn nắng · F2 bóng tiếp xúc dưới tán"
 	if RenderingServer.get_rendering_device()!=null:$HUD/Help.text+="\nF1 bóng nắng mềm"
 	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ · Shift+H chiều sâu không khí"
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
-	$HUD/Help.text+="\nG cụm sồi · Shift+G đến xem"
+	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -194,22 +198,31 @@ func set_review_view(mode: String) -> void:
 	if look != null:look.refresh_atmosphere()
 	if grove != null and grove.visible:grove.update_focus(camera,player.global_position,mode=="gameplay")
 
+func build_grove() -> bool:
+	var candidate := GROVE_REVIEW.new()
+	candidate.name = "GroveReview"
+	if not candidate.build(self):
+		candidate.free()
+		push_warning("WorldMap grove assets or support unavailable.")
+		return false
+	grove = candidate
+	add_child(grove)
+	return true
+
+func set_grove_visible(enabled: bool, at: Vector3) -> bool:
+	var player_shape := player.get_node("CollisionShape3D").shape as CapsuleShape3D
+	if not grove.set_enabled(enabled, at, player_shape): return false
+	for batch: MultiMeshInstance3D in geometry.accent_batches: batch.visible = enabled
+	if enabled:
+		grove.update_focus($Camera3D, player.global_position, view_mode == "gameplay")
+		if look != null: look.refresh_grove_lighting()
+	return true
+
 func review_grove(visit: bool) -> void:
-	if grove == null:
-		var candidate := GROVE_REVIEW.new()
-		candidate.name = "GroveReview"
-		if not candidate.build(self):
-			candidate.free()
-			push_warning("WorldMap grove assets or support unavailable.")
-			return
-		grove = candidate
-		add_child(grove)
+	if grove == null: return
 	var point: Vector2 = GROVE_REVIEW.REVIEW_POSITION
 	var destination := Vector3(point.x, surface_height(point.x, point.y) + 0.02, point.y)
-	var player_shape := player.get_node("CollisionShape3D").shape as CapsuleShape3D
-	if not grove.set_enabled(visit or not grove.visible, destination if visit else player.global_position, player_shape):
-		return
-	if grove.visible: look.refresh_grove_lighting()
+	if not set_grove_visible(visit or not grove.visible, destination if visit else player.global_position): return
 	if visit:
 		player.position = destination
 		player.velocity = Vector3.ZERO
@@ -217,8 +230,6 @@ func review_grove(visit: bool) -> void:
 		player.reset_physics_interpolation()
 		_camera_ground_y = destination.y
 		set_review_view("gameplay")
-	elif grove.visible:
-		grove.update_focus($Camera3D,player.global_position,view_mode=="gameplay")
 
 func update_status() -> void:
 	$HUD/Defeated.visible=player.is_dead

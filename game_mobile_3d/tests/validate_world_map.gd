@@ -81,6 +81,9 @@ func run() -> void:
 	var excluded: Array[RID]=[]
 	for body: StaticBody3D in scene.border_bodies:excluded.append(body.get_rid())
 	for body in geometry.find_children("LeafCollision_*","StaticBody3D",true,false):excluded.append(body.get_rid())
+	# Validate the original terrain height independently of new solid trunks.
+	if scene.grove != null:
+		for body: StaticBody3D in scene.grove._trunks:excluded.append(body.get_rid())
 	var sampled:=0
 	for column: Vector2i in scene.columns:
 		if posmod(column.x*7+column.y*11,29)!=0:continue

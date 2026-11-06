@@ -9,8 +9,30 @@ const PLACEMENTS := [
 	Vector4(-29.0, 1.3, 0.78, 1.25),
 	Vector4(-25.0, 3.7, 0.91, 2.0),
 	Vector4(-17.8, 11.5, 0.82, 0.1),
+	Vector4(-4.6, -3.5, 0.89, 0.7),
+	Vector4(4.3, -9.4, 0.90, 2.1),
 ]
 const REVIEW_POSITION := Vector2(-27.5, 8.0)
+# Small authored pockets on the two meadow approaches. The schematic and its
+# vegetation batches remain separately inspectable.
+const UNDERSTORY := {
+	Vector2i(0, -4): {
+		"short_grass": [Vector2(-5.75,-3.18), Vector2(-4.16,-4.47), Vector2(-3.64,-2.36), Vector2(-2.72,-4.52), Vector2(1.82,-5.42), Vector2(2.43,-4.65), Vector2(3.29,-5.51), Vector2(4.37,-4.77), Vector2(4.65,-8.71)],
+		"tall_grass": [Vector2(-5.47,-4.36), Vector2(-3.36,-3.57), Vector2(-2.47,-6.41), Vector2(2.37,-5.63), Vector2(5.28,-4.27)],
+		"flower_white": [Vector2(-3.41,-4.62), Vector2(-2.38,-3.58), Vector2(-1.76,-4.33), Vector2(2.68,-6.33)],
+		"flower_blue": [Vector2(2.64,-3.28), Vector2(3.27,-3.61), Vector2(3.74,-4.32), Vector2(4.75,-5.64)],
+		"flower_yellow": [Vector2(-6.32,-3.63), Vector2(-5.43,-2.53), Vector2(-4.19,-2.54), Vector2(-2.75,-5.48)],
+		"flower_red": [Vector2(5.51,-5.35), Vector2(6.37,-6.65)],
+	},
+	Vector2i(-27, 7): {
+		"short_grass": [Vector2(-34.72,5.36), Vector2(-33.43,4.38), Vector2(-34.63,6.34), Vector2(-30.62,6.43), Vector2(-28.26,9.41), Vector2(-27.41,9.63), Vector2(-25.62,7.37), Vector2(-25.37,6.62), Vector2(-24.59,8.49), Vector2(-17.66,10.44), Vector2(-17.56,12.64), Vector2(-18.38,10.52)],
+		"tall_grass": [Vector2(-32.57,4.42), Vector2(-28.57,10.44), Vector2(-26.62,8.62), Vector2(-24.73,7.55), Vector2(-16.68,11.63)],
+		"flower_white": [Vector2(-27.57,8.71), Vector2(-26.38,9.67), Vector2(-25.41,9.37), Vector2(-17.67,13.32)],
+		"flower_blue": [Vector2(-26.49,5.45), Vector2(-24.31,6.56), Vector2(-25.44,5.34)],
+		"flower_yellow": [Vector2(-34.63,4.43), Vector2(-32.37,5.37), Vector2(-32.76,6.62), Vector2(-19.59,10.38)],
+		"flower_red": [Vector2(-24.72,9.29), Vector2(-16.63,10.69)],
+	},
+}
 const REVEAL_SHADER := preload("res://materials/world_map_grove.gdshader")
 const TRUNK_RADIUS := 0.27
 const TRUNK_HEIGHT := 2.6
@@ -41,6 +63,26 @@ func build(level: Node3D) -> bool:
 		_prepare_meshes(tree)
 		_add_trunk(tree, placement.z)
 	return true
+
+func build_understory(level: Node3D) -> void:
+	var offset := Vector3(level.runtime.offset[0], level.runtime.offset[1], level.runtime.offset[2])
+	var placed: Dictionary = {}
+	for anchor: Vector2i in UNDERSTORY:
+		var planting: Dictionary = {}
+		for kind: String in UNDERSTORY[anchor]:
+			var roots: Array[Vector3] = []
+			for point: Vector2 in UNDERSTORY[anchor][kind]:
+				var height: float = level.surface_height(point.x, point.y)
+				if not is_finite(height) or not is_equal_approx(height, 3.0): continue
+				var local := Vector3(point.x, height, point.y) - offset
+				var cell := Vector3i(local.floor())
+				if placed.has(cell) or level.geometry.cells.has(cell): continue
+				var support: int = level.geometry.cells.get(cell + Vector3i.DOWN, -1)
+				if support < 0 or level.runtime.palette[support].kind != "grass_block": continue
+				placed[cell] = true
+				roots.append(Vector3(point.x, height, point.y))
+			planting[kind] = roots
+		level.geometry.build_accent_planting(anchor, planting)
 
 func _prepare_meshes(tree: Node3D) -> void:
 	for visual: MeshInstance3D in tree.find_children("*", "MeshInstance3D", true, false):
