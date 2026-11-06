@@ -17,6 +17,7 @@ const TRUNK_HEIGHT := 2.6
 
 var _appearance := ShaderMaterial.new()
 var _canopy_appearance := ShaderMaterial.new()
+var _direct_clouds := false
 var _trunks: Array[StaticBody3D] = []
 
 func build(level: Node3D) -> bool:
@@ -87,6 +88,7 @@ func set_enabled(value: bool, player_position: Vector3, player_shape: CapsuleSha
 	return true
 
 func set_lighting(bark: Shader, leaves: Shader, field: Texture2D, shape: Vector4, time: float) -> void:
+	_direct_clouds = field != null
 	_apply_lighting(_appearance, bark, field, shape, time)
 	_apply_lighting(_canopy_appearance, leaves, field, shape, time)
 
@@ -104,6 +106,7 @@ func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D,
 		material.set_shader_parameter("cloud_time", time)
 
 func publish_cloud_time(time: float) -> void:
+	if not _direct_clouds: return
 	_appearance.set_shader_parameter("cloud_time", time)
 	_canopy_appearance.set_shader_parameter("cloud_time", time)
 

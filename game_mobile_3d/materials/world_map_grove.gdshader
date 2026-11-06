@@ -6,6 +6,11 @@ uniform float native_specular = 0.24;
 
 #ifdef GAF_WORLD_DIRECT_CLOUD
 #include "res://materials/world_map_clouds.gdshaderinc"
+varying vec2 grove_world_xz;
+
+void vertex() {
+	grove_world_xz = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;
+}
 #endif
 #if defined(GAF_WORLD_DIRECT_CLOUD) || defined(GAF_WORLD_FOLIAGE_LIGHT)
 #define GAF_WORLD_BURLEY
@@ -32,7 +37,7 @@ void fragment() {
 	ROUGHNESS = 0.95;
 	SPECULAR = native_specular;
 #ifdef GAF_WORLD_DIRECT_CLOUD
-	cloud_transmission = world_cloud_shade((INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz);
+	cloud_transmission = world_cloud_shade(vec3(grove_world_xz.x, 0.0, grove_world_xz.y));
 #elif defined(GAF_WORLD_FOLIAGE_LIGHT)
 	cloud_transmission = 1.0;
 #endif

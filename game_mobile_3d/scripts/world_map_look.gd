@@ -454,7 +454,7 @@ func publish_clouds(time: float) -> void:
 	for material: ShaderMaterial in materials.values():material.set_shader_parameter("cloud_time",time)
 	level.geometry.update_cloud_time(time)
 	if direct_clouds_active():
-		if level.grove != null and level.grove.visible and foliage_light_available():
+		if level.grove != null and level.grove.visible:
 			level.grove.publish_cloud_time(time)
 		for material: ShaderMaterial in _direct_actor_materials:
 			if material!=null:material.set_shader_parameter("cloud_time",time)
