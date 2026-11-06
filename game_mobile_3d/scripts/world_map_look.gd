@@ -4,6 +4,12 @@ const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
+const DAY_PALETTE := {
+	"ambient_light_color": Color(0.43, 0.67, 0.90),
+	"ambient_light_energy": 0.39,
+	"adjustment_enabled": true,
+	"adjustment_color_correction": preload("res://assets/graphics/meadow_daylight_v5/day_palette.res"),
+}
 const MOTION=preload("res://scripts/grassland_motion.gd")
 const REVIEW_SHADOW_BLUR := 1.08
 const REVIEW_SHADOW_NORMAL_BIAS := 0.76
@@ -50,6 +56,9 @@ var _day_composition_previous: Dictionary = {}
 var _atmosphere_environment: Environment
 var _atmosphere_previous: Dictionary = {}
 var _exposure_requested := false
+var _palette_requested := false
+var _palette_environment: Environment
+var _palette_previous: Dictionary = {}
 var _exposure_effect: CompositorEffect
 var _exposure_compositor: Compositor
 var _previous_compositor: Compositor
@@ -523,6 +532,36 @@ func _restore_atmosphere() -> void:
 	_atmosphere_previous.clear()
 	_atmosphere_environment = null
 
+func day_palette_available() -> bool:
+	return atmosphere_review_available() and not level.get_viewport().use_hdr_2d
+
+func day_palette_active() -> bool:
+	return _palette_environment != null
+
+func set_day_palette(enabled: bool) -> void:
+	if enabled and not day_palette_available(): return
+	_palette_requested = enabled
+	_refresh_day_palette()
+
+func _refresh_day_palette() -> void:
+	var environment: Environment
+	if _palette_requested and stage == 2 and day_palette_available():
+		environment = level.get_node("WorldEnvironment").environment
+	if environment == _palette_environment: return
+	_restore_day_palette()
+	if environment == null: return
+	_palette_environment = environment
+	for property: String in DAY_PALETTE:
+		_palette_previous[property] = environment.get(property)
+		environment.set(property, DAY_PALETTE[property])
+
+func _restore_day_palette() -> void:
+	if _palette_environment == null: return
+	for property: String in _palette_previous:
+		_palette_environment.set(property, _palette_previous[property])
+	_palette_previous.clear()
+	_palette_environment = null
+
 func local_exposure_available() -> bool:
 	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
 
@@ -567,6 +606,8 @@ func _release_local_exposure() -> void:
 	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
 
 func _process(_delta: float) -> void:
+	if _palette_requested and stage == 2 and day_palette_active() == level.get_viewport().use_hdr_2d:
+		_refresh_day_palette()
 	if _exposure_effect == null: return
 	if not is_instance_valid(_exposure_camera) or _exposure_camera.compositor != _exposure_compositor:
 		set_local_exposure(false)
@@ -608,6 +649,7 @@ func set_stage(value: int) -> void:
 	var environment: Environment=(PRESET.environment if stage==2 else baseline_environment).duplicate()
 	level.get_node("WorldEnvironment").environment=environment
 	refresh_atmosphere()
+	_refresh_day_palette()
 	var sun: DirectionalLight3D=level.get_node("Sun")
 	for property: String in baseline_sun:sun.set(property,baseline_sun[property])
 	RenderingServer.directional_shadow_atlas_set_size(saved_shadow_size,saved_shadow_16bit)
@@ -643,6 +685,7 @@ func freeze_motion(time: float=0.0) -> void:
 
 func _exit_tree() -> void:
 	_restore_atmosphere()
+	_restore_day_palette()
 	_release_local_exposure()
 	RenderingServer.directional_shadow_atlas_set_size(saved_shadow_size,saved_shadow_16bit)
 	RenderingServer.directional_soft_shadow_filter_set_quality(saved_shadow_quality as RenderingServer.ShadowQuality)
