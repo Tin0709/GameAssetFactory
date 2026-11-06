@@ -94,10 +94,12 @@ static func stamp_oaks(field: Dictionary, terrain: Image, map_min: Vector2i, bas
 				if height_weight <= 0.0: continue
 				var uv := Vector2(local.x, local.z) / (2.0 * OAK_STAMP_EXTENT) + Vector2(0.5, 0.5)
 				var coverage := roundi(_sample_oak(atlas, index % 2, uv) * height_weight * gain * 255.0)
-				if coverage <= roundi(image.get_pixel(x, z).r * 255.0): continue
+				var previous_sample := image.get_pixel(x, z)
+				if coverage <= roundi(previous_sample.r * 255.0): continue
 				var height := clampi(roundi((receiver.g - base_y) * HEIGHT_CODES_PER_METRE * (coverage / 255.0)), 0, 65535)
-				# Alpha tags the ambient-only oak share. Existing shrub texels keep alpha zero.
-				image.set_pixel(x, z, Color8(coverage, height >> 8, height & 255, coverage))
+				# Retain existing shrub coverage for direct light, including overlaps.
+				var shrub := roundi((previous_sample.r - previous_sample.a) * 255.0)
+				image.set_pixel(x, z, Color8(coverage, height >> 8, height & 255, coverage - shrub))
 	return {"image": image, "origin": Vector2(bounds.position), "extent": Vector2(bounds.size)}
 
 
