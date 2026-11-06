@@ -36,7 +36,7 @@ func build(level: Node3D) -> bool:
 		tree.scale = Vector3.ONE * placement.z
 		add_child(tree)
 		_prepare_meshes(tree)
-		_add_trunk(tree.position, placement.z)
+		_add_trunk(tree, placement.z)
 	return true
 
 func _prepare_meshes(tree: Node3D) -> void:
@@ -53,20 +53,18 @@ func _prepare_meshes(tree: Node3D) -> void:
 		visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		visual.material_override = _appearance
 
-func _add_trunk(base: Vector3, tree_scale: float) -> void:
+func _add_trunk(tree: Node3D, tree_scale: float) -> void:
 	var shape := CylinderShape3D.new()
 	shape.radius = TRUNK_RADIUS * tree_scale
 	shape.height = TRUNK_HEIGHT * tree_scale
 	var collider := CollisionShape3D.new()
 	collider.shape = shape
 	var body := StaticBody3D.new()
-	body.position = base + Vector3.UP * shape.height * 0.5
+	body.position.y = TRUNK_HEIGHT * 0.5
 	body.collision_layer = 0
 	body.collision_mask = 0
 	body.add_child(collider)
-	# Parent to the oak so each tree and its collider can be inspected together.
-	var tree: Node3D = get_child(-1)
-	body.position = tree.transform.affine_inverse() * body.position
+	# Cancel the visual scale because the physics dimensions are in metres.
 	body.scale = Vector3.ONE / tree_scale
 	tree.add_child(body)
 	_trunks.append(body)
