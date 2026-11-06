@@ -2,6 +2,8 @@ extends Node3D
 ## Authored schematic layout; visual optimization never changes the source cells.
 const DATA := "res://assets/maps/world_map/runtime.json"
 const CAMERA_OFFSET := Vector3(12,15,16)
+# Extend the orthographic depth range past the view origin for foreground cliffs.
+const GAMEPLAY_CAMERA_NEAR := -8.0
 const GROVE_REVIEW := preload("res://scripts/world_map_grove.gd")
 const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 var runtime: Dictionary
@@ -16,6 +18,8 @@ var border_bodies: Array[StaticBody3D] = []
 var look
 var grove: Node3D
 var _camera_ground_y := NAN
+var _extended_camera_depth := true
+@onready var _original_camera_near: float = $Camera3D.near
 @onready var player: CharacterBody3D = $Actors/Player
 
 func _enter_tree() -> void:
@@ -74,7 +78,7 @@ func _ready() -> void:
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
 	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu ban ngày"
-	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi"
+	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -196,8 +200,13 @@ func set_review_view(mode: String) -> void:
 		camera.rotation_degrees=Vector3(-90,0,0)
 		# Zero-length cutaway corridor restores native materials for overview.
 		geometry.update_cutaway(Vector3.ZERO,Vector3.ZERO)
+	_update_camera_near(camera)
 	if look != null:look.refresh_atmosphere()
 	if grove != null and grove.visible:grove.update_focus(camera,player.global_position,mode=="gameplay")
+
+func _update_camera_near(camera: Camera3D) -> void:
+	var extend := _extended_camera_depth and view_mode == "gameplay" and camera.projection == Camera3D.PROJECTION_ORTHOGONAL
+	camera.near = GAMEPLAY_CAMERA_NEAR if extend else _original_camera_near
 
 func build_grove() -> bool:
 	var candidate := GROVE_REVIEW.new()
@@ -254,7 +263,13 @@ func _unhandled_input(event: InputEvent) -> void:
 				$WorldEnvironment.environment.fog_enabled = not $WorldEnvironment.environment.fog_enabled
 				if look.atmosphere_review_active():look.refresh_atmosphere()
 			get_viewport().set_input_as_handled()
-		if event.physical_keycode==KEY_V:set_review_view("overview" if view_mode=="gameplay" else "gameplay")
+		if event.physical_keycode == KEY_V:
+			if event.shift_pressed:
+				_extended_camera_depth = not _extended_camera_depth
+				_update_camera_near($Camera3D)
+			else:
+				set_review_view("overview" if view_mode == "gameplay" else "gameplay")
+			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_B:set_reference_look(look.stage==0)
 		if event.physical_keycode == KEY_U and look.stage == 2 and look.atmosphere_review_available():
 			look.toggle_day_composition()
