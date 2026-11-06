@@ -1,4 +1,6 @@
 uniform float wind_phase = 0.0;
+uniform float breeze_phase = 0.0;
+uniform bool travelling_breeze = false;
 uniform float wind_strength = 1.0;
 uniform float interaction_strength = 1.0;
 uniform vec3 player_position = vec3(0.0);
@@ -27,6 +29,16 @@ vec2 world_passage(vec3 root) {
 	return total/max(1.0,weights)*elevation*interaction_strength;
 }
 vec2 world_breeze(vec3 root) {
+	if (travelling_breeze) {
+		// A broad gust moves over several patches while detail moves across
+		// individual clumps. Both bands complete whole cycles in 28 seconds.
+		float broad = sin(dot(root.xz, vec2(0.32, 0.20)) - 4.0 * breeze_phase);
+		float detail = sin(dot(root.xz, vec2(1.10, -0.87)) - 10.0 * breeze_phase);
+		float gust = smoothstep(-0.65, 0.97, broad + 0.18 * detail);
+		vec2 heading = vec2(0.848, 0.530);
+		vec2 across = vec2(-heading.y, heading.x);
+		return (heading * (1.55 * gust - 0.55) + across * (0.14 * detail)) * wind_strength;
+	}
 	float phase = wind_phase + sin(dot(root.xz,vec2(0.19,0.13)))*0.35;
 	return vec2(sin(phase),0.45*sin(phase+1.1))*wind_strength;
 }

@@ -27,6 +27,7 @@ const POCKET_CLOUD_SHAPE:=Vector4(1.35,.40,.65,.49)
 var level: Node3D
 var motion=MOTION.new()
 var wind_materials: Array[ShaderMaterial]=[]
+var travelling_breeze := true
 var terrain_materials: Array[Array]=[]
 var plant_meshes: Array[Array]=[]
 var materials: Dictionary={}
@@ -135,6 +136,8 @@ func make_material(native: BaseMaterial3D,kind: String) -> ShaderMaterial:
 		material.set_shader_parameter("plant_kind",0 if kind=="short_grass" else (2 if kind=="tall_grass" else 1))
 		material.set_shader_parameter("wind_strength",1.5 if kind=="tall_grass" else 2.0)
 		wind_materials.append(material)
+	if kind != "terrain":
+		material.set_shader_parameter("travelling_breeze", travelling_breeze)
 	material.set_shader_parameter("atlas",native.albedo_texture)
 	if kind=="terrain" and native.albedo_texture!=null:
 		var texture_key:=native.albedo_texture.get_instance_id()
@@ -671,17 +674,25 @@ func _physics_process(delta: float) -> void:
 	elapsed=motion.clock
 	previous_position=position
 	publish_clouds(elapsed)
+	_publish_wind(position)
+
+func set_travelling_breeze(enabled: bool) -> void:
+	travelling_breeze = enabled
+	for material: ShaderMaterial in wind_materials:
+		material.set_shader_parameter("travelling_breeze", enabled)
+
+func _publish_wind(position: Vector3) -> void:
+	var phase := fposmod(motion.clock, 28.0) * TAU / 28.0
 	for material: ShaderMaterial in wind_materials:
 		motion.publish(material)
+		material.set_shader_parameter("breeze_phase", phase)
 		material.set_shader_parameter("player_position",position)
 
 func freeze_motion(time: float=0.0) -> void:
 	active=false
 	motion=MOTION.new();motion.clock=time
 	motion.advance(0.0,level.player.position,Vector3.ZERO,3.0,5.0)
-	for material: ShaderMaterial in wind_materials:
-		motion.publish(material)
-		material.set_shader_parameter("player_position",level.player.position)
+	_publish_wind(level.player.position)
 
 func _exit_tree() -> void:
 	_restore_atmosphere()
