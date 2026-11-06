@@ -2,6 +2,7 @@ extends Node3D
 ## Authored schematic layout; visual optimization never changes the source cells.
 const DATA := "res://assets/maps/world_map/runtime.json"
 const CAMERA_OFFSET := Vector3(12,15,16)
+const GROVE_REVIEW := preload("res://scripts/world_map_grove.gd")
 const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 var runtime: Dictionary
 var geometry
@@ -13,6 +14,7 @@ var view_mode := "gameplay"
 var build_msec := 0
 var border_bodies: Array[StaticBody3D] = []
 var look
+var grove: Node3D
 var _camera_ground_y := NAN
 @onready var player: CharacterBody3D = $Actors/Player
 
@@ -67,6 +69,7 @@ func _ready() -> void:
 	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ · Shift+H chiều sâu không khí"
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
+	$HUD/Help.text+="\nG cụm sồi · Shift+G đến xem"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -173,6 +176,7 @@ func _process(delta: float) -> void:
 	if view_mode=="gameplay":
 		$Camera3D.position=Vector3(player.global_position.x,_camera_ground_y,player.global_position.z)+CAMERA_OFFSET
 		geometry.update_cutaway(player.global_position,$Camera3D.global_position)
+		if grove != null and grove.visible:grove.update_focus($Camera3D,player.global_position,true)
 
 func set_review_view(mode: String) -> void:
 	view_mode=mode
@@ -188,6 +192,32 @@ func set_review_view(mode: String) -> void:
 		# Zero-length cutaway corridor restores native materials for overview.
 		geometry.update_cutaway(Vector3.ZERO,Vector3.ZERO)
 	if look != null:look.refresh_atmosphere()
+	if grove != null and grove.visible:grove.update_focus(camera,player.global_position,mode=="gameplay")
+
+func review_grove(visit: bool) -> void:
+	if grove == null:
+		var candidate := GROVE_REVIEW.new()
+		candidate.name = "GroveReview"
+		if not candidate.build(self):
+			candidate.free()
+			push_warning("WorldMap grove assets or support unavailable.")
+			return
+		grove = candidate
+		add_child(grove)
+	var point: Vector2 = GROVE_REVIEW.REVIEW_POSITION
+	var destination := Vector3(point.x, surface_height(point.x, point.y) + 0.02, point.y)
+	var player_shape := player.get_node("CollisionShape3D").shape as CapsuleShape3D
+	if not grove.set_enabled(visit or not grove.visible, destination if visit else player.global_position, player_shape):
+		return
+	if visit:
+		player.position = destination
+		player.velocity = Vector3.ZERO
+		player.cancel_jump()
+		player.reset_physics_interpolation()
+		_camera_ground_y = destination.y
+		set_review_view("gameplay")
+	elif grove.visible:
+		grove.update_focus($Camera3D,player.global_position,view_mode=="gameplay")
 
 func update_status() -> void:
 	$HUD/Defeated.visible=player.is_dead
@@ -199,6 +229,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not map_ready:return
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_G:
+			review_grove(event.shift_pressed)
+			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_H:
 			if event.shift_pressed and look.atmosphere_review_available():
 				if look.stage == 2 and view_mode == "gameplay":
