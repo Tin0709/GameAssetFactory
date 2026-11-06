@@ -494,7 +494,9 @@ func build_accent_planting(anchor: Vector2i, planting: Dictionary) -> void:
 		var positions: Array = []
 		for point: Vector3 in planting[kind]:
 			positions.append(point - origin)
-		if not positions.is_empty():
+		if positions.is_empty(): continue
+		if not _parts.has(kind): _load_parts(kind)
+		if _parts.has(kind):
 			_build_multimeshes(anchor, origin, kind, positions, -1, [], accent_batches)
 
 
