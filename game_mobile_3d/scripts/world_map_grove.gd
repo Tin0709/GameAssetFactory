@@ -1,5 +1,5 @@
 extends Node3D
-## An optional grove using the two original Forest Canopy V3 trees.
+## Reversible woodland planting using the two original Forest Canopy V3 trees.
 const OAKS := [
 	"res://assets/environment/forest_canopy_v3/tree_oak_a.glb",
 	"res://assets/environment/forest_canopy_v3/tree_oak_b.glb",
@@ -11,9 +11,13 @@ const PLACEMENTS := [
 	Vector4(-17.8, 11.5, 0.82, 0.1),
 	Vector4(-4.6, -3.5, 0.89, 0.7),
 	Vector4(4.45, -8.45, 0.90, 2.1),
+	Vector4(-9.45, 3.65, 0.82, 0.35),
+	Vector4(5.54, -0.55, 0.76, 1.5),
+	Vector4(21.5, 7.6, 0.91, 2.65),
+	Vector4(26.35, 12.35, 0.84, 0.96),
 ]
 const REVIEW_POSITION := Vector2(-27.5, 8.0)
-# Small authored pockets on the two meadow approaches. The schematic and its
+# Small authored pockets on the meadow approaches and east path. The schematic and its
 # vegetation batches remain separately inspectable.
 const UNDERSTORY := {
 	Vector2i(0, -4): {
@@ -31,6 +35,36 @@ const UNDERSTORY := {
 		"flower_blue": [Vector2(-26.49,5.45), Vector2(-24.31,6.56), Vector2(-25.44,5.34)],
 		"flower_yellow": [Vector2(-34.63,4.43), Vector2(-32.37,5.37), Vector2(-32.76,6.62), Vector2(-19.59,10.38)],
 		"flower_red": [Vector2(-24.72,9.29), Vector2(-16.63,10.69)],
+	},
+	Vector2i(6, -1): {
+		"short_grass": [Vector2(2.52, -2.35), Vector2(4.37, -3.42), Vector2(7.31, 0.34), Vector2(6.48, 1.72)],
+		"tall_grass": [Vector2(3.34, -2.4), Vector2(8.37, -1.44)],
+		"flower_white": [Vector2(3.38, -3.42), Vector2(7.27, -1.92)],
+		"flower_blue": [Vector2(4.63, -1.66), Vector2(5.34, -1.27), Vector2(6.28, -1.42)],
+		"flower_yellow": [Vector2(7.37, -0.44)],
+		"flower_red": [Vector2(4.38, 0.48)],
+	},
+	Vector2i(-9, 4): {
+		"short_grass": [Vector2(-11.61, 3.32), Vector2(-7.56, 5.23), Vector2(-4.73, 3.48)],
+		"tall_grass": [Vector2(-11.66, 4.55), Vector2(-6.68, 2.36)],
+		"flower_blue": [Vector2(-6.46, 5.38)],
+		"flower_yellow": [Vector2(-11.53, 2.52), Vector2(-9.65, 2.34), Vector2(-10.47, 3.66)],
+		"flower_red": [Vector2(-6.39, 4.44)],
+	},
+	Vector2i(23, 8): {
+		"short_grass": [Vector2(20.37, 6.46), Vector2(22.47, 6.55), Vector2(23.43, 8.42), Vector2(24.46, 10.62)],
+		"tall_grass": [Vector2(20.48, 8.42), Vector2(22.43, 9.35)],
+		"flower_white": [Vector2(22.58, 8.62)],
+		"flower_blue": [Vector2(20.55, 7.35), Vector2(21.49, 8.5), Vector2(21.68, 9.39)],
+		"flower_yellow": [Vector2(22.45, 7.41), Vector2(23.34, 9.57)],
+	},
+	Vector2i(26, 13): {
+		"short_grass": [Vector2(24.41, 11.63), Vector2(26.69, 10.47), Vector2(26.42, 14.41)],
+		"tall_grass": [Vector2(25.56, 11.33), Vector2(25.72, 14.39)],
+		"flower_white": [Vector2(25.42, 12.41), Vector2(26.43, 13.63)],
+		"flower_blue": [Vector2(25.29, 13.37), Vector2(27.27, 13.43)],
+		"flower_yellow": [Vector2(24.48, 12.52), Vector2(24.36, 13.46)],
+		"flower_red": [Vector2(27.48, 14.49)],
 	},
 }
 const REVEAL_SHADER := preload("res://materials/world_map_grove.gdshader")
