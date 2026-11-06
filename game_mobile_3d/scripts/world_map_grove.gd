@@ -16,11 +16,13 @@ const TRUNK_RADIUS := 0.27
 const TRUNK_HEIGHT := 2.6
 
 var _appearance := ShaderMaterial.new()
+var _canopy_appearance := ShaderMaterial.new()
 var _trunks: Array[StaticBody3D] = []
 
 func build(level: Node3D) -> bool:
 	hide()
 	_appearance.shader = REVEAL_SHADER
+	_canopy_appearance.shader = REVEAL_SHADER
 	var assets: Array[PackedScene] = []
 	for path: String in OAKS:
 		var asset := load(path) as PackedScene
@@ -42,7 +44,8 @@ func build(level: Node3D) -> bool:
 func _prepare_meshes(tree: Node3D) -> void:
 	for visual: MeshInstance3D in tree.find_children("*", "MeshInstance3D", true, false):
 		var source := visual.get_active_material(0) as StandardMaterial3D
-		_appearance.set_shader_parameter("surface_specular", source.metallic_specular)
+		var appearance := _canopy_appearance if str(visual.name).begins_with("Leaves") else _appearance
+		appearance.set_shader_parameter("native_specular", source.metallic_specular)
 		# The shadow-only instance uses the original mesh and its imported shadow mesh.
 		var caster := MeshInstance3D.new()
 		caster.name = visual.name + "Shadow"
@@ -51,7 +54,7 @@ func _prepare_meshes(tree: Node3D) -> void:
 		caster.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 		visual.get_parent().add_child(caster)
 		visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		visual.material_override = _appearance
+		visual.material_override = appearance
 
 func _add_trunk(tree: Node3D, tree_scale: float) -> void:
 	var shape := CylinderShape3D.new()
@@ -83,8 +86,32 @@ func set_enabled(value: bool, player_position: Vector3, player_shape: CapsuleSha
 		trunk.collision_layer = 1 if value else 0
 	return true
 
+func set_lighting(bark: Shader, leaves: Shader, field: Texture2D, shape: Vector4, time: float) -> void:
+	_apply_lighting(_appearance, bark, field, shape, time)
+	_apply_lighting(_canopy_appearance, leaves, field, shape, time)
+
+func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D, shape: Vector4, time: float) -> void:
+	if material.shader != shader:
+		var parameters := ["reveal_player", "player_view", "native_specular"]
+		var values := parameters.map(material.get_shader_parameter)
+		material.shader = shader
+		for i in parameters.size():
+			if values[i] != null: material.set_shader_parameter(parameters[i], values[i])
+	if field != null:
+		material.set_shader_parameter("clouds_enabled", true)
+		material.set_shader_parameter("cloud_field", field)
+		material.set_shader_parameter("cloud_shape", shape)
+		material.set_shader_parameter("cloud_time", time)
+
+func publish_cloud_time(time: float) -> void:
+	_appearance.set_shader_parameter("cloud_time", time)
+	_canopy_appearance.set_shader_parameter("cloud_time", time)
+
 func update_focus(camera: Camera3D, player_position: Vector3, gameplay: bool) -> void:
 	_appearance.set_shader_parameter("reveal_player", gameplay)
+	_canopy_appearance.set_shader_parameter("reveal_player", gameplay)
 	if gameplay:
 		var focus := player_position + Vector3.UP * 0.9
-		_appearance.set_shader_parameter("player_view", camera.global_transform.affine_inverse() * focus)
+		var view_position := camera.global_transform.affine_inverse() * focus
+		_appearance.set_shader_parameter("player_view", view_position)
+		_canopy_appearance.set_shader_parameter("player_view", view_position)

@@ -2,7 +2,18 @@ shader_type spatial;
 
 uniform bool reveal_player = false;
 uniform vec3 player_view;
-uniform float surface_specular = 0.24;
+uniform float native_specular = 0.24;
+
+#ifdef GAF_WORLD_DIRECT_CLOUD
+#include "res://materials/world_map_clouds.gdshaderinc"
+#endif
+#if defined(GAF_WORLD_DIRECT_CLOUD) || defined(GAF_WORLD_FOLIAGE_LIGHT)
+#define GAF_WORLD_BURLEY
+#ifdef GAF_WORLD_FOLIAGE_LIGHT
+#define GAF_WORLD_OPAQUE_FOLIAGE
+#endif
+#include "res://materials/world_map_direct_cloud.gdshaderinc"
+#endif
 
 void fragment() {
 	if (reveal_player) {
@@ -19,5 +30,10 @@ void fragment() {
 	}
 	ALBEDO = COLOR.rgb;
 	ROUGHNESS = 0.95;
-	SPECULAR = surface_specular;
+	SPECULAR = native_specular;
+#ifdef GAF_WORLD_DIRECT_CLOUD
+	cloud_transmission = world_cloud_shade((INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz);
+#elif defined(GAF_WORLD_FOLIAGE_LIGHT)
+	cloud_transmission = 1.0;
+#endif
 }

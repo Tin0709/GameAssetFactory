@@ -317,7 +317,9 @@ func foliage_light_active() -> bool:
 func set_foliage_light(enabled: bool) -> void:
 	if enabled == _foliage_light_requested or (enabled and not foliage_light_available()): return
 	_foliage_light_requested = enabled
-	if stage == 2: _apply_review_shaders()
+	if stage == 2:
+		_apply_review_shaders()
+		refresh_grove_lighting()
 
 func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool = false) -> Shader:
 	if not (direct or canopy or foliage): return original
@@ -332,8 +334,8 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 			defines += "\n#define GAF_WORLD_FOLIAGE_LIGHT"
 		if direct:
 			defines += "\n#define GAF_WORLD_DIRECT_CLOUD"
-			if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
-				defines += "\n#define GAF_WORLD_FORCE_LAMBERT"
+		if (direct or foliage) and ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
+			defines += "\n#define GAF_WORLD_FORCE_LAMBERT"
 		shader.code = original.code.replace("shader_type spatial;", defines)
 		variants[key] = shader
 	return variants[key]
@@ -416,10 +418,19 @@ func _apply_daylight_pockets() -> void:
 				material.set_shader_parameter("cloud_field",texture)
 				material.set_shader_parameter("cloud_shape",_cloud_shape)
 	level.geometry.update_cloud_style(texture,_cloud_shape)
+	refresh_grove_lighting()
 	if stage==2:
 		var sun: DirectionalLight3D=level.get_node("Sun")
 		sun.light_color=Color(1.,.963,.865) if pockets else PRESET.sun_settings.light_color
 		sun.light_energy=1.72 if pockets else PRESET.sun_settings.light_energy
+
+func refresh_grove_lighting() -> void:
+	if level.grove == null or not level.grove.visible: return
+	var direct := foliage_light_available() and direct_clouds_active()
+	var native: Shader = level.grove.REVEAL_SHADER
+	var bark := _review_variant(native, direct, false)
+	var leaves := _review_variant(native, direct, false, foliage_light_active())
+	level.grove.set_lighting(bark, leaves, _pockets_texture if direct else null, _cloud_shape, cloud_clock)
 
 func cloud_sample(point: Vector2) -> float:
 	var image:=_pockets_image if daylight_pockets_active() else cloud_image
@@ -443,6 +454,8 @@ func publish_clouds(time: float) -> void:
 	for material: ShaderMaterial in materials.values():material.set_shader_parameter("cloud_time",time)
 	level.geometry.update_cloud_time(time)
 	if direct_clouds_active():
+		if level.grove != null and level.grove.visible and foliage_light_available():
+			level.grove.publish_cloud_time(time)
 		for material: ShaderMaterial in _direct_actor_materials:
 			if material!=null:material.set_shader_parameter("cloud_time",time)
 		return

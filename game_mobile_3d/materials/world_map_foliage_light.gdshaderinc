@@ -1,4 +1,12 @@
 // Bounded direct transmission for WorldMap's authored foliage.
+vec3 world_foliage_lobe(vec3 face, vec3 light_dir, vec3 view_dir, float front, float weight, float strength) {
+	float back = max(-dot(face, light_dir), 0.0);
+	float through_view = max(-dot(view_dir, light_dir), 0.0);
+	float scatter = back * (0.55 + 0.45 * through_view * through_view);
+	return vec3(1.0, 0.91, 0.64) * min(1.0 - front, scatter * weight * strength);
+}
+
+#ifndef GAF_WORLD_FOLIAGE_LOBE_ONLY
 uniform float foliage_transmission : hint_range(0.0, 0.5) = 0.0;
 varying vec3 foliage_face;
 varying float foliage_weight;
@@ -15,10 +23,8 @@ void light() {
 		irradiance *= cloud_transmission;
 #endif
 		// Foliage face comes from the view-facing normal before artistic smoothing.
-		float back = max(-dot(foliage_face, LIGHT), 0.0);
-		float through_view = max(-dot(VIEW, LIGHT), 0.0);
-		float scatter = back * (0.55 + 0.45 * through_view * through_view);
-		response += vec3(1.0, 0.91, 0.64) * min(1.0 - front, scatter * foliage_weight * foliage_transmission);
+		response += world_foliage_lobe(foliage_face, LIGHT, VIEW, front, foliage_weight, foliage_transmission);
 	}
 	DIFFUSE_LIGHT += irradiance * response;
 }
+#endif

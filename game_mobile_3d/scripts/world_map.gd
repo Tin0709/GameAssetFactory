@@ -209,6 +209,7 @@ func review_grove(visit: bool) -> void:
 	var player_shape := player.get_node("CollisionShape3D").shape as CapsuleShape3D
 	if not grove.set_enabled(visit or not grove.visible, destination if visit else player.global_position, player_shape):
 		return
+	if grove.visible: look.refresh_grove_lighting()
 	if visit:
 		player.position = destination
 		player.velocity = Vector3.ZERO
