@@ -525,6 +525,7 @@ func _apply_review_shaders() -> void:
 		var adapter: ShaderMaterial=_direct_actor_materials[index] if (direct or actor_sky) else null
 		if adapter != null:
 			adapter.shader = _actor_sky_variant(direct) if actor_sky else _review_variant(DIRECT_ACTOR_SHADER, true, false)
+			adapter.set_shader_parameter("albedo_tint", item[4] if direct else item[3].albedo_color)
 		if stage==0 or ((direct or actor_sky) and adapter==null):
 			item[0].set_surface_override_material(item[1],item[2])
 		else:
@@ -639,9 +640,13 @@ func publish_clouds(time: float) -> void:
 			if material!=null:material.set_shader_parameter("cloud_time",time)
 		return
 	var shade:=cloud_shade(level.player.position,time) if stage>0 else 1.0
-	for item: Array in actor_materials:
+	for index in actor_materials.size():
+		var item: Array = actor_materials[index]
 		var linear: Color=item[4].srgb_to_linear()
 		item[3].albedo_color=Color(linear.r*shade,linear.g*shade,linear.b*shade,linear.a).linear_to_srgb()
+		if stage == 2 and _actor_sky_requested and local_exposure_available():
+			var adapter: ShaderMaterial = _direct_actor_materials[index]
+			if adapter != null: adapter.set_shader_parameter("albedo_tint", item[3].albedo_color)
 
 func atmosphere_review_available() -> bool:
 	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
