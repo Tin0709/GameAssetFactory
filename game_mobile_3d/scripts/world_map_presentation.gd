@@ -4,6 +4,7 @@ var level: Node3D
 var enabled := false
 var _scene_tree: SceneTree
 var _previous_tree_interpolation := false
+var _previous_jitter_fix := 0.5
 var _previous_modes: Array[Array] = []
 var _owns_service := false
 
@@ -11,11 +12,15 @@ func begin(world: Node3D) -> void:
 	level = world
 	_scene_tree = get_tree()
 	_previous_tree_interpolation = _scene_tree.physics_interpolation
+	_previous_jitter_fix = Engine.physics_jitter_fix
 	_previous_modes.append([level, level.physics_interpolation_mode])
 	level.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	# Activate before static render instances are built. Switching this global
 	# representation after construction leaves existing static RIDs stale.
 	_scene_tree.physics_interpolation = true
+	# Match Godot's startup interpolation path: timer jitter correction would
+	# otherwise compete with the render interpolation fraction.
+	Engine.physics_jitter_fix = 0.0
 	_owns_service = true
 
 func setup() -> void:
@@ -43,4 +48,5 @@ func _exit_tree() -> void:
 	for item: Array in _previous_modes:
 		if is_instance_valid(item[0]): item[0].physics_interpolation_mode = item[1]
 	_scene_tree.physics_interpolation = _previous_tree_interpolation
+	Engine.physics_jitter_fix = _previous_jitter_fix
 	_owns_service = false
