@@ -30,11 +30,11 @@ func setup(world:Node3D)->void:
         _installed=_install()
     refresh()
 
-func _install()->bool:
-    if CACHE.get_meta("source_runtime_sha256","")!=FileAccess.get_sha256(level.DATA):
+func _install(cache:Resource=CACHE)->bool:
+    if cache.get_meta("source_runtime_sha256","")!=FileAccess.get_sha256(level.DATA):
         validation_errors.append("Source map changed; retain original terrain lighting");return false
-    var values:PackedFloat32Array=CACHE.get_meta("values",PackedFloat32Array())
-    var records:Array=CACHE.get_meta("rows",[])
+    var values:PackedFloat32Array=cache.get_meta("values",PackedFloat32Array())
+    var records:Array=cache.get_meta("rows",[])
     var chunks:Dictionary={}
     for chunk:MeshInstance3D in level.geometry.terrain_chunks:chunks[str(chunk.name)]=chunk
     var rows:Dictionary={};var count:=0
