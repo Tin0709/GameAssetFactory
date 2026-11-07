@@ -82,6 +82,7 @@ func build(level: Node3D) -> bool:
 	_appearance.shader = REVEAL_SHADER
 	_canopy_appearance.shader = REVEAL_SHADER
 	_canopy_shadow.shader = REVEAL_SHADER
+	_canopy_shadow.set_shader_parameter("reveal_player", false)
 	var assets: Array[PackedScene] = []
 	for path: String in OAKS:
 		var asset := load(path) as PackedScene
