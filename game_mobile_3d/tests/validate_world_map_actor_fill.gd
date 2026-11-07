@@ -29,6 +29,9 @@ func run()->void:
     for item:Array in w.look.actor_materials:check(item[0].get_surface_override_material(item[1])==item[2],"B restores actual original actor material")
     w.look.set_stage(2);await frames()
     check(fill.is_active()==native,"Reference look resumes selected local fill")
+    w.look.set_stage(1);await frames()
+    for item:Array in w.look.actor_materials:check(item[0].get_active_material(item[1])==item[3],"Material-only stage retains its native actor adapter")
+    w.look.set_stage(2);await frames()
     if native:
         w.player.set_physics_process(false)
         w.player.position=Vector3(-4.6,3.02,-2.55);w.player.reset_physics_interpolation()
