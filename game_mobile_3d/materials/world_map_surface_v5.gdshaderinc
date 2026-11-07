@@ -212,5 +212,3 @@ vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	}
 	return mix(grass,soil,dirt);
 }
-
-
