@@ -2,6 +2,14 @@
 
 Main scene: `res://scenes/WorldMap.tscn` (F5). B compares the imported/native look with the current review; V switches overview, H toggles haze, R returns to the safe centre. User playtests keep normal audio.
 
+Open **`Open World Map.cmd`** from the repository root to play this map directly.
+The new planting is enabled at launch: ten Forest Canopy V3 oaks and 87 additional
+short/tall grass and white/blue/yellow/red flower patches, alongside all original
+schematic vegetation. **G** compares the added planting on/off; **Shift+G** visits
+the western oak grove. Wind, passage reactions, trunk collisions and canopy reveal
+remain active. `Open Overworld Meadow.cmd` opens the separate private MD2 fidelity
+lab and is not the main WorldMap launcher.
+
 `World Map.litematic` is an unchanged copy of the user file. `manifest.json` records hashes, complete original states, counts, mappings and independently audited exposed area. `runtime.json` keeps all 42,996 non-air cells, including marker/paired-upper entries which do not render.
 
 ## Coordinate and mapping contract
