@@ -47,4 +47,8 @@ func run()->void:
         w.look.set_direct_clouds(false);await frames()
         var lit:ShaderMaterial=w.look.actor_materials[0][0].get_active_material(w.look.actor_materials[0][1])
         check(lit!=null and lit.get_shader_parameter("sky_block")!=null,"Local fill survives F3-off native direct lighting")
+        w.look.publish_clouds(17.3)
+        check(lit.get_shader_parameter("albedo_tint")==w.look.actor_materials[0][3].albedo_color,"F3-off retains existing actor cloud-color fallback")
+        w.look.set_direct_clouds(true);await frames()
+        check(lit.get_shader_parameter("albedo_tint")==w.look.actor_materials[0][4],"F3 return restores ungraded tint for direct-only cloud shading")
     w.free();finish()
