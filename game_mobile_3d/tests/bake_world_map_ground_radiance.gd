@@ -57,4 +57,3 @@ func run()->void:
     image.convert(Image.FORMAT_RGBAH);image.save_exr(output.path_join("radiance.private.exr"))
     var metadata:Dictionary={"size":[dimensions.x,dimensions.y],"pixels_per_metre":2.0,"tile_span_metres":10.0,"origin":[origin.x,origin.y],"extent":[extent.x,extent.y],"sun_direction":[direction.x,direction.y,direction.z],"unit_energy":1.,"white_light":true,"ambient":false,"specular":false,"fog_grade":false,"roof":roof,"source_sha256":w.runtime.source_sha256,"source_runtime_sha256":FileAccess.get_sha256(w.DATA),"scope":"Original GAF tiled render. Static source illumination, tile-shadow precision and indirect patch model are approximations, not native MD2 GI."}
     FileAccess.open(output.path_join("metadata.private.json"),FileAccess.WRITE).store_string(JSON.stringify(metadata));print("GROUND_RADIANCE_BAKE ",JSON.stringify(metadata));quit()
-
