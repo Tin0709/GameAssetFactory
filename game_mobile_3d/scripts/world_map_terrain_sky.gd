@@ -37,11 +37,20 @@ func _install(cache:Resource=CACHE)->bool:
     var records:Array=cache.get_meta("rows",[])
     var chunks:Dictionary={}
     for chunk:MeshInstance3D in level.geometry.terrain_chunks:chunks[str(chunk.name)]=chunk
+    var expected:Dictionary={}
+    for name:String in chunks:
+        var mesh:ArrayMesh=chunks[name].mesh
+        for s in mesh.get_surface_count():
+            var material:Material=mesh.surface_get_material(s)
+            if material is ShaderMaterial and int(material.get_shader_parameter("ground_grade"))==3:
+                expected[name+":"+str(s)]=true
+    if records.size()!=expected.size():validation_errors.append("Incomplete mineral surface coverage");return false
     var rows:Dictionary={};var count:=0
     # Validate the entire cache before replacing any generated mesh.
     for record:Dictionary in records:
         var chunk:MeshInstance3D=chunks.get(str(record.chunk))
         var surface:=int(record.surface);var key:=str(record.chunk)+":"+str(surface)
+        if not expected.has(key):validation_errors.append("Unexpected mineral surface coverage "+key);return false
         if chunk==null or surface<0 or surface>=chunk.mesh.get_surface_count() or rows.has(key):
             validation_errors.append("Invalid source row "+key);return false
         var arrays:Array=chunk.mesh.surface_get_arrays(surface)
@@ -52,7 +61,7 @@ func _install(cache:Resource=CACHE)->bool:
     if count==0 or count!=values.size():validation_errors.append("Incomplete cache");return false
     for value:float in values:
         if not is_finite(value) or value<0. or value>1.:validation_errors.append("Invalid visibility");return false
-    var candidates:Dictionary={}
+    var candidates:Dictionary={};var replacements:Dictionary={}
     for name:String in chunks:
         var chunk:MeshInstance3D=chunks[name]
         var original:ArrayMesh=chunk.mesh;var relevant:=false
@@ -71,11 +80,15 @@ func _install(cache:Resource=CACHE)->bool:
             replacement.add_surface_from_arrays(original.surface_get_primitive_type(s),arrays,[],{},flags)
             if replacement.get_surface_count()!=s+1:validation_errors.append("Custom stream creation failed");return false
             replacement.surface_set_material(s,original.surface_get_material(s))
-        source_signatures[name]=signatures;candidates[name]=replacement
+        source_signatures[name]=signatures;candidates[name]=replacement;replacements[original]=replacement
     for name:String in candidates:
         var chunk:MeshInstance3D=chunks[name]
         chunk.mesh=candidates[name]
         chunk.get_node("NativeShadowCaster").mesh=chunk.mesh
+    # Look owns stage/B material changes through these mesh references. Rebind
+    # them atomically with the visuals; do not retain detached old GPU meshes.
+    for row:Array in level.look.terrain_materials:
+        if replacements.has(row[0]):row[0]=replacements[row[0]]
     stream_vertices=count;return true
 
 func available()->bool:
