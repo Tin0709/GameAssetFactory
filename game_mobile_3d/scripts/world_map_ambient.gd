@@ -17,7 +17,9 @@ func setup(world: Node3D) -> void:
 	refresh()
 
 func available() -> bool:
-	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
+	return RenderingServer.get_current_rendering_method() == "mobile" \
+		and RenderingServer.get_rendering_device() != null \
+		and not ProjectSettings.get_setting("rendering/lights_and_shadows/use_physical_light_units", false)
 
 func is_active() -> bool:
 	return _environment != null
@@ -26,10 +28,16 @@ func set_enabled(value: bool) -> void:
 	enabled = value
 	refresh()
 
+func _supported_background(environment: Environment) -> bool:
+	# Sky baking has its own background-energy pathway. Only the calibrated
+	# non-physical, unit-energy configuration is supported; others retain COLOR.
+	return environment.background_mode in [Environment.BG_COLOR, Environment.BG_CLEAR_COLOR] \
+		and is_equal_approx(environment.background_energy_multiplier, 1.0)
+
 func _eligible(environment: Environment) -> bool:
 	# A visible/foreign sky or ambient reflections need their own lighting model.
 	return environment != null and environment.sky == null \
-		and environment.background_mode in [Environment.BG_COLOR, Environment.BG_CLEAR_COLOR] \
+		and _supported_background(environment) \
 		and environment.ambient_light_source == Environment.AMBIENT_SOURCE_COLOR \
 		and environment.reflected_light_source in [Environment.REFLECTION_SOURCE_SKY, Environment.REFLECTION_SOURCE_DISABLED]
 
@@ -59,7 +67,7 @@ func refresh() -> void:
 			if _environment.get(field) != _applied[field]:
 				_restore()
 				return
-		if not candidate.background_mode in [Environment.BG_COLOR, Environment.BG_CLEAR_COLOR]:
+		if not _supported_background(candidate):
 			_restore()
 			return
 	else:
