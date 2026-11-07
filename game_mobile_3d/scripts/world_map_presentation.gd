@@ -1,5 +1,5 @@
 extends Node
-## Render-only interpolation. Physics, input and authored local poses are untouched.
+## Render interpolation; controller equations and authored local poses stay intact.
 var level: Node3D
 var enabled := false
 var _scene_tree: SceneTree
@@ -15,8 +15,8 @@ func begin(world: Node3D) -> void:
 	_previous_jitter_fix = Engine.physics_jitter_fix
 	_previous_modes.append([level, level.physics_interpolation_mode])
 	level.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-	# Activate before static render instances are built. Switching this global
-	# representation after construction leaves existing static RIDs stale.
+	# Activate before build: otherwise deferred transform uploads created under
+	# the non-interpolated path can be skipped after service activation.
 	_scene_tree.physics_interpolation = true
 	# Match Godot's startup interpolation path: timer jitter correction would
 	# otherwise compete with the render interpolation fraction.
