@@ -86,8 +86,10 @@ func _ready() -> void:
 	actor_fill=load("res://scripts/world_map_actor_fill.gd").new()
 	actor_fill.name="ActorSkyVisibility"
 	add_child(actor_fill);actor_fill.setup(self)
+	if look.ground_bounce_available(): look.set_ground_bounce(true)
 	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu · F4 nắng qua mây · F3 bóng mây chỉ chặn nắng · F2 bóng tiếp xúc dưới tán"
 	if RenderingServer.get_rendering_device()!=null:$HUD/Help.text+="\nF1 bóng nắng mềm"
+	if look.ground_bounce_available():$HUD/Help.text+=" · Shift+F1 nắng hắt từ nền"
 	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ · Shift+H chiều sâu không khí"
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
@@ -341,7 +343,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			look.set_local_exposure(not look.local_exposure_active())
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_F1 and look.stage==2:
-			look.set_directional_shadow_review(not look.directional_shadow_review_active())
+			if event.shift_pressed:
+				look.set_ground_bounce(not look.ground_bounce_active())
+			else:
+				look.set_directional_shadow_review(not look.directional_shadow_review_active())
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_F2 and look.stage==2:
 			if event.shift_pressed:

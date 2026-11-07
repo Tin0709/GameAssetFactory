@@ -3,6 +3,7 @@ extends Node
 const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
 const ACTOR_SKY_SHADER=preload("res://materials/world_map_actor_sky.gdshader")
+const GROUND_RADIANCE=preload("res://assets/graphics/world_map_ground_bounce_v001/normalized_ground.res")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
 const LEAF_SAMPLING_TEXTURE = preload("res://assets/graphics/meadow_daylight_v5/leaf_sampling.res")
@@ -96,6 +97,9 @@ var _review_shaders: Dictionary[ShaderMaterial,Shader]={}
 var _direct_actor_materials: Array[ShaderMaterial]=[]
 var _actor_sky_requested := false
 var _actor_sky_shaders: Dictionary = {}
+var _ground_bounce_requested := false
+var _ground_bounce_applied := false
+var _ground_bounce_layout_matches := false
 var _pockets_image: Image
 var _pockets_texture: ImageTexture
 var _cloud_shape:=BASE_CLOUD_SHAPE
@@ -105,6 +109,7 @@ func setup(map: Node3D) -> void:
 	process_physics_priority=3
 	baseline_environment=level.get_node("WorldEnvironment").environment.duplicate()
 	build_path_map()
+	_ground_bounce_layout_matches = FileAccess.get_sha256(level.DATA) == GROUND_RADIANCE.get_meta("source_runtime_sha256", "")
 	build_cloud_field()
 	saved_shadow_size=int(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/size"))
 	saved_shadow_16bit=bool(ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/16_bits"))
@@ -472,8 +477,9 @@ func toggle_leaf_sampling() -> void:
 
 func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool = false) -> Shader:
 	var filtered_leaves := original == PRESET.leaves_shader and leaf_sampling_active()
-	if not (direct or canopy or foliage or filtered_leaves): return original
-	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves))
+	var bounce := ground_bounce_active() and original in [PRESET.ground_shader, PRESET.cutaway_shader]
+	if not (direct or canopy or foliage or filtered_leaves or bounce): return original
+	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1))
 	var variants: Dictionary = _shader_variants.get_or_add(original, {})
 	if not variants.has(key):
 		var shader := Shader.new()
@@ -486,6 +492,8 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 			defines += "\n#define GAF_WORLD_DIRECT_CLOUD"
 		if filtered_leaves:
 			defines += "\n#define GAF_WORLD_LEAF_SAMPLING"
+		if bounce:
+			defines += "\n#define GAF_WORLD_GROUND_BOUNCE"
 		if (direct or foliage) and ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
 			defines += "\n#define GAF_WORLD_FORCE_LAMBERT"
 		shader.code = original.code.replace("shader_type spatial;", defines)
@@ -493,6 +501,7 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 	return variants[key]
 
 func _apply_review_shaders() -> void:
+	_ground_bounce_applied = ground_bounce_active()
 	_leaf_sampling_applied = leaf_sampling_active()
 	var direct := direct_clouds_active()
 	var actor_sky := stage == 2 and _actor_sky_requested and local_exposure_available()
@@ -530,6 +539,40 @@ func _apply_review_shaders() -> void:
 			item[0].set_surface_override_material(item[1],item[2])
 		else:
 			item[0].set_surface_override_material(item[1],adapter if (direct or actor_sky) else item[3])
+	_bind_ground_radiance()
+
+func ground_bounce_available() -> bool:
+	if not _ground_bounce_layout_matches or not local_exposure_available(): return false
+	if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading"): return false
+	if ProjectSettings.get_setting("rendering/lights_and_shadows/use_physical_light_units", false): return false
+	if GROUND_RADIANCE.get_meta("origin", Vector2.INF) != path_map_origin or GROUND_RADIANCE.get_meta("extent", Vector2.ZERO) != path_map_size: return false
+	if GROUND_RADIANCE.get_size() != path_map_size * 2.0: return false
+	var sun: DirectionalLight3D = level.get_node("Sun")
+	var source: Vector3 = GROUND_RADIANCE.get_meta("sun_direction", Vector3.ZERO)
+	return sun.is_visible_in_tree() and sun.light_energy > 0.0 and sun.shadow_enabled \
+		and source.dot(sun.global_basis.z.normalized()) > cos(deg_to_rad(0.1))
+
+func ground_bounce_active() -> bool:
+	return stage == 2 and _ground_bounce_requested and ground_bounce_available() \
+		and direct_clouds_active() and day_composition_active() and day_finish_active()
+
+func set_ground_bounce(enabled: bool) -> void:
+	_ground_bounce_requested = enabled
+	_refresh_ground_bounce()
+
+func _refresh_ground_bounce() -> void:
+	level.geometry.reset_cutaway_materials()
+	_apply_review_shaders()
+	var focus: Vector3 = level.presentation.player_position()
+	level.geometry.update_cutaway(focus, level.get_node("Camera3D").position, level.view_mode == "gameplay")
+
+func _bind_ground_radiance() -> void:
+	if not _ground_bounce_applied: return
+	for material: ShaderMaterial in _review_shaders:
+		if _review_shaders[material] != PRESET.ground_shader: continue
+		material.set_shader_parameter("ground_bounce_map", GROUND_RADIANCE)
+		material.set_shader_parameter("ground_bounce_direction", GROUND_RADIANCE.get_meta("sun_direction"))
+		material.set_shader_parameter("ground_bounce_radius", 3.0)
 
 func set_actor_sky_fill(enabled: bool) -> void:
 	_actor_sky_requested = enabled
@@ -764,6 +807,8 @@ func _release_local_exposure() -> void:
 	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
 
 func _process(_delta: float) -> void:
+	if ground_bounce_active() != _ground_bounce_applied:
+		_refresh_ground_bounce()
 	if leaf_sampling_active() != _leaf_sampling_applied:
 		_apply_review_shaders()
 	if _palette_requested != DayPalette.NONE and stage == 2:
