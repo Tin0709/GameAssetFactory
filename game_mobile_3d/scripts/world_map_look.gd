@@ -543,6 +543,8 @@ func _actor_sky_variant(direct: bool) -> Shader:
 		if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
 			header += "\n#define GAF_WORLD_FORCE_LAMBERT"
 		shader.code = ACTOR_SKY_SHADER.code.replace("shader_type spatial;", header)
+		if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
+			shader.code = shader.code.replace("diffuse_burley", "diffuse_lambert")
 		_actor_sky_shaders[direct] = shader
 	return _actor_sky_shaders[direct]
 

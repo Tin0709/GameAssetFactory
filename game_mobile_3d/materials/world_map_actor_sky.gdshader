@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode cull_disabled;
+render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_clouds.gdshaderinc"
 #include "res://materials/world_map_actor_sky.gdshaderinc"
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
