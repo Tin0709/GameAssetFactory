@@ -24,6 +24,13 @@ func run()->void:
     w.look.set_stage(0);await frames();check(not w.look.ground_bounce_active(),"Original B stage suspends bounce")
     w.look.set_stage(2);await frames();check(w.look.ground_bounce_active()==native,"Returning to Day resumes bounce")
     if native:
+        var stone:ShaderMaterial
+        for item:Array in w.look.terrain_materials:
+            if int(item[3].get_shader_parameter("ground_grade"))==3:stone=item[3];break
+        check(stone!=null,"Existing mineral material is test receiver")
+        var cutaway:ShaderMaterial=w.geometry._make_cutaway_material(stone)
+        for parameter:String in ["ground_bounce_map","ground_bounce_direction","ground_bounce_radius"]:
+            check(cutaway.get_shader_parameter(parameter)==stone.get_shader_parameter(parameter),"Cutaway retains reflected-ground "+parameter)
         var sun:DirectionalLight3D=w.get_node("Sun");var rotation:Vector3=sun.rotation
         sun.rotation.y+=.2;await frames();check(not w.look.ground_bounce_active(),"Different source direction rejects stale bake")
         sun.rotation=rotation;await frames();check(w.look.ground_bounce_active(),"Original source direction restores cached bake")
