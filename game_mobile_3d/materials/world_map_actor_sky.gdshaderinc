@@ -1,4 +1,4 @@
-uniform vec4 sky_block[12];
+uniform vec4 sky_block[60];
 uniform vec2 sky_heights;
 // Original bounce reserve: this is an art parameter, not recovered MD2 GI.
 uniform float sky_strength = 0.75;
@@ -14,6 +14,11 @@ float actor_block_term(int index, float height, vec3 normal) {
 float actor_sky_visibility(vec3 position, vec3 normal) {
 	float height = clamp((position.y - sky_heights.x) / max(sky_heights.y - sky_heights.x, 0.001), 0.0, 1.0);
 	// Dominant occluders do not compound into black when their projections overlap.
-	float blocked = max(actor_block_term(0, height, normal), actor_block_term(6, height, normal));
+	float blocked = 0.0;
+	for (int crown = 0; crown < 10; crown++) {
+		int index = crown * 6;
+		if (sky_block[index].x == 0.0 && sky_block[index + 3].x == 0.0) continue;
+		blocked = max(blocked, actor_block_term(index, height, normal));
+	}
 	return 1.0 - sky_strength * blocked;
 }

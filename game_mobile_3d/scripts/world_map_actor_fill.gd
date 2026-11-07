@@ -4,6 +4,7 @@ const PROBES := [
 	preload("res://assets/graphics/meadow_daylight_v5/oak_sky_a.res"),
 	preload("res://assets/graphics/meadow_daylight_v5/oak_sky_b.res"),
 ]
+const MAX_CROWNS := 10
 var level: Node3D
 var enabled := true
 var _trees: Array[Array] = []
@@ -13,7 +14,7 @@ var _last_visible := false
 
 func setup(world: Node3D) -> void:
 	level = world
-	_coefficients.resize(12)
+	_coefficients.resize(MAX_CROWNS * 6)
 	if is_instance_valid(level.grove):
 		for tree: Node3D in level.grove.get_children():
 			var rotation := tree.global_basis.orthonormalized()
@@ -22,7 +23,7 @@ func setup(world: Node3D) -> void:
 
 func available() -> bool:
 	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null \
-		and is_instance_valid(level) and is_instance_valid(level.grove) and not _trees.is_empty()
+		and is_instance_valid(level) and is_instance_valid(level.grove) and not _trees.is_empty() and _trees.size() <= MAX_CROWNS
 
 func is_active() -> bool:
 	return enabled and available() and level.look.stage == 2
@@ -57,9 +58,9 @@ func refresh() -> void:
 		_last_position = position
 		_last_visible = visible
 		_coefficients.fill(Vector4.ZERO)
-		var candidates: Array[Array] = []
 		if visible:
-			for tree: Array in _trees:
+			for index in _trees.size():
+				var tree: Array = _trees[index]
 				var inverse: Transform3D = tree[0]
 				var local := inverse * position
 				if maxf(absf(local.x), absf(local.z)) >= 6.0: continue
@@ -67,11 +68,7 @@ func refresh() -> void:
 				for height: float in [0.15, 1.8]:
 					var probe: Vector3 = inverse * (position + Vector3.UP * height)
 					pair.append_array(_rotate(tree[2].sample(probe), tree[1]))
-				candidates.append([maxf(pair[0].x, pair[3].x), pair])
-		candidates.sort_custom(func(a: Array, b: Array) -> bool: return a[0] > b[0])
-		for i in mini(2, candidates.size()):
-			var pair: PackedVector4Array = candidates[i][1]
-			for term in 6: _coefficients[i * 6 + term] = pair[term]
+				for term in 6: _coefficients[index * 6 + term] = pair[term]
 	# Material selection can change at F3/B while the actor remains stationary.
 	for material: ShaderMaterial in level.look._direct_actor_materials:
 		if material == null: continue
