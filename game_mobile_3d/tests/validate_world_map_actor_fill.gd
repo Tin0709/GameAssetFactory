@@ -63,4 +63,10 @@ func run()->void:
         check(lit.get_shader_parameter("albedo_tint")==w.look.actor_materials[0][3].albedo_color,"F3-off retains existing actor cloud-color fallback")
         w.look.set_direct_clouds(true);await frames()
         check(lit.get_shader_parameter("albedo_tint")==w.look.actor_materials[0][4],"F3 return restores ungraded tint for direct-only cloud shading")
+    var saved_grove:Node3D=w.grove
+    w.grove=null
+    var fallback:Node=load("res://scripts/world_map_actor_fill.gd").new()
+    root.add_child(fallback);fallback.setup(w)
+    check(not fallback.is_active(),"Optional grove build failure preserves native actor fallback")
+    fallback.free();w.grove=saved_grove
     w.free();finish()
