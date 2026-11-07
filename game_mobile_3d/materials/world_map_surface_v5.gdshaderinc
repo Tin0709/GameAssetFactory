@@ -140,6 +140,30 @@ float terrain_contact_shade(vec3 world,vec3 normal) {
 	}
 	return (1.0-occlusion*contact_shade_strength)*(1.0-plant_contact);
 }
+uniform float oak_root_beds = 0.0;
+
+uniform vec4 oak_root_sites[16];
+
+float oak_root_finger(vec2 point, vec2 end) {
+	float along = clamp(dot(point, end) / dot(end, end), 0.0, 1.0);
+	return 1.0 - smoothstep(0.09, 0.32, length(point - end * along));
+}
+
+float oak_root_coverage(vec3 world, int root_id) {
+	vec4 site = oak_root_sites[root_id - 1];
+	vec2 from_trunk = world.xz - site.xy;
+	vec2 point = vec2(dot(from_trunk, vec2(site.z, -site.w)), dot(from_trunk, site.wz));
+	vec2 patch = floor(point * 8.0) / 8.0;
+	float noise = edge_noise(patch * 5.7 + vec2(3.1, 20.8));
+	float radius = length((point - vec2(0.065, -0.045)) * vec2(0.93, 1.05));
+	float core = 1.0 - smoothstep(0.38, 0.98 * 1.12, radius + (noise - 0.5) * 0.32);
+	// The original tree meshes have four roots at these local headings.
+	float fingers = max(max(oak_root_finger(point, vec2(0.80, -0.10)),
+		oak_root_finger(point, vec2(-0.75, 0.20))),
+		max(oak_root_finger(point, vec2(0.24, 0.76)), oak_root_finger(point, vec2(-0.15, -0.71))));
+	return oak_root_beds * max(core, fingers * mix(0.26, 0.72, noise));
+}
+
 vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	vec3 original=grade_surface_kind(source,ground_grade,texture_contrast);
 	if (top>0.9 && ground_grade==1 && source.g>source.r*1.13 && source.g>source.b*1.35) original=vary_grass_surface(original,world);
@@ -147,11 +171,18 @@ vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	vec2 grid=floor(world.xz)-path_map_origin;
 	if (any(lessThan(grid,vec2(0.0))) || any(greaterThanEqual(grid,path_map_size))) return original;
 	vec4 field=texture(path_surface_map,(grid+0.5)/path_map_size);
-	if (ground_grade==1 && field.a>1.5) {
+	int bits=int(round(field.r));
+	int root_id=bits >> 8;
+	float root_coverage=0.0;
+	if (oak_root_beds > 0.0 && root_id > 0 && root_id <= 16 && ground_grade == 1 && abs(field.g-world.y) <= 0.02) {
+		root_coverage=oak_root_coverage(world, root_id);
+	}
+	if (ground_grade==1 && (field.a>1.5 || root_coverage>0.0)) {
 		vec3 soil=grade_surface_kind(texture(path_dirt_atlas,world.xz).rgb,2,texture_contrast);
 		original=plant_soil_speckles(original,soil,world,field);
+		original=mix(original,soil*vec3(0.83,0.86,0.93),root_coverage);
 	}
-	int mask=int(round(field.r));
+	int mask=bits & 255;
 	if (mask==0 || abs(field.g-world.y)>0.02) return original;
 	vec2 local=fract(world.xz);
 	float distance_to_other=10.0;
@@ -170,6 +201,7 @@ vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	grass=vary_grass_surface(grass,world);
 	vec3 soil=grade_surface_kind(texture(path_dirt_atlas,world.xz).rgb,2,texture_contrast);
 	grass=plant_soil_speckles(grass,soil,world,field);
+	grass=mix(grass,soil*vec3(0.83,0.86,0.93),root_coverage);
 	if (path_verge > 0.0) {
 		// Let grass reclaim the road shoulders in coherent world-space patches.
 		// Preserve the solid dirt away from the border and reuse both atlases.
@@ -180,3 +212,5 @@ vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	}
 	return mix(grass,soil,dirt);
 }
+
+

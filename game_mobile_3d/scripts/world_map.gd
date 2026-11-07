@@ -78,7 +78,7 @@ func _ready() -> void:
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
 	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu · Shift+P màu cân bằng"
-	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá"
+	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá\nShift+F2 đất quanh gốc sồi"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -229,7 +229,9 @@ func set_grove_visible(enabled: bool, at: Vector3) -> bool:
 	if enabled:
 		grove.update_focus($Camera3D, player.global_position, view_mode == "gameplay")
 		if look != null: look.refresh_grove_lighting()
-	if look != null: look.refresh_canopy_contact()
+	if look != null:
+		look.refresh_canopy_contact()
+		look.refresh_oak_root_beds()
 	return true
 
 func review_grove(visit: bool) -> void:
@@ -300,7 +302,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			look.set_directional_shadow_review(not look.directional_shadow_review_active())
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_F2 and look.stage==2:
-			look.set_canopy_contact(not look.canopy_contact_active())
+			if event.shift_pressed:
+				look.set_oak_root_beds(not look.oak_root_beds_active())
+			else:
+				look.set_canopy_contact(not look.canopy_contact_active())
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_F3 and look.stage==2:
 			look.set_direct_clouds(not look.direct_clouds_active())

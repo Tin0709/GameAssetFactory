@@ -61,6 +61,8 @@ var cloud_clock:=0.0
 var _pockets_requested:=false
 var _foliage_light_requested := false
 var _crown_detail_requested := false
+var _oak_root_beds_requested := false
+var _oak_root_sites := PackedVector4Array()
 var _atmosphere_requested := false
 var _day_composition_previous: Dictionary = {}
 var _atmosphere_environment: Environment
@@ -203,7 +205,55 @@ func build_path_map() -> void:
 				if other.x>0 and other.x!=value.x and is_equal_approx(other.y,value.y):mask|=1<<index
 		if mask!=0:path_edge_cells+=1
 		path_map_image.set_pixel(key.x-bounds.min[0],key.y-bounds.min[2],Color(mask,value.y,value.x,float(plant_contacts.get(key,1))))
+	_stamp_oak_root_sites()
 	path_map=ImageTexture.create_from_image(path_map_image)
+
+func _stamp_oak_root_sites() -> void:
+	_oak_root_sites.resize(16)
+	_oak_root_sites.fill(Vector4.ZERO)
+	if level.grove == null: return
+	var map_min := Vector2i(path_map_origin)
+	var bounds := Rect2i(Vector2i.ZERO, path_map_image.get_size())
+	for index in mini(level.grove.get_child_count(), _oak_root_sites.size()):
+		var tree: Node3D = level.grove.get_child(index)
+		var transform := tree.global_transform
+		var centre := Vector2(transform.origin.x, transform.origin.z)
+		var scale_squared := transform.basis.x.length_squared()
+		if scale_squared <= 0.000001: continue
+		_oak_root_sites[index] = Vector4(centre.x, centre.y,
+			transform.basis.x.x / scale_squared, transform.basis.z.x / scale_squared)
+		var reach := 1.45 * sqrt(scale_squared)
+		var first := Vector2i((centre - Vector2.ONE * reach).floor()) - map_min
+		var last := Vector2i((centre + Vector2.ONE * reach).floor()) - map_min
+		for y in range(maxi(0, first.y), mini(bounds.end.y - 1, last.y) + 1):
+			for x in range(maxi(0, first.x), mini(bounds.end.x - 1, last.x) + 1):
+				var data := path_map_image.get_pixel(x, y)
+				if data.b != 1.0 or absf(data.g - transform.origin.y) > 0.02: continue
+				var corner := Vector2(map_min + Vector2i(x, y))
+				if centre.distance_squared_to(centre.clamp(corner, corner + Vector2.ONE)) > reach * reach: continue
+				var previous_id := int(round(data.r)) >> 8
+				if previous_id > 0:
+					var previous_site := _oak_root_sites[previous_id - 1]
+					var sample_point := corner + Vector2.ONE * 0.5
+					if sample_point.distance_squared_to(centre) >= sample_point.distance_squared_to(Vector2(previous_site.x, previous_site.y)): continue
+				# Retain all eight path-edge bits. Upper bits identify this root.
+				data.r = float((int(round(data.r)) & 255) | ((index + 1) << 8))
+				path_map_image.set_pixel(x, y, data)
+
+func oak_root_beds_active() -> bool:
+	return stage == 2 and _oak_root_beds_requested and level.grove != null and level.grove.visible
+
+func set_oak_root_beds(enabled: bool) -> void:
+	_oak_root_beds_requested = enabled
+	refresh_oak_root_beds()
+
+func refresh_oak_root_beds() -> void:
+	for material: ShaderMaterial in _review_shaders:
+		if _review_shaders[material] not in [PRESET.ground_shader, PRESET.plants_shader]: continue
+		material.set_shader_parameter("oak_root_sites", _oak_root_sites)
+		material.set_shader_parameter("oak_root_beds", 0.85 if oak_root_beds_active() else 0.0)
+	level.geometry.reset_cutaway_materials()
+	level.geometry.update_cutaway(level.player.position, level.get_node("Camera3D").position, level.view_mode == "gameplay")
 
 func configure_path_materials() -> void:
 	var grass: Texture2D
@@ -684,6 +734,7 @@ func set_stage(value: int) -> void:
 	_apply_review_shaders()
 	_apply_daylight_pockets()
 	_apply_local_exposure()
+	refresh_oak_root_beds()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)
 
