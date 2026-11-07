@@ -4,7 +4,11 @@ func _initialize()->void:
     var args:=OS.get_cmdline_user_args()
     if args.size()!=1:push_error("Supply original bake output directory after --");quit(2);return
     var folder:String=args[0]
-    var info:Dictionary=JSON.parse_string(FileAccess.get_file_as_string(folder.path_join("metadata.private.json")))
+    var parsed:Variant=JSON.parse_string(FileAccess.get_file_as_string(folder.path_join("metadata.private.json")))
+    if not parsed is Dictionary:push_error("Missing original bake metadata");quit(2);return
+    var info:Dictionary=parsed
+    if info.get("source_runtime_sha256","")!=FileAccess.get_sha256("res://assets/maps/world_map/runtime.json"):
+        push_error("Bake must explicitly identify the current original GAF runtime map");quit(2);return
     var size:=Vector2i(info.size[0],info.size[1]);var bytes:=FileAccess.get_file_as_bytes(folder.path_join("radiance_rgba32.private.bin"))
     if bytes.size()!=size.x*size.y*16:push_error("Unexpected radiance payload");quit(2);return
     var image:=Image.create_from_data(size.x,size.y,false,Image.FORMAT_RGBAF,bytes);image.convert(Image.FORMAT_RGBAH)
@@ -13,7 +17,7 @@ func _initialize()->void:
     texture.set_meta("extent",Vector2(info.extent[0],info.extent[1]))
     texture.set_meta("sun_direction",Vector3(info.sun_direction[0],info.sun_direction[1],info.sun_direction[2]))
     texture.set_meta("source_map_sha256",info.source_sha256)
-    texture.set_meta("source_runtime_sha256",info.get("source_runtime_sha256",FileAccess.get_sha256("res://assets/maps/world_map/runtime.json")))
+    texture.set_meta("source_runtime_sha256",info.source_runtime_sha256)
     texture.set_meta("ownership","Original GAF normalized Lambert ground radiance; no MD2 data")
     texture.set_meta("model_version",1)
     DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://assets/graphics/world_map_ground_bounce_v001"))
