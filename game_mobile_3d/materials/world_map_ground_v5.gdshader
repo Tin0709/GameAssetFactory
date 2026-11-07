@@ -2,6 +2,9 @@ shader_type spatial;
 render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_surface_v5.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
+#ifdef GAF_WORLD_GROUND_BOUNCE
+#include "res://materials/world_map_ground_bounce.gdshaderinc"
+#endif
 #ifdef GAF_WORLD_CANOPY
 #include "res://materials/world_map_canopy.gdshaderinc"
 #endif
@@ -28,6 +31,9 @@ void vertex() {
 #endif
 
 void fragment() {
+#ifdef GAF_WORLD_GROUND_BOUNCE
+	ground_reflection = ground_bounce(surface_world, normalize(surface_normal));
+#endif
 #ifdef GAF_WORLD_CANOPY
 	vec2 contact = surface_top > 0.9 ? canopy_ao(surface_world) : vec2(1.0, CANOPY_DIRECT_AFFECT);
 	AO = contact.x;

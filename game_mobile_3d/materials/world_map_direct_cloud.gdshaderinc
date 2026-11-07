@@ -15,6 +15,14 @@ float world_cloud_fresnel(float cosine) {
 #endif
 
 void light() {
+#ifdef GAF_WORLD_GROUND_BOUNCE
+	vec3 source_direction = normalize((INV_VIEW_MATRIX * vec4(LIGHT, 0.0)).xyz);
+	if (LIGHT_IS_DIRECTIONAL && dot(source_direction, ground_bounce_direction) > 0.9999) {
+		// Source radiance was baked with unit white sun. Current light color,
+		// energy and shared local cloud modulation apply exactly once here.
+		DIFFUSE_LIGHT += LIGHT_COLOR * (ground_reflection * cloud_transmission / PI);
+	}
+#endif
 	float nl = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
 	if (LIGHT_IS_DIRECTIONAL) {
