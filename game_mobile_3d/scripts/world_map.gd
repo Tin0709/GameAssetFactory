@@ -17,6 +17,7 @@ var build_msec := 0
 var border_bodies: Array[StaticBody3D] = []
 var look
 var grove: Node3D
+var presentation: Node
 var _camera_ground_y := NAN
 var _extended_camera_depth := true
 @onready var _original_camera_near: float = $Camera3D.near
@@ -63,6 +64,9 @@ func _ready() -> void:
 	if not spawn_position.is_finite():
 		abort_map("No clear spawn in World Map");return
 	map_ready=true
+	presentation=load("res://scripts/world_map_presentation.gd").new()
+	presentation.name="RenderPresentation"
+	add_child(presentation);presentation.setup(self)
 	reset_player()
 	set_review_view("gameplay")
 	if build_grove():
@@ -81,7 +85,7 @@ func _ready() -> void:
 	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu · Shift+P màu cân bằng"
 	if look.day_palette_available():$HUD/Help.text+=" · F8 so tổng thể"
 	if look.leaf_sampling_available():$HUD/Help.text+="\nF9 so mép lá · Shift+F9 MSAA 2× / 4×"
-	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá\nShift+F2 đất quanh gốc sồi · Alt+N gió tán sồi"
+	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá\nShift+F2 đất quanh gốc sồi · Alt+N gió tán sồi · F10 nội suy hiển thị"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -172,6 +176,7 @@ func reset_player() -> void:
 	_camera_ground_y=spawn_position.y
 	player.velocity=Vector3.ZERO
 	if player.has_method("cancel_jump"):player.cancel_jump()
+	player.reset_physics_interpolation()
 
 func _physics_process(_delta: float) -> void:
 	if map_ready and player.position.y<float(runtime.border.min[1])-1.0:reset_player()
@@ -187,10 +192,13 @@ func _process(delta: float) -> void:
 		_camera_ground_y=lerpf(_camera_ground_y,player.global_position.y,1.0-exp(-delta/.16))
 	if view_mode=="gameplay":
 		var camera: Camera3D = $Camera3D
+		var focus: Vector3 = presentation.player_position()
 		_update_camera_near(camera)
-		camera.position=Vector3(player.global_position.x,_camera_ground_y,player.global_position.z)+CAMERA_OFFSET
-		geometry.update_cutaway(player.global_position,camera.global_position)
-		if grove != null and grove.visible:grove.update_focus(camera,player.global_position,true)
+		camera.position=Vector3(focus.x,_camera_ground_y,focus.z)+CAMERA_OFFSET
+		geometry.update_cutaway(focus,camera.global_position)
+		if grove != null and grove.visible:grove.update_focus(camera,focus,true)
+	if presentation.enabled and look != null and look.active:
+		look.publish_render_wind(presentation.wind_time(look.motion.clock))
 
 func set_review_view(mode: String) -> void:
 	view_mode=mode
@@ -260,6 +268,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not map_ready:return
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_F10:
+			presentation.set_enabled(not presentation.enabled)
+			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_G:
 			review_grove(event.shift_pressed)
 			get_viewport().set_input_as_handled()

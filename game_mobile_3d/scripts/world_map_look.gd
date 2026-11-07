@@ -816,11 +816,19 @@ func set_oak_crown_wind(enabled: bool) -> void:
 	oak_crown_wind = enabled
 	_publish_crown_wind()
 
-func _publish_crown_wind() -> void:
+func _publish_crown_wind(clock: float = NAN) -> void:
 	if level.grove == null: return
+	var time := motion.clock if is_nan(clock) else clock
 	level.grove.publish_crown_wind(stage != 0 and oak_crown_wind,
-		fposmod(motion.clock, 4.0) * TAU / 4.0,
-		fposmod(motion.clock, 28.0) * TAU / 28.0, travelling_breeze)
+		fposmod(time, 4.0) * TAU / 4.0,
+		fposmod(time, 28.0) * TAU / 28.0, travelling_breeze)
+
+func publish_render_wind(time: float) -> void:
+	# Only background time is interpolated; physical passage history is intact.
+	_publish_crown_wind(time)
+	for material: ShaderMaterial in wind_materials:
+		material.set_shader_parameter("wind_phase", fposmod(time, 4.0) * TAU / 4.0)
+		material.set_shader_parameter("breeze_phase", fposmod(time, 28.0) * TAU / 28.0)
 
 func set_segment_passage_height(enabled: bool) -> void:
 	segment_passage_height = enabled
