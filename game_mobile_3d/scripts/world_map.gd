@@ -24,6 +24,9 @@ var _extended_camera_depth := true
 @onready var player: CharacterBody3D = $Actors/Player
 
 func _enter_tree() -> void:
+	presentation=load("res://scripts/world_map_presentation.gd").new()
+	presentation.name="RenderPresentation"
+	add_child(presentation);presentation.begin(self)
 	# Swap before child _ready callbacks. A nested inherited scene replacement
 	# leaves the previous Player orphaned in Godot 4.7; free it explicitly.
 	var actors: Node=$Actors
@@ -64,9 +67,7 @@ func _ready() -> void:
 	if not spawn_position.is_finite():
 		abort_map("No clear spawn in World Map");return
 	map_ready=true
-	presentation=load("res://scripts/world_map_presentation.gd").new()
-	presentation.name="RenderPresentation"
-	add_child(presentation);presentation.setup(self)
+	presentation.setup()
 	reset_player()
 	set_review_view("gameplay")
 	if build_grove():
