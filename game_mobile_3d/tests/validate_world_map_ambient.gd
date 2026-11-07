@@ -43,6 +43,11 @@ func run() -> void:
     check(snapshot(env) == baseline, "F11 restores every owned Environment field")
     if native:
         fill.set_enabled(true)
+        env.background_energy_multiplier = 2.0
+        await frames()
+        check(not fill.is_active() and snapshot(env) == baseline, "Non-default background energy retains constant fill instead of doubling ambient")
+        env.background_energy_multiplier = 1.0
+        await frames()
         var first_sky: Sky = env.sky
         world.look.set_day_palette(true, false)
         await frames()
