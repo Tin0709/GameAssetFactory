@@ -2,6 +2,7 @@ extends Node
 ## WorldMap-only look. Source textures, GLBs, shared environments and actors stay intact.
 const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
+const ACTOR_SKY_SHADER=preload("res://materials/world_map_actor_sky.gdshader")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
 const LEAF_SAMPLING_TEXTURE = preload("res://assets/graphics/meadow_daylight_v5/leaf_sampling.res")
@@ -93,6 +94,8 @@ var _direct_clouds_requested:=false
 var _shader_variants: Dictionary[Shader,Dictionary]={}
 var _review_shaders: Dictionary[ShaderMaterial,Shader]={}
 var _direct_actor_materials: Array[ShaderMaterial]=[]
+var _actor_sky_requested := false
+var _actor_sky_shaders: Dictionary = {}
 var _pockets_image: Image
 var _pockets_texture: ImageTexture
 var _cloud_shape:=BASE_CLOUD_SHAPE
@@ -492,6 +495,7 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 func _apply_review_shaders() -> void:
 	_leaf_sampling_applied = leaf_sampling_active()
 	var direct := direct_clouds_active()
+	var actor_sky := _actor_sky_requested and local_exposure_available()
 	var canopy := canopy_contact_active()
 	var foliage := foliage_light_active()
 	level.geometry.cutaway_shader = _review_variant(PRESET.cutaway_shader, direct, canopy)
@@ -514,15 +518,32 @@ func _apply_review_shaders() -> void:
 			var strength := 0.2652 if leaves else (0.1248 if plant_kind == 0 else 0.1794)
 			material.set_shader_parameter("foliage_transmission", strength)
 	_apply_canopy_contact()
-	if direct and _direct_actor_materials.is_empty():
+	if (direct or actor_sky) and _direct_actor_materials.is_empty():
 		for item: Array in actor_materials:_direct_actor_materials.append(_make_direct_actor(item[0],item[3],item[4]))
 	for index in actor_materials.size():
 		var item: Array=actor_materials[index]
-		var adapter: ShaderMaterial=_direct_actor_materials[index] if direct else null
-		if stage==0 or (direct and adapter==null):
+		var adapter: ShaderMaterial=_direct_actor_materials[index] if (direct or actor_sky) else null
+		if adapter != null:
+			adapter.shader = _actor_sky_variant(direct) if actor_sky else _review_variant(DIRECT_ACTOR_SHADER, true, false)
+		if stage==0 or ((direct or actor_sky) and adapter==null):
 			item[0].set_surface_override_material(item[1],item[2])
 		else:
-			item[0].set_surface_override_material(item[1],adapter if direct else item[3])
+			item[0].set_surface_override_material(item[1],adapter if (direct or actor_sky) else item[3])
+
+func set_actor_sky_fill(enabled: bool) -> void:
+	_actor_sky_requested = enabled
+	_apply_review_shaders()
+
+func _actor_sky_variant(direct: bool) -> Shader:
+	if not _actor_sky_shaders.has(direct):
+		var shader := Shader.new()
+		var header := "shader_type spatial;"
+		if direct: header += "\n#define GAF_WORLD_DIRECT_CLOUD"
+		if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
+			header += "\n#define GAF_WORLD_FORCE_LAMBERT"
+		shader.code = ACTOR_SKY_SHADER.code.replace("shader_type spatial;", header)
+		_actor_sky_shaders[direct] = shader
+	return _actor_sky_shaders[direct]
 
 func _make_direct_actor(node: MeshInstance3D, source: BaseMaterial3D, tint: Color) -> ShaderMaterial:
 	# Restrict the adapter to the current opaque, textured actor and equipment contract.

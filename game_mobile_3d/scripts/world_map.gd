@@ -19,6 +19,7 @@ var look
 var grove: Node3D
 var presentation: Node
 var ambient: Node
+var actor_fill: Node
 var _camera_ground_y := NAN
 var _extended_camera_depth := true
 @onready var _original_camera_near: float = $Camera3D.near
@@ -82,6 +83,9 @@ func _ready() -> void:
 	ambient=load("res://scripts/world_map_ambient.gd").new()
 	ambient.name="DirectionalAmbient"
 	add_child(ambient);ambient.setup(self)
+	actor_fill=load("res://scripts/world_map_actor_fill.gd").new()
+	actor_fill.name="ActorSkyVisibility"
+	add_child(actor_fill);actor_fill.setup(self)
 	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu · F4 nắng qua mây · F3 bóng mây chỉ chặn nắng · F2 bóng tiếp xúc dưới tán"
 	if RenderingServer.get_rendering_device()!=null:$HUD/Help.text+="\nF1 bóng nắng mềm"
 	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ · Shift+H chiều sâu không khí"
@@ -91,7 +95,7 @@ func _ready() -> void:
 	if look.day_palette_available():$HUD/Help.text+=" · F8 so tổng thể"
 	if look.leaf_sampling_available():$HUD/Help.text+="\nF9 so mép lá · Shift+F9 MSAA 2× / 4×"
 	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá\nShift+F2 đất quanh gốc sồi · Alt+N gió tán sồi · F10 nội suy hiển thị"
-	if ambient.available(): $HUD/Help.text+=" · F11 ánh sáng trời / đất"
+	if ambient.available(): $HUD/Help.text+=" · F11 ánh sáng trời / đất · Shift+F11 ánh sáng nhân vật dưới cây"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -275,7 +279,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_F11:
-			ambient.set_enabled(not ambient.enabled)
+			if event.shift_pressed:
+				actor_fill.set_enabled(not actor_fill.enabled)
+			else:
+				ambient.set_enabled(not ambient.enabled)
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_F10:
 			presentation.set_enabled(not presentation.enabled)
