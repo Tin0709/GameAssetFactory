@@ -495,7 +495,7 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 func _apply_review_shaders() -> void:
 	_leaf_sampling_applied = leaf_sampling_active()
 	var direct := direct_clouds_active()
-	var actor_sky := _actor_sky_requested and local_exposure_available()
+	var actor_sky := stage == 2 and _actor_sky_requested and local_exposure_available()
 	var canopy := canopy_contact_active()
 	var foliage := foliage_light_active()
 	level.geometry.cutaway_shader = _review_variant(PRESET.cutaway_shader, direct, canopy)
