@@ -353,6 +353,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				look.set_directional_shadow_review(not look.directional_shadow_review_active())
 			get_viewport().set_input_as_handled()
+		if event.physical_keycode==KEY_F12:
+			terrain_sky.set_enabled(not terrain_sky.enabled)
+			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_F2 and look.stage==2:
 			if event.shift_pressed:
 				look.toggle_oak_root_beds()

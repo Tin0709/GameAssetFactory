@@ -11,6 +11,9 @@ render_mode cull_disabled, diffuse_burley;
 varying vec3 surface_world;
 varying float surface_top;
 varying vec3 surface_normal;
+#ifdef GAF_WORLD_TERRAIN_SKY
+varying float terrain_sky_factor;
+#endif
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D smooth_atlas : source_color, filter_linear_mipmap, repeat_disable;
 uniform bool smooth_sampling = false;
@@ -21,6 +24,9 @@ uniform float native_roughness = 1.0;
 uniform float native_metallic = 0.0;
 uniform float native_specular = 0.0;
 void vertex() {
+#ifdef GAF_WORLD_TERRAIN_SKY
+	terrain_sky_factor = CUSTOM0.x;
+#endif
 	surface_world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
 	surface_top=(MODEL_NORMAL_MATRIX*NORMAL).y;
 	surface_normal=MODEL_NORMAL_MATRIX*NORMAL;
@@ -38,6 +44,12 @@ void fragment() {
 	vec2 contact = surface_top > 0.9 ? canopy_ao(surface_world) : vec2(1.0, CANOPY_DIRECT_AFFECT);
 	AO = contact.x;
 	AO_LIGHT_AFFECT = contact.y;
+#endif
+#ifdef GAF_WORLD_TERRAIN_SKY
+	if (ground_grade == 3 && abs(surface_normal.y) < 0.1) {
+		AO = clamp(terrain_sky_factor, 0.0, 1.0);
+		AO_LIGHT_AFFECT = 0.0;
+	}
 #endif
 	vec4 color = albedo_tint;
 	if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);
