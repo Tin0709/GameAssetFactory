@@ -818,7 +818,7 @@ func set_oak_crown_wind(enabled: bool) -> void:
 
 func _publish_crown_wind(clock: float = NAN) -> void:
 	if level.grove == null: return
-	var time := motion.clock if is_nan(clock) else clock
+	var time: float = motion.clock if is_nan(clock) else clock
 	level.grove.publish_crown_wind(stage != 0 and oak_crown_wind,
 		fposmod(time, 4.0) * TAU / 4.0,
 		fposmod(time, 28.0) * TAU / 28.0, travelling_breeze)
