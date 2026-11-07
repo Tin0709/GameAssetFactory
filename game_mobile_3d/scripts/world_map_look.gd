@@ -100,6 +100,7 @@ var _actor_sky_shaders: Dictionary = {}
 var _ground_bounce_requested := false
 var _ground_bounce_applied := false
 var _ground_bounce_layout_matches := false
+var _terrain_sky_enabled := false
 var _pockets_image: Image
 var _pockets_texture: ImageTexture
 var _cloud_shape:=BASE_CLOUD_SHAPE
@@ -478,8 +479,9 @@ func toggle_leaf_sampling() -> void:
 func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool = false) -> Shader:
 	var filtered_leaves := original == PRESET.leaves_shader and leaf_sampling_active()
 	var bounce := ground_bounce_active() and original in [PRESET.ground_shader, PRESET.cutaway_shader]
-	if not (direct or canopy or foliage or filtered_leaves or bounce): return original
-	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1))
+	var terrain_sky := stage == 2 and _terrain_sky_enabled and original in [PRESET.ground_shader, PRESET.cutaway_shader]
+	if not (direct or canopy or foliage or filtered_leaves or bounce or terrain_sky): return original
+	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1) | (int(terrain_sky) << 2))
 	var variants: Dictionary = _shader_variants.get_or_add(original, {})
 	if not variants.has(key):
 		var shader := Shader.new()
@@ -494,6 +496,8 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 			defines += "\n#define GAF_WORLD_LEAF_SAMPLING"
 		if bounce:
 			defines += "\n#define GAF_WORLD_GROUND_BOUNCE"
+		if terrain_sky:
+			defines += "\n#define GAF_WORLD_TERRAIN_SKY"
 		if (direct or foliage) and ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
 			defines += "\n#define GAF_WORLD_FORCE_LAMBERT"
 		shader.code = original.code.replace("shader_type spatial;", defines)
@@ -558,6 +562,11 @@ func ground_bounce_active() -> bool:
 
 func set_ground_bounce(enabled: bool) -> void:
 	_ground_bounce_requested = enabled
+	_refresh_ground_bounce()
+
+func set_terrain_sky(enabled: bool) -> void:
+	if enabled == _terrain_sky_enabled: return
+	_terrain_sky_enabled = enabled
 	_refresh_ground_bounce()
 
 func _refresh_ground_bounce() -> void:

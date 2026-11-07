@@ -20,6 +20,7 @@ var grove: Node3D
 var presentation: Node
 var ambient: Node
 var actor_fill: Node
+var terrain_sky: Node
 var _camera_ground_y := NAN
 var _extended_camera_depth := true
 @onready var _original_camera_near: float = $Camera3D.near
@@ -87,9 +88,13 @@ func _ready() -> void:
 	actor_fill.name="ActorSkyVisibility"
 	add_child(actor_fill);actor_fill.setup(self)
 	if look.ground_bounce_available(): look.set_ground_bounce(true)
+	terrain_sky=load("res://scripts/world_map_terrain_sky.gd").new()
+	terrain_sky.name="TerrainSkyVisibility"
+	add_child(terrain_sky);terrain_sky.setup(self)
 	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu · F4 nắng qua mây · F3 bóng mây chỉ chặn nắng · F2 bóng tiếp xúc dưới tán"
 	if RenderingServer.get_rendering_device()!=null:$HUD/Help.text+="\nF1 bóng nắng mềm"
 	if look.ground_bounce_available():$HUD/Help.text+=" · Shift+F1 nắng hắt từ nền"
+	if terrain_sky.available():$HUD/Help.text+=" · F12 độ che ánh trời ở vách đá"
 	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ · Shift+H chiều sâu không khí"
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
