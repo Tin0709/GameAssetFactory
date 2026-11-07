@@ -13,6 +13,10 @@ func blocked(values:PackedVector4Array,normal:Vector3)->float:
         var c:=values[i*6+3];var q:=values[i*6+4];var r:=values[i*6+5]
         result=maxf(result,clampf(c.x+Vector3(c.y,c.z,c.w).dot(normal)+Vector3(q.x,q.y,q.z).dot(normal*normal)+2.0*(q.w*normal.x*normal.y+r.x*normal.x*normal.z+r.y*normal.y*normal.z),0,1))
     return result
+func all_zero(values:PackedVector4Array)->bool:
+    for v:Vector4 in values:
+        if v.length()>0.000001:return false
+    return true
 func finish()->void:
     print("ACTOR_FILL checks=",checks," failures=",JSON.stringify(failures));quit(0 if failures.is_empty() else 1)
 func run()->void:
@@ -52,9 +56,12 @@ func run()->void:
             check(absf(blocked(crossing[0],normal)-blocked(crossing[1],normal))<.001,"Directional fill stays continuous across candidate rankings "+str(normal))
         w.player.position.y=9.;w.player.reset_physics_interpolation()
         await frames();fill.refresh()
-        check(fill.current_coefficients()[0].length()<0.000001,"Above-crown player is not darkened by a ground-only footprint")
+        check(all_zero(fill.current_coefficients()),"Above-crown player is not darkened by a ground-only footprint")
+        w.player.position=Vector3(-4.6,3.02,-2.55);w.player.reset_physics_interpolation()
+        await frames();fill.refresh()
+        check(not all_zero(fill.current_coefficients()),"Hidden-grove fixture starts with actual nonzero crown occlusion")
         w.grove.hide();fill.refresh()
-        check(fill.current_coefficients()[0].length()<0.000001,"Hidden grove releases actor occlusion")
+        check(all_zero(fill.current_coefficients()),"Hidden grove releases actor occlusion")
         w.grove.show();w.reset_player();fill.refresh()
         w.look.set_direct_clouds(false);await frames()
         var lit:ShaderMaterial=w.look.actor_materials[0][0].get_active_material(w.look.actor_materials[0][1])
