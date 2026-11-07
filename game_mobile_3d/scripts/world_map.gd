@@ -303,7 +303,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_F2 and look.stage==2:
 			if event.shift_pressed:
-				look.set_oak_root_beds(not look.oak_root_beds_active())
+				look.toggle_oak_root_beds()
 			else:
 				look.set_canopy_contact(not look.canopy_contact_active())
 			get_viewport().set_input_as_handled()

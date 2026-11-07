@@ -243,8 +243,8 @@ func _stamp_oak_root_sites() -> void:
 func oak_root_beds_active() -> bool:
 	return stage == 2 and _oak_root_beds_requested and level.grove != null and level.grove.visible
 
-func set_oak_root_beds(enabled: bool) -> void:
-	_oak_root_beds_requested = enabled
+func toggle_oak_root_beds() -> void:
+	_oak_root_beds_requested = not _oak_root_beds_requested
 	refresh_oak_root_beds()
 
 func refresh_oak_root_beds() -> void:
