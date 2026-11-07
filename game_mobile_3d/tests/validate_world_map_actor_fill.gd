@@ -7,6 +7,12 @@ func check(ok:bool,message:String)->void:
     if not ok:failures.append(message)
 func frames()->void:
     for i in 3:await process_frame
+func blocked(values:PackedVector4Array,normal:Vector3)->float:
+    var result:=0.0
+    for i in values.size()/6:
+        var c:=values[i*6+3];var q:=values[i*6+4];var r:=values[i*6+5]
+        result=maxf(result,clampf(c.x+Vector3(c.y,c.z,c.w).dot(normal)+Vector3(q.x,q.y,q.z).dot(normal*normal)+2.0*(q.w*normal.x*normal.y+r.x*normal.x*normal.z+r.y*normal.y*normal.z),0,1))
+    return result
 func finish()->void:
     print("ACTOR_FILL checks=",checks," failures=",JSON.stringify(failures));quit(0 if failures.is_empty() else 1)
 func run()->void:
@@ -38,6 +44,12 @@ func run()->void:
         await frames();fill.refresh()
         var under:PackedVector4Array=fill.current_coefficients()
         check(under[0].length()>0.01,"Original oak affects its covered receiver")
+        var crossing:Array=[]
+        for z:float in [4.489718376,4.489720376]:
+            w.player.position=Vector3(-29.12,3.02,z);w.player.reset_physics_interpolation()
+            await frames();fill.refresh();crossing.append(fill.current_coefficients())
+        for normal:Vector3 in [Vector3.LEFT,Vector3.RIGHT,Vector3.FORWARD,Vector3.BACK,Vector3.UP]:
+            check(absf(blocked(crossing[0],normal)-blocked(crossing[1],normal))<.001,"Directional fill stays continuous across candidate rankings "+str(normal))
         w.player.position.y=9.;w.player.reset_physics_interpolation()
         await frames();fill.refresh()
         check(fill.current_coefficients()[0].length()<0.000001,"Above-crown player is not darkened by a ground-only footprint")
