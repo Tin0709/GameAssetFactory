@@ -36,6 +36,7 @@ var level: Node3D
 var motion=MOTION.new()
 var wind_materials: Array[ShaderMaterial]=[]
 var travelling_breeze := true
+var oak_crown_wind := true
 var segment_passage_height := true
 var terrain_materials: Array[Array]=[]
 var plant_meshes: Array[Array]=[]
@@ -583,6 +584,7 @@ func refresh_grove_lighting() -> void:
 	var leaves := _review_variant(native, direct, false, foliage_light_active())
 	level.grove.set_lighting(bark, leaves, _pockets_texture if direct else null, _cloud_shape, cloud_clock)
 	level.grove.set_crown_detail(stage == 2 and _crown_detail_requested)
+	_publish_crown_wind()
 
 func toggle_crown_detail() -> void:
 	_crown_detail_requested = not _crown_detail_requested
@@ -808,6 +810,17 @@ func set_travelling_breeze(enabled: bool) -> void:
 	travelling_breeze = enabled
 	for material: ShaderMaterial in wind_materials:
 		material.set_shader_parameter("travelling_breeze", enabled)
+	_publish_crown_wind()
+
+func set_oak_crown_wind(enabled: bool) -> void:
+	oak_crown_wind = enabled
+	_publish_crown_wind()
+
+func _publish_crown_wind() -> void:
+	if level.grove == null: return
+	level.grove.publish_crown_wind(stage != 0 and oak_crown_wind,
+		fposmod(motion.clock, 4.0) * TAU / 4.0,
+		fposmod(motion.clock, 28.0) * TAU / 28.0, travelling_breeze)
 
 func set_segment_passage_height(enabled: bool) -> void:
 	segment_passage_height = enabled
@@ -815,6 +828,7 @@ func set_segment_passage_height(enabled: bool) -> void:
 		material.set_shader_parameter("segment_passage_height", enabled)
 
 func _publish_wind(position: Vector3) -> void:
+	_publish_crown_wind()
 	var phase := fposmod(motion.clock, 28.0) * TAU / 28.0
 	for material: ShaderMaterial in wind_materials:
 		motion.publish(material)

@@ -73,6 +73,7 @@ const TRUNK_HEIGHT := 2.6
 
 var _appearance := ShaderMaterial.new()
 var _canopy_appearance := ShaderMaterial.new()
+var _canopy_shadow := ShaderMaterial.new()
 var _direct_clouds := false
 var _trunks: Array[StaticBody3D] = []
 
@@ -80,6 +81,7 @@ func build(level: Node3D) -> bool:
 	hide()
 	_appearance.shader = REVEAL_SHADER
 	_canopy_appearance.shader = REVEAL_SHADER
+	_canopy_shadow.shader = REVEAL_SHADER
 	var assets: Array[PackedScene] = []
 	for path: String in OAKS:
 		var asset := load(path) as PackedScene
@@ -129,6 +131,11 @@ func _prepare_meshes(tree: Node3D) -> void:
 		caster.mesh = visual.mesh
 		caster.transform = visual.transform
 		caster.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+		if appearance == _canopy_appearance:
+			# The caster shares the exact deformation, but never the reveal hole.
+			caster.material_override = _canopy_shadow
+			caster.extra_cull_margin = 0.20
+			visual.extra_cull_margin = 0.20
 		visual.get_parent().add_child(caster)
 		visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		visual.material_override = appearance
@@ -170,6 +177,13 @@ func set_lighting(bark: Shader, leaves: Shader, field: Texture2D, shape: Vector4
 
 func set_crown_detail(enabled: bool) -> void:
 	_canopy_appearance.set_shader_parameter("crown_detail", enabled)
+
+func publish_crown_wind(enabled: bool, wind_phase: float, breeze_phase: float, travelling: bool) -> void:
+	for material: ShaderMaterial in [_canopy_appearance, _canopy_shadow]:
+		material.set_shader_parameter("crown_wind_enabled", enabled)
+		material.set_shader_parameter("wind_phase", wind_phase)
+		material.set_shader_parameter("breeze_phase", breeze_phase)
+		material.set_shader_parameter("travelling_breeze", travelling)
 
 func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D, shape: Vector4, time: float) -> void:
 	if material.shader != shader:

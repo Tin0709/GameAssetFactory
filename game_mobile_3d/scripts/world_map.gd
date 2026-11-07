@@ -81,7 +81,7 @@ func _ready() -> void:
 	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu · Shift+P màu cân bằng"
 	if look.day_palette_available():$HUD/Help.text+=" · F8 so tổng thể"
 	if look.leaf_sampling_available():$HUD/Help.text+="\nF9 so mép lá · Shift+F9 MSAA 2× / 4×"
-	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá\nShift+F2 đất quanh gốc sồi"
+	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá\nShift+F2 đất quanh gốc sồi · Alt+N gió tán sồi"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
@@ -264,7 +264,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			review_grove(event.shift_pressed)
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_N and look.stage != 0:
-			if event.shift_pressed:
+			if event.alt_pressed:
+				look.set_oak_crown_wind(not look.oak_crown_wind)
+			elif event.shift_pressed:
 				look.set_segment_passage_height(not look.segment_passage_height)
 			else:
 				look.set_travelling_breeze(not look.travelling_breeze)

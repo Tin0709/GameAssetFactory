@@ -1,6 +1,9 @@
 shader_type spatial;
+#include "res://materials/world_map_wind.gdshaderinc"
 
 uniform bool reveal_player = false;
+uniform bool crown_wind_enabled = false;
+uniform float crown_wind_amplitude = 0.020;
 uniform vec3 player_view;
 uniform float native_specular = 0.24;
 uniform bool crown_detail = false;
@@ -14,6 +17,17 @@ varying vec2 grove_world_xz;
 void vertex() {
 	// Evaluate inside each face so its exact block boundary stays deterministic.
 	crown_local = VERTEX - NORMAL * 0.004;
+	if (crown_wind_enabled) {
+		// One rigid transform for the complete authored crown: voxel blocks
+		// retain their shape. Bark stays fixed under the overlapping foliage.
+		vec3 root = MODEL_MATRIX[3].xyz;
+		vec2 breeze = world_breeze(root) * crown_wind_amplitude;
+		mat3 orientation = mat3(normalize(MODEL_MATRIX[0].xyz), normalize(MODEL_MATRIX[1].xyz), normalize(MODEL_MATRIX[2].xyz));
+		vec2 bend = (transpose(orientation) * vec3(breeze.x, 0.0, breeze.y)).xz;
+		vec3 pivot = vec3(0.0, 2.0, 0.0);
+		VERTEX = pivot + rotate_plant(VERTEX - pivot, bend);
+		NORMAL = rotate_plant(NORMAL, bend);
+	}
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	grove_world_xz = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;
 #endif
