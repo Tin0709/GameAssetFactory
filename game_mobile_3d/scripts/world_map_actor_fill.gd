@@ -14,13 +14,15 @@ var _last_visible := false
 func setup(world: Node3D) -> void:
 	level = world
 	_coefficients.resize(12)
-	for tree: Node3D in level.grove.get_children():
-		var rotation := tree.global_basis.orthonormalized()
-		_trees.append([tree.global_transform.affine_inverse(), rotation, PROBES[_trees.size() % 2]])
+	if is_instance_valid(level.grove):
+		for tree: Node3D in level.grove.get_children():
+			var rotation := tree.global_basis.orthonormalized()
+			_trees.append([tree.global_transform.affine_inverse(), rotation, PROBES[_trees.size() % 2]])
 	set_enabled(true)
 
 func available() -> bool:
-	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null
+	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null \
+		and is_instance_valid(level) and is_instance_valid(level.grove) and not _trees.is_empty()
 
 func is_active() -> bool:
 	return enabled and available() and level.look.stage == 2

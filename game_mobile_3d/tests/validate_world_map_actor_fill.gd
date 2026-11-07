@@ -45,8 +45,8 @@ func run()->void:
         var under:PackedVector4Array=fill.current_coefficients()
         check(under[0].length()>0.01,"Original oak affects its covered receiver")
         var crossing:Array=[]
-        for z:float in [4.488719376,4.490719376]:
-            w.player.position=Vector3(-29.12,3.02,z);w.player.reset_physics_interpolation()
+        for z:float in [4.400636044,4.402636044]:
+            w.player.position=Vector3(-29.44,3.02,z);w.player.reset_physics_interpolation()
             await frames();fill.refresh();crossing.append(fill.current_coefficients())
         for normal:Vector3 in [Vector3.LEFT,Vector3.RIGHT,Vector3.FORWARD,Vector3.BACK,Vector3.UP]:
             check(absf(blocked(crossing[0],normal)-blocked(crossing[1],normal))<.001,"Directional fill stays continuous across candidate rankings "+str(normal))
