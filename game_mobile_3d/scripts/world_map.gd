@@ -72,12 +72,14 @@ func _ready() -> void:
 	look.name="ReferenceLook"
 	add_child(look);look.setup(self)
 	if look.atmosphere_review_available(): look.toggle_day_composition()
+	if look.day_palette_available(): look.toggle_day_finish()
 	$HUD/Help.text="WORLD MAP · JUMP + LAND V004\nWASD di chuyển · Shift chạy · SPACE nhảy · Giữ SPACE khi chạy: nhảy liên tiếp · R về điểm bắt đầu\n1/2/3 súng · 0 tay không · V toàn map · H sương · B so màu · F4 nắng qua mây · F3 bóng mây chỉ chặn nắng · F2 bóng tiếp xúc dưới tán"
 	if RenderingServer.get_rendering_device()!=null:$HUD/Help.text+="\nF1 bóng nắng mềm"
 	if look.local_exposure_available():$HUD/Help.text+=" · F7 sáng tối cục bộ · Shift+H chiều sâu không khí"
 	if look.foliage_light_available():$HUD/Help.text+=" · Y xuyên sáng lá"
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
 	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu · Shift+P màu cân bằng"
+	if look.day_palette_available():$HUD/Help.text+=" · F8 so tổng thể"
 	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá\nShift+F2 đất quanh gốc sồi"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
@@ -282,6 +284,9 @@ func _unhandled_input(event: InputEvent) -> void:
 				set_review_view("overview" if view_mode == "gameplay" else "gameplay")
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode==KEY_B:set_reference_look(look.stage==0)
+		if event.physical_keycode == KEY_F8 and look.stage == 2:
+			look.toggle_day_finish()
+			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_U and look.stage == 2 and look.atmosphere_review_available():
 			look.toggle_day_composition()
 			get_viewport().set_input_as_handled()

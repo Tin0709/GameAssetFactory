@@ -65,6 +65,7 @@ var _oak_root_beds_requested := false
 var _oak_root_sites := PackedVector4Array()
 var _atmosphere_requested := false
 var _day_composition_previous: Dictionary = {}
+var _day_finish_previous: Dictionary = {}
 var _atmosphere_environment: Environment
 var _atmosphere_previous: Dictionary = {}
 var _exposure_requested := false
@@ -361,6 +362,34 @@ func set_direct_clouds(value: bool) -> void:
 
 func day_composition_active() -> bool:
 	return stage == 2 and not _day_composition_previous.is_empty()
+
+func day_finish_active() -> bool:
+	return stage == 2 and not _day_finish_previous.is_empty()
+
+func toggle_day_finish() -> void:
+	if stage != 2: return
+	if _day_finish_previous.is_empty():
+		if not day_palette_available(): return
+		_day_finish_previous = {
+			"palette": _palette_requested,
+			"contact": _canopy_requested,
+			"crown": _crown_detail_requested,
+			"roots": _oak_root_beds_requested,
+		}
+		_palette_requested = DayPalette.BALANCED
+		_canopy_requested = true
+		_crown_detail_requested = true
+		_oak_root_beds_requested = true
+	else:
+		_palette_requested = _day_finish_previous.palette
+		_canopy_requested = _day_finish_previous.contact
+		_crown_detail_requested = _day_finish_previous.crown
+		_oak_root_beds_requested = _day_finish_previous.roots
+		_day_finish_previous.clear()
+	_refresh_day_palette()
+	_apply_review_shaders()
+	refresh_grove_lighting()
+	refresh_oak_root_beds()
 
 func toggle_day_composition() -> void:
 	if stage != 2 or not atmosphere_review_available(): return
