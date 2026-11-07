@@ -41,6 +41,8 @@ class Source:
         """Exact anisotropic DDA with global-box entry and tied-axis crossings."""
         o = (np.asarray(origins, float) - self.offset) * self.scale
         d = np.broadcast_to(np.asarray(directions_, float), o.shape) * self.scale
+        if not np.all(np.isfinite(o)) or not np.all(np.isfinite(d)) or np.any(np.all(d == 0., axis=1)):
+            raise ValueError('Rays require finite origins and nonzero finite directions')
         a = np.divide(self.low - o, d, out=np.full_like(d, -np.inf), where=d != 0)
         b = np.divide(self.high - o, d, out=np.full_like(d, np.inf), where=d != 0)
         enter = np.maximum(np.minimum(a, b).max(1), 0.)

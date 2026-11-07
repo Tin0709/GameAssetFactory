@@ -40,6 +40,10 @@ class TerrainSky(unittest.TestCase):
         values=self.source.evaluate(self.source.points,1024)
         np.testing.assert_array_equal(values,[1.])
 
+    def test_degenerate_ray_is_rejected(self):
+        with self.assertRaises(ValueError):
+            self.source.hits(np.array([[10.5,2.5,-6.5]]),np.zeros((1,3)))
+
     def test_bake_refuses_existing_output(self):
         output=self.folder/'new-bake'
         result=model.bake(self.source,output,64)
