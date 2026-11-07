@@ -568,7 +568,7 @@ func _make_cutaway_material(native: Material) -> ShaderMaterial:
 		material.set_shader_parameter("native_specular", native.metallic_specular)
 		material.set_shader_parameter("use_vertex_color", native.vertex_color_use_as_albedo)
 	elif native is ShaderMaterial:
-		for parameter: String in ["atlas", "smooth_atlas", "smooth_sampling", "use_albedo_texture", "albedo_tint", "native_roughness", "native_metallic", "native_specular", "use_vertex_color", "ground_grade", "texture_contrast", "grass_variation_strength", "contact_shade_strength", "plant_soil_strength", "path_blending", "path_verge", "path_surface_map", "path_grass_atlas", "path_dirt_atlas", "path_map_origin", "path_map_size", "oak_root_sites", "oak_root_beds", "clouds_enabled", "cloud_time", "cloud_field", "cloud_shape", "canopy_field", "canopy_origin", "canopy_extent", "canopy_base_y"]:
+		for parameter: String in ["atlas", "smooth_atlas", "smooth_sampling", "use_albedo_texture", "albedo_tint", "native_roughness", "native_metallic", "native_specular", "use_vertex_color", "ground_grade", "texture_contrast", "grass_variation_strength", "contact_shade_strength", "plant_soil_strength", "path_blending", "path_verge", "path_surface_map", "path_grass_atlas", "path_dirt_atlas", "path_map_origin", "path_map_size", "oak_root_sites", "oak_root_beds", "clouds_enabled", "cloud_time", "cloud_field", "cloud_shape", "canopy_field", "canopy_origin", "canopy_extent", "canopy_base_y", "ground_bounce_map", "ground_bounce_direction", "ground_bounce_radius"]:
 			var value: Variant = native.get_shader_parameter(parameter)
 			if value != null:
 				material.set_shader_parameter(parameter, value)
