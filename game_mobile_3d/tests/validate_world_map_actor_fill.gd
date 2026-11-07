@@ -45,7 +45,7 @@ func run()->void:
         var under:PackedVector4Array=fill.current_coefficients()
         check(under[0].length()>0.01,"Original oak affects its covered receiver")
         var crossing:Array=[]
-        for z:float in [4.489718376,4.489720376]:
+        for z:float in [4.488719376,4.490719376]:
             w.player.position=Vector3(-29.12,3.02,z);w.player.reset_physics_interpolation()
             await frames();fill.refresh();crossing.append(fill.current_coefficients())
         for normal:Vector3 in [Vector3.LEFT,Vector3.RIGHT,Vector3.FORWARD,Vector3.BACK,Vector3.UP]:
