@@ -10,6 +10,11 @@ the western oak grove. Wind, passage reactions, trunk collisions and canopy reve
 remain active. `Open Overworld Meadow.cmd` opens the separate private MD2 fidelity
 lab and is not the main WorldMap launcher.
 
+The oak crowns now share the meadow breeze; **Alt+N** compares their motion on/off.
+Each crown rotates as one rigid piece, with matching moving shadows. Bark and
+colliders remain fixed. **N** still compares the travelling and former wind fields;
+**B** suspends the new crown motion for the original-material comparison.
+
 `World Map.litematic` is an unchanged copy of the user file. `manifest.json` records hashes, complete original states, counts, mappings and independently audited exposed area. `runtime.json` keeps all 42,996 non-air cells, including marker/paired-upper entries which do not render.
 
 ## Coordinate and mapping contract
