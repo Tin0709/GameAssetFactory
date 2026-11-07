@@ -37,6 +37,8 @@ def trace(points,dirs,occupancy,minimum,cell=.15):
     return hit.reshape(len(points),len(dirs))
 
 def coefficients(hit,dirs):
+    # Original L2 cosine-kernel polynomial: 3/32 + u/2 + 15*u*u/32.
+    # Uniform upper-sky samples have solid-angle weight2*pi/N; normalize by pi.
     h=hit.astype(float);n=len(dirs)
     first=h@dirs/n;second=np.einsum('pi,ij,ik->pjk',h,dirs,dirs,optimize=True)/n
     return np.column_stack([.1875*h.mean(axis=1),first,.9375*second[:,0,0],.9375*second[:,1,1],.9375*second[:,2,2],.9375*second[:,0,1],.9375*second[:,0,2],.9375*second[:,1,2]]).astype(np.float32)

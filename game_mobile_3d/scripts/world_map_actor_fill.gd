@@ -1,8 +1,8 @@
 extends Node
 ## Original static crown visibility for this map's existing opaque player materials.
 const PROBES := [
-	preload("res://assets/graphics/meadow_daylight_v5/oak_sky_a.res"),
-	preload("res://assets/graphics/meadow_daylight_v5/oak_sky_b.res"),
+	preload("res://assets/graphics/world_map_actor_sky_v001/oak_sky_a.res"),
+	preload("res://assets/graphics/world_map_actor_sky_v001/oak_sky_b.res"),
 ]
 const MAX_CROWNS := 10
 var level: Node3D
