@@ -22,10 +22,26 @@ func run()->void:
     check(not sky.is_active() and w.ambient.enabled==ambient,"F12 disables only local terrain visibility")
     w._unhandled_input(e);await frames();check(sky.is_active()==native,"F12 restores selected local visibility")
     w.look.set_stage(0);await frames();check(not sky.is_active(),"Original B look retains original ambient")
+    if native:
+        var representative:MeshInstance3D=w.geometry.get_node(sky.source_signatures.keys()[0])
+        check(representative.mesh.surface_get_material(0) is BaseMaterial3D,"B changes actual live replacement material to original")
     w.look.set_stage(2);await frames();check(sky.is_active()==native,"Current look restores selected local visibility")
     if native:
         check(sky.stream_vertices==50894,"Expected original mineral vertex count")
         check(sky.validation_errors.is_empty(),"All cached source signatures match")
+        var live_meshes:Array=[]
+        for chunk:MeshInstance3D in w.geometry.terrain_chunks:live_meshes.append(chunk.mesh)
+        check(w.look.terrain_materials.all(func(row:Array)->bool:return row[0] in live_meshes),"All material owners reference live generated meshes")
+        var source:Resource=load("res://assets/graphics/world_map_terrain_sky_v001/visibility.res")
+        var malformed:Resource=source.duplicate(true)
+        var records:Array=malformed.get_meta("rows").duplicate(true)
+        var omitted:Dictionary=records.pop_back()
+        malformed.set_meta("rows",records)
+        var payload:PackedFloat32Array=source.get_meta("values")
+        malformed.set_meta("values",payload.slice(0,int(omitted.start)))
+        var probe:Node=load("res://scripts/world_map_terrain_sky.gd").new();probe.level=w
+        check(not probe._install(malformed) and probe.validation_errors.any(func(message:String)->bool:return "coverage" in message),"Coherent truncated cache is rejected for missing surface coverage")
+        probe.free()
         for chunk:MeshInstance3D in w.geometry.terrain_chunks:
             if not sky.source_signatures.has(str(chunk.name)):continue
             for s in chunk.mesh.get_surface_count():
