@@ -58,7 +58,12 @@ func _update_field() -> void:
 func refresh() -> void:
 	var candidate: Environment
 	if enabled and available() and is_instance_valid(level) and level.look != null and level.look.stage == 2:
-		candidate = level.get_node("WorldEnvironment").environment
+		var world_environment: WorldEnvironment = level.get_node("WorldEnvironment")
+		var camera: Camera3D = level.get_viewport().get_camera_3d()
+		# Camera exposure also scales the sky-bake pathway. Keep the existing
+		# constant fill when an uncalibrated exposure owner is present.
+		if world_environment.camera_attributes == null and (camera == null or camera.attributes == null):
+			candidate = world_environment.environment
 	if candidate != _environment: _restore()
 	if candidate == null: return
 	if _environment != null:
