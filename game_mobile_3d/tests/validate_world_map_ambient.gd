@@ -49,6 +49,18 @@ func run() -> void:
         env.background_energy_multiplier = 1.0
         await frames()
         var first_sky: Sky = env.sky
+        for code: int in [KEY_F8, KEY_U]:
+            event.physical_keycode = code
+            for i in 2:
+                world._unhandled_input(event)
+                await frames()
+                check(fill.is_active() and env.sky == first_sky, "Combined look control preserves cached directional fill: " + str(code))
+        var camera: Camera3D = world.get_node("Camera3D")
+        camera.attributes = CameraAttributesPractical.new()
+        await frames()
+        check(not fill.is_active() and snapshot(env) == baseline, "Uncalibrated camera exposure attributes retain constant fill")
+        camera.attributes = null
+        await frames()
         world.look.set_day_palette(true, false)
         await frames()
         var first_center: Vector3 = first_sky.sky_material.get_shader_parameter("center")
