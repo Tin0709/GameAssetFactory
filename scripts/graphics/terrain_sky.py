@@ -99,6 +99,9 @@ def bake(source, output, rays):
     values[selected] = source.evaluate(unique, rays)[inverse]
     values.tofile(output / 'visibility.private.bin')
     metadata = {key: source.metadata[key] for key in ('rows', 'source_runtime_sha256', 'ambient_srgb')}
+    # Triangle indices are an authoring diagnostic, not runtime cache payload.
+    metadata['rows'] = [{key: value for key, value in row.items() if key != 'indices'}
+                        for row in metadata['rows']]
     metadata.update(rays=rays, full_vertices=len(values), unique_vertical_vertices=len(unique),
                     seconds=time.monotonic() - start, scope='Original static upper-sky luma visibility; not MD2 GI')
     (output / 'metadata.private.json').write_text(json.dumps(metadata, indent=2))
