@@ -80,6 +80,7 @@ func _ready() -> void:
 	if look.atmosphere_review_available():$HUD/Help.text+=" · U cảnh ban ngày"
 	if look.day_palette_available():$HUD/Help.text+=" · P bảng màu · Shift+P màu cân bằng"
 	if look.day_palette_available():$HUD/Help.text+=" · F8 so tổng thể"
+	if look.leaf_sampling_available():$HUD/Help.text+="\nF9 so mép lá · Shift+F9 MSAA 2× / 4×"
 	$HUD/Help.text+="\nG cỏ, hoa và sồi mới · Shift+G đến cụm sồi · Shift+V so mặt cắt camera · N so gió · Shift+N so vệt cỏ · Shift+Y cụm lá\nShift+F2 đất quanh gốc sồi"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
@@ -286,6 +287,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.physical_keycode==KEY_B:set_reference_look(look.stage==0)
 		if event.physical_keycode == KEY_F8 and look.stage == 2:
 			look.toggle_day_finish()
+			get_viewport().set_input_as_handled()
+		if event.physical_keycode == KEY_F9:
+			if event.shift_pressed:
+				var viewport := get_viewport()
+				viewport.msaa_3d = Viewport.MSAA_2X if viewport.msaa_3d == Viewport.MSAA_4X else Viewport.MSAA_4X
+			elif look.stage == 2:
+				look.toggle_leaf_sampling()
 			get_viewport().set_input_as_handled()
 		if event.physical_keycode == KEY_U and look.stage == 2 and look.atmosphere_review_available():
 			look.toggle_day_composition()

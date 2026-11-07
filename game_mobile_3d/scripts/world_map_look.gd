@@ -4,6 +4,7 @@ const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
+const LEAF_SAMPLING_TEXTURE = preload("res://assets/graphics/meadow_daylight_v5/leaf_sampling.res")
 const DAY_PALETTE := {
 	"ambient_light_color": Color(0.43, 0.67, 0.90),
 	"ambient_light_energy": 0.39,
@@ -61,6 +62,9 @@ var cloud_clock:=0.0
 var _pockets_requested:=false
 var _foliage_light_requested := false
 var _crown_detail_requested := false
+var _leaf_sampling_requested := false
+var _leaf_sampling_applied := false
+var _leaf_source_textures: Dictionary[ShaderMaterial, Texture2D] = {}
 var _oak_root_beds_requested := false
 var _oak_root_sites := PackedVector4Array()
 var _atmosphere_requested := false
@@ -142,6 +146,7 @@ func make_material(native: BaseMaterial3D,kind: String) -> ShaderMaterial:
 		material.set_shader_parameter("use_vertex_color",native.vertex_color_use_as_albedo)
 	elif kind.begins_with("leaf"):
 		material.shader=PRESET.leaves_shader
+		_leaf_source_textures[material] = native.albedo_texture
 		material.set_shader_parameter("wind_strength",1.5)
 		wind_materials.append(material)
 	else:
@@ -375,16 +380,19 @@ func toggle_day_finish() -> void:
 			"contact": _canopy_requested,
 			"crown": _crown_detail_requested,
 			"roots": _oak_root_beds_requested,
+			"leaf_sampling": _leaf_sampling_requested,
 		}
 		_palette_requested = DayPalette.BALANCED
 		_canopy_requested = true
 		_crown_detail_requested = true
 		_oak_root_beds_requested = true
+		_leaf_sampling_requested = true
 	else:
 		_palette_requested = _day_finish_previous.palette
 		_canopy_requested = _day_finish_previous.contact
 		_crown_detail_requested = _day_finish_previous.crown
 		_oak_root_beds_requested = _day_finish_previous.roots
+		_leaf_sampling_requested = _day_finish_previous.leaf_sampling
 		_day_finish_previous.clear()
 	_refresh_day_palette()
 	_apply_review_shaders()
@@ -447,9 +455,21 @@ func set_foliage_light(enabled: bool) -> void:
 		_apply_review_shaders()
 		refresh_grove_lighting()
 
+func leaf_sampling_available() -> bool:
+	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null and level.get_viewport().msaa_3d != Viewport.MSAA_DISABLED
+
+func leaf_sampling_active() -> bool:
+	return stage != 0 and _leaf_sampling_requested and leaf_sampling_available()
+
+func toggle_leaf_sampling() -> void:
+	if not _leaf_sampling_requested and not leaf_sampling_available(): return
+	_leaf_sampling_requested = not _leaf_sampling_requested
+	_apply_review_shaders()
+
 func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool = false) -> Shader:
-	if not (direct or canopy or foliage): return original
-	var key := Vector3i(int(direct), int(canopy), int(foliage))
+	var filtered_leaves := original == PRESET.leaves_shader and leaf_sampling_active()
+	if not (direct or canopy or foliage or filtered_leaves): return original
+	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves))
 	var variants: Dictionary = _shader_variants.get_or_add(original, {})
 	if not variants.has(key):
 		var shader := Shader.new()
@@ -460,6 +480,8 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 			defines += "\n#define GAF_WORLD_FOLIAGE_LIGHT"
 		if direct:
 			defines += "\n#define GAF_WORLD_DIRECT_CLOUD"
+		if filtered_leaves:
+			defines += "\n#define GAF_WORLD_LEAF_SAMPLING"
 		if (direct or foliage) and ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
 			defines += "\n#define GAF_WORLD_FORCE_LAMBERT"
 		shader.code = original.code.replace("shader_type spatial;", defines)
@@ -467,6 +489,7 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 	return variants[key]
 
 func _apply_review_shaders() -> void:
+	_leaf_sampling_applied = leaf_sampling_active()
 	var direct := direct_clouds_active()
 	var canopy := canopy_contact_active()
 	var foliage := foliage_light_active()
@@ -484,6 +507,8 @@ func _apply_review_shaders() -> void:
 		material.shader = target
 		for parameter: String in params:
 			if params[parameter] != null: material.set_shader_parameter(parameter, params[parameter])
+		if leaves:
+			material.set_shader_parameter("atlas", LEAF_SAMPLING_TEXTURE if _leaf_sampling_applied else _leaf_source_textures[material])
 		if transmit:
 			var strength := 0.2652 if leaves else (0.1248 if plant_kind == 0 else 0.1794)
 			material.set_shader_parameter("foliage_transmission", strength)
@@ -709,6 +734,8 @@ func _release_local_exposure() -> void:
 	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
 
 func _process(_delta: float) -> void:
+	if leaf_sampling_active() != _leaf_sampling_applied:
+		_apply_review_shaders()
 	if _palette_requested != DayPalette.NONE and stage == 2:
 		_refresh_day_palette()
 	if _exposure_effect == null: return

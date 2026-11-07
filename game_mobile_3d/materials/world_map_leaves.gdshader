@@ -1,9 +1,17 @@
 shader_type spatial;
+#ifdef GAF_WORLD_LEAF_SAMPLING
+render_mode cull_disabled, diffuse_lambert, specular_disabled, alpha_to_coverage;
+#else
 render_mode cull_disabled, diffuse_lambert, specular_disabled;
+#endif
 #include "res://materials/world_map_wind.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
 varying vec3 leaf_world;
+#ifdef GAF_WORLD_LEAF_SAMPLING
+uniform sampler2D atlas : source_color, filter_linear_mipmap, repeat_disable;
+#else
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
+#endif
 uniform vec4 albedo_tint : source_color = vec4(1.0);
 void vertex() {
 	vec3 world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
@@ -33,6 +41,10 @@ void fragment() {
 #endif
 	ALPHA=source.a;
 	ALPHA_SCISSOR_THRESHOLD=0.5;
+#ifdef GAF_WORLD_LEAF_SAMPLING
+	ALPHA_ANTIALIASING_EDGE=0.3;
+	ALPHA_TEXTURE_COORDINATE=UV*vec2(textureSize(atlas,0));
+#endif
 #ifdef GAF_WORLD_FOLIAGE_LIGHT
 	foliage_face = normalize(NORMAL);
 	foliage_weight = 1.0;
