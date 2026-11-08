@@ -21,6 +21,13 @@ func run()->void:
 	print("SHOWCASE_STARTUP_STATE ",JSON.stringify({"floor":w.player.is_on_floor(),"floor_initialized":w.player._floor_initialized,"jump_phase":w.player._jump_stage,"clip":w.player.active_clip,"velocity":str(w.player.velocity)}))
 	check(w.player.is_on_floor() and w.player._jump_stage.is_empty() and w.player.active_clip=="Idle","Startup settles into grounded Idle without input")
 	check(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")),"Test audio muted by default")
+	w.reset_player();Input.action_press("jump")
+	var immediate_jump_landing:=false
+	for i in 65:
+		await physics_frame
+		if i==2:Input.action_release("jump")
+		immediate_jump_landing=immediate_jump_landing or w.player._jump_stage=="JumpLanding"
+	check(immediate_jump_landing,"A genuine jump immediately after reset still plays Landing")
 	check(not w.get_node("HUD/Help").visible,"Technical HUD hidden by default")
 	check(not w.showcase.panel.visible,"Options hidden by default")
 	check(w.look.stage==2,"Reference graphics stage default")
