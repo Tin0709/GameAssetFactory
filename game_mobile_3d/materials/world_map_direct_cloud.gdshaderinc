@@ -63,6 +63,11 @@ void light() {
 			if(terrain_pbr_enabled)visibility=0.5/max(mix(2.0*nl*nv,nl+nv,alpha),0.000001);
 #endif
 			vec3 f0 = mix(vec3(0.16 * native_specular * native_specular), ALBEDO, METALLIC);
+#ifdef GAF_WORLD_TERRAIN_PBR
+			// Explicit source-motivated fit for canonical matte GAF blocks. The
+			// authored material and its parameters are retained for comparison.
+			if(terrain_dielectric_response && native_specular<=0.)f0=mix(vec3(.04),ALBEDO,METALLIC);
+#endif
 			float f90 = clamp(16.5 * (f0.r + f0.g + f0.b), METALLIC, 1.0);
 			vec3 fresnel = mix(f0, vec3(f90), world_cloud_fresnel(lh));
 			float distribution_squared=min(distribution*distribution,PI);

@@ -121,6 +121,8 @@ func _ready() -> void:
 	terrain_light.name="TerrainColoredTransport";add_child(terrain_light);terrain_light.setup(self)
 	player_light=load("res://scripts/world_map_player_transport.gd").new()
 	player_light.name="PlayerColoredTransport";add_child(player_light);player_light.setup(self)
+	showcase.air_light.setup(self)
+	if showcase.mist!=null:showcase.mist.light_provider=showcase.air_field
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func abort_map(message: String) -> void:

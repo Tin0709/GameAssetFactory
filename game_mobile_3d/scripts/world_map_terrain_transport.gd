@@ -1,6 +1,7 @@
 extends Node
 ## Original static GAF diffuse transport, not Lumen. Never owns global light/player.
 const PATH="res://assets/graphics/world_map_terrain_transport_v001/transport.res"
+const BRDF=preload("res://assets/graphics/world_map_air_light_v001/brdf.res")
 var level:Node3D
 var cache:Resource
 var installed:=false
@@ -10,6 +11,7 @@ var _last_key:=Vector3.INF
 var _last_scale:=-1.
 var _last_tint:=Vector3.INF
 var _last_response:Variant=null
+var _last_dielectric:Variant=null
 var _world_transforms:Dictionary={}
 var _transforms_dirty:=false
 var _transforms_valid:=true
@@ -137,8 +139,10 @@ func bind(force:bool=false)->void:
 	var now:Color=level.get_node("WorldEnvironment").environment.ambient_light_color.srgb_to_linear()
 	var tint:=Vector3(now.r/source.r,now.g/source.g,now.b/source.b)
 	var response:bool=level.look.terrain_visibility_response
-	if not force and key==_last_key and scale==_last_scale and tint==_last_tint and response==_last_response:return
+	var dielectric:bool=level.look.terrain_dielectric_response and level.look.terrain_review=="combined"
+	if not force and key==_last_key and scale==_last_scale and tint==_last_tint and response==_last_response and dielectric==_last_dielectric:return
 	_last_key=key;_last_scale=scale;_last_tint=tint;_last_response=response
+	_last_dielectric=dielectric
 	var materials={}
 	for row in level.look.terrain_materials:materials[row[3]]=true
 	for chunk in level.geometry._cutaway_chunks:
@@ -146,4 +150,6 @@ func bind(force:bool=false)->void:
 	for m:ShaderMaterial in materials:
 		m.set_shader_parameter("terrain_key_radiance",key);m.set_shader_parameter("terrain_ambient_scale",scale);m.set_shader_parameter("terrain_ambient_tint",tint)
 		m.set_shader_parameter("terrain_colored_visibility",response)
+		var compatible:bool=dielectric and is_zero_approx(float(m.get_shader_parameter("native_metallic")))
+		m.set_shader_parameter("terrain_dielectric_response",compatible);m.set_shader_parameter("terrain_rough_reflection",compatible);m.set_shader_parameter("terrain_env_brdf",BRDF)
 func _process(_delta:float)->void:refresh()

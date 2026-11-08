@@ -1,4 +1,7 @@
 uniform bool terrain_pbr_enabled=false;
+uniform bool terrain_dielectric_response=false;
+uniform bool terrain_rough_reflection=false;
+uniform sampler2D terrain_env_brdf:filter_linear,repeat_disable;
 uniform bool terrain_has_metal=false;
 uniform bool terrain_has_rough=false;
 uniform sampler2D terrain_metal_map : hint_default_white, filter_nearest, repeat_disable;

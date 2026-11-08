@@ -1,6 +1,6 @@
 extends RefCounted
 ## Opaque unit-UV terrain contract. Existing atlas/grade/sampling stays owned by Look.
-const PARAMETERS=["terrain_pbr_enabled","terrain_has_metal","terrain_has_rough","terrain_metal_map","terrain_rough_map","terrain_metal_channel","terrain_rough_channel","terrain_glow_map","terrain_glow_enabled","terrain_glow_add","terrain_glow_tint","terrain_glow_energy"]
+const PARAMETERS=["terrain_pbr_enabled","terrain_has_metal","terrain_has_rough","terrain_metal_map","terrain_rough_map","terrain_metal_channel","terrain_rough_channel","terrain_glow_map","terrain_glow_enabled","terrain_glow_add","terrain_glow_tint","terrain_glow_energy","terrain_dielectric_response","terrain_rough_reflection","terrain_env_brdf"]
 static func supported(s:BaseMaterial3D)->bool:
 	if not s is StandardMaterial3D or s.next_pass!=null or s.transparency!=BaseMaterial3D.TRANSPARENCY_DISABLED:return false
 	if s.uv1_scale!=Vector3.ONE or s.uv1_offset!=Vector3.ZERO or s.uv1_triplanar or s.emission_on_uv2:return false
@@ -17,6 +17,7 @@ static func channel(value:int)->Vector4:
 	if value==BaseMaterial3D.TEXTURE_CHANNEL_GRAYSCALE:return Vector4(1./3.,1./3.,1./3.,0)
 	var result:=Vector4.ZERO;result[value]=1.;return result
 static func bind(m:ShaderMaterial,s:BaseMaterial3D,enabled:bool)->void:
+	m.set_shader_parameter("terrain_dielectric_response",false);m.set_shader_parameter("terrain_rough_reflection",false)
 	enabled=enabled and supported(s)
 	m.set_shader_parameter("native_roughness",s.roughness if enabled else 1.)
 	m.set_shader_parameter("native_metallic",s.metallic if enabled else 0.)

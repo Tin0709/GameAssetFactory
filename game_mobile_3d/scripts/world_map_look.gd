@@ -7,6 +7,7 @@ const PLAYER_MATERIAL=preload("res://scripts/world_map_player_material.gd")
 const TERRAIN_MATERIAL=preload("res://scripts/world_map_terrain_material.gd")
 var terrain_review:="combined"
 var terrain_visibility_response:=true
+var terrain_dielectric_response:=true
 const GROUND_RADIANCE=preload("res://assets/graphics/world_map_ground_bounce_v001/normalized_ground.res")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
@@ -594,6 +595,10 @@ func set_terrain_review(mode:String)->void:
 func set_terrain_visibility_response(value:bool)->void:
 	terrain_visibility_response=value
 	if level.get("terrain_light")!=null:level.terrain_light.bind(true)
+
+func set_terrain_dielectric_response(value:bool)->void:
+	terrain_dielectric_response=value
+	_refresh_ground_bounce()
 
 func _private_player_material_scope()->bool:
 	return level.player.get("using_original_source")==true

@@ -23,3 +23,13 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 	if(terrain_colored_visibility)irradiance*=terrain_contact_response(color,contact);
 	return color*(1.0-metallic)*irradiance;
 }
+#ifdef GAF_WORLD_TERRAIN_PBR
+// Recovered split-sum consumer form; independently integrated GGX LUT.
+// Existing diffuse transport is only a low-frequency incident-radiance proxy.
+vec3 terrain_reflected(vec3 normal,vec3 view,float rough,float visibility,float cloud,float contact,float source_spec){
+	vec3 incident=terrain_sky_light*terrain_ambient_scale*terrain_ambient_tint*visibility+terrain_sun_bounce*terrain_key_radiance*cloud;
+	vec2 integrated=texture(terrain_env_brdf,vec2(clamp(dot(normal,view),0.,1.),clamp(rough,0.,1.))).rg;
+	float f0=source_spec>0.? .16*source_spec*source_spec:.04;
+	return incident*(vec3(f0)*integrated.x+vec3(integrated.y))*clamp(contact,0.,1.);
+}
+#endif

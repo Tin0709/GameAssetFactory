@@ -16,6 +16,7 @@ var noise_strength:=1.
 var material_provider:Callable
 var compositor_owned:Callable
 var medium_state:Callable
+var light_provider:Callable
 var _variants:Dictionary={}
 var _bound_materials:Dictionary={}
 var _owned_compositor:Compositor
@@ -73,12 +74,20 @@ func _process(_delta:float)->void:
  for v in [origin,dx,dy,ray,ray_dx,ray_dy]:_append(v,data)
  data.append_array(PackedFloat32Array([_profile.volume_density,_profile.height_falloff,_base,_clock]))
  var rgb:Vector3=_profile.fog_color;var color:=Color(rgb.x,rgb.y,rgb.z).srgb_to_linear()
- _append(Vector3(color.r,color.g,color.b),data,float(_profile.get("scatter_energy",.25)))
+ var linear:Vector3=_profile.get("linear_scatter_rgb",Vector3(color.r,color.g,color.b))
+ _append(linear,data,float(_profile.get("scatter_energy",.25)))
  _append(_actor,data,_profile.player_light_weight)
  var warm:Vector3=_profile.player_light_color;var warm_linear:=Color(warm.x,warm.y,warm.z).srgb_to_linear()
  _append(Vector3(warm_linear.r,warm_linear.g,warm_linear.b),data,_radius)
  data.append_array(PackedFloat32Array([_profile.fog_begin,_camera.far,noise_strength,0.]))
- effect.configure(data.to_byte_array(),size,noise.get_rid())
+ var light:Dictionary=light_provider.call()if light_provider.is_valid()else {"valid":false}
+ var light_rid:=RID()
+ if light.get("texture")!=null:light_rid=light.texture.get_rid()
+ if light.get("valid",false):
+  _append(light.origin,data,1.);_append(light.step,data,.2);_append(light.dimensions,data)
+ else:
+  for i in 3:_append(Vector3.ZERO,data)
+ effect.configure(data.to_byte_array(),size,noise.get_rid(),light_rid)
  var state:Dictionary=effect.snapshot()
  var ready:bool=state.ready and state.error.is_empty()
  if medium_state.is_valid():medium_state.call(ready,str(state.error))

@@ -27,6 +27,9 @@ var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
 var mist:Node3D
 var spatial_mist:=true
+var captured_scatter:=true
+var shadowed_scatter:=true
+var air_light=preload("res://scripts/world_map_air_light.gd").new()
 var _mist_sample:Dictionary={}
 var _day:Dictionary={}
 var _environment:Environment
@@ -129,8 +132,16 @@ func _update_mist()->void:
 	var sun:DirectionalLight3D=level.get_node("Sun");var key:=sun.light_color.srgb_to_linear()
 	var incoming:=Vector3(ambient.r,ambient.g,ambient.b).dot(luma)*env.ambient_light_energy*.75+Vector3(key.r,key.g,key.b).dot(luma)*sun.light_energy*.03
 	var rgb:Vector3=_mist_sample.fog_color;var color:=Color(rgb.x,rgb.y,rgb.z).srgb_to_linear()
-	_mist_sample.scatter_energy=clampf(incoming,.015,.18)/maxf(Vector3(color.r,color.g,color.b).dot(luma),.0001)
-	mist.publish(_mist_sample,level.presentation.player_position(),level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
+	var linear:=Vector3(color.r,color.g,color.b)
+	if captured_scatter:linear=air_light.scatter_color(linear,hour)
+	var sample:=_mist_sample.duplicate();sample.linear_scatter_rgb=linear
+	sample.scatter_energy=clampf(incoming,.015,.18)/maxf(linear.dot(luma),.0001)
+	mist.publish(sample,level.presentation.player_position(),level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
+
+func air_field()->Dictionary:
+	var result:Dictionary=air_light.field()
+	if not shadowed_scatter:result.valid=false
+	return result
 
 func _mist_state(ready:bool,error:String)->void:
 	if mist==null or not mist.visible or _mist_sample.is_empty():return
@@ -340,6 +351,11 @@ func _build_ui()->void:
 	var terrain_response:=CheckButton.new();terrain_response.name="TerrainVisibilityResponse";terrain_response.text="Terrain · colored corner response"
 	terrain_response.button_pressed=level.look.terrain_visibility_response;terrain_response.focus_mode=Control.FOCUS_NONE;box.add_child(terrain_response)
 	terrain_response.toggled.connect(level.look.set_terrain_visibility_response)
+	var terrain_sheen:=CheckButton.new();terrain_sheen.name="TerrainDielectricResponse";terrain_sheen.text="Terrain · soft dielectric / reflected light";terrain_sheen.button_pressed=level.look.terrain_dielectric_response;terrain_sheen.focus_mode=Control.FOCUS_NONE;box.add_child(terrain_sheen)
+	terrain_sheen.toggled.connect(level.look.set_terrain_dielectric_response)
+	for entry in [["captured_scatter","Air · captured Forest scatter color"],["shadowed_scatter","Air · terrain-shadowed scattering"]]:
+		var toggle:=CheckButton.new();toggle.name=entry[0];toggle.text=entry[1];toggle.button_pressed=get(entry[0]);toggle.focus_mode=Control.FOCUS_NONE;box.add_child(toggle)
+		var property:String=entry[0];toggle.toggled.connect(func(value:bool):set(property,value))
 	_terrain_light_note=Label.new();box.add_child(_terrain_light_note)
 	if plants!=null:
 		var grass_light:=CheckButton.new();grass_light.text="Grass lighting · MD2 study";grass_light.button_pressed=plants.grass_lighting_enabled
