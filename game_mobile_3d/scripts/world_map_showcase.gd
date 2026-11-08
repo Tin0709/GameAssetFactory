@@ -25,6 +25,8 @@ var _cycle_button:CheckButton
 var _exposure_button:CheckButton
 var _player_material_note:Label
 var _terrain_light_note:Label
+var _fps_label:Label
+var _fps_elapsed:=0.
 const ENV_FIELDS:=["ambient_light_color","ambient_light_energy","background_color","tonemap_exposure","adjustment_saturation","fog_light_color","fog_density"]
 
 func make_player()->Node3D:
@@ -132,6 +134,10 @@ func compare_baseline()->void:
 
 func _process(delta:float)->void:
 	if not private_primary or level==null:return
+	_fps_elapsed+=delta
+	if _fps_label!=null and _fps_elapsed>=.5:
+		_fps_elapsed=0.
+		_fps_label.text="FPS: %d"%Engine.get_frames_per_second()
 	_elapsed+=delta
 	if cycle_enabled and level.look.stage==2:hour=fposmod(hour+delta*.08,24.)
 	apply_time()
@@ -146,10 +152,16 @@ func _process(delta:float)->void:
 
 func _build_ui()->void:
 	var hud:=level.get_node("HUD")
-	panel=PanelContainer.new();panel.name="ShowcaseOptions";panel.position=Vector2(18,18)
+	_fps_label=Label.new();_fps_label.name="ShowcaseFPS";_fps_label.position=Vector2(18,6)
+	_fps_label.text="FPS: %d"%Engine.get_frames_per_second();_fps_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	_fps_label.add_theme_font_size_override("font_size",18)
+	_fps_label.add_theme_color_override("font_color",Color.WHITE)
+	_fps_label.add_theme_color_override("font_outline_color",Color(0,0,0,.85))
+	_fps_label.add_theme_constant_override("outline_size",4);hud.add_child(_fps_label)
+	panel=PanelContainer.new();panel.name="ShowcaseOptions";panel.position=Vector2(18,40)
 	panel.custom_minimum_size=Vector2(410,0);hud.add_child(panel)
 	var scroll:=ScrollContainer.new();scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size=Vector2(440,minf(level.get_viewport().get_visible_rect().size.y-36.,630.));panel.add_child(scroll)
+	scroll.custom_minimum_size=Vector2(440,minf(level.get_viewport().get_visible_rect().size.y-58.,630.));panel.add_child(scroll)
 	var box:=VBoxContainer.new();box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(box)
 	var title:=Label.new();title.text="OVERWORLD · A&S / MD2 + SABRE";box.add_child(title)
 	status=Label.new();box.add_child(status)
@@ -199,7 +211,7 @@ func _build_ui()->void:
 			toggle.button_pressed=true;toggle.focus_mode=Control.FOCUS_NONE;box.add_child(toggle)
 			toggle.toggled.connect(func(value:bool):plants.set(option,value))
 	panel.hide()
-	_hint=Label.new();_hint.name="ShowcaseHint";_hint.position=Vector2(18,18);_hint.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	_hint=Label.new();_hint.name="ShowcaseHint";_hint.position=Vector2(18,34);_hint.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · L options"
 	if not unavailable_reason.is_empty():_hint.text=unavailable_reason;_hint.modulate=Color(1.,.6,.35)
 	hud.add_child(_hint)
