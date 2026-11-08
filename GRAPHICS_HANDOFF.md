@@ -1,5 +1,11 @@
 # GameAssetFactory graphics checkpoint
 
+**2026-11-08 subsequent authorized integration:** F5 WorldMap now selects the
+private A&S/MD2 + Sabre primary and combined Day showcase. Current launch,
+controls, architecture, evidence and limitations:
+[Unified showcase](docs/graphics/unified_showcase_v001/README.md).
+The checkpoint below remains a historical preservation record.
+
 Checkpoint date:2026-11-08, Asia/Saigon. **Development is stopped at the user's
 request. This is not acceptance of MD2-level visual quality. Resume only after
 an explicit new instruction.** No graphics code, shader, scene, asset or setting
