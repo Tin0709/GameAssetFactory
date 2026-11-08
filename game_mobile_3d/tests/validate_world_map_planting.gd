@@ -25,7 +25,13 @@ func run()->void:
 		for material:ShaderMaterial in plants.materials:
 			check(material.get_shader_parameter("cell_limited_motion")==false,"Native canopy is not clipped to individual cells")
 			check(material.get_shader_parameter("ground_mask_enabled")==true,"Canopy clipped away from dirt path surfaces")
+		plants.wind_enabled=false
+		await process_frame;await process_frame
 		plants.set_dense_review(false)
+		plants.wind_enabled=true
+		var wind_restored:=true
+		for strength:float in plants._wind_intensities:wind_restored=wind_restored and strength>0.
+		check(wind_restored,"Wind intensity survives a profile switch while wind is disabled")
 		check(not plants.dense_grass_review,"Previous clustered flower study remains selectable")
 	check(plants.placements.size()>800,"Large meadow carpets and scattered patches exist")
 	var occupied:Dictionary={};var bounds_ok:=true;var ground_ok:=true
