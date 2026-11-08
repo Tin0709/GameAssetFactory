@@ -77,6 +77,7 @@ func setup_world_audio(world:Node3D)->void:
 func cancel_jump()->void:
 	var at:=global_position
 	reset_actor();global_position=at;velocity=Vector3.ZERO
+	if effects!=null:effects.reset()
 	_left=false;_e=false;_right=false;_q=false;_c=false
 	if reference_audio!=null:reference_audio.reset()
 	reset_physics_interpolation();presentation_reset.emit()
