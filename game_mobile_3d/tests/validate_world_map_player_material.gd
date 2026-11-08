@@ -16,6 +16,12 @@ func run()->void:
 	var native:bool=RenderingServer.get_current_rendering_method()=="mobile" and RenderingServer.get_rendering_device()!=null
 	if native:check(adapters==3,"Body, face and Sabre preserve rich PBR through adapters")
 	if look.has_method("set_player_material_review"):
+		if native:
+			check(not look.player_material.profile.is_empty(),"Captured profile validates in private workspace")
+			var skins:=0
+			for m in look._direct_actor_materials:
+				if m!=null and m.get_meta("verified_valorie",false):skins+=1
+			check(skins==2,"Only pixel-identified Valorie body and face are verified")
 		look.set_player_material_review("neutral")
 		for i in look.actor_materials.size():
 			var row=look.actor_materials[i];var m=row[0].get_active_material(row[1])
@@ -36,6 +42,15 @@ func run()->void:
 		for m in look._direct_actor_materials:
 			if m!=null:check(not m.get_shader_parameter("recovered_roughness"),"Self-light does not enable roughness")
 		look.set_player_material_review("combined")
+		if native:
+			w.showcase.set_hour(22.)
+			for m in look._direct_actor_materials:
+				if m!=null:check(not m.get_shader_parameter("recovered_roughness") and not m.get_shader_parameter("recovered_self_light"),"Unverified Night suspends Day material effects")
+			w.showcase.set_hour(12.)
+			var active:=0
+			for m in look._direct_actor_materials:
+				if m!=null and m.get_shader_parameter("recovered_roughness"):active+=1
+			check(active==2,"Day returns both verified skin effects")
 		look.set_stage(0)
 		for row in look.actor_materials:check(row[0].get_surface_override_material(row[1])==row[2],"B restores original overrides")
 		look.set_stage(2);look.set_player_material_review("original")
