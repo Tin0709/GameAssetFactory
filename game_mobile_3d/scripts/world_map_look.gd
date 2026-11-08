@@ -588,7 +588,7 @@ func _apply_player_materials(direct:bool,sky:bool)->void:
 		var enabled:=player_adapter_enabled and stage==2 and player_material.available() and m!=null
 		if not enabled:
 			row[0].set_surface_override_material(row[1],row[2]);continue
-		var visible_sky:=sky and is_instance_valid(level.grove) and level.grove.is_visible_in_tree()
+		var visible_sky:bool=sky and is_instance_valid(level.grove) and level.grove.is_visible_in_tree()
 		m.shader=player_material.variant(row[3].transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,direct and player_cloud_enabled,visible_sky)
 		m.set_shader_parameter("albedo_tint",row[4])
 		var verified:bool=m.get_meta("verified_valorie",false) and player_effects_available()
