@@ -84,6 +84,9 @@ func _add_cell(asset:String,cell:Vector2i,position:Vector3,color:String,carpet:b
 	var center:=original.get_center();center.y=original.position.y
 	var transform:=Transform3D(basis,position-basis*center)
 	var bounds:AABB=transform*original
+	var margin:=Vector2(.94-bounds.size.x,.94-bounds.size.z).max(Vector2.ZERO)*.5
+	var jitter:=Vector3(_rng.randf_range(-margin.x,margin.x),0.,_rng.randf_range(-margin.y,margin.y))
+	transform.origin+=jitter;position+=jitter;bounds=transform*original
 	var key:=asset+"/"+str(Vector2i(floori(position.x/TILE),floori(position.z/TILE)))
 	if not _groups.has(key):_groups[key]={"asset":asset,"transforms":[],"custom":[]}
 	_groups[key].transforms.append(transform)
