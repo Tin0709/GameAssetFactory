@@ -20,7 +20,8 @@ func _init()->void:
 
 func available()->bool:
 	return RenderingServer.get_current_rendering_method()=="mobile" and RenderingServer.get_rendering_device()!=null \
-		and not ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading")
+		and not ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading") \
+		and not ProjectSettings.get_setting("rendering/lights_and_shadows/use_physical_light_units",false)
 
 func source_skin(node:MeshInstance3D,source:BaseMaterial3D)->bool:
 	if profile.is_empty() or not str(node.name) in ["SabrePrototypeBody","SabrePrototypeFace"]:return false

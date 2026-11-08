@@ -278,3 +278,42 @@ Raw measurements, screenshots, scripts and logs remain private at
 No phone benchmark, native-cycle/Lumen parity, terrain-cache closure, new artistic
 approval or production eligibility is claimed. Next: review the unified F5
 experience, then profile devices and target specific remaining visual gaps.
+# Player material comparisons — 2026-11-08
+
+F5 still opens the existing WorldMap. **L → PLAYER MATERIAL** selects Original,
+Neutral, Cloud only (default), recovered Valorie Roughness only, recovered
+view-facing Self-light only, or Combined. Original restores actual previous
+surface overrides; B remains the whole-map baseline. F3 also gates player direct
+cloud shading. The scrollable options panel fits 720p. Audio remains OFF.
+
+The focused factory `world_map_player_material.gd` and `world_map_player_pbr`
+shader now preserve all three current private surfaces: opaque Sabre, alpha-cutout
+body/face, original nearest atlas, separate metal/rough channel selection and
+emission. Unsupported flags/features/materials or renderers restore the source.
+Godot owns ambient, fog, shadows and the no-cloud direct BRDF. Existing canopy
+visibility retains its own control across every comparison mode. The old original
+GAF actor keeps its previous path. No rig, motion, grass or environment asset changed.
+
+Recovered parameters are loaded from a hash-validated **external** PIX buffer;
+Valorie identification checks atlas and ORM pixels/channels, not duplicate names.
+The Day roughness transform and cubic N·V self-light are independently authored
+equivalents of recovered operations. They default OFF, suspend outside verified
+Day/source conditions, and never apply to Sabre. Source emission is retained;
+this is not a complete native emissive/SSS/indirect-light reconstruction.
+
+Validation: 61 native Mobile material/state checks; existing primary-showcase,
+grass lighting and wind checks pass. Locked original↔neutral and restore images
+have **0 changed pixels**; no-sun cloud comparison also has 0. The custom direct
+cloud path is not bitexact: a unity-field diagnostic has p95 4/max7 RGB byte
+differences among changed pixels. It avoids the older actor helper's artificial
+GGX clipping; grass/terrain helpers are unchanged. Shader precision/compilation
+closure remains open. Comparisons include whole final-image effects of grading
+and exposure, not registered MD2 error scores.
+
+Private reproducible inputs, screenshots, tests and timing:
+`MD2 Research/godot_lab/world_map_unified_showcase_v001/player_light_audit_v001/adapter_v001/`.
+Desktop ABBA viewport samples showed 133 draws in every mode and approximately
+0.361–0.364ms GPU on RTX4070TiSUPER/Mobile D3D12. These are shared-workstation
+observations, not isolated causal cost or handset performance certification.
+Human artistic review and phone measurements remain pending.
+

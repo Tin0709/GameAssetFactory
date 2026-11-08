@@ -8,11 +8,11 @@
 
 ## Tasks
 
-- [ ] Watch existing rich-material coverage fail; add rejection/identity/independent-toggle tests.
-- [ ] Implement a strict material factory and shader variants under existing Look ownership. Correct the actor-only GGX clipping error; do not change grass/terrain BRDFs. Preserve original tint, not the legacy cloud-tinted duplicate.
-- [ ] Add compact independent controls in existing L panel, with original/neutral/cloud/roughness/self-light/combined presets and safe Day/source guards.
-- [ ] Capture locked Mobile comparisons, verify neutral and restore pixels, no-sun cloud invariance, alpha/emission and source-only scope. Validate live owners, baseline/day-night, locomotion/jump/combat, and desktop cost without phone claims.
-- [ ] Fresh review, address findings, document evidence/limits, commit and normal push per repository instructions.
+- [x] Watch existing rich-material coverage fail; add rejection/identity/independent-toggle tests.
+- [x] Implement a strict material factory and shader variants under existing Look ownership. Correct the actor-only GGX clipping error; do not change grass/terrain BRDFs. Preserve original tint, not the legacy cloud-tinted duplicate.
+- [x] Add compact independent controls in existing L panel, with original/neutral/cloud/roughness/self-light/combined presets and safe Day/source guards.
+- [x] Capture locked Mobile comparisons, verify neutral and restore pixels, no-sun cloud invariance, alpha/emission and source-only scope. Validate live owners, baseline/day-night, locomotion/jump/combat, and desktop cost without phone claims.
+- [x] Fresh review, address findings, document evidence/limits, commit and normal push per repository instructions.
 
 ## Review focus
 
@@ -21,3 +21,5 @@ Missing/changed private evidence; feature-rich unsupported material; opaque weap
 ## Execution ledger
 
 - Existing private probe was not neutral: it used the legacy tinted duplicate and clipped GGX to 1. Matching engine source confirms `saturateHalf` is an overflow guard, not [0,1] saturation. Stock generated shader with original tint gives exact 0-pixel difference in the locked Mobile frame. Preserve old probes as historical evidence, not acceptance tests.
+
+- Fresh review found and verified fixes for automatic-cycle Day guards, independent canopy AO and unsupported flags; native61 checks and private image receipts. Git checkpoint integration follows existing main/normal-push policy.
