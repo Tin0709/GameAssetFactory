@@ -1,5 +1,44 @@
 # Unified playable Overworld showcase
 
+**2026-11-08 — Recovered background gusts:** dense private WorldMap grass now
+reuses the existing audited two-noise wind permutation instead of the small sine
+sway. Two point/repeat samples advect separately at100× different spatial scales;
+the nested easing produces travelling gusts, then the existing verified rotation
+helper bends relative geometry above the captured10cm pivot pin/1cm ramp.
+Captured gain0.62831855 includes native global/material multipliers; it is not
+multiplied by the old .5 strength again. Wind OFF gates it exactly. Source clock,
+speed, spatial scale, axis and noise are external hash-validated research inputs.
+Only wind keys are consumed from the old private profile; its graphics settings
+are not applied. Simulation elapsed time drives the existing interpolated clock.
+
+L → **Grass gusts · recovered MD2 wind** restores the exact preceding sine
+motion. Existing **Grass wind** disables background wind in either selection;
+player contact remains independent. Missing/changed evidence falls back to the
+previous motion. Prior flower-study motion, approved spread/light/palette, density,
+paths, actor and mute stay. Per-card UV2 roots adapt native individual-instance
+pivots to our composite. Other grass-family permutations, native world phase and
+complete contact/Niagara equivalence remain unverified. No dynamic gust recoloring
+was added. Native-style wind and the existing contact arc add independently.
+
+Actual current vertex-body GPU probe with captured position/pivot/time/noise:
+max displacement error0.0000003152m against the native trace. Root-pin and wind-OFF
+probes return exact zero. Frozen old-mode restoration and wind-OFF time sweep are
+pixel-identical.48frames per mode preserve locked framing; temporal image change
+3.57→4.76 RGB codes is a motion diagnostic, not an MD2 accuracy score. Live player
+contact still produces force1.0227. Four focused contracts pass; static review
+found no important issues. Source files and proprietary noise remain external.
+
+Two added vertex texture fetches, no new passes/geometry. Conservative wind bounds
+reserve the original contact margin; view draws128→133 due to changed culling.
+Desktop ABBA medians old .773/1.680ms vs new1.052/1.112ms show substantial background
+drift: **do not infer a causal GPU cost or phone throughput**. Phone profiling is
+pending. Native pivot rotation can move some tilted composite card corners below
+terrain; the CPU support sweep records1,505/138,240 sampled tip corners (including
+transparent corners), minimum−.177m. Roots stay pinned; no invented ground clamp
+is called native behavior. Visible clipping across all terrains remains a review
+boundary. Private video previews, probes and evidence:
+`MD2 Research/godot_lab/world_map_unified_showcase_v001/grass_wind_v001/`.
+
 **2026-11-08 — Outward grass spread:** existing private capture draw913 confirms
 non-upright placement before WPO, although the source cards themselves are vertical.
 102 reconstructed input inclinations span0.274–56.958deg, median32.884deg;
