@@ -16,6 +16,10 @@ func run()->void:
 	var native:bool=RenderingServer.get_current_rendering_method()=="mobile" and RenderingServer.get_rendering_device()!=null
 	if native:check(adapters==3,"Body, face and Sabre preserve rich PBR through adapters")
 	if look.has_method("set_player_material_review"):
+		var row0=look.actor_materials[0]
+		for flag:int in [BaseMaterial3D.FLAG_DISABLE_DEPTH_TEST,BaseMaterial3D.FLAG_UV1_USE_TRIPLANAR,BaseMaterial3D.FLAG_EMISSION_ON_UV2]:
+			var unusual:BaseMaterial3D=row0[3].duplicate();unusual.set_flag(flag,true)
+			check(not look.player_material.supports(row0[0],unusual),"Unsupported vertex/depth/UV behavior falls back")
 		if native:
 			check(not look.player_material.profile.is_empty(),"Captured profile validates in private workspace")
 			var skins:=0
@@ -43,6 +47,11 @@ func run()->void:
 			if m!=null:check(not m.get_shader_parameter("recovered_roughness"),"Self-light does not enable roughness")
 		look.set_player_material_review("combined")
 		if native:
+			look.set_ground_bounce(false)
+			w.showcase.hour=22.;w.showcase.apply_time()
+			for j in 3:await process_frame
+			for m in look._direct_actor_materials:
+				if m!=null:check(not m.get_shader_parameter("recovered_roughness") and not m.get_shader_parameter("recovered_self_light"),"Automatic cycle suspends Day effects without relying on bounce refresh")
 			w.showcase.set_hour(22.)
 			for m in look._direct_actor_materials:
 				if m!=null:check(not m.get_shader_parameter("recovered_roughness") and not m.get_shader_parameter("recovered_self_light"),"Unverified Night suspends Day material effects")
