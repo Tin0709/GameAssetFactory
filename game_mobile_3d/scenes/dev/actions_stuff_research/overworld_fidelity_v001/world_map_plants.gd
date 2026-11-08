@@ -289,6 +289,7 @@ func snapshot()->Dictionary:
 	data["one_asset_per_block"]=true;data["trees"]=0
 	data["dense_grass_review"]=dense_grass_review;data["eligible_grass_cells"]=eligible_grass_cells
 	data["grass_splay_active"]=grass_splay_active()
+	data["recovered_wind_active"]=grass_wind!=null and grass_wind.configured and recovered_wind_enabled and dense_grass_review
 	if dense_grass_review:
 		data["source_card_scale"]=1.;data["cards_per_patch"]=4
 		var heights:Array[float]=[]

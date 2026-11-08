@@ -8,6 +8,7 @@ var noise:Texture2D
 var _radii:Dictionary={}
 
 func setup(reader:RefCounted)->void:
+	configured=false;error="";data.clear();noise=null;_radii.clear()
 	var research:=OS.get_environment("MD2_RESEARCH_ROOT")
 	if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
 	var path:=research.path_join("godot_lab/world_map_unified_showcase_v001/grass_wind_v001/profile.private.json")
@@ -25,8 +26,7 @@ func setup(reader:RefCounted)->void:
 		if typeof(value) not in [TYPE_FLOAT,TYPE_INT] or not is_finite(float(value)):error="Invalid wind parameter "+key;return
 	if wind.gain<0. or wind.gain>PI or wind.pin_m<0. or wind.ramp_m<=0. or wind.max_m<0. or wind.spatial<=0. or wind.speed<0.:
 		error="Wind parameters outside supported range";return
-	for key:String in ["axis"]:
-		if not _vec2(wind.get(key)):error="Invalid wind axis";return
+	if not _vec2(wind.get("axis")):error="Invalid wind axis";return
 	if Vector2(wind.axis[0]+.01,wind.axis[1]+.01).length()<.000001:error="Zero wind axis";return
 	if not _vec2(parsed.get("grass_world_origin_cm")):error="Invalid wind world origin";return
 	var image:Variant=parsed.get("grass_noise_path")
@@ -51,8 +51,8 @@ func apply(materials:Array[ShaderMaterial],enabled:bool)->void:
 		mat.set_shader_parameter("review_grass_noise",noise)
 		mat.set_shader_parameter("review_world_origin_cm",Vector2(data.grass_world_origin_cm[0],data.grass_world_origin_cm[1]))
 		mat.set_shader_parameter("review_wind_axis",Vector2(w.axis[0],w.axis[1]))
-		for pair:Array in [["gain","gain"],["pin_m","pin_m"],["ramp_m","ramp_m"],["max_m","max_m"],["time_bias","time_bias"],["speed","speed"],["spatial","spatial"]]:
-			mat.set_shader_parameter("review_wind_"+pair[0],w[pair[1]])
+		for key:String in ["gain","pin_m","ramp_m","max_m","time_bias","speed","spatial"]:
+			mat.set_shader_parameter("review_wind_"+key,w[key])
 
 func margin(mm:MultiMesh,node_basis:Basis)->float:
 	if not configured:return .8

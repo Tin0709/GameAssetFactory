@@ -51,7 +51,7 @@ func run()->void:
 	check(max_length_error<.00001,"Native card edge lengths preserved without stretching")
 	check(max_angle_error<.00001,"Card inclination matches measured captured input")
 	check(min_ground>-.00001,"All static roots stay above ground")
-	check(min_bent_ground>-.00001,"Existing maximum wind/contact bend cannot push these cards below their support plane")
+	check(min_bent_ground>-.00001,"Existing contact arc stays above the support plane; source wind is audited separately")
 	for i in roots.size():check(roots[i]==p.placements[i].root,"Cell root layout and RNG unchanged")
 	p.set_grass_splay(false)
 	var restored:=vertices(p)
