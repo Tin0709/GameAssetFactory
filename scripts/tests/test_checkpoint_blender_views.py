@@ -25,7 +25,9 @@ class BlenderViewTests(unittest.TestCase):
         self.blender.write_bytes(b'fixture')
         for name in ['blender/MD2_Animation_Library_BrowserFixed.blend', 'scripts/md2_blender_library.py',
                      'blender/prototype_sabre/MD2_Valorie_Sabre_Source_Showcase.blend',
-                     'blender/prototype_sabre/source_preview_ui.py']:
+                     'blender/prototype_sabre/source_preview_ui.py',
+                     'graphics_vfx/depth/environment/MD2_Environment_Depth_Reference.blend',
+                     'graphics_vfx/depth/environment/overworld/open_grass_review.py']:
             path = self.research / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b'fixture')
@@ -61,6 +63,7 @@ class BlenderViewTests(unittest.TestCase):
         expected = {
             'animation': ['blender/MD2_Animation_Library_BrowserFixed.blend', 'scripts/md2_blender_library.py'],
             'sabre': ['blender/prototype_sabre/MD2_Valorie_Sabre_Source_Showcase.blend', 'blender/prototype_sabre/source_preview_ui.py'],
+            'grass': ['graphics_vfx/depth/environment/MD2_Environment_Depth_Reference.blend', 'graphics_vfx/depth/environment/overworld/open_grass_review.py'],
         }
         for key, files in expected.items():
             with self.subTest(key=key):
