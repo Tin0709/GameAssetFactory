@@ -21,6 +21,11 @@ uniform float field_extent=34.0;
 uniform float lighting_grade=1.0;
 // Optional map-cell constraint; legacy private meadow keeps its original path.
 uniform bool cell_limited_motion=false;
+uniform bool ground_mask_enabled=false;
+uniform sampler2D ground_coverage_map : filter_nearest, repeat_disable;
+uniform vec2 ground_coverage_origin=vec2(0.0);
+uniform vec2 ground_coverage_extent=vec2(1.0);
+varying vec3 foliage_world;
 varying float height_fraction;
 varying vec3 root_color;
 varying vec3 wrapped_normal_world;
@@ -53,6 +58,7 @@ void vertex(){
 		world_offset=target-(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
 	}
 	VERTEX+=(inverse(MODEL_MATRIX)*vec4(world_offset,0.0)).xyz;
+	foliage_world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
 	if(tinted_grass)NORMAL=normalize(NORMAL*0.35+vec3(0.0,0.65,0.0));
 	wrapped_normal_world=normalize(MODEL_NORMAL_MATRIX*NORMAL);
 	root_color=textureLod(ground_atlas,mix(ground_uv.xy,ground_uv.zw,fract(vec2(root.x,-root.z))),0.0).rgb;
@@ -68,6 +74,12 @@ void fragment(){
 		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
 	}
 	ALBEDO=color;ALPHA=texel.a;ALPHA_SCISSOR_THRESHOLD=cutoff;
+	if(ground_mask_enabled){
+		vec2 mask_uv=(floor(foliage_world.xz)-ground_coverage_origin+vec2(0.5))/ground_coverage_extent;
+		float inside=step(0.0,mask_uv.x)*step(mask_uv.x,1.0)*step(0.0,mask_uv.y)*step(mask_uv.y,1.0);
+		float kind=texture(ground_coverage_map,mask_uv).b;
+		ALPHA*=inside*(1.0-step(0.25,abs(kind-1.0)));
+	}
 	ROUGHNESS=1.0;SPECULAR=0.0;
 	if(has_mre){vec3 packed=texture(mre_map,UV).rgb;METALLIC=packed.r;ROUGHNESS=packed.g;}
 	// Inferred wrapped backlighting; no claim of matching native two-sided shader.

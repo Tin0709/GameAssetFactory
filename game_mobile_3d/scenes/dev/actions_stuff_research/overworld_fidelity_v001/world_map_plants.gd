@@ -4,6 +4,9 @@ const READER=preload("private_bundle.gd")
 const GRASSES:=["MD2 | SM_GrassShort_01","MD2 | SM_GrassShort_02","MD2 | SM_GrassMedium_02","MD2 | SM_GrassMedium_03"]
 const FLOWERS:={"pink":"MD2 | SM_CA1_TulipPink","yellow":"MD2 | SM_Dandelion_A","white":"MD2 | SM_Daisy_A","purple":"MD2 | SM_TPT_Purpleflower_S"}
 const TILE:=32.
+const MEDIUM:=["MD2 | SM_GrassMedium_01","MD2 | SM_GrassMedium_02","MD2 | SM_GrassMedium_03"]
+var dense_grass_review:=true
+var eligible_grass_cells:=0
 var world:Node3D
 var error:=""
 var placements:Array[Dictionary]=[]
@@ -24,12 +27,84 @@ func setup_world(level:Node3D)->void:
 	_rng.seed=110826
 	_cluster.seed=8291;_cluster.frequency=.075;_cluster.fractal_octaves=2
 	_detail.seed=721;_detail.frequency=.23;_detail.fractal_octaves=2
-	_build_flower_centers()
-	_build_cell_planting()
-	_prepare_materials()
-	_flush_cell_batches()
+	_rebuild_planting()
 	player.presentation_reset.connect(reset)
 	print("WORLD_MAP_GRASS_FLOWERS_READY ",JSON.stringify(snapshot()))
+
+func set_dense_review(value:bool)->void:
+	if value==dense_grass_review:return
+	dense_grass_review=value;_rebuild_planting()
+
+func _rebuild_planting()->void:
+	for child:Node in get_children():
+		remove_child(child);child.queue_free()
+	placements.clear();_groups.clear();_plant_cells.clear();species_counts.clear();flower_colors.clear()
+	materials.clear();_wind_intensities.clear();_flower_centers.clear()
+	instance_count=0;batch_count=0;eligible_grass_cells=0;_rng.seed=110826
+	_build_flower_centers()
+	if dense_grass_review:
+		_build_native_patches();_build_dense_planting()
+	else:_build_cell_planting()
+	_prepare_materials();_flush_cell_batches();reset()
+
+func _patch_name(index:int)->String:return "PRIVATE COMPOSITE | Native grass patch %02d"%index
+
+func _build_native_patches()->void:
+	# One transient patch mesh per root. Native cards/UVs/heights stay at1x;
+	# their assembly into crossed tufts is original, not a recovered MD2 mesh.
+	for variant in 6:
+		var name:=_patch_name(variant)
+		if bundle.meshes.has(name):continue
+		var vertices:=PackedVector3Array();var normals:=PackedVector3Array()
+		var uvs:=PackedVector2Array();var roots:=PackedVector2Array();var motion:=PackedFloat32Array()
+		for card in 4:
+			var source_name:String=MEDIUM[(variant+card)%3] if card<3 else GRASSES[variant%2]
+			var source:Mesh=bundle.meshes[source_name]
+			var arrays:=source.surface_get_arrays(0)
+			var raw:Variant=arrays[Mesh.ARRAY_CUSTOM0]
+			var source_motion:PackedFloat32Array=raw.to_float32_array() if raw is PackedByteArray else raw
+			var angle:=float(card)*TAU/3.+float(variant)*.13 if card<3 else .37+variant*.23
+			var rotation:=Basis(Vector3.UP,angle)
+			var offset:=Vector3(cos(angle)*.12,0.,sin(angle)*.12)
+			for i in arrays[Mesh.ARRAY_VERTEX].size():
+				vertices.append(rotation*arrays[Mesh.ARRAY_VERTEX][i]+offset)
+				normals.append(rotation*arrays[Mesh.ARRAY_NORMAL][i]);uvs.append(arrays[Mesh.ARRAY_TEX_UV][i])
+				var root:Vector2=arrays[Mesh.ARRAY_TEX_UV2][i]
+				var transformed:=rotation*Vector3(root.x,0.,root.y)+offset
+				roots.append(Vector2(transformed.x,transformed.z))
+				motion.append_array(PackedFloat32Array([source_motion[i*4],source_motion[i*4+1],source_motion[i*4+2]+float(card)*1.1,source_motion[i*4+3]]))
+		var result:Array=[];result.resize(Mesh.ARRAY_MAX)
+		result[Mesh.ARRAY_VERTEX]=vertices;result[Mesh.ARRAY_NORMAL]=normals
+		result[Mesh.ARRAY_TEX_UV]=uvs;result[Mesh.ARRAY_TEX_UV2]=roots;result[Mesh.ARRAY_CUSTOM0]=motion
+		var mesh:=ArrayMesh.new()
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,result,[],{},Mesh.ARRAY_CUSTOM_RGBA_FLOAT<<Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT)
+		mesh.surface_set_material(0,bundle.meshes[MEDIUM[1]].surface_get_material(0))
+		bundle.meshes[name]=mesh
+
+func _build_dense_planting()->void:
+	var keys:Array=world.columns.keys();keys.sort()
+	for column:Vector2i in keys:
+		var height:float=world.columns[column]
+		var position:Vector3=world.source_to_world(Vector3i(column.x,0,column.y));position.y=height+float(world.runtime.offset[1])
+		var low:Array=world.runtime.border.min;var high:Array=world.runtime.border.max
+		if position.x<low[0] or position.x>=high[0] or position.z<low[2] or position.z>=high[2]:continue
+		if not world.clear_standing_space(column,height):continue
+		var index:int=world.geometry.cells.get(Vector3i(column.x,floori(height-.01),column.y),-1)
+		if index<0:continue
+		var kind:String=world.runtime.palette[index].kind
+		if not kind.begins_with("grass_"):continue # Dirt path blocks remain bare.
+		eligible_grass_cells+=1
+		var cell:=Vector2i(floori(position.x),floori(position.z))
+		var asset:=_patch_name(_rng.randi()%6)
+		position+=Vector3(_rng.randf_range(-.09,.09),0.,_rng.randf_range(-.09,.09))
+		var transform:=Transform3D(Basis(Vector3.UP,_rng.randf()*TAU),position)
+		var bounds:AABB=transform*bundle.meshes[asset].get_aabb()
+		var key:=asset+"/"+str(Vector2i(floori(position.x/TILE),floori(position.z/TILE)))
+		if not _groups.has(key):_groups[key]={"asset":asset,"transforms":[],"custom":[]}
+		_groups[key].transforms.append(transform);_groups[key].custom.append(Color(_rng.randf()*TAU,cell.x+.5,cell.y+.5,1.))
+		placements.append({"cell":cell,"root":position,"asset":asset,"bounds":bounds,"flower":"","carpet":true,"scale":1.,"cards":4,"ground_kind":kind})
+		_add_plant_root(Vector2(position.x,position.z))
+		instance_count+=1;species_counts[asset]=int(species_counts.get(asset,0))+1
 
 func _build_flower_centers()->void:
 	var colors:Array=FLOWERS.keys()
@@ -113,7 +188,11 @@ func _prepare_materials()->void:
 		material.set_shader_parameter("interaction_previous",interaction.previous_texture)
 		material.set_shader_parameter("field_extent",interaction.extent)
 		material.set_shader_parameter("ground_atlas",bundle.textures[ground.texture]);material.set_shader_parameter("ground_uv",uv)
-		material.set_shader_parameter("cell_limited_motion",true)
+		material.set_shader_parameter("cell_limited_motion",not dense_grass_review)
+		material.set_shader_parameter("ground_mask_enabled",dense_grass_review)
+		material.set_shader_parameter("ground_coverage_map",world.look.path_map)
+		material.set_shader_parameter("ground_coverage_origin",world.look.path_map_origin)
+		material.set_shader_parameter("ground_coverage_extent",world.look.path_map_size)
 
 func _flush_cell_batches()->void:
 	for key:String in _groups:
@@ -147,6 +226,10 @@ func _process(_delta:float)->void:
 func snapshot()->Dictionary:
 	var data:=super.snapshot()
 	data["one_asset_per_block"]=true;data["trees"]=0
+	data["dense_grass_review"]=dense_grass_review;data["eligible_grass_cells"]=eligible_grass_cells
+	if dense_grass_review:
+		data["source_card_scale"]=1.;data["cards_per_patch"]=4
+		data["native_medium_height_m"]=[.671,.941,.926]
 	data["carpet_cells"]=placements.filter(func(row:Dictionary)->bool:return row.carpet and row.flower.is_empty()).size()
 	data["mesh_material_scope"]="Existing private MD2 source bundle; cell fit/distribution/motion limits are original adapters"
 	return data
