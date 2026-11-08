@@ -41,7 +41,7 @@ func run()->void:
 		a=script.new();root.add_child(a);a.set_physics_process(false)
 		check(a.using_private_skin and (a.using_original_source or a.appearance_label=="MD2 Valorie skin / reconstructed motion"),"External GLTFDocument source/appearance loads and is clearly labelled")
 		check(a.model.scene_file_path.is_empty(),"Private runtime scene has no saved/imported project resource")
-		var expected_states:=22+a.supplemental_combat_clips+(1 if a.novelty_jump!=null else 0)
+		var expected_states:int=22+a.supplemental_combat_clips+(1 if a.novelty_jump!=null else 0)
 		check(a.skeleton.get_bone_count()==(32 if a.using_original_source else 11) and a.clips.size()==expected_states,"Private rig/base interface plus declared combat and optional jump-flip states retained")
 		check(a.face.mesh.get_blend_shape_count()==2 and a.marker_base!=null and a.marker_tip!=null,"Private variant preserves face and blade interface")
 		check(a.face.get_blend_shape_value(a._focus_index)==0. and a.face.get_blend_shape_value(a._blink_index)==0.,"Private appearance starts with neutral zero morphs")
