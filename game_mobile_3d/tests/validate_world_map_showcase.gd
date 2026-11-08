@@ -16,6 +16,10 @@ func run()->void:
 	check(is_equal_approx(w.player.run_speed,7.),"Verified 7m/s speed retained")
 	check(w.get_node_or_null("Combat")==null,"Incompatible pistol director not initialized")
 	check(w.player.get("render_presenter")!=null,"Source pose presenter connected")
+	for i in 18:await physics_frame
+	print("SHOWCASE_STARTUP_STATE ",JSON.stringify({"floor":w.player.is_on_floor(),"floor_initialized":w.player._floor_initialized,"jump_phase":w.player._jump_stage,"clip":w.player.active_clip,"velocity":str(w.player.velocity)}))
+	check(w.player.is_on_floor() and w.player._jump_stage.is_empty() and w.player.active_clip=="Idle","Startup settles into grounded Idle without input")
+	check(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")),"Test audio muted by default")
 	check(not w.get_node("HUD/Help").visible,"Technical HUD hidden by default")
 	check(not w.showcase.panel.visible,"Options hidden by default")
 	check(w.look.stage==2,"Reference graphics stage default")
@@ -29,6 +33,11 @@ func run()->void:
 	var trunks_disabled:=true
 	for trunk:StaticBody3D in w.grove._trunks:trunks_disabled=trunks_disabled and trunk.collision_layer==0
 	check(trunks_disabled,"Removed trees have no invisible trunk collisions")
+	var leftover_root_cells:=0
+	for y in w.look.path_map_image.get_height():
+		for x in w.look.path_map_image.get_width():
+			if w.look.path_map_image.get_pixel(x,y).a>1.:leftover_root_cells+=1
+	check(leftover_root_cells==0,"Hidden vegetation leaves no root soil or plant contact masks")
 	w.reset_player();check(w.player.position.distance_to(w.spawn_position)<.001,"Reset preserves authored spawn")
 	w.player.effects.sample(.01,true,Vector3.ZERO,Vector3.UP,123)
 	check(not w.player.effects.samples.is_empty(),"Reset test contains trail history")
