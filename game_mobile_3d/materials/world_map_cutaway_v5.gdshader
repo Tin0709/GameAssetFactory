@@ -1,8 +1,13 @@
 shader_type spatial;
+#define GAF_WORLD_TERRAIN_PBR
 render_mode diffuse_burley, depth_draw_always, cull_disabled;
 #include "res://materials/gameplay_cliff_cutaway.gdshaderinc"
 #include "res://materials/world_map_surface_v5.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
+#include "res://materials/world_map_terrain_pbr.gdshaderinc"
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+#include "res://materials/world_map_terrain_transport.gdshaderinc"
+#endif
 #ifdef GAF_WORLD_GROUND_BOUNCE
 #include "res://materials/world_map_ground_bounce.gdshaderinc"
 #endif
@@ -28,6 +33,9 @@ uniform float native_metallic = 0.0;
 uniform float native_specular = 0.0;
 
 void vertex() {
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+	terrain_sky_light=CUSTOM1.rgb;terrain_sun_bounce=CUSTOM2.rgb;
+#endif
 #ifdef GAF_WORLD_TERRAIN_SKY
 	terrain_sky_factor = CUSTOM0.x;
 #endif
@@ -65,13 +73,23 @@ void fragment() {
 #else
 	ALBEDO*=world_cloud_shade(cutaway_world);
 #endif
-	ALBEDO*=terrain_contact_shade(cutaway_world,surface_normal);
+	float receiver_contact=terrain_contact_shade(cutaway_world,surface_normal);
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+	terrain_direct_contact=receiver_contact;
+#else
+	ALBEDO*=receiver_contact;
+#endif
 	// Chunk bounds include low ground beside high walls. Fade only above the
 	// player's lower body; otherwise transparent floor exposes buried faces and
 	// draws a rectangular seam where the neighbouring chunk stays opaque.
 	float wall_height=smoothstep(cutaway_start.y-0.3,cutaway_start.y+0.3,cutaway_world.y);
 	ALPHA = color.a * mix(1.0,cliff_visibility(),wall_height);
-	ROUGHNESS = native_roughness;
-	METALLIC = native_metallic;
+	vec2 packed_pbr=terrain_pbr(UV);
+	ROUGHNESS = native_roughness*packed_pbr.y;
+	METALLIC = native_metallic*packed_pbr.x;
 	SPECULAR = native_specular;
+	EMISSION=terrain_emission(UV);
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission);
+#endif
 }

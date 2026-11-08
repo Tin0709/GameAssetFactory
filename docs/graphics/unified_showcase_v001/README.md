@@ -1,3 +1,10 @@
+**2026-11-08 — Terrain implementation authorized and applied:** F5/L TERRAIN now
+compares Previous, source PBR, original local colored indirect and Combined.
+Combined defaults ON for review. See [terrain transport guide](../../../game_mobile_3d/assets/graphics/world_map_terrain_transport_v001/README.md)
+for source boundaries, guards, controls, regeneration and validation. Player
+Combined and approved grass/gameplay/global light/exposure remain preserved.
+This explicitly supersedes the earlier terrain-research-only note below.
+
 # Unified playable Overworld showcase
 
 **2026-11-08 â€” Recovered background gusts:** dense private WorldMap grass now

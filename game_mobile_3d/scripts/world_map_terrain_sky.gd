@@ -12,7 +12,9 @@ var _applied:=false
 
 static func authored_signature(mesh:ArrayMesh,surface:int)->String:
     var arrays:Array=mesh.surface_get_arrays(surface)
-    arrays[Mesh.ARRAY_CUSTOM0]=null
+    # Additional streams are owned by the new validated transport installer;
+    # neither is part of the original GLB. That installer rejects pre-owned data.
+    for slot in [Mesh.ARRAY_CUSTOM0,Mesh.ARRAY_CUSTOM1,Mesh.ARRAY_CUSTOM2]:arrays[slot]=null
     var context:=HashingContext.new();context.start(HashingContext.HASH_SHA256)
     context.update(var_to_bytes(arrays));return context.finish().hex_encode()
 

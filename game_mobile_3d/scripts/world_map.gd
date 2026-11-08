@@ -21,6 +21,7 @@ var presentation: Node
 var ambient: Node
 var actor_fill: Node
 var terrain_sky: Node
+var terrain_light: Node
 var vegetation_visible:=true
 var showcase: Node
 var _camera_ground_y := NAN
@@ -115,6 +116,8 @@ func _ready() -> void:
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
 	showcase.setup(self)
+	terrain_light=load("res://scripts/world_map_terrain_transport.gd").new()
+	terrain_light.name="TerrainColoredTransport";add_child(terrain_light);terrain_light.setup(self)
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func abort_map(message: String) -> void:

@@ -4,6 +4,8 @@ const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
 const ACTOR_SKY_SHADER=preload("res://materials/world_map_actor_sky.gdshader")
 const PLAYER_MATERIAL=preload("res://scripts/world_map_player_material.gd")
+const TERRAIN_MATERIAL=preload("res://scripts/world_map_terrain_material.gd")
+var terrain_review:="combined"
 const GROUND_RADIANCE=preload("res://assets/graphics/world_map_ground_bounce_v001/normalized_ground.res")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
@@ -501,11 +503,12 @@ func toggle_leaf_sampling() -> void:
 	_apply_review_shaders()
 
 func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool = false) -> Shader:
+	var spatial:=direct and terrain_spatial_active() and original in [PRESET.ground_shader,PRESET.cutaway_shader]
 	var filtered_leaves := original == PRESET.leaves_shader and leaf_sampling_active()
 	var bounce := ground_bounce_active() and original in [PRESET.ground_shader, PRESET.cutaway_shader]
-	var terrain_sky := stage == 2 and _terrain_sky_enabled and original in [PRESET.ground_shader, PRESET.cutaway_shader]
+	var terrain_sky := stage == 2 and _terrain_sky_enabled and not spatial and original in [PRESET.ground_shader, PRESET.cutaway_shader]
 	if not (direct or canopy or foliage or filtered_leaves or bounce or terrain_sky): return original
-	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1) | (int(terrain_sky) << 2))
+	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1) | (int(terrain_sky) << 2) | (int(spatial)<<3))
 	var variants: Dictionary = _shader_variants.get_or_add(original, {})
 	if not variants.has(key):
 		var shader := Shader.new()
@@ -522,13 +525,16 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 			defines += "\n#define GAF_WORLD_GROUND_BOUNCE"
 		if terrain_sky:
 			defines += "\n#define GAF_WORLD_TERRAIN_SKY"
+		if spatial:defines+="\n#define GAF_WORLD_SPATIAL_TERRAIN"
 		if (direct or foliage) and ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):
 			defines += "\n#define GAF_WORLD_FORCE_LAMBERT"
 		shader.code = original.code.replace("shader_type spatial;", defines)
+		if spatial:shader.code=shader.code.replace("render_mode ","render_mode ambient_light_disabled, ")
 		variants[key] = shader
 	return variants[key]
 
 func _apply_review_shaders() -> void:
+	for row in terrain_materials:TERRAIN_MATERIAL.bind(row[3],row[2],stage==2 and terrain_review in ["materials","combined"])
 	_ground_bounce_applied = ground_bounce_active()
 	_leaf_sampling_applied = leaf_sampling_active()
 	var direct := direct_clouds_active()
@@ -571,6 +577,15 @@ func _apply_review_shaders() -> void:
 		else:
 			item[0].set_surface_override_material(item[1],adapter if (direct or actor_sky) else item[3])
 	_bind_ground_radiance()
+	if level.get("terrain_light")!=null:level.terrain_light.bind(true)
+
+func terrain_spatial_active()->bool:
+	return level.get("terrain_light")!=null and level.terrain_light.is_active()
+
+func set_terrain_review(mode:String)->void:
+	if not mode in ["previous","materials","lighting","combined"]:return
+	terrain_review=mode
+	_refresh_ground_bounce()
 
 func _private_player_material_scope()->bool:
 	return level.player.get("using_original_source")==true
@@ -621,6 +636,7 @@ func ground_bounce_available() -> bool:
 		and source.dot(sun.global_basis.z.normalized()) > cos(deg_to_rad(0.1))
 
 func ground_bounce_active() -> bool:
+	if terrain_spatial_active():return false
 	return stage == 2 and _ground_bounce_requested and ground_bounce_available() \
 		and direct_clouds_active() and day_composition_active() and day_finish_active()
 

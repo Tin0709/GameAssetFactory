@@ -32,9 +32,15 @@ void light() {
 #endif
 	if (nl > 0.0) {
 		vec3 incident = LIGHT_COLOR * (ATTENUATION * nl / PI);
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+		incident*=terrain_direct_contact;
+#endif
 		if (LIGHT_IS_DIRECTIONAL) incident *= cloud_transmission;
 #ifdef GAF_WORLD_BURLEY
 		float nv = clamp(dot(NORMAL, VIEW), 0.0, 1.0);
+#ifdef GAF_WORLD_TERRAIN_PBR
+		if(terrain_pbr_enabled)nv=max(nv,0.0001);
+#endif
 		vec3 half_vector = normalize(LIGHT + VIEW);
 		float lh = clamp(dot(LIGHT, half_vector), 0.0, 1.0);
 		if (METALLIC < 1.0) {
@@ -53,10 +59,17 @@ void light() {
 			float alpha_nh = nh * alpha;
 			float distribution = alpha / max(1.0 - nh * nh + alpha_nh * alpha_nh, 0.000001);
 			float visibility = min(0.5 / max(mix(2.0 * nl * nv, nl + nv, alpha), 0.000001), 1.0);
+#ifdef GAF_WORLD_TERRAIN_PBR
+			if(terrain_pbr_enabled)visibility=0.5/max(mix(2.0*nl*nv,nl+nv,alpha),0.000001);
+#endif
 			vec3 f0 = mix(vec3(0.16 * native_specular * native_specular), ALBEDO, METALLIC);
 			float f90 = clamp(16.5 * (f0.r + f0.g + f0.b), METALLIC, 1.0);
 			vec3 fresnel = mix(f0, vec3(f90), world_cloud_fresnel(lh));
-			SPECULAR_LIGHT += incident * fresnel * (min(distribution * distribution, PI) * visibility * SPECULAR_AMOUNT);
+			float distribution_squared=min(distribution*distribution,PI);
+#ifdef GAF_WORLD_TERRAIN_PBR
+			if(terrain_pbr_enabled)distribution_squared=distribution*distribution;
+#endif
+			SPECULAR_LIGHT += incident * fresnel * (distribution_squared * visibility * SPECULAR_AMOUNT);
 		}
 #else
 		DIFFUSE_LIGHT += incident;

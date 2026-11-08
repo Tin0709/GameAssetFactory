@@ -1,7 +1,12 @@
 shader_type spatial;
+#define GAF_WORLD_TERRAIN_PBR
 render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_surface_v5.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
+#include "res://materials/world_map_terrain_pbr.gdshaderinc"
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+#include "res://materials/world_map_terrain_transport.gdshaderinc"
+#endif
 #ifdef GAF_WORLD_GROUND_BOUNCE
 #include "res://materials/world_map_ground_bounce.gdshaderinc"
 #endif
@@ -24,6 +29,9 @@ uniform float native_roughness = 1.0;
 uniform float native_metallic = 0.0;
 uniform float native_specular = 0.0;
 void vertex() {
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+	terrain_sky_light=CUSTOM1.rgb;terrain_sun_bounce=CUSTOM2.rgb;
+#endif
 #ifdef GAF_WORLD_TERRAIN_SKY
 	terrain_sky_factor = CUSTOM0.x;
 #endif
@@ -60,8 +68,16 @@ void fragment() {
 #else
 	ALBEDO*=world_cloud_shade(surface_world);
 #endif
-	ALBEDO*=terrain_contact_shade(surface_world,surface_normal);
-	ROUGHNESS = native_roughness;
-	METALLIC = native_metallic;
+	float receiver_contact=terrain_contact_shade(surface_world,surface_normal);
+	vec2 packed_pbr=terrain_pbr(UV);
+	ROUGHNESS = native_roughness*packed_pbr.y;
+	METALLIC = native_metallic*packed_pbr.x;
 	SPECULAR = native_specular;
+	EMISSION=terrain_emission(UV);
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+	terrain_direct_contact=receiver_contact;
+	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission);
+#else
+	ALBEDO*=receiver_contact;
+#endif
 }

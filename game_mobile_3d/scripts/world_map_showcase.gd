@@ -24,6 +24,7 @@ var _elapsed:=0.
 var _cycle_button:CheckButton
 var _exposure_button:CheckButton
 var _player_material_note:Label
+var _terrain_light_note:Label
 const ENV_FIELDS:=["ambient_light_color","ambient_light_energy","background_color","tonemap_exposure","adjustment_saturation","fog_light_color","fog_density"]
 
 func make_player()->Node3D:
@@ -136,6 +137,7 @@ func _process(delta:float)->void:
 	apply_time()
 	if _hint!=null and unavailable_reason.is_empty():_hint.visible=_elapsed<12. and not panel.visible
 	if status!=null and panel.visible:
+		_terrain_light_note.text="Local field: %s · original GAF transport\nCalibrated Day only; MD2 composition reference."%("active" if level.terrain_light!=null and level.terrain_light.is_active() else "suspended / off")
 		_player_material_note.text="Same scene light / pose. Skin recovery: %s.\nB suspends adapter; F3 also gates direct clouds."%("verified Day profile" if level.look.player_effects_available() else "suspended outside verified Day / source")
 		_cycle_button.set_pressed_no_signal(cycle_enabled)
 		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
@@ -176,6 +178,13 @@ func _build_ui()->void:
 	material_picker.select(material_modes.find(level.look.player_material_review));box.add_child(material_picker)
 	material_picker.item_selected.connect(func(index:int):level.look.set_player_material_review(material_modes[index]))
 	_player_material_note=Label.new();_player_material_note.text="Same scene light / pose. Skin recovery: Day only.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(_player_material_note)
+	var terrain_title:=Label.new();terrain_title.text="TERRAIN · material / colored indirect";box.add_child(terrain_title)
+	var terrain_modes:=["previous","materials","lighting","combined"]
+	var terrain_picker:=OptionButton.new();terrain_picker.name="TerrainLightComparison";terrain_picker.focus_mode=Control.FOCUS_NONE
+	for label:String in ["Previous terrain graphics","PBR materials only","Local colored indirect only","Combined terrain (default)"]:terrain_picker.add_item(label)
+	terrain_picker.select(terrain_modes.find(level.look.terrain_review));box.add_child(terrain_picker)
+	terrain_picker.item_selected.connect(func(index:int):level.look.set_terrain_review(terrain_modes[index]))
+	_terrain_light_note=Label.new();box.add_child(_terrain_light_note)
 	if plants!=null:
 		var grass_light:=CheckButton.new();grass_light.text="Grass lighting · MD2 study";grass_light.button_pressed=plants.grass_lighting_enabled
 		grass_light.focus_mode=Control.FOCUS_NONE;box.add_child(grass_light);grass_light.toggled.connect(plants.set_grass_lighting)
