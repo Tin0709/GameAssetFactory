@@ -20,6 +20,8 @@ func run()->void:
 		for flag:int in [BaseMaterial3D.FLAG_DISABLE_DEPTH_TEST,BaseMaterial3D.FLAG_UV1_USE_TRIPLANAR,BaseMaterial3D.FLAG_EMISSION_ON_UV2]:
 			var unusual:BaseMaterial3D=row0[3].duplicate();unusual.set_flag(flag,true)
 			check(not look.player_material.supports(row0[0],unusual),"Unsupported vertex/depth/UV behavior falls back")
+		var aa:BaseMaterial3D=row0[3].duplicate();aa.alpha_antialiasing_mode=BaseMaterial3D.ALPHA_ANTIALIASING_ALPHA_TO_COVERAGE
+		check(not look.player_material.supports(row0[0],aa),"Unsupported alpha coverage falls back")
 		if native:
 			check(not look.player_material.profile.is_empty(),"Captured profile validates in private workspace")
 			var skins:=0
@@ -60,6 +62,13 @@ func run()->void:
 			for m in look._direct_actor_materials:
 				if m!=null and m.get_shader_parameter("recovered_roughness"):active+=1
 			check(active==2,"Day returns both verified skin effects")
+			w.set_grove_visible(true,w.player.global_position)
+			look.set_actor_sky_fill(true)
+			for mode in ["neutral","roughness","self_light","cloud","combined"]:
+				look.set_player_material_review(mode)
+				for m in look._direct_actor_materials:
+					if m!=null:check(m.get_shader_parameter("sky_strength")!=null,"Canopy AO stays independent in "+mode)
+			w.set_grove_visible(false,w.player.global_position)
 		look.set_stage(0)
 		for row in look.actor_materials:check(row[0].get_surface_override_material(row[1])==row[2],"B restores original overrides")
 		look.set_stage(2);look.set_player_material_review("original")

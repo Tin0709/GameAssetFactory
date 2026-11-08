@@ -4,6 +4,7 @@ const SHADER=preload("res://materials/world_map_player_pbr.gdshader")
 const CB_PATH="godot_lab/world_map_unified_showcase_v001/player_light_audit_v001/hero_draws/event856_PIX_GENERIC_PIPELINE_STAGE_PS_r3.bin"
 const CB_SHA="e364754a2009f38b96e60362eb9a6b8fcd6315a3f6d816570333ff1dc46e3d71"
 const SKIN_RGBA_SHA="a08cb0963081657956181ca610a383b1384b101ee3129f95d5166226c7ec2025"
+const ORM_RGBA_SHA="99d8ff9d3c111806dbdd7c85cda9ba3def9620aa56cae793fd9cd8a2572b0c9b"
 var variants:Dictionary={}
 var profile:Dictionary={}
 
@@ -23,14 +24,20 @@ func available()->bool:
 
 func source_skin(node:MeshInstance3D,source:BaseMaterial3D)->bool:
 	if profile.is_empty() or not str(node.name) in ["SabrePrototypeBody","SabrePrototypeFace"]:return false
-	if source.albedo_texture==null:return false
-	var image:=source.albedo_texture.get_image()
+	return texture_matches(source.albedo_texture,SKIN_RGBA_SHA) and texture_matches(source.roughness_texture,ORM_RGBA_SHA) \
+		and source.roughness_texture==source.metallic_texture and source.roughness_texture_channel==BaseMaterial3D.TEXTURE_CHANNEL_GREEN \
+		and source.metallic_texture_channel==BaseMaterial3D.TEXTURE_CHANNEL_BLUE and source.roughness==1.0
+
+func texture_matches(texture:Texture2D,sha:String)->bool:
+	if texture==null:return false
+	var image:=texture.get_image()
 	if image==null or image.get_size()!=Vector2i(64,64):return false
 	image.convert(Image.FORMAT_RGBA8)
 	var digest:=HashingContext.new();digest.start(HashingContext.HASH_SHA256);digest.update(image.get_data())
-	return digest.finish().hex_encode()==SKIN_RGBA_SHA
+	return digest.finish().hex_encode()==sha
 
 func supports(node:MeshInstance3D,source:BaseMaterial3D)->bool:
+	if not source is StandardMaterial3D:return false
 	if node.material_override!=null or source.next_pass!=null or source.albedo_texture==null:return false
 	if (source.cull_mode!=BaseMaterial3D.CULL_DISABLED or source.texture_filter!=BaseMaterial3D.TEXTURE_FILTER_NEAREST
 		or source.texture_repeat or not source.transparency in [BaseMaterial3D.TRANSPARENCY_DISABLED,BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR]
@@ -39,6 +46,12 @@ func supports(node:MeshInstance3D,source:BaseMaterial3D)->bool:
 		or source.depth_draw_mode!=BaseMaterial3D.DEPTH_DRAW_OPAQUE_ONLY
 		or source.uv1_scale!=Vector3.ONE or source.uv1_offset!=Vector3.ZERO
 		or source.vertex_color_use_as_albedo or source.disable_ambient_light or source.disable_receive_shadows or source.disable_fog):return false
+	if source.alpha_antialiasing_mode!=BaseMaterial3D.ALPHA_ANTIALIASING_OFF or source.billboard_mode!=BaseMaterial3D.BILLBOARD_DISABLED \
+		or source.grow or source.proximity_fade_enabled or source.distance_fade_mode!=BaseMaterial3D.DISTANCE_FADE_DISABLED:return false
+	# These two inert flags are allowed only because vertex color and height mapping
+	# have already been excluded. All other non-feature behavior needs a new adapter.
+	for flag in BaseMaterial3D.FLAG_MAX:
+		if source.get_flag(flag) and not flag in [BaseMaterial3D.FLAG_SRGB_VERTEX_COLOR,BaseMaterial3D.FLAG_INVERT_HEIGHTMAP]:return false
 	for feature in BaseMaterial3D.FEATURE_MAX:
 		if feature!=BaseMaterial3D.FEATURE_EMISSION and source.get_feature(feature):return false
 	return true

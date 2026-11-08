@@ -106,6 +106,7 @@ var player_cloud_enabled:=true
 var player_roughness_enabled:=false
 var player_self_light_enabled:=false
 var player_material_review:="cloud"
+var _player_effects_applied:=false
 var _ground_bounce_requested := false
 var _ground_bounce_applied := false
 var _ground_bounce_layout_matches := false
@@ -579,6 +580,7 @@ func player_effects_available()->bool:
 		and (level.get("showcase")==null or level.showcase.is_day_anchor())
 
 func _apply_player_materials(direct:bool,sky:bool)->void:
+	_player_effects_applied=player_effects_available()
 	if _direct_actor_materials.is_empty():
 		for row:Array in actor_materials:_direct_actor_materials.append(player_material.create(row[0],row[3],row[4]))
 	for i in actor_materials.size():
@@ -586,7 +588,8 @@ func _apply_player_materials(direct:bool,sky:bool)->void:
 		var enabled:=player_adapter_enabled and stage==2 and player_material.available() and m!=null
 		if not enabled:
 			row[0].set_surface_override_material(row[1],row[2]);continue
-		m.shader=player_material.variant(row[3].transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,direct and player_cloud_enabled,sky and player_material_review in ["cloud","combined"])
+		var visible_sky:=sky and is_instance_valid(level.grove) and level.grove.is_visible_in_tree()
+		m.shader=player_material.variant(row[3].transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,direct and player_cloud_enabled,visible_sky)
 		m.set_shader_parameter("albedo_tint",row[4])
 		var verified:bool=m.get_meta("verified_valorie",false) and player_effects_available()
 		m.set_shader_parameter("recovered_roughness",verified and player_roughness_enabled)
@@ -880,6 +883,8 @@ func _release_local_exposure() -> void:
 	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
 
 func _process(_delta: float) -> void:
+	if _private_player_material_scope() and player_effects_available()!=_player_effects_applied:
+		_apply_review_shaders()
 	if ground_bounce_active() != _ground_bounce_applied:
 		_refresh_ground_bounce()
 	if leaf_sampling_active() != _leaf_sampling_applied:
