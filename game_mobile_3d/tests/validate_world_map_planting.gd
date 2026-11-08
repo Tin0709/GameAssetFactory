@@ -18,9 +18,10 @@ func run()->void:
 		for row:Dictionary in plants.placements:
 			check(not roots.has(row.cell),"One dense patch root per block")
 			roots[row.cell]=true
-			full_scale=full_scale and is_equal_approx(row.scale,1.) and row.cards==4
+			var native_height:float=plants.bundle.meshes[plants.MEDIUM[1]].get_aabb().size.y
+			full_scale=full_scale and is_equal_approx(row.scale,1.) and absf(row.bounds.size.y-native_height)<.001
 			supported=supported and row.ground_kind.begins_with("grass_") and absf(row.bounds.position.y-w.surface_height(row.root.x,row.root.z))<.002
-		check(full_scale,"Dense patches keep native source scale and four crossed cards")
+		check(full_scale,"Measured dense patch height matches unscaled native medium grass")
 		check(supported,"Dense grass is grounded and never rooted on dirt paths")
 		for material:ShaderMaterial in plants.materials:
 			check(material.get_shader_parameter("cell_limited_motion")==false,"Native canopy is not clipped to individual cells")
