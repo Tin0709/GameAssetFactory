@@ -23,6 +23,7 @@ var _hint:Label
 var _elapsed:=0.
 var _cycle_button:CheckButton
 var _exposure_button:CheckButton
+var _player_material_note:Label
 const ENV_FIELDS:=["ambient_light_color","ambient_light_energy","background_color","tonemap_exposure","adjustment_saturation","fog_light_color","fog_density"]
 
 func make_player()->Node3D:
@@ -135,6 +136,7 @@ func _process(delta:float)->void:
 	apply_time()
 	if _hint!=null and unavailable_reason.is_empty():_hint.visible=_elapsed<12. and not panel.visible
 	if status!=null and panel.visible:
+		_player_material_note.text="Same scene light / pose. Skin recovery: %s.\nB suspends adapter; F3 also gates direct clouds."%("verified Day profile" if level.look.player_effects_available() else "suspended outside verified Day / source")
 		_cycle_button.set_pressed_no_signal(cycle_enabled)
 		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
 		var msaa:String=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
@@ -173,7 +175,7 @@ func _build_ui()->void:
 	for label:String in ["Original materials (previous player)","Neutral adapter · no new effects","Cloud shading only (default)","Recovered Valorie roughness only","Recovered view self-light only","Combined · all three"]:material_picker.add_item(label)
 	material_picker.select(material_modes.find(level.look.player_material_review));box.add_child(material_picker)
 	material_picker.item_selected.connect(func(index:int):level.look.set_player_material_review(material_modes[index]))
-	var material_note:=Label.new();material_note.text="Same scene light / pose. Skin recovery: Day only.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(material_note)
+	_player_material_note=Label.new();_player_material_note.text="Same scene light / pose. Skin recovery: Day only.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(_player_material_note)
 	if plants!=null:
 		var grass_light:=CheckButton.new();grass_light.text="Grass lighting · MD2 study";grass_light.button_pressed=plants.grass_lighting_enabled
 		grass_light.focus_mode=Control.FOCUS_NONE;box.add_child(grass_light);grass_light.toggled.connect(plants.set_grass_lighting)
