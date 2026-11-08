@@ -21,6 +21,14 @@ func run()->void:
 	check(w.look.stage==2,"Reference graphics stage default")
 	if RenderingServer.get_rendering_device()!=null:check(w.look.day_finish_active(),"Combined Day finish default on Mobile")
 	check(not w.terrain_sky.enabled,"Unfinished terrain cache optional")
+	var vegetation_hidden:bool=not w.grove.visible
+	for batch:MultiMeshInstance3D in w.geometry.vegetation_batches+w.geometry.accent_batches:
+		vegetation_hidden=vegetation_hidden and not batch.is_visible_in_tree()
+	check(vegetation_hidden,"Trees, schematic foliage, grass and flowers absent by default")
+	check(not w.look.canopy_contact_active(),"No contact shading from removed vegetation")
+	var trunks_disabled:=true
+	for trunk:StaticBody3D in w.grove._trunks:trunks_disabled=trunks_disabled and trunk.collision_layer==0
+	check(trunks_disabled,"Removed trees have no invisible trunk collisions")
 	w.reset_player();check(w.player.position.distance_to(w.spawn_position)<.001,"Reset preserves authored spawn")
 	w.player.effects.sample(.01,true,Vector3.ZERO,Vector3.UP,123)
 	check(not w.player.effects.samples.is_empty(),"Reset test contains trail history")
