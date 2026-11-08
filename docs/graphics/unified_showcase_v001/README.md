@@ -301,7 +301,8 @@ equivalents of recovered operations. They default OFF, suspend outside verified
 Day/source conditions, and never apply to Sabre. Source emission is retained;
 this is not a complete native emissive/SSS/indirect-light reconstruction.
 
-Validation: 61 native Mobile material/state checks; existing primary-showcase,
+Validation: 61 native Mobile material/state checks, 11 headless fallback checks
+and 29 legacy actor-fill checks; existing primary-showcase,
 grass lighting and wind checks pass. Locked original↔neutral and restore images
 have **0 changed pixels**; no-sun cloud comparison also has 0. The custom direct
 cloud path is not bitexact: a unity-field diagnostic has p95 4/max7 RGB byte
@@ -316,4 +317,3 @@ Desktop ABBA viewport samples showed 133 draws in every mode and approximately
 0.361–0.364ms GPU on RTX4070TiSUPER/Mobile D3D12. These are shared-workstation
 observations, not isolated causal cost or handset performance certification.
 Human artistic review and phone measurements remain pending.
-

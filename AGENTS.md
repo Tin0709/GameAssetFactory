@@ -430,4 +430,3 @@
 
 
 **2026-10-29 — Private MD2 source meadow visual pass, Pending:** Same MD2OverworldFidelityTest. User narrows to locked Day/reference, then explicitly adds original trees/grass and Day/Night. graphics_review_v001/strict_match opt-in editor-only external calibration/LUT. Four source Oak variants +96 source medium/tall grass roots; matching source atlas reconstructed because GLB material is WorldGrid. Source assets stay Research, never res:// or exports. Native color LUT converted privately for Mobile; shadow reach/fog start corrected, grass palette/texture/noise subpath source-backed. Spatial diffuse/exposure/leaf mask and Night remain adapters; do not claim native Lumen/Night parity. F9 previous/updated, phase controls; locked camera default. Keep prior baseline/100m/Blender/gameplay/audio. Research/godot_lab/overworld_strict_day_v001 contains comparisons, mismatch bounds and native checks. No art approval or phone FPS claim.
-
