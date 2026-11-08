@@ -1,5 +1,11 @@
 # Unified playable Overworld showcase
 
+**Follow-up user change:** trees, schematic foliage, grass and flowers are absent
+from the playable map by default. Their trunk collisions, canopy/contact shading
+and oak-root shading are disabled too. Terrain/grass blocks, character, combat,
+lighting and source assets are preserved. G can restore the saved vegetation for
+comparison; explicit original-player diagnostic mode retains the old planting.
+
 2026-11-08. User-authorized integration after the closed graphics checkpoint;
 not a declaration of MD2-quality completion or a restart of broad research.
 

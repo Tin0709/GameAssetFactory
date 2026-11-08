@@ -300,7 +300,7 @@ func configure_path_materials() -> void:
 		material.set_shader_parameter("path_dirt_atlas",dirt)
 
 func canopy_contact_active() -> bool:
-	return stage == 2 and _canopy_requested
+	return stage == 2 and _canopy_requested and level.get("vegetation_visible")!=false
 
 func set_canopy_contact(enabled: bool) -> void:
 	if enabled == _canopy_requested: return
@@ -311,9 +311,8 @@ func set_canopy_contact(enabled: bool) -> void:
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 
 func refresh_canopy_contact() -> void:
-	if not canopy_contact_active(): return
 	level.geometry.reset_cutaway_materials()
-	_apply_canopy_contact()
+	_apply_review_shaders()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 
 func _apply_canopy_contact() -> void:

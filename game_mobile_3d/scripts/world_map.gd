@@ -21,6 +21,7 @@ var presentation: Node
 var ambient: Node
 var actor_fill: Node
 var terrain_sky: Node
+var vegetation_visible:=true
 var showcase: Node
 var _camera_ground_y := NAN
 var _extended_camera_depth := true
@@ -266,7 +267,8 @@ func set_grove_visible(enabled: bool, at: Vector3) -> bool:
 	if collider==null:collider=player.get_node_or_null("BodyCollision")
 	var player_shape := collider.shape as CapsuleShape3D
 	if not grove.set_enabled(enabled, at, player_shape): return false
-	for batch: MultiMeshInstance3D in geometry.accent_batches: batch.visible = enabled
+	vegetation_visible=enabled
+	for batch: MultiMeshInstance3D in geometry.vegetation_batches+geometry.accent_batches: batch.visible = enabled
 	if enabled:
 		grove.update_focus($Camera3D, player.global_position, view_mode == "gameplay")
 		if look != null: look.refresh_grove_lighting()
