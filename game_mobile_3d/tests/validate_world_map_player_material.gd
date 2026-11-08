@@ -67,7 +67,10 @@ func run()->void:
 			for mode in ["neutral","roughness","self_light","cloud","combined"]:
 				look.set_player_material_review(mode)
 				for m in look._direct_actor_materials:
-					if m!=null:check(m.get_shader_parameter("sky_strength")!=null,"Canopy AO stays independent in "+mode)
+					if m!=null:
+						var names:Array=[]
+						for u in m.shader.get_shader_uniform_list():names.append(u.name)
+						check("sky_strength" in names,"Canopy AO stays independent in "+mode)
 			w.set_grove_visible(false,w.player.global_position)
 		look.set_stage(0)
 		for row in look.actor_materials:check(row[0].get_surface_override_material(row[1])==row[2],"B restores original overrides")
