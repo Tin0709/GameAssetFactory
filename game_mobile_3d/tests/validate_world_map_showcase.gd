@@ -18,10 +18,10 @@ func run()->void:
 	check(w.player.get("render_presenter")!=null,"Source pose presenter connected")
 	check(not w.get_node("HUD/Help").visible,"Technical HUD hidden by default")
 	check(not w.showcase.panel.visible,"Options hidden by default")
-	check(w.look.stage==2 and w.look.day_finish_active(),"Combined Day finish default")
+	check(w.look.stage==2,"Reference graphics stage default")
+	if RenderingServer.get_rendering_device()!=null:check(w.look.day_finish_active(),"Combined Day finish default on Mobile")
 	check(not w.terrain_sky.enabled,"Unfinished terrain cache optional")
-	var original:Vector3=w.player.position
-	w.reset_player();check(w.player.position.distance_to(original)<.001,"Reset preserves authored spawn")
+	w.reset_player();check(w.player.position.distance_to(w.spawn_position)<.001,"Reset preserves authored spawn")
 	var sun:Vector3=w.get_node("Sun").rotation
 	w.showcase.set_hour(22.)
 	await process_frame
