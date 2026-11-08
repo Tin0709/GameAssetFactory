@@ -35,6 +35,7 @@ func setup(world:Node3D)->void:
 	if level.player.get("primary_ready")!=true:
 		unavailable_reason="Private A&S/MD2 + Sabre data missing. Set MD2_RESEARCH_ROOT to the private research folder and restart."
 	level.terrain_sky.set_enabled(false)
+	if level.player.has_method("setup_world_audio"):level.player.setup_world_audio(level)
 	_capture_day()
 	_build_ui()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
@@ -116,6 +117,13 @@ func _build_ui()->void:
 	var compare:=Button.new();compare.text="Compare original / combined graphics (B)";compare.focus_mode=Control.FOCUS_NONE;box.add_child(compare);compare.pressed.connect(compare_baseline)
 	var experimental:=CheckButton.new();experimental.text="Optional unfinished terrain sky cache (F12)";experimental.focus_mode=Control.FOCUS_NONE;box.add_child(experimental)
 	experimental.toggled.connect(func(value:bool):level.terrain_sky.set_enabled(value))
+	var audio:=CheckButton.new();audio.text="Environment + footsteps + Sabre audio";audio.button_pressed=true;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
+	audio.toggled.connect(func(value:bool):
+		var actor=level.player
+		if actor.get("reference_audio")!=null:actor.reference_audio.enabled=value
+		if actor.get("environment_audio")!=null and actor.environment_audio.audio!=null:
+			actor.environment_audio.audio.ambient_enabled=value
+			actor.environment_audio.audio.footsteps_enabled=value;actor.environment_audio.audio.rustle_enabled=value)
 	panel.hide()
 	_hint=Label.new();_hint.name="ShowcaseHint";_hint.position=Vector2(18,18);_hint.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · L options"

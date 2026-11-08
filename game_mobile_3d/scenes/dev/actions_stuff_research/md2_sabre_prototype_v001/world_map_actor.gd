@@ -11,6 +11,7 @@ var _landed:bool:
 	get:return _jump_stage=="JumpLanding"
 var render_presenter:Node
 var reference_audio:Node
+var environment_audio:Node3D
 var primary_ready:=false
 var _left:=false
 var _e:=false
@@ -63,6 +64,15 @@ func _process(_delta:float)->void:
 
 func showcase_display_position()->Vector3:
 	return render_presenter.display_actor if render_presenter!=null else global_position
+
+func setup_world_audio(world:Node3D)->void:
+	if not primary_ready:return
+	var script=load("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/world_map_audio.gd")
+	environment_audio=script.new();environment_audio.name="ShowcaseAmbientAudio"
+	world.add_child(environment_audio)
+	var research:=OS.get_environment("MD2_RESEARCH_ROOT")
+	if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
+	environment_audio.setup(world,research)
 
 func cancel_jump()->void:
 	var at:=global_position
