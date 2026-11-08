@@ -54,7 +54,7 @@ func reset()->void:
 	upload()
 
 func _stamp(point:Vector3)->void:
-	if point.y>1.25:return
+	if point.y>1.25 and not surface_height_provider.is_valid():return
 	var a:=Vector2(point.x,point.z)
 	var minimum:=Vector2i(floori((a.x-RADIUS+extent*.5)/cell),floori((a.y-RADIUS+extent*.5)/cell))
 	var maximum:=Vector2i(floori((a.x+RADIUS+extent*.5)/cell),floori((a.y+RADIUS+extent*.5)/cell))
