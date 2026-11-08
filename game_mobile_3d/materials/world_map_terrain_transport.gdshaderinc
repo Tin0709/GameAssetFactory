@@ -5,6 +5,21 @@ varying float terrain_direct_contact;
 uniform vec3 terrain_key_radiance=vec3(0);
 uniform float terrain_ambient_scale=1.0;
 uniform vec3 terrain_ambient_tint=vec3(1);
-vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud){
-	return color*(1.0-metallic)*(terrain_sky_light*terrain_ambient_scale*terrain_ambient_tint*visibility+terrain_sun_bounce*terrain_key_radiance*cloud);
+uniform bool terrain_colored_visibility=false;
+// Independently expressed visibility fit, validated against the research oracle.
+// Contact is our existing local geometry proxy, NOT a recovered bent-normal field.
+vec3 terrain_contact_response(vec3 albedo,float contact){
+	float open_fraction=clamp(contact,0.0,0.9990000128746033);
+	float blocked=1.0-open_fraction;
+	float single=open_fraction*(1.0+blocked/(2.0*sqrt(sqrt(blocked))));
+	float returned=27.576936721801758*open_fraction*blocked*sqrt(blocked)
+		*exp2(-4.813464164733887*sqrt(sqrt(open_fraction)));
+	float return_ratio=returned/max(1.0-single,0.00001);
+	vec3 reflectance=clamp(albedo,vec3(0.0),vec3(0.5));
+	return vec3(single)+returned*reflectance/max(vec3(1.0)-(1.0-return_ratio)*reflectance,vec3(0.00001));
+}
+vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,float contact){
+	vec3 irradiance=terrain_sky_light*terrain_ambient_scale*terrain_ambient_tint*visibility+terrain_sun_bounce*terrain_key_radiance*cloud;
+	if(terrain_colored_visibility)irradiance*=terrain_contact_response(color,contact);
+	return color*(1.0-metallic)*irradiance;
 }

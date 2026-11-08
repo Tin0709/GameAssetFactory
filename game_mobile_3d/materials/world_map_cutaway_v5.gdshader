@@ -78,7 +78,7 @@ void fragment() {
 #endif
 	float receiver_contact=terrain_contact_shade(cutaway_world,surface_normal);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
-	terrain_direct_contact=receiver_contact;
+	terrain_direct_contact=terrain_colored_visibility ? 1.0 : receiver_contact;
 #else
 	ALBEDO*=receiver_contact;
 #endif
@@ -93,7 +93,7 @@ void fragment() {
 	SPECULAR = native_specular;
 	EMISSION=terrain_emission(UV);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
-	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission);
+	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact);
 #endif
 #ifdef GAF_SHARED_MIST
 	FOG=gaf_surface_mist(SCREEN_UV,-VERTEX.z,INV_VIEW_MATRIX[3].xyz,-INV_VIEW_MATRIX[2].xyz,vec2(PROJECTION_MATRIX[0][0],PROJECTION_MATRIX[1][1]));

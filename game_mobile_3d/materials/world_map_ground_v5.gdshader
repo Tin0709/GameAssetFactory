@@ -78,8 +78,8 @@ void fragment() {
 	SPECULAR = native_specular;
 	EMISSION=terrain_emission(UV);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
-	terrain_direct_contact=receiver_contact;
-	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission);
+	terrain_direct_contact=terrain_colored_visibility ? 1.0 : receiver_contact;
+	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact);
 #else
 	ALBEDO*=receiver_contact;
 #endif

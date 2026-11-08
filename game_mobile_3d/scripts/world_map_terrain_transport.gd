@@ -9,6 +9,7 @@ var _applied:=false
 var _last_key:=Vector3.INF
 var _last_scale:=-1.
 var _last_tint:=Vector3.INF
+var _last_response:Variant=null
 var _world_transforms:Dictionary={}
 var _transforms_dirty:=false
 var _transforms_valid:=true
@@ -135,12 +136,14 @@ func bind(force:bool=false)->void:
 	var original:Array=cache.get_meta("ambient_srgb");var source:=Color(original[0],original[1],original[2]).srgb_to_linear()
 	var now:Color=level.get_node("WorldEnvironment").environment.ambient_light_color.srgb_to_linear()
 	var tint:=Vector3(now.r/source.r,now.g/source.g,now.b/source.b)
-	if not force and key==_last_key and scale==_last_scale and tint==_last_tint:return
-	_last_key=key;_last_scale=scale;_last_tint=tint
+	var response:bool=level.look.terrain_visibility_response
+	if not force and key==_last_key and scale==_last_scale and tint==_last_tint and response==_last_response:return
+	_last_key=key;_last_scale=scale;_last_tint=tint;_last_response=response
 	var materials={}
 	for row in level.look.terrain_materials:materials[row[3]]=true
 	for chunk in level.geometry._cutaway_chunks:
 		for m in chunk.materials:materials[m]=true
 	for m:ShaderMaterial in materials:
 		m.set_shader_parameter("terrain_key_radiance",key);m.set_shader_parameter("terrain_ambient_scale",scale);m.set_shader_parameter("terrain_ambient_tint",tint)
+		m.set_shader_parameter("terrain_colored_visibility",response)
 func _process(_delta:float)->void:refresh()

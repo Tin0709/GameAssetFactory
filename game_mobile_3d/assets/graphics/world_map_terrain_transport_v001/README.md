@@ -1,5 +1,11 @@
 # WorldMap colored terrain transport
 
+**2026-11-08 follow-up:** Main-map local transport now defaults to the reversible
+colored short-contact response. L → Terrain · colored corner response restores
+the preceding direct-contact treatment when disabled. No cache/geometry change.
+Read `docs/graphics/unified_showcase_v001/TERRAIN_COLOR_RESPONSE.md` for the
+source/proxy distinction, render tests and performance limits.
+
 **Corner correction,2026-11-08:** Normal-offset rays at concave grid endpoints
 could enter neighbouring blocks. The baker now retains already-empty origins
 exactly and resolves blocked ones within the existing1cm tangent neighbourhood;

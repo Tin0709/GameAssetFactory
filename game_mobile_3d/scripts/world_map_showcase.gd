@@ -332,6 +332,9 @@ func _build_ui()->void:
 	for label:String in ["Previous terrain graphics","PBR materials only","Local colored indirect only","Combined terrain (default)"]:terrain_picker.add_item(label)
 	terrain_picker.select(terrain_modes.find(level.look.terrain_review));box.add_child(terrain_picker)
 	terrain_picker.item_selected.connect(func(index:int):level.look.set_terrain_review(terrain_modes[index]))
+	var terrain_response:=CheckButton.new();terrain_response.name="TerrainVisibilityResponse";terrain_response.text="Terrain · colored corner response"
+	terrain_response.button_pressed=level.look.terrain_visibility_response;terrain_response.focus_mode=Control.FOCUS_NONE;box.add_child(terrain_response)
+	terrain_response.toggled.connect(level.look.set_terrain_visibility_response)
 	_terrain_light_note=Label.new();box.add_child(_terrain_light_note)
 	if plants!=null:
 		var grass_light:=CheckButton.new();grass_light.text="Grass lighting · MD2 study";grass_light.button_pressed=plants.grass_lighting_enabled
