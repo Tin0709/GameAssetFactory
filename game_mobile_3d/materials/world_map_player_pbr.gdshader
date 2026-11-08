@@ -1,0 +1,62 @@
+shader_type spatial;
+render_mode cull_disabled, diffuse_burley, specular_schlick_ggx;
+#include "res://materials/world_map_clouds.gdshaderinc"
+#ifdef GAF_PLAYER_SKY
+#include "res://materials/world_map_actor_sky.gdshaderinc"
+#endif
+uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
+uniform sampler2D metal_map : hint_default_white, filter_nearest, repeat_disable;
+uniform sampler2D rough_map : hint_default_white, filter_nearest, repeat_disable;
+uniform sampler2D glow_map : source_color, hint_default_black, filter_nearest, repeat_disable;
+uniform vec4 albedo_tint : source_color = vec4(1.0);
+uniform vec4 glow_tint : source_color = vec4(1.0);
+uniform vec4 metal_channel = vec4(0.0,0.0,1.0,0.0);
+uniform vec4 rough_channel = vec4(0.0,1.0,0.0,0.0);
+uniform float native_metallic = 0.0;
+uniform float native_roughness = 1.0;
+uniform float native_specular = 0.5;
+uniform float cutout = 0.5;
+uniform bool glow_enabled = false;
+uniform bool glow_add = false;
+uniform float glow_energy = 1.0;
+uniform bool recovered_roughness = false;
+uniform bool recovered_self_light = false;
+// Values supplied only by the validated external reference profile.
+uniform vec3 roughness_transform = vec3(1.0,0.0,1.0);
+uniform float self_light_scale = 0.0;
+varying vec3 actor_world;
+#ifdef GAF_PLAYER_DIRECT
+#include "res://materials/world_map_player_light.gdshaderinc"
+#endif
+void vertex(){actor_world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;}
+void fragment(){
+	vec4 base=texture(atlas,UV);
+	ALBEDO=albedo_tint.rgb*base.rgb;
+	METALLIC=dot(texture(metal_map,UV),metal_channel)*native_metallic;
+	float rough=dot(texture(rough_map,UV),rough_channel);
+	ROUGHNESS=rough*native_roughness;
+	SPECULAR=native_specular;
+	if(recovered_roughness){
+		float decoded=rough<=0.04045?rough/12.92:pow((rough+0.055)/1.055,2.4);
+		ROUGHNESS=clamp(decoded*roughness_transform.x,roughness_transform.y,roughness_transform.z);
+	}
+	if(glow_enabled){
+		vec3 glow=texture(glow_map,UV).rgb;
+		EMISSION=(glow_add?glow_tint.rgb+glow:glow_tint.rgb*glow)*glow_energy;
+	}
+	if(recovered_self_light){
+		float facing=max(dot(normalize(NORMAL),normalize(VIEW))*self_light_scale,0.0);
+		EMISSION+=ALBEDO*facing*facing*facing;
+	}
+#ifdef GAF_PLAYER_CUTOUT
+	ALPHA*=albedo_tint.a*base.a;
+	ALPHA_SCISSOR_THRESHOLD=cutout;
+#endif
+#ifdef GAF_PLAYER_SKY
+	AO=actor_sky_visibility(actor_world,normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.0)).xyz));
+	AO_LIGHT_AFFECT=0.0;
+#endif
+#ifdef GAF_PLAYER_DIRECT
+	player_cloud=world_cloud_shade(actor_world);
+#endif
+}
