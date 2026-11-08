@@ -19,6 +19,8 @@ uniform float interaction_alpha=1.0;
 uniform float interaction_strength=1.0;
 uniform float field_extent=34.0;
 uniform float lighting_grade=1.0;
+// Optional map-cell constraint; legacy private meadow keeps its original path.
+uniform bool cell_limited_motion=false;
 varying float height_fraction;
 varying vec3 root_color;
 varying vec3 wrapped_normal_world;
@@ -44,6 +46,12 @@ void vertex(){
 	float vertical=h*sin(theta*u)/max(theta,0.000001)-h*u;
 	if(theta<0.0001){planar=0.5*h*theta*u*u;vertical=-h*theta*theta*u*u*u/6.0;}
 	vec3 world_offset=vec3(heading.x*planar,vertical,heading.y*planar);
+	if(cell_limited_motion){
+		world_offset*=INSTANCE_CUSTOM.a;
+		vec3 target=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz+world_offset;
+		target.xz=clamp(target.xz,INSTANCE_CUSTOM.gb-vec2(0.48),INSTANCE_CUSTOM.gb+vec2(0.48));
+		world_offset=target-(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
+	}
 	VERTEX+=(inverse(MODEL_MATRIX)*vec4(world_offset,0.0)).xyz;
 	if(tinted_grass)NORMAL=normalize(NORMAL*0.35+vec3(0.0,0.65,0.0));
 	wrapped_normal_world=normalize(MODEL_NORMAL_MATRIX*NORMAL);

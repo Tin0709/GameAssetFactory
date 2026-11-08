@@ -74,6 +74,13 @@ func setup_world_audio(world:Node3D)->void:
 	if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
 	environment_audio.setup(world,research)
 
+func setup_world_vegetation(world:Node3D)->Node3D:
+	if not primary_ready:return null
+	var script=load("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_plants.gd")
+	var plants:Node3D=script.new();plants.name="PrivateGrassFlowers"
+	world.add_child(plants);plants.setup_world(world)
+	return plants
+
 func cancel_jump()->void:
 	var at:=global_position
 	reset_actor();global_position=at;velocity=Vector3.ZERO

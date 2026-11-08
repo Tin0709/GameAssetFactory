@@ -12,6 +12,7 @@ var status:Label
 var hour:=12.
 var cycle_enabled:=false
 var audio_enabled:=false
+var plants:Node3D
 var palette:=PALETTE.new()
 var _day:Dictionary={}
 var _environment:Environment
@@ -42,6 +43,7 @@ func setup(world:Node3D)->void:
 	level.terrain_sky.set_enabled(false)
 	# Requested bare map: preserve the authored assets and placements for recovery.
 	level.set_grove_visible(false,level.player.global_position)
+	if level.player.has_method("setup_world_vegetation"):plants=level.player.setup_world_vegetation(level)
 	if level.look.local_exposure_available():
 		level.look.set_local_exposure(true)
 		level.look._exposure_effect.set_review_strength(LOCAL_EXPOSURE_STRENGTH)
@@ -50,7 +52,7 @@ func setup(world:Node3D)->void:
 	_capture_day()
 	_build_ui()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
-	level.get_node("HUD/Help").text="GRAPHICS COMPARISON\nF8 Day finish · F11 directional fill · Shift+F11 actor canopy fill\nF7 local exposure · Shift+F1 ground bounce · F1 soft shadows\nF2 canopy contact · Shift+F2 root soil · F3 direct cloud shading\nF9 leaf edges · Shift+F9 MSAA · F10 pose interpolation\nF12 optional terrain cache · G vegetation · Shift+G visit grove\nH fog · N wind · Shift+N passage · Alt+N crown wind"
+	level.get_node("HUD/Help").text="GRAPHICS COMPARISON\nF8 Day finish · F11 directional fill · Shift+F11 actor canopy fill\nF7 local exposure · Shift+F1 ground bounce · F1 soft shadows\nF2 canopy contact · Shift+F2 root soil · F3 direct cloud shading\nF9 leaf edges · Shift+F9 MSAA · F10 pose interpolation\nF12 optional terrain cache · G grass/flowers · L wind/interaction options\nH fog · N terrain wind · Shift+N passage · Alt+N crown wind"
 	DisplayServer.window_set_title("GameAssetFactory · Overworld Showcase · A&S / MD2 Sabre · L options")
 	print("WORLD_MAP_SHOWCASE_READY ",JSON.stringify({"primary_ready":unavailable_reason.is_empty(),"private_external":true,"hour":hour,"experimental_terrain_sky":false}))
 
@@ -163,6 +165,11 @@ func _build_ui()->void:
 	experimental.toggled.connect(func(value:bool):level.terrain_sky.set_enabled(value))
 	var audio:=CheckButton.new();audio.text="Enable test audio (default off)";audio.button_pressed=audio_enabled;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
 	audio.toggled.connect(set_audio_enabled)
+	if plants!=null:
+		for option:String in ["wind_enabled","interactions_enabled"]:
+			var toggle:=CheckButton.new();toggle.text="Grass wind" if option=="wind_enabled" else "Player grass / flower interaction"
+			toggle.button_pressed=true;toggle.focus_mode=Control.FOCUS_NONE;box.add_child(toggle)
+			toggle.toggled.connect(func(value:bool):plants.set(option,value))
 	panel.hide()
 	_hint=Label.new();_hint.name="ShowcaseHint";_hint.position=Vector2(18,18);_hint.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · L options"
@@ -171,6 +178,10 @@ func _build_ui()->void:
 
 func handle_key(event:InputEventKey)->bool:
 	if not private_primary:return false
+	if event.physical_keycode==KEY_G and plants!=null:
+		plants.visible=not plants.visible
+		if not plants.visible:plants.reset()
+		return true
 	if event.physical_keycode==KEY_L:
 		_debug=not _debug;panel.visible=_debug;_hint.visible=not _debug
 		return true
