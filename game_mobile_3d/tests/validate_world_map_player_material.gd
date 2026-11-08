@@ -9,12 +9,18 @@ func run()->void:
 	var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w)
 	await create_timer(.5).timeout
 	var look=w.look
+	check(look.player_material_review=="combined","User-approved combined player lighting is the startup default")
 	check(look.has_method("set_player_material_review"),"Independent player material controls exist")
 	var adapters:=0
 	for m in look._direct_actor_materials:
 		if m!=null:adapters+=1
 	var native:bool=RenderingServer.get_current_rendering_method()=="mobile" and RenderingServer.get_rendering_device()!=null
 	if native:check(adapters==3,"Body, face and Sabre preserve rich PBR through adapters")
+	if native:
+		var recovered_at_start:=0
+		for m in look._direct_actor_materials:
+			if m!=null and m.get_shader_parameter("recovered_roughness") and m.get_shader_parameter("recovered_self_light"):recovered_at_start+=1
+		check(recovered_at_start==2,"Approved startup applies both recovered terms to the two verified skin surfaces")
 	if look.has_method("set_player_material_review"):
 		var row0=look.actor_materials[0]
 		for flag:int in [BaseMaterial3D.FLAG_DISABLE_DEPTH_TEST,BaseMaterial3D.FLAG_UV1_USE_TRIPLANAR,BaseMaterial3D.FLAG_EMISSION_ON_UV2]:

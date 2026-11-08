@@ -280,9 +280,13 @@ approval or production eligibility is claimed. Next: review the unified F5
 experience, then profile devices and target specific remaining visual gaps.
 # Player material comparisons — 2026-11-08
 
+**User approval follow-up:** Combined is now the persistent player default,
+including clouds and the two validated Day skin terms. Original/neutral and every
+independent comparison remain available. Night/source/renderer guards are unchanged.
+
 F5 still opens the existing WorldMap. **L → PLAYER MATERIAL** selects Original,
-Neutral, Cloud only (default), recovered Valorie Roughness only, recovered
-view-facing Self-light only, or Combined. Original restores actual previous
+Neutral, Cloud only, recovered Valorie Roughness only, recovered
+view-facing Self-light only, or Combined (approved default). Original restores actual previous
 surface overrides; B remains the whole-map baseline. F3 also gates player direct
 cloud shading. The scrollable options panel fits 720p. Audio remains OFF.
 
@@ -297,11 +301,11 @@ GAF actor keeps its previous path. No rig, motion, grass or environment asset ch
 Recovered parameters are loaded from a hash-validated **external** PIX buffer;
 Valorie identification checks atlas and ORM pixels/channels, not duplicate names.
 The Day roughness transform and cubic N·V self-light are independently authored
-equivalents of recovered operations. They default OFF, suspend outside verified
+equivalents of recovered operations. They now default ON after user approval, suspend outside verified
 Day/source conditions, and never apply to Sabre. Source emission is retained;
 this is not a complete native emissive/SSS/indirect-light reconstruction.
 
-Validation: 61 native Mobile material/state checks, 11 headless fallback checks
+Validation: 63 native Mobile material/state checks, 12 headless fallback checks
 and 29 legacy actor-fill checks; existing primary-showcase,
 grass lighting and wind checks pass. Locked original↔neutral and restore images
 have **0 changed pixels**; no-sun cloud comparison also has 0. The custom direct
@@ -317,3 +321,13 @@ Desktop ABBA viewport samples showed 133 draws in every mode and approximately
 0.361–0.364ms GPU on RTX4070TiSUPER/Mobile D3D12. These are shared-workstation
 observations, not isolated causal cost or handset performance certification.
 Human artistic review and phone measurements remain pending.
+
+## Terrain investigation follow-up
+
+The approved player now defaults to Combined. Terrain remains unchanged while
+private material/light A/B studies at three existing map views investigate PBR
+input preservation and position-dependent colored indirect lighting. See private
+`player_light_audit_v001/adapter_v001` for the prior adapter checkpoint and
+`terrain_light_audit_v001/README.md` beside it for new source-backed findings,
+math counterfactuals, cutaway-aware screenshots and exact restore checks.
+No new capture, extraction or production terrain feature is introduced.

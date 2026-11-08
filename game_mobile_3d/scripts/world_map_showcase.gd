@@ -172,7 +172,7 @@ func _build_ui()->void:
 	var player_title:=Label.new();player_title.text="PLAYER MATERIAL · independent comparisons";box.add_child(player_title)
 	var material_modes:=["original","neutral","cloud","roughness","self_light","combined"]
 	var material_picker:=OptionButton.new();material_picker.name="PlayerMaterialComparison";material_picker.focus_mode=Control.FOCUS_NONE
-	for label:String in ["Original materials (previous player)","Neutral adapter · no new effects","Cloud shading only (default)","Recovered Valorie roughness only","Recovered view self-light only","Combined · all three"]:material_picker.add_item(label)
+	for label:String in ["Original materials (previous player)","Neutral adapter · no new effects","Cloud shading only","Recovered Valorie roughness only","Recovered view self-light only","Combined · approved default"]:material_picker.add_item(label)
 	material_picker.select(material_modes.find(level.look.player_material_review));box.add_child(material_picker)
 	material_picker.item_selected.connect(func(index:int):level.look.set_player_material_review(material_modes[index]))
 	_player_material_note=Label.new();_player_material_note.text="Same scene light / pose. Skin recovery: Day only.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(_player_material_note)
