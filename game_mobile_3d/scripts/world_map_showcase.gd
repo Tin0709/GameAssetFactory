@@ -103,7 +103,7 @@ func _process(delta:float)->void:
 	_elapsed+=delta
 	if cycle_enabled and level.look.stage==2:hour=fposmod(hour+delta*.08,24.)
 	apply_time()
-	if _hint!=null and unavailable_reason.is_empty():_hint.visible=_elapsed<12.
+	if _hint!=null and unavailable_reason.is_empty():_hint.visible=_elapsed<12. and not panel.visible
 	if status!=null and panel.visible:
 		_cycle_button.set_pressed_no_signal(cycle_enabled)
 		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
