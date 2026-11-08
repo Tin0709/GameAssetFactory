@@ -33,6 +33,12 @@ func run()->void:
 	w.showcase.set_hour(12.)
 	await process_frame
 	check(w.get_node("Sun").rotation.distance_to(sun)<.00001,"Noon restores exact sun")
+	w.set_review_view("overview")
+	var overview_env:Environment=w.get_node("WorldEnvironment").environment
+	var overview_fog:float=overview_env.fog_density
+	w.showcase.set_hour(22.);w.showcase.set_hour(12.)
+	check(is_equal_approx(overview_env.fog_density,overview_fog),"Night-Day restores current overview atmosphere")
+	w.set_review_view("gameplay")
 	w.showcase.compare_baseline()
 	check(w.look.stage==0,"Comparison restores baseline")
 	w.showcase.compare_baseline()
