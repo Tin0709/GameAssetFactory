@@ -1,5 +1,6 @@
 shader_type spatial;
 render_mode cull_disabled, diffuse_burley, specular_disabled;
+#include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_splay.gdshaderinc"
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/grass_normal_v001/world_normal.gdshaderinc"
@@ -25,6 +26,7 @@ uniform float field_extent=34.0;
 uniform float lighting_grade=1.0;
 // Optional map-cell constraint; legacy private meadow keeps its original path.
 uniform bool cell_limited_motion=false;
+uniform bool splayed_rest_motion=false;
 uniform bool ground_mask_enabled=false;
 uniform sampler2D ground_coverage_map : filter_nearest, repeat_disable;
 uniform vec2 ground_coverage_origin=vec2(0.0);
@@ -55,6 +57,9 @@ void vertex(){
 	float vertical=h*sin(theta*u)/max(theta,0.000001)-h*u;
 	if(theta<0.0001){planar=0.5*h*theta*u*u;vertical=-h*theta*theta*u*u*u/6.0;}
 	vec3 world_offset=vec3(heading.x*planar,vertical,heading.y*planar);
+	if(splayed_rest_motion){
+		world_offset=gaf_grass_rest_arc(normalize(MODEL_NORMAL_MATRIX*NORMAL),heading,planar,vertical);
+	}
 	if(cell_limited_motion){
 		world_offset*=INSTANCE_CUSTOM.a;
 		vec3 target=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz+world_offset;

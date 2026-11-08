@@ -227,6 +227,7 @@ func _prepare_materials()->void:
 		material.set_shader_parameter("field_extent",interaction.extent)
 		material.set_shader_parameter("ground_atlas",bundle.textures[ground.texture]);material.set_shader_parameter("ground_uv",uv)
 		material.set_shader_parameter("cell_limited_motion",not dense_grass_review)
+		material.set_shader_parameter("splayed_rest_motion",grass_splay_active())
 		material.set_shader_parameter("ground_mask_enabled",dense_grass_review)
 		material.set_shader_parameter("ground_coverage_map",world.look.path_map)
 		material.set_shader_parameter("ground_coverage_origin",world.look.path_map_origin)
