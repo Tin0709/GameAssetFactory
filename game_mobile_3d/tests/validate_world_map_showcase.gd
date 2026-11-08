@@ -22,6 +22,9 @@ func run()->void:
 	if RenderingServer.get_rendering_device()!=null:check(w.look.day_finish_active(),"Combined Day finish default on Mobile")
 	check(not w.terrain_sky.enabled,"Unfinished terrain cache optional")
 	w.reset_player();check(w.player.position.distance_to(w.spawn_position)<.001,"Reset preserves authored spawn")
+	w.player.effects.sample(.01,true,Vector3.ZERO,Vector3.UP,123)
+	check(not w.player.effects.samples.is_empty(),"Reset test contains trail history")
+	w.reset_player();check(w.player.effects.samples.is_empty(),"Reset clears prior blade trail")
 	var sun:Vector3=w.get_node("Sun").rotation
 	w.showcase.set_hour(22.)
 	await process_frame

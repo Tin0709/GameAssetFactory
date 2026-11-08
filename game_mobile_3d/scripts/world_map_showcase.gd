@@ -107,7 +107,7 @@ func _process(delta:float)->void:
 	if status!=null and panel.visible:
 		_cycle_button.set_pressed_no_signal(cycle_enabled)
 		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
-		var msaa:=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
+		var msaa:String=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
 		status.text="%s · %02d:%02d · %s\n%d FPS · %s · MSAA %s\nPrivate reference player; not for distribution"%["Combined" if level.look.stage==2 else "Original graphics",int(hour),int(fmod(hour,1.)*60.),"Cycle" if cycle_enabled else "Paused",Engine.get_frames_per_second(),RenderingServer.get_current_rendering_method(),msaa]
 
 func _build_ui()->void:
