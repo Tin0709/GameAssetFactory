@@ -14,6 +14,7 @@ var _groups:Dictionary={}
 var _flower_centers:Array[Dictionary]=[]
 var _cluster:=FastNoiseLite.new()
 var _detail:=FastNoiseLite.new()
+var _native_wind_intensities:Dictionary={}
 
 func setup_world(level:Node3D)->void:
 	world=level;player=level.player;process_physics_priority=4;process_priority=1
@@ -22,6 +23,8 @@ func setup_world(level:Node3D)->void:
 	if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
 	if bundle.read(research.path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")).is_empty():
 		error=bundle.error;push_warning(error);set_physics_process(false);set_process(false);return
+	for material:ShaderMaterial in bundle.materials:
+		_native_wind_intensities[material.get_instance_id()]=float(material.get_shader_parameter("wind_intensity"))
 	interaction=Spring.new(104.)
 	interaction.surface_height_provider=world.surface_height
 	_rng.seed=110826
@@ -183,7 +186,7 @@ func _prepare_materials()->void:
 	var ground:Dictionary=bundle.data.materials["OW MD2 | MI_MasterTerrain_Opaque_Overworld"]
 	var uv:=_grass_top_uv()
 	for material:ShaderMaterial in materials:
-		_wind_intensities.append(float(material.get_shader_parameter("wind_intensity")))
+		_wind_intensities.append(float(_native_wind_intensities.get(material.get_instance_id(),bundle.data.motion.intensity)))
 		material.set_shader_parameter("interaction_field",interaction.texture)
 		material.set_shader_parameter("interaction_previous",interaction.previous_texture)
 		material.set_shader_parameter("field_extent",interaction.extent)
