@@ -55,6 +55,8 @@ var saved_shadow_quality:=1
 var filtered_textures: Dictionary={}
 var path_map: ImageTexture
 var path_map_image: Image
+var _planted_path_map_image: Image
+var _path_map_vegetation_visible:=true
 var path_map_origin:=Vector2.ZERO
 var path_map_size:=Vector2.ZERO
 var path_edge_cells:=0
@@ -222,7 +224,22 @@ func build_path_map() -> void:
 		if mask!=0:path_edge_cells+=1
 		path_map_image.set_pixel(key.x-bounds.min[0],key.y-bounds.min[2],Color(mask,value.y,value.x,float(plant_contacts.get(key,1))))
 	_stamp_oak_root_sites()
+	_planted_path_map_image=path_map_image.duplicate()
 	path_map=ImageTexture.create_from_image(path_map_image)
+
+func refresh_vegetation_ground_detail() -> void:
+	var enabled:bool=level.get("vegetation_visible")!=false
+	if enabled==_path_map_vegetation_visible:return
+	_path_map_vegetation_visible=enabled
+	path_map_image=_planted_path_map_image.duplicate()
+	if not enabled:
+		for y in path_map_image.get_height():
+			for x in path_map_image.get_width():
+				var data:=path_map_image.get_pixel(x,y)
+				data.a=minf(data.a,1.) # Preserve terrain coverage, remove plant roots.
+				data.r=float(int(round(data.r))&255) # Keep path edges, remove oak IDs.
+				path_map_image.set_pixel(x,y,data)
+	path_map.update(path_map_image)
 
 func _stamp_oak_root_sites() -> void:
 	_oak_root_sites.resize(16)

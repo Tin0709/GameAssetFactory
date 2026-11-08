@@ -470,6 +470,10 @@ func _physics_process(delta:float)->void:
 	move_and_slide()
 	if measured_air_step and not is_on_floor() and not is_on_ceiling():velocity.y=measured_end_velocity
 	_grounded=is_on_floor() and velocity.y<=0.
+	# Spawn/reset may begin a few millimetres above support. Its first contact
+	# intentionally skips Landing, but must also retire that initial air state.
+	if _grounded and not _floor_initialized and _jump_stage=="JumpAirborne":
+		_jump_stage="";_jump_time=0.
 	if taking_step:
 		_step_distance+=Vector2(global_position.x-before_move.x,global_position.z-before_move.z).length();_step_elapsed+=delta
 		_step_ready=_step_distance>=COMBAT_STEP_DISTANCE or _step_elapsed>=COMBAT_STEP_TIMEOUT-.0000001

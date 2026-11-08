@@ -273,6 +273,7 @@ func set_grove_visible(enabled: bool, at: Vector3) -> bool:
 		grove.update_focus($Camera3D, player.global_position, view_mode == "gameplay")
 		if look != null: look.refresh_grove_lighting()
 	if look != null:
+		look.refresh_vegetation_ground_detail()
 		look.refresh_canopy_contact()
 		look.refresh_oak_root_beds()
 	return true

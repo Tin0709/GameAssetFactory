@@ -11,6 +11,7 @@ var panel:PanelContainer
 var status:Label
 var hour:=12.
 var cycle_enabled:=false
+var audio_enabled:=false
 var palette:=PALETTE.new()
 var _day:Dictionary={}
 var _environment:Environment
@@ -45,6 +46,7 @@ func setup(world:Node3D)->void:
 		level.look.set_local_exposure(true)
 		level.look._exposure_effect.set_review_strength(LOCAL_EXPOSURE_STRENGTH)
 	if level.player.has_method("setup_world_audio"):level.player.setup_world_audio(level)
+	set_audio_enabled(false)
 	_capture_day()
 	_build_ui()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
@@ -61,6 +63,15 @@ func _capture_day()->void:
 	_time_applied=false
 
 func is_day_anchor()->bool:return is_equal_approx(hour,12.)
+
+func set_audio_enabled(value:bool)->void:
+	audio_enabled=value
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"),not value)
+	var actor=level.player
+	if actor.get("reference_audio")!=null:actor.reference_audio.enabled=value
+	if actor.get("environment_audio")!=null and actor.environment_audio.audio!=null:
+		actor.environment_audio.audio.ambient_enabled=value
+		actor.environment_audio.audio.footsteps_enabled=value;actor.environment_audio.audio.rustle_enabled=value
 
 func _restore_day()->void:
 	if not _time_applied or _day.is_empty():return
@@ -150,13 +161,8 @@ func _build_ui()->void:
 		if level.look._exposure_effect!=null:level.look._exposure_effect.set_review_strength(LOCAL_EXPOSURE_STRENGTH))
 	var experimental:=CheckButton.new();experimental.text="Optional unfinished terrain sky cache (F12)";experimental.focus_mode=Control.FOCUS_NONE;box.add_child(experimental)
 	experimental.toggled.connect(func(value:bool):level.terrain_sky.set_enabled(value))
-	var audio:=CheckButton.new();audio.text="Environment + footsteps + Sabre audio";audio.button_pressed=true;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
-	audio.toggled.connect(func(value:bool):
-		var actor=level.player
-		if actor.get("reference_audio")!=null:actor.reference_audio.enabled=value
-		if actor.get("environment_audio")!=null and actor.environment_audio.audio!=null:
-			actor.environment_audio.audio.ambient_enabled=value
-			actor.environment_audio.audio.footsteps_enabled=value;actor.environment_audio.audio.rustle_enabled=value)
+	var audio:=CheckButton.new();audio.text="Enable test audio (default off)";audio.button_pressed=audio_enabled;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
+	audio.toggled.connect(set_audio_enabled)
 	panel.hide()
 	_hint=Label.new();_hint.name="ShowcaseHint";_hint.position=Vector2(18,18);_hint.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · L options"
