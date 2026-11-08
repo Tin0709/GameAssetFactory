@@ -1,5 +1,35 @@
 # Unified playable Overworld showcase
 
+**2026-11-08 — Outward grass spread:** existing private capture draw913 confirms
+non-upright placement before WPO, although the source cards themselves are vertical.
+102 reconstructed input inclinations span0.274–56.958deg, median32.884deg;
+instance57 uses the native-trace-confirmed identity and measures10.746deg.
+Other instances are decoded captured inputs, not individually debugger-verified.
+External hash-validated angles now pitch the existing four-card patches radially.
+This radial composition is an original adapter, not the recovered native
+population/placement algorithm. Source cards/UVs remain untouched and unscaled.
+
+L → **Grass spread · captured inclinations** restores exact prior upright
+patches. Missing/changed private profile falls back upright. Prior grass/flower
+profile is unaffected. The 8,418 cell roots, paths, density, lighting, camera,
+character and mute remain. Pitched source normals are nearly UP before placement;
+their tiny source deviations are retained. Motion uses those normals as the rest
+direction: the existing arc delta is projected into the pitched rest frame,
+avoiding the stretching caused by adding an upright arc to a tilted stem.
+This remains an original wind/contact adapter, not native Niagara equivalence.
+
+Validation: source mesh hashes and bundle unchanged; static card edge error
+<0.00000024m, inclination error<0.00000018rad; support/contact bounds pass.
+Actual GPU shared-helper test4,896cases preserves theoretical arc chord length
+within0.00000057m and keeps tips above ground. That test verifies the independent
+helper, not complete native wind equivalence. Same-camera upright restoration is
+pixel-identical; actual player force remains1.0227. Native Mobile shows spread,
+wind/contact and lighting together. Same close view93draws both modes; ordinary
+view127→128 from changed culling bounds, with unchanged96batches/card counts.
+No added texture lookup/render pass; small vertex projection cost and alpha
+overdraw still require phone profiling. Private evidence/scripts/images:
+`MD2 Research/godot_lab/world_map_unified_showcase_v001/grass_splay_v001/`.
+
 **2026-11-08 — Grass light response:** default private Mobile WorldMap now uses
 the hash-validated captured Day grass normal weight1, applied after interpolation
 in world space. Source evidence: private `godot_lab/grass_normal_response_v001/`
