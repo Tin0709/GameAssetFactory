@@ -1,7 +1,7 @@
 extends "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/meadow.gd"
 ## Private reference planting on the EXISTING authored terrain, not another map.
 const READER=preload("private_bundle.gd")
-const GRASSES:=["MD2 | SM_CA1_ShortGrass","MD2 | SM_CA1_MedGrass2","MD2 | SM_GrassMedium_02","MD2 | SM_GrassShort_01"]
+const GRASSES:=["MD2 | SM_GrassShort_01","MD2 | SM_GrassShort_02","MD2 | SM_GrassMedium_02","MD2 | SM_GrassMedium_03"]
 const FLOWERS:={"pink":"MD2 | SM_CA1_TulipPink","yellow":"MD2 | SM_Dandelion_A","white":"MD2 | SM_Daisy_A","purple":"MD2 | SM_TPT_Purpleflower_S"}
 const TILE:=32.
 var world:Node3D
@@ -68,7 +68,9 @@ func _build_cell_planting()->void:
 		var flower:=distance<1. and _rng.randf()<(.82 if distance<.7 else .5)
 		if not flower and not carpet and not clump:continue
 		if not flower and _rng.randf()>(.93 if carpet else .72):continue
-		var asset:String=FLOWERS[color] if flower else GRASSES[_rng.randi()%GRASSES.size()]
+		# Coherent short/medium families per patch, rather than mixed-color noise.
+		var grass_index: int=(0 if detail<.5 else 1)+(2 if mass>.55 else 0)
+		var asset:String=FLOWERS[color] if flower else GRASSES[grass_index]
 		_add_cell(asset,cell,position, color if flower else "",carpet)
 
 func _add_cell(asset:String,cell:Vector2i,position:Vector3,color:String,carpet:bool)->void:

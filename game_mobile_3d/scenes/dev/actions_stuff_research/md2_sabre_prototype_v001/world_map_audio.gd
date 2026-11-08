@@ -5,7 +5,10 @@ const AUDIO=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_
 var level:Node3D
 var audio:Node3D
 var interactions_enabled:bool:
-	get:return level.look.stage!=0
+	get:
+		var planting=level.showcase.get("plants")
+		if planting!=null:return planting.visible and planting.interactions_enabled
+		return level.look.stage!=0
 var _plants:Dictionary={}
 var error:=""
 
@@ -41,5 +44,7 @@ func surface_at(point:Vector3)->String:
 	return "grass"
 
 func has_foliage(point:Vector3)->bool:
+	var planting=level.showcase.get("plants")
+	if planting!=null:return planting.visible and planting.has_foliage(point)
 	if level.grove!=null and not level.grove.visible:return false
 	return _plants.has(Vector2i(floori(point.x),floori(point.z)))
