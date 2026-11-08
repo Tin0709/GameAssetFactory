@@ -71,10 +71,15 @@ bạn mở Blender với add-on MCP như trước. Đóng app sẽ dừng theo d
 MCP đã được yêu cầu khởi động tiếp tục chạy để các client khác còn dùng được.
 Không có đăng ký Startup/Task Scheduler cho tính năng này.
 
-Ba nút mở nhanh trong cùng khu vực Blender (tự xuống hàng khi cửa sổ hẹp):
+Các nút mở nhanh trong cùng khu vực Blender (tự xuống hàng khi cửa sổ hẹp):
 
 - **Mở Animation MD2:** mở `MD2_Animation_Library_BrowserFixed.blend` và nạp
   `scripts/md2_blender_library.py`.
+- **Mở Cỏ MD2:** mở file private
+  `graphics_vfx/depth/environment/MD2_Environment_Depth_Reference.blend` bằng
+  `overworld/open_grass_review.py`, chọn sẵn scene **OW 02 | Grass asset library**
+  và bộ lọc Grass (12 mẫu). Bootstrap review không lưu đè file Blender gốc.
+  **Copy path** cạnh nút copy đường dẫn file `.blend`; assets vẫn ở MD2 Research.
 - **Mở Valorie + Sabre:** mở `MD2_Valorie_Sabre_Source_Showcase.blend` và nạp
   `source_preview_ui.py`.
 - **Mở Animation Showcase:** mở `blender/animation/showcase/Animation_Showcase.blend`

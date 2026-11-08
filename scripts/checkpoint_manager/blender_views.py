@@ -4,7 +4,7 @@ from pathlib import Path
 import subprocess
 
 
-VIEW_LABELS = {'animation': 'Animation MD2', 'sabre': 'Valorie + Sabre', 'showcase': 'Animation Showcase',
+VIEW_LABELS = {'animation': 'Animation MD2', 'sabre': 'Valorie + Sabre', 'grass': 'Cỏ MD2', 'showcase': 'Animation Showcase',
                'actions_stuff': 'Actions & Stuff', 'tacz': 'TaCZ · Gun Animations'}
 
 
@@ -19,6 +19,8 @@ class BlenderViewLauncher:
                           self.research_root / 'scripts/md2_blender_library.py'),
             'sabre': (self.research_root / 'blender/prototype_sabre/MD2_Valorie_Sabre_Source_Showcase.blend',
                       self.research_root / 'blender/prototype_sabre/source_preview_ui.py'),
+            'grass': (self.research_root / 'graphics_vfx/depth/environment/MD2_Environment_Depth_Reference.blend',
+                      self.research_root / 'graphics_vfx/depth/environment/overworld/open_grass_review.py'),
             'showcase': (self.project_root / 'blender/animation/showcase/Animation_Showcase.blend',
                          self.project_root / 'scripts/load_showcase_ui.py'),
             'actions_stuff': (self.project_root.parent / 'ACT-Research/blender/Actions_Stuff_Animation_Library.blend',
