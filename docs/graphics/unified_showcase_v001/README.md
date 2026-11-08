@@ -1,5 +1,35 @@
 # Unified playable Overworld showcase
 
+**Current planting — grass and flowers only:** WorldMap now displays4,642 private
+MD2 reference instances:3,821 grass assets and821 flowers (pink256, yellow184,
+white210, purple171). There are3,460 carpet-grass cells plus smaller clumps and
+flower pockets. One asset per integer XZ block, on supported grass terrain only;
+the dirt paths and spawn clearance stay open. Original meshes/textures load from
+the existing Research bundle, without extraction or copied assets in res://.
+
+The original placement adapter fits/recenters each mesh inside its cell with
+bounded jitter, rotation and scale. Animated tips also stay within that cell's
+0.48m half-extent. Rendering uses105 spatial MultiMesh batches,8 species and a
+shared interaction field. G now toggles ONLY these grass/flower batches; L offers
+independent wind/contact toggles. Trees, old schematic vegetation, brown root
+speckles and default audio remain off. Existing player, camera and graphics stay.
+
+Motion reuses the private lab's wind/grass/flower deformation and underdamped
+recovery, with an optional receiver-height callback for this stepped map. Plants
+on a3m higher cliff do not receive a player's lower-level contact. Existing field
+memory recovers instead of being masked off instantly. This is an original
+terrain/placement adapter; source wind parameters are evidence-backed but complete
+native Niagara/Jump physics equivalence is NOT claimed.
+
+Validation: actual map cell uniqueness, transformed mesh bounds, support heights,
+four flower colors, distinct UI controls, grounded Idle/mute and cliff contact
+pass. Legacy flat-field29 checks and the complete showcase contract pass. Native
+Mobile/D3D12 shows wind and force-driven motion, recovery without teleport reset,
+and active contact during actual movement. Same-camera bare/planted and motion
+images plus numeric results are private in
+`MD2 Research/godot_lab/world_map_unified_showcase_v001/grass_flowers_cells_v001/`.
+Desktop capped timing is not a handset performance certification.
+
 **Latest test defaults:** all project test audio starts muted via the default
 Master bus. L can explicitly enable it for a review. Hidden vegetation now also
 removes its root-soil/contact flags and oak IDs from the live ground field while
