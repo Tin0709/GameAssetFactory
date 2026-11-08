@@ -36,7 +36,7 @@ func make_player()->Node3D:
 func setup(world:Node3D)->void:
 	level=world;process_priority=-10
 	if not private_primary:return
-	if level.player.get("primary_ready")!=true:
+	if level.player.get("primary_ready")!=true and unavailable_reason.is_empty():
 		unavailable_reason="Private A&S/MD2 + Sabre data missing. Set MD2_RESEARCH_ROOT to the private research folder and restart."
 	level.terrain_sky.set_enabled(false)
 	if level.look.local_exposure_available():
