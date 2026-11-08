@@ -2,6 +2,10 @@
 
 The user said the current appearance is beautiful enough and requested wrap-up. Stop graphics research and implementation here. Resume only on a new explicit request. Preserve all prior work; no new experiment was promoted during wrap-up. This is acceptance of the current visual stopping point, not a claim that every MD2 algorithm, native timing or mobile release requirement has been recovered.
 
+## Small authorized follow-up: gentler midday
+
+After wrap-up the user requested softer Day/noon lighting. Main WorldMap now defaults to `gentle_noon=true` in `world_map_showcase.gd`: direct sunlight ×0.82 at12h, smooth envelope returning to unchanged7h/16.5h; night/ambient/source profiles unchanged. L → **Light · gentle midday sunlight** restores the previous result. This is an original artistic adjustment, not an MD2 source value. Actual Mobile/D3D12 main-scene checks and existing showcase/Forest atmosphere regressions pass; locked HDR OFF restoration is exact0. No new GPU pass/resource. Private evidence: `godot_lab/world_map_unified_showcase_v001/soft_noon_v001/`. Broad research remains stopped. F8/F5 reloads the updated default.
+
 ## Open the correct result
 
 Project: `C:/Users/ADMIN/Desktop/Dev/GameAssetFactory/game_mobile_3d/project.godot`.

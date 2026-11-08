@@ -5,6 +5,8 @@ const PRIVATE_ADAPTER="res://scenes/dev/actions_stuff_research/md2_sabre_prototy
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
+# User-directed art adjustment; recovered Forest profiles stay untouched.
+const GENTLE_NOON_DIRECT_SCALE:=.82
 var level:Node3D
 var private_primary:=true
 var unavailable_reason:=""
@@ -31,6 +33,7 @@ var phase_air=preload("res://scripts/world_map_phase_air.gd").new()
 var measured_atmosphere:=true
 var coupled_bloom:=true
 var coherent_bloom:=true
+var gentle_noon:=true
 var grade_review:Node
 var hdr_air:=true
 var _hdr_owned:=false
@@ -132,6 +135,20 @@ func set_spatial_mist(value:bool)->void:
 func set_measured_atmosphere(value:bool)->void:
 	measured_atmosphere=value
 	_restore_day();apply_time();_update_mist()
+
+static func noon_direct_scale(time:float)->float:
+	if not is_finite(time):return 1.
+	var h:=fposmod(time,24.)
+	var weight:=smoothstep(7.,12.,h) if h<=12. else 1.-smoothstep(12.,16.5,h)
+	return lerpf(1.,GENTLE_NOON_DIRECT_SCALE,weight)
+
+func set_gentle_noon(value:bool)->void:
+	gentle_noon=value
+	if level==null or level.look==null or level.look.stage!=2:return
+	_restore_day();apply_time()
+	if level.terrain_light!=null:level.terrain_light.bind(true)
+	if level.player_light!=null:level.player_light.refresh(true)
+	level.look._refresh_ground_bounce();_update_mist()
 
 func set_coupled_bloom(value:bool)->void:
 	coupled_bloom=value
@@ -260,6 +277,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		var key:=sun.light_color.srgb_to_linear();var rgb:Vector3=Vector3(key.r,key.g,key.b)*p.key_color_scale
 		var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
 		sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb();sun.light_energy*=p.key_scale*peak
+		if gentle_noon:sun.light_energy*=noon_direct_scale(hour)
 		if _player_light!=null:
 			var warm:Vector3=p.player_light_color
 			_player_light.light_color=Color(warm.x,warm.y,warm.z);_player_light.light_energy=p.player_light_weight
@@ -382,6 +400,9 @@ func _build_ui()->void:
 	var modes=["previous","haze","lighting","combined"];atmosphere.select(modes.find(atmosphere_review));box.add_child(atmosphere)
 	atmosphere.item_selected.connect(func(index:int):set_atmosphere_review(modes[index]))
 	atmosphere.tooltip_text="Forest A1 Day: read live in MD2. Other phases: recovered presets. Fog, bloom and light transfer are original Mobile approximations."
+	var gentle:=CheckButton.new();gentle.name="GentleNoon";gentle.text="Light · gentle midday sunlight";gentle.button_pressed=gentle_noon;gentle.focus_mode=Control.FOCUS_NONE;box.add_child(gentle)
+	gentle.tooltip_text="18% less direct sunlight at noon, smoothly returning to the previous morning/evening lighting. Ambient and source presets unchanged. OFF compares the previous result."
+	gentle.toggled.connect(set_gentle_noon)
 	var volume:=CheckButton.new();volume.text="Spatial mist · world height / patches";volume.button_pressed=spatial_mist;volume.focus_mode=Control.FOCUS_NONE;box.add_child(volume)
 	volume.toggled.connect(set_spatial_mist)
 	var measured:=CheckButton.new();measured.text="Air · measured night / dawn / day";measured.button_pressed=measured_atmosphere;measured.focus_mode=Control.FOCUS_NONE;box.add_child(measured);measured.toggled.connect(set_measured_atmosphere)
