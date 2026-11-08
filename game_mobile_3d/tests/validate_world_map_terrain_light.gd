@@ -13,6 +13,16 @@ func run()->void:
 	if not w.look.has_method("set_terrain_review") or w.get("terrain_light")==null:
 		w.free();print("TERRAIN_LIGHT checks=",checks," failures=",JSON.stringify(failures));quit(1);return
 	var native:bool=RenderingServer.get_current_rendering_method()=="mobile" and RenderingServer.get_rendering_device()!=null
+	var exporter=load("res://tools/export_world_map_terrain_light.gd")
+	for chunk:Node3D in w.geometry.terrain_chunks:
+		check(exporter.original_chunk_transform(chunk,w.geometry.CHUNK_SIZE),"Authoring accepts original translated chunks")
+	var probe_chunk:=Node3D.new();probe_chunk.name="Terrain_-2_3";root.add_child(probe_chunk)
+	probe_chunk.position=Vector3(-20,0,30)
+	check(exporter.original_chunk_transform(probe_chunk,10),"Negative grid coordinates accepted")
+	probe_chunk.position.x+=.25
+	check(not exporter.original_chunk_transform(probe_chunk,10),"Moved authoring chunk rejected")
+	probe_chunk.position.x-=.25;probe_chunk.rotation.y=.1
+	check(not exporter.original_chunk_transform(probe_chunk,10),"Rotated authoring chunk rejected");probe_chunk.free()
 	w.look.set_terrain_review("combined")
 	check(w.terrain_light.is_active()==native,"Only supported Day configuration applies local lighting")
 	for row in w.look.terrain_materials:

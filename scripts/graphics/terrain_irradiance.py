@@ -60,14 +60,43 @@ def sphere(count):
     return np.column_stack([np.cos(angle)*r,y,np.sin(angle)*r])
 
 
+def receiver_origins(scene,points,epsilon=.01):
+    """Approach an exposed face from empty space, including concave endpoints.
+
+    A normal epsilon alone can enter the perpendicular wall meeting a vertex.
+    Retain valid origins exactly; otherwise choose the nearest legal tangential
+    offset within a 1cm square. This changes integration origins, never geometry.
+    """
+    p=np.asarray(points,float);normal=p[:,3:]
+    origin=p[:,:3]+normal*epsilon
+    def occupied(q):
+        cell=np.floor((q-scene.offset)*scene.scale).astype(int)
+        within=np.all((cell>=scene.low)&(cell<scene.high),axis=1)
+        result=np.zeros(len(cell),bool)
+        result[within]=scene.grid[tuple((cell[within]-scene.low).T)]>=0
+        return result
+    pending=occupied(origin)
+    if not np.any(pending):return origin
+    axis=np.eye(3)[abs(normal).argmin(1)]
+    tangent=np.cross(normal,axis);tangent/=np.linalg.norm(tangent,axis=1)[:,None]
+    other=np.cross(normal,tangent)
+    for a,b in [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]:
+        candidate=p[:,:3]+normal*epsilon+(a*tangent+b*other)*epsilon
+        accept=pending&~occupied(candidate)
+        origin[accept]=candidate[accept];pending[accept]=False
+        if not np.any(pending):return origin
+    raise ValueError('Receiver has no exposed origin in its tangential neighbourhood')
+
+
 def integrate(scene,points,rays,sun_direction,sky_mean):
     points=np.asarray(points,float);dirs=sphere(rays);mean=np.asarray(sky_mean,float)
     sun=np.asarray(sun_direction,float);sun=sun/np.linalg.norm(sun)
     if points.ndim!=2 or points.shape[1]!=6 or not np.isfinite(points).all() or not np.allclose(np.linalg.norm(points[:,3:],axis=1),1,atol=1e-4):raise ValueError('Finite unit-normal receivers required')
     sky_radiance=mean*(1+dirs[:,1,None]*np.array([.15,.25,.45])+.18*(dirs[:,0,None]*.616-dirs[:,2,None]*.788))
+    origins=receiver_origins(scene,points)
     sky_out=[];sun_out=[];vis_out=[]
     for start in range(0,len(points),128):
-        p=points[start:start+128];n=len(p);origin=np.repeat(p[:,:3]+p[:,3:]*.01,rays,axis=0)
+        p=points[start:start+128];n=len(p);origin=np.repeat(origins[start:start+128],rays,axis=0)
         hit,normal=scene.trace(origin,np.tile(dirs,(n,1)));mask=hit>=0
         weight=np.maximum(p[:,3:]@dirs.T,0.)*(4./rays)
         visible=(~mask).reshape(n,rays)
@@ -103,10 +132,13 @@ def bake(source,output,rays):
     snapped=np.round(points[:,:3]*2)*.5;points[:,:3]=np.where(abs(points[:,:3]-snapped)<1e-4,snapped,points[:,:3])
     unique,inverse=np.unique(points,axis=0,return_inverse=True)
     scene=Scene(meta['occupied'],meta['offset'],meta['side_colors'],meta['top_colors'])
+    origins=receiver_origins(scene,unique)
+    baseline=unique.astype(float)
+    repaired=int(np.count_nonzero(np.linalg.norm(origins-(baseline[:,:3]+baseline[:,3:]*.01),axis=1)>1e-9))
     started=time.monotonic();result=integrate(scene,unique,rays,meta['sun_direction'],meta['sky_mean'])
     for name in ['sky','sun']:result[name][inverse].astype('<f4').tofile(output/(name+'.bin'))
     info={k:v for k,v in meta.items() if k not in ['occupied','side_colors','top_colors']}
-    info.update(rays=rays,unique_receivers=len(unique),seconds=time.monotonic()-started,sky_min=float(result['sky'].min()),sky_max=float(result['sky'].max()),sun_max=float(result['sun'].max()),visibility_mean=float(result['visibility'].mean()),scope='Original GAF static diffuse transport; not native Lumen')
+    info.update(rays=rays,unique_receivers=len(unique),receiver_origin_policy='empty_tangent_neighbourhood_v2',repaired_receivers=repaired,seconds=time.monotonic()-started,sky_min=float(result['sky'].min()),sky_max=float(result['sky'].max()),sun_max=float(result['sun'].max()),visibility_mean=float(result['visibility'].mean()),scope='Original GAF static diffuse transport; not native Lumen')
     (output/'metadata.json').write_text(json.dumps(info,indent=2));print(json.dumps({k:v for k,v in info.items() if k!='rows'}))
 
 

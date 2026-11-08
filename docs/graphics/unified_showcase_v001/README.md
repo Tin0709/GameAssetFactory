@@ -1,4 +1,6 @@
-**2026-11-08 � Terrain implementation authorized and applied:** F5/L TERRAIN now
+**2026-11-08 — Terrain corner follow-up:** Corrected offline ray origins at concave grid endpoints and rebaked only original GAF radiance.10107 unique receivers repaired; valid inputs remain bitexact. No runtime shader/geometry/pass, global exposure or direct-shadow change. F12 now explicitly reads legacy sky-only replacing colored GI; leave OFF for the current default. Locked comparisons, source recheck and validation are private under `terrain_corner_softness_v001`. See the transport guide below for reproducibility and native limits.
+
+**2026-11-08 — Terrain implementation authorized and applied:** F5/L TERRAIN now
 compares Previous, source PBR, original local colored indirect and Combined.
 Combined defaults ON for review. See [terrain transport guide](../../../game_mobile_3d/assets/graphics/world_map_terrain_transport_v001/README.md)
 for source boundaries, guards, controls, regeneration and validation. Player

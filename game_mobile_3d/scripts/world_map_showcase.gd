@@ -179,7 +179,8 @@ func _build_ui()->void:
 	_exposure_button.toggled.connect(func(value:bool):
 		level.look.set_local_exposure(value)
 		if level.look._exposure_effect!=null:level.look._exposure_effect.set_review_strength(LOCAL_EXPOSURE_STRENGTH))
-	var experimental:=CheckButton.new();experimental.text="Optional unfinished terrain sky cache (F12)";experimental.focus_mode=Control.FOCUS_NONE;box.add_child(experimental)
+	var experimental:=CheckButton.new();experimental.text="Legacy sky-only · F12 (replaces local GI)";experimental.focus_mode=Control.FOCUS_NONE;box.add_child(experimental)
+	experimental.tooltip_text="Experimental older visibility-only comparison. It replaces the default colored terrain indirect lighting; the two systems never stack."
 	experimental.toggled.connect(func(value:bool):level.terrain_sky.set_enabled(value))
 	var audio:=CheckButton.new();audio.text="Enable test audio (default off)";audio.button_pressed=audio_enabled;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
 	audio.toggled.connect(set_audio_enabled)

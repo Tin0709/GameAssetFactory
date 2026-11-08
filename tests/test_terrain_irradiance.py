@@ -1,8 +1,27 @@
 import unittest
 import numpy as np
-from scripts.graphics.terrain_irradiance import Scene, integrate
+from scripts.graphics.terrain_irradiance import Scene, integrate, receiver_origins
 
 class TerrainIrradianceTests(unittest.TestCase):
+    def test_open_origins_unchanged_and_enclosed_receiver_rejected(self):
+        scene=Scene([[0,0,0]],[0,0,0],[[.2,.2,.2]])
+        p=np.array([[.5,.5,.5,0,1,0],[0.,.25,.5,-1,0,0]])
+        np.testing.assert_array_equal(receiver_origins(scene,p),p[:,:3]+p[:,3:]*.01)
+        with self.assertRaisesRegex(ValueError,'no exposed origin'):
+            receiver_origins(scene,np.array([[.5,.25,.5,1,0,0]]))
+
+    def test_concave_boundary_matches_exposed_face_interior(self):
+        # A side-face endpoint lies exactly on its neighbouring perpendicular
+        # wall. Normal-only epsilon enters that wall and falsely blocks all rays.
+        scene=Scene([[0,1,0],[1,1,1]],[0,0,0],[[.2,.2,.2],[.2,.2,.2]])
+        edge=np.array([[1.,.75,1.,1,0,0]])
+        interior=np.array([[1.,.75,.99,1,0,0]])
+        a=integrate(scene,edge,256,[0,1,0],[.1,.2,.3])
+        b=integrate(scene,interior,256,[0,1,0],[.1,.2,.3])
+        self.assertGreater(b['visibility'][0],.4)
+        np.testing.assert_allclose(a['sky'],b['sky'],atol=1e-9)
+        np.testing.assert_allclose(a['sun'],b['sun'],atol=1e-9)
+
     def test_open_surface_preserves_sky_integral(self):
         scene=Scene([[0,0,0],[0,1,0]], [0,0,0], [[.2,.2,.2],[.2,.2,.2]])
         r=integrate(scene,np.array([[.5,1.,.5,0,1,0]]),256,[0,1,0],[.1,.2,.3])

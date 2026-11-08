@@ -1,5 +1,15 @@
 # WorldMap colored terrain transport
 
+**Corner correction,2026-11-08:** Normal-offset rays at concave grid endpoints
+could enter neighbouring blocks. The baker now retains already-empty origins
+exactly and resolves blocked ones within the existing1cm tangent neighbourhood;
+unresolved enclosed receivers fail closed. The current cache repairs10107 unique
+receivers (13864 vertex instances);120942 other instances retain bitexact sky/sun
+data. This corrects false corner darkness without changing global exposure,
+direct shadow filtering, source geometry, shaders or runtime stream size. It is
+an original integration-boundary fix, not native MD2 Lumen/PCSS recovery. F12 is
+labelled explicitly as a legacy sky-only replacement, not an additional effect.
+
 Original GAF data, derived exclusively from the existing authored map/atlases.
 `transport.res` is a compressed approximately1.1MB Resource, not MD2 reference
 data. It covers598 surfaces/134,806 generated vertices/56,993 unique receivers.
@@ -38,8 +48,8 @@ Set `GAF_SHOWCASE_PLAYER=original` for authoring, then clear it before normal pl
 2. `py -3 -m scripts.graphics.terrain_irradiance --source <scratch-export> --output <scratch-bake> --rays 256`
 3. `<godot> --headless --path game_mobile_3d --script res://tools/pack_world_map_terrain_light.gd -- <scratch-bake>`
 
-The baker assumes original identity world-grid transforms; restore the grid before
-rebaking a transformed scene. Regenerate after authored material/layout changes.
+The baker requires identity chunk bases and original grid-aligned translations;
+restore the grid before rebaking a transformed scene. Regenerate after authored material/layout changes.
 Export uses actual scene material colors/recipe and exact solid half cells, with
 low-frequency face averages. Trees, moving vegetation, fine source textures,
 dynamic emitters and cloud variation at secondary hit points are not traced.

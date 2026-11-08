@@ -1,6 +1,11 @@
 extends SceneTree
 ## Authoring tool: existing GAF map and authored colors only, no MD2 inputs.
 func _initialize()->void:call_deferred("run")
+static func original_chunk_transform(chunk:Node3D,chunk_size:int)->bool:
+	var parts:=str(chunk.name).split("_")
+	if parts.size()!=3 or parts[0]!="Terrain" or not parts[1].is_valid_int() or not parts[2].is_valid_int():return false
+	var origin:=Vector3(int(parts[1])*chunk_size,0,int(parts[2])*chunk_size)
+	return chunk.global_transform.is_equal_approx(Transform3D(Basis.IDENTITY,origin))
 func digest(source:BaseMaterial3D,m:ShaderMaterial)->String:
 	var h:=HashingContext.new();h.start(HashingContext.HASH_SHA256)
 	h.update(var_to_bytes([source.albedo_color,source.vertex_color_use_as_albedo]))
@@ -35,7 +40,7 @@ func run()->void:
 		fingerprints[name]=digest(source,row[3])
 		colors[name]=mean_color(source,grade,float(row[3].get_shader_parameter("texture_contrast")))
 	for chunk:MeshInstance3D in w.geometry.terrain_chunks:
-		if not chunk.global_transform.is_equal_approx(Transform3D.IDENTITY):
+		if not original_chunk_transform(chunk,w.geometry.CHUNK_SIZE):
 			push_error("Baker requires the original world-grid transform");w.free();quit(2);return
 		for s in chunk.mesh.get_surface_count():
 			var arrays:Array=chunk.mesh.surface_get_arrays(s)
