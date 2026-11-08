@@ -384,3 +384,4 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.physical_keycode==KEY_F4 and look.stage==2:
 			look.set_daylight_pockets(not look.daylight_pockets_active())
 			get_viewport().set_input_as_handled()
+		showcase.end_environment_edit()
