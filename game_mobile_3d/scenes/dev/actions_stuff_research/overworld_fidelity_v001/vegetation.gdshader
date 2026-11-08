@@ -1,5 +1,9 @@
 shader_type spatial;
 render_mode cull_disabled, diffuse_burley, specular_disabled;
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+#include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
+#include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/grass_normal_v001/world_normal.gdshaderinc"
+#endif
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D mre_map : filter_nearest, repeat_disable;
 uniform sampler2D interaction_field : filter_linear, repeat_disable;
@@ -59,7 +63,9 @@ void vertex(){
 	}
 	VERTEX+=(inverse(MODEL_MATRIX)*vec4(world_offset,0.0)).xyz;
 	foliage_world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
+#ifndef GAF_REFERENCE_GRASS_LIGHTING
 	if(tinted_grass)NORMAL=normalize(NORMAL*0.35+vec3(0.0,0.65,0.0));
+#endif
 	wrapped_normal_world=normalize(MODEL_NORMAL_MATRIX*NORMAL);
 	root_color=textureLod(ground_atlas,mix(ground_uv.xy,ground_uv.zw,fract(vec2(root.x,-root.z))),0.0).rgb;
 }
@@ -69,7 +75,12 @@ void fragment(){
 	if(tinted_grass){
 		// Preserve the authored upward grass normals on both sides, as in the
 		// existing lab. Automatic backface flipping otherwise makes dark stripes.
-		NORMAL=normalize(mat3(VIEW_MATRIX)*wrapped_normal_world);
+		vec3 world_normal=wrapped_normal_world;
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+		study_face=normalize(mat3(VIEW_MATRIX)*(FRONT_FACING?world_normal:-world_normal));
+		world_normal=gaf_foliage_world_normal(world_normal,study_grass_up_weight);
+#endif
+		NORMAL=normalize(mat3(VIEW_MATRIX)*world_normal);
 		color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);
 		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
 	}
@@ -84,4 +95,9 @@ void fragment(){
 	if(has_mre){vec3 packed=texture(mre_map,UV).rgb;METALLIC=packed.r;ROUGHNESS=packed.g;}
 	// Inferred wrapped backlighting; no claim of matching native two-sided shader.
 	BACKLIGHT=color*0.18;
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+	BACKLIGHT=vec3(0.0);
+	study_tip_weight=smoothstep(0.26,0.85,height_fraction);
+	study_cloud=world_cloud_shade(foliage_world);
+#endif
 }

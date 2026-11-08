@@ -5,6 +5,9 @@ const GRASSES:=["MD2 | SM_GrassShort_01","MD2 | SM_GrassShort_02","MD2 | SM_Gras
 const FLOWERS:={"pink":"MD2 | SM_CA1_TulipPink","yellow":"MD2 | SM_Dandelion_A","white":"MD2 | SM_Daisy_A","purple":"MD2 | SM_TPT_Purpleflower_S"}
 const TILE:=32.
 const MEDIUM:=["MD2 | SM_GrassMedium_01","MD2 | SM_GrassMedium_02","MD2 | SM_GrassMedium_03"]
+const GRASS_LIGHT=preload("world_map_grass_light.gd")
+var grass_light:RefCounted
+var grass_lighting_enabled:=true
 var dense_grass_review:=true
 var eligible_grass_cells:=0
 var world:Node3D
@@ -25,6 +28,7 @@ func setup_world(level:Node3D)->void:
 		error=bundle.error;push_warning(error);set_physics_process(false);set_process(false);return
 	for material:ShaderMaterial in bundle.materials:
 		_native_wind_intensities[material.get_instance_id()]=float(material.get_shader_parameter("wind_intensity"))
+	grass_light=GRASS_LIGHT.new();grass_light.setup(world,bundle)
 	interaction=Spring.new(104.)
 	interaction.surface_height_provider=world.surface_height
 	_rng.seed=110826
@@ -48,7 +52,17 @@ func _rebuild_planting()->void:
 	if dense_grass_review:
 		_build_native_patches();_build_dense_planting()
 	else:_build_cell_planting()
-	_prepare_materials();_flush_cell_batches();reset()
+	_prepare_materials();_refresh_grass_lighting();_flush_cell_batches();reset()
+
+func set_grass_lighting(value:bool)->void:
+	grass_lighting_enabled=value;_refresh_grass_lighting()
+
+func _refresh_grass_lighting()->void:
+	if grass_light==null:return
+	grass_light.apply(materials,grass_lighting_enabled and world.look.stage==2)
+	for node:Node in get_children():
+		if node is MultiMeshInstance3D:
+			node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_ON if grass_light.active and node.get_meta("green_grass",false) else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 func _patch_name(index:int)->String:return "PRIVATE COMPOSITE | Native grass patch %02d"%index
 
@@ -208,6 +222,9 @@ func _flush_cell_batches()->void:
 		node.multimesh=mm;node.extra_cull_margin=.8
 		node.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF
 		node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var green:bool=mm.mesh.surface_get_material(0).get_shader_parameter("tinted_grass")==true
+		node.set_meta("green_grass",green)
+		if grass_light!=null and grass_light.active and green:node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 		add_child(node);batch_count+=1
 	_groups.clear()
 
@@ -220,6 +237,10 @@ func _physics_process(delta:float)->void:
 
 func _process(_delta:float)->void:
 	if not visible:return
+	if grass_light!=null:
+		var wanted:bool=grass_lighting_enabled and world.look.stage==2 and grass_light.supported()
+		if wanted!=grass_light.active:_refresh_grass_lighting()
+		grass_light.sync()
 	present(Engine.get_physics_interpolation_fraction())
 	var displayed:float=world.presentation.wind_time(clock) if world.presentation.enabled else clock
 	for i in materials.size():
@@ -241,3 +262,6 @@ func snapshot()->Dictionary:
 	data["carpet_cells"]=placements.filter(func(row:Dictionary)->bool:return row.carpet and row.flower.is_empty()).size()
 	data["mesh_material_scope"]="Existing private MD2 source bundle; cell fit/distribution/motion limits are original adapters"
 	return data
+
+func _exit_tree()->void:
+	if grass_light!=null:grass_light.restore()
