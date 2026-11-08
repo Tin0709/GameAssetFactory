@@ -20,6 +20,7 @@ func setup_world(level:Node3D)->void:
 	if bundle.read(research.path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")).is_empty():
 		error=bundle.error;push_warning(error);set_physics_process(false);set_process(false);return
 	interaction=Spring.new(104.)
+	interaction.surface_height_provider=world.surface_height
 	_rng.seed=110826
 	_cluster.seed=8291;_cluster.frequency=.075;_cluster.fractal_octaves=2
 	_detail.seed=721;_detail.frequency=.23;_detail.fractal_octaves=2
@@ -132,8 +133,6 @@ func _physics_process(delta:float)->void:
 	clock+=delta
 	if not enabled or not visible:return
 	var point:=player.global_position
-	var height:float=world.surface_height(point.x,point.z)
-	point.y=maxf(0.,point.y-height) if is_finite(height) else 100.
 	if not interactions_enabled:point.y=100.
 	interaction.advance(delta,point,player.velocity)
 

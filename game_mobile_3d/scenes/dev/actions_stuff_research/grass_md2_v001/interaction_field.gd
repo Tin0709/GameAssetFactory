@@ -30,6 +30,7 @@ var accumulator:=0.
 var previous:=Vector3.ZERO
 var initialized:=false
 var update_usec:=0
+var surface_height_provider:Callable # Optional original stepped-terrain adapter.
 
 func _init(covered_extent:float=EXTENT)->void:
 	extent=maxf(EXTENT,covered_extent)
@@ -82,21 +83,26 @@ func advance(delta:float,point:Vector3,velocity:Vector3)->void:
 		var at:=previous.lerp(point,float(step+1)/float(steps))
 		_stamp(at)
 		var ground_gain:=1.-smoothstep(.25,1.25,maxf(0.,at.y))
-		var amplitude:=minf(.96,.46+.085*speed)*ground_gain
+		var maximum_amplitude:=minf(.96,.46+.085*speed)
 		var movement_gain:=.90*speed/(speed+.4)
 		var i:=active.size()-1
 		while i>=0:
 			var index:=active[i];var row:=index/size;var col:=index%size
 			var root_point:=Vector2((col+.5)*cell-extent*.5,(row+.5)*cell-extent*.5)
+			var receiver_gain:=ground_gain
+			if surface_height_provider.is_valid():
+				var support:float=surface_height_provider.call(root_point.x,root_point.y)
+				receiver_gain=1.-smoothstep(.5,1.5,absf(at.y-support)) if is_finite(support) else 0.
+			var amplitude:=maximum_amplitude*receiver_gain
 			var away:=root_point-Vector2(at.x,at.z);var distance:=away.length()
 			var q:=clampf(1.-distance/RADIUS,0.,1.);var falloff:=q*q*(3.-2.*q)
 			var direction:=away/maxf(distance,.00001)*.70+forward*movement_gain
 			direction=direction/maxf(direction.length(),.12)
 			var desired:=direction*(amplitude*falloff)
-			var omega:=lerpf(RECOVERY,RESPONSE,falloff*ground_gain)
+			var omega:=lerpf(RECOVERY,RESPONSE,falloff*receiver_gain)
 			# Only newly increasing contact supplies a kick. Resting contact never
 			# restarts the oscillation, and repeated brushes remain velocity-bounded.
-			var contact:=falloff*ground_gain
+			var contact:=falloff*receiver_gain
 			var rise:=maxf(0.,contact-contact_weights[index]);contact_weights[index]=contact
 			var kick:=direction*rise*(8.0+2.4*minf(speed/7.55,1.))
 			var velocity_now:=(Vector2(vx[index],vz[index])+kick).limit_length(8.5)
