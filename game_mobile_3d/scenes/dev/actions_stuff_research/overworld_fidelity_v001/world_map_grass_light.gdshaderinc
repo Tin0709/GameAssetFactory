@@ -10,10 +10,13 @@ varying float study_cloud;
 float grass_fresnel(float x){float q=1.0-x;float q2=q*q;return q2*q2*q;}
 void light(){
 	float front=clamp(dot(NORMAL,LIGHT),0.0,1.0);
+	vec3 response=vec3(front);
+#ifndef GAF_GRASS_FORCE_LAMBERT
 	float nv=clamp(dot(NORMAL,VIEW),0.0,1.0);
 	float lh=clamp(dot(LIGHT,normalize(LIGHT+VIEW)),0.0,1.0);
 	float grazing=2.0*ROUGHNESS*lh*lh-0.5;
-	vec3 response=vec3(front*(1.0+grazing*grass_fresnel(nv))*(1.0+grazing*grass_fresnel(front)));
+	response*=((1.0+grazing*grass_fresnel(nv))*(1.0+grazing*grass_fresnel(front)));
+#endif
 	if(LIGHT_IS_DIRECTIONAL){
 		response+=world_foliage_lobe(study_face,LIGHT,VIEW,front,study_tip_weight,study_transmission);
 	}

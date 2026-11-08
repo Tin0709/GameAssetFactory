@@ -45,7 +45,9 @@ func apply(materials:Array[ShaderMaterial],enabled:bool)->void:
 		var source:Shader=material.shader
 		if not _variants.has(source):
 			var variant:=Shader.new();variant.resource_name="Grass lighting · captured world normal"
-			variant.code=source.code.replace("shader_type spatial;","shader_type spatial;\n#define GAF_REFERENCE_GRASS_LIGHTING")
+			var header:="shader_type spatial;\n#define GAF_REFERENCE_GRASS_LIGHTING"
+			if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_lambert_over_burley"):header+="\n#define GAF_GRASS_FORCE_LAMBERT"
+			variant.code=source.code.replace("shader_type spatial;",header)
 			_variants[source]=variant
 		var shader:Shader=_variants[source]
 		_records.append({"material":material,"original":source,"variant":shader})
