@@ -25,6 +25,7 @@ func run()->void:
 	for variant in 6:
 		var a:PackedVector3Array=upright[variant];var b:PackedVector3Array=fan[variant]
 		var mesh:Mesh=p.bundle.meshes[p._patch_name(variant)]
+		var normals:PackedVector3Array=mesh.surface_get_arrays(0)[Mesh.ARRAY_NORMAL]
 		var raw:Variant=mesh.surface_get_arrays(0)[Mesh.ARRAY_CUSTOM0]
 		var motion:PackedFloat32Array=raw.to_float32_array() if raw is PackedByteArray else raw
 		check(a.size()==b.size(),"Source topology unchanged")
@@ -34,7 +35,10 @@ func run()->void:
 				min_ground=minf(min_ground,b[i].y)
 				var u:float=motion[i*4];var h:float=motion[i*4+1]
 				# Conservative existing WPO bound: strongest contact/wind bend.
-				min_bent_ground=minf(min_bent_ground,b[i].y+h*sin(.75*u)/.75-h*u)
+				var rest_y:float=normals[i].normalized().y
+				var vertical:float=h*sin(.75*u)/.75-h*u
+				var planar:float=h*(1.-cos(.75*u))/.75
+				min_bent_ground=minf(min_bent_ground,b[i].y+rest_y*vertical-sqrt(maxf(0.,1.-rest_y*rest_y))*planar)
 				if motion[i*4]>.99:tops[b[i]]=true
 				if motion[i*4]<.01:bases[b[i]]=true
 				for j in range(card*6,card*6+6):max_length_error=maxf(max_length_error,absf(a[i].distance_to(a[j])-b[i].distance_to(b[j])))
