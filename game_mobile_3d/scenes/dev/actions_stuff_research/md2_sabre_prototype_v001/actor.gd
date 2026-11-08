@@ -414,6 +414,8 @@ func _physics_process(delta:float)->void:
 	if _move_requested:_last_run_gait=_run_requested
 	if _move_requested or jump_pressed:resume_gameplay()
 	var was_grounded:=is_on_floor() and velocity.y<=0.
+	# A jump accepted on the first post-reset tick has real prior support too.
+	_floor_initialized=_floor_initialized or was_grounded
 	combo.movement_requested=using_original_source and was_grounded and _move_requested
 	if combo.phase==&"step":
 		if jump_pressed or not was_grounded:combo.cancel()
