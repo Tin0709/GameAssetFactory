@@ -3,6 +3,7 @@ extends Node
 const PRESET=preload("res://assets/graphics/meadow_daylight_v5/preset.tres")
 const DIRECT_ACTOR_SHADER=preload("res://materials/world_map_actor_direct.gdshader")
 const ACTOR_SKY_SHADER=preload("res://materials/world_map_actor_sky.gdshader")
+const PLAYER_MATERIAL=preload("res://scripts/world_map_player_material.gd")
 const GROUND_RADIANCE=preload("res://assets/graphics/world_map_ground_bounce_v001/normalized_ground.res")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
 const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
@@ -99,6 +100,12 @@ var _review_shaders: Dictionary[ShaderMaterial,Shader]={}
 var _direct_actor_materials: Array[ShaderMaterial]=[]
 var _actor_sky_requested := false
 var _actor_sky_shaders: Dictionary = {}
+var player_material=PLAYER_MATERIAL.new()
+var player_adapter_enabled:=true
+var player_cloud_enabled:=true
+var player_roughness_enabled:=false
+var player_self_light_enabled:=false
+var player_material_review:="cloud"
 var _ground_bounce_requested := false
 var _ground_bounce_applied := false
 var _ground_bounce_layout_matches := false
@@ -547,9 +554,12 @@ func _apply_review_shaders() -> void:
 			var strength := 0.2652 if leaves else (0.1248 if plant_kind == 0 else 0.1794)
 			material.set_shader_parameter("foliage_transmission", strength)
 	_apply_canopy_contact()
-	if (direct or actor_sky) and _direct_actor_materials.is_empty():
+	if _private_player_material_scope():
+		_apply_player_materials(direct,actor_sky)
+	elif (direct or actor_sky) and _direct_actor_materials.is_empty():
 		for item: Array in actor_materials:_direct_actor_materials.append(_make_direct_actor(item[0],item[3],item[4]))
 	for index in actor_materials.size():
+		if _private_player_material_scope():break
 		var item: Array=actor_materials[index]
 		var adapter: ShaderMaterial=_direct_actor_materials[index] if (direct or actor_sky) else null
 		if adapter != null:
@@ -560,6 +570,40 @@ func _apply_review_shaders() -> void:
 		else:
 			item[0].set_surface_override_material(item[1],adapter if (direct or actor_sky) else item[3])
 	_bind_ground_radiance()
+
+func _private_player_material_scope()->bool:
+	return level.player.get("using_original_source")==true
+
+func player_effects_available()->bool:
+	return _private_player_material_scope() and player_material.available() and not player_material.profile.is_empty() \
+		and (level.get("showcase")==null or level.showcase.is_day_anchor())
+
+func _apply_player_materials(direct:bool,sky:bool)->void:
+	if _direct_actor_materials.is_empty():
+		for row:Array in actor_materials:_direct_actor_materials.append(player_material.create(row[0],row[3],row[4]))
+	for i in actor_materials.size():
+		var row:Array=actor_materials[i];var m:ShaderMaterial=_direct_actor_materials[i]
+		var enabled:=player_adapter_enabled and stage==2 and player_material.available() and m!=null
+		if not enabled:
+			row[0].set_surface_override_material(row[1],row[2]);continue
+		m.shader=player_material.variant(row[3].transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,direct and player_cloud_enabled,sky)
+		m.set_shader_parameter("albedo_tint",row[4])
+		var verified:bool=m.get_meta("verified_valorie",false) and player_effects_available()
+		m.set_shader_parameter("recovered_roughness",verified and player_roughness_enabled)
+		m.set_shader_parameter("recovered_self_light",verified and player_self_light_enabled)
+		m.set_shader_parameter("cloud_field",_pockets_texture if daylight_pockets_active() or direct else cloud_texture)
+		m.set_shader_parameter("cloud_shape",_cloud_shape);m.set_shader_parameter("cloud_time",cloud_clock)
+		m.set_shader_parameter("clouds_enabled",true)
+		row[0].set_surface_override_material(row[1],m)
+
+func set_player_material_review(mode:String)->void:
+	if not mode in ["original","neutral","cloud","roughness","self_light","combined"]:return
+	player_material_review=mode
+	player_adapter_enabled=mode!="original"
+	player_cloud_enabled=mode in ["cloud","combined"]
+	player_roughness_enabled=mode in ["roughness","combined"]
+	player_self_light_enabled=mode in ["self_light","combined"]
+	_apply_review_shaders()
 
 func ground_bounce_available() -> bool:
 	if level.get("showcase")!=null and level.showcase.private_primary and not level.showcase.is_day_anchor():return false
@@ -713,6 +757,7 @@ func publish_clouds(time: float) -> void:
 	var shade:=cloud_shade(level.player.position,time) if stage>0 else 1.0
 	for index in actor_materials.size():
 		var item: Array = actor_materials[index]
+		if _private_player_material_scope():continue
 		var linear: Color=item[4].srgb_to_linear()
 		item[3].albedo_color=Color(linear.r*shade,linear.g*shade,linear.b*shade,linear.a).linear_to_srgb()
 		if stage == 2 and _actor_sky_requested and local_exposure_available():
