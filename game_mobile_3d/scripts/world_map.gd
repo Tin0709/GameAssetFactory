@@ -21,6 +21,7 @@ var presentation: Node
 var ambient: Node
 var actor_fill: Node
 var terrain_sky: Node
+var showcase: Node
 var _camera_ground_y := NAN
 var _extended_camera_depth := true
 @onready var _original_camera_near: float = $Camera3D.near
@@ -35,7 +36,13 @@ func _enter_tree() -> void:
 	var actors: Node=$Actors
 	var previous: Node3D=actors.get_node("Player")
 	var index:=previous.get_index()
-	var replacement: Node3D=JUMP_REVIEW_PLAYER.instantiate()
+	showcase=load("res://scripts/world_map_showcase.gd").new()
+	showcase.name="UnifiedShowcase";add_child(showcase)
+	var replacement: Node3D=showcase.make_player()
+	if showcase.private_primary:
+		for service:String in ["Combat","SpawnDirector"]:
+			var old:=get_node_or_null(service)
+			if old!=null:remove_child(old);old.free()
 	replacement.name=previous.name;replacement.transform=previous.transform
 	actors.remove_child(previous);previous.free()
 	actors.add_child(replacement);actors.move_child(replacement,index)
@@ -46,10 +53,11 @@ func _ready() -> void:
 	$WorldEnvironment.environment=$WorldEnvironment.environment.duplicate()
 	$Ground.collision_layer=0
 	$Ground/CollisionShape3D.disabled=true
-	$Combat.combat_enabled=false
-	$SpawnDirector.enabled=false
-	$SpawnDirector.set_physics_process(false)
-	player.get_node("Pistol").enabled=false
+	if has_node("Combat"):$Combat.combat_enabled=false
+	if has_node("SpawnDirector"):
+		$SpawnDirector.enabled=false
+		$SpawnDirector.set_physics_process(false)
+	if player.has_node("Pistol"):player.get_node("Pistol").enabled=false
 	$HUD/Status.hide()
 	get_viewport().msaa_3d=Viewport.MSAA_2X
 	if not FileAccess.file_exists(DATA):
@@ -105,6 +113,7 @@ func _ready() -> void:
 	if ambient.available(): $HUD/Help.text+=" · F11 ánh sáng trời / đất · Shift+F11 ánh sáng nhân vật dưới cây"
 	DisplayServer.window_set_title("World Map · WASD / Shift · V overview")
 	build_msec=Time.get_ticks_msec()-started
+	showcase.setup(self)
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func abort_map(message: String) -> void:
@@ -251,7 +260,9 @@ func build_grove() -> bool:
 	return true
 
 func set_grove_visible(enabled: bool, at: Vector3) -> bool:
-	var player_shape := player.get_node("CollisionShape3D").shape as CapsuleShape3D
+	var collider:=player.get_node_or_null("CollisionShape3D")
+	if collider==null:collider=player.get_node_or_null("BodyCollision")
+	var player_shape := collider.shape as CapsuleShape3D
 	if not grove.set_enabled(enabled, at, player_shape): return false
 	for batch: MultiMeshInstance3D in geometry.accent_batches: batch.visible = enabled
 	if enabled:
@@ -285,6 +296,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not map_ready:return
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and event.pressed and not event.echo:
+		if showcase.handle_key(event):
+			get_viewport().set_input_as_handled();return
 		if event.physical_keycode == KEY_F11:
 			if event.shift_pressed:
 				actor_fill.set_enabled(not actor_fill.enabled)

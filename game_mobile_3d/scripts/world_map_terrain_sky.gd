@@ -92,6 +92,7 @@ func _install(cache:Resource=CACHE)->bool:
     stream_vertices=count;return true
 
 func available()->bool:
+	if level.get("showcase")!=null and level.showcase.private_primary and not level.showcase.is_day_anchor():return false
     if not _installed or not is_instance_valid(level) or level.ambient==null or not level.ambient.is_active():return false
     if not level.look.local_exposure_available() or ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading"):return false
     var environment:Environment=level.get_node("WorldEnvironment").environment

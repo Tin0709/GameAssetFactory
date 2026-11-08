@@ -546,6 +546,7 @@ func _apply_review_shaders() -> void:
 	_bind_ground_radiance()
 
 func ground_bounce_available() -> bool:
+	if level.get("showcase")!=null and level.showcase.private_primary and not level.showcase.is_day_anchor():return false
 	if not _ground_bounce_layout_matches or not local_exposure_available(): return false
 	if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading"): return false
 	if ProjectSettings.get_setting("rendering/lights_and_shadows/use_physical_light_units", false): return false
@@ -822,6 +823,7 @@ func _process(_delta: float) -> void:
 		_apply_review_shaders()
 	if _palette_requested != DayPalette.NONE and stage == 2:
 		_refresh_day_palette()
+	if level.get("showcase")!=null:level.showcase.apply_time()
 	if _exposure_effect == null: return
 	if not is_instance_valid(_exposure_camera) or _exposure_camera.compositor != _exposure_compositor:
 		set_local_exposure(false)

@@ -33,11 +33,13 @@ func set_enabled(value: bool) -> void:
 	enabled = value
 	# Keep static RIDs in one representation for the map's entire lifetime.
 	# Only the physical root is interpolated; per-frame local poses stay direct.
-	level.player.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_ON if enabled else Node.PHYSICS_INTERPOLATION_MODE_OFF
+	var owns_pose:bool=level.player.has_method("showcase_display_position")
+	level.player.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_ON if enabled and not owns_pose else Node.PHYSICS_INTERPOLATION_MODE_OFF
 	level.player.visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	if is_instance_valid(level.player): level.player.reset_physics_interpolation()
 
 func player_position() -> Vector3:
+	if level.player.has_method("showcase_display_position"):return level.player.showcase_display_position()
 	return level.player.get_global_transform_interpolated().origin if enabled else level.player.global_position
 
 func wind_time(physics_time: float) -> float:
