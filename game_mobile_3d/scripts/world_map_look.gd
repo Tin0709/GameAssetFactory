@@ -586,7 +586,7 @@ func _apply_player_materials(direct:bool,sky:bool)->void:
 		var enabled:=player_adapter_enabled and stage==2 and player_material.available() and m!=null
 		if not enabled:
 			row[0].set_surface_override_material(row[1],row[2]);continue
-		m.shader=player_material.variant(row[3].transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,direct and player_cloud_enabled,sky)
+		m.shader=player_material.variant(row[3].transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR,direct and player_cloud_enabled,sky and player_material_review in ["cloud","combined"])
 		m.set_shader_parameter("albedo_tint",row[4])
 		var verified:bool=m.get_meta("verified_valorie",false) and player_effects_available()
 		m.set_shader_parameter("recovered_roughness",verified and player_roughness_enabled)
