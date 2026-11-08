@@ -27,6 +27,15 @@ var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
 var mist:Node3D
 var spatial_mist:=true
+var phase_air=preload("res://scripts/world_map_phase_air.gd").new()
+var measured_atmosphere:=true
+var coupled_bloom:=true
+var coherent_bloom:=true
+var grade_review:Node
+var hdr_air:=true
+var _hdr_owned:=false
+var _hdr_saved:=false
+var _hdr_viewport:Viewport
 var captured_scatter:=true
 var shadowed_scatter:=true
 var air_light=preload("res://scripts/world_map_air_light.gd").new()
@@ -76,6 +85,7 @@ func setup(world:Node3D)->void:
 		_player_light.omni_range=forest.player_range;_player_light.omni_attenuation=2.;_player_light.position.y=1.4
 		level.player.add_child(_player_light);_player_light.hide()
 		mist=preload("res://scripts/world_map_atmosphere_volume.gd").new();level.get_node("Camera3D").add_child(mist);mist.setup();mist.material_provider=_mist_materials;mist.medium_state=_mist_state;mist.compositor_owned=func(c):return c==level.look._exposure_compositor
+	grade_review=preload("res://scripts/world_map_grade_review.gd").new();add_child(grade_review);grade_review.setup(self)
 	_build_ui()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
 	level.get_node("HUD/Help").text="GRAPHICS COMPARISON\nF8 Day finish · F11 directional fill · Shift+F11 actor canopy fill\nF7 local exposure · Shift+F1 ground bounce · F1 soft shadows\nF2 canopy contact · Shift+F2 root soil · F3 direct cloud shading\nF9 leaf edges · Shift+F9 MSAA · F10 pose interpolation\nF12 optional terrain cache · G grass/flowers · L wind/interaction options\nH fog · N terrain wind · Shift+N passage · Alt+N crown wind"
@@ -103,6 +113,7 @@ func set_audio_enabled(value:bool)->void:
 		actor.environment_audio.audio.footsteps_enabled=value;actor.environment_audio.audio.rustle_enabled=value
 
 func _restore_day()->void:
+	if grade_review!=null:grade_review.release()
 	if not _time_applied or _day.is_empty():return
 	for field:String in ENV_FIELDS:_environment.set(field,_day[field])
 	var sun:DirectionalLight3D=level.get_node("Sun")
@@ -118,9 +129,50 @@ func set_spatial_mist(value:bool)->void:
 	_restore_day();spatial_mist=value;apply_time()
 	_update_mist()
 
+func set_measured_atmosphere(value:bool)->void:
+	measured_atmosphere=value
+	_restore_day();apply_time();_update_mist()
+
+func set_coupled_bloom(value:bool)->void:
+	coupled_bloom=value
+	if level.look._exposure_effect!=null:level.look._exposure_effect.set_air_bloom(value and forest_active() and atmosphere_review in ["haze","combined"])
+
+func set_coherent_bloom(value:bool)->void:
+	coherent_bloom=value
+	if level!=null and level.look._exposure_effect!=null:level.look._exposure_effect.set_coherent_bloom_source(value)
+
+func set_source_grade(value:bool)->void:
+	if grade_review!=null:grade_review.set_requested(value)
+
+func set_hdr_air(value:bool)->void:
+	hdr_air=value;_update_hdr_air()
+
+func _update_hdr_air()->void:
+	if level==null:return
+	var viewport:Viewport=level.get_viewport()
+	var rd:=RenderingServer.get_rendering_device()
+	var usage:=RenderingDevice.TEXTURE_USAGE_COLOR_ATTACHMENT_BIT|RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT
+	var wanted:bool=hdr_air and forest_active() and rd!=null and rd.texture_is_format_supported_for_usage(RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT,usage)
+	if wanted and not _hdr_owned:
+		_hdr_viewport=viewport;_hdr_saved=viewport.use_hdr_2d;_hdr_owned=true
+		viewport.use_hdr_2d=true
+	elif not wanted and _hdr_owned:
+		viewport.use_hdr_2d=_hdr_saved;_hdr_owned=false
+
+func _exit_tree()->void:
+	if grade_review!=null:grade_review.release()
+	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
+
 func _update_mist()->void:
+	_update_hdr_air()
+	set_coherent_bloom(coherent_bloom)
+	if level!=null and level.look._exposure_effect!=null:set_coupled_bloom(coupled_bloom)
 	if mist==null:return
 	var env:Environment=level.get_node("WorldEnvironment").environment
+	if forest_active() and atmosphere_review in ["haze","combined"] and level.look._exposure_effect!=null:
+		var state:Dictionary=level.look._exposure_effect.snapshot()
+		env.glow_enabled=not(coupled_bloom and state.frames>0 and str(state.error).is_empty())
+		_forest_expected.glow_enabled=env.glow_enabled
 	mist.visible=forest_active() and spatial_mist and atmosphere_review in ["haze","combined"] and env.fog_enabled and not _mist_sample.is_empty()
 	if not mist.visible:return
 	var ready:bool=mist.effect.snapshot().ready and mist.failure().is_empty()
@@ -134,9 +186,30 @@ func _update_mist()->void:
 	var rgb:Vector3=_mist_sample.fog_color;var color:=Color(rgb.x,rgb.y,rgb.z).srgb_to_linear()
 	var linear:=Vector3(color.r,color.g,color.b)
 	if captured_scatter:linear=air_light.scatter_color(linear,hour)
-	var sample:=_mist_sample.duplicate();sample.linear_scatter_rgb=linear
+	var sample:=_mist_sample.duplicate()
+	var measured:Dictionary=phase_air.sample(hour) if measured_atmosphere else {}
+	if not measured.is_empty():
+		# Source chromaticity in linear space; retain the approved incident-light energy.
+		var source:Vector3=measured.linear_scatter
+		linear=source*linear.dot(luma)/maxf(source.dot(luma),.0001)
+		sample.volume_density*=measured.density_ratio
+		sample.height_falloff=measured.height_falloff_m
+		sample.fog_begin=measured.start_m
+	sample.linear_scatter_rgb=linear
 	sample.scatter_energy=clampf(incoming,.015,.18)/maxf(linear.dot(luma),.0001)
-	mist.publish(sample,level.presentation.player_position(),level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
+	var emitter:Vector3=level.presentation.player_position()
+	var lantern=level.player.get("lantern")
+	if lantern!=null and lantern.ready_private:
+		var point:Vector3=lantern.emitter_position()
+		if _player_light!=null:_player_light.top_level=true;_player_light.light_cull_mask=1;_player_light.global_position=point
+		emitter=point-Vector3.UP*1.4
+	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
+
+func sync_lantern_emitter(point:Vector3)->void:
+	if not point.is_finite():return
+	if _player_light!=null:
+		_player_light.top_level=true;_player_light.light_cull_mask=1;_player_light.global_position=point
+	if mist!=null and mist.visible:mist.set_warm_emitter(point)
 
 func air_field()->Dictionary:
 	var result:Dictionary=air_light.field()
@@ -311,6 +384,11 @@ func _build_ui()->void:
 	atmosphere.tooltip_text="Forest A1 Day: read live in MD2. Other phases: recovered presets. Fog, bloom and light transfer are original Mobile approximations."
 	var volume:=CheckButton.new();volume.text="Spatial mist · world height / patches";volume.button_pressed=spatial_mist;volume.focus_mode=Control.FOCUS_NONE;box.add_child(volume)
 	volume.toggled.connect(set_spatial_mist)
+	var measured:=CheckButton.new();measured.text="Air · measured night / dawn / day";measured.button_pressed=measured_atmosphere;measured.focus_mode=Control.FOCUS_NONE;box.add_child(measured);measured.toggled.connect(set_measured_atmosphere)
+	var bloom_air:=CheckButton.new();bloom_air.text="Air · exposure-shaped soft light";bloom_air.button_pressed=coupled_bloom;bloom_air.focus_mode=Control.FOCUS_NONE;box.add_child(bloom_air);bloom_air.toggled.connect(set_coupled_bloom)
+	var coherent_toggle:=CheckButton.new();coherent_toggle.text="Air · consistent scene / bloom exposure";coherent_toggle.button_pressed=coherent_bloom;coherent_toggle.focus_mode=Control.FOCUS_NONE;coherent_toggle.tooltip_text="Use the same bounded exposure gain for scene and bloom source, before filtering. OFF restores previous source equation. Original Mobile formula, not full native Unreal local exposure.";box.add_child(coherent_toggle);coherent_toggle.toggled.connect(set_coherent_bloom)
+	var grade_toggle:=CheckButton.new();grade_toggle.text="Air · private Forest phase LUTs (experimental)";grade_toggle.focus_mode=Control.FOCUS_NONE;grade_toggle.button_pressed=false;grade_toggle.disabled=not grade_review.available();grade_toggle.tooltip_text="Eight captured Forest LUTs at unity input gain; original clock interpolation/mirrored evening. Replaces final grade, not lighting. HDR/F7 only; OFF by default. Native radiometry/clock unresolved.";box.add_child(grade_toggle);grade_toggle.toggled.connect(set_source_grade)
+	var hdr_toggle:=CheckButton.new();hdr_toggle.text="Air · preserve HDR highlights (higher bandwidth)";hdr_toggle.button_pressed=hdr_air;hdr_toggle.focus_mode=Control.FOCUS_NONE;box.add_child(hdr_toggle);hdr_toggle.toggled.connect(set_hdr_air)
 	var times:=HBoxContainer.new();box.add_child(times)
 	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Night",22.]]:
 		var button:=Button.new();button.text=entry[0];button.focus_mode=Control.FOCUS_NONE;times.add_child(button)

@@ -1,3 +1,5 @@
+Latest authorized phase/bloom follow-up: see [PHASE_ATMOSPHERE.md](PHASE_ATMOSPHERE.md). The historical implementation and validation record below is preserved.
+
 # Forest entrance atmosphere / shared spatial mist
 
 Scope: existing `game_mobile_3d/scenes/WorldMap.tscn`, F5. This is an independently authored Mobile atmosphere adapter, not a recovered Unreal volumetric renderer or MD2-quality approval. Approved rig, clips, controller, camera, terrain geometry/transport data,8418 grass roots, wind and interaction are retained. Test audio stays OFF.

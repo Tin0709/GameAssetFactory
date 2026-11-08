@@ -35,6 +35,8 @@ func setup()->void:
  noise=ImageTexture.create_from_image(image);hide()
 func publish(p:Dictionary,actor:Vector3,base:float,time:float,_ortho:bool,radius:float)->void:
  _profile=p;_actor=actor;_base=base;_clock=time;_radius=radius
+func set_warm_emitter(point:Vector3)->void:
+ if point.is_finite():_actor=point-Vector3.UP*1.4
 func _append(v:Vector3,values:PackedFloat32Array,w:float=0.)->void:values.append_array(PackedFloat32Array([v.x,v.y,v.z,w]))
 func _process(_delta:float)->void:
  if effect==null:return

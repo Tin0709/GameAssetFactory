@@ -2,6 +2,8 @@ extends CompositorEffect
 ## A bounded local contrast adjustment on the resolved scene before Godot's tone curve.
 
 const TILE_SIZE := 16
+const HDR_FORMAT := RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT
+var _source_format:=0
 const COLOR_FORMAT := RenderingDevice.DATA_FORMAT_A2B10G10R10_UNORM_PACK32
 const USAGE := RenderingDevice.TEXTURE_USAGE_COLOR_ATTACHMENT_BIT | RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT
 const VERTEX := """#version 450
@@ -19,6 +21,7 @@ void main() {
 """
 const METER := """#version 450
 layout(set=0,binding=0) uniform sampler2D source_color;
+layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; };
 layout(location=0) out float result;
 const vec3 luma = vec3(0.2126, 0.7152, 0.0722);
 void main() {
@@ -28,7 +31,7 @@ void main() {
 	for (int y = 2; y < 16; y += 4) {
 		for (int x = 2; x < 16; x += 4) {
 			vec3 rgb = texelFetch(source_color, min(start + ivec2(x,y), size - 1), 0).rgb;
-			sum += log2(max(dot(rgb, luma), 0.002));
+			sum += log2(max(dot(rgb, luma), 0.002*(air.z>.5?2.0:1.0)));
 		}
 	}
 	result = sum / 16.0;
@@ -37,7 +40,8 @@ void main() {
 const APPLY := """#version 450
 layout(set=0,binding=0) uniform sampler2D source_color;
 layout(set=0,binding=1) uniform sampler2D log_meter;
-layout(push_constant,std430) uniform Settings { vec4 settings; };
+layout(set=0,binding=2) uniform sampler2D soft_light;
+layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; };
 layout(location=0) out vec4 result;
 const vec3 luma = vec3(0.2126, 0.7152, 0.0722);
 void main() {
@@ -57,23 +61,96 @@ void main() {
 		textureLod(log_meter, uv - vec2(0.0, step_uv.y), 0.0).r
 	);
 	float y = dot(color.rgb, luma);
-	float log_pixel = log2(max(y, 0.002));
+	float log_pixel = log2(max(y, 0.002*(air.z>.5?2.0:1.0)));
 	// Let the current pixel moderate a dark or bright neighborhood.
 	float log_base = log_pixel + 0.60 * clamp(log_area - log_pixel, -2.0, 2.0);
 	float stops = log2(settings.y) - log_base;
-	float toe = smoothstep(0.002, 0.012, y);
+	float toe = smoothstep(0.002, 0.012, y/(air.z>.5?2.0:1.0));
 	float gain_stops = clamp(stops * settings.x, -settings.z, settings.w);
 	gain_stops *= (gain_stops > 0.0) ? toe : 1.0;
 	// Preserve RGB ratios when a saturated component is near the packed target limit.
 	float peak = max(max(color.r, color.g), color.b);
-	float gain = min(exp2(gain_stops), 1.0 / max(peak, 0.002));
-	result = vec4(color.rgb * gain, color.a);
+	float gain = exp2(gain_stops);
+	if(air.z<.5) gain=min(gain,1.0/max(peak,0.002));
+	vec3 adjusted = color.rgb * gain;
+	if (air.x > 0.0) {
+		vec2 uv_air = gl_FragCoord.xy / vec2(textureSize(source_color, 0));
+		vec3 spread = textureLod(soft_light, uv_air, 0.0).rgb;
+		// Original bounded Mobile light spread, not the native UE bloom kernel.
+		adjusted += spread * air.x;
+	}
+	result = vec4(adjusted, color.a);
 }
 """
 
+const AIR_SOURCE := """#version 450
+layout(set=0,binding=0) uniform sampler2D source_color;
+layout(set=0,binding=1) uniform sampler2D log_meter;
+layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; };
+layout(location=0) out vec4 result;
+void main(){
+ vec2 uv=gl_FragCoord.xy/ceil(vec2(textureSize(source_color,0))/4.0);
+ vec2 px=1.0/vec2(textureSize(source_color,0));vec3 sum=vec3(0);
+ for(int y=0;y<4;y++)for(int x=0;x<4;x++){
+  vec2 at=uv+(vec2(x,y)-1.5)*px;vec3 c=textureLod(source_color,at,0.).rgb;
+  float local=textureLod(log_meter,at,0.).r;
+  float stops=clamp((log2(settings.y)-local)*settings.x,-settings.z,settings.w);
+  sum+=c*exp2(stops);
+ }
+ result=vec4(sum/16.,1.);
+}
+"""
+const AIR_BLUR := """#version 450
+layout(set=0,binding=0) uniform sampler2D source_color;
+layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; };
+layout(location=0) out vec4 result;
+void main(){
+ vec2 uv=gl_FragCoord.xy/vec2(textureSize(source_color,0));
+ vec2 step_uv=DIRECTION/vec2(textureSize(source_color,0));
+ vec3 c=textureLod(source_color,uv,0.).rgb*.30;
+ c+=(textureLod(source_color,uv+step_uv*2.,0.).rgb+textureLod(source_color,uv-step_uv*2.,0.).rgb)*.25;
+ c+=(textureLod(source_color,uv+step_uv*6.,0.).rgb+textureLod(source_color,uv-step_uv*6.,0.).rgb)*.10;
+ result=vec4(c,1.);
+}
+"""
+# Keep the bloom input on the exact same ORIGINAL bounded exposure treatment
+# as scene APPLY. Native source evidence establishes ordering/coherence, not
+# equivalence of our bounded formula to Unreal's bilateral local exposure.
+var _coherent_bloom_source:=true
+var _render_coherent_bloom:=true
+func set_coherent_bloom_source(value:bool)->void:
+	_guard.lock();_coherent_bloom_source=value;_guard.unlock()
+func _coherent_air_source()->String:
+	# Reuse the single authoritative gain body; no independently drifting formula.
+	var first:=APPLY.find("\tvec2 grid =")
+	var last:=APPLY.find("\tvec3 adjusted =")
+	if first<0 or last<=first:
+		_report("error","Scene exposure gain contract changed");return ""
+	var gain:=APPLY.substr(first,last-first).replace("gl_FragCoord.xy","pixel")
+	var fn:="const vec3 luma=vec3(.2126,.7152,.0722);\nfloat scene_gain(vec3 rgb,vec2 pixel){vec4 color=vec4(rgb,1.);\n"+gain+"\nreturn gain;}\n"
+	var main_start:=AIR_SOURCE.find("void main(){")
+	if main_start<0:
+		_report("error","Bloom source exposure contract changed");return ""
+	return AIR_SOURCE.substr(0,main_start)+fn+"""void main(){
+ ivec2 dimensions=textureSize(source_color,0);
+ ivec2 first=ivec2(gl_FragCoord.xy)*4;vec3 sum=vec3(0.);
+ for(int y=0;y<4;y++)for(int x=0;x<4;x++){
+  ivec2 pixel=min(first+ivec2(x,y),dimensions-1);
+  vec3 c=texelFetch(source_color,pixel,0).rgb;
+  sum+=c*scene_gain(c,vec2(pixel)+.5);
+ }
+ result=vec4(sum/16.,1.);
+}
+"""
+
+var _air_bloom:=false
+func set_air_bloom(value:bool)->void:
+	if _air_bloom==value:return
+	_air_bloom=value;set_neutral(false)
+
 var _guard := Mutex.new()
 const REVIEW_PARAMETERS := [0.23, 0.10, 0.24, 0.38]
-var _parameters := PackedFloat32Array(REVIEW_PARAMETERS).to_byte_array()
+var _parameters := PackedFloat32Array(REVIEW_PARAMETERS + [0.,0.,0.,0.]).to_byte_array()
 var _review_strength := float(REVIEW_PARAMETERS[0])
 var _state := {"frames": 0, "rebuilds": 0, "error": "", "bytes": 0, "first_build_us": 0}
 var _color := RID()
@@ -87,7 +164,7 @@ func _init() -> void:
 	access_resolved_color = true
 
 func set_neutral(neutral: bool) -> void:
-	var parameters := PackedFloat32Array(REVIEW_PARAMETERS)
+	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16 if _air_bloom and not neutral else 0.,0.,0.,0.])
 	parameters[0] = 0.0 if neutral else _review_strength
 	_guard.lock()
 	_parameters = parameters.to_byte_array()
@@ -188,8 +265,20 @@ func _build(rd: RenderingDevice, color: RID, format: RDTextureFormat) -> bool:
 	if not nearest.is_valid() or not linear.is_valid(): return false
 	if not _prepare_pass(rd, COPY, copy_fb, [_sample(0, nearest, color)]): return false
 	if not _prepare_pass(rd, METER, meter_fb, [_sample(0, nearest, copy)]): return false
-	if not _prepare_pass(rd, APPLY, _scene_framebuffer, [_sample(0, nearest, copy), _sample(1, linear, meter)]): return false
-	_report("bytes", format.width * format.height * 4 + width * height * 2)
+	var small: Array[RID]=[]
+	for i in 3:
+		var t:=_texture(rd,ceili(float(format.width)/4.),ceili(float(format.height)/4.),RenderingDevice.DATA_FORMAT_B10G11R11_UFLOAT_PACK32)
+		if not t.is_valid():return false
+		small.append(t)
+	var air_source:=_coherent_air_source() if _render_coherent_bloom else AIR_SOURCE
+	if air_source.is_empty():return false
+	if not _prepare_pass(rd,air_source,_keep(rd.framebuffer_create([small[0]])),[_sample(0,linear,copy),_sample(1,linear,meter)]):return false
+	for i in 2:
+		var code:=AIR_BLUR.replace("DIRECTION","vec2(1.,0.)" if i==0 else "vec2(0.,1.)")
+		if not _prepare_pass(rd,code,_keep(rd.framebuffer_create([small[i+1]])),[_sample(0,linear,small[i])]):return false
+	if not _prepare_pass(rd, APPLY, _scene_framebuffer, [_sample(0, nearest, copy), _sample(1, linear, meter),_sample(2,linear,small[2])]): return false
+	_report("coherent_bloom",_render_coherent_bloom)
+	_report("bytes", format.width * format.height * (8 if format.format==HDR_FORMAT else 4) + width * height * 2 + ceili(float(format.width)/4.)*ceili(float(format.height)/4.)*12)
 	_guard.lock()
 	if _state.rebuilds == 0: _state.first_build_us = Time.get_ticks_usec() - start
 	_state.rebuilds += 1
@@ -201,28 +290,39 @@ func _render_callback(kind: int, data: RenderData) -> void:
 	var buffers := data.get_render_scene_buffers() as RenderSceneBuffersRD
 	var rd := RenderingServer.get_rendering_device()
 	if buffers == null or rd == null: return
+	_guard.lock();var coherent:=_coherent_bloom_source;_guard.unlock()
+	if coherent!=_render_coherent_bloom:
+		_release(rd);_render_coherent_bloom=coherent
+		_report("coherent_bloom",coherent)
 	var color := buffers.get_color_layer(0)
 	if not color.is_valid(): return
 	if color != _color:
 		_release(rd)
 		var format := rd.texture_get_format(color)
-		if buffers.get_view_count() != 1 or format.samples != RenderingDevice.TEXTURE_SAMPLES_1 or format.format != COLOR_FORMAT:
+		if buffers.get_view_count() != 1 or format.samples != RenderingDevice.TEXTURE_SAMPLES_1 or format.format not in [COLOR_FORMAT,HDR_FORMAT]:
 			_report("error", "Local exposure requires a supported resolved scene color")
 			return
+		_source_format=format.format;_report("color_format",_source_format)
 		if not _build(rd, color, format):
 			_release(rd)
 			if _state.error.is_empty(): _report("error", "Could not prepare local exposure passes")
 			return
 		_color = color
 	_guard.lock()
-	var parameters := _parameters
+	var parameters := _parameters.duplicate()
 	_guard.unlock()
+	if _source_format==HDR_FORMAT:
+		# RGB10 scene color stores half radiance; RGBA16F stores full radiance.
+		# Preserve the existing physical middle gray and toe, not a new art gain.
+		parameters.encode_float(4,parameters.decode_float(4)*2.)
+		parameters.encode_float(24,1.)
 	for index in _passes.size():
+		if index in [2,3,4] and parameters.decode_float(16)<=0.:continue
 		var pass_data := _passes[index]
 		var list := rd.draw_list_begin(pass_data[0])
 		rd.draw_list_bind_render_pipeline(list, pass_data[1])
 		rd.draw_list_bind_uniform_set(list, pass_data[2], 0)
-		if index == 2: rd.draw_list_set_push_constant(list, parameters, 16)
+		if index >= 1: rd.draw_list_set_push_constant(list, parameters, 32)
 		rd.draw_list_draw(list, false, 1, 3)
 		rd.draw_list_end()
 	_guard.lock()

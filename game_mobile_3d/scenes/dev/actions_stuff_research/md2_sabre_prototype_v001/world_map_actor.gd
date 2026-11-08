@@ -3,6 +3,10 @@ extends "res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.
 const FX=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/effects.gd")
 const AUDIO=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
 const PRESENTER=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/render_presenter.gd")
+var lantern:Node3D
+var _idle_wait:=0.
+var _inspect_age:=0.
+var _inspecting:=false
 var is_dead:=false
 var smooth_step_active:=false
 var jump_active:bool:
@@ -41,9 +45,30 @@ func _ready()->void:
 			var alias:String=clips[key].get("audio_alias","")
 			if not alias.is_empty():reference_audio.clip_aliases[key]=alias
 		reference_audio.is_event_valid=func(serial:int)->bool:return combo.serial==serial and combo.active() and review_clip.is_empty()
+	if primary_ready:
+		lantern=preload("res://scripts/world_map_player_lantern.gd").new();lantern.name="PrivateHipLantern"
+		model.add_child(lantern);lantern.setup(self)
+		presentation_reset.connect(func():_idle_wait=0.;_inspect_age=0.;_inspecting=false)
 	if not primary_ready:
 		push_error("Primary A&S/MD2+Sabre is unavailable. External private source/hybrid data required; fallback is NOT the selected player.")
 		set_physics_process(false);set_process_input(false);set_process_unhandled_input(false)
+
+func _select_clip()->String:
+	var selected:=super._select_clip()
+	if selected!="Idle" or _move_requested or not _grounded or not review_clip.is_empty():
+		_idle_wait=0.;_inspecting=false;_inspect_age=0.;return selected
+	if _inspecting:return "InspectWeapon"
+	if _idle_wait>=6. and clips.has("InspectWeapon"):
+		_inspecting=true;_inspect_age=0.;return "InspectWeapon"
+	return selected
+
+func _animate(delta:float)->void:
+	if _inspecting:
+		_inspect_age+=delta
+		if clips.has("InspectWeapon") and _inspect_age>=float(clips.InspectWeapon.duration):
+			_inspecting=false;_inspect_age=0.;_idle_wait=-8.
+	else:_idle_wait+=delta
+	super._animate(delta)
 
 func _physics_process(delta:float)->void:
 	var camera:=get_viewport().get_camera_3d()

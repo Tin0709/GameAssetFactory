@@ -10,7 +10,7 @@ var terrain_visibility_response:=true
 var terrain_dielectric_response:=true
 const GROUND_RADIANCE=preload("res://assets/graphics/world_map_ground_bounce_v001/normalized_ground.res")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
-const LOCAL_EXPOSURE = preload("res://scripts/world_map_local_exposure.gd")
+const LOCAL_EXPOSURE = preload("res://scripts/world_map_reference_grade.gd")
 const LEAF_SAMPLING_TEXTURE = preload("res://assets/graphics/meadow_daylight_v5/leaf_sampling.res")
 const DAY_PALETTE := {
 	"ambient_light_color": Color(0.43, 0.67, 0.90),
@@ -833,7 +833,9 @@ func _restore_atmosphere() -> void:
 	_atmosphere_environment = null
 
 func day_palette_available() -> bool:
-	return atmosphere_review_available() and not level.get_viewport().use_hdr_2d
+	var owner=level.get("showcase")
+	var owned_hdr:bool=owner!=null and owner.get("_hdr_owned")==true
+	return atmosphere_review_available() and (not level.get_viewport().use_hdr_2d or owned_hdr)
 
 func day_palette_active(balanced: bool = false) -> bool:
 	return _palette_applied == (DayPalette.BALANCED if balanced else DayPalette.ORIGINAL)
