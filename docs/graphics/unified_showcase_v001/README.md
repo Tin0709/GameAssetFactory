@@ -1,5 +1,35 @@
 # Unified playable Overworld showcase
 
+**2026-11-08 — Grass light response:** default private Mobile WorldMap now uses
+the hash-validated captured Day grass normal weight1, applied after interpolation
+in world space. Source evidence: private `godot_lab/grass_normal_response_v001/`
+(PS835/913); the buffer remains external. This is the verified normal consumer,
+not recovery of the entire native foliage lighting algorithm.
+
+Original mobile equivalents add real alpha-tested grass shadows, the existing
+ground's directional cloud attenuation, and bounded warm tip transmission using
+the existing GAF foliage helper (.1248 original policy, not an MD2 constant).
+Direct transmission shares shadow/cloud attenuation; no emissive or ambient lift.
+Existing palette, textures, source scale, density, wind/contact deformation,
+paths, character, audio mute and scene remain unchanged. Native Lumen/indirect
+lighting and complete native two-sided scattering are not reproduced.
+
+Press L → **Grass lighting · MD2 study** for an exact old-shader/shadow-OFF
+comparison. B baseline also suspends the new path. Unsupported renderers or
+forced vertex shading retain the old response. The private captured parameter
+must validate; absent/changed data falls back safely. Flowers keep their old shader.
+
+Validation: native Mobile/D3D12 contract and planting regression pass; independent
+static review found no important issues. Frozen same-camera OFF restoration is
+pixel-identical; transmission ON/OFF without sunlight is pixel-identical. Grass
+ROI luminance p90–p10 increases14.55→41.17 (contrast diagnostic, not MD2 error).
+Actual player passage produces force1.0227; a controlled force .9081 decays to
+.00328 after4s with the new light path enabled. Native static spawn draws85→127;
+current capped desktop motion interval16.66ms. Extra alpha-shadow draws require
+phone measurement; neither handset FPS nor full MD2 visual equivalence is claimed.
+Private screenshots, scripts and receipts:
+`MD2 Research/godot_lab/world_map_unified_showcase_v001/grass_light_match_v001/`.
+
 **Current grass-only density review:** flowers are temporarily hidden. All8,418
 supported grass blocks in the100m playable boundary have one patch root; actual
 dirt-path and stone blocks remain unplanted. The optional shader ground-kind mask
