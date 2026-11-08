@@ -17,6 +17,8 @@ var _time_applied:=false
 var _debug:=false
 var _hint:Label
 var _elapsed:=0.
+var _cycle_button:CheckButton
+var _exposure_button:CheckButton
 const ENV_FIELDS:=["ambient_light_color","ambient_light_energy","background_color","tonemap_exposure","adjustment_saturation","fog_light_color","fog_density"]
 
 func make_player()->Node3D:
@@ -35,10 +37,14 @@ func setup(world:Node3D)->void:
 	if level.player.get("primary_ready")!=true:
 		unavailable_reason="Private A&S/MD2 + Sabre data missing. Set MD2_RESEARCH_ROOT to the private research folder and restart."
 	level.terrain_sky.set_enabled(false)
+	if level.look.local_exposure_available():
+		level.look.set_local_exposure(true)
+		level.look._exposure_effect.set_review_strength(.12)
 	if level.player.has_method("setup_world_audio"):level.player.setup_world_audio(level)
 	_capture_day()
 	_build_ui()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
+	level.get_node("HUD/Help").text="GRAPHICS COMPARISON\nF8 Day finish · F11 directional fill · Shift+F11 actor canopy fill\nF7 local exposure · Shift+F1 ground bounce · F1 soft shadows\nF2 canopy contact · Shift+F2 root soil · F3 direct cloud shading\nF9 leaf edges · Shift+F9 MSAA · F10 pose interpolation\nF12 optional terrain cache · G vegetation · Shift+G visit grove\nH fog · N wind · Shift+N passage · Alt+N crown wind"
 	DisplayServer.window_set_title("GameAssetFactory · Overworld Showcase · A&S / MD2 Sabre · L options")
 	print("WORLD_MAP_SHOWCASE_READY ",JSON.stringify({"primary_ready":unavailable_reason.is_empty(),"private_external":true,"hour":hour,"experimental_terrain_sky":false}))
 
@@ -98,7 +104,10 @@ func _process(delta:float)->void:
 	apply_time()
 	if _hint!=null and unavailable_reason.is_empty():_hint.visible=_elapsed<12.
 	if status!=null and panel.visible:
-		status.text="%s · %02d:%02d · %s\n%d FPS · %s · MSAA %s\nPrivate reference player; not for distribution"%["Combined" if level.look.stage==2 else "Original graphics",int(hour),int(fmod(hour,1.)*60.),"Cycle" if cycle_enabled else "Paused",Engine.get_frames_per_second(),RenderingServer.get_current_rendering_method(),str(level.get_viewport().msaa_3d)]
+		_cycle_button.set_pressed_no_signal(cycle_enabled)
+		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
+		var msaa:=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
+		status.text="%s · %02d:%02d · %s\n%d FPS · %s · MSAA %s\nPrivate reference player; not for distribution"%["Combined" if level.look.stage==2 else "Original graphics",int(hour),int(fmod(hour,1.)*60.),"Cycle" if cycle_enabled else "Paused",Engine.get_frames_per_second(),RenderingServer.get_current_rendering_method(),msaa]
 
 func _build_ui()->void:
 	var hud:=level.get_node("HUD")
@@ -113,8 +122,14 @@ func _build_ui()->void:
 		var button:=Button.new();button.text=entry[0];button.focus_mode=Control.FOCUS_NONE;times.add_child(button)
 		button.pressed.connect(set_hour.bind(float(entry[1])))
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
+	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)
 	var compare:=Button.new();compare.text="Compare original / combined graphics (B)";compare.focus_mode=Control.FOCUS_NONE;box.add_child(compare);compare.pressed.connect(compare_baseline)
+	_exposure_button=CheckButton.new();_exposure_button.text="Bounded local exposure (F7)";_exposure_button.focus_mode=Control.FOCUS_NONE;box.add_child(_exposure_button)
+	_exposure_button.disabled=not level.look.local_exposure_available()
+	_exposure_button.toggled.connect(func(value:bool):
+		level.look.set_local_exposure(value)
+		if level.look._exposure_effect!=null:level.look._exposure_effect.set_review_strength(.12))
 	var experimental:=CheckButton.new();experimental.text="Optional unfinished terrain sky cache (F12)";experimental.focus_mode=Control.FOCUS_NONE;box.add_child(experimental)
 	experimental.toggled.connect(func(value:bool):level.terrain_sky.set_enabled(value))
 	var audio:=CheckButton.new();audio.text="Environment + footsteps + Sabre audio";audio.button_pressed=true;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)

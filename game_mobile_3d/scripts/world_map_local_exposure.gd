@@ -74,6 +74,7 @@ void main() {
 var _guard := Mutex.new()
 const REVIEW_PARAMETERS := [0.23, 0.10, 0.24, 0.38]
 var _parameters := PackedFloat32Array(REVIEW_PARAMETERS).to_byte_array()
+var _review_strength := float(REVIEW_PARAMETERS[0])
 var _state := {"frames": 0, "rebuilds": 0, "error": "", "bytes": 0, "first_build_us": 0}
 var _color := RID()
 var _resources: Array[RID] = []
@@ -87,10 +88,15 @@ func _init() -> void:
 
 func set_neutral(neutral: bool) -> void:
 	var parameters := PackedFloat32Array(REVIEW_PARAMETERS)
-	if neutral: parameters[0] = 0.0
+	parameters[0] = 0.0 if neutral else _review_strength
 	_guard.lock()
 	_parameters = parameters.to_byte_array()
 	_guard.unlock()
+
+func set_review_strength(value: float) -> void:
+	# Scene-local art setting; preserve the established finite gain clamps.
+	_review_strength = clampf(value, 0.0, REVIEW_PARAMETERS[0]) if is_finite(value) else REVIEW_PARAMETERS[0]
+	set_neutral(false)
 
 func snapshot() -> Dictionary:
 	_guard.lock()
