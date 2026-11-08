@@ -26,35 +26,43 @@
   ],
   "artifacts": {
     "CURRENT_GAPS.md": {
-      "bytes": 3808,
+      "content_bytes": 3808,
+      "hash_mode": "LF_normalized_UTF8_text",
       "sha256": "23bb7b02700a851fbf79794a9e7e4d63af369c08cc28dc9bd91e8d04556193f0"
     },
     "EVALUATION.md": {
-      "bytes": 5446,
+      "content_bytes": 5446,
+      "hash_mode": "LF_normalized_UTF8_text",
       "sha256": "3cb118de4173551ff13e381eb349add9a0d02f94c7a67b738f90e4fec64b68a5"
     },
     "gold_slice_layout.png": {
-      "bytes": 198313,
+      "content_bytes": 198313,
+      "hash_mode": "raw_bytes",
       "sha256": "e74e7feadc3a55eb27c15667341f7bff0e2085ed95469337af2fb5ecba0a870d"
     },
     "gold_slice_layout.svg": {
-      "bytes": 37035,
-      "sha256": "93dbb07259cbe828f79820f61ed74975674ee3f71db166e106d4f15bc574ac3b"
+      "content_bytes": 35597,
+      "hash_mode": "LF_normalized_UTF8_text",
+      "sha256": "d42804f182ba303ddae9eff03d1f0849004ccc5057be00dadd6c29a3ec62fca7"
     },
     "GRAPHICS_DIRECTION.md": {
-      "bytes": 8489,
+      "content_bytes": 8489,
+      "hash_mode": "LF_normalized_UTF8_text",
       "sha256": "d89e37673ff26cfd859ef732c82e276a0f7e0fe86ae192c46f6662d19ecb7796"
     },
     "MOBILE_BUDGET.md": {
-      "bytes": 5544,
+      "content_bytes": 5544,
+      "hash_mode": "LF_normalized_UTF8_text",
       "sha256": "066115f5c94ca1350464cb08afec6f4d96b1421cd324975867976d22b84f0d00"
     },
     "OVERWORLD_GOLD_SLICE_PLAN.md": {
-      "bytes": 10125,
+      "content_bytes": 10125,
+      "hash_mode": "LF_normalized_UTF8_text",
       "sha256": "dbc79180a2a48e49cfb476a75fe2fe70db116fea7ddc1ee6dfaff380b9fcad2b"
     },
     "README.md": {
-      "bytes": 2928,
+      "content_bytes": 2928,
+      "hash_mode": "LF_normalized_UTF8_text",
       "sha256": "0d6fdcdd9fac5d5fd08db75161945d3f8d72c1ecc8620750f33f34104c5e4454"
     }
   }
