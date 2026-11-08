@@ -1,4 +1,7 @@
 shader_type spatial;
+#ifdef GAF_SHARED_MIST
+#include "res://materials/world_map_mist.gdshaderinc"
+#endif
 render_mode cull_disabled, diffuse_burley, specular_schlick_ggx;
 #include "res://materials/world_map_clouds.gdshaderinc"
 #ifdef GAF_PLAYER_SKY
@@ -58,5 +61,8 @@ void fragment(){
 #endif
 #ifdef GAF_PLAYER_DIRECT
 	player_cloud=world_cloud_shade(actor_world);
+#endif
+#ifdef GAF_SHARED_MIST
+	FOG=gaf_surface_mist(SCREEN_UV,-VERTEX.z,INV_VIEW_MATRIX[3].xyz,-INV_VIEW_MATRIX[2].xyz,vec2(PROJECTION_MATRIX[0][0],PROJECTION_MATRIX[1][1]));
 #endif
 }

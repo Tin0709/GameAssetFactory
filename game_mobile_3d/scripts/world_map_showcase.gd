@@ -3,6 +3,7 @@ extends Node
 const ORIGINAL=preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 const PRIVATE_ADAPTER="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/world_map_actor.gd"
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
+const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 var level:Node3D
 var private_primary:=true
@@ -14,6 +15,19 @@ var cycle_enabled:=false
 var audio_enabled:=false
 var plants:Node3D
 var palette:=PALETTE.new()
+var forest:=FOREST.new()
+var atmosphere_review:="combined"
+var _forest_expected:Dictionary={}
+var _forest_hour:=INF
+var _forest_sun:Color
+var _forest_energy:float
+var _vignette:ColorRect
+var _player_light:OmniLight3D
+var _atmosphere_picker:OptionButton
+var _legacy_sky_button:CheckButton
+var mist:Node3D
+var spatial_mist:=true
+var _mist_sample:Dictionary={}
 var _day:Dictionary={}
 var _environment:Environment
 var _time_applied:=false
@@ -27,7 +41,7 @@ var _player_material_note:Label
 var _terrain_light_note:Label
 var _fps_label:Label
 var _fps_elapsed:=0.
-const ENV_FIELDS:=["ambient_light_color","ambient_light_energy","background_color","tonemap_exposure","adjustment_saturation","fog_light_color","fog_density"]
+const ENV_FIELDS:=["ambient_light_color","ambient_light_energy","background_color","tonemap_exposure","adjustment_saturation","adjustment_contrast","fog_light_color","fog_density","fog_depth_begin","fog_depth_end","fog_depth_curve","fog_light_energy","glow_enabled","glow_intensity","glow_bloom","glow_hdr_threshold"]
 
 func make_player()->Node3D:
 	private_primary=OS.get_environment("GAF_SHOWCASE_PLAYER")!="original"
@@ -54,6 +68,11 @@ func setup(world:Node3D)->void:
 	if level.player.has_method("setup_world_audio"):level.player.setup_world_audio(level)
 	set_audio_enabled(false)
 	_capture_day()
+	if forest.available():
+		_player_light=OmniLight3D.new();_player_light.name="AtmospherePlayerLight";_player_light.shadow_enabled=false
+		_player_light.omni_range=forest.player_range;_player_light.omni_attenuation=2.;_player_light.position.y=1.4
+		level.player.add_child(_player_light);_player_light.hide()
+		mist=preload("res://scripts/world_map_atmosphere_volume.gd").new();level.get_node("Camera3D").add_child(mist);mist.setup();mist.material_provider=_mist_materials;mist.medium_state=_mist_state;mist.compositor_owned=func(c):return c==level.look._exposure_compositor
 	_build_ui()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
 	level.get_node("HUD/Help").text="GRAPHICS COMPARISON\nF8 Day finish · F11 directional fill · Shift+F11 actor canopy fill\nF7 local exposure · Shift+F1 ground bounce · F1 soft shadows\nF2 canopy contact · Shift+F2 root soil · F3 direct cloud shading\nF9 leaf edges · Shift+F9 MSAA · F10 pose interpolation\nF12 optional terrain cache · G grass/flowers · L wind/interaction options\nH fog · N terrain wind · Shift+N passage · Alt+N crown wind"
@@ -67,6 +86,7 @@ func _capture_day()->void:
 	var sun:DirectionalLight3D=level.get_node("Sun")
 	_day.sun_rotation=sun.rotation_degrees;_day.sun_color=sun.light_color;_day.sun_energy=sun.light_energy
 	_time_applied=false
+	_forest_expected.clear();_forest_hour=INF
 
 func is_day_anchor()->bool:return is_equal_approx(hour,12.)
 
@@ -85,6 +105,97 @@ func _restore_day()->void:
 	var sun:DirectionalLight3D=level.get_node("Sun")
 	sun.rotation_degrees=_day.sun_rotation;sun.light_color=_day.sun_color;sun.light_energy=_day.sun_energy
 	_time_applied=false
+	_forest_expected.clear();_forest_hour=INF
+	if _vignette!=null:_vignette.hide()
+	if _player_light!=null:_player_light.hide()
+	if mist!=null:mist.hide()
+	_mist_sample.clear()
+
+func set_spatial_mist(value:bool)->void:
+	_restore_day();spatial_mist=value;apply_time()
+	_update_mist()
+
+func _update_mist()->void:
+	if mist==null:return
+	var env:Environment=level.get_node("WorldEnvironment").environment
+	mist.visible=forest_active() and spatial_mist and atmosphere_review in ["haze","combined"] and env.fog_enabled and not _mist_sample.is_empty()
+	if not mist.visible:return
+	var ready:bool=mist.effect.snapshot().ready and mist.failure().is_empty()
+	env.fog_density=0. if ready else float(_mist_sample.fog_opacity);_forest_expected.fog_density=env.fog_density
+	if not mist.failure().is_empty():
+		env.fog_density=float(_mist_sample.fog_opacity);_forest_expected.fog_density=env.fog_density;mist.hide();return
+	var camera:Camera3D=level.get_node("Camera3D")
+	var luma:=Vector3(.2126,.7152,.0722);var ambient:=env.ambient_light_color.srgb_to_linear()
+	var sun:DirectionalLight3D=level.get_node("Sun");var key:=sun.light_color.srgb_to_linear()
+	var incoming:=Vector3(ambient.r,ambient.g,ambient.b).dot(luma)*env.ambient_light_energy*.75+Vector3(key.r,key.g,key.b).dot(luma)*sun.light_energy*.03
+	var rgb:Vector3=_mist_sample.fog_color;var color:=Color(rgb.x,rgb.y,rgb.z).srgb_to_linear()
+	_mist_sample.scatter_energy=clampf(incoming,.015,.18)/maxf(Vector3(color.r,color.g,color.b).dot(luma),.0001)
+	mist.publish(_mist_sample,level.presentation.player_position(),level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
+
+func _mist_state(ready:bool,error:String)->void:
+	if mist==null or not mist.visible or _mist_sample.is_empty():return
+	# Called late, AFTER configure invalidates a resized field in this same frame.
+	var env:Environment=level.get_node("WorldEnvironment").environment
+	env.fog_density=0. if ready and error.is_empty() else float(_mist_sample.fog_opacity)
+	_forest_expected.fog_density=env.fog_density
+
+func _mist_materials()->Array:
+	var result:Array=level.look.materials.values()
+	result.append_array(level.look._direct_actor_materials)
+	if plants!=null:result.append_array(plants.materials)
+	for chunk:Dictionary in level.geometry._cutaway_chunks:result.append_array(chunk.materials)
+	return result
+
+func forest_active()->bool:
+	return private_primary and level!=null and level.look.stage==2 and level.view_mode=="gameplay" and atmosphere_review!="previous" and forest.available()
+
+func set_atmosphere_review(mode:String)->void:
+	if not mode in ["previous","haze","lighting","combined"]:return
+	_restore_day();atmosphere_review=mode;_forest_expected.clear();apply_time()
+	if mode!="previous" and level!=null and level.terrain_sky.enabled:level.terrain_sky.set_enabled(false)
+	if level!=null:level.look._refresh_ground_bounce()
+
+func terrain_ambient_reference()->Color:
+	if forest_active() and atmosphere_review in ["lighting","combined"] and not _forest_expected.is_empty():return _day.ambient_light_color
+	return Color(-1,-1,-1)
+
+func forest_spatial_sky_context()->bool:
+	return forest_active() and atmosphere_review in ["lighting","combined"] and not _forest_expected.is_empty()
+
+func terrain_ambient_matches(color:Color,source:Color)->bool:
+	return terrain_ambient_reference().is_equal_approx(source) and _forest_expected.get("ambient_light_color")==color
+
+func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
+	var p:=forest.sample(hour)
+	if atmosphere_review in ["lighting","combined"]:
+		var linear:=env.ambient_light_color.srgb_to_linear();var source:=Vector3(linear.r,linear.g,linear.b)
+		var tinted:Vector3=source*p.ambient_tint;var luma:=Vector3(.2126,.7152,.0722)
+		tinted*=source.dot(luma)/maxf(tinted.dot(luma),.000001)
+		env.ambient_light_color=Color(tinted.x,tinted.y,tinted.z).linear_to_srgb()
+		env.ambient_light_energy*=p.ambient_energy_scale
+		var key:=sun.light_color.srgb_to_linear();var rgb:Vector3=Vector3(key.r,key.g,key.b)*p.key_color_scale
+		var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
+		sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb();sun.light_energy*=p.key_scale*peak
+		if _player_light!=null:
+			var warm:Vector3=p.player_light_color
+			_player_light.light_color=Color(warm.x,warm.y,warm.z);_player_light.light_energy=p.player_light_weight
+			_player_light.visible=p.player_light_weight>0.
+	if atmosphere_review in ["haze","combined"]:
+		var fog:Vector3=p.fog_color
+		env.fog_light_color=Color(fog.x,fog.y,fog.z);env.fog_depth_begin=p.fog_begin;env.fog_depth_end=p.fog_end
+		env.fog_depth_curve=.8;env.fog_density=p.fog_opacity
+		if spatial_mist and mist!=null and mist.failure().is_empty() and mist.effect.snapshot().ready:env.fog_density=0.
+		env.glow_enabled=true;env.glow_intensity=float(_day.glow_intensity)*p.glow_scale
+		env.glow_bloom=float(_day.glow_bloom)*p.bloom_scale;env.glow_hdr_threshold=.86
+		env.adjustment_contrast=float(_day.adjustment_contrast)*p.contrast_scale
+		env.adjustment_saturation*=p.saturation_scale
+	if _vignette!=null:
+		_vignette.visible=atmosphere_review in ["haze","combined"]
+		_vignette.material.set_shader_parameter("strength",p.vignette)
+	_forest_expected.clear()
+	for field:String in ENV_FIELDS:_forest_expected[field]=env.get(field)
+	_forest_sun=sun.light_color;_forest_energy=sun.light_energy;_forest_hour=hour
+	_mist_sample=p
 
 func begin_environment_edit()->void:
 	if not private_primary or _day.is_empty():return
@@ -105,12 +216,23 @@ func apply_time()->void:
 	if not private_primary or level==null or level.look==null:return
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
-		_time_applied=false;return
+		_time_applied=false;_forest_expected.clear()
+		if _vignette!=null:_vignette.hide()
+		if _player_light!=null:_player_light.hide()
+		return
 	if env!=_environment:_capture_day()
-	if is_day_anchor():
-		_restore_day();return
-	var p:Dictionary=palette.sample(hour);var noon:Dictionary=palette.sample(12.)
+	var use_forest:=forest_active()
 	var sun:DirectionalLight3D=level.get_node("Sun")
+	if use_forest and _forest_hour==hour and not _forest_expected.is_empty() and sun.light_color==_forest_sun and sun.light_energy==_forest_energy:
+		var unchanged:=true
+		for field:String in _forest_expected:
+			if env.get(field)!=_forest_expected[field]:unchanged=false;break
+		if unchanged:return
+	if _time_applied:_restore_day()
+	if is_day_anchor():
+		if use_forest:_apply_forest(env,sun);_time_applied=true
+		return
+	var p:Dictionary=palette.sample(hour);var noon:Dictionary=palette.sample(12.)
 	sun.rotation_degrees=Vector3(_day.sun_rotation)+Vector3(p.pitch-noon.pitch,p.yaw-noon.yaw,0)
 	sun.light_color=Color(_day.sun_color)*Color(p.key)/Color(noon.key)
 	sun.light_energy=float(_day.sun_energy)*float(p.energy)/float(noon.energy)
@@ -121,6 +243,7 @@ func apply_time()->void:
 	env.adjustment_saturation=float(_day.adjustment_saturation)*float(p.saturation)/float(noon.saturation)
 	env.fog_light_color=p.fog
 	env.fog_density=float(_day.fog_density)*float(p.fog_amount)/float(noon.fog_amount)
+	if use_forest:_apply_forest(env,sun)
 	_time_applied=true
 
 func compare_baseline()->void:
@@ -141,9 +264,12 @@ func _process(delta:float)->void:
 	_elapsed+=delta
 	if cycle_enabled and level.look.stage==2:hour=fposmod(hour+delta*.08,24.)
 	apply_time()
+	_update_mist()
 	if _hint!=null and unavailable_reason.is_empty():_hint.visible=_elapsed<12. and not panel.visible
 	if status!=null and panel.visible:
-		_terrain_light_note.text="Local field: %s · original GAF transport\nCalibrated Day only; MD2 composition reference."%("active" if level.terrain_light!=null and level.terrain_light.is_active() else "suspended / off")
+		_atmosphere_picker.select(["previous","haze","lighting","combined"].find(atmosphere_review))
+		_legacy_sky_button.set_pressed_no_signal(level.terrain_sky.enabled)
+		_terrain_light_note.text="Local field: %s · original GAF transport\nSky RGB retint; sun transport stays Day-guarded."%("active" if level.terrain_light!=null and level.terrain_light.is_active() else "suspended / off")
 		_player_material_note.text="Same scene light / pose. Skin recovery: %s.\nB suspends adapter; F3 also gates direct clouds."%("verified Day profile" if level.look.player_effects_available() else "suspended outside verified Day / source")
 		_cycle_button.set_pressed_no_signal(cycle_enabled)
 		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
@@ -166,6 +292,14 @@ func _build_ui()->void:
 	var title:=Label.new();title.text="OVERWORLD · A&S / MD2 + SABRE";box.add_child(title)
 	status=Label.new();box.add_child(status)
 	var controls:=Label.new();controls.text="WASD run · Shift slow walk · Space jump\nLMB / E combo · airborne: downward attack\nRMB aim / strafe · Q / C turn · R reset\nL options · B original graphics · V overview\nT next time · Shift+T auto day/night";box.add_child(controls)
+	var atmosphere:=OptionButton.new();atmosphere.name="AtmosphereComparison";atmosphere.focus_mode=Control.FOCUS_NONE
+	_atmosphere_picker=atmosphere
+	for label:String in ["Previous atmosphere","Forest entrance · haze / bloom only","Forest entrance · lighting only","Forest entrance · combined"]:atmosphere.add_item(label)
+	var modes=["previous","haze","lighting","combined"];atmosphere.select(modes.find(atmosphere_review));box.add_child(atmosphere)
+	atmosphere.item_selected.connect(func(index:int):set_atmosphere_review(modes[index]))
+	atmosphere.tooltip_text="Forest A1 Day: read live in MD2. Other phases: recovered presets. Fog, bloom and light transfer are original Mobile approximations."
+	var volume:=CheckButton.new();volume.text="Spatial mist · world height / patches";volume.button_pressed=spatial_mist;volume.focus_mode=Control.FOCUS_NONE;box.add_child(volume)
+	volume.toggled.connect(set_spatial_mist)
 	var times:=HBoxContainer.new();box.add_child(times)
 	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Night",22.]]:
 		var button:=Button.new();button.text=entry[0];button.focus_mode=Control.FOCUS_NONE;times.add_child(button)
@@ -180,6 +314,7 @@ func _build_ui()->void:
 		level.look.set_local_exposure(value)
 		if level.look._exposure_effect!=null:level.look._exposure_effect.set_review_strength(LOCAL_EXPOSURE_STRENGTH))
 	var experimental:=CheckButton.new();experimental.text="Legacy sky-only · F12 (replaces local GI)";experimental.focus_mode=Control.FOCUS_NONE;box.add_child(experimental)
+	_legacy_sky_button=experimental
 	experimental.tooltip_text="Experimental older visibility-only comparison. It replaces the default colored terrain indirect lighting; the two systems never stack."
 	experimental.toggled.connect(func(value:bool):level.terrain_sky.set_enabled(value))
 	var audio:=CheckButton.new();audio.text="Enable test audio (default off)";audio.button_pressed=audio_enabled;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
@@ -216,6 +351,10 @@ func _build_ui()->void:
 	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · L options"
 	if not unavailable_reason.is_empty():_hint.text=unavailable_reason;_hint.modulate=Color(1.,.6,.35)
 	hud.add_child(_hint)
+	_vignette=ColorRect.new();_vignette.name="AtmosphereVignette";_vignette.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	_vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_vignette.z_index=-20
+	var material:=ShaderMaterial.new();material.shader=preload("res://materials/world_map_atmosphere_vignette.gdshader");_vignette.material=material
+	hud.add_child(_vignette);_vignette.hide()
 
 func handle_key(event:InputEventKey)->bool:
 	if not private_primary:return false

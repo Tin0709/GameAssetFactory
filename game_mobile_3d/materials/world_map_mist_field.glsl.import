@@ -1,0 +1,13 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://boeg3puivci1j"
+path="res://.godot/imported/world_map_mist_field.glsl-4f431213f4a14c945913803319c86400.res"
+
+[deps]
+
+source_file="res://materials/world_map_mist_field.glsl"
+dest_files=["res://.godot/imported/world_map_mist_field.glsl-4f431213f4a14c945913803319c86400.res"]
+
+[params]

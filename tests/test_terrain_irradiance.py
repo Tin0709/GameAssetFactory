@@ -3,6 +3,14 @@ import numpy as np
 from scripts.graphics.terrain_irradiance import Scene, integrate, receiver_origins
 
 class TerrainIrradianceTests(unittest.TestCase):
+    def test_sky_chromatic_rescale_is_linear_without_rebake(self):
+        scene=Scene([[0,1,0],[1,1,1]],[0,0,0],[[.2,.4,.1],[.3,.1,.2]])
+        p=np.array([[1.,.75,1.,1,0,0],[1.,.75,.5,1,0,0]])
+        a=integrate(scene,p,256,[0,1,0],[.1,.2,.3])
+        b=integrate(scene,p,256,[0,1,0],[.2,.1,.6])
+        np.testing.assert_allclose(b['sky'],a['sky']*[2,.5,2],atol=1e-12)
+        np.testing.assert_array_equal(b['sun'],a['sun'])
+
     def test_open_origins_unchanged_and_enclosed_receiver_rejected(self):
         scene=Scene([[0,0,0]],[0,0,0],[[.2,.2,.2]])
         p=np.array([[.5,.5,.5,0,1,0],[0.,.25,.5,-1,0,0]])

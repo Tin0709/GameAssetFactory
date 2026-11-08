@@ -1,5 +1,8 @@
 shader_type spatial;
 #define GAF_WORLD_TERRAIN_PBR
+#ifdef GAF_SHARED_MIST
+#include "res://materials/world_map_mist.gdshaderinc"
+#endif
 render_mode diffuse_burley, depth_draw_always, cull_disabled;
 #include "res://materials/gameplay_cliff_cutaway.gdshaderinc"
 #include "res://materials/world_map_surface_v5.gdshaderinc"
@@ -91,5 +94,8 @@ void fragment() {
 	EMISSION=terrain_emission(UV);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission);
+#endif
+#ifdef GAF_SHARED_MIST
+	FOG=gaf_surface_mist(SCREEN_UV,-VERTEX.z,INV_VIEW_MATRIX[3].xyz,-INV_VIEW_MATRIX[2].xyz,vec2(PROJECTION_MATRIX[0][0],PROJECTION_MATRIX[1][1]));
 #endif
 }

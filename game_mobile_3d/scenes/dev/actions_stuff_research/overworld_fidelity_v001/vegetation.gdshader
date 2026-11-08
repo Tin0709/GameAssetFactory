@@ -1,4 +1,7 @@
 shader_type spatial;
+#ifdef GAF_SHARED_MIST
+#include "res://materials/world_map_mist.gdshaderinc"
+#endif
 render_mode cull_disabled, diffuse_burley, specular_disabled;
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_splay.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_wind.gdshaderinc"
@@ -111,5 +114,8 @@ void fragment(){
 	BACKLIGHT=vec3(0.0);
 	study_tip_weight=smoothstep(0.26,0.85,height_fraction);
 	study_cloud=world_cloud_shade(foliage_world);
+#endif
+#ifdef GAF_SHARED_MIST
+	FOG=gaf_surface_mist(SCREEN_UV,-VERTEX.z,INV_VIEW_MATRIX[3].xyz,-INV_VIEW_MATRIX[2].xyz,vec2(PROJECTION_MATRIX[0][0],PROJECTION_MATRIX[1][1]));
 #endif
 }

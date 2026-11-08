@@ -76,3 +76,30 @@ lights_and_shadows/directional_shadow/size.mobile=1024
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=1
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality.mobile=1
 environment/defaults/default_clear_color=Color(0.075, 0.13, 0.17, 1)
+
+[shader_globals]
+
+gaf_mist_enabled={
+"type": "bool",
+"value": false
+}
+gaf_mist_far={
+"type": "float",
+"value": 72.0
+}
+gaf_mist_volume={
+"type": "sampler3D",
+"value": ""
+}
+gaf_mist_camera_position={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+gaf_mist_camera_direction={
+"type": "vec3",
+"value": Vector3(0, 0, -1)
+}
+gaf_mist_projection_scale={
+"type": "vec2",
+"value": Vector2(1, 1)
+}

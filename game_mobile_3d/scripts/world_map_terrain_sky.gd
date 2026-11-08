@@ -105,6 +105,7 @@ func available()->bool:
 func is_active()->bool:return _applied
 
 func set_enabled(value:bool)->void:
+    if value and level.showcase.forest_active():level.showcase.set_atmosphere_review("previous")
     enabled=value;refresh()
 
 func refresh()->void:

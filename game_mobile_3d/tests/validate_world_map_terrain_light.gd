@@ -47,7 +47,10 @@ func run()->void:
 		check(w.terrain_light.is_active(),"Restored transform resumes transport")
 		check(not w.look.ground_bounce_active(),"Legacy mineral bounce does not double count")
 		w.showcase.set_hour(22.);await process_frame;await process_frame
-		check(not w.terrain_light.is_active(),"Night rejects static Day transport")
+		check(w.look.terrain_materials[0][3].get_shader_parameter("terrain_key_radiance")==Vector3.ZERO,"Night rejects cached Day sunlight")
+		w.showcase.set_atmosphere_review("previous");await process_frame;await process_frame
+		check(not w.terrain_light.is_active(),"Previous Night rejects unadapted Day transport")
+		w.showcase.set_atmosphere_review("combined")
 		w.showcase.set_hour(12.);await process_frame;await process_frame
 		check(w.terrain_light.is_active(),"Noon restores local transport")
 		w.look.set_stage(0);await process_frame

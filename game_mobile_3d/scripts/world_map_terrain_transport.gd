@@ -8,6 +8,7 @@ var error:=""
 var _applied:=false
 var _last_key:=Vector3.INF
 var _last_scale:=-1.
+var _last_tint:=Vector3.INF
 var _world_transforms:Dictionary={}
 var _transforms_dirty:=false
 var _transforms_valid:=true
@@ -41,7 +42,7 @@ func _install()->bool:
 		if not v is Array or v.size()!=3:return reject("Invalid normalization profile")
 		for x in v:
 			if not (x is float or x is int) or not is_finite(float(x)):return reject("Invalid normalization profile")
-			if key=="ambient_srgb" and (float(x)<0. or float(x)>1.):return reject("Invalid normalization profile")
+			if key=="ambient_srgb" and (float(x)<=0. or float(x)>1.):return reject("Invalid normalization profile")
 	var d:Array=cache.get_meta("sun_direction")
 	if absf(Vector3(d[0],d[1],d[2]).length()-1.)>.0001:return reject("Invalid normalization profile")
 	if cache.get_meta("source_runtime_sha256","")!=FileAccess.get_sha256(level.DATA):return reject("Map changed")
@@ -106,14 +107,19 @@ func available()->bool:
 	if not installed or not level.ambient.is_active() or level.look.stage!=2:return false
 	if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading") or ProjectSettings.get_setting("rendering/lights_and_shadows/use_physical_light_units",false):return false
 	if level.terrain_sky.enabled or not level.look.direct_clouds_active() or not level.look.day_finish_active() or not level.look.day_composition_active():return false
-	if level.showcase.private_primary and not level.showcase.is_day_anchor():return false
+	var forest_sky:bool=level.showcase.forest_spatial_sky_context()
+	if level.showcase.private_primary and not level.showcase.is_day_anchor() and not forest_sky:return false
 	var sun:DirectionalLight3D=level.get_node("Sun");var d:Array=cache.get_meta("sun_direction",[])
 	if not is_finite(sun.light_energy) or sun.light_energy<0.:return false
 	for v in [sun.light_color.r,sun.light_color.g,sun.light_color.b]:
 		if not is_finite(v) or v<0.:return false
-	if d.size()!=3 or not sun.is_visible_in_tree() or not sun.shadow_enabled or sun.global_basis.z.normalized().dot(Vector3(d[0],d[1],d[2]))<cos(deg_to_rad(.1)):return false
+	if d.size()!=3 or not sun.is_visible_in_tree() or not sun.shadow_enabled:return false
+	if sun.global_basis.z.normalized().dot(Vector3(d[0],d[1],d[2]))<cos(deg_to_rad(.1)) and not forest_sky:return false
 	var env:Environment=level.get_node("WorldEnvironment").environment;var color:Array=cache.get_meta("ambient_srgb",[])
-	return color.size()==3 and env.ambient_light_color.is_equal_approx(Color(color[0],color[1],color[2])) and is_finite(env.ambient_light_energy) and env.ambient_light_energy>=0.
+	if color.size()!=3:return false
+	var source:=Color(color[0],color[1],color[2])
+	var matches:bool=env.ambient_light_color.is_equal_approx(source) or level.showcase.terrain_ambient_matches(env.ambient_light_color,source)
+	return matches and is_finite(env.ambient_light_energy) and env.ambient_light_energy>=0.
 func is_active()->bool:return available() and level.look.terrain_review in ["lighting","combined"]
 func refresh()->void:
 	var active:=is_active()
@@ -123,14 +129,18 @@ func refresh()->void:
 func bind(force:bool=false)->void:
 	if not is_active():return
 	var sun:DirectionalLight3D=level.get_node("Sun");var c:=sun.light_color.srgb_to_linear();var key:=Vector3(c.r,c.g,c.b)*sun.light_energy
-	if not level.look._ground_bounce_requested:key=Vector3.ZERO
+	var direction:Array=cache.get_meta("sun_direction")
+	if not level.look._ground_bounce_requested or sun.global_basis.z.normalized().dot(Vector3(direction[0],direction[1],direction[2]))<cos(deg_to_rad(.1)):key=Vector3.ZERO
 	var scale:float=level.get_node("WorldEnvironment").environment.ambient_light_energy/float(cache.get_meta("ambient_energy"))
-	if not force and key==_last_key and scale==_last_scale:return
-	_last_key=key;_last_scale=scale
+	var original:Array=cache.get_meta("ambient_srgb");var source:=Color(original[0],original[1],original[2]).srgb_to_linear()
+	var now:Color=level.get_node("WorldEnvironment").environment.ambient_light_color.srgb_to_linear()
+	var tint:=Vector3(now.r/source.r,now.g/source.g,now.b/source.b)
+	if not force and key==_last_key and scale==_last_scale and tint==_last_tint:return
+	_last_key=key;_last_scale=scale;_last_tint=tint
 	var materials={}
 	for row in level.look.terrain_materials:materials[row[3]]=true
 	for chunk in level.geometry._cutaway_chunks:
 		for m in chunk.materials:materials[m]=true
 	for m:ShaderMaterial in materials:
-		m.set_shader_parameter("terrain_key_radiance",key);m.set_shader_parameter("terrain_ambient_scale",scale)
+		m.set_shader_parameter("terrain_key_radiance",key);m.set_shader_parameter("terrain_ambient_scale",scale);m.set_shader_parameter("terrain_ambient_tint",tint)
 func _process(_delta:float)->void:refresh()

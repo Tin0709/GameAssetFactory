@@ -34,7 +34,7 @@ func supported()->bool:
 
 func restore()->void:
 	for row:Dictionary in _records:
-		if row.material.shader==row.variant:row.material.shader=row.original
+		if preload("res://scripts/world_map_atmosphere_volume.gd").base_shader(row.material.shader)==row.variant:row.material.shader=row.original
 	_records.clear();active=false
 
 func apply(materials:Array[ShaderMaterial],enabled:bool)->void:
@@ -42,7 +42,7 @@ func apply(materials:Array[ShaderMaterial],enabled:bool)->void:
 	if not enabled or not supported():return
 	for material:ShaderMaterial in materials:
 		if material.get_shader_parameter("tinted_grass")!=true:continue
-		var source:Shader=material.shader
+		var source:Shader=preload("res://scripts/world_map_atmosphere_volume.gd").base_shader(material.shader)
 		if not _variants.has(source):
 			var variant:=Shader.new();variant.resource_name="Grass lighting · captured world normal"
 			var header:="shader_type spatial;\n#define GAF_REFERENCE_GRASS_LIGHTING"
