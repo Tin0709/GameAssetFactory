@@ -4,6 +4,7 @@
 vec3 gaf_grass_rest_arc(vec3 rest_direction, vec2 heading, float planar, float vertical) {
 	vec3 rest = normalize(rest_direction);
 	vec3 lateral = vec3(heading.x, 0.0, heading.y);
-	vec3 tangent = normalize(lateral - rest * dot(lateral, rest));
+	vec3 tangent = lateral - rest * dot(lateral, rest);
+	tangent /= max(length(tangent), 0.000001);
 	return tangent * planar + rest * vertical;
 }
