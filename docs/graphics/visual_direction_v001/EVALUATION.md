@@ -42,6 +42,7 @@ Write one observed strength and one remaining problem per item.
 | Motion and temporal clarity |10| Breeze, passage, shadows and player presentation remain stable and coherent |
 | Atmosphere |5| Distance has depth while the playable foreground remains crisp |
 
+Compute the score as `sum(weight * rating / 4)` across the eight criteria.
 Proposed art-candidate threshold:weighted score at least80/100, with every
 criterion at least3. This is an internal review rule, not an already accepted
 standard. A high average cannot compensate for the vetoes below. Record actual

@@ -1,0 +1,61 @@
+{
+  "revision": 1,
+  "client_date": "2026-11-08",
+  "status": "proposed_direction_and_build_plan",
+  "source_checkpoint": "7e5a1702fef720bac0df90bb2b6b76f49bc46d81",
+  "confirmed_user_choice": "Warm sunlit woodland-edge meadow with cool shade and adventure",
+  "user_approved_design_fields": [
+    "mood"
+  ],
+  "detailed_design_approved": false,
+  "implementation_started": false,
+  "current_scene": "res://scenes/WorldMap.tscn",
+  "broad_reverse_engineering_resumed": false,
+  "new_runtime_capture": false,
+  "game_files_changed": false,
+  "proprietary_reference_assets_copied": false,
+  "builder_check": "nothing important left",
+  "builder_check_scope": "Planning clarity only; not art approval or performance acceptance",
+  "rubric_weight_sum": 100,
+  "png_preview": "original authored schematic,1920x1200; visually inspected",
+  "local_links_verified": 12,
+  "official_sources": [
+    "https://docs.godotengine.org/en/4.7/tutorials/rendering/renderers.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/performance/optimizing_3d_performance.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/performance/gpu_optimization.html"
+  ],
+  "artifacts": {
+    "CURRENT_GAPS.md": {
+      "bytes": 3808,
+      "sha256": "23bb7b02700a851fbf79794a9e7e4d63af369c08cc28dc9bd91e8d04556193f0"
+    },
+    "EVALUATION.md": {
+      "bytes": 5446,
+      "sha256": "3cb118de4173551ff13e381eb349add9a0d02f94c7a67b738f90e4fec64b68a5"
+    },
+    "gold_slice_layout.png": {
+      "bytes": 198313,
+      "sha256": "e74e7feadc3a55eb27c15667341f7bff0e2085ed95469337af2fb5ecba0a870d"
+    },
+    "gold_slice_layout.svg": {
+      "bytes": 37035,
+      "sha256": "93dbb07259cbe828f79820f61ed74975674ee3f71db166e106d4f15bc574ac3b"
+    },
+    "GRAPHICS_DIRECTION.md": {
+      "bytes": 8489,
+      "sha256": "d89e37673ff26cfd859ef732c82e276a0f7e0fe86ae192c46f6662d19ecb7796"
+    },
+    "MOBILE_BUDGET.md": {
+      "bytes": 5544,
+      "sha256": "066115f5c94ca1350464cb08afec6f4d96b1421cd324975867976d22b84f0d00"
+    },
+    "OVERWORLD_GOLD_SLICE_PLAN.md": {
+      "bytes": 10125,
+      "sha256": "dbc79180a2a48e49cfb476a75fe2fe70db116fea7ddc1ee6dfaff380b9fcad2b"
+    },
+    "README.md": {
+      "bytes": 2928,
+      "sha256": "0d6fdcdd9fac5d5fd08db75161945d3f8d72c1ecc8620750f33f34104c5e4454"
+    }
+  }
+}

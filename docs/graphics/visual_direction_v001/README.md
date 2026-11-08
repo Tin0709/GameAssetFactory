@@ -42,3 +42,12 @@ executable placement map. Its [SVG source](gold_slice_layout.svg) is editable.
 Implementation is **not started**. First decision after reading: approve or
 revise the direction and the M0/M1 blockout scope. The final game-quality and
 device-performance gates remain open.
+
+## Responsibility at build time
+
+The user owns art approval. Environment art owns composition/material/planting
+choices; technical art owns reversible integration and light-cache validity;
+QA owns registered comparisons, restoration and scoped device evidence. A
+single developer can perform those roles, but the evidence and approval records
+stay separate. A fresh builder check found no important unanswered planning
+question; that review is not user artistic approval or device qualification.
