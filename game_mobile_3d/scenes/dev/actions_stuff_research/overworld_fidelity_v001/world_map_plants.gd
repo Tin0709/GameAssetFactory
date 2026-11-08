@@ -6,8 +6,11 @@ const FLOWERS:={"pink":"MD2 | SM_CA1_TulipPink","yellow":"MD2 | SM_Dandelion_A",
 const TILE:=32.
 const MEDIUM:=["MD2 | SM_GrassMedium_01","MD2 | SM_GrassMedium_02","MD2 | SM_GrassMedium_03"]
 const GRASS_LIGHT=preload("world_map_grass_light.gd")
+const GRASS_SPLAY=preload("world_map_grass_splay.gd")
 var grass_light:RefCounted
 var grass_lighting_enabled:=true
+var grass_splay:RefCounted
+var grass_splay_enabled:=true
 var dense_grass_review:=true
 var eligible_grass_cells:=0
 var world:Node3D
@@ -29,6 +32,7 @@ func setup_world(level:Node3D)->void:
 	for material:ShaderMaterial in bundle.materials:
 		_native_wind_intensities[material.get_instance_id()]=float(material.get_shader_parameter("wind_intensity"))
 	grass_light=GRASS_LIGHT.new();grass_light.setup(world,bundle)
+	grass_splay=GRASS_SPLAY.new();grass_splay.setup(bundle)
 	interaction=Spring.new(104.)
 	interaction.surface_height_provider=world.surface_height
 	_rng.seed=110826
@@ -64,7 +68,16 @@ func _refresh_grass_lighting()->void:
 		if node is MultiMeshInstance3D:
 			node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_ON if grass_light.active and node.get_meta("green_grass",false) else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
-func _patch_name(index:int)->String:return "PRIVATE COMPOSITE | Native grass patch %02d"%index
+func grass_splay_active()->bool:
+	return dense_grass_review and grass_splay_enabled and grass_splay!=null and grass_splay.configured
+
+func set_grass_splay(value:bool)->void:
+	if value==grass_splay_enabled:return
+	grass_splay_enabled=value
+	if dense_grass_review:_rebuild_planting()
+
+func _patch_name(index:int)->String:
+	return ("PRIVATE COMPOSITE | Native grass fan %02d" if grass_splay_active() else "PRIVATE COMPOSITE | Native grass patch %02d")%index
 
 func _build_native_patches()->void:
 	# One transient patch mesh per root. Native cards/UVs/heights stay at1x;
@@ -83,9 +96,17 @@ func _build_native_patches()->void:
 			var angle:=float(card)*TAU/3.+float(variant)*.13 if card<3 else .37+variant*.23
 			var rotation:=Basis(Vector3.UP,angle)
 			var offset:=Vector3(cos(angle)*.12,0.,sin(angle)*.12)
+			var tilt:=Basis.IDENTITY
+			var pivot:=Vector3.ZERO
+			if grass_splay_active():
+				# Rigid pitch about each card's horizontal bottom edge. The three
+				# outward headings are an original radial assembly, not native layout.
+				tilt=Basis(Vector3.FORWARD,grass_splay.angle(variant*4+card))
+				offset=rotation*Vector3(.12,0.,0.)
+				var bounds:=source.get_aabb();pivot=Vector3(bounds.get_center().x,bounds.position.y,0.)
 			for i in arrays[Mesh.ARRAY_VERTEX].size():
-				vertices.append(rotation*arrays[Mesh.ARRAY_VERTEX][i]+offset)
-				normals.append(rotation*arrays[Mesh.ARRAY_NORMAL][i]);uvs.append(arrays[Mesh.ARRAY_TEX_UV][i])
+				vertices.append(rotation*(pivot+tilt*(arrays[Mesh.ARRAY_VERTEX][i]-pivot))+offset)
+				normals.append(rotation*tilt*arrays[Mesh.ARRAY_NORMAL][i]);uvs.append(arrays[Mesh.ARRAY_TEX_UV][i])
 				var root:Vector2=arrays[Mesh.ARRAY_TEX_UV2][i]
 				var transformed:=rotation*Vector3(root.x,0.,root.y)+offset
 				roots.append(Vector2(transformed.x,transformed.z))
@@ -251,6 +272,7 @@ func snapshot()->Dictionary:
 	var data:=super.snapshot()
 	data["one_asset_per_block"]=true;data["trees"]=0
 	data["dense_grass_review"]=dense_grass_review;data["eligible_grass_cells"]=eligible_grass_cells
+	data["grass_splay_active"]=grass_splay_active()
 	if dense_grass_review:
 		data["source_card_scale"]=1.;data["cards_per_patch"]=4
 		var heights:Array[float]=[]
