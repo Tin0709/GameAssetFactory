@@ -232,7 +232,12 @@ func snapshot()->Dictionary:
 	data["dense_grass_review"]=dense_grass_review;data["eligible_grass_cells"]=eligible_grass_cells
 	if dense_grass_review:
 		data["source_card_scale"]=1.;data["cards_per_patch"]=4
-		data["native_medium_height_m"]=[.671,.941,.926]
+		var heights:Array[float]=[]
+		for name:String in MEDIUM:heights.append(bundle.meshes[name].get_aabb().size.y)
+		data["native_medium_height_m"]=heights
+		data["patch_height_m"]=bundle.meshes[_patch_name(0)].get_aabb().size.y
+		data["player_source_height_m"]=bundle.data.scale_evidence.player_static_mesh_height_m
+		data["patch_to_player_height_ratio"]=float(data.patch_height_m)/float(data.player_source_height_m)
 	data["carpet_cells"]=placements.filter(func(row:Dictionary)->bool:return row.carpet and row.flower.is_empty()).size()
 	data["mesh_material_scope"]="Existing private MD2 source bundle; cell fit/distribution/motion limits are original adapters"
 	return data

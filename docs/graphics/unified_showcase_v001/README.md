@@ -1,5 +1,33 @@
 # Unified playable Overworld showcase
 
+**Current grass-only density review:** flowers are temporarily hidden. All8,418
+supported grass blocks in the100m playable boundary have one patch root; actual
+dirt-path and stone blocks remain unplanted. The optional shader ground-kind mask
+also clips overhanging blades away from dirt/stone, preserving readable paths.
+There is no noise-density omission, empty spawn circle or cell-fit downscaling in
+this review. Trees, root-soil speckles and audio remain off.
+
+Each transient private patch assembles three original MD2 Medium cards and one
+Short card at **native1x scale**, with rotated root offsets. Medium heights are
+read from the source meshes (approx0.671/0.941/0.926m), against the recovered
+player body height2.003417m. Root uniqueness remains one patch per block;
+canopies may overlap naturally and are no longer clipped to individual cells.
+This crossed-card assembly and distribution are original review adapters, not
+an exact recovered MD2 patch mesh or native population density. UVs, alpha atlas,
+normals and motion channels are preserved. Generated private meshes stay in RAM.
+
+L: **Dense grass only · native card scale** switches between this review and the
+previous4,642grass/flower study, preserved unchanged. G still toggles planting;
+wind/contact controls work in either profile. Immutable material wind strengths
+are retained across profile switches, including switching while wind is off.
+Both profiles, terrain coverage, source scale, no dirt roots, mutable wind
+regression, grounded Idle, mute and cliff contact pass validation.
+
+Native Mobile/D3D12 review:96batches/33,672cards, observed87draws in the spawn view,
+60FPS-capped desktop interval16.66ms. This is not mobile-device throughput.
+Wind, actual movement contact and continuous4s recovery were captured privately in
+`MD2 Research/godot_lab/world_map_unified_showcase_v001/dense_native_grass_v001/`.
+
 **Current planting — grass and flowers only:** WorldMap now displays4,642 private
 MD2 reference instances:3,821 grass assets and821 flowers (pink256, yellow184,
 white210, purple171). There are3,460 carpet-grass cells plus smaller clumps and
