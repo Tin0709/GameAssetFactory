@@ -144,7 +144,9 @@ func _build_ui()->void:
 	var hud:=level.get_node("HUD")
 	panel=PanelContainer.new();panel.name="ShowcaseOptions";panel.position=Vector2(18,18)
 	panel.custom_minimum_size=Vector2(410,0);hud.add_child(panel)
-	var box:=VBoxContainer.new();panel.add_child(box)
+	var scroll:=ScrollContainer.new();scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size=Vector2(440,minf(level.get_viewport().get_visible_rect().size.y-36.,630.));panel.add_child(scroll)
+	var box:=VBoxContainer.new();box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(box)
 	var title:=Label.new();title.text="OVERWORLD · A&S / MD2 + SABRE";box.add_child(title)
 	status=Label.new();box.add_child(status)
 	var controls:=Label.new();controls.text="WASD run · Shift slow walk · Space jump\nLMB / E combo · airborne: downward attack\nRMB aim / strafe · Q / C turn · R reset\nL options · B original graphics · V overview\nT next time · Shift+T auto day/night";box.add_child(controls)
@@ -165,6 +167,13 @@ func _build_ui()->void:
 	experimental.toggled.connect(func(value:bool):level.terrain_sky.set_enabled(value))
 	var audio:=CheckButton.new();audio.text="Enable test audio (default off)";audio.button_pressed=audio_enabled;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
 	audio.toggled.connect(set_audio_enabled)
+	var player_title:=Label.new();player_title.text="PLAYER MATERIAL · independent comparisons";box.add_child(player_title)
+	var material_modes:=["original","neutral","cloud","roughness","self_light","combined"]
+	var material_picker:=OptionButton.new();material_picker.name="PlayerMaterialComparison";material_picker.focus_mode=Control.FOCUS_NONE
+	for label:String in ["Original materials (previous player)","Neutral adapter · no new effects","Cloud shading only (default)","Recovered Valorie roughness only","Recovered view self-light only","Combined · all three"]:material_picker.add_item(label)
+	material_picker.select(material_modes.find(level.look.player_material_review));box.add_child(material_picker)
+	material_picker.item_selected.connect(func(index:int):level.look.set_player_material_review(material_modes[index]))
+	var material_note:=Label.new();material_note.text="Same scene light / pose. Skin recovery: Day only.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(material_note)
 	if plants!=null:
 		var grass_light:=CheckButton.new();grass_light.text="Grass lighting · MD2 study";grass_light.button_pressed=plants.grass_lighting_enabled
 		grass_light.focus_mode=Control.FOCUS_NONE;box.add_child(grass_light);grass_light.toggled.connect(plants.set_grass_lighting)
