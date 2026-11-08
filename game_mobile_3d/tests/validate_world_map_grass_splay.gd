@@ -20,7 +20,7 @@ func run()->void:
 	var upright:=vertices(p)
 	p.set_grass_splay(true)
 	var fan:=vertices(p)
-	var max_length_error:=0.;var max_angle_error:=0.;var min_ground:=INF
+	var max_length_error:=0.;var max_angle_error:=0.;var min_ground:=INF;var min_bent_ground:=INF
 	for variant in 6:
 		var a:PackedVector3Array=upright[variant];var b:PackedVector3Array=fan[variant]
 		var mesh:Mesh=p.bundle.meshes[p._patch_name(variant)]
@@ -31,6 +31,9 @@ func run()->void:
 			var tops:Dictionary={};var bases:Dictionary={}
 			for i in range(card*6,card*6+6):
 				min_ground=minf(min_ground,b[i].y)
+				var u:float=motion[i*4];var h:float=motion[i*4+1]
+				# Conservative existing WPO bound: strongest contact/wind bend.
+				min_bent_ground=minf(min_bent_ground,b[i].y+h*sin(.75*u)/.75-h*u)
 				if motion[i*4]>.99:tops[b[i]]=true
 				if motion[i*4]<.01:bases[b[i]]=true
 				for j in range(card*6,card*6+6):max_length_error=maxf(max_length_error,absf(a[i].distance_to(a[j])-b[i].distance_to(b[j])))
@@ -43,6 +46,7 @@ func run()->void:
 	check(max_length_error<.00001,"Native card edge lengths preserved without stretching")
 	check(max_angle_error<.00001,"Card inclination matches measured captured input")
 	check(min_ground>-.00001,"All static roots stay above ground")
+	check(min_bent_ground>-.00001,"Existing maximum wind/contact bend cannot push these cards below their support plane")
 	for i in roots.size():check(roots[i]==p.placements[i].root,"Cell root layout and RNG unchanged")
 	p.set_grass_splay(false)
 	var restored:=vertices(p)
@@ -50,5 +54,5 @@ func run()->void:
 	p.set_grass_splay(true)
 	check(p.instance_count==8418 and p.flower_colors.is_empty(),"Density and grass-only selection preserved")
 	check(AudioServer.is_bus_mute(0) and w.player.active_clip=="Idle","Muted grounded startup preserved")
-	print("GRASS_SPLAY_RESULT ",JSON.stringify({"failures":failures,"max_edge_error_m":max_length_error,"max_angle_error_rad":max_angle_error,"min_ground_m":min_ground,"shape":p.grass_splay.snapshot()}))
+	print("GRASS_SPLAY_RESULT ",JSON.stringify({"failures":failures,"max_edge_error_m":max_length_error,"max_angle_error_rad":max_angle_error,"min_ground_m":min_ground,"min_bent_ground_m":min_bent_ground,"shape":p.grass_splay.snapshot()}))
 	w.free();await process_frame;await create_timer(.2).timeout;quit(0 if failures.is_empty() else 1)

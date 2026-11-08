@@ -5,6 +5,7 @@ var error:=""
 var angles:Array[float]=[]
 
 func setup(reader:RefCounted)->void:
+	configured=false;error="";angles.clear()
 	var research:=OS.get_environment("MD2_RESEARCH_ROOT")
 	if research.is_empty():research="C:/Users/ADMIN/Desktop/MD2 Research"
 	var path:=research.path_join("godot_lab/world_map_unified_showcase_v001/grass_splay_v001/profile.private.json")
