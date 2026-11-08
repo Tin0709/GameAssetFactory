@@ -1,0 +1,16 @@
+{
+  "checkpoint_date": "2026-11-08",
+  "timezone": "Asia/Saigon",
+  "status": "stopped_checkpoint_not_visual_quality_acceptance",
+  "implementation_anchor": "38da2d6c8332e078131ed104d0c0ede4427dd35b",
+  "main_scene": "res://scenes/WorldMap.tscn",
+  "engine": "Godot4.7.2 ed1daf0bf Forward Mobile",
+  "private_checkpoint_directory": "MD2 Research/checkpoints/graphics_goal_20261108_103016",
+  "proprietary_research_included": false,
+  "graphics_code_changed_during_wrapup": false,
+  "graphics_tests_rerun_during_wrapup": false,
+  "remaining_known_issue": "Final public terrain-sky cache cross-run image equality failed; cause unverified",
+  "device_performance_accepted": false,
+  "resume_requires_explicit_user_instruction": true,
+  "final_publication_receipt": "Private Research GRAPHICS_HANDOFF.md and checkpoint final-record.private.json; this commit is documentation only"
+}
