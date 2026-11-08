@@ -227,6 +227,7 @@ func _process(delta: float) -> void:
 		look.publish_render_wind(presentation.wind_time(look.motion.clock))
 
 func set_review_view(mode: String) -> void:
+	if showcase!=null:showcase.begin_environment_edit()
 	view_mode=mode
 	var camera: Camera3D=$Camera3D
 	if mode=="gameplay":
@@ -242,6 +243,7 @@ func set_review_view(mode: String) -> void:
 	_update_camera_near(camera)
 	if look != null:look.refresh_atmosphere()
 	if grove != null and grove.visible:grove.update_focus(camera,player.global_position,mode=="gameplay")
+	if showcase!=null:showcase.end_environment_edit()
 
 func _update_camera_near(camera: Camera3D) -> void:
 	var extend := _extended_camera_depth and view_mode == "gameplay" and camera.projection == Camera3D.PROJECTION_ORTHOGONAL
@@ -298,6 +300,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if showcase.handle_key(event):
 			get_viewport().set_input_as_handled();return
+		showcase.begin_environment_edit()
 		if event.physical_keycode == KEY_F11:
 			if event.shift_pressed:
 				actor_fill.set_enabled(not actor_fill.enabled)

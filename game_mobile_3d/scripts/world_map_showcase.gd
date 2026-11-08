@@ -15,6 +15,7 @@ var palette:=PALETTE.new()
 var _day:Dictionary={}
 var _environment:Environment
 var _time_applied:=false
+var _environment_edit_depth:=0
 var _debug:=false
 var _hint:Label
 var _elapsed:=0.
@@ -59,6 +60,24 @@ func _capture_day()->void:
 
 func is_day_anchor()->bool:return is_equal_approx(hour,12.)
 
+func _restore_day()->void:
+	if not _time_applied or _day.is_empty():return
+	for field:String in ENV_FIELDS:_environment.set(field,_day[field])
+	var sun:DirectionalLight3D=level.get_node("Sun")
+	sun.rotation_degrees=_day.sun_rotation;sun.light_color=_day.sun_color;sun.light_energy=_day.sun_energy
+	_time_applied=false
+
+func begin_environment_edit()->void:
+	if not private_primary or _day.is_empty():return
+	if _environment_edit_depth==0:_restore_day()
+	_environment_edit_depth+=1
+
+func end_environment_edit()->void:
+	if _environment_edit_depth==0:return
+	_environment_edit_depth-=1
+	if _environment_edit_depth==0 and level.look.stage==2:
+		_capture_day();apply_time()
+
 func set_hour(value:float)->void:
 	hour=fposmod(value,24.);apply_time()
 	if level!=null:level.look._refresh_ground_bounce()
@@ -70,11 +89,7 @@ func apply_time()->void:
 		_time_applied=false;return
 	if env!=_environment:_capture_day()
 	if is_day_anchor():
-		if not _time_applied:return
-		for field:String in ENV_FIELDS:env.set(field,_day[field])
-		var sun:DirectionalLight3D=level.get_node("Sun")
-		sun.rotation_degrees=_day.sun_rotation;sun.light_color=_day.sun_color;sun.light_energy=_day.sun_energy
-		_time_applied=false;return
+		_restore_day();return
 	var p:Dictionary=palette.sample(hour);var noon:Dictionary=palette.sample(12.)
 	var sun:DirectionalLight3D=level.get_node("Sun")
 	sun.rotation_degrees=Vector3(_day.sun_rotation)+Vector3(p.pitch-noon.pitch,p.yaw-noon.yaw,0)
