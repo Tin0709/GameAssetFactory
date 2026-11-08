@@ -1,5 +1,14 @@
 # Unified playable Overworld showcase
 
+**Latest test defaults:** all project test audio starts muted via the default
+Master bus. L can explicitly enable it for a review. Hidden vegetation now also
+removes its root-soil/contact flags and oak IDs from the live ground field while
+preserving terrain height/kind/path-edge channels; G restores the exact planted
+field. Startup fix: the first physical ground contact now clears the transient
+JumpAirborne state, which previously persisted despite floor=true/velocity=0.
+Only that initialization branch changed in the source controller; clips, normal
+jump physics, combat and approved animation data remain unchanged.
+
 **Follow-up user change:** trees, schematic foliage, grass and flowers are absent
 from the playable map by default. Their trunk collisions, canopy/contact shading
 and oak-root shading are disabled too. Terrain/grass blocks, character, combat,

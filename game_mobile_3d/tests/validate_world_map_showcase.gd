@@ -4,6 +4,7 @@ func check(value:bool,message:String)->void:
 	if not value:failures.append(message);push_error(message)
 func _initialize()->void:call_deferred("run")
 func run()->void:
+	check(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")),"Project test bus starts muted before scene setup")
 	var w=load("res://scenes/WorldMap.tscn").instantiate()
 	root.add_child(w)
 	await process_frame
@@ -38,6 +39,12 @@ func run()->void:
 		for x in w.look.path_map_image.get_width():
 			if w.look.path_map_image.get_pixel(x,y).a>1.:leftover_root_cells+=1
 	check(leftover_root_cells==0,"Hidden vegetation leaves no root soil or plant contact masks")
+	w.set_grove_visible(true,w.player.global_position)
+	check(w.look.path_map_image.get_data()==w.look._planted_path_map_image.get_data(),"Vegetation comparison restores exact original ground field")
+	w.set_grove_visible(false,w.player.global_position)
+	w.showcase.set_audio_enabled(true)
+	check(not AudioServer.is_bus_mute(0),"Audio can be explicitly enabled for review")
+	w.showcase.set_audio_enabled(false)
 	w.reset_player();check(w.player.position.distance_to(w.spawn_position)<.001,"Reset preserves authored spawn")
 	w.player.effects.sample(.01,true,Vector3.ZERO,Vector3.UP,123)
 	check(not w.player.effects.samples.is_empty(),"Reset test contains trail history")
