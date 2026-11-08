@@ -792,6 +792,8 @@ func _apply_local_exposure() -> void:
 	_exposure_camera = level.get_node("Camera3D")
 	_previous_compositor = _exposure_camera.compositor
 	_exposure_effect = LOCAL_EXPOSURE.new()
+	if level.get("showcase")!=null and level.showcase.private_primary:
+		_exposure_effect.set_review_strength(level.showcase.LOCAL_EXPOSURE_STRENGTH)
 	_exposure_compositor = Compositor.new()
 	var source := _previous_compositor
 	if source == null:

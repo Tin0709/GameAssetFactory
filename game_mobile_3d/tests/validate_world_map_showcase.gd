@@ -34,6 +34,9 @@ func run()->void:
 	check(w.look.stage==0,"Comparison restores baseline")
 	w.showcase.compare_baseline()
 	check(w.look.stage==2,"Comparison restores combined look")
+	if RenderingServer.get_rendering_device()!=null:
+		check(w.look.local_exposure_active(),"Combined local exposure restored")
+		check(is_equal_approx(w.look._exposure_effect._review_strength,.12),"Bounded scene profile survives comparison")
 	print("WORLD_MAP_SHOWCASE_RESULT ",JSON.stringify({"failures":failures,"private":w.player.using_original_source,"clips":w.player.clips.size()}))
-	w.free();await process_frame
+	w.free();await process_frame;await create_timer(.2).timeout
 	quit(0 if failures.is_empty() else 1)

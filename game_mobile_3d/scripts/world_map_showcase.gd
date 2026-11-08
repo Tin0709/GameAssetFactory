@@ -3,6 +3,7 @@ extends Node
 const ORIGINAL=preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 const PRIVATE_ADAPTER="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/world_map_actor.gd"
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
+const LOCAL_EXPOSURE_STRENGTH:=.12
 var level:Node3D
 var private_primary:=true
 var unavailable_reason:=""
@@ -39,7 +40,7 @@ func setup(world:Node3D)->void:
 	level.terrain_sky.set_enabled(false)
 	if level.look.local_exposure_available():
 		level.look.set_local_exposure(true)
-		level.look._exposure_effect.set_review_strength(.12)
+		level.look._exposure_effect.set_review_strength(LOCAL_EXPOSURE_STRENGTH)
 	if level.player.has_method("setup_world_audio"):level.player.setup_world_audio(level)
 	_capture_day()
 	_build_ui()
@@ -129,7 +130,7 @@ func _build_ui()->void:
 	_exposure_button.disabled=not level.look.local_exposure_available()
 	_exposure_button.toggled.connect(func(value:bool):
 		level.look.set_local_exposure(value)
-		if level.look._exposure_effect!=null:level.look._exposure_effect.set_review_strength(.12))
+		if level.look._exposure_effect!=null:level.look._exposure_effect.set_review_strength(LOCAL_EXPOSURE_STRENGTH))
 	var experimental:=CheckButton.new();experimental.text="Optional unfinished terrain sky cache (F12)";experimental.focus_mode=Control.FOCUS_NONE;box.add_child(experimental)
 	experimental.toggled.connect(func(value:bool):level.terrain_sky.set_enabled(value))
 	var audio:=CheckButton.new();audio.text="Environment + footsteps + Sabre audio";audio.button_pressed=true;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
