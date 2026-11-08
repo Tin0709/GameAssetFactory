@@ -7,6 +7,7 @@ const SKIN_RGBA_SHA="a08cb0963081657956181ca610a383b1384b101ee3129f95d5166226c7e
 const ORM_RGBA_SHA="99d8ff9d3c111806dbdd7c85cda9ba3def9620aa56cae793fd9cd8a2572b0c9b"
 var variants:Dictionary={}
 var profile:Dictionary={}
+var skin_mask:Texture2D
 
 func _init()->void:
 	if not OS.has_feature("editor"):return
@@ -17,6 +18,16 @@ func _init()->void:
 	var values:=FileAccess.get_file_as_bytes(path).to_float32_array()
 	if values.size()<40:return
 	profile={"roughness":Vector3(values[35],values[36],values[37]),"self_light":values[28]}
+	var mask_path:=research.path_join("extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Characters/Player/Skins/Valorie/T_Valorie_MRES.png")
+	if FileAccess.file_exists(mask_path):
+		var image:=Image.load_from_file(mask_path)
+		if image!=null and image.get_size()==Vector2i(64,64):
+			image.convert(Image.FORMAT_RGBA8)
+			var digest:=HashingContext.new();digest.start(HashingContext.HASH_SHA256);digest.update(image.get_data())
+			if digest.finish().hex_encode()=="26e10dc3da0acbb9e319b5e0e2fc7a476fcdfe51dace0c0dc10eb0ed69938abc":
+				var alpha:=PackedByteArray();var bytes:=image.get_data()
+				for i in 4096:alpha.append(bytes[i*4+3])
+				skin_mask=ImageTexture.create_from_image(Image.create_from_data(64,64,false,Image.FORMAT_R8,alpha))
 
 func available()->bool:
 	return RenderingServer.get_current_rendering_method()=="mobile" and RenderingServer.get_rendering_device()!=null \
@@ -87,4 +98,5 @@ func create(node:MeshInstance3D,source:BaseMaterial3D,tint:Color)->ShaderMateria
 	var verified:=source_skin(node,source);m.set_meta("verified_valorie",verified)
 	if verified:
 		m.set_shader_parameter("roughness_transform",profile.roughness);m.set_shader_parameter("self_light_scale",profile.self_light)
+		if skin_mask!=null:m.set_shader_parameter("skin_profile_mask",skin_mask);m.set_meta("has_profile_mask",true)
 	return m

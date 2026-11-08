@@ -109,6 +109,9 @@ var player_cloud_enabled:=true
 var player_roughness_enabled:=true
 var player_self_light_enabled:=true
 var player_material_review:="combined"
+var player_local_light_enabled:=true
+var player_reflection_enabled:=true
+var player_skin_enabled:=true
 var _player_effects_applied:=false
 var _ground_bounce_requested := false
 var _ground_bounce_applied := false
@@ -618,6 +621,7 @@ func _apply_player_materials(direct:bool,sky:bool)->void:
 		m.set_shader_parameter("cloud_shape",_cloud_shape);m.set_shader_parameter("cloud_time",cloud_clock)
 		m.set_shader_parameter("clouds_enabled",true)
 		row[0].set_surface_override_material(row[1],m)
+	if level.get("player_light")!=null:level.player_light.refresh(true)
 
 func set_player_material_review(mode:String)->void:
 	if not mode in ["original","neutral","cloud","roughness","self_light","combined"]:return

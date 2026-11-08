@@ -322,9 +322,14 @@ func _build_ui()->void:
 	var player_title:=Label.new();player_title.text="PLAYER MATERIAL · independent comparisons";box.add_child(player_title)
 	var material_modes:=["original","neutral","cloud","roughness","self_light","combined"]
 	var material_picker:=OptionButton.new();material_picker.name="PlayerMaterialComparison";material_picker.focus_mode=Control.FOCUS_NONE
-	for label:String in ["Original materials (previous player)","Neutral adapter · no new effects","Cloud shading only","Recovered Valorie roughness only","Recovered view self-light only","Combined · approved default"]:material_picker.add_item(label)
+	for label:String in ["Original materials (previous player)","Neutral adapter · no new effects","Cloud shading only","Recovered Valorie roughness only","Recovered view self-light only","Combined · current default"]:material_picker.add_item(label)
 	material_picker.select(material_modes.find(level.look.player_material_review));box.add_child(material_picker)
 	material_picker.item_selected.connect(func(index:int):level.look.set_player_material_review(material_modes[index]))
+	for entry in [["player_local_light_enabled","Player · local colored indirect"],["player_reflection_enabled","Player · broad rough reflection"],["player_skin_enabled","Player · skin softness (approximation)"]]:
+		var toggle:=CheckButton.new();toggle.name=entry[0];toggle.text=entry[1];toggle.focus_mode=Control.FOCUS_NONE
+		toggle.button_pressed=level.look.get(entry[0]);box.add_child(toggle)
+		var property:String=entry[0]
+		toggle.toggled.connect(func(value:bool):level.look.set(property,value);if level.get("player_light")!=null:level.player_light.refresh(true))
 	_player_material_note=Label.new();_player_material_note.text="Same scene light / pose. Skin recovery: Day only.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(_player_material_note)
 	var terrain_title:=Label.new();terrain_title.text="TERRAIN · material / colored indirect";box.add_child(terrain_title)
 	var terrain_modes:=["previous","materials","lighting","combined"]

@@ -4,6 +4,14 @@ varying float player_cloud;
 float player_fresnel(float c){float x=1.0-c;float s=x*x;return s*s*x;}
 void light(){
 	float nl=max(dot(NORMAL,LIGHT),0.0);
+	// Original selective wrap, not native screen-space diffusion. Integral of
+	// max(N.L+w,0)/(1+w)^2 over the sphere is PI: redistribute, do not add a lamp.
+	if(player_skin_weight>0.){
+		float wrapped=max(dot(NORMAL,LIGHT)+.15,0.)/(1.15*1.15);
+		float delta=wrapped-nl;
+		float visibility=ATTENUATION*(LIGHT_IS_DIRECTIONAL?player_cloud:1.);
+		DIFFUSE_LIGHT+=LIGHT_COLOR*visibility*delta/PI*player_skin_weight;
+	}
 	if(nl>0.0){
 		float nv=max(dot(NORMAL,VIEW),0.0001);
 		vec3 h=normalize(LIGHT+VIEW);

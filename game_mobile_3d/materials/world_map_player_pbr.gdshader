@@ -4,6 +4,7 @@ shader_type spatial;
 #endif
 render_mode cull_disabled, diffuse_burley, specular_schlick_ggx;
 #include "res://materials/world_map_clouds.gdshaderinc"
+#include "res://materials/world_map_player_transport.gdshaderinc"
 #ifdef GAF_PLAYER_SKY
 #include "res://materials/world_map_actor_sky.gdshaderinc"
 #endif
@@ -39,6 +40,7 @@ void fragment(){
 	float rough=dot(texture(rough_map,UV),rough_channel);
 	ROUGHNESS=rough*native_roughness;
 	SPECULAR=native_specular;
+	player_skin_weight=skin_wrap_enabled?step(.10000000149,texture(skin_profile_mask,UV).r):0.;
 	if(recovered_roughness){
 		float decoded=rough<=0.04045?rough/12.92:pow((rough+0.055)/1.055,2.4);
 		ROUGHNESS=clamp(decoded*roughness_transform.x,roughness_transform.y,roughness_transform.z);
@@ -59,6 +61,29 @@ void fragment(){
 	AO=actor_sky_visibility(actor_world,normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.0)).xyz));
 	AO_LIGHT_AFFECT=0.0;
 #endif
+	if(player_local_light || player_rough_reflection){
+		vec3 wn=normalize((INV_VIEW_MATRIX*vec4(NORMAL,0.)).xyz);
+		vec3 wv=normalize((INV_VIEW_MATRIX*vec4(VIEW,0.)).xyz);
+		float cloud=world_cloud_shade(actor_world);
+		float height=actor_world.y-player_probe_base;
+		float visible_sky=1.;
+#ifdef GAF_PLAYER_SKY
+		visible_sky=AO;
+#endif
+		if(player_local_light){
+			EMISSION+=ALBEDO*(1.-METALLIC)*player_cube_light(wn,height,cloud)*visible_sky;
+			AO=0.; // Replace engine diffuse sky instead of stacking two ambient terms.
+			AO_LIGHT_AFFECT=0.;
+		}
+		if(player_rough_reflection){
+			vec3 reflected=reflect(-wv,wn);
+			vec3 radiance=player_cube_light(reflected,height,cloud);
+			vec3 average=(player_axis_light(0,height,cloud)+player_axis_light(1,height,cloud)+player_axis_light(2,height,cloud)+player_axis_light(3,height,cloud)+player_axis_light(4,height,cloud)+player_axis_light(5,height,cloud))/6.;
+			radiance=mix(radiance,average,ROUGHNESS*ROUGHNESS);
+			vec3 f0=mix(vec3(.16*native_specular*native_specular),ALBEDO,METALLIC);
+			EMISSION+=radiance*f0*visible_sky;
+		}
+	}
 #ifdef GAF_PLAYER_DIRECT
 	player_cloud=world_cloud_shade(actor_world);
 #endif
