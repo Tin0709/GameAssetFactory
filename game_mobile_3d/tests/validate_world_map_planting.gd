@@ -10,6 +10,23 @@ func run()->void:
 	check(plants!=null,"Primary map has the private grass and flower planting")
 	if plants==null:w.free();await process_frame;quit(1);return
 	check(plants.error.is_empty(),"Existing external Blender bundle loads without extraction")
+	check(plants.get("dense_grass_review")==true,"Dense grass-only review is the current default")
+	if plants.get("dense_grass_review")==true:
+		check(plants.flower_colors.is_empty(),"No flowers in dense review")
+		check(plants.placements.size()==plants.eligible_grass_cells,"Every supported grass block covered; dirt excluded")
+		var roots:Dictionary={};var full_scale:=true;var supported:=true
+		for row:Dictionary in plants.placements:
+			check(not roots.has(row.cell),"One dense patch root per block")
+			roots[row.cell]=true
+			full_scale=full_scale and is_equal_approx(row.scale,1.) and row.cards==4
+			supported=supported and row.ground_kind.begins_with("grass_") and absf(row.bounds.position.y-w.surface_height(row.root.x,row.root.z))<.002
+		check(full_scale,"Dense patches keep native source scale and four crossed cards")
+		check(supported,"Dense grass is grounded and never rooted on dirt paths")
+		for material:ShaderMaterial in plants.materials:
+			check(material.get_shader_parameter("cell_limited_motion")==false,"Native canopy is not clipped to individual cells")
+			check(material.get_shader_parameter("ground_mask_enabled")==true,"Canopy clipped away from dirt path surfaces")
+		plants.set_dense_review(false)
+		check(not plants.dense_grass_review,"Previous clustered flower study remains selectable")
 	check(plants.placements.size()>800,"Large meadow carpets and scattered patches exist")
 	var occupied:Dictionary={};var bounds_ok:=true;var ground_ok:=true
 	for row:Dictionary in plants.placements:
