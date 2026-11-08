@@ -7,6 +7,9 @@ const TILE:=32.
 const MEDIUM:=["MD2 | SM_GrassMedium_01","MD2 | SM_GrassMedium_02","MD2 | SM_GrassMedium_03"]
 const GRASS_LIGHT=preload("world_map_grass_light.gd")
 const GRASS_SPLAY=preload("world_map_grass_splay.gd")
+const GRASS_WIND=preload("world_map_grass_wind.gd")
+var grass_wind:RefCounted
+var recovered_wind_enabled:=true
 var grass_light:RefCounted
 var grass_lighting_enabled:=true
 var grass_splay:RefCounted
@@ -33,6 +36,7 @@ func setup_world(level:Node3D)->void:
 		_native_wind_intensities[material.get_instance_id()]=float(material.get_shader_parameter("wind_intensity"))
 	grass_light=GRASS_LIGHT.new();grass_light.setup(world,bundle)
 	grass_splay=GRASS_SPLAY.new();grass_splay.setup(bundle)
+	grass_wind=GRASS_WIND.new();grass_wind.setup(bundle)
 	interaction=Spring.new(104.)
 	interaction.surface_height_provider=world.surface_height
 	_rng.seed=110826
@@ -56,7 +60,18 @@ func _rebuild_planting()->void:
 	if dense_grass_review:
 		_build_native_patches();_build_dense_planting()
 	else:_build_cell_planting()
-	_prepare_materials();_refresh_grass_lighting();_flush_cell_batches();reset()
+	_prepare_materials();_refresh_grass_lighting();_flush_cell_batches();_refresh_grass_wind();reset()
+
+func set_recovered_wind(value:bool)->void:
+	recovered_wind_enabled=value;_refresh_grass_wind()
+
+func _refresh_grass_wind()->void:
+	if grass_wind==null:return
+	var active:bool=recovered_wind_enabled and dense_grass_review and grass_wind.configured
+	grass_wind.apply(materials,active)
+	for child:Node in get_children():
+		if child is MultiMeshInstance3D:
+			child.extra_cull_margin=grass_wind.margin(child.multimesh,child.global_transform.basis) if active and child.get_meta("green_grass",false) else .8
 
 func set_grass_lighting(value:bool)->void:
 	grass_lighting_enabled=value;_refresh_grass_lighting()

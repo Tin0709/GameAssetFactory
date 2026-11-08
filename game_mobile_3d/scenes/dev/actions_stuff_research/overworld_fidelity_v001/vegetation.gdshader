@@ -1,6 +1,7 @@
 shader_type spatial;
 render_mode cull_disabled, diffuse_burley, specular_disabled;
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_splay.gdshaderinc"
+#include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_wind.gdshaderinc"
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/grass_normal_v001/world_normal.gdshaderinc"
@@ -44,9 +45,12 @@ void vertex(){
 	vec2 direction=normalize(wind_direction);
 	float spatial=dot(root.xz,direction);
 	float phase=CUSTOM0.z+spatial*0.6283185+INSTANCE_CUSTOM.r;
-	vec2 bend=direction*(0.28*sin(wind_time*frequency*6.2831853+phase)+0.055*sin(wind_time*6.2831853*0.625+spatial*0.34));
-	bend+=vec2(-direction.y,direction.x)*0.025*sin(wind_time*6.2831853*0.25+phase);
-	bend*=wind_intensity*CUSTOM0.w;
+	vec2 bend=vec2(0.0);
+	if(!review_source_wind){
+		bend=direction*(0.28*sin(wind_time*frequency*6.2831853+phase)+0.055*sin(wind_time*6.2831853*0.625+spatial*0.34));
+		bend+=vec2(-direction.y,direction.x)*0.025*sin(wind_time*6.2831853*0.25+phase);
+		bend*=wind_intensity*CUSTOM0.w;
+	}
 	vec2 field_uv=(root.xz+vec2(field_extent*0.5))/field_extent;
 	float inside=step(0.0,field_uv.x)*step(field_uv.x,1.0)*step(0.0,field_uv.y)*step(field_uv.y,1.0);
 	vec2 contact=mix(textureLod(interaction_previous,field_uv,0.0).rg,textureLod(interaction_field,field_uv,0.0).rg,interaction_alpha)*inside;
@@ -59,6 +63,9 @@ void vertex(){
 	vec3 world_offset=vec3(heading.x*planar,vertical,heading.y*planar);
 	if(splayed_rest_motion){
 		world_offset=gaf_grass_rest_arc(normalize(MODEL_NORMAL_MATRIX*NORMAL),heading,planar,vertical);
+	}
+	if(review_source_wind && wind_intensity>0.0){
+		world_offset+=gaf_source_grass_wind((MODEL_MATRIX*vec4(VERTEX,1.0)).xyz,root,wind_time);
 	}
 	if(cell_limited_motion){
 		world_offset*=INSTANCE_CUSTOM.a;
