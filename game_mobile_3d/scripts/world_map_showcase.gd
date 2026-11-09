@@ -26,6 +26,7 @@ var _forest_energy:float
 var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
 static var _point_kernel_owner:WeakRef
+var _point_lights:Dictionary={}
 var source_point_cutoff:=true
 var _point_cutoff_toggle:CheckButton
 var source_warm_light:=false
@@ -85,6 +86,8 @@ func setup(world:Node3D)->void:
 	level=world;process_priority=-10
 	if not private_primary:return
 	_point_kernel_owner=weakref(self)
+	get_tree().node_added.connect(_track_point_light)
+	for light in level.find_children("*","Light3D",true,false):_track_point_light(light)
 	if level.player.get("primary_ready")!=true and unavailable_reason.is_empty():
 		unavailable_reason="Private A&S/MD2 + Sabre data missing. Set MD2_RESEARCH_ROOT to the private research folder and restart."
 	level.terrain_sky.set_enabled(false)
@@ -272,9 +275,19 @@ func _update_player_falloff()->void:
 	if mist!=null:mist.recovered_point_kernel=verified and source_warm_light and point_response.kernel_available()
 	_publish_point_cutoff()
 
+func _track_point_light(node:Node)->void:
+	if level!=null and (node is OmniLight3D or node is SpotLight3D)and level.is_ancestor_of(node):_point_lights[node.get_instance_id()]=weakref(node)
+
+func _single_point_scope()->bool:
+	for key in _point_lights.keys():
+		var light=_point_lights[key].get_ref()
+		if light==null:_point_lights.erase(key);continue
+		if light!=_player_light and level.is_ancestor_of(light)and light.is_visible_in_tree()and light.light_energy>0. and (light.light_cull_mask&1)!=0:return false
+	return true
+
 func _publish_point_cutoff()->void:
 	if _point_kernel_owner==null or _point_kernel_owner.get_ref()!=self:return
-	var eligible:bool=_player_light!=null and source_point_cutoff and noninverse_player_light and forest_active()and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and is_equal_approx(_player_light.omni_range,point_response.radius_m)
+	var eligible:bool=_player_light!=null and source_point_cutoff and noninverse_player_light and forest_active()and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and _single_point_scope()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
 	var point:Vector3=_player_light.global_position if _player_light!=null else Vector3.ZERO
 	RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4(point.x,point.y,point.z,_player_light.omni_range if eligible else 0.))
 	if level!=null:RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera",level.get_node("Camera3D").global_position)
