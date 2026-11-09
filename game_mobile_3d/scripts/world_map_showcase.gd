@@ -91,7 +91,7 @@ func setup(world:Node3D)->void:
 	if not private_primary:return
 	_point_kernel_owner=weakref(self)
 	get_tree().node_added.connect(_track_point_light)
-	for light in level.find_children("*","Light3D",true,false):_track_point_light(light)
+	for light in get_tree().root.find_children("*","Light3D",true,false):_track_point_light(light)
 	if level.player.get("primary_ready")!=true and unavailable_reason.is_empty():
 		unavailable_reason="Private A&S/MD2 + Sabre data missing. Set MD2_RESEARCH_ROOT to the private research folder and restart."
 	level.terrain_sky.set_enabled(false)
@@ -284,13 +284,13 @@ func _update_player_falloff()->void:
 	_publish_point_cutoff()
 
 func _track_point_light(node:Node)->void:
-	if level!=null and (node is OmniLight3D or node is SpotLight3D)and level.is_ancestor_of(node):_point_lights[node.get_instance_id()]=weakref(node)
+	if level!=null and (node is OmniLight3D or node is SpotLight3D):_point_lights[node.get_instance_id()]=weakref(node)
 
 func _single_point_scope()->bool:
 	for key in _point_lights.keys():
 		var light=_point_lights[key].get_ref()
 		if light==null:_point_lights.erase(key);continue
-		if light!=_player_light and level.is_ancestor_of(light)and light.is_visible_in_tree()and light.light_energy>0. and (light.light_cull_mask&1)!=0:return false
+		if light!=_player_light and light.is_inside_tree()and light.get_world_3d()==level.get_world_3d()and light.is_visible_in_tree()and light.light_energy>0. and (light.light_cull_mask&1)!=0:return false
 	return true
 
 func _point_receiver_scope()->bool:
