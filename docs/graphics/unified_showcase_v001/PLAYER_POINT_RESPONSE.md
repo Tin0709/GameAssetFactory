@@ -1,3 +1,5 @@
+Latest 2026-11-10: radial cutoff now recovered and applied; see PLAYER_RADIAL_KERNEL.md. Earlier cutoff-unrecovered statements below are historical. Six-scale bloom remainsOFF.
+
 # Player point-light distance mode
 
 2026-11-10: F5 WorldMap now enables **L -> Light - recovered non-inverse player falloff** in the supported private Forest context. OFF restores the old response. Noon stays unchanged because the player light is hidden there.

@@ -1,3 +1,5 @@
+Latest 2026-11-10: radial cutoff now recovered and applied; see PLAYER_RADIAL_KERNEL.md. Earlier cutoff-unrecovered statements below are historical. Six-scale bloom remainsOFF.
+
 # Six-scale bloom comparison (2026-11-10)
 
 The existing WorldMap now offers **L -> Air - six-scale spread (experimental)**. It is OFF by default. The prior measured bloom response remains ON. F5 still opens the approved Noon scene; the new graph has no extra resources at Noon.
