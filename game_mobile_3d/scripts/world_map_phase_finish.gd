@@ -6,6 +6,9 @@ const SHA="c82d5489028813cdd1a2061d845fabca43789112e2a96e67dfe8eba80f8c71a3"
 var showcase:Node
 var requested:=true
 var active:=false
+var edge_softening:=false
+func set_edge_softening(value:bool)->void:
+ edge_softening=value;refresh()
 var last_error:=""
 var toggle:CheckButton
 var source_toggle:CheckButton
@@ -51,7 +54,7 @@ func restore_environment()->void:
 func release()->void:
  restore_environment()
  if _effect!=null:
-  _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_review_strength(_saved_strength)
+  _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_display_edges(false);_effect.set_review_strength(_saved_strength)
  if _compositor!=null and _native!=null:
   var keep:Array[CompositorEffect]=[]
   for effect in _compositor.compositor_effects:
@@ -93,7 +96,7 @@ func refresh()->void:
   compositor.compositor_effects=chain
  if _environment==null:
   if not effect.configure_finish(true,env,weight):_fail("Unsupported original finish; previous appearance restored");return
- effect.set_reference_hour(showcase.hour);effect.prepare_reference_grade(true)
+ effect.set_display_edges(edge_softening);effect.set_reference_hour(showcase.hour);effect.prepare_reference_grade(true)
  var state:Dictionary=effect.snapshot();var native_state:Dictionary=_native.snapshot()
  var error:String=str(state.get("error",""))+str(state.get("reference_failure",""))+str(native_state.get("error",""))
  if not error.is_empty():_fail(error);return

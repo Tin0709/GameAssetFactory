@@ -1,6 +1,11 @@
 extends "res://scripts/world_map_reference_grade.gd"
 ## Original bridge between the approved GAF finish and a private reference transfer.
 ## The Filmic/BCS order follows Godot's public mathematical operations; verified on GPU.
+const EDGES=preload("res://scripts/world_map_display_edges.gd")
+var _edge_requested:=false
+var _render_edge:=false
+func set_display_edges(value:bool)->void:
+ _guard.lock();_edge_requested=value;_guard.unlock()
 var _finish_wanted:=false
 var _render_finish:=false
 var _baseline:=PackedByteArray()
@@ -39,14 +44,14 @@ func _render_callback(kind:int,data:RenderData)->void:
  if kind!=effect_callback_type:return
  var rd:=RenderingServer.get_rendering_device()
  if rd==null:return
- _guard.lock();var wanted:=_finish_wanted;var baseline:=_baseline.duplicate();var generation:=_palette_generation;_guard.unlock()
- if wanted!=_render_finish or(wanted and generation!=_render_palette_generation):
-  _release(rd);_render_finish=wanted;_render_palette_generation=generation
+ _guard.lock();var wanted:=_finish_wanted;var baseline:=_baseline.duplicate();var generation:=_palette_generation;var edge:=_edge_requested and wanted;_guard.unlock()
+ if wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
+  _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
  if _baseline_buffer.is_valid()and baseline!=_last_baseline:
   rd.buffer_update(_baseline_buffer,0,baseline.size(),baseline);_last_baseline=baseline
  super(kind,data)
 func _release(rd:RenderingDevice)->void:
- _baseline_buffer=RID();_last_baseline=PackedByteArray();_report("finish_ready",false);_report("finish_bytes",0)
+ _baseline_buffer=RID();_last_baseline=PackedByteArray();_report("finish_ready",false);_report("finish_bytes",0);_report("edge_active",false);_report("edge_bytes",0)
  super(rd)
 func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUniform])->String:
  if not _render_finish or not fragment.contains("inverse_display(clamp(display,0.,1.))"):return fragment
@@ -77,5 +82,25 @@ vec3 gaf_finish(vec3 c){
  fragment=fragment.replace("void main() {",helpers+"void main() {")
  fragment=fragment.replace("if (settings.x <= 0.0)","if (settings.x < 0.0)")
  fragment=fragment.replace("result=vec4(inverse_display(clamp(display,0.,1.)),color.a);","result=vec4(mix(gaf_finish(adjusted),inverse_display(clamp(display,0.,1.)),base[1].z),color.a);")
+ if _render_edge:
+  fragment=fragment.replace("color.a);", "color.a);result.rgb=clamp(gaf_display(result.rgb),0.,1.);")
  _report("finish_ready",true);_report("finish_bytes",131104)
  return fragment
+
+func _prepare_pass(rd:RenderingDevice,fragment:String,framebuffer:RID,uniforms:Array[RDUniform])->bool:
+ if fragment!=APPLY or not _render_edge or not _render_finish:return super._prepare_pass(rd,fragment,framebuffer,uniforms)
+ var format:=rd.texture_get_format(_color)if _color.is_valid()else null
+ # _color is assigned after _build; borrow source_color texture dimensions instead.
+ var source:RID=uniforms[0].get_ids()[1]
+ format=rd.texture_get_format(source)
+ var image:=_texture(rd,format.width,format.height,COLOR_FORMAT)
+ if not image.is_valid():_report("error","Display-edge target unsupported");return false
+ var target:=_keep(rd.framebuffer_create([image]))
+ if not target.is_valid():return false
+ if not super._prepare_pass(rd,fragment,target,uniforms):return false
+ if not _baseline_buffer.is_valid():_report("error","Display edges require owned final color transfer");return false
+ var parameters:=RDUniform.new();parameters.uniform_type=RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER;parameters.binding=1;parameters.add_id(_baseline_buffer)
+ var linear:=_sampler(rd,RenderingDevice.SAMPLER_FILTER_LINEAR)
+ if not linear.is_valid()or not super._prepare_pass(rd,EDGES.FRAGMENT,framebuffer,[_sample(0,linear,image),parameters]):return false
+ _report("edge_active",true);_report("edge_bytes",format.width*format.height*4);_report("edge_error","")
+ return true
