@@ -1,5 +1,10 @@
 # Graphics handoff — accepted visual checkpoint, 2026-11-08
 
+## PAUSED BY USER — 2026-11-09
+
+The user explicitly paused the resumed graphics goal. Do not continue research, implementation or tests until requested. Latest saved main has the new default-selected phase finish, with exact Noon bypass. Read private `phase_finish_bridge_v001/PAUSED.md` and `MD2 Research/CURRENT_GRAPHICS_CHECKPOINT.txt` before resuming. Latest44native control/ownership/composition checks pass; broader9-entry suite and46-state lifecycle passed before final guards, so final full-system validation/performance/gameplay and fresh screenshots remain unfinished. Previous30paired captures show10exactrestores/Noon unchanged but predate final guards. No MD2-quality/native-radiometry/phone-performance claim. Existing old review PID13908 was left open; F8/F5/restart loads current saved code. Usage12%remaining; this pause is explicit, independent of the1%threshold.
+
+
 The user said the current appearance is beautiful enough and requested wrap-up. Stop graphics research and implementation here. Resume only on a new explicit request. Preserve all prior work; no new experiment was promoted during wrap-up. This is acceptance of the current visual stopping point, not a claim that every MD2 algorithm, native timing or mobile release requirement has been recovered.
 
 ## Resumed graphics goal — 2026-11-09
