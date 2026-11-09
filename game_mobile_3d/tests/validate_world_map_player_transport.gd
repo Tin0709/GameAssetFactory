@@ -63,11 +63,14 @@ func run():
    check(w.player_light.has_method("set_phase_sky"),"Independent all-phase sky control exists")
    if w.player_light.has_method("set_phase_sky"):
     for time in [7.,11.999,12.001,16.5,18.5,22.]:
-     w.showcase.set_hour(time);w.player_light.refresh(true)
+     w.showcase.set_hour(time)
+     await process_frame;await process_frame
+     w.player_light.refresh()
      check(w.player_light.is_active(),"Spatial sky remains active at "+str(time))
      for m in materials:
       check(not m.get_shader_parameter("skin_wrap_enabled"),"Day-only mask stays suspended at "+str(time))
       check(not m.get_shader_parameter("recovered_self_light"),"Captured self-light not invented at "+str(time))
+      check(not m.get_shader_parameter("recovered_roughness"),"Captured roughness scope unchanged at "+str(time))
      if time in [7.,16.5,18.5,22.]:
       for m in materials:check(m.get_shader_parameter("player_probe_key")==Vector3.ZERO,"No stale Day bounce at "+str(time))
     w.player_light.set_phase_sky(false)
