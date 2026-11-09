@@ -34,6 +34,7 @@ var measured_atmosphere:=true
 var coupled_bloom:=true
 var coherent_bloom:=true
 var measured_bloom_response:=true
+var _shape_toggle:CheckButton
 var source_bloom_shape:=false
 var bloom_response=preload("res://scripts/world_map_bloom_response.gd").new()
 var gentle_noon:=true
@@ -170,7 +171,8 @@ func set_coupled_bloom(value:bool)->void:
 		var response:float=bloom_response.sample(hour)if enabled and measured_bloom_response else 1.
 		level.look._exposure_effect.set_air_bloom_response(response)
 		var shape_weight:float=phase_finish.phase_weight(hour)if phase_finish!=null and phase_finish.active else 0.
-		level.look._exposure_effect.set_bloom_shape(source_bloom_shape and enabled and coherent_bloom,shape_weight)
+		if level.look._exposure_effect.has_method("set_bloom_shape"):
+			level.look._exposure_effect.set_bloom_shape(source_bloom_shape and enabled and coherent_bloom,shape_weight)
 
 func set_coherent_bloom(value:bool)->void:
 	coherent_bloom=value
@@ -376,7 +378,14 @@ func compare_baseline()->void:
 	else:
 		level.look.set_stage(2);_capture_day();apply_time()
 
+func _update_shape_control()->void:
+	if _shape_toggle==null:return
+	var effect=level.look._exposure_effect if level!=null and level.look!=null else null
+	_shape_toggle.disabled=effect==null or not effect.has_method("multiscale_available")or not effect.multiscale_available()or not level.look.local_exposure_active()
+	_shape_toggle.set_pressed_no_signal(source_bloom_shape)
+
 func _process(delta:float)->void:
+	_update_shape_control()
 	if not private_primary or level==null:return
 	_fps_elapsed+=delta
 	if _fps_label!=null and _fps_elapsed>=.5:
@@ -432,7 +441,7 @@ func _build_ui()->void:
 	response.toggled.connect(set_measured_bloom_response)
 	var shape:=CheckButton.new();shape.name="SourceBloomShape";shape.text="Air - six-scale spread (experimental)";shape.focus_mode=Control.FOCUS_NONE;shape.button_pressed=source_bloom_shape;box.add_child(shape)
 	shape.tooltip_text="Private captured numeric kernels in an original six-level pyramid. Energy normalized; source-relative intensity is separate. Original viewport mapping and phase fade preserve Noon. Higher pass/bandwidth cost; OFF pending validation."
-	shape.toggled.connect(set_source_bloom_shape)
+	shape.toggled.connect(set_source_bloom_shape);_shape_toggle=shape;_update_shape_control()
 	var coherent_toggle:=CheckButton.new();coherent_toggle.text="Air · consistent scene / bloom exposure";coherent_toggle.button_pressed=coherent_bloom;coherent_toggle.focus_mode=Control.FOCUS_NONE;coherent_toggle.tooltip_text="Use the same bounded exposure gain for scene and bloom source, before filtering. OFF restores previous source equation. Original Mobile formula, not full native Unreal local exposure.";box.add_child(coherent_toggle);coherent_toggle.toggled.connect(set_coherent_bloom)
 	var grade_toggle:=CheckButton.new();grade_toggle.text="Air · private Forest phase LUTs (experimental)";grade_toggle.focus_mode=Control.FOCUS_NONE;grade_toggle.button_pressed=false;grade_toggle.disabled=not grade_review.available();grade_toggle.tooltip_text="Eight captured Forest LUTs at unity input gain; original clock interpolation/mirrored evening. Replaces final grade, not lighting. HDR/F7 only; OFF by default. Native radiometry/clock unresolved.";box.add_child(grade_toggle);grade_toggle.toggled.connect(set_source_grade)
 	var finish_toggle:=CheckButton.new();finish_toggle.name="PhaseFinish";finish_toggle.text="Air · humid Forest finishing (Noon preserved)";finish_toggle.button_pressed=phase_finish.requested;finish_toggle.disabled=not phase_finish.available();finish_toggle.focus_mode=Control.FOCUS_NONE;box.add_child(finish_toggle)

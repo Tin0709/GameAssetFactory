@@ -91,18 +91,22 @@ func _make_shapes(rd:RenderingDevice,copy:RID,meter:RID,format:RDTextureFormat,l
   if not _kernel_pass(rd,fields[i],RID(),h,level.h,linear)or not _kernel_pass(rd,h,coarse,v,level.v,linear):return RID()
   coarse=v
  return coarse
+func _shape_control(rd:RenderingDevice,weight:float)->RID:
+ return _keep(rd.storage_buffer_create(16,PackedFloat32Array([weight,0.,0.,0.]).to_byte_array()))
 func _build_air(rd:RenderingDevice,copy:RID,meter:RID,format:RDTextureFormat,linear:RID)->RID:
  var old:=super._build_air(rd,copy,meter,format,linear)
  if not old.is_valid()or not _render_shape or not _reference_requested or _reference_blocked:return old
  var mark:=_resources.size();var pass_mark:=_passes.size();_work_bytes=0;_coefficient_bytes=0
  var result:=_make_shapes(rd,copy,meter,format,linear)
- if not result.is_valid():
+ _guard.lock();var weight:=_shape_weight;_guard.unlock()
+ if result.is_valid():_shape_buffer=_shape_control(rd,weight)
+ if not result.is_valid()or not _shape_buffer.is_valid():
   var why:=failure()
   while _resources.size()>mark:rd.free_rid(_resources.pop_back())
-  _passes.resize(pass_mark);_shape_blocked=true;_render_shape=false
+  _passes.resize(pass_mark);_shape_buffer=RID();_shape_blocked=true;_render_shape=false
   _report("shape_error",why if not why.is_empty()else"Unsupported optional six-scale resources");_report("error","")
   return old
- _old_soft=old;_shape_ready=true;_air_bytes+=_work_bytes
+ _old_soft=old;_shape_ready=true;_last_shape_weight=weight;_air_bytes+=_work_bytes
  _report("shape_active",true);_report("shape_levels",6);_report("shape_bytes",_work_bytes+_coefficient_bytes+16);_report("shape_error","")
  return result
 func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUniform])->String:
@@ -111,8 +115,6 @@ func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUnifor
  var sampler:=_sampler(rd,RenderingDevice.SAMPLER_FILTER_LINEAR)
  uniforms.append(_sample(7,sampler,_old_soft))
  _guard.lock();var weight:=_shape_weight;_guard.unlock()
- _shape_buffer=_keep(rd.storage_buffer_create(16,PackedFloat32Array([weight,0.,0.,0.]).to_byte_array()));_last_shape_weight=weight
- if not _shape_buffer.is_valid():_report("error","Optional shape fade buffer unavailable");return fragment
  var u:=RDUniform.new();u.uniform_type=RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER;u.binding=8;u.add_id(_shape_buffer);uniforms.append(u)
  fragment=fragment.replace("void main() {","layout(set=0,binding=7)uniform sampler2D original_spread;\nlayout(set=0,binding=8,std430)readonly buffer ShapeControl{vec4 shape;};\nvoid main() {")
  return fragment.replace("vec3 spread = textureLod(soft_light, uv_air, 0.0).rgb;","vec3 spread = mix(textureLod(original_spread,uv_air,0.).rgb,textureLod(soft_light,uv_air,0.).rgb,shape.x);")
