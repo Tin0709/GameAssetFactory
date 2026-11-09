@@ -170,7 +170,7 @@ func set_coupled_bloom(value:bool)->void:
 		level.look._exposure_effect.set_air_bloom(enabled)
 		var response:float=bloom_response.sample(hour)if enabled and measured_bloom_response else 1.
 		level.look._exposure_effect.set_air_bloom_response(response)
-		var shape_weight:float=phase_finish.phase_weight(hour)if phase_finish!=null and phase_finish.active else 0.
+		var shape_weight:float=phase_finish.phase_weight(hour)if phase_finish!=null and phase_finish.requested else 0.
 		if level.look._exposure_effect.has_method("set_bloom_shape"):
 			level.look._exposure_effect.set_bloom_shape(source_bloom_shape and enabled and coherent_bloom,shape_weight)
 

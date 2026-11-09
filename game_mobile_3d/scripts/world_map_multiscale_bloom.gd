@@ -112,9 +112,8 @@ func _build_air(rd:RenderingDevice,copy:RID,meter:RID,format:RDTextureFormat,lin
 func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUniform])->String:
  fragment=super._finish_fragment(fragment,rd,uniforms)
  if not _shape_ready or not fragment.contains("vec3 spread = textureLod(soft_light, uv_air, 0.0).rgb;"):return fragment
- var sampler:=_sampler(rd,RenderingDevice.SAMPLER_FILTER_LINEAR)
+ var sampler:RID=uniforms[2].get_ids()[0]
  uniforms.append(_sample(7,sampler,_old_soft))
- _guard.lock();var weight:=_shape_weight;_guard.unlock()
  var u:=RDUniform.new();u.uniform_type=RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER;u.binding=8;u.add_id(_shape_buffer);uniforms.append(u)
  fragment=fragment.replace("void main() {","layout(set=0,binding=7)uniform sampler2D original_spread;\nlayout(set=0,binding=8,std430)readonly buffer ShapeControl{vec4 shape;};\nvoid main() {")
  return fragment.replace("vec3 spread = textureLod(soft_light, uv_air, 0.0).rgb;","vec3 spread = mix(textureLod(original_spread,uv_air,0.).rgb,textureLod(soft_light,uv_air,0.).rgb,shape.x);")
