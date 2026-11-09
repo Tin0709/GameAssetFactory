@@ -1,3 +1,5 @@
+**2026-11-09 — USER RESUMED (LATEST):** Current active goal resumes from graphics_pause_20261109_232350; earlier PAUSED notes are historical. Keep main WorldMap, Noon anchor and approved gameplay. Validate combined all-phase player material plus phase finish first, then investigate source-backed final-image softness only where visually useful. Private evidence remains outside Git. User wrap-up threshold remains ~1% account quota; currently11%remaining.
+
 **2026-11-09 — USER EXPLICIT PAUSE (LATEST):** Stop graphics research/implementation/tests until user resumes. Latest checkpoint: `C:\Users\ADMIN\Desktop\MD2 Research\checkpoints\graphics_pause_20261109_232350`; read GRAPHICS_PAUSE.txt and private phase_finish_bridge_v001/final_validation_v002 + player_material_phases_v001. Final bridge validation and nine-phase player material proof are saved; 105 native/16 headless material checks pass. Strict rare half-code replica/Noon grass residuals remain documented, visual acceptance and handset performance pending. Previous pause notes below are historical. No remote push claimed.
 
 # Graphics handoff — accepted visual checkpoint, 2026-11-08
