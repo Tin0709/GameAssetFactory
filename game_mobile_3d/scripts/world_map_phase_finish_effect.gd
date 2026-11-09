@@ -89,10 +89,9 @@ vec3 gaf_finish(vec3 c){
 
 func _prepare_pass(rd:RenderingDevice,fragment:String,framebuffer:RID,uniforms:Array[RDUniform])->bool:
  if fragment!=APPLY or not _render_edge or not _render_finish:return super._prepare_pass(rd,fragment,framebuffer,uniforms)
- var format:=rd.texture_get_format(_color)if _color.is_valid()else null
  # _color is assigned after _build; borrow source_color texture dimensions instead.
  var source:RID=uniforms[0].get_ids()[1]
- format=rd.texture_get_format(source)
+ var format:=rd.texture_get_format(source)
  var image:=_texture(rd,format.width,format.height,COLOR_FORMAT)
  if not image.is_valid():_report("error","Display-edge target unsupported");return false
  var target:=_keep(rd.framebuffer_create([image]))
