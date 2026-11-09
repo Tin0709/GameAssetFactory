@@ -2,6 +2,14 @@
 
 The user said the current appearance is beautiful enough and requested wrap-up. Stop graphics research and implementation here. Resume only on a new explicit request. Preserve all prior work; no new experiment was promoted during wrap-up. This is acceptance of the current visual stopping point, not a claim that every MD2 algorithm, native timing or mobile release requirement has been recovered.
 
+## Resumed graphics goal — 2026-11-09
+
+The user explicitly resumed main-game lighting, fog/humid softness and player lighting across all hours. This supersedes the earlier STOPPED instruction only for this new scope. Noon/gentle sunlight stays the visual anchor. Main now defaults to original phase-aware actor sky; read PHASE_PLAYER_SKY.md. Private phase_visual_fidelity_v002 has121native checks/30HDR images, fallbacks, actual-controller30/60/120 and performance results.
+
+Humidity research: reviewed the preserved50image LE×LUT experiment. Native-shaped exposure plus source grading restores chromatic night depth better than either alone, but cross-engine radiometry/clock and visual calibration are still unverified. A new25image narrow/broad ×.16/.28bloom trial shows increasing bloom mainly lifts/softens the image without solving the MD2 humid appearance. It was NOT promoted. All five restores are exact. Do not increase extinction to compensate for a final-image problem: measured source center-lower fog T=1 across nine frames.
+
+Next: integrate an independently authored, reversible exposure/color finishing comparison into the same main scene, using the existing conformed graph and private LUTs only as reference data, preserving the accepted gentler Noon. Benchmark already completed: three phases/ABBA, direct RD stage totals .055–.058ms current vs .123–.125ms reference LE+LUT on RTX4070TiSUPER/720p; no phone certification. See native_grade_performance_summary.json, graph/source profiles and saved_LE_grade_review.png. Do not repeat capture/extraction or re-run the rejected bloom trial. Preserve approved gameplay/assets. The active goal is not complete. User requests checkpoint/pause when remaining account usage reaches approximately1%; last observed12%remaining, not a token-budget percentage.
+
 ## Small authorized follow-up: gentler midday
 
 After wrap-up the user requested softer Day/noon lighting. Main WorldMap now defaults to `gentle_noon=true` in `world_map_showcase.gd`: direct sunlight ×0.82 at12h, smooth envelope returning to unchanged7h/16.5h; night/ambient/source profiles unchanged. L → **Light · gentle midday sunlight** restores the previous result. This is an original artistic adjustment, not an MD2 source value. Actual Mobile/D3D12 main-scene checks and existing showcase/Forest atmosphere regressions pass; locked HDR OFF restoration is exact0. No new GPU pass/resource. Private evidence: `godot_lab/world_map_unified_showcase_v001/soft_noon_v001/`. Broad research remains stopped. F8/F5 reloads the updated default.
