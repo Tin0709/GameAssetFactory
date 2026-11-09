@@ -16,6 +16,7 @@ func run():
  check(f.has_method("set_edge_softening"),"Existing phase finish exposes reversible display-edge comparison")
  if not f.has_method("set_edge_softening"):
   print("DISPLAY_EDGES checks=",checks," failures=",JSON.stringify(failures));w.free();await process_frame;quit(1);return
+ check(w.find_child("DisplayEdges",true,false)!=null,"Existing L menu exposes optional comparison")
  check(not f.edge_softening,"Unapproved filter stays OFF by default")
  f.set_edge_softening(true)
  check(f.edge_softening,"Selection retained")
@@ -29,6 +30,10 @@ func run():
   check(s.get("edge_error","").is_empty(),"Shader valid")
   var n=s.rebuilds
   await settle();check(edge_state(w).rebuilds==n,"Stable phase never reallocates each frame")
+  DisplayServer.window_set_size(Vector2i(961,541));await settle()
+  check(edge_state(w).get("edge_bytes",0)==961*541*4,"Odd resize rebuilds display target")
+  DisplayServer.window_set_size(Vector2i(1280,720));await settle()
+  check(edge_state(w).get("edge_bytes",0)==1280*720*4,"Resize back releases former target")
   f.set_edge_softening(false);await settle();s=edge_state(w)
   check(not s.get("edge_active",false)and s.get("edge_bytes",0)==0,"OFF releases target and original APPLY restored")
   f.set_edge_softening(true);await settle()

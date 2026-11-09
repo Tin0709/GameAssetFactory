@@ -12,6 +12,7 @@ func set_edge_softening(value:bool)->void:
 var last_error:=""
 var toggle:CheckButton
 var source_toggle:CheckButton
+var edge_toggle:CheckButton
 var _profile_path:=""
 var _verified:=false
 var _native:CompositorEffect
@@ -112,4 +113,6 @@ func refresh()->void:
 func _process(_delta:float)->void:
  refresh()
  if toggle!=null:toggle.set_pressed_no_signal(requested)
+ if edge_toggle!=null:
+  edge_toggle.set_pressed_no_signal(edge_softening);edge_toggle.disabled=not available()
 func _exit_tree()->void:release()

@@ -44,7 +44,7 @@ func _render_callback(kind:int,data:RenderData)->void:
  if kind!=effect_callback_type:return
  var rd:=RenderingServer.get_rendering_device()
  if rd==null:return
- _guard.lock();var wanted:=_finish_wanted;var baseline:=_baseline.duplicate();var generation:=_palette_generation;var edge:=_edge_requested and wanted;_guard.unlock()
+ _guard.lock();var wanted:=_finish_wanted;var baseline:=_baseline.duplicate();var generation:=_palette_generation;var edge:=_edge_requested and wanted and _reference_enabled and _reference_requested and not _reference_blocked;_guard.unlock()
  if wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
  if _baseline_buffer.is_valid()and baseline!=_last_baseline:
@@ -88,7 +88,7 @@ vec3 gaf_finish(vec3 c){
  return fragment
 
 func _prepare_pass(rd:RenderingDevice,fragment:String,framebuffer:RID,uniforms:Array[RDUniform])->bool:
- if fragment!=APPLY or not _render_edge or not _render_finish:return super._prepare_pass(rd,fragment,framebuffer,uniforms)
+ if fragment!=APPLY or not _render_edge or not _render_finish or not _reference_requested or _reference_blocked:return super._prepare_pass(rd,fragment,framebuffer,uniforms)
  # _color is assigned after _build; borrow source_color texture dimensions instead.
  var source:RID=uniforms[0].get_ids()[1]
  var format:=rd.texture_get_format(source)
