@@ -8,6 +8,22 @@ func _initialize():call_deferred("run")
 func settle():
  for i in 32:await process_frame
 func run():
+ var loader=load("res://scripts/world_map_point_response.gd")
+ var research:=OS.get_environment("MD2_RESEARCH_ROOT")
+ var original_root:=research if not research.is_empty()else "C:/Users/ADMIN/Desktop/MD2 Research"
+ var fixture:=original_root.path_join("godot_lab/world_map_unified_showcase_v001/player_soft_source_v001/loader_fixtures/"+str(Time.get_ticks_usec()))
+ # Real file absence/corruption, not a mocked verified flag.
+ for file in [loader.FILE,loader.KERNEL_FILE]:
+  var path:String=fixture.path_join(file);DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+  FileAccess.open(path,FileAccess.WRITE).store_buffer(FileAccess.get_file_as_bytes(original_root.path_join(file)))
+ OS.set_environment("MD2_RESEARCH_ROOT",fixture)
+ var missing=loader.new();check(missing.kernel_available()and not missing.soft_available(),"Absent soft profile keeps radial but disables specular")
+ var soft_path:String=fixture.path_join(loader.SOFT_FILE);DirAccess.make_dir_recursive_absolute(soft_path.get_base_dir())
+ FileAccess.open(soft_path,FileAccess.WRITE).store_string("{}")
+ check(not loader.new().soft_available(),"Corrupt soft profile rejected")
+ FileAccess.open(soft_path,FileAccess.WRITE).store_buffer(FileAccess.get_file_as_bytes(original_root.path_join(loader.SOFT_FILE)))
+ check(loader.new().soft_available(),"Pinned profile accepted")
+ OS.set_environment("MD2_RESEARCH_ROOT",research)
  var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w)
  await settle()
  check(w.showcase.has_method("set_player_soft_source"),"Player finite-source comparison exists")
