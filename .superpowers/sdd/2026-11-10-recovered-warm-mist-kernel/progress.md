@@ -1,0 +1,4 @@
+# SDD ledger - plan: docs/superpowers/plans/2026-11-10-recovered-warm-mist-kernel.md
+Previousgoalturn progress: confirmed noninverse mismatch corrected/validatedmain. New native shader resource tracing recovered radius/power branch,3draw57bindingCBread0errors.
+Ruling: use exact recovered surface radial kernel in our original air warm branch; label propagation to volume as reconstruction, not native volumetric parity. Leave Godot surface quartic unchanged. Preserve intensity/density/Noon and baseline; no arbitraryart gain.
+Preflight: profile optional separatefrom noninverse flag; integration.w reserved172byte used, legacy176/224B fixtures remain0. Only color source, never optical density.
