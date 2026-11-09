@@ -1,10 +1,9 @@
 extends SceneTree
 class FailedFinish extends "res://scripts/world_map_phase_finish_effect.gd":
  var reject_edges:=true
- func _prepare_pass(rd:RenderingDevice,fragment:String,framebuffer:RID,uniforms:Array[RDUniform])->bool:
-  if reject_edges and fragment==EDGES.FRAGMENT:
-   _report("error","Injected optional edge shader failure");return false
-  return super._prepare_pass(rd,fragment,framebuffer,uniforms)
+ func _texture(rd:RenderingDevice,width:int,height:int,format:int)->RID:
+  if reject_edges and format==COLOR_FORMAT:return RID()
+  return super._texture(rd,width,height,format)
 var failures=[]
 var checks:=0
 func check(ok,label):
