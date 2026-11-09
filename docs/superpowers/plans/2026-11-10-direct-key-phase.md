@@ -14,7 +14,9 @@ Constraints: main WorldMap only, no new scene/project/install/capture; preserve 
 
 Review focus: toggle cache invalidation; exact Noon; baseline/haze-only/missing proof; gentle-noon control semantics; continuous/fractional/wrapped hours.
 
-- [ ] RED actual main API and phase-ratio contracts, missing/corrupt proof.
-- [ ] GREEN private loader + original direct-color transfer + independent L toggle.
-- [ ] Locked before/after/restore at multiple hours/sites; all other inputs stable except physically dependent light scatter; visual evaluation/default decision.
-- [ ] Mobile native regressions, cycle/controller30/60/120, comparative desktop timing, fresh review and saved evidence/resume point.
+- [x] RED actual main API and phase-ratio contracts, missing/corrupt proof.
+- [x] GREEN private loader + original direct-color transfer + independent L toggle.
+- [x] Locked before/after/restore at multiple hours/sites; all other inputs stable except physically dependent light scatter; visual evaluation/default decision.
+- [x] Mobile native regressions, cycle/controller30/60/120, comparative desktop timing, fresh review and saved evidence/resume point.
+
+Bounded milestone complete: source relative direct-key ON by visible/evidence decision, old palette retained. No overall-goal completion or phone certification. Existing authorized main checkout retained; no merge/push requested.
