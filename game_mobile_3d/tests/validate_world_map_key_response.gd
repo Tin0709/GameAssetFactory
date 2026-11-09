@@ -61,6 +61,8 @@ func run():
   w.showcase.set_atmosphere_review("combined");await settle();check(w.showcase.key_response_active,"Lighting scope resumes")
   w.showcase.set_gentle_noon(false);await settle();var ungentle=radiance(w)
   w.showcase.set_gentle_noon(true);await settle();check(radiance(w)==ungentle,"Gentle Noon toggle does not retune Night")
+  w.look.set_stage(0);w.showcase.apply_time();await settle()
+  check(not w.showcase.key_response_active,"Direct baseline stage clears active response state")
  check(w.player.run_speed==7. and AudioServer.is_bus_mute(0),"Approved gameplay/audio preserved")
  w.free();await process_frame
  print("KEY_RESPONSE checks=",checks," failures=",JSON.stringify(failures));quit(0 if failures.is_empty()else 1)
