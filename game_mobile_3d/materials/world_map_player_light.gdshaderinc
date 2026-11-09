@@ -1,22 +1,24 @@
+#include "res://materials/world_map_point_kernel.gdshaderinc"
 // Actor-only Burley/GGX direct response. Ambient/emission remain engine-owned.
 // Unlike the older matte-terrain helper, specular lobes are not clipped to 1.
 varying float player_cloud;
 float player_fresnel(float c){float x=1.0-c;float s=x*x;return s*s*x;}
 void light(){
+	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);
 	float nl=max(dot(NORMAL,LIGHT),0.0);
 	// Original selective wrap, not native screen-space diffusion. Integral of
 	// max(N.L+w,0)/(1+w)^2 over the sphere is PI: redistribute, do not add a lamp.
 	if(player_skin_weight>0.){
 		float wrapped=max(dot(NORMAL,LIGHT)+.15,0.)/(1.15*1.15);
 		float delta=wrapped-nl;
-		float visibility=ATTENUATION*(LIGHT_IS_DIRECTIONAL?player_cloud:1.);
+		float visibility=point_attenuation*(LIGHT_IS_DIRECTIONAL?player_cloud:1.);
 		DIFFUSE_LIGHT+=LIGHT_COLOR*visibility*delta/PI*player_skin_weight;
 	}
 	if(nl>0.0){
 		float nv=max(dot(NORMAL,VIEW),0.0001);
 		vec3 h=normalize(LIGHT+VIEW);
 		float lh=clamp(dot(LIGHT,h),0.0,1.0);
-		float incident=ATTENUATION*nl/PI;
+		float incident=point_attenuation*nl/PI;
 		if(LIGHT_IS_DIRECTIONAL)incident*=player_cloud;
 		if(METALLIC<1.0){
 #ifndef GAF_WORLD_FORCE_LAMBERT

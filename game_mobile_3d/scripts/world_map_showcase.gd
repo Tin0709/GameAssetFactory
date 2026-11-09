@@ -25,6 +25,9 @@ var _forest_sun:Color
 var _forest_energy:float
 var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
+static var _point_kernel_owner:WeakRef
+var source_point_cutoff:=true
+var _point_cutoff_toggle:CheckButton
 var source_warm_light:=false
 var _warm_kernel_toggle:CheckButton
 var noninverse_player_light:=true
@@ -81,6 +84,7 @@ func make_player()->Node3D:
 func setup(world:Node3D)->void:
 	level=world;process_priority=-10
 	if not private_primary:return
+	_point_kernel_owner=weakref(self)
 	if level.player.get("primary_ready")!=true and unavailable_reason.is_empty():
 		unavailable_reason="Private A&S/MD2 + Sabre data missing. Set MD2_RESEARCH_ROOT to the private research folder and restart."
 	level.terrain_sky.set_enabled(false)
@@ -203,6 +207,8 @@ func _update_hdr_air()->void:
 		viewport.use_hdr_2d=_hdr_saved;_hdr_owned=false
 
 func _exit_tree()->void:
+	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
+		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
 	if grade_review!=null:grade_review.release()
 	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
 
@@ -249,6 +255,9 @@ func _update_mist()->void:
 		emitter=point-Vector3.UP*1.4
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
 
+func set_source_point_cutoff(value:bool)->void:
+	source_point_cutoff=value;_publish_point_cutoff()
+
 func set_source_warm_light(value:bool)->void:
 	source_warm_light=value;_update_player_falloff()
 
@@ -261,12 +270,21 @@ func _update_player_falloff()->void:
 	var decay:=0. if verified else 2.
 	if _player_light.omni_attenuation!=decay:_player_light.omni_attenuation=decay
 	if mist!=null:mist.recovered_point_kernel=verified and source_warm_light and point_response.kernel_available()
+	_publish_point_cutoff()
+
+func _publish_point_cutoff()->void:
+	if _point_kernel_owner==null or _point_kernel_owner.get_ref()!=self:return
+	var eligible:bool=_player_light!=null and source_point_cutoff and noninverse_player_light and forest_active()and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and is_equal_approx(_player_light.omni_range,point_response.radius_m)
+	var point:Vector3=_player_light.global_position if _player_light!=null else Vector3.ZERO
+	RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4(point.x,point.y,point.z,_player_light.omni_range if eligible else 0.))
+	if level!=null:RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera",level.get_node("Camera3D").global_position)
 
 func sync_lantern_emitter(point:Vector3)->void:
 	if not point.is_finite():return
 	if _player_light!=null:
 		_player_light.top_level=true;_player_light.light_cull_mask=1;_player_light.global_position=point
 	if mist!=null and mist.visible:mist.set_warm_emitter(point)
+	_publish_point_cutoff()
 
 func air_field()->Dictionary:
 	var result:Dictionary=air_light.field()
@@ -398,6 +416,9 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
+	if _point_cutoff_toggle!=null:
+		_point_cutoff_toggle.disabled=not point_response.kernel_available()or not forest.available()or not noninverse_player_light
+		_point_cutoff_toggle.set_pressed_no_signal(source_point_cutoff)
 	if _warm_kernel_toggle!=null:
 		_warm_kernel_toggle.disabled=not point_response.kernel_available()or not forest.available()or not noninverse_player_light
 		_warm_kernel_toggle.set_pressed_no_signal(source_warm_light)
@@ -460,6 +481,9 @@ func _build_ui()->void:
 	var point_mode:=CheckButton.new();point_mode.name="NoninversePlayerLight";point_mode.text="Light - recovered non-inverse player falloff";point_mode.focus_mode=Control.FOCUS_NONE;point_mode.button_pressed=noninverse_player_light;point_mode.disabled=not point_response.available()or not forest.available();box.add_child(point_mode)
 	point_mode.tooltip_text="Native point light has inverse-square falloff OFF. Removes Godot distance^-2 while retaining its range cutoff and existing phase intensity. Not exact native radial cutoff or photometry. OFF restores previous falloff."
 	point_mode.toggled.connect(set_noninverse_player_light);_point_response_toggle=point_mode
+	var cutoff:=CheckButton.new();cutoff.name="SourcePointCutoff";cutoff.text="Light - recovered point radial cutoff";cutoff.focus_mode=Control.FOCUS_NONE;cutoff.button_pressed=source_point_cutoff;cutoff.disabled=not point_response.kernel_available()or not forest.available();box.add_child(cutoff)
+	cutoff.tooltip_text="Captured8m/power2 squared-radius kernel. Original algebraic correction of Godot's range window for the owned local light; energy/materials unchanged. OFF restores prior non-inverse quartic response. Not full native radiometry or soft source."
+	cutoff.toggled.connect(set_source_point_cutoff);_point_cutoff_toggle=cutoff
 	var warm_kernel:=CheckButton.new();warm_kernel.name="SourceWarmLight";warm_kernel.text="Air - local-light radial source (experimental)";warm_kernel.focus_mode=Control.FOCUS_NONE;warm_kernel.button_pressed=source_warm_light;warm_kernel.disabled=not point_response.kernel_available()or not forest.available();box.add_child(warm_kernel)
 	warm_kernel.tooltip_text="Verified point-light squared-radius kernel transferred into our original Mobile mist. Only warm incoming light changes; extinction/noise/amplitude unchanged. Native full volumetric transport remains approximate. OFF restores prior linear-radius source."
 	warm_kernel.toggled.connect(set_source_warm_light);_warm_kernel_toggle=warm_kernel

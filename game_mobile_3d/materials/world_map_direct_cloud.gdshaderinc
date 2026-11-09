@@ -1,3 +1,4 @@
+#include "res://materials/world_map_point_kernel.gdshaderinc"
 // Original WorldMap direct-light response. Godot still resolves ambient, fog and shadows.
 varying float cloud_transmission;
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
@@ -15,6 +16,7 @@ float world_cloud_fresnel(float cosine) {
 #endif
 
 void light() {
+	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);
 #ifdef GAF_WORLD_GROUND_BOUNCE
 	vec3 source_direction = normalize((INV_VIEW_MATRIX * vec4(LIGHT, 0.0)).xyz);
 	if (LIGHT_IS_DIRECTIONAL && dot(source_direction, ground_bounce_direction) > 0.9999) {
@@ -27,11 +29,11 @@ void light() {
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
 	if (LIGHT_IS_DIRECTIONAL) {
 		vec3 response = world_foliage_lobe(NORMAL, LIGHT, VIEW, nl, 1.0, foliage_transmission);
-		DIFFUSE_LIGHT += response * LIGHT_COLOR * (ATTENUATION * cloud_transmission / PI);
+		DIFFUSE_LIGHT += response * LIGHT_COLOR * (point_attenuation * cloud_transmission / PI);
 	}
 #endif
 	if (nl > 0.0) {
-		vec3 incident = LIGHT_COLOR * (ATTENUATION * nl / PI);
+		vec3 incident = LIGHT_COLOR * (point_attenuation * nl / PI);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 		incident*=terrain_direct_contact;
 #endif

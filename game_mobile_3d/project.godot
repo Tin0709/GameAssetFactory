@@ -79,6 +79,15 @@ environment/defaults/default_clear_color=Color(0.075, 0.13, 0.17, 1)
 
 [shader_globals]
 
+gaf_point_kernel={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
+gaf_point_kernel_camera={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+
 gaf_mist_enabled={
 "type": "bool",
 "value": false

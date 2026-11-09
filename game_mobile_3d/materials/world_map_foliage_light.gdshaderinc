@@ -1,3 +1,4 @@
+#include "res://materials/world_map_point_kernel.gdshaderinc"
 // Bounded direct transmission for WorldMap's authored foliage.
 vec3 world_foliage_lobe(vec3 face, vec3 light_dir, vec3 view_dir, float front, float weight, float strength) {
 	float back = max(-dot(face, light_dir), 0.0);
@@ -15,8 +16,9 @@ varying float cloud_transmission;
 #endif
 
 void light() {
+	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);
 	float front = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
-	vec3 irradiance = LIGHT_COLOR * (ATTENUATION / PI);
+	vec3 irradiance = LIGHT_COLOR * (point_attenuation / PI);
 	vec3 response = vec3(front);
 	if (LIGHT_IS_DIRECTIONAL) {
 #ifdef GAF_WORLD_DIRECT_CLOUD
