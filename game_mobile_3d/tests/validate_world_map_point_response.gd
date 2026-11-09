@@ -8,6 +8,15 @@ func _initialize():call_deferred("run")
 func settle():
  for i in 40:await process_frame
 func run():
+ var prior=OS.get_environment("MD2_RESEARCH_ROOT")
+ var fixture="user://point_response_%d_%d"%[OS.get_process_id(),Time.get_ticks_usec()]
+ var path=fixture.path_join(load("res://scripts/world_map_point_response.gd").FILE)
+ DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+ OS.set_environment("MD2_RESEARCH_ROOT",ProjectSettings.globalize_path(fixture))
+ check(not load("res://scripts/world_map_point_response.gd").new().available(),"Missing proof disables recovered mode")
+ FileAccess.open(path,FileAccess.WRITE).store_string("{}")
+ check(not load("res://scripts/world_map_point_response.gd").new().available(),"Corrupt proof disables recovered mode")
+ OS.set_environment("MD2_RESEARCH_ROOT",prior)
  var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w)
  await settle()
  check(w.showcase.has_method("set_noninverse_player_light"),"Main exposes reversible recovered non-inverse mode")

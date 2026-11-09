@@ -24,6 +24,9 @@ var _forest_hour:=INF
 var _forest_sun:Color
 var _forest_energy:float
 var _vignette:ColorRect
+var point_response=preload("res://scripts/world_map_point_response.gd").new()
+var noninverse_player_light:=true
+var _point_response_toggle:CheckButton
 var _player_light:OmniLight3D
 var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
@@ -202,6 +205,7 @@ func _exit_tree()->void:
 	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
 
 func _update_mist()->void:
+	_update_player_falloff()
 	_update_hdr_air()
 	set_coherent_bloom(coherent_bloom)
 	if level!=null and level.look._exposure_effect!=null:set_coupled_bloom(coupled_bloom)
@@ -242,6 +246,14 @@ func _update_mist()->void:
 		if _player_light!=null:_player_light.top_level=true;_player_light.light_cull_mask=1;_player_light.global_position=point
 		emitter=point-Vector3.UP*1.4
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
+
+func set_noninverse_player_light(value:bool)->void:
+	noninverse_player_light=value;_update_player_falloff()
+
+func _update_player_falloff()->void:
+	if _player_light==null:return
+	var verified:bool=noninverse_player_light and forest_active()and point_response.available()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
+	_player_light.omni_attenuation=0. if verified else 2.
 
 func sync_lantern_emitter(point:Vector3)->void:
 	if not point.is_finite():return
@@ -379,6 +391,9 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
+	if _point_response_toggle!=null:
+		_point_response_toggle.disabled=not point_response.available()or not forest.available()
+		_point_response_toggle.set_pressed_no_signal(noninverse_player_light)
 	if _shape_toggle==null:return
 	var effect=level.look._exposure_effect if level!=null and level.look!=null else null
 	_shape_toggle.disabled=effect==null or not effect.has_method("multiscale_available")or not effect.multiscale_available()or not level.look.local_exposure_active()
@@ -432,6 +447,9 @@ func _build_ui()->void:
 	var gentle:=CheckButton.new();gentle.name="GentleNoon";gentle.text="Light · gentle midday sunlight";gentle.button_pressed=gentle_noon;gentle.focus_mode=Control.FOCUS_NONE;box.add_child(gentle)
 	gentle.tooltip_text="18% less direct sunlight at noon, smoothly returning to the previous morning/evening lighting. Ambient and source presets unchanged. OFF compares the previous result."
 	gentle.toggled.connect(set_gentle_noon)
+	var point_mode:=CheckButton.new();point_mode.name="NoninversePlayerLight";point_mode.text="Light - recovered non-inverse player falloff";point_mode.focus_mode=Control.FOCUS_NONE;point_mode.button_pressed=noninverse_player_light;point_mode.disabled=not point_response.available()or not forest.available();box.add_child(point_mode)
+	point_mode.tooltip_text="Native point light has inverse-square falloff OFF. Removes Godot distance^-2 while retaining its range cutoff and existing phase intensity. Not exact native radial cutoff or photometry. OFF restores previous falloff."
+	point_mode.toggled.connect(set_noninverse_player_light);_point_response_toggle=point_mode
 	var volume:=CheckButton.new();volume.text="Spatial mist · world height / patches";volume.button_pressed=spatial_mist;volume.focus_mode=Control.FOCUS_NONE;box.add_child(volume)
 	volume.toggled.connect(set_spatial_mist)
 	var measured:=CheckButton.new();measured.text="Air · measured night / dawn / day";measured.button_pressed=measured_atmosphere;measured.focus_mode=Control.FOCUS_NONE;box.add_child(measured);measured.toggled.connect(set_measured_atmosphere)
