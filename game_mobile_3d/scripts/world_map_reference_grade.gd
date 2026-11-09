@@ -70,6 +70,8 @@ func _release(rd:RenderingDevice)->void:
  _reference_buffer=RID();_last_flag=false
  _report("reference_ready",false);_report("reference_bytes",0)
  super._release(rd)
+func _finish_fragment(fragment:String,_rd:RenderingDevice,_uniforms:Array[RDUniform])->String:
+ return fragment
 func _prepare_pass(rd:RenderingDevice,fragment:String,framebuffer:RID,uniforms:Array[RDUniform])->bool:
  if fragment==APPLY and reference_available and _reference_requested and not _reference_blocked:
   var profile:Dictionary=_profile
@@ -111,4 +113,4 @@ void main() {""")
  display*=q[0].w;
  result=vec4(inverse_display(clamp(display,0.,1.)),color.a);
  }else{result=vec4(adjusted,color.a);}""")
- return super._prepare_pass(rd,fragment,framebuffer,uniforms)
+ return super._prepare_pass(rd,_finish_fragment(fragment,rd,uniforms),framebuffer,uniforms)
