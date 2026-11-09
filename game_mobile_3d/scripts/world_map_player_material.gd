@@ -5,9 +5,12 @@ const CB_PATH="godot_lab/world_map_unified_showcase_v001/player_light_audit_v001
 const CB_SHA="e364754a2009f38b96e60362eb9a6b8fcd6315a3f6d816570333ff1dc46e3d71"
 const SKIN_RGBA_SHA="a08cb0963081657956181ca610a383b1384b101ee3129f95d5166226c7ec2025"
 const ORM_RGBA_SHA="99d8ff9d3c111806dbdd7c85cda9ba3def9620aa56cae793fd9cd8a2572b0c9b"
+const PHASE_PROOF="godot_lab/world_map_unified_showcase_v001/player_material_phases_v001/phase-proof.private.json"
+const PHASE_SHA="328a90e94088ee3b5143ff3d778dd67d13fbf9613ad7caf8d3237e4cf414ffb4"
 var variants:Dictionary={}
 var profile:Dictionary={}
 var skin_mask:Texture2D
+var phase_verified:=false
 
 func _init()->void:
 	if not OS.has_feature("editor"):return
@@ -18,6 +21,7 @@ func _init()->void:
 	var values:=FileAccess.get_file_as_bytes(path).to_float32_array()
 	if values.size()<40:return
 	profile={"roughness":Vector3(values[35],values[36],values[37]),"self_light":values[28]}
+	_load_phase_proof(research)
 	var mask_path:=research.path_join("extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Characters/Player/Skins/Valorie/T_Valorie_MRES.png")
 	if FileAccess.file_exists(mask_path):
 		var image:=Image.load_from_file(mask_path)
@@ -28,6 +32,31 @@ func _init()->void:
 				var alpha:=PackedByteArray();var bytes:=image.get_data()
 				for i in 4096:alpha.append(bytes[i*4+3])
 				skin_mask=ImageTexture.create_from_image(Image.create_from_data(64,64,false,Image.FORMAT_R8,alpha))
+
+func _load_phase_proof(research:String)->void:
+	phase_verified=false
+	var path:=research.path_join(PHASE_PROOF)
+	if not FileAccess.file_exists(path)or FileAccess.get_sha256(path)!=PHASE_SHA:return
+	var proof=JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not proof is Dictionary or proof.get("schema")!="private-valorie-phase-material-proof/1"or proof.get("prefix_bytes")!=160:return
+	if proof.get("skin_rgba_sha256")!=SKIN_RGBA_SHA or proof.get("mres_rgba_sha256")!="26e10dc3da0acbb9e319b5e0e2fc7a476fcdfe51dace0c0dc10eb0ed69938abc":return
+	var rows=proof.get("samples")
+	if not rows is Array or rows.size()!=9:return
+	for i in 9:
+		var row=rows[i]
+		if not row is Dictionary or row.get("frame")!=i+1:return
+		for key in ["shader_sha256","skin_rgba_sha256","mres_rgba_sha256","prefix_sha256"]:
+			if row.get(key)!=proof.get(key):return
+		var relative=row.get("cb")
+		if not relative is String or relative.is_absolute_path()or relative.contains("..")or not relative.begins_with("godot_lab/world_map_unified_showcase_v001/player_material_phases_v001/frame_"):return
+		var file:=FileAccess.open(research.path_join(relative),FileAccess.READ)
+		if file==null:return
+		var bytes:=file.get_buffer(160)
+		var digest:=HashingContext.new();digest.start(HashingContext.HASH_SHA256);digest.update(bytes)
+		if bytes.size()!=160 or digest.finish().hex_encode()!=proof.prefix_sha256:return
+		var values:=bytes.to_float32_array()
+		if Vector3(values[35],values[36],values[37])!=profile.roughness or values[28]!=profile.self_light:return
+	phase_verified=true
 
 func available()->bool:
 	return RenderingServer.get_current_rendering_method()=="mobile" and RenderingServer.get_rendering_device()!=null \

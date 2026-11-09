@@ -376,7 +376,8 @@ func _process(delta:float)->void:
 		_atmosphere_picker.select(["previous","haze","lighting","combined"].find(atmosphere_review))
 		_legacy_sky_button.set_pressed_no_signal(level.terrain_sky.enabled)
 		_terrain_light_note.text="Local field: %s · original GAF transport\nSky RGB retint; sun transport stays Day-guarded."%("active" if level.terrain_light!=null and level.terrain_light.is_active() else "suspended / off")
-		_player_material_note.text="Same scene light / pose. Skin recovery: %s.\nB suspends adapter; F3 also gates direct clouds."%("verified Day profile" if level.look.player_effects_available() else "suspended outside verified Day / source")
+		var profile_scope:="nine captured phases" if level.look.player_phase_material_enabled and level.look.player_material.phase_verified else "Day-only comparison"
+		_player_material_note.text="Same scene light / pose. Material: %s.\nB suspends adapter; F3 also gates direct clouds."%(profile_scope if level.look.player_effects_available() else "suspended outside verified scope")
 		_cycle_button.set_pressed_no_signal(cycle_enabled)
 		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
 		var msaa:String=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
@@ -447,9 +448,12 @@ func _build_ui()->void:
 		toggle.button_pressed=level.look.get(entry[0]);box.add_child(toggle)
 		var property:String=entry[0]
 		toggle.toggled.connect(func(value:bool):level.look.set(property,value);if level.get("player_light")!=null:level.player_light.refresh(true))
-	_player_material_note=Label.new();_player_material_note.text="Same scene light / pose. Skin recovery: Day only.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(_player_material_note)
+	_player_material_note=Label.new();_player_material_note.text="Same scene light / pose. Captured material scope below.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(_player_material_note)
+	var phase_material:=CheckButton.new();phase_material.name="PlayerPhaseMaterial";phase_material.text="Player · verified material across phases";phase_material.button_pressed=level.look.player_phase_material_enabled;phase_material.disabled=not level.look.player_material.phase_verified;phase_material.focus_mode=Control.FOCUS_NONE;box.add_child(phase_material)
+	phase_material.tooltip_text="Nine captured night-to-day draws use identical Valorie shader, skin/MRES and material scalars. OFF restores the previous Day-only scope. Skin wrap remains an original Mobile approximation."
+	phase_material.toggled.connect(level.look.set_player_phase_material)
 	var phase_sky:=CheckButton.new();phase_sky.name="PlayerPhaseSky";phase_sky.text="Player · phase-aware indirect (all day)";phase_sky.button_pressed=true;phase_sky.focus_mode=Control.FOCUS_NONE;box.add_child(phase_sky)
-	phase_sky.tooltip_text="Original spatial sky follows attributed Forest lighting at all hours. Captured skin/self-light stay Day-only; rotated sunlight never reuses cached Day bounce. OFF restores previous phase scope."
+	phase_sky.tooltip_text="Original spatial sky follows attributed Forest lighting at all hours. Captured material response has a separate control; rotated sunlight never reuses cached Day bounce. OFF restores the previous sky scope."
 	phase_sky.toggled.connect(func(value:bool):
 		if level.get("player_light")!=null:level.player_light.set_phase_sky(value))
 	var terrain_title:=Label.new();terrain_title.text="TERRAIN · material / colored indirect";box.add_child(terrain_title)

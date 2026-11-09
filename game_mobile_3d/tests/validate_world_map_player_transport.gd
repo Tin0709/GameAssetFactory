@@ -28,6 +28,7 @@ func run():
  var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w);await create_timer(.7).timeout
  var native=RenderingServer.get_current_rendering_method()=="mobile" and RenderingServer.get_rendering_device()!=null
  if native:
+  w.look.set_player_phase_material(false) # Legacy material scope; phase proof has its own native test.
   check(w.get("player_light")!=null,"Main WorldMap owns actor field")
   if w.get("player_light")!=null:
    w.player_light.refresh(true)

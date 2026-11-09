@@ -22,6 +22,7 @@ func run()->void:
 			if m!=null and m.get_shader_parameter("recovered_roughness") and m.get_shader_parameter("recovered_self_light"):recovered_at_start+=1
 		check(recovered_at_start==2,"Approved startup applies both recovered terms to the two verified skin surfaces")
 	if look.has_method("set_player_material_review"):
+		look.set_player_phase_material(false) # Isolate the preserved legacy Day-only comparison.
 		var row0=look.actor_materials[0]
 		for flag:int in [BaseMaterial3D.FLAG_DISABLE_DEPTH_TEST,BaseMaterial3D.FLAG_UV1_USE_TRIPLANAR,BaseMaterial3D.FLAG_EMISSION_ON_UV2]:
 			var unusual:BaseMaterial3D=row0[3].duplicate();unusual.set_flag(flag,true)

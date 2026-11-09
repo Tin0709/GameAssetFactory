@@ -111,6 +111,7 @@ var player_roughness_enabled:=true
 var player_self_light_enabled:=true
 var player_material_review:="combined"
 var player_local_light_enabled:=true
+var player_phase_material_enabled:=true
 var player_reflection_enabled:=true
 var player_skin_enabled:=true
 var _player_effects_applied:=false
@@ -605,7 +606,11 @@ func _private_player_material_scope()->bool:
 
 func player_effects_available()->bool:
 	return _private_player_material_scope() and player_material.available() and not player_material.profile.is_empty() \
-		and (level.get("showcase")==null or level.showcase.is_day_anchor())
+		and (level.get("showcase")==null or level.showcase.is_day_anchor()or (player_phase_material_enabled and player_material.phase_verified))
+
+func set_player_phase_material(value:bool)->void:
+	player_phase_material_enabled=value
+	_apply_review_shaders()
 
 func _apply_player_materials(direct:bool,sky:bool)->void:
 	_player_effects_applied=player_effects_available()
