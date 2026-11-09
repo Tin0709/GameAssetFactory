@@ -63,7 +63,7 @@ func run():
    check(w.player_light.has_method("set_phase_sky"),"Independent all-phase sky control exists")
    if w.player_light.has_method("set_phase_sky"):
     for time in [7.,11.999,12.001,16.5,18.5,22.]:
-     w.showcase.set_hour(time)
+     w.showcase.hour=time;w.showcase.apply_time()
      await process_frame;await process_frame
      w.player_light.refresh()
      check(w.player_light.is_active(),"Spatial sky remains active at "+str(time))
