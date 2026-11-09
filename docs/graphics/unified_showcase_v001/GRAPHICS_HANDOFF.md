@@ -1,3 +1,5 @@
+**2026-11-10 USER RESUMED (LATEST):** Continue six-scale bloom shape plan from graphics_pause_20261110_005824. Default OFF until spatial/visual/performance/failure validation; preserve Noon and approved controller. Earlier PAUSED entries below are historical.
+
 **2026-11-10 USER EXPLICIT PAUSE (LATEST):** Stop graphics research, implementation and new tests until resumed. Checkpoint: `C:\Users\ADMIN\Desktop\MD2 Research\checkpoints\graphics_pause_20261110_005824`. Six-scale bloom shape default OFF; native17/headless5 passed, spatial/visual/performance/fallback validation unfinished. Host legacy-method guard and UI availability remain TODO. Prior relative-response baseline retained. Read GRAPHICS_PAUSE.txt and CURRENT_GRAPHICS_CHECKPOINT.txt. Earlier ACTIVE entries below are historical. No remote push claimed.
 
 ## 2026-11-10 — ACTIVE: source-backed relative bloom response in main WorldMap

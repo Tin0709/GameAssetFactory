@@ -1,4 +1,6 @@
 extends SceneTree
+class ControlFailure extends "res://scripts/world_map_multiscale_bloom.gd":
+ func _shape_control(_rd:RenderingDevice,_weight:float)->RID:return RID()
 var checks:=0
 var failures=[]
 func check(ok,label):
@@ -9,6 +11,16 @@ func settle():
  for i in 40:await process_frame
 func snapshot(w):return w.look._exposure_effect.snapshot()if w.look._exposure_effect!=null else {}
 func run():
+  var original_root=OS.get_environment("MD2_RESEARCH_ROOT")
+ var fixture="user://missing_shape_fixture"
+ DirAccess.make_dir_recursive_absolute(fixture)
+ OS.set_environment("MD2_RESEARCH_ROOT",ProjectSettings.globalize_path(fixture))
+ check(not load("res://scripts/world_map_bloom_shapes.gd").new().available(),"Missing pinned profile unavailable")
+ var path=fixture.path_join(load("res://scripts/world_map_bloom_shapes.gd").FILE)
+ DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+ FileAccess.open(path,FileAccess.WRITE).store_string("{}")
+ check(not load("res://scripts/world_map_bloom_shapes.gd").new().available(),"Corrupt pinned profile unavailable")
+ OS.set_environment("MD2_RESEARCH_ROOT",original_root)
  var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w)
  await settle()
  check(w.showcase.has_method("set_source_bloom_shape"),"Existing main exposes reversible six-radius study")
@@ -40,6 +52,17 @@ func run():
   check(s.get("shape_active",false)and s.get("shape_weight",0.)>0. and s.get("shape_weight",1.)<1.,"Original fade blends toward Noon rather than switches")
   w.showcase.phase_finish.set_requested(false);await settle();check(not snapshot(w).get("shape_active",false),"Standalone/previous grade cannot run unvalidated shape")
   w.showcase.phase_finish.set_requested(true);await settle();await settle()
+  # Replace the current compositor effect to exercise optional late allocation failure.
+  var old=w.look._exposure_effect;var compositor=w.look._exposure_compositor
+  w.showcase.phase_finish.set_requested(false);await settle()
+  var broken=ControlFailure.new();broken.set_review_strength(.12);broken.set_air_bloom(true)
+  var chain:Array[CompositorEffect]=compositor.compositor_effects.duplicate()
+  var index=chain.find(old);chain[index]=broken;compositor.compositor_effects=chain;w.look._exposure_effect=broken
+  old.enabled=false;RenderingServer.call_on_render_thread(old.release_on_render_thread)
+  w.showcase.phase_finish.set_requested(true);w.showcase.set_source_bloom_shape(true);await settle();await settle()
+  check(w.look.local_exposure_active()and broken.failure().is_empty(),"Shape fade allocation failure preserves existing F7")
+  check(not broken.snapshot().get("shape_active",false),"Shape fade allocation failure rolls back optional shape")
+  check(w.showcase.phase_finish.active,"Shape failure preserves owned phase grade")
   w.look.set_local_exposure(false);await settle();check(not w.look.local_exposure_active(),"F7 OFF still releases everything")
  check(w.player.run_speed==7. and AudioServer.is_bus_mute(0),"Approved controller/audio unchanged")
  print("BLOOM_SHAPE checks=",checks," failures=",JSON.stringify(failures));w.free();await process_frame;quit(0 if failures.is_empty()else 1)
