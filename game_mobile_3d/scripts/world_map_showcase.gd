@@ -286,9 +286,16 @@ func _single_point_scope()->bool:
 		if light!=_player_light and level.is_ancestor_of(light)and light.is_visible_in_tree()and light.light_energy>0. and (light.light_cull_mask&1)!=0:return false
 	return true
 
+func _point_receiver_scope()->bool:
+	if level==null or level.look==null:return false
+	if not level.look.direct_clouds_active()or not level.look.player_adapter_enabled or not level.look.player_cloud_enabled or not level.look.player_effects_available():return false
+	if ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading"):return false
+	if plants!=null and plants.visible and not plants.grass_lighting_enabled:return false
+	return true
+
 func _publish_point_cutoff()->void:
 	if _point_kernel_owner==null or _point_kernel_owner.get_ref()!=self:return
-	var eligible:bool=_player_light!=null and source_point_cutoff and noninverse_player_light and forest_active()and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and _single_point_scope()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
+	var eligible:bool=_player_light!=null and source_point_cutoff and noninverse_player_light and forest_active()and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and _single_point_scope()and _point_receiver_scope()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
 	var point:Vector3=_player_light.global_position if _player_light!=null else Vector3.ZERO
 	point_kernel_state=Vector4(point.x,point.y,point.z,_player_light.omni_range if eligible else 0.)
 	RenderingServer.global_shader_parameter_set("gaf_point_kernel",point_kernel_state)
@@ -432,7 +439,7 @@ func compare_baseline()->void:
 
 func _update_shape_control()->void:
 	if _point_cutoff_toggle!=null:
-		_point_cutoff_toggle.disabled=not point_response.kernel_available()or not forest.available()or not noninverse_player_light
+		_point_cutoff_toggle.disabled=not point_response.kernel_available()or not forest.available()or not noninverse_player_light or not _point_receiver_scope()
 		_point_cutoff_toggle.set_pressed_no_signal(source_point_cutoff)
 	if _warm_kernel_toggle!=null:
 		_warm_kernel_toggle.disabled=not point_response.kernel_available()or not forest.available()or not noninverse_player_light
