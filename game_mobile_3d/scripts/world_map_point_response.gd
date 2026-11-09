@@ -1,9 +1,13 @@
 extends RefCounted
-## Recovered mode selection only; Godot range cutoff remains an approximation.
+## Pinned external point-light proofs. No reference assets are bundled.
 const FILE="godot_lab/world_map_unified_showcase_v001/deepdark_entrance_v001/player-light.private.json"
 const SHA="5f6fe39377b114e178236c93625dc6cf3d4afc4b41d02a207b456889cfaafc54"
 const KERNEL_FILE="godot_lab/world_map_unified_showcase_v001/point_light_kernel_v001/profile.private.json"
 const KERNEL_SHA="0fb21e417b285b85e2458b0c691a7b036dc0db9bf3f8fa1e98e9591d3831274f"
+const SOFT_FILE="godot_lab/world_map_unified_showcase_v001/player_soft_source_v001/profile.private.json"
+const SOFT_SHA="04672ff9dcb2d79ec65475d93cca946fa57e16150cd4a633545ac5d853d7102a"
+var soft_verified:=false
+var soft_settings:=Vector2.ZERO
 var kernel_verified:=false
 var verified:=false
 var radius_m:=0.
