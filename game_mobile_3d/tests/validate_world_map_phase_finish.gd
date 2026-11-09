@@ -43,5 +43,5 @@ func run():
   w.showcase.compare_baseline();await settle();check(f.active,"B Combined resumes finishing")
   f.set_requested(false);await settle();check(not f.active,"OFF restores existing phase treatment")
   check(is_equal_approx(w.look._exposure_effect._review_strength,.12),"OFF restores bounded exposure")
- check(w.player.run_speed==7.and AudioServer.is_bus_mute(0),"Movement and muted audio unchanged")
+ check(w.player.run_speed==7. and AudioServer.is_bus_mute(0),"Movement and muted audio unchanged")
  print("PHASE_FINISH checks=",checks," failures=",JSON.stringify(failures));w.free();await process_frame;quit(0 if failures.is_empty()else 1)
