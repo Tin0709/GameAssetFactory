@@ -156,7 +156,7 @@ func set_gentle_noon(value:bool)->void:
 	level.look._refresh_ground_bounce();_update_mist()
 
 func set_measured_bloom_response(value:bool)->void:
- measured_bloom_response=value;set_coupled_bloom(coupled_bloom)
+	measured_bloom_response=value;set_coupled_bloom(coupled_bloom)
 
 func set_coupled_bloom(value:bool)->void:
 	coupled_bloom=value
