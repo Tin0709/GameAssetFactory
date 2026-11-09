@@ -12,9 +12,11 @@ Constraints: preserve main WorldMap, Noon, camera, all assets, 7 m/s movement, a
 
 Review focus: fallback after toggles; owner exit/global cleanup; same-frame lamp follow; directional/other-light exclusion; zero roughness/distance stability.
 
-- [ ] RED actual WorldMap test for missing soft-source API and pinned proof/gates.
-- [ ] GREEN external proof loader, original scalar helper, player-only shader and optional L control. No shared terrain/grass shading change.
-- [ ] GPU scalar tests versus recorded arithmetic and actual WorldMap locked OFF/ON/restore screenshots across day; Noon exact and unchanged light/fog/camera values.
-- [ ] Existing native regressions, actual controller 30/60/120, desktop comparative timings, fresh final review; save findings/default decision and resume point.
+- [x] RED actual WorldMap test for missing soft-source API and pinned proof/gates.
+- [x] GREEN external proof loader, original scalar helper, player-only shader and optional L control. No shared terrain/grass shading change.
+- [x] GPU scalar tests versus recorded arithmetic and actual WorldMap locked OFF/ON/restore screenshots across day; Noon exact and unchanged light/fog/camera values.
+- [x] Existing native regressions, actual controller 30/60/120, desktop comparative timings, fresh final review; save findings/default decision and resume point.
 
 Evidence under private Research/godot_lab/world_map_unified_showcase_v001/player_soft_source_v001. Earlier milestones and failed probes retained. Whole graphics goal stays active.
+
+Bounded milestone complete. Default remains OFF by measured visual decision; overall graphics goal remains active. Final native/visual/timing evidence and failures preserved privately. Fresh review P2 same-world sibling-light scope fixed and re-reviewed.
