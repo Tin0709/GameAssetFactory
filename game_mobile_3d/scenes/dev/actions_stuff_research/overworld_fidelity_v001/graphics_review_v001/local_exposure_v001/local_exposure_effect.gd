@@ -53,7 +53,7 @@ func snapshot()->Dictionary:
  _mutex.lock();var result:Dictionary=_published.duplicate(true);_mutex.unlock();return result
 func _publish_snapshot()->void:
  _mutex.lock()
- var result:={"frames":_frames,"error":_error,"size":[_size.x,_size.y],"gain":_gain,"neutral":_neutral,"owned_RIDs":_owned.size(),"graph_owned_RIDs":_graph.owned.size(),"graph_error":_graph.error,"graph_source_hashes":_graph.source_hashes.duplicate(),"parameters_sha256":_metadata_sha,"buffer_rebuilds":_rebuilds}
+ var result:={"frames":_frames,"error":_error,"size":[_size.x,_size.y],"gain":_gain,"neutral":_neutral,"strength":_strength,"owned_RIDs":_owned.size(),"graph_owned_RIDs":_graph.owned.size(),"graph_error":_graph.error,"graph_source_hashes":_graph.source_hashes.duplicate(),"parameters_sha256":_metadata_sha,"buffer_rebuilds":_rebuilds}
  _published=result;_mutex.unlock()
 func _compile_raster(rd:RenderingDevice,fragment:String)->RID:
  var source:=RDShaderSource.new();source.source_vertex=FileAccess.get_file_as_string(_kernel_folder.path_join("fullscreen.vert.glslinc"));source.source_fragment=fragment
@@ -103,7 +103,7 @@ void main(){
  vec2 grid=textureLod(exposure_grid,vec3(uv,depth),0.).rg;float blur=textureLod(blurred_log,uv,0.).r;
  float local=grid.y<p[1].y?blur:grid.x/grid.y;
  float base=local+(blur-local)*p[1].x+log2(p[0].x);float delta=base-log2(p[0].y);
- float contrast=delta>0.?p[0].z:p[0].w;contrast=mix(1.,contrast,control.value.y);if(control.value.x==0.)contrast=1.;
+ float contrast=delta>0.?p[0].z:p[0].w;if(control.value.y<1.)contrast=mix(1.,contrast,control.value.y);if(control.value.x==0.)contrast=1.;
  float gain=exp2((contrast-1.)*delta);output_color=vec4(color.rgb*gain,color.a);
 }
 """

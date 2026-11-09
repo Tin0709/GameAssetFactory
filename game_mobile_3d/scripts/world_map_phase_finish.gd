@@ -64,12 +64,15 @@ func refresh()->void:
  if showcase==null or showcase.level==null:return
  var level=showcase.level;var effect=level.look._exposure_effect
  var weight:=phase_weight(showcase.hour)
- var wanted:bool=requested and weight>0. and available()and showcase.forest_active()and level.look.local_exposure_active()and level.get_viewport().use_hdr_2d
+ var palette=level.get_node("WorldEnvironment").environment.adjustment_color_correction
+ var compatible:bool=palette is Texture3D and palette.get_width()==32 and palette.get_height()==32 and palette.get_depth()==32
+ var wanted:bool=requested and weight>0. and compatible and available()and showcase.forest_active()and level.look.day_finish_active()and level.look.local_exposure_active()and level.get_viewport().use_hdr_2d
  var compositor:Compositor=level.look._exposure_compositor
  if _effect!=null and(not wanted or effect!=_effect or compositor!=_compositor):release()
  if source_toggle!=null:source_toggle.disabled=_grade_owned or not showcase.grade_review.available()
  if not wanted:return
  if _native==null:
+  if FileAccess.get_sha256(_profile_path)!=SHA:_fail("Private phase-finishing profile changed");return
   _native=REFERENCE.new()
   if not _native.configure_external(_profile_path):_fail(_native.snapshot().error);return
   _native.set_strength(0.)

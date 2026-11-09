@@ -7,6 +7,8 @@ var _baseline:=PackedByteArray()
 var _baseline_slices:Array[Image]=[]
 var _baseline_buffer:=RID()
 var _baseline_texture:Texture3D
+var _palette_generation:=0
+var _render_palette_generation:=-1
 var _last_baseline:=PackedByteArray()
 func configure_finish(value:bool,env:Environment=null,weight:float=0.)->bool:
  if value:
@@ -14,13 +16,16 @@ func configure_finish(value:bool,env:Environment=null,weight:float=0.)->bool:
   var texture:Texture3D=env.adjustment_color_correction
   if texture.get_width()!=32 or texture.get_height()!=32 or texture.get_depth()!=32:return false
   var slices:Array[Image]=_baseline_slices
-  if texture!=_baseline_texture:
+  var changed:=texture!=_baseline_texture
+  if changed:
    slices=texture.get_data()
    if slices.size()!=32:return false
    for image in slices:image.convert(Image.FORMAT_RGBA8)
    _baseline_texture=texture
   var data:=PackedFloat32Array([env.tonemap_exposure,env.tonemap_white,env.adjustment_brightness,env.adjustment_contrast,env.adjustment_saturation,1. if env.adjustment_enabled else 0.,clampf(weight,0.,1.),0.]).to_byte_array()
-  _guard.lock();_baseline=data;_baseline_slices=slices;_finish_wanted=true;_guard.unlock()
+  _guard.lock();_baseline=data;_baseline_slices=slices;_finish_wanted=true
+  if changed:_palette_generation+=1
+  _guard.unlock()
  else:
   _guard.lock();_finish_wanted=false;_guard.unlock()
  return true
@@ -32,9 +37,9 @@ func _render_callback(kind:int,data:RenderData)->void:
  if kind!=effect_callback_type:return
  var rd:=RenderingServer.get_rendering_device()
  if rd==null:return
- _guard.lock();var wanted:=_finish_wanted;var baseline:=_baseline.duplicate();_guard.unlock()
- if wanted!=_render_finish:
-  _release(rd);_render_finish=wanted
+ _guard.lock();var wanted:=_finish_wanted;var baseline:=_baseline.duplicate();var generation:=_palette_generation;_guard.unlock()
+ if wanted!=_render_finish or(wanted and generation!=_render_palette_generation):
+  _release(rd);_render_finish=wanted;_render_palette_generation=generation
  if _baseline_buffer.is_valid()and baseline!=_last_baseline:
   rd.buffer_update(_baseline_buffer,0,baseline.size(),baseline);_last_baseline=baseline
  super(kind,data)
