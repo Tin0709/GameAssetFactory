@@ -27,6 +27,8 @@ func run():
   w.showcase.set_noninverse_player_light(true);await settle()
   w.showcase.point_response.kernel_verified=false;await settle();check(radius(w)==0.,"Missing proof falls back")
   w.showcase.point_response.kernel_verified=true;await settle();check(is_equal_approx(radius(w),8.),"Valid proof restores kernel")
+  w.look.set_direct_clouds(false);await settle();check(radius(w)==0.,"F3 built-in receiver fallback suspends kernel")
+  w.look.set_direct_clouds(true);await settle();check(is_equal_approx(radius(w),8.),"F3 restored custom receivers resume kernel")
   var extra=OmniLight3D.new();w.add_child(extra);await settle();check(radius(w)==0.,"Additional local light suspends single-owned-light correction")
   extra.light_cull_mask=2;await settle();check(is_equal_approx(radius(w),8.),"Non-receiver light does not affect owned layer")
   extra.free();await settle()
