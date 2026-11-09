@@ -17,6 +17,10 @@ var cycle_enabled:=false
 var audio_enabled:=false
 var plants:Node3D
 var palette:=PALETTE.new()
+var key_response=preload("res://scripts/world_map_key_response.gd").new()
+var captured_key_response:=false
+var key_response_active:=false
+var _key_response_toggle:CheckButton
 var forest:=FOREST.new()
 var atmosphere_review:="combined"
 var _forest_expected:Dictionary={}
@@ -138,6 +142,7 @@ func set_audio_enabled(value:bool)->void:
 		actor.environment_audio.audio.footsteps_enabled=value;actor.environment_audio.audio.rustle_enabled=value
 
 func _restore_day()->void:
+	key_response_active=false
 	if phase_finish!=null:phase_finish.restore_environment()
 	if grade_review!=null:grade_review.release()
 	if not _time_applied or _day.is_empty():return
@@ -172,6 +177,26 @@ func set_gentle_noon(value:bool)->void:
 	if level.terrain_light!=null:level.terrain_light.bind(true)
 	if level.player_light!=null:level.player_light.refresh(true)
 	level.look._refresh_ground_bounce();_update_mist()
+
+func set_captured_key_response(value:bool)->void:
+	captured_key_response=value
+	if level==null or level.look==null or level.look.stage!=2:return
+	_restore_day();apply_time()
+	if level.terrain_light!=null:level.terrain_light.bind(true)
+	if level.player_light!=null:level.player_light.refresh(true)
+	level.look._refresh_ground_bounce();_update_mist()
+
+func _apply_captured_key(sun:DirectionalLight3D)->void:
+	key_response_active=false
+	if not captured_key_response or not key_response.available()or is_day_anchor():return
+	var noon:=forest.sample(12.)
+	var base:Color=Color(_day.sun_color).srgb_to_linear()
+	var reference:=Vector3(base.r,base.g,base.b)*noon.key_color_scale*float(_day.sun_energy)*float(noon.key_scale)
+	var rgb:Vector3=reference*key_response.sample(hour)*(noon_direct_scale(hour)if gentle_noon else 1.)
+	var peak:=maxf(rgb.x,maxf(rgb.y,rgb.z))
+	if peak<=0. or not rgb.is_finite():return
+	sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb();sun.light_energy=peak
+	key_response_active=true
 
 func set_source_bloom_shape(value:bool)->void:
 	source_bloom_shape=value;set_coupled_bloom(coupled_bloom)
@@ -356,6 +381,7 @@ func terrain_ambient_matches(color:Color,source:Color)->bool:
 	return terrain_ambient_reference().is_equal_approx(source) and _forest_expected.get("ambient_light_color")==color
 
 func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
+	key_response_active=false
 	var p:=forest.sample(hour)
 	if atmosphere_review in ["lighting","combined"]:
 		var linear:=env.ambient_light_color.srgb_to_linear();var source:=Vector3(linear.r,linear.g,linear.b)
@@ -367,6 +393,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
 		sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb();sun.light_energy*=p.key_scale*peak
 		if gentle_noon:sun.light_energy*=noon_direct_scale(hour)
+		_apply_captured_key(sun)
 		if _player_light!=null:
 			var warm:Vector3=p.player_light_color
 			_player_light.light_color=Color(warm.x,warm.y,warm.z);_player_light.light_energy=p.player_light_weight
@@ -447,6 +474,9 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
+	if _key_response_toggle!=null:
+		_key_response_toggle.disabled=not key_response.available()or not forest.available()
+		_key_response_toggle.set_pressed_no_signal(captured_key_response)
 	if _soft_source_toggle!=null:
 		_soft_source_toggle.disabled=not point_response.soft_available()or not forest.available()or not source_point_cutoff or not noninverse_player_light or not _point_receiver_scope()
 		_soft_source_toggle.set_pressed_no_signal(player_soft_source)
@@ -521,6 +551,9 @@ func _build_ui()->void:
 	var soft:=CheckButton.new();soft.name="PlayerSoftSource";soft.text="Player - finite-source specular (comparison)";soft.focus_mode=Control.FOCUS_NONE;soft.button_pressed=player_soft_source;soft.disabled=not point_response.soft_available();box.add_child(soft)
 	soft.tooltip_text="Source-backed point specular broadening only. Does not change diffuse, sunlight, ambient or fog. Full native SSS/radiometry remains unverified."
 	soft.toggled.connect(set_player_soft_source);_soft_source_toggle=soft
+	var key:=CheckButton.new();key.name="CapturedKeyResponse";key.text="Light - captured direct-key phase response";key.focus_mode=Control.FOCUS_NONE;key.button_pressed=captured_key_response;key.disabled=not key_response.available();box.add_child(key)
+	key.tooltip_text="Captured relative direct-light RGB, anchored to the approved Noon. Clock placement/mirrored evening are original. No native lux, sun trajectory or indirect-light claim. OFF restores prior palette."
+	key.toggled.connect(set_captured_key_response);_key_response_toggle=key
 	var warm_kernel:=CheckButton.new();warm_kernel.name="SourceWarmLight";warm_kernel.text="Air - local-light radial source (experimental)";warm_kernel.focus_mode=Control.FOCUS_NONE;warm_kernel.button_pressed=source_warm_light;warm_kernel.disabled=not point_response.kernel_available()or not forest.available();box.add_child(warm_kernel)
 	warm_kernel.tooltip_text="Verified point-light squared-radius kernel transferred into our original Mobile mist. Only warm incoming light changes; extinction/noise/amplitude unchanged. Native full volumetric transport remains approximate. OFF restores prior linear-radius source."
 	warm_kernel.toggled.connect(set_source_warm_light);_warm_kernel_toggle=warm_kernel
