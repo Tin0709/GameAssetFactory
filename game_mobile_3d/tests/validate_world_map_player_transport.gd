@@ -37,9 +37,11 @@ func run():
    check(not w.player_light.is_active(),"Mismatched normalization falls back before dividing")
    w.player_light.cache.set_meta("ambient_energy",energy);w.player_light.refresh(true)
    check(w.player_light.is_active(),"Valid normalization resumes")
-   for m in w.look._direct_actor_materials:check(m.get_shader_parameter("player_local_light"),"All three surfaces receive source-independent spatial field")
+   var materials:Array=w.look._direct_actor_materials.filter(func(m):return m!=null)
+   check(materials.size()==3,"Only supported body, face and Sabre materials are adapted")
+   for m in materials:check(m.get_shader_parameter("player_local_light"),"All three surfaces receive source-independent spatial field")
    var count=0
-   for m in w.look._direct_actor_materials:
+   for m in materials:
     if m.get_meta("verified_valorie",false):
      check(m.get_shader_parameter("skin_profile_mask")!=null,"Source mask restored externally")
      check(m.get_shader_parameter("skin_wrap_enabled"),"Original selective skin response enabled")
@@ -53,9 +55,9 @@ func run():
      button.button_pressed=false;check(not w.look.get(key),"UI toggles correct independent flag: "+key)
      button.button_pressed=true;check(w.look.get(key),"UI restores correct flag: "+key)
    w.look.player_local_light_enabled=false;w.player_light.refresh(true)
-   for m in w.look._direct_actor_materials:check(not m.get_shader_parameter("player_local_light"),"Diffuse can be disabled independently")
+   for m in materials:check(not m.get_shader_parameter("player_local_light"),"Diffuse can be disabled independently")
    w.look.player_local_light_enabled=true;w.look.set_player_material_review("neutral");w.player_light.refresh(true)
-   for m in w.look._direct_actor_materials:check(not m.get_shader_parameter("player_local_light"),"Old neutral comparison is unchanged")
+   for m in materials:check(not m.get_shader_parameter("player_local_light"),"Old neutral comparison is unchanged")
    w.look.set_player_material_review("combined");w.showcase.set_hour(22.);w.player_light.refresh(true)
    check(w.player_light.is_active(),"Night uses original phase-aware sky transport")
    check(w.player_light.has_method("set_phase_sky"),"Independent all-phase sky control exists")
@@ -63,11 +65,11 @@ func run():
     for time in [7.,11.999,12.001,16.5,18.5,22.]:
      w.showcase.set_hour(time);w.player_light.refresh(true)
      check(w.player_light.is_active(),"Spatial sky remains active at "+str(time))
-     for m in w.look._direct_actor_materials:
+     for m in materials:
       check(not m.get_shader_parameter("skin_wrap_enabled"),"Day-only mask stays suspended at "+str(time))
       check(not m.get_shader_parameter("recovered_self_light"),"Captured self-light not invented at "+str(time))
      if time in [7.,16.5,18.5,22.]:
-      for m in w.look._direct_actor_materials:check(m.get_shader_parameter("player_probe_key")==Vector3.ZERO,"No stale Day bounce at "+str(time))
+      for m in materials:check(m.get_shader_parameter("player_probe_key")==Vector3.ZERO,"No stale Day bounce at "+str(time))
     w.player_light.set_phase_sky(false)
     check(not w.player_light.is_active(),"OFF restores old Night ambient path")
     w.player_light.set_phase_sky(true)
