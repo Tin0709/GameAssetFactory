@@ -35,6 +35,7 @@ func run():
  if not failures.is_empty():
   w.free();print("KEY_RESPONSE checks=",checks," failures=",JSON.stringify(failures));quit(1);return
  var native=RenderingServer.get_current_rendering_method()=="mobile"and RenderingServer.get_rendering_device()!=null
+ check(w.showcase.captured_key_response,"Validated relative key selected by default")
  if native:
   check(w.showcase.key_response.available(),"Private source curve verified")
   w.showcase.set_captured_key_response(false);w.showcase.set_hour(12.);await settle()

@@ -18,7 +18,7 @@ var audio_enabled:=false
 var plants:Node3D
 var palette:=PALETTE.new()
 var key_response=preload("res://scripts/world_map_key_response.gd").new()
-var captured_key_response:=false
+var captured_key_response:=true
 var key_response_active:=false
 var _key_response_toggle:CheckButton
 var forest:=FOREST.new()
@@ -434,6 +434,7 @@ func apply_time()->void:
 	if not private_primary or level==null or level.look==null:return
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
+		key_response_active=false
 		_time_applied=false;_forest_expected.clear()
 		if _vignette!=null:_vignette.hide()
 		if _player_light!=null:_player_light.hide()
