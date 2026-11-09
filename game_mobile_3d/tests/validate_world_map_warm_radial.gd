@@ -13,7 +13,8 @@ func run():
  check(w.showcase.has_method("set_source_warm_light"),"Existing main exposes recovered radial air source")
  if not w.showcase.has_method("set_source_warm_light"):
   print("WARM_RADIAL checks=",checks," failures=",JSON.stringify(failures));w.free();await process_frame;quit(1);return
- check(w.showcase.source_warm_light,"Supported source warm kernel defaults ON")
+ check(not w.showcase.source_warm_light,"Unvalidated warm transport stays OFF")
+ w.showcase.set_source_warm_light(true)
  var native=RenderingServer.get_current_rendering_method()=="mobile"and RenderingServer.get_rendering_device()!=null
  if native:
   w.showcase.set_hour(22.);await settle()
