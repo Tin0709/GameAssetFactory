@@ -77,6 +77,13 @@ func run():
     check(not w.player_light.is_active(),"OFF restores old Night ambient path")
     w.player_light.set_phase_sky(true)
     check(w.player_light.is_active(),"ON restores phase sky")
+    w.player.using_original_source=false
+    check(not w.player_light.available(),"Missing private actor never binds field to legacy shaders")
+    w.player.using_original_source=true
+    var profile:Dictionary=w.look.player_material.profile
+    w.look.player_material.profile={}
+    check(w.player_light.available(),"Original phase sky is independent of optional captured skin constants")
+    w.look.player_material.profile=profile
     w.showcase.compare_baseline();w.player_light.refresh(true)
     check(not w.player_light.is_active(),"Baseline suspends phase sky")
     w.showcase.compare_baseline();w.player_light.refresh(true)
