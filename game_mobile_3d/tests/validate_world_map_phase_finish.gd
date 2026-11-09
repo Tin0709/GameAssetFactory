@@ -17,8 +17,8 @@ func run():
  check(f.requested,"Improved phase finish is selected by default")
  check(is_equal_approx(f.phase_weight(12.),0.),"Noon anchor is preserved")
  for time in [0.,7.,16.5,18.5,22.]:check(is_equal_approx(f.phase_weight(time),1.),"Full atmospheric finishing outside Noon: "+str(time))
- check(f.phase_weight(10.)>0.and f.phase_weight(10.)<1.,"Smooth morning blend")
- check(f.phase_weight(14.)>0.and f.phase_weight(14.)<1.,"Smooth afternoon blend")
+ check(f.phase_weight(10.)>0. and f.phase_weight(10.)<1.,"Smooth morning blend")
+ check(f.phase_weight(14.)>0. and f.phase_weight(14.)<1.,"Smooth afternoon blend")
  var native:bool=RenderingServer.get_current_rendering_method()=="mobile"and RenderingServer.get_rendering_device()!=null
  check(f.available()==native,"Private finishing only available on supported renderer with verified data")
  check(not f.active,"Noon uses the unchanged original finish")
