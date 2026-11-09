@@ -25,6 +25,8 @@ var _forest_sun:Color
 var _forest_energy:float
 var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
+var source_warm_light:=true
+var _warm_kernel_toggle:CheckButton
 var noninverse_player_light:=true
 var _point_response_toggle:CheckButton
 var _player_light:OmniLight3D
@@ -247,6 +249,9 @@ func _update_mist()->void:
 		emitter=point-Vector3.UP*1.4
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
 
+func set_source_warm_light(value:bool)->void:
+	source_warm_light=value;_update_player_falloff()
+
 func set_noninverse_player_light(value:bool)->void:
 	noninverse_player_light=value;_update_player_falloff()
 
@@ -255,6 +260,7 @@ func _update_player_falloff()->void:
 	var verified:bool=noninverse_player_light and forest_active()and point_response.available()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
 	var decay:=0. if verified else 2.
 	if _player_light.omni_attenuation!=decay:_player_light.omni_attenuation=decay
+	if mist!=null:mist.recovered_point_kernel=verified and source_warm_light and point_response.kernel_available()
 
 func sync_lantern_emitter(point:Vector3)->void:
 	if not point.is_finite():return
@@ -392,6 +398,9 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
+	if _warm_kernel_toggle!=null:
+		_warm_kernel_toggle.disabled=not point_response.kernel_available()or not forest.available()or not noninverse_player_light
+		_warm_kernel_toggle.set_pressed_no_signal(source_warm_light)
 	if _point_response_toggle!=null:
 		_point_response_toggle.disabled=not point_response.available()or not forest.available()
 		_point_response_toggle.set_pressed_no_signal(noninverse_player_light)
@@ -451,6 +460,9 @@ func _build_ui()->void:
 	var point_mode:=CheckButton.new();point_mode.name="NoninversePlayerLight";point_mode.text="Light - recovered non-inverse player falloff";point_mode.focus_mode=Control.FOCUS_NONE;point_mode.button_pressed=noninverse_player_light;point_mode.disabled=not point_response.available()or not forest.available();box.add_child(point_mode)
 	point_mode.tooltip_text="Native point light has inverse-square falloff OFF. Removes Godot distance^-2 while retaining its range cutoff and existing phase intensity. Not exact native radial cutoff or photometry. OFF restores previous falloff."
 	point_mode.toggled.connect(set_noninverse_player_light);_point_response_toggle=point_mode
+	var warm_kernel:=CheckButton.new();warm_kernel.name="SourceWarmLight";warm_kernel.text="Air - recovered local-light radial source";warm_kernel.focus_mode=Control.FOCUS_NONE;warm_kernel.button_pressed=source_warm_light;warm_kernel.disabled=not point_response.kernel_available()or not forest.available();box.add_child(warm_kernel)
+	warm_kernel.tooltip_text="Verified point-light squared-radius kernel transferred into our original Mobile mist. Only warm incoming light changes; extinction/noise/amplitude unchanged. Native full volumetric transport remains approximate. OFF restores prior linear-radius source."
+	warm_kernel.toggled.connect(set_source_warm_light);_warm_kernel_toggle=warm_kernel
 	var volume:=CheckButton.new();volume.text="Spatial mist · world height / patches";volume.button_pressed=spatial_mist;volume.focus_mode=Control.FOCUS_NONE;box.add_child(volume)
 	volume.toggled.connect(set_spatial_mist)
 	var measured:=CheckButton.new();measured.text="Air · measured night / dawn / day";measured.button_pressed=measured_atmosphere;measured.focus_mode=Control.FOCUS_NONE;box.add_child(measured);measured.toggled.connect(set_measured_atmosphere)

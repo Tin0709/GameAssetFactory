@@ -18,6 +18,7 @@ func configure(parameters:PackedByteArray,size:Vector2i,noise:RID,light:RID=RID(
 	_mutex.lock()
 	_parameters=parameters.duplicate()
 	if _parameters.size()==176:_parameters.resize(224) # Legacy fixtures: neutral new-light branch.
+	_state.point_kernel=_parameters.size()==224 and _parameters.decode_float(172)>.5
 	_size=size;_noise=noise;_light=light
 	if size!=_allocated or light!=_allocated_light:_state.ready=false
 	_mutex.unlock()

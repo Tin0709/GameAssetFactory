@@ -13,6 +13,7 @@ var _radius:=8.
 var _bound_generation:=-1
 var _gate:=false
 var noise_strength:=1.
+var recovered_point_kernel:=false
 var material_provider:Callable
 var compositor_owned:Callable
 var medium_state:Callable
@@ -81,7 +82,7 @@ func _process(_delta:float)->void:
  _append(_actor,data,_profile.player_light_weight)
  var warm:Vector3=_profile.player_light_color;var warm_linear:=Color(warm.x,warm.y,warm.z).srgb_to_linear()
  _append(Vector3(warm_linear.r,warm_linear.g,warm_linear.b),data,_radius)
- data.append_array(PackedFloat32Array([_profile.fog_begin,_camera.far,noise_strength,0.]))
+ data.append_array(PackedFloat32Array([_profile.fog_begin,_camera.far,noise_strength,1. if recovered_point_kernel else 0.]))
  var light:Dictionary=light_provider.call()if light_provider.is_valid()else {"valid":false}
  var light_rid:=RID()
  if light.get("texture")!=null:light_rid=light.texture.get_rid()

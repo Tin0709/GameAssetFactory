@@ -11,7 +11,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 scatter; // linear RGB, energy
  vec4 subject; // world XYZ, warm strength
  vec4 warm; // linear RGB, range
- vec4 integration; // start distance, far view-depth, noise strength, reserved
+ vec4 integration; // start distance, far view-depth, noise strength, recovered radial warm source
  vec4 light_origin; // world lattice origin, enabled
  vec4 light_step; // world lattice spacing, occlusion floor
  vec4 light_size;
@@ -24,6 +24,12 @@ float scatter_visibility(vec3 point){
  // Recovered finish core; producer here is our static world field, not the
  // original radial screen-space blur. Never modify optical extinction.
  return p.light_step.w+(1.-p.light_step.w)*v*v;
+}
+// Independently authored radial source. Source proof establishes exponent2;
+// using it in this original participating medium is a reconstruction.
+float local_point_weight(vec3 offset,float radius,bool recovered){
+ float remaining=recovered?max(0.,1.-dot(offset,offset)/(radius*radius)):max(0.,1.-length(offset)/radius);
+ return remaining*remaining;
 }
 void main(){
  ivec3 size=imageSize(volume);ivec2 pixel=ivec2(gl_GlobalInvocationID.xy);
@@ -45,7 +51,7 @@ void main(){
    float n=textureLod(noise_field,(point.xz+vec2(p.medium.w*.045,-p.medium.w*.025))/256.0+.5,0.0).r;
    float bank=smoothstep(.30,.68,n);float variation=mix(1.0,bank*bank*1.8,p.integration.z);
    float tau=p.medium.x*height*variation*(d-start)*ray_length;
-   float warmth=p.subject.w*pow(max(0.0,1.0-length(point-(p.subject.xyz+vec3(0.0,1.4,0.0)))/p.warm.w),2.0);
+   float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
    vec3 light=p.scatter.rgb*p.scatter.w+p.warm.rgb*(warmth*.25);
    light*=scatter_visibility(point);
    scattered+=exp(-optical)*(1.0-exp(-tau))*light;optical+=tau;
