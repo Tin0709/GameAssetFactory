@@ -144,6 +144,12 @@ func _coherent_air_source()->String:
 """
 
 var _air_bloom:=false
+var _air_response:=1.
+func set_air_bloom_response(value:float)->void:
+ var response:=clampf(value,0.,4.)if is_finite(value)else 1.
+ if response==_air_response:return
+ _air_response=response;set_neutral(false)
+
 func set_air_bloom(value:bool)->void:
 	if _air_bloom==value:return
 	_air_bloom=value;set_neutral(false)
@@ -164,11 +170,12 @@ func _init() -> void:
 	access_resolved_color = true
 
 func set_neutral(neutral: bool) -> void:
-	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16 if _air_bloom and not neutral else 0.,0.,0.,0.])
+	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16*_air_response if _air_bloom and not neutral else 0.,0.,0.,0.])
 	parameters[0] = 0.0 if neutral else _review_strength
 	_guard.lock()
 	_parameters = parameters.to_byte_array()
 	_guard.unlock()
+	_report("air_bloom_response",_air_response);_report("air_bloom_weight",parameters[4])
 
 func set_review_strength(value: float) -> void:
 	# Scene-local art setting; preserve the established finite gain clamps.
