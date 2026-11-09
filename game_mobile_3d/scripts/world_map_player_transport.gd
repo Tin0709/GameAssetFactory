@@ -33,7 +33,7 @@ func available()->bool:
  if not cache_ready or not context_matches()or not level.terrain_light.available():return false
  # The original sky basis is source-independent and may follow the same
  # attributed phase sky as terrain. Native Day bounce rays remain angle-gated.
- var phase_context:bool=phase_sky and level.showcase.forest_spatial_sky_context()and level.look.player_material.available()
+ var phase_context:bool=phase_sky and level.look._private_player_material_scope()and level.showcase.forest_spatial_sky_context()and level.look.player_material.available()
  if not(level.look.player_effects_available()or phase_context)or not level.look.player_adapter_enabled or level.look.player_material_review!="combined":return false
  return true
 func is_active()->bool:return _active

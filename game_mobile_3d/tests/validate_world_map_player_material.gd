@@ -38,6 +38,9 @@ func run()->void:
 		for i in look.actor_materials.size():
 			var row=look.actor_materials[i];var m=row[0].get_active_material(row[1])
 			if not native:continue
+			if look._direct_actor_materials[i]==null:
+				check(m==row[2],"Unsupported attachment preserves its original material")
+				continue
 			check(m is ShaderMaterial,"Neutral uses a real adapter")
 			check(m.get_shader_parameter("albedo_tint")==row[4],"Neutral retains original tint")
 			check(m.get_shader_parameter("metal_map")==row[3].metallic_texture,"Metal texture preserved")
