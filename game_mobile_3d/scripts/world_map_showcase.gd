@@ -441,6 +441,10 @@ func _build_ui()->void:
 		var property:String=entry[0]
 		toggle.toggled.connect(func(value:bool):level.look.set(property,value);if level.get("player_light")!=null:level.player_light.refresh(true))
 	_player_material_note=Label.new();_player_material_note.text="Same scene light / pose. Skin recovery: Day only.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(_player_material_note)
+	var phase_sky:=CheckButton.new();phase_sky.name="PlayerPhaseSky";phase_sky.text="Player · phase-aware indirect (all day)";phase_sky.button_pressed=true;phase_sky.focus_mode=Control.FOCUS_NONE;box.add_child(phase_sky)
+	phase_sky.tooltip_text="Original spatial sky follows attributed Forest lighting at all hours. Captured skin/self-light stay Day-only; rotated sunlight never reuses cached Day bounce. OFF restores previous phase scope."
+	phase_sky.toggled.connect(func(value:bool):
+		if level.get("player_light")!=null:level.player_light.set_phase_sky(value))
 	var terrain_title:=Label.new();terrain_title.text="TERRAIN · material / colored indirect";box.add_child(terrain_title)
 	var terrain_modes:=["previous","materials","lighting","combined"]
 	var terrain_picker:=OptionButton.new();terrain_picker.name="TerrainLightComparison";terrain_picker.focus_mode=Control.FOCUS_NONE

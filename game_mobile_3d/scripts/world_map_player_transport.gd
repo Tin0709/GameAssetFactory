@@ -12,6 +12,9 @@ var _sky:=PackedVector3Array()
 var _sun:=PackedVector3Array()
 var update_usec:=0
 var _last_bind_key:Array=[]
+var phase_sky:=true
+func set_phase_sky(value:bool)->void:
+ phase_sky=value;refresh(true)
 func setup(world:Node3D)->void:
  level=world;process_priority=30
  if RenderingServer.get_current_rendering_method()!="mobile"or RenderingServer.get_rendering_device()==null or not level.showcase.private_primary:return
@@ -28,7 +31,10 @@ func context_matches()->bool:
  return true
 func available()->bool:
  if not cache_ready or not context_matches()or not level.terrain_light.available():return false
- if not level.look.player_effects_available()or not level.look.player_adapter_enabled or level.look.player_material_review!="combined":return false
+ # The original sky basis is source-independent and may follow the same
+ # attributed phase sky as terrain. Native Day bounce rays remain angle-gated.
+ var phase_context:bool=phase_sky and level.showcase.forest_spatial_sky_context()and level.look.player_material.available()
+ if not(level.look.player_effects_available()or phase_context)or not level.look.player_adapter_enabled or level.look.player_material_review!="combined":return false
  return true
 func is_active()->bool:return _active
 func refresh(force:bool=false)->void:
@@ -50,7 +56,8 @@ func refresh(force:bool=false)->void:
   tint=Vector3(b.r/a.r,b.g/a.g,b.b/a.b);scale=env.ambient_light_energy/float(cache.get_meta("ambient_energy"))
   var sun:DirectionalLight3D=level.get_node("Sun");var c:=sun.light_color.srgb_to_linear();var d:Array=cache.get_meta("sun_direction")
   if level.look._ground_bounce_requested and sun.global_basis.z.normalized().dot(Vector3(d[0],d[1],d[2]))>cos(deg_to_rad(.1)):key=Vector3(c.r,c.g,c.b)*sun.light_energy
- var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key]
+ var skin_verified:bool=level.look.player_effects_available()
+ var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified]
  if not force and bind_key==_last_bind_key:
   update_usec=Time.get_ticks_usec()-started;return
  _last_bind_key=bind_key
@@ -59,7 +66,7 @@ func refresh(force:bool=false)->void:
   var diffuse:bool=active and level.look.player_local_light_enabled
   m.set_shader_parameter("player_local_light",diffuse)
   m.set_shader_parameter("player_rough_reflection",active and level.look.player_reflection_enabled)
-  m.set_shader_parameter("skin_wrap_enabled",active and level.look.player_skin_enabled and m.get_meta("has_profile_mask",false))
+  m.set_shader_parameter("skin_wrap_enabled",active and skin_verified and level.look.player_skin_enabled and m.get_meta("has_profile_mask",false))
   if active:
    m.set_shader_parameter("player_probe_sky",_sky);m.set_shader_parameter("player_probe_sun",_sun)
    m.set_shader_parameter("player_probe_base",p.y);m.set_shader_parameter("player_probe_tint",tint)
