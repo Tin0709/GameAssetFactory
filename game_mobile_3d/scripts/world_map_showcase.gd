@@ -27,6 +27,7 @@ var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
 static var _point_kernel_owner:WeakRef
 var _point_lights:Dictionary={}
+var point_kernel_state:=Vector4.ZERO
 var source_point_cutoff:=true
 var _point_cutoff_toggle:CheckButton
 var source_warm_light:=false
@@ -289,7 +290,8 @@ func _publish_point_cutoff()->void:
 	if _point_kernel_owner==null or _point_kernel_owner.get_ref()!=self:return
 	var eligible:bool=_player_light!=null and source_point_cutoff and noninverse_player_light and forest_active()and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and _single_point_scope()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
 	var point:Vector3=_player_light.global_position if _player_light!=null else Vector3.ZERO
-	RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4(point.x,point.y,point.z,_player_light.omni_range if eligible else 0.))
+	point_kernel_state=Vector4(point.x,point.y,point.z,_player_light.omni_range if eligible else 0.)
+	RenderingServer.global_shader_parameter_set("gaf_point_kernel",point_kernel_state)
 	if level!=null:RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera",level.get_node("Camera3D").global_position)
 
 func sync_lantern_emitter(point:Vector3)->void:
