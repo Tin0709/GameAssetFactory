@@ -6,15 +6,19 @@ var _render_finish:=false
 var _baseline:=PackedByteArray()
 var _baseline_slices:Array[Image]=[]
 var _baseline_buffer:=RID()
+var _baseline_texture:Texture3D
 var _last_baseline:=PackedByteArray()
 func configure_finish(value:bool,env:Environment=null,weight:float=0.)->bool:
  if value:
   if env==null or env.tonemap_mode!=Environment.TONE_MAPPER_FILMIC or not env.adjustment_color_correction is Texture3D:return false
   var texture:Texture3D=env.adjustment_color_correction
   if texture.get_width()!=32 or texture.get_height()!=32 or texture.get_depth()!=32:return false
-  var slices:Array[Image]=texture.get_data()
-  if slices.size()!=32:return false
-  for image in slices:image.convert(Image.FORMAT_RGBA8)
+  var slices:Array[Image]=_baseline_slices
+  if texture!=_baseline_texture:
+   slices=texture.get_data()
+   if slices.size()!=32:return false
+   for image in slices:image.convert(Image.FORMAT_RGBA8)
+   _baseline_texture=texture
   var data:=PackedFloat32Array([env.tonemap_exposure,env.tonemap_white,env.adjustment_brightness,env.adjustment_contrast,env.adjustment_saturation,1. if env.adjustment_enabled else 0.,clampf(weight,0.,1.),0.]).to_byte_array()
   _guard.lock();_baseline=data;_baseline_slices=slices;_finish_wanted=true;_guard.unlock()
  else:
