@@ -4,6 +4,7 @@ extends "res://scripts/world_map_reference_grade.gd"
 const EDGES=preload("res://scripts/world_map_display_edges.gd")
 var _edge_requested:=false
 var _render_edge:=false
+var _reported_size:=Vector2i.ZERO
 func set_display_edges(value:bool)->void:
  _guard.lock();_edge_requested=value;_guard.unlock()
 var _finish_wanted:=false
@@ -44,6 +45,9 @@ func _render_callback(kind:int,data:RenderData)->void:
  if kind!=effect_callback_type:return
  var rd:=RenderingServer.get_rendering_device()
  if rd==null:return
+ var buffers:=data.get_render_scene_buffers()as RenderSceneBuffersRD
+ if buffers!=null and buffers.get_internal_size()!=_reported_size:
+  _reported_size=buffers.get_internal_size();_report("render_size",[_reported_size.x,_reported_size.y])
  _guard.lock();var wanted:=_finish_wanted;var baseline:=_baseline.duplicate();var generation:=_palette_generation;var edge:=_edge_requested and wanted and _reference_enabled and _reference_requested and not _reference_blocked;_guard.unlock()
  if wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
@@ -51,7 +55,7 @@ func _render_callback(kind:int,data:RenderData)->void:
   rd.buffer_update(_baseline_buffer,0,baseline.size(),baseline);_last_baseline=baseline
  super(kind,data)
 func _release(rd:RenderingDevice)->void:
- _baseline_buffer=RID();_last_baseline=PackedByteArray();_report("finish_ready",false);_report("finish_bytes",0);_report("edge_active",false);_report("edge_bytes",0)
+ _baseline_buffer=RID();_last_baseline=PackedByteArray();_report("finish_ready",false);_report("finish_bytes",0);_report("edge_active",false);_report("edge_bytes",0);_report("edge_size",[0,0])
  super(rd)
 func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUniform])->String:
  if not _render_finish or not fragment.contains("inverse_display(clamp(display,0.,1.))"):return fragment

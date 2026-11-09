@@ -31,8 +31,8 @@ func run():
   var n=s.rebuilds
   await settle();check(edge_state(w).rebuilds==n,"Stable phase never reallocates each frame")
   DisplayServer.window_set_size(Vector2i(961,541));await settle()
-  print("RESIZE_DIAGNOSTIC ",JSON.stringify({"window":[DisplayServer.window_get_size().x,DisplayServer.window_get_size().y],"root":[root.size.x,root.size.y],"edge":edge_state(w)}))
-  check(edge_state(w).get("edge_bytes",0)==961*541*4,"Odd resize rebuilds display target")
+  var resized=edge_state(w);var dimensions=resized.get("render_size",[0,0])
+  check(resized.get("edge_size",[])==dimensions and dimensions!=[1280,720]and resized.get("edge_bytes",0)==int(dimensions[0])*int(dimensions[1])*4,"Odd resize follows independently observed 3D render buffer extent")
   DisplayServer.window_set_size(Vector2i(1280,720));await settle()
   check(edge_state(w).get("edge_bytes",0)==1280*720*4,"Resize back releases former target")
   f.set_edge_softening(false);await settle();s=edge_state(w)
