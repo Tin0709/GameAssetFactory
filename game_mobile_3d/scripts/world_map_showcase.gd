@@ -162,6 +162,7 @@ func set_coherent_bloom(value:bool)->void:
 	if level!=null and level.look._exposure_effect!=null:level.look._exposure_effect.set_coherent_bloom_source(value)
 
 func set_source_grade(value:bool)->void:
+	if value and phase_finish!=null:phase_finish.set_requested(false)
 	if grade_review!=null:grade_review.set_requested(value)
 
 func set_hdr_air(value:bool)->void:

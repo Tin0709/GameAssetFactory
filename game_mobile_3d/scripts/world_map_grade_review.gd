@@ -13,10 +13,12 @@ func available()->bool:
  var e=showcase.level.look._exposure_effect
  return e!=null and e.get("reference_available")==true and str(e.snapshot().get("reference_failure","")).is_empty()
 func active()->bool:return _environment!=null
+func _phase_owned()->bool:
+ return showcase!=null and showcase.get("phase_finish")!=null and showcase.phase_finish.owns_grade()
 func set_requested(value:bool)->void:
  requested=value;refresh()
 func release(disable_effect:bool=true)->void:
- if disable_effect and _effect!=null:_effect.set_reference_grade(false)
+ if disable_effect and _effect!=null and not _phase_owned():_effect.set_reference_grade(false)
  if _environment!=null:
   for key in _saved:
    _environment.set(key,_saved[key])
@@ -25,6 +27,7 @@ func release(disable_effect:bool=true)->void:
  _environment=null;_saved.clear()
 func refresh()->void:
  if showcase==null or showcase.level==null:return
+ if _phase_owned():return
  var effect=showcase.level.look._exposure_effect
  var wanted:bool=requested and available()and showcase.forest_active()and showcase.level.get_viewport().use_hdr_2d
  if _effect!=effect:release();_effect=effect

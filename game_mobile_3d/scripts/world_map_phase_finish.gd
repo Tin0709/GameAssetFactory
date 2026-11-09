@@ -24,7 +24,7 @@ static func phase_weight(time:float)->float:
  var h:=fposmod(time,24.)
  return 1.-smoothstep(7.,12.,h)if h<=12. else smoothstep(12.,16.5,h)
 func setup(value:Node)->void:
- showcase=value;process_priority=25
+ showcase=value;process_priority=25;_saved_strength=showcase.LOCAL_EXPOSURE_STRENGTH
  if not OS.has_feature("editor"):return
  var root:=OS.get_environment("MD2_RESEARCH_ROOT")
  if root.is_empty():root="C:/Users/ADMIN/Desktop/MD2 Research"
@@ -33,8 +33,14 @@ func setup(value:Node)->void:
 func available()->bool:
  if not _verified or showcase==null or showcase.level==null or not showcase.unavailable_reason.is_empty():return false
  var effect=showcase.level.look._exposure_effect
+ var compositor:Compositor=showcase.level.look._exposure_compositor
+ if compositor!=null:
+  for item in compositor.compositor_effects:
+   if item is REFERENCE and item!=_native:return false
  return effect!=null and effect.has_method("configure_finish")and effect.get("reference_available")==true and RenderingServer.get_current_rendering_method()=="mobile"and RenderingServer.get_rendering_device()!=null
+func owns_grade()->bool:return _grade_owned
 func set_requested(value:bool)->void:
+ if value:last_error=""
  requested=value;refresh()
 func restore_environment()->void:
  if _environment!=null:
@@ -76,8 +82,8 @@ func refresh()->void:
   _native=REFERENCE.new()
   if not _native.configure_external(_profile_path):_fail(_native.snapshot().error);return
   _native.set_strength(0.)
-  _effect=effect;_compositor=compositor;_saved_strength=effect._review_strength
-  _saved_grade=showcase.grade_review.requested;_grade_owned=true;showcase.grade_review.set_requested(false)
+  _effect=effect;_compositor=compositor
+  _saved_grade=showcase.grade_review.requested;showcase.grade_review.set_requested(false);_grade_owned=true
   var chain:Array[CompositorEffect]=[]
   for item in compositor.compositor_effects:
    if item==effect:chain.append(_native)
