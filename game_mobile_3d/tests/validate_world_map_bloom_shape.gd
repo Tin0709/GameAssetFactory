@@ -11,7 +11,7 @@ func settle():
  for i in 40:await process_frame
 func snapshot(w):return w.look._exposure_effect.snapshot()if w.look._exposure_effect!=null else {}
 func run():
-  var original_root=OS.get_environment("MD2_RESEARCH_ROOT")
+ var original_root=OS.get_environment("MD2_RESEARCH_ROOT")
  var fixture="user://missing_shape_fixture"
  DirAccess.make_dir_recursive_absolute(fixture)
  OS.set_environment("MD2_RESEARCH_ROOT",ProjectSettings.globalize_path(fixture))
