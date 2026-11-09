@@ -101,5 +101,5 @@ func _prepare_pass(rd:RenderingDevice,fragment:String,framebuffer:RID,uniforms:A
  var parameters:=RDUniform.new();parameters.uniform_type=RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER;parameters.binding=1;parameters.add_id(_baseline_buffer)
  var linear:=_sampler(rd,RenderingDevice.SAMPLER_FILTER_LINEAR)
  if not linear.is_valid()or not super._prepare_pass(rd,EDGES.FRAGMENT,framebuffer,[_sample(0,linear,image),parameters]):return false
- _report("edge_active",true);_report("edge_bytes",format.width*format.height*4);_report("edge_error","")
+ _report("edge_active",true);_report("edge_bytes",format.width*format.height*4);_report("edge_size",[format.width,format.height]);_report("edge_error","")
  return true
