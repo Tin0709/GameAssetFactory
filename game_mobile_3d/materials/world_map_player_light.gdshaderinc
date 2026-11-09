@@ -1,4 +1,5 @@
 #include "res://materials/world_map_point_kernel.gdshaderinc"
+#include "res://materials/world_map_soft_source.gdshaderinc"
 // Actor-only Burley/GGX direct response. Ambient/emission remain engine-owned.
 // Unlike the older matte-terrain helper, specular lobes are not clipped to 1.
 varying float player_cloud;
@@ -28,8 +29,10 @@ void light(){
 			DIFFUSE_LIGHT+=LIGHT_COLOR*incident;
 #endif
 		}
-		if(ROUGHNESS>0.0){
+		float source_angle=gaf_player_soft_angle(LIGHT_IS_DIRECTIONAL,LIGHT,actor_world,INV_VIEW_MATRIX);
+		if(ROUGHNESS>0.0||source_angle>0.){
 			float a=ROUGHNESS*ROUGHNESS;
+			if(source_angle>0.)a=gaf_soft_lobe_width(ROUGHNESS,lh,source_angle,gaf_point_soft.y);
 			float nh=clamp(dot(NORMAL,h),0.0,1.0);
 			float k=a/max(1.0-nh*nh+(nh*a)*(nh*a),0.0000001);
 			float visibility=0.5/max(mix(2.0*nl*nv,nl+nv,a),0.0000001);

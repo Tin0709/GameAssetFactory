@@ -32,5 +32,14 @@ func _init()->void:
  var r=k.get("radius_m")
  if not(r is float or r is int)or not is_finite(r)or not is_equal_approx(float(r),radius_m):return
  kernel_verified=true
+ var soft_path:=root.path_join(SOFT_FILE)
+ if not FileAccess.file_exists(soft_path)or FileAccess.get_sha256(soft_path)!=SOFT_SHA:return
+ var soft=JSON.parse_string(FileAccess.get_file_as_string(soft_path))
+ if not soft is Dictionary or soft.get("schema")!="private-player-soft-source/1"or soft.get("operation")!="angular-source-ggx-broadening"or soft.get("hard_radius_m")!=0. or soft.get("source_length_m")!=0.:return
+ var size=soft.get("soft_radius_m");var minimum=soft.get("min_roughness")
+ if not(size is float or size is int)or not is_finite(size)or size<=0. or size>100.:return
+ if not(minimum is float or minimum is int)or not is_finite(minimum)or minimum<0. or minimum>1.:return
+ soft_settings=Vector2(float(size),float(minimum));soft_verified=true
 func available()->bool:return verified
 func kernel_available()->bool:return verified and kernel_verified
+func soft_available()->bool:return kernel_available()and soft_verified
