@@ -8,6 +8,25 @@ func _initialize():call_deferred("run")
 func settle():
  for i in 28:await process_frame
 func run():
+ var old_root:=OS.get_environment("MD2_RESEARCH_ROOT")
+ var research:=old_root if not old_root.is_empty()else"C:/Users/ADMIN/Desktop/MD2 Research"
+ var script=load("res://scripts/world_map_bloom_response.gd")
+ var original:=FileAccess.get_file_as_bytes(research.path_join(script.FILE))
+ var fallbacks=[]
+ for kind in ["valid","missing","corrupt"]:
+  var fixture:=research.path_join("godot_lab/world_map_unified_showcase_v001/multiscale_bloom_v001/loader_fixtures/"+kind)
+  var path:=fixture.path_join(script.FILE);DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+  if kind!="missing":
+   var bytes:=original.duplicate()
+   if kind=="corrupt":bytes.append(32)
+   FileAccess.open(path,FileAccess.WRITE).store_buffer(bytes)
+  OS.set_environment("MD2_RESEARCH_ROOT",fixture)
+  var profile=script.new()
+  check(profile.available()==(kind=="valid"),"Actual "+kind+" private profile loading")
+  if kind!="valid":
+   check(profile.sample(0.)==1.,kind+" profile yields conservative unity")
+   fallbacks.append(profile)
+ OS.set_environment("MD2_RESEARCH_ROOT",old_root)
  var w=load("res://scenes/WorldMap.tscn").instantiate();root.add_child(w)
  await settle()
  var s=w.showcase
@@ -37,5 +56,10 @@ func run():
   check(w.look._exposure_effect._parameters.decode_float(16)==0.,"Bloom OFF remains fully OFF")
   s.set_coupled_bloom(true);await settle()
   check(w.look._exposure_effect._parameters.decode_float(16)>.16,"Selected Night response resumes")
+  for profile in fallbacks:
+   s.bloom_response=profile;s.set_measured_bloom_response(true);await settle()
+   check(is_equal_approx(w.look._exposure_effect._parameters.decode_float(16),.16),"Invalid source proof preserves actual previous GPU uniform")
+  var e=w.look._exposure_effect;e.set_air_bloom_response(NAN)
+  check(is_equal_approx(e._parameters.decode_float(16),.16),"Nonfinite direct scalar input safely restores unity")
  check(w.player.run_speed==7. and AudioServer.is_bus_mute(0),"Gameplay and muted audio retained")
  print("BLOOM_RESPONSE checks=",checks," failures=",JSON.stringify(failures));w.free();await process_frame;quit(0 if failures.is_empty()else 1)

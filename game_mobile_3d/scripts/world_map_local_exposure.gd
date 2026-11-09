@@ -174,8 +174,8 @@ func set_neutral(neutral: bool) -> void:
 	parameters[0] = 0.0 if neutral else _review_strength
 	_guard.lock()
 	_parameters = parameters.to_byte_array()
+	_state["air_bloom_response"]=_air_response;_state["air_bloom_weight"]=parameters[4]
 	_guard.unlock()
-	_report("air_bloom_response",_air_response);_report("air_bloom_weight",parameters[4])
 
 func set_review_strength(value: float) -> void:
 	# Scene-local art setting; preserve the established finite gain clamps.
