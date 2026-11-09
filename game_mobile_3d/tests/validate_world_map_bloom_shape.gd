@@ -12,7 +12,7 @@ func settle():
 func snapshot(w):return w.look._exposure_effect.snapshot()if w.look._exposure_effect!=null else {}
 func run():
  var original_root=OS.get_environment("MD2_RESEARCH_ROOT")
- var fixture="user://missing_shape_fixture"
+ var fixture="user://shape_fixture_%d_%d"%[OS.get_process_id(),Time.get_ticks_usec()]
  DirAccess.make_dir_recursive_absolute(fixture)
  OS.set_environment("MD2_RESEARCH_ROOT",ProjectSettings.globalize_path(fixture))
  check(not load("res://scripts/world_map_bloom_shapes.gd").new().available(),"Missing pinned profile unavailable")
@@ -52,6 +52,12 @@ func run():
   check(s.get("shape_active",false)and s.get("shape_weight",0.)>0. and s.get("shape_weight",1.)<1.,"Original fade blends toward Noon rather than switches")
   w.showcase.phase_finish.set_requested(false);await settle();check(not snapshot(w).get("shape_active",false),"Standalone/previous grade cannot run unvalidated shape")
   w.showcase.phase_finish.set_requested(true);await settle();await settle()
+  var original_size=root.size
+  root.size=Vector2i(961,541);await settle();await settle()
+  s=snapshot(w)
+  check(s.get("shape_active",false)and s.get("render_size",[0,0])[0]==961,"Odd resolution rebuilds shape against actual 3D buffer")
+  check(s.get("shape_error","").is_empty()and w.look.local_exposure_active(),"Resize retains healthy optional graph and F7")
+  root.size=original_size;await settle();await settle()
   # Replace the current compositor effect to exercise optional late allocation failure.
   var old=w.look._exposure_effect;var compositor=w.look._exposure_compositor
   w.showcase.phase_finish.set_requested(false);await settle()
