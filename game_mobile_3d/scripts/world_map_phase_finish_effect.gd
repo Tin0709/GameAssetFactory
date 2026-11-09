@@ -20,7 +20,9 @@ func configure_finish(value:bool,env:Environment=null,weight:float=0.)->bool:
   if changed:
    slices=texture.get_data()
    if slices.size()!=32:return false
-   for image in slices:image.convert(Image.FORMAT_RGBA8)
+   for image in slices:
+    if image.is_compressed()or image.get_format()not in [Image.FORMAT_RGB8,Image.FORMAT_RGBA8]:return false
+    image.convert(Image.FORMAT_RGBA8)
    _baseline_texture=texture
   var data:=PackedFloat32Array([env.tonemap_exposure,env.tonemap_white,env.adjustment_brightness,env.adjustment_contrast,env.adjustment_saturation,1. if env.adjustment_enabled else 0.,clampf(weight,0.,1.),0.]).to_byte_array()
   _guard.lock();_baseline=data;_baseline_slices=slices;_finish_wanted=true

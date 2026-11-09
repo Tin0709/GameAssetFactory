@@ -37,7 +37,7 @@ func available()->bool:
  if compositor!=null:
   for item in compositor.compositor_effects:
    if item is REFERENCE and item!=_native:return false
- return effect!=null and effect.has_method("configure_finish")and effect.get("reference_available")==true and RenderingServer.get_current_rendering_method()=="mobile"and RenderingServer.get_rendering_device()!=null
+ return effect!=null and effect.has_method("configure_finish")and effect.get("reference_available")==true and effect.failure().is_empty()and str(effect.snapshot().get("reference_failure","")).is_empty()and RenderingServer.get_current_rendering_method()=="mobile"and RenderingServer.get_rendering_device()!=null
 func owns_grade()->bool:return _grade_owned
 func set_requested(value:bool)->void:
  if value:last_error=""
@@ -70,9 +70,10 @@ func refresh()->void:
  if showcase==null or showcase.level==null:return
  var level=showcase.level;var effect=level.look._exposure_effect
  var weight:=phase_weight(showcase.hour)
- var palette=level.get_node("WorldEnvironment").environment.adjustment_color_correction
+ var env:Environment=level.get_node("WorldEnvironment").environment
+ var palette=env.adjustment_color_correction
  var compatible:bool=palette is Texture3D and palette.get_width()==32 and palette.get_height()==32 and palette.get_depth()==32
- var wanted:bool=requested and weight>0. and compatible and available()and showcase.forest_active()and level.look.day_finish_active()and level.look.local_exposure_active()and level.get_viewport().use_hdr_2d
+ var wanted:bool=requested and weight>0. and compatible and available()and showcase.forest_active()and showcase.atmosphere_review=="combined"and showcase.coupled_bloom and not env.glow_enabled and level.look.day_finish_active()and level.look.local_exposure_active()and level.get_viewport().use_hdr_2d and level.get_viewport().screen_space_aa==Viewport.SCREEN_SPACE_AA_DISABLED
  var compositor:Compositor=level.look._exposure_compositor
  if _effect!=null and(not wanted or effect!=_effect or compositor!=_compositor):release()
  if source_toggle!=null:source_toggle.disabled=_grade_owned or not showcase.grade_review.available()
@@ -90,7 +91,6 @@ func refresh()->void:
    chain.append(item)
   if not _native in chain:_fail("Main exposure compositor ownership changed");return
   compositor.compositor_effects=chain
- var env:Environment=level.get_node("WorldEnvironment").environment
  if _environment==null:
   if not effect.configure_finish(true,env,weight):_fail("Unsupported original finish; previous appearance restored");return
  effect.set_reference_hour(showcase.hour);effect.prepare_reference_grade(true)
