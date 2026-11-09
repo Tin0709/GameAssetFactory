@@ -253,7 +253,8 @@ func set_noninverse_player_light(value:bool)->void:
 func _update_player_falloff()->void:
 	if _player_light==null:return
 	var verified:bool=noninverse_player_light and forest_active()and point_response.available()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
-	_player_light.omni_attenuation=0. if verified else 2.
+	var decay:=0. if verified else 2.
+	if _player_light.omni_attenuation!=decay:_player_light.omni_attenuation=decay
 
 func sync_lantern_emitter(point:Vector3)->void:
 	if not point.is_finite():return
