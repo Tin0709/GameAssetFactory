@@ -1,3 +1,5 @@
+Latest saved-code follow-up: private display_edge_finish_v001/final_visual_v002 has30fresh images/10exact OFFrestores; Noon cliff exact, meadow tiny grass residual <.124/255 retained.8fresh direct-RD ABBA blocks: Night~.125msOFF/.145msON, Noon~.056ms unchanged; desktop only, earlier5ms spikes preserved. Source-native AA still not exact and stays OFF. Read FINDINGS.txt for scope and failures.
+
 ## 2026-11-09 — ACTIVE resumed graphics / measured display-edge comparison
 
 Latest user resume supersedes historical STOPPED/PAUSED entries below. Main phase finishing and nine-phase player material evidence are now validated on the saved code; see `godot_lab/world_map_unified_showcase_v001/phase_finish_bridge_v001/final_validation_v002` and `player_material_phases_v001`. Latest combined actual-controller test `combined_validation_v002/fixed_tick_v005` has exact repeat/feature trajectories at render30/60/120 (physics60) and full motion/combo coverage.
