@@ -191,7 +191,7 @@ func _apply_captured_key(sun:DirectionalLight3D)->void:
 	if not captured_key_response or not key_response.available()or is_day_anchor():return
 	var noon:=forest.sample(12.)
 	var base:Color=Color(_day.sun_color).srgb_to_linear()
-	var reference:=Vector3(base.r,base.g,base.b)*noon.key_color_scale*float(_day.sun_energy)*float(noon.key_scale)
+	var reference:Vector3=Vector3(base.r,base.g,base.b)*noon.key_color_scale*float(_day.sun_energy)*float(noon.key_scale)
 	var rgb:Vector3=reference*key_response.sample(hour)*(noon_direct_scale(hour)if gentle_noon else 1.)
 	var peak:=maxf(rgb.x,maxf(rgb.y,rgb.z))
 	if peak<=0. or not rgb.is_finite():return
