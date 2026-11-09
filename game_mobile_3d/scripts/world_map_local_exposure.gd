@@ -120,7 +120,7 @@ var _coherent_bloom_source:=true
 var _render_coherent_bloom:=true
 func set_coherent_bloom_source(value:bool)->void:
 	_guard.lock();_coherent_bloom_source=value;_guard.unlock()
-func _coherent_air_source()->String:
+func _coherent_air_source(block:int=4)->String:
 	# Reuse the single authoritative gain body; no independently drifting formula.
 	var first:=APPLY.find("\tvec2 grid =")
 	var last:=APPLY.find("\tvec3 adjusted =")
@@ -131,7 +131,7 @@ func _coherent_air_source()->String:
 	var main_start:=AIR_SOURCE.find("void main(){")
 	if main_start<0:
 		_report("error","Bloom source exposure contract changed");return ""
-	return AIR_SOURCE.substr(0,main_start)+fn+"""void main(){
+	var source:=AIR_SOURCE.substr(0,main_start)+fn+"""void main(){
  ivec2 dimensions=textureSize(source_color,0);
  ivec2 first=ivec2(gl_FragCoord.xy)*4;vec3 sum=vec3(0.);
  for(int y=0;y<4;y++)for(int x=0;x<4;x++){
@@ -142,6 +142,8 @@ func _coherent_air_source()->String:
  result=vec4(sum/16.,1.);
 }
 """
+	return source.replace("*4;","*"+str(block)+";").replace("y<4;","y<"+str(block)+";").replace("x<4;","x<"+str(block)+";").replace("sum/16.","sum/"+str(block*block)+".")
+
 
 var _air_bloom:=false
 var _air_response:=1.
@@ -256,6 +258,23 @@ func _prepare_pass(rd: RenderingDevice, fragment: String, framebuffer: RID, unif
 	_passes.append([framebuffer, pipeline, binding])
 	return true
 
+var _air_bytes:=0
+var _air_pass_end:=5
+func _build_air(rd:RenderingDevice,copy:RID,meter:RID,format:RDTextureFormat,linear:RID)->RID:
+	var small: Array[RID]=[]
+	for i in 3:
+		var t:=_texture(rd,ceili(float(format.width)/4.),ceili(float(format.height)/4.),RenderingDevice.DATA_FORMAT_B10G11R11_UFLOAT_PACK32)
+		if not t.is_valid():return RID()
+		small.append(t)
+	var air_source:=_coherent_air_source() if _render_coherent_bloom else AIR_SOURCE
+	if air_source.is_empty():return RID()
+	if not _prepare_pass(rd,air_source,_keep(rd.framebuffer_create([small[0]])),[_sample(0,linear,copy),_sample(1,linear,meter)]):return RID()
+	for i in 2:
+		var code:=AIR_BLUR.replace("DIRECTION","vec2(1.,0.)" if i==0 else "vec2(0.,1.)")
+		if not _prepare_pass(rd,code,_keep(rd.framebuffer_create([small[i+1]])),[_sample(0,linear,small[i])]):return RID()
+	_air_bytes=ceili(float(format.width)/4.)*ceili(float(format.height)/4.)*12
+	return small[2]
+
 func _build(rd: RenderingDevice, color: RID, format: RDTextureFormat) -> bool:
 	var start := Time.get_ticks_usec()
 	var width := ceili(float(format.width) / TILE_SIZE)
@@ -272,20 +291,12 @@ func _build(rd: RenderingDevice, color: RID, format: RDTextureFormat) -> bool:
 	if not nearest.is_valid() or not linear.is_valid(): return false
 	if not _prepare_pass(rd, COPY, copy_fb, [_sample(0, nearest, color)]): return false
 	if not _prepare_pass(rd, METER, meter_fb, [_sample(0, nearest, copy)]): return false
-	var small: Array[RID]=[]
-	for i in 3:
-		var t:=_texture(rd,ceili(float(format.width)/4.),ceili(float(format.height)/4.),RenderingDevice.DATA_FORMAT_B10G11R11_UFLOAT_PACK32)
-		if not t.is_valid():return false
-		small.append(t)
-	var air_source:=_coherent_air_source() if _render_coherent_bloom else AIR_SOURCE
-	if air_source.is_empty():return false
-	if not _prepare_pass(rd,air_source,_keep(rd.framebuffer_create([small[0]])),[_sample(0,linear,copy),_sample(1,linear,meter)]):return false
-	for i in 2:
-		var code:=AIR_BLUR.replace("DIRECTION","vec2(1.,0.)" if i==0 else "vec2(0.,1.)")
-		if not _prepare_pass(rd,code,_keep(rd.framebuffer_create([small[i+1]])),[_sample(0,linear,small[i])]):return false
-	if not _prepare_pass(rd, APPLY, _scene_framebuffer, [_sample(0, nearest, copy), _sample(1, linear, meter),_sample(2,linear,small[2])]): return false
+	var soft:=_build_air(rd,copy,meter,format,linear)
+	if not soft.is_valid():return false
+	_air_pass_end=_passes.size()
+	if not _prepare_pass(rd, APPLY, _scene_framebuffer, [_sample(0, nearest, copy), _sample(1, linear, meter),_sample(2,linear,soft)]): return false
 	_report("coherent_bloom",_render_coherent_bloom)
-	_report("bytes", format.width * format.height * (8 if format.format==HDR_FORMAT else 4) + width * height * 2 + ceili(float(format.width)/4.)*ceili(float(format.height)/4.)*12)
+	_report("bytes", format.width * format.height * (8 if format.format==HDR_FORMAT else 4) + width * height * 2 + _air_bytes)
 	_guard.lock()
 	if _state.rebuilds == 0: _state.first_build_us = Time.get_ticks_usec() - start
 	_state.rebuilds += 1
@@ -324,7 +335,7 @@ func _render_callback(kind: int, data: RenderData) -> void:
 		parameters.encode_float(4,parameters.decode_float(4)*2.)
 		parameters.encode_float(24,1.)
 	for index in _passes.size():
-		if index in [2,3,4] and parameters.decode_float(16)<=0.:continue
+		if index>=2 and index<_air_pass_end and parameters.decode_float(16)<=0.:continue
 		var pass_data := _passes[index]
 		var list := rd.draw_list_begin(pass_data[0])
 		rd.draw_list_bind_render_pipeline(list, pass_data[1])

@@ -10,7 +10,7 @@ var terrain_visibility_response:=true
 var terrain_dielectric_response:=true
 const GROUND_RADIANCE=preload("res://assets/graphics/world_map_ground_bounce_v001/normalized_ground.res")
 const CANOPY=preload("res://scripts/world_map_canopy.gd")
-const LOCAL_EXPOSURE = preload("res://scripts/world_map_phase_finish_effect.gd")
+const LOCAL_EXPOSURE = preload("res://scripts/world_map_multiscale_bloom.gd")
 const LEAF_SAMPLING_TEXTURE = preload("res://assets/graphics/meadow_daylight_v5/leaf_sampling.res")
 const DAY_PALETTE := {
 	"ambient_light_color": Color(0.43, 0.67, 0.90),
