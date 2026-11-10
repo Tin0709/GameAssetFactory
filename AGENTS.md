@@ -1,3 +1,9 @@
+## 2026-11-10 — PAUSED BY USER: primary-light direction candidate saved
+
+Existing main WorldMap/L direction option currently ON, preserves approved Noon. Verified native primary CB differs from fog Sun at Night; original Noon-anchored relative ground NdotL/azimuth transfer implemented. Runtime ratios<5.3e-8; helper51/key62,48actual Lambert faces, render30/60/120 gameplay zero trajectory differences pass. 42photos: bothNoon exact; strict restore gateFAILED12/14, sparse residuals retained; unchangedcontrol also exhibits nondeterminism. Desktop7h viewport median+.251ms, changed shadow draw counts/no new texture; no phone claim.
+
+**Unfinished:** prepared integration.gd has NOT run; B/stage/context/proof runtime gates, broader regressions/cycle and full default visual acceptance pending. Clock/handoff/evening still original approximations, full ambient/humidity unresolved. Do not advertise MD2 parity. Read private key_direction_transfer_v001/FINDINGS.txt and CURRENT_GRAPHICS_CHECKPOINT.txt. Goal UI verified PAUSED; no further research/tests/launches until resumed. No manual commit/push; observed externalHEAD20950d91.
+
 ## 2026-11-10 — ACTIVE: bloom source-order comparison validated, kept OFF
 
 Existing WorldMap/L **Air - raw downsample before exposure (experimental)** added with original code, adjacent same-buffer reference ownership and actual submitted-strength latch. No extra pass/image;80byte payload onlywhenON.21controls/F7/failure/release,3resizes,phase/mist regressions and actual30/60/120render gameplay pass; trajectories0. Reviewer caught uniform auto-invalidation: actualRED3errors, GREEN0. Independent coherent live arithmetic270,405RGBcomponents within2R11steps (max1.137). **This is not native parity.** Native9-frame strictmax remainsFAILED; repeated same PIX queries demonstrably vary. Active/padding extent limits retained.
