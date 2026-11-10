@@ -1,3 +1,9 @@
+## 2026-11-10 — ACTIVE: direction integration closed; angular sky gap isolated
+
+Explicit user resume supersedes pause snapshots below. Existing main captured primary-direction option remains ON:38context/proof/B/stage checks, phase44, playertransport121/playerphase105, sharedmist and actual300frame cycle pass. Noon retained; original captureclock/evening limitations unchanged. Earlier strict image-restore failure remains documented; no native parity or handset claim.
+
+New private angular_sky_audit_v001: real sourcecube GPU270texelcenters/810RGBcomponents bit-exact; original diffuse-source diagnostic shows mean-only phase transfer loses directional shape. SH9 useful but negative ratio cases rejected.30research-only actortrial images/10exactrestores/Noonidentity saved; shortcut over already-bounced probe field NOT promoted. Next validate source-only transport at open/cliff/shaded poses before new cache. No productioncode change onresume; read CURRENT_GRAPHICS_CHECKPOINT.txt. No newcapture/install/extraction/scene or manualpush. Fullgoalactive/unfinished.
+
 ## 2026-11-10 — PAUSED BY USER: primary-light direction candidate saved
 
 Existing main WorldMap/L direction option currently ON, preserves approved Noon. Verified native primary CB differs from fog Sun at Night; original Noon-anchored relative ground NdotL/azimuth transfer implemented. Runtime ratios<5.3e-8; helper51/key62,48actual Lambert faces, render30/60/120 gameplay zero trajectory differences pass. 42photos: bothNoon exact; strict restore gateFAILED12/14, sparse residuals retained; unchangedcontrol also exhibits nondeterminism. Desktop7h viewport median+.251ms, changed shadow draw counts/no new texture; no phone claim.
