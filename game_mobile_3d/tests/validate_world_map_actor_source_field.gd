@@ -12,6 +12,7 @@ func _initialize():
  var scales=[.5,.25,.3,.31,.32,.29,.27,.25];var means=[2.,4.,1.5,1.25,1.2,1.1,1.05,1.]
  for i in 8:
   var value=PackedFloat32Array();value.resize(144);value.fill(scales[i]);arrays.append(value);data.anchors.append({"hour":obj.HOURS[i],"mean_ratio":[means[i],means[i],means[i]],"file":"phase_%02d.private.bin"%i,"sha256":obj.digest(value.to_byte_array())})
+ var good_data=data.duplicate(true);var good_arrays=arrays.duplicate(true)
  check(obj.accept(data,arrays,host,"fixture"),"Original fixture accepted")
  for i in 8:
   var q=obj.sample(Vector3(.3,.4,.7),obj.HOURS[i],Vector3.ONE*means[i]);check(q.valid and q.sky[0].is_equal_approx(Vector3.ONE*scales[i]),"Anchor "+str(i))
@@ -22,4 +23,13 @@ func _initialize():
  arrays[0][0]=3.;data.anchors[0].mean_ratio[0]=3.;check(obj.sample(Vector3.ZERO,0.,Vector3.ONE*2.).sky[0]==Vector3.ONE*.5,"Owned fixture snapshot")
  var bads=[];var bad=data.duplicate(true);bad.schema="bad";bads.append(bad);bad=data.duplicate(true);bad.native_clock_recovered=true;bads.append(bad);bad=data.duplicate(true);bad.anchors[7].mean_ratio=[2,2,2];bads.append(bad)
  for bad_data in bads:check(not obj.accept(bad_data,arrays,host,"fixture")and not obj.available(),"Rejected metadata clears state")
+ for kind in ["nan","negative","range","length","reference"]:
+  var payload=good_arrays.duplicate(true);var manifest=good_data.duplicate(true);var index=7 if kind=="reference"else 0;var values=PackedFloat32Array(payload[index])
+  if kind=="nan":values[0]=NAN
+  elif kind=="negative":values[0]=-.1
+  elif kind=="range":values[0]=4.1
+  elif kind=="length":values.resize(143)
+  else:values[0]=.2
+  payload[index]=values;manifest.anchors[index].sha256=obj.digest(values.to_byte_array())
+  check(not obj.accept(manifest,payload,host,"fixture")and not obj.available(),"Rejected payload "+kind)
  print("ACTOR_SOURCE_FIELD checks=",checks," failures=",JSON.stringify(failures));quit(0 if failures.is_empty()else 1)
