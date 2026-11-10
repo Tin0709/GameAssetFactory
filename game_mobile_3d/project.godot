@@ -91,7 +91,6 @@ gaf_point_soft={
 "type": "vec2",
 "value": Vector2(0, 0)
 }
-
 gaf_mist_enabled={
 "type": "bool",
 "value": false

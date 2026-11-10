@@ -1,12 +1,17 @@
 extends Node
 ## Owns an original phase bridge, never light/materials or source assets.
 const REFERENCE=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/local_exposure_v001/local_exposure_effect.gd")
+const SOURCE_REFERENCE=preload("res://scripts/world_map_source_reference.gd")
 const PROFILE="godot_lab/world_map_unified_showcase_v001/native_exposure_transfer_v001/parameters_v002.private.json"
 const SHA="c82d5489028813cdd1a2061d845fabca43789112e2a96e67dfe8eba80f8c71a3"
 var showcase:Node
 var requested:=true
 var active:=false
 var edge_softening:=false
+var source_order:=false
+var source_order_toggle:CheckButton
+func set_source_order(value:bool)->void:
+ source_order=value;refresh()
 func set_edge_softening(value:bool)->void:
  edge_softening=value;refresh()
 var last_error:=""
@@ -55,6 +60,7 @@ func restore_environment()->void:
 func release()->void:
  restore_environment()
  if _effect!=null:
+  if _effect.has_method("set_bloom_source_reference"):_effect.set_bloom_source_reference(null,false,0.)
   _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_display_edges(false);_effect.set_review_strength(_saved_strength)
  if _compositor!=null and _native!=null:
   var keep:Array[CompositorEffect]=[]
@@ -84,7 +90,7 @@ func refresh()->void:
  if not wanted:return
  if _native==null:
   if FileAccess.get_sha256(_profile_path)!=SHA:_fail("Private phase-finishing profile changed");return
-  _native=REFERENCE.new()
+  _native=SOURCE_REFERENCE.new()
   if not _native.configure_external(_profile_path):_fail(_native.snapshot().error);return
   _native.set_strength(0.)
   _effect=effect;_compositor=compositor
@@ -98,6 +104,10 @@ func refresh()->void:
  if _environment==null:
   if not effect.configure_finish(true,env,weight):_fail("Unsupported original finish; previous appearance restored");return
  effect.set_display_edges(edge_softening);effect.set_reference_hour(showcase.hour);effect.prepare_reference_grade(true)
+ if effect.has_method("set_bloom_source_reference"):
+  var chain:=compositor.compositor_effects
+  var adjacent:=chain.find(effect)>0 and chain[chain.find(effect)-1]==_native
+  effect.set_bloom_source_reference(_native,source_order and adjacent,weight)
  var state:Dictionary=effect.snapshot();var native_state:Dictionary=_native.snapshot()
  var error:String=str(state.get("error",""))+str(state.get("reference_failure",""))+str(native_state.get("error",""))
  if not error.is_empty():_fail(error);return
@@ -115,4 +125,7 @@ func _process(_delta:float)->void:
  if toggle!=null:toggle.set_pressed_no_signal(requested)
  if edge_toggle!=null:
   edge_toggle.set_pressed_no_signal(edge_softening);edge_toggle.disabled=not available()
+ if source_order_toggle!=null:
+  source_order_toggle.set_pressed_no_signal(source_order)
+  source_order_toggle.disabled=not available()or not showcase.coherent_bloom or showcase.source_bloom_shape
 func _exit_tree()->void:release()

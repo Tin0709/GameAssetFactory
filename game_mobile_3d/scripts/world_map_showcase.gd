@@ -21,6 +21,15 @@ var key_response=preload("res://scripts/world_map_key_response.gd").new()
 var captured_key_response:=true
 var key_response_active:=false
 var _key_response_toggle:CheckButton
+var direction_response=preload("res://scripts/world_map_light_direction.gd").new()
+var captured_key_direction:=true
+var key_direction_active:=false
+var _direction_toggle:CheckButton
+var sky_response=preload("res://scripts/world_map_sky_response.gd").new()
+var captured_sky_response:=true
+var sky_response_active:=false
+var captured_mist_source:=true
+var mist_source_active:=false
 var forest:=FOREST.new()
 var atmosphere_review:="combined"
 var _forest_expected:Dictionary={}
@@ -143,6 +152,9 @@ func set_audio_enabled(value:bool)->void:
 
 func _restore_day()->void:
 	key_response_active=false
+	key_direction_active=false
+	sky_response_active=false
+	mist_source_active=false
 	if phase_finish!=null:phase_finish.restore_environment()
 	if grade_review!=null:grade_review.release()
 	if not _time_applied or _day.is_empty():return
@@ -185,6 +197,47 @@ func set_captured_key_response(value:bool)->void:
 	if level.terrain_light!=null:level.terrain_light.bind(true)
 	if level.player_light!=null:level.player_light.refresh(true)
 	level.look._refresh_ground_bounce();_update_mist()
+
+func set_captured_key_direction(value:bool)->void:
+	captured_key_direction=value
+	if level==null or level.look==null or level.look.stage!=2:return
+	_restore_day();apply_time()
+	if level.terrain_light!=null:level.terrain_light.bind(true)
+	if level.player_light!=null:level.player_light.refresh(true)
+	level.look._refresh_ground_bounce();_update_mist()
+
+func _apply_captured_direction(sun:DirectionalLight3D)->void:
+	key_direction_active=false
+	if not captured_key_direction or not direction_response.available()or is_day_anchor()or _day.is_empty():return
+	var noon:=Basis.from_euler(Vector3(_day.sun_rotation)*(PI/180.),sun.rotation_order).z.normalized()
+	var direction:Vector3=direction_response.sample(hour,noon)
+	if direction==Vector3.ZERO:return
+	sun.rotation=Basis.looking_at(-direction,Vector3.UP).get_euler(sun.rotation_order)
+	key_direction_active=true
+
+func set_captured_sky_response(value:bool)->void:
+	captured_sky_response=value
+	if level==null or level.look==null or level.look.stage!=2:return
+	_restore_day();apply_time()
+	if level.ambient!=null:level.ambient.refresh()
+	if level.terrain_light!=null:level.terrain_light.bind(true)
+	if level.player_light!=null:level.player_light.refresh(true)
+	level.look._refresh_ground_bounce();_update_mist()
+
+func _apply_captured_sky(env:Environment)->void:
+	sky_response_active=false
+	if not captured_sky_response or not sky_response.available()or is_day_anchor():return
+	var noon:=forest.sample(12.)
+	var base:Color=Color(_day.ambient_light_color).srgb_to_linear()
+	var source:=Vector3(base.r,base.g,base.b);var luma:=Vector3(.2126,.7152,.0722)
+	var tinted:Vector3=source*noon.ambient_tint
+	tinted*=source.dot(luma)/maxf(tinted.dot(luma),.000001)
+	var rgb:Vector3=tinted*sky_response.sample(hour)
+	if not rgb.is_finite()or minf(rgb.x,minf(rgb.y,rgb.z))<0.:return
+	var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
+	env.ambient_light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb()
+	env.ambient_light_energy=float(_day.ambient_light_energy)*float(noon.ambient_energy_scale)*peak
+	sky_response_active=true
 
 func _apply_captured_key(sun:DirectionalLight3D)->void:
 	key_response_active=false
@@ -246,6 +299,7 @@ func _exit_tree()->void:
 	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
 
 func _update_mist()->void:
+	mist_source_active=false
 	_update_player_falloff()
 	_update_hdr_air()
 	set_coherent_bloom(coherent_bloom)
@@ -280,6 +334,7 @@ func _update_mist()->void:
 		sample.fog_begin=measured.start_m
 	sample.linear_scatter_rgb=linear
 	sample.scatter_energy=clampf(incoming,.015,.18)/maxf(linear.dot(luma),.0001)
+	_apply_mist_source(sample,measured,linear)
 	var emitter:Vector3=level.presentation.player_position()
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
@@ -287,6 +342,33 @@ func _update_mist()->void:
 		if _player_light!=null:_player_light.top_level=true;_player_light.light_cull_mask=1;_player_light.global_position=point
 		emitter=point-Vector3.UP*1.4
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
+
+func set_captured_mist_source(value:bool)->void:
+	captured_mist_source=value;_update_mist()
+
+func _apply_mist_source(sample:Dictionary,measured:Dictionary,linear:Vector3)->void:
+	# Relative source coefficients only. Clock, extinction and spatial transport
+	# remain original adapters; this is not absolute native fog radiometry.
+	if not captured_mist_source or not measured_atmosphere or measured.is_empty()or atmosphere_review!="combined"or is_day_anchor()or _day.is_empty():return
+	var noon:Dictionary=forest.sample(12.)
+	var reference:Dictionary=phase_air.sample(12.)
+	if noon.is_empty()or reference.is_empty():return
+	var luma:=Vector3(.2126,.7152,.0722)
+	var ambient:Color=Color(_day.ambient_light_color).srgb_to_linear()
+	var key:Color=Color(_day.sun_color).srgb_to_linear()
+	# Noon ambient tint preserves luminance; key color/energy peak normalization
+	# also preserves their linear product. Derive the anchor without changing time.
+	var incoming:=Vector3(ambient.r,ambient.g,ambient.b).dot(luma)*float(_day.ambient_light_energy)*float(noon.ambient_energy_scale)*.75
+	var noon_key_scale:=float(noon.key_scale)*(noon_direct_scale(12.)if gentle_noon else 1.)
+	incoming+=(Vector3(key.r,key.g,key.b)*noon.key_color_scale).dot(luma)*float(_day.sun_energy)*noon_key_scale*.03
+	var source:Vector3=measured.linear_scatter
+	var anchor:Vector3=reference.linear_scatter
+	var denominator:=anchor.dot(luma)*linear.dot(luma)
+	if not source.is_finite()or not is_finite(incoming)or not is_finite(denominator)or denominator<=.00000001:return
+	var energy:=source.dot(luma)*clampf(incoming,.015,.18)/denominator
+	if not is_finite(energy)or energy<0.:return
+	sample.scatter_energy=energy
+	mist_source_active=true
 
 func set_source_point_cutoff(value:bool)->void:
 	source_point_cutoff=value;_publish_point_cutoff()
@@ -382,6 +464,8 @@ func terrain_ambient_matches(color:Color,source:Color)->bool:
 
 func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	key_response_active=false
+	key_direction_active=false
+	sky_response_active=false
 	var p:=forest.sample(hour)
 	if atmosphere_review in ["lighting","combined"]:
 		var linear:=env.ambient_light_color.srgb_to_linear();var source:=Vector3(linear.r,linear.g,linear.b)
@@ -389,11 +473,13 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		tinted*=source.dot(luma)/maxf(tinted.dot(luma),.000001)
 		env.ambient_light_color=Color(tinted.x,tinted.y,tinted.z).linear_to_srgb()
 		env.ambient_light_energy*=p.ambient_energy_scale
+		_apply_captured_sky(env)
 		var key:=sun.light_color.srgb_to_linear();var rgb:Vector3=Vector3(key.r,key.g,key.b)*p.key_color_scale
 		var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
 		sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb();sun.light_energy*=p.key_scale*peak
 		if gentle_noon:sun.light_energy*=noon_direct_scale(hour)
 		_apply_captured_key(sun)
+		_apply_captured_direction(sun)
 		if _player_light!=null:
 			var warm:Vector3=p.player_light_color
 			_player_light.light_color=Color(warm.x,warm.y,warm.z);_player_light.light_energy=p.player_light_weight
@@ -431,10 +517,13 @@ func set_hour(value:float)->void:
 	if level!=null:level.look._refresh_ground_bounce()
 
 func apply_time()->void:
-	if not private_primary or level==null or level.look==null:return
+	if not private_primary or level==null or level.look==null:
+		sky_response_active=false;key_direction_active=false;return
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
 		key_response_active=false
+		key_direction_active=false
+		sky_response_active=false
 		_time_applied=false;_forest_expected.clear()
 		if _vignette!=null:_vignette.hide()
 		if _player_light!=null:_player_light.hide()
@@ -475,6 +564,9 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
+	if _direction_toggle!=null:
+		_direction_toggle.disabled=not direction_response.available()or not forest.available()
+		_direction_toggle.set_pressed_no_signal(captured_key_direction)
 	if _key_response_toggle!=null:
 		_key_response_toggle.disabled=not key_response.available()or not forest.available()
 		_key_response_toggle.set_pressed_no_signal(captured_key_response)
@@ -555,6 +647,15 @@ func _build_ui()->void:
 	var key:=CheckButton.new();key.name="CapturedKeyResponse";key.text="Light - captured direct-key phase response";key.focus_mode=Control.FOCUS_NONE;key.button_pressed=captured_key_response;key.disabled=not key_response.available();box.add_child(key)
 	key.tooltip_text="Captured relative direct-light RGB, anchored to the approved Noon. Clock placement/mirrored evening are original. No native lux, sun trajectory or indirect-light claim. OFF restores prior palette."
 	key.toggled.connect(set_captured_key_response);_key_response_toggle=key
+	var direction:=CheckButton.new();direction.name="CapturedKeyDirection";direction.text="Light - captured primary direction (Noon anchored)";direction.focus_mode=Control.FOCUS_NONE;direction.button_pressed=captured_key_direction;direction.disabled=not direction_response.available();box.add_child(direction)
+	direction.tooltip_text="Measured primary-light azimuth and relative ground NdotL, anchored to approved Noon. Night uses the primary CB, not fog Sun. Clock, handoff interpolation and Noon normalization are original. OFF restores prior trajectory."
+	direction.toggled.connect(set_captured_key_direction);_direction_toggle=direction
+	var sky_source:=CheckButton.new();sky_source.name="CapturedSkyResponse";sky_source.text="Light - captured sky phase response";sky_source.focus_mode=Control.FOCUS_NONE;sky_source.button_pressed=captured_sky_response;sky_source.disabled=not sky_response.available();box.add_child(sky_source)
+	sky_source.tooltip_text="Relative directional-environment angular mean from existing captures, anchored to approved Noon. Retains original spatial visibility; not full Lumen, native hours or absolute irradiance. OFF restores prior ambient palette."
+	sky_source.toggled.connect(set_captured_sky_response)
+	var fog_source:=CheckButton.new();fog_source.name="CapturedMistSource";fog_source.text="Air - captured fog-source phase response";fog_source.focus_mode=Control.FOCUS_NONE;fog_source.button_pressed=captured_mist_source;fog_source.disabled=phase_air.anchors.is_empty();box.add_child(fog_source)
+	fog_source.tooltip_text="Relative measured fog-source RGB anchored to approved Noon. Density, local lamp and spatial transport unchanged. Native hours/absolute radiometry not recovered. OFF restores previous incident-light amplitude."
+	fog_source.toggled.connect(set_captured_mist_source)
 	var warm_kernel:=CheckButton.new();warm_kernel.name="SourceWarmLight";warm_kernel.text="Air - local-light radial source (experimental)";warm_kernel.focus_mode=Control.FOCUS_NONE;warm_kernel.button_pressed=source_warm_light;warm_kernel.disabled=not point_response.kernel_available()or not forest.available();box.add_child(warm_kernel)
 	warm_kernel.tooltip_text="Verified point-light squared-radius kernel transferred into our original Mobile mist. Only warm incoming light changes; extinction/noise/amplitude unchanged. Native full volumetric transport remains approximate. OFF restores prior linear-radius source."
 	warm_kernel.toggled.connect(set_source_warm_light);_warm_kernel_toggle=warm_kernel
@@ -568,6 +669,9 @@ func _build_ui()->void:
 	var shape:=CheckButton.new();shape.name="SourceBloomShape";shape.text="Air - six-scale spread (experimental)";shape.focus_mode=Control.FOCUS_NONE;shape.button_pressed=source_bloom_shape;box.add_child(shape)
 	shape.tooltip_text="Private captured numeric kernels in an original six-level pyramid. Energy normalized; source-relative intensity is separate. Original viewport mapping and phase fade preserve Noon. Higher pass/bandwidth cost; OFF pending validation."
 	shape.toggled.connect(set_source_bloom_shape);_shape_toggle=shape;_update_shape_control()
+	var source_order:=CheckButton.new();source_order.name="BloomSourceOrder";source_order.text="Air - raw downsample before exposure (experimental)";source_order.focus_mode=Control.FOCUS_NONE;source_order.button_pressed=phase_finish.source_order;box.add_child(source_order)
+	source_order.tooltip_text="Original source-order reconstruction with existing exposure statistics. Same intensity; preserved Noon. Mutually exclusive with six-scale spread. Quarter-resolution/phase blend remain approximations."
+	source_order.toggled.connect(phase_finish.set_source_order);phase_finish.source_order_toggle=source_order
 	var coherent_toggle:=CheckButton.new();coherent_toggle.text="Air · consistent scene / bloom exposure";coherent_toggle.button_pressed=coherent_bloom;coherent_toggle.focus_mode=Control.FOCUS_NONE;coherent_toggle.tooltip_text="Use the same bounded exposure gain for scene and bloom source, before filtering. OFF restores previous source equation. Original Mobile formula, not full native Unreal local exposure.";box.add_child(coherent_toggle);coherent_toggle.toggled.connect(set_coherent_bloom)
 	var grade_toggle:=CheckButton.new();grade_toggle.text="Air · private Forest phase LUTs (experimental)";grade_toggle.focus_mode=Control.FOCUS_NONE;grade_toggle.button_pressed=false;grade_toggle.disabled=not grade_review.available();grade_toggle.tooltip_text="Eight captured Forest LUTs at unity input gain; original clock interpolation/mirrored evening. Replaces final grade, not lighting. HDR/F7 only; OFF by default. Native radiometry/clock unresolved.";box.add_child(grade_toggle);grade_toggle.toggled.connect(set_source_grade)
 	var finish_toggle:=CheckButton.new();finish_toggle.name="PhaseFinish";finish_toggle.text="Air · humid Forest finishing (Noon preserved)";finish_toggle.button_pressed=phase_finish.requested;finish_toggle.disabled=not phase_finish.available();finish_toggle.focus_mode=Control.FOCUS_NONE;box.add_child(finish_toggle)
