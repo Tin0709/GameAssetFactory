@@ -1,3 +1,9 @@
+## 2026-11-11 — ACTIVE: optional geometry-filtered actor sky phase field
+
+Existing main F5/L **Player - spatial sky phase field (experimental)** added, defaultOFF. Independent source/geometry model; preserved approvedNoon, shader/PBR settings/controller/assets. Private8phasefields are editor/hash/baseline pinned and lazy.123runtime/26originalfixtures/4Python + player121/105/phase44/cycle300 pass; actual render30/60/120 gameplay feature/repeat paths0. Public30photos:10/10exactrestores, bothNoonexact. Review lifecycle/UI bugs reproducedRED andfixedGREEN. No nativeLumen/imageparity claim.
+
+New source-only rastermask provider and actual GPUsource samples verify missingangularinput. Original128raymodel FAILED23.16% against independent98304direction6pose oracle;1024model4.66%passes ownmodel gates (not oldsurfacecache acceptance). WarmCPU+.053msdesktop;6.4MB CPUfield, firstload~120ms, no resolvedGPUdelta/samepairsdrawtextures, no phoneclaim. HoldOFF: modestactor-onlybenefit, coldhitch and terrain/grass coherence pending. Source-order/edge/sixscale remainOFF; originalbestdefaultretained. Read private source_transport_probe_v001/voxel_phase_field_v001/FINDINGS.txt and CURRENT_GRAPHICS_CHECKPOINT.txt. No newnativecapture/tool/scene/manualpush. Fullgoalactive/unfinished.
+
 ## 2026-11-10 — ACTIVE: direction integration closed; angular sky gap isolated
 
 Explicit user resume supersedes pause snapshots below. Existing main captured primary-direction option remains ON:38context/proof/B/stage checks, phase44, playertransport121/playerphase105, sharedmist and actual300frame cycle pass. Noon retained; original captureclock/evening limitations unchanged. Earlier strict image-restore failure remains documented; no native parity or handset claim.
