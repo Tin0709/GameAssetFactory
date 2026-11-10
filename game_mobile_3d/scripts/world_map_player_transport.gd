@@ -52,7 +52,9 @@ func refresh(force:bool=false)->void:
  var source_hour:float=level.showcase.hour if use_source else 12.
  var source_mean:Vector3=level.showcase.sky_response.sample(source_hour)if use_source else Vector3.ONE
  var next_source_key:Array=[use_source,source_hour,source_mean]
- if active and (p!=_position or force or next_source_key!=_source_key):
+ # Eligibility can change without a position/input change. Rebuild on re-entry,
+ # including when an optional source was disabled while transport was inactive.
+ if active and (not _active or p!=_position or force or next_source_key!=_source_key):
   _position=p;_sky.clear();_sun.clear()
   var corrected:=PackedVector3Array();var correction_ok:=true
   for height in [.25,1.,1.8]:
