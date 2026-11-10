@@ -13,6 +13,12 @@ var _sun:=PackedVector3Array()
 var update_usec:=0
 var _last_bind_key:Array=[]
 var phase_sky:=true
+var source_field=preload("res://scripts/world_map_actor_source_field.gd").new()
+var source_field_enabled:=false
+var source_field_active:=false
+var _source_key:Array=[]
+func set_source_field(value:bool)->void:
+ source_field_enabled=value;refresh(true)
 func set_phase_sky(value:bool)->void:
  phase_sky=value;refresh(true)
 func setup(world:Node3D)->void:
@@ -21,6 +27,7 @@ func setup(world:Node3D)->void:
  if ResourceLoader.exists(PATH):
   cache=load(PATH)
   cache_ready=cache.get_meta("scope","")=="Original GAF actor incident field; not MD2 radiance" and cache.get_meta("source_runtime_sha256","")==FileAccess.get_sha256(level.DATA) and context_matches() and field.initialize(cache)
+  if cache_ready:source_field.prepare(field)
  refresh(true)
 func context_matches()->bool:
  if cache==null or level.get("terrain_light")==null or not level.terrain_light.installed:return false
@@ -41,13 +48,26 @@ func is_active()->bool:return _active
 func refresh(force:bool=false)->void:
  var started:=Time.get_ticks_usec()
  var active:=available();var p:Vector3=level.presentation.player_position()
- if active and (p!=_position or force):
+ var use_source:bool=active and source_field_enabled and source_field.available()and phase_sky and level.showcase.captured_sky_response and level.showcase.sky_response.available()and level.showcase.forest_spatial_sky_context()and not level.showcase.is_day_anchor()
+ var source_hour:float=level.showcase.hour if use_source else 12.
+ var source_mean:Vector3=level.showcase.sky_response.sample(source_hour)if use_source else Vector3.ONE
+ var next_source_key:Array=[use_source,source_hour,source_mean]
+ if active and (p!=_position or force or next_source_key!=_source_key):
   _position=p;_sky.clear();_sun.clear()
+  var corrected:=PackedVector3Array();var correction_ok:=true
   for height in [.25,1.,1.8]:
    var q:Dictionary=field.sample(p+Vector3.UP*height)
    if not q.valid:active=false;break
    _sky.append_array(q.sky);_sun.append_array(q.sun)
+   if use_source:
+    var response:Dictionary=source_field.sample(p+Vector3.UP*height,source_hour,source_mean)
+    if response.valid:corrected.append_array(response.sky)
+    else:correction_ok=false
+  source_field_active=active and use_source and correction_ok and corrected.size()==18
+  if source_field_active:_sky=corrected
  elif active and _sky.size()!=18:active=false
+ source_field_active=source_field_active and active and use_source
+ _source_key=next_source_key
  _active=active
  var env:Environment=level.get_node("WorldEnvironment").environment
  var original:Array=cache.get_meta("ambient_srgb",[])if cache_ready else []
@@ -58,7 +78,7 @@ func refresh(force:bool=false)->void:
   var sun:DirectionalLight3D=level.get_node("Sun");var c:=sun.light_color.srgb_to_linear();var d:Array=cache.get_meta("sun_direction")
   if level.look._ground_bounce_requested and sun.global_basis.z.normalized().dot(Vector3(d[0],d[1],d[2]))>cos(deg_to_rad(.1)):key=Vector3(c.r,c.g,c.b)*sun.light_energy
  var skin_verified:bool=level.look.player_effects_available()
- var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified]
+ var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active]
  if not force and bind_key==_last_bind_key:
   update_usec=Time.get_ticks_usec()-started;return
  _last_bind_key=bind_key

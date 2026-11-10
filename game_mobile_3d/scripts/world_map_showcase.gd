@@ -25,6 +25,7 @@ var direction_response=preload("res://scripts/world_map_light_direction.gd").new
 var captured_key_direction:=true
 var key_direction_active:=false
 var _direction_toggle:CheckButton
+var _player_source_toggle:CheckButton
 var sky_response=preload("res://scripts/world_map_sky_response.gd").new()
 var captured_sky_response:=true
 var sky_response_active:=false
@@ -564,6 +565,9 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
+	if _player_source_toggle!=null and level.player_light!=null:
+		_player_source_toggle.disabled=not level.player_light.source_field.available()or not captured_sky_response
+		_player_source_toggle.set_pressed_no_signal(level.player_light.source_field_enabled)
 	if _direction_toggle!=null:
 		_direction_toggle.disabled=not direction_response.available()or not forest.available()
 		_direction_toggle.set_pressed_no_signal(captured_key_direction)
@@ -653,6 +657,9 @@ func _build_ui()->void:
 	var sky_source:=CheckButton.new();sky_source.name="CapturedSkyResponse";sky_source.text="Light - captured sky phase response";sky_source.focus_mode=Control.FOCUS_NONE;sky_source.button_pressed=captured_sky_response;sky_source.disabled=not sky_response.available();box.add_child(sky_source)
 	sky_source.tooltip_text="Relative directional-environment angular mean from existing captures, anchored to approved Noon. Retains original spatial visibility; not full Lumen, native hours or absolute irradiance. OFF restores prior ambient palette."
 	sky_source.toggled.connect(set_captured_sky_response)
+	var actor_source:=CheckButton.new();actor_source.name="ActorSourceField";actor_source.text="Player - spatial sky phase field (experimental)";actor_source.focus_mode=Control.FOCUS_NONE;actor_source.button_pressed=level.player_light.source_field_enabled;actor_source.disabled=not level.player_light.source_field.available();box.add_child(actor_source)
+	actor_source.tooltip_text="Original geometry-filtered captured sky response on the existing voxel/reserve model. Noon unchanged; clock and visibility remain approximations. First activation reads 6.4 MB of private CPU data; no extra GPU pass. OFF restores previous actor lighting."
+	actor_source.toggled.connect(func(value):level.player_light.set_source_field(value);_update_shape_control());_player_source_toggle=actor_source
 	var fog_source:=CheckButton.new();fog_source.name="CapturedMistSource";fog_source.text="Air - captured fog-source phase response";fog_source.focus_mode=Control.FOCUS_NONE;fog_source.button_pressed=captured_mist_source;fog_source.disabled=phase_air.anchors.is_empty();box.add_child(fog_source)
 	fog_source.tooltip_text="Relative measured fog-source RGB anchored to approved Noon. Density, local lamp and spatial transport unchanged. Native hours/absolute radiometry not recovered. OFF restores previous incident-light amplitude."
 	fog_source.toggled.connect(set_captured_mist_source)
