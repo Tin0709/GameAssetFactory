@@ -4,8 +4,12 @@
 #define GAF_POINT_KERNEL_HELPER
 global uniform vec4 gaf_point_kernel;
 global uniform vec3 gaf_point_kernel_camera;
-float gaf_point_transfer(bool directional,vec3 light_dir,vec2 screen,float depth,mat4 inverse_projection,mat4 inverse_view){
- if(directional||gaf_point_kernel.w<=0.)return 1.;
+global uniform bool gaf_point_mixed;
+bool gaf_is_player_point(bool directional, float light_blue) {
+ return !directional && gaf_point_kernel.w > 0.0 && (!gaf_point_mixed || light_blue > 0.0);
+}
+float gaf_point_transfer(bool directional,vec3 light_dir,vec2 screen,float depth,mat4 inverse_projection,mat4 inverse_view,float light_blue){
+ if(!gaf_is_player_point(directional, light_blue))return 1.;
  if(distance(inverse_view[3].xyz,gaf_point_kernel_camera)>.005)return 1.;
  vec4 view=inverse_projection*vec4(screen*2.-1.,depth,1.);
  vec3 world=(inverse_view*vec4(view.xyz/view.w,1.)).xyz;

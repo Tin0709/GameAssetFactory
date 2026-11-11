@@ -16,7 +16,7 @@ varying float cloud_transmission;
 #endif
 
 void light() {
-	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);
+	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
 	float front = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
 	vec3 irradiance = LIGHT_COLOR * (point_attenuation / PI);
 	vec3 response = vec3(front);

@@ -44,6 +44,7 @@ var _source_terrain_tiles: Texture2DArray
 var _source_terrain_toggle: CheckButton
 var forest:=FOREST.new()
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
+var forest_path_light := preload("res://scripts/world_map_forest_path_light.gd").new()
 var atmosphere_review:="combined"
 var _forest_expected:Dictionary={}
 var _forest_hour:=INF
@@ -74,6 +75,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
+	&"forest_path_light": ["Forest path light", 1.],
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"humid_light": ["Humid light diffusion", 1.],
@@ -83,7 +85,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 20
+const LIGHTING_MIX_VERSION := 21
 const NIGHT_MIST_MAX_GAIN := 4.0
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
@@ -462,6 +464,7 @@ func _exit_tree()->void:
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
 		RenderingServer.global_shader_parameter_set("gaf_point_soft",Vector2.ZERO)
+		RenderingServer.global_shader_parameter_set("gaf_point_mixed",false)
 	if grade_review!=null:grade_review.release()
 	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
 
@@ -584,11 +587,15 @@ func _update_player_falloff()->void:
 func _track_point_light(node:Node)->void:
 	if level!=null and (node is OmniLight3D or node is SpotLight3D):_point_lights[node.get_instance_id()]=weakref(node)
 
-func _single_point_scope()->bool:
+func _point_scope_supported() -> bool:
 	for key in _point_lights.keys():
-		var light=_point_lights[key].get_ref()
+		var light: Light3D = _point_lights[key].get_ref()
 		if light==null:_point_lights.erase(key);continue
-		if light!=_player_light and light.is_inside_tree()and light.get_world_3d()==level.get_world_3d()and light.is_visible_in_tree()and light.light_energy>0. and (light.light_cull_mask&1)!=0:return false
+		if light == _player_light or not light.is_inside_tree() or light.get_world_3d() != level.get_world_3d() \
+			or not light.is_visible_in_tree() or light.light_energy <= 0.0 or (light.light_cull_mask & 1) == 0:
+			continue
+		if not forest_path_light.is_compatible_secondary(light) or _player_light.light_color.b <= 0.0:
+			return false
 	return true
 
 func _point_receiver_scope()->bool:
@@ -600,10 +607,14 @@ func _point_receiver_scope()->bool:
 
 func _publish_point_cutoff()->void:
 	if _point_kernel_owner==null or _point_kernel_owner.get_ref()!=self:return
-	var eligible:bool=_player_light!=null and source_point_cutoff and noninverse_player_light and forest_active()and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and _single_point_scope()and _point_receiver_scope()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
+	var eligible:bool=_player_light!=null and source_point_cutoff and noninverse_player_light and forest_active()and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and _point_scope_supported()and _point_receiver_scope()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
 	var point:Vector3=_player_light.global_position if _player_light!=null else Vector3.ZERO
 	point_kernel_state=Vector4(point.x,point.y,point.z,_player_light.omni_range if eligible else 0.)
+	var secondary: OmniLight3D = forest_path_light.light
+	var mixed := eligible and is_instance_valid(secondary) and secondary.is_visible_in_tree() \
+		and secondary.light_energy > 0.0 and (secondary.light_cull_mask & 1) != 0
 	RenderingServer.global_shader_parameter_set("gaf_point_kernel",point_kernel_state)
+	RenderingServer.global_shader_parameter_set("gaf_point_mixed",mixed)
 	point_soft_state=point_response.soft_settings if eligible and player_soft_source and point_response.soft_available()else Vector2.ZERO
 	RenderingServer.global_shader_parameter_set("gaf_point_soft",point_soft_state)
 	if level!=null:RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera",level.get_node("Camera3D").global_position)
@@ -688,7 +699,7 @@ func set_forest_spruce_visible(enabled: bool) -> void:
 			grove.update_focus(level.get_node("Camera3D"), level.player.global_position, level.view_mode == "gameplay")
 	if _spruce_toggle != null:
 		_spruce_toggle.set_pressed_no_signal(grove.spruce_visible())
-	_sync_forest_accents()
+	_sync_forest_night_lights()
 
 func set_source_terrain(enabled: bool) -> bool:
 	if not private_primary:
@@ -725,6 +736,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"forest_path_light":
+		return .7
 	if effect == &"humid_light":
 		return 0.
 	if effect == &"night_path_chroma":
@@ -848,7 +861,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -878,6 +891,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 19 and effect == &"night_mist_light":
 			missing_value = 0.
 		if version < 20 and effect == &"forest_accents":
+			missing_value = 0.
+		if version < 21 and effect == &"forest_path_light":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -912,8 +927,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"night_path_chroma":
 		_publish_night_path_chroma()
 		return
-	if changed_effect == &"forest_accents":
-		_sync_forest_accents()
+	if changed_effect in [&"forest_accents", &"forest_path_light"]:
+		_sync_forest_night_lights()
 		return
 	if changed_effect in [&"", &"oak_leaf_tint"]:
 		_sync_oak_leaf_tint()
@@ -1050,19 +1065,21 @@ func _publish_night_path_chroma() -> void:
 		strength = moonlight_weight(hour) * _lighting_scale(&"night_path_chroma")
 	level.look.set_night_path_chroma(strength)
 
-func _sync_forest_accents() -> void:
+func _sync_forest_night_lights() -> void:
 	if level == null:
 		return
 	var phase := 0.0
 	if forest_active() and unavailable_reason.is_empty() and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
 		phase = moonlight_weight(hour)
 	forest_accents.update(level, phase, _lighting_scale(&"forest_accents"))
+	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light")):
+		_publish_point_cutoff()
 
 func apply_time()->void:
 	if not private_primary or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
 	_publish_night_path_chroma()
-	_sync_forest_accents()
+	_sync_forest_night_lights()
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
 		key_response_active=false
@@ -1254,6 +1271,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Lift cool scattered light at night in Combined mode. 0% restores the old color intensity. Fog density and the warm lantern are separate."
 		if effect == &"forest_accents":
 			slider.tooltip_text = "Adjust the private blue mushroom accents along the forest path at night. 0% hides them. The player lantern stays independent."
+		if effect == &"forest_path_light":
+			slider.tooltip_text = "Adjust the fixed warm light beside the forest path. 0% hides the fixture and its light. Works at night in Combined mode."
 		if effect == &"shadow_softness":
 			slider.tooltip_text = "Adjust the F1 sunlight filter radius in the morning and afternoon. 100% uses the previous radius. Noon and night keep their existing filter."
 		if effect == &"sun_pockets":

@@ -9,8 +9,8 @@ float gaf_soft_lobe_width(float roughness,float view_half,float angular_radius,f
  float spread=angular_radius*angular_radius/(.4+3.6*clamp(view_half,0.,1.));
  return sqrt(clamp(base*base+spread,0.,1.));
 }
-float gaf_player_soft_angle(bool directional,vec3 light_dir,vec3 world,mat4 inverse_view){
- if(directional||gaf_point_soft.x<=0.||gaf_point_kernel.w<=0.)return 0.;
+float gaf_player_soft_angle(bool directional,vec3 light_dir,vec3 world,mat4 inverse_view,float light_blue){
+ if(gaf_point_soft.x<=0.||!gaf_is_player_point(directional, light_blue))return 0.;
  if(distance(inverse_view[3].xyz,gaf_point_kernel_camera)>.005)return 0.;
  vec3 offset=gaf_point_kernel.xyz-world;
  float d2=dot(offset,offset);

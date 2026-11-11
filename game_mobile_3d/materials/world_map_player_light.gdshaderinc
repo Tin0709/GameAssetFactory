@@ -5,7 +5,7 @@
 varying float player_cloud;
 float player_fresnel(float c){float x=1.0-c;float s=x*x;return s*s*x;}
 void light(){
-	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);
+	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
 	float nl=max(dot(NORMAL,LIGHT),0.0);
 	// Original selective wrap, not native screen-space diffusion. Integral of
 	// max(N.L+w,0)/(1+w)^2 over the sphere is PI: redistribute, do not add a lamp.
@@ -29,7 +29,7 @@ void light(){
 			DIFFUSE_LIGHT+=LIGHT_COLOR*incident;
 #endif
 		}
-		float source_angle=gaf_player_soft_angle(LIGHT_IS_DIRECTIONAL,LIGHT,actor_world,INV_VIEW_MATRIX);
+		float source_angle=gaf_player_soft_angle(LIGHT_IS_DIRECTIONAL,LIGHT,actor_world,INV_VIEW_MATRIX,LIGHT_COLOR.b);
 		if(ROUGHNESS>0.0||source_angle>0.){
 			float a=ROUGHNESS*ROUGHNESS;
 			if(source_angle>0.)a=gaf_soft_lobe_width(ROUGHNESS,lh,source_angle,gaf_point_soft.y);

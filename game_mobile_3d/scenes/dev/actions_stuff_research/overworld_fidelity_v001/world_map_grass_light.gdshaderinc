@@ -9,7 +9,7 @@ varying float study_tip_weight;
 varying float study_cloud;
 float grass_fresnel(float x){float q=1.0-x;float q2=q*q;return q2*q2*q;}
 void light(){
-	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);
+	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
 	float front=clamp(dot(NORMAL,LIGHT),0.0,1.0);
 	vec3 response=vec3(front);
 #ifndef GAF_GRASS_FORCE_LAMBERT
