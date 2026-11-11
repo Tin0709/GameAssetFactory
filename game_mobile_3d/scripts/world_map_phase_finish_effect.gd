@@ -58,10 +58,13 @@ func _render_callback(kind:int,data:RenderData)->void:
  var buffers:=data.get_render_scene_buffers()as RenderSceneBuffersRD
  if buffers!=null and buffers.get_internal_size()!=_reported_size:
   _reported_size=buffers.get_internal_size();_report("render_size",[_reported_size.x,_reported_size.y])
- _guard.lock();var wanted:=_finish_wanted;var baseline:=_baseline.duplicate();var generation:=_palette_generation;var edge:=_edge_requested and wanted and _reference_enabled and _reference_requested and not _reference_blocked;_guard.unlock()
  _guard.lock()
+ var wanted := _finish_wanted
+ var baseline := _baseline.duplicate()
+ var generation := _palette_generation
+ var edge := _edge_requested and wanted and _reference_enabled and _reference_requested and not _reference_blocked
  var humid_weight := _humid_weight if wanted and _parameters.decode_float(16) > 0. else 0.
- var humid_actor := _humid_actor
+ var humid_actor := _humid_actor if humid_weight > 0. else Vector4.ZERO
  _guard.unlock()
  if not baseline.is_empty():
   baseline.encode_float(28, humid_weight)
@@ -72,9 +75,10 @@ func _render_callback(kind:int,data:RenderData)->void:
  if wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
  if _baseline_buffer.is_valid()and baseline!=_last_baseline:
-  rd.buffer_update(_baseline_buffer,0,baseline.size(),baseline);_last_baseline=baseline
+  if rd.buffer_update(_baseline_buffer, 0, baseline.size(), baseline) == OK:
+   _last_baseline = baseline
  super(kind,data)
- _report("humid_light_weight", _last_baseline.decode_float(28) if _baseline_buffer.is_valid() else 0.)
+ _report("humid_light_weight", _last_baseline.decode_float(28) if _baseline_buffer.is_valid() and failure().is_empty() else 0.)
 func _release(rd:RenderingDevice)->void:
  _baseline_buffer=RID();_last_baseline=PackedByteArray();_report("finish_ready",false);_report("finish_bytes",0);_report("edge_active",false);_report("edge_bytes",0);_report("edge_size",[0,0])
  super(rd)
