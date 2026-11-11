@@ -37,6 +37,8 @@ var captured_sky_response:=true
 var sky_response_active:=false
 var captured_mist_source:=true
 var mist_source_active:=false
+var grove_mist_enabled := true
+var _grove_mist_toggle: CheckButton
 var forest:=FOREST.new()
 var atmosphere_review:="combined"
 var _forest_expected:Dictionary={}
@@ -636,7 +638,14 @@ func _mist_materials()->Array:
 	result.append_array(level.look._direct_actor_materials)
 	if plants!=null:result.append_array(plants.materials)
 	for chunk:Dictionary in level.geometry._cutaway_chunks:result.append_array(chunk.materials)
+	if grove_mist_enabled and level.grove != null:
+		result.append_array(level.grove.mist_receivers(PHASE_FINISH.phase_weight(hour)))
 	return result
+
+func set_grove_mist(enabled: bool) -> void:
+	grove_mist_enabled = enabled
+	if _grove_mist_toggle != null:
+		_grove_mist_toggle.set_pressed_no_signal(enabled)
 
 func forest_active()->bool:
 	return private_primary and level!=null and level.look.stage==2 and level.view_mode=="gameplay" and atmosphere_review!="previous" and forest.available()
@@ -1163,6 +1172,14 @@ func _build_ui()->void:
 		near_haze_enabled = enabled
 	)
 	box.add_child(near_haze)
+	var grove_mist := CheckButton.new()
+	_grove_mist_toggle = grove_mist
+	grove_mist.text = "Air · shared grove mist"
+	grove_mist.focus_mode = Control.FOCUS_NONE
+	grove_mist.button_pressed = grove_mist_enabled
+	grove_mist.tooltip_text = "Apply the existing spatial mist to tree bark and crowns when the grove is visible. Fades out at Noon. Turn off to compare."
+	grove_mist.toggled.connect(set_grove_mist)
+	box.add_child(grove_mist)
 	var gentle:=CheckButton.new();gentle.name="GentleNoon";gentle.text="Light · gentle midday sunlight";gentle.button_pressed=gentle_noon;gentle.focus_mode=Control.FOCUS_NONE;box.add_child(gentle)
 	gentle.tooltip_text="18% less direct sunlight at noon, smoothly returning to the previous morning/evening lighting. Ambient and source presets unchanged. OFF compares the previous result."
 	gentle.toggled.connect(set_gentle_noon)

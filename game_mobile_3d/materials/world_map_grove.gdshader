@@ -1,5 +1,9 @@
 shader_type spatial;
 #include "res://materials/world_map_wind.gdshaderinc"
+#ifdef GAF_SHARED_MIST
+#include "res://materials/world_map_mist.gdshaderinc"
+uniform float grove_mist_strength = 0.0;
+#endif
 
 uniform bool reveal_player = false;
 uniform bool crown_wind_enabled = false;
@@ -79,6 +83,11 @@ void fragment() {
 	ALBEDO = albedo;
 	ROUGHNESS = 0.95;
 	SPECULAR = native_specular;
+#ifdef GAF_SHARED_MIST
+	vec4 mist = gaf_surface_mist(SCREEN_UV, -VERTEX.z, INV_VIEW_MATRIX[3].xyz, -INV_VIEW_MATRIX[2].xyz,
+		vec2(PROJECTION_MATRIX[0][0], PROJECTION_MATRIX[1][1]));
+	FOG = vec4(mist.rgb, mist.a * grove_mist_strength);
+#endif
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	cloud_transmission = world_cloud_shade(vec3(grove_world_xz.x, 0.0, grove_world_xz.y));
 #elif defined(GAF_WORLD_FOLIAGE_LIGHT)

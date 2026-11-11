@@ -111,19 +111,26 @@ func _process(_delta:float)->void:
   RenderingServer.global_shader_parameter_set("gaf_mist_projection_scale",Vector2(projection.x.x,projection.y.y))
  _set_gate(ready);_sync_materials(ready)
 func _sync_materials(active:bool):
- if material_provider.is_valid():
+ var current: Dictionary = {}
+ if active and material_provider.is_valid():
   for m:ShaderMaterial in material_provider.call():
-   if m!=null:_bound_materials[m.get_instance_id()]=weakref(m)
+   if m==null:continue
+   var key := m.get_instance_id()
+   current[key] = true
+   if not _bound_materials.has(key):_bound_materials[key]=weakref(m)
  for key in _bound_materials.keys():
   var m:ShaderMaterial=_bound_materials[key].get_ref()
   if m==null:_bound_materials.erase(key);continue
   var base:Shader=base_shader(m.shader)
-  if base==null or not base.code.contains("GAF_SHARED_MIST"):continue
+  if base==null or not base.code.contains("GAF_SHARED_MIST"):
+   _bound_materials.erase(key)
+   continue
   var target:=base
-  if active:
+  if current.has(key):
    if not _variants.has(base):
     var wrapped:=Shader.new();wrapped.code=base.code.replace("shader_type spatial;","shader_type spatial;\n#define GAF_SHARED_MIST");wrapped.set_meta("gaf_mist_base",base);_variants[base]=wrapped
    target=_variants[base]
+  else:_bound_materials.erase(key)
   if m.shader!=target:m.shader=target
 static func base_shader(shader:Shader)->Shader:
  return shader.get_meta("gaf_mist_base",shader) if shader!=null else null

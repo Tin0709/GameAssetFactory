@@ -75,6 +75,7 @@ var _appearance := ShaderMaterial.new()
 var _canopy_appearance := ShaderMaterial.new()
 var _canopy_shadow := ShaderMaterial.new()
 var _direct_clouds := false
+var _mist_strength := -1.0
 var _trunks: Array[StaticBody3D] = []
 
 func build(level: Node3D) -> bool:
@@ -187,7 +188,7 @@ func publish_crown_wind(enabled: bool, wind_phase: float, breeze_phase: float, t
 		material.set_shader_parameter("travelling_breeze", travelling)
 
 func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D, shape: Vector4, time: float) -> void:
-	if material.shader != shader:
+	if material.shader.get_meta("gaf_mist_base", material.shader) != shader:
 		var parameters := ["reveal_player", "player_view", "native_specular"]
 		var values := parameters.map(material.get_shader_parameter)
 		material.shader = shader
@@ -198,6 +199,16 @@ func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D,
 		material.set_shader_parameter("cloud_field", field)
 		material.set_shader_parameter("cloud_shape", shape)
 		material.set_shader_parameter("cloud_time", time)
+
+func mist_receivers(strength: float) -> Array[ShaderMaterial]:
+	if not visible or strength <= 0.0:
+		return []
+	var receivers: Array[ShaderMaterial] = [_appearance, _canopy_appearance]
+	if _mist_strength != strength:
+		_mist_strength = strength
+		for material in receivers:
+			material.set_shader_parameter("grove_mist_strength", strength)
+	return receivers
 
 func publish_cloud_time(time: float) -> void:
 	if not _direct_clouds: return
