@@ -49,6 +49,10 @@ func _ready()->void:
 func _process(delta:float)->void:
 	if not error_text.is_empty():return
 	super._process(delta)
+	if graphics_foundation != null and graphics_foundation.strict_match != null:
+		var trees: Node3D = graphics_foundation.strict_match.trees
+		if trees != null:
+			trees.update_crown_wind()
 	_status_clock+=delta
 	if _status_clock>.5 and meadow_status!=null:
 		_status_clock=0.
@@ -60,6 +64,14 @@ func _unhandled_input(event:InputEvent)->void:
 	if not error_text.is_empty():return
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_H:
 		set_hud_visible(not hud_visible);get_viewport().set_input_as_handled();return
+	if event is InputEventKey and event.pressed and not event.echo and event.alt_pressed and event.physical_keycode == KEY_N:
+		if graphics_foundation != null and graphics_foundation.strict_match != null:
+			var trees: Node3D = graphics_foundation.strict_match.trees
+			if trees != null:
+				trees.crown_wind_enabled = not trees.crown_wind_enabled
+				trees.update_crown_wind()
+				get_viewport().set_input_as_handled()
+				return
 	if graphics_foundation!=null and graphics_foundation.input(event):get_viewport().set_input_as_handled();return
 	super._unhandled_input(event)
 
@@ -84,7 +96,8 @@ func _build_meadow_ui()->void:
 	var box:=VBoxContainer.new();box.add_theme_constant_override("separation",4);panel.add_child(box)
 	var title:=Label.new();title.text="OVERWORLD · PRIVATE FIDELITY STUDY";title.add_theme_font_size_override("font_size",15);box.add_child(title)
 	var hint:=Label.new();hint.text="WASD run · Shift walk · Space jump\nLMB / E Sabre · R reset · V overview · H hide UI";hint.add_theme_font_size_override("font_size",12);box.add_child(hint)
-	_toggle(box,"Wind",true,func(on:bool):meadow.wind_enabled=on)
+	var wind_toggle := _toggle(box,"Wind",true,func(on:bool):meadow.wind_enabled=on)
+	wind_toggle.tooltip_text = "Wind for grass and tree canopies. Alt+N toggles the canopies separately."
 	var pockets:=_toggle(box,"Flower pockets",false,_set_flower_pockets)
 	pockets.name="FlowerPocketsToggle"
 	pockets.tooltip_text="Arrange the same flowers into grouped color patches along the meadow paths."
