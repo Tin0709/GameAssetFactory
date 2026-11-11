@@ -1,5 +1,6 @@
 shader_type spatial;
 #include "res://materials/world_map_wind.gdshaderinc"
+#include "res://materials/world_map_crown_wind.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/leaf_material_v001/leaf_material.gdshaderinc"
 #ifdef GAF_SHARED_MIST
 #include "res://materials/world_map_mist.gdshaderinc"

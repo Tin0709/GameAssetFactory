@@ -6,6 +6,7 @@ render_mode diffuse_burley, ambient_light_disabled;
 #endif
 #include "directional_fill_v001/directional_fill.gdshaderinc"
 #include "leaf_material_v001/leaf_material.gdshaderinc"
+#include "res://materials/world_map_crown_wind.gdshaderinc"
 uniform bool gaf_leaf_material_enabled=false;
 uniform sampler2D gaf_leaf_vertex_colors : filter_nearest, repeat_disable;
 uniform float gaf_leaf_scatter_strength=0.0;
