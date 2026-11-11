@@ -4,6 +4,8 @@ const FILE="godot_lab/world_map_unified_showcase_v001/deepdark_entrance_v001/pla
 const SHA="5f6fe39377b114e178236c93625dc6cf3d4afc4b41d02a207b456889cfaafc54"
 const KERNEL_FILE="godot_lab/world_map_unified_showcase_v001/point_light_kernel_v001/profile.private.json"
 const KERNEL_SHA="0fb21e417b285b85e2458b0c691a7b036dc0db9bf3f8fa1e98e9591d3831274f"
+const DAWN_FILE="godot_lab/world_map_unified_showcase_v001/lantern_phase_transfer_v001/profile.private.json"
+const DAWN_SHA="31179c46805cfd96c6fbc7e0eea67ea96310d1c9e6f7ba2413f1a5fc87542141"
 const SOFT_FILE="godot_lab/world_map_unified_showcase_v001/player_soft_source_v001/profile.private.json"
 const SOFT_SHA="04672ff9dcb2d79ec65475d93cca946fa57e16150cd4a633545ac5d853d7102a"
 var soft_verified:=false
@@ -11,6 +13,7 @@ var soft_settings:=Vector2.ZERO
 var kernel_verified:=false
 var verified:=false
 var radius_m:=0.
+var dawn_profile:Dictionary={}
 func _init()->void:
  if not OS.has_feature("editor"):return
  var root:=OS.get_environment("MD2_RESEARCH_ROOT")
@@ -32,6 +35,7 @@ func _init()->void:
  var r=k.get("radius_m")
  if not(r is float or r is int)or not is_finite(r)or not is_equal_approx(float(r),radius_m):return
  kernel_verified=true
+ _load_dawn(root)
  var soft_path:=root.path_join(SOFT_FILE)
  if not FileAccess.file_exists(soft_path)or FileAccess.get_sha256(soft_path)!=SOFT_SHA:return
  var soft=JSON.parse_string(FileAccess.get_file_as_string(soft_path))
@@ -43,3 +47,25 @@ func _init()->void:
 func available()->bool:return verified
 func kernel_available()->bool:return verified and kernel_verified
 func soft_available()->bool:return kernel_available()and soft_verified
+
+func _load_dawn(root:String)->void:
+ var path:=root.path_join(DAWN_FILE)
+ if not FileAccess.file_exists(path) or FileAccess.get_sha256(path)!=DAWN_SHA:return
+ var profile=JSON.parse_string(FileAccess.get_file_as_string(path))
+ if not profile is Dictionary or profile.get("schema")!="private-player-dawn-fade/1":return
+ for field in ["full_density","zero_density","mid_density","mid_relative_energy","latest_source_hour"]:
+  var value=profile.get(field)
+  if not (value is float or value is int) or not is_finite(value) or value<0.:return
+ if not (profile.full_density<profile.mid_density and profile.mid_density<profile.zero_density):return
+ if profile.mid_relative_energy>=1. or profile.latest_source_hour<=0. or profile.latest_source_hour>7.:return
+ var predicted:=inverse_lerp(float(profile.zero_density),float(profile.full_density),float(profile.mid_density))
+ if absf(predicted-float(profile.mid_relative_energy))>1e-6:return
+ dawn_profile=profile
+
+func dawn_available()->bool:
+ return kernel_available() and not dawn_profile.is_empty()
+
+func dawn_gain(hour:float, density:float, authored:float)->float:
+ if not dawn_available() or not is_finite(hour) or not is_finite(density):return authored
+ if hour<0. or hour>float(dawn_profile.latest_source_hour):return authored
+ return clampf(inverse_lerp(float(dawn_profile.zero_density),float(dawn_profile.full_density),density),0.,1.)

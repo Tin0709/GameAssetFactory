@@ -78,6 +78,8 @@ var _near_haze_toggle: CheckButton
 var _save_mix_button: Button
 var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
+var captured_lantern_dawn:=true
+var _lantern_dawn_toggle:CheckButton
 static var _point_kernel_owner:WeakRef
 var _point_lights:Dictionary={}
 var point_kernel_state:=Vector4.ZERO
@@ -439,6 +441,13 @@ func _apply_mist_source(sample:Dictionary,measured:Dictionary,linear:Vector3)->v
 func set_source_point_cutoff(value:bool)->void:
 	source_point_cutoff=value;_publish_point_cutoff()
 
+func set_captured_lantern_dawn(value:bool)->void:
+	if captured_lantern_dawn==value:return
+	captured_lantern_dawn=value
+	_forest_hour=INF
+	apply_time()
+	_update_mist()
+
 func set_player_soft_source(value:bool)->void:
 	player_soft_source=value;_publish_point_cutoff()
 
@@ -680,6 +689,11 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	key_direction_active=false
 	sky_response_active=false
 	var p:=forest.sample(hour)
+	if captured_lantern_dawn and point_response.dawn_available() and hour<=float(point_response.dawn_profile.latest_source_hour):
+		var source:Dictionary=phase_air.sample(hour)
+		if not source.is_empty():
+			# Use the captured transition fraction, independent of the user's fog slider.
+			p.player_light_weight=point_response.dawn_gain(hour,source.density_ratio,p.player_light_weight)
 	if atmosphere_review in ["lighting","combined"]:
 		var linear:=env.ambient_light_color.srgb_to_linear();var source:=Vector3(linear.r,linear.g,linear.b)
 		var tinted:Vector3=source*p.ambient_tint;var luma:=Vector3(.2126,.7152,.0722)
@@ -788,6 +802,9 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
+	if _lantern_dawn_toggle!=null:
+		_lantern_dawn_toggle.disabled=not point_response.dawn_available() or not phase_air.anchors.size() or not forest.available()
+		_lantern_dawn_toggle.set_pressed_no_signal(captured_lantern_dawn)
 	if _player_source_toggle!=null and level.player_light!=null:
 		_player_source_toggle.disabled=not level.player_light.source_field.available()or not captured_sky_response
 		_player_source_toggle.set_pressed_no_signal(level.player_light.source_field_enabled)
@@ -964,6 +981,15 @@ func _build_ui()->void:
 	var point_mode:=CheckButton.new();point_mode.name="NoninversePlayerLight";point_mode.text="Light - recovered non-inverse player falloff";point_mode.focus_mode=Control.FOCUS_NONE;point_mode.button_pressed=noninverse_player_light;point_mode.disabled=not point_response.available()or not forest.available();box.add_child(point_mode)
 	point_mode.tooltip_text="Native point light has inverse-square falloff OFF. Removes Godot distance^-2 while retaining its range cutoff and existing phase intensity. Not exact native radial cutoff or photometry. OFF restores previous falloff."
 	point_mode.toggled.connect(set_noninverse_player_light);_point_response_toggle=point_mode
+	var dawn:=CheckButton.new()
+	dawn.name="CapturedLanternDawn"
+	dawn.text="Light · captured lantern fade at dawn"
+	dawn.focus_mode=Control.FOCUS_NONE
+	dawn.button_pressed=captured_lantern_dawn
+	dawn.tooltip_text="Matches the relative lantern strength in the captured dawn transition. Uses the existing Godot time mapping. Turn off to compare the previous curve."
+	dawn.toggled.connect(set_captured_lantern_dawn)
+	box.add_child(dawn)
+	_lantern_dawn_toggle=dawn
 	var cutoff:=CheckButton.new();cutoff.name="SourcePointCutoff";cutoff.text="Light - recovered point radial cutoff";cutoff.focus_mode=Control.FOCUS_NONE;cutoff.button_pressed=source_point_cutoff;cutoff.disabled=not point_response.kernel_available()or not forest.available();box.add_child(cutoff)
 	cutoff.tooltip_text="Captured8m/power2 squared-radius kernel. Original algebraic correction of Godot's range window for the owned local light; energy/materials unchanged. OFF restores prior non-inverse quartic response. Not full native radiometry or soft source."
 	cutoff.toggled.connect(set_source_point_cutoff);_point_cutoff_toggle=cutoff
