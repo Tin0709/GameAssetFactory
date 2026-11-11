@@ -13,6 +13,8 @@ const GENTLE_NOON_DIRECT_SCALE:=.82
 const NEAR_HAZE_ENTRY_M := 23.945624
 const NEAR_HAZE_EXTINCTION := 0.00468248024
 const NEAR_HAZE_REFERENCE_HEIGHT_M := 1.65
+const FOREST_NEAR_SCATTER_CENTER := Vector2(-24.0, 15.0)
+const FOREST_NEAR_SCATTER_MAX_GAIN := 2.0
 var level:Node3D
 var private_primary:=true
 var unavailable_reason:=""
@@ -72,6 +74,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"fog": ["Fog density", 2.],
 	&"near_haze": ["Near haze density", 2.],
 	&"near_haze_depth": ["Near haze depth", 1.],
+	&"forest_near_scatter": ["Forest mist depth light", 1.],
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
@@ -85,7 +88,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 21
+const LIGHTING_MIX_VERSION := 22
 const NIGHT_MIST_MAX_GAIN := 4.0
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
@@ -522,6 +525,10 @@ func _update_mist()->void:
 		var depth_mix := _lighting_scale(&"near_haze_depth")
 		if depth_mix > 0.:
 			sample.near_fade_start = lerpf(.4, NEAR_HAZE_FADE_START, depth_mix)
+		if strength > 0.0 and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
+			var gain := _lighting_scale(&"forest_near_scatter") * FOREST_NEAR_SCATTER_MAX_GAIN
+			if gain > 0.0:
+				sample.near_scatter = Vector3(FOREST_NEAR_SCATTER_CENTER.x, FOREST_NEAR_SCATTER_CENTER.y, gain)
 	var emitter:Vector3=level.presentation.player_position()
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
@@ -737,7 +744,7 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
-	if effect == &"forest_path_light":
+	if effect in [&"forest_path_light", &"forest_near_scatter"]:
 		return .7
 	if effect == &"humid_light":
 		return 0.
@@ -862,7 +869,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -894,6 +901,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 20 and effect == &"forest_accents":
 			missing_value = 0.
 		if version < 21 and effect == &"forest_path_light":
+			missing_value = 0.
+		if version < 22 and effect == &"forest_near_scatter":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -950,7 +959,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
 		_update_mist()
 		return
 	if changed_effect in [&"grass_sky", &"spruce_sky", &"humid_light"]:
@@ -1268,6 +1277,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
 		if effect == &"near_haze_depth":
 			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
+		if effect == &"forest_near_scatter":
+			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
 		if effect == &"night_mist_light":
 			slider.tooltip_text = "Lift cool scattered light at night in Combined mode. 0% restores the old color intensity. Fog density and the warm lantern are separate."
 		if effect == &"forest_accents":

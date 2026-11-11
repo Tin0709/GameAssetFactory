@@ -80,7 +80,10 @@ func _process(_delta:float)->void:
  _append(origin,data,near_layer.x)
  _append(dx,data,near_layer.y)
  _append(dy,data,near_layer.z)
- for v in [ray,ray_dx,ray_dy]:_append(v,data)
+ var near_scatter:Vector3=_profile.get("near_scatter",Vector3.ZERO) if near_layer.y>0. else Vector3.ZERO
+ _append(ray,data,near_scatter.z)
+ _append(ray_dx,data,near_scatter.x)
+ _append(ray_dy,data,near_scatter.y)
  data.append_array(PackedFloat32Array([_profile.volume_density,_profile.height_falloff,_base,_clock]))
  var rgb:Vector3=_profile.fog_color;var color:=Color(rgb.x,rgb.y,rgb.z).srgb_to_linear()
  var linear:Vector3=_profile.get("linear_scatter_rgb",Vector3(color.r,color.g,color.b))

@@ -8,7 +8,9 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 origin;    // World ray origin; near entry distance in w.
  vec4 origin_dx; // Horizontal origin delta; near extinction in w.
  vec4 origin_dy; // Vertical origin delta; near reference height in w.
- vec4 ray;vec4 ray_dx;vec4 ray_dy;
+ vec4 ray;       // World ray direction, near scatter gain
+ vec4 ray_dx;    // Ray delta, near scatter world X
+ vec4 ray_dy;    // Ray delta, near scatter world Z
  vec4 medium; // density, height falloff, base height, time
  vec4 scatter; // linear RGB, energy
  vec4 subject; // world XYZ, warm strength
@@ -18,6 +20,8 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 light_step; // world lattice spacing, occlusion floor
  vec4 light_size; // world lattice dimensions, near-layer fade start
 } p;
+const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
+const float FOREST_SCATTER_END_RADIUS_M = 15.0;
 float scatter_visibility(vec3 point){
  if(p.light_origin.w<.5)return 1.;
  vec3 cell=(point-p.light_origin.xyz)/p.light_step.xyz;
@@ -65,7 +69,14 @@ void main(){
    float entry=p.origin.w/ray_length;
    vec3 point=origin+ray*((max(previous,entry)+min(d,near_z))*.5);
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
-   vec3 light=(p.scatter.rgb*p.scatter.w+p.warm.rgb*(warmth*.25))*scatter_visibility(point);
+   vec3 light=p.scatter.rgb*p.scatter.w+p.warm.rgb*(warmth*.25);
+   if(p.ray.w>0.0){
+    vec2 delta=point.xz-vec2(p.ray_dx.w,p.ray_dy.w);
+    float region=1.0-smoothstep(FOREST_SCATTER_FULL_RADIUS_M*FOREST_SCATTER_FULL_RADIUS_M,
+      FOREST_SCATTER_END_RADIUS_M*FOREST_SCATTER_END_RADIUS_M,dot(delta,delta));
+    light+=p.scatter.rgb*p.scatter.w*(p.ray.w*region);
+   }
+   light*=scatter_visibility(point);
    scattered+=exp(-optical)*(1.0-exp(-nearby))*light;optical+=nearby;
   }
   float start=max(previous,near_z);
