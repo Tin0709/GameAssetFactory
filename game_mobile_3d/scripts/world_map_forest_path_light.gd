@@ -47,6 +47,8 @@ func _load(world: Node3D) -> void:
 	var directory := root.path_join(FOLDER)
 	var mesh_path := directory.path_join(MESH_NAME)
 	var atlas_path := directory.path_join(ATLAS_NAME)
+	if not FileAccess.file_exists(mesh_path) or not FileAccess.file_exists(atlas_path):
+		return
 	if FileAccess.get_sha256(mesh_path) != MESH_SHA or FileAccess.get_sha256(atlas_path) != ATLAS_SHA:
 		return
 	var image := Image.load_from_file(atlas_path)
