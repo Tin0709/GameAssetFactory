@@ -124,7 +124,7 @@ var _legacy_sky_button:CheckButton
 var mist:Node3D
 var spatial_mist:=true
 var near_haze_enabled: bool:
-	get: return float(_lighting_mix.get(&"near_haze", 0.)) > 0.
+	get: return float(_lighting_mix.get(&"near_haze", _lighting_scale_default(&"near_haze"))) > 0.
 	set(value):
 		if value != near_haze_enabled:
 			set_lighting_scale(&"near_haze", 1. if value else 0.)
@@ -693,7 +693,7 @@ func set_full_direct_shadows(value:bool)->void:
 func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"shadow_softness":
 		return DAYLIGHT_SHADOW_SOFTNESS
-	return 0. if effect in [&"near_haze", &"grass_sky"] else 1.
+	return 0. if effect == &"grass_sky" else 1.
 
 func _lighting_scale(effect: StringName) -> float:
 	var default := _lighting_scale_default(effect)
@@ -813,7 +813,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		if version < 12 and effect == &"daylight_balance":
 			missing_value = 0. # Keep saved looks as they were before this calibration.
-		if version < 13 and effect == &"near_haze_depth":
+		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
@@ -1210,7 +1210,7 @@ func _build_ui()->void:
 	var near_haze := CheckButton.new()
 	_near_haze_toggle = near_haze
 	near_haze.name = "NearHazePreview"
-	near_haze.text = "Air · near haze (preview)"
+	near_haze.text = "Air · near haze"
 	near_haze.focus_mode = Control.FOCUS_NONE
 	near_haze.button_pressed = near_haze_enabled
 	near_haze.tooltip_text = "A light layer behind the player before the distant fog. Compare outside noon in Combined or Haze mode."
