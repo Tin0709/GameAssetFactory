@@ -1,3 +1,9 @@
+## Asset sourcing for private gameplay and testing
+
+Use only verified Minecraft Dungeons II source assets for all new asset selections and replacements in private tests and private gameplay. This applies to every asset type, including meshes, textures, materials, rigs, animations, audio and VFX. Confirm provenance in the MD2 Research workspace before use. If a source asset is unavailable, leave that new test element out and document the gap. Preserve existing approved work while its sources are audited and equivalent MD2 assets are verified.
+
+Keep proprietary source files in the private MD2 Research workspace. Use external local references for Godot and keep the files out of GameAssetFactory, Git and distributable builds.
+
 ## 2026-11-11 — ACTIVE: optional geometry-filtered actor sky phase field
 
 Existing main F5/L **Player - spatial sky phase field (experimental)** added, defaultOFF. Independent source/geometry model; preserved approvedNoon, shader/PBR settings/controller/assets. Private8phasefields are editor/hash/baseline pinned and lazy.123runtime/26originalfixtures/4Python + player121/105/phase44/cycle300 pass; actual render30/60/120 gameplay feature/repeat paths0. Public30photos:10/10exactrestores, bothNoonexact. Review lifecycle/UI bugs reproducedRED andfixedGREEN. No nativeLumen/imageparity claim.
