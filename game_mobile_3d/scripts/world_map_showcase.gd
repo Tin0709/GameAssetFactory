@@ -47,6 +47,7 @@ var _forest_shadow_opacity:float
 var full_direct_shadows:=true
 const LIGHTING_MIX_CONTROLS := {
 	&"sun": ["Direct sunlight", 2.],
+	&"sun_pockets": ["Sunlight pockets", 1.5],
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
@@ -67,7 +68,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 10
+const LIGHTING_MIX_VERSION := 11
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
 const MOON_TINT := Color("#b6cdf5")
@@ -683,6 +684,11 @@ func shadow_softness_mix_scale() -> float:
 	var weight := PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 	return lerpf(1., _lighting_scale(&"shadow_softness"), weight)
 
+func sunlight_pockets_weight() -> float:
+	if not forest_active() or atmosphere_review not in ["lighting", "combined"]:
+		return 0.
+	return .65 * _lighting_scale(&"sun_pockets") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+
 func local_exposure_mix_scale() -> float:
 	if forest_active() and atmosphere_review in ["haze", "combined"]:
 		var scale := _lighting_scale(&"exposure")
@@ -747,7 +753,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -757,7 +763,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			or (version < 6 and effect == &"grass_sky") or (version < 7 and effect == &"moon") \
 			or (version < 8 and effect in [&"lantern_lift", &"lantern_air"]) \
 			or (version < 9 and effect == &"lantern_glow") \
-			or (version < 10 and effect == &"shadow_softness")
+			or (version < 10 and effect == &"shadow_softness") \
+			or (version < 11 and effect == &"sun_pockets")
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
@@ -791,6 +798,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"shadow_softness":
 		level.look.refresh_directional_shadow_blur(level.get_node("Sun"))
+		return
+	if changed_effect == &"sun_pockets":
+		level.look.refresh_daylight_cloud_shape()
 		return
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
@@ -917,6 +927,7 @@ func apply_time()->void:
 	var use_forest:=forest_active()
 	var sun:DirectionalLight3D=level.get_node("Sun")
 	level.look.refresh_directional_shadow_blur(sun)
+	level.look.refresh_daylight_cloud_shape()
 	if use_forest and _forest_hour==hour and not _forest_expected.is_empty() and sun.light_color==_forest_sun and sun.light_energy==_forest_energy and sun.shadow_opacity==_forest_shadow_opacity:
 		var unchanged:=true
 		for field:String in _forest_expected:
@@ -1085,6 +1096,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
 		if effect == &"shadow_softness":
 			slider.tooltip_text = "Adjust the F1 sunlight filter radius in the morning and afternoon. 100% uses the previous radius. Noon and night keep their existing filter."
+		if effect == &"sun_pockets":
+			slider.tooltip_text = "Deepen the existing F3 daylight shade on terrain, grass and the player. 0% restores the previous light pattern. Noon and night keep their current lighting."
 		if effect == &"lantern_lift":
 			slider.tooltip_text = "Height above the hip mount when lantern from above is enabled. 100% uses the captured face-to-light distance fit, 66% approximates the previous height."
 		if effect == &"lantern_air":

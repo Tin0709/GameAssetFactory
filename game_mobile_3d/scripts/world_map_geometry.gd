@@ -581,7 +581,8 @@ func update_cloud_style(texture: Texture2D, shape: Vector4) -> void:
 	# Cached inactive cutaways can be reactivated later without rebuilding.
 	for item: Dictionary in _cutaway_chunks:
 		for material: ShaderMaterial in item.materials:
-			material.set_shader_parameter("cloud_field",texture)
+			if texture != null:
+				material.set_shader_parameter("cloud_field",texture)
 			material.set_shader_parameter("cloud_shape",shape)
 
 func update_cloud_time(time: float) -> void:

@@ -204,6 +204,12 @@ func publish_cloud_time(time: float) -> void:
 	_appearance.set_shader_parameter("cloud_time", time)
 	_canopy_appearance.set_shader_parameter("cloud_time", time)
 
+func publish_cloud_shape(shape: Vector4) -> void:
+	if not _direct_clouds:
+		return
+	_appearance.set_shader_parameter("cloud_shape", shape)
+	_canopy_appearance.set_shader_parameter("cloud_shape", shape)
+
 func update_focus(camera: Camera3D, player_position: Vector3, gameplay: bool) -> void:
 	_appearance.set_shader_parameter("reveal_player", gameplay)
 	_canopy_appearance.set_shader_parameter("reveal_player", gameplay)

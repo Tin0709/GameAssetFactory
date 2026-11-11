@@ -40,6 +40,7 @@ const ATMOSPHERE_FOG := {
 const ATMOSPHERE_BACKDROP := Color(0.57, 0.68, 0.69)
 const BASE_CLOUD_SHAPE:=Vector4(13.,.50,.73,.20)
 const POCKET_CLOUD_SHAPE:=Vector4(1.35,.40,.65,.49)
+const DEEPER_POCKET_CLOUD_SHAPE := Vector4(1.35,.39,.56,.72)
 var level: Node3D
 var motion=MOTION.new()
 var wind_materials: Array[ShaderMaterial]=[]
@@ -736,21 +737,42 @@ func _apply_daylight_pockets() -> void:
 		_pockets_image=noise.get_seamless_image(64,64)
 		_pockets_texture=ImageTexture.create_from_image(_pockets_image)
 	var texture:=_pockets_texture if pockets else cloud_texture
-	_cloud_shape=POCKET_CLOUD_SHAPE if pockets else BASE_CLOUD_SHAPE
-	for material: ShaderMaterial in materials.values():
-		material.set_shader_parameter("cloud_field",texture)
-		material.set_shader_parameter("cloud_shape",_cloud_shape)
-	if direct_clouds_active():
-		for material: ShaderMaterial in _direct_actor_materials:
-			if material!=null:
-				material.set_shader_parameter("cloud_field",texture)
-				material.set_shader_parameter("cloud_shape",_cloud_shape)
-	level.geometry.update_cloud_style(texture,_cloud_shape)
+	_publish_cloud_style(texture, _daylight_cloud_shape() if pockets else BASE_CLOUD_SHAPE)
 	refresh_grove_lighting()
 	if stage==2:
 		var sun: DirectionalLight3D=level.get_node("Sun")
 		sun.light_color=Color(1.,.963,.865) if pockets else PRESET.sun_settings.light_color
 		sun.light_energy=1.72 if pockets else PRESET.sun_settings.light_energy
+
+func _daylight_cloud_shape() -> Vector4:
+	var showcase = level.get("showcase")
+	if showcase == null or not direct_clouds_active():
+		return POCKET_CLOUD_SHAPE
+	return POCKET_CLOUD_SHAPE.lerp(DEEPER_POCKET_CLOUD_SHAPE, showcase.sunlight_pockets_weight())
+
+func refresh_daylight_cloud_shape() -> void:
+	if not direct_clouds_active():
+		return
+	var shape := _daylight_cloud_shape()
+	if _cloud_shape.is_equal_approx(shape):
+		return
+	_publish_cloud_style(null, shape)
+	if level.grove != null and level.grove.visible:
+		level.grove.publish_cloud_shape(shape)
+
+func _publish_cloud_style(texture: Texture2D, shape: Vector4) -> void:
+	_cloud_shape = shape
+	for material: ShaderMaterial in materials.values():
+		if texture != null:
+			material.set_shader_parameter("cloud_field",texture)
+		material.set_shader_parameter("cloud_shape",_cloud_shape)
+	if direct_clouds_active():
+		for material: ShaderMaterial in _direct_actor_materials:
+			if material!=null:
+				if texture != null:
+					material.set_shader_parameter("cloud_field",texture)
+				material.set_shader_parameter("cloud_shape",_cloud_shape)
+	level.geometry.update_cloud_style(texture,_cloud_shape)
 
 func refresh_grove_lighting() -> void:
 	if level.grove == null or not level.grove.visible: return
