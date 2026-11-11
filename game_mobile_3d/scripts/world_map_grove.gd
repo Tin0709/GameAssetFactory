@@ -17,6 +17,11 @@ const LEAF_PROOF := "godot_lab/leaf_vertex_material_v001/profile.private.json"
 const LEAF_PROOF_SHA := "b4f10be37bfc16bab2b8c06a669619dafe5b9c5942b157421c4fe1cb30f56444"
 const LEAF_DRAW_CONSTANTS := "graphics_vfx/gpu_capture_20261029/terrain_foliage_reconstruction/bindings/event879_PIX_GENERIC_PIPELINE_STAGE_PS_r2.bin"
 const LEAF_DRAW_SHA := "5c4234fad3f6a08209897ef737b638a7e8086b5459b79d9cbecd86cafaa24966"
+const CROWN_WIND_PROFILE := "godot_lab/oak_raster_registration_v001/review_wind.private.json"
+const CROWN_WIND_PROFILE_SHA := "14a1cd2b17fdb74140ba56df8511a6a9466408ab61fc3dc70bbf0f279b4c0349"
+const CROWN_WIND_PATTERN := "oak_wind.private.rgba8"
+const CROWN_WIND_MAX_GAIN := .50
+const CROWN_WIND_CULL_MARGIN := .60
 const OAKS := [
 	"res://assets/environment/forest_canopy_v3/tree_oak_a.glb",
 	"res://assets/environment/forest_canopy_v3/tree_oak_b.glb",
@@ -100,6 +105,9 @@ var _source_leaf_weights: ImageTexture
 var _source_leaf_mesh: Mesh
 var _source_leaf_hue := 0.
 var _source_leaf_mix := 0.
+var _source_crown_pattern: ImageTexture
+var _source_crown_time := 0.
+var _published_source_wind := Vector2.INF
 var _spruce_root: Node3D
 var _spruce_atlas: ImageTexture
 var _spruce_appearance := ShaderMaterial.new()
@@ -158,6 +166,7 @@ func _build_source_oaks(level: Node3D) -> bool:
 		assets.append(mesh)
 	source_oaks = assets.size() == 4
 	if source_oaks:
+		_load_source_crown_wind(root)
 		_bind_source_atlas(_canopy_appearance)
 		_bind_source_atlas(_canopy_shadow)
 		for index in PLACEMENTS.size():
@@ -234,7 +243,9 @@ func _place_source_spruce(level: Node3D, assets: Array[Node3D], rows: Array, ima
 		var meshes := tree.find_children("*", "MeshInstance3D", true, false)
 		for visual: MeshInstance3D in meshes:
 			visual.position += Vector3(width * .5, 0., width * .5)
-			_spruce_casters.append(_split_shadow(visual, _spruce_appearance, _spruce_shadow))
+			var caster := _split_shadow(visual, _spruce_appearance, _spruce_shadow)
+			_bind_crown_heights(visual, caster, 3.4)
+			_spruce_casters.append(caster)
 		var shape := BoxShape3D.new()
 		shape.size = Vector3(width, 3.4, width)
 		var collider := CollisionShape3D.new()
@@ -251,6 +262,8 @@ func _place_source_spruce(level: Node3D, assets: Array[Node3D], rows: Array, ima
 func _bind_spruce_atlas(material: ShaderMaterial) -> void:
 	material.set_shader_parameter("use_source_atlas", true)
 	material.set_shader_parameter("source_atlas", _spruce_atlas)
+	if _source_crown_pattern != null:
+		material.set_shader_parameter("source_crown_pattern", _source_crown_pattern)
 
 func spruce_available() -> bool:
 	return is_instance_valid(_spruce_root)
@@ -292,10 +305,42 @@ func _checked_source_path(root: String, row: Variant, extension: String) -> Stri
 func _bind_source_atlas(material: ShaderMaterial) -> void:
 	material.set_shader_parameter("use_source_atlas", true)
 	material.set_shader_parameter("source_atlas", _source_atlas)
+	if _source_crown_pattern != null:
+		material.set_shader_parameter("source_crown_pattern", _source_crown_pattern)
 	if material == _canopy_appearance and _source_leaf_weights != null:
 		material.set_shader_parameter("source_leaf_weights", _source_leaf_weights)
 		material.set_shader_parameter("source_leaf_hue", _source_leaf_hue)
 		material.set_shader_parameter("source_leaf_tint_mix", _source_leaf_mix)
+
+func _load_source_crown_wind(root: String) -> void:
+	var path := root.path_join(CROWN_WIND_PROFILE)
+	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != CROWN_WIND_PROFILE_SHA:
+		return
+	var profile: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var pattern := path.get_base_dir().path_join(CROWN_WIND_PATTERN)
+	var bytes := FileAccess.get_file_as_bytes(pattern)
+	const SIZE := 512
+	if bytes.size() != SIZE * SIZE * 4:
+		return
+	var digest := HashingContext.new()
+	digest.start(HashingContext.HASH_SHA256)
+	digest.update(bytes)
+	if digest.finish().hex_encode() != profile.texture_sha256:
+		return
+	_source_crown_time = float(profile.time_offset)
+	_source_crown_pattern = ImageTexture.create_from_image(Image.create_from_data(SIZE, SIZE, false, Image.FORMAT_RGBA8, bytes))
+
+func source_crown_wind_available() -> bool:
+	return _source_crown_pattern != null
+
+func _bind_crown_heights(visual: MeshInstance3D, caster: MeshInstance3D, trunk_top: float) -> void:
+	if not source_crown_wind_available():
+		return
+	var top := visual.get_aabb().end.y
+	var heights := Vector2(trunk_top, lerpf(trunk_top, top, .58))
+	for mesh: MeshInstance3D in [visual, caster]:
+		mesh.set_instance_shader_parameter("source_crown_heights", heights)
+		mesh.extra_cull_margin = maxf(mesh.extra_cull_margin, CROWN_WIND_CULL_MARGIN)
 
 func _prepare_source_leaf_tint(root: String, asset_sha: String, asset: Node3D) -> void:
 	if RenderingServer.get_current_rendering_method() != "mobile" or RenderingServer.get_rendering_device() == null:
@@ -383,7 +428,9 @@ func _prepare_meshes(tree: Node3D) -> void:
 		if appearance == _canopy_appearance:
 			# The caster shares the exact deformation, but never the reveal hole.
 			visual.extra_cull_margin = 0.20
-		_split_shadow(visual, appearance, _canopy_shadow if appearance == _canopy_appearance else null)
+		var caster := _split_shadow(visual, appearance, _canopy_shadow if appearance == _canopy_appearance else null)
+		if source_oaks:
+			_bind_crown_heights(visual, caster, TRUNK_HEIGHT)
 		if source_oaks and _source_leaf_mesh != null and visual.mesh == _source_leaf_mesh:
 			visual.set_instance_shader_parameter("source_leaf_mask", true)
 
@@ -441,7 +488,19 @@ func set_lighting(bark: Shader, leaves: Shader, field: Texture2D, shape: Vector4
 func set_crown_detail(enabled: bool) -> void:
 	_canopy_appearance.set_shader_parameter("crown_detail", enabled)
 
-func publish_crown_wind(enabled: bool, wind_phase: float, breeze_phase: float, travelling: bool) -> void:
+func publish_crown_wind(enabled: bool, wind_phase: float, breeze_phase: float, travelling: bool, time: float = 0., strength: float = 1.) -> void:
+	if source_oaks:
+		if not source_crown_wind_available():
+			return
+		# The two wind UVs complete whole periods every 20 seconds.
+		var state := Vector2(fposmod(time + _source_crown_time, 20.0), CROWN_WIND_MAX_GAIN * strength) if enabled and strength > 0. else Vector2.ZERO
+		if state == _published_source_wind:
+			return
+		_published_source_wind = state
+		for material: ShaderMaterial in [_canopy_appearance, _canopy_shadow, _spruce_appearance, _spruce_shadow]:
+			if material.shader != null:
+				material.set_shader_parameter("source_crown_wind", state)
+		return
 	for material: ShaderMaterial in [_canopy_appearance, _canopy_shadow]:
 		material.set_shader_parameter("crown_wind_enabled", enabled)
 		material.set_shader_parameter("wind_phase", wind_phase)

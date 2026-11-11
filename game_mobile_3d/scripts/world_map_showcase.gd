@@ -74,11 +74,12 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"humid_light": ["Humid light diffusion", 1.],
+	&"tree_wind": ["Tree canopy wind", 1.],
 	&"exposure": ["Local exposure", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 16
+const LIGHTING_MIX_VERSION := 17
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
@@ -832,7 +833,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -854,6 +855,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 15 and effect == &"spruce_sky":
 			missing_value = 0.
 		if version < 16 and effect == &"humid_light":
+			missing_value = 0.
+		if version < 17 and effect == &"tree_wind":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -881,6 +884,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
+	if changed_effect in [&"", &"tree_wind"] and level != null and level.look != null:
+		level.look._publish_crown_wind()
+		if changed_effect == &"tree_wind":
+			return
 	if changed_effect in [&"", &"oak_leaf_tint"]:
 		_sync_oak_leaf_tint()
 		if changed_effect == &"oak_leaf_tint":
@@ -1212,6 +1219,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Adjust the base glow radius independently of Bloom brightness. Leaves the approved noon look intact."
 		if effect == &"humid_light":
 			slider.tooltip_text = "Soften lit areas into the surrounding haze. Try 65% at 16:30. Requires Combined mist and the Mobile Forest finish. Noon keeps its approved look."
+		if effect == &"tree_wind":
+			slider.tooltip_text = "Adjust the sway of private source oaks and spruces. Alt+N toggles crown wind; 0% keeps the source trees still."
 		slider.focus_mode = Control.FOCUS_NONE
 		slider.max_value = spec[1]
 		slider.step = .01

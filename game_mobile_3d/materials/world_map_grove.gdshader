@@ -13,6 +13,9 @@ uniform sampler2D source_leaf_weights : filter_nearest, repeat_disable;
 uniform float source_leaf_hue = 0.0;
 uniform float source_leaf_tint_mix = 0.0;
 instance uniform bool source_leaf_mask = false;
+instance uniform vec2 source_crown_heights = vec2(0.0);
+uniform sampler2D source_crown_pattern : filter_linear, repeat_enable;
+uniform vec2 source_crown_wind = vec2(0.0);
 uniform bool crown_wind_enabled = false;
 uniform float crown_wind_amplitude = 0.020;
 uniform vec3 player_view;
@@ -33,7 +36,16 @@ void vertex() {
 	}
 	// Evaluate inside each face so its exact block boundary stays deterministic.
 	crown_local = VERTEX - NORMAL * 0.004;
-	if (crown_wind_enabled && !use_source_atlas) {
+	if (use_source_atlas && source_crown_wind.y > 0.0 && VERTEX.y > source_crown_heights.x
+			&& source_crown_heights.y > source_crown_heights.x) {
+		float weight = smoothstep(source_crown_heights.x, source_crown_heights.y, VERTEX.y);
+		// Anchor wind to the world so gameplay and shadow cameras see one pose.
+		vec3 world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+		vec3 wind_position = vec3(world_position.x, -24.0, world_position.z);
+		vec3 drift = gaf_leaf_wind_offset(source_crown_pattern, wind_position,
+			source_crown_wind.x, source_crown_wind.y * weight);
+		VERTEX += inverse(mat3(MODEL_MATRIX)) * drift;
+	} else if (crown_wind_enabled && !use_source_atlas) {
 		// One rigid transform for the complete authored crown: voxel blocks
 		// retain their shape. Bark stays fixed under the overlapping foliage.
 		vec3 root = MODEL_MATRIX[3].xyz;

@@ -1047,7 +1047,8 @@ func _publish_crown_wind(clock: float = NAN) -> void:
 	var time: float = motion.clock if is_nan(clock) else clock
 	level.grove.publish_crown_wind(stage != 0 and oak_crown_wind,
 		fposmod(time, 4.0) * TAU / 4.0,
-		fposmod(time, 28.0) * TAU / 28.0, travelling_breeze)
+		fposmod(time, 28.0) * TAU / 28.0, travelling_breeze, time,
+		level.showcase._lighting_scale(&"tree_wind"))
 
 func publish_render_wind(time: float) -> void:
 	# Only background time is interpolated; physical passage history is intact.
