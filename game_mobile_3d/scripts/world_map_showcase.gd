@@ -459,10 +459,16 @@ func set_atmosphere_review(mode:String)->void:
 	if level!=null:level.look._refresh_ground_bounce()
 
 func set_full_direct_shadows(value:bool)->void:
-	if full_direct_shadows==value:return
-	_restore_day()
 	full_direct_shadows=value
-	apply_time()
+	if _time_applied and forest_active() and atmosphere_review in ["lighting","combined"]:
+		_apply_direct_shadow_opacity(level.get_node("Sun"))
+
+func _apply_direct_shadow_opacity(sun:DirectionalLight3D)->void:
+	var opacity:=float(_day.sun_shadow_opacity)
+	if full_direct_shadows and not is_day_anchor():
+		opacity=lerpf(opacity,1.,PHASE_FINISH.phase_weight(hour))
+	sun.shadow_opacity=opacity
+	_forest_shadow_opacity=opacity
 
 func terrain_ambient_reference()->Color:
 	if forest_active() and atmosphere_review in ["lighting","combined"] and not _forest_expected.is_empty():return _day.ambient_light_color
@@ -493,8 +499,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		_apply_captured_key(sun)
 		_apply_captured_direction(sun)
 		# In full shade, block the direct beam and leave ambient fill to its own path.
-		if full_direct_shadows and not is_day_anchor():
-			sun.shadow_opacity=lerpf(float(_day.sun_shadow_opacity),1.,PHASE_FINISH.phase_weight(hour))
+		_apply_direct_shadow_opacity(sun)
 		if _player_light!=null:
 			var warm:Vector3=p.player_light_color
 			_player_light.light_color=Color(warm.x,warm.y,warm.z);_player_light.light_energy=p.player_light_weight
