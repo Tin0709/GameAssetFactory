@@ -320,7 +320,7 @@ func set_reference_look(enabled: bool) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not map_ready:return
 	if view_mode == "gameplay" and event is InputEventMouseButton and event.pressed:
-		var wheel_up := event.button_index == MOUSE_BUTTON_WHEEL_UP
+		var wheel_up: bool = event.button_index == MOUSE_BUTTON_WHEEL_UP
 		if wheel_up or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			var steps: float = event.factor if event.factor > 0.0 else 1.0
 			_camera_size_target = clampf(_camera_size_target * pow(CAMERA_ZOOM_STEP, -steps if wheel_up else steps),
