@@ -48,6 +48,7 @@ var full_direct_shadows:=true
 const LIGHTING_MIX_CONTROLS := {
 	&"sun": ["Direct sunlight", 2.],
 	&"sky": ["Ambient sky", 2.],
+	&"sky_chroma": ["Sky color", 1.],
 	&"shadow": ["Shadow strength", 1.],
 	&"lantern": ["Hip lantern", 2.],
 	&"fog": ["Fog density", 2.],
@@ -57,7 +58,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 2
+const LIGHTING_MIX_VERSION := 3
 var _lighting_mix: Dictionary = {}
 var _lighting_sliders: Dictionary = {}
 var _vignette:ColorRect
@@ -265,6 +266,14 @@ func _apply_captured_sky(env:Environment)->void:
 	env.ambient_light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb()
 	env.ambient_light_energy=float(_day.ambient_light_energy)*float(noon.ambient_energy_scale)*peak
 	sky_response_active=true
+
+func _apply_sky_chroma(env: Environment) -> void:
+	var scale := lerpf(1., _lighting_scale(&"sky_chroma"), PHASE_FINISH.phase_weight(hour))
+	if scale == 1.:
+		return
+	var rgb := env.ambient_light_color.srgb_to_linear()
+	var luma := Vector3(rgb.r, rgb.g, rgb.b).dot(Vector3(.2126, .7152, .0722))
+	env.ambient_light_color = Color(luma, luma, luma).lerp(rgb, scale).linear_to_srgb()
 
 func _apply_captured_key(sun:DirectionalLight3D)->void:
 	key_response_active=false
@@ -546,11 +555,12 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
-		var missing_value := 1. if version == 1 and effect == &"grade" else -1.
+		var from_older_recipe := (version == 1 and effect == &"grade") or (version < 3 and effect == &"sky_chroma")
+		var missing_value := 1. if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -608,6 +618,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		env.ambient_light_color=Color(tinted.x,tinted.y,tinted.z).linear_to_srgb()
 		env.ambient_light_energy*=p.ambient_energy_scale
 		_apply_captured_sky(env)
+		_apply_sky_chroma(env)
 		var key:=sun.light_color.srgb_to_linear();var rgb:Vector3=Vector3(key.r,key.g,key.b)*p.key_color_scale
 		var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
 		sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb();sun.light_energy*=p.key_scale*peak
@@ -811,6 +822,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Scales local contrast gain. The color grade remains active."
 		if effect == &"grade":
 			slider.tooltip_text = "Blend the captured-reference finish with the original palette and tone curve. Local exposure stays active."
+		if effect == &"sky_chroma":
+			slider.tooltip_text = "Reduce the color of ambient sky light at fixed luminance. Noon uses its approved sky color."
 		slider.focus_mode = Control.FOCUS_NONE
 		slider.max_value = spec[1]
 		slider.step = .01
