@@ -788,7 +788,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"night_path_chroma":
 		return .75
 	if effect == &"forest_path_beam":
-		return 0.
+		return .65
 	if effect in [&"night_mist_light", &"forest_path_air"]:
 		return .5
 	if effect == &"shadow_softness":
