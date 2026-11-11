@@ -64,6 +64,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"player_sky": ["Player sky fill", 2.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"grass_shade_color": ["Grass shade color", 1.],
+	&"grass_root_tone": ["Night grass root tone", 1.],
 	&"grass_shadow_reach": ["Grass shadow reach", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
@@ -94,7 +95,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 28
+const LIGHTING_MIX_VERSION := 29
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -788,6 +789,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 0.
 	if effect == &"night_path_chroma":
 		return .75
+	if effect == &"grass_root_tone":
+		return .85
 	if effect == &"forest_path_beam":
 		return .65
 	if effect in [&"night_mist_light", &"forest_path_air"]:
@@ -867,6 +870,11 @@ func grass_shade_color_mix() -> Vector3:
 	var tint := Vector2(.80, 1.24).lerp(Vector2(.84, 1.14), smoothstep(7., 16.5, hour))
 	return Vector3(tint.x, tint.y, strength) if strength > 0. else Vector3.ZERO
 
+func grass_root_tone_mix() -> float:
+	if _balanced_preview or not forest_active() or atmosphere_review != "combined":
+		return 0.0
+	return _lighting_scale(&"grass_root_tone") * moonlight_weight(hour)
+
 func grass_shadow_height_scale() -> float:
 	var strength := _lighting_scale(&"grass_shadow_reach") * twilight_color_weight()
 	if strength <= 0. or not key_direction_active or not direction_response.available() or _day.is_empty():
@@ -933,7 +941,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -979,6 +987,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 27 and effect == &"forest_path_air":
 			missing_value = 0.
 		if version < 28 and effect == &"forest_path_beam":
+			missing_value = 0.
+		if version < 29 and effect == &"grass_root_tone":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -1050,7 +1060,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
 		_update_mist()
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_shadow_reach", &"spruce_sky", &"humid_light"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_shadow_reach", &"spruce_sky", &"humid_light"]:
 		return
 	if changed_effect == &"player_sky":
 		if level.player_light != null:
@@ -1371,6 +1381,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Scale sky fill on the player outside noon. Terrain, direct lights, and the fog keep their own settings."
 		if effect == &"grass_sky":
 			slider.tooltip_text = "Blend the existing grass ambient light with the terrain's baked sky fill at each root. The approved Noon is retained."
+		if effect == &"grass_root_tone":
+			slider.tooltip_text = "Blend the lower blades towards the nearby terrain hue at night. Leaves the existing grass lighting and shadows active."
 		if effect == &"grass_shade_color":
 			slider.tooltip_text = "Cool the baked sky light on grass beneath the forest canopy. Uses Grass sky fill in Combined mode. Noon and night keep their current lighting."
 		if effect == &"grass_shadow_reach":

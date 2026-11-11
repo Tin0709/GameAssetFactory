@@ -14,6 +14,7 @@ uniform vec2 study_ground_sky_origin;
 uniform vec3 study_ground_sky_scale = vec3(1.0);
 uniform float study_ground_sky_mix = 0.0;
 uniform vec3 study_grass_shade_color = vec3(0.0);
+uniform float study_grass_root_tone = 0.0;
 uniform float study_grass_shadow_height = 1.0;
 varying flat vec4 study_ground_sky_at_root;
 varying flat float study_canopy_sky_at_root;
@@ -127,6 +128,17 @@ void fragment(){
 		NORMAL=normalize(mat3(VIEW_MATRIX)*world_normal);
 		color=mix(base_tint,tip_tint,clamp(height_fraction,0.0,1.0))*(vec3(0.65)+0.35*texel.rgb);
 		color=mix(root_color,color,smoothstep(0.0,0.18,height_fraction));
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+		if (study_grass_root_tone > 0.0 && height_fraction < 0.62) {
+			// Calibrated against adjacent terrain and foliage in the Forest
+			// G-buffer. Preserve luminance and taper towards the blade tip.
+			const vec3 luma = vec3(0.2126, 0.7152, 0.0722);
+			vec3 ground_tone = color * vec3(0.91, 1.0, 1.25);
+			ground_tone *= dot(color, luma) / max(dot(ground_tone, luma), 0.000001);
+			float tone_mix = study_grass_root_tone * (1.0 - smoothstep(0.19, 0.62, height_fraction));
+			color = mix(color, ground_tone, tone_mix);
+		}
+#endif
 	}
 	ALBEDO=color;ALPHA=texel.a;ALPHA_SCISSOR_THRESHOLD=cutoff;
 	if(ground_mask_enabled){

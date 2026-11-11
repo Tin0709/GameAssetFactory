@@ -12,6 +12,7 @@ var _ground_sky:Texture2D
 var _ground_sky_checked:=false
 var _ground_sky_state:=Vector4.INF
 var _grass_shade_color := Vector3.INF
+var _grass_root_tone := -1.
 var _shadow_height_scale := -1.
 
 func setup(level:Node3D,reader:RefCounted)->void:
@@ -44,6 +45,7 @@ func restore()->void:
 	_records.clear();active=false
 	_ground_sky_state=Vector4.INF
 	_grass_shade_color = Vector3.INF
+	_grass_root_tone = -1.
 	_shadow_height_scale = -1.
 
 func apply(materials:Array[ShaderMaterial],enabled:bool)->void:
@@ -101,10 +103,13 @@ func _sync_ground_sky()->void:
 	var shade_color: Vector3 = world.showcase.grass_shade_color_mix() if state.w > 0. else Vector3.ZERO
 	var sky_changed := state != _ground_sky_state
 	var color_changed := shade_color != _grass_shade_color
-	if not sky_changed and not color_changed:
+	var root_tone: float = world.showcase.grass_root_tone_mix()
+	var root_changed := root_tone != _grass_root_tone
+	if not sky_changed and not color_changed and not root_changed:
 		return
 	_ground_sky_state=state
 	_grass_shade_color = shade_color
+	_grass_root_tone = root_tone
 	for row:Dictionary in _records:
 		var material:ShaderMaterial=row.material
 		if sky_changed:
@@ -115,6 +120,8 @@ func _sync_ground_sky()->void:
 			material.set_shader_parameter("study_ground_sky_mix",state.w)
 		if color_changed:
 			material.set_shader_parameter("study_grass_shade_color", shade_color)
+		if root_changed:
+			material.set_shader_parameter("study_grass_root_tone", root_tone)
 
 func snapshot()->Dictionary:
 	return {"configured":configured,"active":active,"normal_weight":weight,"materials":_records.size(),"error":error,"normal_scope":"Captured Day grass world-normal consumer; other biome weights unverified","lighting_scope":"Original mobile transmission and alpha shadows, not native Lumen"}
