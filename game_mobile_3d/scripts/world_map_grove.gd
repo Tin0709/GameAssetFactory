@@ -21,7 +21,7 @@ const CROWN_WIND_PROFILE := "godot_lab/oak_raster_registration_v001/review_wind.
 const CROWN_WIND_PROFILE_SHA := "14a1cd2b17fdb74140ba56df8511a6a9466408ab61fc3dc70bbf0f279b4c0349"
 const CROWN_WIND_PATTERN := "oak_wind.private.rgba8"
 const CROWN_WIND_MAX_GAIN := .50
-const CROWN_WIND_CULL_MARGIN := .60
+const CROWN_WIND_CULL_MARGIN := .65
 const OAKS := [
 	"res://assets/environment/forest_canopy_v3/tree_oak_a.glb",
 	"res://assets/environment/forest_canopy_v3/tree_oak_b.glb",
