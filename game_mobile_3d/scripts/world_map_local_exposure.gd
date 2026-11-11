@@ -106,7 +106,7 @@ layout(push_constant,std430) uniform Settings { vec4 settings; vec4 air; };
 layout(location=0) out vec4 result;
 void main(){
  vec2 uv=gl_FragCoord.xy/vec2(textureSize(source_color,0));
- vec2 step_uv=DIRECTION/vec2(textureSize(source_color,0));
+ vec2 step_uv=DIRECTION*air.w/vec2(textureSize(source_color,0));
  vec3 c=textureLod(source_color,uv,0.).rgb*.30;
  c+=(textureLod(source_color,uv+step_uv*2.,0.).rgb+textureLod(source_color,uv-step_uv*2.,0.).rgb)*.25;
  c+=(textureLod(source_color,uv+step_uv*6.,0.).rgb+textureLod(source_color,uv-step_uv*6.,0.).rgb)*.10;
@@ -147,6 +147,13 @@ func _coherent_air_source(block:int=4)->String:
 
 var _air_bloom:=false
 var _air_response:=1.
+var _air_spread:=1.
+func set_air_bloom_spread(value: float) -> void:
+	var spread := clampf(value, 0., 2.) if is_finite(value) else 1.
+	if spread == _air_spread: return
+	_air_spread = spread
+	set_neutral(false)
+
 func set_air_bloom_response(value:float)->void:
 	var response:=clampf(value,0.,4.)if is_finite(value)else 1.
 	if response==_air_response:return
@@ -158,9 +165,9 @@ func set_air_bloom(value:bool)->void:
 
 var _guard := Mutex.new()
 const REVIEW_PARAMETERS := [0.23, 0.10, 0.24, 0.38]
-var _parameters := PackedFloat32Array(REVIEW_PARAMETERS + [0.,0.,0.,0.]).to_byte_array()
+var _parameters := PackedFloat32Array(REVIEW_PARAMETERS + [0.,0.,0.,1.]).to_byte_array()
 var _review_strength := float(REVIEW_PARAMETERS[0])
-var _state := {"frames": 0, "rebuilds": 0, "error": "", "bytes": 0, "first_build_us": 0}
+var _state := {"frames": 0, "rebuilds": 0, "error": "", "bytes": 0, "first_build_us": 0, "air_bloom_spread": 1.}
 var _color := RID()
 var _resources: Array[RID] = []
 var _passes: Array[Array] = []
@@ -172,11 +179,12 @@ func _init() -> void:
 	access_resolved_color = true
 
 func set_neutral(neutral: bool) -> void:
-	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16*_air_response if _air_bloom and not neutral else 0.,0.,0.,0.])
+	var parameters := PackedFloat32Array(REVIEW_PARAMETERS + [.16*_air_response if _air_bloom and not neutral else 0.,0.,0.,_air_spread])
 	parameters[0] = 0.0 if neutral else _review_strength
 	_guard.lock()
 	_parameters = parameters.to_byte_array()
 	_state["air_bloom_response"]=_air_response;_state["air_bloom_weight"]=parameters[4]
+	_state["air_bloom_spread"]=_air_spread
 	_guard.unlock()
 
 func set_review_strength(value: float) -> void:

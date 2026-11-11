@@ -53,18 +53,21 @@ const LIGHTING_MIX_CONTROLS := {
 	&"shadow": ["Shadow strength", 1.],
 	&"lantern": ["Hip lantern", 2.],
 	&"fog": ["Fog density", 2.],
+	&"near_haze": ["Near haze density", 2.],
 	&"scatter": ["Fog brightness", 2.],
 	&"bloom": ["Bloom", 2.],
+	&"bloom_spread": ["Bloom spread", 2.],
 	&"exposure": ["Local exposure", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 4
+const LIGHTING_MIX_VERSION := 5
 const BALANCED_ATMOSPHERE := {
 	&"sky_chroma": .65,
 	&"grade": .55,
 	&"exposure": .9,
 	&"player_sky": 1.25,
+	&"near_haze": 1.,
 }
 const BALANCED_DAY_REFERENCE_FINISH := .75
 var _lighting_mix: Dictionary = {}
@@ -92,7 +95,11 @@ var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
 var mist:Node3D
 var spatial_mist:=true
-var near_haze_enabled := false
+var near_haze_enabled: bool:
+	get: return float(_lighting_mix.get(&"near_haze", 0.)) > 0.
+	set(value):
+		if value != near_haze_enabled:
+			set_lighting_scale(&"near_haze", 1. if value else 0.)
 var phase_air=preload("res://scripts/world_map_phase_air.gd").new()
 var measured_atmosphere:=true
 var coupled_bloom:=true
@@ -312,6 +319,8 @@ func set_coupled_bloom(value:bool)->void:
 		level.look._exposure_effect.set_air_bloom(enabled)
 		var response:float=bloom_response.sample(hour)if enabled and measured_bloom_response else 1.
 		level.look._exposure_effect.set_air_bloom_response(response * _lighting_scale(&"bloom") if enabled else response)
+		var spread := lerpf(1., _lighting_scale(&"bloom_spread"), PHASE_FINISH.phase_weight(hour)) if enabled else 1.
+		level.look._exposure_effect.set_air_bloom_spread(spread)
 		var shape_weight:float=phase_finish.phase_weight(hour)if phase_finish!=null and phase_finish.requested else 0.
 		if level.look._exposure_effect.has_method("set_bloom_shape"):
 			level.look._exposure_effect.set_bloom_shape(source_bloom_shape and enabled and coherent_bloom,shape_weight)
@@ -387,8 +396,9 @@ func _update_mist()->void:
 	_apply_mist_source(sample,measured,linear)
 	sample.scatter_energy *= _lighting_scale(&"scatter")
 	sample.player_light_weight *= _lighting_scale(&"lantern")
-	if (near_haze_enabled or _balanced_preview) and not measured.is_empty() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
-		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * PHASE_FINISH.phase_weight(hour)
+	var near_scale := _lighting_scale(&"near_haze")
+	if near_scale > 0. and not measured.is_empty() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * PHASE_FINISH.phase_weight(hour) * near_scale
 		strength *= _lighting_scale(&"fog")
 		sample.near_layer = Vector3(NEAR_HAZE_ENTRY_M, strength, level.spawn_position.y + NEAR_HAZE_REFERENCE_HEIGHT_M)
 	var emitter:Vector3=level.presentation.player_position()
@@ -513,10 +523,14 @@ func set_full_direct_shadows(value:bool)->void:
 	if _time_applied and forest_active() and atmosphere_review in ["lighting","combined"]:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
+func _lighting_scale_default(effect: StringName) -> float:
+	return 0. if effect == &"near_haze" else 1.
+
 func _lighting_scale(effect: StringName) -> float:
+	var default := _lighting_scale_default(effect)
 	if _balanced_preview:
-		return BALANCED_ATMOSPHERE.get(effect, 1.)
-	return _lighting_mix.get(effect, 1.)
+		return BALANCED_ATMOSPHERE.get(effect, default)
+	return _lighting_mix.get(effect, default)
 
 func set_balanced_atmosphere_preview(enabled: bool) -> void:
 	if _balanced_preview == enabled:
@@ -563,7 +577,7 @@ func set_lighting_scale(effect: StringName, value: float) -> void:
 	if not LIGHTING_MIX_CONTROLS.has(effect) or not is_finite(value):
 		return
 	var scale := clampf(value, 0., LIGHTING_MIX_CONTROLS[effect][1])
-	if scale == float(_lighting_mix.get(effect, 1.)):
+	if scale == float(_lighting_mix.get(effect, _lighting_scale_default(effect))):
 		return
 	_lighting_mix[effect] = scale
 	_refresh_lighting_mix(effect)
@@ -577,7 +591,7 @@ func save_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	var config := ConfigFile.new()
 	config.set_value("recipe", "version", LIGHTING_MIX_VERSION)
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
-		config.set_value("strengths", String(effect), float(_lighting_mix.get(effect, 1.)))
+		config.set_value("strengths", String(effect), float(_lighting_mix.get(effect, _lighting_scale_default(effect))))
 	var temporary_path := path + ".tmp"
 	var error := config.save(temporary_path)
 	if error == OK:
@@ -592,13 +606,14 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
 		var from_older_recipe: bool = (version == 1 and effect == &"grade") \
-			or (version < 3 and effect == &"sky_chroma") or (version < 4 and effect == &"player_sky")
-		var missing_value := 1. if from_older_recipe else -1.
+			or (version < 3 and effect == &"sky_chroma") or (version < 4 and effect == &"player_sky") \
+			or (version < 5 and effect in [&"near_haze", &"bloom_spread"])
+		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -624,6 +639,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
 	if not forest_active():
+		return
+	if changed_effect in [&"near_haze", &"bloom_spread"]:
+		_update_mist()
 		return
 	if changed_effect == &"player_sky":
 		if level.player_light != null:
@@ -879,6 +897,10 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Reduce the color of ambient sky light at fixed luminance. Noon uses its approved sky color."
 		if effect == &"player_sky":
 			slider.tooltip_text = "Scale sky fill on the player outside noon. Terrain, direct lights, and the fog keep their own settings."
+		if effect == &"near_haze":
+			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
+		if effect == &"bloom_spread":
+			slider.tooltip_text = "Adjust the base glow radius independently of Bloom brightness. Leaves the approved noon look intact."
 		slider.focus_mode = Control.FOCUS_NONE
 		slider.max_value = spec[1]
 		slider.step = .01
@@ -888,7 +910,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		var readout := Label.new()
 		readout.custom_minimum_size.x = 48
 		readout.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		readout.text = "100%"
+		readout.text = "%d%%" % roundi(slider.value * 100.)
 		row.add_child(readout)
 		slider.set_meta("readout", readout)
 		_lighting_sliders[effect] = slider
@@ -934,7 +956,6 @@ func _build_ui()->void:
 	near_haze.tooltip_text = "A light layer behind the player before the distant fog. Compare outside noon in Combined or Haze mode."
 	near_haze.toggled.connect(func(enabled: bool):
 		near_haze_enabled = enabled
-		_update_mist()
 	)
 	box.add_child(near_haze)
 	var gentle:=CheckButton.new();gentle.name="GentleNoon";gentle.text="Light · gentle midday sunlight";gentle.button_pressed=gentle_noon;gentle.focus_mode=Control.FOCUS_NONE;box.add_child(gentle)
