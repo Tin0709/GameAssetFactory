@@ -83,6 +83,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_mist_light": ["Night mist light", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
 	&"forest_path_light": ["Forest path light", 1.],
+	&"forest_path_air": ["Path light in mist", 1.],
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"humid_light": ["Humid light diffusion", 1.],
@@ -92,8 +93,9 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 26
+const LIGHTING_MIX_VERSION := 27
 const NIGHT_MIST_MAX_GAIN := 4.0
+const PATH_AIR_MAX_SCALE := .24
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
@@ -108,6 +110,7 @@ const BALANCED_ATMOSPHERE := {
 	&"player_sky": 1.25,
 	&"grass_sky": 0.,
 	&"spruce_sky": 0.,
+	&"forest_path_air": 0.,
 	&"oak_leaf_tint": 0.,
 	&"near_haze": 1.,
 }
@@ -216,7 +219,7 @@ func setup(world:Node3D)->void:
 		_player_light=OmniLight3D.new();_player_light.name="AtmospherePlayerLight";_player_light.shadow_enabled=false
 		_player_light.omni_range=forest.player_range;_player_light.omni_attenuation=2.;_player_light.position.y=1.4
 		level.player.add_child(_player_light);_player_light.hide()
-		mist=preload("res://scripts/world_map_atmosphere_volume.gd").new();level.get_node("Camera3D").add_child(mist);mist.setup();mist.material_provider=_mist_materials;mist.medium_state=_mist_state;mist.compositor_owned=func(c):return c==level.look._exposure_compositor
+		mist=preload("res://scripts/world_map_atmosphere_volume.gd").new();level.get_node("Camera3D").add_child(mist);mist.setup();mist.material_provider=_mist_materials;mist.medium_state=_mist_state;mist.path_light_provider=_path_air_source;mist.compositor_owned=func(c):return c==level.look._exposure_compositor
 	grade_review=preload("res://scripts/world_map_grade_review.gd").new();add_child(grade_review);grade_review.setup(self)
 	phase_finish=PHASE_FINISH.new();add_child(phase_finish);phase_finish.setup(self)
 	_build_ui()
@@ -676,6 +679,17 @@ func air_field()->Dictionary:
 	if not shadowed_scatter:result.valid=false
 	return result
 
+func _path_air_source() -> PackedFloat32Array:
+	var gain := _lighting_scale(&"forest_path_air")
+	var lamp: OmniLight3D = forest_path_light.light
+	if gain <= 0.0 or not forest_active() or atmosphere_review != "combined" \
+		or not is_instance_valid(lamp) or not lamp.is_visible_in_tree() or lamp.light_energy <= 0.0:
+		return PackedFloat32Array()
+	var position := lamp.global_position
+	var rgb := lamp.light_color.srgb_to_linear()
+	return PackedFloat32Array([position.x, position.y, position.z, lamp.omni_range,
+		rgb.r, rgb.g, rgb.b, lamp.light_energy * PATH_AIR_MAX_SCALE * gain])
+
 func _mist_state(ready:bool,error:String)->void:
 	if mist==null or not mist.visible or _mist_sample.is_empty():return
 	# Called late, AFTER configure invalidates a resized field in this same frame.
@@ -756,7 +770,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 0.
 	if effect == &"night_path_chroma":
 		return .75
-	if effect == &"night_mist_light":
+	if effect in [&"night_mist_light", &"forest_path_air"]:
 		return .5
 	if effect == &"shadow_softness":
 		return DAYLIGHT_SHADOW_SOFTNESS
@@ -899,7 +913,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -942,6 +956,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 26 and effect == &"grass_shadow_reach":
 			missing_value = 0.
+		if version < 27 and effect == &"forest_path_air":
+			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
@@ -972,6 +988,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		level.look._publish_crown_wind()
 		if changed_effect == &"tree_wind":
 			return
+	if changed_effect == &"forest_path_air":
+		return # The volume reads the live fixture and mix immediately before dispatch.
 	if changed_effect == &"night_path_chroma":
 		_publish_night_path_chroma()
 		return
@@ -1344,6 +1362,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
 		if effect == &"forest_near_scatter":
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
+		if effect == &"forest_path_air":
+			slider.tooltip_text = "Warm the existing mist near the fixed forest lamp. Set 0% for the prior look. Requires Combined mode and Forest path light."
 		if effect == &"night_mist_light":
 			slider.tooltip_text = "Lift cool scattered light at night in Combined mode. 0% restores the old color intensity. Fog density and the warm lantern are separate."
 		if effect == &"forest_accents":

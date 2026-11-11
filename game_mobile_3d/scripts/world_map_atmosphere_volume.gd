@@ -18,6 +18,7 @@ var material_provider:Callable
 var compositor_owned:Callable
 var medium_state:Callable
 var light_provider:Callable
+var path_light_provider: Callable
 var _variants:Dictionary={}
 var _bound_materials:Dictionary={}
 var _owned_compositor:Compositor
@@ -101,7 +102,8 @@ func _process(_delta:float)->void:
  else:
   for i in 2:_append(Vector3.ZERO,data)
   _append(Vector3.ZERO,data,near_fade_start)
- effect.configure(data.to_byte_array(),size,noise.get_rid(),light_rid)
+ var path_light: PackedFloat32Array = path_light_provider.call() if path_light_provider.is_valid() else PackedFloat32Array()
+ effect.configure(data.to_byte_array(),size,noise.get_rid(),light_rid,path_light)
  var state:Dictionary=effect.snapshot()
  var ready:bool=state.ready and state.error.is_empty()
  if medium_state.is_valid():medium_state.call(ready,str(state.error))
