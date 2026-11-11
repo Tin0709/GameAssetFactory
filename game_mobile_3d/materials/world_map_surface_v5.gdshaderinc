@@ -13,7 +13,7 @@ uniform float contact_shade_strength = 0.30;
 uniform float plant_soil_strength = 0.75;
 #ifdef GAF_WORLD_TERRAIN_PBR
 uniform bool use_source_terrain = false;
-uniform sampler2DArray source_terrain_tiles : source_color, filter_nearest_mipmap, repeat_enable;
+uniform sampler2DArray source_terrain_tiles : source_color, filter_linear_mipmap, repeat_enable;
 
 vec3 source_terrain_sample(vec2 uv, float layer) {
 	return texture(source_terrain_tiles, vec3(uv, layer)).rgb;
