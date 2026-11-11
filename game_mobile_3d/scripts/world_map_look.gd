@@ -262,7 +262,7 @@ func refresh_vegetation_ground_detail() -> void:
 func _stamp_oak_root_sites() -> void:
 	_oak_root_sites.resize(16)
 	_oak_root_sites.fill(Vector4.ZERO)
-	if level.grove == null: return
+	if level.grove == null or level.grove.source_oaks: return
 	var map_min := Vector2i(path_map_origin)
 	var bounds := Rect2i(Vector2i.ZERO, path_map_image.get_size())
 	for index in mini(level.grove.get_child_count(), _oak_root_sites.size()):
@@ -292,7 +292,7 @@ func _stamp_oak_root_sites() -> void:
 				path_map_image.set_pixel(x, y, data)
 
 func oak_root_beds_active() -> bool:
-	return stage == 2 and _oak_root_beds_requested and level.grove != null and level.grove.visible
+	return stage == 2 and _oak_root_beds_requested and level.grove != null and level.grove.visible and not level.grove.source_oaks
 
 func toggle_oak_root_beds() -> void:
 	_oak_root_beds_requested = not _oak_root_beds_requested
@@ -352,7 +352,7 @@ func refresh_canopy_contact() -> void:
 
 func _apply_canopy_contact() -> void:
 	if not canopy_contact_active(): return
-	var with_oaks: bool = level.grove != null and level.grove.visible
+	var with_oaks: bool = level.grove != null and level.grove.visible and not level.grove.source_oaks
 	if _canopy_profile.is_empty() or with_oaks != _canopy_has_oaks:
 		var base_y: float = level.runtime.source_bounds.min[1] + level.runtime.offset[1]
 		if _canopy_shrubs.is_empty():

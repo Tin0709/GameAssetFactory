@@ -6,6 +6,8 @@ shader_type spatial;
 
 uniform bool reveal_player = false;
 uniform float grove_mist_strength = 0.0;
+uniform bool use_source_atlas = false;
+uniform sampler2D source_atlas : source_color, filter_nearest, repeat_disable;
 uniform bool crown_wind_enabled = false;
 uniform float crown_wind_amplitude = 0.020;
 uniform vec3 player_view;
@@ -21,7 +23,7 @@ varying vec2 grove_world_xz;
 void vertex() {
 	// Evaluate inside each face so its exact block boundary stays deterministic.
 	crown_local = VERTEX - NORMAL * 0.004;
-	if (crown_wind_enabled) {
+	if (crown_wind_enabled && !use_source_atlas) {
 		// One rigid transform for the complete authored crown: voxel blocks
 		// retain their shape. Bark stays fixed under the overlapping foliage.
 		vec3 root = MODEL_MATRIX[3].xyz;
@@ -68,6 +70,11 @@ vec3 crown_color(vec3 color) {
 
 void fragment() {
 	vec3 albedo = crown_detail ? crown_color(COLOR.rgb) : COLOR.rgb;
+	if (use_source_atlas) {
+		vec4 texel = texture(source_atlas, UV);
+		if (texel.a < 0.3333) discard;
+		albedo = texel.rgb;
+	}
 	if (reveal_player) {
 		// WorldMap uses an orthographic camera. Keep the opening centred on
 		// the player even while the camera holds its elevation during a jump.

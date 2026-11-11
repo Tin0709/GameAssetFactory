@@ -15,7 +15,7 @@ var _last_visible := false
 func setup(world: Node3D) -> void:
 	level = world
 	_coefficients.resize(MAX_CROWNS * 6)
-	if is_instance_valid(level.grove):
+	if is_instance_valid(level.grove) and not level.grove.source_oaks:
 		for tree: Node3D in level.grove.get_children():
 			var rotation := tree.global_basis.orthonormalized()
 			_trees.append([tree.global_transform.affine_inverse(), rotation, PROBES[_trees.size() % 2]])

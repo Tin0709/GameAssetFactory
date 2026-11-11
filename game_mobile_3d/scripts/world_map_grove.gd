@@ -1,5 +1,6 @@
 extends Node3D
-## Reversible woodland planting using the two original Forest Canopy V3 trees.
+## Woodland planting. Editor research trees are loaded from the private workspace.
+const SOURCE_MANIFEST := "godot_lab/world_map_unified_showcase_v001/grove_mist_continuity_v001/native_oaks/sources.private.json"
 const OAKS := [
 	"res://assets/environment/forest_canopy_v3/tree_oak_a.glb",
 	"res://assets/environment/forest_canopy_v3/tree_oak_b.glb",
@@ -77,6 +78,8 @@ var _canopy_shadow := ShaderMaterial.new()
 var _direct_clouds := false
 var _mist_strength := -1.0
 var _trunks: Array[StaticBody3D] = []
+var source_oaks := false
+var _source_atlas: ImageTexture
 
 func build(level: Node3D) -> bool:
 	hide()
@@ -84,6 +87,8 @@ func build(level: Node3D) -> bool:
 	_canopy_appearance.shader = REVEAL_SHADER
 	_canopy_shadow.shader = REVEAL_SHADER
 	_canopy_shadow.set_shader_parameter("reveal_player", false)
+	if level.showcase.private_primary:
+		return _build_source_oaks(level)
 	var assets: Array[PackedScene] = []
 	for path: String in OAKS:
 		var asset := load(path) as PackedScene
@@ -91,15 +96,86 @@ func build(level: Node3D) -> bool:
 		assets.append(asset)
 	for index in PLACEMENTS.size():
 		var placement: Vector4 = PLACEMENTS[index]
-		var height: float = level.surface_height(placement.x, placement.y)
-		if not is_finite(height): return false
 		var tree := assets[index % assets.size()].instantiate() as Node3D
-		tree.position = Vector3(placement.x, height, placement.y)
-		tree.rotation.y = placement.w
-		tree.scale = Vector3.ONE * placement.z
-		add_child(tree)
-		_prepare_meshes(tree)
-		_add_trunk(tree, placement.z)
+		if not _place_tree(level, tree, placement): return false
+	return true
+
+func _build_source_oaks(level: Node3D) -> bool:
+	if not OS.has_feature("editor"): return false
+	var root := OS.get_environment("MD2_RESEARCH_ROOT")
+	if root.is_empty():
+		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
+	root = root.simplify_path().replace("\\", "/").trim_suffix("/")
+	var project := ProjectSettings.globalize_path("res://").simplify_path().replace("\\", "/").trim_suffix("/").to_lower()
+	if not root.is_absolute_path() or root.begins_with("res://") or root.begins_with("user://") \
+		or root.to_lower() == project or root.to_lower().begins_with(project + "/"):
+		return false
+	var manifest_path := root.path_join(SOURCE_MANIFEST)
+	if not FileAccess.file_exists(manifest_path): return false
+	var manifest: Variant = JSON.parse_string(FileAccess.get_file_as_string(manifest_path))
+	if not manifest is Dictionary or manifest.get("schema") != "private_world_map_oaks_v1": return false
+	var meshes: Variant = manifest.get("meshes")
+	if not meshes is Array or meshes.size() != 4: return false
+	var atlas_path := _checked_source_path(root, manifest.get("atlas"), "png")
+	if atlas_path.is_empty(): return false
+	var image := Image.load_from_file(atlas_path)
+	if image == null or image.is_empty(): return false
+	_source_atlas = ImageTexture.create_from_image(image)
+	var assets: Array[Node3D] = []
+	for row: Variant in meshes:
+		var path := _checked_source_path(root, row, "glb")
+		if path.is_empty(): break
+		var document := GLTFDocument.new()
+		var state := GLTFState.new()
+		if document.append_from_file(path, state) != OK: break
+		var mesh := document.generate_scene(state) as Node3D
+		if mesh == null: break
+		mesh.set_meta("source_glb", path.get_file())
+		assets.append(mesh)
+	source_oaks = assets.size() == 4
+	if source_oaks:
+		_bind_source_atlas(_canopy_appearance)
+		_bind_source_atlas(_canopy_shadow)
+		for index in PLACEMENTS.size():
+			var original := assets[index % assets.size()]
+			var tree := Node3D.new()
+			tree.name = "MD2Oak%02d" % (index + 1)
+			tree.set_meta("source_glb", original.get_meta("source_glb"))
+			var visual := original.duplicate() as Node3D
+			# Every source trunk spans -1..0 in both horizontal axes.
+			visual.position += Vector3(.5, 0., .5)
+			tree.add_child(visual)
+			if not _place_tree(level, tree, PLACEMENTS[index]):
+				source_oaks = false
+				break
+	for asset in assets:
+		asset.free()
+	return source_oaks
+
+func _checked_source_path(root: String, row: Variant, extension: String) -> String:
+	if not row is Dictionary or not row.get("file") is String or not row.get("sha256") is String:
+		return ""
+	var relative: String = row.file
+	if relative.is_absolute_path() or relative.get_extension().to_lower() != extension: return ""
+	var path := root.path_join(relative.replace("\\", "/")).simplify_path()
+	if not path.begins_with(root + "/extracted/") or not FileAccess.file_exists(path): return ""
+	return path if FileAccess.get_sha256(path) == row.sha256 else ""
+
+func _bind_source_atlas(material: ShaderMaterial) -> void:
+	material.set_shader_parameter("use_source_atlas", true)
+	material.set_shader_parameter("source_atlas", _source_atlas)
+
+func _place_tree(level: Node3D, tree: Node3D, placement: Vector4) -> bool:
+	var height: float = level.surface_height(placement.x, placement.y)
+	if not is_finite(height):
+		tree.free()
+		return false
+	tree.position = Vector3(placement.x, height, placement.y)
+	tree.rotation.y = placement.w
+	tree.scale = Vector3.ONE * placement.z
+	add_child(tree)
+	_prepare_meshes(tree)
+	_add_trunk(tree, placement.z)
 	return true
 
 func build_understory(level: Node3D) -> void:
@@ -125,8 +201,9 @@ func build_understory(level: Node3D) -> void:
 func _prepare_meshes(tree: Node3D) -> void:
 	for visual: MeshInstance3D in tree.find_children("*", "MeshInstance3D", true, false):
 		var source := visual.get_active_material(0) as StandardMaterial3D
-		var appearance := _canopy_appearance if str(visual.name).begins_with("Leaves") else _appearance
-		appearance.set_shader_parameter("native_specular", source.metallic_specular)
+		var appearance := _canopy_appearance if source_oaks or str(visual.name).begins_with("Leaves") else _appearance
+		if not source_oaks and source != null:
+			appearance.set_shader_parameter("native_specular", source.metallic_specular)
 		# The shadow-only instance uses the original mesh and its imported shadow mesh.
 		var caster := MeshInstance3D.new()
 		caster.name = visual.name + "Shadow"
@@ -144,7 +221,7 @@ func _prepare_meshes(tree: Node3D) -> void:
 
 func _add_trunk(tree: Node3D, tree_scale: float) -> void:
 	var shape := CylinderShape3D.new()
-	shape.radius = TRUNK_RADIUS * tree_scale
+	shape.radius = (.48 if source_oaks else TRUNK_RADIUS) * tree_scale
 	shape.height = TRUNK_HEIGHT * tree_scale
 	var collider := CollisionShape3D.new()
 	collider.shape = shape
@@ -194,6 +271,8 @@ func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D,
 		material.shader = shader
 		for i in parameters.size():
 			if values[i] != null: material.set_shader_parameter(parameters[i], values[i])
+		if source_oaks and material == _canopy_appearance:
+			_bind_source_atlas(material)
 	if field != null:
 		material.set_shader_parameter("clouds_enabled", true)
 		material.set_shader_parameter("cloud_field", field)
