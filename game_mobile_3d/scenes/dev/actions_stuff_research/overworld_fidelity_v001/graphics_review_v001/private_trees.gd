@@ -88,7 +88,7 @@ func update_crown_wind() -> void:
 	if _crown_materials.is_empty():
 		return
 	var active: bool = crown_wind_enabled and is_visible_in_tree() and meadow.wind_enabled
-	var state := CrownWind.sample_state(meadow.clock, _crown_profile.time_offset, 1.0 if active else 0.0)
+	var state := CrownWind.sample_state(meadow.clock, _crown_profile.time_offset, CrownWind.DEFAULT_STRENGTH if active else 0.0)
 	if state == _crown_state:
 		return
 	_crown_state = state

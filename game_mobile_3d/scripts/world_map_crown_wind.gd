@@ -3,8 +3,12 @@ extends RefCounted
 const CROWN_WIND_PROFILE := "godot_lab/oak_raster_registration_v001/review_wind.private.json"
 const CROWN_WIND_PROFILE_SHA := "14a1cd2b17fdb74140ba56df8511a6a9466408ab61fc3dc70bbf0f279b4c0349"
 const CROWN_WIND_PATTERN := "oak_wind.private.rgba8"
-const MAX_GAIN := .50
-const CULL_MARGIN := .65
+const REFERENCE_GAIN := .50
+const DEFAULT_STRENGTH := 1.25
+const MAX_STRENGTH := 1.35
+# The 100% displacement bound is 0.484 m in world space. Allow for 135%
+# and the smallest current tree scale (0.76) in the local bounds.
+const CULL_MARGIN := .9
 
 static func load_pattern(root: String) -> Dictionary:
 	var path := root.path_join(CROWN_WIND_PROFILE)
@@ -66,4 +70,4 @@ static func foliage_weights(source: ArrayMesh) -> PackedByteArray:
 
 static func sample_state(time: float, time_offset: float, strength: float) -> Vector2:
 	# Both scroll vectors wrap after 20 seconds.
-	return Vector2(fposmod(time + time_offset, 20.0), MAX_GAIN * strength) if strength > 0.0 else Vector2.ZERO
+	return Vector2(fposmod(time + time_offset, 20.0), REFERENCE_GAIN * minf(strength, MAX_STRENGTH)) if strength > 0.0 else Vector2.ZERO

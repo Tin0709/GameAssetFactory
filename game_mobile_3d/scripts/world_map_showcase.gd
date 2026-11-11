@@ -5,6 +5,7 @@ const PRIVATE_ADAPTER="res://scenes/dev/actions_stuff_research/md2_sabre_prototy
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
 const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
+const CrownWind := preload("res://scripts/world_map_crown_wind.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 # User-directed art adjustment; recovered Forest profiles stay untouched.
 const GENTLE_NOON_DIRECT_SCALE:=.82
@@ -89,7 +90,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"humid_light": ["Humid light diffusion", 1.],
-	&"tree_wind": ["Tree canopy wind", 1.],
+	&"tree_wind": ["Tree canopy wind", CrownWind.MAX_STRENGTH],
 	&"night_path_chroma": ["Night path color", 1.],
 	&"exposure": ["Local exposure", 1.],
 	&"grade": ["Reference finish", 1.],
@@ -799,6 +800,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return DAYLIGHT_SHADOW_SOFTNESS
 	if effect == &"spruce_sky":
 		return .5
+	if effect == &"tree_wind":
+		return CrownWind.DEFAULT_STRENGTH
 	return 1.
 
 func _lighting_scale(effect: StringName) -> float:
@@ -965,7 +968,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 16 and effect == &"humid_light":
 			missing_value = 0.
 		if version < 17 and effect == &"tree_wind":
-			missing_value = 0.
+			missing_value = CrownWind.DEFAULT_STRENGTH
 		if version < 18 and effect == &"night_path_chroma":
 			missing_value = 0.
 		if version < 19 and effect == &"night_mist_light":
@@ -1424,7 +1427,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"humid_light":
 			slider.tooltip_text = "Soften lit areas into the surrounding haze. Try 65% at 16:30. Requires Combined mist and the Mobile Forest finish. Noon keeps its approved look."
 		if effect == &"tree_wind":
-			slider.tooltip_text = "Adjust the sway of private source oaks and spruces. Alt+N toggles crown wind; 0% keeps the source trees still."
+			slider.tooltip_text = "Adjust sway for the source oaks and spruces. 100% is the previous response, 125% is the new default. Alt+N toggles sway."
 		if effect == &"night_path_chroma":
 			slider.tooltip_text = "Soften warm dirt color at night using the Forest reference. 0% restores the original path color. Daylight and the source atlas preview keep their own color."
 		slider.focus_mode = Control.FOCUS_NONE
