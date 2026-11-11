@@ -176,8 +176,8 @@ func setup(world:Node3D)->void:
 	if level.player.get("primary_ready")!=true and unavailable_reason.is_empty():
 		unavailable_reason="Private A&S/MD2 + Sabre data missing. Set MD2_RESEARCH_ROOT to the private research folder and restart."
 	level.terrain_sky.set_enabled(false)
-	# Requested bare map: preserve the authored assets and placements for recovery.
-	level.set_grove_visible(false,level.player.global_position)
+	if level.grove == null or not level.grove.source_oaks:
+		level.set_grove_visible(false,level.player.global_position)
 	if level.player.has_method("setup_world_vegetation"):plants=level.player.setup_world_vegetation(level)
 	if level.look.local_exposure_available():
 		level.look.set_local_exposure(true)

@@ -91,7 +91,8 @@ func _ready() -> void:
 	reset_player()
 	set_review_view("gameplay")
 	if build_grove():
-		grove.build_understory(self)
+		if not grove.source_oaks:
+			grove.build_understory(self)
 		set_grove_visible(true, player.global_position)
 	look=load("res://scripts/world_map_look.gd").new()
 	look.name="ReferenceLook"
@@ -276,7 +277,7 @@ func build_grove() -> bool:
 	candidate.name = "GroveReview"
 	if not candidate.build(self):
 		candidate.free()
-		push_warning("WorldMap grove assets or support unavailable.")
+		push_warning("WorldMap grove source unavailable; trees are omitted in the private showcase." if showcase.private_primary else "WorldMap grove assets or support unavailable.")
 		return false
 	grove = candidate
 	add_child(grove)
@@ -286,10 +287,11 @@ func set_grove_visible(enabled: bool, at: Vector3) -> bool:
 	var collider:=player.get_node_or_null("CollisionShape3D")
 	if collider==null:collider=player.get_node_or_null("BodyCollision")
 	var player_shape := collider.shape as CapsuleShape3D
-	if not grove.set_enabled(enabled, at, player_shape): return false
+	if grove != null and not grove.set_enabled(enabled, at, player_shape): return false
 	vegetation_visible=enabled
-	for batch: MultiMeshInstance3D in geometry.vegetation_batches+geometry.accent_batches: batch.visible = enabled
-	if enabled:
+	for batch: MultiMeshInstance3D in geometry.vegetation_batches+geometry.accent_batches:
+		batch.visible = enabled and not showcase.private_primary
+	if enabled and grove != null:
 		grove.update_focus($Camera3D, player.global_position, view_mode == "gameplay")
 		if look != null: look.refresh_grove_lighting()
 	if look != null:
