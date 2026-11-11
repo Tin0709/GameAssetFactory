@@ -523,6 +523,13 @@ func set_balanced_atmosphere_preview(enabled: bool) -> void:
 	_balanced_preview = enabled
 	_refresh_lighting_mix()
 
+func balanced_shadow_weight() -> float:
+	if not _balanced_preview or atmosphere_review not in ["lighting", "combined"] or not forest_active():
+		return 0.
+	# Keep the approved Noon and night filtering. This is a Godot look blend.
+	var daylight := smoothstep(5.5, 7., hour) * (1. - smoothstep(16.5, 19.5, hour))
+	return PHASE_FINISH.phase_weight(hour) * daylight
+
 func local_exposure_mix_scale() -> float:
 	if forest_active() and atmosphere_review in ["haze", "combined"]:
 		var scale := _lighting_scale(&"exposure")
@@ -725,6 +732,7 @@ func apply_time()->void:
 	if env!=_environment:_capture_day()
 	var use_forest:=forest_active()
 	var sun:DirectionalLight3D=level.get_node("Sun")
+	level.look.refresh_directional_shadow_blur(sun)
 	if use_forest and _forest_hour==hour and not _forest_expected.is_empty() and sun.light_color==_forest_sun and sun.light_energy==_forest_energy and sun.shadow_opacity==_forest_shadow_opacity:
 		var unchanged:=true
 		for field:String in _forest_expected:
@@ -909,7 +917,7 @@ func _build_ui()->void:
 	_balanced_toggle = balanced
 	balanced.name = "BalancedAtmospherePreview"
 	balanced.text = "Balanced atmosphere (preview)"
-	balanced.tooltip_text = "Compare a softer dawn, afternoon and night with near haze. Turn off to return to your own mix."
+	balanced.tooltip_text = "Compare near haze and a balanced light mix. Morning and afternoon also soften F1's directional shadow edges. Turn off to restore your mix."
 	balanced.focus_mode = Control.FOCUS_NONE
 	balanced.toggled.connect(set_balanced_atmosphere_preview)
 	box.add_child(balanced)

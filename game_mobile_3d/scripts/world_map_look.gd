@@ -27,6 +27,7 @@ const BALANCED_DAY_PALETTE := {
 enum DayPalette { NONE, ORIGINAL, BALANCED }
 const MOTION=preload("res://scripts/grassland_motion.gd")
 const REVIEW_SHADOW_BLUR := 1.08
+const BALANCED_SHADOW_BLUR := 1.24
 const REVIEW_SHADOW_NORMAL_BIAS := 0.76
 const ATMOSPHERE_FOG := {
 	"fog_depth_begin": 25.8,
@@ -950,7 +951,7 @@ func set_directional_shadow_review(enabled: bool) -> void:
 
 func _apply_directional_shadow_review(sun: DirectionalLight3D) -> void:
 	var review := directional_shadow_review_active()
-	sun.shadow_blur = REVIEW_SHADOW_BLUR if review else PRESET.sun_settings.shadow_blur
+	refresh_directional_shadow_blur(sun)
 	sun.shadow_normal_bias = REVIEW_SHADOW_NORMAL_BIAS if review else PRESET.sun_settings.shadow_normal_bias
 	var use_16bit: bool = PRESET.shadow_16bit
 	if review:
@@ -961,6 +962,17 @@ func _apply_directional_shadow_review(sun: DirectionalLight3D) -> void:
 	RenderingServer.directional_shadow_atlas_set_size(PRESET.shadow_atlas_size, use_16bit)
 	var quality := RenderingServer.SHADOW_QUALITY_SOFT_HIGH if review else PRESET.shadow_quality
 	RenderingServer.directional_soft_shadow_filter_set_quality(quality as RenderingServer.ShadowQuality)
+
+func refresh_directional_shadow_blur(sun: DirectionalLight3D) -> void:
+	if stage != 2:
+		return
+	var blur: float = PRESET.sun_settings.shadow_blur
+	if directional_shadow_review_active():
+		var showcase = level.get("showcase")
+		var weight: float = showcase.balanced_shadow_weight() if showcase != null else 0.
+		blur = lerpf(REVIEW_SHADOW_BLUR, BALANCED_SHADOW_BLUR, weight)
+	if not is_equal_approx(sun.shadow_blur, blur):
+		sun.shadow_blur = blur
 
 func set_stage(value: int) -> void:
 	stage=clampi(value,0,2)
