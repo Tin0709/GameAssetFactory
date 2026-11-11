@@ -5,6 +5,7 @@ shader_type spatial;
 render_mode cull_disabled, diffuse_burley, specular_schlick_ggx;
 #include "res://materials/world_map_clouds.gdshaderinc"
 #include "res://materials/world_map_player_transport.gdshaderinc"
+#include "res://materials/world_map_spruce_sky.gdshaderinc"
 #ifdef GAF_PLAYER_SKY
 #include "res://materials/world_map_actor_sky.gdshaderinc"
 #endif
@@ -29,10 +30,14 @@ uniform bool recovered_self_light = false;
 uniform vec3 roughness_transform = vec3(1.0,0.0,1.0);
 uniform float self_light_scale = 0.0;
 varying vec3 actor_world;
+varying float actor_canopy_sky;
 #ifdef GAF_PLAYER_DIRECT
 #include "res://materials/world_map_player_light.gdshaderinc"
 #endif
-void vertex(){actor_world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;}
+void vertex(){
+	actor_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	actor_canopy_sky = gaf_spruce_sky(actor_world, INV_VIEW_MATRIX[3].xyz);
+}
 void fragment(){
 	vec4 base=texture(atlas,UV);
 	ALBEDO=albedo_tint.rgb*base.rgb;
@@ -71,14 +76,16 @@ void fragment(){
 		visible_sky=AO;
 #endif
 		if(player_local_light){
-			EMISSION+=ALBEDO*(1.-METALLIC)*player_cube_light(wn,height,cloud)*visible_sky;
+			EMISSION+=ALBEDO*(1.-METALLIC)*player_cube_light(wn,height,cloud,actor_canopy_sky)*visible_sky;
 			AO=0.; // Replace engine diffuse sky instead of stacking two ambient terms.
 			AO_LIGHT_AFFECT=0.;
 		}
 		if(player_rough_reflection){
 			vec3 reflected=reflect(-wv,wn);
-			vec3 radiance=player_cube_light(reflected,height,cloud);
-			vec3 average=(player_axis_light(0,height,cloud)+player_axis_light(1,height,cloud)+player_axis_light(2,height,cloud)+player_axis_light(3,height,cloud)+player_axis_light(4,height,cloud)+player_axis_light(5,height,cloud))/6.;
+			vec3 radiance=player_cube_light(reflected,height,cloud,actor_canopy_sky);
+			vec3 average=(player_axis_light(0,height,cloud,actor_canopy_sky)+player_axis_light(1,height,cloud,actor_canopy_sky)
+				+player_axis_light(2,height,cloud,actor_canopy_sky)+player_axis_light(3,height,cloud,actor_canopy_sky)
+				+player_axis_light(4,height,cloud,actor_canopy_sky)+player_axis_light(5,height,cloud,actor_canopy_sky))/6.;
 			radiance=mix(radiance,average,ROUGHNESS*ROUGHNESS);
 			vec3 f0=mix(vec3(.16*native_specular*native_specular),ALBEDO,METALLIC);
 			EMISSION+=radiance*f0*visible_sky;

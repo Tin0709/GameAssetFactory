@@ -7,12 +7,14 @@ render_mode cull_disabled, diffuse_burley, specular_disabled;
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_wind.gdshaderinc"
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
+#include "res://materials/world_map_spruce_sky.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/grass_normal_v001/world_normal.gdshaderinc"
 uniform sampler2D study_ground_sky : filter_nearest, repeat_disable;
 uniform vec2 study_ground_sky_origin;
 uniform vec3 study_ground_sky_scale = vec3(1.0);
 uniform float study_ground_sky_mix = 0.0;
 varying flat vec4 study_ground_sky_at_root;
+varying flat float study_canopy_sky_at_root;
 
 vec4 grass_ground_sky(vec2 world_position) {
 	ivec2 cell = ivec2(floor(world_position - study_ground_sky_origin));
@@ -57,6 +59,7 @@ void vertex(){
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 	// The patch origin stays in its own cell while the blades bend.
 	study_ground_sky_at_root = study_ground_sky_mix > 0.0 ? grass_ground_sky(MODEL_MATRIX[3].xz) : vec4(0.0);
+	study_canopy_sky_at_root = gaf_spruce_sky(MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz);
 #endif
 	// Full float custom attribute: normalized height, blade height, phase, response.
 	float u=CUSTOM0.x;
@@ -132,9 +135,9 @@ void fragment(){
 	BACKLIGHT=vec3(0.0);
 	float ground_mix = study_ground_sky_at_root.a * study_ground_sky_mix;
 	// Crossfade the ambient terms. AO_LIGHT_AFFECT keeps direct light separate.
-	AO = 1.0 - ground_mix;
+	AO = (1.0 - ground_mix) * study_canopy_sky_at_root;
 	AO_LIGHT_AFFECT = 0.0;
-	EMISSION = color * (1.0 - METALLIC) * study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix;
+	EMISSION = color * (1.0 - METALLIC) * study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix * study_canopy_sky_at_root;
 	study_tip_weight=smoothstep(0.26,0.85,height_fraction);
 	study_cloud=world_cloud_shade(foliage_world);
 #endif
