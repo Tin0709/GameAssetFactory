@@ -8,6 +8,10 @@ const SPRUCE_PLACEMENTS := [
 	Vector4(-22.5, 0.5, 2, 3), Vector4(-16.5, 7.5, 3, 0),
 	Vector4(-35.5, 15.5, 1, 2), Vector4(-26.0, 19.0, 4, 1),
 	Vector4(-40.5, 22.5, 2, 0),
+	# Extend the forest along both approaches while leaving the dirt path clear.
+	Vector4(-39.5, -4.5, 3, 2), Vector4(-26.5, -6.5, 4, 3),
+	Vector4(-13.5, 0.5, 0, 1), Vector4(-15.5, 16.5, 1, 3),
+	Vector4(-31.5, 27.5, 2, 1),
 ]
 const LEAF_PROOF := "godot_lab/leaf_vertex_material_v001/profile.private.json"
 const LEAF_PROOF_SHA := "b4f10be37bfc16bab2b8c06a669619dafe5b9c5942b157421c4fe1cb30f56444"
