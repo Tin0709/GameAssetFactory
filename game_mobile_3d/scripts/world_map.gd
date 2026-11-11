@@ -2,6 +2,10 @@ extends Node3D
 ## Authored schematic layout; visual optimization never changes the source cells.
 const DATA := "res://assets/maps/world_map/runtime.json"
 const CAMERA_OFFSET := Vector3(12,15,16)
+const CAMERA_SIZE_DEFAULT := 14.5
+const CAMERA_SIZE_MIN := 6.0
+const CAMERA_SIZE_MAX := 42.0
+const CAMERA_ZOOM_STEP := 1.15
 # Extend the orthographic depth range past the view origin for foreground cliffs.
 const GAMEPLAY_CAMERA_NEAR := -8.0
 const GROVE_REVIEW := preload("res://scripts/world_map_grove.gd")
@@ -26,6 +30,8 @@ var player_light:Node
 var vegetation_visible:=true
 var showcase: Node
 var _camera_ground_y := NAN
+var _camera_size_target := CAMERA_SIZE_DEFAULT
+var _camera_zooming := false
 var _extended_camera_depth := true
 @onready var _original_camera_near: float = $Camera3D.near
 @onready var player: CharacterBody3D = $Actors/Player
@@ -227,6 +233,11 @@ func _process(delta: float) -> void:
 		_camera_ground_y=lerpf(_camera_ground_y,player.global_position.y,1.0-exp(-delta/.16))
 	if view_mode=="gameplay":
 		var camera: Camera3D = $Camera3D
+		if _camera_zooming:
+			camera.size = lerpf(camera.size, _camera_size_target, 1.0 - exp(-delta / 0.08))
+			if absf(camera.size - _camera_size_target) < 0.002:
+				camera.size = _camera_size_target
+				_camera_zooming = false
 		var focus: Vector3 = presentation.player_position()
 		_update_camera_near(camera)
 		camera.position=Vector3(focus.x,_camera_ground_y,focus.z)+CAMERA_OFFSET
@@ -240,7 +251,8 @@ func set_review_view(mode: String) -> void:
 	view_mode=mode
 	var camera: Camera3D=$Camera3D
 	if mode=="gameplay":
-		camera.size=14.5;camera.far=72.0
+		camera.size=_camera_size_target;camera.far=72.0
+		_camera_zooming = false
 		camera.rotation_degrees=Vector3(-36.315886,36.869898,0)
 		camera.position=Vector3(player.global_position.x,_camera_ground_y,player.global_position.z)+CAMERA_OFFSET
 	else:
@@ -307,6 +319,15 @@ func set_reference_look(enabled: bool) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not map_ready:return
+	if view_mode == "gameplay" and event is InputEventMouseButton and event.pressed:
+		var wheel_up := event.button_index == MOUSE_BUTTON_WHEEL_UP
+		if wheel_up or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			var steps: float = event.factor if event.factor > 0.0 else 1.0
+			_camera_size_target = clampf(_camera_size_target * pow(CAMERA_ZOOM_STEP, -steps if wheel_up else steps),
+				CAMERA_SIZE_MIN, CAMERA_SIZE_MAX)
+			_camera_zooming = true
+			get_viewport().set_input_as_handled()
+			return
 	if event.is_action_pressed("reset_test"):reset_player()
 	if event is InputEventKey and event.pressed and not event.echo:
 		if showcase.handle_key(event):
