@@ -1,8 +1,8 @@
 extends Node
 ## Original diffuse sky visibility field derived from the fixed private grove.
 
-const PROOF := "godot_lab/world_map_unified_showcase_v001/forest_canopy_sky_v001/field.private.json"
-const PROOF_SHA := "86157755d29c57620e6ce0e4168463d4a5752ac0adb8486eb33dabac4ddced65"
+const PROOF := "godot_lab/world_map_unified_showcase_v001/forest_spruce_layout_v002/field.private.json"
+const PROOF_SHA := "155d6221f111ab2479aba2dae86841cf33055f5adf351789b61781eab2959d14"
 const PHASE := preload("res://scripts/world_map_phase_finish.gd")
 static var _owner: WeakRef
 
