@@ -49,6 +49,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sun": ["Direct sunlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
+	&"player_sky": ["Player sky fill", 2.],
 	&"shadow": ["Shadow strength", 1.],
 	&"lantern": ["Hip lantern", 2.],
 	&"fog": ["Fog density", 2.],
@@ -58,7 +59,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 3
+const LIGHTING_MIX_VERSION := 4
 var _lighting_mix: Dictionary = {}
 var _lighting_sliders: Dictionary = {}
 var _vignette:ColorRect
@@ -515,6 +516,11 @@ func bounded_exposure_strength() -> float:
 func reference_finish_mix_scale() -> float:
 	return _lighting_scale(&"grade")
 
+func player_sky_fill_mix_scale() -> float:
+	if forest_spatial_sky_context():
+		return lerpf(1., _lighting_scale(&"player_sky"), PHASE_FINISH.phase_weight(hour))
+	return 1.
+
 func _apply_bounded_exposure_mix() -> void:
 	if phase_finish != null and phase_finish.active:
 		return
@@ -555,11 +561,12 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
-		var from_older_recipe: bool = (version == 1 and effect == &"grade") or (version < 3 and effect == &"sky_chroma")
+		var from_older_recipe: bool = (version == 1 and effect == &"grade") \
+			or (version < 3 and effect == &"sky_chroma") or (version < 4 and effect == &"player_sky")
 		var missing_value := 1. if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
@@ -824,6 +831,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Blend the captured-reference finish with the original palette and tone curve. Local exposure stays active."
 		if effect == &"sky_chroma":
 			slider.tooltip_text = "Reduce the color of ambient sky light at fixed luminance. Noon uses its approved sky color."
+		if effect == &"player_sky":
+			slider.tooltip_text = "Scale sky fill on the player outside noon. Terrain, direct lights, and the fog keep their own settings."
 		slider.focus_mode = Control.FOCUS_NONE
 		slider.max_value = spec[1]
 		slider.step = .01
