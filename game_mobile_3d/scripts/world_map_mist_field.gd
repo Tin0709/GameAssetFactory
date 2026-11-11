@@ -70,7 +70,7 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	return true
 func _render_callback(kind:int,data:RenderData)->void:
 	if kind!=effect_callback_type:return
-	_mutex.lock();var parameters:=_parameters;var path_parameters:=_path_parameters;var size:=_size;var noise:=_noise;var light:=_light;var error:String=_state.error;_mutex.unlock()
+	_mutex.lock();var parameters:=_parameters.duplicate();var path_parameters:=_path_parameters;var size:=_size;var noise:=_noise;var light:=_light;var error:String=_state.error;_mutex.unlock()
 	if parameters.size()!=224 or size.x<=0 or not error.is_empty():return
 	var rd:=RenderingServer.get_rendering_device();var buffers:=data.get_render_scene_buffers() as RenderSceneBuffersRD
 	if rd==null or buffers==null or buffers.get_view_count()!=1:return
