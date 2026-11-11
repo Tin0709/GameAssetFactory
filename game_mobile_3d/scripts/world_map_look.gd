@@ -155,6 +155,7 @@ func setup(map: Node3D) -> void:
 		# Bound all wind/player deformation so chunk culling cannot trim tips.
 		batch.extra_cull_margin=.65 if kind=="tall_grass" else .3
 	configure_path_materials()
+	refresh_vegetation_ground_detail()
 	for node: Node in level.player.visual.find_children("*","MeshInstance3D",true,false):
 		for index in node.mesh.get_surface_count():
 			var native: Material=node.get_active_material(index)
