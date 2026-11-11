@@ -67,7 +67,7 @@ const LIGHTING_MIX_VERSION := 7
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
 const MOON_TINT := Color("#b6cdf5")
 var moonlight_enabled := true
-var night_reference_atmosphere := false
+var night_reference_atmosphere := true
 var _night_reference_toggle: CheckButton
 const BALANCED_ATMOSPHERE := {
 	&"sky_chroma": .65,
@@ -334,7 +334,7 @@ static func moonlight_weight(time:float)->float:
 	return 1.-smoothstep(3.5,4.5,h) if h<12. else smoothstep(19.5,21.,h)
 
 func reference_hour() -> float:
-	if not night_reference_atmosphere:
+	if not night_reference_atmosphere or phase_air.anchors.is_empty() or not sky_response.available():
 		return hour
 	var midnight := 24. if hour > 12. else 0.
 	return fposmod(lerpf(hour, midnight, moonlight_weight(hour)), 24.)
