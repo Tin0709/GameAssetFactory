@@ -2,10 +2,10 @@ shader_type spatial;
 #include "res://materials/world_map_wind.gdshaderinc"
 #ifdef GAF_SHARED_MIST
 #include "res://materials/world_map_mist.gdshaderinc"
-uniform float grove_mist_strength = 0.0;
 #endif
 
 uniform bool reveal_player = false;
+uniform float grove_mist_strength = 0.0;
 uniform bool crown_wind_enabled = false;
 uniform float crown_wind_amplitude = 0.020;
 uniform vec3 player_view;
