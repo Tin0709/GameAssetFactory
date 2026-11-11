@@ -208,7 +208,9 @@ func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:
 	var arrays := source.surface_get_arrays(0)
 	# These source atlases put foliage on the left and bark on the right.
 	# Both regions share the U = 0.5 edge, so classify whole triangles.
-	if arrays[Mesh.ARRAY_COLOR] != null or arrays[Mesh.ARRAY_TEX_UV] == null or arrays[Mesh.ARRAY_INDEX] == null:
+	var format := source.surface_get_format(0)
+	var required := Mesh.ARRAY_FORMAT_TEX_UV | Mesh.ARRAY_FORMAT_INDEX
+	if (format & Mesh.ARRAY_FORMAT_COLOR) != 0 or (format & required) != required:
 		return
 	var uv: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
 	var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
