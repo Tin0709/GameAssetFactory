@@ -5,7 +5,9 @@ layout(rgba16f,set=0,binding=0) uniform writeonly image3D volume;
 layout(set=0,binding=1) uniform sampler2D noise_field;
 layout(set=0,binding=3) uniform sampler3D light_field;
 layout(std140,set=0,binding=2) uniform Parameters{
- vec4 origin;vec4 origin_dx;vec4 origin_dy;
+ vec4 origin;    // World ray origin; near entry distance in w.
+ vec4 origin_dx; // Horizontal origin delta; near extinction in w.
+ vec4 origin_dy; // Vertical origin delta; near reference height in w.
  vec4 ray;vec4 ray_dx;vec4 ray_dy;
  vec4 medium; // density, height falloff, base height, time
  vec4 scatter; // linear RGB, energy
@@ -31,6 +33,22 @@ float local_point_weight(vec3 offset,float radius,bool recovered){
  float remaining=recovered?max(0.,1.-dot(offset,offset)/(radius*radius)):max(0.,1.-length(offset)/radius);
  return remaining*remaining;
 }
+float near_optical(vec3 origin,vec3 ray,float ray_length,float start,float end){
+ float strength=p.origin_dx.w;
+ if(strength<=0.)return 0.;
+ float entry=p.origin.w/ray_length;
+ float exit=p.integration.x/ray_length;
+ float a=max(start,entry);
+ float b=min(end,exit);
+ if(b<=a)return 0.;
+ float h0=clamp(-(origin.y+ray.y*a-p.origin_dy.w)*p.medium.y,-16.,2.);
+ float h1=clamp(-(origin.y+ray.y*b-p.origin_dy.w)*p.medium.y,-16.,2.);
+ float height=abs(h1-h0)>.0001?(exp(h1)-exp(h0))/(h1-h0):exp(h0);
+ float fraction=((a+b)*.5-entry)/max(exit-entry,.0001);
+ // Leave the fitted near path intact and taper into the unchanged far bank.
+ float fade=1.-smoothstep(.4,1.,fraction);
+ return strength*height*fade*(b-a)*ray_length;
+}
 void main(){
  ivec3 size=imageSize(volume);ivec2 pixel=ivec2(gl_GlobalInvocationID.xy);
  if(any(greaterThanEqual(pixel,size.xy)))return;
@@ -42,6 +60,14 @@ void main(){
  imageStore(volume,ivec3(pixel,0),vec4(0.0,0.0,0.0,1.0));
  for(int i=1;i<32;i++){
   float d=pow(float(i)/31.0,2.0)*p.integration.y;
+  float nearby=near_optical(origin,ray,ray_length,previous,d);
+  if(nearby>0.){
+   float entry=p.origin.w/ray_length;
+   vec3 point=origin+ray*((max(previous,entry)+min(d,near_z))*.5);
+   float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
+   vec3 light=(p.scatter.rgb*p.scatter.w+p.warm.rgb*(warmth*.25))*scatter_visibility(point);
+   scattered+=exp(-optical)*(1.0-exp(-nearby))*light;optical+=nearby;
+  }
   float start=max(previous,near_z);
   if(d>start){
    vec3 a=origin+ray*start;vec3 b=origin+ray*d;vec3 point=(a+b)*0.5;
