@@ -66,6 +66,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"lantern_glow": ["Lantern glow", 2.],
 	&"fog": ["Fog density", 2.],
 	&"near_haze": ["Near haze density", 2.],
+	&"near_haze_depth": ["Near haze depth", 1.],
 	&"scatter": ["Fog brightness", 2.],
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
@@ -73,8 +74,9 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 12
+const LIGHTING_MIX_VERSION := 13
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
+const NEAR_HAZE_FADE_START := .86
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
 const MOON_TINT := Color("#b6cdf5")
 var moonlight_enabled := true
@@ -496,6 +498,9 @@ func _update_mist()->void:
 		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * PHASE_FINISH.phase_weight(hour) * near_scale
 		strength *= _lighting_scale(&"fog")
 		sample.near_layer = Vector3(NEAR_HAZE_ENTRY_M, strength, level.spawn_position.y + NEAR_HAZE_REFERENCE_HEIGHT_M)
+		var depth_mix := _lighting_scale(&"near_haze_depth")
+		if depth_mix > 0.:
+			sample.near_fade_start = lerpf(.4, NEAR_HAZE_FADE_START, depth_mix)
 	var emitter:Vector3=level.presentation.player_position()
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
@@ -793,7 +798,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -808,6 +813,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		if version < 12 and effect == &"daylight_balance":
 			missing_value = 0. # Keep saved looks as they were before this calibration.
+		if version < 13 and effect == &"near_haze_depth":
+			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -847,7 +854,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"bloom_spread", &"lantern_air"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"bloom_spread", &"lantern_air"]:
 		_update_mist()
 		return
 	if changed_effect == &"grass_sky":
@@ -1140,6 +1147,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Blend the existing grass ambient light with the terrain's baked sky fill at each root. The approved Noon is retained."
 		if effect == &"near_haze":
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
+		if effect == &"near_haze_depth":
+			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
 		if effect == &"shadow_softness":
 			slider.tooltip_text = "Adjust the F1 sunlight filter radius in the morning and afternoon. 100% uses the previous radius. Noon and night keep their existing filter."
 		if effect == &"sun_pockets":

@@ -16,7 +16,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 integration; // start distance, far view-depth, noise strength, recovered radial warm source
  vec4 light_origin; // world lattice origin, enabled
  vec4 light_step; // world lattice spacing, occlusion floor
- vec4 light_size;
+ vec4 light_size; // world lattice dimensions, near-layer fade start
 } p;
 float scatter_visibility(vec3 point){
  if(p.light_origin.w<.5)return 1.;
@@ -45,8 +45,8 @@ float near_optical(vec3 origin,vec3 ray,float ray_length,float start,float end){
  float h1=clamp(-(origin.y+ray.y*b-p.origin_dy.w)*p.medium.y,-16.,2.);
  float height=abs(h1-h0)>.0001?(exp(h1)-exp(h0))/(h1-h0):exp(h0);
  float fraction=((a+b)*.5-entry)/max(exit-entry,.0001);
- // Leave the fitted near path intact and taper into the unchanged far bank.
- float fade=1.-smoothstep(.4,1.,fraction);
+ // Preserve the entry fit and extend the middle of the layer before the far bank.
+ float fade=1.-smoothstep(clamp(p.light_size.w,.4,.95),1.,fraction);
  return strength*height*fade*(b-a)*ray_length;
 }
 void main(){

@@ -92,10 +92,12 @@ func _process(_delta:float)->void:
  var light:Dictionary=light_provider.call()if light_provider.is_valid()else {"valid":false}
  var light_rid:=RID()
  if light.get("texture")!=null:light_rid=light.texture.get_rid()
+ var near_fade_start := float(_profile.get("near_fade_start", 0.)) if near_layer.y > 0. else 0.
  if light.get("valid",false):
-  _append(light.origin,data,1.);_append(light.step,data,.2);_append(light.dimensions,data)
+  _append(light.origin,data,1.);_append(light.step,data,.2);_append(light.dimensions,data,near_fade_start)
  else:
-  for i in 3:_append(Vector3.ZERO,data)
+  for i in 2:_append(Vector3.ZERO,data)
+  _append(Vector3.ZERO,data,near_fade_start)
  effect.configure(data.to_byte_array(),size,noise.get_rid(),light_rid)
  var state:Dictionary=effect.snapshot()
  var ready:bool=state.ready and state.error.is_empty()
