@@ -74,7 +74,13 @@ func _process(_delta:float)->void:
  else:
   ray=tl-origin;ray_dx=tr-tl;ray_dy=bl-tl
  var data:=PackedFloat32Array()
- for v in [origin,dx,dy,ray,ray_dx,ray_dy]:_append(v,data)
+ var near_layer:Vector3=_profile.get("near_layer",Vector3.ZERO)
+ if not is_ortho or near_layer.y<=0. or near_layer.x<=0. or near_layer.x>=float(_profile.fog_begin):
+  near_layer=Vector3.ZERO
+ _append(origin,data,near_layer.x)
+ _append(dx,data,near_layer.y)
+ _append(dy,data,near_layer.z)
+ for v in [ray,ray_dx,ray_dy]:_append(v,data)
  data.append_array(PackedFloat32Array([_profile.volume_density,_profile.height_falloff,_base,_clock]))
  var rgb:Vector3=_profile.fog_color;var color:=Color(rgb.x,rgb.y,rgb.z).srgb_to_linear()
  var linear:Vector3=_profile.get("linear_scatter_rgb",Vector3(color.r,color.g,color.b))
@@ -98,6 +104,7 @@ func _process(_delta:float)->void:
   if _bound_generation!=int(state.rebuilds):
    RenderingServer.global_shader_parameter_set("gaf_mist_volume",effect.texture);_bound_generation=state.rebuilds
   RenderingServer.global_shader_parameter_set("gaf_mist_far",_camera.far)
+  RenderingServer.global_shader_parameter_set("gaf_mist_near_entry",near_layer.x)
   RenderingServer.global_shader_parameter_set("gaf_mist_camera_position",_camera.global_position)
   RenderingServer.global_shader_parameter_set("gaf_mist_camera_direction",-_camera.global_basis.z)
   var projection:=_camera.get_camera_projection()

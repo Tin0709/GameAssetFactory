@@ -99,6 +99,10 @@ gaf_mist_far={
 "type": "float",
 "value": 72.0
 }
+gaf_mist_near_entry={
+"type": "float",
+"value": 0.0
+}
 gaf_mist_volume={
 "type": "sampler3D",
 "value": ""

@@ -8,6 +8,11 @@ const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 # User-directed art adjustment; recovered Forest profiles stay untouched.
 const GENTLE_NOON_DIRECT_SCALE:=.82
+## Original WorldMap entry distance and reference height. Extinction is fitted
+## to three captured actor rays, normalized by their relative phase density.
+const NEAR_HAZE_ENTRY_M := 23.945624
+const NEAR_HAZE_EXTINCTION := 0.00468248024
+const NEAR_HAZE_REFERENCE_HEIGHT_M := 1.65
 var level:Node3D
 var private_primary:=true
 var unavailable_reason:=""
@@ -70,6 +75,7 @@ var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
 var mist:Node3D
 var spatial_mist:=true
+var near_haze_enabled := false
 var phase_air=preload("res://scripts/world_map_phase_air.gd").new()
 var measured_atmosphere:=true
 var coupled_bloom:=true
@@ -354,6 +360,10 @@ func _update_mist()->void:
 	_apply_mist_source(sample,measured,linear)
 	sample.scatter_energy *= _lighting_scale(&"scatter")
 	sample.player_light_weight *= _lighting_scale(&"lantern")
+	if near_haze_enabled and not measured.is_empty() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * PHASE_FINISH.phase_weight(hour)
+		strength *= _lighting_scale(&"fog")
+		sample.near_layer = Vector3(NEAR_HAZE_ENTRY_M, strength, level.spawn_position.y + NEAR_HAZE_REFERENCE_HEIGHT_M)
 	var emitter:Vector3=level.presentation.player_position()
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
@@ -744,6 +754,17 @@ func _build_ui()->void:
 	atmosphere.item_selected.connect(func(index:int):set_atmosphere_review(modes[index]))
 	atmosphere.tooltip_text="Forest A1 Day: read live in MD2. Other phases: recovered presets. Fog, bloom and light transfer are original Mobile approximations."
 	_build_lighting_mix(box)
+	var near_haze := CheckButton.new()
+	near_haze.name = "NearHazePreview"
+	near_haze.text = "Air · near haze (preview)"
+	near_haze.focus_mode = Control.FOCUS_NONE
+	near_haze.button_pressed = near_haze_enabled
+	near_haze.tooltip_text = "A light layer behind the player before the distant fog. Compare outside noon in Combined or Haze mode."
+	near_haze.toggled.connect(func(enabled: bool):
+		near_haze_enabled = enabled
+		_update_mist()
+	)
+	box.add_child(near_haze)
 	var gentle:=CheckButton.new();gentle.name="GentleNoon";gentle.text="Light · gentle midday sunlight";gentle.button_pressed=gentle_noon;gentle.focus_mode=Control.FOCUS_NONE;box.add_child(gentle)
 	gentle.tooltip_text="18% less direct sunlight at noon, smoothly returning to the previous morning/evening lighting. Ambient and source presets unchanged. OFF compares the previous result."
 	gentle.toggled.connect(set_gentle_noon)
