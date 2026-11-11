@@ -1108,7 +1108,8 @@ func twilight_color_weight() -> float:
 	return dawn + dusk
 
 func _publish_stone_twilight_color() -> void:
-	level.look.set_stone_twilight_color(twilight_color_weight() * _lighting_scale(&"stone_twilight_color"))
+	if level != null and level.look != null:
+		level.look.set_stone_twilight_color(twilight_color_weight() * _lighting_scale(&"stone_twilight_color"))
 
 func _sync_forest_night_lights() -> void:
 	if level == null:
