@@ -324,8 +324,9 @@ func set_moonlight_enabled(value:bool)->void:
 	_update_mist()
 
 static func moonlight_weight(time:float)->float:
+	if not is_finite(time):return 0.
 	var h:=fposmod(time,24.)
-	return 1.-smoothstep(4.5,5.5,h) if h<12. else smoothstep(19.5,21.,h)
+	return 1.-smoothstep(3.5,4.5,h) if h<12. else smoothstep(19.5,21.,h)
 
 func _apply_key_mix(sun:DirectionalLight3D)->void:
 	var weight:=moonlight_weight(hour) if moonlight_enabled else 0.
