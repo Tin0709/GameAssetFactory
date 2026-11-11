@@ -205,6 +205,7 @@ func setup(world:Node3D)->void:
 	level=world;process_priority=-10
 	if not private_primary:return
 	_point_kernel_owner=weakref(self)
+	RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
 	get_tree().node_added.connect(_track_point_light)
 	for light in get_tree().root.find_children("*","Light3D",true,false):_track_point_light(light)
 	if level.player.get("primary_ready")!=true and unavailable_reason.is_empty():
