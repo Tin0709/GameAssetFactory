@@ -473,7 +473,7 @@ func _prepare_meshes(tree: Node3D) -> void:
 			visual.extra_cull_margin = 0.20
 		var caster := _split_shadow(visual, appearance, _canopy_shadow if appearance == _canopy_appearance else null)
 		if source_oaks:
-		_bind_crown_wind(visual, caster)
+			_bind_crown_wind(visual, caster)
 		if source_oaks and _source_leaf_mesh != null and visual.mesh == _source_leaf_mesh:
 			visual.set_instance_shader_parameter("source_leaf_mask", true)
 
