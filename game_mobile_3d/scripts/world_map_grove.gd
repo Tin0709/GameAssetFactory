@@ -17,11 +17,7 @@ const LEAF_PROOF := "godot_lab/leaf_vertex_material_v001/profile.private.json"
 const LEAF_PROOF_SHA := "b4f10be37bfc16bab2b8c06a669619dafe5b9c5942b157421c4fe1cb30f56444"
 const LEAF_DRAW_CONSTANTS := "graphics_vfx/gpu_capture_20261029/terrain_foliage_reconstruction/bindings/event879_PIX_GENERIC_PIPELINE_STAGE_PS_r2.bin"
 const LEAF_DRAW_SHA := "5c4234fad3f6a08209897ef737b638a7e8086b5459b79d9cbecd86cafaa24966"
-const CROWN_WIND_PROFILE := "godot_lab/oak_raster_registration_v001/review_wind.private.json"
-const CROWN_WIND_PROFILE_SHA := "14a1cd2b17fdb74140ba56df8511a6a9466408ab61fc3dc70bbf0f279b4c0349"
-const CROWN_WIND_PATTERN := "oak_wind.private.rgba8"
-const CROWN_WIND_MAX_GAIN := .50
-const CROWN_WIND_CULL_MARGIN := .65
+const CrownWind := preload("res://scripts/world_map_crown_wind.gd")
 const CROWN_MASK_WIDTH := 512
 const OAKS := [
 	"res://assets/environment/forest_canopy_v3/tree_oak_a.glb",
@@ -208,46 +204,10 @@ func _load_source_tree(path: String) -> Node3D:
 
 func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:
 	var source := visual.mesh as ArrayMesh
-	if source == null or source.get_surface_count() != 1 or source.surface_get_primitive_type(0) != Mesh.PRIMITIVE_TRIANGLES:
-		return
-	var arrays := source.surface_get_arrays(0)
-	# These source atlases put foliage on the left and bark on the right.
-	# Both regions share the U = 0.5 edge, so classify whole triangles.
-	var format := source.surface_get_format(0)
-	var required := Mesh.ARRAY_FORMAT_TEX_UV | Mesh.ARRAY_FORMAT_INDEX
-	if (format & required) != required:
-		return
-	var uv: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
-	var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
-	if uv.is_empty() or indices.is_empty() or indices.size() % 3 != 0:
-		return
-	var weights := PackedByteArray()
-	weights.resize(uv.size())
-	const UNASSIGNED := 2
-	# GLTF's compressed UV can land one UNORM16 step from the atlas edge.
-	const LEFT_EDGE := 0.5 - 1.0 / 65535.0
-	const RIGHT_EDGE := 0.5 + 1.0 / 65535.0
-	weights.fill(UNASSIGNED)
-	for index in range(0, indices.size(), 3):
-		var u0 := uv[indices[index]].x
-		var u1 := uv[indices[index + 1]].x
-		var u2 := uv[indices[index + 2]].x
-		var low := minf(u0, minf(u1, u2))
-		var high := maxf(u0, maxf(u1, u2))
-		var has_leaf_uv := low < LEFT_EDGE
-		var has_bark_uv := high > RIGHT_EDGE
-		if has_leaf_uv == has_bark_uv:
-			return
-		var weight := int(has_leaf_uv)
-		for corner in 3:
-			var vertex := indices[index + corner]
-			if weights[vertex] != UNASSIGNED and weights[vertex] != weight:
-				return
-			weights[vertex] = weight
-	source.set_meta("source_crown_mask_base", _crown_mask_bytes.size())
-	for vertex in weights.size():
-		weights[vertex] = 255 if weights[vertex] == 1 else 0
-	_crown_mask_bytes.append_array(weights)
+	var weights := CrownWind.foliage_weights(source)
+	if not weights.is_empty():
+		source.set_meta("source_crown_mask_base", _crown_mask_bytes.size())
+		_crown_mask_bytes.append_array(weights)
 
 func _finish_source_crown_masks() -> void:
 	if _crown_mask_bytes.is_empty():
@@ -379,22 +339,10 @@ func _bind_source_atlas(material: ShaderMaterial) -> void:
 		material.set_shader_parameter("source_leaf_tint_mix", _source_leaf_mix)
 
 func _load_source_crown_wind(root: String) -> void:
-	var path := root.path_join(CROWN_WIND_PROFILE)
-	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != CROWN_WIND_PROFILE_SHA:
-		return
-	var profile: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
-	var pattern := path.get_base_dir().path_join(CROWN_WIND_PATTERN)
-	var bytes := FileAccess.get_file_as_bytes(pattern)
-	const SIZE := 512
-	if bytes.size() != SIZE * SIZE * 4:
-		return
-	var digest := HashingContext.new()
-	digest.start(HashingContext.HASH_SHA256)
-	digest.update(bytes)
-	if digest.finish().hex_encode() != profile.texture_sha256:
-		return
-	_source_crown_time = float(profile.time_offset)
-	_source_crown_pattern = ImageTexture.create_from_image(Image.create_from_data(SIZE, SIZE, false, Image.FORMAT_RGBA8, bytes))
+	var profile := CrownWind.load_pattern(root)
+	if not profile.is_empty():
+		_source_crown_pattern = profile.texture
+		_source_crown_time = profile.time_offset
 
 func source_crown_wind_available() -> bool:
 	return _source_crown_pattern != null
@@ -405,7 +353,7 @@ func _bind_crown_wind(visual: MeshInstance3D, caster: MeshInstance3D) -> void:
 		return
 	for mesh: MeshInstance3D in [visual, caster]:
 		mesh.set_instance_shader_parameter("source_crown_mask_base", base)
-		mesh.extra_cull_margin = maxf(mesh.extra_cull_margin, CROWN_WIND_CULL_MARGIN)
+		mesh.extra_cull_margin = maxf(mesh.extra_cull_margin, CrownWind.CULL_MARGIN)
 
 func _prepare_source_leaf_tint(root: String, asset_sha: String, asset: Node3D) -> void:
 	if RenderingServer.get_current_rendering_method() != "mobile" or RenderingServer.get_rendering_device() == null:
@@ -557,8 +505,7 @@ func publish_crown_wind(enabled: bool, wind_phase: float, breeze_phase: float, t
 	if source_oaks:
 		if not source_crown_wind_available():
 			return
-		# The two wind UVs complete whole periods every 20 seconds.
-		var state := Vector2(fposmod(time + _source_crown_time, 20.0), CROWN_WIND_MAX_GAIN * strength) if enabled and strength > 0. else Vector2.ZERO
+		var state := CrownWind.sample_state(time, _source_crown_time, strength if enabled else 0.0)
 		if state == _published_source_wind:
 			return
 		_published_source_wind = state
