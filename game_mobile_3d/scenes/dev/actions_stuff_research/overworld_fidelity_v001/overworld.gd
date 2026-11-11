@@ -49,10 +49,6 @@ func _ready()->void:
 func _process(delta:float)->void:
 	if not error_text.is_empty():return
 	super._process(delta)
-	if graphics_foundation != null and graphics_foundation.strict_match != null:
-		var trees: Node3D = graphics_foundation.strict_match.trees
-		if trees != null:
-			trees.update_crown_wind()
 	_status_clock+=delta
 	if _status_clock>.5 and meadow_status!=null:
 		_status_clock=0.
@@ -67,9 +63,7 @@ func _unhandled_input(event:InputEvent)->void:
 	if event is InputEventKey and event.pressed and not event.echo and event.alt_pressed and event.physical_keycode == KEY_N:
 		if graphics_foundation != null and graphics_foundation.strict_match != null:
 			var trees: Node3D = graphics_foundation.strict_match.trees
-			if trees != null:
-				trees.crown_wind_enabled = not trees.crown_wind_enabled
-				trees.update_crown_wind()
+			if trees != null and trees.toggle_crown_wind():
 				get_viewport().set_input_as_handled()
 				return
 	if graphics_foundation!=null and graphics_foundation.input(event):get_viewport().set_input_as_handled();return

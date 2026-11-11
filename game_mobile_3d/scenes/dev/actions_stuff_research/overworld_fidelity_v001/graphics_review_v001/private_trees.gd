@@ -59,6 +59,8 @@ func setup(lab:Node,rows:Array,hue:float=0.,backlight:Vector3=Vector3.ZERO)->voi
 		loaded+=1
 	for source:Node in cache.values():source.free()
 	_build_grass_patches(lab,rows)
+	set_process(not _crown_materials.is_empty())
+
 func _bind_crown_wind(visual: MeshInstance3D, material: ShaderMaterial) -> void:
 	var weights := CrownWind.foliage_weights(visual.mesh as ArrayMesh)
 	if weights.is_empty():
@@ -71,6 +73,16 @@ func _bind_crown_wind(visual: MeshInstance3D, material: ShaderMaterial) -> void:
 	material.set_shader_parameter("gaf_crown_pattern", _crown_profile.texture)
 	visual.extra_cull_margin = maxf(visual.extra_cull_margin, CrownWind.CULL_MARGIN)
 	_crown_materials.append(material)
+
+func _process(_delta: float) -> void:
+	update_crown_wind()
+
+func toggle_crown_wind() -> bool:
+	if _crown_materials.is_empty():
+		return false
+	crown_wind_enabled = not crown_wind_enabled
+	update_crown_wind()
+	return true
 
 func update_crown_wind() -> void:
 	if _crown_materials.is_empty():
