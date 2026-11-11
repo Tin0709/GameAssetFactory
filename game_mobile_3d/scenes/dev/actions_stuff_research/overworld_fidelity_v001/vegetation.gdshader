@@ -8,6 +8,20 @@ render_mode cull_disabled, diffuse_burley, specular_disabled;
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/grass_normal_v001/world_normal.gdshaderinc"
+uniform sampler2D study_ground_sky : filter_nearest, repeat_disable;
+uniform vec2 study_ground_sky_origin;
+uniform vec3 study_ground_sky_scale = vec3(1.0);
+uniform float study_ground_sky_mix = 0.0;
+varying flat vec4 study_ground_sky_at_root;
+
+vec4 grass_ground_sky(vec2 world_position) {
+	ivec2 cell = ivec2(floor(world_position - study_ground_sky_origin));
+	ivec2 extent = textureSize(study_ground_sky, 0);
+	if (any(lessThan(cell, ivec2(0))) || any(greaterThanEqual(cell, extent))) {
+		return vec4(0.0);
+	}
+	return texelFetch(study_ground_sky, cell, 0);
+}
 #endif
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;
 uniform sampler2D mre_map : filter_nearest, repeat_disable;
@@ -40,6 +54,10 @@ varying float height_fraction;
 varying vec3 root_color;
 varying vec3 wrapped_normal_world;
 void vertex(){
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+	// The patch origin stays in its own cell while the blades bend.
+	study_ground_sky_at_root = study_ground_sky_mix > 0.0 ? grass_ground_sky(MODEL_MATRIX[3].xz) : vec4(0.0);
+#endif
 	// Full float custom attribute: normalized height, blade height, phase, response.
 	float u=CUSTOM0.x;
 	float h=CUSTOM0.y;
@@ -112,6 +130,11 @@ void fragment(){
 	BACKLIGHT=color*0.18;
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 	BACKLIGHT=vec3(0.0);
+	float ground_mix = study_ground_sky_at_root.a * study_ground_sky_mix;
+	// Crossfade the ambient terms. AO_LIGHT_AFFECT keeps direct light separate.
+	AO = 1.0 - ground_mix;
+	AO_LIGHT_AFFECT = 0.0;
+	EMISSION = color * (1.0 - METALLIC) * study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix;
 	study_tip_weight=smoothstep(0.26,0.85,height_fraction);
 	study_cloud=world_cloud_shade(foliage_world);
 #endif

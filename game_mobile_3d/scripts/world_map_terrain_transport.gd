@@ -129,15 +129,24 @@ func refresh()->void:
 	if active!=_applied:
 		_applied=active;level.look._refresh_ground_bounce()
 	bind()
+
+func ambient_scale(env:Environment)->float:
+	return env.ambient_light_energy/float(cache.get_meta("ambient_energy"))
+
+func ambient_tint(env:Environment)->Vector3:
+	var original:Array=cache.get_meta("ambient_srgb")
+	var source:=Color(original[0],original[1],original[2]).srgb_to_linear()
+	var now:=env.ambient_light_color.srgb_to_linear()
+	return Vector3(now.r/source.r,now.g/source.g,now.b/source.b)
+
 func bind(force:bool=false)->void:
 	if not is_active():return
 	var sun:DirectionalLight3D=level.get_node("Sun");var c:=sun.light_color.srgb_to_linear();var key:=Vector3(c.r,c.g,c.b)*sun.light_energy
 	var direction:Array=cache.get_meta("sun_direction")
 	if not level.look._ground_bounce_requested or sun.global_basis.z.normalized().dot(Vector3(direction[0],direction[1],direction[2]))<cos(deg_to_rad(.1)):key=Vector3.ZERO
-	var scale:float=level.get_node("WorldEnvironment").environment.ambient_light_energy/float(cache.get_meta("ambient_energy"))
-	var original:Array=cache.get_meta("ambient_srgb");var source:=Color(original[0],original[1],original[2]).srgb_to_linear()
-	var now:Color=level.get_node("WorldEnvironment").environment.ambient_light_color.srgb_to_linear()
-	var tint:=Vector3(now.r/source.r,now.g/source.g,now.b/source.b)
+	var env:Environment=level.get_node("WorldEnvironment").environment
+	var scale:=ambient_scale(env)
+	var tint:=ambient_tint(env)
 	var response:bool=level.look.terrain_visibility_response
 	var dielectric:bool=level.look.terrain_dielectric_response and level.look.terrain_review=="combined"
 	if not force and key==_last_key and scale==_last_scale and tint==_last_tint and response==_last_response and dielectric==_last_dielectric:return

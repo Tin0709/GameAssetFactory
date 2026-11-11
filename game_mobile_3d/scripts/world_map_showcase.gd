@@ -50,6 +50,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
 	&"player_sky": ["Player sky fill", 2.],
+	&"grass_sky": ["Grass sky fill", 1.],
 	&"shadow": ["Shadow strength", 1.],
 	&"lantern": ["Hip lantern", 2.],
 	&"fog": ["Fog density", 2.],
@@ -61,7 +62,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 5
+const LIGHTING_MIX_VERSION := 6
 const BALANCED_ATMOSPHERE := {
 	&"sky_chroma": .65,
 	&"grade": .55,
@@ -533,7 +534,7 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
-	return 0. if effect == &"near_haze" else 1.
+	return 0. if effect in [&"near_haze", &"grass_sky"] else 1.
 
 func _lighting_scale(effect: StringName) -> float:
 	var default := _lighting_scale_default(effect)
@@ -573,6 +574,11 @@ func player_sky_fill_mix_scale() -> float:
 	if forest_spatial_sky_context():
 		return lerpf(1., _lighting_scale(&"player_sky"), PHASE_FINISH.phase_weight(hour))
 	return 1.
+
+func grass_sky_fill_mix_scale() -> float:
+	if forest_spatial_sky_context():
+		return _lighting_scale(&"grass_sky") * PHASE_FINISH.phase_weight(hour)
+	return 0.
 
 func _apply_bounded_exposure_mix() -> void:
 	if phase_finish != null and phase_finish.active:
@@ -615,13 +621,14 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
 		var from_older_recipe: bool = (version == 1 and effect == &"grade") \
 			or (version < 3 and effect == &"sky_chroma") or (version < 4 and effect == &"player_sky") \
-			or (version < 5 and effect in [&"near_haze", &"bloom_spread"])
+			or (version < 5 and effect in [&"near_haze", &"bloom_spread"]) \
+			or (version < 6 and effect == &"grass_sky")
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
@@ -651,6 +658,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"near_haze", &"bloom_spread"]:
 		_update_mist()
+		return
+	if changed_effect == &"grass_sky":
 		return
 	if changed_effect == &"player_sky":
 		if level.player_light != null:
@@ -914,6 +923,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Reduce the color of ambient sky light at fixed luminance. Noon uses its approved sky color."
 		if effect == &"player_sky":
 			slider.tooltip_text = "Scale sky fill on the player outside noon. Terrain, direct lights, and the fog keep their own settings."
+		if effect == &"grass_sky":
+			slider.tooltip_text = "Blend the existing grass ambient light with the terrain's baked sky fill at each root. The approved Noon is retained."
 		if effect == &"near_haze":
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
 		if effect == &"bloom_spread":

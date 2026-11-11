@@ -1,5 +1,6 @@
 extends RefCounted
 ## Captured parameter stays external; lighting response is independently authored.
+const GROUND_SKY_PATH = "res://assets/graphics/world_map_terrain_transport_v001/grass_sky.res"
 var world:Node3D
 var configured:=false
 var active:=false
@@ -7,6 +8,9 @@ var error:=""
 var weight:=0.
 var _records:Array[Dictionary]=[]
 var _variants:Dictionary={}
+var _ground_sky:Texture2D
+var _ground_sky_checked:=false
+var _ground_sky_state:=Vector4.INF
 
 func setup(level:Node3D,reader:RefCounted)->void:
 	world=level
@@ -36,6 +40,7 @@ func restore()->void:
 	for row:Dictionary in _records:
 		if preload("res://scripts/world_map_atmosphere_volume.gd").base_shader(row.material.shader)==row.variant:row.material.shader=row.original
 	_records.clear();active=false
+	_ground_sky_state=Vector4.INF
 
 func apply(materials:Array[ShaderMaterial],enabled:bool)->void:
 	restore()
@@ -67,6 +72,32 @@ func sync()->void:
 		m.set_shader_parameter("cloud_field",ground.get_shader_parameter("cloud_field"))
 		m.set_shader_parameter("cloud_shape",ground.get_shader_parameter("cloud_shape"))
 		m.set_shader_parameter("cloud_time",look.cloud_clock)
+	_sync_ground_sky()
+
+func _sync_ground_sky()->void:
+	var terrain=world.terrain_light
+	var blend:float=world.showcase.grass_sky_fill_mix_scale()
+	var state:=Vector4.ZERO
+	if blend>0. and terrain!=null and terrain.is_active():
+		if not _ground_sky_checked:
+			_ground_sky_checked=true
+			if ResourceLoader.exists(GROUND_SKY_PATH):
+				var field:=load(GROUND_SKY_PATH) as Texture2D
+				if field!=null and field.get_meta("origin",null) is Vector2 and field.get_meta("terrain_sha256","")==FileAccess.get_sha256(terrain.PATH):
+					_ground_sky=field
+		if _ground_sky!=null:
+			var env:Environment=world.get_node("WorldEnvironment").environment
+			var rgb:Vector3=terrain.ambient_tint(env)*terrain.ambient_scale(env)
+			state=Vector4(rgb.x,rgb.y,rgb.z,blend)
+	if state==_ground_sky_state:return
+	_ground_sky_state=state
+	for row:Dictionary in _records:
+		var material:ShaderMaterial=row.material
+		if state.w>0.:
+			material.set_shader_parameter("study_ground_sky",_ground_sky)
+			material.set_shader_parameter("study_ground_sky_origin",_ground_sky.get_meta("origin"))
+			material.set_shader_parameter("study_ground_sky_scale",Vector3(state.x,state.y,state.z))
+		material.set_shader_parameter("study_ground_sky_mix",state.w)
 
 func snapshot()->Dictionary:
 	return {"configured":configured,"active":active,"normal_weight":weight,"materials":_records.size(),"error":error,"normal_scope":"Captured Day grass world-normal consumer; other biome weights unverified","lighting_scope":"Original mobile transmission and alpha shadows, not native Lumen"}
