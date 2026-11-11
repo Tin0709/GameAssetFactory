@@ -49,6 +49,7 @@ var oak_crown_wind := true
 var segment_passage_height := true
 var terrain_materials: Array[Array]=[]
 var _night_path_chroma := 0.0
+var _stone_twilight_color := 0.0
 var plant_meshes: Array[Array]=[]
 var materials: Dictionary={}
 var baseline_environment: Environment
@@ -485,9 +486,18 @@ func set_night_path_chroma(strength: float) -> void:
 	if _night_path_chroma == strength:
 		return
 	_night_path_chroma = strength
+	_set_terrain_color(&"night_path_chroma", strength)
+
+func set_stone_twilight_color(strength: float) -> void:
+	if _stone_twilight_color == strength:
+		return
+	_stone_twilight_color = strength
+	_set_terrain_color(&"stone_twilight_color", strength)
+
+func _set_terrain_color(parameter: StringName, strength: float) -> void:
 	for item: Array in terrain_materials:
-		item[3].set_shader_parameter("night_path_chroma", strength)
-	level.geometry.update_night_path_chroma(strength)
+		item[3].set_shader_parameter(parameter, strength)
+	level.geometry.update_terrain_color(parameter, strength)
 
 func _refresh_cloud_look() -> void:
 	level.geometry.reset_cutaway_materials()

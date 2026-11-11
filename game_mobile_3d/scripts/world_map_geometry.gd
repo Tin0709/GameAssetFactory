@@ -568,7 +568,7 @@ func _make_cutaway_material(native: Material) -> ShaderMaterial:
 		material.set_shader_parameter("native_specular", native.metallic_specular)
 		material.set_shader_parameter("use_vertex_color", native.vertex_color_use_as_albedo)
 	elif native is ShaderMaterial:
-		for parameter: String in ["use_source_terrain", "source_terrain_tiles", "night_path_chroma"]:
+		for parameter: String in ["use_source_terrain", "source_terrain_tiles", "night_path_chroma", "stone_twilight_color"]:
 			var value: Variant = native.get_shader_parameter(parameter)
 			if value != null: material.set_shader_parameter(parameter, value)
 		for parameter:String in preload("res://scripts/world_map_terrain_material.gd").PARAMETERS+["terrain_key_radiance","terrain_ambient_scale","terrain_ambient_tint","terrain_colored_visibility"]:
@@ -580,10 +580,10 @@ func _make_cutaway_material(native: Material) -> ShaderMaterial:
 				material.set_shader_parameter(parameter, value)
 	return material
 
-func update_night_path_chroma(strength: float) -> void:
+func update_terrain_color(parameter: StringName, strength: float) -> void:
 	for item: Dictionary in _cutaway_chunks:
 		for material: ShaderMaterial in item.materials:
-			material.set_shader_parameter("night_path_chroma", strength)
+			material.set_shader_parameter(parameter, strength)
 
 func update_cloud_style(texture: Texture2D, shape: Vector4) -> void:
 	# Cached inactive cutaways can be reactivated later without rebuilding.

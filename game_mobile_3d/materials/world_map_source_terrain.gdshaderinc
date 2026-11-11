@@ -2,6 +2,15 @@
 uniform bool use_source_terrain = false;
 uniform sampler2DArray source_terrain_tiles : source_color, filter_linear_mipmap, repeat_enable;
 uniform float night_path_chroma = 0.0;
+uniform float stone_twilight_color = 0.0;
+
+vec3 grade_stone_twilight(vec3 albedo) {
+	if (ground_grade != 3 || stone_twilight_color <= 0.0) return albedo;
+	// The verified stone atlas tile is neutral. Retain the authored texel
+	// luminance and relief so the scene lights supply the cool/warm contrast.
+	float reflectance = dot(albedo, vec3(0.2126, 0.7152, 0.0722));
+	return mix(albedo, vec3(reflectance), stone_twilight_color);
+}
 
 vec3 grade_night_path(vec3 albedo, float top) {
 	if (night_path_chroma <= 0.0 || !path_blending || use_source_terrain || top <= 0.9 || (ground_grade != 1 && ground_grade != 2)) {
