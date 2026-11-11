@@ -60,8 +60,18 @@ const LIGHTING_MIX_CONTROLS := {
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
 const LIGHTING_MIX_VERSION := 4
+const BALANCED_ATMOSPHERE := {
+	&"sky_chroma": .65,
+	&"grade": .55,
+	&"exposure": .9,
+	&"player_sky": 1.25,
+}
 var _lighting_mix: Dictionary = {}
 var _lighting_sliders: Dictionary = {}
+var _balanced_preview := false
+var _balanced_toggle: CheckButton
+var _near_haze_toggle: CheckButton
+var _save_mix_button: Button
 var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
 static var _point_kernel_owner:WeakRef
@@ -376,7 +386,7 @@ func _update_mist()->void:
 	_apply_mist_source(sample,measured,linear)
 	sample.scatter_energy *= _lighting_scale(&"scatter")
 	sample.player_light_weight *= _lighting_scale(&"lantern")
-	if near_haze_enabled and not measured.is_empty() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+	if (near_haze_enabled or _balanced_preview) and not measured.is_empty() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
 		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * PHASE_FINISH.phase_weight(hour)
 		strength *= _lighting_scale(&"fog")
 		sample.near_layer = Vector3(NEAR_HAZE_ENTRY_M, strength, level.spawn_position.y + NEAR_HAZE_REFERENCE_HEIGHT_M)
@@ -503,11 +513,20 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale(effect: StringName) -> float:
+	if _balanced_preview:
+		return BALANCED_ATMOSPHERE.get(effect, 1.)
 	return _lighting_mix.get(effect, 1.)
+
+func set_balanced_atmosphere_preview(enabled: bool) -> void:
+	if _balanced_preview == enabled:
+		return
+	_balanced_preview = enabled
+	_refresh_lighting_mix()
 
 func local_exposure_mix_scale() -> float:
 	if forest_active() and atmosphere_review in ["haze", "combined"]:
-		return _lighting_scale(&"exposure")
+		var scale := _lighting_scale(&"exposure")
+		return lerpf(1., scale, PHASE_FINISH.phase_weight(hour)) if _balanced_preview else scale
 	return 1.
 
 func bounded_exposure_strength() -> float:
@@ -533,12 +552,13 @@ func set_lighting_scale(effect: StringName, value: float) -> void:
 	if not LIGHTING_MIX_CONTROLS.has(effect) or not is_finite(value):
 		return
 	var scale := clampf(value, 0., LIGHTING_MIX_CONTROLS[effect][1])
-	if scale == _lighting_scale(effect):
+	if scale == float(_lighting_mix.get(effect, 1.)):
 		return
 	_lighting_mix[effect] = scale
 	_refresh_lighting_mix(effect)
 
 func reset_lighting_mix() -> void:
+	_balanced_preview = false
 	_lighting_mix.clear()
 	_refresh_lighting_mix()
 
@@ -546,7 +566,7 @@ func save_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	var config := ConfigFile.new()
 	config.set_value("recipe", "version", LIGHTING_MIX_VERSION)
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
-		config.set_value("strengths", String(effect), _lighting_scale(effect))
+		config.set_value("strengths", String(effect), float(_lighting_mix.get(effect, 1.)))
 	var temporary_path := path + ".tmp"
 	var error := config.save(temporary_path)
 	if error == OK:
@@ -574,12 +594,21 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			return ERR_INVALID_DATA
 		restored[effect] = float(value)
 	_lighting_mix = restored
+	_balanced_preview = false
 	_refresh_lighting_mix()
 	return OK
 
 func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
+	if _balanced_toggle != null:
+		_balanced_toggle.set_pressed_no_signal(_balanced_preview)
+	if _near_haze_toggle != null:
+		_near_haze_toggle.set_pressed_no_signal(near_haze_enabled or _balanced_preview)
+		_near_haze_toggle.disabled = _balanced_preview
+	if _save_mix_button != null:
+		_save_mix_button.disabled = _balanced_preview
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
+		slider.editable = not _balanced_preview
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
@@ -786,6 +815,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 	var save := Button.new()
+	_save_mix_button = save
 	save.name = "LightingMixSave"
 	save.text = "Save mix"
 	save.tooltip_text = "Replace your saved slider settings on this device."
@@ -875,7 +905,16 @@ func _build_ui()->void:
 	atmosphere.item_selected.connect(func(index:int):set_atmosphere_review(modes[index]))
 	atmosphere.tooltip_text="Forest A1 Day: read live in MD2. Other phases: recovered presets. Fog, bloom and light transfer are original Mobile approximations."
 	_build_lighting_mix(box)
+	var balanced := CheckButton.new()
+	_balanced_toggle = balanced
+	balanced.name = "BalancedAtmospherePreview"
+	balanced.text = "Balanced atmosphere (preview)"
+	balanced.tooltip_text = "Compare a softer dawn, afternoon and night with near haze. Turn off to return to your own mix."
+	balanced.focus_mode = Control.FOCUS_NONE
+	balanced.toggled.connect(set_balanced_atmosphere_preview)
+	box.add_child(balanced)
 	var near_haze := CheckButton.new()
+	_near_haze_toggle = near_haze
 	near_haze.name = "NearHazePreview"
 	near_haze.text = "Air · near haze (preview)"
 	near_haze.focus_mode = Control.FOCUS_NONE
