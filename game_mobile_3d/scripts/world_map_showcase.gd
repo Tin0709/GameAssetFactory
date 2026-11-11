@@ -760,7 +760,7 @@ func grass_sky_fill_mix_scale() -> float:
 		return _lighting_scale(&"grass_sky") * PHASE_FINISH.phase_weight(hour)
 
 func _sync_oak_leaf_tint() -> void:
-	if level.grove == null:
+	if level == null or level.grove == null:
 		return
 	var strength := 0.
 	if forest_active() and atmosphere_review == "combined" and level.grove.visible:
