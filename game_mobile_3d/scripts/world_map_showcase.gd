@@ -715,7 +715,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"shadow_softness":
 		return DAYLIGHT_SHADOW_SOFTNESS
 	if effect == &"spruce_sky":
-		return 0.
+		return .5
 	return 1.
 
 func _lighting_scale(effect: StringName) -> float:
@@ -1187,6 +1187,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Scale sky fill on the player outside noon. Terrain, direct lights, and the fog keep their own settings."
 		if effect == &"grass_sky":
 			slider.tooltip_text = "Blend the existing grass ambient light with the terrain's baked sky fill at each root. The approved Noon is retained."
+		if effect == &"spruce_sky":
+			slider.tooltip_text = "Reduce sky fill under the private spruce on terrain, grass, and the player. Zero restores the prior fill. Noon fades to zero."
 		if effect == &"near_haze":
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
 		if effect == &"near_haze_depth":
