@@ -55,6 +55,8 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom": ["Bloom", 2.],
 	&"exposure": ["Local exposure", 1.],
 }
+const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
+const LIGHTING_MIX_VERSION := 1
 var _lighting_mix: Dictionary = {}
 var _lighting_sliders: Dictionary = {}
 var _vignette:ColorRect
@@ -521,6 +523,37 @@ func reset_lighting_mix() -> void:
 	_lighting_mix.clear()
 	_refresh_lighting_mix()
 
+func save_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
+	var config := ConfigFile.new()
+	config.set_value("recipe", "version", LIGHTING_MIX_VERSION)
+	for effect: StringName in LIGHTING_MIX_CONTROLS:
+		config.set_value("strengths", String(effect), _lighting_scale(effect))
+	var temporary_path := path + ".tmp"
+	var error := config.save(temporary_path)
+	if error == OK:
+		error = DirAccess.rename_absolute(temporary_path, path)
+	if error != OK and FileAccess.file_exists(temporary_path):
+		DirAccess.remove_absolute(temporary_path)
+	return error
+
+func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
+	var config := ConfigFile.new()
+	var error := config.load(path)
+	if error != OK:
+		return error
+	if config.get_value("recipe", "version", 0) != LIGHTING_MIX_VERSION:
+		return ERR_FILE_UNRECOGNIZED
+	var restored := {}
+	for effect: StringName in LIGHTING_MIX_CONTROLS:
+		var value: Variant = config.get_value("strengths", String(effect), -1.)
+		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
+		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
+			return ERR_INVALID_DATA
+		restored[effect] = float(value)
+	_lighting_mix = restored
+	_refresh_lighting_mix()
+	return OK
+
 func _refresh_lighting_mix(exposure_only := false) -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
@@ -724,11 +757,39 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 	title.text = "Lighting mix"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
+	var save := Button.new()
+	save.name = "LightingMixSave"
+	save.text = "Save mix"
+	save.tooltip_text = "Replace your saved slider settings on this device."
+	save.focus_mode = Control.FOCUS_NONE
+	header.add_child(save)
+	var load_button := Button.new()
+	load_button.name = "LightingMixLoad"
+	load_button.text = "Load mix"
+	load_button.tooltip_text = "Apply your saved slider settings to the current time preset."
+	load_button.focus_mode = Control.FOCUS_NONE
+	header.add_child(load_button)
 	var reset := Button.new()
 	reset.text = "Reset mix"
 	reset.focus_mode = Control.FOCUS_NONE
 	reset.pressed.connect(reset_lighting_mix)
 	header.add_child(reset)
+	var message := Label.new()
+	message.hide()
+	box.add_child(message)
+	save.pressed.connect(func():
+		var error := save_lighting_mix()
+		message.text = "Mix saved on this device." if error == OK else "Could not save mix: " + error_string(error)
+		message.show())
+	load_button.pressed.connect(func():
+		var error := load_lighting_mix()
+		if error == OK:
+			message.text = "Saved mix applied."
+		elif error == ERR_FILE_NOT_FOUND:
+			message.text = "No saved mix. Use Save mix first."
+		else:
+			message.text = "Could not load mix: " + error_string(error)
+		message.show())
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
 		var spec: Array = LIGHTING_MIX_CONTROLS[effect]
 		var row := HBoxContainer.new()
