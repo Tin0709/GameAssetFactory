@@ -354,8 +354,11 @@ func _apply_key_mix(sun:DirectionalLight3D)->void:
 		var noon:=palette.sample(12.)
 		var rotation:=noon_rotation+Vector3(midnight.pitch-noon.pitch,midnight.yaw-noon.yaw,0.)*(PI/180.)
 		direction=Basis.from_euler(rotation,sun.rotation_order).z
-	direction=sun.basis.z.normalized().slerp(direction,weight).normalized()
-	sun.rotation=Basis.looking_at(-direction,Vector3.UP).get_euler(sun.rotation_order)
+	# Move the shadow direction only after most of the sunlight has faded.
+	var direction_mix:=smoothstep(.65,1.,weight)
+	if direction_mix>0.:
+		direction=sun.basis.z.normalized().slerp(direction,direction_mix).normalized()
+		sun.rotation=Basis.looking_at(-direction,Vector3.UP).get_euler(sun.rotation_order)
 
 func set_source_bloom_shape(value:bool)->void:
 	source_bloom_shape=value;set_coupled_bloom(coupled_bloom)
