@@ -26,6 +26,11 @@ vec3 source_terrain_color(vec3 world, vec3 normal) {
 	float layer = ground_grade == 3 ? 4.0 : (normal.y > 0.9 ? 3.0 : 2.0);
 	if (ground_grade == 1) {
 		layer = normal.y > 0.9 ? 0.0 : (horizontal ? 2.0 : 1.0);
+		if (!horizontal) {
+			// Avoid filtering the bottom earth row into the grass edge above.
+			vec2 bounded = vec2(uv.x, clamp(fract(uv.y), 0.03125, 0.96875));
+			return textureGrad(source_terrain_tiles, vec3(bounded, layer), dFdx(uv), dFdy(uv)).rgb;
+		}
 	}
 	return source_terrain_sample(uv, layer);
 }

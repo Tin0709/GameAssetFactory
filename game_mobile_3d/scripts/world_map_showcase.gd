@@ -650,11 +650,17 @@ func set_grove_mist(enabled: bool) -> void:
 		_grove_mist_toggle.set_pressed_no_signal(enabled)
 
 func set_source_terrain(enabled: bool) -> bool:
+	if not private_primary:
+		return false
 	if enabled and _source_terrain_tiles == null:
 		_source_terrain_tiles = preload("res://scripts/world_map_source_terrain.gd").load_tiles()
-	enabled = enabled and _source_terrain_tiles != null and private_primary
+	enabled = enabled and _source_terrain_tiles != null
+	var bound: Dictionary[ShaderMaterial, bool] = {}
 	for item: Array in level.look.terrain_materials:
 		var material: ShaderMaterial = item[3]
+		if bound.has(material):
+			continue
+		bound[material] = true
 		material.set_shader_parameter("use_source_terrain", enabled)
 		material.set_shader_parameter("source_terrain_tiles", _source_terrain_tiles if enabled else null)
 	level.geometry.reset_cutaway_materials()
