@@ -758,6 +758,7 @@ func player_sky_fill_mix_scale() -> float:
 func grass_sky_fill_mix_scale() -> float:
 	if forest_spatial_sky_context():
 		return _lighting_scale(&"grass_sky") * PHASE_FINISH.phase_weight(hour)
+	return 0.
 
 func _sync_oak_leaf_tint() -> void:
 	if level == null or level.grove == null:
@@ -766,7 +767,6 @@ func _sync_oak_leaf_tint() -> void:
 	if forest_active() and atmosphere_review == "combined" and level.grove.visible:
 		strength = _lighting_scale(&"oak_leaf_tint") * PHASE_FINISH.phase_weight(hour)
 	level.grove.set_source_leaf_tint(strength)
-	return 0.
 
 func _apply_bounded_exposure_mix() -> void:
 	if phase_finish != null and phase_finish.active:
