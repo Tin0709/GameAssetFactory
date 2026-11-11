@@ -1009,37 +1009,52 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 	title.text = "Lighting mix"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
+	var preset := OptionButton.new()
+	preset.name = "LightingMixPreset"
+	preset.focus_mode = Control.FOCUS_NONE
+	preset.tooltip_text = "Choose which local preset to save or load."
+	for slot in range(1, 5):
+		preset.add_item("Preset %d" % slot, slot)
+	preset.select(0)
+	header.add_child(preset)
+	var preset_path := func() -> String:
+		var slot := preset.get_selected_id()
+		return LIGHTING_MIX_PATH if slot == 1 else "user://world_map_lighting_mix_%d.cfg" % slot
+	var actions := HBoxContainer.new()
+	box.add_child(actions)
 	var save := Button.new()
 	_save_mix_button = save
 	save.name = "LightingMixSave"
 	save.text = "Save mix"
-	save.tooltip_text = "Replace your saved slider settings on this device."
+	save.tooltip_text = "Save your current slider values to the selected preset."
 	save.focus_mode = Control.FOCUS_NONE
-	header.add_child(save)
+	actions.add_child(save)
 	var load_button := Button.new()
 	load_button.name = "LightingMixLoad"
 	load_button.text = "Load mix"
-	load_button.tooltip_text = "Apply your saved slider settings to the current time preset."
+	load_button.tooltip_text = "Apply the selected preset's slider values to the current time."
 	load_button.focus_mode = Control.FOCUS_NONE
-	header.add_child(load_button)
+	actions.add_child(load_button)
 	var reset := Button.new()
 	reset.text = "Reset mix"
+	reset.tooltip_text = "Reset the live slider values without changing saved presets."
 	reset.focus_mode = Control.FOCUS_NONE
 	reset.pressed.connect(reset_lighting_mix)
-	header.add_child(reset)
+	actions.add_child(reset)
 	var message := Label.new()
 	message.hide()
 	box.add_child(message)
+	preset.item_selected.connect(func(_index: int): message.hide())
 	save.pressed.connect(func():
-		var error := save_lighting_mix()
-		message.text = "Mix saved on this device." if error == OK else "Could not save mix: " + error_string(error)
+		var error := save_lighting_mix(preset_path.call())
+		message.text = "Preset %d saved on this device." % preset.get_selected_id() if error == OK else "Could not save mix: " + error_string(error)
 		message.show())
 	load_button.pressed.connect(func():
-		var error := load_lighting_mix()
+		var error := load_lighting_mix(preset_path.call())
 		if error == OK:
-			message.text = "Saved mix applied."
+			message.text = "Preset %d applied." % preset.get_selected_id()
 		elif error == ERR_FILE_NOT_FOUND:
-			message.text = "No saved mix. Use Save mix first."
+			message.text = "Preset %d is empty." % preset.get_selected_id()
 		else:
 			message.text = "Could not load mix: " + error_string(error)
 		message.show())
