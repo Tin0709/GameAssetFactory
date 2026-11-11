@@ -18,12 +18,18 @@ var _render_palette_generation:=-1
 var _last_baseline:=PackedByteArray()
 var _humid_weight := 0.
 var _humid_actor := Vector4.ZERO
+var _twilight_shadow_weight := 0.
 
 func set_humid_light(weight: float, actor: Vector4 = Vector4.ZERO) -> void:
  var amount := clampf(weight, 0., 1.) if is_finite(weight) and actor.is_finite() else 0.
  _guard.lock()
  _humid_weight = amount
  _humid_actor = actor if amount > 0. else Vector4.ZERO
+ _guard.unlock()
+
+func set_twilight_shadow_color(weight: float) -> void:
+ _guard.lock()
+ _twilight_shadow_weight = clampf(weight, 0., 1.) if is_finite(weight) else 0.
  _guard.unlock()
 
 func configure_finish(value:bool,env:Environment=null,weight:float=0.)->bool:
@@ -40,7 +46,7 @@ func configure_finish(value:bool,env:Environment=null,weight:float=0.)->bool:
     if image.is_compressed()or image.get_format()not in [Image.FORMAT_RGB8,Image.FORMAT_RGBA8]:return false
     image.convert(Image.FORMAT_RGBA8)
    _baseline_texture=texture
-  var data:=PackedFloat32Array([env.tonemap_exposure,env.tonemap_white,env.adjustment_brightness,env.adjustment_contrast,env.adjustment_saturation,1. if env.adjustment_enabled else 0.,clampf(weight,0.,1.),0.,0.,0.,0.,0.]).to_byte_array()
+  var data:=PackedFloat32Array([env.tonemap_exposure,env.tonemap_white,env.adjustment_brightness,env.adjustment_contrast,env.adjustment_saturation,1. if env.adjustment_enabled else 0.,clampf(weight,0.,1.),0.,0.,0.,0.,0.,0.,0.,0.,0.]).to_byte_array()
   _guard.lock();_baseline=data;_baseline_slices=slices;_finish_wanted=true
   if changed:_palette_generation+=1
   _guard.unlock()
@@ -65,6 +71,7 @@ func _render_callback(kind:int,data:RenderData)->void:
  var edge := _edge_requested and wanted and _reference_enabled and _reference_requested and not _reference_blocked
  var humid_weight := _humid_weight if wanted and _parameters.decode_float(16) > 0. else 0.
  var humid_actor := _humid_actor if humid_weight > 0. else Vector4.ZERO
+ var twilight_shadow_weight := _twilight_shadow_weight if wanted and _reference_enabled else 0.
  _guard.unlock()
  if not baseline.is_empty():
   baseline.encode_float(28, humid_weight)
@@ -72,6 +79,7 @@ func _render_callback(kind:int,data:RenderData)->void:
   baseline.encode_float(36, humid_actor.y)
   baseline.encode_float(40, humid_actor.z)
   baseline.encode_float(44, humid_actor.w)
+  baseline.encode_float(48, twilight_shadow_weight)
  if wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
  if _baseline_buffer.is_valid()and baseline!=_last_baseline:
@@ -79,13 +87,15 @@ func _render_callback(kind:int,data:RenderData)->void:
    _last_baseline = baseline
  super(kind,data)
  _report("humid_light_weight", _last_baseline.decode_float(28) if _baseline_buffer.is_valid() and failure().is_empty() else 0.)
+ _report("twilight_shadow_weight", _last_baseline.decode_float(48) if _baseline_buffer.is_valid() and failure().is_empty() else 0.)
 func _release(rd:RenderingDevice)->void:
  _baseline_buffer=RID();_last_baseline=PackedByteArray();_report("finish_ready",false);_report("finish_bytes",0);_report("edge_active",false);_report("edge_bytes",0);_report("edge_size",[0,0])
+ _report("twilight_shadow_weight",0.)
  super(rd)
 func _finish_fragment(fragment:String,rd:RenderingDevice,uniforms:Array[RDUniform])->String:
  if not _render_finish or not fragment.contains("inverse_display(clamp(display,0.,1.))"):return fragment
  _guard.lock();var slices:=_baseline_slices.duplicate();var baseline:=_baseline.duplicate();_guard.unlock()
- if slices.size()!=32 or baseline.size()!=48:return fragment
+ if slices.size()!=32 or baseline.size()!=64:return fragment
  var format:=RDTextureFormat.new();format.texture_type=RenderingDevice.TEXTURE_TYPE_3D;format.width=32;format.height=32;format.depth=32;format.format=RenderingDevice.DATA_FORMAT_R8G8B8A8_SRGB;format.usage_bits=RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT
  if not rd.texture_is_format_supported_for_usage(format.format,format.usage_bits):
   _report("error","Owned finish requires sampled 3D sRGB texture support");return fragment
@@ -118,11 +128,24 @@ vec3 gaf_finish(vec3 c){
  if(base[1].y>.5){c=gaf_display(c*base[0].z);c=mix(vec3(.5),c,base[0].w);c=mix(vec3(dot(c,vec3(1./3.))),c,base[1].x);c=textureLod(gaf_palette,clamp(c,0.,1.),0.).rgb;}
  return c;
 }
+vec3 recover_twilight_shadow_color(vec3 graded, vec3 original) {
+ float y = dot(graded, luma);
+ float blue = max(graded.b - graded.g, 0.);
+ if (base[3].x <= 0. || blue <= 0. || y <= .004 || y >= .17) return graded;
+ float lost_red = original.r / max(original.g, .001) - graded.r / max(graded.g, .001);
+ float mask = smoothstep(.14,.64,blue / max(y,.008)) * smoothstep(.12,.44,lost_red);
+ mask *= smoothstep(.004,.017,y) * (1. - smoothstep(.075,.17,y));
+ // Restore part of the red chroma from the original finish at fixed luminance.
+ // Keep green and enough blue to retain the cool shadow hue.
+ float missing = max(original.r * y / max(dot(original,luma),.00001) - graded.r, 0.);
+ float shift = min(missing, .85 * blue * luma.b / luma.r) * mask * base[3].x;
+ return graded + vec3(shift, 0., -shift * luma.r / luma.b);
+}
 """
  fragment=fragment.replace("void main() {",helpers+"void main() {")
  fragment=fragment.replace("adjusted += spread * air.x;","if (base[1].w > 0.) adjusted = diffuse_humid_light(adjusted, spread, uv_air);\n\t\tadjusted += spread * air.x;")
  fragment=fragment.replace("if (settings.x <= 0.0)","if (settings.x < 0.0)")
- fragment=fragment.replace("result=vec4(inverse_display(clamp(display,0.,1.)),color.a);","result=vec4(mix(gaf_finish(adjusted),inverse_display(clamp(display,0.,1.)),base[1].z),color.a);")
+ fragment=fragment.replace("result=vec4(inverse_display(clamp(display,0.,1.)),color.a);","vec3 original_finish = gaf_finish(adjusted);\n\t\tvec3 mixed_finish = mix(original_finish,inverse_display(clamp(display,0.,1.)),base[1].z);\n\t\tresult=vec4(recover_twilight_shadow_color(mixed_finish,original_finish),color.a);")
  if _render_edge:
   fragment=fragment.replace("color.a);", "color.a);result.rgb=clamp(gaf_display(result.rgb),0.,1.);")
  _report("finish_ready",true);_report("finish_bytes",131072+baseline.size())
