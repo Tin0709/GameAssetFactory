@@ -73,11 +73,12 @@ const LIGHTING_MIX_CONTROLS := {
 	&"scatter": ["Fog brightness", 2.],
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
+	&"humid_light": ["Humid light diffusion", 1.],
 	&"exposure": ["Local exposure", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 15
+const LIGHTING_MIX_VERSION := 16
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
@@ -712,6 +713,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"humid_light":
+		return 0.
 	if effect == &"shadow_softness":
 		return DAYLIGHT_SHADOW_SOFTNESS
 	if effect == &"spruce_sky":
@@ -829,7 +832,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -849,6 +852,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 14 and effect == &"oak_leaf_tint":
 			missing_value = 0.
 		if version < 15 and effect == &"spruce_sky":
+			missing_value = 0.
+		if version < 16 and effect == &"humid_light":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -898,7 +903,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"bloom_spread", &"lantern_air"]:
 		_update_mist()
 		return
-	if changed_effect in [&"grass_sky", &"spruce_sky"]:
+	if changed_effect in [&"grass_sky", &"spruce_sky", &"humid_light"]:
 		return
 	if changed_effect == &"player_sky":
 		if level.player_light != null:
@@ -1205,6 +1210,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Adjusts the glowing lantern glass on Mobile. Around 6% matches its previous brightness. The point light and mist keep their own strengths."
 		if effect == &"bloom_spread":
 			slider.tooltip_text = "Adjust the base glow radius independently of Bloom brightness. Leaves the approved noon look intact."
+		if effect == &"humid_light":
+			slider.tooltip_text = "Soften lit areas into the surrounding haze. Try 65% at 16:30. Requires Combined mist and the Mobile Forest finish. Noon keeps its approved look."
 		slider.focus_mode = Control.FOCUS_NONE
 		slider.max_value = spec[1]
 		slider.step = .01

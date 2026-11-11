@@ -60,6 +60,7 @@ func restore_environment()->void:
 func release()->void:
  restore_environment()
  if _effect!=null:
+  _effect.set_humid_light(0.)
   if _effect.has_method("set_bloom_source_reference"):_effect.set_bloom_source_reference(null,false,0.)
   _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_display_edges(false)
   _effect.set_review_strength(_saved_strength*showcase.local_exposure_mix_scale())
@@ -120,10 +121,29 @@ func refresh()->void:
  var finish_scale:float=showcase.reference_finish_mix_scale()
  _native.set_strength(weight*gain_scale);effect.set_review_strength(_saved_strength*(1.-weight)*gain_scale)
  effect.set_finish_weight(weight*finish_scale);effect.set_reference_grade(true)
+ _publish_humid_light(effect)
  env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=false
  for key in ["tonemap_exposure","adjustment_enabled"]:
   if showcase._forest_expected.has(key):showcase._forest_expected[key]=env.get(key)
  active=true
+
+func _publish_humid_light(effect: CompositorEffect) -> void:
+ var level: Node = showcase.level
+ var strength: float = showcase._lighting_scale(&"humid_light")
+ var from_noon := absf(fposmod(showcase.hour, 24.) - 12.)
+ var amount := strength * smoothstep(.25, 2.5, from_noon)
+ if amount <= 0. or level.view_mode != "gameplay" or not showcase.mist.visible:
+  effect.set_humid_light(0.)
+  return
+ var camera: Camera3D = level.get_viewport().get_camera_3d()
+ var actor: Vector3 = level.player.global_position + Vector3.UP * 1.02
+ var extent := level.get_viewport().get_visible_rect().size
+ if camera == null or camera.projection != Camera3D.PROJECTION_ORTHOGONAL or camera.is_position_behind(actor) or extent.x <= 0. or extent.y <= 0.:
+  effect.set_humid_light(0.)
+  return
+ var center := camera.unproject_position(actor) / extent
+ var inverse_radius := camera.size / .69
+ effect.set_humid_light(amount, Vector4(center.x, center.y, extent.aspect() * inverse_radius, .67 * inverse_radius))
 func _process(_delta:float)->void:
  refresh()
  if toggle!=null:toggle.set_pressed_no_signal(requested)
