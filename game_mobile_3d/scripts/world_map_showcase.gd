@@ -328,10 +328,7 @@ func _update_mist()->void:
 	_update_hdr_air()
 	set_coherent_bloom(coherent_bloom)
 	if level!=null and level.look._exposure_effect!=null:
-		var exposure=level.look._exposure_effect
-		if phase_finish==null or not phase_finish.active:
-			var strength:=bounded_exposure_strength()
-			if exposure._review_strength!=strength:exposure.set_review_strength(strength)
+		_apply_bounded_exposure_mix()
 		set_coupled_bloom(coupled_bloom)
 	if mist==null:return
 	var env:Environment=level.get_node("WorldEnvironment").environment
@@ -503,6 +500,14 @@ func local_exposure_mix_scale() -> float:
 func bounded_exposure_strength() -> float:
 	return LOCAL_EXPOSURE_STRENGTH * local_exposure_mix_scale()
 
+func _apply_bounded_exposure_mix() -> void:
+	if phase_finish != null and phase_finish.active:
+		return
+	var effect = level.look._exposure_effect
+	var strength := bounded_exposure_strength()
+	if effect != null and effect._review_strength != strength:
+		effect.set_review_strength(strength)
+
 func set_lighting_scale(effect: StringName, value: float) -> void:
 	if not LIGHTING_MIX_CONTROLS.has(effect) or not is_finite(value):
 		return
@@ -510,19 +515,24 @@ func set_lighting_scale(effect: StringName, value: float) -> void:
 	if scale == _lighting_scale(effect):
 		return
 	_lighting_mix[effect] = scale
-	_refresh_lighting_mix()
+	_refresh_lighting_mix(effect == &"exposure")
 
 func reset_lighting_mix() -> void:
 	_lighting_mix.clear()
 	_refresh_lighting_mix()
 
-func _refresh_lighting_mix() -> void:
+func _refresh_lighting_mix(exposure_only := false) -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
 	if not forest_active():
+		return
+	if exposure_only:
+		_apply_bounded_exposure_mix()
+		if phase_finish != null:
+			phase_finish.refresh()
 		return
 	# Re-evaluate the authored preset before applying scales to prevent compounding.
 	_forest_hour = INF
