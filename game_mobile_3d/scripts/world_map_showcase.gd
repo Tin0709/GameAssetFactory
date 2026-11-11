@@ -54,6 +54,8 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"shadow": ["Shadow strength", 1.],
 	&"lantern": ["Hip lantern", 2.],
+	&"lantern_lift": ["Lantern height", 1.5],
+	&"lantern_air": ["Lantern in mist", 2.],
 	&"fog": ["Fog density", 2.],
 	&"near_haze": ["Near haze density", 2.],
 	&"scatter": ["Fog brightness", 2.],
@@ -63,7 +65,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 7
+const LIGHTING_MIX_VERSION := 8
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
 const MOON_TINT := Color("#b6cdf5")
 var moonlight_enabled := true
@@ -87,7 +89,8 @@ var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
 var captured_lantern_dawn:=true
 var _lantern_dawn_toggle:CheckButton
-const LANTERN_OVERHEAD_LIFT_M := 1.35
+## Idle calibration to the two captured light-to-face separations. The animated hip remains the anchor.
+const LANTERN_OVERHEAD_LIFT_M := 2.06
 var lantern_overhead := true
 var _lantern_overhead_toggle: CheckButton
 static var _point_kernel_owner:WeakRef
@@ -474,7 +477,7 @@ func _update_mist()->void:
 	sample.scatter_energy=clampf(incoming,.015,.18)/maxf(linear.dot(luma),.0001)
 	_apply_mist_source(sample,measured,linear)
 	sample.scatter_energy *= _lighting_scale(&"scatter")
-	sample.player_light_weight *= _lighting_scale(&"lantern")
+	sample.player_light_weight *= _lighting_scale(&"lantern") * _lighting_scale(&"lantern_air")
 	var near_scale := _lighting_scale(&"near_haze")
 	if near_scale > 0. and not measured.is_empty() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
 		var strength: float = NEAR_HAZE_EXTINCTION * measured.density_ratio * PHASE_FINISH.phase_weight(hour) * near_scale
@@ -575,6 +578,9 @@ func set_lantern_overhead(value: bool) -> void:
 	lantern_overhead = value
 	if _lantern_overhead_toggle != null:
 		_lantern_overhead_toggle.set_pressed_no_signal(value)
+	_refresh_lantern_position()
+
+func _refresh_lantern_position() -> void:
 	if level == null:
 		return
 	var lantern = level.player.get("lantern")
@@ -582,8 +588,8 @@ func set_lantern_overhead(value: bool) -> void:
 		sync_lantern_emitter(lantern.emitter_position())
 
 func _lantern_light_origin(hip: Vector3) -> Vector3:
-	# Lift the shared light source in world space, independent of the mesh swing.
-	return hip + Vector3.UP * LANTERN_OVERHEAD_LIFT_M if lantern_overhead else hip
+	var lift := LANTERN_OVERHEAD_LIFT_M * _lighting_scale(&"lantern_lift") if lantern_overhead else 0.
+	return hip + Vector3.UP * lift
 
 func _position_lantern_light(origin: Vector3) -> void:
 	if _player_light == null:
@@ -720,14 +726,15 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
 		var from_older_recipe: bool = (version == 1 and effect == &"grade") \
 			or (version < 3 and effect == &"sky_chroma") or (version < 4 and effect == &"player_sky") \
 			or (version < 5 and effect in [&"near_haze", &"bloom_spread"]) \
-			or (version < 6 and effect == &"grass_sky") or (version < 7 and effect == &"moon")
+			or (version < 6 and effect == &"grass_sky") or (version < 7 and effect == &"moon") \
+			or (version < 8 and effect in [&"lantern_lift", &"lantern_air"])
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
@@ -755,7 +762,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
 	if not forest_active():
 		return
-	if changed_effect in [&"near_haze", &"bloom_spread"]:
+	if changed_effect == &"lantern_lift":
+		_refresh_lantern_position()
+		return
+	if changed_effect in [&"near_haze", &"bloom_spread", &"lantern_air"]:
 		_update_mist()
 		return
 	if changed_effect == &"grass_sky":
@@ -1028,6 +1038,10 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Blend the existing grass ambient light with the terrain's baked sky fill at each root. The approved Noon is retained."
 		if effect == &"near_haze":
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
+		if effect == &"lantern_lift":
+			slider.tooltip_text = "Height above the hip mount when lantern from above is enabled. 100% uses the captured face-to-light distance fit, 66% approximates the previous height."
+		if effect == &"lantern_air":
+			slider.tooltip_text = "Scales only lantern light scattered by the existing mist. Surface lighting and fog density have separate controls."
 		if effect == &"bloom_spread":
 			slider.tooltip_text = "Adjust the base glow radius independently of Bloom brightness. Leaves the approved noon look intact."
 		slider.focus_mode = Control.FOCUS_NONE
