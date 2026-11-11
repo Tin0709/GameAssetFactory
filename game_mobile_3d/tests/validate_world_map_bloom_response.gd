@@ -47,8 +47,12 @@ func run():
    s.set_hour(hour);await settle()
    var e=w.look._exposure_effect
    check(e!=null,"Existing exposure survives at "+str(hour))
-   var wanted=.16*s.bloom_response.sample(hour)
+   var source_hour:float=0. if hour==22. else hour
+   var wanted=.16*s.bloom_response.sample(source_hour)
    check(absf(e._parameters.decode_float(16)-wanted)<.00000004,"Actual existing air uniform follows observed relative gain at "+str(hour))
+  s.set_night_reference_atmosphere(false);await settle()
+  check(absf(w.look._exposure_effect._parameters.decode_float(16)-.16*s.bloom_response.sample(22.))<.00000004,"Night comparison restores the previous mirrored gain")
+  s.set_night_reference_atmosphere(true);await settle()
   s.set_measured_bloom_response(false);await settle()
   check(is_equal_approx(w.look._exposure_effect._parameters.decode_float(16),.16),"OFF restores previous fixed response")
   s.set_measured_bloom_response(true);await settle()

@@ -40,7 +40,7 @@ func run():
   check(s.get("shape_levels",0)==6,"Six actual spatial levels")
   check(s.get("shape_bytes",0)>0,"Allocation measured")
   check(w.showcase.phase_finish.active and w.look.local_exposure_active(),"Phase grade and F7 remain owned")
-  check(absf(s.get("air_bloom_weight",0.)-.16*w.showcase.bloom_response.sample(22.))<.00000004,"Shape does not duplicate intensity")
+  check(absf(s.get("air_bloom_weight",0.)-.16*w.showcase.bloom_response.sample(0.))<.00000004,"Shape does not duplicate captured night intensity")
   var n=s.rebuilds
   await settle();check(snapshot(w).rebuilds==n,"Stable scene does not reallocate")
   w.showcase.set_source_bloom_shape(false);await settle();s=snapshot(w)
