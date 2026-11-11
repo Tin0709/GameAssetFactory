@@ -40,6 +40,17 @@ var _forest_sun:Color
 var _forest_energy:float
 var _forest_shadow_opacity:float
 var full_direct_shadows:=true
+const LIGHTING_MIX_CONTROLS := {
+	&"sun": ["Direct sunlight", 2.],
+	&"sky": ["Ambient sky", 2.],
+	&"shadow": ["Shadow strength", 1.],
+	&"lantern": ["Hip lantern", 2.],
+	&"fog": ["Fog density", 2.],
+	&"scatter": ["Fog brightness", 2.],
+	&"bloom": ["Bloom", 2.],
+}
+var _lighting_mix: Dictionary = {}
+var _lighting_sliders: Dictionary = {}
 var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
 static var _point_kernel_owner:WeakRef
@@ -269,7 +280,7 @@ func set_coupled_bloom(value:bool)->void:
 		var enabled:bool=value and forest_active() and atmosphere_review in ["haze","combined"]
 		level.look._exposure_effect.set_air_bloom(enabled)
 		var response:float=bloom_response.sample(hour)if enabled and measured_bloom_response else 1.
-		level.look._exposure_effect.set_air_bloom_response(response)
+		level.look._exposure_effect.set_air_bloom_response(response * _lighting_scale(&"bloom") if enabled else response)
 		var shape_weight:float=phase_finish.phase_weight(hour)if phase_finish!=null and phase_finish.requested else 0.
 		if level.look._exposure_effect.has_method("set_bloom_shape"):
 			level.look._exposure_effect.set_bloom_shape(source_bloom_shape and enabled and coherent_bloom,shape_weight)
@@ -341,6 +352,7 @@ func _update_mist()->void:
 	sample.linear_scatter_rgb=linear
 	sample.scatter_energy=clampf(incoming,.015,.18)/maxf(linear.dot(luma),.0001)
 	_apply_mist_source(sample,measured,linear)
+	sample.scatter_energy *= _lighting_scale(&"scatter")
 	var emitter:Vector3=level.presentation.player_position()
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
@@ -463,12 +475,42 @@ func set_full_direct_shadows(value:bool)->void:
 	if _time_applied and forest_active() and atmosphere_review in ["lighting","combined"]:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
+func _lighting_scale(effect: StringName) -> float:
+	return _lighting_mix.get(effect, 1.)
+
+func set_lighting_scale(effect: StringName, value: float) -> void:
+	if not LIGHTING_MIX_CONTROLS.has(effect) or not is_finite(value):
+		return
+	var scale := clampf(value, 0., LIGHTING_MIX_CONTROLS[effect][1])
+	if scale == _lighting_scale(effect):
+		return
+	_lighting_mix[effect] = scale
+	_refresh_lighting_mix()
+
+func reset_lighting_mix() -> void:
+	_lighting_mix.clear()
+	_refresh_lighting_mix()
+
+func _refresh_lighting_mix() -> void:
+	for effect: StringName in _lighting_sliders:
+		var slider: HSlider = _lighting_sliders[effect]
+		var scale := _lighting_scale(effect)
+		slider.set_value_no_signal(scale)
+		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
+	if not forest_active():
+		return
+	# Re-evaluate the authored preset before applying scales to prevent compounding.
+	_forest_hour = INF
+	apply_time()
+	level.look._refresh_ground_bounce()
+	_update_mist()
+
 func _apply_direct_shadow_opacity(sun:DirectionalLight3D)->void:
 	var opacity:=float(_day.sun_shadow_opacity)
 	if full_direct_shadows and not is_day_anchor():
 		opacity=lerpf(opacity,1.,PHASE_FINISH.phase_weight(hour))
-	sun.shadow_opacity=opacity
-	_forest_shadow_opacity=opacity
+	sun.shadow_opacity=opacity * _lighting_scale(&"shadow")
+	_forest_shadow_opacity=sun.shadow_opacity
 
 func terrain_ambient_reference()->Color:
 	if forest_active() and atmosphere_review in ["lighting","combined"] and not _forest_expected.is_empty():return _day.ambient_light_color
@@ -498,18 +540,24 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		if gentle_noon:sun.light_energy*=noon_direct_scale(hour)
 		_apply_captured_key(sun)
 		_apply_captured_direction(sun)
+		env.ambient_light_energy *= _lighting_scale(&"sky")
+		sun.light_energy *= _lighting_scale(&"sun")
 		# In full shade, block the direct beam and leave ambient fill to its own path.
 		_apply_direct_shadow_opacity(sun)
 		if _player_light!=null:
 			var warm:Vector3=p.player_light_color
 			_player_light.light_color=Color(warm.x,warm.y,warm.z);_player_light.light_energy=p.player_light_weight
-			_player_light.visible=p.player_light_weight>0.
+			_player_light.light_energy *= _lighting_scale(&"lantern")
+			_player_light.visible=_player_light.light_energy>0.
 	if atmosphere_review in ["haze","combined"]:
+		p.fog_opacity *= _lighting_scale(&"fog")
+		p.volume_density *= _lighting_scale(&"fog")
 		var fog:Vector3=p.fog_color
 		env.fog_light_color=Color(fog.x,fog.y,fog.z);env.fog_depth_begin=p.fog_begin;env.fog_depth_end=p.fog_end
+		env.fog_light_energy *= _lighting_scale(&"scatter")
 		env.fog_depth_curve=.8;env.fog_density=p.fog_opacity
 		if spatial_mist and mist!=null and mist.failure().is_empty() and mist.effect.snapshot().ready:env.fog_density=0.
-		env.glow_enabled=true;env.glow_intensity=float(_day.glow_intensity)*p.glow_scale
+		env.glow_enabled=true;env.glow_intensity=float(_day.glow_intensity)*p.glow_scale * _lighting_scale(&"bloom")
 		env.glow_bloom=float(_day.glow_bloom)*p.bloom_scale;env.glow_hdr_threshold=.86
 		env.adjustment_contrast=float(_day.adjustment_contrast)*p.contrast_scale
 		env.adjustment_saturation*=p.saturation_scale
@@ -634,6 +682,44 @@ func _process(delta:float)->void:
 		var msaa:String=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
 		status.text="%s · %02d:%02d · %s\n%d FPS · %s · MSAA %s\nPrivate reference player; not for distribution"%["Combined" if level.look.stage==2 else "Original graphics",int(hour),int(fmod(hour,1.)*60.),"Cycle" if cycle_enabled else "Paused",Engine.get_frames_per_second(),RenderingServer.get_current_rendering_method(),msaa]
 
+func _build_lighting_mix(box: VBoxContainer) -> void:
+	var header := HBoxContainer.new()
+	box.add_child(header)
+	var title := Label.new()
+	title.text = "Lighting mix"
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(title)
+	var reset := Button.new()
+	reset.text = "Reset mix"
+	reset.focus_mode = Control.FOCUS_NONE
+	reset.pressed.connect(reset_lighting_mix)
+	header.add_child(reset)
+	for effect: StringName in LIGHTING_MIX_CONTROLS:
+		var spec: Array = LIGHTING_MIX_CONTROLS[effect]
+		var row := HBoxContainer.new()
+		box.add_child(row)
+		var label := Label.new()
+		label.text = spec[0]
+		label.custom_minimum_size.x = 130
+		row.add_child(label)
+		var slider := HSlider.new()
+		slider.accessibility_name = label.text
+		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
+		slider.focus_mode = Control.FOCUS_NONE
+		slider.max_value = spec[1]
+		slider.step = .01
+		slider.value = _lighting_scale(effect)
+		slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(slider)
+		var readout := Label.new()
+		readout.custom_minimum_size.x = 48
+		readout.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		readout.text = "100%"
+		row.add_child(readout)
+		slider.set_meta("readout", readout)
+		_lighting_sliders[effect] = slider
+		slider.value_changed.connect(func(value: float): set_lighting_scale(effect, value))
+
 func _build_ui()->void:
 	var hud:=level.get_node("HUD")
 	_fps_label=Label.new();_fps_label.name="ShowcaseFPS";_fps_label.position=Vector2(18,6)
@@ -656,6 +742,7 @@ func _build_ui()->void:
 	var modes=["previous","haze","lighting","combined"];atmosphere.select(modes.find(atmosphere_review));box.add_child(atmosphere)
 	atmosphere.item_selected.connect(func(index:int):set_atmosphere_review(modes[index]))
 	atmosphere.tooltip_text="Forest A1 Day: read live in MD2. Other phases: recovered presets. Fog, bloom and light transfer are original Mobile approximations."
+	_build_lighting_mix(box)
 	var gentle:=CheckButton.new();gentle.name="GentleNoon";gentle.text="Light · gentle midday sunlight";gentle.button_pressed=gentle_noon;gentle.focus_mode=Control.FOCUS_NONE;box.add_child(gentle)
 	gentle.tooltip_text="18% less direct sunlight at noon, smoothly returning to the previous morning/evening lighting. Ambient and source presets unchanged. OFF compares the previous result."
 	gentle.toggled.connect(set_gentle_noon)
