@@ -67,6 +67,8 @@ const LIGHTING_MIX_VERSION := 7
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
 const MOON_TINT := Color("#b6cdf5")
 var moonlight_enabled := true
+var night_reference_atmosphere := false
+var _night_reference_toggle: CheckButton
 const BALANCED_ATMOSPHERE := {
 	&"sky_chroma": .65,
 	&"grade": .55,
@@ -289,7 +291,7 @@ func _apply_captured_sky(env:Environment)->void:
 	var source:=Vector3(base.r,base.g,base.b);var luma:=Vector3(.2126,.7152,.0722)
 	var tinted:Vector3=source*noon.ambient_tint
 	tinted*=source.dot(luma)/maxf(tinted.dot(luma),.000001)
-	var rgb:Vector3=tinted*sky_response.sample(hour)
+	var rgb:Vector3=tinted*sky_response.sample(reference_hour())
 	if not rgb.is_finite()or minf(rgb.x,minf(rgb.y,rgb.z))<0.:return
 	var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
 	env.ambient_light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb()
@@ -330,6 +332,25 @@ static func moonlight_weight(time:float)->float:
 	if not is_finite(time):return 0.
 	var h:=fposmod(time,24.)
 	return 1.-smoothstep(3.5,4.5,h) if h<12. else smoothstep(19.5,21.,h)
+
+func reference_hour() -> float:
+	if not night_reference_atmosphere:
+		return hour
+	var midnight := 24. if hour > 12. else 0.
+	return fposmod(lerpf(hour, midnight, moonlight_weight(hour)), 24.)
+
+func set_night_reference_atmosphere(value: bool) -> void:
+	if night_reference_atmosphere == value:
+		return
+	night_reference_atmosphere = value
+	if _night_reference_toggle != null:
+		_night_reference_toggle.set_pressed_no_signal(value)
+	if level == null:
+		return
+	_forest_hour = INF
+	apply_time()
+	level.look._refresh_ground_bounce()
+	_update_mist()
 
 func _apply_key_mix(sun:DirectionalLight3D)->void:
 	var weight:=moonlight_weight(hour) if moonlight_enabled else 0.
@@ -375,7 +396,7 @@ func set_coupled_bloom(value:bool)->void:
 	if level.look._exposure_effect!=null:
 		var enabled:bool=value and forest_active() and atmosphere_review in ["haze","combined"]
 		level.look._exposure_effect.set_air_bloom(enabled)
-		var response:float=bloom_response.sample(hour)if enabled and measured_bloom_response else 1.
+		var response:float=bloom_response.sample(reference_hour())if enabled and measured_bloom_response else 1.
 		level.look._exposure_effect.set_air_bloom_response(response * _lighting_scale(&"bloom") if enabled else response)
 		var spread := lerpf(1., _lighting_scale(&"bloom_spread"), PHASE_FINISH.phase_weight(hour)) if enabled else 1.
 		level.look._exposure_effect.set_air_bloom_spread(spread)
@@ -441,7 +462,7 @@ func _update_mist()->void:
 	var linear:=Vector3(color.r,color.g,color.b)
 	if captured_scatter:linear=air_light.scatter_color(linear,hour)
 	var sample:=_mist_sample.duplicate()
-	var measured:Dictionary=phase_air.sample(hour) if measured_atmosphere else {}
+	var measured:Dictionary=phase_air.sample(reference_hour()) if measured_atmosphere else {}
 	if not measured.is_empty():
 		# Source chromaticity in linear space; retain the approved incident-light energy.
 		var source:Vector3=measured.linear_scatter
@@ -1107,6 +1128,16 @@ func _build_ui()->void:
 	moon.tooltip_text="Fade sunlight to a cool night key. Turn off to compare the previous evening lighting."
 	moon.toggled.connect(set_moonlight_enabled)
 	box.add_child(moon)
+	var night_air := CheckButton.new()
+	night_air.name = "NightReferenceAtmosphere"
+	night_air.text = "Air · captured night atmosphere"
+	night_air.focus_mode = Control.FOCUS_NONE
+	night_air.button_pressed = night_reference_atmosphere
+	night_air.disabled = phase_air.anchors.is_empty() or not sky_response.available()
+	night_air.tooltip_text = "Use the captured midnight sky, fog, bloom and grade together when the moon phase is fully active."
+	night_air.toggled.connect(set_night_reference_atmosphere)
+	box.add_child(night_air)
+	_night_reference_toggle = night_air
 	var direction:=CheckButton.new();direction.name="CapturedKeyDirection";direction.text="Light - captured primary direction (Noon anchored)";direction.focus_mode=Control.FOCUS_NONE;direction.button_pressed=captured_key_direction;direction.disabled=not direction_response.available();box.add_child(direction)
 	direction.tooltip_text="Measured primary-light azimuth and relative ground NdotL, anchored to approved Noon. Night uses the primary CB, not fog Sun. Clock, handoff interpolation and Noon normalization are original. OFF restores prior trajectory."
 	direction.toggled.connect(set_captured_key_direction);_direction_toggle=direction

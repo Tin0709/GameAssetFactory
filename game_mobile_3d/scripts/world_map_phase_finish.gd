@@ -104,7 +104,7 @@ func refresh()->void:
   compositor.compositor_effects=chain
  if _environment==null:
   if not effect.configure_finish(true,env,weight):_fail("Unsupported original finish; previous appearance restored");return
- effect.set_display_edges(edge_softening);effect.set_reference_hour(showcase.hour);effect.prepare_reference_grade(true)
+ effect.set_display_edges(edge_softening);effect.set_reference_hour(showcase.reference_hour());effect.prepare_reference_grade(true)
  if effect.has_method("set_bloom_source_reference"):
   var chain:=compositor.compositor_effects
   var adjacent:=chain.find(effect)>0 and chain[chain.find(effect)-1]==_native

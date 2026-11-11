@@ -49,7 +49,7 @@ func refresh(force:bool=false)->void:
  var started:=Time.get_ticks_usec()
  var active:=available();var p:Vector3=level.presentation.player_position()
  var use_source:bool=active and source_field_enabled and source_field.available()and phase_sky and level.showcase.captured_sky_response and level.showcase.sky_response.available()and level.showcase.forest_spatial_sky_context()and not level.showcase.is_day_anchor()
- var source_hour:float=level.showcase.hour if use_source else 12.
+ var source_hour:float=level.showcase.reference_hour() if use_source else 12.
  var source_mean:Vector3=level.showcase.sky_response.sample(source_hour)if use_source else Vector3.ONE
  var next_source_key:Array=[use_source,source_hour,source_mean]
  # Eligibility can change without a position/input change. Rebuild on re-entry,

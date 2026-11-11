@@ -32,7 +32,7 @@ func refresh()->void:
  var wanted:bool=requested and available()and showcase.forest_active()and showcase.level.get_viewport().use_hdr_2d
  if _effect!=effect:release();_effect=effect
  if effect!=null and effect.has_method("set_reference_grade"):
-  effect.set_reference_hour(showcase.hour);effect.prepare_reference_grade(wanted)
+  effect.set_reference_hour(showcase.reference_hour());effect.prepare_reference_grade(wanted)
  var state:Dictionary=effect.snapshot()if effect!=null else {}
  if not wanted or not state.get("reference_ready",false)or state.get("color_format",0)!=RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT or not str(state.get("error","")).is_empty():
   release();return
