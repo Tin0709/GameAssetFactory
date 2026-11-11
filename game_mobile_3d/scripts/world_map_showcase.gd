@@ -4,6 +4,7 @@ const ORIGINAL=preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 const PRIVATE_ADAPTER="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/world_map_actor.gd"
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
+const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 # User-directed art adjustment; recovered Forest profiles stay untouched.
 const GENTLE_NOON_DIRECT_SCALE:=.82
@@ -37,6 +38,8 @@ var _forest_expected:Dictionary={}
 var _forest_hour:=INF
 var _forest_sun:Color
 var _forest_energy:float
+var _forest_shadow_opacity:float
+var full_direct_shadows:=true
 var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
 static var _point_kernel_owner:WeakRef
@@ -124,7 +127,7 @@ func setup(world:Node3D)->void:
 		level.player.add_child(_player_light);_player_light.hide()
 		mist=preload("res://scripts/world_map_atmosphere_volume.gd").new();level.get_node("Camera3D").add_child(mist);mist.setup();mist.material_provider=_mist_materials;mist.medium_state=_mist_state;mist.compositor_owned=func(c):return c==level.look._exposure_compositor
 	grade_review=preload("res://scripts/world_map_grade_review.gd").new();add_child(grade_review);grade_review.setup(self)
-	phase_finish=preload("res://scripts/world_map_phase_finish.gd").new();add_child(phase_finish);phase_finish.setup(self)
+	phase_finish=PHASE_FINISH.new();add_child(phase_finish);phase_finish.setup(self)
 	_build_ui()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
 	level.get_node("HUD/Help").text="GRAPHICS COMPARISON\nF8 Day finish · F11 directional fill · Shift+F11 actor canopy fill\nF7 local exposure · Shift+F1 ground bounce · F1 soft shadows\nF2 canopy contact · Shift+F2 root soil · F3 direct cloud shading\nF9 leaf edges · Shift+F9 MSAA · F10 pose interpolation\nF12 optional terrain cache · G grass/flowers · L wind/interaction options\nH fog · N terrain wind · Shift+N passage · Alt+N crown wind"
@@ -137,6 +140,7 @@ func _capture_day()->void:
 	for field:String in ENV_FIELDS:_day[field]=_environment.get(field)
 	var sun:DirectionalLight3D=level.get_node("Sun")
 	_day.sun_rotation=sun.rotation_degrees;_day.sun_color=sun.light_color;_day.sun_energy=sun.light_energy
+	_day.sun_shadow_opacity=sun.shadow_opacity
 	_time_applied=false
 	_forest_expected.clear();_forest_hour=INF
 
@@ -162,6 +166,7 @@ func _restore_day()->void:
 	for field:String in ENV_FIELDS:_environment.set(field,_day[field])
 	var sun:DirectionalLight3D=level.get_node("Sun")
 	sun.rotation_degrees=_day.sun_rotation;sun.light_color=_day.sun_color;sun.light_energy=_day.sun_energy
+	sun.shadow_opacity=_day.sun_shadow_opacity
 	_time_applied=false
 	_forest_expected.clear();_forest_hour=INF
 	if _vignette!=null:_vignette.hide()
@@ -453,6 +458,12 @@ func set_atmosphere_review(mode:String)->void:
 	if mode!="previous" and level!=null and level.terrain_sky.enabled:level.terrain_sky.set_enabled(false)
 	if level!=null:level.look._refresh_ground_bounce()
 
+func set_full_direct_shadows(value:bool)->void:
+	if full_direct_shadows==value:return
+	_restore_day()
+	full_direct_shadows=value
+	apply_time()
+
 func terrain_ambient_reference()->Color:
 	if forest_active() and atmosphere_review in ["lighting","combined"] and not _forest_expected.is_empty():return _day.ambient_light_color
 	return Color(-1,-1,-1)
@@ -481,6 +492,9 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		if gentle_noon:sun.light_energy*=noon_direct_scale(hour)
 		_apply_captured_key(sun)
 		_apply_captured_direction(sun)
+		# In full shade, block the direct beam and leave ambient fill to its own path.
+		if full_direct_shadows and not is_day_anchor():
+			sun.shadow_opacity=lerpf(float(_day.sun_shadow_opacity),1.,PHASE_FINISH.phase_weight(hour))
 		if _player_light!=null:
 			var warm:Vector3=p.player_light_color
 			_player_light.light_color=Color(warm.x,warm.y,warm.z);_player_light.light_energy=p.player_light_weight
@@ -500,6 +514,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 	_forest_expected.clear()
 	for field:String in ENV_FIELDS:_forest_expected[field]=env.get(field)
 	_forest_sun=sun.light_color;_forest_energy=sun.light_energy;_forest_hour=hour
+	_forest_shadow_opacity=sun.shadow_opacity
 	_mist_sample=p
 
 func begin_environment_edit()->void:
@@ -532,7 +547,7 @@ func apply_time()->void:
 	if env!=_environment:_capture_day()
 	var use_forest:=forest_active()
 	var sun:DirectionalLight3D=level.get_node("Sun")
-	if use_forest and _forest_hour==hour and not _forest_expected.is_empty() and sun.light_color==_forest_sun and sun.light_energy==_forest_energy:
+	if use_forest and _forest_hour==hour and not _forest_expected.is_empty() and sun.light_color==_forest_sun and sun.light_energy==_forest_energy and sun.shadow_opacity==_forest_shadow_opacity:
 		var unchanged:=true
 		for field:String in _forest_expected:
 			if env.get(field)!=_forest_expected[field]:unchanged=false;break
@@ -654,6 +669,15 @@ func _build_ui()->void:
 	var direction:=CheckButton.new();direction.name="CapturedKeyDirection";direction.text="Light - captured primary direction (Noon anchored)";direction.focus_mode=Control.FOCUS_NONE;direction.button_pressed=captured_key_direction;direction.disabled=not direction_response.available();box.add_child(direction)
 	direction.tooltip_text="Measured primary-light azimuth and relative ground NdotL, anchored to approved Noon. Night uses the primary CB, not fog Sun. Clock, handoff interpolation and Noon normalization are original. OFF restores prior trajectory."
 	direction.toggled.connect(set_captured_key_direction);_direction_toggle=direction
+	var shadow:=CheckButton.new()
+	shadow.name="FullDirectShadows"
+	shadow.text="Light - full direct shadows"
+	shadow.focus_mode=Control.FOCUS_NONE
+	shadow.button_pressed=full_direct_shadows
+	shadow.disabled=not forest.available()
+	shadow.tooltip_text="Fully blocks direct sunlight in deep shadow outside the Noon blend. Turn off to compare the previous shadow strength."
+	box.add_child(shadow)
+	shadow.toggled.connect(set_full_direct_shadows)
 	var sky_source:=CheckButton.new();sky_source.name="CapturedSkyResponse";sky_source.text="Light - captured sky phase response";sky_source.focus_mode=Control.FOCUS_NONE;sky_source.button_pressed=captured_sky_response;sky_source.disabled=not sky_response.available();box.add_child(sky_source)
 	sky_source.tooltip_text="Relative directional-environment angular mean from existing captures, anchored to approved Noon. Retains original spatial visibility; not full Lumen, native hours or absolute irradiance. OFF restores prior ambient palette."
 	sky_source.toggled.connect(set_captured_sky_response)
