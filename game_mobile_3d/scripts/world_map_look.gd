@@ -754,7 +754,7 @@ func refresh_daylight_cloud_shape() -> void:
 	if not direct_clouds_active():
 		return
 	var shape := _daylight_cloud_shape()
-	if _cloud_shape.is_equal_approx(shape):
+	if _cloud_shape == shape:
 		return
 	_publish_cloud_style(null, shape)
 	if level.grove != null and level.grove.visible:
