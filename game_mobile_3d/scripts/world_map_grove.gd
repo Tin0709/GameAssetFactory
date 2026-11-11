@@ -197,7 +197,52 @@ func _load_source_tree(path: String) -> Node3D:
 	var tree := document.generate_scene(state) as Node3D
 	if tree != null:
 		tree.set_meta("source_glb", path.get_file())
+		for visual: MeshInstance3D in tree.find_children("*", "MeshInstance3D", true, false):
+			_prepare_source_crown_mask(visual)
 	return tree
+
+func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:
+	var source := visual.mesh as ArrayMesh
+	if source == null or source.get_surface_count() != 1 or source.surface_get_primitive_type(0) != Mesh.PRIMITIVE_TRIANGLES:
+		return
+	var arrays := source.surface_get_arrays(0)
+	# These source atlases put foliage on the left and bark on the right.
+	# Both regions share the U = 0.5 edge, so classify whole triangles.
+	if arrays[Mesh.ARRAY_COLOR] != null or arrays[Mesh.ARRAY_TEX_UV] == null or arrays[Mesh.ARRAY_INDEX] == null:
+		return
+	var uv: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
+	var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+	if uv.is_empty() or indices.is_empty() or indices.size() % 3 != 0:
+		return
+	var weights := PackedByteArray()
+	weights.resize(uv.size())
+	const UNASSIGNED := 2
+	weights.fill(UNASSIGNED)
+	for index in range(0, indices.size(), 3):
+		var u0 := uv[indices[index]].x
+		var u1 := uv[indices[index + 1]].x
+		var u2 := uv[indices[index + 2]].x
+		var low := minf(u0, minf(u1, u2))
+		var high := maxf(u0, maxf(u1, u2))
+		if (low < 0.5 and high > 0.5) or (low == 0.5 and high == 0.5):
+			return
+		var weight := int(low < 0.5)
+		for corner in 3:
+			var vertex := indices[index + corner]
+			if weights[vertex] != UNASSIGNED and weights[vertex] != weight:
+				return
+			weights[vertex] = weight
+	var colors := PackedColorArray()
+	colors.resize(uv.size())
+	for vertex in uv.size():
+		colors[vertex] = Color(1.0, 1.0 if weights[vertex] == 1 else 0.0, 1.0)
+	arrays[Mesh.ARRAY_COLOR] = colors
+	var masked := ArrayMesh.new()
+	masked.resource_name = source.resource_name
+	masked.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	masked.surface_set_material(0, source.surface_get_material(0))
+	masked.set_meta("source_crown_mask", true)
+	visual.mesh = masked
 
 func _build_source_spruce(level: Node3D, root: String) -> void:
 	var manifest_path := root.path_join(SPRUCE_MANIFEST)
@@ -244,7 +289,7 @@ func _place_source_spruce(level: Node3D, assets: Array[Node3D], rows: Array, ima
 		for visual: MeshInstance3D in meshes:
 			visual.position += Vector3(width * .5, 0., width * .5)
 			var caster := _split_shadow(visual, _spruce_appearance, _spruce_shadow)
-			_bind_crown_heights(visual, caster, 3.4)
+			_bind_crown_wind(visual, caster)
 			_spruce_casters.append(caster)
 		var shape := BoxShape3D.new()
 		shape.size = Vector3(width, 3.4, width)
@@ -333,13 +378,11 @@ func _load_source_crown_wind(root: String) -> void:
 func source_crown_wind_available() -> bool:
 	return _source_crown_pattern != null
 
-func _bind_crown_heights(visual: MeshInstance3D, caster: MeshInstance3D, trunk_top: float) -> void:
-	if not source_crown_wind_available():
+func _bind_crown_wind(visual: MeshInstance3D, caster: MeshInstance3D) -> void:
+	if not source_crown_wind_available() or not visual.mesh.get_meta("source_crown_mask", false):
 		return
-	var top := visual.get_aabb().end.y
-	var heights := Vector2(trunk_top, lerpf(trunk_top, top, .58))
 	for mesh: MeshInstance3D in [visual, caster]:
-		mesh.set_instance_shader_parameter("source_crown_heights", heights)
+		mesh.set_instance_shader_parameter("source_crown_mask", true)
 		mesh.extra_cull_margin = maxf(mesh.extra_cull_margin, CROWN_WIND_CULL_MARGIN)
 
 func _prepare_source_leaf_tint(root: String, asset_sha: String, asset: Node3D) -> void:
@@ -430,7 +473,7 @@ func _prepare_meshes(tree: Node3D) -> void:
 			visual.extra_cull_margin = 0.20
 		var caster := _split_shadow(visual, appearance, _canopy_shadow if appearance == _canopy_appearance else null)
 		if source_oaks:
-			_bind_crown_heights(visual, caster, TRUNK_HEIGHT)
+		_bind_crown_wind(visual, caster)
 		if source_oaks and _source_leaf_mesh != null and visual.mesh == _source_leaf_mesh:
 			visual.set_instance_shader_parameter("source_leaf_mask", true)
 
