@@ -462,9 +462,9 @@ func _update_mist()->void:
 	var emitter:Vector3=level.presentation.player_position()
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
-		var point:Vector3=lantern.emitter_position()
-		sync_lantern_emitter(point)
-		emitter=_lantern_light_origin(point)-Vector3.UP*1.4
+		var origin := _lantern_light_origin(lantern.emitter_position())
+		_position_lantern_light(origin)
+		emitter=origin-Vector3.UP*1.4
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
 
 func set_captured_mist_source(value:bool)->void:
@@ -564,11 +564,17 @@ func _lantern_light_origin(hip: Vector3) -> Vector3:
 	# Lift the shared light source in world space, independent of the mesh swing.
 	return hip + Vector3.UP * LANTERN_OVERHEAD_LIFT_M if lantern_overhead else hip
 
+func _position_lantern_light(origin: Vector3) -> void:
+	if _player_light == null:
+		return
+	_player_light.top_level = true
+	_player_light.light_cull_mask = 1
+	_player_light.global_position = origin
+
 func sync_lantern_emitter(point:Vector3)->void:
 	if not point.is_finite():return
 	var origin := _lantern_light_origin(point)
-	if _player_light!=null:
-		_player_light.top_level=true;_player_light.light_cull_mask=1;_player_light.global_position=origin
+	_position_lantern_light(origin)
 	if mist!=null and mist.visible:mist.set_warm_emitter(origin)
 	_publish_point_cutoff()
 
