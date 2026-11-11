@@ -44,7 +44,10 @@ void vertex() {
 		if (weight > 0.0) {
 			// Anchor wind to the world so gameplay and shadow cameras see one pose.
 			vec3 world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-			vec3 wind_position = vec3(world_position.x, -24.0, world_position.z);
+			// Keep the Oak wind's height-dependent slope, with a fixed virtual
+			// sample height above each tree instead of the moving view camera.
+			vec3 wind_position = world_position - vec3(0.0, MODEL_MATRIX[3].y + 24.0, 0.0);
+			wind_position.y = min(wind_position.y, -8.0);
 			vec3 drift = gaf_leaf_wind_offset(source_crown_pattern, wind_position,
 				source_crown_wind.x, source_crown_wind.y * weight);
 			VERTEX += inverse(mat3(MODEL_MATRIX)) * drift;
