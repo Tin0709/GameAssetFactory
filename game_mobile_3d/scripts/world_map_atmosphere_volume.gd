@@ -102,8 +102,10 @@ func _process(_delta:float)->void:
  else:
   for i in 2:_append(Vector3.ZERO,data)
   _append(Vector3.ZERO,data,near_fade_start)
- var path_light: PackedFloat32Array = path_light_provider.call() if path_light_provider.is_valid() else PackedFloat32Array()
- effect.configure(data.to_byte_array(),size,noise.get_rid(),light_rid,path_light)
+ if path_light_provider.is_valid() and effect.has_method("configure_path_light"):
+  effect.configure_path_light(data.to_byte_array(),size,noise.get_rid(),light_rid,path_light_provider.call())
+ else:
+  effect.configure(data.to_byte_array(),size,noise.get_rid(),light_rid)
  var state:Dictionary=effect.snapshot()
  var ready:bool=state.ready and state.error.is_empty()
  if medium_state.is_valid():medium_state.call(ready,str(state.error))

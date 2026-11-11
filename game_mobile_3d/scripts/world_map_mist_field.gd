@@ -17,7 +17,10 @@ var _buffer:=RID()
 var _pipeline:=RID()
 var _uniform:=RID()
 func _init():effect_callback_type=EFFECT_CALLBACK_TYPE_PRE_OPAQUE
-func configure(parameters:PackedByteArray,size:Vector2i,noise:RID,light:RID=RID(),path_light:=PackedFloat32Array())->void:
+func configure(parameters:PackedByteArray,size:Vector2i,noise:RID,light:RID=RID())->void:
+	configure_path_light(parameters,size,noise,light,PackedFloat32Array())
+
+func configure_path_light(parameters: PackedByteArray, size: Vector2i, noise: RID, light: RID, path_light: PackedFloat32Array) -> void:
 	var path_bytes := path_light.to_byte_array()
 	if path_bytes.size() != PATH_SOURCE_BYTES:
 		path_bytes.resize(PATH_SOURCE_BYTES)
