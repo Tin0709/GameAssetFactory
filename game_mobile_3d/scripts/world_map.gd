@@ -243,7 +243,7 @@ func _process(delta: float) -> void:
 		_update_camera_near(camera)
 		camera.position=Vector3(focus.x,_camera_ground_y,focus.z)+CAMERA_OFFSET
 		geometry.update_cutaway(focus,camera.global_position)
-		if grove != null and grove.visible:grove.update_focus(camera,focus,true)
+		if grove != null and (grove.visible or grove.spruce_visible()):grove.update_focus(camera,focus,true)
 	if presentation.enabled and look != null and look.active:
 		look.publish_render_wind(presentation.wind_time(look.motion.clock))
 
@@ -264,7 +264,7 @@ func set_review_view(mode: String) -> void:
 		geometry.update_cutaway(Vector3.ZERO,Vector3.ZERO)
 	_update_camera_near(camera)
 	if look != null:look.refresh_atmosphere()
-	if grove != null and grove.visible:grove.update_focus(camera,player.global_position,mode=="gameplay")
+	if grove != null and (grove.visible or grove.spruce_visible()):grove.update_focus(camera,player.global_position,mode=="gameplay")
 	if showcase!=null:showcase.end_environment_edit()
 
 func _update_camera_near(camera: Camera3D) -> void:

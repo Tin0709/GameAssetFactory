@@ -776,7 +776,7 @@ func _publish_cloud_style(texture: Texture2D, shape: Vector4) -> void:
 	level.geometry.update_cloud_style(texture,_cloud_shape)
 
 func refresh_grove_lighting() -> void:
-	if level.grove == null or not level.grove.visible: return
+	if level.grove == null or not (level.grove.visible or level.grove.spruce_visible()): return
 	var direct := foliage_light_available() and direct_clouds_active()
 	var native: Shader = level.grove.REVEAL_SHADER
 	var bark := _review_variant(native, direct, false)

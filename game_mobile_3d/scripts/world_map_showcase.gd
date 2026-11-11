@@ -39,6 +39,7 @@ var captured_mist_source:=true
 var mist_source_active:=false
 var grove_mist_enabled := true
 var _grove_mist_toggle: CheckButton
+var _spruce_toggle: CheckButton
 var _source_terrain_tiles: Texture2DArray
 var _source_terrain_toggle: CheckButton
 var forest:=FOREST.new()
@@ -659,6 +660,20 @@ func set_grove_mist(enabled: bool) -> void:
 	if _grove_mist_toggle != null:
 		_grove_mist_toggle.set_pressed_no_signal(enabled)
 
+func set_forest_spruce_visible(enabled: bool) -> void:
+	var grove = level.grove
+	if grove == null or not grove.spruce_available():
+		return
+	var collider := level.player.get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if collider == null:
+		collider = level.player.get_node_or_null("BodyCollision") as CollisionShape3D
+	if collider != null and grove.set_spruce_visible(enabled, level.player.global_position, collider.shape as CapsuleShape3D):
+		if enabled:
+			level.look.refresh_grove_lighting()
+			grove.update_focus(level.get_node("Camera3D"), level.player.global_position, level.view_mode == "gameplay")
+	if _spruce_toggle != null:
+		_spruce_toggle.set_pressed_no_signal(grove.spruce_visible())
+
 func set_source_terrain(enabled: bool) -> bool:
 	if not private_primary:
 		return false
@@ -1246,6 +1261,22 @@ func _build_ui()->void:
 	grove_mist.tooltip_text = "Apply the existing spatial mist to tree bark and crowns when the grove is visible. Fades out at Noon. Turn off to compare."
 	grove_mist.toggled.connect(set_grove_mist)
 	box.add_child(grove_mist)
+	if level.grove != null and level.grove.spruce_available():
+		var spruce := CheckButton.new()
+		spruce.name = "ForestSpruce"
+		spruce.text = "Forest · MD2 tall spruce (Ctrl+G)"
+		spruce.focus_mode = Control.FOCUS_NONE
+		spruce.button_pressed = level.grove.spruce_visible()
+		spruce.toggled.connect(set_forest_spruce_visible)
+		box.add_child(spruce)
+		_spruce_toggle = spruce
+		var shadows := CheckButton.new()
+		shadows.name = "ForestSpruceShadows"
+		shadows.text = "Forest · spruce shadows"
+		shadows.focus_mode = Control.FOCUS_NONE
+		shadows.button_pressed = level.grove.spruce_shadows
+		shadows.toggled.connect(level.grove.set_spruce_shadows)
+		box.add_child(shadows)
 	var terrain_atlas := CheckButton.new()
 	_source_terrain_toggle = terrain_atlas
 	terrain_atlas.text = "Terrain · MD2 atlas (preview)"
@@ -1419,7 +1450,7 @@ func _build_ui()->void:
 			toggle.toggled.connect(func(value:bool):plants.set(option,value))
 	panel.hide()
 	_hint=Label.new();_hint.name="ShowcaseHint";_hint.position=Vector2(18,34);_hint.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · Shift+G grove · L options"
+	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · Shift+G forest · L options"
 	if not unavailable_reason.is_empty():_hint.text=unavailable_reason;_hint.modulate=Color(1.,.6,.35)
 	hud.add_child(_hint)
 	_vignette=ColorRect.new();_vignette.name="AtmosphereVignette";_vignette.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -1429,6 +1460,9 @@ func _build_ui()->void:
 
 func handle_key(event:InputEventKey)->bool:
 	if not private_primary:return false
+	if event.physical_keycode == KEY_G and event.ctrl_pressed and level.grove != null and level.grove.spruce_available():
+		set_forest_spruce_visible(not level.grove.spruce_visible())
+		return true
 	if event.physical_keycode==KEY_G and not event.shift_pressed and plants!=null:
 		plants.visible=not plants.visible
 		if not plants.visible:plants.reset()
