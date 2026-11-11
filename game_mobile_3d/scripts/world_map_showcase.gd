@@ -585,7 +585,8 @@ func _update_player_falloff()->void:
 	_publish_point_cutoff()
 
 func _track_point_light(node:Node)->void:
-	if level!=null and (node is OmniLight3D or node is SpotLight3D):_point_lights[node.get_instance_id()]=weakref(node)
+	if level != null and node is Light3D and not node is DirectionalLight3D:
+		_point_lights[node.get_instance_id()] = weakref(node)
 
 func _point_scope_supported() -> bool:
 	for key in _point_lights.keys():
