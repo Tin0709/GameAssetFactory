@@ -61,7 +61,8 @@ func release()->void:
  restore_environment()
  if _effect!=null:
   if _effect.has_method("set_bloom_source_reference"):_effect.set_bloom_source_reference(null,false,0.)
-  _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_display_edges(false);_effect.set_review_strength(_saved_strength)
+  _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_display_edges(false)
+  _effect.set_review_strength(_saved_strength*showcase.local_exposure_mix_scale())
  if _compositor!=null and _native!=null:
   var keep:Array[CompositorEffect]=[]
   for effect in _compositor.compositor_effects:
@@ -115,7 +116,8 @@ func refresh()->void:
  if _environment==null:
   _environment=env
   for key in ["tonemap_mode","tonemap_exposure","adjustment_enabled"]:_saved[key]=env.get(key)
- _native.set_strength(weight);effect.set_review_strength(_saved_strength*(1.-weight));effect.set_finish_weight(weight);effect.set_reference_grade(true)
+ var gain_scale:float=showcase.local_exposure_mix_scale()
+ _native.set_strength(weight*gain_scale);effect.set_review_strength(_saved_strength*(1.-weight)*gain_scale);effect.set_finish_weight(weight);effect.set_reference_grade(true)
  env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=false
  for key in ["tonemap_exposure","adjustment_enabled"]:
   if showcase._forest_expected.has(key):showcase._forest_expected[key]=env.get(key)

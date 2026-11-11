@@ -53,6 +53,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"fog": ["Fog density", 2.],
 	&"scatter": ["Fog brightness", 2.],
 	&"bloom": ["Bloom", 2.],
+	&"exposure": ["Local exposure", 1.],
 }
 var _lighting_mix: Dictionary = {}
 var _lighting_sliders: Dictionary = {}
@@ -134,7 +135,7 @@ func setup(world:Node3D)->void:
 	if level.player.has_method("setup_world_vegetation"):plants=level.player.setup_world_vegetation(level)
 	if level.look.local_exposure_available():
 		level.look.set_local_exposure(true)
-		level.look._exposure_effect.set_review_strength(LOCAL_EXPOSURE_STRENGTH)
+		level.look._exposure_effect.set_review_strength(bounded_exposure_strength())
 	if level.player.has_method("setup_world_audio"):level.player.setup_world_audio(level)
 	set_audio_enabled(false)
 	_capture_day()
@@ -326,7 +327,12 @@ func _update_mist()->void:
 	_update_player_falloff()
 	_update_hdr_air()
 	set_coherent_bloom(coherent_bloom)
-	if level!=null and level.look._exposure_effect!=null:set_coupled_bloom(coupled_bloom)
+	if level!=null and level.look._exposure_effect!=null:
+		var exposure=level.look._exposure_effect
+		if phase_finish==null or not phase_finish.active:
+			var strength:=bounded_exposure_strength()
+			if exposure._review_strength!=strength:exposure.set_review_strength(strength)
+		set_coupled_bloom(coupled_bloom)
 	if mist==null:return
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if forest_active() and atmosphere_review in ["haze","combined"] and level.look._exposure_effect!=null:
@@ -488,6 +494,14 @@ func set_full_direct_shadows(value:bool)->void:
 
 func _lighting_scale(effect: StringName) -> float:
 	return _lighting_mix.get(effect, 1.)
+
+func local_exposure_mix_scale() -> float:
+	if forest_active() and atmosphere_review in ["haze", "combined"]:
+		return _lighting_scale(&"exposure")
+	return 1.
+
+func bounded_exposure_strength() -> float:
+	return LOCAL_EXPOSURE_STRENGTH * local_exposure_mix_scale()
 
 func set_lighting_scale(effect: StringName, value: float) -> void:
 	if not LIGHTING_MIX_CONTROLS.has(effect) or not is_finite(value):
@@ -716,6 +730,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		var slider := HSlider.new()
 		slider.accessibility_name = label.text
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
+		if effect == &"exposure":
+			slider.tooltip_text = "Scales local contrast gain. The color grade remains active."
 		slider.focus_mode = Control.FOCUS_NONE
 		slider.max_value = spec[1]
 		slider.step = .01
@@ -839,7 +855,7 @@ func _build_ui()->void:
 	_exposure_button.disabled=not level.look.local_exposure_available()
 	_exposure_button.toggled.connect(func(value:bool):
 		level.look.set_local_exposure(value)
-		if level.look._exposure_effect!=null:level.look._exposure_effect.set_review_strength(LOCAL_EXPOSURE_STRENGTH))
+		if level.look._exposure_effect!=null:level.look._exposure_effect.set_review_strength(bounded_exposure_strength()))
 	var experimental:=CheckButton.new();experimental.text="Legacy sky-only · F12 (replaces local GI)";experimental.focus_mode=Control.FOCUS_NONE;box.add_child(experimental)
 	_legacy_sky_button=experimental
 	experimental.tooltip_text="Experimental older visibility-only comparison. It replaces the default colored terrain indirect lighting; the two systems never stack."
