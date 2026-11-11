@@ -11,6 +11,9 @@ uniform sampler2D gaf_leaf_vertex_colors : filter_nearest, repeat_disable;
 uniform float gaf_leaf_scatter_strength=0.0;
 uniform sampler2D gaf_leaf_wind_pattern : filter_nearest, repeat_enable;
 uniform vec2 gaf_leaf_wind = vec2(0.0);
+uniform sampler2D gaf_crown_mask : filter_nearest, repeat_disable;
+uniform sampler2D gaf_crown_pattern : filter_linear, repeat_enable;
+uniform vec2 gaf_crown_wind = vec2(0.0);
 varying vec2 gaf_leaf_weights;
 uniform bool review_alpha_mask=false;
 uniform bool gaf_rock_bounce=false;
@@ -47,6 +50,14 @@ void vertex(){
   vec3 relative = p - MAIN_CAM_INV_VIEW_MATRIX[3].xyz;
   if(abs(relative.y) >= 0.2){
    vec3 offset = gaf_leaf_wind_offset(gaf_leaf_wind_pattern, relative, gaf_leaf_wind.x, gaf_leaf_wind.y * gaf_leaf_weights.g);
+   VERTEX += inverse(mat3(MODEL_MATRIX)) * offset;
+   p += offset;
+  }
+ } else if (gaf_crown_wind.y > 0.0) {
+  int width = textureSize(gaf_crown_mask, 0).x;
+  float weight = texelFetch(gaf_crown_mask, ivec2(VERTEX_ID % width, VERTEX_ID / width), 0).r;
+  if (weight > 0.0) {
+   vec3 offset = gaf_leaf_world_drift(gaf_crown_pattern, p, MODEL_MATRIX[3].y, gaf_crown_wind, weight);
    VERTEX += inverse(mat3(MODEL_MATRIX)) * offset;
    p += offset;
   }

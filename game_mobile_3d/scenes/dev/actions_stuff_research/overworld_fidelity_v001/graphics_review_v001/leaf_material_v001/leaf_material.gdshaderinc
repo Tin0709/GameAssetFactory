@@ -17,3 +17,10 @@ vec3 gaf_leaf_wind_offset(sampler2D pattern, vec3 relative, float clock, float w
  float horizontal = (3.0 * broad + 0.25 * detail.x - 1.0) * 0.30;
  return weight * vec3(horizontal, detail.y * 0.15, horizontal);
 }
+
+vec3 gaf_leaf_world_drift(sampler2D pattern, vec3 position, float root_height, vec2 state, float weight) {
+ // A world-fixed reference height keeps the wind identical for view and shadow passes.
+ vec3 relative = position - vec3(0.0, root_height + 24.0, 0.0);
+ relative.y = min(relative.y, -8.0);
+ return gaf_leaf_wind_offset(pattern, relative, state.x, state.y * weight);
+}
