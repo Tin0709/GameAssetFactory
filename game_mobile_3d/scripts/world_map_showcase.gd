@@ -83,6 +83,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_mist_light": ["Night mist light", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
 	&"forest_path_light": ["Forest path light", 1.],
+	&"forest_path_beam": ["Path light beam", 1.],
 	&"forest_path_air": ["Path light in mist", 1.],
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
@@ -93,9 +94,10 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 27
+const LIGHTING_MIX_VERSION := 28
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
+const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
@@ -111,6 +113,7 @@ const BALANCED_ATMOSPHERE := {
 	&"grass_sky": 0.,
 	&"spruce_sky": 0.,
 	&"forest_path_air": 0.,
+	&"forest_path_beam": 0.,
 	&"oak_leaf_tint": 0.,
 	&"near_haze": 1.,
 }
@@ -134,6 +137,7 @@ var _lantern_overhead_toggle: CheckButton
 static var _point_kernel_owner:WeakRef
 var _point_lights:Dictionary={}
 var point_kernel_state:=Vector4.ZERO
+var path_beam_state := Vector4.ZERO
 var point_soft_state:=Vector2.ZERO
 var player_soft_source:=false
 var _soft_source_toggle:CheckButton
@@ -475,6 +479,7 @@ func _exit_tree()->void:
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
 		RenderingServer.global_shader_parameter_set("gaf_point_soft",Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_point_mixed",false)
+		RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
 	if grade_review!=null:grade_review.release()
 	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
 
@@ -630,6 +635,17 @@ func _publish_point_cutoff()->void:
 		and secondary.light_energy > 0.0 and (secondary.light_cull_mask & 1) != 0
 	RenderingServer.global_shader_parameter_set("gaf_point_kernel",point_kernel_state)
 	RenderingServer.global_shader_parameter_set("gaf_point_mixed",mixed)
+	var beam_strength := _lighting_scale(&"forest_path_beam") if mixed else 0.0
+	var beam := Vector4.ZERO
+	if beam_strength > 0.0:
+		# PIX establishes the inclination. Aim its horizontal component along
+		# our path, whose orientation is independent of the captured map.
+		var position := secondary.global_position
+		var back := (Vector2(position.x, position.z) - PATH_BEAM_AIM_XZ).normalized()
+		beam = Vector4(back.x * sqrt(.5), sqrt(.5), back.y * sqrt(.5), beam_strength)
+	if beam != path_beam_state:
+		path_beam_state = beam
+		RenderingServer.global_shader_parameter_set("gaf_path_beam",beam)
 	point_soft_state=point_response.soft_settings if eligible and player_soft_source and point_response.soft_available()else Vector2.ZERO
 	RenderingServer.global_shader_parameter_set("gaf_point_soft",point_soft_state)
 	if level!=null:RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera",level.get_node("Camera3D").global_position)
@@ -770,6 +786,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 0.
 	if effect == &"night_path_chroma":
 		return .75
+	if effect == &"forest_path_beam":
+		return 0.
 	if effect in [&"night_mist_light", &"forest_path_air"]:
 		return .5
 	if effect == &"shadow_softness":
@@ -913,7 +931,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -958,6 +976,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 27 and effect == &"forest_path_air":
 			missing_value = 0.
+		if version < 28 and effect == &"forest_path_beam":
+			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
@@ -988,6 +1008,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		level.look._publish_crown_wind()
 		if changed_effect == &"tree_wind":
 			return
+	if changed_effect == &"forest_path_beam":
+		_publish_point_cutoff()
+		return
 	if changed_effect == &"forest_path_air":
 		return # The volume reads the live fixture and mix immediately before dispatch.
 	if changed_effect == &"night_path_chroma":
@@ -1362,6 +1385,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
 		if effect == &"forest_near_scatter":
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
+		if effect == &"forest_path_beam":
+			slider.tooltip_text = "Aim the fixed forest light downward across the path using the captured angular falloff. Set 0% to compare the previous beam."
 		if effect == &"forest_path_air":
 			slider.tooltip_text = "Warm the existing mist near the fixed forest lamp. Set 0% for the prior look. Requires Combined mode and Forest path light."
 		if effect == &"night_mist_light":

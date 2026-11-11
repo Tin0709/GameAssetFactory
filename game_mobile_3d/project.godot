@@ -107,6 +107,10 @@ gaf_point_mixed={
 "type": "bool",
 "value": false
 }
+gaf_path_beam={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
 gaf_point_soft={
 "type": "vec2",
 "value": Vector2(0, 0)
