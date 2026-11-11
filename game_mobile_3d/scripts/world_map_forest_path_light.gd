@@ -27,7 +27,8 @@ func update(world: Node3D, phase: float, strength: float) -> bool:
 	_submitted = state
 	fixture.visible = state.y > 0.0
 	light.light_energy = state.y
-	_material.set_shader_parameter("phase_coverage", state.x)
+	# Finish the fixture reveal before the light finishes its dusk ramp.
+	_material.set_shader_parameter("phase_coverage", smoothstep(0.0, 0.25, state.x))
 	return true
 
 func is_compatible_secondary(candidate: Light3D) -> bool:
