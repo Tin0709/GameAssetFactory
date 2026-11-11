@@ -288,9 +288,9 @@ func set_grove_visible(enabled: bool, at: Vector3) -> bool:
 	if collider==null:collider=player.get_node_or_null("BodyCollision")
 	var player_shape := collider.shape as CapsuleShape3D
 	if grove != null and not grove.set_enabled(enabled, at, player_shape): return false
-	vegetation_visible=enabled
+	vegetation_visible=enabled and not showcase.private_primary
 	for batch: MultiMeshInstance3D in geometry.vegetation_batches+geometry.accent_batches:
-		batch.visible = enabled and not showcase.private_primary
+		batch.visible = vegetation_visible
 	if enabled and grove != null:
 		grove.update_focus($Camera3D, player.global_position, view_mode == "gameplay")
 		if look != null: look.refresh_grove_lighting()

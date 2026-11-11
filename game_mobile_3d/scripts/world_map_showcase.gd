@@ -1346,7 +1346,7 @@ func _build_ui()->void:
 			toggle.toggled.connect(func(value:bool):plants.set(option,value))
 	panel.hide()
 	_hint=Label.new();_hint.name="ShowcaseHint";_hint.position=Vector2(18,34);_hint.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · L options"
+	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · Shift+G grove · L options"
 	if not unavailable_reason.is_empty():_hint.text=unavailable_reason;_hint.modulate=Color(1.,.6,.35)
 	hud.add_child(_hint)
 	_vignette=ColorRect.new();_vignette.name="AtmosphereVignette";_vignette.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -1356,7 +1356,7 @@ func _build_ui()->void:
 
 func handle_key(event:InputEventKey)->bool:
 	if not private_primary:return false
-	if event.physical_keycode==KEY_G and plants!=null:
+	if event.physical_keycode==KEY_G and not event.shift_pressed and plants!=null:
 		plants.visible=not plants.visible
 		if not plants.visible:plants.reset()
 		return true
