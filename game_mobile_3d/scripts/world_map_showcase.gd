@@ -667,7 +667,8 @@ func set_forest_spruce_visible(enabled: bool) -> void:
 	var collider := level.player.get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if collider == null:
 		collider = level.player.get_node_or_null("BodyCollision") as CollisionShape3D
-	if collider != null and grove.set_spruce_visible(enabled, level.player.global_position, collider.shape as CapsuleShape3D):
+	var capsule := collider.shape as CapsuleShape3D if collider != null else null
+	if capsule != null and grove.set_spruce_visible(enabled, level.player.global_position, capsule):
 		if enabled:
 			level.look.refresh_grove_lighting()
 			grove.update_focus(level.get_node("Camera3D"), level.player.global_position, level.view_mode == "gameplay")

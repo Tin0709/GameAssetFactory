@@ -6,7 +6,7 @@ const SPRUCE_MANIFEST_SHA := "e26848637c3c3d700d3f9bf7d0197b9da96ccbd492fdce4cdc
 const SPRUCE_PLACEMENTS := [
 	Vector4(-37.5, 5.5, 0, 0), Vector4(-31.5, -2.5, 1, 1),
 	Vector4(-22.5, 0.5, 2, 3), Vector4(-16.5, 7.5, 3, 0),
-	Vector4(-35.5, 15.5, 1, 2), Vector4(-25.0, 17.0, 4, 1),
+	Vector4(-35.5, 15.5, 1, 2), Vector4(-26.0, 19.0, 4, 1),
 	Vector4(-40.5, 22.5, 2, 0),
 ]
 const LEAF_PROOF := "godot_lab/leaf_vertex_material_v001/profile.private.json"
