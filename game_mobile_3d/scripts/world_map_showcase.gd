@@ -39,6 +39,8 @@ var captured_mist_source:=true
 var mist_source_active:=false
 var grove_mist_enabled := true
 var _grove_mist_toggle: CheckButton
+var _source_terrain_tiles: Texture2DArray
+var _source_terrain_toggle: CheckButton
 var forest:=FOREST.new()
 var atmosphere_review:="combined"
 var _forest_expected:Dictionary={}
@@ -647,6 +649,20 @@ func set_grove_mist(enabled: bool) -> void:
 	if _grove_mist_toggle != null:
 		_grove_mist_toggle.set_pressed_no_signal(enabled)
 
+func set_source_terrain(enabled: bool) -> bool:
+	if enabled and _source_terrain_tiles == null:
+		_source_terrain_tiles = preload("res://scripts/world_map_source_terrain.gd").load_tiles()
+	enabled = enabled and _source_terrain_tiles != null and private_primary
+	for item: Array in level.look.terrain_materials:
+		var material: ShaderMaterial = item[3]
+		material.set_shader_parameter("use_source_terrain", enabled)
+		material.set_shader_parameter("source_terrain_tiles", _source_terrain_tiles if enabled else null)
+	level.geometry.reset_cutaway_materials()
+	level.geometry.update_cutaway(level.player.position, level.get_node("Camera3D").position, level.view_mode == "gameplay")
+	if _source_terrain_toggle != null:
+		_source_terrain_toggle.set_pressed_no_signal(enabled)
+	return enabled
+
 func forest_active()->bool:
 	return private_primary and level!=null and level.look.stage==2 and level.view_mode=="gameplay" and atmosphere_review!="previous" and forest.available()
 
@@ -1180,6 +1196,13 @@ func _build_ui()->void:
 	grove_mist.tooltip_text = "Apply the existing spatial mist to tree bark and crowns when the grove is visible. Fades out at Noon. Turn off to compare."
 	grove_mist.toggled.connect(set_grove_mist)
 	box.add_child(grove_mist)
+	var terrain_atlas := CheckButton.new()
+	_source_terrain_toggle = terrain_atlas
+	terrain_atlas.text = "Terrain · MD2 atlas (preview)"
+	terrain_atlas.focus_mode = Control.FOCUS_NONE
+	terrain_atlas.tooltip_text = "Compare the original MD2 surface tiles on the current WorldMap. B shows the original graphics."
+	terrain_atlas.toggled.connect(set_source_terrain)
+	box.add_child(terrain_atlas)
 	var gentle:=CheckButton.new();gentle.name="GentleNoon";gentle.text="Light · gentle midday sunlight";gentle.button_pressed=gentle_noon;gentle.focus_mode=Control.FOCUS_NONE;box.add_child(gentle)
 	gentle.tooltip_text="18% less direct sunlight at noon, smoothly returning to the previous morning/evening lighting. Ambient and source presets unchanged. OFF compares the previous result."
 	gentle.toggled.connect(set_gentle_noon)

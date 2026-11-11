@@ -68,8 +68,12 @@ void fragment() {
 	}
 #endif
 	vec4 color = albedo_tint;
-	if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);
-	if (use_vertex_color) color *= COLOR;
+	if (use_source_terrain) {
+		color.rgb = source_terrain_color(cutaway_world, surface_normal);
+	} else {
+		if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);
+		if (use_vertex_color) color *= COLOR;
+	}
 	ALBEDO = shade_world_surface(color.rgb,cutaway_world,surface_top);
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	cloud_transmission=world_cloud_shade(cutaway_world);

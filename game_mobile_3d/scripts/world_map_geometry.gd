@@ -568,6 +568,9 @@ func _make_cutaway_material(native: Material) -> ShaderMaterial:
 		material.set_shader_parameter("native_specular", native.metallic_specular)
 		material.set_shader_parameter("use_vertex_color", native.vertex_color_use_as_albedo)
 	elif native is ShaderMaterial:
+		for parameter: String in ["use_source_terrain", "source_terrain_tiles"]:
+			var value: Variant = native.get_shader_parameter(parameter)
+			if value != null: material.set_shader_parameter(parameter, value)
 		for parameter:String in preload("res://scripts/world_map_terrain_material.gd").PARAMETERS+["terrain_key_radiance","terrain_ambient_scale","terrain_ambient_tint","terrain_colored_visibility"]:
 			var value:Variant=native.get_shader_parameter(parameter)
 			if value!=null:material.set_shader_parameter(parameter,value)
