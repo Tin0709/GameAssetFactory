@@ -66,6 +66,7 @@ const BALANCED_ATMOSPHERE := {
 	&"exposure": .9,
 	&"player_sky": 1.25,
 }
+const BALANCED_DAY_REFERENCE_FINISH := .75
 var _lighting_mix: Dictionary = {}
 var _lighting_sliders: Dictionary = {}
 var _balanced_preview := false
@@ -527,8 +528,10 @@ func balanced_shadow_weight() -> float:
 	if not _balanced_preview or atmosphere_review not in ["lighting", "combined"] or not forest_active():
 		return 0.
 	# Keep the approved Noon and night filtering. This is a Godot look blend.
-	var daylight := smoothstep(5.5, 7., hour) * (1. - smoothstep(16.5, 19.5, hour))
-	return PHASE_FINISH.phase_weight(hour) * daylight
+	return PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+
+func _balanced_daylight_weight() -> float:
+	return smoothstep(5.5, 7., hour) * (1. - smoothstep(16.5, 19.5, hour))
 
 func local_exposure_mix_scale() -> float:
 	if forest_active() and atmosphere_review in ["haze", "combined"]:
@@ -540,7 +543,8 @@ func bounded_exposure_strength() -> float:
 	return LOCAL_EXPOSURE_STRENGTH * local_exposure_mix_scale()
 
 func reference_finish_mix_scale() -> float:
-	return _lighting_scale(&"grade")
+	var base := _lighting_scale(&"grade")
+	return lerpf(base, BALANCED_DAY_REFERENCE_FINISH, _balanced_daylight_weight()) if _balanced_preview else base
 
 func player_sky_fill_mix_scale() -> float:
 	if forest_spatial_sky_context():
@@ -917,7 +921,7 @@ func _build_ui()->void:
 	_balanced_toggle = balanced
 	balanced.name = "BalancedAtmospherePreview"
 	balanced.text = "Balanced atmosphere (preview)"
-	balanced.tooltip_text = "Compare near haze and a balanced light mix. Morning and afternoon also soften F1's directional shadow edges. Turn off to restore your mix."
+	balanced.tooltip_text = "Compare near haze, cooler shaded surfaces and softer F1 shadow edges during the day. Turn off to restore your mix."
 	balanced.focus_mode = Control.FOCUS_NONE
 	balanced.toggled.connect(set_balanced_atmosphere_preview)
 	box.add_child(balanced)
