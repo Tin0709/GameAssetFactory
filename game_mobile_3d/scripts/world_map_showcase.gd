@@ -87,6 +87,7 @@ const BALANCED_ATMOSPHERE := {
 	&"grade": .55,
 	&"exposure": .9,
 	&"player_sky": 1.25,
+	&"grass_sky": 0.,
 	&"near_haze": 1.,
 }
 const BALANCED_DAY_REFERENCE_FINISH := .75
@@ -693,7 +694,7 @@ func set_full_direct_shadows(value:bool)->void:
 func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"shadow_softness":
 		return DAYLIGHT_SHADOW_SOFTNESS
-	return 0. if effect == &"grass_sky" else 1.
+	return 1.
 
 func _lighting_scale(effect: StringName) -> float:
 	var default := _lighting_scale_default(effect)
@@ -805,7 +806,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		var from_older_recipe: bool = (version == 1 and effect == &"grade") \
 			or (version < 3 and effect == &"sky_chroma") or (version < 4 and effect == &"player_sky") \
 			or (version < 5 and effect in [&"near_haze", &"bloom_spread"]) \
-			or (version < 6 and effect == &"grass_sky") or (version < 7 and effect == &"moon") \
+			or (version < 7 and effect == &"moon") \
 			or (version < 8 and effect in [&"lantern_lift", &"lantern_air"]) \
 			or (version < 9 and effect == &"lantern_glow") \
 			or (version < 10 and effect == &"shadow_softness") \
@@ -813,6 +814,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		if version < 12 and effect == &"daylight_balance":
 			missing_value = 0. # Keep saved looks as they were before this calibration.
+		if version < 6 and effect == &"grass_sky":
+			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
