@@ -20,12 +20,12 @@ vec3 source_terrain_sample(vec2 uv, float layer) {
 }
 
 vec3 source_terrain_color(vec3 world, vec3 normal) {
-	bool flat = abs(normal.y) > 0.9;
-	vec2 uv = flat ? vec2(world.x, -world.z) :
+	bool horizontal = abs(normal.y) > 0.9;
+	vec2 uv = horizontal ? vec2(world.x, -world.z) :
 		vec2(abs(normal.x) > 0.9 ? -world.z * sign(normal.x) : world.x * sign(normal.z), world.y);
 	float layer = ground_grade == 3 ? 4.0 : (normal.y > 0.9 ? 3.0 : 2.0);
 	if (ground_grade == 1) {
-		layer = normal.y > 0.9 ? 0.0 : (flat ? 2.0 : 1.0);
+		layer = normal.y > 0.9 ? 0.0 : (horizontal ? 2.0 : 1.0);
 	}
 	return source_terrain_sample(uv, layer);
 }
