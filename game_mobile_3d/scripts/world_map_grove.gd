@@ -1,6 +1,14 @@
 extends Node3D
 ## Woodland planting. Editor research trees are loaded from the private workspace.
 const SOURCE_MANIFEST := "godot_lab/world_map_unified_showcase_v001/grove_mist_continuity_v001/native_oaks/sources.private.json"
+const SPRUCE_MANIFEST := "godot_lab/world_map_unified_showcase_v001/forest_spruce_shadow_v001/sources.private.json"
+const SPRUCE_MANIFEST_SHA := "e26848637c3c3d700d3f9bf7d0197b9da96ccbd492fdce4cdcd387246dc577c7"
+const SPRUCE_PLACEMENTS := [
+	Vector4(-37.5, 5.5, 0, 0), Vector4(-31.5, -2.5, 1, 1),
+	Vector4(-22.5, 0.5, 2, 3), Vector4(-16.5, 7.5, 3, 0),
+	Vector4(-35.5, 15.5, 1, 2), Vector4(-25.0, 17.0, 4, 1),
+	Vector4(-40.5, 22.5, 2, 0),
+]
 const LEAF_PROOF := "godot_lab/leaf_vertex_material_v001/profile.private.json"
 const LEAF_PROOF_SHA := "b4f10be37bfc16bab2b8c06a669619dafe5b9c5942b157421c4fe1cb30f56444"
 const LEAF_DRAW_CONSTANTS := "graphics_vfx/gpu_capture_20261029/terrain_foliage_reconstruction/bindings/event879_PIX_GENERIC_PIPELINE_STAGE_PS_r2.bin"
@@ -88,6 +96,13 @@ var _source_leaf_weights: ImageTexture
 var _source_leaf_mesh: Mesh
 var _source_leaf_hue := 0.
 var _source_leaf_mix := 0.
+var _spruce_root: Node3D
+var _spruce_atlas: ImageTexture
+var _spruce_appearance := ShaderMaterial.new()
+var _spruce_shadow := ShaderMaterial.new()
+var _spruce_trunks: Array[StaticBody3D] = []
+var _spruce_casters: Array[MeshInstance3D] = []
+var spruce_shadows := true
 
 func build(level: Node3D) -> bool:
 	hide()
@@ -132,13 +147,8 @@ func _build_source_oaks(level: Node3D) -> bool:
 	var assets: Array[Node3D] = []
 	for row: Variant in meshes:
 		var path := _checked_source_path(root, row, "glb")
-		if path.is_empty(): break
-		var document := GLTFDocument.new()
-		var state := GLTFState.new()
-		if document.append_from_file(path, state) != OK: break
-		var mesh := document.generate_scene(state) as Node3D
+		var mesh := _load_source_tree(path)
 		if mesh == null: break
-		mesh.set_meta("source_glb", path.get_file())
 		if path.get_file() == "SM_Tree_Oak_1x1_Var2.glb":
 			_prepare_source_leaf_tint(root, row.sha256, mesh)
 		assets.append(mesh)
@@ -160,7 +170,111 @@ func _build_source_oaks(level: Node3D) -> bool:
 				break
 	for asset in assets:
 		asset.free()
+	if source_oaks:
+		_build_source_spruce(level, root)
 	return source_oaks
+
+func _load_source_tree(path: String) -> Node3D:
+	if path.is_empty():
+		return null
+	var document := GLTFDocument.new()
+	var state := GLTFState.new()
+	if document.append_from_file(path, state) != OK:
+		return null
+	var tree := document.generate_scene(state) as Node3D
+	if tree != null:
+		tree.set_meta("source_glb", path.get_file())
+	return tree
+
+func _build_source_spruce(level: Node3D, root: String) -> void:
+	var manifest_path := root.path_join(SPRUCE_MANIFEST)
+	if not FileAccess.file_exists(manifest_path) or FileAccess.get_sha256(manifest_path) != SPRUCE_MANIFEST_SHA:
+		return
+	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(manifest_path))
+	var atlas_path := _checked_source_path(root, manifest.atlas, "png")
+	if atlas_path.is_empty():
+		return
+	var image := Image.load_from_file(atlas_path)
+	if image == null or image.is_empty():
+		return
+	var assets: Array[Node3D] = []
+	for row: Dictionary in manifest.meshes:
+		var asset := _load_source_tree(_checked_source_path(root, row, "glb"))
+		if asset == null:
+			break
+		assets.append(asset)
+	if assets.size() == manifest.meshes.size():
+		_place_source_spruce(level, assets, manifest.meshes, image)
+	for asset in assets:
+		asset.free()
+
+func _place_source_spruce(level: Node3D, assets: Array[Node3D], rows: Array, image: Image) -> void:
+	# Placement is authored for the existing walkable path. Keep the source
+	# metres, UVs and mesh intact, centering each trunk on its original footprint.
+	for spot: Vector4 in SPRUCE_PLACEMENTS:
+		if not is_finite(level.surface_height(spot.x, spot.y)):
+			return
+	_spruce_atlas = ImageTexture.create_from_image(image)
+	for material: ShaderMaterial in [_spruce_appearance, _spruce_shadow]:
+		material.shader = REVEAL_SHADER
+		_bind_spruce_atlas(material)
+	_spruce_root = Node3D.new()
+	_spruce_root.name = "ForestSpruce"
+	for spot: Vector4 in SPRUCE_PLACEMENTS:
+		var index := int(spot.z)
+		var width: float = rows[index].trunk_width_m
+		var tree := assets[index].duplicate() as Node3D
+		tree.name = "MD2Spruce%02d" % (_spruce_root.get_child_count() + 1)
+		tree.position = Vector3(spot.x, level.surface_height(spot.x, spot.y), spot.y)
+		tree.rotation.y = spot.w * PI * .5
+		var meshes := tree.find_children("*", "MeshInstance3D", true, false)
+		for visual: MeshInstance3D in meshes:
+			visual.position += Vector3(width * .5, 0., width * .5)
+			_spruce_casters.append(_split_shadow(visual, _spruce_appearance, _spruce_shadow))
+		var shape := BoxShape3D.new()
+		shape.size = Vector3(width, 3.4, width)
+		var collider := CollisionShape3D.new()
+		collider.shape = shape
+		var body := StaticBody3D.new()
+		body.name = "Trunk"
+		body.position.y = shape.size.y * .5
+		body.add_child(collider)
+		tree.add_child(body)
+		_spruce_trunks.append(body)
+		_spruce_root.add_child(tree)
+	level.add_child(_spruce_root)
+
+func _bind_spruce_atlas(material: ShaderMaterial) -> void:
+	material.set_shader_parameter("use_source_atlas", true)
+	material.set_shader_parameter("source_atlas", _spruce_atlas)
+
+func spruce_available() -> bool:
+	return is_instance_valid(_spruce_root)
+
+func spruce_visible() -> bool:
+	return spruce_available() and _spruce_root.visible
+
+func set_spruce_visible(value: bool, player_position: Vector3, capsule: CapsuleShape3D) -> bool:
+	if not spruce_available():
+		return false
+	if value:
+		for trunk: StaticBody3D in _spruce_trunks:
+			var shape: BoxShape3D = trunk.get_child(0).shape
+			var offset := trunk.to_local(player_position)
+			var margin := Vector2(shape.size.x, shape.size.z) * .5
+			var horizontal := (Vector2(offset.x, offset.z).abs() - margin).max(Vector2.ZERO)
+			if absf(offset.y + capsule.height * .5) < (shape.size.y + capsule.height) * .5 \
+				and horizontal.length() < capsule.radius + .03:
+				return false
+	_spruce_root.visible = value
+	for trunk: StaticBody3D in _spruce_trunks:
+		trunk.collision_layer = 1 if value else 0
+	return true
+
+func set_spruce_shadows(value: bool) -> void:
+	spruce_shadows = value
+	for caster in _spruce_casters:
+		caster.visible = value
 
 func _checked_source_path(root: String, row: Variant, extension: String) -> String:
 	if not row is Dictionary or not row.get("file") is String or not row.get("sha256") is String:
@@ -262,22 +376,25 @@ func _prepare_meshes(tree: Node3D) -> void:
 		var appearance := _canopy_appearance if source_oaks or str(visual.name).begins_with("Leaves") else _appearance
 		if not source_oaks and source != null:
 			appearance.set_shader_parameter("native_specular", source.metallic_specular)
-		# The shadow-only instance uses the original mesh and its imported shadow mesh.
-		var caster := MeshInstance3D.new()
-		caster.name = visual.name + "Shadow"
-		caster.mesh = visual.mesh
-		caster.transform = visual.transform
-		caster.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 		if appearance == _canopy_appearance:
 			# The caster shares the exact deformation, but never the reveal hole.
-			caster.material_override = _canopy_shadow
-			caster.extra_cull_margin = 0.20
 			visual.extra_cull_margin = 0.20
-		visual.get_parent().add_child(caster)
-		visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		visual.material_override = appearance
+		_split_shadow(visual, appearance, _canopy_shadow if appearance == _canopy_appearance else null)
 		if source_oaks and _source_leaf_mesh != null and visual.mesh == _source_leaf_mesh:
 			visual.set_instance_shader_parameter("source_leaf_mask", true)
+
+func _split_shadow(visual: MeshInstance3D, appearance: ShaderMaterial, shadow: ShaderMaterial) -> MeshInstance3D:
+	var caster := MeshInstance3D.new()
+	caster.name = visual.name + "Shadow"
+	caster.mesh = visual.mesh
+	caster.transform = visual.transform
+	caster.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+	caster.material_override = shadow
+	caster.extra_cull_margin = visual.extra_cull_margin
+	visual.get_parent().add_child(caster)
+	visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	visual.material_override = appearance
+	return caster
 
 func _add_trunk(tree: Node3D, tree_scale: float) -> void:
 	var shape := CylinderShape3D.new()
@@ -313,6 +430,9 @@ func set_lighting(bark: Shader, leaves: Shader, field: Texture2D, shape: Vector4
 	_direct_clouds = field != null
 	_apply_lighting(_appearance, bark, field, shape, time)
 	_apply_lighting(_canopy_appearance, leaves, field, shape, time)
+	if spruce_available():
+		_apply_lighting(_spruce_appearance, leaves, field, shape, time)
+		_bind_spruce_atlas(_spruce_appearance)
 
 func set_crown_detail(enabled: bool) -> void:
 	_canopy_appearance.set_shader_parameter("crown_detail", enabled)
@@ -340,12 +460,16 @@ func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D,
 		material.set_shader_parameter("cloud_time", time)
 
 func mist_receivers(strength: float) -> Array[ShaderMaterial]:
-	if not visible or strength <= 0.0:
+	if strength <= 0.0:
 		return []
-	var receivers: Array[ShaderMaterial] = [_appearance, _canopy_appearance]
+	var receivers: Array[ShaderMaterial] = []
+	if visible:
+		receivers.append_array([_appearance, _canopy_appearance])
+	if spruce_visible():
+		receivers.append(_spruce_appearance)
 	if _mist_strength != strength:
 		_mist_strength = strength
-		for material in receivers:
+		for material in [_appearance, _canopy_appearance, _spruce_appearance]:
 			material.set_shader_parameter("grove_mist_strength", strength)
 	return receivers
 
@@ -353,18 +477,22 @@ func publish_cloud_time(time: float) -> void:
 	if not _direct_clouds: return
 	_appearance.set_shader_parameter("cloud_time", time)
 	_canopy_appearance.set_shader_parameter("cloud_time", time)
+	if spruce_available(): _spruce_appearance.set_shader_parameter("cloud_time", time)
 
 func publish_cloud_shape(shape: Vector4) -> void:
 	if not _direct_clouds:
 		return
 	_appearance.set_shader_parameter("cloud_shape", shape)
 	_canopy_appearance.set_shader_parameter("cloud_shape", shape)
+	if spruce_available(): _spruce_appearance.set_shader_parameter("cloud_shape", shape)
 
 func update_focus(camera: Camera3D, player_position: Vector3, gameplay: bool) -> void:
 	_appearance.set_shader_parameter("reveal_player", gameplay)
 	_canopy_appearance.set_shader_parameter("reveal_player", gameplay)
+	if spruce_available(): _spruce_appearance.set_shader_parameter("reveal_player", gameplay)
 	if gameplay:
 		var focus := player_position + Vector3.UP * 0.9
 		var view_position := camera.global_transform.affine_inverse() * focus
 		_appearance.set_shader_parameter("player_view", view_position)
 		_canopy_appearance.set_shader_parameter("player_view", view_position)
+		if spruce_available(): _spruce_appearance.set_shader_parameter("player_view", view_position)
