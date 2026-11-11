@@ -71,6 +71,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"near_haze": ["Near haze density", 2.],
 	&"near_haze_depth": ["Near haze depth", 1.],
 	&"scatter": ["Fog brightness", 2.],
+	&"night_mist_light": ["Night mist light", 1.],
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"humid_light": ["Humid light diffusion", 1.],
@@ -80,7 +81,8 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 18
+const LIGHTING_MIX_VERSION := 19
+const NIGHT_MIST_MAX_GAIN := 4.0
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
@@ -501,6 +503,11 @@ func _update_mist()->void:
 	sample.scatter_energy=clampf(incoming,.015,.18)/maxf(linear.dot(luma),.0001)
 	_apply_mist_source(sample,measured,linear)
 	sample.scatter_energy *= _lighting_scale(&"scatter")
+	if atmosphere_review == "combined" and not measured.is_empty():
+		# Scale only the existing cool source. Optical depth and the warm emitter
+		# stay independent, so the distant haze can lift without hiding the actor.
+		var night_mix := moonlight_weight(hour) * _lighting_scale(&"night_mist_light")
+		sample.scatter_energy *= lerpf(1.0, NIGHT_MIST_MAX_GAIN, night_mix)
 	sample.player_light_weight *= _lighting_scale(&"lantern") * _lighting_scale(&"lantern_air")
 	var near_scale := _lighting_scale(&"near_haze")
 	if near_scale > 0. and not measured.is_empty() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
@@ -719,6 +726,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 0.
 	if effect == &"night_path_chroma":
 		return .75
+	if effect == &"night_mist_light":
+		return .5
 	if effect == &"shadow_softness":
 		return DAYLIGHT_SHADOW_SOFTNESS
 	if effect == &"spruce_sky":
@@ -836,7 +845,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -862,6 +871,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 17 and effect == &"tree_wind":
 			missing_value = 0.
 		if version < 18 and effect == &"night_path_chroma":
+			missing_value = 0.
+		if version < 19 and effect == &"night_mist_light":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -915,7 +926,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"bloom_spread", &"lantern_air"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
 		_update_mist()
 		return
 	if changed_effect in [&"grass_sky", &"spruce_sky", &"humid_light"]:
@@ -1222,6 +1233,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
 		if effect == &"near_haze_depth":
 			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
+		if effect == &"night_mist_light":
+			slider.tooltip_text = "Lift cool scattered light at night in Combined mode. 0% restores the old color intensity. Fog density and the warm lantern are separate."
 		if effect == &"shadow_softness":
 			slider.tooltip_text = "Adjust the F1 sunlight filter radius in the morning and afternoon. 100% uses the previous radius. Noon and night keep their existing filter."
 		if effect == &"sun_pockets":
