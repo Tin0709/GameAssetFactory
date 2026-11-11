@@ -11,30 +11,6 @@ uniform vec2 path_map_size = vec2(1.0);
 uniform float grass_variation_strength = 0.16;
 uniform float contact_shade_strength = 0.30;
 uniform float plant_soil_strength = 0.75;
-#ifdef GAF_WORLD_TERRAIN_PBR
-uniform bool use_source_terrain = false;
-uniform sampler2DArray source_terrain_tiles : source_color, filter_linear_mipmap, repeat_enable;
-
-vec3 source_terrain_sample(vec2 uv, float layer) {
-	return texture(source_terrain_tiles, vec3(uv, layer)).rgb;
-}
-
-vec3 source_terrain_color(vec3 world, vec3 normal) {
-	bool horizontal = abs(normal.y) > 0.9;
-	vec2 uv = horizontal ? vec2(world.x, -world.z) :
-		vec2(abs(normal.x) > 0.9 ? -world.z * sign(normal.x) : world.x * sign(normal.z), world.y);
-	float layer = ground_grade == 3 ? 4.0 : (normal.y > 0.9 ? 3.0 : 2.0);
-	if (ground_grade == 1) {
-		layer = normal.y > 0.9 ? 0.0 : (horizontal ? 2.0 : 1.0);
-		if (!horizontal) {
-			// Avoid filtering the bottom earth row into the grass edge above.
-			vec2 bounded = vec2(uv.x, clamp(fract(uv.y), 0.03125, 0.96875));
-			return textureGrad(source_terrain_tiles, vec3(bounded, layer), dFdx(uv), dFdy(uv)).rgb;
-		}
-	}
-	return source_terrain_sample(uv, layer);
-}
-#endif
 vec3 grade_surface_kind(vec3 source, int grade, float contrast) {
 	if (grade == 0) return source;
 	bool green = source.g > source.r * 1.13 && source.g > source.b * 1.35;
@@ -189,14 +165,8 @@ float oak_root_coverage(vec3 world, int root_id) {
 }
 
 vec3 shade_world_surface(vec3 source, vec3 world, float top) {
-	vec3 original = source;
-#ifdef GAF_WORLD_TERRAIN_PBR
-	if (!use_source_terrain)
-#endif
-	{
-		original = grade_surface_kind(source,ground_grade,texture_contrast);
-		if (top>0.9 && ground_grade==1 && source.g>source.r*1.13 && source.g>source.b*1.35) original=vary_grass_surface(original,world);
-	}
+	vec3 original=grade_surface_kind(source,ground_grade,texture_contrast);
+	if (top>0.9 && ground_grade==1 && source.g>source.r*1.13 && source.g>source.b*1.35) original=vary_grass_surface(original,world);
 	if (!path_blending || top<0.9 || ground_grade==3) return original;
 	vec2 grid=floor(world.xz)-path_map_origin;
 	if (any(lessThan(grid,vec2(0.0))) || any(greaterThanEqual(grid,path_map_size))) return original;
@@ -227,22 +197,11 @@ vec3 shade_world_surface(vec3 source, vec3 world, float top) {
 	vec2 patch=floor(world.xz*10.0)/10.0;
 	float noise=edge_noise(patch*2.8)*0.70+edge_noise(patch*7.1)*0.30;
 	float dirt=smoothstep(-0.035,0.035,signed_distance+(noise-0.54)*0.64);
-	vec3 grass;
-	vec3 soil;
-#ifdef GAF_WORLD_TERRAIN_PBR
-	if (use_source_terrain) {
-		vec2 uv = vec2(world.x, -world.z);
-		grass = source_terrain_sample(uv, 0.0);
-		soil = source_terrain_sample(uv, 3.0);
-	} else
-#endif
-	{
-		grass=grade_surface_kind(texture(path_grass_atlas,world.xz).rgb,1,texture_contrast);
-		grass=vary_grass_surface(grass,world);
-		soil=grade_surface_kind(texture(path_dirt_atlas,world.xz).rgb,2,texture_contrast);
-		grass=plant_soil_speckles(grass,soil,world,field);
-		grass=mix(grass,soil*vec3(0.83,0.86,0.93),root_coverage);
-	}
+	vec3 grass=grade_surface_kind(texture(path_grass_atlas,world.xz).rgb,1,texture_contrast);
+	grass=vary_grass_surface(grass,world);
+	vec3 soil=grade_surface_kind(texture(path_dirt_atlas,world.xz).rgb,2,texture_contrast);
+	grass=plant_soil_speckles(grass,soil,world,field);
+	grass=mix(grass,soil*vec3(0.83,0.86,0.93),root_coverage);
 	if (path_verge > 0.0) {
 		// Let grass reclaim the road shoulders in coherent world-space patches.
 		// Preserve the solid dirt away from the border and reuse both atlases.

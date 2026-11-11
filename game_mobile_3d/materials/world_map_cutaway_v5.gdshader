@@ -6,6 +6,7 @@ shader_type spatial;
 render_mode diffuse_burley, depth_draw_always, cull_disabled;
 #include "res://materials/gameplay_cliff_cutaway.gdshaderinc"
 #include "res://materials/world_map_surface_v5.gdshaderinc"
+#include "res://materials/world_map_source_terrain.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
 #include "res://materials/world_map_terrain_pbr.gdshaderinc"
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
@@ -69,12 +70,12 @@ void fragment() {
 #endif
 	vec4 color = albedo_tint;
 	if (use_source_terrain) {
-		color.rgb = source_terrain_color(cutaway_world, surface_normal);
+		ALBEDO = source_terrain_color(cutaway_world, surface_normal);
 	} else {
 		if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);
 		if (use_vertex_color) color *= COLOR;
+		ALBEDO = shade_world_surface(color.rgb, cutaway_world, surface_top);
 	}
-	ALBEDO = shade_world_surface(color.rgb,cutaway_world,surface_top);
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	cloud_transmission=world_cloud_shade(cutaway_world);
 #else
