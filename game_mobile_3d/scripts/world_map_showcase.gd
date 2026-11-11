@@ -353,6 +353,7 @@ func _update_mist()->void:
 	sample.scatter_energy=clampf(incoming,.015,.18)/maxf(linear.dot(luma),.0001)
 	_apply_mist_source(sample,measured,linear)
 	sample.scatter_energy *= _lighting_scale(&"scatter")
+	sample.player_light_weight *= _lighting_scale(&"lantern")
 	var emitter:Vector3=level.presentation.player_position()
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
