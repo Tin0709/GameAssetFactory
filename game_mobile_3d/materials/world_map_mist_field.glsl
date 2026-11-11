@@ -103,4 +103,3 @@ void main(){
   imageStore(volume,ivec3(pixel,i),vec4(scattered,exp(-optical)));previous=d;
  }
 }
-
