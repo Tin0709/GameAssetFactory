@@ -58,6 +58,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"daylight_balance": ["Daylight color balance", 1.],
 	&"player_sky": ["Player sky fill", 2.],
 	&"grass_sky": ["Grass sky fill", 1.],
+	&"oak_leaf_tint": ["MD2 oak leaf tint", 1.],
 	&"shadow": ["Shadow strength", 1.],
 	&"shadow_softness": ["Shadow softness", 1.5],
 	&"lantern": ["Hip lantern", 2.],
@@ -74,7 +75,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 13
+const LIGHTING_MIX_VERSION := 14
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
@@ -88,6 +89,7 @@ const BALANCED_ATMOSPHERE := {
 	&"exposure": .9,
 	&"player_sky": 1.25,
 	&"grass_sky": 0.,
+	&"oak_leaf_tint": 0.,
 	&"near_haze": 1.,
 }
 const BALANCED_DAY_REFERENCE_FINISH := .75
@@ -756,6 +758,14 @@ func player_sky_fill_mix_scale() -> float:
 func grass_sky_fill_mix_scale() -> float:
 	if forest_spatial_sky_context():
 		return _lighting_scale(&"grass_sky") * PHASE_FINISH.phase_weight(hour)
+
+func _sync_oak_leaf_tint() -> void:
+	if level.grove == null:
+		return
+	var strength := 0.
+	if forest_active() and atmosphere_review == "combined" and level.grove.visible:
+		strength = _lighting_scale(&"oak_leaf_tint") * PHASE_FINISH.phase_weight(hour)
+	level.grove.set_source_leaf_tint(strength)
 	return 0.
 
 func _apply_bounded_exposure_mix() -> void:
@@ -799,7 +809,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -815,6 +825,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 12 and effect == &"daylight_balance":
 			missing_value = 0. # Keep saved looks as they were before this calibration.
 		if version < 6 and effect == &"grass_sky":
+			missing_value = 0.
+		if version < 14 and effect == &"oak_leaf_tint":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -842,6 +854,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
+	if changed_effect in [&"", &"oak_leaf_tint"]:
+		_sync_oak_leaf_tint()
+		if changed_effect == &"oak_leaf_tint":
+			return
 	if changed_effect in [&"", &"lantern_glow"]:
 		_refresh_lantern_glow()
 		if changed_effect == &"lantern_glow":
@@ -1055,6 +1071,7 @@ func _process(delta:float)->void:
 	if cycle_enabled and level.look.stage==2:hour=fposmod(hour+delta*.08,24.)
 	apply_time()
 	_update_mist()
+	_sync_oak_leaf_tint()
 	if _hint!=null and unavailable_reason.is_empty():_hint.visible=_elapsed<12. and not panel.visible
 	if status!=null and panel.visible:
 		_atmosphere_picker.select(["previous","haze","lighting","combined"].find(atmosphere_review))

@@ -1,6 +1,10 @@
 extends Node3D
 ## Woodland planting. Editor research trees are loaded from the private workspace.
 const SOURCE_MANIFEST := "godot_lab/world_map_unified_showcase_v001/grove_mist_continuity_v001/native_oaks/sources.private.json"
+const LEAF_PROOF := "godot_lab/leaf_vertex_material_v001/profile.private.json"
+const LEAF_PROOF_SHA := "b4f10be37bfc16bab2b8c06a669619dafe5b9c5942b157421c4fe1cb30f56444"
+const LEAF_DRAW_CONSTANTS := "graphics_vfx/gpu_capture_20261029/terrain_foliage_reconstruction/bindings/event879_PIX_GENERIC_PIPELINE_STAGE_PS_r2.bin"
+const LEAF_DRAW_SHA := "5c4234fad3f6a08209897ef737b638a7e8086b5459b79d9cbecd86cafaa24966"
 const OAKS := [
 	"res://assets/environment/forest_canopy_v3/tree_oak_a.glb",
 	"res://assets/environment/forest_canopy_v3/tree_oak_b.glb",
@@ -80,6 +84,10 @@ var _mist_strength := -1.0
 var _trunks: Array[StaticBody3D] = []
 var source_oaks := false
 var _source_atlas: ImageTexture
+var _source_leaf_weights: ImageTexture
+var _source_leaf_mesh: Mesh
+var _source_leaf_hue := 0.
+var _source_leaf_mix := 0.
 
 func build(level: Node3D) -> bool:
 	hide()
@@ -131,6 +139,8 @@ func _build_source_oaks(level: Node3D) -> bool:
 		var mesh := document.generate_scene(state) as Node3D
 		if mesh == null: break
 		mesh.set_meta("source_glb", path.get_file())
+		if path.get_file() == "SM_Tree_Oak_1x1_Var2.glb":
+			_prepare_source_leaf_tint(root, row.sha256, mesh)
 		assets.append(mesh)
 	source_oaks = assets.size() == 4
 	if source_oaks:
@@ -164,6 +174,54 @@ func _checked_source_path(root: String, row: Variant, extension: String) -> Stri
 func _bind_source_atlas(material: ShaderMaterial) -> void:
 	material.set_shader_parameter("use_source_atlas", true)
 	material.set_shader_parameter("source_atlas", _source_atlas)
+	if material == _canopy_appearance and _source_leaf_weights != null:
+		material.set_shader_parameter("source_leaf_weights", _source_leaf_weights)
+		material.set_shader_parameter("source_leaf_hue", _source_leaf_hue)
+		material.set_shader_parameter("source_leaf_tint_mix", _source_leaf_mix)
+
+func _prepare_source_leaf_tint(root: String, asset_sha: String, asset: Node3D) -> void:
+	if RenderingServer.get_current_rendering_method() != "mobile" or RenderingServer.get_rendering_device() == null:
+		return
+	var proof_path := root.path_join(LEAF_PROOF)
+	var constants_path := root.path_join(LEAF_DRAW_CONSTANTS)
+	if not FileAccess.file_exists(proof_path) or FileAccess.get_sha256(proof_path) != LEAF_PROOF_SHA:
+		return
+	if not FileAccess.file_exists(constants_path) or FileAccess.get_sha256(constants_path) != LEAF_DRAW_SHA:
+		return
+	var proof: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(proof_path))
+	if proof.asset_sha256 != asset_sha:
+		return
+	var meshes := asset.find_children("*", "MeshInstance3D", true, false)
+	if meshes.size() != 1:
+		return
+	var mesh: Mesh = meshes[0].mesh
+	if mesh == null or mesh.get_surface_count() != 1:
+		return
+	var arrays := mesh.surface_get_arrays(0)
+	if arrays[Mesh.ARRAY_VERTEX].size() != 1552 or arrays[Mesh.ARRAY_INDEX].size() != 2328:
+		return
+	var hashes := HashingContext.new()
+	for channel: Array in [[Mesh.ARRAY_VERTEX, "positions"], [Mesh.ARRAY_TEX_UV, "uv"], [Mesh.ARRAY_INDEX, "indices"]]:
+		hashes.start(HashingContext.HASH_SHA256)
+		hashes.update(arrays[channel[0]].to_byte_array())
+		if hashes.finish().hex_encode() != proof.imported_hashes[channel[1]]:
+			return
+	var weight_path := proof_path.get_base_dir().path_join("oak_var2_color.private.rgba8")
+	if not FileAccess.file_exists(weight_path) or FileAccess.get_sha256(weight_path) != proof.colors_sha256:
+		return
+	var bytes := FileAccess.get_file_as_bytes(weight_path)
+	if bytes.size() != 1552 * 4:
+		return
+	_source_leaf_mesh = mesh
+	_source_leaf_weights = ImageTexture.create_from_image(Image.create_from_data(1552, 1, false, Image.FORMAT_RGBA8, bytes))
+	# Draw 879's material register 1.x supplies the leaf hue angle.
+	_source_leaf_hue = FileAccess.get_file_as_bytes(constants_path).decode_float(16)
+
+func set_source_leaf_tint(strength: float) -> void:
+	if _source_leaf_weights == null or strength == _source_leaf_mix:
+		return
+	_source_leaf_mix = strength
+	_canopy_appearance.set_shader_parameter("source_leaf_tint_mix", strength)
 
 func _place_tree(level: Node3D, tree: Node3D, placement: Vector4) -> bool:
 	var height: float = level.surface_height(placement.x, placement.y)
@@ -218,6 +276,8 @@ func _prepare_meshes(tree: Node3D) -> void:
 		visual.get_parent().add_child(caster)
 		visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		visual.material_override = appearance
+		if source_oaks and _source_leaf_mesh != null and visual.mesh == _source_leaf_mesh:
+			visual.set_instance_shader_parameter("source_leaf_mask", true)
 
 func _add_trunk(tree: Node3D, tree_scale: float) -> void:
 	var shape := CylinderShape3D.new()

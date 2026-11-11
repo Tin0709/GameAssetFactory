@@ -1,5 +1,6 @@
 shader_type spatial;
 #include "res://materials/world_map_wind.gdshaderinc"
+#include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/leaf_material_v001/leaf_material.gdshaderinc"
 #ifdef GAF_SHARED_MIST
 #include "res://materials/world_map_mist.gdshaderinc"
 #endif
@@ -8,12 +9,17 @@ uniform bool reveal_player = false;
 uniform float grove_mist_strength = 0.0;
 uniform bool use_source_atlas = false;
 uniform sampler2D source_atlas : source_color, filter_nearest, repeat_disable;
+uniform sampler2D source_leaf_weights : filter_nearest, repeat_disable;
+uniform float source_leaf_hue = 0.0;
+uniform float source_leaf_tint_mix = 0.0;
+instance uniform bool source_leaf_mask = false;
 uniform bool crown_wind_enabled = false;
 uniform float crown_wind_amplitude = 0.020;
 uniform vec3 player_view;
 uniform float native_specular = 0.24;
 uniform bool crown_detail = false;
 varying vec3 crown_local;
+varying float source_leaf_red;
 
 #ifdef GAF_WORLD_DIRECT_CLOUD
 #include "res://materials/world_map_clouds.gdshaderinc"
@@ -21,6 +27,10 @@ varying vec2 grove_world_xz;
 #endif
 
 void vertex() {
+	source_leaf_red = 0.0;
+	if (source_leaf_mask && source_leaf_tint_mix > 0.0) {
+		source_leaf_red = texelFetch(source_leaf_weights, ivec2(VERTEX_ID, 0), 0).r;
+	}
 	// Evaluate inside each face so its exact block boundary stays deterministic.
 	crown_local = VERTEX - NORMAL * 0.004;
 	if (crown_wind_enabled && !use_source_atlas) {
@@ -74,6 +84,9 @@ void fragment() {
 		vec4 texel = texture(source_atlas, UV);
 		if (texel.a < 0.3333) discard;
 		albedo = texel.rgb;
+		if (source_leaf_red > 0.0) {
+			albedo = gaf_leaf_color(albedo, source_leaf_hue, source_leaf_red * source_leaf_tint_mix);
+		}
 	}
 	if (reveal_player) {
 		// WorldMap uses an orthographic camera. Keep the opening centred on
