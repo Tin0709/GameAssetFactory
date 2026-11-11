@@ -79,6 +79,22 @@ environment/defaults/default_clear_color=Color(0.075, 0.13, 0.17, 1)
 
 [shader_globals]
 
+gaf_spruce_sky_region={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
+gaf_spruce_sky_extent={
+"type": "vec3",
+"value": Vector3(1, 1, 1)
+}
+gaf_spruce_sky_camera={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+gaf_spruce_sky_volume={
+"type": "sampler3D",
+"value": ""
+}
 gaf_point_kernel={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 0)

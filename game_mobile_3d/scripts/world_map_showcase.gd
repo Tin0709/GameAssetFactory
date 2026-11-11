@@ -59,6 +59,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"daylight_balance": ["Daylight color balance", 1.],
 	&"player_sky": ["Player sky fill", 2.],
 	&"grass_sky": ["Grass sky fill", 1.],
+	&"spruce_sky": ["Forest canopy sky", 1.],
 	&"oak_leaf_tint": ["MD2 oak leaf tint", 1.],
 	&"shadow": ["Shadow strength", 1.],
 	&"shadow_softness": ["Shadow softness", 1.5],
@@ -76,7 +77,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 14
+const LIGHTING_MIX_VERSION := 15
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
@@ -90,6 +91,7 @@ const BALANCED_ATMOSPHERE := {
 	&"exposure": .9,
 	&"player_sky": 1.25,
 	&"grass_sky": 0.,
+	&"spruce_sky": 0.,
 	&"oak_leaf_tint": 0.,
 	&"near_haze": 1.,
 }
@@ -712,6 +714,8 @@ func set_full_direct_shadows(value:bool)->void:
 func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"shadow_softness":
 		return DAYLIGHT_SHADOW_SOFTNESS
+	if effect == &"spruce_sky":
+		return 0.
 	return 1.
 
 func _lighting_scale(effect: StringName) -> float:
@@ -825,7 +829,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -843,6 +847,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 6 and effect == &"grass_sky":
 			missing_value = 0.
 		if version < 14 and effect == &"oak_leaf_tint":
+			missing_value = 0.
+		if version < 15 and effect == &"spruce_sky":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -892,7 +898,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"bloom_spread", &"lantern_air"]:
 		_update_mist()
 		return
-	if changed_effect == &"grass_sky":
+	if changed_effect in [&"grass_sky", &"spruce_sky"]:
 		return
 	if changed_effect == &"player_sky":
 		if level.player_light != null:

@@ -11,6 +11,7 @@ render_mode diffuse_burley, depth_draw_always, cull_disabled;
 #include "res://materials/world_map_terrain_pbr.gdshaderinc"
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 #include "res://materials/world_map_terrain_transport.gdshaderinc"
+#include "res://materials/world_map_spruce_sky.gdshaderinc"
 #endif
 #ifdef GAF_WORLD_GROUND_BOUNCE
 #include "res://materials/world_map_ground_bounce.gdshaderinc"
@@ -38,7 +39,8 @@ uniform float native_specular = 0.0;
 
 void vertex() {
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
-	terrain_sky_light=CUSTOM1.rgb;terrain_sun_bounce=CUSTOM2.rgb;
+	terrain_sky_light = CUSTOM1.rgb * gaf_spruce_sky((MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz, INV_VIEW_MATRIX[3].xyz);
+	terrain_sun_bounce = CUSTOM2.rgb;
 #endif
 #ifdef GAF_WORLD_TERRAIN_SKY
 	terrain_sky_factor = CUSTOM0.x;

@@ -130,6 +130,10 @@ func _ready() -> void:
 	player_light.name="PlayerColoredTransport";add_child(player_light);player_light.setup(self)
 	showcase.air_light.setup(self)
 	if showcase.mist!=null:showcase.mist.light_provider=showcase.air_field
+	var spruce_sky := preload("res://scripts/world_map_spruce_sky.gd").new()
+	spruce_sky.name = "SpruceSkyVisibility"
+	add_child(spruce_sky)
+	spruce_sky.setup(self)
 	print("WORLD_MAP_READY cells=%d terrain_triangles=%d build_ms=%d spawn=%s" % [geometry.cells.size(),geometry.terrain_triangles,build_msec,spawn_position])
 
 func abort_map(message: String) -> void:
