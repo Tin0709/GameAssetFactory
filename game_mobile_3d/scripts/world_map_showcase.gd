@@ -536,7 +536,7 @@ func set_lighting_scale(effect: StringName, value: float) -> void:
 	if scale == _lighting_scale(effect):
 		return
 	_lighting_mix[effect] = scale
-	_refresh_lighting_mix(effect in [&"exposure", &"grade"])
+	_refresh_lighting_mix(effect)
 
 func reset_lighting_mix() -> void:
 	_lighting_mix.clear()
@@ -577,7 +577,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	_refresh_lighting_mix()
 	return OK
 
-func _refresh_lighting_mix(finishing_only := false) -> void:
+func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		var scale := _lighting_scale(effect)
@@ -585,7 +585,11 @@ func _refresh_lighting_mix(finishing_only := false) -> void:
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
 	if not forest_active():
 		return
-	if finishing_only:
+	if changed_effect == &"player_sky":
+		if level.player_light != null:
+			level.player_light.refresh()
+		return
+	if changed_effect in [&"exposure", &"grade"]:
 		_apply_bounded_exposure_mix()
 		if phase_finish != null:
 			phase_finish.refresh()
