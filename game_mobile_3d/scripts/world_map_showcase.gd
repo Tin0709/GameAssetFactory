@@ -43,6 +43,7 @@ var _spruce_toggle: CheckButton
 var _source_terrain_tiles: Texture2DArray
 var _source_terrain_toggle: CheckButton
 var forest:=FOREST.new()
+var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
 var atmosphere_review:="combined"
 var _forest_expected:Dictionary={}
 var _forest_hour:=INF
@@ -72,6 +73,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"near_haze_depth": ["Near haze depth", 1.],
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
+	&"forest_accents": ["Forest glow accents", 1.375],
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"humid_light": ["Humid light diffusion", 1.],
@@ -81,7 +83,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 19
+const LIGHTING_MIX_VERSION := 20
 const NIGHT_MIST_MAX_GAIN := 4.0
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
@@ -686,6 +688,7 @@ func set_forest_spruce_visible(enabled: bool) -> void:
 			grove.update_focus(level.get_node("Camera3D"), level.player.global_position, level.view_mode == "gameplay")
 	if _spruce_toggle != null:
 		_spruce_toggle.set_pressed_no_signal(grove.spruce_visible())
+	_sync_forest_accents()
 
 func set_source_terrain(enabled: bool) -> bool:
 	if not private_primary:
@@ -845,7 +848,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -873,6 +876,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 18 and effect == &"night_path_chroma":
 			missing_value = 0.
 		if version < 19 and effect == &"night_mist_light":
+			missing_value = 0.
+		if version < 20 and effect == &"forest_accents":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -906,6 +911,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			return
 	if changed_effect == &"night_path_chroma":
 		_publish_night_path_chroma()
+		return
+	if changed_effect == &"forest_accents":
+		_sync_forest_accents()
 		return
 	if changed_effect in [&"", &"oak_leaf_tint"]:
 		_sync_oak_leaf_tint()
@@ -1042,10 +1050,19 @@ func _publish_night_path_chroma() -> void:
 		strength = moonlight_weight(hour) * _lighting_scale(&"night_path_chroma")
 	level.look.set_night_path_chroma(strength)
 
+func _sync_forest_accents() -> void:
+	if level == null:
+		return
+	var phase := 0.0
+	if forest_active() and unavailable_reason.is_empty() and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
+		phase = moonlight_weight(hour)
+	forest_accents.update(level, phase, _lighting_scale(&"forest_accents"))
+
 func apply_time()->void:
 	if not private_primary or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
 	_publish_night_path_chroma()
+	_sync_forest_accents()
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
 		key_response_active=false
@@ -1235,6 +1252,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
 		if effect == &"night_mist_light":
 			slider.tooltip_text = "Lift cool scattered light at night in Combined mode. 0% restores the old color intensity. Fog density and the warm lantern are separate."
+		if effect == &"forest_accents":
+			slider.tooltip_text = "Adjust the private blue mushroom accents along the forest path at night. 0% hides them. The player lantern stays independent."
 		if effect == &"shadow_softness":
 			slider.tooltip_text = "Adjust the F1 sunlight filter radius in the morning and afternoon. 100% uses the previous radius. Noon and night keep their existing filter."
 		if effect == &"sun_pockets":
