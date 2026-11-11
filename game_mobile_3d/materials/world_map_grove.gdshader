@@ -13,7 +13,8 @@ uniform sampler2D source_leaf_weights : filter_nearest, repeat_disable;
 uniform float source_leaf_hue = 0.0;
 uniform float source_leaf_tint_mix = 0.0;
 instance uniform bool source_leaf_mask = false;
-instance uniform bool source_crown_mask = false;
+instance uniform int source_crown_mask_base = -1;
+uniform sampler2D source_crown_weights : filter_nearest, repeat_disable;
 uniform sampler2D source_crown_pattern : filter_linear, repeat_enable;
 uniform vec2 source_crown_wind = vec2(0.0);
 uniform bool crown_wind_enabled = false;
@@ -36,13 +37,18 @@ void vertex() {
 	}
 	// Evaluate inside each face so its exact block boundary stays deterministic.
 	crown_local = VERTEX - NORMAL * 0.004;
-	if (use_source_atlas && source_crown_mask && source_crown_wind.y > 0.0 && COLOR.g > 0.0) {
-		// Anchor wind to the world so gameplay and shadow cameras see one pose.
-		vec3 world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-		vec3 wind_position = vec3(world_position.x, -24.0, world_position.z);
-		vec3 drift = gaf_leaf_wind_offset(source_crown_pattern, wind_position,
-			source_crown_wind.x, source_crown_wind.y * COLOR.g);
-		VERTEX += inverse(mat3(MODEL_MATRIX)) * drift;
+	if (use_source_atlas && source_crown_mask_base >= 0 && source_crown_wind.y > 0.0) {
+		int index = source_crown_mask_base + VERTEX_ID;
+		int width = textureSize(source_crown_weights, 0).x;
+		float weight = texelFetch(source_crown_weights, ivec2(index % width, index / width), 0).r;
+		if (weight > 0.0) {
+			// Anchor wind to the world so gameplay and shadow cameras see one pose.
+			vec3 world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+			vec3 wind_position = vec3(world_position.x, -24.0, world_position.z);
+			vec3 drift = gaf_leaf_wind_offset(source_crown_pattern, wind_position,
+				source_crown_wind.x, source_crown_wind.y * weight);
+			VERTEX += inverse(mat3(MODEL_MATRIX)) * drift;
+		}
 	} else if (crown_wind_enabled && !use_source_atlas) {
 		// One rigid transform for the complete authored crown: voxel blocks
 		// retain their shape. Bark stays fixed under the overlapping foliage.

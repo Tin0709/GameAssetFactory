@@ -22,6 +22,7 @@ const CROWN_WIND_PROFILE_SHA := "14a1cd2b17fdb74140ba56df8511a6a9466408ab61fc3dc
 const CROWN_WIND_PATTERN := "oak_wind.private.rgba8"
 const CROWN_WIND_MAX_GAIN := .50
 const CROWN_WIND_CULL_MARGIN := .65
+const CROWN_MASK_WIDTH := 512
 const OAKS := [
 	"res://assets/environment/forest_canopy_v3/tree_oak_a.glb",
 	"res://assets/environment/forest_canopy_v3/tree_oak_b.glb",
@@ -106,6 +107,8 @@ var _source_leaf_mesh: Mesh
 var _source_leaf_hue := 0.
 var _source_leaf_mix := 0.
 var _source_crown_pattern: ImageTexture
+var _source_crown_weights: ImageTexture
+var _crown_mask_bytes := PackedByteArray()
 var _source_crown_time := 0.
 var _published_source_wind := Vector2.INF
 var _spruce_root: Node3D
@@ -156,6 +159,7 @@ func _build_source_oaks(level: Node3D) -> bool:
 	var image := Image.load_from_file(atlas_path)
 	if image == null or image.is_empty(): return false
 	_source_atlas = ImageTexture.create_from_image(image)
+	_load_source_crown_wind(root)
 	var assets: Array[Node3D] = []
 	for row: Variant in meshes:
 		var path := _checked_source_path(root, row, "glb")
@@ -166,7 +170,6 @@ func _build_source_oaks(level: Node3D) -> bool:
 		assets.append(mesh)
 	source_oaks = assets.size() == 4
 	if source_oaks:
-		_load_source_crown_wind(root)
 		_bind_source_atlas(_canopy_appearance)
 		_bind_source_atlas(_canopy_shadow)
 		for index in PLACEMENTS.size():
@@ -185,6 +188,7 @@ func _build_source_oaks(level: Node3D) -> bool:
 		asset.free()
 	if source_oaks:
 		_build_source_spruce(level, root)
+		_finish_source_crown_masks()
 	return source_oaks
 
 func _load_source_tree(path: String) -> Node3D:
@@ -197,8 +201,9 @@ func _load_source_tree(path: String) -> Node3D:
 	var tree := document.generate_scene(state) as Node3D
 	if tree != null:
 		tree.set_meta("source_glb", path.get_file())
-		for visual: MeshInstance3D in tree.find_children("*", "MeshInstance3D", true, false):
-			_prepare_source_crown_mask(visual)
+		if source_crown_wind_available():
+			for visual: MeshInstance3D in tree.find_children("*", "MeshInstance3D", true, false):
+				_prepare_source_crown_mask(visual)
 	return tree
 
 func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:
@@ -210,7 +215,7 @@ func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:
 	# Both regions share the U = 0.5 edge, so classify whole triangles.
 	var format := source.surface_get_format(0)
 	var required := Mesh.ARRAY_FORMAT_TEX_UV | Mesh.ARRAY_FORMAT_INDEX
-	if (format & Mesh.ARRAY_FORMAT_COLOR) != 0 or (format & required) != required:
+	if (format & required) != required:
 		return
 	var uv: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
 	var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
@@ -239,17 +244,22 @@ func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:
 			if weights[vertex] != UNASSIGNED and weights[vertex] != weight:
 				return
 			weights[vertex] = weight
-	var colors := PackedColorArray()
-	colors.resize(uv.size())
-	for vertex in uv.size():
-		colors[vertex] = Color(1.0, 1.0 if weights[vertex] == 1 else 0.0, 1.0)
-	arrays[Mesh.ARRAY_COLOR] = colors
-	var masked := ArrayMesh.new()
-	masked.resource_name = source.resource_name
-	masked.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays, [], {}, format & Mesh.ARRAY_FLAG_COMPRESS_ATTRIBUTES)
-	masked.surface_set_material(0, source.surface_get_material(0))
-	masked.set_meta("source_crown_mask", true)
-	visual.mesh = masked
+	source.set_meta("source_crown_mask_base", _crown_mask_bytes.size())
+	for vertex in weights.size():
+		weights[vertex] = 255 if weights[vertex] == 1 else 0
+	_crown_mask_bytes.append_array(weights)
+
+func _finish_source_crown_masks() -> void:
+	if _crown_mask_bytes.is_empty():
+		return
+	var height := ceili(float(_crown_mask_bytes.size()) / CROWN_MASK_WIDTH)
+	_crown_mask_bytes.resize(CROWN_MASK_WIDTH * height)
+	var image := Image.create_from_data(CROWN_MASK_WIDTH, height, false, Image.FORMAT_R8, _crown_mask_bytes)
+	_source_crown_weights = ImageTexture.create_from_image(image)
+	_crown_mask_bytes.clear()
+	for material: ShaderMaterial in [_canopy_appearance, _canopy_shadow, _spruce_appearance, _spruce_shadow]:
+		if material.shader != null:
+			material.set_shader_parameter("source_crown_weights", _source_crown_weights)
 
 func _build_source_spruce(level: Node3D, root: String) -> void:
 	var manifest_path := root.path_join(SPRUCE_MANIFEST)
@@ -316,6 +326,8 @@ func _bind_spruce_atlas(material: ShaderMaterial) -> void:
 	material.set_shader_parameter("source_atlas", _spruce_atlas)
 	if _source_crown_pattern != null:
 		material.set_shader_parameter("source_crown_pattern", _source_crown_pattern)
+	if _source_crown_weights != null:
+		material.set_shader_parameter("source_crown_weights", _source_crown_weights)
 
 func spruce_available() -> bool:
 	return is_instance_valid(_spruce_root)
@@ -359,6 +371,8 @@ func _bind_source_atlas(material: ShaderMaterial) -> void:
 	material.set_shader_parameter("source_atlas", _source_atlas)
 	if _source_crown_pattern != null:
 		material.set_shader_parameter("source_crown_pattern", _source_crown_pattern)
+	if _source_crown_weights != null:
+		material.set_shader_parameter("source_crown_weights", _source_crown_weights)
 	if material == _canopy_appearance and _source_leaf_weights != null:
 		material.set_shader_parameter("source_leaf_weights", _source_leaf_weights)
 		material.set_shader_parameter("source_leaf_hue", _source_leaf_hue)
@@ -386,10 +400,11 @@ func source_crown_wind_available() -> bool:
 	return _source_crown_pattern != null
 
 func _bind_crown_wind(visual: MeshInstance3D, caster: MeshInstance3D) -> void:
-	if not source_crown_wind_available() or not visual.mesh.get_meta("source_crown_mask", false):
+	var base: int = visual.mesh.get_meta("source_crown_mask_base", -1)
+	if base < 0:
 		return
 	for mesh: MeshInstance3D in [visual, caster]:
-		mesh.set_instance_shader_parameter("source_crown_mask", true)
+		mesh.set_instance_shader_parameter("source_crown_mask_base", base)
 		mesh.extra_cull_margin = maxf(mesh.extra_cull_margin, CROWN_WIND_CULL_MARGIN)
 
 func _prepare_source_leaf_tint(root: String, asset_sha: String, asset: Node3D) -> void:
