@@ -47,6 +47,7 @@ var _forest_shadow_opacity:float
 var full_direct_shadows:=true
 const LIGHTING_MIX_CONTROLS := {
 	&"sun": ["Direct sunlight", 2.],
+	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
 	&"player_sky": ["Player sky fill", 2.],
@@ -62,7 +63,10 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 6
+const LIGHTING_MIX_VERSION := 7
+const KEY_LUMA := Vector3(.2126, .7152, .0722)
+const MOON_TINT := Color("#b6cdf5")
+var moonlight_enabled := true
 const BALANCED_ATMOSPHERE := {
 	&"sky_chroma": .65,
 	&"grade": .55,
@@ -300,14 +304,58 @@ func _apply_sky_chroma(env: Environment) -> void:
 func _apply_captured_key(sun:DirectionalLight3D)->void:
 	key_response_active=false
 	if not captured_key_response or not key_response.available()or is_day_anchor():return
-	var noon:=forest.sample(12.)
-	var base:Color=Color(_day.sun_color).srgb_to_linear()
-	var reference:Vector3=Vector3(base.r,base.g,base.b)*noon.key_color_scale*float(_day.sun_energy)*float(noon.key_scale)
-	var rgb:Vector3=reference*key_response.sample(hour)*(noon_direct_scale(hour)if gentle_noon else 1.)
+	var rgb:=_captured_key_rgb(hour)*(noon_direct_scale(hour)if gentle_noon else 1.)
 	var peak:=maxf(rgb.x,maxf(rgb.y,rgb.z))
 	if peak<=0. or not rgb.is_finite():return
 	sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb();sun.light_energy=peak
 	key_response_active=true
+
+func _captured_key_rgb(time:float)->Vector3:
+	var noon:=forest.sample(12.)
+	var base:Color=Color(_day.sun_color).srgb_to_linear()
+	var reference:Vector3=Vector3(base.r,base.g,base.b)*noon.key_color_scale*float(_day.sun_energy)*float(noon.key_scale)
+	return reference*key_response.sample(time)
+
+func set_moonlight_enabled(value:bool)->void:
+	if moonlight_enabled==value:return
+	moonlight_enabled=value
+	_forest_hour=INF
+	apply_time()
+	_update_mist()
+
+static func moonlight_weight(time:float)->float:
+	var h:=fposmod(time,24.)
+	return 1.-smoothstep(4.5,5.5,h) if h<12. else smoothstep(19.5,21.,h)
+
+func _apply_key_mix(sun:DirectionalLight3D)->void:
+	var weight:=moonlight_weight(hour) if moonlight_enabled else 0.
+	var sunlight:=_lighting_scale(&"sun")
+	if weight<=0.:
+		sun.light_energy*=sunlight
+		return
+	var source:=sun.light_color.srgb_to_linear()
+	var solar:=Vector3(source.r,source.g,source.b)*sun.light_energy*sunlight
+	var tint:=MOON_TINT.srgb_to_linear()
+	var moon:=Vector3(tint.r,tint.g,tint.b)
+	# The native midnight key anchors luminance. The cool color and schedule
+	# are original art choices. A single directional light owns both phases.
+	var night_luma:=_captured_key_rgb(0.).dot(KEY_LUMA) if key_response.available() else float(_day.sun_energy)*.012
+	moon*=night_luma*_lighting_scale(&"moon")/moon.dot(KEY_LUMA)
+	var rgb:=solar.lerp(moon,weight)
+	var peak:=maxf(rgb.x,maxf(rgb.y,rgb.z))
+	sun.light_energy=peak
+	if peak>0.:
+		sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb()
+	var noon_rotation:=Vector3(_day.sun_rotation)*(PI/180.)
+	var noon_direction:=Basis.from_euler(noon_rotation,sun.rotation_order).z.normalized()
+	var direction:Vector3=direction_response.sample(0.,noon_direction) if captured_key_direction else Vector3.ZERO
+	if direction==Vector3.ZERO:
+		var midnight:=palette.sample(0.)
+		var noon:=palette.sample(12.)
+		var rotation:=noon_rotation+Vector3(midnight.pitch-noon.pitch,midnight.yaw-noon.yaw,0.)*(PI/180.)
+		direction=Basis.from_euler(rotation,sun.rotation_order).z
+	direction=sun.basis.z.normalized().slerp(direction,weight).normalized()
+	sun.rotation=Basis.looking_at(-direction,Vector3.UP).get_euler(sun.rotation_order)
 
 func set_source_bloom_shape(value:bool)->void:
 	source_bloom_shape=value;set_coupled_bloom(coupled_bloom)
@@ -621,14 +669,14 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
 		var from_older_recipe: bool = (version == 1 and effect == &"grade") \
 			or (version < 3 and effect == &"sky_chroma") or (version < 4 and effect == &"player_sky") \
 			or (version < 5 and effect in [&"near_haze", &"bloom_spread"]) \
-			or (version < 6 and effect == &"grass_sky")
+			or (version < 6 and effect == &"grass_sky") or (version < 7 and effect == &"moon")
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
@@ -718,7 +766,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		_apply_captured_key(sun)
 		_apply_captured_direction(sun)
 		env.ambient_light_energy *= _lighting_scale(&"sky")
-		sun.light_energy *= _lighting_scale(&"sun")
+		_apply_key_mix(sun)
 		# In full shade, block the direct beam and leave ambient fill to its own path.
 		_apply_direct_shadow_opacity(sun)
 		if _player_light!=null:
@@ -917,6 +965,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
 		if effect == &"exposure":
 			slider.tooltip_text = "Scales local contrast gain. The color grade remains active."
+		if effect == &"moon":
+			slider.tooltip_text = "Scales the cool directional night light. Hip lantern, ambient sky, and daytime sunlight are independent."
 		if effect == &"grade":
 			slider.tooltip_text = "Blend the captured-reference finish with the original palette and tone curve. Local exposure stays active."
 		if effect == &"sky_chroma":
@@ -1010,6 +1060,14 @@ func _build_ui()->void:
 	var key:=CheckButton.new();key.name="CapturedKeyResponse";key.text="Light - captured direct-key phase response";key.focus_mode=Control.FOCUS_NONE;key.button_pressed=captured_key_response;key.disabled=not key_response.available();box.add_child(key)
 	key.tooltip_text="Captured relative direct-light RGB, anchored to the approved Noon. Clock placement/mirrored evening are original. No native lux, sun trajectory or indirect-light claim. OFF restores prior palette."
 	key.toggled.connect(set_captured_key_response);_key_response_toggle=key
+	var moon:=CheckButton.new()
+	moon.name="NightMoonlight"
+	moon.text="Light · moonlight at night"
+	moon.button_pressed=moonlight_enabled
+	moon.focus_mode=Control.FOCUS_NONE
+	moon.tooltip_text="Fade sunlight to a cool night key. Turn off to compare the previous evening lighting."
+	moon.toggled.connect(set_moonlight_enabled)
+	box.add_child(moon)
 	var direction:=CheckButton.new();direction.name="CapturedKeyDirection";direction.text="Light - captured primary direction (Noon anchored)";direction.focus_mode=Control.FOCUS_NONE;direction.button_pressed=captured_key_direction;direction.disabled=not direction_response.available();box.add_child(direction)
 	direction.tooltip_text="Measured primary-light azimuth and relative ground NdotL, anchored to approved Noon. Night uses the primary CB, not fog Sun. Clock, handoff interpolation and Noon normalization are original. OFF restores prior trajectory."
 	direction.toggled.connect(set_captured_key_direction);_direction_toggle=direction
