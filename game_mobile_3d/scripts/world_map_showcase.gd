@@ -53,6 +53,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"player_sky": ["Player sky fill", 2.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"shadow": ["Shadow strength", 1.],
+	&"shadow_softness": ["Shadow softness", 1.5],
 	&"lantern": ["Hip lantern", 2.],
 	&"lantern_lift": ["Lantern height", 1.5],
 	&"lantern_air": ["Lantern in mist", 2.],
@@ -66,7 +67,8 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 9
+const LIGHTING_MIX_VERSION := 10
+const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
 const MOON_TINT := Color("#b6cdf5")
 var moonlight_enabled := true
@@ -650,6 +652,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"shadow_softness":
+		return DAYLIGHT_SHADOW_SOFTNESS
 	return 0. if effect in [&"near_haze", &"grass_sky"] else 1.
 
 func _lighting_scale(effect: StringName) -> float:
@@ -672,6 +676,12 @@ func balanced_shadow_weight() -> float:
 
 func _balanced_daylight_weight() -> float:
 	return smoothstep(5.5, 7., hour) * (1. - smoothstep(16.5, 19.5, hour))
+
+func shadow_softness_mix_scale() -> float:
+	if _balanced_preview or not forest_active() or atmosphere_review not in ["lighting", "combined"]:
+		return 1.
+	var weight := PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+	return lerpf(1., _lighting_scale(&"shadow_softness"), weight)
 
 func local_exposure_mix_scale() -> float:
 	if forest_active() and atmosphere_review in ["haze", "combined"]:
@@ -737,7 +747,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -746,7 +756,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			or (version < 5 and effect in [&"near_haze", &"bloom_spread"]) \
 			or (version < 6 and effect == &"grass_sky") or (version < 7 and effect == &"moon") \
 			or (version < 8 and effect in [&"lantern_lift", &"lantern_air"]) \
-			or (version < 9 and effect == &"lantern_glow")
+			or (version < 9 and effect == &"lantern_glow") \
+			or (version < 10 and effect == &"shadow_softness")
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
@@ -777,6 +788,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if changed_effect == &"lantern_glow":
 			return
 	if not forest_active():
+		return
+	if changed_effect == &"shadow_softness":
+		level.look.refresh_directional_shadow_blur(level.get_node("Sun"))
 		return
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
@@ -1054,6 +1068,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Blend the existing grass ambient light with the terrain's baked sky fill at each root. The approved Noon is retained."
 		if effect == &"near_haze":
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
+		if effect == &"shadow_softness":
+			slider.tooltip_text = "Adjust the F1 sunlight filter radius in the morning and afternoon. 100% uses the previous radius. Noon and night keep their existing filter."
 		if effect == &"lantern_lift":
 			slider.tooltip_text = "Height above the hip mount when lantern from above is enabled. 100% uses the captured face-to-light distance fit, 66% approximates the previous height."
 		if effect == &"lantern_air":

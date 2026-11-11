@@ -971,6 +971,8 @@ func refresh_directional_shadow_blur(sun: DirectionalLight3D) -> void:
 		var showcase = level.get("showcase")
 		var weight: float = showcase.balanced_shadow_weight() if showcase != null else 0.
 		blur = lerpf(REVIEW_SHADOW_BLUR, BALANCED_SHADOW_BLUR, weight)
+		if showcase != null:
+			blur *= showcase.shadow_softness_mix_scale()
 	if not is_equal_approx(sun.shadow_blur, blur):
 		sun.shadow_blur = blur
 
