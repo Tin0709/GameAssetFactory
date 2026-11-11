@@ -38,6 +38,8 @@ func run():
  check(w.showcase.captured_key_response,"Validated relative key selected by default")
  if native:
   check(w.showcase.key_response.available(),"Private source curve verified")
+  # Isolate the captured key response from the separately tested moon grade.
+  w.showcase.set_moonlight_enabled(false)
   w.showcase.set_captured_key_response(false);w.showcase.set_hour(12.);await settle()
   var noon=radiance(w);var soft_scale=w.showcase.noon_direct_scale(12.)
   w.showcase.set_captured_key_response(true);await settle()
