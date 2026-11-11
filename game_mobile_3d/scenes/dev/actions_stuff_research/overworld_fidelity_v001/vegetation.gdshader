@@ -14,6 +14,7 @@ uniform vec2 study_ground_sky_origin;
 uniform vec3 study_ground_sky_scale = vec3(1.0);
 uniform float study_ground_sky_mix = 0.0;
 uniform vec3 study_grass_shade_color = vec3(0.0);
+uniform float study_grass_shadow_height = 1.0;
 varying flat vec4 study_ground_sky_at_root;
 varying flat float study_canopy_sky_at_root;
 
@@ -99,6 +100,12 @@ void vertex(){
 		world_offset=target-(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
 	}
 	VERTEX+=(inverse(MODEL_MATRIX)*vec4(world_offset,0.0)).xyz;
+#ifdef GAF_REFERENCE_GRASS_LIGHTING
+	// Only the orthographic shadow draw uses the corrected blade height.
+	if (IN_SHADOW_PASS && PROJECTION_MATRIX[3][3] > .5) {
+		VERTEX.y *= study_grass_shadow_height;
+	}
+#endif
 	foliage_world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
 #ifndef GAF_REFERENCE_GRASS_LIGHTING
 	if(tinted_grass)NORMAL=normalize(NORMAL*0.35+vec3(0.0,0.65,0.0));

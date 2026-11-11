@@ -64,6 +64,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"player_sky": ["Player sky fill", 2.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"grass_shade_color": ["Grass shade color", 1.],
+	&"grass_shadow_reach": ["Grass shadow reach", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
 	&"spruce_sky": ["Forest canopy sky", 1.],
@@ -91,7 +92,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 25
+const LIGHTING_MIX_VERSION := 26
 const NIGHT_MIST_MAX_GAIN := 4.0
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
@@ -832,6 +833,23 @@ func grass_shade_color_mix() -> Vector3:
 	var tint := Vector2(.80, 1.24).lerp(Vector2(.84, 1.14), smoothstep(7., 16.5, hour))
 	return Vector3(tint.x, tint.y, strength) if strength > 0. else Vector3.ZERO
 
+func grass_shadow_height_scale() -> float:
+	var strength := _lighting_scale(&"grass_shadow_reach") * twilight_color_weight()
+	if strength <= 0. or not key_direction_active or not direction_response.available() or _day.is_empty():
+		return 1.
+	if moonlight_enabled:
+		strength *= 1. - moonlight_weight(hour)
+	var sun: DirectionalLight3D = level.get_node("Sun")
+	var noon := Basis.from_euler(Vector3(_day.sun_rotation) * (PI / 180.), sun.rotation_order).z.normalized()
+	var up := sun.global_basis.z.normalized().y
+	if up <= .001 or up >= .999 or noon.y <= .001:
+		return 1.
+	var source_up: float = clampf(up * direction_response.anchors[-1].y / noon.y, .001, .999)
+	# At a common grass height, horizontal shadow reach is height * cot(elevation).
+	var game_reach := sqrt(1. - up * up) / up
+	var source_reach := sqrt(1. - source_up * source_up) / source_up
+	return lerpf(1., clampf(source_reach / game_reach, .5, 1.), strength)
+
 func _sync_oak_leaf_tint() -> void:
 	if level == null or level.grove == null:
 		return
@@ -881,7 +899,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -921,6 +939,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 24 and effect == &"stone_twilight_color":
 			missing_value = 0.
 		if version < 25 and effect == &"twilight_shadow_color":
+			missing_value = 0.
+		if version < 26 and effect == &"grass_shadow_reach":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -987,7 +1007,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
 		_update_mist()
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"spruce_sky", &"humid_light"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_shadow_reach", &"spruce_sky", &"humid_light"]:
 		return
 	if changed_effect == &"player_sky":
 		if level.player_light != null:
@@ -1310,6 +1330,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Blend the existing grass ambient light with the terrain's baked sky fill at each root. The approved Noon is retained."
 		if effect == &"grass_shade_color":
 			slider.tooltip_text = "Cool the baked sky light on grass beneath the forest canopy. Uses Grass sky fill in Combined mode. Noon and night keep their current lighting."
+		if effect == &"grass_shadow_reach":
+			slider.tooltip_text = "Correct the length of grass shadows at dawn and dusk for the captured sun elevation. 0% uses the previous length."
 		if effect == &"stone_twilight_color":
 			slider.tooltip_text = "Reduce the baked blue tint of stone at dawn and dusk in Combined mode. The source atlas preview uses its own colors."
 		if effect == &"twilight_shadow_color":

@@ -12,6 +12,7 @@ var _ground_sky:Texture2D
 var _ground_sky_checked:=false
 var _ground_sky_state:=Vector4.INF
 var _grass_shade_color := Vector3.INF
+var _shadow_height_scale := -1.
 
 func setup(level:Node3D,reader:RefCounted)->void:
 	world=level
@@ -43,6 +44,7 @@ func restore()->void:
 	_records.clear();active=false
 	_ground_sky_state=Vector4.INF
 	_grass_shade_color = Vector3.INF
+	_shadow_height_scale = -1.
 
 func apply(materials:Array[ShaderMaterial],enabled:bool)->void:
 	restore()
@@ -75,6 +77,11 @@ func sync()->void:
 		m.set_shader_parameter("cloud_shape",ground.get_shader_parameter("cloud_shape"))
 		m.set_shader_parameter("cloud_time",look.cloud_clock)
 	_sync_ground_sky()
+	var shadow_scale: float = world.showcase.grass_shadow_height_scale()
+	if shadow_scale != _shadow_height_scale:
+		_shadow_height_scale = shadow_scale
+		for row: Dictionary in _records:
+			row.material.set_shader_parameter("study_grass_shadow_height",shadow_scale)
 
 func _sync_ground_sky()->void:
 	var terrain=world.terrain_light
