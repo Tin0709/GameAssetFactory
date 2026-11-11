@@ -803,7 +803,7 @@ func compare_baseline()->void:
 
 func _update_shape_control()->void:
 	if _lantern_dawn_toggle!=null:
-		_lantern_dawn_toggle.disabled=not point_response.dawn_available() or not phase_air.anchors.size() or not forest.available()
+		_lantern_dawn_toggle.disabled=not point_response.dawn_available() or phase_air.anchors.is_empty() or not forest.available()
 		_lantern_dawn_toggle.set_pressed_no_signal(captured_lantern_dawn)
 	if _player_source_toggle!=null and level.player_light!=null:
 		_player_source_toggle.disabled=not level.player_light.source_field.available()or not captured_sky_response
