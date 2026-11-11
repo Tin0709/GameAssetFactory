@@ -55,6 +55,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
+	&"daylight_balance": ["Daylight color balance", 1.],
 	&"player_sky": ["Player sky fill", 2.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"shadow": ["Shadow strength", 1.],
@@ -72,7 +73,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 11
+const LIGHTING_MIX_VERSION := 12
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
 const MOON_TINT := Color("#b6cdf5")
@@ -313,7 +314,8 @@ func _apply_captured_sky(env:Environment)->void:
 	sky_response_active=true
 
 func _apply_sky_chroma(env: Environment) -> void:
-	var scale := lerpf(1., _lighting_scale(&"sky_chroma"), PHASE_FINISH.phase_weight(hour))
+	var manual := lerpf(1., _lighting_scale(&"sky_chroma"), PHASE_FINISH.phase_weight(hour))
+	var scale := manual * lerpf(1., .82, _daylight_color_balance_weight())
 	if scale == 1.:
 		return
 	var rgb := env.ambient_light_color.srgb_to_linear()
@@ -709,6 +711,11 @@ func balanced_shadow_weight() -> float:
 func _balanced_daylight_weight() -> float:
 	return smoothstep(5.5, 7., hour) * (1. - smoothstep(16.5, 19.5, hour))
 
+func _daylight_color_balance_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not forest_active():
+		return 0.
+	return _lighting_scale(&"daylight_balance") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+
 func shadow_softness_mix_scale() -> float:
 	if _balanced_preview or not forest_active() or atmosphere_review not in ["lighting", "combined"]:
 		return 1.
@@ -731,7 +738,9 @@ func bounded_exposure_strength() -> float:
 
 func reference_finish_mix_scale() -> float:
 	var base := _lighting_scale(&"grade")
-	return lerpf(base, BALANCED_DAY_REFERENCE_FINISH, _balanced_daylight_weight()) if _balanced_preview else base
+	if _balanced_preview:
+		return lerpf(base, BALANCED_DAY_REFERENCE_FINISH, _balanced_daylight_weight())
+	return base * lerpf(1., .77, _daylight_color_balance_weight())
 
 func player_sky_fill_mix_scale() -> float:
 	if forest_spatial_sky_context():
@@ -784,7 +793,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -797,6 +806,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			or (version < 10 and effect == &"shadow_softness") \
 			or (version < 11 and effect == &"sun_pockets")
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
+		if version < 12 and effect == &"daylight_balance":
+			missing_value = 0. # Keep saved looks as they were before this calibration.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
@@ -855,6 +866,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	apply_time()
 	level.look._refresh_ground_bounce()
 	_update_mist()
+	if changed_effect == &"daylight_balance" and phase_finish != null:
+		phase_finish.refresh()
 
 func _apply_direct_shadow_opacity(sun:DirectionalLight3D)->void:
 	var opacity:=float(_day.sun_shadow_opacity)
