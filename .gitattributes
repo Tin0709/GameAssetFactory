@@ -15,3 +15,6 @@ scripts/*.ps1 text eol=crlf
 scripts/*.sh text eol=lf
 docs/setup/*.md text eol=lf
 /*.cmd text eol=crlf
+
+# The terrain irradiance cache verifies the exact source recipe bytes.
+/game_mobile_3d/materials/world_map_surface_v5.gdshaderinc -text
