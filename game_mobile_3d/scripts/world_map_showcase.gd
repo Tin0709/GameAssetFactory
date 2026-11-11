@@ -559,7 +559,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
-		var from_older_recipe := (version == 1 and effect == &"grade") or (version < 3 and effect == &"sky_chroma")
+		var from_older_recipe: bool = (version == 1 and effect == &"grade") or (version < 3 and effect == &"sky_chroma")
 		var missing_value := 1. if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
