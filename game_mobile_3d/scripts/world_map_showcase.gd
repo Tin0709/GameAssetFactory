@@ -54,9 +54,10 @@ const LIGHTING_MIX_CONTROLS := {
 	&"scatter": ["Fog brightness", 2.],
 	&"bloom": ["Bloom", 2.],
 	&"exposure": ["Local exposure", 1.],
+	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 1
+const LIGHTING_MIX_VERSION := 2
 var _lighting_mix: Dictionary = {}
 var _lighting_sliders: Dictionary = {}
 var _vignette:ColorRect
@@ -502,6 +503,9 @@ func local_exposure_mix_scale() -> float:
 func bounded_exposure_strength() -> float:
 	return LOCAL_EXPOSURE_STRENGTH * local_exposure_mix_scale()
 
+func reference_finish_mix_scale() -> float:
+	return _lighting_scale(&"grade")
+
 func _apply_bounded_exposure_mix() -> void:
 	if phase_finish != null and phase_finish.active:
 		return
@@ -517,7 +521,7 @@ func set_lighting_scale(effect: StringName, value: float) -> void:
 	if scale == _lighting_scale(effect):
 		return
 	_lighting_mix[effect] = scale
-	_refresh_lighting_mix(effect == &"exposure")
+	_refresh_lighting_mix(effect in [&"exposure", &"grade"])
 
 func reset_lighting_mix() -> void:
 	_lighting_mix.clear()
@@ -541,11 +545,13 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	var error := config.load(path)
 	if error != OK:
 		return error
-	if config.get_value("recipe", "version", 0) != LIGHTING_MIX_VERSION:
+	var version: Variant = config.get_value("recipe", "version", 0)
+	if version not in [1, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
-		var value: Variant = config.get_value("strengths", String(effect), -1.)
+		var missing_value := 1. if version == 1 and effect == &"grade" else -1.
+		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
 			return ERR_INVALID_DATA
@@ -554,7 +560,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	_refresh_lighting_mix()
 	return OK
 
-func _refresh_lighting_mix(exposure_only := false) -> void:
+func _refresh_lighting_mix(finishing_only := false) -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		var scale := _lighting_scale(effect)
@@ -562,7 +568,7 @@ func _refresh_lighting_mix(exposure_only := false) -> void:
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
 	if not forest_active():
 		return
-	if exposure_only:
+	if finishing_only:
 		_apply_bounded_exposure_mix()
 		if phase_finish != null:
 			phase_finish.refresh()
@@ -803,6 +809,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
 		if effect == &"exposure":
 			slider.tooltip_text = "Scales local contrast gain. The color grade remains active."
+		if effect == &"grade":
+			slider.tooltip_text = "Blend the captured-reference finish with the original palette and tone curve. Local exposure stays active."
 		slider.focus_mode = Control.FOCUS_NONE
 		slider.max_value = spec[1]
 		slider.step = .01

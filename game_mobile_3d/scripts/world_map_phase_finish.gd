@@ -117,7 +117,9 @@ func refresh()->void:
   _environment=env
   for key in ["tonemap_mode","tonemap_exposure","adjustment_enabled"]:_saved[key]=env.get(key)
  var gain_scale:float=showcase.local_exposure_mix_scale()
- _native.set_strength(weight*gain_scale);effect.set_review_strength(_saved_strength*(1.-weight)*gain_scale);effect.set_finish_weight(weight);effect.set_reference_grade(true)
+ var finish_scale:float=showcase.reference_finish_mix_scale()
+ _native.set_strength(weight*gain_scale);effect.set_review_strength(_saved_strength*(1.-weight)*gain_scale)
+ effect.set_finish_weight(weight*finish_scale);effect.set_reference_grade(true)
  env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=false
  for key in ["tonemap_exposure","adjustment_enabled"]:
   if showcase._forest_expected.has(key):showcase._forest_expected[key]=env.get(key)
