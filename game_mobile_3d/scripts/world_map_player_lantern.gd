@@ -19,6 +19,8 @@ var initialized:=false
 var angle:=0.
 var angular_velocity:=0.
 var ready_private:=false
+var _emission_materials: Array[StandardMaterial3D] = []
+var _base_emission_energy := 0.
 func setup(body:Node3D)->void:
  actor=body;top_level=true;process_priority=-5
  if not OS.has_feature("editor")or not actor.using_original_source:return
@@ -59,6 +61,7 @@ func setup(body:Node3D)->void:
    # Emission textures are sampled as source-color; encode the data mask once.
    emission_image.set_pixel(x,y,Color(value,value,value).linear_to_srgb())
  var mask:=ImageTexture.create_from_image(emission_image)
+ _base_emission_energy = .8 * float(profile.emissive_brightness) / float(profile.generic_emissive_brightness)
  for mesh:MeshInstance3D in mesh_root.find_children("*","MeshInstance3D",true,false):
   mesh.layers=2 # Receive sun/ambient, exclude the fixture-centered point light.
   for i in mesh.mesh.get_surface_count():
@@ -69,9 +72,15 @@ func setup(body:Node3D)->void:
     material.metallic=1.;material.metallic_texture=packed;material.metallic_texture_channel=BaseMaterial3D.TEXTURE_CHANNEL_RED
     material.roughness=1.;material.roughness_texture=packed;material.roughness_texture_channel=BaseMaterial3D.TEXTURE_CHANNEL_GREEN
     material.emission_operator=BaseMaterial3D.EMISSION_OP_MULTIPLY
-    material.emission_energy_multiplier=.8*float(profile.emissive_brightness)/float(profile.generic_emissive_brightness);mesh.set_surface_override_material(i,material)
+    material.emission_energy_multiplier=_base_emission_energy
+    _emission_materials.append(material)
+    mesh.set_surface_override_material(i,material)
    center=mesh_root.position+mesh_root.basis*(mesh.transform*mesh.get_aabb().get_center())
  _load_inspect();ready_private=true;_apply_toggle(0.)
+
+func set_emission_gain(gain: float) -> void:
+ for material in _emission_materials:
+  material.emission_energy_multiplier = _base_emission_energy * gain
 func _load_inspect()->void:
  var scene=actor.load_private_model(profile.files.inspect.path)
  if scene==null:return

@@ -56,6 +56,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"lantern": ["Hip lantern", 2.],
 	&"lantern_lift": ["Lantern height", 1.5],
 	&"lantern_air": ["Lantern in mist", 2.],
+	&"lantern_glow": ["Lantern glow", 2.],
 	&"fog": ["Fog density", 2.],
 	&"near_haze": ["Near haze density", 2.],
 	&"scatter": ["Fog brightness", 2.],
@@ -65,7 +66,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 8
+const LIGHTING_MIX_VERSION := 9
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
 const MOON_TINT := Color("#b6cdf5")
 var moonlight_enabled := true
@@ -91,6 +92,8 @@ var captured_lantern_dawn:=true
 var _lantern_dawn_toggle:CheckButton
 ## Idle calibration to the two captured light-to-face separations. The animated hip remains the anchor.
 const LANTERN_OVERHEAD_LIFT_M := 2.06
+## Mobile HDR fit from the captured visible lamp core and locked gameplay comparisons.
+const LANTERN_EMISSION_GAIN := 16.
 var lantern_overhead := true
 var _lantern_overhead_toggle: CheckButton
 static var _point_kernel_owner:WeakRef
@@ -185,6 +188,7 @@ func setup(world:Node3D)->void:
 	grade_review=preload("res://scripts/world_map_grade_review.gd").new();add_child(grade_review);grade_review.setup(self)
 	phase_finish=PHASE_FINISH.new();add_child(phase_finish);phase_finish.setup(self)
 	_build_ui()
+	_refresh_lantern_glow()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
 	level.get_node("HUD/Help").text="GRAPHICS COMPARISON\nF8 Day finish · F11 directional fill · Shift+F11 actor canopy fill\nF7 local exposure · Shift+F1 ground bounce · F1 soft shadows\nF2 canopy contact · Shift+F2 root soil · F3 direct cloud shading\nF9 leaf edges · Shift+F9 MSAA · F10 pose interpolation\nF12 optional terrain cache · G grass/flowers · L wind/interaction options\nH fog · N terrain wind · Shift+N passage · Alt+N crown wind"
 	DisplayServer.window_set_title("GameAssetFactory · Overworld Showcase · A&S / MD2 Sabre · L options")
@@ -587,6 +591,13 @@ func _refresh_lantern_position() -> void:
 	if lantern != null and lantern.ready_private:
 		sync_lantern_emitter(lantern.emitter_position())
 
+func _refresh_lantern_glow() -> void:
+	if level == null or not forest.available() or RenderingServer.get_current_rendering_method() != "mobile":
+		return
+	var lantern = level.player.get("lantern")
+	if lantern != null and lantern.ready_private:
+		lantern.set_emission_gain(LANTERN_EMISSION_GAIN * _lighting_scale(&"lantern_glow"))
+
 func _lantern_light_origin(hip: Vector3) -> Vector3:
 	var lift := LANTERN_OVERHEAD_LIFT_M * _lighting_scale(&"lantern_lift") if lantern_overhead else 0.
 	return hip + Vector3.UP * lift
@@ -726,7 +737,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -734,7 +745,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			or (version < 3 and effect == &"sky_chroma") or (version < 4 and effect == &"player_sky") \
 			or (version < 5 and effect in [&"near_haze", &"bloom_spread"]) \
 			or (version < 6 and effect == &"grass_sky") or (version < 7 and effect == &"moon") \
-			or (version < 8 and effect in [&"lantern_lift", &"lantern_air"])
+			or (version < 8 and effect in [&"lantern_lift", &"lantern_air"]) \
+			or (version < 9 and effect == &"lantern_glow")
 		var missing_value := _lighting_scale_default(effect) if from_older_recipe else -1.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
@@ -760,6 +772,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
+	if changed_effect in [&"", &"lantern_glow"]:
+		_refresh_lantern_glow()
+		if changed_effect == &"lantern_glow":
+			return
 	if not forest_active():
 		return
 	if changed_effect == &"lantern_lift":
@@ -1042,6 +1058,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Height above the hip mount when lantern from above is enabled. 100% uses the captured face-to-light distance fit, 66% approximates the previous height."
 		if effect == &"lantern_air":
 			slider.tooltip_text = "Scales only lantern light scattered by the existing mist. Surface lighting and fog density have separate controls."
+		if effect == &"lantern_glow":
+			slider.tooltip_text = "Adjusts the glowing lantern glass on Mobile. Around 6% matches its previous brightness. The point light and mist keep their own strengths."
 		if effect == &"bloom_spread":
 			slider.tooltip_text = "Adjust the base glow radius independently of Bloom brightness. Leaves the approved noon look intact."
 		slider.focus_mode = Control.FOCUS_NONE
