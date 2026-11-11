@@ -628,15 +628,16 @@ func _point_receiver_scope()->bool:
 
 func _publish_point_cutoff()->void:
 	if _point_kernel_owner==null or _point_kernel_owner.get_ref()!=self:return
-	var eligible:bool=_player_light!=null and source_point_cutoff and noninverse_player_light and forest_active()and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and _point_scope_supported()and _point_receiver_scope()and is_equal_approx(_player_light.omni_range,point_response.radius_m)
+	var receiver_scope := _player_light != null and forest_active() and _point_scope_supported() and _point_receiver_scope()
+	var eligible:bool=receiver_scope and source_point_cutoff and noninverse_player_light and point_response.kernel_available()and _player_light.omni_attenuation==0. and _player_light.visible and _player_light.light_energy>0. and is_equal_approx(_player_light.omni_range,point_response.radius_m)
 	var point:Vector3=_player_light.global_position if _player_light!=null else Vector3.ZERO
 	point_kernel_state=Vector4(point.x,point.y,point.z,_player_light.omni_range if eligible else 0.)
 	var secondary: OmniLight3D = forest_path_light.light
-	var mixed := eligible and is_instance_valid(secondary) and secondary.is_visible_in_tree() \
+	var secondary_active := receiver_scope and is_instance_valid(secondary) and secondary.is_visible_in_tree() \
 		and secondary.light_energy > 0.0 and (secondary.light_cull_mask & 1) != 0
 	RenderingServer.global_shader_parameter_set("gaf_point_kernel",point_kernel_state)
-	RenderingServer.global_shader_parameter_set("gaf_point_mixed",mixed)
-	var beam_strength := _lighting_scale(&"forest_path_beam") if mixed else 0.0
+	RenderingServer.global_shader_parameter_set("gaf_point_mixed",eligible and secondary_active)
+	var beam_strength := _lighting_scale(&"forest_path_beam") if secondary_active else 0.0
 	var beam := Vector4.ZERO
 	if beam_strength > 0.0:
 		# PIX establishes the inclination. Aim its horizontal component along
