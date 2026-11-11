@@ -17,4 +17,4 @@ docs/setup/*.md text eol=lf
 /*.cmd text eol=crlf
 
 # The terrain irradiance cache verifies the exact source recipe bytes.
-/game_mobile_3d/materials/world_map_surface_v5.gdshaderinc -text
+/game_mobile_3d/materials/world_map_surface_v5.gdshaderinc -text whitespace=cr-at-eol
