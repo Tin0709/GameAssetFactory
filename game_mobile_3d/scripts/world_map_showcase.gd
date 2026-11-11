@@ -85,6 +85,9 @@ var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
 var captured_lantern_dawn:=true
 var _lantern_dawn_toggle:CheckButton
+const LANTERN_OVERHEAD_LIFT_M := 1.35
+var lantern_overhead := true
+var _lantern_overhead_toggle: CheckButton
 static var _point_kernel_owner:WeakRef
 var _point_lights:Dictionary={}
 var point_kernel_state:=Vector4.ZERO
@@ -460,8 +463,8 @@ func _update_mist()->void:
 	var lantern=level.player.get("lantern")
 	if lantern!=null and lantern.ready_private:
 		var point:Vector3=lantern.emitter_position()
-		if _player_light!=null:_player_light.top_level=true;_player_light.light_cull_mask=1;_player_light.global_position=point
-		emitter=point-Vector3.UP*1.4
+		sync_lantern_emitter(point)
+		emitter=_lantern_light_origin(point)-Vector3.UP*1.4
 	mist.publish(sample,emitter,level.spawn_position.y-1.,level.look.elapsed,camera.projection==Camera3D.PROJECTION_ORTHOGONAL,forest.player_range)
 
 func set_captured_mist_source(value:bool)->void:
@@ -545,11 +548,28 @@ func _publish_point_cutoff()->void:
 	RenderingServer.global_shader_parameter_set("gaf_point_soft",point_soft_state)
 	if level!=null:RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera",level.get_node("Camera3D").global_position)
 
+func set_lantern_overhead(value: bool) -> void:
+	if lantern_overhead == value:
+		return
+	lantern_overhead = value
+	if _lantern_overhead_toggle != null:
+		_lantern_overhead_toggle.set_pressed_no_signal(value)
+	if level == null:
+		return
+	var lantern = level.player.get("lantern")
+	if lantern != null and lantern.ready_private:
+		sync_lantern_emitter(lantern.emitter_position())
+
+func _lantern_light_origin(hip: Vector3) -> Vector3:
+	# Lift the shared light source in world space, independent of the mesh swing.
+	return hip + Vector3.UP * LANTERN_OVERHEAD_LIFT_M if lantern_overhead else hip
+
 func sync_lantern_emitter(point:Vector3)->void:
 	if not point.is_finite():return
+	var origin := _lantern_light_origin(point)
 	if _player_light!=null:
-		_player_light.top_level=true;_player_light.light_cull_mask=1;_player_light.global_position=point
-	if mist!=null and mist.visible:mist.set_warm_emitter(point)
+		_player_light.top_level=true;_player_light.light_cull_mask=1;_player_light.global_position=origin
+	if mist!=null and mist.visible:mist.set_warm_emitter(origin)
 	_publish_point_cutoff()
 
 func air_field()->Dictionary:
@@ -1055,6 +1075,15 @@ func _build_ui()->void:
 	dawn.toggled.connect(set_captured_lantern_dawn)
 	box.add_child(dawn)
 	_lantern_dawn_toggle=dawn
+	var overhead := CheckButton.new()
+	overhead.name = "LanternOverhead"
+	overhead.text = "Light · lantern from above"
+	overhead.button_pressed = lantern_overhead
+	overhead.focus_mode = Control.FOCUS_NONE
+	overhead.tooltip_text = "Raise the light source above the visible hip lantern. Turn off to compare hip-level lighting."
+	overhead.toggled.connect(set_lantern_overhead)
+	box.add_child(overhead)
+	_lantern_overhead_toggle = overhead
 	var cutoff:=CheckButton.new();cutoff.name="SourcePointCutoff";cutoff.text="Light - recovered point radial cutoff";cutoff.focus_mode=Control.FOCUS_NONE;cutoff.button_pressed=source_point_cutoff;cutoff.disabled=not point_response.kernel_available()or not forest.available();box.add_child(cutoff)
 	cutoff.tooltip_text="Captured8m/power2 squared-radius kernel. Original algebraic correction of Godot's range window for the owned local light; energy/materials unchanged. OFF restores prior non-inverse quartic response. Not full native radiometry or soft source."
 	cutoff.toggled.connect(set_source_point_cutoff);_point_cutoff_toggle=cutoff
