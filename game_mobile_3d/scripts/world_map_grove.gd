@@ -219,6 +219,9 @@ func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:
 	var weights := PackedByteArray()
 	weights.resize(uv.size())
 	const UNASSIGNED := 2
+	# GLTF's compressed UV can land one UNORM16 step from the atlas edge.
+	const LEFT_EDGE := 0.5 - 1.0 / 65535.0
+	const RIGHT_EDGE := 0.5 + 1.0 / 65535.0
 	weights.fill(UNASSIGNED)
 	for index in range(0, indices.size(), 3):
 		var u0 := uv[indices[index]].x
@@ -226,9 +229,11 @@ func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:
 		var u2 := uv[indices[index + 2]].x
 		var low := minf(u0, minf(u1, u2))
 		var high := maxf(u0, maxf(u1, u2))
-		if (low < 0.5 and high > 0.5) or (low == 0.5 and high == 0.5):
+		var has_leaf_uv := low < LEFT_EDGE
+		var has_bark_uv := high > RIGHT_EDGE
+		if has_leaf_uv == has_bark_uv:
 			return
-		var weight := int(low < 0.5)
+		var weight := int(has_leaf_uv)
 		for corner in 3:
 			var vertex := indices[index + corner]
 			if weights[vertex] != UNASSIGNED and weights[vertex] != weight:
@@ -241,7 +246,7 @@ func _prepare_source_crown_mask(visual: MeshInstance3D) -> void:
 	arrays[Mesh.ARRAY_COLOR] = colors
 	var masked := ArrayMesh.new()
 	masked.resource_name = source.resource_name
-	masked.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	masked.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays, [], {}, format & Mesh.ARRAY_FLAG_COMPRESS_ATTRIBUTES)
 	masked.surface_set_material(0, source.surface_get_material(0))
 	masked.set_meta("source_crown_mask", true)
 	visual.mesh = masked
