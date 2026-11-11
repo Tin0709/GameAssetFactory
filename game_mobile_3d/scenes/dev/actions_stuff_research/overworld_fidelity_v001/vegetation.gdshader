@@ -13,6 +13,7 @@ uniform sampler2D study_ground_sky : filter_nearest, repeat_disable;
 uniform vec2 study_ground_sky_origin;
 uniform vec3 study_ground_sky_scale = vec3(1.0);
 uniform float study_ground_sky_mix = 0.0;
+uniform vec3 study_grass_shade_color = vec3(0.0);
 varying flat vec4 study_ground_sky_at_root;
 varying flat float study_canopy_sky_at_root;
 
@@ -138,6 +139,14 @@ void fragment(){
 	AO = (1.0 - ground_mix) * study_canopy_sky_at_root;
 	AO_LIGHT_AFFECT = 0.0;
 	EMISSION = color * (1.0 - METALLIC) * study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix * study_canopy_sky_at_root;
+	// The canopy field weights the color change without altering sky irradiance.
+	float shade_mix = study_grass_shade_color.z * (1.0 - smoothstep(0.73, 0.96, study_canopy_sky_at_root));
+	if (shade_mix > 0.0) {
+		const vec3 luma = vec3(0.2126, 0.7152, 0.0722);
+		vec3 cool_fill = EMISSION * vec3(study_grass_shade_color.x, 1.0, study_grass_shade_color.y);
+		cool_fill *= dot(EMISSION, luma) / max(dot(cool_fill, luma), 0.000001);
+		EMISSION = mix(EMISSION, cool_fill, shade_mix);
+	}
 	study_tip_weight=smoothstep(0.26,0.85,height_fraction);
 	study_cloud=world_cloud_shade(foliage_world);
 #endif
