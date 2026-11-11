@@ -77,6 +77,7 @@ void fragment() {
 		if (use_albedo_texture) color *= smooth_sampling ? texture(smooth_atlas, UV) : texture(atlas, UV);
 		if (use_vertex_color) color *= COLOR;
 		ALBEDO = shade_world_surface(color.rgb, cutaway_world, surface_top);
+		ALBEDO = grade_night_path(ALBEDO, surface_top);
 	}
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	cloud_transmission=world_cloud_shade(cutaway_world);

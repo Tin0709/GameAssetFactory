@@ -1,6 +1,18 @@
 // Optional private albedo preview. Keep the hashed base surface recipe independent.
 uniform bool use_source_terrain = false;
 uniform sampler2DArray source_terrain_tiles : source_color, filter_linear_mipmap, repeat_enable;
+uniform float night_path_chroma = 0.0;
+
+vec3 grade_night_path(vec3 albedo, float top) {
+	if (night_path_chroma <= 0.0 || !path_blending || use_source_terrain || top <= 0.9 || (ground_grade != 1 && ground_grade != 2)) {
+		return albedo;
+	}
+	float warm = smoothstep(1.06, 1.35, albedo.r / max(albedo.g, 0.0001));
+	float luminance = dot(albedo, vec3(0.2126, 0.7152, 0.0722));
+	// Normalized linear median from the warm, horizontal Forest PIX samples.
+	vec3 target = vec3(1.3236068, 0.9310745, 0.7298717) * luminance;
+	return mix(albedo, target, warm * night_path_chroma);
+}
 
 vec3 source_terrain_sample(vec2 uv, float layer) {
 	return texture(source_terrain_tiles, vec3(uv, layer)).rgb;

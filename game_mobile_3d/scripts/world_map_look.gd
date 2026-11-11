@@ -48,6 +48,7 @@ var travelling_breeze := true
 var oak_crown_wind := true
 var segment_passage_height := true
 var terrain_materials: Array[Array]=[]
+var _night_path_chroma := 0.0
 var plant_meshes: Array[Array]=[]
 var materials: Dictionary={}
 var baseline_environment: Environment
@@ -479,6 +480,14 @@ func _apply_path_verge(strength: float) -> void:
 	for material: ShaderMaterial in wind_materials:
 		if _review_shaders.get(material) == PRESET.plants_shader and material.get_shader_parameter("plant_kind") in [0, 2]:
 			material.set_shader_parameter("path_verge", strength)
+
+func set_night_path_chroma(strength: float) -> void:
+	if _night_path_chroma == strength:
+		return
+	_night_path_chroma = strength
+	for item: Array in terrain_materials:
+		item[3].set_shader_parameter("night_path_chroma", strength)
+	level.geometry.update_night_path_chroma(strength)
 
 func _refresh_cloud_look() -> void:
 	level.geometry.reset_cutaway_materials()

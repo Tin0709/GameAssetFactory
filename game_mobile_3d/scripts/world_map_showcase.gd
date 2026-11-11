@@ -75,11 +75,12 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"humid_light": ["Humid light diffusion", 1.],
 	&"tree_wind": ["Tree canopy wind", 1.],
+	&"night_path_chroma": ["Night path color", 1.],
 	&"exposure": ["Local exposure", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 17
+const LIGHTING_MIX_VERSION := 18
 const DAYLIGHT_SHADOW_SOFTNESS := 1.15
 const NEAR_HAZE_FADE_START := .86
 const KEY_LUMA := Vector3(.2126, .7152, .0722)
@@ -716,6 +717,8 @@ func set_full_direct_shadows(value:bool)->void:
 func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"humid_light":
 		return 0.
+	if effect == &"night_path_chroma":
+		return .75
 	if effect == &"shadow_softness":
 		return DAYLIGHT_SHADOW_SOFTNESS
 	if effect == &"spruce_sky":
@@ -833,7 +836,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -857,6 +860,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 16 and effect == &"humid_light":
 			missing_value = 0.
 		if version < 17 and effect == &"tree_wind":
+			missing_value = 0.
+		if version < 18 and effect == &"night_path_chroma":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
@@ -888,6 +893,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		level.look._publish_crown_wind()
 		if changed_effect == &"tree_wind":
 			return
+	if changed_effect == &"night_path_chroma":
+		_publish_night_path_chroma()
+		return
 	if changed_effect in [&"", &"oak_leaf_tint"]:
 		_sync_oak_leaf_tint()
 		if changed_effect == &"oak_leaf_tint":
@@ -1015,9 +1023,18 @@ func set_hour(value:float)->void:
 	hour=fposmod(value,24.);apply_time()
 	if level!=null:level.look._refresh_ground_bounce()
 
+func _publish_night_path_chroma() -> void:
+	if level == null or level.look == null:
+		return
+	var strength := 0.0
+	if forest_active() and atmosphere_review in ["lighting", "combined"]:
+		strength = moonlight_weight(hour) * _lighting_scale(&"night_path_chroma")
+	level.look.set_night_path_chroma(strength)
+
 func apply_time()->void:
 	if not private_primary or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
+	_publish_night_path_chroma()
 	var env:Environment=level.get_node("WorldEnvironment").environment
 	if level.look.stage!=2:
 		key_response_active=false
@@ -1221,6 +1238,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Soften lit areas into the surrounding haze. Try 65% at 16:30. Requires Combined mist and the Mobile Forest finish. Noon keeps its approved look."
 		if effect == &"tree_wind":
 			slider.tooltip_text = "Adjust the sway of private source oaks and spruces. Alt+N toggles crown wind; 0% keeps the source trees still."
+		if effect == &"night_path_chroma":
+			slider.tooltip_text = "Soften warm dirt color at night using the Forest reference. 0% restores the original path color. Daylight and the source atlas preview keep their own color."
 		slider.focus_mode = Control.FOCUS_NONE
 		slider.max_value = spec[1]
 		slider.step = .01
