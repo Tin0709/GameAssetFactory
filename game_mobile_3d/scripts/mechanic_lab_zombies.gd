@@ -55,6 +55,7 @@ const SWORD_STRIKES := [
 	{
 		"damage": 22, "range_m": 3.85, "strength": 800.0, "angle": 25.0, "stagger": 40.0,
 		"cone_degrees": 14.0, "cone_offset": -4.0, "cone_cutoff": 4.0,
+		"push_duration": 0.20, # Observed outward phase of a living target in the Sword capture.
 	},
 ]
 const SWORD_AIR_STRIKE := {"damage": 24, "range_m": 2.5, "strength": 1150.0, "angle": 25.0, "stagger": 37.5}
@@ -292,7 +293,7 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	elif sabre_ground:
 		death_strike = Zombie.DeathStrike.SABRE_GROUND
 	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger),
-		float(strike.strength), death_strike)
+		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)))
 	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
 
 func _load_assets() -> void:

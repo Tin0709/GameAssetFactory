@@ -22,6 +22,7 @@ const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
 const STAGGER_DURATION := 0.65 # DefaultHostile.GA_BecomeStaggered.
 const KNOCKBACK_CONTROL_LOCK := 0.4 # DT_MeleePropertyDefinition: Sabre and Sword.
+const KNOCKBACK_DECELERATION := 10.0
 const DEFAULT_DEATH_IMPULSE := Vector2(285.0, 190.0)
 # DT_MobDefinition.DefaultHostile -> GA_Ragdoll (HandleFinalDeath).
 # Zombie inherits this row through MeleeAttackMob. The runtime solver formula
@@ -119,6 +120,7 @@ var _feedback: Feedback
 var _mesh: MeshInstance3D
 var _walk_clip: StringName
 var _knockback := Vector3.ZERO
+var _knockback_deceleration := KNOCKBACK_DECELERATION
 var _knockback_control_left := 0.0
 var _death_direction := Vector3.ZERO
 var _death_strength := 500.0
@@ -269,10 +271,9 @@ func _physics_process(delta: float) -> void:
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 	var controlled_time := maxf(0.0, delta - _knockback_control_left)
 	_knockback_control_left = maxf(0.0, _knockback_control_left - delta)
-	var travel := _knockback
+	var travel := _integrate_knockback(delta)
 	if controlled_time > 0.000001:
 		travel += _chase_velocity(controlled_time) * (controlled_time / delta)
-	_knockback = _knockback.move_toward(Vector3.ZERO, delta * 10.0)
 	velocity.x = travel.x
 	velocity.z = travel.z
 	if is_on_floor():
@@ -282,6 +283,18 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_advance_animation(delta)
 	ragdoll.sample(delta)
+
+func _integrate_knockback(delta: float) -> Vector3:
+	var speed := _knockback.length()
+	if speed <= 0.0:
+		return Vector3.ZERO
+	var direction := _knockback / speed
+	var moving_time := minf(delta, speed / _knockback_deceleration)
+	var end_speed := maxf(0.0, speed - _knockback_deceleration * moving_time)
+	_knockback = direction * end_speed
+	# move_and_slide uses a step velocity. Integrate the falling speed through
+	# the moving part of the step so the push distance is independent of tick rate.
+	return direction * ((speed + end_speed) * 0.5 * moving_time / delta)
 
 func _advance_animation(delta: float) -> void:
 	if animation.current_animation != ATTACK:
@@ -338,7 +351,8 @@ func _play_loop(clip: StringName) -> void:
 		animation.play(clip, 0.13)
 
 func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE,
-		stagger: float = MAX_POISE, knockback_strength: float = 500.0, death_strike := DeathStrike.GROUND) -> void:
+		stagger: float = MAX_POISE, knockback_strength: float = 500.0, death_strike := DeathStrike.GROUND,
+		push_duration := 0.0) -> void:
 	if health <= 0 or amount <= 0:
 		return
 	health = maxi(0, health - amount)
@@ -358,7 +372,14 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		set_deferred("collision_mask", 0)
 	elif stagger > 0.0:
 		_knockback = direction * launch_impulse.x / 80.0
+		_knockback_deceleration = KNOCKBACK_DECELERATION
 		if not _knockback.is_zero_approx():
+			if push_duration > 0.0:
+				# Fit the push time while retaining the strength-derived open-floor travel.
+				var speed := _knockback.length()
+				var scale := speed / (KNOCKBACK_DECELERATION * push_duration)
+				_knockback *= scale
+				_knockback_deceleration = speed * scale / push_duration
 			_knockback_control_left = KNOCKBACK_CONTROL_LOCK
 		_poise -= stagger
 		_poise_recovery_wait = POISE_RECOVERY_DELAY
