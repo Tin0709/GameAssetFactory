@@ -120,6 +120,9 @@ func clip()->String:
 	if phase==&"air_attack":return "AirAttack"
 	return "CombatReady"
 func active()->bool:return phase not in [&"ready",&"step"]
+func ground_windup_active() -> bool:
+	return phase == &"attack" and not _impact_sent
+
 func playback_rate()->float:
 	if phase==&"air_attack":return maxf(.001,air_attack_play_rate)
 	if native_enabled and phase in [&"attack",&"recovery"]:return float(native_windows[index].rate)

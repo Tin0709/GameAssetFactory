@@ -92,8 +92,9 @@ func _ready() -> void:
 		ribbon_material.shader = SABRE_RIBBON_SHADER
 		player.effects.ribbon.material_override = ribbon_material
 		player.combo.native_tap_buffer_seconds = SABRE_TAP_BUFFER
-		$Zombies.setup_combat(player, player.clips, player.combo.native_windows)
-		player.connect("attack_pose_sample", $Zombies.sample_sabre)
+		$Zombies.setup_combat(player)
+		player.grounded_melee_aim = $Zombies.aim_sabre
+		player.connect("grounded_sabre_impact", $Zombies.strike_sabre)
 		player.connect("heavy_jump_landed", $Zombies.land_sabre)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)

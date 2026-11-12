@@ -5,7 +5,7 @@ extends CharacterBody3D
 signal attack_accepted(index:int,clip:String,serial:int)
 signal attack_accepted_timed(index:int,clip:String,serial:int,simulation_time:float)
 signal impact_ready(index:int,base:Vector3,tip:Vector3,serial:int)
-signal attack_pose_sample(index: int, clip: String, source_time: float, base: Vector3, tip: Vector3, serial: int)
+signal grounded_sabre_impact(index: int, clip: String, serial: int)
 signal heavy_jump_landed(position: Vector3, forward: Vector3, serial: int, fall_height: float)
 signal source_locomotion_event(notify:String,clip:String,source_seconds:float,simulation_seconds:float)
 signal physics_pose_ready
@@ -31,6 +31,7 @@ const SOURCE_MOVING_LAND_SECONDS:=.05
 const COMBAT_STEP_DISTANCE:=.45 # Reconstructed interval; no native value recovered.
 const COMBAT_STEP_TIMEOUT:=.30
 var combo=Combo.new()
+var grounded_melee_aim: Callable
 var clips:Dictionary={}
 var visual:Node3D
 var model:Node3D
@@ -511,11 +512,15 @@ func _physics_process(delta:float)->void:
 		_combat_path+=distance;_combat_locked_seconds+=delta-_combat_open_seconds
 	var facing:=visual.rotation.y
 	if not combo.active() or (combo.native_enabled and _grounded):
+		var melee_direction := Vector3.ZERO
+		if _grounded and not combat_requested and grounded_melee_aim.is_valid() and combo.ground_windup_active():
+			melee_direction = grounded_melee_aim.call(combo.index, combo.serial, Vector3(stick.x, 0.0, stick.y))
 		if combat_requested:
 			if has_aim_point:
 				var look:=aim_point-global_position
 				if Vector2(look.x,look.z).length()>.1:facing=atan2(look.x,look.z)
 			else:facing+=turn_axis*2.8*delta
+		elif not melee_direction.is_zero_approx():facing=atan2(melee_direction.x,melee_direction.z)
 		elif _move_requested:facing=atan2(stick.x,stick.y)
 		var turn_rate:=ground_turn_rate if _grounded else 12.
 		if hybrid_motion!=null and _grounded and not combo.active() and not combat_requested:
@@ -549,10 +554,6 @@ func _animate(delta:float)->void:
 	if direction_adapter!=null:direction_adapter.restore()
 	simulation_clock+=delta;expression_clock+=delta
 	var selected:=_select_clip()
-	var sample_attack: bool = review_clip.is_empty() and combo.phase in [&"attack", &"air_attack"] and attack_pose_sample.has_connections()
-	var sampled_index: int = combo.index
-	var sampled_serial: int = combo.serial
-	var sampled_time: float = combo.time + delta * combo.playback_rate() if sample_attack else 0.0
 	_play(selected)
 	var motion_speed:float=_animation_motion_speed if _combat_plan_active else current_speed
 	var layered_combat:bool=combat_legs!=null and combo.native_enabled and review_clip.is_empty() and _grounded and combo.phase in [&"attack",&"recovery"]
@@ -630,14 +631,16 @@ func _animate(delta:float)->void:
 	if hybrid_motion!=null:hybrid_motion.keep_shoulders_attached()
 	_refresh_markers()
 	_apply_face(delta)
-	if sample_attack:
-		attack_pose_sample.emit(sampled_index, selected, sampled_time, marker_base.global_position, marker_tip.global_position, sampled_serial)
 	for event:Dictionary in combo.drain_events():
 		if event.kind=="accepted":
 			_record_order(&"attack_notice",{"accepted_index":event.index,"accepted_serial":event.serial,"source_simulation_time":simulation_clock-(combo.clock-float(event.at)),"clock_scope":"Signal delivery; source_simulation_time is the reconstructed acceptance clock."})
 			accepted_count+=1;attack_accepted.emit(event.index,event.clip,event.serial)
 			attack_accepted_timed.emit(event.index,event.clip,event.serial,simulation_clock-(combo.clock-float(event.at)))
-		elif event.kind=="impact":impact_count+=1;impact_ready.emit(event.index,marker_base.global_position,marker_tip.global_position,event.serial)
+		elif event.kind=="impact":
+			impact_count+=1
+			impact_ready.emit(event.index,marker_base.global_position,marker_tip.global_position,event.serial)
+			if event.clip!="AirAttack":
+				grounded_sabre_impact.emit(event.index,event.clip,event.serial)
 	if effects!=null:
 		var active:=false
 		if combo.phase in [&"attack",&"air_attack"] and review_clip.is_empty():
