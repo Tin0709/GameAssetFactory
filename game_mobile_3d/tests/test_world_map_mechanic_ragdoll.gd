@@ -44,8 +44,13 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	var supported_without_torso := false
 	var wall_gravity := 0.0
 	var settled_gravity := 0.0
+	var parked_frame := -1
+	var smallest_rest_axis_y := 1.0
 	for frame in 135:
 		await physics_frame
+		if zombie._corpse_parked:
+			parked_frame = frame
+			break
 		if not zombie.ragdoll.running:
 			break
 		var contact: Dictionary = zombie.ragdoll.contact_motion()
@@ -55,6 +60,11 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 		var chest: PhysicalBone3D = zombie.ragdoll.bodies.Chest
 		var chest_state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
 		settled_gravity = chest_state.total_gravity.y
+		if first_landing >= 0:
+			var parts: Dictionary = zombie.ragdoll.bodies
+			var feet: Vector3 = (parts["Leg.L"].global_position + parts["Leg.R"].global_position) * 0.5
+			var axis: Vector3 = (parts.Head.global_position - feet).normalized()
+			smallest_rest_axis_y = minf(smallest_rest_axis_y, absf(axis.y))
 		for part: PhysicalBone3D in zombie.ragdoll.bodies.values():
 			var state := PhysicsServer3D.body_get_direct_state(part.get_rid())
 			for i in state.get_contact_count():
@@ -68,7 +78,10 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	check(supported_without_torso and first_landing > first_wall and first_landing < 90,
 		"Stable support at the foot of the cliff starts landing within 1.5 s")
 	check(settled_gravity > -30.0, "A supported body leaves its flight-gravity state")
-	print("WORLDMAP_CLIFF wall=", first_wall, " landing=", first_landing, " gravity=", settled_gravity)
+	check(parked_frame > first_landing and parked_frame < 120 and smallest_rest_axis_y < 0.32,
+		"The corpse rolls away from the rock corner and comes to a supported rest within two seconds")
+	print("WORLDMAP_CLIFF wall=", first_wall, " landing=", first_landing, " gravity=", settled_gravity,
+		" park=", parked_frame, " min_axis_y=", smallest_rest_axis_y)
 	zombie.free()
 	await ticks(2)
 
