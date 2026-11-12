@@ -533,7 +533,7 @@ func _animate(delta:float)->void:
 	if direction_adapter!=null:direction_adapter.restore()
 	simulation_clock+=delta;expression_clock+=delta
 	var selected:=_select_clip()
-	var sample_attack := review_clip.is_empty() and combo.phase in [&"attack", &"air_attack"] and not attack_pose_sample.get_connections().is_empty()
+	var sample_attack: bool = review_clip.is_empty() and combo.phase in [&"attack", &"air_attack"] and attack_pose_sample.has_connections()
 	var sampled_index: int = combo.index
 	var sampled_serial: int = combo.serial
 	var sampled_time: float = combo.time + delta * combo.playback_rate() if sample_attack else 0.0

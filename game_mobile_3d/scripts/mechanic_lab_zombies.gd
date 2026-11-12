@@ -87,7 +87,7 @@ func _spawn_point_clear(point: Vector3, player_position: Vector3) -> bool:
 	return true
 
 func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, tip: Vector3, serial: int) -> void:
-	var window := _hit_windows.get(clip, Vector2(-1.0, -1.0))
+	var window: Vector2 = _hit_windows.get(clip, Vector2(-1.0, -1.0))
 	if source_time < window.x or source_time > window.y:
 		return
 	if serial != _attack_serial:
