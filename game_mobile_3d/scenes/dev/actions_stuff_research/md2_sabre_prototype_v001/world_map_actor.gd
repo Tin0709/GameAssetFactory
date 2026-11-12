@@ -9,6 +9,8 @@ var _inspect_age:=0.
 var _inspecting:=false
 var is_dead:=false
 var aerial_melee_enabled := true
+var _default_weapon_clips: Dictionary
+var _default_weapon_gait: RefCounted
 var smooth_step_active:=false
 var jump_active:bool:
 	get:return _jump_stage in ["JumpTakeoff","JumpAirborne"]
@@ -115,6 +117,29 @@ func setup_world_vegetation(world:Node3D)->Node3D:
 
 func cancel_jump()->void:
 	_reset_map_actor_at(global_position)
+
+func set_weapon_locomotion(profile: Dictionary) -> void:
+	var use_source := not profile.is_empty()
+	if weapon_source_locomotion == use_source:
+		return
+	if _default_weapon_clips.is_empty():
+		_default_weapon_gait = source_gait
+		for slot: String in profile.clips:
+			_default_weapon_clips[slot] = clips[slot]
+	var replacements: Dictionary = profile.clips if use_source else _default_weapon_clips
+	for slot: String in replacements:
+		clips[slot] = replacements[slot]
+	source_gait = profile.gait if use_source else _default_weapon_gait
+	weapon_source_locomotion = use_source
+	# The logical state may stay Idle or Run while its assigned clip changes.
+	active_clip = ""
+	_idle_wait = 0.0
+	_inspecting = false
+	_inspect_age = 0.0
+	if foot_placement != null:
+		foot_placement.clear()
+	if novelty_jump != null:
+		novelty_jump.cancel()
 
 func attack(value: bool) -> void:
 	if value and not aerial_melee_enabled and not _grounded:

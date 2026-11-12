@@ -180,6 +180,9 @@ func apply(actor,key:String,delta:float)->void:
 	phase_advanced=0.;phase_hz=0.;owns_pose=false
 	if not actor.review_clip.is_empty():_last_stage="";return
 	var stage:String=actor._jump_stage
+	if actor.weapon_source_locomotion:
+		_last_stage=stage
+		return
 	var speed:float=actor.current_speed
 	var moving:bool=actor._move_requested and speed>.001
 	# Contact/flight clocks belong to physical state, even while MD2 combat

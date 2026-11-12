@@ -3,9 +3,12 @@ extends RefCounted
 
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
 const ReferenceAudio := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
+const SourceGait := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/source_gait.gd")
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/Art/Characters/Player/"
-const CLIPS := SOURCE + "Animations/Weapons_Melee/2H_Medium/Combat/"
+const MEDIUM_CLIPS := SOURCE + "Animations/Weapons_Melee/2H_Medium/"
+const CLIPS := MEDIUM_CLIPS + "Combat/"
 const LIBRARY := &"private_curved_greatsword"
+const LOCOMOTION_LIBRARY := &"private_curved_greatsword_locomotion"
 const MESH_HASH := "00195143cc38f043e053cf4e9427597d711a34038d90fd088d55216fbb9120ed"
 const TEXTURE_HASH := "56a9c441e36abb74df27c6bcdc392c6c55eac73c24e22ebfd8c01a5c627eb0e8"
 const BLADE_BASE := Vector3(0.0, -0.44, 0.0)
@@ -28,10 +31,57 @@ const RECOVERY_HASHES := [
 	"887a19e50dafc565548a3bf2febadb9acc4d9320a45f3babcdb1cabf0a7cc869",
 	"e165c68502bcbb88a295ec86029651353481e13bd3187be826a636f8f9b201d8",
 ]
+# ABP_2HMediumAnimLayers_C and its Player_Walk_Run_Claymore blend space.
+const LOCOMOTION := {
+	"Idle": [MEDIUM_CLIPS, "Player_2H_Medium_Idle", 80.0, true, "idle",
+		"f5c1757f021e061c835b19d92c5618c333dbac7cc8b6e3feec7267201e42d737"],
+	"Walk": [MEDIUM_CLIPS, "Player_2H_Medium_Walk", 26.0, true, "locomotion",
+		"a4560e33101c2cca12dba36172e82feef29c9da63532b0f782c8358dfec24794"],
+	"Run": [MEDIUM_CLIPS, "Player_2H_Medium_Run", 13.0, true, "locomotion",
+		"2449b394d51a8ae7e0ff63d9a252d798b4faa0ba7049a0e0a850e28e0c85f76c"],
+	"JumpTakeoff": [MEDIUM_CLIPS, "Player_2H_Medium_Jump", 11.0, false, "jump",
+		"4b24eeba758c6a12322780c4b8ca8c51d65696f36a11a260e129dd14e8bdf845"],
+	"JumpAirborne": [MEDIUM_CLIPS, "Player_2H_Medium_Jump_Loop", 25.0, true, "jump",
+		"2324b4386c5006f5a7e17d5fbdcd6c07bbe9cfa33be67d7aba353d861004f64b"],
+	"JumpLanding": [MEDIUM_CLIPS, "Player_2H_Medium_Jump_Land", 9.0, false, "jump",
+		"dba9c9a2d3119a451ae6d4f3c3718f7f5b7dae2dee0035eee0c9365a9f4d651c"],
+	"InspectWeapon": [SOURCE + "Animations/Novelties/", "Player_Idle_Novelty_ExamineWeapon_2HMedium", 80.0, false, "inspection",
+		"4bc651129922cf1e549dd580840280cec640a86ccdafcce02bec1ed24de61405"],
+}
 
 static func load_mesh(actor: CharacterBody3D, research_root: String) -> Mesh:
 	return Sword.load_verified_mesh(actor, research_root, SOURCE + "Equipment/Weapons/CurvedGreatsword/",
 		"CurvedGreatsword", MESH_HASH, TEXTURE_HASH)
+
+static func load_locomotion(actor: CharacterBody3D, research_root: String) -> Dictionary:
+	var entries: Array[Dictionary] = []
+	for slot: String in LOCOMOTION:
+		var source: Array = LOCOMOTION[slot]
+		entries.append({
+			"path": ReferenceAudio.resolve_private_file(research_root, source[0] + source[1] + ".glb"),
+			"semantic": "NativeCurved" + slot, "source_name": source[1],
+			"duration": source[2] / 30.0, "loop": source[3], "category": source[4], "sha256": source[5],
+		})
+	if not actor._load_private_clip_library(entries, LOCOMOTION_LIBRARY):
+		return {}
+	var slots := {}
+	for slot: String in LOCOMOTION:
+		slots[slot] = actor.clips["NativeCurved" + slot]
+	slots.CombatReady = slots.Idle
+	# Use the measured source knots on the lab's existing speed-to-axis mapping.
+	var samples: Array[Dictionary] = []
+	var keys := ["Idle", "Walk", "Run"]
+	var inputs := [0.0, 0.3, 1.2]
+	for i in keys.size():
+		var clip: Dictionary = slots[keys[i]]
+		samples.append({"semantic": keys[i], "source_name": clip.source_name,
+			"input": inputs[i], "duration": clip.duration, "rate": 1.0})
+	var gait := SourceGait.new()
+	if not gait.setup(actor.skeleton, actor.animation_player, slots, {
+		"schema": "md2-private-source-gait/1", "base_speed_cm_s": 700.0, "input_floor": 0.2, "samples": samples,
+	}):
+		return {}
+	return {"clips": slots, "gait": gait}
 
 static func combat_profile(research_root: String) -> Dictionary:
 	var profile := {

@@ -41,6 +41,7 @@ var _sabre_blade_tip: Vector3
 var _sabre_profile: Dictionary
 var _sword_profile: Dictionary
 var _curved_profile: Dictionary
+var _curved_locomotion: Dictionary
 var _sabre_audio_aliases: Dictionary
 var _sabre_audio_rates: Dictionary
 var _shake_serial := -1
@@ -195,11 +196,12 @@ func _select_weapon(index: int) -> void:
 	$Zombies.sword_equipped = sword_equipped
 	$Zombies.curved_equipped = curved_equipped
 	player.aerial_melee_enabled = not curved_equipped
+	player.set_weapon_locomotion(_curved_locomotion if curved_equipped else {})
 	$HUD/DropMedium.disabled = curved_equipped
 	$HUD/DropHigh.disabled = curved_equipped
 	var attack_hint := "chém dưới đất" if curved_equipped else "chém hoặc bổ trên không"
 	$HUD/Controls.text = (PRIVATE_CONTROLS % attack_hint) + " · Cuộn chuột để zoom"
-	$HUD/SpawnStatus.text = ""
+	$HUD/SpawnStatus.text = "Thiếu dữ liệu tư thế hai tay đã xác minh." if curved_equipped and _curved_locomotion.is_empty() else ""
 
 func _weapon_profile(index: int) -> Dictionary:
 	match index:
@@ -230,6 +232,7 @@ func _load_weapon(index: int) -> bool:
 	if not player.animation_player.has_animation_library(CurvedGreatsword.LIBRARY):
 		return false
 	_curved_profile = profile
+	_curved_locomotion = CurvedGreatsword.load_locomotion(player, research_root)
 	player.reference_audio.add_manifest(research_root, CurvedGreatsword.MEDIA_MANIFEST)
 	return true
 
