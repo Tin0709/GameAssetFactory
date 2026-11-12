@@ -555,12 +555,13 @@ func _update_mist()->void:
 	if not mist.failure().is_empty():
 		env.fog_density=float(_mist_sample.fog_opacity);_forest_expected.fog_density=env.fog_density;mist.hide();return
 	var camera:Camera3D=level.get_node("Camera3D")
-	var local_gain := 0.
+	var local_phase := 0.
 	if atmosphere_review == "combined" and not _balanced_preview and level.view_mode == "gameplay":
-		local_gain = PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
-		local_gain *= _lighting_scale(&"fog") * minf(1., _lighting_scale(&"near_haze"))
-	mist.set_local_region(level.local_mist_region, local_gain * _lighting_scale(&"local_mist"))
-	mist.set_additional_local_region(level.additional_mist_region, local_gain * _lighting_scale(&"cliff_mist"))
+		local_phase = PHASE_FINISH.phase_weight(hour)
+	var daylight := _balanced_daylight_weight()
+	var fog_gain := _lighting_scale(&"fog") * minf(1., _lighting_scale(&"near_haze"))
+	mist.set_local_region(level.local_mist_region, _lighting_scale(&"local_mist") * local_phase * daylight * fog_gain)
+	mist.set_additional_local_region(level.additional_mist_region, _lighting_scale(&"cliff_mist") * local_phase * daylight * fog_gain)
 	var luma:=Vector3(.2126,.7152,.0722);var ambient:=env.ambient_light_color.srgb_to_linear()
 	var sun:DirectionalLight3D=level.get_node("Sun");var key:=sun.light_color.srgb_to_linear()
 	var incoming:=Vector3(ambient.r,ambient.g,ambient.b).dot(luma)*env.ambient_light_energy*.75+Vector3(key.r,key.g,key.b).dot(luma)*sun.light_energy*.03
@@ -1631,6 +1632,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
 		if effect == &"local_mist":
 			slider.tooltip_text = "Scales the map's local fog volume in morning and afternoon. 0% uses the existing mist."
+		if effect == &"cliff_mist":
+			slider.editable = level.additional_mist_region != null
+			slider.tooltip_text = "Adds a thin mist layer across the northwest cliff in daylight. Try 100% at 07:00 or 16:30 in Combined mode."
 		if effect == &"forest_near_scatter":
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
 		if effect == &"sunlit_mist":
