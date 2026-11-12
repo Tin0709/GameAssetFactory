@@ -60,6 +60,15 @@ func run() -> void:
 	check(absf(rad_to_deg(atan2(impulse.y, Vector2(impulse.x, impulse.z).length())) - 30.0) < 0.01,
 		"DefaultHostile's 30-degree launch is applied to the death impulse")
 	check(zombie.ragdoll.handoff_error < 0.005, "No snap at physics handoff")
+	var joints: Dictionary = zombie.ragdoll.source_joint_rids.duplicate()
+	check(joints.size() == 5, "All five authored joints become native Godot constraints")
+	for child: String in joints:
+		var joint: RID = joints[child]
+		var spec: Dictionary = zombie.ragdoll.source_joints[child]
+		check(spec.parent == "Chest", child + " connects to the spine body")
+		check(is_equal_approx(PhysicsServer3D.cone_twist_joint_get_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_SWING_SPAN), deg_to_rad(45.0))
+			and is_equal_approx(PhysicsServer3D.cone_twist_joint_get_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_TWIST_SPAN), deg_to_rad(15.0)),
+			child + " uses the asset's cone and twist spans")
 	await ticks(60)
 	check(zombie._corpse_landed and zombie.ragdoll.max_anchor_error() < 0.10, "The corpse settles with connected joints")
 	while is_instance_valid(zombie) and zombie._corpse_age < 4.96:
