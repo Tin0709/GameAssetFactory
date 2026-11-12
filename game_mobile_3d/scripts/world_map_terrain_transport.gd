@@ -23,8 +23,8 @@ var regional_sky_state := Vector2.ZERO
 var regional_sky_phase := Vector4.ZERO
 var night_sky_texture: ImageTexture
 var night_sky_state := Vector2.ZERO
-var _day_sky_failed := false
-var _night_sky_failed := false
+var _day_sky_ready := false
+var _night_sky_ready := false
 class TransformWatch extends Node3D:
 	var guard:Node
 	func _notification(what:int)->void:
@@ -128,10 +128,12 @@ func _install()->bool:
 	_transforms_dirty=false
 	if has_ids:
 		_regional_sky = level.regional_sky_region
+		_day_sky_ready = _regional_sky.has_day_field()
+		_night_sky_ready = _regional_sky.has_night_field()
 	return true
 
 func regional_sky_available() -> bool:
-	return _regional_sky != null and not _day_sky_failed and _regional_sky.has_day_field() and level.showcase.sky_response.available()
+	return _day_sky_ready and level.showcase.sky_response.available()
 
 func _refresh_regional_sky() -> void:
 	if _regional_sky == null:
@@ -152,7 +154,7 @@ func _refresh_regional_sky() -> void:
 	if regional_sky_texture == null:
 		regional_sky_texture = _regional_sky.load_texture()
 		if regional_sky_texture == null:
-			_day_sky_failed = true
+			_day_sky_ready = false
 			_set_regional_sky_state(Vector2.ZERO)
 			return
 	var i := 0
@@ -170,7 +172,7 @@ func _set_regional_sky_state(state: Vector2, sample := Vector4.ZERO) -> void:
 	_bind_sky_receivers()
 
 func night_sky_available() -> bool:
-	return _regional_sky != null and not _night_sky_failed and _regional_sky.has_night_field() and level.showcase.sky_response.available()
+	return _night_sky_ready and level.showcase.sky_response.available()
 
 func _refresh_night_sky() -> void:
 	var review = level.showcase
@@ -183,7 +185,7 @@ func _refresh_night_sky() -> void:
 		if state != Vector2.ZERO and night_sky_texture == null:
 			night_sky_texture = _regional_sky.load_night_texture()
 			if night_sky_texture == null:
-				_night_sky_failed = true
+				_night_sky_ready = false
 				state = Vector2.ZERO
 	if state != night_sky_state:
 		night_sky_state = state
