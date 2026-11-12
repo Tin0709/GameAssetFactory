@@ -20,6 +20,15 @@ uniform float study_grass_root_tone = 0.0;
 uniform float study_grass_shadow_height = 1.0;
 varying flat vec4 study_ground_sky_at_root;
 varying flat float study_canopy_sky_at_root;
+varying flat vec3 study_day_bounce_at_root;
+
+vec3 grass_day_bounce(vec2 world_position) {
+	if (dot(day_bounce_key.rgb, vec3(1.0)) <= 0.0) return vec3(0.0);
+	ivec2 extent = ivec2(day_bounce_roots.zw);
+	ivec2 cell = ivec2(floor(world_position - day_bounce_roots.xy));
+	if (any(lessThan(cell, ivec2(0))) || any(greaterThanEqual(cell, extent))) return vec3(0.0);
+	return gaf_day_bounce(day_bounce_grass_start + cell.y * extent.x + cell.x);
+}
 
 vec4 grass_ground_sky(vec2 world_position) {
 	ivec2 cell = ivec2(floor(world_position - study_ground_sky_origin));
@@ -78,6 +87,7 @@ void vertex(){
 	// The patch origin stays in its own cell while the blades bend.
 	study_ground_sky_at_root = study_ground_sky_mix > 0.0 ? grass_ground_sky(MODEL_MATRIX[3].xz) : vec4(0.0);
 	study_canopy_sky_at_root = gaf_spruce_sky(MODEL_MATRIX[3].xyz, INV_VIEW_MATRIX[3].xyz);
+	study_day_bounce_at_root = grass_day_bounce(MODEL_MATRIX[3].xz);
 #endif
 	// Full float custom attribute: normalized height, blade height, phase, response.
 	float u=CUSTOM0.x;
@@ -183,6 +193,7 @@ void fragment(){
 	}
 	float sole = gaf_player_contact(foliage_world, CAMERA_POSITION_WORLD);
 	AO *= sole;
+	EMISSION += color * (1.0 - METALLIC) * study_day_bounce_at_root;
 	EMISSION *= sole;
 	if (gaf_diffuse_opening.w > 0.0) {
 		grass_opening_incident = study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix * study_canopy_sky_at_root * sole;

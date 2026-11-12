@@ -23,8 +23,11 @@ var regional_sky_state := Vector2.ZERO
 var regional_sky_phase := Vector4.ZERO
 var night_sky_texture: ImageTexture
 var night_sky_state := Vector2.ZERO
+var day_bounce_texture: ImageTexture3D
+var day_bounce_key := Vector4.ZERO
 var _day_sky_ready := false
 var _night_sky_ready := false
+var _day_bounce_ready := false
 class TransformWatch extends Node3D:
 	var guard:Node
 	func _notification(what:int)->void:
@@ -130,6 +133,7 @@ func _install()->bool:
 		_regional_sky = level.regional_sky_region
 		_day_sky_ready = _regional_sky.has_day_field()
 		_night_sky_ready = _regional_sky.has_night_field()
+		_day_bounce_ready = _regional_sky.has_sun_bounce_field()
 	return true
 
 func regional_sky_available() -> bool:
@@ -174,6 +178,34 @@ func _set_regional_sky_state(state: Vector2, sample := Vector4.ZERO) -> void:
 func night_sky_available() -> bool:
 	return _night_sky_ready and level.showcase.sky_response.available()
 
+func day_bounce_available() -> bool:
+	return _day_bounce_ready
+
+func _refresh_day_bounce() -> void:
+	var review = level.showcase
+	var key := Vector4.ZERO
+	var hour: float = review.hour
+	var strength: float = review._lighting_scale(&"daylight_bounce")
+	if strength > 0.0 and day_bounce_available() and _last_key.is_zero_approx() \
+			and (hour < 11.5 or hour > 12.5) and review.forest_active() \
+			and not review._balanced_preview and review.atmosphere_review == "combined" \
+			and level.view_mode == "gameplay" and level.look._ground_bounce_requested \
+			and review._source_terrain_toggle != null and review._source_terrain_toggle.button_pressed \
+			and is_active():
+		var sun: DirectionalLight3D = level.get_node("Sun")
+		var sample := _regional_sky.sun_bounce_sample(hour, sun.global_basis.z.normalized())
+		if sample.y > 0.0 and sun.is_visible_in_tree() and sun.shadow_enabled and sun.light_energy > 0.0:
+			if day_bounce_texture == null:
+				day_bounce_texture = _regional_sky.load_sun_bounce_texture()
+				_day_bounce_ready = day_bounce_texture != null
+			if day_bounce_texture != null:
+				var c := sun.light_color.srgb_to_linear()
+				var rgb := Vector3(c.r, c.g, c.b) * (sun.light_energy * sample.y * strength)
+				key = Vector4(rgb.x, rgb.y, rgb.z, sample.x)
+	if key != day_bounce_key:
+		day_bounce_key = key
+		_bind_sky_receivers()
+
 func _refresh_night_sky() -> void:
 	var review = level.showcase
 	var state := Vector2.ZERO
@@ -205,6 +237,12 @@ func _bind_sky_receivers() -> void:
 		plants.grass_light.bind_regional_sky(self)
 
 func bind_regional_sky(material: ShaderMaterial) -> void:
+	material.set_shader_parameter("day_bounce_key", day_bounce_key)
+	if day_bounce_key != Vector4.ZERO and material.get_shader_parameter("day_bounce_field") != day_bounce_texture:
+		material.set_shader_parameter("day_bounce_field", day_bounce_texture)
+		material.set_shader_parameter("day_bounce_roots", Vector4(
+			_regional_sky.grass_origin.x, _regional_sky.grass_origin.y, _regional_sky.grass_extent.x, _regional_sky.grass_extent.y))
+		material.set_shader_parameter("day_bounce_grass_start", _regional_sky.terrain_receivers)
 	material.set_shader_parameter("night_sky_state", night_sky_state)
 	if night_sky_state.x > 0.0 and material.get_shader_parameter("night_sky_field") != night_sky_texture:
 		material.set_shader_parameter("night_sky_field", night_sky_texture)
@@ -284,3 +322,4 @@ func _process(_delta:float)->void:
 	refresh()
 	_refresh_regional_sky()
 	_refresh_night_sky()
+	_refresh_day_bounce()

@@ -9,6 +9,17 @@ uniform sampler2D night_sky_field : filter_nearest, repeat_disable;
 uniform vec2 night_sky_state = vec2(0.0); // spatial fill, stone color balance
 uniform vec4 night_sky_roots; // grass origin and extent
 uniform int night_sky_grass_start;
+uniform sampler3D day_bounce_field : filter_linear, repeat_disable;
+uniform vec4 day_bounce_key = vec4(0.0); // Linear key RGB and phase slice.
+uniform vec4 day_bounce_roots;
+uniform int day_bounce_grass_start;
+
+vec3 gaf_day_bounce(int receiver) {
+	if (dot(day_bounce_key.rgb, vec3(1.0)) <= 0.0) return vec3(0.0);
+	ivec2 extent = textureSize(day_bounce_field, 0).xy;
+	ivec2 cell = ivec2(receiver % extent.x, receiver / extent.x);
+	return textureLod(day_bounce_field, vec3((vec2(cell) + 0.5) / vec2(extent), day_bounce_key.w), 0.0).rgb * day_bounce_key.rgb;
+}
 
 vec3 gaf_night_sky(vec3 sky, int receiver) {
 	if (night_sky_state.x <= 0.0) return sky;

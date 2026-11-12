@@ -44,6 +44,7 @@ void vertex() {
 	float canopy = gaf_spruce_sky(world_point, INV_VIEW_MATRIX[3].xyz);
 	terrain_sky_light = sky * canopy;
 	terrain_night_sky_light = gaf_night_sky(sky, receiver) * canopy;
+	terrain_day_bounce = gaf_day_bounce(receiver);
 	terrain_sun_bounce = CUSTOM2.rgb;
 #endif
 #ifdef GAF_WORLD_TERRAIN_SKY

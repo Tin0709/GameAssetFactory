@@ -2,6 +2,7 @@
 varying vec3 terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 varying vec3 terrain_night_sky_light;
+varying vec3 terrain_day_bounce;
 #endif
 varying vec3 terrain_sun_bounce;
 varying float terrain_direct_contact;
@@ -33,6 +34,7 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 		float luma = dot(irradiance, vec3(.2126, .7152, .0722));
 		irradiance = mix(irradiance, vec3(luma), night_sky_state.y);
 	}
+	irradiance += terrain_day_bounce;
 #endif
 	if(terrain_colored_visibility)irradiance*=terrain_contact_response(color,contact);
 	return color*(1.0-metallic)*irradiance;
