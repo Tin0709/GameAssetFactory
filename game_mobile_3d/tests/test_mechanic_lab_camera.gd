@@ -22,6 +22,11 @@ func run() -> void:
 	current_scene = lab
 	lab.set_process(false)
 	await physics_frame
+	if lab.get_node_or_null("CombatAudio") == null:
+		check(false, "Private MD2 player is available in MechanicLab")
+		lab.free()
+		quit(1)
+		return
 	check(is_zero_approx(contact(lab, Vector3(2.4, 1.9, 0), 100)), "Raised contact outside the three-dimensional outer radius does not shake")
 	check(lab._impact_light.visible, "An out-of-range shake does not suppress local contact light")
 	lab.reset_player()
@@ -32,6 +37,9 @@ func run() -> void:
 	lab.reset_player()
 	lab.camera.size = 6.0
 	check(is_equal_approx(contact(lab, Vector3(1.8, -1.35, 0), 103, "Attack3"), half), "Sword finisher is symmetric about the pawn and independent of zoom")
+	var age: float = lab._shake_age
+	contact(lab, Vector3(1.0, 0.0, 0.0), 103, "Attack3")
+	check(lab._shake_age > age, "A second target in the same swing does not restart the camera pulse")
 	lab.reset_player()
 	check(is_zero_approx(contact(lab, Vector3(1, 0, 0), 104, "Attack2", 1)), "Sword ordinary strike has zero shake")
 	lab.free()
