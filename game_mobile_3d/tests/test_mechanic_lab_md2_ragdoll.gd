@@ -111,11 +111,13 @@ func run() -> void:
 	var landing_speed := 0.0
 	var follow_through_speed := -INF
 	var lowest_corner := 0.0
+	var last_anchor_error := INF
 	for i in 60:
 		await physics_frame
 		if not zombie.ragdoll.running:
 			break
 		lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
+		last_anchor_error = zombie.ragdoll.max_anchor_error()
 		var momentum := Vector3.ZERO
 		for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
 			momentum += body.linear_velocity * body.mass
@@ -133,7 +135,7 @@ func run() -> void:
 	check(landing_speed > 0.0 and follow_through_speed > landing_speed * 0.55,
 		"The corpse retains forward momentum through its first 100 ms on the floor")
 	check(lowest_corner >= -0.013, "The grounded strike stays within the floor contact tolerance")
-	check(zombie._corpse_landed and zombie.ragdoll.max_anchor_error() < 0.10, "The corpse settles with connected joints")
+	check(zombie._corpse_landed and last_anchor_error < 0.10, "The corpse settles with connected joints")
 	while zombie.ragdoll.running and zombie._corpse_age < 1.85:
 		await physics_frame
 	check(not zombie.ragdoll.running, "A supported corpse holds still before the fade instead of vibrating on the floor")
@@ -253,7 +255,8 @@ func check_rebound(zombie) -> void:
 			continue
 		var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
 		var state := PhysicsServer3D.body_get_direct_state(head.get_rid())
-		if state and is_equal_approx(state.total_gravity.y, -50.0) and is_equal_approx(head.linear_damp, 0.01):
+		if state and is_equal_approx(state.total_gravity.y, -50.0) and is_equal_approx(head.linear_damp, 0.01) \
+				and is_equal_approx(head.angular_damp, zombie._death_profile.angular_damping):
 			free_flight = true
 			break
 	check(free_flight, "A corpse that rebounds clear of the floor returns to air gravity and drag")
