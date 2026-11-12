@@ -79,10 +79,12 @@ func _ready() -> void:
 		body.collision_mask = 0
 	if _death_profile == null:
 		_death_profile = DeathProfile.new()
-		_death_profile.linear_impulse = 145.0
-		_death_profile.upward_impulse = 28.0
-		_death_profile.angular_impulse = 2.2
-		_death_profile.linear_damping = 0.30
+		# Launch the whole corpse clear of the floor before the joints take up the hit.
+		_death_profile.linear_impulse = 285.0
+		_death_profile.upward_impulse = 190.0
+		_death_profile.angular_impulse = 3.2
+		_death_profile.transport_fraction = 0.93
+		_death_profile.linear_damping = 0.18
 		_death_profile.joint_resistance = 0.45
 	if _flash_material == null:
 		_flash_material = StandardMaterial3D.new()
