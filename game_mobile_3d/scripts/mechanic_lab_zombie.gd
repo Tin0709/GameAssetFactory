@@ -127,6 +127,8 @@ var _corpse_parked := false
 var _settled_seconds := 0.0
 var _landing_age := INF
 var _supported_roll_damping := false
+var _wall_brace_age := 0.0
+var _wall_gravity := false
 var _physics_profile: Dictionary
 var _corpse_floor: CollisionShape3D
 static var _flash_material: ShaderMaterial
@@ -441,20 +443,37 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		and is_equal_approx(contact_age, gravity_blend_end) and motion.supports >= 3 \
 		and motion.core_supports > 0 and motion.leg_supported and motion.linear <= DEATH_LIMB_SUPPORT_MAX_SPEED \
 		and absf(_corpse_axis().normalized().y) <= CORPSE_SETTLE_MAX_AXIS_Y
-	if is_equal_approx(contact_age, _landing_age) and damp_supported_roll == _supported_roll_damping:
+	var wall_gravity := _update_wall_brace(delta, motion)
+	if is_equal_approx(contact_age, _landing_age) and damp_supported_roll == _supported_roll_damping \
+			and wall_gravity == _wall_gravity:
 		return
 	_landing_age = contact_age
 	_supported_roll_damping = damp_supported_roll
+	_wall_gravity = wall_gravity
 	var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
 	var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
 	var flight_gravity_scale := _gravity_scale(ZOMBIE_GRAVITY)
+	var gravity_scale := flight_gravity_scale if wall_gravity else lerpf(flight_gravity_scale, 1.0, gravity_blend)
 	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 	var angular_damp := DEATH_SUPPORTED_ANGULAR_DAMP if damp_supported_roll \
 		else lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 	for body: PhysicalBone3D in ragdoll.bodies.values():
-		body.gravity_scale = lerpf(flight_gravity_scale, 1.0, gravity_blend)
+		body.gravity_scale = gravity_scale
 		body.linear_damp = linear_damp
 		body.angular_damp = angular_damp
+
+func _update_wall_brace(delta: float, motion: Dictionary) -> bool:
+	if is_instance_valid(_corpse_floor) or ragdoll.source_joints.is_empty():
+		return false
+	var slow: bool = motion.linear <= CORPSE_SETTLE_SPEED and motion.angular <= CORPSE_SETTLE_SPIN
+	# Wait until the corpse stalls against a wall with its weight outside its floor contacts.
+	# Once it begins to tip, keep Overworld gravity until the brace releases.
+	if (slow or _wall_gravity) and absf(_corpse_axis().normalized().y) > CORPSE_SETTLE_MAX_AXIS_Y \
+			and ragdoll.is_braced_against_terrain():
+		_wall_brace_age += delta
+	else:
+		_wall_brace_age = 0.0
+	return _wall_brace_age >= CORPSE_SETTLE_TIME
 
 static func _gravity_scale(acceleration: float) -> float:
 	return acceleration / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))

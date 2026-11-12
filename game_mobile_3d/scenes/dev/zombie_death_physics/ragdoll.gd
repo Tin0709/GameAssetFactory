@@ -15,6 +15,7 @@ const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "
 const FLOOR_CONTACT_SLOP := 0.005
 const FLOOR_REST_SLOP := 0.012
 const MIN_SUPPORT_NORMAL_Y := 0.5
+const MAX_WALL_NORMAL_Y := 0.10
 const HANDOFF_MIN_WALL_OVERLAP := 0.035
 const HANDOFF_WALL_REST_OVERLAP := 0.012
 const HANDOFF_MAX_SHIFT := 0.12
@@ -609,6 +610,33 @@ func contact_motion() -> Dictionary:
 	return {"contacts":contacts,"core_contacts":core_contacts,"supports":supports,
 		"core_supports":core_supports,"leg_supported":leg_supports > 0,"support_span":support_span,
 		"linear":peak_linear,"angular":peak_angular}
+
+func is_braced_against_terrain() -> bool:
+	var has_wall_contact := false
+	var support_points := PackedVector2Array()
+	var weighted_center := Vector3.ZERO
+	var mass := 0.0
+	for body: PhysicalBone3D in bodies.values():
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			return false
+		weighted_center += (state.transform.origin + state.center_of_mass) * body.mass
+		mass += body.mass
+		for index in state.get_contact_count():
+			if not state.get_contact_collider_object(index) is StaticBody3D:
+				continue
+			var normal_y := state.get_contact_local_normal(index).y
+			has_wall_contact = has_wall_contact or absf(normal_y) < MAX_WALL_NORMAL_Y
+			if normal_y >= MIN_SUPPORT_NORMAL_Y:
+				var point := state.get_contact_collider_position(index)
+				support_points.append(Vector2(point.x, point.z))
+	if not has_wall_contact or support_points.is_empty():
+		return false
+	var footprint := Geometry2D.convex_hull(support_points)
+	if footprint.size() < 4:
+		return true
+	var center := Vector2(weighted_center.x, weighted_center.z) / mass
+	return not Geometry2D.is_point_in_polygon(center, footprint)
 
 func has_flat_limb_support() -> bool:
 	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
