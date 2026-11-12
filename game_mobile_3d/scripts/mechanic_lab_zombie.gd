@@ -83,6 +83,7 @@ const CORPSE_SETTLE_TIME := 0.10
 const CORPSE_SETTLE_SPEED := 0.34
 const CORPSE_SETTLE_SPIN := 1.6
 const CORPSE_SETTLE_MAX_AXIS_Y := 0.32
+const CORPSE_UPRIGHT_AXIS_Y := 0.70
 const HIT_FLASH_DURATION := 0.083
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
@@ -414,7 +415,11 @@ func _update_death(delta: float) -> void:
 			if source_rig:
 				body.bounce = 0.0
 	if _corpse_landed:
-		_update_landing_forces(delta, sabre_finisher, contact.supports > 0)
+		var supported: bool = contact.supports > 0
+		if supported and source_rig and contact.core_supports == 0 and not is_instance_valid(_corpse_floor):
+			# Keep Overworld gravity while the corpse is perched upright without core support.
+			supported = absf(_corpse_axis().normalized().y) <= CORPSE_UPRIGHT_AXIS_Y
+		_update_landing_forces(delta, sabre_finisher, supported)
 		_check_corpse_settled(delta, contact)
 
 func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool) -> void:
@@ -443,6 +448,11 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool)
 static func _gravity_scale(acceleration: float) -> float:
 	return acceleration / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 
+func _corpse_axis() -> Vector3:
+	var bodies := ragdoll.bodies
+	var feet: Vector3 = (bodies["Leg.L"].global_position + bodies["Leg.R"].global_position) * 0.5
+	return bodies.Head.global_position - feet
+
 func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
 	if motion.core_supports == 0 or not motion.leg_supported or motion.supports < 3 \
 		or motion.linear > CORPSE_SETTLE_SPEED or motion.angular > CORPSE_SETTLE_SPIN:
@@ -450,9 +460,7 @@ func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
 		return
 	# A head-first hit can stall before the body falls over. On terraces,
 	# compare the pose with the actual surface span between core and feet.
-	var bodies := ragdoll.bodies
-	var feet: Vector3 = (bodies["Leg.L"].global_position + bodies["Leg.R"].global_position) * 0.5
-	var head_to_feet: Vector3 = bodies.Head.global_position - feet
+	var head_to_feet := _corpse_axis()
 	var axis := head_to_feet.normalized()
 	if absf(axis.y) > CORPSE_SETTLE_MAX_AXIS_Y:
 		var span: Vector3 = motion.support_span
