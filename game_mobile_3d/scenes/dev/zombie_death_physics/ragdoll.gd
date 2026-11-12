@@ -15,6 +15,9 @@ const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "
 const FLOOR_CONTACT_SLOP := 0.005
 const FLOOR_REST_SLOP := 0.012
 const MIN_SUPPORT_NORMAL_Y := 0.5
+# SK_Zombie_PhysicsAsset enables linear projection with a 5 cm tolerance.
+const SOURCE_ANCHOR_TOLERANCE := 0.05
+const PROJECTION_COLLISION_MARGIN := 0.001
 @export var maximum_inherited_linear_speed := 3.0
 @export var maximum_inherited_angular_speed := 10.0
 var skeleton: Skeleton3D
@@ -38,7 +41,9 @@ var _parts: Array = PARTS
 var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
 var _flat_floor: CollisionShape3D
-var _floor_projection_frame := -1
+var _pose_correction_frame := -1
+var _projection_query: PhysicsTestMotionParameters3D
+var _projection_hit: PhysicsTestMotionResult3D
 # (Nm/rad, Nms/rad): soft restoring torque plus relative angular damping.
 const JOINT_RESPONSE := {"Chest": Vector2(18,5.4), "Head": Vector2(4,2.4), "Arm.L": Vector2(3,2.1), "Arm.R": Vector2(3,2.1), "Leg.L": Vector2(6,2.7), "Leg.R": Vector2(6,2.7)}
 
@@ -100,9 +105,9 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	if running or sample_count < 2: return false
 	running = true
 	_flat_floor = flat_floor
-	if _flat_floor != null:
+	if _flat_floor != null or not source_joints.is_empty():
 		for body: PhysicalBone3D in bodies.values():
-			body.set("floor_projection", _project_floor_contact)
+			body.set("pose_correction", _correct_physical_pose)
 	simulator.active = true
 	# This refreshes all cached animated poses, sets all body transforms and changes mode.
 	simulator.physical_bones_start_simulation()
@@ -295,11 +300,46 @@ func minimum_corner_y() -> float:
 					result = minf(result, (body.global_transform * (half * Vector3(x,y,z))).y)
 	return result
 
-func _project_floor_contact() -> void:
+func _correct_physical_pose() -> void:
 	var frame := Engine.get_physics_frames()
-	if not running or _floor_projection_frame == frame or not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+	if not running or _pose_correction_frame == frame:
 		return
-	_floor_projection_frame = frame
+	_pose_correction_frame = frame
+	if is_instance_valid(_flat_floor) and not _flat_floor.disabled:
+		_project_floor_contact()
+	if not source_joint_rids.is_empty():
+		_project_source_anchors()
+
+func _project_source_anchors() -> void:
+	for name: String in source_joint_rids:
+		var spec: Dictionary = source_joints[name]
+		var child: PhysicalBone3D = bodies[name]
+		var parent: PhysicalBone3D = bodies[spec.parent]
+		var state := PhysicsServer3D.body_get_direct_state(child.get_rid())
+		var parent_state := PhysicsServer3D.body_get_direct_state(parent.get_rid())
+		if state == null or parent_state == null or state.get_contact_count() > 0:
+			continue
+		var correction: Vector3 = (parent_state.transform * spec.parent_frame).origin \
+			- (state.transform * spec.child_frame).origin
+		var distance := correction.length()
+		if distance <= SOURCE_ANCHOR_TOLERANCE:
+			continue
+		# Move the free child only as far as the terrain permits, leaving the
+		# authored tolerance and preserving rotation and velocities.
+		if _projection_query == null:
+			_projection_query = PhysicsTestMotionParameters3D.new()
+			_projection_query.margin = PROJECTION_COLLISION_MARGIN
+			_projection_query.recovery_as_collision = true
+			_projection_hit = PhysicsTestMotionResult3D.new()
+		var motion := correction * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
+		_projection_query.from = state.transform
+		_projection_query.motion = motion
+		if PhysicsServer3D.body_test_motion(child.get_rid(), _projection_query, _projection_hit):
+			motion *= _projection_hit.get_collision_safe_fraction()
+		if not motion.is_zero_approx():
+			state.transform = state.transform.translated(motion)
+
+func _project_floor_contact() -> void:
 	var floor_box := _flat_floor.shape as BoxShape3D
 	var floor_pose := _flat_floor.global_transform
 	if floor_box == null or not floor_pose.basis.y.is_equal_approx(Vector3.UP) \

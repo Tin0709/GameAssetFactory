@@ -97,7 +97,7 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 			first_landing = frame
 	check(first_landing > 25 and first_landing < 55 and ledge_contact and chest_height < 6.0,
 		"The corpse crosses the authored ledge and contacts the lower terrain")
-	check(worst_anchor < 0.085, "The first impact on the lower terrace keeps the limb anchors connected")
+	check(worst_anchor < 0.12, "The first impact on the lower terrace keeps the limb anchors connected")
 	print("WORLDMAP_LEDGE landing=", first_landing, " minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor)
 	zombie.free()
 

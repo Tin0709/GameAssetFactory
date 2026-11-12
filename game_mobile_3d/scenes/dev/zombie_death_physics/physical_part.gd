@@ -4,10 +4,10 @@ extends PhysicalBone3D
 @export var maximum_angular_speed := 8.0
 var peak_linear_speed := 0.0
 var peak_angular_speed := 0.0
-var floor_projection: Callable
+var pose_correction: Callable
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
-	if floor_projection.is_valid():
-		floor_projection.call()
+	if pose_correction.is_valid():
+		pose_correction.call()
 	peak_linear_speed = maxf(peak_linear_speed, state.linear_velocity.length())
 	peak_angular_speed = maxf(peak_angular_speed, state.angular_velocity.length())
 	state.linear_velocity = state.linear_velocity.limit_length(maximum_linear_speed)
