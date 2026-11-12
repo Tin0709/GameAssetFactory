@@ -405,7 +405,7 @@ func _show_player_hit(lost: int) -> void:
 	var lateral := camera.global_basis.x * (1.0 if _player_hit_serial % 2 == 0 else -1.0)
 	_player_hit_serial += 1
 	DamageFeedback.spawn_number(lost, $Zombies.damage_digits(), _player_damage_numbers,
-		player.global_position + Vector3.UP * 2.08, lateral, PLAYER_DAMAGE_TINT)
+		player.global_position + Vector3.UP * 2.32, lateral, PLAYER_DAMAGE_TINT)
 
 func _clear_player_flash() -> void:
 	for mesh: MeshInstance3D in _player_overlays:
