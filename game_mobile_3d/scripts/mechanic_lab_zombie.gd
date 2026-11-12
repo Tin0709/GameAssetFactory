@@ -1,6 +1,8 @@
 extends CharacterBody3D
 
 signal melee_hit(amount: int)
+
+enum DeathStrike { GROUND, AIR, SABRE_FINISHER }
 signal melee_audio(point: Vector3, contact: bool)
 
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
@@ -39,6 +41,10 @@ const DEATH_FINISHER_ROLL_SPEED := 1.0
 # attacks retain their flight profile to keep the stronger launches stable.
 const DEATH_FLIGHT_GRAVITY := 32.0
 const DEATH_AIR_ATTACK_FLIGHT_GRAVITY := 21.0
+const SABRE_FINISHER_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
+const SABRE_FINISHER_GRAVITY_HOLD := 0.30
+const SABRE_FINISHER_HEAD_FRICTION := 0.70
+const SABRE_FINISHER_HEAD_BOUNCE := 0.30
 const DEATH_LANDING_BLEND_TIME := 0.20
 const DEATH_LANDING_LINEAR_DAMP := 3.0
 const DEATH_LANDING_ANGULAR_DAMP := 4.0
@@ -101,7 +107,7 @@ var _knockback := Vector3.ZERO
 var _knockback_control_left := 0.0
 var _death_direction := Vector3.ZERO
 var _death_strength := 500.0
-var _death_from_air_attack := false
+var _death_strike := DeathStrike.GROUND
 var _death_rng := RandomNumberGenerator.new()
 var _poise := MAX_POISE
 var _poise_recovery_wait := 0.0
@@ -307,7 +313,7 @@ func _play_loop(clip: StringName) -> void:
 		animation.play(clip, 0.13)
 
 func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE,
-		stagger: float = MAX_POISE, knockback_strength: float = 500.0, air_attack := false) -> void:
+		stagger: float = MAX_POISE, knockback_strength: float = 500.0, death_strike := DeathStrike.GROUND) -> void:
 	if health <= 0 or amount <= 0:
 		return
 	health = maxi(0, health - amount)
@@ -321,7 +327,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 	if health <= 0:
 		_death_direction = direction
 		_death_strength = knockback_strength
-		_death_from_air_attack = air_attack
+		_death_strike = death_strike
 		animation.pause()
 		set_deferred("collision_layer", 0)
 		set_deferred("collision_mask", 0)
@@ -350,7 +356,10 @@ func _update_death(delta: float) -> void:
 		_update_corpse_material(remaining)
 	if _corpse_parked:
 		return
-	var flight_gravity := DEATH_AIR_ATTACK_FLIGHT_GRAVITY if _death_from_air_attack else DEATH_FLIGHT_GRAVITY
+	var sabre_finisher := _death_strike == DeathStrike.SABRE_FINISHER
+	var flight_gravity := DEATH_AIR_ATTACK_FLIGHT_GRAVITY if _death_strike == DeathStrike.AIR else DEATH_FLIGHT_GRAVITY
+	if sabre_finisher:
+		flight_gravity = SABRE_FINISHER_GRAVITY
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
 			ragdoll.sample(delta)
@@ -360,6 +369,11 @@ func _update_death(delta: float) -> void:
 			body.collision_layer = 2
 			body.collision_mask = 1
 			mass += body.mass
+		if sabre_finisher:
+			# Start with MD2's default material values on the leading contact.
+			var head: PhysicalBone3D = ragdoll.bodies.Head
+			head.friction = SABRE_FINISHER_HEAD_FRICTION
+			head.bounce = SABRE_FINISHER_HEAD_BOUNCE
 		var launch := _death_profile.duplicate() as DeathProfile
 		var angle := deg_to_rad(DEATH_LAUNCH_ANGLE)
 		var launch_impulse := _death_launch_speed(_death_strength) * mass
@@ -376,15 +390,18 @@ func _update_death(delta: float) -> void:
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			# Leave room for the floor impulse to roll the body over a limb.
 			body.set("maximum_angular_speed", DEATH_LANDING_ANGULAR_SPEED_LIMIT)
-	if _landing_age < DEATH_LANDING_BLEND_TIME:
-		_landing_age = minf(_landing_age + delta, DEATH_LANDING_BLEND_TIME)
+	var gravity_hold := SABRE_FINISHER_GRAVITY_HOLD if sabre_finisher else 0.0
+	var gravity_blend_end := gravity_hold + DEATH_LANDING_BLEND_TIME
+	if _landing_age < gravity_blend_end:
+		_landing_age = minf(_landing_age + delta, gravity_blend_end)
 		# Let contact and friction lead the first impact, then settle the roll.
 		var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
+		var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
 		var flight_gravity_scale := flight_gravity / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 		var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 		var angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 		for body: PhysicalBone3D in ragdoll.bodies.values():
-			body.gravity_scale = lerpf(flight_gravity_scale, 1.0, blend)
+			body.gravity_scale = lerpf(flight_gravity_scale, 1.0, gravity_blend)
 			body.linear_damp = linear_damp
 			body.angular_damp = angular_damp
 	if _corpse_landed and _corpse_age >= CORPSE_DESATURATION_START:
@@ -423,10 +440,10 @@ static func _death_launch_speed(strength: float) -> float:
 	return DEATH_SOURCE_SPEED * DEATH_SPEED_TO_LAB * (1.0 + extra * DEATH_TIER_INFLUENCE)
 
 func _death_spin(direction: Vector3) -> Vector3:
-	var angular_scale := DEATH_AIR_ATTACK_ANGULAR_TO_LAB if _death_from_air_attack else DEATH_ANGULAR_TO_LAB
+	var angular_scale := DEATH_AIR_ATTACK_ANGULAR_TO_LAB if _death_strike == DeathStrike.AIR else DEATH_ANGULAR_TO_LAB
 	var speed := DEATH_SOURCE_ANGULAR_SCALE * angular_scale
 	var spin := Vector3.UP.cross(direction) * speed
-	if not _death_from_air_attack and _death_strength >= DEATH_STRENGTH_THRESHOLDS[1]:
+	if _death_strike != DeathStrike.AIR and _death_strength >= DEATH_STRENGTH_THRESHOLDS[1]:
 		# An off-axis launch lets the grounded finisher roll onto its side.
 		spin -= direction * DEATH_FINISHER_ROLL_SPEED
 	if _death_rng.randf() < DEATH_TWIRL_CHANCE:

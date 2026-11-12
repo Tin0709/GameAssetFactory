@@ -190,7 +190,8 @@ func check_combo_finisher(lab, group, sword: bool) -> void:
 			var feet: Vector3 = (bodies["Leg.L"].global_position + bodies["Leg.R"].global_position) * 0.5
 			var head_to_legs: Vector3 = bodies.Head.global_position - feet
 			vertical_axis = absf(head_to_legs.normalized().y)
-	check(landing_time > 0.25 and landing_time < 0.57, weapon + "'s finisher makes prompt core contact")
+	var earliest_contact := 0.38 if sword else 0.25
+	check(landing_time > earliest_contact and landing_time < 0.57, weapon + "'s finisher makes prompt core contact")
 	check(lowest_corner > -0.17, weapon + "'s finisher avoids deep floor overlap")
 	if not sword:
 		check(vertical_axis < 0.34, "Sabre's finisher rolls out of its inverted pose within 300 ms")
