@@ -14,16 +14,21 @@ const AUDIO_ALIASES := {
 }
 
 static func load_mesh(actor: CharacterBody3D, research_root: String) -> Mesh:
-	var path := ReferenceAudio.resolve_private_file(research_root, ASSET_DIR + "SM_Sword.glb")
-	var texture := ReferenceAudio.resolve_private_file(research_root, ASSET_DIR + "T_Sword.png")
+	return load_verified_mesh(actor, research_root, ASSET_DIR, "Sword", MESH_HASH, TEXTURE_HASH)
+
+static func load_verified_mesh(actor: CharacterBody3D, research_root: String, directory: String,
+		weapon_name: String, mesh_hash: String, texture_hash: String) -> Mesh:
+	var mesh_name := "SM_" + weapon_name
+	var path := ReferenceAudio.resolve_private_file(research_root, directory + mesh_name + ".glb")
+	var texture := ReferenceAudio.resolve_private_file(research_root, directory + "T_" + weapon_name + ".png")
 	if path.is_empty() or texture.is_empty() or not FileAccess.file_exists(path) or not FileAccess.file_exists(texture):
 		return null
-	if FileAccess.get_sha256(path) != MESH_HASH or FileAccess.get_sha256(texture) != TEXTURE_HASH:
+	if FileAccess.get_sha256(path) != mesh_hash or FileAccess.get_sha256(texture) != texture_hash:
 		return null
 	var model: Node3D = actor.load_private_model(path)
 	if model == null:
 		return null
-	var node := model.find_child("SM_Sword", true, false) as MeshInstance3D
+	var node := model.find_child(mesh_name, true, false) as MeshInstance3D
 	var mesh := node.mesh if node != null else null
 	model.free()
 	if mesh == null or mesh.get_surface_count() != 1:

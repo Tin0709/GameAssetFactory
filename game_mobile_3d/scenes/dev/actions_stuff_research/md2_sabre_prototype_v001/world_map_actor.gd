@@ -8,6 +8,7 @@ var _idle_wait:=0.
 var _inspect_age:=0.
 var _inspecting:=false
 var is_dead:=false
+var aerial_melee_enabled := true
 var smooth_step_active:=false
 var jump_active:bool:
 	get:return _jump_stage in ["JumpTakeoff","JumpAirborne"]
@@ -114,6 +115,11 @@ func setup_world_vegetation(world:Node3D)->Node3D:
 
 func cancel_jump()->void:
 	_reset_map_actor_at(global_position)
+
+func attack(value: bool) -> void:
+	if value and not aerial_melee_enabled and not _grounded:
+		return
+	super.attack(value)
 
 func enter_lab_defeat() -> void:
 	is_dead = true

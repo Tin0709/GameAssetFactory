@@ -342,7 +342,7 @@ func _outgoing_locomotion_sampler(key:String,phase:float)->Callable:
 		cursor.phase=fposmod(float(cursor.phase)+delta/float(clips.Idle.duration),1.)
 		return source_gait.sample("Idle",float(cursor.phase))
 
-func _load_private_combat_clips(config:Variant)->void:
+func _load_private_combat_clips(config:Variant, library_name:StringName=&"private_combat")->void:
 	# Stage ALL resources and validate their relationship before changing any
 	# approved action. An optional malformed/stale sidecar must fail closed.
 	if not config is Dictionary or config.get("schema")!="md2-private-sabre-combat/1" or not config.get("additional_clips") is Array or config.additional_clips.size()>8:return
@@ -391,7 +391,7 @@ func _load_private_combat_clips(config:Variant)->void:
 					if old_path.get_subname_count()!=1 or skeleton.find_bone(old_path.get_subname(0))<0:valid=false;break
 					copied.track_set_path(track,NodePath(str(target)+":"+str(old_path.get_subname(0))))
 				if valid:
-					var entry:Dictionary=value.duplicate(true);entry.action="private_combat/"+value.semantic;entry.source_file=path;entry.source_alias_adapter=false
+					var entry:Dictionary=value.duplicate(true);entry.action=String(library_name)+"/"+value.semantic;entry.source_file=path;entry.source_alias_adapter=false
 					candidate[value.semantic]=entry;staged[value.semantic]=copied
 		imported.free()
 		if not valid:return
@@ -399,10 +399,10 @@ func _load_private_combat_clips(config:Variant)->void:
 	if not validator.configure_native(config):return
 	var library:=AnimationLibrary.new()
 	for key:String in staged:library.add_animation(key,staged[key])
-	if animation_player.has_animation_library("private_combat"):return
-	animation_player.add_animation_library("private_combat",library)
+	if animation_player.has_animation_library(library_name):return
+	animation_player.add_animation_library(library_name,library)
 	for key:String in staged:clips[key]=candidate[key]
-	supplemental_combat_clips=staged.size()
+	if library_name==&"private_combat":supplemental_combat_clips=staged.size()
 
 func _physics_process(delta:float)->void:
 	_apply_jump_settings()
