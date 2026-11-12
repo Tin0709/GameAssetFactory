@@ -27,9 +27,9 @@ float outline_top_edge(ivec2 neighbour, float height, float coverage) {
 
 float terrain_outline(vec3 world, vec3 normal) {
 	if (terrain_outline_strength <= 0.0 || path_map_size.x <= 0.0 || normal.y < -0.9) return 1.0;
-	vec3 pixel = length(vec2(dFdx(world.x), dFdy(world.x))) * vec3(1.0, 0.0, 0.0)
-		+ length(vec2(dFdx(world.y), dFdy(world.y))) * vec3(0.0, 1.0, 0.0)
-		+ length(vec2(dFdx(world.z), dFdy(world.z))) * vec3(0.0, 0.0, 1.0);
+	vec3 dx = dFdx(world);
+	vec3 dy = dFdy(world);
+	vec3 pixel = sqrt(dx * dx + dy * dy);
 	vec2 grid = world.xz - path_map_origin;
 	float edge = 0.0;
 	if (normal.y > 0.9) {

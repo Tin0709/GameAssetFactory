@@ -50,8 +50,6 @@ var _source_terrain_tiles: Texture2DArray
 var _source_terrain_toggle: CheckButton
 var forest:=FOREST.new()
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
-const WorldOutline = preload("res://scripts/world_map_outline.gd")
-var world_outline: WorldOutline
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_path_light := preload("res://scripts/world_map_forest_path_light.gd").new()
 var atmosphere_review:="combined"
@@ -252,12 +250,6 @@ func make_player()->Node3D:
 
 func setup(world:Node3D)->void:
 	level=world;process_priority=-10
-	var compositor: Compositor = level.get_node("WorldEnvironment").compositor
-	if compositor != null:
-		for effect in compositor.compositor_effects:
-			if effect is WorldOutline:
-				world_outline = effect
-				break
 	if not private_primary:
 		_build_basic_settings()
 		return
@@ -544,10 +536,6 @@ func _update_hdr_air()->void:
 		viewport.use_hdr_2d=_hdr_saved;_hdr_owned=false
 
 func _exit_tree()->void:
-	if world_outline != null:
-		world_outline.enabled = false
-		if RenderingServer.get_rendering_device() != null:
-			RenderingServer.call_on_render_thread(world_outline.release_on_render_thread)
 	if RenderingServer.frame_pre_draw.is_connected(_sync_point_camera):
 		RenderingServer.frame_pre_draw.disconnect(_sync_point_camera)
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
@@ -1280,8 +1268,6 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
-		if effect in [&"world_outline_strength", &"world_outline_width"]:
-			slider.editable = slider.editable and world_outline != null and WorldOutline.supported(level.get_viewport())
 		if effect == &"foot_contact":
 			slider.editable = slider.editable and player_contact.available()
 		if effect == &"projected_sun":
@@ -1521,13 +1507,12 @@ func _sync_forest_night_lights() -> void:
 		_publish_point_cutoff()
 
 func sync_world_outline() -> void:
-	if world_outline == null:
+	if level == null or level.look == null:
 		return
 	var strength := _lighting_scale(&"world_outline_strength")
-	if level.look.stage != 2 or _balanced_preview or not WorldOutline.supported(level.get_viewport()):
+	if level.look.stage != 2 or _balanced_preview:
 		strength = 0.
-	world_outline.configure(strength, roundi(_lighting_scale(&"world_outline_width")),
-		level.look.path_map, level.look.path_map_origin)
+	level.look.set_terrain_outline(strength, _lighting_scale(&"world_outline_width"))
 
 func apply_time()->void:
 	if not private_primary or level==null or level.look==null:

@@ -51,6 +51,7 @@ var terrain_materials: Array[Array]=[]
 var _night_path_chroma := 0.0
 var _stone_twilight_color := 0.0
 var _stone_detail_softness := 0.0
+var _terrain_outline := Vector2(0.0, 1.0)
 var plant_meshes: Array[Array]=[]
 var materials: Dictionary={}
 var baseline_environment: Environment
@@ -501,6 +502,13 @@ func _set_terrain_color(parameter: StringName, strength: float) -> void:
 	for item: Array in terrain_materials:
 		item[3].set_shader_parameter(parameter, strength)
 	level.geometry.update_terrain_color(parameter, strength)
+
+func set_terrain_outline(strength: float, width: float) -> void:
+	if _terrain_outline.x != strength:
+		_set_terrain_color(&"terrain_outline_strength", strength)
+	if _terrain_outline.y != width:
+		_set_terrain_color(&"terrain_outline_width", width)
+	_terrain_outline = Vector2(strength, width)
 
 func set_stone_detail_softness(strength: float) -> void:
 	if strength == _stone_detail_softness:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
 [ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
@@ -12,15 +12,6 @@
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_soft_cliff_mix.tres" id="soft_cliff_mix"]
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_forest_day_air_mix.tres" id="forest_air_mix"]
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_humid_forest_mix.tres" id="humid_forest_mix"]
-[ext_resource type="Script" path="res://scripts/world_map_outline.gd" id="outline"]
-
-[sub_resource type="CompositorEffect" id="OutlineEffect"]
-resource_local_to_scene = true
-script = ExtResource("outline")
-
-[sub_resource type="Compositor" id="WorldMapCompositor"]
-resource_local_to_scene = true
-compositor_effects = Array[CompositorEffect]([SubResource("OutlineEffect")])
 
 [node name="WorldMap" instance=ExtResource("base")]
 script = ExtResource("map")
@@ -41,9 +32,6 @@ disabled = true
 
 [node name="Camera3D" parent="."]
 far = 180.0
-
-[node name="WorldEnvironment" parent="."]
-compositor = SubResource("WorldMapCompositor")
 
 [node name="Help" parent="HUD"]
 text = "WORLD MAP"
