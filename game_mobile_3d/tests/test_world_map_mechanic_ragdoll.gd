@@ -206,7 +206,7 @@ func cliff_edge_case(world: Node3D, group: Node3D, effects: Node3D, seed: int, x
 	await ticks(2)
 
 func terrain_supported_rest(world: Node3D, group: Node3D, effects: Node3D, seed: int, start: Vector3,
-		direction: Vector3, yaw: float, strike: Zombie.DeathStrike, minimum_supports: int) -> void:
+		direction: Vector3, yaw: float, strike: Zombie.DeathStrike, expected_supports: int) -> void:
 	group._spawn_serial = seed
 	var zombie = await launch(world, group, effects, start, direction, strike, yaw)
 	if zombie == null:
@@ -228,7 +228,7 @@ func terrain_supported_rest(world: Node3D, group: Node3D, effects: Node3D, seed:
 			break
 		if zombie.ragdoll.running:
 			supports = zombie.ragdoll.contact_motion().supports
-	check(release_frame >= 170 and supports >= minimum_supports and zombie.ragdoll.bodies.is_empty(),
+	check(release_frame >= 170 and supports == expected_supports and zombie.ragdoll.bodies.is_empty(),
 		"Terrain seed %d releases after the ragdoll settles on its terrain contacts" % seed)
 	if zombie._corpse_parked:
 		var pose_matches := last_simulated.size() == skeleton.get_bone_count()
@@ -395,9 +395,9 @@ func run() -> void:
 		await terrain_supported_rest(world, group, effects, 63, Vector3(-33.5, 9.0, -39.46),
 			Vector3.RIGHT.rotated(Vector3.UP, -0.13), -0.13, Zombie.DeathStrike.GROUND, 2)
 		await terrain_supported_rest(world, group, effects, 21, Vector3(-37.5, 3.0, -33.5),
-			Vector3.FORWARD.rotated(Vector3.UP, 0.055), 0.0, Zombie.DeathStrike.GROUND, 3)
+			Vector3.FORWARD.rotated(Vector3.UP, 0.055), 0.0, Zombie.DeathStrike.GROUND, 4)
 		await terrain_supported_rest(world, group, effects, 48, Vector3(-37.46, 3.0, -33.5),
-			Vector3.FORWARD.rotated(Vector3.UP, 0.085), -0.195, Zombie.DeathStrike.GROUND, 3)
+			Vector3.FORWARD.rotated(Vector3.UP, 0.085), -0.195, Zombie.DeathStrike.GROUND, 4)
 		await cliff_delayed_roll_case(world, group, effects)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)

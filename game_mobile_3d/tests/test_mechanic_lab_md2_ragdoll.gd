@@ -208,6 +208,8 @@ func check_combo_finisher(lab, group, slot: int) -> void:
 	var flight_gravity := 0.0
 	for i in 70:
 		await physics_frame
+		if zombie._corpse_parked:
+			break
 		if zombie.ragdoll.running:
 			lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
 			if not zombie._corpse_landed:
@@ -218,6 +220,9 @@ func check_combo_finisher(lab, group, slot: int) -> void:
 		if not zombie._corpse_landed:
 			continue
 		landing_time = minf(landing_time, zombie._corpse_age)
+		if slot == 1:
+			# Test the rebound while bodies are still simulated.
+			break
 		if slot != 0:
 			continue
 		var since_contact: float = zombie._corpse_age - landing_time
