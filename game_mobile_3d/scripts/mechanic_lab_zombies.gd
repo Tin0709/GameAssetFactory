@@ -113,7 +113,9 @@ func aim_sabre(index: int, serial: int, movement: Vector3) -> Vector3:
 		_aim_target = _find_melee_target(float(SABRE_STRIKES[index].range_m), movement)
 	if not is_instance_valid(_aim_target) or _aim_target.health <= 0 or _aim_target.is_queued_for_deletion():
 		return Vector3.ZERO
-	return _aim_target.global_position - _attacker.global_position
+	var direction := _aim_target.global_position - _attacker.global_position
+	direction.y = 0.0
+	return direction
 
 func _find_melee_target(reach: float, movement: Vector3) -> Zombie:
 	var origin := _attacker.global_position
