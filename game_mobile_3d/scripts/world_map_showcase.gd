@@ -609,8 +609,7 @@ func _update_mist()->void:
 	if atmosphere_review == "combined" and not measured.is_empty():
 		# Scale only the existing cool source. Optical depth and the warm emitter
 		# stay independent, so the distant haze can lift without hiding the actor.
-		var night_weight := moonlight_weight(hour)
-		var night_mix := night_weight * _lighting_scale(&"night_mist_light")
+		var night_mix := moonlight_weight(hour) * _lighting_scale(&"night_mist_light")
 		sample.scatter_energy *= lerpf(1.0, NIGHT_MIST_MAX_GAIN, night_mix)
 		sample.depth_scatter = night_weight * _lighting_scale(&"night_depth_scatter")
 	sample.player_light_weight *= _lighting_scale(&"lantern") * _lighting_scale(&"lantern_air")
