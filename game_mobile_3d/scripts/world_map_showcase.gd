@@ -1526,7 +1526,8 @@ func sync_world_outline() -> void:
 	var strength := _lighting_scale(&"world_outline_strength")
 	if level.look.stage != 2 or _balanced_preview or not WorldOutline.supported(level.get_viewport()):
 		strength = 0.
-	world_outline.configure(strength, roundi(_lighting_scale(&"world_outline_width")))
+	world_outline.configure(strength, roundi(_lighting_scale(&"world_outline_width")),
+		level.look.path_map, level.look.path_map_origin)
 
 func apply_time()->void:
 	if not private_primary or level==null or level.look==null:
