@@ -4,6 +4,7 @@ extends Node3D
 const MAX_SAMPLES:=28
 const PARTICLE_CAPACITY:=48
 const MAX_PARTICLE_HISTORY:=16
+const RIBBON_U := [0.0, 1.0, 1.0, 0.0, 1.0, 0.0]
 var samples:Array[Dictionary]=[]
 var particles:Array[Dictionary]=[]
 var clock:=0.
@@ -93,11 +94,15 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 		for i in range(1,shown.size()):
 			var a:Dictionary=shown[i-1];var b:Dictionary=shown[i]
 			var opacity:=clampf(1.-(time-float(a.time))/.14,0.,1.)*intensity*.58
-			for point:Vector3 in [a.base,a.tip,b.tip,a.base,b.tip,b.base]:
-				_mesh.surface_set_color(Color(1.,.73,.23,opacity));_mesh.surface_add_vertex(point)
+			var ribbon_points := [a.base, a.tip, b.tip, a.base, b.tip, b.base]
+			for corner in ribbon_points.size():
+				_mesh.surface_set_uv(Vector2(RIBBON_U[corner], 0.0))
+				_mesh.surface_set_color(Color(1.,.73,.23,opacity));_mesh.surface_add_vertex(ribbon_points[corner])
 			var a_inner:Vector3=Vector3(a.base).lerp(a.tip,.86);var b_inner:Vector3=Vector3(b.base).lerp(b.tip,.86)
-			for point:Vector3 in [a_inner,a.tip,b.tip,a_inner,b.tip,b_inner]:
-				_mesh.surface_set_color(Color(1.,.97,.82,opacity*.8));_mesh.surface_add_vertex(point)
+			var edge_points := [a_inner, a.tip, b.tip, a_inner, b.tip, b_inner]
+			for corner in edge_points.size():
+				_mesh.surface_set_uv(Vector2(lerpf(0.86, 1.0, RIBBON_U[corner]), 0.0))
+				_mesh.surface_set_color(Color(1.,.97,.82,opacity*.8));_mesh.surface_add_vertex(edge_points[corner])
 		_mesh.surface_end()
 	for i in particles.size():
 		var particle:Dictionary=particles[i]
