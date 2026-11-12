@@ -40,12 +40,19 @@ class LocalUITests(unittest.TestCase):
         lab = {'action': 'mechanic-lab'}
         self.assertEqual(self.request('POST', '/action', headers, lab)[0], 202)
         self.assertEqual(self.ui.actions.get_nowait(), lab)
+        for action in ('copy-godot', 'copy-mechanic-lab'):
+            payload = {'action': action}
+            self.assertEqual(self.request('POST', '/action', headers, dict(payload, path='ignored'))[0], 400)
+            self.assertEqual(self.request('POST', '/action', headers, payload)[0], 202)
+            self.assertEqual(self.ui.actions.get_nowait(), payload)
 
     def test_assets_do_not_include_the_session_token(self):
         status, body = self.request('GET', '/')
         self.assertEqual(status, 200)
         self.assertIn(b'<title>DevDock</title>', body)
         self.assertIn(b'data-action="mechanic-lab"', body)
+        self.assertIn(b'data-action="copy-mechanic-lab"', body)
+        self.assertIn(b'data-action="copy-godot"', body)
         self.assertNotIn(self.ui.token.encode(), body)
         status, icon = self.request('GET', '/devdock.ico')
         self.assertEqual(status, 200)

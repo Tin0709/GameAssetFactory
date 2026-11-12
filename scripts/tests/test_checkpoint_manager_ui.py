@@ -413,6 +413,26 @@ class DesktopTests(unittest.TestCase):
         self.assertIn('Actions & Stuff (PID 4444)', log)
         self.assertIn('Cỏ MD2 (PID 5555)', log)
 
+    def test_copy_godot_buttons_use_configured_scenes_without_launching(self):
+        project = Path(__file__).resolve().parents[2] / 'game_mobile_3d'
+        expected = {
+            'godot': project / 'scenes/WorldMap.tscn',
+            'mechanic-lab': project / 'scenes/dev/MechanicLab.tscn',
+        }
+        with patch.object(self.root, 'clipboard_clear'), patch.object(
+            self.root, 'clipboard_append'
+        ) as clipboard, patch('checkpoint_manager.desktop.Popen') as launch:
+            for key, path in expected.items():
+                self.app.godot_copy_buttons[key].invoke()
+                clipboard.assert_called_with(str(path))
+            launch.assert_not_called()
+        with patch.object(self.root, 'clipboard_append') as clipboard, patch.object(
+            self.app.notifications, 'show'
+        ) as notice:
+            self.app.copy_godot_scene_path('mechanic-lab', browser=True)
+            clipboard.assert_not_called()
+            notice.assert_called_once_with('Đường dẫn Godot', str(expected['mechanic-lab']), kind='copy')
+
     def test_copy_path_buttons_copy_each_blend_path_without_opening_blender(self):
         clipboard = {'text': ''}
         expected = {
