@@ -311,6 +311,9 @@ func _build(rd: RenderingDevice, color: RID, format: RDTextureFormat) -> bool:
 	_guard.unlock()
 	return true
 
+func _finish_needs_soft_light() -> bool:
+	return false
+
 func _render_callback(kind: int, data: RenderData) -> void:
 	if kind != effect_callback_type or not _state.error.is_empty(): return
 	var buffers := data.get_render_scene_buffers() as RenderSceneBuffersRD
@@ -337,13 +340,18 @@ func _render_callback(kind: int, data: RenderData) -> void:
 	_guard.lock()
 	var parameters := _parameters.duplicate()
 	_guard.unlock()
+	var finish_needs_soft_light := _finish_needs_soft_light()
+	# The finish and bloom share the same filtered light, with separate weights.
+	if finish_needs_soft_light:
+		parameters.encode_float(20, 1.0)
 	if _source_format==HDR_FORMAT:
 		# RGB10 scene color stores half radiance; RGBA16F stores full radiance.
 		# Preserve the existing physical middle gray and toe, not a new art gain.
 		parameters.encode_float(4,parameters.decode_float(4)*2.)
 		parameters.encode_float(24,1.)
+	var needs_soft_light := parameters.decode_float(16) > 0.0 or finish_needs_soft_light
 	for index in _passes.size():
-		if index>=2 and index<_air_pass_end and parameters.decode_float(16)<=0.:continue
+		if index >= 2 and index < _air_pass_end and not needs_soft_light: continue
 		var pass_data := _passes[index]
 		var list := rd.draw_list_begin(pass_data[0])
 		rd.draw_list_bind_render_pipeline(list, pass_data[1])

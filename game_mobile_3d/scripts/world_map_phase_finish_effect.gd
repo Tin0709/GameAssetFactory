@@ -25,6 +25,7 @@ var _twilight_shadow_weight := 0.
 var _depth_diffusion := DepthDiffusion.new()
 var _humid_depth := PackedByteArray()
 var _humid_mist: CompositorEffect
+var _render_humid_spread := false
 
 func set_humid_light(weight: float, actor: Vector4 = Vector4.ZERO, depth := PackedByteArray(), mist: CompositorEffect = null, daylight_weight := 0., daylight_spill := 0.) -> void:
  var amount := clampf(weight, 0., 1.) if is_finite(weight) and actor.is_finite() else 0.
@@ -67,6 +68,9 @@ func set_finish_weight(value:float)->void:
  _guard.lock()
  if not _baseline.is_empty():_baseline.encode_float(24,clampf(value,0.,1.)if is_finite(value)else 0.)
  _guard.unlock()
+func _finish_needs_soft_light() -> bool:
+ return _render_humid_spread
+
 func _render_callback(kind:int,data:RenderData)->void:
  if kind!=effect_callback_type:return
  var rd:=RenderingServer.get_rendering_device()
@@ -79,7 +83,7 @@ func _render_callback(kind:int,data:RenderData)->void:
  var baseline := _baseline.duplicate()
  var generation := _palette_generation
  var edge := _edge_requested and wanted and _reference_enabled and _reference_requested and not _reference_blocked
- var diffusion_active := wanted and _parameters.decode_float(16) > 0.
+ var diffusion_active := wanted and _reference_requested and not _reference_blocked
  var humid_weight := _humid_weight if diffusion_active else 0.
  var daylight_haze := _daylight_haze_weight if diffusion_active else 0.
  var daylight_spill := _daylight_haze_spill if daylight_haze > 0. else 0.
@@ -101,6 +105,8 @@ func _render_callback(kind:int,data:RenderData)->void:
  var depth_changed := _depth_diffusion.refresh_sources(rd, buffers, depth_mist)
  if depth_changed or wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
+ _render_humid_spread = humid_weight > 0.0 or (daylight_haze > 0.0 and _depth_diffusion.depth.is_valid()
+  and _depth_diffusion.volume.is_valid() and depth_data.size() == DepthDiffusion.SETTINGS_SIZE)
  _depth_diffusion.write(rd, depth_data)
  if _baseline_buffer.is_valid()and baseline!=_last_baseline:
   if rd.buffer_update(_baseline_buffer, 0, baseline.size(), baseline) == OK:
@@ -186,6 +192,7 @@ vec3 recover_twilight_shadow_color(vec3 graded, vec3 original) {
  weight += day_mix;""")
   diffusion_condition += " || base[3].y > 0."
  fragment=fragment.replace("void main() {",helpers+"void main() {")
+ fragment=fragment.replace("if (air.x > 0.0) {", "if (air.x > 0.0 || air.y > 0.0) {")
  fragment=fragment.replace("adjusted += spread * air.x;","if (" + diffusion_condition + ") adjusted = diffuse_humid_light(adjusted, spread, uv_air);\n\t\tadjusted += spread * air.x;")
  fragment=fragment.replace("if (settings.x <= 0.0)","if (settings.x < 0.0)")
  fragment=fragment.replace("result=vec4(inverse_display(clamp(display,0.,1.)),color.a);","vec3 original_finish = gaf_finish(adjusted);\n\t\tvec3 mixed_finish = mix(original_finish,inverse_display(clamp(display,0.,1.)),base[1].z);\n\t\tresult=vec4(recover_twilight_shadow_color(mixed_finish,original_finish),color.a);")
