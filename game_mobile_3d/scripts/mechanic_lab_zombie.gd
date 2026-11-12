@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 signal melee_hit(amount: int)
+signal melee_audio(point: Vector3, contact: bool)
 
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const Ragdoll := preload("res://scenes/dev/zombie_death_physics/ragdoll.gd")
@@ -253,6 +254,8 @@ func _advance_animation(delta: float) -> void:
 		_check_melee_contact()
 
 func _check_melee_contact() -> void:
+	if target.get("is_dead") == true:
+		return
 	var offset := target.global_position - global_position
 	if absf(offset.y) > MELEE_HEIGHT_LIMIT:
 		return
@@ -263,6 +266,7 @@ func _check_melee_contact() -> void:
 	var ray := PhysicsRayQueryParameters3D.create(global_position + height, target.global_position + height, LEVEL_COLLISION_MASK)
 	ray.hit_from_inside = true
 	if get_world_3d().direct_space_state.intersect_ray(ray).is_empty():
+		melee_audio.emit(global_position + height, true)
 		melee_hit.emit(MELEE_DAMAGE)
 
 func _chase_velocity(delta: float) -> Vector3:
@@ -283,6 +287,7 @@ func _chase_velocity(delta: float) -> Vector3:
 	if height_delta < 1.15 and _attack_cooldown <= 0.0:
 		animation.play(ATTACK, 0.1)
 		_attack_cooldown = MELEE_COOLDOWN
+		melee_audio.emit(global_position + Vector3.UP * (HEIGHT * 0.5), false)
 	else:
 		_play_loop(IDLE)
 	return Vector3.ZERO

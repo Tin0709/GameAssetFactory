@@ -114,6 +114,7 @@ func _ready() -> void:
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
+		$Zombies.zombie_attack_audio.connect(_combat_audio.zombie_attack)
 		_setup_weapon_selector()
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
