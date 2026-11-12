@@ -16,6 +16,19 @@ func ticks(count: int) -> void:
 	for i in count:
 		await physics_frame
 
+func terrain_contact_depth(zombie: Node3D) -> float:
+	var deepest := 0.0
+	for part: PhysicalBone3D in zombie.ragdoll.bodies.values():
+		var state := PhysicsServer3D.body_get_direct_state(part.get_rid())
+		for i in state.get_contact_count():
+			var collider := state.get_contact_collider_object(i) as Node
+			if collider == null or collider.name != "WorldCollision":
+				continue
+			# Godot reports the two points and the normal in world coordinates.
+			var separation := state.get_contact_collider_position(i) - state.get_contact_local_position(i)
+			deepest = maxf(deepest, separation.dot(state.get_contact_local_normal(i)))
+	return deepest
+
 func launch(world: Node3D, group: Node3D, effects: Node3D, start: Vector3, direction: Vector3,
 		strike := Zombie.DeathStrike.SABRE_FINISHER) -> Node3D:
 	if not group.spawn(world.player, Basis.IDENTITY, effects):
@@ -46,6 +59,7 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	var settled_gravity := 0.0
 	var parked_frame := -1
 	var smallest_rest_axis_y := 1.0
+	var worst_overlap := 0.0
 	for frame in 135:
 		await physics_frame
 		if zombie._corpse_parked:
@@ -53,6 +67,7 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 			break
 		if not zombie.ragdoll.running:
 			break
+		worst_overlap = maxf(worst_overlap, terrain_contact_depth(zombie))
 		var contact: Dictionary = zombie.ragdoll.contact_motion()
 		supported_without_torso = supported_without_torso or (contact.supports >= 2 and contact.core_supports == 0)
 		if zombie._corpse_landed and first_landing < 0:
@@ -80,8 +95,9 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	check(settled_gravity > -30.0, "A supported body leaves its flight-gravity state")
 	check(parked_frame > first_landing and parked_frame < 120 and smallest_rest_axis_y < 0.32,
 		"The corpse rolls away from the rock corner and comes to a supported rest within two seconds")
+	check(worst_overlap < 0.12, "The cliff contact stays within the terrain penetration budget")
 	print("WORLDMAP_CLIFF wall=", first_wall, " landing=", first_landing, " gravity=", settled_gravity,
-		" park=", parked_frame, " min_axis_y=", smallest_rest_axis_y)
+		" park=", parked_frame, " min_axis_y=", smallest_rest_axis_y, " peak_overlap_m=", worst_overlap)
 	zombie.free()
 	await ticks(2)
 
@@ -92,6 +108,7 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	var first_landing := -1
 	var chest_height := INF
 	var worst_anchor := 0.0
+	var worst_overlap := 0.0
 	var ledge_contact := false
 	var parked_frame := -1
 	for frame in (200 if strike == Zombie.DeathStrike.GROUND else 72):
@@ -102,6 +119,7 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 		if not zombie.ragdoll.running:
 			continue
 		worst_anchor = maxf(worst_anchor, zombie.ragdoll.max_anchor_error())
+		worst_overlap = maxf(worst_overlap, terrain_contact_depth(zombie))
 		var chest: PhysicalBone3D = zombie.ragdoll.bodies.Chest
 		chest_height = minf(chest_height, chest.global_position.y)
 		for name in ["Head", "Chest"]:
@@ -116,10 +134,12 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	check(first_landing > 25 and first_landing < 60 and ledge_contact and chest_height < 6.0,
 		"The corpse crosses the authored ledge and contacts the lower terrain")
 	check(worst_anchor < 0.12, "The first impact on the lower terrace keeps the limb anchors connected")
+	check(worst_overlap < 0.12, "The ledge contact stays within the terrain penetration budget")
 	if strike == Zombie.DeathStrike.GROUND:
 		check(parked_frame > first_landing, "A supported corpse parks across the two terraces after a forward melee finisher")
 	print("WORLDMAP_LEDGE strike=", strike, " landing=", first_landing,
-		" minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor, " park=", parked_frame)
+		" minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor, " park=", parked_frame,
+		" peak_overlap_m=", worst_overlap)
 	zombie.free()
 	await ticks(2)
 
