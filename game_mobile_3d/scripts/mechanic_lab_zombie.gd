@@ -17,7 +17,7 @@ const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
 const DEFAULT_DEATH_IMPULSE := Vector2(285.0, 190.0)
 const DEATH_TRAVEL_SCALE := 1.35
-const DEATH_LIFT_IMPULSE := 185.0
+const DEATH_LIFT_IMPULSE := 193.0
 const DEATH_LIFT_SCALE := 0.25
 const DEATH_PITCH_SPEED := 5.6
 const DEATH_GRAVITY := 15.0
@@ -70,6 +70,7 @@ var _poise_recovery_wait := 0.0
 var _attack_cooldown := 0.0
 var _flash_left := 0.0
 var _corpse_age := 0.0
+var _corpse_landed := false
 static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
 static var _corpse_material: ShaderMaterial
@@ -212,6 +213,13 @@ func _update_death(delta: float) -> void:
 		if ragdoll.begin(launch, direction, "Chest", 0.0, DEATH_GRAVITY):
 			_apply_death_tumble(Vector3.UP.cross(direction) * DEATH_PITCH_SPEED)
 		return
+	if not _corpse_landed and ragdoll.contact_motion().core_contacts > 0:
+		_corpse_landed = true
+		# Absorb the landing once the torso reaches the floor. Physics still
+		# owns the remaining slide and the pose of every joint.
+		for body: PhysicalBone3D in ragdoll.bodies.values():
+			body.linear_damp = 2.6
+			body.angular_damp = 3.2
 	var remaining := CORPSE_LIFETIME - _corpse_age
 	if remaining <= 0.00001:
 		queue_free()
