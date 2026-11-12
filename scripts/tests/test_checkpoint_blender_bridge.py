@@ -105,7 +105,22 @@ class BridgeTests(unittest.TestCase):
 
     def test_existing_mcp_is_reused_without_starting_a_process(self):
         with patch('subprocess.Popen', side_effect=AssertionError('must not spawn')):
-            self.assertIn('đã', self.bridge.start().lower())
+            self.assertIn('đã', self.bridge.start_setup().lower())
+
+    def test_setup_launches_blender_if_http_is_ready_but_addon_is_not_listening(self):
+        with patch.object(self.bridge, '_addon_probe', return_value=False), \
+             patch.object(self.bridge, '_listener_open', return_value=False), \
+             patch.object(self.bridge, '_open_blender') as launch:
+            self.bridge.start_setup()
+            launch.assert_called_once()
+
+    def test_setup_keeps_an_occupied_addon_port_without_opening_another_blender(self):
+        with patch.object(self.bridge, '_addon_probe', return_value=False), \
+             patch.object(self.bridge, '_listener_open', return_value=True), \
+             patch.object(self.bridge, '_open_blender') as launch:
+            with self.assertRaises(BridgeError):
+                self.bridge.start_setup()
+            launch.assert_not_called()
 
     def test_unrelated_listener_is_not_replaced(self):
         self.server_name = 'unrelated-service'
