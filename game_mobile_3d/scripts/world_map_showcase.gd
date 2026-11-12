@@ -72,6 +72,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
+	&"twilight_sky_chroma": ["Sắc ánh sáng hắt chạng vạng", 1.],
 	&"night_sky_fill": ["Ánh sáng hắt ban đêm", 1.],
 	&"dawn_sky_transition": ["Ánh sáng hắt rạng sáng", 1.],
 	&"daylight_balance": ["Daylight color balance", 1.],
@@ -143,7 +144,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 67
+const LIGHTING_MIX_VERSION := 68
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -446,6 +447,18 @@ func _apply_sky_chroma(env: Environment) -> void:
 	var rgb := env.ambient_light_color.srgb_to_linear()
 	var luma := Vector3(rgb.r, rgb.g, rgb.b).dot(Vector3(.2126, .7152, .0722))
 	env.ambient_light_color = Color(luma, luma, luma).lerp(rgb, scale).linear_to_srgb()
+
+func _apply_twilight_sky(env: Environment) -> void:
+	if not sky_response_active or _balanced_preview or hour <= 19.0 or hour >= 20.0:
+		return
+	var color := env.ambient_light_color.srgb_to_linear()
+	var rgb := Vector3(color.r, color.g, color.b)
+	var adjusted: Vector3 = sky_response.twilight_color(rgb, hour, _lighting_scale(&"twilight_sky_chroma"))
+	if adjusted == rgb:
+		return
+	var peak := maxf(1.0, adjusted[adjusted.max_axis_index()])
+	env.ambient_light_color = Color(adjusted.x / peak, adjusted.y / peak, adjusted.z / peak).linear_to_srgb()
+	env.ambient_light_energy *= peak
 
 func _apply_captured_key(sun:DirectionalLight3D)->void:
 	key_response_active=false
@@ -961,6 +974,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 0.
 	if effect == &"dawn_sky_transition":
 		return .35
+	if effect == &"twilight_sky_chroma":
+		return .5
 	if effect == &"grass_night_albedo":
 		return .55
 	if effect == &"dawn_mist_source":
@@ -1353,6 +1368,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 67 and effect == &"evening_key_response":
 			missing_value = 0.
+		if version < 68 and effect == &"twilight_sky_chroma":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1398,6 +1415,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
 		if effect == &"evening_key_response":
 			slider.editable = slider.editable and key_response.evening_available()
+		if effect == &"twilight_sky_chroma":
+			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
 		if effect == &"forest_path_placement":
@@ -1552,6 +1571,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		env.ambient_light_energy*=p.ambient_energy_scale
 		_apply_captured_sky(env)
 		_apply_sky_chroma(env)
+		_apply_twilight_sky(env)
 		var key:=sun.light_color.srgb_to_linear();var rgb:Vector3=Vector3(key.r,key.g,key.b)*p.key_color_scale
 		var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
 		sun.light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb();sun.light_energy*=p.key_scale*peak
