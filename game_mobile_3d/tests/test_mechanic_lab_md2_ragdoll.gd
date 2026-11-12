@@ -161,7 +161,8 @@ func run() -> void:
 	for slot in 3:
 		await check_combo_finisher(lab, group, slot)
 	await check_flat_rest_after_tumble(lab, group)
-	await check_flat_contact_jitter(lab, group)
+	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
+	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.8)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
@@ -273,29 +274,29 @@ func check_flat_rest_after_tumble(lab, group) -> void:
 		"The flat-floor tumble stops vibrating and releases its rigid bodies within 1.85 seconds")
 	zombie.free()
 
-func check_flat_contact_jitter(lab, group) -> void:
-	const SERIAL := 246
-	group._spawn_serial = SERIAL
+func check_flat_contact_jitter(lab, group, serial: int, pose_time: float, direction_angle: float,
+		strength: float, settle_deadline: float) -> void:
+	group._spawn_serial = serial
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
 	zombie.set_physics_process(false)
 	zombie.global_position = Vector3(2.0, 0.02, 0.0)
-	zombie.rotation.y = fmod(SERIAL * 0.41, TAU)
+	zombie.rotation.y = fmod(serial * 0.41, TAU)
 	zombie.animation.play(ZOMBIE.IDLE)
-	zombie.animation.advance(0.28)
+	zombie.animation.advance(pose_time)
 	zombie.reset_physics_interpolation()
 	await ticks(2)
 	for i in 2:
 		zombie.ragdoll.sample(1.0 / 60.0)
-	zombie.take_hit(100, Vector3.RIGHT.rotated(Vector3.UP, 0.91), Vector2.ZERO, 0.0, 800.0)
+	zombie.take_hit(100, Vector3.RIGHT.rotated(Vector3.UP, direction_angle), Vector2.ZERO, 0.0, strength)
 	zombie.set_physics_process(true)
 	var lowest_corner := 0.0
-	while not zombie._corpse_parked and zombie._corpse_age < 2.2:
+	while not zombie._corpse_parked and zombie._corpse_age < settle_deadline:
 		await physics_frame
 		if zombie.ragdoll.running:
 			lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
-	check(zombie._corpse_parked, "A fully supported corpse stops shaking on the flat floor within 2.2 seconds")
+	check(zombie._corpse_parked, "Flat-floor corpse %d stops shaking within %.1f seconds" % [serial, settle_deadline])
 	check(lowest_corner >= -0.013, "The corpse stays within the floor contact tolerance while settling")
-	print("RAGDOLL_FLAT_CONTACT_REST seconds=", zombie._corpse_age, " peak_overlap_m=", -lowest_corner)
+	print("RAGDOLL_FLAT_CONTACT_REST serial=", serial, " seconds=", zombie._corpse_age, " peak_overlap_m=", -lowest_corner)
 	zombie.free()
 
