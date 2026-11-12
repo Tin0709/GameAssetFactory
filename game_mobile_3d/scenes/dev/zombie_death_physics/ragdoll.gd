@@ -31,25 +31,28 @@ var last_strength := 1.0
 var joint_rest_rotations: Dictionary = {}
 var resistance_gain := 0.0
 var resistance_age := 0.0
+var _parts: Array = PARTS
 # (Nm/rad, Nms/rad): soft restoring torque plus relative angular damping.
 const JOINT_RESPONSE := {"Chest": Vector2(18,5.4), "Head": Vector2(4,2.4), "Arm.L": Vector2(3,2.1), "Arm.R": Vector2(3,2.1), "Leg.L": Vector2(6,2.7), "Leg.R": Vector2(6,2.7)}
 
-func setup(target: Skeleton3D) -> void:
+func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {}) -> void:
 	set_physics_process(false)
 	skeleton = target
+	_parts = part_layout
 	# Reject unsupported rigs instead of quietly binding the wrong bones/scale.
 	assert(skeleton.global_basis.get_scale().is_equal_approx(Vector3.ONE), "Ragdoll requires unit-scale hierarchy")
 	simulator = PhysicalBoneSimulator3D.new()
 	simulator.name = "DeathPhysicsSimulator"
 	skeleton.add_child(simulator)
 	simulator.active = false
-	for part in PARTS:
-		var id := skeleton.find_bone(part[0])
-		assert(id >= 0, "Missing original Zombie bone: " + part[0])
+	for part in _parts:
+		var bone_name: String = bone_names.get(part[0], part[0])
+		var id := skeleton.find_bone(bone_name)
+		assert(id >= 0, "Missing ragdoll bone: " + bone_name)
 		var body := PhysicalBone3D.new()
 		body.set_script(PHYSICAL_PART)
 		body.name = "Corpse_" + part[0]
-		body.set("bone_name", part[0])
+		body.set("bone_name", bone_name)
 		body.body_offset = skeleton.get_bone_global_rest(id).affine_inverse() * Transform3D(Basis.IDENTITY, part[1])
 		body.mass = part[3]
 		body.friction = 0.75
@@ -88,7 +91,7 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	simulator.active = true
 	# This refreshes all cached animated poses, sets all body transforms and changes mode.
 	simulator.physical_bones_start_simulation()
-	for part in PARTS:
+	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		handoff_error = maxf(handoff_error, body.global_position.distance_to(current[part[0]].origin))
 		body.gravity_scale = gravity / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
@@ -109,7 +112,7 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	# Rebuild frames only AFTER every body has the current pose. Native parent frame
 	# is computed from this exact pose, accommodating animated bone translations.
 	# Limits are relative to the captured pose; no rest-pose projection/correction.
-	for part in PARTS:
+	for part in _parts:
 		if part[0] == "Hips": continue
 		var body: PhysicalBone3D = bodies[part[0]]
 		body.joint_rotation = Vector3(0, 0, PI / 2.0) # Joint X axis along rigid part Y.
@@ -222,7 +225,7 @@ func apply_impact(profile: Resource, direction: Vector3, location: String, dista
 func nearest_part(world_point: Vector3) -> PhysicalBone3D:
 	var nearest: PhysicalBone3D = bodies.Chest
 	var best := INF
-	for part in PARTS:
+	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var point := body.global_transform.affine_inverse() * world_point
 		var half: Vector3 = part[2] * 0.5
@@ -242,7 +245,7 @@ func max_anchor_error() -> float:
 
 func minimum_corner_y() -> float:
 	var result := INF
-	for part in PARTS:
+	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var half: Vector3 = part[2] * 0.5
 		for x in [-1, 1]:
