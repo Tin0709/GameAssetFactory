@@ -113,6 +113,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"sculk_surface": ["Sculk phát sáng", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
+	&"forest_path_placement": ["Vị trí đèn lối rừng", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
 	&"forest_path_air": ["Path light in mist", 1.],
 	&"bloom": ["Bloom", 2.],
@@ -131,7 +132,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 55
+const LIGHTING_MIX_VERSION := 56
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -893,7 +894,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 1.
 	if effect == &"world_outline_strength":
 		return 0.
-	if effect == &"sculk_surface":
+	if effect in [&"sculk_surface", &"forest_path_placement"]:
 		return 0.
 	if effect == &"forest_daylight_accents":
 		return .65
@@ -1083,6 +1084,8 @@ func set_lighting_scale(effect: StringName, value: float) -> void:
 	var scale := clampf(value, 0., LIGHTING_MIX_CONTROLS[effect][1])
 	if effect == &"world_outline_width":
 		scale = clampf(roundf(scale), 1., 4.)
+	if effect == &"forest_path_placement":
+		scale = roundf(scale)
 	if scale == float(_lighting_mix.get(effect, _lighting_scale_default(effect))):
 		return
 	_lighting_mix[effect] = scale
@@ -1124,6 +1127,8 @@ func apply_scene_lighting_mix(preset: SceneLightingMix) -> bool:
 		var strength: float = preset.strengths[effect]
 		if not LIGHTING_MIX_CONTROLS.has(effect) or not is_finite(strength) \
 				or strength < 0. or strength > float(LIGHTING_MIX_CONTROLS[effect][1]):
+			return false
+		if effect == &"forest_path_placement" and strength != roundf(strength):
 			return false
 	_lighting_mix.merge(preset.strengths, true)
 	_refresh_lighting_mix()
@@ -1243,6 +1248,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 55 and effect == &"cool_shadow_detail":
 			missing_value = 0.
+		if version < 56 and effect == &"forest_path_placement":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1256,6 +1263,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
 			return ERR_INVALID_DATA
 		if effect == &"world_outline_width" and (value < 1. or value != roundf(value)):
+			return ERR_INVALID_DATA
+		if effect == &"forest_path_placement" and value != roundf(value):
 			return ERR_INVALID_DATA
 		restored[effect] = float(value)
 	_lighting_mix = restored
@@ -1280,6 +1289,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
+		if effect == &"forest_path_placement":
+			slider.editable = slider.editable and level.forest_path_light_offset.is_finite() \
+				and not level.forest_path_light_offset.is_zero_approx()
 		if effect == &"foot_contact":
 			slider.editable = slider.editable and player_contact.available()
 		if effect == &"projected_sun":
@@ -1348,7 +1360,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
-	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"sculk_surface"]:
+	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface"]:
 		_sync_forest_night_lights()
 		return
 	if changed_effect in [&"", &"oak_leaf_tint"]:
@@ -1528,7 +1540,8 @@ func _sync_forest_night_lights() -> void:
 	else:
 		forest_accents.update(level, phase, night_strength)
 	sculk_surface.update(level, maxf(day, phase) if not _balanced_preview else 0., _lighting_scale(&"sculk_surface"))
-	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light")):
+	var offset: Vector2 = level.forest_path_light_offset if _lighting_scale(&"forest_path_placement") == 1. else Vector2.ZERO
+	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light"), offset):
 		_publish_point_cutoff()
 
 func sync_world_outline() -> void:
@@ -1695,6 +1708,8 @@ func _process(delta:float)->void:
 static func _mix_readout(effect: StringName, value: float) -> String:
 	if effect == &"world_outline_width":
 		return "%d px" % roundi(value)
+	if effect == &"forest_path_placement":
+		return "Lệch lối" if value == 1. else "Gốc"
 	return "%d%%" % roundi(value * 100.)
 
 func _build_lighting_mix(box: VBoxContainer) -> void:
@@ -1895,6 +1910,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		slider.step = .01
 		if effect == &"world_outline_width":
 			slider.min_value = 1.
+			slider.step = 1.
+		if effect == &"forest_path_placement":
 			slider.step = 1.
 		slider.value = _lighting_scale(effect)
 		slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
