@@ -98,6 +98,14 @@ func run() -> void:
 	check(is_equal_approx(launch_mass, 60.0), "The relative source masses use the lab's total mass")
 	check(Vector2(impulse.x, impulse.z).length() / launch_mass > 8.0,
 		"A normal lethal strike adds over 8 m/s along the floor")
+	var skeleton: Skeleton3D = zombie.ragdoll.skeleton
+	var last_physical_pose: Array[Transform3D] = []
+	skeleton.skeleton_updated.connect(func():
+		if not zombie.ragdoll.running:
+			return
+		last_physical_pose.clear()
+		for bone in skeleton.get_bone_count():
+			last_physical_pose.append(skeleton.get_bone_global_pose(bone)))
 	var fastest_descent := 0.0
 	var landing_time := INF
 	var landing_speed := 0.0
@@ -105,6 +113,8 @@ func run() -> void:
 	var lowest_corner := 0.0
 	for i in 60:
 		await physics_frame
+		if not zombie.ragdoll.running:
+			break
 		lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
 		var momentum := Vector3.ZERO
 		for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
@@ -124,14 +134,6 @@ func run() -> void:
 		"The corpse retains forward momentum through its first 100 ms on the floor")
 	check(lowest_corner >= -0.013, "The grounded strike stays within the floor contact tolerance")
 	check(zombie._corpse_landed and zombie.ragdoll.max_anchor_error() < 0.10, "The corpse settles with connected joints")
-	var skeleton: Skeleton3D = zombie.ragdoll.skeleton
-	var last_physical_pose: Array[Transform3D] = []
-	skeleton.skeleton_updated.connect(func():
-		if not zombie.ragdoll.running:
-			return
-		last_physical_pose.clear()
-		for bone in skeleton.get_bone_count():
-			last_physical_pose.append(skeleton.get_bone_global_pose(bone)))
 	while zombie.ragdoll.running and zombie._corpse_age < 1.85:
 		await physics_frame
 	check(not zombie.ragdoll.running, "A supported corpse holds still before the fade instead of vibrating on the floor")
