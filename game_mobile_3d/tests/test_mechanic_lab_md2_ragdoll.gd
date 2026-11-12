@@ -161,6 +161,7 @@ func run() -> void:
 	for slot in 3:
 		await check_combo_finisher(lab, group, slot)
 	await check_flat_rest_after_tumble(lab, group)
+	await check_flat_contact_jitter(lab, group)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
@@ -270,5 +271,26 @@ func check_flat_rest_after_tumble(lab, group) -> void:
 		await physics_frame
 	check(zombie._corpse_parked and zombie.ragdoll.bodies.is_empty(),
 		"The flat-floor tumble stops vibrating and releases its rigid bodies within 1.85 seconds")
+	zombie.free()
+
+func check_flat_contact_jitter(lab, group) -> void:
+	group._spawn_serial = 246
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(2.0, 0.02, 0.0)
+	zombie.rotation.y = fmod(246 * 0.41, TAU)
+	zombie.animation.play(ZOMBIE.IDLE)
+	zombie.animation.advance(0.28)
+	zombie.reset_physics_interpolation()
+	await ticks(2)
+	for i in 2:
+		zombie.ragdoll.sample(1.0 / 60.0)
+	zombie.take_hit(100, Vector3.RIGHT.rotated(Vector3.UP, 0.91), Vector2.ZERO, 0.0, 800.0)
+	zombie.set_physics_process(true)
+	while not zombie._corpse_parked and zombie._corpse_age < 2.2:
+		await physics_frame
+	check(zombie._corpse_parked, "A fully supported corpse stops shaking on the flat floor within 2.2 seconds")
+	print("RAGDOLL_FLAT_CONTACT_REST seconds=", zombie._corpse_age, " parked=", zombie._corpse_parked)
 	zombie.free()
 
