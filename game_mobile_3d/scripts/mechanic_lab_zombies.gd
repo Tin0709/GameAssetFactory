@@ -41,6 +41,7 @@ const SABRE_STRIKES := [
 	},
 ]
 const AIR_STRIKE := {"damage": 20, "range_m": 2.5, "strength": 1150.0, "angle": 25.0, "stagger": 37.0}
+# DT_MeleePropertyDefinition: Sword_1 through Sword_3.
 const SWORD_STRIKES := [
 	{
 		"damage": 14, "range_m": 2.75, "strength": 500.0, "angle": 15.0, "stagger": 25.0,
