@@ -138,7 +138,7 @@ def build_layout(app):
     app.godot_copy_buttons = {}
     for key, attr, label, callback, kind in (
         ('godot', 'gameplay_button', 'Chạy gameplay chính', app.open_main_gameplay, 'primary'),
-        ('mechanic-lab', 'mechanic_lab_button', 'Mở MechanicLab', app.open_mechanic_lab, 'subtle'),
+        ('mechanic-lab', 'mechanic_lab_button', 'Mở MechanicLab', app.open_mechanic_lab, 'normal'),
     ):
         group = ttk.Frame(title, style='Card.TFrame')
         group.pack(side='right', padx=(12, 0))
