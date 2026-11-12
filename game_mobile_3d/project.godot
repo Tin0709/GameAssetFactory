@@ -175,3 +175,23 @@ gaf_mist_projection_scale={
 "type": "vec2",
 "value": Vector2(1, 1)
 }
+gaf_local_mist_center={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
+gaf_local_mist_radii={
+"type": "vec3",
+"value": Vector3(1, 1, 1)
+}
+gaf_local_mist_origin={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+gaf_local_mist_dx={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+gaf_local_mist_dy={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}

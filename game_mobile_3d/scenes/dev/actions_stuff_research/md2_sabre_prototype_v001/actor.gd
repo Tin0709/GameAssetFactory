@@ -511,9 +511,11 @@ func _physics_process(delta:float)->void:
 		_animation_motion_speed=minf(desired.length(),distance/_combat_open_seconds) if _combat_open_seconds>.00000001 else 0.
 		_combat_path+=distance;_combat_locked_seconds+=delta-_combat_open_seconds
 	var facing:=visual.rotation.y
-	if not combo.active() or (combo.native_enabled and _grounded):
+	var use_melee_aim := _grounded and not combat_requested and review_clip.is_empty() \
+		and grounded_melee_aim.is_valid() and combo.ground_windup_active()
+	if not combo.active() or (combo.native_enabled and _grounded) or use_melee_aim:
 		var melee_direction := Vector3.ZERO
-		if _grounded and not combat_requested and grounded_melee_aim.is_valid() and combo.ground_windup_active():
+		if use_melee_aim:
 			melee_direction = grounded_melee_aim.call(combo.index, combo.serial, Vector3(stick.x, 0.0, stick.y))
 		if combat_requested:
 			if has_aim_point:
