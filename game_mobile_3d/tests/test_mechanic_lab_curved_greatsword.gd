@@ -38,17 +38,34 @@ func run() -> void:
 	check(weapon.selected == 2, "Curved Greatsword loads from the verified private assets")
 	lab.player.attack_accepted.connect(func(_index, clip, _serial): attacks.append(clip))
 	var group := lab.get_node("Zombies") as Node3D
-	(lab.get_node("HUD/SpawnZombie") as Button).pressed.emit()
-	if group.get_child_count() != 1:
-		check(false, "One zombie is available for the combo")
+	var spawn := lab.get_node("HUD/SpawnZombie") as Button
+	spawn.pressed.emit()
+	spawn.pressed.emit()
+	if group.get_child_count() != 2:
+		check(false, "Two zombies are available for the combo and splash")
 		finish(lab)
 		return
 	var target = group.get_child(0)
 	target.set_physics_process(false)
 	target.position = Vector3(0.0, 0.0, 1.3)
 	target.health = 100
-	group.sabre_contact.connect(func(_point, _direction, _clip, _index, _serial, _lethal):
-		damage.append(target.health))
+	var distant_target = group.get_child(1)
+	distant_target.set_physics_process(false)
+	distant_target.position = Vector3(0.65, 0.0, 4.5)
+	distant_target.health = 100
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	var combat_audio := lab.get_node("CombatAudio")
+	var swing_audio = lab.player.reference_audio
+	check(not toggle.button_pressed and not swing_audio.enabled, "Combat audio defaults to off")
+	toggle.button_pressed = true
+	var swing_count: int = swing_audio.played_count
+	var hit_count: int = combat_audio._next_choice.get(&"curved_hit", 0)
+	var shake_contacts: Array[int] = []
+	group.sabre_contact.connect(func(point, _direction, _clip, index, serial, _lethal):
+		if point.distance_to(target.global_position) < 2.0:
+			damage.append(target.health)
+			if lab._shake_serial == serial:
+				shake_contacts.append(index))
 	attack(true)
 	for i in 140:
 		await physics_frame
@@ -62,6 +79,13 @@ func run() -> void:
 	check(attacks == ["NativeCurvedAttack1", "NativeCurvedAttack2", "NativeCurvedAttack3"],
 		"Held E plays the three source attacks in order")
 	check(damage == [80, 60, 30], "The three contacts deal 20, 20 and 30 damage")
+	check(distant_target.health == 91, "Only the finisher reaches the distant target for 30% splash")
+	check(shake_contacts == [2], "Only the finisher triggers a nearby camera shake")
+	check(swing_audio.played_count == swing_count + 3, "Three source swing samples reach the audio voices")
+	check(combat_audio._groups.get(&"curved_hit", []).size() == 3
+		and combat_audio._next_choice.get(&"curved_hit", -1) == hit_count,
+		"Three contacts play the Curved Greatsword hitmarker once per strike")
+	toggle.button_pressed = false
 	check(recovered and not lab.player.combo.active(), "Release plays the source finisher recovery")
 	check(lab.player.drop_for_lab(5.0), "Airborne fixture starts a drop")
 	await ticks(3)
