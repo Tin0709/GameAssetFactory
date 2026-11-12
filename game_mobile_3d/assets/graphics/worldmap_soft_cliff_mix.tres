@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/scene_lighting_mix.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Vách đá mềm"
+description = "Làm dịu vân đá và phối ánh sáng hắt với sương cục bộ ở vách tây bắc. Ánh sáng hắt và sương đổi theo buổi. Lúc trưa phần dễ thấy nhất là vân đá dịu hơn."
+review_tip = "Đứng ở vách tây bắc và đổi giờ qua Sáng, Trưa, Chiều, Đêm. Dùng Hoàn tác để trở về công thức trước."
+strengths = Dictionary[StringName, float]({
+&"stone_detail_softness": 0.5,
+&"stone_diffuse_contrast": 0.55,
+&"daylight_bounce": 0.65,
+&"cliff_mist": 0.65,
+&"night_cliff_mist": 1.0,
+&"night_spatial_sky": 0.65,
+&"night_stone_fill_balance": 0.72
+})
