@@ -46,6 +46,7 @@ var _light_peak := 0.0
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
 @onready var _impact_light: OmniLight3D = $CombatImpactLight
+@onready var _player_body := player.get_node_or_null("BodyCollision") as CollisionShape3D
 
 func _enter_tree() -> void:
 	presentation = PlayerPresentation.new()
@@ -228,12 +229,11 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	_combat_audio.contact(point, serial, lethal)
 	var finisher := clip in ["Attack3", "NativeFinisher"]
 	_start_contact_light(point, serial, 2.3 if finisher else 1.8)
-	# Sabre_3 is the only grounded variant with a shake class. Its radius and
-	# non-oriented flag come from the row; the lab waveform is an approximation.
+	# Sabre_3 and Sword_3 share the source radius and non-oriented shake.
+	# Approximate StartMatineeCameraShakeAtPawn using the capsule center.
 	if not finisher or _shake_serial == serial:
 		return
-	var offset := point - player.global_position
-	var distance := Vector2(offset.x, offset.z).length()
+	var distance := _player_body.global_position.distance_to(point)
 	var falloff := 1.0 - clampf(inverse_lerp(FINISHER_SHAKE_INNER_RADIUS, FINISHER_SHAKE_OUTER_RADIUS, distance), 0.0, 1.0)
 	if falloff <= 0.0:
 		return
