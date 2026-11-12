@@ -137,7 +137,8 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	check(worst_anchor < 0.12, "The first impact on the lower terrace keeps the limb anchors connected")
 	check(worst_overlap < 0.12, "The ledge contact stays within the terrain penetration budget")
 	if strike == Zombie.DeathStrike.GROUND:
-		check(parked_frame > first_landing, "A supported corpse parks across the two terraces after a forward melee finisher")
+		check(parked_frame > first_landing and parked_frame < 150,
+			"A forward melee finisher rolls off its upright foot support and settles within 2.5 seconds")
 	print("WORLDMAP_LEDGE strike=", strike, " landing=", first_landing,
 		" minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor, " park=", parked_frame,
 		" peak_overlap_m=", worst_overlap)
