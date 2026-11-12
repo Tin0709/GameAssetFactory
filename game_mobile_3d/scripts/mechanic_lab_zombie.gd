@@ -32,8 +32,10 @@ const DEATH_TIER_INFLUENCE := 0.75
 const DEATH_ANGULAR_TO_LAB := 0.14
 # Honeycomb Fields footage puts lethal hit to body-down near 0.6 seconds.
 const DEATH_FLIGHT_GRAVITY := 21.0
-const DEATH_LANDING_LINEAR_DAMP := 7.0
-const DEATH_LANDING_ANGULAR_DAMP := 10.0
+const DEATH_LANDING_BLEND_TIME := 0.20
+const DEATH_LANDING_LINEAR_DAMP := 3.0
+const DEATH_LANDING_ANGULAR_DAMP := 4.0
+const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
 const HEIGHT := 1.95
 const CHASE_SPEED := 3.1
 const MELEE_RANGE := 1.36
@@ -95,6 +97,7 @@ var _attack_cooldown := 0.0
 var _flash_left := 0.0
 var _corpse_age := 0.0
 var _corpse_landed := false
+var _landing_age := INF
 var _physics_profile: Dictionary
 static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
@@ -323,13 +326,22 @@ func _update_death(delta: float) -> void:
 		return
 	if not _corpse_landed and ragdoll.contact_motion().core_contacts > 0:
 		_corpse_landed = true
+		_landing_age = 0.0
 		ragdoll.set_physics_process(false)
-		# Absorb the landing once the torso reaches the floor. Physics still
-		# owns the remaining slide and the pose of every joint.
 		for body: PhysicalBone3D in ragdoll.bodies.values():
-			body.gravity_scale = 1.0
-			body.linear_damp = DEATH_LANDING_LINEAR_DAMP
-			body.angular_damp = DEATH_LANDING_ANGULAR_DAMP
+			# Leave room for the floor impulse to roll the body over a limb.
+			body.set("maximum_angular_speed", DEATH_LANDING_ANGULAR_SPEED_LIMIT)
+	if _landing_age < DEATH_LANDING_BLEND_TIME:
+		_landing_age = minf(_landing_age + delta, DEATH_LANDING_BLEND_TIME)
+		# Let contact and friction lead the first impact, then settle the roll.
+		var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
+		var flight_gravity_scale := DEATH_FLIGHT_GRAVITY / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+		var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
+		var angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
+		for body: PhysicalBone3D in ragdoll.bodies.values():
+			body.gravity_scale = lerpf(flight_gravity_scale, 1.0, blend)
+			body.linear_damp = linear_damp
+			body.angular_damp = angular_damp
 	var remaining := CORPSE_LIFETIME - _corpse_age
 	if remaining <= 0.00001:
 		queue_free()
