@@ -9,5 +9,6 @@ if __name__ == '__main__':
                         help='Enable local checkpoints after the initial scan; never Push.')
     parser.add_argument('--auto-repo', action='append', default=[], metavar='NAME',
                         help='Enable only this named repository after scanning (repeatable); never Push.')
+    parser.add_argument('--native-ui', action='store_true', help='Open the classic Tk interface.')
     args = parser.parse_args()
-    main(auto_commit=args.auto_commit, auto_repos=args.auto_repo)
+    main(auto_commit=args.auto_commit, auto_repos=args.auto_repo, native_ui=args.native_ui)

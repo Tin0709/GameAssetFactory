@@ -274,7 +274,7 @@ class WebWindow:
         elif action == 'shortcut':
             app.open_blender_view(data['view'])
         elif action == 'copy-shortcut':
-            app.copy_blender_view_path(data['view'])
+            app.copy_blender_view_path(data['view'], browser=True)
         else:
             self._repo_action(action, data)
 

@@ -1,4 +1,5 @@
 """A visible desktop UI. Opening the app never enables Git writes."""
+from collections import deque
 from datetime import datetime
 import json
 import logging
@@ -16,7 +17,7 @@ from .ui_widgets import InAppDialog, Notifications
 from .layout import build_layout
 
 from .core import AutoSchedule, FilesChanging, GitRepository, RepoBlocked, RepoConfig, redact
-from .blender_bridge import BlenderBridge, BridgeMonitor
+from .blender_bridge import BlenderBridge, BridgeMonitor, BridgeStatus
 from .blender_views import BlenderViewLauncher, VIEW_LABELS
 
 
@@ -82,6 +83,7 @@ class CheckpointApp:
         self.state_dir = Path(state_dir)
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.logger = logging.Logger('checkpoint-desktop')
+        self.recent_log = deque(maxlen=160)
         handler = RotatingFileHandler(self.state_dir / 'manager.log', maxBytes=1_000_000, backupCount=2, encoding='utf-8')
         self.logger.addHandler(handler)
         try:
@@ -125,6 +127,8 @@ class CheckpointApp:
         self.repo_issues = [False] * len(configs)
         self.busy_indices = ()
         self.bridge_detail = tk.StringVar(root, 'Đang kiểm tra server và Blender…')
+        self.bridge_status = BridgeStatus(False, False, False, 'Đang kiểm tra…', 'Đang kiểm tra server và Blender.')
+        self.bridge_start_until = None
         research = next((config.path for config in configs if config.name == 'MD2 Research'), None)
         self.view_launcher = BlenderViewLauncher(self.state_dir, research)
         self.view_buttons = {}
@@ -144,7 +148,15 @@ class CheckpointApp:
 
     def log(self, message):
         message = redact(message)
-        line = datetime.now().strftime('%H:%M:%S') + '  ' + message
+        stamp = datetime.now().strftime('%H:%M:%S')
+        if message.startswith(('Blender MCP:', 'Đã chạy gameplay', 'Không mở được gameplay', 'Đã mở ', 'Đã copy path')):
+            kind = 'tool'
+        elif any(message.startswith(config.name + ':') for config in self.configs) or 'tự commit' in message.lower():
+            kind = 'git'
+        else:
+            kind = 'system'
+        self.recent_log.append(dict(time=stamp, message=message, kind=kind))
+        line = stamp + '  ' + message
         self.logger.info(line)
         self.log_widget.configure(state='normal')
         self.log_widget.insert('end', line + '\n')
@@ -191,6 +203,9 @@ class CheckpointApp:
 
     def refresh(self):
         self._submit(lambda: self._cycle(range(len(self.configs)), [False] * len(self.configs), self._anchors()))
+
+    def refresh_repository(self, index):
+        self._submit(lambda: self._cycle([index], [False] * len(self.configs), self._anchors()), indices=[index])
 
     def tick(self):
         if self.closed or self.closing:
@@ -374,16 +389,21 @@ class CheckpointApp:
         self.dialog.show_confirm('Commit ngay · ' + self.configs[index].name,
             f'Commit các thay đổi hợp lệ trên nhánh {snapshot.branch}?\n\nFile staged sẵn được giữ nguyên. Thao tác này chỉ tạo commit cục bộ.', confirm)
 
-    def push_now(self, index):
+    def push_now(self, index, *, expected_identity=None, confirmed=False):
         snapshot = self.snapshots[index]
-        if not snapshot or self.busy or self.dialog.active:
+        if self.busy:
+            return False
+        if not snapshot or self.closed or self.closing or (self.dialog.active and not confirmed):
+            return
+        if expected_identity is not None and snapshot.identity != expected_identity:
+            self.notifications.show('Trạng thái Git đã thay đổi', 'Kiểm tra nhánh và HEAD rồi bấm Push lại.', kind='error')
             return
         identity = snapshot.identity
         def job():
             message = self.repositories[index].push(expected_identity=identity)
             return [(index, self.repositories[index].scan(), message, False, False)]
         self.log(f'{self.configs[index].name}: đang Push theo yêu cầu của bạn…')
-        self._submit(job, kind='push_result', indices=[index], label='Đang Push')
+        return self._submit(job, kind='push_result', indices=[index], label='Đang Push')
 
     def open_main_gameplay(self):
         if self.closed or self.closing or self.dialog.active:
@@ -402,9 +422,14 @@ class CheckpointApp:
         self.log(f'Đã chạy gameplay chính trong Godot (PID {self.gameplay_process.pid}).')
 
     def start_blender(self):
-        if not self.closed and not self.closing:
+        if not self.closed and not self.closing and self.bridge_start_until is None:
+            self.bridge_start_until = self.clock() + 60
             self.blender_light.set('working', 'Đang xử lý yêu cầu…')
             self.bridge_monitor.request_start()
+
+    @property
+    def bridge_starting(self):
+        return self.bridge_start_until is not None
 
     def open_blender_view(self, key):
         if self.closed or self.closing:
@@ -417,17 +442,19 @@ class CheckpointApp:
             self.log(f'Không mở được {label}: {error}')
             self.notifications.show('Không mở được ' + label, redact(str(error)), kind='error')
 
-    def copy_blender_view_path(self, key):
+    def copy_blender_view_path(self, key, *, browser=False):
         if self.closed or self.closing:
             return
         label = VIEW_LABELS.get(key, 'Blender')
         try:
             path = self.view_launcher.blend_path(key)
-            self.root.clipboard_clear()
-            self.root.clipboard_append(str(path))
-            self.root.update_idletasks()
+            if not browser:
+                self.root.clipboard_clear()
+                self.root.clipboard_append(str(path))
+                self.root.update_idletasks()
             self.log(f'Đã copy path {label}.')
-            self.notifications.show('Đã copy đường dẫn', str(path))
+            self.notifications.show('Đường dẫn Blender' if browser else 'Đã copy đường dẫn', str(path),
+                                    kind='copy' if browser else 'info')
         except (OSError, ValueError, tk.TclError) as error:
             self.log(f'Không copy được path {label}: {error}')
             self.notifications.show('Không copy được đường dẫn', redact(str(error)), kind='error')
@@ -437,6 +464,9 @@ class CheckpointApp:
             self.bridge_monitor.refresh()
 
     def _poll_blender(self):
+        if self.bridge_start_until is not None and self.clock() >= self.bridge_start_until:
+            self.bridge_start_until = None
+            self.notifications.show('Blender MCP chưa kết nối', 'Xem nhật ký MCP hoặc bấm Kiểm tra kết nối.', kind='error')
         while True:
             try:
                 kind, value = self.bridge_monitor.events.get_nowait()
@@ -444,7 +474,14 @@ class CheckpointApp:
                 return
             if kind == 'message':
                 self.log('Blender MCP: ' + value)
+            elif kind == 'start_error':
+                self.bridge_start_until = None
+                self.log('Blender MCP: ' + value)
+                self.notifications.show('Không chạy được Blender MCP', value, kind='error')
             else:
+                self.bridge_status = value
+                if value.connected:
+                    self.bridge_start_until = None
                 color = 'ok' if value.connected else 'working' if value.server_ready or value.blender_ready else 'idle'
                 self.blender_light.set(color, value.label)
                 stamp = datetime.now().strftime('%H:%M:%S')
@@ -483,7 +520,7 @@ def default_configs(repository, desktop):
     ]
 
 
-def main(auto_commit=False, auto_repos=()):
+def main(auto_commit=False, auto_repos=(), native_ui=False):
     if os.name == 'nt':
         import ctypes
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Tin0709.GAFGitCheckpointManager')
@@ -515,11 +552,22 @@ def main(auto_commit=False, auto_repos=()):
         instance.close()
         root.destroy()
         raise ValueError('Unknown auto-commit repositories: ' + ', '.join(sorted(unknown)))
+    window = None
     try:
-        CheckpointApp(root, configs, state_dir, start_auto=True if auto_commit else tuple(auto_repos))
-        root.deiconify()
+        from .web_ui import WebWindow, find_browser
+        app = CheckpointApp(root, configs, state_dir, start_auto=True if auto_commit else tuple(auto_repos))
+        browser = None if native_ui else find_browser()
+        if browser is not None:
+            try:
+                window = WebWindow(app, browser)
+            except OSError as error:
+                app.log('Không mở được giao diện Liquid Glass: ' + str(error))
+        if window is None:
+            root.deiconify()
         root.mainloop()
     finally:
+        if window is not None:
+            window.close()
         instance.close()
 
 
