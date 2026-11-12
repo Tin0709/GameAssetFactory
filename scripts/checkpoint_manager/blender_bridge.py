@@ -7,8 +7,11 @@ from pathlib import Path
 import queue
 import socket
 import subprocess
+import sys
 import threading
 import time
+
+from dev import ROOT, find_tool
 
 
 SOURCE = 'git+https://projects.blender.org/lab/blender_mcp.git@v1.0.3#subdirectory=mcp'
@@ -44,6 +47,7 @@ class BlenderBridge:
         self.state_dir = Path(state_dir)
         self.config = config or BridgeConfig()
         self._process = None
+        self._blender_process = None
         self._protocol = '2024-11-05'
         self._retry_tool_after = 0.0
 
@@ -191,12 +195,55 @@ class BlenderBridge:
             return BridgeStatus(True, True, False, 'Chưa xác minh kết nối MCP', 'Blender phản hồi trực tiếp nhưng lệnh qua HTTP MCP chưa thành công.')
         return BridgeStatus(True, True, True, 'Đã kết nối Blender', 'Server MCP và Blender đã phản hồi lệnh kiểm tra chỉ đọc.')
 
-    def _port_open(self):
+    @staticmethod
+    def _listener_open(host, port, timeout):
         try:
-            with socket.create_connection((self.config.http_host, self.config.http_port), timeout=self.config.timeout):
+            with socket.create_connection((host, port), timeout=timeout):
                 return True
         except OSError:
             return False
+
+    def _port_open(self):
+        config = self.config
+        return self._listener_open(config.http_host, config.http_port, config.timeout)
+
+    def _open_blender(self):
+        blender = find_tool('blender')
+        if sys.platform == 'win32':
+            data = Path(os.environ.get('APPDATA', Path.home() / 'AppData/Roaming')) / 'Blender Foundation/Blender'
+        elif sys.platform == 'darwin':
+            data = Path.home() / 'Library/Application Support/Blender'
+        else:
+            data = Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config')) / 'blender'
+        addon = Path(os.environ.get('BLENDER_MCP_ADDON', data / '5.2/extensions/user_default/mcp')).expanduser()
+        if not (addon / 'mcp_to_blender_server.py').is_file():
+            raise BridgeError('Không tìm thấy Blender Lab MCP 1.0.3. Cài extension hoặc đặt BLENDER_MCP_ADDON tới thư mục đã cài.')
+        env = dict(os.environ, BLENDER_MCP_ADDON=str(addon), BLENDER_MCP_HOST=self.config.addon_host,
+                   BLENDER_MCP_PORT=str(self.config.addon_port))
+        self.state_dir.mkdir(parents=True, exist_ok=True)
+        with (self.state_dir / 'blender-mcp-session.log').open('ab') as output:
+            self._blender_process = subprocess.Popen(
+                [str(blender), '--factory-startup', '--disable-autoexec', '--python', str(ROOT / 'scripts/start_blender_mcp.py')],
+                env=env, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT,
+            )
+
+    def start_setup(self):
+        """Start the server and a visible Blender session when the bridge is absent."""
+        config = self.config
+        if config.http_host not in ('localhost', '127.0.0.1') or config.addon_host not in ('localhost', '127.0.0.1'):
+            raise BridgeError('Thiết lập Blender MCP tự động chỉ hỗ trợ địa chỉ loopback.')
+        self._retry_tool_after = 0.0
+        ready = self._addon_probe()
+        starting = self._blender_process is not None and self._blender_process.poll() is None
+        if not ready and not starting and self._listener_open(config.addon_host, config.addon_port, config.timeout):
+            raise BridgeError(f'Cổng Blender {config.addon_port} đang bận hoặc cầu nối không phản hồi.')
+        message = self.start()
+        if ready:
+            return message
+        if starting:
+            return message + ' Đang chờ Blender đã mở phản hồi.'
+        self._open_blender()
+        return message + ' Đã mở Blender cùng cầu nối. Đang xác minh kết nối.'
 
     def start(self):
         if self._process is not None and self._process.poll() is None:
@@ -247,9 +294,9 @@ class BridgeMonitor:
             if self._start_requested.is_set():
                 self._start_requested.clear()
                 try:
-                    self.events.put(('message', self.bridge.start()))
+                    self.events.put(('message', self.bridge.start_setup()))
                 except Exception as error:
-                    self.events.put(('message', 'Không chạy MCP: ' + str(error)))
+                    self.events.put(('start_error', 'Không chạy MCP: ' + str(error)))
             if self._stop.is_set():
                 break
             try:
