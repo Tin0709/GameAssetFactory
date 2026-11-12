@@ -113,6 +113,12 @@ func run() -> void:
 	while is_instance_valid(zombie) and zombie._corpse_age < 4.96:
 		await physics_frame
 	check(is_instance_valid(zombie), "Corpse remains until the table's five-second lifespan")
+	if is_instance_valid(zombie):
+		check(not zombie.ragdoll.running and zombie.ragdoll.bodies.is_empty() and zombie.ragdoll.source_joint_rids.is_empty(),
+			"A grounded, settled corpse releases its physics bodies and joints before despawn")
+		var dissolve: float = zombie._mesh.get_instance_shader_parameter("dissolve")
+		check(zombie._mesh.is_visible_in_tree() and dissolve > 0.0 and dissolve < 1.0,
+			"The retained corpse mesh still dissolves after physics is released")
 	await ticks(6)
 	check(not is_instance_valid(zombie), "Corpse is released after its breakup")
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
