@@ -15,6 +15,7 @@ uniform sampler2D study_ground_sky : filter_nearest, repeat_disable;
 uniform vec2 study_ground_sky_origin;
 uniform vec3 study_ground_sky_scale = vec3(1.0);
 uniform float study_ground_sky_mix = 0.0;
+uniform float study_twilight_ground_ambient = 1.0;
 uniform vec3 study_grass_shade_color = vec3(0.0);
 uniform float study_grass_root_tone = 0.0;
 uniform float study_grass_night_albedo = 0.0;
@@ -198,7 +199,8 @@ void fragment(){
 		EMISSION = mix(EMISSION, cool_fill, shade_mix);
 	}
 	float sole = gaf_player_contact(foliage_world, CAMERA_POSITION_WORLD);
-	AO *= sole;
+	AO *= sole * study_twilight_ground_ambient;
+	EMISSION *= study_twilight_ground_ambient;
 	EMISSION += color * (1.0 - METALLIC) * study_day_bounce_at_root;
 	EMISSION *= sole;
 	if (gaf_diffuse_opening.w > 0.0) {

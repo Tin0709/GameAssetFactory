@@ -332,7 +332,7 @@ func bind(force:bool=false)->void:
 	var direction:Array=cache.get_meta("sun_direction")
 	if not level.look._ground_bounce_requested or sun.global_basis.z.normalized().dot(Vector3(direction[0],direction[1],direction[2]))<cos(deg_to_rad(.1)):key=Vector3.ZERO
 	var env:Environment=level.get_node("WorldEnvironment").environment
-	var scale:=ambient_scale(env)
+	var scale := ambient_scale(env) * float(level.showcase.twilight_ground_ambient_scale())
 	var tint:=ambient_tint(env)
 	var response:bool=level.look.terrain_visibility_response
 	var dielectric:bool=level.look.terrain_dielectric_response and level.look.terrain_review=="combined"

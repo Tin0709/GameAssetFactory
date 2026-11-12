@@ -14,6 +14,7 @@ var _ground_sky_state:=Vector4.INF
 var _grass_shade_color := Vector3.INF
 var _grass_root_tone := -1.
 var _night_albedo := -1.
+var _twilight_ambient := -1.
 var _shadow_height_scale := -1.
 
 func setup(level:Node3D,reader:RefCounted)->void:
@@ -48,6 +49,7 @@ func restore()->void:
 	_grass_shade_color = Vector3.INF
 	_grass_root_tone = -1.
 	_night_albedo = -1.
+	_twilight_ambient = -1.
 	_shadow_height_scale = -1.
 
 func apply(materials:Array[ShaderMaterial],enabled:bool)->void:
@@ -87,6 +89,11 @@ func sync()->void:
 		m.set_shader_parameter("cloud_shape",ground.get_shader_parameter("cloud_shape"))
 		m.set_shader_parameter("cloud_time",look.cloud_clock)
 	_sync_ground_sky()
+	var twilight_ambient: float = world.showcase.twilight_ground_ambient_scale()
+	if twilight_ambient != _twilight_ambient:
+		_twilight_ambient = twilight_ambient
+		for row: Dictionary in _records:
+			row.material.set_shader_parameter("study_twilight_ground_ambient", twilight_ambient)
 	var night_albedo: float = world.showcase.grass_night_albedo_mix()
 	if night_albedo != _night_albedo:
 		_night_albedo = night_albedo

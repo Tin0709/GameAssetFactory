@@ -100,6 +100,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"cool_shadow_detail": ["Cool shadow detail", 1.],
 	&"spruce_sky": ["Forest canopy sky", 1.],
 	&"tree_shade": ["Tree shade depth", 1.],
+	&"twilight_ground_ambient": ["Ánh hắt mặt đất lúc chạng vạng", 1.],
 	&"twilight_crown": ["Ánh hắt trên tán lúc chạng vạng", 1.],
 	&"oak_leaf_tint": ["MD2 oak leaf tint", 1.],
 	&"shadow": ["Shadow strength", 1.],
@@ -150,7 +151,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 73
+const LIGHTING_MIX_VERSION := 74
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -1164,6 +1165,12 @@ func grass_shade_color_mix() -> Vector3:
 	var tint := Vector2(.80, 1.24).lerp(Vector2(.84, 1.14), smoothstep(7., 16.5, hour))
 	return Vector3(tint.x, tint.y, strength) if strength > 0. else Vector3.ZERO
 
+func twilight_ground_ambient_scale() -> float:
+	if not forest_spatial_sky_context() or not captured_sky_response or plants == null or not plants.grass_light.active:
+		return 1.0
+	# Calibrated on the same three WorldMap views, with fog and direct lights fixed.
+	return lerpf(1.0, .55, twilight_finish_weight() * _lighting_scale(&"twilight_ground_ambient"))
+
 func grass_root_tone_mix() -> float:
 	return _lighting_scale(&"grass_root_tone") * _night_grass_weight()
 
@@ -1433,6 +1440,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 73 and effect == &"twilight_crown":
 			missing_value = 0.
+		if version < 74 and effect == &"twilight_ground_ambient":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1482,7 +1491,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and point_response.evening_available()
 		if effect in [&"twilight_sky_chroma", &"twilight_ambient", &"twilight_crown"]:
 			slider.editable = slider.editable and sky_response.twilight_available()
-		if effect == &"twilight_grass_albedo":
+		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
 		if effect == &"twilight_soft_bloom":
 			slider.editable = slider.editable and sky_response.twilight_available() and bloom_response.available()
@@ -1563,6 +1572,11 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface"]:
 		_sync_forest_night_lights()
+		return
+	if changed_effect == &"twilight_ground_ambient":
+		level.terrain_light.bind()
+		if plants != null:
+			plants.grass_light.sync()
 		return
 	if changed_effect == &"twilight_crown":
 		_sync_twilight_crown()
