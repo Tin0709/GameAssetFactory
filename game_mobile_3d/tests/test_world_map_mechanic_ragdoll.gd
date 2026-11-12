@@ -84,11 +84,13 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 			continue
 		var chest: PhysicalBone3D = zombie.ragdoll.bodies.Chest
 		chest_height = minf(chest_height, chest.global_position.y)
-		var state := PhysicsServer3D.body_get_direct_state(chest.get_rid())
-		for i in state.get_contact_count():
-			var collider := state.get_contact_collider_object(i) as Node
-			if collider != null and collider.name == "WorldCollision" and state.get_contact_local_normal(i).y > 0.8:
-				ledge_contact = true
+		for name in ["Head", "Chest"]:
+			var part: PhysicalBone3D = zombie.ragdoll.bodies[name]
+			var state := PhysicsServer3D.body_get_direct_state(part.get_rid())
+			for i in state.get_contact_count():
+				var collider := state.get_contact_collider_object(i) as Node
+				if collider != null and collider.name == "WorldCollision" and state.get_contact_local_normal(i).y > 0.8:
+					ledge_contact = true
 		if zombie._corpse_landed and first_landing < 0:
 			first_landing = frame
 	check(first_landing > 25 and first_landing < 55 and ledge_contact and chest_height < 6.0,
