@@ -32,6 +32,7 @@ const CONE_SUPPORT_OVERSHOOT_COS := cos(deg_to_rad(75.0))
 # SK_Zombie_PhysicsAsset enables linear projection with a 5 cm tolerance.
 const SOURCE_ANCHOR_TOLERANCE := 0.05
 const PROJECTION_COLLISION_MARGIN := 0.001
+const CONTACT_ANCHOR_RECOVERY_MAX_SHIFT := 0.18
 @export var maximum_inherited_linear_speed := 3.0
 @export var maximum_inherited_angular_speed := 10.0
 var skeleton: Skeleton3D
@@ -413,7 +414,9 @@ func _project_source_anchors() -> void:
 			_projection_hit = PhysicsTestMotionResult3D.new()
 		var motion := correction * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
 		if contacting:
-			_project_contacting_anchor(child, state, motion)
+			# Small errors on a supported limb stay with the contact solver.
+			if distance > 2.0 * SOURCE_ANCHOR_TOLERANCE:
+				_project_contacting_anchor(child, state, motion.limit_length(CONTACT_ANCHOR_RECOVERY_MAX_SHIFT))
 			continue
 		_projection_query.from = state.transform
 		_projection_query.motion = motion
