@@ -143,7 +143,7 @@ func _publish_humid_light(effect: CompositorEffect) -> void:
   effect.set_humid_light(0.)
   return
  var camera: Camera3D = level.get_viewport().get_camera_3d()
- var actor: Vector3 = level.player.global_position + Vector3.UP * 1.02
+ var actor: Vector3 = level.presentation.player_position() + Vector3.UP * 1.02
  var extent := level.get_viewport().get_visible_rect().size
  if camera == null or camera.projection != Camera3D.PROJECTION_ORTHOGONAL or camera.is_position_behind(actor) or extent.x <= 0. or extent.y <= 0.:
   effect.set_humid_light(0.)
