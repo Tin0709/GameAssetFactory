@@ -39,7 +39,10 @@ func setup(research_root:String)->void:
 		for i in VOICE_CAPACITY:
 			var player:=AudioStreamPlayer.new();player.name="PrivateSabreVoice%d"%i
 			player.volume_db=-14.;player.pitch_scale=1.;add_child(player);voices.append(player)
-	var path:=resolve_private_file(research_root,"reports/prototype_sabre/private_media_manifest.json")
+	add_manifest(research_root, "reports/prototype_sabre/private_media_manifest.json")
+
+func add_manifest(research_root: String, manifest: String) -> void:
+	var path:=resolve_private_file(research_root,manifest)
 	if path.is_empty() or not FileAccess.file_exists(path):return
 	var data:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not data is Dictionary or data.get("schema","")!="sabre-private-media/1":return

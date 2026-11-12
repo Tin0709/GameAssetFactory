@@ -41,6 +41,21 @@ const SABRE_STRIKES := [
 	},
 ]
 const AIR_STRIKE := {"damage": 20, "range_m": 2.5, "strength": 1150.0, "angle": 25.0, "stagger": 37.0}
+const SWORD_STRIKES := [
+	{
+		"damage": 14, "range_m": 2.75, "strength": 500.0, "angle": 15.0, "stagger": 25.0,
+		"cone_degrees": 70.0, "cone_offset": -1.2, "cone_cutoff": 1.2,
+	},
+	{
+		"damage": 16, "range_m": 2.75, "strength": 500.0, "angle": 15.0, "stagger": 25.0,
+		"cone_degrees": 70.0, "cone_offset": -1.2, "cone_cutoff": 1.2,
+	},
+	{
+		"damage": 22, "range_m": 3.85, "strength": 800.0, "angle": 25.0, "stagger": 40.0,
+		"cone_degrees": 14.0, "cone_offset": -4.0, "cone_cutoff": 4.0,
+	},
+]
+const SWORD_AIR_STRIKE := {"damage": 24, "range_m": 2.5, "strength": 1150.0, "angle": 25.0, "stagger": 37.5}
 const GROUND_HEIGHT_LIMIT := 2.1
 const AIR_CENTRE_OFFSET := 1.5
 const AIR_PRIMARY_RANGE := 1.5
@@ -54,6 +69,7 @@ const IMPULSE_PER_STRENGTH := 0.43
 const MELEE_CONTACT_HEIGHT := Vector3.UP * (Zombie.HEIGHT * 0.5)
 
 var _visual: PackedScene
+var sword_equipped := false
 var _physics_profile: Dictionary
 var _digits: Array[Texture2D]
 var _spawn_serial := 0
@@ -115,7 +131,7 @@ func _spawn_point_clear(point: Vector3, player_position: Vector3) -> bool:
 func aim_sabre(index: int, serial: int, movement: Vector3) -> Vector3:
 	if serial != _aim_serial:
 		_aim_serial = serial
-		_aim_target = _find_melee_target(float(SABRE_STRIKES[index].range_m), movement)
+		_aim_target = _find_melee_target(float(_strikes()[index].range_m), movement)
 	if not is_instance_valid(_aim_target) or _aim_target.health <= 0 or _aim_target.is_queued_for_deletion():
 		return Vector3.ZERO
 	var direction := _aim_target.global_position - _attacker.global_position
@@ -149,11 +165,14 @@ func _melee_ray(origin: Vector3) -> PhysicsRayQueryParameters3D:
 	ray.hit_from_inside = true
 	return ray
 
+func _strikes() -> Array:
+	return SWORD_STRIKES if sword_equipped else SABRE_STRIKES
+
 func strike_sabre(index: int, clip: String, serial: int) -> void:
 	if serial == _attack_serial:
 		return
 	_attack_serial = serial
-	var strike: Dictionary = SABRE_STRIKES[index]
+	var strike: Dictionary = _strikes()[index]
 	var forward := _attacker_visual.global_basis.z
 	forward.y = 0.0
 	forward = forward.normalized()
@@ -206,7 +225,7 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 	var forward := Vector3(facing.x, 0.0, facing.z).normalized()
 	var centre := position + forward * AIR_CENTRE_OFFSET
 	sabre_landing.emit(centre, serial)
-	var strike := AIR_STRIKE.duplicate()
+	var strike := (SWORD_AIR_STRIKE if sword_equipped else AIR_STRIKE).duplicate()
 	if fall_height >= HIGH_FALL_HEIGHT:
 		strike.damage *= 3
 		strike.strength *= 1.4
@@ -230,7 +249,8 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 		_apply_contact(zombie, contact, "AirAttack", 0, serial, strike, forward, distance > AIR_PRIMARY_RANGE)
 
 func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool) -> void:
-	var direction := zombie.global_position - _attacker.global_position if clip == "AirAttack" or index == 2 else forward
+	var radial := clip == "AirAttack" or (index == 2 and not sword_equipped)
+	var direction := zombie.global_position - _attacker.global_position if radial else forward
 	direction.y = 0.0
 	direction = direction.normalized()
 	var damage := roundi(float(strike.damage) * SPLASH_MULTIPLIER) if splash else int(strike.damage)
