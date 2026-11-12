@@ -431,6 +431,8 @@ func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodySt
 	for i in range(0, points.size(), 2):
 		var offset := points[i + 1] - points[i]
 		var depth := offset.length()
+		if depth > TERRAIN_DEEP_RESIDUAL:
+			return
 		if depth <= PROJECTION_COLLISION_MARGIN:
 			continue
 		var separation := motion.dot(offset / depth)
