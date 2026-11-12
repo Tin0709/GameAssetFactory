@@ -3,6 +3,17 @@ varying vec3 terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 varying vec3 terrain_night_sky_light;
 varying vec3 terrain_day_bounce;
+varying float stone_diffuse_log;
+uniform sampler2D stone_diffuse_field : filter_nearest, repeat_disable;
+uniform float stone_diffuse_strength = 0.0;
+
+float gaf_stone_diffuse_sample(int receiver, vec3 world_normal) {
+	if (stone_diffuse_strength <= 0.0 || ground_grade != 3 || abs(world_normal.y) >= 0.1) return 0.0;
+	int width = textureSize(stone_diffuse_field, 0).x;
+	ivec2 pixel = ivec2(receiver % width, receiver / width);
+	// The map stores a bounded log2 ratio over connected coplanar terrain.
+	return (texelFetch(stone_diffuse_field, pixel, 0).r * 255.0 - 128.0) * (0.45 / 127.0);
+}
 #endif
 varying vec3 terrain_sun_bounce;
 varying float terrain_direct_contact;
@@ -27,6 +38,7 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 	vec3 sky = terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
+	if (ground_grade == 3 && stone_diffuse_strength > 0.0) sky *= exp2(stone_diffuse_log * stone_diffuse_strength);
 #endif
 	vec3 irradiance = sky * terrain_ambient_scale * terrain_ambient_tint * visibility + terrain_sun_bounce * terrain_key_radiance * cloud;
 #ifdef GAF_TERRAIN_NIGHT_SKY

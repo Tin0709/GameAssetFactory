@@ -49,6 +49,7 @@ void vertex() {
 	terrain_sky_light = sky * canopy;
 	terrain_night_sky_light = gaf_night_sky(sky, receiver) * canopy;
 	terrain_day_bounce = gaf_day_bounce(receiver);
+	stone_diffuse_log = gaf_stone_diffuse_sample(receiver, MODEL_NORMAL_MATRIX * NORMAL);
 	terrain_sun_bounce = CUSTOM2.rgb;
 #endif
 #ifdef GAF_WORLD_TERRAIN_SKY

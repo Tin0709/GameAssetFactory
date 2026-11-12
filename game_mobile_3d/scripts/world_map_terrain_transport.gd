@@ -25,9 +25,12 @@ var night_sky_texture: ImageTexture
 var night_sky_state := Vector2.ZERO
 var day_bounce_texture: ImageTexture3D
 var day_bounce_key := Vector4.ZERO
+var stone_diffuse_texture: ImageTexture
+var stone_diffuse_strength := 0.0
 var _day_sky_ready := false
 var _night_sky_ready := false
 var _day_bounce_ready := false
+var _stone_diffuse_ready := false
 class TransformWatch extends Node3D:
 	var guard:Node
 	func _notification(what:int)->void:
@@ -134,6 +137,7 @@ func _install()->bool:
 		_day_sky_ready = _regional_sky.has_day_field()
 		_night_sky_ready = _regional_sky.has_night_field()
 		_day_bounce_ready = _regional_sky.has_sun_bounce_field()
+		_stone_diffuse_ready = _regional_sky.has_stone_diffuse_field()
 	return true
 
 func regional_sky_available() -> bool:
@@ -180,6 +184,25 @@ func night_sky_available() -> bool:
 
 func day_bounce_available() -> bool:
 	return _day_bounce_ready
+
+func stone_diffuse_available() -> bool:
+	return _stone_diffuse_ready
+
+func _refresh_stone_diffuse() -> void:
+	var review = level.showcase
+	var strength := 0.0
+	if stone_diffuse_available() and is_active() and review.forest_active() \
+			and not review._balanced_preview and review.atmosphere_review == "combined" \
+			and level.view_mode == "gameplay" and level.look.terrain_review == "combined":
+		strength = review._lighting_scale(&"stone_diffuse_contrast")
+		if strength > 0.0 and stone_diffuse_texture == null:
+			stone_diffuse_texture = _regional_sky.load_stone_diffuse_texture()
+			if stone_diffuse_texture == null:
+				_stone_diffuse_ready = false
+				strength = 0.0
+	if strength != stone_diffuse_strength:
+		stone_diffuse_strength = strength
+		_bind_sky_receivers()
 
 func _refresh_day_bounce() -> void:
 	var review = level.showcase
@@ -231,6 +254,9 @@ func _bind_sky_receivers() -> void:
 		for material in chunk.materials:
 			materials[material] = true
 	for material: ShaderMaterial in materials:
+		material.set_shader_parameter("stone_diffuse_strength", stone_diffuse_strength)
+		if stone_diffuse_strength > 0.0 and material.get_shader_parameter("stone_diffuse_field") != stone_diffuse_texture:
+			material.set_shader_parameter("stone_diffuse_field", stone_diffuse_texture)
 		bind_regional_sky(material)
 	var plants = level.showcase.plants
 	if plants != null and plants.grass_light != null:
@@ -323,3 +349,4 @@ func _process(_delta:float)->void:
 	_refresh_regional_sky()
 	_refresh_night_sky()
 	_refresh_day_bounce()
+	_refresh_stone_diffuse()

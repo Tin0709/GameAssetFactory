@@ -554,7 +554,7 @@ func _project_floor_contact() -> void:
 	# contact. Keep the resting tolerance through small solver velocity spikes.
 	var landing_blended := not source_joint_rids.is_empty() and is_equal_approx(bodies.Head.gravity_scale, 1.0)
 	if landing_blended:
-		return
+		lift -= 0.006
 	if slow or landing_blended:
 		lift -= FLOOR_REST_SLOP - FLOOR_CONTACT_SLOP
 	if lift <= 0.0:

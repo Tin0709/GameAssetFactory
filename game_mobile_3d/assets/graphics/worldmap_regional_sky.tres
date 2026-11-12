@@ -24,3 +24,5 @@ sun_bounce_hours = PackedFloat32Array(5.5, 7, 9.5, 14.5, 16.5, 18.5)
 sun_bounce_directions = PackedVector3Array(-0.6103695, 0.13083187, 0.78123754, -0.58540434, 0.3096388, 0.74928343, -0.515683, 0.54627162, 0.66004419, -0.515683, 0.54627162, 0.66004419, -0.57135493, 0.37249461, 0.73130113, -0.6103695, 0.13083187, 0.78123754)
 sun_bounce_slices = PackedInt32Array(0, 1, 2, 2, 3, 4)
 sun_bounce_layer_count = 5
+stone_diffuse_path = "godot_lab/world_map_unified_showcase_v001/stone_face_transition_v002/diffuse_contrast.private.r8"
+stone_diffuse_sha256 = "980aa2c65c3e3fdf494e80f5659ef66853eb6440d6c3838a198a8cce180be813"
