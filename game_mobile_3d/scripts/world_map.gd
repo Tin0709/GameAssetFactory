@@ -18,6 +18,7 @@ const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 @export var night_mist_region: LocalMistRegion
 @export var regional_sky_region: RegionalSkyRegion
 @export var scene_lighting_mix: SceneLightingMix
+@export var additional_lighting_mixes: Array[SceneLightingMix] = []
 var runtime: Dictionary
 var geometry
 var columns: Dictionary = {}

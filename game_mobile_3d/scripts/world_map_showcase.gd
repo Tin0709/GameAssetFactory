@@ -156,6 +156,7 @@ var _balanced_preview := false
 var _balanced_toggle: CheckButton
 const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 var _scene_mix_button: Button
+var _additional_mix_buttons: Array[Button] = []
 var _near_haze_toggle: CheckButton
 var _save_mix_button: Button
 var _vignette:ColorRect
@@ -1214,6 +1215,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_save_mix_button.disabled = _balanced_preview
 	if _scene_mix_button != null:
 		_scene_mix_button.disabled = _balanced_preview
+	for button in _additional_mix_buttons:
+		button.disabled = _balanced_preview
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
@@ -1624,20 +1627,20 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 	box.add_child(message)
 	var scene_mix: SceneLightingMix = level.scene_lighting_mix
 	if scene_mix != null and not scene_mix.strengths.is_empty():
-		var apply_mix := Button.new()
-		_scene_mix_button = apply_mix
-		apply_mix.name = "SceneLightingMix"
-		apply_mix.text = "Apply " + scene_mix.display_name
-		apply_mix.tooltip_text = "Apply this map's values to the live sliders. Save mix stores the result."
-		apply_mix.focus_mode = Control.FOCUS_NONE
-		actions.add_sibling(apply_mix)
-		apply_mix.pressed.connect(func():
-			var before := _mix_snapshot()
-			var applied := apply_scene_lighting_mix(level.scene_lighting_mix)
-			if applied:
-				_remember_mix_edit(before)
-			message.text = "Map lighting mix applied." if applied else "Map lighting mix is unavailable."
-			message.show())
+		_scene_mix_button = _make_scene_mix_button(scene_mix, message)
+		_scene_mix_button.name = "SceneLightingMix"
+		actions.add_sibling(_scene_mix_button)
+	for preset_index: int in level.additional_lighting_mixes.size():
+		var extra: SceneLightingMix = level.additional_lighting_mixes[preset_index]
+		if extra == null or extra.strengths.is_empty():
+			continue
+		var button := _make_scene_mix_button(extra, message)
+		button.set_meta("settings_item_id", "apply-map-mix-%d" % preset_index)
+		button.set_meta("settings_item_copy", [extra.display_name, extra.display_name,
+			extra.description if not extra.description.is_empty() else "Áp dụng công thức ánh sáng của bản đồ.",
+			extra.review_tip if not extra.review_tip.is_empty() else "Dùng Hoàn tác để khôi phục công thức trước."])
+		_additional_mix_buttons.append(button)
+		box.add_child(button)
 	preset.item_selected.connect(func(_index: int): message.hide())
 	save.pressed.connect(func():
 		var error := save_lighting_mix(preset_path.call())
@@ -1785,6 +1788,20 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		slider.value_changed.connect(func(value: float): set_lighting_scale(effect, value))
 		slider.drag_started.connect(_begin_mix_drag)
 		slider.drag_ended.connect(_end_mix_drag)
+
+func _make_scene_mix_button(mix: SceneLightingMix, message: Label) -> Button:
+	var button := Button.new()
+	button.text = "Apply " + mix.display_name
+	button.tooltip_text = "Áp dụng công thức cho các thanh trượt đang dùng."
+	button.focus_mode = Control.FOCUS_NONE
+	button.pressed.connect(func():
+		var before := _mix_snapshot()
+		var applied := apply_scene_lighting_mix(mix)
+		if applied:
+			_remember_mix_edit(before)
+		message.text = ("Đã áp dụng " if applied else "Chưa áp dụng được ") + mix.display_name
+		message.show())
+	return button
 
 func _build_basic_settings() -> void:
 	var hud: CanvasLayer = level.get_node("HUD")

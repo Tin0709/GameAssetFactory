@@ -46,6 +46,8 @@ var _full := false
 var _info: PanelContainer
 var _info_trigger: Button
 var _widgets: Dictionary = {}
+var _items := Copy.ITEMS.duplicate()
+var _map_mix_ids: Array[String] = []
 var _sliders: Dictionary = {}
 var _undo_button: Button
 var _history: Array[Callable] = []
@@ -204,6 +206,10 @@ func _collect(legacy: VBoxContainer, sliders: Dictionary) -> void:
 
 func _collect_widget(node: Node) -> void:
 	var id: String = NAMED.get(String(node.name), "")
+	if node.has_meta("settings_item_id"):
+		id = node.get_meta("settings_item_id")
+		_items[id] = node.get_meta("settings_item_copy")
+		_map_mix_ids.append(id)
 	if id.is_empty() and node is Button and not node is OptionButton:
 		id = _regex.sub(node.text.to_lower(), "-", true).strip_edges().trim_prefix("-").trim_suffix("-")
 	if not id.is_empty():
@@ -212,16 +218,16 @@ func _collect_widget(node: Node) -> void:
 func _register(id: String, widget: Control) -> void:
 	_widgets[id] = widget
 	widget.reparent(_park)
-	if Copy.ITEMS.has(id):
+	if _items.has(id):
 		if widget is HBoxContainer:
 			var caption := widget.get_child(0) as Label
-			caption.text = Copy.ITEMS[id][0]
+			caption.text = _items[id][0]
 			caption.custom_minimum_size.x = 0
 			caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			caption.size_flags_stretch_ratio = 1.5
 			caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		elif widget is Button and not widget is OptionButton:
-			widget.text = Copy.ITEMS[id][0]
+			widget.text = _items[id][0]
 			if widget is CheckButton:
 				widget.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	if widget is Label:
@@ -395,7 +401,9 @@ func _build_quick() -> void:
 	_add_row(time, "original-gaf-day-night-preview")
 	var mix := _section("Preset ánh sáng")
 	_add_row_buttons(mix, ["preset"] + PRESETS)
-	_add_row(mix, "apply-forest")
+	_add_row_buttons(mix, ["apply-forest"] + _map_mix_ids.slice(0, 1))
+	for id: String in _map_mix_ids.slice(1):
+		_add_row(mix, id)
 	_add_row(mix, "preset-message")
 	var main := _section("Điều chỉnh ban đêm" if _night else "Điều chỉnh ban ngày")
 	for id: String in (NIGHT_QUICK if _night else DAY_QUICK):
@@ -404,8 +412,8 @@ func _build_quick() -> void:
 func _build_results(query: String) -> void:
 	var results := _section("Kết quả tìm kiếm")
 	var found := 0
-	for id: String in Copy.ITEMS:
-		var entry: Array = Copy.ITEMS[id]
+	for id: String in _items:
+		var entry: Array = _items[id]
 		if id == COMPARE or not _widgets.has(id):
 			continue
 		if _fold(entry[0] + " " + entry[1]).contains(query):
@@ -460,7 +468,7 @@ func _add_row(parent: VBoxContainer, id: String) -> void:
 	var row := HBoxContainer.new()
 	stack.add_child(row)
 	if widget is OptionButton:
-		var caption := _label(Copy.ITEMS[id][0])
+		var caption := _label(_items[id][0])
 		caption.custom_minimum_size.x = 138
 		row.add_child(caption)
 	widget.reparent(row)
@@ -485,7 +493,7 @@ func _info_button(id: String, parent: VBoxContainer) -> Button:
 	var button := _button("ⓘ")
 	button.name = "Info_" + id
 	button.custom_minimum_size = Vector2(28, 30)
-	button.tooltip_text = "Thông tin về " + Copy.ITEMS[id][0]
+	button.tooltip_text = "Thông tin về " + _items[id][0]
 	button.add_theme_color_override("font_color", ACCENT)
 	button.pressed.connect(_toggle_info.bind(id, parent, button))
 	return button
@@ -502,7 +510,7 @@ func _toggle_info(id: String, parent: VBoxContainer, button: Button) -> void:
 	parent.add_child(_info)
 	var layout := VBoxContainer.new()
 	_info.add_child(layout)
-	var entry: Array = Copy.ITEMS[id]
+	var entry: Array = _items[id]
 	var title := _label(entry[0], 16)
 	title.add_theme_color_override("font_color", ACCENT)
 	layout.add_child(title)
