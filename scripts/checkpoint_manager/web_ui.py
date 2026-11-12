@@ -8,8 +8,13 @@ import queue
 import secrets
 import shutil
 import subprocess
+import tempfile
 import threading
-import time
+
+from dev import find_tool, godot_command
+
+from .blender_views import VIEW_LABELS
+from .core import redact
 
 
 ASSETS = Path(__file__).with_name('web')
@@ -34,7 +39,6 @@ def valid_action(data):
             return fields == {'repo', 'enabled'} and type(data['enabled']) is bool
         return fields == {'repo'}
     if action in {'shortcut', 'copy-shortcut'}:
-        from .blender_views import VIEW_LABELS
         return fields == {'view'} and isinstance(data['view'], str) and data['view'] in VIEW_LABELS
     if action == 'settings':
         return fields == {'seconds'} and type(data['seconds']) is int and 10 <= data['seconds'] <= 3600
@@ -164,7 +168,6 @@ class WebNotifications:
         self.serial = 0
 
     def show(self, title, detail, kind='info'):
-        from .core import redact
         self.serial += 1
         self.state = dict(id=self.serial, title=redact(title), detail=redact(detail)[:1200], kind=kind)
 
@@ -196,17 +199,20 @@ class WebWindow:
         except OSError:
             self.theme = 'dark'
         self.theme = 'light' if self.theme == 'light' else 'dark'
+        self.godot_ready = self._godot_available()
         self.ui = LocalUI()
+        self.profile = tempfile.TemporaryDirectory(dir=app.state_dir, prefix='liquid-glass-', ignore_cleanup_errors=True)
         try:
             with (app.state_dir / 'browser-window.log').open('ab') as output:
                 self.process = subprocess.Popen(
-                    [str(browser), f'--user-data-dir={app.state_dir / "liquid-glass-profile"}',
-                     '--no-first-run', '--disable-background-mode', '--window-size=1400,980',
+                    [str(browser), f'--user-data-dir={self.profile.name}',
+                     '--no-first-run', '--no-default-browser-check', '--disable-background-mode', '--window-size=1400,980',
                      f'--app={self.ui.origin}/#{self.ui.token}'],
                     stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT,
                 )
         except OSError:
             self.ui.close()
+            self.profile.cleanup()
             raise
         app.dialog = WebDialog()
         app.notifications = WebNotifications()
@@ -224,14 +230,22 @@ class WebWindow:
         self.ui.publish(self._snapshot())
         app.after_ids['web'] = app.root.after(180, self._poll)
 
+    @staticmethod
+    def _godot_available():
+        try:
+            godot_command(find_tool('godot'), scene=None, editor=False, headless=False)
+            return True
+        except (OSError, ValueError):
+            return False
+
     def _snapshot(self):
         app = self.app
         repos = {}
-        for key, name in REPO_NAMES.items():
-            if name not in [config.name for config in app.configs]:
+        keys = {name: key for key, name in REPO_NAMES.items()}
+        for index, config in enumerate(app.configs):
+            if config.name not in keys:
                 continue
-            index = next(i for i, config in enumerate(app.configs) if config.name == name)
-            config, snapshot = app.configs[index], app.snapshots[index]
+            key, snapshot = keys[config.name], app.snapshots[index]
             ahead, behind = None, None
             if snapshot and len(counts := snapshot.ahead_behind.split()) == 2 and all(n.isdecimal() for n in counts):
                 ahead, behind = map(int, counts)
@@ -244,9 +258,11 @@ class WebWindow:
                               ignored=len(snapshot.changes) - len(snapshot.eligible) if snapshot else None,
                               staged=snapshot.staged if snapshot else None)
         bridge = app.bridge_status
+        gameplay = app.gameplay_process
+        godot = dict(available=self.godot_ready, running=gameplay is not None and gameplay.poll() is None)
         return dict(theme=self.theme, interval=app.schedule.interval, busy=app.busy,
                     remaining=max(0, round(app.schedule.last + app.schedule.interval - app.clock())),
-                    repos=repos, logs=list(app.recent_log), notice=app.notifications.state,
+                    repos=repos, logs=list(app.recent_log), notice=app.notifications.state, godot=godot,
                     dialog=app.dialog.state, bridge=dict(label=bridge.label, detail=bridge.detail,
                                                         connected=bridge.connected, starting=app.bridge_starting))
 
@@ -258,6 +274,7 @@ class WebWindow:
         if action in simple:
             simple[action]()
         elif action == 'refresh':
+            self.godot_ready = self._godot_available()
             app.refresh()
             app.refresh_blender()
         elif action == 'settings':
@@ -307,3 +324,4 @@ class WebWindow:
 
     def close(self):
         self.ui.close()
+        self.profile.cleanup()

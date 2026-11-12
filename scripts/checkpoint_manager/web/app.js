@@ -154,6 +154,9 @@ function render(state) {
   $('#sidebar-progress').style.width = (repos.length ? 100 * enabled / repos.length : 0) + '%';
   $('.sidebar-bottom .status-light').classList.toggle('warn', !enabled);
   const systems = $$('.system-item');
+  systems[0].querySelector('small').textContent = state.godot.running ? 'Đang chạy' :
+    state.godot.available ? 'Đã cấu hình' : 'Chưa tìm thấy';
+  systems[0].querySelector('.status-light').classList.toggle('warn', !state.godot.available);
   const bridgeLabel = state.bridge.starting ? 'Đang khởi động…' : state.bridge.label;
   systems[1].querySelector('small').textContent = bridgeLabel;
   systems[1].querySelector('.status-light').classList.toggle('warn', !state.bridge.connected);
@@ -171,8 +174,12 @@ function render(state) {
     const {id, title, detail, kind} = state.notice;
     noticeId = id;
     if (kind === 'copy') {
-      navigator.clipboard.writeText(detail).then(() => notify('Đã sao chép đường dẫn', detail))
-        .catch(() => notify('Sao chép đường dẫn này', detail));
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(detail).then(() => notify('Đã sao chép đường dẫn', detail))
+          .catch(() => notify('Sao chép đường dẫn này', detail));
+      } else {
+        notify('Sao chép đường dẫn này', detail);
+      }
     } else {
       notify(title, detail);
     }
