@@ -1559,6 +1559,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"daylight_haze":
 			slider.editable = DepthDiffusion.supported(level.get_viewport())
 			slider.tooltip_text = "Soften the distant lit mist in the morning and afternoon. 0% restores the prior finish. Requires Mobile D3D12 and 2× MSAA."
+		if effect == &"daylight_haze_spill":
+			slider.editable = DepthDiffusion.supported(level.get_viewport())
+			slider.tooltip_text = "Blend from the earlier daylight haze to light spilling from bright areas into nearby shade. Requires Daylight haze softness."
 		if effect == &"humid_light":
 			slider.tooltip_text = "Soften lit areas into the surrounding haze. Try 65% at 16:30. Requires Combined mist and the Mobile Forest finish. Noon keeps its approved look."
 		if effect == &"humid_depth":
