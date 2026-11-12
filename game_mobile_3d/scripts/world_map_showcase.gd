@@ -1413,6 +1413,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
 		if effect == &"forest_near_scatter":
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
+		if effect == &"sunlit_mist":
+			slider.editable = directional_air.available()
+			slider.tooltip_text = "Try 24% in the forest at 16:30. Scatters sunlight through canopy gaps; fades to zero at noon and night." if slider.editable else "Requires the verified private canopy field and the Mobile renderer."
 		if effect == &"forest_path_beam":
 			slider.tooltip_text = "Aim the fixed forest light downward across the path using the captured angular falloff. Set 0% to compare the previous beam."
 		if effect == &"forest_path_air":

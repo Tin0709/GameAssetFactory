@@ -36,7 +36,7 @@ func setup(level: Node3D, review: Node) -> void:
 		return
 	var folder := root.path_join(FOLDER)
 	var proof_path := folder.path_join(PROOF)
-	if FileAccess.get_sha256(proof_path) != PROOF_SHA:
+	if not FileAccess.file_exists(proof_path) or FileAccess.get_sha256(proof_path) != PROOF_SHA:
 		return
 	var proof: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(proof_path))
 	var geometry_path := folder.path_join("geometry.private.json")
@@ -66,7 +66,7 @@ func setup(level: Node3D, review: Node) -> void:
 			return
 		_casters.append({"node": caster, "pose": pose, "mesh": caster.mesh})
 	var path := proof_path.get_base_dir().path_join("daylight.private.r8")
-	if FileAccess.get_sha256(path) != proof.sha256:
+	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != proof.sha256:
 		return
 	var shape := Vector3i(_vector(proof.dimensions))
 	var data := FileAccess.get_file_as_bytes(path)
