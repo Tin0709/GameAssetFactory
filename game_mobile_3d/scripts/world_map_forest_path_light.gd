@@ -16,14 +16,29 @@ var light: OmniLight3D
 var _material: ShaderMaterial
 var _attempted := false
 var _submitted := Vector2.ZERO
+var _submitted_offset := Vector2.ZERO
 
-func update(world: Node3D, phase: float, strength: float) -> bool:
+func update(world: Node3D, phase: float, strength: float, offset := Vector2.ZERO) -> bool:
 	var state := Vector2(phase, ENERGY * strength * phase) if strength > 0.0 else Vector2.ZERO
 	if state.y > 0.0 and not _attempted:
 		_attempted = true
 		_load(world)
-	if not is_instance_valid(fixture) or state == _submitted:
+	if not is_instance_valid(fixture):
 		return false
+	var moved := false
+	if offset.is_finite() and offset != _submitted_offset:
+		_submitted_offset = offset
+		var anchor := ANCHOR + offset
+		var ground: float = world.surface_height(anchor.x, anchor.y)
+		if not is_finite(ground):
+			anchor = ANCHOR
+			ground = world.surface_height(anchor.x, anchor.y)
+		if is_finite(ground):
+			var position := Vector3(anchor.x + 1.0, ground, anchor.y + 1.0)
+			moved = fixture.position != position
+			fixture.position = position
+	if state == _submitted:
+		return moved
 	_submitted = state
 	fixture.visible = state.y > 0.0
 	light.light_energy = state.y

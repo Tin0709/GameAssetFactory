@@ -21,5 +21,6 @@ strengths = Dictionary[StringName, float]({
 &"night_spatial_sky": 0.65,
 &"night_stone_fill_balance": 0.72,
 &"bloom_diffusion": 0.60,
-&"sculk_surface": 0.65
+&"sculk_surface": 0.65,
+&"forest_path_placement": 1.0
 })

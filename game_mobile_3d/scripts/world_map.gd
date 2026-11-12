@@ -21,6 +21,8 @@ const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 @export var additional_lighting_mixes: Array[SceneLightingMix] = []
 ## Optional origins for the 2 m private Sculk vein meshes, on flat terrain.
 @export var sculk_surface_sites: PackedVector2Array
+## Optional second position for the fixed forest light, relative to its base anchor.
+@export var forest_path_light_offset := Vector2.ZERO
 ## Optional translation in the two axes of the projected sunlight plane.
 @export var projected_sun_shift := Vector2.ZERO
 var runtime: Dictionary
