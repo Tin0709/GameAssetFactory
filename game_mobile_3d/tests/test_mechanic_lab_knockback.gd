@@ -63,6 +63,24 @@ func run() -> void:
 	check(first_chase_step >= step_limit - 1 and first_chase_step <= step_limit + 1,
 		"The zombie resumes chasing after 0.4 s, measured step %d" % first_chase_step)
 	check(zombie.animation.current_animation in ZOMBIE.WALK_CLIPS, "The zombie returns to its locomotion clip")
+	var after_chase: float = zombie.position.z
+	zombie.take_hit(3, Vector3.BACK, Vector2(200.0, 0.0), 0.0)
+	await ticks(2)
+	check(zombie.position.z < after_chase, "A splash hit with no lab knockback leaves the chase active")
+
+	zombie.position = Vector3(0.0, 0.0, 1.36)
+	for i in Engine.physics_ticks_per_second:
+		if zombie.animation.current_animation == ZOMBIE.ATTACK and zombie.animation.current_animation_position >= 0.12:
+			break
+		await physics_frame
+	var player_hp: int = lab.player_health
+	zombie.take_hit(1, Vector3.RIGHT, Vector2(4.0, 0.0), 1.0)
+	check(zombie.animation.current_animation == ZOMBIE.ATTACK, "Movement lock does not restart an active windup below the poise threshold")
+	for i in Engine.physics_ticks_per_second:
+		if lab.player_health < player_hp:
+			break
+		await physics_frame
+	check(lab.player_health == player_hp - 6, "The active attack can still connect if the player stays in reach")
 	lab.free()
 	print("MECHANIC_LAB_KNOCKBACK first_chase_step=", first_chase_step,
 		" travel=", furthest - at_contact, " failures=", failures)
