@@ -138,11 +138,11 @@ func _process(delta: float) -> void:
 			_shake_duration = 0.0
 		else:
 			_shake_age = minf(_shake_age + delta, _shake_duration)
-	if _light_remaining > 0.0:
-		_light_remaining = maxf(0.0, _light_remaining - delta)
+	if _impact_light.visible:
 		var decay := _light_remaining / CONTACT_LIGHT_DURATION
 		_impact_light.light_energy = _light_peak * decay * decay
 		_impact_light.visible = _light_remaining > 0.0
+		_light_remaining = maxf(0.0, _light_remaining - delta)
 
 func _set_combat_audio(enabled: bool) -> void:
 	if _combat_audio == null:
