@@ -8,6 +8,7 @@ static var _owner: WeakRef
 
 var proof_ready := false
 var applied_strength := 0.
+var applied_tree_strength := 0.
 var _level: Node3D
 var _camera: Camera3D
 var _texture: ImageTexture3D
@@ -71,6 +72,7 @@ func setup(level: Node3D) -> void:
 		return
 	_owner = weakref(self)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_region", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_extent", Vector3(_dimensions))
 	RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", _texture)
 	proof_ready = true
@@ -92,6 +94,7 @@ func _process(_delta: float) -> void:
 func refresh() -> void:
 	if not proof_ready or _owner == null or _owner.get_ref() != self:
 		applied_strength = 0.
+		applied_tree_strength = 0.
 		return
 	var strength := 0.
 	var review = _level.showcase
@@ -102,6 +105,12 @@ func refresh() -> void:
 	if strength != applied_strength:
 		applied_strength = strength
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_region", Vector4(_origin.x, _origin.y, _origin.z, strength))
+	var tree_strength := 0.
+	if strength > 0.:
+		tree_strength = review._lighting_scale(&"tree_shade") * review._balanced_daylight_weight()
+	if tree_strength != applied_tree_strength:
+		applied_tree_strength = tree_strength
+		RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", tree_strength)
 	if strength > 0. and _published_camera != _camera.global_position:
 		_published_camera = _camera.global_position
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_camera", _published_camera)
@@ -109,5 +118,6 @@ func refresh() -> void:
 func _exit_tree() -> void:
 	if _owner != null and _owner.get_ref() == self:
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_region", Vector4.ZERO)
+		RenderingServer.global_shader_parameter_set("gaf_grove_sky_strength", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_spruce_sky_volume", null)
 		_owner = null

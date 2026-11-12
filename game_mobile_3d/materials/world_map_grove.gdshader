@@ -4,6 +4,9 @@ render_mode alpha_to_coverage_and_one;
 #endif
 #include "res://materials/world_map_wind.gdshaderinc"
 #include "res://materials/world_map_crown_wind.gdshaderinc"
+#include "res://materials/world_map_spruce_sky.gdshaderinc"
+global uniform float gaf_grove_sky_strength;
+varying float tree_sky;
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/leaf_material_v001/leaf_material.gdshaderinc"
 #ifdef GAF_SHARED_MIST
 #include "res://materials/world_map_mist.gdshaderinc"
@@ -62,6 +65,13 @@ void vertex() {
 		vec3 pivot = vec3(0.0, 2.0, 0.0);
 		VERTEX = pivot + rotate_plant(VERTEX - pivot, bend);
 		NORMAL = rotate_plant(NORMAL, bend);
+	}
+	tree_sky = 1.0;
+	if (use_source_atlas && gaf_grove_sky_strength > 0.0) {
+		vec3 point = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+		float ceiling = gaf_spruce_sky_region.y + gaf_spruce_sky_extent.y - 1.0;
+		float edge = 1.0 - smoothstep(ceiling - 1.0, ceiling, point.y);
+		tree_sky = mix(1.0, gaf_spruce_sky(point, INV_VIEW_MATRIX[3].xyz), edge);
 	}
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	grove_world_xz = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;
@@ -136,6 +146,13 @@ void fragment() {
 	ALPHA_ANTIALIASING_EDGE = coverage == 0.5 ? 0.499 : 0.0;
 	ALPHA_TEXTURE_COORDINATE = FRAGCOORD.xy;
 #endif
+	if (use_source_atlas && gaf_grove_sky_strength > 0.0) {
+		// Warm atlas bark receives stronger shade than the green crown.
+		float wood = smoothstep(1.05, 1.30, albedo.r / max(albedo.g, 0.001));
+		float amount = gaf_grove_sky_strength * mix(0.29411765, 1.0, wood);
+		AO = mix(1.0, tree_sky, amount);
+		AO_LIGHT_AFFECT = 0.0;
+	}
 	ALBEDO = albedo;
 	ROUGHNESS = 0.95;
 	SPECULAR = native_specular;

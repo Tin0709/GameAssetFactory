@@ -80,6 +80,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
 	&"spruce_sky": ["Forest canopy sky", 1.],
+	&"tree_shade": ["Tree shade depth", 1.],
 	&"oak_leaf_tint": ["MD2 oak leaf tint", 1.],
 	&"shadow": ["Shadow strength", 1.],
 	&"shadow_softness": ["Shadow softness", 1.5],
@@ -109,7 +110,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 36
+const LIGHTING_MIX_VERSION := 37
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -130,6 +131,7 @@ const BALANCED_ATMOSPHERE := {
 	&"player_sky": 1.25,
 	&"grass_sky": 0.,
 	&"spruce_sky": 0.,
+	&"tree_shade": 0.,
 	&"forest_path_air": 0.,
 	&"forest_path_beam": 0.,
 	&"oak_leaf_tint": 0.,
@@ -840,6 +842,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .5
 	if effect == &"shadow_softness":
 		return DAYLIGHT_SHADOW_SOFTNESS
+	if effect == &"tree_shade":
+		return .85
 	if effect == &"spruce_sky":
 		return .5
 	if effect == &"tree_wind":
@@ -1001,7 +1005,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1059,6 +1063,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 33 and effect == &"projected_sun":
 			missing_value = 0.
 		if version < 34 and effect == &"humid_depth":
+			missing_value = 0.
+		if version < 37 and effect == &"tree_shade":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
 			missing_value = 0.
@@ -1150,7 +1156,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
 		_update_mist()
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_shadow_reach", &"spruce_sky"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
 		return
 	if changed_effect in [&"player_sky", &"player_bounce"]:
 		if level.player_light != null:
@@ -1490,6 +1496,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Recover color in deep blue shadows at dawn and dusk while keeping their brightness. Requires the reference finish in Combined mode."
 		if effect == &"spruce_sky":
 			slider.tooltip_text = "Reduce sky fill under the private spruce on terrain, grass, and the player. Zero restores the prior fill. Noon fades to zero."
+		if effect == &"tree_shade":
+			slider.tooltip_text = "Use Forest canopy sky on the trees in daylight. The trunks pick up more shade than the leaves. 0% compares the previous lighting."
 		if effect == &"near_haze":
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
 		if effect == &"near_haze_depth":
