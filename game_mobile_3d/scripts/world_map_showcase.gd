@@ -1839,6 +1839,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Blend the captured-reference finish with the original palette and tone curve. Local exposure stays active."
 		if effect == &"sky_chroma":
 			slider.tooltip_text = "Reduce the color of ambient sky light at fixed luminance. Noon uses its approved sky color."
+		if effect == &"dawn_sky_transition":
+			slider.editable = sky_response.available()
+			slider.tooltip_text = "Thử 35% lúc 02:30 để ánh sáng hắt chuyển dần sang rạng sáng. 0% dùng cấu hình gốc."
 		if effect == &"daylight_balance":
 			slider.tooltip_text = "Reduce the blue cast of daytime shadows in Combined mode. 0% restores the previous balance. Noon and night keep their own look."
 		if effect == &"player_sky":
