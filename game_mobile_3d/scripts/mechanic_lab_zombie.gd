@@ -31,7 +31,7 @@ const DEATH_SPEED_TO_LAB := 0.0088
 const DEATH_TIER_INFLUENCE := 0.75
 const DEATH_ANGULAR_TO_LAB := 0.14
 # Honeycomb Fields footage puts lethal hit to body-down near 0.6 seconds.
-const DEATH_GRAVITY := 24.0
+const DEATH_FLIGHT_GRAVITY := 21.0
 const DEATH_LANDING_LINEAR_DAMP := 7.0
 const DEATH_LANDING_ANGULAR_DAMP := 10.0
 const HEIGHT := 1.95
@@ -318,7 +318,7 @@ func _update_death(delta: float) -> void:
 		launch.linear_impulse = cos(angle) * launch_impulse
 		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
-		if ragdoll.begin(launch, direction, "Chest", 0.0, DEATH_GRAVITY):
+		if ragdoll.begin(launch, direction, "Chest", 0.0, DEATH_FLIGHT_GRAVITY):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	if not _corpse_landed and ragdoll.contact_motion().core_contacts > 0:
@@ -327,6 +327,7 @@ func _update_death(delta: float) -> void:
 		# Absorb the landing once the torso reaches the floor. Physics still
 		# owns the remaining slide and the pose of every joint.
 		for body: PhysicalBone3D in ragdoll.bodies.values():
+			body.gravity_scale = 1.0
 			body.linear_damp = DEATH_LANDING_LINEAR_DAMP
 			body.angular_damp = DEATH_LANDING_ANGULAR_DAMP
 	var remaining := CORPSE_LIFETIME - _corpse_age
