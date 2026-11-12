@@ -38,7 +38,9 @@ func _candidate(data:RenderData)->Dictionary:
 	var state:Dictionary=native.rendered_source()
 	var strength:=float(state.get("strength",0.))
 	if state.get("frame",-1)!=native._frames or not is_finite(strength)or strength<=0. or strength>1.:return {}
-	bytes.append_array(PackedFloat32Array([strength,strength,0.,0.]).to_byte_array())
+	var shadow_lift:=float(state.get("shadow_lift",1.))
+	if not is_finite(shadow_lift)or shadow_lift<0. or shadow_lift>1.:return {}
+	bytes.append_array(PackedFloat32Array([strength,strength,shadow_lift,0.]).to_byte_array())
 	return {"raw":raw,"grid":grid,"blur":blur,"parameters":bytes}
 
 func _render_callback(kind:int,data:RenderData)->void:
@@ -101,7 +103,8 @@ float source_gain(vec3 rgb,vec2 uv){
  float broad=textureLod(source_broad_log,uv,0.).r;
  float local=pair.y<s[1].y?broad:pair.x/pair.y;
  float delta=local+(broad-local)*s[1].x+log2(s[0].x/s[0].y);
- float contrast=mix(1.,delta>0.?s[0].z:s[0].w,s[4].x);
+ float strength=delta>0.?s[4].x:s[4].x*s[4].z;
+ float contrast=mix(1.,delta>0.?s[0].z:s[0].w,strength);
  return exp2((contrast-1.)*delta);
 }
 """

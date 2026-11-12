@@ -121,7 +121,8 @@ func refresh()->void:
   for key in ["tonemap_mode","tonemap_exposure","adjustment_enabled"]:_saved[key]=env.get(key)
  var gain_scale:float=showcase.local_exposure_mix_scale()
  var finish_scale:float=showcase.reference_finish_mix_scale()
- _native.set_strength(weight*gain_scale);effect.set_review_strength(_saved_strength*(1.-weight)*gain_scale)
+ _native.set_strength(weight*gain_scale,showcase.daylight_shadow_lift())
+ effect.set_review_strength(_saved_strength*(1.-weight)*gain_scale)
  effect.set_finish_weight(weight*finish_scale);effect.set_reference_grade(true)
  var shadow_color: float = showcase._lighting_scale(&"twilight_shadow_color") * showcase.twilight_color_weight() if finish_scale > 0. else 0.
  effect.set_twilight_shadow_color(shadow_color)

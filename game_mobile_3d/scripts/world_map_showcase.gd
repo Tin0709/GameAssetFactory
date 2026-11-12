@@ -108,10 +108,11 @@ const LIGHTING_MIX_CONTROLS := {
 	&"tree_wind": ["Tree canopy wind", CrownWind.MAX_STRENGTH],
 	&"night_path_chroma": ["Night path color", 1.],
 	&"exposure": ["Local exposure", 1.],
+	&"daylight_shadow_lift": ["Daylight shadow lift", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 39
+const LIGHTING_MIX_VERSION := 40
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -928,6 +929,12 @@ func local_exposure_mix_scale() -> float:
 		return lerpf(1., scale, PHASE_FINISH.phase_weight(hour)) if _balanced_preview else scale
 	return 1.
 
+func daylight_shadow_lift() -> float:
+	if _balanced_preview:
+		return 1.
+	var daylight := smoothstep(5.5, 7., hour) * (1. - smoothstep(16.5, 19., hour))
+	return lerpf(1., _lighting_scale(&"daylight_shadow_lift"), daylight)
+
 func bounded_exposure_strength() -> float:
 	return LOCAL_EXPOSURE_STRENGTH * local_exposure_mix_scale()
 
@@ -1025,7 +1032,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1090,6 +1097,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 39 and effect == &"daylight_haze_spill":
 			missing_value = 0.
+		if version < 40 and effect == &"daylight_shadow_lift":
+			missing_value = 1.
 		if version < 36 and effect == &"daylight_haze":
 			missing_value = 0.
 		if version < 35 and effect == &"sun_opening":
@@ -1186,7 +1195,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if level.player_light != null:
 			level.player_light.refresh()
 		return
-	if changed_effect in [&"exposure", &"grade"]:
+	if changed_effect in [&"exposure", &"daylight_shadow_lift", &"grade"]:
 		_apply_bounded_exposure_mix()
 		if phase_finish != null:
 			phase_finish.refresh()
@@ -1501,6 +1510,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		slider.tooltip_text = "100% uses the current time preset. Original graphics (B) ignores this mix."
 		if effect == &"exposure":
 			slider.tooltip_text = "Scales local contrast gain. The color grade remains active."
+		if effect == &"daylight_shadow_lift":
+			slider.tooltip_text = "Try 75% at 07:00 or 16:30 to deepen shaded areas. 100% restores the current look. Requires the humid Forest finish and local exposure."
 		if effect == &"moon":
 			slider.tooltip_text = "Scales the cool directional night light. Hip lantern, ambient sky, and daytime sunlight are independent."
 		if effect == &"grade":
