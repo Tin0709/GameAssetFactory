@@ -103,6 +103,7 @@ func _ready() -> void:
 	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
 	$HUD/CombatAudioToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
+	$HUD/RagdollTuning.visible = not $HUD/SpawnZombie.disabled
 	$HUD/DropMedium.disabled = $HUD/SpawnZombie.disabled
 	$HUD/DropHigh.disabled = $HUD/SpawnZombie.disabled
 	$HUD/PlayerHealth.visible = not $HUD/SpawnZombie.disabled
@@ -363,6 +364,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			_:
 				return
 		get_viewport().set_input_as_handled()
+
+func _set_ragdoll_launch(percent: float) -> void:
+	$Zombies.ragdoll_launch_multiplier = percent * 0.01
+	$HUD/RagdollTuning/Launch/Value.text = "Lực văng ragdoll · %d%%" % roundi(percent)
+
+func _set_ragdoll_gravity(percent: float) -> void:
+	$Zombies.ragdoll_gravity_multiplier = percent * 0.01
+	$HUD/RagdollTuning/Gravity/Value.text = "Trọng lực ragdoll · %d%%" % roundi(percent)
 
 func _spawn_zombie() -> void:
 	var facing := Basis(Vector3.UP, player.visual.rotation.y)

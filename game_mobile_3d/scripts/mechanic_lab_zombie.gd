@@ -118,6 +118,8 @@ var animation: AnimationPlayer
 var ragdoll: Ragdoll
 var max_health := TRAINING_HEALTH
 var health := TRAINING_HEALTH
+var ragdoll_launch_multiplier := 1.0
+var ragdoll_gravity_multiplier := 1.0
 var _feedback: Feedback
 var _mesh: MeshInstance3D
 var _walk_clip: StringName
@@ -428,7 +430,7 @@ func _update_death(delta: float) -> void:
 			head.bounce = DEATH_SOURCE_RESTITUTION
 		var launch := _death_profile.duplicate() as DeathProfile
 		var angle := deg_to_rad(DEATH_LAUNCH_ANGLE)
-		var launch_impulse := _death_launch_speed(_death_strength) * mass
+		var launch_impulse := _death_launch_speed(_death_strength) * mass * ragdoll_launch_multiplier
 		launch.linear_impulse = cos(angle) * launch_impulse
 		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
@@ -437,7 +439,8 @@ func _update_death(delta: float) -> void:
 			floor_impact_limb_share = SABRE_FINISHER_FLOOR_LIMB_SHARE
 		elif _death_strike == DeathStrike.SABRE_GROUND:
 			floor_impact_limb_share = SABRE_GROUND_FLOOR_LIMB_SHARE
-		if ragdoll.begin(launch, direction, "Chest", 0.0, ZOMBIE_GRAVITY, _corpse_floor, floor_impact_limb_share):
+		var flight_gravity := ZOMBIE_GRAVITY * ragdoll_gravity_multiplier
+		if ragdoll.begin(launch, direction, "Chest", 0.0, flight_gravity, _corpse_floor, floor_impact_limb_share):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	var contact := ragdoll.contact_motion()
@@ -500,11 +503,12 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
 	var flight_gravity_scale := _gravity_scale(ZOMBIE_GRAVITY)
 	var gravity_scale := flight_gravity_scale if wall_gravity else lerpf(flight_gravity_scale, 1.0, gravity_blend)
+	ragdoll.floor_landing_blended = not wall_gravity and is_equal_approx(gravity_blend, 1.0)
 	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 	var base_angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 	var angular_damp := lerpf(base_angular_damp, DEATH_SUPPORTED_ANGULAR_DAMP, roll_weight)
 	for body: PhysicalBone3D in ragdoll.bodies.values():
-		body.gravity_scale = gravity_scale
+		body.gravity_scale = gravity_scale * ragdoll_gravity_multiplier
 		body.linear_damp = linear_damp
 		body.angular_damp = angular_damp
 

@@ -44,6 +44,7 @@ var current: Dictionary = {}
 var sample_delta := 1.0 / 60.0
 var sample_count := 0
 var running := false
+var floor_landing_blended := false
 var handoff_error := 0.0
 var inherited: Dictionary = {}
 var anchors: Dictionary = {}
@@ -127,6 +128,7 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	_flat_floor = flat_floor
 	_floor_impact_limb_share = floor_impact_limb_share if not source_joints.is_empty() else 0.0
 	_flat_floor_has_contact = false
+	floor_landing_blended = false
 	if _flat_floor != null or not source_joints.is_empty():
 		for body: PhysicalBone3D in bodies.values():
 			body.set("pose_correction", _correct_physical_pose)
@@ -663,7 +665,7 @@ func _project_floor_contact() -> void:
 	var floor_half := floor_box.size * 0.5
 	var floor_inverse := floor_pose.affine_inverse()
 	var lift := 0.0
-	var landing_blended := not source_joint_rids.is_empty() and is_equal_approx(bodies.Head.gravity_scale, 1.0)
+	var landing_blended := not source_joint_rids.is_empty() and floor_landing_blended
 	if _floor_impact_limb_share > 0.0 and not _flat_floor_has_contact:
 		var floor_body := _flat_floor.get_parent()
 		for body: PhysicalBone3D in bodies.values():

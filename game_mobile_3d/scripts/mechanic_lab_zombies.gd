@@ -89,6 +89,8 @@ const MELEE_CONTACT_HEIGHT := Vector3.UP * (Zombie.HEIGHT * 0.5)
 var _visual: PackedScene
 var sword_equipped := false
 var curved_equipped := false
+var ragdoll_launch_multiplier := 1.0
+var ragdoll_gravity_multiplier := 1.0
 var _physics_profile: Dictionary
 var _digits: Array[Texture2D]
 var _spawn_serial := 0
@@ -292,6 +294,9 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 		death_strike = Zombie.DeathStrike.SABRE_FINISHER
 	elif sabre_ground:
 		death_strike = Zombie.DeathStrike.SABRE_GROUND
+	if damage >= zombie.health:
+		zombie.ragdoll_launch_multiplier = ragdoll_launch_multiplier
+		zombie.ragdoll_gravity_multiplier = ragdoll_gravity_multiplier
 	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger),
 		float(strike.strength), death_strike, float(strike.get("push_duration", 0.0)))
 	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
