@@ -27,10 +27,13 @@ const DEATH_SOURCE_ANGULAR_SCALE := 40.0
 const DEATH_TWIRL_CHANCE := 0.33
 const DEATH_STRENGTH_THRESHOLDS := [400.0, 750.0, 1200.0]
 const DEATH_ADDITIONAL_MULTIPLIERS := [0.5, 1.0, 1.5]
-const DEATH_SPEED_TO_LAB := 0.0078
-const DEATH_TIER_INFLUENCE := 0.22
+const DEATH_SPEED_TO_LAB := 0.0088
+const DEATH_TIER_INFLUENCE := 0.75
 const DEATH_ANGULAR_TO_LAB := 0.14
-const DEATH_GRAVITY := 15.0
+# Honeycomb Fields footage puts lethal hit to body-down near 0.6 seconds.
+const DEATH_GRAVITY := 24.0
+const DEATH_LANDING_LINEAR_DAMP := 7.0
+const DEATH_LANDING_ANGULAR_DAMP := 10.0
 const HEIGHT := 1.95
 const CHASE_SPEED := 3.1
 const MELEE_RANGE := 1.36
@@ -324,8 +327,8 @@ func _update_death(delta: float) -> void:
 		# Absorb the landing once the torso reaches the floor. Physics still
 		# owns the remaining slide and the pose of every joint.
 		for body: PhysicalBone3D in ragdoll.bodies.values():
-			body.linear_damp = 5.2
-			body.angular_damp = 6.8
+			body.linear_damp = DEATH_LANDING_LINEAR_DAMP
+			body.angular_damp = DEATH_LANDING_ANGULAR_DAMP
 	var remaining := CORPSE_LIFETIME - _corpse_age
 	if remaining <= 0.00001:
 		queue_free()
