@@ -1,0 +1,72 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/mechanic_lab.gd" id="lab"]
+[ext_resource type="Shader" path="res://materials/mechanic_lab_ground.gdshader" id="ground"]
+
+[sub_resource type="Environment" id="environment"]
+background_mode = 1
+background_color = Color(0.55, 0.66, 0.75, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.93, 0.96, 1, 1)
+ambient_light_energy = 0.64
+
+[sub_resource type="ShaderMaterial" id="grass_block"]
+resource_local_to_scene = true
+shader = ExtResource("ground")
+
+[sub_resource type="BoxMesh" id="ground_mesh"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxShape3D" id="ground_collision"]
+size = Vector3(100, 1, 100)
+
+[node name="MechanicLab" type="Node3D"]
+script = ExtResource("lab")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("environment")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, -38, 0)
+light_color = Color(1, 0.97, 0.91, 1)
+light_energy = 1.15
+shadow_enabled = true
+directional_shadow_max_distance = 48.0
+
+[node name="Ground" type="StaticBody3D" parent="."]
+position = Vector3(0, -0.5, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("ground_mesh")
+material_override = SubResource("grass_block")
+
+[node name="Collision" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("ground_collision")
+
+[node name="Actors" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(12, 15, 16)
+projection = 1
+current = true
+size = 14.5
+far = 160.0
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="HUD"]
+offset_left = 18.0
+offset_top = 12.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 20
+text = "MechanicLab · 100 × 100 block"
+
+[node name="Controls" type="Label" parent="HUD"]
+offset_left = 18.0
+offset_top = 43.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 14

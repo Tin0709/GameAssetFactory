@@ -1,7 +1,6 @@
 extends Node
 ## Owns the unified review, not the private assets or the original controller.
-const ORIGINAL=preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
-const PRIVATE_ADAPTER="res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/world_map_actor.gd"
+const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
 const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
 const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
@@ -218,14 +217,11 @@ var _fps_elapsed:=0.
 const ENV_FIELDS:=["ambient_light_color","ambient_light_energy","background_color","tonemap_exposure","adjustment_saturation","adjustment_contrast","fog_light_color","fog_density","fog_depth_begin","fog_depth_end","fog_depth_curve","fog_light_energy","glow_enabled","glow_intensity","glow_bloom","glow_hdr_threshold"]
 
 func make_player()->Node3D:
-	private_primary=OS.get_environment("GAF_SHOWCASE_PLAYER")!="original"
-	if not private_primary:return ORIGINAL.instantiate()
-	if OS.has_feature("editor") and ResourceLoader.exists(PRIVATE_ADAPTER):
-		return load(PRIVATE_ADAPTER).new()
-	unavailable_reason="Primary A&S/MD2 + Sabre requires the private editor workspace. No reference assets are included in builds."
-	var placeholder:=ORIGINAL.instantiate()
-	placeholder.process_mode=Node.PROCESS_MODE_DISABLED
-	return placeholder
+	private_primary = PlayerFactory.uses_private_player()
+	var selected := PlayerFactory.create(private_primary)
+	if selected.process_mode == Node.PROCESS_MODE_DISABLED:
+		unavailable_reason = "Primary A&S/MD2 + Sabre requires the private editor workspace. No reference assets are included in builds."
+	return selected
 
 func setup(world:Node3D)->void:
 	level=world;process_priority=-10
