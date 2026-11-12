@@ -39,8 +39,11 @@ const DEATH_AIR_ATTACK_ANGULAR_TO_LAB := 0.14
 const DEATH_FINISHER_ROLL_SPEED := 1.0
 const ZOMBIE_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
 const SABRE_FINISHER_GRAVITY_HOLD := 0.30
-const SABRE_FINISHER_HEAD_FRICTION := 0.70
-const DEATH_SOURCE_RESTITUTION := 0.30 # MD2 DefaultPhysicalMaterial.
+# MD2 DefaultPhysicalMaterial, shared by all six authored bodies.
+const DEATH_SOURCE_FRICTION := 0.70
+const DEATH_SOURCE_RESTITUTION := 0.30
+const SOURCE_MASS_EXPONENT := 0.75
+const SOURCE_RIG_LAB_MASS := 60.0
 const DEATH_LANDING_BLEND_TIME := 0.20
 const DEATH_AIR_LINEAR_DAMP := 0.01 # SK_Zombie_PhysicsAsset body defaults.
 const DEATH_FLOOR_CONTACT_MARGIN := 0.02
@@ -199,20 +202,20 @@ func _source_physics_setup(skeleton: Skeleton3D) -> Dictionary:
 	var offsets := {}
 	var parts := []
 	var joints := {}
-	var volume := 0.0
+	var total_mass_weight := 0.0
 	for entry: Dictionary in _physics_profile.bodies:
 		var name: String = roles.get(entry.bone, "")
 		if name.is_empty() or skeleton.find_bone(entry.bone) < 0:
 			return {}
 		var size := _from_unreal(entry.size_cm) * 0.01
-		var box_volume := size.x * size.y * size.z
-		volume += box_volume
+		var mass_weight := pow(size.x * size.y * size.z, SOURCE_MASS_EXPONENT)
+		total_mass_weight += mass_weight
 		bones[name] = entry.bone
 		offsets[name] = Transform3D(Basis.IDENTITY, _from_unreal(entry.center_cm) * 0.01)
-		parts.append([name, Vector3.ZERO, size, box_volume, 0.0, 0.0])
+		parts.append([name, Vector3.ZERO, size, mass_weight, 0.0, 0.0])
+	# The density and mass scale are shared. Normalize the relative masses to the lab's total.
 	for part: Array in parts:
-		# Preserve the lab's mass budget. MD2's body setup has no mass override.
-		part[3] *= 60.0 / volume
+		part[3] *= SOURCE_RIG_LAB_MASS / total_mass_weight
 	for entry: Dictionary in _physics_profile.constraints:
 		var child: String = roles[entry.child]
 		var parent: String = roles[entry.parent]
@@ -375,11 +378,12 @@ func _update_death(delta: float) -> void:
 			body.collision_mask = LEVEL_COLLISION_MASK
 			if source_rig:
 				body.bounce = DEATH_SOURCE_RESTITUTION
+				body.friction = DEATH_SOURCE_FRICTION
 			mass += body.mass
 		if sabre_finisher:
 			# Start with MD2's default material values on the leading contact.
 			var head: PhysicalBone3D = ragdoll.bodies.Head
-			head.friction = SABRE_FINISHER_HEAD_FRICTION
+			head.friction = DEATH_SOURCE_FRICTION
 			head.bounce = DEATH_SOURCE_RESTITUTION
 		var launch := _death_profile.duplicate() as DeathProfile
 		var angle := deg_to_rad(DEATH_LAUNCH_ANGLE)
