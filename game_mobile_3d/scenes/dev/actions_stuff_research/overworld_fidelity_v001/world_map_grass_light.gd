@@ -11,6 +11,8 @@ var _variants:Dictionary={}
 var _ground_sky:Texture2D
 var _ground_sky_checked:=false
 var _ground_sky_state:=Vector4.INF
+var _regional_state := Vector2.ZERO
+var _regional_phase := Vector4.ZERO
 var _grass_shade_color := Vector3.INF
 var _grass_root_tone := -1.
 var _shadow_height_scale := -1.
@@ -44,6 +46,7 @@ func restore()->void:
 		if preload("res://scripts/world_map_atmosphere_volume.gd").base_shader(row.material.shader)==row.variant:row.material.shader=row.original
 	_records.clear();active=false
 	_ground_sky_state=Vector4.INF
+	_regional_state = Vector2.INF
 	_grass_shade_color = Vector3.INF
 	_grass_root_tone = -1.
 	_shadow_height_scale = -1.
@@ -105,11 +108,16 @@ func _sync_ground_sky()->void:
 	var color_changed := shade_color != _grass_shade_color
 	var root_tone: float = world.showcase.grass_root_tone_mix()
 	var root_changed := root_tone != _grass_root_tone
-	if not sky_changed and not color_changed and not root_changed:
+	var regional_state: Vector2 = terrain.regional_sky_state if terrain != null else Vector2.ZERO
+	var regional_phase: Vector4 = terrain.regional_sky_phase if terrain != null else Vector4.ZERO
+	var regional_changed := regional_state != _regional_state or regional_phase != _regional_phase
+	if not sky_changed and not color_changed and not root_changed and not regional_changed:
 		return
 	_ground_sky_state=state
 	_grass_shade_color = shade_color
 	_grass_root_tone = root_tone
+	_regional_state = regional_state
+	_regional_phase = regional_phase
 	for row:Dictionary in _records:
 		var material:ShaderMaterial=row.material
 		if sky_changed:
@@ -122,6 +130,8 @@ func _sync_ground_sky()->void:
 			material.set_shader_parameter("study_grass_shade_color", shade_color)
 		if root_changed:
 			material.set_shader_parameter("study_grass_root_tone", root_tone)
+		if regional_changed and terrain != null:
+			terrain.bind_regional_sky(material)
 
 func snapshot()->Dictionary:
 	return {"configured":configured,"active":active,"normal_weight":weight,"materials":_records.size(),"error":error,"normal_scope":"Captured Day grass world-normal consumer; other biome weights unverified","lighting_scope":"Original mobile transmission and alpha shadows, not native Lumen"}

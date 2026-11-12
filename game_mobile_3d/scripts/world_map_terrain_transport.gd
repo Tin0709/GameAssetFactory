@@ -19,7 +19,7 @@ var _transforms_valid:=true
 var _regional_sky: preload("res://scripts/regional_sky_region.gd")
 var regional_sky_texture: ImageTexture3D
 var regional_sky_state := Vector2.ZERO
-var _regional_sky_phase := Vector4.ZERO
+var regional_sky_phase := Vector4.ZERO
 class TransformWatch extends Node3D:
 	var guard:Node
 	func _notification(what:int)->void:
@@ -128,7 +128,13 @@ func _install()->bool:
 func regional_sky_available() -> bool:
 	return _regional_sky != null and level.showcase.sky_response.available()
 
-func publish_regional_sky(hour: float, strength: float) -> void:
+func _refresh_regional_sky() -> void:
+	if _regional_sky == null:
+		return
+	var review = level.showcase
+	var strength: float = review._lighting_scale(&"regional_sky") if not review._balanced_preview \
+		and review.atmosphere_review == "combined" and level.view_mode == "gameplay" else 0.0
+	var hour: float = review.hour
 	var active := strength * smoothstep(4.5, 5.5, hour) * (1.0 - smoothstep(17.5, 20.0, hour))
 	if active <= 0.0 or level.showcase.is_day_anchor() or not regional_sky_available() or not is_active():
 		_set_regional_sky_state(Vector2.ZERO)
@@ -144,25 +150,37 @@ func publish_regional_sky(hour: float, strength: float) -> void:
 			_regional_sky = null
 			_set_regional_sky_state(Vector2.ZERO)
 			return
-		RenderingServer.global_shader_parameter_set("gaf_regional_sky_field", regional_sky_texture)
-		RenderingServer.global_shader_parameter_set("gaf_regional_sky_bounds", _regional_sky.bounds())
-		RenderingServer.global_shader_parameter_set("gaf_regional_sky_roots", Vector4(
-			_regional_sky.grass_origin.x, _regional_sky.grass_origin.y, _regional_sky.grass_extent.x, _regional_sky.grass_extent.y))
 	var i := 0
 	while i < SKY_HOURS.size() - 2 and phase > SKY_HOURS[i + 1]:
 		i += 1
 	var weight := smoothstep(SKY_HOURS[i], SKY_HOURS[i + 1], phase)
 	var sample := Vector4((i + weight + 0.5) / float(_regional_sky.extent.z), 1.0 / ratio.x, 1.0 / ratio.y, 1.0 / ratio.z)
-	if sample != _regional_sky_phase:
-		_regional_sky_phase = sample
-		RenderingServer.global_shader_parameter_set("gaf_regional_sky_phase", sample)
-	_set_regional_sky_state(Vector2(active, _regional_sky.terrain_receivers))
+	_set_regional_sky_state(Vector2(active, _regional_sky.terrain_receivers), sample)
 
-func _set_regional_sky_state(state: Vector2) -> void:
-	if state == regional_sky_state:
+func _set_regional_sky_state(state: Vector2, sample := Vector4.ZERO) -> void:
+	if state == regional_sky_state and sample == regional_sky_phase:
 		return
 	regional_sky_state = state
-	RenderingServer.global_shader_parameter_set("gaf_regional_sky_state", state)
+	regional_sky_phase = sample
+	var materials := {}
+	for row in level.look.terrain_materials:
+		materials[row[3]] = true
+	for chunk in level.geometry._cutaway_chunks:
+		for material in chunk.materials:
+			materials[material] = true
+	for material: ShaderMaterial in materials:
+		bind_regional_sky(material)
+
+func bind_regional_sky(material: ShaderMaterial) -> void:
+	material.set_shader_parameter("regional_sky_state", regional_sky_state)
+	if regional_sky_state.x <= 0.0:
+		return
+	material.set_shader_parameter("regional_sky_phase", regional_sky_phase)
+	if material.get_shader_parameter("regional_sky_field") != regional_sky_texture:
+		material.set_shader_parameter("regional_sky_field", regional_sky_texture)
+		material.set_shader_parameter("regional_sky_bounds", _regional_sky.bounds())
+		material.set_shader_parameter("regional_sky_roots", Vector4(
+			_regional_sky.grass_origin.x, _regional_sky.grass_origin.y, _regional_sky.grass_extent.x, _regional_sky.grass_extent.y))
 func available()->bool:
 	if _transforms_dirty:
 		_transforms_dirty=false;_transforms_valid=true
@@ -223,4 +241,6 @@ func bind(force:bool=false)->void:
 		m.set_shader_parameter("terrain_colored_visibility",response)
 		var compatible:bool=dielectric and is_zero_approx(float(m.get_shader_parameter("native_metallic")))
 		m.set_shader_parameter("terrain_dielectric_response",compatible);m.set_shader_parameter("terrain_rough_reflection",compatible);m.set_shader_parameter("terrain_env_brdf",BRDF)
-func _process(_delta:float)->void:refresh()
+func _process(_delta:float)->void:
+	refresh()
+	_refresh_regional_sky()
