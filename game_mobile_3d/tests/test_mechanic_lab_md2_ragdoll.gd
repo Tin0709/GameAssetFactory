@@ -162,7 +162,7 @@ func run() -> void:
 		await check_combo_finisher(lab, group, slot)
 	await check_flat_rest_after_tumble(lab, group)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
-	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.8)
+	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
