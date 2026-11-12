@@ -85,7 +85,8 @@ void fragment() {
 		ALBEDO = shade_world_surface(color.rgb, surface_world, surface_top);
 		ALBEDO = grade_stone_twilight(grade_night_path(ALBEDO, surface_top));
 	}
-	ALBEDO *= terrain_outline(surface_world, surface_normal);
+	vec3 outline_ray = PROJECTION_MATRIX[3][3] > 0.5 ? -INV_VIEW_MATRIX[2].xyz : normalize(surface_world - CAMERA_POSITION_WORLD);
+	ALBEDO *= terrain_outline(surface_world, surface_normal, outline_ray);
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	cloud_transmission=world_cloud_shade(surface_world);
 #else
