@@ -384,7 +384,9 @@ func contact_motion() -> Dictionary:
 	var core_contacts := 0
 	var supports := 0
 	var core_supports := 0
-	var leg_supported := false
+	var leg_supports := 0
+	var core_support_sum := Vector3.ZERO
+	var leg_support_sum := Vector3.ZERO
 	var peak_linear := 0.0
 	var peak_angular := 0.0
 	for name in bodies:
@@ -393,19 +395,27 @@ func contact_motion() -> Dictionary:
 		if direct and direct.get_contact_count() > 0:
 			contacts += 1
 			var is_core: bool = name in ["Hips", "Chest", "Head"]
+			var is_leg: bool = name in ["Leg.L", "Leg.R"]
 			if is_core: core_contacts += 1
 			for index in direct.get_contact_count():
 				# The contact normal is reported in world axes by the lab backend.
 				if direct.get_contact_local_normal(index).y < MIN_SUPPORT_NORMAL_Y:
 					continue
 				supports += 1
-				if is_core: core_supports += 1
-				if name in ["Leg.L", "Leg.R"]: leg_supported = true
+				if is_core:
+					core_supports += 1
+					core_support_sum += direct.get_contact_collider_position(index)
+				if is_leg:
+					leg_supports += 1
+					leg_support_sum += direct.get_contact_collider_position(index)
 				break
 		peak_linear = maxf(peak_linear,body.linear_velocity.length())
 		peak_angular = maxf(peak_angular,body.angular_velocity.length())
+	var support_span := Vector3.ZERO
+	if core_supports > 0 and leg_supports > 0:
+		support_span = core_support_sum / core_supports - leg_support_sum / leg_supports
 	return {"contacts":contacts,"core_contacts":core_contacts,"supports":supports,
-		"core_supports":core_supports,"leg_supported":leg_supported,
+		"core_supports":core_supports,"leg_supported":leg_supports > 0,"support_span":support_span,
 		"linear":peak_linear,"angular":peak_angular}
 
 func release(visible_world_pose: Array[Transform3D] = []) -> void:

@@ -442,13 +442,19 @@ func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
 		or motion.linear > CORPSE_SETTLE_SPEED or motion.angular > CORPSE_SETTLE_SPIN:
 		_settled_seconds = 0.0
 		return
-	# A head-first hit can briefly stall before the body falls over.
+	# A head-first hit can stall before the body falls over. On terraces,
+	# compare the pose with the actual surface span between core and feet.
 	var bodies := ragdoll.bodies
 	var feet: Vector3 = (bodies["Leg.L"].global_position + bodies["Leg.R"].global_position) * 0.5
-	var axis: Vector3 = (bodies.Head.global_position - feet).normalized()
+	var head_to_feet: Vector3 = bodies.Head.global_position - feet
+	var axis := head_to_feet.normalized()
 	if absf(axis.y) > CORPSE_SETTLE_MAX_AXIS_Y:
-		_settled_seconds = 0.0
-		return
+		var span: Vector3 = motion.support_span
+		var horizontal_span := Vector2(span.x, span.z).length()
+		var support_up := Vector3.UP.slide(span.normalized()).normalized()
+		if horizontal_span < head_to_feet.length() * 0.5 or absf(axis.dot(support_up)) > CORPSE_SETTLE_MAX_AXIS_Y:
+			_settled_seconds = 0.0
+			return
 	_settled_seconds += delta
 	var skeleton := ragdoll.skeleton
 	if _settled_seconds >= CORPSE_SETTLE_TIME and not skeleton.skeleton_updated.is_connected(_capture_corpse_pose):
