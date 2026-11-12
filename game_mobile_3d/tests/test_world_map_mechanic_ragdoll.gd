@@ -30,14 +30,14 @@ func terrain_contact_depth(zombie: Node3D) -> float:
 	return deepest
 
 func launch(world: Node3D, group: Node3D, effects: Node3D, start: Vector3, direction: Vector3,
-		strike := Zombie.DeathStrike.SABRE_FINISHER) -> Node3D:
+		strike := Zombie.DeathStrike.SABRE_FINISHER, yaw := 0.0) -> Node3D:
 	if not group.spawn(world.player, Basis.IDENTITY, effects):
 		check(false, "The verified zombie is available on WorldMap")
 		return null
 	var zombie = group.get_child(0)
 	zombie.set_physics_process(false)
 	zombie.global_position = start + Vector3.UP * 0.02
-	zombie.rotation.y = 0.0
+	zombie.rotation.y = yaw
 	zombie.animation.play(Zombie.IDLE)
 	zombie.animation.advance(0.2)
 	zombie.reset_physics_interpolation()
@@ -179,6 +179,43 @@ func shape_overlap(world: Node3D, shape: Shape3D, pose: Transform3D) -> float:
 		depth = maxf(depth, points[i].distance_to(points[i + 1]))
 	return depth
 
+func braced_cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
+	group._spawn_serial = 8
+	var direction := Vector3.FORWARD.rotated(Vector3.UP, 0.17)
+	var zombie = await launch(world, group, effects, Vector3(-37.28, 3.0, -33.5), direction,
+		Zombie.DeathStrike.SABRE_FINISHER, 0.16)
+	if zombie == null:
+		return
+	var first_landing := -1
+	var parked_frame := -1
+	var peak_overlap := 0.0
+	var gravity_resumed := false
+	var supported_gravity := false
+	for frame in 240:
+		await physics_frame
+		if zombie._corpse_parked:
+			parked_frame = frame
+			break
+		if not zombie.ragdoll.running:
+			continue
+		peak_overlap = maxf(peak_overlap, terrain_contact_depth(zombie))
+		if not zombie._corpse_landed:
+			continue
+		if first_landing < 0:
+			first_landing = frame
+		var chest: PhysicalBone3D = zombie.ragdoll.bodies.Chest
+		var gravity := PhysicsServer3D.body_get_direct_state(chest.get_rid()).total_gravity.y
+		supported_gravity = supported_gravity or gravity > -20.0
+		gravity_resumed = gravity_resumed or (supported_gravity and is_equal_approx(gravity, -50.0))
+	check(first_landing >= 15 and first_landing <= 35 and peak_overlap < 0.12,
+		"The braced cliff case keeps its initial landing and contact depth")
+	check(gravity_resumed and parked_frame > first_landing,
+		"The corpse tips from its wall brace under Overworld gravity and settles within four seconds")
+	print("WORLDMAP_BRACED_CLIFF landing=", first_landing, " park=", parked_frame,
+		" gravity_resumed=", gravity_resumed, " peak_overlap_m=", peak_overlap)
+	zombie.free()
+	await ticks(2)
+
 func near_wall_handoff(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	if not group.spawn(world.player, Basis.IDENTITY, effects):
 		check(false, "The verified zombie is available for the wall handoff")
@@ -253,6 +290,7 @@ func run() -> void:
 			Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT.rotated(Vector3.UP, -0.10))
 		await oblique_cliff_case(world, group, effects)
 		await near_wall_handoff(world, group, effects)
+		await braced_cliff_case(world, group, effects)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
