@@ -77,6 +77,8 @@ var _pockets_requested:=false
 var _foliage_light_requested := false
 var _crown_detail_requested := false
 var _leaf_sampling_requested := false
+var grove_reveal_coverage_requested := true
+var _grove_coverage_applied := false
 var _leaf_sampling_applied := false
 var _leaf_source_textures: Dictionary[ShaderMaterial, Texture2D] = {}
 var _oak_root_beds_requested := false
@@ -797,9 +799,6 @@ func _publish_cloud_style(texture: Texture2D, shape: Vector4) -> void:
 					material.set_shader_parameter("cloud_field",texture)
 				material.set_shader_parameter("cloud_shape",_cloud_shape)
 	level.geometry.update_cloud_style(texture,_cloud_shape)
-
-var grove_reveal_coverage_requested := true
-var _grove_coverage_applied := false
 
 func set_grove_reveal_coverage(enabled: bool) -> void:
 	if enabled == grove_reveal_coverage_requested:

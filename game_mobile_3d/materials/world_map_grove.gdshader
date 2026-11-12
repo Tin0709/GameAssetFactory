@@ -123,7 +123,7 @@ void fragment() {
 			// Share the transition across two MSAA samples, with the original
 			// per-pixel threshold selecting the fractional remainder.
 			float samples = opacity * 2.0;
-			coverage = 0.5 * (floor(samples) + step(threshold, fract(samples)));
+			coverage = 0.5 * (floor(samples) + (fract(samples) > threshold ? 1.0 : 0.0));
 #else
 			if (opacity <= threshold) discard;
 #endif
