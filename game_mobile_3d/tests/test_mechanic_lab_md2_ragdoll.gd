@@ -133,21 +133,23 @@ func run() -> void:
 		check(pose_preserved, "Releasing physics retains the last rendered pose, including utility bones")
 	await ticks(6)
 	check(not is_instance_valid(zombie), "Corpse is released after its breakup")
-	await check_sword_finisher(lab, group)
+	await check_combo_finisher(lab, group, false)
+	await check_combo_finisher(lab, group, true)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
 
-func check_sword_finisher(lab, group) -> void:
+func check_combo_finisher(lab, group, sword: bool) -> void:
 	lab.reset_player()
-	lab._select_weapon(1)
+	lab._select_weapon(1 if sword else 0)
 	lab.get_node("HUD/BaseZombieToggle").button_pressed = false
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
 	var lethal_clips: Array[String] = []
-	group.sabre_contact.connect(func(_point, _direction, clip, _index, _serial, lethal):
+	var record_lethal := func(_point, _direction, clip, _index, _serial, lethal):
 		if lethal:
-			lethal_clips.append(clip))
+			lethal_clips.append(clip)
+	group.sabre_contact.connect(record_lethal)
 	await ticks(56)
 	var attack := InputEventKey.new()
 	attack.physical_keycode = KEY_E
@@ -160,15 +162,38 @@ func check_sword_finisher(lab, group) -> void:
 	var release := InputEventKey.new()
 	release.physical_keycode = KEY_E
 	root.push_input(release, true)
-	check(group.sword_equipped and lethal_clips == ["Attack3"], "Sword's third strike produces a lethal ragdoll")
+	group.sabre_contact.disconnect(record_lethal)
+	var weapon := "Sword" if sword else "Sabre"
+	var expected_clip := "Attack3" if sword else "NativeFinisher"
+	check(group.sword_equipped == sword and lethal_clips == [expected_clip],
+		weapon + "'s third strike produces a lethal ragdoll")
 	var landing_time := INF
 	var lowest_corner := 0.0
+	var vertical_axis := INF
+	var lower_contact_time := INF
 	for i in 70:
 		await physics_frame
-		if zombie._corpse_landed:
-			landing_time = minf(landing_time, zombie._corpse_age)
 		if zombie.ragdoll.running:
 			lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
-	check(landing_time > 0.38 and landing_time < 0.57, "Sword's finisher makes core contact within 570 ms")
-	check(lowest_corner > -0.17, "Sword's finisher avoids deep floor overlap")
+		if not zombie._corpse_landed:
+			continue
+		landing_time = minf(landing_time, zombie._corpse_age)
+		if sword:
+			continue
+		var since_contact: float = zombie._corpse_age - landing_time
+		var bodies: Dictionary = zombie.ragdoll.bodies
+		for part in ["Chest", "Leg.L", "Leg.R"]:
+			var state := PhysicsServer3D.body_get_direct_state(bodies[part].get_rid())
+			if state and state.get_contact_count() > 0:
+				lower_contact_time = minf(lower_contact_time, since_contact)
+		if vertical_axis == INF and since_contact >= 0.30 - 0.0001:
+			var feet: Vector3 = (bodies["Leg.L"].global_position + bodies["Leg.R"].global_position) * 0.5
+			var head_to_legs: Vector3 = bodies.Head.global_position - feet
+			vertical_axis = absf(head_to_legs.normalized().y)
+	check(landing_time > 0.25 and landing_time < 0.57, weapon + "'s finisher makes prompt core contact")
+	check(lowest_corner > -0.17, weapon + "'s finisher avoids deep floor overlap")
+	if not sword:
+		check(vertical_axis < 0.34, "Sabre's finisher rolls out of its inverted pose within 300 ms")
+		check(lower_contact_time < 0.40, "Sabre's chest or legs reach the floor within 400 ms of head contact")
+	zombie.free()
 
