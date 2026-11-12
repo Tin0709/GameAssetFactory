@@ -62,6 +62,9 @@ const CORPSE_DISSOLVE_KEYS := [
 ]
 const CORPSE_DESATURATION_START := 2.3
 const CORPSE_DESATURATION_END := 3.6
+const CORPSE_SETTLE_TIME := 0.20
+const CORPSE_SETTLE_SPEED := 0.08
+const CORPSE_SETTLE_SPIN := 0.65
 const HIT_FLASH_DURATION := 0.083
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
@@ -97,6 +100,8 @@ var _attack_cooldown := 0.0
 var _flash_left := 0.0
 var _corpse_age := 0.0
 var _corpse_landed := false
+var _corpse_parked := false
+var _settled_seconds := 0.0
 var _landing_age := INF
 var _physics_profile: Dictionary
 static var _flash_material: ShaderMaterial
@@ -306,6 +311,14 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 
 func _update_death(delta: float) -> void:
 	_corpse_age += delta
+	var remaining := CORPSE_LIFETIME - _corpse_age
+	if remaining <= 0.00001:
+		queue_free()
+		return
+	if _corpse_age >= CORPSE_DESATURATION_START:
+		_update_corpse_material(remaining)
+	if _corpse_parked:
+		return
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
 			ragdoll.sample(delta)
@@ -342,11 +355,32 @@ func _update_death(delta: float) -> void:
 			body.gravity_scale = lerpf(flight_gravity_scale, 1.0, blend)
 			body.linear_damp = linear_damp
 			body.angular_damp = angular_damp
-	var remaining := CORPSE_LIFETIME - _corpse_age
-	if remaining <= 0.00001:
-		queue_free()
-	elif _corpse_age >= CORPSE_DESATURATION_START:
-		_update_corpse_material(remaining)
+	if _corpse_landed and _corpse_age >= CORPSE_DESATURATION_START:
+		_check_corpse_settled(delta)
+
+func _check_corpse_settled(delta: float) -> void:
+	var motion := ragdoll.contact_motion()
+	if motion.core_contacts == 0 or motion.contacts < 2 \
+		or motion.linear > CORPSE_SETTLE_SPEED or motion.angular > CORPSE_SETTLE_SPIN:
+		_settled_seconds = 0.0
+		return
+	_settled_seconds += delta
+	var skeleton := ragdoll.skeleton
+	if _settled_seconds >= CORPSE_SETTLE_TIME and not skeleton.skeleton_updated.is_connected(_capture_corpse_pose):
+		skeleton.skeleton_updated.connect(_capture_corpse_pose, CONNECT_ONE_SHOT)
+
+func _capture_corpse_pose() -> void:
+	# Read the evaluated physical pose while the skeleton modifiers are applied.
+	var skeleton := ragdoll.skeleton
+	var pose: Array[Transform3D] = []
+	for i in skeleton.get_bone_count():
+		pose.append(skeleton.global_transform * skeleton.get_bone_global_pose(i))
+	_park_corpse.call_deferred(pose)
+
+func _park_corpse(pose: Array[Transform3D]) -> void:
+	if not is_queued_for_deletion() and ragdoll.running:
+		ragdoll.release(pose)
+		_corpse_parked = true
 
 static func _death_launch_speed(strength: float) -> float:
 	var extra := 0.0
