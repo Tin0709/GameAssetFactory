@@ -6,6 +6,7 @@ const SourceTerrain := preload("res://scripts/world_map_source_terrain.gd")
 const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const MovementAudio := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/environment_audio.gd")
+const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
 const PrivateOverworldBundle := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/private_bundle.gd")
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
 const CurvedGreatsword := preload("res://scripts/mechanic_lab_curved_greatsword.gd")
@@ -125,6 +126,12 @@ func _ready() -> void:
 		_combat_audio.name = "CombatAudio"
 		add_child(_combat_audio)
 		_setup_movement_audio()
+		var dust := MovementDust.new()
+		dust.name = "MovementDust"
+		if dust.setup(player, $Ground/Collision):
+			add_child(dust)
+		else:
+			dust.free()
 		_player_flash_material = ShaderMaterial.new()
 		_player_flash_material.shader = PLAYER_HIT_FLASH_SHADER
 		for mesh: MeshInstance3D in player.model.find_children("*", "MeshInstance3D", true, false):
