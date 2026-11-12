@@ -1,4 +1,5 @@
 """Exercise the local UI transport without starting Chromium or touching Git."""
+from contextlib import closing
 import http.client
 import json
 from pathlib import Path
@@ -16,7 +17,7 @@ class LocalUITests(unittest.TestCase):
         self.ui.publish({'ready': True})
 
     def request(self, method, path, headers=None, payload=None):
-        with http.client.HTTPConnection('127.0.0.1', self.ui.port, timeout=3) as client:
+        with closing(http.client.HTTPConnection('127.0.0.1', self.ui.port, timeout=3)) as client:
             client.request(method, path, body=json.dumps(payload) if payload else None, headers=headers or {})
             response = client.getresponse()
             return response.status, response.read()
