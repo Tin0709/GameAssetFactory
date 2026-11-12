@@ -28,6 +28,12 @@ void light() {
 	}
 #endif
 	float nl = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+	float opening_fill = gaf_diffuse_opening_weight(LIGHT_IS_DIRECTIONAL, LIGHT, LIGHT_COLOR, INV_VIEW_MATRIX, ATTENUATION * cloud_transmission);
+	if (opening_fill > 0.0) {
+		DIFFUSE_LIGHT += terrain_opening_incident * (opening_fill * smoothstep(0.0, 0.22, nl));
+	}
+#endif
 #ifdef GAF_WORLD_OPAQUE_FOLIAGE
 	if (LIGHT_IS_DIRECTIONAL) {
 		vec3 response = world_foliage_lobe(NORMAL, LIGHT, VIEW, nl, 1.0, foliage_transmission);

@@ -170,6 +170,9 @@ void fragment(){
 	float sole = gaf_player_contact(foliage_world, CAMERA_POSITION_WORLD);
 	AO *= sole;
 	EMISSION *= sole;
+	if (gaf_diffuse_opening.w > 0.0) {
+		grass_opening_incident = study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix * study_canopy_sky_at_root * sole;
+	}
 	study_tip_weight=smoothstep(0.26,0.85,height_fraction);
 	study_cloud=world_cloud_shade(foliage_world);
 #endif

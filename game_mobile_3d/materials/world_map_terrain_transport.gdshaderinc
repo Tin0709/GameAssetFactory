@@ -2,6 +2,7 @@
 varying vec3 terrain_sky_light;
 varying vec3 terrain_sun_bounce;
 varying float terrain_direct_contact;
+varying vec3 terrain_opening_incident;
 uniform vec3 terrain_key_radiance=vec3(0);
 uniform float terrain_ambient_scale=1.0;
 uniform vec3 terrain_ambient_tint=vec3(1);
@@ -22,6 +23,11 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 	vec3 irradiance=terrain_sky_light*terrain_ambient_scale*terrain_ambient_tint*visibility+terrain_sun_bounce*terrain_key_radiance*cloud;
 	if(terrain_colored_visibility)irradiance*=terrain_contact_response(color,contact);
 	return color*(1.0-metallic)*irradiance;
+}
+
+vec3 terrain_opening_fill(vec3 albedo, float contact, float sole) {
+	vec3 incident = terrain_sky_light * terrain_ambient_scale * terrain_ambient_tint * sole;
+	return terrain_colored_visibility ? incident * terrain_contact_response(albedo, contact) : incident;
 }
 #ifdef GAF_WORLD_TERRAIN_PBR
 // Recovered split-sum consumer form; independently integrated GGX LUT.

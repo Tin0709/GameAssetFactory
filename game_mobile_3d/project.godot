@@ -83,6 +83,10 @@ gaf_sun_opening_gain={
 "type": "float",
 "value": 0.0
 }
+gaf_diffuse_opening={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
 gaf_projected_sun_strength={
 "type": "float",
 "value": 0.0

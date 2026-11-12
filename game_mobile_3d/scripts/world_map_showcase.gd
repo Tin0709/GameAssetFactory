@@ -60,6 +60,7 @@ var _forest_shadow_opacity:float
 var full_direct_shadows:=true
 var projected_sun := ProjectedSun.new()
 var _opening_gain := 0.0
+var _diffuse_opening := Vector4.ZERO
 const LIGHTING_MIX_CONTROLS := {
 	&"sun": ["Direct sunlight", 2.],
 	&"sun_pockets": ["Sunlight pockets", 1.5],
@@ -74,6 +75,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"foot_contact": ["Player ground contact (preview)", 1.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"grass_shade_color": ["Grass shade color", 1.],
+	&"diffuse_openings": ["Sunlit diffuse fill", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
 	&"grass_shadow_reach": ["Grass shadow reach", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
@@ -112,7 +114,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 40
+const LIGHTING_MIX_VERSION := 41
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -234,6 +236,7 @@ func setup(world:Node3D)->void:
 	RenderingServer.frame_pre_draw.connect(_sync_point_camera)
 	projected_sun.setup()
 	RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
+	RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
 	get_tree().node_added.connect(_track_point_light)
 	for light in get_tree().root.find_children("*","Light3D",true,false):_track_point_light(light)
@@ -518,6 +521,7 @@ func _exit_tree()->void:
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
 		projected_sun.release()
 		RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
+		RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
 		RenderingServer.global_shader_parameter_set("gaf_point_soft",Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_point_mixed",false)
@@ -701,6 +705,21 @@ func _sync_point_camera() -> void:
 	if camera_position != _point_kernel_camera:
 		_point_kernel_camera = camera_position
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera", camera_position)
+	_sync_diffuse_opening()
+
+func _sync_diffuse_opening() -> void:
+	var state := Vector4.ZERO
+	var gain := _lighting_scale(&"diffuse_openings")
+	if gain > 0. and not _balanced_preview and atmosphere_review == "combined" and forest_active() \
+		and level.terrain_light != null and level.terrain_light.is_active():
+		gain *= PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+		var sun: DirectionalLight3D = level.get_node("Sun")
+		if gain > 0. and sun.is_visible_in_tree() and sun.shadow_enabled and sun.light_energy > 0.:
+			var direction := sun.global_basis.z.normalized()
+			state = Vector4(direction.x, direction.y, direction.z, gain)
+	if state != _diffuse_opening:
+		_diffuse_opening = state
+		RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", state)
 
 func set_lantern_overhead(value: bool) -> void:
 	if lantern_overhead == value:
@@ -843,7 +862,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .65
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
-	if effect in [&"humid_light", &"humid_depth"]:
+	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings"]:
 		return 0.
 	if effect == &"sunlit_mist":
 		return .24
@@ -1032,7 +1051,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1099,6 +1118,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 40 and effect == &"daylight_shadow_lift":
 			missing_value = 1.
+		if version < 41 and effect == &"diffuse_openings":
+			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
 			missing_value = 0.
 		if version < 35 and effect == &"sun_opening":
@@ -1138,6 +1159,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"projected_sun", &"sun_opening"]:
 		refresh_daylight_shading()
 		return
+	if changed_effect == &"diffuse_openings":
+		return # Published with the final camera and sun before drawing.
 	if changed_effect in [&"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
 		if phase_finish != null:
 			phase_finish.refresh()
@@ -1530,6 +1553,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Blend the lower blades towards the nearby terrain hue at night. Leaves the existing grass lighting and shadows active."
 		if effect == &"grass_shade_color":
 			slider.tooltip_text = "Cool the baked sky light on grass beneath the forest canopy. Uses Grass sky fill in Combined mode. Noon and night keep their current lighting."
+		if effect == &"diffuse_openings":
+			slider.tooltip_text = "Try 100% at 07:00 or 16:30. Adds diffuse fill to grass and terrain in openings. Requires Combined lighting and the local terrain field."
 		if effect == &"grass_shadow_reach":
 			slider.tooltip_text = "Correct the length of grass shadows at dawn and dusk for the captured sun elevation. 0% uses the previous length."
 		if effect == &"stone_twilight_color":
