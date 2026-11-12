@@ -166,6 +166,7 @@ func run() -> void:
 		await check_combo_finisher(lab, group, slot)
 	await check_sabre_landing_reversal(lab, group)
 	await check_sabre_landing_reversal(lab, group, true)
+	await check_sabre_head_and_arm_brace(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
@@ -371,6 +372,50 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 		" supported_m=", peak_supported_reversal, " peak_damping_step=", peak_damping_step,
 		" whole_body_reversals=", whole_body_reversals, " peak_whole_body_m=", peak_whole_body_reversal,
 		" upward_step_m=", peak_supported_rise, " age=", zombie._corpse_age)
+	zombie.free()
+
+func check_sabre_head_and_arm_brace(lab, group) -> void:
+	lab.reset_player()
+	var selector := lab.get_node("HUD/Weapon") as OptionButton
+	selector.select(0)
+	selector.item_selected.emit(0)
+	lab.get_node("HUD/BaseZombieToggle").button_pressed = false
+	const SPAWN_SERIAL := 464
+	group._spawn_serial = SPAWN_SERIAL
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 120011 + SPAWN_SERIAL
+	zombie.global_position += Vector3(rng.randf_range(-0.42, 0.42), 0.0, rng.randf_range(-0.37, 0.35))
+	zombie.reset_physics_interpolation()
+	await ticks(rng.randi_range(44, 69))
+	var attack := InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	attack.pressed = true
+	root.push_input(attack, true)
+	for i in 140:
+		if zombie.health == 0:
+			break
+		await physics_frame
+	attack.pressed = false
+	root.push_input(attack, true)
+	var braced := false
+	var leg_supported_after_brace := false
+	for i in 130:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+		if not zombie.ragdoll.running:
+			continue
+		var contact: Dictionary = zombie.ragdoll.contact_motion()
+		if zombie._corpse_age >= 0.82 and contact.supports == 2 and contact.core_supports == 1 and not contact.leg_supported:
+			braced = true
+		if braced and contact.leg_supported:
+			leg_supported_after_brace = true
+	check(braced and leg_supported_after_brace and zombie._corpse_parked,
+		"Sabre's head-and-arm brace rolls onto leg support and releases within 130 ticks")
+	print("SABRE_HEAD_ARM_REST seconds=", zombie._corpse_age,
+		" braced=", braced, " leg_supported_after_brace=", leg_supported_after_brace)
 	zombie.free()
 
 func check_flat_rest_after_tumble(lab, group) -> void:
