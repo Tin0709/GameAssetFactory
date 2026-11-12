@@ -13,6 +13,7 @@ const PARTS := [
 ]
 const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "Chest", "Leg.L": "Hips", "Leg.R": "Hips"}
 const FLOOR_CONTACT_SLOP := 0.005
+const FLOOR_REST_SLOP := 0.012
 @export var maximum_inherited_linear_speed := 3.0
 @export var maximum_inherited_angular_speed := 10.0
 var skeleton: Skeleton3D
@@ -304,11 +305,14 @@ func _project_floor_contact() -> void:
 	var floor_half := floor_box.size * 0.5
 	var floor_inverse := floor_pose.affine_inverse()
 	var lift := 0.0
+	var slow := true
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if state == null:
 			continue
+		slow = slow and state.linear_velocity.length_squared() < 0.6 * 0.6 \
+			and state.angular_velocity.length_squared() < 2.0 * 2.0
 		var pose := floor_inverse * state.transform
 		var half: Vector3 = part[2] * 0.5
 		var extent_y := Vector3(absf(pose.basis.x.y), absf(pose.basis.y.y), absf(pose.basis.z.y)).dot(half)
@@ -320,6 +324,9 @@ func _project_floor_contact() -> void:
 		var extent_z := Vector3(absf(pose.basis.x.z), absf(pose.basis.y.z), absf(pose.basis.z.z)).dot(half)
 		if absf(pose.origin.x) + extent_x <= floor_half.x and absf(pose.origin.z) + extent_z <= floor_half.z:
 			lift = depth
+	# Leave the native contact solver its resting tolerance so it can sleep.
+	if slow:
+		lift -= FLOOR_REST_SLOP - FLOOR_CONTACT_SLOP
 	if lift <= 0.0:
 		return
 	# Correct penetration before the bones sync to the rendered skeleton.

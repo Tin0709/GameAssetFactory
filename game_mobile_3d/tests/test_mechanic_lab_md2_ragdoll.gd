@@ -69,6 +69,9 @@ func run() -> void:
 		await physics_frame
 	await ticks(4)
 	check(zombie.ragdoll.running and zombie.health == 0, "Lethal contact transfers the live pose to physics")
+	var head_state := PhysicsServer3D.body_get_direct_state(zombie.ragdoll.bodies.Head.get_rid())
+	check(head_state and is_equal_approx(head_state.total_gravity.y, -50.0),
+		"Grounded hits use 50 m/s² of downward gravity in flight")
 	var impulse: Vector3 = zombie.ragdoll.total_applied_impulse
 	check(absf(rad_to_deg(atan2(impulse.y, Vector2(impulse.x, impulse.z).length())) - 30.0) < 0.01,
 		"DefaultHostile's 30-degree launch is applied to the death impulse")
@@ -91,8 +94,10 @@ func run() -> void:
 	var landing_time := INF
 	var landing_speed := 0.0
 	var follow_through_speed := -INF
+	var lowest_corner := 0.0
 	for i in 60:
 		await physics_frame
+		lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
 		var momentum := Vector3.ZERO
 		for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
 			momentum += body.linear_velocity * body.mass
@@ -109,6 +114,7 @@ func run() -> void:
 	check(landing_time > 0.38 and landing_time < 0.55, "A grounded Sabre strike brings the torso down within 550 ms")
 	check(landing_speed > 0.0 and follow_through_speed > landing_speed * 0.55,
 		"The corpse retains forward momentum through its first 100 ms on the floor")
+	check(lowest_corner >= -0.013, "The grounded strike stays within the floor contact tolerance")
 	check(zombie._corpse_landed and zombie.ragdoll.max_anchor_error() < 0.10, "The corpse settles with connected joints")
 	var skeleton: Skeleton3D = zombie.ragdoll.skeleton
 	var last_physical_pose: Array[Transform3D] = []
@@ -190,9 +196,8 @@ func check_combo_finisher(lab, group, sword: bool) -> void:
 			var feet: Vector3 = (bodies["Leg.L"].global_position + bodies["Leg.R"].global_position) * 0.5
 			var head_to_legs: Vector3 = bodies.Head.global_position - feet
 			vertical_axis = absf(head_to_legs.normalized().y)
-	var earliest_contact := 0.38 if sword else 0.25
-	check(landing_time > earliest_contact and landing_time < 0.57, weapon + "'s finisher makes prompt core contact")
-	check(lowest_corner > -0.17, weapon + "'s finisher avoids deep floor overlap")
+	check(landing_time > 0.25 and landing_time < 0.50, weapon + "'s finisher makes prompt core contact")
+	check(lowest_corner >= -0.013, weapon + "'s finisher stays within the floor contact tolerance")
 	if not sword:
 		check(vertical_axis < 0.34, "Sabre's finisher rolls out of its inverted pose within 300 ms")
 		check(lower_contact_time < 0.40, "Sabre's chest or legs reach the floor within 400 ms of head contact")

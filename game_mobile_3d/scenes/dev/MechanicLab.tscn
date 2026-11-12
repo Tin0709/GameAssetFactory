@@ -167,7 +167,7 @@ tooltip_text = "Bấm E hoặc chuột trái khi đang rơi để thử đòn b�
 [node name="Weapon" type="OptionButton" parent="HUD"]
 offset_left = 790.0
 offset_top = 69.0
-offset_right = 906.0
+offset_right = 977.0
 offset_bottom = 103.0
 focus_mode = 0
 tooltip_text = "Chọn vũ khí để thử combo."

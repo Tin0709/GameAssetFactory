@@ -6,6 +6,7 @@ const SourceTerrain := preload("res://scripts/world_map_source_terrain.gd")
 const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
+const CurvedGreatsword := preload("res://scripts/mechanic_lab_curved_greatsword.gd")
 const SABRE_RIBBON_SHADER := preload("res://materials/mechanic_lab_sabre_ribbon.gdshader")
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
 const SPAWN := Vector3(0.0, 0.03, 0.0)
@@ -20,6 +21,9 @@ const HEAVY_SHAKE_DURATION := 0.20
 const FINISHER_SHAKE_INNER_RADIUS := 1.5
 const FINISHER_SHAKE_OUTER_RADIUS := 3.0
 const FINISHER_SHAKE_HEIGHT_FRACTION := 0.008
+const PRIVATE_CONTROLS := "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E %s · R về giữa"
+
+enum Weapon { SABRE, SWORD, CURVED_GREATSWORD }
 
 var presentation: Node
 var player_health := MAX_PLAYER_HEALTH
@@ -28,12 +32,15 @@ var _previous_msaa: Viewport.MSAA
 var _previous_hdr: bool
 var _combat_audio: CombatAudio
 var _weapon_mesh: MeshInstance3D
+var _equipped_weapon := Weapon.SABRE
 var _sabre_mesh: Mesh
 var _sword_mesh: Mesh
+var _curved_mesh: Mesh
 var _sabre_blade_base: Vector3
 var _sabre_blade_tip: Vector3
 var _sabre_profile: Dictionary
 var _sword_profile: Dictionary
+var _curved_profile: Dictionary
 var _sabre_audio_aliases: Dictionary
 var _sabre_audio_rates: Dictionary
 var _shake_serial := -1
@@ -78,7 +85,7 @@ func _ready() -> void:
 	if not player_ready:
 		$HUD/Controls.text = "Thiếu dữ liệu player của gameplay chính. Kiểm tra MD2_RESEARCH_ROOT."
 	elif using_private:
-		$HUD/Controls.text = "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E chém hoặc bổ trên không · R về giữa"
+		$HUD/Controls.text = PRIVATE_CONTROLS % "chém hoặc bổ trên không"
 	else:
 		$HUD/Controls.text = "WASD di chuyển · Shift chạy · Space nhảy · R về giữa"
 	$HUD/Controls.text += " · Cuộn chuột để zoom"
@@ -121,6 +128,7 @@ func _ready() -> void:
 func _setup_weapon_selector() -> void:
 	$HUD/Weapon.add_item("Sabre")
 	$HUD/Weapon.add_item("Sword")
+	$HUD/Weapon.add_item("Curved Greatsword")
 	_weapon_mesh = player.model.find_child("SabrePrototypeSabre", true, false) as MeshInstance3D
 	if _weapon_mesh == null or not player.combo.native_enabled:
 		return
@@ -135,43 +143,95 @@ func _setup_weapon_selector() -> void:
 	$HUD/Weapon.item_selected.connect(_select_weapon)
 
 func _select_weapon(index: int) -> void:
-	var previous := 1 if $Zombies.sword_equipped else 0
-	if previous == index:
+	if index == _equipped_weapon:
 		return
 	if player_health == 0 or not player.is_on_floor() or player.combo.active() or player.combo.held:
-		$HUD/Weapon.select(previous)
+		$HUD/Weapon.select(_equipped_weapon)
 		$HUD/SpawnStatus.text = "Chờ đứng trên đất và kết thúc đòn để đổi vũ khí."
 		return
-	var sword_equipped := index == 1
-	if sword_equipped and _sword_mesh == null:
-		var research_root := OS.get_environment("MD2_RESEARCH_ROOT")
-		if research_root.is_empty():
-			research_root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
-		_sword_mesh = Sword.load_mesh(player, research_root)
-		if _sword_mesh == null:
-			$HUD/Weapon.select(previous)
-			$HUD/SpawnStatus.text = "Không tìm thấy model Sword đã xác minh trong MD2 Research."
-			return
-		player.reference_audio.add_manifest(research_root, Sword.MEDIA_MANIFEST)
-	if not player.combo.configure_native(_sword_profile if sword_equipped else _sabre_profile):
-		player.combo.configure_native(_sabre_profile if previous == 0 else _sword_profile)
-		$HUD/Weapon.select(previous)
+	if not _load_weapon(index):
+		$HUD/Weapon.select(_equipped_weapon)
+		$HUD/SpawnStatus.text = "Không tải được dữ liệu %s đã xác minh trong MD2 Research." % $HUD/Weapon.get_item_text(index)
+		return
+	if not player.combo.configure_native(_weapon_profile(index)):
+		player.combo.configure_native(_weapon_profile(_equipped_weapon))
+		$HUD/Weapon.select(_equipped_weapon)
 		$HUD/SpawnStatus.text = "Không thể tải combo của vũ khí này."
 		return
-	_weapon_mesh.mesh = _sword_mesh if sword_equipped else _sabre_mesh
-	player.marker_base.position = Sword.BLADE_BASE if sword_equipped else _sabre_blade_base
-	player.marker_tip.position = Sword.BLADE_TIP if sword_equipped else _sabre_blade_tip
+	var mesh := _sabre_mesh
+	var blade_base := _sabre_blade_base
+	var blade_tip := _sabre_blade_tip
+	var aliases := _sabre_audio_aliases
+	var rates := _sabre_audio_rates
+	match index:
+		Weapon.SWORD:
+			mesh = _sword_mesh
+			blade_base = Sword.BLADE_BASE
+			blade_tip = Sword.BLADE_TIP
+			aliases = Sword.AUDIO_ALIASES
+			rates = {"SwordAttack1": 1.0, "SwordAttack2": 1.0, "SwordAttack3": 1.4,
+				"SwordAirAttack": player.combo.air_attack_play_rate}
+		Weapon.CURVED_GREATSWORD:
+			mesh = _curved_mesh
+			blade_base = CurvedGreatsword.BLADE_BASE
+			blade_tip = CurvedGreatsword.BLADE_TIP
+			aliases = {}
+			rates = {"NativeCurvedAttack1": CurvedGreatsword.PLAYBACK_RATE,
+				"NativeCurvedAttack2": CurvedGreatsword.PLAYBACK_RATE,
+				"NativeCurvedAttack3": CurvedGreatsword.PLAYBACK_RATE}
+	_weapon_mesh.mesh = mesh
+	player.marker_base.position = blade_base
+	player.marker_tip.position = blade_tip
 	player.reference_audio.reset()
-	player.reference_audio.clip_aliases = Sword.AUDIO_ALIASES if sword_equipped else _sabre_audio_aliases
-	player.reference_audio.clip_play_rates = {
-		"SwordAttack1": 1.0, "SwordAttack2": 1.0, "SwordAttack3": 1.4,
-		"SwordAirAttack": player.combo.air_attack_play_rate,
-	} if sword_equipped else _sabre_audio_rates
+	player.reference_audio.clip_aliases = aliases
+	player.reference_audio.clip_play_rates = rates
 	player.effects.reset()
 	_combat_audio.reset()
+	_equipped_weapon = index as Weapon
+	var sword_equipped := index == Weapon.SWORD
+	var curved_equipped := index == Weapon.CURVED_GREATSWORD
 	_combat_audio.sword_equipped = sword_equipped
+	_combat_audio.curved_equipped = curved_equipped
 	$Zombies.sword_equipped = sword_equipped
+	$Zombies.curved_equipped = curved_equipped
+	player.aerial_melee_enabled = not curved_equipped
+	$HUD/DropMedium.disabled = curved_equipped
+	$HUD/DropHigh.disabled = curved_equipped
+	var attack_hint := "chém dưới đất" if curved_equipped else "chém hoặc bổ trên không"
+	$HUD/Controls.text = (PRIVATE_CONTROLS % attack_hint) + " · Cuộn chuột để zoom"
 	$HUD/SpawnStatus.text = ""
+
+func _weapon_profile(index: int) -> Dictionary:
+	match index:
+		Weapon.SWORD:
+			return _sword_profile
+		Weapon.CURVED_GREATSWORD:
+			return _curved_profile
+	return _sabre_profile
+
+func _load_weapon(index: int) -> bool:
+	if index == Weapon.SABRE or (index == Weapon.SWORD and _sword_mesh != null) \
+			or (index == Weapon.CURVED_GREATSWORD and not _curved_profile.is_empty()):
+		return true
+	var research_root := OS.get_environment("MD2_RESEARCH_ROOT")
+	if research_root.is_empty():
+		research_root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
+	if index == Weapon.SWORD:
+		_sword_mesh = Sword.load_mesh(player, research_root)
+		if _sword_mesh == null:
+			return false
+		player.reference_audio.add_manifest(research_root, Sword.MEDIA_MANIFEST)
+		return true
+	_curved_mesh = CurvedGreatsword.load_mesh(player, research_root)
+	if _curved_mesh == null:
+		return false
+	var profile := CurvedGreatsword.combat_profile(_sabre_profile, research_root)
+	player._load_private_combat_clips(profile, CurvedGreatsword.LIBRARY)
+	if not player.animation_player.has_animation_library(CurvedGreatsword.LIBRARY):
+		return false
+	_curved_profile = profile
+	player.reference_audio.add_manifest(research_root, CurvedGreatsword.MEDIA_MANIFEST)
+	return true
 
 func _apply_daylight_render_settings() -> void:
 	if RenderingServer.get_rendering_device() == null:
@@ -228,9 +288,9 @@ func _set_combat_audio(enabled: bool) -> void:
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, lethal: bool) -> void:
 	player.effects.contact(point, direction)
 	_combat_audio.contact(point, serial, lethal)
-	var finisher := clip in ["Attack3", "NativeFinisher"]
+	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3"]
 	_start_contact_light(point, serial, 2.3 if finisher else 1.8)
-	# Sabre_3 and Sword_3 share the source radius and non-oriented shake.
+	# These finishers share the source radii and non-oriented shake.
 	# Approximate StartMatineeCameraShakeAtPawn using the capsule center.
 	if not finisher or _shake_serial == serial or _player_body == null:
 		return
