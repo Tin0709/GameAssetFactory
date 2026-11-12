@@ -183,13 +183,13 @@ class WebNotifications:
 
 
 def find_browser():
-    for name in ('msedge', 'chrome', 'chromium', 'google-chrome'):
+    for name in ('chrome', 'chromium', 'google-chrome', 'msedge'):
         if executable := shutil.which(name):
             return Path(executable)
     if os.name == 'nt':
-        for variable in ('ProgramFiles(x86)', 'ProgramFiles', 'LOCALAPPDATA'):
-            if directory := os.environ.get(variable):
-                for relative in ('Microsoft/Edge/Application/msedge.exe', 'Google/Chrome/Application/chrome.exe'):
+        for relative in ('Google/Chrome/Application/chrome.exe', 'Microsoft/Edge/Application/msedge.exe'):
+            for variable in ('ProgramFiles', 'ProgramFiles(x86)', 'LOCALAPPDATA'):
+                if directory := os.environ.get(variable):
                     candidate = Path(directory) / relative
                     if candidate.is_file():
                         return candidate
@@ -220,7 +220,8 @@ class WebWindow:
             with (app.state_dir / 'browser-window.log').open('ab') as output:
                 self.process = subprocess.Popen(
                     [str(browser), f'--user-data-dir={self.profile.name}',
-                     '--no-first-run', '--no-default-browser-check', '--disable-background-mode', '--window-size=1400,980',
+                     '--no-first-run', '--no-default-browser-check', '--disable-background-mode',
+                     '--disable-sync', '--window-size=1400,980',
                      f'--app={self.ui.origin}/#{self.ui.token}'],
                     stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT,
                 )
