@@ -41,7 +41,7 @@ const DEATH_FINISHER_ROLL_SPEED := 1.0
 const ZOMBIE_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
 const SABRE_FINISHER_GRAVITY_HOLD := 0.30
 const SABRE_GROUND_FLOOR_LIMB_SHARE := 0.35
-const SABRE_FINISHER_FLOOR_LIMB_SHARE := 0.65
+const SABRE_FINISHER_FLOOR_LIMB_SHARE := 0.62
 # MD2 DefaultPhysicalMaterial, shared by all six authored bodies.
 const DEATH_SOURCE_FRICTION := 0.70
 const DEATH_SOURCE_RESTITUTION := 0.30
