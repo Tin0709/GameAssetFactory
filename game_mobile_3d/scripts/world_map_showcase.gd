@@ -72,6 +72,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
+	&"dawn_sky_transition": ["Ánh sáng hắt rạng sáng", 1.],
 	&"daylight_balance": ["Daylight color balance", 1.],
 	&"player_sky": ["Player sky fill", 2.],
 	&"player_bounce": ["Player reflected sunlight (preview)", 1.],
@@ -135,7 +136,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 59
+const LIGHTING_MIX_VERSION := 60
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -404,12 +405,21 @@ func _apply_captured_sky(env:Environment)->void:
 	var source:=Vector3(base.r,base.g,base.b);var luma:=Vector3(.2126,.7152,.0722)
 	var tinted:Vector3=source*noon.ambient_tint
 	tinted*=source.dot(luma)/maxf(tinted.dot(luma),.000001)
-	var rgb:Vector3=tinted*sky_response.sample(reference_hour())
+	var rgb:Vector3=tinted*_sample_sky_response()
 	if not rgb.is_finite()or minf(rgb.x,minf(rgb.y,rgb.z))<0.:return
 	var peak:=maxf(1.,maxf(rgb.x,maxf(rgb.y,rgb.z)))
 	env.ambient_light_color=Color(rgb.x/peak,rgb.y/peak,rgb.z/peak).linear_to_srgb()
 	env.ambient_light_energy=float(_day.ambient_light_energy)*float(noon.ambient_energy_scale)*peak
 	sky_response_active=true
+
+func _sample_sky_response() -> Vector3:
+	var reference := reference_hour()
+	var pinned: Vector3 = sky_response.sample(reference)
+	var strength := _lighting_scale(&"dawn_sky_transition")
+	if strength <= 0. or hour >= 4.5 or hour <= reference:
+		return pinned
+	# Advance the sky source only. Fog and bloom use their existing reference phase.
+	return pinned.lerp(sky_response.sample(hour), strength)
 
 func _apply_sky_chroma(env: Environment) -> void:
 	var manual := lerpf(1., _lighting_scale(&"sky_chroma"), PHASE_FINISH.phase_weight(hour))
@@ -900,6 +910,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 1.
 	if effect == &"world_outline_strength":
 		return 0.
+	if effect == &"dawn_sky_transition":
+		return 0.
 	if effect in [&"sculk_surface", &"forest_path_placement", &"forest_path_air_beam", &"night_depth_scatter", &"night_stone_top_cool"]:
 		return 0.
 	if effect == &"forest_daylight_accents":
@@ -1262,6 +1274,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 59 and effect == &"night_stone_top_cool":
 			missing_value = 0.
+		if version < 60 and effect == &"dawn_sky_transition":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1299,6 +1313,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
+		if effect == &"dawn_sky_transition":
+			slider.editable = slider.editable and sky_response.available()
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
 		if effect == &"forest_path_placement":
