@@ -6,6 +6,12 @@ const SOURCE := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events
 const SABRE := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_sabre_hitmarker_%02d.ogg"
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
+const VOICES_PER_POOL := 3
+const HIT_GAIN_DB := -9.0
+const SLAM_GAIN_DB := -10.0
+const HURT_GAIN_DB := -20.0
+const DEATH_GAIN_DB := -14.0
+
 const HIT_HASHES := [
 	"01b446de1994e109804c1379e19d13b93d271d826e30bfe211d2f560e4651cb9",
 	"6322929e87d0ea43485ac7f436ecd7ef7601596c64b076a857a42863aa4959b6",
@@ -33,7 +39,7 @@ var enabled := false
 var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _next_choice: Dictionary[StringName, int] = {}
-var _next_voice := 0
+var _next_voice: Array[int] = [0, 0]
 var _last_weapon_serial := -1
 var _master_was_muted := false
 
@@ -51,7 +57,7 @@ func set_enabled(value: bool, preview_point: Vector3) -> void:
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
 		AudioServer.set_bus_mute(0, false)
-	_play(&"hit", preview_point, -8.0)
+	_play(&"hit", preview_point, HIT_GAIN_DB)
 
 func _restore_master() -> void:
 	if _master_was_muted:
@@ -66,15 +72,16 @@ func contact(point: Vector3, serial: int, lethal: bool) -> void:
 		return
 	if serial != _last_weapon_serial:
 		_last_weapon_serial = serial
-		_play(&"hit", point, -11.0)
-	_play(&"death" if lethal else &"hurt", point, -10.0 if lethal else -15.0)
+		_play(&"hit", point, HIT_GAIN_DB)
+	_play(&"death" if lethal else &"hurt", point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
 
 func slam_landed(point: Vector3) -> void:
 	if enabled:
-		_play(&"slam", point, -11.0)
+		_play(&"slam", point, SLAM_GAIN_DB)
 
 func reset() -> void:
 	_last_weapon_serial = -1
+	_next_voice = [0, 0]
 	for voice in _voices:
 		voice.stop()
 		voice.stream = null
@@ -85,10 +92,13 @@ func _load_audio() -> void:
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	if root.is_empty():
 		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
-	for i in 6:
+	for i in 2 * VOICES_PER_POOL:
 		var voice := AudioStreamPlayer3D.new()
 		voice.unit_size = 4.5
 		voice.max_distance = 35.0
+		# Keep distance and panning, while preserving the source transient spectrum.
+		voice.attenuation_filter_db = 0.0
+		voice.attenuation_filter_cutoff_hz = 20500.0
 		add_child(voice)
 		_voices.append(voice)
 	for i in HIT_HASHES.size():
@@ -116,9 +126,18 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 	if choices.is_empty():
 		return
 	var choice: int = _next_choice.get(group, 0)
-	var voice := _voices[_next_voice]
+	# Enemy reactions share their own budget so a crowd cannot cut weapon tails.
+	var pool := 1 if group == &"hurt" or group == &"death" else 0
+	var first := pool * VOICES_PER_POOL
+	var slot := _next_voice[pool]
+	for offset in VOICES_PER_POOL:
+		var candidate := (slot + offset) % VOICES_PER_POOL
+		if not _voices[first + candidate].playing:
+			slot = candidate
+			break
+	var voice := _voices[first + slot]
 	_next_choice[group] = (choice + 1) % choices.size()
-	_next_voice = (_next_voice + 1) % _voices.size()
+	_next_voice[pool] = (slot + 1) % VOICES_PER_POOL
 	voice.stop()
 	voice.stream = choices[choice]
 	voice.global_position = point

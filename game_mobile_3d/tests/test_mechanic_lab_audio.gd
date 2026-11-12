@@ -57,14 +57,22 @@ func run() -> void:
 	AudioServer.set_bus_mute(0, true)
 	audio.set_enabled(true, Vector3.ZERO)
 	check(not AudioServer.is_bus_mute(0), "Audio toggle enables playback")
-	for group in {&"hit": 5, &"hurt": 3, &"death": 3, &"slam": 3}:
-		check(audio._groups.get(group, []).size() == {&"hit": 5, &"hurt": 3, &"death": 3, &"slam": 3}[group],
+	var expected := {&"hit": 5, &"hurt": 3, &"death": 3, &"slam": 3}
+	for group in expected:
+		check(audio._groups.get(group, []).size() == expected[group],
 			"All pinned MD2 variants decode for " + str(group))
 	audio.reset()
 	audio.contact(Vector3.FORWARD * 2.0, 7, false)
-	var hit_voice: AudioStreamPlayer3D = audio._voices[0]
+	var hit_voice: AudioStreamPlayer3D
+	for voice in audio._voices:
+		if voice.stream in audio._groups.get(&"hit", []):
+			hit_voice = voice
+			break
+	check(hit_voice != null, "First contact plays the Sabre hit")
+	if hit_voice == null:
+		quit(1)
+		return
 	var hit: AudioStream = hit_voice.stream
-	check(hit != null, "First contact plays the Sabre hit")
 	for i in 12:
 		audio.contact(Vector3.FORWARD * 2.0, 7, i % 2 == 0)
 	check(hit_voice.stream == hit and hit_voice.playing, "Reaction burst never steals the current Sabre hit")
@@ -95,8 +103,11 @@ func run() -> void:
 		"Combat voice preserves the 8 kHz test tone relative to 1 kHz")
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised}))
-	audio.free()
-	camera.free()
+	hit_voice.stream = null
+	AudioServer.remove_bus_effect(bus, 0)
+	audio.queue_free()
+	camera.queue_free()
+	await process_frame
 	AudioServer.remove_bus(bus)
 	quit(0 if failures.is_empty() else 1)
 

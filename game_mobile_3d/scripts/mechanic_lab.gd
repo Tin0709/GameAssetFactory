@@ -129,11 +129,15 @@ func _exit_tree() -> void:
 func _process(delta: float) -> void:
 	var focus: Vector3 = presentation.player_position()
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
-	if _shake_age < _shake_duration:
-		_shake_age = minf(_shake_age + delta, _shake_duration)
+	if _shake_duration > 0.0:
+		# Sample the hit at age zero on its first displayed frame.
 		var decay := 1.0 - _shake_age / _shake_duration
 		var pulse := cos(TAU * 15.0 * _shake_age) * decay * decay
 		camera.h_offset = camera.size * _shake_strength * pulse
+		if _shake_age >= _shake_duration:
+			_shake_duration = 0.0
+		else:
+			_shake_age = minf(_shake_age + delta, _shake_duration)
 	if _light_remaining > 0.0:
 		_light_remaining = maxf(0.0, _light_remaining - delta)
 		var decay := _light_remaining / CONTACT_LIGHT_DURATION
