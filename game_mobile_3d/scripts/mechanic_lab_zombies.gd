@@ -24,9 +24,18 @@ const FLOOR_LIMIT := 49.0
 const SPACING := 1.25
 # DT_MeleePropertyDefinition: Sabre_1 through Sabre_3.
 const SABRE_STRIKES := [
-	{"damage": 12, "range_m": 2.5, "strength": 500.0, "angle": 15.0, "stagger": 23.0},
-	{"damage": 14, "range_m": 2.5, "strength": 500.0, "angle": 15.0, "stagger": 23.0},
-	{"damage": 22, "range_m": 3.5, "strength": 800.0, "angle": 25.0, "stagger": 45.0},
+	{
+		"damage": 12, "range_m": 2.5, "strength": 500.0, "angle": 15.0, "stagger": 23.0,
+		"cone_degrees": 85.0, "cone_offset": -1.2, "cone_cutoff": 1.2,
+	},
+	{
+		"damage": 14, "range_m": 2.5, "strength": 500.0, "angle": 15.0, "stagger": 23.0,
+		"cone_degrees": 90.0, "cone_offset": -1.2, "cone_cutoff": 1.2,
+	},
+	{
+		"damage": 22, "range_m": 3.5, "strength": 800.0, "angle": 25.0, "stagger": 45.0,
+		"cone_degrees": 180.0, "cone_offset": 0.0, "cone_cutoff": 0.0,
+	},
 ]
 const AIR_STRIKE := {"damage": 20, "range_m": 2.5, "strength": 1150.0, "angle": 25.0, "stagger": 37.0}
 const GROUND_HEIGHT_LIMIT := 2.1
@@ -39,34 +48,21 @@ const LEVEL_COLLISION_MASK := 1
 const SPLASH_MULTIPLIER := 0.3
 # Lab impulse scale anchors the 800-strength finisher to the existing ragdoll.
 const IMPULSE_PER_STRENGTH := 0.43
-const BLADE_RADIUS := 0.14
+const MELEE_CONTACT_HEIGHT := Vector3.UP * (Zombie.HEIGHT * 0.5)
 
 var _visual: PackedScene
 var _digits: Array[Texture2D]
 var _spawn_serial := 0
-var _hit_windows: Dictionary[String, Vector2] = {}
 var _attack_serial := -1
 var _landing_serial := -1
-var _previous_base := Vector3.ZERO
-var _previous_tip := Vector3.ZERO
-var _hit_targets: Dictionary[int, bool] = {}
+var _aim_serial := -1
+var _aim_target: Zombie
 var _attacker: CharacterBody3D
 var _attacker_visual: Node3D
 
-func setup_combat(attacker: CharacterBody3D, clips: Dictionary, native_windows: Array) -> void:
+func setup_combat(attacker: CharacterBody3D) -> void:
 	_attacker = attacker
 	_attacker_visual = attacker.get("visual") as Node3D
-	for clip: String in clips:
-		var data: Dictionary = clips[clip]
-		if data.category == "attack" and clip != "AirAttack":
-			var trail: Array = data.vfx_window
-			_hit_windows[clip] = Vector2(float(trail[0]), float(trail[1]))
-	for index in native_windows.size():
-		var native: Dictionary = native_windows[index]
-		var clip: String = native.get("attack_key", "Attack%d" % (index + 1))
-		var trail: Array = native.get("trail_window", clips[clip].vfx_window)
-		# The source contact key anchors the start. The trail tail bounds the lab sweep.
-		_hit_windows[clip] = Vector2(minf(float(trail[0]), float(native.melee)), maxf(float(trail[1]), float(native.melee)))
 
 func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie: bool = false) -> bool:
 	if _visual == null:
@@ -111,62 +107,90 @@ func _spawn_point_clear(point: Vector3, player_position: Vector3) -> bool:
 			return false
 	return true
 
-func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, tip: Vector3, serial: int) -> void:
-	if clip == "AirAttack":
+func aim_sabre(index: int, serial: int, movement: Vector3) -> Vector3:
+	if serial != _aim_serial:
+		_aim_serial = serial
+		_aim_target = _find_melee_target(float(SABRE_STRIKES[index].range_m), movement)
+	if not is_instance_valid(_aim_target) or _aim_target.health <= 0 or _aim_target.is_queued_for_deletion():
+		return Vector3.ZERO
+	return _aim_target.global_position - _attacker.global_position
+
+func _find_melee_target(reach: float, movement: Vector3) -> Zombie:
+	var origin := _attacker.global_position
+	var space := get_world_3d().direct_space_state
+	var ray := _melee_ray(origin)
+	var nearest: Zombie
+	var nearest_squared := INF
+	for zombie: Zombie in get_children():
+		if zombie.health <= 0 or zombie.is_queued_for_deletion():
+			continue
+		var offset := zombie.global_position - origin
+		if absf(offset.y) > GROUND_HEIGHT_LIMIT:
+			continue
+		offset.y = 0.0
+		var distance_squared := offset.length_squared()
+		if distance_squared > reach * reach or distance_squared >= nearest_squared or offset.dot(movement) < 0.0:
+			continue
+		ray.to = zombie.global_position + MELEE_CONTACT_HEIGHT
+		if space.intersect_ray(ray).is_empty():
+			nearest = zombie
+			nearest_squared = distance_squared
+	return nearest
+
+func _melee_ray(origin: Vector3) -> PhysicsRayQueryParameters3D:
+	var ray := PhysicsRayQueryParameters3D.create(origin + MELEE_CONTACT_HEIGHT, origin, LEVEL_COLLISION_MASK)
+	ray.hit_from_inside = true
+	return ray
+
+func strike_sabre(index: int, clip: String, serial: int) -> void:
+	if serial == _attack_serial:
 		return
-	var window: Vector2 = _hit_windows.get(clip, Vector2(-1.0, -1.0))
-	if source_time < window.x or source_time > window.y:
-		return
-	if serial != _attack_serial:
-		_attack_serial = serial
-		_previous_base = base
-		_previous_tip = tip
-		_hit_targets.clear()
-	var strike: Dictionary = SABRE_STRIKES[clampi(index, 0, SABRE_STRIKES.size() - 1)]
+	_attack_serial = serial
+	var strike: Dictionary = SABRE_STRIKES[index]
 	var forward := _attacker_visual.global_basis.z
 	forward.y = 0.0
 	forward = forward.normalized()
 	var origin := _attacker.global_position
+	var range_squared := float(strike.range_m) * float(strike.range_m)
+	# Treat the source angle as the full opening. Set back the apex and clip
+	# along its axis. Measure total reach from the player.
+	var cone_offset := forward * float(strike.cone_offset)
+	var cone_cutoff := float(strike.cone_cutoff)
+	var half_angle_cos := cos(deg_to_rad(float(strike.cone_degrees) * 0.5))
+	var space := get_world_3d().direct_space_state
+	var ray := _melee_ray(origin)
 	var candidates: Array[Zombie] = []
-	var points := PackedVector3Array()
-	var nearest_index := -1
-	var nearest_distance := INF
+	var primary: Zombie
+	var nearest_squared := INF
 	for zombie: Zombie in get_children():
-		var id := zombie.get_instance_id()
-		if zombie.health <= 0 or zombie.is_queued_for_deletion() or _hit_targets.has(id):
+		if zombie.health <= 0 or zombie.is_queued_for_deletion():
 			continue
 		var offset := zombie.global_position - origin
-		var distance := Vector2(offset.x, offset.z).length()
-		if distance > float(strike.range_m) or absf(offset.y) > GROUND_HEIGHT_LIMIT:
+		if absf(offset.y) > GROUND_HEIGHT_LIMIT:
 			continue
-		var low := zombie.global_position + Vector3.UP * Zombie.HIT_RADIUS
-		var high := zombie.global_position + Vector3.UP * (Zombie.HEIGHT - Zombie.HIT_RADIUS)
-		var reach := Zombie.HIT_RADIUS + BLADE_RADIUS
-		# Check the current blade and both diagonals of the surface swept since the previous pose.
-		var contact := _blade_contact(base, tip, low, high, reach)
-		if not contact.is_finite():
-			contact = _blade_contact(_previous_base, tip, low, high, reach)
-		if not contact.is_finite():
-			contact = _blade_contact(base, _previous_tip, low, high, reach)
-		if contact.is_finite():
-			if distance < nearest_distance:
-				nearest_index = candidates.size()
-				nearest_distance = distance
-			candidates.append(zombie)
-			points.append(contact)
-	_previous_base = base
-	_previous_tip = tip
-	if nearest_index < 0:
+		offset.y = 0.0
+		var distance_squared := offset.length_squared()
+		if distance_squared > range_squared:
+			continue
+		var from_apex := offset - cone_offset
+		var along_axis := from_apex.dot(forward)
+		if along_axis + 0.00001 < maxf(cone_cutoff, from_apex.length() * half_angle_cos):
+			continue
+		ray.to = zombie.global_position + MELEE_CONTACT_HEIGHT
+		if not space.intersect_ray(ray).is_empty():
+			continue
+		candidates.append(zombie)
+		if distance_squared < nearest_squared:
+			nearest_squared = distance_squared
+			primary = zombie
+	if primary == null:
 		return
-	# The first blade contact is primary. Ties within a sample favor the nearer
-	# target so spawn order cannot change which target takes the full strike.
-	if _hit_targets.is_empty():
-		_apply_contact(candidates[nearest_index], points[nearest_index], clip, index, serial, strike, forward, false)
-	for slot in candidates.size():
-		var zombie := candidates[slot]
-		if _hit_targets.has(zombie.get_instance_id()):
-			continue
-		_apply_contact(zombie, points[slot], clip, index, serial, strike, forward, true)
+	if _aim_serial == serial and is_instance_valid(_aim_target) and candidates.has(_aim_target):
+		primary = _aim_target
+	_apply_contact(primary, primary.global_position + MELEE_CONTACT_HEIGHT, clip, index, serial, strike, forward, false)
+	for zombie in candidates:
+		if zombie != primary:
+			_apply_contact(zombie, zombie.global_position + MELEE_CONTACT_HEIGHT, clip, index, serial, strike, forward, true)
 
 func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: float) -> void:
 	if serial == _landing_serial:
@@ -205,14 +229,8 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	var damage := roundi(float(strike.damage) * SPLASH_MULTIPLIER) if splash else int(strike.damage)
 	var angle := deg_to_rad(float(strike.angle))
 	var impulse := Vector2(cos(angle), sin(angle)) * float(strike.strength) * IMPULSE_PER_STRENGTH
-	if clip != "AirAttack":
-		_hit_targets[zombie.get_instance_id()] = true
 	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger), float(strike.strength))
 	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
-
-func _blade_contact(a: Vector3, b: Vector3, low: Vector3, high: Vector3, reach: float) -> Vector3:
-	var closest := Geometry3D.get_closest_points_between_segments(a, b, low, high)
-	return closest[0] if closest[0].distance_squared_to(closest[1]) <= reach * reach else Vector3.INF
 
 func _load_assets() -> void:
 	if not OS.has_feature("editor"):
