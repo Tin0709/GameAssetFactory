@@ -72,6 +72,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
+	&"night_sky_fill": ["Ánh sáng hắt ban đêm", 1.],
 	&"dawn_sky_transition": ["Ánh sáng hắt rạng sáng", 1.],
 	&"daylight_balance": ["Daylight color balance", 1.],
 	&"player_sky": ["Player sky fill", 2.],
@@ -139,7 +140,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 63
+const LIGHTING_MIX_VERSION := 64
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -425,6 +426,14 @@ func _sample_sky_response() -> Vector3:
 		return pinned
 	# Advance the sky source only. Fog and bloom use their existing reference phase.
 	return pinned.lerp(sky_response.sample(hour), strength)
+
+func _night_sky_fill_multiplier() -> float:
+	if _balanced_preview or not sky_response_active or atmosphere_review != "combined":
+		return 1.0
+	# The captured sky supplies the phase and color. Calibrate only the scene's
+	# diffuse fill relative to the hip light, with the existing moon transition.
+	var amount := _lighting_scale(&"night_sky_fill") * moonlight_weight(hour)
+	return lerpf(1.0, 3.5, amount)
 
 func _apply_sky_chroma(env: Environment) -> void:
 	var manual := lerpf(1., _lighting_scale(&"sky_chroma"), PHASE_FINISH.phase_weight(hour))
@@ -1318,6 +1327,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 63 and effect == &"lantern_grass_tone":
 			missing_value = 0.
+		if version < 64 and effect == &"night_sky_fill":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1355,7 +1366,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
-		if effect == &"dawn_sky_transition":
+		if effect in [&"dawn_sky_transition", &"night_sky_fill"]:
 			slider.editable = slider.editable and sky_response.available()
 		if effect == &"dawn_mist_source":
 			slider.editable = slider.editable and not phase_air.anchors.is_empty()
@@ -1517,7 +1528,7 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		if gentle_noon:sun.light_energy*=noon_direct_scale(hour)
 		_apply_captured_key(sun)
 		_apply_captured_direction(sun)
-		env.ambient_light_energy *= _lighting_scale(&"sky")
+		env.ambient_light_energy *= _lighting_scale(&"sky") * _night_sky_fill_multiplier()
 		_apply_key_mix(sun)
 		# In full shade, block the direct beam and leave ambient fill to its own path.
 		_apply_direct_shadow_opacity(sun)
