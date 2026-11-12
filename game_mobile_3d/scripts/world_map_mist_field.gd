@@ -7,7 +7,7 @@ const PATH_SOURCE_BYTES := 48
 const GPU_PARAMETER_BYTES := 224 + PATH_SOURCE_BYTES
 const DIRECTIONAL_PARAMETER_BYTES := 64
 const LOCAL_MIST_BYTES := 48
-const DEPTH_SCATTER_BYTES := 16
+const DEPTH_SCATTER_BYTES := 32
 const MAX_DEPTH_SCATTER_GAIN := 6.0
 const DEPTH_SCATTER_START_M := 2.0
 const DEPTH_SCATTER_FULL_M := 8.0
@@ -46,7 +46,7 @@ func configure_with_mist_regions(parameters: PackedByteArray, size: Vector2i, no
 
 func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, noise: RID, light: RID,
 		path_light: PackedFloat32Array, local_mist: PackedFloat32Array, additional_mist: PackedFloat32Array,
-		depth_scatter: float) -> void:
+		depth_scatter: float, depth_color: Vector3 = Vector3.ZERO) -> void:
 	var path_bytes := path_light.to_byte_array()
 	if path_bytes.size() == LEGACY_PATH_SOURCE_BYTES:
 		path_bytes.resize(PATH_SOURCE_BYTES)
@@ -71,8 +71,9 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		additional_bytes.fill(0)
 	var entry := parameters.decode_float(12) if parameters.size() >= 16 else 0.0
 	var gain := clampf(depth_scatter, 0.0, MAX_DEPTH_SCATTER_GAIN) if entry > 0.0 and is_finite(depth_scatter) else 0.0
+	var color := depth_color if gain > 0.0 and depth_color.is_finite() else Vector3.ZERO
 	var depth_bytes := PackedFloat32Array([entry + DEPTH_SCATTER_START_M, entry + DEPTH_SCATTER_FULL_M,
-		gain, 0.0]).to_byte_array()
+		gain, 0.0, color.x, color.y, color.z, 1.0 if color != Vector3.ZERO else 0.0]).to_byte_array()
 	_mutex.lock()
 	_parameters=parameters.duplicate()
 	_path_parameters = path_bytes
