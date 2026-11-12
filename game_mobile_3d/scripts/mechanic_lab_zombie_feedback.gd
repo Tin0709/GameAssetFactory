@@ -5,7 +5,7 @@ const HEALTH_SHADER := preload("res://materials/mechanic_lab_zombie_health.gdsha
 const DIGIT_SIZE := 32
 const DIGIT_ADVANCE := 24.5
 const NUMBER_DURATION := 0.68
-const NUMBER_PIXEL_SIZE := 0.012
+const NUMBER_PIXEL_SIZE := 0.0144
 
 var digits: Array[Texture2D]
 var effects: Node3D
@@ -20,7 +20,7 @@ static var _bar_material: ShaderMaterial
 func _ready() -> void:
 	if _bar_mesh == null:
 		_bar_mesh = QuadMesh.new()
-		_bar_mesh.size = Vector2(0.86, 0.135)
+		_bar_mesh.size = Vector2(0.86, 0.165)
 		_bar_material = ShaderMaterial.new()
 		_bar_material.shader = HEALTH_SHADER
 	bar = MeshInstance3D.new()
