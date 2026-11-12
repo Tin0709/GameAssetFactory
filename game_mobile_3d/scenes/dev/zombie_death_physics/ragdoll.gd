@@ -57,6 +57,7 @@ var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
 var _flat_floor: CollisionShape3D
 var _pose_correction_frame := -1
+var _terrain_origins: Dictionary[String, Vector3]
 var _terrain_query: PhysicsShapeQueryParameters3D
 var _projection_query: PhysicsTestMotionParameters3D
 var _projection_hit: PhysicsTestMotionResult3D
@@ -376,6 +377,12 @@ func _correct_physical_pose() -> void:
 		_project_terrain_contact()
 	if not source_joint_rids.is_empty():
 		_project_source_anchors()
+		if not is_instance_valid(_flat_floor):
+			for name: String in bodies:
+				var body: PhysicalBone3D = bodies[name]
+				var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+				if state:
+					_terrain_origins[name] = state.transform.origin
 
 func _project_source_anchors() -> void:
 	for name: String in source_joint_rids:
@@ -407,20 +414,13 @@ func _project_source_anchors() -> void:
 		if distance <= SOURCE_ANCHOR_TOLERANCE:
 			continue
 		# Leave the authored tolerance and preserve rotation and velocities.
-		if _projection_query == null:
-			_projection_query = PhysicsTestMotionParameters3D.new()
-			_projection_query.margin = PROJECTION_COLLISION_MARGIN
-			_projection_query.recovery_as_collision = true
-			_projection_hit = PhysicsTestMotionResult3D.new()
 		var motion := correction * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
 		if contacting:
 			# Small errors on a supported limb stay with the contact solver.
 			if distance > 2.0 * SOURCE_ANCHOR_TOLERANCE:
 				_project_contacting_anchor(child, state, motion.limit_length(CONTACT_ANCHOR_RECOVERY_MAX_SHIFT))
 			continue
-		_projection_query.from = state.transform
-		_projection_query.motion = motion
-		if PhysicsServer3D.body_test_motion(child.get_rid(), _projection_query, _projection_hit):
+		if _test_projection_motion(child, state.transform, motion):
 			motion *= _projection_hit.get_collision_safe_fraction()
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
@@ -443,18 +443,28 @@ func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodySt
 		return
 	# Sweep from the clear end because a forward sweep can stop inside the
 	# original overlap. A hit near the original pose is the expected contact.
-	_projection_query.from = state.transform.translated(motion)
-	_projection_query.motion = -motion
-	if PhysicsServer3D.body_test_motion(body.get_rid(), _projection_query, _projection_hit):
+	var destination := state.transform.translated(motion)
+	if _test_projection_motion(body, destination, -motion):
 		var early_hit := 1.0 - _projection_hit.get_collision_unsafe_fraction() - escape_fraction
 		if early_hit * motion.length() > 2.0 * PROJECTION_COLLISION_MARGIN:
 			return
-	state.transform = _projection_query.from
+	state.transform = destination
+
+func _test_projection_motion(body: PhysicalBone3D, start: Transform3D, motion: Vector3) -> bool:
+	if _projection_query == null:
+		_projection_query = PhysicsTestMotionParameters3D.new()
+		_projection_query.margin = PROJECTION_COLLISION_MARGIN
+		_projection_query.recovery_as_collision = true
+		_projection_hit = PhysicsTestMotionResult3D.new()
+	_projection_query.from = start
+	_projection_query.motion = motion
+	return PhysicsServer3D.body_test_motion(body.get_rid(), _projection_query, _projection_hit)
 
 func _project_terrain_contact() -> void:
 	var lift := 0.0
 	var deepest: PhysicalBone3D
 	var has_deep_contact := false
+	var first_wall_parts: Array[String] = []
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
@@ -469,11 +479,15 @@ func _project_terrain_contact() -> void:
 		var fast_contact := _can_have_fast_contact(state, part[2])
 		if fall_speed <= TERRAIN_MIN_FALL_SPEED and not fast_contact:
 			continue
+		var can_rewind: bool = state.get_contact_count() == 0 and _terrain_origins.has(part[0])
 		var points := _terrain_contact_points(body, state, Vector3.ZERO)
 		for i in range(0, points.size(), 2):
 			var offset := points[i + 1] - points[i]
 			var depth := offset.length()
 			has_deep_contact = has_deep_contact or depth > TERRAIN_DEEP_OVERLAP - PROJECTION_COLLISION_MARGIN
+			if can_rewind and depth > TERRAIN_DEEP_OVERLAP and absf(offset.y) < depth * MIN_SUPPORT_NORMAL_Y:
+				first_wall_parts.append(part[0])
+				can_rewind = false
 			if fall_speed <= TERRAIN_MIN_FALL_SPEED or offset.y < TERRAIN_MIN_OVERLAP or offset.y < depth * TERRAIN_MIN_SUPPORT_Y:
 				continue
 			# Keep contact for the next solve and bound the lift by one step of travel.
@@ -485,6 +499,46 @@ func _project_terrain_contact() -> void:
 		_try_terrain_translation(Vector3.UP * lift, deepest)
 	if has_deep_contact:
 		_project_deep_terrain_contact()
+	if not first_wall_parts.is_empty():
+		_project_unresolved_wall_contact(first_wall_parts)
+
+func _project_unresolved_wall_contact(names: Array[String]) -> void:
+	var deepest: PhysicalBone3D
+	var deepest_depth := TERRAIN_DEEP_OVERLAP
+	var correction := Vector3.ZERO
+	for name in names:
+		var body: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			continue
+		var depth := _deepest_contact(_terrain_contact_points(body, state, Vector3.ZERO))
+		if depth <= deepest_depth:
+			continue
+		var rewind := _first_wall_rewind(body, state, _terrain_origins[name])
+		if rewind.is_zero_approx():
+			continue
+		deepest = body
+		deepest_depth = depth
+		correction = rewind
+	if deepest != null:
+		_try_terrain_translation(correction, deepest)
+
+func _first_wall_rewind(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, previous_origin: Vector3) -> Vector3:
+	var travel := state.transform.origin - previous_origin
+	if travel.length_squared() <= TERRAIN_DEEP_OVERLAP * TERRAIN_DEEP_OVERLAP:
+		return Vector3.ZERO
+	# Sweep the full box along the last step when the engine's CCD missed the edge.
+	var start := Transform3D(state.transform.basis, previous_origin)
+	if _deepest_contact(_terrain_contacts_at(body, state.get_space_state(), start)) > FLOOR_CONTACT_SLOP:
+		return Vector3.ZERO
+	if not _test_projection_motion(body, start, travel):
+		return Vector3.ZERO
+	var normal := _projection_hit.get_collision_normal()
+	if absf(normal.y) >= MIN_SUPPORT_NORMAL_Y or travel.dot(normal) >= 0.0:
+		return Vector3.ZERO
+	var remaining := travel * (1.0 - _projection_hit.get_collision_unsafe_fraction())
+	var rewind := maxf(0.0, remaining.length() - TERRAIN_RESIDUAL_OVERLAP)
+	return -travel.normalized() * minf(rewind, TERRAIN_MAX_RECOVERY_SHIFT)
 
 func _can_have_fast_contact(state: PhysicsDirectBodyState3D, box_size: Vector3) -> bool:
 	var half_diagonal := (box_size * 0.5).length()
@@ -705,6 +759,7 @@ func release(visible_world_pose: Array[Transform3D] = []) -> void:
 		simulator.free()
 	simulator = null
 	bodies.clear()
+	_terrain_origins.clear()
 	anchors.clear()
 	joint_rest_rotations.clear()
 	if not pose.is_empty():
