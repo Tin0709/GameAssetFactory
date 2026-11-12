@@ -48,7 +48,6 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	hud = layer
 	panel = window
 	_full = full
-	var old_scroll := legacy.get_parent()
 	_park = Control.new()
 	_park.name = "SettingsControlStorage"
 	_park.hide()
@@ -56,8 +55,8 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	if status != null:
 		status.reparent(_park)
 	_collect(legacy, sliders)
-	panel.remove_child(old_scroll)
-	old_scroll.queue_free()
+	panel.remove_child(legacy)
+	legacy.queue_free()
 
 	_shield = Control.new()
 	_shield.name = "WorldMapSettingsPointerShield"

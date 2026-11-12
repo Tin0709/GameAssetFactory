@@ -413,14 +413,19 @@ func _load_private_clip_library(entries:Array, library_name:StringName, combat_c
 	for key:String in staged:clips[key]=candidate[key]
 	return true
 
+func _live_movement_input_enabled() -> bool:
+	return true
+
 func _physics_process(delta:float)->void:
 	_apply_jump_settings()
 	if foot_placement!=null:foot_placement.restore()
 	_record_order(&"physics_begin",{"delta":delta})
-	var stick:=requested_direction if scripted_input else Input.get_vector("move_left","move_right","move_forward","move_backward")
+	var live_input := not scripted_input and _live_movement_input_enabled()
+	var stick := Input.get_vector("move_left","move_right","move_forward","move_backward") if live_input else Vector2.ZERO
+	if scripted_input:stick=requested_direction
 	if not scripted_input:stick=_movement_right*stick.x+_movement_back*stick.y
-	var sprint:=requested_run if scripted_input else Input.is_action_pressed("sprint")
-	var jump_down:=requested_jump if scripted_input else Input.is_action_pressed("jump")
+	var sprint:=requested_run if scripted_input else live_input and Input.is_action_pressed("sprint")
+	var jump_down:=requested_jump if scripted_input else live_input and Input.is_action_pressed("jump")
 	var jump_pressed:=jump_down and not _jump_held;_jump_held=jump_down
 	# Human source controls use ordinary full-speed movement, with Shift as a
 	# slow study modifier. Explicit scripted Walk/Run and authored controls stay stable.

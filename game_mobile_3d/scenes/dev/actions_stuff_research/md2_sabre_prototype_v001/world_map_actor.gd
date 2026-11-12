@@ -73,6 +73,9 @@ func _animate(delta:float)->void:
 	else:_idle_wait+=delta
 	super._animate(delta)
 
+func _live_movement_input_enabled() -> bool:
+	return not (get_viewport().gui_get_focus_owner() is LineEdit)
+
 func _physics_process(delta:float)->void:
 	if is_dead:
 		if not is_on_floor():

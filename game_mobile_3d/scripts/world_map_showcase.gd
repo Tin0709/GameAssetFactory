@@ -1739,13 +1739,11 @@ func _build_basic_settings() -> void:
 	panel = PanelContainer.new()
 	panel.name = "ShowcaseOptions"
 	hud.add_child(panel)
-	var scroll := ScrollContainer.new()
-	panel.add_child(scroll)
 	var box := VBoxContainer.new()
-	scroll.add_child(box)
+	panel.add_child(box)
 	var help := Label.new()
 	help.name = "SettingsKeysHelp"
-	help.text = level.get_node("HUD/Help").text
+	help.text = level.get_node("HUD/Help").text + "\nL ẩn / hiện HUD"
 	box.add_child(help)
 	_settings.setup(hud, panel, box, {}, null, false)
 	level.get_node("HUD/Help").hide()
@@ -1758,11 +1756,8 @@ func _build_ui()->void:
 	_fps_label.add_theme_color_override("font_color",Color.WHITE)
 	_fps_label.add_theme_color_override("font_outline_color",Color(0,0,0,.85))
 	_fps_label.add_theme_constant_override("outline_size",4);hud.add_child(_fps_label)
-	panel=PanelContainer.new();panel.name="ShowcaseOptions";panel.position=Vector2(18,40)
-	panel.custom_minimum_size=Vector2(410,0);hud.add_child(panel)
-	var scroll:=ScrollContainer.new();scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size=Vector2(440,minf(level.get_viewport().get_visible_rect().size.y-58.,630.));panel.add_child(scroll)
-	var box:=VBoxContainer.new();box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(box)
+	panel=PanelContainer.new();panel.name="ShowcaseOptions";hud.add_child(panel)
+	var box:=VBoxContainer.new();panel.add_child(box)
 	status=Label.new();box.add_child(status)
 	var controls:=Label.new();controls.name="SettingsKeysHelp"
 	controls.text="WASD di chuyển · Shift đi chậm · Space nhảy\nChuột trái / E đánh combo · Trên không: đánh xuống\nChuột phải ngắm / đi ngang · Q / C xoay · R về điểm đầu\nLăn chuột thu phóng · V xem toàn bản đồ\nL ẩn / hiện HUD · B so sánh đồ họa gốc\nT chuyển thời điểm · Shift+T tự chuyển ngày / đêm\nF1 bóng mềm · F2 bóng tiếp xúc · F3 bóng mây\nF7 exposure cục bộ · F8 màu ban ngày · F9 mép lá\nF10 nội suy · F11 ánh sáng môi trường · F12 cache địa hình"
