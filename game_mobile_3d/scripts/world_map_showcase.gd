@@ -116,6 +116,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_mist_light": ["Night mist light", 1.],
 	&"night_depth_scatter": ["Ánh xanh trong sương xa", 1.],
 	&"dawn_mist_source": ["Ánh sáng sương rạng sáng", 1.],
+	&"evening_mist_profile": ["Sương hoàng hôn", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"sculk_surface": ["Sculk phát sáng", 1.],
@@ -141,7 +142,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 65
+const LIGHTING_MIX_VERSION := 66
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -677,9 +678,11 @@ func _sample_mist_phase() -> Dictionary:
 		return {}
 	var reference := reference_hour()
 	var measured: Dictionary = phase_air.sample(reference)
+	if measured.is_empty() or not captured_mist_source or atmosphere_review != "combined" or _balanced_preview:
+		return measured
+	phase_air.blend_evening(measured, hour, _lighting_scale(&"evening_mist_profile"))
 	var strength := _lighting_scale(&"dawn_mist_source")
-	if measured.is_empty() or not captured_mist_source or atmosphere_review != "combined" or _balanced_preview \
-			or strength <= 0. or hour >= 4.5 or hour <= reference:
+	if strength <= 0. or hour >= 4.5 or hour <= reference:
 		return measured
 	var dawn: Dictionary = phase_air.sample(hour)
 	# Advance the light source while retaining the existing optical profile.
@@ -1344,6 +1347,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 65 and effect == &"night_soft_bloom":
 			missing_value = 0.
+		if version < 66 and effect == &"evening_mist_profile":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1385,6 +1390,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.available()
 		if effect == &"dawn_mist_source":
 			slider.editable = slider.editable and not phase_air.anchors.is_empty()
+		if effect == &"evening_mist_profile":
+			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
 		if effect == &"forest_path_placement":
@@ -1482,7 +1489,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"dawn_mist_source"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"dawn_mist_source", &"evening_mist_profile"]:
 		_update_mist()
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
