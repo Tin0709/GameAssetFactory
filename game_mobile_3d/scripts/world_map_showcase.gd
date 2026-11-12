@@ -116,6 +116,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_path_placement": ["Vị trí đèn lối rừng", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
 	&"forest_path_air": ["Path light in mist", 1.],
+	&"forest_path_air_beam": ["Hướng đèn trong sương", 1.],
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"bloom_diffusion": ["Độ mềm bloom", 1.],
@@ -132,7 +133,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 56
+const LIGHTING_MIX_VERSION := 57
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -812,8 +813,10 @@ func _path_air_source() -> PackedFloat32Array:
 		return PackedFloat32Array()
 	var position := lamp.global_position
 	var rgb := lamp.light_color.srgb_to_linear()
+	var beam := path_beam_state
 	return PackedFloat32Array([position.x, position.y, position.z, lamp.omni_range,
-		rgb.r, rgb.g, rgb.b, lamp.light_energy * PATH_AIR_MAX_SCALE * gain])
+		rgb.r, rgb.g, rgb.b, lamp.light_energy * PATH_AIR_MAX_SCALE * gain,
+		beam.x, beam.y, beam.z, beam.w * _lighting_scale(&"forest_path_air_beam")])
 
 func _mist_state(ready:bool,error:String)->void:
 	if mist==null or not mist.visible or _mist_sample.is_empty():return
@@ -894,7 +897,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 1.
 	if effect == &"world_outline_strength":
 		return 0.
-	if effect in [&"sculk_surface", &"forest_path_placement"]:
+	if effect in [&"sculk_surface", &"forest_path_placement", &"forest_path_air_beam"]:
 		return 0.
 	if effect == &"forest_daylight_accents":
 		return .65
@@ -1250,6 +1253,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 56 and effect == &"forest_path_placement":
 			missing_value = 0.
+		if version < 57 and effect == &"forest_path_air_beam":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1345,7 +1350,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"forest_path_beam":
 		_publish_point_cutoff()
 		return
-	if changed_effect in [&"forest_path_air", &"sunlit_mist"]:
+	if changed_effect in [&"forest_path_air", &"forest_path_air_beam", &"sunlit_mist"]:
 		return # The volume reads the live fixture and mix immediately before dispatch.
 	if changed_effect == &"foot_contact":
 		player_contact.refresh()

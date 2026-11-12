@@ -24,6 +24,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 light_size; // world lattice dimensions, near-layer fade start
  vec4 path_position_range;
  vec4 path_rgb_gain;
+ vec4 path_scatter_axis_weight;
 #ifdef GAF_DIRECTIONAL_AIR
  vec4 directional_rgb_gain;
  vec4 directional_slots;
@@ -57,7 +58,15 @@ float local_point_weight(vec3 offset,float radius,bool recovered){
 vec3 path_light(vec3 point){
  if(p.path_rgb_gain.w<=0.)return vec3(0.);
  vec3 offset=point-p.path_position_range.xyz;
- return p.path_rgb_gain.rgb*(p.path_rgb_gain.w*local_point_weight(offset,p.path_position_range.w,true));
+ float response=p.path_rgb_gain.w*local_point_weight(offset,p.path_position_range.w,true);
+ if(response>0. && p.path_scatter_axis_weight.w>0.){
+  // Match the angular response of the existing surface light. The medium
+  // still computes its own optical depth and has no separate point shadow map.
+  float axis_response=dot(-offset,p.path_scatter_axis_weight.xyz)*inversesqrt(max(dot(offset,offset),1e-8));
+  float angle=clamp((axis_response-0.0164524354)*1.016727686,0.,1.);
+  response*=mix(1.,angle*angle,p.path_scatter_axis_weight.w);
+ }
+ return p.path_rgb_gain.rgb*response;
 }
 #ifdef GAF_DIRECTIONAL_AIR
 float directional_visibility(vec3 cell, int slot, int columns){

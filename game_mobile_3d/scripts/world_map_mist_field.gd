@@ -2,8 +2,9 @@ extends CompositorEffect
 ## Integrates one original participating medium before any surface is shaded.
 var texture:=Texture3DRD.new()
 var _mutex:=Mutex.new()
-const PATH_SOURCE_BYTES := 32
-const GPU_PARAMETER_BYTES := 256
+const LEGACY_PATH_SOURCE_BYTES := 32
+const PATH_SOURCE_BYTES := 48
+const GPU_PARAMETER_BYTES := 224 + PATH_SOURCE_BYTES
 const DIRECTIONAL_PARAMETER_BYTES := 64
 const LOCAL_MIST_BYTES := 48
 var directional_grid: ImageTexture3D
@@ -37,7 +38,9 @@ func configure_with_local_mist(parameters: PackedByteArray, size: Vector2i, nois
 func configure_with_mist_regions(parameters: PackedByteArray, size: Vector2i, noise: RID, light: RID,
 		path_light: PackedFloat32Array, local_mist: PackedFloat32Array, additional_mist: PackedFloat32Array) -> void:
 	var path_bytes := path_light.to_byte_array()
-	if path_bytes.size() != PATH_SOURCE_BYTES:
+	if path_bytes.size() == LEGACY_PATH_SOURCE_BYTES:
+		path_bytes.resize(PATH_SOURCE_BYTES)
+	elif path_bytes.size() != PATH_SOURCE_BYTES:
 		path_bytes.resize(PATH_SOURCE_BYTES)
 		path_bytes.fill(0)
 	var directional_bytes := PackedByteArray()
