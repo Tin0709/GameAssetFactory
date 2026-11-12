@@ -37,11 +37,7 @@ const DEATH_TIER_INFLUENCE := 0.75
 const DEATH_ANGULAR_TO_LAB := 0.18
 const DEATH_AIR_ATTACK_ANGULAR_TO_LAB := 0.14
 const DEATH_FINISHER_ROLL_SPEED := 1.0
-# Calibrate grounded hits to the recorded Sabre and Sword tumbles. Air
-# attacks retain their flight profile to keep the stronger launches stable.
-const DEATH_FLIGHT_GRAVITY := 32.0
-const DEATH_AIR_ATTACK_FLIGHT_GRAVITY := 21.0
-const SABRE_FINISHER_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
+const DEATH_FLIGHT_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
 const SABRE_FINISHER_GRAVITY_HOLD := 0.30
 const SABRE_FINISHER_HEAD_FRICTION := 0.70
 const SABRE_FINISHER_HEAD_BOUNCE := 0.30
@@ -119,13 +115,16 @@ var _corpse_parked := false
 var _settled_seconds := 0.0
 var _landing_age := INF
 var _physics_profile: Dictionary
+var _corpse_floor: CollisionShape3D
 static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
 static var _corpse_material: ShaderMaterial
 
-func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D], serial: int, physics_profile: Dictionary = {}) -> void:
+func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D],
+		serial: int, physics_profile: Dictionary = {}, corpse_floor: CollisionShape3D = null) -> void:
 	target = player
 	_physics_profile = physics_profile
+	_corpse_floor = corpse_floor
 	_death_rng.seed = hash(Vector2i(serial, 1709))
 	_walk_clip = WALK_CLIPS[serial % WALK_CLIPS.size()]
 	add_child(model)
@@ -156,9 +155,9 @@ func _ready() -> void:
 	var skeleton := find_child("Skeleton3D", true, false) as Skeleton3D
 	var source := _source_physics_setup(skeleton)
 	if source.is_empty():
-		ragdoll.setup(skeleton, RAGDOLL_PARTS, RAGDOLL_BONES)
+		ragdoll.setup(skeleton, RAGDOLL_PARTS, RAGDOLL_BONES, {}, {}, _corpse_floor)
 	else:
-		ragdoll.setup(skeleton, source.parts, source.bones, source.offsets, source.joints)
+		ragdoll.setup(skeleton, source.parts, source.bones, source.offsets, source.joints, _corpse_floor)
 	for body: PhysicalBone3D in ragdoll.bodies.values():
 		body.collision_layer = 0
 		body.collision_mask = 0
@@ -357,9 +356,6 @@ func _update_death(delta: float) -> void:
 	if _corpse_parked:
 		return
 	var sabre_finisher := _death_strike == DeathStrike.SABRE_FINISHER
-	var flight_gravity := DEATH_AIR_ATTACK_FLIGHT_GRAVITY if _death_strike == DeathStrike.AIR else DEATH_FLIGHT_GRAVITY
-	if sabre_finisher:
-		flight_gravity = SABRE_FINISHER_GRAVITY
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
 			ragdoll.sample(delta)
@@ -380,7 +376,7 @@ func _update_death(delta: float) -> void:
 		launch.linear_impulse = cos(angle) * launch_impulse
 		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
-		if ragdoll.begin(launch, direction, "Chest", 0.0, flight_gravity):
+		if ragdoll.begin(launch, direction, "Chest", 0.0, DEATH_FLIGHT_GRAVITY):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	if not _corpse_landed and ragdoll.contact_motion().core_contacts > 0:
@@ -397,7 +393,7 @@ func _update_death(delta: float) -> void:
 		# Let contact and friction lead the first impact, then settle the roll.
 		var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
 		var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
-		var flight_gravity_scale := flight_gravity / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+		var flight_gravity_scale := DEATH_FLIGHT_GRAVITY / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 		var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 		var angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 		for body: PhysicalBone3D in ragdoll.bodies.values():

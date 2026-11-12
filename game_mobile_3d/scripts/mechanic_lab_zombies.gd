@@ -100,7 +100,8 @@ func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie:
 	zombie.name = "Zombie"
 	zombie.position = point
 	zombie.max_health = Zombie.BASE_HEALTH if base_zombie else Zombie.TRAINING_HEALTH
-	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial, _physics_profile)
+	var corpse_floor := get_node_or_null("../Ground/Collision") as CollisionShape3D
+	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial, _physics_profile, corpse_floor)
 	zombie.melee_hit.connect(player_hit.emit)
 	zombie.melee_audio.connect(zombie_attack_audio.emit)
 	_spawn_serial += 1

@@ -1,5 +1,5 @@
 extends Node
-## Native skeletal adapter. No transform writers or scripted falling once handed off.
+## Native skeletal adapter with optional contact recovery for a flat lab floor.
 const PHYSICAL_PART = preload("res://scenes/dev/zombie_death_physics/physical_part.gd")
 const PARTS := [
 	# name, Skeleton Y-up rest center, inset box, kg, bend°, twist°
@@ -12,6 +12,7 @@ const PARTS := [
 	["Leg.R", Vector3(-0.1125, 0.3375, 0), Vector3(0.205, 0.655, 0.205), 7.0, 25.0, 10.0],
 ]
 const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "Chest", "Leg.L": "Hips", "Leg.R": "Hips"}
+const FLOOR_CONTACT_SLOP := 0.005
 @export var maximum_inherited_linear_speed := 3.0
 @export var maximum_inherited_angular_speed := 10.0
 var skeleton: Skeleton3D
@@ -34,15 +35,18 @@ var resistance_age := 0.0
 var _parts: Array = PARTS
 var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
+var _flat_floor: CollisionShape3D
+var _floor_projection_frame := -1
 # (Nm/rad, Nms/rad): soft restoring torque plus relative angular damping.
 const JOINT_RESPONSE := {"Chest": Vector2(18,5.4), "Head": Vector2(4,2.4), "Arm.L": Vector2(3,2.1), "Arm.R": Vector2(3,2.1), "Leg.L": Vector2(6,2.7), "Leg.R": Vector2(6,2.7)}
 
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
-		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}) -> void:
+		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}, flat_floor: CollisionShape3D = null) -> void:
 	set_physics_process(false)
 	skeleton = target
 	_parts = part_layout
 	source_joints = authored_joints
+	_flat_floor = flat_floor
 	# Reject unsupported rigs instead of quietly binding the wrong bones/scale.
 	assert(skeleton.global_basis.get_scale().is_equal_approx(Vector3.ONE), "Ragdoll requires unit-scale hierarchy")
 	simulator = PhysicalBoneSimulator3D.new()
@@ -55,6 +59,8 @@ func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionar
 		assert(id >= 0, "Missing ragdoll bone: " + bone_name)
 		var body := PhysicalBone3D.new()
 		body.set_script(PHYSICAL_PART)
+		if _flat_floor != null:
+			body.set("floor_projection", _project_floor_contact)
 		body.name = "Corpse_" + part[0]
 		body.set("bone_name", bone_name)
 		body.body_offset = body_offsets.get(part[0],
@@ -284,6 +290,44 @@ func minimum_corner_y() -> float:
 				for z in [-1, 1]:
 					result = minf(result, (body.global_transform * (half * Vector3(x,y,z))).y)
 	return result
+
+func _project_floor_contact() -> void:
+	var frame := Engine.get_physics_frames()
+	if not running or _floor_projection_frame == frame or not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return
+	_floor_projection_frame = frame
+	var floor_box := _flat_floor.shape as BoxShape3D
+	var floor_pose := _flat_floor.global_transform
+	if floor_box == null or not floor_pose.basis.y.is_equal_approx(Vector3.UP) \
+			or not floor_pose.basis.get_scale().is_equal_approx(Vector3.ONE):
+		return
+	var floor_half := floor_box.size * 0.5
+	var floor_inverse := floor_pose.affine_inverse()
+	var lift := 0.0
+	for part in _parts:
+		var body: PhysicalBone3D = bodies[part[0]]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			continue
+		var pose := floor_inverse * state.transform
+		var half: Vector3 = part[2] * 0.5
+		var extent_y := Vector3(absf(pose.basis.x.y), absf(pose.basis.y.y), absf(pose.basis.z.y)).dot(half)
+		var depth := floor_half.y - (pose.origin.y - extent_y) - FLOOR_CONTACT_SLOP
+		if depth <= lift or pose.origin.y + extent_y < -floor_half.y:
+			continue
+		# The finite platform only supports boxes whose footprints fit on it.
+		var extent_x := Vector3(absf(pose.basis.x.x), absf(pose.basis.y.x), absf(pose.basis.z.x)).dot(half)
+		var extent_z := Vector3(absf(pose.basis.x.z), absf(pose.basis.y.z), absf(pose.basis.z.z)).dot(half)
+		if absf(pose.origin.x) + extent_x <= floor_half.x and absf(pose.origin.z) + extent_z <= floor_half.z:
+			lift = depth
+	if lift <= 0.0:
+		return
+	# Correct penetration before the bones sync to the rendered skeleton.
+	# Translate the whole assembly together so joint anchors and velocities stay intact.
+	for body: PhysicalBone3D in bodies.values():
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state:
+			state.transform = state.transform.translated(Vector3.UP * lift)
 
 func contact_motion() -> Dictionary:
 	var contacts := 0
