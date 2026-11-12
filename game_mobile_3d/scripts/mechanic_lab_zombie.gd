@@ -528,15 +528,16 @@ func _check_wall_rest(delta: float, motion: Dictionary) -> bool:
 		return false
 	# Solver velocities can oscillate on a supported edge. Check that each
 	# body stays near the same pose throughout the whole rest window.
+	var moved := false
 	for name in _wall_rest_poses:
 		var body: PhysicalBone3D = ragdoll.bodies[name]
 		var start := _wall_rest_poses[name]
 		var pose := body.global_transform
 		if pose.origin.distance_to(start.origin) > CORPSE_WALL_REST_SHIFT \
 				or pose.basis.get_rotation_quaternion().angle_to(start.basis.get_rotation_quaternion()) > CORPSE_WALL_REST_TURN:
-			_wall_rest_poses.clear()
+			moved = true
 			break
-	if _wall_rest_poses.is_empty():
+	if moved or _wall_rest_poses.is_empty():
 		for name: String in ragdoll.bodies:
 			_wall_rest_poses[name] = ragdoll.bodies[name].global_transform
 		_wall_rest_age = 0.0
