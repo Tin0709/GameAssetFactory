@@ -25,9 +25,9 @@ const DEATH_SOURCE_ANGULAR_SCALE := 40.0
 const DEATH_TWIRL_CHANCE := 0.33
 const DEATH_STRENGTH_THRESHOLDS := [400.0, 750.0, 1200.0]
 const DEATH_ADDITIONAL_MULTIPLIERS := [0.5, 1.0, 1.5]
-const DEATH_SPEED_TO_LAB := 0.0074
-const DEATH_TIER_INFLUENCE := 0.28
-const DEATH_ANGULAR_TO_LAB := 0.14
+const DEATH_SPEED_TO_LAB := 0.0078
+const DEATH_TIER_INFLUENCE := 0.22
+const DEATH_ANGULAR_TO_LAB := 0.144
 const DEATH_GRAVITY := 15.0
 const HEIGHT := 1.95
 const HIT_RADIUS := 0.48
@@ -231,8 +231,8 @@ func _update_death(delta: float) -> void:
 		# Absorb the landing once the torso reaches the floor. Physics still
 		# owns the remaining slide and the pose of every joint.
 		for body: PhysicalBone3D in ragdoll.bodies.values():
-			body.linear_damp = 3.4
-			body.angular_damp = 4.8
+			body.linear_damp = 5.2
+			body.angular_damp = 6.8
 	var remaining := CORPSE_LIFETIME - _corpse_age
 	if remaining <= 0.00001:
 		queue_free()
