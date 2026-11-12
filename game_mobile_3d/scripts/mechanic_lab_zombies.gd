@@ -132,9 +132,11 @@ func _spawn_point_clear(point: Vector3, player_position: Vector3) -> bool:
 func aim_sabre(index: int, serial: int, movement: Vector3) -> Vector3:
 	if serial != _aim_serial:
 		_aim_serial = serial
-		_aim_target = _find_melee_target(float(_strikes()[index].range_m), movement)
+		_aim_target = null
 	if not is_instance_valid(_aim_target) or _aim_target.health <= 0 or _aim_target.is_queued_for_deletion():
-		return Vector3.ZERO
+		_aim_target = _find_melee_target(float(_strikes()[index].range_m), movement)
+		if _aim_target == null:
+			return Vector3.ZERO
 	var direction := _aim_target.global_position - _attacker.global_position
 	direction.y = 0.0
 	return direction
