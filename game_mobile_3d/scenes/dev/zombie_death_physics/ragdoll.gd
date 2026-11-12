@@ -21,6 +21,7 @@ const TERRAIN_MIN_OVERLAP := 0.035
 const TERRAIN_RESIDUAL_OVERLAP := 0.018
 const CONE_DEFAULT_BIAS := 0.30
 const CONE_OVERSHOOT_BIAS := 0.10
+const CONE_SUPPORT_OVERSHOOT_COS := cos(deg_to_rad(75.0))
 # SK_Zombie_PhysicsAsset enables linear projection with a 5 cm tolerance.
 const SOURCE_ANCHOR_TOLERANCE := 0.05
 const PROJECTION_COLLISION_MARGIN := 0.001
@@ -330,9 +331,15 @@ func _project_source_anchors() -> void:
 			continue
 		var parent_frame: Transform3D = parent_state.transform * spec.parent_frame
 		var child_frame: Transform3D = state.transform * spec.child_frame
-		# Godot's cone solver flips its swing axis past perpendicular. Reduce
-		# the angular correction there so an impact does not wrench the anchor apart.
-		var overshot := child_frame.basis.x.dot(parent_frame.basis.x) <= 0.0
+		# Godot's cone solver flips its swing axis past perpendicular. A limb
+		# braced against terrain can wrench the anchor apart before that flip.
+		var alignment := child_frame.basis.x.dot(parent_frame.basis.x)
+		var overshot := alignment <= 0.0
+		if not overshot and alignment < CONE_SUPPORT_OVERSHOOT_COS:
+			for index in state.get_contact_count():
+				if state.get_contact_local_normal(index).y > MIN_SUPPORT_NORMAL_Y:
+					overshot = true
+					break
 		var bias := CONE_OVERSHOOT_BIAS if overshot else CONE_DEFAULT_BIAS
 		PhysicsServer3D.cone_twist_joint_set_param(source_joint_rids[name], PhysicsServer3D.CONE_TWIST_JOINT_BIAS, bias)
 		if state.get_contact_count() > 0:
