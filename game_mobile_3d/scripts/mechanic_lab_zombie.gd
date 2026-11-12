@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 signal melee_hit(amount: int)
 
-enum DeathStrike { GROUND, AIR, SABRE_FINISHER }
+enum DeathStrike { GROUND, AIR, SABRE_FINISHER, CURVED_GREATSWORD }
 signal melee_audio(point: Vector3, contact: bool)
 
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
@@ -38,6 +38,7 @@ const DEATH_ANGULAR_TO_LAB := 0.18
 const DEATH_AIR_ATTACK_ANGULAR_TO_LAB := 0.14
 const DEATH_FINISHER_ROLL_SPEED := 1.0
 const DEATH_FLIGHT_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
+const CURVED_GREATSWORD_FLIGHT_GRAVITY := 32.0
 const SABRE_FINISHER_GRAVITY_HOLD := 0.30
 const SABRE_FINISHER_HEAD_FRICTION := 0.70
 const SABRE_FINISHER_HEAD_BOUNCE := 0.30
@@ -155,9 +156,9 @@ func _ready() -> void:
 	var skeleton := find_child("Skeleton3D", true, false) as Skeleton3D
 	var source := _source_physics_setup(skeleton)
 	if source.is_empty():
-		ragdoll.setup(skeleton, RAGDOLL_PARTS, RAGDOLL_BONES, {}, {}, _corpse_floor)
+		ragdoll.setup(skeleton, RAGDOLL_PARTS, RAGDOLL_BONES)
 	else:
-		ragdoll.setup(skeleton, source.parts, source.bones, source.offsets, source.joints, _corpse_floor)
+		ragdoll.setup(skeleton, source.parts, source.bones, source.offsets, source.joints)
 	for body: PhysicalBone3D in ragdoll.bodies.values():
 		body.collision_layer = 0
 		body.collision_mask = 0
@@ -356,6 +357,8 @@ func _update_death(delta: float) -> void:
 	if _corpse_parked:
 		return
 	var sabre_finisher := _death_strike == DeathStrike.SABRE_FINISHER
+	var curved := _death_strike == DeathStrike.CURVED_GREATSWORD
+	var flight_gravity := CURVED_GREATSWORD_FLIGHT_GRAVITY if curved else DEATH_FLIGHT_GRAVITY
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
 			ragdoll.sample(delta)
@@ -376,7 +379,7 @@ func _update_death(delta: float) -> void:
 		launch.linear_impulse = cos(angle) * launch_impulse
 		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
-		if ragdoll.begin(launch, direction, "Chest", 0.0, DEATH_FLIGHT_GRAVITY):
+		if ragdoll.begin(launch, direction, "Chest", 0.0, flight_gravity, null if curved else _corpse_floor):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	if not _corpse_landed and ragdoll.contact_motion().core_contacts > 0:
@@ -393,7 +396,7 @@ func _update_death(delta: float) -> void:
 		# Let contact and friction lead the first impact, then settle the roll.
 		var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
 		var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
-		var flight_gravity_scale := DEATH_FLIGHT_GRAVITY / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+		var flight_gravity_scale := flight_gravity / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 		var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 		var angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 		for body: PhysicalBone3D in ragdoll.bodies.values():

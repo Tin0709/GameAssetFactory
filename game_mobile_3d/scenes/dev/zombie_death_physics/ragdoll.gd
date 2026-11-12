@@ -42,12 +42,11 @@ var _floor_projection_frame := -1
 const JOINT_RESPONSE := {"Chest": Vector2(18,5.4), "Head": Vector2(4,2.4), "Arm.L": Vector2(3,2.1), "Arm.R": Vector2(3,2.1), "Leg.L": Vector2(6,2.7), "Leg.R": Vector2(6,2.7)}
 
 func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
-		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}, flat_floor: CollisionShape3D = null) -> void:
+		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}) -> void:
 	set_physics_process(false)
 	skeleton = target
 	_parts = part_layout
 	source_joints = authored_joints
-	_flat_floor = flat_floor
 	# Reject unsupported rigs instead of quietly binding the wrong bones/scale.
 	assert(skeleton.global_basis.get_scale().is_equal_approx(Vector3.ONE), "Ragdoll requires unit-scale hierarchy")
 	simulator = PhysicalBoneSimulator3D.new()
@@ -60,8 +59,6 @@ func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionar
 		assert(id >= 0, "Missing ragdoll bone: " + bone_name)
 		var body := PhysicalBone3D.new()
 		body.set_script(PHYSICAL_PART)
-		if _flat_floor != null:
-			body.set("floor_projection", _project_floor_contact)
 		body.name = "Corpse_" + part[0]
 		body.set("bone_name", bone_name)
 		body.body_offset = body_offsets.get(part[0],
@@ -97,9 +94,14 @@ func sample(delta: float) -> void:
 		current[name] = skeleton.global_transform * skeleton.get_bone_global_pose(body.get_bone_id()) * body.body_offset
 	sample_count += 1
 
-func begin(profile: Resource, direction: Vector3, location: String, distance: float, gravity: float) -> bool:
+func begin(profile: Resource, direction: Vector3, location: String, distance: float, gravity: float,
+		flat_floor: CollisionShape3D = null) -> bool:
 	if running or sample_count < 2: return false
 	running = true
+	_flat_floor = flat_floor
+	if _flat_floor != null:
+		for body: PhysicalBone3D in bodies.values():
+			body.set("floor_projection", _project_floor_contact)
 	simulator.active = true
 	# This refreshes all cached animated poses, sets all body transforms and changes mode.
 	simulator.physical_bones_start_simulation()
