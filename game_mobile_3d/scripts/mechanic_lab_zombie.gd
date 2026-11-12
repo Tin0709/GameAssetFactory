@@ -3,6 +3,7 @@ extends CharacterBody3D
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const Ragdoll := preload("res://scenes/dev/zombie_death_physics/ragdoll.gd")
 const DeathProfile := preload("res://scenes/dev/zombie_death_physics/death_profile.gd")
+const CORPSE_SHADER := preload("res://materials/mechanic_lab_zombie_corpse.gdshader")
 const IDLE := &"Zombie_Idle"
 const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Variant2"]
 const SPAWN := &"Zombie_Spawn"
@@ -14,8 +15,11 @@ const HIT_RADIUS := 0.48
 const CHASE_SPEED := 3.1
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
-const CORPSE_LIFETIME := 2.0
-const CORPSE_DISSOLVE_DURATION := 0.40
+# Honeycomb Farm footage: visible breakup about 4.4–4.9 seconds after the lethal hit.
+const CORPSE_LIFETIME := 4.9
+const CORPSE_DISSOLVE_DURATION := 0.50
+const CORPSE_DESATURATION_START := 2.3
+const CORPSE_DESATURATION_END := 3.6
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
 const RAGDOLL_BONES := {
@@ -44,9 +48,9 @@ var _death_direction := Vector3.ZERO
 var _attack_cooldown := 0.0
 var _flash_left := 0.0
 var _corpse_age := 0.0
-var _corpse_material: StandardMaterial3D
 static var _flash_material: StandardMaterial3D
 static var _death_profile: DeathProfile
+static var _corpse_material: ShaderMaterial
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D], serial: int) -> void:
 	target = player
@@ -163,6 +167,7 @@ func take_hit(amount: int, direction: Vector3) -> void:
 		animation.play(STAGGER, 0.0, 2.7)
 
 func _update_death(delta: float) -> void:
+	_corpse_age += delta
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
 			ragdoll.sample(delta)
@@ -172,24 +177,26 @@ func _update_death(delta: float) -> void:
 			body.collision_mask = 1
 		ragdoll.begin(_death_profile, _death_direction, "Chest", 0.0, 13.0)
 		return
-	_corpse_age += delta
 	var remaining := CORPSE_LIFETIME - _corpse_age
 	if remaining <= 0.00001:
 		queue_free()
-	elif remaining < CORPSE_DISSOLVE_DURATION:
-		_dissolve_corpse(remaining / CORPSE_DISSOLVE_DURATION)
+	elif _corpse_age >= CORPSE_DESATURATION_START:
+		_update_corpse_material(remaining)
 
-func _dissolve_corpse(coverage: float) -> void:
-	if _corpse_material == null:
-		var skin := _mesh.get_active_material(0) as StandardMaterial3D
-		if skin == null:
-			return
-		_corpse_material = skin.duplicate() as StandardMaterial3D
-		_corpse_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_HASH
+func _update_corpse_material(remaining: float) -> void:
+	if _mesh.material_override == null:
+		if _corpse_material == null:
+			var skin := _mesh.get_active_material(0) as StandardMaterial3D
+			if skin == null:
+				return
+			_corpse_material = ShaderMaterial.new()
+			_corpse_material.shader = CORPSE_SHADER
+			_corpse_material.set_shader_parameter("skin", skin.albedo_texture)
 		_mesh.material_override = _corpse_material
-	var tint := _corpse_material.albedo_color
-	tint.a = smoothstep(0.0, 1.0, coverage)
-	_corpse_material.albedo_color = tint
+	var gray := smoothstep(CORPSE_DESATURATION_START, CORPSE_DESATURATION_END, _corpse_age) * 0.80
+	var breakup := 1.0 - clampf(remaining / CORPSE_DISSOLVE_DURATION, 0.0, 1.0)
+	_mesh.set_instance_shader_parameter("desaturation", gray)
+	_mesh.set_instance_shader_parameter("dissolve", breakup)
 
 func _exit_tree() -> void:
 	if is_instance_valid(ragdoll):
