@@ -145,6 +145,29 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	zombie.free()
 	await ticks(2)
 
+func oblique_cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
+	group._spawn_serial = 10
+	var direction := Vector3.FORWARD.rotated(Vector3.UP, -0.10)
+	var zombie = await launch(world, group, effects, Vector3(-37.5, 3.0, -33.5), direction, Zombie.DeathStrike.AIR)
+	if zombie == null:
+		return
+	var worst_overlap := 0.0
+	var worst_anchor := 0.0
+	for frame in 80:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+		if not zombie.ragdoll.running:
+			continue
+		worst_overlap = maxf(worst_overlap, terrain_contact_depth(zombie))
+		worst_anchor = maxf(worst_anchor, zombie.ragdoll.max_anchor_error())
+	check(zombie._corpse_landed, "The oblique cliff impact still reaches ground support")
+	check(worst_overlap > 0.0 and worst_overlap < 0.12, "The oblique cliff contact stays within the terrain penetration budget")
+	check(worst_anchor < 0.12, "The oblique cliff impact keeps the limb anchors connected")
+	print("WORLDMAP_OBLIQUE_CLIFF peak_overlap_m=", worst_overlap, " peak_anchor_m=", worst_anchor)
+	zombie.free()
+	await ticks(2)
+
 func run() -> void:
 	var world = preload("res://scenes/WorldMap.tscn").instantiate()
 	root.add_child(world)
@@ -172,6 +195,13 @@ func run() -> void:
 		group._spawn_serial = 7
 		await ledge_case(world, group, effects, Zombie.DeathStrike.AIR, 190,
 			Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT.rotated(Vector3.UP, 0.10))
+		# The spinning head can still travel into a floor or an edge after the first bounce.
+		group._spawn_serial = 5
+		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER, 190, Vector3(-33.5, 9.0, -39.15))
+		group._spawn_serial = 10
+		await ledge_case(world, group, effects, Zombie.DeathStrike.AIR, 190,
+			Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT.rotated(Vector3.UP, -0.10))
+		await oblique_cliff_case(world, group, effects)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
