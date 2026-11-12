@@ -563,7 +563,7 @@ func _project_floor_contact() -> void:
 	# Keep joint anchors together on hard impacts. Once supported, correcting
 	# only the penetrating parts avoids lifting the other limbs off the floor.
 	for body: PhysicalBone3D in bodies.values():
-		var correction := depths.get(body, 0.0) - slop if landing_blended else lift
+		var correction: float = depths.get(body, 0.0) - slop if landing_blended else lift
 		if correction <= 0.0:
 			continue
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
