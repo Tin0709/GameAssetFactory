@@ -96,6 +96,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
+	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
 	&"forest_path_air": ["Path light in mist", 1.],
@@ -110,7 +111,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 37
+const LIGHTING_MIX_VERSION := 38
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -132,6 +133,7 @@ const BALANCED_ATMOSPHERE := {
 	&"grass_sky": 0.,
 	&"spruce_sky": 0.,
 	&"tree_shade": 0.,
+	&"forest_daylight_accents": 0.,
 	&"forest_path_air": 0.,
 	&"forest_path_beam": 0.,
 	&"oak_leaf_tint": 0.,
@@ -814,6 +816,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"forest_daylight_accents":
+		return .65
 	if effect == &"daylight_haze":
 		return .65
 	if effect == &"sun_opening":
@@ -1005,7 +1009,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1065,6 +1069,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 34 and effect == &"humid_depth":
 			missing_value = 0.
 		if version < 37 and effect == &"tree_shade":
+			missing_value = 0.
+		if version < 38 and effect == &"forest_daylight_accents":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
 			missing_value = 0.
@@ -1131,7 +1137,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
-	if changed_effect in [&"forest_accents", &"forest_path_light"]:
+	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light"]:
 		_sync_forest_night_lights()
 		return
 	if changed_effect in [&"", &"oak_leaf_tint"]:
@@ -1284,9 +1290,19 @@ func _sync_forest_night_lights() -> void:
 	if level == null:
 		return
 	var phase := 0.0
+	var day := 0.0
+	var night_strength := _lighting_scale(&"forest_accents")
+	var day_strength := _lighting_scale(&"forest_daylight_accents")
 	if forest_active() and unavailable_reason.is_empty() and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
 		phase = moonlight_weight(hour)
-	forest_accents.update(level, phase, _lighting_scale(&"forest_accents"))
+		if day_strength > 0.0:
+			day = PHASE_FINISH.phase_weight(hour) * (1.0 - phase)
+	if day > 0.0:
+		var coverage := day + (phase if night_strength > 0.0 else 0.0)
+		var emission := day * day_strength + phase * night_strength
+		forest_accents.update(level, coverage, emission / coverage)
+	else:
+		forest_accents.update(level, phase, night_strength)
 	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light")):
 		_publish_point_cutoff()
 
@@ -1518,6 +1534,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Lift cool scattered light at night in Combined mode. 0% restores the old color intensity. Fog density and the warm lantern are separate."
 		if effect == &"forest_accents":
 			slider.tooltip_text = "Adjust the private blue mushroom accents along the forest path at night. 0% hides them. The player lantern stays independent."
+		if effect == &"forest_daylight_accents":
+			slider.tooltip_text = "Adjust the blue mushrooms along the forest path in morning and afternoon. Noon and the night mix keep their own settings."
 		if effect == &"forest_path_light":
 			slider.tooltip_text = "Adjust the fixed warm light beside the forest path. 0% hides the fixture and its light. Works at night in Combined mode."
 		if effect == &"shadow_softness":
