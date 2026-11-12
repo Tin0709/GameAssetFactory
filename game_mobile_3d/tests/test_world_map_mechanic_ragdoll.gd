@@ -193,7 +193,7 @@ func near_wall_handoff(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	await ticks(2)
 	for i in 2:
 		zombie.ragdoll.sample(1.0 / 60.0)
-	var capsule := zombie.get_node("CollisionShape3D") as CollisionShape3D
+	var capsule := zombie.find_children("*", "CollisionShape3D", false, false)[0] as CollisionShape3D
 	check(shape_overlap(world, capsule.shape, capsule.global_transform) < 0.001,
 		"The standing capsule clears the wall before the limb enters ragdoll physics")
 	var arm: PhysicalBone3D = zombie.ragdoll.bodies["Arm.R"]
