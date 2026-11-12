@@ -53,7 +53,7 @@ void main() {
 """
 
 var _guard := Mutex.new()
-var _controls := Vector2(0.0, 2.0)
+var _controls := Vector2(0.0, 1.0)
 var _frames := 0
 var _failure := ""
 var _sampler := RID()

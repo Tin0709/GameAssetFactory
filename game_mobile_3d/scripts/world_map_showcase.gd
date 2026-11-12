@@ -900,7 +900,7 @@ func set_full_direct_shadows(value:bool)->void:
 
 func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"world_outline_width":
-		return 2.
+		return 1.
 	if effect == &"world_outline_strength":
 		return 0.
 	if effect == &"sculk_surface":
