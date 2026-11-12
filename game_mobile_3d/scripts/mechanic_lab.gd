@@ -223,7 +223,7 @@ func _drop_player(height: float) -> void:
 		$HUD/SpawnStatus.text = "Chờ player chạm đất để thử lại."
 
 func _on_player_hit(amount: int) -> void:
-	if player_health == 0:
+	if player_health == 0 or amount <= 0:
 		return
 	player_health = maxi(0, player_health - amount)
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
@@ -233,12 +233,14 @@ func _on_player_hit(amount: int) -> void:
 		player.release_inputs()
 		player.velocity = Vector3.ZERO
 		player.set_physics_process(false)
+		player.set_process_input(false)
 		player.set_process_unhandled_input(false)
 
 func reset_player() -> void:
 	if player_health == 0:
 		player.is_dead = false
 		player.set_physics_process(true)
+		player.set_process_input(true)
 		player.set_process_unhandled_input(true)
 	player_health = MAX_PLAYER_HEALTH
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
