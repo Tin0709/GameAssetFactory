@@ -69,7 +69,7 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		additional_bytes.resize(LOCAL_MIST_BYTES)
 		additional_bytes.fill(0)
 	var entry := parameters.decode_float(12) if parameters.size() >= 16 else 0.0
-	var gain := clampf(depth_scatter, 0.0, 1.0) if entry > 0.0 and is_finite(depth_scatter) else 0.0
+	var gain := clampf(depth_scatter, 0.0, 3.0) if entry > 0.0 and is_finite(depth_scatter) else 0.0
 	var depth_bytes := PackedFloat32Array([entry + DEPTH_SCATTER_START_M, entry + DEPTH_SCATTER_FULL_M,
 		gain, 0.0]).to_byte_array()
 	_mutex.lock()
