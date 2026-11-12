@@ -79,6 +79,10 @@ environment/defaults/default_clear_color=Color(0.075, 0.13, 0.17, 1)
 
 [shader_globals]
 
+gaf_replay_bounce={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
 gaf_sun_opening_gain={
 "type": "float",
 "value": 0.0

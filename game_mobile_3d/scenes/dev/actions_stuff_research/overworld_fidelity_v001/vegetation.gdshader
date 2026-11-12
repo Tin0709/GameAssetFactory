@@ -6,6 +6,7 @@ render_mode cull_disabled, diffuse_burley, specular_disabled;
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_splay.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_wind.gdshaderinc"
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
+#include "res://materials/world_map_replay_bounce.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
 #include "res://materials/world_map_player_contact.gdshaderinc"
@@ -203,6 +204,7 @@ void fragment(){
 	EMISSION *= study_twilight_ground_ambient;
 	EMISSION += color * (1.0 - METALLIC) * study_day_bounce_at_root;
 	EMISSION *= sole;
+	EMISSION += color * (1.0 - METALLIC) * gaf_replay_incident(foliage_world,vec3(0.0,1.0,0.0)) * (0.64 * sole);
 	if (gaf_diffuse_opening.w > 0.0) {
 		grass_opening_incident = study_ground_sky_at_root.rgb * study_ground_sky_scale * ground_mix * study_canopy_sky_at_root * sole;
 	}

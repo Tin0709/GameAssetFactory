@@ -133,6 +133,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"sculk_surface": ["Sculk phát sáng", 1.],
 	&"forest_replay_emission": ["Ánh bệ đá trong rừng", 1.],
+	&"forest_replay_bounce": ["Ánh hắt quanh bệ đá", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
 	&"forest_path_placement": ["Vị trí đèn lối rừng", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
@@ -157,7 +158,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 78
+const LIGHTING_MIX_VERSION := 79
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -289,6 +290,7 @@ func setup(world:Node3D)->void:
 	projected_sun.setup()
 	RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
+	RenderingServer.global_shader_parameter_set("gaf_replay_bounce", Vector4.ZERO)
 	RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
 	get_tree().node_added.connect(_track_point_light)
 	for light in get_tree().root.find_children("*","Light3D",true,false):_track_point_light(light)
@@ -629,6 +631,7 @@ func _exit_tree()->void:
 		projected_sun.release()
 		RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_diffuse_opening", Vector4.ZERO)
+		forest_replay.publish_bounce(0.0)
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
 		RenderingServer.global_shader_parameter_set("gaf_point_soft",Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_point_mixed",false)
@@ -1482,6 +1485,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 78 and effect == &"forest_replay_emission":
 			missing_value = 0.
+		if version < 79 and effect == &"forest_replay_bounce":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1539,7 +1544,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.twilight_available() and bloom_response.available()
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
-		if effect == &"forest_replay_emission":
+		if effect in [&"forest_replay_emission", &"forest_replay_bounce"]:
 			slider.editable = slider.editable and forest_replay.available(level)
 		if effect == &"forest_path_placement":
 			slider.editable = slider.editable and level.forest_path_light_offset.is_finite() \
@@ -1614,7 +1619,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
-	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission"]:
+	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"forest_path_placement", &"sculk_surface", &"forest_replay_emission", &"forest_replay_bounce"]:
 		_sync_forest_night_lights()
 		return
 	if changed_effect == &"twilight_ground_ambient":
@@ -1812,6 +1817,7 @@ func _sync_forest_night_lights() -> void:
 		forest_accents.update(level, phase, night_strength)
 	sculk_surface.update(level, maxf(day, phase) if not _balanced_preview else 0., _lighting_scale(&"sculk_surface"))
 	forest_replay.update(level, replay_phase, _lighting_scale(&"forest_replay_emission"))
+	forest_replay.publish_bounce(_lighting_scale(&"forest_replay_bounce"))
 	var offset: Vector2 = level.forest_path_light_offset if _lighting_scale(&"forest_path_placement") == 1. else Vector2.ZERO
 	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light"), offset):
 		_publish_point_cutoff()

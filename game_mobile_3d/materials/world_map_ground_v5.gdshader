@@ -13,6 +13,7 @@ render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_regional_sky.gdshaderinc"
 #define GAF_TERRAIN_NIGHT_SKY
 #include "res://materials/world_map_terrain_transport.gdshaderinc"
+#include "res://materials/world_map_replay_bounce.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
 #include "res://materials/world_map_player_contact.gdshaderinc"
 #endif
@@ -105,6 +106,7 @@ void fragment() {
 		terrain_opening_incident = terrain_opening_fill(ALBEDO, receiver_contact, sole);
 	}
 	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top)*sole;
+	EMISSION+=ALBEDO*(1.0-METALLIC)*gaf_replay_incident(surface_world,surface_normal)*receiver_contact*sole;
 	if(terrain_rough_reflection)EMISSION+=terrain_reflected(normalize(NORMAL),normalize(VIEW),ROUGHNESS,AO,cloud_transmission,receiver_contact,native_specular);
 #else
 	ALBEDO*=receiver_contact;

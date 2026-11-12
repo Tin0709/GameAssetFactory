@@ -16,6 +16,7 @@ var fixture: Node3D
 var _material: ShaderMaterial
 var _attempted := false
 var _submitted := Vector2.INF
+var _submitted_bounce := Vector4.ZERO
 
 static func evening_weight(hour: float) -> float:
 	if not is_finite(hour):
@@ -39,6 +40,16 @@ func update(world, phase: float, strength: float) -> void:
 	fixture.visible = state.y > 0.
 	_material.set_shader_parameter("radiant_strength", 3.0 * state.y)
 	_material.set_shader_parameter("phase_coverage", state.x)
+
+func publish_bounce(strength: float) -> void:
+	var state := Vector4.ZERO
+	if strength > 0.0 and is_instance_valid(fixture) and fixture.visible:
+		var center := fixture.global_position + Vector3.UP * 1.42
+		state = Vector4(center.x, center.y, center.z, 0.4 * _submitted.y * strength)
+	if state == _submitted_bounce:
+		return
+	_submitted_bounce = state
+	RenderingServer.global_shader_parameter_set("gaf_replay_bounce",state)
 
 func _load(world) -> void:
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
