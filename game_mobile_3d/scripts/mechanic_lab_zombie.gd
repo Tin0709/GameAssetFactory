@@ -17,6 +17,7 @@ const TRAINING_HEALTH := 48
 const MAX_POISE := 28.0
 const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
+const STAGGER_DURATION := 0.65 # DefaultHostile.GA_BecomeStaggered.
 const DEFAULT_DEATH_IMPULSE := Vector2(285.0, 190.0)
 # DT_MobDefinition.DefaultHostile -> GA_Ragdoll (HandleFinalDeath).
 # Zombie inherits this row through MeleeAttackMob. The runtime solver formula
@@ -306,8 +307,10 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		_poise_recovery_wait = POISE_RECOVERY_DELAY
 		if _poise <= 0.0:
 			_poise = MAX_POISE
-			animation.stop(true)
-			animation.play(STAGGER, 0.0, 2.7)
+			if animation.current_animation != STAGGER:
+				animation.stop(true)
+				var clip_duration := animation.get_animation(STAGGER).length
+				animation.play(STAGGER, 0.0, clip_duration / STAGGER_DURATION)
 
 func _update_death(delta: float) -> void:
 	_corpse_age += delta
