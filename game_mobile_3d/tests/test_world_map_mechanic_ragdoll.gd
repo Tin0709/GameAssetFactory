@@ -168,6 +168,56 @@ func oblique_cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	zombie.free()
 	await ticks(2)
 
+func shape_overlap(world: Node3D, shape: Shape3D, pose: Transform3D) -> float:
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.collision_mask = 1
+	query.shape = shape
+	query.transform = pose
+	var points := world.get_world_3d().direct_space_state.collide_shape(query, 16)
+	var depth := 0.0
+	for i in range(0, points.size(), 2):
+		depth = maxf(depth, points[i].distance_to(points[i + 1]))
+	return depth
+
+func near_wall_handoff(world: Node3D, group: Node3D, effects: Node3D) -> void:
+	if not group.spawn(world.player, Basis.IDENTITY, effects):
+		check(false, "The verified zombie is available for the wall handoff")
+		return
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(-33.5, 9.02, -39.545)
+	zombie.rotation.y = 5.0 * PI / 4.0
+	zombie.animation.play(Zombie.IDLE)
+	zombie.animation.advance(0.40)
+	zombie.reset_physics_interpolation()
+	await ticks(2)
+	for i in 2:
+		zombie.ragdoll.sample(1.0 / 60.0)
+	var capsule := zombie.get_node("CollisionShape3D") as CollisionShape3D
+	check(shape_overlap(world, capsule.shape, capsule.global_transform) < 0.001,
+		"The standing capsule clears the wall before the limb enters ragdoll physics")
+	var arm: PhysicalBone3D = zombie.ragdoll.bodies["Arm.R"]
+	var arm_shape := arm.get_child(0) as CollisionShape3D
+	var captured_arm: Transform3D = zombie.ragdoll.current["Arm.R"]
+	var before := shape_overlap(world, arm_shape.shape, captured_arm * arm_shape.transform)
+	check(before > 0.08, "The idle arm collider overlaps the wall in the captured pose")
+	zombie.take_hit(100, Vector3.RIGHT, Vector2.ZERO, 0.0, 800.0, Zombie.DeathStrike.GROUND)
+	zombie._update_death(1.0 / 60.0)
+	var after := shape_overlap(world, arm_shape.shape, arm_shape.global_transform)
+	var shift := arm.global_position - captured_arm.origin
+	check(after < 0.02 and absf(shift.y) < 0.001 and shift.length() <= 0.12,
+		"The handoff reduces the arm overlap with a bounded horizontal shift")
+	check(zombie.ragdoll.handoff_error < 0.005, "The wall handoff preserves the relative animated pose")
+	zombie.set_physics_process(true)
+	var peak := 0.0
+	for i in 40:
+		await physics_frame
+		peak = maxf(peak, terrain_contact_depth(zombie))
+	check(zombie._corpse_landed and peak < 0.045, "The cleared pose launches and reaches the lower terrace")
+	print("WORLDMAP_HANDOFF before=", before, " after=", after, " peak_overlap_m=", peak, " shift=", shift)
+	zombie.free()
+	await ticks(2)
+
 func run() -> void:
 	var world = preload("res://scenes/WorldMap.tscn").instantiate()
 	root.add_child(world)
@@ -202,6 +252,7 @@ func run() -> void:
 		await ledge_case(world, group, effects, Zombie.DeathStrike.AIR, 190,
 			Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT.rotated(Vector3.UP, -0.10))
 		await oblique_cliff_case(world, group, effects)
+		await near_wall_handoff(world, group, effects)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
