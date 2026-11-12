@@ -398,26 +398,55 @@ func _project_source_anchors() -> void:
 					break
 		var bias := CONE_OVERSHOOT_BIAS if overshot else CONE_DEFAULT_BIAS
 		PhysicsServer3D.cone_twist_joint_set_param(source_joint_rids[name], PhysicsServer3D.CONE_TWIST_JOINT_BIAS, bias)
-		if state.get_contact_count() > 0:
+		var contacting := state.get_contact_count() > 0
+		if contacting and is_instance_valid(_flat_floor):
 			continue
 		var correction := parent_frame.origin - child_frame.origin
 		var distance := correction.length()
 		if distance <= SOURCE_ANCHOR_TOLERANCE:
 			continue
-		# Move the free child only as far as the terrain permits, leaving the
-		# authored tolerance and preserving rotation and velocities.
+		# Leave the authored tolerance and preserve rotation and velocities.
 		if _projection_query == null:
 			_projection_query = PhysicsTestMotionParameters3D.new()
 			_projection_query.margin = PROJECTION_COLLISION_MARGIN
 			_projection_query.recovery_as_collision = true
 			_projection_hit = PhysicsTestMotionResult3D.new()
 		var motion := correction * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
+		if contacting and _project_contacting_anchor(child, state, motion):
+			continue
+		if contacting:
+			continue
 		_projection_query.from = state.transform
 		_projection_query.motion = motion
 		if PhysicsServer3D.body_test_motion(child.get_rid(), _projection_query, _projection_hit):
 			motion *= _projection_hit.get_collision_safe_fraction()
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
+
+func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, motion: Vector3) -> bool:
+	var points := _terrain_contact_points(body, state, Vector3.ZERO)
+	var escape_fraction := 0.0
+	for i in range(0, points.size(), 2):
+		var offset := points[i + 1] - points[i]
+		var depth := offset.length()
+		if depth <= PROJECTION_COLLISION_MARGIN:
+			continue
+		var separation := motion.dot(offset / depth)
+		if separation <= depth:
+			return false
+		escape_fraction = maxf(escape_fraction, depth / separation)
+	if _deepest_contact(_terrain_contact_points(body, state, motion)) > PROJECTION_COLLISION_MARGIN:
+		return false
+	# Sweep from the clear end because a forward sweep can stop inside the
+	# original overlap. A hit near the original pose is the expected contact.
+	_projection_query.from = state.transform.translated(motion)
+	_projection_query.motion = -motion
+	if PhysicsServer3D.body_test_motion(body.get_rid(), _projection_query, _projection_hit):
+		var blocked_distance := (1.0 - _projection_hit.get_collision_unsafe_fraction()) * motion.length()
+		if blocked_distance > escape_fraction * motion.length() + 2.0 * PROJECTION_COLLISION_MARGIN:
+			return false
+	state.transform = _projection_query.from
+	return true
 
 func _project_terrain_contact() -> void:
 	var lift := 0.0
