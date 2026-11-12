@@ -10,7 +10,12 @@ const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Vari
 const SPAWN := &"Zombie_Spawn"
 const ATTACK := &"Zombie_BasicAttack"
 const STAGGER := &"Zombie_Staggered"
-const MAX_HEALTH := 60
+const BASE_HEALTH := 8
+const TRAINING_HEALTH := 48
+const MAX_POISE := 28.0
+const POISE_RECOVERY_DELAY := 2.0
+const POISE_RECOVERY_PER_SECOND := 20.0
+const DEFAULT_DEATH_IMPULSE := Vector2(285.0, 190.0)
 const HEIGHT := 1.95
 const HIT_RADIUS := 0.48
 const CHASE_SPEED := 3.1
@@ -41,12 +46,16 @@ const RAGDOLL_PARTS := [
 var target: CharacterBody3D
 var animation: AnimationPlayer
 var ragdoll: Ragdoll
-var health := MAX_HEALTH
+var max_health := TRAINING_HEALTH
+var health := TRAINING_HEALTH
 var _feedback: Feedback
 var _mesh: MeshInstance3D
 var _walk_clip: StringName
 var _knockback := Vector3.ZERO
 var _death_direction := Vector3.ZERO
+var _death_impulse := DEFAULT_DEATH_IMPULSE
+var _poise := MAX_POISE
+var _poise_recovery_wait := 0.0
 var _attack_cooldown := 0.0
 var _flash_left := 0.0
 var _corpse_age := 0.0
@@ -76,6 +85,7 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 	collision_mask = 1 | 2 | 4
 
 func _ready() -> void:
+	health = max_health
 	animation.play(SPAWN)
 	animation.advance(0)
 	ragdoll = Ragdoll.new()
@@ -87,9 +97,6 @@ func _ready() -> void:
 		body.collision_mask = 0
 	if _death_profile == null:
 		_death_profile = DeathProfile.new()
-		# Launch the whole corpse clear of the floor before the joints take up the hit.
-		_death_profile.linear_impulse = 285.0
-		_death_profile.upward_impulse = 190.0
 		_death_profile.angular_impulse = 3.2
 		_death_profile.transport_fraction = 0.93
 		_death_profile.linear_damping = 0.18
@@ -111,6 +118,9 @@ func _physics_process(delta: float) -> void:
 	if global_position.y < -6.0:
 		queue_free()
 		return
+	var recovery_time := maxf(0.0, delta - _poise_recovery_wait)
+	_poise_recovery_wait = maxf(0.0, _poise_recovery_wait - delta)
+	_poise = minf(MAX_POISE, _poise + POISE_RECOVERY_PER_SECOND * recovery_time)
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 	var travel := _chase_velocity(delta) + _knockback
 	_knockback = _knockback.move_toward(Vector3.ZERO, delta * 10.0)
@@ -147,25 +157,30 @@ func _play_loop(clip: StringName) -> void:
 	if animation.current_animation != clip:
 		animation.play(clip, 0.13)
 
-func take_hit(amount: int, direction: Vector3) -> void:
+func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE, stagger: float = MAX_POISE) -> void:
 	if health <= 0 or amount <= 0:
 		return
 	health = maxi(0, health - amount)
 	direction.y = 0.0
 	direction = direction.normalized()
-	_feedback.show_hit(amount, health, MAX_HEALTH)
+	_feedback.show_hit(amount, health, max_health)
 	_mesh.material_overlay = _flash_material
 	_mesh.set_instance_shader_parameter("hit_flash", 1.0)
 	_flash_left = HIT_FLASH_DURATION
 	if health <= 0:
 		_death_direction = direction
+		_death_impulse = launch_impulse
 		animation.pause()
 		set_deferred("collision_layer", 0)
 		set_deferred("collision_mask", 0)
-	else:
-		_knockback = direction * 2.6
-		animation.stop(true)
-		animation.play(STAGGER, 0.0, 2.7)
+	elif stagger > 0.0:
+		_knockback = direction * launch_impulse.x / 80.0
+		_poise -= stagger
+		_poise_recovery_wait = POISE_RECOVERY_DELAY
+		if _poise <= 0.0:
+			_poise = MAX_POISE
+			animation.stop(true)
+			animation.play(STAGGER, 0.0, 2.7)
 
 func _update_death(delta: float) -> void:
 	_corpse_age += delta
@@ -176,7 +191,10 @@ func _update_death(delta: float) -> void:
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			body.collision_layer = 2
 			body.collision_mask = 1
-		ragdoll.begin(_death_profile, _death_direction, "Chest", 0.0, 13.0)
+		var launch := _death_profile.duplicate() as DeathProfile
+		launch.linear_impulse = _death_impulse.x
+		launch.upward_impulse = _death_impulse.y
+		ragdoll.begin(launch, _death_direction, "Chest", 0.0, 13.0)
 		return
 	var remaining := CORPSE_LIFETIME - _corpse_age
 	if remaining <= 0.00001:
