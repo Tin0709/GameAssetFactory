@@ -63,7 +63,7 @@ func burst(point: Vector3, attack_direction: Vector3) -> void:
 		outward = (outward + attack_direction.normalized() * 0.24).normalized()
 		var spark := _particles[_next]
 		_next = (_next + 1) % _particles.size()
-		spark.origin = point + outward * 0.09
+		spark.origin = point + outward * 0.21
 		spark.velocity = outward * _random.randf_range(2.0, 4.4)
 		spark.age = 0.0
 		spark.lifetime = _random.randf_range(0.15, 0.24)
