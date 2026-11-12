@@ -92,20 +92,20 @@ float near_optical(vec3 origin,vec3 ray,float ray_length,float start,float end){
  return strength*height*fade*(b-a)*ray_length;
 }
 // The normalized ray intersects an ellipsoid with density 1 - dot(point, point).
-vec3 local_intersection(vec3 origin,vec3 ray){
- if(p.local_center_strength.w<=0. || p.origin_dx.w<=0.)return vec3(0.);
+vec4 local_intersection(vec3 origin,vec3 ray){
+ if(p.local_center_strength.w<=0. || p.origin_dx.w<=0.)return vec4(0.);
  vec3 start=(origin-p.local_center_strength.xyz)/p.local_radii.xyz;
  vec3 direction=ray/p.local_radii.xyz;
  float curvature=dot(direction,direction);
  float midpoint=-dot(start,direction)/curvature;
  vec3 nearest=start+direction*midpoint;
- return vec3(midpoint,curvature,max(1.-dot(nearest,nearest),0.));
+ float ceiling=max(1.-dot(nearest,nearest),0.);
+ return vec4(midpoint,curvature,ceiling,sqrt(ceiling/curvature));
 }
-float local_optical(vec3 chord,float start,float end,float ray_length){
+float local_optical(vec4 chord,float start,float end,float ray_length){
  if(chord.z<=0.)return 0.;
- float radius=sqrt(chord.z/chord.y);
- float a=max(start-chord.x,-radius);
- float b=min(end-chord.x,radius);
+ float a=max(start-chord.x,-chord.w);
+ float b=min(end-chord.x,chord.w);
  float width=b-a;
  if(width<=0.)return 0.;
  float middle=(a+b)*.5;
@@ -120,7 +120,7 @@ void main(){
  vec3 ray=p.ray.xyz+p.ray_dx.xyz*uv.x+p.ray_dy.xyz*uv.y;
  float ray_length=length(ray);float near_z=p.integration.x/ray_length;
  float entry=p.origin.w/ray_length;
- vec3 local_chord=local_intersection(origin,ray);
+ vec4 local_chord=local_intersection(origin,ray);
  vec3 local_light=p.scatter.rgb*p.scatter.w*p.local_scatter_multiplier.xyz;
  vec3 scattered=vec3(0.0);float optical=0.0;float previous=0.0;
  imageStore(volume,ivec3(pixel,0),vec4(0.0,0.0,0.0,1.0));

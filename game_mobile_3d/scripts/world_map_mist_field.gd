@@ -58,7 +58,9 @@ func configure_with_local_mist(parameters: PackedByteArray, size: Vector2i, nois
 	if size!=_allocated or light!=_allocated_light:_state.ready=false
 	_mutex.unlock()
 func snapshot()->Dictionary:
-	_mutex.lock();var copy:=_state.duplicate();_mutex.unlock();return copy
+	_mutex.lock();var copy:=_state.duplicate();_mutex.unlock()
+	if not enabled:copy.local_mist_gain=0.
+	return copy
 func near_entry_m() -> float:
 	_mutex.lock()
 	var entry := _parameters.decode_float(12) if _parameters.size() >= 16 else 0.0

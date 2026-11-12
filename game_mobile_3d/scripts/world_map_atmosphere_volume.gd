@@ -52,6 +52,7 @@ func _process(_delta:float)->void:
  var active:=visible and is_visible_in_tree() and not _profile.is_empty() and _camera!=null
  effect.enabled=active
  if not active:
+  if _gate:RenderingServer.global_shader_parameter_set("gaf_local_mist_center",Vector4.ZERO)
   _set_gate(false);_sync_materials(false);return
  var compositor:=_camera.compositor
  if compositor==null or not effect in compositor.compositor_effects:
