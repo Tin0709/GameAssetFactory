@@ -5,6 +5,8 @@ const PlayerPresentation := preload("res://scripts/world_map_presentation.gd")
 const SourceTerrain := preload("res://scripts/world_map_source_terrain.gd")
 const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
+const MovementAudio := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/environment_audio.gd")
+const PrivateOverworldBundle := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/private_bundle.gd")
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
 const CurvedGreatsword := preload("res://scripts/mechanic_lab_curved_greatsword.gd")
 const DamageFeedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
@@ -35,6 +37,7 @@ var _exposure: CompositorEffect
 var _previous_msaa: Viewport.MSAA
 var _previous_hdr: bool
 var _combat_audio: CombatAudio
+var _movement_audio: MovementAudio
 var _weapon_mesh: MeshInstance3D
 var _equipped_weapon := Weapon.SABRE
 var _sabre_mesh: Mesh
@@ -121,6 +124,7 @@ func _ready() -> void:
 		_combat_audio = CombatAudio.new()
 		_combat_audio.name = "CombatAudio"
 		add_child(_combat_audio)
+		_setup_movement_audio()
 		_player_flash_material = ShaderMaterial.new()
 		_player_flash_material.shader = PLAYER_HIT_FLASH_SHADER
 		for mesh: MeshInstance3D in player.model.find_children("*", "MeshInstance3D", true, false):
@@ -308,11 +312,28 @@ func _process(delta: float) -> void:
 		_impact_light.visible = _light_remaining > 0.0
 		_light_remaining = maxf(0.0, _light_remaining - delta)
 
+func _setup_movement_audio() -> void:
+	var manifest := PrivateOverworldBundle.default_path()
+	var research := OS.get_environment("MD2_RESEARCH_ROOT")
+	if not research.is_empty():
+		manifest = research.path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")
+	var bundle := PrivateOverworldBundle.new()
+	if not bundle.read_audio(manifest, "grass"):
+		return
+	_movement_audio = MovementAudio.new()
+	_movement_audio.name = "MovementAudio"
+	add_child(_movement_audio)
+	_movement_audio.setup(player, null, bundle)
+
 func _set_combat_audio(enabled: bool) -> void:
 	if _combat_audio == null:
 		return
 	if player.reference_audio != null:
 		player.reference_audio.enabled = enabled
+	if _movement_audio != null:
+		_movement_audio.footsteps_enabled = enabled
+		if not enabled:
+			_movement_audio.reset_contacts()
 	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP)
 
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, lethal: bool) -> void:
@@ -451,5 +472,7 @@ func reset_player() -> void:
 	player.velocity = Vector3.ZERO
 	if player.has_method("cancel_jump"):
 		player.cancel_jump()
+	if _movement_audio != null:
+		_movement_audio.reset_contacts()
 	player.reset_physics_interpolation()
 	camera.position = CAMERA_OFFSET

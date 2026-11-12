@@ -16,11 +16,7 @@ func setup(world:Node3D,research:String)->void:
 	level=world
 	var path:=research.path_join("godot_lab/overworld_fidelity_v001/bundle.private.json")
 	var reader:=BUNDLE.new()
-	if not reader.permitted(path) or not FileAccess.file_exists(path):error="Private ambience manifest unavailable";return
-	var parsed:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not parsed is Dictionary or parsed.get("schema","")!="private_overworld_v1" or not parsed.get("private_only",false):error="Invalid ambience manifest";return
-	reader.root=research.replace("\\","/").simplify_path().to_lower()
-	reader.data={"audio":parsed.get("audio",{}),"audio_config":parsed.get("audio_config",{}),"audio_scope":parsed.get("audio_scope","")}
+	if not reader.read_audio(path):error=reader.error;return
 	for cell:Vector3i in level.geometry.cells:
 		var entry:Dictionary=level.runtime.palette[level.geometry.cells[cell]]
 		if entry.category=="plant":

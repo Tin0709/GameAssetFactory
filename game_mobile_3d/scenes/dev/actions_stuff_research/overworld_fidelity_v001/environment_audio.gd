@@ -47,11 +47,20 @@ func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted)->void:
 			if stream==null:rejected_count+=1;continue
 			stream.loop=false;rows.append({"stream":stream,"name":row.name,"seconds":row.seconds});loaded_count+=1
 		groups[key]=rows
-	_make_bed("wind",float(config.get("wind_db",-19.)))
-	for i in 4:step_voices.append(_voice("Footstep",float(config.get("footstep_radius_m",8.))));rustle_voices.append(_voice("Vegetation",float(config.get("environment_radius_m",7.))))
-	for i in 3:
-		var voice:=_voice("MeadowNature",float(config.get("environment_radius_m",20.)));voice.unit_size=float(config.get("nature_unit_size_m_adapter",2.));nature_voices.append(voice)
-	var listener:=AudioListener3D.new();listener.name="GroundLevelAudioListener";actor.add_child(listener);listener.position.y=1.55;listener.make_current()
+	# The flat grass lab supplies its own listener and only needs footsteps.
+	if meadow == null:
+		ambient_enabled = false
+		rustle_enabled = false
+	else:
+		_make_bed("wind",float(config.get("wind_db",-19.)))
+	for i in 4:
+		step_voices.append(_voice("Footstep",float(config.get("footstep_radius_m",8.))))
+		if meadow != null:
+			rustle_voices.append(_voice("Vegetation",float(config.get("environment_radius_m",7.))))
+	if meadow != null:
+		for i in 3:
+			var voice:=_voice("MeadowNature",float(config.get("environment_radius_m",20.)));voice.unit_size=float(config.get("nature_unit_size_m_adapter",2.));nature_voices.append(voice)
+		var listener:=AudioListener3D.new();listener.name="GroundLevelAudioListener";actor.add_child(listener);listener.position.y=1.55;listener.make_current()
 	actor.physics_pose_ready.connect(_on_pose)
 	actor.presentation_reset.connect(reset_contacts)
 	print("OVERWORLD_AUDIO_READY ",JSON.stringify({"loaded":loaded_count,"rejected":rejected_count,"groups":groups.keys(),"scope":reader.data.audio_scope}))
@@ -130,11 +139,11 @@ func _on_pose()->void:
 		if (rising_contact or land) and clock-_last_step>.12:
 			_last_step=clock
 			var position:Vector3=soles[side].center
-			var key:String=meadow.surface_at(position)
+			var key: String = meadow.surface_at(position) if meadow != null else "grass"
 			if footsteps_enabled:
 				_play(key,step_voices[_step_index%4],position,float(config.get("landing_db",-9.)) if land else float(config.get("footsteps_db",-14.)),1.);_step_index+=1
 				if land:event_count.landing+=1
-			if rustle_enabled and meadow.interactions_enabled and key!="stone"and meadow.has_foliage(position):
+			if rustle_enabled and meadow != null and meadow.interactions_enabled and key!="stone"and meadow.has_foliage(position):
 				_play("rustle",rustle_voices[_rustle_index%4],position+Vector3.UP*.3,float(config.get("rustle_db",-22.))-(3. if actor.current_speed<4. else 0.),1.);_rustle_index+=1
 	_was_grounded=grounded
 

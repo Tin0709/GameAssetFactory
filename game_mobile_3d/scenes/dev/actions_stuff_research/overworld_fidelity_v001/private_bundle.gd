@@ -70,6 +70,25 @@ func read(path:String)->Dictionary:
 		meshes[entry.name]=mesh
 	return data
 
+func read_audio(path: String, group := "") -> bool:
+	if not permitted(path) or not FileAccess.file_exists(path):
+		error = "Private ambience manifest unavailable"
+		return false
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not parsed is Dictionary or parsed.get("schema", "") != "private_overworld_v1" \
+			or not parsed.get("private_only", false) or not parsed.get("audio", {}) is Dictionary:
+		error = "Invalid ambience manifest"
+		return false
+	var samples: Dictionary = parsed.get("audio", {})
+	if not group.is_empty():
+		if not samples.get(group, []) is Array or samples.get(group, []).is_empty():
+			error = "Private audio group unavailable: " + group
+			return false
+		samples = {group: samples[group]}
+	root = path.simplify_path().replace("\\", "/").get_base_dir().get_base_dir().get_base_dir().to_lower()
+	data = {"audio": samples, "audio_config": parsed.get("audio_config", {}), "audio_scope": parsed.get("audio_scope", "")}
+	return true
+
 func audio_stream(row:Dictionary)->AudioStreamOggVorbis:
 	var path:String=row.get("path","")
 	if not permitted(path) or not FileAccess.file_exists(path) or FileAccess.get_sha256(path)!=String(row.get("sha256","")):return null
