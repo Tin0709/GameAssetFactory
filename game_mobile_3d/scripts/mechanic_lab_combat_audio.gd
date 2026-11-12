@@ -7,11 +7,13 @@ const SABRE := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_sabre_
 const SWORD := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_sword_%02d.ogg"
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
+const PLAYER_HURT := "Player/Hurt/sfx_multi_hit-%03d_soundWave.ogg"
 const VOICES_PER_POOL := 3
 const HIT_GAIN_DB := -9.0
 const SLAM_GAIN_DB := -10.0
 const HURT_GAIN_DB := -20.0
 const DEATH_GAIN_DB := -14.0
+const PLAYER_HURT_GAIN_DB := -14.0
 
 const HIT_HASHES := [
 	"01b446de1994e109804c1379e19d13b93d271d826e30bfe211d2f560e4651cb9",
@@ -40,11 +42,17 @@ const LANDING_HASHES := [
 	"452771d3aec25299b9308f0d64c52dbbcdcc38ab3c2453112ec4796837b466f9",
 	"a97f48e243ebb2665540255e7def73234c447432504d17e5f0ee941e4c8340f7",
 ]
+const PLAYER_HURT_HASHES := [
+	"3442fd3503fca76ccc78d29bfee9d16390fc3d5a62bd1cbbdb9213b880ab5494",
+	"8ab4eba4ec92dd73368e3eb3302726d12861306b1fc9951757beb0111e291b32",
+	"ef7f8eef33586be6322f5189b7a21653733986bbad63b8ca0e0cdbb860746e0a",
+]
 
 var enabled := false
 var sword_equipped := false
 var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
+var _player_hurt_voice: AudioStreamPlayer
 var _next_choice: Dictionary[StringName, int] = {}
 var _next_voice: Array[int] = [0, 0]
 var _last_weapon_serial := -1
@@ -86,12 +94,23 @@ func slam_landed(point: Vector3) -> void:
 	if enabled:
 		_play(&"slam", point, SLAM_GAIN_DB)
 
+func player_hurt() -> void:
+	if not enabled or _player_hurt_voice == null:
+		return
+	var stream := _next_stream(&"player_hurt")
+	if stream != null:
+		_player_hurt_voice.stream = stream
+		_player_hurt_voice.play()
+
 func reset() -> void:
 	_last_weapon_serial = -1
 	_next_voice = [0, 0]
 	for voice in _voices:
 		voice.stop()
 		voice.stream = null
+	if _player_hurt_voice != null:
+		_player_hurt_voice.stop()
+		_player_hurt_voice.stream = null
 
 func _load_audio() -> void:
 	if not OS.has_feature("editor"):
@@ -99,6 +118,11 @@ func _load_audio() -> void:
 	var root := OS.get_environment("MD2_RESEARCH_ROOT")
 	if root.is_empty():
 		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
+	# DefaultPlayer routes SW.Audio.Generic.Hurt to SW.Audio.Category.Player.Local.
+	_player_hurt_voice = AudioStreamPlayer.new()
+	_player_hurt_voice.name = "PlayerHurt"
+	_player_hurt_voice.volume_db = PLAYER_HURT_GAIN_DB
+	add_child(_player_hurt_voice)
 	for i in 2 * VOICES_PER_POOL:
 		var voice := AudioStreamPlayer3D.new()
 		voice.unit_size = 4.5
@@ -118,6 +142,8 @@ func _load_audio() -> void:
 		_load_sample(root, &"death", ZOMBIE % ["Death", i + 1], DEATH_HASHES[i])
 	for i in LANDING_HASHES.size():
 		_load_sample(root, &"slam", HEAVY_LANDING % (i + 1), LANDING_HASHES[i])
+	for i in PLAYER_HURT_HASHES.size():
+		_load_sample(root, &"player_hurt", PLAYER_HURT % (i + 1), PLAYER_HURT_HASHES[i])
 
 func _load_sample(root: String, group: StringName, relative: String, checksum: String) -> void:
 	var path := ReferenceAudio.resolve_private_file(root, SOURCE.path_join(relative))
@@ -130,11 +156,18 @@ func _load_sample(root: String, group: StringName, relative: String, checksum: S
 			_groups[group] = []
 		_groups[group].append(stream)
 
-func _play(group: StringName, point: Vector3, gain: float) -> void:
+func _next_stream(group: StringName) -> AudioStream:
 	var choices: Array = _groups.get(group, [])
 	if choices.is_empty():
-		return
+		return null
 	var choice: int = _next_choice.get(group, 0)
+	_next_choice[group] = (choice + 1) % choices.size()
+	return choices[choice]
+
+func _play(group: StringName, point: Vector3, gain: float) -> void:
+	var stream := _next_stream(group)
+	if stream == null:
+		return
 	# Enemy reactions share their own budget so a crowd cannot cut weapon tails.
 	var pool := 1 if group == &"hurt" or group == &"death" else 0
 	var first := pool * VOICES_PER_POOL
@@ -145,10 +178,9 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 			slot = candidate
 			break
 	var voice := _voices[first + slot]
-	_next_choice[group] = (choice + 1) % choices.size()
 	_next_voice[pool] = (slot + 1) % VOICES_PER_POOL
 	voice.stop()
-	voice.stream = choices[choice]
+	voice.stream = stream
 	voice.global_position = point
 	voice.volume_db = gain
 	voice.max_db = gain

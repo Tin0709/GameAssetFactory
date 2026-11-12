@@ -294,6 +294,7 @@ func _on_player_hit(amount: int) -> void:
 		return
 	player_health = maxi(0, player_health - amount)
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
+	_combat_audio.player_hurt()
 	if player_health == 0:
 		player.enter_lab_defeat()
 		$HUD/Defeat.show()
