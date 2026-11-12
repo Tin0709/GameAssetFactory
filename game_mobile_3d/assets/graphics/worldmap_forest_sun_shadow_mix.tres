@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 display_name = "Rừng ẩm · Nắng và bóng"
-description = "Phối sương sau tán với viền nắng mềm, ánh sáng hắt ở vùng sáng và sắc đá trong bóng xanh."
-review_tip = "Thử lúc 16:30 ở lối rừng, rồi xem vách đá lúc 22:00. Dùng Hoàn tác để trở về phối trước."
+description = "Viền nắng mềm, sắc đá trong bóng xanh và mảng Sculk phát sáng dọc lối rừng."
+review_tip = "Xem lối rừng lúc 16:30 và 22:00. Chỉnh Sculk phát sáng để so riêng lớp nền xanh. Dùng Hoàn tác để về phối trước."
 strengths = Dictionary[StringName, float]({
 &"projected_sun_position": 1.0,
 &"projected_sun_softness": 0.75,
@@ -20,5 +20,6 @@ strengths = Dictionary[StringName, float]({
 &"night_cliff_mist": 1.0,
 &"night_spatial_sky": 0.65,
 &"night_stone_fill_balance": 0.72,
-&"bloom_diffusion": 0.60
+&"bloom_diffusion": 0.60,
+&"sculk_surface": 0.65
 })
