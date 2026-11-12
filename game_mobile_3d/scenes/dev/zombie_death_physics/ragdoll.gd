@@ -17,6 +17,9 @@ const FLOOR_REST_SLOP := 0.012
 const FLOOR_SHARED_LIFT_THRESHOLD := 0.05
 const FLOOR_LANDING_LIFT_THRESHOLD := 0.045
 const FLOOR_LANDING_MAX_LIFT_REDUCTION := 0.02
+const FLOOR_PREDICTION_SLOP := 0.01
+const FLOOR_PREDICTION_MIN_CLOSING_SPEED := 0.6
+const FLOOR_PREDICTION_FRICTION := 0.15
 const MIN_SUPPORT_NORMAL_Y := 0.5
 const MAX_WALL_NORMAL_Y := 0.10
 const HANDOFF_MIN_WALL_OVERLAP := 0.035
@@ -799,22 +802,75 @@ func _project_floor_contact() -> void:
 	# contact. Keep the resting tolerance through small solver velocity spikes.
 	var slop := FLOOR_REST_SLOP if slow or landing_blended else FLOOR_CONTACT_SLOP
 	lift -= slop
-	if lift <= 0.0:
-		return
-	var shared_lift := 0.0 if landing_blended else lift
-	if not landing_blended and _flat_floor_has_contact:
-		# Keep more of a deep floor correction on the limb that penetrated.
-		shared_lift -= maxf(0.0, lift - FLOOR_SHARED_LIFT_THRESHOLD) * _floor_impact_limb_share
-		# During the roll, bound the extra local correction to limit joint separation.
-		var excess_lift := maxf(shared_lift - FLOOR_LANDING_LIFT_THRESHOLD, 0.0)
-		shared_lift -= minf(excess_lift * floor_impact_blend, FLOOR_LANDING_MAX_LIFT_REDUCTION)
-	for body: PhysicalBone3D in bodies.values():
-		var correction := maxf(shared_lift, depths.get(body, 0.0) - slop)
-		if correction <= 0.0:
-			continue
+	if lift > 0.0:
+		var shared_lift := 0.0 if landing_blended else lift
+		if not landing_blended and _flat_floor_has_contact:
+			# Keep more of a deep floor correction on the limb that penetrated.
+			shared_lift -= maxf(0.0, lift - FLOOR_SHARED_LIFT_THRESHOLD) * _floor_impact_limb_share
+			# During the roll, bound the extra local correction to limit joint separation.
+			var excess_lift := maxf(shared_lift - FLOOR_LANDING_LIFT_THRESHOLD, 0.0)
+			shared_lift -= minf(excess_lift * floor_impact_blend, FLOOR_LANDING_MAX_LIFT_REDUCTION)
+		for body: PhysicalBone3D in bodies.values():
+			var correction := maxf(shared_lift, depths.get(body, 0.0) - slop)
+			if correction <= 0.0:
+				continue
+			var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+			if state:
+				state.transform = state.transform.translated(Vector3.UP * correction)
+	if _flat_floor_has_contact and not landing_blended and floor_impact_blend > 0.0:
+		_preempt_floor_penetration(floor_half, floor_inverse, floor_pose.origin.y + floor_half.y)
+
+func _preempt_floor_penetration(floor_half: Vector3, floor_inverse: Transform3D, floor_y: float) -> void:
+	# During the Sabre roll, a rotating box can dig in again before the next
+	# contact solve. Predict its lowest corner and oppose only the closing speed.
+	for part in _parts:
+		var body: PhysicalBone3D = bodies[part[0]]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
-		if state:
-			state.transform = state.transform.translated(Vector3.UP * correction)
+		if state == null or state.sleeping:
+			continue
+		var half: Vector3 = part[2] * 0.5
+		var radius := half.length()
+		var pose := state.transform
+		if pose.origin.y + radius < floor_y:
+			continue
+		var dt := state.step
+		var angular := state.angular_velocity.limit_length(body.get("maximum_angular_speed"))
+		var angle := angular.length() * dt
+		var rotation := Basis(angular.normalized(), angle) if angle > 0.00001 else Basis.IDENTITY
+		var linear := state.linear_velocity.limit_length(body.get("maximum_linear_speed"))
+		var vertical := linear.y * maxf(0.0, 1.0 - dt * state.total_linear_damp) + state.total_gravity.y * dt
+		var centre := pose.origin + state.center_of_mass
+		var rotated := rotation * pose.basis
+		var predicted_centre := centre + Vector3(linear.x, vertical, linear.z) * dt
+		var centre_in_floor := floor_inverse * predicted_centre
+		if absf(centre_in_floor.x) + radius >= floor_half.x or absf(centre_in_floor.z) + radius >= floor_half.z:
+			continue
+		var corner := half * Vector3(-signf(rotated.x.y), -signf(rotated.y.y), -signf(rotated.z.y))
+		var offset := pose.basis * corner
+		var lever := offset - state.center_of_mass
+		var predicted_y := predicted_centre.y + (rotation * lever).y
+		var current_y := centre.y + lever.y
+		var overrun := minf(current_y, floor_y) - predicted_y - FLOOR_PREDICTION_SLOP
+		var point_velocity := linear + angular.cross(lever)
+		var closing := -point_velocity.y
+		if overrun <= 0.0 or closing < FLOOR_PREDICTION_MIN_CLOSING_SPEED:
+			continue
+		var moment := lever.cross(Vector3.UP)
+		var inverse_mass := state.inverse_mass + moment.dot(state.inverse_inertia_tensor * moment)
+		if inverse_mass <= 0.0:
+			continue
+		var normal_impulse := minf(overrun / dt, closing) / inverse_mass
+		var impulse := Vector3.UP * normal_impulse
+		var tangent := Vector3(point_velocity.x, 0.0, point_velocity.z)
+		var tangent_speed := tangent.length()
+		if tangent_speed > 0.001:
+			# Bound the extra traction so the existing floor solver carries most of the slide.
+			var unit := tangent / tangent_speed
+			var tangent_moment := lever.cross(unit)
+			var tangent_inverse_mass := state.inverse_mass + tangent_moment.dot(state.inverse_inertia_tensor * tangent_moment)
+			if tangent_inverse_mass > 0.0:
+				impulse -= unit * minf(tangent_speed / tangent_inverse_mass, normal_impulse * FLOOR_PREDICTION_FRICTION)
+		state.apply_impulse(impulse, lever + state.center_of_mass)
 
 func contact_motion() -> Dictionary:
 	var contacts := 0
