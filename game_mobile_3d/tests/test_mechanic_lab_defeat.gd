@@ -91,15 +91,23 @@ func run() -> void:
 		"R respawns at full HP with a clean input state")
 	if respawn != null:
 		check(not respawn.is_visible_in_tree(), "Retry prompt hides after R")
+		check(lab.player.drop_for_lab(5.0), "Airborne defeat fixture starts a five-metre drop")
+		await ticks(3)
 		lab._on_player_hit(100)
-		await process_frame
+		var height: float = lab.player.global_position.y
+		key(KEY_E, true)
+		await ticks(60)
+		key(KEY_E, false)
+		check(height > 3.0 and lab.player.is_on_floor() and not lab.player.combo.active(),
+			"Airborne defeat settles to the floor while combat input stays disabled")
 		var point := respawn.get_global_rect().get_center()
 		mouse(MOUSE_BUTTON_LEFT, point, true)
 		mouse(MOUSE_BUTTON_LEFT, point, false)
 		await ticks(4)
 		check(lab.player_health == 100 and not lab.player.is_dead and not respawn.is_visible_in_tree(),
 			"Clicking Retry respawns without starting an attack")
-		check(not lab.player.combo.active(), "Click release does not leave a queued attack")
+		check(not lab.player.combo.active() and weapon.selected == 1,
+			"Retry leaves no queued attack and preserves the selected weapon")
 	lab.free()
 	print("MECHANIC_LAB_DEFEAT ", JSON.stringify({"checks": checks, "failures": failures}))
 	quit(0 if failures.is_empty() else 1)
