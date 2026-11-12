@@ -9,6 +9,7 @@ signal grounded_sabre_impact(index: int, clip: String, serial: int)
 signal heavy_jump_landed(position: Vector3, forward: Vector3, serial: int, fall_height: float)
 signal source_locomotion_event(notify:String,clip:String,source_seconds:float,simulation_seconds:float)
 signal physics_pose_ready
+signal surface_contact(point: Vector3, landed: bool)
 signal presentation_reset
 const Model=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/assets/Sabre_Character_Authored.glb")
 const Combo=preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/combo_state.gd")
@@ -144,6 +145,8 @@ var _step_seen:=-1
 var _step_distance:=0.
 var _step_elapsed:=0.
 var _step_ready:=false
+var _surface_feet: Array[bool] = [false, false]
+var _last_surface_contact := -INF
 
 func _ready()->void:
 	collision_layer=2;collision_mask=1;add_to_group("player")
@@ -512,7 +515,8 @@ func _physics_process(delta:float)->void:
 	# an interrupted ascent at a ceiling) owns the transition into the air loop.
 	if using_original_source and not _grounded and _jump_stage=="JumpTakeoff" and velocity.y<=0.:
 		_jump_stage="JumpAirborne";_jump_time=0.
-	if _grounded and not was_grounded and _floor_initialized:
+	var landed := _grounded and not was_grounded and _floor_initialized
+	if landed:
 		if novelty_jump!=null and not weapon_source_locomotion:novelty_jump.contact(simulation_clock+delta)
 		if _jump_stage!="JumpLanding":_jump_stage="JumpLanding";_jump_time=0.
 	elif not _grounded and (_jump_stage.is_empty() or (_uses_native_jump_pose(_jump_stage) and _jump_stage=="JumpLanding")):
@@ -563,8 +567,27 @@ func _physics_process(delta:float)->void:
 		_refresh_markers()
 	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and (not combo.active() or (combo.native_enabled and combo.movement_allowed()))) if direction_adapter!=null else []
 	movement_meter.sample(delta,global_position,desired.length(),_move_requested,_gait_cycles_this_tick,soles)
+	_emit_surface_contact(soles, landed)
 	_record_order(&"physics_end",{"open_seconds":_combat_open_seconds,"position":[global_position.x,global_position.y,global_position.z]})
 	physics_pose_ready.emit()
+
+func _emit_surface_contact(soles: Array, landed: bool) -> void:
+	if soles.size() != 2:
+		return
+	var planted_foot := -1
+	for side in 2:
+		var planted: bool = _grounded and soles[side].height < (0.11 if _surface_feet[side] else 0.055)
+		if planted and not _surface_feet[side] and planted_foot < 0:
+			planted_foot = side
+		_surface_feet[side] = planted
+	if not review_clip.is_empty() or not _grounded:
+		return
+	if landed:
+		_last_surface_contact = simulation_clock
+		surface_contact.emit(soles[0].center.lerp(soles[1].center, 0.5), true)
+	elif planted_foot >= 0 and current_speed > 0.4 and simulation_clock - _last_surface_contact > 0.12:
+		_last_surface_contact = simulation_clock
+		surface_contact.emit(soles[planted_foot].center, false)
 
 func _uses_native_jump_pose(key:String)->bool:
 	return native_jump_pose_enabled and using_original_source and key in ["JumpTakeoff","JumpAirborne","JumpLanding"]
@@ -848,6 +871,8 @@ func reset_actor()->void:
 	# Otherwise its first new step starts from the previous life's heading.
 	if direction_adapter!=null:direction_adapter.deactivate()
 	expression_clock=0.;simulation_clock=0.;focus_value=0.;blink_value=0.;_forced_blink=0.
+	_surface_feet = [false, false]
+	_last_surface_contact = simulation_clock
 	_play("Idle",0.);_apply_face(0.);reset_physics_interpolation()
 	reset_movement_measurements()
 	presentation_reset.emit()

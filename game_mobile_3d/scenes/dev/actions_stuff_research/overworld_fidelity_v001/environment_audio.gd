@@ -29,9 +29,6 @@ var loaded_count:=0
 var rejected_count:=0
 var _random:=RandomNumberGenerator.new()
 var _last_choice:Dictionary={}
-var _contacts:Array[bool]=[false,false]
-var _was_grounded:=true
-var _last_step:=-10.
 var _next_nature:=4.
 var _next_bird:=2.5
 var _step_index:=0
@@ -61,7 +58,7 @@ func setup(body:CharacterBody3D,field:Node3D,bundle:RefCounted)->void:
 		for i in 3:
 			var voice:=_voice("MeadowNature",float(config.get("environment_radius_m",20.)));voice.unit_size=float(config.get("nature_unit_size_m_adapter",2.));nature_voices.append(voice)
 		var listener:=AudioListener3D.new();listener.name="GroundLevelAudioListener";actor.add_child(listener);listener.position.y=1.55;listener.make_current()
-	actor.physics_pose_ready.connect(_on_pose)
+	actor.surface_contact.connect(_on_surface_contact)
 	actor.presentation_reset.connect(reset_contacts)
 	print("OVERWORLD_AUDIO_READY ",JSON.stringify({"loaded":loaded_count,"rejected":rejected_count,"groups":groups.keys(),"scope":reader.data.audio_scope}))
 
@@ -124,31 +121,20 @@ func _play(key:String,voice:AudioStreamPlayer3D,point:Vector3,db:float,pitch:flo
 	events.append({"time":clock,"key":key,"name":row.name,"at":[point.x,point.y,point.z]})
 	if events.size()>256:events.pop_front()
 
-func _on_pose()->void:
-	if actor.direction_adapter==null:return
-	var grounded:bool=actor._grounded
-	var moving:=Vector2(actor.velocity.x,actor.velocity.z).length()>.4
-	var soles:Array=actor.direction_adapter.observe_soles(actor.global_position.y,grounded)
-	var land:bool=grounded and not _was_grounded
-	for side in 2:
-		var height:float=soles[side].height
-		var contact:bool=grounded and height<(.11 if _contacts[side] else .055)
-		var rising_contact:bool=contact and not _contacts[side]
-		_contacts[side]=contact
-		if not actor.review_clip.is_empty() or not grounded or (not moving and not land):continue
-		if (rising_contact or land) and clock-_last_step>.12:
-			_last_step=clock
-			var position:Vector3=soles[side].center
-			var key: String = meadow.surface_at(position) if meadow != null else "grass"
-			if footsteps_enabled:
-				_play(key,step_voices[_step_index%4],position,float(config.get("landing_db",-9.)) if land else float(config.get("footsteps_db",-14.)),1.);_step_index+=1
-				if land:event_count.landing+=1
-			if rustle_enabled and meadow != null and meadow.interactions_enabled and key!="stone"and meadow.has_foliage(position):
-				_play("rustle",rustle_voices[_rustle_index%4],position+Vector3.UP*.3,float(config.get("rustle_db",-22.))-(3. if actor.current_speed<4. else 0.),1.);_rustle_index+=1
-	_was_grounded=grounded
+func _on_surface_contact(point: Vector3, landed: bool) -> void:
+	var key: String = meadow.surface_at(point) if meadow != null else "grass"
+	if footsteps_enabled:
+		var db := float(config.get("landing_db", -9.0)) if landed else float(config.get("footsteps_db", -14.0))
+		_play(key, step_voices[_step_index % 4], point, db, 1.0)
+		_step_index += 1
+		if landed:
+			event_count.landing += 1
+	if rustle_enabled and meadow != null and meadow.interactions_enabled and key != "stone" and meadow.has_foliage(point):
+		var rustle_db := float(config.get("rustle_db", -22.0)) - (3.0 if actor.current_speed < 4.0 else 0.0)
+		_play("rustle", rustle_voices[_rustle_index % 4], point + Vector3.UP * 0.3, rustle_db, 1.0)
+		_rustle_index += 1
 
 func reset_contacts()->void:
-	_contacts=[false,false];_was_grounded=true;_last_step=clock
 	for voice:AudioStreamPlayer3D in step_voices:voice.stop()
 	for voice:AudioStreamPlayer3D in rustle_voices:voice.stop()
 
