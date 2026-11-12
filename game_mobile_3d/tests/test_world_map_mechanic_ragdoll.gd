@@ -139,6 +139,9 @@ func run() -> void:
 		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER)
 		# Curved Greatsword and Sword use the same forward ground death response.
 		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND)
+		# Reproduce the first spawn's tumble variant, whose head and feet rest at different heights.
+		group._spawn_serial = 0
+		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
