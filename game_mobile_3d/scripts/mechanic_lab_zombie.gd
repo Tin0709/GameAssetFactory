@@ -15,6 +15,7 @@ const CHASE_SPEED := 3.1
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
 const CORPSE_LIFETIME := 2.0
+const CORPSE_DISSOLVE_DURATION := 0.40
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
 const RAGDOLL_BONES := {
@@ -43,6 +44,7 @@ var _death_direction := Vector3.ZERO
 var _attack_cooldown := 0.0
 var _flash_left := 0.0
 var _corpse_age := 0.0
+var _corpse_material: StandardMaterial3D
 static var _flash_material: StandardMaterial3D
 static var _death_profile: DeathProfile
 
@@ -171,8 +173,23 @@ func _update_death(delta: float) -> void:
 		ragdoll.begin(_death_profile, _death_direction, "Chest", 0.0, 13.0)
 		return
 	_corpse_age += delta
-	if _corpse_age >= CORPSE_LIFETIME:
+	var remaining := CORPSE_LIFETIME - _corpse_age
+	if remaining <= 0.00001:
 		queue_free()
+	elif remaining < CORPSE_DISSOLVE_DURATION:
+		_dissolve_corpse(remaining / CORPSE_DISSOLVE_DURATION)
+
+func _dissolve_corpse(coverage: float) -> void:
+	if _corpse_material == null:
+		var skin := _mesh.get_active_material(0) as StandardMaterial3D
+		if skin == null:
+			return
+		_corpse_material = skin.duplicate() as StandardMaterial3D
+		_corpse_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_HASH
+		_mesh.material_override = _corpse_material
+	var tint := _corpse_material.albedo_color
+	tint.a = smoothstep(0.0, 1.0, coverage)
+	_corpse_material.albedo_color = tint
 
 func _exit_tree() -> void:
 	if is_instance_valid(ragdoll):
