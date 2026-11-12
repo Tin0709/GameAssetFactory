@@ -436,8 +436,8 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var gravity_blend_end := gravity_hold + DEATH_LANDING_BLEND_TIME
 	var contact_age := minf(_landing_age + delta, gravity_blend_end) if supported else 0.0
 	# Add rolling resistance once the flat floor carries the slow, low pose.
-	# Leave the first impact and free limbs' follow-through to the solver.
-	var damp_supported_roll := flat_floor and not ragdoll.source_joints.is_empty() \
+	# The original response still drives the first impact and free flight.
+	var damp_supported_roll: bool = flat_floor and not ragdoll.source_joints.is_empty() \
 		and is_equal_approx(contact_age, gravity_blend_end) and motion.supports >= 3 \
 		and motion.core_supports > 0 and motion.leg_supported and motion.linear <= DEATH_LIMB_SUPPORT_MAX_SPEED \
 		and absf(_corpse_axis().normalized().y) <= CORPSE_SETTLE_MAX_AXIS_Y
