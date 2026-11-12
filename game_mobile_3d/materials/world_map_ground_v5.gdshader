@@ -5,6 +5,7 @@ shader_type spatial;
 #endif
 render_mode cull_disabled, diffuse_burley;
 #include "res://materials/world_map_surface_v5.gdshaderinc"
+#include "res://materials/world_map_terrain_outline.gdshaderinc"
 #include "res://materials/world_map_source_terrain.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
 #include "res://materials/world_map_terrain_pbr.gdshaderinc"
@@ -84,6 +85,7 @@ void fragment() {
 		ALBEDO = shade_world_surface(color.rgb, surface_world, surface_top);
 		ALBEDO = grade_stone_twilight(grade_night_path(ALBEDO, surface_top));
 	}
+	ALBEDO *= terrain_outline(surface_world, surface_normal);
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	cloud_transmission=world_cloud_shade(surface_world);
 #else

@@ -6,6 +6,7 @@ shader_type spatial;
 render_mode diffuse_burley, depth_draw_always, cull_disabled;
 #include "res://materials/gameplay_cliff_cutaway.gdshaderinc"
 #include "res://materials/world_map_surface_v5.gdshaderinc"
+#include "res://materials/world_map_terrain_outline.gdshaderinc"
 #include "res://materials/world_map_source_terrain.gdshaderinc"
 #include "res://materials/world_map_clouds.gdshaderinc"
 #include "res://materials/world_map_terrain_pbr.gdshaderinc"
@@ -89,6 +90,7 @@ void fragment() {
 		ALBEDO = shade_world_surface(color.rgb, cutaway_world, surface_top);
 		ALBEDO = grade_stone_twilight(grade_night_path(ALBEDO, surface_top));
 	}
+	ALBEDO *= terrain_outline(cutaway_world, surface_normal);
 #ifdef GAF_WORLD_DIRECT_CLOUD
 	cloud_transmission=world_cloud_shade(cutaway_world);
 #else
