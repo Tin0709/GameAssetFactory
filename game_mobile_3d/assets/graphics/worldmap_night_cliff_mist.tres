@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/local_mist_region.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+center_m = Vector3(-44, 12.5, -26)
+radii_m = Vector3(7, 1.7, 8)
+extinction_per_meter = 0.018
+scatter_multiplier = Vector3(1, 1, 1)

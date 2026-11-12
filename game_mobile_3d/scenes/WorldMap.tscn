@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
 [ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
@@ -6,11 +6,13 @@
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_cliff_mist.tres" id="cliff_mist"]
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_forest_daylight_mix.tres" id="forest_mix"]
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_regional_sky.tres" id="regional_sky"]
+[ext_resource type="Resource" path="res://assets/graphics/worldmap_night_cliff_mist.tres" id="night_mist"]
 
 [node name="WorldMap" instance=ExtResource("base")]
 script = ExtResource("map")
 local_mist_region = ExtResource("mist")
 additional_mist_region = ExtResource("cliff_mist")
+night_mist_region = ExtResource("night_mist")
 regional_sky_region = ExtResource("regional_sky")
 scene_lighting_mix = ExtResource("forest_mix")
 
