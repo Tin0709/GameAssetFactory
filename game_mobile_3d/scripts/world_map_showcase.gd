@@ -89,6 +89,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grass_shadow_reach": ["Grass shadow reach", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
+	&"cool_shadow_detail": ["Cool shadow detail", 1.],
 	&"spruce_sky": ["Forest canopy sky", 1.],
 	&"tree_shade": ["Tree shade depth", 1.],
 	&"oak_leaf_tint": ["MD2 oak leaf tint", 1.],
@@ -130,7 +131,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 54
+const LIGHTING_MIX_VERSION := 55
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -902,6 +903,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .75
 	if effect == &"twilight_shadow_color":
 		return .65
+	if effect == &"cool_shadow_detail":
+		return 0.
 	if effect in [&"daylight_bounce", &"stone_diffuse_contrast", &"stone_detail_softness", &"projected_sun_position", &"projected_sun_softness", &"bloom_diffusion"]:
 		return 0.
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
@@ -1238,6 +1241,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = _lighting_scale_default(effect)
 		if version < 54 and effect == &"projected_sun_softness":
 			missing_value = 0.
+		if version < 55 and effect == &"cool_shadow_detail":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1339,7 +1344,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"stone_twilight_color":
 		_publish_stone_twilight_color()
 		return
-	if changed_effect == &"twilight_shadow_color":
+	if changed_effect in [&"twilight_shadow_color", &"cool_shadow_detail"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -1492,6 +1497,17 @@ func twilight_color_weight() -> float:
 	var dawn := smoothstep(4.5, 5.5, hour) * (1.0 - smoothstep(5.5, 8.0, hour))
 	var dusk := smoothstep(16.5, 19.0, hour) * (1.0 - smoothstep(19.0, 20.75, hour))
 	return dawn + dusk
+
+func shadow_color_detail_weight() -> float:
+	var twilight := twilight_color_weight() * _lighting_scale(&"twilight_shadow_color")
+	var strength := _lighting_scale(&"cool_shadow_detail")
+	if strength <= 0.0 or not forest_active() or atmosphere_review != "combined" or _balanced_preview:
+		return twilight
+	var daylight := 0.70 * _balanced_daylight_weight()
+	var night := 0.40 * moonlight_weight(hour)
+	var phase_target := PHASE_FINISH.phase_weight(hour) * maxf(daylight, night)
+	# Share the existing correction so overlapping time windows cannot stack.
+	return lerpf(twilight, maxf(twilight, phase_target), strength)
 
 func _publish_stone_twilight_color() -> void:
 	if level != null and level.look != null:
