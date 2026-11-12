@@ -22,6 +22,7 @@ regional_sky_region = ExtResource("regional_sky")
 scene_lighting_mix = ExtResource("forest_mix")
 additional_lighting_mixes = Array[ExtResource("mix_type")]([ExtResource("night_mix"), ExtResource("soft_cliff_mix"), ExtResource("forest_air_mix"), ExtResource("humid_forest_mix")])
 projected_sun_shift = Vector2(0, 6)
+sculk_surface_sites = PackedVector2Array(-22, 15, -23, 19, -24, 23, -24, 26)
 
 [node name="Ground" parent="."]
 collision_layer = 0

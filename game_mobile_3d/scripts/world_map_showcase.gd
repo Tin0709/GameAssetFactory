@@ -50,6 +50,7 @@ var _source_terrain_tiles: Texture2DArray
 var _source_terrain_toggle: CheckButton
 var forest:=FOREST.new()
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
+var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_path_light := preload("res://scripts/world_map_forest_path_light.gd").new()
 var atmosphere_review:="combined"
 var _forest_expected:Dictionary={}
@@ -108,6 +109,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_mist_light": ["Night mist light", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
+	&"sculk_surface": ["Sculk phát sáng", 1.],
 	&"forest_path_light": ["Forest path light", 1.],
 	&"forest_path_beam": ["Path light beam", 1.],
 	&"forest_path_air": ["Path light in mist", 1.],
@@ -125,7 +127,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 51
+const LIGHTING_MIX_VERSION := 52
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -883,6 +885,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"sculk_surface":
+		return 0.
 	if effect == &"forest_daylight_accents":
 		return .65
 	if effect == &"daylight_haze":
@@ -1215,6 +1219,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 51 and effect == &"bloom_diffusion":
 			missing_value = 0.
+		if version < 52 and effect == &"sculk_surface":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1248,6 +1254,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
+		if effect == &"sculk_surface":
+			slider.editable = slider.editable and sculk_surface.available(level)
 		if effect == &"foot_contact":
 			slider.editable = slider.editable and player_contact.available()
 		if effect == &"projected_sun":
@@ -1310,7 +1318,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
-	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light"]:
+	if changed_effect in [&"forest_accents", &"forest_daylight_accents", &"forest_path_light", &"sculk_surface"]:
 		_sync_forest_night_lights()
 		return
 	if changed_effect in [&"", &"oak_leaf_tint"]:
@@ -1478,6 +1486,7 @@ func _sync_forest_night_lights() -> void:
 		forest_accents.update(level, day, day_strength)
 	else:
 		forest_accents.update(level, phase, night_strength)
+	sculk_surface.update(level, maxf(day, phase) if not _balanced_preview else 0., _lighting_scale(&"sculk_surface"))
 	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light")):
 		_publish_point_cutoff()
 

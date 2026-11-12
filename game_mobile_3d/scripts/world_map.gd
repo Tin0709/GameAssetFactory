@@ -19,6 +19,8 @@ const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 @export var regional_sky_region: RegionalSkyRegion
 @export var scene_lighting_mix: SceneLightingMix
 @export var additional_lighting_mixes: Array[SceneLightingMix] = []
+## Optional origins for the 2 m private Sculk vein meshes, on flat terrain.
+@export var sculk_surface_sites: PackedVector2Array
 ## Optional translation in the two axes of the projected sunlight plane.
 @export var projected_sun_shift := Vector2.ZERO
 var runtime: Dictionary

@@ -13,6 +13,7 @@ var material: ShaderMaterial
 
 var attempted := false
 var _frame := -1
+var _submitted := Vector2.INF
 
 func available(world: Node3D) -> bool:
 	return world != null and not world.sculk_surface_sites.is_empty() and OS.has_feature("editor") \
@@ -25,10 +26,14 @@ func update(world: Node3D, coverage: float, strength: float) -> void:
 		_load(world)
 	if not is_instance_valid(mesh_batch):
 		return
-	mesh_batch.visible = visible
+	if mesh_batch.visible != visible:
+		mesh_batch.visible = visible
 	if visible:
-		material.set_shader_parameter("phase_coverage", coverage)
-		material.set_shader_parameter("emission_scale", .60 * strength)
+		var parameters := Vector2(coverage, .60 * strength)
+		if parameters != _submitted:
+			_submitted = parameters
+			material.set_shader_parameter("phase_coverage", parameters.x)
+			material.set_shader_parameter("emission_scale", parameters.y)
 		advance_clock(world.look.cloud_clock)
 
 func _load(world: Node3D) -> void:
