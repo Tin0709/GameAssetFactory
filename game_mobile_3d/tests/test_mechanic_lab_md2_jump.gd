@@ -5,6 +5,7 @@ const LAB = preload("res://scenes/dev/MechanicLab.tscn")
 const SOURCE_ACTOR = preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/actor.gd")
 var failures: Array[String] = []
 var checks := 0
+var moving_resume_seconds := {}
 
 func _initialize() -> void:
 	call_deferred("run")
@@ -108,10 +109,12 @@ func run() -> void:
 		check(actor.current_speed > 1.0, "Landing animation allows horizontal movement" + label)
 		check(await wait_clip(actor, "Run", hz), "Landing resumes Run" + label)
 		var resume_seconds: float = actor.simulation_clock - contact_clock
+		moving_resume_seconds[hz] = resume_seconds
+		check(actor.hybrid_motion.owns_pose, "Live gait owns the pose on Run entry" + label)
 		check(resume_seconds <= 0.05 + 1.0 / hz + 0.00001,
 			"Running landing hands back promptly%s (%.3f s)" % [label, resume_seconds])
 	check(oracle.get("native_jump_pose_enabled") != true, "Shared actor defaults to the existing hybrid jump")
-	print("MECHANIC_LAB_MD2_JUMP ", JSON.stringify({"checks": checks, "failures": failures}))
+	print("MECHANIC_LAB_MD2_JUMP ", JSON.stringify({"checks": checks, "failures": failures, "moving_resume_seconds": moving_resume_seconds}))
 	lab.free()
 	oracle.free()
 	quit(0 if failures.is_empty() else 1)

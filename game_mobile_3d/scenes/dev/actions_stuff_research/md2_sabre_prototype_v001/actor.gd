@@ -611,8 +611,11 @@ func _animate(delta:float)->void:
 			_jump_time+=delta
 			if not using_original_source and _jump_stage=="JumpTakeoff" and _jump_time>=float(clips.JumpTakeoff.duration):_jump_stage="JumpAirborne";_jump_time-=float(clips.JumpTakeoff.duration)
 			elif _jump_stage=="JumpLanding":
-				var moving_release:bool=using_original_source and hybrid_motion==null and _grounded and _move_requested and _jump_time>=SOURCE_MOVING_LAND_SECONDS
-				var landing_seconds:float=hybrid_motion.landing_duration if hybrid_motion!=null and not _uses_native_jump_pose("JumpLanding") else float(clips.JumpLanding.duration)
+				var native_landing:=_uses_native_jump_pose("JumpLanding")
+				# Keep the source impact, then hand off to the live gait while still moving.
+				var early_release:=hybrid_motion==null or (native_landing and current_speed>.001)
+				var moving_release:=using_original_source and early_release and _grounded and _move_requested and _jump_time>=SOURCE_MOVING_LAND_SECONDS
+				var landing_seconds:float=hybrid_motion.landing_duration if hybrid_motion!=null and not native_landing else float(clips.JumpLanding.duration)
 				if moving_release or _jump_time>=landing_seconds:_jump_stage="";_jump_time=0.
 		_transition_time+=delta
 		if not _transition.is_empty() and _transition_time>=float(clips[_transition].duration):_transition=""
