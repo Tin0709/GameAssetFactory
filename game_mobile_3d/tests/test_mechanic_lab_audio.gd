@@ -58,6 +58,65 @@ func next_zombie_hit(lab, capture: AudioEffectCapture = null) -> int:
 			capture.clear_buffer()
 	return 0
 
+func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var movement = lab.get_node_or_null("MovementAudio")
+	check(movement != null, "MechanicLab connects player contacts to a movement audio node")
+	if movement == null:
+		lab.free()
+		return
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	check(not toggle.button_pressed and not movement.footsteps_enabled
+		and movement.groups.get("grass", []).size() == 6 and movement.rejected_count == 0,
+		"All six private grass samples load while lab audio starts muted")
+	for voice: AudioStreamPlayer3D in movement.step_voices:
+		voice.bus = AudioServer.get_bus_name(bus)
+	Input.action_press("move_forward")
+	for i in 35:
+		await physics_frame
+	check(movement.event_count.grass == 0, "Muted locomotion schedules no sounds")
+	Input.action_release("move_forward")
+	for i in 25:
+		await physics_frame
+	toggle.button_pressed = true
+	for i in 20:
+		await physics_frame
+	check(movement.event_count.grass == 0, "Idle on grass schedules no steps")
+	capture.clear_buffer()
+	Input.action_press("move_forward")
+	for i in 65:
+		await physics_frame
+	var steps: int = movement.event_count.grass
+	var peak := 0.0
+	for sample in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+	check(steps >= 3 and peak > 0.001 and peak < 0.9,
+		"Walking contacts send MD2 grass steps to the mixer with headroom")
+	Input.action_press("jump")
+	for i in 10:
+		await physics_frame
+		if not lab.player._grounded:
+			break
+	Input.action_release("jump")
+	var before_landing: int = movement.event_count.grass
+	var stayed_quiet := true
+	for i in 75:
+		await physics_frame
+		if lab.player._grounded:
+			break
+		stayed_quiet = stayed_quiet and movement.event_count.grass == before_landing
+	check(lab.player._grounded and stayed_quiet and movement.event_count.landing == 1
+		and movement.event_count.grass == before_landing + 1,
+		"A normal jump emits one landing sample and no airborne steps")
+	toggle.button_pressed = false
+	check(not movement.footsteps_enabled and not movement.step_voices.any(func(voice): return voice.playing),
+		"Turning off lab audio stops movement voices immediately")
+	Input.action_release("move_forward")
+	print("MECHANIC_LAB_MOVEMENT_AUDIO steps=", steps, " landing=", movement.event_count.landing, " pcm_peak=", peak)
+	lab.free()
+
 func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
 	root.add_child(lab)
@@ -192,6 +251,7 @@ func run() -> void:
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
 	await check_local_hurt(bus, capture)
+	await check_movement_audio(bus, capture)
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
