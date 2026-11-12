@@ -3,6 +3,7 @@ extends Node
 const PATH="res://assets/graphics/world_map_terrain_transport_v001/transport.res"
 const BRDF=preload("res://assets/graphics/world_map_air_light_v001/brdf.res")
 const SKY_HOURS := preload("res://scripts/world_map_sky_response.gd").HOURS
+const RegionalSkyRegion = preload("res://scripts/regional_sky_region.gd")
 var level:Node3D
 var cache:Resource
 var installed:=false
@@ -16,7 +17,7 @@ var _last_dielectric:Variant=null
 var _world_transforms:Dictionary={}
 var _transforms_dirty:=false
 var _transforms_valid:=true
-var _regional_sky: preload("res://scripts/regional_sky_region.gd")
+var _regional_sky: RegionalSkyRegion
 var regional_sky_texture: ImageTexture3D
 var regional_sky_state := Vector2.ZERO
 var regional_sky_phase := Vector4.ZERO
