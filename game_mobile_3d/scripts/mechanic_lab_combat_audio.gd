@@ -51,7 +51,7 @@ func set_enabled(value: bool, preview_point: Vector3) -> void:
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
 		AudioServer.set_bus_mute(0, false)
-	_play(&"hit", preview_point, -8.0)
+	_play(&"hit", preview_point, -4.0)
 
 func _restore_master() -> void:
 	if _master_was_muted:

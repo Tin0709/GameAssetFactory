@@ -76,6 +76,12 @@ func _ready() -> void:
 	$HUD/DropHigh.pressed.connect(_drop_player.bind(7.0))
 	if not $HUD/SpawnZombie.disabled:
 		player.collision_mask |= 4
+		var listener := AudioListener3D.new()
+		listener.name = "CombatAudioListener"
+		player.add_child(listener)
+		listener.position.y = 1.55
+		listener.global_basis = camera.global_basis
+		listener.make_current()
 		_combat_audio = CombatAudio.new()
 		_combat_audio.name = "CombatAudio"
 		add_child(_combat_audio)
