@@ -70,6 +70,10 @@ func _ready() -> void:
 	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
 	$HUD/CombatAudioToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
+	$HUD/DropMedium.disabled = $HUD/SpawnZombie.disabled
+	$HUD/DropHigh.disabled = $HUD/SpawnZombie.disabled
+	$HUD/DropMedium.pressed.connect(_drop_player.bind(5.0))
+	$HUD/DropHigh.pressed.connect(_drop_player.bind(7.0))
 	if not $HUD/SpawnZombie.disabled:
 		player.collision_mask |= 4
 		_combat_audio = CombatAudio.new()
@@ -192,6 +196,12 @@ func _spawn_zombie() -> void:
 		$HUD/SpawnStatus.text = ""
 	else:
 		$HUD/SpawnStatus.text = "Không thể tạo zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
+
+func _drop_player(height: float) -> void:
+	if player.drop_for_lab(height):
+		$HUD/SpawnStatus.text = ""
+	else:
+		$HUD/SpawnStatus.text = "Chờ player chạm đất để thử lại."
 
 func reset_player() -> void:
 	_shake_serial = -1

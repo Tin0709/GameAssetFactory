@@ -118,5 +118,23 @@ focus_mode = 0
 text = "Zombie MD2 · 8 HP"
 tooltip_text = "Áp dụng cho zombie mới. Khi tắt, zombie luyện combo có 48 HP."
 
+[node name="DropMedium" type="Button" parent="HUD"]
+offset_left = 546.0
+offset_top = 69.0
+offset_right = 657.0
+offset_bottom = 103.0
+focus_mode = 0
+text = "Thả rơi 5 m"
+tooltip_text = "Bấm E hoặc chuột trái khi đang rơi để thử đòn bổ."
+
+[node name="DropHigh" type="Button" parent="HUD"]
+offset_left = 668.0
+offset_top = 69.0
+offset_right = 779.0
+offset_bottom = 103.0
+focus_mode = 0
+text = "Thả rơi 7 m"
+tooltip_text = "Bấm E hoặc chuột trái khi đang rơi để thử đòn bổ."
+
 [connection signal="pressed" from="HUD/SpawnZombie" to="." method="_spawn_zombie"]
 [connection signal="toggled" from="HUD/CombatAudioToggle" to="." method="_set_combat_audio"]

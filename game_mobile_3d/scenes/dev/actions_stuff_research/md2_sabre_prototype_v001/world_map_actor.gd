@@ -107,8 +107,20 @@ func setup_world_vegetation(world:Node3D)->Node3D:
 	return plants
 
 func cancel_jump()->void:
-	var at:=global_position
+	_reset_map_actor_at(global_position)
+
+func drop_for_lab(height: float) -> bool:
+	if not is_on_floor():
+		return false
+	_reset_map_actor_at(global_position + Vector3.UP * height, visual.rotation.y)
+	_floor_initialized = true
+	return true
+
+func _reset_map_actor_at(at: Vector3, yaw: float = 0.0) -> void:
 	reset_actor();global_position=at;velocity=Vector3.ZERO
+	visual.rotation.y = yaw
+	if hybrid_motion != null:
+		hybrid_motion.facing.reset(yaw)
 	if effects!=null:effects.reset()
 	_left=false;_e=false;_right=false;_q=false;_c=false
 	if reference_audio!=null:reference_audio.reset()

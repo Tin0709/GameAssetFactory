@@ -32,6 +32,9 @@ const AIR_STRIKE := {"damage": 20, "range_m": 2.5, "strength": 1150.0, "angle": 
 const GROUND_HEIGHT_LIMIT := 2.1
 const AIR_CENTRE_OFFSET := 1.5
 const AIR_PRIMARY_RANGE := 1.5
+# GA_HeavyJumpAttackInstanceData. Use apex-to-contact displacement in this lab.
+const MEDIUM_FALL_HEIGHT := 4.0
+const HIGH_FALL_HEIGHT := 6.5
 const LEVEL_COLLISION_MASK := 1
 const SPLASH_MULTIPLIER := 0.3
 # Lab impulse scale anchors the 800-strength finisher to the existing ragdoll.
@@ -165,13 +168,20 @@ func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, t
 			continue
 		_apply_contact(zombie, points[slot], clip, index, serial, strike, forward, true)
 
-func land_sabre(position: Vector3, facing: Vector3, serial: int) -> void:
+func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: float) -> void:
 	if serial == _landing_serial:
 		return
 	_landing_serial = serial
 	var forward := Vector3(facing.x, 0.0, facing.z).normalized()
 	var centre := position + forward * AIR_CENTRE_OFFSET
 	sabre_landing.emit(centre, serial)
+	var strike := AIR_STRIKE.duplicate()
+	if fall_height >= HIGH_FALL_HEIGHT:
+		strike.damage *= 3
+		strike.strength *= 1.4
+	elif fall_height >= MEDIUM_FALL_HEIGHT:
+		strike.damage *= 2
+		strike.strength *= 1.2
 	var space := get_world_3d().direct_space_state
 	var ray := PhysicsRayQueryParameters3D.create(position + Vector3.UP * 0.65, position, LEVEL_COLLISION_MASK)
 	ray.hit_from_inside = true
@@ -180,13 +190,13 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int) -> void:
 			continue
 		var offset := zombie.global_position - centre
 		var distance := Vector2(offset.x, offset.z).length()
-		if distance > float(AIR_STRIKE.range_m) or absf(offset.y) > GROUND_HEIGHT_LIMIT:
+		if distance > float(strike.range_m) or absf(offset.y) > GROUND_HEIGHT_LIMIT:
 			continue
 		var contact := zombie.global_position + Vector3.UP * 0.65
 		ray.to = contact
 		if not space.intersect_ray(ray).is_empty():
 			continue
-		_apply_contact(zombie, contact, "AirAttack", 0, serial, AIR_STRIKE, forward, distance > AIR_PRIMARY_RANGE)
+		_apply_contact(zombie, contact, "AirAttack", 0, serial, strike, forward, distance > AIR_PRIMARY_RANGE)
 
 func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool) -> void:
 	var direction := zombie.global_position - _attacker.global_position if clip == "AirAttack" or index == 2 else forward

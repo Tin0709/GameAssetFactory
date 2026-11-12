@@ -6,7 +6,7 @@ signal attack_accepted(index:int,clip:String,serial:int)
 signal attack_accepted_timed(index:int,clip:String,serial:int,simulation_time:float)
 signal impact_ready(index:int,base:Vector3,tip:Vector3,serial:int)
 signal attack_pose_sample(index: int, clip: String, source_time: float, base: Vector3, tip: Vector3, serial: int)
-signal heavy_jump_landed(position: Vector3, forward: Vector3, serial: int)
+signal heavy_jump_landed(position: Vector3, forward: Vector3, serial: int, fall_height: float)
 signal source_locomotion_event(notify:String,clip:String,source_seconds:float,simulation_seconds:float)
 signal physics_pose_ready
 signal presentation_reset
@@ -123,6 +123,7 @@ var _jump_held:=false
 var _jump_stage:=""
 var _jump_time:=0.
 var _heavy_slam_active:=false
+var _airborne_peak_height := -INF
 var _transition:=""
 var _transition_time:=0.
 var _review_time:=0.
@@ -433,6 +434,10 @@ func _physics_process(delta:float)->void:
 	_time_since_grounded=0. if was_grounded else _time_since_grounded+delta
 	var accepted_jump:bool=jump_pressed and (was_grounded or (using_original_source and _time_since_grounded<=coyote_time))
 	if accepted_jump:_heavy_slam_active=false
+	if was_grounded or accepted_jump:
+		_airborne_peak_height = global_position.y
+	else:
+		_airborne_peak_height = maxf(_airborne_peak_height, global_position.y)
 	var speed:=run_speed if _run_requested else walk_speed
 	if measured_jump_active and _run_requested and (not was_grounded or jump_pressed):speed=float(jump_runtime_profile.normal_air_speed_m_s)
 	var desired:=stick.limit_length()*speed
@@ -483,7 +488,9 @@ func _physics_process(delta:float)->void:
 		_step_ready=_step_distance>=COMBAT_STEP_DISTANCE or _step_elapsed>=COMBAT_STEP_TIMEOUT-.0000001
 	if _grounded:
 		if not was_grounded and _heavy_slam_active and _floor_initialized and review_clip.is_empty():
-			heavy_jump_landed.emit(global_position, visual.global_basis.z, combo.serial)
+			var fall_height := maxf(0.0, _airborne_peak_height - global_position.y)
+			heavy_jump_landed.emit(global_position, visual.global_basis.z, combo.serial, fall_height)
+		_airborne_peak_height = global_position.y
 		_heavy_slam_active=false
 	# Source pose duration does not define physical flight. The apex (including
 	# an interrupted ascent at a ceiling) owns the transition into the air loop.
@@ -798,6 +805,7 @@ func reset_actor()->void:
 	_last_run_gait=false
 	_gait_resume_phase=0.;_step_seen=-1;_step_distance=0.;_step_elapsed=0.;_step_ready=false
 	_time_since_grounded=INF
+	_airborne_peak_height = -INF
 	visual.rotation.y=0.
 	# Rebase the direction adapter AFTER resetting the visual's world heading.
 	# Otherwise its first new step starts from the previous life's heading.
