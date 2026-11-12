@@ -1817,7 +1817,8 @@ func _sync_forest_night_lights() -> void:
 		forest_accents.update(level, phase, night_strength)
 	sculk_surface.update(level, maxf(day, phase) if not _balanced_preview else 0., _lighting_scale(&"sculk_surface"))
 	forest_replay.update(level, replay_phase, _lighting_scale(&"forest_replay_emission"))
-	forest_replay.publish_bounce(_lighting_scale(&"forest_replay_bounce"))
+	if _point_kernel_owner != null and _point_kernel_owner.get_ref() == self:
+		forest_replay.publish_bounce(_lighting_scale(&"forest_replay_bounce"))
 	var offset: Vector2 = level.forest_path_light_offset if _lighting_scale(&"forest_path_placement") == 1. else Vector2.ZERO
 	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light"), offset):
 		_publish_point_cutoff()
