@@ -140,6 +140,7 @@ func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Ar
 	collision_mask = 1 | 2 | 4
 
 func _ready() -> void:
+	set_process(false)
 	health = max_health
 	animation.play(SPAWN)
 	animation.advance(0)
@@ -213,13 +214,17 @@ func _source_physics_setup(skeleton: Skeleton3D) -> Dictionary:
 			"parent_frame": offsets[parent].affine_inverse() * parent_frame, "swing": entry.swing, "twist": entry.twist}
 	return {"parts": parts, "bones": bones, "offsets": offsets, "joints": joints}
 
-func _physics_process(delta: float) -> void:
-	if _flash_left > 0.0:
+func _process(delta: float) -> void:
+	# Sample before advancing so the first drawn frame gets the full flash.
+	var flash := smoothstep(0.0, HIT_FLASH_DURATION * 0.65, _flash_left)
+	_mesh.set_instance_shader_parameter("hit_flash", flash)
+	if _flash_left <= 0.0:
+		_mesh.material_overlay = null
+		set_process(false)
+	else:
 		_flash_left = maxf(0.0, _flash_left - delta)
-		var flash := smoothstep(0.0, HIT_FLASH_DURATION * 0.65, _flash_left)
-		_mesh.set_instance_shader_parameter("hit_flash", flash)
-		if _flash_left == 0.0:
-			_mesh.material_overlay = null
+
+func _physics_process(delta: float) -> void:
 	if health <= 0:
 		_update_death(delta)
 		return
@@ -311,6 +316,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 	_mesh.material_overlay = _flash_material
 	_mesh.set_instance_shader_parameter("hit_flash", 1.0)
 	_flash_left = HIT_FLASH_DURATION
+	set_process(true)
 	if health <= 0:
 		_death_direction = direction
 		_death_strength = knockback_strength
