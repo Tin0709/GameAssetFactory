@@ -72,6 +72,8 @@ func run() -> void:
 	var head_state := PhysicsServer3D.body_get_direct_state(zombie.ragdoll.bodies.Head.get_rid())
 	check(head_state and is_equal_approx(head_state.total_gravity.y, -50.0),
 		"Grounded hits use 50 m/s² of downward gravity in flight")
+	check(is_equal_approx(zombie.ragdoll.bodies.Head.linear_damp, 0.01),
+		"The ragdoll uses the authored air drag during launch")
 	var impulse: Vector3 = zombie.ragdoll.total_applied_impulse
 	check(absf(rad_to_deg(atan2(impulse.y, Vector2(impulse.x, impulse.z).length())) - 30.0) < 0.01,
 		"DefaultHostile's 30-degree launch is applied to the death impulse")
@@ -201,5 +203,23 @@ func check_combo_finisher(lab, group, sword: bool) -> void:
 	if not sword:
 		check(vertical_axis < 0.34, "Sabre's finisher rolls out of its inverted pose within 300 ms")
 		check(lower_contact_time < 0.40, "Sabre's chest or legs reach the floor within 400 ms of head contact")
+	else:
+		await check_rebound(zombie)
 	zombie.free()
+
+func check_rebound(zombie) -> void:
+	# Give every body the same upward speed to test re-entry into free flight.
+	for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
+		body.apply_central_impulse(Vector3.UP * body.mass * 6.0)
+	var free_flight := false
+	for i in 24:
+		await physics_frame
+		if zombie.ragdoll.minimum_corner_y() <= 0.025:
+			continue
+		var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
+		var state := PhysicsServer3D.body_get_direct_state(head.get_rid())
+		if state and is_equal_approx(state.total_gravity.y, -50.0) and is_equal_approx(head.linear_damp, 0.01):
+			free_flight = true
+			break
+	check(free_flight, "A corpse that rebounds clear of the floor returns to air gravity and drag")
 
