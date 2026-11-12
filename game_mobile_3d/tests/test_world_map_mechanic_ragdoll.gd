@@ -102,7 +102,8 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	await ticks(2)
 
 func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.DeathStrike,
-		frames: int, start := Vector3(-33.5, 9.0, -39.5), direction := Vector3.RIGHT, yaw := 0.0) -> void:
+		frames: int, start := Vector3(-33.5, 9.0, -39.5), direction := Vector3.RIGHT, yaw := 0.0,
+		anchor_limit := 0.12) -> void:
 	var zombie = await launch(world, group, effects, start, direction, strike, yaw)
 	if zombie == null:
 		return
@@ -134,7 +135,7 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 			first_landing = frame
 	check(first_landing > 25 and first_landing < 60 and ledge_contact and chest_height < 6.0,
 		"The corpse crosses the authored ledge and contacts the lower terrain")
-	check(worst_anchor < 0.12, "The first impact on the lower terrace keeps the limb anchors connected")
+	check(worst_anchor < anchor_limit, "The first impact on the lower terrace keeps the limb anchors connected")
 	check(worst_overlap < 0.12, "The ledge contact stays within the terrain penetration budget")
 	if strike == Zombie.DeathStrike.GROUND:
 		check(parked_frame > first_landing and parked_frame < 150,
@@ -317,6 +318,13 @@ func run() -> void:
 		group._spawn_serial = 3
 		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND, 200,
 			Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT.rotated(Vector3.UP, 0.055), 0.16)
+		# The left arm reaches the next step a tick before the solver reports it.
+		group._spawn_serial = 43
+		await ledge_case(world, group, effects, Zombie.DeathStrike.AIR, 190,
+			Vector3(-33.5, 9.0, -39.35), Vector3.RIGHT.rotated(Vector3.UP, 0.21), -0.065, 0.22)
+		group._spawn_serial = 11
+		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER, 180,
+			Vector3(-33.5, 9.0, -39.28), Vector3.RIGHT.rotated(Vector3.UP, -0.18))
 		await oblique_cliff_case(world, group, effects)
 		await cliff_edge_case(world, group, effects, 10, -37.39, -0.18, -0.08, Zombie.DeathStrike.AIR)
 		# A glancing right arm can cross the front triangle before the side reports contact.
