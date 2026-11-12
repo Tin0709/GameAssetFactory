@@ -24,6 +24,7 @@ const COMPARE := "compare-original-combined-graphics-b"
 const ACCENT := Color("#edc788")
 const DIM := Color("#acc0b3")
 const BORDER := Color("#3e5448")
+const UNDO_LIMIT := 48
 
 var hud: CanvasLayer
 var gear: Button
@@ -42,6 +43,15 @@ var _info: PanelContainer
 var _info_trigger: Button
 var _widgets: Dictionary = {}
 var _sliders: Dictionary = {}
+var _undo_button: Button
+var _history: Array[Callable] = []
+var _undoing := false
+var _toggle_before: Dictionary = {}
+var _choice_before: Dictionary = {}
+var _dragging := false
+var _drag_offset := Vector2.ZERO
+var _moved := false
+var _preferred_position := Vector2.ZERO
 
 func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 		sliders: Dictionary, status: Label, full: bool) -> void:
@@ -66,6 +76,7 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	_shield.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_shield.gui_input.connect(_outside_click)
 	panel.reparent(_shield, false)
+	panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	panel.custom_minimum_size = Vector2.ZERO
 	panel.theme = _make_theme()
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -77,8 +88,20 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	var header := HBoxContainer.new()
 	layout.add_child(header)
 	var heading := _label("Cài đặt Overworld", 23)
+	heading.name = "SettingsDragHandle"
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.mouse_filter = Control.MOUSE_FILTER_STOP
+	heading.mouse_default_cursor_shape = Control.CURSOR_MOVE
+	heading.tooltip_text = "Giữ chuột trái trên tiêu đề và kéo để di chuyển menu."
+	heading.gui_input.connect(_drag_header)
 	header.add_child(heading)
+	if full:
+		_undo_button = _button("Hoàn tác")
+		_undo_button.name = "UndoSettings"
+		_undo_button.tooltip_text = "Khôi phục lần chỉnh gần nhất."
+		_undo_button.disabled = true
+		_undo_button.pressed.connect(_undo_last)
+		header.add_child(_undo_button)
 	if _widgets.has(COMPARE):
 		var compare: Button = _widgets[COMPARE]
 		compare.reparent(header)
@@ -137,6 +160,7 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	gear.offset_top = 12
 	gear.offset_bottom = 50
 	gear.pressed.connect(_toggle_open)
+	hud.move_child(_shield, -1)
 	hud.get_viewport().size_changed.connect(_resize)
 	_resize()
 	_rebuild()
@@ -180,20 +204,90 @@ func _register(id: String, widget: Control) -> void:
 				widget.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	if widget is Label:
 		widget.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	elif widget is CheckButton:
+		widget.button_down.connect(_begin_toggle.bind(widget))
+		widget.pressed.connect(_finish_toggle.bind(widget))
+	elif widget is OptionButton:
+		widget.get_popup().about_to_popup.connect(func(): _choice_before[widget] = widget.selected)
+		widget.item_selected.connect(_finish_choice.bind(widget))
 
 func _resize() -> void:
-	var view_width := _shield.get_viewport_rect().size.x
-	panel.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
-	panel.offset_left = -minf(view_width - 32.0, 608.0) - 16.0
-	panel.offset_right = -16.0
-	panel.offset_top = 60.0
-	panel.offset_bottom = -16.0
+	var bounds := _shield.get_viewport_rect().size
+	var width := minf(bounds.x - 32.0, 608.0)
+	var desired := _preferred_position if _moved else Vector2(bounds.x - width - 16.0, 60.0)
+	var min_height := maxf(240.0, panel.get_combined_minimum_size().y)
+	panel.position = Vector2(clampf(desired.x, 8.0, bounds.x - width - 8.0),
+		clampf(desired.y, 8.0, maxf(8.0, bounds.y - min_height - 16.0)))
+	panel.size = Vector2(width, minf(644.0, bounds.y - panel.position.y - 16.0))
+
+func _drag_header(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		_dragging = event.pressed
+		if _dragging:
+			_drag_offset = event.global_position - panel.position
+	elif event is InputEventMouseMotion and _dragging:
+		_moved = true
+		_preferred_position = event.global_position - _drag_offset
+		_resize()
+
+func remember_edit(restore: Callable) -> void:
+	if _undoing or _undo_button == null:
+		return
+	if _history.size() == UNDO_LIMIT:
+		_history.pop_front()
+	_history.append(restore)
+	_undo_button.disabled = false
+
+func _undo_last() -> void:
+	if _history.is_empty():
+		return
+	_close_info()
+	_undoing = true
+	var restore: Callable = _history.pop_back()
+	restore.call()
+	_undoing = false
+	_undo_button.disabled = _history.is_empty()
+
+func _begin_toggle(widget: CheckButton) -> void:
+	_toggle_before.clear()
+	_toggle_before[widget] = widget.button_pressed
+	for other: Control in _widgets.values():
+		if other is CheckButton:
+			_toggle_before[other] = other.button_pressed
+
+func _finish_toggle(widget: CheckButton) -> void:
+	if not _toggle_before.has(widget):
+		return
+	var changed: Dictionary = {}
+	for other: CheckButton in _toggle_before:
+		if other.button_pressed != _toggle_before[other]:
+			changed[other] = _toggle_before[other]
+	_toggle_before.clear()
+	if not changed.is_empty():
+		remember_edit(_restore_toggles.bind(changed))
+
+func _restore_toggles(previous: Dictionary) -> void:
+	# Restore the clicked option first; it may also restore its dependent toggles.
+	for widget: CheckButton in previous:
+		if widget.button_pressed != previous[widget]:
+			widget.button_pressed = previous[widget]
+
+func _finish_choice(index: int, widget: OptionButton) -> void:
+	var previous: int = _choice_before.get(widget, index)
+	_choice_before.erase(widget)
+	if previous >= 0 and previous != index:
+		remember_edit(_restore_choice.bind(widget, previous))
+
+func _restore_choice(widget: OptionButton, index: int) -> void:
+	widget.select(index)
+	widget.item_selected.emit(index)
 
 func _toggle_open() -> void:
 	set_open(not panel.visible)
 
 func set_open(value: bool) -> void:
 	if not value:
+		_dragging = false
 		_close_info()
 		if search.has_focus():
 			search.release_focus()
