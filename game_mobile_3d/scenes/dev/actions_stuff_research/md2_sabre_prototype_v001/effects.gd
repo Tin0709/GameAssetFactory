@@ -5,6 +5,8 @@ const MAX_SAMPLES:=28
 const PARTICLE_CAPACITY:=48
 const MAX_PARTICLE_HISTORY:=16
 const RIBBON_U := [0.0, 1.0, 1.0, 0.0, 1.0, 0.0]
+const RIBBON_SAMPLE := [0, 0, 1, 0, 1, 1]
+const RIBBON_LIFETIME := 0.14
 var samples:Array[Dictionary]=[]
 var particles:Array[Dictionary]=[]
 var clock:=0.
@@ -42,7 +44,7 @@ func sample(delta:float,active:bool,base:Vector3,tip:Vector3,attack_serial:int)-
 		samples.append({"base":base,"tip":tip,"time":clock})
 		if samples.size()>MAX_SAMPLES:samples.pop_front()
 	var display_lag:=1./maxf(1.,Engine.physics_ticks_per_second)
-	while not samples.is_empty() and clock-float(samples[0].time)>.14+display_lag:samples.pop_front()
+	while not samples.is_empty() and clock-float(samples[0].time)>RIBBON_LIFETIME+display_lag:samples.pop_front()
 	for particle:Dictionary in particles:
 		if float(particle.life)>0.:
 			particle.life=maxf(0.,float(particle.life)-delta);particle.velocity+=Vector3(0,-1.8,0)*delta;particle.position+=particle.velocity*delta
@@ -66,7 +68,7 @@ func contact(point: Vector3, direction: Vector3) -> void:
 func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=null)->Array:
 	var result:Array=[]
 	for point:Dictionary in samples:
-		if display_time-float(point.time)>.14:continue
+		if display_time-float(point.time)>RIBBON_LIFETIME:continue
 		if float(point.time)<=display_time:result.append(point)
 		else:
 			if not result.is_empty() and display_time>float(result[-1].time):
@@ -93,15 +95,18 @@ func present(display_time:float=-1.,blade_base:Variant=null,blade_tip:Variant=nu
 		_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 		for i in range(1,shown.size()):
 			var a:Dictionary=shown[i-1];var b:Dictionary=shown[i]
-			var opacity:=clampf(1.-(time-float(a.time))/.14,0.,1.)*intensity*.58
+			var age_a := clampf((time - float(a.time)) / RIBBON_LIFETIME, 0.0, 1.0)
+			var age_b := clampf((time - float(b.time)) / RIBBON_LIFETIME, 0.0, 1.0)
+			var ages := Vector2(age_a, age_b)
+			var opacity := (1.0 - age_a) * intensity * 0.58
 			var ribbon_points := [a.base, a.tip, b.tip, a.base, b.tip, b.base]
 			for corner in ribbon_points.size():
-				_mesh.surface_set_uv(Vector2(RIBBON_U[corner], 0.0))
+				_mesh.surface_set_uv(Vector2(RIBBON_U[corner], ages[RIBBON_SAMPLE[corner]]))
 				_mesh.surface_set_color(Color(1.,.73,.23,opacity));_mesh.surface_add_vertex(ribbon_points[corner])
 			var a_inner:Vector3=Vector3(a.base).lerp(a.tip,.86);var b_inner:Vector3=Vector3(b.base).lerp(b.tip,.86)
 			var edge_points := [a_inner, a.tip, b.tip, a_inner, b.tip, b_inner]
 			for corner in edge_points.size():
-				_mesh.surface_set_uv(Vector2(lerpf(0.86, 1.0, RIBBON_U[corner]), 0.0))
+				_mesh.surface_set_uv(Vector2(lerpf(0.86, 1.0, RIBBON_U[corner]), ages[RIBBON_SAMPLE[corner]]))
 				_mesh.surface_set_color(Color(1.,.97,.82,opacity*.8));_mesh.surface_add_vertex(edge_points[corner])
 		_mesh.surface_end()
 	for i in particles.size():
