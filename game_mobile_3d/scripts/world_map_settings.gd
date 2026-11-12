@@ -399,6 +399,7 @@ func _build_quick() -> void:
 	var time := _section("Thời điểm")
 	_add_row_buttons(time, PHASES)
 	_add_row(time, "sunset")
+	_add_row(time, "twilight")
 	_add_row(time, "dawn")
 	_add_row(time, "original-gaf-day-night-preview")
 	var mix := _section("Preset ánh sáng")

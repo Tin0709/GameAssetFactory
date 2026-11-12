@@ -117,6 +117,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_depth_scatter": ["Ánh xanh trong sương xa", 1.],
 	&"dawn_mist_source": ["Ánh sáng sương rạng sáng", 1.],
 	&"evening_mist_profile": ["Sương hoàng hôn", 1.],
+	&"evening_key_response": ["Ánh trực tiếp lúc chạng vạng", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"sculk_surface": ["Sculk phát sáng", 1.],
@@ -142,7 +143,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 66
+const LIGHTING_MIX_VERSION := 67
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -459,7 +460,8 @@ func _captured_key_rgb(time:float)->Vector3:
 	var noon:=forest.sample(12.)
 	var base:Color=Color(_day.sun_color).srgb_to_linear()
 	var reference:Vector3=Vector3(base.r,base.g,base.b)*noon.key_color_scale*float(_day.sun_energy)*float(noon.key_scale)
-	return reference*key_response.sample(time)
+	var evening_strength := 0.0 if _balanced_preview else _lighting_scale(&"evening_key_response")
+	return reference * key_response.sample_evening(time, evening_strength)
 
 func set_moonlight_enabled(value:bool)->void:
 	if moonlight_enabled==value:return
@@ -1349,6 +1351,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 66 and effect == &"evening_mist_profile":
 			missing_value = 0.
+		if version < 67 and effect == &"evening_key_response":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1392,6 +1396,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and not phase_air.anchors.is_empty()
 		if effect == &"evening_mist_profile":
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
+		if effect == &"evening_key_response":
+			slider.editable = slider.editable and key_response.evening_available()
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
 		if effect == &"forest_path_placement":
@@ -2247,7 +2253,7 @@ func _build_ui()->void:
 	edges.toggled.connect(phase_finish.set_edge_softening);phase_finish.edge_toggle=edges
 	var hdr_toggle:=CheckButton.new();hdr_toggle.text="Air · preserve HDR highlights (higher bandwidth)";hdr_toggle.button_pressed=hdr_air;hdr_toggle.focus_mode=Control.FOCUS_NONE;box.add_child(hdr_toggle);hdr_toggle.toggled.connect(set_hdr_air)
 	var times:=HBoxContainer.new();box.add_child(times)
-	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Sunset",18.5],["Night",22.],["Dawn",2.5]]:
+	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Sunset",18.5],["Twilight",19.5],["Night",22.],["Dawn",2.5]]:
 		var button:=Button.new();button.text=entry[0];button.focus_mode=Control.FOCUS_NONE;times.add_child(button)
 		button.pressed.connect(_choose_hour.bind(float(entry[1])))
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)

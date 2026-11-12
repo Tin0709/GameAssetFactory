@@ -37,29 +37,29 @@ func sample(hour:float)->Vector3:
  return Vector3(a[0],a[1],a[2]).lerp(Vector3(b[0],b[1],b[2]),smoothstep(HOURS[i],HOURS[i+1],h))
 
 func _load_evening(path: String) -> void:
-	if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != EVENING_SHA:
-		return
-	var profile: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
-	evening_anchors = profile.anchors
+ if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != EVENING_SHA:
+  return
+ var profile: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
+ evening_anchors = profile.anchors
 
 func evening_available() -> bool:
-	return available() and not evening_anchors.is_empty()
+ return available() and not evening_anchors.is_empty()
 
 func sample_evening(hour: float, strength: float) -> Vector3:
-	var baseline := sample(hour)
-	if not evening_available() or not is_finite(hour) or strength <= 0.0:
-		return baseline
-	# These are WorldMap review times assigned to ordered GPU observations.
-	var weight := strength * smoothstep(19.0, 19.5, hour) * (1.0 - smoothstep(20.5, 21.0, hour))
-	if weight <= 0.0:
-		return baseline
-	for i in range(1, evening_anchors.size()):
-		var end: Dictionary = evening_anchors[i]
-		if hour <= float(end.hour):
-			var start: Dictionary = evening_anchors[i - 1]
-			var a: Array = start.rgb_ratio
-			var b: Array = end.rgb_ratio
-			var blend := inverse_lerp(float(start.hour), float(end.hour), hour)
-			var measured := Vector3(a[0], a[1], a[2]).lerp(Vector3(b[0], b[1], b[2]), blend)
-			return baseline.lerp(measured, weight)
-	return baseline
+ var baseline := sample(hour)
+ if not evening_available() or not is_finite(hour) or strength <= 0.0:
+  return baseline
+ # These are WorldMap review times assigned to ordered GPU observations.
+ var weight := strength * smoothstep(19.0, 19.5, hour) * (1.0 - smoothstep(20.5, 21.0, hour))
+ if weight <= 0.0:
+  return baseline
+ for i in range(1, evening_anchors.size()):
+  var end: Dictionary = evening_anchors[i]
+  if hour <= float(end.hour):
+   var start: Dictionary = evening_anchors[i - 1]
+   var a: Array = start.rgb_ratio
+   var b: Array = end.rgb_ratio
+   var blend := inverse_lerp(float(start.hour), float(end.hour), hour)
+   var measured := Vector3(a[0], a[1], a[2]).lerp(Vector3(b[0], b[1], b[2]), blend)
+   return baseline.lerp(measured, weight)
+ return baseline
