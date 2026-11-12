@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 signal melee_hit(amount: int)
 
-enum DeathStrike { GROUND, AIR, SABRE_FINISHER, CURVED_GREATSWORD }
+enum DeathStrike { GROUND, AIR, SABRE_FINISHER }
 signal melee_audio(point: Vector3, contact: bool)
 
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
@@ -38,7 +38,6 @@ const DEATH_ANGULAR_TO_LAB := 0.18
 const DEATH_AIR_ATTACK_ANGULAR_TO_LAB := 0.14
 const DEATH_FINISHER_ROLL_SPEED := 1.0
 const ZOMBIE_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
-const CURVED_GREATSWORD_FLIGHT_GRAVITY := 32.0
 const SABRE_FINISHER_GRAVITY_HOLD := 0.30
 const SABRE_FINISHER_HEAD_FRICTION := 0.70
 const DEATH_SOURCE_RESTITUTION := 0.30 # MD2 DefaultPhysicalMaterial.
@@ -364,9 +363,7 @@ func _update_death(delta: float) -> void:
 	if _corpse_parked:
 		return
 	var sabre_finisher := _death_strike == DeathStrike.SABRE_FINISHER
-	var curved := _death_strike == DeathStrike.CURVED_GREATSWORD
 	var source_rig := not ragdoll.source_joints.is_empty()
-	var flight_gravity := CURVED_GREATSWORD_FLIGHT_GRAVITY if curved else ZOMBIE_GRAVITY
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
 			ragdoll.sample(delta)
@@ -390,7 +387,7 @@ func _update_death(delta: float) -> void:
 		launch.linear_impulse = cos(angle) * launch_impulse
 		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
-		if ragdoll.begin(launch, direction, "Chest", 0.0, flight_gravity, null if curved else _corpse_floor):
+		if ragdoll.begin(launch, direction, "Chest", 0.0, ZOMBIE_GRAVITY, _corpse_floor):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	var contact := ragdoll.contact_motion()
@@ -411,10 +408,10 @@ func _update_death(delta: float) -> void:
 			if source_rig:
 				body.bounce = 0.0
 	if _corpse_landed:
-		_update_landing_forces(delta, flight_gravity, sabre_finisher, contact.supports > 0)
+		_update_landing_forces(delta, sabre_finisher, contact.supports > 0)
 		_check_corpse_settled(delta, contact)
 
-func _update_landing_forces(delta: float, flight_gravity: float, sabre_finisher: bool, supported: bool) -> void:
+func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool) -> void:
 	if not supported and is_instance_valid(_corpse_floor):
 		# The solver can omit contact for a frame while rolling close to the floor.
 		var box := _corpse_floor.shape as BoxShape3D
@@ -429,7 +426,7 @@ func _update_landing_forces(delta: float, flight_gravity: float, sabre_finisher:
 	_landing_age = contact_age
 	var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
 	var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
-	var flight_gravity_scale := _gravity_scale(flight_gravity)
+	var flight_gravity_scale := _gravity_scale(ZOMBIE_GRAVITY)
 	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 	var angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 	for body: PhysicalBone3D in ragdoll.bodies.values():

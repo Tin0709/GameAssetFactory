@@ -94,7 +94,7 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	var worst_anchor := 0.0
 	var ledge_contact := false
 	var parked_frame := -1
-	for frame in (200 if strike == Zombie.DeathStrike.CURVED_GREATSWORD else 72):
+	for frame in (200 if strike == Zombie.DeathStrike.GROUND else 72):
 		await physics_frame
 		if zombie._corpse_parked:
 			parked_frame = frame
@@ -116,8 +116,8 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	check(first_landing > 25 and first_landing < 60 and ledge_contact and chest_height < 6.0,
 		"The corpse crosses the authored ledge and contacts the lower terrain")
 	check(worst_anchor < 0.12, "The first impact on the lower terrace keeps the limb anchors connected")
-	if strike == Zombie.DeathStrike.CURVED_GREATSWORD:
-		check(parked_frame > first_landing, "A supported Curved Greatsword corpse parks across the two terraces")
+	if strike == Zombie.DeathStrike.GROUND:
+		check(parked_frame > first_landing, "A supported corpse parks across the two terraces after a forward melee finisher")
 	print("WORLDMAP_LEDGE strike=", strike, " landing=", first_landing,
 		" minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor, " park=", parked_frame)
 	zombie.free()
@@ -137,7 +137,8 @@ func run() -> void:
 		await cliff_case(world, group, effects)
 		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER)
 		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER)
-		await ledge_case(world, group, effects, Zombie.DeathStrike.CURVED_GREATSWORD)
+		# Curved Greatsword and Sword use the same forward ground death response.
+		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)

@@ -286,9 +286,7 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	var angle := deg_to_rad(float(strike.angle))
 	var impulse := Vector2(cos(angle), sin(angle)) * float(strike.strength) * IMPULSE_PER_STRENGTH
 	var death_strike := Zombie.DeathStrike.AIR if air_attack else Zombie.DeathStrike.GROUND
-	if curved_equipped:
-		death_strike = Zombie.DeathStrike.CURVED_GREATSWORD
-	elif sabre_finisher:
+	if sabre_finisher:
 		death_strike = Zombie.DeathStrike.SABRE_FINISHER
 	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger),
 		float(strike.strength), death_strike)
