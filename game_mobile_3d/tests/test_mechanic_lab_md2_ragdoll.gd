@@ -220,8 +220,8 @@ func check_combo_finisher(lab, group, slot: int) -> void:
 		if not zombie._corpse_landed:
 			continue
 		landing_time = minf(landing_time, zombie._corpse_age)
-		if slot == 1:
-			# Test the rebound while bodies are still simulated.
+		if slot == 1 and zombie._corpse_age - landing_time >= ZOMBIE.DEATH_LANDING_BLEND_TIME - 0.00001:
+			# Rebound from the landed state while the bodies are still simulated.
 			break
 		if slot != 0:
 			continue
