@@ -6,6 +6,7 @@ const PALETTE=preload("res://scripts/world_map_showcase_palette.gd")
 const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
 const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
 const CrownWind := preload("res://scripts/world_map_crown_wind.gd")
+const DirectionalAir := preload("res://scripts/world_map_directional_air.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 # User-directed art adjustment; recovered Forest profiles stay untouched.
 const GENTLE_NOON_DIRECT_SCALE:=.82
@@ -81,6 +82,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"near_haze": ["Near haze density", 2.],
 	&"near_haze_depth": ["Near haze depth", 1.],
 	&"forest_near_scatter": ["Forest mist depth light", 1.],
+	&"sunlit_mist": ["Canopy sunlight in mist (preview)", DirectionalAir.MAX_GAIN],
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
@@ -96,7 +98,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 29
+const LIGHTING_MIX_VERSION := 30
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -153,6 +155,7 @@ var _player_light:OmniLight3D
 var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
 var mist:Node3D
+var directional_air := DirectionalAir.new()
 var spatial_mist:=true
 var near_haze_enabled: bool:
 	get: return float(_lighting_mix.get(&"near_haze", _lighting_scale_default(&"near_haze"))) > 0.
@@ -227,6 +230,10 @@ func setup(world:Node3D)->void:
 		_player_light.omni_range=forest.player_range;_player_light.omni_attenuation=2.;_player_light.position.y=1.4
 		level.player.add_child(_player_light);_player_light.hide()
 		mist=preload("res://scripts/world_map_atmosphere_volume.gd").new();level.get_node("Camera3D").add_child(mist);mist.setup();mist.material_provider=_mist_materials;mist.medium_state=_mist_state;mist.path_light_provider=_path_air_source;mist.compositor_owned=func(c):return c==level.look._exposure_compositor
+		directional_air.setup(level, self)
+		if directional_air.available():
+			mist.effect.directional_grid = directional_air.texture
+			mist.effect.directional_provider = directional_air.parameters
 	grade_review=preload("res://scripts/world_map_grade_review.gd").new();add_child(grade_review);grade_review.setup(self)
 	phase_finish=PHASE_FINISH.new();add_child(phase_finish);phase_finish.setup(self)
 	_build_ui()
@@ -788,6 +795,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .7
 	if effect == &"humid_light":
 		return 0.
+	if effect == &"sunlit_mist":
+		return 0.
 	if effect == &"night_path_chroma":
 		return .75
 	if effect == &"grass_root_tone":
@@ -944,7 +953,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -992,6 +1001,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 28 and effect == &"forest_path_beam":
 			missing_value = 0.
 		if version < 29 and effect == &"grass_root_tone":
+			missing_value = 0.
+		if version < 30 and effect == &"sunlit_mist":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.

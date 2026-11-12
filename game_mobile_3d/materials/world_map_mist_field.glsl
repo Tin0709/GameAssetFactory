@@ -4,6 +4,9 @@ layout(local_size_x=8,local_size_y=8,local_size_z=1) in;
 layout(rgba16f,set=0,binding=0) uniform writeonly image3D volume;
 layout(set=0,binding=1) uniform sampler2D noise_field;
 layout(set=0,binding=3) uniform sampler3D light_field;
+#ifdef GAF_DIRECTIONAL_AIR
+layout(set=0,binding=4) uniform sampler3D directional_field;
+#endif
 layout(std140,set=0,binding=2) uniform Parameters{
  vec4 origin;    // World ray origin; near entry distance in w.
  vec4 origin_dx; // Horizontal origin delta; near extinction in w.
@@ -21,6 +24,12 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 light_size; // world lattice dimensions, near-layer fade start
  vec4 path_position_range;
  vec4 path_rgb_gain;
+#ifdef GAF_DIRECTIONAL_AIR
+ vec4 directional_rgb_gain;
+ vec4 directional_slots;
+ vec4 directional_origin_step;
+ vec4 directional_tile;
+#endif
 } p;
 const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
 const float FOREST_SCATTER_END_RADIUS_M = 15.0;
@@ -44,6 +53,25 @@ vec3 path_light(vec3 point){
  vec3 offset=point-p.path_position_range.xyz;
  return p.path_rgb_gain.rgb*(p.path_rgb_gain.w*local_point_weight(offset,p.path_position_range.w,true));
 }
+#ifdef GAF_DIRECTIONAL_AIR
+float directional_visibility(vec3 cell, int slot, int columns){
+ vec2 offset=vec2(slot%columns,slot/columns)*p.directional_tile.xy;
+ vec3 dimensions=vec3(textureSize(directional_field,0));
+ return textureLod(directional_field,(cell+vec3(offset,0.)+.5)/dimensions,0.).r;
+}
+vec3 directional_air(vec3 point){
+ if(p.directional_rgb_gain.w<=0.)return vec3(0.);
+ vec3 cell=(point-p.directional_origin_step.xyz)/p.directional_origin_step.w;
+ if(any(lessThan(cell,vec3(0)))||any(greaterThan(cell,p.directional_tile.xyz-1.)))return vec3(0.);
+ int a=int(p.directional_slots.x), b=int(p.directional_slots.y), columns=int(p.directional_slots.w);
+ float weight=p.directional_slots.z;
+ float visibility;
+ if(a==b||weight<=0.)visibility=directional_visibility(cell,a,columns);
+ else if(weight>=1.)visibility=directional_visibility(cell,b,columns);
+ else visibility=mix(directional_visibility(cell,a,columns),directional_visibility(cell,b,columns),weight);
+ return p.directional_rgb_gain.rgb*(p.directional_rgb_gain.w*visibility);
+}
+#endif
 float near_optical(vec3 origin,vec3 ray,float ray_length,float start,float end){
  float strength=p.origin_dx.w;
  if(strength<=0.)return 0.;
@@ -84,6 +112,9 @@ void main(){
     light+=p.scatter.rgb*p.scatter.w*(p.ray.w*region);
    }
    light=light*scatter_visibility(point)+path_light(point);
+#ifdef GAF_DIRECTIONAL_AIR
+   light+=directional_air(point);
+#endif
    scattered+=exp(-optical)*(1.0-exp(-nearby))*light;optical+=nearby;
   }
   float start=max(previous,near_z);
@@ -98,6 +129,9 @@ void main(){
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
    vec3 light=p.scatter.rgb*p.scatter.w+p.warm.rgb*(warmth*.25);
    light=light*scatter_visibility(point)+path_light(point);
+#ifdef GAF_DIRECTIONAL_AIR
+   light+=directional_air(point);
+#endif
    scattered+=exp(-optical)*(1.0-exp(-tau))*light;optical+=tau;
   }
   imageStore(volume,ivec3(pixel,i),vec4(scattered,exp(-optical)));previous=d;
