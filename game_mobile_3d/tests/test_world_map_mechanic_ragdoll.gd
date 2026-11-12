@@ -205,11 +205,10 @@ func cliff_edge_case(world: Node3D, group: Node3D, effects: Node3D, seed: int, x
 	zombie.free()
 	await ticks(2)
 
-func wall_supported_ledge_rest(world: Node3D, group: Node3D, effects: Node3D, seed: int, z: float,
-		skew: float, yaw: float, strike: Zombie.DeathStrike) -> void:
+func terrain_supported_rest(world: Node3D, group: Node3D, effects: Node3D, seed: int, start: Vector3,
+		direction: Vector3, yaw: float, strike: Zombie.DeathStrike, minimum_supports: int) -> void:
 	group._spawn_serial = seed
-	var direction := Vector3.RIGHT.rotated(Vector3.UP, skew)
-	var zombie = await launch(world, group, effects, Vector3(-33.5, 9.0, z), direction, strike, yaw)
+	var zombie = await launch(world, group, effects, start, direction, strike, yaw)
 	if zombie == null:
 		return
 	var skeleton: Skeleton3D = zombie.ragdoll.skeleton
@@ -229,14 +228,38 @@ func wall_supported_ledge_rest(world: Node3D, group: Node3D, effects: Node3D, se
 			break
 		if zombie.ragdoll.running:
 			supports = zombie.ragdoll.contact_motion().supports
-	check(release_frame >= 170 and supports == 2 and zombie.ragdoll.bodies.is_empty(),
-		"Ledge seed %d releases only after stable support on two body parts" % seed)
+	check(release_frame >= 170 and supports >= minimum_supports and zombie.ragdoll.bodies.is_empty(),
+		"Terrain seed %d releases after the ragdoll settles on its terrain contacts" % seed)
 	if zombie._corpse_parked:
 		var pose_matches := last_simulated.size() == skeleton.get_bone_count()
 		for bone in last_simulated.size():
 			pose_matches = pose_matches and last_simulated[bone].is_equal_approx(skeleton.get_bone_global_pose(bone))
-		check(pose_matches, "Ledge seed %d retains the final visible ragdoll pose" % seed)
-	print("WORLDMAP_WALL_SUPPORTED_REST seed=", seed, " release=", release_frame, " supports=", supports)
+		check(pose_matches, "Terrain seed %d retains the final visible ragdoll pose" % seed)
+	print("WORLDMAP_TERRAIN_REST seed=", seed, " release=", release_frame, " supports=", supports)
+	zombie.free()
+	await ticks(2)
+
+func cliff_delayed_roll_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
+	group._spawn_serial = 68
+	var zombie = await launch(world, group, effects, Vector3(-37.21, 3.0, -33.5),
+		Vector3.FORWARD.rotated(Vector3.UP, 0.085), Zombie.DeathStrike.SABRE_FINISHER, 0.195)
+	if zombie == null:
+		return
+	var leg_at_pause := Vector3.ZERO
+	var leg_travel := 0.0
+	for frame in 215:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+		if frame < 101 or not zombie.ragdoll.running:
+			continue
+		var leg: PhysicalBone3D = zombie.ragdoll.bodies["Leg.L"]
+		if frame == 101:
+			leg_at_pause = leg.global_position
+		elif not leg_at_pause.is_zero_approx():
+			leg_travel = maxf(leg_travel, leg.global_position.distance_to(leg_at_pause))
+	check(leg_travel > 0.055, "A brief pause against a cliff leaves the later leg roll intact")
+	print("WORLDMAP_DELAYED_ROLL leg_travel_m=", leg_travel)
 	zombie.free()
 	await ticks(2)
 
@@ -367,8 +390,15 @@ func run() -> void:
 		await cliff_edge_case(world, group, effects, 57, -37.46, 0.085, -0.065, Zombie.DeathStrike.GROUND)
 		await near_wall_handoff(world, group, effects)
 		await braced_cliff_case(world, group, effects)
-		await wall_supported_ledge_rest(world, group, effects, 28, -39.39, -0.18, 0.16, Zombie.DeathStrike.AIR)
-		await wall_supported_ledge_rest(world, group, effects, 63, -39.46, -0.13, -0.13, Zombie.DeathStrike.GROUND)
+		await terrain_supported_rest(world, group, effects, 28, Vector3(-33.5, 9.0, -39.39),
+			Vector3.RIGHT.rotated(Vector3.UP, -0.18), 0.16, Zombie.DeathStrike.AIR, 2)
+		await terrain_supported_rest(world, group, effects, 63, Vector3(-33.5, 9.0, -39.46),
+			Vector3.RIGHT.rotated(Vector3.UP, -0.13), -0.13, Zombie.DeathStrike.GROUND, 2)
+		await terrain_supported_rest(world, group, effects, 21, Vector3(-37.5, 3.0, -33.5),
+			Vector3.FORWARD.rotated(Vector3.UP, 0.055), 0.0, Zombie.DeathStrike.GROUND, 3)
+		await terrain_supported_rest(world, group, effects, 48, Vector3(-37.46, 3.0, -33.5),
+			Vector3.FORWARD.rotated(Vector3.UP, 0.085), -0.195, Zombie.DeathStrike.GROUND, 3)
+		await cliff_delayed_roll_case(world, group, effects)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
