@@ -73,6 +73,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
 	&"twilight_sky_chroma": ["Sắc ánh sáng hắt chạng vạng", 1.],
+	&"twilight_ambient": ["Hạ ánh nền chạng vạng", 1.],
 	&"night_sky_fill": ["Ánh sáng hắt ban đêm", 1.],
 	&"dawn_sky_transition": ["Ánh sáng hắt rạng sáng", 1.],
 	&"daylight_balance": ["Daylight color balance", 1.],
@@ -131,6 +132,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"bloom_diffusion": ["Độ mềm bloom", 1.],
 	&"night_soft_bloom": ["Ánh tán mềm ban đêm", 1.],
+	&"twilight_soft_bloom": ["Ánh tán mềm chạng vạng", 1.],
 	&"world_outline_strength": ["World Outline", 4.],
 	&"world_outline_width": ["Độ dày viền", 4.],
 	&"daylight_haze": ["Daylight haze softness", 1.],
@@ -144,7 +146,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 68
+const LIGHTING_MIX_VERSION := 69
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -552,6 +554,17 @@ func night_soft_bloom_weight() -> float:
 		return 0.0
 	return _lighting_scale(&"night_soft_bloom") * moonlight_weight(hour)
 
+func twilight_finish_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not sky_response.twilight_available():
+		return 0.0
+	# WorldMap times assigned to the measured evening sequence.
+	return smoothstep(19.0, 19.5, hour) * (1.0 - smoothstep(20.0, 21.0, hour))
+
+func twilight_soft_bloom_weight() -> float:
+	if not coupled_bloom or not measured_bloom_response or not bloom_response.available():
+		return 0.0
+	return _lighting_scale(&"twilight_soft_bloom") * twilight_finish_weight()
+
 func set_coupled_bloom(value:bool)->void:
 	coupled_bloom=value
 	if level.look._exposure_effect!=null:
@@ -560,9 +573,11 @@ func set_coupled_bloom(value:bool)->void:
 		var response:float=bloom_response.sample(reference_hour())if enabled and measured_bloom_response else 1.
 		# Keep the original main Bloom control and allow it to turn the contribution off.
 		var strength := lerpf(1.0, 1.7, night_soft_bloom_weight())
+		var twilight := twilight_soft_bloom_weight()
+		strength *= lerpf(1.0, 1.35, twilight)
 		level.look._exposure_effect.set_air_bloom_response(response * _lighting_scale(&"bloom") * strength if enabled else response)
 		var spread := lerpf(1., _lighting_scale(&"bloom_spread"), PHASE_FINISH.phase_weight(hour)) if enabled else 1.
-		level.look._exposure_effect.set_air_bloom_spread(spread)
+		level.look._exposure_effect.set_air_bloom_spread(spread * lerpf(1.0, 1.6, twilight))
 		var shape_weight:float=phase_finish.phase_weight(hour)if phase_finish!=null and phase_finish.requested else 0.
 		if level.look._exposure_effect.has_method("set_bloom_shape"):
 			level.look._exposure_effect.set_bloom_shape(source_bloom_shape and enabled and coherent_bloom,shape_weight)
@@ -1370,6 +1385,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 68 and effect == &"twilight_sky_chroma":
 			missing_value = 0.
+		if version < 69 and effect in [&"twilight_ambient", &"twilight_soft_bloom"]:
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1415,8 +1432,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
 		if effect == &"evening_key_response":
 			slider.editable = slider.editable and key_response.evening_available()
-		if effect == &"twilight_sky_chroma":
+		if effect in [&"twilight_sky_chroma", &"twilight_ambient"]:
 			slider.editable = slider.editable and sky_response.twilight_available()
+		if effect == &"twilight_soft_bloom":
+			slider.editable = slider.editable and sky_response.twilight_available() and bloom_response.available()
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
 		if effect == &"forest_path_placement":
@@ -1464,9 +1483,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return # Published with the final camera and sun before drawing.
 	if changed_effect in [&"regional_sky", &"daylight_bounce", &"stone_diffuse_contrast", &"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
 		return # Terrain transport refreshes both receivers together.
-	if changed_effect == &"night_soft_bloom" and level != null:
+	if changed_effect in [&"night_soft_bloom", &"twilight_soft_bloom"] and level != null:
 		set_coupled_bloom(coupled_bloom)
-	if changed_effect in [&"night_soft_bloom", &"bloom_diffusion", &"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
+	if changed_effect in [&"night_soft_bloom", &"twilight_soft_bloom", &"bloom_diffusion", &"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -1579,6 +1598,8 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		_apply_captured_key(sun)
 		_apply_captured_direction(sun)
 		env.ambient_light_energy *= _lighting_scale(&"sky") * _night_sky_fill_multiplier()
+		if sky_response_active:
+			env.ambient_light_energy *= lerpf(1.0, .75, _lighting_scale(&"twilight_ambient") * twilight_finish_weight())
 		_apply_key_mix(sun)
 		# In full shade, block the direct beam and leave ambient fill to its own path.
 		_apply_direct_shadow_opacity(sun)
