@@ -378,6 +378,25 @@ class DesktopTests(unittest.TestCase):
             self.app.gameplay_button.invoke()
             self.assertEqual(launch.call_count, 2)
 
+    def test_mechanic_lab_launches_its_scene_even_with_gameplay_running(self):
+        godot = self.base / 'Godot with spaces.exe'
+        godot.touch()
+        gameplay = Mock(pid=1234)
+        lab = Mock(pid=2345)
+        gameplay.poll.return_value = lab.poll.return_value = None
+        with patch.dict(os.environ, {'GODOT_BIN': str(godot)}), patch(
+            'checkpoint_manager.desktop.Popen', side_effect=[gameplay, lab]
+        ) as launch:
+            self.app.gameplay_button.invoke()
+            self.assertTrue(hasattr(self.app, 'mechanic_lab_button'), 'Missing MechanicLab shortcut')
+            self.app.mechanic_lab_button.invoke()
+            self.app.mechanic_lab_button.invoke()
+            self.assertEqual(launch.call_count, 2)
+            command = launch.call_args.args[0]
+            self.assertEqual(command[-1], 'res://scenes/dev/MechanicLab.tscn')
+            self.assertNotIn('--headless', command)
+            self.assertNotIn('--audio-driver', command)
+
     def test_blender_view_buttons_open_the_requested_views(self):
         def open_view(key):
             return {'animation': 1111, 'sabre': 2222, 'showcase': 3333, 'actions_stuff': 4444, 'grass': 5555}[key]
