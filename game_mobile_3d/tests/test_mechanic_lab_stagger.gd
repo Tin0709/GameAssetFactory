@@ -58,6 +58,8 @@ func run() -> void:
 	check(lab.player_health == 100, "The interrupted windup never damages the player")
 	await wait_for_windup(zombie)
 	check(zombie.animation.current_animation == ZOMBIE.ATTACK, "Zombie resumes attacking after stagger")
+	zombie.take_hit(20, Vector3.BACK, Vector2.ZERO, 37.0)
+	check(zombie.animation.current_animation == ZOMBIE.STAGGER, "A new poise break can stagger after the first one ends")
 	lab.free()
 	print("MECHANIC_LAB_STAGGER duration=", elapsed, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
