@@ -45,6 +45,8 @@ const SABRE_FINISHER_HEAD_BOUNCE := 0.30
 const DEATH_LANDING_BLEND_TIME := 0.20
 const DEATH_AIR_LINEAR_DAMP := 0.01 # SK_Zombie_PhysicsAsset body defaults.
 const DEATH_FLOOR_CONTACT_MARGIN := 0.02
+const DEATH_LIMB_SUPPORT_DURATION := 0.10
+const DEATH_LIMB_SUPPORT_MAX_SPEED := 2.0
 const DEATH_LANDING_LINEAR_DAMP := 3.0
 const DEATH_LANDING_ANGULAR_DAMP := 4.0
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
@@ -116,6 +118,7 @@ var _attack_cooldown := 0.0
 var _flash_left := 0.0
 var _corpse_age := 0.0
 var _corpse_landed := false
+var _limb_support_age := 0.0
 var _corpse_parked := false
 var _settled_seconds := 0.0
 var _landing_age := INF
@@ -388,7 +391,12 @@ func _update_death(delta: float) -> void:
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	var contact := ragdoll.contact_motion()
-	if not _corpse_landed and contact.core_supports > 0:
+	if not _corpse_landed:
+		# On a terrace, limbs can carry the body before the core reaches a surface.
+		# Require sustained support so a brief grazing hit keeps its flight response.
+		var limbs_supporting: bool = contact.supports >= 2 and contact.linear < DEATH_LIMB_SUPPORT_MAX_SPEED
+		_limb_support_age = _limb_support_age + delta if limbs_supporting else 0.0
+	if not _corpse_landed and (contact.core_supports > 0 or _limb_support_age >= DEATH_LIMB_SUPPORT_DURATION - 0.00001):
 		_corpse_landed = true
 		_landing_age = 0.0
 		ragdoll.set_physics_process(false)
