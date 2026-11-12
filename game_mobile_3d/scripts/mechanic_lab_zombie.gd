@@ -75,9 +75,10 @@ const CORPSE_DISSOLVE_KEYS := [
 ]
 const CORPSE_DESATURATION_START := 2.3
 const CORPSE_DESATURATION_END := 3.6
-const CORPSE_SETTLE_TIME := 0.20
-const CORPSE_SETTLE_SPEED := 0.08
-const CORPSE_SETTLE_SPIN := 0.65
+const CORPSE_SETTLE_TIME := 0.10
+const CORPSE_SETTLE_SPEED := 0.22
+const CORPSE_SETTLE_SPIN := 1.6
+const CORPSE_SETTLE_MAX_SLOPE := 0.32
 const HIT_FLASH_DURATION := 0.083
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
@@ -396,8 +397,7 @@ func _update_death(delta: float) -> void:
 			body.set("maximum_angular_speed", DEATH_LANDING_ANGULAR_SPEED_LIMIT)
 	if _corpse_landed:
 		_update_landing_forces(delta, flight_gravity, sabre_finisher, contact.contacts > 0)
-		if _corpse_age >= CORPSE_DESATURATION_START:
-			_check_corpse_settled(delta, contact)
+		_check_corpse_settled(delta, contact)
 
 func _update_landing_forces(delta: float, flight_gravity: float, sabre_finisher: bool, supported: bool) -> void:
 	if not supported and is_instance_valid(_corpse_floor):
@@ -426,8 +426,15 @@ static func _gravity_scale(acceleration: float) -> float:
 	return acceleration / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 
 func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
-	if motion.core_contacts == 0 or motion.contacts < 2 \
+	if motion.core_contacts == 0 or not motion.leg_supported or motion.contacts < 3 \
 		or motion.linear > CORPSE_SETTLE_SPEED or motion.angular > CORPSE_SETTLE_SPIN:
+		_settled_seconds = 0.0
+		return
+	# A head-first hit can briefly stall before the body falls over.
+	var bodies := ragdoll.bodies
+	var feet: Vector3 = (bodies["Leg.L"].global_position + bodies["Leg.R"].global_position) * 0.5
+	var axis: Vector3 = (bodies.Head.global_position - feet).normalized()
+	if absf(axis.y) > CORPSE_SETTLE_MAX_SLOPE:
 		_settled_seconds = 0.0
 		return
 	_settled_seconds += delta

@@ -341,6 +341,7 @@ func _project_floor_contact() -> void:
 func contact_motion() -> Dictionary:
 	var contacts := 0
 	var core_contacts := 0
+	var leg_supported := false
 	var peak_linear := 0.0
 	var peak_angular := 0.0
 	for name in bodies:
@@ -349,9 +350,11 @@ func contact_motion() -> Dictionary:
 		if direct and direct.get_contact_count() > 0:
 			contacts += 1
 			if name in ["Hips","Chest","Head"]: core_contacts += 1
+			if name in ["Leg.L", "Leg.R"]: leg_supported = true
 		peak_linear = maxf(peak_linear,body.linear_velocity.length())
 		peak_angular = maxf(peak_angular,body.angular_velocity.length())
-	return {"contacts":contacts,"core_contacts":core_contacts,"linear":peak_linear,"angular":peak_angular}
+	return {"contacts":contacts,"core_contacts":core_contacts,"leg_supported":leg_supported,
+		"linear":peak_linear,"angular":peak_angular}
 
 func release(visible_world_pose: Array[Transform3D] = []) -> void:
 	# Called outside the physics integration callback. Free native joints/bodies,
