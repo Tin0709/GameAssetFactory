@@ -331,6 +331,11 @@ func update_status() -> void:
 func set_reference_look(enabled: bool) -> void:
 	look.set_stage(2 if enabled else 0)
 
+func _input(event: InputEvent) -> void:
+	if map_ready and event is InputEventKey and event.pressed and not event.echo:
+		if showcase.handle_hud_key(event):
+			get_viewport().set_input_as_handled()
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not map_ready:return
 	if view_mode == "gameplay" and event is InputEventMouseButton and event.pressed:

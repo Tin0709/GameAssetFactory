@@ -219,7 +219,7 @@ var _day:Dictionary={}
 var _environment:Environment
 var _time_applied:=false
 var _environment_edit_depth:=0
-var _debug:=false
+var _settings := preload("res://scripts/world_map_settings.gd").new()
 var _hint:Label
 var _elapsed:=0.
 var _cycle_button:CheckButton
@@ -239,7 +239,9 @@ func make_player()->Node3D:
 
 func setup(world:Node3D)->void:
 	level=world;process_priority=-10
-	if not private_primary:return
+	if not private_primary:
+		_build_basic_settings()
+		return
 	_point_kernel_owner=weakref(self)
 	RenderingServer.frame_pre_draw.connect(_sync_point_camera)
 	projected_sun.setup()
@@ -278,8 +280,7 @@ func setup(world:Node3D)->void:
 	set_source_terrain(true)
 	_refresh_lantern_glow()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
-	level.get_node("HUD/Help").text="GRAPHICS COMPARISON\nF8 Day finish · F11 directional fill · Shift+F11 actor canopy fill\nF7 local exposure · Shift+F1 ground bounce · F1 soft shadows\nF2 canopy contact · Shift+F2 root soil · F3 direct cloud shading\nF9 leaf edges · Shift+F9 MSAA · F10 pose interpolation\nF12 optional terrain cache · G grass/flowers · L wind/interaction options\nH fog · N terrain wind · Shift+N passage · Alt+N crown wind"
-	DisplayServer.window_set_title("GameAssetFactory · Overworld Showcase · A&S / MD2 Sabre · L options")
+	DisplayServer.window_set_title("GameAssetFactory · Overworld Showcase · A&S / MD2 Sabre · L HUD")
 	print("WORLD_MAP_SHOWCASE_READY ",JSON.stringify({"primary_ready":unavailable_reason.is_empty(),"private_external":true,"hour":hour,"experimental_terrain_sky":false}))
 
 func _capture_day()->void:
@@ -1522,6 +1523,7 @@ func _process(delta:float)->void:
 	_sync_oak_leaf_tint()
 	if _hint!=null and unavailable_reason.is_empty():_hint.visible=_elapsed<12. and not panel.visible
 	if status!=null and panel.visible:
+		_settings.update_phase(hour < 6. or hour >= 20.)
 		_atmosphere_picker.select(["previous","haze","lighting","combined"].find(atmosphere_review))
 		_legacy_sky_button.set_pressed_no_signal(level.terrain_sky.enabled)
 		_terrain_light_note.text="Local field: %s · original GAF transport\nSky RGB retint; sun transport stays Day-guarded."%("active" if level.terrain_light!=null and level.terrain_light.is_active() else "suspended / off")
@@ -1530,7 +1532,7 @@ func _process(delta:float)->void:
 		_cycle_button.set_pressed_no_signal(cycle_enabled)
 		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
 		var msaa:String=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
-		status.text="%s · %02d:%02d · %s\n%d FPS · %s · MSAA %s\nPrivate reference player; not for distribution"%["Combined" if level.look.stage==2 else "Original graphics",int(hour),int(fmod(hour,1.)*60.),"Cycle" if cycle_enabled else "Paused",Engine.get_frames_per_second(),RenderingServer.get_current_rendering_method(),msaa]
+		status.text="%s · %02d:%02d · %s · %d FPS · %s · MSAA %s"%["Tổng hợp" if level.look.stage==2 else "Bản gốc",int(hour),int(fmod(hour,1.)*60.),"Tự chuyển" if cycle_enabled else "Cố định",Engine.get_frames_per_second(),RenderingServer.get_current_rendering_method(),msaa]
 
 func _build_lighting_mix(box: VBoxContainer) -> void:
 	var header := HBoxContainer.new()
@@ -1572,6 +1574,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 	reset.pressed.connect(reset_lighting_mix)
 	actions.add_child(reset)
 	var message := Label.new()
+	message.name = "SettingsPresetMessage"
 	message.hide()
 	box.add_child(message)
 	var scene_mix: SceneLightingMix = level.scene_lighting_mix
@@ -1731,6 +1734,22 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		_lighting_sliders[effect] = slider
 		slider.value_changed.connect(func(value: float): set_lighting_scale(effect, value))
 
+func _build_basic_settings() -> void:
+	var hud: CanvasLayer = level.get_node("HUD")
+	panel = PanelContainer.new()
+	panel.name = "ShowcaseOptions"
+	hud.add_child(panel)
+	var scroll := ScrollContainer.new()
+	panel.add_child(scroll)
+	var box := VBoxContainer.new()
+	scroll.add_child(box)
+	var help := Label.new()
+	help.name = "SettingsKeysHelp"
+	help.text = level.get_node("HUD/Help").text
+	box.add_child(help)
+	_settings.setup(hud, panel, box, {}, null, false)
+	level.get_node("HUD/Help").hide()
+
 func _build_ui()->void:
 	var hud:=level.get_node("HUD")
 	_fps_label=Label.new();_fps_label.name="ShowcaseFPS";_fps_label.position=Vector2(18,6)
@@ -1744,9 +1763,10 @@ func _build_ui()->void:
 	var scroll:=ScrollContainer.new();scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.custom_minimum_size=Vector2(440,minf(level.get_viewport().get_visible_rect().size.y-58.,630.));panel.add_child(scroll)
 	var box:=VBoxContainer.new();box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(box)
-	var title:=Label.new();title.text="OVERWORLD · A&S / MD2 + SABRE";box.add_child(title)
 	status=Label.new();box.add_child(status)
-	var controls:=Label.new();controls.text="WASD run · Shift slow walk · Space jump\nLMB / E combo · airborne: downward attack\nRMB aim / strafe · Q / C turn · R reset\nMouse wheel zoom · V overview\nL options · B original graphics\nT next time · Shift+T auto day/night";box.add_child(controls)
+	var controls:=Label.new();controls.name="SettingsKeysHelp"
+	controls.text="WASD di chuyển · Shift đi chậm · Space nhảy\nChuột trái / E đánh combo · Trên không: đánh xuống\nChuột phải ngắm / đi ngang · Q / C xoay · R về điểm đầu\nLăn chuột thu phóng · V xem toàn bản đồ\nL ẩn / hiện HUD · B so sánh đồ họa gốc\nT chuyển thời điểm · Shift+T tự chuyển ngày / đêm\nF1 bóng mềm · F2 bóng tiếp xúc · F3 bóng mây\nF7 exposure cục bộ · F8 màu ban ngày · F9 mép lá\nF10 nội suy · F11 ánh sáng môi trường · F12 cache địa hình"
+	box.add_child(controls)
 	var atmosphere:=OptionButton.new();atmosphere.name="AtmosphereComparison";atmosphere.focus_mode=Control.FOCUS_NONE
 	_atmosphere_picker=atmosphere
 	for label:String in ["Previous atmosphere","Forest entrance · haze / bloom only","Forest entrance · lighting only","Forest entrance · combined"]:atmosphere.add_item(label)
@@ -1928,7 +1948,6 @@ func _build_ui()->void:
 	experimental.toggled.connect(func(value:bool):level.terrain_sky.set_enabled(value))
 	var audio:=CheckButton.new();audio.text="Enable test audio (default off)";audio.button_pressed=audio_enabled;audio.focus_mode=Control.FOCUS_NONE;box.add_child(audio)
 	audio.toggled.connect(set_audio_enabled)
-	var player_title:=Label.new();player_title.text="PLAYER MATERIAL · independent comparisons";box.add_child(player_title)
 	var material_modes:=["original","neutral","cloud","roughness","self_light","combined"]
 	var material_picker:=OptionButton.new();material_picker.name="PlayerMaterialComparison";material_picker.focus_mode=Control.FOCUS_NONE
 	for label:String in ["Original materials (previous player)","Neutral adapter · no new effects","Cloud shading only","Recovered Valorie roughness only","Recovered view self-light only","Combined · current default"]:material_picker.add_item(label)
@@ -1939,7 +1958,7 @@ func _build_ui()->void:
 		toggle.button_pressed=level.look.get(entry[0]);box.add_child(toggle)
 		var property:String=entry[0]
 		toggle.toggled.connect(func(value:bool):level.look.set(property,value);if level.get("player_light")!=null:level.player_light.refresh(true))
-	_player_material_note=Label.new();_player_material_note.text="Same scene light / pose. Captured material scope below.\nB suspends adapter; F3 also gates direct clouds.";box.add_child(_player_material_note)
+	_player_material_note=Label.new();_player_material_note.name="SettingsPlayerNote";box.add_child(_player_material_note)
 	var phase_material:=CheckButton.new();phase_material.name="PlayerPhaseMaterial";phase_material.text="Player · verified material across phases";phase_material.button_pressed=level.look.player_phase_material_enabled;phase_material.disabled=not level.look.player_material.phase_verified;phase_material.focus_mode=Control.FOCUS_NONE;box.add_child(phase_material)
 	phase_material.tooltip_text="Nine captured night-to-day draws use identical Valorie shader, skin/MRES and material scalars. OFF restores the previous Day-only scope. Skin wrap remains an original Mobile approximation."
 	phase_material.toggled.connect(level.look.set_player_phase_material)
@@ -1947,7 +1966,6 @@ func _build_ui()->void:
 	phase_sky.tooltip_text="Original spatial sky follows attributed Forest lighting at all hours. Captured material response has a separate control; rotated sunlight never reuses cached Day bounce. OFF restores the previous sky scope."
 	phase_sky.toggled.connect(func(value:bool):
 		if level.get("player_light")!=null:level.player_light.set_phase_sky(value))
-	var terrain_title:=Label.new();terrain_title.text="TERRAIN · material / colored indirect";box.add_child(terrain_title)
 	var terrain_modes:=["previous","materials","lighting","combined"]
 	var terrain_picker:=OptionButton.new();terrain_picker.name="TerrainLightComparison";terrain_picker.focus_mode=Control.FOCUS_NONE
 	for label:String in ["Previous terrain graphics","PBR materials only","Local colored indirect only","Combined terrain (default)"]:terrain_picker.add_item(label)
@@ -1961,7 +1979,7 @@ func _build_ui()->void:
 	for entry in [["captured_scatter","Air · captured Forest scatter color"],["shadowed_scatter","Air · terrain-shadowed scattering"]]:
 		var toggle:=CheckButton.new();toggle.name=entry[0];toggle.text=entry[1];toggle.button_pressed=get(entry[0]);toggle.focus_mode=Control.FOCUS_NONE;box.add_child(toggle)
 		var property:String=entry[0];toggle.toggled.connect(func(value:bool):set(property,value))
-	_terrain_light_note=Label.new();box.add_child(_terrain_light_note)
+	_terrain_light_note=Label.new();_terrain_light_note.name="SettingsTerrainNote";box.add_child(_terrain_light_note)
 	if plants!=null:
 		var grass_light:=CheckButton.new();grass_light.text="Grass lighting · MD2 study";grass_light.button_pressed=plants.grass_lighting_enabled
 		grass_light.focus_mode=Control.FOCUS_NONE;box.add_child(grass_light);grass_light.toggled.connect(plants.set_grass_lighting)
@@ -1977,13 +1995,29 @@ func _build_ui()->void:
 			toggle.toggled.connect(func(value:bool):plants.set(option,value))
 	panel.hide()
 	_hint=Label.new();_hint.name="ShowcaseHint";_hint.position=Vector2(18,34);_hint.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	_hint.text="WASD · Shift walk · Space jump · LMB / E Sabre · Shift+G forest · L options"
+	_hint.text="WASD di chuyển · Space nhảy · Chuột trái / E đánh · L ẩn / hiện HUD"
 	if not unavailable_reason.is_empty():_hint.text=unavailable_reason;_hint.modulate=Color(1.,.6,.35)
 	hud.add_child(_hint)
 	_vignette=ColorRect.new();_vignette.name="AtmosphereVignette";_vignette.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	_vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_vignette.z_index=-20
 	var material:=ShaderMaterial.new();material.shader=preload("res://materials/world_map_atmosphere_vignette.gdshader");_vignette.material=material
-	hud.add_child(_vignette);_vignette.hide()
+	# The vignette is part of the image, so it stays visible with the HUD hidden.
+	var atmosphere_layer := CanvasLayer.new()
+	atmosphere_layer.name = "AtmosphereOverlay"
+	atmosphere_layer.layer = hud.layer - 1
+	level.add_child(atmosphere_layer)
+	atmosphere_layer.add_child(_vignette);_vignette.hide()
+	_settings.setup(hud, panel, box, _lighting_sliders, status, true)
+
+func handle_hud_key(event: InputEventKey) -> bool:
+	if event.physical_keycode == KEY_L:
+		if _settings.search.has_focus() and not event.ctrl_pressed:
+			return false
+		_settings.toggle_hud()
+		return true
+	if event.physical_keycode == KEY_ESCAPE:
+		return _settings.handle_escape()
+	return false
 
 func handle_key(event:InputEventKey)->bool:
 	if not private_primary:return false
@@ -1993,9 +2027,6 @@ func handle_key(event:InputEventKey)->bool:
 	if event.physical_keycode==KEY_G and not event.shift_pressed and plants!=null:
 		plants.visible=not plants.visible
 		if not plants.visible:plants.reset()
-		return true
-	if event.physical_keycode==KEY_L:
-		_debug=not _debug;panel.visible=_debug;_hint.visible=not _debug
 		return true
 	if event.physical_keycode==KEY_B:compare_baseline();return true
 	if event.physical_keycode==KEY_T:
