@@ -5,16 +5,18 @@ var _mutex:=Mutex.new()
 const PATH_SOURCE_BYTES := 32
 const GPU_PARAMETER_BYTES := 256
 const DIRECTIONAL_PARAMETER_BYTES := 64
+const LOCAL_MIST_BYTES := 48
 var directional_grid: ImageTexture3D
 var directional_provider: Callable
 var _directional_parameters := PackedByteArray()
 var _parameters:=PackedByteArray()
 var _path_parameters := PackedByteArray()
+var _local_mist_parameters := PackedByteArray()
 var _size:=Vector2i.ZERO
 var _noise:=RID()
 var _light:=RID()
 var _allocated_light:=RID()
-var _state:={"ready":false,"error":"","frames":0,"rebuilds":0,"bytes":0}
+var _state:={"ready":false,"error":"","frames":0,"rebuilds":0,"bytes":0,"local_mist_gain":0.}
 var _resources:Array[RID]=[]
 var _allocated:=Vector2i.ZERO
 var _buffer:=RID()
@@ -25,6 +27,10 @@ func configure(parameters:PackedByteArray,size:Vector2i,noise:RID,light:RID=RID(
 	configure_path_light(parameters,size,noise,light,PackedFloat32Array())
 
 func configure_path_light(parameters: PackedByteArray, size: Vector2i, noise: RID, light: RID, path_light: PackedFloat32Array) -> void:
+	configure_with_local_mist(parameters,size,noise,light,path_light,PackedFloat32Array())
+
+func configure_with_local_mist(parameters: PackedByteArray, size: Vector2i, noise: RID, light: RID,
+		path_light: PackedFloat32Array, local_mist: PackedFloat32Array) -> void:
 	var path_bytes := path_light.to_byte_array()
 	if path_bytes.size() != PATH_SOURCE_BYTES:
 		path_bytes.resize(PATH_SOURCE_BYTES)
@@ -37,10 +43,15 @@ func configure_path_light(parameters: PackedByteArray, size: Vector2i, noise: RI
 		if directional_bytes.size() != DIRECTIONAL_PARAMETER_BYTES:
 			directional_bytes.resize(DIRECTIONAL_PARAMETER_BYTES)
 			directional_bytes.fill(0)
+	var local_bytes := local_mist.to_byte_array()
+	if local_bytes.size() != LOCAL_MIST_BYTES:
+		local_bytes.resize(LOCAL_MIST_BYTES)
+		local_bytes.fill(0)
 	_mutex.lock()
 	_parameters=parameters.duplicate()
 	_path_parameters = path_bytes
 	_directional_parameters = directional_bytes
+	_local_mist_parameters = local_bytes
 	if _parameters.size()==176:_parameters.resize(224) # Legacy fixtures: neutral new-light branch.
 	_state.point_kernel=_parameters.size()==224 and _parameters.decode_float(172)>.5
 	_size=size;_noise=noise;_light=light
@@ -71,7 +82,7 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	var error:=spirv.get_stage_compile_error(RenderingDevice.SHADER_STAGE_COMPUTE)
 	if not error.is_empty():_report("error",error);return false
 	var shader:=_keep(rd.shader_create_from_spirv(spirv));_pipeline=_keep(rd.compute_pipeline_create(shader))
-	var parameter_size := GPU_PARAMETER_BYTES + (DIRECTIONAL_PARAMETER_BYTES if directional_grid != null else 0)
+	var parameter_size := GPU_PARAMETER_BYTES + LOCAL_MIST_BYTES + (DIRECTIONAL_PARAMETER_BYTES if directional_grid != null else 0)
 	_buffer=_keep(rd.uniform_buffer_create(parameter_size))
 	var sampler_state:=RDSamplerState.new();sampler_state.min_filter=RenderingDevice.SAMPLER_FILTER_LINEAR;sampler_state.mag_filter=RenderingDevice.SAMPLER_FILTER_LINEAR
 	var sampler:=_keep(rd.sampler_create(sampler_state));var noise_rd:=RenderingServer.texture_get_rd_texture(noise)
@@ -101,7 +112,7 @@ func _build(rd:RenderingDevice,size:Vector2i,noise:RID,light:RID)->bool:
 	return true
 func _render_callback(kind:int,data:RenderData)->void:
 	if kind!=effect_callback_type:return
-	_mutex.lock();var parameters:=_parameters.duplicate();var path_parameters:=_path_parameters;var directional_parameters:=_directional_parameters;var size:=_size;var noise:=_noise;var light:=_light;var error:String=_state.error;_mutex.unlock()
+	_mutex.lock();var parameters:=_parameters.duplicate();var path_parameters:=_path_parameters;var directional_parameters:=_directional_parameters;var local_parameters:=_local_mist_parameters;var size:=_size;var noise:=_noise;var light:=_light;var error:String=_state.error;_mutex.unlock()
 	if parameters.size()!=224 or size.x<=0 or not error.is_empty():return
 	var rd:=RenderingServer.get_rendering_device();var buffers:=data.get_render_scene_buffers() as RenderSceneBuffersRD
 	if rd==null or buffers==null or buffers.get_view_count()!=1:return
@@ -112,10 +123,11 @@ func _render_callback(kind:int,data:RenderData)->void:
 			return
 	parameters.append_array(path_parameters)
 	parameters.append_array(directional_parameters)
+	parameters.append_array(local_parameters)
 	rd.buffer_update(_buffer,0,parameters.size(),parameters)
 	var list:=rd.compute_list_begin();rd.compute_list_bind_compute_pipeline(list,_pipeline);rd.compute_list_bind_uniform_set(list,_uniform,0)
 	rd.compute_list_dispatch(list,ceili(size.x/8.),ceili(size.y/8.),1);rd.compute_list_end()
-	_mutex.lock();_state.ready=true;_state.frames+=1;_mutex.unlock()
+	_mutex.lock();_state.ready=true;_state.frames+=1;_state.local_mist_gain=local_parameters.decode_float(12);_mutex.unlock()
 func release_on_render_thread():
 	var rd:=RenderingServer.get_rendering_device()
 	if rd!=null:_release(rd)

@@ -1,6 +1,7 @@
 extends Node3D
 ## Shared camera-scoped medium. No scene-color/depth copy or fullscreen overlay.
 const FIELD=preload("res://scripts/world_map_mist_field.gd")
+const LocalMistRegion=preload("res://scripts/local_mist_region.gd")
 static var _owner:WeakRef
 var effect:CompositorEffect
 var noise:ImageTexture
@@ -23,12 +24,15 @@ var _variants:Dictionary={}
 var _bound_materials:Dictionary={}
 var _owned_compositor:Compositor
 var _previous_compositor:Compositor
+var _local_region:LocalMistRegion
+var _local_gain:=0.
 func setup()->void:
  name="SpatialAtmosphereVolume";process_mode=Node.PROCESS_MODE_ALWAYS;process_priority=100
  _camera=get_parent() as Camera3D
  effect=FIELD.new();effect.enabled=false
  _owner=weakref(self)
  RenderingServer.global_shader_parameter_set("gaf_mist_enabled",false)
+ RenderingServer.global_shader_parameter_set("gaf_local_mist_center",Vector4.ZERO)
  var image:=Image.create(64,64,false,Image.FORMAT_RF)
  var source:=FastNoiseLite.new();source.seed=318;source.frequency=.04;source.fractal_octaves=3
  for y in 64:
@@ -37,6 +41,8 @@ func setup()->void:
  noise=ImageTexture.create_from_image(image);hide()
 func publish(p:Dictionary,actor:Vector3,base:float,time:float,_ortho:bool,radius:float)->void:
  _profile=p;_actor=actor;_base=base;_clock=time;_radius=radius
+func set_local_region(region:LocalMistRegion,gain:float)->void:
+ _local_region=region;_local_gain=gain
 func set_warm_emitter(point:Vector3)->void:
  if point.is_finite():_actor=point-Vector3.UP*1.4
 func _append(v:Vector3,values:PackedFloat32Array,w:float=0.)->void:values.append_array(PackedFloat32Array([v.x,v.y,v.z,w]))
@@ -102,7 +108,13 @@ func _process(_delta:float)->void:
  else:
   for i in 2:_append(Vector3.ZERO,data)
   _append(Vector3.ZERO,data,near_fade_start)
- if path_light_provider.is_valid() and effect.has_method("configure_path_light"):
+ var local:=PackedFloat32Array()
+ if effect.has_method("configure_with_local_mist"):
+  if near_layer.y>0. and _local_region!=null and _local_gain>0.:
+   local=_local_region.render_parameters(_local_gain)
+  var path:PackedFloat32Array=path_light_provider.call() if path_light_provider.is_valid() else PackedFloat32Array()
+  effect.configure_with_local_mist(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local)
+ elif path_light_provider.is_valid() and effect.has_method("configure_path_light"):
   effect.configure_path_light(data.to_byte_array(),size,noise.get_rid(),light_rid,path_light_provider.call())
  else:
   effect.configure(data.to_byte_array(),size,noise.get_rid(),light_rid)
@@ -118,6 +130,14 @@ func _process(_delta:float)->void:
   RenderingServer.global_shader_parameter_set("gaf_mist_camera_direction",-_camera.global_basis.z)
   var projection:=_camera.get_camera_projection()
   RenderingServer.global_shader_parameter_set("gaf_mist_projection_scale",Vector2(projection.x.x,projection.y.y))
+  if local.size()==12:
+   RenderingServer.global_shader_parameter_set("gaf_local_mist_origin",origin)
+   RenderingServer.global_shader_parameter_set("gaf_local_mist_dx",dx)
+   RenderingServer.global_shader_parameter_set("gaf_local_mist_dy",dy)
+   RenderingServer.global_shader_parameter_set("gaf_local_mist_radii",Vector3(local[4],local[5],local[6]))
+   RenderingServer.global_shader_parameter_set("gaf_local_mist_center",Vector4(local[0],local[1],local[2],local[3]))
+  else:
+   RenderingServer.global_shader_parameter_set("gaf_local_mist_center",Vector4.ZERO)
  _set_gate(ready);_sync_materials(ready)
 func _sync_materials(active:bool):
  var current: Dictionary = {}
@@ -155,6 +175,7 @@ func _exit_tree():
   if _camera.compositor==_owned_compositor:_camera.compositor=_previous_compositor
  if _owner!=null and _owner.get_ref()==self:
   RenderingServer.global_shader_parameter_set("gaf_mist_enabled",false)
+  RenderingServer.global_shader_parameter_set("gaf_local_mist_center",Vector4.ZERO)
   RenderingServer.global_shader_parameter_set("gaf_mist_volume",null);_owner=null
  RenderingServer.call_on_render_thread(effect.release_on_render_thread)
 

@@ -554,6 +554,7 @@ func _update_mist()->void:
 	var local_gain := 0.
 	if atmosphere_review == "combined" and not _balanced_preview and level.view_mode == "gameplay":
 		local_gain = _lighting_scale(&"local_mist") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+		local_gain *= _lighting_scale(&"fog") * minf(1., _lighting_scale(&"near_haze"))
 	mist.set_local_region(level.local_mist_region, local_gain)
 	var luma:=Vector3(.2126,.7152,.0722);var ambient:=env.ambient_light_color.srgb_to_linear()
 	var sun:DirectionalLight3D=level.get_node("Sun");var key:=sun.light_color.srgb_to_linear()
@@ -1575,10 +1576,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"near_haze":
 			slider.tooltip_text = "0% disables the near layer. 100% uses the reference-fitted strength. Fog density is the master scale."
 		if effect == &"near_haze_depth":
-			slider.tooltip_text = "Controls how far the near haze remains visible before the distant bank."
+			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
 		if effect == &"local_mist":
 			slider.tooltip_text = "Scales the map's local fog volume in morning and afternoon. 0% uses the existing mist."
-			slider.tooltip_text = "Extend the near haze into the middle distance. 0% restores the previous taper. Requires Near haze density above 0%."
 		if effect == &"forest_near_scatter":
 			slider.tooltip_text = "Add depth between trees by lifting light in the existing near mist. 0% restores the prior light. Requires Combined mode and Near haze density above 0%."
 		if effect == &"sunlit_mist":
