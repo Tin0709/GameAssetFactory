@@ -43,15 +43,18 @@ func run():
  check(w.find_child("MeasuredBloomResponse",true,false)!=null,"L menu comparison exists")
  var native=RenderingServer.get_current_rendering_method()=="mobile"and RenderingServer.get_rendering_device()!=null
  if native:
-  for hour in [0.,6.5,7.,10.,12.,18.5,22.]:
+  for hour in [0.,4.,6.5,7.,10.,12.,18.5,20.25,22.]:
    s.set_hour(hour);await settle()
    var e=w.look._exposure_effect
    check(e!=null,"Existing exposure survives at "+str(hour))
-   var source_hour:float=0. if hour==22. else hour
-   var wanted=.16*s.bloom_response.sample(source_hour)
-   check(absf(e._parameters.decode_float(16)-wanted)<.00000004,"Actual existing air uniform follows observed relative gain at "+str(hour))
+   var night_gain:float=1.7 if hour in [0.,22.] else (1.35 if hour in [4.,20.25] else 1.)
+   var wanted=.16*s.bloom_response.sample(s.reference_hour())*night_gain
+   check(absf(e._parameters.decode_float(16)-wanted)<.00000008,"Measured phase and soft night bloom reach the GPU at "+str(hour))
+  s.set_lighting_scale(&"night_soft_bloom",0.);await settle()
+  check(is_equal_approx(w.look._exposure_effect._parameters.decode_float(16),.16*s.bloom_response.sample(0.)),"Soft night bloom at 0% restores prior midnight weight")
+  s.set_lighting_scale(&"night_soft_bloom",1.);await settle()
   s.set_night_reference_atmosphere(false);await settle()
-  check(absf(w.look._exposure_effect._parameters.decode_float(16)-.16*s.bloom_response.sample(22.))<.00000004,"Night comparison restores the previous mirrored gain")
+  check(absf(w.look._exposure_effect._parameters.decode_float(16)-.16*s.bloom_response.sample(22.)*1.7)<.00000008,"Night reference comparison uses mirrored phase with the same soft bloom setting")
   s.set_night_reference_atmosphere(true);await settle()
   s.set_measured_bloom_response(false);await settle()
   check(is_equal_approx(w.look._exposure_effect._parameters.decode_float(16),.16),"OFF restores previous fixed response")
