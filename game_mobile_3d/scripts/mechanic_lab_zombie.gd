@@ -34,6 +34,7 @@ const DEATH_SPEED_TO_LAB := 0.0088
 const DEATH_TIER_INFLUENCE := 0.75
 const DEATH_ANGULAR_TO_LAB := 0.18
 const DEATH_AIR_ATTACK_ANGULAR_TO_LAB := 0.14
+const DEATH_FINISHER_ROLL_SPEED := 1.0
 # Calibrate grounded hits to the recorded Sabre and Sword tumbles. Air
 # attacks retain their flight profile to keep the stronger launches stable.
 const DEATH_FLIGHT_GRAVITY := 32.0
@@ -425,6 +426,9 @@ func _death_spin(direction: Vector3) -> Vector3:
 	var angular_scale := DEATH_AIR_ATTACK_ANGULAR_TO_LAB if _death_from_air_attack else DEATH_ANGULAR_TO_LAB
 	var speed := DEATH_SOURCE_ANGULAR_SCALE * angular_scale
 	var spin := Vector3.UP.cross(direction) * speed
+	if not _death_from_air_attack and _death_strength >= DEATH_STRENGTH_THRESHOLDS[1]:
+		# An off-axis launch lets the grounded finisher roll onto its side.
+		spin -= direction * DEATH_FINISHER_ROLL_SPEED
 	if _death_rng.randf() < DEATH_TWIRL_CHANCE:
 		spin.y = speed * (0.45 if _death_rng.randf() < 0.5 else -0.45)
 	return spin
