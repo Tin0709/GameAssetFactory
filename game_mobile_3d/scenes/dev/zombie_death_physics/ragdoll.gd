@@ -57,7 +57,7 @@ var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
 var _flat_floor: CollisionShape3D
 var _pose_correction_frame := -1
-var _terrain_origins: Dictionary[String, Vector3]
+var _terrain_poses: Dictionary[String, Transform3D]
 var _terrain_query: PhysicsShapeQueryParameters3D
 var _projection_query: PhysicsTestMotionParameters3D
 var _projection_hit: PhysicsTestMotionResult3D
@@ -382,7 +382,7 @@ func _correct_physical_pose() -> void:
 				var body: PhysicalBone3D = bodies[name]
 				var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 				if state:
-					_terrain_origins[name] = state.transform.origin
+					_terrain_poses[name] = state.transform
 
 func _project_source_anchors() -> void:
 	for name: String in source_joint_rids:
@@ -465,6 +465,8 @@ func _project_terrain_contact() -> void:
 	var deepest: PhysicalBone3D
 	var has_deep_contact := false
 	var first_wall_parts: Array[String] = []
+	var missed_wall: PhysicalBone3D
+	var missed_rewind := Vector3.ZERO
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
@@ -479,8 +481,13 @@ func _project_terrain_contact() -> void:
 		var fast_contact := _can_have_fast_contact(state, part[2])
 		if fall_speed <= TERRAIN_MIN_FALL_SPEED and not fast_contact:
 			continue
-		var can_rewind: bool = state.get_contact_count() == 0 and _terrain_origins.has(part[0])
+		var can_rewind: bool = state.get_contact_count() == 0 and _terrain_poses.has(part[0])
 		var points := _terrain_contact_points(body, state, Vector3.ZERO)
+		if can_rewind and not steep_fall and points.is_empty():
+			var rewind := _missed_wall_rewind(body, state, _terrain_poses[part[0]])
+			if rewind.length_squared() > missed_rewind.length_squared():
+				missed_wall = body
+				missed_rewind = rewind
 		for i in range(0, points.size(), 2):
 			var offset := points[i + 1] - points[i]
 			var depth := offset.length()
@@ -501,6 +508,8 @@ func _project_terrain_contact() -> void:
 		_project_deep_terrain_contact()
 	if not first_wall_parts.is_empty():
 		_project_unresolved_wall_contact(first_wall_parts)
+	elif missed_wall != null and not has_deep_contact:
+		_try_terrain_translation(missed_rewind, missed_wall, true)
 
 func _project_unresolved_wall_contact(names: Array[String]) -> void:
 	var deepest: PhysicalBone3D
@@ -514,7 +523,7 @@ func _project_unresolved_wall_contact(names: Array[String]) -> void:
 		var depth := _deepest_contact(_terrain_contact_points(body, state, Vector3.ZERO))
 		if depth <= deepest_depth:
 			continue
-		var rewind := _first_wall_rewind(body, state, _terrain_origins[name])
+		var rewind := _first_wall_rewind(body, state, _terrain_poses[name].origin)
 		if rewind.is_zero_approx():
 			continue
 		deepest = body
@@ -522,6 +531,18 @@ func _project_unresolved_wall_contact(names: Array[String]) -> void:
 		correction = rewind
 	if deepest != null:
 		_try_terrain_translation(correction, deepest)
+
+func _missed_wall_rewind(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, start: Transform3D) -> Vector3:
+	var travel := state.transform.origin - start.origin
+	var distance := travel.length()
+	if distance <= TERRAIN_DEEP_OVERLAP + TERRAIN_RESIDUAL_OVERLAP:
+		return Vector3.ZERO
+	# A box can enter a one-sided cliff face and end the step with no reported overlap.
+	var fraction := _wall_sweep_fraction(body, start, travel)
+	var rewind := (1.0 - fraction) * distance - TERRAIN_RESIDUAL_OVERLAP
+	if fraction <= 0.0 or rewind <= TERRAIN_DEEP_OVERLAP:
+		return Vector3.ZERO
+	return -travel * (minf(rewind, TERRAIN_MAX_RECOVERY_SHIFT) / distance)
 
 func _first_wall_rewind(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, previous_origin: Vector3) -> Vector3:
 	var travel := state.transform.origin - previous_origin
@@ -531,14 +552,17 @@ func _first_wall_rewind(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, p
 	var start := Transform3D(state.transform.basis, previous_origin)
 	if _deepest_contact(_terrain_contacts_at(body, state.get_space_state(), start)) > FLOOR_CONTACT_SLOP:
 		return Vector3.ZERO
-	if not _test_projection_motion(body, start, travel):
-		return Vector3.ZERO
-	var normal := _projection_hit.get_collision_normal()
-	if absf(normal.y) >= MIN_SUPPORT_NORMAL_Y or travel.dot(normal) >= 0.0:
-		return Vector3.ZERO
-	var remaining := travel * (1.0 - _projection_hit.get_collision_unsafe_fraction())
+	var remaining := travel * (1.0 - _wall_sweep_fraction(body, start, travel))
 	var rewind := maxf(0.0, remaining.length() - TERRAIN_RESIDUAL_OVERLAP)
 	return -travel.normalized() * minf(rewind, TERRAIN_MAX_RECOVERY_SHIFT)
+
+func _wall_sweep_fraction(body: PhysicalBone3D, start: Transform3D, travel: Vector3) -> float:
+	if not _test_projection_motion(body, start, travel):
+		return 1.0
+	var normal := _projection_hit.get_collision_normal()
+	if absf(normal.y) >= MIN_SUPPORT_NORMAL_Y or travel.dot(normal) >= 0.0:
+		return 1.0
+	return _projection_hit.get_collision_unsafe_fraction()
 
 func _can_have_fast_contact(state: PhysicsDirectBodyState3D, box_size: Vector3) -> bool:
 	var half_diagonal := (box_size * 0.5).length()
@@ -576,7 +600,7 @@ func _project_deep_terrain_contact() -> void:
 	if deepest != null:
 		_try_terrain_translation(motion, deepest)
 
-func _try_terrain_translation(motion: Vector3, deepest: PhysicalBone3D) -> void:
+func _try_terrain_translation(motion: Vector3, deepest: PhysicalBone3D, crossed_wall := false) -> void:
 	for body: PhysicalBone3D in bodies.values():
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if state == null:
@@ -584,7 +608,11 @@ func _try_terrain_translation(motion: Vector3, deepest: PhysicalBone3D) -> void:
 		var before := _deepest_contact(_terrain_contact_points(body, state, Vector3.ZERO))
 		var after := _deepest_contact(_terrain_contact_points(body, state, motion))
 		# Reject a shift into an adjacent ledge or one that leaves the worst contact unchanged.
-		if after > maxf(before, FLOOR_CONTACT_SLOP) + PROJECTION_COLLISION_MARGIN \
+		if crossed_wall and body == deepest:
+			# Leave a shallow contact on the entry face for the next solve.
+			if before > FLOOR_CONTACT_SLOP or after <= FLOOR_CONTACT_SLOP or after > TERRAIN_DEEP_RESIDUAL:
+				return
+		elif after > maxf(before, FLOOR_CONTACT_SLOP) + PROJECTION_COLLISION_MARGIN \
 				or (body == deepest and after >= before - FLOOR_CONTACT_SLOP):
 			return
 	for body: PhysicalBone3D in bodies.values():
@@ -759,7 +787,7 @@ func release(visible_world_pose: Array[Transform3D] = []) -> void:
 		simulator.free()
 	simulator = null
 	bodies.clear()
-	_terrain_origins.clear()
+	_terrain_poses.clear()
 	anchors.clear()
 	joint_rest_rotations.clear()
 	if not pose.is_empty():
