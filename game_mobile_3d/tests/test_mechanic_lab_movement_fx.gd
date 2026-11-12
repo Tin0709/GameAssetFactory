@@ -60,6 +60,16 @@ func run() -> void:
 		and contacts.back() and landed_particles > walking_peak,
 		"The jump adds only one stronger burst, on landing")
 	Input.action_release("move_forward")
+	for i in 45:
+		await physics_frame
+	check(visible_particles(dust) == 0 and not dust.is_processing(), "Dust fades and stops processing at rest")
+	Input.action_press("move_forward")
+	for i in 35:
+		await physics_frame
+		if visible_particles(dust) > 0:
+			break
+	Input.action_release("move_forward")
+	check(visible_particles(dust) > 0, "Movement emits dust again after resting")
 	lab.reset_player()
 	await physics_frame
 	check(visible_particles(dust) == 0, "Reset clears the active particle pool")
