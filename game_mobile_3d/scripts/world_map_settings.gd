@@ -90,6 +90,8 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	var heading := _label("Cài đặt Overworld", 23)
 	heading.name = "SettingsDragHandle"
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
+	heading.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	heading.mouse_filter = Control.MOUSE_FILTER_STOP
 	heading.mouse_default_cursor_shape = Control.CURSOR_MOVE
 	heading.tooltip_text = "Giữ chuột trái trên tiêu đề và kéo để di chuyển menu."
@@ -215,7 +217,7 @@ func _resize() -> void:
 	var bounds := _shield.get_viewport_rect().size
 	var width := minf(bounds.x - 32.0, 608.0)
 	var desired := _preferred_position if _moved else Vector2(bounds.x - width - 16.0, 60.0)
-	var min_height := maxf(240.0, panel.get_combined_minimum_size().y)
+	var min_height := 240.0
 	panel.position = Vector2(clampf(desired.x, 8.0, bounds.x - width - 8.0),
 		clampf(desired.y, 8.0, maxf(8.0, bounds.y - min_height - 16.0)))
 	panel.size = Vector2(width, minf(644.0, bounds.y - panel.position.y - 16.0))
