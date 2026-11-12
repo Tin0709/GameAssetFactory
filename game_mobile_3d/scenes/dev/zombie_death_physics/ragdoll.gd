@@ -412,9 +412,8 @@ func _project_source_anchors() -> void:
 			_projection_query.recovery_as_collision = true
 			_projection_hit = PhysicsTestMotionResult3D.new()
 		var motion := correction * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
-		if contacting and _project_contacting_anchor(child, state, motion):
-			continue
 		if contacting:
+			_project_contacting_anchor(child, state, motion)
 			continue
 		_projection_query.from = state.transform
 		_projection_query.motion = motion
@@ -423,7 +422,7 @@ func _project_source_anchors() -> void:
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
 
-func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, motion: Vector3) -> bool:
+func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, motion: Vector3) -> void:
 	var points := _terrain_contact_points(body, state, Vector3.ZERO)
 	var escape_fraction := 0.0
 	for i in range(0, points.size(), 2):
@@ -433,20 +432,19 @@ func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodySt
 			continue
 		var separation := motion.dot(offset / depth)
 		if separation <= depth:
-			return false
+			return
 		escape_fraction = maxf(escape_fraction, depth / separation)
 	if _deepest_contact(_terrain_contact_points(body, state, motion)) > PROJECTION_COLLISION_MARGIN:
-		return false
+		return
 	# Sweep from the clear end because a forward sweep can stop inside the
 	# original overlap. A hit near the original pose is the expected contact.
 	_projection_query.from = state.transform.translated(motion)
 	_projection_query.motion = -motion
 	if PhysicsServer3D.body_test_motion(body.get_rid(), _projection_query, _projection_hit):
-		var blocked_distance := (1.0 - _projection_hit.get_collision_unsafe_fraction()) * motion.length()
-		if blocked_distance > escape_fraction * motion.length() + 2.0 * PROJECTION_COLLISION_MARGIN:
-			return false
+		var early_hit := 1.0 - _projection_hit.get_collision_unsafe_fraction() - escape_fraction
+		if early_hit * motion.length() > 2.0 * PROJECTION_COLLISION_MARGIN:
+			return
 	state.transform = _projection_query.from
-	return true
 
 func _project_terrain_contact() -> void:
 	var lift := 0.0
