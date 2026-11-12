@@ -58,7 +58,8 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 			var state := PhysicsServer3D.body_get_direct_state(part.get_rid())
 			for i in state.get_contact_count():
 				var collider := state.get_contact_collider_object(i) as Node
-				if first_wall < 0 and collider != null and collider.name == "WorldCollision" +					and absf(state.get_contact_local_normal(i).y) < 0.05:
+				var is_wall := absf(state.get_contact_local_normal(i).y) < 0.05
+				if first_wall < 0 and collider != null and collider.name == "WorldCollision" and is_wall:
 					first_wall = frame
 					wall_gravity = chest_state.total_gravity.y
 	check(first_wall >= 0 and is_equal_approx(wall_gravity, -50.0),
