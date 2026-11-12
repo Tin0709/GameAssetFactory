@@ -25,6 +25,10 @@ const ACCENT := Color("#edc788")
 const DIM := Color("#acc0b3")
 const BORDER := Color("#3e5448")
 const UNDO_LIMIT := 48
+const DEFAULT_MENU_SIZE := Vector2(608.0, 644.0)
+const MIN_MENU_SIZE := Vector2(448.0, 240.0)
+const LEADING_INSET := Vector2(8.0, 8.0)
+const TRAILING_INSET := Vector2(16.0, 16.0)
 
 var hud: CanvasLayer
 var gear: Button
@@ -52,6 +56,9 @@ var _dragging := false
 var _drag_offset := Vector2.ZERO
 var _moved := false
 var _preferred_position := Vector2.ZERO
+var _preferred_size := DEFAULT_MENU_SIZE
+var _resizing := false
+var _resize_offset := Vector2.ZERO
 
 func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 		sliders: Dictionary, status: Label, full: bool) -> void:
@@ -139,17 +146,30 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 	search.visible = full
 	search.text_changed.connect(_rebuild)
 
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 0)
+	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_child(content)
 	scroll = ScrollContainer.new()
 	scroll.name = "SettingsScroll"
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.mouse_force_pass_scroll_events = false
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.follow_focus = true
-	layout.add_child(scroll)
+	content.add_child(scroll)
 	_body = VBoxContainer.new()
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body.add_theme_constant_override("separation", 8)
 	scroll.add_child(_body)
+	var grip := _button("◢")
+	grip.name = "SettingsResizeHandle"
+	grip.custom_minimum_size = Vector2(30.0, 22.0)
+	grip.size_flags_horizontal = Control.SIZE_SHRINK_END
+	grip.mouse_default_cursor_shape = Control.CURSOR_BDIAGSIZE
+	grip.tooltip_text = "Giữ chuột trái và kéo để đổi kích thước menu."
+	grip.add_theme_color_override("font_color", ACCENT)
+	grip.gui_input.connect(_drag_resize)
+	content.add_child(grip)
 
 	gear = _button("⚙  Cài đặt")
 	gear.name = "WorldMapSettingsButton"
@@ -215,12 +235,12 @@ func _register(id: String, widget: Control) -> void:
 
 func _resize() -> void:
 	var bounds := _shield.get_viewport_rect().size
-	var width := minf(bounds.x - 32.0, 608.0)
-	var desired := _preferred_position if _moved else Vector2(bounds.x - width - 16.0, 60.0)
-	var min_height := 240.0
-	panel.position = Vector2(clampf(desired.x, 8.0, bounds.x - width - 8.0),
-		clampf(desired.y, 8.0, maxf(8.0, bounds.y - min_height - 16.0)))
-	panel.size = Vector2(width, minf(644.0, bounds.y - panel.position.y - 16.0))
+	var available := (bounds - LEADING_INSET - TRAILING_INSET).max(Vector2.ONE)
+	var wanted := _preferred_size.clamp(MIN_MENU_SIZE.min(available), available)
+	var desired := _preferred_position if _moved else Vector2(bounds.x - wanted.x - TRAILING_INSET.x, 60.0)
+	var position_limit := bounds - TRAILING_INSET - Vector2(wanted.x, minf(MIN_MENU_SIZE.y, available.y))
+	panel.position = desired.clamp(LEADING_INSET, position_limit.max(LEADING_INSET))
+	panel.size = wanted.min(bounds - panel.position - TRAILING_INSET)
 
 func _drag_header(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -230,6 +250,20 @@ func _drag_header(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and _dragging:
 		_moved = true
 		_preferred_position = event.global_position - _drag_offset
+		_resize()
+
+func _drag_resize(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		_resizing = event.pressed
+		if _resizing:
+			_resize_offset = panel.get_global_rect().end - event.global_position
+	elif event is InputEventMouseMotion and _resizing:
+		# Clamp the moving corner while keeping the top-left corner fixed.
+		_moved = true
+		_preferred_position = panel.position
+		var available := _shield.get_viewport_rect().size - panel.position - TRAILING_INSET
+		var wanted := event.global_position + _resize_offset - panel.get_global_rect().position
+		_preferred_size = wanted.clamp(MIN_MENU_SIZE.min(available), available)
 		_resize()
 
 func remember_edit(restore: Callable) -> void:
@@ -290,6 +324,7 @@ func _toggle_open() -> void:
 func set_open(value: bool) -> void:
 	if not value:
 		_dragging = false
+		_resizing = false
 		_close_info()
 		if search.has_focus():
 			search.release_focus()
