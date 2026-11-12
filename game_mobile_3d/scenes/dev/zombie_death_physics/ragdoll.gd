@@ -738,6 +738,9 @@ func contact_motion() -> Dictionary:
 		"linear":peak_linear,"angular":peak_angular}
 
 func is_braced_against_terrain() -> bool:
+	return terrain_wall_support_margin() < 0.0
+
+func terrain_wall_support_margin() -> float:
 	var has_wall_contact := false
 	var support_points := PackedVector2Array()
 	var weighted_center := Vector3.ZERO
@@ -745,7 +748,7 @@ func is_braced_against_terrain() -> bool:
 	for body: PhysicalBone3D in bodies.values():
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if state == null:
-			return false
+			return NAN
 		weighted_center += (state.transform.origin + state.center_of_mass) * body.mass
 		mass += body.mass
 		for index in state.get_contact_count():
@@ -757,12 +760,18 @@ func is_braced_against_terrain() -> bool:
 				var point := state.get_contact_collider_position(index)
 				support_points.append(Vector2(point.x, point.z))
 	if not has_wall_contact or support_points.is_empty():
-		return false
+		return NAN
 	var footprint := Geometry2D.convex_hull(support_points)
 	if footprint.size() < 4:
-		return true
+		return -INF
 	var center := Vector2(weighted_center.x, weighted_center.z) / mass
-	return not Geometry2D.is_point_in_polygon(center, footprint)
+	if not Geometry2D.is_point_in_polygon(center, footprint):
+		return -INF
+	var margin := INF
+	for edge in range(footprint.size() - 1):
+		var nearest := Geometry2D.get_closest_point_to_segment(center, footprint[edge], footprint[edge + 1])
+		margin = minf(margin, center.distance_to(nearest))
+	return margin
 
 func has_flat_limb_support() -> bool:
 	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
