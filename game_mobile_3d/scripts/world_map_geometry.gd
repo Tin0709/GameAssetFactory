@@ -576,7 +576,7 @@ func _make_cutaway_material(native: Material) -> ShaderMaterial:
 			var value:Variant=native.get_shader_parameter(parameter)
 			if value!=null:material.set_shader_parameter(parameter,value)
 		for parameter: String in ["regional_sky_field", "regional_sky_bounds", "regional_sky_phase", "regional_sky_state",
-				"night_sky_field", "night_sky_state", "night_sky_roots", "night_sky_grass_start",
+				"night_sky_field", "night_sky_state", "night_sky_roots", "night_sky_grass_start", "night_stone_top_cool",
 				"day_bounce_field", "day_bounce_key", "stone_diffuse_field", "stone_diffuse_strength"]:
 			var value: Variant = native.get_shader_parameter(parameter)
 			if value != null: material.set_shader_parameter(parameter, value)

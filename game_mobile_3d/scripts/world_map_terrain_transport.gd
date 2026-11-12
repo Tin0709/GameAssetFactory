@@ -23,6 +23,7 @@ var regional_sky_state := Vector2.ZERO
 var regional_sky_phase := Vector4.ZERO
 var night_sky_texture: ImageTexture
 var night_sky_state := Vector2.ZERO
+var night_stone_top_cool := 0.0
 var day_bounce_texture: ImageTexture3D
 var day_bounce_key := Vector4.ZERO
 var stone_diffuse_texture: ImageTexture
@@ -242,8 +243,10 @@ func _refresh_night_sky() -> void:
 			if night_sky_texture == null:
 				_night_sky_ready = false
 				state = Vector2.ZERO
-	if state != night_sky_state:
+	var top_cool: float = review._lighting_scale(&"night_stone_top_cool") if state.y > 0.0 else 0.0
+	if state != night_sky_state or top_cool != night_stone_top_cool:
 		night_sky_state = state
+		night_stone_top_cool = top_cool
 		_bind_sky_receivers()
 
 func _bind_sky_receivers() -> void:
@@ -255,6 +258,7 @@ func _bind_sky_receivers() -> void:
 			materials[material] = true
 	for material: ShaderMaterial in materials:
 		material.set_shader_parameter("stone_diffuse_strength", stone_diffuse_strength)
+		material.set_shader_parameter("night_stone_top_cool", night_stone_top_cool)
 		if stone_diffuse_strength > 0.0 and material.get_shader_parameter("stone_diffuse_field") != stone_diffuse_texture:
 			material.set_shader_parameter("stone_diffuse_field", stone_diffuse_texture)
 		bind_regional_sky(material)

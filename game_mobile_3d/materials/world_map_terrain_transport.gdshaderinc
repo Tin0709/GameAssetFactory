@@ -6,6 +6,7 @@ varying vec3 terrain_day_bounce;
 varying float stone_diffuse_log;
 uniform sampler2D stone_diffuse_field : filter_nearest, repeat_disable;
 uniform float stone_diffuse_strength = 0.0;
+uniform float night_stone_top_cool = 0.0;
 
 float gaf_stone_diffuse_sample(int receiver, vec3 world_normal) {
 	if (stone_diffuse_strength <= 0.0 || ground_grade != 3 || abs(world_normal.y) >= 0.1) return 0.0;
@@ -34,7 +35,7 @@ vec3 terrain_contact_response(vec3 albedo,float contact){
 	vec3 reflectance=clamp(albedo,vec3(0.0),vec3(0.5));
 	return vec3(single)+returned*reflectance/max(vec3(1.0)-(1.0-return_ratio)*reflectance,vec3(0.00001));
 }
-vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,float contact){
+vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,float contact,float face_y){
 	vec3 sky = terrain_sky_light;
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
@@ -44,7 +45,9 @@ vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,flo
 #ifdef GAF_TERRAIN_NIGHT_SKY
 	if (ground_grade == 3 && night_sky_state.y > 0.0) {
 		float luma = dot(irradiance, vec3(.2126, .7152, .0722));
-		irradiance = mix(irradiance, vec3(luma), night_sky_state.y);
+		// Keep more of the incident sky chroma on upward-facing stone.
+		float balance = night_sky_state.y * (1.0 - night_stone_top_cool * clamp(face_y, 0.0, 1.0));
+		irradiance = mix(irradiance, vec3(luma), balance);
 	}
 	irradiance += terrain_day_bounce;
 #endif

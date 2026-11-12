@@ -118,7 +118,7 @@ void fragment() {
 	if (gaf_diffuse_opening.w > 0.0) {
 		terrain_opening_incident = terrain_opening_fill(ALBEDO, receiver_contact, sole);
 	}
-	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact)*sole;
+	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact,surface_top)*sole;
 	if(terrain_rough_reflection)EMISSION+=terrain_reflected(normalize(NORMAL),normalize(VIEW),ROUGHNESS,AO,cloud_transmission,receiver_contact,native_specular);
 #endif
 #ifdef GAF_SHARED_MIST
