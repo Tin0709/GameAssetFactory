@@ -146,6 +146,7 @@ func _collect(legacy: VBoxContainer, sliders: Dictionary) -> void:
 	for id: StringName in sliders:
 		var slider: HSlider = sliders[id]
 		var row := slider.get_parent() as HBoxContainer
+		slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		_sliders[String(id)] = slider
 		_register(String(id), row)
 	for node: Node in legacy.get_children():
@@ -183,7 +184,7 @@ func _register(id: String, widget: Control) -> void:
 func _resize() -> void:
 	var view_width := _shield.get_viewport_rect().size.x
 	panel.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
-	panel.offset_left = -minf(view_width - 32.0, 690.0) - 16.0
+	panel.offset_left = -minf(view_width - 32.0, 608.0) - 16.0
 	panel.offset_right = -16.0
 	panel.offset_top = 60.0
 	panel.offset_bottom = -16.0
@@ -387,7 +388,13 @@ func _toggle_info(id: String, parent: VBoxContainer, button: Button) -> void:
 		slider.value_changed.connect(show_value)
 		value.tree_exiting.connect(func(): slider.value_changed.disconnect(show_value))
 	if scroll.is_ancestor_of(_info):
-		scroll.ensure_control_visible.call_deferred(_info)
+		_reveal_info(_info)
+
+func _reveal_info(card: Control) -> void:
+	# Wait for the containers to assign the wrapped text's height.
+	await hud.get_tree().process_frame
+	if is_instance_valid(card) and card == _info:
+		scroll.ensure_control_visible(card)
 
 func _close_info() -> void:
 	if _info != null:
