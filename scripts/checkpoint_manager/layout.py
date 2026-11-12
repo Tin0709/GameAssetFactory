@@ -34,7 +34,7 @@ def _dark_titlebar(root):
 
 def build_layout(app):
     root = app.root
-    root.title('Git Checkpoint Manager — GameAssetFactory & MD2')
+    root.title('DevDock')
     root.geometry(f'{min(1400, root.winfo_screenwidth() - 80)}x{min(980, root.winfo_screenheight() - 100)}')
     root.minsize(960, 660)
     root.configure(background=PAGE)
@@ -104,17 +104,17 @@ def build_layout(app):
     actions.pack(side='right', padx=(10, 0))
     assets = Path(__file__).with_name('assets')
     try:
-        app.header_icon = tk.PhotoImage(file=str(assets / 'checkpoint-manager-v2-64.png'))
+        app.header_icon = tk.PhotoImage(file=str(assets / 'devdock-64.png'))
         ttk.Label(brand, image=app.header_icon, style='Card.TLabel').pack(side='left', padx=(0, 14))
         if os.name == 'nt':
-            root.iconbitmap(str(assets / 'checkpoint-manager-v2.ico'))
+            root.iconbitmap(str(assets / 'devdock.ico'))
         else:
             root.iconphoto(True, app.header_icon)
     except tk.TclError:
         app.header_icon = None
     heading = ttk.Frame(brand, style='Card.TFrame')
     heading.pack(side='left')
-    ttk.Label(heading, text='Git Checkpoint Manager', style='Title.TLabel').pack(anchor='w')
+    ttk.Label(heading, text='DevDock', style='Title.TLabel').pack(anchor='w')
     ttk.Label(heading, text=f'Checkpoint cục bộ · Push thủ công · {len(app.configs)} repository riêng biệt', style='Muted.TLabel').pack(anchor='w', pady=(3, 0))
     Button(actions, '✓  Bật tự commit tất cả', app.resume_all, kind='success').pack(side='right')
     Button(actions, '●  Tạm dừng tất cả', app.pause_all).pack(side='right', padx=8)

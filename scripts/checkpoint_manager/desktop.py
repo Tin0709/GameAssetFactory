@@ -42,7 +42,7 @@ class SingleInstance:
                 raise RuntimeError('Không thể tạo khóa ứng dụng Windows.')
             if error == 183:
                 self._kernel.CloseHandle(handle)
-                raise RuntimeError('Git Checkpoint Manager đang mở. Hãy dùng cửa sổ hiện tại.')
+                raise RuntimeError('DevDock đang mở. Hãy dùng cửa sổ hiện tại.')
             self._mutex = handle
         try:
             self._lock_file(path)
@@ -66,7 +66,7 @@ class SingleInstance:
                 fcntl.flock(self.file, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except OSError:
             self.file.close()
-            raise RuntimeError('Git Checkpoint Manager đang mở. Hãy dùng cửa sổ hiện tại.') from None
+            raise RuntimeError('DevDock đang mở. Hãy dùng cửa sổ hiện tại.') from None
 
     def close(self):
         if self.file is not None and not self.file.closed:
@@ -538,7 +538,8 @@ def main(auto_commit=False, auto_repos=(), native_ui=False):
             user32.FindWindowW.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p]
             user32.ShowWindow.argtypes = [ctypes.c_void_p, ctypes.c_int]
             user32.SetForegroundWindow.argtypes = [ctypes.c_void_p]
-            window = user32.FindWindowW(None, 'Git Checkpoint Manager — GameAssetFactory & MD2')
+            window = (user32.FindWindowW(None, 'DevDock')
+                      or user32.FindWindowW(None, 'Git Checkpoint Manager — GameAssetFactory & MD2'))
             if window:
                 user32.ShowWindow(window, 9)
                 user32.SetForegroundWindow(window)

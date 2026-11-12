@@ -43,7 +43,7 @@ async function send(action, fields = {}) {
     if (!response.ok) throw new Error('HTTP ' + response.status);
     return true;
   } catch {
-    notify('Không gửi được thao tác', 'Thử lại hoặc mở lại Git Checkpoint Manager.');
+    notify('Không gửi được thao tác', 'Thử lại hoặc mở lại DevDock.');
     return false;
   }
 }
@@ -194,7 +194,7 @@ async function poll() {
     if (state.repos) render(state);
     offline = false;
   } catch {
-    if (!offline) notify('Mất kết nối với app', 'Mở lại Git Checkpoint Manager nếu cửa sổ chưa tự kết nối.');
+    if (!offline) notify('Mất kết nối với app', 'Mở lại DevDock nếu cửa sổ chưa tự kết nối.');
     offline = true;
   } finally {
     setTimeout(poll, 650);

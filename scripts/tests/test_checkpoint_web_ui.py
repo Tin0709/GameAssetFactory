@@ -41,6 +41,9 @@ class LocalUITests(unittest.TestCase):
     def test_assets_do_not_include_the_session_token(self):
         status, body = self.request('GET', '/')
         self.assertEqual(status, 200)
-        self.assertIn(b'Git Checkpoint Manager', body)
+        self.assertIn(b'<title>DevDock</title>', body)
         self.assertNotIn(self.ui.token.encode(), body)
+        status, icon = self.request('GET', '/devdock.ico')
+        self.assertEqual(status, 200)
+        self.assertTrue(icon.startswith(b'\x00\x00\x01\x00'))
         self.assertEqual(self.request('GET', '/../../desktop.py')[0], 404)

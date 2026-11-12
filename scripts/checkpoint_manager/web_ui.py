@@ -19,7 +19,9 @@ from .core import redact
 
 ASSETS = Path(__file__).with_name('web')
 ROUTES = {'/': ('index.html', 'text/html; charset=utf-8'),
-          '/app.js': ('app.js', 'text/javascript; charset=utf-8')}
+          '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
+          '/devdock.png': ('../assets/devdock-64.png', 'image/png'),
+          '/devdock.ico': ('../assets/devdock.ico', 'image/x-icon')}
 REPO_ACTIONS = {'repo-refresh', 'changes', 'commit', 'push'}
 SIMPLE_ACTIONS = {'godot', 'start-mcp', 'check-mcp', 'refresh', 'all-on', 'all-off'}
 REPO_NAMES = {'gaf': 'GameAssetFactory', 'md2': 'MD2 Research', 'tacz': 'TaCZ Research'}
@@ -75,7 +77,7 @@ class LocalUI:
                 self.send_header('X-Content-Type-Options', 'nosniff')
                 self.send_header('Content-Security-Policy',
                                  "default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; "
-                                 "img-src data:; connect-src 'self'; frame-ancestors 'none'; "
+                                 "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; "
                                  "form-action 'none'; base-uri 'none'")
                 self.end_headers()
                 self.wfile.write(body)
@@ -200,8 +202,12 @@ class WebWindow:
             self.theme = 'dark'
         self.theme = 'light' if self.theme == 'light' else 'dark'
         self.godot_ready = self._godot_available()
-        self.ui = LocalUI()
         self.profile = tempfile.TemporaryDirectory(dir=app.state_dir, prefix='liquid-glass-', ignore_cleanup_errors=True)
+        try:
+            self.ui = LocalUI()
+        except OSError:
+            self.profile.cleanup()
+            raise
         try:
             with (app.state_dir / 'browser-window.log').open('ab') as output:
                 self.process = subprocess.Popen(
