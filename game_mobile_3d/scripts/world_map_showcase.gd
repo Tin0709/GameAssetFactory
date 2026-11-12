@@ -418,7 +418,7 @@ func _sample_sky_response() -> Vector3:
 	var reference := reference_hour()
 	var pinned: Vector3 = sky_response.sample(reference)
 	var strength := _lighting_scale(&"dawn_sky_transition")
-	if strength <= 0. or hour >= 4.5 or hour <= reference:
+	if _balanced_preview or strength <= 0. or hour >= 4.5 or hour <= reference:
 		return pinned
 	# Advance the sky source only. Fog and bloom use their existing reference phase.
 	return pinned.lerp(sky_response.sample(hour), strength)
@@ -655,7 +655,7 @@ func _sample_mist_phase() -> Dictionary:
 	var reference := reference_hour()
 	var measured: Dictionary = phase_air.sample(reference)
 	var strength := _lighting_scale(&"dawn_mist_source")
-	if measured.is_empty() or not captured_mist_source or atmosphere_review != "combined" \
+	if measured.is_empty() or not captured_mist_source or atmosphere_review != "combined" or _balanced_preview \
 			or strength <= 0. or hour >= 4.5 or hour <= reference:
 		return measured
 	var dawn: Dictionary = phase_air.sample(hour)
@@ -927,8 +927,12 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 1.
 	if effect == &"world_outline_strength":
 		return 0.
-	if effect in [&"dawn_sky_transition", &"grass_night_albedo", &"dawn_mist_source"]:
-		return 0.
+	if effect == &"dawn_sky_transition":
+		return .35
+	if effect == &"grass_night_albedo":
+		return .55
+	if effect == &"dawn_mist_source":
+		return .65
 	if effect in [&"sculk_surface", &"forest_path_placement", &"forest_path_air_beam", &"night_depth_scatter", &"night_stone_top_cool"]:
 		return 0.
 	if effect == &"forest_daylight_accents":

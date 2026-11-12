@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/scene_lighting_mix.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Rạng sáng · Đối chứng"
+description = "Tạm đưa ba thanh ánh hắt, ánh sáng sương và độ dịu lá cỏ về 0% để xem hình ảnh trước khi cập nhật."
+review_tip = "Chọn Rạng sáng · 02:30 hoặc Đêm ở mục Thời điểm. Bấm Hoàn tác hoặc chọn Rừng ẩm · Rạng sáng để trở lại phối mới."
+strengths = Dictionary[StringName, float]({
+&"dawn_sky_transition": 0.0,
+&"grass_night_albedo": 0.0,
+&"dawn_mist_source": 0.0
+})
