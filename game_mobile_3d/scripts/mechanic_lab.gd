@@ -82,7 +82,9 @@ func _ready() -> void:
 		player.combo.native_tap_buffer_seconds = SABRE_TAP_BUFFER
 		$Zombies.setup_combat(player, player.clips, player.combo.native_windows)
 		player.connect("attack_pose_sample", $Zombies.sample_sabre)
+		player.connect("heavy_jump_landed", $Zombies.land_sabre)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
+		$Zombies.sabre_landing.connect(_on_sabre_landing)
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
 func _apply_daylight_render_settings() -> void:
@@ -137,13 +139,7 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	player.effects.contact(point, direction)
 	_combat_audio.contact(point, serial, lethal)
 	var finisher := clip in ["Attack3", "NativeFinisher"]
-	if _light_serial != serial:
-		_light_serial = serial
-		_light_peak = 2.3 if finisher or clip == "AirAttack" else 1.8
-		_light_remaining = CONTACT_LIGHT_DURATION
-		_impact_light.global_position = point
-		_impact_light.light_energy = _light_peak
-		_impact_light.show()
+	_start_contact_light(point, serial, 2.3 if finisher else 1.8)
 	# Sabre_3 is the only grounded variant with a shake class. Its radius and
 	# non-oriented flag come from the row; the lab waveform is an approximation.
 	if not finisher or _shake_serial == serial:
@@ -157,6 +153,21 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	_shake_strength = FINISHER_SHAKE_HEIGHT_FRACTION * falloff
 	_shake_age = 0.0
 	_shake_duration = HEAVY_SHAKE_DURATION
+
+func _on_sabre_landing(point: Vector3, serial: int) -> void:
+	player.effects.contact(point + Vector3.UP * 0.12, Vector3.UP)
+	_start_contact_light(point + Vector3.UP * 0.60, serial, 2.3)
+	_combat_audio.slam_landed(point)
+
+func _start_contact_light(point: Vector3, serial: int, energy: float) -> void:
+	if _light_serial == serial:
+		return
+	_light_serial = serial
+	_light_peak = energy
+	_light_remaining = CONTACT_LIGHT_DURATION
+	_impact_light.global_position = point
+	_impact_light.light_energy = _light_peak
+	_impact_light.show()
 
 func _physics_process(_delta: float) -> void:
 	if player.position.y < -5.0:
