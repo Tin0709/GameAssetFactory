@@ -76,6 +76,22 @@ theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 20
 text = "MechanicLab · 100 × 100 block"
 
+[node name="PlayerHealth" type="Label" parent="HUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -225.0
+offset_top = 12.0
+offset_right = -18.0
+offset_bottom = 38.0
+mouse_filter = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+text = "100 / 100 HP"
+horizontal_alignment = 2
+
 [node name="Controls" type="Label" parent="HUD"]
 offset_left = 18.0
 offset_top = 43.0

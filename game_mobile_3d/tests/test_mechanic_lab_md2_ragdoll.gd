@@ -29,6 +29,12 @@ func run() -> void:
 		quit(1)
 		return
 	var zombie = group.get_child(0)
+	check(zombie.ragdoll.bodies.size() == 6 and not zombie.ragdoll.bodies.has("Hips"),
+		"Verified SK_Zombie asset supplies six rigid bodies without a hip collider")
+	check(zombie.ragdoll.bodies.Chest.get("bone_name") == "J_Spine" and zombie.ragdoll.bodies.Head.get("bone_name") == "J_Neck",
+		"Physics bodies bind to the asset's spine and neck bones")
+	var head_box := zombie.ragdoll.bodies.Head.get_child(0).shape as BoxShape3D
+	check(head_box.size.is_equal_approx(Vector3(0.5, 0.5, 0.5)), "Neck collider uses the source box dimensions")
 	var strengths := [399.0, 400.0, 750.0, 1200.0]
 	for i in range(1, strengths.size()):
 		check(ZOMBIE._death_launch_speed(strengths[i]) > ZOMBIE._death_launch_speed(strengths[i - 1]),

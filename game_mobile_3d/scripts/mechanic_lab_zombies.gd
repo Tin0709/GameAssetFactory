@@ -3,6 +3,7 @@ extends Node3D
 
 signal sabre_contact(point: Vector3, direction: Vector3, clip: String, index: int, serial: int, lethal: bool)
 signal sabre_landing(point: Vector3, serial: int)
+signal player_hit(amount: int)
 
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
@@ -79,6 +80,7 @@ func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie:
 	zombie.position = point
 	zombie.max_health = Zombie.BASE_HEALTH if base_zombie else Zombie.TRAINING_HEALTH
 	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial)
+	zombie.melee_hit.connect(player_hit.emit)
 	_spawn_serial += 1
 	add_child(zombie, true)
 	zombie.look_at(floor_position, Vector3.UP, true)

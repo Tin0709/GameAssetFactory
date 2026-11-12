@@ -13,6 +13,7 @@ const MIN_CAMERA_SIZE := 4.5
 const MAX_CAMERA_SIZE := 30.0
 const ZOOM_STEP := 1.15
 const SABRE_TAP_BUFFER := 0.16
+const MAX_PLAYER_HEALTH := 100
 const CONTACT_LIGHT_DURATION := 0.17
 const HEAVY_SHAKE_DURATION := 0.20
 const FINISHER_SHAKE_INNER_RADIUS := 1.5
@@ -20,6 +21,7 @@ const FINISHER_SHAKE_OUTER_RADIUS := 3.0
 const FINISHER_SHAKE_HEIGHT_FRACTION := 0.008
 
 var presentation: Node
+var player_health := MAX_PLAYER_HEALTH
 var _exposure: CompositorEffect
 var _previous_msaa: Viewport.MSAA
 var _previous_hdr: bool
@@ -74,6 +76,7 @@ func _ready() -> void:
 	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
 	$HUD/DropMedium.disabled = $HUD/SpawnZombie.disabled
 	$HUD/DropHigh.disabled = $HUD/SpawnZombie.disabled
+	$HUD/PlayerHealth.visible = not $HUD/SpawnZombie.disabled
 	$HUD/DropMedium.pressed.connect(_drop_player.bind(5.0))
 	$HUD/DropHigh.pressed.connect(_drop_player.bind(7.0))
 	if not $HUD/SpawnZombie.disabled:
@@ -98,6 +101,7 @@ func _ready() -> void:
 		player.connect("heavy_jump_landed", $Zombies.land_sabre)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
+		$Zombies.player_hit.connect(_on_player_hit)
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
 func _apply_daylight_render_settings() -> void:
@@ -211,12 +215,33 @@ func _spawn_zombie() -> void:
 		$HUD/SpawnStatus.text = "Không thể tạo zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
 
 func _drop_player(height: float) -> void:
+	if player_health == 0:
+		return
 	if player.drop_for_lab(height):
 		$HUD/SpawnStatus.text = ""
 	else:
 		$HUD/SpawnStatus.text = "Chờ player chạm đất để thử lại."
 
+func _on_player_hit(amount: int) -> void:
+	if player_health == 0:
+		return
+	player_health = maxi(0, player_health - amount)
+	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
+	if player_health == 0:
+		$HUD/PlayerHealth.text += "  ·  R hồi máu"
+		player.is_dead = true
+		player.release_inputs()
+		player.velocity = Vector3.ZERO
+		player.set_physics_process(false)
+		player.set_process_unhandled_input(false)
+
 func reset_player() -> void:
+	if player_health == 0:
+		player.is_dead = false
+		player.set_physics_process(true)
+		player.set_process_unhandled_input(true)
+	player_health = MAX_PLAYER_HEALTH
+	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
 	_shake_serial = -1
 	_shake_duration = 0.0
 	camera.h_offset = 0.0

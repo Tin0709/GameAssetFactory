@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+signal melee_hit(amount: int)
+
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const Ragdoll := preload("res://scenes/dev/zombie_death_physics/ragdoll.gd")
 const DeathProfile := preload("res://scenes/dev/zombie_death_physics/death_profile.gd")
@@ -33,6 +35,17 @@ const HEIGHT := 1.95
 const CHASE_SPEED := 3.1
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
+# Zombie overrides damage and attack speed. MeleeAttackMob supplies the range,
+# cone and cooldown. The two source times are landmarks on Zombie_BasicAttack.
+const MELEE_DAMAGE := 6
+const MELEE_REACH := 2.0
+const MELEE_HEIGHT_LIMIT := 2.0
+const MELEE_HALF_ANGLE_COS := 0.9659258263 # cos(30 degrees / 2).
+const MELEE_COOLDOWN := 0.5
+const TELEGRAPH_RATE := 1.5
+const TELEGRAPH_END := 15.0 / 30.0
+const MELEE_CONTACT_TIME := 17.0 / 30.0
+const LEVEL_COLLISION_MASK := 1
 # Honeycomb Farm footage: the silhouette breaks up quickly, then a few
 # remnants linger. The thresholds map that timing onto this shader's noise.
 const CORPSE_LIFETIME := 5.0
@@ -153,11 +166,38 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity += get_gravity() * delta
 	move_and_slide()
-	animation.advance(delta)
+	_advance_animation(delta)
 	ragdoll.sample(delta)
+
+func _advance_animation(delta: float) -> void:
+	if animation.current_animation != ATTACK:
+		animation.advance(delta)
+		return
+	var before := animation.current_animation_position
+	var telegraph_seconds := clampf((TELEGRAPH_END - before) / TELEGRAPH_RATE, 0.0, delta)
+	var advance_seconds := delta + telegraph_seconds * (TELEGRAPH_RATE - 1.0)
+	animation.advance(advance_seconds)
+	if before < MELEE_CONTACT_TIME and before + advance_seconds >= MELEE_CONTACT_TIME:
+		_check_melee_contact()
+
+func _check_melee_contact() -> void:
+	var offset := target.global_position - global_position
+	if absf(offset.y) > MELEE_HEIGHT_LIMIT:
+		return
+	offset.y = 0.0
+	if offset.length_squared() > MELEE_REACH * MELEE_REACH or global_basis.z.dot(offset) < offset.length() * MELEE_HALF_ANGLE_COS:
+		return
+	var height := Vector3.UP * (HEIGHT * 0.5)
+	var ray := PhysicsRayQueryParameters3D.create(global_position + height, target.global_position + height, LEVEL_COLLISION_MASK)
+	ray.hit_from_inside = true
+	if get_world_3d().direct_space_state.intersect_ray(ray).is_empty():
+		melee_hit.emit(MELEE_DAMAGE)
 
 func _chase_velocity(delta: float) -> Vector3:
 	if animation.current_animation in [SPAWN, ATTACK, STAGGER]:
+		return Vector3.ZERO
+	if target.get("is_dead") == true:
+		_play_loop(IDLE)
 		return Vector3.ZERO
 	var offset := target.global_position - global_position
 	var height_delta := absf(offset.y)
@@ -170,7 +210,7 @@ func _chase_velocity(delta: float) -> Vector3:
 		return offset.normalized() * minf(CHASE_SPEED, (distance - MELEE_RANGE) / delta)
 	if height_delta < 1.15 and _attack_cooldown <= 0.0:
 		animation.play(ATTACK, 0.1)
-		_attack_cooldown = animation.get_animation(ATTACK).length + 0.30
+		_attack_cooldown = MELEE_COOLDOWN
 	else:
 		_play_loop(IDLE)
 	return Vector3.ZERO
