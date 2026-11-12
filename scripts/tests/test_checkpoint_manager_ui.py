@@ -11,7 +11,7 @@ import tkinter as tk
 import unittest
 import uuid
 import weakref
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from checkpoint_manager.core import GitRepository, RepoConfig
@@ -356,6 +356,27 @@ class DesktopTests(unittest.TestCase):
         finally:
             release.set()
             self.wait_idle()
+
+    def test_main_gameplay_button_uses_the_project_default_and_allows_relaunch(self):
+        godot = self.base / 'Godot with spaces.exe'
+        godot.touch()
+        running = Mock(pid=1234)
+        running.poll.return_value = None
+        with patch.dict(os.environ, {'GODOT_BIN': str(godot)}), patch('checkpoint_manager.desktop.Popen', return_value=running) as launch:
+            self.assertTrue(hasattr(self.app, 'gameplay_button'), 'Missing main gameplay shortcut')
+            self.app.gameplay_button.invoke()
+            self.app.gameplay_button.invoke()
+            launch.assert_called_once()
+            command = launch.call_args.args[0]
+            self.assertEqual(Path(command[0]), godot)
+            self.assertTrue((Path(command[command.index('--path') + 1]) / 'project.godot').is_file())
+            self.assertFalse(any(arg.startswith('res://') for arg in command))
+            self.assertNotIn('--editor', command)
+            self.assertNotIn('--headless', command)
+            self.assertNotIn('--audio-driver', command)
+            running.poll.return_value = 0
+            self.app.gameplay_button.invoke()
+            self.assertEqual(launch.call_count, 2)
 
     def test_blender_view_buttons_open_the_requested_views(self):
         def open_view(key):
