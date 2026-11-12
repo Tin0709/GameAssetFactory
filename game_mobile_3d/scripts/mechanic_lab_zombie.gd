@@ -503,6 +503,7 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
 	var flight_gravity_scale := _gravity_scale(ZOMBIE_GRAVITY)
 	var gravity_scale := flight_gravity_scale if wall_gravity else lerpf(flight_gravity_scale, 1.0, gravity_blend)
+	ragdoll.floor_impact_blend = gravity_blend if flat_sabre_finisher else 0.0
 	ragdoll.floor_landing_blended = not wall_gravity and is_equal_approx(gravity_blend, 1.0)
 	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 	var base_angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)

@@ -15,6 +15,8 @@ const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "
 const FLOOR_CONTACT_SLOP := 0.005
 const FLOOR_REST_SLOP := 0.012
 const FLOOR_SHARED_LIFT_THRESHOLD := 0.05
+const FLOOR_LANDING_LIFT_THRESHOLD := 0.045
+const FLOOR_LANDING_MAX_LIFT_REDUCTION := 0.02
 const MIN_SUPPORT_NORMAL_Y := 0.5
 const MAX_WALL_NORMAL_Y := 0.10
 const HANDOFF_MIN_WALL_OVERLAP := 0.035
@@ -47,6 +49,7 @@ var sample_delta := 1.0 / 60.0
 var sample_count := 0
 var running := false
 var floor_landing_blended := false
+var floor_impact_blend := 0.0
 var handoff_error := 0.0
 var inherited: Dictionary = {}
 var anchors: Dictionary = {}
@@ -131,6 +134,7 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	_floor_impact_limb_share = floor_impact_limb_share if not source_joints.is_empty() else 0.0
 	_flat_floor_has_contact = false
 	floor_landing_blended = false
+	floor_impact_blend = 0.0
 	if _flat_floor != null or not source_joints.is_empty():
 		for body: PhysicalBone3D in bodies.values():
 			body.set("pose_correction", _correct_physical_pose)
@@ -801,6 +805,9 @@ func _project_floor_contact() -> void:
 	if not landing_blended and _flat_floor_has_contact:
 		# Keep more of a deep floor correction on the limb that penetrated.
 		shared_lift -= maxf(0.0, lift - FLOOR_SHARED_LIFT_THRESHOLD) * _floor_impact_limb_share
+		# During the roll, bound the extra local correction to limit joint separation.
+		var excess_lift := maxf(shared_lift - FLOOR_LANDING_LIFT_THRESHOLD, 0.0)
+		shared_lift -= minf(excess_lift * floor_impact_blend, FLOOR_LANDING_MAX_LIFT_REDUCTION)
 	for body: PhysicalBone3D in bodies.values():
 		var correction := maxf(shared_lift, depths.get(body, 0.0) - slop)
 		if correction <= 0.0:
