@@ -93,7 +93,7 @@ func check_movement_audio(bus: int, capture: AudioEffectCapture) -> void:
 	for sample in capture.get_buffer(capture.get_frames_available()):
 		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
 	check(steps >= 3 and peak > 0.001 and peak < 0.9,
-		"Walking contacts send MD2 grass steps to the mixer with headroom")
+		"Movement contacts send MD2 grass steps to the mixer with headroom")
 	Input.action_press("jump")
 	for i in 10:
 		await physics_frame
