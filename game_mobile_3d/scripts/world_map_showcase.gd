@@ -113,6 +113,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
 	&"night_depth_scatter": ["Ánh xanh trong sương xa", 1.],
+	&"dawn_mist_source": ["Ánh sáng sương rạng sáng", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"sculk_surface": ["Sculk phát sáng", 1.],
@@ -137,7 +138,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 61
+const LIGHTING_MIX_VERSION := 62
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -606,7 +607,7 @@ func _update_mist()->void:
 	var linear:=Vector3(color.r,color.g,color.b)
 	if captured_scatter:linear=air_light.scatter_color(linear,hour)
 	var sample:=_mist_sample.duplicate()
-	var measured:Dictionary=phase_air.sample(reference_hour()) if measured_atmosphere else {}
+	var measured := _sample_mist_phase()
 	if not measured.is_empty():
 		# Source chromaticity in linear space; retain the approved incident-light energy.
 		var source:Vector3=measured.linear_scatter
@@ -647,6 +648,21 @@ func _update_mist()->void:
 
 func set_captured_mist_source(value:bool)->void:
 	captured_mist_source=value;_update_mist()
+
+func _sample_mist_phase() -> Dictionary:
+	if not measured_atmosphere:
+		return {}
+	var reference := reference_hour()
+	var measured: Dictionary = phase_air.sample(reference)
+	var strength := _lighting_scale(&"dawn_mist_source")
+	if measured.is_empty() or not captured_mist_source or atmosphere_review != "combined" \
+			or strength <= 0. or hour >= 4.5 or hour <= reference:
+		return measured
+	var dawn: Dictionary = phase_air.sample(hour)
+	# Advance the light source while retaining the existing optical profile.
+	var pinned: Vector3 = measured.linear_scatter
+	measured.linear_scatter = pinned.lerp(dawn.linear_scatter, strength)
+	return measured
 
 func _apply_mist_source(sample:Dictionary,measured:Dictionary,linear:Vector3)->void:
 	# Relative source coefficients only. Clock, extinction and spatial transport
@@ -911,7 +927,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 1.
 	if effect == &"world_outline_strength":
 		return 0.
-	if effect in [&"dawn_sky_transition", &"grass_night_albedo"]:
+	if effect in [&"dawn_sky_transition", &"grass_night_albedo", &"dawn_mist_source"]:
 		return 0.
 	if effect in [&"sculk_surface", &"forest_path_placement", &"forest_path_air_beam", &"night_depth_scatter", &"night_stone_top_cool"]:
 		return 0.
@@ -1285,6 +1301,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 61 and effect == &"grass_night_albedo":
 			missing_value = 0.
+		if version < 62 and effect == &"dawn_mist_source":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1324,6 +1342,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"dawn_sky_transition":
 			slider.editable = slider.editable and sky_response.available()
+		if effect == &"dawn_mist_source":
+			slider.editable = slider.editable and not phase_air.anchors.is_empty()
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
 		if effect == &"forest_path_placement":
@@ -1419,7 +1439,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"dawn_mist_source"]:
 		_update_mist()
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
@@ -1851,6 +1871,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"dawn_sky_transition":
 			slider.editable = sky_response.available()
 			slider.tooltip_text = "Thử 35% lúc 02:30 để ánh sáng hắt chuyển dần sang rạng sáng. 0% dùng cấu hình gốc."
+		if effect == &"dawn_mist_source":
+			slider.editable = not phase_air.anchors.is_empty()
+			slider.tooltip_text = "Thử 65% lúc 02:30 để xem ánh sáng trong lớp sương xa. 0% dùng cấu hình gốc."
 		if effect == &"daylight_balance":
 			slider.tooltip_text = "Reduce the blue cast of daytime shadows in Combined mode. 0% restores the previous balance. Noon and night keep their own look."
 		if effect == &"player_sky":
