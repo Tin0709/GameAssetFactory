@@ -207,7 +207,7 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	var impulse := Vector2(cos(angle), sin(angle)) * float(strike.strength) * IMPULSE_PER_STRENGTH
 	if clip != "AirAttack":
 		_hit_targets[zombie.get_instance_id()] = true
-	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger))
+	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger), float(strike.strength))
 	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
 
 func _blade_contact(a: Vector3, b: Vector3, low: Vector3, high: Vector3, reach: float) -> Vector3:

@@ -16,10 +16,18 @@ const MAX_POISE := 28.0
 const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
 const DEFAULT_DEATH_IMPULSE := Vector2(285.0, 190.0)
-const DEATH_TRAVEL_SCALE := 1.35
-const DEATH_LIFT_IMPULSE := 193.0
-const DEATH_LIFT_SCALE := 0.25
-const DEATH_PITCH_SPEED := 5.6
+# DT_MobDefinition.DefaultHostile -> GA_Ragdoll (HandleFinalDeath).
+# Zombie inherits this row through MeleeAttackMob. The runtime solver formula
+# is unavailable; Godot's speed, spin, and tier response are local calibration.
+const DEATH_SOURCE_SPEED := 800.0
+const DEATH_LAUNCH_ANGLE := 30.0
+const DEATH_SOURCE_ANGULAR_SCALE := 40.0
+const DEATH_TWIRL_CHANCE := 0.33
+const DEATH_STRENGTH_THRESHOLDS := [400.0, 750.0, 1200.0]
+const DEATH_ADDITIONAL_MULTIPLIERS := [0.5, 1.0, 1.5]
+const DEATH_SPEED_TO_LAB := 0.0064
+const DEATH_TIER_INFLUENCE := 0.5
+const DEATH_ANGULAR_TO_LAB := 0.14
 const DEATH_GRAVITY := 15.0
 const HEIGHT := 1.95
 const HIT_RADIUS := 0.48
@@ -28,7 +36,7 @@ const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
 # Honeycomb Farm footage: the silhouette breaks up quickly, then a few
 # remnants linger. The thresholds map that timing onto this shader's noise.
-const CORPSE_LIFETIME := 4.93
+const CORPSE_LIFETIME := 5.0
 const CORPSE_DISSOLVE_DURATION := 0.48
 const CORPSE_DISSOLVE_KEYS := [
 	Vector2(0.0, 0.0), Vector2(0.067, 0.25), Vector2(0.117, 0.45),
@@ -64,7 +72,8 @@ var _mesh: MeshInstance3D
 var _walk_clip: StringName
 var _knockback := Vector3.ZERO
 var _death_direction := Vector3.ZERO
-var _death_impulse := DEFAULT_DEATH_IMPULSE
+var _death_strength := 500.0
+var _death_rng := RandomNumberGenerator.new()
 var _poise := MAX_POISE
 var _poise_recovery_wait := 0.0
 var _attack_cooldown := 0.0
@@ -77,6 +86,7 @@ static var _corpse_material: ShaderMaterial
 
 func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D], serial: int) -> void:
 	target = player
+	_death_rng.seed = hash(Vector2i(serial, 1709))
 	_walk_clip = WALK_CLIPS[serial % WALK_CLIPS.size()]
 	add_child(model)
 	animation = model.get_node("AnimationPlayer")
@@ -170,7 +180,7 @@ func _play_loop(clip: StringName) -> void:
 	if animation.current_animation != clip:
 		animation.play(clip, 0.13)
 
-func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE, stagger: float = MAX_POISE) -> void:
+func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE, stagger: float = MAX_POISE, knockback_strength: float = 500.0) -> void:
 	if health <= 0 or amount <= 0:
 		return
 	health = maxi(0, health - amount)
@@ -182,7 +192,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 	_flash_left = HIT_FLASH_DURATION
 	if health <= 0:
 		_death_direction = direction
-		_death_impulse = launch_impulse
+		_death_strength = knockback_strength
 		animation.pause()
 		set_deferred("collision_layer", 0)
 		set_deferred("collision_mask", 0)
@@ -201,17 +211,19 @@ func _update_death(delta: float) -> void:
 		if ragdoll.sample_count < 2:
 			ragdoll.sample(delta)
 			return
+		var mass := 0.0
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			body.collision_layer = 2
 			body.collision_mask = 1
+			mass += body.mass
 		var launch := _death_profile.duplicate() as DeathProfile
-		# The lethal hit has a separate lift and turnover. Normal stagger still
-		# uses the strike's original impulse and stays on the ground.
-		launch.linear_impulse = _death_impulse.x * DEATH_TRAVEL_SCALE
-		launch.upward_impulse = DEATH_LIFT_IMPULSE + _death_impulse.y * DEATH_LIFT_SCALE
+		var angle := deg_to_rad(DEATH_LAUNCH_ANGLE)
+		var launch_impulse := _death_launch_speed(_death_strength) * mass
+		launch.linear_impulse = cos(angle) * launch_impulse
+		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
 		if ragdoll.begin(launch, direction, "Chest", 0.0, DEATH_GRAVITY):
-			_apply_death_tumble(Vector3.UP.cross(direction) * DEATH_PITCH_SPEED)
+			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	if not _corpse_landed and ragdoll.contact_motion().core_contacts > 0:
 		_corpse_landed = true
@@ -226,12 +238,25 @@ func _update_death(delta: float) -> void:
 	elif _corpse_age >= CORPSE_DESATURATION_START:
 		_update_corpse_material(remaining)
 
-func _apply_death_tumble(spin: Vector3) -> void:
+static func _death_launch_speed(strength: float) -> float:
+	var extra := 0.0
+	for tier in DEATH_STRENGTH_THRESHOLDS.size():
+		if strength < DEATH_STRENGTH_THRESHOLDS[tier]:
+			break
+		extra = DEATH_ADDITIONAL_MULTIPLIERS[tier]
+	return DEATH_SOURCE_SPEED * DEATH_SPEED_TO_LAB * (1.0 + extra * DEATH_TIER_INFLUENCE)
+
+func _death_spin(direction: Vector3) -> Vector3:
+	var speed := DEATH_SOURCE_ANGULAR_SCALE * DEATH_ANGULAR_TO_LAB
+	var spin := Vector3.UP.cross(direction) * speed
+	if _death_rng.randf() < DEATH_TWIRL_CHANCE:
+		spin.y = speed * (0.45 if _death_rng.randf() < 0.5 else -0.45)
+	return spin
+
+func _apply_death_tumble(spin: Vector3, mass: float) -> void:
 	var centre := Vector3.ZERO
-	var mass := 0.0
 	for body: PhysicalBone3D in ragdoll.bodies.values():
 		centre += body.global_position * body.mass
-		mass += body.mass
 	centre /= mass
 	# Start a shared rotation about the mass centre. Its tangential impulses
 	# sum to zero, so this does not add another push along the strike.
