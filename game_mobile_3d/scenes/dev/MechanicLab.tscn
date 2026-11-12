@@ -48,6 +48,8 @@ shape = SubResource("ground_collision")
 [node name="Zombies" type="Node3D" parent="."]
 script = ExtResource("zombies")
 
+[node name="CombatEffects" type="Node3D" parent="."]
+
 [node name="Camera3D" type="Camera3D" parent="."]
 position = Vector3(12, 15, 16)
 projection = 1

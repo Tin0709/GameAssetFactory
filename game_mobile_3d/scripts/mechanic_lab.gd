@@ -52,6 +52,7 @@ func _ready() -> void:
 	$HUD/Controls.text += " · Cuộn chuột để zoom"
 	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
 	if not $HUD/SpawnZombie.disabled:
+		player.collision_mask |= 4
 		player.connect("impact_ready", $Zombies.on_sabre_impact)
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
@@ -105,7 +106,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _spawn_zombie() -> void:
 	var facing := Basis(Vector3.UP, player.visual.rotation.y)
-	if $Zombies.spawn(player.global_position, facing):
+	if $Zombies.spawn(player, facing, $CombatEffects):
 		$HUD/SpawnStatus.text = ""
 	else:
 		$HUD/SpawnStatus.text = "Không thể tạo zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
