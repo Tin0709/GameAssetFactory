@@ -253,6 +253,7 @@ func setup(world:Node3D)->void:
 	add_child(player_contact)
 	player_contact.setup(level)
 	_build_ui()
+	set_source_terrain(true)
 	_refresh_lantern_glow()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
 	level.get_node("HUD/Help").text="GRAPHICS COMPARISON\nF8 Day finish · F11 directional fill · Shift+F11 actor canopy fill\nF7 local exposure · Shift+F1 ground bounce · F1 soft shadows\nF2 canopy contact · Shift+F2 root soil · F3 direct cloud shading\nF9 leaf edges · Shift+F9 MSAA · F10 pose interpolation\nF12 optional terrain cache · G grass/flowers · L wind/interaction options\nH fog · N terrain wind · Shift+N passage · Alt+N crown wind"
@@ -1611,9 +1612,9 @@ func _build_ui()->void:
 		box.add_child(shadows)
 	var terrain_atlas := CheckButton.new()
 	_source_terrain_toggle = terrain_atlas
-	terrain_atlas.text = "Terrain · MD2 atlas (preview)"
+	terrain_atlas.text = "Terrain · MD2 atlas"
 	terrain_atlas.focus_mode = Control.FOCUS_NONE
-	terrain_atlas.tooltip_text = "Compare the original MD2 surface tiles on the current WorldMap. B shows the original graphics."
+	terrain_atlas.tooltip_text = "Use MD2 surface tiles from the private research workspace. Turn this off to compare the previous tiles. B compares the full original graphics."
 	terrain_atlas.toggled.connect(set_source_terrain)
 	box.add_child(terrain_atlas)
 	var gentle:=CheckButton.new();gentle.name="GentleNoon";gentle.text="Light · gentle midday sunlight";gentle.button_pressed=gentle_noon;gentle.focus_mode=Control.FOCUS_NONE;box.add_child(gentle)
