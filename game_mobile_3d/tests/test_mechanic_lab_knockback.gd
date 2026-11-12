@@ -125,7 +125,7 @@ func check_sword_finisher_push(lab, group) -> void:
 			await physics_frame
 			var displacement: Vector3 = zombie.global_position - hit.origin
 			travel = maxf(travel, displacement.dot(hit.direction))
-			if zombie._knockback.is_zero_approx():
+			if zombie._knockback == Vector3.ZERO:
 				stop_time = float(Engine.get_physics_frames() - hit.frame) / Engine.physics_ticks_per_second
 				remaining_lock = zombie._knockback_control_left
 				break

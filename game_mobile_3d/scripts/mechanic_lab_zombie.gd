@@ -291,7 +291,7 @@ func _integrate_knockback(delta: float) -> Vector3:
 	var direction := _knockback / speed
 	var moving_time := minf(delta, speed / _knockback_deceleration)
 	var end_speed := maxf(0.0, speed - _knockback_deceleration * moving_time)
-	_knockback = direction * end_speed
+	_knockback = Vector3.ZERO if is_zero_approx(end_speed) else direction * end_speed
 	# move_and_slide uses a step velocity. Integrate the falling speed through
 	# the moving part of the step so the push distance is independent of tick rate.
 	return direction * ((speed + end_speed) * 0.5 * moving_time / delta)
