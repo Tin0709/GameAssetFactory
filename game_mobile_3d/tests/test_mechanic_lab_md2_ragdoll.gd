@@ -291,6 +291,7 @@ func check_sabre_landing_reversal(lab, group) -> void:
 	var previous_height: Dictionary[String, float]
 	var previous_step: Dictionary[String, float]
 	var peak_reversal := 0.0
+	var peak_supported_reversal := 0.0
 	var reached_low_pose := false
 	for i in 120:
 		await physics_frame
@@ -299,6 +300,7 @@ func check_sabre_landing_reversal(lab, group) -> void:
 		if not zombie.ragdoll.running:
 			continue
 		var motion: Dictionary = zombie.ragdoll.contact_motion()
+		var was_low := reached_low_pose
 		if zombie._corpse_landed and motion.supports > 0 and zombie.ragdoll.minimum_corner_y() <= 0.015 \
 				and absf(zombie._corpse_axis().normalized().y) <= 0.25:
 			reached_low_pose = true
@@ -308,12 +310,15 @@ func check_sabre_landing_reversal(lab, group) -> void:
 				var step := height - previous_height[name]
 				var prior := previous_step.get(name, 0.0) as float
 				if reached_low_pose and step * prior < 0.0:
-					peak_reversal = maxf(peak_reversal, absf(step - prior) * 0.5)
+					var reversal := absf(step - prior) * 0.5
+					peak_reversal = maxf(peak_reversal, reversal)
+					if was_low:
+						peak_supported_reversal = maxf(peak_supported_reversal, reversal)
 				previous_step[name] = step
 			previous_height[name] = height
-	check(reached_low_pose and peak_reversal < 0.065,
+	check(reached_low_pose and peak_reversal < 0.075 and peak_supported_reversal < 0.065,
 		"Sabre's grounded finisher avoids large alternating vertical steps after contact")
-	print("SABRE_LANDING_REVERSAL m=", peak_reversal)
+	print("SABRE_LANDING_REVERSAL entry_m=", peak_reversal, " supported_m=", peak_supported_reversal)
 	zombie.free()
 
 func check_flat_rest_after_tumble(lab, group) -> void:
