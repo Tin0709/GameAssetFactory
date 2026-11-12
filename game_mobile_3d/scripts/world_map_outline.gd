@@ -50,8 +50,8 @@ bool is_wall(ivec2 first, ivec2 second, float height, float tolerance) {
 }
 
 bool is_terrain(float depth, vec2 uv) {
-	vec2 clip_xy = (uv * 2.0 - 1.0) * vec2(1.0, -1.0);
-	vec4 point = world_from_clip * vec4(clip_xy, 1.0 - 2.0 * depth, 1.0);
+	// RenderSceneData supplies the renderer's Y-flipped, reverse-Z projection.
+	vec4 point = world_from_clip * vec4(uv * 2.0 - 1.0, depth, 1.0);
 	vec3 world = point.xyz / point.w;
 	vec2 grid = world.xz - terrain_origin.xy;
 	ivec2 cell = ivec2(floor(grid));
