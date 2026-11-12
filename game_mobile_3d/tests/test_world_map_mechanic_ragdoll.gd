@@ -179,6 +179,31 @@ func shape_overlap(world: Node3D, shape: Shape3D, pose: Transform3D) -> float:
 		depth = maxf(depth, points[i].distance_to(points[i + 1]))
 	return depth
 
+func cliff_edge_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
+	group._spawn_serial = 10
+	var direction := Vector3.FORWARD.rotated(Vector3.UP, -0.18)
+	var zombie = await launch(world, group, effects, Vector3(-37.39, 3.0, -33.5), direction,
+		Zombie.DeathStrike.AIR, -0.08)
+	if zombie == null:
+		return
+	var peak_overlap := 0.0
+	var peak_anchor := 0.0
+	for frame in 120:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+		if not zombie.ragdoll.running:
+			continue
+		peak_overlap = maxf(peak_overlap, terrain_contact_depth(zombie))
+		peak_anchor = maxf(peak_anchor, zombie.ragdoll.max_anchor_error())
+	check(zombie._corpse_landed and peak_anchor < 0.12,
+		"The cliff-edge strike reaches ground with the source limb anchors connected")
+	check(peak_overlap > 0.0 and peak_overlap < 0.12,
+		"The fast head strike stays within the contact depth budget at a cliff edge")
+	print("WORLDMAP_CLIFF_EDGE peak_overlap_m=", peak_overlap, " peak_anchor_m=", peak_anchor)
+	zombie.free()
+	await ticks(2)
+
 func braced_cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	group._spawn_serial = 8
 	var direction := Vector3.FORWARD.rotated(Vector3.UP, 0.17)
@@ -293,6 +318,7 @@ func run() -> void:
 		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND, 200,
 			Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT.rotated(Vector3.UP, 0.055), 0.16)
 		await oblique_cliff_case(world, group, effects)
+		await cliff_edge_case(world, group, effects)
 		await near_wall_handoff(world, group, effects)
 		await braced_cliff_case(world, group, effects)
 	world.free()
