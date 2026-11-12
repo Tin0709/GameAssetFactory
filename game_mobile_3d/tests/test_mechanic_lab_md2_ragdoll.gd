@@ -338,7 +338,8 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 		mean_height /= zombie.ragdoll.bodies.size()
 		if previous_mean_height < INF:
 			var mean_step := mean_height - previous_mean_height
-			if zombie._corpse_age - first_contact <= 0.55 and first_contact < INF +					and mean_step * previous_mean_step < 0.0:
+			var since_contact: float = zombie._corpse_age - first_contact
+			if first_contact < INF and since_contact <= 0.55 and mean_step * previous_mean_step < 0.0:
 				var reversal := absf(mean_step - previous_mean_step) * 0.5
 				peak_whole_body_reversal = maxf(peak_whole_body_reversal, reversal)
 				if reversal > 0.02:
