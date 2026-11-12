@@ -63,7 +63,7 @@ func _ready() -> void:
 	if not player_ready:
 		$HUD/Controls.text = "Thiếu dữ liệu player của gameplay chính. Kiểm tra MD2_RESEARCH_ROOT."
 	elif using_private:
-		$HUD/Controls.text = "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E dùng Sabre · R về giữa"
+		$HUD/Controls.text = "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E chém hoặc bổ trên không · R về giữa"
 	else:
 		$HUD/Controls.text = "WASD di chuyển · Shift chạy · Space nhảy · R về giữa"
 	$HUD/Controls.text += " · Cuộn chuột để zoom"
