@@ -104,11 +104,12 @@ func run() -> void:
 		actor.requested_jump = false
 		check(await wait_clip(actor, "JumpLanding", hz) and actor.is_on_floor(),
 			"Running jump enters source landing on contact" + label)
-		for i in ceili(0.07 * hz):
-			await tick()
-		compare_source(actor, oracle, "JumpLanding", "Moving landing" + label)
+		var contact_clock: float = actor.simulation_clock
 		check(actor.current_speed > 1.0, "Landing animation allows horizontal movement" + label)
 		check(await wait_clip(actor, "Run", hz), "Landing resumes Run" + label)
+		var resume_seconds: float = actor.simulation_clock - contact_clock
+		check(resume_seconds <= 0.05 + 1.0 / hz + 0.00001,
+			"Running landing hands back promptly%s (%.3f s)" % [label, resume_seconds])
 	check(oracle.get("native_jump_pose_enabled") != true, "Shared actor defaults to the existing hybrid jump")
 	print("MECHANIC_LAB_MD2_JUMP ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
