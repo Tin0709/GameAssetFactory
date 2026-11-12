@@ -79,6 +79,7 @@ var _combat_path:=0.
 var _combat_locked_seconds:=0.
 var _combat_was_moving:=false
 var native_gait_enabled:=true
+var weapon_source_locomotion := false
 var cadence_label:=""
 var current_speed:=0.
 var walk_speed:=2.16
@@ -351,26 +352,34 @@ func _load_private_combat_clips(config:Variant, library_name:StringName=&"privat
 		if not name is String or name not in ["J_L_Leg","J_R_Leg"] or skeleton.find_bone(name)<0:return
 	var seconds:Variant=config.get("blend_seconds")
 	if not (seconds is float or seconds is int) or not is_finite(float(seconds)) or float(seconds)<=0.:return
+	if _load_private_clip_library(config.additional_clips,library_name,config) and library_name==&"private_combat":
+		supplemental_combat_clips=config.additional_clips.size()
+
+func _load_private_clip_library(entries:Array, library_name:StringName, combat_config:Variant=null)->bool:
+	if entries.is_empty() or entries.size()>8 or animation_player.has_animation_library(library_name):return false
 	var staged:Dictionary={};var candidate:Dictionary=clips.duplicate(true)
 	var research:=private_model_path().get_base_dir().get_base_dir().get_base_dir().replace("\\","/").simplify_path().trim_suffix("/").to_lower()+"/"
-	for value:Variant in config.additional_clips:
-		if not value is Dictionary:return
+	for value:Variant in entries:
+		if not value is Dictionary:return false
 		for key:String in ["path","semantic","sha256","source_name"]:
-			if not value.get(key) is String or String(value[key]).is_empty():return
-		if clips.has(value.semantic) or staged.has(value.semantic) or not String(value.semantic).begins_with("Native"):return
+			if not value.get(key) is String or String(value[key]).is_empty():return false
+		if clips.has(value.semantic) or staged.has(value.semantic) or not String(value.semantic).begins_with("Native"):return false
 		var duration:Variant=value.get("duration")
-		if not (duration is float or duration is int) or not is_finite(float(duration)) or float(duration)<=0. or float(duration)>60.:return
-		if not value.get("loop") is bool or value.loop or value.get("category") not in ["attack","recovery"]:return
-		if not value.get("vfx_window") is Array or value.vfx_window.size()!=2:return
-		for point:Variant in value.vfx_window:
-			if not (point is float or point is int) or not is_finite(float(point)) or float(point)<0.:return
-		if float(value.vfx_window[1])<float(value.vfx_window[0]):return
-		if value.category=="attack" and float(value.vfx_window[1])>float(duration):return
+		if not (duration is float or duration is int) or not is_finite(float(duration)) or float(duration)<=0. or float(duration)>60.:return false
+		if not value.get("loop") is bool:return false
+		if combat_config!=null:
+			if value.loop or value.get("category") not in ["attack","recovery"]:return false
+			if not value.get("vfx_window") is Array or value.vfx_window.size()!=2:return false
+			for point:Variant in value.vfx_window:
+				if not (point is float or point is int) or not is_finite(float(point)) or float(point)<0.:return false
+			if float(value.vfx_window[1])<float(value.vfx_window[0]):return false
+			if value.category=="attack" and float(value.vfx_window[1])>float(duration):return false
+		elif value.get("category") not in ["idle","locomotion","jump","inspection"]:return false
 		var path:String=value.path
-		if not path.is_absolute_path() or not path.replace("\\","/").simplify_path().to_lower().begins_with(research) or not path.ends_with(".glb"):return
-		if FileAccess.get_sha256(path)!=value.sha256:return
+		if not path.is_absolute_path() or not path.replace("\\","/").simplify_path().to_lower().begins_with(research) or not path.ends_with(".glb"):return false
+		if FileAccess.get_sha256(path)!=value.sha256:return false
 		var imported:=load_private_model(path)
-		if imported==null:return
+		if imported==null:return false
 		var player:AnimationPlayer;var rig:Skeleton3D
 		for node:Node in imported.find_children("*","",true,false):
 			if node is AnimationPlayer:player=node
@@ -394,15 +403,15 @@ func _load_private_combat_clips(config:Variant, library_name:StringName=&"privat
 					var entry:Dictionary=value.duplicate(true);entry.action=String(library_name)+"/"+value.semantic;entry.source_file=path;entry.source_alias_adapter=false
 					candidate[value.semantic]=entry;staged[value.semantic]=copied
 		imported.free()
-		if not valid:return
-	var validator=Combo.new();validator.setup(candidate)
-	if not validator.configure_native(config):return
+		if not valid:return false
+	if combat_config!=null:
+		var validator=Combo.new();validator.setup(candidate)
+		if not validator.configure_native(combat_config):return false
 	var library:=AnimationLibrary.new()
 	for key:String in staged:library.add_animation(key,staged[key])
-	if animation_player.has_animation_library(library_name):return
-	animation_player.add_animation_library(library_name,library)
+	if animation_player.add_animation_library(library_name,library)!=OK:return false
 	for key:String in staged:clips[key]=candidate[key]
-	if library_name==&"private_combat":supplemental_combat_clips=staged.size()
+	return true
 
 func _physics_process(delta:float)->void:
 	_apply_jump_settings()
@@ -472,7 +481,7 @@ func _physics_process(delta:float)->void:
 	velocity=Vector3(planar.x,ground_vertical if was_grounded else velocity.y-gravity*gravity_factor*delta,planar.y)
 	if accepted_jump:
 		combo.cancel();velocity.y=sqrt(2.*gravity*jump_height)-(gravity*delta*.5 if using_original_source else 0.);_jump_stage="JumpTakeoff";_jump_time=0.
-		if novelty_jump!=null:novelty_jump.launch(simulation_clock)
+		if novelty_jump!=null and not weapon_source_locomotion:novelty_jump.launch(simulation_clock)
 		_heavy_slam_active=false
 		_time_since_grounded=INF # Consume the coyote opportunity; no second air jump.
 	if measured_air_step:velocity.y=measured_end_velocity+gravity*gravity_factor*delta*.5
@@ -499,7 +508,7 @@ func _physics_process(delta:float)->void:
 	if using_original_source and not _grounded and _jump_stage=="JumpTakeoff" and velocity.y<=0.:
 		_jump_stage="JumpAirborne";_jump_time=0.
 	if _grounded and not was_grounded and _floor_initialized:
-		if novelty_jump!=null:novelty_jump.contact(simulation_clock+delta)
+		if novelty_jump!=null and not weapon_source_locomotion:novelty_jump.contact(simulation_clock+delta)
 		if _jump_stage!="JumpLanding":_jump_stage="JumpLanding";_jump_time=0.
 	elif not _grounded and (_jump_stage.is_empty() or (_uses_native_jump_pose(_jump_stage) and _jump_stage=="JumpLanding")):
 		_jump_stage="JumpAirborne";_jump_time=0.
@@ -629,7 +638,7 @@ func _animate(delta:float)->void:
 		_transition_time+=delta
 		if not _transition.is_empty() and _transition_time>=float(clips[_transition].duration):_transition=""
 	if body_stability!=null:
-		if body_stability_enabled and review_clip.is_empty() and _grounded and not combo.active() and (hybrid_motion==null or not hybrid_motion.owns_pose) and (selected in GAITS or selected in ["Idle","CombatReady"]):body_stability.apply(selected,delta,selected in GAITS)
+		if body_stability_enabled and not weapon_source_locomotion and review_clip.is_empty() and _grounded and not combo.active() and (hybrid_motion==null or not hybrid_motion.owns_pose) and (selected in GAITS or selected in ["Idle","CombatReady"]):body_stability.apply(selected,delta,selected in GAITS)
 		else:body_stability.deactivate()
 	if direction_adapter!=null:
 		var settling:bool=selected in ["Idle","CombatReady"] and absf(direction_adapter.current_yaw)>.0001
