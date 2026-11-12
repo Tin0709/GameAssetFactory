@@ -68,9 +68,17 @@ func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 		"The lab starts with the combat mix muted")
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var muted_damage := await next_zombie_hit(lab)
-	check(muted_damage == 6 and audio._next_choice.get(&"player_hurt", 0) == 0,
-		"Zombie damage while muted schedules no hurt sample")
+	check(muted_damage == 6 and audio._next_choice.get(&"player_hurt", 0) == 0
+		and audio._next_choice.get(&"zombie_windup", 0) == 0 and audio._next_choice.get(&"zombie_hit", 0) == 0,
+		"Zombie attacks while muted schedule no combat samples")
 	toggle.button_pressed = true
+	var before_windup: int = lab.player_health
+	for i in 180:
+		if audio._next_choice.get(&"zombie_windup", 0) == 1 or lab.player_health < before_windup:
+			break
+		await physics_frame
+	check(audio._next_choice.get(&"zombie_windup", 0) == 1 and lab.player_health == before_windup,
+		"The zombie telegraph plays before damage")
 	var local_voice := audio.get_node_or_null("PlayerHurt") as AudioStreamPlayer
 	check(local_voice != null and audio._groups.get(&"player_hurt", []).size() == 3,
 		"Three pinned MD2 player-hurt files decode into a local stereo voice")
@@ -81,12 +89,23 @@ func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 		check(heard_damage == 6 and local_voice.stream in audio._groups[&"player_hurt"]
 			and audio._next_choice.get(&"player_hurt", 0) == 1,
 			"Confirmed zombie contact starts the player-hurt voice in the same physics tick")
+		check(audio._next_choice.get(&"zombie_hit", 0) == 1, "A confirmed strike also plays the zombie's contact cue")
 		await create_timer(0.16).timeout
 		var peak := 0.0
 		for frame in capture.get_buffer(capture.get_frames_available()):
 			peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
 		check(peak > 0.005 and peak < 0.5, "The local hurt cue reaches the mixer with headroom (peak %.4f)" % peak)
 		print("MECHANIC_LAB_PLAYER_HURT_PEAK ", peak)
+		for i in 180:
+			if audio._next_choice.get(&"zombie_windup", 0) == 2:
+				break
+			await physics_frame
+		var before_miss: int = lab.player_health
+		lab.player.global_position += Vector3.RIGHT * 8.0
+		await create_timer(0.5).timeout
+		check(audio._next_choice.get(&"zombie_windup", 0) == 2
+			and audio._next_choice.get(&"zombie_hit", 0) == 1 and lab.player_health == before_miss,
+			"A windup plays once when the player leaves reach, without a contact cue")
 		lab._on_player_hit(lab.player_health)
 		check(lab.player_health == 0 and local_voice.playing, "The final hit plays through the defeat transition")
 		toggle.button_pressed = false
@@ -104,7 +123,8 @@ func run() -> void:
 	AudioServer.set_bus_mute(0, true)
 	audio.set_enabled(true, Vector3.ZERO)
 	check(not AudioServer.is_bus_mute(0), "Audio toggle enables playback")
-	var expected := {&"hit": 5, &"hurt": 3, &"death": 3, &"slam": 3, &"slam_grass": 6}
+	var expected := {&"hit": 5, &"hurt": 3, &"death": 3, &"slam": 3, &"slam_grass": 6,
+		&"zombie_windup": 4, &"zombie_hit": 4}
 	for group in expected:
 		check(audio._groups.get(group, []).size() == expected[group],
 			"All pinned MD2 variants decode for " + str(group))
