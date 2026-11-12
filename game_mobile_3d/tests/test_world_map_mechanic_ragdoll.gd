@@ -167,6 +167,10 @@ func run() -> void:
 		group._spawn_serial = 2
 		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER, 190,
 			Vector3(-33.5, 9.0, -39.15), Vector3.RIGHT.rotated(Vector3.UP, -0.10))
+		# A different airborne tumble catches the left arm after the head hits the lower terrace.
+		group._spawn_serial = 7
+		await ledge_case(world, group, effects, Zombie.DeathStrike.AIR, 190,
+			Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT.rotated(Vector3.UP, 0.10))
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
