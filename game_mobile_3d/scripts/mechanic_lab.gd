@@ -10,11 +10,13 @@ const WORLD_MAP_NOON_EXPOSURE := 0.12
 const MIN_CAMERA_SIZE := 4.5
 const MAX_CAMERA_SIZE := 30.0
 const ZOOM_STEP := 1.15
+const SABRE_TAP_BUFFER := 0.16
 
 var presentation: Node
 var _exposure: CompositorEffect
 var _previous_msaa: Viewport.MSAA
 var _previous_hdr: bool
+var _contact_kick := 0.0
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
 
@@ -53,7 +55,10 @@ func _ready() -> void:
 	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
 	if not $HUD/SpawnZombie.disabled:
 		player.collision_mask |= 4
-		player.connect("impact_ready", $Zombies.on_sabre_impact)
+		player.combo.native_tap_buffer_seconds = SABRE_TAP_BUFFER
+		$Zombies.setup_combat(player.clips, player.combo.native_windows)
+		player.connect("attack_pose_sample", $Zombies.sample_sabre)
+		$Zombies.sabre_contact.connect(_on_sabre_contact)
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
 func _apply_daylight_render_settings() -> void:
@@ -83,9 +88,14 @@ func _exit_tree() -> void:
 	viewport.msaa_3d = _previous_msaa
 	viewport.use_hdr_2d = _previous_hdr
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	var focus: Vector3 = presentation.player_position()
-	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
+	_contact_kick = move_toward(_contact_kick, 0.0, delta * 0.8)
+	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z) + camera.basis.y * _contact_kick
+
+func _on_sabre_contact(point: Vector3, direction: Vector3) -> void:
+	_contact_kick = 0.055
+	player.effects.contact(point, direction)
 
 func _physics_process(_delta: float) -> void:
 	if player.position.y < -5.0:
@@ -112,6 +122,7 @@ func _spawn_zombie() -> void:
 		$HUD/SpawnStatus.text = "Không thể tạo zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
 
 func reset_player() -> void:
+	_contact_kick = 0.0
 	player.position = SPAWN
 	player.velocity = Vector3.ZERO
 	if player.has_method("cancel_jump"):

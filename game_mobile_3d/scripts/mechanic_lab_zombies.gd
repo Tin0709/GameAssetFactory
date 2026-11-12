@@ -1,6 +1,8 @@
 extends Node3D
 ## Spawn and hit routing for private MD2 zombies in MechanicLab.
 
+signal sabre_contact(point: Vector3, direction: Vector3)
+
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const SOURCE_DIR := "extracted/2026-10-25 19-26-25/Game/Spicewood"
@@ -20,10 +22,27 @@ const DIGIT_HASH := "7fa2e2801d368ee8f1a61c81bf736c60a250f42bd343ed97b71ceb9000e
 const FLOOR_LIMIT := 49.0
 const SPACING := 1.25
 const SABRE_DAMAGE := [20, 20, 28]
+const BLADE_RADIUS := 0.14
 
 var _visual: PackedScene
 var _digits: Array[Texture2D]
 var _spawn_serial := 0
+var _hit_windows: Dictionary[String, Vector2] = {}
+var _attack_serial := -1
+var _previous_base := Vector3.ZERO
+var _previous_tip := Vector3.ZERO
+var _hit_targets: Dictionary[int, bool] = {}
+
+func setup_combat(clips: Dictionary, native_windows: Array) -> void:
+	for clip: String in clips:
+		var data: Dictionary = clips[clip]
+		if data.category == "attack" or clip == "AirAttack":
+			var trail: Array = data.vfx_window
+			_hit_windows[clip] = Vector2(float(trail[0]), float(trail[1]))
+	for native: Dictionary in native_windows:
+		var clip: String = native.get("attack_key", "Attack%d" % (int(native.index) + 1))
+		var trail: Array = native.get("trail_window", clips[clip].vfx_window)
+		_hit_windows[clip] = Vector2(minf(float(trail[0]), float(native.melee)), maxf(float(trail[1]), float(native.melee)))
 
 func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D) -> bool:
 	if _visual == null:
@@ -67,16 +86,39 @@ func _spawn_point_clear(point: Vector3, player_position: Vector3) -> bool:
 			return false
 	return true
 
-func on_sabre_impact(index: int, base: Vector3, tip: Vector3, _serial: int) -> void:
+func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, tip: Vector3, serial: int) -> void:
+	var window := _hit_windows.get(clip, Vector2(-1.0, -1.0))
+	if source_time < window.x or source_time > window.y:
+		return
+	if serial != _attack_serial:
+		_attack_serial = serial
+		_previous_base = base
+		_previous_tip = tip
+		_hit_targets.clear()
 	for zombie: Zombie in get_children():
-		if zombie.health <= 0 or zombie.is_queued_for_deletion():
+		var id := zombie.get_instance_id()
+		if zombie.health <= 0 or zombie.is_queued_for_deletion() or _hit_targets.has(id):
 			continue
 		var low := zombie.global_position + Vector3.UP * Zombie.HIT_RADIUS
 		var high := zombie.global_position + Vector3.UP * (Zombie.HEIGHT - Zombie.HIT_RADIUS)
-		var closest := Geometry3D.get_closest_points_between_segments(base, tip, low, high)
-		if closest[0].distance_squared_to(closest[1]) <= Zombie.HIT_RADIUS * Zombie.HIT_RADIUS:
+		var reach := Zombie.HIT_RADIUS + BLADE_RADIUS
+		# Check the current blade and both diagonals of the surface swept since the previous pose.
+		var contact := _blade_contact(base, tip, low, high, reach)
+		if not contact.is_finite():
+			contact = _blade_contact(_previous_base, tip, low, high, reach)
+		if not contact.is_finite():
+			contact = _blade_contact(base, _previous_tip, low, high, reach)
+		if contact.is_finite():
 			var direction := zombie.global_position - zombie.target.global_position
+			_hit_targets[id] = true
 			zombie.take_hit(SABRE_DAMAGE[clampi(index, 0, SABRE_DAMAGE.size() - 1)], direction)
+			sabre_contact.emit(contact, direction.normalized())
+	_previous_base = base
+	_previous_tip = tip
+
+func _blade_contact(a: Vector3, b: Vector3, low: Vector3, high: Vector3, reach: float) -> Vector3:
+	var closest := Geometry3D.get_closest_points_between_segments(a, b, low, high)
+	return closest[0] if closest[0].distance_squared_to(closest[1]) <= reach * reach else Vector3.INF
 
 func _load_assets() -> void:
 	if not OS.has_feature("editor"):

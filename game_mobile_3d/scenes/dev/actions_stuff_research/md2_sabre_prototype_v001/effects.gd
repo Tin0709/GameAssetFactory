@@ -59,6 +59,9 @@ func _burst(point:Vector3,direction:Vector3)->void:
 		particle.position=point;particle.velocity=direction.normalized()*_rng.randf_range(.2,.8)+Vector3(_rng.randf_range(-.7,.7),_rng.randf_range(.1,.7),_rng.randf_range(-.7,.7))
 		particle.duration=duration;particle.life=duration;particle.born=clock;particle.history.clear();added+=1
 		if added>=8:break
+func contact(point: Vector3, direction: Vector3) -> void:
+	if enabled:
+		_burst(point, direction)
 func samples_at(display_time:float,blade_base:Variant=null,blade_tip:Variant=null)->Array:
 	var result:Array=[]
 	for point:Dictionary in samples:
