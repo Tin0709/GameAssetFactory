@@ -5,6 +5,7 @@ extends CharacterBody3D
 signal attack_accepted(index:int,clip:String,serial:int)
 signal attack_accepted_timed(index:int,clip:String,serial:int,simulation_time:float)
 signal impact_ready(index:int,base:Vector3,tip:Vector3,serial:int)
+signal attack_pose_sample(index: int, clip: String, source_time: float, base: Vector3, tip: Vector3, serial: int)
 signal source_locomotion_event(notify:String,clip:String,source_seconds:float,simulation_seconds:float)
 signal physics_pose_ready
 signal presentation_reset
@@ -532,6 +533,10 @@ func _animate(delta:float)->void:
 	if direction_adapter!=null:direction_adapter.restore()
 	simulation_clock+=delta;expression_clock+=delta
 	var selected:=_select_clip()
+	var sample_attack := review_clip.is_empty() and combo.phase in [&"attack", &"air_attack"] and not attack_pose_sample.get_connections().is_empty()
+	var sampled_index: int = combo.index
+	var sampled_serial: int = combo.serial
+	var sampled_time: float = combo.time + delta * combo.playback_rate() if sample_attack else 0.0
 	_play(selected)
 	var motion_speed:float=_animation_motion_speed if _combat_plan_active else current_speed
 	var layered_combat:bool=combat_legs!=null and combo.native_enabled and review_clip.is_empty() and _grounded and combo.phase in [&"attack",&"recovery"]
@@ -603,6 +608,8 @@ func _animate(delta:float)->void:
 	if hybrid_motion!=null:hybrid_motion.keep_shoulders_attached()
 	_refresh_markers()
 	_apply_face(delta)
+	if sample_attack:
+		attack_pose_sample.emit(sampled_index, selected, sampled_time, marker_base.global_position, marker_tip.global_position, sampled_serial)
 	for event:Dictionary in combo.drain_events():
 		if event.kind=="accepted":
 			_record_order(&"attack_notice",{"accepted_index":event.index,"accepted_serial":event.serial,"source_simulation_time":simulation_clock-(combo.clock-float(event.at)),"clock_scope":"Signal delivery; source_simulation_time is the reconstructed acceptance clock."})

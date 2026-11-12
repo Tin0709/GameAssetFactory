@@ -22,6 +22,7 @@ var _events:Array[Dictionary]=[]
 var native_enabled:=false
 var native_windows:Array=[]
 var native_input_policy:="legacy_buffer"
+var native_tap_buffer_seconds := 0.0
 var native_event_hz:=0.
 var native_air_interrupt:=false
 var movement_evaluation_hz:=0.
@@ -91,7 +92,7 @@ func boundary_seconds()->float:
 		if _queued() and time<chain-.00000001:boundary=minf(boundary,chain-time)
 	return boundary/playback_rate()
 
-func _queued()->bool:return held or (native_input_policy!="live_hold" and buffer_until>=clock-.0000001)
+func _queued()->bool:return held or ((native_input_policy!="live_hold" or native_tap_buffer_seconds>0.0) and buffer_until>=clock-.0000001)
 
 func _resolve_native()->void:
 	if native_enabled and phase in [&"attack",&"recovery"] and _queued():
@@ -101,6 +102,7 @@ func movement_plan(delta:float)->Array[Dictionary]:
 	# Forecast with the SAME state machine. No real clock/input/event mutation.
 	var copy=get_script().new();copy.clips=clips;copy.native_windows=native_windows;copy.native_enabled=native_enabled;copy.native_input_policy=native_input_policy;copy.native_event_hz=native_event_hz;copy.native_air_interrupt=native_air_interrupt
 	copy.movement_evaluation_hz=movement_evaluation_hz;copy.movement_consumer_ticks=movement_consumer_ticks
+	copy.native_tap_buffer_seconds = native_tap_buffer_seconds
 	for key in ["phase","index","time","clock","held","buffer_until","buffer_seconds","attack_play_rates","air_attack_play_rate","movement_breaks_enabled","movement_requested","step_serial","step_next_index","step_buffered","serial","_impact_sent"]:copy.set(key,get(key))
 	var result:Array[Dictionary]=[];var left:=maxf(0.,delta)
 	while left>0.:
@@ -135,9 +137,9 @@ func request_attack(airborne:bool=false)->void:
 	if native_enabled and native_air_interrupt and airborne and phase in [&"attack",&"recovery"]:
 		_start_attack(0,true);return
 	if native_enabled and native_input_policy=="live_hold" and phase in [&"attack",&"recovery"]:
-		# Captured grounded presses are not stored across an active ability.
-		# Held input is sampled at RecoveryStart; a fresh later edge is immediate.
+		# Captured behavior remains the default. The lab can opt into storing one early tap.
 		if phase==&"recovery" or time>=chain_source_gate()-.00000001:_start_attack((index+1)%3)
+		elif native_tap_buffer_seconds > 0.0:buffer_until=clock+native_tap_buffer_seconds
 		return
 	if phase==&"step" and airborne:_start_attack(0,true)
 	elif phase==&"step":step_buffered=true
