@@ -304,6 +304,8 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 	var previous_mean_step := 0.0
 	var whole_body_reversals := 0
 	var peak_whole_body_reversal := 0.0
+	var previous_center_height := 0.0
+	var peak_supported_rise := 0.0
 	for i in 120:
 		await physics_frame
 		if zombie._corpse_parked:
@@ -322,8 +324,14 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 			peak_damping_step = maxf(peak_damping_step, damping - previous_damping)
 		previous_damping = damping
 		var mean_height := 0.0
+		var weighted_height := 0.0
+		var total_mass := 0.0
 		for name: String in zombie.ragdoll.bodies:
-			var height: float = zombie.ragdoll.bodies[name].global_position.y
+			var body: PhysicalBone3D = zombie.ragdoll.bodies[name]
+			var height := body.global_position.y
+			var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+			weighted_height += (height + state.center_of_mass.y) * body.mass
+			total_mass += body.mass
 			mean_height += height
 			if previous_height.has(name):
 				var step := height - previous_height[name]
@@ -335,6 +343,10 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 						peak_supported_reversal = maxf(peak_supported_reversal, reversal)
 				previous_step[name] = step
 			previous_height[name] = height
+		var center_height := weighted_height / total_mass
+		if was_low:
+			peak_supported_rise = maxf(peak_supported_rise, center_height - previous_center_height)
+		previous_center_height = center_height
 		mean_height /= zombie.ragdoll.bodies.size()
 		if previous_mean_height < INF:
 			var mean_step := mean_height - previous_mean_height
@@ -347,6 +359,8 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 			previous_mean_step = mean_step
 		previous_mean_height = mean_height
 	if not offset_spawn:
+		check(reached_low_pose and peak_supported_rise < 0.040,
+			"Sabre's grounded finisher keeps upward center-of-mass steps below 4 cm after the low pose")
 		check(reached_low_pose and peak_reversal < 0.075 and peak_supported_reversal < 0.065,
 			"Sabre's grounded finisher avoids large alternating vertical steps after contact")
 		check(zombie._corpse_parked and zombie._corpse_age <= 1.25 and peak_damping_step > 0.0 and peak_damping_step < 1.40,
@@ -356,7 +370,7 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 	print("SABRE_LANDING_REVERSAL offset=", offset_spawn, " entry_m=", peak_reversal,
 		" supported_m=", peak_supported_reversal, " peak_damping_step=", peak_damping_step,
 		" whole_body_reversals=", whole_body_reversals, " peak_whole_body_m=", peak_whole_body_reversal,
-		" age=", zombie._corpse_age)
+		" upward_step_m=", peak_supported_rise, " age=", zombie._corpse_age)
 	zombie.free()
 
 func check_flat_rest_after_tumble(lab, group) -> void:
