@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/scene_lighting_mix.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Sương nắng lối rừng"
+description = "Đưa vệt nắng về phía lối rừng và làm dịu lớp không khí sau hàng cây. Dùng các hiệu ứng nắng trong sương, độ mềm vùng xa và sương cục bộ."
+review_tip = "Đến lối rừng phía tây lúc 07:00 hoặc 16:30. Nhìn vùng râm sau thân cây và so bằng Hoàn tác. Trưa và đêm dùng đồ họa hiện tại."
+strengths = Dictionary[StringName, float]({
+&"projected_sun_position": 1.0,
+&"sunlit_mist": 0.36,
+&"daylight_haze": 0.85,
+&"local_mist": 0.18
+})

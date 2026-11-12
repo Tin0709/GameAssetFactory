@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/GameplayMap.tscn" id="base"]
 [ext_resource type="Script" path="res://scripts/world_map.gd" id="map"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/scene_lighting_mix.gd" id="mix_type"]
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_night_cliff_mix.tres" id="night_mix"]
 [ext_resource type="Resource" path="res://assets/graphics/worldmap_soft_cliff_mix.tres" id="soft_cliff_mix"]
+[ext_resource type="Resource" path="res://assets/graphics/worldmap_forest_day_air_mix.tres" id="forest_air_mix"]
 
 [node name="WorldMap" instance=ExtResource("base")]
 script = ExtResource("map")
@@ -18,7 +19,7 @@ additional_mist_region = ExtResource("cliff_mist")
 night_mist_region = ExtResource("night_mist")
 regional_sky_region = ExtResource("regional_sky")
 scene_lighting_mix = ExtResource("forest_mix")
-additional_lighting_mixes = Array[ExtResource("mix_type")]([ExtResource("night_mix"), ExtResource("soft_cliff_mix")])
+additional_lighting_mixes = Array[ExtResource("mix_type")]([ExtResource("night_mix"), ExtResource("soft_cliff_mix"), ExtResource("forest_air_mix")])
 projected_sun_shift = Vector2(0, 6)
 
 [node name="Ground" parent="."]
