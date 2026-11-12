@@ -20,6 +20,7 @@ const DEATH_TRAVEL_SCALE := 1.35
 const DEATH_LIFT_IMPULSE := 185.0
 const DEATH_LIFT_SCALE := 0.25
 const DEATH_PITCH_SPEED := 5.3
+const DEATH_GRAVITY := 16.0
 const HEIGHT := 1.95
 const HIT_RADIUS := 0.48
 const CHASE_SPEED := 3.1
@@ -208,7 +209,7 @@ func _update_death(delta: float) -> void:
 		launch.linear_impulse = _death_impulse.x * DEATH_TRAVEL_SCALE
 		launch.upward_impulse = DEATH_LIFT_IMPULSE + _death_impulse.y * DEATH_LIFT_SCALE
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
-		if ragdoll.begin(launch, direction, "Chest", 0.0, 10.0):
+		if ragdoll.begin(launch, direction, "Chest", 0.0, DEATH_GRAVITY):
 			_apply_death_tumble(Vector3.UP.cross(direction) * DEATH_PITCH_SPEED)
 		return
 	var remaining := CORPSE_LIFETIME - _corpse_age
