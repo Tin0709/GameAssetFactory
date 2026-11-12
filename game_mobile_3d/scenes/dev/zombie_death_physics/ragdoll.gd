@@ -385,6 +385,7 @@ func _correct_physical_pose() -> void:
 					_terrain_poses[name] = state.transform
 
 func _project_source_anchors() -> void:
+	var flat_floor := is_instance_valid(_flat_floor)
 	for name: String in source_joint_rids:
 		var spec: Dictionary = source_joints[name]
 		var child: PhysicalBone3D = bodies[name]
@@ -407,7 +408,7 @@ func _project_source_anchors() -> void:
 		var bias := CONE_OVERSHOOT_BIAS if overshot else CONE_DEFAULT_BIAS
 		PhysicsServer3D.cone_twist_joint_set_param(source_joint_rids[name], PhysicsServer3D.CONE_TWIST_JOINT_BIAS, bias)
 		var contacting := state.get_contact_count() > 0
-		if contacting and is_instance_valid(_flat_floor):
+		if contacting and flat_floor:
 			continue
 		var correction := parent_frame.origin - child_frame.origin
 		var distance := correction.length()
@@ -415,17 +416,26 @@ func _project_source_anchors() -> void:
 			continue
 		# Leave the authored tolerance and preserve rotation and velocities.
 		var motion := correction * (1.0 - SOURCE_ANCHOR_TOLERANCE / distance)
+		var can_project_contact := not flat_floor and distance > 2.0 * SOURCE_ANCHOR_TOLERANCE
 		if contacting:
 			# Small errors on a supported limb stay with the contact solver.
-			if distance > 2.0 * SOURCE_ANCHOR_TOLERANCE:
+			if can_project_contact:
 				_project_contacting_anchor(child, state, motion.limit_length(CONTACT_ANCHOR_RECOVERY_MAX_SHIFT))
 			continue
 		if _test_projection_motion(child, state.transform, motion):
-			motion *= _projection_hit.get_collision_safe_fraction()
+			var safe_fraction := _projection_hit.get_collision_safe_fraction()
+			if is_zero_approx(safe_fraction) and can_project_contact:
+				# Shape overlap can precede the next solver contact. Test the
+				# current pose before treating the outward motion as blocked.
+				_project_contacting_anchor(child, state,
+					motion.limit_length(CONTACT_ANCHOR_RECOVERY_MAX_SHIFT), true)
+				continue
+			motion *= safe_fraction
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
 
-func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, motion: Vector3) -> void:
+func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, motion: Vector3,
+		require_overlap := false) -> void:
 	var points := _terrain_contact_points(body, state, Vector3.ZERO)
 	var escape_fraction := 0.0
 	for i in range(0, points.size(), 2):
@@ -439,6 +449,8 @@ func _project_contacting_anchor(body: PhysicalBone3D, state: PhysicsDirectBodySt
 		if separation <= depth:
 			return
 		escape_fraction = maxf(escape_fraction, depth / separation)
+	if require_overlap and escape_fraction <= 0.0:
+		return
 	if _deepest_contact(_terrain_contact_points(body, state, motion)) > PROJECTION_COLLISION_MARGIN:
 		return
 	# Sweep from the clear end because a forward sweep can stop inside the
