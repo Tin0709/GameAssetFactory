@@ -1,0 +1,32 @@
+[gd_resource type="Environment" format=3]
+
+[ext_resource type="ImageTexture3D" path="res://assets/graphics/meadow_daylight_v5/day_balanced.res" id="grade"]
+[ext_resource type="Shader" path="res://materials/world_map_ambient.gdshader" id="ambient"]
+
+[sub_resource type="ShaderMaterial" id="ambient_material"]
+shader = ExtResource("ambient")
+shader_parameter/center = Vector3(0.030962674, 0.07402519, 0.14219014)
+shader_parameter/vertical = Vector3(0.0046444014, 0.018506298, 0.063985564)
+shader_parameter/horizontal = Vector3(0.0055732816, 0.0133245345, 0.025594227)
+
+[sub_resource type="Sky" id="ambient_sky"]
+sky_material = SubResource("ambient_material")
+process_mode = 1
+radiance_size = 0
+
+[resource]
+resource_name = "WorldMap daylight (12:00)"
+background_mode = 1
+background_color = Color(0.57, 0.68, 0.69, 1)
+sky = SubResource("ambient_sky")
+ambient_light_source = 3
+ambient_light_color = Color(0.4760586, 0.70860344, 0.94727916, 1)
+ambient_light_energy = 0.1608061
+reflected_light_source = 1
+tonemap_mode = 2
+tonemap_exposure = 0.96
+tonemap_white = 4.0
+adjustment_enabled = true
+adjustment_contrast = 0.95
+adjustment_saturation = 1.08
+adjustment_color_correction = ExtResource("grade")

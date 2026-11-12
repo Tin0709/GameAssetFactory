@@ -2,13 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/mechanic_lab.gd" id="lab"]
 [ext_resource type="Shader" path="res://materials/mechanic_lab_ground.gdshader" id="ground"]
-
-[sub_resource type="Environment" id="environment"]
-background_mode = 1
-background_color = Color(0.55, 0.66, 0.75, 1)
-ambient_light_source = 3
-ambient_light_color = Color(0.93, 0.96, 1, 1)
-ambient_light_energy = 0.64
+[ext_resource type="Environment" path="res://environment/MechanicLabDaylight.tres" id="daylight"]
 
 [sub_resource type="ShaderMaterial" id="grass_block"]
 resource_local_to_scene = true
@@ -24,14 +18,19 @@ size = Vector3(100, 1, 100)
 script = ExtResource("lab")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("environment")
+environment = ExtResource("daylight")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-rotation_degrees = Vector3(-55, -38, 0)
-light_color = Color(1, 0.97, 0.91, 1)
-light_energy = 1.15
+rotation_degrees = Vector3(-50, -38, 0)
+light_color = Color(0.9833454, 1, 0.89710116, 1)
+light_energy = 1.998142
 shadow_enabled = true
-directional_shadow_max_distance = 48.0
+shadow_bias = 0.12
+shadow_normal_bias = 0.76
+shadow_blur = 1.08
+shadow_opacity = 0.782
+directional_shadow_mode = 0
+directional_shadow_max_distance = 29.0
 
 [node name="Ground" type="StaticBody3D" parent="."]
 position = Vector3(0, -0.5, 0)

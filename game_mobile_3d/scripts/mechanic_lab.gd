@@ -3,10 +3,15 @@ extends Node3D
 const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
 const PlayerPresentation := preload("res://scripts/world_map_presentation.gd")
 const SourceTerrain := preload("res://scripts/world_map_source_terrain.gd")
+const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
 const SPAWN := Vector3(0.0, 0.03, 0.0)
+const WORLD_MAP_NOON_EXPOSURE := 0.12
 
 var presentation: Node
+var _exposure: CompositorEffect
+var _previous_msaa: Viewport.MSAA
+var _previous_hdr: bool
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
 
@@ -21,6 +26,7 @@ func _enter_tree() -> void:
 	$Actors.add_child(actor)
 
 func _ready() -> void:
+	_apply_daylight_render_settings()
 	var material := $Ground/Mesh.material_override as ShaderMaterial
 	var tiles := SourceTerrain.load_tiles()
 	if tiles != null:
@@ -41,6 +47,33 @@ func _ready() -> void:
 	else:
 		$HUD/Controls.text = "WASD di chuyển · Shift chạy · Space nhảy · R về giữa"
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
+
+func _apply_daylight_render_settings() -> void:
+	if RenderingServer.get_rendering_device() == null:
+		return
+	var viewport := get_viewport()
+	_previous_msaa = viewport.msaa_3d
+	_previous_hdr = viewport.use_hdr_2d
+	viewport.msaa_3d = Viewport.MSAA_2X
+	viewport.use_hdr_2d = true
+	_exposure = LocalExposure.new()
+	_exposure.set_review_strength(WORLD_MAP_NOON_EXPOSURE)
+	_exposure.set_air_bloom(true)
+	var compositor := Compositor.new()
+	compositor.compositor_effects = [_exposure]
+	camera.compositor = compositor
+
+func _exit_tree() -> void:
+	if _exposure == null:
+		return
+	_exposure.enabled = false
+	camera.compositor = null
+	var effect := _exposure
+	_exposure = null
+	RenderingServer.call_on_render_thread(func(): effect.release_on_render_thread())
+	var viewport := get_viewport()
+	viewport.msaa_3d = _previous_msaa
+	viewport.use_hdr_2d = _previous_hdr
 
 func _process(_delta: float) -> void:
 	var focus: Vector3 = presentation.player_position()
