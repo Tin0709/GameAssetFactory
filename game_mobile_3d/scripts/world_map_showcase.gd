@@ -77,6 +77,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grass_shade_color": ["Grass shade color", 1.],
 	&"diffuse_openings": ["Sunlit diffuse fill", 1.],
 	&"regional_sky": ["Local cliff skylight (preview)", 1.],
+	&"daylight_bounce": ["Daylight terrain bounce (preview)", 1.],
 	&"night_spatial_sky": ["Night terrain bounce (preview)", 1.],
 	&"night_stone_fill_balance": ["Night stone color balance (preview)", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
@@ -120,7 +121,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 46
+const LIGHTING_MIX_VERSION := 47
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -883,6 +884,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .75
 	if effect == &"twilight_shadow_color":
 		return .65
+	if effect == &"daylight_bounce":
+		return 0.
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
 	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"cliff_mist", &"night_cliff_mist", &"night_spatial_sky", &"night_stone_fill_balance"]:
@@ -1187,6 +1190,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 46 and effect == &"night_cliff_mist":
 			missing_value = 0.
+		if version < 47 and effect == &"daylight_bounce":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1226,6 +1231,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and projected_sun.available()
 		if effect == &"regional_sky":
 			slider.editable = _regional_sky_editable()
+		if effect == &"daylight_bounce":
+			slider.editable = _day_bounce_editable()
 		if effect in [&"night_spatial_sky", &"night_stone_fill_balance"]:
 			slider.editable = _night_sky_editable()
 		if effect == &"cliff_mist":
@@ -1242,7 +1249,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect == &"diffuse_openings":
 		return # Published with the final camera and sun before drawing.
-	if changed_effect in [&"regional_sky", &"night_spatial_sky", &"night_stone_fill_balance"]:
+	if changed_effect in [&"regional_sky", &"daylight_bounce", &"night_spatial_sky", &"night_stone_fill_balance"]:
 		return # Terrain transport refreshes both receivers together.
 	if changed_effect in [&"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
 		if phase_finish != null:
@@ -1546,12 +1553,18 @@ func _regional_sky_editable() -> bool:
 func _night_sky_editable() -> bool:
 	return not _balanced_preview and level != null and level.terrain_light != null and level.terrain_light.night_sky_available()
 
+func _day_bounce_editable() -> bool:
+	return not _balanced_preview and level != null and level.terrain_light != null and level.terrain_light.day_bounce_available()
+
 func _process(delta:float)->void:
 	_update_shape_control()
 	if not private_primary or level==null:return
 	var regional_slider: HSlider = _lighting_sliders.get(&"regional_sky")
 	if regional_slider != null:
 		regional_slider.editable = _regional_sky_editable()
+	var day_bounce_slider: HSlider = _lighting_sliders.get(&"daylight_bounce")
+	if day_bounce_slider != null:
+		day_bounce_slider.editable = _day_bounce_editable()
 	var night_editable := _night_sky_editable()
 	for effect in [&"night_spatial_sky", &"night_stone_fill_balance"]:
 		var slider: HSlider = _lighting_sliders.get(effect)
