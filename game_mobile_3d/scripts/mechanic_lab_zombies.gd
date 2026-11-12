@@ -39,9 +39,11 @@ func setup_combat(clips: Dictionary, native_windows: Array) -> void:
 		if data.category == "attack" or clip == "AirAttack":
 			var trail: Array = data.vfx_window
 			_hit_windows[clip] = Vector2(float(trail[0]), float(trail[1]))
-	for native: Dictionary in native_windows:
-		var clip: String = native.get("attack_key", "Attack%d" % (int(native.index) + 1))
+	for index in native_windows.size():
+		var native: Dictionary = native_windows[index]
+		var clip: String = native.get("attack_key", "Attack%d" % (index + 1))
 		var trail: Array = native.get("trail_window", clips[clip].vfx_window)
+		# The source contact key anchors the start. The trail tail bounds the lab sweep.
 		_hit_windows[clip] = Vector2(minf(float(trail[0]), float(native.melee)), maxf(float(trail[1]), float(native.melee)))
 
 func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D) -> bool:

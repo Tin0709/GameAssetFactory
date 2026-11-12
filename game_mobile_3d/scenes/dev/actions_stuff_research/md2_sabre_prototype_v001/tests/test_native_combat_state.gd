@@ -54,6 +54,25 @@ func run()->void:
 		check(s.index==1 and s.time==0.,"Press after opened gate begins next strike without waiting for full recovery")
 		s.cancel();s.request_attack();s.advance(.01);s.request_attack();s.advance(.33)
 		check(s.index==0,"Expired220ms adapter tap cannot become a ghost combo")
+		var lab := Combo.new()
+		lab.setup(actor.clips)
+		lab.configure_native(config)
+		lab.native_tap_buffer_seconds = 0.16
+		lab.request_attack()
+		var gate := lab.chain_source_gate() / lab.playback_rate()
+		lab.advance(gate - 0.10)
+		lab.attack(true)
+		lab.attack(false)
+		lab.advance(0.11)
+		check(lab.index == 1 and lab.phase == &"attack" and not lab.held, "Opt-in tap buffer chains a released input once")
+		lab.advance(1.0)
+		check(lab.serial == 2 and not lab.active(), "A consumed tap cannot queue another strike")
+		lab.cancel()
+		lab.request_attack()
+		lab.advance(gate - 0.20)
+		lab.request_attack()
+		lab.advance(0.21)
+		check(lab.index == 0, "An expired lab tap cannot chain")
 		for name:String in ["resume","chain","attack_duration"]:
 			s.cancel();s._start_attack(0);s.held=name=="chain"
 			var w:Dictionary=config.windows[0];s.advance((float(w[name])-1.1e-8)/float(w.rate));var before:float=s.clock
