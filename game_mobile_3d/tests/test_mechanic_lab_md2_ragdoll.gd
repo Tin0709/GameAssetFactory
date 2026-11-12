@@ -39,6 +39,8 @@ func run() -> void:
 	for i in range(1, strengths.size()):
 		check(ZOMBIE._death_launch_speed(strengths[i]) > ZOMBIE._death_launch_speed(strengths[i - 1]),
 			"Source strength threshold changes the launch tier")
+	check(ZOMBIE._death_launch_speed(800.0) > ZOMBIE._death_launch_speed(500.0) * 1.25,
+		"Sabre's final strike adds at least 25 percent launch speed for the same pose")
 	var seed_before: int = zombie._death_rng.seed
 	var twirls := 0
 	var left_twirls := 0
@@ -69,7 +71,24 @@ func run() -> void:
 		check(is_equal_approx(PhysicsServer3D.cone_twist_joint_get_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_SWING_SPAN), deg_to_rad(45.0))
 			and is_equal_approx(PhysicsServer3D.cone_twist_joint_get_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_TWIST_SPAN), deg_to_rad(15.0)),
 			child + " uses the asset's cone and twist spans")
-	await ticks(60)
+	var launch_mass := 0.0
+	for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
+		launch_mass += body.mass
+	check(Vector2(impulse.x, impulse.z).length() / launch_mass > 8.0,
+		"A normal lethal strike adds over 8 m/s along the floor")
+	var fastest_descent := 0.0
+	var landing_time := INF
+	for i in 60:
+		await physics_frame
+		if zombie._corpse_landed:
+			landing_time = minf(landing_time, zombie._corpse_age)
+			continue
+		var vertical_momentum := 0.0
+		for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
+			vertical_momentum += body.linear_velocity.y * body.mass
+		fastest_descent = maxf(fastest_descent, -vertical_momentum / launch_mass)
+	check(fastest_descent > 5.0, "The corpse falls faster than 5 m/s before head or chest contact")
+	check(landing_time > 0.40 and landing_time < 0.64, "The torso reaches the floor in the calibrated window")
 	check(zombie._corpse_landed and zombie.ragdoll.max_anchor_error() < 0.10, "The corpse settles with connected joints")
 	while is_instance_valid(zombie) and zombie._corpse_age < 4.96:
 		await physics_frame
