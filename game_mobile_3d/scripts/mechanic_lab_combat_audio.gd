@@ -51,7 +51,7 @@ func set_enabled(value: bool, preview_point: Vector3) -> void:
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
 		AudioServer.set_bus_mute(0, false)
-	_play(&"hit", preview_point, -4.0)
+	_play(&"hit", preview_point, -8.0)
 
 func _restore_master() -> void:
 	if _master_was_muted:
@@ -87,7 +87,7 @@ func _load_audio() -> void:
 		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
 	for i in 6:
 		var voice := AudioStreamPlayer3D.new()
-		voice.unit_size = 10.0
+		voice.unit_size = 4.5
 		voice.max_distance = 35.0
 		add_child(voice)
 		_voices.append(voice)
@@ -123,4 +123,5 @@ func _play(group: StringName, point: Vector3, gain: float) -> void:
 	voice.stream = choices[choice]
 	voice.global_position = point
 	voice.volume_db = gain
+	voice.max_db = gain
 	voice.play()
