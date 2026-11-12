@@ -304,12 +304,16 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 	var previous_mean_step := 0.0
 	var whole_body_reversals := 0
 	var peak_whole_body_reversal := 0.0
+	var peak_anchor_gap := 0.0
+	var lowest_corner := 0.0
 	for i in 120:
 		await physics_frame
 		if zombie._corpse_parked:
 			break
 		if not zombie.ragdoll.running:
 			continue
+		peak_anchor_gap = maxf(peak_anchor_gap, zombie.ragdoll.max_anchor_error())
+		lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
 		var motion: Dictionary = zombie.ragdoll.contact_motion()
 		if motion.supports > 0:
 			first_contact = minf(first_contact, zombie._corpse_age)
@@ -353,10 +357,12 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 			"Sabre's low roll settles with a gradual increase in angular damping")
 	check(reached_low_pose and whole_body_reversals <= 4 and peak_whole_body_reversal < 0.05,
 		"Sabre's finisher lands without repeatedly lifting the entire corpse (offset=%s)" % offset_spawn)
+	check(peak_anchor_gap < 0.08 and lowest_corner >= -0.013,
+		"Sabre's finisher keeps its joints connected during floor contact (offset=%s)" % offset_spawn)
 	print("SABRE_LANDING_REVERSAL offset=", offset_spawn, " entry_m=", peak_reversal,
 		" supported_m=", peak_supported_reversal, " peak_damping_step=", peak_damping_step,
 		" whole_body_reversals=", whole_body_reversals, " peak_whole_body_m=", peak_whole_body_reversal,
-		" age=", zombie._corpse_age)
+		" anchor_gap_m=", peak_anchor_gap, " floor_depth_m=", -lowest_corner, " age=", zombie._corpse_age)
 	zombie.free()
 
 func check_flat_rest_after_tumble(lab, group) -> void:
