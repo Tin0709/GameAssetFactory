@@ -183,6 +183,14 @@ gaf_local_mist_radii={
 "type": "vec3",
 "value": Vector3(1, 1, 1)
 }
+gaf_additional_mist_center={
+"type": "vec4",
+"value": Vector4(0, 0, 0, 0)
+}
+gaf_additional_mist_radii={
+"type": "vec3",
+"value": Vector3(1, 1, 1)
+}
 gaf_local_mist_origin={
 "type": "vec3",
 "value": Vector3(0, 0, 0)

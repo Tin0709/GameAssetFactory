@@ -8,14 +8,15 @@ global uniform vec3 gaf_mist_camera_direction;
 global uniform vec2 gaf_mist_projection_scale;
 global uniform vec4 gaf_local_mist_center;
 global uniform vec3 gaf_local_mist_radii;
+global uniform vec4 gaf_additional_mist_center;
+global uniform vec3 gaf_additional_mist_radii;
 global uniform vec3 gaf_local_mist_origin;
 global uniform vec3 gaf_local_mist_dx;
 global uniform vec3 gaf_local_mist_dy;
 
-float gaf_local_mist_entry(vec2 uv,vec3 direction,float base_entry){
-	vec3 origin=gaf_local_mist_origin+gaf_local_mist_dx*uv.x+gaf_local_mist_dy*uv.y;
-	vec3 start=(origin-gaf_local_mist_center.xyz)/gaf_local_mist_radii;
-	vec3 ray=direction/gaf_local_mist_radii;
+float gaf_local_mist_entry(vec3 origin,vec3 direction,float base_entry,vec3 center,vec3 radii){
+	vec3 start=(origin-center)/radii;
+	vec3 ray=direction/radii;
 	float curvature=dot(ray,ray);
 	float midpoint=-dot(start,ray)/curvature;
 	vec3 nearest=start+ray*midpoint;
@@ -33,8 +34,14 @@ vec4 gaf_surface_mist(vec2 uv,float view_depth,vec3 camera_position,vec3 directi
 	if (entry > 0.0) {
 		float previous_slice = floor(sqrt(entry/gaf_mist_far)*31.0);
 		float next_depth = gaf_mist_far * pow((previous_slice+1.0)/31.0, 2.0);
-		if (view_depth < next_depth && gaf_local_mist_center.w > 0.0) {
-			entry=gaf_local_mist_entry(uv,direction,entry);
+		if (view_depth < next_depth && (gaf_local_mist_center.w > 0.0 || gaf_additional_mist_center.w > 0.0)) {
+			vec3 origin=gaf_local_mist_origin+gaf_local_mist_dx*uv.x+gaf_local_mist_dy*uv.y;
+			if (gaf_local_mist_center.w > 0.0) {
+				entry=gaf_local_mist_entry(origin,direction,entry,gaf_local_mist_center.xyz,gaf_local_mist_radii);
+			}
+			if (gaf_additional_mist_center.w > 0.0) {
+				entry=gaf_local_mist_entry(origin,direction,entry,gaf_additional_mist_center.xyz,gaf_additional_mist_radii);
+			}
 			previous_slice=floor(sqrt(entry/gaf_mist_far)*31.0);
 			next_depth=gaf_mist_far*pow((previous_slice+1.0)/31.0,2.0);
 		}
