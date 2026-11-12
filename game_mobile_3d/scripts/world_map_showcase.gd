@@ -7,6 +7,7 @@ const FOREST=preload("res://scripts/world_map_forest_atmosphere.gd")
 const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
 const CrownWind := preload("res://scripts/world_map_crown_wind.gd")
 const DirectionalAir := preload("res://scripts/world_map_directional_air.gd")
+const PlayerContact := preload("res://scripts/world_map_player_contact.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 # User-directed art adjustment; recovered Forest profiles stay untouched.
 const GENTLE_NOON_DIRECT_SCALE:=.82
@@ -64,6 +65,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sky_chroma": ["Sky color", 1.],
 	&"daylight_balance": ["Daylight color balance", 1.],
 	&"player_sky": ["Player sky fill", 2.],
+	&"foot_contact": ["Player ground contact (preview)", 1.],
 	&"grass_sky": ["Grass sky fill", 1.],
 	&"grass_shade_color": ["Grass shade color", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
@@ -98,7 +100,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 30
+const LIGHTING_MIX_VERSION := 31
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -156,6 +158,7 @@ var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
 var mist:Node3D
 var directional_air := DirectionalAir.new()
+var player_contact: Node
 var spatial_mist:=true
 var near_haze_enabled: bool:
 	get: return float(_lighting_mix.get(&"near_haze", _lighting_scale_default(&"near_haze"))) > 0.
@@ -236,6 +239,9 @@ func setup(world:Node3D)->void:
 			mist.effect.directional_provider = directional_air.parameters
 	grade_review=preload("res://scripts/world_map_grade_review.gd").new();add_child(grade_review);grade_review.setup(self)
 	phase_finish=PHASE_FINISH.new();add_child(phase_finish);phase_finish.setup(self)
+	player_contact = PlayerContact.new()
+	add_child(player_contact)
+	player_contact.setup(level)
 	_build_ui()
 	_refresh_lantern_glow()
 	level.get_node("HUD/Help").hide();level.get_node("HUD/Status").hide()
@@ -797,6 +803,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 0.
 	if effect == &"sunlit_mist":
 		return 0.
+	if effect == &"foot_contact":
+		return 0.
 	if effect == &"night_path_chroma":
 		return .75
 	if effect == &"grass_root_tone":
@@ -953,7 +961,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1004,6 +1012,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 30 and effect == &"sunlit_mist":
 			missing_value = 0.
+		if version < 31 and effect == &"foot_contact":
+			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
@@ -1027,6 +1037,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
+		if effect == &"foot_contact":
+			slider.editable = slider.editable and player_contact.available()
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
@@ -1039,6 +1051,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return
 	if changed_effect in [&"forest_path_air", &"sunlit_mist"]:
 		return # The volume reads the live fixture and mix immediately before dispatch.
+	if changed_effect == &"foot_contact":
+		player_contact.refresh()
+		return
 	if changed_effect == &"night_path_chroma":
 		_publish_night_path_chroma()
 		return
@@ -1416,6 +1431,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"sunlit_mist":
 			slider.editable = directional_air.available()
 			slider.tooltip_text = "Try 24% in the forest at 16:30. Scatters sunlight through canopy gaps; fades to zero at noon and night." if slider.editable else "Requires the verified private canopy field and the Mobile renderer."
+		if effect == &"foot_contact":
+			slider.editable = player_contact.available()
+			slider.tooltip_text = "Soft indirect-light contact beneath each boot. Try 75% in the forest. Zero compares the prior look. Noon keeps its approved lighting."
 		if effect == &"forest_path_beam":
 			slider.tooltip_text = "Aim the fixed forest light downward across the path using the captured angular falloff. Set 0% to compare the previous beam."
 		if effect == &"forest_path_air":
