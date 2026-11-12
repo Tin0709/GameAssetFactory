@@ -110,6 +110,14 @@ func run() -> void:
 	check(landing_speed > 0.0 and follow_through_speed > landing_speed * 0.55,
 		"The corpse retains forward momentum through its first 100 ms on the floor")
 	check(zombie._corpse_landed and zombie.ragdoll.max_anchor_error() < 0.10, "The corpse settles with connected joints")
+	var skeleton: Skeleton3D = zombie.ragdoll.skeleton
+	var last_physical_pose: Array[Transform3D] = []
+	skeleton.skeleton_updated.connect(func():
+		if not zombie.ragdoll.running:
+			return
+		last_physical_pose.clear()
+		for bone in skeleton.get_bone_count():
+			last_physical_pose.append(skeleton.get_bone_global_pose(bone)))
 	while is_instance_valid(zombie) and zombie._corpse_age < 4.96:
 		await physics_frame
 	check(is_instance_valid(zombie), "Corpse remains until the table's five-second lifespan")
@@ -119,6 +127,10 @@ func run() -> void:
 		var dissolve: float = zombie._mesh.get_instance_shader_parameter("dissolve")
 		check(zombie._mesh.is_visible_in_tree() and dissolve > 0.0 and dissolve < 1.0,
 			"The retained corpse mesh still dissolves after physics is released")
+		var pose_preserved := last_physical_pose.size() == skeleton.get_bone_count()
+		for bone in last_physical_pose.size():
+			pose_preserved = pose_preserved and skeleton.get_bone_global_pose(bone).is_equal_approx(last_physical_pose[bone])
+		check(pose_preserved, "Releasing physics retains the last rendered pose, including utility bones")
 	await ticks(6)
 	check(not is_instance_valid(zombie), "Corpse is released after its breakup")
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
