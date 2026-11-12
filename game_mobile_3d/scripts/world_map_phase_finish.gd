@@ -63,6 +63,7 @@ func release()->void:
  if _effect!=null:
   _effect.set_humid_light(0.)
   _effect.set_twilight_shadow_color(0.)
+  _effect.set_bloom_diffusion(0.)
   if _effect.has_method("set_bloom_source_reference"):_effect.set_bloom_source_reference(null,false,0.)
   _effect.set_reference_grade(false);_effect.prepare_reference_grade(false);_effect.configure_finish(false);_effect.set_display_edges(false)
   _effect.set_review_strength(_saved_strength*showcase.local_exposure_mix_scale())
@@ -126,6 +127,7 @@ func refresh()->void:
  effect.set_finish_weight(weight*finish_scale);effect.set_reference_grade(true)
  var shadow_color: float = showcase._lighting_scale(&"twilight_shadow_color") * showcase.twilight_color_weight() if finish_scale > 0. else 0.
  effect.set_twilight_shadow_color(shadow_color)
+ effect.set_bloom_diffusion(.85 * showcase._lighting_scale(&"bloom_diffusion") * weight)
  _publish_humid_light(effect)
  env.tonemap_mode=Environment.TONE_MAPPER_LINEAR;env.tonemap_exposure=1.;env.adjustment_enabled=false
  for key in ["tonemap_exposure","adjustment_enabled"]:

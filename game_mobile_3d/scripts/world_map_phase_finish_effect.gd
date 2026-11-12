@@ -22,6 +22,7 @@ var _daylight_haze_weight := 0.
 var _daylight_haze_spill := 0.
 var _humid_actor := Vector4.ZERO
 var _twilight_shadow_weight := 0.
+var _bloom_diffusion_mix := 0.
 var _depth_diffusion := DepthDiffusion.new()
 var _humid_depth := PackedByteArray()
 var _humid_mist: CompositorEffect
@@ -41,6 +42,11 @@ func set_humid_light(weight: float, actor: Vector4 = Vector4.ZERO, depth := Pack
 func set_twilight_shadow_color(weight: float) -> void:
  _guard.lock()
  _twilight_shadow_weight = clampf(weight, 0., 1.) if is_finite(weight) else 0.
+ _guard.unlock()
+
+func set_bloom_diffusion(weight: float) -> void:
+ _guard.lock()
+ _bloom_diffusion_mix = clampf(weight, 0., 1.) if is_finite(weight) else 0.
  _guard.unlock()
 
 func configure_finish(value:bool,env:Environment=null,weight:float=0.)->bool:
@@ -92,6 +98,7 @@ func _render_callback(kind:int,data:RenderData)->void:
  var depth_data := _humid_depth
  var depth_mist := _humid_mist if use_diffusion else null
  var twilight_shadow_weight := _twilight_shadow_weight if wanted and _reference_enabled else 0.
+ var bloom_diffusion_mix := _bloom_diffusion_mix if diffusion_active else 0.
  _guard.unlock()
  if not baseline.is_empty():
   baseline.encode_float(28, humid_weight)
@@ -102,6 +109,7 @@ func _render_callback(kind:int,data:RenderData)->void:
   baseline.encode_float(48, twilight_shadow_weight)
   baseline.encode_float(52, daylight_haze)
   baseline.encode_float(56, daylight_spill)
+  baseline.encode_float(60, bloom_diffusion_mix)
  var depth_changed := _depth_diffusion.refresh_sources(rd, buffers, depth_mist)
  if depth_changed or wanted!=_render_finish or edge!=_render_edge or(wanted and generation!=_render_palette_generation):
   _release(rd);_render_finish=wanted;_render_palette_generation=generation;_render_edge=edge
@@ -193,7 +201,13 @@ vec3 recover_twilight_shadow_color(vec3 graded, vec3 original) {
   diffusion_condition += " || base[3].y > 0."
  fragment=fragment.replace("void main() {",helpers+"void main() {")
  fragment=fragment.replace("if (air.x > 0.0) {", "if (air.x > 0.0 || air.y > 0.0) {")
- fragment=fragment.replace("adjusted += spread * air.x;","if (" + diffusion_condition + ") adjusted = diffuse_humid_light(adjusted, spread, uv_air);\n\t\tadjusted += spread * air.x;")
+ fragment=fragment.replace("adjusted += spread * air.x;","if (" + diffusion_condition + ") adjusted = diffuse_humid_light(adjusted, spread, uv_air);" + """
+  // Use the existing bloom samples to soften bright-to-dark transitions before tonemapping.
+  if (base[3].w > 0.0 && air.x > 0.0) {
+   adjusted += (spread - adjusted) * min(air.x * base[3].w, 0.48);
+  }
+  adjusted += spread * air.x;
+ """)
  fragment=fragment.replace("if (settings.x <= 0.0)","if (settings.x < 0.0)")
  fragment=fragment.replace("result=vec4(inverse_display(clamp(display,0.,1.)),color.a);","vec3 original_finish = gaf_finish(adjusted);\n\t\tvec3 mixed_finish = mix(original_finish,inverse_display(clamp(display,0.,1.)),base[1].z);\n\t\tresult=vec4(recover_twilight_shadow_color(mixed_finish,original_finish),color.a);")
  if _render_edge:
