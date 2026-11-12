@@ -15,6 +15,7 @@ const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "
 const FLOOR_CONTACT_SLOP := 0.005
 const FLOOR_REST_SLOP := 0.012
 const FLOOR_SHARED_LIFT_THRESHOLD := 0.05
+const FLOOR_ANCHOR_RECOVERY_SPEED := 1.5
 const MIN_SUPPORT_NORMAL_Y := 0.5
 const MAX_WALL_NORMAL_Y := 0.10
 const HANDOFF_MIN_WALL_OVERLAP := 0.035
@@ -700,16 +701,57 @@ func _project_floor_contact() -> void:
 	if lift <= 0.0:
 		return
 	var shared_lift := 0.0 if landing_blended else lift
-	if not landing_blended and _flat_floor_has_contact:
+	var split_impact := not landing_blended and _flat_floor_has_contact
+	var corrections: Dictionary[PhysicalBone3D, float] = {}
+	if split_impact:
 		# Keep more of a deep floor correction on the limb that penetrated.
 		shared_lift -= maxf(0.0, lift - FLOOR_SHARED_LIFT_THRESHOLD) * _floor_impact_limb_share
+		for body: PhysicalBone3D in bodies.values():
+			corrections[body] = maxf(shared_lift, depths.get(body, 0.0) - slop)
+		_limit_floor_anchor_gaps(corrections)
 	for body: PhysicalBone3D in bodies.values():
-		var correction := maxf(shared_lift, depths.get(body, 0.0) - slop)
+		var correction := corrections[body] if split_impact else maxf(shared_lift, depths.get(body, 0.0) - slop)
 		if correction <= 0.0:
 			continue
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if state:
 			state.transform = state.transform.translated(Vector3.UP * correction)
+
+func _limit_floor_anchor_gaps(corrections: Dictionary[PhysicalBone3D, float]) -> void:
+	var parents: Dictionary[PhysicalBone3D, PhysicalBone3D] = {}
+	var lift_limits: Dictionary[PhysicalBone3D, Vector2] = {}
+	for name: String in source_joint_rids:
+		var joint: Dictionary = source_joints[name]
+		var child: PhysicalBone3D = bodies[name]
+		var parent: PhysicalBone3D = bodies[joint.parent]
+		var child_state := PhysicsServer3D.body_get_direct_state(child.get_rid())
+		var parent_state := PhysicsServer3D.body_get_direct_state(parent.get_rid())
+		if child_state == null or parent_state == null:
+			continue
+		var child_anchor := (child_state.transform * (joint.child_frame as Transform3D)).origin
+		var parent_anchor := (parent_state.transform * (joint.parent_frame as Transform3D)).origin
+		var separation := child_anchor - parent_anchor
+		var horizontal_sq := separation.x * separation.x + separation.z * separation.z
+		# Use the vertical budget left after the horizontal anchor error.
+		# Recover an existing excess gradually during the floor correction.
+		var tolerance_y := sqrt(maxf(0.0, SOURCE_ANCHOR_TOLERANCE * SOURCE_ANCHOR_TOLERANCE - horizontal_sq))
+		var allowance := maxf(tolerance_y, absf(separation.y) - FLOOR_ANCHOR_RECOVERY_SPEED * child_state.step)
+		parents[child] = parent
+		lift_limits[child] = Vector2(allowance - separation.y, allowance + separation.y)
+	# Propagate the least upward shifts needed along the joint tree.
+	# Every correction still clears its own collider from the floor.
+	for pass_index in lift_limits.size():
+		var changed := false
+		for child: PhysicalBone3D in lift_limits:
+			var parent := parents[child]
+			var limit := lift_limits[child]
+			var child_lift := maxf(corrections[child], corrections[parent] - limit.y)
+			var parent_lift := maxf(corrections[parent], child_lift - limit.x)
+			changed = changed or child_lift > corrections[child] or parent_lift > corrections[parent]
+			corrections[child] = child_lift
+			corrections[parent] = parent_lift
+		if not changed:
+			break
 
 func contact_motion() -> Dictionary:
 	var contacts := 0
