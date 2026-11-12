@@ -84,7 +84,54 @@ func run() -> void:
 			break
 		await physics_frame
 	check(lab.player_health == player_hp - 6, "The active attack can still connect if the player stays in reach")
+	zombie.free()
+	await check_crowd(lab, group)
 	lab.free()
 	print("MECHANIC_LAB_KNOCKBACK first_chase_step=", first_chase_step,
 		" travel=", furthest - at_contact, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_crowd(lab, group) -> void:
+	lab.reset_player()
+	for i in 6:
+		lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombies := group.get_children() as Array[Node]
+	check(zombies.size() == 6, "The crowd fixture spawns six zombies")
+	if zombies.size() != 6:
+		return
+	await ticks(35)
+	var origin: Vector3 = lab.player.global_position
+	var forward: Vector3 = lab.player.visual.global_basis.z
+	var right := Vector3.UP.cross(forward)
+	var centre := origin + forward * 2.15
+	zombies[0].global_position = centre
+	zombies[0].health = 8
+	for i in range(1, zombies.size()):
+		var angle := (i - 1) * TAU / 5.0
+		zombies[i].global_position = centre + (right * cos(angle) + forward * sin(angle)) * 0.88
+	group.land_sabre(origin, forward, 1000, 0.25)
+	var rise := 0.0
+	var corpse_contacts := 0
+	for frame in 45:
+		await physics_frame
+		for i in range(1, zombies.size()):
+			var survivor := zombies[i] as CharacterBody3D
+			rise = maxf(rise, survivor.global_position.y - origin.y)
+			for contact in survivor.get_slide_collision_count():
+				if survivor.get_slide_collision(contact).get_collider() is PhysicalBone3D:
+					corpse_contacts += 1
+	check(zombies[0].health == 0 and zombies[1].health > 0 and zombies[1].health < 48,
+		"The same heavy attack kills one zombie and damages a survivor")
+	check(rise < 0.03 and corpse_contacts == 0,
+		"Ragdoll cannot lift a living zombie. Peak rise %.3f m, corpse contacts %d" % [rise, corpse_contacts])
+	var falling := zombies[1] as CharacterBody3D
+	falling.global_position = origin + Vector3(12.0, 1.0, 0.0)
+	falling.velocity = Vector3.ZERO
+	var fall_ticks := 0
+	for frame in 36:
+		await physics_frame
+		fall_ticks += 1
+		if falling.global_position.y - origin.y < 0.02:
+			break
+	check(fall_ticks <= ceili(0.25 * Engine.physics_ticks_per_second),
+		"A living zombie returns from a 1 m drop within 250 ms, measured ticks %d" % fall_ticks)
