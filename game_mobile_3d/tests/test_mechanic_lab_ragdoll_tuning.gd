@@ -65,7 +65,7 @@ func click_slider(slider: HSlider, high: bool) -> void:
 
 func replay_combo(lab) -> Dictionary:
 	lab.reset_player()
-	var group := lab.get_node("Zombies")
+	var group = lab.get_node("Zombies")
 	group._spawn_serial = 1
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var result := {"health": [], "impulse": Vector3.ZERO, "flight": 0.0, "ground_scale": 0.0}
