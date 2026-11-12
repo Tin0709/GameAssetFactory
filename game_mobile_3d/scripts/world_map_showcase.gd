@@ -92,6 +92,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_stone_top_cool": ["Sắc xanh trên mặt đá", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
+	&"twilight_grass_albedo": ["Độ dịu lá cỏ chạng vạng", 1.],
 	&"lantern_grass_tone": ["Sắc đèn hông trên cỏ", 1.],
 	&"grass_shadow_reach": ["Grass shadow reach", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
@@ -146,7 +147,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 69
+const LIGHTING_MIX_VERSION := 70
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -991,7 +992,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .35
 	if effect == &"twilight_sky_chroma":
 		return .5
-	if effect == &"grass_night_albedo":
+	if effect in [&"grass_night_albedo", &"twilight_grass_albedo"]:
 		return .55
 	if effect == &"dawn_mist_source":
 		return .65
@@ -1149,7 +1150,15 @@ func grass_root_tone_mix() -> float:
 	return _lighting_scale(&"grass_root_tone") * _night_grass_weight()
 
 func grass_night_albedo_mix() -> float:
-	return _lighting_scale(&"grass_night_albedo") * _night_grass_weight()
+	return _blend_grass_albedo(_night_grass_weight())
+
+func _blend_grass_albedo(night: float) -> float:
+	var night_albedo := _lighting_scale(&"grass_night_albedo") * night
+	if twilight_finish_weight() <= 0.0:
+		return night_albedo
+	# Use the same blade response as at night and hand it over as moonlight rises.
+	var twilight := _lighting_scale(&"twilight_grass_albedo") * smoothstep(19.0, 19.5, hour)
+	return night_albedo + twilight * (1.0 - night)
 
 func _night_grass_weight() -> float:
 	if _balanced_preview or not forest_active() or atmosphere_review != "combined":
@@ -1387,6 +1396,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 69 and effect in [&"twilight_ambient", &"twilight_soft_bloom"]:
 			missing_value = 0.
+		if version < 70 and effect == &"twilight_grass_albedo":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1434,6 +1445,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and key_response.evening_available()
 		if effect in [&"twilight_sky_chroma", &"twilight_ambient"]:
 			slider.editable = slider.editable and sky_response.twilight_available()
+		if effect == &"twilight_grass_albedo":
+			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
 		if effect == &"twilight_soft_bloom":
 			slider.editable = slider.editable and sky_response.twilight_available() and bloom_response.available()
 		if effect == &"sculk_surface":
@@ -1536,7 +1549,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"dawn_mist_source", &"evening_mist_profile"]:
 		_update_mist()
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
 		return
 	if changed_effect in [&"player_sky", &"player_bounce"]:
 		if level.player_light != null:
