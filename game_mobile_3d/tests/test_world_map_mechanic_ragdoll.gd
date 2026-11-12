@@ -102,8 +102,8 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	await ticks(2)
 
 func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.DeathStrike,
-		frames: int, start := Vector3(-33.5, 9.0, -39.5), direction := Vector3.RIGHT) -> void:
-	var zombie = await launch(world, group, effects, start, direction, strike)
+		frames: int, start := Vector3(-33.5, 9.0, -39.5), direction := Vector3.RIGHT, yaw := 0.0) -> void:
+	var zombie = await launch(world, group, effects, start, direction, strike, yaw)
 	if zombie == null:
 		return
 	var first_landing := -1
@@ -288,6 +288,10 @@ func run() -> void:
 		group._spawn_serial = 10
 		await ledge_case(world, group, effects, Zombie.DeathStrike.AIR, 190,
 			Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT.rotated(Vector3.UP, -0.10))
+		# The right arm brushes the lower terrace while its anchor pulls away from it.
+		group._spawn_serial = 3
+		await ledge_case(world, group, effects, Zombie.DeathStrike.GROUND, 200,
+			Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT.rotated(Vector3.UP, 0.055), 0.16)
 		await oblique_cliff_case(world, group, effects)
 		await near_wall_handoff(world, group, effects)
 		await braced_cliff_case(world, group, effects)
