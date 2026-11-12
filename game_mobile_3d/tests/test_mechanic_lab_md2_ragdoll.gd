@@ -349,7 +349,7 @@ func check_sabre_landing_reversal(lab, group, offset_spawn := false) -> void:
 	if not offset_spawn:
 		check(reached_low_pose and peak_reversal < 0.075 and peak_supported_reversal < 0.065,
 			"Sabre's grounded finisher avoids large alternating vertical steps after contact")
-		check(zombie._corpse_parked and zombie._corpse_age <= 1.40 and peak_damping_step > 0.0 and peak_damping_step < 1.40,
+		check(zombie._corpse_parked and zombie._corpse_age <= 1.25 and peak_damping_step > 0.0 and peak_damping_step < 1.40,
 			"Sabre's low roll settles with a gradual increase in angular damping")
 	check(reached_low_pose and whole_body_reversals <= 4 and peak_whole_body_reversal < 0.05,
 		"Sabre's finisher lands without repeatedly lifting the entire corpse (offset=%s)" % offset_spawn)
