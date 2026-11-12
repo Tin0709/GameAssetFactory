@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Git Checkpoint Manager — GameAssetFactory &amp; MD2</title>
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+      color-scheme: dark;
+      --bg: #09101e;
+      --bg-deep: #060c19;
+      --text: #f5f8ff;
+      --muted: #a0aec6;
+      --subtle: #7789a6;
+      --line: rgba(220,235,255,.115);
+      --line-strong: rgba(225,240,255,.23);
+      --matte: rgba(19,29,49,.86);
+      --matte-hover: rgba(28,40,64,.95);
+      --glass: rgba(55,75,106,.28);
+      --glass-strong: rgba(37,55,82,.48);
+      --glass-top: rgba(255,255,255,.17);
+      --accent: #8eb6ff;
+      --accent-deep: #5b8ef3;
+      --accent-ink: #071932;
+      --green: #72e2be;
+      --amber: #f4c47c;
+      --red: #ff9aaa;
+      --shadow: 0 24px 60px rgba(1,7,23,.3), 0 5px 14px rgba(1,7,23,.13);
+      --radius: 25px;
+    }
+    html[data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf3fb;
+      --bg-deep: #dfe8f7;
+      --text: #172b46;
+      --muted: #5e718a;
+      --subtle: #70829a;
+      --line: rgba(34,71,109,.12);
+      --line-strong: rgba(45,86,120,.22);
+      --matte: rgba(255,255,255,.82);
+      --matte-hover: rgba(255,255,255,.96);
+      --glass: rgba(255,255,255,.39);
+      --glass-strong: rgba(255,255,255,.66);
+      --glass-top: rgba(255,255,255,.88);
+      --accent: #2867d8;
+      --accent-deep: #5b8ef3;
+      --accent-ink: #fff;
+      --green: #17876e;
+      --amber: #a46c1e;
+      --red: #bb485f;
+      --shadow: 0 24px 62px rgba(44,78,118,.11), 0 6px 24px rgba(45,85,126,.08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--text); background: var(--bg);
+      font-size: 14px; line-height: 1.5; overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content:""; position: fixed; inset: 0; z-index: -3; pointer-events: none;
+      background:
+        radial-gradient(ellipse 44% 46% at 20% 3%, rgba(58,116,210,.23), transparent 78%),
+        radial-gradient(ellipse 37% 40% at 96% 24%, rgba(92,72,164,.17), transparent 80%),
+        radial-gradient(ellipse 32% 35% at 64% 90%, rgba(28,126,140,.13), transparent 80%),
+        linear-gradient(150deg,var(--bg),var(--bg-deep));
+    }
+    body::after {
+      content:""; position: fixed; inset:0; pointer-events:none; z-index:-2; opacity:.15;
+      background-image: radial-gradient(rgba(208,229,255,.25) .7px,transparent .7px);
+      background-size: 24px 24px; mask-image: linear-gradient(95deg,transparent,black 55%,transparent);
+    }
+    html[data-theme="light"] body::before {
+      background: radial-gradient(ellipse 49% 52% at 12% 5%, rgba(129,181,250,.39),transparent 75%),radial-gradient(ellipse 36% 45% at 93% 24%,rgba(190,177,247,.36),transparent 77%),radial-gradient(ellipse 40% 40% at 80% 90%,rgba(125,216,210,.23),transparent 80%),linear-gradient(155deg,var(--bg),var(--bg-deep));
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    button, input, summary { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    button:focus:not(:focus-visible) { outline: none; }
+    h1,h2,h3,p { margin:0; }
+    .ico { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+    .ico.sm { width:16px;height:16px; } .ico.xs { width:14px;height:14px; }
+    .mono { font-family:ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono",monospace; }
+    .app-shell { width:min(1570px,100%); margin:auto; display:grid; grid-template-columns:246px minmax(0,1fr); gap:27px; padding:21px 28px 40px 20px; align-items:start; }
+    .glass {
+      background: linear-gradient(140deg,rgba(255,255,255,.115),transparent 37%),var(--glass);
+      border: 1px solid var(--line-strong);
+      box-shadow: inset 0 1px 0 var(--glass-top), inset 0 -1px 0 rgba(255,255,255,.028), var(--shadow);
+      -webkit-backdrop-filter: blur(30px) saturate(165%); backdrop-filter: blur(30px) saturate(165%);
+    }
+    .sidebar { height:calc(100vh - 42px); min-height:660px; border-radius:29px; padding:24px 15px 17px; position:sticky; top:21px; display:flex; flex-direction:column; gap:24px; }
+    .brand { display:flex;align-items:center;gap:12px;padding:0 10px;min-width:0; }
+    .brand-icon { width:45px;height:45px;flex:none; border-radius:15px; display:grid;place-items:center; background:linear-gradient(146deg,rgba(121,190,255,.2),rgba(79,109,188,.22)); border:1px solid rgba(195,223,255,.2);box-shadow:inset 0 1px rgba(255,255,255,.3); }
+    .brand-icon img { width:40px;height:40px;object-fit:contain; }
+    .brand-name { font-size:18px;font-weight:750;line-height:1.05;letter-spacing:-.7px; }
+    .brand-caption { margin-top:5px;font-size:11px;color:var(--muted);letter-spacing:.04em; }
+    .nav-label { font-size:10px;letter-spacing:.14em;font-weight:750;color:var(--subtle);padding:0 17px;margin:10px 0 10px; }
+    .side-nav { display:flex; flex-direction:column; gap:5px; }
+    .nav-link { position:relative; display:flex; gap:13px;align-items:center;min-height:45px;padding:0 14px;border-radius:15px;color:var(--muted);text-decoration:none;font-weight:580;transition:background .2s,color .2s; }
+    .nav-link .ico { width:19px;height:19px; }
+    .nav-link:hover { background:rgba(255,255,255,.07);color:var(--text); }
+    .nav-link.active { color:var(--text);background:linear-gradient(125deg,rgba(179,213,255,.22),rgba(96,139,206,.09));border:1px solid rgba(215,236,255,.15);box-shadow:inset 0 1px rgba(255,255,255,.17); }
+    .nav-link.active::before { content:"";position:absolute;left:-16px;top:13px;bottom:13px;width:3px;background:var(--accent);border-radius:6px;box-shadow:0 0 16px var(--accent); }
+    .nav-count {margin-left:auto;font-size:11px;border-radius:8px;padding:2px 7px;color:var(--accent);background:rgba(104,149,225,.13);font-weight:700;}
+    .sidebar-spacer {flex:1;}
+    .sidebar-bottom { background:rgba(10,20,37,.23); border:1px solid var(--line);border-radius:20px;padding:15px; }
+    html[data-theme="light"] .sidebar-bottom {background:rgba(255,255,255,.29);}
+    .sidebar-bottom-head { display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:680;margin-bottom:10px;}
+    .status-light {width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(114,226,190,.08),0 0 15px rgba(114,226,190,.35);display:inline-block;}
+    .status-light.warn {background:var(--amber);box-shadow:0 0 12px rgba(244,196,124,.25);}
+    .mini-track {height:5px;background:rgba(151,171,206,.18);border-radius:20px;overflow:hidden;}
+    .mini-track span {height:100%;width:66.666%;display:block;border-radius:inherit;background:linear-gradient(90deg,#69d2ce,#91baff);transition:width .3s;}
+    .sidebar-footnote {font-size:11px;color:var(--subtle);margin-top:9px;line-height:1.5;}
+    .sidebar-tag {display:flex;gap:8px;align-items:center;color:var(--subtle);font-size:11px;padding:0 12px;}
+    .main { min-width:0; }
+    .topbar { display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:51px;margin-bottom:21px; }
+    .breadcrumb { font-size:12px;color:var(--subtle);display:flex;gap:9px;align-items:center;letter-spacing:.01em; }
+    .breadcrumb b {font-weight:650;color:var(--muted);}
+    .top-actions {display:flex;align-items:center;gap:9px;}
+    .preview-badge {display:inline-flex;gap:8px;align-items:center;white-space:nowrap;border:1px solid var(--line);background:rgba(96,124,174,.11);border-radius:99px;padding:7px 12px;color:var(--muted);font-size:11px;font-weight:680;letter-spacing:.045em;}
+    .preview-badge::before {content:"";height:6px;width:6px;border-radius:50%;background:var(--amber);}
+    .icon-btn { width:39px;height:39px;padding:0;border-radius:14px;display:inline-grid;place-items:center;color:var(--text);border:1px solid var(--line);background:rgba(125,151,188,.09);transition:background .2s,transform .2s,border-color .2s; }
+    .icon-btn:hover {background:rgba(173,206,255,.15);border-color:var(--line-strong);transform:translateY(-1px);}
+    .top-icon-btn {border:1px solid var(--line-strong);background:var(--glass);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px var(--glass-top);}
+    .hero { position:relative;overflow:hidden; min-height:236px;display:grid;grid-template-columns:minmax(0,1fr) 280px;align-items:center;gap:26px;border-radius:29px;padding:31px 35px;background:linear-gradient(117deg,rgba(38,67,109,.95),rgba(26,40,76,.87) 55%,rgba(34,37,71,.83));border:1px solid rgba(189,215,255,.22); box-shadow:inset 0 1px rgba(255,255,255,.19),0 20px 50px rgba(2,10,26,.19); }
+    .hero::before {content:"";position:absolute;pointer-events:none;width:400px;height:400px;right:-50px;top:-235px;background:radial-gradient(circle,rgba(129,174,255,.40),transparent 64%);filter:blur(5px);}
+    .hero::after {content:"";position:absolute;pointer-events:none;width:380px;height:220px;right:160px;bottom:-180px;background:radial-gradient(ellipse,rgba(68,211,203,.16),transparent 69%);}
+    html[data-theme="light"] .hero {background:linear-gradient(125deg,#789fda,#778bc0 60%,#867cb7);color:#fff;}
+    .hero-content,.hero-side {position:relative;z-index:1;}
+    .eyebrow {display:flex;gap:8px;align-items:center;font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:#c7ddff;font-weight:760;margin-bottom:11px;}
+    .eyebrow .glint {font-size:15px;color:#bfeafc;}
+    .hero h1 {font-size:clamp(30px,3vw,44px);font-weight:760;line-height:1.12;letter-spacing:-1.7px;color:#fff;}
+    .hero-desc {margin-top:12px;max-width:520px;color:#d0ddf2;font-size:13px;line-height:1.7;}
+    .hero-meta {display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin-top:21px;color:#d5e3f6;font-size:12px;}
+    .hero-meta span {display:inline-flex;gap:7px;align-items:center;}
+    .hero-meta .ico {color:#a9ceff;}
+    .hero-side {padding:17px;border:1px solid rgba(237,246,255,.18);border-radius:21px;background:linear-gradient(140deg,rgba(255,255,255,.15),rgba(255,255,255,.035));box-shadow:inset 0 1px rgba(255,255,255,.21);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+    .hero-side-title {font-size:11px;color:#d0dbef;letter-spacing:.07em;font-weight:680;margin-bottom:11px;}
+    .system-item {display:flex;align-items:center;gap:10px;padding:7px 0;color:#fff;font-size:12px;}
+    .system-item:not(:last-child) {border-bottom:1px solid rgba(255,255,255,.1);}
+    .system-item small {margin-left:auto;color:#d1def3;font-size:11px;}
+    .system-item .ico {width:16px;height:16px;color:#c3d8fa;}
+    .system-item .status-light {width:6px;height:6px;}
+    .overview-strip {margin-top:17px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;}
+    .stat {min-height:98px;display:flex;align-items:center;gap:15px;background:var(--matte);border:1px solid var(--line);border-radius:22px;padding:17px 19px;box-shadow:inset 0 1px rgba(255,255,255,.05);}
+    .stat-icon {height:43px;width:43px;flex:none;display:grid;place-items:center;border-radius:16px;background:rgba(97,146,233,.13);color:var(--accent);}
+    .stat-icon.warning {background:rgba(250,185,95,.1);color:var(--amber);}
+    .stat-icon.mint {background:rgba(103,223,187,.1);color:var(--green);}
+    .stat-top {font-size:11px;color:var(--muted);white-space:nowrap;}
+    .stat-number {display:flex;align-items:baseline;gap:8px;margin-top:3px;line-height:1.2;font-weight:730;font-size:25px;letter-spacing:-.75px;}
+    .stat-number small {font-weight:500;font-size:11px;color:var(--subtle);letter-spacing:0;}
+    .section {scroll-margin-top:20px;margin-top:32px;}
+    .section-head {display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:15px;}
+    .section-head h2 {font-size:21px;font-weight:735;letter-spacing:-.6px;}
+    .section-head p {font-size:12px;color:var(--muted);margin-top:4px;}
+    .text-link {border:0;background:none;color:var(--accent);font-size:12px;font-weight:670;display:inline-flex;align-items:center;gap:5px;padding:7px 0;}
+    .text-link:hover {text-decoration:underline;}
+    .launch-grid {display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .launch-card { min-width:0;position:relative;overflow:hidden;min-height:181px;background:var(--matte);border:1px solid var(--line);border-radius:24px;padding:22px 23px 20px;box-shadow:inset 0 1px rgba(255,255,255,.07);transition:border-color .2s,transform .2s;}
+    .launch-card:hover {border-color:var(--line-strong);transform:translateY(-2px);}
+    .launch-card::after {content:"";position:absolute;width:195px;height:195px;right:-86px;top:-95px;border-radius:50%;background:radial-gradient(circle,rgba(83,153,247,.15),transparent 71%);pointer-events:none;}
+    .launch-card.blender::after {background:radial-gradient(circle,rgba(244,158,98,.14),transparent 71%);}
+    .launch-top {display:flex;align-items:center;gap:12px;position:relative;z-index:1;}
+    .tool-icon {width:48px;height:48px;border:1px solid rgba(173,205,255,.22);border-radius:16px;display:grid;place-items:center;color:#b7d6ff;background:linear-gradient(145deg,rgba(74,142,227,.34),rgba(73,95,166,.15));}
+    .tool-icon .ico {width:26px;height:26px;stroke-width:1.7;}
+    .tool-icon.orange {background:linear-gradient(145deg,rgba(245,155,86,.26),rgba(174,101,90,.10));color:#ffbc89;border-color:rgba(248,180,133,.18);}
+    .tool-name {font-size:17px;font-weight:720;letter-spacing:-.5px;}
+    .tool-caption {font-size:11px;color:var(--muted);margin-top:3px;}
+    .launch-bottom {margin-top:24px;display:flex;justify-content:space-between;gap:12px;align-items:center;position:relative;z-index:1;}
+    .tool-hint {color:var(--subtle);font-size:11px;}
+    .tool-hint.good {color:var(--green);display:inline-flex;align-items:center;gap:8px;}
+    .btn {display:inline-flex;gap:9px;align-items:center;justify-content:center;min-height:39px;padding:0 15px;border-radius:13px;border:1px solid var(--line-strong);background:rgba(143,172,214,.1);color:var(--text);font-weight:650;font-size:12px;white-space:nowrap;transition:background .2s,transform .2s,border-color .2s,box-shadow .2s;}
+    .btn:hover {background:rgba(158,188,235,.19);transform:translateY(-1px);}
+    .btn.primary {color:#071b36;background:linear-gradient(150deg,#c1dcff,#90baff);border-color:rgba(223,239,255,.58);box-shadow:inset 0 1px rgba(255,255,255,.76),0 6px 24px rgba(77,139,255,.17);}
+    .btn.primary:hover {background:linear-gradient(150deg,#d3e7ff,#a3c6ff);box-shadow:inset 0 1px #fff,0 8px 26px rgba(77,139,255,.22);}
+    .btn.secondary {background:rgba(145,178,224,.12);}
+    .btn.subtle {background:transparent;border-color:var(--line);color:var(--muted);}
+    .btn.subtle:hover {color:var(--text);background:rgba(150,185,235,.1);}
+    .btn .ico {height:16px;width:16px;}
+    .shortcut-panel {margin-top:14px;background:var(--matte);border:1px solid var(--line);border-radius:24px;padding:18px 20px 20px;}
+    .shortcut-head {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;}
+    .shortcut-head h3 {font-size:13px;font-weight:690;letter-spacing:-.15px;display:flex;gap:9px;align-items:center;}
+    .shortcut-head h3 .ico {color:var(--accent);}
+    .shortcut-head span {font-size:11px;color:var(--subtle);}
+    .shortcut-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;}
+    .shortcut-item {display:flex;align-items:center;gap:3px;min-width:0;background:rgba(125,151,183,.06);border:1px solid var(--line);border-radius:14px;padding:3px;}
+    .shortcut-open {min-width:0;display:flex;align-items:center;gap:9px;flex:1;border:0;padding:8px;color:var(--text);background:transparent;text-align:left;border-radius:11px;font-size:12px;font-weight:555;}
+    .shortcut-open:hover {background:rgba(166,194,238,.09);}
+    .shortcut-open .ico {color:var(--subtle);width:15px;height:15px;}
+    .shortcut-open span {overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+    .copy-btn {height:29px;width:29px;padding:0;border:0;display:grid;place-items:center;border-radius:10px;background:transparent;color:var(--subtle);flex:none;}
+    .copy-btn:hover {color:var(--text);background:rgba(166,194,238,.13);}
+    .repo-controls-head {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .repo-controls-head .btn {min-height:36px;font-size:11px;}
+    .repo-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start;}
+    .repo-card {background:var(--matte);border:1px solid var(--line);border-radius:24px;padding:20px;min-width:0;transition:border-color .2s,transform .2s;box-shadow:inset 0 1px rgba(255,255,255,.05);}
+    .repo-card:hover {border-color:var(--line-strong);}
+    .repo-top {display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+    .repo-brand {display:flex;align-items:center;gap:10px;min-width:0;}
+    .repo-avatar {width:39px;height:39px;flex:none;border-radius:13px;background:rgba(126,171,242,.14);border:1px solid rgba(142,178,236,.14);display:grid;place-items:center;color:var(--accent);}
+    .repo-avatar .ico {width:20px;height:20px;}
+    .repo-avatar.purple {color:#c5b5ff;background:rgba(165,136,245,.13);border-color:rgba(180,151,243,.13);}
+    .repo-avatar.orange {color:#edb78c;background:rgba(221,156,106,.12);border-color:rgba(225,167,109,.14);}
+    .repo-name {font-size:14px;font-weight:720;letter-spacing:-.2px;overflow-wrap:anywhere;line-height:1.35;}
+    .branch {font-size:10px;color:var(--subtle);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:205px;}
+    .state-label {display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:680;color:var(--green);margin-top:16px;}
+    .state-label.off {color:var(--subtle);}
+    .state-label.alert {color:var(--amber);}
+    .state-label::before {content:"";width:6px;height:6px;background:currentColor;border-radius:50%;box-shadow:0 0 10px currentColor;}
+    .repo-metrics {display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px;}
+    .repo-metric {padding:13px 12px;border-radius:14px;background:rgba(139,164,200,.065);border:1px solid rgba(167,193,231,.055);}
+    .repo-metric strong {display:block;font-size:25px;font-weight:735;letter-spacing:-.9px;line-height:1.1;}
+    .repo-metric strong.warn {color:var(--amber);}
+    .repo-metric small {display:block;color:var(--muted);font-size:10.5px;margin-top:5px;line-height:1.4;}
+    .repo-sync {font-size:10px;color:var(--subtle);margin-top:11px;display:flex;align-items:center;gap:6px;}
+    .repo-sync .ico {height:13px;width:13px;}
+    .toggle-row {padding:15px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;border-top:1px solid var(--line);}
+    .toggle-row span {font-size:12px;font-weight:620;}
+    .switch {width:44px;height:26px;border:1px solid rgba(176,194,224,.19);background:rgba(134,150,178,.23);border-radius:20px;display:block;position:relative;flex:none;transition:background .2s;cursor:pointer;}
+    .switch input {position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer;}
+    .switch::after {content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#dce5f2;box-shadow:0 2px 4px rgba(0,0,0,.25);transition:transform .24s cubic-bezier(.3,1.4,.35,1),background .2s;pointer-events:none;}
+    .switch:has(input:checked) {background:linear-gradient(105deg,#62b6e9,#6c9bf7);border-color:rgba(146,209,255,.67);box-shadow:inset 0 1px rgba(255,255,255,.25);}
+    .switch:has(input:checked)::after {transform:translateX(18px);background:white;}
+    .switch:has(input:focus-visible) {outline:2px solid var(--accent);outline-offset:4px;}
+    .repo-actions {display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+    .repo-actions .btn {min-width:0;padding:0 8px;font-size:11px;min-height:36px;border-radius:11px;gap:5px;}
+    .repo-actions .ico {width:14px;height:14px;}
+    .repo-card details {border-top:1px solid var(--line);padding-top:11px;margin-top:14px;}
+    .repo-card summary {cursor:pointer;list-style:none;color:var(--muted);font-size:11px;font-weight:620;display:flex;align-items:center;justify-content:space-between;gap:6px;user-select:none;}
+    .repo-card summary::-webkit-details-marker {display:none;}
+    .repo-card summary .ico {transition:transform .2s;}
+    .repo-card details[open] summary .ico {transform:rotate(180deg);}
+    .repo-details {margin-top:13px;display:grid;gap:8px;font-size:11px;}
+    .detail-line {display:flex;justify-content:space-between;gap:10px;align-items:start;}
+    .detail-line span {color:var(--subtle);}
+    .detail-line b {font-weight:560;min-width:0;overflow-wrap:anywhere;text-align:right;}
+    .path-block {background:rgba(9,17,31,.22);border:1px solid var(--line);border-radius:11px;padding:9px;font-size:10px;line-height:1.5;color:var(--muted);overflow-wrap:anywhere;}
+    .repo-warning {padding:10px 11px;border:1px solid rgba(238,180,91,.23);border-radius:12px;color:var(--amber);background:rgba(221,159,68,.07);font-size:10.5px;line-height:1.5;display:flex;gap:7px;align-items:flex-start;}
+    .repo-warning .ico {width:15px;height:15px;}
+    .warning-inline {margin-top:11px;display:flex;gap:7px;align-items:center;font-size:10px;color:var(--amber);}
+    .warning-inline .ico {width:13px;height:13px;}
+    .log-panel {background:var(--matte);border:1px solid var(--line);border-radius:24px;overflow:hidden;}
+    .log-toolbar {display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:14px 18px;}
+    .log-title {display:flex;gap:10px;align-items:center;font-size:12px;font-weight:690;}
+    .log-title .status-light {width:6px;height:6px;}
+    .log-actions {display:flex;align-items:center;gap:7px;}
+    .filter-btn {border:none;color:var(--subtle);background:transparent;border-radius:9px;padding:6px 10px;font-size:11px;}
+    .filter-btn.active {background:rgba(133,172,234,.15);color:var(--text);}
+    .log-list {padding:12px 19px;min-height:120px;max-height:215px;overflow:auto;font-size:11px;line-height:1.8;}
+    .log-line {display:flex;gap:15px;color:var(--muted);padding:3px 0;}
+    .log-time {color:var(--subtle);flex:none;}
+    .log-message {overflow-wrap:anywhere;}
+    .log-line.system .log-message {color:var(--green);}
+    .log-line.warning .log-message {color:var(--amber);}
+    .log-line[hidden] {display:none;}
+    .app-footer {display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--subtle);font-size:10.5px;margin:17px 3px 0;padding-bottom:15px;}
+    .footer-mark {display:flex;gap:7px;align-items:center;white-space:nowrap;}
+    .footer-mark .ico {width:14px;height:14px;}
+    .toast {position:fixed;z-index:100;right:25px;bottom:24px;max-width:min(390px,calc(100vw - 30px));padding:14px 16px;border-radius:19px;display:flex;align-items:flex-start;gap:12px;color:var(--text);background:var(--glass-strong);border:1px solid var(--line-strong);box-shadow:var(--shadow),inset 0 1px var(--glass-top);-webkit-backdrop-filter:blur(32px) saturate(175%);backdrop-filter:blur(32px) saturate(175%);animation:toast-in .3s ease-out;}
+    .toast[hidden] {display:none;}
+    .toast strong {display:block;font-size:12px;margin-bottom:3px;}
+    .toast p {font-size:11px;color:var(--muted);line-height:1.5;}
+    .toast-icon {width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:rgba(111,175,255,.15);color:var(--accent);flex:none;}
+    .toast-close {border:0;background:transparent;color:var(--muted);padding:2px;flex:none;}
+    @keyframes toast-in {from{opacity:0;transform:translateY(9px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    dialog {width:min(495px,calc(100% - 25px));border-radius:27px;border:1px solid var(--line-strong);padding:0;color:var(--text);background:var(--matte);box-shadow:0 30px 90px rgba(0,0,0,.48),inset 0 1px var(--glass-top);-webkit-backdrop-filter:blur(35px);backdrop-filter:blur(35px);}
+    dialog::backdrop {background:rgba(1,7,18,.69);backdrop-filter:blur(8px);}
+    dialog[open] {animation:dialog-in .22s ease-out;}
+    @keyframes dialog-in {from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .modal-body {padding:24px;}
+    .modal-head {display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
+    .modal-head h2 {font-size:21px;letter-spacing:-.6px;}
+    .modal-desc {font-size:12px;color:var(--muted);line-height:1.7;}
+    .modal-actions {display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:23px;}
+    .settings-row {margin-top:20px;padding-top:20px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:13px;}
+    .settings-row label {font-size:12px;font-weight:680;}
+    .settings-row small {display:block;font-size:11px;color:var(--muted);margin-top:4px;}
+    .number-input {display:flex;align-items:center;gap:7px;border:1px solid var(--line-strong);background:rgba(131,171,229,.07);border-radius:13px;padding:5px 10px;flex:none;}
+    .number-input input {width:48px;border:0;outline:0;background:transparent;color:var(--text);font-weight:730;font-size:15px;text-align:right;appearance:textfield;}
+    .number-input input::-webkit-inner-spin-button {appearance:none;}
+    .number-input span {font-size:11px;color:var(--subtle);}
+    .settings-note {display:flex;gap:9px;align-items:flex-start;color:var(--muted);border:1px solid var(--line);background:rgba(146,170,202,.07);padding:11px;border-radius:13px;margin-top:17px;font-size:11px;line-height:1.6;}
+    .settings-note .ico {width:16px;height:16px;flex:none;color:var(--accent);margin-top:1px;}
+    .modal-code {max-height:275px;overflow:auto;white-space:pre-wrap;margin:17px 0 0;border:1px solid var(--line);background:rgba(7,15,28,.19);border-radius:13px;padding:15px;color:var(--muted);font:11px/1.8 ui-monospace,"SFMono-Regular",Consolas,monospace;}
+    .modal-warning {color:var(--amber);border-color:rgba(239,183,106,.23);background:rgba(226,161,61,.06);}
+    @media (max-width:1300px) {
+      .app-shell {grid-template-columns:220px minmax(0,1fr);gap:20px;padding-right:20px;}
+      .repo-grid {gap:11px;}
+      .repo-card {padding:16px;}
+      .repo-actions .btn {font-size:10px;}
+    }
+    @media (max-width:1130px) {
+      .repo-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+      .repo-card:last-child {grid-column:auto;}
+      .shortcut-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+      .hero {grid-template-columns:1fr 240px;}
+    }
+    @media (max-width:860px) {
+      .app-shell {display:block;padding:14px 15px 30px;}
+      .sidebar {height:auto;min-height:0;position:static;border-radius:22px;padding:13px;gap:12px;margin-bottom:17px;}
+      .brand {padding:3px 5px;}
+      .brand-icon {height:38px;width:38px;border-radius:12px;}
+      .brand-icon img {width:35px;height:35px;}
+      .brand-name {font-size:16px;}
+      .brand-caption {font-size:10px;margin-top:2px;}
+      .nav-label,.sidebar-spacer,.sidebar-bottom,.sidebar-tag {display:none;}
+      .side-nav {display:flex;flex-direction:row;gap:5px;overflow-x:auto;padding-bottom:1px;}
+      .nav-link {min-width:max-content;min-height:38px;padding:0 12px;border-radius:12px;font-size:12px;gap:8px;}
+      .nav-link .ico {width:16px;height:16px;}
+      .nav-link.active::before {display:none;}
+      .topbar {margin-bottom:12px;}
+    }
+    @media (max-width:670px) {
+      .breadcrumb {font-size:11px;}
+      .topbar {min-height:44px;}
+      .preview-badge {padding:6px 9px;font-size:9px;}
+      .top-actions {gap:6px;}
+      .top-icon-btn {width:36px;height:36px;border-radius:12px;}
+      .hero {padding:24px;grid-template-columns:1fr;gap:16px;border-radius:24px;}
+      .hero h1 {font-size:33px;}
+      .hero-side {display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:11px;}
+      .hero-side-title {grid-column:1/-1;margin:0 0 -3px;}
+      .system-item {display:block;border:0!important;padding:6px 3px;}
+      .system-item small {display:block;margin:3px 0 0;font-size:10px;}
+      .system-item .ico {display:none;}
+      .overview-strip {grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+      .stat {padding:12px;min-height:90px;display:block;border-radius:17px;}
+      .stat-icon {width:29px;height:29px;border-radius:10px;margin-bottom:5px;}
+      .stat-icon .ico {width:16px;height:16px;}
+      .stat-top {font-size:9px;white-space:normal;}
+      .stat-number {font-size:22px;margin-top:4px;}
+      .stat-number small {display:none;}
+      .section {margin-top:26px;}
+      .launch-grid,.repo-grid {grid-template-columns:1fr;}
+      .launch-card {min-height:160px;}
+      .shortcut-grid {grid-template-columns:1fr 1fr;}
+      .section-head {align-items:start;}
+      .section-head h2 {font-size:19px;}
+      .section#repositories .section-head {flex-direction:column;align-items:flex-start;gap:11px;}
+      .repo-controls-head .btn {font-size:11px;min-width:36px;padding:0 11px;gap:6px;}
+      .side-nav {gap:2px;justify-content:space-between;}
+      .nav-link {padding:0 8px;gap:5px;font-size:11px;}
+      .nav-count {display:none;}
+      .repo-controls-head .ico {width:17px;height:17px;}
+      .log-actions .filter-btn {font-size:10px;padding:6px 7px;}
+      .app-footer {display:block;line-height:1.7;}
+      .footer-mark {margin-top:7px;}
+    }
+    @media (max-width:405px) {
+      .hero h1 {font-size:28px;}
+      .hero-meta {gap:8px;font-size:10px;}
+      .shortcut-grid {grid-template-columns:1fr;}
+      .section-head p {max-width:200px;}
+      .stat-number {font-size:20px;}
+      .log-toolbar {display:block;}
+      .log-actions {margin-top:10px;}
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *,*::before,*::after {animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+    }
+    @media (prefers-reduced-transparency:reduce) {
+      .glass, .top-icon-btn, .toast, dialog {backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--matte)!important;}
+    }
+    @supports not (backdrop-filter:blur(5px)) {
+      .glass, .top-icon-btn,.toast,dialog {background:var(--matte);}
+    }
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></symbol>
+    <symbol id="i-git" viewBox="0 0 24 24"><circle cx="6" cy="3.5" r="2"/><circle cx="6" cy="20.5" r="2"/><circle cx="18" cy="6.5" r="2"/><path d="M6 5.5v13M6 12h7a5 5 0 0 0 5-5v1.5"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.9 1.9 0 0 0 .4 2.1l.1.1-2.1 2.1-.1-.1a1.9 1.9 0 0 0-2.1-.4 1.9 1.9 0 0 0-1.1 1.8V21h-3v-.4A1.9 1.9 0 0 0 10.4 19a1.9 1.9 0 0 0-2.1.4l-.1.1-2.1-2.1.1-.1a1.9 1.9 0 0 0 .4-2.1A1.9 1.9 0 0 0 4.8 14H4v-3h.8a1.9 1.9 0 0 0 1.8-1.1 1.9 1.9 0 0 0-.4-2.1l-.1-.1 2.1-2.1.1.1a1.9 1.9 0 0 0 2.1.4A1.9 1.9 0 0 0 11.5 4V3h3v1a1.9 1.9 0 0 0 1.1 1.8 1.9 1.9 0 0 0 2.1-.4l.1-.1 2.1 2.1-.1.1a1.9 1.9 0 0 0-.4 2.1A1.9 1.9 0 0 0 21.2 11h.8v3h-.8a1.9 1.9 0 0 0-1.8 1Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.8 15.4A9 9 0 0 1 8.6 3.2 9 9 0 1 0 20.8 15.4Z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+    <symbol id="i-cube" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 7v10l9 5V12M21 7v10l-9 5"/></symbol>
+    <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.5 6a5 5 0 0 0-6.5 6.5L3 17.5A2.1 2.1 0 0 0 6.5 21L12 16a5 5 0 0 0 6.5-6.5L16 12l-4-4 2.5-2Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.8 2.1 18a2 2 0 0 0 1.7 3h16.4a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.8 9A7 7 0 0 1 18 6l2 1M4 17l2 1a7 7 0 0 0 12.2-3"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.7"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 5v14m10-14v14"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 2h8l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2ZM14 2v5h5"/><path d="M8 12h8m-8 4h8"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="3"/><path d="m6 9 3 3-3 3m6 0h5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 11v5m0-9h.01"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+  </svg>
+
+  <div class="app-shell" id="dashboard">
+    <aside class="sidebar glass" aria-label="Thanh điều hướng">
+      <div class="brand">
+        <div class="brand-icon"><img src="data:image/png;base64,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" alt=""></div>
+        <div><div class="brand-name">Checkpoint<span style="color:var(--accent)">.</span></div><div class="brand-caption">GAME DEV WORKSPACE</div></div>
+      </div>
+      <div>
+        <div class="nav-label">WORKSPACE</div>
+        <nav class="side-nav" aria-label="Các mục">
+          <a href="#dashboard" class="nav-link active" data-nav="dashboard"><svg class="ico"><use href="#i-dashboard"/></svg>Tổng quan</a>
+          <a href="#tools" class="nav-link" data-nav="tools"><svg class="ico"><use href="#i-grid"/></svg>Công cụ</a>
+          <a href="#repositories" class="nav-link" data-nav="repositories"><svg class="ico"><use href="#i-git"/></svg>Repositories <span class="nav-count">3</span></a>
+          <a href="#activity" class="nav-link" data-nav="activity"><svg class="ico"><use href="#i-activity"/></svg>Nhật ký</a>
+        </nav>
+      </div>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-bottom-head"><span>Tự động checkpoint</span><span class="status-light"></span></div>
+        <div class="mini-track" aria-hidden="true"><span id="sidebar-progress"></span></div>
+        <p class="sidebar-footnote"><strong id="sidebar-count" style="color:var(--text)">— repos</strong> đang bật. Git push luôn thủ công.</p>
+      </div>
+      <div class="sidebar-tag"><svg class="ico xs"><use href="#i-info"/></svg>Liquid Glass • v2.0</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="breadcrumb">WORKSPACE <svg class="ico xs"><use href="#i-arrow"/></svg> <b>Overview</b></div>
+        <div class="top-actions">
+          <span class="preview-badge">WORKSPACE CỤC BỘ</span>
+          <button class="icon-btn top-icon-btn" id="theme-toggle" type="button" aria-label="Đổi giao diện sáng tối" title="Đổi sáng / tối"><svg class="ico" id="theme-icon"><use href="#i-sun"/></svg></button>
+          <button class="icon-btn top-icon-btn" type="button" data-action="settings" aria-label="Cài đặt" title="Cài đặt"><svg class="ico"><use href="#i-settings"/></svg></button>
+        </div>
+      </header>
+
+      <section class="hero" aria-label="Chào mừng">
+        <div class="hero-content">
+          <div class="eyebrow"><span class="glint">✦</span> YOUR CREATIVE SPACE</div>
+          <h1>Bắt đầu phiên<br>làm việc của bạn.</h1>
+          <p class="hero-desc">Godot, Blender và Git — mọi thứ bạn cần để tiếp tục phát triển game, ngay tại đây.</p>
+          <div class="hero-meta"><span><svg class="ico sm"><use href="#i-git"/></svg>3 repositories</span><span><svg class="ico sm"><use href="#i-clock"/></svg>Quét mỗi <b id="hero-interval">10</b>s</span><span><svg class="ico sm"><use href="#i-refresh"/></svg>Tiếp theo <b id="next-scan">7</b>s</span></div>
+        </div>
+        <div class="hero-side" aria-label="Trạng thái các công cụ">
+          <div class="hero-side-title">SYSTEM OVERVIEW</div>
+          <div class="system-item"><span class="status-light"></span> Godot <small>Đã cấu hình</small></div>
+          <div class="system-item"><span class="status-light"></span> Blender MCP <small>Đang kiểm tra…</small></div>
+          <div class="system-item"><span class="status-light warn"></span> Git status <small>Đang đọc…</small></div>
+        </div>
+      </section>
+
+      <div class="overview-strip" aria-label="Tổng quan checkpoint">
+        <div class="stat"><div class="stat-icon"><svg class="ico"><use href="#i-git"/></svg></div><div><div class="stat-top">Tự động checkpoint</div><div class="stat-number"><span id="stat-enabled">—</span><small>repo đang bật</small></div></div></div>
+        <div class="stat"><div class="stat-icon warning"><svg class="ico"><use href="#i-file"/></svg></div><div><div class="stat-top">File chưa commit</div><div class="stat-number"><span id="stat-files">—</span><small>trên 3 repo</small></div></div></div>
+        <div class="stat"><div class="stat-icon mint"><svg class="ico"><use href="#i-upload"/></svg></div><div><div class="stat-top">Commit chưa push</div><div class="stat-number"><span id="stat-ahead">—</span><small>trên 3 repo</small></div></div></div>
+      </div>
+
+      <section class="section" id="tools" aria-labelledby="tools-title">
+        <div class="section-head"><div><h2 id="tools-title">Khởi động nhanh</h2><p>Tiếp tục công việc chỉ với một cú nhấp.</p></div><button class="text-link" type="button" data-action="refresh"><svg class="ico sm"><use href="#i-refresh"/></svg>Kiểm tra trạng thái</button></div>
+        <div class="launch-grid">
+          <article class="launch-card godot">
+            <div class="launch-top"><div class="tool-icon"><svg class="ico"><use href="#i-cube"/></svg></div><div><div class="tool-name">Godot Engine</div><div class="tool-caption">Cyan Sanctum · Gameplay chính (F5)</div></div></div>
+            <div class="launch-bottom"><span class="tool-hint">Main game scene</span><button class="btn primary" type="button" data-action="godot"><svg class="ico"><use href="#i-play"/></svg>Chạy gameplay</button></div>
+          </article>
+          <article class="launch-card blender">
+            <div class="launch-top"><div class="tool-icon orange"><svg class="ico"><use href="#i-tool"/></svg></div><div><div class="tool-name">Blender MCP</div><div class="tool-caption">Đang kiểm tra kết nối Blender</div></div></div>
+            <div class="launch-bottom"><span class="tool-hint good"><span class="status-light"></span> Đang kiểm tra…</span><div style="display:flex;gap:7px"><button class="btn subtle" type="button" data-action="check-mcp" title="Kiểm tra kết nối"><svg class="ico"><use href="#i-refresh"/></svg></button><button class="btn secondary" type="button" data-action="start-mcp"><svg class="ico"><use href="#i-play"/></svg>Chạy MCP</button></div></div>
+          </article>
+        </div>
+        <div class="shortcut-panel">
+          <div class="shortcut-head"><h3><svg class="ico"><use href="#i-folder"/></svg> Mở nhanh file Blender</h3><span>6 shortcuts · MCP kiểm tra mỗi 3 giây</span></div>
+          <div class="shortcut-grid">
+            <div class="shortcut-item"><button class="shortcut-open" data-action="shortcut" data-name="Animation MD2"><svg class="ico"><use href="#i-file"/></svg><span>Animation MD2</span></button><button class="copy-btn" data-action="copy-shortcut" data-name="Animation MD2" aria-label="Copy path Animation MD2" title="Copy path"><svg class="ico xs"><use href="#i-copy"/></svg></button></div>
+            <div class="shortcut-item"><button class="shortcut-open" data-action="shortcut" data-name="Valorie + Sabre"><svg class="ico"><use href="#i-file"/></svg><span>Valorie + Sabre</span></button><button class="copy-btn" data-action="copy-shortcut" data-name="Valorie + Sabre" aria-label="Copy path Valorie + Sabre" title="Copy path"><svg class="ico xs"><use href="#i-copy"/></svg></button></div>
+            <div class="shortcut-item"><button class="shortcut-open" data-action="shortcut" data-name="Cỏ MD2"><svg class="ico"><use href="#i-file"/></svg><span>Cỏ MD2</span></button><button class="copy-btn" data-action="copy-shortcut" data-name="Cỏ MD2" aria-label="Copy path Cỏ MD2" title="Copy path"><svg class="ico xs"><use href="#i-copy"/></svg></button></div>
+            <div class="shortcut-item"><button class="shortcut-open" data-action="shortcut" data-name="Animation Showcase"><svg class="ico"><use href="#i-file"/></svg><span>Animation Showcase</span></button><button class="copy-btn" data-action="copy-shortcut" data-name="Animation Showcase" aria-label="Copy path Animation Showcase" title="Copy path"><svg class="ico xs"><use href="#i-copy"/></svg></button></div>
+            <div class="shortcut-item"><button class="shortcut-open" data-action="shortcut" data-name="Actions &amp; Stuff"><svg class="ico"><use href="#i-file"/></svg><span>Actions &amp; Stuff</span></button><button class="copy-btn" data-action="copy-shortcut" data-name="Actions &amp; Stuff" aria-label="Copy path Actions &amp; Stuff" title="Copy path"><svg class="ico xs"><use href="#i-copy"/></svg></button></div>
+            <div class="shortcut-item"><button class="shortcut-open" data-action="shortcut" data-name="TaCZ · Gun Animations"><svg class="ico"><use href="#i-file"/></svg><span>TaCZ · Gun Animations</span></button><button class="copy-btn" data-action="copy-shortcut" data-name="TaCZ · Gun Animations" aria-label="Copy path TaCZ Gun Animations" title="Copy path"><svg class="ico xs"><use href="#i-copy"/></svg></button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="repositories" aria-labelledby="repos-title">
+        <div class="section-head"><div><h2 id="repos-title">Git repositories</h2><p>Checkpoint cục bộ tự động. Push luôn do bạn quyết định.</p></div><div class="repo-controls-head"><button class="btn subtle" type="button" data-action="all-off"><svg class="ico"><use href="#i-pause"/></svg>Tạm dừng tất cả</button><button class="btn secondary" type="button" data-action="all-on"><svg class="ico"><use href="#i-check"/></svg>Bật tất cả</button></div></div>
+        <div class="repo-grid">
+          <article class="repo-card" data-repo="gaf" data-repo-name="GameAssetFactory">
+            <div class="repo-top"><div class="repo-brand"><div class="repo-avatar"><svg class="ico"><use href="#i-cube"/></svg></div><div style="min-width:0"><div class="repo-name">GameAssetFactory</div><div class="branch mono" title="">—</div></div></div><button class="icon-btn" type="button" data-action="repo-refresh" title="Làm mới GameAssetFactory" aria-label="Làm mới GameAssetFactory"><svg class="ico sm"><use href="#i-refresh"/></svg></button></div>
+            <div class="state-label" data-state>Đang đọc…</div>
+            <div class="repo-metrics"><div class="repo-metric"><strong>—</strong><small>file chưa commit</small></div><div class="repo-metric"><strong class="warn">—</strong><small>commit chưa push</small></div></div>
+            <p class="repo-sync">Đang đọc trạng thái…</p>
+            <div class="toggle-row"><span>Tự động commit</span><label class="switch"><input type="checkbox" role="switch" aria-label="Tự động commit GameAssetFactory" ></label></div>
+            <div class="repo-actions"><button class="btn subtle" type="button" data-action="changes"><svg class="ico"><use href="#i-eye"/></svg>Thay đổi</button><button class="btn secondary" type="button" data-action="commit"><svg class="ico"><use href="#i-git"/></svg>Commit</button><button class="btn primary" type="button" data-action="push"><svg class="ico"><use href="#i-upload"/></svg>Push</button></div>
+            <details><summary>Chi tiết repository <svg class="ico sm"><use href="#i-chevron"/></svg></summary><div class="repo-details"><div class="path-block mono">—</div><div class="detail-line"><span>Nhánh</span><b class="mono">—</b></div><div class="detail-line"><span>HEAD</span><b class="mono">—</b></div><div class="detail-line"><span>Upstream</span><b class="mono">—</b></div><div class="detail-line"><span>Hợp lệ / bỏ qua</span><b>—</b></div><div class="detail-line"><span>Đã stage</span><b>—</b></div></div></details>
+          </article>
+          <article class="repo-card" data-repo="md2" data-repo-name="MD2 Research" data-needs-check="true">
+            <div class="repo-top"><div class="repo-brand"><div class="repo-avatar purple"><svg class="ico"><use href="#i-folder"/></svg></div><div style="min-width:0"><div class="repo-name">MD2 Research</div><div class="branch mono" title="">—</div></div></div><button class="icon-btn" type="button" data-action="repo-refresh" title="Làm mới MD2 Research" aria-label="Làm mới MD2 Research"><svg class="ico sm"><use href="#i-refresh"/></svg></button></div>
+            <div class="state-label alert" data-state>Đang đọc…</div>
+            <div class="repo-metrics"><div class="repo-metric"><strong class="warn">—</strong><small>file chưa commit</small></div><div class="repo-metric"><strong class="warn">—</strong><small>commit chưa push</small></div></div>
+            <p class="repo-sync">Đang đọc trạng thái…</p>
+            <div class="toggle-row"><span>Tự động commit</span><label class="switch"><input type="checkbox" role="switch" aria-label="Tự động commit MD2 Research"></label></div>
+            <div class="repo-actions"><button class="btn subtle" type="button" data-action="changes"><svg class="ico"><use href="#i-eye"/></svg>Thay đổi</button><button class="btn secondary" type="button" data-action="commit"><svg class="ico"><use href="#i-git"/></svg>Commit</button><button class="btn primary" type="button" data-action="push"><svg class="ico"><use href="#i-upload"/></svg>Push</button></div>
+            <p class="warning-inline"><svg class="ico"><use href="#i-alert"/></svg>Push yêu cầu kiểm tra repo PRIVATE</p>
+            <details><summary>Chi tiết &amp; lưu ý <svg class="ico sm"><use href="#i-chevron"/></svg></summary><div class="repo-details"><div class="repo-warning"><svg class="ico"><use href="#i-alert"/></svg><span>Dữ liệu gốc trong Release snapshot không được cập nhật bởi Git commit/push. Kiểm tra repo PRIVATE trước khi push.</span></div><div class="path-block mono">—</div><div class="detail-line"><span>Nhánh</span><b class="mono">—</b></div><div class="detail-line"><span>Upstream</span><b class="mono">—</b></div><div class="detail-line"><span>Hợp lệ / bỏ qua</span><b>—</b></div><div class="detail-line"><span>Đã stage</span><b>—</b></div></div></details>
+          </article>
+          <article class="repo-card" data-repo="tacz" data-repo-name="TaCZ Research">
+            <div class="repo-top"><div class="repo-brand"><div class="repo-avatar orange"><svg class="ico"><use href="#i-tool"/></svg></div><div style="min-width:0"><div class="repo-name">TaCZ Research</div><div class="branch mono" title="">—</div></div></div><button class="icon-btn" type="button" data-action="repo-refresh" title="Làm mới TaCZ Research" aria-label="Làm mới TaCZ Research"><svg class="ico sm"><use href="#i-refresh"/></svg></button></div>
+            <div class="state-label" data-state>Đang đọc…</div>
+            <div class="repo-metrics"><div class="repo-metric"><strong>—</strong><small>file chưa commit</small></div><div class="repo-metric"><strong>—</strong><small>commit chưa push</small></div></div>
+            <p class="repo-sync">Đang đọc trạng thái…</p>
+            <div class="toggle-row"><span>Tự động commit</span><label class="switch"><input type="checkbox" role="switch" aria-label="Tự động commit TaCZ Research" ></label></div>
+            <div class="repo-actions"><button class="btn subtle" type="button" data-action="changes"><svg class="ico"><use href="#i-eye"/></svg>Thay đổi</button><button class="btn secondary" type="button" data-action="commit"><svg class="ico"><use href="#i-git"/></svg>Commit</button><button class="btn primary" type="button" data-action="push"><svg class="ico"><use href="#i-upload"/></svg>Push</button></div>
+            <p class="warning-inline"><svg class="ico"><use href="#i-alert"/></svg>Push yêu cầu kiểm tra repo PRIVATE</p>
+            <details><summary>Chi tiết &amp; lưu ý <svg class="ico sm"><use href="#i-chevron"/></svg></summary><div class="repo-details"><div class="repo-warning"><svg class="ico"><use href="#i-alert"/></svg><span>Dữ liệu gốc trong Release snapshot không được cập nhật bởi Git commit/push. Kiểm tra repo PRIVATE trước khi push.</span></div><div class="path-block mono">—</div><div class="detail-line"><span>Nhánh</span><b class="mono">—</b></div><div class="detail-line"><span>Upstream</span><b class="mono">—</b></div><div class="detail-line"><span>Hợp lệ / bỏ qua</span><b>—</b></div><div class="detail-line"><span>Đã stage</span><b>—</b></div></div></details>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="activity" aria-labelledby="activity-title">
+        <div class="section-head"><div><h2 id="activity-title">Nhật ký hoạt động</h2><p>Theo dõi thao tác Git, Godot và Blender trong phiên hiện tại.</p></div></div>
+        <div class="log-panel"><div class="log-toolbar"><div class="log-title"><span class="status-light"></span> ACTIVITY LOG</div><div class="log-actions"><button type="button" class="filter-btn active" data-filter="all">Tất cả</button><button type="button" class="filter-btn" data-filter="git">Git</button><button type="button" class="filter-btn" data-filter="tool">Công cụ</button><button type="button" class="icon-btn" data-action="copy-log" aria-label="Sao chép nhật ký" title="Sao chép nhật ký" style="width:29px;height:29px;border-radius:9px"><svg class="ico xs"><use href="#i-copy"/></svg></button></div></div>
+          <div class="log-list mono" id="log-list" aria-live="polite">
+
+
+
+
+          </div>
+        </div>
+      </section>
+      <footer class="app-footer"><span>Đóng app = dừng hẹn giờ · Bỏ qua file đang ghi · Không có thay đổi hợp lệ thì không tạo commit.</span><span class="footer-mark"><svg class="ico"><use href="#i-info"/></svg>Git Checkpoint Manager</span></footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden><div class="toast-icon"><svg class="ico sm"><use href="#i-info"/></svg></div><div style="min-width:0;flex:1"><strong id="toast-heading"></strong><p id="toast-detail"></p></div><button class="toast-close" type="button" id="toast-close" aria-label="Đóng thông báo"><svg class="ico xs"><use href="#i-x"/></svg></button></div>
+
+  <dialog id="settings-dialog" aria-labelledby="settings-title"><div class="modal-body"><div class="modal-head"><h2 id="settings-title">Cài đặt checkpoint</h2><button class="icon-btn" data-close-dialog type="button" aria-label="Đóng"><svg class="ico sm"><use href="#i-x"/></svg></button></div><p class="modal-desc">Điều chỉnh chu kỳ quét cho hệ thống tự động commit.</p><div class="settings-row"><div><label for="scan-seconds">Chu kỳ quét</label><small>Từ 10 đến 3600 giây</small></div><div class="number-input"><input id="scan-seconds" type="number" inputmode="numeric" min="10" max="3600" value="10" step="1" required><span>giây</span></div></div><div class="settings-note"><svg class="ico"><use href="#i-info"/></svg><span>Checkpoint chỉ là Git commit cục bộ. Push không bao giờ tự chạy và luôn yêu cầu bạn xác nhận.</span></div><div class="modal-actions"><button class="btn subtle" type="button" data-close-dialog>Hủy</button><button class="btn primary" type="button" id="save-settings">Áp dụng</button></div></div></dialog>
+
+  <dialog id="action-dialog" aria-labelledby="action-title"><div class="modal-body"><div class="modal-head"><h2 id="action-title">Xác nhận</h2><button class="icon-btn" data-close-dialog type="button" aria-label="Đóng"><svg class="ico sm"><use href="#i-x"/></svg></button></div><p class="modal-desc" id="action-desc"></p><div class="settings-note" id="action-note"><svg class="ico"><use href="#i-info"/></svg><span id="action-note-text"></span></div><pre class="modal-code" id="diff-preview" hidden></pre><div class="modal-actions"><button class="btn subtle" type="button" data-close-dialog>Đóng</button><button class="btn primary" type="button" id="action-confirm">Xác nhận</button></div></div></dialog>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
