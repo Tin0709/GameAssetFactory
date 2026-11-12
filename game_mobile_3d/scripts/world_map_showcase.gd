@@ -8,6 +8,7 @@ const PHASE_FINISH=preload("res://scripts/world_map_phase_finish.gd")
 const CrownWind := preload("res://scripts/world_map_crown_wind.gd")
 const DirectionalAir := preload("res://scripts/world_map_directional_air.gd")
 const PlayerContact := preload("res://scripts/world_map_player_contact.gd")
+const ProjectedSun := preload("res://scripts/world_map_projected_sun.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 # User-directed art adjustment; recovered Forest profiles stay untouched.
 const GENTLE_NOON_DIRECT_SCALE:=.82
@@ -57,9 +58,11 @@ var _forest_sun:Color
 var _forest_energy:float
 var _forest_shadow_opacity:float
 var full_direct_shadows:=true
+var projected_sun := ProjectedSun.new()
 const LIGHTING_MIX_CONTROLS := {
 	&"sun": ["Direct sunlight", 2.],
 	&"sun_pockets": ["Sunlight pockets", 1.5],
+	&"projected_sun": ["Projected sunlight (preview)", 1.],
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
@@ -101,7 +104,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 32
+const LIGHTING_MIX_VERSION := 33
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -214,6 +217,7 @@ func setup(world:Node3D)->void:
 	level=world;process_priority=-10
 	if not private_primary:return
 	_point_kernel_owner=weakref(self)
+	projected_sun.setup()
 	RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
 	get_tree().node_added.connect(_track_point_light)
 	for light in get_tree().root.find_children("*","Light3D",true,false):_track_point_light(light)
@@ -493,6 +497,7 @@ func _update_hdr_air()->void:
 
 func _exit_tree()->void:
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
+		projected_sun.release()
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
 		RenderingServer.global_shader_parameter_set("gaf_point_soft",Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_point_mixed",false)
@@ -808,6 +813,8 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 0.
 	if effect == &"player_bounce":
 		return 0.
+	if effect == &"projected_sun":
+		return 0.
 	if effect == &"night_path_chroma":
 		return .75
 	if effect == &"grass_root_tone":
@@ -860,6 +867,17 @@ func sunlight_pockets_weight() -> float:
 	if not forest_active() or atmosphere_review not in ["lighting", "combined"]:
 		return 0.
 	return .65 * _lighting_scale(&"sun_pockets") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+
+func refresh_projected_sun() -> void:
+	if _point_kernel_owner == null or _point_kernel_owner.get_ref() != self:
+		return
+	var weight := 0.0
+	if forest_active() and atmosphere_review in ["lighting", "combined"] and level.look.direct_clouds_active():
+		weight = _lighting_scale(&"projected_sun") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+	projected_sun.set_weight(weight)
+	var slider: HSlider = _lighting_sliders.get(&"projected_sun")
+	if slider != null:
+		slider.editable = not _balanced_preview and projected_sun.available()
 
 func local_exposure_mix_scale() -> float:
 	if forest_active() and atmosphere_review in ["haze", "combined"]:
@@ -964,7 +982,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1019,6 +1037,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 32 and effect == &"player_bounce":
 			missing_value = 0.
+		if version < 33 and effect == &"projected_sun":
+			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
@@ -1044,9 +1064,14 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"foot_contact":
 			slider.editable = slider.editable and player_contact.available()
+		if effect == &"projected_sun":
+			slider.editable = slider.editable and projected_sun.available()
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
+	if changed_effect == &"projected_sun":
+		refresh_projected_sun()
+		return
 	if changed_effect in [&"", &"tree_wind"] and level != null and level.look != null:
 		level.look._publish_crown_wind()
 		if changed_effect == &"tree_wind":
@@ -1231,6 +1256,7 @@ func _sync_forest_night_lights() -> void:
 func apply_time()->void:
 	if not private_primary or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
+	refresh_projected_sun()
 	_publish_night_path_chroma()
 	_publish_stone_twilight_color()
 	_sync_forest_night_lights()
@@ -1455,6 +1481,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Adjust the F1 sunlight filter radius in the morning and afternoon. 100% uses the previous radius. Noon and night keep their existing filter."
 		if effect == &"sun_pockets":
 			slider.tooltip_text = "Deepen the existing F3 daylight shade on terrain, grass and the player. 0% restores the previous light pattern. Noon and night keep their current lighting."
+		if effect == &"projected_sun":
+			slider.editable = projected_sun.available()
+			slider.tooltip_text = "Try 65% at 07:00 or 16:30. The private Forest projection shapes the sunlight between shadows. Requires F3 direct cloud shading and the verified private reference."
 		if effect == &"lantern_lift":
 			slider.tooltip_text = "Height above the hip mount when lantern from above is enabled. 100% uses the captured face-to-light distance fit, 66% approximates the previous height."
 		if effect == &"lantern_air":

@@ -79,6 +79,14 @@ environment/defaults/default_clear_color=Color(0.075, 0.13, 0.17, 1)
 
 [shader_globals]
 
+gaf_projected_sun_strength={
+"type": "float",
+"value": 0.0
+}
+gaf_projected_sun_mask={
+"type": "sampler2D",
+"value": ""
+}
 gaf_player_sole_left={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 0)
