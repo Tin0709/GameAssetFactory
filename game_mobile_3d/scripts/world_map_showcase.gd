@@ -50,6 +50,8 @@ var _source_terrain_tiles: Texture2DArray
 var _source_terrain_toggle: CheckButton
 var forest:=FOREST.new()
 var forest_accents := preload("res://scripts/world_map_forest_accents.gd").new()
+const WorldOutline = preload("res://scripts/world_map_outline.gd")
+var world_outline: WorldOutline
 var sculk_surface := preload("res://scripts/world_map_sculk_surface.gd").new()
 var forest_path_light := preload("res://scripts/world_map_forest_path_light.gd").new()
 var atmosphere_review:="combined"
@@ -116,6 +118,8 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"bloom_diffusion": ["Độ mềm bloom", 1.],
+	&"world_outline_strength": ["World Outline", 4.],
+	&"world_outline_width": ["Độ dày viền", 4.],
 	&"daylight_haze": ["Daylight haze softness", 1.],
 	&"daylight_haze_spill": ["Light spread into shade", 1.],
 	&"humid_light": ["Humid light diffusion", 1.],
@@ -127,7 +131,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 52
+const LIGHTING_MIX_VERSION := 53
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -248,6 +252,12 @@ func make_player()->Node3D:
 
 func setup(world:Node3D)->void:
 	level=world;process_priority=-10
+	var compositor: Compositor = level.get_node("WorldEnvironment").compositor
+	if compositor != null:
+		for effect in compositor.compositor_effects:
+			if effect is WorldOutline:
+				world_outline = effect
+				break
 	if not private_primary:
 		_build_basic_settings()
 		return
@@ -534,6 +544,10 @@ func _update_hdr_air()->void:
 		viewport.use_hdr_2d=_hdr_saved;_hdr_owned=false
 
 func _exit_tree()->void:
+	if world_outline != null:
+		world_outline.enabled = false
+		if RenderingServer.get_rendering_device() != null:
+			RenderingServer.call_on_render_thread(world_outline.release_on_render_thread)
 	if RenderingServer.frame_pre_draw.is_connected(_sync_point_camera):
 		RenderingServer.frame_pre_draw.disconnect(_sync_point_camera)
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
@@ -885,6 +899,10 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"world_outline_width":
+		return 2.
+	if effect == &"world_outline_strength":
+		return 0.
 	if effect == &"sculk_surface":
 		return 0.
 	if effect == &"forest_daylight_accents":
@@ -1067,6 +1085,8 @@ func set_lighting_scale(effect: StringName, value: float) -> void:
 	if not LIGHTING_MIX_CONTROLS.has(effect) or not is_finite(value):
 		return
 	var scale := clampf(value, 0., LIGHTING_MIX_CONTROLS[effect][1])
+	if effect == &"world_outline_width":
+		scale = clampf(roundf(scale), 1., 4.)
 	if scale == float(_lighting_mix.get(effect, _lighting_scale_default(effect))):
 		return
 	_lighting_mix[effect] = scale
@@ -1221,6 +1241,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 52 and effect == &"sculk_surface":
 			missing_value = 0.
+		if version < 53 and effect in [&"world_outline_strength", &"world_outline_width"]:
+			missing_value = _lighting_scale_default(effect)
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1232,6 +1254,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
 		var maximum: float = LIGHTING_MIX_CONTROLS[effect][1]
 		if not (value is int or value is float) or not is_finite(value) or value < 0. or value > maximum:
+			return ERR_INVALID_DATA
+		if effect == &"world_outline_width" and (value < 1. or value != roundf(value)):
 			return ERR_INVALID_DATA
 		restored[effect] = float(value)
 	_lighting_mix = restored
@@ -1256,6 +1280,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		if effect == &"sculk_surface":
 			slider.editable = slider.editable and sculk_surface.available(level)
+		if effect in [&"world_outline_strength", &"world_outline_width"]:
+			slider.editable = slider.editable and world_outline != null and WorldOutline.supported(level.get_viewport())
 		if effect == &"foot_contact":
 			slider.editable = slider.editable and player_contact.available()
 		if effect == &"projected_sun":
@@ -1280,7 +1306,11 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and DepthDiffusion.supported(level.get_viewport())
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
-		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
+		slider.get_meta("readout").text = _mix_readout(effect, scale)
+	if changed_effect in [&"", &"world_outline_strength", &"world_outline_width"]:
+		sync_world_outline()
+		if changed_effect != &"":
+			return
 	if changed_effect in [&"", &"stone_detail_softness"] and level != null and level.look != null:
 		level.look.set_stone_detail_softness(_lighting_scale(&"stone_detail_softness"))
 		if changed_effect == &"stone_detail_softness":
@@ -1490,6 +1520,14 @@ func _sync_forest_night_lights() -> void:
 	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light")):
 		_publish_point_cutoff()
 
+func sync_world_outline() -> void:
+	if world_outline == null:
+		return
+	var strength := _lighting_scale(&"world_outline_strength")
+	if level.look.stage != 2 or _balanced_preview or not WorldOutline.supported(level.get_viewport()):
+		strength = 0.
+	world_outline.configure(strength, roundi(_lighting_scale(&"world_outline_width")))
+
 func apply_time()->void:
 	if not private_primary or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
@@ -1642,6 +1680,11 @@ func _process(delta:float)->void:
 		_exposure_button.set_pressed_no_signal(level.look.local_exposure_active())
 		var msaa:String=["Off","2×","4×","8×"][level.get_viewport().msaa_3d]
 		status.text="%s · %02d:%02d · %s · %d FPS · %s · MSAA %s"%["Tổng hợp" if level.look.stage==2 else "Bản gốc",int(hour),int(fmod(hour,1.)*60.),"Tự chuyển" if cycle_enabled else "Cố định",Engine.get_frames_per_second(),RenderingServer.get_current_rendering_method(),msaa]
+
+static func _mix_readout(effect: StringName, value: float) -> String:
+	if effect == &"world_outline_width":
+		return "%d px" % roundi(value)
+	return "%d%%" % roundi(value * 100.)
 
 func _build_lighting_mix(box: VBoxContainer) -> void:
 	var header := HBoxContainer.new()
@@ -1839,13 +1882,16 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		slider.focus_mode = Control.FOCUS_NONE
 		slider.max_value = spec[1]
 		slider.step = .01
+		if effect == &"world_outline_width":
+			slider.min_value = 1.
+			slider.step = 1.
 		slider.value = _lighting_scale(effect)
 		slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(slider)
 		var readout := Label.new()
 		readout.custom_minimum_size.x = 48
 		readout.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		readout.text = "%d%%" % roundi(slider.value * 100.)
+		readout.text = _mix_readout(effect, slider.value)
 		row.add_child(readout)
 		slider.set_meta("readout", readout)
 		_lighting_sliders[effect] = slider

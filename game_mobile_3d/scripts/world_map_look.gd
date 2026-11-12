@@ -1055,6 +1055,8 @@ func refresh_directional_shadow_blur(sun: DirectionalLight3D) -> void:
 
 func set_stage(value: int) -> void:
 	stage=clampi(value,0,2)
+	if level.get("showcase") != null:
+		level.showcase.sync_world_outline()
 	if level.geometry.has_method("reset_cutaway_materials"):level.geometry.reset_cutaway_materials()
 	for item: Array in terrain_materials:item[0].surface_set_material(item[1],item[2] if stage==0 else item[3])
 	for item: Array in plant_meshes:item[0].mesh=item[1] if stage==0 else item[2]
