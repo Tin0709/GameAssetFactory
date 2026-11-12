@@ -6,6 +6,7 @@ signal attack_accepted(index:int,clip:String,serial:int)
 signal attack_accepted_timed(index:int,clip:String,serial:int,simulation_time:float)
 signal impact_ready(index:int,base:Vector3,tip:Vector3,serial:int)
 signal attack_pose_sample(index: int, clip: String, source_time: float, base: Vector3, tip: Vector3, serial: int)
+signal heavy_jump_landed(position: Vector3, forward: Vector3, serial: int)
 signal source_locomotion_event(notify:String,clip:String,source_seconds:float,simulation_seconds:float)
 signal physics_pose_ready
 signal presentation_reset
@@ -480,7 +481,10 @@ func _physics_process(delta:float)->void:
 	if taking_step:
 		_step_distance+=Vector2(global_position.x-before_move.x,global_position.z-before_move.z).length();_step_elapsed+=delta
 		_step_ready=_step_distance>=COMBAT_STEP_DISTANCE or _step_elapsed>=COMBAT_STEP_TIMEOUT-.0000001
-	if _grounded:_heavy_slam_active=false
+	if _grounded:
+		if not was_grounded and _heavy_slam_active and _floor_initialized and review_clip.is_empty():
+			heavy_jump_landed.emit(global_position, visual.global_basis.z, combo.serial)
+		_heavy_slam_active=false
 	# Source pose duration does not define physical flight. The apex (including
 	# an interrupted ascent at a ceiling) owns the transition into the air loop.
 	if using_original_source and not _grounded and _jump_stage=="JumpTakeoff" and velocity.y<=0.:

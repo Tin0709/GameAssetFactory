@@ -2,6 +2,7 @@ extends Node3D
 ## Spawn and hit routing for private MD2 zombies in MechanicLab.
 
 signal sabre_contact(point: Vector3, direction: Vector3, clip: String, index: int, serial: int, lethal: bool)
+signal sabre_landing(point: Vector3, serial: int)
 
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
@@ -31,6 +32,7 @@ const AIR_STRIKE := {"damage": 20, "range_m": 2.5, "strength": 1150.0, "angle": 
 const GROUND_HEIGHT_LIMIT := 2.1
 const AIR_CENTRE_OFFSET := 1.5
 const AIR_PRIMARY_RANGE := 1.5
+const LEVEL_COLLISION_MASK := 1
 const SPLASH_MULTIPLIER := 0.3
 # Lab impulse scale anchors the 800-strength finisher to the existing ragdoll.
 const IMPULSE_PER_STRENGTH := 0.43
@@ -41,6 +43,7 @@ var _digits: Array[Texture2D]
 var _spawn_serial := 0
 var _hit_windows: Dictionary[String, Vector2] = {}
 var _attack_serial := -1
+var _landing_serial := -1
 var _previous_base := Vector3.ZERO
 var _previous_tip := Vector3.ZERO
 var _hit_targets: Dictionary[int, bool] = {}
@@ -52,7 +55,7 @@ func setup_combat(attacker: CharacterBody3D, clips: Dictionary, native_windows: 
 	_attacker_visual = attacker.get("visual") as Node3D
 	for clip: String in clips:
 		var data: Dictionary = clips[clip]
-		if data.category == "attack" or clip == "AirAttack":
+		if data.category == "attack" and clip != "AirAttack":
 			var trail: Array = data.vfx_window
 			_hit_windows[clip] = Vector2(float(trail[0]), float(trail[1]))
 	for index in native_windows.size():
@@ -106,6 +109,8 @@ func _spawn_point_clear(point: Vector3, player_position: Vector3) -> bool:
 	return true
 
 func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, tip: Vector3, serial: int) -> void:
+	if clip == "AirAttack":
+		return
 	var window: Vector2 = _hit_windows.get(clip, Vector2(-1.0, -1.0))
 	if source_time < window.x or source_time > window.y:
 		return
@@ -114,13 +119,11 @@ func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, t
 		_previous_base = base
 		_previous_tip = tip
 		_hit_targets.clear()
-	var air := clip == "AirAttack"
-	var strike: Dictionary = AIR_STRIKE if air else SABRE_STRIKES[clampi(index, 0, SABRE_STRIKES.size() - 1)]
+	var strike: Dictionary = SABRE_STRIKES[clampi(index, 0, SABRE_STRIKES.size() - 1)]
 	var forward := _attacker_visual.global_basis.z
 	forward.y = 0.0
 	forward = forward.normalized()
 	var origin := _attacker.global_position
-	var centre := origin + forward * AIR_CENTRE_OFFSET if air else origin
 	var candidates: Array[Zombie] = []
 	var points := PackedVector3Array()
 	var nearest_index := -1
@@ -129,9 +132,9 @@ func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, t
 		var id := zombie.get_instance_id()
 		if zombie.health <= 0 or zombie.is_queued_for_deletion() or _hit_targets.has(id):
 			continue
-		var offset := zombie.global_position - centre
+		var offset := zombie.global_position - origin
 		var distance := Vector2(offset.x, offset.z).length()
-		if distance > float(strike.range_m) or (not air and absf(offset.y) > GROUND_HEIGHT_LIMIT):
+		if distance > float(strike.range_m) or absf(offset.y) > GROUND_HEIGHT_LIMIT:
 			continue
 		var low := zombie.global_position + Vector3.UP * Zombie.HIT_RADIUS
 		var high := zombie.global_position + Vector3.UP * (Zombie.HEIGHT - Zombie.HIT_RADIUS)
@@ -152,27 +155,48 @@ func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, t
 	_previous_tip = tip
 	if nearest_index < 0:
 		return
-	var angle := deg_to_rad(float(strike.angle))
-	var impulse := Vector2(cos(angle), sin(angle)) * float(strike.strength) * IMPULSE_PER_STRENGTH
 	# The first blade contact is primary. Ties within a sample favor the nearer
 	# target so spawn order cannot change which target takes the full strike.
-	if not air and _hit_targets.is_empty():
-		_apply_contact(candidates[nearest_index], points[nearest_index], clip, index, serial, strike, impulse, forward, false)
+	if _hit_targets.is_empty():
+		_apply_contact(candidates[nearest_index], points[nearest_index], clip, index, serial, strike, forward, false)
 	for slot in candidates.size():
 		var zombie := candidates[slot]
 		if _hit_targets.has(zombie.get_instance_id()):
 			continue
-		var planar := zombie.global_position - centre
-		planar.y = 0.0
-		var splash := not air or planar.length() > AIR_PRIMARY_RANGE
-		_apply_contact(zombie, points[slot], clip, index, serial, strike, impulse, forward, splash)
+		_apply_contact(zombie, points[slot], clip, index, serial, strike, forward, true)
 
-func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, impulse: Vector2, forward: Vector3, splash: bool) -> void:
+func land_sabre(position: Vector3, facing: Vector3, serial: int) -> void:
+	if serial == _landing_serial:
+		return
+	_landing_serial = serial
+	var forward := Vector3(facing.x, 0.0, facing.z).normalized()
+	var centre := position + forward * AIR_CENTRE_OFFSET
+	sabre_landing.emit(centre, serial)
+	var space := get_world_3d().direct_space_state
+	var ray := PhysicsRayQueryParameters3D.create(position + Vector3.UP * 0.65, position, LEVEL_COLLISION_MASK)
+	ray.hit_from_inside = true
+	for zombie: Zombie in get_children():
+		if zombie.health <= 0 or zombie.is_queued_for_deletion():
+			continue
+		var offset := zombie.global_position - centre
+		var distance := Vector2(offset.x, offset.z).length()
+		if distance > float(AIR_STRIKE.range_m) or absf(offset.y) > GROUND_HEIGHT_LIMIT:
+			continue
+		var contact := zombie.global_position + Vector3.UP * 0.65
+		ray.to = contact
+		if not space.intersect_ray(ray).is_empty():
+			continue
+		_apply_contact(zombie, contact, "AirAttack", 0, serial, AIR_STRIKE, forward, distance > AIR_PRIMARY_RANGE)
+
+func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool) -> void:
 	var direction := zombie.global_position - _attacker.global_position if clip == "AirAttack" or index == 2 else forward
 	direction.y = 0.0
 	direction = direction.normalized()
 	var damage := roundi(float(strike.damage) * SPLASH_MULTIPLIER) if splash else int(strike.damage)
-	_hit_targets[zombie.get_instance_id()] = true
+	var angle := deg_to_rad(float(strike.angle))
+	var impulse := Vector2(cos(angle), sin(angle)) * float(strike.strength) * IMPULSE_PER_STRENGTH
+	if clip != "AirAttack":
+		_hit_targets[zombie.get_instance_id()] = true
 	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger))
 	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
 
