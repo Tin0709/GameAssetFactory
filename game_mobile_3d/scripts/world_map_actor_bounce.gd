@@ -38,7 +38,7 @@ func available() -> bool:
 	return not _proof.is_empty()
 
 func sample(position: Vector3, slots: Vector4) -> PackedVector3Array:
-	if not available() or slots.w <= 0. or fade(position) <= 0. or not _load():
+	if not available() or slots.w <= 0. or not position.is_finite() or fade(position) <= 0. or not _load():
 		return PackedVector3Array()
 	var key := Vector3(slots.x, slots.y, slots.z)
 	if position == _position and key == _slots:

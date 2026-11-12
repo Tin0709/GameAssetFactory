@@ -14,6 +14,8 @@ var update_usec:=0
 var _last_bind_key:Array=[]
 var phase_sky:=true
 var source_field=preload("res://scripts/world_map_actor_source_field.gd").new()
+var phase_bounce=preload("res://scripts/world_map_actor_bounce.gd").new()
+var phase_bounce_active:=false
 var source_field_enabled:=false
 var source_field_active:=false
 var _source_key:Array=[]
@@ -28,6 +30,7 @@ func setup(world:Node3D)->void:
   cache=load(PATH)
   cache_ready=cache.get_meta("scope","")=="Original GAF actor incident field; not MD2 radiance" and cache.get_meta("source_runtime_sha256","")==FileAccess.get_sha256(level.DATA) and context_matches() and field.initialize(cache)
   if cache_ready:source_field.prepare(field)
+  if cache_ready:phase_bounce.setup(level,PATH)
  refresh(true)
 func context_matches()->bool:
  if cache==null or level.get("terrain_light")==null or not level.terrain_light.installed:return false
@@ -74,14 +77,25 @@ func refresh(force:bool=false)->void:
  var env:Environment=level.get_node("WorldEnvironment").environment
  var original:Array=cache.get_meta("ambient_srgb",[])if cache_ready else []
  var tint:=Vector3.ONE;var scale:=0.;var key:=Vector3.ZERO
+ var bounce_sun:=_sun
+ phase_bounce_active=false
  if active:
   var a:=Color(original[0],original[1],original[2]).srgb_to_linear();var b:=env.ambient_light_color.srgb_to_linear()
   tint=Vector3(b.r/a.r,b.g/a.g,b.b/a.b);scale=env.ambient_light_energy/float(cache.get_meta("ambient_energy"))
   scale*=level.showcase.player_sky_fill_mix_scale()
   var sun:DirectionalLight3D=level.get_node("Sun");var c:=sun.light_color.srgb_to_linear();var d:Array=cache.get_meta("sun_direction")
   if level.look._ground_bounce_requested and sun.global_basis.z.normalized().dot(Vector3(d[0],d[1],d[2]))>cos(deg_to_rad(.1)):key=Vector3(c.r,c.g,c.b)*sun.light_energy
+  var bounce_mix:float=level.showcase._lighting_scale(&"player_bounce")
+  if bounce_mix>0. and key==Vector3.ZERO and level.look._ground_bounce_requested and phase_bounce.available() \
+   and (level.look.player_local_light_enabled or level.look.player_reflection_enabled):
+   var slots:Vector4=level.showcase.directional_air.sun_slots()
+   var values:PackedVector3Array=phase_bounce.sample(p,slots)
+   if values.size()==18:
+    bounce_sun=values
+    key=Vector3(c.r,c.g,c.b)*(sun.light_energy*bounce_mix*slots.w*phase_bounce.fade(p))
+    phase_bounce_active=true
  var skin_verified:bool=level.look.player_effects_available()
- var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active]
+ var bind_key:Array=[active,p,level.look.player_local_light_enabled,level.look.player_reflection_enabled,level.look.player_skin_enabled,tint,scale,key,skin_verified,_source_key,source_field_active,phase_bounce_active,bounce_sun if phase_bounce_active else null]
  if not force and bind_key==_last_bind_key:
   update_usec=Time.get_ticks_usec()-started;return
  _last_bind_key=bind_key
@@ -92,7 +106,7 @@ func refresh(force:bool=false)->void:
   m.set_shader_parameter("player_rough_reflection",active and level.look.player_reflection_enabled)
   m.set_shader_parameter("skin_wrap_enabled",active and skin_verified and level.look.player_skin_enabled and m.get_meta("has_profile_mask",false))
   if active:
-   m.set_shader_parameter("player_probe_sky",_sky);m.set_shader_parameter("player_probe_sun",_sun)
+   m.set_shader_parameter("player_probe_sky",_sky);m.set_shader_parameter("player_probe_sun",bounce_sun)
    m.set_shader_parameter("player_probe_base",p.y);m.set_shader_parameter("player_probe_tint",tint)
    m.set_shader_parameter("player_probe_scale",scale);m.set_shader_parameter("player_probe_key",key)
  update_usec=Time.get_ticks_usec()-started
