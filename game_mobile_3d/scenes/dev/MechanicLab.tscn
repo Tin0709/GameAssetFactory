@@ -109,5 +109,14 @@ offset_bottom = 103.0
 focus_mode = 0
 text = "Âm thanh combat"
 
+[node name="BaseZombieToggle" type="CheckButton" parent="HUD"]
+offset_left = 350.0
+offset_top = 69.0
+offset_right = 535.0
+offset_bottom = 103.0
+focus_mode = 0
+text = "Zombie MD2 · 8 HP"
+tooltip_text = "Áp dụng cho zombie mới. Khi tắt, zombie luyện combo có 48 HP."
+
 [connection signal="pressed" from="HUD/SpawnZombie" to="." method="_spawn_zombie"]
 [connection signal="toggled" from="HUD/CombatAudioToggle" to="." method="_set_combat_audio"]

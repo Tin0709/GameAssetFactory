@@ -69,6 +69,7 @@ func _ready() -> void:
 	$HUD/Controls.text += " · Cuộn chuột để zoom"
 	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
 	$HUD/CombatAudioToggle.disabled = $HUD/SpawnZombie.disabled
+	$HUD/BaseZombieToggle.disabled = $HUD/SpawnZombie.disabled
 	if not $HUD/SpawnZombie.disabled:
 		player.collision_mask |= 4
 		_combat_audio = CombatAudio.new()
@@ -79,7 +80,7 @@ func _ready() -> void:
 		ribbon_material.shader = SABRE_RIBBON_SHADER
 		player.effects.ribbon.material_override = ribbon_material
 		player.combo.native_tap_buffer_seconds = SABRE_TAP_BUFFER
-		$Zombies.setup_combat(player.clips, player.combo.native_windows)
+		$Zombies.setup_combat(player, player.clips, player.combo.native_windows)
 		player.connect("attack_pose_sample", $Zombies.sample_sabre)
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
@@ -176,7 +177,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _spawn_zombie() -> void:
 	var facing := Basis(Vector3.UP, player.visual.rotation.y)
-	if $Zombies.spawn(player, facing, $CombatEffects):
+	if $Zombies.spawn(player, facing, $CombatEffects, $HUD/BaseZombieToggle.button_pressed):
 		$HUD/SpawnStatus.text = ""
 	else:
 		$HUD/SpawnStatus.text = "Không thể tạo zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."

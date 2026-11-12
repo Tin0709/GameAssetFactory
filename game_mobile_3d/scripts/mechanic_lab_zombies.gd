@@ -21,7 +21,19 @@ const SKIN_HASH := "1569dd314999fa126dbea34a3ea44112e79c2737f519b87ab8f20be29ad9
 const DIGIT_HASH := "7fa2e2801d368ee8f1a61c81bf736c60a250f42bd343ed97b71ceb9000e9beef"
 const FLOOR_LIMIT := 49.0
 const SPACING := 1.25
-const SABRE_DAMAGE := [20, 20, 28]
+# DT_MeleePropertyDefinition: Sabre_1 through Sabre_3.
+const SABRE_STRIKES := [
+	{"damage": 12, "range_m": 2.5, "strength": 500.0, "angle": 15.0, "stagger": 23.0},
+	{"damage": 14, "range_m": 2.5, "strength": 500.0, "angle": 15.0, "stagger": 23.0},
+	{"damage": 22, "range_m": 3.5, "strength": 800.0, "angle": 25.0, "stagger": 45.0},
+]
+const AIR_STRIKE := {"damage": 20, "range_m": 2.5, "strength": 1150.0, "angle": 25.0, "stagger": 37.0}
+const GROUND_HEIGHT_LIMIT := 2.1
+const AIR_CENTRE_OFFSET := 1.5
+const AIR_PRIMARY_RANGE := 1.5
+const SPLASH_MULTIPLIER := 0.3
+# Lab impulse scale anchors the 800-strength finisher to the existing ragdoll.
+const IMPULSE_PER_STRENGTH := 0.43
 const BLADE_RADIUS := 0.14
 
 var _visual: PackedScene
@@ -32,8 +44,12 @@ var _attack_serial := -1
 var _previous_base := Vector3.ZERO
 var _previous_tip := Vector3.ZERO
 var _hit_targets: Dictionary[int, bool] = {}
+var _attacker: CharacterBody3D
+var _attacker_visual: Node3D
 
-func setup_combat(clips: Dictionary, native_windows: Array) -> void:
+func setup_combat(attacker: CharacterBody3D, clips: Dictionary, native_windows: Array) -> void:
+	_attacker = attacker
+	_attacker_visual = attacker.get("visual") as Node3D
 	for clip: String in clips:
 		var data: Dictionary = clips[clip]
 		if data.category == "attack" or clip == "AirAttack":
@@ -46,7 +62,7 @@ func setup_combat(clips: Dictionary, native_windows: Array) -> void:
 		# The source contact key anchors the start. The trail tail bounds the lab sweep.
 		_hit_windows[clip] = Vector2(minf(float(trail[0]), float(native.melee)), maxf(float(trail[1]), float(native.melee)))
 
-func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D) -> bool:
+func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie: bool = false) -> bool:
 	if _visual == null:
 		_load_assets()
 	if _visual == null:
@@ -59,6 +75,7 @@ func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D) -> bool:
 	var zombie := Zombie.new()
 	zombie.name = "Zombie"
 	zombie.position = point
+	zombie.max_health = Zombie.BASE_HEALTH if base_zombie else Zombie.TRAINING_HEALTH
 	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial)
 	_spawn_serial += 1
 	add_child(zombie, true)
@@ -97,9 +114,24 @@ func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, t
 		_previous_base = base
 		_previous_tip = tip
 		_hit_targets.clear()
+	var air := clip == "AirAttack"
+	var strike: Dictionary = AIR_STRIKE if air else SABRE_STRIKES[clampi(index, 0, SABRE_STRIKES.size() - 1)]
+	var forward := _attacker_visual.global_basis.z
+	forward.y = 0.0
+	forward = forward.normalized()
+	var origin := _attacker.global_position
+	var centre := origin + forward * AIR_CENTRE_OFFSET if air else origin
+	var candidates: Array[Zombie] = []
+	var points := PackedVector3Array()
+	var nearest_index := -1
+	var nearest_distance := INF
 	for zombie: Zombie in get_children():
 		var id := zombie.get_instance_id()
 		if zombie.health <= 0 or zombie.is_queued_for_deletion() or _hit_targets.has(id):
+			continue
+		var offset := zombie.global_position - centre
+		var distance := Vector2(offset.x, offset.z).length()
+		if distance > float(strike.range_m) or (not air and absf(offset.y) > GROUND_HEIGHT_LIMIT):
 			continue
 		var low := zombie.global_position + Vector3.UP * Zombie.HIT_RADIUS
 		var high := zombie.global_position + Vector3.UP * (Zombie.HEIGHT - Zombie.HIT_RADIUS)
@@ -111,12 +143,38 @@ func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, t
 		if not contact.is_finite():
 			contact = _blade_contact(base, _previous_tip, low, high, reach)
 		if contact.is_finite():
-			var direction := zombie.global_position - zombie.target.global_position
-			_hit_targets[id] = true
-			zombie.take_hit(SABRE_DAMAGE[clampi(index, 0, SABRE_DAMAGE.size() - 1)], direction)
-			sabre_contact.emit(contact, direction.normalized(), clip, index, serial, zombie.health <= 0)
+			if distance < nearest_distance:
+				nearest_index = candidates.size()
+				nearest_distance = distance
+			candidates.append(zombie)
+			points.append(contact)
 	_previous_base = base
 	_previous_tip = tip
+	if nearest_index < 0:
+		return
+	var angle := deg_to_rad(float(strike.angle))
+	var impulse := Vector2(cos(angle), sin(angle)) * float(strike.strength) * IMPULSE_PER_STRENGTH
+	# The first blade contact is primary. Ties within a sample favor the nearer
+	# target so spawn order cannot change which target takes the full strike.
+	if not air and _hit_targets.is_empty():
+		_apply_contact(candidates[nearest_index], points[nearest_index], clip, index, serial, strike, impulse, forward, false)
+	for slot in candidates.size():
+		var zombie := candidates[slot]
+		if _hit_targets.has(zombie.get_instance_id()):
+			continue
+		var planar := zombie.global_position - centre
+		planar.y = 0.0
+		var splash := not air or planar.length() > AIR_PRIMARY_RANGE
+		_apply_contact(zombie, points[slot], clip, index, serial, strike, impulse, forward, splash)
+
+func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, impulse: Vector2, forward: Vector3, splash: bool) -> void:
+	var direction := zombie.global_position - _attacker.global_position if clip == "AirAttack" or index == 2 else forward
+	direction.y = 0.0
+	direction = direction.normalized()
+	var damage := roundi(float(strike.damage) * SPLASH_MULTIPLIER) if splash else int(strike.damage)
+	_hit_targets[zombie.get_instance_id()] = true
+	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger))
+	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
 
 func _blade_contact(a: Vector3, b: Vector3, low: Vector3, high: Vector3, reach: float) -> Vector3:
 	var closest := Geometry3D.get_closest_points_between_segments(a, b, low, high)
