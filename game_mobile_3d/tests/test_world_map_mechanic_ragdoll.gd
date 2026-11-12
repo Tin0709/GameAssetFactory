@@ -30,7 +30,7 @@ func terrain_contact_depth(zombie: Node3D) -> float:
 	return deepest
 
 func launch(world: Node3D, group: Node3D, effects: Node3D, start: Vector3, direction: Vector3,
-		strike := Zombie.DeathStrike.SABRE_FINISHER, yaw := 0.0) -> Node3D:
+		strike := Zombie.DeathStrike.SABRE_FINISHER, yaw := 0.0, launch_multiplier := 1.0) -> Node3D:
 	if not group.spawn(world.player, Basis.IDENTITY, effects):
 		check(false, "The verified zombie is available on WorldMap")
 		return null
@@ -44,6 +44,7 @@ func launch(world: Node3D, group: Node3D, effects: Node3D, start: Vector3, direc
 	await ticks(2)
 	for i in 2:
 		zombie.ragdoll.sample(1.0 / 60.0)
+	zombie.ragdoll_launch_multiplier = launch_multiplier
 	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 800.0, strike)
 	zombie.set_physics_process(true)
 	return zombie
@@ -103,8 +104,8 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 
 func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.DeathStrike,
 		frames: int, start := Vector3(-33.5, 9.0, -39.5), direction := Vector3.RIGHT, yaw := 0.0,
-		anchor_limit := 0.12) -> void:
-	var zombie = await launch(world, group, effects, start, direction, strike, yaw)
+		anchor_limit := 0.12, launch_multiplier := 1.0) -> void:
+	var zombie = await launch(world, group, effects, start, direction, strike, yaw, launch_multiplier)
 	if zombie == null:
 		return
 	var first_landing := -1
@@ -136,7 +137,7 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	check(first_landing > 25 and first_landing < 60 and ledge_contact and chest_height < 6.0,
 		"The corpse crosses the authored ledge and contacts the lower terrain")
 	check(worst_anchor < anchor_limit, "The first impact on the lower terrace keeps the limb anchors connected")
-	check(worst_overlap < 0.12, "The ledge contact stays within the terrain penetration budget")
+	check(worst_overlap < 0.12, "The ledge contact at %.0f%% launch stays within the terrain penetration budget" % (launch_multiplier * 100.0))
 	if strike == Zombie.DeathStrike.GROUND:
 		check(parked_frame > first_landing and parked_frame < 150,
 			"A forward melee finisher rolls off its upright foot support and settles within 2.5 seconds")
@@ -383,6 +384,10 @@ func run() -> void:
 		group._spawn_serial = 11
 		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER, 180,
 			Vector3(-33.5, 9.0, -39.28), Vector3.RIGHT.rotated(Vector3.UP, -0.18))
+		# A faster Sabre throw crosses the slanted edge within one physics tick.
+		group._spawn_serial = 8
+		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER, 125,
+			Vector3(-33.5, 9.0, -39.14), Vector3.RIGHT.rotated(Vector3.UP, -0.18), 0.0, 0.12, 1.20)
 		await oblique_cliff_case(world, group, effects)
 		await cliff_edge_case(world, group, effects, 10, -37.39, -0.18, -0.08, Zombie.DeathStrike.AIR)
 		# A glancing right arm can cross the front triangle before the side reports contact.
