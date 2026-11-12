@@ -1,0 +1,24 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/scene_lighting_mix.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Rừng ẩm · Nắng và bóng"
+description = "Phối sương sau tán với viền nắng mềm, ánh sáng hắt ở vùng sáng và sắc đá trong bóng xanh."
+review_tip = "Thử lúc 16:30 ở lối rừng, rồi xem vách đá lúc 22:00. Dùng Hoàn tác để trở về phối trước."
+strengths = Dictionary[StringName, float]({
+&"projected_sun_position": 1.0,
+&"projected_sun_softness": 0.75,
+&"cool_shadow_detail": 0.70,
+&"diffuse_openings": 0.45,
+&"sunlit_mist": 0.36,
+&"daylight_haze": 0.85,
+&"local_mist": 0.18,
+&"daylight_bounce": 0.65,
+&"cliff_mist": 0.65,
+&"night_cliff_mist": 1.0,
+&"night_spatial_sky": 0.65,
+&"night_stone_fill_balance": 0.72,
+&"bloom_diffusion": 0.60
+})
