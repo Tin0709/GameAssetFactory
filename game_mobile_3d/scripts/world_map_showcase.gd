@@ -109,6 +109,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sunlit_mist": ["Canopy sunlight in mist", DirectionalAir.MAX_GAIN],
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
+	&"night_depth_scatter": ["Ánh xanh trong sương xa", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
 	&"forest_daylight_accents": ["Forest daylight accents", 1.],
 	&"sculk_surface": ["Sculk phát sáng", 1.],
@@ -133,7 +134,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 57
+const LIGHTING_MIX_VERSION := 58
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -608,8 +609,10 @@ func _update_mist()->void:
 	if atmosphere_review == "combined" and not measured.is_empty():
 		# Scale only the existing cool source. Optical depth and the warm emitter
 		# stay independent, so the distant haze can lift without hiding the actor.
-		var night_mix := moonlight_weight(hour) * _lighting_scale(&"night_mist_light")
+		var night_weight := moonlight_weight(hour)
+		var night_mix := night_weight * _lighting_scale(&"night_mist_light")
 		sample.scatter_energy *= lerpf(1.0, NIGHT_MIST_MAX_GAIN, night_mix)
+		sample.depth_scatter = night_weight * _lighting_scale(&"night_depth_scatter")
 	sample.player_light_weight *= _lighting_scale(&"lantern") * _lighting_scale(&"lantern_air")
 	var near_scale := _lighting_scale(&"near_haze")
 	if near_scale > 0. and not measured.is_empty() and camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
@@ -897,7 +900,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 1.
 	if effect == &"world_outline_strength":
 		return 0.
-	if effect in [&"sculk_surface", &"forest_path_placement", &"forest_path_air_beam"]:
+	if effect in [&"sculk_surface", &"forest_path_placement", &"forest_path_air_beam", &"night_depth_scatter"]:
 		return 0.
 	if effect == &"forest_daylight_accents":
 		return .65
@@ -1255,6 +1258,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 57 and effect == &"forest_path_air_beam":
 			missing_value = 0.
+		if version < 58 and effect == &"night_depth_scatter":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1387,7 +1392,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter"]:
 		_update_mist()
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:

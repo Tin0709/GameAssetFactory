@@ -23,5 +23,6 @@ strengths = Dictionary[StringName, float]({
 &"bloom_diffusion": 0.60,
 &"sculk_surface": 0.65,
 &"forest_path_placement": 1.0,
-&"forest_path_air_beam": 0.65
+&"forest_path_air_beam": 0.65,
+&"night_depth_scatter": 1.0
 })
