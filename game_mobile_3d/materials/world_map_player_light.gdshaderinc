@@ -1,11 +1,13 @@
 #include "res://materials/world_map_point_kernel.gdshaderinc"
 #include "res://materials/world_map_soft_source.gdshaderinc"
+#include "res://materials/world_map_sun_opening.gdshaderinc"
 // Actor-only Burley/GGX direct response. Ambient/emission remain engine-owned.
 // Unlike the older matte-terrain helper, specular lobes are not clipped to 1.
 varying float player_cloud;
 float player_fresnel(float c){float x=1.0-c;float s=x*x;return s*s*x;}
 void light(){
 	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
+	vec3 key_color = LIGHT_COLOR * gaf_opening_gain(LIGHT_IS_DIRECTIONAL, ATTENUATION * player_cloud);
 	float nl=max(dot(NORMAL,LIGHT),0.0);
 	// Original selective wrap, not native screen-space diffusion. Integral of
 	// max(N.L+w,0)/(1+w)^2 over the sphere is PI: redistribute, do not add a lamp.
@@ -13,7 +15,7 @@ void light(){
 		float wrapped=max(dot(NORMAL,LIGHT)+.15,0.)/(1.15*1.15);
 		float delta=wrapped-nl;
 		float visibility=point_attenuation*(LIGHT_IS_DIRECTIONAL?player_cloud:1.);
-		DIFFUSE_LIGHT+=LIGHT_COLOR*visibility*delta/PI*player_skin_weight;
+		DIFFUSE_LIGHT+=key_color*visibility*delta/PI*player_skin_weight;
 	}
 	if(nl>0.0){
 		float nv=max(dot(NORMAL,VIEW),0.0001);
@@ -24,9 +26,9 @@ void light(){
 		if(METALLIC<1.0){
 #ifndef GAF_WORLD_FORCE_LAMBERT
 			float grazing=2.0*lh*lh*ROUGHNESS-0.5;
-			DIFFUSE_LIGHT+=LIGHT_COLOR*incident*(1.0+grazing*player_fresnel(nv))*(1.0+grazing*player_fresnel(nl));
+			DIFFUSE_LIGHT+=key_color*incident*(1.0+grazing*player_fresnel(nv))*(1.0+grazing*player_fresnel(nl));
 #else
-			DIFFUSE_LIGHT+=LIGHT_COLOR*incident;
+			DIFFUSE_LIGHT+=key_color*incident;
 #endif
 		}
 		float source_angle=gaf_player_soft_angle(LIGHT_IS_DIRECTIONAL,LIGHT,actor_world,INV_VIEW_MATRIX,LIGHT_COLOR.b);
@@ -38,7 +40,7 @@ void light(){
 			float visibility=0.5/max(mix(2.0*nl*nv,nl+nv,a),0.0000001);
 			vec3 f0=mix(vec3(0.16*native_specular*native_specular),ALBEDO,METALLIC);
 			float f90=clamp(dot(f0,vec3(16.5)),METALLIC,1.0);
-			SPECULAR_LIGHT+=LIGHT_COLOR*incident*k*k*visibility*(f0+(f90-f0)*player_fresnel(lh))*SPECULAR_AMOUNT;
+			SPECULAR_LIGHT+=key_color*incident*k*k*visibility*(f0+(f90-f0)*player_fresnel(lh))*SPECULAR_AMOUNT;
 		}
 	}
 }

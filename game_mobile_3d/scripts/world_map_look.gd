@@ -506,7 +506,7 @@ func _refresh_cloud_look() -> void:
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)
 	if level.get("showcase") != null:
-		level.showcase.refresh_projected_sun()
+		level.showcase.refresh_daylight_shading()
 
 func foliage_light_available() -> bool:
 	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_rendering_device() != null and not ProjectSettings.get_setting_with_override("rendering/shading/overrides/force_vertex_shading")

@@ -1,5 +1,6 @@
 // Original Mobile response using existing GAF direct-light/cloud helpers.
 #include "res://materials/world_map_clouds.gdshaderinc"
+#include "res://materials/world_map_sun_opening.gdshaderinc"
 #define GAF_WORLD_FOLIAGE_LOBE_ONLY
 #include "res://materials/world_map_foliage_light.gdshaderinc"
 uniform float study_grass_up_weight=0.0;
@@ -22,5 +23,6 @@ void light(){
 		response+=world_foliage_lobe(study_face,LIGHT,VIEW,front,study_tip_weight,study_transmission);
 	}
 	float cloud=LIGHT_IS_DIRECTIONAL?study_cloud:1.0;
-	DIFFUSE_LIGHT+=response*LIGHT_COLOR*(point_attenuation*cloud/PI);
+	float gain = gaf_opening_gain(LIGHT_IS_DIRECTIONAL, ATTENUATION * cloud);
+	DIFFUSE_LIGHT+=response*(LIGHT_COLOR * gain)*(point_attenuation*cloud/PI);
 }

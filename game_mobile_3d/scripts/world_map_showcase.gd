@@ -60,9 +60,11 @@ var _forest_energy:float
 var _forest_shadow_opacity:float
 var full_direct_shadows:=true
 var projected_sun := ProjectedSun.new()
+var _opening_gain := 0.0
 const LIGHTING_MIX_CONTROLS := {
 	&"sun": ["Direct sunlight", 2.],
 	&"sun_pockets": ["Sunlight pockets", 1.5],
+	&"sun_opening": ["Sunlit openings", 1.],
 	&"projected_sun": ["Projected sunlight (preview)", 1.],
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
@@ -106,7 +108,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 34
+const LIGHTING_MIX_VERSION := 35
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -220,6 +222,7 @@ func setup(world:Node3D)->void:
 	if not private_primary:return
 	_point_kernel_owner=weakref(self)
 	projected_sun.setup()
+	RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 	RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
 	get_tree().node_added.connect(_track_point_light)
 	for light in get_tree().root.find_children("*","Light3D",true,false):_track_point_light(light)
@@ -500,6 +503,7 @@ func _update_hdr_air()->void:
 func _exit_tree()->void:
 	if _point_kernel_owner!=null and _point_kernel_owner.get_ref()==self:
 		projected_sun.release()
+		RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", 0.)
 		RenderingServer.global_shader_parameter_set("gaf_point_kernel",Vector4.ZERO);_point_kernel_owner=null
 		RenderingServer.global_shader_parameter_set("gaf_point_soft",Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_point_mixed",false)
@@ -803,6 +807,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"sun_opening":
+		return .75
 	if effect == &"twilight_shadow_color":
 		return .65
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
@@ -870,13 +876,17 @@ func sunlight_pockets_weight() -> float:
 		return 0.
 	return .65 * _lighting_scale(&"sun_pockets") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 
-func refresh_projected_sun() -> void:
+func refresh_daylight_shading() -> void:
 	if _point_kernel_owner == null or _point_kernel_owner.get_ref() != self:
 		return
-	var weight := 0.0
+	var phase := 0.0
 	if forest_active() and atmosphere_review in ["lighting", "combined"] and level.look.direct_clouds_active():
-		weight = _lighting_scale(&"projected_sun") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
-	projected_sun.set_weight(weight)
+		phase = PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+	projected_sun.set_weight(_lighting_scale(&"projected_sun") * phase)
+	var gain := .64 * _lighting_scale(&"sun_opening") * phase if not _balanced_preview else 0.
+	if gain != _opening_gain:
+		_opening_gain = gain
+		RenderingServer.global_shader_parameter_set("gaf_sun_opening_gain", gain)
 	var slider: HSlider = _lighting_sliders.get(&"projected_sun")
 	if slider != null:
 		slider.editable = not _balanced_preview and projected_sun.available()
@@ -984,7 +994,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1043,6 +1053,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 34 and effect == &"humid_depth":
 			missing_value = 0.
+		if version < 35 and effect == &"sun_opening":
+			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
@@ -1075,8 +1087,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
-	if changed_effect == &"projected_sun":
-		refresh_projected_sun()
+	if changed_effect in [&"projected_sun", &"sun_opening"]:
+		refresh_daylight_shading()
 		return
 	if changed_effect in [&"humid_light", &"humid_depth"]:
 		if phase_finish != null:
@@ -1266,7 +1278,7 @@ func _sync_forest_night_lights() -> void:
 func apply_time()->void:
 	if not private_primary or level==null or level.look==null:
 		sky_response_active=false;key_direction_active=false;return
-	refresh_projected_sun()
+	refresh_daylight_shading()
 	_publish_night_path_chroma()
 	_publish_stone_twilight_color()
 	_sync_forest_night_lights()
@@ -1494,6 +1506,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Adjust the F1 sunlight filter radius in the morning and afternoon. 100% uses the previous radius. Noon and night keep their existing filter."
 		if effect == &"sun_pockets":
 			slider.tooltip_text = "Deepen the existing F3 daylight shade on terrain, grass and the player. 0% restores the previous light pattern. Noon and night keep their current lighting."
+		if effect == &"sun_opening":
+			slider.tooltip_text = "Lift sunlit openings on the ground, grass and player at dawn and in the afternoon. 0% restores the previous response. Requires F3 direct shading."
 		if effect == &"projected_sun":
 			slider.editable = projected_sun.available()
 			slider.tooltip_text = "Try 65% at 07:00 or 16:30. The private Forest projection shapes the sunlight between shadows. Requires F3 direct cloud shading and the verified private reference."
