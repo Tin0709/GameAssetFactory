@@ -2163,7 +2163,7 @@ func _build_ui()->void:
 	edges.toggled.connect(phase_finish.set_edge_softening);phase_finish.edge_toggle=edges
 	var hdr_toggle:=CheckButton.new();hdr_toggle.text="Air · preserve HDR highlights (higher bandwidth)";hdr_toggle.button_pressed=hdr_air;hdr_toggle.focus_mode=Control.FOCUS_NONE;box.add_child(hdr_toggle);hdr_toggle.toggled.connect(set_hdr_air)
 	var times:=HBoxContainer.new();box.add_child(times)
-	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Night",22.]]:
+	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Night",22.],["Dawn",2.5]]:
 		var button:=Button.new();button.text=entry[0];button.focus_mode=Control.FOCUS_NONE;times.add_child(button)
 		button.pressed.connect(_choose_hour.bind(float(entry[1])))
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
