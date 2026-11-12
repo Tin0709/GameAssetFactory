@@ -27,6 +27,8 @@ const TERRAIN_RESIDUAL_OVERLAP := 0.018
 const TERRAIN_DEEP_OVERLAP := 0.12
 const TERRAIN_DEEP_RESIDUAL := 0.08
 const TERRAIN_MAX_RECOVERY_SHIFT := 0.14
+const TERRAIN_POSE_REWIND_LIMIT := 0.30
+const TERRAIN_POSE_REWIND_SAMPLES := 8
 const CONE_DEFAULT_BIAS := 0.30
 const CONE_OVERSHOOT_BIAS := 0.10
 const CONE_SUPPORT_OVERSHOOT_COS := cos(deg_to_rad(75.0))
@@ -529,6 +531,63 @@ func _project_terrain_contact() -> void:
 		_project_unresolved_wall_contact(first_wall_parts)
 	elif missed_wall != null and not has_deep_contact:
 		_try_terrain_translation(missed_rewind, missed_wall, true)
+	if has_deep_contact:
+		_rewind_swept_terrain_pose()
+
+func _rewind_swept_terrain_pose() -> void:
+	if _terrain_poses.size() != bodies.size():
+		return
+	var present: Dictionary[String, Transform3D] = {}
+	var deepest := ""
+	var worst := TERRAIN_DEEP_OVERLAP
+	for name: String in bodies:
+		var body: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			return
+		present[name] = state.transform
+		var depth := _deepest_contact(_terrain_contact_points(body, state, Vector3.ZERO))
+		if depth > worst:
+			deepest = name
+			worst = depth
+	if deepest.is_empty():
+		return
+	var leading: PhysicalBone3D = bodies[deepest]
+	var leading_state := PhysicsServer3D.body_get_direct_state(leading.get_rid())
+	var space := leading_state.get_space_state()
+	var prior_depth := _deepest_contact(_terrain_contacts_at(leading, space, _terrain_poses[deepest]))
+	if prior_depth > TERRAIN_DEEP_RESIDUAL:
+		return
+	var maximum_fraction := 1.0
+	for name: String in bodies:
+		var travel := present[name].origin.distance_to(_terrain_poses[name].origin)
+		if travel > TERRAIN_POSE_REWIND_LIMIT:
+			maximum_fraction = minf(maximum_fraction, TERRAIN_POSE_REWIND_LIMIT / travel)
+
+	# A rotating limb can cross a ledge before the end-pose normal points
+	# against its motion. Sample the entire rig at matching times so nearby
+	# limbs follow the same correction, then let the solver handle velocity.
+	var best: Dictionary[String, Transform3D] = {}
+	for sample in range(1, TERRAIN_POSE_REWIND_SAMPLES + 1):
+		var fraction := maximum_fraction * float(sample) / float(TERRAIN_POSE_REWIND_SAMPLES)
+		var trial: Dictionary[String, Transform3D] = {}
+		var peak := 0.0
+		for name: String in bodies:
+			var pose := present[name].interpolate_with(_terrain_poses[name], fraction)
+			trial[name] = pose
+			var depth := _deepest_contact(_terrain_contacts_at(bodies[name], space, pose))
+			peak = maxf(peak, depth)
+			if peak >= worst - TERRAIN_RESIDUAL_OVERLAP:
+				break
+		if trial.size() == bodies.size() and peak < worst - TERRAIN_RESIDUAL_OVERLAP:
+			best = trial
+			worst = peak
+			if peak <= TERRAIN_DEEP_RESIDUAL:
+				break
+	for name: String in best:
+		var body: PhysicalBone3D = bodies[name]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		state.transform = best[name]
 
 func _project_unresolved_wall_contact(names: Array[String]) -> void:
 	var deepest: PhysicalBone3D
