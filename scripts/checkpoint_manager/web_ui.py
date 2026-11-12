@@ -22,7 +22,7 @@ ASSETS = Path(__file__).with_name('web')
 ROUTES = {'/': ('index.html', 'text/html; charset=utf-8'),
           '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
           '/devdock.png': ('../assets/devdock-64.png', 'image/png'),
-          '/devdock.ico': ('../assets/devdock.ico', 'image/x-icon')}
+          '/devdock.ico': ('../assets/devdock-transparent.ico', 'image/x-icon')}
 REPO_ACTIONS = {'repo-refresh', 'changes', 'commit', 'push'}
 SIMPLE_ACTIONS = {'godot', 'start-mcp', 'check-mcp', 'refresh', 'all-on', 'all-off'}
 REPO_NAMES = {'gaf': 'GameAssetFactory', 'md2': 'MD2 Research', 'tacz': 'TaCZ Research'}

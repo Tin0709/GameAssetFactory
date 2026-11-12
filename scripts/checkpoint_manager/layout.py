@@ -107,7 +107,7 @@ def build_layout(app):
         app.header_icon = tk.PhotoImage(file=str(assets / 'devdock-64.png'))
         ttk.Label(brand, image=app.header_icon, style='Card.TLabel').pack(side='left', padx=(0, 14))
         if os.name == 'nt':
-            root.iconbitmap(str(assets / 'devdock.ico'))
+            root.iconbitmap(str(assets / 'devdock-transparent.ico'))
         else:
             root.iconphoto(True, app.header_icon)
     except tk.TclError:
