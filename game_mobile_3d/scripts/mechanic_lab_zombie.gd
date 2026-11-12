@@ -17,9 +17,9 @@ const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
 const DEFAULT_DEATH_IMPULSE := Vector2(285.0, 190.0)
 const DEATH_TRAVEL_SCALE := 1.35
-const DEATH_LIFT_IMPULSE := 205.0
+const DEATH_LIFT_IMPULSE := 185.0
 const DEATH_LIFT_SCALE := 0.25
-const DEATH_PITCH_SPEED := 6.3
+const DEATH_PITCH_SPEED := 5.3
 const HEIGHT := 1.95
 const HIT_RADIUS := 0.48
 const CHASE_SPEED := 3.1
@@ -104,7 +104,7 @@ func _ready() -> void:
 		_death_profile.angular_impulse = 0.8
 		_death_profile.transport_fraction = 0.96
 		_death_profile.linear_damping = 0.30
-		_death_profile.angular_damping = 1.3
+		_death_profile.angular_damping = 0.9
 		_death_profile.joint_resistance = 0.45
 	if _flash_material == null:
 		_flash_material = ShaderMaterial.new()
@@ -202,7 +202,7 @@ func _update_death(delta: float) -> void:
 		launch.linear_impulse = _death_impulse.x * DEATH_TRAVEL_SCALE
 		launch.upward_impulse = DEATH_LIFT_IMPULSE + _death_impulse.y * DEATH_LIFT_SCALE
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
-		if ragdoll.begin(launch, direction, "Chest", 0.0, 13.0):
+		if ragdoll.begin(launch, direction, "Chest", 0.0, 10.0):
 			_apply_death_tumble(Vector3.UP.cross(direction) * DEATH_PITCH_SPEED)
 		return
 	var remaining := CORPSE_LIFETIME - _corpse_age
