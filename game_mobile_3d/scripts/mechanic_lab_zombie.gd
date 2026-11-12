@@ -17,8 +17,8 @@ const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
 const DEFAULT_DEATH_IMPULSE := Vector2(285.0, 190.0)
 const DEATH_TRAVEL_SCALE := 1.35
-const DEATH_LIFT_IMPULSE := 190.0
-const DEATH_LIFT_SCALE := 0.53
+const DEATH_LIFT_IMPULSE := 205.0
+const DEATH_LIFT_SCALE := 0.25
 const DEATH_PITCH_SPEED := 6.3
 const HEIGHT := 1.95
 const HIT_RADIUS := 0.48
@@ -101,9 +101,10 @@ func _ready() -> void:
 		body.collision_mask = 0
 	if _death_profile == null:
 		_death_profile = DeathProfile.new()
-		_death_profile.angular_impulse = 3.2
-		_death_profile.transport_fraction = 0.93
-		_death_profile.linear_damping = 0.18
+		_death_profile.angular_impulse = 0.8
+		_death_profile.transport_fraction = 0.96
+		_death_profile.linear_damping = 0.30
+		_death_profile.angular_damping = 1.3
 		_death_profile.joint_resistance = 0.45
 	if _flash_material == null:
 		_flash_material = ShaderMaterial.new()
