@@ -33,6 +33,9 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 local_center_strength; // authored world XYZ and peak extinction per meter
  vec4 local_radii;
  vec4 local_scatter_multiplier;
+ vec4 additional_center_strength;
+ vec4 additional_radii;
+ vec4 additional_scatter_multiplier;
 } p;
 const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
 const float FOREST_SCATTER_END_RADIUS_M = 15.0;
@@ -92,17 +95,17 @@ float near_optical(vec3 origin,vec3 ray,float ray_length,float start,float end){
  return strength*height*fade*(b-a)*ray_length;
 }
 // The normalized ray intersects an ellipsoid with density 1 - dot(point, point).
-vec4 local_intersection(vec3 origin,vec3 ray){
- if(p.local_center_strength.w<=0. || p.origin_dx.w<=0.)return vec4(0.);
- vec3 start=(origin-p.local_center_strength.xyz)/p.local_radii.xyz;
- vec3 direction=ray/p.local_radii.xyz;
+vec4 local_intersection(vec3 origin,vec3 ray,vec4 center_strength,vec3 radii){
+ if(center_strength.w<=0. || p.origin_dx.w<=0.)return vec4(0.);
+ vec3 start=(origin-center_strength.xyz)/radii;
+ vec3 direction=ray/radii;
  float curvature=dot(direction,direction);
  float midpoint=-dot(start,direction)/curvature;
  vec3 nearest=start+direction*midpoint;
  float ceiling=max(1.-dot(nearest,nearest),0.);
  return vec4(midpoint,curvature,ceiling,sqrt(ceiling/curvature));
 }
-float local_optical(vec4 chord,float start,float end,float ray_length){
+float local_optical(vec4 chord,float start,float end,float ray_length,float extinction){
  if(chord.z<=0.)return 0.;
  float a=max(start-chord.x,-chord.w);
  float b=min(end-chord.x,chord.w);
@@ -110,7 +113,7 @@ float local_optical(vec4 chord,float start,float end,float ray_length){
  if(width<=0.)return 0.;
  float middle=(a+b)*.5;
  float density=chord.z-chord.y*(middle*middle+width*width/12.);
- return p.local_center_strength.w*ray_length*width*max(density,0.);
+ return extinction*ray_length*width*max(density,0.);
 }
 void main(){
  ivec3 size=imageSize(volume);ivec2 pixel=ivec2(gl_GlobalInvocationID.xy);
@@ -120,15 +123,23 @@ void main(){
  vec3 ray=p.ray.xyz+p.ray_dx.xyz*uv.x+p.ray_dy.xyz*uv.y;
  float ray_length=length(ray);float near_z=p.integration.x/ray_length;
  float entry=p.origin.w/ray_length;
- vec4 local_chord=local_intersection(origin,ray);
+ vec4 local_chord=local_intersection(origin,ray,p.local_center_strength,p.local_radii.xyz);
+ vec4 additional_chord=local_intersection(origin,ray,p.additional_center_strength,p.additional_radii.xyz);
  vec3 local_light=p.scatter.rgb*p.scatter.w*p.local_scatter_multiplier.xyz;
+ vec3 additional_light=p.scatter.rgb*p.scatter.w*p.additional_scatter_multiplier.xyz;
  vec3 scattered=vec3(0.0);float optical=0.0;float previous=0.0;
  imageStore(volume,ivec3(pixel,0),vec4(0.0,0.0,0.0,1.0));
  for(int i=1;i<32;i++){
   float d=pow(float(i)/31.0,2.0)*p.integration.y;
-  float early=local_optical(local_chord,previous,min(d,entry),ray_length);
+  float early=local_optical(local_chord,previous,min(d,entry),ray_length,p.local_center_strength.w);
+  float additional_early=local_optical(additional_chord,previous,min(d,entry),ray_length,p.additional_center_strength.w);
+  vec3 early_light=local_light;
+  if(additional_early>0.){
+   early_light=early>0.?(local_light*early+additional_light*additional_early)/(early+additional_early):additional_light;
+   early+=additional_early;
+  }
   if(early>0.){
-   scattered+=exp(-optical)*(1.-exp(-early))*local_light;
+   scattered+=exp(-optical)*(1.-exp(-early))*early_light;
    optical+=early;
   }
   float nearby=near_optical(origin,ray,ray_length,previous,d);
@@ -146,10 +157,15 @@ void main(){
 #ifdef GAF_DIRECTIONAL_AIR
    light+=directional_air(point);
 #endif
-   float local_depth=local_optical(local_chord,max(previous,entry),min(d,near_z),ray_length);
+   float local_depth=local_optical(local_chord,max(previous,entry),min(d,near_z),ray_length,p.local_center_strength.w);
    if(local_depth>0.){
     light=(light*nearby+local_light*local_depth)/(nearby+local_depth);
     nearby+=local_depth;
+   }
+   float additional_depth=local_optical(additional_chord,max(previous,entry),min(d,near_z),ray_length,p.additional_center_strength.w);
+   if(additional_depth>0.){
+    light=(light*nearby+additional_light*additional_depth)/(nearby+additional_depth);
+    nearby+=additional_depth;
    }
    scattered+=exp(-optical)*(1.0-exp(-nearby))*light;optical+=nearby;
   }
