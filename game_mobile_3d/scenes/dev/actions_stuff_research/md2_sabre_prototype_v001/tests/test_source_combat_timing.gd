@@ -43,6 +43,7 @@ func run()->void:
 		var normal_start:float=a.simulation_clock
 		while not a._grounded and guard<hz*3:await tick();guard+=1
 		var normal_fall:float=a.simulation_clock-normal_start
+		var normal_gravity:float=a.gravity
 		a.reset_actor();await ticks(4);a.requested_jump=true;await tick();a.requested_jump=false;guard=0
 		while a.velocity.y>0. and guard<hz*2:await tick();guard+=1
 		var start_velocity:float=a.velocity.y;var slam_start:float=a.simulation_clock;a.attack(true);a.attack(false);await tick()
@@ -53,7 +54,7 @@ func run()->void:
 		check(source_at_contact>=float(a.clips.AirAttack.vfx_window[0]) and source_at_contact<=float(a.clips.AirAttack.vfx_window[1]),"Real slam contact stays inside original blade-motion effect window at%dHz"%hz)
 		check(absf(source_at_contact-.2542)/a.combo.playback_rate()<.04,"Derived aerial audio landmark remains near floor contact at%dHz"%hz)
 		check(slam_fall<normal_fall*.85,"Slam reaches real floor decisively sooner at%dHz"%hz)
-		check(absf(a.gravity-38.4)<.0001,"Ordinary jump gravity adapter is not replaced by aerial attack factor")
+		check(is_equal_approx(a.gravity,normal_gravity),"Ordinary jump gravity adapter is not replaced by aerial attack factor")
 		timings.append({"hz":hz,"normal_apex":apex,"normal_apex_to_floor":normal_fall,"slam_apex_to_floor":slam_fall,"air_source_time_at_contact":source_at_contact,"air_rate":a.combo.playback_rate()})
 		a.reset_actor();a.global_position.y=100.;await ticks(3);a.attack(true);a.attack(false);await ticks(hz)
 		check(not a._grounded and not a.combo.active() and a._heavy_slam_active,"Heavy gravity persists after air clip ends above a high ledge at%dHz"%hz)
