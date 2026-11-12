@@ -238,7 +238,7 @@ func _refresh_night_sky() -> void:
 			and review.forest_active() and is_active() and night_sky_available() \
 			and review._source_terrain_toggle != null and review._source_terrain_toggle.button_pressed:
 		state = Vector2(review._lighting_scale(&"night_spatial_sky"), review._lighting_scale(&"night_stone_fill_balance")) * moon
-		if state != Vector2.ZERO and night_sky_texture == null:
+		if state.x > 0.0 and night_sky_texture == null:
 			night_sky_texture = _regional_sky.load_night_texture()
 			if night_sky_texture == null:
 				_night_sky_ready = false

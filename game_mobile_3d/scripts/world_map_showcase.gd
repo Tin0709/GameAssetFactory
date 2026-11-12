@@ -86,7 +86,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"stone_diffuse_contrast": ["Stone face lighting transition (preview)", 1.],
 	&"stone_detail_softness": ["Stone texture softness", 1.],
 	&"night_spatial_sky": ["Night terrain bounce (preview)", 1.],
-	&"night_stone_fill_balance": ["Night stone color balance (preview)", 1.],
+	&"night_stone_fill_balance": ["Cân bằng sắc đá ban đêm", 1.],
 	&"night_stone_top_cool": ["Sắc xanh trên mặt đá", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
@@ -960,7 +960,11 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .55
 	if effect == &"dawn_mist_source":
 		return .65
-	if effect in [&"sculk_surface", &"forest_path_placement", &"forest_path_air_beam", &"night_depth_scatter", &"night_stone_top_cool"]:
+	if effect == &"night_stone_fill_balance":
+		return .48
+	if effect == &"night_stone_top_cool":
+		return .12
+	if effect in [&"sculk_surface", &"forest_path_placement", &"forest_path_air_beam", &"night_depth_scatter"]:
 		return 0.
 	if effect == &"forest_daylight_accents":
 		return .65
@@ -976,7 +980,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 0.
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
-	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"cliff_mist", &"night_cliff_mist", &"night_spatial_sky", &"night_stone_fill_balance"]:
+	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"cliff_mist", &"night_cliff_mist", &"night_spatial_sky"]:
 		return 0.
 	if effect == &"sunlit_mist":
 		return .24
@@ -1934,7 +1938,7 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		if effect == &"night_spatial_sky":
 			slider.tooltip_text = "Try 65% at 22:00 at the northwest cliff. Replaces some sky fill with local bounce on terrain and grass. Requires the private source atlas."
 		if effect == &"night_stone_fill_balance":
-			slider.tooltip_text = "Try 72% at 22:00. Reduces blue in diffuse light on stone only, keeping its linear luminance."
+			slider.tooltip_text = "Mặc định 48%. Thử 0% ở 22:00 để so màu đá tại cùng góc."
 		if effect == &"grass_shadow_reach":
 			slider.tooltip_text = "Correct the length of grass shadows at dawn and dusk for the captured sun elevation. 0% uses the previous length."
 		if effect == &"stone_twilight_color":
