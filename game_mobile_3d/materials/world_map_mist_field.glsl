@@ -37,6 +37,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 additional_center_strength;
  vec4 additional_radii;
  vec4 additional_scatter_multiplier;
+ vec4 depth_scatter; // World metres along the ray: start, full effect, gain, padding.
 } p;
 const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
 const float FOREST_SCATTER_END_RADIUS_M = 15.0;
@@ -114,6 +115,10 @@ vec4 local_intersection(vec3 origin,vec3 ray,vec4 center_strength,vec3 radii){
  float ceiling=max(1.-dot(nearest,nearest),0.);
  return vec4(midpoint,curvature,ceiling,sqrt(ceiling/curvature));
 }
+float ambient_depth_gain(float depth_m){
+ if(p.depth_scatter.z<=0.)return 1.;
+ return 1.+p.depth_scatter.z*smoothstep(p.depth_scatter.x,p.depth_scatter.y,depth_m);
+}
 float local_optical(vec4 chord,float start,float end,float ray_length,float extinction){
  if(chord.z<=0.)return 0.;
  float a=max(start-chord.x,-chord.w);
@@ -153,9 +158,10 @@ void main(){
   }
   float nearby=near_optical(origin,ray,ray_length,previous,d);
   if(nearby>0.){
-   vec3 point=origin+ray*((max(previous,entry)+min(d,near_z))*.5);
+   float middle=(max(previous,entry)+min(d,near_z))*.5;
+   vec3 point=origin+ray*middle;
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
-   vec3 light=p.scatter.rgb*p.scatter.w+p.warm.rgb*(warmth*.25);
+   vec3 light=p.scatter.rgb*p.scatter.w*ambient_depth_gain(middle*ray_length)+p.warm.rgb*(warmth*.25);
    if(p.ray.w>0.0){
     vec2 delta=point.xz-vec2(p.ray_dx.w,p.ray_dy.w);
     float region=1.0-smoothstep(FOREST_SCATTER_FULL_RADIUS_M*FOREST_SCATTER_FULL_RADIUS_M,
@@ -188,7 +194,7 @@ void main(){
    float bank=smoothstep(.30,.68,n);float variation=mix(1.0,bank*bank*1.8,p.integration.z);
    float tau=p.medium.x*height*variation*(d-start)*ray_length;
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
-   vec3 light=p.scatter.rgb*p.scatter.w+p.warm.rgb*(warmth*.25);
+   vec3 light=p.scatter.rgb*p.scatter.w*ambient_depth_gain((start+d)*.5*ray_length)+p.warm.rgb*(warmth*.25);
    light=light*scatter_visibility(point)+path_light(point);
 #ifdef GAF_DIRECTIONAL_AIR
    light+=directional_air(point);

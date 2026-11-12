@@ -125,7 +125,11 @@ func _process(_delta:float)->void:
   if effect.has_method("configure_with_mist_regions"):
    if near_layer.y>0. and _additional_region!=null and _additional_gain>0.:
     additional=_additional_region.render_parameters(_additional_gain)
-   effect.configure_with_mist_regions(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional)
+   if effect.has_method("configure_with_depth_scatter"):
+    var depth_scatter := float(_profile.get("depth_scatter",0.)) if near_layer.y>0. else 0.
+    effect.configure_with_depth_scatter(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional,depth_scatter)
+   else:
+    effect.configure_with_mist_regions(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional)
   else:
    effect.configure_with_local_mist(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local)
  elif path_light_provider.is_valid() and effect.has_method("configure_path_light"):
