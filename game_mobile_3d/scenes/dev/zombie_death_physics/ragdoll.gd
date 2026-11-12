@@ -556,7 +556,8 @@ func _rewind_swept_terrain_pose() -> void:
 	var leading_state := PhysicsServer3D.body_get_direct_state(leading.get_rid())
 	var space := leading_state.get_space_state()
 	var prior_depth := _deepest_contact(_terrain_contacts_at(leading, space, _terrain_poses[deepest]))
-	if prior_depth > TERRAIN_DEEP_RESIDUAL:
+	# The preceding recovery targets this depth. Allow for query precision.
+	if prior_depth > TERRAIN_DEEP_RESIDUAL + PROJECTION_COLLISION_MARGIN:
 		return
 	var maximum_fraction := 1.0
 	for name: String in bodies:
