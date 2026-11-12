@@ -15,6 +15,7 @@ const DamageFeedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const PLAYER_HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_player_hit_flash.gdshader")
 const SABRE_RIBBON_SHADER := preload("res://materials/mechanic_lab_sabre_ribbon.gdshader")
 const EffectSource := preload("res://scripts/mechanic_lab_effect_source.gd")
+const ContactSparks := preload("res://scripts/mechanic_lab_contact_sparks.gd")
 const SLASH_TEXTURE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Combat/Materials/T_Slash_Grayscale.png"
 const SLASH_TEXTURE_SHA256 := "bd5d52c41304562f1f4108aa5fc564f09d0e23766fd489a2d45ae8c30a7e11a5"
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
@@ -42,6 +43,7 @@ var _exposure: CompositorEffect
 var _previous_msaa: Viewport.MSAA
 var _previous_hdr: bool
 var _combat_audio: CombatAudio
+var _contact_sparks: ContactSparks
 var _movement_audio: MovementAudio
 var _weapon_mesh: MeshInstance3D
 var _equipped_weapon := Weapon.SABRE
@@ -142,6 +144,14 @@ func _ready() -> void:
 			add_child(wind)
 		else:
 			wind.free()
+		var contact_sparks := ContactSparks.new()
+		contact_sparks.name = "ContactSparks"
+		if contact_sparks.setup():
+			_contact_sparks = contact_sparks
+			add_child(_contact_sparks)
+			player.presentation_reset.connect(_contact_sparks.clear)
+		else:
+			contact_sparks.free()
 		_player_flash_material = ShaderMaterial.new()
 		_player_flash_material.shader = PLAYER_HIT_FLASH_SHADER
 		for mesh: MeshInstance3D in player.model.find_children("*", "MeshInstance3D", true, false):
@@ -358,7 +368,10 @@ func _set_combat_audio(enabled: bool) -> void:
 	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP)
 
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, lethal: bool) -> void:
-	player.effects.contact(point, direction)
+	if _contact_sparks != null:
+		_contact_sparks.burst(point, direction)
+	else:
+		player.effects.contact(point, direction)
 	_combat_audio.contact(point, serial, lethal)
 	var finisher := clip in ["Attack3", "NativeFinisher", "NativeCurvedAttack3"]
 	_start_contact_light(point, serial, 2.3 if finisher else 1.8)
