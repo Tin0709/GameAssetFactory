@@ -100,6 +100,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"forest_path_air": ["Path light in mist", 1.],
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
+	&"daylight_haze": ["Daylight haze softness", 1.],
 	&"humid_light": ["Humid light diffusion", 1.],
 	&"humid_depth": ["Diffusion by depth (preview)", 1.],
 	&"tree_wind": ["Tree canopy wind", CrownWind.MAX_STRENGTH],
@@ -108,7 +109,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 35
+const LIGHTING_MIX_VERSION := 36
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -121,6 +122,7 @@ var night_reference_atmosphere := true
 var _night_reference_toggle: CheckButton
 const BALANCED_ATMOSPHERE := {
 	&"projected_sun": 0.,
+	&"daylight_haze": 0.,
 	&"sky_chroma": .65,
 	&"grade": .55,
 	&"exposure": .9,
@@ -809,6 +811,8 @@ func set_full_direct_shadows(value:bool)->void:
 		_apply_direct_shadow_opacity(level.get_node("Sun"))
 
 func _lighting_scale_default(effect: StringName) -> float:
+	if effect == &"daylight_haze":
+		return .65
 	if effect == &"sun_opening":
 		return .75
 	if effect == &"twilight_shadow_color":
@@ -996,7 +1000,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1055,6 +1059,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 34 and effect == &"humid_depth":
 			missing_value = 0.
+		if version < 36 and effect == &"daylight_haze":
+			missing_value = 0.
 		if version < 35 and effect == &"sun_opening":
 			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
@@ -1084,7 +1090,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and player_contact.available()
 		if effect == &"projected_sun":
 			slider.editable = slider.editable and projected_sun.available()
-		if effect == &"humid_depth":
+		if effect in [&"daylight_haze", &"humid_depth"]:
 			slider.editable = slider.editable and DepthDiffusion.supported(level.get_viewport())
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
@@ -1092,7 +1098,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"projected_sun", &"sun_opening"]:
 		refresh_daylight_shading()
 		return
-	if changed_effect in [&"humid_light", &"humid_depth"]:
+	if changed_effect in [&"daylight_haze", &"humid_light", &"humid_depth"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -1331,9 +1337,10 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
-	var depth_slider: HSlider = _lighting_sliders.get(&"humid_depth")
-	if depth_slider != null:
-		depth_slider.editable = not _balanced_preview and DepthDiffusion.supported(level.get_viewport())
+	for effect: StringName in [&"daylight_haze", &"humid_depth"]:
+		var depth_slider: HSlider = _lighting_sliders.get(effect)
+		if depth_slider != null:
+			depth_slider.editable = not _balanced_preview and DepthDiffusion.supported(level.get_viewport())
 	if _lantern_dawn_toggle!=null:
 		_lantern_dawn_toggle.disabled=not point_response.dawn_available() or phase_air.anchors.is_empty() or not forest.available()
 		_lantern_dawn_toggle.set_pressed_no_signal(captured_lantern_dawn)
@@ -1521,6 +1528,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Adjusts the glowing lantern glass on Mobile. Around 6% matches its previous brightness. The point light and mist keep their own strengths."
 		if effect == &"bloom_spread":
 			slider.tooltip_text = "Adjust the base glow radius independently of Bloom brightness. Leaves the approved noon look intact."
+		if effect == &"daylight_haze":
+			slider.editable = DepthDiffusion.supported(level.get_viewport())
+			slider.tooltip_text = "Soften the distant lit mist in the morning and afternoon. 0% restores the prior finish. Requires Mobile D3D12 and 2× MSAA."
 		if effect == &"humid_light":
 			slider.tooltip_text = "Soften lit areas into the surrounding haze. Try 65% at 16:30. Requires Combined mist and the Mobile Forest finish. Noon keeps its approved look."
 		if effect == &"humid_depth":

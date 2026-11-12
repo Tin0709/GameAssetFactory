@@ -133,10 +133,13 @@ func refresh()->void:
 
 func _publish_humid_light(effect: CompositorEffect) -> void:
  var level: Node = showcase.level
- var strength: float = showcase._lighting_scale(&"humid_light")
- var from_noon := absf(fposmod(showcase.hour, 24.) - 12.)
- var amount := strength * smoothstep(.25, 2.5, from_noon)
- if amount <= 0. or level.view_mode != "gameplay" or showcase.mist == null or not showcase.mist.visible:
+ var hour: float = fposmod(showcase.hour, 24.)
+ var away_from_noon := smoothstep(.25, 2.5, absf(hour - 12.))
+ var amount: float = showcase._lighting_scale(&"humid_light") * away_from_noon
+ var daylight := smoothstep(5.5, 7., hour) * (1. - smoothstep(18., 19.5, hour))
+ var supports_depth := DepthDiffusion.supported(level.get_viewport())
+ var daylight_amount: float = showcase._lighting_scale(&"daylight_haze") * daylight * away_from_noon if supports_depth else 0.
+ if maxf(amount, daylight_amount) <= 0. or level.view_mode != "gameplay" or showcase.mist == null or not showcase.mist.visible:
   effect.set_humid_light(0.)
   return
  var camera: Camera3D = level.get_viewport().get_camera_3d()
@@ -148,13 +151,11 @@ func _publish_humid_light(effect: CompositorEffect) -> void:
  var center := camera.unproject_position(actor) / extent
  var inverse_radius := camera.size / .69
  var protection := Vector4(center.x, center.y, extent.aspect() * inverse_radius, .67 * inverse_radius)
- var hour: float = fposmod(showcase.hour, 24.)
- var daylight := smoothstep(5.5, 7., hour) * (1. - smoothstep(18., 19.5, hour))
- var placement: float = showcase._lighting_scale(&"humid_depth") * daylight
- if placement > 0. and DepthDiffusion.supported(level.get_viewport()):
+ var placement: float = showcase._lighting_scale(&"humid_depth") * daylight if amount > 0. else 0.
+ if supports_depth and maxf(placement, daylight_amount) > 0.:
   var mist: CompositorEffect = showcase.mist.effect
   var settings := DepthDiffusion.parameters(camera, actor, mist.near_entry_m(), placement)
-  effect.set_humid_light(amount, protection, settings, mist)
+  effect.set_humid_light(amount, protection, settings, mist, daylight_amount)
  else:
   effect.set_humid_light(amount, protection)
 func _process(_delta:float)->void:
