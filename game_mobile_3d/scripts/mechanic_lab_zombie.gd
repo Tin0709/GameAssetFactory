@@ -78,7 +78,7 @@ const CORPSE_DESATURATION_END := 3.6
 const CORPSE_SETTLE_TIME := 0.10
 const CORPSE_SETTLE_SPEED := 0.34
 const CORPSE_SETTLE_SPIN := 1.6
-const CORPSE_SETTLE_MAX_SLOPE := 0.32
+const CORPSE_SETTLE_MAX_AXIS_Y := 0.32
 const HIT_FLASH_DURATION := 0.083
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
@@ -434,7 +434,7 @@ func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
 	var bodies := ragdoll.bodies
 	var feet: Vector3 = (bodies["Leg.L"].global_position + bodies["Leg.R"].global_position) * 0.5
 	var axis: Vector3 = (bodies.Head.global_position - feet).normalized()
-	if absf(axis.y) > CORPSE_SETTLE_MAX_SLOPE:
+	if absf(axis.y) > CORPSE_SETTLE_MAX_AXIS_Y:
 		_settled_seconds = 0.0
 		return
 	_settled_seconds += delta
