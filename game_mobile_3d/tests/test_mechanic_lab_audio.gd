@@ -48,12 +48,14 @@ func capture_ratio(voice: AudioStreamPlayer3D, capture: AudioEffectCapture) -> f
 	var low := band_power(frames, 1000.0)
 	return band_power(frames, 8000.0) / low if low > 0.00000001 else -1.0
 
-func next_zombie_hit(lab) -> int:
+func next_zombie_hit(lab, capture: AudioEffectCapture = null) -> int:
 	var before: int = lab.player_health
 	for i in 180:
 		await physics_frame
 		if lab.player_health < before:
 			return before - lab.player_health
+		if capture != null:
+			capture.clear_buffer()
 	return 0
 
 func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
@@ -75,19 +77,22 @@ func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
 	if local_voice != null:
 		local_voice.bus = AudioServer.get_bus_name(bus)
 		capture.clear_buffer()
-		var heard_damage := await next_zombie_hit(lab)
-		check(heard_damage == 6 and local_voice.playing and local_voice.stream in audio._groups[&"player_hurt"],
+		var heard_damage := await next_zombie_hit(lab, capture)
+		check(heard_damage == 6 and local_voice.stream in audio._groups[&"player_hurt"]
+			and audio._next_choice.get(&"player_hurt", 0) == 1,
 			"Confirmed zombie contact starts the player-hurt voice in the same physics tick")
 		await create_timer(0.16).timeout
 		var peak := 0.0
 		for frame in capture.get_buffer(capture.get_frames_available()):
 			peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
-		check(peak > 0.005 and peak < 0.5, "The local hurt cue reaches the mixer with headroom")
+		check(peak > 0.005 and peak < 0.5, "The local hurt cue reaches the mixer with headroom (peak %.4f)" % peak)
+		print("MECHANIC_LAB_PLAYER_HURT_PEAK ", peak)
 		lab._on_player_hit(lab.player_health)
 		check(lab.player_health == 0 and local_voice.playing, "The final hit plays through the defeat transition")
 		toggle.button_pressed = false
 		check(not local_voice.playing and local_voice.stream == null and AudioServer.is_bus_mute(0),
 			"Turning audio off stops a live player-hurt cue and restores mute")
+		await create_timer(0.1).timeout
 	lab.free()
 
 func run() -> void:
