@@ -539,8 +539,9 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 	var filtered_leaves := original == PRESET.leaves_shader and leaf_sampling_active()
 	var bounce := ground_bounce_active() and original in [PRESET.ground_shader, PRESET.cutaway_shader]
 	var terrain_sky := stage == 2 and _terrain_sky_enabled and not spatial and original in [PRESET.ground_shader, PRESET.cutaway_shader]
-	if not (direct or canopy or foliage or filtered_leaves or bounce or terrain_sky or grove_coverage): return original
-	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1) | (int(terrain_sky) << 2) | (int(spatial)<<3) | (int(grove_coverage) << 4))
+	var tree_sky := stage == 2 and level.showcase.private_primary and level.grove != null and original == level.grove.REVEAL_SHADER
+	if not (direct or canopy or foliage or filtered_leaves or bounce or terrain_sky or grove_coverage or tree_sky): return original
+	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1) | (int(terrain_sky) << 2) | (int(spatial)<<3) | (int(grove_coverage) << 4) | (int(tree_sky) << 5))
 	var variants: Dictionary = _shader_variants.get_or_add(original, {})
 	if not variants.has(key):
 		var shader := Shader.new()
@@ -555,6 +556,8 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 			defines += "\n#define GAF_WORLD_LEAF_SAMPLING"
 		if grove_coverage:
 			defines += "\n#define GAF_GROVE_REVEAL_COVERAGE"
+		if tree_sky:
+			defines += "\n#define GAF_WORLD_TREE_SKY"
 		if bounce:
 			defines += "\n#define GAF_WORLD_GROUND_BOUNCE"
 		if terrain_sky:
