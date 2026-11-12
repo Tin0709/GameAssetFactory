@@ -104,7 +104,7 @@ func run() -> void:
 	AudioServer.set_bus_mute(0, true)
 	audio.set_enabled(true, Vector3.ZERO)
 	check(not AudioServer.is_bus_mute(0), "Audio toggle enables playback")
-	var expected := {&"hit": 5, &"hurt": 3, &"death": 3, &"slam": 3}
+	var expected := {&"hit": 5, &"hurt": 3, &"death": 3, &"slam": 3, &"slam_grass": 6}
 	for group in expected:
 		check(audio._groups.get(group, []).size() == expected[group],
 			"All pinned MD2 variants decode for " + str(group))
@@ -153,10 +153,17 @@ func run() -> void:
 	audio.reset()
 	for voice in audio._voices:
 		voice.bus = &"MechanicLabAudioTest"
+	audio.slam_landed(Vector3.FORWARD * 2.0)
+	check(audio._next_choice.get(&"slam_grass", 0) == 1 and audio._next_choice.get(&"slam", 0) == 0,
+		"Sabre landing selects the grass debris and no Sword-only layer")
+	audio.reset()
+	audio.sword_equipped = true
 	capture.clear_buffer()
 	audio.slam_landed(Vector3.FORWARD * 2.0)
 	audio.contact(Vector3.FORWARD * 2.0, 8, false)
 	audio.contact(Vector3.FORWARD * 2.0, 8, true)
+	check(audio._next_choice.get(&"slam_grass", 0) == 2 and audio._next_choice.get(&"slam", 0) == 1,
+		"Sword landing layers grass and Sword impact while hitting enemies")
 	await create_timer(0.65).timeout
 	var peak := 0.0
 	for frame in capture.get_buffer(capture.get_frames_available()):
