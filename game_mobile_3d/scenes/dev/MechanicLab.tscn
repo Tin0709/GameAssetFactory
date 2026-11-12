@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/mechanic_lab.gd" id="lab"]
 [ext_resource type="Shader" path="res://materials/mechanic_lab_ground.gdshader" id="ground"]
 [ext_resource type="Environment" path="res://environment/MechanicLabDaylight.tres" id="daylight"]
+[ext_resource type="Script" path="res://scripts/mechanic_lab_zombies.gd" id="zombies"]
 
 [sub_resource type="ShaderMaterial" id="grass_block"]
 resource_local_to_scene = true
@@ -44,6 +45,9 @@ shape = SubResource("ground_collision")
 
 [node name="Actors" type="Node3D" parent="."]
 
+[node name="Zombies" type="Node3D" parent="."]
+script = ExtResource("zombies")
+
 [node name="Camera3D" type="Camera3D" parent="."]
 position = Vector3(12, 15, 16)
 projection = 1
@@ -69,3 +73,22 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 14
+
+[node name="SpawnZombie" type="Button" parent="HUD"]
+offset_left = 18.0
+offset_top = 69.0
+offset_right = 146.0
+offset_bottom = 103.0
+focus_mode = 0
+text = "Spawn Zombie"
+tooltip_text = "Tạo một zombie để thử Sabre"
+
+[node name="SpawnStatus" type="Label" parent="HUD"]
+offset_left = 156.0
+offset_top = 75.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 14
+
+[connection signal="pressed" from="HUD/SpawnZombie" to="." method="_spawn_zombie"]

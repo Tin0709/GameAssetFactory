@@ -7,6 +7,9 @@ const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
 const SPAWN := Vector3(0.0, 0.03, 0.0)
 const WORLD_MAP_NOON_EXPOSURE := 0.12
+const MIN_CAMERA_SIZE := 4.5
+const MAX_CAMERA_SIZE := 30.0
+const ZOOM_STEP := 1.15
 
 var presentation: Node
 var _exposure: CompositorEffect
@@ -46,6 +49,10 @@ func _ready() -> void:
 		$HUD/Controls.text = "WASD di chuyển · Shift đi bộ · Space nhảy · Chuột trái / E dùng Sabre · R về giữa"
 	else:
 		$HUD/Controls.text = "WASD di chuyển · Shift chạy · Space nhảy · R về giữa"
+	$HUD/Controls.text += " · Cuộn chuột để zoom"
+	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
+	if not $HUD/SpawnZombie.disabled:
+		player.connect("impact_ready", $Zombies.on_sabre_impact)
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
 
 func _apply_daylight_render_settings() -> void:
@@ -86,6 +93,22 @@ func _physics_process(_delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reset_test"):
 		reset_player()
+	if event is InputEventMouseButton and event.pressed:
+		match event.button_index:
+			MOUSE_BUTTON_WHEEL_UP:
+				camera.size = maxf(MIN_CAMERA_SIZE, camera.size / ZOOM_STEP)
+			MOUSE_BUTTON_WHEEL_DOWN:
+				camera.size = minf(MAX_CAMERA_SIZE, camera.size * ZOOM_STEP)
+			_:
+				return
+		get_viewport().set_input_as_handled()
+
+func _spawn_zombie() -> void:
+	var facing := Basis(Vector3.UP, player.visual.rotation.y)
+	if $Zombies.spawn(player.global_position, facing):
+		$HUD/SpawnStatus.text = ""
+	else:
+		$HUD/SpawnStatus.text = "Không thể tạo zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
 
 func reset_player() -> void:
 	player.position = SPAWN
