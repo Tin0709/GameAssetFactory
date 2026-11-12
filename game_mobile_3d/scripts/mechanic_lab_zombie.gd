@@ -56,6 +56,9 @@ const DEATH_LANDING_LINEAR_DAMP := 3.0
 const DEATH_LANDING_ANGULAR_DAMP := 4.0
 const DEATH_SUPPORTED_ANGULAR_DAMP := 12.0
 const SABRE_ROLL_BLEND_END := 0.35
+const SABRE_BRACE_MIN_AGE := 0.82
+const SABRE_BRACE_GRAVITY_SHARE := 0.65
+const SABRE_BRACE_BLEND_TIME := 0.10
 const SABRE_ROLL_RESPONSE_TIME := 0.10
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
 const HEIGHT := 1.95
@@ -143,6 +146,7 @@ var _landing_age := INF
 var _roll_damping_weight := 0.0
 var _wall_brace_age := 0.0
 var _wall_gravity := false
+var _flat_brace_weight := 0.0
 var _terrain_rest_age := 0.0
 var _terrain_rest_duration := 0.0
 var _terrain_rest_poses: Dictionary[String, Transform3D]
@@ -493,16 +497,25 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 	if flat_sabre_finisher and not ragdoll.source_joints.is_empty():
 		roll_weight = _sabre_roll_weight(delta, contact_age, motion, damp_supported_roll) if supported else 0.0
 	var wall_gravity := _update_wall_brace(delta, motion)
+	# A slow corpse propped on its upper body can take seconds for its
+	# feet to come down. Restore some flight gravity until it rolls off.
+	var braced: bool = flat_sabre_finisher and not ragdoll.source_joints.is_empty() \
+		and contact_age >= gravity_blend_end - 0.00001 and _corpse_age >= SABRE_BRACE_MIN_AGE \
+		and motion.core_supports > 0 and motion.supports == 2 and not motion.leg_supported
+	var brace_target := 1.0 - smoothstep(0.6, 1.6, motion.linear) if braced else 0.0
+	var flat_brace_weight := move_toward(_flat_brace_weight, brace_target, delta / SABRE_BRACE_BLEND_TIME)
 	if is_equal_approx(contact_age, _landing_age) and is_equal_approx(roll_weight, _roll_damping_weight) \
-			and wall_gravity == _wall_gravity:
+			and wall_gravity == _wall_gravity and is_equal_approx(flat_brace_weight, _flat_brace_weight):
 		return
 	_landing_age = contact_age
 	_roll_damping_weight = roll_weight
 	_wall_gravity = wall_gravity
+	_flat_brace_weight = flat_brace_weight
 	var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
 	var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
 	var flight_gravity_scale := _gravity_scale(ZOMBIE_GRAVITY)
 	var gravity_scale := flight_gravity_scale if wall_gravity else lerpf(flight_gravity_scale, 1.0, gravity_blend)
+	gravity_scale = lerpf(gravity_scale, flight_gravity_scale, _flat_brace_weight * SABRE_BRACE_GRAVITY_SHARE)
 	ragdoll.floor_impact_blend = gravity_blend if flat_sabre_finisher else 0.0
 	ragdoll.floor_landing_blended = not wall_gravity and is_equal_approx(gravity_blend, 1.0)
 	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
