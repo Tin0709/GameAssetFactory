@@ -51,6 +51,7 @@ const DEATH_LIMB_SUPPORT_DURATION := 0.10
 const DEATH_LIMB_SUPPORT_MAX_SPEED := 2.0
 const DEATH_LANDING_LINEAR_DAMP := 3.0
 const DEATH_LANDING_ANGULAR_DAMP := 4.0
+const DEATH_SUPPORTED_ANGULAR_DAMP := 12.0
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
 const HEIGHT := 1.95
 const CHASE_SPEED := 3.1
@@ -125,6 +126,7 @@ var _limb_support_age := 0.0
 var _corpse_parked := false
 var _settled_seconds := 0.0
 var _landing_age := INF
+var _supported_roll_damping := false
 var _physics_profile: Dictionary
 var _corpse_floor: CollisionShape3D
 static var _flash_material: ShaderMaterial
@@ -419,27 +421,36 @@ func _update_death(delta: float) -> void:
 		if supported and source_rig and contact.core_supports == 0 and not is_instance_valid(_corpse_floor):
 			# Keep Overworld gravity while the corpse is perched upright without core support.
 			supported = absf(_corpse_axis().normalized().y) <= CORPSE_UPRIGHT_AXIS_Y
-		_update_landing_forces(delta, sabre_finisher, supported)
+		_update_landing_forces(delta, sabre_finisher, supported, contact)
 		_check_corpse_settled(delta, contact)
 
-func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool) -> void:
-	if not supported and is_instance_valid(_corpse_floor):
+func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool, motion: Dictionary) -> void:
+	var flat_floor := is_instance_valid(_corpse_floor) and not _corpse_floor.disabled
+	if not supported and flat_floor:
 		# The solver can omit contact for a frame while rolling close to the floor.
 		var box := _corpse_floor.shape as BoxShape3D
-		if box != null and not _corpse_floor.disabled:
+		if box != null:
 			var floor_top := (_corpse_floor.global_transform * (Vector3.UP * box.size.y * 0.5)).y
 			supported = absf(ragdoll.minimum_corner_y() - floor_top) <= DEATH_FLOOR_CONTACT_MARGIN
 	var gravity_hold := SABRE_FINISHER_GRAVITY_HOLD if sabre_finisher else 0.0
 	var gravity_blend_end := gravity_hold + DEATH_LANDING_BLEND_TIME
 	var contact_age := minf(_landing_age + delta, gravity_blend_end) if supported else 0.0
-	if is_equal_approx(contact_age, _landing_age):
+	# Add rolling resistance once the flat floor carries the slow, low pose.
+	# Leave the first impact and free limbs' follow-through to the solver.
+	var damp_supported_roll := flat_floor and not ragdoll.source_joints.is_empty() \
+		and is_equal_approx(contact_age, gravity_blend_end) and motion.supports >= 3 \
+		and motion.core_supports > 0 and motion.leg_supported and motion.linear <= DEATH_LIMB_SUPPORT_MAX_SPEED \
+		and absf(_corpse_axis().normalized().y) <= CORPSE_SETTLE_MAX_AXIS_Y
+	if is_equal_approx(contact_age, _landing_age) and damp_supported_roll == _supported_roll_damping:
 		return
 	_landing_age = contact_age
+	_supported_roll_damping = damp_supported_roll
 	var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
 	var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
 	var flight_gravity_scale := _gravity_scale(ZOMBIE_GRAVITY)
 	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
-	var angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
+	var angular_damp := DEATH_SUPPORTED_ANGULAR_DAMP if damp_supported_roll \
+		else lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 	for body: PhysicalBone3D in ragdoll.bodies.values():
 		body.gravity_scale = lerpf(flight_gravity_scale, 1.0, gravity_blend)
 		body.linear_damp = linear_damp
