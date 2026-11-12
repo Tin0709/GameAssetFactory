@@ -528,7 +528,13 @@ func _physics_process(delta:float)->void:
 		if hybrid_motion!=null and _grounded and not combo.active() and not combat_requested:
 			visual.rotation.y=hybrid_motion.facing.step(visual.rotation.y,facing,delta,turn_rate,_move_requested)
 		else:
-			visual.rotation.y+=clampf(wrapf(facing-visual.rotation.y,-PI,PI),-turn_rate*delta,turn_rate*delta)
+			var yaw_error := wrapf(facing - visual.rotation.y, -PI, PI)
+			var turn_step := turn_rate * delta
+			if not melee_direction.is_zero_approx():
+				# Finish turning by contact if a target enters reach late in the windup.
+				var remaining := maxf(delta, combo.windup_seconds_left())
+				turn_step = maxf(turn_step, absf(yaw_error) * delta / remaining)
+			visual.rotation.y += clampf(yaw_error, -turn_step, turn_step)
 			if hybrid_motion!=null:hybrid_motion.facing.reset(visual.rotation.y)
 	if combat_requested!=_previous_combat:
 		_transition="" if using_original_source else ("ReadyEnter" if combat_requested else "ReadyExit");_transition_time=0.;_previous_combat=combat_requested

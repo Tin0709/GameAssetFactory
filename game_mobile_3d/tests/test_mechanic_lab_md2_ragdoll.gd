@@ -55,7 +55,8 @@ func run() -> void:
 		"Seeded death variants produce occasional twirls in both directions")
 	await ticks(56)
 	var strike: Dictionary = group.SABRE_STRIKES[0]
-	group._apply_contact(zombie, zombie.global_position + Vector3.UP, "Attack1", 0, 1, strike, Vector3.FORWARD, false)
+	group._apply_contact(zombie, zombie.global_position + Vector3.UP, "Attack1", 0, 1, strike,
+		lab.player.visual.global_basis.z, false)
 	await ticks(4)
 	check(zombie.ragdoll.running and zombie.health == 0, "Lethal contact transfers the live pose to physics")
 	var impulse: Vector3 = zombie.ragdoll.total_applied_impulse

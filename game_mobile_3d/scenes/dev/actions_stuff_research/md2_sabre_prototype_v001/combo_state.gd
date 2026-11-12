@@ -123,6 +123,14 @@ func active()->bool:return phase not in [&"ready",&"step"]
 func ground_windup_active() -> bool:
 	return phase == &"attack" and not _impact_sent
 
+func windup_seconds_left() -> float:
+	return maxf(0.0, (_impact_source_time() - time) / playback_rate())
+
+func _impact_source_time() -> float:
+	if native_enabled and phase == &"attack":
+		return float(native_windows[index].melee)
+	return float(clips[clip()].vfx_window[0])
+
 func playback_rate()->float:
 	if phase==&"air_attack":return maxf(.001,air_attack_play_rate)
 	if native_enabled and phase in [&"attack",&"recovery"]:return float(native_windows[index].rate)
@@ -185,8 +193,7 @@ func advance(delta:float)->void:
 		var previous:=time
 		time+=segment*rate;clock+=segment;left-=segment
 		if phase in [&"attack",&"air_attack"] and not _impact_sent:
-			var gate:float=clips[clip()].vfx_window[0]
-			if native_enabled and phase==&"attack":gate=float(native_windows[index].melee)
+			var gate := _impact_source_time()
 			if previous<=gate and time>=gate:
 				_impact_sent=true;_events.append({"kind":"impact","index":index,"serial":serial,"clip":clip(),"at":clock-(time-gate)/rate})
 		if remaining()<=.00000001:_finish()
