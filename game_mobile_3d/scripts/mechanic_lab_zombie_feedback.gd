@@ -3,8 +3,9 @@ extends Node3D
 
 const HEALTH_SHADER := preload("res://materials/mechanic_lab_zombie_health.gdshader")
 const DIGIT_SIZE := 32
+const DIGIT_ADVANCE := 24.5
 const NUMBER_DURATION := 0.68
-const NUMBER_PIXEL_SIZE := 0.010
+const NUMBER_PIXEL_SIZE := 0.012
 
 var digits: Array[Texture2D]
 var effects: Node3D
@@ -19,7 +20,7 @@ static var _bar_material: ShaderMaterial
 func _ready() -> void:
 	if _bar_mesh == null:
 		_bar_mesh = QuadMesh.new()
-		_bar_mesh.size = Vector2(0.86, 0.108)
+		_bar_mesh.size = Vector2(0.86, 0.135)
 		_bar_material = ShaderMaterial.new()
 		_bar_material.shader = HEALTH_SHADER
 	bar = MeshInstance3D.new()
@@ -63,7 +64,6 @@ static func spawn_number(amount: int, glyphs: Array[Texture2D], parent: Node3D,
 	number.name = "DamageNumber"
 	number.set_meta("amount", amount)
 	var text := str(amount)
-	var spacing := 0.245
 	var sprites: Array[Sprite3D] = []
 	for i in text.length():
 		var sprite := Sprite3D.new()
@@ -73,7 +73,7 @@ static func spawn_number(amount: int, glyphs: Array[Texture2D], parent: Node3D,
 		sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 		sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		sprite.render_priority = 1
-		sprite.offset.x = (i - (text.length() - 1) * 0.5) * spacing / NUMBER_PIXEL_SIZE
+		sprite.offset.x = (i - (text.length() - 1) * 0.5) * DIGIT_ADVANCE
 		number.add_child(sprite)
 		sprites.append(sprite)
 	parent.add_child(number, true)
