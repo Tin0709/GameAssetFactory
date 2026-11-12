@@ -6,6 +6,7 @@ uniform vec4 cloud_shape = vec4(13.0, 0.50, 0.73, 0.20);
 uniform sampler2D cloud_field : filter_linear, repeat_enable;
 global uniform float gaf_projected_sun_strength;
 global uniform vec2 gaf_projected_sun_shift;
+global uniform float gaf_projected_sun_softness;
 global uniform sampler2D gaf_projected_sun_mask : filter_linear_mipmap, repeat_enable;
 float cloud_noise(vec2 p) {
 	return texture(cloud_field,(p+0.5)/64.0).r;
@@ -20,6 +21,7 @@ float world_cloud_shade(vec3 world) {
 	// places openings over the WorldMap path and adjacent rock shelves.
 	vec2 plane = 0.809017 * world.xz + 0.587785 * world.y * vec2(-1.0, 1.0) + vec2(3.5, -1.2) + gaf_projected_sun_shift;
 	float warp = texture(gaf_projected_sun_mask, plane * 0.2 + cloud_time * vec2(0.6, -0.6)).g;
-	float mask = texture(gaf_projected_sun_mask, plane / 30.0 + warp * 0.003).r;
+	vec3 projected = texture(gaf_projected_sun_mask, plane / 30.0 + warp * 0.003).rgb;
+	float mask = mix(projected.r, projected.b, gaf_projected_sun_softness);
 	return mix(current_shade, 0.1 + 0.9 * mask, gaf_projected_sun_strength);
 }
