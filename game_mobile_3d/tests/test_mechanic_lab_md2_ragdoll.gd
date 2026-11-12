@@ -89,17 +89,26 @@ func run() -> void:
 		"A normal lethal strike adds over 8 m/s along the floor")
 	var fastest_descent := 0.0
 	var landing_time := INF
+	var landing_speed := 0.0
+	var follow_through_speed := 0.0
 	for i in 60:
 		await physics_frame
-		if zombie._corpse_landed:
-			landing_time = minf(landing_time, zombie._corpse_age)
-			continue
-		var vertical_momentum := 0.0
+		var momentum := Vector3.ZERO
 		for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
-			vertical_momentum += body.linear_velocity.y * body.mass
-		fastest_descent = maxf(fastest_descent, -vertical_momentum / launch_mass)
+			momentum += body.linear_velocity * body.mass
+		var velocity := momentum / launch_mass
+		if zombie._corpse_landed:
+			if landing_time == INF:
+				landing_time = zombie._corpse_age
+				landing_speed = velocity.dot(zombie._death_direction)
+			elif zombie._corpse_age - landing_time >= 0.10 - 0.0001 and follow_through_speed == 0.0:
+				follow_through_speed = velocity.dot(zombie._death_direction)
+			continue
+		fastest_descent = maxf(fastest_descent, -velocity.y)
 	check(fastest_descent > 5.0, "The corpse falls faster than 5 m/s before head or chest contact")
 	check(landing_time > 0.40 and landing_time < 0.64, "The torso reaches the floor in the calibrated window")
+	check(landing_speed > 0.0 and follow_through_speed > landing_speed * 0.55,
+		"The corpse retains forward momentum through its first 100 ms on the floor")
 	check(zombie._corpse_landed and zombie.ragdoll.max_anchor_error() < 0.10, "The corpse settles with connected joints")
 	while is_instance_valid(zombie) and zombie._corpse_age < 4.96:
 		await physics_frame
