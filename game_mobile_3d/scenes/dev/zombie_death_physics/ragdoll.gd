@@ -738,9 +738,9 @@ func contact_motion() -> Dictionary:
 		"linear":peak_linear,"angular":peak_angular}
 
 func is_braced_against_terrain() -> bool:
-	return terrain_wall_support_margin() < 0.0
+	return terrain_support_margin(true) < 0.0
 
-func terrain_wall_support_margin() -> float:
+func terrain_support_margin(require_wall := false) -> float:
 	var has_wall_contact := false
 	var support_points := PackedVector2Array()
 	var weighted_center := Vector3.ZERO
@@ -759,7 +759,7 @@ func terrain_wall_support_margin() -> float:
 			if normal_y >= MIN_SUPPORT_NORMAL_Y:
 				var point := state.get_contact_collider_position(index)
 				support_points.append(Vector2(point.x, point.z))
-	if not has_wall_contact or support_points.is_empty():
+	if (require_wall and not has_wall_contact) or support_points.is_empty():
 		return NAN
 	var footprint := Geometry2D.convex_hull(support_points)
 	if footprint.size() < 4:

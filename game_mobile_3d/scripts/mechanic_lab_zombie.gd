@@ -86,10 +86,11 @@ const CORPSE_SETTLE_SPIN := 1.6
 const CORPSE_SETTLE_MAX_AXIS_Y := 0.32
 const CORPSE_UPRIGHT_AXIS_Y := 0.70
 const CORPSE_WALL_REST_TIME := 0.50
-const CORPSE_WALL_SUPPORT_MARGIN := 0.012
+const CORPSE_TERRAIN_REST_TIME := 1.0
+const CORPSE_TERRAIN_SUPPORT_MARGIN := 0.012
 # Compare pose drift over a rest window using MD2's default material sleep speeds.
-const CORPSE_WALL_REST_SHIFT := 0.01 * CORPSE_WALL_REST_TIME
-const CORPSE_WALL_REST_TURN := 0.05 * CORPSE_WALL_REST_TIME
+const CORPSE_TERRAIN_REST_SHIFT := 0.01 * CORPSE_WALL_REST_TIME
+const CORPSE_TERRAIN_REST_TURN := 0.05 * CORPSE_WALL_REST_TIME
 const HIT_FLASH_DURATION := 0.083
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
@@ -134,8 +135,9 @@ var _landing_age := INF
 var _supported_roll_damping := false
 var _wall_brace_age := 0.0
 var _wall_gravity := false
-var _wall_rest_age := 0.0
-var _wall_rest_poses: Dictionary[String, Transform3D]
+var _terrain_rest_age := 0.0
+var _terrain_rest_duration := 0.0
+var _terrain_rest_poses: Dictionary[String, Transform3D]
 var _physics_profile: Dictionary
 var _corpse_floor: CollisionShape3D
 static var _flash_material: ShaderMaterial
@@ -491,13 +493,15 @@ func _corpse_axis() -> Vector3:
 	return bodies.Head.global_position - feet
 
 func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
-	if _check_wall_rest(delta, motion):
+	var normally_supported := _has_rest_support(motion)
+	_settled_seconds = _settled_seconds + delta if normally_supported else 0.0
+	if _settled_seconds >= CORPSE_SETTLE_TIME or _check_terrain_rest(delta, motion, normally_supported):
 		_queue_corpse_pose_capture()
-		return
+
+func _has_rest_support(motion: Dictionary) -> bool:
 	if not motion.leg_supported or motion.supports < 3 \
 		or motion.linear > CORPSE_SETTLE_SPEED or motion.angular > CORPSE_SETTLE_SPIN:
-		_settled_seconds = 0.0
-		return
+		return false
 	# A head-first hit can stall before the body falls over. On terraces,
 	# compare the pose with the actual surface span between core and feet.
 	var head_to_feet := _corpse_axis()
@@ -505,45 +509,44 @@ func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
 	var near_horizontal := absf(axis.y) <= CORPSE_SETTLE_MAX_AXIS_Y
 	# On the flat floor a near-horizontal corpse can rest on both legs and an arm.
 	if motion.core_supports == 0 and (not near_horizontal or not ragdoll.has_flat_limb_support()):
-		_settled_seconds = 0.0
-		return
-	if not near_horizontal:
-		var span: Vector3 = motion.support_span
-		var horizontal_span := Vector2(span.x, span.z).length()
-		var support_up := Vector3.UP.slide(span.normalized()).normalized()
-		if horizontal_span < head_to_feet.length() * 0.5 or absf(axis.dot(support_up)) > CORPSE_SETTLE_MAX_AXIS_Y:
-			_settled_seconds = 0.0
-			return
-	_settled_seconds += delta
-	if _settled_seconds >= CORPSE_SETTLE_TIME:
-		_queue_corpse_pose_capture()
+		return false
+	if near_horizontal:
+		return true
+	var span: Vector3 = motion.support_span
+	var horizontal_span := Vector2(span.x, span.z).length()
+	var support_up := Vector3.UP.slide(span.normalized()).normalized()
+	return horizontal_span >= head_to_feet.length() * 0.5 and absf(axis.dot(support_up)) <= CORPSE_SETTLE_MAX_AXIS_Y
 
-func _check_wall_rest(delta: float, motion: Dictionary) -> bool:
-	var slow_support: bool = not is_instance_valid(_corpse_floor) and not ragdoll.source_joints.is_empty() \
-		and motion.supports == 2 and motion.core_supports == 1 and motion.leg_supported \
+func _check_terrain_rest(delta: float, motion: Dictionary, normally_supported: bool) -> bool:
+	var two_parts: bool = motion.supports == 2
+	var slow_support: bool = not normally_supported and not is_instance_valid(_corpse_floor) \
+		and not ragdoll.source_joints.is_empty() and motion.supports >= 2 and motion.core_supports > 0 \
+		and (not two_parts or motion.leg_supported) \
 		and motion.linear <= CORPSE_SETTLE_SPEED * 0.5 and motion.angular <= CORPSE_SETTLE_SPIN * 0.5
-	if not slow_support or not (ragdoll.terrain_wall_support_margin() > CORPSE_WALL_SUPPORT_MARGIN):
-		_wall_rest_age = 0.0
-		_wall_rest_poses.clear()
+	if not slow_support or not (ragdoll.terrain_support_margin(two_parts) > CORPSE_TERRAIN_SUPPORT_MARGIN):
+		_terrain_rest_age = 0.0
+		_terrain_rest_poses.clear()
 		return false
 	# Solver velocities can oscillate on a supported edge. Check that each
 	# body stays near the same pose throughout the whole rest window.
+	var duration := CORPSE_WALL_REST_TIME if two_parts else CORPSE_TERRAIN_REST_TIME
 	var moved := false
-	for name in _wall_rest_poses:
+	for name in _terrain_rest_poses:
 		var body: PhysicalBone3D = ragdoll.bodies[name]
-		var start := _wall_rest_poses[name]
+		var start := _terrain_rest_poses[name]
 		var pose := body.global_transform
-		if pose.origin.distance_to(start.origin) > CORPSE_WALL_REST_SHIFT \
-				or pose.basis.get_rotation_quaternion().angle_to(start.basis.get_rotation_quaternion()) > CORPSE_WALL_REST_TURN:
+		if pose.origin.distance_to(start.origin) > CORPSE_TERRAIN_REST_SHIFT \
+				or pose.basis.get_rotation_quaternion().angle_to(start.basis.get_rotation_quaternion()) > CORPSE_TERRAIN_REST_TURN:
 			moved = true
 			break
-	if moved or _wall_rest_poses.is_empty():
+	if moved or _terrain_rest_poses.is_empty() or duration != _terrain_rest_duration:
 		for name: String in ragdoll.bodies:
-			_wall_rest_poses[name] = ragdoll.bodies[name].global_transform
-		_wall_rest_age = 0.0
+			_terrain_rest_poses[name] = ragdoll.bodies[name].global_transform
+		_terrain_rest_duration = duration
+		_terrain_rest_age = 0.0
 		return false
-	_wall_rest_age += delta
-	return _wall_rest_age >= CORPSE_WALL_REST_TIME - 0.00001
+	_terrain_rest_age += delta
+	return _terrain_rest_age >= _terrain_rest_duration - 0.00001
 
 func _queue_corpse_pose_capture() -> void:
 	var skeleton := ragdoll.skeleton
