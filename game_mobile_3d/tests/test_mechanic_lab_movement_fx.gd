@@ -84,7 +84,7 @@ func run() -> void:
 	lab.reset_player()
 	await physics_frame
 	check(visible_particles(dust) == 0 and visible_particles(wind) == 0, "Reset clears both movement effects")
-	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " landing=", landed_particles,
+	print("MECHANIC_LAB_MOVEMENT_FX walk=", walking_peak, " wind=", running_wind, " landing=", landed_particles,
 		" contacts=", contacts.size(), " failures=", failures)
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
