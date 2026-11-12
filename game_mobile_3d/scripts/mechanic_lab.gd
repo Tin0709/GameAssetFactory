@@ -13,6 +13,8 @@ const MIN_CAMERA_SIZE := 4.5
 const MAX_CAMERA_SIZE := 30.0
 const ZOOM_STEP := 1.15
 const SABRE_TAP_BUFFER := 0.16
+const CONTACT_LIGHT_DURATION := 0.17
+const HEAVY_SHAKE_DURATION := 0.20
 
 var presentation: Node
 var _exposure: CompositorEffect
@@ -24,8 +26,12 @@ var _shake_age := 0.0
 var _shake_duration := 0.0
 var _shake_strength := 0.0
 var _shake_axis := Vector2.UP
+var _light_serial := -1
+var _light_remaining := 0.0
+var _light_peak := 0.0
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
+@onready var _impact_light: OmniLight3D = $CombatImpactLight
 
 func _enter_tree() -> void:
 	presentation = PlayerPresentation.new()
@@ -113,6 +119,11 @@ func _process(delta: float) -> void:
 		var offset := _shake_axis * camera.size * _shake_strength * pulse
 		camera.h_offset = offset.x
 		camera.v_offset = offset.y
+	if _light_remaining > 0.0:
+		_light_remaining = maxf(0.0, _light_remaining - delta)
+		var decay := _light_remaining / CONTACT_LIGHT_DURATION
+		_impact_light.light_energy = _light_peak * decay * decay
+		_impact_light.visible = _light_remaining > 0.0
 
 func _set_combat_audio(enabled: bool) -> void:
 	if _combat_audio == null:
@@ -121,19 +132,27 @@ func _set_combat_audio(enabled: bool) -> void:
 		player.reference_audio.enabled = enabled
 	_combat_audio.set_enabled(enabled)
 
-func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, index: int, serial: int, lethal: bool) -> void:
+func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, lethal: bool) -> void:
 	player.effects.contact(point, direction)
 	_combat_audio.contact(point, serial, lethal)
-	var heavy := index == 2 or clip == "AirAttack"
-	var strength := 0.013 if lethal else (0.010 if heavy else 0.006)
-	if _shake_serial == serial and strength <= _shake_strength:
+	var heavy := clip in ["Attack3", "NativeFinisher", "AirAttack"]
+	if _light_serial != serial:
+		_light_serial = serial
+		_light_peak = 2.3 if heavy else 1.8
+		_light_remaining = CONTACT_LIGHT_DURATION
+		_impact_light.global_position = point
+		_impact_light.light_energy = _light_peak
+		_impact_light.show()
+	# Isolated basic melee captures showed no shake even on a kill.
+	# The heavier moves retain a bounded lab response until their profiles are measured.
+	if not heavy or _shake_serial == serial:
 		return
 	_shake_serial = serial
-	_shake_strength = strength
+	_shake_strength = 0.008
 	_shake_age = 0.0
-	_shake_duration = 0.19 if lethal or heavy else 0.14
-	var screen_direction := Vector2(direction.dot(camera.basis.x), direction.dot(camera.basis.y))
-	_shake_axis = screen_direction.normalized() if screen_direction.length_squared() > 0.01 else Vector2.UP
+	_shake_duration = HEAVY_SHAKE_DURATION
+	var screen_x := direction.dot(camera.basis.x)
+	_shake_axis = Vector2(-1.0 if screen_x < 0.0 else 1.0, 0.0)
 
 func _physics_process(_delta: float) -> void:
 	if player.position.y < -5.0:
@@ -164,6 +183,10 @@ func reset_player() -> void:
 	_shake_duration = 0.0
 	camera.h_offset = 0.0
 	camera.v_offset = 0.0
+	_light_serial = -1
+	_light_remaining = 0.0
+	_impact_light.light_energy = 0.0
+	_impact_light.hide()
 	if _combat_audio != null:
 		_combat_audio.reset()
 	player.position = SPAWN
