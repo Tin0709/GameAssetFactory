@@ -33,6 +33,8 @@ func run() -> void:
 		finish(lab)
 		return
 	check(weapon.get_item_text(2) == "Curved Greatsword", "The third option identifies the source weapon")
+	var original_gait: RefCounted = lab.player.source_gait
+	var original_idle: String = lab.player.clips.Idle.action
 	var research := OS.get_environment("MD2_RESEARCH_ROOT")
 	OS.set_environment("MD2_RESEARCH_ROOT", ProjectSettings.globalize_path("res://"))
 	weapon.select(2)
@@ -116,8 +118,8 @@ func run() -> void:
 	weapon.item_selected.emit(0)
 	check(weapon.selected == 0 and not group.sword_equipped, "The Sabre can be equipped again")
 	await ticks(4)
-	check(lab.player.clips.Idle.source_name != "Player_2H_Medium_Idle"
-		and lab.player.source_gait.state(7.0).input != 1.2,
+	check(lab.player.animation_player.assigned_animation == original_idle
+		and lab.player.source_gait == original_gait,
 		"Returning to Sabre restores the original locomotion profile")
 	finish(lab)
 
@@ -126,6 +128,12 @@ func check_locomotion(lab: Node) -> void:
 	await ticks(6)
 	check(String(actor.animation_player.assigned_animation).ends_with("/NativeCurvedIdle"),
 		"The equipped Curved Greatsword uses the captured two-handed idle")
+	for i in 400:
+		await physics_frame
+		if String(actor.animation_player.assigned_animation).ends_with("/NativeCurvedInspectWeapon"):
+			break
+	check(String(actor.animation_player.assigned_animation).ends_with("/NativeCurvedInspectWeapon"),
+		"Idle inspection shows the source two-handed weapon gesture")
 	actor.scripted_input = true
 	actor.requested_direction = Vector2(0.0, -1.0)
 	actor.requested_run = false
@@ -136,7 +144,7 @@ func check_locomotion(lab: Node) -> void:
 	await ticks(30)
 	check(String(actor.animation_player.assigned_animation).ends_with("/NativeCurvedRun")
 		and not actor.hybrid_motion.owns_pose, "Running uses the two-handed gait pose")
-	check(is_equal_approx(actor.source_gait.state(2.1).weight, 1.0)
+	check(is_equal_approx(actor.source_gait.state(2.8).weight, 1.0 / 9.0)
 		and is_equal_approx(actor.source_gait.state(8.4).weight, 1.0),
 		"The composed gait has the original walk and run sample positions")
 	actor.requested_direction = Vector2.ZERO
