@@ -220,6 +220,7 @@ var _environment:Environment
 var _time_applied:=false
 var _environment_edit_depth:=0
 var _settings := preload("res://scripts/world_map_settings.gd").new()
+var _mix_before_drag: Dictionary = {}
 var _hint:Label
 var _elapsed:=0.
 var _cycle_button:CheckButton
@@ -1053,6 +1054,30 @@ func reset_lighting_mix() -> void:
 	_lighting_mix.clear()
 	_refresh_lighting_mix()
 
+func _mix_snapshot() -> Dictionary:
+	var strengths := {}
+	for effect: StringName in LIGHTING_MIX_CONTROLS:
+		strengths[effect] = float(_lighting_mix.get(effect, _lighting_scale_default(effect)))
+	return {"strengths": strengths, "balanced": _balanced_preview}
+
+func _remember_mix_edit(before: Dictionary) -> void:
+	if before != _mix_snapshot():
+		_settings.remember_edit(_restore_mix_snapshot.bind(before))
+
+func _restore_mix_snapshot(snapshot: Dictionary) -> void:
+	_lighting_mix = snapshot.strengths
+	_balanced_preview = snapshot.balanced
+	_refresh_lighting_mix()
+
+func _begin_mix_drag() -> void:
+	_mix_before_drag = _mix_snapshot()
+
+func _end_mix_drag(_changed: bool) -> void:
+	if _mix_before_drag.is_empty():
+		return
+	_remember_mix_edit(_mix_before_drag)
+	_mix_before_drag = {}
+
 func apply_scene_lighting_mix(preset: SceneLightingMix) -> bool:
 	if preset == null or preset.strengths.is_empty() or _balanced_preview:
 		return false
@@ -1372,6 +1397,11 @@ func set_hour(value:float)->void:
 	hour=fposmod(value,24.);apply_time()
 	if level!=null:level.look._refresh_ground_bounce()
 
+func _choose_hour(value: float) -> void:
+	if not is_equal_approx(hour, value):
+		_settings.remember_edit(set_hour.bind(hour))
+	set_hour(value)
+
 func _publish_night_path_chroma() -> void:
 	if level == null or level.look == null:
 		return
@@ -1460,6 +1490,18 @@ func compare_baseline()->void:
 		level.look.set_stage(0)
 	else:
 		level.look.set_stage(2);_capture_day();apply_time()
+
+func _compare_from_settings() -> void:
+	_settings.remember_edit(_restore_comparison_stage.bind(int(level.look.stage)))
+	compare_baseline()
+
+func _restore_comparison_stage(previous: int) -> void:
+	if previous == level.look.stage:
+		return
+	if previous == 2 or level.look.stage == 2:
+		compare_baseline()
+	if previous != level.look.stage:
+		level.look.set_stage(previous)
 
 func _update_shape_control()->void:
 	for effect: StringName in [&"daylight_haze", &"daylight_haze_spill", &"humid_depth"]:
@@ -1571,7 +1613,10 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 	reset.text = "Reset mix"
 	reset.tooltip_text = "Reset the live slider values without changing saved presets."
 	reset.focus_mode = Control.FOCUS_NONE
-	reset.pressed.connect(reset_lighting_mix)
+	reset.pressed.connect(func():
+		var before := _mix_snapshot()
+		reset_lighting_mix()
+		_remember_mix_edit(before))
 	actions.add_child(reset)
 	var message := Label.new()
 	message.name = "SettingsPresetMessage"
@@ -1587,7 +1632,10 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		apply_mix.focus_mode = Control.FOCUS_NONE
 		actions.add_sibling(apply_mix)
 		apply_mix.pressed.connect(func():
+			var before := _mix_snapshot()
 			var applied := apply_scene_lighting_mix(level.scene_lighting_mix)
+			if applied:
+				_remember_mix_edit(before)
 			message.text = "Map lighting mix applied." if applied else "Map lighting mix is unavailable."
 			message.show())
 	preset.item_selected.connect(func(_index: int): message.hide())
@@ -1596,8 +1644,10 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		message.text = "Preset %d saved on this device." % preset.get_selected_id() if error == OK else "Could not save mix: " + error_string(error)
 		message.show())
 	load_button.pressed.connect(func():
+		var before := _mix_snapshot()
 		var error := load_lighting_mix(preset_path.call())
 		if error == OK:
+			_remember_mix_edit(before)
 			message.text = "Preset %d applied." % preset.get_selected_id()
 		elif error == ERR_FILE_NOT_FOUND:
 			message.text = "Preset %d is empty." % preset.get_selected_id()
@@ -1733,6 +1783,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 		slider.set_meta("readout", readout)
 		_lighting_sliders[effect] = slider
 		slider.value_changed.connect(func(value: float): set_lighting_scale(effect, value))
+		slider.drag_started.connect(_begin_mix_drag)
+		slider.drag_ended.connect(_end_mix_drag)
 
 func _build_basic_settings() -> void:
 	var hud: CanvasLayer = level.get_node("HUD")
@@ -1927,11 +1979,11 @@ func _build_ui()->void:
 	var times:=HBoxContainer.new();box.add_child(times)
 	for entry:Array in [["Morning",7.],["Day",12.],["Golden",16.5],["Night",22.]]:
 		var button:=Button.new();button.text=entry[0];button.focus_mode=Control.FOCUS_NONE;times.add_child(button)
-		button.pressed.connect(set_hour.bind(float(entry[1])))
+		button.pressed.connect(_choose_hour.bind(float(entry[1])))
 	var cycle:=CheckButton.new();cycle.text="Original GAF day/night preview";cycle.focus_mode=Control.FOCUS_NONE;box.add_child(cycle)
 	_cycle_button=cycle
 	cycle.toggled.connect(func(value:bool):cycle_enabled=value)
-	var compare:=Button.new();compare.text="Compare original / combined graphics (B)";compare.focus_mode=Control.FOCUS_NONE;box.add_child(compare);compare.pressed.connect(compare_baseline)
+	var compare:=Button.new();compare.text="Compare original / combined graphics (B)";compare.focus_mode=Control.FOCUS_NONE;box.add_child(compare);compare.pressed.connect(_compare_from_settings)
 	_exposure_button=CheckButton.new();_exposure_button.text="Bounded local exposure (F7)";_exposure_button.focus_mode=Control.FOCUS_NONE;box.add_child(_exposure_button)
 	_exposure_button.disabled=not level.look.local_exposure_available()
 	_exposure_button.toggled.connect(func(value:bool):
@@ -2003,6 +2055,9 @@ func _build_ui()->void:
 	level.add_child(atmosphere_layer)
 	atmosphere_layer.add_child(_vignette);_vignette.hide()
 	_settings.setup(hud, panel, box, _lighting_sliders, status, true)
+	panel.visibility_changed.connect(func():
+		if not panel.is_visible_in_tree():
+			_end_mix_drag(false))
 
 func handle_hud_key(event: InputEventKey) -> bool:
 	if event.physical_keycode == KEY_L:
@@ -2023,13 +2078,16 @@ func handle_key(event:InputEventKey)->bool:
 		plants.visible=not plants.visible
 		if not plants.visible:plants.reset()
 		return true
-	if event.physical_keycode==KEY_B:compare_baseline();return true
+	if event.physical_keycode==KEY_B:_compare_from_settings();return true
 	if event.physical_keycode==KEY_T:
-		if event.shift_pressed:cycle_enabled=not cycle_enabled
+		if event.shift_pressed:
+			var previous := cycle_enabled
+			_settings.remember_edit(func(): cycle_enabled = previous)
+			cycle_enabled=not cycle_enabled
 		else:
 			var phases:=[7.,12.,16.5,22.];var next:=7.
 			for h:float in phases:
 				if h>hour+.01:next=h;break
-			set_hour(next)
+			_choose_hour(next)
 		return true
 	return false
