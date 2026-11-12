@@ -151,7 +151,9 @@ var _vignette:ColorRect
 var point_response=preload("res://scripts/world_map_point_response.gd").new()
 var captured_lantern_dawn:=true
 var _lantern_dawn_toggle:CheckButton
-## Idle calibration to the two captured light-to-face separations. The animated hip remains the anchor.
+## Resting emitter height above the rendered player root, measured in the idle comparison.
+const LANTERN_REST_HEIGHT_M := 0.65
+## Additional height calibrated to the two captured light-to-face separations.
 const LANTERN_OVERHEAD_LIFT_M := 2.06
 ## Mobile HDR fit from the captured visible lamp core and locked gameplay comparisons.
 const LANTERN_EMISSION_GAIN := 16.
@@ -709,8 +711,11 @@ func _refresh_lantern_glow() -> void:
 		lantern.set_emission_gain(LANTERN_EMISSION_GAIN * _lighting_scale(&"lantern_glow"))
 
 func _lantern_light_origin(hip: Vector3) -> Vector3:
-	var lift := LANTERN_OVERHEAD_LIFT_M * _lighting_scale(&"lantern_lift") if lantern_overhead else 0.
-	return hip + Vector3.UP * lift
+	if not lantern_overhead:
+		return hip
+	var lift := LANTERN_OVERHEAD_LIFT_M * _lighting_scale(&"lantern_lift")
+	# The overhead pool follows the rendered player while the visible hip lantern swings.
+	return level.presentation.player_position() + Vector3.UP * (LANTERN_REST_HEIGHT_M + lift)
 
 func _position_lantern_light(origin: Vector3) -> void:
 	if _player_light == null:
