@@ -388,7 +388,7 @@ func _update_death(delta: float) -> void:
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	var contact := ragdoll.contact_motion()
-	if not _corpse_landed and contact.core_contacts > 0:
+	if not _corpse_landed and contact.core_supports > 0:
 		_corpse_landed = true
 		_landing_age = 0.0
 		ragdoll.set_physics_process(false)
@@ -396,7 +396,7 @@ func _update_death(delta: float) -> void:
 			# Leave room for the floor impulse to roll the body over a limb.
 			body.set("maximum_angular_speed", DEATH_LANDING_ANGULAR_SPEED_LIMIT)
 	if _corpse_landed:
-		_update_landing_forces(delta, flight_gravity, sabre_finisher, contact.contacts > 0)
+		_update_landing_forces(delta, flight_gravity, sabre_finisher, contact.supports > 0)
 		_check_corpse_settled(delta, contact)
 
 func _update_landing_forces(delta: float, flight_gravity: float, sabre_finisher: bool, supported: bool) -> void:
@@ -426,7 +426,7 @@ static func _gravity_scale(acceleration: float) -> float:
 	return acceleration / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 
 func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
-	if motion.core_contacts == 0 or not motion.leg_supported or motion.contacts < 3 \
+	if motion.core_supports == 0 or not motion.leg_supported or motion.supports < 3 \
 		or motion.linear > CORPSE_SETTLE_SPEED or motion.angular > CORPSE_SETTLE_SPIN:
 		_settled_seconds = 0.0
 		return

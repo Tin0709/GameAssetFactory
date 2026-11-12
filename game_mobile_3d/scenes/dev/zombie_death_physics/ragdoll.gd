@@ -14,6 +14,7 @@ const PARTS := [
 const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "Chest", "Leg.L": "Hips", "Leg.R": "Hips"}
 const FLOOR_CONTACT_SLOP := 0.005
 const FLOOR_REST_SLOP := 0.012
+const MIN_SUPPORT_NORMAL_Y := 0.5
 @export var maximum_inherited_linear_speed := 3.0
 @export var maximum_inherited_angular_speed := 10.0
 var skeleton: Skeleton3D
@@ -341,6 +342,8 @@ func _project_floor_contact() -> void:
 func contact_motion() -> Dictionary:
 	var contacts := 0
 	var core_contacts := 0
+	var supports := 0
+	var core_supports := 0
 	var leg_supported := false
 	var peak_linear := 0.0
 	var peak_angular := 0.0
@@ -349,11 +352,20 @@ func contact_motion() -> Dictionary:
 		var direct := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if direct and direct.get_contact_count() > 0:
 			contacts += 1
-			if name in ["Hips","Chest","Head"]: core_contacts += 1
-			if name in ["Leg.L", "Leg.R"]: leg_supported = true
+			var is_core: bool = name in ["Hips", "Chest", "Head"]
+			if is_core: core_contacts += 1
+			for index in direct.get_contact_count():
+				# The contact normal is reported in world axes by the lab backend.
+				if direct.get_contact_local_normal(index).y < MIN_SUPPORT_NORMAL_Y:
+					continue
+				supports += 1
+				if is_core: core_supports += 1
+				if name in ["Leg.L", "Leg.R"]: leg_supported = true
+				break
 		peak_linear = maxf(peak_linear,body.linear_velocity.length())
 		peak_angular = maxf(peak_angular,body.angular_velocity.length())
-	return {"contacts":contacts,"core_contacts":core_contacts,"leg_supported":leg_supported,
+	return {"contacts":contacts,"core_contacts":core_contacts,"supports":supports,
+		"core_supports":core_supports,"leg_supported":leg_supported,
 		"linear":peak_linear,"angular":peak_angular}
 
 func release(visible_world_pose: Array[Transform3D] = []) -> void:
