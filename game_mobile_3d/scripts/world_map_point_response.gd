@@ -8,6 +8,12 @@ const DAWN_FILE="godot_lab/world_map_unified_showcase_v001/lantern_phase_transfe
 const DAWN_SHA="31179c46805cfd96c6fbc7e0eea67ea96310d1c9e6f7ba2413f1a5fc87542141"
 const SOFT_FILE="godot_lab/world_map_unified_showcase_v001/player_soft_source_v001/profile.private.json"
 const SOFT_SHA="04672ff9dcb2d79ec65475d93cca946fa57e16150cd4a633545ac5d853d7102a"
+const EVENING_FILE := "graphics_vfx/forest_pix_capture_20261112/forest_twilight_actor/evening_lantern.private.json"
+const EVENING_SHA := "4ec5547bcbf57e8aeeb8fe6718dac8171d9e4c08de6f9e024a4d9d87b13c216f"
+const EVENING_START := 18.5
+const EVENING_END := 21.0
+const EVENING_HOURS := [19.0, 19.5, 20.0, 20.5, 21.0]
+var _evening_energy: PackedFloat64Array
 var soft_verified:=false
 var soft_settings:=Vector2.ZERO
 var kernel_verified:=false
@@ -36,6 +42,7 @@ func _init()->void:
  if not(r is float or r is int)or not is_finite(r)or not is_equal_approx(float(r),radius_m):return
  kernel_verified=true
  _load_dawn(root)
+ _load_evening(root.path_join(EVENING_FILE))
  var soft_path:=root.path_join(SOFT_FILE)
  if not FileAccess.file_exists(soft_path)or FileAccess.get_sha256(soft_path)!=SOFT_SHA:return
  var soft=JSON.parse_string(FileAccess.get_file_as_string(soft_path))
@@ -47,6 +54,52 @@ func _init()->void:
 func available()->bool:return verified
 func kernel_available()->bool:return verified and kernel_verified
 func soft_available()->bool:return kernel_available()and soft_verified
+
+func _load_evening(path: String) -> void:
+ if not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != EVENING_SHA:
+  return
+ var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+ if not data is Dictionary or data.get("schema") != "private-forest-evening-lantern/1":
+  return
+ var anchors = data.get("anchors")
+ if not anchors is Array or anchors.size() != EVENING_HOURS.size():
+  return
+ var energy := PackedFloat64Array()
+ var previous := 0.0
+ for i in anchors.size():
+  var row = anchors[i]
+  if not row is Dictionary or row.get("hour") != EVENING_HOURS[i]:
+   return
+  var value = row.get("relative_energy")
+  if not (value is float or value is int) or not is_finite(value) or value <= previous or value > 1.0:
+   return
+  energy.append(value)
+  previous = value
+ if previous == 1.0:
+  _evening_energy = energy
+
+func evening_available() -> bool:
+ return kernel_available() and _evening_energy.size() == EVENING_HOURS.size()
+
+func evening_lantern_energy(hour: float, authored: float, strength: float, bounds: Vector2) -> float:
+ if not evening_available() or authored <= 0.0 or strength <= 0.0 or not is_finite(hour) or hour <= EVENING_START or hour >= EVENING_END:
+  return authored
+ # Keep the approved endpoints and require a monotone path. The earlier captured
+ # value falls below the approved 18:30 energy and would cause a visible dip.
+ if not bounds.is_finite() or bounds.x < 0.0 or bounds.x > _evening_energy[1] or bounds.y < _evening_energy[3]:
+  return authored
+ var before_hour := EVENING_START
+ var before_energy := bounds.x
+ for i in range(1, 4):
+  var after_hour: float = EVENING_HOURS[i]
+  var after_energy := _evening_energy[i]
+  if hour <= after_hour:
+   var progress := inverse_lerp(before_hour, after_hour, hour)
+   return lerpf(authored, lerpf(before_energy, after_energy, progress), strength)
+  before_hour = after_hour
+  before_energy = after_energy
+ var progress := inverse_lerp(before_hour, EVENING_END, hour)
+ return lerpf(authored, lerpf(before_energy, bounds.y, progress), strength)
 
 func _load_dawn(root:String)->void:
  var path:=root.path_join(DAWN_FILE)

@@ -104,6 +104,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"shadow": ["Shadow strength", 1.],
 	&"shadow_softness": ["Shadow softness", 1.5],
 	&"lantern": ["Hip lantern", 2.],
+	&"evening_lantern": ["Đèn hông chạng vạng", 1.],
 	&"lantern_lift": ["Lantern height", 1.5],
 	&"lantern_air": ["Lantern in mist", 2.],
 	&"lantern_glow": ["Lantern glow", 2.],
@@ -148,7 +149,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 71
+const LIGHTING_MIX_VERSION := 72
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -216,6 +217,7 @@ var _warm_kernel_toggle:CheckButton
 var noninverse_player_light:=true
 var _point_response_toggle:CheckButton
 var _player_light:OmniLight3D
+var _evening_lantern_bounds := Vector2.ZERO
 var _atmosphere_picker:OptionButton
 var _legacy_sky_button:CheckButton
 var mist:Node3D
@@ -295,6 +297,8 @@ func setup(world:Node3D)->void:
 	set_audio_enabled(false)
 	_capture_day()
 	if forest.available():
+		_evening_lantern_bounds = Vector2(forest.sample(point_response.EVENING_START).player_light_weight,
+			forest.sample(point_response.EVENING_END).player_light_weight)
 		_player_light=OmniLight3D.new();_player_light.name="AtmospherePlayerLight";_player_light.shadow_enabled=false
 		_player_light.omni_range=forest.player_range;_player_light.omni_attenuation=2.;_player_light.position.y=1.4
 		level.player.add_child(_player_light);_player_light.hide()
@@ -1415,6 +1419,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 71 and effect == &"twilight_depth_scatter":
 			missing_value = 0.
+		if version < 72 and effect == &"evening_lantern":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1460,6 +1466,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
 		if effect == &"evening_key_response":
 			slider.editable = slider.editable and key_response.evening_available()
+		if effect == &"evening_lantern":
+			slider.editable = slider.editable and point_response.evening_available()
 		if effect in [&"twilight_sky_chroma", &"twilight_ambient"]:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect == &"twilight_grass_albedo":
@@ -1612,6 +1620,9 @@ func _apply_forest(env:Environment,sun:DirectionalLight3D)->void:
 		if not source.is_empty():
 			# Use the captured transition fraction, independent of the user's fog slider.
 			p.player_light_weight=point_response.dawn_gain(hour,source.density_ratio,p.player_light_weight)
+	if not _balanced_preview and atmosphere_review == "combined":
+		p.player_light_weight = point_response.evening_lantern_energy(hour, p.player_light_weight,
+			_lighting_scale(&"evening_lantern"), _evening_lantern_bounds)
 	if atmosphere_review in ["lighting","combined"]:
 		var linear:=env.ambient_light_color.srgb_to_linear();var source:=Vector3(linear.r,linear.g,linear.b)
 		var tinted:Vector3=source*p.ambient_tint;var luma:=Vector3(.2126,.7152,.0722)
