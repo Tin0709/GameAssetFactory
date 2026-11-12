@@ -182,7 +182,7 @@ func shape_overlap(world: Node3D, shape: Shape3D, pose: Transform3D) -> float:
 	return depth
 
 func cliff_edge_case(world: Node3D, group: Node3D, effects: Node3D, seed: int, x: float,
-		skew: float, yaw: float, strike: Zombie.DeathStrike) -> void:
+		skew: float, yaw: float, strike: Zombie.DeathStrike, anchor_limit := 0.12) -> void:
 	group._spawn_serial = seed
 	var direction := Vector3.FORWARD.rotated(Vector3.UP, skew)
 	var zombie = await launch(world, group, effects, Vector3(x, 3.0, -33.5), direction, strike, yaw)
@@ -198,7 +198,7 @@ func cliff_edge_case(world: Node3D, group: Node3D, effects: Node3D, seed: int, x
 			continue
 		peak_overlap = maxf(peak_overlap, terrain_contact_depth(zombie))
 		peak_anchor = maxf(peak_anchor, zombie.ragdoll.max_anchor_error())
-	check(zombie._corpse_landed and peak_anchor < 0.12,
+	check(zombie._corpse_landed and peak_anchor < anchor_limit,
 		"Cliff-edge strike %d reaches ground with the source limb anchors connected" % seed)
 	check(peak_overlap > 0.0 and peak_overlap < 0.12,
 		"Cliff-edge strike %d stays within the contact depth budget" % seed)
@@ -393,6 +393,8 @@ func run() -> void:
 		# A glancing right arm can cross the front triangle before the side reports contact.
 		await cliff_edge_case(world, group, effects, 30, -37.5, 0.055, -0.08, Zombie.DeathStrike.GROUND)
 		await cliff_edge_case(world, group, effects, 57, -37.46, 0.085, -0.065, Zombie.DeathStrike.GROUND)
+		# The corrected pose leaves a shallow wall contact before the limb slows.
+		await cliff_edge_case(world, group, effects, 51, -37.46, 0.21, 0.0, Zombie.DeathStrike.GROUND, 0.055)
 		await near_wall_handoff(world, group, effects)
 		await braced_cliff_case(world, group, effects)
 		await terrain_supported_rest(world, group, effects, 28, Vector3(-33.5, 9.0, -39.39),
