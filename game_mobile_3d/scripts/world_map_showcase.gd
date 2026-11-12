@@ -94,6 +94,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"near_haze": ["Near haze density", 2.],
 	&"near_haze_depth": ["Near haze depth", 1.],
 	&"local_mist": ["Local mist volume (preview)", 1.],
+	&"cliff_mist": ["Cliff mist depth (preview)", 1.],
 	&"forest_near_scatter": ["Forest mist depth light", 1.],
 	&"sunlit_mist": ["Canopy sunlight in mist", DirectionalAir.MAX_GAIN],
 	&"scatter": ["Fog brightness", 2.],
@@ -116,7 +117,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 43
+const LIGHTING_MIX_VERSION := 44
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -556,9 +557,10 @@ func _update_mist()->void:
 	var camera:Camera3D=level.get_node("Camera3D")
 	var local_gain := 0.
 	if atmosphere_review == "combined" and not _balanced_preview and level.view_mode == "gameplay":
-		local_gain = _lighting_scale(&"local_mist") * PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+		local_gain = PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 		local_gain *= _lighting_scale(&"fog") * minf(1., _lighting_scale(&"near_haze"))
-	mist.set_local_region(level.local_mist_region, local_gain)
+	mist.set_local_region(level.local_mist_region, local_gain * _lighting_scale(&"local_mist"))
+	mist.set_additional_local_region(level.additional_mist_region, local_gain * _lighting_scale(&"cliff_mist"))
 	var luma:=Vector3(.2126,.7152,.0722);var ambient:=env.ambient_light_color.srgb_to_linear()
 	var sun:DirectionalLight3D=level.get_node("Sun");var key:=sun.light_color.srgb_to_linear()
 	var incoming:=Vector3(ambient.r,ambient.g,ambient.b).dot(luma)*env.ambient_light_energy*.75+Vector3(key.r,key.g,key.b).dot(luma)*sun.light_energy*.03
@@ -871,7 +873,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .65
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
-	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky"]:
+	if effect in [&"humid_light", &"humid_depth", &"diffuse_openings", &"local_mist", &"regional_sky", &"cliff_mist"]:
 		return 0.
 	if effect == &"sunlit_mist":
 		return .24
@@ -1143,6 +1145,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 43 and effect == &"regional_sky":
 			missing_value = 0.
+		if version < 44 and effect == &"cliff_mist":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1180,6 +1184,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and projected_sun.available()
 		if effect == &"regional_sky":
 			slider.editable = _regional_sky_editable()
+		if effect == &"cliff_mist":
+			slider.editable = slider.editable and level != null and level.additional_mist_region != null
 		if effect in [&"daylight_haze", &"daylight_haze_spill", &"humid_depth"]:
 			slider.editable = slider.editable and DepthDiffusion.supported(level.get_viewport())
 		var scale := _lighting_scale(effect)
@@ -1240,7 +1246,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
 		_update_mist()
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
