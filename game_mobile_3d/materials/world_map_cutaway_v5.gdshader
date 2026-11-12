@@ -102,7 +102,7 @@ void fragment() {
 	SPECULAR = native_specular;
 	EMISSION=terrain_emission(UV);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
-	float sole = cutaway_normal.y > 0.9 ? gaf_player_contact(cutaway_world, CAMERA_POSITION_WORLD) : 1.0;
+	float sole = surface_normal.y > 0.9 ? gaf_player_contact(cutaway_world, CAMERA_POSITION_WORLD) : 1.0;
 	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact)*sole;
 	if(terrain_rough_reflection)EMISSION+=terrain_reflected(normalize(NORMAL),normalize(VIEW),ROUGHNESS,AO,cloud_transmission,receiver_contact,native_specular);
 #endif
