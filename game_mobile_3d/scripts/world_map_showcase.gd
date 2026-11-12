@@ -1072,7 +1072,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version < 1 or version > LIGHTING_MIX_VERSION:
+	if not version is int or version < 1 or version > LIGHTING_MIX_VERSION:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1140,6 +1140,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 		if version < 40 and effect == &"daylight_shadow_lift":
 			missing_value = 1.
 		if version < 42 and effect == &"local_mist":
+			missing_value = 0.
+		if version < 43 and effect == &"regional_sky":
 			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
