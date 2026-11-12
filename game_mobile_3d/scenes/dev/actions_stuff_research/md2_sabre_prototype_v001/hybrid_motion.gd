@@ -200,7 +200,7 @@ func apply(actor,key:String,delta:float)->void:
 	var deforms:Array[Transform3D]=[]
 	if not actor.combo.active() and is_gait(key):
 		deforms=_ground_deforms(phase,run_weight);last_kind="Run" if actor._run_requested else "Walk"
-	elif not actor.combo.active() and key in ["JumpTakeoff","JumpAirborne","JumpLanding"]:
+	elif not actor.combo.active() and key in ["JumpTakeoff","JumpAirborne","JumpLanding"] and not actor._uses_native_jump_pose(key):
 		if stage=="JumpLanding":
 			var motion_weight:=landing_move_weight*landing_move_weight*(3.-2.*landing_move_weight)
 			landing_samples+=1;last_kind="LandingMoving" if landing_moving else "LandingStationary"

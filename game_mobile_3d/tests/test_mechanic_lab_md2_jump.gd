@@ -17,7 +17,6 @@ func check(condition: bool, message: String) -> void:
 
 func tick() -> void:
 	await physics_frame
-	await process_frame
 
 func wait_clip(actor, clip: String, ticks: int) -> bool:
 	for i in ticks:

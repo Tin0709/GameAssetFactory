@@ -1,3 +1,5 @@
+#include "res://materials/world_map_point_kernel.gdshaderinc"
+
 global uniform float gaf_sun_opening_gain;
 global uniform vec4 gaf_diffuse_opening;
 

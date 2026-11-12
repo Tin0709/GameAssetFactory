@@ -65,6 +65,7 @@ var input_order_trace=InputOrderTrace.new()
 var foot_placement:RefCounted
 var hybrid_motion:RefCounted
 var hybrid_motion_enabled:=true
+var native_jump_pose_enabled:=false
 var jump_runtime_profile:Dictionary={}
 var measured_jump_requested:=true
 var measured_jump_active:=false
@@ -499,7 +500,8 @@ func _physics_process(delta:float)->void:
 	if _grounded and not was_grounded and _floor_initialized:
 		if novelty_jump!=null:novelty_jump.contact(simulation_clock+delta)
 		if _jump_stage!="JumpLanding":_jump_stage="JumpLanding";_jump_time=0.
-	elif not _grounded and _jump_stage.is_empty():_jump_stage="JumpAirborne";_jump_time=0.
+	elif not _grounded and (_jump_stage.is_empty() or (_uses_native_jump_pose(_jump_stage) and _jump_stage=="JumpLanding")):
+		_jump_stage="JumpAirborne";_jump_time=0.
 	_floor_initialized=_floor_initialized or _grounded
 	current_speed=Vector2(get_real_velocity().x,get_real_velocity().z).length()
 	_animation_motion_speed=current_speed
@@ -529,13 +531,16 @@ func _physics_process(delta:float)->void:
 		var step:=minf(left,1./120.)
 		if combo.active():step=minf(step,maxf(.00000001,combo.boundary_seconds()))
 		_animate(step);left-=step
-	if foot_placement!=null:
+	if foot_placement!=null and not _uses_native_jump_pose(active_clip):
 		foot_placement.apply(delta,_grounded,not review_clip.is_empty(),not combo.active() or combo.movement_allowed(),combo.serial)
 		_refresh_markers()
 	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and (not combo.active() or (combo.native_enabled and combo.movement_allowed()))) if direction_adapter!=null else []
 	movement_meter.sample(delta,global_position,desired.length(),_move_requested,_gait_cycles_this_tick,soles)
 	_record_order(&"physics_end",{"open_seconds":_combat_open_seconds,"position":[global_position.x,global_position.y,global_position.z]})
 	physics_pose_ready.emit()
+
+func _uses_native_jump_pose(key:String)->bool:
+	return native_jump_pose_enabled and using_original_source and key in ["JumpTakeoff","JumpAirborne","JumpLanding"]
 
 func _animate(delta:float)->void:
 	if foot_placement!=null:foot_placement.restore()
@@ -555,6 +560,9 @@ func _animate(delta:float)->void:
 	_playback_speed=1.
 	if review_clip.is_empty() and combo.active():_playback_speed=combo.playback_rate()
 	if selected=="JumpFlip" and review_clip.is_empty():_playback_speed=float(clips.JumpFlip.duration)/(2.*sqrt(2.*jump_height/gravity))
+	if review_clip.is_empty() and selected=="JumpTakeoff" and _uses_native_jump_pose(selected):
+		# Fit the source takeoff to the nominal apex without changing the capsule.
+		_playback_speed=float(clips.JumpTakeoff.duration)/sqrt(2.*jump_height/gravity)
 	if review_clip.is_empty() and selected in GAITS:
 		var nominal:float=(run_stride_speed if selected in ["Run","CombatRun"] else walk_stride_speed) if using_original_source else (run_speed if _run_requested else walk_speed)
 		_playback_speed=maxf(0.,motion_speed/nominal) if using_original_source else clampf(current_speed/nominal,.25,1.25)
@@ -604,7 +612,7 @@ func _animate(delta:float)->void:
 			if not using_original_source and _jump_stage=="JumpTakeoff" and _jump_time>=float(clips.JumpTakeoff.duration):_jump_stage="JumpAirborne";_jump_time-=float(clips.JumpTakeoff.duration)
 			elif _jump_stage=="JumpLanding":
 				var moving_release:bool=using_original_source and hybrid_motion==null and _grounded and _move_requested and _jump_time>=SOURCE_MOVING_LAND_SECONDS
-				var landing_seconds:float=hybrid_motion.landing_duration if hybrid_motion!=null else float(clips.JumpLanding.duration)
+				var landing_seconds:float=hybrid_motion.landing_duration if hybrid_motion!=null and not _uses_native_jump_pose("JumpLanding") else float(clips.JumpLanding.duration)
 				if moving_release or _jump_time>=landing_seconds:_jump_stage="";_jump_time=0.
 		_transition_time+=delta
 		if not _transition.is_empty() and _transition_time>=float(clips[_transition].duration):_transition=""
@@ -710,8 +718,9 @@ func _play(key:String,blend:float=.04)->void:
 			var rate:float=combo.playback_rate() if combo.active() else 1.
 			var idle_to_move:bool=active_clip in ["Idle","CombatReady"] and key in GAITS
 			var move_to_idle:bool=active_clip in GAITS and key in ["Idle","CombatReady"]
-			var continuous_hybrid_jump:bool=hybrid_motion!=null and active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding"] and key in ["JumpTakeoff","JumpAirborne","JumpLanding"] and not(key=="JumpLanding" and _move_requested)
-			var hybrid_jump_boundary:bool=hybrid_motion!=null and (active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding","JumpFlip"] or key in ["JumpTakeoff","JumpAirborne","JumpLanding","JumpFlip"])
+			var hybrid_jump:bool=hybrid_motion!=null and not (_uses_native_jump_pose(active_clip) or _uses_native_jump_pose(key))
+			var continuous_hybrid_jump:bool=hybrid_jump and active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding"] and key in ["JumpTakeoff","JumpAirborne","JumpLanding"] and not(key=="JumpLanding" and _move_requested)
+			var hybrid_jump_boundary:bool=hybrid_jump and (active_clip in ["JumpTakeoff","JumpAirborne","JumpLanding","JumpFlip"] or key in ["JumpTakeoff","JumpAirborne","JumpLanding","JumpFlip"])
 			if _continuous_combat_segment(active_clip,key) or continuous_hybrid_jump:
 				_outgoing_locomotion_state.clear();source_transition.discard_raw()
 			elif _combat_entry(key):

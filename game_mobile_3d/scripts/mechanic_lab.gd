@@ -41,6 +41,8 @@ func _enter_tree() -> void:
 	add_child(presentation)
 	presentation.begin(self)
 	var actor := PlayerFactory.create(PlayerFactory.uses_private_player())
+	if "native_jump_pose_enabled" in actor:
+		actor.native_jump_pose_enabled = true
 	actor.name = "Player"
 	actor.position = SPAWN
 	$Actors.add_child(actor)
