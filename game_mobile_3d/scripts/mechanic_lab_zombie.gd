@@ -4,6 +4,7 @@ const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const Ragdoll := preload("res://scenes/dev/zombie_death_physics/ragdoll.gd")
 const DeathProfile := preload("res://scenes/dev/zombie_death_physics/death_profile.gd")
 const CORPSE_SHADER := preload("res://materials/mechanic_lab_zombie_corpse.gdshader")
+const HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_zombie_hit_flash.gdshader")
 const IDLE := &"Zombie_Idle"
 const WALK_CLIPS := [&"Zombie_Walk", &"Zombie_Walk_Variant1", &"Zombie_Walk_Variant2"]
 const SPAWN := &"Zombie_Spawn"
@@ -20,6 +21,7 @@ const CORPSE_LIFETIME := 4.9
 const CORPSE_DISSOLVE_DURATION := 0.50
 const CORPSE_DESATURATION_START := 2.3
 const CORPSE_DESATURATION_END := 3.6
+const HIT_FLASH_DURATION := 0.083
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
 const RAGDOLL_BONES := {
@@ -48,7 +50,7 @@ var _death_direction := Vector3.ZERO
 var _attack_cooldown := 0.0
 var _flash_left := 0.0
 var _corpse_age := 0.0
-static var _flash_material: StandardMaterial3D
+static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
 static var _corpse_material: ShaderMaterial
 
@@ -93,13 +95,16 @@ func _ready() -> void:
 		_death_profile.linear_damping = 0.18
 		_death_profile.joint_resistance = 0.45
 	if _flash_material == null:
-		_flash_material = StandardMaterial3D.new()
-		_flash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		_flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		_flash_material.albedo_color = Color(1.0, 0.14, 0.08, 0.48)
-		_flash_material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+		_flash_material = ShaderMaterial.new()
+		_flash_material.shader = HIT_FLASH_SHADER
 
 func _physics_process(delta: float) -> void:
+	if _flash_left > 0.0:
+		_flash_left = maxf(0.0, _flash_left - delta)
+		var flash := smoothstep(0.0, HIT_FLASH_DURATION * 0.65, _flash_left)
+		_mesh.set_instance_shader_parameter("hit_flash", flash)
+		if _flash_left == 0.0:
+			_mesh.material_overlay = null
 	if health <= 0:
 		_update_death(delta)
 		return
@@ -107,10 +112,6 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 		return
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
-	if _flash_left > 0.0:
-		_flash_left -= delta
-		if _flash_left <= 0.0:
-			_mesh.material_overlay = null
 	var travel := _chase_velocity(delta) + _knockback
 	_knockback = _knockback.move_toward(Vector3.ZERO, delta * 10.0)
 	velocity.x = travel.x
@@ -153,15 +154,15 @@ func take_hit(amount: int, direction: Vector3) -> void:
 	direction.y = 0.0
 	direction = direction.normalized()
 	_feedback.show_hit(amount, health, MAX_HEALTH)
+	_mesh.material_overlay = _flash_material
+	_mesh.set_instance_shader_parameter("hit_flash", 1.0)
+	_flash_left = HIT_FLASH_DURATION
 	if health <= 0:
 		_death_direction = direction
-		_mesh.material_overlay = null
 		animation.pause()
 		set_deferred("collision_layer", 0)
 		set_deferred("collision_mask", 0)
 	else:
-		_mesh.material_overlay = _flash_material
-		_flash_left = 0.10
 		_knockback = direction * 2.6
 		animation.stop(true)
 		animation.play(STAGGER, 0.0, 2.7)
