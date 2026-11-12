@@ -6,11 +6,13 @@ const SOURCE := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events
 const SABRE := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_sabre_hitmarker_%02d.ogg"
 const SWORD := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_sword_%02d.ogg"
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
+const GRASS_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttackDebris/sfx_HJA_impact debris_Grass_%02d.ogg"
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
 const PLAYER_HURT := "Player/Hurt/sfx_multi_hit-%03d_soundWave.ogg"
 const VOICES_PER_POOL := 3
 const HIT_GAIN_DB := -9.0
 const SLAM_GAIN_DB := -10.0
+const GRASS_LANDING_GAIN_DB := -16.0
 const HURT_GAIN_DB := -20.0
 const DEATH_GAIN_DB := -14.0
 const PLAYER_HURT_GAIN_DB := -14.0
@@ -41,6 +43,14 @@ const LANDING_HASHES := [
 	"ef64187aa4ff1b50d32fcfe617d04b3bde4ac7f8e045bbb687895ea60e3b81ab",
 	"452771d3aec25299b9308f0d64c52dbbcdcc38ab3c2453112ec4796837b466f9",
 	"a97f48e243ebb2665540255e7def73234c447432504d17e5f0ee941e4c8340f7",
+]
+const GRASS_LANDING_HASHES := [
+	"ee75570063f0cab520dd1f184dba12d80a863eefa247a0917fa79b096ed333a8",
+	"b2630725de22fa7e841b244817623f58d675581b771eec5b3ae8b2e0c183b311",
+	"6cec2b51dfe4abb81ce3762c3176f24a7008b3a2700748c74b58e69bdf136899",
+	"59171aa40d29b5b0a28ad4caf5b99a97270bcad0ad183ca10219e8aeb77a06e0",
+	"b46cc8bc85384043a08525675bf7c2eed52a0a3d4aba5f254b0874244be152bb",
+	"7c34ccd9be1a3cd4c69561c12691cef32de62611cdaec422de6dd4a139cd2581",
 ]
 const PLAYER_HURT_HASHES := [
 	"3442fd3503fca76ccc78d29bfee9d16390fc3d5a62bd1cbbdb9213b880ab5494",
@@ -91,8 +101,12 @@ func contact(point: Vector3, serial: int, lethal: bool) -> void:
 	_play(&"death" if lethal else &"hurt", point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
 
 func slam_landed(point: Vector3) -> void:
-	if enabled:
+	if not enabled:
+		return
+	# MechanicLab has a grass-block floor. The Sword hit is a separate layer.
+	if sword_equipped:
 		_play(&"slam", point, SLAM_GAIN_DB)
+	_play(&"slam_grass", point, GRASS_LANDING_GAIN_DB)
 
 func player_hurt() -> void:
 	if not enabled or _player_hurt_voice == null:
@@ -142,6 +156,8 @@ func _load_audio() -> void:
 		_load_sample(root, &"death", ZOMBIE % ["Death", i + 1], DEATH_HASHES[i])
 	for i in LANDING_HASHES.size():
 		_load_sample(root, &"slam", HEAVY_LANDING % (i + 1), LANDING_HASHES[i])
+	for i in GRASS_LANDING_HASHES.size():
+		_load_sample(root, &"slam_grass", GRASS_LANDING % (i + 1), GRASS_LANDING_HASHES[i])
 	for i in PLAYER_HURT_HASHES.size():
 		_load_sample(root, &"player_hurt", PLAYER_HURT % (i + 1), PLAYER_HURT_HASHES[i])
 
