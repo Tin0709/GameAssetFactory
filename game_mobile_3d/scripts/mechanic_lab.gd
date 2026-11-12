@@ -295,20 +295,15 @@ func _on_player_hit(amount: int) -> void:
 	player_health = maxi(0, player_health - amount)
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
 	if player_health == 0:
-		$HUD/PlayerHealth.text += "  ·  R hồi máu"
-		player.is_dead = true
-		player.release_inputs()
-		player.velocity = Vector3.ZERO
-		player.set_physics_process(false)
-		player.set_process_input(false)
-		player.set_process_unhandled_input(false)
+		player.enter_lab_defeat()
+		$HUD/Defeat.show()
 
 func reset_player() -> void:
 	if player_health == 0:
 		player.is_dead = false
-		player.set_physics_process(true)
 		player.set_process_input(true)
 		player.set_process_unhandled_input(true)
+		$HUD/Defeat.hide()
 	player_health = MAX_PLAYER_HEALTH
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
 	_shake_serial = -1

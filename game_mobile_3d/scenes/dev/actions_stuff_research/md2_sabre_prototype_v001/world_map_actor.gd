@@ -71,6 +71,12 @@ func _animate(delta:float)->void:
 	super._animate(delta)
 
 func _physics_process(delta:float)->void:
+	if is_dead:
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+			move_and_slide()
+			physics_pose_ready.emit()
+		return
 	var camera:=get_viewport().get_camera_3d()
 	if camera!=null:set_movement_camera_basis(camera.global_basis)
 	turn_axis=float(_q)-float(_c);combat_requested=_right or _q or _c;has_aim_point=false
@@ -108,6 +114,13 @@ func setup_world_vegetation(world:Node3D)->Node3D:
 
 func cancel_jump()->void:
 	_reset_map_actor_at(global_position)
+
+func enter_lab_defeat() -> void:
+	is_dead = true
+	set_process_input(false)
+	set_process_unhandled_input(false)
+	# Reset the pose, combo and presentation at the point of defeat.
+	_reset_map_actor_at(global_position, visual.rotation.y)
 
 func drop_for_lab(height: float) -> bool:
 	if not is_on_floor():
