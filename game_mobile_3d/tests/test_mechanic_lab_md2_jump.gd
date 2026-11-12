@@ -87,9 +87,10 @@ func run() -> void:
 		check(await wait_clip(actor, "JumpLanding", 2 * hz) and actor.is_on_floor(),
 			"Free-fall landing starts at actual contact" + label)
 		check(await wait_clip(actor, "Idle", hz), "Drop landing returns to Idle" + label)
-	check(not oracle.native_jump_pose_enabled, "Shared actor defaults to the existing hybrid jump")
+	check(oracle.get("native_jump_pose_enabled") != true, "Shared actor defaults to the existing hybrid jump")
 	print("MECHANIC_LAB_MD2_JUMP ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	oracle.free()
 	quit(0 if failures.is_empty() else 1)
+
 
