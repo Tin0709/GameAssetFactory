@@ -110,6 +110,7 @@ class BridgeTests(unittest.TestCase):
     def test_setup_launches_blender_if_http_is_ready_but_addon_is_not_listening(self):
         with patch.object(self.bridge, '_addon_probe', return_value=False), \
              patch.object(self.bridge, '_listener_open', return_value=False), \
+             patch.object(self.bridge, '_port_open', return_value=True), \
              patch.object(self.bridge, '_open_blender') as launch:
             self.bridge.start_setup()
             launch.assert_called_once()
