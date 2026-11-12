@@ -101,9 +101,24 @@ func run() -> void:
 	var revised := await capture_ratio(hit_voice, capture)
 	check(previous > 0.0 and revised > previous * 2.0 and revised > 0.90,
 		"Combat voice preserves the 8 kHz test tone relative to 1 kHz")
-	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
-		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised}))
 	hit_voice.stream = null
+	audio.set_enabled(true, Vector3.FORWARD * 2.0)
+	audio.reset()
+	for voice in audio._voices:
+		voice.bus = &"MechanicLabAudioTest"
+	capture.clear_buffer()
+	audio.slam_landed(Vector3.FORWARD * 2.0)
+	audio.contact(Vector3.FORWARD * 2.0, 8, false)
+	audio.contact(Vector3.FORWARD * 2.0, 8, true)
+	await create_timer(0.65).timeout
+	var peak := 0.0
+	for frame in capture.get_buffer(capture.get_frames_available()):
+		peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
+	check(peak > 0.01 and peak < 0.9, "Simultaneous MD2 impact, slam and reactions have mix headroom")
+	audio.set_enabled(false, Vector3.ZERO)
+	await create_timer(0.08).timeout
+	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
+		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
 	audio.queue_free()
 	camera.queue_free()
