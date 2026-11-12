@@ -1150,7 +1150,9 @@ func grass_root_tone_mix() -> float:
 	return _lighting_scale(&"grass_root_tone") * _night_grass_weight()
 
 func grass_night_albedo_mix() -> float:
-	return _blend_grass_albedo(_night_grass_weight())
+	if _balanced_preview or atmosphere_review != "combined" or not forest_active():
+		return 0.0
+	return _blend_grass_albedo(moonlight_weight(hour))
 
 func _blend_grass_albedo(night: float) -> float:
 	var night_albedo := _lighting_scale(&"grass_night_albedo") * night
