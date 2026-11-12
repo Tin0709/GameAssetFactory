@@ -91,6 +91,10 @@ gaf_projected_sun_strength={
 "type": "float",
 "value": 0.0
 }
+gaf_projected_sun_shift={
+"type": "vec2",
+"value": Vector2(0, 0)
+}
 gaf_projected_sun_mask={
 "type": "sampler2D",
 "value": ""

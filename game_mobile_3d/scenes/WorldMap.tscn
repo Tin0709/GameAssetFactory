@@ -19,6 +19,7 @@ night_mist_region = ExtResource("night_mist")
 regional_sky_region = ExtResource("regional_sky")
 scene_lighting_mix = ExtResource("forest_mix")
 additional_lighting_mixes = Array[ExtResource("mix_type")]([ExtResource("night_mix"), ExtResource("soft_cliff_mix")])
+projected_sun_shift = Vector2(0, 6)
 
 [node name="Ground" parent="."]
 collision_layer = 0

@@ -4,11 +4,13 @@ const MASK_PATH := "godot_lab/world_map_unified_showcase_v001/forest_dappled_lig
 const MASK_SHA256 := "23956b5aab0996a696066516d8796cbf088570bf8e73a3175d8c4b152c329cca"
 const MASK_SIZE := Vector2i(512, 512)
 const STRENGTH := &"gaf_projected_sun_strength"
+const SHIFT := &"gaf_projected_sun_shift"
 const MASK := &"gaf_projected_sun_mask"
 
 var _path := ""
 var _texture: ImageTexture
 var _weight := 0.0
+var _shift := Vector2.ZERO
 
 func setup() -> void:
 	release()
@@ -47,9 +49,18 @@ func set_weight(weight: float) -> void:
 	_weight = weight
 	RenderingServer.global_shader_parameter_set(STRENGTH, weight)
 
+func set_shift(shift: Vector2) -> void:
+	var applied := shift if _weight > 0.0 and shift.is_finite() else Vector2.ZERO
+	if applied == _shift:
+		return
+	_shift = applied
+	RenderingServer.global_shader_parameter_set(SHIFT, _shift)
+
 func release() -> void:
 	RenderingServer.global_shader_parameter_set(STRENGTH, 0.)
+	RenderingServer.global_shader_parameter_set(SHIFT, Vector2.ZERO)
 	RenderingServer.global_shader_parameter_set(MASK, null)
 	_weight = 0.
+	_shift = Vector2.ZERO
 	_texture = null
 	_path = ""

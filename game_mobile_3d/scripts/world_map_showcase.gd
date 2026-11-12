@@ -66,6 +66,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sun_pockets": ["Sunlight pockets", 1.5],
 	&"sun_opening": ["Sunlit openings", 1.],
 	&"projected_sun": ["Projected sunlight", 1.],
+	&"projected_sun_position": ["Projected sunlight placement", 1.],
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
@@ -123,7 +124,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 49
+const LIGHTING_MIX_VERSION := 50
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -889,7 +890,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .75
 	if effect == &"twilight_shadow_color":
 		return .65
-	if effect in [&"daylight_bounce", &"stone_diffuse_contrast", &"stone_detail_softness"]:
+	if effect in [&"daylight_bounce", &"stone_diffuse_contrast", &"stone_detail_softness", &"projected_sun_position"]:
 		return 0.
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
@@ -965,6 +966,7 @@ func refresh_daylight_shading() -> void:
 	if forest_active() and atmosphere_review in ["lighting", "combined"] and level.look.direct_clouds_active():
 		phase = PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
 	projected_sun.set_weight(_lighting_scale(&"projected_sun") * phase)
+	projected_sun.set_shift(level.projected_sun_shift * _lighting_scale(&"projected_sun_position"))
 	var gain := .64 * _lighting_scale(&"sun_opening") * phase if not _balanced_preview else 0.
 	if gain != _opening_gain:
 		_opening_gain = gain
@@ -972,6 +974,13 @@ func refresh_daylight_shading() -> void:
 	var slider: HSlider = _lighting_sliders.get(&"projected_sun")
 	if slider != null:
 		slider.editable = not _balanced_preview and projected_sun.available()
+	var placement: HSlider = _lighting_sliders.get(&"projected_sun_position")
+	if placement != null:
+		placement.editable = _projected_placement_available()
+
+func _projected_placement_available() -> bool:
+	return not _balanced_preview and projected_sun.available() and level != null \
+		and level.projected_sun_shift.is_finite() and level.projected_sun_shift != Vector2.ZERO
 
 func local_exposure_mix_scale() -> float:
 	if forest_active() and atmosphere_review in ["haze", "combined"]:
@@ -1201,6 +1210,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 49 and effect == &"stone_detail_softness":
 			missing_value = 0.
+		if version < 50 and effect == &"projected_sun_position":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1238,6 +1249,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and player_contact.available()
 		if effect == &"projected_sun":
 			slider.editable = slider.editable and projected_sun.available()
+		if effect == &"projected_sun_position":
+			slider.editable = _projected_placement_available()
 		if effect == &"regional_sky":
 			slider.editable = _regional_sky_editable()
 		if effect == &"daylight_bounce":
@@ -1261,7 +1274,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		level.look.set_stone_detail_softness(_lighting_scale(&"stone_detail_softness"))
 		if changed_effect == &"stone_detail_softness":
 			return
-	if changed_effect in [&"projected_sun", &"sun_opening"]:
+	if changed_effect in [&"projected_sun", &"projected_sun_position", &"sun_opening"]:
 		refresh_daylight_shading()
 		return
 	if changed_effect == &"diffuse_openings":
