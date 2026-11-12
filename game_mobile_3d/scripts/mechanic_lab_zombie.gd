@@ -454,7 +454,7 @@ func _corpse_axis() -> Vector3:
 	return bodies.Head.global_position - feet
 
 func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
-	if motion.core_supports == 0 or not motion.leg_supported or motion.supports < 3 \
+	if not motion.leg_supported or motion.supports < 3 \
 		or motion.linear > CORPSE_SETTLE_SPEED or motion.angular > CORPSE_SETTLE_SPIN:
 		_settled_seconds = 0.0
 		return
@@ -462,6 +462,10 @@ func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
 	# compare the pose with the actual surface span between core and feet.
 	var head_to_feet := _corpse_axis()
 	var axis := head_to_feet.normalized()
+	if motion.core_supports == 0 and (absf(axis.y) > CORPSE_SETTLE_MAX_AXIS_Y or not ragdoll.has_flat_limb_support()):
+		# On the flat floor a prone corpse can rest on both legs and a shoulder.
+		_settled_seconds = 0.0
+		return
 	if absf(axis.y) > CORPSE_SETTLE_MAX_AXIS_Y:
 		var span: Vector3 = motion.support_span
 		var horizontal_span := Vector2(span.x, span.z).length()

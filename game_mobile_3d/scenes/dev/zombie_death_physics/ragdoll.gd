@@ -610,6 +610,23 @@ func contact_motion() -> Dictionary:
 		"core_supports":core_supports,"leg_supported":leg_supports > 0,"support_span":support_span,
 		"linear":peak_linear,"angular":peak_angular}
 
+func has_flat_limb_support() -> bool:
+	if not is_instance_valid(_flat_floor) or _flat_floor.disabled:
+		return false
+	var floor_body := _flat_floor.get_parent()
+	return _body_supported_by(bodies["Leg.L"], floor_body) and _body_supported_by(bodies["Leg.R"], floor_body) \
+		and (_body_supported_by(bodies["Arm.L"], floor_body) or _body_supported_by(bodies["Arm.R"], floor_body))
+
+static func _body_supported_by(body: PhysicalBone3D, floor_body: Node) -> bool:
+	var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+	if state == null:
+		return false
+	for index in state.get_contact_count():
+		if state.get_contact_local_normal(index).y >= MIN_SUPPORT_NORMAL_Y \
+				and state.get_contact_collider_object(index) == floor_body:
+			return true
+	return false
+
 func release(visible_world_pose: Array[Transform3D] = []) -> void:
 	# Called outside the physics integration callback. Free native joints/bodies,
 	# not just collisions/sleep flags. Optionally retain the final visible pose.
