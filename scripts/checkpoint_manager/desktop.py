@@ -134,6 +134,7 @@ class CheckpointApp:
         self.view_buttons = {}
         self.view_copy_buttons = {}
         self.gameplay_process = None
+        self.mechanic_lab_process = None
         self._build()
         self.bridge_monitor = BridgeMonitor(bridge or BlenderBridge(self.state_dir))
         root.protocol('WM_DELETE_WINDOW', self.close)
@@ -149,7 +150,7 @@ class CheckpointApp:
     def log(self, message):
         message = redact(message)
         stamp = datetime.now().strftime('%H:%M:%S')
-        if message.startswith(('Blender MCP:', 'Đã chạy gameplay', 'Không mở được gameplay', 'Đã mở ', 'Đã copy path')):
+        if message.startswith(('Blender MCP:', 'Đã chạy gameplay', 'Đã chạy MechanicLab', 'Không mở được gameplay', 'Không mở được MechanicLab', 'Đã mở ', 'Đã copy path')):
             kind = 'tool'
         elif any(message.startswith(config.name + ':') for config in self.configs) or 'tự commit' in message.lower():
             kind = 'git'
@@ -406,20 +407,31 @@ class CheckpointApp:
         return self._submit(job, kind='push_result', indices=[index], label='Đang Push')
 
     def open_main_gameplay(self):
+        self.gameplay_process = self._launch_godot(
+            None, 'gameplay chính', 'godot-gameplay.log', self.gameplay_process
+        )
+
+    def open_mechanic_lab(self):
+        self.mechanic_lab_process = self._launch_godot(
+            'mechanic-lab', 'MechanicLab', 'godot-mechanic-lab.log', self.mechanic_lab_process
+        )
+
+    def _launch_godot(self, scene, label, log_file, process):
         if self.closed or self.closing or self.dialog.active:
-            return
-        if self.gameplay_process is not None and self.gameplay_process.poll() is None:
-            self.notifications.show('Gameplay chính đang chạy', 'Dùng cửa sổ Godot đã mở.')
-            return
+            return process
+        if process is not None and process.poll() is None:
+            self.notifications.show(f'{label} đang chạy', 'Dùng cửa sổ Godot đã mở.')
+            return process
         try:
-            command = godot_command(find_tool('godot'), scene=None, editor=False, headless=False)
-            with (self.state_dir / 'godot-gameplay.log').open('wb') as output:
-                self.gameplay_process = Popen(command, cwd=ROOT, stdin=DEVNULL, stdout=output, stderr=STDOUT)
+            command = godot_command(find_tool('godot'), scene=scene, editor=False, headless=False)
+            with (self.state_dir / log_file).open('wb') as output:
+                process = Popen(command, cwd=ROOT, stdin=DEVNULL, stdout=output, stderr=STDOUT)
         except (OSError, ValueError) as error:
-            self.log(f'Không mở được gameplay chính: {error}')
-            self.notifications.show('Không mở được gameplay chính', redact(str(error)), kind='error')
-            return
-        self.log(f'Đã chạy gameplay chính trong Godot (PID {self.gameplay_process.pid}).')
+            self.log(f'Không mở được {label}: {error}')
+            self.notifications.show(f'Không mở được {label}', redact(str(error)), kind='error')
+            return None
+        self.log(f'Đã chạy {label} trong Godot (PID {process.pid}).')
+        return process
 
     def start_blender(self):
         if not self.closed and not self.closing and self.bridge_start_until is None:

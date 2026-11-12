@@ -22,6 +22,7 @@ VIEWERS = {
     'soldier': 'blender/characters/soldier/showcase/SOLDIER_Asset_Library.blend',
 }
 SCENES = {
+    'mechanic-lab': 'res://scenes/dev/MechanicLab.tscn',
     'combat': 'res://scenes/dev/ActionsStuffWalkRunTest.tscn',
     'overworld': 'res://scenes/dev/MD2OverworldFidelityTest.tscn',
     'snappy': 'res://scenes/dev/SnappyLocomotionFastJumpTest.tscn',

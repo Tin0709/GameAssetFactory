@@ -172,6 +172,7 @@
     .tool-name {font-size:17px;font-weight:720;letter-spacing:-.5px;}
     .tool-caption {font-size:11px;color:var(--muted);margin-top:3px;}
     .launch-bottom {margin-top:24px;display:flex;justify-content:space-between;gap:12px;align-items:center;position:relative;z-index:1;}
+    .godot-actions {justify-content:flex-end;flex-wrap:wrap;gap:8px;}
     .tool-hint {color:var(--subtle);font-size:11px;}
     .tool-hint.good {color:var(--green);display:inline-flex;align-items:center;gap:8px;}
     .btn {display:inline-flex;gap:9px;align-items:center;justify-content:center;min-height:39px;padding:0 15px;border-radius:13px;border:1px solid var(--line-strong);background:rgba(143,172,214,.1);color:var(--text);font-weight:650;font-size:12px;white-space:nowrap;transition:background .2s,transform .2s,border-color .2s,box-shadow .2s;}
@@ -460,7 +461,10 @@
         <div class="launch-grid">
           <article class="launch-card godot">
             <div class="launch-top"><div class="tool-icon"><svg class="ico"><use href="#i-cube"/></svg></div><div><div class="tool-name">Godot Engine</div><div class="tool-caption">Cyan Sanctum · Gameplay chính (F5)</div></div></div>
-            <div class="launch-bottom"><span class="tool-hint">Main game scene</span><button class="btn primary" type="button" data-action="godot"><svg class="ico"><use href="#i-play"/></svg>Chạy gameplay</button></div>
+            <div class="launch-bottom godot-actions">
+              <button class="btn secondary" type="button" data-action="mechanic-lab"><svg class="ico"><use href="#i-tool"/></svg>Mở MechanicLab</button>
+              <button class="btn primary" type="button" data-action="godot"><svg class="ico"><use href="#i-play"/></svg>Chạy gameplay</button>
+            </div>
           </article>
           <article class="launch-card blender">
             <div class="launch-top"><div class="tool-icon orange"><svg class="ico"><use href="#i-tool"/></svg></div><div><div class="tool-name">Blender MCP</div><div class="tool-caption">Đang kiểm tra kết nối Blender</div></div></div>

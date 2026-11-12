@@ -137,6 +137,8 @@ def build_layout(app):
     title = row(godot)
     app.gameplay_button = Button(title, 'Chạy gameplay chính', app.open_main_gameplay, kind='primary')
     app.gameplay_button.pack(side='right', padx=(12, 0))
+    app.mechanic_lab_button = Button(title, 'Mở MechanicLab', app.open_mechanic_lab)
+    app.mechanic_lab_button.pack(side='right', padx=(12, 0))
     ttk.Label(title, text='Godot', style='CardTitle.TLabel').pack(anchor='w')
     ttk.Label(title, text='Cảnh mặc định của Cyan Sanctum (F5)', style='Muted.TLabel').pack(anchor='w', pady=(4, 0))
 

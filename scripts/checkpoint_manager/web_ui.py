@@ -24,7 +24,7 @@ ROUTES = {'/': ('index.html', 'text/html; charset=utf-8'),
           '/devdock.png': ('../assets/devdock-64.png', 'image/png'),
           '/devdock.ico': ('../assets/devdock-transparent.ico', 'image/x-icon')}
 REPO_ACTIONS = {'repo-refresh', 'changes', 'commit', 'push'}
-SIMPLE_ACTIONS = {'godot', 'start-mcp', 'check-mcp', 'refresh', 'all-on', 'all-off'}
+SIMPLE_ACTIONS = {'godot', 'mechanic-lab', 'start-mcp', 'check-mcp', 'refresh', 'all-on', 'all-off'}
 REPO_NAMES = {'gaf': 'GameAssetFactory', 'md2': 'MD2 Research', 'tacz': 'TaCZ Research'}
 
 
@@ -315,7 +315,7 @@ class WebWindow:
     def _dispatch(self, data):
         app = self.app
         action = data['action']
-        simple = {'godot': app.open_main_gameplay, 'start-mcp': app.start_blender,
+        simple = {'godot': app.open_main_gameplay, 'mechanic-lab': app.open_mechanic_lab, 'start-mcp': app.start_blender,
                   'check-mcp': app.refresh_blender, 'all-on': app.resume_all, 'all-off': app.pause_all}
         if action in simple:
             simple[action]()
