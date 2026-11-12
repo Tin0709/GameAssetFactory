@@ -95,6 +95,20 @@ func run() -> void:
 		check(await wait_clip(actor, "JumpAirborne", 4), "Medium drop enters the same source loop" + label)
 		check(await wait_clip(actor, "JumpLanding", 2 * hz), "Medium drop plays source landing" + label)
 		check(await wait_clip(actor, "Idle", hz), "Medium drop returns to Idle" + label)
+
+		actor.requested_direction = Vector2(0.0, -1.0)
+		actor.requested_run = true
+		check(await wait_clip(actor, "Run", hz), "Moving trial starts in Run" + label)
+		actor.requested_jump = true
+		check(await wait_clip(actor, "JumpTakeoff", hz), "Running jump starts source takeoff" + label)
+		actor.requested_jump = false
+		check(await wait_clip(actor, "JumpLanding", hz) and actor.is_on_floor(),
+			"Running jump enters source landing on contact" + label)
+		for i in ceili(0.07 * hz):
+			await tick()
+		compare_source(actor, oracle, "JumpLanding", "Moving landing" + label)
+		check(actor.current_speed > 1.0, "Landing animation allows horizontal movement" + label)
+		check(await wait_clip(actor, "Run", hz), "Landing resumes Run" + label)
 	check(oracle.get("native_jump_pose_enabled") != true, "Shared actor defaults to the existing hybrid jump")
 	print("MECHANIC_LAB_MD2_JUMP ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
