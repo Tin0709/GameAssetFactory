@@ -362,8 +362,8 @@ class DesktopTests(unittest.TestCase):
         godot.touch()
         running = Mock(pid=1234)
         running.poll.return_value = None
+        self.assertTrue(hasattr(self.app, 'gameplay_button'), 'Missing main gameplay shortcut')
         with patch.dict(os.environ, {'GODOT_BIN': str(godot)}), patch('checkpoint_manager.desktop.Popen', return_value=running) as launch:
-            self.assertTrue(hasattr(self.app, 'gameplay_button'), 'Missing main gameplay shortcut')
             self.app.gameplay_button.invoke()
             self.app.gameplay_button.invoke()
             launch.assert_called_once()
