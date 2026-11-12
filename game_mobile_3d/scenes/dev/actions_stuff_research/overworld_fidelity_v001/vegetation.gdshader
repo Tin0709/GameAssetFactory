@@ -34,6 +34,12 @@ vec4 grass_ground_sky(vec2 world_position) {
 		int receiver = int(regional_sky_state.y) + cell.y * extent.x + cell.x;
 		incident.rgb = gaf_regional_sky(incident.rgb, study_ground_sky_scale, world_position, receiver);
 	}
+	if (night_sky_state.x > 0.0 && incident.a > 0.0 &&
+			all(equal(study_ground_sky_origin, night_sky_roots.xy)) &&
+			all(equal(extent, ivec2(night_sky_roots.zw)))) {
+		int receiver = night_sky_grass_start + cell.y * extent.x + cell.x;
+		incident.rgb = gaf_night_sky(incident.rgb, receiver);
+	}
 	return incident;
 }
 #endif

@@ -5,6 +5,18 @@ uniform vec4 regional_sky_roots;
 uniform vec4 regional_sky_phase;
 uniform vec2 regional_sky_state = vec2(0.0); // strength, grass receiver start
 
+uniform sampler2D night_sky_field : filter_nearest, repeat_disable;
+uniform vec2 night_sky_state = vec2(0.0); // spatial fill, stone color balance
+uniform vec4 night_sky_roots; // grass origin and extent
+uniform int night_sky_grass_start;
+
+vec3 gaf_night_sky(vec3 sky, int receiver) {
+	if (night_sky_state.x <= 0.0) return sky;
+	ivec2 extent = textureSize(night_sky_field, 0);
+	ivec2 cell = ivec2(receiver % extent.x, receiver / extent.x);
+	return mix(sky, texelFetch(night_sky_field, cell, 0).rgb, night_sky_state.x);
+}
+
 vec3 gaf_regional_sky(vec3 incident, vec3 tint, vec2 position_xz, int receiver) {
 	if (regional_sky_state.x <= 0.0) return incident;
 	float distance_m = length(position_xz - regional_sky_bounds.xy);

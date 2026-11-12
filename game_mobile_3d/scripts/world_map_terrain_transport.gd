@@ -21,6 +21,10 @@ var _regional_sky: RegionalSkyRegion
 var regional_sky_texture: ImageTexture3D
 var regional_sky_state := Vector2.ZERO
 var regional_sky_phase := Vector4.ZERO
+var night_sky_texture: ImageTexture
+var night_sky_state := Vector2.ZERO
+var _day_sky_failed := false
+var _night_sky_failed := false
 class TransformWatch extends Node3D:
 	var guard:Node
 	func _notification(what:int)->void:
@@ -127,7 +131,7 @@ func _install()->bool:
 	return true
 
 func regional_sky_available() -> bool:
-	return _regional_sky != null and level.showcase.sky_response.available()
+	return _regional_sky != null and not _day_sky_failed and _regional_sky.has_day_field() and level.showcase.sky_response.available()
 
 func _refresh_regional_sky() -> void:
 	if _regional_sky == null:
@@ -148,7 +152,7 @@ func _refresh_regional_sky() -> void:
 	if regional_sky_texture == null:
 		regional_sky_texture = _regional_sky.load_texture()
 		if regional_sky_texture == null:
-			_regional_sky = null
+			_day_sky_failed = true
 			_set_regional_sky_state(Vector2.ZERO)
 			return
 	var i := 0
@@ -163,6 +167,29 @@ func _set_regional_sky_state(state: Vector2, sample := Vector4.ZERO) -> void:
 		return
 	regional_sky_state = state
 	regional_sky_phase = sample
+	_bind_sky_receivers()
+
+func night_sky_available() -> bool:
+	return _regional_sky != null and not _night_sky_failed and _regional_sky.has_night_field() and level.showcase.sky_response.available()
+
+func _refresh_night_sky() -> void:
+	var review = level.showcase
+	var state := Vector2.ZERO
+	var moon: float = review.moonlight_weight(review.hour)
+	if moon > 0.0 and not review._balanced_preview and review.atmosphere_review == "combined" \
+			and review.forest_active() and is_active() and night_sky_available() \
+			and review._source_terrain_toggle != null and review._source_terrain_toggle.button_pressed:
+		state = Vector2(review._lighting_scale(&"night_spatial_sky"), review._lighting_scale(&"night_stone_fill_balance")) * moon
+		if state != Vector2.ZERO and night_sky_texture == null:
+			night_sky_texture = _regional_sky.load_night_texture()
+			if night_sky_texture == null:
+				_night_sky_failed = true
+				state = Vector2.ZERO
+	if state != night_sky_state:
+		night_sky_state = state
+		_bind_sky_receivers()
+
+func _bind_sky_receivers() -> void:
 	var materials := {}
 	for row in level.look.terrain_materials:
 		materials[row[3]] = true
@@ -176,6 +203,12 @@ func _set_regional_sky_state(state: Vector2, sample := Vector4.ZERO) -> void:
 		plants.grass_light.bind_regional_sky(self)
 
 func bind_regional_sky(material: ShaderMaterial) -> void:
+	material.set_shader_parameter("night_sky_state", night_sky_state)
+	if night_sky_state.x > 0.0 and material.get_shader_parameter("night_sky_field") != night_sky_texture:
+		material.set_shader_parameter("night_sky_field", night_sky_texture)
+		material.set_shader_parameter("night_sky_roots", Vector4(
+			_regional_sky.grass_origin.x, _regional_sky.grass_origin.y, _regional_sky.grass_extent.x, _regional_sky.grass_extent.y))
+		material.set_shader_parameter("night_sky_grass_start", _regional_sky.terrain_receivers)
 	material.set_shader_parameter("regional_sky_state", regional_sky_state)
 	if regional_sky_state.x <= 0.0:
 		return
@@ -248,3 +281,4 @@ func bind(force:bool=false)->void:
 func _process(_delta:float)->void:
 	refresh()
 	_refresh_regional_sky()
+	_refresh_night_sky()

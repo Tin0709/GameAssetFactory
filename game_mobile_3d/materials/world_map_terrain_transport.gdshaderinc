@@ -1,5 +1,8 @@
 // Original baked GAF irradiance, terrain-only. No native source coefficients.
 varying vec3 terrain_sky_light;
+#ifdef GAF_TERRAIN_NIGHT_SKY
+varying vec3 terrain_night_sky_light;
+#endif
 varying vec3 terrain_sun_bounce;
 varying float terrain_direct_contact;
 varying vec3 terrain_opening_incident;
@@ -20,7 +23,17 @@ vec3 terrain_contact_response(vec3 albedo,float contact){
 	return vec3(single)+returned*reflectance/max(vec3(1.0)-(1.0-return_ratio)*reflectance,vec3(0.00001));
 }
 vec3 terrain_indirect(vec3 color,float metallic,float visibility,float cloud,float contact){
-	vec3 irradiance=terrain_sky_light*terrain_ambient_scale*terrain_ambient_tint*visibility+terrain_sun_bounce*terrain_key_radiance*cloud;
+	vec3 sky = terrain_sky_light;
+#ifdef GAF_TERRAIN_NIGHT_SKY
+	if (night_sky_state.x > 0.0) sky = terrain_night_sky_light;
+#endif
+	vec3 irradiance = sky * terrain_ambient_scale * terrain_ambient_tint * visibility + terrain_sun_bounce * terrain_key_radiance * cloud;
+#ifdef GAF_TERRAIN_NIGHT_SKY
+	if (ground_grade == 3 && night_sky_state.y > 0.0) {
+		float luma = dot(irradiance, vec3(.2126, .7152, .0722));
+		irradiance = mix(irradiance, vec3(luma), night_sky_state.y);
+	}
+#endif
 	if(terrain_colored_visibility)irradiance*=terrain_contact_response(color,contact);
 	return color*(1.0-metallic)*irradiance;
 }

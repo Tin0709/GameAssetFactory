@@ -13,6 +13,8 @@ extends Resource
 @export var indices_sha256: String
 @export var field_path: String
 @export var field_sha256: String
+@export var night_field_path: String
+@export var night_field_sha256: String
 
 func read_ids(transport_path: String, vertex_count: int) -> PackedFloat32Array:
 	if not OS.has_feature("editor") or not center_xz.is_finite() or not grass_origin.is_finite():
@@ -25,7 +27,7 @@ func read_ids(transport_path: String, vertex_count: int) -> PackedFloat32Array:
 		return PackedFloat32Array()
 	if transport_sha256.length() != 64 or FileAccess.get_sha256(transport_path) != transport_sha256:
 		return PackedFloat32Array()
-	if not FileAccess.file_exists(_private_path(field_path)):
+	if not has_day_field() and not has_night_field():
 		return PackedFloat32Array()
 	var ids := _read_verified(indices_path, indices_sha256, vertex_count * 4).to_float32_array()
 	for id in ids:
@@ -33,10 +35,27 @@ func read_ids(transport_path: String, vertex_count: int) -> PackedFloat32Array:
 			return PackedFloat32Array()
 	return ids
 
-func load_texture() -> ImageTexture3D:
+func has_day_field() -> bool:
+	return OS.has_feature("editor") and FileAccess.file_exists(_private_path(field_path))
+
+func has_night_field() -> bool:
+	return OS.has_feature("editor") and night_field_sha256.length() == 64 and FileAccess.file_exists(_private_path(night_field_path))
+
+func load_night_texture() -> ImageTexture:
+	if extent.x <= 0 or extent.y <= 0 or not _supports_packed_texture():
+		return null
+	var bytes := _read_verified(night_field_path, night_field_sha256, extent.x * extent.y * 4)
+	if bytes.is_empty():
+		return null
+	return ImageTexture.create_from_image(Image.create_from_data(extent.x, extent.y, false, Image.FORMAT_RGBE9995, bytes))
+
+func _supports_packed_texture() -> bool:
 	var rd := RenderingServer.get_rendering_device()
-	if rd == null or not rd.texture_is_format_supported_for_usage(
-			RenderingDevice.DATA_FORMAT_E5B9G9R9_UFLOAT_PACK32, RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT):
+	return rd != null and rd.texture_is_format_supported_for_usage(
+		RenderingDevice.DATA_FORMAT_E5B9G9R9_UFLOAT_PACK32, RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT)
+
+func load_texture() -> ImageTexture3D:
+	if not _supports_packed_texture():
 		return null
 	var slice_bytes := extent.x * extent.y * 4
 	var bytes := _read_verified(field_path, field_sha256, slice_bytes * extent.z)

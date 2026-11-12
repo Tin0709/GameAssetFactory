@@ -16,3 +16,5 @@ indices_path = "godot_lab/world_map_unified_showcase_v001/terrain_sky_basis_v001
 indices_sha256 = "2bd8eb450b8fd3ef54bdcf6905f8abeb68367c47507265ca512494f7c40442d1"
 field_path = "godot_lab/world_map_unified_showcase_v001/terrain_sky_luma_v001/sky_phase.private.rgb9e5"
 field_sha256 = "f571a629dd9a5a4e34eb6601759ef2b13ff1288343a23ef0540c8fb5bf04dcd3"
+night_field_path = "godot_lab/world_map_unified_showcase_v001/terrain_night_spatial_fill_v001/night_sky_combined.private.rgb9e5"
+night_field_sha256 = "3753b445cec6bfc7c73bd460a778bba45a8c7c95cedae8baf2efbdf8f4f55243"

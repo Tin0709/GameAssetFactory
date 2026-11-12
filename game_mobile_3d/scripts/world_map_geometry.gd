@@ -574,7 +574,8 @@ func _make_cutaway_material(native: Material) -> ShaderMaterial:
 		for parameter:String in preload("res://scripts/world_map_terrain_material.gd").PARAMETERS+["terrain_key_radiance","terrain_ambient_scale","terrain_ambient_tint","terrain_colored_visibility"]:
 			var value:Variant=native.get_shader_parameter(parameter)
 			if value!=null:material.set_shader_parameter(parameter,value)
-		for parameter: String in ["regional_sky_field", "regional_sky_bounds", "regional_sky_phase", "regional_sky_state"]:
+		for parameter: String in ["regional_sky_field", "regional_sky_bounds", "regional_sky_phase", "regional_sky_state",
+				"night_sky_field", "night_sky_state", "night_sky_roots", "night_sky_grass_start"]:
 			var value: Variant = native.get_shader_parameter(parameter)
 			if value != null: material.set_shader_parameter(parameter, value)
 		for parameter: String in ["atlas", "smooth_atlas", "smooth_sampling", "use_albedo_texture", "albedo_tint", "native_roughness", "native_metallic", "native_specular", "use_vertex_color", "ground_grade", "texture_contrast", "grass_variation_strength", "contact_shade_strength", "plant_soil_strength", "path_blending", "path_verge", "path_surface_map", "path_grass_atlas", "path_dirt_atlas", "path_map_origin", "path_map_size", "oak_root_sites", "oak_root_beds", "clouds_enabled", "cloud_time", "cloud_field", "cloud_shape", "canopy_field", "canopy_origin", "canopy_extent", "canopy_base_y", "ground_bounce_map", "ground_bounce_direction", "ground_bounce_radius"]:
