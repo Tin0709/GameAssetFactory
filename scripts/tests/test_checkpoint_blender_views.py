@@ -52,6 +52,22 @@ class BlenderViewTests(unittest.TestCase):
         self.assertEqual(self.launcher.blend_path('actions_stuff'), blend)
         self.assertFalse(launch.call_args.kwargs.get('shell', False))
 
+    def test_actions_stuff_113_opens_a_separate_library(self):
+        root = self.root / 'ACT-Research-1.13'
+        blend = root / 'blender/Actions_Stuff_1.13.blend'
+        script = root / 'scripts/bootstrap.py'
+        for path in (blend, script):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.touch()
+        with patch('subprocess.Popen') as launch:
+            launch.return_value.pid = 113
+            self.assertEqual(self.launcher.open('actions_stuff_113'), 113)
+        self.assertEqual(launch.call_args.args[0], [str(self.blender), '--factory-startup',
+            '--disable-autoexec', str(blend), '--python', str(script)])
+        self.assertEqual(self.launcher.blend_path('actions_stuff_113'), blend)
+        self.assertEqual(self.launcher.blend_path('actions_stuff'),
+                         self.actions / 'blender/Actions_Stuff_Animation_Library.blend')
+
     def test_missing_actions_stuff_bootstrap_does_not_launch(self):
         (self.actions / 'scripts/bootstrap.py').unlink()
         with patch('subprocess.Popen') as launch:
