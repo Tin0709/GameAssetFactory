@@ -589,6 +589,42 @@ func _rewind_swept_terrain_pose() -> void:
 		var body: PhysicalBone3D = bodies[name]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		state.transform = best[name]
+	if not best.is_empty():
+		_resolve_rewound_wall_contact()
+
+func _resolve_rewound_wall_contact() -> void:
+	var closing_speed := 0.1
+	var contact_state: PhysicsDirectBodyState3D
+	var contact_offset := Vector3.ZERO
+	var contact_normal := Vector3.ZERO
+	for body: PhysicalBone3D in bodies.values():
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		var points := _terrain_contact_points(body, state, Vector3.ZERO)
+		for i in range(0, points.size(), 2):
+			var separation := points[i + 1] - points[i]
+			var depth := separation.length()
+			if depth <= PROJECTION_COLLISION_MARGIN or depth > TERRAIN_DEEP_OVERLAP:
+				continue
+			var normal := separation / depth
+			if absf(normal.y) >= MAX_WALL_NORMAL_Y:
+				continue
+			var offset := points[i] - state.transform.origin
+			var lever := offset - state.center_of_mass
+			var toward := -(state.linear_velocity + state.angular_velocity.cross(lever)).dot(normal)
+			if toward <= closing_speed:
+				continue
+			closing_speed = toward
+			contact_state = state
+			contact_offset = offset
+			contact_normal = normal
+	if contact_state == null:
+		return
+	# The corrected pose can still have an inward wall velocity. Resolve
+	# one point with zero restitution so it can roll along the surface.
+	var moment := (contact_offset - contact_state.center_of_mass).cross(contact_normal)
+	var inverse_mass := contact_state.inverse_mass + moment.dot(contact_state.inverse_inertia_tensor * moment)
+	if inverse_mass > 0.0:
+		contact_state.apply_impulse(contact_normal * (closing_speed / inverse_mass), contact_offset)
 
 func _project_unresolved_wall_contact(names: Array[String]) -> void:
 	var deepest: PhysicalBone3D
