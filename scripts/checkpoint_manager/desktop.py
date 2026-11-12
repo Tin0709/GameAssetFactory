@@ -6,9 +6,12 @@ from logging.handlers import RotatingFileHandler
 import os
 from pathlib import Path
 import queue
+from subprocess import DEVNULL, STDOUT, Popen
 import threading
 import time
 import tkinter as tk
+
+from dev import ROOT, find_tool, godot_command
 from .ui_widgets import InAppDialog, Notifications
 from .layout import build_layout
 
@@ -126,6 +129,7 @@ class CheckpointApp:
         self.view_launcher = BlenderViewLauncher(self.state_dir, research)
         self.view_buttons = {}
         self.view_copy_buttons = {}
+        self.gameplay_process = None
         self._build()
         self.bridge_monitor = BridgeMonitor(bridge or BlenderBridge(self.state_dir))
         root.protocol('WM_DELETE_WINDOW', self.close)
@@ -380,6 +384,22 @@ class CheckpointApp:
             return [(index, self.repositories[index].scan(), message, False, False)]
         self.log(f'{self.configs[index].name}: đang Push theo yêu cầu của bạn…')
         self._submit(job, kind='push_result', indices=[index], label='Đang Push')
+
+    def open_main_gameplay(self):
+        if self.closed or self.closing or self.dialog.active:
+            return
+        if self.gameplay_process is not None and self.gameplay_process.poll() is None:
+            self.notifications.show('Gameplay chính đang chạy', 'Dùng cửa sổ Godot đã mở.')
+            return
+        try:
+            command = godot_command(find_tool('godot'), scene=None, editor=False, headless=False)
+            with (self.state_dir / 'godot-gameplay.log').open('wb') as output:
+                self.gameplay_process = Popen(command, cwd=ROOT, stdin=DEVNULL, stdout=output, stderr=STDOUT)
+        except (OSError, ValueError) as error:
+            self.log(f'Không mở được gameplay chính: {error}')
+            self.notifications.show('Không mở được gameplay chính', redact(str(error)), kind='error')
+            return
+        self.log(f'Đã chạy gameplay chính trong Godot (PID {self.gameplay_process.pid}).')
 
     def start_blender(self):
         if not self.closed and not self.closing:
