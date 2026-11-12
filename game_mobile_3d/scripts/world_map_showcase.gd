@@ -1295,12 +1295,9 @@ func _sync_forest_night_lights() -> void:
 	var day_strength := _lighting_scale(&"forest_daylight_accents")
 	if forest_active() and unavailable_reason.is_empty() and atmosphere_review == "combined" and level.grove != null and level.grove.spruce_visible():
 		phase = moonlight_weight(hour)
-		if day_strength > 0.0:
-			day = PHASE_FINISH.phase_weight(hour) * (1.0 - phase)
-	if day > 0.0:
-		var coverage := day + (phase if night_strength > 0.0 else 0.0)
-		var emission := day * day_strength + phase * night_strength
-		forest_accents.update(level, coverage, emission / coverage)
+		day = PHASE_FINISH.phase_weight(hour) * _balanced_daylight_weight()
+	if day > 0.0 and day_strength > 0.0:
+		forest_accents.update(level, day, day_strength)
 	else:
 		forest_accents.update(level, phase, night_strength)
 	if forest_path_light.update(level, phase, _lighting_scale(&"forest_path_light")):
