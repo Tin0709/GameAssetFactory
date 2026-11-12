@@ -79,6 +79,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"regional_sky": ["Local cliff skylight (preview)", 1.],
 	&"daylight_bounce": ["Daylight terrain bounce (preview)", 1.],
 	&"stone_diffuse_contrast": ["Stone face lighting transition (preview)", 1.],
+	&"stone_detail_softness": ["Stone texture softness", 1.],
 	&"night_spatial_sky": ["Night terrain bounce (preview)", 1.],
 	&"night_stone_fill_balance": ["Night stone color balance (preview)", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
@@ -122,7 +123,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 48
+const LIGHTING_MIX_VERSION := 49
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -860,6 +861,9 @@ func set_source_terrain(enabled: bool) -> bool:
 	level.geometry.update_cutaway(level.player.position, level.get_node("Camera3D").position, level.view_mode == "gameplay")
 	if _source_terrain_toggle != null:
 		_source_terrain_toggle.set_pressed_no_signal(enabled)
+	var stone_detail: HSlider = _lighting_sliders.get(&"stone_detail_softness")
+	if stone_detail != null:
+		stone_detail.editable = _stone_detail_editable()
 	return enabled
 
 func forest_active()->bool:
@@ -885,7 +889,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .75
 	if effect == &"twilight_shadow_color":
 		return .65
-	if effect in [&"daylight_bounce", &"stone_diffuse_contrast"]:
+	if effect in [&"daylight_bounce", &"stone_diffuse_contrast", &"stone_detail_softness"]:
 		return 0.
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
@@ -1238,6 +1242,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = _day_bounce_editable()
 		if effect == &"stone_diffuse_contrast":
 			slider.editable = _stone_diffuse_editable()
+		if effect == &"stone_detail_softness":
+			slider.editable = _stone_detail_editable()
 		if effect in [&"night_spatial_sky", &"night_stone_fill_balance"]:
 			slider.editable = _night_sky_editable()
 		if effect == &"cliff_mist":
@@ -1249,6 +1255,10 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
+	if changed_effect in [&"", &"stone_detail_softness"] and level != null and level.look != null:
+		level.look.set_stone_detail_softness(_lighting_scale(&"stone_detail_softness"))
+		if changed_effect == &"stone_detail_softness":
+			return
 	if changed_effect in [&"projected_sun", &"sun_opening"]:
 		refresh_daylight_shading()
 		return
@@ -1563,6 +1573,9 @@ func _day_bounce_editable() -> bool:
 
 func _stone_diffuse_editable() -> bool:
 	return not _balanced_preview and level != null and level.terrain_light != null and level.terrain_light.stone_diffuse_available()
+
+func _stone_detail_editable() -> bool:
+	return not _balanced_preview and _source_terrain_toggle != null and _source_terrain_toggle.button_pressed
 
 func _process(delta:float)->void:
 	_update_shape_control()

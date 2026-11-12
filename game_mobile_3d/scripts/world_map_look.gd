@@ -50,6 +50,7 @@ var segment_passage_height := true
 var terrain_materials: Array[Array]=[]
 var _night_path_chroma := 0.0
 var _stone_twilight_color := 0.0
+var _stone_detail_softness := 0.0
 var plant_meshes: Array[Array]=[]
 var materials: Dictionary={}
 var baseline_environment: Environment
@@ -500,6 +501,15 @@ func _set_terrain_color(parameter: StringName, strength: float) -> void:
 	for item: Array in terrain_materials:
 		item[3].set_shader_parameter(parameter, strength)
 	level.geometry.update_terrain_color(parameter, strength)
+
+func set_stone_detail_softness(strength: float) -> void:
+	if strength == _stone_detail_softness:
+		return
+	_stone_detail_softness = strength
+	_publish_stone_detail_softness()
+
+func _publish_stone_detail_softness() -> void:
+	_set_terrain_color(&"stone_detail_mip", _stone_detail_softness * .9 if stage == 2 else 0.)
 
 func _refresh_cloud_look() -> void:
 	level.geometry.reset_cutaway_materials()
@@ -1062,6 +1072,8 @@ func set_stage(value: int) -> void:
 	_apply_review_shaders()
 	_apply_daylight_pockets()
 	_apply_local_exposure()
+	if _stone_detail_softness > 0.0:
+		_publish_stone_detail_softness()
 	refresh_oak_root_beds()
 	level.geometry.update_cutaway(level.player.position,level.get_node("Camera3D").position,level.view_mode=="gameplay")
 	publish_clouds(cloud_clock)

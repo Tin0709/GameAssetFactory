@@ -3,6 +3,7 @@ uniform bool use_source_terrain = false;
 uniform sampler2DArray source_terrain_tiles : source_color, filter_linear_mipmap, repeat_enable;
 uniform float night_path_chroma = 0.0;
 uniform float stone_twilight_color = 0.0;
+uniform float stone_detail_mip = 0.0;
 
 vec3 grade_stone_twilight(vec3 albedo) {
 	if (ground_grade != 3 || stone_twilight_color <= 0.0) return albedo;
@@ -24,6 +25,15 @@ vec3 grade_night_path(vec3 albedo, float top) {
 }
 
 vec3 source_terrain_sample(vec2 uv, float layer) {
+	if (stone_detail_mip > 0.0 && layer == 4.0) {
+		// Filter stone albedo in its own tile. Keep distant mip selection and
+		// leave geometry coverage, grass edges, and lighting to their existing passes.
+		vec2 dx = dFdx(uv);
+		vec2 dy = dFdy(uv);
+		float texels_per_pixel = float(textureSize(source_terrain_tiles, 0).x) * max(length(dx), length(dy));
+		float scale = max(1.0, exp2(stone_detail_mip) / max(texels_per_pixel, 0.00001));
+		return textureGrad(source_terrain_tiles, vec3(uv, layer), dx * scale, dy * scale).rgb;
+	}
 	return texture(source_terrain_tiles, vec3(uv, layer)).rgb;
 }
 
