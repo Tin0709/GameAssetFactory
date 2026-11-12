@@ -126,6 +126,17 @@ func run() -> void:
 		last_physical_pose.clear()
 		for bone in skeleton.get_bone_count():
 			last_physical_pose.append(skeleton.get_bone_global_pose(bone)))
+	while zombie.ragdoll.running and zombie._corpse_age < 1.85:
+		await physics_frame
+	check(not zombie.ragdoll.running, "A supported corpse holds still before the fade instead of vibrating on the floor")
+	var resting_pose: Array[Transform3D] = []
+	for bone in skeleton.get_bone_count():
+		resting_pose.append(skeleton.get_bone_global_pose(bone))
+	await ticks(18)
+	var held_still := true
+	for bone in skeleton.get_bone_count():
+		held_still = held_still and skeleton.get_bone_global_pose(bone).is_equal_approx(resting_pose[bone])
+	check(held_still, "The parked corpse holds every bone still across later physics frames")
 	while is_instance_valid(zombie) and zombie._corpse_age < 4.96:
 		await physics_frame
 	check(is_instance_valid(zombie), "Corpse remains until the table's five-second lifespan")
