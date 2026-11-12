@@ -65,7 +65,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"sun": ["Direct sunlight", 2.],
 	&"sun_pockets": ["Sunlight pockets", 1.5],
 	&"sun_opening": ["Sunlit openings", 1.],
-	&"projected_sun": ["Projected sunlight (preview)", 1.],
+	&"projected_sun": ["Projected sunlight", 1.],
 	&"moon": ["Moonlight", 2.],
 	&"sky": ["Ambient sky", 2.],
 	&"sky_chroma": ["Sky color", 1.],
@@ -120,6 +120,7 @@ var moonlight_enabled := true
 var night_reference_atmosphere := true
 var _night_reference_toggle: CheckButton
 const BALANCED_ATMOSPHERE := {
+	&"projected_sun": 0.,
 	&"sky_chroma": .65,
 	&"grade": .55,
 	&"exposure": .9,
@@ -823,7 +824,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect == &"player_bounce":
 		return 0.
 	if effect == &"projected_sun":
-		return 0.
+		return .40
 	if effect == &"night_path_chroma":
 		return .75
 	if effect == &"grass_root_tone":
