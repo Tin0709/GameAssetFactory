@@ -9,6 +9,7 @@ render_mode cull_disabled, diffuse_burley, specular_disabled;
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
 #include "res://materials/world_map_player_contact.gdshaderinc"
+#include "res://materials/world_map_regional_sky.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/grass_normal_v001/world_normal.gdshaderinc"
 uniform sampler2D study_ground_sky : filter_nearest, repeat_disable;
 uniform vec2 study_ground_sky_origin;
@@ -26,7 +27,14 @@ vec4 grass_ground_sky(vec2 world_position) {
 	if (any(lessThan(cell, ivec2(0))) || any(greaterThanEqual(cell, extent))) {
 		return vec4(0.0);
 	}
-	return texelFetch(study_ground_sky, cell, 0);
+	vec4 incident = texelFetch(study_ground_sky, cell, 0);
+	if (regional_sky_state.x > 0.0 && incident.a > 0.0 &&
+			all(equal(study_ground_sky_origin, regional_sky_roots.xy)) &&
+			all(equal(extent, ivec2(regional_sky_roots.zw)))) {
+		int receiver = int(regional_sky_state.y) + cell.y * extent.x + cell.x;
+		incident.rgb = gaf_regional_sky(incident.rgb, study_ground_sky_scale, world_position, receiver);
+	}
+	return incident;
 }
 #endif
 uniform sampler2D atlas : source_color, filter_nearest, repeat_disable;

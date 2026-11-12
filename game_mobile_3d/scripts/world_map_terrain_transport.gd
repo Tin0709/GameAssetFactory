@@ -170,6 +170,9 @@ func _set_regional_sky_state(state: Vector2, sample := Vector4.ZERO) -> void:
 			materials[material] = true
 	for material: ShaderMaterial in materials:
 		bind_regional_sky(material)
+	var plants = level.showcase.plants
+	if plants != null and plants.grass_light != null:
+		plants.grass_light.bind_regional_sky(self)
 
 func bind_regional_sky(material: ShaderMaterial) -> void:
 	material.set_shader_parameter("regional_sky_state", regional_sky_state)

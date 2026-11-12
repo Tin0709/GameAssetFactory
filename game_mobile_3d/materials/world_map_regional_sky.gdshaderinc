@@ -1,0 +1,21 @@
+// Original diffuse receiver adjustment. No native shader code or assets.
+uniform sampler3D regional_sky_field : filter_linear, repeat_disable;
+uniform vec4 regional_sky_bounds;
+uniform vec4 regional_sky_roots;
+uniform vec4 regional_sky_phase;
+uniform vec2 regional_sky_state = vec2(0.0); // strength, grass receiver start
+
+vec3 gaf_regional_sky(vec3 incident, vec3 tint, vec2 position_xz, int receiver) {
+	if (regional_sky_state.x <= 0.0) return incident;
+	float distance_m = length(position_xz - regional_sky_bounds.xy);
+	float gain = regional_sky_state.x * (1.0 - smoothstep(regional_sky_bounds.z, regional_sky_bounds.w, distance_m));
+	if (gain <= 0.0) return incident;
+	vec3 luma_weights = vec3(0.2126, 0.7152, 0.0722) * tint;
+	float incident_luma = dot(incident, luma_weights);
+	if (incident_luma < 0.00001) return incident;
+	ivec2 extent = textureSize(regional_sky_field, 0).xy;
+	vec2 cell = vec2(float(receiver % extent.x), float(receiver / extent.x));
+	vec3 sky = textureLod(regional_sky_field, vec3((cell + 0.5) / vec2(extent), regional_sky_phase.x), 0.0).rgb;
+	float ratio = dot(sky * regional_sky_phase.yzw, luma_weights) / incident_luma;
+	return mix(incident, incident * max(1.0, ratio), gain);
+}
