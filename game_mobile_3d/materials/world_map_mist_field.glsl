@@ -37,7 +37,7 @@ layout(std140,set=0,binding=2) uniform Parameters{
  vec4 additional_center_strength;
  vec4 additional_radii;
  vec4 additional_scatter_multiplier;
- vec4 depth_scatter; // World metres along the ray: start, full effect, gain, padding.
+ vec4 depth_scatter; // World metres along the ray: start, full effect, source gain, extinction gain.
  vec4 depth_scatter_color; // Linear change to ambient source RGB, enabled in w.
 } p;
 const float FOREST_SCATTER_FULL_RADIUS_M = 6.0;
@@ -89,6 +89,10 @@ vec3 directional_air(vec3 point){
  return p.directional_rgb_gain.rgb*(p.directional_rgb_gain.w*visibility);
 }
 #endif
+float distant_optical_gain(float depth_m) {
+ if (p.depth_scatter.w <= 0.0) return 1.0;
+ return 1.0 + p.depth_scatter.w * smoothstep(p.depth_scatter.x, p.depth_scatter.y, depth_m);
+}
 float near_optical(vec3 origin,vec3 ray,float ray_length,float start,float end){
  float strength=p.origin_dx.w;
  if(strength<=0.)return 0.;
@@ -163,6 +167,7 @@ void main(){
   float nearby=near_optical(origin,ray,ray_length,previous,d);
   if(nearby>0.){
    float middle=(max(previous,entry)+min(d,near_z))*.5;
+   nearby*=distant_optical_gain(middle*ray_length);
    vec3 point=origin+ray*middle;
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
    vec3 light=ambient_depth_source(middle*ray_length)+p.warm.rgb*(warmth*.25);
@@ -196,7 +201,7 @@ void main(){
    float height=abs(h1-h0)>.0001?(exp(h1)-exp(h0))/(h1-h0):exp(h0);
    float n=textureLod(noise_field,(point.xz+vec2(p.medium.w*.045,-p.medium.w*.025))/256.0+.5,0.0).r;
    float bank=smoothstep(.30,.68,n);float variation=mix(1.0,bank*bank*1.8,p.integration.z);
-   float tau=p.medium.x*height*variation*(d-start)*ray_length;
+   float tau=p.medium.x*height*variation*(d-start)*ray_length*distant_optical_gain((start+d)*.5*ray_length);
    float warmth=p.subject.w*local_point_weight(point-(p.subject.xyz+vec3(0.0,1.4,0.0)),p.warm.w,p.integration.w>.5);
    vec3 light=ambient_depth_source((start+d)*.5*ray_length)+p.warm.rgb*(warmth*.25);
    light=light*scatter_visibility(point)+path_light(point);

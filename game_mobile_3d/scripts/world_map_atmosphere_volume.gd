@@ -128,7 +128,8 @@ func _process(_delta:float)->void:
    if effect.has_method("configure_with_depth_scatter"):
     var depth_scatter := float(_profile.get("depth_scatter",0.)) if near_layer.y>0. else 0.
     var depth_color: Vector3 = _profile.get("depth_scatter_color",Vector3.ZERO)
-    effect.configure_with_depth_scatter(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional,depth_scatter,depth_color)
+    var depth_optical := float(_profile.get("depth_optical",0.)) if near_layer.y>0. else 0.
+    effect.configure_with_depth_scatter(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional,depth_scatter,depth_color,depth_optical)
    else:
     effect.configure_with_mist_regions(data.to_byte_array(),size,noise.get_rid(),light_rid,path,local,additional)
   else:
