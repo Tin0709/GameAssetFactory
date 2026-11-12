@@ -8,10 +8,13 @@ void main() {
 }
 """
 const FRAGMENT := """#version 450
-#if SAMPLES == 2
+#define SAMPLES __OUTLINE_SAMPLES__
+#if SAMPLES > 1
 layout(set=0, binding=0) uniform sampler2DMS depth_map;
 float read_depth(ivec2 p) {
-	return max(texelFetch(depth_map, p, 0).r, texelFetch(depth_map, p, 1).r);
+	float nearest = texelFetch(depth_map, p, 0).r;
+	for (int i = 1; i < SAMPLES; i++) nearest = max(nearest, texelFetch(depth_map, p, i).r);
+	return nearest;
 }
 #else
 layout(set=0, binding=0) uniform sampler2D depth_map;
@@ -63,7 +66,7 @@ func _init() -> void:
 	enabled = false
 
 static func supported(viewport: Viewport) -> bool:
-	return viewport != null and viewport.msaa_3d in [Viewport.MSAA_DISABLED, Viewport.MSAA_2X] \
+	return viewport != null and viewport.msaa_3d <= Viewport.MSAA_8X \
 		and RenderingServer.get_current_rendering_method() == "mobile" \
 		and RenderingServer.get_rendering_device() != null
 
@@ -100,18 +103,18 @@ func _render_callback(kind: int, data: RenderData) -> void:
 	var scene := data.get_render_scene_data()
 	if rd == null or buffers == null or buffers.get_view_count() != 1 or scene == null:
 		return
-	var msaa := buffers.get_msaa_3d() == RenderingServer.VIEWPORT_MSAA_2X
-	if not msaa and buffers.get_msaa_3d() != RenderingServer.VIEWPORT_MSAA_DISABLED:
+	var msaa := buffers.get_msaa_3d()
+	if msaa > RenderingServer.VIEWPORT_MSAA_8X:
 		return
-	var depth := buffers.get_depth_layer(0, msaa)
+	var depth := buffers.get_depth_layer(0, msaa != RenderingServer.VIEWPORT_MSAA_DISABLED)
 	var color := buffers.get_color_layer(0)
 	if not depth.is_valid() or not color.is_valid():
 		return
 	var depth_format := rd.texture_get_format(depth)
 	var color_format := rd.texture_get_format(color)
-	var samples := 2 if msaa else 1
-	var sample_format := RenderingDevice.TEXTURE_SAMPLES_2 if msaa else RenderingDevice.TEXTURE_SAMPLES_1
-	if depth_format.samples != sample_format or color_format.samples != RenderingDevice.TEXTURE_SAMPLES_1 \
+	var sample_formats := [RenderingDevice.TEXTURE_SAMPLES_1, RenderingDevice.TEXTURE_SAMPLES_2,
+		RenderingDevice.TEXTURE_SAMPLES_4, RenderingDevice.TEXTURE_SAMPLES_8]
+	if depth_format.samples != sample_formats[msaa] or color_format.samples != RenderingDevice.TEXTURE_SAMPLES_1 \
 			or depth_format.width != color_format.width or depth_format.height != color_format.height \
 			or (depth_format.usage_bits & RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT) == 0:
 		return
@@ -119,6 +122,7 @@ func _render_callback(kind: int, data: RenderData) -> void:
 	var framebuffer := FramebufferCacheRD.get_cache_multipass([color], [], 1)
 	if not framebuffer.is_valid():
 		return
+	var samples := 1 << msaa
 	var pipeline := _get_pipeline(rd, samples, rd.framebuffer_get_format(framebuffer))
 	if not pipeline.is_valid():
 		return
@@ -150,7 +154,7 @@ func _get_pipeline(rd: RenderingDevice, samples: int, framebuffer_format: int) -
 	if not _shaders.has(samples):
 		var source := RDShaderSource.new()
 		source.source_vertex = VERTEX
-		source.source_fragment = FRAGMENT.replace("#if SAMPLES == 2", "#if %d == 2" % samples)
+		source.source_fragment = FRAGMENT.replace("__OUTLINE_SAMPLES__", str(samples))
 		var spirv := rd.shader_compile_spirv_from_source(source)
 		for stage in [RenderingDevice.SHADER_STAGE_VERTEX, RenderingDevice.SHADER_STAGE_FRAGMENT]:
 			var error := spirv.get_stage_compile_error(stage)
@@ -178,6 +182,8 @@ func _get_pipeline(rd: RenderingDevice, samples: int, framebuffer_format: int) -
 		RenderingDevice.RENDER_PRIMITIVE_TRIANGLES, raster, RDPipelineMultisampleState.new(),
 		RDPipelineDepthStencilState.new(), colors)
 	if not rd.render_pipeline_is_valid(pipeline):
+		if pipeline.is_valid():
+			rd.free_rid(pipeline)
 		_fail("World Outline blend pipeline could not be created")
 		return RID()
 	_pipelines[key] = pipeline
