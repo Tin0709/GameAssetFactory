@@ -5,6 +5,7 @@ const PlayerPresentation := preload("res://scripts/world_map_presentation.gd")
 const SourceTerrain := preload("res://scripts/world_map_source_terrain.gd")
 const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
+const Sword := preload("res://scripts/mechanic_lab_sword.gd")
 const SABRE_RIBBON_SHADER := preload("res://materials/mechanic_lab_sabre_ribbon.gdshader")
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
 const SPAWN := Vector3(0.0, 0.03, 0.0)
@@ -26,6 +27,15 @@ var _exposure: CompositorEffect
 var _previous_msaa: Viewport.MSAA
 var _previous_hdr: bool
 var _combat_audio: CombatAudio
+var _weapon_mesh: MeshInstance3D
+var _sabre_mesh: Mesh
+var _sword_mesh: Mesh
+var _sabre_blade_base: Vector3
+var _sabre_blade_tip: Vector3
+var _sabre_profile: Dictionary
+var _sword_profile: Dictionary
+var _sabre_audio_aliases: Dictionary
+var _sabre_audio_rates: Dictionary
 var _shake_serial := -1
 var _shake_age := 0.0
 var _shake_duration := 0.0
@@ -77,6 +87,7 @@ func _ready() -> void:
 	$HUD/DropMedium.disabled = $HUD/SpawnZombie.disabled
 	$HUD/DropHigh.disabled = $HUD/SpawnZombie.disabled
 	$HUD/PlayerHealth.visible = not $HUD/SpawnZombie.disabled
+	$HUD/Weapon.disabled = true
 	$HUD/DropMedium.pressed.connect(_drop_player.bind(5.0))
 	$HUD/DropHigh.pressed.connect(_drop_player.bind(7.0))
 	if not $HUD/SpawnZombie.disabled:
@@ -102,7 +113,63 @@ func _ready() -> void:
 		$Zombies.sabre_contact.connect(_on_sabre_contact)
 		$Zombies.sabre_landing.connect(_on_sabre_landing)
 		$Zombies.player_hit.connect(_on_player_hit)
+		_setup_weapon_selector()
 	print("MECHANIC_LAB_READY floor=100x100 player_ready=%s source_tiles=%s" % [player_ready, tiles != null])
+
+func _setup_weapon_selector() -> void:
+	$HUD/Weapon.add_item("Sabre")
+	$HUD/Weapon.add_item("Sword")
+	_weapon_mesh = player.model.find_child("SabrePrototypeSabre", true, false) as MeshInstance3D
+	if _weapon_mesh == null or not player.combo.native_enabled:
+		return
+	_sabre_mesh = _weapon_mesh.mesh
+	_sabre_blade_base = player.marker_base.position
+	_sabre_blade_tip = player.marker_tip.position
+	_sabre_profile = player.runtime_locomotion_profile.combat
+	_sword_profile = Sword.combat_profile(_sabre_profile, player.clips)
+	_sabre_audio_aliases = player.reference_audio.clip_aliases.duplicate()
+	_sabre_audio_rates = player.reference_audio.clip_play_rates.duplicate()
+	$HUD/Weapon.disabled = false
+	$HUD/Weapon.item_selected.connect(_select_weapon)
+
+func _select_weapon(index: int) -> void:
+	var previous := 1 if $Zombies.sword_equipped else 0
+	if previous == index:
+		return
+	if player_health == 0 or not player.is_on_floor() or player.combo.active() or player.combo.held:
+		$HUD/Weapon.select(previous)
+		$HUD/SpawnStatus.text = "Chờ đứng trên đất và kết thúc đòn để đổi vũ khí."
+		return
+	var sword_equipped := index == 1
+	if sword_equipped and _sword_mesh == null:
+		var research_root := OS.get_environment("MD2_RESEARCH_ROOT")
+		if research_root.is_empty():
+			research_root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
+		_sword_mesh = Sword.load_mesh(player, research_root)
+		if _sword_mesh == null:
+			$HUD/Weapon.select(previous)
+			$HUD/SpawnStatus.text = "Không tìm thấy model Sword đã xác minh trong MD2 Research."
+			return
+		player.reference_audio.add_manifest(research_root, Sword.MEDIA_MANIFEST)
+	if not player.combo.configure_native(_sword_profile if sword_equipped else _sabre_profile):
+		player.combo.configure_native(_sabre_profile if previous == 0 else _sword_profile)
+		$HUD/Weapon.select(previous)
+		$HUD/SpawnStatus.text = "Không thể tải combo của vũ khí này."
+		return
+	_weapon_mesh.mesh = _sword_mesh if sword_equipped else _sabre_mesh
+	player.marker_base.position = Sword.BLADE_BASE if sword_equipped else _sabre_blade_base
+	player.marker_tip.position = Sword.BLADE_TIP if sword_equipped else _sabre_blade_tip
+	player.reference_audio.reset()
+	player.reference_audio.clip_aliases = Sword.AUDIO_ALIASES if sword_equipped else _sabre_audio_aliases
+	player.reference_audio.clip_play_rates = {
+		"SwordAttack1": 1.0, "SwordAttack2": 1.0, "SwordAttack3": 1.4,
+		"SwordAirAttack": player.combo.air_attack_play_rate,
+	} if sword_equipped else _sabre_audio_rates
+	player.effects.reset()
+	_combat_audio.reset()
+	_combat_audio.sword_equipped = sword_equipped
+	$Zombies.sword_equipped = sword_equipped
+	$HUD/SpawnStatus.text = ""
 
 func _apply_daylight_render_settings() -> void:
 	if RenderingServer.get_rendering_device() == null:

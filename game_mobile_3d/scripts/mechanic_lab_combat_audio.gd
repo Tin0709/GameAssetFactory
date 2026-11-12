@@ -4,6 +4,7 @@ extends Node3D
 const ReferenceAudio := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
 const SOURCE := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events/Spicewood"
 const SABRE := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_sabre_hitmarker_%02d.ogg"
+const SWORD := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_sword_%02d.ogg"
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
 const VOICES_PER_POOL := 3
@@ -18,6 +19,11 @@ const HIT_HASHES := [
 	"c5b535da7408fcc3ff4c24e6f7fb3576e58c90051ee4b4393d1473e0a86528e1",
 	"39bea042b72c20fb35626cb78a5371ed05ae84efa9fe322c0e253dd6e7762d9c",
 	"baa42ba5a6d2fe35401f135ac5c3348b60209974aa26722940410d74b2d3d23b",
+]
+const SWORD_HIT_HASHES := [
+	"f48696a70b3c38480811492cc570c17c7ef08bbe0c684f586341f7f09947de31",
+	"57522a414b5ea426b73c2c8d24198bc42d60fbd6d4d48421388640709dd4f4b1",
+	"6e6a712c4d47ae32cbb1cc1828004fb53a3494a9446eead9c66eecdfa9740bf8",
 ]
 const HURT_HASHES := [
 	"fa84b833daecb58d0f95b6470393732c7f66ef33bb5e27d1b869322586a3fa12",
@@ -36,6 +42,7 @@ const LANDING_HASHES := [
 ]
 
 var enabled := false
+var sword_equipped := false
 var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _next_choice: Dictionary[StringName, int] = {}
@@ -57,7 +64,7 @@ func set_enabled(value: bool, preview_point: Vector3) -> void:
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
 		AudioServer.set_bus_mute(0, false)
-	_play(&"hit", preview_point, HIT_GAIN_DB)
+	_play(&"sword_hit" if sword_equipped else &"hit", preview_point, HIT_GAIN_DB)
 
 func _restore_master() -> void:
 	if _master_was_muted:
@@ -72,7 +79,7 @@ func contact(point: Vector3, serial: int, lethal: bool) -> void:
 		return
 	if serial != _last_weapon_serial:
 		_last_weapon_serial = serial
-		_play(&"hit", point, HIT_GAIN_DB)
+		_play(&"sword_hit" if sword_equipped else &"hit", point, HIT_GAIN_DB)
 	_play(&"death" if lethal else &"hurt", point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
 
 func slam_landed(point: Vector3) -> void:
@@ -103,6 +110,8 @@ func _load_audio() -> void:
 		_voices.append(voice)
 	for i in HIT_HASHES.size():
 		_load_sample(root, &"hit", SABRE % (i + 1), HIT_HASHES[i])
+	for i in SWORD_HIT_HASHES.size():
+		_load_sample(root, &"sword_hit", SWORD % (i + 1), SWORD_HIT_HASHES[i])
 	for i in HURT_HASHES.size():
 		_load_sample(root, &"hurt", ZOMBIE % ["Hurt", i + 1], HURT_HASHES[i])
 	for i in DEATH_HASHES.size():

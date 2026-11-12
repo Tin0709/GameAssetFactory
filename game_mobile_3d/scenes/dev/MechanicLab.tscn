@@ -153,5 +153,13 @@ focus_mode = 0
 text = "Thả rơi 7 m"
 tooltip_text = "Bấm E hoặc chuột trái khi đang rơi để thử đòn bổ."
 
+[node name="Weapon" type="OptionButton" parent="HUD"]
+offset_left = 790.0
+offset_top = 69.0
+offset_right = 906.0
+offset_bottom = 103.0
+focus_mode = 0
+tooltip_text = "Chọn vũ khí để thử combo."
+
 [connection signal="pressed" from="HUD/SpawnZombie" to="." method="_spawn_zombie"]
 [connection signal="toggled" from="HUD/CombatAudioToggle" to="." method="_set_combat_audio"]
