@@ -34,6 +34,11 @@ func run() -> void:
 		click_slider(gravity, true)
 		check(gravity.value == 1000.0, "A pointer click can increase ragdoll gravity to 1000%")
 		var heavier := await replay_combo(lab)
+		click_slider(launch, true)
+		var combined := await replay_combo(lab)
+		check(combined.health == baseline.health and combined.impulse.is_equal_approx(stronger.impulse)
+			and is_equal_approx(combined.flight, heavier.flight) and is_equal_approx(combined.ground_scale, 10.0),
+			"The two maximum settings work together")
 		check(baseline.health == [36, 22, 0] and stronger.health == baseline.health
 			and lighter.health == baseline.health and heavier.health == baseline.health,
 			"Every setting preserves all three actual Sabre damage events")
