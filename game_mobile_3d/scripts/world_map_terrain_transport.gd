@@ -2,6 +2,7 @@ extends Node
 ## Original static GAF diffuse transport, not Lumen. Never owns global light/player.
 const PATH="res://assets/graphics/world_map_terrain_transport_v001/transport.res"
 const BRDF=preload("res://assets/graphics/world_map_air_light_v001/brdf.res")
+const SKY_HOURS := preload("res://scripts/world_map_sky_response.gd").HOURS
 var level:Node3D
 var cache:Resource
 var installed:=false
@@ -15,6 +16,10 @@ var _last_dielectric:Variant=null
 var _world_transforms:Dictionary={}
 var _transforms_dirty:=false
 var _transforms_valid:=true
+var _regional_sky: preload("res://scripts/regional_sky_region.gd")
+var regional_sky_texture: ImageTexture3D
+var regional_sky_state := Vector2.ZERO
+var _regional_sky_phase := Vector4.ZERO
 class TransformWatch extends Node3D:
 	var guard:Node
 	func _notification(what:int)->void:
@@ -80,6 +85,10 @@ func _install()->bool:
 		if a[Mesh.ARRAY_CUSTOM1]!=null or a[Mesh.ARRAY_CUSTOM2]!=null:return reject("Custom stream already owned")
 		indexed[key]=row;next+=int(row.count)
 	if next*3!=sky.size():return reject("Coverage count mismatch")
+	var ids := PackedFloat32Array()
+	if level.regional_sky_region != null and level.showcase.private_primary:
+		ids = level.regional_sky_region.read_ids(PATH, next)
+	var has_ids := not ids.is_empty()
 	var replacements={};var candidates={}
 	for name:String in chunks:
 		var old:ArrayMesh=chunks[name].mesh;var mesh:=ArrayMesh.new()
@@ -88,6 +97,18 @@ func _install()->bool:
 			var begin:=int(row.start)*3;var end:=begin+int(row.count)*3
 			a[Mesh.ARRAY_CUSTOM1]=sky.slice(begin,end);a[Mesh.ARRAY_CUSTOM2]=sun.slice(begin,end)
 			var flags:=old.surface_get_format(s)|Mesh.ARRAY_FORMAT_CUSTOM1|Mesh.ARRAY_FORMAT_CUSTOM2|(Mesh.ARRAY_CUSTOM_RGB_FLOAT<<Mesh.ARRAY_FORMAT_CUSTOM1_SHIFT)|(Mesh.ARRAY_CUSTOM_RGB_FLOAT<<Mesh.ARRAY_FORMAT_CUSTOM2_SHIFT)
+			if has_ids:
+				var count := int(row.count)
+				var start := int(row.start)
+				var sky_ids := PackedFloat32Array()
+				sky_ids.resize(count * 4)
+				for vertex in count:
+					for channel in 3:
+						sky_ids[vertex * 4 + channel] = sky[begin + vertex * 3 + channel]
+					sky_ids[vertex * 4 + 3] = ids[start + vertex]
+				a[Mesh.ARRAY_CUSTOM1] = sky_ids
+				var shift := Mesh.ARRAY_FORMAT_CUSTOM1_SHIFT
+				flags = (flags & ~(7 << shift)) | (Mesh.ARRAY_CUSTOM_RGBA_FLOAT << shift)
 			mesh.add_surface_from_arrays(old.surface_get_primitive_type(s),a,[],{},flags)
 			if mesh.get_surface_count()!=s+1 or signature(mesh,s)!=str(row.signature):return reject("Runtime stream altered authored geometry")
 			mesh.surface_set_material(s,old.surface_get_material(s))
@@ -100,7 +121,48 @@ func _install()->bool:
 	for chunk:Node3D in _world_transforms:
 		var watch:=TransformWatch.new();watch.name="TransportTransformGuard";watch.guard=self;chunk.add_child(watch);watch.set_notify_transform(true)
 	_transforms_dirty=false
+	if has_ids:
+		_regional_sky = level.regional_sky_region
 	return true
+
+func regional_sky_available() -> bool:
+	return _regional_sky != null and level.showcase.sky_response.available()
+
+func publish_regional_sky(hour: float, strength: float) -> void:
+	var active := strength * smoothstep(4.5, 5.5, hour) * (1.0 - smoothstep(17.5, 20.0, hour))
+	if active <= 0.0 or level.showcase.is_day_anchor() or not regional_sky_available() or not is_active():
+		_set_regional_sky_state(Vector2.ZERO)
+		return
+	var phase := minf(hour, 24.0 - hour)
+	var ratio: Vector3 = level.showcase.sky_response.sample(hour)
+	if minf(ratio.x, minf(ratio.y, ratio.z)) <= 0.0:
+		_set_regional_sky_state(Vector2.ZERO)
+		return
+	if regional_sky_texture == null:
+		regional_sky_texture = _regional_sky.load_texture()
+		if regional_sky_texture == null:
+			_regional_sky = null
+			_set_regional_sky_state(Vector2.ZERO)
+			return
+		RenderingServer.global_shader_parameter_set("gaf_regional_sky_field", regional_sky_texture)
+		RenderingServer.global_shader_parameter_set("gaf_regional_sky_bounds", _regional_sky.bounds())
+		RenderingServer.global_shader_parameter_set("gaf_regional_sky_roots", Vector4(
+			_regional_sky.grass_origin.x, _regional_sky.grass_origin.y, _regional_sky.grass_extent.x, _regional_sky.grass_extent.y))
+	var i := 0
+	while i < SKY_HOURS.size() - 2 and phase > SKY_HOURS[i + 1]:
+		i += 1
+	var weight := smoothstep(SKY_HOURS[i], SKY_HOURS[i + 1], phase)
+	var sample := Vector4((i + weight + 0.5) / float(_regional_sky.extent.z), 1.0 / ratio.x, 1.0 / ratio.y, 1.0 / ratio.z)
+	if sample != _regional_sky_phase:
+		_regional_sky_phase = sample
+		RenderingServer.global_shader_parameter_set("gaf_regional_sky_phase", sample)
+	_set_regional_sky_state(Vector2(active, _regional_sky.terrain_receivers))
+
+func _set_regional_sky_state(state: Vector2) -> void:
+	if state == regional_sky_state:
+		return
+	regional_sky_state = state
+	RenderingServer.global_shader_parameter_set("gaf_regional_sky_state", state)
 func available()->bool:
 	if _transforms_dirty:
 		_transforms_dirty=false;_transforms_valid=true

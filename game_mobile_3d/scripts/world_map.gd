@@ -13,6 +13,7 @@ const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV
 const LocalMistRegion = preload("res://scripts/local_mist_region.gd")
 const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 @export var local_mist_region: LocalMistRegion
+@export var regional_sky_region: preload("res://scripts/regional_sky_region.gd")
 @export var scene_lighting_mix: SceneLightingMix
 var runtime: Dictionary
 var geometry

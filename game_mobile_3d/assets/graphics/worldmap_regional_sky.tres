@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/regional_sky_region.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+center_xz = Vector2(-42, -29.5)
+inner_radius_m = 9.0
+outer_radius_m = 18.0
+extent = Vector3i(256, 271, 8)
+terrain_receivers = 56993
+grass_origin = Vector2(-54, -55)
+grass_extent = Vector2i(112, 109)
+transport_sha256 = "817cd24b0ec52a74ebc45a71a8161173095c86147b93aec6dfad2a269037ceda"
+indices_path = "godot_lab/world_map_unified_showcase_v001/terrain_sky_basis_v001/receiver_ids.private.f32"
+indices_sha256 = "2bd8eb450b8fd3ef54bdcf6905f8abeb68367c47507265ca512494f7c40442d1"
+field_path = "godot_lab/world_map_unified_showcase_v001/terrain_sky_luma_v001/sky_phase.private.rgb9e5"
+field_sha256 = "f571a629dd9a5a4e34eb6601759ef2b13ff1288343a23ef0540c8fb5bf04dcd3"
