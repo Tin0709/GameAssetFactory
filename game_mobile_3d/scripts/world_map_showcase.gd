@@ -91,7 +91,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"near_haze": ["Near haze density", 2.],
 	&"near_haze_depth": ["Near haze depth", 1.],
 	&"forest_near_scatter": ["Forest mist depth light", 1.],
-	&"sunlit_mist": ["Canopy sunlight in mist (preview)", DirectionalAir.MAX_GAIN],
+	&"sunlit_mist": ["Canopy sunlight in mist", DirectionalAir.MAX_GAIN],
 	&"scatter": ["Fog brightness", 2.],
 	&"night_mist_light": ["Night mist light", 1.],
 	&"forest_accents": ["Forest glow accents", 1.375],
@@ -122,6 +122,7 @@ var night_reference_atmosphere := true
 var _night_reference_toggle: CheckButton
 const BALANCED_ATMOSPHERE := {
 	&"projected_sun": 0.,
+	&"sunlit_mist": 0.,
 	&"daylight_haze": 0.,
 	&"sky_chroma": .65,
 	&"grade": .55,
@@ -822,7 +823,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 	if effect in [&"humid_light", &"humid_depth"]:
 		return 0.
 	if effect == &"sunlit_mist":
-		return 0.
+		return .24
 	if effect == &"foot_contact":
 		return 0.
 	if effect == &"player_bounce":
