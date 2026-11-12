@@ -135,10 +135,20 @@ def build_layout(app):
 
     godot = card()
     title = row(godot)
-    app.gameplay_button = Button(title, 'Chạy gameplay chính', app.open_main_gameplay, kind='primary')
-    app.gameplay_button.pack(side='right', padx=(12, 0))
-    app.mechanic_lab_button = Button(title, 'Mở MechanicLab', app.open_mechanic_lab)
-    app.mechanic_lab_button.pack(side='right', padx=(12, 0))
+    app.godot_copy_buttons = {}
+    for key, attr, label, callback, kind in (
+        ('godot', 'gameplay_button', 'Chạy gameplay chính', app.open_main_gameplay, 'primary'),
+        ('mechanic-lab', 'mechanic_lab_button', 'Mở MechanicLab', app.open_mechanic_lab, 'subtle'),
+    ):
+        group = ttk.Frame(title, style='Card.TFrame')
+        group.pack(side='right', padx=(12, 0))
+        launch = Button(group, label, callback, kind=kind)
+        launch.pack(side='left', padx=(0, 3))
+        setattr(app, attr, launch)
+        copy = Button(group, 'Copy path', lambda scene=key: app.copy_godot_scene_path(scene),
+                      kind='ghost', small=True)
+        copy.pack(side='left')
+        app.godot_copy_buttons[key] = copy
     ttk.Label(title, text='Godot', style='CardTitle.TLabel').pack(anchor='w')
     ttk.Label(title, text='Cảnh mặc định của Cyan Sanctum (F5)', style='Muted.TLabel').pack(anchor='w', pady=(4, 0))
 

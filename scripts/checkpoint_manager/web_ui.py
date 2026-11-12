@@ -24,6 +24,7 @@ ROUTES = {'/': ('index.html', 'text/html; charset=utf-8'),
           '/devdock.png': ('../assets/devdock-64.png', 'image/png'),
           '/devdock.ico': ('../assets/devdock-transparent.ico', 'image/x-icon')}
 REPO_ACTIONS = {'repo-refresh', 'changes', 'commit', 'push'}
+GODOT_COPY_ACTIONS = {'copy-godot': 'godot', 'copy-mechanic-lab': 'mechanic-lab'}
 SIMPLE_ACTIONS = {'godot', 'mechanic-lab', 'start-mcp', 'check-mcp', 'refresh', 'all-on', 'all-off'}
 REPO_NAMES = {'gaf': 'GameAssetFactory', 'md2': 'MD2 Research', 'tacz': 'TaCZ Research'}
 
@@ -33,7 +34,7 @@ def valid_action(data):
         return False
     action = data['action']
     fields = set(data) - {'action'}
-    if action in SIMPLE_ACTIONS:
+    if action in SIMPLE_ACTIONS or action in GODOT_COPY_ACTIONS:
         return not fields
     if action in REPO_ACTIONS | {'toggle'}:
         if data.get('repo') not in REPO_NAMES.values():
@@ -338,6 +339,8 @@ class WebWindow:
             app.open_blender_view(data['view'])
         elif action == 'copy-shortcut':
             app.copy_blender_view_path(data['view'], browser=True)
+        elif action in GODOT_COPY_ACTIONS:
+            app.copy_godot_scene_path(GODOT_COPY_ACTIONS[action], browser=True)
         else:
             self._repo_action(action, data)
 

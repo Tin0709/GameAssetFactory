@@ -7,18 +7,39 @@ from logging.handlers import RotatingFileHandler
 import os
 from pathlib import Path
 import queue
+import re
 from subprocess import DEVNULL, STDOUT, Popen
 import threading
 import time
 import tkinter as tk
 
-from dev import ROOT, find_tool, godot_command
+from dev import ROOT, SCENES, find_tool, godot_command
 from .ui_widgets import InAppDialog, Notifications
 from .layout import build_layout
 
 from .core import AutoSchedule, FilesChanging, GitRepository, RepoBlocked, RepoConfig, redact
 from .blender_bridge import BlenderBridge, BridgeMonitor, BridgeStatus
 from .blender_views import BlenderViewLauncher, VIEW_LABELS
+
+
+def godot_scene_path(key):
+    project = ROOT / 'game_mobile_3d'
+    if key == 'godot':
+        settings = (project / 'project.godot').read_text(encoding='utf-8-sig')
+        main = re.search(r'^\s*run/main_scene\s*=\s*"([^"\r\n]+)"', settings, re.MULTILINE)
+        if main is None:
+            raise ValueError('Không tìm thấy scene mặc định trong project.godot.')
+        resource = main.group(1)
+    elif key == 'mechanic-lab':
+        resource = SCENES[key]
+    else:
+        raise ValueError('Lối tắt Godot không hợp lệ.')
+    if not resource.startswith('res://'):
+        raise ValueError('Scene Godot cần có đường dẫn res://.')
+    path = (project / resource.removeprefix('res://')).resolve()
+    if not path.is_relative_to(project.resolve()) or not path.is_file():
+        raise FileNotFoundError(resource)
+    return path
 
 
 class SingleInstance:
@@ -455,17 +476,24 @@ class CheckpointApp:
             self.notifications.show('Không mở được ' + label, redact(str(error)), kind='error')
 
     def copy_blender_view_path(self, key, *, browser=False):
+        self._copy_path(VIEW_LABELS.get(key, 'Blender'), 'Blender',
+                        lambda: self.view_launcher.blend_path(key), browser=browser)
+
+    def copy_godot_scene_path(self, key, *, browser=False):
+        label = 'gameplay chính' if key == 'godot' else 'MechanicLab'
+        self._copy_path(label, 'Godot', lambda: godot_scene_path(key), browser=browser)
+
+    def _copy_path(self, label, tool, get_path, *, browser):
         if self.closed or self.closing:
             return
-        label = VIEW_LABELS.get(key, 'Blender')
         try:
-            path = self.view_launcher.blend_path(key)
+            path = get_path()
             if not browser:
                 self.root.clipboard_clear()
                 self.root.clipboard_append(str(path))
                 self.root.update_idletasks()
             self.log(f'Đã copy path {label}.')
-            self.notifications.show('Đường dẫn Blender' if browser else 'Đã copy đường dẫn', str(path),
+            self.notifications.show(f'Đường dẫn {tool}' if browser else 'Đã copy đường dẫn', str(path),
                                     kind='copy' if browser else 'info')
         except (OSError, ValueError, tk.TclError) as error:
             self.log(f'Không copy được path {label}: {error}')
