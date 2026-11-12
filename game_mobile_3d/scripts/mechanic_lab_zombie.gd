@@ -37,12 +37,14 @@ const DEATH_TIER_INFLUENCE := 0.75
 const DEATH_ANGULAR_TO_LAB := 0.18
 const DEATH_AIR_ATTACK_ANGULAR_TO_LAB := 0.14
 const DEATH_FINISHER_ROLL_SPEED := 1.0
-const DEATH_FLIGHT_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
+const ZOMBIE_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
 const CURVED_GREATSWORD_FLIGHT_GRAVITY := 32.0
 const SABRE_FINISHER_GRAVITY_HOLD := 0.30
 const SABRE_FINISHER_HEAD_FRICTION := 0.70
 const SABRE_FINISHER_HEAD_BOUNCE := 0.30
 const DEATH_LANDING_BLEND_TIME := 0.20
+const DEATH_AIR_LINEAR_DAMP := 0.01 # SK_Zombie_PhysicsAsset body defaults.
+const DEATH_FLOOR_CONTACT_MARGIN := 0.02
 const DEATH_LANDING_LINEAR_DAMP := 3.0
 const DEATH_LANDING_ANGULAR_DAMP := 4.0
 const DEATH_LANDING_ANGULAR_SPEED_LIMIT := 16.0
@@ -61,6 +63,7 @@ const TELEGRAPH_RATE := 1.5
 const TELEGRAPH_END := 15.0 / 30.0
 const MELEE_CONTACT_TIME := 17.0 / 30.0
 const LEVEL_COLLISION_MASK := 1
+const CORPSE_COLLISION_LAYER := 8
 # Honeycomb Farm footage: the silhouette breaks up quickly, then a few
 # remnants linger. The thresholds map that timing onto this shader's noise.
 const CORPSE_LIFETIME := 5.0
@@ -166,7 +169,7 @@ func _ready() -> void:
 		_death_profile = DeathProfile.new()
 		_death_profile.angular_impulse = 0.8
 		_death_profile.transport_fraction = 0.96
-		_death_profile.linear_damping = 0.30
+		_death_profile.linear_damping = DEATH_AIR_LINEAR_DAMP
 		_death_profile.angular_damping = 0.9
 		_death_profile.joint_resistance = 0.45
 	if _flash_material == null:
@@ -253,7 +256,7 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor():
 		velocity.y = 0.0
 	else:
-		velocity += get_gravity() * delta
+		velocity += get_gravity() * _gravity_scale(ZOMBIE_GRAVITY) * delta
 	move_and_slide()
 	_advance_animation(delta)
 	ragdoll.sample(delta)
@@ -358,15 +361,16 @@ func _update_death(delta: float) -> void:
 		return
 	var sabre_finisher := _death_strike == DeathStrike.SABRE_FINISHER
 	var curved := _death_strike == DeathStrike.CURVED_GREATSWORD
-	var flight_gravity := CURVED_GREATSWORD_FLIGHT_GRAVITY if curved else DEATH_FLIGHT_GRAVITY
+	var flight_gravity := CURVED_GREATSWORD_FLIGHT_GRAVITY if curved else ZOMBIE_GRAVITY
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
 			ragdoll.sample(delta)
 			return
 		var mass := 0.0
 		for body: PhysicalBone3D in ragdoll.bodies.values():
-			body.collision_layer = 2
-			body.collision_mask = 1
+			# The player uses layer 2, which the living controllers can stand on.
+			body.collision_layer = CORPSE_COLLISION_LAYER
+			body.collision_mask = LEVEL_COLLISION_MASK
 			mass += body.mass
 		if sabre_finisher:
 			# Start with MD2's default material values on the leading contact.
@@ -382,32 +386,46 @@ func _update_death(delta: float) -> void:
 		if ragdoll.begin(launch, direction, "Chest", 0.0, flight_gravity, null if curved else _corpse_floor):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
-	if not _corpse_landed and ragdoll.contact_motion().core_contacts > 0:
+	var contact := ragdoll.contact_motion()
+	if not _corpse_landed and contact.core_contacts > 0:
 		_corpse_landed = true
 		_landing_age = 0.0
 		ragdoll.set_physics_process(false)
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			# Leave room for the floor impulse to roll the body over a limb.
 			body.set("maximum_angular_speed", DEATH_LANDING_ANGULAR_SPEED_LIMIT)
+	if _corpse_landed:
+		_update_landing_forces(delta, flight_gravity, sabre_finisher, contact.contacts > 0)
+		if _corpse_age >= CORPSE_DESATURATION_START:
+			_check_corpse_settled(delta, contact)
+
+func _update_landing_forces(delta: float, flight_gravity: float, sabre_finisher: bool, supported: bool) -> void:
+	if not supported and is_instance_valid(_corpse_floor):
+		# The solver can omit contact for a frame while rolling close to the floor.
+		var box := _corpse_floor.shape as BoxShape3D
+		if box != null and not _corpse_floor.disabled:
+			var floor_top := (_corpse_floor.global_transform * (Vector3.UP * box.size.y * 0.5)).y
+			supported = absf(ragdoll.minimum_corner_y() - floor_top) <= DEATH_FLOOR_CONTACT_MARGIN
 	var gravity_hold := SABRE_FINISHER_GRAVITY_HOLD if sabre_finisher else 0.0
 	var gravity_blend_end := gravity_hold + DEATH_LANDING_BLEND_TIME
-	if _landing_age < gravity_blend_end:
-		_landing_age = minf(_landing_age + delta, gravity_blend_end)
-		# Let contact and friction lead the first impact, then settle the roll.
-		var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
-		var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
-		var flight_gravity_scale := flight_gravity / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
-		var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
-		var angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
-		for body: PhysicalBone3D in ragdoll.bodies.values():
-			body.gravity_scale = lerpf(flight_gravity_scale, 1.0, gravity_blend)
-			body.linear_damp = linear_damp
-			body.angular_damp = angular_damp
-	if _corpse_landed and _corpse_age >= CORPSE_DESATURATION_START:
-		_check_corpse_settled(delta)
+	var contact_age := minf(_landing_age + delta, gravity_blend_end) if supported else 0.0
+	if is_equal_approx(contact_age, _landing_age):
+		return
+	_landing_age = contact_age
+	var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
+	var gravity_blend := smoothstep(gravity_hold, gravity_blend_end, _landing_age)
+	var flight_gravity_scale := _gravity_scale(flight_gravity)
+	var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
+	var angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
+	for body: PhysicalBone3D in ragdoll.bodies.values():
+		body.gravity_scale = lerpf(flight_gravity_scale, 1.0, gravity_blend)
+		body.linear_damp = linear_damp
+		body.angular_damp = angular_damp
 
-func _check_corpse_settled(delta: float) -> void:
-	var motion := ragdoll.contact_motion()
+static func _gravity_scale(acceleration: float) -> float:
+	return acceleration / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+
+func _check_corpse_settled(delta: float, motion: Dictionary) -> void:
 	if motion.core_contacts == 0 or motion.contacts < 2 \
 		or motion.linear > CORPSE_SETTLE_SPEED or motion.angular > CORPSE_SETTLE_SPIN:
 		_settled_seconds = 0.0
