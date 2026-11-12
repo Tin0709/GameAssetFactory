@@ -36,6 +36,11 @@ func run() -> void:
 		"Physics bodies bind to the asset's spine and neck bones")
 	var head_box := zombie.ragdoll.bodies.Head.get_child(0).shape as BoxShape3D
 	check(head_box.size.is_equal_approx(Vector3(0.5, 0.5, 0.5)), "Neck collider uses the source box dimensions")
+	var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
+	var arm: PhysicalBone3D = zombie.ragdoll.bodies["Arm.L"]
+	# The verified 50 cm cube has 8/3 the volume of the 25 x 75 x 25 cm arm box.
+	check(is_equal_approx(head.mass / arm.mass, pow(8.0 / 3.0, 0.75)),
+		"MD2's physical material scales the mass ratio between the neck and arm")
 	var strengths := [399.0, 400.0, 750.0, 1200.0]
 	for i in range(1, strengths.size()):
 		check(ZOMBIE._death_launch_speed(strengths[i]) > ZOMBIE._death_launch_speed(strengths[i - 1]),
@@ -90,6 +95,7 @@ func run() -> void:
 	var launch_mass := 0.0
 	for body: PhysicalBone3D in zombie.ragdoll.bodies.values():
 		launch_mass += body.mass
+	check(is_equal_approx(launch_mass, 60.0), "The relative source masses use the lab's total mass")
 	check(Vector2(impulse.x, impulse.z).length() / launch_mass > 8.0,
 		"A normal lethal strike adds over 8 m/s along the floor")
 	var fastest_descent := 0.0
