@@ -277,7 +277,8 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 
 func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool) -> void:
 	var air_attack := clip == "AirAttack"
-	var sabre_finisher := index == 2 and not sword_equipped and not curved_equipped and not air_attack
+	var sabre_ground := not sword_equipped and not curved_equipped and not air_attack
+	var sabre_finisher := index == 2 and sabre_ground
 	var radial := air_attack or sabre_finisher
 	var direction := zombie.global_position - _attacker.global_position if radial else forward
 	direction.y = 0.0
@@ -288,6 +289,8 @@ func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, se
 	var death_strike := Zombie.DeathStrike.AIR if air_attack else Zombie.DeathStrike.GROUND
 	if sabre_finisher:
 		death_strike = Zombie.DeathStrike.SABRE_FINISHER
+	elif sabre_ground:
+		death_strike = Zombie.DeathStrike.SABRE_GROUND
 	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger),
 		float(strike.strength), death_strike)
 	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)

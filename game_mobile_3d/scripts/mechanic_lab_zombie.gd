@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 signal melee_hit(amount: int)
 
-enum DeathStrike { GROUND, AIR, SABRE_FINISHER }
+enum DeathStrike { GROUND, AIR, SABRE_FINISHER, SABRE_GROUND }
 signal melee_audio(point: Vector3, contact: bool)
 
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
@@ -407,7 +407,8 @@ func _update_death(delta: float) -> void:
 		launch.linear_impulse = cos(angle) * launch_impulse
 		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
-		if ragdoll.begin(launch, direction, "Chest", 0.0, ZOMBIE_GRAVITY, _corpse_floor):
+		var sabre_landing := sabre_finisher or _death_strike == DeathStrike.SABRE_GROUND
+		if ragdoll.begin(launch, direction, "Chest", 0.0, ZOMBIE_GRAVITY, _corpse_floor, sabre_landing):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	var contact := ragdoll.contact_motion()

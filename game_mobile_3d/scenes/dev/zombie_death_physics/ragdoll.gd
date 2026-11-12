@@ -14,6 +14,8 @@ const PARTS := [
 const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "Chest", "Leg.L": "Hips", "Leg.R": "Hips"}
 const FLOOR_CONTACT_SLOP := 0.005
 const FLOOR_REST_SLOP := 0.012
+const FLOOR_SHARED_LIFT_THRESHOLD := 0.05
+const FLOOR_EXCESS_LIFT_PART_SHARE := 0.35
 const MIN_SUPPORT_NORMAL_Y := 0.5
 const MAX_WALL_NORMAL_Y := 0.10
 const HANDOFF_MIN_WALL_OVERLAP := 0.035
@@ -56,6 +58,8 @@ var _parts: Array = PARTS
 var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
 var _flat_floor: CollisionShape3D
+var _split_floor_impact := false
+var _flat_floor_has_contact := false
 var _pose_correction_frame := -1
 var _terrain_poses: Dictionary[String, Transform3D]
 var _terrain_query: PhysicsShapeQueryParameters3D
@@ -118,10 +122,12 @@ func sample(delta: float) -> void:
 	sample_count += 1
 
 func begin(profile: Resource, direction: Vector3, location: String, distance: float, gravity: float,
-		flat_floor: CollisionShape3D = null) -> bool:
+		flat_floor: CollisionShape3D = null, split_floor_impact := false) -> bool:
 	if running or sample_count < 2: return false
 	running = true
 	_flat_floor = flat_floor
+	_split_floor_impact = split_floor_impact and not source_joints.is_empty()
+	_flat_floor_has_contact = false
 	if _flat_floor != null or not source_joints.is_empty():
 		for body: PhysicalBone3D in bodies.values():
 			body.set("pose_correction", _correct_physical_pose)
@@ -659,6 +665,13 @@ func _project_floor_contact() -> void:
 	var floor_inverse := floor_pose.affine_inverse()
 	var lift := 0.0
 	var landing_blended := not source_joint_rids.is_empty() and is_equal_approx(bodies.Head.gravity_scale, 1.0)
+	if _split_floor_impact and not _flat_floor_has_contact:
+		var floor_body := _flat_floor.get_parent()
+		for body: PhysicalBone3D in bodies.values():
+			if _body_supported_by(body, floor_body):
+				_flat_floor_has_contact = true
+				break
+	var min_depth := FLOOR_REST_SLOP if landing_blended else FLOOR_CONTACT_SLOP
 	var depths: Dictionary[PhysicalBone3D, float] = {}
 	var slow := true
 	for part in _parts:
@@ -672,7 +685,6 @@ func _project_floor_contact() -> void:
 		var half: Vector3 = part[2] * 0.5
 		var extent_y := Vector3(absf(pose.basis.x.y), absf(pose.basis.y.y), absf(pose.basis.z.y)).dot(half)
 		var depth := floor_half.y - (pose.origin.y - extent_y)
-		var min_depth := FLOOR_REST_SLOP if landing_blended else maxf(lift, FLOOR_CONTACT_SLOP)
 		if depth <= min_depth or pose.origin.y + extent_y < -floor_half.y:
 			continue
 		# The finite platform only supports boxes whose footprints fit on it.
@@ -680,7 +692,7 @@ func _project_floor_contact() -> void:
 		var extent_z := Vector3(absf(pose.basis.x.z), absf(pose.basis.y.z), absf(pose.basis.z.z)).dot(half)
 		if absf(pose.origin.x) + extent_x <= floor_half.x and absf(pose.origin.z) + extent_z <= floor_half.z:
 			lift = maxf(lift, depth)
-			if landing_blended:
+			if landing_blended or _flat_floor_has_contact:
 				depths[body] = depth
 	# The tighter flight clearance can repeatedly lift grounded limbs out of
 	# contact. Keep the resting tolerance through small solver velocity spikes.
@@ -688,10 +700,13 @@ func _project_floor_contact() -> void:
 	lift -= slop
 	if lift <= 0.0:
 		return
-	# Keep joint anchors together on hard impacts. Once supported, correcting
-	# only the penetrating parts avoids lifting the other limbs off the floor.
+	var shared_lift := 0.0 if landing_blended else lift
+	if not landing_blended and _flat_floor_has_contact:
+		# Once Sabre's throw meets the floor, leave part of a large correction
+		# with the penetrating limb so it does not kick the whole body upward.
+		shared_lift -= maxf(0.0, lift - FLOOR_SHARED_LIFT_THRESHOLD) * FLOOR_EXCESS_LIFT_PART_SHARE
 	for body: PhysicalBone3D in bodies.values():
-		var correction: float = depths.get(body, 0.0) - slop if landing_blended else lift
+		var correction := maxf(shared_lift, depths.get(body, 0.0) - slop)
 		if correction <= 0.0:
 			continue
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
