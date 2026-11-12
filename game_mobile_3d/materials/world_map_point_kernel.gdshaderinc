@@ -6,6 +6,7 @@ global uniform vec4 gaf_point_kernel;
 global uniform vec3 gaf_point_kernel_camera;
 global uniform bool gaf_point_mixed;
 global uniform vec4 gaf_path_beam;
+global uniform float gaf_lantern_grass_tone;
 
 float gaf_path_beam_weight(vec3 to_source_world, vec3 axis) {
  float angle = clamp((dot(to_source_world, axis) - 0.0164524354) * 1.016727686, 0.0, 1.0);
@@ -13,6 +14,15 @@ float gaf_path_beam_weight(vec3 to_source_world, vec3 axis) {
 }
 bool gaf_is_player_point(bool directional, float light_blue) {
  return !directional && gaf_point_kernel.w > 0.0 && (!gaf_point_mixed || light_blue > 0.0);
+}
+// Apply the measured color difference to diffuse reflection only. The
+// division preserves the original luminance of the lamp times surface color.
+vec3 gaf_lantern_diffuse_tint(vec3 albedo, vec3 lamp, vec3 factors, float strength) {
+ vec3 reflected = albedo * lamp;
+ vec3 luma = vec3(0.2126, 0.7152, 0.0722);
+ float original = dot(reflected, luma);
+ float adjusted = dot(reflected * factors, luma);
+ return mix(vec3(1.0), factors * (original / max(adjusted, 0.00001)), strength);
 }
 float gaf_point_transfer(bool directional,vec3 light_dir,vec2 screen,float depth,mat4 inverse_projection,mat4 inverse_view,float light_blue){
  if (!directional && light_blue == 0.0 && gaf_path_beam.w > 0.0

@@ -11,7 +11,7 @@ varying float study_cloud;
 varying vec3 grass_opening_incident;
 float grass_fresnel(float x){float q=1.0-x;float q2=q*q;return q2*q2*q;}
 void light(){
-	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
+	float point_transfer=gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
 	float front=clamp(dot(NORMAL,LIGHT),0.0,1.0);
 	vec3 response=vec3(front);
 #ifndef GAF_GRASS_FORCE_LAMBERT
@@ -29,5 +29,10 @@ void light(){
 	if (opening_fill > 0.0) {
 		DIFFUSE_LIGHT += grass_opening_incident * (0.65 * opening_fill);
 	}
-	DIFFUSE_LIGHT+=response*(LIGHT_COLOR * gain)*(point_attenuation*cloud/PI);
+	vec3 diffuse_color=LIGHT_COLOR * gain;
+	// The identity transfer is returned for non-lantern lights and other cameras.
+	if (gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && gaf_is_player_point(LIGHT_IS_DIRECTIONAL,LIGHT_COLOR.b)) {
+		diffuse_color *= gaf_lantern_diffuse_tint(ALBEDO,LIGHT_COLOR,vec3(1.247,1.0,1.078),gaf_lantern_grass_tone);
+	}
+	DIFFUSE_LIGHT+=response*diffuse_color*(ATTENUATION*point_transfer*cloud/PI);
 }

@@ -17,7 +17,8 @@ float world_cloud_fresnel(float cosine) {
 #endif
 
 void light() {
-	float point_attenuation=ATTENUATION*gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
+	float point_transfer=gaf_point_transfer(LIGHT_IS_DIRECTIONAL,LIGHT,SCREEN_UV,FRAGCOORD.z,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX,LIGHT_COLOR.b);
+	float point_attenuation=ATTENUATION*point_transfer;
 	vec3 key_color = LIGHT_COLOR * gaf_opening_gain(LIGHT_IS_DIRECTIONAL, ATTENUATION * cloud_transmission);
 #ifdef GAF_WORLD_GROUND_BOUNCE
 	vec3 source_direction = normalize((INV_VIEW_MATRIX * vec4(LIGHT, 0.0)).xyz);
@@ -46,6 +47,17 @@ void light() {
 		incident*=terrain_direct_contact;
 #endif
 		if (LIGHT_IS_DIRECTIONAL) incident *= cloud_transmission;
+		vec3 diffuse_incident = incident;
+#ifdef GAF_WORLD_SPATIAL_TERRAIN
+		if (gaf_lantern_grass_tone > 0.0 && point_transfer < 1.0 && surface_top > 0.998 && ground_grade == 1
+			&& gaf_is_player_point(LIGHT_IS_DIRECTIONAL,LIGHT_COLOR.b)) {
+			// Only the green side of the grass/soil blend receives the turf correction.
+			float turf = min(smoothstep(1.04,1.10,ALBEDO.g/max(ALBEDO.r,0.0001)),
+				smoothstep(1.1,1.2,ALBEDO.g/max(ALBEDO.b,0.0001)));
+			if (turf > 0.0) diffuse_incident *= gaf_lantern_diffuse_tint(ALBEDO,LIGHT_COLOR,
+				vec3(1.489,1.0,1.479),turf*gaf_lantern_grass_tone);
+		}
+#endif
 #ifdef GAF_WORLD_BURLEY
 		float nv = clamp(dot(NORMAL, VIEW), 0.0, 1.0);
 #ifdef GAF_WORLD_TERRAIN_PBR
@@ -56,10 +68,10 @@ void light() {
 		if (METALLIC < 1.0) {
 #ifndef GAF_WORLD_FORCE_LAMBERT
 			float grazing = 2.0 * ROUGHNESS * lh * lh - 0.5;
-			DIFFUSE_LIGHT += incident * (1.0 + grazing * world_cloud_fresnel(nv))
+			DIFFUSE_LIGHT += diffuse_incident * (1.0 + grazing * world_cloud_fresnel(nv))
 				* (1.0 + grazing * world_cloud_fresnel(nl));
 #else
-			DIFFUSE_LIGHT += incident;
+			DIFFUSE_LIGHT += diffuse_incident;
 #endif
 		}
 		// Isotropic GGX for the current opaque actor and matte terrain.
@@ -87,7 +99,7 @@ void light() {
 			SPECULAR_LIGHT += incident * fresnel * (distribution_squared * visibility * SPECULAR_AMOUNT);
 		}
 #else
-		DIFFUSE_LIGHT += incident;
+		DIFFUSE_LIGHT += diffuse_incident;
 #endif
 	}
 }

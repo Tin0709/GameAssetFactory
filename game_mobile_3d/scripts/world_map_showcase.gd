@@ -89,6 +89,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_stone_top_cool": ["Sắc xanh trên mặt đá", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
 	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
+	&"lantern_grass_tone": ["Sắc đèn hông trên cỏ", 1.],
 	&"grass_shadow_reach": ["Grass shadow reach", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
@@ -138,7 +139,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 62
+const LIGHTING_MIX_VERSION := 63
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -164,6 +165,7 @@ const BALANCED_ATMOSPHERE := {
 	&"forest_daylight_accents": 0.,
 	&"forest_path_air": 0.,
 	&"forest_path_beam": 0.,
+	&"lantern_grass_tone": 0.,
 	&"oak_leaf_tint": 0.,
 	&"near_haze": 1.,
 }
@@ -193,6 +195,7 @@ static var _point_kernel_owner:WeakRef
 var _point_kernel_camera := Vector3.INF
 var _point_lights:Dictionary={}
 var point_kernel_state:=Vector4.ZERO
+var _lantern_grass_tone := 0.0
 var path_beam_state := Vector4.ZERO
 var point_soft_state:=Vector2.ZERO
 var player_soft_source:=false
@@ -564,6 +567,8 @@ func _exit_tree()->void:
 		RenderingServer.global_shader_parameter_set("gaf_point_soft",Vector2.ZERO)
 		RenderingServer.global_shader_parameter_set("gaf_point_mixed",false)
 		RenderingServer.global_shader_parameter_set("gaf_path_beam",Vector4.ZERO)
+		RenderingServer.global_shader_parameter_set("gaf_lantern_grass_tone",0.0)
+		_lantern_grass_tone = 0.0
 	if grade_review!=null:grade_review.release()
 	if _hdr_owned and is_instance_valid(_hdr_viewport):_hdr_viewport.use_hdr_2d=_hdr_saved
 
@@ -748,6 +753,10 @@ func _publish_point_cutoff()->void:
 		and secondary.light_energy > 0.0 and (secondary.light_cull_mask & 1) != 0
 	RenderingServer.global_shader_parameter_set("gaf_point_kernel",point_kernel_state)
 	RenderingServer.global_shader_parameter_set("gaf_point_mixed",eligible and secondary_active)
+	var tone := _lighting_scale(&"lantern_grass_tone") if eligible and atmosphere_review == "combined" else 0.0
+	if tone != _lantern_grass_tone:
+		_lantern_grass_tone = tone
+		RenderingServer.global_shader_parameter_set("gaf_lantern_grass_tone",tone)
 	var beam_strength := _lighting_scale(&"forest_path_beam") if secondary_active else 0.0
 	var beam := Vector4.ZERO
 	if beam_strength > 0.0:
@@ -1307,6 +1316,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 62 and effect == &"dawn_mist_source":
 			missing_value = 0.
+		if version < 63 and effect == &"lantern_grass_tone":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1403,7 +1414,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		level.look._publish_crown_wind()
 		if changed_effect == &"tree_wind":
 			return
-	if changed_effect == &"forest_path_beam":
+	if changed_effect in [&"forest_path_beam", &"lantern_grass_tone"]:
 		_publish_point_cutoff()
 		return
 	if changed_effect in [&"forest_path_air", &"forest_path_air_beam", &"sunlit_mist"]:

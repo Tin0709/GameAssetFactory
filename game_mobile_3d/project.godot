@@ -151,6 +151,10 @@ gaf_path_beam={
 "type": "vec4",
 "value": Vector4(0, 0, 0, 0)
 }
+gaf_lantern_grass_tone={
+"type": "float",
+"value": 0.0
+}
 gaf_point_soft={
 "type": "vec2",
 "value": Vector2(0, 0)
