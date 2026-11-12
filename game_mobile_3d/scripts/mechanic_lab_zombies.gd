@@ -254,14 +254,16 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 		_apply_contact(zombie, contact, "AirAttack", 0, serial, strike, forward, distance > AIR_PRIMARY_RANGE)
 
 func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool) -> void:
-	var radial := clip == "AirAttack" or (index == 2 and not sword_equipped)
+	var air_attack := clip == "AirAttack"
+	var radial := air_attack or (index == 2 and not sword_equipped)
 	var direction := zombie.global_position - _attacker.global_position if radial else forward
 	direction.y = 0.0
 	direction = direction.normalized()
 	var damage := roundi(float(strike.damage) * SPLASH_MULTIPLIER) if splash else int(strike.damage)
 	var angle := deg_to_rad(float(strike.angle))
 	var impulse := Vector2(cos(angle), sin(angle)) * float(strike.strength) * IMPULSE_PER_STRENGTH
-	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger), float(strike.strength))
+	zombie.take_hit(damage, direction, impulse, 0.0 if splash else float(strike.stagger),
+		float(strike.strength), air_attack)
 	sabre_contact.emit(point, direction, clip, index, serial, zombie.health <= 0)
 
 func _load_assets() -> void:

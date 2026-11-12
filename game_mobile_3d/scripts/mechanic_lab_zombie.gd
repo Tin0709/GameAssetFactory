@@ -32,9 +32,12 @@ const DEATH_STRENGTH_THRESHOLDS := [400.0, 750.0, 1200.0]
 const DEATH_ADDITIONAL_MULTIPLIERS := [0.5, 1.0, 1.5]
 const DEATH_SPEED_TO_LAB := 0.0088
 const DEATH_TIER_INFLUENCE := 0.75
-const DEATH_ANGULAR_TO_LAB := 0.14
-# Honeycomb Fields footage puts lethal hit to body-down near 0.6 seconds.
-const DEATH_FLIGHT_GRAVITY := 21.0
+const DEATH_ANGULAR_TO_LAB := 0.18
+const DEATH_AIR_ATTACK_ANGULAR_TO_LAB := 0.14
+# Calibrate grounded hits to the recorded Sabre and Sword tumbles. Air
+# attacks retain their flight profile to keep the stronger launches stable.
+const DEATH_FLIGHT_GRAVITY := 32.0
+const DEATH_AIR_ATTACK_FLIGHT_GRAVITY := 21.0
 const DEATH_LANDING_BLEND_TIME := 0.20
 const DEATH_LANDING_LINEAR_DAMP := 3.0
 const DEATH_LANDING_ANGULAR_DAMP := 4.0
@@ -97,6 +100,7 @@ var _knockback := Vector3.ZERO
 var _knockback_control_left := 0.0
 var _death_direction := Vector3.ZERO
 var _death_strength := 500.0
+var _death_from_air_attack := false
 var _death_rng := RandomNumberGenerator.new()
 var _poise := MAX_POISE
 var _poise_recovery_wait := 0.0
@@ -296,7 +300,8 @@ func _play_loop(clip: StringName) -> void:
 	if animation.current_animation != clip:
 		animation.play(clip, 0.13)
 
-func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE, stagger: float = MAX_POISE, knockback_strength: float = 500.0) -> void:
+func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT_DEATH_IMPULSE,
+		stagger: float = MAX_POISE, knockback_strength: float = 500.0, air_attack := false) -> void:
 	if health <= 0 or amount <= 0:
 		return
 	health = maxi(0, health - amount)
@@ -309,6 +314,7 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 	if health <= 0:
 		_death_direction = direction
 		_death_strength = knockback_strength
+		_death_from_air_attack = air_attack
 		animation.pause()
 		set_deferred("collision_layer", 0)
 		set_deferred("collision_mask", 0)
@@ -337,6 +343,7 @@ func _update_death(delta: float) -> void:
 		_update_corpse_material(remaining)
 	if _corpse_parked:
 		return
+	var flight_gravity := DEATH_AIR_ATTACK_FLIGHT_GRAVITY if _death_from_air_attack else DEATH_FLIGHT_GRAVITY
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
 			ragdoll.sample(delta)
@@ -352,7 +359,7 @@ func _update_death(delta: float) -> void:
 		launch.linear_impulse = cos(angle) * launch_impulse
 		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
-		if ragdoll.begin(launch, direction, "Chest", 0.0, DEATH_FLIGHT_GRAVITY):
+		if ragdoll.begin(launch, direction, "Chest", 0.0, flight_gravity):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	if not _corpse_landed and ragdoll.contact_motion().core_contacts > 0:
@@ -366,7 +373,7 @@ func _update_death(delta: float) -> void:
 		_landing_age = minf(_landing_age + delta, DEATH_LANDING_BLEND_TIME)
 		# Let contact and friction lead the first impact, then settle the roll.
 		var blend := smoothstep(0.0, DEATH_LANDING_BLEND_TIME, _landing_age)
-		var flight_gravity_scale := DEATH_FLIGHT_GRAVITY / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+		var flight_gravity_scale := flight_gravity / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 		var linear_damp := lerpf(_death_profile.linear_damping, DEATH_LANDING_LINEAR_DAMP, blend)
 		var angular_damp := lerpf(_death_profile.angular_damping, DEATH_LANDING_ANGULAR_DAMP, blend)
 		for body: PhysicalBone3D in ragdoll.bodies.values():
@@ -409,7 +416,8 @@ static func _death_launch_speed(strength: float) -> float:
 	return DEATH_SOURCE_SPEED * DEATH_SPEED_TO_LAB * (1.0 + extra * DEATH_TIER_INFLUENCE)
 
 func _death_spin(direction: Vector3) -> Vector3:
-	var speed := DEATH_SOURCE_ANGULAR_SCALE * DEATH_ANGULAR_TO_LAB
+	var angular_scale := DEATH_AIR_ATTACK_ANGULAR_TO_LAB if _death_from_air_attack else DEATH_ANGULAR_TO_LAB
+	var speed := DEATH_SOURCE_ANGULAR_SCALE * angular_scale
 	var spin := Vector3.UP.cross(direction) * speed
 	if _death_rng.randf() < DEATH_TWIRL_CHANCE:
 		spin.y = speed * (0.45 if _death_rng.randf() < 0.5 else -0.45)
