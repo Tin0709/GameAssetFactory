@@ -33,7 +33,7 @@ func _ready() -> void:
 	DisplayServer.window_set_title("MechanicLab")
 
 	var using_private := PlayerFactory.uses_private_player()
-	var player_ready := not using_private or player.get("primary_ready") == true
+	var player_ready: bool = not using_private or player.get("primary_ready") == true
 	if not player_ready:
 		$HUD/Controls.text = "Thiếu dữ liệu player của gameplay chính. Kiểm tra MD2_RESEARCH_ROOT."
 	elif using_private:
