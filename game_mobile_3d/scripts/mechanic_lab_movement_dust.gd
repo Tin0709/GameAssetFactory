@@ -78,6 +78,8 @@ func _on_surface_contact(point: Vector3, landed: bool) -> void:
 	var motion := _actor.get_real_velocity()
 	motion.y = 0.0
 	var running := motion.length_squared() > 16.0
+	if not landed:
+		ground_point -= motion.normalized() * (0.12 if running else 0.06)
 	var count := 5 if landed else (3 if running else 2)
 	var spread := 0.24 if landed else 0.11
 	for i in count:
