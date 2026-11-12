@@ -36,7 +36,7 @@ varying float source_leaf_red;
 
 #ifdef GAF_WORLD_DIRECT_CLOUD
 #include "res://materials/world_map_clouds.gdshaderinc"
-varying vec2 grove_world_xz;
+varying vec3 grove_world;
 #endif
 
 void vertex() {
@@ -78,7 +78,7 @@ void vertex() {
 	}
 #endif
 #ifdef GAF_WORLD_DIRECT_CLOUD
-	grove_world_xz = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz;
+	grove_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 #endif
 }
 
@@ -168,7 +168,7 @@ void fragment() {
 	FOG = vec4(mist.rgb, mist.a * grove_mist_strength);
 #endif
 #ifdef GAF_WORLD_DIRECT_CLOUD
-	cloud_transmission = world_cloud_shade(vec3(grove_world_xz.x, 0.0, grove_world_xz.y));
+	cloud_transmission = world_cloud_shade(grove_world);
 #elif defined(GAF_WORLD_FOLIAGE_LIGHT)
 	cloud_transmission = 1.0;
 #endif
