@@ -1,4 +1,7 @@
 shader_type spatial;
+#ifdef GAF_GROVE_REVEAL_COVERAGE
+render_mode alpha_to_coverage_and_one;
+#endif
 #include "res://materials/world_map_wind.gdshaderinc"
 #include "res://materials/world_map_crown_wind.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/leaf_material_v001/leaf_material.gdshaderinc"
@@ -95,6 +98,9 @@ vec3 crown_color(vec3 color) {
 }
 
 void fragment() {
+#ifdef GAF_GROVE_REVEAL_COVERAGE
+	float coverage = 1.0;
+#endif
 	vec3 albedo = crown_detail ? crown_color(COLOR.rgb) : COLOR.rgb;
 	if (use_source_atlas) {
 		vec4 texel = texture(source_atlas, UV);
@@ -113,9 +119,23 @@ void fragment() {
 		if (offset.z > 0.01 && distance_to_player < 0.80) {
 			float opacity = smoothstep(0.35, 0.80, distance_to_player);
 			float threshold = fract(52.9829189 * fract(dot(floor(FRAGCOORD.xy), vec2(0.06711056, 0.00583715))));
+#ifdef GAF_GROVE_REVEAL_COVERAGE
+			// Share the transition across two MSAA samples, with the original
+			// per-pixel threshold selecting the fractional remainder.
+			float samples = opacity * 2.0;
+			coverage = 0.5 * (floor(samples) + step(threshold, fract(samples)));
+#else
 			if (opacity <= threshold) discard;
+#endif
 		}
 	}
+#ifdef GAF_GROVE_REVEAL_COVERAGE
+	ALPHA = coverage;
+	ALPHA_SCISSOR_THRESHOLD = 0.001;
+	// Mobile adds the scissor threshold to the edge before computing coverage.
+	ALPHA_ANTIALIASING_EDGE = coverage == 0.5 ? 0.499 : 0.0;
+	ALPHA_TEXTURE_COORDINATE = FRAGCOORD.xy;
+#endif
 	ALBEDO = albedo;
 	ROUGHNESS = 0.95;
 	SPECULAR = native_specular;

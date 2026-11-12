@@ -1617,6 +1617,13 @@ func _build_ui()->void:
 		_spruce_toggle = spruce
 		var shadows := CheckButton.new()
 		shadows.name = "ForestSpruceShadows"
+		var cover := CheckButton.new()
+		cover.text = "Forest · softer player reveal"
+		cover.tooltip_text = "Softer edges where trees hide the player. Uses Mobile D3D12 with 2× MSAA."
+		cover.focus_mode = Control.FOCUS_NONE
+		cover.button_pressed = level.look.grove_reveal_coverage_requested
+		cover.toggled.connect(level.look.set_grove_reveal_coverage)
+		box.add_child(cover)
 		shadows.text = "Forest · spruce shadows"
 		shadows.focus_mode = Control.FOCUS_NONE
 		shadows.button_pressed = level.grove.spruce_shadows

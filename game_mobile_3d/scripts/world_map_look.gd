@@ -532,13 +532,13 @@ func toggle_leaf_sampling() -> void:
 	_leaf_sampling_requested = not _leaf_sampling_requested
 	_apply_review_shaders()
 
-func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool = false) -> Shader:
+func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool = false, grove_coverage: bool = false) -> Shader:
 	var spatial:=direct and terrain_spatial_active() and original in [PRESET.ground_shader,PRESET.cutaway_shader]
 	var filtered_leaves := original == PRESET.leaves_shader and leaf_sampling_active()
 	var bounce := ground_bounce_active() and original in [PRESET.ground_shader, PRESET.cutaway_shader]
 	var terrain_sky := stage == 2 and _terrain_sky_enabled and not spatial and original in [PRESET.ground_shader, PRESET.cutaway_shader]
-	if not (direct or canopy or foliage or filtered_leaves or bounce or terrain_sky): return original
-	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1) | (int(terrain_sky) << 2) | (int(spatial)<<3))
+	if not (direct or canopy or foliage or filtered_leaves or bounce or terrain_sky or grove_coverage): return original
+	var key := Vector4i(int(direct), int(canopy), int(foliage), int(filtered_leaves) | (int(bounce) << 1) | (int(terrain_sky) << 2) | (int(spatial)<<3) | (int(grove_coverage) << 4))
 	var variants: Dictionary = _shader_variants.get_or_add(original, {})
 	if not variants.has(key):
 		var shader := Shader.new()
@@ -551,6 +551,8 @@ func _review_variant(original: Shader, direct: bool, canopy: bool, foliage: bool
 			defines += "\n#define GAF_WORLD_DIRECT_CLOUD"
 		if filtered_leaves:
 			defines += "\n#define GAF_WORLD_LEAF_SAMPLING"
+		if grove_coverage:
+			defines += "\n#define GAF_GROVE_REVEAL_COVERAGE"
 		if bounce:
 			defines += "\n#define GAF_WORLD_GROUND_BOUNCE"
 		if terrain_sky:
@@ -796,12 +798,28 @@ func _publish_cloud_style(texture: Texture2D, shape: Vector4) -> void:
 				material.set_shader_parameter("cloud_shape",_cloud_shape)
 	level.geometry.update_cloud_style(texture,_cloud_shape)
 
+var grove_reveal_coverage_requested := true
+var _grove_coverage_applied := false
+
+func set_grove_reveal_coverage(enabled: bool) -> void:
+	if enabled == grove_reveal_coverage_requested:
+		return
+	grove_reveal_coverage_requested = enabled
+	refresh_grove_lighting()
+
+func grove_reveal_coverage_active() -> bool:
+	return grove_reveal_coverage_requested and stage == 2 and level.showcase.private_primary \
+		and RenderingServer.get_current_rendering_method() == "mobile" \
+		and RenderingServer.get_current_rendering_driver_name() == "d3d12" \
+		and level.get_viewport().msaa_3d == Viewport.MSAA_2X
+
 func refresh_grove_lighting() -> void:
 	if level.grove == null or not (level.grove.visible or level.grove.spruce_visible()): return
 	var direct := foliage_light_available() and direct_clouds_active()
 	var native: Shader = level.grove.REVEAL_SHADER
-	var bark := _review_variant(native, direct, false)
-	var leaves := _review_variant(native, direct, false, foliage_light_active())
+	_grove_coverage_applied = grove_reveal_coverage_active()
+	var bark := _review_variant(native, direct, false, false, _grove_coverage_applied)
+	var leaves := _review_variant(native, direct, false, foliage_light_active(), _grove_coverage_applied)
 	level.grove.set_lighting(bark, leaves, _pockets_texture if direct else null, _cloud_shape, cloud_clock)
 	level.grove.set_crown_detail(stage == 2 and _crown_detail_requested)
 	_publish_crown_wind()
@@ -971,6 +989,9 @@ func _process(_delta: float) -> void:
 		_refresh_ground_bounce()
 	if leaf_sampling_active() != _leaf_sampling_applied:
 		_apply_review_shaders()
+	if level.grove != null and (level.grove.visible or level.grove.spruce_visible()) \
+		and grove_reveal_coverage_active() != _grove_coverage_applied:
+		refresh_grove_lighting()
 	if _palette_requested != DayPalette.NONE and stage == 2:
 		_refresh_day_palette()
 	if level.get("showcase")!=null:level.showcase.apply_time()
