@@ -129,6 +129,7 @@ const ITEMS := {
 	"morning": ["Sáng", "Morning", "Đặt giờ cảnh thành 07:00.", "Dùng để xem nắng sớm, bóng dài và sương buổi sáng."],
 	"day": ["Trưa", "Day", "Đặt giờ cảnh thành 12:00.", "Dùng làm mốc so độ sáng và sắc đá giữa trưa."],
 	"golden": ["Chiều", "Golden", "Đặt giờ cảnh thành 16:30.", "Dùng để xem nắng chiều, vệt nắng qua lá và sương có ánh sáng."],
+	"sunset": ["Hoàng hôn · 18:30", "Sunset · 18:30", "Đặt giờ WorldMap thành 18:30 để xem ánh sáng và sương lúc mặt trời lặn.", "Vào Sương & hiệu ứng → Sương cục bộ để chỉnh Sương hoàng hôn."],
 	"night": ["Đêm", "Night", "Đặt giờ cảnh thành 22:00.", "Dùng để xem ánh trăng, đèn hông và sương vách đá ban đêm."],
 	"dawn": ["Rạng sáng · 02:30", "Dawn · 02:30", "Đặt giờ trong WorldMap thành 02:30 để xem giai đoạn chuyển sáng trước bình minh.", "Vào Ánh sáng → Mặt trời và bầu trời để thử Ánh sáng hắt rạng sáng ở 35%."],
 	"original-gaf-day-night-preview": ["Tự chuyển ngày / đêm", "Original GAF day/night preview", "Cho giờ trong cảnh tự chạy để nhìn chuyển tiếp sáng, chiều và đêm.", "Tắt nếu cần giữ một giờ cố định để so. Phím Shift+T bật hoặc tắt chu kỳ."],
