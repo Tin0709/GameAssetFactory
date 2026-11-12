@@ -160,6 +160,7 @@ func run() -> void:
 	check(not is_instance_valid(zombie), "Corpse is released after its breakup")
 	for slot in 3:
 		await check_combo_finisher(lab, group, slot)
+	await check_flat_rest_after_tumble(lab, group)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
@@ -249,4 +250,25 @@ func check_rebound(zombie) -> void:
 			free_flight = true
 			break
 	check(free_flight, "A corpse that rebounds clear of the floor returns to air gravity and drag")
+
+func check_flat_rest_after_tumble(lab, group) -> void:
+	group._spawn_serial = 35
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	zombie.set_physics_process(false)
+	zombie.global_position = Vector3(2.0, 0.02, 0.0)
+	zombie.rotation.y = 35 * 0.41
+	zombie.animation.play(ZOMBIE.ATTACK)
+	zombie.animation.advance(0.18)
+	zombie.reset_physics_interpolation()
+	await ticks(2)
+	for i in 2:
+		zombie.ragdoll.sample(1.0 / 60.0)
+	zombie.take_hit(100, Vector3.RIGHT.rotated(Vector3.UP, 0.66), Vector2.ZERO, 0.0, 1150.0, ZOMBIE.DeathStrike.SABRE_FINISHER)
+	zombie.set_physics_process(true)
+	while not zombie._corpse_parked and zombie._corpse_age < 1.85:
+		await physics_frame
+	check(zombie._corpse_parked and zombie.ragdoll.bodies.is_empty(),
+		"The flat-floor tumble stops vibrating and releases its rigid bodies within 1.85 seconds")
+	zombie.free()
 
