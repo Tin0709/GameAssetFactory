@@ -108,6 +108,18 @@ func run() -> void:
 			"Clicking Retry respawns without starting an attack")
 		check(not lab.player.combo.active() and weapon.selected == 1,
 			"Retry leaves no queued attack and preserves the selected weapon")
+	var popup := weapon.get_popup()
+	weapon.show_popup()
+	await ticks(2)
+	check(popup.visible, "Weapon menu opens during play")
+	lab._on_player_hit(100)
+	await ticks(2)
+	check(not popup.visible and weapon.disabled, "Defeat dismisses and locks the weapon menu")
+	key(KEY_R, true)
+	key(KEY_R, false)
+	await ticks(4)
+	check(lab.player_health == 100 and not weapon.disabled and weapon.selected == 1,
+		"R retries after defeat with the weapon menu open and restores the selection")
 	lab.free()
 	print("MECHANIC_LAB_DEFEAT ", JSON.stringify({"checks": checks, "failures": failures}))
 	quit(0 if failures.is_empty() else 1)
