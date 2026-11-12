@@ -18,6 +18,7 @@ const MAX_POISE := 28.0
 const POISE_RECOVERY_DELAY := 2.0
 const POISE_RECOVERY_PER_SECOND := 20.0
 const STAGGER_DURATION := 0.65 # DefaultHostile.GA_BecomeStaggered.
+const KNOCKBACK_CONTROL_LOCK := 0.4 # DT_MeleePropertyDefinition: Sabre and Sword.
 const DEFAULT_DEATH_IMPULSE := Vector2(285.0, 190.0)
 # DT_MobDefinition.DefaultHostile -> GA_Ragdoll (HandleFinalDeath).
 # Zombie inherits this row through MeleeAttackMob. The runtime solver formula
@@ -92,6 +93,7 @@ var _feedback: Feedback
 var _mesh: MeshInstance3D
 var _walk_clip: StringName
 var _knockback := Vector3.ZERO
+var _knockback_control_left := 0.0
 var _death_direction := Vector3.ZERO
 var _death_strength := 500.0
 var _death_rng := RandomNumberGenerator.new()
@@ -223,7 +225,11 @@ func _physics_process(delta: float) -> void:
 	_poise_recovery_wait = maxf(0.0, _poise_recovery_wait - delta)
 	_poise = minf(MAX_POISE, _poise + POISE_RECOVERY_PER_SECOND * recovery_time)
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
-	var travel := _chase_velocity(delta) + _knockback
+	var controlled_time := maxf(0.0, delta - _knockback_control_left)
+	_knockback_control_left = maxf(0.0, _knockback_control_left - delta)
+	var travel := _knockback
+	if controlled_time > 0.000001:
+		travel += _chase_velocity(controlled_time) * (controlled_time / delta)
 	_knockback = _knockback.move_toward(Vector3.ZERO, delta * 10.0)
 	velocity.x = travel.x
 	velocity.z = travel.z
@@ -303,6 +309,8 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 		set_deferred("collision_mask", 0)
 	elif stagger > 0.0:
 		_knockback = direction * launch_impulse.x / 80.0
+		if not _knockback.is_zero_approx():
+			_knockback_control_left = KNOCKBACK_CONTROL_LOCK
 		_poise -= stagger
 		_poise_recovery_wait = POISE_RECOVERY_DELAY
 		if _poise <= 0.0:
@@ -311,6 +319,8 @@ func take_hit(amount: int, direction: Vector3, launch_impulse: Vector2 = DEFAULT
 				animation.stop(true)
 				var clip_duration := animation.get_animation(STAGGER).length
 				animation.play(STAGGER, 0.0, clip_duration / STAGGER_DURATION)
+		elif _knockback_control_left > 0.0 and animation.current_animation in WALK_CLIPS:
+			_play_loop(IDLE)
 
 func _update_death(delta: float) -> void:
 	_corpse_age += delta
