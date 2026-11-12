@@ -88,6 +88,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_stone_fill_balance": ["Night stone color balance (preview)", 1.],
 	&"night_stone_top_cool": ["Sắc xanh trên mặt đá", 1.],
 	&"grass_root_tone": ["Night grass root tone", 1.],
+	&"grass_night_albedo": ["Độ dịu lá cỏ ban đêm", 1.],
 	&"grass_shadow_reach": ["Grass shadow reach", 1.],
 	&"stone_twilight_color": ["Stone twilight color", 1.],
 	&"twilight_shadow_color": ["Twilight shadow color", 1.],
@@ -136,7 +137,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 60
+const LIGHTING_MIX_VERSION := 61
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -910,7 +911,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return 1.
 	if effect == &"world_outline_strength":
 		return 0.
-	if effect == &"dawn_sky_transition":
+	if effect in [&"dawn_sky_transition", &"grass_night_albedo"]:
 		return 0.
 	if effect in [&"sculk_surface", &"forest_path_placement", &"forest_path_air_beam", &"night_depth_scatter", &"night_stone_top_cool"]:
 		return 0.
@@ -1059,9 +1060,15 @@ func grass_shade_color_mix() -> Vector3:
 	return Vector3(tint.x, tint.y, strength) if strength > 0. else Vector3.ZERO
 
 func grass_root_tone_mix() -> float:
+	return _lighting_scale(&"grass_root_tone") * _night_grass_weight()
+
+func grass_night_albedo_mix() -> float:
+	return _lighting_scale(&"grass_night_albedo") * _night_grass_weight()
+
+func _night_grass_weight() -> float:
 	if _balanced_preview or not forest_active() or atmosphere_review != "combined":
 		return 0.0
-	return _lighting_scale(&"grass_root_tone") * moonlight_weight(hour)
+	return moonlight_weight(hour)
 
 func grass_shadow_height_scale() -> float:
 	var strength := _lighting_scale(&"grass_shadow_reach") * twilight_color_weight()
@@ -1276,6 +1283,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 60 and effect == &"dawn_sky_transition":
 			missing_value = 0.
+		if version < 61 and effect == &"grass_night_albedo":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1413,7 +1422,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter"]:
 		_update_mist()
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
 		return
 	if changed_effect in [&"player_sky", &"player_bounce"]:
 		if level.player_light != null:
@@ -1852,6 +1861,8 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Blend the existing grass ambient light with the terrain's baked sky fill at each root. The approved Noon is retained."
 		if effect == &"grass_root_tone":
 			slider.tooltip_text = "Blend the lower blades towards the nearby terrain hue at night. Leaves the existing grass lighting and shadows active."
+		if effect == &"grass_night_albedo":
+			slider.tooltip_text = "Thử 55% ở lối rừng ban đêm. 0% dùng màu lá hiện tại."
 		if effect == &"grass_shade_color":
 			slider.tooltip_text = "Cool the baked sky light on grass beneath the forest canopy. Uses Grass sky fill in Combined mode. Noon and night keep their current lighting."
 		if effect == &"diffuse_openings":

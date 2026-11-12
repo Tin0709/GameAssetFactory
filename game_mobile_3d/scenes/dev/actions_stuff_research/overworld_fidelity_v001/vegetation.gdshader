@@ -17,6 +17,7 @@ uniform vec3 study_ground_sky_scale = vec3(1.0);
 uniform float study_ground_sky_mix = 0.0;
 uniform vec3 study_grass_shade_color = vec3(0.0);
 uniform float study_grass_root_tone = 0.0;
+uniform float study_grass_night_albedo = 0.0;
 uniform float study_grass_shadow_height = 1.0;
 varying flat vec4 study_ground_sky_at_root;
 varying flat float study_canopy_sky_at_root;
@@ -162,6 +163,11 @@ void fragment(){
 			ground_tone *= dot(color, luma) / max(dot(ground_tone, luma), 0.000001);
 			float tone_mix = study_grass_root_tone * (1.0 - smoothstep(0.19, 0.62, height_fraction));
 			color = mix(color, ground_tone, tone_mix);
+		}
+		if (study_grass_night_albedo > 0.0) {
+			float tip = smoothstep(0.0, 0.58, height_fraction);
+			float above_root = smoothstep(0.03, 0.23, height_fraction);
+			color *= mix(1.0, mix(0.75, 0.62, tip), study_grass_night_albedo * above_root);
 		}
 #endif
 	}
