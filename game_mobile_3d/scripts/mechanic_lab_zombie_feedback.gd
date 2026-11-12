@@ -49,6 +49,16 @@ func _process(delta: float) -> void:
 		set_process(false)
 
 func _spawn_number(amount: int) -> void:
+	var camera := get_viewport().get_camera_3d()
+	var side := camera.global_basis.x if camera != null else Vector3.RIGHT
+	var lateral := side * (1.0 if _serial % 2 == 0 else -1.0)
+	_serial += 1
+	spawn_number(amount, digits, effects, global_position + Vector3.UP * 2.40, lateral)
+
+static func spawn_number(amount: int, glyphs: Array[Texture2D], parent: Node3D,
+		origin: Vector3, lateral: Vector3, tint: Color = Color.WHITE) -> void:
+	if glyphs.size() != 10:
+		return
 	var number := Node3D.new()
 	number.name = "DamageNumber"
 	number.set_meta("amount", amount)
@@ -57,7 +67,8 @@ func _spawn_number(amount: int) -> void:
 	var sprites: Array[Sprite3D] = []
 	for i in text.length():
 		var sprite := Sprite3D.new()
-		sprite.texture = digits[text.unicode_at(i) - 48]
+		sprite.texture = glyphs[text.unicode_at(i) - 48]
+		sprite.modulate = tint
 		sprite.pixel_size = NUMBER_PIXEL_SIZE
 		sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 		sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -65,12 +76,8 @@ func _spawn_number(amount: int) -> void:
 		sprite.offset.x = (i - (text.length() - 1) * 0.5) * spacing / NUMBER_PIXEL_SIZE
 		number.add_child(sprite)
 		sprites.append(sprite)
-	effects.add_child(number, true)
-	var camera := get_viewport().get_camera_3d()
-	var side := camera.global_basis.x if camera != null else Vector3.RIGHT
-	var lateral := side * (1.0 if _serial % 2 == 0 else -1.0)
-	_serial += 1
-	number.global_position = global_position + Vector3.UP * 2.40 + lateral * 0.12
+	parent.add_child(number, true)
+	number.global_position = origin + lateral * 0.12
 	number.scale = Vector3.ONE * 0.85
 	var tween := number.create_tween().set_parallel()
 	tween.tween_property(number, "global_position", number.global_position + Vector3.UP * 0.74 + lateral * 0.32, NUMBER_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)

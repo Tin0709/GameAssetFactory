@@ -98,6 +98,9 @@ var _aim_target: Zombie
 var _attacker: CharacterBody3D
 var _attacker_visual: Node3D
 
+func damage_digits() -> Array[Texture2D]:
+	return _digits
+
 func setup_combat(attacker: CharacterBody3D) -> void:
 	_attacker = attacker
 	_attacker_visual = attacker.get("visual") as Node3D

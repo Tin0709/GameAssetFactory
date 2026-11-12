@@ -7,6 +7,8 @@ const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
 const CurvedGreatsword := preload("res://scripts/mechanic_lab_curved_greatsword.gd")
+const DamageFeedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
+const PLAYER_HIT_FLASH_SHADER := preload("res://materials/mechanic_lab_player_hit_flash.gdshader")
 const SABRE_RIBBON_SHADER := preload("res://materials/mechanic_lab_sabre_ribbon.gdshader")
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
 const SPAWN := Vector3(0.0, 0.03, 0.0)
@@ -16,6 +18,8 @@ const MAX_CAMERA_SIZE := 30.0
 const ZOOM_STEP := 1.15
 const SABRE_TAP_BUFFER := 0.16
 const MAX_PLAYER_HEALTH := 100
+const PLAYER_HIT_FLASH_DURATION := 0.10
+const PLAYER_DAMAGE_TINT := Color(1.0, 0.18, 0.22)
 const CONTACT_LIGHT_DURATION := 0.17
 const HEAVY_SHAKE_DURATION := 0.20
 const FINISHER_SHAKE_INNER_RADIUS := 1.5
@@ -51,6 +55,12 @@ var _shake_strength := 0.0
 var _light_serial := -1
 var _light_remaining := 0.0
 var _light_peak := 0.0
+var _player_flash_remaining := 0.0
+var _player_flash_material: ShaderMaterial
+var _player_flash_meshes: Array[MeshInstance3D] = []
+var _player_overlays: Dictionary[MeshInstance3D, Material] = {}
+var _player_damage_numbers: Node3D
+var _player_hit_serial := 0
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
 @onready var _impact_light: OmniLight3D = $CombatImpactLight
@@ -110,6 +120,14 @@ func _ready() -> void:
 		_combat_audio = CombatAudio.new()
 		_combat_audio.name = "CombatAudio"
 		add_child(_combat_audio)
+		_player_flash_material = ShaderMaterial.new()
+		_player_flash_material.shader = PLAYER_HIT_FLASH_SHADER
+		for mesh: MeshInstance3D in player.model.find_children("*", "MeshInstance3D", true, false):
+			if mesh.skin != null:
+				_player_flash_meshes.append(mesh)
+		_player_damage_numbers = Node3D.new()
+		_player_damage_numbers.name = "PlayerDamageNumbers"
+		$CombatEffects.add_child(_player_damage_numbers)
 		_set_combat_audio(false)
 		var ribbon_material := ShaderMaterial.new()
 		ribbon_material.shader = SABRE_RIBBON_SHADER
@@ -266,6 +284,14 @@ func _exit_tree() -> void:
 func _process(delta: float) -> void:
 	var focus: Vector3 = presentation.player_position()
 	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
+	if not _player_overlays.is_empty():
+		if _player_flash_remaining <= 0.0:
+			_clear_player_flash()
+		else:
+			var weight := smoothstep(0.0, PLAYER_HIT_FLASH_DURATION * 0.65, _player_flash_remaining)
+			for mesh: MeshInstance3D in _player_overlays:
+				mesh.set_instance_shader_parameter(&"player_hit_flash", weight)
+			_player_flash_remaining = maxf(0.0, _player_flash_remaining - delta)
 	if _shake_duration > 0.0:
 		# Sample the hit at age zero on its first displayed frame.
 		var decay := 1.0 - _shake_age / _shake_duration
@@ -356,15 +382,37 @@ func _drop_player(height: float) -> void:
 func _on_player_hit(amount: int) -> void:
 	if player_health == 0 or amount <= 0:
 		return
-	player_health = maxi(0, player_health - amount)
+	var lost := mini(player_health, amount)
+	player_health -= lost
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
 	_combat_audio.player_hurt()
+	_show_player_hit(lost)
 	if player_health == 0:
 		player.enter_lab_defeat()
 		# The popup captures keyboard input while it is open, including R.
 		$HUD/Weapon.get_popup().hide()
 		$HUD/Weapon.disabled = true
 		$HUD/Defeat.show()
+
+func _show_player_hit(lost: int) -> void:
+	if _player_overlays.is_empty():
+		for mesh: MeshInstance3D in _player_flash_meshes:
+			_player_overlays[mesh] = mesh.material_overlay
+			mesh.material_overlay = _player_flash_material
+	for mesh: MeshInstance3D in _player_overlays:
+		mesh.set_instance_shader_parameter(&"player_hit_flash", 1.0)
+	_player_flash_remaining = PLAYER_HIT_FLASH_DURATION
+	var lateral := camera.global_basis.x * (1.0 if _player_hit_serial % 2 == 0 else -1.0)
+	_player_hit_serial += 1
+	DamageFeedback.spawn_number(lost, $Zombies.damage_digits(), _player_damage_numbers,
+		player.global_position + Vector3.UP * 2.08, lateral, PLAYER_DAMAGE_TINT)
+
+func _clear_player_flash() -> void:
+	for mesh: MeshInstance3D in _player_overlays:
+		mesh.set_instance_shader_parameter(&"player_hit_flash", 0.0)
+		mesh.material_overlay = _player_overlays[mesh]
+	_player_overlays.clear()
+	_player_flash_remaining = 0.0
 
 func reset_player() -> void:
 	if player_health == 0:
@@ -375,6 +423,11 @@ func reset_player() -> void:
 		$HUD/Weapon.disabled = _weapon_mesh == null or not player.combo.native_enabled
 	player_health = MAX_PLAYER_HEALTH
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
+	_clear_player_flash()
+	if _player_damage_numbers != null:
+		for number: Node3D in _player_damage_numbers.get_children():
+			number.hide()
+			number.queue_free()
 	_shake_serial = -1
 	_shake_duration = 0.0
 	camera.h_offset = 0.0
