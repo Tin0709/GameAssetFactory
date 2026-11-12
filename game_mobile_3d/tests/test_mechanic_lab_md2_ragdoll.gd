@@ -90,7 +90,7 @@ func run() -> void:
 	var fastest_descent := 0.0
 	var landing_time := INF
 	var landing_speed := 0.0
-	var follow_through_speed := 0.0
+	var follow_through_speed := -INF
 	for i in 60:
 		await physics_frame
 		var momentum := Vector3.ZERO
@@ -101,7 +101,7 @@ func run() -> void:
 			if landing_time == INF:
 				landing_time = zombie._corpse_age
 				landing_speed = velocity.dot(zombie._death_direction)
-			elif zombie._corpse_age - landing_time >= 0.10 - 0.0001 and follow_through_speed == 0.0:
+			elif follow_through_speed == -INF and zombie._corpse_age - landing_time >= 0.10 - 0.0001:
 				follow_through_speed = velocity.dot(zombie._death_direction)
 			continue
 		fastest_descent = maxf(fastest_descent, -velocity.y)
