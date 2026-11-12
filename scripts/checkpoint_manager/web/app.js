@@ -4,7 +4,7 @@ const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const views = {
   'Animation MD2': 'animation', 'Valorie + Sabre': 'sabre', 'Cỏ MD2': 'grass',
-  'Animation Showcase': 'showcase', 'Actions & Stuff': 'actions_stuff', 'TaCZ · Gun Animations': 'tacz'
+  'Animation Showcase': 'showcase', 'Actions & Stuff': 'actions_stuff', 'Actions & Stuff 1.13': 'actions_stuff_113', 'TaCZ · Gun Animations': 'tacz'
 };
 const initialToken = location.hash.slice(1);
 if (/^[\w-]{43}$/.test(initialToken)) {
