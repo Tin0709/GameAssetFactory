@@ -29,6 +29,22 @@ func run() -> void:
 		quit(1)
 		return
 	var zombie = group.get_child(0)
+	var strengths := [399.0, 400.0, 750.0, 1200.0]
+	for i in range(1, strengths.size()):
+		check(ZOMBIE._death_launch_speed(strengths[i]) > ZOMBIE._death_launch_speed(strengths[i - 1]),
+			"Source strength threshold changes the launch tier")
+	var seed_before: int = zombie._death_rng.seed
+	var twirls := 0
+	var left_twirls := 0
+	for i in 300:
+		zombie._death_rng.seed = hash(Vector2i(i, 1709))
+		var spin: Vector3 = zombie._death_spin(Vector3.FORWARD)
+		if not is_zero_approx(spin.y):
+			twirls += 1
+			left_twirls += int(spin.y < 0.0)
+	zombie._death_rng.seed = seed_before
+	check(twirls >= 70 and twirls <= 130 and left_twirls > 0 and left_twirls < twirls,
+		"Seeded death variants produce occasional twirls in both directions")
 	await ticks(56)
 	var strike: Dictionary = group.SABRE_STRIKES[0]
 	group._apply_contact(zombie, zombie.global_position + Vector3.UP, "Attack1", 0, 1, strike, Vector3.FORWARD, false)
