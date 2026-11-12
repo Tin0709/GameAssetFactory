@@ -495,8 +495,10 @@ func _project_floor_contact() -> void:
 		var extent_z := Vector3(absf(pose.basis.x.z), absf(pose.basis.y.z), absf(pose.basis.z.z)).dot(half)
 		if absf(pose.origin.x) + extent_x <= floor_half.x and absf(pose.origin.z) + extent_z <= floor_half.z:
 			lift = depth
-	# Leave the native contact solver its resting tolerance so it can sleep.
-	if slow:
+	# The tighter flight clearance can repeatedly lift grounded limbs out of
+	# contact. Keep the resting tolerance through small solver velocity spikes.
+	var landing_blended := not source_joint_rids.is_empty() and is_equal_approx(bodies.Head.gravity_scale, 1.0)
+	if slow or landing_blended:
 		lift -= FLOOR_REST_SLOP - FLOOR_CONTACT_SLOP
 	if lift <= 0.0:
 		return
