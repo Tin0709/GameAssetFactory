@@ -40,6 +40,8 @@ const DEATH_AIR_ATTACK_ANGULAR_TO_LAB := 0.14
 const DEATH_FINISHER_ROLL_SPEED := 1.0
 const ZOMBIE_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
 const SABRE_FINISHER_GRAVITY_HOLD := 0.30
+const SABRE_GROUND_FLOOR_LIMB_SHARE := 0.35
+const SABRE_FINISHER_FLOOR_LIMB_SHARE := 0.65
 # MD2 DefaultPhysicalMaterial, shared by all six authored bodies.
 const DEATH_SOURCE_FRICTION := 0.70
 const DEATH_SOURCE_RESTITUTION := 0.30
@@ -430,8 +432,12 @@ func _update_death(delta: float) -> void:
 		launch.linear_impulse = cos(angle) * launch_impulse
 		launch.upward_impulse = sin(angle) * launch_impulse
 		var direction := Vector3.FORWARD if _death_direction.is_zero_approx() else _death_direction
-		var sabre_landing := sabre_finisher or _death_strike == DeathStrike.SABRE_GROUND
-		if ragdoll.begin(launch, direction, "Chest", 0.0, ZOMBIE_GRAVITY, _corpse_floor, sabre_landing):
+		var floor_impact_limb_share := 0.0
+		if sabre_finisher:
+			floor_impact_limb_share = SABRE_FINISHER_FLOOR_LIMB_SHARE
+		elif _death_strike == DeathStrike.SABRE_GROUND:
+			floor_impact_limb_share = SABRE_GROUND_FLOOR_LIMB_SHARE
+		if ragdoll.begin(launch, direction, "Chest", 0.0, ZOMBIE_GRAVITY, _corpse_floor, floor_impact_limb_share):
 			_apply_death_tumble(_death_spin(direction), mass)
 		return
 	var contact := ragdoll.contact_motion()
@@ -467,17 +473,21 @@ func _update_landing_forces(delta: float, sabre_finisher: bool, supported: bool,
 		if box != null:
 			var floor_top := (_corpse_floor.global_transform * (Vector3.UP * box.size.y * 0.5)).y
 			supported = absf(ragdoll.minimum_corner_y() - floor_top) <= DEATH_FLOOR_CONTACT_MARGIN
-	var gravity_hold := SABRE_FINISHER_GRAVITY_HOLD if sabre_finisher else 0.0
+	var flat_sabre_finisher := flat_floor and sabre_finisher
+	# The flat floor can support the roll immediately. Keep the extra
+	# gravity hold for the finisher's bank and ledge contacts.
+	var gravity_hold := SABRE_FINISHER_GRAVITY_HOLD if sabre_finisher and not flat_floor else 0.0
 	var gravity_blend_end := gravity_hold + DEATH_LANDING_BLEND_TIME
-	var contact_age := minf(_landing_age + delta, gravity_blend_end) if supported else 0.0
+	var landing_blend_end := maxf(gravity_blend_end, SABRE_ROLL_BLEND_END) if flat_sabre_finisher else gravity_blend_end
+	var contact_age := minf(_landing_age + delta, landing_blend_end) if supported else 0.0
 	# Add rolling resistance once the flat floor carries the slow, low pose.
 	# The original response still drives the first impact and free flight.
 	var damp_supported_roll: bool = flat_floor and not ragdoll.source_joints.is_empty() \
-		and is_equal_approx(contact_age, gravity_blend_end) and motion.supports >= 3 \
+		and contact_age >= gravity_blend_end - 0.00001 and motion.supports >= 3 \
 		and motion.core_supports > 0 and motion.leg_supported and motion.linear <= DEATH_LIMB_SUPPORT_MAX_SPEED \
 		and absf(_corpse_axis().normalized().y) <= CORPSE_SETTLE_MAX_AXIS_Y
 	var roll_weight := 1.0 if damp_supported_roll else 0.0
-	if sabre_finisher and flat_floor and not ragdoll.source_joints.is_empty():
+	if flat_sabre_finisher and not ragdoll.source_joints.is_empty():
 		roll_weight = _sabre_roll_weight(delta, contact_age, motion, damp_supported_roll) if supported else 0.0
 	var wall_gravity := _update_wall_brace(delta, motion)
 	if is_equal_approx(contact_age, _landing_age) and is_equal_approx(roll_weight, _roll_damping_weight) \

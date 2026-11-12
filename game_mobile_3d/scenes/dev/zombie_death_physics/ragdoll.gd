@@ -15,7 +15,6 @@ const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "
 const FLOOR_CONTACT_SLOP := 0.005
 const FLOOR_REST_SLOP := 0.012
 const FLOOR_SHARED_LIFT_THRESHOLD := 0.05
-const FLOOR_EXCESS_LIFT_PART_SHARE := 0.35
 const MIN_SUPPORT_NORMAL_Y := 0.5
 const MAX_WALL_NORMAL_Y := 0.10
 const HANDOFF_MIN_WALL_OVERLAP := 0.035
@@ -58,7 +57,7 @@ var _parts: Array = PARTS
 var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
 var _flat_floor: CollisionShape3D
-var _split_floor_impact := false
+var _floor_impact_limb_share := 0.0
 var _flat_floor_has_contact := false
 var _pose_correction_frame := -1
 var _terrain_poses: Dictionary[String, Transform3D]
@@ -122,11 +121,11 @@ func sample(delta: float) -> void:
 	sample_count += 1
 
 func begin(profile: Resource, direction: Vector3, location: String, distance: float, gravity: float,
-		flat_floor: CollisionShape3D = null, split_floor_impact := false) -> bool:
+		flat_floor: CollisionShape3D = null, floor_impact_limb_share := 0.0) -> bool:
 	if running or sample_count < 2: return false
 	running = true
 	_flat_floor = flat_floor
-	_split_floor_impact = split_floor_impact and not source_joints.is_empty()
+	_floor_impact_limb_share = floor_impact_limb_share if not source_joints.is_empty() else 0.0
 	_flat_floor_has_contact = false
 	if _flat_floor != null or not source_joints.is_empty():
 		for body: PhysicalBone3D in bodies.values():
@@ -665,7 +664,7 @@ func _project_floor_contact() -> void:
 	var floor_inverse := floor_pose.affine_inverse()
 	var lift := 0.0
 	var landing_blended := not source_joint_rids.is_empty() and is_equal_approx(bodies.Head.gravity_scale, 1.0)
-	if _split_floor_impact and not _flat_floor_has_contact:
+	if _floor_impact_limb_share > 0.0 and not _flat_floor_has_contact:
 		var floor_body := _flat_floor.get_parent()
 		for body: PhysicalBone3D in bodies.values():
 			if _body_supported_by(body, floor_body):
@@ -702,9 +701,8 @@ func _project_floor_contact() -> void:
 		return
 	var shared_lift := 0.0 if landing_blended else lift
 	if not landing_blended and _flat_floor_has_contact:
-		# Once Sabre's throw meets the floor, leave part of a large correction
-		# with the penetrating limb so it does not kick the whole body upward.
-		shared_lift -= maxf(0.0, lift - FLOOR_SHARED_LIFT_THRESHOLD) * FLOOR_EXCESS_LIFT_PART_SHARE
+		# Keep more of a deep floor correction on the limb that penetrated.
+		shared_lift -= maxf(0.0, lift - FLOOR_SHARED_LIFT_THRESHOLD) * _floor_impact_limb_share
 	for body: PhysicalBone3D in bodies.values():
 		var correction := maxf(shared_lift, depths.get(body, 0.0) - slop)
 		if correction <= 0.0:
