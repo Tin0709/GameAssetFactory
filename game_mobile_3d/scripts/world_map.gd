@@ -11,7 +11,9 @@ const GAMEPLAY_CAMERA_NEAR := -8.0
 const GROVE_REVIEW := preload("res://scripts/world_map_grove.gd")
 const JUMP_REVIEW_PLAYER = preload("res://scenes/characters/CuboidPlayerJumpGifV004.tscn")
 const LocalMistRegion = preload("res://scripts/local_mist_region.gd")
+const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
 @export var local_mist_region: LocalMistRegion
+@export var scene_lighting_mix: SceneLightingMix
 var runtime: Dictionary
 var geometry
 var columns: Dictionary = {}

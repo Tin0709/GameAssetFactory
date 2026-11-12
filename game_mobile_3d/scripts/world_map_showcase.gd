@@ -149,6 +149,8 @@ var _lighting_mix: Dictionary = {}
 var _lighting_sliders: Dictionary = {}
 var _balanced_preview := false
 var _balanced_toggle: CheckButton
+const SceneLightingMix = preload("res://scripts/scene_lighting_mix.gd")
+var _scene_mix_button: Button
 var _near_haze_toggle: CheckButton
 var _save_mix_button: Button
 var _vignette:ColorRect
@@ -1038,6 +1040,18 @@ func reset_lighting_mix() -> void:
 	_lighting_mix.clear()
 	_refresh_lighting_mix()
 
+func apply_scene_lighting_mix(preset: SceneLightingMix) -> bool:
+	if preset == null or preset.strengths.is_empty() or _balanced_preview:
+		return false
+	for effect: StringName in preset.strengths:
+		var strength: float = preset.strengths[effect]
+		if not LIGHTING_MIX_CONTROLS.has(effect) or not is_finite(strength) \
+				or strength < 0. or strength > float(LIGHTING_MIX_CONTROLS[effect][1]):
+			return false
+	_lighting_mix.merge(preset.strengths, true)
+	_refresh_lighting_mix()
+	return true
+
 func save_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	var config := ConfigFile.new()
 	config.set_value("recipe", "version", LIGHTING_MIX_VERSION)
@@ -1152,6 +1166,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_near_haze_toggle.disabled = _balanced_preview
 	if _save_mix_button != null:
 		_save_mix_button.disabled = _balanced_preview
+	if _scene_mix_button != null:
+		_scene_mix_button.disabled = _balanced_preview
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
 		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
@@ -1514,6 +1530,19 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 	var message := Label.new()
 	message.hide()
 	box.add_child(message)
+	var scene_mix: SceneLightingMix = level.scene_lighting_mix
+	if scene_mix != null and not scene_mix.strengths.is_empty():
+		var apply_mix := Button.new()
+		_scene_mix_button = apply_mix
+		apply_mix.name = "SceneLightingMix"
+		apply_mix.text = "Apply " + scene_mix.display_name
+		apply_mix.tooltip_text = "Apply this map's values to the live sliders. Save mix stores the result."
+		apply_mix.focus_mode = Control.FOCUS_NONE
+		actions.add_sibling(apply_mix)
+		apply_mix.pressed.connect(func():
+			var applied := apply_scene_lighting_mix(level.scene_lighting_mix)
+			message.text = "Map lighting mix applied." if applied else "Map lighting mix is unavailable."
+			message.show())
 	preset.item_selected.connect(func(_index: int): message.hide())
 	save.pressed.connect(func():
 		var error := save_lighting_mix(preset_path.call())
