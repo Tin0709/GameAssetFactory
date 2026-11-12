@@ -1199,6 +1199,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 48 and effect == &"stone_diffuse_contrast":
 			missing_value = 0.
+		if version < 49 and effect == &"stone_detail_softness":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
