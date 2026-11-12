@@ -152,15 +152,15 @@ func run() -> void:
 		check(pose_preserved, "Releasing physics retains the last rendered pose, including utility bones")
 	await ticks(6)
 	check(not is_instance_valid(zombie), "Corpse is released after its breakup")
-	await check_combo_finisher(lab, group, false)
-	await check_combo_finisher(lab, group, true)
+	for slot in 3:
+		await check_combo_finisher(lab, group, slot)
 	print("MECHANIC_LAB_MD2_RAGDOLL ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
 	quit(0 if failures.is_empty() else 1)
 
-func check_combo_finisher(lab, group, sword: bool) -> void:
+func check_combo_finisher(lab, group, slot: int) -> void:
 	lab.reset_player()
-	lab._select_weapon(1 if sword else 0)
+	lab._select_weapon(slot)
 	lab.get_node("HUD/BaseZombieToggle").button_pressed = false
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
@@ -182,22 +182,28 @@ func check_combo_finisher(lab, group, sword: bool) -> void:
 	release.physical_keycode = KEY_E
 	root.push_input(release, true)
 	group.sabre_contact.disconnect(record_lethal)
-	var weapon := "Sword" if sword else "Sabre"
-	var expected_clip := "Attack3" if sword else "NativeFinisher"
-	check(group.sword_equipped == sword and lethal_clips == [expected_clip],
+	var weapon: String = ["Sabre", "Sword", "Curved Greatsword"][slot]
+	var expected_clip: String = ["NativeFinisher", "Attack3", "NativeCurvedAttack3"][slot]
+	check(lethal_clips == [expected_clip],
 		weapon + "'s third strike produces a lethal ragdoll")
 	var landing_time := INF
 	var lowest_corner := 0.0
 	var vertical_axis := INF
 	var lower_contact_time := INF
+	var flight_gravity := 0.0
 	for i in 70:
 		await physics_frame
 		if zombie.ragdoll.running:
 			lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
+			if not zombie._corpse_landed:
+				var head: PhysicalBone3D = zombie.ragdoll.bodies.Head
+				var state := PhysicsServer3D.body_get_direct_state(head.get_rid())
+				if state != null:
+					flight_gravity = state.total_gravity.y
 		if not zombie._corpse_landed:
 			continue
 		landing_time = minf(landing_time, zombie._corpse_age)
-		if sword:
+		if slot != 0:
 			continue
 		var since_contact: float = zombie._corpse_age - landing_time
 		var bodies: Dictionary = zombie.ragdoll.bodies
@@ -211,11 +217,13 @@ func check_combo_finisher(lab, group, sword: bool) -> void:
 			vertical_axis = absf(head_to_legs.normalized().y)
 	check(landing_time > 0.25 and landing_time < 0.50, weapon + "'s finisher makes prompt core contact")
 	check(lowest_corner >= -0.013, weapon + "'s finisher stays within the floor contact tolerance")
-	if not sword:
+	if slot == 0:
 		check(vertical_axis < 0.34, "Sabre's finisher rolls out of its inverted pose within 300 ms")
 		check(lower_contact_time < 0.40, "Sabre's chest or legs reach the floor within 400 ms of head contact")
-	else:
+	elif slot == 1:
 		await check_rebound(zombie)
+	else:
+		check(is_equal_approx(flight_gravity, -50.0), "Curved Greatsword uses the Overworld flight gravity")
 	zombie.free()
 
 func check_rebound(zombie) -> void:

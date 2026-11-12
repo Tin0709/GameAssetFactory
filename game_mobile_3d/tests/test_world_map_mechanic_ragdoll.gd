@@ -93,8 +93,12 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	var chest_height := INF
 	var worst_anchor := 0.0
 	var ledge_contact := false
-	for frame in 72:
+	var parked_frame := -1
+	for frame in (200 if strike == Zombie.DeathStrike.CURVED_GREATSWORD else 72):
 		await physics_frame
+		if zombie._corpse_parked:
+			parked_frame = frame
+			break
 		if not zombie.ragdoll.running:
 			continue
 		worst_anchor = maxf(worst_anchor, zombie.ragdoll.max_anchor_error())
@@ -112,8 +116,10 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.De
 	check(first_landing > 25 and first_landing < 60 and ledge_contact and chest_height < 6.0,
 		"The corpse crosses the authored ledge and contacts the lower terrain")
 	check(worst_anchor < 0.12, "The first impact on the lower terrace keeps the limb anchors connected")
+	if strike == Zombie.DeathStrike.CURVED_GREATSWORD:
+		check(parked_frame > first_landing, "A supported Curved Greatsword corpse parks across the two terraces")
 	print("WORLDMAP_LEDGE strike=", strike, " landing=", first_landing,
-		" minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor)
+		" minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor, " park=", parked_frame)
 	zombie.free()
 	await ticks(2)
 
