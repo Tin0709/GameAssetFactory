@@ -155,7 +155,8 @@ func _publish_humid_light(effect: CompositorEffect) -> void:
  if supports_depth and maxf(placement, daylight_amount) > 0.:
   var mist: CompositorEffect = showcase.mist.effect
   var settings := DepthDiffusion.parameters(camera, actor, mist.near_entry_m(), placement)
-  effect.set_humid_light(amount, protection, settings, mist, daylight_amount)
+  effect.set_humid_light(amount, protection, settings, mist, daylight_amount,
+   showcase._lighting_scale(&"daylight_haze_spill"))
  else:
   effect.set_humid_light(amount, protection)
 func _process(_delta:float)->void:

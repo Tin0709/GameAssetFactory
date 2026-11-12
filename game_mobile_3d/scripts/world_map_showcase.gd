@@ -103,6 +103,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"daylight_haze": ["Daylight haze softness", 1.],
+	&"daylight_haze_spill": ["Light spread into shade", 1.],
 	&"humid_light": ["Humid light diffusion", 1.],
 	&"humid_depth": ["Diffusion by depth (preview)", 1.],
 	&"tree_wind": ["Tree canopy wind", CrownWind.MAX_STRENGTH],
@@ -111,7 +112,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 38
+const LIGHTING_MIX_VERSION := 39
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -126,6 +127,7 @@ const BALANCED_ATMOSPHERE := {
 	&"projected_sun": 0.,
 	&"sunlit_mist": 0.,
 	&"daylight_haze": 0.,
+	&"daylight_haze_spill": 0.,
 	&"sky_chroma": .65,
 	&"grade": .55,
 	&"exposure": .9,
@@ -1009,7 +1011,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1072,6 +1074,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 38 and effect == &"forest_daylight_accents":
 			missing_value = 0.
+		if version < 39 and effect == &"daylight_haze_spill":
+			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
 			missing_value = 0.
 		if version < 35 and effect == &"sun_opening":
@@ -1103,7 +1107,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and player_contact.available()
 		if effect == &"projected_sun":
 			slider.editable = slider.editable and projected_sun.available()
-		if effect in [&"daylight_haze", &"humid_depth"]:
+		if effect in [&"daylight_haze", &"daylight_haze_spill", &"humid_depth"]:
 			slider.editable = slider.editable and DepthDiffusion.supported(level.get_viewport())
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
@@ -1111,7 +1115,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"projected_sun", &"sun_opening"]:
 		refresh_daylight_shading()
 		return
-	if changed_effect in [&"daylight_haze", &"humid_light", &"humid_depth"]:
+	if changed_effect in [&"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
@@ -1357,7 +1361,7 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
-	for effect: StringName in [&"daylight_haze", &"humid_depth"]:
+	for effect: StringName in [&"daylight_haze", &"daylight_haze_spill", &"humid_depth"]:
 		var depth_slider: HSlider = _lighting_sliders.get(effect)
 		if depth_slider != null:
 			depth_slider.editable = not _balanced_preview and DepthDiffusion.supported(level.get_viewport())
