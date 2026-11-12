@@ -205,6 +205,41 @@ func cliff_edge_case(world: Node3D, group: Node3D, effects: Node3D, seed: int, x
 	zombie.free()
 	await ticks(2)
 
+func wall_supported_ledge_rest(world: Node3D, group: Node3D, effects: Node3D, seed: int, z: float,
+		skew: float, yaw: float, strike: Zombie.DeathStrike) -> void:
+	group._spawn_serial = seed
+	var direction := Vector3.RIGHT.rotated(Vector3.UP, skew)
+	var zombie = await launch(world, group, effects, Vector3(-33.5, 9.0, z), direction, strike, yaw)
+	if zombie == null:
+		return
+	var skeleton: Skeleton3D = zombie.ragdoll.skeleton
+	var last_simulated: Array[Transform3D] = []
+	skeleton.skeleton_updated.connect(func() -> void:
+		if not zombie.ragdoll.running:
+			return
+		last_simulated.clear()
+		for bone in skeleton.get_bone_count():
+			last_simulated.append(skeleton.get_bone_global_pose(bone)))
+	var release_frame := -1
+	var supports := 0
+	for frame in 290:
+		await physics_frame
+		if zombie._corpse_parked:
+			release_frame = frame
+			break
+		if zombie.ragdoll.running:
+			supports = zombie.ragdoll.contact_motion().supports
+	check(release_frame >= 170 and supports == 2 and zombie.ragdoll.bodies.is_empty(),
+		"Ledge seed %d releases only after stable support on two body parts" % seed)
+	if zombie._corpse_parked:
+		var pose_matches := last_simulated.size() == skeleton.get_bone_count()
+		for bone in last_simulated.size():
+			pose_matches = pose_matches and last_simulated[bone].is_equal_approx(skeleton.get_bone_global_pose(bone))
+		check(pose_matches, "Ledge seed %d retains the final visible ragdoll pose" % seed)
+	print("WORLDMAP_WALL_SUPPORTED_REST seed=", seed, " release=", release_frame, " supports=", supports)
+	zombie.free()
+	await ticks(2)
+
 func braced_cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	group._spawn_serial = 8
 	var direction := Vector3.FORWARD.rotated(Vector3.UP, 0.17)
@@ -332,6 +367,8 @@ func run() -> void:
 		await cliff_edge_case(world, group, effects, 57, -37.46, 0.085, -0.065, Zombie.DeathStrike.GROUND)
 		await near_wall_handoff(world, group, effects)
 		await braced_cliff_case(world, group, effects)
+		await wall_supported_ledge_rest(world, group, effects, 28, -39.39, -0.18, 0.16, Zombie.DeathStrike.AIR)
+		await wall_supported_ledge_rest(world, group, effects, 63, -39.46, -0.13, -0.13, Zombie.DeathStrike.GROUND)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
