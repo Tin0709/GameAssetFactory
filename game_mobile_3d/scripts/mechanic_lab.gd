@@ -231,7 +231,7 @@ func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index:
 	_start_contact_light(point, serial, 2.3 if finisher else 1.8)
 	# Sabre_3 and Sword_3 share the source radius and non-oriented shake.
 	# Approximate StartMatineeCameraShakeAtPawn using the capsule center.
-	if not finisher or _shake_serial == serial:
+	if not finisher or _shake_serial == serial or _player_body == null:
 		return
 	var distance := _player_body.global_position.distance_to(point)
 	var falloff := 1.0 - clampf(inverse_lerp(FINISHER_SHAKE_INNER_RADIUS, FINISHER_SHAKE_OUTER_RADIUS, distance), 0.0, 1.0)
