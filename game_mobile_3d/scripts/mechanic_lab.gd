@@ -4,6 +4,7 @@ const PlayerFactory := preload("res://scripts/world_map_player_factory.gd")
 const PlayerPresentation := preload("res://scripts/world_map_presentation.gd")
 const SourceTerrain := preload("res://scripts/world_map_source_terrain.gd")
 const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
+const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const CAMERA_OFFSET := Vector3(12.0, 15.0, 16.0)
 const SPAWN := Vector3(0.0, 0.03, 0.0)
 const WORLD_MAP_NOON_EXPOSURE := 0.12
@@ -16,7 +17,12 @@ var presentation: Node
 var _exposure: CompositorEffect
 var _previous_msaa: Viewport.MSAA
 var _previous_hdr: bool
-var _contact_kick := 0.0
+var _combat_audio: CombatAudio
+var _shake_serial := -1
+var _shake_age := 0.0
+var _shake_duration := 0.0
+var _shake_strength := 0.0
+var _shake_axis := Vector2.UP
 @onready var player: CharacterBody3D = $Actors/Player
 @onready var camera: Camera3D = $Camera3D
 
@@ -53,8 +59,13 @@ func _ready() -> void:
 		$HUD/Controls.text = "WASD di chuyển · Shift chạy · Space nhảy · R về giữa"
 	$HUD/Controls.text += " · Cuộn chuột để zoom"
 	$HUD/SpawnZombie.disabled = not (using_private and player_ready)
+	$HUD/CombatAudioToggle.disabled = $HUD/SpawnZombie.disabled
 	if not $HUD/SpawnZombie.disabled:
 		player.collision_mask |= 4
+		_combat_audio = CombatAudio.new()
+		_combat_audio.name = "CombatAudio"
+		$CombatEffects.add_child(_combat_audio)
+		_set_combat_audio(false)
 		player.combo.native_tap_buffer_seconds = SABRE_TAP_BUFFER
 		$Zombies.setup_combat(player.clips, player.combo.native_windows)
 		player.connect("attack_pose_sample", $Zombies.sample_sabre)
@@ -90,12 +101,35 @@ func _exit_tree() -> void:
 
 func _process(delta: float) -> void:
 	var focus: Vector3 = presentation.player_position()
-	_contact_kick = move_toward(_contact_kick, 0.0, delta * 0.8)
-	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z) + camera.basis.y * _contact_kick
+	camera.position = CAMERA_OFFSET + Vector3(focus.x, 0.0, focus.z)
+	if _shake_age < _shake_duration:
+		_shake_age = minf(_shake_age + delta, _shake_duration)
+		var decay := 1.0 - _shake_age / _shake_duration
+		var pulse := cos(TAU * 15.0 * _shake_age) * decay * decay
+		var offset := _shake_axis * camera.size * _shake_strength * pulse
+		camera.h_offset = offset.x
+		camera.v_offset = offset.y
 
-func _on_sabre_contact(point: Vector3, direction: Vector3) -> void:
-	_contact_kick = 0.055
+func _set_combat_audio(enabled: bool) -> void:
+	if _combat_audio == null:
+		return
+	if player.reference_audio != null:
+		player.reference_audio.enabled = enabled
+	_combat_audio.set_enabled(enabled)
+
+func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, index: int, serial: int, lethal: bool) -> void:
 	player.effects.contact(point, direction)
+	_combat_audio.contact(point, serial, lethal)
+	var heavy := index == 2 or clip == "AirAttack"
+	var strength := 0.013 if lethal else (0.010 if heavy else 0.006)
+	if _shake_serial == serial and strength <= _shake_strength:
+		return
+	_shake_serial = serial
+	_shake_strength = strength
+	_shake_age = 0.0
+	_shake_duration = 0.19 if lethal or heavy else 0.14
+	var screen_direction := Vector2(direction.dot(camera.basis.x), direction.dot(camera.basis.y))
+	_shake_axis = screen_direction.normalized() if screen_direction.length_squared() > 0.01 else Vector2.UP
 
 func _physics_process(_delta: float) -> void:
 	if player.position.y < -5.0:
@@ -122,7 +156,12 @@ func _spawn_zombie() -> void:
 		$HUD/SpawnStatus.text = "Không thể tạo zombie. Kiểm tra dữ liệu MD2 Research và chỗ trống."
 
 func reset_player() -> void:
-	_contact_kick = 0.0
+	_shake_serial = -1
+	_shake_duration = 0.0
+	camera.h_offset = 0.0
+	camera.v_offset = 0.0
+	if _combat_audio != null:
+		_combat_audio.reset()
 	player.position = SPAWN
 	player.velocity = Vector3.ZERO
 	if player.has_method("cancel_jump"):
