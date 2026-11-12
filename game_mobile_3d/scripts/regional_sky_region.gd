@@ -20,6 +20,7 @@ extends Resource
 @export var sun_bounce_hours: PackedFloat32Array
 @export var sun_bounce_directions: PackedVector3Array
 @export var sun_bounce_slices: PackedInt32Array
+@export var sun_bounce_layer_count := 0
 
 func read_ids(transport_path: String, vertex_count: int) -> PackedFloat32Array:
 	if not OS.has_feature("editor") or not center_xz.is_finite() or not grass_origin.is_finite():
@@ -49,13 +50,14 @@ func has_night_field() -> bool:
 func has_sun_bounce_field() -> bool:
 	var size := sun_bounce_hours.size()
 	if not OS.has_feature("editor") or sun_bounce_sha256.length() != 64 or size < 2 \
+			or sun_bounce_layer_count <= 0 or sun_bounce_layer_count > size \
 			or sun_bounce_directions.size() != size or sun_bounce_slices.size() != size \
 			or not FileAccess.file_exists(_private_path(sun_bounce_path)):
 		return false
 	for index in size:
 		if not is_finite(sun_bounce_hours[index]) or sun_bounce_hours[index] < 0.0 or sun_bounce_hours[index] > 24.0 \
 				or not sun_bounce_directions[index].is_finite() or not sun_bounce_directions[index].is_normalized() \
-				or sun_bounce_slices[index] < 0 or sun_bounce_slices[index] >= size:
+				or sun_bounce_slices[index] < 0 or sun_bounce_slices[index] >= sun_bounce_layer_count:
 			return false
 		if index > 0 and sun_bounce_hours[index] <= sun_bounce_hours[index - 1]:
 			return false
@@ -77,10 +79,10 @@ func sun_bounce_sample(hour: float, direction: Vector3) -> Vector2:
 	var expected := a.lerp(b, weight).normalized()
 	var confidence := smoothstep(cos(deg_to_rad(4.0)), cos(deg_to_rad(0.5)), direction.dot(expected))
 	var slice := lerpf(sun_bounce_slices[index], sun_bounce_slices[index + 1], weight)
-	return Vector2((slice + 0.5) / float(sun_bounce_slices.max() + 1), fade * confidence)
+	return Vector2((slice + 0.5) / float(sun_bounce_layer_count), fade * confidence)
 
 func load_sun_bounce_texture() -> ImageTexture3D:
-	return _load_volume(sun_bounce_path, sun_bounce_sha256, sun_bounce_slices.max() + 1)
+	return _load_volume(sun_bounce_path, sun_bounce_sha256, sun_bounce_layer_count)
 
 func load_night_texture() -> ImageTexture:
 	if extent.x <= 0 or extent.y <= 0 or not _supports_packed_texture():
