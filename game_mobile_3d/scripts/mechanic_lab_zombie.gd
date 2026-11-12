@@ -378,7 +378,9 @@ func _update_death(delta: float) -> void:
 			body.collision_mask = LEVEL_COLLISION_MASK
 			if source_rig:
 				body.bounce = DEATH_SOURCE_RESTITUTION
-				body.friction = DEATH_SOURCE_FRICTION
+				# The flat lab uses its calibrated floor traction during contact recovery.
+				if not is_instance_valid(_corpse_floor):
+					body.friction = DEATH_SOURCE_FRICTION
 			mass += body.mass
 		if sabre_finisher:
 			# Start with MD2's default material values on the leading contact.
