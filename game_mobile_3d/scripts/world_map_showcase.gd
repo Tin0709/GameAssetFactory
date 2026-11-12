@@ -1026,7 +1026,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		_save_mix_button.disabled = _balanced_preview
 	for effect: StringName in _lighting_sliders:
 		var slider: HSlider = _lighting_sliders[effect]
-		slider.editable = not _balanced_preview
+		slider.editable = not _balanced_preview and (effect != &"sunlit_mist" or directional_air.available())
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
@@ -1037,7 +1037,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"forest_path_beam":
 		_publish_point_cutoff()
 		return
-	if changed_effect == &"forest_path_air":
+	if changed_effect in [&"forest_path_air", &"sunlit_mist"]:
 		return # The volume reads the live fixture and mix immediately before dispatch.
 	if changed_effect == &"night_path_chroma":
 		_publish_night_path_chroma()
