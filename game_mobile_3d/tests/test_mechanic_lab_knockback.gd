@@ -74,8 +74,11 @@ func run() -> void:
 			break
 		await physics_frame
 	var player_hp: int = lab.player_health
+	var windup_position: float = zombie.animation.current_animation_position
 	zombie.take_hit(1, Vector3.RIGHT, Vector2(4.0, 0.0), 1.0)
-	check(zombie.animation.current_animation == ZOMBIE.ATTACK, "Movement lock does not restart an active windup below the poise threshold")
+	check(zombie.animation.current_animation == ZOMBIE.ATTACK
+		and is_equal_approx(zombie.animation.current_animation_position, windup_position),
+		"A hit below the poise threshold preserves an active windup")
 	for i in Engine.physics_ticks_per_second:
 		if lab.player_health < player_hp:
 			break
