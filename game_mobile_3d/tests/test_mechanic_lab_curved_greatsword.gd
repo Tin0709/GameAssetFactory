@@ -45,6 +45,9 @@ func run() -> void:
 	weapon.select(2)
 	weapon.item_selected.emit(2)
 	check(weapon.selected == 2, "Curved Greatsword loads from the verified private assets")
+	await check_locomotion(lab)
+	lab.reset_player()
+	await ticks(12)
 	lab.player.attack_accepted.connect(func(_index, clip, _serial): attacks.append(clip))
 	var group := lab.get_node("Zombies") as Node3D
 	var spawn := lab.get_node("HUD/SpawnZombie") as Button
@@ -112,7 +115,44 @@ func run() -> void:
 	weapon.select(0)
 	weapon.item_selected.emit(0)
 	check(weapon.selected == 0 and not group.sword_equipped, "The Sabre can be equipped again")
+	await ticks(4)
+	check(lab.player.clips.Idle.source_name != "Player_2H_Medium_Idle"
+		and lab.player.source_gait.state(7.0).input != 1.2,
+		"Returning to Sabre restores the original locomotion profile")
 	finish(lab)
+
+func check_locomotion(lab: Node) -> void:
+	var actor = lab.player
+	await ticks(6)
+	check(String(actor.animation_player.assigned_animation).ends_with("/NativeCurvedIdle"),
+		"The equipped Curved Greatsword uses the captured two-handed idle")
+	actor.scripted_input = true
+	actor.requested_direction = Vector2(0.0, -1.0)
+	actor.requested_run = false
+	await ticks(24)
+	check(String(actor.animation_player.assigned_animation).ends_with("/NativeCurvedWalk")
+		and not actor.hybrid_motion.owns_pose, "Walking uses the two-handed gait pose")
+	actor.requested_run = true
+	await ticks(30)
+	check(String(actor.animation_player.assigned_animation).ends_with("/NativeCurvedRun")
+		and not actor.hybrid_motion.owns_pose, "Running uses the two-handed gait pose")
+	check(is_equal_approx(actor.source_gait.state(2.1).weight, 1.0)
+		and is_equal_approx(actor.source_gait.state(8.4).weight, 1.0),
+		"The composed gait has the original walk and run sample positions")
+	actor.requested_direction = Vector2.ZERO
+	await ticks(16)
+	actor.requested_jump = true
+	await ticks(2)
+	actor.requested_jump = false
+	var airborne_clips: Array[String] = []
+	for i in 75:
+		await physics_frame
+		var clip := String(actor.animation_player.assigned_animation).get_file()
+		if clip.begins_with("NativeCurvedJump") and not airborne_clips.has(clip):
+			airborne_clips.append(clip)
+	check(airborne_clips == ["NativeCurvedJumpTakeoff", "NativeCurvedJumpAirborne", "NativeCurvedJumpLanding"],
+		"Jump and landing use the three verified two-handed clips")
+	actor.scripted_input = false
 
 func finish(lab: Node) -> void:
 	lab.free()
