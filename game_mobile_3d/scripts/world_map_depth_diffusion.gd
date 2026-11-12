@@ -41,9 +41,9 @@ var settings_buffer := RID()
 var applied := PackedByteArray()
 
 static func supported(viewport: Viewport) -> bool:
-	# This path is validated with the D3D12 Mobile attachment. Keep the existing
-	# finish on drivers whose MSAA lifetime and bandwidth are still unmeasured.
-	return RenderingServer.get_current_rendering_method() == "mobile" and RenderingServer.get_current_rendering_driver_name() == "d3d12" \
+	# The render callback still checks that the actual attachment can be sampled.
+	return RenderingServer.get_current_rendering_method() == "mobile" \
+		and RenderingServer.get_current_rendering_driver_name() in ["d3d12", "vulkan"] \
 		and viewport != null and viewport.msaa_3d == Viewport.MSAA_2X
 
 static func parameters(camera: Camera3D, focus: Vector3, entry: float, weight: float) -> PackedByteArray:
