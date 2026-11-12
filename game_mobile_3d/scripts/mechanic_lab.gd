@@ -298,6 +298,9 @@ func _on_player_hit(amount: int) -> void:
 	_combat_audio.player_hurt()
 	if player_health == 0:
 		player.enter_lab_defeat()
+		# The popup captures keyboard input while it is open, including R.
+		$HUD/Weapon.get_popup().hide()
+		$HUD/Weapon.disabled = true
 		$HUD/Defeat.show()
 
 func reset_player() -> void:
@@ -306,6 +309,7 @@ func reset_player() -> void:
 		player.set_process_input(true)
 		player.set_process_unhandled_input(true)
 		$HUD/Defeat.hide()
+		$HUD/Weapon.disabled = _weapon_mesh == null or not player.combo.native_enabled
 	player_health = MAX_PLAYER_HEALTH
 	$HUD/PlayerHealth.text = "%d / %d HP" % [player_health, MAX_PLAYER_HEALTH]
 	_shake_serial = -1
