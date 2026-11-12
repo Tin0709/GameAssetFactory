@@ -8,6 +8,7 @@ render_mode alpha_to_coverage_and_one;
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
 global uniform float gaf_grove_sky_strength;
 varying float tree_sky;
+uniform float crown_dusk_occlusion = 0.0;
 #endif
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/leaf_material_v001/leaf_material.gdshaderinc"
 #ifdef GAF_SHARED_MIST
@@ -151,13 +152,19 @@ void fragment() {
 	ALPHA_TEXTURE_COORDINATE = FRAGCOORD.xy;
 #endif
 #ifdef GAF_WORLD_TREE_SKY
+	float ambient_visibility = 1.0;
 	if (use_source_atlas && gaf_grove_sky_strength > 0.0) {
 		// Warm atlas bark receives stronger shade than the green crown.
 		float wood = smoothstep(1.05, 1.30, albedo.r / max(albedo.g, 0.001));
 		float amount = gaf_grove_sky_strength * mix(0.29411765, 1.0, wood);
-		AO = mix(1.0, tree_sky, amount);
-		AO_LIGHT_AFFECT = 0.0;
+		ambient_visibility = mix(1.0, tree_sky, amount);
 	}
+	// The validated tree atlases reserve the left half for leaf triangles.
+	if (use_source_atlas && UV.x < 0.5 && crown_dusk_occlusion > 0.0) {
+		ambient_visibility *= 1.0 - crown_dusk_occlusion;
+	}
+	AO = ambient_visibility;
+	AO_LIGHT_AFFECT = 0.0;
 #endif
 	ALBEDO = albedo;
 	ROUGHNESS = 0.95;

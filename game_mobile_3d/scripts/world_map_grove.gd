@@ -102,6 +102,7 @@ var _source_leaf_weights: ImageTexture
 var _source_leaf_mesh: Mesh
 var _source_leaf_hue := 0.
 var _source_leaf_mix := 0.
+var _crown_dusk_occlusion := 0.0
 var _source_crown_pattern: ImageTexture
 var _source_crown_weights: ImageTexture
 var _crown_mask_bytes := PackedByteArray()
@@ -498,6 +499,14 @@ func set_lighting(bark: Shader, leaves: Shader, field: Texture2D, shape: Vector4
 		_apply_lighting(_spruce_appearance, leaves, field, shape, time)
 		_bind_spruce_atlas(_spruce_appearance)
 
+func set_crown_dusk_occlusion(value: float) -> void:
+	if _crown_dusk_occlusion == value:
+		return
+	_crown_dusk_occlusion = value
+	_canopy_appearance.set_shader_parameter("crown_dusk_occlusion", value)
+	if spruce_available():
+		_spruce_appearance.set_shader_parameter("crown_dusk_occlusion", value)
+
 func set_crown_detail(enabled: bool) -> void:
 	_canopy_appearance.set_shader_parameter("crown_detail", enabled)
 
@@ -521,7 +530,7 @@ func publish_crown_wind(enabled: bool, wind_phase: float, breeze_phase: float, t
 
 func _apply_lighting(material: ShaderMaterial, shader: Shader, field: Texture2D, shape: Vector4, time: float) -> void:
 	if material.shader.get_meta("gaf_mist_base", material.shader) != shader:
-		var parameters := ["reveal_player", "player_view", "native_specular"]
+		var parameters := ["reveal_player", "player_view", "native_specular", "crown_dusk_occlusion"]
 		var values := parameters.map(material.get_shader_parameter)
 		material.shader = shader
 		for i in parameters.size():
