@@ -231,6 +231,9 @@ func check_combo_finisher(lab, group, slot: int) -> void:
 	if slot == 0:
 		check(vertical_axis < 0.34, "Sabre's finisher rolls out of its inverted pose within 300 ms")
 		check(lower_contact_time < 0.40, "Sabre's chest or legs reach the floor within 400 ms of head contact")
+		while zombie.ragdoll.running and zombie._corpse_age < 1.35 - 0.00001:
+			await physics_frame
+		check(zombie._corpse_parked, "Sabre's finisher releases the fully supported corpse within 1.35 seconds")
 	elif slot == 1:
 		await check_rebound(zombie)
 	else:
