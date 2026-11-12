@@ -15,6 +15,9 @@ const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "
 const FLOOR_CONTACT_SLOP := 0.005
 const FLOOR_REST_SLOP := 0.012
 const MIN_SUPPORT_NORMAL_Y := 0.5
+const HANDOFF_MIN_WALL_OVERLAP := 0.035
+const HANDOFF_WALL_REST_OVERLAP := 0.012
+const HANDOFF_MAX_SHIFT := 0.12
 const TERRAIN_MIN_FALL_SPEED := 2.0
 const TERRAIN_MIN_SUPPORT_Y := 0.85
 const TERRAIN_MIN_OVERLAP := 0.035
@@ -119,12 +122,15 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	if _flat_floor != null or not source_joints.is_empty():
 		for body: PhysicalBone3D in bodies.values():
 			body.set("pose_correction", _correct_physical_pose)
+	var handoff_shift := _handoff_wall_clearance() if not source_joints.is_empty() else Vector3.ZERO
+	if not handoff_shift.is_zero_approx():
+		skeleton.global_position += handoff_shift
 	simulator.active = true
 	# This refreshes all cached animated poses, sets all body transforms and changes mode.
 	simulator.physical_bones_start_simulation()
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
-		handoff_error = maxf(handoff_error, body.global_position.distance_to(current[part[0]].origin))
+		handoff_error = maxf(handoff_error, body.global_position.distance_to(current[part[0]].origin + handoff_shift))
 		body.gravity_scale = gravity / float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 		body.linear_damp = profile.linear_damping
 		body.angular_damp = profile.angular_damping
@@ -169,6 +175,52 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	set_physics_process(resistance_gain > 0.0)
 	apply_impact(profile, direction, location, distance)
 	return true
+
+func _handoff_wall_clearance() -> Vector3:
+	# The living capsule can clear the wall while an animated limb overlaps it.
+	# Test the captured boxes before the solver can turn that overlap into a kick.
+	var space := skeleton.get_world_3d().direct_space_state
+	var depths: Dictionary[String, float] = {}
+	var candidates: Array[Vector3] = []
+	var initial_peak := 0.0
+	for part in _parts:
+		var name: String = part[0]
+		var points := _terrain_contacts_at(bodies[name], space, current[name])
+		depths[name] = _deepest_contact(points)
+		initial_peak = maxf(initial_peak, depths[name])
+		var deepest_wall := HANDOFF_MIN_WALL_OVERLAP
+		var wall_motion := Vector3.ZERO
+		for i in range(0, points.size(), 2):
+			var offset := points[i + 1] - points[i]
+			var depth := offset.length()
+			if depth <= deepest_wall or absf(offset.y) > depth * 0.7:
+				continue
+			var horizontal := Vector3(offset.x, 0.0, offset.z)
+			var clearance := (depth - HANDOFF_WALL_REST_OVERLAP) * depth / horizontal.length()
+			wall_motion = horizontal.normalized() * minf(clearance, HANDOFF_MAX_SHIFT)
+			deepest_wall = depth
+		if not wall_motion.is_zero_approx():
+			candidates.append(wall_motion)
+	var best := Vector3.ZERO
+	var best_depth := initial_peak
+	for motion in candidates:
+		var peak := _handoff_clearance_depth(space, depths, motion)
+		if peak < best_depth - FLOOR_CONTACT_SLOP:
+			best = motion
+			best_depth = peak
+	return best
+
+func _handoff_clearance_depth(space: PhysicsDirectSpaceState3D, depths: Dictionary[String, float], motion: Vector3) -> float:
+	var peak := 0.0
+	for name in depths:
+		var pose: Transform3D = current[name]
+		var limit := maxf(depths[name], FLOOR_CONTACT_SLOP) + PROJECTION_COLLISION_MARGIN
+		var midway := _deepest_contact(_terrain_contacts_at(bodies[name], space, pose.translated(motion * 0.5)))
+		var after := _deepest_contact(_terrain_contacts_at(bodies[name], space, pose.translated(motion)))
+		if maxf(midway, after) > limit:
+			return INF
+		peak = maxf(peak, after)
+	return peak
 
 func _build_source_joints() -> void:
 	# PhysicalBone3D's automatic joint follows the Skeleton3D hierarchy and
@@ -367,8 +419,6 @@ func _project_source_anchors() -> void:
 			state.transform = state.transform.translated(motion)
 
 func _project_terrain_contact() -> void:
-	if _terrain_query == null:
-		_terrain_query = PhysicsShapeQueryParameters3D.new()
 	var lift := 0.0
 	var deepest: PhysicalBone3D
 	var has_deep_contact := false
@@ -455,11 +505,16 @@ func _try_terrain_translation(motion: Vector3, deepest: PhysicalBone3D) -> void:
 		state.transform = state.transform.translated(motion)
 
 func _terrain_contact_points(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, motion: Vector3) -> Array[Vector3]:
+	return _terrain_contacts_at(body, state.get_space_state(), state.transform.translated(motion))
+
+func _terrain_contacts_at(body: PhysicalBone3D, space: PhysicsDirectSpaceState3D, pose: Transform3D) -> Array[Vector3]:
+	if _terrain_query == null:
+		_terrain_query = PhysicsShapeQueryParameters3D.new()
 	var collider := body.get_child(0) as CollisionShape3D
 	_terrain_query.collision_mask = body.collision_mask
 	_terrain_query.shape = collider.shape
-	_terrain_query.transform = (state.transform * collider.transform).translated(motion)
-	return state.get_space_state().collide_shape(_terrain_query, 16)
+	_terrain_query.transform = pose * collider.transform
+	return space.collide_shape(_terrain_query, 16)
 
 func _deepest_contact(points: Array[Vector3]) -> float:
 	var deepest := 0.0
