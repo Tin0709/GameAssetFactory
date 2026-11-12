@@ -48,6 +48,48 @@ func capture_ratio(voice: AudioStreamPlayer3D, capture: AudioEffectCapture) -> f
 	var low := band_power(frames, 1000.0)
 	return band_power(frames, 8000.0) / low if low > 0.00000001 else -1.0
 
+func next_zombie_hit(lab) -> int:
+	var before: int = lab.player_health
+	for i in 180:
+		await physics_frame
+		if lab.player_health < before:
+			return before - lab.player_health
+	return 0
+
+func check_local_hurt(bus: int, capture: AudioEffectCapture) -> void:
+	var lab = preload("res://scenes/dev/MechanicLab.tscn").instantiate()
+	root.add_child(lab)
+	current_scene = lab
+	var audio = lab.get_node("CombatAudio")
+	var toggle := lab.get_node("HUD/CombatAudioToggle") as CheckButton
+	check(not toggle.button_pressed and not audio.enabled and AudioServer.is_bus_mute(0),
+		"The lab starts with the combat mix muted")
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var muted_damage := await next_zombie_hit(lab)
+	check(muted_damage == 6 and audio._next_choice.get(&"player_hurt", 0) == 0,
+		"Zombie damage while muted schedules no hurt sample")
+	toggle.button_pressed = true
+	var local_voice := audio.get_node_or_null("PlayerHurt") as AudioStreamPlayer
+	check(local_voice != null and audio._groups.get(&"player_hurt", []).size() == 3,
+		"Three pinned MD2 player-hurt files decode into a local stereo voice")
+	if local_voice != null:
+		local_voice.bus = AudioServer.get_bus_name(bus)
+		capture.clear_buffer()
+		var heard_damage := await next_zombie_hit(lab)
+		check(heard_damage == 6 and local_voice.playing and local_voice.stream in audio._groups[&"player_hurt"],
+			"Confirmed zombie contact starts the player-hurt voice in the same physics tick")
+		await create_timer(0.16).timeout
+		var peak := 0.0
+		for frame in capture.get_buffer(capture.get_frames_available()):
+			peak = maxf(peak, maxf(absf(frame.x), absf(frame.y)))
+		check(peak > 0.005 and peak < 0.5, "The local hurt cue reaches the mixer with headroom")
+		lab._on_player_hit(lab.player_health)
+		check(lab.player_health == 0 and local_voice.playing, "The final hit plays through the defeat transition")
+		toggle.button_pressed = false
+		check(not local_voice.playing and local_voice.stream == null and AudioServer.is_bus_mute(0),
+			"Turning audio off stops a live player-hurt cue and restores mute")
+	lab.free()
+
 func run() -> void:
 	var camera := Camera3D.new()
 	root.add_child(camera)
@@ -117,6 +159,7 @@ func run() -> void:
 	check(peak > 0.01 and peak < 0.9, "Simultaneous MD2 impact, slam and reactions have mix headroom")
 	audio.set_enabled(false, Vector3.ZERO)
 	await create_timer(0.08).timeout
+	await check_local_hurt(bus, capture)
 	print("MECHANIC_LAB_AUDIO ", JSON.stringify({"checks": checks, "failures": failures,
 		"old_high_low_power_ratio": previous, "new_high_low_power_ratio": revised, "source_mix_peak": peak}))
 	AudioServer.remove_bus_effect(bus, 0)
