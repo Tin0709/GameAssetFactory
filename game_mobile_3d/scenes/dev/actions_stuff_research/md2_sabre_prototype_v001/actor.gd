@@ -531,8 +531,8 @@ func _physics_process(delta:float)->void:
 		var step:=minf(left,1./120.)
 		if combo.active():step=minf(step,maxf(.00000001,combo.boundary_seconds()))
 		_animate(step);left-=step
-	if foot_placement!=null and not _uses_native_jump_pose(active_clip):
-		foot_placement.apply(delta,_grounded,not review_clip.is_empty(),not combo.active() or combo.movement_allowed(),combo.serial)
+	if foot_placement!=null:
+		foot_placement.apply(delta,_grounded,not review_clip.is_empty() or _uses_native_jump_pose(active_clip),not combo.active() or combo.movement_allowed(),combo.serial)
 		_refresh_markers()
 	var soles:Array=direction_adapter.observe_soles(global_position.y,_grounded and review_clip.is_empty() and (not combo.active() or (combo.native_enabled and combo.movement_allowed()))) if direction_adapter!=null else []
 	movement_meter.sample(delta,global_position,desired.length(),_move_requested,_gait_cycles_this_tick,soles)

@@ -25,9 +25,15 @@ const HIT_RADIUS := 0.48
 const CHASE_SPEED := 3.1
 const MELEE_RANGE := 1.36
 const MELEE_RANGE_TOLERANCE := 0.025
-# Honeycomb Farm footage: visible breakup about 4.4–4.9 seconds after the lethal hit.
-const CORPSE_LIFETIME := 4.9
-const CORPSE_DISSOLVE_DURATION := 0.50
+# Honeycomb Farm footage: the silhouette breaks up quickly, then a few
+# remnants linger. The thresholds map that timing onto this shader's noise.
+const CORPSE_LIFETIME := 4.93
+const CORPSE_DISSOLVE_DURATION := 0.48
+const CORPSE_DISSOLVE_KEYS := [
+	Vector2(0.0, 0.0), Vector2(0.067, 0.25), Vector2(0.117, 0.45),
+	Vector2(0.183, 0.60), Vector2(0.25, 0.81), Vector2(0.383, 0.853),
+	Vector2(0.433, 0.90), Vector2(CORPSE_DISSOLVE_DURATION, 1.0),
+]
 const CORPSE_DESATURATION_START := 2.3
 const CORPSE_DESATURATION_END := 3.6
 const HIT_FLASH_DURATION := 0.083
@@ -235,9 +241,19 @@ func _update_corpse_material(remaining: float) -> void:
 			_corpse_material.set_shader_parameter("skin", skin.albedo_texture)
 		_mesh.material_override = _corpse_material
 	var gray := smoothstep(CORPSE_DESATURATION_START, CORPSE_DESATURATION_END, _corpse_age) * 0.80
-	var breakup := 1.0 - clampf(remaining / CORPSE_DISSOLVE_DURATION, 0.0, 1.0)
 	_mesh.set_instance_shader_parameter("desaturation", gray)
-	_mesh.set_instance_shader_parameter("dissolve", breakup)
+	_mesh.set_instance_shader_parameter("dissolve", _corpse_breakup_threshold(remaining))
+
+static func _corpse_breakup_threshold(remaining: float) -> float:
+	var elapsed := CORPSE_DISSOLVE_DURATION - remaining
+	if elapsed <= 0.0:
+		return 0.0
+	for i in range(1, CORPSE_DISSOLVE_KEYS.size()):
+		var next: Vector2 = CORPSE_DISSOLVE_KEYS[i]
+		if elapsed <= next.x:
+			var prior: Vector2 = CORPSE_DISSOLVE_KEYS[i - 1]
+			return remap(elapsed, prior.x, next.x, prior.y, next.y)
+	return 1.0
 
 func _exit_tree() -> void:
 	if is_instance_valid(ragdoll):

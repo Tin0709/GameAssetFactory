@@ -60,7 +60,11 @@ func run() -> void:
 		Engine.physics_ticks_per_second = hz
 		lab.reset_player()
 		var label := " at %d Hz" % hz
-		check(await wait_clip(actor, "Idle", hz), "Reset settles to Idle" + label)
+		for i in 8:
+			await tick()
+			if actor.is_on_floor():
+				break
+		check(actor.is_on_floor() and actor.active_clip == "Idle", "Reset settles on the floor" + label)
 		actor.requested_jump = true
 		check(await wait_clip(actor, "JumpTakeoff", hz), "Space starts takeoff" + label)
 		actor.requested_jump = false
@@ -86,6 +90,11 @@ func run() -> void:
 		check(await wait_clip(actor, "JumpLanding", 2 * hz) and actor.is_on_floor(),
 			"Free-fall landing starts at actual contact" + label)
 		check(await wait_clip(actor, "Idle", hz), "Drop landing returns to Idle" + label)
+
+		check(actor.drop_for_lab(5.0), "Medium drop starts on the floor" + label)
+		check(await wait_clip(actor, "JumpAirborne", 4), "Medium drop enters the same source loop" + label)
+		check(await wait_clip(actor, "JumpLanding", 2 * hz), "Medium drop plays source landing" + label)
+		check(await wait_clip(actor, "Idle", hz), "Medium drop returns to Idle" + label)
 	check(oracle.get("native_jump_pose_enabled") != true, "Shared actor defaults to the existing hybrid jump")
 	print("MECHANIC_LAB_MD2_JUMP ", JSON.stringify({"checks": checks, "failures": failures}))
 	lab.free()
