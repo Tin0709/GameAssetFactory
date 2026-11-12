@@ -164,6 +164,7 @@ func run() -> void:
 	check(not is_instance_valid(zombie), "Corpse is released after its breakup")
 	for slot in 3:
 		await check_combo_finisher(lab, group, slot)
+	await check_sabre_landing_reversal(lab, group)
 	await check_flat_rest_after_tumble(lab, group)
 	await check_flat_contact_jitter(lab, group, 246, 0.28, 0.91, 800.0, 2.2)
 	await check_flat_contact_jitter(lab, group, 264, 0.2, 0.66, 1265.0, 2.9)
@@ -265,6 +266,55 @@ func check_rebound(zombie) -> void:
 			free_flight = true
 			break
 	check(free_flight, "A corpse that rebounds clear of the floor returns to air gravity and drag")
+
+func check_sabre_landing_reversal(lab, group) -> void:
+	lab.reset_player()
+	var selector := lab.get_node("HUD/Weapon") as OptionButton
+	selector.select(0)
+	selector.item_selected.emit(0)
+	lab.get_node("HUD/BaseZombieToggle").button_pressed = false
+	group._spawn_serial = 5
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	await ticks(56)
+	var attack := InputEventKey.new()
+	attack.physical_keycode = KEY_E
+	attack.pressed = true
+	root.push_input(attack, true)
+	for i in 140:
+		if zombie.health == 0:
+			break
+		await physics_frame
+	var release := InputEventKey.new()
+	release.physical_keycode = KEY_E
+	root.push_input(release, true)
+	var previous_height: Dictionary[String, float]
+	var previous_step: Dictionary[String, float]
+	var peak_reversal := 0.0
+	var reached_low_pose := false
+	for i in 120:
+		await physics_frame
+		if zombie._corpse_parked:
+			break
+		if not zombie.ragdoll.running:
+			continue
+		var motion: Dictionary = zombie.ragdoll.contact_motion()
+		if zombie._corpse_landed and motion.supports > 0 and zombie.ragdoll.minimum_corner_y() <= 0.015 \
+				and absf(zombie._corpse_axis().normalized().y) <= 0.25:
+			reached_low_pose = true
+		for name: String in zombie.ragdoll.bodies:
+			var height: float = zombie.ragdoll.bodies[name].global_position.y
+			if previous_height.has(name):
+				var step := height - previous_height[name]
+				var prior := previous_step.get(name, 0.0) as float
+				if reached_low_pose and step * prior < 0.0:
+					peak_reversal = maxf(peak_reversal, absf(step - prior) * 0.5)
+				previous_step[name] = step
+			previous_height[name] = height
+	check(reached_low_pose and peak_reversal < 0.065,
+		"Sabre's grounded finisher avoids large alternating vertical steps after contact")
+	print("SABRE_LANDING_REVERSAL m=", peak_reversal)
+	zombie.free()
 
 func check_flat_rest_after_tumble(lab, group) -> void:
 	group._spawn_serial = 35
