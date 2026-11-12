@@ -48,6 +48,11 @@ func configure_path_light(parameters: PackedByteArray, size: Vector2i, noise: RI
 	_mutex.unlock()
 func snapshot()->Dictionary:
 	_mutex.lock();var copy:=_state.duplicate();_mutex.unlock();return copy
+func near_entry_m() -> float:
+	_mutex.lock()
+	var entry := _parameters.decode_float(12) if _parameters.size() >= 16 else 0.0
+	_mutex.unlock()
+	return entry
 func _report(key:String,value:Variant):
 	_mutex.lock();_state[key]=value;_mutex.unlock()
 func _keep(rid:RID)->RID:

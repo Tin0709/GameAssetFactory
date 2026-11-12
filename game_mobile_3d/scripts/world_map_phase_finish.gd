@@ -2,6 +2,7 @@ extends Node
 ## Owns an original phase bridge, never light/materials or source assets.
 const REFERENCE=preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/local_exposure_v001/local_exposure_effect.gd")
 const SOURCE_REFERENCE=preload("res://scripts/world_map_source_reference.gd")
+const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
 const PROFILE="godot_lab/world_map_unified_showcase_v001/native_exposure_transfer_v001/parameters_v002.private.json"
 const SHA="c82d5489028813cdd1a2061d845fabca43789112e2a96e67dfe8eba80f8c71a3"
 var showcase:Node
@@ -135,7 +136,7 @@ func _publish_humid_light(effect: CompositorEffect) -> void:
  var strength: float = showcase._lighting_scale(&"humid_light")
  var from_noon := absf(fposmod(showcase.hour, 24.) - 12.)
  var amount := strength * smoothstep(.25, 2.5, from_noon)
- if amount <= 0. or level.view_mode != "gameplay" or not showcase.mist.visible:
+ if amount <= 0. or level.view_mode != "gameplay" or showcase.mist == null or not showcase.mist.visible:
   effect.set_humid_light(0.)
   return
  var camera: Camera3D = level.get_viewport().get_camera_3d()
@@ -146,7 +147,16 @@ func _publish_humid_light(effect: CompositorEffect) -> void:
   return
  var center := camera.unproject_position(actor) / extent
  var inverse_radius := camera.size / .69
- effect.set_humid_light(amount, Vector4(center.x, center.y, extent.aspect() * inverse_radius, .67 * inverse_radius))
+ var protection := Vector4(center.x, center.y, extent.aspect() * inverse_radius, .67 * inverse_radius)
+ var hour: float = fposmod(showcase.hour, 24.)
+ var daylight := smoothstep(5.5, 7., hour) * (1. - smoothstep(18., 19.5, hour))
+ var placement: float = showcase._lighting_scale(&"humid_depth") * daylight
+ if placement > 0. and DepthDiffusion.supported(level.get_viewport()):
+  var mist: CompositorEffect = showcase.mist.effect
+  var settings := DepthDiffusion.parameters(camera, actor, mist.near_entry_m(), placement)
+  effect.set_humid_light(amount, protection, settings, mist)
+ else:
+  effect.set_humid_light(amount, protection)
 func _process(_delta:float)->void:
  refresh()
  if toggle!=null:toggle.set_pressed_no_signal(requested)

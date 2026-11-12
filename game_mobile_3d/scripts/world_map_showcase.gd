@@ -9,6 +9,7 @@ const CrownWind := preload("res://scripts/world_map_crown_wind.gd")
 const DirectionalAir := preload("res://scripts/world_map_directional_air.gd")
 const PlayerContact := preload("res://scripts/world_map_player_contact.gd")
 const ProjectedSun := preload("res://scripts/world_map_projected_sun.gd")
+const DepthDiffusion := preload("res://scripts/world_map_depth_diffusion.gd")
 const LOCAL_EXPOSURE_STRENGTH:=.12
 # User-directed art adjustment; recovered Forest profiles stay untouched.
 const GENTLE_NOON_DIRECT_SCALE:=.82
@@ -98,13 +99,14 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"humid_light": ["Humid light diffusion", 1.],
+	&"humid_depth": ["Diffusion by depth (preview)", 1.],
 	&"tree_wind": ["Tree canopy wind", CrownWind.MAX_STRENGTH],
 	&"night_path_chroma": ["Night path color", 1.],
 	&"exposure": ["Local exposure", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 33
+const LIGHTING_MIX_VERSION := 34
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -805,7 +807,7 @@ func _lighting_scale_default(effect: StringName) -> float:
 		return .65
 	if effect in [&"forest_path_light", &"forest_near_scatter", &"grass_shade_color", &"stone_twilight_color"]:
 		return .7
-	if effect == &"humid_light":
+	if effect in [&"humid_light", &"humid_depth"]:
 		return 0.
 	if effect == &"sunlit_mist":
 		return 0.
@@ -982,7 +984,7 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 	if error != OK:
 		return error
 	var version: Variant = config.get_value("recipe", "version", 0)
-	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, LIGHTING_MIX_VERSION]:
+	if version not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, LIGHTING_MIX_VERSION]:
 		return ERR_FILE_UNRECOGNIZED
 	var restored := {}
 	for effect: StringName in LIGHTING_MIX_CONTROLS:
@@ -1039,6 +1041,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 33 and effect == &"projected_sun":
 			missing_value = 0.
+		if version < 34 and effect == &"humid_depth":
+			missing_value = 0.
 		if (version < 13 and effect == &"near_haze_depth") or (version < 5 and effect == &"near_haze"):
 			missing_value = 0.
 		var value: Variant = config.get_value("strengths", String(effect), missing_value)
@@ -1066,11 +1070,17 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and player_contact.available()
 		if effect == &"projected_sun":
 			slider.editable = slider.editable and projected_sun.available()
+		if effect == &"humid_depth":
+			slider.editable = slider.editable and DepthDiffusion.supported(level.get_viewport())
 		var scale := _lighting_scale(effect)
 		slider.set_value_no_signal(scale)
 		slider.get_meta("readout").text = "%d%%" % roundi(scale * 100.)
 	if changed_effect == &"projected_sun":
 		refresh_projected_sun()
+		return
+	if changed_effect in [&"humid_light", &"humid_depth"]:
+		if phase_finish != null:
+			phase_finish.refresh()
 		return
 	if changed_effect in [&"", &"tree_wind"] and level != null and level.look != null:
 		level.look._publish_crown_wind()
@@ -1119,7 +1129,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect in [&"near_haze", &"near_haze_depth", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light"]:
 		_update_mist()
 		return
-	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_shadow_reach", &"spruce_sky", &"humid_light"]:
+	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_shadow_reach", &"spruce_sky"]:
 		return
 	if changed_effect in [&"player_sky", &"player_bounce"]:
 		if level.player_light != null:
@@ -1307,6 +1317,9 @@ func compare_baseline()->void:
 		level.look.set_stage(2);_capture_day();apply_time()
 
 func _update_shape_control()->void:
+	var depth_slider: HSlider = _lighting_sliders.get(&"humid_depth")
+	if depth_slider != null:
+		depth_slider.editable = not _balanced_preview and DepthDiffusion.supported(level.get_viewport())
 	if _lantern_dawn_toggle!=null:
 		_lantern_dawn_toggle.disabled=not point_response.dawn_available() or phase_air.anchors.is_empty() or not forest.available()
 		_lantern_dawn_toggle.set_pressed_no_signal(captured_lantern_dawn)
@@ -1494,6 +1507,9 @@ func _build_lighting_mix(box: VBoxContainer) -> void:
 			slider.tooltip_text = "Adjust the base glow radius independently of Bloom brightness. Leaves the approved noon look intact."
 		if effect == &"humid_light":
 			slider.tooltip_text = "Soften lit areas into the surrounding haze. Try 65% at 16:30. Requires Combined mist and the Mobile Forest finish. Noon keeps its approved look."
+		if effect == &"humid_depth":
+			slider.editable = DepthDiffusion.supported(level.get_viewport())
+			slider.tooltip_text = "At 100%, move Humid light diffusion from near surfaces to the distant mist. Try Humid light diffusion at 65% and time 16:30. Preview requires D3D12 Mobile and 2× MSAA."
 		if effect == &"tree_wind":
 			slider.tooltip_text = "Adjust sway for the source oaks and spruces. 100% is the previous response, 125% is the new default. Alt+N toggles sway."
 		if effect == &"night_path_chroma":
