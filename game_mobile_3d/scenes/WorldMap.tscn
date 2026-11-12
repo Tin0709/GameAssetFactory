@@ -27,6 +27,7 @@ additional_lighting_mixes = Array[ExtResource("mix_type")]([ExtResource("night_m
 projected_sun_shift = Vector2(0, 6)
 sculk_surface_sites = PackedVector2Array(-22, 15, -23, 19, -24, 23, -24, 26)
 forest_path_light_offset = Vector2(-9.6, 2.3)
+forest_replay_site = Vector2(-27.5, 8.5)
 
 [node name="Ground" parent="."]
 collision_layer = 0
