@@ -1,5 +1,5 @@
 extends Node
-## Native skeletal adapter with optional contact recovery for a flat lab floor.
+## Native skeletal adapter with contact recovery for the lab floor and authored terrain.
 const PHYSICAL_PART = preload("res://scenes/dev/zombie_death_physics/physical_part.gd")
 const PARTS := [
 	# name, Skeleton Y-up rest center, inset box, kg, bend°, twist°
@@ -15,6 +15,12 @@ const PARENTS := {"Chest": "Hips", "Head": "Chest", "Arm.L": "Chest", "Arm.R": "
 const FLOOR_CONTACT_SLOP := 0.005
 const FLOOR_REST_SLOP := 0.012
 const MIN_SUPPORT_NORMAL_Y := 0.5
+const TERRAIN_MIN_FALL_SPEED := 2.0
+const TERRAIN_MIN_SUPPORT_Y := 0.85
+const TERRAIN_MIN_OVERLAP := 0.035
+const TERRAIN_RESIDUAL_OVERLAP := 0.018
+const CONE_DEFAULT_BIAS := 0.30
+const CONE_OVERSHOOT_BIAS := 0.10
 # SK_Zombie_PhysicsAsset enables linear projection with a 5 cm tolerance.
 const SOURCE_ANCHOR_TOLERANCE := 0.05
 const PROJECTION_COLLISION_MARGIN := 0.001
@@ -42,6 +48,7 @@ var source_joints: Dictionary
 var source_joint_rids: Dictionary[String, RID]
 var _flat_floor: CollisionShape3D
 var _pose_correction_frame := -1
+var _terrain_query: PhysicsShapeQueryParameters3D
 var _projection_query: PhysicsTestMotionParameters3D
 var _projection_hit: PhysicsTestMotionResult3D
 # (Nm/rad, Nms/rad): soft restoring torque plus relative angular damping.
@@ -307,6 +314,8 @@ func _correct_physical_pose() -> void:
 	_pose_correction_frame = frame
 	if is_instance_valid(_flat_floor) and not _flat_floor.disabled:
 		_project_floor_contact()
+	elif not source_joint_rids.is_empty():
+		_project_terrain_contact()
 	if not source_joint_rids.is_empty():
 		_project_source_anchors()
 
@@ -317,10 +326,18 @@ func _project_source_anchors() -> void:
 		var parent: PhysicalBone3D = bodies[spec.parent]
 		var state := PhysicsServer3D.body_get_direct_state(child.get_rid())
 		var parent_state := PhysicsServer3D.body_get_direct_state(parent.get_rid())
-		if state == null or parent_state == null or state.get_contact_count() > 0:
+		if state == null or parent_state == null:
 			continue
-		var correction: Vector3 = (parent_state.transform * spec.parent_frame).origin \
-			- (state.transform * spec.child_frame).origin
+		var parent_frame: Transform3D = parent_state.transform * spec.parent_frame
+		var child_frame: Transform3D = state.transform * spec.child_frame
+		# Godot's cone solver flips its swing axis past perpendicular. Reduce
+		# the angular correction there so an impact does not wrench the anchor apart.
+		var overshot := child_frame.basis.x.dot(parent_frame.basis.x) <= 0.0
+		var bias := CONE_OVERSHOOT_BIAS if overshot else CONE_DEFAULT_BIAS
+		PhysicsServer3D.cone_twist_joint_set_param(source_joint_rids[name], PhysicsServer3D.CONE_TWIST_JOINT_BIAS, bias)
+		if state.get_contact_count() > 0:
+			continue
+		var correction := parent_frame.origin - child_frame.origin
 		var distance := correction.length()
 		if distance <= SOURCE_ANCHOR_TOLERANCE:
 			continue
@@ -338,6 +355,65 @@ func _project_source_anchors() -> void:
 			motion *= _projection_hit.get_collision_safe_fraction()
 		if not motion.is_zero_approx():
 			state.transform = state.transform.translated(motion)
+
+func _project_terrain_contact() -> void:
+	if _terrain_query == null:
+		_terrain_query = PhysicsShapeQueryParameters3D.new()
+	var lift := 0.0
+	var deepest: PhysicalBone3D
+	for part in _parts:
+		var body: PhysicalBone3D = bodies[part[0]]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			continue
+		var velocity := state.linear_velocity
+		var fall_speed := -velocity.y
+		# Godot's linear CCD slows individual parts on contact. Keep it for
+		# horizontal travel and let the whole-body projection handle steep falls.
+		var steep_fall := fall_speed > TERRAIN_MIN_FALL_SPEED and fall_speed > Vector2(velocity.x, velocity.z).length()
+		PhysicsServer3D.body_set_enable_continuous_collision_detection(body.get_rid(), not steep_fall)
+		if fall_speed <= TERRAIN_MIN_FALL_SPEED:
+			continue
+		var points := _terrain_contact_points(body, state, Vector3.ZERO)
+		for i in range(0, points.size(), 2):
+			var offset := points[i + 1] - points[i]
+			var depth := offset.length()
+			if offset.y < TERRAIN_MIN_OVERLAP or offset.y < depth * TERRAIN_MIN_SUPPORT_Y:
+				continue
+			# Keep contact for the next solve and bound the lift by one step of travel.
+			var step_lift := minf((depth - TERRAIN_RESIDUAL_OVERLAP) * depth / offset.y, fall_speed * state.step)
+			if step_lift > lift:
+				lift = step_lift
+				deepest = body
+	if deepest == null:
+		return
+	var motion := Vector3.UP * lift
+	for body: PhysicalBone3D in bodies.values():
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null:
+			return
+		var before := _deepest_contact(_terrain_contact_points(body, state, Vector3.ZERO))
+		var after := _deepest_contact(_terrain_contact_points(body, state, motion))
+		# Reject a lift into an adjacent ledge or one that leaves the worst contact unchanged.
+		if after > maxf(before, FLOOR_CONTACT_SLOP) + PROJECTION_COLLISION_MARGIN \
+				or (body == deepest and after >= before - FLOOR_CONTACT_SLOP):
+			return
+	for body: PhysicalBone3D in bodies.values():
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		state.transform = state.transform.translated(motion)
+
+func _terrain_contact_points(body: PhysicalBone3D, state: PhysicsDirectBodyState3D, motion: Vector3) -> Array[Vector3]:
+	var collider := body.get_child(0) as CollisionShape3D
+	_terrain_query.collision_mask = body.collision_mask
+	_terrain_query.shape = collider.shape
+	_terrain_query.transform = (state.transform * collider.transform).translated(motion)
+	return state.get_space_state().collide_shape(_terrain_query, 16)
+
+func _deepest_contact(points: Array[Vector3]) -> float:
+	var deepest := 0.0
+	for i in range(0, points.size(), 2):
+		deepest = maxf(deepest, points[i].distance_to(points[i + 1]))
+	return deepest
 
 func _project_floor_contact() -> void:
 	var floor_box := _flat_floor.shape as BoxShape3D
