@@ -1,7 +1,7 @@
 extends Node3D
 ## Spawn and hit routing for private MD2 zombies in MechanicLab.
 
-signal sabre_contact(point: Vector3, direction: Vector3)
+signal sabre_contact(point: Vector3, direction: Vector3, clip: String, index: int, serial: int, lethal: bool)
 
 const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
@@ -114,7 +114,7 @@ func sample_sabre(index: int, clip: String, source_time: float, base: Vector3, t
 			var direction := zombie.global_position - zombie.target.global_position
 			_hit_targets[id] = true
 			zombie.take_hit(SABRE_DAMAGE[clampi(index, 0, SABRE_DAMAGE.size() - 1)], direction)
-			sabre_contact.emit(contact, direction.normalized())
+			sabre_contact.emit(contact, direction.normalized(), clip, index, serial, zombie.health <= 0)
 	_previous_base = base
 	_previous_tip = tip
 
