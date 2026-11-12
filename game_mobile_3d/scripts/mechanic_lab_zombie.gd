@@ -13,6 +13,7 @@ const HEIGHT := 1.95
 const HIT_RADIUS := 0.48
 const CHASE_SPEED := 3.1
 const MELEE_RANGE := 1.36
+const MELEE_RANGE_TOLERANCE := 0.025
 const CORPSE_LIFETIME := 2.0
 
 # Fit the existing seven-body solver to the verified SK_Zombie bind mesh.
@@ -123,7 +124,7 @@ func _chase_velocity(delta: float) -> Vector3:
 	var distance := offset.length()
 	if distance > 0.01:
 		rotation.y = lerp_angle(rotation.y, atan2(offset.x, offset.z), minf(delta * 10.0, 1.0))
-	if distance > MELEE_RANGE:
+	if distance > MELEE_RANGE + MELEE_RANGE_TOLERANCE:
 		_play_loop(_walk_clip)
 		return offset.normalized() * minf(CHASE_SPEED, (distance - MELEE_RANGE) / delta)
 	if height_delta < 1.15 and _attack_cooldown <= 0.0:
