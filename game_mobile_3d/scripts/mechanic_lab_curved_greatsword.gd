@@ -33,10 +33,13 @@ static func load_mesh(actor: CharacterBody3D, research_root: String) -> Mesh:
 	return Sword.load_verified_mesh(actor, research_root, SOURCE + "Equipment/Weapons/CurvedGreatsword/",
 		"CurvedGreatsword", MESH_HASH, TEXTURE_HASH)
 
-static func combat_profile(sabre: Dictionary, research_root: String) -> Dictionary:
-	var profile := sabre.duplicate(true)
-	profile.windows = []
-	profile.additional_clips = []
+static func combat_profile(research_root: String) -> Dictionary:
+	var profile := {
+		"schema": "md2-private-sabre-combat/1",
+		"input": {"ground_policy": "live_hold", "event_evaluation_hz": 60.0},
+		"leg_branches": ["J_L_Leg", "J_R_Leg"], "blend_seconds": 0.08,
+		"windows": [], "additional_clips": [],
+	}
 	for i in ATTACK_FRAMES.size():
 		var stem := "Player_CurvedGreatswordCombo_Attack%d" % (i + 1)
 		var attack := "NativeCurvedAttack%d" % (i + 1)

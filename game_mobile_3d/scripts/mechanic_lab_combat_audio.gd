@@ -5,6 +5,7 @@ const ReferenceAudio := preload("res://scenes/dev/actions_stuff_research/md2_sab
 const SOURCE := "extracted/2026-10-26 12-46-42/Game/Spicewood/Audio/Wwise/Events/Spicewood"
 const SABRE := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_sabre_hitmarker_%02d.ogg"
 const SWORD := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_weapon_hitmarker_sword_%02d.ogg"
+const CURVED := "Items/Weapons/Weapon_Melee/5_weapons_melee_hitmarkers/sfx_hitmarker_curvedGreatsword-%03d.ogg"
 const HEAVY_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttack/sfx_sword_jump_attack_heavy_Hit_%02d.ogg"
 const GRASS_LANDING := "Items/Weapons/Weapon_Melee/7_weapons_melee_heavyJumpAttack/weapons_melee_heavyJumpAttackDebris/sfx_HJA_impact debris_Grass_%02d.ogg"
 const ZOMBIE := "Mobs/Mob_Hostile/MobType1/Zombie/sfx_mob_zombieVariant1%s_%02d.ogg"
@@ -32,6 +33,11 @@ const SWORD_HIT_HASHES := [
 	"f48696a70b3c38480811492cc570c17c7ef08bbe0c684f586341f7f09947de31",
 	"57522a414b5ea426b73c2c8d24198bc42d60fbd6d4d48421388640709dd4f4b1",
 	"6e6a712c4d47ae32cbb1cc1828004fb53a3494a9446eead9c66eecdfa9740bf8",
+]
+const CURVED_HIT_HASHES := [
+	"522fcced9d4d8fc2f95934649f7a7841f1adfcf94886ce6e7ab6369f22239e83",
+	"83e50a2ac88ad0c49cc82b86e13d2c0b24b9d48ea04880132debe130e76bcfe2",
+	"ccfaa913edee16fa4fcd803855303e71c9a272bc0ff0900a6f1ff54de74c7738",
 ]
 const HURT_HASHES := [
 	"fa84b833daecb58d0f95b6470393732c7f66ef33bb5e27d1b869322586a3fa12",
@@ -76,6 +82,7 @@ const ZOMBIE_HIT_HASHES := [
 
 var enabled := false
 var sword_equipped := false
+var curved_equipped := false
 var _groups: Dictionary[StringName, Array] = {}
 var _voices: Array[AudioStreamPlayer3D] = []
 var _player_hurt_voice: AudioStreamPlayer
@@ -98,7 +105,7 @@ func set_enabled(value: bool, preview_point: Vector3) -> void:
 	_master_was_muted = AudioServer.is_bus_mute(0)
 	if _master_was_muted:
 		AudioServer.set_bus_mute(0, false)
-	_play(&"sword_hit" if sword_equipped else &"hit", preview_point, HIT_GAIN_DB)
+	_play(_weapon_hit_group(), preview_point, HIT_GAIN_DB)
 
 func _restore_master() -> void:
 	if _master_was_muted:
@@ -113,8 +120,13 @@ func contact(point: Vector3, serial: int, lethal: bool) -> void:
 		return
 	if serial != _last_weapon_serial:
 		_last_weapon_serial = serial
-		_play(&"sword_hit" if sword_equipped else &"hit", point, HIT_GAIN_DB)
+		_play(_weapon_hit_group(), point, HIT_GAIN_DB)
 	_play(&"death" if lethal else &"hurt", point, DEATH_GAIN_DB if lethal else HURT_GAIN_DB)
+
+func _weapon_hit_group() -> StringName:
+	if curved_equipped:
+		return &"curved_hit"
+	return &"sword_hit" if sword_equipped else &"hit"
 
 func slam_landed(point: Vector3) -> void:
 	if not enabled:
@@ -171,6 +183,8 @@ func _load_audio() -> void:
 		_load_sample(root, &"hit", SABRE % (i + 1), HIT_HASHES[i])
 	for i in SWORD_HIT_HASHES.size():
 		_load_sample(root, &"sword_hit", SWORD % (i + 1), SWORD_HIT_HASHES[i])
+	for i in CURVED_HIT_HASHES.size():
+		_load_sample(root, &"curved_hit", CURVED % (i + 1), CURVED_HIT_HASHES[i])
 	for i in HURT_HASHES.size():
 		_load_sample(root, &"hurt", ZOMBIE % ["Hurt", i + 1], HURT_HASHES[i])
 	for i in DEATH_HASHES.size():

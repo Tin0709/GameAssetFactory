@@ -225,7 +225,7 @@ func _load_weapon(index: int) -> bool:
 	_curved_mesh = CurvedGreatsword.load_mesh(player, research_root)
 	if _curved_mesh == null:
 		return false
-	var profile := CurvedGreatsword.combat_profile(_sabre_profile, research_root)
+	var profile := CurvedGreatsword.combat_profile(research_root)
 	player._load_private_combat_clips(profile, CurvedGreatsword.LIBRARY)
 	if not player.animation_player.has_animation_library(CurvedGreatsword.LIBRARY):
 		return false

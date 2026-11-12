@@ -58,6 +58,21 @@ const SWORD_STRIKES := [
 	},
 ]
 const SWORD_AIR_STRIKE := {"damage": 24, "range_m": 2.5, "strength": 1150.0, "angle": 25.0, "stagger": 37.5}
+# DT_MeleePropertyDefinition: CurvedGreatsword_1 through CurvedGreatsword_3.
+const CURVED_STRIKES := [
+	{
+		"damage": 20, "range_m": 2.0, "strength": 650.0, "angle": 25.0, "stagger": 25.0,
+		"cone_degrees": 60.0, "cone_offset": -1.8, "cone_cutoff": 1.0,
+	},
+	{
+		"damage": 20, "range_m": 2.5, "strength": 650.0, "angle": 25.0, "stagger": 25.0,
+		"cone_degrees": 60.0, "cone_offset": -1.0, "cone_cutoff": 1.0,
+	},
+	{
+		"damage": 30, "range_m": 5.0, "strength": 800.0, "angle": 25.0, "stagger": 45.0,
+		"cone_degrees": 180.0, "cone_offset": 0.0, "cone_cutoff": 0.25,
+	},
+]
 const GROUND_HEIGHT_LIMIT := 2.1
 const AIR_CENTRE_OFFSET := 1.5
 const AIR_PRIMARY_RANGE := 1.5
@@ -72,6 +87,7 @@ const MELEE_CONTACT_HEIGHT := Vector3.UP * (Zombie.HEIGHT * 0.5)
 
 var _visual: PackedScene
 var sword_equipped := false
+var curved_equipped := false
 var _physics_profile: Dictionary
 var _digits: Array[Texture2D]
 var _spawn_serial := 0
@@ -172,6 +188,8 @@ func _melee_ray(origin: Vector3) -> PhysicsRayQueryParameters3D:
 	return ray
 
 func _strikes() -> Array:
+	if curved_equipped:
+		return CURVED_STRIKES
 	return SWORD_STRIKES if sword_equipped else SABRE_STRIKES
 
 func strike_sabre(index: int, clip: String, serial: int) -> void:
@@ -256,7 +274,7 @@ func land_sabre(position: Vector3, facing: Vector3, serial: int, fall_height: fl
 
 func _apply_contact(zombie: Zombie, point: Vector3, clip: String, index: int, serial: int, strike: Dictionary, forward: Vector3, splash: bool) -> void:
 	var air_attack := clip == "AirAttack"
-	var sabre_finisher := index == 2 and not sword_equipped and not air_attack
+	var sabre_finisher := index == 2 and not sword_equipped and not curved_equipped and not air_attack
 	var radial := air_attack or sabre_finisher
 	var direction := zombie.global_position - _attacker.global_position if radial else forward
 	direction.y = 0.0
