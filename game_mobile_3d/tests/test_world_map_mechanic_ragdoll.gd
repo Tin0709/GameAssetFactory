@@ -77,11 +77,13 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 		return
 	var first_landing := -1
 	var chest_height := INF
+	var worst_anchor := 0.0
 	var ledge_contact := false
 	for frame in 72:
 		await physics_frame
 		if not zombie.ragdoll.running:
 			continue
+		worst_anchor = maxf(worst_anchor, zombie.ragdoll.max_anchor_error())
 		var chest: PhysicalBone3D = zombie.ragdoll.bodies.Chest
 		chest_height = minf(chest_height, chest.global_position.y)
 		for name in ["Head", "Chest"]:
@@ -95,7 +97,8 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 			first_landing = frame
 	check(first_landing > 25 and first_landing < 55 and ledge_contact and chest_height < 6.0,
 		"The corpse crosses the authored ledge and contacts the lower terrain")
-	print("WORLDMAP_LEDGE landing=", first_landing, " minimum_chest_y=", chest_height)
+	check(worst_anchor < 0.085, "The first impact on the lower terrace keeps the limb anchors connected")
+	print("WORLDMAP_LEDGE landing=", first_landing, " minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor)
 	zombie.free()
 
 func run() -> void:
