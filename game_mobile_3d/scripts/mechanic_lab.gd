@@ -137,7 +137,7 @@ func _set_combat_audio(enabled: bool) -> void:
 		return
 	if player.reference_audio != null:
 		player.reference_audio.enabled = enabled
-	_combat_audio.set_enabled(enabled)
+	_combat_audio.set_enabled(enabled, player.global_position + Vector3.UP)
 
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, lethal: bool) -> void:
 	player.effects.contact(point, direction)

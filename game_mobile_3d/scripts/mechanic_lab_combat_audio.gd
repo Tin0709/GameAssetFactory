@@ -35,13 +35,33 @@ var _voices: Array[AudioStreamPlayer3D] = []
 var _next_choice: Dictionary[StringName, int] = {}
 var _next_voice := 0
 var _last_weapon_serial := -1
+var _master_was_muted := false
 
-func set_enabled(value: bool) -> void:
+func set_enabled(value: bool, preview_point: Vector3) -> void:
+	if enabled == value:
+		return
 	enabled = value
 	if not enabled:
 		reset()
-	elif _voices.is_empty():
+		_restore_master()
+		return
+	if _voices.is_empty():
 		_load_audio()
+	if _groups.is_empty():
+		return
+	# The project starts with Master muted for quiet tests.
+	_master_was_muted = AudioServer.is_bus_mute(0)
+	if _master_was_muted:
+		AudioServer.set_bus_mute(0, false)
+	_play(&"hit", preview_point, -8.0)
+
+func _restore_master() -> void:
+	if _master_was_muted:
+		AudioServer.set_bus_mute(0, true)
+		_master_was_muted = false
+
+func _exit_tree() -> void:
+	_restore_master()
 
 func contact(point: Vector3, serial: int, lethal: bool) -> void:
 	if not enabled:
