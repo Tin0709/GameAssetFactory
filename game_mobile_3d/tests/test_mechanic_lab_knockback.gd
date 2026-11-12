@@ -85,11 +85,57 @@ func run() -> void:
 		await physics_frame
 	check(lab.player_health == player_hp - 6, "The active attack can still connect if the player stays in reach")
 	zombie.free()
+	await check_sword_finisher_push(lab, group)
 	await check_crowd(lab, group)
 	lab.free()
 	print("MECHANIC_LAB_KNOCKBACK first_chase_step=", first_chase_step,
 		" travel=", furthest - at_contact, " failures=", failures)
 	quit(0 if failures.is_empty() else 1)
+
+func check_sword_finisher_push(lab, group) -> void:
+	lab.reset_player()
+	var selector := lab.get_node("HUD/Weapon") as OptionButton
+	selector.select(1)
+	selector.item_selected.emit(1)
+	lab.get_node("HUD/SpawnZombie").pressed.emit()
+	var zombie = group.get_child(0)
+	zombie.health = 100
+	zombie.max_health = 100
+	await ticks(roundi(Engine.physics_ticks_per_second * 56.0 / 60.0))
+	var hits: Array[Dictionary] = []
+	var record := func(_point, direction, clip, index, _serial, _lethal):
+		if index == 2:
+			hits.append({"origin": zombie.global_position, "direction": direction, "clip": clip,
+				"frame": Engine.get_physics_frames()})
+	group.sabre_contact.connect(record)
+	attack(true)
+	for frame in ceili(Engine.physics_ticks_per_second * 3.0):
+		await physics_frame
+		if not hits.is_empty():
+			break
+	attack(false)
+	group.sabre_contact.disconnect(record)
+	check(hits.size() == 1 and zombie.health == 48, "Actual Sword combo leaves a living target on the third hit")
+	if not hits.is_empty():
+		var hit := hits[0]
+		var travel := 0.0
+		var stop_time := INF
+		var remaining_lock := 0.0
+		for frame in ceili(Engine.physics_ticks_per_second * 0.45):
+			await physics_frame
+			var displacement: Vector3 = zombie.global_position - hit.origin
+			travel = maxf(travel, displacement.dot(hit.direction))
+			if zombie._knockback.is_zero_approx():
+				stop_time = float(Engine.get_physics_frames() - hit.frame) / Engine.physics_ticks_per_second
+				remaining_lock = zombie._knockback_control_left
+				break
+		check(hit.clip == "Attack3" and stop_time >= 0.18 and stop_time <= 0.22 and remaining_lock > 0.14,
+			"Sword's living target finishes its outward push while movement control is still locked")
+		check(travel > 0.73 and travel < 0.79, "Sword's finisher keeps its calibrated outward travel")
+		print("MECHANIC_LAB_SWORD_PUSH stop=", stop_time, " travel=", travel, " lock_left=", remaining_lock)
+	zombie.free()
+	selector.select(0)
+	selector.item_selected.emit(0)
 
 func check_crowd(lab, group) -> void:
 	lab.reset_player()
