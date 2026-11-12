@@ -32,13 +32,17 @@ var joint_rest_rotations: Dictionary = {}
 var resistance_gain := 0.0
 var resistance_age := 0.0
 var _parts: Array = PARTS
+var source_joints: Dictionary
+var source_joint_rids: Dictionary[String, RID]
 # (Nm/rad, Nms/rad): soft restoring torque plus relative angular damping.
 const JOINT_RESPONSE := {"Chest": Vector2(18,5.4), "Head": Vector2(4,2.4), "Arm.L": Vector2(3,2.1), "Arm.R": Vector2(3,2.1), "Leg.L": Vector2(6,2.7), "Leg.R": Vector2(6,2.7)}
 
-func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {}) -> void:
+func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionary = {},
+		body_offsets: Dictionary = {}, authored_joints: Dictionary = {}) -> void:
 	set_physics_process(false)
 	skeleton = target
 	_parts = part_layout
+	source_joints = authored_joints
 	# Reject unsupported rigs instead of quietly binding the wrong bones/scale.
 	assert(skeleton.global_basis.get_scale().is_equal_approx(Vector3.ONE), "Ragdoll requires unit-scale hierarchy")
 	simulator = PhysicalBoneSimulator3D.new()
@@ -53,7 +57,8 @@ func setup(target: Skeleton3D, part_layout: Array = PARTS, bone_names: Dictionar
 		body.set_script(PHYSICAL_PART)
 		body.name = "Corpse_" + part[0]
 		body.set("bone_name", bone_name)
-		body.body_offset = skeleton.get_bone_global_rest(id).affine_inverse() * Transform3D(Basis.IDENTITY, part[1])
+		body.body_offset = body_offsets.get(part[0],
+			skeleton.get_bone_global_rest(id).affine_inverse() * Transform3D(Basis.IDENTITY, part[1]))
 		body.mass = part[3]
 		body.friction = 0.75
 		body.bounce = 0.0
@@ -109,6 +114,10 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 		inherited[part[0]] = {"linear": velocity, "angular": angular}
 		body.linear_velocity = velocity
 		body.angular_velocity = angular
+	if not source_joints.is_empty():
+		_build_source_joints()
+		apply_impact(profile, direction, location, distance)
+		return true
 	# Rebuild frames only AFTER every body has the current pose. Native parent frame
 	# is computed from this exact pose, accommodating animated bone translations.
 	# Limits are relative to the captured pose; no rest-pose projection/correction.
@@ -134,6 +143,21 @@ func begin(profile: Resource, direction: Vector3, location: String, distance: fl
 	set_physics_process(resistance_gain > 0.0)
 	apply_impact(profile, direction, location, distance)
 	return true
+
+func _build_source_joints() -> void:
+	# PhysicalBone3D's automatic joint follows the Skeleton3D hierarchy and
+	# derives one frame from the current pose. MD2 legs connect to J_Spine,
+	# so supply both authored frames to the Godot physics server explicitly.
+	for child_name: String in source_joints:
+		var spec: Dictionary = source_joints[child_name]
+		var child: PhysicalBone3D = bodies[child_name]
+		var parent: PhysicalBone3D = bodies[spec.parent]
+		var joint := PhysicsServer3D.joint_create()
+		PhysicsServer3D.joint_make_cone_twist(joint, parent.get_rid(), spec.parent_frame,
+			child.get_rid(), spec.child_frame)
+		PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_SWING_SPAN, deg_to_rad(spec.swing))
+		PhysicsServer3D.cone_twist_joint_set_param(joint, PhysicsServer3D.CONE_TWIST_JOINT_TWIST_SPAN, deg_to_rad(spec.twist))
+		source_joint_rids[child_name] = joint
 
 func _physics_process(delta: float) -> void:
 	if not running: return
@@ -237,6 +261,13 @@ func nearest_part(world_point: Vector3) -> PhysicalBone3D:
 
 func max_anchor_error() -> float:
 	var result := 0.0
+	for child_name: String in source_joint_rids:
+		var spec: Dictionary = source_joints[child_name]
+		var child: PhysicalBone3D = bodies[child_name]
+		var parent: PhysicalBone3D = bodies[spec.parent]
+		var child_frame: Transform3D = child.global_transform * spec.child_frame
+		var parent_frame: Transform3D = parent.global_transform * spec.parent_frame
+		result = maxf(result, child_frame.origin.distance_to(parent_frame.origin))
 	for name in anchors:
 		var child: PhysicalBone3D = bodies[name]
 		var parent: PhysicalBone3D = bodies[PARENTS[name]]
@@ -278,6 +309,9 @@ func release(visible_world_pose: Array[Transform3D] = []) -> void:
 	for world_pose in visible_world_pose: pose.append(skeleton.global_transform.affine_inverse()*world_pose)
 	set_physics_process(false)
 	running = false
+	for joint: RID in source_joint_rids.values():
+		PhysicsServer3D.free_rid(joint)
+	source_joint_rids.clear()
 	if is_instance_valid(simulator):
 		simulator.physical_bones_stop_simulation()
 		simulator.active = false

@@ -9,6 +9,8 @@ const Zombie := preload("res://scripts/mechanic_lab_zombie.gd")
 const Feedback := preload("res://scripts/mechanic_lab_zombie_feedback.gd")
 const SOURCE_DIR := "extracted/2026-10-25 19-26-25/Game/Spicewood"
 const ZOMBIE_DIR := "Art/Characters/Enemies/Zombie"
+const PHYSICS_PROFILE_PATH := "reports/combat/observations/zombie_physics_asset_20261112.private.json"
+const PHYSICS_PROFILE_HASH := "e0d671c88b3763828679b45ebc0cd084ba0a8ce13060beb757a33b4c329832b2"
 const CLIP_HASHES := {
 	&"Zombie_Idle": "e55529262e3f6f93e07e5a89f50c0e6dcf8375984285d48d5064475132659f0f",
 	&"Zombie_Spawn": "c21a5172d02ec26d6b834902fe546f2f461fcb167d6d60d65d07b22c7e592c74",
@@ -52,6 +54,7 @@ const IMPULSE_PER_STRENGTH := 0.43
 const MELEE_CONTACT_HEIGHT := Vector3.UP * (Zombie.HEIGHT * 0.5)
 
 var _visual: PackedScene
+var _physics_profile: Dictionary
 var _digits: Array[Texture2D]
 var _spawn_serial := 0
 var _attack_serial := -1
@@ -79,7 +82,7 @@ func spawn(player: CharacterBody3D, facing: Basis, effects: Node3D, base_zombie:
 	zombie.name = "Zombie"
 	zombie.position = point
 	zombie.max_health = Zombie.BASE_HEALTH if base_zombie else Zombie.TRAINING_HEALTH
-	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial)
+	zombie.configure(_visual.instantiate(), player, effects, _digits, _spawn_serial, _physics_profile)
 	zombie.melee_hit.connect(player_hit.emit)
 	_spawn_serial += 1
 	add_child(zombie, true)
@@ -265,6 +268,11 @@ func _load_assets() -> void:
 		var packed := PackedScene.new()
 		if _digits.size() == 10 and packed.pack(model) == OK:
 			_visual = packed
+			var path := root.path_join(PHYSICS_PROFILE_PATH)
+			if _verified(path, PHYSICS_PROFILE_HASH):
+				var decoded: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+				if decoded is Dictionary and decoded.get("idle_glb_sha256") == CLIP_HASHES[Zombie.IDLE]:
+					_physics_profile = decoded
 	model.free()
 
 func _add_clips(directory: String, player: AnimationPlayer) -> bool:

@@ -92,12 +92,14 @@ var _attack_cooldown := 0.0
 var _flash_left := 0.0
 var _corpse_age := 0.0
 var _corpse_landed := false
+var _physics_profile: Dictionary
 static var _flash_material: ShaderMaterial
 static var _death_profile: DeathProfile
 static var _corpse_material: ShaderMaterial
 
-func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D], serial: int) -> void:
+func configure(model: Node, player: CharacterBody3D, effects: Node3D, digits: Array[Texture2D], serial: int, physics_profile: Dictionary = {}) -> void:
 	target = player
+	_physics_profile = physics_profile
 	_death_rng.seed = hash(Vector2i(serial, 1709))
 	_walk_clip = WALK_CLIPS[serial % WALK_CLIPS.size()]
 	add_child(model)
@@ -125,7 +127,11 @@ func _ready() -> void:
 	ragdoll = Ragdoll.new()
 	add_child(ragdoll)
 	var skeleton := find_child("Skeleton3D", true, false) as Skeleton3D
-	ragdoll.setup(skeleton, RAGDOLL_PARTS, RAGDOLL_BONES)
+	var source := _source_physics_setup(skeleton)
+	if source.is_empty():
+		ragdoll.setup(skeleton, RAGDOLL_PARTS, RAGDOLL_BONES)
+	else:
+		ragdoll.setup(skeleton, source.parts, source.bones, source.offsets, source.joints)
 	for body: PhysicalBone3D in ragdoll.bodies.values():
 		body.collision_layer = 0
 		body.collision_mask = 0
@@ -139,6 +145,54 @@ func _ready() -> void:
 	if _flash_material == null:
 		_flash_material = ShaderMaterial.new()
 		_flash_material.shader = HIT_FLASH_SHADER
+
+# Asset Dumper swaps Unreal Y/Z and exports centimetres as metres. Validate
+# the conversion against both authored anchors in the verified mesh's bind pose.
+static func _from_unreal(v: Array) -> Vector3:
+	return Vector3(v[0], v[2], v[1])
+
+static func _source_frame(frame: Array) -> Transform3D:
+	var primary := _from_unreal(frame[1])
+	var secondary := _from_unreal(frame[2])
+	return Transform3D(Basis(primary, secondary, primary.cross(secondary)).orthonormalized(),
+		_from_unreal(frame[0]) * 0.01)
+
+func _source_physics_setup(skeleton: Skeleton3D) -> Dictionary:
+	if _physics_profile.get("schema") != "md2-zombie-physics/1":
+		return {}
+	var roles := {"J_Spine": "Chest", "J_Neck": "Head", "J_L_Arm": "Arm.L", "J_R_Arm": "Arm.R",
+		"J_L_Leg": "Leg.L", "J_R_Leg": "Leg.R"}
+	var bones := {}
+	var offsets := {}
+	var parts := []
+	var joints := {}
+	var volume := 0.0
+	for entry: Dictionary in _physics_profile.bodies:
+		var name: String = roles.get(entry.bone, "")
+		if name.is_empty() or skeleton.find_bone(entry.bone) < 0:
+			return {}
+		var size := _from_unreal(entry.size_cm) * 0.01
+		var box_volume := size.x * size.y * size.z
+		volume += box_volume
+		bones[name] = entry.bone
+		offsets[name] = Transform3D(Basis.IDENTITY, _from_unreal(entry.center_cm) * 0.01)
+		parts.append([name, Vector3.ZERO, size, box_volume, 0.0, 0.0])
+	for part: Array in parts:
+		# Preserve the lab's mass budget. MD2's body setup has no mass override.
+		part[3] *= 60.0 / volume
+	for entry: Dictionary in _physics_profile.constraints:
+		var child: String = roles[entry.child]
+		var parent: String = roles[entry.parent]
+		var child_frame := _source_frame(entry.child_frame)
+		var parent_frame := _source_frame(entry.parent_frame)
+		var child_bind := skeleton.get_bone_global_rest(skeleton.find_bone(entry.child)) * child_frame
+		var parent_bind := skeleton.get_bone_global_rest(skeleton.find_bone(entry.parent)) * parent_frame
+		if child_bind.origin.distance_to(parent_bind.origin) > 0.005 or child_bind.basis.get_rotation_quaternion().angle_to(parent_bind.basis.get_rotation_quaternion()) > 0.03:
+			push_warning("MD2 zombie physics anchors do not match the imported bind pose.")
+			return {}
+		joints[child] = {"parent": parent, "child_frame": offsets[child].affine_inverse() * child_frame,
+			"parent_frame": offsets[parent].affine_inverse() * parent_frame, "swing": entry.swing, "twist": entry.twist}
+	return {"parts": parts, "bones": bones, "offsets": offsets, "joints": joints}
 
 func _physics_process(delta: float) -> void:
 	if _flash_left > 0.0:
