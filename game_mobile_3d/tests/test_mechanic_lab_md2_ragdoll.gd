@@ -160,7 +160,9 @@ func run() -> void:
 
 func check_combo_finisher(lab, group, slot: int) -> void:
 	lab.reset_player()
-	lab._select_weapon(slot)
+	var selector := lab.get_node("HUD/Weapon") as OptionButton
+	selector.select(slot)
+	selector.item_selected.emit(slot)
 	lab.get_node("HUD/BaseZombieToggle").button_pressed = false
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
