@@ -19,6 +19,9 @@ const TERRAIN_MIN_FALL_SPEED := 2.0
 const TERRAIN_MIN_SUPPORT_Y := 0.85
 const TERRAIN_MIN_OVERLAP := 0.035
 const TERRAIN_RESIDUAL_OVERLAP := 0.018
+const TERRAIN_DEEP_OVERLAP := 0.12
+const TERRAIN_DEEP_RESIDUAL := 0.08
+const TERRAIN_MAX_RECOVERY_SHIFT := 0.14
 const CONE_DEFAULT_BIAS := 0.30
 const CONE_OVERSHOOT_BIAS := 0.10
 const CONE_SUPPORT_OVERSHOOT_COS := cos(deg_to_rad(75.0))
@@ -368,6 +371,7 @@ func _project_terrain_contact() -> void:
 		_terrain_query = PhysicsShapeQueryParameters3D.new()
 	var lift := 0.0
 	var deepest: PhysicalBone3D
+	var has_deep_contact := false
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
@@ -379,29 +383,70 @@ func _project_terrain_contact() -> void:
 		# horizontal travel and let the whole-body projection handle steep falls.
 		var steep_fall := fall_speed > TERRAIN_MIN_FALL_SPEED and fall_speed > Vector2(velocity.x, velocity.z).length()
 		PhysicsServer3D.body_set_enable_continuous_collision_detection(body.get_rid(), not steep_fall)
-		if fall_speed <= TERRAIN_MIN_FALL_SPEED:
+		var fast_contact := _can_have_fast_contact(state, part[2])
+		if fall_speed <= TERRAIN_MIN_FALL_SPEED and not fast_contact:
 			continue
 		var points := _terrain_contact_points(body, state, Vector3.ZERO)
 		for i in range(0, points.size(), 2):
 			var offset := points[i + 1] - points[i]
 			var depth := offset.length()
-			if offset.y < TERRAIN_MIN_OVERLAP or offset.y < depth * TERRAIN_MIN_SUPPORT_Y:
+			has_deep_contact = has_deep_contact or depth > TERRAIN_DEEP_OVERLAP - PROJECTION_COLLISION_MARGIN
+			if fall_speed <= TERRAIN_MIN_FALL_SPEED or offset.y < TERRAIN_MIN_OVERLAP or offset.y < depth * TERRAIN_MIN_SUPPORT_Y:
 				continue
 			# Keep contact for the next solve and bound the lift by one step of travel.
 			var step_lift := minf((depth - TERRAIN_RESIDUAL_OVERLAP) * depth / offset.y, fall_speed * state.step)
 			if step_lift > lift:
 				lift = step_lift
 				deepest = body
-	if deepest == null:
-		return
-	var motion := Vector3.UP * lift
+	if deepest != null:
+		_translate_clear_of_terrain(Vector3.UP * lift, deepest)
+	if has_deep_contact:
+		_project_deep_terrain_contact()
+
+func _can_have_fast_contact(state: PhysicsDirectBodyState3D, box_size: Vector3) -> bool:
+	var half_diagonal := (box_size * 0.5).length()
+	return state.linear_velocity.length() + state.angular_velocity.length() * half_diagonal > TERRAIN_MIN_FALL_SPEED
+
+func _project_deep_terrain_contact() -> void:
+	var worst_depth := TERRAIN_DEEP_OVERLAP
+	var motion := Vector3.ZERO
+	var deepest: PhysicalBone3D
+	for part in _parts:
+		var body: PhysicalBone3D = bodies[part[0]]
+		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+		if state == null or not _can_have_fast_contact(state, part[2]):
+			continue
+		var points := _terrain_contact_points(body, state, Vector3.ZERO)
+		for i in range(0, points.size(), 2):
+			var offset := points[i + 1] - points[i]
+			var depth := offset.length()
+			if depth <= worst_depth:
+				continue
+			var normal := offset / depth
+			if normal.y < -0.05:
+				continue
+			# The contact point can still move inward while the body's center slows.
+			var radius := points[i] - state.transform.origin - state.center_of_mass
+			var point_velocity := state.linear_velocity + state.angular_velocity.cross(radius)
+			var approach := -point_velocity.dot(normal)
+			var direction := Vector3.UP if normal.y >= TERRAIN_MIN_SUPPORT_Y else normal
+			var separation := minf(depth - TERRAIN_DEEP_RESIDUAL, approach * state.step) / direction.dot(normal)
+			if separation < FLOOR_CONTACT_SLOP:
+				continue
+			worst_depth = depth
+			deepest = body
+			motion = direction * minf(separation, TERRAIN_MAX_RECOVERY_SHIFT)
+	if deepest != null:
+		_translate_clear_of_terrain(motion, deepest)
+
+func _translate_clear_of_terrain(motion: Vector3, deepest: PhysicalBone3D) -> void:
 	for body: PhysicalBone3D in bodies.values():
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if state == null:
 			return
 		var before := _deepest_contact(_terrain_contact_points(body, state, Vector3.ZERO))
 		var after := _deepest_contact(_terrain_contact_points(body, state, motion))
-		# Reject a lift into an adjacent ledge or one that leaves the worst contact unchanged.
+		# Reject a shift into an adjacent ledge or one that leaves the worst contact unchanged.
 		if after > maxf(before, FLOOR_CONTACT_SLOP) + PROJECTION_COLLISION_MARGIN \
 				or (body == deepest and after >= before - FLOOR_CONTACT_SLOP):
 			return
