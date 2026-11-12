@@ -34,7 +34,6 @@ var _shield: Control
 var _body: VBoxContainer
 var _park: Control
 var _views: OptionButton
-var _heading: Label
 var _regex := RegEx.create_from_string("[^a-z0-9]+")
 var _active := 0
 var _night := false
@@ -78,9 +77,9 @@ func setup(layer: CanvasLayer, window: PanelContainer, legacy: VBoxContainer,
 
 	var header := HBoxContainer.new()
 	layout.add_child(header)
-	_heading = _label("Cài đặt Overworld", 23)
-	_heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(_heading)
+	var heading := _label("Cài đặt Overworld", 23)
+	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(heading)
 	if _widgets.has(COMPARE):
 		var compare: Button = _widgets[COMPARE]
 		compare.reparent(header)
@@ -263,8 +262,7 @@ func _build_quick() -> void:
 	_add_row_buttons(time, PHASES)
 	_add_row(time, "original-gaf-day-night-preview")
 	var mix := _section("Preset ánh sáng")
-	_add_row(mix, "preset")
-	_add_row_buttons(mix, PRESETS)
+	_add_row_buttons(mix, ["preset"] + PRESETS)
 	_add_row(mix, "apply-forest")
 	_add_row(mix, "preset-message")
 	var main := _section("Điều chỉnh ban đêm" if _night else "Điều chỉnh ban ngày")
@@ -330,7 +328,9 @@ func _add_row(parent: VBoxContainer, id: String) -> void:
 	var row := HBoxContainer.new()
 	stack.add_child(row)
 	if widget is OptionButton:
-		row.add_child(_label(Copy.ITEMS[id][0]))
+		var caption := _label(Copy.ITEMS[id][0])
+		caption.custom_minimum_size.x = 138
+		row.add_child(caption)
 	widget.reparent(row)
 	widget.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(_info_button(id, stack))
@@ -425,7 +425,7 @@ static func _box(fill: Color, border: Color, radius: int, margin: int) -> StyleB
 static func _make_theme() -> Theme:
 	var theme := Theme.new()
 	theme.default_font_size = 15
-	theme.set_stylebox("panel", "PanelContainer", _box(Color("#18251f"), BORDER, 12, 12))
+	theme.set_stylebox("panel", "PanelContainer", _box(Color("#25362f"), BORDER, 12, 12))
 	for kind: String in ["Button", "OptionButton"]:
 		theme.set_stylebox("normal", kind, _box(Color("#293e33"), BORDER, 6, 6))
 		theme.set_stylebox("hover", kind, _box(Color("#395347"), ACCENT, 6, 6))
