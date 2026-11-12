@@ -122,6 +122,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_mist_light": ["Night mist light", 1.],
 	&"night_depth_scatter": ["Ánh xanh trong sương xa", 1.],
 	&"twilight_depth_scatter": ["Ánh tán xạ xa chạng vạng", 1.],
+	&"twilight_far_air": ["Ánh sương sau tán cây", 1.],
 	&"dawn_mist_source": ["Ánh sáng sương rạng sáng", 1.],
 	&"evening_mist_profile": ["Sương hoàng hôn", 1.],
 	&"evening_key_response": ["Ánh trực tiếp lúc chạng vạng", 1.],
@@ -148,10 +149,11 @@ const LIGHTING_MIX_CONTROLS := {
 	&"night_path_chroma": ["Night path color", 1.],
 	&"exposure": ["Local exposure", 1.],
 	&"daylight_shadow_lift": ["Daylight shadow lift", 1.],
+	&"twilight_shadow_lift": ["Giữ chiều sâu vùng râm", 1.],
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 74
+const LIGHTING_MIX_VERSION := 75
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -717,7 +719,8 @@ func _mist_depth_scatter(night_weight: float) -> float:
 			or phase_air.evening_anchors.is_empty():
 		return night
 	# Reuse the depth ramp of the existing camera medium and blend just its source light.
-	var twilight := 2.4 * _lighting_scale(&"twilight_depth_scatter") * _twilight_window()
+	var gain := lerpf(2.4, 6.0, _lighting_scale(&"twilight_far_air"))
+	var twilight := gain * _lighting_scale(&"twilight_depth_scatter") * _twilight_window()
 	return maxf(night, twilight)
 
 func set_captured_mist_source(value:bool)->void:
@@ -1133,11 +1136,12 @@ func local_exposure_mix_scale() -> float:
 		return lerpf(1., scale, PHASE_FINISH.phase_weight(hour)) if _balanced_preview else scale
 	return 1.
 
-func daylight_shadow_lift() -> float:
+func local_exposure_shadow_lift() -> float:
 	if _balanced_preview:
 		return 1.
 	var daylight := smoothstep(5.5, 7., hour) * (1. - smoothstep(16.5, 19., hour))
-	return lerpf(1., _lighting_scale(&"daylight_shadow_lift"), daylight)
+	var twilight := twilight_finish_weight() * _lighting_scale(&"twilight_shadow_lift")
+	return lerpf(1., _lighting_scale(&"daylight_shadow_lift"), daylight) * lerpf(1., .94, twilight)
 
 func bounded_exposure_strength() -> float:
 	return LOCAL_EXPOSURE_STRENGTH * local_exposure_mix_scale()
@@ -1442,6 +1446,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 74 and effect == &"twilight_ground_ambient":
 			missing_value = 0.
+		if version < 75 and effect in [&"twilight_shadow_lift", &"twilight_far_air"]:
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1483,7 +1489,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.available()
 		if effect == &"dawn_mist_source":
 			slider.editable = slider.editable and not phase_air.anchors.is_empty()
-		if effect in [&"evening_mist_profile", &"twilight_depth_scatter"]:
+		if effect in [&"evening_mist_profile", &"twilight_depth_scatter", &"twilight_far_air"]:
 			slider.editable = slider.editable and not phase_air.evening_anchors.is_empty()
 		if effect == &"evening_key_response":
 			slider.editable = slider.editable and key_response.evening_available()
@@ -1493,6 +1499,8 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 			slider.editable = slider.editable and sky_response.twilight_available()
 		if effect in [&"twilight_grass_albedo", &"twilight_ground_ambient"]:
 			slider.editable = slider.editable and sky_response.twilight_available() and plants != null and plants.grass_light.active
+		if effect == &"twilight_shadow_lift":
+			slider.editable = slider.editable and phase_finish != null and phase_finish.available() and sky_response.twilight_available()
 		if effect == &"twilight_soft_bloom":
 			slider.editable = slider.editable and sky_response.twilight_available() and bloom_response.available()
 		if effect == &"sculk_surface":
@@ -1600,7 +1608,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 	if changed_effect == &"lantern_lift":
 		_refresh_lantern_position()
 		return
-	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"twilight_depth_scatter", &"dawn_mist_source", &"evening_mist_profile"]:
+	if changed_effect in [&"near_haze", &"near_haze_depth", &"local_mist", &"cliff_mist", &"night_cliff_mist", &"forest_near_scatter", &"bloom_spread", &"lantern_air", &"night_mist_light", &"night_depth_scatter", &"twilight_depth_scatter", &"twilight_far_air", &"dawn_mist_source", &"evening_mist_profile"]:
 		_update_mist()
 		return
 	if changed_effect in [&"grass_sky", &"grass_shade_color", &"grass_root_tone", &"grass_night_albedo", &"twilight_grass_albedo", &"grass_shadow_reach", &"spruce_sky", &"tree_shade"]:
@@ -1609,7 +1617,7 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		if level.player_light != null:
 			level.player_light.refresh()
 		return
-	if changed_effect in [&"exposure", &"daylight_shadow_lift", &"grade"]:
+	if changed_effect in [&"exposure", &"daylight_shadow_lift", &"twilight_shadow_lift", &"grade"]:
 		_apply_bounded_exposure_mix()
 		if phase_finish != null:
 			phase_finish.refresh()

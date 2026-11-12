@@ -8,6 +8,7 @@ const GPU_PARAMETER_BYTES := 224 + PATH_SOURCE_BYTES
 const DIRECTIONAL_PARAMETER_BYTES := 64
 const LOCAL_MIST_BYTES := 48
 const DEPTH_SCATTER_BYTES := 16
+const MAX_DEPTH_SCATTER_GAIN := 6.0
 const DEPTH_SCATTER_START_M := 2.0
 const DEPTH_SCATTER_FULL_M := 8.0
 var directional_grid: ImageTexture3D
@@ -69,7 +70,7 @@ func configure_with_depth_scatter(parameters: PackedByteArray, size: Vector2i, n
 		additional_bytes.resize(LOCAL_MIST_BYTES)
 		additional_bytes.fill(0)
 	var entry := parameters.decode_float(12) if parameters.size() >= 16 else 0.0
-	var gain := clampf(depth_scatter, 0.0, 3.0) if entry > 0.0 and is_finite(depth_scatter) else 0.0
+	var gain := clampf(depth_scatter, 0.0, MAX_DEPTH_SCATTER_GAIN) if entry > 0.0 and is_finite(depth_scatter) else 0.0
 	var depth_bytes := PackedFloat32Array([entry + DEPTH_SCATTER_START_M, entry + DEPTH_SCATTER_FULL_M,
 		gain, 0.0]).to_byte_array()
 	_mutex.lock()
