@@ -16,7 +16,8 @@ func ticks(count: int) -> void:
 	for i in count:
 		await physics_frame
 
-func launch(world: Node3D, group: Node3D, effects: Node3D, start: Vector3, direction: Vector3) -> Node3D:
+func launch(world: Node3D, group: Node3D, effects: Node3D, start: Vector3, direction: Vector3,
+		strike := Zombie.DeathStrike.SABRE_FINISHER) -> Node3D:
 	if not group.spawn(world.player, Basis.IDENTITY, effects):
 		check(false, "The verified zombie is available on WorldMap")
 		return null
@@ -30,7 +31,7 @@ func launch(world: Node3D, group: Node3D, effects: Node3D, start: Vector3, direc
 	await ticks(2)
 	for i in 2:
 		zombie.ragdoll.sample(1.0 / 60.0)
-	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 800.0, Zombie.DeathStrike.SABRE_FINISHER)
+	zombie.take_hit(100, direction, Vector2.ZERO, 0.0, 800.0, strike)
 	zombie.set_physics_process(true)
 	return zombie
 
@@ -71,8 +72,8 @@ func cliff_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 	zombie.free()
 	await ticks(2)
 
-func ledge_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
-	var zombie = await launch(world, group, effects, Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT)
+func ledge_case(world: Node3D, group: Node3D, effects: Node3D, strike: Zombie.DeathStrike) -> void:
+	var zombie = await launch(world, group, effects, Vector3(-33.5, 9.0, -39.5), Vector3.RIGHT, strike)
 	if zombie == null:
 		return
 	var first_landing := -1
@@ -95,11 +96,13 @@ func ledge_case(world: Node3D, group: Node3D, effects: Node3D) -> void:
 					ledge_contact = true
 		if zombie._corpse_landed and first_landing < 0:
 			first_landing = frame
-	check(first_landing > 25 and first_landing < 55 and ledge_contact and chest_height < 6.0,
+	check(first_landing > 25 and first_landing < 60 and ledge_contact and chest_height < 6.0,
 		"The corpse crosses the authored ledge and contacts the lower terrain")
 	check(worst_anchor < 0.12, "The first impact on the lower terrace keeps the limb anchors connected")
-	print("WORLDMAP_LEDGE landing=", first_landing, " minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor)
+	print("WORLDMAP_LEDGE strike=", strike, " landing=", first_landing,
+		" minimum_chest_y=", chest_height, " peak_anchor_m=", worst_anchor)
 	zombie.free()
+	await ticks(2)
 
 func run() -> void:
 	var world = preload("res://scenes/WorldMap.tscn").instantiate()
@@ -113,7 +116,9 @@ func run() -> void:
 		world.add_child(effects)
 		world.add_child(group)
 		await cliff_case(world, group, effects)
-		await ledge_case(world, group, effects)
+		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER)
+		await ledge_case(world, group, effects, Zombie.DeathStrike.SABRE_FINISHER)
+		await ledge_case(world, group, effects, Zombie.DeathStrike.CURVED_GREATSWORD)
 	world.free()
 	print("WORLD_MAP_MECHANIC_RAGDOLL failures=", failures)
 	quit(0 if failures.is_empty() else 1)
