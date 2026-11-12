@@ -33,6 +33,15 @@ func run() -> void:
 		finish(lab)
 		return
 	check(weapon.get_item_text(2) == "Curved Greatsword", "The third option identifies the source weapon")
+	var research := OS.get_environment("MD2_RESEARCH_ROOT")
+	OS.set_environment("MD2_RESEARCH_ROOT", ProjectSettings.globalize_path("res://"))
+	weapon.select(2)
+	weapon.item_selected.emit(2)
+	check(weapon.selected == 0, "An invalid private asset root leaves the Sabre equipped")
+	if research.is_empty():
+		OS.unset_environment("MD2_RESEARCH_ROOT")
+	else:
+		OS.set_environment("MD2_RESEARCH_ROOT", research)
 	weapon.select(2)
 	weapon.item_selected.emit(2)
 	check(weapon.selected == 2, "Curved Greatsword loads from the verified private assets")
@@ -61,9 +70,11 @@ func run() -> void:
 	var swing_count: int = swing_audio.played_count
 	var hit_count: int = combat_audio._next_choice.get(&"curved_hit", 0)
 	var shake_contacts: Array[int] = []
+	var hit_choices: Array[int] = []
 	group.sabre_contact.connect(func(point, _direction, _clip, index, serial, _lethal):
 		if point.distance_to(target.global_position) < 2.0:
 			damage.append(target.health)
+			hit_choices.append(combat_audio._next_choice.get(&"curved_hit", -1))
 			if lab._shake_serial == serial:
 				shake_contacts.append(index))
 	attack(true)
@@ -83,6 +94,7 @@ func run() -> void:
 	check(shake_contacts == [2], "Only the finisher triggers a nearby camera shake")
 	check(swing_audio.played_count == swing_count + 3, "Three source swing samples reach the audio voices")
 	check(combat_audio._groups.get(&"curved_hit", []).size() == 3
+		and hit_choices == [(hit_count + 1) % 3, (hit_count + 2) % 3, hit_count]
 		and combat_audio._next_choice.get(&"curved_hit", -1) == hit_count,
 		"Three contacts play the Curved Greatsword hitmarker once per strike")
 	toggle.button_pressed = false
