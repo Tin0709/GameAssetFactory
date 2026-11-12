@@ -7,6 +7,7 @@ const LocalExposure := preload("res://scripts/world_map_bloom_source.gd")
 const CombatAudio := preload("res://scripts/mechanic_lab_combat_audio.gd")
 const MovementAudio := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/environment_audio.gd")
 const MovementDust := preload("res://scripts/mechanic_lab_movement_dust.gd")
+const MovementWind := preload("res://scripts/mechanic_lab_movement_wind.gd")
 const PrivateOverworldBundle := preload("res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/private_bundle.gd")
 const Sword := preload("res://scripts/mechanic_lab_sword.gd")
 const CurvedGreatsword := preload("res://scripts/mechanic_lab_curved_greatsword.gd")
@@ -132,6 +133,12 @@ func _ready() -> void:
 			add_child(dust)
 		else:
 			dust.free()
+		var wind := MovementWind.new()
+		wind.name = "MovementWind"
+		if wind.setup(player):
+			add_child(wind)
+		else:
+			wind.free()
 		_player_flash_material = ShaderMaterial.new()
 		_player_flash_material.shader = PLAYER_HIT_FLASH_SHADER
 		for mesh: MeshInstance3D in player.model.find_children("*", "MeshInstance3D", true, false):

@@ -1,6 +1,6 @@
 extends Node3D
 
-const PrivatePath := preload("res://scenes/dev/actions_stuff_research/md2_sabre_prototype_v001/reference_audio.gd")
+const EffectSource := preload("res://scripts/mechanic_lab_effect_source.gd")
 const SOURCE := "extracted/2026-10-25 19-26-25/Game/Spicewood/FX/Smoke/T_SmokePixel.png"
 const SOURCE_SHA256 := "78d326787c4065d70e227ec386a7330f53621c8733ad114bc80eaea7f7f1b5fc"
 const FRAMES := [0, 9, 10, 16, 24, 25]
@@ -46,16 +46,8 @@ func setup(actor: CharacterBody3D, ground: CollisionShape3D) -> bool:
 	return true
 
 static func _load_mask() -> Texture2D:
-	if not OS.has_feature("editor"):
-		return null
-	var root := OS.get_environment("MD2_RESEARCH_ROOT")
-	if root.is_empty():
-		root = OS.get_environment("USERPROFILE").path_join("Desktop/MD2 Research")
-	var path := PrivatePath.resolve_private_file(root, SOURCE)
-	if path.is_empty() or not FileAccess.file_exists(path) or FileAccess.get_sha256(path) != SOURCE_SHA256:
-		return null
-	var atlas := Image.load_from_file(path)
-	if atlas == null or atlas.get_size() != Vector2i(128, 64):
+	var atlas := EffectSource.load_image(SOURCE, SOURCE_SHA256, Vector2i(128, 64))
+	if atlas == null:
 		return null
 	atlas.convert(Image.FORMAT_RGBA8)
 	# The exported RGB channels are masks. Preserve the atlas alpha exactly.
