@@ -9,6 +9,8 @@ const MAX_GAIN := .42
 const ZERO := [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]
 
 var texture: ImageTexture3D
+var research_root: String
+var payload_sha256: String
 var _level: Node3D
 var _review: Node
 var _sun: DirectionalLight3D
@@ -90,22 +92,38 @@ func setup(level: Node3D, review: Node) -> void:
 	_tile = _vector(proof.size)
 	_step = proof.step
 	_columns = int(proof.columns)
+	research_root = root
+	payload_sha256 = proof.sha256
 	texture = image
 
 func available() -> bool:
 	return texture != null
 
 func parameters() -> PackedFloat32Array:
+	if not available() or not is_instance_valid(_review):
+		return PackedFloat32Array(ZERO)
+	var gain: float = _review._lighting_scale(&"sunlit_mist")
+	if gain <= 0.:
+		return PackedFloat32Array(ZERO)
+	var slots := sun_slots()
+	if slots.w <= 0.:
+		return PackedFloat32Array(ZERO)
+	var c := _sun.light_color.srgb_to_linear()
+	var rgb := Vector3(c.r, c.g, c.b) * _sun.light_energy
+	return PackedFloat32Array([rgb.x, rgb.y, rgb.z, gain * slots.w,
+		slots.x, slots.y, slots.z, _columns,
+		_origin.x, _origin.y, _origin.z, _step, _tile.x, _tile.y, _tile.z, 0.])
+
+func sun_slots() -> Vector4:
 	if not available() or not is_instance_valid(_review) or not _review.forest_active() \
 		or _review.atmosphere_review != "combined" or not _level.grove.visible or not _level.grove.spruce_visible() \
 		or not _level.grove.spruce_shadows or not _sun.shadow_enabled or not _sun.is_visible_in_tree():
-		return PackedFloat32Array(ZERO)
+		return Vector4.ZERO
 	var h: float = _review.hour
-	var gain: float = _review._lighting_scale(&"sunlit_mist")
-	gain *= Phase.phase_weight(h) * smoothstep(5.5, 6.5, h) * (1. - smoothstep(18.5, 19.5, h))
+	var gain := Phase.phase_weight(h) * smoothstep(5.5, 6.5, h) * (1. - smoothstep(18.5, 19.5, h))
 	gain *= smoothstep(0., .2, _sun.shadow_opacity)
 	if gain <= 0. or _sun.light_energy <= 0.:
-		return PackedFloat32Array(ZERO)
+		return Vector4.ZERO
 	var high := clampi(_hours.bsearch(h), 1, _hours.size() - 1)
 	var low := high - 1
 	var weight := inverse_lerp(_hours[low], _hours[high], h)
@@ -113,12 +131,8 @@ func parameters() -> PackedFloat32Array:
 	var error := expected.angle_to(_sun.global_basis.z.normalized())
 	gain *= 1. - smoothstep(deg_to_rad(.45), deg_to_rad(1.35), error)
 	if gain <= 0. or not _geometry_current():
-		return PackedFloat32Array(ZERO)
-	var c := _sun.light_color.srgb_to_linear()
-	var rgb := Vector3(c.r, c.g, c.b) * _sun.light_energy
-	return PackedFloat32Array([rgb.x, rgb.y, rgb.z, gain,
-		_slots[low], _slots[high], weight, _columns,
-		_origin.x, _origin.y, _origin.z, _step, _tile.x, _tile.y, _tile.z, 0.])
+		return Vector4.ZERO
+	return Vector4(_slots[low], _slots[high], weight, gain)
 
 func _geometry_current() -> bool:
 	for row: Dictionary in _casters:
