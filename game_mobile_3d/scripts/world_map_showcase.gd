@@ -160,6 +160,7 @@ const LANTERN_EMISSION_GAIN := 16.
 var lantern_overhead := true
 var _lantern_overhead_toggle: CheckButton
 static var _point_kernel_owner:WeakRef
+var _point_kernel_camera := Vector3.INF
 var _point_lights:Dictionary={}
 var point_kernel_state:=Vector4.ZERO
 var path_beam_state := Vector4.ZERO
@@ -686,7 +687,9 @@ func _publish_point_cutoff()->void:
 		RenderingServer.global_shader_parameter_set("gaf_path_beam",beam)
 	point_soft_state=point_response.soft_settings if eligible and player_soft_source and point_response.soft_available()else Vector2.ZERO
 	RenderingServer.global_shader_parameter_set("gaf_point_soft",point_soft_state)
-	if level!=null:RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera",level.get_node("Camera3D").global_position)
+	if level!=null:
+		_point_kernel_camera=level.get_node("Camera3D").global_position
+		RenderingServer.global_shader_parameter_set("gaf_point_kernel_camera",_point_kernel_camera)
 
 func set_lantern_overhead(value: bool) -> void:
 	if lantern_overhead == value:
