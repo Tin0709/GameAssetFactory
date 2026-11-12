@@ -11,6 +11,7 @@ render_mode cull_disabled, diffuse_burley;
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 #include "res://materials/world_map_terrain_transport.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
+#include "res://materials/world_map_player_contact.gdshaderinc"
 #endif
 #ifdef GAF_WORLD_GROUND_BOUNCE
 #include "res://materials/world_map_ground_bounce.gdshaderinc"
@@ -87,7 +88,8 @@ void fragment() {
 	EMISSION=terrain_emission(UV);
 #ifdef GAF_WORLD_SPATIAL_TERRAIN
 	terrain_direct_contact=terrain_colored_visibility ? 1.0 : receiver_contact;
-	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact);
+	float sole = surface_top > 0.9 ? gaf_player_contact(surface_world, CAMERA_POSITION_WORLD) : 1.0;
+	EMISSION+=terrain_indirect(ALBEDO,METALLIC,AO,cloud_transmission,receiver_contact)*sole;
 	if(terrain_rough_reflection)EMISSION+=terrain_reflected(normalize(NORMAL),normalize(VIEW),ROUGHNESS,AO,cloud_transmission,receiver_contact,native_specular);
 #else
 	ALBEDO*=receiver_contact;

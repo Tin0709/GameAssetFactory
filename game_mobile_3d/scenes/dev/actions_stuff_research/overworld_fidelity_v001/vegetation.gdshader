@@ -8,6 +8,7 @@ render_mode cull_disabled, diffuse_burley, specular_disabled;
 #ifdef GAF_REFERENCE_GRASS_LIGHTING
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/world_map_grass_light.gdshaderinc"
 #include "res://materials/world_map_spruce_sky.gdshaderinc"
+#include "res://materials/world_map_player_contact.gdshaderinc"
 #include "res://scenes/dev/actions_stuff_research/overworld_fidelity_v001/graphics_review_v001/grass_normal_v001/world_normal.gdshaderinc"
 uniform sampler2D study_ground_sky : filter_nearest, repeat_disable;
 uniform vec2 study_ground_sky_origin;
@@ -166,6 +167,9 @@ void fragment(){
 		cool_fill *= dot(EMISSION, luma) / max(dot(cool_fill, luma), 0.000001);
 		EMISSION = mix(EMISSION, cool_fill, shade_mix);
 	}
+	float sole = gaf_player_contact(foliage_world, CAMERA_POSITION_WORLD);
+	AO *= sole;
+	EMISSION *= sole;
 	study_tip_weight=smoothstep(0.26,0.85,height_fraction);
 	study_cloud=world_cloud_shade(foliage_world);
 #endif
