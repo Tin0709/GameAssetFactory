@@ -127,6 +127,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"bloom": ["Bloom", 2.],
 	&"bloom_spread": ["Bloom spread", 2.],
 	&"bloom_diffusion": ["Độ mềm bloom", 1.],
+	&"night_soft_bloom": ["Ánh tán mềm ban đêm", 1.],
 	&"world_outline_strength": ["World Outline", 4.],
 	&"world_outline_width": ["Độ dày viền", 4.],
 	&"daylight_haze": ["Daylight haze softness", 1.],
@@ -140,7 +141,7 @@ const LIGHTING_MIX_CONTROLS := {
 	&"grade": ["Reference finish", 1.],
 }
 const LIGHTING_MIX_PATH := "user://world_map_lighting_mix.cfg"
-const LIGHTING_MIX_VERSION := 64
+const LIGHTING_MIX_VERSION := 65
 const NIGHT_MIST_MAX_GAIN := 4.0
 const PATH_AIR_MAX_SCALE := .24
 const PATH_BEAM_AIM_XZ := Vector2(-24.0, 18.0)
@@ -529,13 +530,21 @@ func set_source_bloom_shape(value:bool)->void:
 func set_measured_bloom_response(value:bool)->void:
 	measured_bloom_response=value;set_coupled_bloom(coupled_bloom)
 
+func night_soft_bloom_weight() -> float:
+	if _balanced_preview or atmosphere_review != "combined" or not coupled_bloom \
+		or not measured_bloom_response or not bloom_response.available():
+		return 0.0
+	return _lighting_scale(&"night_soft_bloom") * moonlight_weight(hour)
+
 func set_coupled_bloom(value:bool)->void:
 	coupled_bloom=value
 	if level.look._exposure_effect!=null:
 		var enabled:bool=value and forest_active() and atmosphere_review in ["haze","combined"]
 		level.look._exposure_effect.set_air_bloom(enabled)
 		var response:float=bloom_response.sample(reference_hour())if enabled and measured_bloom_response else 1.
-		level.look._exposure_effect.set_air_bloom_response(response * _lighting_scale(&"bloom") if enabled else response)
+		# Keep the original main Bloom control and allow it to turn the contribution off.
+		var strength := lerpf(1.0, 1.7, night_soft_bloom_weight())
+		level.look._exposure_effect.set_air_bloom_response(response * _lighting_scale(&"bloom") * strength if enabled else response)
 		var spread := lerpf(1., _lighting_scale(&"bloom_spread"), PHASE_FINISH.phase_weight(hour)) if enabled else 1.
 		level.look._exposure_effect.set_air_bloom_spread(spread)
 		var shape_weight:float=phase_finish.phase_weight(hour)if phase_finish!=null and phase_finish.requested else 0.
@@ -1329,6 +1338,8 @@ func load_lighting_mix(path: String = LIGHTING_MIX_PATH) -> Error:
 			missing_value = 0.
 		if version < 64 and effect == &"night_sky_fill":
 			missing_value = 0.
+		if version < 65 and effect == &"night_soft_bloom":
+			missing_value = 0.
 		if version < 41 and effect == &"diffuse_openings":
 			missing_value = 0.
 		if version < 36 and effect == &"daylight_haze":
@@ -1417,7 +1428,9 @@ func _refresh_lighting_mix(changed_effect: StringName = &"") -> void:
 		return # Published with the final camera and sun before drawing.
 	if changed_effect in [&"regional_sky", &"daylight_bounce", &"stone_diffuse_contrast", &"night_spatial_sky", &"night_stone_fill_balance", &"night_stone_top_cool"]:
 		return # Terrain transport refreshes both receivers together.
-	if changed_effect in [&"bloom_diffusion", &"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
+	if changed_effect == &"night_soft_bloom" and level != null:
+		set_coupled_bloom(coupled_bloom)
+	if changed_effect in [&"night_soft_bloom", &"bloom_diffusion", &"daylight_haze", &"daylight_haze_spill", &"humid_light", &"humid_depth"]:
 		if phase_finish != null:
 			phase_finish.refresh()
 		return
