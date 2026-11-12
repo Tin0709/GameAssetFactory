@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import tempfile
 import threading
+import time
 
 from dev import find_tool, godot_command
 
@@ -56,6 +57,7 @@ class LocalUI:
         self.token = secrets.token_urlsafe(32)
         self.actions = queue.Queue(maxsize=24)
         self._state = b'{}'
+        self.last_seen = None
         self._assets = {url: ((ASSETS / file).read_bytes(), content_type)
                         for url, (file, content_type) in ROUTES.items()}
         owner = self
@@ -93,7 +95,10 @@ class LocalUI:
                 if not self._local():
                     return self._reply(403)
                 if self.path == '/state':
-                    return self._reply(200, owner._state) if self._authorized() else self._reply(403)
+                    if not self._authorized():
+                        return self._reply(403)
+                    owner.last_seen = time.monotonic()
+                    return self._reply(200, owner._state)
                 if self.path in owner._assets:
                     return self._reply(200, *owner._assets[self.path])
                 self._reply(404)
@@ -195,6 +200,9 @@ class WebWindow:
     """Run the HTML window while keeping Tk and Git on their existing threads."""
     def __init__(self, app, browser):
         self.app = app
+        self.started = time.monotonic()
+        self.window_handle = None
+        self.browser_ready = False
         self.theme_path = app.state_dir / 'theme.txt'
         try:
             self.theme = self.theme_path.read_text(encoding='utf-8').strip()
@@ -222,19 +230,50 @@ class WebWindow:
             raise
         app.dialog = WebDialog()
         app.notifications = WebNotifications()
+        self.start_auto = app.auto_start_pending
+        app.auto_start_pending = False
         self._poll()
 
     def _poll(self):
         app = self.app
         if app.closed or app.closing:
             return
-        if self.process.poll() is not None:
+        if self._window_closed():
+            if not self.browser_ready:
+                app.log('Cửa sổ DevDock chưa kết nối. Có thể mở bằng tùy chọn --native-ui.')
             app.close()
             return
+        if not self.browser_ready and self.ui.last_seen is not None:
+            self.browser_ready = True
+            app.auto_start_pending = self.start_auto
+            if self.start_auto and not app.busy:
+                app.refresh()
         while not self.ui.actions.empty():
             self._dispatch(self.ui.actions.get_nowait())
         self.ui.publish(self._snapshot())
         app.after_ids['web'] = app.root.after(180, self._poll)
+
+    def _window_closed(self):
+        last_seen = self.ui.last_seen
+        if last_seen is None:
+            # Edge may hand the window to a replacement process at startup.
+            return time.monotonic() - self.started > 30
+        if os.name != 'nt':
+            return self.process.poll() is not None
+        import ctypes
+        from ctypes import wintypes
+        user32 = ctypes.windll.user32
+        user32.FindWindowW.argtypes = (wintypes.LPCWSTR, wintypes.LPCWSTR)
+        user32.FindWindowW.restype = wintypes.HWND
+        user32.IsWindow.argtypes = (wintypes.HWND,)
+        user32.IsWindow.restype = wintypes.BOOL
+        if self.window_handle is not None and user32.IsWindow(self.window_handle):
+            return False
+        previous = self.window_handle
+        self.window_handle = user32.FindWindowW('Chrome_WidgetWin_1', 'DevDock') or None
+        if self.window_handle is not None:
+            return False
+        return previous is not None or time.monotonic() - last_seen > 120
 
     @staticmethod
     def _godot_available():
