@@ -218,6 +218,7 @@ func handle_escape() -> bool:
 
 func _outside_click(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_shield.accept_event()
 		set_open(false)
 
 func update_phase(night: bool) -> void:
