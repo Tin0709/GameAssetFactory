@@ -292,6 +292,8 @@ func check_sabre_landing_reversal(lab, group) -> void:
 	var previous_step: Dictionary[String, float]
 	var peak_reversal := 0.0
 	var peak_supported_reversal := 0.0
+	var previous_damping := 0.0
+	var peak_damping_step := 0.0
 	var reached_low_pose := false
 	for i in 120:
 		await physics_frame
@@ -304,6 +306,10 @@ func check_sabre_landing_reversal(lab, group) -> void:
 		if zombie._corpse_landed and motion.supports > 0 and zombie.ragdoll.minimum_corner_y() <= 0.015 \
 				and absf(zombie._corpse_axis().normalized().y) <= 0.25:
 			reached_low_pose = true
+		var damping: float = zombie.ragdoll.bodies.Head.angular_damp
+		if previous_damping >= ZOMBIE.DEATH_LANDING_ANGULAR_DAMP and damping >= previous_damping:
+			peak_damping_step = maxf(peak_damping_step, damping - previous_damping)
+		previous_damping = damping
 		for name: String in zombie.ragdoll.bodies:
 			var height: float = zombie.ragdoll.bodies[name].global_position.y
 			if previous_height.has(name):
@@ -318,7 +324,10 @@ func check_sabre_landing_reversal(lab, group) -> void:
 			previous_height[name] = height
 	check(reached_low_pose and peak_reversal < 0.075 and peak_supported_reversal < 0.065,
 		"Sabre's grounded finisher avoids large alternating vertical steps after contact")
-	print("SABRE_LANDING_REVERSAL entry_m=", peak_reversal, " supported_m=", peak_supported_reversal)
+	check(zombie._corpse_parked and zombie._corpse_age <= 1.40 and peak_damping_step > 0.0 and peak_damping_step < 1.40,
+		"Sabre's low roll settles with a gradual increase in angular damping")
+	print("SABRE_LANDING_REVERSAL entry_m=", peak_reversal, " supported_m=", peak_supported_reversal,
+		" peak_damping_step=", peak_damping_step, " age=", zombie._corpse_age)
 	zombie.free()
 
 func check_flat_rest_after_tumble(lab, group) -> void:
