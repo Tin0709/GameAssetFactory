@@ -274,12 +274,13 @@ func check_flat_rest_after_tumble(lab, group) -> void:
 	zombie.free()
 
 func check_flat_contact_jitter(lab, group) -> void:
-	group._spawn_serial = 246
+	const SERIAL := 246
+	group._spawn_serial = SERIAL
 	lab.get_node("HUD/SpawnZombie").pressed.emit()
 	var zombie = group.get_child(0)
 	zombie.set_physics_process(false)
 	zombie.global_position = Vector3(2.0, 0.02, 0.0)
-	zombie.rotation.y = fmod(246 * 0.41, TAU)
+	zombie.rotation.y = fmod(SERIAL * 0.41, TAU)
 	zombie.animation.play(ZOMBIE.IDLE)
 	zombie.animation.advance(0.28)
 	zombie.reset_physics_interpolation()
@@ -288,9 +289,13 @@ func check_flat_contact_jitter(lab, group) -> void:
 		zombie.ragdoll.sample(1.0 / 60.0)
 	zombie.take_hit(100, Vector3.RIGHT.rotated(Vector3.UP, 0.91), Vector2.ZERO, 0.0, 800.0)
 	zombie.set_physics_process(true)
+	var lowest_corner := 0.0
 	while not zombie._corpse_parked and zombie._corpse_age < 2.2:
 		await physics_frame
+		if zombie.ragdoll.running:
+			lowest_corner = minf(lowest_corner, zombie.ragdoll.minimum_corner_y())
 	check(zombie._corpse_parked, "A fully supported corpse stops shaking on the flat floor within 2.2 seconds")
-	print("RAGDOLL_FLAT_CONTACT_REST seconds=", zombie._corpse_age, " parked=", zombie._corpse_parked)
+	check(lowest_corner >= -0.013, "The corpse stays within the floor contact tolerance while settling")
+	print("RAGDOLL_FLAT_CONTACT_REST seconds=", zombie._corpse_age, " peak_overlap_m=", -lowest_corner)
 	zombie.free()
 

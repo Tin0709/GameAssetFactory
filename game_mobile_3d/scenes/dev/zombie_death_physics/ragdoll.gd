@@ -545,7 +545,8 @@ func _project_floor_contact() -> void:
 		var half: Vector3 = part[2] * 0.5
 		var extent_y := Vector3(absf(pose.basis.x.y), absf(pose.basis.y.y), absf(pose.basis.z.y)).dot(half)
 		var depth := floor_half.y - (pose.origin.y - extent_y)
-		if depth <= FLOOR_CONTACT_SLOP or pose.origin.y + extent_y < -floor_half.y:
+		var min_depth := FLOOR_REST_SLOP if landing_blended else maxf(lift, FLOOR_CONTACT_SLOP)
+		if depth <= min_depth or pose.origin.y + extent_y < -floor_half.y:
 			continue
 		# The finite platform only supports boxes whose footprints fit on it.
 		var extent_x := Vector3(absf(pose.basis.x.x), absf(pose.basis.y.x), absf(pose.basis.z.x)).dot(half)
