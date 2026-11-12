@@ -531,6 +531,8 @@ func _project_floor_contact() -> void:
 	var floor_half := floor_box.size * 0.5
 	var floor_inverse := floor_pose.affine_inverse()
 	var lift := 0.0
+	var landing_blended := not source_joint_rids.is_empty() and is_equal_approx(bodies.Head.gravity_scale, 1.0)
+	var depths: Dictionary[PhysicalBone3D, float] = {}
 	var slow := true
 	for part in _parts:
 		var body: PhysicalBone3D = bodies[part[0]]
@@ -542,29 +544,31 @@ func _project_floor_contact() -> void:
 		var pose := floor_inverse * state.transform
 		var half: Vector3 = part[2] * 0.5
 		var extent_y := Vector3(absf(pose.basis.x.y), absf(pose.basis.y.y), absf(pose.basis.z.y)).dot(half)
-		var depth := floor_half.y - (pose.origin.y - extent_y) - FLOOR_CONTACT_SLOP
-		if depth <= lift or pose.origin.y + extent_y < -floor_half.y:
+		var depth := floor_half.y - (pose.origin.y - extent_y)
+		if depth <= FLOOR_CONTACT_SLOP or pose.origin.y + extent_y < -floor_half.y:
 			continue
 		# The finite platform only supports boxes whose footprints fit on it.
 		var extent_x := Vector3(absf(pose.basis.x.x), absf(pose.basis.y.x), absf(pose.basis.z.x)).dot(half)
 		var extent_z := Vector3(absf(pose.basis.x.z), absf(pose.basis.y.z), absf(pose.basis.z.z)).dot(half)
 		if absf(pose.origin.x) + extent_x <= floor_half.x and absf(pose.origin.z) + extent_z <= floor_half.z:
-			lift = depth
+			lift = maxf(lift, depth)
+			if landing_blended:
+				depths[body] = depth
 	# The tighter flight clearance can repeatedly lift grounded limbs out of
 	# contact. Keep the resting tolerance through small solver velocity spikes.
-	var landing_blended := not source_joint_rids.is_empty() and is_equal_approx(bodies.Head.gravity_scale, 1.0)
-	if landing_blended:
-		lift -= 0.006
-	if slow or landing_blended:
-		lift -= FLOOR_REST_SLOP - FLOOR_CONTACT_SLOP
+	var slop := FLOOR_REST_SLOP if slow or landing_blended else FLOOR_CONTACT_SLOP
+	lift -= slop
 	if lift <= 0.0:
 		return
-	# Correct penetration before the bones sync to the rendered skeleton.
-	# Translate the whole assembly together so joint anchors and velocities stay intact.
+	# Keep joint anchors together on hard impacts. Once supported, correcting
+	# only the penetrating parts avoids lifting the other limbs off the floor.
 	for body: PhysicalBone3D in bodies.values():
+		var correction := depths.get(body, 0.0) - slop if landing_blended else lift
+		if correction <= 0.0:
+			continue
 		var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
 		if state:
-			state.transform = state.transform.translated(Vector3.UP * lift)
+			state.transform = state.transform.translated(Vector3.UP * correction)
 
 func contact_motion() -> Dictionary:
 	var contacts := 0
