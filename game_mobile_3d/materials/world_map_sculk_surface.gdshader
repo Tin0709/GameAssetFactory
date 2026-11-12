@@ -22,6 +22,7 @@ void fragment() {
 	}
 	ivec2 texel = ivec2(floor(fract(world_point.xz) * 16.0));
 	vec4 sample_data = texelFetch(packed_source, atlas_cell * 16 + texel, 0);
+	// Forest PIX material parameters. Sample the packed channels as linear data.
 	ALBEDO = sample_data.r * vec3(0.391573, 0.817068, 0.975842) + vec3(0.0, 0.013702, 0.024158);
 	vec2 normal_xy = sample_data.ba * 2.0 - 1.0;
 	NORMAL_MAP = vec3(normal_xy * 0.5 + 0.5, sqrt(max(1.0 - dot(normal_xy,normal_xy),0.0)) * 0.5 + 0.5);
