@@ -41,7 +41,7 @@ const ZOMBIE_GRAVITY := 50.0 # MD2 Overworld's default, converted from cm/s².
 const CURVED_GREATSWORD_FLIGHT_GRAVITY := 32.0
 const SABRE_FINISHER_GRAVITY_HOLD := 0.30
 const SABRE_FINISHER_HEAD_FRICTION := 0.70
-const SABRE_FINISHER_HEAD_BOUNCE := 0.30
+const DEATH_SOURCE_RESTITUTION := 0.30 # MD2 DefaultPhysicalMaterial.
 const DEATH_LANDING_BLEND_TIME := 0.20
 const DEATH_AIR_LINEAR_DAMP := 0.01 # SK_Zombie_PhysicsAsset body defaults.
 const DEATH_FLOOR_CONTACT_MARGIN := 0.02
@@ -365,6 +365,7 @@ func _update_death(delta: float) -> void:
 		return
 	var sabre_finisher := _death_strike == DeathStrike.SABRE_FINISHER
 	var curved := _death_strike == DeathStrike.CURVED_GREATSWORD
+	var source_rig := not ragdoll.source_joints.is_empty()
 	var flight_gravity := CURVED_GREATSWORD_FLIGHT_GRAVITY if curved else ZOMBIE_GRAVITY
 	if not ragdoll.running:
 		if ragdoll.sample_count < 2:
@@ -375,12 +376,14 @@ func _update_death(delta: float) -> void:
 			# The player uses layer 2, which the living controllers can stand on.
 			body.collision_layer = CORPSE_COLLISION_LAYER
 			body.collision_mask = LEVEL_COLLISION_MASK
+			if source_rig:
+				body.bounce = DEATH_SOURCE_RESTITUTION
 			mass += body.mass
 		if sabre_finisher:
 			# Start with MD2's default material values on the leading contact.
 			var head: PhysicalBone3D = ragdoll.bodies.Head
 			head.friction = SABRE_FINISHER_HEAD_FRICTION
-			head.bounce = SABRE_FINISHER_HEAD_BOUNCE
+			head.bounce = DEATH_SOURCE_RESTITUTION
 		var launch := _death_profile.duplicate() as DeathProfile
 		var angle := deg_to_rad(DEATH_LAUNCH_ANGLE)
 		var launch_impulse := _death_launch_speed(_death_strength) * mass
@@ -403,6 +406,10 @@ func _update_death(delta: float) -> void:
 		for body: PhysicalBone3D in ragdoll.bodies.values():
 			# Leave room for the floor impulse to roll the body over a limb.
 			body.set("maximum_angular_speed", DEATH_LANDING_ANGULAR_SPEED_LIMIT)
+			# The source material supplies the first impacts. Godot's resting
+			# contact phase uses an inelastic response to avoid repeated rebounds.
+			if source_rig:
+				body.bounce = 0.0
 	if _corpse_landed:
 		_update_landing_forces(delta, flight_gravity, sabre_finisher, contact.supports > 0)
 		_check_corpse_settled(delta, contact)
