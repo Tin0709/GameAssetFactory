@@ -15,6 +15,9 @@ const ZOOM_STEP := 1.15
 const SABRE_TAP_BUFFER := 0.16
 const CONTACT_LIGHT_DURATION := 0.17
 const HEAVY_SHAKE_DURATION := 0.20
+const FINISHER_SHAKE_INNER_RADIUS := 1.5
+const FINISHER_SHAKE_OUTER_RADIUS := 3.0
+const FINISHER_SHAKE_HEIGHT_FRACTION := 0.008
 
 var presentation: Node
 var _exposure: CompositorEffect
@@ -25,7 +28,6 @@ var _shake_serial := -1
 var _shake_age := 0.0
 var _shake_duration := 0.0
 var _shake_strength := 0.0
-var _shake_axis := Vector2.UP
 var _light_serial := -1
 var _light_remaining := 0.0
 var _light_peak := 0.0
@@ -116,9 +118,7 @@ func _process(delta: float) -> void:
 		_shake_age = minf(_shake_age + delta, _shake_duration)
 		var decay := 1.0 - _shake_age / _shake_duration
 		var pulse := cos(TAU * 15.0 * _shake_age) * decay * decay
-		var offset := _shake_axis * camera.size * _shake_strength * pulse
-		camera.h_offset = offset.x
-		camera.v_offset = offset.y
+		camera.h_offset = camera.size * _shake_strength * pulse
 	if _light_remaining > 0.0:
 		_light_remaining = maxf(0.0, _light_remaining - delta)
 		var decay := _light_remaining / CONTACT_LIGHT_DURATION
@@ -135,24 +135,27 @@ func _set_combat_audio(enabled: bool) -> void:
 func _on_sabre_contact(point: Vector3, direction: Vector3, clip: String, _index: int, serial: int, lethal: bool) -> void:
 	player.effects.contact(point, direction)
 	_combat_audio.contact(point, serial, lethal)
-	var heavy := clip in ["Attack3", "NativeFinisher", "AirAttack"]
+	var finisher := clip in ["Attack3", "NativeFinisher"]
 	if _light_serial != serial:
 		_light_serial = serial
-		_light_peak = 2.3 if heavy else 1.8
+		_light_peak = 2.3 if finisher or clip == "AirAttack" else 1.8
 		_light_remaining = CONTACT_LIGHT_DURATION
 		_impact_light.global_position = point
 		_impact_light.light_energy = _light_peak
 		_impact_light.show()
-	# Isolated basic melee captures showed no shake even on a kill.
-	# The heavier moves retain a bounded lab response until their profiles are measured.
-	if not heavy or _shake_serial == serial:
+	# Sabre_3 is the only grounded variant with a shake class. Its radius and
+	# non-oriented flag come from the row; the lab waveform is an approximation.
+	if not finisher or _shake_serial == serial:
+		return
+	var offset := point - player.global_position
+	var distance := Vector2(offset.x, offset.z).length()
+	var falloff := 1.0 - clampf(inverse_lerp(FINISHER_SHAKE_INNER_RADIUS, FINISHER_SHAKE_OUTER_RADIUS, distance), 0.0, 1.0)
+	if falloff <= 0.0:
 		return
 	_shake_serial = serial
-	_shake_strength = 0.008
+	_shake_strength = FINISHER_SHAKE_HEIGHT_FRACTION * falloff
 	_shake_age = 0.0
 	_shake_duration = HEAVY_SHAKE_DURATION
-	var screen_x := direction.dot(camera.basis.x)
-	_shake_axis = Vector2(-1.0 if screen_x < 0.0 else 1.0, 0.0)
 
 func _physics_process(_delta: float) -> void:
 	if player.position.y < -5.0:
