@@ -25,24 +25,25 @@ func run() -> void:
 		check(launch.value == 100.0 and gravity.value == 100.0, "Sliders start at the reference settings")
 		var baseline := await replay_combo(lab)
 		click_slider(launch, true)
-		check(launch.value == 200.0, "A pointer click can increase ragdoll launch to 200%")
+		check(launch.value == 1000.0, "A pointer click can increase ragdoll launch to 1000%")
 		var stronger := await replay_combo(lab)
 		launch.value = 100.0
 		click_slider(gravity, false)
 		check(gravity.value == 25.0, "A pointer click can reduce ragdoll gravity to 25%")
 		var lighter := await replay_combo(lab)
-		gravity.value = 200.0
+		click_slider(gravity, true)
+		check(gravity.value == 1000.0, "A pointer click can increase ragdoll gravity to 1000%")
 		var heavier := await replay_combo(lab)
 		check(baseline.health == [36, 22, 0] and stronger.health == baseline.health
 			and lighter.health == baseline.health and heavier.health == baseline.health,
 			"Every setting preserves all three actual Sabre damage events")
-		check(baseline.impulse.length() > 0.0 and stronger.impulse.is_equal_approx(baseline.impulse * 2.0)
+		check(baseline.impulse.length() > 0.0 and stronger.impulse.is_equal_approx(baseline.impulse * 10.0)
 			and lighter.impulse.is_equal_approx(baseline.impulse)
 			and heavier.impulse.is_equal_approx(baseline.impulse), "Only the launch slider changes the lethal impulse")
 		check(is_equal_approx(baseline.flight, -50.0) and is_equal_approx(stronger.flight, baseline.flight)
-			and is_equal_approx(lighter.flight, -12.5) and is_equal_approx(heavier.flight, -100.0),
+			and is_equal_approx(lighter.flight, -12.5) and is_equal_approx(heavier.flight, -500.0),
 			"Only the gravity slider changes the flight acceleration")
-		check(is_equal_approx(lighter.ground_scale, 0.25) and is_equal_approx(heavier.ground_scale, 2.0),
+		check(is_equal_approx(lighter.ground_scale, 0.25) and is_equal_approx(heavier.ground_scale, 10.0),
 			"The grounded ragdoll finishes its gravity blend at either setting")
 		print("RAGDOLL_TUNING flight=", [baseline.flight, stronger.flight, lighter.flight, heavier.flight],
 			" impulse=", [baseline.impulse.length(), stronger.impulse.length()],
